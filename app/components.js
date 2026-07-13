@@ -1,3 +1,35 @@
 import Link from "next/link";
-export function Header(){return <header className="siteHeader"><Link className="brand" href="/"><img src="/images/sandbagger-logo.png" alt="Sandbagger Invitational logo"/><div><strong>Sandbagger Invitational</strong><span>Established 2016</span></div></Link><nav><Link href="/live">Live</Link><Link href="/players">Players</Link><Link href="/history">History</Link><a href="/#cup">The Cup</a></nav></header>}
-export function Footer(){return <footer><div><strong>Sandbagger Invitational</strong><span>24 players. Two teams. One trophy.</span></div><span>Official tournament website · baggerinv.com</span></footer>}
+import Menu from "./Menu";
+
+export function Header() {
+  return (
+    <header className="siteHeader">
+      <Link href="/" className="brand">
+        <img
+          src="/images/sandbagger-logo.png"
+          alt="Sandbagger Invitational"
+        />
+
+        <div>
+          <strong>Sandbagger Invitational</strong>
+          <span>Established 2016</span>
+        </div>
+      </Link>
+
+      <Menu />
+    </header>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer>
+      <div>
+        <strong>Sandbagger Invitational</strong>
+        <span>24 Players • Two Teams • One Trophy</span>
+      </div>
+
+      <span>Official Tournament Website</span>
+    </footer>
+  );
+}
