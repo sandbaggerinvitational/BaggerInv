@@ -1,3 +1,57 @@
-import {Header,Footer} from "../components";
-const years=[["2016","Scottsdale"],["2017","Scottsdale"],["2018","Horseshoe Bay"],["2019","Tournament archive"],["2020","Tournament archive"],["2021","Tournament archive"],["2022","Tournament archive"],["2023","Tournament archive"],["2024","Tournament archive"],["2025","Bandon Dunes"]];
-export default function History(){return <main><Header/><section className="pageHero"><p className="eyebrow">Since 2016</p><h1>History of the Invitational</h1><p>Past teams, captains, host courses, champions, awards, and match records.</p></section><section className="section"><div className="timeline">{years.map(([y,l])=><article className="timelineItem" key={y}><div className="timelineYear">{y}</div><div><span>{l}</span><h2>Sandbagger Invitational</h2><p>Champion, roster, final score, awards, and photos will appear here.</p></div></article>)}</div></section><Footer/></main>}
+import Link from "next/link";
+import { Header, Footer } from "../components";
+import { getTournaments } from "../../lib/stats";
+import styles from "../historical.module.css";
+
+export const metadata = {
+  title: "History | Sandbagger Invitational",
+};
+
+export default function HistoryPage() {
+  const tournaments = getTournaments();
+
+  return (
+    <main>
+      <Header />
+
+      <section className={styles.pageHero}>
+        <p className={styles.eyebrow}>Since 2017</p>
+        <h1>Tournament History</h1>
+        <p>
+          Host destinations, team identities, champions, captains, courses, and awards.
+        </p>
+      </section>
+
+      <section className={styles.content}>
+        <div className={styles.timeline}>
+          {tournaments.map((tournament) => (
+            <article className={styles.yearCard} key={tournament.year}>
+              <div className={styles.yearNumber}>{tournament.year}</div>
+
+              <div>
+                <span className={styles.sectionLabel}>{tournament.Location}</span>
+                <h2>
+                  {tournament["Winning Team"] || "Upcoming Invitational"}
+                </h2>
+                <p>
+                  {tournament["Final Score"]
+                    ? `Final score: ${tournament["Final Score"]}`
+                    : "Teams and results to be announced."}
+                </p>
+              </div>
+
+              <Link
+                className={styles.yearLink}
+                href={`/history/${tournament.year}`}
+              >
+                View year →
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <Footer />
+    </main>
+  );
+}
