@@ -89,12 +89,12 @@ function buildSinglesMatch(row) {
 }
 
 export async function getTournamentData() {
-  const url =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
-    `?tqx=out:csv&gid=${WEBSITE_FEED_GID}`;
+const url =
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
+  `?tqx=out:csv&gid=${WEBSITE_FEED_GID}`;
 
   const response = await fetch(url, {
-    next: { revalidate: 30 },
+    cache: "no-store",
   });
 
   if (!response.ok) {
