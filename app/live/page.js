@@ -1,3 +1,18 @@
-import {Header,Footer} from "../components";
-const rounds=[["Round 1","2 vs. 2"],["Round 2","Scramble"],["Round 3","Singles"]];
-export default function Live(){return <main><Header/><section className="pageHero"><p className="eyebrow">Tournament Central</p><h1>Live Match Center</h1><p>This page will connect directly to your tournament Google Sheet.</p></section><section className="scoreBanner"><div><span>Team One</span><strong>0</strong></div><p>Overall Score</p><div><span>Team Two</span><strong>0</strong></div></section><section className="section"><div className="roundGrid">{rounds.map(([a,b])=><article className="roundCard" key={a}><span>{b}</span><h2>{a}</h2><p>Awaiting tournament data</p></article>)}</div><div className="placeholderPanel">Google Sheets connection comes next. Your existing matchups and leaderboard will populate this page automatically.</div></section><Footer/></main>}
+
+import { Header, Footer } from "../components";
+import MatchCenter from "./MatchCenter";
+
+export const metadata = {
+  title: "Live Match Center | Sandbagger Invitational",
+  description: "Round-by-round Sandbagger Invitational results and team scoring.",
+};
+
+export default function LivePage() {
+  return (
+    <main>
+      <Header />
+      <MatchCenter />
+      <Footer />
+    </main>
+  );
+}
