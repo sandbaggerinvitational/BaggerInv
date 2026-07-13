@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const menuLinks = [
   { label: "Home", href: "/" },
-  { label: "Live Match Center", href: "/live" },
+  { label: "Match Center", href: "/live" },
   { label: "Players", href: "/players" },
+  { label: "Records", href: "/records" },
   { label: "History", href: "/history" },
   { label: "The Cup", href: "/#cup" },
 ];
@@ -14,14 +15,17 @@ const menuLinks = [
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(false);
 
-  function closeMenu() {
-    setIsOpen(false);
-  }
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   return (
     <>
       <button
-        className="menuButton"
+        className={`menuButton ${isOpen ? "active" : ""}`}
         type="button"
         aria-label="Open navigation menu"
         aria-expanded={isOpen}
@@ -34,13 +38,10 @@ export default function Menu() {
 
       <div
         className={`menuBackdrop ${isOpen ? "show" : ""}`}
-        onClick={closeMenu}
+        onClick={() => setIsOpen(false)}
       />
 
-      <aside
-        className={`sideMenu ${isOpen ? "open" : ""}`}
-        aria-hidden={!isOpen}
-      >
+      <aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen}>
         <div className="sideMenuTop">
           <div>
             <strong>Sandbagger Invitational</strong>
@@ -51,15 +52,20 @@ export default function Menu() {
             className="closeMenuButton"
             type="button"
             aria-label="Close navigation menu"
-            onClick={closeMenu}
+            onClick={() => setIsOpen(false)}
           >
             ×
           </button>
         </div>
 
         <nav className="sideNav">
-          {menuLinks.map((link) => (
-            <Link key={link.href} href={link.href} onClick={closeMenu}>
+          {menuLinks.map((link, index) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+            >
+              <span>{String(index + 1).padStart(2, "0")}</span>
               {link.label}
             </Link>
           ))}
