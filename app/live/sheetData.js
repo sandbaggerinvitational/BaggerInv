@@ -1,5 +1,4 @@
-const SHEET_ID = "1bnXlkt4m-UHSW5MakrKsxt-UcAE-auDB5BT73kwNKUs";
-const WEBSITE_FEED_GID = "1051192073";
+
 
 function parseCsv(text) {
   const rows = [];
@@ -90,18 +89,20 @@ function buildSinglesMatch(row) {
 
 export async function getTournamentData() {
 const url =
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
-  `?tqx=out:csv&gid=${WEBSITE_FEED_GID}`;
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7pFJCpgdgWIKs6IG6_oHpxjqGmic8tTEaWh1IPZapPhIBctS8Rl30Cun9XHwfD0R7hJVuZd_fxzUy/pub?gid=1051192073&single=true&output=csv";
 
-  const response = await fetch(url, {
-    cache: "no-store",
-  });
+const response = await fetch(url, {
+  cache: "no-store",
+});
 
   if (!response.ok) {
     throw new Error(`Google Sheet request failed: ${response.status}`);
   }
 
   const csv = await response.text();
+  if (!csv || csv.trim().startsWith("<!DOCTYPE html")) {
+  throw new Error("Google returned HTML instead of CSV.");
+}
   const rows = parseCsv(csv);
 
   const statusPrimary = clean(rowAt(rows, 2)[1]);
