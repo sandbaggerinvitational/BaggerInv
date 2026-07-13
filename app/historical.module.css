@@ -1,0 +1,410 @@
+.pageHero {
+  padding: 78px 7vw 62px;
+  color: white;
+  background:
+    radial-gradient(circle at 82% 10%, rgba(212,177,95,.16), transparent 28%),
+    linear-gradient(120deg, #07271e, #0d4333);
+}
+
+.pageHero h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3.2rem, 8vw, 6.8rem);
+  line-height: .95;
+  letter-spacing: -.045em;
+}
+
+.pageHero p {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: #d8e3dd;
+  line-height: 1.7;
+}
+
+.eyebrow {
+  margin: 0 0 14px !important;
+  color: #d4b15f !important;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+.content {
+  padding: 58px 7vw 90px;
+  background: #fffdf8;
+}
+
+.notice {
+  margin-bottom: 30px;
+  padding: 16px 18px;
+  border-left: 4px solid #d4b15f;
+  border-radius: 10px;
+  background: #f5f0e6;
+  color: #5f665f;
+  line-height: 1.55;
+}
+
+.playerGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.playerCard {
+  padding: 22px;
+  border: 1px solid #ddd6c8;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 14px 36px rgba(15,35,25,.05);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.playerCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 44px rgba(15,35,25,.09);
+}
+
+.playerTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.playerTop h2 {
+  margin: 5px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+}
+
+.playerTop span,
+.sectionLabel {
+  color: #c9232d;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  font-size: .67rem;
+  font-weight: 800;
+}
+
+.activeBadge,
+.inactiveBadge {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: .65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.activeBadge {
+  color: #0b3529;
+  background: #dce9e3;
+}
+
+.inactiveBadge {
+  color: #666;
+  background: #efede7;
+}
+
+.statStrip {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #eee8dc;
+}
+
+.statStrip div {
+  padding: 16px 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.statStrip span,
+.kpi span,
+.formatCard span {
+  color: #6d746f;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .63rem;
+}
+
+.statStrip strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.profileHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 28px;
+  align-items: end;
+}
+
+.profileHeader h1 {
+  max-width: 900px;
+}
+
+.profileMeta {
+  text-align: right;
+  color: #d8e3dd;
+}
+
+.kpiGrid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.kpi {
+  min-height: 120px;
+  padding: 19px;
+  border: 1px solid #ddd6c8;
+  border-radius: 16px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.kpi strong {
+  margin-top: 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.85rem;
+}
+
+.section {
+  margin-top: 64px;
+}
+
+.section h2 {
+  margin: 7px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.formatGrid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.formatCard {
+  padding: 20px;
+  border: 1px solid #ddd6c8;
+  border-radius: 16px;
+  background: white;
+}
+
+.formatCard h3 {
+  margin: 8px 0 16px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.formatCard strong {
+  display: block;
+  font-size: 1.45rem;
+}
+
+.formatCard em {
+  display: block;
+  margin-top: 6px;
+  color: #6d746f;
+  font-style: normal;
+}
+
+.dataTable {
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid #ddd6c8;
+  border-radius: 17px;
+  background: white;
+}
+
+.tableRow {
+  padding: 16px 19px;
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, .7fr);
+  gap: 14px;
+  align-items: center;
+  border-bottom: 1px solid #eee8dc;
+}
+
+.tableRow:last-child {
+  border-bottom: 0;
+}
+
+.tableHead {
+  background: #0b3529;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .66rem;
+  font-weight: 800;
+}
+
+.simpleTable .tableRow {
+  grid-template-columns: 70px 1.5fr .8fr .8fr;
+}
+
+.recordSections {
+  display: grid;
+  gap: 52px;
+}
+
+.podium {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.podiumCard {
+  padding: 19px;
+  border: 1px solid #ddd6c8;
+  border-radius: 15px;
+  background: white;
+}
+
+.podiumCard b {
+  color: #c9232d;
+}
+
+.podiumCard h3 {
+  margin: 10px 0 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+}
+
+.podiumCard strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.7rem;
+}
+
+.timeline {
+  display: grid;
+}
+
+.yearCard {
+  padding: 28px 0;
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 28px;
+  align-items: center;
+  border-bottom: 1px solid #ddd6c8;
+}
+
+.yearNumber {
+  color: #c9232d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.5rem;
+}
+
+.yearCard h2 {
+  margin: 5px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.8rem;
+}
+
+.yearCard p {
+  margin: 0;
+  color: #6d746f;
+}
+
+.yearLink {
+  color: #0b3529;
+  font-weight: 800;
+}
+
+.tournamentGrid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.detailCard {
+  padding: 22px;
+  border: 1px solid #ddd6c8;
+  border-radius: 17px;
+  background: white;
+}
+
+.detailCard h2 {
+  margin: 0 0 16px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+}
+
+.detailList {
+  display: grid;
+  gap: 12px;
+}
+
+.detailList div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.detailList span {
+  color: #6d746f;
+}
+
+@media (max-width: 1000px) {
+  .playerGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .kpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .formatGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .podium {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .pageHero,
+  .content {
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
+
+  .playerGrid,
+  .kpiGrid,
+  .formatGrid,
+  .podium,
+  .tournamentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .profileHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .profileMeta {
+    text-align: left;
+  }
+
+  .dataTable {
+    overflow-x: auto;
+  }
+
+  .tableRow {
+    min-width: 620px;
+  }
+
+  .yearCard {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
