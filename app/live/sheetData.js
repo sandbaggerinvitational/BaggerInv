@@ -1,37 +1,69 @@
+const WEBSITE_FEED_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7pFJCpgdgWIKs6IG6_oHpxjqGmic8tTEaWh1IPZapPhIBctS8Rl30Cun9XHwfD0R7hJVuZd_fxzUy/pub?gid=1051192073&single=true&output=csv";
 
+const SHEET_ROWS = {
+  tournament: {
+    status: 2,
+    year: 3,
+    location: 4,
+    dates: 5,
+    teamOneName: 6,
+    teamOneScore: 7,
+    teamTwoName: 8,
+    teamTwoScore: 9,
+    currentRound: 10,
+  },
+  roundOne: { start: 14, end: 19 },
+  roundTwo: { start: 23, end: 28 },
+  roundThree: { start: 32, end: 43 },
+  leaderboard: { start: 48, end: 71 },
+};
 
-function parseCsv(text) {
+function parseCsv(csvText) {
   const rows = [];
-  let row = [];
-  let cell = "";
-  let quoted = false;
+  let currentRow = [];
+  let currentCell = "";
+  let insideQuotes = false;
 
-  for (let i = 0; i < text.length; i += 1) {
-    const char = text[i];
-    const next = text[i + 1];
+  for (let index = 0; index < csvText.length; index += 1) {
+    const character = csvText[index];
+    const nextCharacter = csvText[index + 1];
 
-    if (char === '"' && quoted && next === '"') {
-      cell += '"';
-      i += 1;
-    } else if (char === '"') {
-      quoted = !quoted;
-    } else if (char === "," && !quoted) {
-      row.push(cell);
-      cell = "";
-    } else if ((char === "\n" || char === "\r") && !quoted) {
-      if (char === "\r" && next === "\n") i += 1;
-      row.push(cell);
-      rows.push(row);
-      row = [];
-      cell = "";
-    } else {
-      cell += char;
+    if (character === '"' && insideQuotes && nextCharacter === '"') {
+      currentCell += '"';
+      index += 1;
+      continue;
     }
+
+    if (character === '"') {
+      insideQuotes = !insideQuotes;
+      continue;
+    }
+
+    if (character === "," && !insideQuotes) {
+      currentRow.push(currentCell);
+      currentCell = "";
+      continue;
+    }
+
+    if ((character === "\n" || character === "\r") && !insideQuotes) {
+      if (character === "\r" && nextCharacter === "\n") {
+        index += 1;
+      }
+
+      currentRow.push(currentCell);
+      rows.push(currentRow);
+      currentRow = [];
+      currentCell = "";
+      continue;
+    }
+
+    currentCell += character;
   }
 
-  if (cell.length || row.length) {
-    row.push(cell);
-    rows.push(row);
+  if (currentCell.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentCell);
+    rows.push(currentRow);
   }
 
   return rows;
@@ -41,119 +73,198 @@ function clean(value) {
   return String(value ?? "").trim();
 }
 
-function numberValue(value) {
-  const parsed = Number.parseFloat(clean(value));
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function splitPlayers(value) {
-  return clean(value)
-    .split("/")
-    .map((name) => name.trim())
-    .filter(Boolean);
+function toNumber(value) {
+  const number = Number.parseFloat(clean(value));
+  return Number.isFinite(number) ? number : 0;
 }
 
 function rowAt(rows, sheetRowNumber) {
   return rows[sheetRowNumber - 1] ?? [];
 }
 
+function splitPlayers(...values) {
+  return values
+    .flatMap((value) => clean(value).split("/"))
+    .map((name) => name.trim())
+    .filter(Boolean);
+}
+
+function normalizeWinner(value) {
+  const winner = clean(value).toLowerCase();
+
+  if (
+    winner === "team 1" ||
+    winner === "team1" ||
+    winner === "1" ||
+    winner === "the pickles"
+  ) {
+    return "Team 1";
+  }
+
+  if (
+    winner === "team 2" ||
+    winner === "team2" ||
+    winner === "2" ||
+    winner === "team lipp"
+  ) {
+    return "Team 2";
+  }
+
+  return "Halved";
+}
+
 function buildTeamMatch(row, roundLabel) {
-  if (!clean(row[0])) return null;
+  const matchNumber = clean(row[0]);
+
+  if (!matchNumber || matchNumber.toLowerCase() === "match") {
+    return null;
+  }
 
   return {
-    match: clean(row[0]),
+    match: matchNumber,
     round: roundLabel,
-    teamOnePlayers: splitPlayers(row[1]),
-    teamTwoPlayers: splitPlayers(row[2]),
-    frontWinner: clean(row[3]) || "Halved",
-    backWinner: clean(row[4]) || "Halved",
-    overallWinner: clean(row[5]) || "Halved",
-    teamOnePoints: numberValue(row[6]),
-    teamTwoPoints: numberValue(row[7]),
+    teamOnePlayers: splitPlayers(row[1], row[2]),
+    teamTwoPlayers: splitPlayers(row[3], row[4]),
+    frontWinner: normalizeWinner(row[5]),
+    backWinner: normalizeWinner(row[6]),
+    overallWinner: normalizeWinner(row[7]),
+    teamOnePoints: toNumber(row[8]),
+    teamTwoPoints: toNumber(row[9]),
   };
 }
 
 function buildSinglesMatch(row) {
-  if (!clean(row[0])) return null;
+  const matchNumber = clean(row[0]);
+
+  if (!matchNumber || matchNumber.toLowerCase() === "match") {
+    return null;
+  }
 
   return {
-    match: clean(row[0]),
+    match: matchNumber,
     round: "Round 3",
     teamOnePlayers: splitPlayers(row[1]),
     teamTwoPlayers: splitPlayers(row[2]),
-    overallWinner: clean(row[3]) || "Halved",
-    teamOnePoints: numberValue(row[5] ?? row[6]),
-    teamTwoPoints: numberValue(row[6] ?? row[7]),
+    overallWinner: normalizeWinner(row[3]),
+    teamOnePoints: toNumber(row[4]),
+    teamTwoPoints: toNumber(row[5]),
   };
+}
+
+function collectMatches(rows, range, builder) {
+  const matches = [];
+
+  for (
+    let sheetRowNumber = range.start;
+    sheetRowNumber <= range.end;
+    sheetRowNumber += 1
+  ) {
+    const match = builder(rowAt(rows, sheetRowNumber));
+    if (match) matches.push(match);
+  }
+
+  return matches;
+}
+
+function collectLeaderboard(rows) {
+  const players = [];
+
+  for (
+    let sheetRowNumber = SHEET_ROWS.leaderboard.start;
+    sheetRowNumber <= SHEET_ROWS.leaderboard.end;
+    sheetRowNumber += 1
+  ) {
+    const row = rowAt(rows, sheetRowNumber);
+    const rank = clean(row[0]);
+    const player = clean(row[1]);
+
+    if (!rank || !player || rank.toLowerCase() === "rank") {
+      continue;
+    }
+
+    players.push({
+      rank,
+      player,
+      team: clean(row[2]),
+      total: toNumber(row[3]),
+    });
+  }
+
+  return players;
+}
+
+function validateCsv(csvText) {
+  const trimmed = csvText.trim();
+
+  if (!trimmed) {
+    throw new Error("Google returned an empty CSV response.");
+  }
+
+  if (
+    trimmed.startsWith("<!DOCTYPE html") ||
+    trimmed.startsWith("<html") ||
+    trimmed.includes("<script")
+  ) {
+    throw new Error("Google returned HTML instead of CSV.");
+  }
+
+  if (trimmed.includes("window.ppConfig") || trimmed.includes("disableAllReporting")) {
+    throw new Error("Google returned a security script instead of CSV.");
+  }
 }
 
 export async function getTournamentData() {
-const url =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7pFJCpgdgWIKs6IG6_oHpxjqGmic8tTEaWh1IPZapPhIBctS8Rl30Cun9XHwfD0R7hJVuZd_fxzUy/pub?gid=1051192073&single=true&output=csv";
-
-const response = await fetch(url, {
-  cache: "no-store",
-});
+  const response = await fetch(WEBSITE_FEED_CSV_URL, {
+    cache: "no-store",
+  });
 
   if (!response.ok) {
-    throw new Error(`Google Sheet request failed: ${response.status}`);
+    throw new Error(`Google Sheet request failed with status ${response.status}.`);
   }
 
-  const csv = await response.text();
-  if (!csv || csv.trim().startsWith("<!DOCTYPE html")) {
-  throw new Error("Google returned HTML instead of CSV.");
-}
-  const rows = parseCsv(csv);
+  const csvText = await response.text();
+  validateCsv(csvText);
 
-  const statusPrimary = clean(rowAt(rows, 2)[1]);
-  const statusSecondary = clean(rowAt(rows, 6)[1]);
+  const rows = parseCsv(csvText);
+  const tournamentRows = SHEET_ROWS.tournament;
 
   const tournament = {
-    status: statusSecondary || statusPrimary || "Offseason",
-    year: clean(rowAt(rows, 3)[1]) || "2026",
-    location: clean(rowAt(rows, 4)[1]) || "Kiawah Island, SC",
-    dates: clean(rowAt(rows, 5)[1]) || "",
-    currentRound: clean(rowAt(rows, 11)[1]) || "Round 1",
+    status: clean(rowAt(rows, tournamentRows.status)[1]) || "Offseason",
+    year: clean(rowAt(rows, tournamentRows.year)[1]) || "2026",
+    location:
+      clean(rowAt(rows, tournamentRows.location)[1]) || "Kiawah Island, SC",
+    dates: clean(rowAt(rows, tournamentRows.dates)[1]),
+    currentRound:
+      clean(rowAt(rows, tournamentRows.currentRound)[1]) || "Round 1",
     teamOne: {
-      name: clean(rowAt(rows, 7)[1]) || "Team One",
-      score: numberValue(rowAt(rows, 8)[1]),
+      name:
+        clean(rowAt(rows, tournamentRows.teamOneName)[1]) || "Team One",
+      score: toNumber(rowAt(rows, tournamentRows.teamOneScore)[1]),
     },
     teamTwo: {
-      name: clean(rowAt(rows, 9)[1]) || "Team Two",
-      score: numberValue(rowAt(rows, 10)[1]),
+      name:
+        clean(rowAt(rows, tournamentRows.teamTwoName)[1]) || "Team Two",
+      score: toNumber(rowAt(rows, tournamentRows.teamTwoScore)[1]),
     },
   };
 
-  const roundOne = [];
-  for (let rowNumber = 15; rowNumber <= 20; rowNumber += 1) {
-    const match = buildTeamMatch(rowAt(rows, rowNumber), "Round 1");
-    if (match) roundOne.push(match);
-  }
+  const roundOne = collectMatches(
+    rows,
+    SHEET_ROWS.roundOne,
+    (row) => buildTeamMatch(row, "Round 1")
+  );
 
-  const roundTwo = [];
-  for (let rowNumber = 24; rowNumber <= 29; rowNumber += 1) {
-    const match = buildTeamMatch(rowAt(rows, rowNumber), "Round 2");
-    if (match) roundTwo.push(match);
-  }
+  const roundTwo = collectMatches(
+    rows,
+    SHEET_ROWS.roundTwo,
+    (row) => buildTeamMatch(row, "Round 2")
+  );
 
-  const roundThree = [];
-  for (let rowNumber = 33; rowNumber <= 44; rowNumber += 1) {
-    const match = buildSinglesMatch(rowAt(rows, rowNumber));
-    if (match) roundThree.push(match);
-  }
-
-  const leaderboard = [];
-  for (let rowNumber = 49; rowNumber <= 72; rowNumber += 1) {
-    const row = rowAt(rows, rowNumber);
-    if (!clean(row[0]) || !clean(row[1])) continue;
-
-    leaderboard.push({
-      rank: clean(row[0]),
-      player: clean(row[1]),
-      team: clean(row[2]),
-      total: numberValue(row[3]),
-    });
-  }
+  const roundThree = collectMatches(
+    rows,
+    SHEET_ROWS.roundThree,
+    buildSinglesMatch
+  );
 
   return {
     tournament,
@@ -177,7 +288,7 @@ const response = await fetch(url, {
         matches: roundThree,
       },
     },
-    leaderboard,
+    leaderboard: collectLeaderboard(rows),
     updatedAt: new Date().toISOString(),
   };
 }
