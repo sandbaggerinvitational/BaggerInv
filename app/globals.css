@@ -476,14 +476,17 @@ h2 {
   justify-content: space-between;
 }
 
-.yearCard span {
+.yearCard strong {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 2.1rem;
+  line-height: 1;
+  color: var(--ink);
 }
 
-.yearCard strong {
+.yearCard span {
   color: var(--muted);
   font-size: 0.82rem;
+  font-weight: 700;
 }
 
 footer {
@@ -594,16 +597,5 @@ footer span {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-  .historyYearCard {
-  min-height: 220px;
-  padding: 28px 24px;
-  border: 1px solid #ddd6c8;
-  border-radius: 20px;
-  background: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-decoration: none;
-  color: #10251c;
-}
+
 }
