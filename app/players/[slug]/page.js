@@ -105,6 +105,7 @@ export default async function PlayerPage({ params }) {
           <div className={`${styles.dataTable} ${styles.simpleTable}`}>
             <div className={`${styles.tableRow} ${styles.tableHead}`}>
               <span>Year</span>
+              <span>Team</span>
               <span>Record</span>
               <span>Points</span>
               <span>Championship</span>
@@ -113,11 +114,10 @@ export default async function PlayerPage({ params }) {
             {stats.seasons.map((season) => (
               <div className={styles.tableRow} key={season.year}>
                 <strong>{season.year}</strong>
+                <span className={styles.teamBadge}>{season.teamName}</span>
                 <span>{formatRecord(season.overall)}</span>
                 <span>{season.overall.points}</span>
-                <strong>
-                  {stats.championships.includes(season.year) ? "Yes" : "—"}
-                </strong>
+                <strong>{stats.championships.includes(season.year) ? "🏆" : "—"}</strong>
               </div>
             ))}
           </div>
