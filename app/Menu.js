@@ -45,7 +45,7 @@ export default function Menu() {
         <div className="sideMenuTop">
           <div>
             <strong>Sandbagger Invitational</strong>
-            <span>Established 2016</span>
+            <span>Established 2017</span>
           </div>
 
           <button
