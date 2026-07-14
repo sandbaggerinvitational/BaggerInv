@@ -585,4 +585,12 @@ footer span {
   gap: 0;
   font-size: 1.18rem;
 }
+  .historyLocation {
+  margin: 10px 0 20px;
+  color: #8a6a24;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 }
