@@ -437,3 +437,13 @@
 .teamBadge { display: inline-flex; width: fit-content; padding: 7px 10px; border-radius: 999px; background: #f1ecdf; color: #3f473f; font-size: .78rem; font-weight: 800; }
 .simpleTable .tableRow { grid-template-columns: 70px 1.5fr .9fr .7fr .8fr; }
 @media (max-width: 650px) { .championshipLine strong { font-size: .78rem; } .simpleTable .tableRow { min-width: 760px; } }
+
+.profileChampionshipLine {
+  margin-top: 12px;
+}
+
+.profileChampionshipLine strong {
+  color: #d4b15f;
+  font-size: 1rem;
+  line-height: 1.4;
+}
