@@ -71,16 +71,11 @@ export default async function TournamentYearPage({ params }) {
           </div>
 
           <div className={styles.detailCard}>
-            <h2>Team Names</h2>
-            <div className={styles.detailList}>
-              <div>
-                <span>Team 1</span>
-                <strong>{tournament.teams?.["Team 1"] || "TBA"}</strong>
-              </div>
-              <div>
-                <span>Team 2</span>
-                <strong>{tournament.teams?.["Team 2"] || "TBA"}</strong>
-              </div>
+            <h2>Competing Teams</h2>
+            <div className={styles.teamMatchup}>
+              <strong>{tournament.teams?.["Team 1"] || "TBA"}</strong>
+              <span>vs.</span>
+              <strong>{tournament.teams?.["Team 2"] || "TBA"}</strong>
             </div>
           </div>
 
