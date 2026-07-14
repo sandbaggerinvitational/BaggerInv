@@ -37,6 +37,12 @@ export default async function PlayerPage({ params }) {
     ["SI", getFormatName("SI")],
   ];
 
+  const compareHref = biggestRival
+    ? `/compare?player1=${encodeURIComponent(
+        player["Player ID"]
+      )}&player2=${encodeURIComponent(biggestRival.player["Player ID"])}`
+    : "/compare";
+
   return (
     <main>
       <Header />
@@ -124,7 +130,7 @@ export default async function PlayerPage({ params }) {
                 <strong>{formatRecord(biggestRival.record)}</strong>
               </div>
 
-              <Link className={styles.rivalCompareLink} href="/compare">
+              <Link className={styles.rivalCompareLink} href={compareHref}>
                 Compare players →
               </Link>
             </div>
