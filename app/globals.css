@@ -576,6 +576,7 @@ footer span {
 
   .yearGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
   }
 
   .sideMenu {
@@ -592,5 +593,17 @@ footer span {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+  .historyYearCard {
+  min-height: 220px;
+  padding: 28px 24px;
+  border: 1px solid #ddd6c8;
+  border-radius: 20px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #10251c;
 }
 }
