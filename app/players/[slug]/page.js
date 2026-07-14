@@ -60,7 +60,10 @@ export default async function PlayerPage({ params }) {
 
 <div className={styles.profileMeta}>
   {player["First Year"]}–{player.active ? "Present" : player["Last Year"]}
+  </div>
 </div>
+    </section>
+    
 
       <section className={styles.content}>
         <div className={styles.notice}>
