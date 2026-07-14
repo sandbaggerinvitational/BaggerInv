@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import {
@@ -27,6 +28,8 @@ export default async function PlayerPage({ params }) {
   if (!player) notFound();
 
   const stats = getPlayerStats(player["Player ID"]);
+  const biggestRival = stats.opponents[0] ?? null;
+
   const formats = [
     ["overall", "Overall"],
     ["BB", getFormatName("BB")],
@@ -41,29 +44,29 @@ export default async function PlayerPage({ params }) {
       <section className={styles.pageHero}>
         <div className={styles.profileHeader}>
           <div>
-  <p className={styles.eyebrow}>
-    {stats.championships.length
-      ? "Bagger Champion"
-      : "Sandbagger Competitor"}
-  </p>
+            <p className={styles.eyebrow}>
+              {stats.championships.length
+                ? "Bagger Champion"
+                : "Sandbagger Competitor"}
+            </p>
 
-  <h1>{player["Display Name"]}</h1>
+            <h1>{player["Display Name"]}</h1>
 
-  <div className={styles.profileChampionshipLine}>
-    <strong>
-      {stats.championships.length
-        ? stats.championships.join(" • ")
-        : "Still Chasing the Cup"}
-    </strong>
-  </div>
-</div>
+            <div className={styles.profileChampionshipLine}>
+              <strong>
+                {stats.championships.length
+                  ? stats.championships.join(" • ")
+                  : "Still Chasing the Cup"}
+              </strong>
+            </div>
+          </div>
 
-<div className={styles.profileMeta}>
-  {player["First Year"]}–{player.active ? "Present" : player["Last Year"]}
-  </div>
-</div>
-    </section>
-    
+          <div className={styles.profileMeta}>
+            {player["First Year"]}–
+            {player.active ? "Present" : player["Last Year"]}
+          </div>
+        </div>
+      </section>
 
       <section className={styles.content}>
         <div className={styles.notice}>
@@ -76,23 +79,61 @@ export default async function PlayerPage({ params }) {
             <span>Career Record</span>
             <strong>{formatRecord(stats.records.overall)}</strong>
           </div>
+
           <div className={styles.kpi}>
             <span>Career Points</span>
             <strong>{stats.records.overall.points}</strong>
           </div>
+
           <div className={styles.kpi}>
             <span>Point Win %</span>
             <strong>{formatPercentage(stats.percentages.overall)}</strong>
           </div>
+
           <div className={styles.kpi}>
             <span>Tracked Appearances</span>
             <strong>{stats.appearances.length}</strong>
           </div>
+
           <div className={styles.kpi}>
-            <span>Tracked Championships</span>
+            <span>Bagger Championships</span>
             <strong>{stats.championships.length}</strong>
           </div>
         </div>
+
+        <section className={styles.rivalSpotlight}>
+          <div>
+            <span className={styles.sectionLabel}>Most-Faced Opponent</span>
+            <h2>Biggest Rival</h2>
+          </div>
+
+          {biggestRival ? (
+            <div className={styles.rivalProfileCard}>
+              <div>
+                <span>Rival</span>
+                <strong>{biggestRival.player["Display Name"]}</strong>
+              </div>
+
+              <div>
+                <span>Meetings</span>
+                <strong>{biggestRival.record.matches}</strong>
+              </div>
+
+              <div>
+                <span>Head-to-Head</span>
+                <strong>{formatRecord(biggestRival.record)}</strong>
+              </div>
+
+              <Link className={styles.rivalCompareLink} href="/compare">
+                Compare players →
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.rivalEmpty}>
+              Not enough recorded match history to determine a rival.
+            </div>
+          )}
+        </section>
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Format Breakdown</span>
@@ -129,7 +170,9 @@ export default async function PlayerPage({ params }) {
                 <span className={styles.teamBadge}>{season.teamName}</span>
                 <span>{formatRecord(season.overall)}</span>
                 <span>{season.overall.points}</span>
-                <strong>{stats.championships.includes(season.year) ? "🏆" : "—"}</strong>
+                <strong>
+                  {stats.championships.includes(season.year) ? "🏆" : "—"}
+                </strong>
               </div>
             ))}
           </div>
