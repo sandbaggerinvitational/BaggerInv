@@ -59,13 +59,12 @@ export default function Menu() {
         </div>
 
         <nav className="sideNav">
-          {menuLinks.map((link, index) => (
+          {menuLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setIsOpen(false)}
             >
-              <span>{String(index + 1).padStart(2, "0")}</span>
               {link.label}
             </Link>
           ))}
