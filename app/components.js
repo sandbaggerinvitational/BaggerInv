@@ -12,7 +12,7 @@ export function Header() {
 
         <div>
           <strong>Sandbagger Invitational</strong>
-          <span>Established 2016</span>
+          <span>Established 2017</span>
         </div>
       </Link>
 
