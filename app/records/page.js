@@ -41,8 +41,7 @@ export default function RecordsPage() {
         <p className={styles.eyebrow}>The Record Book</p>
         <h1>Records</h1>
         <p>
-          Detailed match records and format leaderboards cover the tracking era
-          beginning with the 2020 Sandbagger Invitational.
+          Detailed match records and format leaderboards cover the tracking era beginning with the 2020 Sandbagger Invitational. Records leaderboards require at least five tracked tournament appearances.
         </p>
       </section>
 
@@ -61,7 +60,7 @@ export default function RecordsPage() {
           />
 
           <LeaderSection
-            title="Tracked Championships"
+            title="Bagger Championships"
             rows={records.championships}
             value={(stats) => stats.championships.length}
           />
