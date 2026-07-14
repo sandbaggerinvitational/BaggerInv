@@ -75,7 +75,7 @@
 .playerTop h2 {
   margin: 5px 0 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.45rem;
+  font-size: 1.28rem;
 }
 
 .playerTop span,
@@ -181,7 +181,7 @@
 .section h2 {
   margin: 7px 0 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
 }
 
 .formatGrid {
@@ -276,12 +276,12 @@
 .podiumCard h3 {
   margin: 10px 0 5px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
 }
 
 .podiumCard strong {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.7rem;
+  font-size: 1.48rem;
 }
 
 .timeline {
@@ -407,4 +407,26 @@
     grid-template-columns: 1fr;
     gap: 8px;
   }
+}
+
+.teamMatchup {
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.teamMatchup strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.35rem, 4vw, 2rem);
+  line-height: 1.15;
+}
+
+.teamMatchup span {
+  color: #c9232d;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: .68rem;
+  font-weight: 800;
 }
