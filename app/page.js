@@ -10,7 +10,7 @@ export default function Home() {
         <div className="kiawahOverlay" />
 
         <div className="kiawahHeroContent">
-          <p className="eyebrow">11th Annual Sandbagger Invitational</p>
+          <p className="eyebrow">10th Annual Sandbagger Invitational</p>
           <h1>Kiawah Island</h1>
           <p className="heroDate">September 25–26, 2026</p>
           <p className="heroIntro">
