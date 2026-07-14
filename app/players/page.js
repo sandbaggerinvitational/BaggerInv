@@ -11,15 +11,15 @@ function ChampionshipLine({ years }) {
   if (!years.length) {
     return (
       <div className={styles.championshipLine}>
-        <span>Bagger Competitor</span>
-        <strong>Seeking first championship</strong>
+        <span>Sandbagger Competitor</span>
+        <strong>Still Chasing the Cup</strong>
       </div>
     );
   }
 
   return (
     <div className={styles.championshipLine}>
-      <span>{years.length > 1 ? "Multi-Time Bagger Champion" : "Bagger Champion"}</span>
+      <span>Bagger Champion</span>
       <strong>{years.join(" • ")}</strong>
     </div>
   );
