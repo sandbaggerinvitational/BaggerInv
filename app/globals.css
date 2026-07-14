@@ -581,4 +581,8 @@ footer span {
   .sideMenu {
     width: 100vw;
   }
+  .sideNav a {
+  gap: 0;
+  font-size: 1.18rem;
+}
 }
