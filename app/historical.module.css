@@ -431,12 +431,41 @@
   font-weight: 800;
 }
 
-.championshipLine { margin-top: 9px; display: flex; flex-direction: column; gap: 4px; }
-.championshipLine span { color: #8a6a24; text-transform: uppercase; letter-spacing: .09em; font-size: .62rem; font-weight: 800; }
-.championshipLine strong { color: #5f665f; font-size: .82rem; line-height: 1.35; }
-.teamBadge { display: inline-flex; width: fit-content; padding: 7px 10px; border-radius: 999px; background: #f1ecdf; color: #3f473f; font-size: .78rem; font-weight: 800; }
-.simpleTable .tableRow { grid-template-columns: 70px 1.5fr .9fr .7fr .8fr; }
-@media (max-width: 650px) { .championshipLine strong { font-size: .78rem; } .simpleTable .tableRow { min-width: 760px; } }
+.championshipLine {
+  margin-top: 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.championshipLine span {
+  color: #8a6a24;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.championshipLine strong {
+  color: #5f665f;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.teamBadge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #f1ecdf;
+  color: #3f473f;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.simpleTable .tableRow {
+  grid-template-columns: 70px 1.5fr 0.9fr 0.7fr 0.8fr;
+}
 
 .profileChampionshipLine {
   margin-top: 12px;
@@ -446,4 +475,14 @@
   color: #d4b15f;
   font-size: 1rem;
   line-height: 1.4;
+}
+
+@media (max-width: 650px) {
+  .championshipLine strong {
+    font-size: 0.78rem;
+  }
+
+  .simpleTable .tableRow {
+    min-width: 760px;
+  }
 }
