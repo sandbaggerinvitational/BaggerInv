@@ -439,3 +439,96 @@
 @media (max-width: 650px) { .championshipLine strong { font-size: .78rem; } .simpleTable .tableRow { min-width: 760px; } }
 
 .rivalLine{margin-top:18px;padding-top:16px;border-top:1px solid #eee8dc;display:flex;flex-direction:column;gap:4px}.rivalLine span{color:#c9232d;text-transform:uppercase;letter-spacing:.09em;font-size:.62rem;font-weight:800}.rivalLine strong{color:#172019;font-family:Georgia,"Times New Roman",serif;font-size:1rem;line-height:1.25}.rivalLine small{color:#6d746f;font-size:.74rem}
+
+/* Player-profile championship line */
+.profileChampionshipLine {
+  margin-top: 12px;
+}
+
+.profileChampionshipLine strong {
+  color: #d4b15f;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Biggest-rival spotlight on individual player profiles */
+.rivalSpotlight {
+  margin-top: 44px;
+}
+
+.rivalSpotlight h2 {
+  margin: 7px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.rivalProfileCard {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid #ddd6c8;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 14px 36px rgba(15, 35, 25, 0.05);
+  display: grid;
+  grid-template-columns: 1.4fr 0.7fr 0.9fr auto;
+  gap: 20px;
+  align-items: center;
+}
+
+.rivalProfileCard > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rivalProfileCard span {
+  color: #6d746f;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.63rem;
+  font-weight: 800;
+}
+
+.rivalProfileCard strong {
+  color: #172019;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+}
+
+.rivalCompareLink {
+  color: #0b3529;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.rivalEmpty {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px dashed #c8c1b4;
+  border-radius: 18px;
+  color: #6d746f;
+  background: #fff;
+}
+
+@media (max-width: 760px) {
+  .rivalProfileCard {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rivalProfileCard > div:first-child,
+  .rivalCompareLink {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .rivalProfileCard {
+    grid-template-columns: 1fr;
+  }
+
+  .rivalProfileCard > div:first-child,
+  .rivalCompareLink {
+    grid-column: auto;
+  }
+}
