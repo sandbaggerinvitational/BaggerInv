@@ -137,25 +137,33 @@ export default function Home() {
         </div>
 
         <div className="yearGrid">
-          {[
-            "2016",
-            "2017",
-            "2018",
-            "2019",
-            "2020",
-            "2021",
-            "2022",
-            "2023",
-            "2024",
-            "2025",
-            "2026",
-          ].map((year) => (
-            <Link href="/history" className="yearCard" key={year}>
-              <span>{year}</span>
-              <strong>View tournament</strong>
-            </Link>
-          ))}
-        </div>
+  {[
+    { year: "2017", location: "Scottsdale, AZ" },
+    { year: "2018", location: "Horseshoe Bay, TX" },
+    { year: "2019", location: "Beaver Creek, CO" },
+    { year: "2020", location: "Traverse City, MI" },
+    { year: "2021", location: "Big Cedar Lodge, MO" },
+    { year: "2022", location: "Pinehurst, NC" },
+    { year: "2023", location: "French Lick, IN" },
+    { year: "2024", location: "Sand Valley, WI" },
+    { year: "2025", location: "Bandon Dunes, OR" },
+    { year: "2026", location: "Kiawah Island, SC" },
+  ].map((tournament) => (
+    <Link
+      key={tournament.year}
+      href={`/history/${tournament.year}`}
+      className="historyYearCard"
+    >
+      <strong>{tournament.year}</strong>
+
+      <p className="historyLocation">
+        {tournament.location}
+      </p>
+
+      <span>View tournament</span>
+    </Link>
+  ))}
+</div>
       </section>
 
       <Footer />
