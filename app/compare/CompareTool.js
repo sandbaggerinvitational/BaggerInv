@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import styles from "./compare.module.css";
 
 const formatRecord = (record) =>
@@ -15,17 +14,20 @@ function validPlayerId(players, requestedId) {
     : "";
 }
 
-export default function CompareTool({ players, headToHead }) {
-  const searchParams = useSearchParams();
-
+export default function CompareTool({
+  players,
+  headToHead,
+  initialPlayerOne = "",
+  initialPlayerTwo = "",
+}) {
   const requestedOne = validPlayerId(
     players,
-    searchParams.get("player1") ?? ""
+    initialPlayerOne
   );
 
   const requestedTwo = validPlayerId(
     players,
-    searchParams.get("player2") ?? ""
+    initialPlayerTwo
   );
 
   const defaultOne = requestedOne || players[0]?.id || "";
@@ -69,7 +71,9 @@ export default function CompareTool({ players, headToHead }) {
     setOneId(value);
 
     if (value === twoId) {
-      const replacement = players.find((player) => player.id !== value);
+      const replacement = players.find(
+        (player) => player.id !== value
+      );
       setTwoId(replacement?.id ?? "");
     }
   }
@@ -78,7 +82,9 @@ export default function CompareTool({ players, headToHead }) {
     setTwoId(value);
 
     if (value === oneId) {
-      const replacement = players.find((player) => player.id !== value);
+      const replacement = players.find(
+        (player) => player.id !== value
+      );
       setOneId(replacement?.id ?? "");
     }
   }
@@ -89,7 +95,8 @@ export default function CompareTool({ players, headToHead }) {
         <p>HEAD TO HEAD</p>
         <h1>Compare Players</h1>
         <span>
-          Select any two Sandbaggers and compare careers and direct meetings.
+          Select any two Sandbaggers and compare careers and direct
+          meetings.
         </span>
       </section>
 
@@ -99,7 +106,9 @@ export default function CompareTool({ players, headToHead }) {
             Player One
             <select
               value={oneId}
-              onChange={(event) => changePlayerOne(event.target.value)}
+              onChange={(event) =>
+                changePlayerOne(event.target.value)
+              }
             >
               {players.map((player) => (
                 <option key={player.id} value={player.id}>
@@ -115,7 +124,9 @@ export default function CompareTool({ players, headToHead }) {
             Player Two
             <select
               value={twoId}
-              onChange={(event) => changePlayerTwo(event.target.value)}
+              onChange={(event) =>
+                changePlayerTwo(event.target.value)
+              }
             >
               {players.map((player) => (
                 <option key={player.id} value={player.id}>
@@ -137,11 +148,27 @@ export default function CompareTool({ players, headToHead }) {
             <div className={styles.comparisonGrid}>
               {[
                 ["Sandbagger Rating", one.rating, two.rating],
-                ["Career Record", formatRecord(one.record), formatRecord(two.record)],
-                ["Point Win %", formatPct(one.percentage), formatPct(two.percentage)],
+                [
+                  "Career Record",
+                  formatRecord(one.record),
+                  formatRecord(two.record),
+                ],
+                [
+                  "Point Win %",
+                  formatPct(one.percentage),
+                  formatPct(two.percentage),
+                ],
                 ["Career Points", one.points, two.points],
-                ["Bagger Championships", one.championships, two.championships],
-                ["Tracked Appearances", one.appearances, two.appearances],
+                [
+                  "Bagger Championships",
+                  one.championships,
+                  two.championships,
+                ],
+                [
+                  "Tracked Appearances",
+                  one.appearances,
+                  two.appearances,
+                ],
               ].map(([label, firstValue, secondValue]) => (
                 <div className={styles.statRow} key={label}>
                   <strong>{firstValue}</strong>
@@ -160,7 +187,9 @@ export default function CompareTool({ players, headToHead }) {
                   : "No direct meetings"}
               </h2>
 
-              <p>Record shown from {one.name}&apos;s perspective.</p>
+              <p>
+                Record shown from {one.name}&apos;s perspective.
+              </p>
 
               {h2h?.overall.matches ? (
                 <div className={styles.formatRows}>
@@ -171,7 +200,9 @@ export default function CompareTool({ players, headToHead }) {
                   ].map(([label, format]) => (
                     <div key={format}>
                       <span>{label}</span>
-                      <strong>{formatRecord(h2h.byFormat[format])}</strong>
+                      <strong>
+                        {formatRecord(h2h.byFormat[format])}
+                      </strong>
                     </div>
                   ))}
                 </div>
@@ -179,7 +210,9 @@ export default function CompareTool({ players, headToHead }) {
             </div>
           </>
         ) : (
-          <div className={styles.empty}>Choose two different players.</div>
+          <div className={styles.empty}>
+            Choose two different players.
+          </div>
         )}
       </section>
     </>
