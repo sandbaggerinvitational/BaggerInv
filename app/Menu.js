@@ -7,6 +7,8 @@ const menuLinks = [
   { label: "Home", href: "/" },
   { label: "Match Center", href: "/live" },
   { label: "Players", href: "/players" },
+  { label: "Compare Players", href: "/compare" },
+  { label: "Sandbagger Ratings", href: "/ratings" },
   { label: "Records", href: "/records" },
   { label: "History", href: "/history" },
   { label: "The Cup", href: "/#cup" },
@@ -45,7 +47,7 @@ export default function Menu() {
         <div className="sideMenuTop">
           <div>
             <strong>Sandbagger Invitational</strong>
-            <span>Established 2017</span>
+            <span>Established 2016</span>
           </div>
 
           <button
