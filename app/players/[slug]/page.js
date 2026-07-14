@@ -41,17 +41,26 @@ export default async function PlayerPage({ params }) {
       <section className={styles.pageHero}>
         <div className={styles.profileHeader}>
           <div>
-            <p className={styles.eyebrow}>
-              {player.active ? "Active Player" : "Tournament Alumni"}
-            </p>
-            <h1>{player["Display Name"]}</h1>
-          </div>
+  <p className={styles.eyebrow}>
+    {stats.championships.length
+      ? "Bagger Champion"
+      : "Sandbagger Competitor"}
+  </p>
 
-          <div className={styles.profileMeta}>
-            {player["First Year"]}–{player.active ? "Present" : player["Last Year"]}
-          </div>
-        </div>
-      </section>
+  <h1>{player["Display Name"]}</h1>
+
+  <div className={styles.profileChampionshipLine}>
+    <strong>
+      {stats.championships.length
+        ? stats.championships.join(" • ")
+        : "Still Chasing the Cup"}
+    </strong>
+  </div>
+</div>
+
+<div className={styles.profileMeta}>
+  {player["First Year"]}–{player.active ? "Present" : player["Last Year"]}
+</div>
 
       <section className={styles.content}>
         <div className={styles.notice}>
