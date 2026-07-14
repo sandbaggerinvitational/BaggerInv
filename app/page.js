@@ -152,7 +152,7 @@ export default function Home() {
     <Link
       key={tournament.year}
       href={`/history/${tournament.year}`}
-      className="YearCard"
+      className="yearCard"
     >
       <strong>{tournament.year}</strong>
 
