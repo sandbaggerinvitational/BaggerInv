@@ -4,7 +4,7 @@ import { getTournaments } from "../../lib/stats";
 import styles from "../historical.module.css";
 
 export const metadata = {
-  title: "History | Sandbagger Invitational",
+  title: "History | The Sandbagger Invitational",
 };
 
 export default function HistoryPage() {
@@ -15,38 +15,34 @@ export default function HistoryPage() {
       <Header />
 
       <section className={styles.pageHero}>
-        <p className={styles.eyebrow}>Since 2017</p>
+        <p className={styles.eyebrow}>The Complete Archive</p>
         <h1>Tournament History</h1>
         <p>
-          Host destinations, team identities, champions, captains, courses, and awards.
+          Every destination, course, team, captain, champion, and award
+          from The Sandbagger Invitational.
         </p>
       </section>
 
       <section className={styles.content}>
-        <div className={styles.timeline}>
+        <div className={styles.historyCardGrid}>
           {tournaments.map((tournament) => (
-            <article className={styles.yearCard} key={tournament.year}>
-              <div className={styles.yearNumber}>{tournament.year}</div>
-
-              <div>
-                <span className={styles.sectionLabel}>{tournament.Location}</span>
-                <h2>
-                  {tournament["Winning Team"] || "Upcoming Invitational"}
-                </h2>
-                <p>
-                  {tournament["Final Score"]
-                    ? `Final score: ${tournament["Final Score"]}`
-                    : "Teams and results to be announced."}
-                </p>
+            <Link
+              className={styles.historyPhotoCard}
+              href={`/history/${tournament.year}`}
+              key={tournament.year}
+            >
+              <div className={styles.historyPhotoPlaceholder}>
+                <span>{tournament.Destination}</span>
               </div>
-
-              <Link
-                className={styles.yearLink}
-                href={`/history/${tournament.year}`}
-              >
-                View year →
-              </Link>
-            </article>
+              <div className={styles.historyCardBody}>
+                <span>{tournament.Annual} Annual</span>
+                <h2>{tournament.year}</h2>
+                <p>{tournament.Destination}</p>
+                <strong>
+                  {tournament["Winning Team"] || "Upcoming Invitational"}
+                </strong>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
