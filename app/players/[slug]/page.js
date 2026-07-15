@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import {
+  formatHandicap,
   formatPercentage,
   formatRecord,
   getFormatName,
@@ -16,19 +17,24 @@ export async function generateMetadata({ params }) {
 
   return {
     title: player
-      ? `${player["Display Name"]} | Sandbagger Invitational`
-      : "Player | Sandbagger Invitational",
+      ? `${player["Display Name"]} | The Sandbagger Invitational`
+      : "Player | The Sandbagger Invitational",
   };
 }
 
 export default async function PlayerPage({ params }) {
   const { slug } = await params;
   const player = getPlayerBySlug(slug);
-
   if (!player) notFound();
 
   const stats = getPlayerStats(player["Player ID"]);
-  const biggestRival = stats.opponents[0] ?? null;
+  const rival = stats.biggestRival;
+
+  const compareHref = rival
+    ? `/compare?player1=${encodeURIComponent(
+        player["Player ID"]
+      )}&player2=${encodeURIComponent(rival.player["Player ID"])}`
+    : "/compare";
 
   const formats = [
     ["overall", "Overall"],
@@ -36,12 +42,6 @@ export default async function PlayerPage({ params }) {
     ["SC", getFormatName("SC")],
     ["SI", getFormatName("SI")],
   ];
-
-  const compareHref = biggestRival
-    ? `/compare?player1=${encodeURIComponent(
-        player["Player ID"]
-      )}&player2=${encodeURIComponent(biggestRival.player["Player ID"])}`
-    : "/compare";
 
   return (
     <main>
@@ -55,9 +55,7 @@ export default async function PlayerPage({ params }) {
                 ? "Bagger Champion"
                 : "Sandbagger Competitor"}
             </p>
-
             <h1>{player["Display Name"]}</h1>
-
             <div className={styles.profileChampionshipLine}>
               <strong>
                 {stats.championships.length
@@ -75,32 +73,23 @@ export default async function PlayerPage({ params }) {
       </section>
 
       <section className={styles.content}>
-        <div className={styles.notice}>
-          Detailed match statistics are calculated from recorded results beginning
-          with the 2020 Invitational.
-        </div>
-
         <div className={styles.kpiGrid}>
           <div className={styles.kpi}>
             <span>Career Record</span>
             <strong>{formatRecord(stats.records.overall)}</strong>
           </div>
-
           <div className={styles.kpi}>
             <span>Career Points</span>
             <strong>{stats.records.overall.points}</strong>
           </div>
-
           <div className={styles.kpi}>
             <span>Point Win %</span>
             <strong>{formatPercentage(stats.percentages.overall)}</strong>
           </div>
-
           <div className={styles.kpi}>
-            <span>Tracked Appearances</span>
-            <strong>{stats.appearances.length}</strong>
+            <span>Avg. Tournament Handicap</span>
+            <strong>{formatHandicap(stats.averageHandicap)}</strong>
           </div>
-
           <div className={styles.kpi}>
             <span>Bagger Championships</span>
             <strong>{stats.championships.length}</strong>
@@ -108,35 +97,30 @@ export default async function PlayerPage({ params }) {
         </div>
 
         <section className={styles.rivalSpotlight}>
-          <div>
-            <span className={styles.sectionLabel}>Most-Faced Opponent</span>
-            <h2>Biggest Rival</h2>
-          </div>
+          <span className={styles.sectionLabel}>Most-Faced Opponent</span>
+          <h2>Biggest Rival</h2>
 
-          {biggestRival ? (
+          {rival ? (
             <div className={styles.rivalProfileCard}>
               <div>
                 <span>Rival</span>
-                <strong>{biggestRival.player["Display Name"]}</strong>
+                <strong>{rival.player["Display Name"]}</strong>
               </div>
-
               <div>
                 <span>Meetings</span>
-                <strong>{biggestRival.record.matches}</strong>
+                <strong>{rival.record.matches}</strong>
               </div>
-
               <div>
                 <span>Head-to-Head</span>
-                <strong>{formatRecord(biggestRival.record)}</strong>
+                <strong>{formatRecord(rival.record)}</strong>
               </div>
-
               <Link className={styles.rivalCompareLink} href={compareHref}>
                 Compare players →
               </Link>
             </div>
           ) : (
             <div className={styles.rivalEmpty}>
-              Not enough recorded match history to determine a rival.
+              Not enough recorded match history.
             </div>
           )}
         </section>
@@ -161,19 +145,28 @@ export default async function PlayerPage({ params }) {
           <span className={styles.sectionLabel}>Season by Season</span>
           <h2>Performance Timeline</h2>
 
-          <div className={`${styles.dataTable} ${styles.simpleTable}`}>
+          <div className={`${styles.dataTable} ${styles.seasonTable}`}>
             <div className={`${styles.tableRow} ${styles.tableHead}`}>
               <span>Year</span>
               <span>Team</span>
+              <span>Handicap</span>
               <span>Record</span>
               <span>Points</span>
-              <span>Championship</span>
+              <span>Title</span>
             </div>
 
             {stats.seasons.map((season) => (
               <div className={styles.tableRow} key={season.year}>
                 <strong>{season.year}</strong>
-                <span className={styles.teamBadge}>{season.teamName}</span>
+                <Link
+                  className={styles.teamBadge}
+                  href={`/history/${season.year}/team/${encodeURIComponent(
+                    season.teamSide
+                  )}`}
+                >
+                  {season.teamName}
+                </Link>
+                <span>{formatHandicap(season.handicap)}</span>
                 <span>{formatRecord(season.overall)}</span>
                 <span>{season.overall.points}</span>
                 <strong>
@@ -193,15 +186,17 @@ export default async function PlayerPage({ params }) {
               <span>#</span>
               <span>Partner</span>
               <span>Record</span>
-              <span>Points</span>
+              <span>Meetings</span>
             </div>
 
             {stats.partners.slice(0, 8).map((row, index) => (
               <div className={styles.tableRow} key={row.player["Player ID"]}>
                 <strong>{index + 1}</strong>
-                <span>{row.player["Display Name"]}</span>
+                <Link href={`/players/${row.player.slug}`}>
+                  {row.player["Display Name"]}
+                </Link>
                 <span>{formatRecord(row.record)}</span>
-                <strong>{row.record.points}</strong>
+                <strong>{row.record.matches}</strong>
               </div>
             ))}
           </div>
