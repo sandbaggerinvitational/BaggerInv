@@ -193,7 +193,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   align-items: flex-end;
   overflow: hidden;
   color: white;
-  background-image: url("/images/kiawah-hero.jpg");
+  background-image: url("/images/home-page-hero.webp");
   background-size: cover;
   background-position: center;
 }
