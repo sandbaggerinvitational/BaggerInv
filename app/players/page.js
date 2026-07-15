@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Header, Footer } from "../components";
+import AssetImage from "../AssetImage";
+import { playerPhoto } from "../../lib/asset-paths";
 import {
   formatHandicap,
   formatRecord,
@@ -54,7 +56,19 @@ export default function PlayersPage() {
               key={player["Player ID"]}
             >
               <div className={styles.playerTop}>
-                <div>
+                <AssetImage
+                  src={playerPhoto(player["Photo Filename"])}
+                  alt={player["Display Name"]}
+                  className={styles.playerCardPhoto}
+                  fallbackClassName={styles.playerCardPhotoFallback}
+                  fallback={player["Display Name"]
+                    .split(" ")
+                    .map((part) => part[0])
+                    .slice(0, 2)
+                    .join("")}
+                />
+
+                <div className={styles.playerCardIdentity}>
                   <h2>{player["Display Name"]}</h2>
                   <ChampionshipLine years={stats.championships} />
                 </div>
