@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
+import AssetImage from "../../AssetImage";
+import {
+  courseLogo,
+  teamLogo,
+  tournamentHero,
+} from "../../../lib/asset-paths";
 import {
   formatHandicap,
   getTournament,
@@ -24,7 +30,17 @@ export default async function TournamentYearPage({ params }) {
       <Header />
 
       <section className={styles.tournamentHero}>
-        <div>
+        <AssetImage
+          src={tournamentHero(tournament["Hero Image"])}
+          alt={`${tournament.year} ${tournament.Destination}`}
+          className={styles.tournamentHeroImage}
+          fallbackClassName={styles.tournamentHeroFallback}
+          fallback={tournament.Destination}
+          loading="eager"
+        />
+        <div className={styles.tournamentHeroOverlay} />
+
+        <div className={styles.tournamentHeroContent}>
           <p>{tournament.Annual} Annual</p>
           <h1>{tournament.year}</h1>
           <h2>{tournament.Destination}</h2>
@@ -40,10 +56,12 @@ export default async function TournamentYearPage({ params }) {
               {tournament["Winning Team"] || "To Be Determined"}
             </strong>
           </div>
-          <b>{tournament["Final Score"] || "2026"}</b>
+          <b>{tournament["Final Score"] || "Upcoming"}</b>
           <div>
             <span>Runner-Up</span>
-            <strong>{tournament["Runner-Up Team"] || "To Be Determined"}</strong>
+            <strong>
+              {tournament["Runner-Up Team"] || "To Be Determined"}
+            </strong>
           </div>
         </div>
 
@@ -60,15 +78,25 @@ export default async function TournamentYearPage({ params }) {
                 )}`}
                 key={team.side}
               >
-                <span>{team.side}</span>
-                <h3>{team.name}</h3>
-                <p>
-                  Captain: {team.captain?.["Display Name"] || "TBA"}
-                </p>
-                <strong>
-                  Avg. Handicap: {formatHandicap(team.averageHandicap)}
-                </strong>
-                <em>View full roster →</em>
+                <AssetImage
+                  src={teamLogo(team.logo)}
+                  alt={`${team.name} logo`}
+                  className={styles.teamCardLogo}
+                  fallbackClassName={styles.teamCardLogoFallback}
+                  fallback={team.name.slice(0, 2).toUpperCase()}
+                />
+
+                <div>
+                  <span>{team.side}</span>
+                  <h3>{team.name}</h3>
+                  <p>
+                    Captain: {team.captain?.["Display Name"] || "TBA"}
+                  </p>
+                  <strong>
+                    Avg. Handicap: {formatHandicap(team.averageHandicap)}
+                  </strong>
+                  <em>View full roster →</em>
+                </div>
               </Link>
             ))}
           </div>
@@ -85,7 +113,13 @@ export default async function TournamentYearPage({ params }) {
                 href={`/courses/${course["Course ID"]}`}
                 key={`${course["Course ID"]}-${course.Round}`}
               >
-                <div className={styles.courseLogoPlaceholder}>⛳</div>
+                <AssetImage
+                  src={courseLogo(course["Course Logo"])}
+                  alt={`${course.Course} logo`}
+                  className={styles.courseLogo}
+                  fallbackClassName={styles.courseLogoPlaceholder}
+                  fallback="⛳"
+                />
                 <span>{course.Round}</span>
                 <h3>{course.Course}</h3>
                 <p>
