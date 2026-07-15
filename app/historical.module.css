@@ -520,7 +520,7 @@
   .rivalCompareLink {
     grid-column: 1 / -1;
   }
-
+}
 
 @media (max-width: 480px) {
   .rivalProfileCard {
@@ -531,7 +531,7 @@
   .rivalCompareLink {
     grid-column: auto;
   }
-  
+}
 .seasonTable .tableRow {
   grid-template-columns: 70px 1.5fr .75fr .8fr .65fr .55fr;
 }
