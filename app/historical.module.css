@@ -520,7 +520,7 @@
   .rivalCompareLink {
     grid-column: 1 / -1;
   }
-}
+
 
 @media (max-width: 480px) {
   .rivalProfileCard {
