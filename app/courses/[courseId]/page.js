@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
+import AssetImage from "../../AssetImage";
+import { courseLogo } from "../../../lib/asset-paths";
 import { getCourse } from "../../../lib/stats";
 import styles from "../../historical.module.css";
 
@@ -23,14 +25,27 @@ export default async function CoursePage({ params }) {
     <main>
       <Header />
 
-      <section className={styles.pageHero}>
-        <p className={styles.eyebrow}>
-          {course.City}, {course.State}
-        </p>
-        <h1>{course.Course}</h1>
-        <p>
-          Designed by {course.Designer} · Opened {course["Year Opened"]}
-        </p>
+      <section className={`${styles.pageHero} ${styles.coursePageHero}`}>
+        <div className={styles.courseHeroLogoWrap}>
+          <AssetImage
+            src={courseLogo(course["Course Logo"])}
+            alt={`${course.Course} logo`}
+            className={styles.courseHeroLogo}
+            fallbackClassName={styles.courseHeroLogoFallback}
+            fallback="⛳"
+            loading="eager"
+          />
+        </div>
+
+        <div>
+          <p className={styles.eyebrow}>
+            {course.City}, {course.State}
+          </p>
+          <h1>{course.Course}</h1>
+          <p>
+            Designed by {course.Designer} · Opened {course["Year Opened"]}
+          </p>
+        </div>
       </section>
 
       <section className={styles.content}>
