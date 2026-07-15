@@ -12,7 +12,6 @@ function LeaderSection({ title, rows, value }) {
     <section>
       <span className={styles.sectionLabel}>All-Time Leaders</span>
       <h2>{title}</h2>
-
       <div className={styles.podium}>
         {rows.slice(0, 5).map(({ player, stats }, index) => (
           <div className={styles.podiumCard} key={player["Player ID"]}>
@@ -27,7 +26,7 @@ function LeaderSection({ title, rows, value }) {
 }
 
 export const metadata = {
-  title: "Records | Sandbagger Invitational",
+  title: "Records | The Sandbagger Invitational",
 };
 
 export default function RecordsPage() {
@@ -36,12 +35,13 @@ export default function RecordsPage() {
   return (
     <main>
       <Header />
-
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>The Record Book</p>
         <h1>Records</h1>
         <p>
-          Detailed match records and format leaderboards cover the tracking era beginning with the 2020 Sandbagger Invitational. Records leaderboards require at least five tracked tournament appearances.
+          Complete match records begin in 2017. Percentage leaderboards
+          require at least five tournament appearances. Career points are
+          incomplete for 2017 and 2018.
         </p>
       </section>
 
@@ -52,25 +52,21 @@ export default function RecordsPage() {
             rows={records.points}
             value={(stats) => stats.records.overall.points}
           />
-
           <LeaderSection
             title="Match Wins"
             rows={records.wins}
             value={(stats) => stats.records.overall.wins}
           />
-
           <LeaderSection
             title="Bagger Championships"
             rows={records.championships}
             value={(stats) => stats.championships.length}
           />
-
           <LeaderSection
             title="Point Win Percentage"
             rows={records.percentage}
             value={(stats) => formatPercentage(stats.percentages.overall)}
           />
-
           {["BB", "SC", "SI"].map((format) => (
             <LeaderSection
               key={format}
@@ -85,7 +81,6 @@ export default function RecordsPage() {
           ))}
         </div>
       </section>
-
       <Footer />
     </main>
   );
