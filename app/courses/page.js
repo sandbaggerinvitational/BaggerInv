@@ -1,162 +1,53 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Header, Footer } from "../../components";
-import AssetImage from "../../AssetImage";
-import {
-  courseLogo,
-  teamLogo,
-  tournamentHero,
-} from "../../../lib/asset-paths";
-import {
-  formatHandicap,
-  getTournament,
-} from "../../../lib/stats";
-import styles from "../../historical.module.css";
+import { Header, Footer } from "../components";
+import AssetImage from "../AssetImage";
+import { courseLogo } from "../../lib/asset-paths";
+import { getCourses } from "../../lib/stats";
+import styles from "../historical.module.css";
 
-export async function generateMetadata({ params }) {
-  const { year } = await params;
-  return {
-    title: `${year} | The Sandbagger Invitational`,
-  };
-}
+export const metadata = {
+  title: "Courses | The Sandbagger Invitational",
+};
 
-export default async function TournamentYearPage({ params }) {
-  const { year } = await params;
-  const tournament = getTournament(year);
-  if (!tournament) notFound();
+export default function CoursesPage() {
+  const courses = getCourses();
 
   return (
     <main>
       <Header />
 
-      <section className={styles.tournamentHero}>
-        <AssetImage
-          src={tournamentHero(tournament["Hero Image"])}
-          alt={`${tournament.year} ${tournament.Destination}`}
-          className={styles.tournamentHeroImage}
-          fallbackClassName={styles.tournamentHeroFallback}
-          fallback={tournament.Destination}
-          loading="eager"
-        />
-        <div className={styles.tournamentHeroOverlay} />
-
-        <div className={styles.tournamentHeroContent}>
-          <p>{tournament.Annual} Annual</p>
-          <h1>{tournament.year}</h1>
-          <h2>{tournament.Destination}</h2>
-          <span>{tournament.Dates}</span>
-        </div>
+      <section className={styles.pageHero}>
+        <p className={styles.eyebrow}>The Venues</p>
+        <h1>Courses</h1>
+        <p>
+          Every course that has hosted a round of The Sandbagger
+          Invitational.
+        </p>
       </section>
 
       <section className={styles.content}>
-        <div className={styles.finalScoreCard}>
-          <div>
-            <span>Champions</span>
-            <strong>
-              {tournament["Winning Team"] || "To Be Determined"}
-            </strong>
-          </div>
-          <b>{tournament["Final Score"] || "Upcoming"}</b>
-          <div>
-            <span>Runner-Up</span>
-            <strong>
-              {tournament["Runner-Up Team"] || "To Be Determined"}
-            </strong>
-          </div>
+        <div className={styles.courseIndexGrid}>
+          {courses.map((course) => (
+            <Link
+              className={styles.courseIndexCard}
+              href={`/courses/${course["Course ID"]}`}
+              key={course["Course ID"]}
+            >
+              <AssetImage
+                src={courseLogo(course["Course Logo"])}
+                alt={`${course.Course} logo`}
+                className={styles.courseIndexLogo}
+                fallbackClassName={styles.courseLogoPlaceholder}
+                fallback="⛳"
+              />
+              <h2>{course.Course}</h2>
+              <p>
+                {course.City}, {course.State}
+              </p>
+              <span>{course.Designer}</span>
+            </Link>
+          ))}
         </div>
-
-        <section className={styles.section}>
-          <span className={styles.sectionLabel}>The Teams</span>
-          <h2>Rosters</h2>
-
-          <div className={styles.teamSeasonGrid}>
-            {tournament.teams.map((team) => (
-              <Link
-                className={styles.teamSeasonCard}
-                href={`/history/${tournament.year}/team/${encodeURIComponent(
-                  team.side
-                )}`}
-                key={team.side}
-              >
-                <AssetImage
-                  src={teamLogo(team.logo)}
-                  alt={`${team.name} logo`}
-                  className={styles.teamCardLogo}
-                  fallbackClassName={styles.teamCardLogoFallback}
-                  fallback={team.name.slice(0, 2).toUpperCase()}
-                />
-
-                <div>
-                  <span>{team.side}</span>
-                  <h3>{team.name}</h3>
-                  <p>
-                    Captain: {team.captain?.["Display Name"] || "TBA"}
-                  </p>
-                  <strong>
-                    Avg. Handicap: {formatHandicap(team.averageHandicap)}
-                  </strong>
-                  <em>View full roster →</em>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          <span className={styles.sectionLabel}>The Destination</span>
-          <h2>Courses Played</h2>
-
-          <div className={styles.courseCardGrid}>
-            {tournament.courses.map((course) => (
-              <Link
-                className={styles.courseCard}
-                href={`/courses/${course["Course ID"]}`}
-                key={`${course["Course ID"]}-${course.Round}`}
-              >
-                <AssetImage
-                  src={courseLogo(course["Course Logo"])}
-                  alt={`${course.Course} logo`}
-                  className={styles.courseLogo}
-                  fallbackClassName={styles.courseLogoPlaceholder}
-                  fallback="⛳"
-                />
-                <span>{course.Round}</span>
-                <h3>{course.Course}</h3>
-                <p>
-                  {course.City}, {course.State}
-                </p>
-                <strong>
-                  {course["Course ID"] === tournament["Championship Course"]
-                    ? "Championship Course"
-                    : course.Format}
-                </strong>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          <span className={styles.sectionLabel}>Tournament Honors</span>
-          <h2>Awards</h2>
-
-          <div className={styles.awardGrid}>
-            {tournament.awards.length ? (
-              tournament.awards.map((award) => (
-                <div className={styles.awardCard} key={award.Award}>
-                  <span>{award.Award}</span>
-                  <strong>
-                    {award.winnerPlayer?.["Display Name"] || award.Winner}
-                  </strong>
-                </div>
-              ))
-            ) : (
-              <div className={styles.awardCard}>
-                <span>Sandbagger of the Year</span>
-                <strong>To Be Determined</strong>
-              </div>
-            )}
-          </div>
-        </section>
       </section>
 
       <Footer />
