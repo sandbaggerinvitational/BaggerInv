@@ -3,7 +3,7 @@
    Clean replacement stylesheet. Do not append old patches.
    ========================================================= */
 
-:root {
+:global(:root) {
   --tsi-green-950: #06261d;
   --tsi-green-900: #0b3529;
   --tsi-green-800: #124c3a;
