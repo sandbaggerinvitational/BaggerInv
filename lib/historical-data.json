@@ -6,18 +6,19 @@
       "Last": "Monteleone",
       "Display Name": "Alex Monteleone",
       "Slug": "Alex-Monteleone",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2021,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "alex-monteleone-pic",
+      "Board of Governors": false,
+      "Nickname": "Mont",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "New Orleans, LA",
       "slug": "alex-monteleone",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "BJ01",
@@ -25,18 +26,19 @@
       "Last": "Jumonville",
       "Display Name": "Blake Jumonville",
       "Slug": "Blake-Jumonville",
-      "Active": "No",
+      "Active": false,
       "First Year": 2019,
       "Last Year": 2021,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "blake-jumonville-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "blake-jumonville",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "BC01",
@@ -44,18 +46,19 @@
       "Last": "Cavanaugh",
       "Display Name": "Brenan Cavanaugh",
       "Slug": "Brenan-Cavanaugh",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "brenan-cavanaugh-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Kansas City, MO",
       "slug": "brenan-cavanaugh",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "BA01",
@@ -63,18 +66,19 @@
       "Last": "Atkinson",
       "Display Name": "Brian Atkinson",
       "Slug": "Brian-Atkinson",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "brian-atkinson-pic",
+      "Board of Governors": true,
+      "Nickname": "Hot Dogs",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Fort Worth, TX",
       "slug": "brian-atkinson",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "CL01",
@@ -82,18 +86,19 @@
       "Last": "Lewis",
       "Display Name": "Caleb Lewis",
       "Slug": "Caleb-Lewis",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2020,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "caleb-lewis-pic",
+      "Board of Governors": false,
+      "Nickname": "QB1",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "caleb-lewis",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "CO02",
@@ -101,18 +106,19 @@
       "Last": "O'Reilly",
       "Display Name": "Cameron O'Reilly",
       "Slug": "Cameron-O'Reilly",
-      "Active": "No",
+      "Active": false,
       "First Year": 2018,
       "Last Year": 2021,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "cameron-o'reilly-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "cameron-o'reilly",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "CP01",
@@ -120,18 +126,19 @@
       "Last": "Patterson",
       "Display Name": "Chase Patterson",
       "Slug": "Chase-Patterson",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "chase-patterson-pic",
+      "Board of Governors": true,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "chase-patterson",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "CM01",
@@ -139,18 +146,19 @@
       "Last": "Micheal",
       "Display Name": "Chris Micheal",
       "Slug": "Chris-Micheal",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2026,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "chris-micheal-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "chris-micheal",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "CS01",
@@ -158,18 +166,19 @@
       "Last": "Seekely",
       "Display Name": "Chris Seekely",
       "Slug": "Chris-Seekely",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2018,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "chris-seekely-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Houston, TX",
       "slug": "chris-seekely",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "CO01",
@@ -177,18 +186,19 @@
       "Last": "O'Reilly",
       "Display Name": "Connor O'Reilly",
       "Slug": "Connor-O'Reilly",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2025,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "connor-o'reilly-pic",
+      "Board of Governors": true,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "connor-o'reilly",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "CF01",
@@ -196,18 +206,19 @@
       "Last": "Freeman",
       "Display Name": "Conor Freeman",
       "Slug": "Conor-Freeman",
-      "Active": "No",
+      "Active": false,
       "First Year": 2020,
       "Last Year": 2022,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "conor-freeman-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Minnetonka, MN",
       "slug": "conor-freeman",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "DR01",
@@ -215,18 +226,19 @@
       "Last": "Rees-Jones",
       "Display Name": "David Rees-Jones",
       "Slug": "David-Rees-Jones",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2018,
-      "Last Year": 2025,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "david-rees-jones-pic",
+      "Board of Governors": false,
+      "Nickname": "DRJ",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "david-rees-jones",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "DT01",
@@ -234,18 +246,19 @@
       "Last": "Tatum",
       "Display Name": "David Tatum",
       "Slug": "David-Tatum",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "david-tatum-pic",
+      "Board of Governors": true,
+      "Nickname": "Czar",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "david-tatum",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "ES01",
@@ -253,18 +266,19 @@
       "Last": "Stockley",
       "Display Name": "Eric Stockley",
       "Slug": "Eric-Stockley",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2025,
-      "Last Year": 2025,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "eric-stockley-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "eric-stockley",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "HM01",
@@ -272,18 +286,19 @@
       "Last": "Moores",
       "Display Name": "Holman Moores",
       "Slug": "Holman-Moores",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "holman-moores-pic",
+      "Board of Governors": true,
+      "Nickname": "Halfman",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Memphis, TN",
       "slug": "holman-moores",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "JK02",
@@ -291,18 +306,19 @@
       "Last": "Keffler",
       "Display Name": "Jack Keffler",
       "Slug": "Jack-Keffler",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2026,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "jack-keffler-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Fort Worth, TX",
       "slug": "jack-keffler",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "JS01",
@@ -310,18 +326,19 @@
       "Last": "Samis",
       "Display Name": "Jack Samis",
       "Slug": "Jack-Samis",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "jack-samis-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Fort Worth, TX",
       "slug": "jack-samis",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "JS02",
@@ -329,18 +346,19 @@
       "Last": "Stickney",
       "Display Name": "Jack Stickney",
       "Slug": "Jack-Stickney",
-      "Active": "No",
+      "Active": false,
       "First Year": 2022,
       "Last Year": 2022,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "jack-stickney-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Atlanta, GA",
       "slug": "jack-stickney",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "JP01",
@@ -348,18 +366,19 @@
       "Last": "Powell",
       "Display Name": "Jason Powell",
       "Slug": "Jason-Powell",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2018,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "jason-powell-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Austin, TX",
       "slug": "jason-powell",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "JG01",
@@ -367,18 +386,19 @@
       "Last": "Geibel",
       "Display Name": "John Geibel",
       "Slug": "John-Geibel",
-      "Active": "No",
+      "Active": false,
       "First Year": 2020,
       "Last Year": 2020,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "john-geibel-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "San Antonio, TX",
       "slug": "john-geibel",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "JK01",
@@ -386,18 +406,19 @@
       "Last": "Kochar",
       "Display Name": "Jupjee Kochar",
       "Slug": "Jupjee-Kochar",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "jupjee-kochar-pic",
+      "Board of Governors": true,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Houston, TX",
       "slug": "jupjee-kochar",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "KW01",
@@ -405,18 +426,19 @@
       "Last": "Whaley",
       "Display Name": "Kelly Whaley",
       "Slug": "Kelly-Whaley",
-      "Active": "No",
+      "Active": false,
       "First Year": 2019,
       "Last Year": 2019,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "kelly-whaley-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "kelly-whaley",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "CB01",
@@ -424,18 +446,19 @@
       "Last": "Beltran",
       "Display Name": "Clay Beltran",
       "Slug": "Clay-Beltran",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "clay-beltran-pic",
+      "Board of Governors": true,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Houston, TX",
       "slug": "clay-beltran",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "MS02",
@@ -443,18 +466,19 @@
       "Last": "Smith",
       "Display Name": "Matthew Smith",
       "Slug": "Matthew-Smith",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2020,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "matthew-smith-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Fort Worth, TX",
       "slug": "matthew-smith",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "MM01",
@@ -462,18 +486,19 @@
       "Last": "Markley",
       "Display Name": "Max Markley",
       "Slug": "Max-Markley",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2024,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "max-markley-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Chattanooga, TN",
       "slug": "max-markley",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "MS01",
@@ -481,18 +506,19 @@
       "Last": "Saldana",
       "Display Name": "Memo Saldana",
       "Slug": "Memo-Saldana",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2019,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "memo-saldana-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Torreon, Mexico",
       "slug": "memo-saldana",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "MH01",
@@ -500,18 +526,19 @@
       "Last": "Hunnicutt",
       "Display Name": "Michael Hunnicutt",
       "Slug": "Michael-Hunnicutt",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2018,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "michael-hunnicutt-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "michael-hunnicutt",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "MO01",
@@ -519,18 +546,19 @@
       "Last": "O'Brien",
       "Display Name": "Michael O'Brien",
       "Slug": "Michael-O'Brien",
-      "Active": "No",
+      "Active": false,
       "First Year": 2017,
       "Last Year": 2017,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Captain Eligible": false,
+      "Photo Filename": "michael-o'brien-pic",
+      "Board of Governors": false,
+      "Nickname": "OB",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "michael-o'brien",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "MB01",
@@ -538,18 +566,19 @@
       "Last": "Berger",
       "Display Name": "Miles Berger",
       "Slug": "Miles-Berger",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "miles-berger-pic",
+      "Board of Governors": true,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Austin, TX",
       "slug": "miles-berger",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "NJ01",
@@ -557,18 +586,19 @@
       "Last": "Julian",
       "Display Name": "Nick Julian",
       "Slug": "Nick-Julian",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2022,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "nick-julian-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Kansas City, MO",
       "slug": "nick-julian",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "PN01",
@@ -576,18 +606,19 @@
       "Last": "Noonan",
       "Display Name": "Patrick Noonan",
       "Slug": "Patrick-Noonan",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2026,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "patrick-noonan-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Fort Worth, TX",
       "slug": "patrick-noonan",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "PC01",
@@ -595,18 +626,19 @@
       "Last": "Curry",
       "Display Name": "Phillip Curry",
       "Slug": "Phillip-Curry",
-      "Active": "No",
+      "Active": false,
       "First Year": 2018,
       "Last Year": 2018,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "phillip-curry-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Houston, TX",
       "slug": "phillip-curry",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "RH01",
@@ -614,18 +646,19 @@
       "Last": "Hill",
       "Display Name": "Raymond Hill",
       "Slug": "Raymond-Hill",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2020,
-      "Last Year": 2024,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "raymond-hill-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Atlanta, GA",
       "slug": "raymond-hill",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "RM01",
@@ -633,18 +666,19 @@
       "Last": "Murphy",
       "Display Name": "Robert Murphy",
       "Slug": "Robert-Murphy",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "robert-murphy-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Houston, TX",
       "slug": "robert-murphy",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "SS01",
@@ -652,18 +686,19 @@
       "Last": "Stepp",
       "Display Name": "Sonny Stepp",
       "Slug": "Sonny-Stepp",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2025,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "sonny-stepp-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Fort Worth, TX",
       "slug": "sonny-stepp",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "SL01",
@@ -671,18 +706,19 @@
       "Last": "Levy",
       "Display Name": "Stephen Levy",
       "Slug": "Stephen-Levy",
-      "Active": "No",
+      "Active": false,
       "First Year": 2021,
       "Last Year": 2021,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "stephen-levy-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Fort Worth, TX",
       "slug": "stephen-levy",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "TL01",
@@ -690,18 +726,19 @@
       "Last": "Lippincott",
       "Display Name": "Taylor Lippincott",
       "Slug": "Taylor-Lippincott",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2026,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": false,
+      "Photo Filename": "taylor-lippincott-pic",
+      "Board of Governors": true,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Klein, TX",
       "slug": "taylor-lippincott",
       "active": true,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "TG01",
@@ -709,18 +746,19 @@
       "Last": "Gregg",
       "Display Name": "Tim Gregg",
       "Slug": "Tim-Gregg",
-      "Active": "No",
+      "Active": false,
       "First Year": 2019,
       "Last Year": 2020,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "tim-gregg-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Omaha, NE",
       "slug": "tim-gregg",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "WC01",
@@ -728,18 +766,19 @@
       "Last": "Caston",
       "Display Name": "Wade Caston",
       "Slug": "Wade-Caston",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2017,
-      "Last Year": 2025,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "wade-caston-pic",
+      "Board of Governors": true,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Dallas, TX",
       "slug": "wade-caston",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": true
     },
     {
       "Player ID": "WD01",
@@ -747,18 +786,19 @@
       "Last": "Dace",
       "Display Name": "William Dace",
       "Slug": "William-Dace",
-      "Active": "No",
+      "Active": false,
       "First Year": 2017,
       "Last Year": 2017,
-      "Captain Eligible": "No",
-      "Photo Filename": null,
+      "Captain Eligible": false,
+      "Photo Filename": "william-dace-pic",
+      "Board of Governors": false,
       "Nickname": null,
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Oklahoma City, OK",
       "slug": "william-dace",
       "active": false,
-      "captainEligible": false
+      "captainEligible": false,
+      "boardOfGovernors": false
     },
     {
       "Player ID": "WO01",
@@ -766,27 +806,36 @@
       "Last": "Oliver",
       "Display Name": "Will Oliver",
       "Slug": "Will-Oliver",
-      "Active": "Yes",
+      "Active": true,
       "First Year": 2018,
-      "Last Year": 2026,
-      "Captain Eligible": "Yes",
-      "Photo Filename": null,
-      "Nickname": null,
+      "Last Year": "Present",
+      "Captain Eligible": true,
+      "Photo Filename": "will-oliver-pic",
+      "Board of Governors": false,
+      "Nickname": "QJ",
       "Bio": null,
-      "Hometown": null,
-      "Handicap": null,
+      "Hometown": "Houston, TX",
       "slug": "will-oliver",
       "active": true,
-      "captainEligible": true
+      "captainEligible": true,
+      "boardOfGovernors": false
     }
   ],
   "tournaments": [
     {
       "Year": 2017,
-      "Location": "Scottsdale, AR",
+      "Annual": "1st",
+      "Dates": "August 11 - 12, 2017",
+      "Destination": "Scottsdale",
+      "Course 1": "TNGC01",
+      "Course 2": "WKPS01",
+      "Course 3": "GGCR01",
+      "Championship Course": "GGCR01",
+      "Hero Image": "grayhawk-raptor",
       "Winning Team": "Team Hornitos",
-      "Losing Team": "Pending",
-      "Final Score": "1-0",
+      "Runner-Up Team": "Thongchai's Army",
+      "Final Score": null,
+      "Team Size": 16,
       "Sandbagger of the Year": null,
       "Captain Team 1": "MB01",
       "Captain Team 2": "HM01",
@@ -794,10 +843,18 @@
     },
     {
       "Year": 2018,
-      "Location": "Horseshoe Bay, TX",
+      "Annual": "2nd",
+      "Dates": "July 27 - 28, 2018",
+      "Destination": "Horseshoe Bay",
+      "Course 1": "ARGC01",
+      "Course 2": "SRGC01",
+      "Course 3": "SRGC02",
+      "Championship Course": "SRGC02",
+      "Hero Image": "summit-rock",
       "Winning Team": "Hosung Choi's Sauce",
-      "Losing Team": "Phil's Calvity Bombs",
-      "Final Score": "209 - 151",
+      "Runner-Up Team": "Phil's Mafia",
+      "Final Score": null,
+      "Team Size": 20,
       "Sandbagger of the Year": "CS01",
       "Captain Team 1": "CB01",
       "Captain Team 2": "PC01",
@@ -805,10 +862,18 @@
     },
     {
       "Year": 2019,
-      "Location": "Beaver Creek, CO",
+      "Annual": "3rd",
+      "Dates": "August 2 - 3, 2019",
+      "Destination": "Beaver Creek",
+      "Course 1": "RSF01",
+      "Course 2": "EVGC01",
+      "Course 3": "RSN01",
+      "Championship Course": "RSN01",
+      "Hero Image": "redsky-norman",
       "Winning Team": "Vijay's Singh Squad",
-      "Losing Team": "Pending",
-      "Final Score": "1-0",
+      "Runner-Up Team": "Phil's Calvity Bombs",
+      "Final Score": "228.5 - 170.5",
+      "Team Size": 20,
       "Sandbagger of the Year": "TG01",
       "Captain Team 1": "JK01",
       "Captain Team 2": "CS01",
@@ -816,10 +881,18 @@
     },
     {
       "Year": 2020,
-      "Location": "Traverse City, MI",
+      "Annual": "4th",
+      "Dates": "August 21 - 22, 2020",
+      "Destination": "Traverse City",
+      "Course 1": "GTW01",
+      "Course 2": "GTB01",
+      "Course 3": "FDGC01",
+      "Championship Course": "FDGC01",
+      "Hero Image": "forest-dunes",
       "Winning Team": "Makin' It Wayne",
-      "Losing Team": "Bryson's Beefcakes",
+      "Runner-Up Team": "Bryson's Beefcakes",
       "Final Score": "583 - 377",
+      "Team Size": 24,
       "Sandbagger of the Year": "BA01",
       "Captain Team 1": "CO01",
       "Captain Team 2": "WC01",
@@ -827,10 +900,18 @@
     },
     {
       "Year": 2021,
-      "Location": "Big Cedar Lodge, MO",
+      "Annual": "5th",
+      "Dates": "August 20 - 21, 2021",
+      "Destination": "Big Cedar Lodge",
+      "Course 1": "ONGC01",
+      "Course 2": "BRGC01",
+      "Course 3": "PVGC01",
+      "Championship Course": "PVGC01",
+      "Hero Image": "paynes-valley",
       "Winning Team": "Dirty Mike and The Boys",
-      "Losing Team": "Nasty Perros",
+      "Runner-Up Team": "Nasty Perros",
       "Final Score": "46 - 32",
+      "Team Size": 24,
       "Sandbagger of the Year": "CO01",
       "Captain Team 1": "MS01",
       "Captain Team 2": "MH01",
@@ -838,10 +919,18 @@
     },
     {
       "Year": 2022,
-      "Location": "Pinehurst, NC",
+      "Annual": "6th",
+      "Dates": "August 19 - 20, 2022",
+      "Destination": "Pinehurst",
+      "Course 1": "P201",
+      "Course 2": "P701",
+      "Course 3": "P401",
+      "Championship Course": "P401",
+      "Hero Image": "pinehurst-no4",
       "Winning Team": "The Holymen",
-      "Losing Team": "Numba 1 Stunnas",
+      "Runner-Up Team": "Numba 1 Stunnas",
       "Final Score": "44.50 - 33.50",
+      "Team Size": 24,
       "Sandbagger of the Year": "MH01",
       "Captain Team 1": "RM01",
       "Captain Team 2": "HM01",
@@ -849,10 +938,18 @@
     },
     {
       "Year": 2023,
-      "Location": "French Lick, IN",
+      "Annual": "7th",
+      "Dates": "September 8 - 9, 2023",
+      "Destination": "French Lick",
+      "Course 1": "PDC01",
+      "Course 2": "PDC01",
+      "Course 3": "DRC01",
+      "Championship Course": "DRC01",
+      "Hero Image": "donald-ross",
       "Winning Team": "Dick's High Cutters",
-      "Losing Team": "DT Floppers",
+      "Runner-Up Team": "DT Floppers",
       "Final Score": "50 - 28",
+      "Team Size": 24,
       "Sandbagger of the Year": "RH01",
       "Captain Team 1": "DT01",
       "Captain Team 2": "CB01",
@@ -860,10 +957,18 @@
     },
     {
       "Year": 2024,
-      "Location": "Sand Valley, WI",
+      "Annual": "8th",
+      "Dates": "August 16 - 17, 2024",
+      "Destination": "Sand Valley",
+      "Course 1": "SVGC01",
+      "Course 2": "MDGC01",
+      "Course 3": "SVGC02",
+      "Championship Course": "SVGC02",
+      "Hero Image": "sand-valley",
       "Winning Team": "Möntley Crüe",
-      "Losing Team": "Queen's Mafia",
+      "Runner-Up Team": "Queen's Mafia",
       "Final Score": "40.50 - 31.50",
+      "Team Size": 24,
       "Sandbagger of the Year": "JP01",
       "Captain Team 1": "AM01",
       "Captain Team 2": "WO01",
@@ -871,10 +976,18 @@
     },
     {
       "Year": 2025,
-      "Location": "Bandon Dunes, OR",
+      "Annual": "9th",
+      "Dates": "August 15 - 16, 2025",
+      "Destination": "Bandon Dunes",
+      "Course 1": "OMGC01",
+      "Course 2": "BDGC01",
+      "Course 3": "PDGC03",
+      "Championship Course": "PDGC03",
+      "Hero Image": "pacific-dunes",
       "Winning Team": "Bandon Brothers",
-      "Losing Team": "The Crispy Boys",
+      "Runner-Up Team": "The Crispy Boys",
       "Final Score": "38.50 - 33.50",
+      "Team Size": 24,
       "Sandbagger of the Year": "CL01",
       "Captain Team 1": "CP01",
       "Captain Team 2": "JP01",
@@ -882,10 +995,18 @@
     },
     {
       "Year": 2026,
-      "Location": "Kiawah Island, SC",
+      "Annual": "10th",
+      "Dates": "September 25 - 26, 2026",
+      "Destination": "Kiawah Island",
+      "Course 1": "TPGC01",
+      "Course 2": "CPGC01",
+      "Course 3": "OCGC01",
+      "Championship Course": "OCGC01",
+      "Hero Image": "ocean-course",
       "Winning Team": null,
-      "Losing Team": null,
+      "Runner-Up Team": null,
       "Final Score": null,
+      "Team Size": 24,
       "Sandbagger of the Year": null,
       "Captain Team 1": "MB01",
       "Captain Team 2": "TL01",
@@ -895,56 +1016,1230 @@
   "teamNames": [
     {
       "Year": 2017,
-      "Team 1": "Team Hornitos",
-      "Team 2": "Pending"
+      "Team Side": "Team 1",
+      "Team ID": "HORNITOS",
+      "Team Names": "Team Hornitos",
+      "Captain": "MB01",
+      "Team Logo": "hornitos-logo"
+    },
+    {
+      "Year": 2017,
+      "Team Side": "Team 2",
+      "Team ID": "THONGCHAI",
+      "Team Names": "Thongchai's Army",
+      "Captain": "HM01",
+      "Team Logo": "thongchai-logo"
     },
     {
       "Year": 2018,
-      "Team 1": "Hosung Choi's Sauce",
-      "Team 2": "Phil's Calvity Bombs"
+      "Team Side": "Team 1",
+      "Team ID": "HOSUNG",
+      "Team Names": "Hosung Choi's Sauce",
+      "Captain": "CB01",
+      "Team Logo": "hosung-logo"
+    },
+    {
+      "Year": 2018,
+      "Team Side": "Team 2",
+      "Team ID": "PHMAFIA",
+      "Team Names": "Phil's Mafia",
+      "Captain": "PC01",
+      "Team Logo": "philsmafia-logo"
     },
     {
       "Year": 2019,
-      "Team 1": "Vijay's Singh Squad",
-      "Team 2": "Pending1"
+      "Team Side": "Team 1",
+      "Team ID": "VJSINGH",
+      "Team Names": "Vijay's Singh Squad",
+      "Captain": "JK01",
+      "Team Logo": "vijays-logo"
+    },
+    {
+      "Year": 2019,
+      "Team Side": "Team 2",
+      "Team ID": "PHBOMBS",
+      "Team Names": "Phil's Calvity Bombs",
+      "Captain": "CS01",
+      "Team Logo": "philscb-logo"
     },
     {
       "Year": 2020,
-      "Team 1": "Bryson's Beefcakes",
-      "Team 2": "Makin' It Wayne"
+      "Team Side": "Team 1",
+      "Team ID": "BRYSON",
+      "Team Names": "Bryson's Beefcakes",
+      "Captain": "CO01",
+      "Team Logo": "brysons-logo"
+    },
+    {
+      "Year": 2020,
+      "Team Side": "Team 2",
+      "Team ID": "MAKINIT",
+      "Team Names": "Makin' It Wayne",
+      "Captain": "WC01",
+      "Team Logo": "makinit-logo"
     },
     {
       "Year": 2021,
-      "Team 1": "Nasty Perros",
-      "Team 2": "Dirty Mike and The Boys"
+      "Team Side": "Team 1",
+      "Team ID": "PERROS",
+      "Team Names": "Nasty Perros",
+      "Captain": "MS01",
+      "Team Logo": "nasty-logo"
+    },
+    {
+      "Year": 2021,
+      "Team Side": "Team 2",
+      "Team ID": "DIRTYMIKE",
+      "Team Names": "Dirty Mike and The Boys",
+      "Captain": "MH01",
+      "Team Logo": "dirtymike-logo"
     },
     {
       "Year": 2022,
-      "Team 1": "Numba 1 Stunnas",
-      "Team 2": "The Holymen"
+      "Team Side": "Team 1",
+      "Team ID": "NUMBA1",
+      "Team Names": "Numba 1 Stunnas",
+      "Captain": "RM01",
+      "Team Logo": "numba1-logo"
+    },
+    {
+      "Year": 2022,
+      "Team Side": "Team 2",
+      "Team ID": "HOLYMEN",
+      "Team Names": "The Holymen",
+      "Captain": "HM01",
+      "Team Logo": "holymen-logo"
     },
     {
       "Year": 2023,
-      "Team 1": "DT Floppers",
-      "Team 2": "Dick's High Cutters"
+      "Team Side": "Team 1",
+      "Team ID": "FLOPPERS",
+      "Team Names": "DT Floppers",
+      "Captain": "DT01",
+      "Team Logo": "dtfloppers-logo"
+    },
+    {
+      "Year": 2023,
+      "Team Side": "Team 2",
+      "Team ID": "DHC",
+      "Team Names": "Dick's High Cutters",
+      "Captain": "CB01",
+      "Team Logo": "dhc-logo"
     },
     {
       "Year": 2024,
-      "Team 1": "Möntley Crüe",
-      "Team 2": "Queen's Mafia"
+      "Team Side": "Team 1",
+      "Team ID": "MONTLEY",
+      "Team Names": "Möntley Crüe",
+      "Captain": "AM01",
+      "Team Logo": "montley-logo"
+    },
+    {
+      "Year": 2024,
+      "Team Side": "Team 2",
+      "Team ID": "QUEENS",
+      "Team Names": "Queen's Mafia",
+      "Captain": "WO01",
+      "Team Logo": "queens-logo"
     },
     {
       "Year": 2025,
-      "Team 1": "Bandon Brothers",
-      "Team 2": "The Crispy Boys"
+      "Team Side": "Team 1",
+      "Team ID": "BANDONBROS",
+      "Team Names": "Bandon Brothers",
+      "Captain": "CP01",
+      "Team Logo": "bandonbrothers-logo"
+    },
+    {
+      "Year": 2025,
+      "Team Side": "Team 2",
+      "Team ID": "CRIPSYBOYS",
+      "Team Names": "The Crispy Boys",
+      "Captain": "JP01",
+      "Team Logo": "crispyboys-logo"
     },
     {
       "Year": 2026,
-      "Team 1": "The Pickles",
-      "Team 2": "Lipp it and Rip it"
+      "Team Side": "Team 1",
+      "Team ID": "PICKLES",
+      "Team Names": "The Pickles",
+      "Captain": "MB01",
+      "Team Logo": "pickles-logo"
+    },
+    {
+      "Year": 2026,
+      "Team Side": "Team 2",
+      "Team ID": "LIPPIT",
+      "Team Names": "Lipp it and Rip it",
+      "Captain": "TL01",
+      "Team Logo": "lippit-logo"
     }
   ],
   "matches": [
+    {
+      "Match ID": "2017-R1-1",
+      "Year": 2017,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 1,
+      "Team 1 Player 1": "MB01",
+      "Team 1 Player 2": "RM01",
+      "Team 2 Player 1": "HM01",
+      "Team 2 Player 2": "WC01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R1-2",
+      "Year": 2017,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 2,
+      "Team 1 Player 1": "JK01",
+      "Team 1 Player 2": "MO01",
+      "Team 2 Player 1": "CP01",
+      "Team 2 Player 2": "CO01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R1-3",
+      "Year": 2017,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 3,
+      "Team 1 Player 1": "WD01",
+      "Team 1 Player 2": "TL01",
+      "Team 2 Player 1": "JS01",
+      "Team 2 Player 2": "CB01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R1-4",
+      "Year": 2017,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 4,
+      "Team 1 Player 1": "BA01",
+      "Team 1 Player 2": "BC01",
+      "Team 2 Player 1": "DT01",
+      "Team 2 Player 2": "SS01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R2-1",
+      "Year": 2017,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 1,
+      "Team 1 Player 1": "BA01",
+      "Team 1 Player 2": "MO01",
+      "Team 2 Player 1": "JS01",
+      "Team 2 Player 2": "CP01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R2-2",
+      "Year": 2017,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 2,
+      "Team 1 Player 1": "MB01",
+      "Team 1 Player 2": "TL01",
+      "Team 2 Player 1": "HM01",
+      "Team 2 Player 2": "CB01",
+      "Matchup Winner": "Halved",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R2-3",
+      "Year": 2017,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 3,
+      "Team 1 Player 1": "JK01",
+      "Team 1 Player 2": "BC01",
+      "Team 2 Player 1": "CO01",
+      "Team 2 Player 2": "SS01",
+      "Matchup Winner": "Halved",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R2-4",
+      "Year": 2017,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 4,
+      "Team 1 Player 1": "RM01",
+      "Team 1 Player 2": "WD01",
+      "Team 2 Player 1": "WC01",
+      "Team 2 Player 2": "DT01",
+      "Matchup Winner": "Halved",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-1",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 1,
+      "Team 1 Player 1": "RM01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "HM01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-2",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 2,
+      "Team 1 Player 1": "BA01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "CO01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-3",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 3,
+      "Team 1 Player 1": "JK01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "CP01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Halved",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-4",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 4,
+      "Team 1 Player 1": "WD01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "JS01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-5",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 5,
+      "Team 1 Player 1": "BC01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "DT01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-6",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 6,
+      "Team 1 Player 1": "MB01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "WC01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-7",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 7,
+      "Team 1 Player 1": "TL01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "CB01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2017-R3-8",
+      "Year": 2017,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 8,
+      "Team 1 Player 1": "MO01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "SS01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-1",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 1,
+      "Team 1 Player 1": "HM01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "RM01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-2",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 2,
+      "Team 1 Player 1": "CP01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "CO02",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-3",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 3,
+      "Team 1 Player 1": "CB01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "PC01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-4",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 4,
+      "Team 1 Player 1": "CO01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "BA01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-5",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 5,
+      "Team 1 Player 1": "CS01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "TL01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-6",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 6,
+      "Team 1 Player 1": "WC01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "DR01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-7",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 7,
+      "Team 1 Player 1": "JP01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "DT01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-8",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 8,
+      "Team 1 Player 1": "JK01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "SS01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-9",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 9,
+      "Team 1 Player 1": "WO01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "MB01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R1-10",
+      "Year": 2018,
+      "Round": 1,
+      "Format": "SI",
+      "Match": 10,
+      "Team 1 Player 1": "MH01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "JS01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R2-1",
+      "Year": 2018,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 1,
+      "Team 1 Player 1": "MH01",
+      "Team 1 Player 2": "CP01",
+      "Team 2 Player 1": "BA01",
+      "Team 2 Player 2": "JS01",
+      "Matchup Winner": "Halved",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R2-2",
+      "Year": 2018,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 2,
+      "Team 1 Player 1": "JP01",
+      "Team 1 Player 2": "HM01",
+      "Team 2 Player 1": "MB01",
+      "Team 2 Player 2": "PC01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R2-3",
+      "Year": 2018,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 3,
+      "Team 1 Player 1": "WC01",
+      "Team 1 Player 2": "CO01",
+      "Team 2 Player 1": "DR01",
+      "Team 2 Player 2": "DT01",
+      "Matchup Winner": "Halved",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R2-4",
+      "Year": 2018,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 4,
+      "Team 1 Player 1": "CS01",
+      "Team 1 Player 2": "WO01",
+      "Team 2 Player 1": "SS01",
+      "Team 2 Player 2": "RM01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R2-5",
+      "Year": 2018,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 5,
+      "Team 1 Player 1": "CB01",
+      "Team 1 Player 2": "JK01",
+      "Team 2 Player 1": "CO02",
+      "Team 2 Player 2": "TL01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R3-1",
+      "Year": 2018,
+      "Round": 3,
+      "Format": "BB",
+      "Match": 1,
+      "Team 1 Player 1": "JP01",
+      "Team 1 Player 2": "JK01",
+      "Team 2 Player 1": "PC01",
+      "Team 2 Player 2": "TL01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R3-2",
+      "Year": 2018,
+      "Round": 3,
+      "Format": "BB",
+      "Match": 2,
+      "Team 1 Player 1": "MH01",
+      "Team 1 Player 2": "CB01",
+      "Team 2 Player 1": "JS01",
+      "Team 2 Player 2": "RM01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R3-3",
+      "Year": 2018,
+      "Round": 3,
+      "Format": "BB",
+      "Match": 3,
+      "Team 1 Player 1": "CS01",
+      "Team 1 Player 2": "CO01",
+      "Team 2 Player 1": "MB01",
+      "Team 2 Player 2": "BA01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R3-4",
+      "Year": 2018,
+      "Round": 3,
+      "Format": "BB",
+      "Match": 4,
+      "Team 1 Player 1": "CP01",
+      "Team 1 Player 2": "WC01",
+      "Team 2 Player 1": "DT01",
+      "Team 2 Player 2": "SS01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2018-R3-5",
+      "Year": 2018,
+      "Round": 3,
+      "Format": "BB",
+      "Match": 5,
+      "Team 1 Player 1": "HM01",
+      "Team 1 Player 2": "WO01",
+      "Team 2 Player 1": "DR01",
+      "Team 2 Player 2": "CO02",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": null,
+      "Back 9 Winner": null,
+      "18-Hole Winner": null,
+      "Team 1 Points": null,
+      "Team 2 Points": null,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R1-1",
+      "Year": 2019,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 1,
+      "Team 1 Player 1": "DT01",
+      "Team 1 Player 2": "MH01",
+      "Team 2 Player 1": "CP01",
+      "Team 2 Player 2": "CO01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team 2",
+      "Team 1 Points": 0,
+      "Team 2 Points": 29,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R1-2",
+      "Year": 2019,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 2,
+      "Team 1 Player 1": "HM01",
+      "Team 1 Player 2": "BA01",
+      "Team 2 Player 1": "RM01",
+      "Team 2 Player 2": "JP01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Halved",
+      "Back 9 Winner": "Team2",
+      "18-Hole Winner": "Halved",
+      "Team 1 Points": 11,
+      "Team 2 Points": 18,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R1-3",
+      "Year": 2019,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 3,
+      "Team 1 Player 1": "DR01",
+      "Team 1 Player 2": "CB01",
+      "Team 2 Player 1": "BJ01",
+      "Team 2 Player 2": "CS01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Halved",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 25.5,
+      "Team 2 Points": 3.5,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R1-4",
+      "Year": 2019,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 4,
+      "Team 1 Player 1": "MB01",
+      "Team 1 Player 2": "WC01",
+      "Team 2 Player 1": "MS01",
+      "Team 2 Player 2": "BC01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team2",
+      "Team 1 Points": 7,
+      "Team 2 Points": 22,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R1-5",
+      "Year": 2019,
+      "Round": 1,
+      "Format": "BB",
+      "Match": 5,
+      "Team 1 Player 1": "JK01",
+      "Team 1 Player 2": "TG01",
+      "Team 2 Player 1": "KW01",
+      "Team 2 Player 2": "TL01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 29,
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R2-1",
+      "Year": 2019,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 1,
+      "Team 1 Player 1": "MH01",
+      "Team 1 Player 2": "TG01",
+      "Team 2 Player 1": "CP01",
+      "Team 2 Player 2": "KW01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 2",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 16,
+      "Team 2 Points": 5,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R2-2",
+      "Year": 2019,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 2,
+      "Team 1 Player 1": "MB01",
+      "Team 1 Player 2": "CB01",
+      "Team 2 Player 1": "RM01",
+      "Team 2 Player 2": "TL01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team 2",
+      "Team 1 Points": 5,
+      "Team 2 Points": 16,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R2-3",
+      "Year": 2019,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 3,
+      "Team 1 Player 1": "HM01",
+      "Team 1 Player 2": "JK01",
+      "Team 2 Player 1": "MS01",
+      "Team 2 Player 2": "CS01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Halved",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 18.5,
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R2-4",
+      "Year": 2019,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 4,
+      "Team 1 Player 1": "DR01",
+      "Team 1 Player 2": "BA01",
+      "Team 2 Player 1": "CO01",
+      "Team 2 Player 2": "JP01",
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Team 2",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 16,
+      "Team 2 Points": 5,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R2-5",
+      "Year": 2019,
+      "Round": 2,
+      "Format": "SC",
+      "Match": 5,
+      "Team 1 Player 1": "WC01",
+      "Team 1 Player 2": "DT01",
+      "Team 2 Player 1": "BC01",
+      "Team 2 Player 2": "BJ01",
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Halved",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team 2",
+      "Team 1 Points": 2.5,
+      "Team 2 Points": 18.5,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-1",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 1,
+      "Team 1 Player 1": "MB01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "RM01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Halved",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 15,
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-2",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 2,
+      "Team 1 Player 1": "HM01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "MS01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Halved",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 13,
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-3",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 3,
+      "Team 1 Player 1": "DR01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "BC01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 13,
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-4",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 4,
+      "Team 1 Player 1": "TG01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "TL01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 17,
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-5",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 5,
+      "Team 1 Player 1": "BA01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "CP01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team 2",
+      "Team 1 Points": 4,
+      "Team 2 Points": 13,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-6",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 6,
+      "Team 1 Player 1": "CB01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "KW01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Halved",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Halved",
+      "Team 1 Points": 10.5,
+      "Team 2 Points": 6.5,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-7",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 7,
+      "Team 1 Player 1": "DT01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "JP01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 17,
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-8",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 8,
+      "Team 1 Player 1": "MH01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "CO01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 1",
+      "Front 9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
+      "18-Hole Winner": "Team 1",
+      "Team 1 Points": 17,
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-9",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 9,
+      "Team 1 Player 1": "WC01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "BJ01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team 2",
+      "Team 1 Points": 0,
+      "Team 2 Points": 17,
+      "Match Status": null,
+      "Notes": null
+    },
+    {
+      "Match ID": "2019-R3-10",
+      "Year": 2019,
+      "Round": 3,
+      "Format": "SI",
+      "Match": 10,
+      "Team 1 Player 1": "JK01",
+      "Team 1 Player 2": null,
+      "Team 2 Player 1": "CS01",
+      "Team 2 Player 2": null,
+      "Matchup Winner": "Team 2",
+      "Front 9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
+      "18-Hole Winner": "Team 2",
+      "Team 1 Points": 0,
+      "Team 2 Points": 17,
+      "Match Status": null,
+      "Notes": null
+    },
     {
       "Match ID": "2020-R1-1",
       "Year": 2020,
@@ -957,10 +2252,12 @@
       "Team 2 Player 2": "BA01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 7,
-      "Team 2 Points": 49
+      "Team 2 Points": 49,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R1-2",
@@ -974,10 +2271,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 14,
-      "Team 2 Points": 42
+      "Team 2 Points": 42,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R1-3",
@@ -991,10 +2290,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 42,
-      "Team 2 Points": 14
+      "Team 2 Points": 14,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R1-4",
@@ -1008,10 +2309,12 @@
       "Team 2 Player 2": "BJ01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 42,
-      "Team 2 Points": 14
+      "Team 2 Points": 14,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R1-5",
@@ -1025,10 +2328,12 @@
       "Team 2 Player 2": "CL01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 7,
-      "Team 2 Points": 49
+      "Team 2 Points": 49,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R1-6",
@@ -1042,10 +2347,12 @@
       "Team 2 Player 2": "CS01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 28,
-      "Team 2 Points": 28
+      "Team 2 Points": 28,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R2-1",
@@ -1059,10 +2366,12 @@
       "Team 2 Player 2": "BA01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 10,
-      "Team 2 Points": 30
+      "Team 2 Points": 30,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R2-2",
@@ -1076,10 +2385,12 @@
       "Team 2 Player 2": "CB01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 40
+      "Team 2 Points": 40,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R2-3",
@@ -1093,10 +2404,12 @@
       "Team 2 Player 2": "CL01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 40,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R2-4",
@@ -1110,10 +2423,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 10,
-      "Team 2 Points": 30
+      "Team 2 Points": 30,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R2-5",
@@ -1127,10 +2442,12 @@
       "Team 2 Player 2": "HM01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 5,
-      "Team 2 Points": 35
+      "Team 2 Points": 35,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R2-6",
@@ -1144,10 +2461,12 @@
       "Team 2 Player 2": "CS01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 40
+      "Team 2 Points": 40,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-1",
@@ -1161,10 +2480,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 32
+      "Team 2 Points": 32,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-2",
@@ -1178,10 +2499,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 32
+      "Team 2 Points": 32,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-3",
@@ -1195,10 +2518,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 16,
-      "Team 2 Points": 16
+      "Team 2 Points": 16,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-4",
@@ -1212,10 +2537,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 28,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-5",
@@ -1229,10 +2556,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 28,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-6",
@@ -1246,10 +2575,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 28,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-7",
@@ -1263,10 +2594,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 16,
-      "Team 2 Points": 16
+      "Team 2 Points": 16,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-8",
@@ -1280,10 +2613,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 24,
-      "Team 2 Points": 8
+      "Team 2 Points": 8,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-9",
@@ -1297,10 +2632,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 4,
-      "Team 2 Points": 28
+      "Team 2 Points": 28,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-10",
@@ -1314,10 +2651,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 28,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-11",
@@ -1331,10 +2670,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 32
+      "Team 2 Points": 32,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2020-R3-12",
@@ -1348,10 +2689,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 32
+      "Team 2 Points": 32,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R1-1",
@@ -1365,10 +2708,12 @@
       "Team 2 Player 2": "CO01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 2,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R1-2",
@@ -1382,10 +2727,12 @@
       "Team 2 Player 2": "WC01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 3.5
+      "Team 2 Points": 3.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R1-3",
@@ -1399,10 +2746,12 @@
       "Team 2 Player 2": "BC01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R1-4",
@@ -1416,10 +2765,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 3.5
+      "Team 2 Points": 3.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R1-5",
@@ -1433,10 +2784,12 @@
       "Team 2 Player 2": "CO02",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R1-6",
@@ -1450,10 +2803,12 @@
       "Team 2 Player 2": "CP01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R2-1",
@@ -1467,10 +2822,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R2-2",
@@ -1484,10 +2841,12 @@
       "Team 2 Player 2": "BC01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R2-3",
@@ -1501,10 +2860,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R2-4",
@@ -1518,10 +2879,12 @@
       "Team 2 Player 2": "WC01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R2-5",
@@ -1535,10 +2898,12 @@
       "Team 2 Player 2": "CO02",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R2-6",
@@ -1552,10 +2917,12 @@
       "Team 2 Player 2": "SS01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-1",
@@ -1569,10 +2936,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-2",
@@ -1586,10 +2955,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-3",
@@ -1603,10 +2974,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-4",
@@ -1620,10 +2993,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-5",
@@ -1637,10 +3012,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-6",
@@ -1654,10 +3031,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-7",
@@ -1671,10 +3050,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-8",
@@ -1688,10 +3069,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-9",
@@ -1705,10 +3088,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-10",
@@ -1722,10 +3107,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-11",
@@ -1739,10 +3126,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2021-R3-12",
@@ -1756,10 +3145,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R1-1",
@@ -1773,10 +3164,12 @@
       "Team 2 Player 2": "CS01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R1-2",
@@ -1790,10 +3183,12 @@
       "Team 2 Player 2": "CB01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R1-3",
@@ -1807,10 +3202,12 @@
       "Team 2 Player 2": "HM01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 1
+      "Team 2 Points": 1,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R1-4",
@@ -1824,10 +3221,12 @@
       "Team 2 Player 2": "BC01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R1-5",
@@ -1841,10 +3240,12 @@
       "Team 2 Player 2": "SS01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R1-6",
@@ -1858,10 +3259,12 @@
       "Team 2 Player 2": "MB01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R2-1",
@@ -1875,10 +3278,12 @@
       "Team 2 Player 2": "MH01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R2-2",
@@ -1892,10 +3297,12 @@
       "Team 2 Player 2": "SS01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R2-3",
@@ -1909,10 +3316,12 @@
       "Team 2 Player 2": "CS01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R2-4",
@@ -1926,10 +3335,12 @@
       "Team 2 Player 2": "CB01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R2-5",
@@ -1943,10 +3354,12 @@
       "Team 2 Player 2": "CO01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R2-6",
@@ -1960,10 +3373,12 @@
       "Team 2 Player 2": "CP01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-1",
@@ -1977,10 +3392,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-2",
@@ -1994,10 +3411,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-3",
@@ -2011,10 +3430,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2,
-      "Team 2 Points": 1
+      "Team 2 Points": 1,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-4",
@@ -2028,10 +3449,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-5",
@@ -2045,10 +3468,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-6",
@@ -2062,10 +3487,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-7",
@@ -2079,10 +3506,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-8",
@@ -2096,10 +3525,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-9",
@@ -2113,10 +3544,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-10",
@@ -2130,10 +3563,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-11",
@@ -2147,10 +3582,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2022-R3-12",
@@ -2164,10 +3601,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2,
-      "Team 2 Points": 1
+      "Team 2 Points": 1,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R1-1",
@@ -2181,10 +3620,12 @@
       "Team 2 Player 2": "RH01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R1-2",
@@ -2198,10 +3639,12 @@
       "Team 2 Player 2": "NJ01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 4,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R1-3",
@@ -2215,10 +3658,12 @@
       "Team 2 Player 2": "CB01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R1-4",
@@ -2232,10 +3677,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R1-5",
@@ -2249,10 +3696,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R1-6",
@@ -2266,10 +3715,12 @@
       "Team 2 Player 2": "MS01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 4
+      "Team 2 Points": 4,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R2-1",
@@ -2283,10 +3734,12 @@
       "Team 2 Player 2": "CO01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R2-2",
@@ -2300,10 +3753,12 @@
       "Team 2 Player 2": "RM01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R2-3",
@@ -2317,10 +3772,12 @@
       "Team 2 Player 2": "JP01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R2-4",
@@ -2329,15 +3786,17 @@
       "Format": "SC",
       "Match": 4,
       "Team 1 Player 1": "MH01",
-      "Team 1 Player 2": "BA01",
+      "Team 1 Player 2": "BC01",
       "Team 2 Player 1": "DR01",
       "Team 2 Player 2": "CB01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R2-5",
@@ -2351,10 +3810,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R2-6",
@@ -2368,10 +3829,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-1",
@@ -2385,10 +3848,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-2",
@@ -2402,10 +3867,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-3",
@@ -2419,10 +3886,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-4",
@@ -2436,10 +3905,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-5",
@@ -2447,16 +3918,18 @@
       "Round": 3,
       "Format": "SI",
       "Match": 5,
-      "Team 1 Player 1": "CP01",
+      "Team 1 Player 1": null,
       "Team 1 Player 2": "",
       "Team 2 Player 1": "JK01",
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": "Ghost Match",
+      "Notes": "Ghost opponent drawn from hat; CP01 injured and did not play"
     },
     {
       "Match ID": "2023-R3-6",
@@ -2470,10 +3943,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-7",
@@ -2487,10 +3962,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-8",
@@ -2504,10 +3981,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2,
-      "Team 2 Points": 1
+      "Team 2 Points": 1,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-9",
@@ -2521,10 +4000,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-10",
@@ -2538,10 +4019,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-11",
@@ -2555,10 +4038,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2023-R3-12",
@@ -2572,10 +4057,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2,
-      "Team 2 Points": 1
+      "Team 2 Points": 1,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R1-1",
@@ -2589,10 +4076,12 @@
       "Team 2 Player 2": "DR01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R1-2",
@@ -2606,10 +4095,12 @@
       "Team 2 Player 2": "BA01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R1-3",
@@ -2623,10 +4114,12 @@
       "Team 2 Player 2": "JP01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R1-4",
@@ -2640,10 +4133,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2,
-      "Team 2 Points": 1
+      "Team 2 Points": 1,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R1-5",
@@ -2657,10 +4152,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R1-6",
@@ -2674,10 +4171,12 @@
       "Team 2 Player 2": "SS01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R2-1",
@@ -2691,10 +4190,12 @@
       "Team 2 Player 2": "NJ01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R2-2",
@@ -2708,10 +4209,12 @@
       "Team 2 Player 2": "BA01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R2-3",
@@ -2725,10 +4228,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2,
-      "Team 2 Points": 1
+      "Team 2 Points": 1,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R2-4",
@@ -2742,10 +4247,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R2-5",
@@ -2759,10 +4266,12 @@
       "Team 2 Player 2": "JP01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R2-6",
@@ -2776,10 +4285,12 @@
       "Team 2 Player 2": "CS01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-1",
@@ -2793,10 +4304,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-2",
@@ -2810,10 +4323,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-3",
@@ -2827,10 +4342,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-4",
@@ -2844,10 +4361,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-5",
@@ -2861,10 +4380,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-6",
@@ -2878,10 +4399,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-7",
@@ -2895,10 +4418,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-8",
@@ -2912,10 +4437,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-9",
@@ -2929,10 +4456,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-10",
@@ -2946,10 +4475,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-11",
@@ -2963,10 +4494,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2024-R3-12",
@@ -2980,10 +4513,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R1-1",
@@ -2997,10 +4532,12 @@
       "Team 2 Player 2": "ES01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R1-2",
@@ -3014,10 +4551,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R1-3",
@@ -3031,10 +4570,12 @@
       "Team 2 Player 2": "JK01",
       "Matchup Winner": "Halved",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Halved",
+      "Back 9 Winner": "Halved",
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R1-4",
@@ -3048,10 +4589,12 @@
       "Team 2 Player 2": "CS01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R1-5",
@@ -3065,10 +4608,12 @@
       "Team 2 Player 2": "CB01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 2",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R1-6",
@@ -3082,10 +4627,12 @@
       "Team 2 Player 2": "DT01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R2-1",
@@ -3099,10 +4646,12 @@
       "Team 2 Player 2": "BC01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R2-2",
@@ -3116,10 +4665,12 @@
       "Team 2 Player 2": "CS01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 2.5,
-      "Team 2 Points": 0.5
+      "Team 2 Points": 0.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R2-3",
@@ -3133,10 +4684,12 @@
       "Team 2 Player 2": "TL01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R2-4",
@@ -3150,10 +4703,12 @@
       "Team 2 Player 2": "DR01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 1,
-      "Team 2 Points": 2
+      "Team 2 Points": 2,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R2-5",
@@ -3167,10 +4722,12 @@
       "Team 2 Player 2": "CB01",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": "Team 1",
-      "Back9 Winner": "Team 1",
+      "Back 9 Winner": "Team 1",
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R2-6",
@@ -3184,10 +4741,12 @@
       "Team 2 Player 2": "ES01",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": "Halved",
-      "Back9 Winner": "Team 2",
+      "Back 9 Winner": "Team 2",
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0.5,
-      "Team 2 Points": 2.5
+      "Team 2 Points": 2.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-1",
@@ -3201,10 +4760,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-2",
@@ -3218,10 +4779,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-3",
@@ -3235,10 +4798,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-4",
@@ -3252,10 +4817,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-5",
@@ -3269,10 +4836,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-6",
@@ -3286,10 +4855,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-7",
@@ -3303,10 +4874,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-8",
@@ -3320,10 +4893,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 1",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 1",
       "Team 1 Points": 3,
-      "Team 2 Points": 0
+      "Team 2 Points": 0,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-9",
@@ -3337,10 +4912,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Halved",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Halved",
       "Team 1 Points": 1.5,
-      "Team 2 Points": 1.5
+      "Team 2 Points": 1.5,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-10",
@@ -3354,10 +4931,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-11",
@@ -3371,10 +4950,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     },
     {
       "Match ID": "2025-R3-12",
@@ -3388,10 +4969,12 @@
       "Team 2 Player 2": "",
       "Matchup Winner": "Team 2",
       "Front 9 Winner": null,
-      "Back9 Winner": null,
+      "Back 9 Winner": null,
       "18-Hole Winner": "Team 2",
       "Team 1 Points": 0,
-      "Team 2 Points": 3
+      "Team 2 Points": 3,
+      "Match Status": null,
+      "Notes": null
     }
   ],
   "rounds": [
@@ -3413,11 +4996,128 @@
   ],
   "rules": [
     {
+      "Year": 2017,
+      "Round": "Round 1",
+      "Format": "BB",
+      "Team Size": 2,
+      "Points Available": null,
+      "Front 9 Used": null,
+      "Back 9 Used": null,
+      "Overall Used": null,
+      "Front 9 Points": null,
+      "Back 9 Points": null,
+      "Overall Points": null
+    },
+    {
+      "Year": 2017,
+      "Round": "Round 2",
+      "Format": "SC",
+      "Team Size": 2,
+      "Points Available": null,
+      "Front 9 Used": null,
+      "Back 9 Used": null,
+      "Overall Used": null,
+      "Front 9 Points": null,
+      "Back 9 Points": null,
+      "Overall Points": null
+    },
+    {
+      "Year": 2017,
+      "Round": "Round 3",
+      "Format": "SI",
+      "Team Size": 1,
+      "Points Available": null,
+      "Front 9 Used": null,
+      "Back 9 Used": null,
+      "Overall Used": null,
+      "Front 9 Points": null,
+      "Back 9 Points": null,
+      "Overall Points": null
+    },
+    {
+      "Year": 2018,
+      "Round": "Round 1",
+      "Format": "SI",
+      "Team Size": 1,
+      "Points Available": null,
+      "Front 9 Used": null,
+      "Back 9 Used": null,
+      "Overall Used": null,
+      "Front 9 Points": null,
+      "Back 9 Points": null,
+      "Overall Points": null
+    },
+    {
+      "Year": 2018,
+      "Round": "Round 2",
+      "Format": "SC",
+      "Team Size": 2,
+      "Points Available": null,
+      "Front 9 Used": null,
+      "Back 9 Used": null,
+      "Overall Used": null,
+      "Front 9 Points": null,
+      "Back 9 Points": null,
+      "Overall Points": null
+    },
+    {
+      "Year": 2018,
+      "Round": "Round 3",
+      "Format": "BB",
+      "Team Size": 2,
+      "Points Available": null,
+      "Front 9 Used": null,
+      "Back 9 Used": null,
+      "Overall Used": null,
+      "Front 9 Points": null,
+      "Back 9 Points": null,
+      "Overall Points": null
+    },
+    {
+      "Year": 2019,
+      "Round": "Round 1",
+      "Format": "BB",
+      "Team Size": 2,
+      "Points Available": 29,
+      "Front 9 Used": true,
+      "Back 9 Used": true,
+      "Overall Used": true,
+      "Front 9 Points": 7,
+      "Back 9 Points": 7,
+      "Overall Points": 15
+    },
+    {
+      "Year": 2019,
+      "Round": "Round 2",
+      "Format": "SC",
+      "Team Size": 2,
+      "Points Available": 21,
+      "Front 9 Used": true,
+      "Back 9 Used": true,
+      "Overall Used": true,
+      "Front 9 Points": 5,
+      "Back 9 Points": 5,
+      "Overall Points": 11
+    },
+    {
+      "Year": 2019,
+      "Round": "Round 3",
+      "Format": "SI",
+      "Team Size": 1,
+      "Points Available": 17,
+      "Front 9 Used": true,
+      "Back 9 Used": true,
+      "Overall Used": true,
+      "Front 9 Points": 4,
+      "Back 9 Points": 4,
+      "Overall Points": 9
+    },
+    {
       "Year": 2020,
       "Round": "Round 1",
       "Format": "BB",
       "Team Size": 2,
-      "Points Avaliable": 56,
+      "Points Available": 56,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3430,7 +5130,7 @@
       "Round": "Round 2",
       "Format": "SC",
       "Team Size": 2,
-      "Points Avaliable": 40,
+      "Points Available": 40,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3443,7 +5143,7 @@
       "Round": "Round 3",
       "Format": "SI",
       "Team Size": 1,
-      "Points Avaliable": 32,
+      "Points Available": 32,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3456,7 +5156,7 @@
       "Round": "Round 1",
       "Format": "BB",
       "Team Size": 2,
-      "Points Avaliable": 4,
+      "Points Available": 4,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3469,7 +5169,7 @@
       "Round": "Round 2",
       "Format": "SC",
       "Team Size": 2,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3482,7 +5182,7 @@
       "Round": "Round 3",
       "Format": "SI",
       "Team Size": 1,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3495,7 +5195,7 @@
       "Round": "Round 1",
       "Format": "BB",
       "Team Size": 2,
-      "Points Avaliable": 4,
+      "Points Available": 4,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3508,7 +5208,7 @@
       "Round": "Round 2",
       "Format": "SC",
       "Team Size": 2,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3521,7 +5221,7 @@
       "Round": "Round 3",
       "Format": "SI",
       "Team Size": 1,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3534,7 +5234,7 @@
       "Round": "Round 1",
       "Format": "BB",
       "Team Size": 2,
-      "Points Avaliable": 4,
+      "Points Available": 4,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3547,7 +5247,7 @@
       "Round": "Round 2",
       "Format": "SC",
       "Team Size": 2,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3560,7 +5260,7 @@
       "Round": "Round 3",
       "Format": "SI",
       "Team Size": 1,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3573,7 +5273,7 @@
       "Round": "Round 1",
       "Format": "BB",
       "Team Size": 2,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3586,7 +5286,7 @@
       "Round": "Round 2",
       "Format": "SC",
       "Team Size": 2,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3599,7 +5299,7 @@
       "Round": "Round 3",
       "Format": "SI",
       "Team Size": 1,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": false,
       "Back 9 Used": false,
       "Overall Used": true,
@@ -3612,7 +5312,7 @@
       "Round": "Round 1",
       "Format": "BB",
       "Team Size": 2,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3625,7 +5325,7 @@
       "Round": "Round 2",
       "Format": "SC",
       "Team Size": 2,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": true,
       "Back 9 Used": true,
       "Overall Used": true,
@@ -3638,7 +5338,7 @@
       "Round": "Round 3",
       "Format": "SI",
       "Team Size": 1,
-      "Points Avaliable": 3,
+      "Points Available": 3,
       "Front 9 Used": false,
       "Back 9 Used": false,
       "Overall Used": true,
@@ -3691,193 +5391,1776 @@
   ],
   "courses": [
     {
+      "Course ID": "TNGC01",
       "Year": 2017,
       "Round": "Round 1",
       "Format": "BB",
       "Course": "Troon North Golf Club",
-      "Location": "Scottsdale, AR"
+      "City": "Scottsdale",
+      "State": "AZ",
+      "Destination": "Scottsdale",
+      "Tee Played": "Gold",
+      "Slope": 139,
+      "Rating": 71.2,
+      "Yardage": 6716,
+      "Par": 72,
+      "Year Opened": 1990,
+      "Designer": "Tom Weiskopf",
+      "Website": "Troon North Golf Club - Website",
+      "Course Logo": "troon-north-logo"
     },
     {
+      "Course ID": "WKPS01",
       "Year": 2017,
       "Round": "Round 2",
       "Format": "SC",
-      "Course": "We-Ko-Pa - Saguaro",
-      "Location": "Scottsdale, AR"
+      "Course": "We-Ko-Pa Golf Club - Saguaro",
+      "City": "Fort McDowell",
+      "State": "AZ",
+      "Destination": "Scottsdale",
+      "Tee Played": "Purple",
+      "Slope": 132,
+      "Rating": 70.2,
+      "Yardage": 6603,
+      "Par": 71,
+      "Year Opened": 2006,
+      "Designer": "Bill Coore & Ben Crenshaw",
+      "Website": "We-Ko-Pa Golf Club - Saguaro - Website",
+      "Course Logo": "wekopa-saguaro-logo"
     },
     {
+      "Course ID": "GGCR01",
       "Year": 2017,
       "Round": "Round 3",
       "Format": "SI",
-      "Course": "Grayhawk Golf Club - Talon",
-      "Location": "Scottsdale, AR"
+      "Course": "Grayhawk Golf Club - Raptor",
+      "City": "Scottsdale",
+      "State": "AZ",
+      "Destination": "Scottsdale",
+      "Tee Played": "Palo Verde",
+      "Slope": 135,
+      "Rating": 71.2,
+      "Yardage": 6526,
+      "Par": 72,
+      "Year Opened": 1995,
+      "Designer": "Tom Fazio",
+      "Website": "Grayhawk Golf Club - Raptor - Website",
+      "Course Logo": "grayhawk-raptor-logo"
     },
     {
+      "Course ID": "ARGC01",
       "Year": 2018,
       "Round": "Round 1",
       "Format": "BB",
-      "Course": "Apple Rock",
-      "Location": "Horseshoe Bay, TX"
+      "Course": "Apple Rock Golf Course",
+      "City": "Horseshoe Bay",
+      "State": "TX",
+      "Destination": "Horseshoe Bay",
+      "Tee Played": "Regular",
+      "Slope": 135,
+      "Rating": 72.3,
+      "Yardage": 6536,
+      "Par": 72,
+      "Year Opened": 1986,
+      "Designer": "Robert Trent Jones Sr.",
+      "Website": "Apple Rock Golf Course - Website",
+      "Course Logo": "apple-rock-logo"
     },
     {
+      "Course ID": "SRGC01",
       "Year": 2018,
       "Round": "Round 2",
       "Format": "SC",
-      "Course": "Ram Rock",
-      "Location": "Horseshoe Bay, TX"
+      "Course": "Slick Rock Golf Course",
+      "City": "Horseshoe Bay",
+      "State": "TX",
+      "Destination": "Horseshoe Bay",
+      "Tee Played": "Championship",
+      "Slope": 134,
+      "Rating": 73.2,
+      "Yardage": 6867,
+      "Par": 72,
+      "Year Opened": 1971,
+      "Designer": "Robert Trent Jones Sr.",
+      "Website": "Slick Rock Golf Course - Website",
+      "Course Logo": "slick-rock-logo"
     },
     {
+      "Course ID": "SRGC02",
       "Year": 2018,
       "Round": "Round 3",
       "Format": "SI",
-      "Course": "Summit Rock",
-      "Location": "Horseshoe Bay, TX"
+      "Course": "Summit Rock Golf Course",
+      "City": "Horseshoe Bay",
+      "State": "TX",
+      "Destination": "Horseshoe Bay",
+      "Tee Played": "Tournament",
+      "Slope": 139,
+      "Rating": 72,
+      "Yardage": 6523,
+      "Par": 72,
+      "Year Opened": 2012,
+      "Designer": "Jack Nicklaus",
+      "Website": "Summit Rock Golf Course - Website",
+      "Course Logo": "summit-rock-logo"
     },
     {
+      "Course ID": "RSF01",
       "Year": 2019,
       "Round": "Round 1",
       "Format": "BB",
-      "Course": "Red Sky - Fazio",
-      "Location": "Beaver Creek, CO"
+      "Course": "Red Sky - Fazio Course",
+      "City": "Wolcott",
+      "State": "CO",
+      "Destination": "Beaver Creek",
+      "Tee Played": "Black",
+      "Slope": 141,
+      "Rating": 72.3,
+      "Yardage": 7116,
+      "Par": 72,
+      "Year Opened": 2002,
+      "Designer": "Tom Fazio",
+      "Website": "Red Sky - Fazio Course - Website",
+      "Course Logo": "redsky-fazio-logo"
     },
     {
+      "Course ID": "EVGC01",
       "Year": 2019,
       "Round": "Round 2",
       "Format": "SC",
       "Course": "Eagle Vail Golf Club",
-      "Location": "Beaver Creek, CO"
+      "City": "Avon",
+      "State": "CO",
+      "Destination": "Beaver Creek",
+      "Tee Played": "Blue",
+      "Slope": 133,
+      "Rating": 70.7,
+      "Yardage": 6538,
+      "Par": 71,
+      "Year Opened": 1972,
+      "Designer": "Ben Krueger",
+      "Website": "Eagle Vail Golf Club - Website",
+      "Course Logo": "eagle-vail-logo"
     },
     {
+      "Course ID": "RSN01",
       "Year": 2019,
       "Round": "Round 3",
       "Format": "SI",
-      "Course": "Red Sky - Norman",
-      "Location": "Beaver Creek, CO"
+      "Course": "Red Sky - Norman Course",
+      "City": "Wolcott",
+      "State": "CO",
+      "Destination": "Beaver Creek",
+      "Tee Played": "Black/Blue",
+      "Slope": 142,
+      "Rating": 72.8,
+      "Yardage": 7099,
+      "Par": 72,
+      "Year Opened": 2003,
+      "Designer": "Greg Norman",
+      "Website": "Red Sky - Norman Course - Website",
+      "Course Logo": "redsky-norman-logo"
     },
     {
+      "Course ID": "GTW01",
       "Year": 2020,
       "Round": "Round 1",
       "Format": "BB",
-      "Course": "Grand Traverse - The Wolverine",
-      "Location": "Traverse City, MI"
+      "Course": "Grand Traverse Resort and Spa - The Wolverine",
+      "City": "Acme",
+      "State": "MI",
+      "Destination": "Traverse City",
+      "Tee Played": "Blue",
+      "Slope": 138,
+      "Rating": 71.8,
+      "Yardage": 6498,
+      "Par": 72,
+      "Year Opened": 1999,
+      "Designer": "Gary Player",
+      "Website": "Grand Traverse Resort and Spa - The Wolverine - Website",
+      "Course Logo": "the-wolverine-logo"
     },
     {
+      "Course ID": "GTB01",
       "Year": 2020,
       "Round": "Round 2",
       "Format": "SC",
-      "Course": "Grand Traverse - The Bear",
-      "Location": "Traverse City, MI"
+      "Course": "Grand Traverse Resort and Spa - The Bear",
+      "City": "Acme",
+      "State": "MI",
+      "Destination": "Traverse City",
+      "Tee Played": "Blue",
+      "Slope": 147,
+      "Rating": 73.3,
+      "Yardage": 6601,
+      "Par": 72,
+      "Year Opened": 1985,
+      "Designer": "Jack Nicklaus",
+      "Website": "Grand Traverse Resort and Spa - The Bear - Website",
+      "Course Logo": "the-bear-logo"
     },
     {
+      "Course ID": "FDGC01",
       "Year": 2020,
       "Round": "Round 3",
       "Format": "SI",
-      "Course": "Forest Dunes",
-      "Location": "Traverse City, MI"
+      "Course": "Forest Dunes Golf Club",
+      "City": "Roscommon",
+      "State": "MI",
+      "Destination": "Traverse City",
+      "Tee Played": "II",
+      "Slope": 139,
+      "Rating": 72.4,
+      "Yardage": 6550,
+      "Par": 72,
+      "Year Opened": 2002,
+      "Designer": "Tom Weiskopf",
+      "Website": "Forest Dunes Golf Club - Website",
+      "Course Logo": "forest-dunes-logo"
     },
     {
+      "Course ID": "ONGC01",
       "Year": 2021,
       "Round": "Round 1",
       "Format": "BB",
-      "Course": "Ozarks National",
-      "Location": "Big Cedar Lodge, MO"
+      "Course": "Ozarks National Golf Course",
+      "City": "Hollister",
+      "State": "MO",
+      "Destination": "Big Cedar Lodge",
+      "Tee Played": "Ozarks",
+      "Slope": 131,
+      "Rating": 73.9,
+      "Yardage": 7036,
+      "Par": 71,
+      "Year Opened": 2019,
+      "Designer": "Bill Coore & Ben Crenshaw",
+      "Website": "Ozarks National Golf Course - Website",
+      "Course Logo": "ozarks-national-logo"
     },
     {
+      "Course ID": "BRGC01",
       "Year": 2021,
       "Round": "Round 2",
       "Format": "SC",
-      "Course": "Buffalo Ridge",
-      "Location": "Big Cedar Lodge, MO"
+      "Course": "Buffalo Ridge Golf Course",
+      "City": "Hollister",
+      "State": "MO",
+      "Destination": "Big Cedar Lodge",
+      "Tee Played": "Buffalo",
+      "Slope": 130,
+      "Rating": 73.4,
+      "Yardage": 7036,
+      "Par": 71,
+      "Year Opened": 1994,
+      "Designer": "Tom Fazio",
+      "Website": "Buffalo Ridge Golf Course - Website",
+      "Course Logo": "buffalo-ridge-logo"
     },
     {
+      "Course ID": "PVGC01",
       "Year": 2021,
       "Round": "Round 3",
       "Format": "SI",
-      "Course": "Payne's Valley",
-      "Location": "Big Cedar Lodge, MO"
+      "Course": "Payne's Valley Golf Course",
+      "City": "Hollister",
+      "State": "MO",
+      "Destination": "Big Cedar Lodge",
+      "Tee Played": "Blue",
+      "Slope": 125,
+      "Rating": 75.6,
+      "Yardage": 6876,
+      "Par": 72,
+      "Year Opened": 2020,
+      "Designer": "TGR Design",
+      "Website": "Payne's Valley Golf Course - Website",
+      "Course Logo": "paynes-valley-logo"
     },
     {
+      "Course ID": "P201",
       "Year": 2022,
       "Round": "Round 1",
       "Format": "BB",
-      "Course": "Pinehurst #2",
-      "Location": "Pinehurst, NC"
+      "Course": "Pinehurst No. 2",
+      "City": "Pinehurst",
+      "State": "NC",
+      "Destination": "Pinehurst",
+      "Tee Played": "Blue/White",
+      "Slope": 130,
+      "Rating": 71.9,
+      "Yardage": 6627,
+      "Par": 72,
+      "Year Opened": 1907,
+      "Designer": "Donald J. Ross",
+      "Website": "Pinehurst No. 2 - Website",
+      "Course Logo": "pinehurst-no2-logo"
     },
     {
+      "Course ID": "P701",
       "Year": 2022,
       "Round": "Round 2",
       "Format": "SC",
-      "Course": "Pinehurst #7",
-      "Location": "Pinehurst, NC"
+      "Course": "Pinehurst No. 7",
+      "City": "Pinehurst",
+      "State": "NC",
+      "Destination": "Pinehurst",
+      "Tee Played": "Blue",
+      "Slope": 138,
+      "Rating": 73.5,
+      "Yardage": 6824,
+      "Par": 72,
+      "Year Opened": 1986,
+      "Designer": "Rees Jones",
+      "Website": "Pinehurst No. 7 - Website",
+      "Course Logo": "pinehurst-no7-logo"
     },
     {
+      "Course ID": "P401",
       "Year": 2022,
       "Round": "Round 3",
       "Format": "SI",
-      "Course": "Pinehurst #4",
-      "Location": "Pinehurst, NC"
+      "Course": "Pinehurst No.4",
+      "City": "Pinehurst",
+      "State": "NC",
+      "Destination": "Pinehurst",
+      "Tee Played": "Blue",
+      "Slope": 135,
+      "Rating": 73.7,
+      "Yardage": 6658,
+      "Par": 72,
+      "Year Opened": 1919,
+      "Designer": "Gil Hanse",
+      "Website": "Pinehurst No.4 - Website",
+      "Course Logo": "pinehurst-no4-logo"
     },
     {
+      "Course ID": "PDC01",
       "Year": 2023,
       "Round": "Round 1",
       "Format": "BB",
       "Course": "The Pete Dye Course",
-      "Location": "French Lick, IN"
+      "City": "French Lick",
+      "State": "IN",
+      "Destination": "French Lick",
+      "Tee Played": "Blue",
+      "Slope": 138,
+      "Rating": 74.1,
+      "Yardage": 6701,
+      "Par": 72,
+      "Year Opened": 2009,
+      "Designer": "Pete Dye",
+      "Website": "The Pete Dye Course - Website",
+      "Course Logo": "pete-dye-logo"
     },
     {
+      "Course ID": "PDC02",
       "Year": 2023,
       "Round": "Round 2",
       "Format": "SC",
       "Course": "The Pete Dye Course",
-      "Location": "French Lick, IN"
+      "City": "French Lick",
+      "State": "IN",
+      "Destination": "French Lick",
+      "Tee Played": "Blue",
+      "Slope": 138,
+      "Rating": 74.1,
+      "Yardage": 6701,
+      "Par": 72,
+      "Year Opened": 2009,
+      "Designer": "Pete Dye",
+      "Website": "The Pete Dye Course - Website",
+      "Course Logo": "pete-dye-logo"
     },
     {
+      "Course ID": "DRC01",
       "Year": 2023,
       "Round": "Round 3",
       "Format": "SI",
       "Course": "The Donald Ross Course",
-      "Location": "French Lick, IN"
+      "City": "French Lick",
+      "State": "IN",
+      "Destination": "French Lick",
+      "Tee Played": "Bronze",
+      "Slope": 146,
+      "Rating": 73,
+      "Yardage": 6517,
+      "Par": 70,
+      "Year Opened": 1917,
+      "Designer": "Donald J. Ross",
+      "Website": "The Donald Ross Course - Website",
+      "Course Logo": "donald-ross-logo"
     },
     {
+      "Course ID": "SVGC01",
       "Year": 2024,
       "Round": "Round 1",
       "Format": "BB",
       "Course": "Sedge Valley",
-      "Location": "Sand Vallye, WI"
+      "City": "Nekoosa",
+      "State": "WI",
+      "Destination": "Sand Valley",
+      "Tee Played": "Back",
+      "Slope": 130,
+      "Rating": 68.7,
+      "Yardage": 5808,
+      "Par": 68,
+      "Year Opened": 2024,
+      "Designer": "Tom Doak",
+      "Website": "Sedge Valley - Website",
+      "Course Logo": "sedge-valley-logo"
     },
     {
+      "Course ID": "MDGC01",
       "Year": 2024,
       "Round": "Round 2",
       "Format": "SC",
       "Course": "Mammoth Dunes",
-      "Location": "Sand Vallye, WI"
+      "City": "Nekoosa",
+      "State": "WI",
+      "Destination": "Sand Valley",
+      "Tee Played": "Black",
+      "Slope": 141,
+      "Rating": 74.1,
+      "Yardage": 7063,
+      "Par": 73,
+      "Year Opened": 2018,
+      "Designer": "David McLay Kidd",
+      "Website": "Mammoth Dunes - Website",
+      "Course Logo": "mammoth-dunes-logo"
     },
     {
+      "Course ID": "SVGC02",
       "Year": 2024,
       "Round": "Round 3",
       "Format": "SI",
       "Course": "Sand Valley",
-      "Location": "Sand Vallye, WI"
+      "City": "Nekoosa",
+      "State": "WI",
+      "Destination": "Sand Valley",
+      "Tee Played": "Back/Orange",
+      "Slope": 140,
+      "Rating": 73.3,
+      "Yardage": 6712,
+      "Par": 72,
+      "Year Opened": 2017,
+      "Designer": "Bill Coore & Ben Crenshaw",
+      "Website": "Sand Valley - Website",
+      "Course Logo": "sand-valley-logo"
     },
     {
+      "Course ID": "OMGC01",
       "Year": 2025,
       "Round": "Round 1",
       "Format": "BB",
-      "Course": "Old MacDonald",
-      "Location": "Bandon Dunes, OR"
+      "Course": "Old Macdonald",
+      "City": "Bandon",
+      "State": "OR",
+      "Destination": "Bandon Dunes",
+      "Tee Played": "Green",
+      "Slope": 127,
+      "Rating": 71.4,
+      "Yardage": 6320,
+      "Par": 71,
+      "Year Opened": 2010,
+      "Designer": "Tom Doak & Jim Urbina",
+      "Website": "Old Macdonald - Website",
+      "Course Logo": "old-macdonald-logo"
     },
     {
+      "Course ID": "BDGC01",
       "Year": 2025,
       "Round": "Round 2",
       "Format": "SC",
       "Course": "Bandon Dunes",
-      "Location": "Bandon Dunes, OR"
+      "City": "Bandon",
+      "State": "OR",
+      "Destination": "Bandon Dunes",
+      "Tee Played": "Black",
+      "Slope": 143,
+      "Rating": 73.5,
+      "Yardage": 6346,
+      "Par": 72,
+      "Year Opened": 1999,
+      "Designer": "David McLay Kidd",
+      "Website": "Bandon Dunes - Website",
+      "Course Logo": "bandon-dunes-logo"
     },
     {
+      "Course ID": "PDGC03",
       "Year": 2025,
       "Round": "Round 3",
       "Format": "SI",
       "Course": "Pacific Dunes",
-      "Location": "Bandon Dunes, OR"
+      "City": "Bandon",
+      "State": "OR",
+      "Destination": "Bandon Dunes",
+      "Tee Played": "Black",
+      "Slope": 143,
+      "Rating": 73.2,
+      "Yardage": 6633,
+      "Par": 71,
+      "Year Opened": 2001,
+      "Designer": "Tom Doak",
+      "Website": "Pacific Dunes - Website",
+      "Course Logo": "pacific-dunes-logo"
+    },
+    {
+      "Course ID": "TPGC01",
+      "Year": 2026,
+      "Round": "Round 1",
+      "Format": "BB",
+      "Course": "Turtle Point",
+      "City": "Kiawah Island",
+      "State": "SC",
+      "Destination": "Kiawah Island",
+      "Tee Played": null,
+      "Slope": null,
+      "Rating": null,
+      "Yardage": null,
+      "Par": null,
+      "Year Opened": 1981,
+      "Designer": "Jack Nicklaus",
+      "Website": "Turtle Point - Website",
+      "Course Logo": "turtle-point-logo"
+    },
+    {
+      "Course ID": "CPGC01",
+      "Year": 2026,
+      "Round": "Round 2",
+      "Format": "SC",
+      "Course": "Cougar Point",
+      "City": "Kiawah Island",
+      "State": "SC",
+      "Destination": "Kiawah Island",
+      "Tee Played": null,
+      "Slope": null,
+      "Rating": null,
+      "Yardage": null,
+      "Par": null,
+      "Year Opened": 1976,
+      "Designer": "Gary Player",
+      "Website": "Cougar Point - Website",
+      "Course Logo": "cougar-point-logo"
+    },
+    {
+      "Course ID": "OCGC01",
+      "Year": 2026,
+      "Round": "Round 3",
+      "Format": "SI",
+      "Course": "The Ocean Course",
+      "City": "Kiawah Island",
+      "State": "SC",
+      "Destination": "Kiawah Island",
+      "Tee Played": null,
+      "Slope": null,
+      "Rating": null,
+      "Yardage": null,
+      "Par": null,
+      "Year Opened": 1991,
+      "Designer": "Pete Dye",
+      "Website": "The Ocean Course - Website",
+      "Course Logo": "ocean-course-logo"
+    }
+  ],
+  "handicaps": [
+    {
+      "Year": 2017,
+      "Player ID": "BC01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10
+    },
+    {
+      "Year": 2017,
+      "Player ID": "BA01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.2
+    },
+    {
+      "Year": 2017,
+      "Player ID": "CP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12
+    },
+    {
+      "Year": 2017,
+      "Player ID": "CO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12
+    },
+    {
+      "Year": 2017,
+      "Player ID": "DT01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.7
+    },
+    {
+      "Year": 2017,
+      "Player ID": "HM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 3.3
+    },
+    {
+      "Year": 2017,
+      "Player ID": "JS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.8
+    },
+    {
+      "Year": 2017,
+      "Player ID": "JK01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14.2
+    },
+    {
+      "Year": 2017,
+      "Player ID": "CB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 14.7
+    },
+    {
+      "Year": 2017,
+      "Player ID": "MO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14
+    },
+    {
+      "Year": 2017,
+      "Player ID": "MB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 3
+    },
+    {
+      "Year": 2017,
+      "Player ID": "RM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 3
+    },
+    {
+      "Year": 2017,
+      "Player ID": "SS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12
+    },
+    {
+      "Year": 2017,
+      "Player ID": "TL01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 16.6
+    },
+    {
+      "Year": 2017,
+      "Player ID": "WC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 6.8
+    },
+    {
+      "Year": 2017,
+      "Player ID": "WD01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9
+    },
+    {
+      "Year": 2018,
+      "Player ID": "RM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 0.6
+    },
+    {
+      "Year": 2018,
+      "Player ID": "WO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 2.1
+    },
+    {
+      "Year": 2018,
+      "Player ID": "MB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 3
+    },
+    {
+      "Year": 2018,
+      "Player ID": "HM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 3.6
+    },
+    {
+      "Year": 2018,
+      "Player ID": "WC01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 7
+    },
+    {
+      "Year": 2018,
+      "Player ID": "DR01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9
+    },
+    {
+      "Year": 2018,
+      "Player ID": "MH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.5
+    },
+    {
+      "Year": 2018,
+      "Player ID": "JS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.9
+    },
+    {
+      "Year": 2018,
+      "Player ID": "CP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.2
+    },
+    {
+      "Year": 2018,
+      "Player ID": "CO02",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.3
+    },
+    {
+      "Year": 2018,
+      "Player ID": "BA01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.4
+    },
+    {
+      "Year": 2018,
+      "Player ID": "CO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.7
+    },
+    {
+      "Year": 2018,
+      "Player ID": "DT01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.8
+    },
+    {
+      "Year": 2018,
+      "Player ID": "JP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 13
+    },
+    {
+      "Year": 2018,
+      "Player ID": "SS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13.8
+    },
+    {
+      "Year": 2018,
+      "Player ID": "JK01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 13.9
+    },
+    {
+      "Year": 2018,
+      "Player ID": "PC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 14
+    },
+    {
+      "Year": 2018,
+      "Player ID": "TL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 14.4
+    },
+    {
+      "Year": 2018,
+      "Player ID": "CB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 16.8
+    },
+    {
+      "Year": 2018,
+      "Player ID": "CS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 21.6
+    },
+    {
+      "Year": 2019,
+      "Player ID": "MS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 2.4
+    },
+    {
+      "Year": 2019,
+      "Player ID": "MB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 2.6
+    },
+    {
+      "Year": 2019,
+      "Player ID": "RM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 3
+    },
+    {
+      "Year": 2019,
+      "Player ID": "HM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 4
+    },
+    {
+      "Year": 2019,
+      "Player ID": "WC01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 5.1
+    },
+    {
+      "Year": 2019,
+      "Player ID": "BC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 5.1
+    },
+    {
+      "Year": 2019,
+      "Player ID": "DR01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 8.6
+    },
+    {
+      "Year": 2019,
+      "Player ID": "JP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8.7
+    },
+    {
+      "Year": 2019,
+      "Player ID": "DT01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.2
+    },
+    {
+      "Year": 2019,
+      "Player ID": "MH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.7
+    },
+    {
+      "Year": 2019,
+      "Player ID": "CP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.4
+    },
+    {
+      "Year": 2019,
+      "Player ID": "BA01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.4
+    },
+    {
+      "Year": 2019,
+      "Player ID": "CO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.9
+    },
+    {
+      "Year": 2019,
+      "Player ID": "BJ01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12
+    },
+    {
+      "Year": 2019,
+      "Player ID": "JK01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14.7
+    },
+    {
+      "Year": 2019,
+      "Player ID": "CS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 15.1
+    },
+    {
+      "Year": 2019,
+      "Player ID": "CB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 17
+    },
+    {
+      "Year": 2019,
+      "Player ID": "KW01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 18
+    },
+    {
+      "Year": 2019,
+      "Player ID": "TG01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 18
+    },
+    {
+      "Year": 2019,
+      "Player ID": "TL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 19.3
+    },
+    {
+      "Year": 2020,
+      "Player ID": "RM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": -0.6
+    },
+    {
+      "Year": 2020,
+      "Player ID": "MS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 1.5
+    },
+    {
+      "Year": 2020,
+      "Player ID": "MB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 2
+    },
+    {
+      "Year": 2020,
+      "Player ID": "HM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 2.1
+    },
+    {
+      "Year": 2020,
+      "Player ID": "WC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 5.2
+    },
+    {
+      "Year": 2020,
+      "Player ID": "CF01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 3.6
+    },
+    {
+      "Year": 2020,
+      "Player ID": "MS02",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 3.9
+    },
+    {
+      "Year": 2020,
+      "Player ID": "BC01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 7.2
+    },
+    {
+      "Year": 2020,
+      "Player ID": "CP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 8.5
+    },
+    {
+      "Year": 2020,
+      "Player ID": "DT01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 7.6
+    },
+    {
+      "Year": 2020,
+      "Player ID": "MH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 7.6
+    },
+    {
+      "Year": 2020,
+      "Player ID": "BJ01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 10.2
+    },
+    {
+      "Year": 2020,
+      "Player ID": "CL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8
+    },
+    {
+      "Year": 2020,
+      "Player ID": "JP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.2
+    },
+    {
+      "Year": 2020,
+      "Player ID": "RH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.5
+    },
+    {
+      "Year": 2020,
+      "Player ID": "CO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.6
+    },
+    {
+      "Year": 2020,
+      "Player ID": "BA01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.5
+    },
+    {
+      "Year": 2020,
+      "Player ID": "JK01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.5
+    },
+    {
+      "Year": 2020,
+      "Player ID": "JG01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 12.9
+    },
+    {
+      "Year": 2020,
+      "Player ID": "CS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.2
+    },
+    {
+      "Year": 2020,
+      "Player ID": "CO02",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14.5
+    },
+    {
+      "Year": 2020,
+      "Player ID": "CB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 15.5
+    },
+    {
+      "Year": 2020,
+      "Player ID": "TG01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 15.2
+    },
+    {
+      "Year": 2020,
+      "Player ID": "TL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 15.4
+    },
+    {
+      "Year": 2021,
+      "Player ID": "WO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 0.8
+    },
+    {
+      "Year": 2021,
+      "Player ID": "HM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 1.6
+    },
+    {
+      "Year": 2021,
+      "Player ID": "MS02",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 1.2
+    },
+    {
+      "Year": 2021,
+      "Player ID": "MS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 3.7
+    },
+    {
+      "Year": 2021,
+      "Player ID": "CF01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 5
+    },
+    {
+      "Year": 2021,
+      "Player ID": "DT01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 6.5
+    },
+    {
+      "Year": 2021,
+      "Player ID": "SL01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 6.2
+    },
+    {
+      "Year": 2021,
+      "Player ID": "WC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 7
+    },
+    {
+      "Year": 2021,
+      "Player ID": "BC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8.2
+    },
+    {
+      "Year": 2021,
+      "Player ID": "MH01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 7.4
+    },
+    {
+      "Year": 2021,
+      "Player ID": "DR01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 6.5
+    },
+    {
+      "Year": 2021,
+      "Player ID": "CP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.1
+    },
+    {
+      "Year": 2021,
+      "Player ID": "BA01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.9
+    },
+    {
+      "Year": 2021,
+      "Player ID": "CO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.4
+    },
+    {
+      "Year": 2021,
+      "Player ID": "JS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 12.2
+    },
+    {
+      "Year": 2021,
+      "Player ID": "RH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.5
+    },
+    {
+      "Year": 2021,
+      "Player ID": "BJ01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 12.6
+    },
+    {
+      "Year": 2021,
+      "Player ID": "TL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.8
+    },
+    {
+      "Year": 2021,
+      "Player ID": "JK01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.9
+    },
+    {
+      "Year": 2021,
+      "Player ID": "SS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.8
+    },
+    {
+      "Year": 2021,
+      "Player ID": "CS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13.7
+    },
+    {
+      "Year": 2021,
+      "Player ID": "CO02",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13.8
+    },
+    {
+      "Year": 2021,
+      "Player ID": "CB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 15.4
+    },
+    {
+      "Year": 2021,
+      "Player ID": "AM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 16.8
+    },
+    {
+      "Year": 2022,
+      "Player ID": "MS02",
+      "Team Side": "Team 2",
+      "Tournament Handicap": -0.5
+    },
+    {
+      "Year": 2022,
+      "Player ID": "RM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": -0.2
+    },
+    {
+      "Year": 2022,
+      "Player ID": "MB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 0.69
+    },
+    {
+      "Year": 2022,
+      "Player ID": "HM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 1.6
+    },
+    {
+      "Year": 2022,
+      "Player ID": "WO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 2
+    },
+    {
+      "Year": 2022,
+      "Player ID": "CF01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 4
+    },
+    {
+      "Year": 2022,
+      "Player ID": "DT01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 6.4
+    },
+    {
+      "Year": 2022,
+      "Player ID": "JP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 6.9
+    },
+    {
+      "Year": 2022,
+      "Player ID": "BA01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 7.4
+    },
+    {
+      "Year": 2022,
+      "Player ID": "MH01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 7.7
+    },
+    {
+      "Year": 2022,
+      "Player ID": "JS02",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8.1
+    },
+    {
+      "Year": 2022,
+      "Player ID": "BC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8.2
+    },
+    {
+      "Year": 2022,
+      "Player ID": "CO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.4
+    },
+    {
+      "Year": 2022,
+      "Player ID": "CP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.8
+    },
+    {
+      "Year": 2022,
+      "Player ID": "DR01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.3
+    },
+    {
+      "Year": 2022,
+      "Player ID": "JK01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.5
+    },
+    {
+      "Year": 2022,
+      "Player ID": "JS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.7
+    },
+    {
+      "Year": 2022,
+      "Player ID": "SS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12
+    },
+    {
+      "Year": 2022,
+      "Player ID": "RH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 12.1
+    },
+    {
+      "Year": 2022,
+      "Player ID": "CS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13.5
+    },
+    {
+      "Year": 2022,
+      "Player ID": "NJ01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14
+    },
+    {
+      "Year": 2022,
+      "Player ID": "TL01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14.1
+    },
+    {
+      "Year": 2022,
+      "Player ID": "CB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 15.9
+    },
+    {
+      "Year": 2022,
+      "Player ID": "AM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 19.9
+    },
+    {
+      "Year": 2023,
+      "Player ID": "RM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": -0.4
+    },
+    {
+      "Year": 2023,
+      "Player ID": "MB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 0.3
+    },
+    {
+      "Year": 2023,
+      "Player ID": "HM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 0.7
+    },
+    {
+      "Year": 2023,
+      "Player ID": "MS02",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 0.7
+    },
+    {
+      "Year": 2023,
+      "Player ID": "WO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 0.8
+    },
+    {
+      "Year": 2023,
+      "Player ID": "MS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 2.5
+    },
+    {
+      "Year": 2023,
+      "Player ID": "MH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 3.8
+    },
+    {
+      "Year": 2023,
+      "Player ID": "DT01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 4
+    },
+    {
+      "Year": 2023,
+      "Player ID": "WC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 4.2
+    },
+    {
+      "Year": 2023,
+      "Player ID": "CP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 7.5
+    },
+    {
+      "Year": 2023,
+      "Player ID": "JP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 7.7
+    },
+    {
+      "Year": 2023,
+      "Player ID": "BC01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 7.8
+    },
+    {
+      "Year": 2023,
+      "Player ID": "BA01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 8.4
+    },
+    {
+      "Year": 2023,
+      "Player ID": "DR01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8.5
+    },
+    {
+      "Year": 2023,
+      "Player ID": "CO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.7
+    },
+    {
+      "Year": 2023,
+      "Player ID": "JS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.1
+    },
+    {
+      "Year": 2023,
+      "Player ID": "NJ01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 10.8
+    },
+    {
+      "Year": 2023,
+      "Player ID": "SS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.9
+    },
+    {
+      "Year": 2023,
+      "Player ID": "JK01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.2
+    },
+    {
+      "Year": 2023,
+      "Player ID": "CB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.1
+    },
+    {
+      "Year": 2023,
+      "Player ID": "RH01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.3
+    },
+    {
+      "Year": 2023,
+      "Player ID": "TL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13.5
+    },
+    {
+      "Year": 2023,
+      "Player ID": "CS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14.9
+    },
+    {
+      "Year": 2023,
+      "Player ID": "AM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 15.1
+    },
+    {
+      "Year": 2024,
+      "Player ID": "RM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 0.5
+    },
+    {
+      "Year": 2024,
+      "Player ID": "WO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 0.9
+    },
+    {
+      "Year": 2024,
+      "Player ID": "MB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 1.2
+    },
+    {
+      "Year": 2024,
+      "Player ID": "MM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 1.5
+    },
+    {
+      "Year": 2024,
+      "Player ID": "HM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 1.6
+    },
+    {
+      "Year": 2024,
+      "Player ID": "MS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 2.4
+    },
+    {
+      "Year": 2024,
+      "Player ID": "MS02",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 2.9
+    },
+    {
+      "Year": 2024,
+      "Player ID": "WC01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 4
+    },
+    {
+      "Year": 2024,
+      "Player ID": "DT01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 4.6
+    },
+    {
+      "Year": 2024,
+      "Player ID": "DR01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 5.1
+    },
+    {
+      "Year": 2024,
+      "Player ID": "MH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 5.7
+    },
+    {
+      "Year": 2024,
+      "Player ID": "JP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 6.7
+    },
+    {
+      "Year": 2024,
+      "Player ID": "NJ01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8
+    },
+    {
+      "Year": 2024,
+      "Player ID": "CO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 8.6
+    },
+    {
+      "Year": 2024,
+      "Player ID": "BA01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9
+    },
+    {
+      "Year": 2024,
+      "Player ID": "CP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.7
+    },
+    {
+      "Year": 2024,
+      "Player ID": "BC01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.1
+    },
+    {
+      "Year": 2024,
+      "Player ID": "JK01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 10.4
+    },
+    {
+      "Year": 2024,
+      "Player ID": "RH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 10.6
+    },
+    {
+      "Year": 2024,
+      "Player ID": "JS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 11.4
+    },
+    {
+      "Year": 2024,
+      "Player ID": "SS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 11.9
+    },
+    {
+      "Year": 2024,
+      "Player ID": "CS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13
+    },
+    {
+      "Year": 2024,
+      "Player ID": "TL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13
+    },
+    {
+      "Year": 2024,
+      "Player ID": "AM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 14
+    },
+    {
+      "Year": 2025,
+      "Player ID": "AM01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 13.4
+    },
+    {
+      "Year": 2025,
+      "Player ID": "BC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 8.4
+    },
+    {
+      "Year": 2025,
+      "Player ID": "BA01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.6
+    },
+    {
+      "Year": 2025,
+      "Player ID": "CL01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.1
+    },
+    {
+      "Year": 2025,
+      "Player ID": "CP01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 8.9
+    },
+    {
+      "Year": 2025,
+      "Player ID": "CS01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13.5
+    },
+    {
+      "Year": 2025,
+      "Player ID": "CO01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 9.5
+    },
+    {
+      "Year": 2025,
+      "Player ID": "DR01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 6.5
+    },
+    {
+      "Year": 2025,
+      "Player ID": "DT01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 5.4
+    },
+    {
+      "Year": 2025,
+      "Player ID": "ES01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 6.5
+    },
+    {
+      "Year": 2025,
+      "Player ID": "HM01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 2.5
+    },
+    {
+      "Year": 2025,
+      "Player ID": "JS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 8.5
+    },
+    {
+      "Year": 2025,
+      "Player ID": "JP01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 6.2
+    },
+    {
+      "Year": 2025,
+      "Player ID": "JK01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 9.3
+    },
+    {
+      "Year": 2025,
+      "Player ID": "CB01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 12.8
+    },
+    {
+      "Year": 2025,
+      "Player ID": "MS02",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 3.6
+    },
+    {
+      "Year": 2025,
+      "Player ID": "MS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 1.7
+    },
+    {
+      "Year": 2025,
+      "Player ID": "MH01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 4.6
+    },
+    {
+      "Year": 2025,
+      "Player ID": "MB01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 0.5
+    },
+    {
+      "Year": 2025,
+      "Player ID": "NJ01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 7.2
+    },
+    {
+      "Year": 2025,
+      "Player ID": "SS01",
+      "Team Side": "Team 1",
+      "Tournament Handicap": 12.6
+    },
+    {
+      "Year": 2025,
+      "Player ID": "TL01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 13.1
+    },
+    {
+      "Year": 2025,
+      "Player ID": "WC01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 3
+    },
+    {
+      "Year": 2025,
+      "Player ID": "WO01",
+      "Team Side": "Team 2",
+      "Tournament Handicap": 0.8
     }
   ]
 }
