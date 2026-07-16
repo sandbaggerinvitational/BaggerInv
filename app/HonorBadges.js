@@ -27,29 +27,9 @@ export function BogShieldIcon({ className = "" }) {
           <stop offset="100%" stopColor="#f0ca67" />
         </linearGradient>
       </defs>
-      <path
-        d="M32 3 58 12v20c0 18-10.5 30.2-26 37C16.5 62.2 6 50 6 32V12L32 3Z"
-        fill="url(#bogGold)"
-        stroke="#9f7422"
-        strokeWidth="2"
-      />
-      <path
-        d="M32 8 53 15v17c0 14.3-7.8 24.8-21 31.2C18.8 56.8 11 46.3 11 32V15L32 8Z"
-        fill="none"
-        stroke="rgba(255,255,255,.48)"
-        strokeWidth="2"
-      />
-      <text
-        x="32"
-        y="40"
-        textAnchor="middle"
-        fontFamily="Georgia, serif"
-        fontSize="17"
-        fontWeight="800"
-        fill="#0b3529"
-      >
-        BOG
-      </text>
+      <path d="M32 3 58 12v20c0 18-10.5 30.2-26 37C16.5 62.2 6 50 6 32V12L32 3Z" fill="url(#bogGold)" stroke="#9f7422" strokeWidth="2" />
+      <path d="M32 8 53 15v17c0 14.3-7.8 24.8-21 31.2C18.8 56.8 11 46.3 11 32V15L32 8Z" fill="none" stroke="rgba(255,255,255,.48)" strokeWidth="2" />
+      <text x="32" y="40" textAnchor="middle" fontFamily="Georgia, serif" fontSize="17" fontWeight="800" fill="#0b3529">BOG</text>
     </svg>
   );
 }
@@ -58,18 +38,8 @@ function sortedYears(years) {
   return [...years].sort((a, b) => Number(a) - Number(b));
 }
 
-function championSummary(count) {
-  return `${count}× Champion`;
-}
-
-function soySummary(count) {
-  return count === 1 ? "SOY" : `${count}× SOY`;
-}
-
 function soyProfileLabel(count) {
-  return count === 1
-    ? "Sandbagger of the Year"
-    : `${count}× Sandbagger of the Year`;
+  return count === 1 ? "Sandbagger of the Year" : `${count}× Sandbagger of the Year`;
 }
 
 export function CompactHonors({
@@ -81,29 +51,24 @@ export function CompactHonors({
   if (!championships.length && !soyYears.length && !isGovernor) return null;
 
   return (
-    <div className={styles.playerCardHonors} aria-label="Career honors">
+    <div className={styles.playerCardHonorIcons} aria-label="Career honors">
       {championships.length ? (
-        <div className={styles.playerCardHonor}>
-          <div className={styles.playerCardHonorMedallion}>
-            <TrophyIcon className={styles.playerCardHonorIcon} />
-          </div>
-          <span>{championSummary(championships.length)}</span>
+        <div className={styles.playerCardHonorIconItem} title={`${championships.length}× Champion`}>
+          <TrophyIcon className={styles.playerCardMiniIcon} />
+          <span>{championships.length}×</span>
         </div>
       ) : null}
 
       {soyYears.length ? (
-        <div className={styles.playerCardHonor}>
-          <div className={styles.playerCardHonorMedallion}>
-            <StarIcon className={styles.playerCardHonorIcon} />
-          </div>
-          <span>{soySummary(soyYears.length)}</span>
+        <div className={styles.playerCardHonorIconItem} title="Sandbagger of the Year">
+          <StarIcon className={styles.playerCardMiniIcon} />
+          {soyYears.length > 1 ? <span>{soyYears.length}×</span> : null}
         </div>
       ) : null}
 
       {isGovernor ? (
-        <div className={`${styles.playerCardHonor} ${styles.playerCardBogHonor}`}>
-          <BogShieldIcon className={styles.playerCardBogShield} />
-          <span>Board of Governors</span>
+        <div className={styles.playerCardHonorIconItem} title="Board of Governors">
+          <BogShieldIcon className={styles.playerCardMiniShield} />
         </div>
       ) : null}
     </div>
@@ -153,9 +118,7 @@ export function CareerHonors({
             <div className={styles.bogMedallion}>
               <BogShieldIcon className={styles.bogHonorIcon} />
             </div>
-            <div>
-              <span>Board of Governors</span>
-            </div>
+            <div><span>Board of Governors</span></div>
           </div>
         ) : null}
       </div>
