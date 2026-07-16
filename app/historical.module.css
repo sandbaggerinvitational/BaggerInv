@@ -1553,3 +1553,134 @@
     font-size: .56rem;
   }
 }
+
+
+/* =========================================================
+   PLAYER CARD HONORS â€” RESUME STYLE
+   ========================================================= */
+
+.playerTop {
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: start;
+}
+
+.playerCardIdentity {
+  min-width: 0;
+}
+
+.playerCardIdentity .activeBadge,
+.playerCardIdentity .inactiveBadge {
+  width: fit-content;
+  margin-top: 12px;
+  display: inline-flex;
+}
+
+.playerCardHonors {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.playerCardHonor {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+}
+
+.playerCardHonorMedallion {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c89c3c;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f9e8ae, #bd8e2d 55%, #f3cf72);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.65),
+    0 5px 10px rgba(116,83,20,.13);
+}
+
+.playerCardHonorIcon {
+  width: 23px;
+  height: 23px;
+  color: #0b3529;
+}
+
+.playerCardHonor span {
+  display: block;
+  color: #9b721f;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-size: .58rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.playerCardHonor strong {
+  display: block;
+  margin-top: 4px;
+  color: #687069;
+  font-size: .69rem;
+  line-height: 1.35;
+}
+
+.playerCardBogHonor {
+  grid-template-columns: 42px minmax(0, 1fr);
+}
+
+.playerCardBogShield {
+  width: 40px;
+  height: 45px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.15));
+}
+
+.playerCardBogHonor strong {
+  color: #0b3529;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+@media (max-width: 1180px) {
+  .playerCardHonors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .playerCardHonors {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .playerCardHonor {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .playerCardHonorMedallion {
+    width: 36px;
+    height: 36px;
+  }
+
+  .playerCardHonorIcon {
+    width: 21px;
+    height: 21px;
+  }
+
+  .playerCardBogShield {
+    width: 36px;
+    height: 41px;
+  }
+}
+
+@media (max-width: 480px) {
+  .playerTop {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+
+  .playerCardHonors {
+    margin-top: 12px;
+  }
+}
