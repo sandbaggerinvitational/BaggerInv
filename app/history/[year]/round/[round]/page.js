@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
 import AssetImage from "../../../../AssetImage";
 import {
+  courseHero,
   courseLogo,
   teamLogo,
-  tournamentHero,
 } from "../../../../../lib/asset-paths";
 import {
   getFormatName,
@@ -16,6 +16,31 @@ import styles from "../../../../historical.module.css";
 function displayPoints(value) {
   if (value === null || value === undefined) return "—";
   return Number.isInteger(value) ? value : Number(value).toFixed(1);
+}
+
+function strokeLabel(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const strokes = Number(value);
+  if (!Number.isFinite(strokes)) return null;
+
+  return `${strokes} ${strokes === 1 ? "stroke" : "strokes"}`;
+}
+
+function playerStroke(match, team, index) {
+  if (match.format === "SC") return null;
+
+  if (match.format === "SI" && index > 0) return null;
+
+  return strokeLabel(team.playerStrokes?.[index]);
+}
+
+function teamStroke(match, team) {
+  return match.format === "SC"
+    ? strokeLabel(team.teamStrokes)
+    : null;
 }
 
 function MatchTrophy() {
@@ -86,8 +111,8 @@ export default async function HistoricalRoundPage({ params }) {
 
       <section className={styles.roundArchiveHero}>
         <AssetImage
-          src={tournamentHero(archive.tournament["Hero Image"])}
-          alt={`${archive.year} ${archive.tournament.Destination}`}
+          src={courseHero(archive.course["Course Profile Image"])}
+          alt={`${archive.course.Course} course`}
           className={styles.roundArchiveHeroImage}
           fallbackClassName={styles.roundArchiveHeroFallback}
           fallback={archive.tournament.Destination}
@@ -169,28 +194,52 @@ export default async function HistoricalRoundPage({ params }) {
                 <div className={styles.roundMatchPlayers}>
                   <div>
                     <span>{match.teamOne.name}</span>
-                    {match.teamOne.players.map((player) => (
-                      <Link
-                        href={`/players/${player.slug}`}
+                    {match.teamOne.players.map((player, index) => (
+                      <div
+                        className={styles.roundMatchPlayerEntry}
                         key={player.id}
                       >
-                        {player.name}
-                      </Link>
+                        <Link href={`/players/${player.slug}`}>
+                          {player.name}
+                        </Link>
+                        {playerStroke(match, match.teamOne, index) ? (
+                          <small className={styles.roundMatchStroke}>
+                            {playerStroke(match, match.teamOne, index)}
+                          </small>
+                        ) : null}
+                      </div>
                     ))}
+                    {teamStroke(match, match.teamOne) ? (
+                      <small className={styles.roundMatchTeamStroke}>
+                        {teamStroke(match, match.teamOne)}
+                      </small>
+                    ) : null}
                   </div>
 
                   <strong>VS</strong>
 
                   <div>
                     <span>{match.teamTwo.name}</span>
-                    {match.teamTwo.players.map((player) => (
-                      <Link
-                        href={`/players/${player.slug}`}
+                    {match.teamTwo.players.map((player, index) => (
+                      <div
+                        className={styles.roundMatchPlayerEntry}
                         key={player.id}
                       >
-                        {player.name}
-                      </Link>
+                        <Link href={`/players/${player.slug}`}>
+                          {player.name}
+                        </Link>
+                        {playerStroke(match, match.teamTwo, index) ? (
+                          <small className={styles.roundMatchStroke}>
+                            {playerStroke(match, match.teamTwo, index)}
+                          </small>
+                        ) : null}
+                      </div>
                     ))}
+                    {teamStroke(match, match.teamTwo) ? (
+                      <small className={styles.roundMatchTeamStroke}>
+                        {teamStroke(match, match.teamTwo)}
+                      </small>
+                    ) : null}
                   </div>
                 </div>
 
