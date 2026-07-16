@@ -18,6 +18,32 @@ function displayPoints(value) {
   return Number.isInteger(value) ? value : Number(value).toFixed(1);
 }
 
+function MatchTrophy() {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <path
+        d="M20 8h24v8c0 10-4.8 18.2-12 21.2C24.8 34.2 20 26 20 16V8Z"
+        fill="currentColor"
+      />
+      <path
+        d="M20 14H10v5c0 9 5.2 15 14 16M44 14h10v5c0 9-5.2 15-14 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M32 37v10M22 55h20M26 47h12v8H26z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function winnerClass(winner, teamOne, teamTwo) {
   if (winner === teamOne) return styles.roundTeamOneWinner;
   if (winner === teamTwo) return styles.roundTeamTwoWinner;
@@ -191,26 +217,55 @@ export default async function HistoricalRoundPage({ params }) {
                   ))}
                 </div>
 
-                <div className={styles.roundMatchPoints}>
-                  <div>
-                    <span>{match.teamOne.name}</span>
-                    <strong>{displayPoints(match.teamOne.points)}</strong>
+                <div className={styles.roundMatchResult}>
+                  <span className={styles.roundMatchResultLabel}>
+                    Match Result
+                  </span>
+
+                  <div
+                    className={`${styles.roundMatchWinnerBanner} ${winnerClass(
+                      match.winner,
+                      match.teamOne.name,
+                      match.teamTwo.name
+                    )}`}
+                  >
+                    {match.winner !== "Halved" &&
+                    match.winner !== "Not recorded" ? (
+                      <MatchTrophy />
+                    ) : null}
+                    <strong>
+                      {match.winner === "Halved"
+                        ? "Match Halved"
+                        : match.winner}
+                    </strong>
                   </div>
-                  <div>
-                    <span>Match Result</span>
-                    <b
-                      className={winnerClass(
-                        match.winner,
-                        match.teamOne.name,
-                        match.teamTwo.name
-                      )}
+
+                  <div className={styles.roundMatchScoreTable}>
+                    <div
+                      className={`${styles.roundMatchScoreRow} ${
+                        match.winner === match.teamOne.name
+                          ? styles.roundMatchScoreWinner
+                          : ""
+                      }`}
                     >
-                      {match.winner}
-                    </b>
-                  </div>
-                  <div>
-                    <span>{match.teamTwo.name}</span>
-                    <strong>{displayPoints(match.teamTwo.points)}</strong>
+                      <span>{match.teamOne.name}</span>
+                      <strong>
+                        {displayPoints(match.teamOne.points)}
+                      </strong>
+                    </div>
+
+                    <div
+                      className={`${styles.roundMatchScoreRow} ${
+                        match.winner === match.teamTwo.name
+                          ? styles.roundMatchScoreWinner
+                          : ""
+                      }`}
+                    >
+                      <span>{match.teamTwo.name}</span>
+                      <strong>
+                        {displayPoints(match.teamTwo.points)}
+                      </strong>
+                    </div>
                   </div>
                 </div>
 
