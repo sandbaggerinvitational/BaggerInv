@@ -103,7 +103,6 @@ export default async function HistoricalRoundPage({ params }) {
               fallbackClassName={styles.roundArchiveTeamLogoFallback}
               fallback={archive.teamOne.name.slice(0, 2).toUpperCase()}
             />
-            <span>Team One</span>
             <strong>{archive.teamOne.name}</strong>
             <b>{displayPoints(archive.teamOne.points)}</b>
           </div>
@@ -121,7 +120,6 @@ export default async function HistoricalRoundPage({ params }) {
               fallbackClassName={styles.roundArchiveTeamLogoFallback}
               fallback={archive.teamTwo.name.slice(0, 2).toUpperCase()}
             />
-            <span>Team Two</span>
             <strong>{archive.teamTwo.name}</strong>
             <b>{displayPoints(archive.teamTwo.points)}</b>
           </div>
@@ -199,7 +197,7 @@ export default async function HistoricalRoundPage({ params }) {
                     <strong>{displayPoints(match.teamOne.points)}</strong>
                   </div>
                   <div>
-                    <span>Match Points</span>
+                    <span>Match Result</span>
                     <b
                       className={winnerClass(
                         match.winner,
