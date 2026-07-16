@@ -3130,3 +3130,98 @@
     margin-inline: 7px;
   }
 }
+
+
+/* =========================================================
+   V7.3.1 â€” HONOR YEAR SEPARATOR FIX
+   ========================================================= */
+
+.honorYearItem {
+  white-space: nowrap;
+}
+
+.honorYearDot {
+  margin-left: 9px;
+  margin-right: 9px;
+}
+
+@media (max-width: 720px) {
+  .honorYearDot {
+    margin-left: 7px;
+    margin-right: 7px;
+  }
+}
+
+
+/* =========================================================
+   V7.4 â€” CHAMPIONSHIP TIMELINE
+   ========================================================= */
+
+.honorYears {
+  margin-top: 10px;
+  display: grid;
+  gap: 7px;
+}
+
+.honorYearRow {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+}
+
+.honorYearItem {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.honorYearItem b {
+  line-height: 1.15;
+}
+
+.honorYearDot {
+  margin: 0 9px;
+  color: var(--tsi-ink);
+  font-style: normal;
+  line-height: 1;
+}
+
+.honorCard {
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .honorCard:hover {
+    transform: translateY(-2px);
+    border-color: #d3b96d;
+    box-shadow: var(--tsi-shadow-md);
+  }
+}
+
+@media (max-width: 720px) {
+  .honorYears {
+    gap: 6px;
+  }
+
+  .honorYearRow {
+    overflow: visible;
+  }
+
+  .honorYearDot {
+    margin-inline: 7px;
+  }
+}
+
+@media (max-width: 430px) {
+  .honorYearRow {
+    font-size: .92em;
+  }
+
+  .honorYearDot {
+    margin-inline: 5px;
+  }
+}
