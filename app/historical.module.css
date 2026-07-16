@@ -2718,3 +2718,34 @@
     min-height: 175px;
   }
 }
+
+
+/* V7.1.5 â€” HISTORY CARD CLEANUP */
+
+.courseRoundPoints {
+  display: block;
+  margin-top: 7px;
+  color: var(--tsi-muted);
+  font-size: .74rem;
+  font-weight: 700;
+}
+
+.roundArchiveTeam {
+  grid-template-rows: auto;
+}
+
+.roundArchiveTeamLogo,
+.roundArchiveTeamLogoFallback {
+  grid-row: 1;
+}
+
+.roundArchiveTeam strong {
+  grid-column: 2;
+  align-self: center;
+}
+
+.roundArchiveTeam b {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+}
