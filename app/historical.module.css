@@ -1556,286 +1556,236 @@
 
 
 /* =========================================================
-   PLAYER CARD HONORS â€” RESUME STYLE
+   V7.0.2 â€” STATISTICS HUB AND FULL LEADERBOARDS
    ========================================================= */
 
-.playerTop {
-  grid-template-columns: 64px minmax(0, 1fr);
-  align-items: start;
+.recordSectionHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
 }
 
-.playerCardIdentity {
-  min-width: 0;
+.recordSectionHeading h2,
+.statisticsCallout h2,
+.statsHubSection h2 {
+  margin: 7px 0 0;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
 }
 
-.playerCardIdentity .activeBadge,
-.playerCardIdentity .inactiveBadge {
-  width: fit-content;
-  margin-top: 12px;
-  display: inline-flex;
+.fullLeaderboardLink,
+.leaderboardTopLinks a,
+.statisticsCallout > a {
+  color: var(--tsi-green-900);
+  font-size: .84rem;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
-.playerCardHonors {
-  margin-top: 14px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.playerCardHonor {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  gap: 9px;
+.statisticsCallout {
+  margin-bottom: 62px;
+  padding: 28px;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-lg);
+  background:
+    radial-gradient(circle at 85% 15%, rgba(212,177,95,.16), transparent 30%),
+    linear-gradient(135deg, #f8f1e3, #fff);
+  box-shadow: var(--tsi-shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
   align-items: center;
 }
 
-.playerCardHonorMedallion {
-  width: 40px;
-  height: 40px;
+.statisticsCallout p {
+  max-width: 690px;
+  margin: 12px 0 0;
+  color: var(--tsi-muted);
+  line-height: 1.6;
+}
+
+.podiumCard {
+  color: inherit;
+}
+
+.statsHubSections {
   display: grid;
-  place-items: center;
-  border: 1px solid #c89c3c;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #f9e8ae, #bd8e2d 55%, #f3cf72);
-  box-shadow:
-    inset 0 1px 2px rgba(255,255,255,.65),
-    0 5px 10px rgba(116,83,20,.13);
+  gap: 68px;
 }
 
-.playerCardHonorIcon {
-  width: 23px;
-  height: 23px;
-  color: #0b3529;
+.statsHubSection > p {
+  max-width: 720px;
+  margin: 12px 0 0;
+  color: var(--tsi-muted);
+  line-height: 1.6;
 }
 
-.playerCardHonor span {
-  display: block;
-  color: #9b721f;
+.statsHubGrid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.statsHubCard {
+  min-height: 245px;
+  padding: 22px;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-md);
+  background: var(--tsi-white);
+  box-shadow: var(--tsi-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.statsHubCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--tsi-shadow-md);
+}
+
+.statsHubCard > span {
+  color: var(--tsi-red-600);
   text-transform: uppercase;
-  letter-spacing: .07em;
-  font-size: .58rem;
+  letter-spacing: .1em;
+  font-size: .62rem;
   font-weight: 800;
-  line-height: 1.25;
 }
 
-.playerCardHonor strong {
-  display: block;
-  margin-top: 4px;
-  color: #687069;
-  font-size: .69rem;
-  line-height: 1.35;
+.statsHubCard h3 {
+  margin: 10px 0 8px;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
 }
 
-.playerCardBogHonor {
-  grid-template-columns: 42px minmax(0, 1fr);
+.statsHubCard > p {
+  margin: 0;
+  color: var(--tsi-muted);
+  font-size: .86rem;
+  line-height: 1.55;
 }
 
-.playerCardBogShield {
-  width: 40px;
-  height: 45px;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,.15));
+.statsHubLeader {
+  margin-top: auto;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.playerCardBogHonor strong {
-  color: #0b3529;
+.statsHubLeader small {
+  color: var(--tsi-gold-500);
   text-transform: uppercase;
   letter-spacing: .08em;
+  font-size: .59rem;
+  font-weight: 800;
 }
 
-@media (max-width: 1180px) {
-  .playerCardHonors {
+.statsHubLeader strong {
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+}
+
+.statsHubCard > b {
+  margin-top: 14px;
+  color: var(--tsi-green-900);
+  font-size: .8rem;
+}
+
+.leaderboardTopLinks {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.fullLeaderboardWrap {
+  overflow-x: auto;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-md);
+  background: var(--tsi-white);
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.fullLeaderboard {
+  min-width: 820px;
+}
+
+.fullLeaderboardHead,
+.fullLeaderboardRow {
+  padding: 15px 18px;
+  display: grid;
+  grid-template-columns:
+    70px minmax(190px, 1.6fr)
+    repeat(4, minmax(120px, .8fr));
+  gap: 14px;
+  align-items: center;
+}
+
+.fullLeaderboardHead {
+  background: var(--tsi-green-900);
+  color: var(--tsi-white);
+}
+
+.fullLeaderboardHead span,
+.fullLeaderboardHead button {
+  color: inherit;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font: inherit;
+  font-size: .64rem;
+  font-weight: 800;
+}
+
+.fullLeaderboardHead button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.fullLeaderboardRow {
+  border-bottom: 1px solid #eee8dc;
+  color: var(--tsi-ink);
+  font-size: .88rem;
+}
+
+.fullLeaderboardRow:last-child {
+  border-bottom: 0;
+}
+
+.fullLeaderboardRow > strong {
+  color: var(--tsi-red-600);
+}
+
+.fullLeaderboardRow > a {
+  color: var(--tsi-green-900);
+  font-weight: 800;
+}
+
+@media (max-width: 1000px) {
+  .statsHubGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 760px) {
-  .playerCardHonors {
-    grid-template-columns: 1fr;
-    gap: 10px;
+@media (max-width: 650px) {
+  .recordSectionHeading,
+  .statisticsCallout {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
-  .playerCardHonor {
-    grid-template-columns: 36px minmax(0, 1fr);
-  }
-
-  .playerCardHonorMedallion {
-    width: 36px;
-    height: 36px;
-  }
-
-  .playerCardHonorIcon {
-    width: 21px;
-    height: 21px;
-  }
-
-  .playerCardBogShield {
-    width: 36px;
-    height: 41px;
-  }
-}
-
-@media (max-width: 480px) {
-  .playerTop {
-    grid-template-columns: 54px minmax(0, 1fr);
-  }
-
-  .playerCardHonors {
-    margin-top: 12px;
-  }
-}
-
-
-/* =========================================================
-   PLAYER CARD DESKTOP LAYOUT FIX
-   Prevent cramped three-column cards and honor collisions.
-   ========================================================= */
-
-.playerGrid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 1440px;
-  margin-inline: auto;
-  gap: 22px;
-}
-
-.playerCard {
-  min-width: 0;
-}
-
-.playerCardHonors {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 18px;
-  row-gap: 14px;
-}
-
-.playerCardBogHonor {
-  grid-column: 1 / -1;
-  width: fit-content;
-  min-width: 210px;
-}
-
-.playerCardHonor span,
-.playerCardHonor strong {
-  overflow-wrap: anywhere;
-}
-
-@media (min-width: 1500px) {
-  .playerGrid {
-    max-width: 1560px;
-  }
-}
-
-@media (max-width: 980px) {
-  .playerGrid {
-    grid-template-columns: 1fr;
-    max-width: 760px;
-  }
-
-  .playerCardHonors {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .playerCardBogHonor {
-    grid-column: auto;
-    width: auto;
-    min-width: 0;
-  }
-}
-
-@media (max-width: 760px) {
-  .playerCardHonors {
+  .statsHubGrid {
     grid-template-columns: 1fr;
   }
 
-  .playerCardBogHonor {
-    width: fit-content;
-    min-width: 0;
-  }
-}
-
-
-/* =========================================================
-   FINAL PLAYER CARD HONORS SUMMARY
-   ========================================================= */
-
-.playerCardHonors {
-  margin-top: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-}
-
-.playerCardHonor,
-.playerCardBogHonor {
-  min-width: 0;
-  width: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 10px 7px 7px;
-  border: 1px solid #dfc887;
-  border-radius: 999px;
-  background: linear-gradient(145deg, #fffaf0, #f5ead0);
-}
-
-.playerCardHonorMedallion {
-  flex: none;
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #c89c3c;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #f9e8ae, #bd8e2d 55%, #f3cf72);
-  box-shadow:
-    inset 0 1px 2px rgba(255,255,255,.65),
-    0 3px 7px rgba(116,83,20,.12);
-}
-
-.playerCardHonorIcon {
-  width: 16px;
-  height: 16px;
-  color: #0b3529;
-}
-
-.playerCardHonor span {
-  color: #8d671c;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  font-size: .58rem;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.playerCardBogHonor {
-  padding-left: 6px;
-}
-
-.playerCardBogShield {
-  flex: none;
-  width: 27px;
-  height: 31px;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,.13));
-}
-
-.playerCardBogHonor span {
-  color: #0b3529;
-}
-
-.playerCardIdentity .activeBadge,
-.playerCardIdentity .inactiveBadge {
-  margin-top: 11px;
-}
-
-@media (max-width: 760px) {
-  .playerCardHonors {
-    gap: 8px;
-  }
-
-  .playerCardHonor,
-  .playerCardBogHonor {
-    padding-top: 6px;
-    padding-bottom: 6px;
+  .leaderboardTopLinks {
+    flex-direction: column;
   }
 }
