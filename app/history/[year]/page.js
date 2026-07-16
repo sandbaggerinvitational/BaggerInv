@@ -21,6 +21,10 @@ export async function generateMetadata({ params }) {
   };
 }
 
+function roundNumber(value) {
+  return Number(String(value ?? "").replace(/\D/g, ""));
+}
+
 export default async function TournamentYearPage({ params }) {
   const { year } = await params;
   const tournament = getTournament(year);
@@ -57,10 +61,7 @@ export default async function TournamentYearPage({ params }) {
               {tournament["Winning Team"] || "To Be Determined"}
             </strong>
           </div>
-          <b>
-            {tournament["Final Score"] ||
-              (tournament["Winning Team"] ? "Final" : "Upcoming")}
-          </b>
+          <b>{tournament["Final Score"] || "Final"}</b>
           <div>
             <span>Runner-Up</span>
             <strong>
@@ -111,27 +112,43 @@ export default async function TournamentYearPage({ params }) {
           <h2>Courses Played</h2>
 
           <div className={styles.courseCardGrid}>
-            {tournament.courses.map((course) => (
-              <Link
-                className={styles.courseCard}
-                href={`/courses/${course["Course ID"]}`}
-                key={`${course["Course ID"]}-${course.Round}`}
-              >
-                <AssetImage
-                  src={courseLogo(course["Course Logo"])}
-                  alt={`${course.Course} logo`}
-                  className={styles.courseLogo}
-                  fallbackClassName={styles.courseLogoPlaceholder}
-                  fallback="⛳"
-                />
-                <span>{course.Round}</span>
-                <h3>{course.Course}</h3>
-                <p>
-                  {course.City}, {course.State}
-                </p>
-                <strong>{getFormatName(course.Format)}</strong>
-              </Link>
-            ))}
+            {tournament.courses.map((course) => {
+              const round = roundNumber(course.Round);
+
+              return (
+                <article
+                  className={`${styles.courseCard} ${styles.courseRoundCard}`}
+                  key={`${course["Course ID"]}-${course.Round}`}
+                >
+                  <Link
+                    className={styles.courseRoundPrimary}
+                    href={`/history/${tournament.year}/round/${round}`}
+                  >
+                    <AssetImage
+                      src={courseLogo(course["Course Logo"])}
+                      alt={`${course.Course} logo`}
+                      className={styles.courseLogo}
+                      fallbackClassName={styles.courseLogoPlaceholder}
+                      fallback="⛳"
+                    />
+                    <span>{course.Round}</span>
+                    <h3>{course.Course}</h3>
+                    <p>
+                      {course.City}, {course.State}
+                    </p>
+                    <strong>{getFormatName(course.Format)}</strong>
+                    <b>View Round Results →</b>
+                  </Link>
+
+                  <Link
+                    className={styles.courseProfileLink}
+                    href={`/courses/${course["Course ID"]}`}
+                  >
+                    View Course Profile
+                  </Link>
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -152,7 +169,7 @@ export default async function TournamentYearPage({ params }) {
             ) : (
               <div className={styles.awardCard}>
                 <span>Sandbagger of the Year</span>
-                <strong>To Be Determined</strong>
+                <strong>Not awarded</strong>
               </div>
             )}
           </div>
