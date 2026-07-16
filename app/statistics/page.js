@@ -38,13 +38,15 @@ export default function StatisticsPage() {
 
               <div className={styles.statsHubGrid}>
                 {section.links.map((item) => {
-                  const leaderboard = getLeaderboard(item.slug);
+                  const leaderboard = item.slug
+                    ? getLeaderboard(item.slug)
+                    : null;
                   const leader = leaderboard?.rows[0];
 
                   return (
                     <Link
                       className={styles.statsHubCard}
-                      href={`/records/${item.slug}`}
+                      href={item.href || `/records/${item.slug}`}
                       key={item.slug}
                     >
                       <span>Leaderboard</span>
