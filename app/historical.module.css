@@ -3284,155 +3284,158 @@
 
 
 /* =========================================================
-   V8.0 â€” WEBP ASSETS, COURSE HEROES & MATCH STROKES
+   V8.1 â€” CAREER TIMELINE & TOURNAMENT STATUS POLISH
    ========================================================= */
 
-.courseProfileHero {
-  position: relative;
-  min-height: 430px;
-  padding: 76px 7vw 62px;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  color: white;
-  background: var(--tsi-green-900);
+.finalScoreCenter > span:only-child {
+  margin-bottom: 0;
+  font-size: .9rem;
 }
 
-.courseProfileHeroImage,
-.courseProfileHeroFallback {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+.careerTimelineSection {
+  margin-top: 68px;
 }
 
-.courseProfileHeroImage {
-  object-fit: cover;
-  object-position: center;
-}
-
-.courseProfileHeroFallback {
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at 72% 18%, #8da99b, #174536);
-  color: rgba(255,255,255,.15);
+.careerTimelineSection h2 {
+  margin: 7px 0 0;
+  color: var(--tsi-ink);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2rem, 6vw, 5.5rem);
-  text-align: center;
+  font-size: clamp(2rem, 4vw, 3.4rem);
 }
 
-.courseProfileHeroShade {
+.careerTimeline {
+  position: relative;
+  margin-top: 26px;
+  display: grid;
+  gap: 11px;
+}
+
+.careerTimeline::before {
+  content: "";
   position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgba(6,38,29,.9), rgba(6,38,29,.15) 76%),
-    linear-gradient(0deg, rgba(6,38,29,.74), transparent 62%);
+  top: 30px;
+  bottom: 30px;
+  left: 96px;
+  width: 2px;
+  background: #e1d8c7;
 }
 
-.courseProfileHeroContent {
+.careerTimelineItem {
+  position: relative;
+  min-height: 94px;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 62px 28px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--tsi-line);
+  border-radius: 16px;
+  background: var(--tsi-white);
+  color: inherit;
+  box-shadow: var(--tsi-shadow-sm);
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+.careerTimelineItem:hover {
+  transform: translateY(-2px);
+  border-color: #cfb771;
+  box-shadow: var(--tsi-shadow-md);
+}
+
+.careerTimelineItem > strong {
+  color: var(--tsi-gold-500);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.careerTimelineMarker {
   position: relative;
   z-index: 1;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 30px;
-  align-items: center;
+  width: 14px;
+  height: 14px;
+  justify-self: center;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: var(--tsi-green-900);
+  box-shadow: 0 0 0 2px #cbb779;
 }
 
-.courseProfileLogoWrap {
-  width: 150px;
-  height: 150px;
-  padding: 18px;
-  border-radius: 22px;
-  background: rgba(255,255,255,.94);
-  box-shadow: 0 18px 42px rgba(0,0,0,.2);
-}
-
-.courseProfileLogo {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.courseProfileLogoFallback {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  color: var(--tsi-green-900);
-  font-size: 2.5rem;
-}
-
-.courseProfileHeroContent h1 {
+.careerTimelineItem h3 {
   margin: 0;
+  color: var(--tsi-ink);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3rem, 7vw, 6rem);
-  line-height: .95;
+  font-size: 1.08rem;
 }
 
-.courseProfileHeroContent > div:last-child > p:last-child {
-  margin: 14px 0 0;
-  color: #dfe9e4;
+.careerTimelineItem p {
+  margin: 4px 0 0;
+  color: var(--tsi-muted);
+  font-size: .78rem;
 }
 
-.roundMatchPlayerEntry {
-  display: block;
+.careerTimelineItem > b {
+  color: var(--tsi-green-900);
+  font-size: .72rem;
+  white-space: nowrap;
 }
 
-.roundMatchPlayerEntry + .roundMatchPlayerEntry {
-  margin-top: 8px;
+.careerTimelineChampion {
+  border-color: #d3b65e;
+  background:
+    linear-gradient(90deg, rgba(238,214,146,.25), white 48%);
+  box-shadow:
+    inset 4px 0 0 var(--tsi-gold-500),
+    var(--tsi-shadow-sm);
 }
 
-.roundMatchStroke,
-.roundMatchTeamStroke {
-  width: fit-content;
-  margin-top: 5px;
-  padding: 4px 8px;
-  display: block;
-  border: 1px solid #ddc987;
-  border-radius: 999px;
-  background: #fbf5e5;
-  color: #765817;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  font-size: .55rem;
-  font-weight: 800;
-  line-height: 1;
+.careerTimelineChampion .careerTimelineMarker {
+  background: var(--tsi-gold-500);
 }
 
-.roundMatchPlayers > div:last-child .roundMatchStroke,
-.roundMatchPlayers > div:last-child .roundMatchTeamStroke {
-  margin-left: auto;
+.careerTimelineRunnerUp .careerTimelineMarker {
+  background: #9b9b92;
 }
 
-.roundMatchTeamStroke {
-  margin-top: 10px;
+.careerTimelineUpcoming {
+  border-style: dashed;
 }
 
-.roundArchiveHeroImage {
-  object-position: center;
+.careerTimelineUpcoming .careerTimelineMarker {
+  background: white;
+  border-color: #e8d9a7;
 }
 
-@media (max-width: 650px) {
-  .courseProfileHero {
-    min-height: 390px;
-    padding-left: 6vw;
-    padding-right: 6vw;
+.careerTimelineAbsent {
+  opacity: .66;
+  box-shadow: none;
+}
+
+.careerTimelineAbsent .careerTimelineMarker {
+  background: #d6d5cf;
+  box-shadow: 0 0 0 2px #e0ded6;
+}
+
+.careerTimelineAbsent:hover {
+  transform: none;
+  border-color: var(--tsi-line);
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .careerTimeline::before {
+    left: 80px;
   }
 
-  .courseProfileHeroContent {
-    grid-template-columns: 1fr;
-    gap: 20px;
+  .careerTimelineItem {
+    grid-template-columns: 48px 22px minmax(0, 1fr);
+    gap: 10px;
+    padding: 16px;
   }
 
-  .courseProfileLogoWrap {
-    width: 104px;
-    height: 104px;
-  }
-
-  .roundMatchPlayers > div:last-child .roundMatchStroke,
-  .roundMatchPlayers > div:last-child .roundMatchTeamStroke {
-    margin-left: 0;
+  .careerTimelineItem > b {
+    grid-column: 3;
   }
 }
