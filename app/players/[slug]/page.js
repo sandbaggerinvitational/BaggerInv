@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import AssetImage from "../../AssetImage";
+import { CareerHonors } from "../../HonorBadges";
 import { playerPhoto } from "../../../lib/asset-paths";
 import {
   formatHandicap,
@@ -109,6 +110,13 @@ export default async function PlayerPage({ params }) {
             <strong>{stats.championships.length}</strong>
           </div>
         </div>
+
+        <CareerHonors
+          championships={stats.championships}
+          soyYears={stats.sandbaggerOfYearYears}
+          isGovernor={player.boardOfGovernors}
+          styles={styles}
+        />
 
         <section className={styles.rivalSpotlight}>
           <span className={styles.sectionLabel}>Most-Faced Opponent</span>
