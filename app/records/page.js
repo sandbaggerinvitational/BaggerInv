@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header, Footer } from "../components";
 import {
   formatPercentage,
@@ -7,18 +8,34 @@ import {
 } from "../../lib/stats";
 import styles from "../historical.module.css";
 
-function LeaderSection({ title, rows, value }) {
+function LeaderSection({ title, slug, rows, value }) {
   return (
     <section>
-      <span className={styles.sectionLabel}>All-Time Leaders</span>
-      <h2>{title}</h2>
+      <div className={styles.recordSectionHeading}>
+        <div>
+          <span className={styles.sectionLabel}>All-Time Leaders</span>
+          <h2>{title}</h2>
+        </div>
+
+        <Link
+          className={styles.fullLeaderboardLink}
+          href={`/records/${slug}`}
+        >
+          View Full Leaderboard →
+        </Link>
+      </div>
+
       <div className={styles.podium}>
         {rows.slice(0, 5).map(({ player, stats }, index) => (
-          <div className={styles.podiumCard} key={player["Player ID"]}>
+          <Link
+            className={styles.podiumCard}
+            href={`/players/${player.slug}`}
+            key={player["Player ID"]}
+          >
             <b>#{index + 1}</b>
             <h3>{player["Display Name"]}</h3>
             <strong>{value(stats)}</strong>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
@@ -35,6 +52,7 @@ export default function RecordsPage() {
   return (
     <main>
       <Header />
+
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>The Record Book</p>
         <h1>Records</h1>
@@ -46,30 +64,56 @@ export default function RecordsPage() {
       </section>
 
       <section className={styles.content}>
+        <div className={styles.statisticsCallout}>
+          <div>
+            <span className={styles.sectionLabel}>Go Deeper</span>
+            <h2>Statistics Center</h2>
+            <p>
+              Explore career efficiency, format leaders, competitive
+              honors, and tournament-handicap statistics.
+            </p>
+          </div>
+
+          <Link href="/statistics">Explore More Stats →</Link>
+        </div>
+
         <div className={styles.recordSections}>
           <LeaderSection
             title="Career Points"
+            slug="career-points"
             rows={records.points}
             value={(stats) => stats.records.overall.points}
           />
+
           <LeaderSection
             title="Match Wins"
+            slug="match-wins"
             rows={records.wins}
             value={(stats) => stats.records.overall.wins}
           />
+
           <LeaderSection
             title="Bagger Championships"
+            slug="championships"
             rows={records.championships}
             value={(stats) => stats.championships.length}
           />
+
           <LeaderSection
             title="Point Win Percentage"
+            slug="win-percentage"
             rows={records.percentage}
             value={(stats) => formatPercentage(stats.percentages.overall)}
           />
-          {["BB", "SC", "SI"].map((format) => (
+
+          {[
+            ["BB", "best-ball"],
+            ["SC", "scramble"],
+            ["SI", "singles"],
+          ].map(([format, slug]) => (
             <LeaderSection
               key={format}
+              slug={slug}
               title={`${getFormatName(format)} Leaders`}
               rows={records.byFormat[format]}
               value={(stats) =>
@@ -81,6 +125,7 @@ export default function RecordsPage() {
           ))}
         </div>
       </section>
+
       <Footer />
     </main>
   );
