@@ -1881,3 +1881,91 @@
     gap: 56px;
   }
 }
+
+
+/* =========================================================
+   V7.0.4 â€” COMPACT PLAYER DIRECTORY HONORS
+   ========================================================= */
+
+.playerCardHonors,
+.playerCardHonor,
+.playerCardBogHonor,
+.playerCardHonorMedallion,
+.playerCardHonorIcon,
+.playerCardBogShield {
+  all: unset;
+}
+
+.playerCardHonorIcons {
+  margin-top: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.playerCardHonorIconItem {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d0a347;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f9e8ae, #bd8e2d 55%, #f3cf72);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.65),
+    0 4px 9px rgba(116,83,20,.12);
+}
+
+.playerCardHonorIconItem span {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: var(--tsi-green-900);
+  color: white;
+  font-size: .55rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.playerCardMiniIcon {
+  width: 22px;
+  height: 22px;
+  color: #0b3529;
+}
+
+.playerCardMiniShield {
+  width: 29px;
+  height: 33px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
+}
+
+.playerCardIdentity .activeBadge,
+.playerCardIdentity .inactiveBadge {
+  margin-top: 12px;
+}
+
+@media (max-width: 650px) {
+  .playerCardHonorIconItem {
+    width: 36px;
+    height: 36px;
+  }
+
+  .playerCardMiniIcon {
+    width: 21px;
+    height: 21px;
+  }
+
+  .playerCardMiniShield {
+    width: 27px;
+    height: 31px;
+  }
+}
