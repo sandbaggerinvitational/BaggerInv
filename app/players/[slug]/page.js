@@ -8,6 +8,7 @@ import {
   formatHandicap,
   formatPercentage,
   formatRecord,
+  getCaptainLegacy,
   getFormatName,
   getPlayerBySlug,
   getPlayerStats,
@@ -31,6 +32,7 @@ export default async function PlayerPage({ params }) {
   if (!player) notFound();
 
   const stats = getPlayerStats(player["Player ID"]);
+  const captainLegacy = getCaptainLegacy(player["Player ID"]);
   const rival = stats.biggestRival;
 
   const compareHref = rival
@@ -117,6 +119,62 @@ export default async function PlayerPage({ params }) {
           isGovernor={player.boardOfGovernors}
           styles={styles}
         />
+
+
+        <section className={styles.captainLegacySection}>
+          <span className={styles.sectionLabel}>Leadership History</span>
+          <h2>Captain Legacy</h2>
+
+          {captainLegacy.seasons.length ? (
+            <>
+              <div className={styles.captainLegacySummary}>
+                <div>
+                  <span>Captain Record</span>
+                  <strong>{formatRecord(captainLegacy.record)}</strong>
+                </div>
+                <div>
+                  <span>Championships as Captain</span>
+                  <strong>{captainLegacy.championships}</strong>
+                </div>
+                <div>
+                  <span>Seasons as Captain</span>
+                  <strong>{captainLegacy.seasons.length}</strong>
+                </div>
+              </div>
+
+              <div className={styles.captainLegacyTimeline}>
+                {captainLegacy.seasons.map((season) => (
+                  <Link
+                    className={`${styles.captainLegacySeason} ${
+                      season.result === "Champion"
+                        ? styles.captainLegacyChampion
+                        : ""
+                    }`}
+                    href={`/history/${season.year}/team/${encodeURIComponent(
+                      season.teamSide
+                    )}`}
+                    key={season.year}
+                  >
+                    <strong>{season.year}</strong>
+                    <div>
+                      <span>{season.teamName}</span>
+                      <small>
+                        {season.result === "Champion"
+                          ? "🏆 Champions"
+                          : season.result}
+                      </small>
+                    </div>
+                    <b>View Team →</b>
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className={styles.captainLegacyEmpty}>
+              Never served as Team Captain.
+            </div>
+          )}
+        </section>
 
         <section className={styles.rivalSpotlight}>
           <span className={styles.sectionLabel}>Most-Faced Opponent</span>
