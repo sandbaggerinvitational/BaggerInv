@@ -27,6 +27,20 @@ function roundNumber(value) {
   return Number(String(value ?? "").replace(/\D/g, ""));
 }
 
+function pointsForRound(roundPoints, round) {
+  return roundPoints.find((item) => item.round === round)?.pointsAvailable ?? null;
+}
+
+function tournamentStatus(tournament) {
+  const hasWinner = Boolean(tournament["Winning Team"]);
+  const hasRunnerUp = Boolean(tournament["Runner-Up Team"]);
+  const hasScore = Boolean(tournament["Final Score"]);
+
+  return hasWinner || hasRunnerUp || hasScore
+    ? tournament["Final Score"] || "Final"
+    : "Upcoming";
+}
+
 export default async function TournamentYearPage({ params }) {
   const { year } = await params;
   const tournament = getTournament(year);
@@ -94,7 +108,7 @@ export default async function TournamentYearPage({ params }) {
               {tournament["Winning Team"] || "To Be Determined"}
             </strong>
           </div>
-          <b>{tournament["Final Score"] || "Final"}</b>
+          <b>{tournamentStatus(tournament)}</b>
           <div>
             <span>Runner-Up</span>
             <strong>
@@ -102,35 +116,6 @@ export default async function TournamentYearPage({ params }) {
             </strong>
           </div>
         </div>
-
-        <section className={styles.roundPointsSection}>
-          <span className={styles.sectionLabel}>Scoring Format</span>
-          <h2>Points Available by Round</h2>
-
-          <div className={styles.roundPointsGrid}>
-            {roundPoints.map((round) => (
-              <Link
-                href={`/history/${tournament.year}/round/${round.round}`}
-                className={styles.roundPointsCard}
-                key={round.round}
-              >
-                <span>{round.roundLabel}</span>
-                <h3>{getFormatName(round.format)}</h3>
-                <p>{round.course}</p>
-
-                {round.pointsAvailable !== null ? (
-                  <strong>
-                    {round.pointsAvailable} Points Available
-                  </strong>
-                ) : (
-                  <strong className={styles.roundPointsBlank}>
-                    &nbsp;
-                  </strong>
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>The Teams</span>
@@ -199,6 +184,11 @@ export default async function TournamentYearPage({ params }) {
                       {course.City}, {course.State}
                     </p>
                     <strong>{getFormatName(course.Format)}</strong>
+                    {pointsForRound(roundPoints, round) !== null ? (
+                      <small className={styles.courseRoundPoints}>
+                        {pointsForRound(roundPoints, round)} Points Available
+                      </small>
+                    ) : null}
                     <b>View Round Results →</b>
                   </Link>
 
