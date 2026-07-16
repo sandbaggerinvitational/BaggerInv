@@ -1972,6 +1972,505 @@
 
 
 /* =========================================================
+   V7.1.0 â€” HISTORICAL ROUND ARCHIVE
+   ========================================================= */
+
+.courseRoundCard {
+  padding: 0;
+}
+
+.courseRoundPrimary {
+  padding: 22px 22px 17px;
+  display: block;
+  color: inherit;
+}
+
+.courseRoundPrimary b {
+  display: block;
+  margin-top: 18px;
+  color: var(--tsi-green-900);
+  font-size: .8rem;
+}
+
+.courseProfileLink {
+  padding: 14px 22px;
+  display: block;
+  border-top: 1px solid #eee8dc;
+  color: var(--tsi-muted);
+  font-size: .76rem;
+  font-weight: 800;
+}
+
+.roundArchiveHero {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  padding: 76px 7vw 62px;
+  display: flex;
+  align-items: flex-end;
+  color: white;
+  background: var(--tsi-green-900);
+}
+
+.roundArchiveHeroImage,
+.roundArchiveHeroFallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.roundArchiveHeroImage {
+  object-fit: cover;
+}
+
+.roundArchiveHeroFallback {
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 72% 18%, #8da99b, #174536);
+  color: rgba(255,255,255,.16);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 7vw, 6rem);
+}
+
+.roundArchiveHeroShade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(6,38,29,.9), rgba(6,38,29,.18) 75%),
+    linear-gradient(0deg, rgba(6,38,29,.72), transparent 58%);
+}
+
+.roundArchiveHeroContent {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 30px;
+  align-items: center;
+}
+
+.roundArchiveCourseLogo {
+  width: 150px;
+  height: 150px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 18px 42px rgba(0,0,0,.2);
+}
+
+.roundArchiveCourseLogoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.roundArchiveCourseLogoFallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--tsi-green-900);
+  font-size: 2.5rem;
+}
+
+.roundArchiveHeroContent p {
+  margin: 0 0 10px;
+  color: var(--tsi-gold-400);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+.roundArchiveHeroContent h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: .94;
+}
+
+.roundArchiveHeroContent h2 {
+  margin: 14px 0 7px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+}
+
+.roundArchiveHeroContent span {
+  color: #dfe9e4;
+}
+
+.roundArchiveScoreboard {
+  padding: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) .75fr minmax(0, 1fr);
+  gap: 22px;
+  align-items: center;
+  border-radius: var(--tsi-radius-lg);
+  background: linear-gradient(135deg, #153f31, var(--tsi-green-950));
+  color: white;
+  box-shadow: var(--tsi-shadow-md);
+}
+
+.roundArchiveTeam {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr) auto;
+  gap: 5px 15px;
+  align-items: center;
+}
+
+.roundArchiveTeamLogo,
+.roundArchiveTeamLogoFallback {
+  grid-row: 1 / 4;
+  width: 74px;
+  height: 74px;
+}
+
+.roundArchiveTeamLogo {
+  object-fit: contain;
+}
+
+.roundArchiveTeamLogoFallback {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  color: var(--tsi-gold-400);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 800;
+}
+
+.roundArchiveTeam span,
+.roundArchiveWinner span,
+.roundMatchPoints span {
+  color: var(--tsi-gold-400);
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  font-size: .62rem;
+  font-weight: 800;
+}
+
+.roundArchiveTeam strong {
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roundArchiveTeam b {
+  grid-column: 3;
+  grid-row: 1 / 4;
+  color: var(--tsi-gold-400);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.5rem;
+}
+
+.roundArchiveWinner {
+  text-align: center;
+}
+
+.roundArchiveWinner strong {
+  display: block;
+  margin-top: 8px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+}
+
+.roundMatchGrid {
+  margin-top: 42px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.roundMatchCard {
+  overflow: hidden;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-lg);
+  background: white;
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.roundMatchHeader {
+  padding: 15px 19px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  background: var(--tsi-cream-100);
+  color: var(--tsi-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .65rem;
+  font-weight: 800;
+}
+
+.roundMatchPlayers {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.roundMatchPlayers > div:last-child {
+  text-align: right;
+}
+
+.roundMatchPlayers span {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--tsi-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .62rem;
+  font-weight: 800;
+}
+
+.roundMatchPlayers a {
+  display: block;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.28rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.roundMatchPlayers > strong {
+  color: var(--tsi-red-600);
+}
+
+.roundSegmentResults {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid #eee8dc;
+  border-bottom: 1px solid #eee8dc;
+}
+
+.roundSegmentResults > div {
+  min-width: 0;
+  padding: 17px 12px;
+  text-align: center;
+  border-right: 1px solid #eee8dc;
+}
+
+.roundSegmentResults > div:last-child {
+  border-right: 0;
+}
+
+.roundSegmentResults span {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--tsi-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .61rem;
+  font-weight: 800;
+}
+
+.roundSegmentResults strong {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  line-height: 1.15;
+}
+
+.roundTeamOneWinner {
+  color: var(--tsi-green-900);
+  background: #dcebe4;
+}
+
+.roundTeamTwoWinner {
+  color: #243b76;
+  background: #e3e7f5;
+}
+
+.roundHalved {
+  color: #5d605d;
+  background: #eceae4;
+}
+
+.roundNotRecorded {
+  color: var(--tsi-muted);
+  background: var(--tsi-cream-100);
+}
+
+.roundMatchPoints {
+  padding: 20px 22px;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 18px;
+  align-items: center;
+  text-align: center;
+}
+
+.roundMatchPoints > div:first-child {
+  text-align: left;
+}
+
+.roundMatchPoints > div:last-child {
+  text-align: right;
+}
+
+.roundMatchPoints span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.roundMatchPoints strong {
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.8rem;
+}
+
+.roundMatchPoints b {
+  display: inline-flex;
+  padding: 8px 11px;
+  border-radius: 999px;
+  font-size: .74rem;
+}
+
+.roundMatchNotes {
+  margin: 0;
+  padding: 0 22px 20px;
+  color: var(--tsi-muted);
+  font-size: .8rem;
+}
+
+.roundArchiveNavigation {
+  margin-top: 42px;
+  padding-top: 25px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 18px;
+  border-top: 1px solid var(--tsi-line);
+}
+
+.roundArchiveNavigation a {
+  color: var(--tsi-green-900);
+  font-weight: 800;
+}
+
+.roundArchiveNavigation a:last-child {
+  text-align: right;
+}
+
+.roundArchiveEmpty {
+  margin-top: 34px;
+  padding: 24px;
+  border: 1px dashed var(--tsi-line);
+  border-radius: var(--tsi-radius-md);
+  color: var(--tsi-muted);
+  text-align: center;
+}
+
+@media (max-width: 980px) {
+  .roundMatchGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .roundArchiveScoreboard {
+    grid-template-columns: 1fr;
+  }
+
+  .roundArchiveWinner {
+    padding: 16px 0;
+    border-top: 1px solid rgba(255,255,255,.12);
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+}
+
+@media (max-width: 650px) {
+  .roundArchiveHero {
+    min-height: 390px;
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
+
+  .roundArchiveHeroContent {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .roundArchiveCourseLogo {
+    width: 104px;
+    height: 104px;
+  }
+
+  .roundArchiveScoreboard {
+    padding: 22px;
+  }
+
+  .roundArchiveTeam {
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+  }
+
+  .roundArchiveTeamLogo,
+  .roundArchiveTeamLogoFallback {
+    width: 58px;
+    height: 58px;
+  }
+
+  .roundArchiveTeam strong {
+    font-size: 1.12rem;
+  }
+
+  .roundArchiveTeam b {
+    font-size: 2rem;
+  }
+
+  .roundMatchPlayers {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .roundMatchPlayers > div:last-child {
+    text-align: left;
+  }
+
+  .roundMatchPlayers > strong {
+    display: none;
+  }
+
+  .roundSegmentResults {
+    grid-template-columns: 1fr;
+  }
+
+  .roundSegmentResults > div {
+    border-right: 0;
+    border-bottom: 1px solid #eee8dc;
+  }
+
+  .roundSegmentResults > div:last-child {
+    border-bottom: 0;
+  }
+
+  .roundMatchPoints {
+    grid-template-columns: 1fr;
+  }
+
+  .roundMatchPoints > div,
+  .roundMatchPoints > div:first-child,
+  .roundMatchPoints > div:last-child {
+    text-align: center;
+  }
+
+  .roundArchiveNavigation {
+    grid-template-columns: 1fr;
+  }
+
+  .roundArchiveNavigation a,
+  .roundArchiveNavigation a:last-child {
+    text-align: center;
+  }
+}
+
+
+/* =========================================================
    V7.0.5 â€” PLAYER CARD BADGE ALIGNMENT
    ========================================================= */
 
