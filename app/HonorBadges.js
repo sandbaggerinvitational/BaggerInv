@@ -39,15 +39,28 @@ function sortedYears(years) {
 }
 
 function HonorYears({ years, styles }) {
+  const orderedYears = sortedYears(years);
+  const rows = [];
+
+  for (let index = 0; index < orderedYears.length; index += 5) {
+    rows.push(orderedYears.slice(index, index + 5));
+  }
+
   return (
     <div className={styles.honorYears}>
-      {sortedYears(years).map((year, index) => (
-        <span className={styles.honorYearItem} key={year}>
-          {index > 0 ? (
-            <i className={styles.honorYearDot} aria-hidden="true">•</i>
-          ) : null}
-          <b>{year}</b>
-        </span>
+      {rows.map((row, rowIndex) => (
+        <div className={styles.honorYearRow} key={rowIndex}>
+          {row.map((year, index) => (
+            <span className={styles.honorYearItem} key={year}>
+              <b>{year}</b>
+              {index < row.length - 1 ? (
+                <i className={styles.honorYearDot} aria-hidden="true">
+                  •
+                </i>
+              ) : null}
+            </span>
+          ))}
+        </div>
       ))}
     </div>
   );
