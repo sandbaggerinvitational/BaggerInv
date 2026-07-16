@@ -1383,3 +1383,173 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================================
+   SANDBAGGER HONORS BADGE SYSTEM
+   ========================================================= */
+
+.compactHonors {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.compactHonorBadge {
+  min-height: 28px;
+  padding: 5px 9px 5px 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #d6c18d;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffaf0, #f2e6c8);
+  color: #5f4a17;
+  text-transform: uppercase;
+  letter-spacing: .055em;
+  font-size: .59rem;
+  font-weight: 750;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+}
+
+.compactHonorBadge b {
+  color: #0b3529;
+  font-size: .64rem;
+}
+
+.compactHonorIcon {
+  width: 17px;
+  height: 17px;
+  color: #b68a2f;
+  flex: none;
+}
+
+.bogCompactBadge {
+  padding-left: 5px;
+  border-color: #b68a2f;
+  background: linear-gradient(145deg, #f7df9a, #c99b35 52%, #f2cf70);
+  color: #0b3529;
+}
+
+.bogCompactIcon {
+  width: 20px;
+  height: 22px;
+  color: #d5a944;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.2));
+}
+
+.honorsSection {
+  margin-top: 54px;
+}
+
+.honorsSection h2 {
+  margin: 8px 0 0;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.9rem, 3.8vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -.025em;
+}
+
+.honorsGrid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.honorCard {
+  min-height: 126px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  border: 1px solid #dbcba6;
+  border-radius: var(--tsi-radius-md);
+  background:
+    radial-gradient(circle at 90% 0%, rgba(212,177,95,.16), transparent 38%),
+    linear-gradient(135deg, #fffdf8, #f6edda);
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.honorCard span {
+  display: block;
+  color: #755a1d;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .65rem;
+  font-weight: 800;
+}
+
+.honorCard strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.honorMedallion,
+.bogMedallion {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c89c3c;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f9e8ae, #bd8e2d 55%, #f3cf72);
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.65),
+    0 7px 15px rgba(116,83,20,.16);
+}
+
+.honorIcon {
+  width: 34px;
+  height: 34px;
+  color: #0b3529;
+}
+
+.bogHonorCard {
+  border-color: #c49a42;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(255,255,255,.32), transparent 40%),
+    linear-gradient(135deg, #f7e5a3, #d0a13c);
+}
+
+.bogMedallion {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bogHonorIcon {
+  width: 50px;
+  height: 57px;
+  color: #e0b44f;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.23));
+}
+
+.bogHonorCard span,
+.bogHonorCard strong {
+  color: #0b3529;
+}
+
+@media (max-width: 900px) {
+  .honorsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .honorsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .compactHonorBadge {
+    font-size: .56rem;
+  }
+}
