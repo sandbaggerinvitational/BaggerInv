@@ -38,6 +38,21 @@ function sortedYears(years) {
   return [...years].sort((a, b) => Number(a) - Number(b));
 }
 
+function HonorYears({ years, styles }) {
+  return (
+    <div className={styles.honorYears}>
+      {sortedYears(years).map((year, index) => (
+        <span className={styles.honorYearItem} key={year}>
+          {index > 0 ? (
+            <i className={styles.honorYearDot} aria-hidden="true">•</i>
+          ) : null}
+          <b>{year}</b>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function soyProfileLabel(count) {
   return count === 1 ? "Sandbagger of the Year" : `${count}× Sandbagger of the Year`;
 }
@@ -96,7 +111,7 @@ export function CareerHonors({
             </div>
             <div>
               <span>{championships.length}× Bagger Champion</span>
-              <strong>{sortedYears(championships).join(" • ")}</strong>
+              <HonorYears years={championships} styles={styles} />
             </div>
           </div>
         ) : null}
@@ -108,7 +123,7 @@ export function CareerHonors({
             </div>
             <div>
               <span>{soyProfileLabel(soyYears.length)}</span>
-              <strong>{sortedYears(soyYears).join(" • ")}</strong>
+              <HonorYears years={soyYears} styles={styles} />
             </div>
           </div>
         ) : null}
