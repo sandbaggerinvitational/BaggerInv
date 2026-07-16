@@ -1,6 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { defaultAssets } from "../lib/asset-paths";
+
+function inferredFallback(src) {
+  const value = String(src ?? "");
+
+  if (value.includes("/images/players/")) {
+    return defaultAssets.player;
+  }
+
+  if (value.includes("/images/teams/logo/")) {
+    return defaultAssets.teamLogo;
+  }
+
+  if (value.includes("/images/courses/logo/")) {
+    return defaultAssets.courseLogo;
+  }
+
+  if (value.includes("/images/courses/hero/")) {
+    return defaultAssets.courseHero;
+  }
+
+  if (value.includes("/images/tournaments/hero/")) {
+    return defaultAssets.tournamentHero;
+  }
+
+  return null;
+}
 
 export default function AssetImage({
   src,
@@ -8,15 +35,39 @@ export default function AssetImage({
   className = "",
   fallbackClassName = "",
   fallback = "TSI",
+  fallbackSrc,
   loading = "lazy",
 }) {
-  const [failed, setFailed] = useState(!src);
+  const automaticFallback = useMemo(
+    () => fallbackSrc || inferredFallback(src),
+    [fallbackSrc, src]
+  );
+
+  const [currentSrc, setCurrentSrc] = useState(
+    src || automaticFallback || null
+  );
+  const [failed, setFailed] = useState(
+    !src && !automaticFallback
+  );
+  const [usedFallback, setUsedFallback] = useState(!src);
 
   useEffect(() => {
-    setFailed(!src);
-  }, [src]);
+    setCurrentSrc(src || automaticFallback || null);
+    setFailed(!src && !automaticFallback);
+    setUsedFallback(!src);
+  }, [src, automaticFallback]);
 
-  if (failed) {
+  function handleError() {
+    if (!usedFallback && automaticFallback) {
+      setCurrentSrc(automaticFallback);
+      setUsedFallback(true);
+      return;
+    }
+
+    setFailed(true);
+  }
+
+  if (failed || !currentSrc) {
     return (
       <div
         className={fallbackClassName}
@@ -30,11 +81,11 @@ export default function AssetImage({
 
   return (
     <img
-      src={src}
+      src={currentSrc}
       alt={alt}
       className={className}
       loading={loading}
-      onError={() => setFailed(true)}
+      onError={handleError}
     />
   );
 }
