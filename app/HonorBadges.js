@@ -58,7 +58,15 @@ function sortedYears(years) {
   return [...years].sort((a, b) => Number(a) - Number(b));
 }
 
-function soyLabel(count) {
+function championSummary(count) {
+  return `${count}× Champion`;
+}
+
+function soySummary(count) {
+  return count === 1 ? "SOY" : `${count}× SOY`;
+}
+
+function soyProfileLabel(count) {
   return count === 1
     ? "Sandbagger of the Year"
     : `${count}× Sandbagger of the Year`;
@@ -79,10 +87,7 @@ export function CompactHonors({
           <div className={styles.playerCardHonorMedallion}>
             <TrophyIcon className={styles.playerCardHonorIcon} />
           </div>
-          <div>
-            <span>{championships.length}× Bagger Champion</span>
-            <strong>{sortedYears(championships).join(" • ")}</strong>
-          </div>
+          <span>{championSummary(championships.length)}</span>
         </div>
       ) : null}
 
@@ -91,20 +96,14 @@ export function CompactHonors({
           <div className={styles.playerCardHonorMedallion}>
             <StarIcon className={styles.playerCardHonorIcon} />
           </div>
-          <div>
-            <span>{soyLabel(soyYears.length)}</span>
-            <strong>{sortedYears(soyYears).join(" • ")}</strong>
-          </div>
+          <span>{soySummary(soyYears.length)}</span>
         </div>
       ) : null}
 
       {isGovernor ? (
         <div className={`${styles.playerCardHonor} ${styles.playerCardBogHonor}`}>
           <BogShieldIcon className={styles.playerCardBogShield} />
-          <div>
-            <span>Board of Governors</span>
-            <strong>BOG</strong>
-          </div>
+          <span>Board of Governors</span>
         </div>
       ) : null}
     </div>
@@ -143,7 +142,7 @@ export function CareerHonors({
               <StarIcon className={styles.honorIcon} />
             </div>
             <div>
-              <span>{soyLabel(soyYears.length)}</span>
+              <span>{soyProfileLabel(soyYears.length)}</span>
               <strong>{sortedYears(soyYears).join(" • ")}</strong>
             </div>
           </div>
@@ -156,7 +155,6 @@ export function CareerHonors({
             </div>
             <div>
               <span>Board of Governors</span>
-              <strong>Lifetime Designation</strong>
             </div>
           </div>
         ) : null}
