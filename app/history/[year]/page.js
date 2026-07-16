@@ -40,7 +40,7 @@ function tournamentStatus(tournament) {
   return {
     complete,
     label: complete ? "Final" : "Upcoming",
-    score: complete ? score || "Final" : "Upcoming",
+    score: score || null,
   };
 }
 
@@ -114,7 +114,7 @@ export default async function TournamentYearPage({ params }) {
           </div>
           <div className={styles.finalScoreCenter}>
             <span>{status.label}</span>
-            <b>{status.score}</b>
+            {status.score ? <b>{status.score}</b> : null}
           </div>
           <div>
             <span>Runner-Up</span>
