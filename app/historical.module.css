@@ -2885,3 +2885,54 @@
     display: none;
   }
 }
+
+
+/* =========================================================
+   V7.2.2 â€” HISTORY & COURSE DETAIL FIXES
+   ========================================================= */
+
+.finalScoreCenter {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.finalScoreCenter > span {
+  display: block !important;
+  margin-bottom: 6px;
+  color: var(--tsi-gold-400);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: .62rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.teamSeasonCard > div > h3 {
+  margin-top: 0;
+}
+
+.courseWebsiteLink {
+  width: fit-content;
+  margin-top: 22px;
+  padding: 11px 15px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--tsi-green-900);
+  border-radius: 999px;
+  color: var(--tsi-green-900);
+  font-size: .8rem;
+  font-weight: 800;
+  transition:
+    background-color .18s ease,
+    color .18s ease,
+    transform .18s ease;
+}
+
+.courseWebsiteLink:hover {
+  transform: translateY(-1px);
+  background: var(--tsi-green-900);
+  color: white;
+}
