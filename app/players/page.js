@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
+import { CompactHonors } from "../HonorBadges";
 import { playerPhoto } from "../../lib/asset-paths";
 import {
   formatHandicap,
@@ -12,24 +13,6 @@ import styles from "../historical.module.css";
 export const metadata = {
   title: "Players | The Sandbagger Invitational",
 };
-
-function ChampionshipLine({ years }) {
-  if (!years.length) {
-    return (
-      <div className={styles.championshipLine}>
-        <span>Sandbagger Competitor</span>
-        <strong>Still Chasing the Cup</strong>
-      </div>
-    );
-  }
-
-  return (
-    <div className={styles.championshipLine}>
-      <span>Bagger Champion</span>
-      <strong>{years.join(" • ")}</strong>
-    </div>
-  );
-}
 
 export default function PlayersPage() {
   const players = getAllPlayerStats();
@@ -70,18 +53,24 @@ export default function PlayersPage() {
 
                 <div className={styles.playerCardIdentity}>
                   <h2>{player["Display Name"]}</h2>
-                  <ChampionshipLine years={stats.championships} />
-                </div>
 
-                <b
-                  className={
-                    player.active
-                      ? styles.activeBadge
-                      : styles.inactiveBadge
-                  }
-                >
-                  {player.active ? "Active" : "Alumni"}
-                </b>
+                  <CompactHonors
+                    championships={stats.championships}
+                    soyYears={stats.sandbaggerOfYearYears}
+                    isGovernor={player.boardOfGovernors}
+                    styles={styles}
+                  />
+
+                  <b
+                    className={
+                      player.active
+                        ? styles.activeBadge
+                        : styles.inactiveBadge
+                    }
+                  >
+                    {player.active ? "Active" : "Alumni"}
+                  </b>
+                </div>
               </div>
 
               <div className={styles.statStrip}>
