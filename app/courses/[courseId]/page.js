@@ -21,6 +21,13 @@ export default async function CoursePage({ params }) {
   const course = getCourse(courseId);
   if (!course) notFound();
 
+  const website =
+    course.Website ||
+    course["Website Link"] ||
+    course["Course Website"] ||
+    course.URL ||
+    "";
+
   return (
     <main>
       <Header />
@@ -59,6 +66,17 @@ export default async function CoursePage({ params }) {
               <div><span>Slope</span><strong>{course.Slope ?? "—"}</strong></div>
               <div><span>Tee Played</span><strong>{course["Tee Played"] ?? "—"}</strong></div>
             </div>
+
+            {website ? (
+              <a
+                className={styles.courseWebsiteLink}
+                href={website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Visit Course Website →
+              </a>
+            ) : null}
           </div>
 
           <div className={styles.detailCard}>
