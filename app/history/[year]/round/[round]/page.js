@@ -25,6 +25,19 @@ function winnerClass(winner, teamOne, teamTwo) {
   return styles.roundNotRecorded;
 }
 
+function visibleSegments(match) {
+  const front = match.segments.find((segment) => segment.label === "Front 9");
+  const back = match.segments.find((segment) => segment.label === "Back 9");
+  const overall = match.segments.find((segment) => segment.label === "18-Hole");
+
+  const frontMissing = !front || front.winner === "Not recorded";
+  const backMissing = !back || back.winner === "Not recorded";
+
+  return frontMissing && backMissing && overall
+    ? [{ ...overall, label: "Overall" }]
+    : match.segments;
+}
+
 export async function generateMetadata({ params }) {
   const { year, round } = await params;
   const archive = getHistoricalRound(year, round);
@@ -157,8 +170,14 @@ export default async function HistoricalRoundPage({ params }) {
                   </div>
                 </div>
 
-                <div className={styles.roundSegmentResults}>
-                  {match.segments.map((segment) => (
+                <div
+                  className={`${styles.roundSegmentResults} ${
+                    visibleSegments(match).length === 1
+                      ? styles.roundSegmentResultsSingle
+                      : ""
+                  }`}
+                >
+                  {visibleSegments(match).map((segment) => (
                     <div key={segment.label}>
                       <span>{segment.label}</span>
                       <strong
