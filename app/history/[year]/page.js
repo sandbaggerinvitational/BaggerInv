@@ -9,8 +9,10 @@ import {
 } from "../../../lib/asset-paths";
 import {
   formatHandicap,
+  getAdjacentTournamentYears,
   getFormatName,
   getTournament,
+  getTournamentRoundPoints,
 } from "../../../lib/stats";
 import styles from "../../historical.module.css";
 
@@ -29,6 +31,10 @@ export default async function TournamentYearPage({ params }) {
   const { year } = await params;
   const tournament = getTournament(year);
   if (!tournament) notFound();
+
+  const roundPoints = getTournamentRoundPoints(year);
+  const { previousYear, nextYear } =
+    getAdjacentTournamentYears(year);
 
   return (
     <main>
@@ -53,6 +59,33 @@ export default async function TournamentYearPage({ params }) {
         </div>
       </section>
 
+      <nav className={styles.tournamentYearNavigation}>
+        {previousYear ? (
+          <Link href={`/history/${previousYear}`}>
+            <span>← Previous Year</span>
+            <strong>{previousYear}</strong>
+          </Link>
+        ) : (
+          <span />
+        )}
+
+        <Link
+          className={styles.tournamentHistoryHome}
+          href="/history"
+        >
+          All Tournament Years
+        </Link>
+
+        {nextYear ? (
+          <Link href={`/history/${nextYear}`}>
+            <span>Next Year →</span>
+            <strong>{nextYear}</strong>
+          </Link>
+        ) : (
+          <span />
+        )}
+      </nav>
+
       <section className={styles.content}>
         <div className={styles.finalScoreCard}>
           <div>
@@ -69,6 +102,35 @@ export default async function TournamentYearPage({ params }) {
             </strong>
           </div>
         </div>
+
+        <section className={styles.roundPointsSection}>
+          <span className={styles.sectionLabel}>Scoring Format</span>
+          <h2>Points Available by Round</h2>
+
+          <div className={styles.roundPointsGrid}>
+            {roundPoints.map((round) => (
+              <Link
+                href={`/history/${tournament.year}/round/${round.round}`}
+                className={styles.roundPointsCard}
+                key={round.round}
+              >
+                <span>{round.roundLabel}</span>
+                <h3>{getFormatName(round.format)}</h3>
+                <p>{round.course}</p>
+
+                {round.pointsAvailable !== null ? (
+                  <strong>
+                    {round.pointsAvailable} Points Available
+                  </strong>
+                ) : (
+                  <strong className={styles.roundPointsBlank}>
+                    &nbsp;
+                  </strong>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>The Teams</span>
@@ -175,6 +237,35 @@ export default async function TournamentYearPage({ params }) {
           </div>
         </section>
       </section>
+
+      <nav
+        className={`${styles.tournamentYearNavigation} ${styles.tournamentYearNavigationBottom}`}
+      >
+        {previousYear ? (
+          <Link href={`/history/${previousYear}`}>
+            <span>← Previous Year</span>
+            <strong>{previousYear}</strong>
+          </Link>
+        ) : (
+          <span />
+        )}
+
+        <Link
+          className={styles.tournamentHistoryHome}
+          href="/history"
+        >
+          All Tournament Years
+        </Link>
+
+        {nextYear ? (
+          <Link href={`/history/${nextYear}`}>
+            <span>Next Year →</span>
+            <strong>{nextYear}</strong>
+          </Link>
+        ) : (
+          <span />
+        )}
+      </nav>
 
       <Footer />
     </main>
