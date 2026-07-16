@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import AssetImage from "../../AssetImage";
-import { courseLogo } from "../../../lib/asset-paths";
+import {
+  courseHero,
+  courseLogo,
+} from "../../../lib/asset-paths";
 import { getCourse, getFormatName } from "../../../lib/stats";
 import styles from "../../historical.module.css";
 
@@ -21,37 +24,44 @@ export default async function CoursePage({ params }) {
   const course = getCourse(courseId);
   if (!course) notFound();
 
-  const website =
-    course.Website ||
-    course["Website Link"] ||
-    course["Course Website"] ||
-    course.URL ||
-    "";
+  const website = course.Website || "";
 
   return (
     <main>
       <Header />
 
-      <section className={`${styles.pageHero} ${styles.coursePageHero}`}>
-        <div className={styles.courseHeroLogoWrap}>
-          <AssetImage
-            src={courseLogo(course["Course Logo"])}
-            alt={`${course.Course} logo`}
-            className={styles.courseHeroLogo}
-            fallbackClassName={styles.courseHeroLogoFallback}
-            fallback="⛳"
-            loading="eager"
-          />
-        </div>
+      <section className={styles.courseProfileHero}>
+        <AssetImage
+          src={courseHero(course["Course Profile Image"])}
+          alt={`${course.Course} course`}
+          className={styles.courseProfileHeroImage}
+          fallbackClassName={styles.courseProfileHeroFallback}
+          fallback={course.Course}
+          loading="eager"
+        />
+        <div className={styles.courseProfileHeroShade} />
 
-        <div>
-          <p className={styles.eyebrow}>
-            {course.City}, {course.State}
-          </p>
-          <h1>{course.Course}</h1>
-          <p>
-            Designed by {course.Designer} · Opened {course["Year Opened"]}
-          </p>
+        <div className={styles.courseProfileHeroContent}>
+          <div className={styles.courseProfileLogoWrap}>
+            <AssetImage
+              src={courseLogo(course["Course Logo"])}
+              alt={`${course.Course} logo`}
+              className={styles.courseProfileLogo}
+              fallbackClassName={styles.courseProfileLogoFallback}
+              fallback="⛳"
+              loading="eager"
+            />
+          </div>
+
+          <div>
+            <p className={styles.eyebrow}>
+              {course.City}, {course.State}
+            </p>
+            <h1>{course.Course}</h1>
+            <p>
+              Designed by {course.Designer} · Opened {course["Year Opened"]}
+            </p>
+          </div>
         </div>
       </section>
 
