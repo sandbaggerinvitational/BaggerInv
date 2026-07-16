@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header, Footer } from "../../../components";
-import AssetImage from "../../../AssetImage";
+import { Header, Footer } from "../../../../components";
+import AssetImage from "../../../../AssetImage";
 import {
   courseLogo,
   teamLogo,
   tournamentHero,
-} from "../../../../lib/asset-paths";
+} from "../../../../../lib/asset-paths";
 import {
   getFormatName,
   getHistoricalRound,
-} from "../../../../lib/stats";
-import styles from "../../../historical.module.css";
+} from "../../../../../lib/stats";
+import styles from "../../../../historical.module.css";
 
 function displayPoints(value) {
   if (value === null || value === undefined) return "—";
