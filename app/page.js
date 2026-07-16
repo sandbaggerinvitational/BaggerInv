@@ -1,169 +1,131 @@
 import Link from "next/link";
-import { Header, Footer } from "./components";
+import { Header, Footer } from "../components";
+import AssetImage from "../AssetImage";
+import { CompactHonors } from "../HonorBadges";
+import { playerPhoto } from "../../lib/asset-paths";
+import {
+  formatHandicap,
+  formatRecord,
+  getAllPlayerStats,
+} from "../../lib/stats";
+import styles from "../historical.module.css";
 
-export default function Home() {
+export const metadata = {
+  title: "Players | The Sandbagger Invitational",
+};
+
+function ChampionshipLine({ years }) {
+  if (!years.length) {
+    return (
+      <div className={styles.championshipLine}>
+        <span>Sandbagger Competitor</span>
+        <strong>Still Chasing the Cup</strong>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.championshipLine}>
+      <span>Bagger Champion</span>
+      <strong>{years.join(" • ")}</strong>
+    </div>
+  );
+}
+
+export default function PlayersPage() {
+  const players = getAllPlayerStats();
+
   return (
     <main>
       <Header />
 
-      <section className="kiawahHero">
-        <div className="kiawahOverlay" />
+      <section className={styles.pageHero}>
+        <p className={styles.eyebrow}>The Competitors</p>
+        <h1>Players</h1>
+        <p>
+          Complete match records from 2017 onward, career handicaps,
+          rivalries, partnerships, ratings, and championship history.
+        </p>
+      </section>
 
-        <div className="kiawahHeroContent">
-          <p className="eyebrow">10th Annual Sandbagger Invitational</p>
-          <h1>Kiawah Island</h1>
-          <p className="heroDate">September 25–26, 2026</p>
-          <p className="heroIntro">
-            Twenty-four players. Two teams. Three rounds. One trophy.
-          </p>
+      <section className={styles.content}>
+        <div className={styles.playerGrid}>
+          {players.map(({ player, stats }) => (
+            <Link
+              className={styles.playerCard}
+              href={`/players/${player.slug}`}
+              key={player["Player ID"]}
+            >
+              <div className={styles.playerTop}>
+                <AssetImage
+                  src={playerPhoto(player["Photo Filename"])}
+                  alt={player["Display Name"]}
+                  className={styles.playerCardPhoto}
+                  fallbackClassName={styles.playerCardPhotoFallback}
+                  fallback={player["Display Name"]
+                    .split(" ")
+                    .map((part) => part[0])
+                    .slice(0, 2)
+                    .join("")}
+                />
 
-          <div className="actions">
-            <Link className="button primary" href="/live">
-              Live Match Center
+                <div className={styles.playerCardIdentity}>
+                  <h2>{player["Display Name"]}</h2>
+                  <ChampionshipLine years={stats.championships} />
+                </div>
+
+                <b
+                  className={
+                    player.active
+                      ? styles.activeBadge
+                      : styles.inactiveBadge
+                  }
+                >
+                  {player.active ? "Active" : "Alumni"}
+                </b>
+              </div>
+
+              <CompactHonors
+                championships={stats.championships}
+                soyYears={stats.sandbaggerOfYearYears}
+                isGovernor={player.boardOfGovernors}
+                styles={styles}
+              />
+
+              <div className={styles.statStrip}>
+                <div>
+                  <span>Record</span>
+                  <strong>{formatRecord(stats.records.overall)}</strong>
+                </div>
+                <div>
+                  <span>Avg. Handicap</span>
+                  <strong>{formatHandicap(stats.averageHandicap)}</strong>
+                </div>
+                <div>
+                  <span>Appearances</span>
+                  <strong>{stats.appearances.length}</strong>
+                </div>
+              </div>
+
+              <div className={styles.rivalLine}>
+                <span>Biggest Rival</span>
+                {stats.biggestRival ? (
+                  <>
+                    <strong>
+                      {stats.biggestRival.player["Display Name"]}
+                    </strong>
+                    <small>
+                      {stats.biggestRival.record.matches} meetings ·{" "}
+                      {formatRecord(stats.biggestRival.record)}
+                    </small>
+                  </>
+                ) : (
+                  <strong>No recorded rival</strong>
+                )}
+              </div>
             </Link>
-            <Link className="button glass" href="/history">
-              Explore the History
-            </Link>
-          </div>
+          ))}
         </div>
-
-        <div className="heroBottomBar">
-          <div>
-            <span>Location</span>
-            <strong>Kiawah Island, South Carolina</strong>
-          </div>
-          <div>
-            <span>Format</span>
-            <strong>Ryder Cup Style</strong>
-          </div>
-          <div>
-            <span>Field</span>
-            <strong>24 Players</strong>
-          </div>
-          <div>
-            <span>Established</span>
-            <strong>2016</strong>
-          </div>
-        </div>
-      </section>
-
-      <section className="section tournamentSpotlight">
-        <div>
-          <p className="eyebrow dark">The Next Chapter</p>
-          <h2>Where the next chapter will be written.</h2>
-          <p className="sectionCopy">
-            The 2026 Sandbagger Invitational heads to Kiawah Island for three
-            rounds of team competition. Team names, captains, pairings, and live
-            scores will populate here directly from your tournament Google Sheet.
-          </p>
-        </div>
-
-        <div className="featureCard">
-          <div>
-            <span>Tournament Status</span>
-            <strong>Offseason</strong>
-          </div>
-          <div>
-            <span>Team One</span>
-            <strong>The Pickles</strong>
-          </div>
-          <div>
-            <span>Team Two</span>
-            <strong>Team Lipp</strong>
-          </div>
-          <div>
-            <span>Current Round</span>
-            <strong>Round 1</strong>
-          </div>
-        </div>
-      </section>
-
-      <section className="liveBand">
-        <div>
-          <p className="eyebrow">Tournament Week</p>
-          <h2>Live Match Center</h2>
-          <p>
-            Follow every matchup, team point, hole status, and leaderboard update
-            as the tournament unfolds.
-          </p>
-        </div>
-
-        <div className="liveScorePreview">
-          <div>
-            <span>The Pickles</span>
-            <strong>0</strong>
-          </div>
-          <p>Overall Score</p>
-          <div>
-            <span>Team Lipp</span>
-            <strong>0</strong>
-          </div>
-        </div>
-
-        <Link className="button light" href="/live">
-          Open Match Center
-        </Link>
-      </section>
-
-      <section className="section cupSection" id="cup">
-        <div className="cupPhoto">
-          <img src="/images/trophy.jpg" alt="The Sandbagger Invitational trophy" />
-        </div>
-
-        <div className="cupCopy">
-          <p className="eyebrow">The Prize</p>
-          <h2>The Cup</h2>
-          <p>
-            Every winning team earns a permanent place in Sandbagger history.
-            The trophy carries the names, teams, and stories of the Invitational
-            from one year to the next.
-          </p>
-          <Link className="textLink" href="/history">
-            View past champions →
-          </Link>
-        </div>
-      </section>
-
-      <section className="section historyPreview">
-        <div className="sectionHeading">
-          <div>
-            <p className="eyebrow dark">A Decade of Competition</p>
-            <h2>Tournament History</h2>
-          </div>
-
-          <Link className="textLink darkLink" href="/history">
-            View all years →
-          </Link>
-        </div>
-
-        <div className="yearGrid">
-  {[
-    { year: "2017", location: "Scottsdale, AZ" },
-    { year: "2018", location: "Horseshoe Bay, TX" },
-    { year: "2019", location: "Beaver Creek, CO" },
-    { year: "2020", location: "Traverse City, MI" },
-    { year: "2021", location: "Big Cedar Lodge, MO" },
-    { year: "2022", location: "Pinehurst, NC" },
-    { year: "2023", location: "French Lick, IN" },
-    { year: "2024", location: "Sand Valley, WI" },
-    { year: "2025", location: "Bandon Dunes, OR" },
-    { year: "2026", location: "Kiawah Island, SC" },
-  ].map((tournament) => (
-    <Link
-      key={tournament.year}
-      href={`/history/${tournament.year}`}
-      className="yearCard"
-    >
-      <strong>{tournament.year}</strong>
-
-      <p className="historyLocation">
-        {tournament.location}
-      </p>
-
-      <span>View tournament</span>
-    </Link>
-  ))}
-</div>
       </section>
 
       <Footer />
