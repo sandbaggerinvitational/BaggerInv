@@ -503,3 +503,156 @@
     font-size: 2.2rem;
   }
 }
+
+
+/* =========================================================
+   V7.2 â€” MATCH CENTER PRESENTATION UPDATE
+   ========================================================= */
+
+.scoreboard .teamBlock {
+  align-items: flex-start;
+}
+
+.scoreboard .teamBlock:last-child {
+  align-items: flex-end;
+}
+
+.matchResult {
+  padding: 22px;
+  border-top: 1px solid #eee8dc;
+  background:
+    linear-gradient(180deg, rgba(248,244,235,.55), rgba(255,255,255,1));
+}
+
+.matchResultLabel {
+  display: block;
+  color: #b78927;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  font-size: .64rem;
+  font-weight: 800;
+}
+
+.matchWinnerBanner {
+  width: fit-content;
+  max-width: 100%;
+  margin: 13px auto 20px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 999px;
+  font-size: .82rem;
+}
+
+.matchWinnerBanner svg {
+  width: 18px;
+  height: 18px;
+  color: #b78927;
+}
+
+.matchWinnerBanner strong {
+  overflow-wrap: anywhere;
+}
+
+.matchScoreTable {
+  display: grid;
+  gap: 9px;
+}
+
+.matchScoreRow {
+  padding: 13px 15px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid #e5dfd2;
+  border-radius: 13px;
+  background: white;
+}
+
+.matchScoreRow > span {
+  min-width: 0;
+  color: #172019;
+  font-size: .86rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.matchScoreRow > strong {
+  flex: none;
+  color: #172019;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+}
+
+.matchScoreWinner {
+  border-color: #bad4c4;
+  background: #edf6f0;
+  box-shadow: inset 4px 0 0 #0b3529;
+}
+
+.players > b {
+  position: relative;
+  padding-inline: 8px;
+  color: #c9232d;
+}
+
+.players > b::before,
+.players > b::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 1px;
+  background: #d9d1c2;
+}
+
+.players > b::before {
+  right: 100%;
+}
+
+.players > b::after {
+  left: 100%;
+}
+
+.matchCard,
+.tabs button,
+.winnerBadge,
+.matchWinnerBanner,
+.matchScoreRow {
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    background-color .18s ease;
+}
+
+.matchCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 48px rgba(15,35,25,.09);
+}
+
+.tabs button:hover:not(.activeTab) {
+  background: #fbf8f1;
+}
+
+@media (max-width: 900px) {
+  .scoreboard .teamBlock,
+  .scoreboard .teamBlock:last-child {
+    align-items: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .matchResult {
+    padding: 20px;
+  }
+
+  .players > b::before,
+  .players > b::after {
+    display: none;
+  }
+}
