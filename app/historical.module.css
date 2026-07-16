@@ -2936,3 +2936,197 @@
   background: var(--tsi-green-900);
   color: white;
 }
+
+
+/* =========================================================
+   V7.3 â€” HONORS WRAPPING & CAPTAIN LEGACY
+   ========================================================= */
+
+.honorYears {
+  margin-top: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 0;
+  align-items: center;
+}
+
+.honorYearItem {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.honorYearItem b {
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: inherit;
+}
+
+.honorYearDot {
+  margin: 0 9px;
+  color: var(--tsi-ink);
+  font-style: normal;
+  line-height: 1;
+}
+
+.honorYearItem:hover b,
+.honorYearItem:hover .honorYearDot {
+  color: var(--tsi-gold-500);
+}
+
+.captainLegacySection {
+  margin-top: 68px;
+}
+
+.captainLegacySection h2 {
+  margin: 7px 0 0;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.captainLegacySummary {
+  margin-top: 25px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-md);
+  background:
+    radial-gradient(circle at 85% 15%, rgba(212,177,95,.12), transparent 30%),
+    var(--tsi-white);
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.captainLegacySummary > div {
+  padding: 22px;
+  border-right: 1px solid #eee8dc;
+}
+
+.captainLegacySummary > div:last-child {
+  border-right: 0;
+}
+
+.captainLegacySummary span {
+  display: block;
+  color: var(--tsi-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .63rem;
+  font-weight: 800;
+}
+
+.captainLegacySummary strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.65rem;
+}
+
+.captainLegacyTimeline {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.captainLegacySeason {
+  padding: 17px 19px;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  gap: 17px;
+  align-items: center;
+  border: 1px solid var(--tsi-line);
+  border-radius: 15px;
+  background: var(--tsi-white);
+  color: inherit;
+  box-shadow: var(--tsi-shadow-sm);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.captainLegacySeason:hover {
+  transform: translateY(-2px);
+  border-color: #cfb771;
+  box-shadow: var(--tsi-shadow-md);
+}
+
+.captainLegacySeason > strong {
+  color: var(--tsi-gold-500);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+}
+
+.captainLegacySeason > div {
+  min-width: 0;
+}
+
+.captainLegacySeason span {
+  display: block;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.captainLegacySeason small {
+  display: block;
+  margin-top: 4px;
+  color: var(--tsi-muted);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.captainLegacySeason > b {
+  color: var(--tsi-green-900);
+  font-size: .75rem;
+  white-space: nowrap;
+}
+
+.captainLegacyChampion {
+  border-color: #d6bd78;
+  background:
+    linear-gradient(90deg, rgba(238,214,146,.22), rgba(255,255,255,1) 45%);
+  box-shadow:
+    inset 4px 0 0 var(--tsi-gold-500),
+    var(--tsi-shadow-sm);
+}
+
+.captainLegacyEmpty {
+  margin-top: 24px;
+  padding: 22px;
+  border: 1px dashed var(--tsi-line);
+  border-radius: var(--tsi-radius-md);
+  color: var(--tsi-muted);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .captainLegacySummary {
+    grid-template-columns: 1fr;
+  }
+
+  .captainLegacySummary > div {
+    border-right: 0;
+    border-bottom: 1px solid #eee8dc;
+  }
+
+  .captainLegacySummary > div:last-child {
+    border-bottom: 0;
+  }
+
+  .captainLegacySeason {
+    grid-template-columns: 62px minmax(0, 1fr);
+  }
+
+  .captainLegacySeason > b {
+    grid-column: 2;
+  }
+
+  .honorYearDot {
+    margin-inline: 7px;
+  }
+}
