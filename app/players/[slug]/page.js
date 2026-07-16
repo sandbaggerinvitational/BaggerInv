@@ -129,7 +129,7 @@ export default async function PlayerPage({ params }) {
                 <strong>{rival.player["Display Name"]}</strong>
               </div>
               <div>
-                <span>Meetings</span>
+                <span>Points Won</span>
                 <strong>{rival.record.matches}</strong>
               </div>
               <div>
@@ -208,7 +208,7 @@ export default async function PlayerPage({ params }) {
               <span>#</span>
               <span>Partner</span>
               <span>Record</span>
-              <span>Meetings</span>
+              <span>Points Won</span>
             </div>
 
             {stats.partners.slice(0, 8).map((row, index) => (
@@ -218,7 +218,7 @@ export default async function PlayerPage({ params }) {
                   {row.player["Display Name"]}
                 </Link>
                 <span>{formatRecord(row.record)}</span>
-                <strong>{row.record.matches}</strong>
+                <strong>{row.record.points}</strong>
               </div>
             ))}
           </div>
