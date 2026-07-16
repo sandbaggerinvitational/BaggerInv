@@ -20,43 +20,103 @@ export function StarIcon({ className = "" }) {
 export function BogShieldIcon({ className = "" }) {
   return (
     <svg className={className} viewBox="0 0 64 72" aria-hidden="true">
-      <path d="M32 3 58 12v20c0 18-10.5 30.2-26 37C16.5 62.2 6 50 6 32V12L32 3Z" fill="currentColor" />
-      <path d="M32 8 53 15v17c0 14.3-7.8 24.8-21 31.2C18.8 56.8 11 46.3 11 32V15L32 8Z" fill="none" stroke="currentColor" strokeWidth="2" opacity=".45" />
-      <text x="32" y="40" textAnchor="middle" fontFamily="Georgia, serif" fontSize="17" fontWeight="800" fill="#0b3529">BOG</text>
+      <defs>
+        <linearGradient id="bogGold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#f5d77d" />
+          <stop offset="52%" stopColor="#d7a83f" />
+          <stop offset="100%" stopColor="#f0ca67" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M32 3 58 12v20c0 18-10.5 30.2-26 37C16.5 62.2 6 50 6 32V12L32 3Z"
+        fill="url(#bogGold)"
+        stroke="#9f7422"
+        strokeWidth="2"
+      />
+      <path
+        d="M32 8 53 15v17c0 14.3-7.8 24.8-21 31.2C18.8 56.8 11 46.3 11 32V15L32 8Z"
+        fill="none"
+        stroke="rgba(255,255,255,.48)"
+        strokeWidth="2"
+      />
+      <text
+        x="32"
+        y="40"
+        textAnchor="middle"
+        fontFamily="Georgia, serif"
+        fontSize="17"
+        fontWeight="800"
+        fill="#0b3529"
+      >
+        BOG
+      </text>
     </svg>
   );
 }
 
-export function CompactHonors({ championships = [], soyYears = [], isGovernor = false, styles }) {
+function sortedYears(years) {
+  return [...years].sort((a, b) => Number(a) - Number(b));
+}
+
+function soyLabel(count) {
+  return count === 1
+    ? "Sandbagger of the Year"
+    : `${count}× Sandbagger of the Year`;
+}
+
+export function CompactHonors({
+  championships = [],
+  soyYears = [],
+  isGovernor = false,
+  styles,
+}) {
   if (!championships.length && !soyYears.length && !isGovernor) return null;
 
   return (
-    <div className={styles.compactHonors} aria-label="Career honors">
+    <div className={styles.playerCardHonors} aria-label="Career honors">
       {championships.length ? (
-        <span className={styles.compactHonorBadge} title="Bagger Champion">
-          <TrophyIcon className={styles.compactHonorIcon} />
-          <b>{championships.length}×</b> Champion
-        </span>
+        <div className={styles.playerCardHonor}>
+          <div className={styles.playerCardHonorMedallion}>
+            <TrophyIcon className={styles.playerCardHonorIcon} />
+          </div>
+          <div>
+            <span>{championships.length}× Bagger Champion</span>
+            <strong>{sortedYears(championships).join(" • ")}</strong>
+          </div>
+        </div>
       ) : null}
 
       {soyYears.length ? (
-        <span className={styles.compactHonorBadge} title="Sandbagger of the Year">
-          <StarIcon className={styles.compactHonorIcon} />
-          <b>{soyYears.length}×</b> SOY
-        </span>
+        <div className={styles.playerCardHonor}>
+          <div className={styles.playerCardHonorMedallion}>
+            <StarIcon className={styles.playerCardHonorIcon} />
+          </div>
+          <div>
+            <span>{soyLabel(soyYears.length)}</span>
+            <strong>{sortedYears(soyYears).join(" • ")}</strong>
+          </div>
+        </div>
       ) : null}
 
       {isGovernor ? (
-        <span className={`${styles.compactHonorBadge} ${styles.bogCompactBadge}`} title="Board of Governors">
-          <BogShieldIcon className={styles.bogCompactIcon} />
-          <b>BOG</b>
-        </span>
+        <div className={`${styles.playerCardHonor} ${styles.playerCardBogHonor}`}>
+          <BogShieldIcon className={styles.playerCardBogShield} />
+          <div>
+            <span>Board of Governors</span>
+            <strong>BOG</strong>
+          </div>
+        </div>
       ) : null}
     </div>
   );
 }
 
-export function CareerHonors({ championships = [], soyYears = [], isGovernor = false, styles }) {
+export function CareerHonors({
+  championships = [],
+  soyYears = [],
+  isGovernor = false,
+  styles,
+}) {
   if (!championships.length && !soyYears.length && !isGovernor) return null;
 
   return (
@@ -67,27 +127,33 @@ export function CareerHonors({ championships = [], soyYears = [], isGovernor = f
       <div className={styles.honorsGrid}>
         {championships.length ? (
           <div className={styles.honorCard}>
-            <div className={styles.honorMedallion}><TrophyIcon className={styles.honorIcon} /></div>
+            <div className={styles.honorMedallion}>
+              <TrophyIcon className={styles.honorIcon} />
+            </div>
             <div>
               <span>{championships.length}× Bagger Champion</span>
-              <strong>{[...championships].sort((a, b) => a - b).join(" • ")}</strong>
+              <strong>{sortedYears(championships).join(" • ")}</strong>
             </div>
           </div>
         ) : null}
 
         {soyYears.length ? (
           <div className={styles.honorCard}>
-            <div className={styles.honorMedallion}><StarIcon className={styles.honorIcon} /></div>
+            <div className={styles.honorMedallion}>
+              <StarIcon className={styles.honorIcon} />
+            </div>
             <div>
-              <span>{soyYears.length}× Sandbagger of the Year</span>
-              <strong>{[...soyYears].sort((a, b) => a - b).join(" • ")}</strong>
+              <span>{soyLabel(soyYears.length)}</span>
+              <strong>{sortedYears(soyYears).join(" • ")}</strong>
             </div>
           </div>
         ) : null}
 
         {isGovernor ? (
           <div className={`${styles.honorCard} ${styles.bogHonorCard}`}>
-            <div className={styles.bogMedallion}><BogShieldIcon className={styles.bogHonorIcon} /></div>
+            <div className={styles.bogMedallion}>
+              <BogShieldIcon className={styles.bogHonorIcon} />
+            </div>
             <div>
               <span>Board of Governors</span>
               <strong>Lifetime Designation</strong>
