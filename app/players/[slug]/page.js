@@ -26,6 +26,41 @@ export async function generateMetadata({ params }) {
   };
 }
 
+
+function ChampionshipTimeline({ years, styles }) {
+  const orderedYears = [...years].sort(
+    (a, b) => Number(a) - Number(b)
+  );
+  const rows = [];
+
+  for (let index = 0; index < orderedYears.length; index += 5) {
+    rows.push(orderedYears.slice(index, index + 5));
+  }
+
+  return (
+    <div className={styles.profileChampionshipTimeline}>
+      {rows.map((row, rowIndex) => (
+        <div
+          className={styles.profileChampionshipRow}
+          key={rowIndex}
+        >
+          {row.map((year, index) => (
+            <span
+              className={styles.profileChampionshipYear}
+              key={year}
+            >
+              <b>{year}</b>
+              {index < row.length - 1 ? (
+                <i aria-hidden="true">•</i>
+              ) : null}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default async function PlayerPage({ params }) {
   const { slug } = await params;
   const player = getPlayerBySlug(slug);
@@ -74,11 +109,14 @@ export default async function PlayerPage({ params }) {
             </p>
             <h1>{player["Display Name"]}</h1>
             <div className={styles.profileChampionshipLine}>
-              <strong>
-                {stats.championships.length
-                  ? stats.championships.join(" • ")
-                  : "Still Chasing the Cup"}
-              </strong>
+              {stats.championships.length ? (
+                <ChampionshipTimeline
+                  years={stats.championships}
+                  styles={styles}
+                />
+              ) : (
+                <strong>Still Chasing the Cup</strong>
+              )}
             </div>
           </div>
 
