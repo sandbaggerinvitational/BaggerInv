@@ -9,6 +9,7 @@ import {
 } from "../../../lib/asset-paths";
 import {
   formatHandicap,
+  getFormatName,
   getTournament,
 } from "../../../lib/stats";
 import styles from "../../historical.module.css";
@@ -56,7 +57,10 @@ export default async function TournamentYearPage({ params }) {
               {tournament["Winning Team"] || "To Be Determined"}
             </strong>
           </div>
-          <b>{tournament["Final Score"] || "Upcoming"}</b>
+          <b>
+            {tournament["Final Score"] ||
+              (tournament["Winning Team"] ? "Final" : "Upcoming")}
+          </b>
           <div>
             <span>Runner-Up</span>
             <strong>
@@ -125,11 +129,7 @@ export default async function TournamentYearPage({ params }) {
                 <p>
                   {course.City}, {course.State}
                 </p>
-                <strong>
-                  {course["Course ID"] === tournament["Championship Course"]
-                    ? "Championship Course"
-                    : course.Format}
-                </strong>
+                <strong>{getFormatName(course.Format)}</strong>
               </Link>
             ))}
           </div>
