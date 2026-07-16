@@ -193,7 +193,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   align-items: flex-end;
   overflow: hidden;
   color: white;
-  background-image: url("/images/home-page-hero.webp");
+  background-image: url("/images/kiawah-hero.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -476,17 +476,14 @@ h2 {
   justify-content: space-between;
 }
 
-.yearCard strong {
+.yearCard span {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 2.1rem;
-  line-height: 1;
-  color: var(--ink);
 }
 
-.yearCard span {
+.yearCard strong {
   color: var(--muted);
   font-size: 0.82rem;
-  font-weight: 700;
 }
 
 footer {
@@ -579,23 +576,34 @@ footer span {
 
   .yearGrid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
   }
 
   .sideMenu {
     width: 100vw;
   }
-  .sideNav a {
-  gap: 0;
-  font-size: 1.18rem;
-}
-  .historyLocation {
-  margin: 10px 0 20px;
-  color: #8a6a24;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
+
+/* =========================================================
+   V8.1 â€” MOBILE HERO CTA VISIBILITY
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .kiawahHero {
+    min-height: 100svh;
+  }
+
+  .kiawahHeroContent {
+    padding-bottom: 265px;
+  }
+
+  .kiawahHeroContent .actions {
+    width: min(100%, 330px);
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .kiawahHeroContent .button {
+    width: 100%;
+  }
 }
