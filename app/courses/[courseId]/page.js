@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import AssetImage from "../../AssetImage";
 import { courseLogo } from "../../../lib/asset-paths";
-import { getCourse } from "../../../lib/stats";
+import { getCourse, getFormatName } from "../../../lib/stats";
 import styles from "../../historical.module.css";
 
 export async function generateMetadata({ params }) {
@@ -67,7 +67,7 @@ export default async function CoursePage({ params }) {
               {course.appearances.map((appearance) => (
                 <div key={`${appearance.Year}-${appearance.Round}`}>
                   <span>{appearance.Year} · {appearance.Round}</span>
-                  <strong>{appearance.Format}</strong>
+                  <strong>{getFormatName(appearance.Format)}</strong>
                 </div>
               ))}
             </div>
