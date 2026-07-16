@@ -159,6 +159,61 @@ export default async function PlayerPage({ params }) {
         />
 
 
+
+        <section className={styles.careerTimelineSection}>
+          <span className={styles.sectionLabel}>Career Journey</span>
+          <h2>Career Timeline</h2>
+
+          <div className={styles.careerTimeline}>
+            {stats.careerTimeline.map((season) => {
+              const content = (
+                <>
+                  <strong>{season.year}</strong>
+                  <span className={styles.careerTimelineMarker} aria-hidden="true" />
+                  <div>
+                    <h3>
+                      {season.result === "Champion"
+                        ? "🏆 Champion"
+                        : season.result}
+                    </h3>
+                    <p>
+                      {season.attended
+                        ? season.teamName
+                        : "Did not participate"}
+                    </p>
+                  </div>
+                  {season.attended ? <b>View Year →</b> : null}
+                </>
+              );
+
+              return season.attended ? (
+                <Link
+                  className={`${styles.careerTimelineItem} ${
+                    season.result === "Champion"
+                      ? styles.careerTimelineChampion
+                      : season.result === "Runner-Up"
+                        ? styles.careerTimelineRunnerUp
+                        : season.result === "Upcoming"
+                          ? styles.careerTimelineUpcoming
+                          : ""
+                  }`}
+                  href={`/history/${season.year}`}
+                  key={season.year}
+                >
+                  {content}
+                </Link>
+              ) : (
+                <div
+                  className={`${styles.careerTimelineItem} ${styles.careerTimelineAbsent}`}
+                  key={season.year}
+                >
+                  {content}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         <section className={styles.captainLegacySection}>
           <span className={styles.sectionLabel}>Leadership History</span>
           <h2>Captain Legacy</h2>
