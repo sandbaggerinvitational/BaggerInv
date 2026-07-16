@@ -32,13 +32,16 @@ function pointsForRound(roundPoints, round) {
 }
 
 function tournamentStatus(tournament) {
-  const hasWinner = Boolean(tournament["Winning Team"]);
-  const hasRunnerUp = Boolean(tournament["Runner-Up Team"]);
-  const hasScore = Boolean(tournament["Final Score"]);
+  const score = String(tournament["Final Score"] ?? "").trim();
+  const winner = String(tournament["Winning Team"] ?? "").trim();
+  const runnerUp = String(tournament["Runner-Up Team"] ?? "").trim();
+  const complete = Boolean(score || winner || runnerUp);
 
-  return hasWinner || hasRunnerUp || hasScore
-    ? tournament["Final Score"] || "Final"
-    : "Upcoming";
+  return {
+    complete,
+    label: complete ? "Final" : "Upcoming",
+    score: complete ? score || "Final" : "Upcoming",
+  };
 }
 
 export default async function TournamentYearPage({ params }) {
@@ -49,6 +52,7 @@ export default async function TournamentYearPage({ params }) {
   const roundPoints = getTournamentRoundPoints(year);
   const { previousYear, nextYear } =
     getAdjacentTournamentYears(year);
+  const status = tournamentStatus(tournament);
 
   return (
     <main>
@@ -108,7 +112,10 @@ export default async function TournamentYearPage({ params }) {
               {tournament["Winning Team"] || "To Be Determined"}
             </strong>
           </div>
-          <b>{tournamentStatus(tournament)}</b>
+          <div className={styles.finalScoreCenter}>
+            <span>{status.label}</span>
+            <b>{status.score}</b>
+          </div>
           <div>
             <span>Runner-Up</span>
             <strong>
@@ -139,13 +146,12 @@ export default async function TournamentYearPage({ params }) {
                 />
 
                 <div>
-                  <span>{team.side}</span>
                   <h3>{team.name}</h3>
                   <p>
                     Captain: {team.captain?.["Display Name"] || "TBA"}
                   </p>
                   <strong>
-                    Avg. Handicap: {formatHandicap(team.averageHandicap)}
+                    Avg. Team Handicap: {formatHandicap(team.averageHandicap)}
                   </strong>
                   <em>View full roster →</em>
                 </div>
