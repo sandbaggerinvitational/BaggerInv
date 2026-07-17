@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { Header, Footer } from "./components";
+import { getTournaments } from "../lib/stats";
 
 export default function Home() {
+  const tournaments = [...getTournaments()].sort(
+    (a, b) => a.year - b.year
+  );
+
   return (
     <main>
       <Header />
@@ -137,21 +142,18 @@ export default function Home() {
         </div>
 
         <div className="yearGrid">
-          {[
-            "2016",
-            "2017",
-            "2018",
-            "2019",
-            "2020",
-            "2021",
-            "2022",
-            "2023",
-            "2024",
-            "2025",
-            "2026",
-          ].map((year) => (
-            <Link href="/history" className="yearCard" key={year}>
-              <span>{year}</span>
+          {tournaments.map((tournament) => (
+            <Link
+              href={`/history/${tournament.year}`}
+              className="yearCard"
+              key={tournament.year}
+            >
+              <span>{tournament.year}</span>
+              <p>
+                {tournament.Destination ||
+                  tournament.Location ||
+                  "Tournament destination"}
+              </p>
               <strong>View tournament</strong>
             </Link>
           ))}
