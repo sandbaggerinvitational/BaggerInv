@@ -11,12 +11,14 @@ import {
   PlayerPair,
 } from "../AdvancedTable";
 import styles from "../../historical.module.css";
+import { addTournamentRanks } from "../../../lib/rankings";
 
 export const metadata = {
   title: "Partnership Analytics | The Sandbagger Invitational",
 };
 
 function PartnershipTable({ title, description, rows, valueLabel, value }) {
+  const rankedRows = addTournamentRanks(rows, value);
   return (
     <section className={styles.advancedStatSection}>
       <span className={styles.sectionLabel}>Team Golf</span>
@@ -32,9 +34,9 @@ function PartnershipTable({ title, description, rows, valueLabel, value }) {
           valueLabel,
         ]}
       >
-        {rows.map((row, index) => (
+        {rankedRows.map((row) => (
           <AdvancedRow key={row.key}>
-            <strong>#{index + 1}</strong>
+            <strong>{row.tournamentRank}</strong>
             <PlayerPair
               first={row.playerOne}
               second={row.playerTwo}

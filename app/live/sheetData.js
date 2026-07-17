@@ -1,294 +1,209 @@
-const WEBSITE_FEED_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7pFJCpgdgWIKs6IG6_oHpxjqGmic8tTEaWh1IPZapPhIBctS8Rl30Cun9XHwfD0R7hJVuZd_fxzUy/pub?gid=1051192073&single=true&output=csv";
+const SPREADSHEET_ID = "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4";
 
-const SHEET_ROWS = {
-  tournament: {
-    status: 2,
-    year: 3,
-    location: 4,
-    dates: 5,
-    teamOneName: 6,
-    teamOneScore: 7,
-    teamTwoName: 8,
-    teamTwoScore: 9,
-    currentRound: 10,
-  },
-  roundOne: { start: 14, end: 19 },
-  roundTwo: { start: 23, end: 28 },
-  roundThree: { start: 32, end: 43 },
-  leaderboard: { start: 48, end: 71 },
-};
+function csvUrl(sheetName) {
+  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+}
 
 function parseCsv(csvText) {
   const rows = [];
-  let currentRow = [];
-  let currentCell = "";
-  let insideQuotes = false;
-
-  for (let index = 0; index < csvText.length; index += 1) {
-    const character = csvText[index];
-    const nextCharacter = csvText[index + 1];
-
-    if (character === '"' && insideQuotes && nextCharacter === '"') {
-      currentCell += '"';
-      index += 1;
-      continue;
+  let row = [];
+  let cell = "";
+  let quoted = false;
+  for (let i = 0; i < csvText.length; i += 1) {
+    const ch = csvText[i];
+    const next = csvText[i + 1];
+    if (ch === '"' && quoted && next === '"') { cell += '"'; i += 1; continue; }
+    if (ch === '"') { quoted = !quoted; continue; }
+    if (ch === "," && !quoted) { row.push(cell); cell = ""; continue; }
+    if ((ch === "\n" || ch === "\r") && !quoted) {
+      if (ch === "\r" && next === "\n") i += 1;
+      row.push(cell); rows.push(row); row = []; cell = ""; continue;
     }
-
-    if (character === '"') {
-      insideQuotes = !insideQuotes;
-      continue;
-    }
-
-    if (character === "," && !insideQuotes) {
-      currentRow.push(currentCell);
-      currentCell = "";
-      continue;
-    }
-
-    if ((character === "\n" || character === "\r") && !insideQuotes) {
-      if (character === "\r" && nextCharacter === "\n") {
-        index += 1;
-      }
-
-      currentRow.push(currentCell);
-      rows.push(currentRow);
-      currentRow = [];
-      currentCell = "";
-      continue;
-    }
-
-    currentCell += character;
+    cell += ch;
   }
-
-  if (currentCell.length > 0 || currentRow.length > 0) {
-    currentRow.push(currentCell);
-    rows.push(currentRow);
-  }
-
+  if (cell || row.length) { row.push(cell); rows.push(row); }
   return rows;
 }
 
-function clean(value) {
-  return String(value ?? "").trim();
+function clean(value) { return String(value ?? "").trim(); }
+function number(value) {
+  const parsed = Number.parseFloat(clean(value).replace(/,/g, ""));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+function truthy(value) { return ["true", "yes", "1"].includes(clean(value).toLowerCase()); }
+
+function table(rows) {
+  const headers = (rows[0] || []).map(clean);
+  return rows.slice(1).filter((row) => row.some((v) => clean(v))).map((row) =>
+    Object.fromEntries(headers.map((header, index) => [header, clean(row[index])]))
+  );
 }
 
-function toNumber(value) {
-  const number = Number.parseFloat(clean(value));
-  return Number.isFinite(number) ? number : 0;
+async function fetchSheet(sheetName) {
+  const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
+  if (!response.ok) throw new Error(`${sheetName} returned ${response.status}.`);
+  const text = await response.text();
+  if (!text.trim() || text.trim().startsWith("<")) {
+    throw new Error(`${sheetName} did not return public CSV data.`);
+  }
+  return table(parseCsv(text));
 }
 
-function rowAt(rows, sheetRowNumber) {
-  return rows[sheetRowNumber - 1] ?? [];
-}
-
-function splitPlayers(...values) {
-  return values
-    .flatMap((value) => clean(value).split("/"))
-    .map((name) => name.trim())
-    .filter(Boolean);
+function formatTime(value) {
+  const raw = clean(value);
+  if (!raw) return "";
+  const match = raw.match(/Date\(\d+,\d+,\d+,(\d+),(\d+),(\d+)\)/);
+  if (match) {
+    const date = new Date(2000, 0, 1, Number(match[1]), Number(match[2]), Number(match[3]));
+    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  }
+  if (/^\d{1,2}:\d{2}/.test(raw)) {
+    const [hours, minutes] = raw.split(":").map(Number);
+    return new Date(2000, 0, 1, hours, minutes).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  }
+  return raw;
 }
 
 function normalizeWinner(value) {
   const winner = clean(value).toLowerCase();
-
-  if (
-    winner === "team 1" ||
-    winner === "team1" ||
-    winner === "1" ||
-    winner === "the pickles"
-  ) {
-    return "Team 1";
-  }
-
-  if (
-    winner === "team 2" ||
-    winner === "team2" ||
-    winner === "2" ||
-    winner === "team lipp"
-  ) {
-    return "Team 2";
-  }
-
-  return "Halved";
+  if (["team 1", "team1", "1"].includes(winner)) return "Team 1";
+  if (["team 2", "team2", "2"].includes(winner)) return "Team 2";
+  if (["halved", "half", "tie", "tied"].includes(winner)) return "Halved";
+  return "";
 }
 
-function buildTeamMatch(row, roundLabel) {
-  const matchNumber = clean(row[0]);
+function displayFormat(code) {
+  return ({ BB: "Best Ball", SC: "2-Man Scramble", SI: "Singles" })[clean(code).toUpperCase()] || clean(code);
+}
 
-  if (!matchNumber || matchNumber.toLowerCase() === "match") {
-    return null;
-  }
+function hcp(value) {
+  const parsed = number(value);
+  return parsed === null ? null : parsed;
+}
 
+function playerEntry(row, side, slot, playerMap) {
+  const id = clean(row[`Team ${side} Player ${slot}`]);
+  if (!id) return null;
   return {
-    match: matchNumber,
-    round: roundLabel,
-    teamOnePlayers: splitPlayers(row[1], row[2]),
-    teamTwoPlayers: splitPlayers(row[3], row[4]),
-    frontWinner: normalizeWinner(row[5]),
-    backWinner: normalizeWinner(row[6]),
-    overallWinner: normalizeWinner(row[7]),
-    teamOnePoints: toNumber(row[8]),
-    teamTwoPoints: toNumber(row[9]),
+    id,
+    name: playerMap[id]?.name || id,
+    slug: playerMap[id]?.slug || "",
+    playingHcp: hcp(row[`Team ${side} Player ${slot} Playing HCP`]),
+    stroke: number(row[`Team ${side} Player ${slot} Stroke`]),
   };
 }
 
-function buildSinglesMatch(row) {
-  const matchNumber = clean(row[0]);
-
-  if (!matchNumber || matchNumber.toLowerCase() === "match") {
-    return null;
-  }
-
-  return {
-    match: matchNumber,
-    round: "Round 3",
-    teamOnePlayers: splitPlayers(row[1]),
-    teamTwoPlayers: splitPlayers(row[2]),
-    overallWinner: normalizeWinner(row[3]),
-    teamOnePoints: toNumber(row[4]),
-    teamTwoPoints: toNumber(row[5]),
-  };
-}
-
-function collectMatches(rows, range, builder) {
-  const matches = [];
-
-  for (
-    let sheetRowNumber = range.start;
-    sheetRowNumber <= range.end;
-    sheetRowNumber += 1
-  ) {
-    const match = builder(rowAt(rows, sheetRowNumber));
-    if (match) matches.push(match);
-  }
-
-  return matches;
-}
-
-function collectLeaderboard(rows) {
-  const players = [];
-
-  for (
-    let sheetRowNumber = SHEET_ROWS.leaderboard.start;
-    sheetRowNumber <= SHEET_ROWS.leaderboard.end;
-    sheetRowNumber += 1
-  ) {
-    const row = rowAt(rows, sheetRowNumber);
-    const rank = clean(row[0]);
-    const player = clean(row[1]);
-
-    if (!rank || !player || rank.toLowerCase() === "rank") {
-      continue;
-    }
-
-    players.push({
-      rank,
-      player,
-      team: clean(row[2]),
-      total: toNumber(row[3]),
+function buildLeaderboard(matches, playerMap, teamNames) {
+  const stats = new Map();
+  const ensure = (id, side) => {
+    if (!stats.has(id)) stats.set(id, {
+      id, player: playerMap[id]?.name || id, slug: playerMap[id]?.slug || "",
+      team: teamNames[side] || `Team ${side}`, teamSide: side,
+      wins: 0, losses: 0, halves: 0, points: 0,
     });
+    return stats.get(id);
+  };
+
+  for (const match of matches) {
+    const winner = normalizeWinner(match.raw["Matchup Winner"] || match.raw["18-Hole Winner"]);
+    const teamOnePoints = number(match.raw["Team 1 Points"]);
+    const teamTwoPoints = number(match.raw["Team 2 Points"]);
+    const completed = winner || teamOnePoints !== null || teamTwoPoints !== null;
+    if (!completed) continue;
+
+    for (const side of [1, 2]) {
+      const players = match[`team${side}Players`];
+      const teamPoints = side === 1 ? teamOnePoints : teamTwoPoints;
+      const share = teamPoints === null ? 0 : teamPoints / Math.max(players.length, 1);
+      for (const player of players) {
+        const stat = ensure(player.id, side);
+        stat.points += share;
+        if (winner === "Halved") stat.halves += 1;
+        else if (winner === `Team ${side}`) stat.wins += 1;
+        else if (winner) stat.losses += 1;
+      }
+    }
   }
 
-  return players;
-}
-
-function validateCsv(csvText) {
-  const trimmed = csvText.trim();
-
-  if (!trimmed) {
-    throw new Error("Google returned an empty CSV response.");
-  }
-
-  if (
-    trimmed.startsWith("<!DOCTYPE html") ||
-    trimmed.startsWith("<html") ||
-    trimmed.includes("<script")
-  ) {
-    throw new Error("Google returned HTML instead of CSV.");
-  }
-
-  if (trimmed.includes("window.ppConfig") || trimmed.includes("disableAllReporting")) {
-    throw new Error("Google returned a security script instead of CSV.");
-  }
+  return [...stats.values()].sort((a, b) =>
+    b.points - a.points || b.wins - a.wins || a.losses - b.losses || b.halves - a.halves || a.player.localeCompare(b.player)
+  );
 }
 
 export async function getTournamentData() {
-  const response = await fetch(WEBSITE_FEED_CSV_URL, {
-    cache: "no-store",
-  });
+  const [liveMatches, liveTournaments, players, teamRows, tournaments, courses] = await Promise.all([
+    fetchSheet("Live Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
+    fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"),
+  ]);
 
-  if (!response.ok) {
-    throw new Error(`Google Sheet request failed with status ${response.status}.`);
+  const active = liveTournaments.find((row) => clean(row.Year)) || {};
+  const year = Number(active.Year) || new Date().getFullYear();
+  const tournamentRow = tournaments.find((row) => Number(row.Year) === year) || {};
+  const playerMap = Object.fromEntries(players.map((row) => [row["Player ID"], {
+    name: row["Display Name"] || `${row.First || ""} ${row.Last || ""}`.trim(),
+    slug: row.Slug || "",
+    active: truthy(row.Active),
+  }]));
+  const courseMap = Object.fromEntries(courses.map((row) => [row["Course ID"], row["Course Name"] || row.Course || row["Full Course Name"] || row["Course ID"]]));
+  const teamNames = { 1: "Team 1", 2: "Team 2" };
+  for (const row of teamRows.filter((item) => Number(item.Year) === year)) {
+    const side = clean(row["Team Side"]).match(/(1|2)/)?.[1];
+    if (side) teamNames[Number(side)] = row["Team Names"] || row["Team Name"] || teamNames[Number(side)];
   }
 
-  const csvText = await response.text();
-  validateCsv(csvText);
+  const matches = liveMatches
+    .filter((row) => Number(row.Year) === year || !row.Year)
+    .map((row) => {
+      const format = clean(row.Format).toUpperCase();
+      const team1Players = [playerEntry(row, 1, 1, playerMap), playerEntry(row, 1, 2, playerMap)].filter(Boolean);
+      const team2Players = [playerEntry(row, 2, 1, playerMap), playerEntry(row, 2, 2, playerMap)].filter(Boolean);
+      return {
+        id: row["Match ID"] || `${year}-${row.Round}-${row.Match}`,
+        raw: row,
+        round: Number(row.Round) || 1,
+        match: row.Match || "",
+        format,
+        formatName: displayFormat(format),
+        course: courseMap[row["Course ID"]] || row["Course ID"] || "",
+        teeTime: formatTime(row["Tee Time"]),
+        status: row["Match Status"] || "Scheduled",
+        notes: row.Notes || "",
+        team1Players,
+        team2Players,
+        team1PlayingHcp: hcp(row["Team 1 Playing HCP"]),
+        team2PlayingHcp: hcp(row["Team 2 Playing HCP"]),
+        team1Stroke: number(row["Team 1 Stroke"]),
+        team2Stroke: number(row["Team 2 Stroke"]),
+        matchupWinner: normalizeWinner(row["Matchup Winner"]),
+        frontWinner: normalizeWinner(row["Front 9 Winner"]),
+        backWinner: normalizeWinner(row["Back 9 Winner"]),
+        overallWinner: normalizeWinner(row["18-Hole Winner"] || row["Matchup Winner"]),
+        team1Points: number(row["Team 1 Points"]),
+        team2Points: number(row["Team 2 Points"]),
+      };
+    });
 
-  const rows = parseCsv(csvText);
-  const tournamentRows = SHEET_ROWS.tournament;
+  const rounds = {};
+  for (const match of matches) {
+    const key = `Round ${match.round}`;
+    if (!rounds[key]) rounds[key] = { label: key, format: match.formatName, matches: [] };
+    rounds[key].matches.push(match);
+  }
 
-  const tournament = {
-    status: clean(rowAt(rows, tournamentRows.status)[1]) || "Offseason",
-    year: clean(rowAt(rows, tournamentRows.year)[1]) || "2026",
-    location:
-      clean(rowAt(rows, tournamentRows.location)[1]) || "Kiawah Island, SC",
-    dates: clean(rowAt(rows, tournamentRows.dates)[1]),
-    currentRound:
-      clean(rowAt(rows, tournamentRows.currentRound)[1]) || "Round 1",
-    teamOne: {
-      name:
-        clean(rowAt(rows, tournamentRows.teamOneName)[1]) || "Team One",
-      score: toNumber(rowAt(rows, tournamentRows.teamOneScore)[1]),
-    },
-    teamTwo: {
-      name:
-        clean(rowAt(rows, tournamentRows.teamTwoName)[1]) || "Team Two",
-      score: toNumber(rowAt(rows, tournamentRows.teamTwoScore)[1]),
-    },
-  };
-
-  const roundOne = collectMatches(
-    rows,
-    SHEET_ROWS.roundOne,
-    (row) => buildTeamMatch(row, "Round 1")
-  );
-
-  const roundTwo = collectMatches(
-    rows,
-    SHEET_ROWS.roundTwo,
-    (row) => buildTeamMatch(row, "Round 2")
-  );
-
-  const roundThree = collectMatches(
-    rows,
-    SHEET_ROWS.roundThree,
-    buildSinglesMatch
-  );
-
+  const leaderboard = buildLeaderboard(matches, playerMap, teamNames);
   return {
-    tournament,
-    rounds: {
-      "Round 1": {
-        label: "Round 1",
-        format: "2 vs. 2",
-        subtitle: "Front 9, Back 9, and Overall",
-        matches: roundOne,
-      },
-      "Round 2": {
-        label: "Round 2",
-        format: "2-Man Scramble",
-        subtitle: "Front 9, Back 9, and Overall",
-        matches: roundTwo,
-      },
-      "Round 3": {
-        label: "Round 3",
-        format: "Singles",
-        subtitle: "One point for the overall match",
-        matches: roundThree,
-      },
+    tournament: {
+      year,
+      status: active["Tournament Status"] || "Upcoming",
+      currentRound: `Round ${Number(active["Current Round"]) || 1}`,
+      location: tournamentRow.Destination || "",
+      dates: tournamentRow.Dates || "",
+      liveMessage: active["Live Message"] || "",
+      lastUpdated: active["Last Updated"] || "",
+      teamOne: { name: teamNames[1], score: number(active["Team 1 Score"]) ?? 0 },
+      teamTwo: { name: teamNames[2], score: number(active["Team 2 Score"]) ?? 0 },
     },
-    leaderboard: collectLeaderboard(rows),
-    updatedAt: new Date().toISOString(),
+    rounds,
+    leaderboard,
   };
 }

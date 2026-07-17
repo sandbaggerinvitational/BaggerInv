@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import styles from "../historical.module.css";
+import { addTournamentRanks } from "../../lib/rankings";
 
 function displayedValue(row, key) {
   if (key === "percentage") return row.percentageDisplay;
@@ -21,7 +22,7 @@ export default function SortableLeaderboard({
   const [direction, setDirection] = useState(initialDirection);
 
   const sortedRows = useMemo(() => {
-    return [...rows].sort((a, b) => {
+    const sorted = [...rows].sort((a, b) => {
       const first = a[sortKey];
       const second = b[sortKey];
 
@@ -37,6 +38,7 @@ export default function SortableLeaderboard({
 
       return direction === "asc" ? comparison : -comparison;
     });
+    return addTournamentRanks(sorted, sortKey);
   }, [rows, sortKey, direction]);
 
   function selectSort(key) {
@@ -75,7 +77,7 @@ export default function SortableLeaderboard({
 
         {sortedRows.map((row, index) => (
           <div className={styles.fullLeaderboardRow} key={row.id}>
-            <strong>#{index + 1}</strong>
+            <strong>{row.tournamentRank}</strong>
             <Link href={`/players/${row.slug}`}>{row.name}</Link>
             {columns.map((column) => (
               <span key={column.key}>

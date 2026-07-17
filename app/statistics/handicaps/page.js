@@ -6,12 +6,14 @@ import {
   AdvancedTable,
 } from "../AdvancedTable";
 import styles from "../../historical.module.css";
+import { addTournamentRanks } from "../../../lib/rankings";
 
 export const metadata = {
   title: "Handicap Analytics | The Sandbagger Invitational",
 };
 
 function HandicapTable({ title, description, rows, high = false }) {
+  const rankedRows = addTournamentRanks(rows, "handicap");
   return (
     <section className={styles.advancedStatSection}>
       <span className={styles.sectionLabel}>Tournament Indexes</span>
@@ -21,11 +23,11 @@ function HandicapTable({ title, description, rows, high = false }) {
       <AdvancedTable
         headers={["Rank", "Player", "Handicap", "Year", "Team"]}
       >
-        {rows.map((row, index) => (
+        {rankedRows.map((row) => (
           <AdvancedRow
             key={`${row.player["Player ID"]}-${row.year}-${row.handicap}`}
           >
-            <strong>#{index + 1}</strong>
+            <strong>{row.tournamentRank}</strong>
             <Link href={`/players/${row.player.slug}`}>
               {row.player["Display Name"]}
             </Link>
@@ -41,6 +43,7 @@ function HandicapTable({ title, description, rows, high = false }) {
 
 export default function HandicapsPage() {
   const handicaps = getHandicapStats();
+  const improvedRanks = addTournamentRanks(handicaps.mostImproved, "improvement");
 
   return (
     <main>
@@ -92,9 +95,9 @@ export default function HandicapsPage() {
                 "Latest",
               ]}
             >
-              {handicaps.mostImproved.map((row, index) => (
+              {improvedRanks.map((row) => (
                 <AdvancedRow key={row.player["Player ID"]}>
-                  <strong>#{index + 1}</strong>
+                  <strong>{row.tournamentRank}</strong>
                   <Link href={`/players/${row.player.slug}`}>
                     {row.player["Display Name"]}
                   </Link>

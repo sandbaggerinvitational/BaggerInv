@@ -13,6 +13,7 @@ import {
   getPlayerBySlug,
   getPlayerStats,
 } from "../../../lib/stats";
+import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 
 export async function generateMetadata({ params }) {
@@ -376,9 +377,9 @@ export default async function PlayerPage({ params }) {
               <span>Points Won</span>
             </div>
 
-            {stats.partners.slice(0, 8).map((row, index) => (
+            {addTournamentRanks(stats.partners.slice(0, 8), (row) => row.record.points).map((row) => (
               <div className={styles.tableRow} key={row.player["Player ID"]}>
-                <strong>{index + 1}</strong>
+                <strong>{row.tournamentRank}</strong>
                 <Link href={`/players/${row.player.slug}`}>
                   {row.player["Display Name"]}
                 </Link>

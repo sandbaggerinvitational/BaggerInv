@@ -7,8 +7,10 @@ import {
   getRecords,
 } from "../../lib/stats";
 import styles from "../historical.module.css";
+import { addTournamentRanks } from "../../lib/rankings";
 
 function LeaderSection({ title, slug, rows, value }) {
+  const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
   return (
     <section>
       <div className={styles.recordSectionHeading}>
@@ -26,13 +28,13 @@ function LeaderSection({ title, slug, rows, value }) {
       </div>
 
       <div className={styles.podium}>
-        {rows.slice(0, 5).map(({ player, stats }, index) => (
+        {rankedRows.slice(0, 5).map(({ player, stats, tournamentRank }) => (
           <Link
             className={styles.podiumCard}
             href={`/players/${player.slug}`}
             key={player["Player ID"]}
           >
-            <b>#{index + 1}</b>
+            <b>{tournamentRank}</b>
             <h3>{player["Display Name"]}</h3>
             <strong>{value(stats)}</strong>
           </Link>

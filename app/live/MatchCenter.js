@@ -1,126 +1,28 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
+import { addTournamentRanks } from "../../lib/rankings";
 import styles from "./live.module.css";
 
-const tournament = {
-  year: 2026,
-  location: "Kiawah Island",
-  status: "Test Mode",
-  currentRound: "Round 1",
-  teamOne: { name: "The Pickles", score: 4.5 },
-  teamTwo: { name: "Team Lipp", score: 3.5 },
-};
+function displayNumber(value) {
+  return value === null || value === undefined || value === "" ? "—" : Number(value).toFixed(Number(value) % 1 ? 1 : 0);
+}
 
-const rounds = {
-  "Round 1": {
-    label: "Round 1",
-    format: "2 vs. 2",
-    subtitle: "Front 9, Back 9, and Overall",
-    matches: [
-      {
-        match: 1,
-        teamOnePlayers: ["Clay", "Miles"],
-        teamTwoPlayers: ["Taylor", "Jack"],
-        frontWinner: "Team 1",
-        backWinner: "Halved",
-        overallWinner: "Team 1",
-        teamOnePoints: 2.5,
-        teamTwoPoints: 0.5,
-      },
-      {
-        match: 2,
-        teamOnePlayers: ["David", "Holman"],
-        teamTwoPlayers: ["Tyler", "Matt"],
-        frontWinner: "Team 2",
-        backWinner: "Team 1",
-        overallWinner: "Halved",
-        teamOnePoints: 1.5,
-        teamTwoPoints: 1.5,
-      },
-      {
-        match: 3,
-        teamOnePlayers: ["Klay", "Drew"],
-        teamTwoPlayers: ["Chris", "Ryan"],
-        frontWinner: "Halved",
-        backWinner: "Team 2",
-        overallWinner: "Team 2",
-        teamOnePoints: 0.5,
-        teamTwoPoints: 2.5,
-      },
-    ],
-  },
-  "Round 2": {
-    label: "Round 2",
-    format: "2-Man Scramble",
-    subtitle: "Front 9, Back 9, and Overall",
-    matches: [
-      {
-        match: 1,
-        teamOnePlayers: ["Clay", "David"],
-        teamTwoPlayers: ["Taylor", "Jack"],
-        frontWinner: "Team 1",
-        backWinner: "Team 2",
-        overallWinner: "Team 2",
-        teamOnePoints: 1,
-        teamTwoPoints: 2,
-      },
-      {
-        match: 2,
-        teamOnePlayers: ["Miles", "Holman"],
-        teamTwoPlayers: ["Tyler", "Matt"],
-        frontWinner: "Halved",
-        backWinner: "Team 1",
-        overallWinner: "Team 1",
-        teamOnePoints: 2.5,
-        teamTwoPoints: 0.5,
-      },
-    ],
-  },
-  "Round 3": {
-    label: "Round 3",
-    format: "Singles",
-    subtitle: "One point for the overall match",
-    matches: [
-      {
-        match: 1,
-        teamOnePlayers: ["Clay"],
-        teamTwoPlayers: ["Taylor"],
-        overallWinner: "Team 1",
-        teamOnePoints: 1,
-        teamTwoPoints: 0,
-      },
-      {
-        match: 2,
-        teamOnePlayers: ["Miles"],
-        teamTwoPlayers: ["Jack"],
-        overallWinner: "Halved",
-        teamOnePoints: 0.5,
-        teamTwoPoints: 0.5,
-      },
-      {
-        match: 3,
-        teamOnePlayers: ["David"],
-        teamTwoPlayers: ["Tyler"],
-        overallWinner: "Team 2",
-        teamOnePoints: 0,
-        teamTwoPoints: 1,
-      },
-    ],
-  },
-};
+function handicap(value) {
+  return value === null || value === undefined ? "" : ` (${value})`;
+}
 
-const leaderboard = [
-  { rank: 1, player: "Clay", team: "The Pickles", r1: 2.5, r2: 2, r3: 1, total: 5.5 },
-  { rank: 2, player: "Miles", team: "The Pickles", r1: 2.5, r2: 1.5, r3: 0.5, total: 4.5 },
-  { rank: 3, player: "Taylor", team: "Team Lipp", r1: 0.5, r2: 2, r3: 0, total: 2.5 },
-  { rank: 4, player: "Jack", team: "Team Lipp", r1: 0.5, r2: 1.5, r3: 0.5, total: 2.5 },
-];
+function strokeText(value) {
+  if (value === null || value === undefined || Number(value) === 0) return "";
+  return `${value} stroke${Number(value) === 1 ? "" : "s"}`;
+}
 
-function winnerLabel(value) {
+function winnerLabel(value, tournament) {
   if (value === "Team 1") return tournament.teamOne.name;
   if (value === "Team 2") return tournament.teamTwo.name;
-  return "Halved";
+  if (value === "Halved") return "Halved";
+  return "Pending";
 }
 
 function winnerClass(value) {
@@ -129,78 +31,56 @@ function winnerClass(value) {
   return styles.halvedBadge;
 }
 
-function MatchTrophy() {
-  return (
-    <svg viewBox="0 0 64 64" aria-hidden="true">
-      <path
-        d="M20 8h24v8c0 10-4.8 18.2-12 21.2C24.8 34.2 20 26 20 16V8Z"
-        fill="currentColor"
-      />
-      <path
-        d="M20 14H10v5c0 9 5.2 15 14 16M44 14h10v5c0 9-5.2 15-14 16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M32 37v10M22 55h20M26 47h12v8H26z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function matchWinner(match) {
-  if (match.teamOnePoints > match.teamTwoPoints) {
-    return tournament.teamOne.name;
+function PlayerList({ players, format, teamHcp, teamStroke }) {
+  if (format === "SC") {
+    return (
+      <div className={styles.playerList}>
+        {players.map((player) => <strong key={player.id}>{player.name}</strong>)}
+        {teamHcp !== null && teamHcp !== undefined ? <small>Team Handicap ({teamHcp})</small> : null}
+        {strokeText(teamStroke) ? <em>{strokeText(teamStroke)}</em> : null}
+      </div>
+    );
   }
 
-  if (match.teamTwoPoints > match.teamOnePoints) {
-    return tournament.teamTwo.name;
-  }
-
-  return "Halved";
-}
-
-function PlayerList({ players }) {
   return (
     <div className={styles.playerList}>
       {players.map((player) => (
-        <strong key={player}>{player}</strong>
+        <div className={styles.playerLine} key={player.id}>
+          <strong>{player.name}{handicap(player.playingHcp)}</strong>
+          {strokeText(player.stroke) ? <em>{strokeText(player.stroke)}</em> : null}
+        </div>
       ))}
     </div>
   );
 }
 
-function Segment({ label, winner }) {
+function Segment({ label, winner, tournament }) {
   return (
     <div className={styles.segment}>
       <span>{label}</span>
       <strong className={`${styles.winnerBadge} ${winnerClass(winner)}`}>
-        {winnerLabel(winner)}
+        {winnerLabel(winner, tournament)}
       </strong>
     </div>
   );
 }
 
-export default function MatchCenter() {
-  const [activeRound, setActiveRound] = useState("Round 1");
+export default function MatchCenter({ initialData, loadError }) {
+  const tournament = initialData?.tournament;
+  const rounds = initialData?.rounds || {};
+  const roundKeys = Object.keys(rounds).sort((a, b) => Number(a.replace(/\D/g, "")) - Number(b.replace(/\D/g, "")));
+  const [activeRound, setActiveRound] = useState(tournament?.currentRound && rounds[tournament.currentRound] ? tournament.currentRound : roundKeys[0]);
   const active = rounds[activeRound];
 
-  const roundTotals = useMemo(() => {
-    return active.matches.reduce(
-      (totals, match) => ({
-        teamOne: totals.teamOne + match.teamOnePoints,
-        teamTwo: totals.teamTwo + match.teamTwoPoints,
-      }),
-      { teamOne: 0, teamTwo: 0 }
-    );
-  }, [active]);
+  const rankedLeaderboard = useMemo(() => addTournamentRanks(initialData?.leaderboard || [], "points"), [initialData]);
+  const roundTotals = useMemo(() => (active?.matches || []).reduce((totals, match) => ({
+    teamOne: totals.teamOne + (match.team1Points || 0),
+    teamTwo: totals.teamTwo + (match.team2Points || 0),
+  }), { teamOne: 0, teamTwo: 0 }), [active]);
+
+  if (!tournament) {
+    return <section className={styles.content}><div className={styles.errorBox}><h1>Live Match Center</h1><p>{loadError || "Live data is not available yet."}</p></div></section>;
+  }
 
   return (
     <>
@@ -208,181 +88,71 @@ export default function MatchCenter() {
         <div>
           <p className={styles.eyebrow}>{tournament.status}</p>
           <h1>Match Center</h1>
-          <p>
-            {tournament.year} Sandbagger Invitational · {tournament.location}
-          </p>
+          <p>{tournament.year} Sandbagger Invitational{tournament.location ? ` · ${tournament.location}` : ""}</p>
+          {tournament.liveMessage ? <div className={styles.liveMessage}>{tournament.liveMessage}</div> : null}
         </div>
       </section>
 
       <section className={styles.scoreboard}>
-        <div className={styles.teamBlock}>
-          <strong>{tournament.teamOne.name}</strong>
-          <b>{tournament.teamOne.score}</b>
-        </div>
-
-        <div className={styles.scoreCenter}>
-          <span>Current Round</span>
-          <strong>{tournament.currentRound}</strong>
-        </div>
-
-        <div className={styles.teamBlock}>
-          <strong>{tournament.teamTwo.name}</strong>
-          <b>{tournament.teamTwo.score}</b>
-        </div>
+        <div className={styles.teamBlock}><strong>{tournament.teamOne.name}</strong><b>{displayNumber(tournament.teamOne.score)}</b></div>
+        <div className={styles.scoreCenter}><span>Current Round</span><strong>{tournament.currentRound}</strong></div>
+        <div className={styles.teamBlock}><strong>{tournament.teamTwo.name}</strong><b>{displayNumber(tournament.teamTwo.score)}</b></div>
       </section>
 
       <section className={styles.content}>
-        <div className={styles.tabs} role="tablist" aria-label="Tournament rounds">
-          {Object.keys(rounds).map((round) => (
-            <button
-              key={round}
-              type="button"
-              className={activeRound === round ? styles.activeTab : ""}
-              onClick={() => setActiveRound(round)}
-            >
-              <span>{rounds[round].format}</span>
-              <strong>{round}</strong>
-            </button>
-          ))}
-        </div>
+        {roundKeys.length ? (
+          <div className={styles.tabs} role="tablist" aria-label="Tournament rounds">
+            {roundKeys.map((round) => (
+              <button key={round} type="button" className={activeRound === round ? styles.activeTab : ""} onClick={() => setActiveRound(round)}>
+                <span>{rounds[round].format}</span><strong>{round}</strong>
+              </button>
+            ))}
+          </div>
+        ) : null}
 
-        <div className={styles.roundHeader}>
-          <div>
-            <span>{active.format}</span>
-            <h2>{active.label} Results</h2>
-            <p>{active.subtitle}</p>
+        {active ? <>
+          <div className={styles.roundHeader}>
+            <div><span>{active.format}</span><h2>{active.label}</h2><p>Live pairings and results</p></div>
+            <div className={styles.roundTotals}><span>Round Points</span><strong>{displayNumber(roundTotals.teamOne)} – {displayNumber(roundTotals.teamTwo)}</strong></div>
           </div>
 
-          <div className={styles.roundTotals}>
-            <span>Round Points</span>
-            <strong>
-              {roundTotals.teamOne} – {roundTotals.teamTwo}
-            </strong>
+          <div className={styles.matchGrid}>
+            {active.matches.map((match) => (
+              <article className={styles.matchCard} key={match.id}>
+                <div className={styles.matchTop}><span>{match.course || `${active.label} · Match ${match.match}`}</span><span>{match.teeTime || match.status}</span></div>
+                <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
+                <div className={styles.players}>
+                  <div><span>{tournament.teamOne.name}</span><PlayerList players={match.team1Players} format={match.format} teamHcp={match.team1PlayingHcp} teamStroke={match.team1Stroke} /></div>
+                  <b>VS</b>
+                  <div><span>{tournament.teamTwo.name}</span><PlayerList players={match.team2Players} format={match.format} teamHcp={match.team2PlayingHcp} teamStroke={match.team2Stroke} /></div>
+                </div>
+                <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
+                  {match.format !== "SI" ? <><Segment label="Front 9" winner={match.frontWinner} tournament={tournament}/><Segment label="Back 9" winner={match.backWinner} tournament={tournament}/></> : null}
+                  <Segment label="Overall" winner={match.overallWinner || match.matchupWinner} tournament={tournament}/>
+                </div>
+                {match.notes ? <p className={styles.matchNotes}>{match.notes}</p> : null}
+                {(match.team1Points !== null || match.team2Points !== null) ? <div className={styles.matchScoreTable}>
+                  <div className={styles.matchScoreRow}><span>{tournament.teamOne.name}</span><strong>{displayNumber(match.team1Points)}</strong></div>
+                  <div className={styles.matchScoreRow}><span>{tournament.teamTwo.name}</span><strong>{displayNumber(match.team2Points)}</strong></div>
+                </div> : null}
+              </article>
+            ))}
           </div>
-        </div>
+        </> : null}
 
-        <div className={styles.matchGrid}>
-          {active.matches.map((match) => (
-            <article className={styles.matchCard} key={`${activeRound}-${match.match}`}>
-              <div className={styles.matchTop}>
-                <span>{active.label} · Match {match.match}</span>
-                <span>Complete</span>
-              </div>
-
-              <div className={styles.players}>
-                <div>
-                  <span>{tournament.teamOne.name}</span>
-                  <PlayerList players={match.teamOnePlayers} />
-                </div>
-
-                <b>VS</b>
-
-                <div>
-                  <span>{tournament.teamTwo.name}</span>
-                  <PlayerList players={match.teamTwoPlayers} />
-                </div>
-              </div>
-
-              <div
-                className={`${styles.segmentGrid} ${
-                  activeRound === "Round 3" ? styles.singleSegmentGrid : ""
-                }`}
-              >
-                {activeRound !== "Round 3" && (
-                  <>
-                    <Segment label="Front 9" winner={match.frontWinner} />
-                    <Segment label="Back 9" winner={match.backWinner} />
-                  </>
-                )}
-
-                <Segment label="Overall" winner={match.overallWinner} />
-              </div>
-
-              <div className={styles.matchResult}>
-                <span className={styles.matchResultLabel}>Match Result</span>
-
-                <div
-                  className={`${styles.matchWinnerBanner} ${
-                    matchWinner(match) === tournament.teamOne.name
-                      ? styles.teamOneBadge
-                      : matchWinner(match) === tournament.teamTwo.name
-                        ? styles.teamTwoBadge
-                        : styles.halvedBadge
-                  }`}
-                >
-                  {matchWinner(match) !== "Halved" ? (
-                    <MatchTrophy />
-                  ) : null}
-                  <strong>
-                    {matchWinner(match) === "Halved"
-                      ? "Match Halved"
-                      : matchWinner(match)}
-                  </strong>
-                </div>
-
-                <div className={styles.matchScoreTable}>
-                  <div
-                    className={`${styles.matchScoreRow} ${
-                      matchWinner(match) === tournament.teamOne.name
-                        ? styles.matchScoreWinner
-                        : ""
-                    }`}
-                  >
-                    <span>{tournament.teamOne.name}</span>
-                    <strong>{match.teamOnePoints}</strong>
-                  </div>
-
-                  <div
-                    className={`${styles.matchScoreRow} ${
-                      matchWinner(match) === tournament.teamTwo.name
-                        ? styles.matchScoreWinner
-                        : ""
-                    }`}
-                  >
-                    <span>{tournament.teamTwo.name}</span>
-                    <strong>{match.teamTwoPoints}</strong>
-                  </div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className={styles.leaderboardHeader}>
-          <div>
-            <span>Player Standings</span>
-            <h2>Leaderboard</h2>
-          </div>
-        </div>
-
+        <div className={styles.leaderboardHeader}><div><span>Player Standings</span><h2>Leaderboard</h2></div></div>
         <div className={styles.leaderboard}>
-          <div className={`${styles.leaderboardRow} ${styles.leaderboardHead}`}>
-            <span>Rank</span>
-            <span>Player</span>
-            <span>Team</span>
-            <span>R1</span>
-            <span>R2</span>
-            <span>R3</span>
-            <span>Total</span>
-          </div>
-
-          {leaderboard.map((player) => (
-            <div className={styles.leaderboardRow} key={player.player}>
-              <strong>{player.rank}</strong>
-              <strong>{player.player}</strong>
-              <span>{player.team}</span>
-              <span>{player.r1}</span>
-              <span>{player.r2}</span>
-              <span>{player.r3}</span>
-              <strong>{player.total}</strong>
+          <div className={`${styles.leaderboardRow} ${styles.leaderboardHead}`}><span>Rank</span><span>Player</span><span>Record</span><span>Points</span></div>
+          {rankedLeaderboard.map((player) => (
+            <div className={`${styles.leaderboardRow} ${player.tournamentRank === "1" ? styles.firstPlace : ""}`} key={player.id}>
+              <strong>{player.tournamentRank}</strong>
+              <span className={styles.playerCell}><i className={player.teamSide === 1 ? styles.teamOneDot : styles.teamTwoDot}/>{player.slug ? <Link href={`/players/${player.slug}`}>{player.player}</Link> : <strong>{player.player}</strong>}</span>
+              <span>{player.wins}-{player.losses}-{player.halves}</span>
+              <strong>{displayNumber(player.points)}</strong>
             </div>
           ))}
         </div>
-
-        <p className={styles.testNote}>
-          This design still uses test data. The next update will connect it to the
-          Google Sheet Website Feed.
-        </p>
+        {loadError ? <p className={styles.testNote}>{loadError}</p> : null}
       </section>
     </>
   );

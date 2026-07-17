@@ -656,3 +656,23 @@
     display: none;
   }
 }
+
+.liveMessage { margin-top: 24px; padding: 13px 16px; border: 1px solid rgba(255,255,255,.18); border-radius: 12px; background: rgba(255,255,255,.08); max-width: 700px; }
+.errorBox { max-width: 760px; margin: 40px auto; padding: 32px; border: 1px solid #ddd6c8; border-radius: 18px; background: white; }
+.matchMeta { padding: 12px 18px 0; display:flex; justify-content:space-between; color:#6d746f; font-size:.76rem; }
+.matchMeta strong { color:#0b3529; }
+.playerLine { display:flex; flex-direction:column; gap:2px; }
+.playerList small { margin-top:8px; font-weight:800; color:#0b3529; }
+.playerList em { color:#c9232d; font-size:.76rem; font-style:normal; font-weight:800; }
+.matchNotes { margin:0; padding:14px 20px; border-top:1px solid #eee7dc; color:#6d746f; font-size:.86rem; }
+.leaderboardRow { grid-template-columns: .55fr 2fr 1fr .8fr !important; }
+.playerCell { display:flex; align-items:center; gap:10px; min-width:0; }
+.playerCell a { color:inherit; text-decoration:none; font-weight:800; }
+.playerCell i { width:8px; height:28px; border-radius:6px; flex:0 0 auto; }
+.teamOneDot { background:#24386f; }
+.teamTwoDot { background:#c9232d; }
+.firstPlace { background:#fff8df; }
+@media (max-width: 700px) {
+  .leaderboardRow { grid-template-columns: .55fr 1.6fr 1fr .7fr !important; }
+  .leaderboardRow > * { font-size:.82rem; }
+}
