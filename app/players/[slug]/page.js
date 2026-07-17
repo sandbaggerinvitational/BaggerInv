@@ -61,6 +61,55 @@ function ChampionshipTimeline({ years, styles }) {
   );
 }
 
+
+function CareerTimelineItem({ season, styles }) {
+  const content = (
+    <>
+      <strong>{season.year}</strong>
+      <span
+        className={styles.careerTimelineMarker}
+        aria-hidden="true"
+      />
+      <div>
+        <h3>
+          {season.result === "Champion"
+            ? "🏆 Champion"
+            : season.result}
+        </h3>
+        <p>
+          {season.attended
+            ? season.teamName
+            : "Did not participate"}
+        </p>
+      </div>
+      {season.attended ? <b>View Year →</b> : null}
+    </>
+  );
+
+  const className = `${styles.careerTimelineItem} ${
+    season.result === "Champion"
+      ? styles.careerTimelineChampion
+      : season.result === "Runner-Up"
+        ? styles.careerTimelineRunnerUp
+        : season.result === "Upcoming"
+          ? styles.careerTimelineUpcoming
+          : !season.attended
+            ? styles.careerTimelineAbsent
+            : ""
+  }`;
+
+  return season.attended ? (
+    <Link
+      className={className}
+      href={`/history/${season.year}`}
+    >
+      {content}
+    </Link>
+  ) : (
+    <div className={className}>{content}</div>
+  );
+}
+
 export default async function PlayerPage({ params }) {
   const { slug } = await params;
   const player = getPlayerBySlug(slug);
@@ -69,6 +118,14 @@ export default async function PlayerPage({ params }) {
   const stats = getPlayerStats(player["Player ID"]);
   const captainLegacy = getCaptainLegacy(player["Player ID"]);
   const rival = stats.biggestRival;
+  const recentCareerSeasons = stats.careerTimeline.slice(-5);
+  const earlierCareerSeasons = stats.careerTimeline.slice(0, -5);
+  const timelineChampionships = stats.careerTimeline.filter(
+    (season) => season.result === "Champion"
+  ).length;
+  const timelineRunnerUps = stats.careerTimeline.filter(
+    (season) => season.result === "Runner-Up"
+  ).length;
 
   const compareHref = rival
     ? `/compare?player1=${encodeURIComponent(
@@ -160,58 +217,50 @@ export default async function PlayerPage({ params }) {
 
 
 
+
         <section className={styles.careerTimelineSection}>
           <span className={styles.sectionLabel}>Career Journey</span>
           <h2>Career Timeline</h2>
 
-          <div className={styles.careerTimeline}>
-            {stats.careerTimeline.map((season) => {
-              const content = (
-                <>
-                  <strong>{season.year}</strong>
-                  <span className={styles.careerTimelineMarker} aria-hidden="true" />
-                  <div>
-                    <h3>
-                      {season.result === "Champion"
-                        ? "🏆 Champion"
-                        : season.result}
-                    </h3>
-                    <p>
-                      {season.attended
-                        ? season.teamName
-                        : "Did not participate"}
-                    </p>
-                  </div>
-                  {season.attended ? <b>View Year →</b> : null}
-                </>
-              );
-
-              return season.attended ? (
-                <Link
-                  className={`${styles.careerTimelineItem} ${
-                    season.result === "Champion"
-                      ? styles.careerTimelineChampion
-                      : season.result === "Runner-Up"
-                        ? styles.careerTimelineRunnerUp
-                        : season.result === "Upcoming"
-                          ? styles.careerTimelineUpcoming
-                          : ""
-                  }`}
-                  href={`/history/${season.year}`}
-                  key={season.year}
-                >
-                  {content}
-                </Link>
-              ) : (
-                <div
-                  className={`${styles.careerTimelineItem} ${styles.careerTimelineAbsent}`}
-                  key={season.year}
-                >
-                  {content}
-                </div>
-              );
-            })}
+          <div className={styles.careerTimelineSummary}>
+            <div>
+              <span>Appearances</span>
+              <strong>{stats.appearances}</strong>
+            </div>
+            <div>
+              <span>Championships</span>
+              <strong>{timelineChampionships}</strong>
+            </div>
+            <div>
+              <span>Runner-Ups</span>
+              <strong>{timelineRunnerUps}</strong>
+            </div>
           </div>
+
+          <div className={styles.careerTimeline}>
+            {recentCareerSeasons.map((season) => (
+              <CareerTimelineItem
+                season={season}
+                styles={styles}
+                key={season.year}
+              />
+            ))}
+          </div>
+
+          {earlierCareerSeasons.length ? (
+            <details className={styles.careerTimelineDetails}>
+              <summary>View Full Career ↓</summary>
+              <div className={styles.careerTimelineEarlier}>
+                {earlierCareerSeasons.map((season) => (
+                  <CareerTimelineItem
+                    season={season}
+                    styles={styles}
+                    key={season.year}
+                  />
+                ))}
+              </div>
+            </details>
+          ) : null}
         </section>
 
         <section className={styles.captainLegacySection}>
