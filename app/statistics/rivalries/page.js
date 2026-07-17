@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header, Footer } from "../../components";
 import { getRivalryStats } from "../../../lib/stats";
 import {
@@ -59,6 +60,11 @@ export default function RivalriesPage() {
       </section>
 
       <section className={styles.content}>
+        <div className={styles.leaderboardTopLinks}>
+          <Link href="/records">← Records</Link>
+          <Link href="/statistics">Statistics Center →</Link>
+        </div>
+
         <div className={styles.advancedStatsStack}>
           <RivalryTable
             title="Most-Played Rivalries"
