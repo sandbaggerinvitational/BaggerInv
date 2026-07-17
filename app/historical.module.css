@@ -3548,7 +3548,7 @@
 }
 
 .careerTimelineDetails[open] summary::after {
-  content: "Hide Earlier Seasons";
+  content: "Hide Earlier Tournaments";
   font-size: .72rem;
 }
 
