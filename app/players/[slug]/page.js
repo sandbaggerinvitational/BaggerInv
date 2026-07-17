@@ -225,7 +225,7 @@ export default async function PlayerPage({ params }) {
           <div className={styles.careerTimelineSummary}>
             <div>
               <span>Appearances</span>
-              <strong>{stats.appearances}</strong>
+              <strong>{stats.careerTimeline.filter((season) => season.attended).length}</strong>
             </div>
             <div>
               <span>Championships</span>
@@ -249,7 +249,7 @@ export default async function PlayerPage({ params }) {
 
           {earlierCareerSeasons.length ? (
             <details className={styles.careerTimelineDetails}>
-              <summary>View Full Career ↓</summary>
+              <summary>View Earlier Seasons</summary>
               <div className={styles.careerTimelineEarlier}>
                 {earlierCareerSeasons.map((season) => (
                   <CareerTimelineItem
