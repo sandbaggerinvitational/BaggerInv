@@ -314,41 +314,6 @@ export default async function PlayerPage({ params }) {
           </div>
         </section>
 
-        <section className={styles.section}>
-          <span className={styles.sectionLabel}>Season by Season</span>
-          <h2>Performance Timeline</h2>
-
-          <div className={`${styles.dataTable} ${styles.seasonTable}`}>
-            <div className={`${styles.tableRow} ${styles.tableHead}`}>
-              <span>Year</span>
-              <span>Team</span>
-              <span>Handicap</span>
-              <span>Record</span>
-              <span>Points</span>
-              <span>Title</span>
-            </div>
-
-            {stats.seasons.map((season) => (
-              <div className={styles.tableRow} key={season.year}>
-                <strong>{season.year}</strong>
-                <Link
-                  className={styles.teamBadge}
-                  href={`/history/${season.year}/team/${encodeURIComponent(
-                    season.teamSide
-                  )}`}
-                >
-                  {season.teamName}
-                </Link>
-                <span>{formatHandicap(season.handicap)}</span>
-                <span>{formatRecord(season.overall)}</span>
-                <span>{season.overall.points}</span>
-                <strong>
-                  {stats.championships.includes(season.year) ? "🏆" : "—"}
-                </strong>
-              </div>
-            ))}
-          </div>
-        </section>
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Team Golf</span>
