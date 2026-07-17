@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header, Footer } from "../../components";
 import {
   formatPercentage,
@@ -65,6 +66,11 @@ export default function PartnershipsPage() {
       </section>
 
       <section className={styles.content}>
+        <div className={styles.leaderboardTopLinks}>
+          <Link href="/records">← Records</Link>
+          <Link href="/statistics">Statistics Center →</Link>
+        </div>
+
         <div className={styles.advancedStatsStack}>
           <PartnershipTable
             title="Most Partnership Points"
