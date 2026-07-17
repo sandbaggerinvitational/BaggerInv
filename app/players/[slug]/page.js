@@ -279,7 +279,7 @@ export default async function PlayerPage({ params }) {
                   <strong>{captainLegacy.championships}</strong>
                 </div>
                 <div>
-                  <span>Tournament as Captain</span>
+                  <span>Tournaments as Captain</span>
                   <strong>{captainLegacy.seasons.length}</strong>
                 </div>
               </div>
