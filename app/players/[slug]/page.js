@@ -249,7 +249,7 @@ export default async function PlayerPage({ params }) {
 
           {earlierCareerSeasons.length ? (
             <details className={styles.careerTimelineDetails}>
-              <summary>View Earlier Seasons</summary>
+              <summary>View Earlier Tournaments</summary>
               <div className={styles.careerTimelineEarlier}>
                 {earlierCareerSeasons.map((season) => (
                   <CareerTimelineItem
@@ -279,7 +279,7 @@ export default async function PlayerPage({ params }) {
                   <strong>{captainLegacy.championships}</strong>
                 </div>
                 <div>
-                  <span>Seasons as Captain</span>
+                  <span>Tournament as Captain</span>
                   <strong>{captainLegacy.seasons.length}</strong>
                 </div>
               </div>
