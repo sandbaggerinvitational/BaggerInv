@@ -56,6 +56,11 @@ export default function HandicapsPage() {
       </section>
 
       <section className={styles.content}>
+        <div className={styles.leaderboardTopLinks}>
+          <Link href="/records">← Records</Link>
+          <Link href="/statistics">Statistics Center →</Link>
+        </div>
+
         <div className={styles.advancedStatsStack}>
           <HandicapTable
             title="Lowest Tournament Handicaps"
