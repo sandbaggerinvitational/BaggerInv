@@ -3548,7 +3548,7 @@
 }
 
 .careerTimelineDetails[open] summary::after {
-  content: "Show Recent Seasons â†‘";
+  content: "Hide Earlier Seasons";
   font-size: .72rem;
 }
 
