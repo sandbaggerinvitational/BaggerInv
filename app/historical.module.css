@@ -3439,3 +3439,144 @@
     grid-column: 3;
   }
 }
+
+
+/* =========================================================
+   V8.1.3 â€” STROKE BADGES & COMPACT CAREER TIMELINE
+   ========================================================= */
+
+.roundMatchPlayerEntry {
+  display: block;
+}
+
+.roundMatchPlayerEntry + .roundMatchPlayerEntry {
+  margin-top: 8px;
+}
+
+.roundMatchStroke,
+.roundMatchTeamStroke {
+  width: fit-content;
+  margin-top: 5px;
+  padding: 4px 8px;
+  display: block;
+  border: 1px solid #ddc987;
+  border-radius: 999px;
+  background: #fbf5e5;
+  color: #765817;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .55rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.roundMatchPlayers > div:last-child .roundMatchStroke,
+.roundMatchPlayers > div:last-child .roundMatchTeamStroke {
+  margin-left: auto;
+}
+
+.roundMatchTeamStroke {
+  margin-top: 10px;
+}
+
+.careerTimelineSummary {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-md);
+  background: var(--tsi-white);
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.careerTimelineSummary > div {
+  padding: 18px 20px;
+  border-right: 1px solid #eee8dc;
+}
+
+.careerTimelineSummary > div:last-child {
+  border-right: 0;
+}
+
+.careerTimelineSummary span {
+  display: block;
+  color: var(--tsi-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .58rem;
+  font-weight: 800;
+}
+
+.careerTimelineSummary strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+}
+
+.careerTimelineDetails {
+  margin-top: 16px;
+}
+
+.careerTimelineDetails summary {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 12px 18px;
+  cursor: pointer;
+  list-style: none;
+  border: 1px solid var(--tsi-green-900);
+  border-radius: 999px;
+  color: var(--tsi-green-900);
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.careerTimelineDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.careerTimelineDetails[open] summary {
+  margin-bottom: 16px;
+}
+
+.careerTimelineDetails[open] summary {
+  font-size: 0;
+}
+
+.careerTimelineDetails[open] summary::after {
+  content: "Show Recent Seasons â†‘";
+  font-size: .72rem;
+}
+
+.careerTimelineEarlier {
+  display: grid;
+  gap: 11px;
+}
+
+.careerTimelineEarlier .careerTimelineItem {
+  opacity: .92;
+}
+
+@media (max-width: 720px) {
+  .careerTimelineSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .careerTimelineSummary > div {
+    border-right: 0;
+    border-bottom: 1px solid #eee8dc;
+  }
+
+  .careerTimelineSummary > div:last-child {
+    border-bottom: 0;
+  }
+
+  .roundMatchPlayers > div:last-child .roundMatchStroke,
+  .roundMatchPlayers > div:last-child .roundMatchTeamStroke {
+    margin-left: 0;
+  }
+}
