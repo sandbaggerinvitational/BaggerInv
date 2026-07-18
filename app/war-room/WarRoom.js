@@ -185,7 +185,7 @@ export default function WarRoom({ initialData, loadError }) {
               Format
               <select value={format} onChange={(event) => changeFormat(event.target.value)}>
                 <option value="BB">Best Ball</option>
-                <option value="SC">2-Man Scramble</option>
+                <option value="SC">Scramble</option>
                 <option value="SI">Singles</option>
               </select>
             </label>

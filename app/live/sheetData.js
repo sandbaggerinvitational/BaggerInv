@@ -73,7 +73,7 @@ function normalizeWinner(value) {
 }
 
 function displayFormat(code) {
-  return ({ BB: "Best Ball", SC: "2-Man Scramble", SI: "Singles" })[clean(code).toUpperCase()] || clean(code);
+  return ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[clean(code).toUpperCase()] || clean(code);
 }
 
 function hcp(value) {
