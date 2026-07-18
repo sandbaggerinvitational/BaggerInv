@@ -782,3 +782,17 @@
     font-size: .58em;
   }
 }
+
+/* v9.0.2 — reserve a stroke-badge row so opposing names stay horizontally aligned */
+@media (min-width: 641px) {
+  .playerLine {
+    display: grid;
+    grid-template-rows: auto 18px;
+    align-content: start;
+    justify-items: start;
+  }
+
+  .players > div:last-child .playerLine {
+    justify-items: end;
+  }
+}

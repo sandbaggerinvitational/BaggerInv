@@ -3622,3 +3622,16 @@
     font-size: .7rem;
   }
 }
+
+/* v9.0.2 — keep opposing player rows aligned when only one player receives strokes */
+@media (min-width: 641px) {
+  .roundMatchPlayerEntry {
+    display: grid;
+    grid-template-rows: auto 18px;
+    align-content: start;
+  }
+
+  .roundMatchStroke {
+    align-self: start;
+  }
+}
