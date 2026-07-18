@@ -50,7 +50,7 @@ export default function WarRoom({ initialData, loadError }) {
       ? assignedTee
       : tees[0] || assignedTee;
   const scorecard = scorecardForTee(scorecards, tee);
-  const holes = holesForTee(sheets, courseId, tee);
+  const holes = holesForTee(sheets, course, tee);
   const settings = settingsMap(sheets.settings || []);
   const historical = initialData?.historical || {};
 
@@ -122,7 +122,7 @@ export default function WarRoom({ initialData, loadError }) {
   const validation = [];
   if (!courseId) validation.push(`No ${formatCode(format)} course is assigned for ${year}.`);
   if (!scorecards.length && courseId)
-    validation.push(`No Course Scorecards rows were found for ${courseId}.`);
+    validation.push(`No Course Scorecards rows were found for ${pick(course, "Course Name", "Course") || courseId}.`);
   if (scorecards.length && !scorecardComplete)
     validation.push(`The ${tee || "selected"} tee is missing rating, slope, or par.`);
   if (!teams.team1.players.length)
