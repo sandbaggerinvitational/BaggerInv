@@ -19,5 +19,5 @@ export default async function WarRoomPage() {
     for(let i=0;i<ids.length;i+=1) for(let j=i+1;j<ids.length;j+=1) headToHead[`${ids[i]}|${ids[j]}`]=getHeadToHead(ids[i],ids[j]);
     data={sheets,historical,partnerships,headToHead};
   } catch(e){ error=e.message || "Unable to load prediction data."; }
-  return <main><Header/><WarRoom initialData={data} loadError={error}/><Footer/></main>;
+  return <main><Header/><WarRoom initialData={data} loadError={error} aiConfigured={Boolean(process.env.OPENAI_API_KEY)}/><Footer/></main>;
 }

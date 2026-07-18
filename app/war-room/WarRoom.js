@@ -27,7 +27,7 @@ const number = (value, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-export default function WarRoom({ initialData, loadError }) {
+export default function WarRoom({ initialData, loadError, aiConfigured = false }) {
   const sheets = initialData?.sheets || {};
   const [format, setFormat] = useState("BB");
   const [selected, setSelected] = useState([]);
@@ -135,6 +135,19 @@ export default function WarRoom({ initialData, loadError }) {
     if (index === 2) return play.strokesB;
     return "—";
   }
+
+  const team1Rows = ready ? details.slice(0, slotsPerTeam).map((player, index) => ({ ...player, playingHandicap: netForPlayer(index) })) : [];
+  const team2Rows = ready ? details.slice(slotsPerTeam).map((player, index) => ({ ...player, playingHandicap: netForPlayer(index + slotsPerTeam) })) : [];
+  const strokeEdge = play ? play.strokesA - play.strokesB : 0;
+  const edgeTeam = strokeEdge > 0 ? teams.team1.name : strokeEdge < 0 ? teams.team2.name : "Even";
+  const edgeAmount = Math.abs(strokeEdge);
+  const frontA = strokeMaps ? strokeMaps.team1.slice(0, 9).reduce((sum, value) => sum + value, 0) : 0;
+  const frontB = strokeMaps ? strokeMaps.team2.slice(0, 9).reduce((sum, value) => sum + value, 0) : 0;
+  const backA = strokeMaps ? strokeMaps.team1.slice(9).reduce((sum, value) => sum + value, 0) : 0;
+  const backB = strokeMaps ? strokeMaps.team2.slice(9).reduce((sum, value) => sum + value, 0) : 0;
+  const frontEdge = frontA - frontB;
+  const backEdge = backA - backB;
+  const playingLabel = formatCode(format) === "SC" ? "Team Playing HCP" : "Combined Playing HCP";
   function applyMatchup(row) {
     const ids = formatCode(format) === "SI"
       ? [row.team1Players[0].id, row.team2Players[0].id]
@@ -146,6 +159,10 @@ export default function WarRoom({ initialData, loadError }) {
   }
   async function generateAiBriefing() {
     if (!ready) return;
+    if (!aiConfigured) {
+      setAiError("AI briefing is not configured yet. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.");
+      return;
+    }
     setAiLoading(true);
     setAiError("");
     try {
@@ -162,8 +179,11 @@ export default function WarRoom({ initialData, loadError }) {
           optimizer,
         })),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Briefing request failed.");
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const suffix = result.requestId ? ` (request ${result.requestId})` : "";
+        throw new Error(`${result.error || "Briefing request failed."}${suffix}`);
+      }
       setAiBriefing(result.briefing);
     } catch (error) {
       setAiError(error.message);
@@ -219,15 +239,29 @@ export default function WarRoom({ initialData, loadError }) {
                 <div><span>{teams.team2.name}</span><strong>{prediction.teamB}%</strong></div>
               </div>
               <div className={styles.bar}><i style={{ width: `${prediction.teamA}%` }} /><b style={{ width: `${prediction.tie}%` }} /><em style={{ width: `${prediction.teamB}%` }} /></div>
-              <div className={styles.factors}>{prediction.factors.map((factor, index) => <div key={index} data-side={factor.side}>{factor.label}</div>)}</div>
+              <div className={styles.driverPanel}>
+                <div className={styles.driverHeading}><span>What drives this prediction</span><small>Objective matchup advantages</small></div>
+                <div className={styles.factorTable}>{prediction.factors.map((factor, index) => <div key={index} data-side={factor.side}><span>{factor.category}</span><strong>{factor.detail}</strong></div>)}</div>
+                <div className={styles.contributionHeading}><span>Weighted model contribution</span><small>Probability-point influence toward either team</small></div>
+                <div className={styles.contributionList}>{prediction.contributions.map((item) => {
+                  const maxImpact = Math.max(1, ...prediction.contributions.map((entry) => Math.abs(entry.impact)));
+                  const width = Math.max(item.side === "neutral" ? 0 : 8, Math.abs(item.impact) / maxImpact * 50);
+                  return <div className={styles.contributionRow} key={item.id} data-side={item.side}>
+                    <div className={styles.contributionLabel}><span>{item.label}</span><small>{item.weight}% weight</small></div>
+                    <div className={styles.contributionTrack}><i style={item.side === "A" ? { width: `${width}%`, left: "50%" } : item.side === "B" ? { width: `${width}%`, right: "50%" } : { width: 0 }} /></div>
+                    <div className={styles.contributionValue}><strong>{item.advantage}</strong><small>{item.side === "neutral" ? "0.0 pts" : `${item.impact > 0 ? "+" : "−"}${Math.abs(item.impact).toFixed(1)} pts`}</small></div>
+                  </div>;
+                })}</div>
+                <div className={styles.contributionLegend}><span>{teams.team2.name}</span><b>Neutral</b><span>{teams.team1.name}</span></div>
+              </div>
             </div>
 
             <div className={styles.briefingCard}>
               <div className={styles.sectionTitle}><span>AI</span><div><p>Captain&apos;s Briefing</p><h2>The scouting report</h2></div></div>
               <div className={styles.briefingText}>{String(aiBriefing || fallbackBriefing).split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
               <div className={styles.aiActions}>
-                <button type="button" onClick={generateAiBriefing} disabled={aiLoading}>{aiLoading ? "Analyzing matchup…" : aiBriefing ? "Refresh AI briefing" : "Generate AI briefing"}</button>
-                <small>The percentages stay deterministic. AI explains the data and recommends a move.</small>
+                <button type="button" onClick={generateAiBriefing} disabled={aiLoading || !aiConfigured}>{aiLoading ? "Analyzing matchup…" : !aiConfigured ? "AI setup required" : aiBriefing ? "Refresh AI briefing" : "Generate AI briefing"}</button>
+                <small>{aiConfigured ? "The percentages stay deterministic. AI explains the data and recommends a move." : "Add OPENAI_API_KEY in Vercel Production Environment Variables and redeploy to enable AI."}</small>
               </div>
               {aiError ? <div className={styles.aiError}>{aiError} The SBI analyst briefing above remains available.</div> : null}
             </div>
@@ -266,7 +300,24 @@ export default function WarRoom({ initialData, loadError }) {
                 <div className={styles.tableHead}><span>Player</span><span>Tournament HCP</span><span>Course HCP</span><span>Playing HCP</span></div>
                 {details.map((player, index) => <div key={player.id}><strong>{player.name}</strong><span>{player.tournamentHandicap.toFixed(1)}</span><span>{Math.round(player.courseHandicap)}</span><b>{netForPlayer(index)}</b></div>)}
               </div>
-              <div className={styles.strokeSummary}><div><span>{teams.team1.name} receives</span><strong>{play.strokesA} stroke{play.strokesA === 1 ? "" : "s"}</strong></div><div><span>{teams.team2.name} receives</span><strong>{play.strokesB} stroke{play.strokesB === 1 ? "" : "s"}</strong></div></div>
+              <div className={styles.strokeEdgeCard}>
+                <span>Match Stroke Edge</span>
+                {edgeAmount ? <><strong>+{edgeAmount}</strong><b>{edgeTeam}</b></> : <><strong>Even</strong><b>No net stroke edge</b></>}
+                <small>{play.strokesA} vs {play.strokesB} {playingLabel}</small>
+              </div>
+              <div className={styles.teamHandicapGrid}>
+                <div className={styles.teamHandicapCard}>
+                  <div className={styles.teamHandicapHeader}><span>{teams.team1.name}</span><strong>{play.strokesA}</strong></div>
+                  {team1Rows.map((player) => <div key={player.id}><span>{player.name}</span><b>{player.playingHandicap === "—" ? "—" : `+${player.playingHandicap}`}</b></div>)}
+                  <small>{playingLabel}</small>
+                </div>
+                <div className={styles.teamHandicapCard}>
+                  <div className={styles.teamHandicapHeader}><span>{teams.team2.name}</span><strong>{play.strokesB}</strong></div>
+                  {team2Rows.map((player) => <div key={player.id}><span>{player.name}</span><b>{player.playingHandicap === "—" ? "—" : `+${player.playingHandicap}`}</b></div>)}
+                  <small>{playingLabel}</small>
+                </div>
+              </div>
+              {strokeMaps ? <div className={styles.nineEdge}><span>Front 9 edge: <b>{frontEdge === 0 ? "Even" : `${frontEdge > 0 ? teams.team1.name : teams.team2.name} +${Math.abs(frontEdge)}`}</b></span><span>Back 9 edge: <b>{backEdge === 0 ? "Even" : `${backEdge > 0 ? teams.team1.name : teams.team2.name} +${Math.abs(backEdge)}`}</b></span></div> : null}
               {holes.length === 18 ? (
                 <div className={styles.holeDetails}><button type="button" onClick={() => setShowHoleDetails((value) => !value)}>{showHoleDetails ? "Hide hole details" : "View hole-by-hole stroke allocation"}</button>{showHoleDetails ? <div className={styles.holeGrid}>{holes.map((hole, index) => <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokeMaps.team1[index] ? <span>{teams.team1.name} +{strokeMaps.team1[index]}</span> : null}{strokeMaps.team2[index] ? <span>{teams.team2.name} +{strokeMaps.team2[index]}</span> : null}{!strokeMaps.team1[index] && !strokeMaps.team2[index] ? <span>—</span> : null}</b></div>)}</div> : null}</div>
               ) : <p className={styles.noHoles}>Hole details are hidden because this tee does not yet have all 18 Course Holes rows.</p>}

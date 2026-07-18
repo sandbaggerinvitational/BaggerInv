@@ -2,36 +2,71 @@ import OpenAI from "openai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
+
+const MAX_BODY_BYTES = 40_000;
+
+function safeError(error) {
+  const status = Number(error?.status) || 500;
+  if (status === 401) return "The OpenAI API key was rejected. Replace OPENAI_API_KEY in Vercel and redeploy.";
+  if (status === 403) return "This OpenAI project is not allowed to use the configured model.";
+  if (status === 404) return "The configured OpenAI model is unavailable. Remove OPENAI_MODEL or set it to gpt-5-mini.";
+  if (status === 429) return "The OpenAI project is rate-limited or out of API credits. Check usage and billing, then try again.";
+  if (status >= 500) return "OpenAI is temporarily unavailable. Try the briefing again in a moment.";
+  return error?.message || "The AI briefing could not be generated right now.";
+}
+
+function validatePayload(data) {
+  if (!data || typeof data !== "object") return "Missing matchup data.";
+  if (!data.selectedMatchup?.probabilities) return "The matchup probabilities are missing.";
+  if (!Array.isArray(data.teams) || data.teams.length !== 2) return "Both team names are required.";
+  if (!Array.isArray(data.selectedMatchup?.players) || data.selectedMatchup.players.length < 2) return "The selected players are missing.";
+  return "";
+}
 
 export async function POST(request) {
+  const requestId = crypto.randomUUID().slice(0, 8);
   if (!process.env.OPENAI_API_KEY) {
     return Response.json(
-      { error: "AI briefing is not configured. Add OPENAI_API_KEY in Vercel Environment Variables." },
+      { error: "AI briefing is not configured. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.", requestId },
       { status: 503 }
     );
   }
 
   try {
-    const data = await request.json();
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const raw = await request.text();
+    if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) {
+      return Response.json({ error: "The matchup briefing request was too large.", requestId }, { status: 413 });
+    }
+    const data = JSON.parse(raw);
+    const validationError = validatePayload(data);
+    if (validationError) return Response.json({ error: validationError, requestId }, { status: 400 });
+
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 25_000, maxRetries: 1 });
+    const model = process.env.OPENAI_MODEL || "gpt-5-mini";
     const response = await client.responses.create({
-      model: process.env.OPENAI_MODEL || "gpt-5-mini",
+      model,
       store: false,
+      max_output_tokens: 500,
       instructions: [
         "You are the Sandbagger Invitational captain's analyst.",
         "Use only the supplied deterministic analytics. Never invent records, scores, players, or percentages.",
         "Write a sharp scouting briefing in 130-190 words.",
-        "Return exactly four short paragraphs separated by blank lines: Matchup Call, Why It Leans, Danger Zone, Captain's Move.",
-        "Do not use markdown bullets, numbered lists, or run-on sentences. Keep each paragraph to two or three crisp sentences.",
-        "Vary the opening language, rhythm, and golf metaphors from one matchup to another. Avoid repeating stock phrases such as viable path, match play remains volatile, or gets the nod.",
-        "Use the actual player and team names. Add personality and tournament-style flair while staying faithful to the supplied numbers.",
-        "Keep the tone confident, golf-savvy, and useful to a captain. Do not mention that you are an AI.",
+        "Return exactly four short paragraphs separated by blank lines.",
+        "Start each paragraph with one of these labels exactly: MATCHUP CALL:, WHY IT LEANS:, DANGER ZONE:, CAPTAIN'S MOVE:.",
+        "Keep each paragraph to two or three crisp sentences. Do not use bullets, numbered lists, markdown headings, or run-on sentences.",
+        "Vary the opening language, cadence, golf metaphors, and strategic angle from matchup to matchup.",
+        "Avoid stock phrases including viable path, match play remains volatile, gets the nod, and not a walkover.",
+        "Use actual player and team names. Add tournament-style flair but stay faithful to the supplied numbers.",
+        "Do not mention that you are an AI or describe the data as supplied.",
       ].join(" "),
       input: `Analyze this matchup data:\n${JSON.stringify(data)}`,
     });
-    return Response.json({ briefing: response.output_text?.trim() || "No briefing was returned." });
+    const briefing = response.output_text?.trim();
+    if (!briefing) throw new Error("OpenAI returned an empty briefing.");
+    return Response.json({ briefing, requestId });
   } catch (error) {
-    console.error("Captain briefing failed", error);
-    return Response.json({ error: "The AI briefing could not be generated right now." }, { status: 500 });
+    console.error("Captain briefing failed", { requestId, status: error?.status, code: error?.code, message: error?.message });
+    return Response.json({ error: safeError(error), requestId }, { status: Number(error?.status) || 500 });
   }
 }
