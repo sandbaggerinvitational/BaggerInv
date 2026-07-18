@@ -9,8 +9,8 @@ function displayNumber(value) {
   return value === null || value === undefined || value === "" ? "—" : Number(value).toFixed(Number(value) % 1 ? 1 : 0);
 }
 
-function handicap(value) {
-  return value === null || value === undefined ? "" : ` (${value})`;
+function hasValue(value) {
+  return value !== null && value !== undefined && value !== "";
 }
 
 function strokeText(value) {
@@ -36,8 +36,8 @@ function PlayerList({ players, format, teamHcp, teamStroke }) {
     return (
       <div className={styles.playerList}>
         {players.map((player) => <strong key={player.id}>{player.name}</strong>)}
-        {teamHcp !== null && teamHcp !== undefined ? (
-          <small className={styles.teamHandicap}>Team Handicap ({teamHcp})</small>
+        {hasValue(teamHcp) ? (
+          <small className={styles.teamHandicap}>Team Handicap <b>({teamHcp})</b></small>
         ) : null}
         {strokeText(teamStroke) ? (
           <em className={styles.strokeBadge}>{strokeText(teamStroke)}</em>
@@ -50,7 +50,12 @@ function PlayerList({ players, format, teamHcp, teamStroke }) {
     <div className={styles.playerList}>
       {players.map((player) => (
         <div className={styles.playerLine} key={player.id}>
-          <strong>{player.name}{handicap(player.playingHcp)}</strong>
+          <strong className={styles.playerName}>
+            <span>{player.name}</span>
+            {hasValue(player.playingHcp) ? (
+              <small className={styles.playerHandicap}>({player.playingHcp})</small>
+            ) : null}
+          </strong>
           {strokeText(player.stroke) ? (
             <em className={styles.strokeBadge}>{strokeText(player.stroke)}</em>
           ) : null}

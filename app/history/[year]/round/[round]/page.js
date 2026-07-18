@@ -31,6 +31,24 @@ function strokeLabel(value) {
   return `${strokes} ${strokes === 1 ? "stroke" : "strokes"}`;
 }
 
+
+function handicapLabel(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const handicap = Number(value);
+  if (!Number.isFinite(handicap)) return null;
+  return `(${Number.isInteger(handicap) ? handicap : handicap.toFixed(1)})`;
+}
+
+function playerHandicap(match, team, index) {
+  if (match.format === "SC") return null;
+  if (match.format === "SI" && index > 0) return null;
+  return handicapLabel(team.playerHandicaps?.[index]);
+}
+
+function teamHandicap(match, team) {
+  return match.format === "SC" ? handicapLabel(team.teamHandicap) : null;
+}
+
 function playerStroke(match, team, index) {
   if (match.format === "SC") return null;
 
@@ -203,9 +221,16 @@ export default async function HistoricalRoundPage({ params }) {
                         className={styles.roundMatchPlayerEntry}
                         key={player.id}
                       >
-                        <Link href={`/players/${player.slug}`}>
-                          {player.name}
-                        </Link>
+                        <div className={styles.roundMatchPlayerName}>
+                          <Link href={`/players/${player.slug}`}>
+                            {player.name}
+                          </Link>
+                          {playerHandicap(match, match.teamOne, index) ? (
+                            <small className={styles.roundMatchHandicap}>
+                              {playerHandicap(match, match.teamOne, index)}
+                            </small>
+                          ) : null}
+                        </div>
                         {playerStroke(match, match.teamOne, index) ? (
                           <small className={styles.roundMatchStroke}>
                             {playerStroke(match, match.teamOne, index)}
@@ -213,6 +238,11 @@ export default async function HistoricalRoundPage({ params }) {
                         ) : null}
                       </div>
                     ))}
+                    {teamHandicap(match, match.teamOne) ? (
+                      <small className={styles.roundMatchTeamHandicap}>
+                        Team Handicap {teamHandicap(match, match.teamOne)}
+                      </small>
+                    ) : null}
                     {teamStroke(match, match.teamOne) ? (
                       <small className={styles.roundMatchTeamStroke}>
                         {teamStroke(match, match.teamOne)}
@@ -229,9 +259,16 @@ export default async function HistoricalRoundPage({ params }) {
                         className={styles.roundMatchPlayerEntry}
                         key={player.id}
                       >
-                        <Link href={`/players/${player.slug}`}>
-                          {player.name}
-                        </Link>
+                        <div className={styles.roundMatchPlayerName}>
+                          <Link href={`/players/${player.slug}`}>
+                            {player.name}
+                          </Link>
+                          {playerHandicap(match, match.teamTwo, index) ? (
+                            <small className={styles.roundMatchHandicap}>
+                              {playerHandicap(match, match.teamTwo, index)}
+                            </small>
+                          ) : null}
+                        </div>
                         {playerStroke(match, match.teamTwo, index) ? (
                           <small className={styles.roundMatchStroke}>
                             {playerStroke(match, match.teamTwo, index)}
@@ -239,6 +276,11 @@ export default async function HistoricalRoundPage({ params }) {
                         ) : null}
                       </div>
                     ))}
+                    {teamHandicap(match, match.teamTwo) ? (
+                      <small className={styles.roundMatchTeamHandicap}>
+                        Team Handicap {teamHandicap(match, match.teamTwo)}
+                      </small>
+                    ) : null}
                     {teamStroke(match, match.teamTwo) ? (
                       <small className={styles.roundMatchTeamStroke}>
                         {teamStroke(match, match.teamTwo)}

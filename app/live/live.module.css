@@ -732,3 +732,53 @@
     font-size: .56rem !important;
   }
 }
+
+/* v9.0.1 — match-card typography and compact handicaps */
+.playerName {
+  display: flex;
+  align-items: baseline;
+  gap: .34rem;
+  min-width: 0;
+}
+
+.playerName > span {
+  color: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  font: inherit;
+}
+
+.playerHandicap {
+  flex: 0 0 auto;
+  color: #172019;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .62em;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.teamHandicap b {
+  font-size: .78em;
+}
+
+/* Keep live names closer to the tournament-history card scale on desktop. */
+@media (min-width: 641px) {
+  .playerList strong {
+    font-size: 1.16rem;
+    line-height: 1.2;
+  }
+
+  .players {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .playerList strong {
+    font-size: 1.28rem;
+  }
+
+  .playerHandicap {
+    font-size: .58em;
+  }
+}

@@ -3580,3 +3580,45 @@
     margin-left: 0;
   }
 }
+
+/* v9.0.1 — historical playing handicaps and matching card typography */
+.roundMatchPlayerName {
+  display: flex;
+  align-items: baseline;
+  gap: .34rem;
+  min-width: 0;
+}
+
+.roundMatchPlayerName a {
+  min-width: 0;
+}
+
+.roundMatchHandicap {
+  flex: 0 0 auto;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .76rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.roundMatchTeamHandicap {
+  width: fit-content;
+  margin-top: 10px;
+  display: block;
+  color: var(--tsi-green-900);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: .58rem;
+  font-weight: 800;
+}
+
+.roundMatchPlayers > div:last-child .roundMatchTeamHandicap {
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .roundMatchHandicap {
+    font-size: .7rem;
+  }
+}
