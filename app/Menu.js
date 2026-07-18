@@ -8,6 +8,7 @@ const menuLinks = [
   { label: "Match Center", href: "/live" },
   { label: "Players", href: "/players" },
   { label: "Compare Players", href: "/compare" },
+  { label: "War Room", href: "/war-room" },
   { label: "Sandbagger Ratings", href: "/ratings" },
   { label: "Records", href: "/records" },
   { label: "History", href: "/history" },
