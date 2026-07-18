@@ -224,7 +224,7 @@ export default function WarRoom({ initialData, loadError }) {
 
             <div className={styles.briefingCard}>
               <div className={styles.sectionTitle}><span>AI</span><div><p>Captain&apos;s Briefing</p><h2>The scouting report</h2></div></div>
-              <p className={styles.briefingText}>{aiBriefing || fallbackBriefing}</p>
+              <div className={styles.briefingText}>{String(aiBriefing || fallbackBriefing).split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
               <div className={styles.aiActions}>
                 <button type="button" onClick={generateAiBriefing} disabled={aiLoading}>{aiLoading ? "Analyzing matchup…" : aiBriefing ? "Refresh AI briefing" : "Generate AI briefing"}</button>
                 <small>The percentages stay deterministic. AI explains the data and recommends a move.</small>
@@ -248,10 +248,10 @@ export default function WarRoom({ initialData, loadError }) {
                     {(optimizerRows || []).map((row, index) => (
                       <div key={row.id} className={styles.optimizerRow}>
                         <b>#{index + 1}</b>
-                        <div><strong>{row.team1Label}</strong><span>{teams.team1.name}</span></div>
+                        <div className={styles.optimizerTeam}><span>{teams.team1.name}</span><strong>{row.team1Label}</strong></div>
                         <div className={styles.vs}>vs</div>
-                        <div><strong>{row.team2Label}</strong><span>{teams.team2.name}</span></div>
-                        <div className={styles.optimizerOdds}><strong>{row.prediction.teamA}%–{row.prediction.teamB}%</strong><span>{row.prediction.tie}% halve</span></div>
+                        <div className={styles.optimizerTeam}><span>{teams.team2.name}</span><strong>{row.team2Label}</strong></div>
+                        <div className={styles.optimizerOdds}><strong><i>{row.prediction.teamA}%</i><em>{row.prediction.teamB}%</em></strong><span>{row.prediction.tie}% halve</span></div>
                         <button type="button" onClick={() => applyMatchup(row)}>Use matchup</button>
                       </div>
                     ))}
@@ -268,7 +268,7 @@ export default function WarRoom({ initialData, loadError }) {
               </div>
               <div className={styles.strokeSummary}><div><span>{teams.team1.name} receives</span><strong>{play.strokesA} stroke{play.strokesA === 1 ? "" : "s"}</strong></div><div><span>{teams.team2.name} receives</span><strong>{play.strokesB} stroke{play.strokesB === 1 ? "" : "s"}</strong></div></div>
               {holes.length === 18 ? (
-                <div className={styles.holeDetails}><button type="button" onClick={() => setShowHoleDetails((value) => !value)}>{showHoleDetails ? "Hide hole details" : "View hole-by-hole stroke allocation"}</button>{showHoleDetails ? <div className={styles.holeGrid}>{holes.map((hole, index) => <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b>{strokeMaps.team1[index] ? `${teams.team1.name} +${strokeMaps.team1[index]}` : strokeMaps.team2[index] ? `${teams.team2.name} +${strokeMaps.team2[index]}` : "—"}</b></div>)}</div> : null}</div>
+                <div className={styles.holeDetails}><button type="button" onClick={() => setShowHoleDetails((value) => !value)}>{showHoleDetails ? "Hide hole details" : "View hole-by-hole stroke allocation"}</button>{showHoleDetails ? <div className={styles.holeGrid}>{holes.map((hole, index) => <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokeMaps.team1[index] ? <span>{teams.team1.name} +{strokeMaps.team1[index]}</span> : null}{strokeMaps.team2[index] ? <span>{teams.team2.name} +{strokeMaps.team2[index]}</span> : null}{!strokeMaps.team1[index] && !strokeMaps.team2[index] ? <span>—</span> : null}</b></div>)}</div> : null}</div>
               ) : <p className={styles.noHoles}>Hole details are hidden because this tee does not yet have all 18 Course Holes rows.</p>}
             </div>
           </>
