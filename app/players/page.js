@@ -7,6 +7,7 @@ import { CompactHonors } from "../HonorBadges";
 import { playerPhoto } from "../../lib/asset-paths";
 import {
   formatHandicap,
+  formatPercentage,
   formatRecord,
   getAllPlayerStats,
 } from "../../lib/stats";
@@ -79,16 +80,24 @@ export default async function PlayersPage() {
 
               <div className={styles.statStrip}>
                 <div>
-                  <span>Record</span>
+                  <span>Career</span>
                   <strong>{formatRecord(stats.records.overall)}</strong>
                 </div>
                 <div>
-                  <span>Avg. Handicap</span>
-                  <strong>{formatHandicap(stats.averageHandicap)}</strong>
+                  <span>Win %</span>
+                  <strong>{formatPercentage(stats.percentages.overall)}</strong>
+                </div>
+                <div>
+                  <span>Titles</span>
+                  <strong>{stats.championships.length}</strong>
                 </div>
                 <div>
                   <span>Appearances</span>
                   <strong>{stats.appearances.length}</strong>
+                </div>
+                <div>
+                  <span>Current HCP</span>
+                  <strong>{formatHandicap(stats.seasons[0]?.handicap)}</strong>
                 </div>
               </div>
 

@@ -20,6 +20,8 @@ import {
   scorecardForTee,
 } from "../../lib/tournament-context";
 import { briefingPayload, buildFallbackBriefing } from "../../lib/captains-briefing";
+import { optimizeLineups } from "../../lib/lineup-optimizer";
+import { teamVibesTier } from "../../lib/prediction-engine";
 
 const clean = (value) => String(value ?? "").trim();
 const number = (value, fallback = 0) => {
@@ -85,6 +87,20 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const prediction = ready
     ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name] })
     : null;
+  const optimizer = useMemo(() => {
+    if (!ready) return null;
+    return optimizeLineups({
+      format,
+      team1: teams.team1,
+      team2: teams.team2,
+      scorecard: scorecardValues,
+      historical,
+      partnerships,
+      headToHead,
+      settings,
+      limit: 3,
+    });
+  }, [ready, format, teams, scorecardValues.rating, scorecardValues.slope, scorecardValues.par, historical, partnerships, headToHead, sheets.settings]);
   const playerStrokeMaps = play && holes.length === 18 && formatCode(format) !== "SC"
     ? play.playerStrokes.map((strokes) => allocateStrokes(strokes, holes))
     : null;
@@ -98,7 +114,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
     : null;
 
   const fallbackBriefing = ready
-    ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer: null })
+    ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer })
     : "";
 
   const validation = [];
@@ -142,10 +158,28 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const frontEdge = frontA - frontB;
   const backEdge = backA - backB;
   const playingLabel = formatCode(format) === "SC" ? "Team Playing HCP" : formatCode(format) === "BB" ? "Best Ball Effective HCP" : "Playing HCP";
+  const favoredSide = prediction?.teamA >= prediction?.teamB ? "A" : "B";
+  const recommendedLineups = favoredSide === "A" ? optimizer?.team1Best : optimizer?.team2Best;
+  const bestLineup = recommendedLineups?.[0];
+  const alternativeLineup = recommendedLineups?.[1] || optimizer?.closest?.[0];
+  const riskScore = prediction
+    ? Math.max(0, Math.min(100, Math.round(100 - Math.abs(prediction.teamA - prediction.teamB) * 2 + prediction.tie + (prediction.confidence === "Low" ? 10 : 0))))
+    : 0;
+  const riskLabel = riskScore >= 75 ? "High volatility" : riskScore >= 50 ? "Competitive" : "Controlled";
+  const driverRows = prediction?.contributions
+    .filter((item) => formatCode(format) !== "SI" || item.id !== "team")
+    .map((item) => {
+      const gap = Math.abs(item.teamA - item.teamB);
+      return {
+        ...item,
+        strength: Math.round(Math.max(item.teamA, item.teamB)),
+        favored: gap < .5 ? "Even" : item.teamA > item.teamB ? teams.team1.name : teams.team2.name,
+      };
+    }) || [];
   async function generateAiBriefing() {
     if (!ready) return;
     if (!aiConfigured) {
-      setAiError("AI briefing is not configured yet. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.");
+      setAiError("The SBI Match Analyst is not configured yet. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.");
       return;
     }
     setAiLoading(true);
@@ -161,7 +195,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
           courseName: pick(course, "Course Name", "Course") || courseId,
           tee,
           players: details,
-          optimizer: null,
+          optimizer,
         })),
       });
       const result = await response.json().catch(() => ({}));
@@ -189,10 +223,10 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
       <section className={styles.shell}>
         {loadError ? <div className={styles.notice}>{loadError}</div> : null}
         {validation.length ? <div className={styles.notice}>{validation.map((message) => <div key={message}>{message}</div>)}</div> : null}
-        <div className={styles.dashboardLink}><span>Captain&apos;s Dashboard</span><strong>Need to test every legal pairing?</strong><Link href="/war-room/lineup-optimizer">Open Lineup Optimizer</Link></div>
+        <div className={styles.dashboardLink}><span>War Room Tools</span><strong>Want the full field view?</strong><Link href="/war-room/lineup-optimizer">Open Lineup Optimizer</Link></div>
 
         <div className={styles.setupCard}>
-          <div className={styles.sectionTitle}><span>01</span><div><p>Match Setup</p><h2>Choose the battlefield</h2></div></div>
+          <div className={styles.sectionTitle}><span>01</span><div><p>Matchup Builder</p><h2>Choose the battlefield</h2></div></div>
           <div className={styles.controlsThree}>
             <label>Format<select value={format} onChange={(event) => changeFormat(event.target.value)}><option value="BB">Best Ball</option><option value="SC">Scramble</option><option value="SI">Singles</option></select></label>
             <label>Course<input value={pick(course, "Course Name", "Course") || courseId || "Not assigned"} readOnly /></label>
@@ -215,6 +249,11 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
           <div className={styles.emptyState}><span>Complete the matchup</span><h2>Select every player to run the prediction.</h2>{!scorecardComplete ? <p>A complete tee scorecard is also required.</p> : null}</div>
         ) : (
           <>
+            <div className={styles.dashboardHeader}>
+              <span>02</span>
+              <div><p>Captain Dashboard</p><h2>The decision desk</h2></div>
+              <small>{formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles"} · {tee}</small>
+            </div>
             <div className={styles.predictionCard}>
               <div className={styles.model}>{prediction.model} · {prediction.confidence} confidence</div>
               <div className={styles.probabilities}>
@@ -224,29 +263,38 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               </div>
               <div className={styles.bar}><i style={{ width: `${prediction.teamA}%` }} /><b style={{ width: `${prediction.tie}%` }} /><em style={{ width: `${prediction.teamB}%` }} /></div>
               <div className={styles.driverPanel}>
-                <div className={styles.driverHeading}><span>What drives this prediction</span><small>Objective matchup advantages</small></div>
-                <div className={styles.factorTable}>{prediction.factors.map((factor, index) => <div key={index} data-side={factor.side}><span>{factor.category}</span><strong>{factor.detail}</strong></div>)}</div>
-                <div className={styles.contributionHeading}><span>Category influence</span><small>Each marker shows which team the category leans toward</small></div>
-                <div className={styles.contributionList}>{prediction.contributions.map((item) => {
-                  const position = Math.max(4, Math.min(96, item.teamA));
-                  const description = item.side === "neutral"
-                    ? "No measurable edge"
-                    : `Leans ${item.advantage} by ${Math.abs(item.impact).toFixed(1)} probability points`;
-                  return <div className={styles.contributionRow} key={item.id} data-side={item.side}>
-                    <div className={styles.contributionLabel}><span>{item.label}</span></div>
-                    <div className={styles.contributionTrack} aria-label={`${teams.team2.name} to ${teams.team1.name}`}><i style={{ left: `${position}%` }} /></div>
-                    <div className={styles.contributionValue}><strong>{description}</strong></div>
-                  </div>;
-                })}</div>
-                <div className={styles.contributionLegend}><span>{teams.team2.name}</span><b>No edge</b><span>{teams.team1.name}</span></div>              </div>
+                <div className={styles.driverHeading}><span>What drives this matchup</span><small>Fast read · deeper bars mean stronger evidence</small></div>
+                <div className={styles.v11DriverList}>{driverRows.map((item) => <div className={styles.v11DriverRow} key={item.id} data-side={item.side}>
+                  <div><strong>{item.label}</strong><span>{item.favored}</span></div>
+                  <div className={styles.v11DriverTrack} role="meter" aria-label={`${item.label}: ${item.favored}`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={item.strength}><i style={{ width: `${item.strength}%` }} /></div>
+                  <b>{item.strength}</b>
+                </div>)}</div>
+              </div>
+            </div>
+
+            <div className={styles.decisionGrid}>
+              {formatCode(format) === "SI" ? <div className={styles.vibesCard}><span>Team Vibes</span><strong>—</strong><b>Singles format</b><small>Pair history is not used in singles.</small></div> : [
+                { key: "A", name: teams.team1.name, vibes: prediction.teamVibes.teamA },
+                { key: "B", name: teams.team2.name, vibes: prediction.teamVibes.teamB },
+              ].map(({ key, name, vibes }) => { const tier = teamVibesTier(vibes); return <div className={styles.vibesCard} key={key} data-known={vibes.known}>
+                <span>{name} · Team Vibes</span><strong>{vibes.known ? Math.round(vibes.score) : "—"}</strong><b>{tier.icon} {tier.label}</b><small>{vibes.known ? `${vibes.sameFormatMatches} same-format · ${vibes.matches} overall matches` : "No recorded pairing history yet"}</small>
+              </div>; })}
+              <div className={styles.riskCard}>
+                <span>Risk Meter</span><strong>{riskScore}</strong><b>{riskLabel}</b><div><i style={{ width: `${riskScore}%` }} /></div><small>Based on margin, halve chance, and confidence.</small>
+              </div>
+            </div>
+
+            <div className={styles.lineupGrid}>
+              <div className={styles.lineupCall}><span>Best Lineup</span>{bestLineup ? <><strong>{favoredSide === "A" ? bestLineup.team1Label : bestLineup.team2Label}</strong><small>Projects at {favoredSide === "A" ? bestLineup.prediction.teamA : bestLineup.prediction.teamB}% for {favoredSide === "A" ? teams.team1.name : teams.team2.name}</small></> : <strong>No lineup available</strong>}</div>
+              <div className={styles.lineupCall}><span>Alternative Lineup</span>{alternativeLineup ? <><strong>{favoredSide === "A" ? alternativeLineup.team1Label : alternativeLineup.team2Label}</strong><small>Projects at {favoredSide === "A" ? alternativeLineup.prediction.teamA : alternativeLineup.prediction.teamB}% for {favoredSide === "A" ? teams.team1.name : teams.team2.name}</small></> : <strong>No alternative available</strong>}</div>
             </div>
 
             <div className={styles.briefingCard}>
-              <div className={styles.sectionTitle}><span>AI</span><div><p>Captain&apos;s Briefing</p><h2>The scouting report</h2></div></div>
+              <div className={styles.sectionTitle}><span>SBI</span><div><p>SBI Match Analyst</p><h2>The official scouting report</h2></div></div>
               <div className={styles.briefingText}>{String(aiBriefing || fallbackBriefing).split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
               <div className={styles.aiActions}>
-                <button type="button" onClick={generateAiBriefing} disabled={aiLoading || !aiConfigured}>{aiLoading ? "Analyzing matchup…" : !aiConfigured ? "AI setup required" : aiBriefing ? "Refresh AI briefing" : "Generate AI briefing"}</button>
-                <small>{aiConfigured ? "The percentages stay deterministic. AI explains the data and recommends a move." : "Add OPENAI_API_KEY in Vercel Production Environment Variables and redeploy to enable AI."}</small>
+                <button type="button" onClick={generateAiBriefing} disabled={aiLoading || !aiConfigured}>{aiLoading ? "Analyzing matchup…" : !aiConfigured ? "Analyst setup required" : aiBriefing ? "Refresh analyst briefing" : "Generate analyst briefing"}</button>
+                <small>{aiConfigured ? "Official SBI analysis built from the deterministic matchup numbers above." : "Add OPENAI_API_KEY in Vercel Production Environment Variables and redeploy to enable the SBI Match Analyst."}</small>
               </div>
               {aiError ? <div className={styles.aiError}>{aiError} The SBI analyst briefing above remains available.</div> : null}
             </div>

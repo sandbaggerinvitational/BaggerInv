@@ -38,7 +38,7 @@ export function RookieBadgeIcon({ className = "" }) {
   return (
     <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
       <circle cx="32" cy="32" r="28" fill="currentColor" opacity=".18" />
-      <path d="M18 47V17h17c8.5 0 14 4.8 14 12 0 5.2-3 9.2-8 11l10 7H40l-9-6h-3v6H18Zm10-15h7c2.8 0 4.5-1.3 4.5-3.5S37.8 25 35 25h-7v7Z" fill="currentColor" />
+      <path d="M20 14h7v8h4v-8h7v8h4v-8h6v15l-6 7 4 13H18l4-13-6-7V14h4Zm3 35h18v5H23v-5Z" fill="currentColor" />
     </svg>
   );
 }

@@ -1,8 +1,17 @@
-# Sandbagger Invitational — v10.4.1
+# Sandbagger Invitational — v11.0.0
 
-Adds the first working Captain's War Room and prediction engine.
+War Room Evolution turns the matchup builder into a complete captain's decision desk.
 
-## New in v10
+## New in v11
+
+- Team Vibes combines 65% same-format and 35% overall pairing performance
+- Scannable matchup-driver strength bars
+- Captain Dashboard with confidence, Team Vibes, lineup calls, and risk meter
+- SBI Match Analyst voice for official scouting briefings
+- Strategy-inspired rookie rook badge and trading-card player directory
+- Hardened briefing API, corrected asset paths, duplicate-route cleanup, and tests
+
+## Introduced in v10
 - Live Google Sheets data for Prediction Settings, Course Scorecards, and Course Holes
 - Best Ball, Scramble, and Singles handicap calculations
 - Course Handicap recalculation for alternate tees

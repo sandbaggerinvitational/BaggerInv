@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { allocateStrokes, courseHandicap, formatCode, playingHandicaps, predict } from "../lib/prediction-engine.js";
+import { allocateStrokes, courseHandicap, formatCode, playingHandicaps, predict, teamVibesForPlayers, teamVibesTier } from "../lib/prediction-engine.js";
 
 test("normalizes supported match formats", () => {
   assert.equal(formatCode("Best Ball"), "BB");
@@ -33,4 +33,23 @@ test("predictions remain bounded and total 100", () => {
   });
   assert.equal(result.teamA + result.teamB + result.tie, 100);
   assert.ok([result.teamA, result.teamB, result.tie].every((value) => value >= 0 && value <= 100));
+});
+
+test("Team Vibes weights same-format and overall partnership history", () => {
+  const partnership = {
+    "a|b": {
+      record: { matches: 10, wins: 6, halves: 0, points: 6 },
+      byFormat: { BB: { matches: 4, wins: 3, halves: 0, points: 3 } },
+    },
+  };
+  const vibes = teamVibesForPlayers("BB", ["b", "a"], partnership);
+  assert.equal(vibes.score, 69.75);
+  assert.equal(vibes.known, true);
+  assert.deepEqual(teamVibesTier(vibes), { label: "Good", icon: "🙂" });
+});
+
+test("Team Vibes marks pairs without history as unknown", () => {
+  const vibes = teamVibesForPlayers("BB", ["a", "b"], {});
+  assert.equal(vibes.known, false);
+  assert.deepEqual(teamVibesTier(vibes), { label: "Unknown", icon: "🤔" });
 });
