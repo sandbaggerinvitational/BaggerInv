@@ -19,6 +19,7 @@ const BOOLEAN_HEADERS = new Set([
   "Active",
   "Captain Eligible",
   "Board of Governors",
+  "Rookie",
   "Front 9 Used",
   "Back 9 Used",
   "Overall Used",

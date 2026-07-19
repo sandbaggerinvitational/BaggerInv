@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import styles from "./war-room.module.css";
 import {
   allocateStrokes,
@@ -18,12 +19,15 @@ import {
   holesForTee,
   scorecardForTee,
 } from "../../lib/tournament-context";
-import { optimizeLineups } from "../../lib/lineup-optimizer";
 import { briefingPayload, buildFallbackBriefing } from "../../lib/captains-briefing";
 
 const clean = (value) => String(value ?? "").trim();
 const number = (value, fallback = 0) => {
-  const parsed = Number.parseFloat(clean(value).replace(/,/g, ""));
+  const normalized = clean(value)
+    .replace(/[−–—]/g, "-")
+    .replace(/,/g, "")
+    .replace(/^\((.*)\)$/, "-$1");
+  const parsed = Number.parseFloat(normalized);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
@@ -33,8 +37,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const [selected, setSelected] = useState([]);
   const [teeOverride, setTeeOverride] = useState("");
   const [showHoleDetails, setShowHoleDetails] = useState(false);
-  const [optimizerOpen, setOptimizerOpen] = useState(false);
-  const [optimizerView, setOptimizerView] = useState("team1");
   const [aiBriefing, setAiBriefing] = useState("");
   const [aiError, setAiError] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -83,27 +85,20 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const prediction = ready
     ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name] })
     : null;
-  const strokeMaps = play && holes.length === 18
-    ? { team1: allocateStrokes(play.strokesA, holes), team2: allocateStrokes(play.strokesB, holes) }
+  const playerStrokeMaps = play && holes.length === 18 && formatCode(format) !== "SC"
+    ? play.playerStrokes.map((strokes) => allocateStrokes(strokes, holes))
+    : null;
+  const effectiveStrokeMaps = play && holes.length === 18
+    ? formatCode(format) === "SC"
+      ? { team1: allocateStrokes(play.strokesA, holes), team2: allocateStrokes(play.strokesB, holes) }
+      : {
+          team1: holes.map((_, index) => Math.max(...playerStrokeMaps.slice(0, slotsPerTeam).map((map) => map[index] || 0))),
+          team2: holes.map((_, index) => Math.max(...playerStrokeMaps.slice(slotsPerTeam).map((map) => map[index] || 0))),
+        }
     : null;
 
-  const optimizer = useMemo(() => {
-    if (!optimizerOpen || !scorecardComplete) return null;
-    return optimizeLineups({
-      format,
-      team1: teams.team1,
-      team2: teams.team2,
-      scorecard: scorecardValues,
-      historical,
-      partnerships,
-      headToHead,
-      settings,
-      limit: 5,
-    });
-  }, [optimizerOpen, scorecardComplete, format, teams, scorecardValues.rating, scorecardValues.slope, scorecardValues.par, historical, partnerships, headToHead, settings]);
-
   const fallbackBriefing = ready
-    ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer })
+    ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer: null })
     : "";
 
   const validation = [];
@@ -118,7 +113,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
     setSelected([]);
     setTeeOverride("");
     setShowHoleDetails(false);
-    setOptimizerOpen(false);
     setAiBriefing("");
     setAiError("");
   }
@@ -141,22 +135,13 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const strokeEdge = play ? play.strokesA - play.strokesB : 0;
   const edgeTeam = strokeEdge > 0 ? teams.team1.name : strokeEdge < 0 ? teams.team2.name : "Even";
   const edgeAmount = Math.abs(strokeEdge);
-  const frontA = strokeMaps ? strokeMaps.team1.slice(0, 9).reduce((sum, value) => sum + value, 0) : 0;
-  const frontB = strokeMaps ? strokeMaps.team2.slice(0, 9).reduce((sum, value) => sum + value, 0) : 0;
-  const backA = strokeMaps ? strokeMaps.team1.slice(9).reduce((sum, value) => sum + value, 0) : 0;
-  const backB = strokeMaps ? strokeMaps.team2.slice(9).reduce((sum, value) => sum + value, 0) : 0;
+  const frontA = effectiveStrokeMaps ? effectiveStrokeMaps.team1.slice(0, 9).reduce((sum, value) => sum + value, 0) : 0;
+  const frontB = effectiveStrokeMaps ? effectiveStrokeMaps.team2.slice(0, 9).reduce((sum, value) => sum + value, 0) : 0;
+  const backA = effectiveStrokeMaps ? effectiveStrokeMaps.team1.slice(9).reduce((sum, value) => sum + value, 0) : 0;
+  const backB = effectiveStrokeMaps ? effectiveStrokeMaps.team2.slice(9).reduce((sum, value) => sum + value, 0) : 0;
   const frontEdge = frontA - frontB;
   const backEdge = backA - backB;
-  const playingLabel = formatCode(format) === "SC" ? "Team Playing HCP" : "Combined Playing HCP";
-  function applyMatchup(row) {
-    const ids = formatCode(format) === "SI"
-      ? [row.team1Players[0].id, row.team2Players[0].id]
-      : [...row.team1Players.map((p) => p.id), ...row.team2Players.map((p) => p.id)];
-    setSelected(ids);
-    setAiBriefing("");
-    setAiError("");
-    window.scrollTo({ top: 420, behavior: "smooth" });
-  }
+  const playingLabel = formatCode(format) === "SC" ? "Team Playing HCP" : formatCode(format) === "BB" ? "Best Ball Effective HCP" : "Playing HCP";
   async function generateAiBriefing() {
     if (!ready) return;
     if (!aiConfigured) {
@@ -176,7 +161,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
           courseName: pick(course, "Course Name", "Course") || courseId,
           tee,
           players: details,
-          optimizer,
+          optimizer: null,
         })),
       });
       const result = await response.json().catch(() => ({}));
@@ -196,8 +181,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
     return <section className={styles.shell}><div className={styles.error}><h1>War Room</h1><p>{loadError || "Prediction data is unavailable."}</p></div></section>;
   }
 
-  const optimizerRows = optimizerView === "team1" ? optimizer?.team1Best : optimizerView === "team2" ? optimizer?.team2Best : optimizer?.closest;
-
   return (
     <>
       <section className={styles.hero}>
@@ -206,6 +189,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
       <section className={styles.shell}>
         {loadError ? <div className={styles.notice}>{loadError}</div> : null}
         {validation.length ? <div className={styles.notice}>{validation.map((message) => <div key={message}>{message}</div>)}</div> : null}
+        <div className={styles.dashboardLink}><span>Captain&apos;s Dashboard</span><strong>Need to test every legal pairing?</strong><Link href="/war-room/lineup-optimizer">Open Lineup Optimizer</Link></div>
 
         <div className={styles.setupCard}>
           <div className={styles.sectionTitle}><span>01</span><div><p>Match Setup</p><h2>Choose the battlefield</h2></div></div>
@@ -242,18 +226,19 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               <div className={styles.driverPanel}>
                 <div className={styles.driverHeading}><span>What drives this prediction</span><small>Objective matchup advantages</small></div>
                 <div className={styles.factorTable}>{prediction.factors.map((factor, index) => <div key={index} data-side={factor.side}><span>{factor.category}</span><strong>{factor.detail}</strong></div>)}</div>
-                <div className={styles.contributionHeading}><span>Weighted model contribution</span><small>Probability-point influence toward either team</small></div>
+                <div className={styles.contributionHeading}><span>Category influence</span><small>Each marker shows which team the category leans toward</small></div>
                 <div className={styles.contributionList}>{prediction.contributions.map((item) => {
-                  const maxImpact = Math.max(1, ...prediction.contributions.map((entry) => Math.abs(entry.impact)));
-                  const width = Math.max(item.side === "neutral" ? 0 : 8, Math.abs(item.impact) / maxImpact * 50);
+                  const position = Math.max(4, Math.min(96, item.teamA));
+                  const description = item.side === "neutral"
+                    ? "No measurable edge"
+                    : `Leans ${item.advantage} by ${Math.abs(item.impact).toFixed(1)} probability points`;
                   return <div className={styles.contributionRow} key={item.id} data-side={item.side}>
-                    <div className={styles.contributionLabel}><span>{item.label}</span><small>{item.weight}% weight</small></div>
-                    <div className={styles.contributionTrack}><i style={item.side === "A" ? { width: `${width}%`, left: "50%" } : item.side === "B" ? { width: `${width}%`, right: "50%" } : { width: 0 }} /></div>
-                    <div className={styles.contributionValue}><strong>{item.advantage}</strong><small>{item.side === "neutral" ? "0.0 pts" : `${item.impact > 0 ? "+" : "−"}${Math.abs(item.impact).toFixed(1)} pts`}</small></div>
+                    <div className={styles.contributionLabel}><span>{item.label}</span></div>
+                    <div className={styles.contributionTrack} aria-label={`${teams.team2.name} to ${teams.team1.name}`}><i style={{ left: `${position}%` }} /></div>
+                    <div className={styles.contributionValue}><strong>{description}</strong></div>
                   </div>;
                 })}</div>
-                <div className={styles.contributionLegend}><span>{teams.team2.name}</span><b>Neutral</b><span>{teams.team1.name}</span></div>
-              </div>
+                <div className={styles.contributionLegend}><span>{teams.team2.name}</span><b>No edge</b><span>{teams.team1.name}</span></div>              </div>
             </div>
 
             <div className={styles.briefingCard}>
@@ -266,38 +251,10 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               {aiError ? <div className={styles.aiError}>{aiError} The SBI analyst briefing above remains available.</div> : null}
             </div>
 
-            <div className={styles.optimizerCard}>
-              <div className={styles.sectionTitle}><span>02</span><div><p>Lineup Optimizer</p><h2>Test every legal combination</h2></div></div>
-              {!optimizerOpen ? (
-                <div className={styles.optimizerIntro}><p>Run every {formatCode(format) === "SI" ? "singles matchup" : "pairing combination"} across both 2026 rosters using the same handicap and prediction engine.</p><button type="button" onClick={() => setOptimizerOpen(true)}>Run lineup optimizer</button></div>
-              ) : !optimizer ? <p>Calculating lineup combinations…</p> : (
-                <>
-                  <div className={styles.optimizerMeta}>{optimizer.matchupCount.toLocaleString()} legal matchups analyzed</div>
-                  <div className={styles.optimizerTabs}>
-                    <button data-active={optimizerView === "team1"} onClick={() => setOptimizerView("team1")}>Best for {teams.team1.name}</button>
-                    <button data-active={optimizerView === "team2"} onClick={() => setOptimizerView("team2")}>Best for {teams.team2.name}</button>
-                    <button data-active={optimizerView === "closest"} onClick={() => setOptimizerView("closest")}>Closest battles</button>
-                  </div>
-                  <div className={styles.optimizerList}>
-                    {(optimizerRows || []).map((row, index) => (
-                      <div key={row.id} className={styles.optimizerRow}>
-                        <b>#{index + 1}</b>
-                        <div className={styles.optimizerTeam}><span>{teams.team1.name}</span><strong>{row.team1Label}</strong></div>
-                        <div className={styles.vs}>vs</div>
-                        <div className={styles.optimizerTeam}><span>{teams.team2.name}</span><strong>{row.team2Label}</strong></div>
-                        <div className={styles.optimizerOdds}><strong><i>{row.prediction.teamA}%</i><em>{row.prediction.teamB}%</em></strong><span>{row.prediction.tie}% halve</span></div>
-                        <button type="button" onClick={() => applyMatchup(row)}>Use matchup</button>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
             <div className={styles.breakdownCard}>
-              <div className={styles.sectionTitle}><span>03</span><div><p>Handicap Breakdown</p><h2>Where the strokes fall</h2></div></div>
+              <div className={styles.sectionTitle}><span>02</span><div><p>Handicap Breakdown</p><h2>Where the strokes fall</h2></div></div>
               <div className={styles.playerTable}>
-                <div className={styles.tableHead}><span>Player</span><span>Tournament HCP</span><span>Course HCP</span><span>Playing HCP</span></div>
+                <div className={styles.tableHead}><span>Player</span><span>Tournament</span><span>Course</span><span>Playing</span></div>
                 {details.map((player, index) => <div key={player.id}><strong>{player.name}</strong><span>{player.tournamentHandicap.toFixed(1)}</span><span>{Math.round(player.courseHandicap)}</span><b>{netForPlayer(index)}</b></div>)}
               </div>
               <div className={styles.strokeEdgeCard}>
@@ -317,9 +274,17 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
                   <small>{playingLabel}</small>
                 </div>
               </div>
-              {strokeMaps ? <div className={styles.nineEdge}><span>Front 9 edge: <b>{frontEdge === 0 ? "Even" : `${frontEdge > 0 ? teams.team1.name : teams.team2.name} +${Math.abs(frontEdge)}`}</b></span><span>Back 9 edge: <b>{backEdge === 0 ? "Even" : `${backEdge > 0 ? teams.team1.name : teams.team2.name} +${Math.abs(backEdge)}`}</b></span></div> : null}
+              {effectiveStrokeMaps ? <div className={styles.nineEdge}><span>Front 9 edge: <b>{frontEdge === 0 ? "Even" : `${frontEdge > 0 ? teams.team1.name : teams.team2.name} +${Math.abs(frontEdge)}`}</b></span><span>Back 9 edge: <b>{backEdge === 0 ? "Even" : `${backEdge > 0 ? teams.team1.name : teams.team2.name} +${Math.abs(backEdge)}`}</b></span></div> : null}
               {holes.length === 18 ? (
-                <div className={styles.holeDetails}><button type="button" onClick={() => setShowHoleDetails((value) => !value)}>{showHoleDetails ? "Hide hole details" : "View hole-by-hole stroke allocation"}</button>{showHoleDetails ? <div className={styles.holeGrid}>{holes.map((hole, index) => <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokeMaps.team1[index] ? <span>{teams.team1.name} +{strokeMaps.team1[index]}</span> : null}{strokeMaps.team2[index] ? <span>{teams.team2.name} +{strokeMaps.team2[index]}</span> : null}{!strokeMaps.team1[index] && !strokeMaps.team2[index] ? <span>—</span> : null}</b></div>)}</div> : null}</div>
+                <div className={styles.holeDetails}><button type="button" onClick={() => setShowHoleDetails((value) => !value)}>{showHoleDetails ? "Hide hole details" : "View hole-by-hole stroke allocation"}</button>{showHoleDetails ? <div className={styles.holeGrid}>{holes.map((hole, index) => {
+                  const strokesHere = formatCode(format) === "SC"
+                    ? [
+                        { player: { id: "team1", name: teams.team1.name }, strokes: effectiveStrokeMaps?.team1?.[index] || 0 },
+                        { player: { id: "team2", name: teams.team2.name }, strokes: effectiveStrokeMaps?.team2?.[index] || 0 },
+                      ].filter((row) => row.strokes)
+                    : details.map((player, playerIndex) => ({ player, strokes: playerStrokeMaps?.[playerIndex]?.[index] || 0 })).filter((row) => row.strokes);
+                  return <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokesHere.length ? strokesHere.map(({ player, strokes }) => <span key={player.id}>{player.name} +{strokes}</span>) : <span>—</span>}</b></div>;
+                })}</div> : null}</div>
               ) : <p className={styles.noHoles}>Hole details are hidden because this tee does not yet have all 18 Course Holes rows.</p>}
             </div>
           </>

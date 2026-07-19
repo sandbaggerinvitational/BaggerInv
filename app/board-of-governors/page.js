@@ -62,6 +62,7 @@ export default async function BoardOfGovernorsPage() {
                       championships={stats.championships}
                       soyYears={stats.sandbaggerOfYearYears}
                       isGovernor
+                      isRookie={player.rookie}
                       styles={styles}
                     />
                     <b className={player.active ? styles.activeBadge : styles.inactiveBadge}>

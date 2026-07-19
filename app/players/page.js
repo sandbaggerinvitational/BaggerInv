@@ -61,6 +61,7 @@ export default async function PlayersPage() {
                     championships={stats.championships}
                     soyYears={stats.sandbaggerOfYearYears}
                     isGovernor={player.boardOfGovernors}
+                    isRookie={player.rookie}
                     styles={styles}
                   />
 

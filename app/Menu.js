@@ -10,6 +10,7 @@ const menuGroups = [
     links: [
       { label: "Match Center", href: "/live" },
       { label: "War Room", href: "/war-room" },
+      { label: "Lineup Optimizer", href: "/war-room/lineup-optimizer" },
     ],
   },
   {

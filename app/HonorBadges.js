@@ -34,6 +34,15 @@ export function BogShieldIcon({ className = "" }) {
   );
 }
 
+export function RookieBadgeIcon({ className = "" }) {
+  return (
+    <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="28" fill="currentColor" opacity=".18" />
+      <path d="M18 47V17h17c8.5 0 14 4.8 14 12 0 5.2-3 9.2-8 11l10 7H40l-9-6h-3v6H18Zm10-15h7c2.8 0 4.5-1.3 4.5-3.5S37.8 25 35 25h-7v7Z" fill="currentColor" />
+    </svg>
+  );
+}
+
 function sortedYears(years) {
   return [...years].sort((a, b) => Number(a) - Number(b));
 }
@@ -74,9 +83,10 @@ export function CompactHonors({
   championships = [],
   soyYears = [],
   isGovernor = false,
+  isRookie = false,
   styles,
 }) {
-  if (!championships.length && !soyYears.length && !isGovernor) return null;
+  if (!championships.length && !soyYears.length && !isGovernor && !isRookie) return null;
 
   return (
     <div className={styles.playerCardHonorIcons} aria-label="Career honors">
@@ -99,6 +109,12 @@ export function CompactHonors({
           <BogShieldIcon className={styles.playerCardMiniShield} />
         </div>
       ) : null}
+
+      {isRookie ? (
+        <div className={`${styles.playerCardHonorIconItem} ${styles.rookieHonorIconItem || ""}`} title="Rookie">
+          <RookieBadgeIcon className={styles.playerCardMiniIcon} />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -107,9 +123,10 @@ export function CareerHonors({
   championships = [],
   soyYears = [],
   isGovernor = false,
+  isRookie = false,
   styles,
 }) {
-  if (!championships.length && !soyYears.length && !isGovernor) return null;
+  if (!championships.length && !soyYears.length && !isGovernor && !isRookie) return null;
 
   return (
     <section className={styles.honorsSection}>
@@ -147,6 +164,15 @@ export function CareerHonors({
               <BogShieldIcon className={styles.bogHonorIcon} />
             </div>
             <div><span>Board of Governors</span></div>
+          </div>
+        ) : null}
+
+        {isRookie ? (
+          <div className={`${styles.honorCard} ${styles.rookieHonorCard || ""}`}>
+            <div className={styles.honorMedallion}>
+              <RookieBadgeIcon className={styles.honorIcon} />
+            </div>
+            <div><span>Rookie</span></div>
           </div>
         ) : null}
       </div>

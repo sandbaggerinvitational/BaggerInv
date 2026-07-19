@@ -3635,3 +3635,14 @@
     align-self: start;
   }
 }
+
+/* Rookie distinction — same footprint as other player-card honors, distinct color */
+.rookieHonorIconItem {
+  border-color: #5b7f86;
+  background: linear-gradient(145deg, #dff4f3, #70a8aa 58%, #bfe4df);
+  color: #123f43;
+}
+.rookieHonorCard {
+  border-color: #9bc2c0;
+  background: linear-gradient(145deg, #f1fbfa, #e0f2ef);
+}

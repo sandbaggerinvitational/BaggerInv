@@ -39,3 +39,56 @@
 .contributionLegend{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin-top:8px;color:#8fa198;font-size:.64rem;text-transform:uppercase;letter-spacing:.08em}
 .contributionLegend span:last-child{text-align:right}.contributionLegend b{font-weight:500}
 @media(max-width:700px){.factorTable{grid-template-columns:1fr}.driverPanel{padding:16px}.driverHeading,.contributionHeading{display:block}.driverHeading small,.contributionHeading small{display:block;text-align:left;margin-top:4px}.contributionRow{grid-template-columns:1fr 1.5fr}.contributionValue{grid-column:1/-1;display:flex;justify-content:space-between;text-align:left;margin-top:-5px}.contributionLabel small{font-size:.64rem}}
+
+/* v10.4.1 — clearer neutral prediction influence */
+.contributionRow {
+  grid-template-columns: minmax(125px, .8fr) minmax(200px, 1.7fr) minmax(210px, 1fr);
+}
+.contributionLabel small { display: none; }
+.contributionTrack {
+  overflow: visible;
+  background: linear-gradient(90deg, rgba(216,221,217,.18), rgba(216,221,217,.08) 49%, rgba(212,177,95,.08) 51%, rgba(212,177,95,.22));
+}
+.contributionTrack::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: rgba(255,255,255,.35);
+}
+.contributionTrack i {
+  width: 16px !important;
+  height: 16px;
+  top: 50%;
+  margin-left: -8px;
+  transform: translateY(-50%);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #d4b15f;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  z-index: 2;
+}
+.contributionRow[data-side="B"] .contributionTrack i { background: #d8ddd9; }
+.contributionRow[data-side="neutral"] .contributionTrack i { background: #aab5af; }
+.contributionValue strong { font-size: .76rem; line-height: 1.35; }
+
+/* Best Ball is an individual-stroke format. Avoid implying partner totals are added. */
+.teamHandicapCard > small { letter-spacing: .06em; }
+
+@media (max-width: 800px) {
+  .contributionRow { grid-template-columns: 1fr; gap: 8px; }
+  .contributionValue { grid-column: auto; margin-top: 0; display: block; }
+  .contributionTrack { margin: 4px 0; }
+  .playerTable .tableHead span { font-size: .52rem; line-height: 1.1; overflow-wrap: anywhere; }
+}
+
+@media (min-width: 1100px) {
+  .breakdownCard .playerTable { max-width: 980px; margin-left: auto; margin-right: auto; }
+  .breakdownCard .teamHandicapGrid,
+  .breakdownCard .strokeEdgeCard,
+  .breakdownCard .nineEdge,
+  .breakdownCard .holeDetails { max-width: 980px; margin-left: auto; margin-right: auto; }
+}
+.dashboardLink{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin-bottom:20px;padding:14px 18px;border:1px solid #ddd6c8;border-radius:14px;background:#f5f0e6}.dashboardLink span{color:#846625;text-transform:uppercase;letter-spacing:.1em;font-size:.68rem;font-weight:800}.dashboardLink strong{font-size:.9rem}.dashboardLink a{padding:10px 14px;border-radius:10px;background:#0b3529;color:#fff;font-size:.78rem;font-weight:800;text-decoration:none}@media(max-width:700px){.dashboardLink{grid-template-columns:1fr}.dashboardLink a{text-align:center}}
