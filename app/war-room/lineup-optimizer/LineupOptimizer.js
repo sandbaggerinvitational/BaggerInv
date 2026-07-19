@@ -49,7 +49,7 @@ export default function LineupOptimizer({ initialData, loadError }) {
   if (!initialData) return <section className={styles.shell}><div className={styles.error}><h1>Lineup Optimizer</h1><p>{loadError || "Lineup data is unavailable."}</p></div></section>;
 
   return <>
-    <section className={styles.hero}><p>Captain&apos;s Dashboard</p><h1>Lineup Optimizer</h1><span>Test every legal matchup before you make the call.</span></section>
+    <section className={styles.hero}><p>War Room Strategy</p><h1>Lineup Optimizer</h1><span>Test every legal matchup before you make the call.</span></section>
     <section className={styles.shell}>
       <div className={styles.setupCard}>
         <div className={styles.sectionTitle}><span>01</span><div><p>Optimizer Setup</p><h2>Choose the format and tee</h2></div></div>

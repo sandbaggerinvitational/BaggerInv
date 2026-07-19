@@ -4,7 +4,7 @@ import { refreshHistoricalData, getAllPlayerStats, getPartnershipStats, getHeadT
 import { loadPredictionSheets } from "../../lib/prediction-data";
 import WarRoom from "./WarRoom";
 
-export const metadata = { title: "War Room | Sandbagger Invitational" };
+export const metadata = { title: "Matchup Builder | Sandbagger Invitational" };
 
 export default async function WarRoomPage() {
   let data=null, error="";

@@ -206,7 +206,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   return (
     <>
       <section className={styles.hero}>
-        <p>Captain&apos;s Analytics</p><h1>War Room</h1><span>Build a matchup. See the strokes. Make the call.</span>
+        <p>War Room Analytics</p><h1>Matchup Builder</h1><span>Build a matchup. See the strokes. Make the call.</span>
       </section>
       <section className={styles.shell}>
         {loadError ? <div className={styles.notice}>{loadError}</div> : null}

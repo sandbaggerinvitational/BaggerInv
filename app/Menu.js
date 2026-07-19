@@ -7,10 +7,14 @@ import { usePathname } from "next/navigation";
 const menuGroups = [
   {
     label: "Live",
+    links: [{ label: "Match Center", href: "/live" }],
+  },
+  {
+    label: "War Room",
     links: [
-      { label: "Match Center", href: "/live" },
-      { label: "War Room", href: "/war-room" },
+      { label: "Matchup Builder", href: "/war-room" },
       { label: "Lineup Optimizer", href: "/war-room/lineup-optimizer" },
+      { label: "Match Simulator", href: "/war-room/simulator" },
     ],
   },
   {
@@ -38,6 +42,7 @@ const menuGroups = [
 
 function isActive(pathname, href) {
   if (href === "/") return pathname === "/";
+  if (href === "/war-room") return pathname === href;
   if (href.includes("#")) return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }

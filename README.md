@@ -1,4 +1,4 @@
-# Sandbagger Invitational — v11.0.2
+# Sandbagger Invitational — v11.1.0
 
 War Room Evolution turns the matchup builder into a complete captain's decision desk.
 
@@ -8,6 +8,10 @@ War Room Evolution turns the matchup builder into a complete captain's decision 
 - Scannable matchup-driver strength bars
 - Selected-matchup decision desk with confidence and Team Vibes
 - Tournament Experience calculated from recorded appearances
+- Seeded 10,000-run Match Simulator with format-aware segment results
+- Best Ball and Scramble expected points and three-point scorelines
+- Singles match-play finishing margins
+- War Room navigation for Matchup Builder, Lineup Optimizer, and Match Simulator
 - SBI Match Analyst voice for official scouting briefings
 - Strategy-inspired rookie rook badge and trading-card player directory
 - Hardened briefing API, corrected asset paths, duplicate-route cleanup, and tests

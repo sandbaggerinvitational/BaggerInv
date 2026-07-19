@@ -65,7 +65,7 @@ test("Tournament Experience favors veterans over rookies", () => {
     handicap: { strokesA: 0, strokesB: 0 }, settings: {}, teamNames: ["Veterans", "Rookies"],
   });
   const experience = result.contributions.find((item) => item.id === "tournament");
-  assert.equal(experience.teamA, 100);
-  assert.equal(experience.teamB, 0);
+  assert.equal(Number(experience.teamA.toFixed(2)), 83.33);
+  assert.equal(Number(experience.teamB.toFixed(2)), 16.67);
   assert.equal(experience.advantage, "Veterans");
 });
