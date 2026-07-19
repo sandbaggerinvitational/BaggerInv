@@ -112,7 +112,10 @@ export function CompactHonors({
 
       {isRookie ? (
         <div className={`${styles.playerCardHonorIconItem} ${styles.rookieHonorIconItem || ""}`} title="Rookie">
-          <RookieBadgeIcon className={styles.playerCardMiniIcon} />
+          <span className={styles.rookieLabel}>
+            <i aria-hidden="true">♜</i>
+            Rookie
+          </span>
         </div>
       ) : null}
     </div>
