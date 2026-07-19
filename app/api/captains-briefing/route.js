@@ -1,10 +1,12 @@
 import OpenAI from "openai";
+import { clientAddress, consumeRateLimit } from "../../../lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 const MAX_BODY_BYTES = 40_000;
+const MAX_NAME_LENGTH = 100;
 
 function safeError(error) {
   const status = Number(error?.status) || 500;
@@ -13,7 +15,7 @@ function safeError(error) {
   if (status === 404) return "The configured OpenAI model is unavailable. Remove OPENAI_MODEL or set it to gpt-5-mini.";
   if (status === 429) return "The OpenAI project is rate-limited or out of API credits. Check usage and billing, then try again.";
   if (status >= 500) return "OpenAI is temporarily unavailable. Try the briefing again in a moment.";
-  return error?.message || "The AI briefing could not be generated right now.";
+  return "The AI briefing could not be generated right now.";
 }
 
 function validatePayload(data) {
@@ -21,11 +23,29 @@ function validatePayload(data) {
   if (!data.selectedMatchup?.probabilities) return "The matchup probabilities are missing.";
   if (!Array.isArray(data.teams) || data.teams.length !== 2) return "Both team names are required.";
   if (!Array.isArray(data.selectedMatchup?.players) || data.selectedMatchup.players.length < 2) return "The selected players are missing.";
+  if (data.selectedMatchup.players.length > 4) return "Too many selected players were provided.";
+  if (![...data.teams, ...data.selectedMatchup.players.map((player) => player?.name)].every(
+    (value) => typeof value === "string" && value.trim() && value.length <= MAX_NAME_LENGTH
+  )) return "Team and player names must be valid.";
+  const probabilities = data.selectedMatchup.probabilities;
+  const values = [probabilities.team1, probabilities.halve, probabilities.team2];
+  if (!values.every((value) => Number.isFinite(value) && value >= 0 && value <= 100)) return "The matchup probabilities are invalid.";
+  if (Math.abs(values.reduce((sum, value) => sum + value, 0) - 100) > 0.01) return "The matchup probabilities must total 100.";
   return "";
 }
 
 export async function POST(request) {
   const requestId = crypto.randomUUID().slice(0, 8);
+  const rateLimit = consumeRateLimit(clientAddress(request));
+  if (!rateLimit.allowed) {
+    return Response.json(
+      { error: "Too many briefing requests. Please wait a minute and try again.", requestId },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.max(1, Math.ceil((rateLimit.resetAt - Date.now()) / 1000))) },
+      }
+    );
+  }
   if (!process.env.OPENAI_API_KEY) {
     return Response.json(
       { error: "AI briefing is not configured. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.", requestId },
@@ -38,7 +58,12 @@ export async function POST(request) {
     if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) {
       return Response.json({ error: "The matchup briefing request was too large.", requestId }, { status: 413 });
     }
-    const data = JSON.parse(raw);
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return Response.json({ error: "The request body must contain valid JSON.", requestId }, { status: 400 });
+    }
     const validationError = validatePayload(data);
     if (validationError) return Response.json({ error: validationError, requestId }, { status: 400 });
 

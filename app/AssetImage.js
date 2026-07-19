@@ -10,11 +10,11 @@ function inferredFallback(src) {
     return defaultAssets.player;
   }
 
-  if (value.includes("/images/teams/logo/")) {
+  if (value.includes("/images/teams/logos/")) {
     return defaultAssets.teamLogo;
   }
 
-  if (value.includes("/images/courses/logo/")) {
+  if (value.includes("/images/courses/logos/")) {
     return defaultAssets.courseLogo;
   }
 
