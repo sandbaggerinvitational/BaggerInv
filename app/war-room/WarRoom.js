@@ -1,6 +1,5 @@
 "use client";
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import styles from "./war-room.module.css";
 import {
   allocateStrokes,
@@ -20,7 +19,6 @@ import {
   scorecardForTee,
 } from "../../lib/tournament-context";
 import { briefingPayload, buildFallbackBriefing } from "../../lib/captains-briefing";
-import { distinctAlternative, optimizeLineups } from "../../lib/lineup-optimizer";
 import { teamVibesTier } from "../../lib/prediction-engine";
 
 const clean = (value) => String(value ?? "").trim();
@@ -99,20 +97,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const prediction = ready
     ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name] })
     : null;
-  const optimizer = useMemo(() => {
-    if (!ready) return null;
-    return optimizeLineups({
-      format,
-      team1: teams.team1,
-      team2: teams.team2,
-      scorecard: scorecardValues,
-      historical,
-      partnerships,
-      headToHead,
-      settings,
-      limit: 50,
-    });
-  }, [ready, format, teams, scorecardValues.rating, scorecardValues.slope, scorecardValues.par, historical, partnerships, headToHead, sheets.settings]);
   const playerStrokeMaps = play && holes.length === 18 && formatCode(format) !== "SC"
     ? play.playerStrokes.map((strokes) => allocateStrokes(strokes, holes))
     : null;
@@ -126,7 +110,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
     : null;
 
   const fallbackBriefing = ready
-    ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer })
+    ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer: null })
     : "";
 
   const validation = [];
@@ -170,10 +154,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const frontEdge = frontA - frontB;
   const backEdge = backA - backB;
   const playingLabel = formatCode(format) === "SC" ? "Team Playing HCP" : formatCode(format) === "BB" ? "Best Ball Effective HCP" : "Playing HCP";
-  const favoredSide = prediction?.teamA >= prediction?.teamB ? "A" : "B";
-  const recommendedLineups = favoredSide === "A" ? optimizer?.team1Best : optimizer?.team2Best;
-  const bestLineup = recommendedLineups?.[0];
-  const alternativeLineup = distinctAlternative(recommendedLineups, favoredSide);
   const driverRows = prediction?.contributions
     .filter((item) => formatCode(format) !== "SI" || item.id !== "team")
     .map((item) => {
@@ -203,7 +183,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
           courseName: pick(course, "Course Name", "Course") || courseId,
           tee,
           players: details,
-          optimizer,
+          optimizer: null,
         })),
       });
       const result = await response.json().catch(() => ({}));
@@ -231,8 +211,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
       <section className={styles.shell}>
         {loadError ? <div className={styles.notice}>{loadError}</div> : null}
         {validation.length ? <div className={styles.notice}>{validation.map((message) => <div key={message}>{message}</div>)}</div> : null}
-        <div className={styles.dashboardLink}><span>War Room Tools</span><strong>Want the full field view?</strong><Link href="/war-room/lineup-optimizer">Open Lineup Optimizer</Link></div>
-
         <div className={styles.setupCard}>
           <div className={styles.sectionTitle}><span>01</span><div><p>Matchup Builder</p><h2>Choose the battlefield</h2></div></div>
           <div className={styles.controlsThree}>
@@ -259,7 +237,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
           <>
             <div className={styles.dashboardHeader}>
               <span>02</span>
-              <div><p>Captain Dashboard</p><h2>The decision desk</h2></div>
+              <div><p>Selected Matchup</p><h2>Matchup analysis</h2></div>
               <small>{formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles"} · {tee}</small>
             </div>
             <div className={styles.predictionCard}>
@@ -287,11 +265,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               ].map(({ key, name, vibes }) => { const tier = teamVibesTier(vibes); return <div className={styles.vibesCard} key={key} data-known={vibes.known}>
                 <span>{name} · Team Vibes</span><strong>{vibes.known ? Math.round(vibes.score) : "—"}</strong><b>{tier.icon} {tier.label}</b><small>{vibes.known ? `${vibes.sameFormatMatches} same-format · ${vibes.matches} overall matches` : "No recorded pairing history yet"}</small>
               </div>; })}
-            </div>
-
-            <div className={styles.lineupGrid}>
-              <div className={styles.lineupCall}><span>Best Lineup</span>{bestLineup ? <><strong>{favoredSide === "A" ? bestLineup.team1Label : bestLineup.team2Label}</strong><small>Projects at {favoredSide === "A" ? bestLineup.prediction.teamA : bestLineup.prediction.teamB}% for {favoredSide === "A" ? teams.team1.name : teams.team2.name}</small></> : <strong>No lineup available</strong>}</div>
-              <div className={styles.lineupCall}><span>Alternative Lineup</span>{alternativeLineup ? <><strong>{favoredSide === "A" ? alternativeLineup.team1Label : alternativeLineup.team2Label}</strong><small>Uses a completely different pairing and projects at {favoredSide === "A" ? alternativeLineup.prediction.teamA : alternativeLineup.prediction.teamB}% for {favoredSide === "A" ? teams.team1.name : teams.team2.name}</small></> : <><strong>No separate pairing available</strong><small>The current roster cannot produce another lineup without reusing a player from the best lineup.</small></>}</div>
             </div>
 
             <div className={styles.briefingCard}>

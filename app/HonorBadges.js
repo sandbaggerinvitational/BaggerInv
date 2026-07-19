@@ -126,10 +126,9 @@ export function CareerHonors({
   championships = [],
   soyYears = [],
   isGovernor = false,
-  isRookie = false,
   styles,
 }) {
-  if (!championships.length && !soyYears.length && !isGovernor && !isRookie) return null;
+  if (!championships.length && !soyYears.length && !isGovernor) return null;
 
   return (
     <section className={styles.honorsSection}>
@@ -170,14 +169,6 @@ export function CareerHonors({
           </div>
         ) : null}
 
-        {isRookie ? (
-          <div className={`${styles.honorCard} ${styles.rookieHonorCard || ""}`}>
-            <div className={styles.honorMedallion}>
-              <RookieBadgeIcon className={styles.honorIcon} />
-            </div>
-            <div><span>Rookie</span></div>
-          </div>
-        ) : null}
       </div>
     </section>
   );

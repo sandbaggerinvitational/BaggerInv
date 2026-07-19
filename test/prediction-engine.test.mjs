@@ -53,3 +53,19 @@ test("Team Vibes marks pairs without history as unknown", () => {
   assert.equal(vibes.known, false);
   assert.deepEqual(teamVibesTier(vibes), { label: "Unknown", icon: "🤔" });
 });
+
+test("Tournament Experience favors veterans over rookies", () => {
+  const players = [{ id: "veteran" }, { id: "rookie" }];
+  const historical = {
+    veteran: { records: { overall: { matches: 0 } }, appearances: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025] },
+    rookie: { records: { overall: { matches: 0 } }, appearances: [] },
+  };
+  const result = predict({
+    format: "Singles", players, historical, partnership: {}, headToHead: {},
+    handicap: { strokesA: 0, strokesB: 0 }, settings: {}, teamNames: ["Veterans", "Rookies"],
+  });
+  const experience = result.contributions.find((item) => item.id === "tournament");
+  assert.equal(experience.teamA, 100);
+  assert.equal(experience.teamB, 0);
+  assert.equal(experience.advantage, "Veterans");
+});
