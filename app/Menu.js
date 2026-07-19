@@ -2,22 +2,48 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-const menuLinks = [
-  { label: "Home", href: "/" },
-  { label: "Match Center", href: "/live" },
-  { label: "Players", href: "/players" },
-  { label: "Compare Players", href: "/compare" },
-  { label: "War Room", href: "/war-room" },
-  { label: "Data Health", href: "/data-health" },
-  { label: "Sandbagger Ratings", href: "/ratings" },
-  { label: "Records", href: "/records" },
-  { label: "History", href: "/history" },
-  { label: "The Cup", href: "/#cup" },
+const menuGroups = [
+  {
+    label: "Live",
+    links: [
+      { label: "Match Center", href: "/live" },
+      { label: "War Room", href: "/war-room" },
+    ],
+  },
+  {
+    label: "Players",
+    links: [
+      { label: "Player Directory", href: "/players" },
+      { label: "Compare Players", href: "/compare" },
+      { label: "Board of Governors", href: "/board-of-governors" },
+      { label: "Sandbagger Ratings", href: "/ratings" },
+      { label: "Records", href: "/records" },
+    ],
+  },
+  {
+    label: "Tournament",
+    links: [
+      { label: "History", href: "/history" },
+      { label: "The Cup", href: "/#cup" },
+    ],
+  },
+  {
+    label: "Admin",
+    links: [{ label: "Data Health", href: "/data-health" }],
+  },
 ];
+
+function isActive(pathname, href) {
+  if (href === "/") return pathname === "/";
+  if (href.includes("#")) return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -25,6 +51,8 @@ export default function Menu() {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  useEffect(() => setIsOpen(false), [pathname]);
 
   return (
     <>
@@ -51,7 +79,6 @@ export default function Menu() {
             <strong>Sandbagger Invitational</strong>
             <span>Established 2016</span>
           </div>
-
           <button
             className="closeMenuButton"
             type="button"
@@ -62,20 +89,36 @@ export default function Menu() {
           </button>
         </div>
 
-        <nav className="sideNav">
-          {menuLinks.map((link) => (
+        <div className="sideMenuScroll">
+          <nav className="sideNav" aria-label="Site navigation">
             <Link
-              key={link.href}
-              href={link.href}
+              className={`sideNavHome ${isActive(pathname, "/") ? "current" : ""}`}
+              href="/"
               onClick={() => setIsOpen(false)}
             >
-              {link.label}
+              Home
             </Link>
-          ))}
-        </nav>
 
-        <div className="sideMenuFooter">
-          24 players · Two teams · One trophy
+            {menuGroups.map((group) => (
+              <section className="sideNavGroup" key={group.label}>
+                <h2>{group.label}</h2>
+                <div>
+                  {group.links.map((link) => (
+                    <Link
+                      className={isActive(pathname, link.href) ? "current" : ""}
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </nav>
+
+          <div className="sideMenuFooter">24 players · Two teams · One trophy</div>
         </div>
       </aside>
     </>
