@@ -8,6 +8,7 @@ import { playerPhoto } from "../../lib/asset-paths";
 import {
   refreshHistoricalData,
   formatHandicap,
+  formatPercentage,
   formatRecord,
   getAllPlayerStats,
 } from "../../lib/stats";
@@ -72,7 +73,8 @@ export default async function BoardOfGovernorsPage() {
                 </div>
 
                 <div className={styles.statStrip}>
-                  <div><span>Record</span><strong>{formatRecord(stats.records.overall)}</strong></div>
+                  <div><span>Career</span><strong>{formatRecord(stats.records.overall)}</strong></div>
+                  <div><span>Win %</span><strong>{formatPercentage(stats.percentages.overall)}</strong></div>
                   <div><span>Avg. Handicap</span><strong>{formatHandicap(stats.averageHandicap)}</strong></div>
                   <div><span>Appearances</span><strong>{stats.appearances.length}</strong></div>
                 </div>

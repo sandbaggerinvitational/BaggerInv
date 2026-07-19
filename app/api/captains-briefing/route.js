@@ -3,19 +3,21 @@ import { clientAddress, consumeRateLimit } from "../../../lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const MAX_BODY_BYTES = 40_000;
 const MAX_NAME_LENGTH = 100;
 
 function safeError(error) {
   const status = Number(error?.status) || 500;
+  const code = String(error?.code || "").toLowerCase();
+  if (code.includes("timeout") || code === "etimedout" || code === "econnreset") return "The SBI Match Analyst took too long to respond. Please try once more.";
   if (status === 401) return "The OpenAI API key was rejected. Replace OPENAI_API_KEY in Vercel and redeploy.";
   if (status === 403) return "This OpenAI project is not allowed to use the configured model.";
   if (status === 404) return "The configured OpenAI model is unavailable. Remove OPENAI_MODEL or set it to gpt-5-mini.";
   if (status === 429) return "The OpenAI project is rate-limited or out of API credits. Check usage and billing, then try again.";
   if (status >= 500) return "OpenAI is temporarily unavailable. Try the briefing again in a moment.";
-  return "The AI briefing could not be generated right now.";
+  return "The SBI Match Analyst could not generate a briefing right now.";
 }
 
 function validatePayload(data) {
@@ -48,7 +50,7 @@ export async function POST(request) {
   }
   if (!process.env.OPENAI_API_KEY) {
     return Response.json(
-      { error: "AI briefing is not configured. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.", requestId },
+      { error: "The SBI Match Analyst is not configured. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.", requestId },
       { status: 503 }
     );
   }
@@ -67,12 +69,13 @@ export async function POST(request) {
     const validationError = validatePayload(data);
     if (validationError) return Response.json({ error: validationError, requestId }, { status: 400 });
 
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 25_000, maxRetries: 1 });
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 50_000, maxRetries: 0 });
     const model = process.env.OPENAI_MODEL || "gpt-5-mini";
     const response = await client.responses.create({
       model,
       store: false,
-      max_output_tokens: 500,
+      ...(model.startsWith("gpt-5") ? { reasoning: { effort: "low" } } : {}),
+      max_output_tokens: 600,
       instructions: [
         "You are the SBI Match Analyst, the official analytics-desk voice of the Sandbagger Invitational.",
         "Use only the supplied deterministic analytics. Never invent records, scores, players, or percentages.",

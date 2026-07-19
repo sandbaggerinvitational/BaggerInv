@@ -240,6 +240,10 @@
   text-align: right;
 }
 
+.players > div:last-child .playerList {
+  align-items: flex-end;
+}
+
 .players span {
   display: block;
   color: #6d746f;
@@ -473,8 +477,12 @@
     text-align: left;
   }
 
-  .players b {
+  .players > b {
     display: none;
+  }
+
+  .players > div:last-child .playerList {
+    align-items: flex-start;
   }
 
   .playerList {

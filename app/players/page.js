@@ -88,17 +88,10 @@ export default async function PlayersPage() {
                   <strong>{formatPercentage(stats.percentages.overall)}</strong>
                 </div>
                 <div>
-                  <span>Titles</span>
-                  <strong>{stats.championships.length}</strong>
+                  <span>Avg. Handicap</span>
+                  <strong>{formatHandicap(stats.averageHandicap)}</strong>
                 </div>
-                <div>
-                  <span>Appearances</span>
-                  <strong>{stats.appearances.length}</strong>
-                </div>
-                <div>
-                  <span>Current HCP</span>
-                  <strong>{formatHandicap(stats.seasons[0]?.handicap)}</strong>
-                </div>
+                <div><span>Appearances</span><strong>{stats.appearances.length}</strong></div>
               </div>
 
               <div className={styles.rivalLine}>

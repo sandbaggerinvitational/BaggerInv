@@ -20,7 +20,7 @@ import {
   scorecardForTee,
 } from "../../lib/tournament-context";
 import { briefingPayload, buildFallbackBriefing } from "../../lib/captains-briefing";
-import { optimizeLineups } from "../../lib/lineup-optimizer";
+import { distinctAlternative, optimizeLineups } from "../../lib/lineup-optimizer";
 import { teamVibesTier } from "../../lib/prediction-engine";
 
 const clean = (value) => String(value ?? "").trim();
@@ -32,6 +32,18 @@ const number = (value, fallback = 0) => {
   const parsed = Number.parseFloat(normalized);
   return Number.isFinite(parsed) ? parsed : fallback;
 };
+
+function compactPlayerName(name) {
+  const parts = clean(name).split(/\s+/).filter(Boolean);
+  if (parts.length < 2) return parts[0] || "Player";
+  return `${parts[0][0]}. ${parts.slice(1).join(" ")}`;
+}
+
+function BriefingParagraph({ paragraph }) {
+  const match = paragraph.match(/^([A-Z][A-Z '\-]+):\s*(.*)$/s);
+  if (!match) return <p>{paragraph}</p>;
+  return <div className={styles.briefingSection}><strong>{match[1]}</strong><p>{match[2]}</p></div>;
+}
 
 export default function WarRoom({ initialData, loadError, aiConfigured = false }) {
   const sheets = initialData?.sheets || {};
@@ -98,7 +110,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
       partnerships,
       headToHead,
       settings,
-      limit: 3,
+      limit: 50,
     });
   }, [ready, format, teams, scorecardValues.rating, scorecardValues.slope, scorecardValues.par, historical, partnerships, headToHead, sheets.settings]);
   const playerStrokeMaps = play && holes.length === 18 && formatCode(format) !== "SC"
@@ -161,11 +173,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const favoredSide = prediction?.teamA >= prediction?.teamB ? "A" : "B";
   const recommendedLineups = favoredSide === "A" ? optimizer?.team1Best : optimizer?.team2Best;
   const bestLineup = recommendedLineups?.[0];
-  const alternativeLineup = recommendedLineups?.[1] || optimizer?.closest?.[0];
-  const riskScore = prediction
-    ? Math.max(0, Math.min(100, Math.round(100 - Math.abs(prediction.teamA - prediction.teamB) * 2 + prediction.tie + (prediction.confidence === "Low" ? 10 : 0))))
-    : 0;
-  const riskLabel = riskScore >= 75 ? "High volatility" : riskScore >= 50 ? "Competitive" : "Controlled";
+  const alternativeLineup = distinctAlternative(recommendedLineups, favoredSide);
   const driverRows = prediction?.contributions
     .filter((item) => formatCode(format) !== "SI" || item.id !== "team")
     .map((item) => {
@@ -279,19 +287,16 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               ].map(({ key, name, vibes }) => { const tier = teamVibesTier(vibes); return <div className={styles.vibesCard} key={key} data-known={vibes.known}>
                 <span>{name} · Team Vibes</span><strong>{vibes.known ? Math.round(vibes.score) : "—"}</strong><b>{tier.icon} {tier.label}</b><small>{vibes.known ? `${vibes.sameFormatMatches} same-format · ${vibes.matches} overall matches` : "No recorded pairing history yet"}</small>
               </div>; })}
-              <div className={styles.riskCard}>
-                <span>Risk Meter</span><strong>{riskScore}</strong><b>{riskLabel}</b><div><i style={{ width: `${riskScore}%` }} /></div><small>Based on margin, halve chance, and confidence.</small>
-              </div>
             </div>
 
             <div className={styles.lineupGrid}>
               <div className={styles.lineupCall}><span>Best Lineup</span>{bestLineup ? <><strong>{favoredSide === "A" ? bestLineup.team1Label : bestLineup.team2Label}</strong><small>Projects at {favoredSide === "A" ? bestLineup.prediction.teamA : bestLineup.prediction.teamB}% for {favoredSide === "A" ? teams.team1.name : teams.team2.name}</small></> : <strong>No lineup available</strong>}</div>
-              <div className={styles.lineupCall}><span>Alternative Lineup</span>{alternativeLineup ? <><strong>{favoredSide === "A" ? alternativeLineup.team1Label : alternativeLineup.team2Label}</strong><small>Projects at {favoredSide === "A" ? alternativeLineup.prediction.teamA : alternativeLineup.prediction.teamB}% for {favoredSide === "A" ? teams.team1.name : teams.team2.name}</small></> : <strong>No alternative available</strong>}</div>
+              <div className={styles.lineupCall}><span>Alternative Lineup</span>{alternativeLineup ? <><strong>{favoredSide === "A" ? alternativeLineup.team1Label : alternativeLineup.team2Label}</strong><small>Uses a completely different pairing and projects at {favoredSide === "A" ? alternativeLineup.prediction.teamA : alternativeLineup.prediction.teamB}% for {favoredSide === "A" ? teams.team1.name : teams.team2.name}</small></> : <><strong>No separate pairing available</strong><small>The current roster cannot produce another lineup without reusing a player from the best lineup.</small></>}</div>
             </div>
 
             <div className={styles.briefingCard}>
               <div className={styles.sectionTitle}><span>SBI</span><div><p>SBI Match Analyst</p><h2>The official scouting report</h2></div></div>
-              <div className={styles.briefingText}>{String(aiBriefing || fallbackBriefing).split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
+              <div className={styles.briefingText}>{String(aiBriefing || fallbackBriefing).split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <BriefingParagraph paragraph={paragraph} key={index} />)}</div>
               <div className={styles.aiActions}>
                 <button type="button" onClick={generateAiBriefing} disabled={aiLoading || !aiConfigured}>{aiLoading ? "Analyzing matchup…" : !aiConfigured ? "Analyst setup required" : aiBriefing ? "Refresh analyst briefing" : "Generate analyst briefing"}</button>
                 <small>{aiConfigured ? "Official SBI analysis built from the deterministic matchup numbers above." : "Add OPENAI_API_KEY in Vercel Production Environment Variables and redeploy to enable the SBI Match Analyst."}</small>
@@ -331,7 +336,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
                         { player: { id: "team2", name: teams.team2.name }, strokes: effectiveStrokeMaps?.team2?.[index] || 0 },
                       ].filter((row) => row.strokes)
                     : details.map((player, playerIndex) => ({ player, strokes: playerStrokeMaps?.[playerIndex]?.[index] || 0 })).filter((row) => row.strokes);
-                  return <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokesHere.length ? strokesHere.map(({ player, strokes }) => <span key={player.id}>{player.name} +{strokes}</span>) : <span>—</span>}</b></div>;
+                  return <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokesHere.length ? strokesHere.map(({ player }) => <span key={player.id}>{formatCode(format) === "SC" ? player.name : compactPlayerName(player.name)}</span>) : <span>—</span>}</b></div>;
                 })}</div> : null}</div>
               ) : <p className={styles.noHoles}>Hole details are hidden because this tee does not yet have all 18 Course Holes rows.</p>}
             </div>
