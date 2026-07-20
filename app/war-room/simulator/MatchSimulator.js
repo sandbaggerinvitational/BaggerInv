@@ -124,7 +124,7 @@ export default function MatchSimulator({ initialData, loadError, initialSelectio
         <div className={styles.sectionTitle}><span>01</span><div><p>Simulation Setup</p><h2>Build the matchup</h2></div></div>
         <div className={styles.controlsThree}>
           <label>Format<select value={format} onChange={(event) => { setFormat(event.target.value); setSelected([]); setTeeOverride(""); resetSimulation(); }}><option value="BB">Best Ball</option><option value="SC">Scramble</option><option value="SI">Singles</option></select></label>
-          <label>Course<div className={styles.readOnly}>{pick(course, "Course Name", "Course") || "No course assigned"}</div></label>
+          <label>Course<input value={pick(course, "Course Name", "Course") || pick(course, "Course ID") || "Not assigned"} readOnly /></label>
           <label>Tee<select value={tee} onChange={(event) => { setTeeOverride(event.target.value); resetSimulation(); }} disabled={!tees.length}>{tees.map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
         </div>
         <div className={styles.matchupGrid}>{[teams.team1, teams.team2].map((team, side) => <div className={styles.teamPanel} key={team.side}>
