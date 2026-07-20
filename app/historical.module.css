@@ -3668,3 +3668,104 @@
 /* Points Champion badge and balanced card layout */
 .playerCard{display:flex;flex-direction:column;height:100%}.playerCard .statStrip{margin-top:auto}.playerCardIdentity{display:flex;flex-direction:column;align-items:flex-start;min-width:0}.playerCardIdentity h2{width:100%}.playerCardHonorIcons{width:100%;min-height:38px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.playerCardIdentity .activeBadge,.playerCardIdentity .inactiveBadge{margin-top:10px;align-self:flex-start}.playerCardHonorIconItem.pointsChampionHonorIconItem{border-color:#d0a347;background:linear-gradient(145deg,#f9e8ae,#bd8e2d 55%,#f3cf72)}.honorsGrid{grid-auto-rows:1fr}.honorCard{height:100%}
 @media(max-width:650px){.playerCardHonorIcons{min-height:36px;gap:6px}.playerCard{height:100%}}
+
+/* Player-card identity layout — status belongs to the avatar, honors belong to the name. */
+.playerTop {
+  grid-template-columns: 72px minmax(0, 1fr);
+  min-height: 104px;
+  align-items: start;
+}
+
+.playerCardAvatarColumn {
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.playerCardAvatarColumn .activeBadge,
+.playerCardAvatarColumn .inactiveBadge {
+  max-width: 72px;
+  padding: 5px 7px;
+  font-size: .5rem;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.playerCardIdentity {
+  min-height: 100px;
+}
+
+.playerCardIdentity h2 {
+  min-height: 2.36em;
+}
+
+.playerCardHonorIcons {
+  min-height: 44px;
+}
+
+.playerCardHonorIconItem.rookieHonorIconItem {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  border-radius: 50%;
+  border-width: 1px;
+  background: linear-gradient(145deg,#edf4ff,#a9c2e4 58%,#d8e6f8);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.65),0 4px 9px rgba(32,72,122,.12);
+}
+
+.playerCardHonorIconItem.rookieHonorIconItem .playerCardMiniIcon {
+  width: 20px;
+  height: 20px;
+  margin-top: -1px;
+  color: #173b6d;
+}
+
+.achievementBadgeLabel {
+  color: #173b6d;
+  font-size: .36rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+.playerCardHonorIconItem .achievementBadgeCount {
+  position: absolute;
+}
+
+@media (max-width: 650px) {
+  .playerTop {
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .playerCardAvatarColumn {
+    width: 68px;
+  }
+
+  .playerCardIdentity h2 {
+    min-height: 2.36em;
+  }
+
+  .playerCardHonorIconItem.rookieHonorIconItem {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+  }
+
+  .playerCardHonorIconItem.rookieHonorIconItem .playerCardMiniIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .achievementBadgeLabel {
+    font-size: .33rem;
+  }
+}

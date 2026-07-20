@@ -43,17 +43,22 @@ export default async function PlayersPage() {
               key={player["Player ID"]}
             >
               <div className={styles.playerTop}>
-                <AssetImage
-                  src={playerPhoto(player["Photo Filename"])}
-                  alt={player["Display Name"]}
-                  className={styles.playerCardPhoto}
-                  fallbackClassName={styles.playerCardPhotoFallback}
-                  fallback={player["Display Name"]
-                    .split(" ")
-                    .map((part) => part[0])
-                    .slice(0, 2)
-                    .join("")}
-                />
+                <div className={styles.playerCardAvatarColumn}>
+                  <AssetImage
+                    src={playerPhoto(player["Photo Filename"])}
+                    alt={player["Display Name"]}
+                    className={styles.playerCardPhoto}
+                    fallbackClassName={styles.playerCardPhotoFallback}
+                    fallback={player["Display Name"]
+                      .split(" ")
+                      .map((part) => part[0])
+                      .slice(0, 2)
+                      .join("")}
+                  />
+                  <b className={player.active ? styles.activeBadge : styles.inactiveBadge}>
+                    {player.active ? "Active" : "Alumni"}
+                  </b>
+                </div>
 
                 <div className={styles.playerCardIdentity}>
                   <h2>{player["Display Name"]}</h2>
@@ -67,15 +72,6 @@ export default async function PlayersPage() {
                     styles={styles}
                   />
 
-                  <b
-                    className={
-                      player.active
-                        ? styles.activeBadge
-                        : styles.inactiveBadge
-                    }
-                  >
-                    {player.active ? "Active" : "Alumni"}
-                  </b>
                 </div>
               </div>
 

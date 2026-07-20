@@ -53,6 +53,34 @@ export function RookieBadgeIcon({ className = "" }) {
   );
 }
 
+export function AchievementBadge({
+  icon,
+  label,
+  count = 0,
+  variant = "default",
+  styles,
+  showLabel = false,
+}) {
+  const variantClass =
+    variant === "rookie"
+      ? styles.rookieHonorIconItem || ""
+      : variant === "pointsChampion"
+        ? styles.pointsChampionHonorIconItem || ""
+        : "";
+
+  return (
+    <div
+      className={`${styles.playerCardHonorIconItem} ${variantClass}`}
+      title={label}
+      aria-label={label}
+    >
+      {icon}
+      {showLabel ? <small className={styles.achievementBadgeLabel}>{label}</small> : null}
+      {count > 1 ? <span className={styles.achievementBadgeCount}>{count}×</span> : null}
+    </div>
+  );
+}
+
 function sortedYears(years) {
   return [...years].sort((a, b) => Number(a) - Number(b));
 }
@@ -102,39 +130,49 @@ export function CompactHonors({
   return (
     <div className={styles.playerCardHonorIcons} aria-label="Career honors">
       {championships.length ? (
-        <div className={styles.playerCardHonorIconItem} title={`${championships.length}× Champion`}>
-          <TrophyIcon className={styles.playerCardMiniIcon} />
-          <span>{championships.length}×</span>
-        </div>
+        <AchievementBadge
+          icon={<TrophyIcon className={styles.playerCardMiniIcon} />}
+          label={`${championships.length}× Champion`}
+          count={championships.length}
+          styles={styles}
+        />
       ) : null}
 
       {soyYears.length ? (
-        <div className={styles.playerCardHonorIconItem} title="Sandbagger of the Year">
-          <StarIcon className={styles.playerCardMiniIcon} />
-          {soyYears.length > 1 ? <span>{soyYears.length}×</span> : null}
-        </div>
+        <AchievementBadge
+          icon={<StarIcon className={styles.playerCardMiniIcon} />}
+          label="Sandbagger of the Year"
+          count={soyYears.length}
+          styles={styles}
+        />
       ) : null}
 
       {pointsChampionYears.length ? (
-        <div className={`${styles.playerCardHonorIconItem} ${styles.pointsChampionHonorIconItem || ""}`} title={`Points Champion — ${pointsChampionYears.join(", ")}`}>
-          <PointsChampionIcon className={styles.playerCardMiniIcon} />
-          {pointsChampionYears.length > 1 ? <span>{pointsChampionYears.length}×</span> : null}
-        </div>
+        <AchievementBadge
+          icon={<PointsChampionIcon className={styles.playerCardMiniIcon} />}
+          label={`Points Champion — ${pointsChampionYears.join(", ")}`}
+          count={pointsChampionYears.length}
+          variant="pointsChampion"
+          styles={styles}
+        />
       ) : null}
 
       {isGovernor ? (
-        <div className={styles.playerCardHonorIconItem} title="Board of Governors">
-          <BogShieldIcon className={styles.playerCardMiniShield} />
-        </div>
+        <AchievementBadge
+          icon={<BogShieldIcon className={styles.playerCardMiniShield} />}
+          label="Board of Governors"
+          styles={styles}
+        />
       ) : null}
 
       {isRookie ? (
-        <div className={`${styles.playerCardHonorIconItem} ${styles.rookieHonorIconItem || ""}`} title="Rookie">
-          <span className={styles.rookieLabel}>
-            <i aria-hidden="true">♜</i>
-            Rookie
-          </span>
-        </div>
+        <AchievementBadge
+          icon={<RookieBadgeIcon className={styles.playerCardMiniIcon} />}
+          label="Rookie"
+          variant="rookie"
+          showLabel
+          styles={styles}
+        />
       ) : null}
     </div>
   );
