@@ -1,2 +1,3 @@
-import test from "node:test";import assert from "node:assert/strict";import {americanOdds} from "../lib/tournament-odds.js";
+import test from "node:test";import assert from "node:assert/strict";import {americanOdds,validateOpeningMatchups} from "../lib/tournament-odds.js";
 test("converts probabilities to American odds",()=>{assert.equal(americanOdds(50),"+100");assert.equal(americanOdds(40),"+150");assert.equal(americanOdds(25),"+300");assert.equal(americanOdds(60),"-150");});
+test("requires complete Round 1 and Round 2 matchups before publishing",()=>{const empty=validateOpeningMatchups({matches:[]},2026);assert.equal(empty.ready,false);const match=(round)=>({Year:2026,Round:round,Format:"BB","Team 1 Player 1":"A","Team 1 Player 2":"B","Team 2 Player 1":"C","Team 2 Player 2":"D"});assert.equal(validateOpeningMatchups({matches:[match(1),match(2)]},2026).ready,true);});

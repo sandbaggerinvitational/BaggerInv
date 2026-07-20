@@ -1,6 +1,5 @@
 "use client";
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import styles from "./odds.module.css";
 
 export default function OddsCenter({ snapshots, error }) {
@@ -8,7 +7,7 @@ export default function OddsCenter({ snapshots, error }) {
   const current = snapshots.find((s)=>s.phase===selectedPhase) || latest;
   const prior = current ? snapshots.filter((s)=>s.phaseOrder<current.phaseOrder).at(-1) : null;
   const movers = useMemo(()=>{ if(!current||!prior)return []; const old=Object.fromEntries(prior.players.map(p=>[p.id,p])); return current.players.filter(p=>old[p.id]).map(p=>({...p,change:p.probability-old[p.id].probability,previous:old[p.id]})).sort((a,b)=>Math.abs(b.change)-Math.abs(a.change)).slice(0,4); },[current,prior]);
-  if (!current) return <section className={styles.shell}><div className={styles.empty}><h1>Odds Center</h1><p>{error || "Official tournament odds have not been published yet."}</p><Link href="/odds-center/admin">Publish the first official snapshot</Link></div></section>;
+  if (!current) return <><section className={styles.hero}><p>SBI Analytics</p><h1>Odds Center</h1><span>Championship and player projections through every official tournament milestone.</span></section><section className={styles.shell}><div className={styles.empty}><span>Projections Coming Soon</span><h2>Odds are not available yet</h2><p>{error || "Official tournament odds have not been published yet."}</p></div></section></>;
   return <>
     <section className={styles.hero}><p>SBI Analytics</p><h1>Odds Center</h1><span>Championship and player projections through every official tournament milestone.</span></section>
     <section className={styles.shell}>
