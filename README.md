@@ -1,4 +1,8 @@
-# Sandbagger Invitational — v11.2.0
+# Sandbagger Invitational — v12.0.0
+
+## Odds Center publishing
+
+The protected `/odds-center/admin` page publishes official 10,000-run tournament snapshots to Google Sheets. Configure `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_SHEETS_ID`, and `ODDS_ADMIN_SECRET` in Vercel. Share the spreadsheet with the service-account email as an editor. The application creates and maintains `Odds Control`, `Odds Snapshots`, `Odds Team Results`, and `Odds Player Results` automatically. Pre-Tournament may be overwritten until any later official phase is published, after which it is locked.
 
 War Room Evolution turns the matchup builder into a complete captain's decision desk.
 
