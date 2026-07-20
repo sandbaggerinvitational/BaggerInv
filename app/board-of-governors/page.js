@@ -89,7 +89,12 @@ export default async function BoardOfGovernorsPage() {
                       <strong>{stats.biggestRival.player["Display Name"]}</strong>
                       <small>{stats.biggestRival.record.matches} meetings · {formatRecord(stats.biggestRival.record)}</small>
                     </>
-                  ) : <strong>No recorded rival</strong>}
+                  ) : (
+                    <>
+                      <strong>No recorded rival</strong>
+                      <small aria-hidden="true">&nbsp;</small>
+                    </>
+                  )}
                 </div>
               </Link>
             ))}

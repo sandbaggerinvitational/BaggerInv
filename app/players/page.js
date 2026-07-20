@@ -104,7 +104,10 @@ export default async function PlayersPage() {
                     </small>
                   </>
                 ) : (
-                  <strong>No recorded rival</strong>
+                  <>
+                    <strong>No recorded rival</strong>
+                    <small aria-hidden="true">&nbsp;</small>
+                  </>
                 )}
               </div>
             </Link>
