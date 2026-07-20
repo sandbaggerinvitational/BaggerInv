@@ -12,6 +12,7 @@ export default function LineupOptimizer({ initialData, loadError }) {
   const [format, setFormat] = useState("BB");
   const [teeOverride, setTeeOverride] = useState("");
   const [view, setView] = useState("team1");
+  const [sortMode, setSortMode] = useState("overall");
   const [hasRun, setHasRun] = useState(false);
 
   const year = useMemo(() => currentTournamentYear(sheets), [sheets]);
@@ -39,43 +40,56 @@ export default function LineupOptimizer({ initialData, loadError }) {
       partnerships: initialData?.partnerships || {},
       headToHead: initialData?.headToHead || {},
       settings: settingsMap(sheets.settings || []),
-      limit: 10,
     });
   }, [hasRun, complete, format, teams, scorecardValues.rating, scorecardValues.slope, scorecardValues.par, initialData, sheets.settings]);
 
-  const rows = view === "team1" ? optimizer?.team1Best : view === "team2" ? optimizer?.team2Best : optimizer?.closest;
+  const rows = useMemo(() => {
+    const source = view === "team1" ? optimizer?.team1Pairings : optimizer?.team2Pairings;
+    const sorted = [...(source || [])];
+    if (sortMode === "safe") sorted.sort((a,b) => b.worstCaseExpectedPoints-a.worstCaseExpectedPoints || b.worstCaseWinProbability-a.worstCaseWinProbability);
+    else if (sortMode === "upside") sorted.sort((a,b) => b.bestCaseWinProbability-a.bestCaseWinProbability || b.averageExpectedPoints-a.averageExpectedPoints);
+    else if (sortMode === "volatile") sorted.sort((a,b) => b.volatility-a.volatility || b.bestCaseWinProbability-a.bestCaseWinProbability);
+    else sorted.sort((a,b) => b.averageExpectedPoints-a.averageExpectedPoints || b.averageWinProbability-a.averageWinProbability);
+    return sorted;
+  }, [optimizer, view, sortMode]);
   const formatLabel = formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles";
 
   if (!initialData) return <section className={styles.shell}><div className={styles.error}><h1>Lineup Optimizer</h1><p>{loadError || "Lineup data is unavailable."}</p></div></section>;
 
   return <>
-    <section className={styles.hero}><p>War Room Strategy</p><h1>Lineup Optimizer</h1><span>Test every legal matchup before you make the call.</span></section>
+    <section className={styles.hero}><p>War Room Strategy</p><h1>Lineup Optimizer</h1><span>Find the pairing that holds up no matter who the opponent sends out.</span></section>
     <section className={styles.shell}>
       <div className={styles.setupCard}>
         <div className={styles.sectionTitle}><span>01</span><div><p>Optimizer Setup</p><h2>Choose the format and tee</h2></div></div>
         <div className={styles.controlsThree}>
           <label>Format<select value={format} onChange={(event) => { setFormat(event.target.value); setTeeOverride(""); setHasRun(false); }}><option value="BB">Best Ball</option><option value="SC">Scramble</option><option value="SI">Singles</option></select></label>
-          <label>Course<div className={styles.readOnly}>{pick(course, "Course Name", "Course") || "No course assigned"}</div></label>
+          <label>Course<input value={pick(course, "Course Name", "Course") || "No course assigned"} readOnly /></label>
           <label>Tee<select value={tee} onChange={(event) => { setTeeOverride(event.target.value); setHasRun(false); }} disabled={!tees.length}>{tees.map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
         </div>
       </div>
 
       <div className={styles.optimizerCard}>
-        <div className={styles.sectionTitle}><span>02</span><div><p>Lineup Optimizer</p><h2>Every legal {formatLabel.toLowerCase()} matchup</h2></div></div>
+        <div className={styles.sectionTitle}><span>02</span><div><p>Lineup Optimizer</p><h2>Best Pairings to Send Out</h2><small>Ranked against every possible opponent combination.</small></div></div>
         {!hasRun ? <div className={styles.optimizerIntro}><p>Analyze every legal combination across the current {year} rosters using the same course handicaps and SBI prediction engine.</p><button type="button" disabled={!complete} onClick={() => setHasRun(true)}>Run lineup optimizer</button></div> : !optimizer ? <p>Calculating lineup combinations…</p> : <>
-          <div className={styles.optimizerMeta}>{optimizer.matchupCount.toLocaleString()} legal matchups analyzed</div>
+          <div className={styles.optimizerMeta}>{optimizer.matchupCount.toLocaleString()} head-to-head outcomes analyzed across {optimizer.pairingCount} legal {formatLabel.toLowerCase()} options</div>
           <div className={styles.optimizerTabs}>
-            <button data-active={view === "team1"} onClick={() => setView("team1")}>Best for {teams.team1.name}</button>
-            <button data-active={view === "team2"} onClick={() => setView("team2")}>Best for {teams.team2.name}</button>
-            <button data-active={view === "closest"} onClick={() => setView("closest")}>Closest battles</button>
+            <button data-active={view === "team1"} onClick={() => setView("team1")}>{teams.team1.name}</button>
+            <button data-active={view === "team2"} onClick={() => setView("team2")}>{teams.team2.name}</button>
           </div>
-          <div className={styles.optimizerList}>{(rows || []).map((row, index) => <div key={row.id} className={styles.optimizerRow}>
-            <b>#{index + 1}</b>
-            <div className={styles.optimizerTeam}><span>{teams.team1.name}</span><strong>{row.team1Label}</strong></div>
-            <div className={styles.vs}>vs</div>
-            <div className={styles.optimizerTeam}><span>{teams.team2.name}</span><strong>{row.team2Label}</strong></div>
-            <div className={styles.optimizerOdds}><strong><i>{row.prediction.teamA}%</i><em>{row.prediction.teamB}%</em></strong><span>{row.prediction.tie}% halve</span></div>
-          </div>)}</div>
+          <div className={styles.optimizerSort}><span>Rank by</span>{[["overall","Best Overall"],["safe","Safest / Most Counter-Proof"],["upside","Highest Upside"],["volatile","Most Volatile"]].map(([key,label])=><button key={key} data-active={sortMode===key} onClick={()=>setSortMode(key)}>{label}</button>)}</div>
+          <div className={styles.pairingList}>{rows.map((row, index) => <details key={row.id} className={styles.pairingRow}>
+            <summary>
+              <b>#{index + 1}</b><div className={styles.pairingName}><span>{view === "team1" ? teams.team1.name : teams.team2.name}</span><strong>{row.label}</strong><small>{row.favorableMatchups} of {row.opponentCount} favorable · {row.dangerousMatchups} dangerous counters</small></div>
+              <div className={styles.pairingMetric}><span>Avg. Expected</span><strong>{row.averageExpectedPoints.toFixed(2)}</strong><small>of 3 points</small></div>
+              <div className={styles.pairingMetric}><span>Avg. W / H / L</span><strong>{row.averageWinProbability}%</strong><small>{row.averageHalveProbability}% / {row.averageLossProbability}%</small></div>
+              <div className={styles.pairingMetric}><span>Worst Case</span><strong>{row.worstCaseWinProbability}%</strong><small>{row.worstCaseExpectedPoints.toFixed(2)} expected</small></div>
+              <div className={styles.pairingMetric}><span>Upside</span><strong>{row.bestCaseWinProbability}%</strong><small>{row.volatility} volatility</small></div><i>⌄</i>
+            </summary>
+            <div className={styles.pairingBreakdown}>
+              <div className={styles.counterCards}><article><span>Best Matchup</span><strong>{row.bestMatchup.opponentLabel}</strong><b>{row.bestMatchup.winProbability}% win · {row.bestMatchup.expectedPoints.toFixed(2)} pts</b></article><article><span>Toughest Matchup</span><strong>{row.toughestMatchup.opponentLabel}</strong><b>{row.toughestMatchup.winProbability}% win · {row.toughestMatchup.expectedPoints.toFixed(2)} pts</b></article><article><span>Counter-Proof Rating</span><strong>{row.favorablePercentage}% favorable</strong><b>{row.dangerousMatchups} dangerous matchups</b></article></div>
+              <div className={styles.opponentTable}><div><b>Possible opponent</b><b>Win</b><b>Halve</b><b>Loss</b><b>Expected</b></div>{row.matchups.map(match=><div key={match.id}><strong>{match.opponentLabel}</strong><span>{match.winProbability}%</span><span>{match.halveProbability}%</span><span>{match.lossProbability}%</span><b>{match.expectedPoints.toFixed(2)}</b></div>)}</div>
+            </div>
+          </details>)}</div>
         </>}
       </div>
     </section>
