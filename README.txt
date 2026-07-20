@@ -1,18 +1,15 @@
-TOURNAMENT PAGE DATA-MAPPING UPDATE
+TEAM LOGO CONTRAST UPDATE
 
-Merge the app, lib, public, and test folders in this package into the matching
-folders in your existing project. Replace files when prompted.
+Merge the app folder in this package into the existing app folder in your project.
+Choose Replace when prompted for matching files.
 
-The tournament logo filename is read from the Tournaments-sheet column:
-Annual Image
+Updated files:
+- app/AssetImage.js
+- app/TeamLogoPlate.js (new)
+- app/historical.module.css
+- app/history/[year]/page.js
+- app/history/[year]/team/[side]/page.js
+- app/history/[year]/round/[round]/page.js
 
-Upload each 800 x 800 PNG tournament logo to:
-public/images/tournaments/logos/
-
-Example sheet value:
-sandbagger-2017
-
-Example uploaded file:
-public/images/tournaments/logos/sandbagger-2017.png
-
-Do not include .png in the Google Sheet value. The website adds it automatically.
+The extracted top-level folder is named app-team-logo-contrast-update so it will
+not be confused with your project's existing app folder.
