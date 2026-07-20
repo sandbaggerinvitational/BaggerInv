@@ -1,15 +1,18 @@
-PLAYER CARD ALIGNMENT UPDATE
+TOURNAMENT PAGE DATA-MAPPING UPDATE
 
-Replace these three files in your existing project:
+Merge the app, lib, public, and test folders in this package into the matching
+folders in your existing project. Replace files when prompted.
 
-1. historical.module.css
-   Replace: app/historical.module.css
+The tournament logo filename is read from the Tournaments-sheet column:
+Annual Image
 
-2. players/page.js
-   Replace: app/players/page.js
+Upload each 800 x 800 PNG tournament logo to:
+public/images/tournaments/logos/
 
-3. board-of-governors/page.js
-   Replace: app/board-of-governors/page.js
+Example sheet value:
+sandbagger-2017
 
-Do not upload the player-card-alignment-update folder itself.
-Do not create another app folder.
+Example uploaded file:
+public/images/tournaments/logos/sandbagger-2017.png
+
+Do not include .png in the Google Sheet value. The website adds it automatically.

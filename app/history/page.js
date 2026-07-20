@@ -48,11 +48,11 @@ export default async function HistoryPage() {
               </div>
 
               <div className={styles.historyCardBody}>
-                <span>{tournament.Annual} Annual</span>
+                <span>{tournament.editionTitle}</span>
                 <h2>{tournament.year}</h2>
                 <p>{tournament.Destination}</p>
                 <strong>
-                  {tournament["Winning Team"] || "Upcoming Invitational"}
+                  {tournament.championTeam?.name || "Upcoming Invitational"}
                 </strong>
               </div>
             </Link>

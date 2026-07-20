@@ -8,6 +8,7 @@ import {
   courseLogo,
   teamLogo,
   tournamentHero,
+  tournamentLogo,
 } from "../../../lib/asset-paths";
 import {
   formatHandicap,
@@ -38,8 +39,8 @@ function pointsForRound(roundPoints, round) {
 
 function tournamentStatus(tournament) {
   const score = String(tournament["Final Score"] ?? "").trim();
-  const winner = String(tournament["Winning Team"] ?? "").trim();
-  const runnerUp = String(tournament["Runner-Up Team"] ?? "").trim();
+  const winner = tournament.championTeamId;
+  const runnerUp = tournament.runnerUpTeamId;
   const complete = Boolean(score || winner || runnerUp);
 
   return {
@@ -84,7 +85,17 @@ export default async function TournamentYearPage({ params }) {
         <div className={styles.tournamentHeroOverlay} />
 
         <div className={styles.tournamentHeroContent}>
-          <p>{tournament.Annual} Annual</p>
+          {tournament.logoFileName ? (
+            <AssetImage
+              src={tournamentLogo(tournament.logoFileName)}
+              alt={`${tournament.year} Sandbagger Invitational tournament logo`}
+              className={styles.tournamentEditionLogo}
+              fallbackClassName={styles.tournamentEditionLogoFallback}
+              fallback=""
+              loading="eager"
+            />
+          ) : null}
+          <p>{tournament.editionTitle}</p>
           <h1>{tournament.year}</h1>
           <h2>{tournament.Destination}</h2>
           <span>{tournament.Dates}</span>
@@ -123,7 +134,7 @@ export default async function TournamentYearPage({ params }) {
           <div>
             <span>Champions</span>
             <strong>
-              {tournament["Winning Team"] || "To Be Determined"}
+              {tournament.championTeam?.name || "To Be Determined"}
             </strong>
           </div>
           <div className={styles.finalScoreCenter}>
@@ -133,7 +144,7 @@ export default async function TournamentYearPage({ params }) {
           <div>
             <span>Runner-Up</span>
             <strong>
-              {tournament["Runner-Up Team"] || "To Be Determined"}
+              {tournament.runnerUpTeam?.name || "To Be Determined"}
             </strong>
           </div>
         </div>
