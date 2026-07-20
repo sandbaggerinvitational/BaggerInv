@@ -3672,6 +3672,7 @@
 /* Player-card identity layout — status belongs to the avatar, honors belong to the name. */
 .playerTop {
   grid-template-columns: 72px minmax(0, 1fr);
+  height: 104px;
   min-height: 104px;
   align-items: start;
 }
@@ -3695,7 +3696,9 @@
 }
 
 .playerCardIdentity {
+  height: 100px;
   min-height: 100px;
+  overflow: visible;
 }
 
 .playerCardIdentity h2 {
@@ -3703,12 +3706,14 @@
 }
 
 .playerCardHonorIcons {
+  margin-top: 4px;
   min-height: 44px;
+  align-content: flex-start;
 }
 
 .playerCardHonorIconItem.rookieHonorIconItem {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -3740,10 +3745,22 @@
   position: absolute;
 }
 
+.playerCard .rivalLine {
+  min-height: 81px;
+  box-sizing: border-box;
+}
+
+.playerCard .rivalLine small {
+  min-height: 1em;
+  line-height: 1;
+}
+
 @media (max-width: 650px) {
   .playerTop {
     grid-template-columns: 68px minmax(0, 1fr);
     gap: 12px;
+    height: 102px;
+    min-height: 102px;
   }
 
   .playerCardAvatarColumn {
@@ -3752,6 +3769,11 @@
 
   .playerCardIdentity h2 {
     min-height: 2.36em;
+  }
+
+  .playerCardIdentity {
+    height: 98px;
+    min-height: 98px;
   }
 
   .playerCardHonorIconItem.rookieHonorIconItem {
