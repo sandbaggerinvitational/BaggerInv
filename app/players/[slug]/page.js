@@ -14,6 +14,7 @@ import {
   getFormatName,
   getPlayerBySlug,
   getPlayerStats,
+  getSandbaggerRatings,
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
@@ -121,6 +122,9 @@ export default async function PlayerPage({ params }) {
   if (!player) notFound();
 
   const stats = getPlayerStats(player["Player ID"]);
+  const overallRating = getSandbaggerRatings().byCategory.OVERALL.find(
+    (row) => row.player["Player ID"] === player["Player ID"]
+  );
   const captainLegacy = getCaptainLegacy(player["Player ID"]);
   const rival = stats.biggestRival;
   const recentCareerSeasons = stats.careerTimeline.slice(-5);
@@ -210,6 +214,10 @@ export default async function PlayerPage({ params }) {
           <div className={styles.kpi}>
             <span>Bagger Championships</span>
             <strong>{stats.championships.length}</strong>
+          </div>
+          <div className={styles.kpi}>
+            <span>Overall SBR</span>
+            <strong>{overallRating?.rating || "—"}</strong>
           </div>
         </div>
 

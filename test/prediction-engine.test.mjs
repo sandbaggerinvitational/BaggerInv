@@ -35,6 +35,16 @@ test("predictions remain bounded and total 100", () => {
   assert.ok([result.teamA, result.teamB, result.tie].every((value) => value >= 0 && value <= 100));
 });
 
+test("format-specific SBR provides the baseline player-strength edge", () => {
+  const historical = {
+    a: { records:{overall:{matches:8}}, appearances:[1], sandbaggerRatings:{OVERALL:{rating:1600,matches:8},SI:{rating:1700,matches:8}} },
+    b: { records:{overall:{matches:8}}, appearances:[1], sandbaggerRatings:{OVERALL:{rating:1500,matches:8},SI:{rating:1450,matches:8}} },
+  };
+  const result=predict({format:"SI",players:[{id:"a"},{id:"b"}],historical,partnership:{},headToHead:{},handicap:{strokesA:0,strokesB:0},settings:{},teamNames:["A","B"]});
+  assert.ok(result.components.player[0] > result.components.player[1]);
+  assert.ok(result.teamA > result.teamB);
+});
+
 test("Team Vibes weights same-format and overall partnership history", () => {
   const partnership = {
     "a|b": {
