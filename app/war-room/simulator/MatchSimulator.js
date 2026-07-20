@@ -15,6 +15,7 @@ import {
   currentTournamentYear,
   getCourseOptions,
   getFormatCourse,
+  getFormatPointsAvailable,
   getTeamContext,
   holesForTee,
   scorecardForTee,
@@ -38,11 +39,12 @@ function ProbabilityRows({ probabilities, teamNames }) {
   </div>)}</div>;
 }
 
-export default function MatchSimulator({ initialData, loadError }) {
+export default function MatchSimulator({ initialData, loadError, initialSelection = {} }) {
   const sheets = initialData?.sheets || {};
-  const [format, setFormat] = useState("BB");
-  const [selected, setSelected] = useState([]);
-  const [teeOverride, setTeeOverride] = useState("");
+  const initialFormat = ["BB", "SC", "SI"].includes(initialSelection.format) ? initialSelection.format : "BB";
+  const [format, setFormat] = useState(initialFormat);
+  const [selected, setSelected] = useState(initialSelection.players || []);
+  const [teeOverride, setTeeOverride] = useState(initialSelection.tee || "");
   const [hasRun, setHasRun] = useState(false);
 
   const year = useMemo(() => currentTournamentYear(sheets), [sheets]);
@@ -60,6 +62,7 @@ export default function MatchSimulator({ initialData, loadError }) {
   };
   const holes = holesForTee(sheets, course, tee);
   const code = formatCode(format);
+  const pointsAvailable = getFormatPointsAvailable(sheets, year, code);
   const required = code === "SI" ? 2 : 4;
   const slotsPerTeam = code === "SI" ? 1 : 2;
   const chosen = Array.from({ length: required }, (_, index) => selected[index] || "");
@@ -87,6 +90,7 @@ export default function MatchSimulator({ initialData, loadError }) {
     handicap: play,
     settings: settingsMap(sheets.settings || []),
     teamNames: [teams.team1.name, teams.team2.name],
+    pointsAvailable,
   }) : null;
   const playerStrokeMaps = ready && code !== "SC" ? play.playerStrokes.map((strokes) => allocateStrokes(strokes, holes)) : null;
   const strokeMaps = ready ? code === "SC"
@@ -103,7 +107,7 @@ export default function MatchSimulator({ initialData, loadError }) {
     teamNames: [teams.team1.name, teams.team2.name],
     iterations: 10_000,
     seed,
-  }) : null, [hasRun, ready, code, prediction, strokeMaps, teams.team1.name, teams.team2.name, seed]);
+  }) : null, [hasRun, ready, code, prediction, strokeMaps, teams.team1.name, teams.team2.name, pointsAvailable, seed]);
 
   function resetSimulation() { setHasRun(false); }
   function updatePlayer(index, value) {

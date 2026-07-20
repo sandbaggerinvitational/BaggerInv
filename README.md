@@ -1,4 +1,4 @@
-# Sandbagger Invitational — v11.1.0
+# Sandbagger Invitational — v11.2.0
 
 War Room Evolution turns the matchup builder into a complete captain's decision desk.
 

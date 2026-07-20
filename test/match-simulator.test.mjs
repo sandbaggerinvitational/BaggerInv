@@ -9,11 +9,11 @@ test("simulation is stable for the same matchup seed", () => {
   assert.deepEqual(simulateMatch(options), simulateMatch(options));
 });
 
-test("singles simulation returns one expected point and match-play margins", () => {
-  const result = simulateMatch({ format: "SI", prediction, iterations: 2000, seed: "singles" });
-  assert.equal(Number((result.expectedPoints.teamA + result.expectedPoints.teamB).toFixed(2)), 1);
-  assert.equal(result.maximumPoints, 1);
-  assert.ok(result.likelyResults.some((row) => /Up|&|Halved/.test(row.label)));
+test("singles simulation returns three expected points and named match-play margins", () => {
+  const result = simulateMatch({ format: "SI", prediction, iterations: 2000, seed: "singles", teamNames: ["Pickles", "Lipp"], pointsAvailable: 3 });
+  assert.equal(Number((result.expectedPoints.teamA + result.expectedPoints.teamB).toFixed(2)), 3);
+  assert.equal(result.maximumPoints, 3);
+  assert.ok(result.likelyResults.some((row) => /Pickles|Lipp|Halved/.test(row.label)));
 });
 
 test("team-format simulation returns three expected points and segment probabilities", () => {

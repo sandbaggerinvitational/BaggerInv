@@ -7,7 +7,13 @@ import MatchSimulator from "./MatchSimulator";
 
 export const metadata = { title: "Match Simulator | Sandbagger Invitational" };
 
-export default async function MatchSimulatorPage() {
+export default async function MatchSimulatorPage({ searchParams }) {
+  const query = await searchParams;
+  const initialSelection = {
+    format: String(query?.format || "").toUpperCase(),
+    players: String(query?.players || "").split(",").filter(Boolean),
+    tee: String(query?.tee || ""),
+  };
   let data = null;
   let error = "";
   try {
@@ -26,5 +32,5 @@ export default async function MatchSimulatorPage() {
   } catch (caughtError) {
     error = caughtError.message || "Unable to load simulation data.";
   }
-  return <main><Header /><MatchSimulator initialData={data} loadError={error} /><Footer /></main>;
+  return <main><Header /><MatchSimulator initialData={data} loadError={error} initialSelection={initialSelection} /><Footer /></main>;
 }

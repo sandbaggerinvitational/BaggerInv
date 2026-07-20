@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import styles from "./war-room.module.css";
 import {
   allocateStrokes,
@@ -258,13 +259,18 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               </div>
             </div>
 
-            <div className={styles.decisionGrid}>
-              {formatCode(format) === "SI" ? <div className={styles.vibesCard}><span>Team Vibes</span><strong>—</strong><b>Singles format</b><small>Pair history is not used in singles.</small></div> : [
+            {formatCode(format) !== "SI" ? <div className={styles.decisionGrid}>
+              {[
                 { key: "A", name: teams.team1.name, vibes: prediction.teamVibes.teamA },
                 { key: "B", name: teams.team2.name, vibes: prediction.teamVibes.teamB },
               ].map(({ key, name, vibes }) => { const tier = teamVibesTier(vibes); return <div className={styles.vibesCard} key={key} data-known={vibes.known}>
                 <span>{name} · Team Vibes</span><strong>{vibes.known ? Math.round(vibes.score) : "—"}</strong><b>{tier.icon} {tier.label}</b><small>{vibes.known ? `${vibes.sameFormatMatches} same-format · ${vibes.matches} overall matches` : "No recorded pairing history yet"}</small>
               </div>; })}
+            </div> : null}
+
+            <div className={styles.simHandoff}>
+              <div><span>Explore the uncertainty</span><strong>See 10,000 possible outcomes for this exact matchup.</strong></div>
+              <Link href={`/war-room/simulator?format=${encodeURIComponent(formatCode(format))}&players=${encodeURIComponent(chosen.join(","))}&tee=${encodeURIComponent(tee)}`}>Run 10,000 simulations →</Link>
             </div>
 
             <div className={styles.briefingCard}>

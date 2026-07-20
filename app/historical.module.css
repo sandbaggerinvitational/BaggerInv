@@ -1768,6 +1768,13 @@
   font-weight: 800;
 }
 
+.tournamentLeaderboard{overflow:hidden;border:1px solid #ddd6c8;border-radius:20px;background:#fff;box-shadow:0 16px 38px rgba(15,35,25,.06)}
+.tournamentLeaderboardRow{display:grid;grid-template-columns:.55fr 2fr 1fr .8fr;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid #ebe5da;color:#46514c}
+.tournamentLeaderboardRow:last-child{border-bottom:0}.tournamentLeaderboardHead{background:#f4efe5;color:#6d746f;text-transform:uppercase;letter-spacing:.09em;font-size:.68rem;font-weight:800}.tournamentLeaderboardFirst{background:#fffaf0}.tournamentLeaderboardFirst>strong:first-child{color:#9b741f}
+.tournamentLeaderboardPlayer{display:flex;align-items:center;gap:10px;min-width:0}.tournamentLeaderboardPlayer i{width:9px;height:9px;flex:none;border-radius:50%;background:#0b3529}.tournamentLeaderboardPlayer i[data-side="2"]{background:#c7a34b}.tournamentLeaderboardPlayer a,.tournamentLeaderboardPlayer b{overflow:hidden;color:#17251f;font-weight:800;text-decoration:none;text-overflow:ellipsis;white-space:nowrap}.tournamentLeaderboardPlayer a:hover{text-decoration:underline}.tournamentLeaderboardEmpty{padding:28px;color:#6d746f;text-align:center}
+
+@media(max-width:600px){.tournamentLeaderboardRow{grid-template-columns:.45fr 1.65fr .9fr .65fr;gap:8px;padding:13px 12px;font-size:.78rem}.tournamentLeaderboardHead{font-size:.58rem}.tournamentLeaderboardPlayer{gap:6px}}
+
 @media (max-width: 1000px) {
   .statsHubGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

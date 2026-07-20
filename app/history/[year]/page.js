@@ -14,8 +14,10 @@ import {
   getAdjacentTournamentYears,
   getFormatName,
   getTournament,
+  getTournamentPlayerLeaderboard,
   getTournamentRoundPoints,
 } from "../../../lib/stats";
+import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 
 export async function generateMetadata({ params }) {
@@ -54,6 +56,7 @@ export default async function TournamentYearPage({ params }) {
   if (!tournament) notFound();
 
   const roundPoints = getTournamentRoundPoints(year);
+  const leaderboard = addTournamentRanks(getTournamentPlayerLeaderboard(year), "points");
   const { previousYear, nextYear } =
     getAdjacentTournamentYears(year);
   const status = tournamentStatus(tournament);
@@ -211,6 +214,28 @@ export default async function TournamentYearPage({ params }) {
                 </article>
               );
             })}
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Player Standings</span>
+          <h2>{tournament.year} Leaderboard</h2>
+
+          <div className={styles.tournamentLeaderboard}>
+            <div className={`${styles.tournamentLeaderboardRow} ${styles.tournamentLeaderboardHead}`}>
+              <span>Rank</span><span>Player</span><span>Record</span><span>Points</span>
+            </div>
+            {leaderboard.length ? leaderboard.map((row) => (
+              <div className={`${styles.tournamentLeaderboardRow} ${row.tournamentRank === "1" ? styles.tournamentLeaderboardFirst : ""}`} key={row.id}>
+                <strong>{row.tournamentRank}</strong>
+                <span className={styles.tournamentLeaderboardPlayer}>
+                  <i data-side={row.teamSide} />
+                  {row.player?.slug ? <Link href={`/players/${row.player.slug}`}>{row.player["Display Name"]}</Link> : <b>{row.player?.["Display Name"] || row.id}</b>}
+                </span>
+                <span>{row.wins}-{row.losses}-{row.halves}</span>
+                <strong>{Number(row.points.toFixed(2))}</strong>
+              </div>
+            )) : <div className={styles.tournamentLeaderboardEmpty}>No completed matches have been recorded for this tournament yet.</div>}
           </div>
         </section>
 
