@@ -62,7 +62,7 @@ export default async function BoardOfGovernorsPage() {
                     <CompactHonors
                       championships={stats.championships}
                       soyYears={stats.sandbaggerOfYearYears}
-                      pointsLeaderYears={stats.individualPointsLeaderYears}
+                      pointsChampionYears={stats.pointsChampionYears}
                       isGovernor
                       isRookie={player.rookie}
                       styles={styles}

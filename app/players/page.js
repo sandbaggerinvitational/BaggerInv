@@ -61,7 +61,7 @@ export default async function PlayersPage() {
                   <CompactHonors
                     championships={stats.championships}
                     soyYears={stats.sandbaggerOfYearYears}
-                    pointsLeaderYears={stats.individualPointsLeaderYears}
+                    pointsChampionYears={stats.pointsChampionYears}
                     isGovernor={player.boardOfGovernors}
                     isRookie={player.rookie}
                     styles={styles}

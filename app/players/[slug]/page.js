@@ -224,7 +224,7 @@ export default async function PlayerPage({ params }) {
         <CareerHonors
           championships={stats.championships}
           soyYears={stats.sandbaggerOfYearYears}
-          pointsLeaderYears={stats.individualPointsLeaderYears}
+          pointsChampionYears={stats.pointsChampionYears}
           isGovernor={player.boardOfGovernors}
           styles={styles}
         />
