@@ -7,7 +7,10 @@ import { usePathname } from "next/navigation";
 const menuGroups = [
   {
     label: "Live",
-    links: [{ label: "Match Center", href: "/live" }],
+    links: [
+      { label: "Match Center", href: "/live" },
+      { label: "Odds Center", href: "/odds-center" },
+    ],
   },
   {
     label: "War Room",
@@ -36,7 +39,10 @@ const menuGroups = [
   },
   {
     label: "Admin",
-    links: [{ label: "Data Health", href: "/data-health" }],
+    links: [
+      { label: "Data Health", href: "/data-health" },
+      { label: "Publish Odds", href: "/odds-center/admin" },
+    ],
   },
 ];
 

@@ -1,0 +1,1 @@
+import {Header,Footer} from "../../components";import OddsAdmin from "./OddsAdmin";export const metadata={title:"Odds Publishing | Sandbagger Invitational"};export default function Page(){return <main><Header/><OddsAdmin/><Footer/></main>}
