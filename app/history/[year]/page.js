@@ -190,6 +190,7 @@ export default async function TournamentYearPage({ params }) {
           <div className={styles.courseCardGrid}>
             {tournament.courses.map((course) => {
               const round = roundNumber(course.Round);
+              const availablePoints = pointsForRound(roundPoints, round);
 
               return (
                 <article
@@ -213,11 +214,15 @@ export default async function TournamentYearPage({ params }) {
                       {course.City}, {course.State}
                     </p>
                     <strong>{getFormatName(course.Format)}</strong>
-                    {pointsForRound(roundPoints, round) !== null ? (
-                      <small className={styles.courseRoundPoints}>
-                        {pointsForRound(roundPoints, round)} Points Available
-                      </small>
-                    ) : null}
+                    <small
+                      className={styles.courseRoundPoints}
+                      data-empty={availablePoints === null}
+                      aria-hidden={availablePoints === null ? "true" : undefined}
+                    >
+                      {availablePoints !== null
+                        ? `${availablePoints} Points Available`
+                        : "\u00a0"}
+                    </small>
                     <b>View Round Results →</b>
                   </Link>
 
