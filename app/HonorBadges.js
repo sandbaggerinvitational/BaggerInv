@@ -17,6 +17,16 @@ export function StarIcon({ className = "" }) {
   );
 }
 
+export function PointsLeaderIcon({ className = "" }) {
+  return (
+    <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="27" fill="none" stroke="currentColor" strokeWidth="4" />
+      <path d="M18 43h28M22 36h7V23h-7v13Zm13 0h7V14h-7v22Z" fill="currentColor" />
+      <path d="m48 13 1.8 3.7 4.1.6-3 2.9.7 4.1-3.6-1.9-3.6 1.9.7-4.1-3-2.9 4.1-.6L48 13Z" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function BogShieldIcon({ className = "" }) {
   return (
     <svg className={className} viewBox="0 0 64 72" aria-hidden="true">
@@ -82,11 +92,12 @@ function soyProfileLabel(count) {
 export function CompactHonors({
   championships = [],
   soyYears = [],
+  pointsLeaderYears = [],
   isGovernor = false,
   isRookie = false,
   styles,
 }) {
-  if (!championships.length && !soyYears.length && !isGovernor && !isRookie) return null;
+  if (!championships.length && !soyYears.length && !pointsLeaderYears.length && !isGovernor && !isRookie) return null;
 
   return (
     <div className={styles.playerCardHonorIcons} aria-label="Career honors">
@@ -101,6 +112,15 @@ export function CompactHonors({
         <div className={styles.playerCardHonorIconItem} title="Sandbagger of the Year">
           <StarIcon className={styles.playerCardMiniIcon} />
           {soyYears.length > 1 ? <span>{soyYears.length}×</span> : null}
+        </div>
+      ) : null}
+
+      {pointsLeaderYears.length ? (
+        <div className={`${styles.playerCardHonorIconItem} ${styles.pointsLeaderHonorIconItem || ""}`} title={`${pointsLeaderYears.join(", ")} Individual Points Leader`}>
+          <PointsLeaderIcon className={styles.playerCardMiniIcon} />
+          <span className={styles.pointsLeaderLabel}>
+            {pointsLeaderYears.length === 1 ? `${pointsLeaderYears[0]} Individual Points Leader` : `${pointsLeaderYears.length}× Individual Points Leader`}
+          </span>
         </div>
       ) : null}
 
@@ -125,10 +145,11 @@ export function CompactHonors({
 export function CareerHonors({
   championships = [],
   soyYears = [],
+  pointsLeaderYears = [],
   isGovernor = false,
   styles,
 }) {
-  if (!championships.length && !soyYears.length && !isGovernor) return null;
+  if (!championships.length && !soyYears.length && !pointsLeaderYears.length && !isGovernor) return null;
 
   return (
     <section className={styles.honorsSection}>
@@ -156,6 +177,18 @@ export function CareerHonors({
             <div>
               <span>{soyProfileLabel(soyYears.length)}</span>
               <HonorYears years={soyYears} styles={styles} />
+            </div>
+          </div>
+        ) : null}
+
+        {pointsLeaderYears.length ? (
+          <div className={styles.honorCard}>
+            <div className={styles.honorMedallion}>
+              <PointsLeaderIcon className={styles.honorIcon} />
+            </div>
+            <div>
+              <span>{pointsLeaderYears.length === 1 ? "Individual Points Leader" : `${pointsLeaderYears.length}× Individual Points Leader`}</span>
+              <HonorYears years={pointsLeaderYears} styles={styles} />
             </div>
           </div>
         ) : null}

@@ -56,7 +56,14 @@ export default async function TournamentYearPage({ params }) {
   if (!tournament) notFound();
 
   const roundPoints = getTournamentRoundPoints(year);
-  const leaderboard = addTournamentRanks(getTournamentPlayerLeaderboard(year), "points");
+  const leaderboardRows = getTournamentPlayerLeaderboard(year);
+  const pointsTracked = leaderboardRows.some((row) => row.pointsTracked);
+  const leaderboard = addTournamentRanks(
+    leaderboardRows,
+    pointsTracked
+      ? "points"
+      : (row) => `${row.winPercentage.toFixed(6)}|${row.wins}|${row.losses}|${row.halves}`
+  );
   const { previousYear, nextYear } =
     getAdjacentTournamentYears(year);
   const status = tournamentStatus(tournament);
@@ -221,9 +228,9 @@ export default async function TournamentYearPage({ params }) {
           <span className={styles.sectionLabel}>Player Standings</span>
           <h2>{tournament.year} Leaderboard</h2>
 
-          <div className={styles.tournamentLeaderboard}>
+          <div className={styles.tournamentLeaderboard} data-points={pointsTracked}>
             <div className={`${styles.tournamentLeaderboardRow} ${styles.tournamentLeaderboardHead}`}>
-              <span>Rank</span><span>Player</span><span>Record</span><span>Points</span>
+              <span>Rank</span><span>Player</span><span>Record</span>{pointsTracked ? <span>Points</span> : null}
             </div>
             {leaderboard.length ? leaderboard.map((row) => (
               <div className={`${styles.tournamentLeaderboardRow} ${row.tournamentRank === "1" ? styles.tournamentLeaderboardFirst : ""}`} key={row.id}>
@@ -233,7 +240,7 @@ export default async function TournamentYearPage({ params }) {
                   {row.player?.slug ? <Link href={`/players/${row.player.slug}`}>{row.player["Display Name"]}</Link> : <b>{row.player?.["Display Name"] || row.id}</b>}
                 </span>
                 <span>{row.wins}-{row.losses}-{row.halves}</span>
-                <strong>{Number(row.points.toFixed(2))}</strong>
+                {pointsTracked ? <strong>{Number(row.points.toFixed(2))}</strong> : null}
               </div>
             )) : <div className={styles.tournamentLeaderboardEmpty}>No completed matches have been recorded for this tournament yet.</div>}
           </div>

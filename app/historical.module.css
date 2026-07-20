@@ -1770,10 +1770,11 @@
 
 .tournamentLeaderboard{overflow:hidden;border:1px solid #ddd6c8;border-radius:20px;background:#fff;box-shadow:0 16px 38px rgba(15,35,25,.06)}
 .tournamentLeaderboardRow{display:grid;grid-template-columns:.55fr 2fr 1fr .8fr;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid #ebe5da;color:#46514c}
+.tournamentLeaderboard[data-points="false"] .tournamentLeaderboardRow{grid-template-columns:.55fr 2.4fr 1.2fr}
 .tournamentLeaderboardRow:last-child{border-bottom:0}.tournamentLeaderboardHead{background:#f4efe5;color:#6d746f;text-transform:uppercase;letter-spacing:.09em;font-size:.68rem;font-weight:800}.tournamentLeaderboardFirst{background:#fffaf0}.tournamentLeaderboardFirst>strong:first-child{color:#9b741f}
 .tournamentLeaderboardPlayer{display:flex;align-items:center;gap:10px;min-width:0}.tournamentLeaderboardPlayer i{width:9px;height:9px;flex:none;border-radius:50%;background:#0b3529}.tournamentLeaderboardPlayer i[data-side="2"]{background:#c7a34b}.tournamentLeaderboardPlayer a,.tournamentLeaderboardPlayer b{overflow:hidden;color:#17251f;font-weight:800;text-decoration:none;text-overflow:ellipsis;white-space:nowrap}.tournamentLeaderboardPlayer a:hover{text-decoration:underline}.tournamentLeaderboardEmpty{padding:28px;color:#6d746f;text-align:center}
 
-@media(max-width:600px){.tournamentLeaderboardRow{grid-template-columns:.45fr 1.65fr .9fr .65fr;gap:8px;padding:13px 12px;font-size:.78rem}.tournamentLeaderboardHead{font-size:.58rem}.tournamentLeaderboardPlayer{gap:6px}}
+@media(max-width:600px){.tournamentLeaderboardRow{grid-template-columns:.45fr 1.65fr .9fr .65fr;gap:8px;padding:13px 12px;font-size:.78rem}.tournamentLeaderboard[data-points="false"] .tournamentLeaderboardRow{grid-template-columns:.45fr 1.8fr 1fr}.tournamentLeaderboardHead{font-size:.58rem}.tournamentLeaderboardPlayer{gap:6px}}
 
 @media (max-width: 1000px) {
   .statsHubGrid {
@@ -3663,3 +3664,7 @@
 .playerCardHonorIconItem .rookieLabel{position:static;width:auto;min-width:0;height:auto;padding:0;display:flex;gap:6px;align-items:center;border:0;border-radius:0;background:transparent;color:#173b6d;font-size:.58rem;font-weight:900;line-height:1;letter-spacing:.09em;text-transform:uppercase;box-shadow:none}
 .rookieLabel i{font-family:Georgia,"Times New Roman",serif;font-size:1.05rem;font-style:normal;line-height:1}
 @media(max-width:650px){.playerCardHonorIconItem.rookieHonorIconItem{height:32px;padding:0 10px}.playerCardHonorIconItem .rookieLabel{font-size:.54rem}.rookieLabel i{font-size:.98rem}}
+
+/* Individual Points Leader badges and balanced card layout */
+.playerCard{display:flex;flex-direction:column;height:100%}.playerCard .statStrip{margin-top:auto}.playerCardIdentity{display:flex;flex-direction:column;align-items:flex-start;min-width:0}.playerCardIdentity h2{width:100%}.playerCardHonorIcons{width:100%;min-height:38px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.playerCardIdentity .activeBadge,.playerCardIdentity .inactiveBadge{margin-top:10px;align-self:flex-start}.playerCardHonorIconItem.pointsLeaderHonorIconItem{width:auto;max-width:100%;height:38px;padding:0 11px;border-radius:999px;background:linear-gradient(145deg,#fff8dd,#d9b24f 58%,#f4da8c)}.playerCardHonorIconItem .pointsLeaderLabel{position:static;width:auto;min-width:0;height:auto;margin-left:6px;padding:0;display:block;overflow:hidden;border:0;border-radius:0;background:transparent;color:#173b31;font-size:.5rem;font-weight:900;line-height:1.15;letter-spacing:.035em;text-transform:uppercase;text-overflow:ellipsis;white-space:normal;box-shadow:none}.pointsLeaderHonorIconItem .playerCardMiniIcon{flex:none}.honorsGrid{grid-auto-rows:1fr}.honorCard{height:100%}
+@media(max-width:650px){.playerCardHonorIcons{min-height:36px;gap:6px}.playerCardHonorIconItem.pointsLeaderHonorIconItem{height:34px;padding:0 9px}.playerCardHonorIconItem .pointsLeaderLabel{font-size:.46rem}.playerCard{height:100%}}
