@@ -611,6 +611,7 @@
 }
 
 .championCard {
+  position: relative;
   min-width: 0;
   padding: 28px;
   display: flex;
@@ -624,6 +625,27 @@
   border-radius: var(--tsi-radius-lg);
   background: var(--tsi-white);
   box-shadow: var(--tsi-shadow-sm);
+}
+
+.championEditionRibbon {
+  position: absolute;
+  top: 14px;
+  right: -1px;
+  max-width: 46%;
+  padding: 7px 12px 7px 14px;
+  overflow: hidden;
+  border: 1px solid #d6b65f;
+  border-right: 0;
+  border-radius: 9px 0 0 9px;
+  background: #ead49a;
+  color: var(--tsi-green-900);
+  box-shadow: 0 5px 14px rgba(103, 76, 19, .1);
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: .11em;
+  font-size: .58rem;
+  font-weight: 900;
 }
 
 .championCardHeading {
@@ -822,7 +844,13 @@
   }
 
   .championCard {
-    padding: 22px;
+    padding: 48px 22px 22px;
+  }
+
+  .championEditionRibbon {
+    top: 12px;
+    padding: 6px 10px 6px 12px;
+    font-size: .52rem;
   }
 
   .championshipSummary {

@@ -15,6 +15,12 @@ function displayScore(value) {
   return String(value || "Score not recorded").replace(/\s+-\s+/g, " – ");
 }
 
+function editionRibbon(value) {
+  const edition = String(value || "").trim();
+  if (!edition) return "";
+  return /annual/i.test(edition) ? edition : `${edition} Annual`;
+}
+
 export default async function ChampionsPage() {
   await refreshHistoricalData();
   const champions = getTournaments().filter(
@@ -38,6 +44,9 @@ export default async function ChampionsPage() {
         <div className={styles.championGrid}>
           {champions.map((tournament) => (
             <article className={styles.championCard} key={tournament.id}>
+              {tournament.editionTitle ? (
+                <span className={styles.championEditionRibbon}>{editionRibbon(tournament.editionTitle)}</span>
+              ) : null}
               <div className={styles.championCardHeading}>
                 <strong>{tournament.year}</strong>
                 <span>{tournament.Destination}</span>

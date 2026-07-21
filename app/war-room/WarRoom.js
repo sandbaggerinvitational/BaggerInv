@@ -19,10 +19,11 @@ import {
   holesForTee,
   scorecardForTee,
 } from "../../lib/tournament-context";
-import { briefingPayload, buildFallbackBriefing } from "../../lib/captains-briefing";
+import { briefingPayload } from "../../lib/captains-briefing";
 import { teamVibesTier } from "../../lib/prediction-engine";
 import { simulateMatch } from "../../lib/match-simulator";
 import SimulationResults from "./SimulationResults";
+import MatchAnalyst from "./MatchAnalyst";
 
 const clean = (value) => String(value ?? "").trim();
 const number = (value, fallback = 0) => {
@@ -42,12 +43,6 @@ function compactPlayerName(name) {
 
 function formatLabel(format) {
   return ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[formatCode(format)] || format;
-}
-
-function BriefingParagraph({ paragraph }) {
-  const match = paragraph.match(/^([A-Z][A-Z '\-]+):\s*(.*)$/s);
-  if (!match) return <p>{paragraph}</p>;
-  return <div className={styles.briefingSection}><strong>{match[1]}</strong><p>{match[2]}</p></div>;
 }
 
 export default function WarRoom({ initialData, loadError, aiConfigured = false, initialSelection = {} }) {
@@ -152,10 +147,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
     window.history.replaceState(null, "", `/war-room?${params.toString()}`);
   }, [ready, format, courseId, tee, chosen.join("|")]);
 
-  const fallbackBriefing = ready
-    ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer: null })
-    : "";
-
   const validation = [];
   if (!courseId) validation.push(`No ${formatCode(format)} course is assigned for ${year}.`);
   if (!scorecards.length && courseId) validation.push(`No Course Scorecards rows were found for ${pick(course, "Course Name", "Course") || courseId}.`);
@@ -226,11 +217,17 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
         body: JSON.stringify(briefingPayload({
           prediction,
           teamNames: [teams.team1.name, teams.team2.name],
-          format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles",
+          format: formatCode(format),
           courseName: pick(course, "Course Name", "Course") || courseId,
           tee,
           players: details,
           optimizer: null,
+          historical,
+          simulation,
+          pointsAvailable,
+          play,
+          strokeMaps: effectiveStrokeMaps,
+          holes,
         })),
       });
       const result = await response.json().catch(() => ({}));
@@ -343,7 +340,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
             {activeSection === "simulation" ? (
               <div className={styles.labSection}>
                 <div className={styles.simRun}>
-                  <button type="button" disabled={holes.length !== 18} onClick={() => setSimulationRun((run) => run + 1)}>
+                  <button type="button" disabled={holes.length !== 18} onClick={() => { setAiBriefing(""); setSimulationRun((run) => run + 1); }}>
                     {simulation ? "Run another 10,000 simulations" : "Run 10,000 simulations"}
                   </button>
                   <small>{holes.length === 18 ? "The simulation uses the matchup selected above. Results remain stable until an input changes." : "A complete 18-hole scorecard is required for simulation."}</small>
@@ -354,15 +351,26 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
               </div>
             ) : null}
 
-            {activeSection === "briefing" ? <div className={styles.briefingCard}>
-              <div className={styles.sectionTitle}><span>SBI</span><div><p>SBI Match Analyst</p><h2>The official scouting report</h2></div></div>
-              <div className={styles.briefingText}>{String(aiBriefing || fallbackBriefing).split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <BriefingParagraph paragraph={paragraph} key={index} />)}</div>
-              <div className={styles.aiActions}>
-                <button type="button" onClick={generateAiBriefing} disabled={aiLoading || !aiConfigured}>{aiLoading ? "Analyzing matchup…" : !aiConfigured ? "Analyst setup required" : aiBriefing ? "Refresh analyst briefing" : "Generate analyst briefing"}</button>
-                <small>{aiConfigured ? "Official SBI analysis built from the deterministic matchup numbers above." : "Add OPENAI_API_KEY in Vercel Production Environment Variables and redeploy to enable the SBI Match Analyst."}</small>
-              </div>
-              {aiError ? <div className={styles.aiError}>{aiError} The SBI analyst briefing above remains available.</div> : null}
-            </div> : null}
+            {activeSection === "briefing" ? <MatchAnalyst
+              prediction={prediction}
+              simulation={simulation}
+              teamNames={[teams.team1.name, teams.team2.name]}
+              players={details}
+              historical={historical}
+              partnerships={partnerships}
+              format={formatCode(format)}
+              pointsAvailable={pointsAvailable}
+              play={play}
+              strokeMaps={effectiveStrokeMaps}
+              holes={holes}
+              courseName={pick(course, "Course Name", "Course") || courseId}
+              tee={tee}
+              aiBriefing={aiBriefing}
+              aiError={aiError}
+              aiLoading={aiLoading}
+              aiConfigured={aiConfigured}
+              onGenerate={generateAiBriefing}
+            /> : null}
 
             {activeSection === "handicaps" ? <div className={styles.breakdownCard}>
               <div className={styles.sectionTitle}><span>02</span><div><p>Handicap Breakdown</p><h2>Where the strokes fall</h2></div></div>
