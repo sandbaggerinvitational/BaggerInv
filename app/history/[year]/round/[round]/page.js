@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import Link from "next/link";
 import { refreshHistoricalData } from "../../../../../lib/stats";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
