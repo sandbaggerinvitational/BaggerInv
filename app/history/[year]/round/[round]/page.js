@@ -1,6 +1,5 @@
 export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../../../../lib/stats";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
 import AssetImage from "../../../../AssetImage";
@@ -14,6 +13,7 @@ import {
   getHistoricalRound,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
+import RoundNavigation from "./RoundNavigation";
 
 function displayPoints(value) {
   if (value === null || value === undefined) return "—";
@@ -167,6 +167,13 @@ export default async function HistoricalRoundPage({ params }) {
       </section>
 
       <section className={styles.content}>
+        <RoundNavigation
+          year={archive.year}
+          previousRound={archive.previousRound}
+          nextRound={archive.nextRound}
+          position="top"
+        />
+
         <div className={styles.roundArchiveScoreboard}>
           <div className={styles.roundArchiveTeam}>
             <TeamLogoPlate
@@ -368,31 +375,11 @@ export default async function HistoricalRoundPage({ params }) {
           </div>
         )}
 
-        <nav className={styles.roundArchiveNavigation}>
-          {archive.previousRound ? (
-            <Link
-              href={`/history/${archive.year}/round/${archive.previousRound}`}
-            >
-              ← Round {archive.previousRound}
-            </Link>
-          ) : (
-            <span />
-          )}
-
-          <Link href={`/history/${archive.year}`}>
-            Back to {archive.year}
-          </Link>
-
-          {archive.nextRound ? (
-            <Link
-              href={`/history/${archive.year}/round/${archive.nextRound}`}
-            >
-              Round {archive.nextRound} →
-            </Link>
-          ) : (
-            <span />
-          )}
-        </nav>
+        <RoundNavigation
+          year={archive.year}
+          previousRound={archive.previousRound}
+          nextRound={archive.nextRound}
+        />
       </section>
 
       <Footer />

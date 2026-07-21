@@ -221,15 +221,26 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .kiawahHero {
-  min-height: calc(100vh - 84px);
+  height: clamp(700px, calc(100svh - 84px), 780px);
   position: relative;
   display: flex;
   align-items: flex-end;
   overflow: hidden;
   color: white;
-  background-image: url("/images/home-page-hero.webp");
-  background-size: cover;
-  background-position: center;
+  background: var(--green-dark);
+}
+
+.kiawahHeroMedia,
+.kiawahHeroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.kiawahHeroImage {
+  object-fit: cover;
+  object-position: center center;
 }
 
 .kiawahOverlay {
@@ -238,6 +249,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   background:
     linear-gradient(90deg, rgba(3, 20, 15, 0.82) 0%, rgba(3, 20, 15, 0.46) 46%, rgba(3, 20, 15, 0.10) 72%),
     linear-gradient(0deg, rgba(3, 20, 15, 0.68) 0%, transparent 42%);
+  z-index: 1;
 }
 
 .kiawahHeroContent {
@@ -358,6 +370,10 @@ h2 {
   margin-top: 8px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.2rem;
+}
+
+.mobileTournamentStrip {
+  display: none;
 }
 
 .section {
@@ -542,6 +558,14 @@ footer span {
 }
 
 @media (max-width: 980px) {
+  .kiawahHero {
+    height: clamp(580px, 72svh, 650px);
+  }
+
+  .kiawahHeroImage {
+    object-position: 55% center;
+  }
+
   .tournamentSpotlight,
   .cupSection,
   .liveBand {
@@ -568,26 +592,64 @@ footer span {
   }
 
   .kiawahHero {
-    min-height: 82vh;
-    background-position: 58% center;
+    height: clamp(480px, 68svh, 540px);
+    min-height: 480px;
+  }
+
+  .kiawahHeroImage {
+    object-position: 60% center;
   }
 
   .kiawahHeroContent {
     width: auto;
-    padding: 90px 6vw 190px;
+    padding: 52px 6vw 42px;
   }
 
   .heroBottomBar {
-    grid-template-columns: repeat(2, 1fr);
+    display: none;
   }
 
-  .heroBottomBar div {
-    min-height: 88px;
-    padding: 18px;
+  .kiawahHeroContent h1 {
+    max-width: 94vw;
+    font-size: clamp(2.8rem, 13vw, 4.35rem);
+    line-height: .94;
   }
 
-  .heroBottomBar div:nth-child(2) {
-    border-right: 0;
+  .heroDate {
+    margin-top: 13px;
+    font-size: clamp(1.12rem, 5vw, 1.48rem);
+  }
+
+  .heroIntro {
+    margin-top: 12px;
+    font-size: .94rem;
+    line-height: 1.45;
+  }
+
+  .actions {
+    margin-top: 20px;
+  }
+
+  .mobileTournamentStrip {
+    min-height: 58px;
+    padding: 12px 5vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    background: var(--green-dark);
+    color: #fffaf0;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .035em;
+    text-align: center;
+  }
+
+  .mobileTournamentStrip span:not(:last-child)::after {
+    content: " •";
+    margin-left: 10px;
+    color: var(--gold);
   }
 
   .section {
@@ -623,22 +685,25 @@ footer span {
    ========================================================= */
 
 @media (max-width: 640px) {
-  .kiawahHero {
-    min-height: 100svh;
-  }
-
-  .kiawahHeroContent {
-    padding-bottom: 265px;
-  }
-
   .kiawahHeroContent .actions {
-    width: min(100%, 330px);
-    flex-direction: column;
-    align-items: stretch;
+    width: 100%;
+    flex-wrap: nowrap;
   }
 
   .kiawahHeroContent .button {
-    width: 100%;
+    min-height: 46px;
+    padding: 0 16px;
+    font-size: .82rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .kiawahHeroContent .actions {
+    flex-wrap: wrap;
+  }
+
+  .kiawahHeroContent .button {
+    flex: 1 1 100%;
   }
 }
 

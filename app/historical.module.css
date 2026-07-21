@@ -2449,12 +2449,27 @@
   border-top: 1px solid var(--tsi-line);
 }
 
+.roundArchiveNavigationTop {
+  margin: 0 0 34px;
+  padding: 0 0 25px;
+  border-top: 0;
+  border-bottom: 1px solid var(--tsi-line);
+}
+
 .roundArchiveNavigation a {
   color: var(--tsi-green-900);
   font-weight: 800;
 }
 
-.roundArchiveNavigation a:last-child {
+.roundArchivePrevious {
+  text-align: left;
+}
+
+.roundArchiveTournamentLink {
+  text-align: center;
+}
+
+.roundArchiveNext {
   text-align: right;
 }
 
@@ -2565,11 +2580,26 @@
   }
 
   .roundArchiveNavigation {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
   }
 
-  .roundArchiveNavigation a,
-  .roundArchiveNavigation a:last-child {
+  .roundArchivePrevious,
+  .roundArchiveNext {
+    min-width: 0;
+  }
+
+  .roundArchivePrevious {
+    text-align: left;
+  }
+
+  .roundArchiveNext {
+    text-align: right;
+  }
+
+  .roundArchiveTournamentLink {
+    grid-column: 1 / -1;
+    grid-row: 2;
     text-align: center;
   }
 }
