@@ -53,6 +53,24 @@ export function RookieBadgeIcon({ className = "" }) {
   );
 }
 
+export function HandicapCommitteeIcon({ className = "" }) {
+  return (
+    <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
+      <text
+        x="32"
+        y="49"
+        fill="currentColor"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontSize="48"
+        fontWeight="700"
+        textAnchor="middle"
+      >
+        ♿
+      </text>
+    </svg>
+  );
+}
+
 export function AchievementBadge({
   icon,
   label,
@@ -66,6 +84,8 @@ export function AchievementBadge({
       ? styles.rookieHonorIconItem || ""
       : variant === "pointsChampion"
         ? styles.pointsChampionHonorIconItem || ""
+        : variant === "handicapCommittee"
+          ? styles.handicapCommitteeHonorIconItem || ""
         : "";
 
   return (
@@ -123,9 +143,10 @@ export function CompactHonors({
   pointsChampionYears = [],
   isGovernor = false,
   isRookie = false,
+  isHandicapCommittee = false,
   styles,
 }) {
-  if (!championships.length && !soyYears.length && !pointsChampionYears.length && !isGovernor && !isRookie) return null;
+  if (!championships.length && !soyYears.length && !pointsChampionYears.length && !isGovernor && !isRookie && !isHandicapCommittee) return null;
 
   return (
     <div className={styles.playerCardHonorIcons} aria-label="Career honors">
@@ -174,6 +195,15 @@ export function CompactHonors({
           styles={styles}
         />
       ) : null}
+
+      {isHandicapCommittee ? (
+        <AchievementBadge
+          icon={<HandicapCommitteeIcon className={styles.playerCardMiniIcon} />}
+          label="Handicap Committee"
+          variant="handicapCommittee"
+          styles={styles}
+        />
+      ) : null}
     </div>
   );
 }
@@ -183,9 +213,10 @@ export function CareerHonors({
   soyYears = [],
   pointsChampionYears = [],
   isGovernor = false,
+  isHandicapCommittee = false,
   styles,
 }) {
-  if (!championships.length && !soyYears.length && !pointsChampionYears.length && !isGovernor) return null;
+  if (!championships.length && !soyYears.length && !pointsChampionYears.length && !isGovernor && !isHandicapCommittee) return null;
 
   return (
     <section className={styles.honorsSection}>
@@ -235,6 +266,18 @@ export function CareerHonors({
               <BogShieldIcon className={styles.bogHonorIcon} />
             </div>
             <div><span>Board of Governors</span></div>
+          </div>
+        ) : null}
+
+        {isHandicapCommittee ? (
+          <div className={`${styles.honorCard} ${styles.handicapCommitteeHonorCard}`}>
+            <div className={`${styles.honorMedallion} ${styles.handicapCommitteeMedallion}`}>
+              <HandicapCommitteeIcon className={styles.honorIcon} />
+            </div>
+            <div>
+              <span>Handicap Committee</span>
+              <div className={styles.honorYears}>Current Member</div>
+            </div>
           </div>
         ) : null}
 

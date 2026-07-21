@@ -70,6 +70,7 @@ export default async function BoardOfGovernorsPage() {
                       pointsChampionYears={stats.pointsChampionYears}
                       isGovernor
                       isRookie={player.rookie}
+                      isHandicapCommittee={player.handicapCommittee}
                       styles={styles}
                     />
                   </div>
