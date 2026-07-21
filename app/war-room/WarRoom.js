@@ -258,12 +258,20 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
         <div className={styles.setupCard} data-collapsed={ready && !showSetup}>
           {ready && !showSetup ? (
             <div className={styles.mobileMatchupSummary}>
-              <div>
-                <strong>{details.slice(0, slotsPerTeam).map((player) => player.name).join(" + ")}</strong>
-                <span>vs</span>
-                <strong>{details.slice(slotsPerTeam).map((player) => player.name).join(" + ")}</strong>
-                <small>{formatLabel(format)} · {pick(course, "Course Name", "Course") || courseId} · {tee}</small>
+              <div className={styles.matchupSummaryTeams}>
+                <div>
+                  {details.slice(0, slotsPerTeam).map((player) => (
+                    <strong key={player.id}>{player.name}</strong>
+                  ))}
+                </div>
+                <span>VS</span>
+                <div>
+                  {details.slice(slotsPerTeam).map((player) => (
+                    <strong key={player.id}>{player.name}</strong>
+                  ))}
+                </div>
               </div>
+              <small>{formatLabel(format)} · {pick(course, "Course Name", "Course") || courseId} · {tee}</small>
               <button type="button" onClick={() => setShowSetup(true)}>Change Matchup</button>
             </div>
           ) : null}
