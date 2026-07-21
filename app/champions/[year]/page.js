@@ -38,7 +38,7 @@ export default async function ChampionshipDetailPage({ params }) {
   const { year } = await params;
   const tournament = getTournament(year);
 
-  if (!tournament?.championTeamId) notFound();
+  if (!tournament?.championTeam) notFound();
 
   const champion = tournament.championTeam;
   const opponent = tournament.runnerUpTeam || tournament.teams.find(

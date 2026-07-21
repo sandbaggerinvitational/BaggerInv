@@ -18,13 +18,14 @@ function displayScore(value) {
 function editionRibbon(value) {
   const edition = String(value || "").trim();
   if (!edition) return "";
-  return /annual/i.test(edition) ? edition : `${edition} Annual`;
+  const annualLabel = edition.match(/\b\d+(?:st|nd|rd|th)\s+annual\b/i)?.[0];
+  return annualLabel || `${edition} Annual`;
 }
 
 export default async function ChampionsPage() {
   await refreshHistoricalData();
   const champions = getTournaments().filter(
-    (tournament) => tournament.championTeamId
+    (tournament) => tournament.championTeam
   );
 
   return (

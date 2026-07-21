@@ -3,7 +3,15 @@
 import { useEffect } from "react";
 
 export default function Error({ error, reset }) {
-  useEffect(() => console.error(error), [error]);
+  useEffect(() => {
+    console.error("Tournament page error boundary", {
+      message: error?.message || "Unknown rendering error",
+      digest: error?.digest || null,
+      cause: error?.cause || null,
+      stack: error?.stack || null,
+      route: window.location.pathname,
+    });
+  }, [error]);
   return (
     <main className="appError">
       <div className="errorCard">
