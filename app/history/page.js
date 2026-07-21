@@ -28,7 +28,7 @@ export default async function HistoryPage() {
         </p>
       </section>
 
-      <section className={styles.content}>
+      <section className={styles.content} id="champions">
         <div className={styles.historyCardGrid}>
           {tournaments.map((tournament) => (
             <Link

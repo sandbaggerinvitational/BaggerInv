@@ -165,7 +165,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 16px 32px 30px;
+  padding: 16px 32px calc(30px + env(safe-area-inset-bottom));
   scrollbar-width: thin;
   scrollbar-color: rgba(212,177,95,.65) transparent;
 }
@@ -214,7 +214,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 560px) {
   .sideMenu { width: 100vw; }
   .sideMenuTop { padding: 22px 24px; min-height: 104px; }
-  .sideMenuScroll { padding: 10px 24px 26px; }
+  .sideMenuScroll { padding: 10px 24px calc(26px + env(safe-area-inset-bottom)); }
   .sideNavHome { font-size: 1.42rem; }
   .sideNavGroup { padding-top: 18px; }
   .sideNavGroup a { font-size: 1.16rem; padding: 11px 12px; }

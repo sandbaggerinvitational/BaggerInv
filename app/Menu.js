@@ -3,59 +3,40 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { navigationSections } from "./navigation";
 
-const menuGroups = [
-  {
-    label: "Live",
-    links: [
-      { label: "Match Center", href: "/live" },
-      { label: "Odds Center", href: "/odds-center" },
-    ],
-  },
-  {
-    label: "War Room",
-    links: [
-      { label: "Matchup Builder", href: "/war-room" },
-      { label: "Lineup Optimizer", href: "/war-room/lineup-optimizer" },
-      { label: "Match Simulator", href: "/war-room/simulator" },
-    ],
-  },
-  {
-    label: "Players",
-    links: [
-      { label: "Player Directory", href: "/players" },
-      { label: "Compare Players", href: "/compare" },
-      { label: "Board of Governors", href: "/board-of-governors" },
-      { label: "Sandbagger Ratings", href: "/ratings" },
-      { label: "Records", href: "/records" },
-    ],
-  },
-  {
-    label: "Tournament",
-    links: [
-      { label: "History", href: "/history" },
-      { label: "The Cup", href: "/#cup" },
-    ],
-  },
-  {
-    label: "Admin",
-    links: [
-      { label: "Data Health", href: "/data-health" },
-      { label: "Publish Odds", href: "/odds-center/admin" },
-    ],
-  },
-];
+function activeNavigationHref(pathname, hash) {
+  const links = navigationSections.flatMap((section) => section.links);
+  const hashMatch = links.find(({ href }) => {
+    if (!href.includes("#")) return false;
+    const [linkPath, linkHash] = href.split("#");
+    return pathname === linkPath && hash === `#${linkHash}`;
+  });
 
-function isActive(pathname, href) {
-  if (href === "/") return pathname === "/";
-  if (href === "/war-room") return pathname === href;
-  if (href.includes("#")) return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
+  if (hashMatch) return hashMatch.href;
+
+  return links
+    .filter(({ href }) => !href.includes("#"))
+    .filter(({ href }) =>
+      href === "/"
+        ? pathname === "/"
+        : pathname === href || pathname.startsWith(`${href}/`)
+    )
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href || "";
 }
 
 export default function Menu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hash, setHash] = useState("");
   const pathname = usePathname();
+  const activeHref = activeNavigationHref(pathname, hash);
+
+  useEffect(() => {
+    const updateHash = () => setHash(window.location.hash);
+    updateHash();
+    window.addEventListener("hashchange", updateHash);
+    return () => window.removeEventListener("hashchange", updateHash);
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -103,31 +84,38 @@ export default function Menu() {
 
         <div className="sideMenuScroll">
           <nav className="sideNav" aria-label="Site navigation">
-            <Link
-              className={`sideNavHome ${isActive(pathname, "/") ? "current" : ""}`}
-              href="/"
-              onClick={() => setIsOpen(false)}
-            >
-              Home
-            </Link>
-
-            {menuGroups.map((group) => (
-              <section className="sideNavGroup" key={group.label}>
-                <h2>{group.label}</h2>
-                <div>
-                  {group.links.map((link) => (
-                    <Link
-                      className={isActive(pathname, link.href) ? "current" : ""}
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            ))}
+            {navigationSections.map((group) =>
+              group.label ? (
+                <section className="sideNavGroup" key={group.label}>
+                  <h2>{group.label}</h2>
+                  <div>
+                    {group.links.map((link) => (
+                      <Link
+                        className={activeHref === link.href ? "current" : ""}
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              ) : (
+                group.links.map((link) => (
+                  <Link
+                    className={`sideNavHome ${
+                      activeHref === link.href ? "current" : ""
+                    }`}
+                    href={link.href}
+                    key={link.href}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))
+              )
+            )}
           </nav>
 
           <div className="sideMenuFooter">24 players · Two teams · One trophy</div>

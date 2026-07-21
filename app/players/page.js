@@ -14,7 +14,7 @@ import {
 import styles from "../historical.module.css";
 
 export const metadata = {
-  title: "Players | The Sandbagger Invitational",
+  title: "Sandbaggers | The Sandbagger Invitational",
 };
 
 export default async function PlayersPage() {
@@ -27,7 +27,7 @@ export default async function PlayersPage() {
 
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>The Competitors</p>
-        <h1>Player Directory</h1>
+        <h1>Sandbaggers</h1>
         <p>
           Complete match records from 2017 onward, career handicaps,
           rivalries, partnerships, ratings, and championship history.
