@@ -83,7 +83,7 @@ export default async function TournamentGuidePage() {
           <div><dt>Edition</dt><dd>{tournament.editionTitle || tournament.year}</dd></div>
           {tournament.Dates || tournament.Date ? <div><dt>Dates</dt><dd>{tournament.Dates || tournament.Date}</dd></div> : null}
           {tournament.Location ? <div><dt>Location</dt><dd>{tournament.Location}</dd></div> : null}
-          <div><dt>Field</dt><dd>{tournament["Team Size"] ? `${Number(tournament["Team Size"]) * 2} players` : "Two teams"}</dd></div>
+          <div><dt>Field</dt><dd>{tournament["Team Size"] ? `${Number(tournament["Team Size"])} players` : "Two teams"}</dd></div>
         </dl>
       </section>
 
