@@ -11,6 +11,10 @@ export const metadata = {
   description: "Every team to win the Sandbagger Invitational.",
 };
 
+function displayScore(value) {
+  return String(value || "Score not recorded").replace(/\s+-\s+/g, " – ");
+}
+
 export default async function ChampionsPage() {
   await refreshHistoricalData();
   const champions = getTournaments().filter(
@@ -34,16 +38,18 @@ export default async function ChampionsPage() {
         <div className={styles.championGrid}>
           {champions.map((tournament) => (
             <article className={styles.championCard} key={tournament.id}>
-              <div className={styles.championCardYear}>{tournament.year}</div>
+              <div className={styles.championCardHeading}>
+                <strong>{tournament.year}</strong>
+                <span>{tournament.Destination}</span>
+              </div>
               <TeamLogoPlate
                 filename={tournament.championTeam.logo}
                 teamName={tournament.championTeam.name}
                 variant="card"
               />
               <div className={styles.championCardCopy}>
-                <span>{tournament.Destination}</span>
                 <h2>{tournament.championTeam.name}</h2>
-                <strong>{tournament["Final Score"] || "Score not recorded"}</strong>
+                <strong>{displayScore(tournament["Final Score"])}</strong>
                 {tournament.championTeam.captain ? (
                   <p>
                     Captain: {tournament.championTeam.captain["Display Name"]}

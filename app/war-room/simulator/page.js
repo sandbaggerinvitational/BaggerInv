@@ -1,36 +1,11 @@
-export const dynamic = "force-dynamic";
-
-import { Header, Footer } from "../../components";
-import { refreshHistoricalData, getAllPlayerStats, getPartnershipStats, getHeadToHead } from "../../../lib/stats";
-import { loadPredictionSheets } from "../../../lib/prediction-data";
-import MatchSimulator from "./MatchSimulator";
-
-export const metadata = { title: "Match Simulator | Sandbagger Invitational" };
+import { redirect } from "next/navigation";
 
 export default async function MatchSimulatorPage({ searchParams }) {
   const query = await searchParams;
-  const initialSelection = {
-    format: String(query?.format || "").toUpperCase(),
-    players: String(query?.players || "").split(",").filter(Boolean),
-    tee: String(query?.tee || ""),
-  };
-  let data = null;
-  let error = "";
-  try {
-    const sheets = await loadPredictionSheets();
-    await refreshHistoricalData();
-    const historical = {};
-    for (const { player, stats } of getAllPlayerStats()) historical[player["Player ID"]] = stats;
-    const partnerships = {};
-    for (const row of getPartnershipStats().byMatches) partnerships[row.key] = { record: row.record, byFormat: row.byFormat, percentage: row.percentage };
-    const ids = Object.keys(historical);
-    const headToHead = {};
-    for (let i = 0; i < ids.length; i += 1) {
-      for (let j = i + 1; j < ids.length; j += 1) headToHead[`${ids[i]}|${ids[j]}`] = getHeadToHead(ids[i], ids[j]);
-    }
-    data = { sheets, historical, partnerships, headToHead };
-  } catch (caughtError) {
-    error = caughtError.message || "Unable to load simulation data.";
-  }
-  return <main><Header /><MatchSimulator initialData={data} loadError={error} initialSelection={initialSelection} /><Footer /></main>;
+  const params = new URLSearchParams();
+  Object.entries(query || {}).forEach(([key, value]) => {
+    if (Array.isArray(value)) value.forEach((item) => params.append(key, item));
+    else if (value !== undefined) params.set(key, value);
+  });
+  redirect(`/war-room${params.size ? `?${params.toString()}` : ""}`);
 }

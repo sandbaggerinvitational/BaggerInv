@@ -24,6 +24,10 @@ function points(value) {
   return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
 }
 
+function displayScore(value) {
+  return String(value || "Score not recorded").replace(/\s+-\s+/g, " – ");
+}
+
 export async function generateMetadata({ params }) {
   const { year } = await params;
   return { title: `${year} Champions | The Sandbagger Invitational` };
@@ -85,7 +89,7 @@ export default async function ChampionshipDetailPage({ params }) {
           <div>
             <span>Winning Team</span>
             <h2>{champion.name}</h2>
-            <strong>{tournament["Final Score"] || "Score not recorded"}</strong>
+            <strong>{displayScore(tournament["Final Score"])}</strong>
             <p>
               Defeated {opponent?.name || "the opposing team"}
               {champion.captain?.["Display Name"]

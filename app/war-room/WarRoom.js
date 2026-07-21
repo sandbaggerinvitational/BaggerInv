@@ -1,6 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./war-room.module.css";
 import {
   allocateStrokes,
@@ -15,12 +14,15 @@ import {
   currentTournamentYear,
   getCourseOptions,
   getFormatCourse,
+  getFormatPointsAvailable,
   getTeamContext,
   holesForTee,
   scorecardForTee,
 } from "../../lib/tournament-context";
 import { briefingPayload, buildFallbackBriefing } from "../../lib/captains-briefing";
 import { teamVibesTier } from "../../lib/prediction-engine";
+import { simulateMatch } from "../../lib/match-simulator";
+import SimulationResults from "./SimulationResults";
 
 const clean = (value) => String(value ?? "").trim();
 const number = (value, fallback = 0) => {
@@ -38,18 +40,28 @@ function compactPlayerName(name) {
   return `${parts[0][0]}. ${parts.slice(1).join(" ")}`;
 }
 
+function formatLabel(format) {
+  return ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[formatCode(format)] || format;
+}
+
 function BriefingParagraph({ paragraph }) {
   const match = paragraph.match(/^([A-Z][A-Z '\-]+):\s*(.*)$/s);
   if (!match) return <p>{paragraph}</p>;
   return <div className={styles.briefingSection}><strong>{match[1]}</strong><p>{match[2]}</p></div>;
 }
 
-export default function WarRoom({ initialData, loadError, aiConfigured = false }) {
+export default function WarRoom({ initialData, loadError, aiConfigured = false, initialSelection = {} }) {
   const sheets = initialData?.sheets || {};
-  const [format, setFormat] = useState("BB");
-  const [selected, setSelected] = useState([]);
-  const [teeOverride, setTeeOverride] = useState("");
+  const initialFormat = ["BB", "SC", "SI"].includes(initialSelection.format)
+    ? initialSelection.format
+    : "BB";
+  const [format, setFormat] = useState(initialFormat);
+  const [selected, setSelected] = useState(initialSelection.players || []);
+  const [teeOverride, setTeeOverride] = useState(initialSelection.tee || "");
   const [showHoleDetails, setShowHoleDetails] = useState(false);
+  const [showSetup, setShowSetup] = useState(true);
+  const [activeSection, setActiveSection] = useState("overview");
+  const [simulationRun, setSimulationRun] = useState(0);
   const [aiBriefing, setAiBriefing] = useState("");
   const [aiError, setAiError] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -74,6 +86,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   };
   const holes = holesForTee(sheets, course, tee);
   const settings = settingsMap(sheets.settings || []);
+  const pointsAvailable = getFormatPointsAvailable(sheets, year, formatCode(format));
   const historical = initialData?.historical || {};
   const partnerships = initialData?.partnerships || {};
   const headToHead = initialData?.headToHead || {};
@@ -96,7 +109,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   const ready = details.length === required && details.every((player) => player.id && Number.isFinite(player.tournamentHandicap) && Number.isFinite(player.courseHandicap)) && scorecardComplete;
   const play = ready ? playingHandicaps(format, details.map((player) => player.courseHandicap)) : null;
   const prediction = ready
-    ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name] })
+    ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name], pointsAvailable })
     : null;
   const playerStrokeMaps = play && holes.length === 18 && formatCode(format) !== "SC"
     ? play.playerStrokes.map((strokes) => allocateStrokes(strokes, holes))
@@ -109,6 +122,35 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
           team2: holes.map((_, index) => Math.max(...playerStrokeMaps.slice(slotsPerTeam).map((map) => map[index] || 0))),
         }
     : null;
+  const simulationStrokeMaps = effectiveStrokeMaps
+    ? { teamA: effectiveStrokeMaps.team1, teamB: effectiveStrokeMaps.team2 }
+    : null;
+  const simulationSeed = `${year}|${courseId}|${tee}|${formatCode(format)}|${chosen.join("|")}|v1`;
+  const simulation = useMemo(
+    () => simulationRun > 0 && ready && simulationStrokeMaps
+      ? simulateMatch({
+          format: formatCode(format),
+          prediction,
+          strokeMaps: simulationStrokeMaps,
+          teamNames: [teams.team1.name, teams.team2.name],
+          iterations: 10_000,
+          seed: simulationSeed,
+        })
+      : null,
+    [simulationRun, ready, format, prediction, simulationStrokeMaps, teams.team1.name, teams.team2.name, simulationSeed]
+  );
+
+  useEffect(() => {
+    if (!ready) return;
+    const params = new URLSearchParams();
+    params.set("format", formatCode(format));
+    if (courseId) params.set("course", courseId);
+    if (tee) params.set("tee", tee);
+    chosen.forEach((playerId, index) => {
+      if (playerId) params.set(`p${index + 1}`, playerId);
+    });
+    window.history.replaceState(null, "", `/war-room?${params.toString()}`);
+  }, [ready, format, courseId, tee, chosen.join("|")]);
 
   const fallbackBriefing = ready
     ? buildFallbackBriefing({ prediction, teamNames: [teams.team1.name, teams.team2.name], format: formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles", players: details, optimizer: null })
@@ -128,6 +170,8 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
     setShowHoleDetails(false);
     setAiBriefing("");
     setAiError("");
+    setSimulationRun(0);
+    setShowSetup(true);
   }
   function updatePlayer(index, value) {
     const next = [...chosen];
@@ -135,6 +179,8 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
     setSelected(next);
     setAiBriefing("");
     setAiError("");
+    setSimulationRun(0);
+    if (next.slice(0, required).every(Boolean)) setShowSetup(false);
   }
   function netForPlayer(index) {
     if (formatCode(format) === "BB" || formatCode(format) === "SI") return play.playerStrokes[index];
@@ -207,17 +253,29 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
   return (
     <>
       <section className={styles.hero}>
-        <p>War Room Analytics</p><h1>Matchup Builder</h1><span>Build a matchup. See the strokes. Make the call.</span>
+        <p>War Room Analytics</p><h1>Matchup Lab</h1><span>One matchup. Deterministic analysis and 10,000 possible outcomes.</span>
       </section>
       <section className={styles.shell}>
         {loadError ? <div className={styles.notice}>{loadError}</div> : null}
         {validation.length ? <div className={styles.notice}>{validation.map((message) => <div key={message}>{message}</div>)}</div> : null}
-        <div className={styles.setupCard}>
-          <div className={styles.sectionTitle}><span>01</span><div><p>Matchup Builder</p><h2>Choose the battlefield</h2></div></div>
+        <div className={styles.setupCard} data-collapsed={ready && !showSetup}>
+          {ready && !showSetup ? (
+            <div className={styles.mobileMatchupSummary}>
+              <div>
+                <strong>{details.slice(0, slotsPerTeam).map((player) => player.name).join(" + ")}</strong>
+                <span>vs</span>
+                <strong>{details.slice(slotsPerTeam).map((player) => player.name).join(" + ")}</strong>
+                <small>{formatLabel(format)} · {pick(course, "Course Name", "Course") || courseId} · {tee}</small>
+              </div>
+              <button type="button" onClick={() => setShowSetup(true)}>Change Matchup</button>
+            </div>
+          ) : null}
+          <div className={styles.setupForm}>
+          <div className={styles.sectionTitle}><span>01</span><div><p>Shared Matchup Setup</p><h2>Choose the battlefield</h2></div></div>
           <div className={styles.controlsThree}>
             <label>Format<select value={format} onChange={(event) => changeFormat(event.target.value)}><option value="BB">Best Ball</option><option value="SC">Scramble</option><option value="SI">Singles</option></select></label>
             <label>Course<input value={pick(course, "Course Name", "Course") || courseId || "Not assigned"} readOnly /></label>
-            <label>Tee<select value={tee} onChange={(event) => { setTeeOverride(event.target.value); setAiBriefing(""); }} disabled={!tees.length}>{tees.length ? tees.map((name) => <option key={name} value={name}>{name}</option>) : <option value="">No scorecard tees</option>}</select></label>
+            <label>Tee<select value={tee} onChange={(event) => { setTeeOverride(event.target.value); setAiBriefing(""); setSimulationRun(0); }} disabled={!tees.length}>{tees.length ? tees.map((name) => <option key={name} value={name}>{name}</option>) : <option value="">No scorecard tees</option>}</select></label>
           </div>
           <div className={styles.matchupGrid}>
             {[teams.team1, teams.team2].map((team, side) => (
@@ -230,6 +288,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               </div>
             ))}
           </div>
+          </div>
         </div>
 
         {!ready ? (
@@ -241,6 +300,18 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
               <div><p>Selected Matchup</p><h2>Matchup analysis</h2></div>
               <small>{formatCode(format) === "BB" ? "Best Ball" : formatCode(format) === "SC" ? "Scramble" : "Singles"} · {tee}</small>
             </div>
+            <nav className={styles.labTabs} aria-label="Matchup Lab sections">
+              {[
+                ["overview", "Overview"],
+                ["simulation", "Simulation"],
+                ["handicaps", "Handicap Breakdown"],
+                ["briefing", "Analyst Briefing"],
+              ].map(([id, label]) => (
+                <button type="button" data-active={activeSection === id} onClick={() => setActiveSection(id)} key={id}>{label}</button>
+              ))}
+            </nav>
+
+            {activeSection === "overview" ? <>
             <div className={styles.predictionCard}>
               <div className={styles.model}>{prediction.model} · {prediction.confidence} confidence</div>
               <div className={styles.probabilities}>
@@ -267,13 +338,23 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
                 <span>{name} · Team Vibes</span><strong>{vibes.known ? Math.round(vibes.score) : "—"}</strong><b>{tier.icon} {tier.label}</b><small>{vibes.known ? `${vibes.sameFormatMatches} same-format · ${vibes.matches} overall matches` : "No recorded pairing history yet"}</small>
               </div>; })}
             </div> : null}
+            </> : null}
 
-            <div className={styles.simHandoff}>
-              <div><span>Explore the uncertainty</span><strong>See 10,000 possible outcomes for this exact matchup.</strong></div>
-              <Link href={`/war-room/simulator?format=${encodeURIComponent(formatCode(format))}&players=${encodeURIComponent(chosen.join(","))}&tee=${encodeURIComponent(tee)}`}>Run 10,000 simulations →</Link>
-            </div>
+            {activeSection === "simulation" ? (
+              <div className={styles.labSection}>
+                <div className={styles.simRun}>
+                  <button type="button" disabled={holes.length !== 18} onClick={() => setSimulationRun((run) => run + 1)}>
+                    {simulation ? "Run another 10,000 simulations" : "Run 10,000 simulations"}
+                  </button>
+                  <small>{holes.length === 18 ? "The simulation uses the matchup selected above. Results remain stable until an input changes." : "A complete 18-hole scorecard is required for simulation."}</small>
+                </div>
+                {simulation ? <SimulationResults simulation={simulation} format={formatCode(format)} teamNames={[teams.team1.name, teams.team2.name]} /> : (
+                  <div className={styles.simulationEmpty}><span>Monte Carlo Simulation</span><h2>Ready for 10,000 outcomes</h2><p>Run the selected matchup to see segment probabilities, expected points, likely results, and match-closing risk.</p></div>
+                )}
+              </div>
+            ) : null}
 
-            <div className={styles.briefingCard}>
+            {activeSection === "briefing" ? <div className={styles.briefingCard}>
               <div className={styles.sectionTitle}><span>SBI</span><div><p>SBI Match Analyst</p><h2>The official scouting report</h2></div></div>
               <div className={styles.briefingText}>{String(aiBriefing || fallbackBriefing).split(/\n\s*\n/).filter(Boolean).map((paragraph, index) => <BriefingParagraph paragraph={paragraph} key={index} />)}</div>
               <div className={styles.aiActions}>
@@ -281,9 +362,9 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
                 <small>{aiConfigured ? "Official SBI analysis built from the deterministic matchup numbers above." : "Add OPENAI_API_KEY in Vercel Production Environment Variables and redeploy to enable the SBI Match Analyst."}</small>
               </div>
               {aiError ? <div className={styles.aiError}>{aiError} The SBI analyst briefing above remains available.</div> : null}
-            </div>
+            </div> : null}
 
-            <div className={styles.breakdownCard}>
+            {activeSection === "handicaps" ? <div className={styles.breakdownCard}>
               <div className={styles.sectionTitle}><span>02</span><div><p>Handicap Breakdown</p><h2>Where the strokes fall</h2></div></div>
               <div className={styles.playerTable}>
                 <div className={styles.tableHead}><span>Player</span><span>Tournament</span><span>Course</span><span>Playing</span></div>
@@ -318,7 +399,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false }
                   return <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokesHere.length ? strokesHere.map(({ player }) => <span key={player.id}>{formatCode(format) === "SC" ? player.name : compactPlayerName(player.name)}</span>) : <span>—</span>}</b></div>;
                 })}</div> : null}</div>
               ) : <p className={styles.noHoles}>Hole details are hidden because this tee does not yet have all 18 Course Holes rows.</p>}
-            </div>
+            </div> : null}
           </>
         )}
       </section>

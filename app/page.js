@@ -229,7 +229,7 @@ export default async function Home() {
             The trophy carries the names, teams, and stories of the Invitational
             from one year to the next.
           </p>
-          <Link className="textLink" href="/history">
+          <Link className="textLink" href="/champions">
             View past champions →
           </Link>
         </div>

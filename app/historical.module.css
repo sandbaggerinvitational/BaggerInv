@@ -611,13 +611,14 @@
 }
 
 .championCard {
-  position: relative;
   min-width: 0;
   padding: 28px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   overflow: hidden;
   border: 1px solid var(--tsi-line);
   border-radius: var(--tsi-radius-lg);
@@ -625,23 +626,33 @@
   box-shadow: var(--tsi-shadow-sm);
 }
 
-.championCardYear {
-  position: absolute;
-  top: 16px;
-  right: 19px;
-  color: rgba(11, 53, 41, .09);
+.championCardHeading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.championCardHeading strong {
+  color: var(--tsi-green-900);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 3.6rem;
+  font-size: 2.7rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.championCardHeading span {
+  color: var(--tsi-gold-500);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: .65rem;
   font-weight: 800;
 }
 
 .championCardCopy {
-  position: relative;
-  z-index: 1;
   min-width: 0;
 }
 
-.championCardCopy > span,
 .championshipSummary span {
   color: var(--tsi-gold-500);
   text-transform: uppercase;
@@ -659,7 +670,8 @@
 }
 
 .championCardCopy h2 {
-  font-size: 1.5rem;
+  margin-top: 0;
+  font-size: 1.55rem;
 }
 
 .championCardCopy > strong {
@@ -669,7 +681,8 @@
 }
 
 .championCardCopy p {
-  margin: 8px 0 17px;
+  min-height: 1em;
+  margin: 9px 0 17px;
   color: var(--tsi-muted);
   font-size: .8rem;
 }

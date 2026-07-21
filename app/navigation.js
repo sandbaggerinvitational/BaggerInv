@@ -13,9 +13,8 @@ export const navigationSections = [
   {
     label: "War Room",
     links: [
-      { label: "Matchup Builder", href: "/war-room" },
+      { label: "Matchup Lab", href: "/war-room" },
       { label: "Lineup Optimizer", href: "/war-room/lineup-optimizer" },
-      { label: "Match Simulator", href: "/war-room/simulator" },
     ],
   },
   {
