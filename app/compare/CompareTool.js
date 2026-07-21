@@ -93,7 +93,7 @@ export default function CompareTool({
     <>
       <section className={styles.hero}>
         <p>HEAD TO HEAD</p>
-        <h1>Compare Players</h1>
+        <h1>Compare Sandbaggers</h1>
         <span>
           Select any two Sandbaggers and compare careers and direct
           meetings.

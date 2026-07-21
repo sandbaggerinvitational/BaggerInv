@@ -23,7 +23,7 @@ export const navigationSections = [
     links: [
       { label: "Sandbaggers", href: "/players" },
       { label: "Sandbagger Ratings", href: "/ratings" },
-      { label: "Compare Players", href: "/compare" },
+      { label: "Compare Sandbaggers", href: "/compare" },
       { label: "Records", href: "/records" },
     ],
   },
@@ -31,7 +31,7 @@ export const navigationSections = [
     label: "Tournament",
     links: [
       { label: "History", href: "/history" },
-      { label: "Champions", href: "/history#champions" },
+      { label: "Champions", href: "/champions" },
       { label: "The Cup", href: "/#cup" },
       { label: "Board of Governors", href: "/board-of-governors" },
       { label: "Rules", href: "/rules" },

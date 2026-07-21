@@ -546,6 +546,20 @@
   box-shadow: var(--tsi-shadow-md);
 }
 
+.historyCardPrimary {
+  display: block;
+}
+
+.historyChampionLink {
+  margin: 0 21px 21px;
+  padding-top: 14px;
+  display: block;
+  border-top: 1px solid var(--tsi-line);
+  color: var(--tsi-green-900);
+  font-size: .78rem;
+  font-weight: 800;
+}
+
 .historyPhotoPlaceholder {
   min-height: 190px;
   padding: 24px;
@@ -586,6 +600,241 @@
 
 .historyCardBody strong {
   color: var(--tsi-green-900);
+}
+
+/* ---------- Champions ---------- */
+
+.championGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.championCard {
+  position: relative;
+  min-width: 0;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-lg);
+  background: var(--tsi-white);
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.championCardYear {
+  position: absolute;
+  top: 16px;
+  right: 19px;
+  color: rgba(11, 53, 41, .09);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3.6rem;
+  font-weight: 800;
+}
+
+.championCardCopy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.championCardCopy > span,
+.championshipSummary span {
+  color: var(--tsi-gold-500);
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  font-size: .65rem;
+  font-weight: 800;
+}
+
+.championCardCopy h2,
+.championshipSummary h2 {
+  margin: 7px 0;
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.05;
+}
+
+.championCardCopy h2 {
+  font-size: 1.5rem;
+}
+
+.championCardCopy > strong {
+  color: var(--tsi-green-900);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.championCardCopy p {
+  margin: 8px 0 17px;
+  color: var(--tsi-muted);
+  font-size: .8rem;
+}
+
+.championCardCopy a,
+.championDetailLinks a {
+  color: var(--tsi-green-900);
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.championshipSummary {
+  padding: 34px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 30px;
+  align-items: center;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-lg);
+  background: linear-gradient(135deg, #fffdf8, #f6eedb);
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.championshipSummary h2 {
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+}
+
+.championshipSummary strong {
+  color: var(--tsi-green-900);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+}
+
+.championshipSummary p {
+  margin: 10px 0 0;
+  color: var(--tsi-muted);
+}
+
+.championRoster {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.championRoster > a {
+  min-width: 0;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-sm);
+  background: var(--tsi-white);
+}
+
+.championRoster strong {
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+}
+
+.championRoster span {
+  color: var(--tsi-muted);
+  font-size: .76rem;
+}
+
+.championRoster b {
+  color: var(--tsi-green-900);
+  font-size: .78rem;
+}
+
+.championRounds {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+}
+
+.championRounds > a {
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: minmax(190px, 1.5fr) 1fr 1fr;
+  gap: 20px;
+  align-items: center;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-sm);
+  background: var(--tsi-white);
+}
+
+.championRounds > a > div,
+.championRounds p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.championRounds span {
+  color: var(--tsi-gold-500);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .62rem;
+  font-weight: 800;
+}
+
+.championRounds > a > div strong,
+.championRounds p b {
+  color: var(--tsi-ink);
+  font-size: .82rem;
+}
+
+.championRounds p strong {
+  color: var(--tsi-green-900);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+}
+
+.championDetailLinks {
+  margin-top: 54px;
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid var(--tsi-line);
+}
+
+@media (max-width: 1050px) {
+  .championGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .championGrid,
+  .championRoster {
+    grid-template-columns: 1fr;
+  }
+
+  .championCard {
+    padding: 22px;
+  }
+
+  .championshipSummary {
+    padding: 26px 20px;
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .championshipSummary > div:first-child {
+    display: flex;
+    justify-content: center;
+  }
+
+  .championRounds > a {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .championRounds > a > div {
+    grid-column: 1 / -1;
+  }
+
+  .championDetailLinks {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 /* ---------- Tournament year ---------- */

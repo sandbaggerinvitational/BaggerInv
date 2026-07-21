@@ -9,7 +9,7 @@ import {
 import CompareTool from "./CompareTool";
 
 export const metadata = {
-  title: "Player Comparison | Sandbagger Invitational",
+  title: "Compare Sandbaggers | Sandbagger Invitational",
 };
 
 export default async function ComparePage({ searchParams }) {

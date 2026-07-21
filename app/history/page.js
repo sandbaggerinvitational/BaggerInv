@@ -31,31 +31,41 @@ export default async function HistoryPage() {
       <section className={styles.content} id="champions">
         <div className={styles.historyCardGrid}>
           {tournaments.map((tournament) => (
-            <Link
-              className={styles.historyPhotoCard}
-              href={`/history/${tournament.year}`}
-              key={tournament.year}
-            >
-              <div className={styles.historyPhotoFrame}>
-                <AssetImage
-                  src={tournamentHero(tournament["Hero Image"])}
-                  alt={`${tournament.year} ${tournament.Destination}`}
-                  className={styles.historyPhoto}
-                  fallbackClassName={styles.historyPhotoPlaceholder}
-                  fallback={tournament.Destination}
-                />
-                <div className={styles.historyPhotoShade} />
-              </div>
+            <article className={styles.historyPhotoCard} key={tournament.year}>
+              <Link
+                className={styles.historyCardPrimary}
+                href={`/history/${tournament.year}`}
+              >
+                <div className={styles.historyPhotoFrame}>
+                  <AssetImage
+                    src={tournamentHero(tournament["Hero Image"])}
+                    alt={`${tournament.year} ${tournament.Destination}`}
+                    className={styles.historyPhoto}
+                    fallbackClassName={styles.historyPhotoPlaceholder}
+                    fallback={tournament.Destination}
+                  />
+                  <div className={styles.historyPhotoShade} />
+                </div>
 
-              <div className={styles.historyCardBody}>
-                <span>{tournament.editionTitle}</span>
-                <h2>{tournament.year}</h2>
-                <p>{tournament.Destination}</p>
-                <strong>
-                  {tournament.championTeam?.name || "Upcoming Invitational"}
-                </strong>
-              </div>
-            </Link>
+                <div className={styles.historyCardBody}>
+                  <span>{tournament.editionTitle}</span>
+                  <h2>{tournament.year}</h2>
+                  <p>{tournament.Destination}</p>
+                  <strong>
+                    {tournament.championTeam?.name || "Upcoming Invitational"}
+                  </strong>
+                </div>
+              </Link>
+
+              {tournament.championTeamId ? (
+                <Link
+                  className={styles.historyChampionLink}
+                  href={`/champions/${tournament.year}`}
+                >
+                  View {tournament.year} Champion →
+                </Link>
+              ) : null}
+            </article>
           ))}
         </div>
       </section>
