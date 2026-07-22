@@ -9,8 +9,10 @@ export async function POST(request) {
     const secret = request.headers.get("x-odds-admin-secret");
     const allowed = [process.env.ADMIN_SECRET, process.env.ODDS_ADMIN_SECRET, process.env.GUIDE_ADMIN_SECRET, process.env.LIVE_ADMIN_SECRET].filter(Boolean);
     if (!secret || !allowed.includes(secret)) return NextResponse.json({ error: "Invalid publishing password." }, { status: 401 });
-    const { phase } = await request.json();
+    const { phase, iterations: requestedIterations = 10_000 } = await request.json();
     if (!ODDS_PHASES.includes(phase)) return NextResponse.json({ error: "Invalid official phase." }, { status: 400 });
+    const iterations = Number(requestedIterations);
+    if (![10_000, 25_000, 50_000, 100_000].includes(iterations)) return NextResponse.json({ error: "Invalid simulation count." }, { status: 400 });
     const inputs = await loadOddsInputs();
     const matchupStatus = validateOpeningMatchups(inputs.sheets);
     if (!matchupStatus.ready) return NextResponse.json({ error: matchupStatus.message }, { status: 409 });
@@ -18,7 +20,7 @@ export async function POST(request) {
       const roundThreeStatus = validateRoundThreePairings(inputs.sheets);
       if (!roundThreeStatus.ready) return NextResponse.json({ error: roundThreeStatus.message }, { status: 409 });
     }
-    const preview = simulateTournamentOdds({ ...inputs, phase, iterations: 10_000 });
+    const preview = simulateTournamentOdds({ ...inputs, phase, iterations });
     const existing = (await readOddsSnapshots()).filter((row) => row.year === preview.year);
     if (phase === "Pre-Tournament" && existing.some((row) => row.phase !== "Pre-Tournament")) return NextResponse.json({ error: "Pre-Tournament is locked because the tournament has started." }, { status: 409 });
     const snapshot = await publishOddsSnapshot(preview);
