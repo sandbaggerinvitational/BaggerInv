@@ -62,7 +62,7 @@ function MatchEditor({ match, playerMap, teams, onAction, busy }) {
   </article>;
 }
 
-export default function LiveMatchControl({ embedded = false, sharedSecret = "", selectedYear = "" }) {
+export default function LiveMatchControl({ embedded = false, sharedSecret = "", sharedUpdatedBy = "", selectedYear = "" }) {
   const [secret, setSecret] = useState(sharedSecret);
   const [updatedBy, setUpdatedBy] = useState("");
   const [data, setData] = useState(null);
@@ -72,6 +72,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const [round, setRound] = useState("");
 
   useEffect(() => { if (sharedSecret) setSecret(sharedSecret); }, [sharedSecret]);
+  useEffect(() => { if (sharedUpdatedBy) setUpdatedBy(sharedUpdatedBy); }, [sharedUpdatedBy]);
   useEffect(() => { if (selectedYear) { setYear(String(selectedYear)); setRound(""); } }, [selectedYear]);
   useEffect(() => { if (embedded && sharedSecret && !data) load(); }, [embedded, sharedSecret]);
 

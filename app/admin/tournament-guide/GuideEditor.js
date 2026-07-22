@@ -31,7 +31,7 @@ function Field({ field, type, value, onChange }) {
   return <label htmlFor={id}>{field}<input id={id} type={type} value={value || ""} onChange={(event) => onChange(field, event.target.value)} /></label>;
 }
 
-export default function GuideEditor({ tournaments, embedded = false, sharedSecret = "", selectedTournamentId, onTournamentChange }) {
+export default function GuideEditor({ tournaments, embedded = false, sharedSecret = "", sharedUpdatedBy = "", selectedTournamentId, onTournamentChange }) {
   const [secret, setSecret] = useState(sharedSecret);
   const [data, setData] = useState(null);
   const [active, setActive] = useState("sections");
@@ -61,7 +61,7 @@ export default function GuideEditor({ tournaments, embedded = false, sharedSecre
   async function save(nextRecord = record) {
     setStatus("Saving to Google Sheets…");
     try {
-      const payload = await request("POST", { type: active, record: { ...nextRecord, "Tournament ID": tournamentId } });
+      const payload = await request("POST", { type: active, record: { ...nextRecord, "Tournament ID": tournamentId }, updatedBy: sharedUpdatedBy || "Guide Admin" });
       setData((current) => ({ ...current, [active]: [...(current[active] || []).filter((item) => item[idField] !== payload.record[idField]), payload.record] }));
       setRecord(payload.record);
       setStatus("Saved successfully.");
@@ -71,7 +71,7 @@ export default function GuideEditor({ tournaments, embedded = false, sharedSecre
   async function remove(item) {
     if (!window.confirm(`Delete “${item[TITLES[active]] || "this item"}”? This cannot be undone.`)) return;
     setStatus("Deleting…");
-    try { await request("DELETE", { type: active, id: item[idField] }); setData((current) => ({ ...current, [active]: current[active].filter((row) => row[idField] !== item[idField]) })); setRecord(blank(tournamentId)); setStatus("Deleted successfully."); }
+    try { await request("DELETE", { type: active, id: item[idField], updatedBy: sharedUpdatedBy || "Guide Admin" }); setData((current) => ({ ...current, [active]: current[active].filter((row) => row[idField] !== item[idField]) })); setRecord(blank(tournamentId)); setStatus("Deleted successfully."); }
     catch (error) { setStatus(error.message); }
   }
 

@@ -26,8 +26,8 @@ export async function GET(request) {
 export async function POST(request) {
   if (!authorized(request)) return deny();
   try {
-    const { type, record } = await request.json();
-    return NextResponse.json({ record: await saveTournamentGuideRecord(type, record) });
+    const { type, record, updatedBy } = await request.json();
+    return NextResponse.json({ record: await saveTournamentGuideRecord(type, record, updatedBy) });
   } catch (error) {
     console.error("Tournament Guide save failed", { sheet: "Guide tabs", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: error?.message || "Unable to save Tournament Guide content." }, { status: 400 });
@@ -37,8 +37,8 @@ export async function POST(request) {
 export async function DELETE(request) {
   if (!authorized(request)) return deny();
   try {
-    const { type, id } = await request.json();
-    return NextResponse.json(await deleteTournamentGuideRecord(type, id));
+    const { type, id, updatedBy } = await request.json();
+    return NextResponse.json(await deleteTournamentGuideRecord(type, id, updatedBy));
   } catch (error) {
     console.error("Tournament Guide delete failed", { sheet: "Guide tabs", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: error?.message || "Unable to delete Tournament Guide content." }, { status: 400 });
