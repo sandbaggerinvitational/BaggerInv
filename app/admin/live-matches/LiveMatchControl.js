@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./live-match-control.module.css";
 
 const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Match Status", "Notes"];
@@ -62,14 +62,18 @@ function MatchEditor({ match, playerMap, teams, onAction, busy }) {
   </article>;
 }
 
-export default function LiveMatchControl() {
-  const [secret, setSecret] = useState("");
+export default function LiveMatchControl({ embedded = false, sharedSecret = "", selectedYear = "" }) {
+  const [secret, setSecret] = useState(sharedSecret);
   const [updatedBy, setUpdatedBy] = useState("");
   const [data, setData] = useState(null);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [year, setYear] = useState("");
   const [round, setRound] = useState("");
+
+  useEffect(() => { if (sharedSecret) setSecret(sharedSecret); }, [sharedSecret]);
+  useEffect(() => { if (selectedYear) { setYear(String(selectedYear)); setRound(""); } }, [selectedYear]);
+  useEffect(() => { if (embedded && sharedSecret && !data) load(); }, [embedded, sharedSecret]);
 
   const request = async (body) => {
     const response = await fetch("/api/live-matches", { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-live-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
@@ -84,7 +88,7 @@ export default function LiveMatchControl() {
       const payload = await request();
       setData(payload.data);
       const years = [...new Set(payload.data.matches.map((match) => String(match.Year)).filter(Boolean))].sort((a, b) => Number(b) - Number(a));
-      setYear(years[0] || ""); setRound(""); setStatus("");
+      setYear(String(selectedYear || years[0] || "")); setRound(""); setStatus("");
     } catch (error) { setStatus(error.message); }
     finally { setBusy(false); }
   };
@@ -107,8 +111,8 @@ export default function LiveMatchControl() {
     finally { setBusy(false); }
   };
 
-  return <section className={styles.shell}>
-    <header className={styles.hero}><p>SBI Administration</p><h1>Live Match Control</h1><span>Update official results, finalize matches into tournament history, and reopen corrections safely.</span></header>
+  return <section className={`${styles.shell} ${embedded ? "liveControlEmbedded" : ""}`}>
+    {!embedded ? <header className={styles.hero}><p>SBI Administration</p><h1>Live Match Control</h1><span>Update official results, finalize matches into tournament history, and reopen corrections safely.</span></header> : null}
     {!data ? <div className={styles.login}>
       <label>Admin password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label>
       <label>Your name<input value={updatedBy} onChange={(event) => setUpdatedBy(event.target.value)} placeholder="Recorded in the update log" /></label>
@@ -116,7 +120,7 @@ export default function LiveMatchControl() {
       {status ? <p>{status}</p> : null}
     </div> : <>
       <div className={styles.toolbar}>
-        <label>Tournament<select value={year} onChange={(event) => { setYear(event.target.value); setRound(""); }}>{years.map((item) => <option key={item}>{item}</option>)}</select></label>
+        {!embedded ? <label>Tournament<select value={year} onChange={(event) => { setYear(event.target.value); setRound(""); }}>{years.map((item) => <option key={item}>{item}</option>)}</select></label> : null}
         <label>Round<select value={round} onChange={(event) => setRound(event.target.value)}><option value="">All rounds</option>{rounds.map((item) => <option key={item} value={item}>Round {item}</option>)}</select></label>
         <label>Updated By<input value={updatedBy} onChange={(event) => setUpdatedBy(event.target.value)} /></label>
         <strong>{matches.length} matches</strong>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./guide-editor.module.css";
 
 const TYPES = [
@@ -31,15 +31,19 @@ function Field({ field, type, value, onChange }) {
   return <label htmlFor={id}>{field}<input id={id} type={type} value={value || ""} onChange={(event) => onChange(field, event.target.value)} /></label>;
 }
 
-export default function GuideEditor({ tournaments }) {
-  const [secret, setSecret] = useState("");
+export default function GuideEditor({ tournaments, embedded = false, sharedSecret = "", selectedTournamentId, onTournamentChange }) {
+  const [secret, setSecret] = useState(sharedSecret);
   const [data, setData] = useState(null);
   const [active, setActive] = useState("sections");
-  const [tournamentId, setTournamentId] = useState(String(tournaments[0]?.id || tournaments[0]?.year || ""));
+  const [tournamentId, setTournamentId] = useState(String(selectedTournamentId || tournaments[0]?.id || tournaments[0]?.year || ""));
   const [record, setRecord] = useState(blank(tournamentId));
   const [status, setStatus] = useState("");
   const idField = TYPES.find(([type]) => type === active)?.[2];
   const records = useMemo(() => (data?.[active] || []).filter((item) => String(item["Tournament ID"]) === tournamentId).sort((a, b) => Number(a["Display Order"] || 0) - Number(b["Display Order"] || 0)), [data, active, tournamentId]);
+
+  useEffect(() => { if (selectedTournamentId && String(selectedTournamentId) !== tournamentId) changeTournament(String(selectedTournamentId)); }, [selectedTournamentId]);
+  useEffect(() => { if (sharedSecret) setSecret(sharedSecret); }, [sharedSecret]);
+  useEffect(() => { if (embedded && sharedSecret && !data) load(); }, [embedded, sharedSecret]);
 
   async function request(method, body) {
     const response = await fetch("/api/tournament-guide", { method, headers: { "content-type": "application/json", "x-guide-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
@@ -72,13 +76,13 @@ export default function GuideEditor({ tournaments }) {
   }
 
   function switchType(type) { setActive(type); setRecord(blank(tournamentId)); }
-  function changeTournament(value) { setTournamentId(value); setRecord(blank(value)); }
+  function changeTournament(value) { setTournamentId(value); setRecord(blank(value)); onTournamentChange?.(value); }
   function change(field, value) { setRecord((current) => ({ ...current, [field]: value })); }
 
-  return <section className={styles.editor}>
-    <header><p>SBI Administration</p><h1>Tournament Guide Editor</h1><span>Create, preview, and publish tournament-week information without changing website code.</span></header>
+  return <section className={`${styles.editor} ${embedded ? styles.embedded : ""}`}>
+    {!embedded ? <header><p>SBI Administration</p><h1>Tournament Guide Editor</h1><span>Create, preview, and publish tournament-week information without changing website code.</span></header> : null}
     {!data ? <div className={styles.login}><label>Admin publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label><button type="button" disabled={!secret} onClick={load}>Open Guide Editor</button>{status ? <p>{status}</p> : null}</div> : <>
-      <div className={styles.toolbar}><label>Tournament<select value={tournamentId} onChange={(event) => changeTournament(event.target.value)}>{tournaments.map((item) => <option key={item.id} value={item.id}>{item.year} — {item.label}</option>)}</select></label><a href="/tournament-guide" target="_blank" rel="noreferrer">Open public preview ↗</a></div>
+      {!embedded ? <div className={styles.toolbar}><label>Tournament<select value={tournamentId} onChange={(event) => changeTournament(event.target.value)}>{tournaments.map((item) => <option key={item.id} value={item.id}>{item.year} — {item.label}</option>)}</select></label><a href="/tournament-guide" target="_blank" rel="noreferrer">Open public preview ↗</a></div> : null}
       <nav className={styles.tabs}>{TYPES.map(([type, label]) => <button className={active === type ? styles.active : ""} key={type} onClick={() => switchType(type)}>{label}</button>)}<button className={active === "preview" ? styles.active : ""} onClick={() => setActive("preview")}>Preview</button></nav>
       {active === "preview" ? <div className={styles.preview}><iframe title="Tournament Guide preview" src="/tournament-guide" /></div> : <div className={styles.workspace}>
         <aside><div><h2>{TYPES.find(([type]) => type === active)?.[1]}</h2><button onClick={() => setRecord(blank(tournamentId))}>+ New</button></div>{records.length ? records.map((item) => <button className={record[idField] === item[idField] ? styles.selected : ""} key={item[idField]} onClick={() => setRecord(item)}><strong>{item[TITLES[active]] || "Untitled"}</strong><span>{item.Status || "Draft"} · Order {item["Display Order"] || 0}</span></button>) : <p>No records for this tournament.</p>}</aside>

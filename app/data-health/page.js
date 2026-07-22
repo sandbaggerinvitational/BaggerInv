@@ -52,7 +52,9 @@ function formatLabel(code) {
   return code === "BB" ? "Best Ball" : code === "SC" ? "Scramble" : "Singles";
 }
 
-export default async function DataHealthPage() {
+export default async function DataHealthPage({ searchParams }) {
+  const query = await searchParams;
+  const embedded = query?.embedded === "1";
   let diagnostics;
   let fatalError = "";
   try {
@@ -97,7 +99,7 @@ export default async function DataHealthPage() {
 
   return (
     <main>
-      <Header />
+      {!embedded ? <Header /> : null}
       <section className={styles.hero}>
         <p>Admin Diagnostics</p>
         <h1>Data Health</h1>
@@ -194,7 +196,7 @@ export default async function DataHealthPage() {
           </>
         ) : null}
       </section>
-      <Footer />
+      {!embedded ? <Footer /> : null}
     </main>
   );
 }
