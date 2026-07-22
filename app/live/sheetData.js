@@ -1,11 +1,19 @@
 import {
   getRoundProgress,
+  getEffectiveTournamentState,
   getTeamMomentum,
   getTournamentState,
-  isFinalizedMatch,
+  isLiveMatch,
+  isOfficialMatchResult,
   remainingByRound,
   roundStatus,
 } from "../../lib/live-tournament";
+import {
+  assertValidTournamentId,
+  recordBelongsToTournament,
+  tournamentId,
+  tournamentYear,
+} from "../../lib/tournament-identifiers";
 
 const SPREADSHEET_ID = "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4";
 
@@ -118,7 +126,7 @@ function buildLeaderboard(matches, playerMap, teamNames) {
     return stats.get(id);
   };
 
-  for (const match of matches.filter(isFinalizedMatch)) {
+  for (const match of matches.filter(isOfficialMatchResult)) {
     const winner = match.matchupWinner || match.overallWinner;
     for (const side of [1, 2]) {
       const players = match[`team${side}Players`];
@@ -156,10 +164,13 @@ export async function getTournamentData() {
     fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
   ]);
 
-  const active = liveTournaments.find((row) => clean(row.Year)) || {};
-  const year = Number(active.Year) || new Date().getFullYear();
-  const tournamentRow = tournaments.find((row) => Number(row.Year) === year) || {};
-  const yearTeams = teamRows.filter((row) => Number(row.Year) === year);
+  const active = [...liveTournaments]
+    .filter((row) => tournamentYear(row))
+    .sort((a, b) => tournamentYear(b) - tournamentYear(a))[0] || {};
+  const year = tournamentYear(active) || Math.max(...tournaments.map(tournamentYear).filter(Boolean));
+  const tournamentRow = tournaments.find((row) => tournamentYear(row) === year) || {};
+  const selectedTournamentId = assertValidTournamentId(tournamentId(tournamentRow) || String(year));
+  const yearTeams = teamRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
   const teams = { 1: { id: "", name: "Team 1", logo: "", captainId: "" }, 2: { id: "", name: "Team 2", logo: "", captainId: "" } };
   for (const row of yearTeams) {
     const side = Number(clean(row["Team Side"]).match(/(1|2)/)?.[1]);
@@ -178,55 +189,69 @@ export async function getTournamentData() {
     active: truthy(row.Active),
     captain: [teams[1].captainId, teams[2].captainId].includes(row["Player ID"]) || truthy(row.Captain),
   }]));
-  const courseMap = Object.fromEntries(courses.filter((row) => Number(row.Year) === year).map((row) => [row["Course ID"], {
+  const courseMap = Object.fromEntries(courses.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year)).map((row) => [row["Course ID"], {
     id: row["Course ID"], name: row["Course Name"] || row.Course || row["Full Course Name"] || row["Course ID"],
     logo: row["Course Logo"] || "", tee: row["Tee Played"] || "",
   }]));
-  const rulesByRound = Object.fromEntries(rules.filter((row) => Number(row.Year) === year).map((row) => [Number(clean(row.Round).match(/\d+/)?.[0]), row]));
-  const permanentMap = Object.fromEntries(permanentRows.filter((row) => Number(row.Year) === year).map((row) => [row["Match ID"], row]));
+  const rulesByRound = Object.fromEntries(rules.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year)).map((row) => [Number(clean(row.Round).match(/\d+/)?.[0]), row]));
+  const configuredMatches = permanentRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
+  const currentLiveRows = liveRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
+  const liveMap = new Map(currentLiveRows.map((row) => [clean(row["Match ID"]), row]));
+  const permanentMap = new Map(configuredMatches.map((row) => [clean(row["Match ID"]), row]));
+  const sourceIds = [...new Set([...configuredMatches, ...currentLiveRows].map((row) => clean(row["Match ID"])).filter(Boolean))];
+  const expectedByRound = new Map();
+  for (const row of configuredMatches.length ? configuredMatches : currentLiveRows) {
+    const round = Number(row.Round);
+    if (round) expectedByRound.set(round, (expectedByRound.get(round) || 0) + 1);
+  }
 
-  const matches = liveRows
-    .filter((row) => Number(row.Year) === year || !row.Year)
-    .map((liveRow) => {
-      const permanent = permanentMap[liveRow["Match ID"]];
-      const authoritative = permanent && /^(final|finalized|complete|completed)$/i.test(clean(permanent["Match Status"]))
-        ? resultFields(permanent, liveRow)
-        : liveRow;
-      const format = clean(liveRow.Format).toUpperCase();
-      const round = Number(liveRow.Round) || 1;
-      const course = courseMap[liveRow["Course ID"]] || { id: liveRow["Course ID"] || "", name: liveRow["Course ID"] || "", logo: "", tee: "" };
+  const matches = sourceIds.map((matchId) => {
+      const permanent = permanentMap.get(matchId) || {};
+      const liveRow = liveMap.get(matchId) || permanent;
+      const permanentFinal = /^(final|finalized)$/i.test(clean(permanent["Match Status"])) || clean(permanent["Finalized At"]);
+      const authoritative = permanentFinal ? resultFields(permanent, liveRow) : liveRow;
+      const rawStatus = clean(authoritative["Match Status"] || liveRow["Match Status"]);
+      const publicResultAllowed = permanentFinal || isLiveMatch({ status: rawStatus });
+      const status = permanentFinal ? "Final" : isLiveMatch({ status: rawStatus }) ? rawStatus : "Scheduled";
+      const format = clean(liveRow.Format || permanent.Format).toUpperCase();
+      const round = Number(liveRow.Round || permanent.Round) || 1;
+      const courseId = liveRow["Course ID"] || permanent["Course ID"] || "";
+      const course = courseMap[courseId] || { id: courseId, name: courseId, logo: "", tee: "" };
       const rule = rulesByRound[round] || {};
       return {
-        id: liveRow["Match ID"] || `${year}-${round}-${liveRow.Match}`,
+        id: matchId,
         round,
-        match: liveRow.Match || "",
+        match: liveRow.Match || permanent.Match || "",
         format,
         formatName: displayFormat(format),
         course,
-        teeTime: formatTime(liveRow["Tee Time"]),
-        status: authoritative["Match Status"] || liveRow["Match Status"] || "Scheduled",
-        finalizedAt: authoritative["Finalized At"] || "",
-        notes: authoritative.Notes || "",
+        teeTime: formatTime(liveRow["Tee Time"] || permanent["Tee Time"]),
+        status,
+        finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",
+        notes: publicResultAllowed ? (authoritative.Notes || "") : "",
         team1Players: [playerEntry(liveRow, 1, 1, playerMap), playerEntry(liveRow, 1, 2, playerMap)].filter(Boolean),
         team2Players: [playerEntry(liveRow, 2, 1, playerMap), playerEntry(liveRow, 2, 2, playerMap)].filter(Boolean),
         team1PlayingHcp: number(liveRow["Team 1 Playing HCP"]),
         team2PlayingHcp: number(liveRow["Team 2 Playing HCP"]),
         team1Stroke: number(liveRow["Team 1 Stroke"]),
         team2Stroke: number(liveRow["Team 2 Stroke"]),
-        matchupWinner: normalizeWinner(authoritative["Matchup Winner"]),
-        frontWinner: normalizeWinner(authoritative["Front 9 Winner"]),
-        backWinner: normalizeWinner(authoritative["Back 9 Winner"]),
-        overallWinner: normalizeWinner(authoritative["18-Hole Winner"] || authoritative["Matchup Winner"]),
-        team1Points: number(authoritative["Team 1 Points"]),
-        team2Points: number(authoritative["Team 2 Points"]),
+        matchupWinner: publicResultAllowed ? normalizeWinner(authoritative["Matchup Winner"]) : "",
+        frontWinner: publicResultAllowed ? normalizeWinner(authoritative["Front 9 Winner"]) : "",
+        backWinner: publicResultAllowed ? normalizeWinner(authoritative["Back 9 Winner"]) : "",
+        overallWinner: publicResultAllowed ? normalizeWinner(authoritative["18-Hole Winner"] || authoritative["Matchup Winner"]) : "",
+        team1Points: publicResultAllowed ? number(authoritative["Team 1 Points"]) : null,
+        team2Points: publicResultAllowed ? number(authoritative["Team 2 Points"]) : null,
         pointsAvailable: number(rule["Points Available"]) ?? 3,
+        expectedRoundMatchCount: expectedByRound.get(round) || 0,
       };
     });
 
-  // The Admin Center edits the canonical Tournaments row. Keep Live Tournaments
-  // as a backwards-compatible fallback for installations that have not migrated.
-  const currentRound = Number(tournamentRow["Current Round"] || active["Current Round"]) || 1;
-  const status = tournamentRow["Tournament Status"] || active["Tournament Status"] || "Upcoming";
+  const configuredStatus = tournamentRow["Tournament Status"] || active["Tournament Status"] || "Upcoming";
+  const configuredRound = tournamentRow["Current Round"] || active["Current Round"] || 1;
+  const statusMode = tournamentRow["Status Mode"] || "Automatic";
+  const effective = getEffectiveTournamentState({ matches, configuredStatus, configuredRound, statusMode });
+  const currentRound = effective.currentRound;
+  const status = effective.status;
   const rounds = [...new Set(matches.map((match) => match.round))].sort((a, b) => a - b).map((roundNumber) => {
     const roundMatches = matches.filter((match) => match.round === roundNumber).sort((a, b) => Number(a.match) - Number(b.match));
     const course = roundMatches[0]?.course || {};
@@ -234,24 +259,26 @@ export async function getTournamentData() {
     return { ...round, status: roundStatus(round, status, currentRound), progress: getRoundProgress(round) };
   });
 
-  const finalizedMatches = matches.filter(isFinalizedMatch);
+  const finalizedMatches = matches.filter(isOfficialMatchResult);
   const finalizedScore = finalizedMatches.reduce((score, match) => ({
     teamOne: score.teamOne + (match.team1Points ?? 0),
     teamTwo: score.teamTwo + (match.team2Points ?? 0),
   }), { teamOne: 0, teamTwo: 0 });
-  const hasFinalizedResults = finalizedMatches.length > 0;
-
   const tournament = {
+    id: selectedTournamentId,
     year,
     status,
+    configuredStatus,
+    statusMode,
+    effective,
     currentRound,
     location: tournamentRow.Destination || tournamentRow.Location || "",
     dates: tournamentRow.Dates || "",
     liveMessage: active["Live Message"] || "",
     lastUpdated: active["Last Updated"] || "",
     tieAdvantageSide: tieAdvantageSide(tournamentRow, teams),
-    teamOne: { ...teams[1], score: hasFinalizedResults ? finalizedScore.teamOne : (number(active["Team 1 Score"]) ?? 0) },
-    teamTwo: { ...teams[2], score: hasFinalizedResults ? finalizedScore.teamTwo : (number(active["Team 2 Score"]) ?? 0) },
+    teamOne: { ...teams[1], score: finalizedScore.teamOne },
+    teamTwo: { ...teams[2], score: finalizedScore.teamTwo },
   };
   const state = getTournamentState({ tournament, rounds });
 

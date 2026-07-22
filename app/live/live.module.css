@@ -785,22 +785,6 @@
    V14 — FINAL MATCH CENTER POLISH
    ========================================================= */
 
-.tournamentRibbon {
-  min-height: 54px;
-  padding: 12px 7vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  color: #fff;
-  background: linear-gradient(90deg, #073126, #0c4b38);
-  border-bottom: 1px solid rgba(225,189,100,.45);
-  text-align: center;
-}
-.tournamentRibbon strong { color: #e1bd64; text-transform: uppercase; letter-spacing: .12em; font-size: .68rem; }
-.tournamentRibbon span { font: 700 1rem Georgia, serif; }
-.tournamentRibbon small { padding: 5px 9px; border-radius: 999px; background: rgba(255,255,255,.11); font-size: .65rem; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
-
 .matchCard { display: flex; flex-direction: column; }
 .matchupTeams {
   min-height: 310px;
@@ -846,8 +830,6 @@
 }
 
 @media (max-width: 700px) {
-  .tournamentRibbon { padding-inline: 5vw; flex-wrap: wrap; gap: 6px 10px; }
-  .tournamentRibbon span { width: 100%; order: 2; }
   .desktopInsights { display: none; }
   .mobileInsights { margin-top: 20px; display: grid; gap: 10px; }
   .mobileInsight { overflow: hidden; border: 1px solid #ddd6c8; border-radius: 16px; background: #fff; }

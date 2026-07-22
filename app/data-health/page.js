@@ -12,13 +12,22 @@ import {
 import { pick } from "../../lib/prediction-engine";
 import styles from "./data-health.module.css";
 import { careerYearDataIssue } from "../../lib/player-career";
+import { isFinalizedMatch, isOfficialMatchResult } from "../../lib/live-tournament";
+import {
+  isValidTournamentId,
+  recordBelongsToTournament,
+  tournamentId,
+  tournamentYear,
+} from "../../lib/tournament-identifiers";
 
 export const metadata = { title: "Data Health | Sandbagger Invitational" };
 
 const clean = (value) => String(value ?? "").trim();
 const REQUIRED_COLUMNS = {
+  tournaments: [["Year", "Tournament ID"]],
   players: [["Player ID", "ID"], ["Display Name", "Player Name", "Name", "First"]],
   matches: [["Year"], ["Format"], ["Team 1 Player 1"], ["Team 2 Player 1"]],
+  liveMatches: [["Match ID"], ["Year", "Tournament ID"], ["Round"], ["Match Status"]],
   teamNames: [["Year"], ["Team Side"], ["Team Name", "Team Names", "Name"]],
   liveTournaments: [["Year"]],
   liveRoundHandicaps: [["Year"], ["Player ID"]],
@@ -102,6 +111,60 @@ export default async function DataHealthPage({ searchParams }) {
   const players = diagnostics?.sheets.players?.rows || [];
   const handicaps = diagnostics?.sheets.handicaps?.rows || [];
   const matches = diagnostics?.sheets.matches?.rows || [];
+  const liveMatches = diagnostics?.sheets.liveMatches?.rows || [];
+  const tournaments = diagnostics?.sheets.tournaments?.rows || [];
+  const liveTournaments = diagnostics?.sheets.liveTournaments?.rows || [];
+  const tournamentRules = diagnostics?.sheets.tournamentRules?.rows || [];
+  const selectedTournament = tournaments.find((record) => tournamentYear(record) === Number(year)) || null;
+  const selectedTournamentId = selectedTournament ? tournamentId(selectedTournament) : "";
+  const explicitTournamentId = (record) => clean(record["Tournament ID"] || record.Year);
+  const directTournamentIds = tournaments.map(explicitTournamentId).filter(Boolean);
+  const knownTournamentIds = new Set(tournaments.map((record) => tournamentId(record)).filter(Boolean));
+  const missingTournamentIds = tournaments.filter((record) => !explicitTournamentId(record));
+  const zeroTournamentIds = tournaments.filter((record) => explicitTournamentId(record) === "0");
+  const duplicateTournamentIds = [...directTournamentIds.reduce((counts, id) => {
+    counts.set(id, (counts.get(id) || 0) + 1);
+    return counts;
+  }, new Map())].filter(([, count]) => count > 1);
+  const requestedTournamentId = clean(query?.tournament);
+  const invalidSelector = Boolean(requestedTournamentId) && (
+    !isValidTournamentId(requestedTournamentId) || !knownTournamentIds.has(requestedTournamentId)
+  );
+  const unknownMatchReferences = [...matches, ...liveMatches].filter((record) => {
+    const reference = explicitTournamentId(record);
+    return reference && !knownTournamentIds.has(reference);
+  });
+  const tournamentMatches = selectedTournamentId
+    ? matches.filter((record) => recordBelongsToTournament(record, selectedTournamentId, year))
+    : [];
+  const expectedRoundCounts = tournamentMatches.reduce((counts, match) => {
+    const round = Number(match.Round);
+    if (Number.isFinite(round)) counts.set(round, (counts.get(round) || 0) + 1);
+    return counts;
+  }, new Map());
+  const definedRounds = [...new Set(tournamentRules
+    .filter((record) => !year || String(record.Year) === String(year))
+    .map((record) => Number(record.Round))
+    .filter(Number.isFinite))];
+  const zeroExpectedRounds = definedRounds.filter((round) => !expectedRoundCounts.get(round));
+  const finalizedWithoutPoints = tournamentMatches.filter(
+    (match) => isFinalizedMatch(match) && !isOfficialMatchResult(match)
+  );
+  const officialMatches = tournamentMatches.filter(isOfficialMatchResult);
+  const finalizedScore = officialMatches.reduce((score, match) => ({
+    teamOne: score.teamOne + (Number(match["Team 1 Points"]) || 0),
+    teamTwo: score.teamTwo + (Number(match["Team 2 Points"]) || 0),
+  }), { teamOne: 0, teamTwo: 0 });
+  const publicTournament = liveTournaments.find((record) =>
+    selectedTournamentId && recordBelongsToTournament(record, selectedTournamentId, year)
+  );
+  const publicScore = {
+    teamOne: Number(publicTournament?.["Team 1 Score"]) || 0,
+    teamTwo: Number(publicTournament?.["Team 2 Score"]) || 0,
+  };
+  const publicScoreMismatch = Boolean(publicTournament) && (
+    publicScore.teamOne !== finalizedScore.teamOne || publicScore.teamTwo !== finalizedScore.teamTwo
+  );
   const appearanceYears = appearanceYearsByPlayer(matches);
   const careerYearIssues = players
     .map((player) => careerYearDataIssue(player, appearanceYears.get(clean(player["Player ID"] || player.ID)) || []))
@@ -205,6 +268,46 @@ export default async function DataHealthPage({ searchParams }) {
             <section className={styles.card}>
               <div className={styles.cardHeader}><div><p>Integrity Checks</p><h2>Potential data problems</h2></div></div>
               <div className={styles.checkList}>
+                <div data-ok={invalidSelector ? "false" : "true"}>
+                  {invalidSelector ? `Invalid tournament selector value: ${requestedTournamentId}` : "Tournament selector resolves to a valid tournament"}
+                  {invalidSelector ? <Link href="/admin?tab=tournament"> Fix in Tournament →</Link> : null}
+                </div>
+                <div data-ok={zeroTournamentIds.length ? "false" : "true"}>
+                  {zeroTournamentIds.length ? "Tournament ID 0 detected" : "No Tournament ID 0 values detected"}
+                  {zeroTournamentIds.length ? <Link href="/admin?tab=tournament"> Fix in Tournament →</Link> : null}
+                </div>
+                <div data-ok={missingTournamentIds.length ? "false" : "true"}>
+                  {missingTournamentIds.length
+                    ? `Missing Tournament ID or Year: ${missingTournamentIds.map((record) => record.Annual || record["Tournament Name"] || "Unnamed tournament").join(", ")}`
+                    : "Every tournament has a stable identifier"}
+                  {missingTournamentIds.length ? <Link href={`/admin?tab=tournament${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Tournament →</Link> : null}
+                </div>
+                <div data-ok={duplicateTournamentIds.length ? "false" : "true"}>
+                  {duplicateTournamentIds.length ? `Duplicate Tournament IDs: ${duplicateTournamentIds.map(([id]) => id).join(", ")}` : "No duplicate Tournament IDs"}
+                  {duplicateTournamentIds.length ? <Link href="/admin?tab=tournament"> Fix in Tournament →</Link> : null}
+                </div>
+                <div data-ok={unknownMatchReferences.length ? "false" : "true"}>
+                  {unknownMatchReferences.length
+                    ? `${unknownMatchReferences.length} match rows reference an unknown Tournament ID`
+                    : "All match rows reference a known tournament"}
+                  {unknownMatchReferences.length ? <Link href={`/admin?tab=matches${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={zeroExpectedRounds.length ? "false" : "true"}>
+                  {zeroExpectedRounds.length ? `Rounds with zero expected matches: ${zeroExpectedRounds.join(", ")}` : "Every defined round has configured matches"}
+                  {zeroExpectedRounds.length ? <Link href={`/admin?tab=matches${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={finalizedWithoutPoints.length ? "false" : "true"}>
+                  {finalizedWithoutPoints.length
+                    ? `Finalized matches missing valid points: ${finalizedWithoutPoints.map((match) => match["Match ID"] || "Unknown match").join(", ")}`
+                    : "Every finalized match has a valid point total"}
+                  {finalizedWithoutPoints.length ? <Link href={`/admin?tab=live-scoring${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Live Scoring →</Link> : null}
+                </div>
+                <div data-ok={publicScoreMismatch ? "false" : "true"}>
+                  {publicScoreMismatch
+                    ? `Public score ${publicScore.teamOne}–${publicScore.teamTwo} differs from finalized total ${finalizedScore.teamOne}–${finalizedScore.teamTwo}`
+                    : "Public score matches the finalized point total"}
+                  {publicScoreMismatch ? <Link href={`/admin?tab=live-scoring${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Review Live Scoring →</Link> : null}
+                </div>
                 <div data-ok={playerDuplicates.length ? "false" : "true"}>{playerDuplicates.length ? `Duplicate Player IDs: ${playerDuplicates.map(([id]) => id).join(", ")}` : "No duplicate Player IDs"}</div>
                 <div data-ok={handicapDuplicates.length ? "false" : "true"}>{handicapDuplicates.length ? `Duplicate Year + Player handicap rows: ${handicapDuplicates.map(([key]) => key.replace("|", " / ")).join(", ")}` : "No duplicate Year + Player handicap rows"}</div>
                 <div data-ok={teams?.team1.players.length && teams?.team2.players.length ? "true" : "false"}>Current-year team rosters {teams?.team1.players.length && teams?.team2.players.length ? "loaded" : "are incomplete"}</div>

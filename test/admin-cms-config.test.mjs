@@ -19,5 +19,5 @@ test("every editable resource has stable identity and field definitions", () => 
 
 test("tournament editor includes status and homepage controls", () => {
   const names = new Set(TOURNAMENT_CMS_FIELDS.map((field) => field.name));
-  for (const required of ["Year", "Tournament Status", "Current Round", "Hero Image", "Mobile Hero Image"]) assert.ok(names.has(required));
+  for (const required of ["Year", "Status Mode", "Tournament Status", "Current Round", "Hero Image", "Mobile Hero Image"]) assert.ok(names.has(required));
 });

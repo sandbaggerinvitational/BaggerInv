@@ -82,6 +82,7 @@ export default async function Home() {
   const playerCount = rosterCount ||
     (Number.isFinite(listedTeamSize) ? listedTeamSize * 2 : 0);
   const status = clean(liveTournament.status) || "Upcoming";
+  const normalizedStatus = status.toUpperCase();
   const currentRound = clean(liveTournament.currentRound) || "Not started";
   const hasPairings = Object.values(liveData?.rounds || {}).some(
     (round) => round.matches?.length
@@ -103,6 +104,9 @@ export default async function Home() {
     { ...currentTournament.team1, name: teamOneName, captainName: captainOne },
     { ...currentTournament.team2, name: teamTwoName, captainName: captainTwo },
   ];
+  const championSide = Number(liveTournament.state?.championSide) || null;
+  const championTeam = championSide === 1 ? liveTournament.teamOne : championSide === 2 ? liveTournament.teamTwo : null;
+  const finalScore = `${liveTournament.teamOne?.score ?? 0}–${liveTournament.teamTwo?.score ?? 0}`;
 
   return (
     <main>
@@ -181,22 +185,34 @@ export default async function Home() {
 
         <div className="tournamentPreviewCard">
           <div className="tournamentPreviewHeader">
-            <span>Tournament Status</span>
-            <strong>{status}</strong>
+            <span>{normalizedStatus === "FINAL" ? `${year} Sandbagger Champions` : "Tournament Status"}</span>
+            <strong>{normalizedStatus}</strong>
           </div>
           <div className="tournamentPreviewTeams">
-            {teams.map((team, index) => (
+            {normalizedStatus === "FINAL" && championTeam ? (
+              <TeamIdentity
+                team={championTeam}
+                detail={`Final score ${finalScore}`}
+                href={`/history/${year}`}
+              />
+            ) : teams.map((team, index) => (
               <TeamIdentity
                 key={team.side || index}
                 team={team}
-                captain={team.captainName}
+                captain={normalizedStatus === "LIVE" ? undefined : team.captainName}
+                score={normalizedStatus === "LIVE" ? (index === 0 ? liveTournament.teamOne?.score ?? 0 : liveTournament.teamTwo?.score ?? 0) : undefined}
                 href={team.side ? `/history/${year}/team/${encodeURIComponent(team.side)}` : null}
               />
             ))}
           </div>
           <div className="tournamentPreviewRound">
-            <div><span>Current Round</span><strong>{currentRound}</strong></div>
-            <Link href="/live">View Pairings →</Link>
+            {normalizedStatus === "FINAL" ? (
+              <><div><span>Final Score</span><strong>{finalScore}</strong></div><Link href={`/history/${year}`}>View Final Results →</Link></>
+            ) : normalizedStatus === "LIVE" ? (
+              <><div><span>Current Round</span><strong>Round {currentRound}</strong></div><Link href="/live">Open Match Center →</Link></>
+            ) : (
+              <><div><span>Opening Round</span><strong>Round 1</strong></div><Link href="/live">View Pairings →</Link></>
+            )}
           </div>
         </div>
       </section>
