@@ -11,6 +11,7 @@ import {
 } from "../../lib/tournament-context";
 import { pick } from "../../lib/prediction-engine";
 import styles from "./data-health.module.css";
+import { careerYearDataIssue } from "../../lib/player-career";
 
 export const metadata = { title: "Data Health | Sandbagger Invitational" };
 
@@ -52,6 +53,23 @@ function formatLabel(code) {
   return code === "BB" ? "Best Ball" : code === "SC" ? "Scramble" : "Singles";
 }
 
+function appearanceYearsByPlayer(matches) {
+  const years = new Map();
+  for (const match of matches) {
+    const year = Number(match.Year);
+    if (!Number.isFinite(year)) continue;
+    for (const field of [
+      "Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2",
+    ]) {
+      const playerId = clean(match[field]);
+      if (!playerId) continue;
+      if (!years.has(playerId)) years.set(playerId, []);
+      years.get(playerId).push(year);
+    }
+  }
+  return years;
+}
+
 export default async function DataHealthPage({ searchParams }) {
   const query = await searchParams;
   const embedded = query?.embedded === "1";
@@ -83,6 +101,11 @@ export default async function DataHealthPage({ searchParams }) {
 
   const players = diagnostics?.sheets.players?.rows || [];
   const handicaps = diagnostics?.sheets.handicaps?.rows || [];
+  const matches = diagnostics?.sheets.matches?.rows || [];
+  const appearanceYears = appearanceYearsByPlayer(matches);
+  const careerYearIssues = players
+    .map((player) => careerYearDataIssue(player, appearanceYears.get(clean(player["Player ID"] || player.ID)) || []))
+    .filter(Boolean);
   const playerDuplicates = duplicateValues(players, ["Player ID", "ID"]);
   const handicapKeys = new Map();
   for (const row of handicaps) {
@@ -186,6 +209,11 @@ export default async function DataHealthPage({ searchParams }) {
                 <div data-ok={handicapDuplicates.length ? "false" : "true"}>{handicapDuplicates.length ? `Duplicate Year + Player handicap rows: ${handicapDuplicates.map(([key]) => key.replace("|", " / ")).join(", ")}` : "No duplicate Year + Player handicap rows"}</div>
                 <div data-ok={teams?.team1.players.length && teams?.team2.players.length ? "true" : "false"}>Current-year team rosters {teams?.team1.players.length && teams?.team2.players.length ? "loaded" : "are incomplete"}</div>
                 <div data-ok={formats.every((item) => item.tees.length) ? "true" : "false"}>All format courses {formats.every((item) => item.tees.length) ? "match at least one scorecard tee" : "do not yet match scorecard tees"}</div>
+                <div data-ok={careerYearIssues.length ? "false" : "true"}>
+                  {careerYearIssues.length
+                    ? `Missing player career start: ${careerYearIssues.map((issue) => issue.playerName).join(", ")}`
+                    : "Every player has a valid career start year or recorded appearance"}
+                </div>
               </div>
             </section>
 

@@ -1,3 +1,12 @@
+import {
+  getRoundProgress,
+  getTeamMomentum,
+  getTournamentState,
+  isFinalizedMatch,
+  remainingByRound,
+  roundStatus,
+} from "../../lib/live-tournament";
+
 const SPREADSHEET_ID = "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4";
 
 function csvUrl(sheetName) {
@@ -25,16 +34,16 @@ function parseCsv(csvText) {
   return rows;
 }
 
-function clean(value) { return String(value ?? "").trim(); }
+const clean = (value) => String(value ?? "").trim();
 function number(value) {
   const parsed = Number.parseFloat(clean(value).replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : null;
 }
-function truthy(value) { return ["true", "yes", "1"].includes(clean(value).toLowerCase()); }
+const truthy = (value) => ["true", "yes", "1"].includes(clean(value).toLowerCase());
 
 function table(rows) {
   const headers = (rows[0] || []).map(clean);
-  return rows.slice(1).filter((row) => row.some((v) => clean(v))).map((row) =>
+  return rows.slice(1).filter((row) => row.some((value) => clean(value))).map((row) =>
     Object.fromEntries(headers.map((header, index) => [header, clean(row[index])]))
   );
 }
@@ -43,9 +52,7 @@ async function fetchSheet(sheetName) {
   const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
   if (!response.ok) throw new Error(`${sheetName} returned ${response.status}.`);
   const text = await response.text();
-  if (!text.trim() || text.trim().startsWith("<")) {
-    throw new Error(`${sheetName} did not return public CSV data.`);
-  }
+  if (!text.trim() || text.trim().startsWith("<")) throw new Error(`${sheetName} did not return public CSV data.`);
   return table(parseCsv(text));
 }
 
@@ -53,10 +60,7 @@ function formatTime(value) {
   const raw = clean(value);
   if (!raw) return "";
   const match = raw.match(/Date\(\d+,\d+,\d+,(\d+),(\d+),(\d+)\)/);
-  if (match) {
-    const date = new Date(2000, 0, 1, Number(match[1]), Number(match[2]), Number(match[3]));
-    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  }
+  if (match) return new Date(2000, 0, 1, Number(match[1]), Number(match[2]), Number(match[3])).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   if (/^\d{1,2}:\d{2}/.test(raw)) {
     const [hours, minutes] = raw.split(":").map(Number);
     return new Date(2000, 0, 1, hours, minutes).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
@@ -76,21 +80,30 @@ function displayFormat(code) {
   return ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[clean(code).toUpperCase()] || clean(code);
 }
 
-function hcp(value) {
-  const parsed = number(value);
-  return parsed === null ? null : parsed;
-}
-
 function playerEntry(row, side, slot, playerMap) {
   const id = clean(row[`Team ${side} Player ${slot}`]);
   if (!id) return null;
+  const player = playerMap[id] || {};
   return {
     id,
-    name: playerMap[id]?.name || id,
-    slug: playerMap[id]?.slug || "",
-    playingHcp: hcp(row[`Team ${side} Player ${slot} Playing HCP`]),
+    name: player.name || id,
+    slug: player.slug || "",
+    photo: player.photo || "",
+    captain: Boolean(player.captain),
+    playingHcp: number(row[`Team ${side} Player ${slot} Playing HCP`] || row[`T${side} P${slot} Playing HCP`]),
     stroke: number(row[`Team ${side} Player ${slot} Stroke`]),
   };
+}
+
+function resultFields(source, fallback) {
+  const result = { ...fallback };
+  for (const field of [
+    "Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner",
+    "Team 1 Points", "Team 2 Points", "Match Status", "Notes", "Finalized At", "Finalized By",
+  ]) {
+    if (clean(source?.[field])) result[field] = source[field];
+  }
+  return result;
 }
 
 function buildLeaderboard(matches, playerMap, teamNames) {
@@ -98,22 +111,17 @@ function buildLeaderboard(matches, playerMap, teamNames) {
   const ensure = (id, side) => {
     if (!stats.has(id)) stats.set(id, {
       id, player: playerMap[id]?.name || id, slug: playerMap[id]?.slug || "",
-      team: teamNames[side] || `Team ${side}`, teamSide: side,
+      team: teamNames[side]?.name || `Team ${side}`, teamSide: side,
       wins: 0, losses: 0, halves: 0, points: 0,
     });
     return stats.get(id);
   };
 
-  for (const match of matches) {
-    const winner = normalizeWinner(match.raw["Matchup Winner"] || match.raw["18-Hole Winner"]);
-    const teamOnePoints = number(match.raw["Team 1 Points"]);
-    const teamTwoPoints = number(match.raw["Team 2 Points"]);
-    const completed = winner || teamOnePoints !== null || teamTwoPoints !== null;
-    if (!completed) continue;
-
+  for (const match of matches.filter(isFinalizedMatch)) {
+    const winner = match.matchupWinner || match.overallWinner;
     for (const side of [1, 2]) {
       const players = match[`team${side}Players`];
-      const teamPoints = side === 1 ? teamOnePoints : teamTwoPoints;
+      const teamPoints = side === 1 ? match.team1Points : match.team2Points;
       const share = teamPoints === null ? 0 : teamPoints / Math.max(players.length, 1);
       for (const player of players) {
         const stat = ensure(player.id, side);
@@ -124,86 +132,133 @@ function buildLeaderboard(matches, playerMap, teamNames) {
       }
     }
   }
+  return [...stats.values()].sort((a, b) => b.points - a.points || b.wins - a.wins || a.losses - b.losses || a.player.localeCompare(b.player));
+}
 
-  return [...stats.values()].sort((a, b) =>
-    b.points - a.points || b.wins - a.wins || a.losses - b.losses || b.halves - a.halves || a.player.localeCompare(b.player)
-  );
+function tieAdvantageSide(tournamentRow, teams) {
+  const reference = clean(
+    tournamentRow["Tie Advantage Team"] ||
+    tournamentRow["Trophy Holder"] ||
+    tournamentRow["Defending Champion Team"]
+  ).toLowerCase();
+  if (!reference) return null;
+  for (const side of [1, 2]) {
+    const team = teams[side];
+    if ([String(side), `team ${side}`, team.id, team.name].map((value) => clean(value).toLowerCase()).includes(reference)) return side;
+  }
+  return null;
 }
 
 export async function getTournamentData() {
-  const [liveMatches, liveTournaments, players, teamRows, tournaments, courses] = await Promise.all([
-    fetchSheet("Live Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
-    fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"),
+  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules] = await Promise.all([
+    fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
+    fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
   ]);
 
   const active = liveTournaments.find((row) => clean(row.Year)) || {};
   const year = Number(active.Year) || new Date().getFullYear();
   const tournamentRow = tournaments.find((row) => Number(row.Year) === year) || {};
+  const yearTeams = teamRows.filter((row) => Number(row.Year) === year);
+  const teams = { 1: { id: "", name: "Team 1", logo: "", captainId: "" }, 2: { id: "", name: "Team 2", logo: "", captainId: "" } };
+  for (const row of yearTeams) {
+    const side = Number(clean(row["Team Side"]).match(/(1|2)/)?.[1]);
+    if (side) teams[side] = {
+      id: row["Team ID"] || "",
+      name: row["Team Names"] || row["Team Name"] || `Team ${side}`,
+      logo: row["Team Logo"] || "",
+      captainId: row.Captain || "",
+    };
+  }
+
   const playerMap = Object.fromEntries(players.map((row) => [row["Player ID"], {
     name: row["Display Name"] || `${row.First || ""} ${row.Last || ""}`.trim(),
     slug: row.Slug || "",
+    photo: row["Photo Filename"] || "",
     active: truthy(row.Active),
+    captain: [teams[1].captainId, teams[2].captainId].includes(row["Player ID"]) || truthy(row.Captain),
   }]));
-  const courseMap = Object.fromEntries(courses.map((row) => [row["Course ID"], row["Course Name"] || row.Course || row["Full Course Name"] || row["Course ID"]]));
-  const teamNames = { 1: "Team 1", 2: "Team 2" };
-  for (const row of teamRows.filter((item) => Number(item.Year) === year)) {
-    const side = clean(row["Team Side"]).match(/(1|2)/)?.[1];
-    if (side) teamNames[Number(side)] = row["Team Names"] || row["Team Name"] || teamNames[Number(side)];
-  }
+  const courseMap = Object.fromEntries(courses.filter((row) => Number(row.Year) === year).map((row) => [row["Course ID"], {
+    id: row["Course ID"], name: row["Course Name"] || row.Course || row["Full Course Name"] || row["Course ID"],
+    logo: row["Course Logo"] || "", tee: row["Tee Played"] || "",
+  }]));
+  const rulesByRound = Object.fromEntries(rules.filter((row) => Number(row.Year) === year).map((row) => [Number(clean(row.Round).match(/\d+/)?.[0]), row]));
+  const permanentMap = Object.fromEntries(permanentRows.filter((row) => Number(row.Year) === year).map((row) => [row["Match ID"], row]));
 
-  const matches = liveMatches
+  const matches = liveRows
     .filter((row) => Number(row.Year) === year || !row.Year)
-    .map((row) => {
-      const format = clean(row.Format).toUpperCase();
-      const team1Players = [playerEntry(row, 1, 1, playerMap), playerEntry(row, 1, 2, playerMap)].filter(Boolean);
-      const team2Players = [playerEntry(row, 2, 1, playerMap), playerEntry(row, 2, 2, playerMap)].filter(Boolean);
+    .map((liveRow) => {
+      const permanent = permanentMap[liveRow["Match ID"]];
+      const authoritative = permanent && /^(final|finalized|complete|completed)$/i.test(clean(permanent["Match Status"]))
+        ? resultFields(permanent, liveRow)
+        : liveRow;
+      const format = clean(liveRow.Format).toUpperCase();
+      const round = Number(liveRow.Round) || 1;
+      const course = courseMap[liveRow["Course ID"]] || { id: liveRow["Course ID"] || "", name: liveRow["Course ID"] || "", logo: "", tee: "" };
+      const rule = rulesByRound[round] || {};
       return {
-        id: row["Match ID"] || `${year}-${row.Round}-${row.Match}`,
-        raw: row,
-        round: Number(row.Round) || 1,
-        match: row.Match || "",
+        id: liveRow["Match ID"] || `${year}-${round}-${liveRow.Match}`,
+        round,
+        match: liveRow.Match || "",
         format,
         formatName: displayFormat(format),
-        course: courseMap[row["Course ID"]] || row["Course ID"] || "",
-        teeTime: formatTime(row["Tee Time"]),
-        status: row["Match Status"] || "Scheduled",
-        notes: row.Notes || "",
-        team1Players,
-        team2Players,
-        team1PlayingHcp: hcp(row["Team 1 Playing HCP"]),
-        team2PlayingHcp: hcp(row["Team 2 Playing HCP"]),
-        team1Stroke: number(row["Team 1 Stroke"]),
-        team2Stroke: number(row["Team 2 Stroke"]),
-        matchupWinner: normalizeWinner(row["Matchup Winner"]),
-        frontWinner: normalizeWinner(row["Front 9 Winner"]),
-        backWinner: normalizeWinner(row["Back 9 Winner"]),
-        overallWinner: normalizeWinner(row["18-Hole Winner"] || row["Matchup Winner"]),
-        team1Points: number(row["Team 1 Points"]),
-        team2Points: number(row["Team 2 Points"]),
+        course,
+        teeTime: formatTime(liveRow["Tee Time"]),
+        status: authoritative["Match Status"] || liveRow["Match Status"] || "Scheduled",
+        finalizedAt: authoritative["Finalized At"] || "",
+        notes: authoritative.Notes || "",
+        team1Players: [playerEntry(liveRow, 1, 1, playerMap), playerEntry(liveRow, 1, 2, playerMap)].filter(Boolean),
+        team2Players: [playerEntry(liveRow, 2, 1, playerMap), playerEntry(liveRow, 2, 2, playerMap)].filter(Boolean),
+        team1PlayingHcp: number(liveRow["Team 1 Playing HCP"]),
+        team2PlayingHcp: number(liveRow["Team 2 Playing HCP"]),
+        team1Stroke: number(liveRow["Team 1 Stroke"]),
+        team2Stroke: number(liveRow["Team 2 Stroke"]),
+        matchupWinner: normalizeWinner(authoritative["Matchup Winner"]),
+        frontWinner: normalizeWinner(authoritative["Front 9 Winner"]),
+        backWinner: normalizeWinner(authoritative["Back 9 Winner"]),
+        overallWinner: normalizeWinner(authoritative["18-Hole Winner"] || authoritative["Matchup Winner"]),
+        team1Points: number(authoritative["Team 1 Points"]),
+        team2Points: number(authoritative["Team 2 Points"]),
+        pointsAvailable: number(rule["Points Available"]) ?? 3,
       };
     });
 
-  const rounds = {};
-  for (const match of matches) {
-    const key = `Round ${match.round}`;
-    if (!rounds[key]) rounds[key] = { label: key, format: match.formatName, matches: [] };
-    rounds[key].matches.push(match);
-  }
+  // The Admin Center edits the canonical Tournaments row. Keep Live Tournaments
+  // as a backwards-compatible fallback for installations that have not migrated.
+  const currentRound = Number(tournamentRow["Current Round"] || active["Current Round"]) || 1;
+  const status = tournamentRow["Tournament Status"] || active["Tournament Status"] || "Upcoming";
+  const rounds = [...new Set(matches.map((match) => match.round))].sort((a, b) => a - b).map((roundNumber) => {
+    const roundMatches = matches.filter((match) => match.round === roundNumber).sort((a, b) => Number(a.match) - Number(b.match));
+    const course = roundMatches[0]?.course || {};
+    const round = { number: roundNumber, label: `Round ${roundNumber}`, format: roundMatches[0]?.formatName || displayFormat(rulesByRound[roundNumber]?.Format), course, matches: roundMatches };
+    return { ...round, status: roundStatus(round, status, currentRound), progress: getRoundProgress(round) };
+  });
 
-  const leaderboard = buildLeaderboard(matches, playerMap, teamNames);
+  const finalizedMatches = matches.filter(isFinalizedMatch);
+  const finalizedScore = finalizedMatches.reduce((score, match) => ({
+    teamOne: score.teamOne + (match.team1Points ?? 0),
+    teamTwo: score.teamTwo + (match.team2Points ?? 0),
+  }), { teamOne: 0, teamTwo: 0 });
+  const hasFinalizedResults = finalizedMatches.length > 0;
+
+  const tournament = {
+    year,
+    status,
+    currentRound,
+    location: tournamentRow.Destination || tournamentRow.Location || "",
+    dates: tournamentRow.Dates || "",
+    liveMessage: active["Live Message"] || "",
+    lastUpdated: active["Last Updated"] || "",
+    tieAdvantageSide: tieAdvantageSide(tournamentRow, teams),
+    teamOne: { ...teams[1], score: hasFinalizedResults ? finalizedScore.teamOne : (number(active["Team 1 Score"]) ?? 0) },
+    teamTwo: { ...teams[2], score: hasFinalizedResults ? finalizedScore.teamTwo : (number(active["Team 2 Score"]) ?? 0) },
+  };
+  const state = getTournamentState({ tournament, rounds });
+
   return {
-    tournament: {
-      year,
-      status: active["Tournament Status"] || "Upcoming",
-      currentRound: `Round ${Number(active["Current Round"]) || 1}`,
-      location: tournamentRow.Destination || "",
-      dates: tournamentRow.Dates || "",
-      liveMessage: active["Live Message"] || "",
-      lastUpdated: active["Last Updated"] || "",
-      teamOne: { name: teamNames[1], score: number(active["Team 1 Score"]) ?? 0 },
-      teamTwo: { name: teamNames[2], score: number(active["Team 2 Score"]) ?? 0 },
-    },
+    tournament: { ...tournament, state },
     rounds,
-    leaderboard,
+    remainingByRound: remainingByRound(rounds),
+    momentum: getTeamMomentum(rounds),
+    leaderboard: buildLeaderboard(matches, playerMap, teams),
   };
 }

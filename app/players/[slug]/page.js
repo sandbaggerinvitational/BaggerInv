@@ -19,6 +19,7 @@ import {
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { formatPoints } from "../../../lib/formatters";
+import { formatPlayerCareerYears } from "../../../lib/player-career";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -136,6 +137,10 @@ export default async function PlayerPage({ params }) {
   const timelineRunnerUps = stats.careerTimeline.filter(
     (season) => season.result === "Runner-Up"
   ).length;
+  const recordedAppearanceYears = stats.seasons
+    .filter((season) => season.overall.matches > 0)
+    .map((season) => season.year);
+  const careerYears = formatPlayerCareerYears(player, recordedAppearanceYears);
 
   const compareHref = rival
     ? `/compare?player1=${encodeURIComponent(
@@ -187,10 +192,7 @@ export default async function PlayerPage({ params }) {
             </div>
           </div>
 
-          <div className={styles.profileMeta}>
-            {player["First Year"]}–
-            {player.active ? "Present" : player["Last Year"]}
-          </div>
+          {careerYears ? <div className={styles.profileMeta}>{careerYears}</div> : null}
         </div>
       </section>
 

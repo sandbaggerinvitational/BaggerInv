@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "./live-match-control.module.css";
+import { getTournamentState } from "../../../lib/live-tournament";
 
 const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Match Status", "Notes"];
 const WINNERS = ["", "Team 1", "Team 2", "Halved"];
@@ -98,6 +99,15 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const rounds = useMemo(() => [...new Set((data?.matches || []).filter((match) => !year || String(match.Year) === year).map((match) => String(match.Round)).filter(Boolean))].sort((a, b) => Number(a) - Number(b)), [data, year]);
   const matches = useMemo(() => (data?.matches || []).filter((match) => (!year || String(match.Year) === year) && (!round || String(match.Round) === round)).sort((a, b) => Number(a.Match) - Number(b.Match)), [data, year, round]);
   const playerMap = useMemo(() => Object.fromEntries((data?.players || []).map((player) => [player.id, player.name])), [data]);
+  const tournamentState = useMemo(() => {
+    const yearMatches = (data?.matches || []).filter((match) => !year || String(match.Year) === year);
+    const finalized = yearMatches.filter((match) => match["Match Status"] === "Final");
+    const teamOne = finalized.reduce((sum, match) => sum + (Number(match["Team 1 Points"]) || 0), 0);
+    const teamTwo = finalized.reduce((sum, match) => sum + (Number(match["Team 2 Points"]) || 0), 0);
+    const grouped = [...new Set(yearMatches.map((match) => Number(match.Round)).filter(Number.isFinite))]
+      .map((number) => ({ number, matches: yearMatches.filter((match) => Number(match.Round) === number) }));
+    return getTournamentState({ tournament: { teamOne: { score: teamOne }, teamTwo: { score: teamTwo } }, rounds: grouped });
+  }, [data, year]);
 
   const act = async (action, match, updates) => {
     if (!updatedBy.trim()) { setStatus("Enter your name before updating a match."); return; }
@@ -127,6 +137,11 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
         <strong>{matches.length} matches</strong>
       </div>
       {status ? <div className={styles.status}>{status}</div> : null}
+      <div className={styles.clinchSummary}>
+        <div><span>{teamName(data.teams, year, 1)}</span><strong>{tournamentState.teamOne.score}</strong><small>{tournamentState.teamOne.pointsToClinch > 0 ? `Need ${tournamentState.teamOne.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
+        <p>{tournamentState.remainingMatches} matches · {tournamentState.remainingPoints} points remaining</p>
+        <div><span>{teamName(data.teams, year, 2)}</span><strong>{tournamentState.teamTwo.score}</strong><small>{tournamentState.teamTwo.pointsToClinch > 0 ? `Need ${tournamentState.teamTwo.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
+      </div>
       <div className={styles.grid}>{matches.map((match) => <MatchEditor key={`${match["Match ID"]}-${match["Updated At"]}-${match["Match Status"]}`} match={match} playerMap={playerMap} teams={data.teams} onAction={act} busy={busy} />)}</div>
     </>}
   </section>;
