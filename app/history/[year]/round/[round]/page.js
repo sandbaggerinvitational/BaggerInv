@@ -14,11 +14,11 @@ import {
   getHistoricalRound,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
+import { formatPoints } from "../../../../../lib/formatters";
 import RoundNavigation from "./RoundNavigation";
 
 function displayPoints(value) {
-  if (value === null || value === undefined) return "—";
-  return Number.isInteger(value) ? value : Number(value).toFixed(1);
+  return formatPoints(value);
 }
 
 function strokeLabel(value) {

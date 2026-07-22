@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Menu from "./Menu";
+import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
 
 export function Header() {
   return (
@@ -12,7 +13,7 @@ export function Header() {
 
         <div>
           <strong>Sandbagger Invitational</strong>
-          <span>Established 2016</span>
+          <span>Established {SITE_ESTABLISHED_YEAR}</span>
         </div>
       </Link>
 

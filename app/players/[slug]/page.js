@@ -18,6 +18,7 @@ import {
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
+import { formatPoints } from "../../../lib/formatters";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -201,7 +202,7 @@ export default async function PlayerPage({ params }) {
           </div>
           <div className={styles.kpi}>
             <span>Career Points</span>
-            <strong>{stats.records.overall.points}</strong>
+            <strong>{formatPoints(stats.records.overall.points)}</strong>
           </div>
           <div className={styles.kpi}>
             <span>Point Win %</span>
@@ -371,7 +372,7 @@ export default async function PlayerPage({ params }) {
               <div className={styles.formatCard} key={key}>
                 <span>{label}</span>
                 <h3>{formatRecord(stats.records[key])}</h3>
-                <strong>{stats.records[key].points} points</strong>
+                <strong>{formatPoints(stats.records[key].points)} points</strong>
                 <em>{formatPercentage(stats.percentages[key])}</em>
               </div>
             ))}
@@ -398,7 +399,7 @@ export default async function PlayerPage({ params }) {
                   {row.player["Display Name"]}
                 </Link>
                 <span>{formatRecord(row.record)}</span>
-                <strong>{row.record.points}</strong>
+                <strong>{formatPoints(row.record.points)}</strong>
               </div>
             ))}
           </div>

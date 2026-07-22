@@ -3,7 +3,7 @@ import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { tournamentLogo } from "../../lib/asset-paths";
 import { loadTournamentGuideSheets } from "../../lib/google-sheets-data";
-import { getTournaments, refreshHistoricalData } from "../../lib/stats";
+import { getFormatName, getTournaments, refreshHistoricalData } from "../../lib/stats";
 import {
   groupBy,
   informationForSection,
@@ -41,6 +41,17 @@ function timeRange(event) {
   return [start, end].filter(Boolean).join(" – ");
 }
 
+function roundNumber(value) {
+  const parsed = Number(String(value ?? "").replace(/\D/g, ""));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function linkedRoundForEvent(tournament, event) {
+  const eventRound = roundNumber(event["Round ID"]);
+  if (!eventRound) return null;
+  return tournament.courses.find((course) => roundNumber(course.Round) === eventRound) || null;
+}
+
 export default async function TournamentGuidePage() {
   await refreshHistoricalData();
   const tournament = getTournaments()[0];
@@ -57,6 +68,11 @@ export default async function TournamentGuidePage() {
   const days = groupBy(guide.itinerary, "Day Label");
   const ruleCategories = groupBy(guide.rules, "Category");
   const sectionDescription = Object.fromEntries(guide.sections.map((section) => [section["Section Slug"], section.Description]));
+  const overviewItems = [
+    ["Edition", tournament.editionTitle || tournament.year],
+    ["Dates", tournament.Dates || tournament.Date],
+    ["Field", tournament["Team Size"] ? `${Number(tournament["Team Size"])} players` : "Two teams"],
+  ].filter(([, value]) => String(value ?? "").trim());
 
   return <main>
     <Header />
@@ -79,12 +95,9 @@ export default async function TournamentGuidePage() {
         <p className={styles.eyebrow}>Everything You Need</p>
         <h2>{tournament.Location || `${tournament.year} Tournament Week`}</h2>
         <Text value={sectionDescription.overview || "Schedules, rules, tournament tools, and important details for Sandbagger Invitational week."} />
-        <dl>
-          <div><dt>Edition</dt><dd>{tournament.editionTitle || tournament.year}</dd></div>
-          {tournament.Dates || tournament.Date ? <div><dt>Dates</dt><dd>{tournament.Dates || tournament.Date}</dd></div> : null}
-          {tournament.Location ? <div><dt>Location</dt><dd>{tournament.Location}</dd></div> : null}
-          <div><dt>Field</dt><dd>{tournament["Team Size"] ? `${Number(tournament["Team Size"])} players` : "Two teams"}</dd></div>
-        </dl>
+        {overviewItems.length ? <dl>{overviewItems.map(([label, value]) => (
+          <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
+        ))}</dl> : null}
       </section>
 
       {guide.itinerary.length ? <section className={styles.guideSection} id="itinerary">
@@ -92,11 +105,15 @@ export default async function TournamentGuidePage() {
         <div className={styles.timeline}>{Object.entries(days).map(([day, events]) => <section className={styles.day} key={day}>
           <h3>{day}</h3>
           {events.map((event) => {
-            const round = tournament.courses.find((item) => String(item["Round ID"] || item.Round) === String(event["Round ID"]));
+            const round = linkedRoundForEvent(tournament, event);
+            const venue = round?.Course || event.Location;
+            const roundMeta = round
+              ? [`Round ${roundNumber(round.Round)}`, getFormatName(round.Format), round["Tee Played"] ? `${round["Tee Played"]} Tees` : ""].filter(Boolean)
+              : [];
             return <article className={`${styles.event} ${isTruthy(event.Featured) ? styles.featured : ""}`} key={event["Event ID"]}>
               <div className={styles.eventTime}>{timeRange(event) || event["Event Date"]}</div>
-              <div><span>{event["Event Type"]}</span><h4>{event.Title}</h4>{event.Subtitle ? <strong>{event.Subtitle}</strong> : null}{event.Location ? <p className={styles.location}>{event.Location}</p> : null}<Text value={event.Details} />
-              {round ? <Link href={`/history/${tournament.year}/round/${round.Round}`}>View Round {round.Round} details →</Link> : null}</div>
+              <div><span>{event["Event Type"]}</span><h4>{event.Title}</h4>{event.Subtitle ? <strong>{event.Subtitle}</strong> : null}{venue ? <p className={styles.location}>{venue}</p> : null}{roundMeta.length ? <p className={styles.roundMeta}>{roundMeta.join(" • ")}</p> : null}<Text value={event.Details} />
+              {round ? <Link href={`/history/${tournament.year}/round/${roundNumber(round.Round)}`}>View Round {roundNumber(round.Round)} details →</Link> : null}</div>
             </article>;
           })}
         </section>)}</div>

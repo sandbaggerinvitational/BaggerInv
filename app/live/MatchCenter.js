@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { addTournamentRanks } from "../../lib/rankings";
 import styles from "./live.module.css";
+import { formatPoints } from "../../lib/formatters";
 
 function displayNumber(value) {
-  return value === null || value === undefined || value === "" ? "—" : Number(value).toFixed(Number(value) % 1 ? 1 : 0);
+  return formatPoints(value);
 }
 
 function hasValue(value) {

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatHandicap, parseNumericValue } from "../lib/formatters.js";
+import { formatHandicap, formatPoints, parseNumericValue } from "../lib/formatters.js";
 
 test("formats plus handicaps with parentheses", () => {
   assert.equal(formatHandicap(-2), "(2)");
@@ -27,4 +27,12 @@ test("uses a dash only for unavailable handicaps", () => {
   assert.equal(formatHandicap(undefined), "—");
   assert.equal(formatHandicap(""), "—");
   assert.equal(formatHandicap("not recorded"), "—");
+});
+
+test("formats tournament points with up to two decimal places", () => {
+  assert.equal(formatPoints(5.75), "5.75");
+  assert.equal(formatPoints(5.5), "5.5");
+  assert.equal(formatPoints(5), "5");
+  assert.equal(formatPoints(3.25), "3.25");
+  assert.equal(formatPoints(null), "—");
 });

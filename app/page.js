@@ -4,7 +4,10 @@ import Link from "next/link";
 import { Header, Footer } from "./components";
 import { getTournaments } from "../lib/stats";
 import { getTournamentData } from "./live/sheetData";
-import { homePageHero } from "../lib/asset-paths";
+import { homePageHero, tournamentLogo } from "../lib/asset-paths";
+import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
+import AssetImage from "./AssetImage";
+import TeamLogoPlate from "./TeamLogoPlate";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -89,13 +92,16 @@ export default async function Home() {
     currentTournament["Mobile Hero Image"] ||
       currentTournament["Homepage Mobile Hero Image"]
   );
-  const establishedYear = tournaments[0]?.year || 2016;
   const captainsCopy = captainOne && captainTwo
     ? ` Captains ${captainOne} and ${captainTwo} lead ${teamOneName} and ${teamTwoName}.`
     : ` ${teamOneName} and ${teamTwoName} will compete for the Cup.`;
   const roundCopy = roundCount
     ? `${roundCount} ${roundCount === 1 ? "round" : "rounds"}`
     : "a full slate";
+  const teams = [
+    { ...currentTournament.team1, name: teamOneName, captainName: captainOne },
+    { ...currentTournament.team2, name: teamTwoName, captainName: captainTwo },
+  ];
 
   return (
     <main>
@@ -126,6 +132,9 @@ export default async function Home() {
             <Link className="button primary" href={primaryAction.href}>
               {primaryAction.label}
             </Link>
+            <Link className="button guide" href="/tournament-guide">
+              Tournament Guide
+            </Link>
             <Link className="button glass" href="/history">
               Explore the History
             </Link>
@@ -139,7 +148,7 @@ export default async function Home() {
           </div>
           <div>
             <span>Format</span>
-            <strong>Ryder Cup Style</strong>
+            <strong>{SITE_FORMAT_LABEL}</strong>
           </div>
           <div>
             <span>Field</span>
@@ -147,7 +156,7 @@ export default async function Home() {
           </div>
           <div>
             <span>Established</span>
-            <strong>{establishedYear}</strong>
+            <strong>{SITE_ESTABLISHED_YEAR}</strong>
           </div>
         </div>
       </section>
@@ -155,7 +164,7 @@ export default async function Home() {
       <div className="mobileTournamentStrip" aria-label="Tournament details">
         <span>{location}</span>
         <span>{playerCount ? `${playerCount} Players` : "Two Teams"}</span>
-        <span>Ryder Cup Style</span>
+        <span>{SITE_FORMAT_LABEL}</span>
       </div>
 
       <section className="section tournamentSpotlight">
@@ -163,28 +172,32 @@ export default async function Home() {
           <p className="eyebrow dark">The Next Chapter</p>
           <h2>Where the next chapter will be written.</h2>
           <p className="sectionCopy">
-            The {year} Sandbagger Invitational heads to {destination} for {roundCopy}
-            of team competition.{captainsCopy} Follow the pairings, momentum, and
+            The {year} Sandbagger Invitational heads to {destination} for {roundCount === 3 ? "three rounds" : roundCopy}
+            {" "}of team match play.{captainsCopy} Follow the pairings, momentum, and
             every point as the tournament unfolds.
           </p>
         </div>
 
-        <div className="featureCard">
-          <div>
+        <div className="tournamentPreviewCard">
+          <div className="tournamentPreviewHeader">
             <span>Tournament Status</span>
             <strong>{status}</strong>
           </div>
-          <div>
-            <span>Team One</span>
-            <strong>{teamOneName}</strong>
+          <div className="tournamentPreviewTeams">
+            {teams.map((team, index) => (
+              <article key={team.side || index}>
+                <TeamLogoPlate filename={team.logo} teamName={team.name} variant="scoreboard" />
+                <div>
+                  <h3>{team.name}</h3>
+                  <p>Captain: {team.captainName || "To be announced"}</p>
+                  {team.side ? <Link href={`/history/${year}/team/${encodeURIComponent(team.side)}`}>View Team →</Link> : null}
+                </div>
+              </article>
+            ))}
           </div>
-          <div>
-            <span>Team Two</span>
-            <strong>{teamTwoName}</strong>
-          </div>
-          <div>
-            <span>Current Round</span>
-            <strong>{currentRound}</strong>
+          <div className="tournamentPreviewRound">
+            <div><span>Current Round</span><strong>{currentRound}</strong></div>
+            <Link href="/live">View Pairings →</Link>
           </div>
         </div>
       </section>
@@ -254,12 +267,21 @@ export default async function Home() {
               className="yearCard"
               key={tournament.year}
             >
+              <span className="yearCardLogo">
+                <AssetImage
+                  src={tournamentLogo(tournament.logoFileName)}
+                  alt={`${tournament.year} tournament logo`}
+                  fallback={String(tournament.year)}
+                  inferFallback={false}
+                />
+              </span>
               <span>{tournament.year}</span>
               <p>
                 {tournament.Destination ||
                   tournament.Location ||
                   "Tournament destination"}
               </p>
+              {Number(tournament.year) === Number(year) && !tournament.championTeamId ? <em>Upcoming</em> : null}
               <strong>View tournament</strong>
             </Link>
           ))}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigationSections } from "./navigation";
+import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
 
 function activeNavigationHref(pathname, hash) {
   const links = navigationSections.flatMap((section) => section.links);
@@ -70,7 +71,7 @@ export default function Menu() {
         <div className="sideMenuTop">
           <div>
             <strong>Sandbagger Invitational</strong>
-            <span>Established 2016</span>
+            <span>Established {SITE_ESTABLISHED_YEAR}</span>
           </div>
           <button
             className="closeMenuButton"
