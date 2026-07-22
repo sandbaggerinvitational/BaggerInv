@@ -8,6 +8,7 @@ import { homePageHero, tournamentLogo } from "../lib/asset-paths";
 import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
 import AssetImage from "./AssetImage";
 import TeamLogoPlate from "./TeamLogoPlate";
+import TeamIdentity from "./TeamIdentity";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -185,14 +186,12 @@ export default async function Home() {
           </div>
           <div className="tournamentPreviewTeams">
             {teams.map((team, index) => (
-              <article key={team.side || index}>
-                <TeamLogoPlate filename={team.logo} teamName={team.name} variant="scoreboard" />
-                <div>
-                  <h3>{team.name}</h3>
-                  <p>Captain: {team.captainName || "To be announced"}</p>
-                  {team.side ? <Link href={`/history/${year}/team/${encodeURIComponent(team.side)}`}>View Team →</Link> : null}
-                </div>
-              </article>
+              <TeamIdentity
+                key={team.side || index}
+                team={team}
+                captain={team.captainName}
+                href={team.side ? `/history/${year}/team/${encodeURIComponent(team.side)}` : null}
+              />
             ))}
           </div>
           <div className="tournamentPreviewRound">

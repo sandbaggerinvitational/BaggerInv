@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 export async function POST(request) {
   try {
     const secret = request.headers.get("x-odds-admin-secret");
-    if (!process.env.ODDS_ADMIN_SECRET || secret !== process.env.ODDS_ADMIN_SECRET) return NextResponse.json({ error: "Invalid publishing password." }, { status: 401 });
+    const allowed = [process.env.ADMIN_SECRET, process.env.ODDS_ADMIN_SECRET, process.env.GUIDE_ADMIN_SECRET, process.env.LIVE_ADMIN_SECRET].filter(Boolean);
+    if (!secret || !allowed.includes(secret)) return NextResponse.json({ error: "Invalid publishing password." }, { status: 401 });
     const { phase } = await request.json();
     if (!ODDS_PHASES.includes(phase)) return NextResponse.json({ error: "Invalid official phase." }, { status: 400 });
     const inputs = await loadOddsInputs();

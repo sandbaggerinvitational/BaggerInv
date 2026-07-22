@@ -1,12 +1,10 @@
-import { Header, Footer } from "../../components";
-import { getTournaments, refreshHistoricalData } from "../../../lib/stats";
-import GuideEditor from "./GuideEditor";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Guide Editor | Sandbagger Invitational" };
 
-export default async function GuideEditorPage() {
-  await refreshHistoricalData();
-  const tournaments = getTournaments().map((item) => ({ id: item.id, year: item.year, label: item.editionTitle || `${item.year} Sandbagger Invitational` }));
-  return <main><Header /><GuideEditor tournaments={tournaments} /><Footer /></main>;
+export default async function GuideEditorPage({ searchParams }) {
+  const query = await searchParams;
+  const tournament = query?.tournament ? `&tournament=${encodeURIComponent(query.tournament)}` : "";
+  redirect(`/admin?tab=guide${tournament}`);
 }

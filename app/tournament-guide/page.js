@@ -83,7 +83,11 @@ export default async function TournamentGuidePage() {
         <strong>{tournament.editionTitle || `${tournament.year} Sandbagger Invitational`}</strong>
         <span>{[tournament.Location, tournament.Dates || tournament.Date].filter(Boolean).join(" • ")}</span>
       </div>
-      <AssetImage src={tournamentLogo(tournament.logoFileName)} alt={`${tournament.year} tournament logo`} fallback={String(tournament.year)} className={styles.logo} fallbackClassName={styles.logoFallback} />
+      <div className={styles.logoPlate}>
+        <div className={styles.logoInner}>
+          <AssetImage src={tournamentLogo(tournament.logoFileName)} alt={`${tournament.year} tournament logo`} fallback={String(tournament.year)} className={styles.logo} fallbackClassName={styles.logoFallback} />
+        </div>
+      </div>
     </section>
 
     <nav className={styles.sectionNav} aria-label="Tournament Guide sections">
