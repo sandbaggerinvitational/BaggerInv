@@ -14,14 +14,10 @@ import {
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
+import { formatPoints } from "../../../lib/formatters";
 
 function roundNumber(value) {
   return Number(String(value ?? "").replace(/\D/g, ""));
-}
-
-function points(value) {
-  if (value === null || value === undefined) return "—";
-  return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
 }
 
 function displayScore(value) {
@@ -112,7 +108,7 @@ export default async function ChampionshipDetailPage({ params }) {
                   <span>
                     Record {standing ? `${standing.wins}-${standing.losses}-${standing.halves}` : "—"}
                   </span>
-                  {pointsTracked ? <b>{points(standing?.points)} pts</b> : null}
+                  {pointsTracked ? <b>{formatPoints(standing?.points)} pts</b> : null}
                 </Link>
               );
             })}
@@ -129,8 +125,8 @@ export default async function ChampionshipDetailPage({ params }) {
                   <span>Round {number} · {getFormatName(course.Format)}</span>
                   <strong>{archive.roundWinner}</strong>
                 </div>
-                <p><b>{champion.name}</b><strong>{points(winningSide.points)}</strong></p>
-                <p><b>{opponent?.name || opposingSide.name}</b><strong>{points(opposingSide.points)}</strong></p>
+                <p><b>{champion.name}</b><strong>{formatPoints(winningSide.points)}</strong></p>
+                <p><b>{opponent?.name || opposingSide.name}</b><strong>{formatPoints(opposingSide.points)}</strong></p>
               </Link>
             ))}
           </div>
@@ -151,7 +147,7 @@ export default async function ChampionshipDetailPage({ params }) {
                   {row.player?.slug ? <Link href={`/players/${row.player.slug}`}>{row.player["Display Name"]}</Link> : <b>{row.player?.["Display Name"] || row.id}</b>}
                 </span>
                 <span>{row.wins}-{row.losses}-{row.halves}</span>
-                {pointsTracked ? <strong>{points(row.points)}</strong> : null}
+                {pointsTracked ? <strong>{formatPoints(row.points)}</strong> : null}
               </div>
             ))}
           </div>
