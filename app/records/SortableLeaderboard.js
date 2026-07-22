@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import styles from "../historical.module.css";
 import { addTournamentRanks } from "../../lib/rankings";
+import { LeaderboardPlayer, LeaderboardRank } from "../TournamentLeaderboard";
 
 function displayedValue(row, key) {
   if (key === "percentage") return row.percentageDisplay;
@@ -77,8 +77,8 @@ export default function SortableLeaderboard({
 
         {sortedRows.map((row, index) => (
           <div className={styles.fullLeaderboardRow} key={row.id}>
-            <strong>{row.tournamentRank}</strong>
-            <Link href={`/players/${row.slug}`}>{row.name}</Link>
+            <LeaderboardRank rank={row.tournamentRank} />
+            <LeaderboardPlayer name={row.name} slug={row.slug} photo={row.photo} />
             {columns.map((column) => (
               <span key={column.key}>
                 {displayedValue(row, column.key)}

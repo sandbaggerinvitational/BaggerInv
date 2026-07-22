@@ -14,6 +14,7 @@ import {
 } from "../AdvancedTable";
 import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
+import { LeaderboardRank } from "../../TournamentLeaderboard";
 
 export const metadata = {
   title: "Partnership Analytics | The Sandbagger Invitational",
@@ -38,7 +39,7 @@ function PartnershipTable({ title, description, rows, valueLabel, value }) {
       >
         {rankedRows.map((row) => (
           <AdvancedRow key={row.key}>
-            <strong>{row.tournamentRank}</strong>
+            <LeaderboardRank rank={row.tournamentRank} />
             <PlayerPair
               first={row.playerOne}
               second={row.playerTwo}

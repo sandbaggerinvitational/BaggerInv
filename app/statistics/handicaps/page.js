@@ -9,6 +9,7 @@ import {
 } from "../AdvancedTable";
 import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
+import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 
 export const metadata = {
   title: "Handicap Analytics | The Sandbagger Invitational",
@@ -29,10 +30,13 @@ function HandicapTable({ title, description, rows, high = false }) {
           <AdvancedRow
             key={`${row.player["Player ID"]}-${row.year}-${row.handicap}`}
           >
-            <strong>{row.tournamentRank}</strong>
-            <Link href={`/players/${row.player.slug}`}>
-              {row.player["Display Name"]}
-            </Link>
+            <LeaderboardRank rank={row.tournamentRank} />
+            <LeaderboardPlayer
+              compact
+              name={row.player["Display Name"]}
+              slug={row.player.slug}
+              photo={row.player["Photo Filename"]}
+            />
             <strong>{formatHandicap(row.handicap)}</strong>
             <span>{row.year}</span>
             <span>{row.teamName}</span>
@@ -100,10 +104,13 @@ export default async function HandicapsPage() {
             >
               {improvedRanks.map((row) => (
                 <AdvancedRow key={row.player["Player ID"]}>
-                  <strong>{row.tournamentRank}</strong>
-                  <Link href={`/players/${row.player.slug}`}>
-                    {row.player["Display Name"]}
-                  </Link>
+                  <LeaderboardRank rank={row.tournamentRank} />
+                  <LeaderboardPlayer
+                    compact
+                    name={row.player["Display Name"]}
+                    slug={row.player.slug}
+                    photo={row.player["Photo Filename"]}
+                  />
                   <strong>{formatHandicap(row.improvement)}</strong>
                   <span>
                     {formatHandicap(row.firstHandicap)} ({row.firstYear})

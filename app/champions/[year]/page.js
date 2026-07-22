@@ -15,6 +15,7 @@ import {
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { formatPoints } from "../../../lib/formatters";
+import TournamentLeaderboard from "../../TournamentLeaderboard";
 
 function roundNumber(value) {
   return Number(String(value ?? "").replace(/\D/g, ""));
@@ -135,22 +136,7 @@ export default async function ChampionshipDetailPage({ params }) {
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Tournament Standings</span>
           <h2>Individual Tournament Leaders</h2>
-          <div className={styles.tournamentLeaderboard} data-points={pointsTracked}>
-            <div className={`${styles.tournamentLeaderboardRow} ${styles.tournamentLeaderboardHead}`}>
-              <span>Rank</span><span>Player</span><span>Record</span>{pointsTracked ? <span>Points</span> : null}
-            </div>
-            {leaderboard.map((row) => (
-              <div className={`${styles.tournamentLeaderboardRow} ${row.tournamentRank === "1" ? styles.tournamentLeaderboardFirst : ""}`} key={row.id}>
-                <strong>{row.tournamentRank}</strong>
-                <span className={styles.tournamentLeaderboardPlayer}>
-                  <i data-side={row.teamSide} />
-                  {row.player?.slug ? <Link href={`/players/${row.player.slug}`}>{row.player["Display Name"]}</Link> : <b>{row.player?.["Display Name"] || row.id}</b>}
-                </span>
-                <span>{row.wins}-{row.losses}-{row.halves}</span>
-                {pointsTracked ? <strong>{formatPoints(row.points)}</strong> : null}
-              </div>
-            ))}
-          </div>
+          <TournamentLeaderboard rows={leaderboard} pointsTracked={pointsTracked} />
         </section>
 
         <div className={styles.championDetailLinks}>
