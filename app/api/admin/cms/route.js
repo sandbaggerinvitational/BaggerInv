@@ -10,6 +10,7 @@ import {
   reorderCmsRecord,
   saveCmsRecord,
 } from "../../../../lib/google-sheets-write";
+import { assertValidTournamentId } from "../../../../lib/tournament-identifiers";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,7 @@ export async function GET(request) {
   const resource = query.get("resource");
   const filters = filtersFrom(query);
   try {
+    if (filters.tournament) assertValidTournamentId(filters.tournament);
     if (resource === "dashboard") return NextResponse.json({ data: await readAdminDashboard(filters) });
     if (resource === "standings") return NextResponse.json({ data: await readAdminStandings(filters) });
     if (resource === "audit") return NextResponse.json({ data: await readAdminAuditLog(query.get("limit")) });
@@ -45,6 +47,7 @@ export async function POST(request) {
     body = await request.json();
     const { resource, action = "save", key, record, tournament, year, updatedBy, direction } = body;
     const filters = { tournament: String(tournament || ""), year: String(year || "") };
+    if (filters.tournament) assertValidTournamentId(filters.tournament);
     let data;
     if (action === "save") data = await saveCmsRecord(resource, record, { key, ...filters, updatedBy });
     else if (action === "archive") data = await archiveCmsRecord(resource, key, updatedBy);

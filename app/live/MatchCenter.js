@@ -76,26 +76,12 @@ function ChampionshipBanner({ tournament }) {
   const winner = state.championSide === 2 ? tournament.teamTwo : tournament.teamOne;
   const loser = state.championSide === 2 ? tournament.teamOne : tournament.teamTwo;
   return <section className={styles.championBanner}>
-    <p>🏆 {tournament.year} Sandbagger Invitational Champions</p>
+    <p>🏆 {tournament.year} Sandbagger Champions</p>
     <Logo filename={winner.logo} name={winner.name} size="champion" />
     <h2>{winner.name}</h2>
     <strong>Final Score · {formatPoints(tournament.teamOne.score)}–{formatPoints(tournament.teamTwo.score)}</strong>
     <span>over {loser.name}</span>
     <Link href={`/champions/${tournament.year}`}>View Final Results →</Link>
-  </section>;
-}
-
-function TournamentRibbon({ tournament }) {
-  const live = ["live", "in progress", "in-progress"].includes(String(tournament.status).toLowerCase());
-  if (!live || tournament.state.complete) return null;
-  const one = tournament.teamOne, two = tournament.teamTwo;
-  const tied = Number(one.score) === Number(two.score);
-  const leader = Number(one.score) > Number(two.score) ? one : two;
-  const trailer = leader === one ? two : one;
-  return <section className={styles.tournamentRibbon}>
-    <strong>🏆 Live Tournament Leader</strong>
-    <span>{tied ? `Tournament tied ${formatPoints(one.score)} – ${formatPoints(two.score)}` : `${leader.name} lead ${formatPoints(leader.score)} – ${formatPoints(trailer.score)}`}</span>
-    <small>Round {tournament.currentRound}</small>
   </section>;
 }
 
@@ -228,7 +214,9 @@ function MatchCard({ match, round, tournament }) {
 export default function MatchCenter({ initialData, loadError }) {
   const tournament = initialData?.tournament;
   const rounds = initialData?.rounds || [];
-  const [activeRound, setActiveRound] = useState(tournament?.currentRound || rounds[0]?.number);
+  const [activeRound, setActiveRound] = useState(
+    Number.isFinite(Number(tournament?.currentRound)) ? Number(tournament.currentRound) : rounds.at(-1)?.number || rounds[0]?.number
+  );
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const active = rounds.find((round) => round.number === activeRound) || rounds[0];
   const rankedLeaderboard = useMemo(() => addTournamentRanks(initialData?.leaderboard || [], "points"), [initialData]);
@@ -241,7 +229,6 @@ export default function MatchCenter({ initialData, loadError }) {
   const leaderboardTitle = championshipMode ? "Final Player Leaderboard" : isLive ? "Live Player Leaderboard" : "Player Standings";
 
   return <>
-    <TournamentRibbon tournament={tournament} />
     <section className={styles.hero}><div><p className={styles.eyebrow}>{tournament.status}</p><h1>Match Center</h1><p>{tournament.year} Sandbagger Invitational{tournament.location ? ` · ${tournament.location}` : ""}</p>{tournament.liveMessage ? <div className={styles.liveMessage}>{tournament.liveMessage}</div> : null}</div></section>
     {championshipMode ? <ChampionshipBanner tournament={tournament} /> : <LiveBanner tournament={tournament} />}
     <section className={styles.content}>
