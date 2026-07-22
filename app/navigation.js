@@ -42,6 +42,7 @@ export const navigationSections = [
       { label: "Data Health", href: "/data-health" },
       { label: "Publish Odds", href: "/odds-center/admin" },
       { label: "Guide Editor", href: "/admin/tournament-guide" },
+      { label: "Live Match Control", href: "/admin/live-matches" },
     ],
   },
 ];
