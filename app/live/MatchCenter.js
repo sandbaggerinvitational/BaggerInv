@@ -7,6 +7,7 @@ import { addTournamentRanks } from "../../lib/rankings";
 import { courseLogo, teamLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPoints } from "../../lib/formatters";
 import { clinchingScenariosEligible } from "../../lib/live-tournament";
+import TournamentLeaderboard from "../TournamentLeaderboard";
 import styles from "./live.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
@@ -32,26 +33,30 @@ function strokeText(value) {
   return `${value} stroke${Number(value) === 1 ? "" : "s"} received`;
 }
 
-function PlayerList({ players, format, teamHcp, teamStroke }) {
-  if (format === "SC") {
-    return <div className={styles.playerList}>
-      {players.map((player) => <PlayerLine player={player} key={player.id} hideHandicap />)}
-      {hasValue(teamHcp) ? <small className={styles.teamHandicap}>Team handicap: {formatHandicap(teamHcp)}</small> : null}
-      {strokeText(teamStroke) ? <em className={styles.strokeBadge}>{strokeText(teamStroke)}</em> : null}
-    </div>;
-  }
-  return <div className={styles.playerList}>{players.map((player) => <PlayerLine player={player} key={player.id} />)}</div>;
-}
-
-function PlayerLine({ player, hideHandicap = false }) {
+function PlayerLine({ player, showHandicap = true, showStroke = true }) {
   return <div className={styles.playerLine}>
     <span className={styles.playerDetails}>
       <strong>{player.name}</strong>
-      {!hideHandicap && hasValue(player.playingHcp) ? <small>Playing handicap: {formatHandicap(player.playingHcp)}</small> : null}
-      {player.captain ? <i>Captain</i> : null}
-      {strokeText(player.stroke) ? <em className={styles.strokeBadge}>{strokeText(player.stroke)}</em> : null}
+      <span className={styles.playerMeta}>
+        {showHandicap && hasValue(player.playingHcp) ? <small>HCP {formatHandicap(player.playingHcp)}</small> : null}
+        {showStroke && strokeText(player.stroke) ? <em className={styles.strokeBadge}>{strokeText(player.stroke)}</em> : null}
+      </span>
     </span>
   </div>;
+}
+
+function MatchTeam({ team, players, format, teamHcp, teamStroke, side }) {
+  const scramble = format === "SC";
+  const hasCaptain = players.some((player) => player.captain);
+  return <section className={styles.matchTeam} data-side={side}>
+    <div className={styles.matchTeamHeader}><Logo filename={team.logo} name={team.name} size="match" /><span>{team.name}</span></div>
+    <div className={styles.playerList}>
+      {players.map((player) => <PlayerLine player={player} showHandicap={!scramble} showStroke={!scramble} key={player.id} />)}
+    </div>
+    <div className={styles.captainSlot}>{hasCaptain ? <i>Captain</i> : <span aria-hidden="true">&nbsp;</span>}</div>
+    <div className={styles.teamHandicapSlot}>{scramble && hasValue(teamHcp) ? <small className={styles.teamHandicap}>Team Handicap: <b>{formatHandicap(teamHcp)}</b></small> : <span aria-hidden="true">&nbsp;</span>}</div>
+    <div className={styles.teamStrokeSlot}>{scramble && strokeText(teamStroke) ? <em className={styles.strokeBadge}>{strokeText(teamStroke)}</em> : <span aria-hidden="true">&nbsp;</span>}</div>
+  </section>;
 }
 
 function winnerLabel(value, tournament) {
@@ -71,12 +76,26 @@ function ChampionshipBanner({ tournament }) {
   const winner = state.championSide === 2 ? tournament.teamTwo : tournament.teamOne;
   const loser = state.championSide === 2 ? tournament.teamOne : tournament.teamTwo;
   return <section className={styles.championBanner}>
-    <p>{tournament.year} Sandbagger Champions</p>
+    <p>🏆 {tournament.year} Sandbagger Invitational Champions</p>
     <Logo filename={winner.logo} name={winner.name} size="champion" />
     <h2>{winner.name}</h2>
     <strong>Final Score · {formatPoints(tournament.teamOne.score)}–{formatPoints(tournament.teamTwo.score)}</strong>
     <span>over {loser.name}</span>
     <Link href={`/champions/${tournament.year}`}>View Final Results →</Link>
+  </section>;
+}
+
+function TournamentRibbon({ tournament }) {
+  const live = ["live", "in progress", "in-progress"].includes(String(tournament.status).toLowerCase());
+  if (!live || tournament.state.complete) return null;
+  const one = tournament.teamOne, two = tournament.teamTwo;
+  const tied = Number(one.score) === Number(two.score);
+  const leader = Number(one.score) > Number(two.score) ? one : two;
+  const trailer = leader === one ? two : one;
+  return <section className={styles.tournamentRibbon}>
+    <strong>🏆 Live Tournament Leader</strong>
+    <span>{tied ? `Tournament tied ${formatPoints(one.score)} – ${formatPoints(two.score)}` : `${leader.name} lead ${formatPoints(leader.score)} – ${formatPoints(trailer.score)}`}</span>
+    <small>Round {tournament.currentRound}</small>
   </section>;
 }
 
@@ -142,21 +161,67 @@ function TournamentStats({ tournament, rounds, remainingByRound, momentum }) {
   </>;
 }
 
+function MobileInsight({ title, preview, children, highlighted = false }) {
+  return <details className={styles.mobileInsight} data-highlighted={highlighted ? "true" : "false"}>
+    <summary><span><strong>{title}</strong><small>{preview}</small></span><i aria-hidden="true">⌄</i></summary>
+    <div>{children}</div>
+  </details>;
+}
+
+function MobileTournamentInsights({ tournament, round, rounds, remainingByRound, momentum }) {
+  if (!round) return null;
+  const state = tournament.state;
+  const scenariosEligible = clinchingScenariosEligible(rounds);
+  const leaderSide = state.clinched
+    ? (state.championSide === 2 ? state.teamTwo : state.teamOne)
+    : (state.teamOne.pointsToClinch <= state.teamTwo.pointsToClinch ? state.teamOne : state.teamTwo);
+  const leaderTeam = leaderSide === state.teamOne ? tournament.teamOne : tournament.teamTwo;
+  return <div className={styles.mobileInsights}>
+    <MobileInsight title="Round Progress" preview={`${round.progress.completedMatches} / ${round.progress.totalMatches} matches complete`}>
+      <RoundProgress round={round} />
+    </MobileInsight>
+    <MobileInsight title={state.clinched ? "Tournament Clinched" : "Points to Clinch"} preview={state.clinched ? `${leaderTeam.name} have secured the Cup` : `${leaderTeam.name} need ${pointsText(leaderSide.pointsToClinch)} more`}>
+      <div className={styles.clinchRows}>{[tournament.teamOne, tournament.teamTwo].map((team, index) => { const side = index ? state.teamTwo : state.teamOne; return <div key={team.name}><Logo filename={team.logo} name={team.name} size="small" /><span><strong>{team.name}</strong><small>{side.pointsToClinch > 0 ? `Need ${pointsText(side.pointsToClinch)} to clinch` : "At the clinching target"}</small></span></div>; })}</div>
+    </MobileInsight>
+    <MobileInsight title="Still On Course" preview={`${state.remainingMatches} match${state.remainingMatches === 1 ? "" : "es"} remain`}>
+      <div className={styles.bigStats}><div><strong>{state.remainingMatches}</strong><span>Remaining Matches</span></div><div><strong>{formatPoints(state.remainingPoints)}</strong><span>Remaining Points</span></div></div>
+      <div className={styles.roundBreakdown}>{remainingByRound.map((item) => <span key={item.number}>{item.label}: {item.matches} match{item.matches === 1 ? "" : "es"} · {formatPoints(item.points)} pts</span>)}</div>
+    </MobileInsight>
+    {momentum ? <MobileInsight title="Team Momentum" preview={momentum.teamOne}>
+      <div className={styles.momentumRows}><div><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="small" /><span><strong>{tournament.teamOne.name}</strong><small>{momentum.teamOne}</small></span></div><div><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="small" /><span><strong>{tournament.teamTwo.name}</strong><small>{momentum.teamTwo}</small></span></div></div>
+    </MobileInsight> : null}
+    {scenariosEligible ? <MobileInsight title="Clinching Scenarios" preview={`${formatPoints(state.remainingPoints)} points remain`} highlighted>
+      <div className={styles.scenarioGrid}>{[tournament.teamOne, tournament.teamTwo].map((team, index) => { const side = index ? state.teamTwo : state.teamOne; return <div key={team.name}><strong>{team.name} clinch with:</strong><ul><li>{pointsText(side.pointsToClinch)} in Singles</li><li>Any combination totaling {formatPoints(side.pointsToClinch)} points</li></ul></div>; })}</div>
+    </MobileInsight> : null}
+  </div>;
+}
+
+function winnerSide(match) {
+  if (hasValue(match.team1Points) && hasValue(match.team2Points) && Number(match.team1Points) !== Number(match.team2Points)) return Number(match.team1Points) > Number(match.team2Points) ? 1 : 2;
+  if ([match.matchupWinner, match.overallWinner].includes("Team 1")) return 1;
+  if ([match.matchupWinner, match.overallWinner].includes("Team 2")) return 2;
+  return null;
+}
+
 function MatchCard({ match, round, tournament }) {
+  const winningSide = winnerSide(match);
   return <article className={styles.matchCard}>
     <div className={styles.matchTop}><span>{match.course.name || `${round.label} · Match ${match.match}`}</span><span>{match.teeTime || match.status}</span></div>
     <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
-    <div className={styles.players}>
-      <div><div className={styles.matchTeamHeader}><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="match" /><span>{tournament.teamOne.name}</span></div><PlayerList players={match.team1Players} format={match.format} teamHcp={match.team1PlayingHcp} teamStroke={match.team1Stroke} /></div>
+    <div className={styles.matchupTeams}>
+      <MatchTeam team={tournament.teamOne} players={match.team1Players} format={match.format} teamHcp={match.team1PlayingHcp} teamStroke={match.team1Stroke} side="one" />
       <b>VS</b>
-      <div><div className={styles.matchTeamHeader}><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="match" /><span>{tournament.teamTwo.name}</span></div><PlayerList players={match.team2Players} format={match.format} teamHcp={match.team2PlayingHcp} teamStroke={match.team2Stroke} /></div>
+      <MatchTeam team={tournament.teamTwo} players={match.team2Players} format={match.format} teamHcp={match.team2PlayingHcp} teamStroke={match.team2Stroke} side="two" />
     </div>
     <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
       {match.format !== "SI" ? <><Segment label="Front 9" winner={match.frontWinner} tournament={tournament} /><Segment label="Back 9" winner={match.backWinner} tournament={tournament} /></> : null}
       <Segment label="Overall" winner={match.overallWinner || match.matchupWinner} tournament={tournament} />
     </div>
     {match.notes ? <p className={styles.matchNotes}>{match.notes}</p> : null}
-    {(match.team1Points !== null || match.team2Points !== null) ? <div className={styles.matchScoreTable}><div className={styles.matchScoreRow}><span>{tournament.teamOne.name}</span><strong>{formatPoints(match.team1Points)}</strong></div><div className={styles.matchScoreRow}><span>{tournament.teamTwo.name}</span><strong>{formatPoints(match.team2Points)}</strong></div></div> : null}
+    {(hasValue(match.team1Points) || hasValue(match.team2Points)) ? <div className={styles.matchResult}><span className={styles.matchResultLabel}>{winningSide ? "Match Winner" : "Match Points"}</span><div className={styles.matchScoreTable}>
+      <div className={`${styles.matchScoreRow} ${winningSide === 1 ? styles.matchScoreWinner : ""}`}><span><i aria-hidden="true" />{tournament.teamOne.name}</span><strong>{formatPoints(match.team1Points)}</strong></div>
+      <div className={`${styles.matchScoreRow} ${winningSide === 2 ? styles.matchScoreWinner : ""}`}><span><i aria-hidden="true" />{tournament.teamTwo.name}</span><strong>{formatPoints(match.team2Points)}</strong></div>
+    </div></div> : null}
   </article>;
 }
 
@@ -172,17 +237,20 @@ export default function MatchCenter({ initialData, loadError }) {
 
   if (!tournament) return <section className={styles.content}><div className={styles.errorBox}><h1>Live Match Center</h1><p>{loadError || "Live data is not available yet."}</p></div></section>;
   const championshipMode = tournament.state.complete && tournament.state.championSide;
+  const isLive = ["live", "in progress", "in-progress"].includes(String(tournament.status).toLowerCase());
+  const leaderboardTitle = championshipMode ? "Final Player Leaderboard" : isLive ? "Live Player Leaderboard" : "Player Standings";
 
   return <>
+    <TournamentRibbon tournament={tournament} />
     <section className={styles.hero}><div><p className={styles.eyebrow}>{tournament.status}</p><h1>Match Center</h1><p>{tournament.year} Sandbagger Invitational{tournament.location ? ` · ${tournament.location}` : ""}</p>{tournament.liveMessage ? <div className={styles.liveMessage}>{tournament.liveMessage}</div> : null}</div></section>
     {championshipMode ? <ChampionshipBanner tournament={tournament} /> : <LiveBanner tournament={tournament} />}
     <section className={styles.content}>
       {rounds.length ? <RoundNavigation rounds={rounds} activeRound={active?.number} onSelect={setActiveRound} /> : null}
-      {active ? <RoundProgress round={active} /> : null}
-      <TournamentStats tournament={tournament} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} />
+      <div className={styles.desktopInsights}>{active ? <RoundProgress round={active} /> : null}<TournamentStats tournament={tournament} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} /></div>
+      <MobileTournamentInsights tournament={tournament} round={active} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} />
       {active ? <><div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong>{formatPoints(roundTotals.teamOne)} – {formatPoints(roundTotals.teamTwo)}</strong></div></div><div className={styles.matchGrid}>{active.matches.map((match) => <MatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div></> : null}
-      {rankedLeaderboard.length ? <><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>Player Standings</h2></div></div>
-        <div className={styles.leaderboard}><div className={`${styles.leaderboardRow} ${styles.leaderboardHead}`}><span>Rank</span><span>Player</span><span>Record</span><span>Points</span></div>{leaderboard.map((player) => <div className={`${styles.leaderboardRow} ${player.tournamentRank === "1" ? styles.firstPlace : ""}`} key={player.id}><strong>{player.tournamentRank}</strong><span className={styles.playerCell}><i className={player.teamSide === 1 ? styles.teamOneDot : styles.teamTwoDot} />{player.slug ? <Link href={`/players/${player.slug}`}>{player.player}</Link> : <strong>{player.player}</strong>}</span><span>{player.wins}-{player.losses}-{player.halves}</span><strong>{formatPoints(player.points)}</strong></div>)}</div>
+      {rankedLeaderboard.length ? <><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>{leaderboardTitle} {isLive || championshipMode ? <em data-mode={championshipMode ? "final" : "live"}>{championshipMode ? "Final" : "Live"}</em> : null}</h2></div></div>
+        <TournamentLeaderboard rows={leaderboard} />
         {rankedLeaderboard.length > 5 ? <button className={styles.leaderboardToggle} type="button" onClick={() => setShowLeaderboard((value) => !value)}>{showLeaderboard ? "Show Top Five" : "View Full Leaderboard →"}</button> : null}</> : null}
       {loadError ? <p className={styles.testNote}>{loadError}</p> : null}
     </section>

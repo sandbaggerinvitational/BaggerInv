@@ -111,6 +111,7 @@ function buildLeaderboard(matches, playerMap, teamNames) {
   const ensure = (id, side) => {
     if (!stats.has(id)) stats.set(id, {
       id, player: playerMap[id]?.name || id, slug: playerMap[id]?.slug || "",
+      photo: playerMap[id]?.photo || "",
       team: teamNames[side]?.name || `Team ${side}`, teamSide: side,
       wins: 0, losses: 0, halves: 0, points: 0,
     });

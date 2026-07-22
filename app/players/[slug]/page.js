@@ -20,6 +20,7 @@ import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { formatPoints } from "../../../lib/formatters";
 import { formatPlayerCareerYears } from "../../../lib/player-career";
+import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -396,10 +397,13 @@ export default async function PlayerPage({ params }) {
 
             {addTournamentRanks(stats.partners.slice(0, 8), (row) => row.record.points).map((row) => (
               <div className={styles.tableRow} key={row.player["Player ID"]}>
-                <strong>{row.tournamentRank}</strong>
-                <Link href={`/players/${row.player.slug}`}>
-                  {row.player["Display Name"]}
-                </Link>
+                <LeaderboardRank rank={row.tournamentRank} />
+                <LeaderboardPlayer
+                  compact
+                  name={row.player["Display Name"]}
+                  slug={row.player.slug}
+                  photo={row.player["Photo Filename"]}
+                />
                 <span>{formatRecord(row.record)}</span>
                 <strong>{formatPoints(row.record.points)}</strong>
               </div>

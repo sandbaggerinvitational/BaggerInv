@@ -1,12 +1,22 @@
-import Link from "next/link";
 import styles from "../historical.module.css";
+import { LeaderboardPlayer } from "../TournamentLeaderboard";
 
 export function PlayerPair({ first, second }) {
   return (
     <span className={styles.playerPair}>
-      <Link href={`/players/${first.slug}`}>{first["Display Name"]}</Link>
+      <LeaderboardPlayer
+        compact
+        name={first["Display Name"]}
+        slug={first.slug}
+        photo={first["Photo Filename"]}
+      />
       <b>+</b>
-      <Link href={`/players/${second.slug}`}>{second["Display Name"]}</Link>
+      <LeaderboardPlayer
+        compact
+        name={second["Display Name"]}
+        slug={second.slug}
+        photo={second["Photo Filename"]}
+      />
     </span>
   );
 }

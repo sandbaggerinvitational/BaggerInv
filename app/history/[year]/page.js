@@ -21,6 +21,7 @@ import {
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { formatPoints } from "../../../lib/formatters";
+import TournamentLeaderboard from "../../TournamentLeaderboard";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -243,22 +244,7 @@ export default async function TournamentYearPage({ params }) {
           <span className={styles.sectionLabel}>Player Standings</span>
           <h2>{tournament.year} Leaderboard</h2>
 
-          <div className={styles.tournamentLeaderboard} data-points={pointsTracked}>
-            <div className={`${styles.tournamentLeaderboardRow} ${styles.tournamentLeaderboardHead}`}>
-              <span>Rank</span><span>Player</span><span>Record</span>{pointsTracked ? <span>Points</span> : null}
-            </div>
-            {leaderboard.length ? leaderboard.map((row) => (
-              <div className={`${styles.tournamentLeaderboardRow} ${row.tournamentRank === "1" ? styles.tournamentLeaderboardFirst : ""}`} key={row.id}>
-                <strong>{row.tournamentRank}</strong>
-                <span className={styles.tournamentLeaderboardPlayer}>
-                  <i data-side={row.teamSide} />
-                  {row.player?.slug ? <Link href={`/players/${row.player.slug}`}>{row.player["Display Name"]}</Link> : <b>{row.player?.["Display Name"] || row.id}</b>}
-                </span>
-                <span>{row.wins}-{row.losses}-{row.halves}</span>
-                {pointsTracked ? <strong>{formatPoints(row.points)}</strong> : null}
-              </div>
-            )) : <div className={styles.tournamentLeaderboardEmpty}>No completed matches have been recorded for this tournament yet.</div>}
-          </div>
+          <TournamentLeaderboard rows={leaderboard} pointsTracked={pointsTracked} emptyMessage="No completed matches have been recorded for this tournament yet." />
         </section>
 
         <section className={styles.section}>
