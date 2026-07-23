@@ -5,6 +5,7 @@ import {
   readLiveMatchAdminData,
   reopenLiveMatch,
   updateLiveMatch,
+  updateLiveMatchPairing,
 } from "../../../lib/google-sheets-write";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +40,7 @@ export async function POST(request) {
     const { action, matchId, updates, updatedBy } = await request.json();
     let match;
     if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
+    else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
     else if (action === "finalize") match = await finalizeLiveMatch(matchId, updates, updatedBy);
     else if (action === "reopen") match = await reopenLiveMatch(matchId, updatedBy);
     else throw new Error("Unknown live-match action.");

@@ -2,17 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "./live-match-control.module.css";
+import pairingStyles from "./pairing-editor.module.css";
 import { getTournamentState } from "../../../lib/live-tournament";
 
 const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Match Status", "Notes"];
+const PAIRING_FIELDS = ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"];
 const WINNERS = ["", "Team 1", "Team 2", "Halved"];
-
-function playerNames(match, side, playerMap) {
-  return [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]]
-    .filter(Boolean)
-    .map((id) => playerMap[id] || id)
-    .join(" + ");
-}
 
 function teamName(teamRows, year, side) {
   const row = teamRows.find((item) => Number(item.Year) === Number(year) && item["Team Side"] === `Team ${side}`);
@@ -23,8 +18,33 @@ function WinnerField({ label, field, value, onChange }) {
   return <label><span>{label}</span><select value={value || ""} onChange={(event) => onChange(field, event.target.value)}>{WINNERS.map((winner) => <option value={winner} key={winner || "pending"}>{winner || "Pending"}</option>)}</select></label>;
 }
 
-function MatchEditor({ match, playerMap, teams, onAction, busy }) {
-  const [draft, setDraft] = useState(() => Object.fromEntries(EDITABLE.map((field) => [field, match[field] || ""])));
+function PairingSide({ side, team, match, draft, players, rosters, singles, disabled, onChange }) {
+  const rosterIds = new Set(
+    rosters
+      .filter((row) => String(row.year) === String(match.Year) && row.side === `Team ${side}`)
+      .map((row) => row.playerId)
+      .filter(Boolean)
+  );
+  const selectedIds = [draft[`Team ${side} Player 1`], draft[`Team ${side} Player 2`]].filter(Boolean);
+  const options = players.filter((player) => !rosterIds.size || rosterIds.has(player.id) || selectedIds.includes(player.id));
+  const slots = singles ? [1] : [1, 2];
+  return <div className={pairingStyles.side}>
+    <span>{team}</span>
+    {slots.map((slot) => {
+      const field = `Team ${side} Player ${slot}`;
+      return <label key={field}>
+        <small>Player {slot}</small>
+        <select value={draft[field] || ""} disabled={disabled} onChange={(event) => onChange(field, event.target.value)}>
+          <option value="">Select player</option>
+          {options.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}
+        </select>
+      </label>;
+    })}
+  </div>;
+}
+
+function MatchEditor({ match, players, rosters, teams, onAction, busy }) {
+  const [draft, setDraft] = useState(() => Object.fromEntries([...EDITABLE, ...PAIRING_FIELDS].map((field) => [field, match[field] || ""])));
   const sideOne = teamName(teams, match.Year, 1);
   const sideTwo = teamName(teams, match.Year, 2);
   const isSingles = String(match.Format).toUpperCase() === "SI";
@@ -37,10 +57,11 @@ function MatchEditor({ match, playerMap, teams, onAction, busy }) {
       <strong>{match["Match Status"] || "Scheduled"}</strong>
     </header>
     <div className={styles.pairing}>
-      <div><span>{sideOne}</span><b>{playerNames(match, 1, playerMap)}</b></div>
+      <PairingSide side={1} team={sideOne} match={match} draft={draft} players={players} rosters={rosters} singles={isSingles} disabled={isFinal || busy} onChange={change} />
       <em>VS</em>
-      <div><span>{sideTwo}</span><b>{playerNames(match, 2, playerMap)}</b></div>
+      <PairingSide side={2} team={sideTwo} match={match} draft={draft} players={players} rosters={rosters} singles={isSingles} disabled={isFinal || busy} onChange={change} />
     </div>
+    {!isFinal ? <div className={pairingStyles.action}><button type="button" disabled={busy} onClick={() => onAction("pairing", match, Object.fromEntries(PAIRING_FIELDS.map((field) => [field, draft[field] || ""])))}>Save Pairing</button></div> : <p className={pairingStyles.locked}>Reopen this match before changing its pairing.</p>}
     <div className={styles.fields}>
       {!isSingles ? <>
         <WinnerField label="Front 9 Winner" field="Front 9 Winner" value={draft["Front 9 Winner"]} onChange={change} />
@@ -98,7 +119,6 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const years = useMemo(() => [...new Set((data?.matches || []).map((match) => String(match.Year)).filter(Boolean))].sort((a, b) => Number(b) - Number(a)), [data]);
   const rounds = useMemo(() => [...new Set((data?.matches || []).filter((match) => !year || String(match.Year) === year).map((match) => String(match.Round)).filter(Boolean))].sort((a, b) => Number(a) - Number(b)), [data, year]);
   const matches = useMemo(() => (data?.matches || []).filter((match) => (!year || String(match.Year) === year) && (!round || String(match.Round) === round)).sort((a, b) => Number(a.Match) - Number(b.Match)), [data, year, round]);
-  const playerMap = useMemo(() => Object.fromEntries((data?.players || []).map((player) => [player.id, player.name])), [data]);
   const tournamentState = useMemo(() => {
     const yearMatches = (data?.matches || []).filter((match) => !year || String(match.Year) === year);
     const finalized = yearMatches.filter((match) => match["Match Status"] === "Final");
@@ -111,13 +131,13 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
 
   const act = async (action, match, updates) => {
     if (!updatedBy.trim()) { setStatus("Enter your name before updating a match."); return; }
-    const verb = action === "finalize" ? "finalize" : action === "reopen" ? "reopen" : "save changes to";
-    if (action !== "update" && !window.confirm(`Are you sure you want to ${verb} ${match["Match ID"]}?`)) return;
-    setBusy(true); setStatus(`${action === "update" ? "Saving" : action === "finalize" ? "Finalizing" : "Reopening"} ${match["Match ID"]}…`);
+    const verb = action === "finalize" ? "finalize" : action === "reopen" ? "reopen" : action === "pairing" ? "save the new pairing for" : "save changes to";
+    if (["finalize", "reopen"].includes(action) && !window.confirm(`Are you sure you want to ${verb} ${match["Match ID"]}?`)) return;
+    setBusy(true); setStatus(`${action === "update" || action === "pairing" ? "Saving" : action === "finalize" ? "Finalizing" : "Reopening"} ${match["Match ID"]}…`);
     try {
       const payload = await request({ action, matchId: match["Match ID"], updates, updatedBy });
       setData((current) => ({ ...current, matches: current.matches.map((row) => row["Match ID"] === payload.match["Match ID"] ? payload.match : row) }));
-      setStatus(`${match["Match ID"]} ${action === "update" ? "updated" : action === "finalize" ? "finalized" : "reopened"} successfully.`);
+      setStatus(`${match["Match ID"]} ${action === "pairing" ? "pairing updated" : action === "update" ? "updated" : action === "finalize" ? "finalized" : "reopened"} successfully.`);
     } catch (error) { setStatus(error.message); }
     finally { setBusy(false); }
   };
@@ -142,7 +162,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
         <p>{tournamentState.remainingMatches} matches · {tournamentState.remainingPoints} points remaining</p>
         <div><span>{teamName(data.teams, year, 2)}</span><strong>{tournamentState.teamTwo.score}</strong><small>{tournamentState.teamTwo.pointsToClinch > 0 ? `Need ${tournamentState.teamTwo.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
       </div>
-      <div className={styles.grid}>{matches.map((match) => <MatchEditor key={`${match["Match ID"]}-${match["Updated At"]}-${match["Match Status"]}`} match={match} playerMap={playerMap} teams={data.teams} onAction={act} busy={busy} />)}</div>
+      <div className={styles.grid}>{matches.map((match) => <MatchEditor key={`${match["Match ID"]}-${match["Updated At"]}-${match["Match Status"]}`} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} busy={busy} />)}</div>
     </>}
   </section>;
 }
