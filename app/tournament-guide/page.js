@@ -68,10 +68,16 @@ export default async function TournamentGuidePage() {
   const days = groupBy(guide.itinerary, "Day Label");
   const ruleCategories = groupBy(guide.rules, "Category");
   const sectionDescription = Object.fromEntries(guide.sections.map((section) => [section["Section Slug"], section.Description]));
+  const rosterCount =
+    (tournament.team1?.roster?.length || 0) +
+    (tournament.team2?.roster?.length || 0);
+  const listedTeamSize = Number(tournament["Team Size"]);
+  const playerCount = rosterCount ||
+    (Number.isFinite(listedTeamSize) && listedTeamSize > 0 ? listedTeamSize * 2 : 0);
   const overviewItems = [
     ["Edition", tournament.editionTitle || tournament.year],
     ["Dates", tournament.Dates || tournament.Date],
-    ["Field", tournament["Team Size"] ? `${Number(tournament["Team Size"])} players` : "Two teams"],
+    ["Field", playerCount ? `${playerCount} players` : "Two teams"],
   ].filter(([, value]) => String(value ?? "").trim());
 
   return <main>
