@@ -54,3 +54,16 @@ test("root metadata configures the production title template and icons", async (
   assert.match(layout, /absoluteUrl\("\/icon\.png"\)/);
   assert.match(layout, /absoluteUrl\("\/apple-icon\.png"\)/);
 });
+
+test("root layout enables Vercel Web Analytics site-wide", async () => {
+  const layout = await readFile(
+    new URL("../app/layout.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    layout,
+    /import \{ Analytics \} from "@vercel\/analytics\/next";/,
+  );
+  assert.match(layout, /\{children\}\s*<Analytics \/>/);
+});
