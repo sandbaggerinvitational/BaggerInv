@@ -7,10 +7,13 @@ import {
   getStatisticsSections,
 } from "../../lib/leaderboards";
 import styles from "../historical.module.css";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Statistics | The Sandbagger Invitational",
-};
+  description: "Sandbagger Invitational career statistics, player performance, handicaps, partnerships, and rivalries.",
+  path: "/statistics",
+});
 
 export default async function StatisticsPage() {
   await refreshHistoricalData();

@@ -15,10 +15,13 @@ import {
 import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { LeaderboardRank } from "../../TournamentLeaderboard";
+import { pageMetadata } from "../../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Partnership Analytics | The Sandbagger Invitational",
-};
+  description: "The strongest and most experienced partnerships in Sandbagger Invitational history.",
+  path: "/statistics/partnerships",
+});
 
 function PartnershipTable({ title, description, rows, valueLabel, value }) {
   const rankedRows = addTournamentRanks(rows, value);

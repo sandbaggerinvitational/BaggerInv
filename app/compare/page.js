@@ -7,10 +7,13 @@ import {
   getHeadToHead,
 } from "../../lib/stats";
 import CompareTool from "./CompareTool";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Compare Sandbaggers | Sandbagger Invitational",
-};
+  description: "Compare Sandbagger Invitational player records, ratings, formats, and head-to-head performance.",
+  path: "/compare",
+});
 
 export default async function ComparePage({ searchParams }) {
   await refreshHistoricalData();

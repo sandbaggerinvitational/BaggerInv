@@ -13,10 +13,13 @@ import {
   getAllPlayerStats,
 } from "../../lib/stats";
 import styles from "../historical.module.css";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Sandbaggers | The Sandbagger Invitational",
-};
+  description: "Explore every Sandbagger Invitational player profile, record, rating, handicap, and achievement.",
+  path: "/players",
+});
 
 export default async function PlayersPage({ searchParams }) {
   await refreshHistoricalData();

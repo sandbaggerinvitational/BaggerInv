@@ -19,8 +19,9 @@ import {
   tournamentId,
   tournamentYear,
 } from "../../lib/tournament-identifiers";
+import { privatePageMetadata } from "../../lib/seo";
 
-export const metadata = { title: "Data Health | Sandbagger Invitational" };
+export const metadata = privatePageMetadata("Data Health | Sandbagger Invitational");
 
 const clean = (value) => String(value ?? "").trim();
 const REQUIRED_COLUMNS = {

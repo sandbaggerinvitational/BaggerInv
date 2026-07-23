@@ -11,10 +11,13 @@ import {
 import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { LeaderboardRank } from "../../TournamentLeaderboard";
+import { pageMetadata } from "../../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Rivalry Analytics | The Sandbagger Invitational",
-};
+  description: "Head-to-head rivalries and competitive history from the Sandbagger Invitational.",
+  path: "/statistics/rivalries",
+});
 
 function RivalryRecord({ row }) {
   return `${row.playerOneWins}-${row.playerTwoWins}-${row.halves}`;

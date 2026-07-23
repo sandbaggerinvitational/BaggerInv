@@ -10,17 +10,23 @@ import {
   getTeamSeason,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
+import { pageMetadata } from "../../../../../lib/seo";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
   const { year, side } = await params;
   const team = getTeamSeason(year, decodeURIComponent(side));
 
-  return {
-    title: team
-      ? `${team.name} | ${year} | The Sandbagger Invitational`
-      : "Team | The Sandbagger Invitational",
-  };
+  const title = team
+    ? `${team.name} | ${year} | The Sandbagger Invitational`
+    : "Team | The Sandbagger Invitational";
+  return pageMetadata({
+    title,
+    description: team
+      ? `${team.name}'s ${year} Sandbagger Invitational roster, captain, and tournament handicaps.`
+      : "Historical Sandbagger Invitational team roster.",
+    path: `/history/${year}/team/${encodeURIComponent(side)}`,
+  });
 }
 
 export default async function TeamSeasonPage({ params }) {

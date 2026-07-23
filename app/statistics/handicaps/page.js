@@ -10,10 +10,13 @@ import {
 import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
+import { pageMetadata } from "../../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Handicap Analytics | The Sandbagger Invitational",
-};
+  description: "Historical Sandbagger Invitational tournament handicap trends and leaderboards.",
+  path: "/statistics/handicaps",
+});
 
 function HandicapTable({ title, description, rows, high = false }) {
   const rankedRows = addTournamentRanks(rows, "handicap");

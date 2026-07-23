@@ -5,11 +5,13 @@ import { Header, Footer } from "../components";
 import TeamLogoPlate from "../TeamLogoPlate";
 import { getTournaments, refreshHistoricalData } from "../../lib/stats";
 import styles from "../historical.module.css";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Champions | The Sandbagger Invitational",
   description: "Every team to win the Sandbagger Invitational.",
-};
+  path: "/champions",
+});
 
 function displayScore(value) {
   return String(value || "Score not recorded").replace(/\s+-\s+/g, " – ");
