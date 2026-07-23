@@ -2,12 +2,24 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
+  DEFAULT_DESCRIPTION,
   DEFAULT_SOCIAL_IMAGE,
   SITE_URL,
   absoluteUrl,
   pageMetadata,
   privatePageMetadata,
 } from "../lib/seo.js";
+
+test("homepage metadata uses the approved social description", () => {
+  const description =
+    "The official home of the Sandbagger Invitational. Live scoring, tournament history, player records, ratings, analytics, and more.";
+  const metadata = pageMetadata({ description });
+
+  assert.equal(DEFAULT_DESCRIPTION, description);
+  assert.equal(metadata.description, description);
+  assert.equal(metadata.openGraph.description, description);
+  assert.equal(metadata.twitter.description, description);
+});
 
 test("production SEO URLs always use baggerinv.com", () => {
   assert.equal(SITE_URL, "https://baggerinv.com");
