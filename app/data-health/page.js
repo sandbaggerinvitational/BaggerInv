@@ -28,7 +28,7 @@ const REQUIRED_COLUMNS = {
   players: [["Player ID", "ID"], ["Display Name", "Player Name", "Name", "First"]],
   matches: [["Year"], ["Format"], ["Team 1 Player 1"], ["Team 2 Player 1"]],
   liveMatches: [["Match ID"], ["Year", "Tournament ID"], ["Round"], ["Match Status"]],
-  teamNames: [["Year"], ["Team Side"], ["Team Name", "Team Names", "Name"]],
+  teamNames: [["Year", "Tournament ID"], ["Team Side"], ["Team ID"], ["Team Name", "Team Names", "Name"], ["Captain Player ID", "Captain"]],
   liveTournaments: [["Year"]],
   liveRoundHandicaps: [["Year"], ["Player ID"]],
   tournamentRules: [["Year"], ["Format"]],
@@ -112,6 +112,8 @@ export default async function DataHealthPage({ searchParams }) {
   const handicaps = diagnostics?.sheets.handicaps?.rows || [];
   const matches = diagnostics?.sheets.matches?.rows || [];
   const liveMatches = diagnostics?.sheets.liveMatches?.rows || [];
+  const teamNames = diagnostics?.sheets.teamNames?.rows || [];
+  const courses = diagnostics?.sheets.courses?.rows || [];
   const tournaments = diagnostics?.sheets.tournaments?.rows || [];
   const liveTournaments = diagnostics?.sheets.liveTournaments?.rows || [];
   const tournamentRules = diagnostics?.sheets.tournamentRules?.rows || [];
@@ -176,6 +178,50 @@ export default async function DataHealthPage({ searchParams }) {
     if (key !== "|") handicapKeys.set(key, (handicapKeys.get(key) || 0) + 1);
   }
   const handicapDuplicates = [...handicapKeys.entries()].filter(([, count]) => count > 1);
+  const playerIds = new Set(players.map((player) => clean(player["Player ID"] || player.ID)).filter(Boolean));
+  const captainIdFor = (team) => clean(team["Captain Player ID"] || team["Captain ID"] || team.Captain);
+  const historicalTeamsMissingCaptain = teamNames.filter(
+    (team) => !captainIdFor(team) && !clean(team["Captain Name"])
+  );
+  const captainIdsNotFound = teamNames.filter(
+    (team) => captainIdFor(team) && !playerIds.has(captainIdFor(team))
+  );
+  const captainsMissingFromRoster = teamNames.filter((team) => {
+    const captainId = captainIdFor(team);
+    if (!captainId || !playerIds.has(captainId)) return false;
+    return !handicaps.some((row) =>
+      Number(row.Year) === Number(team.Year) &&
+      clean(row["Team Side"]) === clean(team["Team Side"]) &&
+      clean(row["Player ID"]) === captainId
+    );
+  });
+  const captainMappingsByTeam = new Map();
+  for (const team of teamNames) {
+    const teamKey = `${clean(team["Tournament ID"] || team.Year)}|${clean(team["Team ID"] || team["Team Side"])}`;
+    const captainId = captainIdFor(team);
+    if (!captainId || teamKey === "|") continue;
+    if (!captainMappingsByTeam.has(teamKey)) captainMappingsByTeam.set(teamKey, new Set());
+    captainMappingsByTeam.get(teamKey).add(captainId);
+  }
+  const multipleCaptainMappings = [...captainMappingsByTeam.entries()].filter(([, ids]) => ids.size > 1);
+  const historicalMatchesMissingTeamIds = matches.filter((match) =>
+    !clean(match["Team 1 Team ID"] || match["Team 1 ID"]) ||
+    !clean(match["Team 2 Team ID"] || match["Team 2 ID"])
+  );
+  const historicalMatchesMissingCourse = matches.filter((match) => {
+    const matchCourseId = clean(match["Course ID"]);
+    return !courses.some((course) => {
+      const sameYear = Number(course.Year) === Number(match.Year);
+      if (!sameYear) return false;
+      if (matchCourseId) return clean(course["Course ID"]) === matchCourseId;
+      return Number(clean(course.Round).replace(/\D/g, "")) === Number(match.Round);
+    });
+  });
+  const historicalScramblesWithIndividualStrokes = matches.filter((match) =>
+    clean(match.Format).toUpperCase() === "SC" &&
+    ["Team 1 Player 1 Stroke", "Team 1 Player 2 Stroke", "Team 2 Player 1 Stroke", "Team 2 Player 2 Stroke"]
+      .some((field) => clean(match[field]) && Number(match[field]) !== 0)
+  );
 
   const sheetItems = diagnostics ? Object.values(diagnostics.sheets) : [];
   const healthCounts = sheetItems.reduce((acc, item) => {
@@ -310,6 +356,34 @@ export default async function DataHealthPage({ searchParams }) {
                 </div>
                 <div data-ok={playerDuplicates.length ? "false" : "true"}>{playerDuplicates.length ? `Duplicate Player IDs: ${playerDuplicates.map(([id]) => id).join(", ")}` : "No duplicate Player IDs"}</div>
                 <div data-ok={handicapDuplicates.length ? "false" : "true"}>{handicapDuplicates.length ? `Duplicate Year + Player handicap rows: ${handicapDuplicates.map(([key]) => key.replace("|", " / ")).join(", ")}` : "No duplicate Year + Player handicap rows"}</div>
+                <div data-ok={historicalTeamsMissingCaptain.length ? "false" : "true"}>
+                  {historicalTeamsMissingCaptain.length ? `${historicalTeamsMissingCaptain.length} historical teams are missing a captain` : "Every historical team has a captain mapping"}
+                  {historicalTeamsMissingCaptain.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}
+                </div>
+                <div data-ok={captainIdsNotFound.length ? "false" : "true"}>
+                  {captainIdsNotFound.length ? `Captain Player IDs not found: ${[...new Set(captainIdsNotFound.map(captainIdFor))].join(", ")}` : "Every historical captain Player ID resolves to a player"}
+                  {captainIdsNotFound.length ? <Link href="/admin?tab=players"> Fix in Players →</Link> : null}
+                </div>
+                <div data-ok={captainsMissingFromRoster.length ? "false" : "true"}>
+                  {captainsMissingFromRoster.length ? `${captainsMissingFromRoster.length} historical captains are not present on their team roster` : "Every historical captain is present on the matching roster"}
+                  {captainsMissingFromRoster.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}
+                </div>
+                <div data-ok={multipleCaptainMappings.length ? "false" : "true"}>
+                  {multipleCaptainMappings.length ? `${multipleCaptainMappings.length} historical teams have multiple captain mappings` : "No historical team has multiple captain mappings"}
+                  {multipleCaptainMappings.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}
+                </div>
+                <div data-ok={historicalMatchesMissingTeamIds.length ? "false" : "true"}>
+                  {historicalMatchesMissingTeamIds.length ? `${historicalMatchesMissingTeamIds.length} historical matches are missing Team IDs` : "Every historical match has Team IDs"}
+                  {historicalMatchesMissingTeamIds.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={historicalMatchesMissingCourse.length ? "false" : "true"}>
+                  {historicalMatchesMissingCourse.length ? `${historicalMatchesMissingCourse.length} historical matches have no valid course mapping` : "Every historical match resolves to a course"}
+                  {historicalMatchesMissingCourse.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={historicalScramblesWithIndividualStrokes.length ? "false" : "true"}>
+                  {historicalScramblesWithIndividualStrokes.length ? `${historicalScramblesWithIndividualStrokes.length} historical scramble matches contain individual stroke values` : "Historical scrambles use team-level stroke fields"}
+                  {historicalScramblesWithIndividualStrokes.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
                 <div data-ok={teams?.team1.players.length && teams?.team2.players.length ? "true" : "false"}>Current-year team rosters {teams?.team1.players.length && teams?.team2.players.length ? "loaded" : "are incomplete"}</div>
                 <div data-ok={formats.every((item) => item.tees.length) ? "true" : "false"}>All format courses {formats.every((item) => item.tees.length) ? "match at least one scorecard tee" : "do not yet match scorecard tees"}</div>
                 <div data-ok={careerYearIssues.length ? "false" : "true"}>

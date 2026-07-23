@@ -316,13 +316,13 @@
 }
 
 .teamOneBadge {
-  color: #0b3529;
-  background: #dce9e3;
+  color: var(--team-one-color, #0b3529);
+  background: color-mix(in srgb, var(--team-one-color, #0b3529) 14%, white);
 }
 
 .teamTwoBadge {
-  color: #24386f;
-  background: #e3e7f4;
+  color: var(--team-two-color, #24386f);
+  background: color-mix(in srgb, var(--team-two-color, #24386f) 14%, white);
 }
 
 .halvedBadge {
@@ -601,6 +601,16 @@
   background: #edf6f0;
   box-shadow: inset 4px 0 0 #0b3529;
 }
+.matchScoreWinner[data-team="one"] {
+  border-color: color-mix(in srgb, var(--team-one-color, #0b3529) 35%, white);
+  background: color-mix(in srgb, var(--team-one-color, #0b3529) 9%, white);
+  box-shadow: inset 4px 0 0 var(--team-one-color, #0b3529);
+}
+.matchScoreWinner[data-team="two"] {
+  border-color: color-mix(in srgb, var(--team-two-color, #24386f) 35%, white);
+  background: color-mix(in srgb, var(--team-two-color, #24386f) 9%, white);
+  box-shadow: inset 4px 0 0 var(--team-two-color, #24386f);
+}
 
 .players > b {
   position: relative;
@@ -812,6 +822,7 @@
   .playerSlot { grid-template-rows: subgrid; }
 }
 .playerSlot > strong { max-width: 100%; align-self: center; font: 700 1.05rem/1.15 Georgia, serif; overflow-wrap: anywhere; }
+.playerSlot > strong a { color: inherit; text-decoration: none; }
 .playerHandicapSlot, .playerStrokeSlot, .teamHandicapSlot, .teamStrokeSlot { width: 100%; min-width: 0; display: flex; align-items: center; justify-content: center; }
 .playerHandicapSlot small { margin: 0 !important; color: #68716d; font-size: .64rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
 .playerPairSpacer { grid-row: span 3; }
