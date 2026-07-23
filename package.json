@@ -10,9 +10,10 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "next": "15.5.18",
+    "openai": "^6.16.0",
     "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "openai": "^6.16.0"
+    "react-dom": "19.0.0"
   }
 }
