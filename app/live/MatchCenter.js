@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import AssetImage from "../AssetImage";
 import { addTournamentRanks } from "../../lib/rankings";
 import { courseLogo, teamLogo } from "../../lib/asset-paths";
@@ -33,30 +33,61 @@ function strokeText(value) {
   return `${value} stroke${Number(value) === 1 ? "" : "s"} received`;
 }
 
-function PlayerLine({ player, showHandicap = true, showStroke = true }) {
-  return <div className={styles.playerLine}>
-    <span className={styles.playerDetails}>
-      <strong>{player.name}</strong>
-      <span className={styles.playerMeta}>
-        {showHandicap && hasValue(player.playingHcp) ? <small>HCP {formatHandicap(player.playingHcp)}</small> : null}
-        {showStroke && strokeText(player.stroke) ? <em className={styles.strokeBadge}>{strokeText(player.stroke)}</em> : null}
-      </span>
+function PlayerSlot({ player, showHandicap = true, showStroke = true }) {
+  if (!player) return <div className={styles.playerSlot} aria-hidden="true" />;
+  return <div className={styles.playerSlot}>
+    <strong>{player.name}</strong>
+    <span className={styles.playerHandicapSlot}>
+      {showHandicap && hasValue(player.playingHcp) ? <small>HCP {formatHandicap(player.playingHcp)}</small> : null}
+    </span>
+    <span className={styles.playerStrokeSlot}>
+      {showStroke && strokeText(player.stroke) ? <em className={styles.strokeBadge}>{strokeText(player.stroke)}</em> : null}
     </span>
   </div>;
 }
 
-function MatchTeam({ team, players, format, teamHcp, teamStroke, side }) {
+function MatchTeamHeader({ team }) {
+  return <div className={styles.matchTeamHeader}>
+    <Logo filename={team.logo} name={team.name} size="match" />
+    <span>{team.name}</span>
+  </div>;
+}
+
+function ScrambleTeamMeta({ teamHcp, teamStroke }) {
+  return <div className={styles.scrambleTeamMeta}>
+    <span className={styles.teamHandicapSlot}>
+      {hasValue(teamHcp) ? <small className={styles.teamHandicap}>Team Handicap: <b>{formatHandicap(teamHcp)}</b></small> : null}
+    </span>
+    <span className={styles.teamStrokeSlot}>
+      {strokeText(teamStroke) ? <em className={styles.strokeBadge}>{strokeText(teamStroke)}</em> : null}
+    </span>
+  </div>;
+}
+
+function MatchupRoster({ tournament, match }) {
+  const { format } = match;
   const scramble = format === "SC";
-  const hasCaptain = players.some((player) => player.captain);
-  return <section className={styles.matchTeam} data-side={side}>
-    <div className={styles.matchTeamHeader}><Logo filename={team.logo} name={team.name} size="match" /><span>{team.name}</span></div>
-    <div className={styles.playerList}>
-      {players.map((player) => <PlayerLine player={player} showHandicap={!scramble} showStroke={!scramble} key={player.id} />)}
-    </div>
-    <div className={styles.captainSlot}>{hasCaptain ? <i>Captain</i> : <span aria-hidden="true">&nbsp;</span>}</div>
-    <div className={styles.teamHandicapSlot}>{scramble && hasValue(teamHcp) ? <small className={styles.teamHandicap}>Team Handicap: <b>{formatHandicap(teamHcp)}</b></small> : <span aria-hidden="true">&nbsp;</span>}</div>
-    <div className={styles.teamStrokeSlot}>{scramble && strokeText(teamStroke) ? <em className={styles.strokeBadge}>{strokeText(teamStroke)}</em> : <span aria-hidden="true">&nbsp;</span>}</div>
-  </section>;
+  const teamOnePlayers = match.team1Players || [];
+  const teamTwoPlayers = match.team2Players || [];
+  const playerCount = Math.max(format === "SI" ? 1 : 2, teamOnePlayers.length, teamTwoPlayers.length);
+
+  return <div className={styles.matchupTeams}>
+    <MatchTeamHeader team={tournament.teamOne} />
+    <b>VS</b>
+    <MatchTeamHeader team={tournament.teamTwo} />
+    {Array.from({ length: playerCount }, (_, index) => (
+      <Fragment key={`player-row-${index}`}>
+        <PlayerSlot player={teamOnePlayers[index]} showHandicap={!scramble} showStroke={!scramble} />
+        <span className={styles.playerPairSpacer} aria-hidden="true" />
+        <PlayerSlot player={teamTwoPlayers[index]} showHandicap={!scramble} showStroke={!scramble} />
+      </Fragment>
+    ))}
+    {scramble ? <>
+      <ScrambleTeamMeta teamHcp={match.team1PlayingHcp} teamStroke={match.team1Stroke} />
+      <span aria-hidden="true" />
+      <ScrambleTeamMeta teamHcp={match.team2PlayingHcp} teamStroke={match.team2Stroke} />
+    </> : null}
+  </div>;
 }
 
 function winnerLabel(value, tournament) {
@@ -194,11 +225,7 @@ function MatchCard({ match, round, tournament }) {
   return <article className={styles.matchCard}>
     <div className={styles.matchTop}><span>{match.course.name || `${round.label} · Match ${match.match}`}</span><span>{match.teeTime || match.status}</span></div>
     <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
-    <div className={styles.matchupTeams}>
-      <MatchTeam team={tournament.teamOne} players={match.team1Players} format={match.format} teamHcp={match.team1PlayingHcp} teamStroke={match.team1Stroke} side="one" />
-      <b>VS</b>
-      <MatchTeam team={tournament.teamTwo} players={match.team2Players} format={match.format} teamHcp={match.team2PlayingHcp} teamStroke={match.team2Stroke} side="two" />
-    </div>
+    <MatchupRoster tournament={tournament} match={match} />
     <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
       {match.format !== "SI" ? <><Segment label="Front 9" winner={match.frontWinner} tournament={tournament} /><Segment label="Back 9" winner={match.backWinner} tournament={tournament} /></> : null}
       <Segment label="Overall" winner={match.overallWinner || match.matchupWinner} tournament={tournament} />

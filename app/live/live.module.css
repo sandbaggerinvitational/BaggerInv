@@ -787,25 +787,35 @@
 
 .matchCard { display: flex; flex-direction: column; }
 .matchupTeams {
-  min-height: 310px;
-  padding: 24px 22px 26px;
+  min-height: 0;
+  padding: 24px 22px 30px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
-  align-items: stretch;
-  gap: 12px;
+  align-items: start;
+  column-gap: 12px;
+  row-gap: 0;
 }
 .matchupTeams > b { align-self: start; margin-top: 26px; color: #c9232d; text-align: center; font-size: .7rem; letter-spacing: .08em; }
-.matchTeam { min-width: 0; display: grid; grid-template-rows: 82px minmax(110px, auto) 24px 22px 25px; align-items: start; justify-items: center; text-align: center; }
-.matchTeamHeader { width: 100%; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; }
+.matchTeamHeader { width: 100%; min-width: 0; min-height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; }
 .matchTeamHeader > span { max-width: 100%; color: #68716d; text-align: center; text-transform: uppercase; letter-spacing: .08em; font-size: .61rem; font-weight: 900; line-height: 1.25; overflow-wrap: anywhere; }
-.matchTeam .playerList { width: 100%; min-height: 110px; margin: 0; display: grid; align-content: start; gap: 12px; }
-.matchTeam .playerLine { min-width: 0; display: block !important; }
-.matchTeam .playerDetails { min-width: 0; display: grid !important; justify-items: center; gap: 5px; color: #172019 !important; text-transform: none !important; letter-spacing: 0 !important; }
-.matchTeam .playerDetails > strong { max-width: 100%; min-height: 2.3em; display: grid; align-items: center; font: 700 1.05rem/1.15 Georgia, serif; overflow-wrap: anywhere; }
-.playerMeta { min-height: 23px; display: flex !important; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; }
-.playerMeta small { margin: 0 !important; color: #68716d; font-size: .64rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
-.captainSlot, .teamHandicapSlot, .teamStrokeSlot { width: 100%; min-width: 0; display: flex; align-items: center; justify-content: center; }
-.captainSlot i { width: fit-content; padding: 3px 8px; border-radius: 999px; background: #f5e9be; color: #715615; font-size: .56rem; font-style: normal; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+.playerSlot {
+  min-width: 0;
+  padding: 7px 2px 5px;
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: auto 18px 25px;
+  align-items: start;
+  justify-items: center;
+  text-align: center;
+}
+@supports (grid-template-rows: subgrid) {
+  .playerSlot { grid-template-rows: subgrid; }
+}
+.playerSlot > strong { max-width: 100%; align-self: center; font: 700 1.05rem/1.15 Georgia, serif; overflow-wrap: anywhere; }
+.playerHandicapSlot, .playerStrokeSlot, .teamHandicapSlot, .teamStrokeSlot { width: 100%; min-width: 0; display: flex; align-items: center; justify-content: center; }
+.playerHandicapSlot small { margin: 0 !important; color: #68716d; font-size: .64rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.playerPairSpacer { grid-row: span 3; }
+.scrambleTeamMeta { min-width: 0; display: grid; grid-template-rows: 22px 25px; justify-items: center; }
 .teamHandicapSlot .teamHandicap { margin: 0 !important; color: #6b6049 !important; font-size: .61rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
 .teamHandicapSlot .teamHandicap b { color: #172019; font-size: 1em; }
 .teamStrokeSlot .strokeBadge { margin: 0; }
@@ -826,7 +836,6 @@
 
 @media (max-width: 1050px) {
   .matchGrid { grid-template-columns: 1fr; }
-  .matchupTeams { min-height: 292px; }
 }
 
 @media (max-width: 700px) {
@@ -847,21 +856,21 @@
   .mobileInsight .scenarioGrid { grid-template-columns: 1fr; gap: 10px; }
   .mobileInsight .scenarioGrid > div { padding: 14px; }
   .mobileInsight .scenarioGrid ul { margin-bottom: 0; }
-  .matchupTeams { min-height: 0; padding: 22px 13px 24px; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); gap: 5px; }
+  .matchupTeams { padding: 20px 13px 26px; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); column-gap: 5px; }
   .matchupTeams > b { margin-top: 23px; font-size: .62rem; }
-  .matchTeam { grid-template-rows: 78px minmax(118px, auto) 24px 22px 25px; }
-  .matchTeam .playerDetails > strong { font-size: .95rem; }
+  .matchTeamHeader { min-height: 74px; gap: 6px; }
+  .playerSlot { padding: 5px 1px 3px; }
+  .playerSlot > strong { font-size: .95rem; }
   .matchTeamHeader > span { font-size: .56rem; }
   .logoPlate[data-size="match"] { width: 36px; height: 36px; }
-  .playerMeta { align-content: start; }
   .strokeBadge { white-space: normal; text-align: center; }
   .leaderboardHeader h2 { font-size: 2.25rem; }
 }
 
 @media (max-width: 390px) {
   .matchupTeams { padding-inline: 9px; }
-  .matchTeam .playerDetails > strong { font-size: .88rem; }
-  .teamHandicapSlot .teamHandicap, .playerMeta small { font-size: .56rem; }
+  .playerSlot > strong { font-size: .88rem; }
+  .teamHandicapSlot .teamHandicap, .playerHandicapSlot small { font-size: .56rem; }
 }
 
 /* =========================================================
@@ -1105,12 +1114,11 @@
 }
 
 /* Keep the final mirrored-card rules authoritative over legacy Match Center selectors. */
-.matchTeam .matchTeamHeader { width: 100%; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; }
-.matchTeam .matchTeamHeader > span { max-width: 100%; color: #68716d; text-align: center; text-transform: uppercase; letter-spacing: .08em; font-size: .61rem; font-weight: 900; line-height: 1.25; overflow-wrap: anywhere; }
-.matchTeam .playerDetails { justify-items: center; }
+.matchupTeams .matchTeamHeader { width: 100%; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; }
+.matchupTeams .matchTeamHeader > span { max-width: 100%; color: #68716d; text-align: center; text-transform: uppercase; letter-spacing: .08em; font-size: .61rem; font-weight: 900; line-height: 1.25; overflow-wrap: anywhere; }
 .matchResult .matchScoreTable { margin-top: 13px; padding: 0; }
 
 @media (max-width: 700px) {
-  .matchTeam .matchTeamHeader > span { font-size: .56rem; }
-  .matchTeam .playerDetails { justify-items: center; }
+  .matchupTeams .matchTeamHeader { gap: 6px; }
+  .matchupTeams .matchTeamHeader > span { font-size: .56rem; }
 }
