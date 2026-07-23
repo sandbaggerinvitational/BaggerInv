@@ -274,10 +274,7 @@ export function CareerHonors({
             <div className={`${styles.honorMedallion} ${styles.handicapCommitteeMedallion}`}>
               <HandicapCommitteeIcon className={styles.honorIcon} />
             </div>
-            <div>
-              <span>Handicap Committee</span>
-              <div className={styles.honorYears}>Current Member</div>
-            </div>
+            <div><span>Handicap Committee</span></div>
           </div>
         ) : null}
 
