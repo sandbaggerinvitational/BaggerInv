@@ -3,6 +3,7 @@ import AssetImage from "../AssetImage";
 import TeamLogoPlate from "../TeamLogoPlate";
 import { formatHandicap } from "../../lib/formatters";
 import styles from "./draft.module.css";
+import DraftAnalysisSummary from "./DraftAnalysisSummary";
 
 function initials(name) {
   return String(name ?? "")
@@ -205,7 +206,122 @@ function CompletedRosters({ draft }) {
   );
 }
 
-export default function DraftExperience({ draft, previousDrafts = [] }) {
+function SignedValue({ value }) {
+  if (!Number.isFinite(value)) return "—";
+  return `${value > 0 ? "+" : ""}${value}`;
+}
+
+function PlayerValueCard({ label, player, final = false }) {
+  return (
+    <article className={styles.analysisCard}>
+      <span>{label}</span>
+      <h3>{player?.name || "Not enough data"}</h3>
+      {player ? (
+        <>
+          <p>Drafted #{player.pick}</p>
+          {final || Number.isFinite(player.finish) ? (
+            <strong>Finished #{player.finish} · <SignedValue value={player.value} /> {player.valueLabel || "DVS"}</strong>
+          ) : (
+            <strong>Projected Value: #{player.expectedPosition}</strong>
+          )}
+        </>
+      ) : <p>Analysis will populate as results become available.</p>}
+    </article>
+  );
+}
+
+function DraftGrades({ analysis }) {
+  return (
+    <article className={`${styles.analysisCard} ${styles.gradesCard}`}>
+      <span>{analysis.state === "projected" ? "Projected Draft Grades" : analysis.state === "live" ? "Draft Grades · Live" : "Final Draft Grades"}</span>
+      <div>
+        {analysis.grades.map((row) => (
+          <section key={row.team.id}>
+            <div>
+              <strong>{row.captain?.name || row.team.name}</strong>
+              <small>{row.team.name}</small>
+            </div>
+            <b>{row.grade}</b>
+          </section>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function DraftAnalysis({ analysis }) {
+  if (!analysis) return null;
+  const projected = analysis.state === "projected";
+  const live = analysis.state === "live";
+  return (
+    <section className={`${styles.section} ${styles.analysis}`}>
+      <div className={styles.sectionHeading}>
+        <span>SBI Draft Desk</span>
+        <h2>Draft Analysis</h2>
+        <p>{projected ? "Pre-tournament projection" : live ? "Tournament in progress" : "Final historical review"}</p>
+      </div>
+
+      <div className={styles.analysisGrid}>
+        {projected ? (
+          <>
+            <article className={`${styles.analysisCard} ${styles.featuredAnalysis}`}>
+              <span>🏆 Projected Best Draft</span>
+              <h3>{analysis.projectedBest.team.name}</h3>
+              <strong>Draft Score: {analysis.projectedBest.score}</strong>
+              <p>Projection source · {analysis.source}</p>
+            </article>
+            <article className={styles.analysisCard}>
+              <span>Projected Tournament Favorite</span>
+              <h3>{analysis.projectedFavorite.team.name}</h3>
+              <b>{analysis.projectedFavorite.probability.toFixed(1)}%</b>
+              <p>Championship probability</p>
+            </article>
+            <PlayerValueCard label="Best Value Pick · Projected" player={analysis.value} />
+            <PlayerValueCard label="Biggest Reach · Projected" player={analysis.reach} />
+          </>
+        ) : live ? (
+          <>
+            <article className={`${styles.analysisCard} ${styles.featuredAnalysis}`}>
+              <span>Current Draft Leader</span>
+              <h3>{analysis.leader.team.name}</h3>
+              <strong>{analysis.leader.points.toFixed(2)} drafted-player points</strong>
+            </article>
+            <article className={styles.analysisCard}>
+              <span>Projection vs Reality</span>
+              <dl>
+                <div><dt>Projected Winner</dt><dd>{analysis.projectedFavorite.team.name}</dd></div>
+                <div><dt>Current Leader</dt><dd>{analysis.leader.team.name}</dd></div>
+              </dl>
+            </article>
+            <PlayerValueCard label="Biggest Surprise" player={analysis.value} final />
+            <PlayerValueCard label="Biggest Disappointment" player={analysis.reach} final />
+          </>
+        ) : (
+          <>
+            <article className={`${styles.analysisCard} ${styles.featuredAnalysis}`}>
+              <span>🏆 Best Draft</span>
+              <h3>{analysis.leader.team.name}</h3>
+              <strong>{analysis.leader.points.toFixed(2)} drafted-player points</strong>
+            </article>
+            <PlayerValueCard label="Steal of the Draft" player={analysis.value} final />
+            <PlayerValueCard label="Biggest Reach" player={analysis.reach} final />
+            <PlayerValueCard label="Biggest Climber" player={analysis.value} final />
+            <PlayerValueCard label="Biggest Faller" player={analysis.reach} final />
+          </>
+        )}
+
+        <DraftGrades analysis={analysis} />
+        <article className={`${styles.analysisCard} ${styles.analystCard}`}>
+          <span>SBI Draft Analyst</span>
+          <h3>{projected ? "Draft Summary" : live ? "Draft Update" : "Final Draft Review"}</h3>
+          <DraftAnalysisSummary analysis={analysis} year={analysis.year} />
+        </article>
+      </div>
+    </section>
+  );
+}
+
+export default function DraftExperience({ draft, previousDrafts = [], analysis = null }) {
   return (
     <>
       <section className={styles.hero}>
@@ -250,6 +366,7 @@ export default function DraftExperience({ draft, previousDrafts = [] }) {
         ) : null}
 
         <CompletedRosters draft={draft} />
+        <DraftAnalysis analysis={analysis} />
 
         {previousDrafts.length ? (
           <section className={styles.history}>
