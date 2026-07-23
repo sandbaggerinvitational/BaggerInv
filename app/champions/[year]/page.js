@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
+import ContextBackLink from "../../ContextBackLink";
 import TeamLogoPlate from "../../TeamLogoPlate";
 import {
   formatHandicap,
@@ -66,6 +67,10 @@ export default async function ChampionshipDetailPage({ params }) {
   return (
     <main>
       <Header />
+      <ContextBackLink
+        href="/champions"
+        label="Back to All Champions"
+      />
 
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>Championship Summary</p>
@@ -143,7 +148,6 @@ export default async function ChampionshipDetailPage({ params }) {
         </section>
 
         <div className={styles.championDetailLinks}>
-          <Link href="/champions">← All Champions</Link>
           <Link href={`/history/${year}`}>View Full {year} Tournament →</Link>
         </div>
       </section>

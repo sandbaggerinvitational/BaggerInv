@@ -3,6 +3,7 @@ import { refreshHistoricalData } from "../../../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
+import ContextBackLink from "../../../../ContextBackLink";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
 import {
   formatHandicap,
@@ -31,6 +32,10 @@ export default async function TeamSeasonPage({ params }) {
   return (
     <main>
       <Header />
+      <ContextBackLink
+        href={`/history/${team.year}`}
+        label={`Back to ${team.year} Tournament`}
+      />
 
       <section className={`${styles.pageHero} ${styles.teamRosterHero}`}>
         <TeamLogoPlate

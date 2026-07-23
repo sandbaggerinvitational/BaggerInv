@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { CompactHonors } from "../HonorBadges";
+import { playerDirectoryHref } from "../../lib/context-navigation";
 import { playerPhoto } from "../../lib/asset-paths";
 import {
   formatHandicap,
@@ -17,8 +18,9 @@ export const metadata = {
   title: "Sandbaggers | The Sandbagger Invitational",
 };
 
-export default async function PlayersPage() {
+export default async function PlayersPage({ searchParams }) {
   await refreshHistoricalData();
+  const directoryHref = playerDirectoryHref(await searchParams);
   const players = getAllPlayerStats();
 
   return (
@@ -39,7 +41,9 @@ export default async function PlayersPage() {
           {players.map(({ player, stats }) => (
             <Link
               className={styles.playerCard}
-              href={`/players/${player.slug}`}
+              href={`/players/${player.slug}?returnTo=${encodeURIComponent(
+                directoryHref
+              )}`}
               key={player["Player ID"]}
             >
               <div className={styles.playerTop}>
