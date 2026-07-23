@@ -241,7 +241,11 @@ function DraftGrades({ analysis }) {
               <strong>{row.captain?.name || row.team.name}</strong>
               <small>{row.team.name}</small>
             </div>
-            <b>{row.grade}</b>
+            <div className={styles.draftGradeResult}>
+              <b>{row.score}</b>
+              <small>Draft Score</small>
+              <em>{row.grade}</em>
+            </div>
           </section>
         ))}
       </div>
