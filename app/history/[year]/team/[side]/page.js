@@ -43,7 +43,7 @@ export default async function TeamSeasonPage({ params }) {
         <p className={styles.eyebrow}>{team.year} Team Roster</p>
         <h1>{team.name}</h1>
         <p>
-          Captain: {team.captain?.["Display Name"] || "TBA"} · Average
+          Captain: {team.captain?.["Display Name"] || team.captainRecordedName || "Captain not recorded"} · Average
           handicap {formatHandicap(team.averageHandicap)}
         </p>
         </div>
@@ -57,12 +57,14 @@ export default async function TeamSeasonPage({ params }) {
               href={`/players/${player.slug}`}
               key={player["Player ID"]}
             >
-              <span>{player["Display Name"]}</span>
+              <span>
+                {player["Display Name"]}
+                {team.captainId === player["Player ID"] ? (
+                  <i className={styles.rosterCaptainMarker} title="Captain" aria-label="Team Captain">C</i>
+                ) : null}
+              </span>
               <strong>{formatHandicap(handicap)}</strong>
               <small>Tournament Handicap</small>
-              {team.captain?.["Player ID"] === player["Player ID"] ? (
-                <b>Captain</b>
-              ) : null}
             </Link>
           ))}
         </div>

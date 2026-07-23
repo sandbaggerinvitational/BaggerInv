@@ -171,14 +171,19 @@ export async function getTournamentData() {
   const tournamentRow = tournaments.find((row) => tournamentYear(row) === year) || {};
   const selectedTournamentId = assertValidTournamentId(tournamentId(tournamentRow) || String(year));
   const yearTeams = teamRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
-  const teams = { 1: { id: "", name: "Team 1", logo: "", captainId: "" }, 2: { id: "", name: "Team 2", logo: "", captainId: "" } };
+  const teams = {
+    1: { id: "", name: "Team 1", logo: "", captainId: "", primaryColor: "", secondaryColor: "" },
+    2: { id: "", name: "Team 2", logo: "", captainId: "", primaryColor: "", secondaryColor: "" },
+  };
   for (const row of yearTeams) {
     const side = Number(clean(row["Team Side"]).match(/(1|2)/)?.[1]);
     if (side) teams[side] = {
       id: row["Team ID"] || "",
       name: row["Team Names"] || row["Team Name"] || `Team ${side}`,
       logo: row["Team Logo"] || "",
-      captainId: row.Captain || "",
+      captainId: row["Captain Player ID"] || row.Captain || "",
+      primaryColor: row["Primary Color"] || "",
+      secondaryColor: row["Secondary Color"] || "",
     };
   }
 

@@ -89,9 +89,7 @@ export default async function ChampionshipDetailPage({ params }) {
             <strong>{displayScore(tournament["Final Score"])}</strong>
             <p>
               Defeated {opponent?.name || "the opposing team"}
-              {champion.captain?.["Display Name"]
-                ? ` · Captain ${champion.captain["Display Name"]}`
-                : ""}
+              {` · Captain ${champion.captain?.["Display Name"] || champion.captainRecordedName || "not recorded"}`}
             </p>
           </div>
         </div>
@@ -104,7 +102,12 @@ export default async function ChampionshipDetailPage({ params }) {
               const standing = standingsByPlayer.get(player["Player ID"]);
               return (
                 <Link href={`/players/${player.slug}`} key={player["Player ID"]}>
-                  <strong>{player["Display Name"]}</strong>
+                  <strong>
+                    {player["Display Name"]}
+                    {champion.captainId === player["Player ID"] ? (
+                      <i className={styles.rosterCaptainMarker} title="Captain" aria-label="Team Captain">C</i>
+                    ) : null}
+                  </strong>
                   <span>Handicap {formatHandicap(handicap)}</span>
                   <span>
                     Record {standing ? `${standing.wins}-${standing.losses}-${standing.halves}` : "—"}

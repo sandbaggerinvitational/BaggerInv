@@ -173,7 +173,7 @@ export default async function TournamentYearPage({ params }) {
                 <div>
                   <h3>{team.name}</h3>
                   <p>
-                    Captain: {team.captain?.["Display Name"] || "TBA"}
+                    Captain: {team.captain?.["Display Name"] || team.captainRecordedName || "Captain not recorded"}
                   </p>
                   <strong>
                     Avg. Team Handicap: {formatHandicap(team.averageHandicap)}

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import AssetImage from "../AssetImage";
+import PublicMatchCard from "../PublicMatchCard";
 import { addTournamentRanks } from "../../lib/rankings";
 import { courseLogo, teamLogo } from "../../lib/asset-paths";
-import { formatHandicap, formatPoints } from "../../lib/formatters";
+import { formatPoints } from "../../lib/formatters";
 import { clinchingScenariosEligible } from "../../lib/live-tournament";
 import TournamentLeaderboard from "../TournamentLeaderboard";
 import styles from "./live.module.css";
@@ -26,80 +27,6 @@ function TeamIdentity({ team, side, score, compact = false }) {
     <Logo filename={team.logo} name={team.name} size={compact ? "small" : "large"} />
     <div><strong>{team.name}</strong>{hasValue(score) ? <b>{formatPoints(score)}</b> : null}</div>
   </div>;
-}
-
-function strokeText(value) {
-  if (!hasValue(value) || Number(value) === 0) return "";
-  return `${value} stroke${Number(value) === 1 ? "" : "s"} received`;
-}
-
-function PlayerSlot({ player, showHandicap = true, showStroke = true }) {
-  if (!player) return <div className={styles.playerSlot} aria-hidden="true" />;
-  return <div className={styles.playerSlot}>
-    <strong>{player.name}</strong>
-    <span className={styles.playerHandicapSlot}>
-      {showHandicap && hasValue(player.playingHcp) ? <small>HCP {formatHandicap(player.playingHcp)}</small> : null}
-    </span>
-    <span className={styles.playerStrokeSlot}>
-      {showStroke && strokeText(player.stroke) ? <em className={styles.strokeBadge}>{strokeText(player.stroke)}</em> : null}
-    </span>
-  </div>;
-}
-
-function MatchTeamHeader({ team }) {
-  return <div className={styles.matchTeamHeader}>
-    <Logo filename={team.logo} name={team.name} size="match" />
-    <span>{team.name}</span>
-  </div>;
-}
-
-function ScrambleTeamMeta({ teamHcp, teamStroke }) {
-  return <div className={styles.scrambleTeamMeta}>
-    <span className={styles.teamHandicapSlot}>
-      {hasValue(teamHcp) ? <small className={styles.teamHandicap}>Team Handicap: <b>{formatHandicap(teamHcp)}</b></small> : null}
-    </span>
-    <span className={styles.teamStrokeSlot}>
-      {strokeText(teamStroke) ? <em className={styles.strokeBadge}>{strokeText(teamStroke)}</em> : null}
-    </span>
-  </div>;
-}
-
-function MatchupRoster({ tournament, match }) {
-  const { format } = match;
-  const scramble = format === "SC";
-  const teamOnePlayers = match.team1Players || [];
-  const teamTwoPlayers = match.team2Players || [];
-  const playerCount = Math.max(format === "SI" ? 1 : 2, teamOnePlayers.length, teamTwoPlayers.length);
-
-  return <div className={styles.matchupTeams}>
-    <MatchTeamHeader team={tournament.teamOne} />
-    <b>VS</b>
-    <MatchTeamHeader team={tournament.teamTwo} />
-    {Array.from({ length: playerCount }, (_, index) => (
-      <Fragment key={`player-row-${index}`}>
-        <PlayerSlot player={teamOnePlayers[index]} showHandicap={!scramble} showStroke={!scramble} />
-        <span className={styles.playerPairSpacer} aria-hidden="true" />
-        <PlayerSlot player={teamTwoPlayers[index]} showHandicap={!scramble} showStroke={!scramble} />
-      </Fragment>
-    ))}
-    {scramble ? <>
-      <ScrambleTeamMeta teamHcp={match.team1PlayingHcp} teamStroke={match.team1Stroke} />
-      <span aria-hidden="true" />
-      <ScrambleTeamMeta teamHcp={match.team2PlayingHcp} teamStroke={match.team2Stroke} />
-    </> : null}
-  </div>;
-}
-
-function winnerLabel(value, tournament) {
-  if (value === "Team 1") return tournament.teamOne.name;
-  if (value === "Team 2") return tournament.teamTwo.name;
-  if (value === "Halved") return "Halved";
-  return "Pending";
-}
-
-function Segment({ label, winner, tournament }) {
-  const className = winner === "Team 1" ? styles.teamOneBadge : winner === "Team 2" ? styles.teamTwoBadge : styles.halvedBadge;
-  return <div className={styles.segment}><span>{label}</span><strong className={`${styles.winnerBadge} ${className}`}>{winnerLabel(winner, tournament)}</strong></div>;
 }
 
 function ChampionshipBanner({ tournament }) {
@@ -213,31 +140,6 @@ function MobileTournamentInsights({ tournament, round, rounds, remainingByRound,
   </div>;
 }
 
-function winnerSide(match) {
-  if (hasValue(match.team1Points) && hasValue(match.team2Points) && Number(match.team1Points) !== Number(match.team2Points)) return Number(match.team1Points) > Number(match.team2Points) ? 1 : 2;
-  if ([match.matchupWinner, match.overallWinner].includes("Team 1")) return 1;
-  if ([match.matchupWinner, match.overallWinner].includes("Team 2")) return 2;
-  return null;
-}
-
-function MatchCard({ match, round, tournament }) {
-  const winningSide = winnerSide(match);
-  return <article className={styles.matchCard}>
-    <div className={styles.matchTop}><span>{match.course.name || `${round.label} · Match ${match.match}`}</span><span>{match.teeTime || match.status}</span></div>
-    <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
-    <MatchupRoster tournament={tournament} match={match} />
-    <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
-      {match.format !== "SI" ? <><Segment label="Front 9" winner={match.frontWinner} tournament={tournament} /><Segment label="Back 9" winner={match.backWinner} tournament={tournament} /></> : null}
-      <Segment label="Overall" winner={match.overallWinner || match.matchupWinner} tournament={tournament} />
-    </div>
-    {match.notes ? <p className={styles.matchNotes}>{match.notes}</p> : null}
-    {(hasValue(match.team1Points) || hasValue(match.team2Points)) ? <div className={styles.matchResult}><span className={styles.matchResultLabel}>{winningSide ? "Match Winner" : "Match Points"}</span><div className={styles.matchScoreTable}>
-      <div className={`${styles.matchScoreRow} ${winningSide === 1 ? styles.matchScoreWinner : ""}`}><span><i aria-hidden="true" />{tournament.teamOne.name}</span><strong>{formatPoints(match.team1Points)}</strong></div>
-      <div className={`${styles.matchScoreRow} ${winningSide === 2 ? styles.matchScoreWinner : ""}`}><span><i aria-hidden="true" />{tournament.teamTwo.name}</span><strong>{formatPoints(match.team2Points)}</strong></div>
-    </div></div> : null}
-  </article>;
-}
-
 export default function MatchCenter({ initialData, loadError }) {
   const tournament = initialData?.tournament;
   const rounds = initialData?.rounds || [];
@@ -262,7 +164,7 @@ export default function MatchCenter({ initialData, loadError }) {
       {rounds.length ? <RoundNavigation rounds={rounds} activeRound={active?.number} onSelect={setActiveRound} /> : null}
       <div className={styles.desktopInsights}>{active ? <RoundProgress round={active} /> : null}<TournamentStats tournament={tournament} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} /></div>
       <MobileTournamentInsights tournament={tournament} round={active} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} />
-      {active ? <><div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong>{formatPoints(roundTotals.teamOne)} – {formatPoints(roundTotals.teamTwo)}</strong></div></div><div className={styles.matchGrid}>{active.matches.map((match) => <MatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div></> : null}
+      {active ? <><div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong>{formatPoints(roundTotals.teamOne)} – {formatPoints(roundTotals.teamTwo)}</strong></div></div><div className={styles.matchGrid}>{active.matches.map((match) => <PublicMatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div></> : null}
       {rankedLeaderboard.length ? <><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>{leaderboardTitle} {isLive || championshipMode ? <em data-mode={championshipMode ? "final" : "live"}>{championshipMode ? "Final" : "Live"}</em> : null}</h2></div></div>
         <TournamentLeaderboard rows={leaderboard} />
         {rankedLeaderboard.length > 5 ? <button className={styles.leaderboardToggle} type="button" onClick={() => setShowLeaderboard((value) => !value)}>{showLeaderboard ? "Show Top Five" : "View Full Leaderboard →"}</button> : null}</> : null}
