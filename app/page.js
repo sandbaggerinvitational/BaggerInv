@@ -6,9 +6,9 @@ import { getTournaments } from "../lib/stats";
 import { getTournamentData } from "./live/sheetData";
 import { homePageHero, tournamentLogo } from "../lib/asset-paths";
 import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
+import { tournamentStartTimestamp } from "../lib/tournament-countdown";
 import AssetImage from "./AssetImage";
-import TeamLogoPlate from "./TeamLogoPlate";
-import TeamIdentity from "./TeamIdentity";
+import TournamentStatusHero from "./TournamentStatusHero";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -23,24 +23,6 @@ function imagePath(value) {
 
 function playerName(player) {
   return clean(player?.["Display Name"] || player?.name);
-}
-
-function primaryHeroAction({ status, hasPairings, year }) {
-  const normalized = clean(status).toLowerCase();
-
-  if (/complete|completed|final/.test(normalized)) {
-    return { label: "Final Results", href: `/history/${year}` };
-  }
-
-  if (/live|in progress|underway/.test(normalized)) {
-    return { label: "Live Match Center", href: "/live" };
-  }
-
-  if (hasPairings || /pairing/.test(normalized)) {
-    return { label: "View Pairings", href: "/live" };
-  }
-
-  return { label: "Tournament Preview", href: `/history/${year}` };
 }
 
 export default async function Home() {
@@ -87,7 +69,6 @@ export default async function Home() {
   const hasPairings = Object.values(liveData?.rounds || {}).some(
     (round) => round.matches?.length
   );
-  const primaryAction = primaryHeroAction({ status, hasPairings, year });
   const edition =
     clean(currentTournament.editionTitle) || `${year} Sandbagger Invitational`;
   const mobileHeroImage = imagePath(
@@ -100,13 +81,38 @@ export default async function Home() {
   const roundCopy = roundCount
     ? `${roundCount} ${roundCount === 1 ? "round" : "rounds"}`
     : "a full slate";
-  const teams = [
-    { ...currentTournament.team1, name: teamOneName, captainName: captainOne },
-    { ...currentTournament.team2, name: teamTwoName, captainName: captainTwo },
-  ];
   const championSide = Number(liveTournament.state?.championSide) || null;
-  const championTeam = championSide === 1 ? liveTournament.teamOne : championSide === 2 ? liveTournament.teamTwo : null;
-  const finalScore = `${liveTournament.teamOne?.score ?? 0}–${liveTournament.teamTwo?.score ?? 0}`;
+  const openingTeeTime = clean(
+    liveTournament.startTime ||
+    liveData?.rounds?.find((round) => Number(round.number) === 1)?.matches?.[0]?.teeTime
+  );
+  const startAt = tournamentStartTimestamp({
+    startDate: liveTournament.startDate || currentTournament["Start Date"],
+    startTime: openingTeeTime,
+    dates,
+    year,
+    timeZone: liveTournament.timeZone || currentTournament["Time Zone"] || "America/Chicago",
+  });
+  const statusHeroTournament = {
+    year,
+    name: edition,
+    location: destination,
+    dates,
+    currentRound,
+    championSide,
+    liveMatches: Number(liveTournament.state?.liveMatches) || 0,
+    remainingPoints: Number(liveTournament.state?.remainingPoints) || 0,
+    teamOne: {
+      ...(liveTournament.teamOne || currentTournament.team1),
+      name: teamOneName,
+      score: liveTournament.teamOne?.score ?? 0,
+    },
+    teamTwo: {
+      ...(liveTournament.teamTwo || currentTournament.team2),
+      name: teamTwoName,
+      score: liveTournament.teamTwo?.score ?? 0,
+    },
+  };
 
   return (
     <main>
@@ -133,17 +139,6 @@ export default async function Home() {
             {playerCount ? `${playerCount} players. ` : ""}Two teams. {roundCount ? `${roundCount} rounds. ` : ""}One trophy.
           </p>
 
-          <div className="actions">
-            <Link className="button primary" href={primaryAction.href}>
-              {primaryAction.label}
-            </Link>
-            <Link className="button guide" href="/tournament-guide">
-              Tournament Guide
-            </Link>
-            <Link className="button glass" href="/history">
-              Explore the History
-            </Link>
-          </div>
         </div>
 
         <div className="heroBottomBar">
@@ -166,6 +161,14 @@ export default async function Home() {
         </div>
       </section>
 
+      <TournamentStatusHero
+        tournament={statusHeroTournament}
+        startAt={startAt}
+        initialNow={Date.now()}
+        initialStatus={normalizedStatus}
+        hasPairings={hasPairings}
+      />
+
       <div className="mobileTournamentStrip" aria-label="Tournament details">
         <span>{location}</span>
         <span>{playerCount ? `${playerCount} Players` : "Two Teams"}</span>
@@ -181,39 +184,9 @@ export default async function Home() {
             {" "}of team match play.{captainsCopy} Follow the pairings, momentum, and
             every point as the tournament unfolds.
           </p>
-        </div>
-
-        <div className="tournamentPreviewCard">
-          <div className="tournamentPreviewHeader">
-            <span>{normalizedStatus === "FINAL" ? `${year} Sandbagger Champions` : "Tournament Status"}</span>
-            <strong>{normalizedStatus}</strong>
-          </div>
-          <div className="tournamentPreviewTeams">
-            {normalizedStatus === "FINAL" && championTeam ? (
-              <TeamIdentity
-                team={championTeam}
-                detail={`Final score ${finalScore}`}
-                href={`/history/${year}`}
-              />
-            ) : teams.map((team, index) => (
-              <TeamIdentity
-                key={team.side || index}
-                team={team}
-                captain={normalizedStatus === "LIVE" ? undefined : team.captainName}
-                score={normalizedStatus === "LIVE" ? (index === 0 ? liveTournament.teamOne?.score ?? 0 : liveTournament.teamTwo?.score ?? 0) : undefined}
-                href={team.side ? `/history/${year}/team/${encodeURIComponent(team.side)}` : null}
-              />
-            ))}
-          </div>
-          <div className="tournamentPreviewRound">
-            {normalizedStatus === "FINAL" ? (
-              <><div><span>Final Score</span><strong>{finalScore}</strong></div><Link href={`/history/${year}`}>View Final Results →</Link></>
-            ) : normalizedStatus === "LIVE" ? (
-              <><div><span>Current Round</span><strong>Round {currentRound}</strong></div><Link href="/live">Open Match Center →</Link></>
-            ) : (
-              <><div><span>Opening Round</span><strong>Round 1</strong></div><Link href="/live">View Pairings →</Link></>
-            )}
-          </div>
+          <Link className="textLink darkLink" href="/history">
+            Explore the History →
+          </Link>
         </div>
       </section>
 
