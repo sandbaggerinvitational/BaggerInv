@@ -372,6 +372,12 @@ export default function DraftExperience({ draft, previousDrafts = [], analysis =
         <CompletedRosters draft={draft} />
         <DraftAnalysis analysis={analysis} />
 
+        <Link className={styles.analyticsLink} href="/draft/analytics">
+          <span>Across Every Completed Draft</span>
+          <strong>Historical Draft Analytics</strong>
+          <b>Explore career records →</b>
+        </Link>
+
         {previousDrafts.length ? (
           <section className={styles.history}>
             <div className={styles.sectionHeading}>
