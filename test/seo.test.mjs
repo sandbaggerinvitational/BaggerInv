@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import {
   DEFAULT_SOCIAL_IMAGE,
   SITE_URL,
@@ -38,4 +39,18 @@ test("private application pages are excluded from search indexing", () => {
   assert.equal(metadata.robots.index, false);
   assert.equal(metadata.robots.follow, false);
   assert.equal(metadata.robots.noarchive, true);
+});
+
+test("root metadata configures the production title template and icons", async () => {
+  const layout = await readFile(
+    new URL("../app/layout.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(layout, /template: `%s \| \$\{SITE_NAME\}`/);
+  assert.match(layout, /absoluteUrl\("\/favicon\.ico"\)/);
+  assert.match(layout, /absoluteUrl\("\/favicon-16x16\.png"\)/);
+  assert.match(layout, /absoluteUrl\("\/favicon-32x32\.png"\)/);
+  assert.match(layout, /absoluteUrl\("\/icon\.png"\)/);
+  assert.match(layout, /absoluteUrl\("\/apple-icon\.png"\)/);
 });

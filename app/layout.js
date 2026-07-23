@@ -3,8 +3,15 @@ import {
   DEFAULT_DESCRIPTION,
   SITE_NAME,
   SITE_URL,
+  absoluteUrl,
   pageMetadata,
 } from "../lib/seo";
+
+const homeMetadata = pageMetadata({
+  title: SITE_NAME,
+  description: DEFAULT_DESCRIPTION,
+  path: "/",
+});
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -20,14 +27,39 @@ export const metadata = {
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
-  ...pageMetadata({
-    title: SITE_NAME,
-    description: DEFAULT_DESCRIPTION,
-    path: "/",
-  }),
+  ...homeMetadata,
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
+  },
   icons: {
-    icon: "/images/sandbagger-logo.png",
-    apple: "/images/sandbagger-logo.png",
+    icon: [
+      {
+        url: absoluteUrl("/favicon.ico"),
+        sizes: "any",
+      },
+      {
+        url: absoluteUrl("/favicon-16x16.png"),
+        type: "image/png",
+        sizes: "16x16",
+      },
+      {
+        url: absoluteUrl("/favicon-32x32.png"),
+        type: "image/png",
+        sizes: "32x32",
+      },
+      {
+        url: absoluteUrl("/icon.png"),
+        type: "image/png",
+        sizes: "1024x1024",
+      },
+    ],
+    shortcut: absoluteUrl("/favicon.ico"),
+    apple: {
+      url: absoluteUrl("/apple-icon.png"),
+      type: "image/png",
+      sizes: "180x180",
+    },
   },
   manifest: "/manifest.webmanifest",
   robots: {
