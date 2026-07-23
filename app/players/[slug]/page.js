@@ -3,6 +3,7 @@ import { refreshHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
+import ContextBackLink from "../../ContextBackLink";
 import AssetImage from "../../AssetImage";
 import { CareerHonors } from "../../HonorBadges";
 import { playerPhoto } from "../../../lib/asset-paths";
@@ -20,6 +21,7 @@ import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { formatPoints } from "../../../lib/formatters";
 import { formatPlayerCareerYears } from "../../../lib/player-career";
+import { safePlayerDirectoryReturnHref } from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 
 export async function generateMetadata({ params }) {
@@ -118,9 +120,13 @@ function CareerTimelineItem({ season, styles }) {
   );
 }
 
-export default async function PlayerPage({ params }) {
+export default async function PlayerPage({ params, searchParams }) {
   await refreshHistoricalData();
   const { slug } = await params;
+  const query = await searchParams;
+  const playerDirectoryReturnHref = safePlayerDirectoryReturnHref(
+    query?.returnTo
+  );
   const player = getPlayerBySlug(slug);
   if (!player) notFound();
 
@@ -159,6 +165,10 @@ export default async function PlayerPage({ params }) {
   return (
     <main>
       <Header />
+      <ContextBackLink
+        href={playerDirectoryReturnHref}
+        label="Back to All Sandbaggers"
+      />
 
       <section className={styles.pageHero}>
         <div className={styles.profileHeader}>

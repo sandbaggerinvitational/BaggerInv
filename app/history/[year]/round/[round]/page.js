@@ -3,6 +3,7 @@ import { refreshHistoricalData } from "../../../../../lib/stats";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
 import AssetImage from "../../../../AssetImage";
+import HistoricalDetailNavigation from "../../../../HistoricalDetailNavigation";
 import PublicMatchCard from "../../../../PublicMatchCard";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
 import {
@@ -15,7 +16,6 @@ import {
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
 import { formatPoints } from "../../../../../lib/formatters";
-import RoundNavigation from "./RoundNavigation";
 
 function displayPoints(value) {
   return formatPoints(value);
@@ -79,10 +79,21 @@ export default async function HistoricalRoundPage({ params }) {
       </section>
 
       <section className={styles.content}>
-        <RoundNavigation
-          year={archive.year}
-          previousRound={archive.previousRound}
-          nextRound={archive.nextRound}
+        <HistoricalDetailNavigation
+          backHref={`/history/${archive.year}`}
+          backLabel={`Back to ${archive.year} Tournament`}
+          previousHref={
+            archive.previousRound
+              ? `/history/${archive.year}/round/${archive.previousRound.number}`
+              : null
+          }
+          previousLabel={archive.previousRound?.label}
+          nextHref={
+            archive.nextRound
+              ? `/history/${archive.year}/round/${archive.nextRound.number}`
+              : null
+          }
+          nextLabel={archive.nextRound?.label}
           position="top"
         />
 
@@ -131,10 +142,21 @@ export default async function HistoricalRoundPage({ params }) {
           </div>
         )}
 
-        <RoundNavigation
-          year={archive.year}
-          previousRound={archive.previousRound}
-          nextRound={archive.nextRound}
+        <HistoricalDetailNavigation
+          backHref={`/history/${archive.year}`}
+          backLabel={`Back to ${archive.year} Tournament`}
+          previousHref={
+            archive.previousRound
+              ? `/history/${archive.year}/round/${archive.previousRound.number}`
+              : null
+          }
+          previousLabel={archive.previousRound?.label}
+          nextHref={
+            archive.nextRound
+              ? `/history/${archive.year}/round/${archive.nextRound.number}`
+              : null
+          }
+          nextLabel={archive.nextRound?.label}
         />
       </section>
 
