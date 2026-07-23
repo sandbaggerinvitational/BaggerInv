@@ -16,6 +16,7 @@ import {
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
 import { formatPoints } from "../../../../../lib/formatters";
+import { pageMetadata } from "../../../../../lib/seo";
 
 function displayPoints(value) {
   return formatPoints(value);
@@ -26,11 +27,19 @@ export async function generateMetadata({ params }) {
   const { year, round } = await params;
   const archive = getHistoricalRound(year, round);
 
-  return {
-    title: archive
-      ? `${archive.year} Round ${archive.round} | The Sandbagger Invitational`
-      : "Historical Round | The Sandbagger Invitational",
-  };
+  const title = archive
+    ? `${archive.year} Round ${archive.round} | The Sandbagger Invitational`
+    : "Historical Round | The Sandbagger Invitational";
+  return pageMetadata({
+    title,
+    description: archive
+      ? `${archive.year} Round ${archive.round} ${getFormatName(archive.format)} results from ${archive.course.Course}.`
+      : "Historical Sandbagger Invitational round results.",
+    path: `/history/${year}/round/${round}`,
+    image: archive?.course?.["Course Profile Image"]
+      ? courseHero(archive.course["Course Profile Image"])
+      : undefined,
+  });
 }
 
 export default async function HistoricalRoundPage({ params }) {

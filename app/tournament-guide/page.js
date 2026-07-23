@@ -13,12 +13,14 @@ import {
   visibleGuideSections,
 } from "../../lib/tournament-guide";
 import styles from "./tournament-guide.module.css";
+import { pageMetadata } from "../../lib/seo";
 
 export const dynamic = "force-dynamic";
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Tournament Guide | Sandbagger Invitational",
   description: "The official tournament-week guide for the Sandbagger Invitational.",
-};
+  path: "/tournament-guide",
+});
 
 function Text({ value }) {
   return paragraphs(value).map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>);

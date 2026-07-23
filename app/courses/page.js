@@ -6,10 +6,13 @@ import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
 import { getCourses } from "../../lib/stats";
 import styles from "../historical.module.css";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Courses | The Sandbagger Invitational",
-};
+  description: "Explore every golf course that has hosted a round of the Sandbagger Invitational.",
+  path: "/courses",
+});
 
 export default async function CoursesPage() {
   await refreshHistoricalData();

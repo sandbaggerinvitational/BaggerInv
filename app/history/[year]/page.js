@@ -20,15 +20,22 @@ import {
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
+import { pageMetadata } from "../../../lib/seo";
 import { formatPoints } from "../../../lib/formatters";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
   const { year } = await params;
-  return {
+  const tournament = getTournament(year);
+  return pageMetadata({
     title: `${year} | The Sandbagger Invitational`,
-  };
+    description: `Complete ${year} Sandbagger Invitational results, teams, courses, matches, awards, and leaderboard.`,
+    path: `/history/${year}`,
+    image: tournament?.["Hero Image"]
+      ? tournamentHero(tournament["Hero Image"])
+      : undefined,
+  });
 }
 
 function roundNumber(value) {

@@ -10,6 +10,7 @@ import {
 } from "../../lib/stats";
 import styles from "../historical.module.css";
 import { addTournamentRanks } from "../../lib/rankings";
+import { pageMetadata } from "../../lib/seo";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -46,9 +47,11 @@ function LeaderSection({ title, slug, rows, value }) {
   );
 }
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Records | The Sandbagger Invitational",
-};
+  description: "The official Sandbagger Invitational record book and all-time leaderboards.",
+  path: "/records",
+});
 
 export default async function RecordsPage() {
   await refreshHistoricalData();

@@ -17,6 +17,7 @@ import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { formatPoints } from "../../../lib/formatters";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
+import { pageMetadata } from "../../../lib/seo";
 
 function roundNumber(value) {
   return Number(String(value ?? "").replace(/\D/g, ""));
@@ -28,7 +29,11 @@ function displayScore(value) {
 
 export async function generateMetadata({ params }) {
   const { year } = await params;
-  return { title: `${year} Champions | The Sandbagger Invitational` };
+  return pageMetadata({
+    title: `${year} Champions | The Sandbagger Invitational`,
+    description: `The ${year} Sandbagger Invitational champions, winning roster, final score, and path to the Cup.`,
+    path: `/champions/${year}`,
+  });
 }
 
 export default async function ChampionshipDetailPage({ params }) {

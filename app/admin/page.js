@@ -1,9 +1,10 @@
 import { Footer, Header } from "../components";
 import { getTournaments, refreshHistoricalData } from "../../lib/stats";
 import AdminCenter from "./AdminCenter";
+import { privatePageMetadata } from "../../lib/seo";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Admin Center | Sandbagger Invitational" };
+export const metadata = privatePageMetadata("Admin Center | Sandbagger Invitational");
 
 export default async function AdminPage() {
   await refreshHistoricalData();

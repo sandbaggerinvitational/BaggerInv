@@ -13,11 +13,13 @@ import {
   getAllPlayerStats,
 } from "../../lib/stats";
 import styles from "../historical.module.css";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Board of Governors | Sandbagger Invitational",
   description: "The stewards of the Sandbagger Invitational.",
-};
+  path: "/board-of-governors",
+});
 
 export default async function BoardOfGovernorsPage() {
   await refreshHistoricalData();

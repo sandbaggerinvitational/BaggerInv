@@ -8,6 +8,7 @@ import {
 } from "../../../lib/leaderboards";
 import SortableLeaderboard from "../SortableLeaderboard";
 import styles from "../../historical.module.css";
+import { pageMetadata } from "../../../lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +18,16 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const leaderboard = getLeaderboard(slug);
 
-  return {
-    title: leaderboard
-      ? `${leaderboard.title} | The Sandbagger Invitational`
-      : "Leaderboard | The Sandbagger Invitational",
-  };
+  const title = leaderboard
+    ? `${leaderboard.title} | The Sandbagger Invitational`
+    : "Leaderboard | The Sandbagger Invitational";
+  return pageMetadata({
+    title,
+    description:
+      leaderboard?.description ||
+      "Official Sandbagger Invitational historical leaderboard.",
+    path: `/records/${slug}`,
+  });
 }
 
 export default async function FullLeaderboardPage({ params }) {

@@ -6,10 +6,13 @@ import AssetImage from "../AssetImage";
 import { tournamentHero } from "../../lib/asset-paths";
 import { getTournaments } from "../../lib/stats";
 import styles from "../historical.module.css";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "History | The Sandbagger Invitational",
-};
+  description: "The complete Sandbagger Invitational archive of destinations, teams, captains, matches, and champions.",
+  path: "/history",
+});
 
 export default async function HistoryPage() {
   await refreshHistoricalData();

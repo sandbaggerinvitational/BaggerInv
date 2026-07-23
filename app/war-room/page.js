@@ -3,8 +3,13 @@ import { Header, Footer } from "../components";
 import { refreshHistoricalData, getAllPlayerStats, getPartnershipStats, getHeadToHead } from "../../lib/stats";
 import { loadPredictionSheets } from "../../lib/prediction-data";
 import WarRoom from "./WarRoom";
+import { pageMetadata } from "../../lib/seo";
 
-export const metadata = { title: "Matchup Lab | Sandbagger Invitational" };
+export const metadata = pageMetadata({
+  title: "Matchup Lab | Sandbagger Invitational",
+  description: "Build Sandbagger Invitational matchups and evaluate the competitive edges behind every pairing.",
+  path: "/war-room",
+});
 
 export default async function WarRoomPage({ searchParams }) {
   const query = await searchParams;

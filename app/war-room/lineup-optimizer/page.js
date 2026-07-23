@@ -3,8 +3,13 @@ import { Header, Footer } from "../../components";
 import { refreshHistoricalData, getAllPlayerStats, getPartnershipStats, getHeadToHead } from "../../../lib/stats";
 import { loadPredictionSheets } from "../../../lib/prediction-data";
 import LineupOptimizer from "./LineupOptimizer";
+import { pageMetadata } from "../../../lib/seo";
 
-export const metadata = { title: "Lineup Optimizer | Sandbagger Invitational" };
+export const metadata = pageMetadata({
+  title: "Lineup Optimizer | Sandbagger Invitational",
+  description: "Rank the best legal Sandbagger Invitational pairings against every possible opponent combination.",
+  path: "/war-room/lineup-optimizer",
+});
 
 export default async function LineupOptimizerPage() {
   let data = null;

@@ -9,17 +9,26 @@ import {
 } from "../../../lib/asset-paths";
 import { getCourse, getFormatName } from "../../../lib/stats";
 import styles from "../../historical.module.css";
+import { pageMetadata } from "../../../lib/seo";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
   const { courseId } = await params;
   const course = getCourse(courseId);
 
-  return {
-    title: course
-      ? `${course.Course} | The Sandbagger Invitational`
-      : "Course | The Sandbagger Invitational",
-  };
+  const title = course
+    ? `${course.Course} | The Sandbagger Invitational`
+    : "Course | The Sandbagger Invitational";
+  return pageMetadata({
+    title,
+    description: course
+      ? `${course.Course} tournament details and Sandbagger Invitational history.`
+      : "Sandbagger Invitational course details and tournament history.",
+    path: `/courses/${encodeURIComponent(courseId)}`,
+    image: course?.["Course Profile Image"]
+      ? courseHero(course["Course Profile Image"])
+      : undefined,
+  });
 }
 
 export default async function CoursePage({ params }) {

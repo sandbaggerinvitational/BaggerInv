@@ -23,17 +23,27 @@ import { formatPoints } from "../../../lib/formatters";
 import { formatPlayerCareerYears } from "../../../lib/player-career";
 import { safePlayerDirectoryReturnHref } from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
+import { pageMetadata } from "../../../lib/seo";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
   const { slug } = await params;
   const player = getPlayerBySlug(slug);
 
-  return {
-    title: player
-      ? `${player["Display Name"]} | The Sandbagger Invitational`
-      : "Player | The Sandbagger Invitational",
-  };
+  const title = player
+    ? `${player["Display Name"]} | The Sandbagger Invitational`
+    : "Player | The Sandbagger Invitational";
+  return pageMetadata({
+    title,
+    description: player
+      ? `${player["Display Name"]}'s Sandbagger Invitational profile, career record, rating, achievements, partners, and rivals.`
+      : "Sandbagger Invitational player profile.",
+    path: `/players/${slug}`,
+    image: player?.["Photo Filename"]
+      ? playerPhoto(player["Photo Filename"])
+      : undefined,
+    type: "profile",
+  });
 }
 
 

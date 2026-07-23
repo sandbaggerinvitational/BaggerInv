@@ -1,4 +1,5 @@
 export const dynamic="force-dynamic";
 import { Header,Footer } from "../components"; import OddsCenter from "./OddsCenter"; import { readOddsSnapshots } from "../../lib/google-sheets-write"; import { loadOddsInputs } from "../../lib/odds-data"; import { currentTournamentYear } from "../../lib/tournament-context"; import { validateOpeningMatchups } from "../../lib/tournament-odds";
-export const metadata={title:"Odds Center | Sandbagger Invitational"};
+import { pageMetadata } from "../../lib/seo";
+export const metadata=pageMetadata({title:"Odds Center | Sandbagger Invitational",description:"Official Sandbagger Invitational championship and player projections.",path:"/odds-center"});
 export default async function Page(){let snapshots=[],error="";try{const inputs=await loadOddsInputs();const year=currentTournamentYear(inputs.sheets);const status=validateOpeningMatchups(inputs.sheets,year);if(!status.ready)error=status.message;else snapshots=(await readOddsSnapshots()).filter((row)=>row.year===year).sort((a,b)=>a.phaseOrder-b.phaseOrder);}catch(e){error=e.message;}return <main><Header/><OddsCenter snapshots={snapshots} error={error}/><Footer/></main>}
