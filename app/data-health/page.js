@@ -38,6 +38,8 @@ const REQUIRED_COLUMNS = {
   scorecards: [["Course ID", "Course Name", "Course"], ["Tee", "Tee Name"], ["Course Rating", "Rating"], ["Slope Rating", "Slope"], ["Par"]],
   holes: [["Course ID", "Course Name", "Course"], ["Tee", "Tee Name"], ["Hole", "Hole Number"], ["Stroke Index", "Handicap", "Index"]],
   settings: [["Setting"], ["Value"]],
+  draftSettings: [["Year"], ["Total Draft Picks", "Total Picks"], ["Team One ID", "Team 1 ID"], ["Team Two ID", "Team 2 ID"]],
+  draftPicks: [["Year"], ["Pick Number"], ["Team ID"], ["Player ID"]],
 };
 
 function hasColumn(headers, choices) {
@@ -118,6 +120,8 @@ export default async function DataHealthPage({ searchParams }) {
   const tournaments = diagnostics?.sheets.tournaments?.rows || [];
   const liveTournaments = diagnostics?.sheets.liveTournaments?.rows || [];
   const tournamentRules = diagnostics?.sheets.tournamentRules?.rows || [];
+  const draftSettings = diagnostics?.sheets.draftSettings?.rows || [];
+  const draftPicks = diagnostics?.sheets.draftPicks?.rows || [];
   const selectedTournament = tournaments.find((record) => tournamentYear(record) === Number(year)) || null;
   const selectedTournamentId = selectedTournament ? tournamentId(selectedTournament) : "";
   const explicitTournamentId = (record) => clean(record["Tournament ID"] || record.Year);
@@ -180,6 +184,32 @@ export default async function DataHealthPage({ searchParams }) {
   }
   const handicapDuplicates = [...handicapKeys.entries()].filter(([, count]) => count > 1);
   const playerIds = new Set(players.map((player) => clean(player["Player ID"] || player.ID)).filter(Boolean));
+  const yearDraftSettings = draftSettings.filter((record) => Number(record.Year) === Number(year));
+  const yearDraftPicks = draftPicks.filter((record) => Number(record.Year) === Number(year));
+  const missingDraftSettings = yearDraftSettings.length === 0;
+  const draftPickCounts = yearDraftPicks.reduce((counts, record) => {
+    const key = `${clean(record.Year)}|${clean(record["Pick Number"])}`;
+    if (key !== "|") counts.set(key, (counts.get(key) || 0) + 1);
+    return counts;
+  }, new Map());
+  const duplicateDraftPicks = [...draftPickCounts.entries()].filter(([, count]) => count > 1);
+  const draftPlayersMissing = yearDraftPicks.filter((record) => {
+    const id = clean(record["Player ID"]);
+    return id && !playerIds.has(id);
+  });
+  const yearTeamIds = new Set(teamNames
+    .filter((record) => Number(record.Year) === Number(year))
+    .map((record) => clean(record["Team ID"]))
+    .filter(Boolean));
+  const draftTeamReferences = [
+    ...yearDraftSettings.flatMap((record) => [
+      clean(record["Team One ID"] || record["Team 1 ID"]),
+      clean(record["Team Two ID"] || record["Team 2 ID"]),
+      clean(record["First Pick Team ID"]),
+    ]),
+    ...yearDraftPicks.map((record) => clean(record["Team ID"])),
+  ].filter(Boolean);
+  const draftTeamsMissing = [...new Set(draftTeamReferences.filter((id) => !yearTeamIds.has(id)))];
   const captainIdFor = (team) => clean(team["Captain Player ID"] || team["Captain ID"] || team.Captain);
   const historicalTeamsMissingCaptain = teamNames.filter(
     (team) => !captainIdFor(team) && !clean(team["Captain Name"])
@@ -356,6 +386,22 @@ export default async function DataHealthPage({ searchParams }) {
                   {publicScoreMismatch ? <Link href={`/admin?tab=live-scoring${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Review Live Scoring →</Link> : null}
                 </div>
                 <div data-ok={playerDuplicates.length ? "false" : "true"}>{playerDuplicates.length ? `Duplicate Player IDs: ${playerDuplicates.map(([id]) => id).join(", ")}` : "No duplicate Player IDs"}</div>
+                <div data-ok={missingDraftSettings ? "false" : "true"}>
+                  {missingDraftSettings ? `Missing Draft Settings for ${year}` : `Draft Settings found for ${year}`}
+                  {missingDraftSettings ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}
+                </div>
+                <div data-ok={duplicateDraftPicks.length ? "false" : "true"}>
+                  {duplicateDraftPicks.length ? `Duplicate Draft Picks: ${duplicateDraftPicks.map(([key]) => key.replace("|", " / Pick ")).join(", ")}` : "No duplicate Draft Picks"}
+                  {duplicateDraftPicks.length ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}
+                </div>
+                <div data-ok={draftPlayersMissing.length ? "false" : "true"}>
+                  {draftPlayersMissing.length ? `Draft Picks reference missing players: ${[...new Set(draftPlayersMissing.map((record) => clean(record["Player ID"])))].join(", ")}` : "Every drafted Player ID is valid"}
+                  {draftPlayersMissing.length ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}
+                </div>
+                <div data-ok={draftTeamsMissing.length ? "false" : "true"}>
+                  {draftTeamsMissing.length ? `Draft records reference missing teams: ${draftTeamsMissing.join(", ")}` : "Every Draft Team ID is valid"}
+                  {draftTeamsMissing.length ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}
+                </div>
                 <div data-ok={handicapDuplicates.length ? "false" : "true"}>{handicapDuplicates.length ? `Duplicate Year + Player handicap rows: ${handicapDuplicates.map(([key]) => key.replace("|", " / ")).join(", ")}` : "No duplicate Year + Player handicap rows"}</div>
                 <div data-ok={historicalTeamsMissingCaptain.length ? "false" : "true"}>
                   {historicalTeamsMissingCaptain.length ? `${historicalTeamsMissingCaptain.length} historical teams are missing a captain` : "Every historical team has a captain mapping"}

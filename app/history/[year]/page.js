@@ -23,6 +23,7 @@ import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import { formatPoints } from "../../../lib/formatters";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
+import { getDraftByYear } from "../../../lib/draft";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -77,6 +78,7 @@ export default async function TournamentYearPage({ params }) {
   const { previousYear, nextYear } =
     getAdjacentTournamentYears(year);
   const status = tournamentStatus(tournament);
+  const draft = await getDraftByYear(year);
 
   return (
     <main>
@@ -139,6 +141,13 @@ export default async function TournamentYearPage({ params }) {
       </nav>
 
       <section className={styles.content}>
+        {draft ? (
+          <Link className={styles.draftHistoryLink} href={`/draft/${year}`}>
+            <span>Official Team Selection</span>
+            <strong>View {year} Draft</strong>
+            <b>View Draft →</b>
+          </Link>
+        ) : null}
         <div className={styles.finalScoreCard}>
           <div>
             <span>Champions</span>

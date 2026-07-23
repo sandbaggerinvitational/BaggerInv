@@ -12,7 +12,7 @@ import { resolveTournamentSelection } from "../../lib/tournament-identifiers";
 
 const TABS = [
   ["dashboard", "Dashboard"], ["tournament", "Tournament"], ["players", "Players"], ["teams", "Teams"],
-  ["schedule", "Schedule"], ["courses", "Courses"], ["matches", "Matches"], ["live-scoring", "Live Scoring"],
+  ["draft", "Draft"], ["schedule", "Schedule"], ["courses", "Courses"], ["matches", "Matches"], ["live-scoring", "Live Scoring"],
   ["standings", "Standings"], ["guide", "Guide"], ["odds", "Odds"], ["media", "Media"],
   ["history", "History"], ["data-health", "Data Health"], ["settings", "Settings"], ["audit-log", "Audit Log"],
 ];
@@ -76,6 +76,7 @@ export default function AdminCenter({ tournaments }) {
         {active === "tournament" ? <TournamentEditor tournamentId={tournamentId} secret={secret} sharedUpdatedBy={updatedBy} /> : null}
         {active === "players" ? <CmsManager resource="players" {...shared} description="Manage player profiles, status, leadership roles, handicapping details, biography, and public presentation." /> : null}
         {active === "teams" ? <div className={styles.stack}><CmsManager resource="teams" {...shared} description="Manage the selected tournament's team identity, captain, colors, logo, motto, and description." /><CmsManager resource="rosters" {...shared} title="Roster Assignments" description="Assign players to Team 1 or Team 2 and maintain the tournament handicap used across the public site." /></div> : null}
+        {active === "draft" ? <div className={styles.stack}><CmsManager resource="draft-settings" {...shared} description="Schedule the draft, assign its teams and captains, set the pick count, and control the public draft presentation." /><CmsManager resource="draft-picks" {...shared} description="Build the official draft board. Player selections write directly to the Draft Picks sheet." /></div> : null}
         {active === "schedule" ? <CmsManager resource="schedule" {...shared} description="Build the tournament-week itinerary, connect rounds and courses, publish events, and reorder the schedule." /> : null}
         {active === "courses" ? <CmsManager resource="courses" {...shared} description="Manage the selected year's course assignments, tees, ratings, yardage, imagery, and GPS links." /> : null}
         {active === "matches" ? <CmsManager resource="matches" {...shared} description="Create and edit official pairings, formats, tee times, starting holes, and match status." /> : null}

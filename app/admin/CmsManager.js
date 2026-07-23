@@ -22,6 +22,11 @@ function FieldEditor({ field, value, onChange, locked = false }) {
   if (field.type === "readonly") return <label><span>{field.label}</span><input value={value || ""} readOnly /></label>;
   if (field.type === "boolean") return <label className={styles.toggle}><input type="checkbox" checked={truthy(value)} onChange={(event) => onChange(event.target.checked ? "TRUE" : "FALSE")} /><span>{field.label}</span></label>;
   if (field.type === "textarea") return <label className={styles.wide}><span>{field.label}</span><textarea rows="5" value={value || ""} onChange={(event) => onChange(event.target.value)} /></label>;
+  if (field.type === "reference" && field.searchable) {
+    const listId = `reference-${field.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+    const selected = (field.options || []).find((option) => option.value === value);
+    return <label><span>{field.label}</span><input list={listId} value={value || ""} onChange={(event) => onChange(event.target.value)} placeholder="Search by name or ID…" /><datalist id={listId}>{(field.options || []).map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</datalist>{field.previewImage && selected?.image ? <span className={styles.referencePreview}><img src={selected.image} alt="" />{selected.label}</span> : selected ? <small>{selected.label}</small> : null}</label>;
+  }
   if (field.type === "select" || field.type === "reference") return <label><span>{field.label}</span><select value={value || ""} onChange={(event) => onChange(event.target.value)}><option value="">Select…</option>{(field.options || []).map((option) => typeof option === "string" ? <option key={option}>{option}</option> : <option value={option.value} key={option.value}>{option.label}</option>)}</select></label>;
   const type = ["number", "date", "time", "url", "color"].includes(field.type) ? field.type : "text";
   return <label><span>{field.label}</span><input type={type} value={value || ""} readOnly={locked} aria-readonly={locked ? "true" : undefined} title={locked ? "Stable IDs cannot be changed after a record is created." : undefined} onChange={(event) => onChange(event.target.value)} /></label>;
@@ -53,7 +58,7 @@ export default function CmsManager({ resource, secret, tournamentId, year, updat
     const blank = Object.fromEntries((data?.fields || []).map((field) => [field.name, field.type === "boolean" ? "FALSE" : ""]));
     if (resource === "teams") blank.Year = String(year || "");
     if (resource === "schedule") blank["Tournament ID"] = String(tournamentId || "");
-    if (resource === "courses" || resource === "matches" || resource === "awards") blank.Year = String(year || "");
+    if (resource === "courses" || resource === "matches" || resource === "awards" || resource === "draft-settings" || resource === "draft-picks") blank.Year = String(year || "");
     setEditingKey(""); setDraft(blank); setStatus("");
   }
 

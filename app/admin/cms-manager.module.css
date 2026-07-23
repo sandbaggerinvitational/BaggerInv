@@ -4,3 +4,4 @@
 
 .teamStandings span small{display:block;margin-top:6px;color:#c9d9d2;font:600 .72rem Arial,sans-serif}
 .formGrid input[readonly]{background:#f0eee8;color:#69716d;cursor:not-allowed}
+.referencePreview{display:flex!important;align-items:center;gap:8px;color:#405149!important;font-size:.72rem!important;text-transform:none!important;letter-spacing:0!important}.referencePreview img{width:30px;height:30px;object-fit:cover;border:1px solid #d5cec1;border-radius:50%;background:#f5f0e6}
