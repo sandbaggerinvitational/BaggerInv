@@ -21,6 +21,7 @@ const STATIC_ROUTES = [
   "/history",
   "/champions",
   "/draft",
+  "/draft/analytics",
   "/tournament-guide",
   "/board-of-governors",
   "/courses",
