@@ -1,0 +1,84 @@
+.side {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.side > span {
+  color: #777f7b;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.side label {
+  display: grid;
+  gap: 4px;
+}
+
+.side small {
+  color: #6b756f;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.side select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #d7cebe;
+  border-radius: 9px;
+  background: #fff;
+  color: #15271f;
+  font: 700 0.9rem Arial, sans-serif;
+}
+
+.side select:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+  margin: -9px 0 18px;
+}
+
+.action button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #0b3d30;
+  border-radius: 999px;
+  background: #fff;
+  color: #0b3d30;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.action button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.locked {
+  margin: -8px 0 18px;
+  color: #7a827e;
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .action {
+    justify-content: stretch;
+  }
+
+  .action button {
+    width: 100%;
+  }
+
+  .locked {
+    text-align: left;
+  }
+}
