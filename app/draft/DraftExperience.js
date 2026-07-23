@@ -179,8 +179,14 @@ function CompletedRosters({ draft }) {
             />
             <h3>{team.name}</h3>
             <div className={styles.captainRow}>
-              <span>Captain</span>
-              <strong>{team.captain?.name || "Captain not recorded"}</strong>
+              <div>
+                <span>Captain</span>
+                <strong>{team.captain?.name || "Captain not recorded"}</strong>
+              </div>
+              <div>
+                <span>Average Team Handicap</span>
+                <strong>{formatHandicap(team.averageHandicap)}</strong>
+              </div>
             </div>
             <span className={styles.rosterLabel}>Draft Picks</span>
             <ol>
