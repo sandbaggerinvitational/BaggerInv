@@ -31,6 +31,7 @@ export const navigationSections = [
     links: [
       { label: "History", href: "/history" },
       { label: "Champions", href: "/champions" },
+      { label: "Draft", href: "/draft" },
       { label: "Tournament Guide", href: "/tournament-guide" },
       { label: "The Cup", href: "/#cup" },
       { label: "Board of Governors", href: "/board-of-governors" },

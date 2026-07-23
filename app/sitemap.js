@@ -5,6 +5,7 @@ import {
   refreshHistoricalData,
 } from "../lib/stats";
 import { getLeaderboardSlugs } from "../lib/leaderboards";
+import { getDraftYears } from "../lib/draft";
 import { absoluteUrl } from "../lib/seo";
 
 const STATIC_ROUTES = [
@@ -19,6 +20,7 @@ const STATIC_ROUTES = [
   "/records",
   "/history",
   "/champions",
+  "/draft",
   "/tournament-guide",
   "/board-of-governors",
   "/courses",
@@ -76,6 +78,9 @@ export default async function sitemap() {
 
     return routes;
   });
+  const draftRoutes = (await getDraftYears()).map((year) =>
+    entry(`/draft/${year}`, "yearly", 0.7)
+  );
 
   return [
     ...STATIC_ROUTES.map((path) =>
@@ -85,5 +90,6 @@ export default async function sitemap() {
     ...courses,
     ...leaderboards,
     ...tournamentRoutes,
+    ...draftRoutes,
   ];
 }

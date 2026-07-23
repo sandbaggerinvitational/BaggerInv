@@ -301,6 +301,43 @@
   margin-top: 13px;
 }
 
+.draftHistoryLink {
+  margin-bottom: 28px;
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-sm);
+  background: var(--tsi-green-900);
+  color: var(--tsi-white);
+}
+
+.draftHistoryLink span {
+  color: var(--tsi-gold-400);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: .65rem;
+  font-weight: 800;
+}
+
+.draftHistoryLink strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.draftHistoryLink b {
+  font-size: .78rem;
+}
+
+@media (max-width: 640px) {
+  .draftHistoryLink {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+}
+
 .profileChampionshipLine strong {
   color: var(--tsi-gold-400);
   font-size: 1rem;
