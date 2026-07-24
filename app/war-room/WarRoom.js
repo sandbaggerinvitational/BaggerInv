@@ -102,20 +102,30 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
 
   const scorecardComplete = tee && clean(scorecardValues.rating) !== "" && clean(scorecardValues.slope) !== "" && clean(scorecardValues.par) !== "";
   const ready = details.length === required && details.every((player) => player.id && Number.isFinite(player.tournamentHandicap) && Number.isFinite(player.courseHandicap)) && scorecardComplete;
-  const play = ready ? playingHandicaps(format, details.map((player) => player.courseHandicap)) : null;
-  const prediction = ready
-    ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name], pointsAvailable })
+  const basePlay = ready ? playingHandicaps(format, details.map((player) => player.courseHandicap)) : null;
+  const playerStrokeMaps = basePlay && holes.length === 18 && formatCode(format) !== "SC"
+    ? basePlay.playerStrokes.map((strokes) => allocateStrokes(strokes, holes))
     : null;
-  const playerStrokeMaps = play && holes.length === 18 && formatCode(format) !== "SC"
-    ? play.playerStrokes.map((strokes) => allocateStrokes(strokes, holes))
-    : null;
-  const effectiveStrokeMaps = play && holes.length === 18
+  const effectiveStrokeMaps = basePlay && holes.length === 18
     ? formatCode(format) === "SC"
-      ? { team1: allocateStrokes(play.strokesA, holes), team2: allocateStrokes(play.strokesB, holes) }
+      ? { team1: allocateStrokes(basePlay.strokesA, holes), team2: allocateStrokes(basePlay.strokesB, holes) }
       : {
           team1: holes.map((_, index) => Math.max(...playerStrokeMaps.slice(0, slotsPerTeam).map((map) => map[index] || 0))),
           team2: holes.map((_, index) => Math.max(...playerStrokeMaps.slice(slotsPerTeam).map((map) => map[index] || 0))),
         }
+    : null;
+  const play = basePlay && effectiveStrokeMaps
+    ? {
+        ...basePlay,
+        frontStrokesA: effectiveStrokeMaps.team1.slice(0, 9).reduce((sum, value) => sum + value, 0),
+        frontStrokesB: effectiveStrokeMaps.team2.slice(0, 9).reduce((sum, value) => sum + value, 0),
+        backStrokesA: effectiveStrokeMaps.team1.slice(9).reduce((sum, value) => sum + value, 0),
+        backStrokesB: effectiveStrokeMaps.team2.slice(9).reduce((sum, value) => sum + value, 0),
+        distributionAdvantageA: effectiveStrokeMaps.team1.reduce((sum, value, index) => sum + Math.sign(value - effectiveStrokeMaps.team2[index]), 0),
+      }
+    : basePlay;
+  const prediction = ready
+    ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name], pointsAvailable })
     : null;
   const simulationStrokeMaps = effectiveStrokeMaps
     ? { teamA: effectiveStrokeMaps.team1, teamB: effectiveStrokeMaps.team2 }
