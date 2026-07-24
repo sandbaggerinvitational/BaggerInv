@@ -174,6 +174,16 @@ export default function MatchAnalyst({
         </ol>
       </AnalystSection>
 
+      <AnalystSection title="Model Calibration">
+        <p>This audit trail shows how the capped underlying-skill adjustment changes {teamNames[0]}’s win probability before the model’s existing minimum and maximum limits are enforced.</p>
+        <dl className={styles.calibrationGrid}>
+          <div><dt>Before skill adjustment</dt><dd>{prediction.calibration.probabilityBeforeSkillAdjustment.toFixed(1)}%</dd></div>
+          <div><dt>Underlying skill adjustment</dt><dd>{prediction.calibration.underlyingSkillAdjustment >= 0 ? "+" : ""}{prediction.calibration.underlyingSkillAdjustment.toFixed(1)} pts</dd></div>
+          <div><dt>After skill adjustment</dt><dd>{prediction.calibration.probabilityAfterSkillAdjustment.toFixed(1)}%</dd></div>
+          <div><dt>Final capped probability</dt><dd>{prediction.calibration.finalCappedProbability.toFixed(1)}%</dd></div>
+        </dl>
+      </AnalystSection>
+
       <AnalystSection title="Player Impact">
         <p><strong>{strongest.name}</strong> is the highest-rated player in this matchup and supplies {teamNames[strongestTeam]} with the strongest individual baseline for {formatName(format)}.</p>
         <p><strong>{counter.name}</strong> is {underdog}’s strongest counter{ratingGap > 0 ? `, sitting about ${ratingGap} blended rating points behind the matchup leader` : " on the available blended ratings"}. <strong>{uncertainty.name}</strong> is the biggest uncertainty because {evidenceLabel(uncertainty.formatMatches).toLowerCase()} supports that player’s format profile.</p>
