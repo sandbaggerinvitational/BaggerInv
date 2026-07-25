@@ -1596,6 +1596,47 @@
   font-size: .75rem;
 }
 
+.profileDraftHistory {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.profileDraftHistory > a {
+  padding: 17px;
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--tsi-line);
+  border-top: 4px solid var(--draft-history-team, #d4b15f);
+  border-radius: 13px;
+  color: var(--tsi-ink);
+  background: var(--tsi-white);
+}
+
+.profileDraftHistory > a strong {
+  color: #9a7422;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+}
+
+.profileDraftHistory > a span,
+.profileDraftHistory > a small {
+  color: var(--tsi-muted);
+  font-size: .7rem;
+}
+
+.profileDraftHistory > a b {
+  font-size: .85rem;
+}
+
+.profileDraftAnalyticsLink {
+  align-content: center;
+  border-top-color: #d4b15f !important;
+  color: #0b4335 !important;
+  font-weight: 900;
+}
+
 @media (min-width: 821px) {
   .formatGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

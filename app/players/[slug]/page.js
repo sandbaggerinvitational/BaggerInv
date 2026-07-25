@@ -26,6 +26,8 @@ import { safePlayerDirectoryReturnHref } from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
 import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
+import { getDrafts } from "../../../lib/draft";
+import { getPlayerDraftHistory } from "../../../lib/draft-analytics";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -146,6 +148,10 @@ export default async function PlayerPage({ params, searchParams }) {
   const formatMatchHistory = getPlayerFormatMatchHistory(
     player["Player ID"],
     stats.records
+  );
+  const playerDraftHistory = getPlayerDraftHistory(
+    await getDrafts(),
+    player["Player ID"]
   );
   const overallRating = getSandbaggerRatings().byCategory.OVERALL.find(
     (row) => row.player["Player ID"] === player["Player ID"]
@@ -410,6 +416,34 @@ export default async function PlayerPage({ params, searchParams }) {
             ))}
           </div>
         </section>
+
+        {playerDraftHistory.length ? (
+          <section className={styles.section}>
+            <span className={styles.sectionLabel}>Draft Analytics</span>
+            <h2>Draft History</h2>
+            <div className={styles.profileDraftHistory}>
+              {playerDraftHistory.map((draft) => (
+                <Link
+                  href={`/draft/${draft.year}`}
+                  key={draft.year}
+                  style={{ "--draft-history-team": draft.teamColor }}
+                >
+                  <strong>{draft.year}</strong>
+                  <span>Pick #{draft.pick}</span>
+                  <b>{draft.team}</b>
+                  <small>
+                    {Number.isFinite(draft.finish)
+                      ? `Finished #${draft.finish} · ${draft.dvs > 0 ? "+" : ""}${draft.dvs} DVS`
+                      : "Tournament result pending"}
+                  </small>
+                </Link>
+              ))}
+              <Link className={styles.profileDraftAnalyticsLink} href="/draft/analytics">
+                Open Historical Draft Analytics →
+              </Link>
+            </div>
+          </section>
+        ) : null}
 
 
         <section className={styles.section}>
