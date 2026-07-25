@@ -14,6 +14,7 @@ import {
   getCaptainLegacy,
   getFormatName,
   getPlayerBySlug,
+  getPlayerFormatMatchHistory,
   getPlayerStats,
   getSandbaggerRatings,
 } from "../../../lib/stats";
@@ -24,6 +25,7 @@ import { formatPlayerCareerYears } from "../../../lib/player-career";
 import { safePlayerDirectoryReturnHref } from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
+import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -141,6 +143,10 @@ export default async function PlayerPage({ params, searchParams }) {
   if (!player) notFound();
 
   const stats = getPlayerStats(player["Player ID"]);
+  const formatMatchHistory = getPlayerFormatMatchHistory(
+    player["Player ID"],
+    stats.records
+  );
   const overallRating = getSandbaggerRatings().byCategory.OVERALL.find(
     (row) => row.player["Player ID"] === player["Player ID"]
   );
@@ -397,6 +403,9 @@ export default async function PlayerPage({ params, searchParams }) {
                 <h3>{formatRecord(stats.records[key])}</h3>
                 <strong>{formatPoints(stats.records[key].points)} points</strong>
                 <em>{formatPercentage(stats.percentages[key])}</em>
+                {key !== "overall" ? (
+                  <PlayerFormatMatchHistory history={formatMatchHistory[key]} />
+                ) : null}
               </div>
             ))}
           </div>

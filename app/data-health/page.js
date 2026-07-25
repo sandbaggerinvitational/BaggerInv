@@ -253,6 +253,47 @@ export default async function DataHealthPage({ searchParams }) {
     ["Team 1 Player 1 Stroke", "Team 1 Player 2 Stroke", "Team 2 Player 1 Stroke", "Team 2 Player 2 Stroke"]
       .some((field) => clean(match[field]) && Number(match[field]) !== 0)
   );
+  const validHistoricalFormats = new Set(["BB", "SC", "SI"]);
+  const historicalMatchesWithInvalidFormat = matches.filter(
+    (match) => !validHistoricalFormats.has(clean(match.Format).toUpperCase())
+  );
+  const historicalMatchesMissingPlayerIds = matches.filter((match) => {
+    const format = clean(match.Format).toUpperCase();
+    const requiredFields = format === "SI"
+      ? ["Team 1 Player 1", "Team 2 Player 1"]
+      : ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"];
+    return requiredFields.some((field) => !clean(match[field]));
+  });
+  const historicalMatchesMissingWinner = matches.filter(
+    (match) => !clean(match["Matchup Winner"] || match["18-Hole Winner"])
+  );
+  const historicalMatchesWithUnresolvedTeam = matches.filter((match) =>
+    ![1, 2].every((side) => teamNames.some((team) =>
+      Number(team.Year) === Number(match.Year) &&
+      clean(team["Team Side"]) === `Team ${side}`
+    ))
+  );
+  const historicalRoundLinksUnavailable = matches.filter((match) =>
+    !Number.isFinite(Number(match.Year)) ||
+    !Number.isFinite(Number(match.Round)) ||
+    historicalMatchesMissingCourse.includes(match)
+  );
+  const formatSummaryMismatches = [];
+  for (const playerId of playerIds) {
+    for (const format of validHistoricalFormats) {
+      const playerMatches = matches.filter((match) =>
+        clean(match.Format).toUpperCase() === format &&
+        ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"]
+          .some((field) => clean(match[field]) === playerId)
+      );
+      const resolvedMatches = playerMatches.filter(
+        (match) => clean(match["Matchup Winner"] || match["18-Hole Winner"])
+      );
+      if (playerMatches.length !== resolvedMatches.length) {
+        formatSummaryMismatches.push({ playerId, format });
+      }
+    }
+  }
 
   const sheetItems = diagnostics ? Object.values(diagnostics.sheets) : [];
   const healthCounts = sheetItems.reduce((acc, item) => {
@@ -430,6 +471,30 @@ export default async function DataHealthPage({ searchParams }) {
                 <div data-ok={historicalScramblesWithIndividualStrokes.length ? "false" : "true"}>
                   {historicalScramblesWithIndividualStrokes.length ? `${historicalScramblesWithIndividualStrokes.length} historical scramble matches contain individual stroke values` : "Historical scrambles use team-level stroke fields"}
                   {historicalScramblesWithIndividualStrokes.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={historicalMatchesMissingPlayerIds.length ? "false" : "true"}>
+                  {historicalMatchesMissingPlayerIds.length ? `${historicalMatchesMissingPlayerIds.length} historical matches are missing required Player IDs` : "Every historical match has the required Player IDs"}
+                  {historicalMatchesMissingPlayerIds.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={historicalMatchesMissingWinner.length ? "false" : "true"}>
+                  {historicalMatchesMissingWinner.length ? `${historicalMatchesMissingWinner.length} historical matches are missing a winner` : "Every historical match has a winner"}
+                  {historicalMatchesMissingWinner.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={historicalMatchesWithInvalidFormat.length ? "false" : "true"}>
+                  {historicalMatchesWithInvalidFormat.length ? `${historicalMatchesWithInvalidFormat.length} historical matches have an invalid Format` : "Every historical match uses BB, SC, or SI"}
+                  {historicalMatchesWithInvalidFormat.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={historicalMatchesWithUnresolvedTeam.length ? "false" : "true"}>
+                  {historicalMatchesWithUnresolvedTeam.length ? `${historicalMatchesWithUnresolvedTeam.length} historical matches cannot resolve both teams for their year` : "Every historical match resolves both historical teams"}
+                  {historicalMatchesWithUnresolvedTeam.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}
+                </div>
+                <div data-ok={historicalRoundLinksUnavailable.length ? "false" : "true"}>
+                  {historicalRoundLinksUnavailable.length ? `${historicalRoundLinksUnavailable.length} historical match links are unavailable` : "Every historical match has a valid round link"}
+                  {historicalRoundLinksUnavailable.length ? <Link href="/admin?tab=matches"> Fix in Matches →</Link> : null}
+                </div>
+                <div data-ok={formatSummaryMismatches.length ? "false" : "true"}>
+                  {formatSummaryMismatches.length ? `${formatSummaryMismatches.length} player format summaries cannot reconcile with expanded match history` : "Player format summaries reconcile with expanded match history"}
+                  {formatSummaryMismatches.length ? <Link href="/admin?tab=matches"> Review Matches →</Link> : null}
                 </div>
                 <div data-ok={teams?.team1.players.length && teams?.team2.players.length ? "true" : "false"}>Current-year team rosters {teams?.team1.players.length && teams?.team2.players.length ? "loaded" : "are incomplete"}</div>
                 <div data-ok={formats.every((item) => item.tees.length) ? "true" : "false"}>All format courses {formats.every((item) => item.tees.length) ? "match at least one scorecard tee" : "do not yet match scorecard tees"}</div>
