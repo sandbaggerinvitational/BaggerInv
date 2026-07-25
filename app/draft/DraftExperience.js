@@ -1,19 +1,9 @@
 import Link from "next/link";
-import AssetImage from "../AssetImage";
 import TeamLogoPlate from "../TeamLogoPlate";
 import { formatHandicap } from "../../lib/formatters";
 import styles from "./draft.module.css";
 import DraftAnalysisSummary from "./DraftAnalysisSummary";
-
-function initials(name) {
-  return String(name ?? "")
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase() || "SBI";
-}
+import DraftPickCard from "./DraftPickCard";
 
 function dateLabel(value) {
   if (!value) return "";
@@ -44,41 +34,6 @@ function DraftTeam({ team }) {
         <span>Captain</span>
         <strong>{team.captain?.name || "Captain not recorded"}</strong>
       </div>
-    </article>
-  );
-}
-
-function DraftedPlayer({ pick }) {
-  return (
-    <article
-      className={styles.pickCard}
-      style={{ "--draft-team": pick.team?.primaryColor || "#0b4a3a" }}
-    >
-      <div className={styles.pickNumber}>Pick {pick.pickNumber}</div>
-      <AssetImage
-        src={pick.player.image}
-        alt={pick.player.name}
-        className={styles.playerImage}
-        fallbackClassName={styles.playerFallback}
-        fallback={initials(pick.player.name)}
-        inferFallback={false}
-      />
-      <h3>{pick.player.name}</h3>
-      <p>Handicap {formatHandicap(pick.player.handicap)}</p>
-      <div className={styles.draftedBy}>
-        {pick.team ? (
-          <TeamLogoPlate
-            filename={pick.team.logo}
-            teamName={pick.team.name}
-            variant="scoreboard"
-          />
-        ) : null}
-        <span>
-          Drafted By
-          <strong>{pick.team?.name || pick.teamId || "Team not recorded"}</strong>
-        </span>
-      </div>
-      {pick.selectedAt ? <time>{pick.selectedAt}</time> : null}
     </article>
   );
 }
@@ -360,7 +315,7 @@ export default function DraftExperience({ draft, previousDrafts = [], analysis =
             <div className={styles.board}>
               {draft.picks.map((pick) =>
                 pick.player ? (
-                  <DraftedPlayer pick={pick} key={pick.pickNumber} />
+                  <DraftPickCard pick={pick} key={pick.pickNumber} />
                 ) : (
                   <PendingPick pick={pick} key={pick.pickNumber} />
                 )
