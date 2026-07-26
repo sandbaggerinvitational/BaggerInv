@@ -53,8 +53,14 @@ test("public scorecards are collapsed, mapped, responsive, and silent when missi
   assert.match(component, /Partial Scorecard/);
   assert.match(component, /scorecard\.status === "PARTIAL"/);
   assert.match(component, /gross score/);
+  assert.match(component, /strokeDots/);
+  assert.match(component, /Hole Winner/);
+  assert.match(component, /matchNetScoring/);
+  assert.match(component, /Gross and net scoring available/);
   assert.match(css, /overflow-x:auto/);
   assert.match(css, /position:sticky/);
+  assert.match(css, /\.netRow/);
+  assert.match(css, /\.winnerRow/);
   assert.match(css, /\.desktopGrid/);
   assert.match(css, /\.mobileGrid/);
   assert.match(css, /focus-visible/);
