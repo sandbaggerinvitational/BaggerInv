@@ -12,6 +12,7 @@ const paths = {
   course: new URL("../app/courses/[courseId]/page.js", import.meta.url),
   hole: new URL("../app/courses/[courseId]/holes/[holeNumber]/page.js", import.meta.url),
   records: new URL("../app/records/page.js", import.meta.url),
+  sheets: new URL("../lib/google-sheets-data.js", import.meta.url),
 };
 
 test("Phase 2 public pages consume the shared scorecard analytics service", async () => {
@@ -48,4 +49,16 @@ test("scorecard UI exposes missing and partial states and scrolls only the grid"
 test("Phase 2 does not add scorecard data to prediction weighting", async () => {
   const prediction = await readFile(new URL("../lib/prediction-engine.js", import.meta.url), "utf8");
   assert.doesNotMatch(prediction, /Round Scorecards|scorecardAnalytics|recordedScoringAverage/);
+});
+
+test("scorecard histories reuse tournament data and fail fast when optional sheets stall", async () => {
+  const source = await readFile(paths.sheets, "utf8");
+  const scorecardSheets = source.match(/export const SCORECARD_SHEETS = \{([\s\S]*?)\n\};/)?.[1] || "";
+
+  assert.match(scorecardSheets, /Round Scorecards/);
+  assert.match(scorecardSheets, /Course Holes/);
+  assert.doesNotMatch(scorecardSheets, /Matches|Courses|Team Names|Players/);
+  assert.match(source, /loadHistoricalData\(\)/);
+  assert.match(source, /timeoutMs:\s*10_000/);
+  assert.match(source, /revalidate:\s*60/);
 });
