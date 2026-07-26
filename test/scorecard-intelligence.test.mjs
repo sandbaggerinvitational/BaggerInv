@@ -9,7 +9,7 @@ import {
   scorecardConfidence,
 } from "../lib/scorecard-intelligence.js";
 
-function card({ playerId, matchId = "M1", format = "SI", team = false, partners = [], scores = Array(18).fill(4) }) {
+function card({ playerId, matchId = "M1", format = "SI", team = false, partners = [], scores = Array(18).fill(4), courseId = "C1", tee = "Black" }) {
   const holes = scores.map((score, index) => ({
     holeNumber: index + 1,
     score,
@@ -26,8 +26,8 @@ function card({ playerId, matchId = "M1", format = "SI", team = false, partners 
     format,
     scoreType: team ? "TEAM" : "INDIVIDUAL",
     participantPlayerIds: team ? partners : [playerId],
-    courseId: "C1",
-    tee: "Black",
+    courseId,
+    tee,
     holes,
     total: scores.reduce((sum, value) => sum + value, 0),
     totalToPar: holes.reduce((sum, hole) => sum + hole.toPar, 0),
@@ -78,4 +78,19 @@ test("matchup intelligence remains isolated from prediction", () => {
   assert.equal(SCORECARD_PREDICTION_INFLUENCE_ENABLED, false);
   assert.equal(intelligence.predictionInfluenceEnabled, false);
   assert.equal(intelligence.available, true);
+});
+
+test("course fit remains available when no comparable field baseline exists", () => {
+  const intelligence = buildMatchupScorecardIntelligence({
+    scorecards: [card({ playerId: "P1", courseId: "OTHER" })],
+    playerIds: ["P1", "P2"],
+    sideSize: 1,
+    format: "SI",
+    selectedHoles: card({ playerId: "X" }).holes,
+    courseId: "C1",
+    tee: "Black",
+  });
+
+  assert.equal(intelligence.profiles[0].courseFit.versusRecordedField, null);
+  assert.equal(intelligence.profiles[0].courseFit.fieldBaseline, null);
 });
