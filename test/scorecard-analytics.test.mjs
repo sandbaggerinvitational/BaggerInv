@@ -54,6 +54,7 @@ const matches = [
   match("2025-R1-3", "SI", ["P9", "", "P10", ""], 3),
 ];
 matches[0]["Team 1 Player 1 Stroke"] = 7;
+matches[0]["Team 2 Player 2 Stroke"] = "";
 matches[1]["Team 1 Stroke"] = 6;
 matches[2]["Team 1 Player 1 Stroke"] = 4;
 
@@ -158,6 +159,8 @@ test("allocates official strokes, builds format net rows, and compares independe
   assert.equal(teamOneNet.type, "BEST_BALL_NET");
   assert.equal(teamOneNet.holes[0].netScore, 2);
   assert.equal(teamTwoNet.holes[0].netScore, 4);
+  assert.equal(teamTwoNet.available, true);
+  assert.equal(bestBall.available, true);
   assert.equal(bestBall.holeWinners[0].winnerSide, "A");
   assert.equal(bestBall.holeWinners[1].winnerType, "HALVED");
 
