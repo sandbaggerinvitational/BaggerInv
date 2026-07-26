@@ -422,7 +422,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
                         { player: { id: "team2", name: teams.team2.name }, strokes: effectiveStrokeMaps?.team2?.[index] || 0 },
                       ].filter((row) => row.strokes)
                     : details.map((player, playerIndex) => ({ player, strokes: playerStrokeMaps?.[playerIndex]?.[index] || 0 })).filter((row) => row.strokes);
-                  return <div key={index}><span>{pick(hole, "Hole", "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokesHere.length ? strokesHere.map(({ player }) => <span key={player.id}>{formatCode(format) === "SC" ? player.name : compactPlayerName(player.name)}</span>) : <span>—</span>}</b></div>;
+                  return <div key={index}><span>{pick(hole, "Hole Number") || index + 1}</span><small>SI {pick(hole, "Stroke Index", "Handicap", "HCP")}</small><b className={styles.holeStrokes}>{strokesHere.length ? strokesHere.map(({ player }) => <span key={player.id}>{formatCode(format) === "SC" ? player.name : compactPlayerName(player.name)}</span>) : <span>—</span>}</b></div>;
                 })}</div> : null}</div>
               ) : <p className={styles.noHoles}>Hole details are hidden because this tee does not yet have all 18 Course Holes rows.</p>}
             </div> : null}

@@ -128,7 +128,7 @@ export default function MatchAnalyst({
 
   const netStrokeHoles = strokeMaps
     ? holes.map((hole, index) => ({
-        hole: Number(hole.Hole || hole["Hole Number"] || index + 1),
+        hole: Number(hole["Hole Number"] || index + 1),
         difference: (strokeMaps.team1?.[index] || 0) - (strokeMaps.team2?.[index] || 0),
       })).filter((hole) => hole.difference)
     : [];
