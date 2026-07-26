@@ -36,7 +36,7 @@ const REQUIRED_COLUMNS = {
   courses: [["Year"], ["Course ID"], ["Course Name", "Course"], ["Format"]],
   handicaps: [["Year"], ["Player ID"], ["Team Side"], ["Tournament Handicap"]],
   scorecards: [["Course ID", "Course Name", "Course"], ["Tee", "Tee Name"], ["Course Rating", "Rating"], ["Slope Rating", "Slope"], ["Par"]],
-  holes: [["Course ID", "Course Name", "Course"], ["Tee", "Tee Name"], ["Hole", "Hole Number"], ["Stroke Index", "Handicap", "Index"]],
+  holes: [["Course ID", "Course Name", "Course"], ["Tee", "Tee Name"], ["Hole Number"], ["Stroke Index", "Handicap", "Index"]],
   settings: [["Setting"], ["Value"]],
   draftSettings: [["Year"], ["Total Draft Picks", "Total Picks"], ["Team One ID", "Team 1 ID"], ["Team Two ID", "Team 2 ID"]],
   draftPicks: [["Year"], ["Pick Number"], ["Team ID"], ["Player ID"]],

@@ -14,7 +14,7 @@ test("calculates course and singles handicaps", () => {
 });
 
 test("allocates strokes in stroke-index order", () => {
-  const holes = Array.from({ length: 18 }, (_, index) => ({ Hole: index + 1, "Stroke Index": 18 - index }));
+  const holes = Array.from({ length: 18 }, (_, index) => ({ "Hole Number": index + 1, "Stroke Index": 18 - index }));
   const result = allocateStrokes(2, holes);
   assert.equal(result[17], 1);
   assert.equal(result[16], 1);
