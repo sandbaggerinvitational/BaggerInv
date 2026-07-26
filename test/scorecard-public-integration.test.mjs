@@ -74,5 +74,20 @@ test("scorecard histories reuse tournament data and fail fast when optional shee
   assert.doesNotMatch(scorecardSheets, /Matches|Courses|Team Names|Players/);
   assert.match(source, /loadHistoricalData\(\)/);
   assert.match(source, /timeoutMs:\s*10_000/);
-  assert.match(source, /revalidate:\s*60/);
+  assert.match(source, /SCORECARD_CACHE_SECONDS\s*=\s*300/);
+  assert.match(source, /HISTORICAL_CACHE_SECONDS\s*=\s*300/);
+});
+
+test("scorecard analytics are reused and the War Room avoids a duplicate archive load", async () => {
+  const [scorecardData, warRoomPage] = await Promise.all([
+    readFile(new URL("../lib/scorecard-data.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/war-room/page.js", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(scorecardData, /ANALYTICS_CACHE_MS\s*=\s*5 \* 60 \* 1000/);
+  assert.match(scorecardData, /if \(cachedAnalytics/);
+  assert.match(scorecardData, /if \(pendingAnalytics\)/);
+  assert.doesNotMatch(warRoomPage, /loadScorecardAnalytics/);
+  assert.match(warRoomPage, /buildScorecardAnalytics/);
+  assert.match(warRoomPage, /relevantScorecards\.map\(compactWarRoomScorecard\)/);
 });

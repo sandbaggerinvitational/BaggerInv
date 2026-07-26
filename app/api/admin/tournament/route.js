@@ -1,6 +1,8 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { readTournamentAdminData, updateTournamentAdminData } from "../../../../lib/google-sheets-write";
+import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
+import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
 
 export const dynamic = "force-dynamic";
 function authorized(request) {
@@ -24,6 +26,8 @@ export async function POST(request) {
   try {
     const { tournament, updates, updatedBy } = await request.json();
     const result = await updateTournamentAdminData(tournament, updates, updatedBy);
+    revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
+    invalidateScorecardAnalyticsCache();
     for (const path of ["/", "/admin", "/history", "/tournament-guide", "/live"]) revalidatePath(path);
     return NextResponse.json(result);
   } catch (error) {

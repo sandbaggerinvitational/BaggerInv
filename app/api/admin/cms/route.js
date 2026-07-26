@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import {
   archiveCmsRecord,
@@ -10,6 +10,8 @@ import {
   reorderCmsRecord,
   saveCmsRecord,
 } from "../../../../lib/google-sheets-write";
+import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
+import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
 import { assertValidTournamentId } from "../../../../lib/tournament-identifiers";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +56,8 @@ export async function POST(request) {
     else if (action === "delete") data = await deleteCmsRecord(resource, key, updatedBy);
     else if (action === "reorder") data = await reorderCmsRecord(resource, key, direction, filters, updatedBy);
     else throw new Error("Unknown Admin Center action.");
+    revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
+    invalidateScorecardAnalyticsCache();
     for (const path of ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/tournament-guide"]) revalidatePath(path);
     return NextResponse.json({ data });
   } catch (error) {
