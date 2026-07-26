@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import {
   finalizeLiveMatch,
@@ -7,6 +7,8 @@ import {
   updateLiveMatch,
   updateLiveMatchPairing,
 } from "../../../lib/google-sheets-write";
+import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data";
+import { invalidateScorecardAnalyticsCache } from "../../../lib/scorecard-data";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,8 @@ function deny() {
 }
 
 function refreshMatchData() {
+  revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
+  invalidateScorecardAnalyticsCache();
   for (const path of ["/live", "/", "/history", "/players", "/records", "/champions"]) revalidatePath(path);
 }
 
