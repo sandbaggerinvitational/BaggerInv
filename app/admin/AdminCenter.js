@@ -6,6 +6,7 @@ import GuideEditor from "./tournament-guide/GuideEditor";
 import LiveMatchControl from "./live-matches/LiveMatchControl";
 import OddsAdmin from "../odds-center/admin/OddsAdmin";
 import TournamentEditor from "./TournamentEditor";
+import ScorecardCalibration from "./ScorecardCalibration";
 import CmsManager, { AuditLogPanel, DashboardPanel, StandingsPanel } from "./CmsManager";
 import styles from "./admin-center.module.css";
 import { resolveTournamentSelection } from "../../lib/tournament-identifiers";
@@ -14,7 +15,7 @@ const TABS = [
   ["dashboard", "Dashboard"], ["tournament", "Tournament"], ["players", "Players"], ["teams", "Teams"],
   ["draft", "Draft"], ["schedule", "Schedule"], ["courses", "Courses"], ["matches", "Matches"], ["live-scoring", "Live Scoring"],
   ["standings", "Standings"], ["guide", "Guide"], ["odds", "Odds"], ["media", "Media"],
-  ["history", "History"], ["data-health", "Data Health"], ["settings", "Settings"], ["audit-log", "Audit Log"],
+  ["history", "History"], ["calibration", "Calibration"], ["data-health", "Data Health"], ["settings", "Settings"], ["audit-log", "Audit Log"],
 ];
 
 export default function AdminCenter({ tournaments }) {
@@ -86,6 +87,7 @@ export default function AdminCenter({ tournaments }) {
         {active === "odds" ? <OddsAdmin embedded sharedSecret={secret} /> : null}
         {active === "media" ? <CmsManager resource="media" {...shared} description="Catalog approved logos, hero images, course photos, player photos, and championship artwork for use throughout the site." /> : null}
         {active === "history" ? <CmsManager resource="awards" {...shared} title="History & Awards" description="Manage year-specific awards and winners. Championship team and final score remain in the Tournament record." /> : null}
+        {active === "calibration" ? <ScorecardCalibration {...shared} /> : null}
         {active === "data-health" ? <div className={styles.frame}><iframe title="Data Health" src={`/data-health?embedded=1&tournament=${encodeURIComponent(tournamentId)}`} /></div> : null}
         {active === "settings" ? <CmsManager resource="settings" {...shared} description="Manage site-wide feature flags, established year, delays, theme options, and other shared values." /> : null}
         {active === "audit-log" ? <AuditLogPanel secret={secret} /> : null}
