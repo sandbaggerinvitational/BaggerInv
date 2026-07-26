@@ -39,6 +39,12 @@ function match(matchId, format, players, matchNumber) {
     "Team 1 Player 2": players[1] || "",
     "Team 2 Player 1": players[2],
     "Team 2 Player 2": players[3] || "",
+    "Team 1 Player 1 Stroke": 0,
+    "Team 1 Player 2 Stroke": 0,
+    "Team 2 Player 1 Stroke": 0,
+    "Team 2 Player 2 Stroke": 0,
+    "Team 1 Stroke": 0,
+    "Team 2 Stroke": 0,
   };
 }
 
@@ -47,6 +53,9 @@ const matches = [
   match("2025-R1-2", "SC", ["P5", "P6", "P7", "P8"], 2),
   match("2025-R1-3", "SI", ["P9", "", "P10", ""], 3),
 ];
+matches[0]["Team 1 Player 1 Stroke"] = 7;
+matches[1]["Team 1 Stroke"] = 6;
+matches[2]["Team 1 Player 1 Stroke"] = 4;
 
 function scoreRow({
   matchId,
@@ -133,6 +142,29 @@ test("calculates reusable individual, nine-hole, streak, and scoring metrics", (
   assert.equal(metrics.longestParStreak.value, 16);
   assert.equal(metrics.par3Average.value, 3);
   assert.equal(metrics.holes15To18.value, 16);
+});
+
+test("allocates official strokes, builds format net rows, and compares independent hole winners", () => {
+  const analytics = buildScorecardAnalytics({ roundScorecards, matches, courseHoles, courses, teamNames });
+  const p1 = analytics.scorecards.find((card) => card.playerId === "P1");
+  const bestBall = p1.matchNetScoring;
+  const teamOneNet = bestBall.rows.find((row) => row.side === 1);
+  const teamTwoNet = bestBall.rows.find((row) => row.side === 2);
+
+  assert.equal(p1.strokesReceived, 7);
+  assert.equal(p1.holes[0].strokesAllocated, 1);
+  assert.equal(p1.holes[0].netScore, p1.holes[0].score - 1);
+  assert.equal(p1.holes[7].strokesAllocated, 0);
+  assert.equal(teamOneNet.type, "BEST_BALL_NET");
+  assert.equal(teamOneNet.holes[0].netScore, 2);
+  assert.equal(teamTwoNet.holes[0].netScore, 4);
+  assert.equal(bestBall.holeWinners[0].winnerSide, "A");
+  assert.equal(bestBall.holeWinners[1].winnerType, "HALVED");
+
+  const scramble = analytics.scorecards.find((card) => card.matchId === "2025-R1-2" && card.side === 1);
+  assert.equal(scramble.strokesReceived, 6);
+  assert.equal(scramble.holes[0].netScore, scramble.holes[0].score - 1);
+  assert.equal(scramble.matchNetScoring.rows.find((row) => row.side === 1).type, "SCRAMBLE_NET");
 });
 
 test("partial scorecards contribute holes and complete nines but never full-round metrics", () => {
