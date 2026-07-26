@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useId, useState } from "react";
 import styles from "../../historical.module.css";
+import ScorecardTable from "../../ScorecardTable";
 
 const FORMAT_LABELS = {
   BB: "Best Ball",
@@ -31,7 +32,7 @@ function winnerColor(match, side) {
   return "#777d79";
 }
 
-function MatchRow({ match }) {
+function MatchRow({ match, scorecards }) {
   const opponents = match.opponents.map((player) => player.name).join(" + ");
   const partner = match.partner.map((player) => player.name).join(" + ");
 
@@ -74,11 +75,15 @@ function MatchRow({ match }) {
           View Match →
         </Link>
       ) : null}
+      <details className={styles.profileMatchScorecard}>
+        <summary>Hole-by-hole scorecard</summary>
+        <ScorecardTable scorecards={scorecards} compact title={`${match.year} · Round ${match.round}`} />
+      </details>
     </article>
   );
 }
 
-export default function PlayerFormatMatchHistory({ history }) {
+export default function PlayerFormatMatchHistory({ history, scorecardsByMatch = {} }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
   const [openYears, setOpenYears] = useState(() =>
@@ -149,7 +154,7 @@ export default function PlayerFormatMatchHistory({ history }) {
                 </button>
                 <div id={yearId} hidden={!yearOpen}>
                   {group.matches.map((match) => (
-                    <MatchRow match={match} key={match.id} />
+                    <MatchRow match={match} scorecards={scorecardsByMatch[match.id] || []} key={match.id} />
                   ))}
                 </div>
               </section>

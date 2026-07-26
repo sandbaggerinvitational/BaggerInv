@@ -24,6 +24,9 @@ import { pageMetadata } from "../../../lib/seo";
 import { formatPoints } from "../../../lib/formatters";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 import { getDraftByYear } from "../../../lib/draft";
+import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
+import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
+import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -61,6 +64,7 @@ function tournamentStatus(tournament) {
 }
 
 export default async function TournamentYearPage({ params }) {
+  const scorecardAnalyticsPromise = loadScorecardAnalytics();
   await refreshHistoricalData();
   const { year } = await params;
   const tournament = getTournament(year);
@@ -79,6 +83,17 @@ export default async function TournamentYearPage({ params }) {
     getAdjacentTournamentYears(year);
   const status = tournamentStatus(tournament);
   const draft = await getDraftByYear(year);
+  const scorecardAnalytics = await scorecardAnalyticsPromise;
+  const tournamentScorecards = filterScorecards(scorecardAnalytics.usableScorecards, { year });
+  const missingTournamentScorecards = scorecardAnalytics.missingScorecards.filter(
+    (scorecard) => scorecard.year === Number(year)
+  );
+  const scoringStatistics = buildScoringHighlights(
+    tournamentScorecards,
+    tournamentScorecards.length + missingTournamentScorecards.length
+  );
+  const participant = (record) =>
+    record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
 
   return (
     <main>
@@ -261,6 +276,66 @@ export default async function TournamentYearPage({ params }) {
           <h2>{tournament.year} Leaderboard</h2>
 
           <TournamentLeaderboard rows={leaderboard} pointsTracked={pointsTracked} emptyMessage="No completed matches have been recorded for this tournament yet." />
+        </section>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Available Scorecard History</span>
+          <h2>Tournament Scoring Statistics</h2>
+          <ScoringStatGrid items={[
+            {
+              label: "Best Individual Round",
+              value: formatScoringNumber(scoringStatistics.lowestRound.value),
+              detail: participant(scoringStatistics.lowestRound),
+              sample: scoringStatistics.lowestRound.label,
+            },
+            {
+              label: "Best Team Round",
+              value: formatScoringNumber(scoringStatistics.lowestTeamRound.value),
+              detail: participant(scoringStatistics.lowestTeamRound),
+              sample: scoringStatistics.lowestTeamRound.label,
+            },
+            {
+              label: "Average Score",
+              value: formatScoringNumber(scoringStatistics.averageScore.value),
+              sample: scoringStatistics.averageScore.label,
+            },
+            {
+              label: "Lowest Front",
+              value: formatScoringNumber(scoringStatistics.lowestFrontNine.value),
+              detail: participant(scoringStatistics.lowestFrontNine),
+              sample: scoringStatistics.lowestFrontNine.label,
+            },
+            {
+              label: "Lowest Back",
+              value: formatScoringNumber(scoringStatistics.lowestBackNine.value),
+              detail: participant(scoringStatistics.lowestBackNine),
+              sample: scoringStatistics.lowestBackNine.label,
+            },
+            {
+              label: "Birdie Leader",
+              value: formatScoringNumber(scoringStatistics.birdieLeader.value),
+              detail: participant(scoringStatistics.birdieLeader),
+              sample: scoringStatistics.birdieLeader.label,
+            },
+            {
+              label: "Hardest Hole",
+              value: scoringStatistics.hardestHole ? `#${scoringStatistics.hardestHole.holeNumber}` : "—",
+              detail: scoringStatistics.hardestHole?.courseId,
+              sample: scoringStatistics.hardestHole?.averageToPar.label,
+            },
+            {
+              label: "Easiest Hole",
+              value: scoringStatistics.easiestHole ? `#${scoringStatistics.easiestHole.holeNumber}` : "—",
+              detail: scoringStatistics.easiestHole?.courseId,
+              sample: scoringStatistics.easiestHole?.averageToPar.label,
+            },
+            {
+              label: "Scorecard Coverage",
+              value: `${scoringStatistics.scorecardCoverage.available} of ${scoringStatistics.scorecardCoverage.expected}`,
+              detail: "Available scorecards",
+              sample: scoringStatistics.scorecardCoverage.label,
+            },
+          ]} />
         </section>
 
         <section className={styles.section}>

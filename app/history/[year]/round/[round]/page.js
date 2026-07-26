@@ -17,6 +17,9 @@ import {
 import styles from "../../../../historical.module.css";
 import { formatPoints } from "../../../../../lib/formatters";
 import { pageMetadata } from "../../../../../lib/seo";
+import { loadScorecardAnalytics } from "../../../../../lib/scorecard-data";
+import { buildScoringHighlights, filterScorecards } from "../../../../../lib/scorecard-analytics";
+import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
 
 function displayPoints(value) {
   return formatPoints(value);
@@ -43,10 +46,28 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function HistoricalRoundPage({ params }) {
+  const scorecardAnalyticsPromise = loadScorecardAnalytics();
   await refreshHistoricalData();
   const { year, round } = await params;
   const archive = getHistoricalRound(year, round);
   if (!archive) notFound();
+  const scorecardAnalytics = await scorecardAnalyticsPromise;
+  const roundScorecards = filterScorecards(scorecardAnalytics.usableScorecards, {
+    year: archive.year,
+    round: archive.round,
+  });
+  const missingRoundScorecards = scorecardAnalytics.missingScorecards.filter((scorecard) =>
+    scorecard.year === Number(archive.year) && scorecard.round === Number(archive.round)
+  );
+  const roundStatistics = buildScoringHighlights(
+    roundScorecards,
+    roundScorecards.length + missingRoundScorecards.length
+  );
+  const participant = (record) =>
+    record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
+  const holeLabel = (hole) => hole
+    ? `Hole ${hole.holeNumber}${hole.tee ? ` · ${hole.tee}` : ""}`
+    : "";
 
   return (
     <main>
@@ -146,10 +167,77 @@ export default async function HistoricalRoundPage({ params }) {
                 round={{ label: `Round ${archive.round}` }}
                 tournament={archive}
                 variant="historical"
+                scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })}
               />
             ))}
           </div>
         )}
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Available Scorecard History</span>
+          <h2>Round Statistics</h2>
+          <ScoringStatGrid items={[
+            {
+              label: "Lowest Round",
+              value: formatScoringNumber(roundStatistics.lowestRound.value),
+              detail: participant(roundStatistics.lowestRound),
+              sample: roundStatistics.lowestRound.label,
+            },
+            {
+              label: "Most Birdies",
+              value: formatScoringNumber(roundStatistics.mostBirdies.value),
+              detail: participant(roundStatistics.mostBirdies),
+              sample: roundStatistics.mostBirdies.label,
+            },
+            {
+              label: "Lowest Front Nine",
+              value: formatScoringNumber(roundStatistics.lowestFrontNine.value),
+              detail: participant(roundStatistics.lowestFrontNine),
+              sample: roundStatistics.lowestFrontNine.label,
+            },
+            {
+              label: "Lowest Back Nine",
+              value: formatScoringNumber(roundStatistics.lowestBackNine.value),
+              detail: participant(roundStatistics.lowestBackNine),
+              sample: roundStatistics.lowestBackNine.label,
+            },
+            {
+              label: "Average Score",
+              value: formatScoringNumber(roundStatistics.averageScore.value),
+              sample: roundStatistics.averageScore.label,
+            },
+            {
+              label: "Hardest Hole",
+              value: roundStatistics.hardestHole ? `#${roundStatistics.hardestHole.holeNumber}` : "—",
+              detail: holeLabel(roundStatistics.hardestHole),
+              sample: roundStatistics.hardestHole?.averageToPar.label,
+            },
+            {
+              label: "Easiest Hole",
+              value: roundStatistics.easiestHole ? `#${roundStatistics.easiestHole.holeNumber}` : "—",
+              detail: holeLabel(roundStatistics.easiestHole),
+              sample: roundStatistics.easiestHole?.averageToPar.label,
+            },
+            {
+              label: "Birdie Leader",
+              value: formatScoringNumber(roundStatistics.birdieLeader.value),
+              detail: participant(roundStatistics.birdieLeader),
+              sample: roundStatistics.birdieLeader.label,
+            },
+            {
+              label: "Lowest Team Round",
+              value: formatScoringNumber(roundStatistics.lowestTeamRound.value),
+              detail: participant(roundStatistics.lowestTeamRound),
+              sample: roundStatistics.lowestTeamRound.label,
+            },
+            {
+              label: "Scorecard Coverage",
+              value: `${roundStatistics.scorecardCoverage.available} of ${roundStatistics.scorecardCoverage.expected}`,
+              detail: "Available scorecards",
+              sample: roundStatistics.scorecardCoverage.label,
+            },
+          ]} />
+        </section>
 
         <HistoricalDetailNavigation
           backHref={`/history/${archive.year}`}

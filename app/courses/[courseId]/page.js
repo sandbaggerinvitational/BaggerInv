@@ -10,6 +10,14 @@ import {
 import { getCourse, getFormatName } from "../../../lib/stats";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
+import Link from "next/link";
+import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
+import {
+  buildScoringHighlights,
+  filterScorecards,
+  summarizeScorecards,
+} from "../../../lib/scorecard-analytics";
+import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -32,12 +40,29 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CoursePage({ params }) {
+  const scorecardAnalyticsPromise = loadScorecardAnalytics();
   await refreshHistoricalData();
   const { courseId } = await params;
   const course = getCourse(courseId);
   if (!course) notFound();
 
   const website = course.Website || "";
+  const scorecardAnalytics = await scorecardAnalyticsPromise;
+  const courseScorecards = filterScorecards(scorecardAnalytics.usableScorecards, { courseId });
+  const missingCourseScorecards = scorecardAnalytics.missingScorecards.filter(
+    (scorecard) => String(scorecard.courseId).toUpperCase() === String(courseId).toUpperCase()
+  );
+  const courseStatistics = summarizeScorecards(
+    courseScorecards,
+    courseScorecards.length + missingCourseScorecards.length
+  );
+  const courseHighlights = buildScoringHighlights(
+    courseScorecards,
+    courseScorecards.length + missingCourseScorecards.length
+  );
+  const holeStatistics = scorecardAnalytics.courseHoleSummaries.filter(
+    (hole) => String(hole.courseId).toUpperCase() === String(courseId).toUpperCase()
+  );
 
   return (
     <main>
@@ -114,6 +139,96 @@ export default async function CoursePage({ params }) {
             </div>
           </div>
         </div>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Available Scorecard History</span>
+          <h2>Course Statistics</h2>
+          <ScoringStatGrid items={[
+            {
+              label: "Average Score",
+              value: formatScoringNumber(courseStatistics.recordedScoringAverage.value),
+              sample: courseStatistics.recordedScoringAverage.label,
+            },
+            {
+              label: "Average To Par",
+              value: formatScoringNumber(courseStatistics.averageToPar.value, { signed: true }),
+              sample: courseStatistics.averageToPar.label,
+            },
+            {
+              label: "Hardest Hole",
+              value: courseHighlights.hardestHole ? `#${courseHighlights.hardestHole.holeNumber}` : "—",
+              detail: courseHighlights.hardestHole?.tee,
+              sample: courseHighlights.hardestHole?.averageToPar.label,
+            },
+            {
+              label: "Easiest Hole",
+              value: courseHighlights.easiestHole ? `#${courseHighlights.easiestHole.holeNumber}` : "—",
+              detail: courseHighlights.easiestHole?.tee,
+              sample: courseHighlights.easiestHole?.averageToPar.label,
+            },
+            {
+              label: "Lowest Round",
+              value: formatScoringNumber(courseStatistics.lowestRecordedRound.value),
+              sample: courseStatistics.lowestRecordedRound.label,
+            },
+            {
+              label: "Birdie %",
+              value: formatScoringNumber(courseStatistics.birdiePercentage.value, { percentage: true }),
+              sample: courseStatistics.birdiePercentage.label,
+            },
+            {
+              label: "Par %",
+              value: formatScoringNumber(courseStatistics.parPercentage.value, { percentage: true }),
+              sample: courseStatistics.parPercentage.label,
+            },
+            {
+              label: "Bogey %",
+              value: formatScoringNumber(courseStatistics.bogeyPercentage.value, { percentage: true }),
+              sample: courseStatistics.bogeyPercentage.label,
+            },
+            {
+              label: "Double+ %",
+              value: formatScoringNumber(courseStatistics.doubleOrWorsePercentage.value, { percentage: true }),
+              sample: courseStatistics.doubleOrWorsePercentage.label,
+            },
+            {
+              label: "Average Front",
+              value: formatScoringNumber(courseStatistics.averageFrontNine.value),
+              sample: courseStatistics.averageFrontNine.label,
+            },
+            {
+              label: "Average Back",
+              value: formatScoringNumber(courseStatistics.averageBackNine.value),
+              sample: courseStatistics.averageBackNine.label,
+            },
+            {
+              label: "Recorded Scorecards",
+              value: `${courseStatistics.scorecardCoverage.available} of ${courseStatistics.scorecardCoverage.expected}`,
+              sample: courseStatistics.scorecardCoverage.label,
+            },
+          ]} />
+        </section>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Hole Analytics</span>
+          <h2>Course Holes</h2>
+          {holeStatistics.length ? (
+            <div className={styles.courseHoleGrid}>
+              {holeStatistics.map((hole) => (
+                <Link
+                  href={`/courses/${encodeURIComponent(courseId)}/holes/${hole.holeNumber}${hole.tee ? `?tee=${encodeURIComponent(hole.tee)}` : ""}`}
+                  key={`${hole.tee}-${hole.holeNumber}`}
+                >
+                  <span>Hole {hole.holeNumber}</span>
+                  <strong>{formatScoringNumber(hole.scoringAverage.value)}</strong>
+                  <small>{hole.tee || "Recorded tee"} · {hole.scoringAverage.label}</small>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.roundArchiveEmpty}>Scorecard unavailable for this course.</div>
+          )}
+        </section>
       </section>
 
       <Footer />

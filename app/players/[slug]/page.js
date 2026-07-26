@@ -28,6 +28,9 @@ import { pageMetadata } from "../../../lib/seo";
 import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
 import { getDrafts } from "../../../lib/draft";
 import { getPlayerDraftHistory } from "../../../lib/draft-analytics";
+import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
+import { filterScorecards } from "../../../lib/scorecard-analytics";
+import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -135,6 +138,7 @@ function CareerTimelineItem({ season, styles }) {
 }
 
 export default async function PlayerPage({ params, searchParams }) {
+  const scorecardAnalyticsPromise = loadScorecardAnalytics();
   await refreshHistoricalData();
   const { slug } = await params;
   const query = await searchParams;
@@ -170,6 +174,17 @@ export default async function PlayerPage({ params, searchParams }) {
     .filter((season) => season.overall.matches > 0)
     .map((season) => season.year);
   const careerYears = formatPlayerCareerYears(player, recordedAppearanceYears);
+  const scorecardAnalytics = await scorecardAnalyticsPromise;
+  const playerScoring = scorecardAnalytics.playerSummary(player["Player ID"]);
+  const playerMatchIds = new Set(
+    Object.values(formatMatchHistory).flatMap((history) => history.matches.map((match) => match.id))
+  );
+  const scorecardsByMatch = Object.fromEntries(
+    [...playerMatchIds].map((matchId) => [
+      matchId,
+      filterScorecards(scorecardAnalytics.scorecards, { matchId }),
+    ])
+  );
 
   const compareHref = rival
     ? `/compare?player1=${encodeURIComponent(
@@ -410,11 +425,77 @@ export default async function PlayerPage({ params, searchParams }) {
                 <strong>{formatPoints(stats.records[key].points)} points</strong>
                 <em>{formatPercentage(stats.percentages[key])}</em>
                 {key !== "overall" ? (
-                  <PlayerFormatMatchHistory history={formatMatchHistory[key]} />
+                  <PlayerFormatMatchHistory history={formatMatchHistory[key]} scorecardsByMatch={scorecardsByMatch} />
                 ) : null}
               </div>
             ))}
           </div>
+        </section>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Available Scorecard History</span>
+          <h2>Scoring Statistics</h2>
+          <ScoringStatGrid items={[
+            {
+              label: "Recorded Rounds",
+              value: playerScoring.recordedScoringAverage.sampleSize,
+              sample: playerScoring.scorecardCoverage.label,
+            },
+            {
+              label: "Gross Scoring Average",
+              value: formatScoringNumber(playerScoring.recordedScoringAverage.value),
+              sample: playerScoring.recordedScoringAverage.label,
+            },
+            {
+              label: "Average To Par",
+              value: formatScoringNumber(playerScoring.averageToPar.value, { signed: true }),
+              sample: playerScoring.averageToPar.label,
+            },
+            {
+              label: "Best Round",
+              value: formatScoringNumber(playerScoring.lowestRecordedRound.value),
+              sample: playerScoring.lowestRecordedRound.label,
+            },
+            {
+              label: "Lowest Front Nine",
+              value: formatScoringNumber(playerScoring.bestFrontNine.value),
+              sample: playerScoring.bestFrontNine.label,
+            },
+            {
+              label: "Lowest Back Nine",
+              value: formatScoringNumber(playerScoring.bestBackNine.value),
+              sample: playerScoring.bestBackNine.label,
+            },
+            { label: "Birdies", value: playerScoring.birdies.value, sample: playerScoring.birdies.label },
+            { label: "Pars", value: playerScoring.pars.value, sample: playerScoring.pars.label },
+            { label: "Bogeys", value: playerScoring.bogeys.value, sample: playerScoring.bogeys.label },
+            { label: "Double+", value: playerScoring.doubleOrWorse.value, sample: playerScoring.doubleOrWorse.label },
+            {
+              label: "Par 3 Average",
+              value: formatScoringNumber(playerScoring.par3Average.value),
+              sample: playerScoring.par3Average.label,
+            },
+            {
+              label: "Par 4 Average",
+              value: formatScoringNumber(playerScoring.par4Average.value),
+              sample: playerScoring.par4Average.label,
+            },
+            {
+              label: "Par 5 Average",
+              value: formatScoringNumber(playerScoring.par5Average.value),
+              sample: playerScoring.par5Average.label,
+            },
+            {
+              label: "Closing Average (16–18)",
+              value: formatScoringNumber(playerScoring.closingAverage.value),
+              sample: playerScoring.closingAverage.label,
+            },
+            {
+              label: "Scorecard Coverage",
+              value: `${playerScoring.scorecardCoverage.available} of ${playerScoring.scorecardCoverage.expected}`,
+              sample: playerScoring.scorecardCoverage.label,
+            },
+          ]} />
         </section>
 
         {playerDraftHistory.length ? (
