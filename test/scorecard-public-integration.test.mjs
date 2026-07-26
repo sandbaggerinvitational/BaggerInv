@@ -32,18 +32,32 @@ test("Phase 2 public pages consume the shared scorecard analytics service", asyn
   assert.match(sources.playerHistory, /ScorecardTable/);
 });
 
-test("scorecard UI exposes missing and partial states and scrolls only the grid", async () => {
+test("public scorecards are collapsed, mapped, responsive, and silent when missing", async () => {
   const [component, css] = await Promise.all([
     readFile(paths.scorecard, "utf8"),
     readFile(paths.scorecardCss, "utf8"),
   ]);
 
-  assert.match(component, /Hole-by-hole scorecard unavailable/);
-  assert.match(component, /Partial historical scorecard/);
+  assert.doesNotMatch(component, /Hole-by-hole scorecard unavailable/);
+  assert.doesNotMatch(component, /Scorecard unavailable for this historical match/);
+  assert.match(component, /if \(!available\.length\) return null/);
+  assert.match(component, /aria-expanded=\{open\}/);
+  assert.match(component, /useState\(false\)/);
+  assert.match(component, /courseName/);
+  assert.doesNotMatch(component, /available\[0\]\.courseId/);
+  assert.match(component, /teeLabel/);
+  assert.match(component, /Front 9/);
+  assert.match(component, /Back 9/);
+  assert.match(component, /segment="front"/);
+  assert.match(component, /segment="back"/);
+  assert.match(component, /Partial Scorecard/);
   assert.match(component, /scorecard\.status === "PARTIAL"/);
   assert.match(component, /gross score/);
   assert.match(css, /overflow-x:auto/);
   assert.match(css, /position:sticky/);
+  assert.match(css, /\.desktopGrid/);
+  assert.match(css, /\.mobileGrid/);
+  assert.match(css, /focus-visible/);
 });
 
 test("Phase 2 does not add scorecard data to prediction weighting", async () => {

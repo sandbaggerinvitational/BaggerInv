@@ -75,10 +75,9 @@ function MatchRow({ match, scorecards }) {
           View Match →
         </Link>
       ) : null}
-      <details className={styles.profileMatchScorecard}>
-        <summary>Hole-by-hole scorecard</summary>
-        <ScorecardTable scorecards={scorecards} compact title={`${match.year} · Round ${match.round}`} />
-      </details>
+      <div className={styles.profileMatchScorecard}>
+        <ScorecardTable scorecards={scorecards} compact title={`${match.year} · Round ${match.round} Scorecard`} />
+      </div>
     </article>
   );
 }
