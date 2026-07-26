@@ -11,6 +11,9 @@ import {
 import styles from "../historical.module.css";
 import { addTournamentRanks } from "../../lib/rankings";
 import { pageMetadata } from "../../lib/seo";
+import { loadScorecardAnalytics } from "../../lib/scorecard-data";
+import { buildScoringRecords } from "../../lib/scorecard-analytics";
+import ScoringStatGrid, { formatScoringNumber } from "../ScoringStatGrid";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -54,8 +57,27 @@ export const metadata = pageMetadata({
 });
 
 export default async function RecordsPage() {
+  const scorecardAnalyticsPromise = loadScorecardAnalytics();
   await refreshHistoricalData();
   const records = getRecords();
+  const scorecardAnalytics = await scorecardAnalyticsPromise;
+  const scoringRecords = buildScoringRecords(scorecardAnalytics.usableScorecards);
+  const participant = (record) =>
+    record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
+  const recordItem = (label, record, options = {}) => ({
+    label,
+    value: formatScoringNumber(record?.value, options),
+    detail: participant(record),
+    sample: record?.label ? `${record.label}. Based on recorded scorecards.` : "Based on recorded scorecards.",
+  });
+  const holeItem = (label, hole) => ({
+    label,
+    value: hole ? `#${hole.holeNumber}` : "—",
+    detail: hole ? `${hole.courseId}${hole.tee ? ` · ${hole.tee}` : ""}` : "",
+    sample: hole?.averageToPar?.label
+      ? `${hole.averageToPar.label}. Based on recorded scorecards.`
+      : "Based on recorded scorecards.",
+  });
 
   return (
     <main>
@@ -84,6 +106,29 @@ export default async function RecordsPage() {
 
           <Link href="/statistics">Explore More Stats →</Link>
         </div>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Available Scorecard History</span>
+          <h2>Scoring Records</h2>
+          <p>Every scoring record below is based on recorded scorecards and does not imply complete all-time coverage.</p>
+          <ScoringStatGrid items={[
+            recordItem("Lowest Recorded Round", scoringRecords.lowestRecordedRound),
+            recordItem("Lowest To Par", scoringRecords.lowestToPar, { signed: true }),
+            recordItem("Lowest Front Nine", scoringRecords.lowestFrontNine),
+            recordItem("Lowest Back Nine", scoringRecords.lowestBackNine),
+            recordItem("Most Birdies", scoringRecords.mostBirdies),
+            recordItem("Most Eagles", scoringRecords.mostEagles),
+            recordItem("Most Consecutive Birdies", scoringRecords.mostConsecutiveBirdies),
+            recordItem("Best Closing Stretch", scoringRecords.bestClosingStretch),
+            recordItem("Best Par 3 Average", scoringRecords.bestPar3Average),
+            recordItem("Best Par 4 Average", scoringRecords.bestPar4Average),
+            recordItem("Best Par 5 Average", scoringRecords.bestPar5Average),
+            holeItem("Hardest Historical Hole", scoringRecords.hardestHistoricalHole),
+            holeItem("Easiest Historical Hole", scoringRecords.easiestHistoricalHole),
+            recordItem("Lowest Scramble Round", scoringRecords.lowestScrambleRound),
+            recordItem("Lowest Singles Round", scoringRecords.lowestSinglesRound),
+          ]} />
+        </section>
 
         <div className={styles.recordSections}>
           <LeaderSection

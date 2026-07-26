@@ -136,6 +136,7 @@ export default async function DataHealthPage({ searchParams }) {
     courseHoles,
     courses,
     teamNames,
+    players,
   });
   const selectedTournament = tournaments.find((record) => tournamentYear(record) === Number(year)) || null;
   const selectedTournamentId = selectedTournament ? tournamentId(selectedTournament) : "";

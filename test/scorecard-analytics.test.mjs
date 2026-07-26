@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildScorecardAnalytics,
+  buildScoringHighlights,
+  buildScoringRecords,
   calculateScorecardMetrics,
+  filterScorecards,
   summarizeScorecards,
 } from "../lib/scorecard-analytics.js";
 
@@ -165,10 +168,37 @@ test("course-hole summaries report sample size, percentages, and difficulty rank
 
   assert.equal(firstHole.scoringAverage.sampleSize, 7);
   assert.equal(firstHole.par, 4);
+  assert.equal(firstHole.bestScore.value, 3);
+  assert.equal(firstHole.worstScore.value, 4);
+  assert.equal(firstHole.birdiePercentage.sampleSize, 7);
   assert.ok(Number.isInteger(firstHole.difficultyRank));
   assert.equal(player.recordedScoringAverage.value, 72);
   assert.equal(player.recordedScoringAverage.label, "Based on 1 recorded round");
   assert.equal(player.scorecardCoverage.expected, 1);
+});
+
+test("shared highlights and records select round, player, team, and hole leaders", () => {
+  const analytics = buildScorecardAnalytics({ roundScorecards, matches, courseHoles, courses, teamNames });
+  const highlights = buildScoringHighlights(analytics.usableScorecards, 8);
+  const records = buildScoringRecords(analytics.usableScorecards);
+
+  assert.equal(highlights.lowestRound.value, 72);
+  assert.equal(highlights.lowestTeamRound.value, 72);
+  assert.equal(highlights.scorecardCoverage.available, 7);
+  assert.equal(highlights.scorecardCoverage.expected, 8);
+  assert.equal(records.lowestRecordedRound.value, 72);
+  assert.equal(records.lowestScrambleRound.value, 72);
+  assert.ok(records.hardestHistoricalHole);
+  assert.ok(records.easiestHistoricalHole);
+});
+
+test("shared scorecard filtering supports public page scopes", () => {
+  const analytics = buildScorecardAnalytics({ roundScorecards, matches, courseHoles, courses, teamNames });
+
+  assert.equal(filterScorecards(analytics.scorecards, { matchId: "2025-R1-2" }).length, 2);
+  assert.equal(filterScorecards(analytics.scorecards, { playerId: "P5" }).length, 1);
+  assert.equal(filterScorecards(analytics.scorecards, { year: 2025, round: 1, format: "SC" }).length, 2);
+  assert.equal(filterScorecards(analytics.scorecards, { courseId: "C1" }).length, 7);
 });
 
 test("returns usable data plus structured validation warnings for bad rows", () => {
