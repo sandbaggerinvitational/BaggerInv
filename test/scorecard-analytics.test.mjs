@@ -18,7 +18,7 @@ const courseHoles = pars.map((par, index) => ({
   Par: par,
   "Stroke Index": index + 1,
 }));
-const courses = [{ Year: 2025, Round: 1, "Course ID": "C1", Tee: "Black" }];
+const courses = [{ Year: 2025, Round: 1, "Course ID": "C1", Course: "Test Course", Tee: "Black" }];
 const teamNames = [
   { Year: 2025, "Team Side": "Team 1", "Team ID": "T1" },
   { Year: 2025, "Team Side": "Team 2", "Team ID": "T2" },
@@ -113,6 +113,7 @@ test("normalizes individual and team scorecards and resolves scramble participan
   const scramble = analytics.teamScorecards.find((card) => card.teamId === "T1");
   assert.deepEqual(scramble.participantPlayerIds, ["P5", "P6"]);
   assert.equal(scramble.playerId, undefined);
+  assert.equal(scramble.courseName, "Test Course");
   assert.equal(scramble.total, 72);
   assert.equal(scramble.totalToPar, 0);
 });
