@@ -24,6 +24,8 @@ import { teamVibesTier } from "../../lib/prediction-engine";
 import { simulateMatch } from "../../lib/match-simulator";
 import SimulationResults from "./SimulationResults";
 import MatchAnalyst from "./MatchAnalyst";
+import RecordedScoringIntelligence from "./RecordedScoringIntelligence";
+import { buildMatchupScorecardIntelligence } from "../../lib/scorecard-intelligence";
 
 const clean = (value) => String(value ?? "").trim();
 const number = (value, fallback = 0) => {
@@ -85,6 +87,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
   const historical = initialData?.historical || {};
   const partnerships = initialData?.partnerships || {};
   const headToHead = initialData?.headToHead || {};
+  const recordedScorecards = initialData?.scorecardAnalytics?.scorecards || [];
 
   const required = formatCode(format) === "SI" ? 2 : 4;
   const chosen = Array.from({ length: required }, (_, index) => selected[index] || "");
@@ -212,6 +215,15 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
         favored: gap < .5 ? "Even" : item.teamA > item.teamB ? teams.team1.name : teams.team2.name,
       };
     }) || [];
+  const scoringIntelligence = useMemo(() => ready ? buildMatchupScorecardIntelligence({
+    scorecards: recordedScorecards,
+    playerIds: details.map((player) => player.id),
+    sideSize: slotsPerTeam,
+    format: formatCode(format),
+    selectedHoles: holes,
+    courseId,
+    tee,
+  }) : null, [ready, recordedScorecards, chosen.join("|"), slotsPerTeam, format, holes, courseId, tee]);
   async function generateAiBriefing() {
     if (!ready) return;
     if (!aiConfigured) {
@@ -238,6 +250,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
           play,
           strokeMaps: effectiveStrokeMaps,
           holes,
+          scoringIntelligence,
         })),
       });
       const result = await response.json().catch(() => ({}));
@@ -318,6 +331,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
             <nav className={styles.labTabs} aria-label="Matchup Lab sections">
               {[
                 ["overview", "Overview"],
+                ["scoring", "Scoring Intelligence"],
                 ["simulation", "Simulation"],
                 ["handicaps", "Handicap Breakdown"],
                 ["briefing", "Analyst Briefing"],
@@ -355,6 +369,13 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
             </div> : null}
             </> : null}
 
+            {activeSection === "scoring" ? <RecordedScoringIntelligence
+              intelligence={scoringIntelligence}
+              players={details}
+              teamNames={[teams.team1.name, teams.team2.name]}
+              format={formatCode(format)}
+            /> : null}
+
             {activeSection === "simulation" ? (
               <div className={styles.labSection}>
                 <div className={styles.simRun}>
@@ -388,6 +409,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
               aiLoading={aiLoading}
               aiConfigured={aiConfigured}
               onGenerate={generateAiBriefing}
+              scoringIntelligence={scoringIntelligence}
             /> : null}
 
             {activeSection === "handicaps" ? <div className={styles.breakdownCard}>

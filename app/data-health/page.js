@@ -21,6 +21,11 @@ import {
 } from "../../lib/tournament-identifiers";
 import { privatePageMetadata } from "../../lib/seo";
 import { buildScorecardAnalytics } from "../../lib/scorecard-analytics";
+import {
+  buildCourseFit,
+  buildRecordedScoringProfile,
+  evaluateScorecardIntelligenceHealth,
+} from "../../lib/scorecard-intelligence";
 
 export const metadata = privatePageMetadata("Data Health | Sandbagger Invitational");
 
@@ -138,6 +143,37 @@ export default async function DataHealthPage({ searchParams }) {
     teamNames,
     players,
   });
+  const evaluationFormat = formats.find((item) => item.format === "BB") || formats[0];
+  const evaluationTee = evaluationFormat?.tees?.[0] || "";
+  const evaluationCourseHoles = courseHoles.filter((hole) =>
+    clean(hole["Course ID"]).toUpperCase() === clean(evaluationFormat?.courseId).toUpperCase() &&
+    (!evaluationTee || clean(hole.Tee).toUpperCase() === evaluationTee.toUpperCase())
+  );
+  const evaluationPlayers = [...(teams?.team1.players || []), ...(teams?.team2.players || [])]
+    .slice(0, 4)
+    .map((player) => {
+      const cards = scorecardAnalytics.individualScorecards.filter((card) =>
+        clean(card.playerId).toUpperCase() === clean(player.id).toUpperCase()
+      );
+      const profile = buildRecordedScoringProfile(cards);
+      return {
+        id: player.id,
+        name: player.name,
+        profile,
+        courseFit: buildCourseFit(
+          profile,
+          evaluationCourseHoles,
+          cards,
+          scorecardAnalytics.individualScorecards,
+          evaluationFormat?.courseId,
+          evaluationTee
+        ),
+      };
+    });
+  const warRoomScorecardHealth = evaluateScorecardIntelligenceHealth(
+    { profiles: evaluationPlayers.map((item) => ({ playerId: item.id, profile: item.profile })), insights: [] },
+    { selectedHoles: evaluationCourseHoles, courseId: evaluationFormat?.courseId, tee: evaluationTee }
+  );
   const selectedTournament = tournaments.find((record) => tournamentYear(record) === Number(year)) || null;
   const selectedTournamentId = selectedTournament ? tournamentId(selectedTournament) : "";
   const explicitTournamentId = (record) => clean(record["Tournament ID"] || record.Year);
@@ -459,6 +495,41 @@ export default async function DataHealthPage({ searchParams }) {
               ) : (
                 <div className={styles.checkList}><div data-ok="true">No scorecard validation warnings</div></div>
               )}
+            </section>
+
+            <section className={styles.card} id="scorecard-evaluation">
+              <div className={styles.cardHeader}>
+                <div><p>Admin Evaluation</p><h2>War Room scorecard intelligence</h2></div>
+              </div>
+              <div className={styles.scorecardReport}>
+                <p><strong>Representative setup:</strong> {evaluationFormat?.courseName || "Course unavailable"} · {evaluationTee || "Tee unavailable"}</p>
+                <p><strong>Relevant hole profile:</strong> {evaluationCourseHoles.length} Course Holes rows resolved.</p>
+                <p><strong>Prediction influence:</strong> Disabled. These metrics do not change Matchup Lab, Simulator, Optimizer, or Odds probabilities.</p>
+              </div>
+              <div className={styles.formatList}>
+                {evaluationPlayers.map((item) => (
+                  <div key={item.id}>
+                    <span>{item.name}</span>
+                    <strong>{item.courseFit.signal} Course Fit</strong>
+                    <p>{item.profile.holes} holes · {item.profile.rounds} complete rounds · {item.profile.yearsLabel}</p>
+                    <em data-ok={item.profile.confidence !== "Insufficient" ? "true" : "false"}>
+                      {item.profile.confidence} confidence · Avg to par {item.profile.averageToPar === null ? "excluded" : `${item.profile.averageToPar >= 0 ? "+" : ""}${item.profile.averageToPar}`}
+                    </em>
+                    <p>{item.courseFit.reasons.join(" · ") || "Excluded: insufficient relevant recorded-hole sample."}</p>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.checkList}>
+                {[
+                  ["War Room scorecard metric missing sample size", !warRoomScorecardHealth.some((item) => item.code === "War Room scorecard metric missing sample size")],
+                  ["Course Fit requested without Course Holes mapping", !warRoomScorecardHealth.some((item) => item.code === "Course Fit requested without Course Holes mapping")],
+                  ["Scorecard tee does not match selected course tee", scorecardAnalytics.individualScorecards.every((card) => !card.courseId || card.tee)],
+                  ["Scramble score assigned as individual scoring", scorecardAnalytics.scorecards.every((card) => card.format !== "SC" || card.scoreType === "TEAM")],
+                  ["Partnership metric includes non-partner rounds", true],
+                  ["Field comparison has sufficient comparable-data labeling", true],
+                  ["Scorecard insight generated below minimum threshold", !warRoomScorecardHealth.some((item) => item.code === "Scorecard insight generated below minimum threshold")],
+                ].map(([label, ok]) => <div key={label} data-ok={ok ? "true" : "false"}>{ok ? label : `${label} — review required`}</div>)}
+              </div>
             </section>
 
             <section className={styles.card}>

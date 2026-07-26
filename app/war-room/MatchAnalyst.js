@@ -64,6 +64,7 @@ export default function MatchAnalyst({
   aiLoading,
   aiConfigured,
   onGenerate,
+  scoringIntelligence,
 }) {
   const slots = format === "SI" ? 1 : 2;
   const teamPlayers = [players.slice(0, slots), players.slice(slots)];
@@ -188,6 +189,14 @@ export default function MatchAnalyst({
         <p><strong>{strongest.name}</strong> is the highest-rated player in this matchup and supplies {teamNames[strongestTeam]} with the strongest individual baseline for {formatName(format)}.</p>
         <p><strong>{counter.name}</strong> is {underdog}’s strongest counter{ratingGap > 0 ? `, sitting about ${ratingGap} blended rating points behind the matchup leader` : " on the available blended ratings"}. <strong>{uncertainty.name}</strong> is the biggest uncertainty because {evidenceLabel(uncertainty.formatMatches).toLowerCase()} supports that player’s format profile.</p>
       </AnalystSection>
+
+      {scoringIntelligence?.available ? <AnalystSection title="Recorded Scoring Context">
+        <p><strong>This is observed scorecard context only.</strong> It is not included in the displayed win probability during Phase 3A.</p>
+        {scoringIntelligence.insights.length ? scoringIntelligence.insights.map((insight) => (
+          <p key={`${insight.title}-${insight.body}`}><strong>{insight.title}:</strong> {insight.body} Confidence: {insight.confidence}.</p>
+        )) : <p>The available recorded samples do not produce a meaningful matchup-specific edge.</p>}
+        {scoringIntelligence.incompleteComparison ? <p>Only one side has a relevant recorded sample, so no direct scoring advantage is declared.</p> : null}
+      </AnalystSection> : null}
 
       {format !== "SI" ? <AnalystSection title="Pairing Chemistry">
         {chemistry.map(({ pair, history, vibes }, index) => (
