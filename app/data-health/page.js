@@ -20,6 +20,7 @@ import {
   tournamentYear,
 } from "../../lib/tournament-identifiers";
 import { privatePageMetadata } from "../../lib/seo";
+import { buildScorecardAnalytics } from "../../lib/scorecard-analytics";
 
 export const metadata = privatePageMetadata("Data Health | Sandbagger Invitational");
 
@@ -36,7 +37,12 @@ const REQUIRED_COLUMNS = {
   courses: [["Year"], ["Course ID"], ["Course Name", "Course"], ["Format"]],
   handicaps: [["Year"], ["Player ID"], ["Team Side"], ["Tournament Handicap"]],
   scorecards: [["Course ID", "Course Name", "Course"], ["Tee", "Tee Name"], ["Course Rating", "Rating"], ["Slope Rating", "Slope"], ["Par"]],
-  holes: [["Course ID", "Course Name", "Course"], ["Tee", "Tee Name"], ["Hole Number"], ["Stroke Index", "Handicap", "Index"]],
+  holes: [["Course ID"], ["Tee"], ["Hole Number"], ["Yardage"], ["Par"], ["Stroke Index"]],
+  roundScorecards: [
+    ["Match ID"], ["Year"], ["Round"], ["Match"], ["Format"], ["Course ID"],
+    ["Player ID"], ["Team ID"], ...Array.from({ length: 18 }, (_, index) => [`Hole ${index + 1}`]),
+    ["Score Type"], ["Source"], ["Notes"], ["Scorecard Status"],
+  ],
   settings: [["Setting"], ["Value"]],
   draftSettings: [["Year"], ["Total Draft Picks", "Total Picks"], ["Team One ID", "Team 1 ID"], ["Team Two ID", "Team 2 ID"]],
   draftPicks: [["Year"], ["Pick Number"], ["Team ID"], ["Player ID"]],
@@ -122,6 +128,15 @@ export default async function DataHealthPage({ searchParams }) {
   const tournamentRules = diagnostics?.sheets.tournamentRules?.rows || [];
   const draftSettings = diagnostics?.sheets.draftSettings?.rows || [];
   const draftPicks = diagnostics?.sheets.draftPicks?.rows || [];
+  const roundScorecards = diagnostics?.sheets.roundScorecards?.rows || [];
+  const courseHoles = diagnostics?.sheets.holes?.rows || [];
+  const scorecardAnalytics = buildScorecardAnalytics({
+    roundScorecards,
+    matches,
+    courseHoles,
+    courses,
+    teamNames,
+  });
   const selectedTournament = tournaments.find((record) => tournamentYear(record) === Number(year)) || null;
   const selectedTournamentId = selectedTournament ? tournamentId(selectedTournament) : "";
   const explicitTournamentId = (record) => clean(record["Tournament ID"] || record.Year);
@@ -381,6 +396,68 @@ export default async function DataHealthPage({ searchParams }) {
                   </div>
                 ))}
               </div>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardHeader}>
+                <div><p>Available Scorecard History</p><h2>Scorecard analytics foundation</h2></div>
+              </div>
+              <div className={styles.summaryGrid}>
+                <div><strong>{scorecardAnalytics.report.scorecardRowsLoaded}</strong><span>Rows loaded</span></div>
+                <div><strong>{scorecardAnalytics.report.matchesCovered}</strong><span>Matches covered</span></div>
+                <div><strong>{scorecardAnalytics.report.missingExpectedScorecards}</strong><span>Missing expected</span></div>
+                <div><strong>{scorecardAnalytics.report.validationWarnings}</strong><span>Validation warnings</span></div>
+              </div>
+              <div className={styles.scorecardReport}>
+                <p>
+                  <strong>Status:</strong>{" "}
+                  {scorecardAnalytics.report.verifiedScorecards} verified ·{" "}
+                  {scorecardAnalytics.report.completeScorecards} complete ·{" "}
+                  {scorecardAnalytics.report.partialScorecards} partial
+                </p>
+                <p>
+                  <strong>Type:</strong>{" "}
+                  {scorecardAnalytics.report.individualScorecards} individual ·{" "}
+                  {scorecardAnalytics.report.teamScorecards} team
+                </p>
+                <p>
+                  <strong>Coverage:</strong>{" "}
+                  Scorecards cover {scorecardAnalytics.report.matchesCovered} of{" "}
+                  {scorecardAnalytics.report.matchesExpected} historical matches and{" "}
+                  {" "}{scorecardAnalytics.report.coursesCovered} courses.
+                </p>
+                <p>
+                  <strong>Unresolved IDs:</strong>{" "}
+                  Courses {scorecardAnalytics.report.unresolvedCourseIds.join(", ") || "none"} ·{" "}
+                  Players {scorecardAnalytics.report.unresolvedPlayerIds.join(", ") || "none"} ·{" "}
+                  Teams {scorecardAnalytics.report.unresolvedTeamIds.join(", ") || "none"}
+                </p>
+              </div>
+              {scorecardAnalytics.warnings.length ? (
+                <div className={styles.scorecardWarnings}>
+                  {scorecardAnalytics.warnings.map((item, index) => (
+                    <details className={styles.sheetRow} key={`${item.code}-${item.matchId}-${item.participant}-${index}`}>
+                      <summary>
+                        <i data-status="warning" />
+                        <div>
+                          <strong>{item.code}</strong>
+                          <span>
+                            {item.matchId || "Unknown match"} · {item.participant}
+                            {item.field ? ` · ${item.field}` : ""}
+                          </span>
+                        </div>
+                        <b>{item.year || "—"} R{item.round || "—"} M{item.matchNumber || "—"}</b>
+                      </summary>
+                      <div className={styles.sheetDetails}>
+                        {item.details ? <p><strong>Details:</strong> {item.details}</p> : null}
+                        <p><strong>Suggested correction:</strong> {item.suggestedCorrection}</p>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.checkList}><div data-ok="true">No scorecard validation warnings</div></div>
+              )}
             </section>
 
             <section className={styles.card}>
