@@ -38,7 +38,13 @@ test("full lineup alternatives remain advisory, distinct, and conflict-free", ()
   });
   assert.equal(plans.length, 3);
   assert.ok(plans.every((plan) => plan.validation.valid));
+  assert.ok(plans.every((plan) => plan.slots.every((slot) => slot.format !== "SI")));
   assert.deepEqual(plans.map((plan) => plan.label), ["Best Overall", "Safest", "Highest Upside"]);
+});
+
+test("Lineup Lab stays partnership-only while preserving future singles inputs", () => {
+  const singles = [{ id: "s1", label: "Player A", players: [{ id: "A" }], averageExpectedPoints: 2, confidence: "HIGH" }];
+  assert.deepEqual(buildLineupPlans({ singles }), []);
 });
 
 test("recommendation modes rank the same shared prediction rows differently", () => {
