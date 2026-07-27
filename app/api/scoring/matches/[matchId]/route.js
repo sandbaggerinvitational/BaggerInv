@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { canScoreMatch, verifyScoringSession } from "../../../../../lib/scoring-access.js";
 import {
+  confirmLiveMatchScorecard,
   readLiveScoringMatch,
   saveLiveHoleScore,
 } from "../../../../../lib/google-sheets-write.js";
@@ -43,7 +44,9 @@ export async function POST(request, { params }) {
       );
     }
     const input = await request.json();
-    const result = await saveLiveHoleScore(matchId, input, current.scorerName || "Authorized scorer");
+    const result = input.action === "confirm"
+      ? await confirmLiveMatchScorecard(matchId, current.scorerName || "Authorized scorer")
+      : await saveLiveHoleScore(matchId, input, current.scorerName || "Authorized scorer");
     return NextResponse.json({ result });
   } catch (error) {
     const conflict = /updated by someone else/i.test(error?.message || "");

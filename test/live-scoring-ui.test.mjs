@@ -7,9 +7,13 @@ test("mobile scorer supports match codes, admin mode, every format, and revision
   assert.match(source, /Match code/);
   assert.match(source, /Administrator/);
   assert.match(source, /format === "BB" \? 2 : 1/);
-  assert.match(source, /Team gross score/);
+  assert.match(source, /gross score/);
+  assert.match(source, /Submit final scorecard/);
+  assert.match(source, /Gets .*stroke/);
+  assert.match(source, /winnerLabel/);
+  assert.match(source, /scorecardGrid/);
   assert.match(source, /expectedRevision/);
-  assert.match(source, /Hole result/);
+  assert.match(source, /result<\/span><strong>{winnerLabel/);
 });
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {
@@ -25,8 +29,8 @@ test("new scoring writes require a separate test spreadsheet", async () => {
   assert.match(source, /SCORING_ENVIRONMENT !== "test"/);
   assert.match(source, /requires a separate test GOOGLE_SHEETS_ID/);
   assert.match(source, /expectedRevision/);
-  assert.match(source, /finalizeLiveMatch/);
   assert.match(source, /matchComplete/);
+  assert.match(source, /confirmLiveMatchScorecard/);
 });
 
 test("scoring login and writes are rate limited", async () => {
