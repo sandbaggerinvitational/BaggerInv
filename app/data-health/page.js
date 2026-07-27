@@ -244,6 +244,26 @@ export default async function DataHealthPage({ searchParams }) {
   }
   const handicapDuplicates = [...handicapKeys.entries()].filter(([, count]) => count > 1);
   const playerIds = new Set(players.map((player) => clean(player["Player ID"] || player.ID)).filter(Boolean));
+  const historicalTeamKeys = new Set(teamNames.flatMap((team) => {
+    const yearKey = clean(team.Year || team["Tournament ID"]);
+    const sideKey = clean(team["Team Side"]).toUpperCase();
+    const teamIdKey = clean(team["Team ID"]).toUpperCase();
+    return [
+      sideKey ? `${yearKey}|SIDE:${sideKey}` : "",
+      teamIdKey ? `${yearKey}|ID:${teamIdKey}` : "",
+    ].filter(Boolean);
+  }));
+  const unresolvedHistoricalRosterTeams = handicaps.filter((row) => {
+    const playerId = clean(row["Player ID"]);
+    const yearKey = clean(row.Year || row["Tournament ID"]);
+    const sideKey = clean(row["Team Side"]).toUpperCase();
+    const teamIdKey = clean(row["Team ID"]).toUpperCase();
+    if (!playerId || !yearKey || (!sideKey && !teamIdKey)) return false;
+    return !(
+      (sideKey && historicalTeamKeys.has(`${yearKey}|SIDE:${sideKey}`)) ||
+      (teamIdKey && historicalTeamKeys.has(`${yearKey}|ID:${teamIdKey}`))
+    );
+  });
   const yearDraftSettings = draftSettings.filter((record) => Number(record.Year) === Number(year));
   const yearDraftPicks = draftPicks.filter((record) => Number(record.Year) === Number(year));
   const missingDraftSettings = yearDraftSettings.length === 0;
@@ -607,6 +627,12 @@ export default async function DataHealthPage({ searchParams }) {
                   {draftTeamsMissing.length ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}
                 </div>
                 <div data-ok={handicapDuplicates.length ? "false" : "true"}>{handicapDuplicates.length ? `Duplicate Year + Player handicap rows: ${handicapDuplicates.map(([key]) => key.replace("|", " / ")).join(", ")}` : "No duplicate Year + Player handicap rows"}</div>
+                <div data-ok={unresolvedHistoricalRosterTeams.length ? "false" : "true"}>
+                  {unresolvedHistoricalRosterTeams.length
+                    ? `${unresolvedHistoricalRosterTeams.length} historical roster assignment${unresolvedHistoricalRosterTeams.length === 1 ? "" : "s"} cannot resolve a team for that year`
+                    : "Every historical roster assignment resolves to its year-specific team"}
+                  {unresolvedHistoricalRosterTeams.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}
+                </div>
                 <div data-ok={historicalTeamsMissingCaptain.length ? "false" : "true"}>
                   {historicalTeamsMissingCaptain.length ? `${historicalTeamsMissingCaptain.length} historical teams are missing a captain` : "Every historical team has a captain mapping"}
                   {historicalTeamsMissingCaptain.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}

@@ -87,6 +87,10 @@ function playerRow(id, points, wins) {
     }],
     seasons: [{
       year: 2025,
+      teamName: id === "P1" ? "The Pickles" : "Lipp it and Rip it",
+      teamLogo: id === "P1" ? "pickles.png" : "lipp.png",
+      teamColor: id === "P1" ? "#0b4335" : "#9a7422",
+      teamResolved: true,
       overall,
       BB: record(0, 0, 0, 0),
       SC: record(0, 0, 0, 0),
@@ -137,6 +141,8 @@ test("player intelligence combines official, scoring, progression, rankings, for
   assert.equal(intelligence.progression.closingRecord, "0-0-3");
   assert.equal(intelligence.rankings.careerPoints, 1);
   assert.equal(intelligence.tournamentHistory[0].year, 2025);
+  assert.equal(intelligence.tournamentHistory[0].teamName, "The Pickles");
+  assert.equal(intelligence.tournamentHistory[0].teamLogo, "pickles.png");
   assert.equal(intelligence.formats[0].code, "SI");
   assert.ok(intelligence.recordsHeld.some((item) => item.slug === "career-points"));
 });
@@ -160,18 +166,26 @@ test("Ghost Match exclusions preserve scoring intelligence and suppress negative
   assert.equal(intelligence.progression.mostConsecutiveHolesLost, 0);
 });
 
-test("player intelligence UI uses dense cards, aligned history, gold rankings, and compact missing scores", async () => {
-  const [component, profileCss, statsCss] = await Promise.all([
+test("player intelligence UI uses dense cards, year-specific teams, finish treatments, and compact missing scores", async () => {
+  const [component, profileCss, statsCss, dataHealth] = await Promise.all([
     readFile(new URL("../app/players/[slug]/PlayerIntelligenceSections.js", import.meta.url), "utf8"),
     readFile(new URL("../app/historical.module.css", import.meta.url), "utf8"),
     readFile(new URL("../app/scoring-stats.module.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/data-health/page.js", import.meta.url), "utf8"),
   ]);
 
   assert.match(component, /<ScoringStatGrid dense/);
   assert.match(component, /playerTournamentHistoryHead/);
   assert.match(component, /data-label="Finish"/);
-  assert.match(component, /season\.averageScore === null[\s\S]*\? "—"/);
+  assert.match(component, /TeamLogoPlate/);
+  assert.match(component, /playerTournamentTeam/);
+  assert.match(component, /upcoming \|\| season\.averageScore === null[\s\S]*\? "—"/);
+  assert.match(component, /data-finish=\{finishKey\}/);
   assert.match(profileCss, /\.playerRankingList strong[\s\S]*var\(--tsi-gold-600\)/);
   assert.match(profileCss, /\.playerTournamentHistory span[\s\S]*var\(--tsi-gold-600\)/);
+  assert.match(profileCss, /--history-team-color/);
+  assert.match(profileCss, /data-finish="champion"/);
   assert.match(statsCss, /\.dense \.card\{min-height:112px;padding:13px 15px/);
+  assert.match(dataHealth, /unresolvedHistoricalRosterTeams/);
+  assert.match(dataHealth, /Every historical roster assignment resolves to its year-specific team/);
 });

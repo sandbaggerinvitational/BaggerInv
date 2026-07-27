@@ -3,6 +3,7 @@ import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
 import { formatPercentage, formatRecord } from "../../../lib/stats";
 import { formatPoints } from "../../../lib/formatters";
+import TeamLogoPlate from "../../TeamLogoPlate";
 import styles from "../../historical.module.css";
 
 function IntelligenceSection({ eyebrow, title, children, open = false }) {
@@ -35,6 +36,47 @@ function RankingList({ rows }) {
         </Link>
       ))}
     </div>
+  );
+}
+
+function TournamentHistoryRow({ season }) {
+  const upcoming = season.finish === "Upcoming";
+  const finishKey = String(season.finish || "")
+    .toLowerCase()
+    .replace(/[^a-z]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return (
+    <Link
+      href={`/history/${season.year}`}
+      data-finish={finishKey}
+      style={{
+        "--history-team-color":
+          season.teamColor || "var(--tsi-gold-600)",
+      }}
+    >
+      <strong>{season.year}</strong>
+      <div className={styles.playerTournamentTeam}>
+        {season.teamLogo ? (
+          <TeamLogoPlate
+            filename={season.teamLogo}
+            teamName={season.teamName}
+            variant="scoreboard"
+          />
+        ) : null}
+        {season.teamName ? <b>{season.teamName}</b> : null}
+      </div>
+      <span data-label="Finish">
+        <em className={styles.playerTournamentFinish}>{season.finish}</em>
+      </span>
+      <span data-label="Record">{upcoming ? "—" : season.recordDisplay}</span>
+      <span data-label="Points">{upcoming ? "—" : formatPoints(season.points)}</span>
+      <span data-label="Avg Score">
+        {upcoming || season.averageScore === null
+          ? "—"
+          : formatScoringNumber(season.averageScore)}
+      </span>
+    </Link>
   );
 }
 
@@ -120,23 +162,14 @@ export default function PlayerIntelligenceSections({
         <div className={styles.playerTournamentHistory}>
           <div className={styles.playerTournamentHistoryHead} aria-hidden="true">
             <span>Year</span>
+            <span>Team</span>
             <span>Finish</span>
             <span>Record</span>
             <span>Points</span>
             <span>Avg Score</span>
           </div>
           {intelligence.tournamentHistory.map((season) => (
-            <Link href={`/history/${season.year}`} key={season.year}>
-              <strong>{season.year}</strong>
-              <span data-label="Finish">{season.finish}</span>
-              <span data-label="Record">{season.recordDisplay}</span>
-              <span data-label="Points">{formatPoints(season.points)}</span>
-              <span data-label="Avg Score">
-                {season.averageScore === null
-                  ? "—"
-                  : formatScoringNumber(season.averageScore)}
-              </span>
-            </Link>
+            <TournamentHistoryRow season={season} key={season.year} />
           ))}
         </div>
       </IntelligenceSection>

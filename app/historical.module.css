@@ -4850,7 +4850,7 @@
 .playerTournamentHistoryHead,
 .playerTournamentHistory > a {
   display: grid;
-  grid-template-columns: .55fr 1fr .75fr .65fr 1fr;
+  grid-template-columns: .45fr minmax(150px, 1.35fr) .8fr .65fr .6fr .75fr;
   gap: 16px;
   align-items: center;
 }
@@ -4867,7 +4867,8 @@
 
 .playerTournamentHistory > a {
   min-height: 48px;
-  padding: 10px 5px;
+  padding: 9px 8px;
+  border-left: 3px solid var(--history-team-color, var(--tsi-gold-600));
   border-bottom: 1px solid var(--tsi-line);
   color: var(--tsi-ink);
 }
@@ -4886,6 +4887,56 @@
   color: var(--tsi-gold-600);
   font-size: .88rem;
   font-weight: 700;
+}
+
+.playerTournamentTeam {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playerTournamentTeam .teamLogoPlateScoreboard {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-width: 1px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .1);
+}
+
+.playerTournamentTeam b {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--tsi-gold-600);
+  font-size: .82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerTournamentFinish {
+  font-style: normal;
+}
+
+.playerTournamentHistory > a[data-finish="champion"] .playerTournamentFinish,
+.playerTournamentHistory > a[data-finish="runner-up"] .playerTournamentFinish {
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: .65rem;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.playerTournamentHistory > a[data-finish="champion"] .playerTournamentFinish {
+  border: 1px solid rgba(177, 137, 50, .5);
+  background: rgba(177, 137, 50, .12);
+  color: var(--tsi-gold-600);
+}
+
+.playerTournamentHistory > a[data-finish="runner-up"] .playerTournamentFinish {
+  border: 1px solid rgba(116, 124, 121, .35);
+  background: rgba(116, 124, 121, .09);
+  color: var(--tsi-muted);
 }
 
 .playerFormatIntelligence {
@@ -5008,15 +5059,29 @@
 
   .playerTournamentHistory > a {
     margin-bottom: 8px;
-    padding: 11px 12px;
+    padding: 10px 11px;
     border: 1px solid var(--tsi-line);
+    border-left: 3px solid var(--history-team-color, var(--tsi-gold-600));
     border-radius: 12px;
     grid-template-columns: 1fr 1fr;
     gap: 7px 16px;
   }
 
-  .playerTournamentHistory > a strong {
+  .playerTournamentHistory > a strong,
+  .playerTournamentTeam {
     grid-column: 1 / -1;
+  }
+
+  .playerTournamentTeam {
+    margin-top: -2px;
+  }
+
+  .playerTournamentTeam:empty {
+    display: none;
+  }
+
+  .playerTournamentTeam b {
+    white-space: normal;
   }
 
   .playerTournamentHistory > a span {
