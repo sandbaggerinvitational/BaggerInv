@@ -25,7 +25,7 @@ test("Phase 2 public pages consume the shared scorecard analytics service", asyn
   }
   assert.match(sources.round, /Round Statistics/);
   assert.match(sources.tournament, /Tournament Scoring Statistics/);
-  assert.match(sources.player, /Scoring Statistics/);
+  assert.match(sources.player, /PlayerIntelligenceSections/);
   assert.match(sources.course, /Course Statistics/);
   assert.match(sources.hole, /Hole Statistics/);
   assert.match(sources.records, /Scoring Records/);
