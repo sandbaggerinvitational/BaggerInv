@@ -151,9 +151,10 @@ function buildIndividualScoreLeaderboard(holeScores, matchMap, courseHoles, play
       const playerIds = [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]].map(clean).filter(Boolean);
       playerIds.forEach((playerId, index) => {
         const gross = format === "SC" ? (grossScores[0] ?? null) : (grossScores[index] ?? null);
-        const strokes = format === "SC"
-          ? getStrokesOnHole(match[`Team ${side} Stroke`], strokeIndex)
-          : getStrokesOnHole(match[`Team ${side} Player ${index + 1} Stroke`], strokeIndex);
+        const allocated = format === "SC"
+          ? (clean(match[`Team ${side} Stroke`]) || match[`Team ${side} Playing HCP`])
+          : (clean(match[`Team ${side} Player ${index + 1} Stroke`]) || match[`Team ${side} Player ${index + 1} Playing HCP`]);
+        const strokes = getStrokesOnHole(allocated, strokeIndex);
         const net = format === "SC" ? number(row[`Team ${side} Net Score`]) : gross === null ? null : gross - strokes;
         add({ playerId, round, gross, net, par, holeNumber: row["Hole Number"] });
       });
