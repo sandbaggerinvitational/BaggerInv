@@ -60,6 +60,8 @@ code—not the hash—to the designated golfers.
 - `/live` shows match position and refreshes about every 15 seconds.
 - Front, back, and overall points total three for Best Ball and Scramble.
 - Singles awards three overall points.
+- A completed match finalizes automatically into `Matches`.
+- Admin reopening permits a correction and creates another audit entry.
 
 Nothing should be merged or connected to production until this checklist passes
 on multiple phones in the preview environment.

@@ -47,9 +47,12 @@ export default function ScoreEntry() {
     if (!response.ok) throw new Error(payload.error || "Unable to load the match.");
     setMatchId(id);
     setData(payload.data);
-    const firstOpen = Array.from({ length: 18 }, (_, index) => index + 1)
-      .find((hole) => !payload.data.holeScores.some((item) => Number(item["Hole Number"]) === hole)) || 18;
-    selectHole(firstOpen, payload.data);
+    const scored = payload.data.holeScores.map((item) => Number(item["Hole Number"]));
+    const targetHole = payload.data.match["Match Status"] === "Final"
+      ? Math.max(1, ...scored)
+      : Array.from({ length: 18 }, (_, index) => index + 1)
+        .find((hole) => !scored.includes(hole)) || 18;
+    selectHole(targetHole, payload.data);
   };
 
   const login = async () => {
@@ -89,6 +92,7 @@ export default function ScoreEntry() {
   };
 
   const match = data?.match || {};
+  const isFinal = match["Match Status"] === "Final";
   const format = String(match.Format || "").toUpperCase();
   const slots = format === "BB" ? 2 : 1;
   const savedHole = data?.holeScores?.find((item) => Number(item["Hole Number"]) === holeNumber);
@@ -154,13 +158,14 @@ export default function ScoreEntry() {
       return <fieldset key={side}><legend>Team {side}</legend>
         {Array.from({ length: slots }, (_, index) => <label key={index}>
           {format === "SC" ? "Team gross score" : ids[index] || `Player ${index + 1}`}
-          <input type="number" inputMode="numeric" min="1" max="20" value={gross[key][index] || ""} onChange={(event) => setScore(key, index, event.target.value)} />
+          <input disabled={isFinal} type="number" inputMode="numeric" min="1" max="20" value={gross[key][index] || ""} onChange={(event) => setScore(key, index, event.target.value)} />
         </label>)}
         {savedHole && <small>Net {savedHole[`Team ${side} Net Score`]}</small>}
       </fieldset>;
     })}</div>
     {savedHole && <div className={styles.result}><span>Hole result</span><strong>{savedHole["Hole Winner"]}</strong><small>Revision {savedHole.Revision} · {savedHole["Updated By"]}</small></div>}
-    <button className={styles.primary} disabled={busy || gross.team1.length < slots || gross.team2.length < slots} onClick={save}>{savedHole ? "Update hole" : "Save hole"}</button>
+    {isFinal && <div className={styles.result}><span>Match complete</span><strong>{match.Notes || match["Match Status Text"] || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
+    <button className={styles.primary} disabled={isFinal || busy || gross.team1.length < slots || gross.team2.length < slots} onClick={save}>{isFinal ? "Match finalized" : savedHole ? "Update hole" : "Save hole"}</button>
     {status && <p className={styles.status}>{status}</p>}
   </section>;
 }

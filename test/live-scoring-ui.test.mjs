@@ -25,4 +25,6 @@ test("new scoring writes require a separate test spreadsheet", async () => {
   assert.match(source, /SCORING_ENVIRONMENT !== "test"/);
   assert.match(source, /requires a separate test GOOGLE_SHEETS_ID/);
   assert.match(source, /expectedRevision/);
+  assert.match(source, /finalizeLiveMatch/);
+  assert.match(source, /matchComplete/);
 });
