@@ -9,11 +9,13 @@ test("mobile scorer supports match codes, admin mode, every format, and revision
   assert.match(source, /format === "BB" \? 2 : 1/);
   assert.match(source, /gross score/);
   assert.match(source, /Submit final scorecard/);
-  assert.match(source, /Gets .*stroke/);
-  assert.match(source, /winnerLabel/);
-  assert.match(source, /scorecardGrid/);
+  assert.match(source, /strokeDots/);
+  assert.match(source, /namedMatchStatus/);
+  assert.match(source, /holeNavigator/);
+  assert.match(source, /scorecardRow/);
+  assert.match(source, /Gross &amp; net/);
   assert.match(source, /expectedRevision/);
-  assert.match(source, /result<\/span><strong>{winnerLabel/);
+  assert.match(source, /<strong>{namedMatchStatus\(data\?\.holeScores, teamNames\)}<\/strong>/);
 });
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {

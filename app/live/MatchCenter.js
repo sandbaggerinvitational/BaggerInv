@@ -141,6 +141,20 @@ function MobileTournamentInsights({ tournament, round, rounds, remainingByRound,
   </div>;
 }
 
+function TeamScoreLeaderboard({ rows = [] }) {
+  if (!rows.some((row) => row.holes)) return null;
+  return <section className={styles.liveScoreLeaderboard} id="team-score-leaderboard">
+    <div className={styles.leaderboardHeader}><div><span>Live Scoring</span><h2>Gross &amp; Net Leaderboard <em data-mode="live">Live</em></h2></div></div>
+    <div className={styles.liveScoreTable}>
+      <div className={styles.liveScoreRow} data-header="true"><span>Team</span><span>Holes</span><span>Gross</span><span>Net</span></div>
+      {rows.map((row, index) => <div className={styles.liveScoreRow} data-leader={index === 0 ? "true" : undefined} key={row.id}>
+        <strong>{row.name}</strong><span>{row.holes}</span><b>{row.gross}</b><b>{row.net}</b>
+      </div>)}
+    </div>
+    <p>Totals use each team’s best gross ball and calculated net score for every recorded hole.</p>
+  </section>;
+}
+
 export default function MatchCenter({ initialData, loadError }) {
   const router = useRouter();
   const tournament = initialData?.tournament;
@@ -180,10 +194,11 @@ export default function MatchCenter({ initialData, loadError }) {
       {rounds.length ? <RoundNavigation rounds={rounds} activeRound={active?.number} onSelect={setActiveRound} /> : null}
       <div className={styles.desktopInsights}>{active ? <RoundProgress round={active} /> : null}<TournamentStats tournament={tournament} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} /></div>
       <MobileTournamentInsights tournament={tournament} round={active} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} />
-      {active ? <><div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong>{formatPoints(roundTotals.teamOne)} – {formatPoints(roundTotals.teamTwo)}</strong></div></div><div className={styles.matchGrid}>{active.matches.map((match) => <PublicMatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div></> : null}
-      {rankedLeaderboard.length ? <><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>{leaderboardTitle} {isLive || championshipMode ? <em data-mode={championshipMode ? "final" : "live"}>{championshipMode ? "Final" : "Live"}</em> : null}</h2></div></div>
+      {active ? <section id="live-matchups"><div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong>{formatPoints(roundTotals.teamOne)} – {formatPoints(roundTotals.teamTwo)}</strong></div></div><div className={styles.matchGrid}>{active.matches.map((match) => <PublicMatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div></section> : null}
+      <TeamScoreLeaderboard rows={initialData?.scoreLeaderboard || []} />
+      {rankedLeaderboard.length ? <section id="individual-points-leaderboard"><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>{leaderboardTitle} {isLive || championshipMode ? <em data-mode={championshipMode ? "final" : "live"}>{championshipMode ? "Final" : "Live"}</em> : null}</h2></div></div>
         <TournamentLeaderboard rows={leaderboard} />
-        {rankedLeaderboard.length > 5 ? <button className={styles.leaderboardToggle} type="button" onClick={() => setShowLeaderboard((value) => !value)}>{showLeaderboard ? "Show Top Five" : "View Full Leaderboard →"}</button> : null}</> : null}
+        {rankedLeaderboard.length > 5 ? <button className={styles.leaderboardToggle} type="button" onClick={() => setShowLeaderboard((value) => !value)}>{showLeaderboard ? "Show Top Five" : "View Full Leaderboard →"}</button> : null}</section> : null}
       {loadError ? <p className={styles.testNote}>{loadError}</p> : null}
     </section>
   </>;

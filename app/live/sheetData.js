@@ -65,6 +65,14 @@ async function fetchSheet(sheetName) {
   return table(parseCsv(text));
 }
 
+async function fetchOptionalSheet(sheetName) {
+  try {
+    return await fetchSheet(sheetName);
+  } catch {
+    return [];
+  }
+}
+
 function formatTime(value) {
   const raw = clean(value);
   if (!raw) return "";
@@ -85,8 +93,44 @@ function normalizeWinner(value) {
   return "";
 }
 
+function replaceTeamIds(value, teams) {
+  return clean(value)
+    .replace(/\bTeam 1\b/gi, teams[1]?.name || "Team 1")
+    .replace(/\bTeam 2\b/gi, teams[2]?.name || "Team 2");
+}
+
 function displayFormat(code) {
   return ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[clean(code).toUpperCase()] || clean(code);
+}
+
+function scoreArray(value) {
+  try {
+    const parsed = JSON.parse(clean(value) || "[]");
+    return Array.isArray(parsed) ? parsed.map(number).filter((item) => item !== null) : [];
+  } catch {
+    return [];
+  }
+}
+
+function buildTeamScoreLeaderboard(holeScores, matchMap, teams) {
+  const totals = {
+    1: { id: teams[1].id || "Team 1", name: teams[1].name, gross: 0, net: 0, holes: 0 },
+    2: { id: teams[2].id || "Team 2", name: teams[2].name, gross: 0, net: 0, holes: 0 },
+  };
+  for (const row of holeScores) {
+    const match = matchMap.get(clean(row["Match ID"]));
+    if (!match) continue;
+    for (const side of [1, 2]) {
+      const grossScores = scoreArray(row[`Team ${side} Gross Scores`]);
+      const gross = grossScores.length ? Math.min(...grossScores) : null;
+      const net = number(row[`Team ${side} Net Score`]);
+      if (gross === null || net === null) continue;
+      totals[side].gross += gross;
+      totals[side].net += net;
+      totals[side].holes += 1;
+    }
+  }
+  return Object.values(totals).sort((a, b) => a.net - b.net || a.gross - b.gross);
 }
 
 function playerEntry(row, side, slot, playerMap) {
@@ -160,9 +204,10 @@ function tieAdvantageSide(tournamentRow, teams) {
 }
 
 export async function getTournamentData() {
-  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules] = await Promise.all([
+  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores] = await Promise.all([
     fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
     fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
+    fetchOptionalSheet("Live Hole Scores"),
   ]);
 
   const active = [...liveTournaments]
@@ -234,8 +279,8 @@ export async function getTournamentData() {
         teeTime: formatTime(liveRow["Tee Time"] || permanent["Tee Time"]),
         status,
         finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",
-        notes: publicResultAllowed ? (authoritative.Notes || "") : "",
-        liveStatusText: publicResultAllowed ? (authoritative["Match Status Text"] || "") : "",
+        notes: publicResultAllowed ? replaceTeamIds(authoritative.Notes, teams) : "",
+        liveStatusText: publicResultAllowed ? replaceTeamIds(authoritative["Match Status Text"], teams) : "",
         team1Players: [playerEntry(liveRow, 1, 1, playerMap), playerEntry(liveRow, 1, 2, playerMap)].filter(Boolean),
         team2Players: [playerEntry(liveRow, 2, 1, playerMap), playerEntry(liveRow, 2, 2, playerMap)].filter(Boolean),
         team1PlayingHcp: number(liveRow["Team 1 Playing HCP"]),
@@ -298,5 +343,10 @@ export async function getTournamentData() {
     remainingByRound: remainingByRound(rounds),
     momentum: getTeamMomentum(rounds),
     leaderboard: buildLeaderboard(matches, playerMap, teams),
+    scoreLeaderboard: buildTeamScoreLeaderboard(
+      liveHoleScores.filter((row) => liveMap.has(clean(row["Match ID"]))),
+      liveMap,
+      teams
+    ),
   };
 }

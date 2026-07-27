@@ -1133,3 +1133,22 @@
   .matchupTeams .matchTeamHeader { gap: 6px; }
   .matchupTeams .matchTeamHeader > span { font-size: .56rem; }
 }
+
+/* Live gross/net totals fed directly by recorded hole scores. */
+.liveScoreLeaderboard { scroll-margin-top: 24px; margin-top: 42px; }
+.liveScoreTable { overflow: hidden; border: 1px solid #ded8cd; border-radius: 16px; background: #fff; box-shadow: 0 12px 30px rgba(11,53,41,.06); }
+.liveScoreRow { display: grid; grid-template-columns: minmax(150px,2fr) repeat(3,1fr); align-items: center; min-height: 58px; border-bottom: 1px solid #ece7de; }
+.liveScoreRow:last-child { border-bottom: 0; }
+.liveScoreRow > * { padding: 12px 18px; text-align: center; }
+.liveScoreRow > *:first-child { text-align: left; }
+.liveScoreRow[data-header="true"] { min-height: 44px; background: #0b4938; color: #fff; font-size: .72rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.liveScoreRow[data-leader="true"] { background: #e8f2ed; }
+.liveScoreRow[data-leader="true"] > strong { color: #0b4938; }
+.liveScoreLeaderboard > p { color: #6d746f; font-size: .76rem; }
+#live-matchups, #individual-points-leaderboard { scroll-margin-top: 24px; }
+
+@media (max-width: 600px) {
+  .liveScoreRow { grid-template-columns: minmax(120px,1.7fr) repeat(3,.7fr); }
+  .liveScoreRow > * { padding: 10px 6px; font-size: .82rem; }
+  .liveScoreRow[data-header="true"] > * { font-size: .62rem; }
+}
