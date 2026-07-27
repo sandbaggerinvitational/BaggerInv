@@ -112,6 +112,7 @@ test("Ghost Match golfers keep progression credit but are excluded from negative
   assert.equal(playerOne.largestLeadBlown, 0);
   assert.equal(playerOne.mostConsecutiveHolesLost, 0);
   assert.equal(playerTwo.largestComebackCompleted, 3);
+  assert.equal(playerTwo.matchesWonAfterTrailing, 1);
   assert.equal(
     analytics.byRecordSlug["largest-lead-blown"].entries.some((entry) =>
       entry.playerIds.includes("P1")
