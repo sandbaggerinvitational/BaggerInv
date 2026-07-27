@@ -30,6 +30,7 @@ import { getDrafts } from "../../../lib/draft";
 import { getPlayerDraftHistory } from "../../../lib/draft-analytics";
 import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import { filterScorecards } from "../../../lib/scorecard-analytics";
+import { playerHoleByHoleAnalytics } from "../../../lib/hole-by-hole-analytics";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 
 export async function generateMetadata({ params }) {
@@ -176,6 +177,10 @@ export default async function PlayerPage({ params, searchParams }) {
   const careerYears = formatPlayerCareerYears(player, recordedAppearanceYears);
   const scorecardAnalytics = await scorecardAnalyticsPromise;
   const playerScoring = scorecardAnalytics.playerSummary(player["Player ID"]);
+  const playerHoleAnalytics = playerHoleByHoleAnalytics(
+    scorecardAnalytics.scorecards,
+    player["Player ID"]
+  );
   const playerMatchIds = new Set(
     Object.values(formatMatchHistory).flatMap((history) => history.matches.map((match) => match.id))
   );
@@ -497,6 +502,55 @@ export default async function PlayerPage({ params, searchParams }) {
             },
           ]} />
         </section>
+
+        <details className={styles.holeAnalyticsDetails}>
+          <summary>
+            <div>
+              <span className={styles.sectionLabel}>Complete Scorecards Only</span>
+              <h2>Hole-by-Hole Analytics</h2>
+            </div>
+            <b>View analytics</b>
+          </summary>
+          <div className={styles.holeAnalyticsBody}>
+            <p>Based only on COMPLETE and VERIFIED scorecards. Partial and missing scorecards are excluded.</p>
+            <h3>Match Play</h3>
+            <ScoringStatGrid items={[
+              { label: "Total Holes Played", value: playerHoleAnalytics.totalHolesPlayed, sample: `Based on ${playerHoleAnalytics.sample.matchPlayHoles} match-play holes` },
+              { label: "Holes Won", value: playerHoleAnalytics.holesWon, sample: `Based on ${playerHoleAnalytics.sample.matchPlayHoles} match-play holes` },
+              { label: "Holes Lost", value: playerHoleAnalytics.holesLost, sample: `Based on ${playerHoleAnalytics.sample.matchPlayHoles} match-play holes` },
+              { label: "Holes Halved", value: playerHoleAnalytics.holesHalved, sample: `Based on ${playerHoleAnalytics.sample.matchPlayHoles} match-play holes` },
+              { label: "Hole Differential", value: formatScoringNumber(playerHoleAnalytics.holeDifferential, { signed: true, decimals: 0 }), sample: "Holes won minus holes lost" },
+              { label: "Front Nine Holes Won", value: playerHoleAnalytics.frontNineHolesWon, sample: `Based on ${playerHoleAnalytics.sample.matchPlayHoles} match-play holes` },
+              { label: "Back Nine Holes Won", value: playerHoleAnalytics.backNineHolesWon, sample: `Based on ${playerHoleAnalytics.sample.matchPlayHoles} match-play holes` },
+              { label: "Closing Holes Won (16–18)", value: playerHoleAnalytics.closingHolesWon, sample: `Based on ${playerHoleAnalytics.sample.matchPlayHoles} match-play holes` },
+            ]} />
+            <h3>Scoring</h3>
+            <ScoringStatGrid items={[
+              { label: "Birdies", value: playerHoleAnalytics.birdies, sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Eagles", value: playerHoleAnalytics.eagles, sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Pars", value: playerHoleAnalytics.pars, sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Bogeys", value: playerHoleAnalytics.bogeys, sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Double Bogeys+", value: playerHoleAnalytics.doubleBogeysOrWorse, sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+            ]} />
+            <h3>Scoring Averages</h3>
+            <ScoringStatGrid items={[
+              { label: "Average Gross Score", value: formatScoringNumber(playerHoleAnalytics.averageGrossScore), sample: `Based on ${playerHoleAnalytics.sample.completeScorecards} complete scorecards` },
+              { label: "Average Net Score", value: formatScoringNumber(playerHoleAnalytics.averageNetScore), sample: `Based on ${playerHoleAnalytics.sample.completeScorecards} complete scorecards with official stroke mapping` },
+              { label: "Par 3 Average", value: formatScoringNumber(playerHoleAnalytics.averagePar3Score), sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Par 4 Average", value: formatScoringNumber(playerHoleAnalytics.averagePar4Score), sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Par 5 Average", value: formatScoringNumber(playerHoleAnalytics.averagePar5Score), sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Front Nine Average", value: formatScoringNumber(playerHoleAnalytics.averageFrontNineScore), sample: `Based on ${playerHoleAnalytics.sample.completeScorecards} complete scorecards` },
+              { label: "Back Nine Average", value: formatScoringNumber(playerHoleAnalytics.averageBackNineScore), sample: `Based on ${playerHoleAnalytics.sample.completeScorecards} complete scorecards` },
+            ]} />
+            <h3>Percentages</h3>
+            <ScoringStatGrid items={[
+              { label: "Birdie %", value: formatScoringNumber(playerHoleAnalytics.birdieRate, { percentage: true }), sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Par %", value: formatScoringNumber(playerHoleAnalytics.parRate, { percentage: true }), sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Bogey %", value: formatScoringNumber(playerHoleAnalytics.bogeyRate, { percentage: true }), sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+              { label: "Double Bogey+ %", value: formatScoringNumber(playerHoleAnalytics.doubleBogeyOrWorseRate, { percentage: true }), sample: `Based on ${playerHoleAnalytics.sample.scoringHoles} scoring holes` },
+            ]} />
+          </div>
+        </details>
 
         {playerDraftHistory.length ? (
           <section className={styles.section}>
