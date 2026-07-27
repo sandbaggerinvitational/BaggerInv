@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import styles from "./score.module.css";
 
 const jsonScores = (value) => {
   try { return JSON.parse(value || "[]"); } catch { return []; }
 };
+const SCORING_SESSION_KEY = "sbi-live-scoring-session";
 
 function playerIds(match, side) {
   return [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]].filter(Boolean);
@@ -50,6 +51,7 @@ export default function ScoreEntry() {
   const [lastSaved, setLastSaved] = useState("");
   const [showReview, setShowReview] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [restoring, setRestoring] = useState(true);
 
   const request = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -74,6 +76,10 @@ export default function ScoreEntry() {
     if (!response.ok) throw new Error(payload.error || "Unable to load the match.");
     setMatchId(id);
     setData(payload.data);
+    try {
+      const saved = JSON.parse(window.sessionStorage.getItem(SCORING_SESSION_KEY) || "{}");
+      window.sessionStorage.setItem(SCORING_SESSION_KEY, JSON.stringify({ ...saved, token: sessionToken, matchId: id }));
+    } catch {}
     setShowReview(payload.data.match["Match Status"] === "Final" || Boolean(payload.data.canConfirm));
     setConfirming(false);
     const scored = payload.data.holeScores.map((item) => Number(item["Hole Number"]));
@@ -83,6 +89,36 @@ export default function ScoreEntry() {
         .find((hole) => !scored.includes(hole)) || 18;
     selectHole(targetHole, payload.data);
   };
+
+  const loadAdminMatches = async (sessionToken) => {
+    const response = await fetch("/api/scoring/matches", {
+      headers: { authorization: `Bearer ${sessionToken}` },
+      cache: "no-store",
+    });
+    const list = await response.json();
+    if (!response.ok) throw new Error(list.error || "Unable to load matches.");
+    setMatchOptions(list.matches || []);
+  };
+
+  useEffect(() => {
+    const restore = async () => {
+      try {
+        const saved = JSON.parse(window.sessionStorage.getItem(SCORING_SESSION_KEY) || "null");
+        if (!saved?.token || !["match", "admin"].includes(saved.scope)) return;
+        setToken(saved.token);
+        setName(saved.scorerName || "");
+        if (saved.matchId) await loadMatch(saved.matchId, saved.token);
+        else if (saved.scope === "admin") await loadAdminMatches(saved.token);
+      } catch {
+        window.sessionStorage.removeItem(SCORING_SESSION_KEY);
+        setToken("");
+        setData(null);
+      } finally {
+        setRestoring(false);
+      }
+    };
+    restore();
+  }, []);
 
   const login = async () => {
     setBusy(true); setStatus("Opening scoring…");
@@ -95,16 +131,16 @@ export default function ScoreEntry() {
         }),
       });
       setToken(payload.token);
+      window.sessionStorage.setItem(SCORING_SESSION_KEY, JSON.stringify({
+        token: payload.token,
+        scope: payload.scope,
+        matchId: payload.matchId || "",
+        scorerName: name.trim(),
+      }));
       if (payload.scope === "match") {
         await loadMatch(payload.matchId, payload.token);
       } else {
-        const response = await fetch("/api/scoring/matches", {
-          headers: { authorization: `Bearer ${payload.token}` },
-          cache: "no-store",
-        });
-        const list = await response.json();
-        if (!response.ok) throw new Error(list.error || "Unable to load matches.");
-        setMatchOptions(list.matches || []);
+        await loadAdminMatches(payload.token);
       }
       setStatus("");
     } catch (error) { setStatus(error.message); }
@@ -216,6 +252,10 @@ export default function ScoreEntry() {
     <Link href={`/live?view=scores&round=${match.Round}`}>Gross &amp; net</Link>
     <Link href={`/live?view=points&round=${match.Round}`}>Player points</Link>
   </nav>;
+
+  if (restoring) return <section className={styles.login}>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>Opening scoring…</h1><p>Restoring your authorized match.</p></div>
+  </section>;
 
   if (!token) return <section className={styles.login}>
     <div className={styles.brand}><span>SBI LIVE</span><h1>Enter scores</h1><p>Use the code assigned to your match.</p></div>

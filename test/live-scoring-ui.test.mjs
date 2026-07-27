@@ -15,6 +15,8 @@ test("mobile scorer supports match codes, admin mode, every format, and revision
   assert.match(source, /scorecardRow/);
   assert.match(source, /Gross &amp; net/);
   assert.match(source, /expectedRevision/);
+  assert.match(source, /sessionStorage\.setItem\(SCORING_SESSION_KEY/);
+  assert.match(source, /Restoring your authorized match/);
   assert.match(source, /<strong>{namedMatchStatus\(data\?\.holeScores, teamNames\)}<\/strong>/);
 });
 
@@ -35,14 +37,13 @@ test("new scoring writes require a separate test spreadsheet", async () => {
   assert.match(source, /confirmLiveMatchScorecard/);
 });
 
-test("scoring login and writes are rate limited", async () => {
+test("scoring login remains retryable while writes are rate limited", async () => {
   const [session, match] = await Promise.all([
     readFile(new URL("../app/api/scoring/session/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/matches/[matchId]/route.js", import.meta.url), "utf8"),
   ]);
-  assert.match(session, /scoring-login:/);
-  assert.match(session, /limit:\s*5/);
-  assert.match(session, /Retry-After/);
+  assert.doesNotMatch(session, /scoring-login:/);
+  assert.doesNotMatch(session, /Too many scoring login attempts/);
   assert.match(match, /scoring-write:/);
   assert.match(match, /limit:\s*30/);
 });
