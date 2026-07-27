@@ -29,6 +29,7 @@ test("live match status reports holes won and the through-hole position", () => 
   assert.deepEqual(status, {
     currentHole: 3, team1HolesWon: 2, team2HolesWon: 0,
     holesRemaining: 15, statusText: "Team 1 2 UP through 3",
+    complete: false, winner: "",
   });
 });
 
@@ -47,6 +48,20 @@ test("singles awards all three points for the overall match", () => {
     holeNumber: index + 1,
     winner: index < 10 ? "Team 1" : "Team 2",
   }));
+  assert.deepEqual(calculateMatchPoints("SI", holes), {
+    frontWinner: "", backWinner: "", overallWinner: "Team 1",
+    team1Points: 3, team2Points: 0,
+  });
+});
+
+test("singles closes early once the lead exceeds holes remaining", () => {
+  const holes = Array.from({ length: 16 }, (_, index) => ({
+    holeNumber: index + 1,
+    winner: index < 9 ? "Team 1" : index < 15 ? "Team 2" : "Halved",
+  }));
+  const status = calculateLiveMatchStatus(holes, "SI");
+  assert.equal(status.statusText, "Team 1 wins 3 & 2");
+  assert.equal(status.complete, true);
   assert.deepEqual(calculateMatchPoints("SI", holes), {
     frontWinner: "", backWinner: "", overallWinner: "Team 1",
     team1Points: 3, team2Points: 0,
