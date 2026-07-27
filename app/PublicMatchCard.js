@@ -5,6 +5,7 @@ import { teamLogo } from "../lib/asset-paths";
 import { formatHandicap, formatPoints } from "../lib/formatters";
 import styles from "./live/live.module.css";
 import ScorecardTable from "./ScorecardTable";
+import MatchProgressionSummary from "./MatchProgressionSummary";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const initials = (name) => String(name ?? "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -146,7 +147,10 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     ) : null}
     <MatchupRoster tournament={tournament} match={match} />
     {variant === "historical" ? (
-      <ScorecardTable scorecards={scorecards} compact />
+      <>
+        <ScorecardTable scorecards={scorecards} compact />
+        <MatchProgressionSummary scorecards={scorecards} />
+      </>
     ) : null}
     <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
       {match.format !== "SI" ? <>
