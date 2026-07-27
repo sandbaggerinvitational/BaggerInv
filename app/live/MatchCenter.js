@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import AssetImage from "../AssetImage";
 import PublicMatchCard from "../PublicMatchCard";
@@ -141,22 +141,26 @@ function MobileTournamentInsights({ tournament, round, rounds, remainingByRound,
   </div>;
 }
 
-function TeamScoreLeaderboard({ rows = [] }) {
+const toPar = (value) => Number(value) === 0 ? "E" : Number(value) > 0 ? `+${value}` : String(value);
+
+function IndividualScoreLeaderboard({ rows = [], round }) {
   if (!rows.some((row) => row.holes)) return null;
-  return <section className={styles.liveScoreLeaderboard} id="team-score-leaderboard">
-    <div className={styles.leaderboardHeader}><div><span>Live Scoring</span><h2>Gross &amp; Net Leaderboard <em data-mode="live">Live</em></h2></div></div>
+  const filtered = rows.filter((row) => !round || Number(row.round) === Number(round));
+  return <section className={styles.liveScoreLeaderboard} id="individual-score-leaderboard">
+    <div className={styles.leaderboardHeader}><div><span>Round {round} Live Scoring</span><h2>Individual Gross &amp; Net <em data-mode="live">Live</em></h2></div></div>
     <div className={styles.liveScoreTable}>
-      <div className={styles.liveScoreRow} data-header="true"><span>Team</span><span>Holes</span><span>Gross</span><span>Net</span></div>
-      {rows.map((row, index) => <div className={styles.liveScoreRow} data-leader={index === 0 ? "true" : undefined} key={row.id}>
-        <strong>{row.name}</strong><span>{row.holes}</span><b>{row.gross}</b><b>{row.net}</b>
+      <div className={styles.liveScoreRow} data-header="true"><span>Player</span><span>Gross</span><span>Gross +/-</span><span>Net</span><span>Net +/-</span></div>
+      {filtered.map((row, index) => <div className={styles.liveScoreRow} data-leader={index === 0 ? "true" : undefined} key={`${row.round}-${row.id}`}>
+        <strong>{row.name}<small>{row.holes} holes</small></strong><b>{row.gross}</b><b>{toPar(row.grossToPar)}</b><b>{row.net}</b><b>{toPar(row.netToPar)}</b>
       </div>)}
     </div>
-    <p>Totals use each team’s best gross ball and calculated net score for every recorded hole.</p>
+    <p>Scramble scores are credited to both golfers on the team. Totals include recorded holes in this round only.</p>
   </section>;
 }
 
 export default function MatchCenter({ initialData, loadError }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const tournament = initialData?.tournament;
   const rounds = initialData?.rounds || [];
   const [activeRound, setActiveRound] = useState(
@@ -186,6 +190,23 @@ export default function MatchCenter({ initialData, loadError }) {
   const championshipMode = tournament.state.complete && tournament.state.championSide;
   const isLive = ["live", "in progress", "in-progress"].includes(String(tournament.status).toLowerCase());
   const leaderboardTitle = championshipMode ? "Final Player Leaderboard" : isLive ? "Live Player Leaderboard" : "Player Standings";
+  const focusedView = searchParams.get("view");
+  const focusedRound = Number(searchParams.get("round")) || active?.number || 1;
+  const focusedRoundData = rounds.find((round) => round.number === focusedRound) || active;
+  const focusedPoints = addTournamentRanks(initialData?.roundLeaderboards?.[focusedRound] || [], "points");
+
+  if (focusedView === "matchups") return <section className={styles.focusedLiveView}>
+    <div className={styles.focusedHeader}><Link href="/score">← Back to scoring</Link><span>Round {focusedRound}</span><h1>Live Matchups</h1><p>The leading side is highlighted as scores are entered.</p></div>
+    {focusedRoundData ? <div className={styles.matchGrid}>{focusedRoundData.matches.map((match) => <PublicMatchCard match={match} round={focusedRoundData} tournament={tournament} key={match.id} />)}</div> : null}
+  </section>;
+  if (focusedView === "scores") return <section className={styles.focusedLiveView}>
+    <div className={styles.focusedHeader}><Link href="/score">← Back to scoring</Link><span>Round {focusedRound}</span><h1>Gross &amp; Net Leaderboard</h1></div>
+    <IndividualScoreLeaderboard rows={initialData?.scoreLeaderboard || []} round={focusedRound} />
+  </section>;
+  if (focusedView === "points") return <section className={styles.focusedLiveView}>
+    <div className={styles.focusedHeader}><Link href="/score">← Back to scoring</Link><span>Round {focusedRound}</span><h1>Individual Points &amp; Records</h1></div>
+    <TournamentLeaderboard rows={focusedPoints} emptyMessage="No points have been decided in this round yet." />
+  </section>;
 
   return <>
     <section className={styles.hero}><div><p className={styles.eyebrow}>{tournament.status}</p><h1>Match Center</h1><p>{tournament.year} Sandbagger Invitational{tournament.location ? ` · ${tournament.location}` : ""}</p><small aria-live="polite">Updates automatically · checked {lastRefresh.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</small>{tournament.liveMessage ? <div className={styles.liveMessage}>{tournament.liveMessage}</div> : null}</div></section>
@@ -195,7 +216,7 @@ export default function MatchCenter({ initialData, loadError }) {
       <div className={styles.desktopInsights}>{active ? <RoundProgress round={active} /> : null}<TournamentStats tournament={tournament} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} /></div>
       <MobileTournamentInsights tournament={tournament} round={active} rounds={rounds} remainingByRound={initialData?.remainingByRound || []} momentum={initialData?.momentum} />
       {active ? <section id="live-matchups"><div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong>{formatPoints(roundTotals.teamOne)} – {formatPoints(roundTotals.teamTwo)}</strong></div></div><div className={styles.matchGrid}>{active.matches.map((match) => <PublicMatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div></section> : null}
-      <TeamScoreLeaderboard rows={initialData?.scoreLeaderboard || []} />
+      <IndividualScoreLeaderboard rows={initialData?.scoreLeaderboard || []} round={active?.number} />
       {rankedLeaderboard.length ? <section id="individual-points-leaderboard"><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>{leaderboardTitle} {isLive || championshipMode ? <em data-mode={championshipMode ? "final" : "live"}>{championshipMode ? "Final" : "Live"}</em> : null}</h2></div></div>
         <TournamentLeaderboard rows={leaderboard} />
         {rankedLeaderboard.length > 5 ? <button className={styles.leaderboardToggle} type="button" onClick={() => setShowLeaderboard((value) => !value)}>{showLeaderboard ? "Show Top Five" : "View Full Leaderboard →"}</button> : null}</section> : null}

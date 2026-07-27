@@ -14,6 +14,7 @@ import {
   tournamentId,
   tournamentYear,
 } from "../../lib/tournament-identifiers";
+import { getStrokesOnHole } from "../../lib/scorecard-net";
 
 const SPREADSHEET_ID =
   process.env.GOOGLE_SHEETS_ID || "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4";
@@ -112,25 +113,50 @@ function scoreArray(value) {
   }
 }
 
-function buildTeamScoreLeaderboard(holeScores, matchMap, teams) {
-  const totals = {
-    1: { id: teams[1].id || "Team 1", name: teams[1].name, gross: 0, net: 0, holes: 0 },
-    2: { id: teams[2].id || "Team 2", name: teams[2].name, gross: 0, net: 0, holes: 0 },
+function buildIndividualScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
+  const totals = new Map();
+  const metadataFor = (match, holeNumber) => courseHoles.find((row) =>
+    clean(row["Course ID"]) === clean(match["Course ID"]) &&
+    Number(row["Hole Number"]) === Number(holeNumber) &&
+    (!clean(match.Tee || match["Tee Played"]) || !clean(row.Tee) || clean(row.Tee) === clean(match.Tee || match["Tee Played"]))
+  );
+  const add = ({ playerId, round, gross, net, par }) => {
+    if (!playerId || gross === null || net === null || par === null) return;
+    const key = `${round}:${playerId}`;
+    if (!totals.has(key)) totals.set(key, {
+      id: playerId, round, name: playerMap[playerId]?.name || playerId,
+      slug: playerMap[playerId]?.slug || "", photo: playerMap[playerId]?.photo || "",
+      gross: 0, net: 0, par: 0, holes: 0,
+    });
+    const row = totals.get(key);
+    row.gross += gross; row.net += net; row.par += par; row.holes += 1;
   };
   for (const row of holeScores) {
     const match = matchMap.get(clean(row["Match ID"]));
     if (!match) continue;
+    const round = Number(match.Round) || 1;
+    const format = clean(match.Format).toUpperCase();
+    const metadata = metadataFor(match, row["Hole Number"]);
+    const par = number(metadata?.Par);
+    const strokeIndex = number(metadata?.["Stroke Index"]);
     for (const side of [1, 2]) {
       const grossScores = scoreArray(row[`Team ${side} Gross Scores`]);
-      const gross = grossScores.length ? Math.min(...grossScores) : null;
-      const net = number(row[`Team ${side} Net Score`]);
-      if (gross === null || net === null) continue;
-      totals[side].gross += gross;
-      totals[side].net += net;
-      totals[side].holes += 1;
+      const playerIds = [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]].map(clean).filter(Boolean);
+      playerIds.forEach((playerId, index) => {
+        const gross = format === "SC" ? (grossScores[0] ?? null) : (grossScores[index] ?? null);
+        const strokes = format === "SC"
+          ? getStrokesOnHole(match[`Team ${side} Stroke`], strokeIndex)
+          : getStrokesOnHole(match[`Team ${side} Player ${index + 1} Stroke`], strokeIndex);
+        const net = format === "SC" ? number(row[`Team ${side} Net Score`]) : gross === null ? null : gross - strokes;
+        add({ playerId, round, gross, net, par });
+      });
     }
   }
-  return Object.values(totals).sort((a, b) => a.net - b.net || a.gross - b.gross);
+  return [...totals.values()].map((row) => ({
+    ...row,
+    grossToPar: row.gross - row.par,
+    netToPar: row.net - row.par,
+  })).sort((a, b) => a.netToPar - b.netToPar || a.grossToPar - b.grossToPar);
 }
 
 function playerEntry(row, side, slot, playerMap) {
@@ -204,10 +230,11 @@ function tieAdvantageSide(tournamentRow, teams) {
 }
 
 export async function getTournamentData() {
-  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores] = await Promise.all([
+  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles] = await Promise.all([
     fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
     fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
     fetchOptionalSheet("Live Hole Scores"),
+    fetchOptionalSheet("Course Holes"),
   ]);
 
   const active = [...liveTournaments]
@@ -281,6 +308,9 @@ export async function getTournamentData() {
         finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",
         notes: publicResultAllowed ? replaceTeamIds(authoritative.Notes, teams) : "",
         liveStatusText: publicResultAllowed ? replaceTeamIds(authoritative["Match Status Text"], teams) : "",
+        team1HolesWon: number(authoritative["Team 1 Holes Won"]) ?? 0,
+        team2HolesWon: number(authoritative["Team 2 Holes Won"]) ?? 0,
+        currentHole: number(authoritative["Current Hole"]) ?? 0,
         team1Players: [playerEntry(liveRow, 1, 1, playerMap), playerEntry(liveRow, 1, 2, playerMap)].filter(Boolean),
         team2Players: [playerEntry(liveRow, 2, 1, playerMap), playerEntry(liveRow, 2, 2, playerMap)].filter(Boolean),
         team1PlayingHcp: number(liveRow["Team 1 Playing HCP"]),
@@ -343,10 +373,17 @@ export async function getTournamentData() {
     remainingByRound: remainingByRound(rounds),
     momentum: getTeamMomentum(rounds),
     leaderboard: buildLeaderboard(matches, playerMap, teams),
-    scoreLeaderboard: buildTeamScoreLeaderboard(
+    scoreLeaderboard: buildIndividualScoreLeaderboard(
       liveHoleScores.filter((row) => liveMap.has(clean(row["Match ID"]))),
       liveMap,
-      teams
+      courseHoles,
+      playerMap
+    ),
+    roundLeaderboards: Object.fromEntries(
+      [...new Set(matches.map((match) => match.round))].map((round) => [
+        round,
+        buildLeaderboard(matches.filter((match) => match.round === round), playerMap, teams),
+      ])
     ),
   };
 }

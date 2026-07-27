@@ -143,6 +143,24 @@ export default function ScoreEntry() {
     return getStrokesOnHole(total, courseHole?.["Stroke Index"]);
   };
 
+  const preview = useMemo(() => {
+    const netFor = (side) => {
+      const key = side === 1 ? "team1" : "team2";
+      const values = Array.from({ length: slots }, (_, index) => Number(gross[key][index]));
+      if (values.some((value) => !Number.isInteger(value) || value < 1)) return null;
+      const nets = values.map((value, index) => value - strokesFor(side, index));
+      return format === "BB" ? Math.min(...nets) : nets[0];
+    };
+    const team1 = netFor(1);
+    const team2 = netFor(2);
+    const winner = team1 === null || team2 === null
+      ? ""
+      : team1 === team2 ? "Halved" : team1 < team2 ? "Team 1" : "Team 2";
+    return { team1, team2, winner };
+  }, [courseHole, format, gross, match, slots]);
+
+  const scoresComplete = preview.team1 !== null && preview.team2 !== null;
+
   const setScore = (side, index, value) => setGross((current) => {
     const next = [...current[side]];
     next[index] = value;
@@ -194,9 +212,9 @@ export default function ScoreEntry() {
   };
 
   const leaderboardLinks = <nav className={styles.liveLinks} aria-label="Live tournament links">
-    <Link href={`/live#match-${matchId}`}>This matchup</Link>
-    <Link href="/live#team-score-leaderboard">Gross &amp; net</Link>
-    <Link href="/live#individual-points-leaderboard">Player points</Link>
+    <Link href={`/live?view=matchups&round=${match.Round}#match-${matchId}`}>Matchups</Link>
+    <Link href={`/live?view=scores&round=${match.Round}`}>Gross &amp; net</Link>
+    <Link href={`/live?view=points&round=${match.Round}`}>Player points</Link>
   </nav>;
 
   if (!token) return <section className={styles.login}>
@@ -281,15 +299,15 @@ export default function ScoreEntry() {
         });
         return playerRows.concat(<div className={styles.holeCardTeam} key={`team-${side}`}>
           <span><strong>{teamNames[side] || `Team ${side}`}</strong><small>NET {format === "BB" ? "BEST BALL" : format === "SC" ? "SCRAMBLE" : "SCORE"}</small></span>
-          <b>{savedHole?.[`Team ${side} Net Score`] || "—"}</b>
+          <b>{preview[`team${side}`] ?? savedHole?.[`Team ${side} Net Score`] ?? "—"}</b>
         </div>);
       })}
-      <div className={styles.holeCardWinner}><strong>Hole winner</strong><b>{holeWinnerMark(savedHole, teamNames) || "Pending"}</b></div>
+      <div className={styles.holeCardWinner}><strong>Hole winner</strong><b>{preview.winner ? holeWinnerMark({ "Hole Winner": preview.winner }, teamNames) : holeWinnerMark(savedHole, teamNames) || "Pending"}</b></div>
     </div>
     {savedHole && <div className={styles.result}><span>Match status</span><strong>{namedMatchStatus(data?.holeScores, teamNames)}</strong><small>Hole {holeNumber}: {holeWinnerMark(savedHole, teamNames)}</small></div>}
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{namedMatchStatus(data?.holeScores, teamNames)}</strong><small>An administrator can reopen the match for corrections.</small></div>}
-    <button className={styles.primary} disabled={isFinal || busy || gross.team1.length < slots || gross.team2.length < slots} onClick={save}>{isFinal ? "Match finalized" : savedHole ? "Update hole" : "Save hole"}</button>
+    <button className={styles.primary} disabled={isFinal || busy || !scoresComplete} onClick={save}>{isFinal ? "Match finalized" : savedHole ? "Update hole" : "Save hole"}</button>
     {status && <p className={styles.status}>{status}</p>}
     {leaderboardLinks}
   </section>;

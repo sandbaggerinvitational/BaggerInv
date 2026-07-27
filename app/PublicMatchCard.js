@@ -133,12 +133,20 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     "--team-one-color": tournament.teamOne.primaryColor || "#0b3529",
     "--team-two-color": tournament.teamTwo.primaryColor || "#24386f",
   };
+  const liveLeader = Number(match.team1HolesWon) === Number(match.team2HolesWon)
+    ? 0 : Number(match.team1HolesWon) > Number(match.team2HolesWon) ? 1 : 2;
 
   return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle}>
     <div className={styles.matchTop}><span>{topLabel}</span><span>{match.teeTime || match.status}</span></div>
     <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
     {match.liveStatusText ? <p className={styles.matchNotes}>{match.liveStatusText}</p> : null}
     <MatchupRoster tournament={tournament} match={match} />
+    {variant === "live" && (match.currentHole || match.liveStatusText) ? <div className={styles.liveTracker}>
+      <span>Through {match.currentHole || "—"}</span>
+      <div data-leading={liveLeader === 1 ? "true" : undefined}><strong>{tournament.teamOne.name}</strong><b>{match.team1HolesWon}</b></div>
+      <div data-leading={liveLeader === 2 ? "true" : undefined}><strong>{tournament.teamTwo.name}</strong><b>{match.team2HolesWon}</b></div>
+      <em>{liveLeader ? `${liveLeader === 1 ? tournament.teamOne.name : tournament.teamTwo.name} ${Math.abs(Number(match.team1HolesWon) - Number(match.team2HolesWon))} UP` : "All square"}</em>
+    </div> : null}
     {variant === "historical" ? (
       <ScorecardTable scorecards={scorecards} compact />
     ) : null}
