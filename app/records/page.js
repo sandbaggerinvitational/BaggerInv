@@ -75,14 +75,20 @@ export default async function RecordsPage() {
   const matchProgression = buildMatchProgressionAnalytics(scorecardAnalytics.scorecards, {
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
   });
+  const scoreToPar = (value) => Number(value) === 0
+    ? "Even"
+    : `${Number(value) > 0 ? "+" : ""}${value}`;
   const recordItem = (record) => ({
     label: record.title,
     value: record.formatter && record.winners[0]
       ? record.formatter(record.winners[0])
       : formatRecordValue(record.winners[0]?.value, record),
+    detail: record.winners.length ? "" : record.emptyState,
     holders: record.winners.map((winner, index) => ({
       id: `${record.slug}-${winner.matchId || winner.playerId || winner.teamId || winner.name}-${index}`,
-      name: winner.playerName || winner.teamName || winner.name || "Recorded performance",
+      name: winner.entityType === "PLAYER"
+        ? winner.playerName
+        : winner.teamName || winner.name || "Recorded performance",
       subtitle: winner.entityType === "TEAM_PERFORMANCE"
         ? winner.playerNames.join(" & ")
         : "",
@@ -93,6 +99,9 @@ export default async function RecordsPage() {
             winner.round ? `Round ${winner.round}` : "",
             winner.formatName || "",
             winner.courseName || "",
+            Number.isFinite(Number(winner.secondaryValue))
+              ? scoreToPar(winner.secondaryValue)
+              : "",
           ].filter(Boolean).join(" · "),
     })),
     leaderboardHref: `/records/${record.slug}`,

@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   buildMatchProgressionAnalytics,
   formatMatchPosition,
+  matchProgressionLeaderboardRows,
   reconstructMatchProgression,
 } from "../lib/match-progression.js";
 import { buildGhostMatchExclusionSet } from "../lib/ghost-match.js";
@@ -127,4 +128,49 @@ test("every progression record exposes a complete eligible leaderboard", () => {
   assert.ok(analytics.records.every((record) => Array.isArray(record.entries)));
   assert.ok(analytics.byRecordSlug["largest-match-victory"].entries.length);
   assert.ok(analytics.byRecordSlug["most-lead-changes"].entries.length);
+  assert.equal(
+    analytics.byRecordSlug["best-front-nine-match"].title,
+    "Most Front-Nine Holes Won in a Match"
+  );
+  assert.ok(analytics.byRecordSlug["most-consecutive-holes-halved"].entries.every(
+    (entry) => entry.value >= 2
+  ));
+});
+
+test("progression leaderboards present Singles as players and team formats with participants", () => {
+  const singles = buildMatchProgressionAnalytics(matchCards(comebackSequence));
+  const singlesRows = matchProgressionLeaderboardRows(
+    singles.byRecordSlug["best-front-nine-match"]
+  );
+  assert.ok(singlesRows.every((row) => row.entityType === "PLAYER"));
+  assert.ok(singlesRows.every((row) => row.name.startsWith("Player ")));
+  assert.ok(singlesRows.every((row) => row.subtitle === ""));
+
+  const bestBallCards = matchCards(comebackSequence, "BB2").map((card, index) => ({
+    ...card,
+    format: "BB",
+    playerId: `BB${index + 1}`,
+    playerName: `Best Ball ${index + 1}`,
+    participantPlayerIds: [`BB${index + 1}`, `PARTNER${index + 1}`],
+    participantNames: [`Best Ball ${index + 1}`, `Partner ${index + 1}`],
+  }));
+  const bestBall = buildMatchProgressionAnalytics(bestBallCards);
+  const teamRows = matchProgressionLeaderboardRows(
+    bestBall.byRecordSlug["best-front-nine-match"]
+  );
+  assert.ok(teamRows.every((row) => row.entityType === "TEAM_PERFORMANCE"));
+  assert.ok(teamRows.every((row) => row.name));
+  assert.ok(teamRows.every((row) => row.subtitle.includes(" & ")));
+});
+
+test("a single halved hole is excluded before progression ranking", () => {
+  const sequence = [
+    "A", "H", "B", "A", "B", "A", "B", "A", "B",
+    "A", "B", "A", "B", "A", "B", "A", "B", "A",
+  ];
+  const analytics = buildMatchProgressionAnalytics(matchCards(sequence, "ONE-HALVE"));
+  const record = analytics.byRecordSlug["most-consecutive-holes-halved"];
+  assert.equal(record.entries.length, 0);
+  assert.equal(record.winners.length, 0);
+  assert.equal(record.emptyState, "No recorded streak of two or more halved holes yet.");
 });
