@@ -129,6 +129,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
   const overallWinner = match.overallWinner || match.matchupWinner;
   const topLabel = match.course?.name || `${round?.label || `Round ${match.round || ""}`} · Match ${match.match}`;
+  const isGhostMatch = String(match.status || "").trim().toUpperCase() === "GHOST MATCH";
   const cardStyle = {
     "--team-one-color": tournament.teamOne.primaryColor || "#0b3529",
     "--team-two-color": tournament.teamTwo.primaryColor || "#24386f",
@@ -137,6 +138,12 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle}>
     <div className={styles.matchTop}><span>{topLabel}</span><span>{match.teeTime || match.status}</span></div>
     <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
+    {variant === "historical" && isGhostMatch ? (
+      <div className={styles.ghostMatchNotice}>
+        <strong>GHOST MATCH</strong>
+        <span>Selected player results are excluded from official records.</span>
+      </div>
+    ) : null}
     <MatchupRoster tournament={tournament} match={match} />
     {variant === "historical" ? (
       <ScorecardTable scorecards={scorecards} compact />

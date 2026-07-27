@@ -66,7 +66,10 @@ export default async function RecordsPage() {
   const playerNames = Object.fromEntries(
     records.points.map(({ player }) => [player["Player ID"], player["Display Name"]])
   );
-  const advancedRecords = buildAdvancedHoleRecords(scorecardAnalytics.scorecards, { playerNames });
+  const advancedRecords = buildAdvancedHoleRecords(scorecardAnalytics.scorecards, {
+    playerNames,
+    ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
+  });
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
   const recordItem = (label, record, options = {}) => ({
