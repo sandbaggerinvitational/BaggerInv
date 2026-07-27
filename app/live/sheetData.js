@@ -120,16 +120,23 @@ function buildIndividualScoreLeaderboard(holeScores, matchMap, courseHoles, play
     Number(row["Hole Number"]) === Number(holeNumber) &&
     (!clean(match.Tee || match["Tee Played"]) || !clean(row.Tee) || clean(row.Tee) === clean(match.Tee || match["Tee Played"]))
   );
-  const add = ({ playerId, round, gross, net, par }) => {
+  const add = ({ playerId, round, gross, net, par, holeNumber }) => {
     if (!playerId || gross === null || net === null || par === null) return;
     const key = `${round}:${playerId}`;
     if (!totals.has(key)) totals.set(key, {
       id: playerId, round, name: playerMap[playerId]?.name || playerId,
       slug: playerMap[playerId]?.slug || "", photo: playerMap[playerId]?.photo || "",
-      gross: 0, net: 0, par: 0, holes: 0,
+      gross: 0, net: 0, par: 0, holes: 0, scorecard: [],
     });
     const row = totals.get(key);
     row.gross += gross; row.net += net; row.par += par; row.holes += 1;
+    row.scorecard.push({
+      hole: Number(holeNumber),
+      gross,
+      net,
+      par,
+      strokes: Math.max(0, gross - net),
+    });
   };
   for (const row of holeScores) {
     const match = matchMap.get(clean(row["Match ID"]));
@@ -148,12 +155,13 @@ function buildIndividualScoreLeaderboard(holeScores, matchMap, courseHoles, play
           ? getStrokesOnHole(match[`Team ${side} Stroke`], strokeIndex)
           : getStrokesOnHole(match[`Team ${side} Player ${index + 1} Stroke`], strokeIndex);
         const net = format === "SC" ? number(row[`Team ${side} Net Score`]) : gross === null ? null : gross - strokes;
-        add({ playerId, round, gross, net, par });
+        add({ playerId, round, gross, net, par, holeNumber: row["Hole Number"] });
       });
     }
   }
   return [...totals.values()].map((row) => ({
     ...row,
+    scorecard: row.scorecard.sort((a, b) => a.hole - b.hole),
     grossToPar: row.gross - row.par,
     netToPar: row.net - row.par,
   })).sort((a, b) => a.netToPar - b.netToPar || a.grossToPar - b.grossToPar);

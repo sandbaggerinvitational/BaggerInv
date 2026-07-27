@@ -144,18 +144,48 @@ function MobileTournamentInsights({ tournament, round, rounds, remainingByRound,
 const toPar = (value) => Number(value) === 0 ? "E" : Number(value) > 0 ? `+${value}` : String(value);
 
 function IndividualScoreLeaderboard({ rows = [], round }) {
+  const [sortBy, setSortBy] = useState("netToPar");
+  const [expandedPlayer, setExpandedPlayer] = useState("");
   if (!rows.some((row) => row.holes)) return null;
-  const filtered = rows.filter((row) => !round || Number(row.round) === Number(round));
+  const filtered = rows
+    .filter((row) => !round || Number(row.round) === Number(round))
+    .sort((a, b) => Number(a[sortBy]) - Number(b[sortBy]) || a.name.localeCompare(b.name));
+  const sortOptions = [
+    ["netToPar", "Low net +/-"],
+    ["grossToPar", "Low gross +/-"],
+    ["net", "Low net"],
+    ["gross", "Low gross"],
+  ];
   return <section className={styles.liveScoreLeaderboard} id="individual-score-leaderboard">
     <div className={styles.leaderboardHeader}><div><span>Round {round} Live Scoring</span><h2>Individual Gross &amp; Net <em data-mode="live">Live</em></h2></div></div>
+    <div className={styles.scoreSorts} aria-label="Sort leaderboard">
+      {sortOptions.map(([key, label]) => <button type="button" data-active={sortBy === key ? "true" : undefined} onClick={() => setSortBy(key)} key={key}>{label}</button>)}
+    </div>
     <div className={styles.liveScoreTable}>
-      <div className={styles.liveScoreRow} data-header="true"><span>Player</span><span>Gross</span><span>Gross +/-</span><span>Net</span><span>Net +/-</span></div>
+      <div className={styles.liveScoreRow} data-header="true"><span>Rank</span><span>Player</span><span>Gross</span><span>Gross +/-</span><span>Net</span><span>Net +/-</span></div>
       {filtered.map((row, index) => <div className={styles.liveScoreRow} data-leader={index === 0 ? "true" : undefined} key={`${row.round}-${row.id}`}>
-        <strong>{row.name}<small>{row.holes} holes</small></strong><b>{row.gross}</b><b>{toPar(row.grossToPar)}</b><b>{row.net}</b><b>{toPar(row.netToPar)}</b>
+        <b className={styles.liveRank}>{index + 1}</b>
+        <button className={styles.scorePlayerButton} type="button" aria-expanded={expandedPlayer === row.id} onClick={() => setExpandedPlayer((current) => current === row.id ? "" : row.id)}>
+          <strong>{row.name}</strong><small>{row.holes} holes · {expandedPlayer === row.id ? "Hide card" : "View card"}</small>
+        </button>
+        <b>{row.gross}</b><b>{toPar(row.grossToPar)}</b><b>{row.net}</b><b>{toPar(row.netToPar)}</b>
+        {expandedPlayer === row.id ? <PlayerLiveScorecard row={row} /> : null}
       </div>)}
     </div>
     <p>Scramble scores are credited to both golfers on the team. Totals include recorded holes in this round only.</p>
   </section>;
+}
+
+function PlayerLiveScorecard({ row }) {
+  const byHole = new Map((row.scorecard || []).map((score) => [Number(score.hole), score]));
+  return <div className={styles.playerLiveCard}>
+    {[Array.from({ length: 9 }, (_, index) => index + 1), Array.from({ length: 9 }, (_, index) => index + 10)].map((holes, index) => <div className={styles.playerLiveNine} key={index}>
+      <div><strong>{index ? "Back" : "Front"}</strong>{holes.map((hole) => <b key={hole}>{hole}</b>)}</div>
+      <div><strong>Gross</strong>{holes.map((hole) => <span key={hole}>{byHole.get(hole)?.strokes ? <i>•</i> : null}{byHole.get(hole)?.gross ?? "—"}</span>)}</div>
+      <div><strong>Net</strong>{holes.map((hole) => <span key={hole}>{byHole.get(hole)?.net ?? "—"}</span>)}</div>
+      <div><strong>+/-</strong>{holes.map((hole) => <span key={hole}>{byHole.has(hole) ? toPar(byHole.get(hole).net - byHole.get(hole).par) : "—"}</span>)}</div>
+    </div>)}
+  </div>;
 }
 
 export default function MatchCenter({ initialData, loadError }) {
@@ -197,6 +227,12 @@ export default function MatchCenter({ initialData, loadError }) {
 
   if (focusedView === "matchups") return <section className={styles.focusedLiveView}>
     <div className={styles.focusedHeader}><Link href="/score">← Back to scoring</Link><span>Round {focusedRound}</span><h1>Live Matchups</h1><p>The leading side is highlighted as scores are entered.</p></div>
+    <div className={styles.focusedTournamentScore}>
+      <span>Tournament score</span>
+      <div><strong>{tournament.teamOne.name}</strong><b>{formatPoints(tournament.teamOne.score)}</b></div>
+      <em>—</em>
+      <div><b>{formatPoints(tournament.teamTwo.score)}</b><strong>{tournament.teamTwo.name}</strong></div>
+    </div>
     {focusedRoundData ? <div className={styles.matchGrid}>{focusedRoundData.matches.map((match) => <PublicMatchCard match={match} round={focusedRoundData} tournament={tournament} key={match.id} />)}</div> : null}
   </section>;
   if (focusedView === "scores") return <section className={styles.focusedLiveView}>

@@ -1137,14 +1137,29 @@
 /* Live gross/net totals fed directly by recorded hole scores. */
 .liveScoreLeaderboard { scroll-margin-top: 24px; margin-top: 42px; }
 .liveScoreTable { overflow: hidden; border: 1px solid #ded8cd; border-radius: 16px; background: #fff; box-shadow: 0 12px 30px rgba(11,53,41,.06); }
-.liveScoreRow { display: grid; grid-template-columns: minmax(150px,2fr) repeat(4,1fr); align-items: center; min-height: 58px; border-bottom: 1px solid #ece7de; }
+.liveScoreRow { display: grid; grid-template-columns: 56px minmax(150px,2fr) repeat(4,1fr); align-items: center; min-height: 58px; border-bottom: 1px solid #ece7de; }
 .liveScoreRow:last-child { border-bottom: 0; }
 .liveScoreRow > * { padding: 12px 18px; text-align: center; }
-.liveScoreRow > *:first-child { text-align: left; }
+.liveScoreRow > *:nth-child(2) { text-align: left; }
 .liveScoreRow[data-header="true"] { min-height: 44px; background: #0b4938; color: #fff; font-size: .72rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .liveScoreRow[data-leader="true"] { background: #e8f2ed; }
 .liveScoreRow[data-leader="true"] > strong { color: #0b4938; }
 .liveScoreRow strong small { display: block; margin-top: 3px; color: #718078; font-size: .62rem; font-weight: 700; }
+.liveRank { color: #0b4938; font-size: 1.05rem; }
+.scorePlayerButton { border: 0; background: transparent; color: #172319; cursor: pointer; text-align: left; }
+.scorePlayerButton strong,.scorePlayerButton small { display: block; }
+.scorePlayerButton small { margin-top: 3px; color: #718078; font-size: .62rem; font-weight: 700; }
+.scoreSorts { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin: 0 0 12px; }
+.scoreSorts button { min-height: 42px; padding: 7px; border: 1px solid #c7cec7; border-radius: 999px; background: #fff; color: #0b4938; font-size: .72rem; font-weight: 900; cursor: pointer; }
+.scoreSorts button[data-active="true"] { border-color: #0b4938; background: #0b4938; color: #fff; }
+.playerLiveCard { grid-column: 1 / -1; display: grid; gap: 8px; padding: 10px !important; border-top: 1px solid #d9ded9; background: #f8f6f0; text-align: left !important; }
+.playerLiveNine { overflow: hidden; border: 1px solid #d7d7d0; border-radius: 8px; background: #fff; }
+.playerLiveNine > div { display: grid; grid-template-columns: 54px repeat(9,minmax(0,1fr)); min-height: 28px; border-bottom: 1px solid #e5e2da; }
+.playerLiveNine > div:last-child { border-bottom: 0; }
+.playerLiveNine > div > * { display: grid; place-items: center; min-width: 0; padding: 3px 1px; border-right: 1px solid #e5e2da; font-size: .62rem; }
+.playerLiveNine > div > *:last-child { border-right: 0; }
+.playerLiveNine > div:first-child { background: #0b4938; color: #fff; }
+.playerLiveNine i { height: 6px; color: #b88d20; font-size: .55rem; font-style: normal; line-height: .5; }
 .liveScoreLeaderboard > p { color: #6d746f; font-size: .76rem; }
 #live-matchups, #individual-points-leaderboard { scroll-margin-top: 24px; }
 .focusedLiveView { width: min(1180px, 92vw); min-height: 70vh; margin: 0 auto; padding: 42px 0 70px; }
@@ -1153,6 +1168,12 @@
 .focusedHeader > span { display: block; margin-top: 26px; color: #946f27; font-size: .72rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
 .focusedHeader h1 { margin: 5px 0; color: #0b3529; font-family: Georgia,serif; font-size: clamp(2rem,5vw,3.6rem); }
 .focusedHeader p { color: #6d746f; }
+.focusedTournamentScore { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin: -8px 0 28px; padding: 18px; border-radius: 15px; background: #0b4938; color: #fff; }
+.focusedTournamentScore > span { grid-column: 1 / -1; text-align: center; font-size: .68rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.focusedTournamentScore > div { display: flex; align-items: center; justify-content:flex-end; gap: 10px; }
+.focusedTournamentScore > div:last-child { justify-content:flex-start; }
+.focusedTournamentScore b { font-family: Georgia,serif; font-size: 1.7rem; }
+.focusedTournamentScore em { font-style: normal; font-weight: 900; }
 .liveTracker { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 0 16px 16px; padding: 12px; border-radius: 12px; background: #f5f2eb; }
 .liveTracker > span { grid-column: 1 / -1; color: #6d746f; text-align: center; font-size: .64rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .liveTracker > div { display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 9px; border: 1px solid #d9d7d0; border-radius: 8px; background: #fff; font-size: .74rem; }
@@ -1161,8 +1182,13 @@
 .liveTracker > em { grid-column: 1 / -1; color: #0b4938; text-align: center; font-size: .76rem; font-style: normal; font-weight: 900; }
 
 @media (max-width: 600px) {
-  .liveScoreRow { grid-template-columns: minmax(104px,1.5fr) repeat(4,.72fr); }
-  .liveScoreRow > * { padding: 10px 6px; font-size: .82rem; }
-  .liveScoreRow[data-header="true"] > * { font-size: .62rem; }
+  .liveScoreRow { grid-template-columns: 34px minmax(92px,1.45fr) repeat(4,minmax(42px,.72fr)); }
+  .liveScoreRow > * { padding: 10px 3px; font-size: .76rem; }
+  .liveScoreRow[data-header="true"] > * { font-size: .54rem; letter-spacing:.03em; }
+  .scoreSorts { grid-template-columns: 1fr 1fr; }
+  .scoreSorts button { font-size: .68rem; }
+  .focusedTournamentScore { padding: 15px 10px; }
+  .focusedTournamentScore strong { font-size: .7rem; }
+  .focusedTournamentScore b { font-size: 1.4rem; }
   .focusedLiveView { width: min(100% - 22px, 1180px); padding-top: 24px; }
 }
