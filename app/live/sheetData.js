@@ -197,6 +197,11 @@ function buildLeaderboard(matches, playerMap, teamNames) {
     return stats.get(id);
   };
 
+  for (const match of matches) {
+    for (const side of [1, 2]) {
+      for (const player of match[`team${side}Players`] || []) ensure(player.id, side);
+    }
+  }
   for (const match of matches.filter(isOfficialMatchResult)) {
     const winner = match.matchupWinner || match.overallWinner;
     for (const side of [1, 2]) {
