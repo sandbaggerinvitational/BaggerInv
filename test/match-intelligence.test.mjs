@@ -105,6 +105,19 @@ test("limited evidence raises upset potential and unavailable categories stay ne
   assert.ok(result.risks[0].some((row) => row.id === "sample"));
 });
 
+test("partnership confidence reads Team Vibes from the selected prediction", () => {
+  const result = buildMatchIntelligence({
+    prediction,
+    teamNames: ["A", "B"],
+    players,
+    historical,
+    format: "BB",
+    scoringIntelligence,
+  });
+
+  assert.equal(result.overview.confidence, "HIGH");
+});
+
 test("Match Intelligence UI is deterministic and contains no external AI action", () => {
   const source = fs.readFileSync(new URL("../app/war-room/MatchAnalyst.js", import.meta.url), "utf8");
   const warRoom = fs.readFileSync(new URL("../app/war-room/WarRoom.js", import.meta.url), "utf8");
