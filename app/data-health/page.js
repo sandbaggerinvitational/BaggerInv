@@ -26,6 +26,7 @@ import {
   buildRecordedScoringProfile,
   evaluateScorecardIntelligenceHealth,
 } from "../../lib/scorecard-intelligence";
+import { validateGhostMatchRows } from "../../lib/ghost-match";
 
 export const metadata = privatePageMetadata("Data Health | Sandbagger Invitational");
 
@@ -51,6 +52,7 @@ const REQUIRED_COLUMNS = {
   settings: [["Setting"], ["Value"]],
   draftSettings: [["Year"], ["Total Draft Picks", "Total Picks"], ["Team One ID", "Team 1 ID"], ["Team Two ID", "Team 2 ID"]],
   draftPicks: [["Year"], ["Pick Number"], ["Team ID"], ["Player ID"]],
+  ghostMatches: [["Match ID"], ["Player ID"]],
 };
 
 function hasColumn(headers, choices) {
@@ -125,6 +127,7 @@ export default async function DataHealthPage({ searchParams }) {
   const players = diagnostics?.sheets.players?.rows || [];
   const handicaps = diagnostics?.sheets.handicaps?.rows || [];
   const matches = diagnostics?.sheets.matches?.rows || [];
+  const ghostMatches = diagnostics?.sheets.ghostMatches?.rows || [];
   const liveMatches = diagnostics?.sheets.liveMatches?.rows || [];
   const teamNames = diagnostics?.sheets.teamNames?.rows || [];
   const courses = diagnostics?.sheets.courses?.rows || [];
@@ -135,6 +138,11 @@ export default async function DataHealthPage({ searchParams }) {
   const draftPicks = diagnostics?.sheets.draftPicks?.rows || [];
   const roundScorecards = diagnostics?.sheets.roundScorecards?.rows || [];
   const courseHoles = diagnostics?.sheets.holes?.rows || [];
+  const ghostMatchWarnings = validateGhostMatchRows({
+    rows: ghostMatches,
+    matches,
+    players,
+  });
   const scorecardAnalytics = buildScorecardAnalytics({
     roundScorecards,
     matches,
@@ -576,6 +584,12 @@ export default async function DataHealthPage({ searchParams }) {
                   {publicScoreMismatch ? <Link href={`/admin?tab=live-scoring${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Review Live Scoring →</Link> : null}
                 </div>
                 <div data-ok={playerDuplicates.length ? "false" : "true"}>{playerDuplicates.length ? `Duplicate Player IDs: ${playerDuplicates.map(([id]) => id).join(", ")}` : "No duplicate Player IDs"}</div>
+                <div data-ok={ghostMatchWarnings.length ? "false" : "true"}>
+                  {ghostMatchWarnings.length
+                    ? `${ghostMatchWarnings.length} Ghost Match mapping warning${ghostMatchWarnings.length === 1 ? "" : "s"}: ${ghostMatchWarnings.map((warning) => `${warning.code} (${warning.matchId || "missing match"}${warning.playerId ? ` / ${warning.playerId}` : ""})`).join("; ")}`
+                    : "All Ghost Match exclusions resolve to valid match participants"}
+                  {ghostMatchWarnings.length ? <Link href="/admin?tab=matches"> Review Matches and Ghost Match sheet →</Link> : null}
+                </div>
                 <div data-ok={missingDraftSettings ? "false" : "true"}>
                   {missingDraftSettings ? `Missing Draft Settings for ${year}` : `Draft Settings found for ${year}`}
                   {missingDraftSettings ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}

@@ -179,7 +179,8 @@ export default async function PlayerPage({ params, searchParams }) {
   const playerScoring = scorecardAnalytics.playerSummary(player["Player ID"]);
   const playerHoleAnalytics = playerHoleByHoleAnalytics(
     scorecardAnalytics.scorecards,
-    player["Player ID"]
+    player["Player ID"],
+    { ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions }
   );
   const playerMatchIds = new Set(
     Object.values(formatMatchHistory).flatMap((history) => history.matches.map((match) => match.id))
