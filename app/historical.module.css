@@ -2441,6 +2441,33 @@
   font-weight: 800;
 }
 
+.scorecardEntity {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.scorecardEntity > strong {
+  color: var(--tsi-green-900);
+  font-weight: 800;
+}
+
+.scorecardEntity > small,
+.scorecardEntity > em {
+  color: var(--tsi-muted);
+  font-size: .72rem;
+  font-style: normal;
+}
+
+.scorecardEntity > em {
+  display: none;
+}
+
+.scorecardValue {
+  color: var(--tsi-green-900);
+  font-weight: 800;
+}
+
 .tournamentLeaderboard{overflow:hidden;border:1px solid #ddd6c8;border-radius:20px;background:#fff;box-shadow:0 16px 38px rgba(15,35,25,.06)}
 .tournamentLeaderboardRow{display:grid;grid-template-columns:.55fr 2fr 1fr .8fr;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid #ebe5da;color:#46514c}
 .tournamentLeaderboard[data-points="false"] .tournamentLeaderboardRow{grid-template-columns:.55fr 2.4fr 1.2fr}
@@ -2468,6 +2495,27 @@
 
   .leaderboardTopLinks {
     flex-direction: column;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboard {
+    min-width: 0;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboardHead,
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboardRow {
+    grid-template-columns: 48px minmax(0, 1fr) 72px !important;
+    gap: 9px;
+    padding: 13px 12px;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboardHead button:nth-of-type(n+3),
+  .fullLeaderboardWrap[data-scorecard="true"] .scorecardContextCell {
+    display: none;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .scorecardEntity > em {
+    display: block;
+    line-height: 1.35;
   }
 }
 

@@ -4,19 +4,57 @@ import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import {
   getLeaderboard,
-  getLeaderboardSlugs,
 } from "../../../lib/leaderboards";
 import SortableLeaderboard from "../SortableLeaderboard";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
+import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
+import {
+  buildScorecardRecordLeaderboards,
+  scorecardLeaderboardRows,
+} from "../../../lib/scorecard-record-leaderboards";
 
 export const dynamic = "force-dynamic";
 
+async function resolveLeaderboard(slug) {
+  const existing = getLeaderboard(slug);
+  if (existing) return { ...existing, scorecard: false };
+  const analytics = await loadScorecardAnalytics();
+  const playerNames = Object.fromEntries(analytics.scorecards
+    .filter((card) => card.playerId)
+    .map((card) => [card.playerId, card.playerName || card.playerId]));
+  const record = buildScorecardRecordLeaderboards(analytics.scorecards, {
+    playerNames,
+    ghostMatchExclusions: analytics.ghostMatchExclusions,
+  }).bySlug[slug];
+  if (!record) return null;
+  const aggregateColumns = [
+    { key: "value", label: "Career Value", numeric: true },
+  ];
+  const performanceColumns = [
+    { key: "value", label: "Value", numeric: true },
+    { key: "year", label: "Year", numeric: true },
+    { key: "round", label: "Round" },
+    { key: "format", label: "Format" },
+    { key: "course", label: "Course" },
+  ];
+  return {
+    title: record.title,
+    description: "Complete leaderboard based only on available COMPLETE and VERIFIED hole-by-hole scorecards.",
+    rows: scorecardLeaderboardRows(record),
+    columns: record.aggregate ? aggregateColumns : performanceColumns,
+    scorecard: true,
+    direction: record.direction,
+    entityLabel: record.entityType === "TEAM_PERFORMANCE"
+      ? "Team Performance"
+      : record.entityType === "COURSE_HOLE" ? "Course Hole" : "Player",
+  };
+}
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
   const { slug } = await params;
-  const leaderboard = getLeaderboard(slug);
+  const leaderboard = await resolveLeaderboard(slug);
 
   const title = leaderboard
     ? `${leaderboard.title} | The Sandbagger Invitational`
@@ -33,14 +71,15 @@ export async function generateMetadata({ params }) {
 export default async function FullLeaderboardPage({ params }) {
   await refreshHistoricalData();
   const { slug } = await params;
-  const leaderboard = getLeaderboard(slug);
+  const leaderboard = await resolveLeaderboard(slug);
   if (!leaderboard) notFound();
 
   const defaultSort =
     leaderboard.columns.find((column) => column.numeric)?.key || "name";
 
-  const ascending =
-    slug === "average-handicap";
+  const ascending = leaderboard.scorecard
+    ? leaderboard.direction === "lowest"
+    : slug === "average-handicap";
 
   return (
     <main>
@@ -63,6 +102,10 @@ export default async function FullLeaderboardPage({ params }) {
           columns={leaderboard.columns}
           initialSort={defaultSort}
           initialDirection={ascending ? "asc" : "desc"}
+          rankingKey={defaultSort}
+          rankingDirection={ascending ? "asc" : "desc"}
+          entityLabel={leaderboard.entityLabel}
+          scorecard={leaderboard.scorecard}
         />
       </section>
 

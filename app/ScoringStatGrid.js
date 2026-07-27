@@ -1,4 +1,5 @@
 import styles from "./scoring-stats.module.css";
+import Link from "next/link";
 
 export function formatScoringNumber(value, { percentage = false, signed = false, decimals = 1 } = {}) {
   if (value === null || value === undefined || !Number.isFinite(Number(value))) return "—";
@@ -16,8 +17,23 @@ export default function ScoringStatGrid({ items = [] }) {
         <article className={styles.card} key={item.label}>
           <span>{item.label}</span>
           <strong>{item.value}</strong>
-          {item.detail ? <b>{item.detail}</b> : null}
-          <small>{item.sample || "Based on available recorded scorecards"}</small>
+          {item.holders?.length ? (
+            <div className={styles.holders}>
+              {item.holders.map((holder) => (
+                <div key={holder.id}>
+                  <b>{holder.name}</b>
+                  {holder.subtitle ? <em>{holder.subtitle}</em> : null}
+                  {holder.context ? <small>{holder.context}</small> : null}
+                </div>
+              ))}
+            </div>
+          ) : item.detail ? <b>{item.detail}</b> : null}
+          {item.sample ? <small>{item.sample}</small> : null}
+          {item.leaderboardHref ? (
+            <Link className={styles.leaderboardLink} href={item.leaderboardHref}>
+              View Full Leaderboard →
+            </Link>
+          ) : null}
         </article>
       ))}
     </div>
