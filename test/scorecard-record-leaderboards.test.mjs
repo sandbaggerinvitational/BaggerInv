@@ -132,12 +132,59 @@ test("Scramble and Best Ball entries retain team and golfer identities", () => {
 test("leaderboards omit invalid metrics, retain all eligible rows, and competition-rank ties", () => {
   const cards = fixtures();
   cards.push({ ...individual({ playerId: "P5", side: 1, matchId: "MISSING" }), total: null });
+  cards[0].holes[0].score -= 1;
+  cards[0].holes[0].toPar = -1;
+  cards[1].holes[1].score -= 1;
+  cards[1].holes[1].toPar = -1;
   const record = buildScorecardRecordLeaderboards(cards).bySlug["most-individual-birdies"];
   const rows = scorecardLeaderboardRows(record);
   const ranked = addTournamentRanks(rows, "value");
 
-  assert.equal(rows.length, 5);
+  assert.equal(rows.length, 2);
   assert.equal(ranked[0].tournamentRank, "T1");
   assert.equal(ranked[1].tournamentRank, "T1");
-  assert.ok(rows.every((row) => Number.isFinite(row.value)));
+  assert.ok(rows.every((row) => row.value >= 1));
+});
+
+test("achievement records exclude zero and one-value non-achievements", () => {
+  const cards = fixtures();
+  const catalog = buildScorecardRecordLeaderboards(cards);
+  assert.equal(catalog.bySlug["most-individual-birdies"].entries.length, 0);
+  assert.equal(catalog.bySlug["most-individual-eagles"].entries.length, 0);
+  assert.equal(catalog.bySlug["most-consecutive-individual-birdies"].entries.length, 0);
+  assert.equal(catalog.bySlug["most-individual-eagles"].emptyState, "No recorded eagles yet.");
+
+  cards[0].holes[0].score -= 1;
+  cards[0].holes[0].toPar = -1;
+  const oneBirdie = buildScorecardRecordLeaderboards(cards);
+  assert.equal(oneBirdie.bySlug["most-individual-birdies"].entries.length, 1);
+  assert.equal(oneBirdie.bySlug["most-consecutive-individual-birdies"].entries.length, 0);
+
+  cards[0].holes[1].score -= 1;
+  cards[0].holes[1].toPar = -1;
+  assert.equal(
+    buildScorecardRecordLeaderboards(cards)
+      .bySlug["most-consecutive-individual-birdies"].entries[0].value,
+    2
+  );
+});
+
+test("closing score requires exact Holes 16–18 and includes gross total and score to par", () => {
+  const complete = individual({ playerId: "P1", side: 1 });
+  complete.holes[15].score = 3;
+  complete.holes[16].score = 4;
+  complete.holes[17].score = 5;
+  const record = buildScorecardRecordLeaderboards([complete])
+    .bySlug["best-individual-closing-stretch"];
+  assert.equal(record.title, "Lowest Individual Score on Holes 16–18");
+  assert.equal(record.entries[0].value, 12);
+  assert.equal(record.entries[0].secondaryValue, 0);
+  assert.equal(scorecardLeaderboardRows(record)[0].valueDisplay, "12 strokes · Even");
+
+  complete.holes = complete.holes.filter((hole) => hole.holeNumber !== 17);
+  assert.equal(
+    buildScorecardRecordLeaderboards([complete])
+      .bySlug["best-individual-closing-stretch"].entries.length,
+    0
+  );
 });

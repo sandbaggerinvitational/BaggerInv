@@ -57,7 +57,8 @@ async function resolveLeaderboard(slug) {
     direction: resolvedRecord.direction,
     entityLabel: resolvedRecord.entityType === "TEAM_PERFORMANCE"
       ? "Team Performance"
-      : resolvedRecord.entityType === "COURSE_HOLE" ? "Course Hole" : progressionRecord ? "Match / Team" : "Player",
+      : resolvedRecord.entityType === "COURSE_HOLE" ? "Course Hole" : progressionRecord ? "Player / Team / Match" : "Player",
+    emptyState: resolvedRecord.emptyState,
   };
 }
 
@@ -107,16 +108,25 @@ export default async function FullLeaderboardPage({ params }) {
           <Link href="/statistics">Statistics Center →</Link>
         </div>
 
-        <SortableLeaderboard
-          rows={leaderboard.rows}
-          columns={leaderboard.columns}
-          initialSort={defaultSort}
-          initialDirection={ascending ? "asc" : "desc"}
-          rankingKey={defaultSort}
-          rankingDirection={ascending ? "asc" : "desc"}
-          entityLabel={leaderboard.entityLabel}
-          scorecard={leaderboard.scorecard}
-        />
+        {leaderboard.rows.length ? (
+          <SortableLeaderboard
+            rows={leaderboard.rows}
+            columns={leaderboard.columns}
+            initialSort={defaultSort}
+            initialDirection={ascending ? "asc" : "desc"}
+            rankingKey={defaultSort}
+            rankingDirection={ascending ? "asc" : "desc"}
+            entityLabel={leaderboard.entityLabel}
+            scorecard={leaderboard.scorecard}
+          />
+        ) : (
+          <div className={styles.statisticsCallout}>
+            <div>
+              <span className={styles.sectionLabel}>No Qualifying Performance</span>
+              <h2>{leaderboard.emptyState}</h2>
+            </div>
+          </div>
+        )}
       </section>
 
       <Footer />
