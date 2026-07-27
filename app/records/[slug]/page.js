@@ -13,6 +13,10 @@ import {
   buildScorecardRecordLeaderboards,
   scorecardLeaderboardRows,
 } from "../../../lib/scorecard-record-leaderboards";
+import {
+  buildMatchProgressionAnalytics,
+  matchProgressionLeaderboardRows,
+} from "../../../lib/match-progression";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +31,11 @@ async function resolveLeaderboard(slug) {
     playerNames,
     ghostMatchExclusions: analytics.ghostMatchExclusions,
   }).bySlug[slug];
-  if (!record) return null;
+  const progressionRecord = record ? null : buildMatchProgressionAnalytics(analytics.scorecards, {
+    ghostMatchExclusions: analytics.ghostMatchExclusions,
+  }).byRecordSlug[slug];
+  const resolvedRecord = record || progressionRecord;
+  if (!resolvedRecord) return null;
   const aggregateColumns = [
     { key: "value", label: "Career Value", numeric: true },
   ];
@@ -39,15 +47,17 @@ async function resolveLeaderboard(slug) {
     { key: "course", label: "Course" },
   ];
   return {
-    title: record.title,
+    title: resolvedRecord.title,
     description: "Complete leaderboard based only on available COMPLETE and VERIFIED hole-by-hole scorecards.",
-    rows: scorecardLeaderboardRows(record),
-    columns: record.aggregate ? aggregateColumns : performanceColumns,
+    rows: record
+      ? scorecardLeaderboardRows(record)
+      : matchProgressionLeaderboardRows(progressionRecord),
+    columns: resolvedRecord.aggregate ? aggregateColumns : performanceColumns,
     scorecard: true,
-    direction: record.direction,
-    entityLabel: record.entityType === "TEAM_PERFORMANCE"
+    direction: resolvedRecord.direction,
+    entityLabel: resolvedRecord.entityType === "TEAM_PERFORMANCE"
       ? "Team Performance"
-      : record.entityType === "COURSE_HOLE" ? "Course Hole" : "Player",
+      : resolvedRecord.entityType === "COURSE_HOLE" ? "Course Hole" : progressionRecord ? "Match / Team" : "Player",
   };
 }
 

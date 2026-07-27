@@ -17,6 +17,7 @@ import {
   buildScorecardRecordLeaderboards,
   formatRecordValue,
 } from "../../lib/scorecard-record-leaderboards";
+import { buildMatchProgressionAnalytics } from "../../lib/match-progression";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -71,9 +72,14 @@ export default async function RecordsPage() {
     playerNames,
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
   });
+  const matchProgression = buildMatchProgressionAnalytics(scorecardAnalytics.scorecards, {
+    ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
+  });
   const recordItem = (record) => ({
     label: record.title,
-    value: formatRecordValue(record.winners[0]?.value, record),
+    value: record.formatter && record.winners[0]
+      ? record.formatter(record.winners[0])
+      : formatRecordValue(record.winners[0]?.value, record),
     holders: record.winners.map((winner, index) => ({
       id: `${record.slug}-${winner.matchId || winner.playerId || winner.teamId || winner.name}-${index}`,
       name: winner.playerName || winner.teamName || winner.name || "Recorded performance",
@@ -139,6 +145,12 @@ export default async function RecordsPage() {
           <ScoringStatGrid items={scorecardRecords.groups.advanced.map(recordItem)} />
           <h3>Match Play Statistics</h3>
           <ScoringStatGrid items={scorecardRecords.groups.matchPlay.map(recordItem)} />
+        </section>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Reconstructed Match Play</span>
+          <h2>Match Progression Records</h2>
+          <ScoringStatGrid items={matchProgression.records.map(recordItem)} />
         </section>
 
         <div className={styles.recordSections}>

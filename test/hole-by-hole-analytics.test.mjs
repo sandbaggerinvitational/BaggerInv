@@ -107,7 +107,7 @@ test("advanced records use the same shared player aggregates", () => {
   assert.ok(records.lowestPar5Average);
 });
 
-test("ghost exclusions suppress match-play analytics only for excluded players", () => {
+test("ghost exclusions preserve legitimate hole-by-hole match-play analytics", () => {
   const completeA = card({ playerId: "A", side: 1 });
   const completeB = card({ playerId: "B", side: 2 });
   completeA.matchNetScoring = winnerData();
@@ -123,10 +123,10 @@ test("ghost exclusions suppress match-play analytics only for excluded players",
   const playerB = rows.find((row) => row.playerId === "B");
 
   assert.equal(playerA.sample.scoringHoles, 18);
-  assert.equal(playerA.totalHolesPlayed, 0);
-  assert.equal(playerA.holesWon, 0);
-  assert.equal(playerA.holesLost, 0);
-  assert.equal(playerA.holesHalved, 0);
+  assert.equal(playerA.totalHolesPlayed, 18);
+  assert.equal(playerA.holesWon, 7);
+  assert.equal(playerA.holesLost, 5);
+  assert.equal(playerA.holesHalved, 6);
   assert.equal(playerB.totalHolesPlayed, 18);
   assert.equal(playerB.holesWon, 5);
   assert.equal(playerB.holesLost, 7);
