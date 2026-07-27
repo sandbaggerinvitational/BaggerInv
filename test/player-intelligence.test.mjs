@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { buildPlayerIntelligence } from "../lib/player-intelligence.js";
 import { buildGhostMatchExclusionSet } from "../lib/ghost-match.js";
@@ -157,4 +158,20 @@ test("Ghost Match exclusions preserve scoring intelligence and suppress negative
   assert.ok(intelligence.hole.birdies > 0);
   assert.equal(intelligence.progression.largestLeadBlown, 0);
   assert.equal(intelligence.progression.mostConsecutiveHolesLost, 0);
+});
+
+test("player intelligence UI uses dense cards, aligned history, gold rankings, and compact missing scores", async () => {
+  const [component, profileCss, statsCss] = await Promise.all([
+    readFile(new URL("../app/players/[slug]/PlayerIntelligenceSections.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/historical.module.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/scoring-stats.module.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(component, /<ScoringStatGrid dense/);
+  assert.match(component, /playerTournamentHistoryHead/);
+  assert.match(component, /data-label="Finish"/);
+  assert.match(component, /season\.averageScore === null[\s\S]*\? "—"/);
+  assert.match(profileCss, /\.playerRankingList strong[\s\S]*var\(--tsi-gold-600\)/);
+  assert.match(profileCss, /\.playerTournamentHistory span[\s\S]*var\(--tsi-gold-600\)/);
+  assert.match(statsCss, /\.dense \.card\{min-height:112px;padding:13px 15px/);
 });
