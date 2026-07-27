@@ -15,7 +15,8 @@ import {
   tournamentYear,
 } from "../../lib/tournament-identifiers";
 
-const SPREADSHEET_ID = "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4";
+const SPREADSHEET_ID =
+  process.env.GOOGLE_SHEETS_ID || "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4";
 
 function csvUrl(sheetName) {
   return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
