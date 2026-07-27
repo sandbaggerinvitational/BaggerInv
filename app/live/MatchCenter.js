@@ -162,13 +162,13 @@ function IndividualScoreLeaderboard({ rows = [], round }) {
       {sortOptions.map(([key, label]) => <button type="button" data-active={sortBy === key ? "true" : undefined} onClick={() => setSortBy(key)} key={key}>{label}</button>)}
     </div>
     <div className={styles.liveScoreTable}>
-      <div className={styles.liveScoreRow} data-header="true"><span>Rank</span><span>Player</span><span>Gross</span><span>Gross +/-</span><span>Net</span><span>Net +/-</span></div>
+      <div className={styles.liveScoreRow} data-header="true"><span>Rank</span><span>Player</span><span>Thru</span><span>Gross</span><span>Gross +/-</span><span>Net</span><span>Net +/-</span></div>
       {filtered.map((row, index) => <div className={styles.liveScoreRow} data-leader={index === 0 ? "true" : undefined} key={`${row.round}-${row.id}`}>
         <b className={styles.liveRank}>{index + 1}</b>
         <button className={styles.scorePlayerButton} type="button" aria-expanded={expandedPlayer === row.id} onClick={() => setExpandedPlayer((current) => current === row.id ? "" : row.id)}>
           <strong>{row.name}</strong><small>{row.holes} holes · {expandedPlayer === row.id ? "Hide card" : "View card"}</small>
         </button>
-        <b>{row.gross}</b><b>{toPar(row.grossToPar)}</b><b>{row.net}</b><b>{toPar(row.netToPar)}</b>
+        <b className={styles.thru}>{row.holes >= 18 ? "F" : row.holes}</b><b>{row.gross}</b><b>{toPar(row.grossToPar)}</b><b>{row.net}</b><b>{toPar(row.netToPar)}</b>
         {expandedPlayer === row.id ? <PlayerLiveScorecard row={row} /> : null}
       </div>)}
     </div>

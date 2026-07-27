@@ -1137,7 +1137,7 @@
 /* Live gross/net totals fed directly by recorded hole scores. */
 .liveScoreLeaderboard { scroll-margin-top: 24px; margin-top: 42px; }
 .liveScoreTable { overflow: hidden; border: 1px solid #ded8cd; border-radius: 16px; background: #fff; box-shadow: 0 12px 30px rgba(11,53,41,.06); }
-.liveScoreRow { display: grid; grid-template-columns: 56px minmax(150px,2fr) repeat(4,1fr); align-items: center; min-height: 58px; border-bottom: 1px solid #ece7de; }
+.liveScoreRow { display: grid; grid-template-columns: 52px minmax(140px,2fr) 54px repeat(4,1fr); align-items: center; min-height: 58px; border-bottom: 1px solid #ece7de; }
 .liveScoreRow:last-child { border-bottom: 0; }
 .liveScoreRow > * { padding: 12px 18px; text-align: center; }
 .liveScoreRow > *:nth-child(2) { text-align: left; }
@@ -1146,6 +1146,7 @@
 .liveScoreRow[data-leader="true"] > strong { color: #0b4938; }
 .liveScoreRow strong small { display: block; margin-top: 3px; color: #718078; font-size: .62rem; font-weight: 700; }
 .liveRank { color: #0b4938; font-size: 1.05rem; }
+.thru { color: #52645c; }
 .scorePlayerButton { border: 0; background: transparent; color: #172319; cursor: pointer; text-align: left; }
 .scorePlayerButton strong,.scorePlayerButton small { display: block; }
 .scorePlayerButton small { margin-top: 3px; color: #718078; font-size: .62rem; font-weight: 700; }
@@ -1182,9 +1183,11 @@
 .liveTracker > em { grid-column: 1 / -1; color: #0b4938; text-align: center; font-size: .76rem; font-style: normal; font-weight: 900; }
 
 @media (max-width: 600px) {
-  .liveScoreRow { grid-template-columns: 34px minmax(92px,1.45fr) repeat(4,minmax(42px,.72fr)); }
-  .liveScoreRow > * { padding: 10px 3px; font-size: .76rem; }
-  .liveScoreRow[data-header="true"] > * { font-size: .54rem; letter-spacing:.03em; }
+  .liveScoreRow { grid-template-columns: 28px minmax(78px,1.35fr) 30px repeat(4,minmax(34px,.65fr)); }
+  .liveScoreRow > * { padding: 10px 2px; font-size: .7rem; }
+  .liveScoreRow[data-header="true"] > * { font-size: .47rem; letter-spacing:.01em; }
+  .scorePlayerButton strong { font-size: .72rem; line-height: 1.08; }
+  .scorePlayerButton small { font-size: .52rem; }
   .scoreSorts { grid-template-columns: 1fr 1fr; }
   .scoreSorts button { font-size: .68rem; }
   .focusedTournamentScore { padding: 15px 10px; }
