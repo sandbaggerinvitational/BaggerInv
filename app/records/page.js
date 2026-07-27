@@ -12,9 +12,11 @@ import styles from "../historical.module.css";
 import { addTournamentRanks } from "../../lib/rankings";
 import { pageMetadata } from "../../lib/seo";
 import { loadScorecardAnalytics } from "../../lib/scorecard-data";
-import { buildScoringRecords } from "../../lib/scorecard-analytics";
-import { buildAdvancedHoleRecords } from "../../lib/hole-by-hole-analytics";
-import ScoringStatGrid, { formatScoringNumber } from "../ScoringStatGrid";
+import ScoringStatGrid from "../ScoringStatGrid";
+import {
+  buildScorecardRecordLeaderboards,
+  formatRecordValue,
+} from "../../lib/scorecard-record-leaderboards";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -62,37 +64,32 @@ export default async function RecordsPage() {
   await refreshHistoricalData();
   const records = getRecords();
   const scorecardAnalytics = await scorecardAnalyticsPromise;
-  const scoringRecords = buildScoringRecords(scorecardAnalytics.usableScorecards);
   const playerNames = Object.fromEntries(
     records.points.map(({ player }) => [player["Player ID"], player["Display Name"]])
   );
-  const advancedRecords = buildAdvancedHoleRecords(scorecardAnalytics.scorecards, {
+  const scorecardRecords = buildScorecardRecordLeaderboards(scorecardAnalytics.scorecards, {
     playerNames,
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
   });
-  const participant = (record) =>
-    record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
-  const recordItem = (label, record, options = {}) => ({
-    label,
-    value: formatScoringNumber(record?.value, options),
-    detail: participant(record),
-    sample: record?.label ? `${record.label}. Based on recorded scorecards.` : "Based on recorded scorecards.",
-  });
-  const holeItem = (label, hole) => ({
-    label,
-    value: hole ? `#${hole.holeNumber}` : "—",
-    detail: hole ? `${hole.courseId}${hole.tee ? ` · ${hole.tee}` : ""}` : "",
-    sample: hole?.averageToPar?.label
-      ? `${hole.averageToPar.label}. Based on recorded scorecards.`
-      : "Based on recorded scorecards.",
-  });
-  const advancedItem = (label, record, { decimals = 1, signed = false, sample = "scoringHoles" } = {}) => ({
-    label,
-    value: formatScoringNumber(record?.value, { decimals, signed }),
-    detail: record?.tied?.map((player) => player.playerName).join(" · ") || "",
-    sample: record
-      ? `Based on ${record.sample[sample]} recorded ${sample === "completeScorecards" ? "complete scorecards" : sample === "matchPlayHoles" ? "match-play holes" : "scoring holes"}.`
-      : "Based on COMPLETE and VERIFIED scorecards.",
+  const recordItem = (record) => ({
+    label: record.title,
+    value: formatRecordValue(record.winners[0]?.value, record),
+    holders: record.winners.map((winner, index) => ({
+      id: `${record.slug}-${winner.matchId || winner.playerId || winner.teamId || winner.name}-${index}`,
+      name: winner.playerName || winner.teamName || winner.name || "Recorded performance",
+      subtitle: winner.entityType === "TEAM_PERFORMANCE"
+        ? winner.playerNames.join(" & ")
+        : "",
+      context: record.aggregate
+        ? ""
+        : [
+            winner.year,
+            winner.round ? `Round ${winner.round}` : "",
+            winner.formatName || "",
+            winner.courseName || "",
+          ].filter(Boolean).join(" · "),
+    })),
+    leaderboardHref: `/records/${record.slug}`,
   });
 
   return (
@@ -126,50 +123,22 @@ export default async function RecordsPage() {
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Available Scorecard History</span>
           <h2>Scoring Records</h2>
-          <p>Every scoring record below is based on recorded scorecards and does not imply complete all-time coverage.</p>
-          <ScoringStatGrid items={[
-            recordItem("Lowest Recorded Round", scoringRecords.lowestRecordedRound),
-            recordItem("Lowest To Par", scoringRecords.lowestToPar, { signed: true }),
-            recordItem("Lowest Front Nine", scoringRecords.lowestFrontNine),
-            recordItem("Lowest Back Nine", scoringRecords.lowestBackNine),
-            recordItem("Most Birdies", scoringRecords.mostBirdies),
-            recordItem("Most Eagles", scoringRecords.mostEagles),
-            recordItem("Most Consecutive Birdies", scoringRecords.mostConsecutiveBirdies),
-            recordItem("Best Closing Stretch", scoringRecords.bestClosingStretch),
-            recordItem("Best Par 3 Average", scoringRecords.bestPar3Average),
-            recordItem("Best Par 4 Average", scoringRecords.bestPar4Average),
-            recordItem("Best Par 5 Average", scoringRecords.bestPar5Average),
-            holeItem("Hardest Historical Hole", scoringRecords.hardestHistoricalHole),
-            holeItem("Easiest Historical Hole", scoringRecords.easiestHistoricalHole),
-            recordItem("Lowest Scramble Round", scoringRecords.lowestScrambleRound),
-            recordItem("Lowest Singles Round", scoringRecords.lowestSinglesRound),
-          ]} />
+          <p>Records and leaderboards are based only on available COMPLETE and VERIFIED hole-by-hole scorecards. Historical coverage is not complete.</p>
+          <h3>Individual Scoring Records</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.individual.map(recordItem)} />
+          <h3>Team Scoring Records</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.team.map(recordItem)} />
+          <h3>Course Hole Records</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.courseHole.map(recordItem)} />
         </section>
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Complete Scorecards Only</span>
           <h2>Advanced Hole-by-Hole Analytics</h2>
-          <p>Career aggregates below use only COMPLETE and VERIFIED hole-by-hole scorecards. Partial and missing scorecards are excluded.</p>
           <h3>Hole Statistics</h3>
-          <ScoringStatGrid items={[
-            advancedItem("Career Most Birdies", advancedRecords.mostBirdies, { decimals: 0 }),
-            advancedItem("Career Most Eagles", advancedRecords.mostEagles, { decimals: 0 }),
-            advancedItem("Most Pars", advancedRecords.mostPars, { decimals: 0 }),
-            advancedItem("Lowest Average Score", advancedRecords.lowestAverageScore, { sample: "completeScorecards" }),
-            advancedItem("Lowest Average Net Score", advancedRecords.lowestAverageNetScore, { sample: "completeScorecards" }),
-            advancedItem("Lowest Par 3 Average", advancedRecords.lowestPar3Average),
-            advancedItem("Lowest Par 4 Average", advancedRecords.lowestPar4Average),
-            advancedItem("Lowest Par 5 Average", advancedRecords.lowestPar5Average),
-          ]} />
+          <ScoringStatGrid items={scorecardRecords.groups.advanced.map(recordItem)} />
           <h3>Match Play Statistics</h3>
-          <ScoringStatGrid items={[
-            advancedItem("Most Holes Won", advancedRecords.mostHolesWon, { decimals: 0, sample: "matchPlayHoles" }),
-            advancedItem("Most Holes Halved", advancedRecords.mostHolesHalved, { decimals: 0, sample: "matchPlayHoles" }),
-            advancedItem("Highest Hole Differential", advancedRecords.highestHoleDifferential, { decimals: 0, signed: true, sample: "matchPlayHoles" }),
-            advancedItem("Most Front Nine Holes Won", advancedRecords.mostFrontNineHolesWon, { decimals: 0, sample: "matchPlayHoles" }),
-            advancedItem("Most Back Nine Holes Won", advancedRecords.mostBackNineHolesWon, { decimals: 0, sample: "matchPlayHoles" }),
-            advancedItem("Most Closing Holes Won (16–18)", advancedRecords.mostClosingHolesWon, { decimals: 0, sample: "matchPlayHoles" }),
-          ]} />
+          <ScoringStatGrid items={scorecardRecords.groups.matchPlay.map(recordItem)} />
         </section>
 
         <div className={styles.recordSections}>
