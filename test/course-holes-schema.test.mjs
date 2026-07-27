@@ -6,7 +6,6 @@ const schemaConsumers = [
   "../lib/captains-briefing.js",
   "../lib/tournament-context.js",
   "../lib/prediction-engine.js",
-  "../app/war-room/MatchAnalyst.js",
   "../app/war-room/WarRoom.js",
   "../app/data-health/page.js",
 ];

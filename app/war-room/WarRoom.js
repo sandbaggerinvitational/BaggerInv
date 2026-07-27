@@ -19,7 +19,6 @@ import {
   holesForTee,
   scorecardForTee,
 } from "../../lib/tournament-context";
-import { briefingPayload } from "../../lib/captains-briefing";
 import { teamVibesTier } from "../../lib/prediction-engine";
 import { simulateMatch } from "../../lib/match-simulator";
 import SimulationResults from "./SimulationResults";
@@ -47,7 +46,7 @@ function formatLabel(format) {
   return ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[formatCode(format)] || format;
 }
 
-export default function WarRoom({ initialData, loadError, aiConfigured = false, initialSelection = {} }) {
+export default function WarRoom({ initialData, loadError, initialSelection = {} }) {
   const sheets = initialData?.sheets || {};
   const initialFormat = ["BB", "SC", "SI"].includes(initialSelection.format)
     ? initialSelection.format
@@ -59,9 +58,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
   const [showSetup, setShowSetup] = useState(true);
   const [activeSection, setActiveSection] = useState("overview");
   const [simulationRun, setSimulationRun] = useState(0);
-  const [aiBriefing, setAiBriefing] = useState("");
-  const [aiError, setAiError] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
 
   const year = useMemo(() => currentTournamentYear(sheets), [sheets]);
   const teams = useMemo(() => getTeamContext(sheets, year), [sheets, year]);
@@ -172,8 +168,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
     setSelected([]);
     setTeeOverride("");
     setShowHoleDetails(false);
-    setAiBriefing("");
-    setAiError("");
     setSimulationRun(0);
     setShowSetup(true);
   }
@@ -181,8 +175,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
     const next = [...chosen];
     next[index] = value;
     setSelected(next);
-    setAiBriefing("");
-    setAiError("");
     setSimulationRun(0);
     if (next.slice(0, required).every(Boolean)) setShowSetup(false);
   }
@@ -224,48 +216,6 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
     courseId,
     tee,
   }) : null, [ready, recordedScorecards, chosen.join("|"), slotsPerTeam, format, holes, courseId, tee]);
-  async function generateAiBriefing() {
-    if (!ready) return;
-    if (!aiConfigured) {
-      setAiError("The SBI Match Analyst is not configured yet. Add OPENAI_API_KEY to the Production environment in Vercel, then redeploy.");
-      return;
-    }
-    setAiLoading(true);
-    setAiError("");
-    try {
-      const response = await fetch("/api/captains-briefing", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(briefingPayload({
-          prediction,
-          teamNames: [teams.team1.name, teams.team2.name],
-          format: formatCode(format),
-          courseName: pick(course, "Course Name", "Course") || courseId,
-          tee,
-          players: details,
-          optimizer: null,
-          historical,
-          simulation,
-          pointsAvailable,
-          play,
-          strokeMaps: effectiveStrokeMaps,
-          holes,
-          scoringIntelligence,
-        })),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        const suffix = result.requestId ? ` (request ${result.requestId})` : "";
-        throw new Error(`${result.error || "Briefing request failed."}${suffix}`);
-      }
-      setAiBriefing(result.briefing);
-    } catch (error) {
-      setAiError(error.message);
-    } finally {
-      setAiLoading(false);
-    }
-  }
-
   if (!initialData) {
     return <section className={styles.shell}><div className={styles.error}><h1>War Room</h1><p>{loadError || "Prediction data is unavailable."}</p></div></section>;
   }
@@ -273,7 +223,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
   return (
     <>
       <section className={styles.hero}>
-        <p>War Room Analytics</p><h1>Matchup Lab</h1><span>One matchup. Deterministic analysis and 10,000 possible outcomes.</span>
+        <p>War Room Analytics</p><h1>Match Intelligence</h1><span>One matchup. A transparent prediction and the evidence behind it.</span>
       </section>
       <section className={styles.shell}>
         {loadError ? <div className={styles.notice}>{loadError}</div> : null}
@@ -303,7 +253,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
           <div className={styles.controlsThree}>
             <label>Format<select value={format} onChange={(event) => changeFormat(event.target.value)}><option value="BB">Best Ball</option><option value="SC">Scramble</option><option value="SI">Singles</option></select></label>
             <label>Course<input value={pick(course, "Course Name", "Course") || courseId || "Not assigned"} readOnly /></label>
-            <label>Tee<select value={tee} onChange={(event) => { setTeeOverride(event.target.value); setAiBriefing(""); setSimulationRun(0); }} disabled={!tees.length}>{tees.length ? tees.map((name) => <option key={name} value={name}>{name}</option>) : <option value="">No scorecard tees</option>}</select></label>
+            <label>Tee<select value={tee} onChange={(event) => { setTeeOverride(event.target.value); setSimulationRun(0); }} disabled={!tees.length}>{tees.length ? tees.map((name) => <option key={name} value={name}>{name}</option>) : <option value="">No scorecard tees</option>}</select></label>
           </div>
           <div className={styles.matchupGrid}>
             {[teams.team1, teams.team2].map((team, side) => (
@@ -334,7 +284,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
                 ["scoring", "Scoring Intelligence"],
                 ["simulation", "Simulation"],
                 ["handicaps", "Handicap Breakdown"],
-                ["briefing", "Analyst Briefing"],
+                ["briefing", "Match Intelligence"],
               ].map(([id, label]) => (
                 <button type="button" data-active={activeSection === id} onClick={() => setActiveSection(id)} key={id}>{label}</button>
               ))}
@@ -379,7 +329,7 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
             {activeSection === "simulation" ? (
               <div className={styles.labSection}>
                 <div className={styles.simRun}>
-                  <button type="button" disabled={holes.length !== 18} onClick={() => { setAiBriefing(""); setSimulationRun((run) => run + 1); }}>
+                  <button type="button" disabled={holes.length !== 18} onClick={() => setSimulationRun((run) => run + 1)}>
                     {simulation ? "Run another 10,000 simulations" : "Run 10,000 simulations"}
                   </button>
                   <small>{holes.length === 18 ? "The simulation uses the matchup selected above. Results remain stable until an input changes." : "A complete 18-hole scorecard is required for simulation."}</small>
@@ -397,19 +347,11 @@ export default function WarRoom({ initialData, loadError, aiConfigured = false, 
               players={details}
               historical={historical}
               partnerships={partnerships}
+              headToHead={headToHead}
               format={formatCode(format)}
               pointsAvailable={pointsAvailable}
-              play={play}
-              strokeMaps={effectiveStrokeMaps}
-              holes={holes}
-              courseName={pick(course, "Course Name", "Course") || courseId}
-              tee={tee}
-              aiBriefing={aiBriefing}
-              aiError={aiError}
-              aiLoading={aiLoading}
-              aiConfigured={aiConfigured}
-              onGenerate={generateAiBriefing}
               scoringIntelligence={scoringIntelligence}
+              matches={sheets.matches || []}
             /> : null}
 
             {activeSection === "handicaps" ? <div className={styles.breakdownCard}>
