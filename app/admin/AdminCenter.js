@@ -47,8 +47,17 @@ export default function AdminCenter({ tournaments }) {
   function updateUrl(nextTab = active, nextTournament = tournamentId) {
     router.replace(`/admin?tab=${encodeURIComponent(nextTab)}&tournament=${encodeURIComponent(nextTournament)}`, { scroll: false });
   }
-  function selectTab(tab) { setActive(tab); updateUrl(tab, tournamentId); }
+  function canLeaveCurrentPanel() {
+    return active !== "live-scoring"
+      || !document.querySelector('[data-live-match-dirty="true"]')
+      || window.confirm("You have unsaved live-match changes. Leave them behind?");
+  }
+  function selectTab(tab) {
+    if (!canLeaveCurrentPanel()) return;
+    setActive(tab); updateUrl(tab, tournamentId);
+  }
   function selectTournament(id) {
+    if (!canLeaveCurrentPanel()) return;
     if (!validTournamentIds.has(String(id)) || String(id) === "0") {
       setStatus("Unable to resolve the selected tournament.");
       return;

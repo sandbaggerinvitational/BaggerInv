@@ -327,6 +327,8 @@ export async function getTournamentData() {
         teeTime: formatTime(liveRow["Tee Time"] || permanent["Tee Time"]),
         status,
         finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",
+        updatedAt: authoritative["Updated At"] || liveRow["Updated At"] || "",
+        updatedBy: authoritative["Updated By"] || liveRow["Updated By"] || "",
         notes: publicResultAllowed ? replaceTeamIds(authoritative.Notes, teams) : "",
         liveStatusText: publicResultAllowed ? replaceTeamIds(authoritative["Match Status Text"], teams) : "",
         team1HolesWon: number(authoritative["Team 1 Holes Won"]) ?? 0,

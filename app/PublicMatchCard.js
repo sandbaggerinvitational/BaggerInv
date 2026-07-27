@@ -5,6 +5,7 @@ import { teamLogo } from "../lib/asset-paths";
 import { formatHandicap, formatPoints } from "../lib/formatters";
 import styles from "./live/live.module.css";
 import ScorecardTable from "./ScorecardTable";
+import { matchState } from "../lib/live-match-ux";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const initials = (name) => String(name ?? "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -135,12 +136,21 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   };
   const liveLeader = Number(match.team1HolesWon) === Number(match.team2HolesWon)
     ? 0 : Number(match.team1HolesWon) > Number(match.team2HolesWon) ? 1 : 2;
+  const state = matchState(match);
+  const hasPairing = [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => player?.name);
+  const hasSegments = Boolean(match.frontWinner || match.backWinner || overallWinner);
+  const winnerName = halved ? "Match halved" : winningSide === 1 ? tournament.teamOne.name : winningSide === 2 ? tournament.teamTwo.name : "";
+  const statusText = state === "final"
+    ? (winnerName || "Final")
+    : state === "live"
+      ? (match.liveStatusText || (liveLeader ? `${liveLeader === 1 ? tournament.teamOne.name : tournament.teamTwo.name} ${Math.abs(Number(match.team1HolesWon) - Number(match.team2HolesWon))} UP` : "All square"))
+      : (match.teeTime ? `Tee time ${match.teeTime}` : "Scheduled");
 
-  return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle}>
-    <div className={styles.matchTop}><span>{topLabel}</span><span>{match.teeTime || match.status}</span></div>
-    <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
-    {match.liveStatusText ? <p className={styles.matchNotes}>{match.liveStatusText}</p> : null}
-    <MatchupRoster tournament={tournament} match={match} />
+  return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle} data-match-state={state} aria-label={`Match ${match.match}: ${statusText}`} tabIndex="0">
+    <div className={styles.matchTop}><span>{topLabel}</span><span>{state === "upcoming" ? match.teeTime || match.status : match.status}</span></div>
+    <div className={styles.matchMeta}><span>Match {match.match} · {match.formatName || round?.format}</span><strong data-state={state}>{state}</strong></div>
+    <div className={styles.primaryMatchState}><strong>{statusText}</strong>{state === "live" && match.currentHole ? <span>THRU {match.currentHole}</span> : null}</div>
+    {hasPairing ? <MatchupRoster tournament={tournament} match={match} /> : <div className={styles.pairingPending}><strong>Pairing announcement coming soon</strong><span>{match.teeTime ? `${match.teeTime} · ` : ""}{match.course?.name || round?.course?.name || "Course to be announced"}</span></div>}
     {variant === "live" && (match.currentHole || match.liveStatusText) ? <div className={styles.liveTracker}>
       <span>Through {match.currentHole || "—"}</span>
       <div data-leading={liveLeader === 1 ? "true" : undefined}><strong>{tournament.teamOne.name}</strong><b>{match.team1HolesWon}</b></div>
@@ -150,13 +160,16 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     {variant === "historical" ? (
       <ScorecardTable scorecards={scorecards} compact />
     ) : null}
-    <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
-      {match.format !== "SI" ? <>
-        <Segment label="Front 9" winner={match.frontWinner} tournament={tournament} />
-        <Segment label="Back 9" winner={match.backWinner} tournament={tournament} />
-      </> : null}
-      <Segment label="Overall" winner={overallWinner} tournament={tournament} />
-    </div>
+    {hasSegments ? <details className={styles.segmentDetails} open={state === "final"}>
+      <summary>Front, back and overall results</summary>
+      <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
+        {match.format !== "SI" ? <>
+          <Segment label="Front 9" winner={match.frontWinner} tournament={tournament} />
+          <Segment label="Back 9" winner={match.backWinner} tournament={tournament} />
+        </> : null}
+        <Segment label="Overall" winner={overallWinner} tournament={tournament} />
+      </div>
+    </details> : null}
     {match.notes ? <p className={styles.matchNotes}>{match.notes}</p> : null}
     {(hasValue(match.team1Points) || hasValue(match.team2Points) || (variant === "historical" && (winningSide || halved))) ? <div className={styles.matchResult}>
       <span className={styles.matchResultLabel}>{halved ? "Match Halved" : winningSide ? "Match Result" : "Match Points"}</span>
@@ -169,5 +182,6 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         <div className={`${styles.matchScoreRow} ${winningSide === 2 ? styles.matchScoreWinner : ""}`} data-team="two"><span><i aria-hidden="true" />{tournament.teamTwo.name}</span><strong>{formatPoints(match.team2Points)}</strong></div>
       </div> : null}
     </div> : null}
+    <footer className={styles.matchFreshness}>{match.updatedAt ? <>Last confirmed {match.updatedAt}{match.updatedBy ? ` by ${match.updatedBy}` : ""}</> : state === "live" ? "Waiting for the next confirmed update" : state === "final" ? "Official result" : `${match.course?.name || round?.course?.name || "Course TBA"} · ${match.formatName || round?.format || "Format TBA"}`}</footer>
   </article>;
 }

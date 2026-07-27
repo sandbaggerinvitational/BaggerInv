@@ -22,10 +22,12 @@ test("mobile scorer supports match codes, admin mode, every format, and revision
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {
   const source = await readFile(new URL("../app/live/MatchCenter.js", import.meta.url), "utf8");
-  assert.match(source, /setInterval\(refresh, 15_000\)/);
-  assert.match(source, /document\.visibilityState !== "visible"/);
+  assert.match(source, /setInterval\(poll, 30_000\)/);
+  assert.match(source, /document\.visibilityState === "visible"/);
   assert.match(source, /clearInterval\(timer\)/);
-  assert.match(source, /router\.refresh\(\)/);
+  assert.match(source, /fetch\("\/api\/live"/);
+  assert.match(source, /refreshPromise\.current/);
+  assert.match(source, /Unable to refresh/);
 });
 
 test("new scoring writes require a separate test spreadsheet", async () => {
