@@ -21,9 +21,13 @@ export const metadata = pageMetadata({
   path: "/war-room/team-intelligence",
 });
 
-export default async function TeamIntelligencePage() {
+const TOOL_KEYS = new Set(["lineup-lab", "partnership-analyzer", "team-comparison", "historical-rankings"]);
+
+export default async function TeamIntelligencePage({ searchParams }) {
   let data = null;
   let error = "";
+  const params = await searchParams;
+  const initialTool = TOOL_KEYS.has(params?.tool) ? params.tool : "lineup-lab";
   try {
     const [sheets, scorecardAnalytics] = await Promise.all([
       loadPredictionSheets(),
@@ -76,5 +80,5 @@ export default async function TeamIntelligencePage() {
     console.error("Failed loading Team Intelligence", caught);
     error = caught?.message || "Unable to load Team Intelligence.";
   }
-  return <main><Header /><TeamIntelligence initialData={data} loadError={error} /><Footer /></main>;
+  return <main><Header /><TeamIntelligence initialData={data} loadError={error} initialTool={initialTool} /><Footer /></main>;
 }

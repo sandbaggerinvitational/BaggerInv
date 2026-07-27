@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatCode, pick, settingsMap } from "../../../lib/prediction-engine";
 import { currentTournamentYear, getCourseOptions, getFormatCourse, getTeamContext, scorecardForTee } from "../../../lib/tournament-context";
 import { optimizeLineups } from "../../../lib/lineup-optimizer";
@@ -24,6 +24,11 @@ function Metric({ label, value, detail }) {
   return <div className={styles.metric}><span>{label}</span><strong>{value}</strong>{detail && <small>{detail}</small>}</div>;
 }
 
+function ConfidenceBadge({ value }) {
+  const label = clean(value).toUpperCase() || "LOW";
+  return <span className={styles.confidenceBadge} data-level={label.toLowerCase()}>{label}</span>;
+}
+
 function PlayerSelect({ players, value, onChange, exclude = "" }) {
   return <select value={value} onChange={(event) => onChange(event.target.value)}>
     <option value="">Select a Sandbagger</option>
@@ -37,7 +42,7 @@ function PartnershipAnalyzer({ data }) {
   const partnership = data.partnerships.find((row) => row.key === [one, two].sort().join("|"));
   const players = [data.players.find((row) => row.id === one), data.players.find((row) => row.id === two)].filter(Boolean);
   return <section className={styles.tool}>
-    <header><p>Tool 01</p><h2>Partnership Analyzer</h2><span>Analyze two golfers only in matches where they played as teammates.</span></header>
+    <header><p>Tool 02</p><h2>Partnership Analyzer</h2><span>Analyze two golfers only in matches where they played as teammates.</span></header>
     <div className={styles.selectGrid}><label>Player One<PlayerSelect players={data.players} value={one} exclude={two} onChange={setOne} /></label><label>Player Two<PlayerSelect players={data.players} value={two} exclude={one} onChange={setTwo} /></label></div>
     <div className={styles.identity}>{players.map((player) => <article key={player.id}><h3>{player.name}</h3><p>HCP {fmt(player.handicap)} · Rating {fmt(player.rating)}</p></article>)}</div>
     {!partnership ? <div className={styles.empty}>No eligible partnership history is recorded for this pairing.</div> : <>
@@ -95,7 +100,7 @@ function TeamComparison({ data }) {
     ? "Scorecard aggregates represent only eligible players with COMPLETE or VERIFIED rounds."
     : "";
   return <section className={styles.tool}>
-    <header><p>Tool 02</p><h2>Team Comparison</h2><span>Compare historical rosters from the same tournament year.</span></header>
+    <header><p>Tool 03</p><h2>Team Comparison</h2><span>Compare historical rosters from the same tournament year.</span></header>
     <div className={styles.selectGrid}><label>Tournament Year<select value={year} onChange={(event) => { setYear(event.target.value); setTeamAId(""); setTeamBId(""); }}>{data.seasons.map((row) => <option key={row.year}>{row.year}</option>)}</select></label><label>Team A<select value={teamA?.id || ""} onChange={(event) => setTeamAId(event.target.value)}>{season?.teams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label><label>Team B<select value={teamB?.id || ""} onChange={(event) => setTeamBId(event.target.value)}>{season?.teams.filter((team) => team.id !== teamA?.id).map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}</select></label></div>
     {teamA && teamB && <>
       <div className={styles.versus}><h3>{teamA.name}</h3><b>VS</b><h3>{teamB.name}</h3></div>
@@ -150,7 +155,7 @@ function LineupLab({ data }) {
     scorecard: { rating: pick(scorecard, "Course Rating", "Rating"), slope: pick(scorecard, "Slope Rating", "Slope"), par: pick(scorecard, "Par") },
     historical: data.historical, partnerships: data.partnershipPredictionMap, headToHead: data.headToHead, settings: settingsMap(sheets.settings || []),
   }) : null, [complete, format, teams, scorecard, data, sheets.settings]);
-  const optimizersByFormat = useMemo(() => Object.fromEntries(["BB", "SC", "SI"].map((code) => {
+  const optimizersByFormat = useMemo(() => Object.fromEntries(["BB", "SC"].map((code) => {
     const assignedCourse = getFormatCourse(sheets, year, code);
     const cards = getCourseOptions(sheets, assignedCourse);
     const assigned = clean(pick(assignedCourse, "Tee", "Tee Name"));
@@ -187,14 +192,13 @@ function LineupLab({ data }) {
     return buildLineupPlans({
       bestBall: rowsFor("BB", "best"),
       scramble: rowsFor("SC", "best"),
-      singles: rowsFor("SI", "best"),
     });
   }, [optimizersByFormat, partnershipMap, side]);
   return <section className={styles.tool}>
-    <header><p>Tool 03</p><h2>Lineup Lab</h2><span>Swap, lock, and compare pairings using the existing SBI prediction engine.</span></header>
+    <header><p>Tool 01</p><h2>Lineup Lab</h2><span>Swap, lock, and compare pairings using the existing SBI prediction engine.</span></header>
     <div className={styles.selectGrid}>
       <label>Tournament Year<select value={year} onChange={(event) => { setYear(Number(event.target.value)); setLocked(""); setExcluded(""); }}>{availableYears.map((value) => <option key={value}>{value}</option>)}</select></label>
-      <label>Format<select value={format} onChange={(event) => { setFormat(event.target.value); setLocked(""); setExcluded(""); setSelectedId(""); }}><option value="BB">Best Ball</option><option value="SC">Scramble</option><option value="SI">Singles</option></select></label>
+      <label>Format<select value={format} onChange={(event) => { setFormat(event.target.value); setLocked(""); setExcluded(""); setSelectedId(""); }}><option value="BB">Best Ball</option><option value="SC">Scramble</option></select></label>
       <label>Team<select value={side} onChange={(event) => { setSide(event.target.value); setLocked(""); setExcluded(""); setSelectedId(""); }}><option value="team1">{teams.team1.name}</option><option value="team2">{teams.team2.name}</option></select></label>
       <label>Recommendation<select value={mode} onChange={(event) => setMode(event.target.value)}><option value="best">Best Available</option><option value="safe">Safest Pair</option><option value="upside">Highest Upside</option><option value="chemistry">Strongest Chemistry</option><option value="closing">Best Closing Pair</option><option value="sleeper">Sleeper Pair</option></select></label>
       <label>Lock Player<select value={locked} onChange={(event) => setLocked(event.target.value)}><option value="">No player locked</option>{activeTeam.players.filter((player) => player.id !== excluded).map((player) => <option key={player.id} value={player.id}>{player.name}</option>)}</select></label>
@@ -202,15 +206,15 @@ function LineupLab({ data }) {
     </div>
     {!complete ? <div className={styles.empty}>The assigned course, tee, rating, slope, and par must be available before Lineup Lab can calculate projections.</div> : !selected ? <div className={styles.empty}>No eligible lineup is available for these settings.</div> : <>
       <div className={styles.recommendation}>
-        <p>Recommended {formatName(format)} {formatCode(format) === "SI" ? "Player" : "Pair"}</p>
+        <p>Recommended {formatName(format)} Pair</p>
         <h3>{selected.label}</h3>
-        <div><Metric label="Average Win" value={`${selected.averageWinProbability}%`} /><Metric label="Expected Points" value={selected.averageExpectedPoints.toFixed(2)} /><Metric label="Pairing Score" value={selected.pairingScore.overall} detail={chemistryGrade(selected.chemistryScore).grade} /><Metric label="Confidence" value={selected.confidence} /></div>
+        <div><Metric label="Average Win" value={`${selected.averageWinProbability}%`} /><Metric label="Expected Points" value={selected.averageExpectedPoints.toFixed(2)} /><Metric label="Pairing Score" value={selected.pairingScore.overall} detail={chemistryGrade(selected.chemistryScore).grade} /><div className={`${styles.metric} ${styles.confidenceMetric}`}><span>Confidence</span><ConfidenceBadge value={selected.confidence} /></div></div>
       </div>
       {opponent && <div className={styles.opponentPick}><label>Opponent Pairing<select value={opponent.id} onChange={(event) => setOpponentId(event.target.value)}>{selected.matchups.map((match) => <option key={match.id} value={match.id}>{match.opponentLabel}</option>)}</select></label><div><Metric label="Projected Win" value={`${opponent.winProbability}%`} /><Metric label="Halve" value={`${opponent.halveProbability}%`} /><Metric label="Projected Loss" value={`${opponent.lossProbability}%`} /><Metric label="Expected Points" value={opponent.expectedPoints.toFixed(2)} /></div></div>}
       <div className={styles.why}><strong>Recommended because</strong>{reasons.map((reason) => <span key={reason}>• {reason}</span>)}<small>Watch: {selected.dangerousMatchups} dangerous counter-matchup{selected.dangerousMatchups === 1 ? "" : "s"}.</small></div>
       <div className={styles.partnerList}>{rows.slice(0, 8).map((row, index) => <button key={row.id} data-active={row.id === selected.id} onClick={() => setSelectedId(row.id)}><b>#{index + 1}</b><span><strong>{row.label}</strong><small>{row.favorableMatchups}/{row.opponentCount} favorable · {row.confidence} confidence</small></span><em>{row.averageWinProbability}%</em></button>)}</div>
-      <details className={styles.details}><summary>Opponent-aware breakdown <b>⌄</b></summary><div className={styles.matchups}>{selected.matchups.map((match) => <article key={match.id}><strong>{match.opponentLabel}</strong><span>{match.winProbability}% win</span><small>{match.expectedPoints.toFixed(2)} expected points</small></article>)}</div></details>
-      {!!lineupPlans.length && <details className={styles.details}><summary>Optimize Entire Team <b>⌄</b></summary><div className={styles.plans}>{lineupPlans.map((plan) => <article key={plan.id}><h4>{plan.label}</h4>{plan.slots.map((slot) => <p key={slot.id}><span>{formatName(slot.format)}</span><strong>{slot.label}</strong></p>)}<small>{plan.projectedPoints.toFixed(2)} combined expected points · {plan.confidence} confidence</small></article>)}</div></details>}
+      <details className={styles.details}><summary>Opponent-aware breakdown <b>⌄</b></summary><div className={styles.matchups}>{selected.matchups.map((match) => <article key={match.id}><strong title={match.opponentLabel}>{match.opponentLabel}</strong><span>{match.winProbability}% Win</span><span>{match.expectedPoints.toFixed(2)} Expected Points</span><ConfidenceBadge value={selected.confidence} /><small>{match.winProbability > match.lossProbability ? "Favorable edge" : match.winProbability < match.lossProbability ? "Opponent edge" : "Even matchup"}</small></article>)}</div></details>
+      {!!lineupPlans.length && <details className={styles.details}><summary>Optimize Entire Team <b>⌄</b></summary><div className={styles.plans}>{lineupPlans.map((plan) => <article key={plan.id}><h4>{plan.label}</h4>{plan.slots.map((slot) => <div className={styles.planPair} key={slot.id}><span>Recommended {formatName(slot.format)} Pair</span><strong>{slot.label}</strong><small>Why: {slot.format === "BB" ? "Best available chemistry and matchup projection" : "Strongest team scoring and closing profile"}</small></div>)}<footer>{plan.projectedPoints.toFixed(2)} combined expected points <ConfidenceBadge value={plan.confidence} /></footer></article>)}</div></details>}
       <div className={styles.advisory}>Advisory only. Lineup Lab never writes recommendations to official Matches or lineup data.</div>
     </>}
   </section>;
@@ -232,9 +236,25 @@ function Rankings({ data }) {
   })}</div></section>;
 }
 
-export default function TeamIntelligence({ initialData, loadError }) {
-  const [tab, setTab] = useState("partnership");
+export default function TeamIntelligence({ initialData, loadError, initialTool = "lineup-lab" }) {
+  const [tab, setTab] = useState(initialTool);
+  useEffect(() => {
+    const handlePopState = () => {
+      const requested = new URLSearchParams(window.location.search).get("tool");
+      if (["lineup-lab", "partnership-analyzer", "team-comparison", "historical-rankings"].includes(requested)) setTab(requested);
+      else setTab("lineup-lab");
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+  const selectTab = (key) => {
+    setTab(key);
+    const url = new URL(window.location.href);
+    if (key === "lineup-lab") url.searchParams.delete("tool");
+    else url.searchParams.set("tool", key);
+    window.history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  };
   if (!initialData) return <section className={styles.shell}><div className={styles.empty}><h1>Team Intelligence unavailable</h1><p>{loadError}</p></div></section>;
-  const tabs = [["partnership", "Partnership Analyzer"], ["comparison", "Team Comparison"], ["lineup", "Lineup Lab"], ["rankings", "Historical Rankings"]];
-  return <><section className={styles.hero}><p>War Room</p><h1>Team Intelligence</h1><span>Partnerships, team edges, and lineup decisions—built from the same SBI analytics behind Matchup Lab.</span></section><section className={styles.shell}><nav className={styles.tabs} aria-label="Team Intelligence tools">{tabs.map(([key, label]) => <button key={key} data-active={tab === key} onClick={() => setTab(key)}>{label}</button>)}</nav>{tab === "partnership" && <PartnershipAnalyzer data={initialData} />}{tab === "comparison" && <TeamComparison data={initialData} />}{tab === "lineup" && <LineupLab data={initialData} />}{tab === "rankings" && <Rankings data={initialData} />}</section></>;
+  const tabs = [["lineup-lab", "Lineup Lab"], ["partnership-analyzer", "Partnership Analyzer"], ["team-comparison", "Team Comparison"], ["historical-rankings", "Historical Rankings"]];
+  return <><section className={styles.hero}><p>War Room</p><h1>Team Intelligence</h1><span>Partnerships, team edges, and lineup decisions—built from the same SBI analytics behind Matchup Lab.</span></section><section className={styles.shell}><nav className={styles.tabs} aria-label="Team Intelligence tools">{tabs.map(([key, label]) => <button key={key} data-active={tab === key} onClick={() => selectTab(key)}>{label}</button>)}</nav>{tab === "lineup-lab" && <LineupLab data={initialData} />}{tab === "partnership-analyzer" && <PartnershipAnalyzer data={initialData} />}{tab === "team-comparison" && <TeamComparison data={initialData} />}{tab === "historical-rankings" && <Rankings data={initialData} />}</section></>;
 }
