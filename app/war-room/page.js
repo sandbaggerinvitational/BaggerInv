@@ -8,8 +8,8 @@ import { buildScorecardAnalytics } from "../../lib/scorecard-analytics";
 import { currentTournamentYear, getTeamContext } from "../../lib/tournament-context";
 
 export const metadata = pageMetadata({
-  title: "Matchup Lab | Sandbagger Invitational",
-  description: "Build Sandbagger Invitational matchups and evaluate the competitive edges behind every pairing.",
+  title: "Match Intelligence | Sandbagger Invitational",
+  description: "Build SBI matchups and understand the deterministic evidence behind every prediction.",
   path: "/war-room",
 });
 
@@ -80,5 +80,5 @@ export default async function WarRoomPage({ searchParams }) {
       },
     };
   } catch(e){ error=e.message || "Unable to load prediction data."; }
-  return <main><Header/><WarRoom initialData={data} loadError={error} aiConfigured={Boolean(process.env.OPENAI_API_KEY)} initialSelection={initialSelection}/><Footer/></main>;
+  return <main><Header/><WarRoom initialData={data} loadError={error} initialSelection={initialSelection}/><Footer/></main>;
 }

@@ -1,243 +1,175 @@
+import { buildMatchIntelligence } from "../../lib/match-intelligence";
 import styles from "./war-room.module.css";
-
-const formatName = (code) => ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[code] || code;
-const recordText = (record) => record?.matches ? `${record.wins}-${record.losses}-${record.halves}` : "no recorded matches";
-
-function edgeLabel(edge) {
-  if (edge < 3) return "Toss-up";
-  if (edge < 8) return "Slight edge";
-  if (edge < 16) return "Clear edge";
-  if (edge < 26) return "Strong favorite";
-  return "Heavy favorite";
-}
-
-function evidenceLabel(matches) {
-  if (!matches) return "No reliable sample";
-  if (matches < 3) return "Limited evidence";
-  if (matches < 7) return "Moderate evidence";
-  return "Strong evidence";
-}
-
-function playerProfile(player, historical, format) {
-  const stats = historical[player.id] || {};
-  const overall = stats.sandbaggerRatings?.OVERALL || {};
-  const byFormat = stats.sandbaggerRatings?.[format] || {};
-  const formatMatches = byFormat.matches || stats.records?.[format]?.matches || 0;
-  const reliability = Math.min(1, formatMatches / 6);
-  const rating = (overall.rating || 1500) + reliability * ((byFormat.rating || overall.rating || 1500) - (overall.rating || 1500));
-  return {
-    ...player,
-    rating,
-    overallRating: overall.rating || 1500,
-    formatRating: byFormat.rating || overall.rating || 1500,
-    formatMatches,
-    appearances: stats.appearances?.length || 0,
-    record: stats.records?.[format] || stats.records?.overall,
-  };
-}
 
 function AnalystSection({ title, children, open = false }) {
   return (
     <details className={styles.analystSection} open={open}>
-      <summary>{title}<span>+</span></summary>
+      <summary>{title}<span aria-hidden="true">+</span></summary>
       <div>{children}</div>
     </details>
   );
 }
 
+function EdgeBadge({ edge, teamNames }) {
+  const label = edge === "TEAM_A"
+    ? teamNames[0]
+    : edge === "TEAM_B" ? teamNames[1] : edge === "TIE" ? "Even" : "Unavailable";
+  return <b className={styles.matchIntelEdge} data-edge={edge}>{label}</b>;
+}
+
+function EvidenceList({ rows, empty }) {
+  if (!rows.length) return <p>{empty}</p>;
+  return <ul className={styles.matchIntelEvidence}>{rows.map((row) => <li key={row.id}>{row.text}</li>)}</ul>;
+}
+
 export default function MatchAnalyst({
   prediction,
-  simulation,
   teamNames,
   players,
   historical,
   partnerships,
+  headToHead,
   format,
   pointsAvailable,
-  play,
-  strokeMaps,
-  holes,
-  courseName,
-  tee,
-  aiBriefing,
-  aiError,
-  aiLoading,
-  aiConfigured,
-  onGenerate,
   scoringIntelligence,
+  matches,
 }) {
-  const slots = format === "SI" ? 1 : 2;
-  const teamPlayers = [players.slice(0, slots), players.slice(slots)];
-  const profiles = players.map((player) => playerProfile(player, historical, format));
-  const teamProfiles = [profiles.slice(0, slots), profiles.slice(slots)];
-  const favoriteIndex = prediction.teamA >= prediction.teamB ? 0 : 1;
-  const underdogIndex = 1 - favoriteIndex;
-  const probabilities = [prediction.teamA, prediction.teamB];
-  const probabilityEdge = Math.abs(prediction.teamA - prediction.teamB);
-  const favorite = teamNames[favoriteIndex];
-  const underdog = teamNames[underdogIndex];
-  const favoriteExpected = simulation
-    ? [simulation.expectedPoints.teamA, simulation.expectedPoints.teamB][favoriteIndex]
-    : ((probabilities[favoriteIndex] + prediction.tie * .5) / 100) * pointsAvailable;
-  const strokeDifference = play.strokesA - play.strokesB;
-  const strokeTeamIndex = strokeDifference > 0 ? 0 : strokeDifference < 0 ? 1 : null;
-  const volatilityValue = simulation
-    ? simulation.volatility.on18 + simulation.volatility.halved
-    : prediction.tie;
-  const volatility = volatilityValue >= 32 ? "High" : volatilityValue >= 20 ? "Moderate" : "Controlled";
-
-  const rankedDrivers = [...prediction.contributions]
-    .filter((driver) => format !== "SI" || driver.id !== "team")
-    .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
-  const factorByLabel = Object.fromEntries((prediction.factors || []).map((factor) => [factor.category.toLowerCase(), factor]));
-  const driverEvidence = (driver) => {
-    if (driver.id === "team") {
-      const matches = prediction.teamVibes.teamA.matches + prediction.teamVibes.teamB.matches;
-      return evidenceLabel(matches);
-    }
-    if (driver.id === "opponent") {
-      const detail = factorByLabel["head-to-head"]?.detail || "";
-      return /no prior/i.test(detail) ? "No reliable sample" : "Moderate evidence";
-    }
-    if (driver.id === "player") return evidenceLabel(profiles.reduce((sum, player) => sum + player.formatMatches, 0));
-    if (driver.id === "tournament") return evidenceLabel(profiles.reduce((sum, player) => sum + player.appearances, 0));
-    return Math.abs(strokeDifference) ? "Strong evidence" : "No net edge";
-  };
-  const driverSentence = (driver) => {
-    const gap = Math.abs(driver.teamA - driver.teamB);
-    if (driver.id === "team" && !prediction.teamVibes.teamA.known && !prediction.teamVibes.teamB.known) return "Neither pairing has a recorded shared-match sample.";
-    if (driver.id === "opponent" && driverEvidence(driver) === "No reliable sample") return "No dependable direct-matchup history is available.";
-    if (gap < .5) return "The available evidence does not separate the two sides.";
-    const beneficiary = driver.teamA > driver.teamB ? teamNames[0] : teamNames[1];
-    const strength = gap >= 24 ? "strong" : gap >= 12 ? "moderate" : "slight";
-    return `${beneficiary} holds a ${strength} ${driver.label.toLowerCase()} advantage.`;
-  };
-
-  const strongest = [...profiles].sort((a, b) => b.rating - a.rating)[0];
-  const counter = [...teamProfiles[underdogIndex]].sort((a, b) => b.rating - a.rating)[0];
-  const uncertainty = [...profiles].sort((a, b) => a.formatMatches - b.formatMatches || a.appearances - b.appearances)[0];
-  const strongestTeam = teamProfiles.findIndex((team) => team.includes(strongest));
-  const ratingGap = strongest && counter ? Math.round(strongest.rating - counter.rating) : 0;
-
-  const chemistry = teamPlayers.map((pair, index) => {
-    if (format === "SI") return null;
-    const key = pair.map((player) => player.id).sort().join("|");
-    const history = partnerships[key];
-    const vibes = index === 0 ? prediction.teamVibes.teamA : prediction.teamVibes.teamB;
-    return { pair, history, vibes };
+  const intelligence = buildMatchIntelligence({
+    prediction,
+    teamNames,
+    players,
+    historical,
+    partnerships,
+    headToHead,
+    format,
+    pointsAvailable,
+    scoringIntelligence,
+    matches,
   });
-
-  const netStrokeHoles = strokeMaps
-    ? holes.map((hole, index) => ({
-        hole: Number(hole["Hole Number"] || index + 1),
-        difference: (strokeMaps.team1?.[index] || 0) - (strokeMaps.team2?.[index] || 0),
-      })).filter((hole) => hole.difference)
-    : [];
-  const frontDifference = netStrokeHoles.filter((hole) => hole.hole <= 9).reduce((sum, hole) => sum + hole.difference, 0);
-  const backDifference = netStrokeHoles.filter((hole) => hole.hole > 9).reduce((sum, hole) => sum + hole.difference, 0);
-  const strokeHoles = netStrokeHoles.map((hole) => hole.hole).join(", ");
-
-  const favoriteDrivers = rankedDrivers.filter((driver) => driver.side === (favoriteIndex === 0 ? "A" : "B"));
-  const opponentDrivers = rankedDrivers.filter((driver) => driver.side === (favoriteIndex === 0 ? "B" : "A"));
-  const leadReason = favoriteDrivers.slice(0, 2).map((driver) => driver.label.toLowerCase()).join(" and ") || "the combined weighted profile";
-  const counterReason = opponentDrivers.slice(0, 2).map((driver) => driver.label.toLowerCase()).join(" and ");
+  if (!intelligence) return null;
+  const overview = intelligence.overview;
+  const favoriteIndex = overview.favoriteIndex;
+  const score = (value) => Number.isFinite(Number(value)) ? Number(value).toFixed(2) : "—";
 
   return (
     <div className={styles.analystReport}>
-      <div className={styles.sectionTitle}><span>SBI</span><div><p>SBI Match Analyst</p><h2>The official scouting report</h2></div></div>
-
-      <div className={styles.analystKeyNumbers}>
-        <span>Key Numbers</span>
-        <dl>
-          <div><dt>Favorite</dt><dd>{favorite}</dd></div>
-          <div><dt>Win probability</dt><dd>{probabilities[favoriteIndex].toFixed(1)}%</dd></div>
-          <div><dt>Halve probability</dt><dd>{prediction.tie.toFixed(1)}%</dd></div>
-          <div><dt>Expected points</dt><dd>{favoriteExpected.toFixed(2)} / {pointsAvailable.toFixed(2)}</dd></div>
-          <div><dt>Match stroke edge</dt><dd>{strokeTeamIndex === null ? "Even" : `${teamNames[strokeTeamIndex]} +${Math.abs(strokeDifference)}`}</dd></div>
-          <div><dt>Confidence</dt><dd>{prediction.confidence}</dd></div>
-          <div><dt>Volatility</dt><dd>{volatility}</dd></div>
-        </dl>
+      <div className={styles.sectionTitle}>
+        <span>SBI</span>
+        <div><p>Official SBI Match Analyst</p><h2>Match Intelligence</h2><small>Deterministic analysis from verified SBI data</small></div>
       </div>
 
-      <AnalystSection title="The Verdict" open>
-        <p><strong>{edgeLabel(probabilityEdge)} — {favorite}.</strong> {favorite} projects at {probabilities[favoriteIndex].toFixed(1)}% against {probabilities[underdogIndex].toFixed(1)}% for {underdog}, with a {prediction.tie.toFixed(1)}% halve probability.</p>
-        <p>{counterReason ? `Although ${underdog} owns the better ${counterReason}, ` : ""}{favorite} remains favored because {leadReason} carries more weight in the current calculation. The {probabilityEdge.toFixed(1)}-point win-probability gap is {probabilityEdge < 8 ? "competitive rather than decisive" : probabilityEdge < 16 ? "meaningful without making this a mismatch" : "substantial across the current inputs"}.</p>
+      <section className={styles.matchIntelOverview}>
+        <div>
+          <span>Projected Edge</span>
+          <h3>{overview.favorite}</h3>
+          <strong>{overview.probabilities[favoriteIndex]}%</strong>
+        </div>
+        <dl>
+          <div><dt>Expected Points</dt><dd>{score(overview.expectedPoints[favoriteIndex])}</dd></div>
+          <div><dt>Confidence</dt><dd>{overview.confidence}</dd></div>
+          <div><dt>Prediction Tier</dt><dd>{overview.predictionTier}</dd></div>
+          <div><dt>Upset Potential</dt><dd>{overview.upsetPotential}</dd></div>
+          <div><dt>Matchup Style</dt><dd>{overview.matchupStyle}</dd></div>
+          <div><dt>Halve</dt><dd>{overview.halveProbability}%</dd></div>
+        </dl>
+      </section>
+
+      <AnalystSection title="Category Breakdown" open>
+        <div className={styles.matchIntelCategories}>
+          {intelligence.categories.map((item) => (
+            <article key={item.id}>
+              <div><strong>{item.label}</strong><small>{item.source}</small></div>
+              <EdgeBadge edge={item.edge} teamNames={teamNames} />
+            </article>
+          ))}
+        </div>
       </AnalystSection>
 
-      <AnalystSection title="Why the Model Leans" open>
+      <AnalystSection title="Key Advantages" open>
+        <div className={styles.matchIntelTwoColumn}>
+          {teamNames.map((name, index) => (
+            <article key={name}>
+              <h3>{name}</h3>
+              <EvidenceList rows={intelligence.advantages[index]} empty="No measurable category advantage." />
+            </article>
+          ))}
+        </div>
+      </AnalystSection>
+
+      <AnalystSection title="Key Risks">
+        <div className={styles.matchIntelTwoColumn}>
+          {teamNames.map((name, index) => (
+            <article key={name}>
+              <h3>{name}</h3>
+              <EvidenceList rows={intelligence.risks[index]} empty="No material risk is supported by the available data." />
+            </article>
+          ))}
+        </div>
+      </AnalystSection>
+
+      <AnalystSection title="Swing Factors" open>
         <ol className={styles.analystDrivers}>
-          {rankedDrivers.map((driver) => (
-            <li key={driver.id}>
-              <div><strong>{driver.label}</strong><b>{driverEvidence(driver)}</b></div>
-              <p>{driverSentence(driver)}</p>
+          {intelligence.swingFactors.map((factor) => (
+            <li key={factor.id}>
+              <div><strong>{factor.label}</strong><EdgeBadge edge={factor.edge} teamNames={teamNames} /></div>
+              <p>{factor.source} · Projected impact {factor.impact.toFixed(1)} points</p>
             </li>
           ))}
         </ol>
       </AnalystSection>
 
-      <AnalystSection title="Model Calibration">
-        <p>This audit trail shows how the capped underlying-skill adjustment changes {teamNames[0]}’s win probability before the model’s existing minimum and maximum limits are enforced.</p>
+      <AnalystSection title="Historical Context">
+        <dl className={styles.matchIntelHistory}>
+          <div><dt>Head-to-head sample</dt><dd>{intelligence.history.headToHeadMatches || "—"}</dd></div>
+          <div><dt>Recorded partnerships</dt><dd>{intelligence.history.partnershipRecords.length || "—"}</dd></div>
+          <div>
+            <dt>Last relevant meeting</dt>
+            <dd>{intelligence.history.lastMeeting
+              ? `${intelligence.history.lastMeeting.year} · Round ${intelligence.history.lastMeeting.round || "—"} · ${intelligence.history.lastMeeting.result}`
+              : "—"}</dd>
+          </div>
+        </dl>
+        {intelligence.history.similarMatch ? (
+          <div className={styles.matchIntelSimilar}>
+            <span>Most Similar Historical Match</span>
+            <strong>{intelligence.history.similarMatch.year} · Round {intelligence.history.similarMatch.round || "—"} · {intelligence.history.similarMatch.format}</strong>
+            <p>Winner: {intelligence.history.similarMatch.winner} · Margin: {intelligence.history.similarMatch.margin}</p>
+            <small>Historical prediction: {intelligence.history.similarMatch.prediction} · Actual: {intelligence.history.similarMatch.actualResult}</small>
+          </div>
+        ) : <p>No sufficiently relevant historical match is available.</p>}
+      </AnalystSection>
+
+      <AnalystSection title="How We Got Here">
+        <p>The values below are the transparent contribution to {teamNames[0]} before the final probability is displayed. Positive values favor {teamNames[0]}; negative values favor {teamNames[1]}.</p>
         <dl className={styles.calibrationGrid}>
-          <div><dt>Before skill adjustment</dt><dd>{prediction.calibration.probabilityBeforeSkillAdjustment.toFixed(1)}%</dd></div>
-          <div><dt>Underlying skill adjustment</dt><dd>{prediction.calibration.underlyingSkillAdjustment >= 0 ? "+" : ""}{prediction.calibration.underlyingSkillAdjustment.toFixed(1)} pts</dd></div>
-          <div><dt>After skill adjustment</dt><dd>{prediction.calibration.probabilityAfterSkillAdjustment.toFixed(1)}%</dd></div>
-          <div><dt>Final capped probability</dt><dd>{prediction.calibration.finalCappedProbability.toFixed(1)}%</dd></div>
+          {intelligence.explainPrediction.map((item) => (
+            <div key={item.id}><dt>{item.label}</dt><dd>{item.value > 0 ? "+" : ""}{item.value} pts</dd></div>
+          ))}
+          <div><dt>Final Win Probability</dt><dd>{intelligence.finalProbability}%</dd></div>
         </dl>
       </AnalystSection>
 
-      <AnalystSection title="Player Impact">
-        <p><strong>{strongest.name}</strong> is the highest-rated player in this matchup and supplies {teamNames[strongestTeam]} with the strongest individual baseline for {formatName(format)}.</p>
-        <p><strong>{counter.name}</strong> is {underdog}’s strongest counter{ratingGap > 0 ? `, sitting about ${ratingGap} blended rating points behind the matchup leader` : " on the available blended ratings"}. <strong>{uncertainty.name}</strong> is the biggest uncertainty because {evidenceLabel(uncertainty.formatMatches).toLowerCase()} supports that player’s format profile.</p>
+      <AnalystSection title="Official SBI Match Analysis" open>
+        <p>{intelligence.analysis}</p>
       </AnalystSection>
 
-      {scoringIntelligence?.available ? <AnalystSection title="Recorded Scoring Context">
-        <p><strong>This is observed scorecard context only.</strong> It is not included in the displayed win probability during Phase 3A.</p>
-        {scoringIntelligence.insights.length ? scoringIntelligence.insights.map((insight) => (
-          <p key={`${insight.title}-${insight.body}`}><strong>{insight.title}:</strong> {insight.body} Confidence: {insight.confidence}.</p>
-        )) : <p>The available recorded samples do not produce a meaningful matchup-specific edge.</p>}
-        {scoringIntelligence.incompleteComparison ? <p>Only one side has a relevant recorded sample, so no direct scoring advantage is declared.</p> : null}
-      </AnalystSection> : null}
-
-      {format !== "SI" ? <AnalystSection title="Pairing Chemistry">
-        {chemistry.map(({ pair, history, vibes }, index) => (
-          <p key={teamNames[index]}><strong>{pair.map((player) => player.name).join(" and ")}</strong> carry a Team Vibes score of {vibes.known ? Math.round(vibes.score) : "unknown"}. {history?.record?.matches ? `Their shared record is ${recordText(history.record)} across ${history.record.matches} matches, with ${vibes.sameFormatMatches} in ${formatName(format)}. ${evidenceLabel(history.record.matches)}.` : "There is no recorded shared-match history, so chemistry is an uncertainty rather than a neutral advantage."}</p>
-        ))}
-      </AnalystSection> : null}
-
-      <AnalystSection title="Stroke Story">
-        <p>{strokeTeamIndex === null ? `The match is played without a net stroke advantage at ${courseName} from the ${tee} tees.` : `${teamNames[strokeTeamIndex]} receive ${Math.abs(strokeDifference)} effective ${Math.abs(strokeDifference) === 1 ? "stroke" : "strokes"}${strokeHoles ? ` on ${strokeHoles.includes(",") ? "holes" : "hole"} ${strokeHoles}` : ""}.`}</p>
-        <p>{strokeTeamIndex === null ? "Handicap does not move the projection toward either side." : `${Math.abs(frontDifference)} net ${Math.abs(frontDifference) === 1 ? "stroke falls" : "strokes fall"} on the front nine and ${Math.abs(backDifference)} on the back. ${opponentDrivers.some((driver) => driver.id === "handicap") ? "The stroke allocation improves the underdog’s route into the match but does not erase the favorite’s stronger weighted advantages." : "The allocation reinforces the projected favorite rather than creating the edge by itself."}`}</p>
-      </AnalystSection>
-
-      <AnalystSection title="Projected Match Flow">
-        {simulation ? <>
-          {format !== "SI" ? <p>The front nine gives {simulation.segmentProbabilities.front.teamA >= simulation.segmentProbabilities.front.teamB ? teamNames[0] : teamNames[1]} the higher segment win probability, while the back nine leans {simulation.segmentProbabilities.back.teamA >= simulation.segmentProbabilities.back.teamB ? teamNames[0] : teamNames[1]}.</p> : <p>Across the full 18-hole singles match, {simulation.winProbability.teamA >= simulation.winProbability.teamB ? teamNames[0] : teamNames[1]} owns the higher simulated win rate.</p>}
-          <p>The most likely result is <strong>{simulation.likelyResults[0]?.label}</strong>. {simulation.volatility.on18.toFixed(1)}% reach the 18th hole, {simulation.volatility.before17.toFixed(1)}% close on 16 or 17, and {simulation.volatility.halved.toFixed(1)}% finish halved.</p>
-        </> : <p>Run the 10,000-match simulation to generate projected match flow, finish-hole outlook, and the most likely result.</p>}
-      </AnalystSection>
-
-      <AnalystSection title="Upset Path">
-        <p>{underdog}’s clearest path is to press its {opponentDrivers[0]?.label.toLowerCase() || "best available counter-edge"}{strokeTeamIndex === underdogIndex && strokeHoles ? `, convert the stroke opportunity on ${strokeHoles.includes(",") ? "holes" : "hole"} ${strokeHoles}` : ""}, and keep {favorite} from converting its {favoriteDrivers[0]?.label.toLowerCase() || "primary advantage"} into early separation.</p>
-        {simulation ? <p>With {simulation.volatility.on18.toFixed(1)}% of simulations reaching 18, extending the match into the closing holes is the higher-variance route.</p> : null}
-      </AnalystSection>
-
-      <AnalystSection title="Favorite’s Failure Point">
-        <p>{favorite} is most vulnerable if its {favoriteDrivers[0]?.label.toLowerCase() || "leading profile"} fails to translate into won holes while {underdog} converts {opponentDrivers[0]?.label.toLowerCase() || "its strongest counter"}. {prediction.teamVibes?.[favoriteIndex === 0 ? "teamA" : "teamB"]?.known ? "Its pairing history provides some support, but does not remove that pressure point." : "The lack of a reliable shared-match sample adds uncertainty to the favorite’s baseline."}</p>
-      </AnalystSection>
-
-      <AnalystSection title="Captain’s Moves" open>
-        <div className={styles.captainMoves}>
-          <p><strong>Captain’s Move — {teamNames[0]}</strong> Use {teamProfiles[0].sort((a, b) => b.rating - a.rating)[0].name} as the primary {formatName(format)} scoring anchor and manage the match around {rankedDrivers.find((driver) => driver.side === "A")?.label.toLowerCase() || "the side’s strongest measured advantage"}. Do not change the selected lineup without optimizer evidence.</p>
-          <p><strong>Captain’s Move — {teamNames[1]}</strong> Build the plan around {teamProfiles[1].sort((a, b) => b.rating - a.rating)[0].name} and protect {rankedDrivers.find((driver) => driver.side === "B")?.label.toLowerCase() || "the side’s strongest measured counter"}. Keep the pairing intact unless the Lineup Optimizer identifies a clearly stronger option.</p>
+      <AnalystSection title="Keys to Victory">
+        <div className={styles.matchIntelTwoColumn}>
+          {teamNames.map((name, index) => (
+            <article key={name}>
+              <h3>{name}</h3>
+              <ul className={styles.matchIntelEvidence}>
+                {intelligence.keysToVictory[index].map((key) => <li key={key}>{key}</li>)}
+              </ul>
+            </article>
+          ))}
         </div>
       </AnalystSection>
 
-      <div className={styles.aiActions}>
-        <button type="button" onClick={onGenerate} disabled={aiLoading || !aiConfigured}>{aiLoading ? "Analyzing matchup…" : !aiConfigured ? "Analyst setup required" : aiBriefing ? "Refresh analyst briefing" : "Generate analyst briefing"}</button>
-        <small>{aiConfigured ? "Generate an additional SBI analytics-desk read from these same verified matchup numbers." : "Add OPENAI_API_KEY in Vercel Production Environment Variables and redeploy to enable generated analyst notes."}</small>
-      </div>
-      {aiBriefing ? <div className={styles.generatedAnalystNotes}><span>Generated Analyst Notes</span>{aiBriefing.split(/\n\s*\n/).filter(Boolean).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div> : null}
-      {aiError ? <div className={styles.aiError}>{aiError} The deterministic scouting report remains available.</div> : null}
+      <section className={styles.captainsNotes}>
+        <span>Captain&apos;s Notes</span>
+        <p>{intelligence.captainsNotes}</p>
+      </section>
     </div>
   );
 }
