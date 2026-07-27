@@ -137,6 +137,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle}>
     <div className={styles.matchTop}><span>{topLabel}</span><span>{match.teeTime || match.status}</span></div>
     <div className={styles.matchMeta}><span>Match {match.match}</span><strong>{match.status}</strong></div>
+    {match.liveStatusText ? <p className={styles.matchNotes}>{match.liveStatusText}</p> : null}
     <MatchupRoster tournament={tournament} match={match} />
     {variant === "historical" ? (
       <ScorecardTable scorecards={scorecards} compact />

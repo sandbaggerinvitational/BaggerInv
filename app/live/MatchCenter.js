@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import AssetImage from "../AssetImage";
 import PublicMatchCard from "../PublicMatchCard";
 import { addTournamentRanks } from "../../lib/rankings";
@@ -141,12 +142,27 @@ function MobileTournamentInsights({ tournament, round, rounds, remainingByRound,
 }
 
 export default function MatchCenter({ initialData, loadError }) {
+  const router = useRouter();
   const tournament = initialData?.tournament;
   const rounds = initialData?.rounds || [];
   const [activeRound, setActiveRound] = useState(
     Number.isFinite(Number(tournament?.currentRound)) ? Number(tournament.currentRound) : rounds.at(-1)?.number || rounds[0]?.number
   );
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState(() => new Date());
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState !== "visible") return;
+      router.refresh();
+      setLastRefresh(new Date());
+    };
+    const timer = window.setInterval(refresh, 15_000);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [router]);
   const active = rounds.find((round) => round.number === activeRound) || rounds[0];
   const rankedLeaderboard = useMemo(() => addTournamentRanks(initialData?.leaderboard || [], "points"), [initialData]);
   const leaderboard = showLeaderboard ? rankedLeaderboard : rankedLeaderboard.slice(0, 5);
@@ -158,7 +174,7 @@ export default function MatchCenter({ initialData, loadError }) {
   const leaderboardTitle = championshipMode ? "Final Player Leaderboard" : isLive ? "Live Player Leaderboard" : "Player Standings";
 
   return <>
-    <section className={styles.hero}><div><p className={styles.eyebrow}>{tournament.status}</p><h1>Match Center</h1><p>{tournament.year} Sandbagger Invitational{tournament.location ? ` · ${tournament.location}` : ""}</p>{tournament.liveMessage ? <div className={styles.liveMessage}>{tournament.liveMessage}</div> : null}</div></section>
+    <section className={styles.hero}><div><p className={styles.eyebrow}>{tournament.status}</p><h1>Match Center</h1><p>{tournament.year} Sandbagger Invitational{tournament.location ? ` · ${tournament.location}` : ""}</p><small aria-live="polite">Updates automatically · checked {lastRefresh.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</small>{tournament.liveMessage ? <div className={styles.liveMessage}>{tournament.liveMessage}</div> : null}</div></section>
     {championshipMode ? <ChampionshipBanner tournament={tournament} /> : <LiveBanner tournament={tournament} />}
     <section className={styles.content}>
       {rounds.length ? <RoundNavigation rounds={rounds} activeRound={active?.number} onSelect={setActiveRound} /> : null}

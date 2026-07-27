@@ -234,6 +234,7 @@ export async function getTournamentData() {
         status,
         finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",
         notes: publicResultAllowed ? (authoritative.Notes || "") : "",
+        liveStatusText: publicResultAllowed ? (authoritative["Match Status Text"] || "") : "",
         team1Players: [playerEntry(liveRow, 1, 1, playerMap), playerEntry(liveRow, 1, 2, playerMap)].filter(Boolean),
         team2Players: [playerEntry(liveRow, 2, 1, playerMap), playerEntry(liveRow, 2, 2, playerMap)].filter(Boolean),
         team1PlayingHcp: number(liveRow["Team 1 Playing HCP"]),
