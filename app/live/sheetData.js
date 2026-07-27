@@ -291,6 +291,13 @@ export async function getTournamentData() {
   const liveMap = new Map(currentLiveRows.map((row) => [clean(row["Match ID"]), row]));
   const permanentMap = new Map(configuredMatches.map((row) => [clean(row["Match ID"]), row]));
   const sourceIds = [...new Set([...configuredMatches, ...currentLiveRows].map((row) => clean(row["Match ID"])).filter(Boolean))];
+  const scoringMatchMap = new Map(sourceIds.map((matchId) => {
+    const merged = { ...(permanentMap.get(matchId) || {}) };
+    for (const [field, value] of Object.entries(liveMap.get(matchId) || {})) {
+      if (clean(value)) merged[field] = value;
+    }
+    return [matchId, merged];
+  }));
   const expectedByRound = new Map();
   for (const row of configuredMatches.length ? configuredMatches : currentLiveRows) {
     const round = Number(row.Round);
@@ -389,7 +396,7 @@ export async function getTournamentData() {
     leaderboard: buildLeaderboard(matches, playerMap, teams),
     scoreLeaderboard: buildIndividualScoreLeaderboard(
       liveHoleScores.filter((row) => liveMap.has(clean(row["Match ID"]))),
-      liveMap,
+      scoringMatchMap,
       courseHoles,
       playerMap
     ),
