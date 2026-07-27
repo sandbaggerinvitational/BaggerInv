@@ -28,3 +28,15 @@ test("new scoring writes require a separate test spreadsheet", async () => {
   assert.match(source, /finalizeLiveMatch/);
   assert.match(source, /matchComplete/);
 });
+
+test("scoring login and writes are rate limited", async () => {
+  const [session, match] = await Promise.all([
+    readFile(new URL("../app/api/scoring/session/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/scoring/matches/[matchId]/route.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(session, /scoring-login:/);
+  assert.match(session, /limit:\s*5/);
+  assert.match(session, /Retry-After/);
+  assert.match(match, /scoring-write:/);
+  assert.match(match, /limit:\s*30/);
+});

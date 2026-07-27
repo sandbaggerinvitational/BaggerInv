@@ -12,6 +12,9 @@ This prototype is intentionally prevented from writing to the production spreads
 
 Do not reuse production secrets for the preview.
 
+Scoring sessions expire after 12 hours. Login attempts and score writes are
+rate-limited to reduce code guessing and accidental rapid resubmission.
+
 ## Test-sheet additions
 
 Add these columns to `Live Matches`:
