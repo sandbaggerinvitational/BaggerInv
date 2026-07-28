@@ -60,6 +60,7 @@ test("activation and match routes enforce rate limiting and server-side Passport
   assert.match(sheets, /codeMatches\.length === 1/);
   assert.match(sheets, /invitation page open while an admin regenerates/);
   assert.match(sheets, /activation audit failed/);
+  assert.match(sheets, /playerId:\s*player\.id/);
   assert.doesNotMatch(sheets, /"Activation Code"\s*:/);
   assert.match(scoreEntry, /Enter Match Code|match code/i);
   assert.match(scoreEntry, /Activate Player Passport/);
