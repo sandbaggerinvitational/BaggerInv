@@ -15,16 +15,43 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  let reference = "";
   try {
-    const { reference, activationCode, deviceLabel } = await request.json();
+    const payload = await request.json();
+    reference = payload.reference;
+    const { activationCode, deviceLabel } = payload;
     const rate = consumeRateLimit(`passport-activation:${clientAddress(request)}:${String(reference || "").slice(0, 24)}`, { limit: 5, windowMs: 15 * 60_000 });
-    if (!rate.allowed) return NextResponse.json({ error: "Unable to activate Player Passport." }, { status: 429 });
+    if (!rate.allowed) return NextResponse.json({ error: "Too many attempts. Wait 15 minutes, then generate a new code and try again." }, { status: 429 });
     const activated = await activatePlayerPassport({ reference, code: activationCode, deviceLabel });
     const token = createPlayerPassportSession(activated);
     const response = NextResponse.json({ activated: true, player: activated.player });
     response.cookies.set(playerPassportCookie(token));
     return response;
-  } catch {
-    return NextResponse.json({ error: "Unable to activate Player Passport." }, { status: 401 });
+  } catch (error) {
+    const reason = String(error?.code || "PASSPORT_ACTIVATION_INTERNAL_ERROR");
+    console.error("Player Passport activation failed", {
+      reason,
+      referenceSuffix: String(reference || "").slice(-6),
+      environment: process.env.VERCEL_ENV || "local",
+      detail: reason === "PASSPORT_ACTIVATION_INTERNAL_ERROR"
+        ? (error instanceof Error ? error.message : String(error))
+        : undefined,
+    });
+    const credentialFailure = [
+      "PASSPORT_REFERENCE_NOT_FOUND",
+      "PASSPORT_ACTIVATION_INACTIVE",
+      "PASSPORT_ACTIVATION_EXPIRED",
+      "PASSPORT_CODE_HASH_MISSING",
+      "PASSPORT_CODE_MISMATCH",
+      "PASSPORT_PLAYER_NOT_ELIGIBLE",
+    ].includes(reason);
+    return NextResponse.json(
+      {
+        error: credentialFailure
+          ? "That activation code is not valid. Generate a new code and try again."
+          : "Player Passport could not save this device. Please try again.",
+      },
+      { status: credentialFailure ? 401 : 500 }
+    );
   }
 }

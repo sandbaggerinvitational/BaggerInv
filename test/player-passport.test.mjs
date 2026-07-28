@@ -47,13 +47,17 @@ test("activation and match routes enforce rate limiting and server-side Passport
     readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
   ]);
   assert.match(activation, /consumeRateLimit/);
-  assert.match(activation, /Unable to activate Player Passport\./);
+  assert.match(activation, /Player Passport activation failed/);
+  assert.match(activation, /PASSPORT_CODE_MISMATCH/);
+  assert.match(activation, /Player Passport could not save this device/);
   assert.match(matches, /authorizePassportMatch/);
   assert.match(matches, /createScoringSession/);
   assert.match(session, /validatePlayerPassport/);
   assert.match(sheets, /playerAppearsInMatch/);
   assert.match(sheets, /Revoked At/);
   assert.match(sheets, /Activation Code Hash/);
+  assert.match(sheets, /PASSPORT_CODE_MISMATCH/);
+  assert.match(sheets, /activation audit failed/);
   assert.doesNotMatch(sheets, /"Activation Code"\s*:/);
   assert.match(scoreEntry, /Enter Match Code|match code/i);
   assert.match(scoreEntry, /Activate Player Passport/);
