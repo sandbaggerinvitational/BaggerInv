@@ -118,7 +118,7 @@ export default async function Home() {
 
   if (liveTournamentV2Enabled() && normalizedStatus === "LIVE") {
     return (
-      <main>
+      <main className="mobileHomeMain">
         <Header activeNavigationHref="/live" />
         <TournamentCommandCenter tournament={statusHeroTournament} liveData={liveData} />
         <Footer />

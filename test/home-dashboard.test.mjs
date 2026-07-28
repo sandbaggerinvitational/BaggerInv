@@ -9,6 +9,7 @@ import {
   appMatchStatus,
   imageFallbackSources,
 } from "../lib/mobile-tournament-app.js";
+import { readFile } from "node:fs/promises";
 
 test("today schedule uses tournament local time, orders events, and marks the next event", () => {
   const items = todaysSchedule([
@@ -57,4 +58,13 @@ test("active tournament header reports its day when a start date is available", 
     currentRound: 2,
     now: new Date("2026-09-26T12:00:00"),
   }), "Day 2 of 3");
+});
+
+test("live mobile Home clips the closed navigation drawer without card overflow", async () => {
+  const [page, globals] = await Promise.all([
+    readFile(new URL("../app/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /className="mobileHomeMain"/);
+  assert.match(globals, /\.mobileHomeMain\s*\{[^}]*overflow-x:\s*clip/s);
 });
