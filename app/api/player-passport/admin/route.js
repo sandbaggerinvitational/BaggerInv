@@ -11,7 +11,16 @@ export const dynamic = "force-dynamic";
 
 function authorized(request) {
   const supplied = request.headers.get("x-live-admin-secret");
-  return Boolean(supplied) && [process.env.ADMIN_SECRET, process.env.LIVE_ADMIN_SECRET].filter(Boolean).includes(supplied);
+  // Player Passport is embedded inside the unified Admin Center. Accept the
+  // same credentials that the Admin Center login accepts so an administrator
+  // does not appear signed in while this panel independently rejects them.
+  const allowed = [
+    process.env.ADMIN_SECRET,
+    process.env.GUIDE_ADMIN_SECRET,
+    process.env.ODDS_ADMIN_SECRET,
+    process.env.LIVE_ADMIN_SECRET,
+  ].filter(Boolean);
+  return Boolean(supplied) && allowed.includes(supplied);
 }
 
 export async function GET(request) {

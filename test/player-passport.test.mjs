@@ -59,6 +59,13 @@ test("activation and match routes enforce rate limiting and server-side Passport
   assert.match(scoreEntry, /Activate Player Passport/);
 });
 
+test("Player Passport admin accepts every unified Admin Center credential", async () => {
+  const source = await readFile(new URL("../app/api/player-passport/admin/route.js", import.meta.url), "utf8");
+  for (const variable of ["ADMIN_SECRET", "GUIDE_ADMIN_SECRET", "ODDS_ADMIN_SECRET", "LIVE_ADMIN_SECRET"]) {
+    assert.match(source, new RegExp(`process\\.env\\.${variable}`));
+  }
+});
+
 test("invitation references preselect identity but do not create authorization", async () => {
   const activationPage = await readFile(new URL("../app/activate/PlayerPassportActivation.js", import.meta.url), "utf8");
   assert.match(activationPage, /invitedReference/);
