@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./tournament-command-center.module.css";
+import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
 import {
   buildTournamentTimeline,
   featuredMatchModel,
@@ -54,6 +55,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
 
   return (
     <div className={styles.page}>
+      <PersonalizedPlayerHome />
       <section className={styles.pulse} aria-labelledby="tournament-pulse-title">
         <div className={styles.pulseTopline}>
           <span className={styles.liveBadge}><i aria-hidden="true" /> Live</span>
