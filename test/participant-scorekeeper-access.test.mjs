@@ -50,6 +50,9 @@ test("participant routes use HTTP-only cookies and server-side current-match aut
   assert.match(sheets, /requiredColumnCount - currentColumnCount/);
   assert.match(adminControl, /key=\{match\["Match ID"\]\}/);
   assert.doesNotMatch(adminControl, /key=\{`\$\{match\["Match ID"\]\}-\$\{match\["Updated At"\]\}/);
+  assert.match(adminControl, /accessByMatch/);
+  assert.match(adminControl, /setAccessByMatch/);
+  assert.match(adminControl, /access=\{accessByMatch\[match\["Match ID"\]\] \|\| null\}/);
 });
 
 test("PWA manifest is standalone and uses safe local navigation scope", () => {

@@ -57,11 +57,10 @@ function FinalizationDialog({ review, busy, onCancel, onConfirm }) {
   </div>;
 }
 
-function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyChange }) {
+function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyChange, access }) {
   const [draft, setDraft] = useState(() => Object.fromEntries([...EDITABLE, ...PAIRING_FIELDS].map((field) => [field, match[field] || ""])));
   const [feedback, setFeedback] = useState("");
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [access, setAccess] = useState(null);
   const sideOne = teamName(teams, match.Year, 1);
   const sideTwo = teamName(teams, match.Year, 2);
   const isSingles = String(match.Format).toUpperCase() === "SI";
@@ -82,7 +81,6 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
     try {
       const result = await onAction(action, match, updates);
       if (result === null) return;
-      if (result.access) setAccess(result.access);
       setFeedback(action === "reopen" ? "Match reopened. Corrections are now enabled." : action === "finalize" ? "Official result finalized successfully." : "Changes saved successfully.");
       setReviewOpen(false);
     } catch (error) { setFeedback(error.message); }
@@ -146,6 +144,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [busyMatchId, setBusyMatchId] = useState("");
+  const [accessByMatch, setAccessByMatch] = useState({});
   const [dirtyMatches, setDirtyMatches] = useState(() => new Set());
   const [year, setYear] = useState("");
   const [round, setRound] = useState("");
@@ -198,6 +197,15 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
     setBusyMatchId(match["Match ID"]);
     try {
       const payload = await request({ action, matchId: match["Match ID"], updates, updatedBy });
+      if (payload.access) {
+        setAccessByMatch((current) => ({ ...current, [match["Match ID"]]: payload.access }));
+      } else if (action === "access-disable") {
+        setAccessByMatch((current) => {
+          const next = { ...current };
+          delete next[match["Match ID"]];
+          return next;
+        });
+      }
       setData((current) => ({ ...current, matches: current.matches.map((row) => row["Match ID"] === payload.match["Match ID"] ? payload.match : row) }));
       return payload;
     } finally { setBusyMatchId(""); }
@@ -223,7 +231,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
         <p>{tournamentState.remainingMatches} matches · {tournamentState.remainingPoints} points remaining</p>
         <div><span>{teamName(data.teams, year, 2)}</span><strong>{tournamentState.teamTwo.score}</strong><small>{tournamentState.teamTwo.pointsToClinch > 0 ? `Need ${tournamentState.teamTwo.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
       </div>
-      {busy ? <div className={styles.loadingState} role="status">Loading live matches…</div> : matches.length ? <div className={styles.grid}>{matches.map((match) => <MatchEditor key={match["Match ID"]} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} onDirtyChange={updateDirty} busy={busyMatchId === match["Match ID"]} />)}</div> : <div className={styles.empty}>No matches are configured for this selection.</div>}
+      {busy ? <div className={styles.loadingState} role="status">Loading live matches…</div> : matches.length ? <div className={styles.grid}>{matches.map((match) => <MatchEditor key={match["Match ID"]} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} onDirtyChange={updateDirty} busy={busyMatchId === match["Match ID"]} access={accessByMatch[match["Match ID"]] || null} />)}</div> : <div className={styles.empty}>No matches are configured for this selection.</div>}
     </>}
   </section>;
 }
