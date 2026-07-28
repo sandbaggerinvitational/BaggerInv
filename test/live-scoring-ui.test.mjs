@@ -31,9 +31,14 @@ test("public Match Center refreshes while visible and stops its timer cleanly", 
 });
 
 test("new scoring writes require a separate test spreadsheet", async () => {
-  const source = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
-  assert.match(source, /SCORING_ENVIRONMENT !== "test"/);
-  assert.match(source, /requires a separate test GOOGLE_SHEETS_ID/);
+  const [source, environment] = await Promise.all([
+    readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/spreadsheet-environment.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(environment, /SCORING_ENVIRONMENT !== "test"/);
+  assert.match(environment, /requires a separate test GOOGLE_SHEETS_ID/);
+  assert.match(environment, /Preview data access is blocked from the production spreadsheet/);
+  assert.match(source, /assertLiveScoringWriteEnvironment/);
   assert.match(source, /expectedRevision/);
   assert.match(source, /matchComplete/);
   assert.match(source, /confirmLiveMatchScorecard/);

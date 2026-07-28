@@ -3,6 +3,7 @@ import { Header, Footer } from "../components";
 import MatchCenter from "./MatchCenter";
 import { getTournamentData } from "./sheetData";
 import { pageMetadata } from "../../lib/seo";
+import PreviewModeBadge from "../PreviewModeBadge";
 
 export const metadata = pageMetadata({
   title: "Match Center | Sandbagger Invitational",
@@ -24,6 +25,7 @@ export default async function LivePage() {
 
   return (
     <main>
+      <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
       <Header />
       <MatchCenter initialData={data} loadError={error} />
       <Footer />

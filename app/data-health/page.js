@@ -26,6 +26,7 @@ import {
   buildRecordedScoringProfile,
   evaluateScorecardIntelligenceHealth,
 } from "../../lib/scorecard-intelligence";
+import { validateGhostMatchRows } from "../../lib/ghost-match";
 
 export const metadata = privatePageMetadata("Data Health | Sandbagger Invitational");
 
@@ -51,6 +52,7 @@ const REQUIRED_COLUMNS = {
   settings: [["Setting"], ["Value"]],
   draftSettings: [["Year"], ["Total Draft Picks", "Total Picks"], ["Team One ID", "Team 1 ID"], ["Team Two ID", "Team 2 ID"]],
   draftPicks: [["Year"], ["Pick Number"], ["Team ID"], ["Player ID"]],
+  ghostMatches: [["Match ID"], ["Player ID"]],
 };
 
 function hasColumn(headers, choices) {
@@ -125,6 +127,7 @@ export default async function DataHealthPage({ searchParams }) {
   const players = diagnostics?.sheets.players?.rows || [];
   const handicaps = diagnostics?.sheets.handicaps?.rows || [];
   const matches = diagnostics?.sheets.matches?.rows || [];
+  const ghostMatches = diagnostics?.sheets.ghostMatches?.rows || [];
   const liveMatches = diagnostics?.sheets.liveMatches?.rows || [];
   const teamNames = diagnostics?.sheets.teamNames?.rows || [];
   const courses = diagnostics?.sheets.courses?.rows || [];
@@ -135,6 +138,11 @@ export default async function DataHealthPage({ searchParams }) {
   const draftPicks = diagnostics?.sheets.draftPicks?.rows || [];
   const roundScorecards = diagnostics?.sheets.roundScorecards?.rows || [];
   const courseHoles = diagnostics?.sheets.holes?.rows || [];
+  const ghostMatchWarnings = validateGhostMatchRows({
+    rows: ghostMatches,
+    matches,
+    players,
+  });
   const scorecardAnalytics = buildScorecardAnalytics({
     roundScorecards,
     matches,
@@ -236,6 +244,26 @@ export default async function DataHealthPage({ searchParams }) {
   }
   const handicapDuplicates = [...handicapKeys.entries()].filter(([, count]) => count > 1);
   const playerIds = new Set(players.map((player) => clean(player["Player ID"] || player.ID)).filter(Boolean));
+  const historicalTeamKeys = new Set(teamNames.flatMap((team) => {
+    const yearKey = clean(team.Year || team["Tournament ID"]);
+    const sideKey = clean(team["Team Side"]).toUpperCase();
+    const teamIdKey = clean(team["Team ID"]).toUpperCase();
+    return [
+      sideKey ? `${yearKey}|SIDE:${sideKey}` : "",
+      teamIdKey ? `${yearKey}|ID:${teamIdKey}` : "",
+    ].filter(Boolean);
+  }));
+  const unresolvedHistoricalRosterTeams = handicaps.filter((row) => {
+    const playerId = clean(row["Player ID"]);
+    const yearKey = clean(row.Year || row["Tournament ID"]);
+    const sideKey = clean(row["Team Side"]).toUpperCase();
+    const teamIdKey = clean(row["Team ID"]).toUpperCase();
+    if (!playerId || !yearKey || (!sideKey && !teamIdKey)) return false;
+    return !(
+      (sideKey && historicalTeamKeys.has(`${yearKey}|SIDE:${sideKey}`)) ||
+      (teamIdKey && historicalTeamKeys.has(`${yearKey}|ID:${teamIdKey}`))
+    );
+  });
   const yearDraftSettings = draftSettings.filter((record) => Number(record.Year) === Number(year));
   const yearDraftPicks = draftPicks.filter((record) => Number(record.Year) === Number(year));
   const missingDraftSettings = yearDraftSettings.length === 0;
@@ -576,6 +604,12 @@ export default async function DataHealthPage({ searchParams }) {
                   {publicScoreMismatch ? <Link href={`/admin?tab=live-scoring${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Review Live Scoring →</Link> : null}
                 </div>
                 <div data-ok={playerDuplicates.length ? "false" : "true"}>{playerDuplicates.length ? `Duplicate Player IDs: ${playerDuplicates.map(([id]) => id).join(", ")}` : "No duplicate Player IDs"}</div>
+                <div data-ok={ghostMatchWarnings.length ? "false" : "true"}>
+                  {ghostMatchWarnings.length
+                    ? `${ghostMatchWarnings.length} Ghost Match mapping warning${ghostMatchWarnings.length === 1 ? "" : "s"}: ${ghostMatchWarnings.map((warning) => `${warning.code} (${warning.matchId || "missing match"}${warning.playerId ? ` / ${warning.playerId}` : ""})`).join("; ")}`
+                    : "All Ghost Match exclusions resolve to valid match participants"}
+                  {ghostMatchWarnings.length ? <Link href="/admin?tab=matches"> Review Matches and Ghost Match sheet →</Link> : null}
+                </div>
                 <div data-ok={missingDraftSettings ? "false" : "true"}>
                   {missingDraftSettings ? `Missing Draft Settings for ${year}` : `Draft Settings found for ${year}`}
                   {missingDraftSettings ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}
@@ -593,6 +627,12 @@ export default async function DataHealthPage({ searchParams }) {
                   {draftTeamsMissing.length ? <Link href={`/admin?tab=draft${selectedTournamentId ? `&tournament=${encodeURIComponent(selectedTournamentId)}` : ""}`}> Fix in Draft →</Link> : null}
                 </div>
                 <div data-ok={handicapDuplicates.length ? "false" : "true"}>{handicapDuplicates.length ? `Duplicate Year + Player handicap rows: ${handicapDuplicates.map(([key]) => key.replace("|", " / ")).join(", ")}` : "No duplicate Year + Player handicap rows"}</div>
+                <div data-ok={unresolvedHistoricalRosterTeams.length ? "false" : "true"}>
+                  {unresolvedHistoricalRosterTeams.length
+                    ? `${unresolvedHistoricalRosterTeams.length} historical roster assignment${unresolvedHistoricalRosterTeams.length === 1 ? "" : "s"} cannot resolve a team for that year`
+                    : "Every historical roster assignment resolves to its year-specific team"}
+                  {unresolvedHistoricalRosterTeams.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}
+                </div>
                 <div data-ok={historicalTeamsMissingCaptain.length ? "false" : "true"}>
                   {historicalTeamsMissingCaptain.length ? `${historicalTeamsMissingCaptain.length} historical teams are missing a captain` : "Every historical team has a captain mapping"}
                   {historicalTeamsMissingCaptain.length ? <Link href="/admin?tab=teams"> Fix in Teams →</Link> : null}

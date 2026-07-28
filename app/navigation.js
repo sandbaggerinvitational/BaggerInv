@@ -15,6 +15,7 @@ export const navigationSections = [
     links: [
       { label: "Matchup Lab", href: "/war-room" },
       { label: "Lineup Optimizer", href: "/war-room/lineup-optimizer" },
+      { label: "Team Intelligence", href: "/war-room/team-intelligence" },
     ],
   },
   {

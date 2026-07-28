@@ -2441,6 +2441,33 @@
   font-weight: 800;
 }
 
+.scorecardEntity {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.scorecardEntity > strong {
+  color: var(--tsi-green-900);
+  font-weight: 800;
+}
+
+.scorecardEntity > small,
+.scorecardEntity > em {
+  color: var(--tsi-muted);
+  font-size: .72rem;
+  font-style: normal;
+}
+
+.scorecardEntity > em {
+  display: none;
+}
+
+.scorecardValue {
+  color: var(--tsi-green-900);
+  font-weight: 800;
+}
+
 .tournamentLeaderboard{overflow:hidden;border:1px solid #ddd6c8;border-radius:20px;background:#fff;box-shadow:0 16px 38px rgba(15,35,25,.06)}
 .tournamentLeaderboardRow{display:grid;grid-template-columns:.55fr 2fr 1fr .8fr;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid #ebe5da;color:#46514c}
 .tournamentLeaderboard[data-points="false"] .tournamentLeaderboardRow{grid-template-columns:.55fr 2.4fr 1.2fr}
@@ -2468,6 +2495,27 @@
 
   .leaderboardTopLinks {
     flex-direction: column;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboard {
+    min-width: 0;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboardHead,
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboardRow {
+    grid-template-columns: 48px minmax(0, 1fr) 72px !important;
+    gap: 9px;
+    padding: 13px 12px;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .fullLeaderboardHead button:nth-of-type(n+3),
+  .fullLeaderboardWrap[data-scorecard="true"] .scorecardContextCell {
+    display: none;
+  }
+
+  .fullLeaderboardWrap[data-scorecard="true"] .scorecardEntity > em {
+    display: block;
+    line-height: 1.35;
   }
 }
 
@@ -4688,4 +4736,376 @@
   }
 }
 .profileMatchScorecard{grid-column:1/-1;margin-top:10px;border-top:1px solid #e5dfd2;padding-top:10px}.profileMatchScorecard>summary{color:#0a493a;cursor:pointer;font-size:12px;font-weight:800;letter-spacing:.06em;list-style:none;text-transform:uppercase}.profileMatchScorecard>summary::-webkit-details-marker{display:none}.profileMatchScorecard>summary::after{content:" +";color:#b18932}.profileMatchScorecard[open]>summary::after{content:" −"}@media(max-width:700px){.profileMatchScorecard{margin-top:6px}}
+
+/* ---------- Player intelligence ---------- */
+
+.playerIntelligence {
+  margin: 26px 0 42px;
+  display: grid;
+  gap: 10px;
+}
+
+.playerIntelligenceSection {
+  overflow: hidden;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-md);
+  background: var(--tsi-white);
+  box-shadow: var(--tsi-shadow-sm);
+}
+
+.playerIntelligenceSection > summary {
+  padding: 16px 20px;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.playerIntelligenceSection > summary::-webkit-details-marker {
+  display: none;
+}
+
+.playerIntelligenceSection > summary h2 {
+  margin: 3px 0 0;
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
+}
+
+.playerIntelligenceSection > summary > b {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(177, 137, 50, .55);
+  border-radius: 50%;
+  color: var(--tsi-green-900);
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  transition: transform .18s ease;
+}
+
+.playerIntelligenceSection[open] > summary > b {
+  transform: rotate(45deg);
+}
+
+.playerIntelligenceSection > summary:focus-visible {
+  outline: 3px solid rgba(177, 137, 50, .45);
+  outline-offset: -3px;
+}
+
+.playerIntelligenceBody {
+  padding: 2px 20px 20px;
+  border-top: 1px solid var(--tsi-line);
+}
+
+.playerIntelligenceBody > h3 {
+  margin: 18px 0 9px;
+  color: var(--tsi-green-900);
+  font-size: .77rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.playerIntelligenceCoverage {
+  margin: 13px 0 0;
+  color: var(--tsi-muted);
+  font-size: .82rem;
+}
+
+.playerRankingList {
+  max-width: 760px;
+  display: grid;
+}
+
+.playerRankingList a {
+  min-height: 40px;
+  border-bottom: 1px solid var(--tsi-line);
+  color: var(--tsi-ink);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.playerRankingList a:hover span {
+  color: var(--tsi-green-700);
+}
+
+.playerRankingList i {
+  height: 1px;
+  background-image: linear-gradient(to right, var(--tsi-line) 45%, transparent 45%);
+  background-size: 7px 1px;
+}
+
+.playerRankingList strong {
+  color: var(--tsi-gold-600);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+}
+
+.playerTournamentHistory {
+  display: grid;
+}
+
+.playerTournamentHistoryHead,
+.playerTournamentHistory > a {
+  display: grid;
+  grid-template-columns: .45fr minmax(150px, 1.35fr) .8fr .65fr .6fr .75fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.playerTournamentHistoryHead {
+  padding: 8px 5px;
+  border-bottom: 2px solid var(--tsi-line);
+  color: var(--tsi-muted);
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.playerTournamentHistory > a {
+  min-height: 48px;
+  padding: 9px 8px;
+  border-left: 3px solid var(--history-team-color, var(--tsi-gold-600));
+  border-bottom: 1px solid var(--tsi-line);
+  color: var(--tsi-ink);
+}
+
+.playerTournamentHistory > a:hover {
+  background: rgba(247, 242, 232, .55);
+}
+
+.playerTournamentHistory strong {
+  color: var(--tsi-green-900);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+}
+
+.playerTournamentHistory span {
+  color: var(--tsi-gold-600);
+  font-size: .88rem;
+  font-weight: 700;
+}
+
+.playerTournamentTeam {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playerTournamentTeam .teamLogoPlateScoreboard {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-width: 1px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .1);
+}
+
+.playerTournamentTeam b {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--tsi-gold-600);
+  font-size: .82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerTournamentFinish {
+  font-style: normal;
+}
+
+.playerTournamentHistory > a[data-finish="champion"] .playerTournamentFinish,
+.playerTournamentHistory > a[data-finish="runner-up"] .playerTournamentFinish {
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: .65rem;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.playerTournamentHistory > a[data-finish="champion"] .playerTournamentFinish {
+  border: 1px solid rgba(177, 137, 50, .5);
+  background: rgba(177, 137, 50, .12);
+  color: var(--tsi-gold-600);
+}
+
+.playerTournamentHistory > a[data-finish="runner-up"] .playerTournamentFinish {
+  border: 1px solid rgba(116, 124, 121, .35);
+  background: rgba(116, 124, 121, .09);
+  color: var(--tsi-muted);
+}
+
+.playerFormatIntelligence {
+  display: grid;
+  gap: 12px;
+}
+
+.playerFormatIntelligence > article {
+  padding: 16px;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-sm);
+  background: rgba(247, 242, 232, .45);
+}
+
+.playerFormatIntelligenceHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.playerFormatIntelligenceHeader small {
+  color: var(--tsi-gold-600);
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.playerFormatIntelligenceHeader h3 {
+  margin: 4px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+}
+
+.playerFormatIntelligenceHeader > strong {
+  color: var(--tsi-green-900);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.6rem;
+}
+
+.playerFormatMetrics {
+  margin: 12px 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.playerFormatMetrics span {
+  color: var(--tsi-muted);
+  display: grid;
+  gap: 5px;
+  font-size: .7rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.playerFormatMetrics b {
+  color: var(--tsi-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.12rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.playerRecordsHeld {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.playerRecordsHeld > a {
+  min-height: 112px;
+  padding: 15px;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-sm);
+  background: linear-gradient(145deg, rgba(247, 242, 232, .76), #fff);
+  color: var(--tsi-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.playerRecordsHeld span {
+  color: var(--tsi-gold-600);
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.playerRecordsHeld strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+}
+
+.playerRecordsHeld b {
+  color: var(--tsi-green-700);
+  font-size: .76rem;
+}
+
+@media (max-width: 700px) {
+  .playerIntelligenceSection > summary {
+    padding: 14px 15px;
+  }
+
+  .playerIntelligenceSection > summary > b {
+    width: 34px;
+    height: 34px;
+  }
+
+  .playerIntelligenceBody {
+    padding: 1px 13px 15px;
+  }
+
+  .playerTournamentHistoryHead {
+    display: none;
+  }
+
+  .playerTournamentHistory > a {
+    margin-bottom: 8px;
+    padding: 10px 11px;
+    border: 1px solid var(--tsi-line);
+    border-left: 3px solid var(--history-team-color, var(--tsi-gold-600));
+    border-radius: 12px;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px 16px;
+  }
+
+  .playerTournamentHistory > a strong,
+  .playerTournamentTeam {
+    grid-column: 1 / -1;
+  }
+
+  .playerTournamentTeam {
+    margin-top: -2px;
+  }
+
+  .playerTournamentTeam:empty {
+    display: none;
+  }
+
+  .playerTournamentTeam b {
+    white-space: normal;
+  }
+
+  .playerTournamentHistory > a span {
+    display: grid;
+    gap: 2px;
+  }
+
+  .playerTournamentHistory > a span::before {
+    content: attr(data-label);
+    color: var(--tsi-muted);
+    font-size: .59rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .playerTournamentHistory > a span:nth-of-type(n + 2) {
+    font-size: .78rem;
+  }
+
+  .playerFormatMetrics,
+  .playerRecordsHeld {
+    grid-template-columns: 1fr;
+  }
+}
 .courseHoleGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.courseHoleGrid>a{background:#fff;border:1px solid #ded8c9;border-radius:18px;color:#153229;padding:18px;text-decoration:none}.courseHoleGrid span,.courseHoleGrid small{display:block}.courseHoleGrid span{color:#8e6c24;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.courseHoleGrid strong{display:block;font-family:Georgia,serif;font-size:30px;margin:8px 0}.courseHoleGrid small{color:#737c78;font-size:11px;line-height:1.35}.courseHoleGrid>a:hover{border-color:#b78c2e;transform:translateY(-2px)}@media(max-width:900px){.courseHoleGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:520px){.courseHoleGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.holeAnalyticsDetails{margin:0 0 44px;border:1px solid #ded8c9;border-radius:24px;background:#fff;overflow:hidden}.holeAnalyticsDetails>summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px 30px;cursor:pointer;list-style:none}.holeAnalyticsDetails>summary::-webkit-details-marker{display:none}.holeAnalyticsDetails>summary h2{margin:5px 0 0}.holeAnalyticsDetails>summary>b{flex:0 0 auto;border:1px solid #b78c2e;border-radius:999px;color:#0a493a;padding:10px 16px;font-size:12px;letter-spacing:.05em;text-transform:uppercase}.holeAnalyticsDetails>summary>b::after{content:" +"}.holeAnalyticsDetails[open]>summary>b::after{content:" −"}.holeAnalyticsBody{border-top:1px solid #e5dfd2;padding:26px 30px 32px}.holeAnalyticsBody>p{color:#6d7772;margin:0 0 26px}.holeAnalyticsBody>h3{color:#153229;font-family:Georgia,serif;font-size:26px;margin:32px 0 14px}.holeAnalyticsBody>h3:first-of-type{margin-top:0}@media(max-width:700px){.holeAnalyticsDetails>summary{align-items:flex-start;padding:22px 20px}.holeAnalyticsDetails>summary>b{padding:8px 10px;font-size:10px}.holeAnalyticsBody{padding:22px 18px 26px}.holeAnalyticsBody>h3{font-size:22px}}

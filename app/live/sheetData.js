@@ -15,9 +15,9 @@ import {
   tournamentYear,
 } from "../../lib/tournament-identifiers";
 import { getStrokesOnHole } from "../../lib/scorecard-net";
+import { resolveSpreadsheetId } from "../../lib/spreadsheet-environment";
 
-const SPREADSHEET_ID =
-  process.env.GOOGLE_SHEETS_ID || "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4";
+const SPREADSHEET_ID = resolveSpreadsheetId();
 
 function csvUrl(sheetName) {
   return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
@@ -307,11 +307,14 @@ export async function getTournamentData() {
   const matches = sourceIds.map((matchId) => {
       const permanent = permanentMap.get(matchId) || {};
       const liveRow = liveMap.get(matchId) || permanent;
-      const permanentFinal = /^(final|finalized)$/i.test(clean(permanent["Match Status"])) || clean(permanent["Finalized At"]);
+      const permanentStatus = clean(permanent["Match Status"]);
+      const permanentFinal = /^(final|finalized|ghost match)$/i.test(permanentStatus) || clean(permanent["Finalized At"]);
       const authoritative = permanentFinal ? resultFields(permanent, liveRow) : liveRow;
       const rawStatus = clean(authoritative["Match Status"] || liveRow["Match Status"]);
       const publicResultAllowed = permanentFinal || isLiveMatch({ status: rawStatus });
-      const status = permanentFinal ? "Final" : isLiveMatch({ status: rawStatus }) ? rawStatus : "Scheduled";
+      const status = permanentFinal
+        ? (/^ghost match$/i.test(permanentStatus) ? "Ghost Match" : "Final")
+        : isLiveMatch({ status: rawStatus }) ? rawStatus : "Scheduled";
       const format = clean(liveRow.Format || permanent.Format).toUpperCase();
       const round = Number(liveRow.Round || permanent.Round) || 1;
       const courseId = liveRow["Course ID"] || permanent["Course ID"] || "";

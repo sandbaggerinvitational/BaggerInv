@@ -6,6 +6,7 @@ import { formatHandicap, formatPoints } from "../lib/formatters";
 import styles from "./live/live.module.css";
 import ScorecardTable from "./ScorecardTable";
 import { matchState } from "../lib/live-match-ux";
+import MatchProgressionSummary from "./MatchProgressionSummary";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const initials = (name) => String(name ?? "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -130,6 +131,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
   const overallWinner = match.overallWinner || match.matchupWinner;
   const topLabel = match.course?.name || `${round?.label || `Round ${match.round || ""}`} · Match ${match.match}`;
+  const isGhostMatch = String(match.status || "").trim().toUpperCase() === "GHOST MATCH";
   const cardStyle = {
     "--team-one-color": tournament.teamOne.primaryColor || "#0b3529",
     "--team-two-color": tournament.teamTwo.primaryColor || "#24386f",
@@ -150,6 +152,12 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     <div className={styles.matchTop}><span>{topLabel}</span><span>{state === "upcoming" ? match.teeTime || match.status : match.status}</span></div>
     <div className={styles.matchMeta}><span>Match {match.match} · {match.formatName || round?.format}</span><strong data-state={state}>{state}</strong></div>
     <div className={styles.primaryMatchState}><strong>{statusText}</strong>{state === "live" && match.currentHole ? <span>THRU {match.currentHole}</span> : null}</div>
+    {variant === "historical" && isGhostMatch ? (
+      <div className={styles.ghostMatchNotice}>
+        <strong>GHOST MATCH</strong>
+        <span>Selected player results are excluded from official records.</span>
+      </div>
+    ) : null}
     {hasPairing ? <MatchupRoster tournament={tournament} match={match} /> : <div className={styles.pairingPending}><strong>Pairing announcement coming soon</strong><span>{match.teeTime ? `${match.teeTime} · ` : ""}{match.course?.name || round?.course?.name || "Course to be announced"}</span></div>}
     {variant === "live" && (match.currentHole || match.liveStatusText) ? <div className={styles.liveTracker}>
       <span>Through {match.currentHole || "—"}</span>
@@ -158,7 +166,10 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       <em>{liveLeader ? `${liveLeader === 1 ? tournament.teamOne.name : tournament.teamTwo.name} ${Math.abs(Number(match.team1HolesWon) - Number(match.team2HolesWon))} UP` : "All square"}</em>
     </div> : null}
     {variant === "historical" ? (
-      <ScorecardTable scorecards={scorecards} compact />
+      <>
+        <ScorecardTable scorecards={scorecards} compact />
+        <MatchProgressionSummary scorecards={scorecards} />
+      </>
     ) : null}
     {hasSegments ? <details className={styles.segmentDetails} open={state === "final"}>
       <summary>Front, back and overall results</summary>

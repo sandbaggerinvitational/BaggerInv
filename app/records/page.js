@@ -12,8 +12,12 @@ import styles from "../historical.module.css";
 import { addTournamentRanks } from "../../lib/rankings";
 import { pageMetadata } from "../../lib/seo";
 import { loadScorecardAnalytics } from "../../lib/scorecard-data";
-import { buildScoringRecords } from "../../lib/scorecard-analytics";
-import ScoringStatGrid, { formatScoringNumber } from "../ScoringStatGrid";
+import ScoringStatGrid from "../ScoringStatGrid";
+import {
+  buildScorecardRecordLeaderboards,
+  formatRecordValue,
+} from "../../lib/scorecard-record-leaderboards";
+import { buildMatchProgressionAnalytics } from "../../lib/match-progression";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -61,22 +65,46 @@ export default async function RecordsPage() {
   await refreshHistoricalData();
   const records = getRecords();
   const scorecardAnalytics = await scorecardAnalyticsPromise;
-  const scoringRecords = buildScoringRecords(scorecardAnalytics.usableScorecards);
-  const participant = (record) =>
-    record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
-  const recordItem = (label, record, options = {}) => ({
-    label,
-    value: formatScoringNumber(record?.value, options),
-    detail: participant(record),
-    sample: record?.label ? `${record.label}. Based on recorded scorecards.` : "Based on recorded scorecards.",
+  const playerNames = Object.fromEntries(
+    records.points.map(({ player }) => [player["Player ID"], player["Display Name"]])
+  );
+  const scorecardRecords = buildScorecardRecordLeaderboards(scorecardAnalytics.scorecards, {
+    playerNames,
+    ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
   });
-  const holeItem = (label, hole) => ({
-    label,
-    value: hole ? `#${hole.holeNumber}` : "—",
-    detail: hole ? `${hole.courseId}${hole.tee ? ` · ${hole.tee}` : ""}` : "",
-    sample: hole?.averageToPar?.label
-      ? `${hole.averageToPar.label}. Based on recorded scorecards.`
-      : "Based on recorded scorecards.",
+  const matchProgression = buildMatchProgressionAnalytics(scorecardAnalytics.scorecards, {
+    ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
+  });
+  const scoreToPar = (value) => Number(value) === 0
+    ? "Even"
+    : `${Number(value) > 0 ? "+" : ""}${value}`;
+  const recordItem = (record) => ({
+    label: record.title,
+    value: record.formatter && record.winners[0]
+      ? record.formatter(record.winners[0])
+      : formatRecordValue(record.winners[0]?.value, record),
+    detail: record.winners.length ? "" : record.emptyState,
+    holders: record.winners.map((winner, index) => ({
+      id: `${record.slug}-${winner.matchId || winner.playerId || winner.teamId || winner.name}-${index}`,
+      name: winner.entityType === "PLAYER"
+        ? winner.playerName
+        : winner.teamName || winner.name || "Recorded performance",
+      subtitle: winner.entityType === "TEAM_PERFORMANCE"
+        ? winner.playerNames.join(" & ")
+        : "",
+      context: record.aggregate
+        ? ""
+        : [
+            winner.year,
+            winner.round ? `Round ${winner.round}` : "",
+            winner.formatName || "",
+            winner.courseName || "",
+            Number.isFinite(Number(winner.secondaryValue))
+              ? scoreToPar(winner.secondaryValue)
+              : "",
+          ].filter(Boolean).join(" · "),
+    })),
+    leaderboardHref: `/records/${record.slug}`,
   });
 
   return (
@@ -110,24 +138,28 @@ export default async function RecordsPage() {
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Available Scorecard History</span>
           <h2>Scoring Records</h2>
-          <p>Every scoring record below is based on recorded scorecards and does not imply complete all-time coverage.</p>
-          <ScoringStatGrid items={[
-            recordItem("Lowest Recorded Round", scoringRecords.lowestRecordedRound),
-            recordItem("Lowest To Par", scoringRecords.lowestToPar, { signed: true }),
-            recordItem("Lowest Front Nine", scoringRecords.lowestFrontNine),
-            recordItem("Lowest Back Nine", scoringRecords.lowestBackNine),
-            recordItem("Most Birdies", scoringRecords.mostBirdies),
-            recordItem("Most Eagles", scoringRecords.mostEagles),
-            recordItem("Most Consecutive Birdies", scoringRecords.mostConsecutiveBirdies),
-            recordItem("Best Closing Stretch", scoringRecords.bestClosingStretch),
-            recordItem("Best Par 3 Average", scoringRecords.bestPar3Average),
-            recordItem("Best Par 4 Average", scoringRecords.bestPar4Average),
-            recordItem("Best Par 5 Average", scoringRecords.bestPar5Average),
-            holeItem("Hardest Historical Hole", scoringRecords.hardestHistoricalHole),
-            holeItem("Easiest Historical Hole", scoringRecords.easiestHistoricalHole),
-            recordItem("Lowest Scramble Round", scoringRecords.lowestScrambleRound),
-            recordItem("Lowest Singles Round", scoringRecords.lowestSinglesRound),
-          ]} />
+          <p>Records and leaderboards are based only on available COMPLETE and VERIFIED hole-by-hole scorecards. Historical coverage is not complete.</p>
+          <h3>Individual Scoring Records</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.individual.map(recordItem)} />
+          <h3>Team Scoring Records</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.team.map(recordItem)} />
+          <h3>Course Hole Records</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.courseHole.map(recordItem)} />
+        </section>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Complete Scorecards Only</span>
+          <h2>Advanced Hole-by-Hole Analytics</h2>
+          <h3>Hole Statistics</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.advanced.map(recordItem)} />
+          <h3>Match Play Statistics</h3>
+          <ScoringStatGrid items={scorecardRecords.groups.matchPlay.map(recordItem)} />
+        </section>
+
+        <section className={styles.section}>
+          <span className={styles.sectionLabel}>Reconstructed Match Play</span>
+          <h2>Match Progression Records</h2>
+          <ScoringStatGrid items={matchProgression.records.map(recordItem)} />
         </section>
 
         <div className={styles.recordSections}>
