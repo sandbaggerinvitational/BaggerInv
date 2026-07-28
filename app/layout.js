@@ -9,6 +9,7 @@ import {
 } from "../lib/seo";
 import PwaFoundation from "./PwaFoundation";
 import ParticipantIdentity from "./ParticipantIdentity";
+import { Suspense } from "react";
 
 const homeMetadata = pageMetadata({
   title: SITE_NAME,
@@ -90,7 +91,9 @@ export default function RootLayout({ children }) {
         {children}
         <Analytics />
         <PwaFoundation />
-        <ParticipantIdentity />
+        <Suspense fallback={null}>
+          <ParticipantIdentity />
+        </Suspense>
       </body>
     </html>
   );

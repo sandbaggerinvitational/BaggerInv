@@ -120,7 +120,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 @media (max-width: 760px) {
   body.passport-navigation-active {
-    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    padding-bottom: calc(82px + env(safe-area-inset-bottom));
   }
 }
 

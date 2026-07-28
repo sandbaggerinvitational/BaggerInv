@@ -8,6 +8,7 @@ import {
   playerPassportCookie,
   verifyPlayerPassportSession,
 } from "../lib/player-passport.js";
+import { participantDestination } from "../lib/participant-shell.js";
 
 const secret = "player-passport-test-secret-long-enough";
 
@@ -65,7 +66,7 @@ test("activation and match routes enforce rate limiting and server-side Passport
   assert.match(activation, /Player Passport could not save this device/);
   assert.match(matches, /authorizePassportMatch/);
   assert.match(matches, /createScoringSession/);
-  assert.match(session, /resolvePlayerPassportToken/);
+  assert.match(session, /inspectPlayerPassportToken/);
   assert.match(sheets, /playerAppearsInMatch/);
   assert.match(sheets, /Revoked At/);
   assert.match(sheets, /Activation Code Hash/);
@@ -135,4 +136,39 @@ test("Passport navigation removal preserves public access and clears personalize
   assert.match(activation, /method: "DELETE"/);
   assert.match(activation, /player-passport-cleared/);
   assert.match(session, /playerPassportCookie\("", 0\)/);
+});
+
+test("Participant Mode shell preserves verified identity across temporary revalidation failures", async () => {
+  const [layout, navigation, session, server, styles, globals] = await Promise.all([
+    readFile(new URL("../app/layout.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/ParticipantIdentity.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/player-passport/session/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/player-passport-server.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/participant-navigation.module.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(layout, /<ParticipantIdentity \/>/);
+  assert.match(layout, /<Suspense fallback=\{null\}>/);
+  assert.match(navigation, /sbi-participant-shell/);
+  assert.match(navigation, /response\.status === 401/);
+  assert.match(navigation, /Preserve the last verified presentation shell/);
+  assert.match(navigation, /pathname\.startsWith\("\/admin"\)/);
+  assert.match(session, /status === "unavailable"/);
+  assert.match(session, /status: 503/);
+  assert.match(server, /Player Passport validation temporarily unavailable/);
+  assert.match(styles, /position:fixed/);
+  assert.match(styles, /env\(safe-area-inset-bottom\)/);
+  assert.match(styles, /z-index:110/);
+  assert.match(globals, /body\.passport-navigation-active/);
+});
+
+test("Participant Mode active destinations cover direct and nested routes", () => {
+  assert.equal(participantDestination("/", "", "clay-beltran"), "Home");
+  assert.equal(participantDestination("/score", "", "clay-beltran"), "My Match");
+  assert.equal(participantDestination("/score/access/token", "", "clay-beltran"), "My Match");
+  assert.equal(participantDestination("/live", "", "clay-beltran"), "Tournament");
+  assert.equal(participantDestination("/live", "?view=points", "clay-beltran"), "Leaderboard");
+  assert.equal(participantDestination("/players/clay-beltran", "", "clay-beltran"), "Me");
+  assert.equal(participantDestination("/players/another-player", "", "clay-beltran"), "");
+  assert.equal(participantDestination("/records", "", "clay-beltran"), "");
 });
