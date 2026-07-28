@@ -34,6 +34,15 @@ function holeWinnerMark(score, teamNames) {
   return score?.["Hole Winner"] === "Halved" ? "—" : "";
 }
 
+function ParticipantLinks({ player }) {
+  return <nav className={styles.liveLinks} aria-label="Player Passport navigation">
+    <Link href="/">My Tournament</Link>
+    <Link href="/live">Tournament Coverage</Link>
+    <Link href="/live?view=points">Live Leaderboard</Link>
+    <Link href={player?.slug ? `/players/${player.slug}` : "/players"}>My Profile</Link>
+  </nav>;
+}
+
 export default function ScoreEntry() {
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
@@ -94,7 +103,17 @@ export default function ScoreEntry() {
   useEffect(() => {
     const restore = async () => {
       try {
-        const session = await fetch("/api/scoring/session", { cache: "no-store" });
+        const [session, passport] = await Promise.all([
+          fetch("/api/scoring/session", { cache: "no-store" }),
+          fetch("/api/player-passport/session", { cache: "no-store" }),
+        ]);
+        if (passport.ok) {
+          const identity = await passport.json();
+          setPassportPlayer(identity.player);
+          const matches = await fetch("/api/player-passport/matches", { cache: "no-store" });
+          const payload = await matches.json();
+          if (matches.ok) setPassportMatches(payload.data?.matches || []);
+        }
         if (session.ok) {
           const payload = await session.json();
           setName(payload.scorerName || "");
@@ -102,16 +121,7 @@ export default function ScoreEntry() {
           await loadMatch();
           return;
         }
-        const passport = await fetch("/api/player-passport/session", { cache: "no-store" });
-        if (passport.ok) {
-          const identity = await passport.json();
-          setPassportPlayer(identity.player);
-          const matches = await fetch("/api/player-passport/matches", { cache: "no-store" });
-          const payload = await matches.json();
-          if (matches.ok) setPassportMatches(payload.data?.matches || []);
-        } else {
-          await loadMatchOptions();
-        }
+        if (!passport.ok) await loadMatchOptions();
       } catch {
         setAuthorized(false);
         setData(null);
@@ -311,8 +321,11 @@ export default function ScoreEntry() {
       {!passportMatches.length && <p className={styles.status}>No tournament matches are assigned to your Player Passport yet.</p>}
       <button type="button" className={styles.clearAccess} onClick={async () => {
         await fetch("/api/player-passport/session", { method: "DELETE" });
-        setPassportPlayer(null); setPassportMatches([]); await loadMatchOptions();
+        setPassportPlayer(null); setPassportMatches([]);
+        window.dispatchEvent(new Event("player-passport-cleared"));
+        await loadMatchOptions();
       }}>This isn’t me · Remove Player Passport</button>
+      <ParticipantLinks player={passportPlayer} />
     </div> : <>
     <Link className={styles.primary} href="/activate">Activate Player Passport</Link>
     <div className={styles.matchChoices} role="radiogroup" aria-label="Choose your match">
@@ -359,6 +372,7 @@ export default function ScoreEntry() {
     </div>)}
     {!isFinal && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
     {leaderboardLinks}
+    {passportPlayer ? <ParticipantLinks player={passportPlayer} /> : null}
     {isFinal ? <div className={styles.result}><span>Match finalized</span><strong>{namedMatchStatus(data?.holeScores, teamNames)}</strong><small>Only an administrator can reopen this scorecard.</small></div> : confirming ? <div className={styles.confirmPanel}>
       <strong>Submit this scorecard as final?</strong>
       <p>Golfers will no longer be able to edit it unless an administrator reopens the match.</p>
@@ -369,6 +383,7 @@ export default function ScoreEntry() {
 
   return <section className={styles.shell}>
     <button type="button" className={styles.clearAccess} onClick={clearAccess}>Leave My Match</button>
+    {passportPlayer ? <ParticipantLinks player={passportPlayer} /> : null}
     <header><div><span>{display.formatName || format} · Round {match.Round}</span><h1>{display.matchName || `Match ${match.Match}`}</h1><p>{display.courseName || match["Course ID"]}</p></div><b>{completed.size}/18</b></header>
     <nav className={styles.holeNavigator} aria-label="Choose hole">
       <button disabled={holeNumber === 1} onClick={() => selectHole(holeNumber - 1)} aria-label="Previous hole">‹</button>

@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   createPlayerPassportSession,
   playerAppearsInMatch,
+  playerMatchSides,
   playerPassportCookie,
   verifyPlayerPassportSession,
 } from "../lib/player-passport.js";
@@ -36,6 +37,18 @@ test("Player Passport match eligibility is limited to participating players", ()
   assert.equal(playerAppearsInMatch(match, "CB01"), true);
   assert.equal(playerAppearsInMatch(match, "PN01"), true);
   assert.equal(playerAppearsInMatch(match, "OTHER"), false);
+  assert.deepEqual(playerMatchSides(match, "CB01"), {
+    side: 1,
+    participantIds: ["CB01", "WO01"],
+    partnerIds: ["WO01"],
+    opponentIds: ["AM01", "PN01"],
+  });
+  assert.deepEqual(playerMatchSides(match, "PN01"), {
+    side: 2,
+    participantIds: ["AM01", "PN01"],
+    partnerIds: ["AM01"],
+    opponentIds: ["CB01", "WO01"],
+  });
 });
 
 test("activation and match routes enforce rate limiting and server-side Passport checks", async () => {
@@ -52,7 +65,7 @@ test("activation and match routes enforce rate limiting and server-side Passport
   assert.match(activation, /Player Passport could not save this device/);
   assert.match(matches, /authorizePassportMatch/);
   assert.match(matches, /createScoringSession/);
-  assert.match(session, /validatePlayerPassport/);
+  assert.match(session, /resolvePlayerPassportToken/);
   assert.match(sheets, /playerAppearsInMatch/);
   assert.match(sheets, /Revoked At/);
   assert.match(sheets, /Activation Code Hash/);
@@ -79,4 +92,47 @@ test("invitation references preselect identity but do not create authorization",
   assert.match(activationPage, /reference\s*\?/);
   assert.match(activationPage, /The invitation link alone does not activate access\./);
   assert.match(activationPage, /activationCode/);
+});
+
+test("active Passport replaces onboarding with participant destinations", async () => {
+  const [page, activation, navigation, score, live, profile, sheets] = await Promise.all([
+    readFile(new URL("../app/activate/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/activate/PlayerPassportActivation.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/ParticipantIdentity.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/MatchCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/players/[slug]/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /resolvePlayerPassportToken/);
+  assert.match(page, /activePlayer=/);
+  assert.match(activation, /Player Passport active/);
+  assert.match(activation, /Welcome back/);
+  assert.match(activation, /history\.replaceState/);
+  assert.match(activation, /location\.replace/);
+  assert.match(navigation, /Home/);
+  assert.match(navigation, /My Match/);
+  assert.match(navigation, /Tournament/);
+  assert.match(navigation, /Leaderboard/);
+  assert.match(navigation, /Me/);
+  assert.match(score, /My Tournament/);
+  assert.match(score, /Live Leaderboard/);
+  assert.match(live, /Back to My Tournament/);
+  assert.match(live, />My Tournament</);
+  assert.match(profile, /Back to My Tournament/);
+  assert.match(profile, /Browse All Sandbaggers/);
+  assert.match(sheets, /record\["Course Name"\] \|\| record\.Course \|\| record\["Full Course Name"\]/);
+});
+
+test("Passport navigation removal preserves public access and clears personalized state", async () => {
+  const [navigation, activation, session] = await Promise.all([
+    readFile(new URL("../app/ParticipantIdentity.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/activate/PlayerPassportActivation.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/player-passport/session/route.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(navigation, /player-passport-cleared/);
+  assert.match(navigation, /pathname\.startsWith\("\/admin"\)/);
+  assert.match(activation, /method: "DELETE"/);
+  assert.match(activation, /player-passport-cleared/);
+  assert.match(session, /playerPassportCookie\("", 0\)/);
 });

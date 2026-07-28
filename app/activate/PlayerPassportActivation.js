@@ -4,15 +4,19 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./activate.module.css";
 
-export default function PlayerPassportActivation({ invitedReference = "" }) {
+export default function PlayerPassportActivation({ invitedReference = "", activePlayer = null }) {
   const [data, setData] = useState(null);
   const [reference, setReference] = useState(invitedReference);
   const [code, setCode] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(true);
-  const [activated, setActivated] = useState(null);
+  const [activated, setActivated] = useState(activePlayer);
 
   useEffect(() => {
+    if (activePlayer) {
+      setBusy(false);
+      return;
+    }
     fetch(`/api/player-passport/activation${invitedReference ? `?player=${encodeURIComponent(invitedReference)}` : ""}`, { cache: "no-store" })
       .then(async (response) => {
         const payload = await response.json();
@@ -22,7 +26,7 @@ export default function PlayerPassportActivation({ invitedReference = "" }) {
       })
       .catch((error) => setStatus(error.message || "Unable to load activation."))
       .finally(() => setBusy(false));
-  }, [invitedReference]);
+  }, [activePlayer, invitedReference]);
 
   const selected = useMemo(() => reference
     ? data?.players?.find((player) => player.reference === reference)
@@ -40,16 +44,31 @@ export default function PlayerPassportActivation({ invitedReference = "" }) {
       if (!response.ok) throw new Error(payload.error);
       setActivated(payload.player);
       setStatus("");
+      window.history.replaceState({}, "", "/");
+      window.dispatchEvent(new Event("player-passport-changed"));
+      window.setTimeout(() => window.location.replace("/"), 500);
     } catch (error) {
       setStatus(error.message || "Unable to activate Player Passport.");
     } finally { setBusy(false); }
   };
 
+  const clearPassport = async () => {
+    await fetch("/api/player-passport/session", { method: "DELETE" });
+    setActivated(null);
+    setData(null);
+    setReference("");
+    setCode("");
+    window.history.replaceState({}, "", "/activate");
+    window.dispatchEvent(new Event("player-passport-cleared"));
+    window.location.reload();
+  };
+
   if (activated) return <section className={styles.shell}>
-    <span className={styles.eyebrow}>Player Passport activated</span>
-    <h1>Welcome, {activated.name}.</h1>
-    <p>This device will remember you. Your Passport can open scorecards only for matches in which you are participating.</p>
-    <div className={styles.actions}><Link href="/score">Open My Match</Link><Link href="/">View My Tournament</Link></div>
+    <span className={styles.eyebrow}>Player Passport active</span>
+    <h1>Welcome back, {activated.name}.</h1>
+    <p>This device remembers you. Your Passport can open scorecards only for matches in which you are participating.</p>
+    <div className={styles.actions}><Link href="/">Open My Tournament</Link><Link href="/score">Open My Match</Link></div>
+    <button type="button" className={styles.fallback} onClick={clearPassport}>This isn’t me</button>
     <p className={styles.note}>For the app experience, use your browser’s Add to Home Screen option.</p>
   </section>;
 

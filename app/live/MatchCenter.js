@@ -191,6 +191,7 @@ function PlayerLiveScorecard({ row }) {
 
 export default function MatchCenter({ initialData, loadError }) {
   const searchParams = useSearchParams();
+  const [passportPlayer, setPassportPlayer] = useState(null);
   const [data, setData] = useState(initialData);
   const tournament = data?.tournament;
   const rounds = data?.rounds || [];
@@ -202,6 +203,12 @@ export default function MatchCenter({ initialData, loadError }) {
   const [clock, setClock] = useState(() => Date.now());
   const [refreshState, setRefreshState] = useState("current");
   const refreshPromise = useRef(null);
+  useEffect(() => {
+    fetch("/api/player-passport/session", { cache: "no-store" })
+      .then(async (response) => response.ok ? (await response.json()).player : null)
+      .then(setPassportPlayer)
+      .catch(() => {});
+  }, []);
   const refresh = useCallback(async () => {
     if (refreshPromise.current) return refreshPromise.current;
     setRefreshState("refreshing");
@@ -244,9 +251,12 @@ export default function MatchCenter({ initialData, loadError }) {
   const focusedRound = Number(searchParams.get("round")) || active?.number || 1;
   const focusedRoundData = rounds.find((round) => round.number === focusedRound) || active;
   const focusedPoints = addTournamentRanks(data?.roundLeaderboards?.[focusedRound] || [], "points");
+  const focusedBack = passportPlayer
+    ? <Link href="/">← Back to My Tournament</Link>
+    : <Link href="/live">← Back to Match Center</Link>;
 
   if (focusedView === "matchups") return <section className={styles.focusedLiveView}>
-    <div className={styles.focusedHeader}><Link href="/score">← Back to scoring</Link><span>Round {focusedRound}</span><h1>Live Matchups</h1><p>The leading side is highlighted as scores are entered.</p></div>
+    <div className={styles.focusedHeader}>{focusedBack}<span>Round {focusedRound}</span><h1>Live Matchups</h1><p>The leading side is highlighted as scores are entered.</p></div>
     <div className={styles.focusedTournamentScore}>
       <span>Tournament score</span>
       <div><strong>{tournament.teamOne.name}</strong><b>{formatPoints(tournament.teamOne.score)}</b></div>
@@ -256,11 +266,11 @@ export default function MatchCenter({ initialData, loadError }) {
     {focusedRoundData ? <div className={styles.matchGrid}>{focusedRoundData.matches.map((match) => <PublicMatchCard match={match} round={focusedRoundData} tournament={tournament} key={match.id} />)}</div> : null}
   </section>;
   if (focusedView === "scores") return <section className={styles.focusedLiveView}>
-    <div className={styles.focusedHeader}><Link href="/score">← Back to scoring</Link><span>Round {focusedRound}</span><h1>Gross &amp; Net Leaderboard</h1></div>
+    <div className={styles.focusedHeader}>{focusedBack}<span>Round {focusedRound}</span><h1>Gross &amp; Net Leaderboard</h1></div>
     <IndividualScoreLeaderboard rows={data?.scoreLeaderboard || []} round={focusedRound} />
   </section>;
   if (focusedView === "points") return <section className={styles.focusedLiveView}>
-    <div className={styles.focusedHeader}><Link href="/score">← Back to scoring</Link><span>Round {focusedRound}</span><h1>Individual Points &amp; Records</h1></div>
+    <div className={styles.focusedHeader}>{focusedBack}<span>Round {focusedRound}</span><h1>Individual Points &amp; Records</h1></div>
     <TournamentLeaderboard rows={focusedPoints} emptyMessage="No points have been decided in this round yet." />
   </section>;
 
@@ -269,6 +279,7 @@ export default function MatchCenter({ initialData, loadError }) {
     {championshipMode ? <ChampionshipBanner tournament={tournament} /> : <LiveBanner tournament={tournament} />}
     <section className={styles.content}>
       <div className={styles.liveControls}>
+        {passportPlayer ? <Link href="/" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, border: "1px solid #0b4938", color: "#0b4938", fontWeight: 900, textDecoration: "none" }}>My Tournament</Link> : null}
         <Link href="/score" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, background: "#0b4938", color: "#fff", fontWeight: 900, textDecoration: "none" }}>My Match</Link>
         <div className={styles.freshness} data-state={refreshState} role="status" aria-live="polite">
           <span aria-hidden="true" />

@@ -118,6 +118,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
   pointer-events: auto;
 }
 
+@media (max-width: 760px) {
+  body.passport-navigation-active {
+    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  }
+}
+
 
 .sideMenu {
   position: fixed;
