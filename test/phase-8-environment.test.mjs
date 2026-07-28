@@ -76,3 +76,23 @@ test("preview routes expose a test-data label and a redacted environment check",
   assert.match(diagnostic, /productionIsolated/);
   assert.doesNotMatch(diagnostic, /GOOGLE_PRIVATE_KEY|GOOGLE_SERVICE_ACCOUNT_EMAIL/);
 });
+
+test("Tournament Mode replaces only the live flagged homepage", () => {
+  const homePage = fs.readFileSync(new URL("../app/page.js", import.meta.url), "utf8");
+  const commandCenter = fs.readFileSync(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8");
+  const menu = fs.readFileSync(new URL("../app/Menu.js", import.meta.url), "utf8");
+
+  assert.match(homePage, /liveTournamentV2Enabled\(\) && normalizedStatus === "LIVE"/);
+  assert.equal(homePage.includes('activeNavigationHref="/live"'), true);
+  for (const section of [
+    "Tournament Pulse",
+    "Featured Match",
+    "Live Team Scoreboard",
+    "Tournament Timeline",
+    "Live Player Leaderboards",
+    "Live Records",
+  ]) {
+    assert.match(commandCenter, new RegExp(section));
+  }
+  assert.match(menu, /activeNavigationHref \|\| activeNavigationHrefForPath/);
+});

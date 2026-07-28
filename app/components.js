@@ -2,7 +2,7 @@ import Link from "next/link";
 import Menu from "./Menu";
 import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
 
-export function Header() {
+export function Header({ activeNavigationHref = "" } = {}) {
   return (
     <header className="siteHeader">
       <Link href="/" className="brand">
@@ -17,7 +17,7 @@ export function Header() {
         </div>
       </Link>
 
-      <Menu />
+      <Menu activeNavigationHref={activeNavigationHref} />
     </header>
   );
 }
