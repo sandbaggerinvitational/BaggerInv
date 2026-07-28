@@ -24,7 +24,9 @@ export default function PlayerPassportActivation({ invitedReference = "" }) {
       .finally(() => setBusy(false));
   }, [invitedReference]);
 
-  const selected = useMemo(() => data?.players?.find((player) => player.reference === reference), [data, reference]);
+  const selected = useMemo(() => reference
+    ? data?.players?.find((player) => player.reference === reference)
+    : null, [data, reference]);
 
   const activate = async () => {
     setBusy(true); setStatus("Activating Player Passport…");

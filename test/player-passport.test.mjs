@@ -62,6 +62,7 @@ test("activation and match routes enforce rate limiting and server-side Passport
 test("invitation references preselect identity but do not create authorization", async () => {
   const activationPage = await readFile(new URL("../app/activate/PlayerPassportActivation.js", import.meta.url), "utf8");
   assert.match(activationPage, /invitedReference/);
+  assert.match(activationPage, /reference\s*\?/);
   assert.match(activationPage, /The invitation link alone does not activate access\./);
   assert.match(activationPage, /activationCode/);
 });
