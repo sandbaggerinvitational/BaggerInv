@@ -82,6 +82,13 @@ export default function ScoreEntry() {
     selectHole(targetHole, payload.data);
   };
 
+  const loadMatchOptions = async () => {
+    const response = await fetch("/api/scoring/access", { cache: "no-store" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "Unable to load active matches.");
+    setMatchOptions(payload.data?.matches || []);
+  };
+
   useEffect(() => {
     const restore = async () => {
       try {
@@ -93,9 +100,7 @@ export default function ScoreEntry() {
           await loadMatch();
           return;
         }
-        const response = await fetch("/api/scoring/access", { cache: "no-store" });
-        const payload = await response.json();
-        if (response.ok) setMatchOptions(payload.data?.matches || []);
+        await loadMatchOptions();
       } catch {
         setAuthorized(false);
         setData(null);
@@ -129,6 +134,8 @@ export default function ScoreEntry() {
     setAuthorized(false);
     setData(null);
     setCredential("");
+    setSelectedMatch("");
+    await loadMatchOptions();
     setStatus("Match access cleared.");
   };
 
@@ -275,6 +282,7 @@ export default function ScoreEntry() {
         <strong>{item.teamOnePlayers.join(" + ") || item.teamOne} vs {item.teamTwoPlayers.join(" + ") || item.teamTwo}</strong>
         <small>{item.format || "Format TBA"} · {item.course || "Course TBA"}{!item.accessAvailable ? " · Access not active" : ""}</small>
       </button>)}
+      {!matchOptions.length && <p className={styles.status}>No scoreable matches are available for the active round yet.</p>}
     </div>
     <label>Your name<input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} /></label>
     <label>Match code<input type="password" inputMode="numeric" autoComplete="one-time-code" value={credential} onChange={(event) => setCredential(event.target.value)} /></label>
