@@ -11,6 +11,7 @@ import CmsManager, { AuditLogPanel, DashboardPanel, StandingsPanel } from "./Cms
 import styles from "./admin-center.module.css";
 import { resolveTournamentSelection } from "../../lib/tournament-identifiers";
 import PreviewModeBadge from "../PreviewModeBadge";
+import PlayerPassportAdmin from "./PlayerPassportAdmin";
 
 const TABS = [
   ["dashboard", "Dashboard"], ["tournament", "Tournament"], ["players", "Players"], ["teams", "Teams"],
@@ -86,7 +87,7 @@ export default function AdminCenter({ tournaments, previewMode = false, liveTour
       <div className={styles.panel}>
         {active === "dashboard" ? <DashboardPanel {...shared} onNavigate={selectTab} /> : null}
         {active === "tournament" ? <TournamentEditor tournamentId={tournamentId} secret={secret} sharedUpdatedBy={updatedBy} /> : null}
-        {active === "players" ? <CmsManager resource="players" {...shared} description="Manage player profiles, status, leadership roles, handicapping details, biography, and public presentation." /> : null}
+        {active === "players" ? <div className={styles.stack}><PlayerPassportAdmin secret={secret} updatedBy={updatedBy} /><CmsManager resource="players" {...shared} description="Manage player profiles, status, leadership roles, handicapping details, biography, and public presentation." /></div> : null}
         {active === "teams" ? <div className={styles.stack}><CmsManager resource="teams" {...shared} description="Manage the selected tournament's team identity, captain, colors, logo, motto, and description." /><CmsManager resource="rosters" {...shared} title="Roster Assignments" description="Assign players to Team 1 or Team 2 and maintain the tournament handicap used across the public site." /></div> : null}
         {active === "draft" ? <div className={styles.stack}><CmsManager resource="draft-settings" {...shared} description="Schedule the draft, assign its teams and captains, set the pick count, and control the public draft presentation." /><CmsManager resource="draft-picks" {...shared} description="Build the official draft board. Player selections write directly to the Draft Picks sheet." /></div> : null}
         {active === "schedule" ? <CmsManager resource="schedule" {...shared} description="Build the tournament-week itinerary, connect rounds and courses, publish events, and reorder the schedule." /> : null}

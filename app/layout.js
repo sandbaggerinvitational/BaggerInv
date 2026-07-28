@@ -8,6 +8,7 @@ import {
   pageMetadata,
 } from "../lib/seo";
 import PwaFoundation from "./PwaFoundation";
+import ParticipantIdentity from "./ParticipantIdentity";
 
 const homeMetadata = pageMetadata({
   title: SITE_NAME,
@@ -89,6 +90,7 @@ export default function RootLayout({ children }) {
         {children}
         <Analytics />
         <PwaFoundation />
+        <ParticipantIdentity />
       </body>
     </html>
   );

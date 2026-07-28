@@ -50,6 +50,8 @@ export default function ScoreEntry() {
   const [showReview, setShowReview] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [restoring, setRestoring] = useState(true);
+  const [passportPlayer, setPassportPlayer] = useState(null);
+  const [passportMatches, setPassportMatches] = useState([]);
 
   const request = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -100,7 +102,16 @@ export default function ScoreEntry() {
           await loadMatch();
           return;
         }
-        await loadMatchOptions();
+        const passport = await fetch("/api/player-passport/session", { cache: "no-store" });
+        if (passport.ok) {
+          const identity = await passport.json();
+          setPassportPlayer(identity.player);
+          const matches = await fetch("/api/player-passport/matches", { cache: "no-store" });
+          const payload = await matches.json();
+          if (matches.ok) setPassportMatches(payload.data?.matches || []);
+        } else {
+          await loadMatchOptions();
+        }
       } catch {
         setAuthorized(false);
         setData(null);
@@ -122,6 +133,21 @@ export default function ScoreEntry() {
           accessCode: credential,
         }),
       });
+      setAuthorized(true);
+      await loadMatch();
+      setStatus("");
+    } catch (error) { setStatus(error.message); }
+    finally { setBusy(false); }
+  };
+
+  const openPassportMatch = async (passportMatch) => {
+    setBusy(true); setStatus("Opening your scorecard…");
+    try {
+      await request("/api/player-passport/matches", {
+        method: "POST",
+        body: JSON.stringify({ matchId: passportMatch.matchId }),
+      });
+      setName(passportPlayer?.name || "");
       setAuthorized(true);
       await loadMatch();
       setStatus("");
@@ -275,7 +301,20 @@ export default function ScoreEntry() {
   </section>;
 
   if (!authorized) return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Select your active-round match, then enter its participant code.</p></div>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>{passportPlayer ? `Welcome, ${passportPlayer.name}. Choose one of your tournament matches.` : "Activate Player Passport or enter a participant match code."}</p></div>
+    {passportPlayer ? <div className={styles.matchChoices} aria-label="Your Player Passport matches">
+      {passportMatches.map((item) => <button type="button" disabled={!item.scoringEnabled || busy} onClick={() => openPassportMatch(item)} key={item.matchId}>
+        <span>Round {item.round} · Match {item.match}{item.teeTime ? ` · ${item.teeTime}` : ""}</span>
+        <strong>{item.format || "Format TBA"} · {item.course || "Course TBA"}</strong>
+        <small>{item.scoringEnabled ? "Open Scorecard" : String(item.status).toLowerCase() === "final" ? "Match complete" : "Not open for scoring yet"}</small>
+      </button>)}
+      {!passportMatches.length && <p className={styles.status}>No tournament matches are assigned to your Player Passport yet.</p>}
+      <button type="button" className={styles.clearAccess} onClick={async () => {
+        await fetch("/api/player-passport/session", { method: "DELETE" });
+        setPassportPlayer(null); setPassportMatches([]); await loadMatchOptions();
+      }}>This isn’t me · Remove Player Passport</button>
+    </div> : <>
+    <Link className={styles.primary} href="/activate">Activate Player Passport</Link>
     <div className={styles.matchChoices} role="radiogroup" aria-label="Choose your match">
       {matchOptions.map((item) => <button type="button" role="radio" aria-checked={selectedMatch === item.selector} data-active={selectedMatch === item.selector} disabled={!item.accessAvailable} onClick={() => setSelectedMatch(item.selector)} key={item.selector || `${item.round}-${item.match}`}>
         <span>Round {item.round} · Match {item.match}{item.teeTime ? ` · ${item.teeTime}` : ""}</span>
@@ -287,6 +326,7 @@ export default function ScoreEntry() {
     <label>Your name<input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} /></label>
     <label>Match code<input type="password" inputMode="numeric" autoComplete="one-time-code" value={credential} onChange={(event) => setCredential(event.target.value)} /></label>
     <button className={styles.primary} disabled={busy || !selectedMatch || !name.trim() || !credential.trim()} onClick={login}>Open My Match</button>
+    </>}
     {status && <p className={styles.status}>{status}</p>}
   </section>;
   if (!data) return <section className={styles.login}><div className={styles.brand}><span>SBI LIVE</span><h1>Unable to open match</h1></div><button className={styles.primary} onClick={clearAccess}>Clear match access</button>{status && <p className={styles.status}>{status}</p>}</section>;
