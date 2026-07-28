@@ -1,11 +1,3 @@
-import {
-  getCourses,
-  getPlayers,
-  getTournaments,
-  refreshHistoricalData,
-} from "../lib/stats";
-import { getLeaderboardSlugs } from "../lib/leaderboards";
-import { getDraftYears } from "../lib/draft";
 import { absoluteUrl } from "../lib/seo";
 
 const STATIC_ROUTES = [
@@ -40,58 +32,83 @@ function entry(path, changeFrequency = "monthly", priority = 0.6) {
   };
 }
 
+function staticEntries() {
+  return STATIC_ROUTES.map((path) =>
+    entry(path, path === "/live" ? "hourly" : "weekly", path === "/" ? 1 : 0.8)
+  );
+}
+
 export default async function sitemap() {
-  await refreshHistoricalData();
+  // Vercel evaluates metadata routes while building Preview deployments.
+  // Preview data is intentionally isolated and must never be used to publish
+  // production search metadata.
+  if (process.env.VERCEL_ENV === "preview") {
+    return staticEntries();
+  }
 
-  const players = getPlayers().map((player) =>
-    entry(`/players/${player.slug}`, "monthly", 0.7)
-  );
-  const courses = getCourses().map((course) =>
-    entry(`/courses/${encodeURIComponent(course["Course ID"])}`, "yearly", 0.5)
-  );
-  const leaderboards = getLeaderboardSlugs().map((slug) =>
-    entry(`/records/${slug}`, "monthly", 0.6)
-  );
+  try {
+    const [
+      { getCourses, getPlayers, getTournaments, refreshHistoricalData },
+      { getLeaderboardSlugs },
+      { getDraftYears },
+    ] = await Promise.all([
+      import("../lib/stats"),
+      import("../lib/leaderboards"),
+      import("../lib/draft"),
+    ]);
+    await refreshHistoricalData();
 
-  const tournamentRoutes = getTournaments().flatMap((tournament) => {
-    const year = tournament.year;
-    const routes = [entry(`/history/${year}`, "yearly", 0.7)];
+    const players = getPlayers().map((player) =>
+      entry(`/players/${player.slug}`, "monthly", 0.7)
+    );
+    const courses = getCourses().map((course) =>
+      entry(`/courses/${encodeURIComponent(course["Course ID"])}`, "yearly", 0.5)
+    );
+    const leaderboards = getLeaderboardSlugs().map((slug) =>
+      entry(`/records/${slug}`, "monthly", 0.6)
+    );
 
-    for (const team of tournament.teams || []) {
-      routes.push(
-        entry(
-          `/history/${year}/team/${encodeURIComponent(team.side)}`,
-          "yearly",
-          0.5
-        )
-      );
-    }
+    const tournamentRoutes = getTournaments().flatMap((tournament) => {
+      const year = tournament.year;
+      const routes = [entry(`/history/${year}`, "yearly", 0.7)];
 
-    for (const course of tournament.courses || []) {
-      const round = Number(String(course.Round ?? "").replace(/\D/g, ""));
-      if (round) {
-        routes.push(entry(`/history/${year}/round/${round}`, "yearly", 0.6));
+      for (const team of tournament.teams || []) {
+        routes.push(
+          entry(
+            `/history/${year}/team/${encodeURIComponent(team.side)}`,
+            "yearly",
+            0.5
+          )
+        );
       }
-    }
 
-    if (tournament.championTeam) {
-      routes.push(entry(`/champions/${year}`, "yearly", 0.7));
-    }
+      for (const course of tournament.courses || []) {
+        const round = Number(String(course.Round ?? "").replace(/\D/g, ""));
+        if (round) {
+          routes.push(entry(`/history/${year}/round/${round}`, "yearly", 0.6));
+        }
+      }
 
-    return routes;
-  });
-  const draftRoutes = (await getDraftYears()).map((year) =>
-    entry(`/draft/${year}`, "yearly", 0.7)
-  );
+      if (tournament.championTeam) {
+        routes.push(entry(`/champions/${year}`, "yearly", 0.7));
+      }
 
-  return [
-    ...STATIC_ROUTES.map((path) =>
-      entry(path, path === "/live" ? "hourly" : "weekly", path === "/" ? 1 : 0.8)
-    ),
-    ...players,
-    ...courses,
-    ...leaderboards,
-    ...tournamentRoutes,
-    ...draftRoutes,
-  ];
+      return routes;
+    });
+    const draftRoutes = (await getDraftYears()).map((year) =>
+      entry(`/draft/${year}`, "yearly", 0.7)
+    );
+
+    return [
+      ...staticEntries(),
+      ...players,
+      ...courses,
+      ...leaderboards,
+      ...tournamentRoutes,
+      ...draftRoutes,
+    ];
+  } catch (error) {
+    console.error("Dynamic sitemap data was unavailable; serving public static routes only.", error);
+    return staticEntries();
+  }
 }
