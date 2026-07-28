@@ -1,7 +1,6 @@
 import {
   DEFAULT_DESCRIPTION,
   SITE_NAME,
-  SITE_URL,
   absoluteUrl,
 } from "../lib/seo.js";
 
