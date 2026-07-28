@@ -11,6 +11,8 @@ test("PWA foundation registers the service worker and supports install guidance"
   assert.match(source, /beforeinstallprompt/);
   assert.match(source, /Add to Home Screen/);
   assert.match(source, /display-mode: standalone/);
+  assert.match(source, /navigator\.onLine/);
+  assert.match(source, /newer version of SBI is ready/);
 });
 
 test("service worker never intercepts writes or private scoring routes", async () => {
@@ -31,4 +33,27 @@ test("offline page does not imply that scores can be saved offline", async () =>
     "utf8",
   );
   assert.match(source, /never reports a score as saved without a confirmed server response/i);
+});
+
+test("iPhone release metadata uses safe-area viewport, launch images, and a maskable icon", async () => {
+  const [layout, manifestSource] = await Promise.all([
+    readFile(new URL("../app/layout.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/manifest.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(layout, /viewportFit: "cover"/);
+  assert.match(layout, /statusBarStyle: "black-translucent"/);
+  assert.match(layout, /startupImage/);
+  assert.match(manifestSource, /icon-maskable-512\.png/);
+  assert.match(manifestSource, /shortcuts/);
+  assert.match(manifestSource, /\/score\?source=shortcut/);
+});
+
+test("participant profile exposes the native Web Share API with a copy fallback", async () => {
+  const source = await readFile(
+    new URL("../app/me/ParticipantProfile.js", import.meta.url),
+    "utf8",
+  );
+  assert.match(source, /navigator\.share/);
+  assert.match(source, /navigator\.clipboard\.writeText/);
+  assert.match(source, /Share SBI/);
 });

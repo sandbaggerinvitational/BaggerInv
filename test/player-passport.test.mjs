@@ -167,7 +167,7 @@ test("Participant Mode active destinations cover direct and nested routes", () =
   assert.equal(participantDestination("/score", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/score/access/token", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/live", "", "clay-beltran"), "Tournament");
-  assert.equal(participantDestination("/live", "?view=points", "clay-beltran"), "Leaderboard");
+  assert.equal(participantDestination("/live", "?view=points", "clay-beltran"), "Leaderboards");
   assert.equal(participantDestination("/players/clay-beltran", "", "clay-beltran"), "Me");
   assert.equal(participantDestination("/players/another-player", "", "clay-beltran"), "");
   assert.equal(participantDestination("/records", "", "clay-beltran"), "");

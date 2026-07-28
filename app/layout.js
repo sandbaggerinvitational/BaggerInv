@@ -70,6 +70,29 @@ export const metadata = {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "SBI",
+    startupImage: [
+      {
+        url: "/splash/iphone-1170x2532.png",
+        media: "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)",
+      },
+      {
+        url: "/splash/iphone-1179x2556.png",
+        media: "(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)",
+      },
+      {
+        url: "/splash/iphone-1290x2796.png",
+        media: "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)",
+      },
+      {
+        url: "/splash/iphone-1320x2868.png",
+        media: "(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3)",
+      },
+    ],
+  },
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
   },
   robots: {
     index: true,
@@ -82,6 +105,14 @@ export const metadata = {
       "max-video-preview": -1,
     },
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  colorScheme: "light",
+  themeColor: "#0b3529",
 };
 
 export default function RootLayout({ children }) {

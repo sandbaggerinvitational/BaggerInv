@@ -12,8 +12,8 @@ const itemsFor = (player) => [
   { href: "/", label: "Home", icon: "⌂" },
   { href: "/score", label: "My Match", icon: "○" },
   { href: "/live", label: "Tournament", icon: "◆" },
-  { href: "/live?view=points", label: "Leaderboard", icon: "≡" },
-  { href: player?.slug ? `/players/${player.slug}` : "/players", label: "Me", icon: "●" },
+  { href: "/live?view=leaderboards", label: "Leaderboards", icon: "≡" },
+  { href: "/me", label: "Me", icon: "●" },
 ];
 
 export default function ParticipantIdentity() {
