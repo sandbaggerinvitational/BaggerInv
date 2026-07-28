@@ -49,3 +49,17 @@ test("scoring login remains retryable while writes are rate limited", async () =
   assert.match(match, /scoring-write:/);
   assert.match(match, /limit:\s*30/);
 });
+
+test("hole scoring batches Google Sheet reads and updates locally after save", async () => {
+  const [sheetSource, scorerSource] = await Promise.all([
+    readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(sheetSource, /\/values:batchGet/);
+  assert.match(sheetSource, /readSheets\(\["Live Matches", "Live Hole Scores", "Course Holes"\]\)/);
+  assert.match(scorerSource, /setData\(nextData\)/);
+  assert.doesNotMatch(
+    scorerSource.match(/const save = async \(\) => \{[\s\S]*?const confirmScorecard/)?.[0] || "",
+    /await loadMatch/
+  );
+});

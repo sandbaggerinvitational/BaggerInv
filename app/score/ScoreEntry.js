@@ -220,7 +220,29 @@ export default function ScoreEntry() {
         .concat(payload.result?.hole || []);
       const savedStatus = namedMatchStatus(nextScores, teamNames);
       setLastSaved(`Hole ${holeNumber} saved · ${savedStatus}`);
-      await loadMatch(matchId);
+      const nextData = {
+        ...data,
+        match: {
+          ...data.match,
+          "Match Status": "Live",
+          "Current Hole": payload.result?.liveStatus?.currentHole,
+          "Team 1 Holes Won": payload.result?.liveStatus?.team1HolesWon,
+          "Team 2 Holes Won": payload.result?.liveStatus?.team2HolesWon,
+          "Holes Remaining": payload.result?.liveStatus?.holesRemaining,
+          "Match Status Text": payload.result?.liveStatus?.statusText,
+        },
+        holeScores: nextScores,
+        canConfirm: Boolean(payload.result?.matchComplete),
+      };
+      setData(nextData);
+      const scored = new Set(nextScores.map((item) => Number(item["Hole Number"])));
+      const nextHole = Array.from({ length: 18 }, (_, index) => index + 1)
+        .find((number) => !scored.has(number));
+      if (nextHole) selectHole(nextHole, nextData);
+      else {
+        setShowReview(true);
+        setConfirming(false);
+      }
       setStatus(`Hole ${holeNumber} saved. ${savedStatus}.`);
     } catch (error) { setStatus(error.message); }
     finally { setBusy(false); }
