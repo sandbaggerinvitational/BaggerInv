@@ -1,26 +1,10 @@
 import Link from "next/link";
 import styles from "./tournament-command-center.module.css";
-
-const timelineEvents = [
-  {
-    time: "Now",
-    icon: "●",
-    title: "Tournament Mode is active",
-    detail: "Live tournament events will appear here as scoring updates arrive.",
-  },
-  {
-    time: "12 min",
-    icon: "↗",
-    title: "Featured match update",
-    detail: "Momentum and hole status will be connected in a future sprint.",
-  },
-  {
-    time: "28 min",
-    icon: "✓",
-    title: "Score confirmed",
-    detail: "Finalized results will automatically join the tournament timeline.",
-  },
-];
+import {
+  buildTournamentTimeline,
+  featuredMatchModel,
+  tournamentProgressModel,
+} from "../lib/live-command-center";
 
 const leaderboards = [
   { label: "Birdies", value: "—", name: "Awaiting scores", detail: "Tournament total" },
@@ -34,7 +18,7 @@ const recordAlerts = [
   { label: "Most Holes Won", detail: "Live hole results will update this record automatically." },
 ];
 
-function TeamScore({ team, side }) {
+function TeamScore({ team, side, progress, remainingPoints }) {
   return (
     <article className={styles.teamScore} data-side={side}>
       <div>
@@ -44,42 +28,57 @@ function TeamScore({ team, side }) {
       <strong>{team.score ?? "—"}</strong>
       <dl>
         <div><dt>Projected</dt><dd>—</dd></div>
-        <div><dt>Available</dt><dd>—</dd></div>
-        <div><dt>Matches left</dt><dd>—</dd></div>
+        <div><dt>Available</dt><dd>{remainingPoints}</dd></div>
+        <div><dt>Matches left</dt><dd>{progress.remainingMatches}</dd></div>
       </dl>
     </article>
   );
 }
 
-export default function TournamentCommandCenter({ tournament }) {
-  const currentRound = tournament.currentRound && tournament.currentRound !== "Not started"
-    ? `Round ${tournament.currentRound}`
+const timelineIcons = {
+  FINAL: "✓",
+  LIVE: "●",
+  TEE_TIME: "↗",
+};
+
+export default function TournamentCommandCenter({ tournament, liveData }) {
+  const rounds = liveData?.rounds || [];
+  const liveTournament = liveData?.tournament || tournament;
+  const currentRound = liveTournament.currentRound && liveTournament.currentRound !== "Not started"
+    ? `Round ${liveTournament.currentRound}`
     : "Round in progress";
+  const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
+  const featured = featuredMatchModel({ tournament: liveTournament, rounds });
+  const timelineEvents = buildTournamentTimeline({ tournament: liveTournament, rounds });
+  const remainingPoints = liveTournament.state?.remainingPoints ?? "—";
 
   return (
     <div className={styles.page}>
       <section className={styles.pulse} aria-labelledby="tournament-pulse-title">
         <div className={styles.pulseTopline}>
           <span className={styles.liveBadge}><i aria-hidden="true" /> Live</span>
-          <span>{tournament.year} Sandbagger Invitational</span>
+          <span>{liveTournament.year} Sandbagger Invitational</span>
         </div>
         <div className={styles.pulseHeading}>
           <div>
             <p>Tournament Pulse</p>
             <h1 id="tournament-pulse-title">{currentRound}</h1>
-            <span>{tournament.location}</span>
+            <span>{liveTournament.location}</span>
           </div>
           <div className={styles.pulseLeader}>
-            <small>Tournament leader</small>
-            <strong>Even</strong>
-            <span>Live scoring will determine the leader</span>
+            <small>Tournament progress</small>
+            <strong>{progress.completedMatches} of {progress.totalMatches}</strong>
+            <span>
+              {progress.remainingMatches} matches remaining
+              {progress.liveMatches ? ` · ${progress.liveMatches} live` : ""}
+            </span>
           </div>
         </div>
         <div className={styles.pulseMetrics}>
-          <div><span>Current team points</span><strong>{tournament.teamOne.score ?? 0}–{tournament.teamTwo.score ?? 0}</strong></div>
+          <div><span>Current team points</span><strong>{liveTournament.teamOne.score ?? 0}–{liveTournament.teamTwo.score ?? 0}</strong></div>
           <div><span>Projected points</span><strong>—</strong></div>
-          <div><span>Tournament status</span><strong>Live</strong></div>
-          <div><span>Remaining matches</span><strong>—</strong></div>
+          <div><span>Matches complete</span><strong>{progress.completedMatches}</strong></div>
+          <div><span>Remaining matches</span><strong>{progress.remainingMatches}</strong></div>
         </div>
       </section>
 
@@ -87,27 +86,33 @@ export default function TournamentCommandCenter({ tournament }) {
         <div className={styles.sectionLabel}>
           <div>
             <p>Featured Match</p>
-            <h2 id="featured-match-title">Match spotlight</h2>
+            <h2 id="featured-match-title">{featured?.label || "Match spotlight"}</h2>
           </div>
-          <span>Awaiting live selection</span>
+          <span>{featured ? [featured.format, featured.course].filter(Boolean).join(" · ") : "No match available"}</span>
         </div>
-        <div className={styles.featuredMatch}>
-          <div className={styles.featuredTeam}>
-            <span>{tournament.teamOne.name}</span>
-            <strong>—</strong>
-            <small>Win probability</small>
+        {featured ? (
+          <div className={styles.featuredMatch}>
+            <div className={styles.featuredTeam}>
+              <span>{featured.teamOneName}</span>
+              {featured.teamOnePlayers ? <b>{featured.teamOnePlayers}</b> : null}
+              <strong>—</strong>
+              <small>Win probability</small>
+            </div>
+            <div className={styles.featuredStatus}>
+              <span>{featured.holeLabel}</span>
+              <b>{featured.status}</b>
+              <small>{featured.momentum}</small>
+            </div>
+            <div className={`${styles.featuredTeam} ${styles.featuredTeamRight}`}>
+              <span>{featured.teamTwoName}</span>
+              {featured.teamTwoPlayers ? <b>{featured.teamTwoPlayers}</b> : null}
+              <strong>—</strong>
+              <small>Win probability</small>
+            </div>
           </div>
-          <div className={styles.featuredStatus}>
-            <span>Hole —</span>
-            <b>Match status</b>
-            <small>Momentum will appear here</small>
-          </div>
-          <div className={`${styles.featuredTeam} ${styles.featuredTeamRight}`}>
-            <span>{tournament.teamTwo.name}</span>
-            <strong>—</strong>
-            <small>Win probability</small>
-          </div>
-        </div>
+        ) : (
+          <div className={styles.featuredEmpty}>No configured match is available for the current round.</div>
+        )}
         <Link href="/live">Open Match Center <span aria-hidden="true">→</span></Link>
       </section>
 
@@ -117,11 +122,21 @@ export default function TournamentCommandCenter({ tournament }) {
             <p>Live Team Scoreboard</p>
             <h2 id="team-scoreboard-title">The race for the Cup</h2>
           </div>
-          <span>Projected scoring ready</span>
+          <span>{progress.liveMatches ? `${progress.liveMatches} matches live` : `${progress.remainingMatches} matches remaining`}</span>
         </div>
         <div className={styles.teamGrid}>
-          <TeamScore team={tournament.teamOne} side="one" />
-          <TeamScore team={tournament.teamTwo} side="two" />
+          <TeamScore
+            team={liveTournament.teamOne}
+            side="one"
+            progress={progress}
+            remainingPoints={remainingPoints}
+          />
+          <TeamScore
+            team={liveTournament.teamTwo}
+            side="two"
+            progress={progress}
+            remainingPoints={remainingPoints}
+          />
         </div>
       </section>
 
@@ -133,15 +148,21 @@ export default function TournamentCommandCenter({ tournament }) {
               <h2 id="timeline-title">What’s happening</h2>
             </div>
           </div>
-          <ol>
-            {timelineEvents.map((event) => (
-              <li key={`${event.time}-${event.title}`}>
-                <time>{event.time}</time>
-                <span className={styles.timelineIcon} aria-hidden="true">{event.icon}</span>
-                <div><strong>{event.title}</strong><p>{event.detail}</p></div>
-              </li>
-            ))}
-          </ol>
+          {timelineEvents.length ? (
+            <ol>
+              {timelineEvents.map((event) => (
+                <li key={event.id}>
+                  <time>{event.time}</time>
+                  <span className={styles.timelineIcon} data-type={event.type} aria-hidden="true">
+                    {timelineIcons[event.type] || "•"}
+                  </span>
+                  <div><strong>{event.title}</strong><p>{event.detail}</p></div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className={styles.timelineEmpty}>Tournament events will appear when tee times or scoring activity are recorded.</div>
+          )}
         </section>
 
         <section className={styles.leaderboards} aria-labelledby="leaderboards-title">

@@ -120,7 +120,7 @@ export default async function Home() {
     return (
       <main>
         <Header activeNavigationHref="/live" />
-        <TournamentCommandCenter tournament={statusHeroTournament} />
+        <TournamentCommandCenter tournament={statusHeroTournament} liveData={liveData} />
         <Footer />
       </main>
     );
