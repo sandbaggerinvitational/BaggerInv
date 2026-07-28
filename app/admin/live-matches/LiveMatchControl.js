@@ -223,7 +223,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
         <p>{tournamentState.remainingMatches} matches · {tournamentState.remainingPoints} points remaining</p>
         <div><span>{teamName(data.teams, year, 2)}</span><strong>{tournamentState.teamTwo.score}</strong><small>{tournamentState.teamTwo.pointsToClinch > 0 ? `Need ${tournamentState.teamTwo.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
       </div>
-      {busy ? <div className={styles.loadingState} role="status">Loading live matches…</div> : matches.length ? <div className={styles.grid}>{matches.map((match) => <MatchEditor key={`${match["Match ID"]}-${match["Updated At"]}-${match["Match Status"]}`} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} onDirtyChange={updateDirty} busy={busyMatchId === match["Match ID"]} />)}</div> : <div className={styles.empty}>No matches are configured for this selection.</div>}
+      {busy ? <div className={styles.loadingState} role="status">Loading live matches…</div> : matches.length ? <div className={styles.grid}>{matches.map((match) => <MatchEditor key={match["Match ID"]} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} onDirtyChange={updateDirty} busy={busyMatchId === match["Match ID"]} />)}</div> : <div className={styles.empty}>No matches are configured for this selection.</div>}
     </>}
   </section>;
 }

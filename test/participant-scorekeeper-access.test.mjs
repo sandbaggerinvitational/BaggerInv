@@ -34,11 +34,12 @@ test("codes and QR tokens are securely matched and invalid values are rejected",
 });
 
 test("participant routes use HTTP-only cookies and server-side current-match authorization", async () => {
-  const [session, current, scoreEntry, sheets] = await Promise.all([
+  const [session, current, scoreEntry, sheets, adminControl] = await Promise.all([
     readFile(new URL("../app/api/scoring/session/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/admin/live-matches/LiveMatchControl.js", import.meta.url), "utf8"),
   ]);
   assert.match(session, /scoringSessionCookie/);
   assert.match(current, /validateParticipantSession/);
@@ -47,6 +48,8 @@ test("participant routes use HTTP-only cookies and server-side current-match aut
   assert.match(scoreEntry, /expectedUpdatedAt/);
   assert.match(sheets, /appendDimension/);
   assert.match(sheets, /requiredColumnCount - currentColumnCount/);
+  assert.match(adminControl, /key=\{match\["Match ID"\]\}/);
+  assert.doesNotMatch(adminControl, /key=\{`\$\{match\["Match ID"\]\}-\$\{match\["Updated At"\]\}/);
 });
 
 test("PWA manifest is standalone and uses safe local navigation scope", () => {
