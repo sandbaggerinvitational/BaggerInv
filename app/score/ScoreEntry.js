@@ -8,8 +8,6 @@ import styles from "./score.module.css";
 const jsonScores = (value) => {
   try { return JSON.parse(value || "[]"); } catch { return []; }
 };
-const SCORING_SESSION_KEY = "sbi-live-scoring-session";
-
 function playerIds(match, side) {
   return [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]].filter(Boolean);
 }
@@ -37,10 +35,10 @@ function holeWinnerMark(score, teamNames) {
 }
 
 export default function ScoreEntry() {
-  const [mode, setMode] = useState("match");
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
-  const [token, setToken] = useState("");
+  const [authorized, setAuthorized] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState("");
   const [matchId, setMatchId] = useState("");
   const [matchOptions, setMatchOptions] = useState([]);
   const [data, setData] = useState(null);
@@ -58,7 +56,6 @@ export default function ScoreEntry() {
       ...options,
       headers: {
         "content-type": "application/json",
-        ...(token ? { authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {}),
       },
     });
@@ -67,19 +64,14 @@ export default function ScoreEntry() {
     return payload;
   };
 
-  const loadMatch = async (id, sessionToken = token) => {
-    const response = await fetch(`/api/scoring/matches/${encodeURIComponent(id)}`, {
-      headers: { authorization: `Bearer ${sessionToken}` },
+  const loadMatch = async () => {
+    const response = await fetch("/api/scoring/current", {
       cache: "no-store",
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Unable to load the match.");
-    setMatchId(id);
+    setMatchId(payload.data.match["Match ID"]);
     setData(payload.data);
-    try {
-      const saved = JSON.parse(window.sessionStorage.getItem(SCORING_SESSION_KEY) || "{}");
-      window.sessionStorage.setItem(SCORING_SESSION_KEY, JSON.stringify({ ...saved, token: sessionToken, matchId: id }));
-    } catch {}
     setShowReview(payload.data.match["Match Status"] === "Final" || Boolean(payload.data.canConfirm));
     setConfirming(false);
     const scored = payload.data.holeScores.map((item) => Number(item["Hole Number"]));
@@ -90,28 +82,22 @@ export default function ScoreEntry() {
     selectHole(targetHole, payload.data);
   };
 
-  const loadAdminMatches = async (sessionToken) => {
-    const response = await fetch("/api/scoring/matches", {
-      headers: { authorization: `Bearer ${sessionToken}` },
-      cache: "no-store",
-    });
-    const list = await response.json();
-    if (!response.ok) throw new Error(list.error || "Unable to load matches.");
-    setMatchOptions(list.matches || []);
-  };
-
   useEffect(() => {
     const restore = async () => {
       try {
-        const saved = JSON.parse(window.sessionStorage.getItem(SCORING_SESSION_KEY) || "null");
-        if (!saved?.token || !["match", "admin"].includes(saved.scope)) return;
-        setToken(saved.token);
-        setName(saved.scorerName || "");
-        if (saved.matchId) await loadMatch(saved.matchId, saved.token);
-        else if (saved.scope === "admin") await loadAdminMatches(saved.token);
+        const session = await fetch("/api/scoring/session", { cache: "no-store" });
+        if (session.ok) {
+          const payload = await session.json();
+          setName(payload.scorerName || "");
+          setAuthorized(true);
+          await loadMatch();
+          return;
+        }
+        const response = await fetch("/api/scoring/access", { cache: "no-store" });
+        const payload = await response.json();
+        if (response.ok) setMatchOptions(payload.data?.matches || []);
       } catch {
-        window.sessionStorage.removeItem(SCORING_SESSION_KEY);
-        setToken("");
+        setAuthorized(false);
         setData(null);
       } finally {
         setRestoring(false);
@@ -127,24 +113,23 @@ export default function ScoreEntry() {
         method: "POST",
         body: JSON.stringify({
           scorerName: name,
-          ...(mode === "admin" ? { adminSecret: credential } : { accessCode: credential }),
+          selector: selectedMatch,
+          accessCode: credential,
         }),
       });
-      setToken(payload.token);
-      window.sessionStorage.setItem(SCORING_SESSION_KEY, JSON.stringify({
-        token: payload.token,
-        scope: payload.scope,
-        matchId: payload.matchId || "",
-        scorerName: name.trim(),
-      }));
-      if (payload.scope === "match") {
-        await loadMatch(payload.matchId, payload.token);
-      } else {
-        await loadAdminMatches(payload.token);
-      }
+      setAuthorized(true);
+      await loadMatch();
       setStatus("");
     } catch (error) { setStatus(error.message); }
     finally { setBusy(false); }
+  };
+
+  const clearAccess = async () => {
+    await fetch("/api/scoring/session", { method: "DELETE" });
+    setAuthorized(false);
+    setData(null);
+    setCredential("");
+    setStatus("Match access cleared.");
   };
 
   const selectHole = (number, source = data) => {
@@ -206,13 +191,14 @@ export default function ScoreEntry() {
   const save = async () => {
     setBusy(true); setStatus(`Saving hole ${holeNumber}…`);
     try {
-      const payload = await request(`/api/scoring/matches/${encodeURIComponent(matchId)}`, {
+      const payload = await request("/api/scoring/current", {
         method: "POST",
         body: JSON.stringify({
           holeNumber,
           team1GrossScores: gross.team1,
           team2GrossScores: gross.team2,
           expectedRevision: Number(savedHole?.Revision || 0),
+          expectedUpdatedAt: match["Updated At"] || "",
         }),
       });
       const nextScores = (data?.holeScores || [])
@@ -230,6 +216,8 @@ export default function ScoreEntry() {
           "Team 2 Holes Won": payload.result?.liveStatus?.team2HolesWon,
           "Holes Remaining": payload.result?.liveStatus?.holesRemaining,
           "Match Status Text": payload.result?.liveStatus?.statusText,
+          "Updated At": payload.result?.updatedAt,
+          "Updated By": payload.result?.updatedBy,
         },
         holeScores: nextScores,
         canConfirm: Boolean(payload.result?.matchComplete),
@@ -251,11 +239,11 @@ export default function ScoreEntry() {
   const confirmScorecard = async () => {
     setBusy(true); setStatus("Submitting final scorecard…");
     try {
-      await request(`/api/scoring/matches/${encodeURIComponent(matchId)}`, {
+      await request("/api/scoring/current", {
         method: "POST",
         body: JSON.stringify({ action: "confirm" }),
       });
-      await loadMatch(matchId);
+      await loadMatch();
       setShowReview(true);
       setStatus("Scorecard finalized.");
     } catch (error) { setStatus(error.message); }
@@ -279,29 +267,21 @@ export default function ScoreEntry() {
     <div className={styles.brand}><span>SBI LIVE</span><h1>Opening scoring…</h1><p>Restoring your authorized match.</p></div>
   </section>;
 
-  if (!token) return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>Enter scores</h1><p>Use the code assigned to your match.</p></div>
-    <div className={styles.mode}>
-      <button data-active={mode === "match"} onClick={() => setMode("match")}>Match code</button>
-      <button data-active={mode === "admin"} onClick={() => setMode("admin")}>Administrator</button>
+  if (!authorized) return <section className={styles.login}>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Select your active-round match, then enter its participant code.</p></div>
+    <div className={styles.matchChoices} role="radiogroup" aria-label="Choose your match">
+      {matchOptions.map((item) => <button type="button" role="radio" aria-checked={selectedMatch === item.selector} data-active={selectedMatch === item.selector} disabled={!item.accessAvailable} onClick={() => setSelectedMatch(item.selector)} key={item.selector || `${item.round}-${item.match}`}>
+        <span>Round {item.round} · Match {item.match}{item.teeTime ? ` · ${item.teeTime}` : ""}</span>
+        <strong>{item.teamOnePlayers.join(" + ") || item.teamOne} vs {item.teamTwoPlayers.join(" + ") || item.teamTwo}</strong>
+        <small>{item.format || "Format TBA"} · {item.course || "Course TBA"}{!item.accessAvailable ? " · Access not active" : ""}</small>
+      </button>)}
     </div>
     <label>Your name<input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} /></label>
-    <label>{mode === "admin" ? "Admin password" : "Match code"}<input type="password" autoCapitalize="characters" value={credential} onChange={(event) => setCredential(event.target.value)} /></label>
-    <button className={styles.primary} disabled={busy || !name.trim() || !credential.trim()} onClick={login}>Open scoring</button>
+    <label>Match code<input type="password" inputMode="numeric" autoComplete="one-time-code" value={credential} onChange={(event) => setCredential(event.target.value)} /></label>
+    <button className={styles.primary} disabled={busy || !selectedMatch || !name.trim() || !credential.trim()} onClick={login}>Open My Match</button>
     {status && <p className={styles.status}>{status}</p>}
   </section>;
-
-  if (!data) return <section className={styles.login}>
-    <div className={styles.brand}><span>ADMIN</span><h1>Choose a match</h1></div>
-    <select value={matchId} onChange={(event) => setMatchId(event.target.value)}>
-      <option value="">Select a match</option>
-      {matchOptions.map((item) => <option key={item["Match ID"]} value={item["Match ID"]}>
-        {item.Year} · Round {item.Round} · Match {item.Match} · {item.Format}
-      </option>)}
-    </select>
-    <button className={styles.primary} disabled={!matchId || busy} onClick={() => loadMatch(matchId)}>Open match</button>
-    {status && <p className={styles.status}>{status}</p>}
-  </section>;
+  if (!data) return <section className={styles.login}><div className={styles.brand}><span>SBI LIVE</span><h1>Unable to open match</h1></div><button className={styles.primary} onClick={clearAccess}>Clear match access</button>{status && <p className={styles.status}>{status}</p>}</section>;
 
   if (showReview) return <section className={`${styles.shell} ${styles.reviewShell}`}>
     <header><div><span>{display.formatName || format} · Round {match.Round}</span><h1>{display.matchName || `Match ${match.Match}`}</h1><p>{display.courseName || match["Course ID"]} · Scorecard review</p></div><b>{completed.size}/18</b></header>
@@ -340,6 +320,7 @@ export default function ScoreEntry() {
   </section>;
 
   return <section className={styles.shell}>
+    <button type="button" className={styles.clearAccess} onClick={clearAccess}>Leave My Match</button>
     <header><div><span>{display.formatName || format} · Round {match.Round}</span><h1>{display.matchName || `Match ${match.Match}`}</h1><p>{display.courseName || match["Course ID"]}</p></div><b>{completed.size}/18</b></header>
     <nav className={styles.holeNavigator} aria-label="Choose hole">
       <button disabled={holeNumber === 1} onClick={() => selectHole(holeNumber - 1)} aria-label="Previous hole">‹</button>

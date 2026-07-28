@@ -269,6 +269,7 @@ export default function MatchCenter({ initialData, loadError }) {
     {championshipMode ? <ChampionshipBanner tournament={tournament} /> : <LiveBanner tournament={tournament} />}
     <section className={styles.content}>
       <div className={styles.liveControls}>
+        <Link href="/score" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, background: "#0b4938", color: "#fff", fontWeight: 900, textDecoration: "none" }}>My Match</Link>
         <div className={styles.freshness} data-state={refreshState} role="status" aria-live="polite">
           <span aria-hidden="true" />
           <strong>{refreshState === "refreshing" ? "Refreshing" : refreshState === "error" ? "Unable to refresh" : "Up to date"}</strong>

@@ -1,12 +1,29 @@
 import { NextResponse } from "next/server";
-import { authenticateLiveMatchCode } from "../../../../lib/google-sheets-write.js";
-import { createScoringSession } from "../../../../lib/scoring-access.js";
+import { authenticateParticipantMatch, validateParticipantSession } from "../../../../lib/google-sheets-write.js";
+import { createScoringSession, scoringSessionCookie, scoringTokenFromRequest, verifyScoringSession, SCORING_SESSION_COOKIE } from "../../../../lib/scoring-access.js";
+import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 
 export const dynamic = "force-dynamic";
 
+export async function GET(request) {
+  try {
+    const session = verifyScoringSession(scoringTokenFromRequest(request));
+    await validateParticipantSession(session);
+    return NextResponse.json({ scope: session.scope, scorerName: session.scorerName, authorized: true });
+  } catch {
+    return NextResponse.json({ authorized: false }, { status: 401 });
+  }
+}
+
+export async function DELETE() {
+  const response = NextResponse.json({ cleared: true });
+  response.cookies.set({ ...scoringSessionCookie("", 0), name: SCORING_SESSION_COOKIE });
+  return response;
+}
+
 export async function POST(request) {
   try {
-    const { accessCode, adminSecret, scorerName } = await request.json();
+    const { selector, accessCode, adminSecret, scorerName } = await request.json();
     if (!String(scorerName || "").trim()) throw new Error("Enter your name.");
     const allowedAdmins = [
       process.env.ADMIN_SECRET,
@@ -18,13 +35,17 @@ export async function POST(request) {
         scope: "admin",
       });
     }
-    const matchId = await authenticateLiveMatchCode(accessCode);
-    return NextResponse.json({
-      token: createScoringSession({ scope: "match", matchId, scorerName }),
+    const rate = consumeRateLimit(`participant-access:${clientAddress(request)}:${String(selector || "").slice(0, 32)}`, { limit: 5, windowMs: 10 * 60_000 });
+    if (!rate.allowed) return NextResponse.json({ error: "Unable to authorize this match." }, { status: 429 });
+    const access = await authenticateParticipantMatch({ selector, code: accessCode });
+    const token = createScoringSession({ scope: "match", ...access, scorerName });
+    const response = NextResponse.json({
       scope: "match",
-      matchId,
+      authorized: true,
     });
+    response.cookies.set(scoringSessionCookie(token));
+    return response;
   } catch (error) {
-    return NextResponse.json({ error: error?.message || "Unable to open scoring." }, { status: 401 });
+    return NextResponse.json({ error: "Unable to authorize this match." }, { status: 401 });
   }
 }

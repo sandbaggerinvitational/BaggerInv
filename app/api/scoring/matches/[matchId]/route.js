@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
-import { canScoreMatch, verifyScoringSession } from "../../../../../lib/scoring-access.js";
+import { canScoreMatch, scoringTokenFromRequest, verifyScoringSession } from "../../../../../lib/scoring-access.js";
 import {
   confirmLiveMatchScorecard,
   readLiveScoringMatch,
   saveLiveHoleScore,
+  validateParticipantSession,
 } from "../../../../../lib/google-sheets-write.js";
 import { clientAddress, consumeRateLimit } from "../../../../../lib/rate-limit.js";
 
 export const dynamic = "force-dynamic";
 
 function session(request) {
-  const authorization = request.headers.get("authorization") || "";
-  return verifyScoringSession(authorization.replace(/^Bearer\s+/i, ""));
+  return verifyScoringSession(scoringTokenFromRequest(request));
 }
 
 export async function GET(request, { params }) {
@@ -19,6 +19,7 @@ export async function GET(request, { params }) {
     const current = session(request);
     const { matchId } = await params;
     if (!canScoreMatch(current, matchId)) throw new Error("This code cannot access that match.");
+    await validateParticipantSession(current);
     return NextResponse.json({ data: await readLiveScoringMatch(matchId) });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Unable to load scoring." }, { status: 403 });
@@ -30,6 +31,7 @@ export async function POST(request, { params }) {
     const current = session(request);
     const { matchId } = await params;
     if (!canScoreMatch(current, matchId)) throw new Error("This code cannot update that match.");
+    await validateParticipantSession(current, { requireWritable: true });
     const rateLimit = consumeRateLimit(`scoring-write:${clientAddress(request)}:${matchId}`, {
       limit: 30,
       windowMs: 60_000,

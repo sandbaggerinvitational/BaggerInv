@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./live-match-control.module.css";
 import pairingStyles from "./pairing-editor.module.css";
+import accessStyles from "./participant-access.module.css";
 import { getTournamentState } from "../../../lib/live-tournament";
 import { finalizationReview, hasUnsavedMatchChanges } from "../../../lib/live-admin-ux";
 
@@ -60,6 +61,7 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
   const [draft, setDraft] = useState(() => Object.fromEntries([...EDITABLE, ...PAIRING_FIELDS].map((field) => [field, match[field] || ""])));
   const [feedback, setFeedback] = useState("");
   const [reviewOpen, setReviewOpen] = useState(false);
+  const [access, setAccess] = useState(null);
   const sideOne = teamName(teams, match.Year, 1);
   const sideTwo = teamName(teams, match.Year, 2);
   const isSingles = String(match.Format).toUpperCase() === "SI";
@@ -80,6 +82,7 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
     try {
       const result = await onAction(action, match, updates);
       if (result === null) return;
+      if (result.access) setAccess(result.access);
       setFeedback(action === "reopen" ? "Match reopened. Corrections are now enabled." : action === "finalize" ? "Official result finalized successfully." : "Changes saved successfully.");
       setReviewOpen(false);
     } catch (error) { setFeedback(error.message); }
@@ -116,6 +119,22 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
     </div>
     <div className={styles.saveState} data-dirty={dirty ? "true" : undefined} role="status" aria-live="polite">{feedback || (dirty ? "Unsaved changes" : "All changes saved")}</div>
     {match["Updated At"] ? <small>Last updated {match["Updated At"]}{match["Updated By"] ? ` by ${match["Updated By"]}` : ""}</small> : null}
+    <section className={accessStyles.panel}>
+      <div className={accessStyles.summary}><span>Participant scorekeeping</span><strong>{String(match["Access Active"]).toUpperCase() === "TRUE" ? "Access active" : "Access inactive"}</strong><small>{match["Access Expires At"] ? `Expires ${new Date(match["Access Expires At"]).toLocaleString()}` : "Generate credentials before sharing access."}</small></div>
+      <div className={accessStyles.actions}>
+        <button type="button" disabled={busy} onClick={() => {
+          if (match["Access Version"] && !window.confirm("Regenerating credentials immediately invalidates the previous code, QR link, and participant sessions. Continue?")) return;
+          run("access-generate", {});
+        }}>{match["Access Version"] ? "Regenerate access" : "Generate access"}</button>
+        {String(match["Access Active"]).toUpperCase() === "TRUE" ? <button type="button" disabled={busy} onClick={() => run("access-disable", {})}>Disable access</button> : null}
+      </div>
+      {access ? <div className={accessStyles.reveal}>
+        <p>Shown once. Save these before leaving this page.</p>
+        <strong>Participant code: {access.code}</strong>
+        <div><button type="button" onClick={() => navigator.clipboard.writeText(access.code)}>Copy code</button><button type="button" onClick={() => navigator.clipboard.writeText(access.accessUrl)}>Copy secure link</button><a href={access.qrDataUrl} download={`${match["Match ID"]}-participant-qr.png`}>Download QR</a></div>
+        <img src={access.qrDataUrl} alt={`QR code for Match ${match.Match} participant scoring`} />
+      </div> : match["Access Version"] ? <p className={accessStyles.note}>For security, the code and QR token are not stored in readable form. Regenerate access to receive new shareable credentials.</p> : null}
+    </section>
     {reviewOpen ? <FinalizationDialog review={review} busy={busy} onCancel={() => setReviewOpen(false)} onConfirm={() => run("finalize")} /> : null}
   </article>;
 }
@@ -180,7 +199,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
     try {
       const payload = await request({ action, matchId: match["Match ID"], updates, updatedBy });
       setData((current) => ({ ...current, matches: current.matches.map((row) => row["Match ID"] === payload.match["Match ID"] ? payload.match : row) }));
-      return payload.match;
+      return payload;
     } finally { setBusyMatchId(""); }
   };
 

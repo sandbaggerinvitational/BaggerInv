@@ -113,7 +113,10 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
         ) : (
           <div className={styles.featuredEmpty}>No configured match is available for the current round.</div>
         )}
-        <Link href="/live">Open Match Center <span aria-hidden="true">→</span></Link>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 22 }}>
+          <Link href="/score" style={{ marginTop: 0, padding: "12px 18px", borderRadius: 999, background: "#0b4435", color: "#fff", textDecoration: "none" }}>My Match <span aria-hidden="true">→</span></Link>
+          <Link href="/live">Open Match Center <span aria-hidden="true">→</span></Link>
+        </div>
       </section>
 
       <section className={styles.scoreboard} aria-labelledby="team-scoreboard-title">

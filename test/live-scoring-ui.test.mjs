@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("mobile scorer supports match codes, admin mode, every format, and revisions", async () => {
+test("mobile scorer supports participant match selection, every format, and revisions", async () => {
   const source = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
   assert.match(source, /Match code/);
-  assert.match(source, /Administrator/);
+  assert.match(source, /My Match/);
+  assert.match(source, /selectedMatch/);
   assert.match(source, /format === "BB" \? 2 : 1/);
   assert.match(source, /gross score/);
   assert.match(source, /Submit final scorecard/);
@@ -15,7 +16,8 @@ test("mobile scorer supports match codes, admin mode, every format, and revision
   assert.match(source, /scorecardRow/);
   assert.match(source, /Gross &amp; net/);
   assert.match(source, /expectedRevision/);
-  assert.match(source, /sessionStorage\.setItem\(SCORING_SESSION_KEY/);
+  assert.doesNotMatch(source, /sessionStorage/);
+  assert.match(source, /\/api\/scoring\/current/);
   assert.match(source, /Restoring your authorized match/);
   assert.match(source, /<strong>{namedMatchStatus\(data\?\.holeScores, teamNames\)}<\/strong>/);
 });
