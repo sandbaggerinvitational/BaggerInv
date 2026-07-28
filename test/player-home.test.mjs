@@ -58,13 +58,14 @@ test("personalized home keeps Passport authorization server-side", async () => {
   ]);
   assert.match(commandCenter, /PersonalizedPlayerHome/);
   assert.match(component, /api\/player-passport\/matches/);
-  assert.match(component, /This isn’t me/);
+  assert.doesNotMatch(component, /This isn’t me/);
   assert.match(component, /My Schedule/);
   assert.match(route, /authorizePassportMatch/);
   assert.match(route, /verifyPlayerPassportSession/);
 });
 
-test("the public Tournament Command Center remains when no Passport exists", async () => {
+test("the public Tournament Command Center offers Passport activation without exposing scoring", async () => {
   const component = await readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8");
-  assert.ok(component.includes('if (state === "public") return null'));
+  assert.match(component, /Activate Player Passport/);
+  assert.match(component, /href="\/activate"/);
 });

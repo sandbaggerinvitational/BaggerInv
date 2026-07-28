@@ -201,7 +201,9 @@ function buildLeaderboard(matches, playerMap, teamNames) {
       id, player: playerMap[id]?.name || id, slug: playerMap[id]?.slug || "",
       photo: playerMap[id]?.photo || "",
       team: teamNames[side]?.name || `Team ${side}`, teamSide: side,
+      teamLogo: teamNames[side]?.logo || "",
       wins: 0, losses: 0, halves: 0, points: 0,
+      matchesPlayed: 0,
     });
     return stats.get(id);
   };
@@ -219,6 +221,7 @@ function buildLeaderboard(matches, playerMap, teamNames) {
       const share = teamPoints === null ? 0 : teamPoints / Math.max(players.length, 1);
       for (const player of players) {
         const stat = ensure(player.id, side);
+        stat.matchesPlayed += 1;
         stat.points += share;
         if (winner === "Halved") stat.halves += 1;
         else if (winner === `Team ${side}`) stat.wins += 1;
@@ -244,11 +247,12 @@ function tieAdvantageSide(tournamentRow, teams) {
 }
 
 export async function getTournamentData() {
-  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles] = await Promise.all([
+  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows] = await Promise.all([
     fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
     fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
     fetchOptionalSheet("Live Hole Scores"),
     fetchOptionalSheet("Course Holes"),
+    fetchOptionalSheet("Tournament Itinerary"),
   ]);
 
   const active = [...liveTournaments]
@@ -267,7 +271,7 @@ export async function getTournamentData() {
     if (side) teams[side] = {
       id: row["Team ID"] || "",
       name: row["Team Names"] || row["Team Name"] || `Team ${side}`,
-      logo: row["Team Logo"] || "",
+      logo: row["Team Logo"] || row["Logo Filename"] || "",
       captainId: row["Captain Player ID"] || row.Captain || "",
       primaryColor: row["Primary Color"] || "",
       secondaryColor: row["Secondary Color"] || "",
@@ -283,7 +287,7 @@ export async function getTournamentData() {
   }]));
   const courseMap = Object.fromEntries(courses.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year)).map((row) => [row["Course ID"], {
     id: row["Course ID"], name: row["Course Name"] || row.Course || row["Full Course Name"] || row["Course ID"],
-    logo: row["Course Logo"] || "", tee: row["Tee Played"] || "",
+    logo: row["Course Logo"] || row["Logo Filename"] || "", tee: row["Tee Played"] || row.Tee || "",
   }]));
   const rulesByRound = Object.fromEntries(rules.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year)).map((row) => [Number(clean(row.Round).match(/\d+/)?.[0]), row]));
   const configuredMatches = permanentRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
@@ -387,11 +391,32 @@ export async function getTournamentData() {
     timeZone: tournamentRow["Time Zone"] || tournamentRow.Timezone || "America/Chicago",
     liveMessage: active["Live Message"] || "",
     lastUpdated: active["Last Updated"] || "",
+    logo: tournamentRow["Tournament Logo Filename"] || tournamentRow["Logo Filename"] || "",
     tieAdvantageSide: tieAdvantageSide(tournamentRow, teams),
     teamOne: { ...teams[1], score: finalizedScore.teamOne },
     teamTwo: { ...teams[2], score: finalizedScore.teamTwo },
   };
   const state = getTournamentState({ tournament, rounds });
+  const schedule = itineraryRows
+    .filter((row) => recordBelongsToTournament(row, selectedTournamentId, year))
+    .filter((row) => !clean(row.Status) || clean(row.Status).toLowerCase() === "published")
+    .map((row) => ({
+      id: row["Event ID"] || `${row["Event Date"]}:${row["Start Time"]}:${row.Title}`,
+      date: row["Event Date"] || "",
+      dayLabel: row["Day Label"] || "",
+      startTime: formatTime(row["Start Time"]),
+      endTime: formatTime(row["End Time"]),
+      type: row["Event Type"] || "Tournament",
+      title: row.Title || "Tournament event",
+      subtitle: row.Subtitle || "",
+      location: row.Location || "",
+      details: row.Details || "",
+      roundId: row["Round ID"] || "",
+      courseId: row["Course ID"] || "",
+      featured: truthy(row.Featured),
+      order: number(row["Display Order"]) ?? 9999,
+    }))
+    .sort((a, b) => clean(a.date).localeCompare(clean(b.date)) || a.order - b.order);
 
   return {
     tournament: { ...tournament, state },
@@ -411,5 +436,6 @@ export async function getTournamentData() {
         buildLeaderboard(matches.filter((match) => match.round === round), playerMap, teams),
       ])
     ),
+    schedule,
   };
 }

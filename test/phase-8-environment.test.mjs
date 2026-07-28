@@ -85,14 +85,12 @@ test("Tournament Mode replaces only the live flagged homepage", () => {
   assert.match(homePage, /liveTournamentV2Enabled\(\) && normalizedStatus === "LIVE"/);
   assert.equal(homePage.includes('activeNavigationHref="/live"'), true);
   for (const section of [
+    "Today’s Schedule",
     "Tournament Pulse",
-    "Featured Match",
-    "Live Team Scoreboard",
-    "Tournament Timeline",
-    "Live Player Leaderboards",
-    "Live Records",
+    "Tournament Leaders",
   ]) {
     assert.match(commandCenter, new RegExp(section));
   }
+  assert.doesNotMatch(commandCenter, /Featured Match|Tournament Timeline|Live Records/);
   assert.match(menu, /activeNavigationHref \|\| activeNavigationHrefForPath/);
 });

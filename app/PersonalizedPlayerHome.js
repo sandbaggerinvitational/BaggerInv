@@ -8,6 +8,9 @@ import {
   normalizedMatchStatus,
   selectRelevantPlayerMatches,
 } from "../lib/player-home";
+import { appMatchStatus, formatMatchResult, imageFallbackSources } from "../lib/mobile-tournament-app";
+import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../lib/asset-paths";
+import MobileIdentityImage from "./MobileIdentityImage";
 import styles from "./personalized-player-home.module.css";
 
 function firstName(name) {
@@ -23,12 +26,20 @@ function matchMeta(match) {
 }
 
 function MatchPeople({ match }) {
-  const participant = match.participantNames?.join(" + ") || "Your side";
+  const participant = match.partnerNames?.length
+    ? `Partner: ${match.partnerNames.join(" + ")}`
+    : match.format === "Singles" ? "Singles" : "Your side";
   const opponents = match.opponentNames?.join(" + ") || "Opponents TBD";
   return <div className={styles.people}>
-    <div><span>{match.team?.name || "Your team"}</span><strong>{participant}</strong></div>
+    <div>
+      <MobileIdentityImage sources={[teamLogo(match.team?.logo)]} name={match.team?.name} className={styles.teamLogo} fallbackClassName={styles.teamLogoFallback} />
+      <span>{match.team?.name || "Your team"}</span><strong>{participant}</strong>
+    </div>
     <b>VS</b>
-    <div><span>Opponent</span><strong>{opponents}</strong></div>
+    <div>
+      <MobileIdentityImage sources={[teamLogo(match.opponentTeam?.logo)]} name={match.opponentTeam?.name} className={styles.teamLogo} fallbackClassName={styles.teamLogoFallback} />
+      <span>{match.opponentTeam?.name || "Opposing team"}</span><strong>{opponents}</strong>
+    </div>
   </div>;
 }
 
@@ -37,8 +48,9 @@ function Action({ match, busy, onOpen }) {
   if (action.kind === "result") {
     return <Link className={styles.primaryAction} href={`/live?view=matchups&round=${match.round}#match-${match.matchId}`}>{action.label}</Link>;
   }
-  return <button className={styles.primaryAction} disabled={!action.enabled || busy} onClick={() => onOpen(match)}>
-    {busy ? "Opening…" : action.label}
+  if (!action.enabled) return <Link className={styles.secondaryAction} href={`/live?view=matchups&round=${match.round}#match-${match.matchId}`}>View Match Details</Link>;
+  return <button className={styles.primaryAction} disabled={busy} onClick={() => onOpen(match)}>
+    {busy ? "Opening…" : action.label === "Open Scorecard" ? "Start Scoring" : action.label}
   </button>;
 }
 
@@ -54,7 +66,7 @@ function Schedule({ matches, emphasizedId }) {
             <strong>{match.course || "Course to be announced"}</strong>
             <small>{match.teeTime || "Tee time TBD"} · {match.opponentNames?.join(" + ") || "Opponents TBD"}</small>
           </div>
-          <div><b>{match.result?.label || normalizedMatchStatus(match)}</b><small>{action.label}</small></div>
+          <div><b>{formatMatchResult(match, match.team?.side) || appMatchStatus(match)}</b><small>{action.label}</small></div>
         </article>;
       })}
     </div>
@@ -115,14 +127,18 @@ export default function PersonalizedPlayerHome() {
     }
   };
 
-  const clearPassport = async () => {
-    await fetch("/api/player-passport/session", { method: "DELETE" });
-    setPayload(null); setState("public");
-    window.dispatchEvent(new Event("player-passport-cleared"));
-  };
-
-  if (state === "loading") return <section className={styles.loading} aria-live="polite">Checking your Player Passport…</section>;
-  if (state === "public") return null;
+  if (state === "loading") return <section className={styles.loading} aria-live="polite">
+    <span className={styles.skeleton} />
+    <span className={styles.skeleton} />
+    <span className={styles.skeleton} />
+    <span className={styles.visuallyHidden}>Checking your Player Passport…</span>
+  </section>;
+  if (state === "public") return <section className={styles.empty}>
+    <p>Your Match</p>
+    <h2 id="player-home-title">Find your tournament match</h2>
+    <span>Activate Player Passport to see your partner, opponents, course, and tee time.</span>
+    <Link className={styles.primaryAction} href="/activate">Activate Player Passport</Link>
+  </section>;
   if (state === "error") return <section className={styles.error}>
     <strong>We couldn’t load your tournament right now.</strong>
     <button onClick={refresh}>Try again</button>
@@ -134,17 +150,24 @@ export default function PersonalizedPlayerHome() {
   return <section className={styles.wrap} aria-labelledby="player-home-title">
     <div className={styles.identity}>
       <div className={styles.identityPlayer}>
-        {player?.teamLogo ? <img src={`/images/${player.teamLogo}`} alt="" /> : null}
+        <MobileIdentityImage
+          sources={imageFallbackSources({
+            playerPhoto: playerPhoto(player?.photo),
+            teamLogo: teamLogo(player?.teamLogo),
+            tournamentLogo: tournamentLogo(payload?.tournament?.logo),
+          })}
+          name={player?.name}
+          className={styles.identityImage}
+          fallbackClassName={styles.identityFallback}
+        />
         <div><span>Player Passport</span><strong>Welcome back, {firstName(player?.name)}</strong></div>
       </div>
-      <button onClick={clearPassport}>This isn’t me</button>
     </div>
 
     {!matches.length ? <div className={styles.empty}>
       <p>Your Tournament</p>
       <h2 id="player-home-title">No assigned matches yet</h2>
       <span>When pairings are published, your schedule will appear here automatically.</span>
-      <div><Link href={player?.slug ? `/players/${player.slug}` : "/players"}>View Player Profile</Link><Link href="/live">Open Match Center</Link></div>
     </div> : selection.choices.length ? <div className={styles.card}>
       <p>Your Tournament</p>
       <h2 id="player-home-title">Choose a Match</h2>
@@ -158,18 +181,26 @@ export default function PersonalizedPlayerHome() {
     </div> : <div className={styles.card}>
       <div className={styles.cardTop}>
         <div><p>Your Match</p><h2 id="player-home-title">{matchMeta(primary)}</h2></div>
-        <span data-status={normalizedMatchStatus(primary)}>{normalizedMatchStatus(primary)}</span>
+        <span data-status={normalizedMatchStatus(primary)}>{appMatchStatus(primary)}</span>
       </div>
       <div className={styles.venue}>
-        <strong>{primary.course || "Course to be announced"}</strong>
-        <span>{primary.teeTime || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
+        <MobileIdentityImage
+          sources={[courseLogo(primary.courseLogo)]}
+          name={primary.course}
+          className={styles.courseLogo}
+          fallbackClassName={styles.courseLogoFallback}
+        />
+        <div>
+          <strong>{primary.course || "Course to be announced"}</strong>
+          <span>{primary.teeTime || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
+        </div>
       </div>
       <MatchPeople match={primary} />
       {normalizedMatchStatus(primary) === "LIVE" ? <div className={styles.progress}>
         <span>Through {primary.currentHole || primary.holesRecorded || "—"}</span>
         {primary.updatedAt ? <small>Last updated {new Date(primary.updatedAt).toLocaleString()}</small> : null}
       </div> : null}
-      {primary.result ? <div className={styles.complete}><span>Match Complete</span><strong>{primary.result.label}</strong></div> : null}
+      {primary.result ? <div className={styles.complete}><span>Match Complete</span><strong>{formatMatchResult(primary, primary.team?.side)}</strong></div> : null}
       <Action match={primary} busy={busyId === primary.matchId} onOpen={openMatch} />
       {normalizedMatchStatus(primary) === "LOCKED" ? <p className={styles.note}>The tournament director has locked scoring for this match.</p> : null}
       {normalizedMatchStatus(primary) === "UPCOMING" ? <p className={styles.note}>Scoring will become available when participant access opens.</p> : null}
@@ -182,10 +213,5 @@ export default function PersonalizedPlayerHome() {
       <div><span>Record</span><strong>{payload.snapshot.record.wins}-{payload.snapshot.record.losses}-{payload.snapshot.record.halves}</strong></div>
       <div><span>Matches Played</span><strong>{payload.snapshot.matchesPlayed}</strong></div>
     </div> : null}
-    <nav className={styles.links} aria-label="Your tournament links">
-      <Link href={player?.slug ? `/players/${player.slug}` : "/players"}>Player Profile</Link>
-      <Link href="/live?view=points">Live Leaderboard</Link>
-      <Link href="/live">Match Center</Link>
-    </nav>
   </section>;
 }

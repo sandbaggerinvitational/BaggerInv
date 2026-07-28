@@ -1,212 +1,214 @@
 import Link from "next/link";
-import styles from "./tournament-command-center.module.css";
 import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
+import MobileIdentityImage from "./MobileIdentityImage";
+import { teamLogo, tournamentLogo } from "../lib/asset-paths";
 import {
-  buildTournamentTimeline,
-  featuredMatchModel,
-  tournamentProgressModel,
-} from "../lib/live-command-center";
+  compactTournamentLeaders,
+  todaysSchedule,
+  tournamentDayLabel,
+} from "../lib/home-dashboard";
+import { tournamentProgressModel } from "../lib/live-command-center";
+import styles from "./tournament-command-center.module.css";
 
-const leaderboards = [
-  { label: "Birdies", value: "—", name: "Awaiting scores", detail: "Tournament total" },
-  { label: "Gross", value: "—", name: "Awaiting scores", detail: "Lowest recorded round" },
-  { label: "Net", value: "—", name: "Awaiting scores", detail: "Lowest recorded round" },
-];
+function assetSource(value, resolver) {
+  const source = String(value || "").trim();
+  if (!source) return null;
+  return /^(https?:)?\/\//i.test(source) || source.startsWith("/")
+    ? source
+    : resolver(source);
+}
 
-const recordAlerts = [
-  { label: "New Birdie Record", detail: "Record alerts will appear as scores are verified." },
-  { label: "Largest Comeback", detail: "Match progression will identify the tournament leader." },
-  { label: "Most Holes Won", detail: "Live hole results will update this record automatically." },
-];
+function score(value) {
+  const number = Number(value || 0);
+  return Number.isInteger(number) ? String(number) : number.toFixed(1);
+}
 
-function TeamScore({ team, side, progress, remainingPoints }) {
+function ScheduleIcon({ type }) {
+  const value = String(type || "").toLowerCase();
+  const icon = value.includes("meal") || value.includes("breakfast") ||
+    value.includes("lunch") || value.includes("dinner") ? "◆"
+    : value.includes("transport") ? "→"
+    : value.includes("golf") || value.includes("round") ? "●" : "•";
+  return <span aria-hidden="true">{icon}</span>;
+}
+
+function TournamentSchedule({ items }) {
   return (
-    <article className={styles.teamScore} data-side={side}>
-      <div>
-        <span>{team.name}</span>
-        <small>Current points</small>
-      </div>
-      <strong>{team.score ?? "—"}</strong>
-      <dl>
-        <div><dt>Projected</dt><dd>—</dd></div>
-        <div><dt>Available</dt><dd>{remainingPoints}</dd></div>
-        <div><dt>Matches left</dt><dd>{progress.remainingMatches}</dd></div>
-      </dl>
-    </article>
+    <section className={styles.schedule} aria-labelledby="today-schedule-title">
+      <header className={styles.sectionHeader}>
+        <div>
+          <p>Today</p>
+          <h2 id="today-schedule-title">Today’s Schedule</h2>
+        </div>
+        <Link href="/tournament-guide#itinerary">Full schedule</Link>
+      </header>
+      {items.length ? (
+        <ol>
+          {items.map((item) => (
+            <li key={item.id} data-state={item.state}>
+              <time>{item.startTime || "TBD"}</time>
+              <ScheduleIcon type={item.type} />
+              <div>
+                <strong>{item.title}</strong>
+                {item.location || item.subtitle ? (
+                  <small>{[item.location, item.subtitle].filter(Boolean).join(" · ")}</small>
+                ) : null}
+              </div>
+              {item.state === "next" ? <b>Next</b> : null}
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div className={styles.emptyState}>
+          <strong>Today’s schedule is not published yet.</strong>
+          <span>Check the Tournament Guide for the full week itinerary.</span>
+        </div>
+      )}
+    </section>
   );
 }
 
-const timelineIcons = {
-  FINAL: "✓",
-  LIVE: "●",
-  TEE_TIME: "↗",
-};
+function TournamentPulse({ tournament, progress, roundCount }) {
+  const total = Math.max(progress.totalMatches, 1);
+  const percentage = Math.min(100, Math.round((progress.completedMatches / total) * 100));
+  return (
+    <section className={styles.pulse} aria-labelledby="tournament-pulse-title">
+      <header className={styles.pulseHeader}>
+        <div>
+          <p>Tournament Pulse</p>
+          <h2 id="tournament-pulse-title">
+            {tournamentDayLabel({
+              startDate: tournament.startDate,
+              currentRound: tournament.currentRound,
+              roundCount,
+            })}
+          </h2>
+        </div>
+        <span className={styles.liveBadge}><i aria-hidden="true" /> Live</span>
+      </header>
+      <div className={styles.scoreboard} aria-label="Current tournament score">
+        <div>
+          <MobileIdentityImage
+            sources={[assetSource(tournament.teamOne?.logo, teamLogo)]}
+            name={tournament.teamOne?.name}
+            alt=""
+            className={styles.scoreLogo}
+            fallbackClassName={styles.scoreLogoFallback}
+          />
+          <span>{tournament.teamOne?.name}</span>
+          <strong>{score(tournament.teamOne?.score)}</strong>
+        </div>
+        <b>–</b>
+        <div>
+          <MobileIdentityImage
+            sources={[assetSource(tournament.teamTwo?.logo, teamLogo)]}
+            name={tournament.teamTwo?.name}
+            alt=""
+            className={styles.scoreLogo}
+            fallbackClassName={styles.scoreLogoFallback}
+          />
+          <span>{tournament.teamTwo?.name}</span>
+          <strong>{score(tournament.teamTwo?.score)}</strong>
+        </div>
+      </div>
+      <div className={styles.progressLabel}>
+        <span>{progress.completedMatches} complete</span>
+        <span>{progress.liveMatches} live</span>
+        <span>{progress.remainingMatches} remaining</span>
+      </div>
+      <div
+        className={styles.progressTrack}
+        role="progressbar"
+        aria-label="Tournament match progress"
+        aria-valuemin="0"
+        aria-valuemax={progress.totalMatches}
+        aria-valuenow={progress.completedMatches}
+      >
+        <span style={{ width: `${percentage}%` }} />
+      </div>
+    </section>
+  );
+}
+
+function TournamentLeaders({ leaders }) {
+  return (
+    <section className={styles.leaders} aria-labelledby="tournament-leaders-title">
+      <header className={styles.sectionHeader}>
+        <div>
+          <p>Live Standings</p>
+          <h2 id="tournament-leaders-title">Tournament Leaders</h2>
+        </div>
+        <Link href="/live?view=leaderboards">View all</Link>
+      </header>
+      {leaders.length ? (
+        <ol>
+          {leaders.map((leader) => (
+            <li key={leader.id}>
+              <span className={styles.rank}>{leader.rank}</span>
+              <MobileIdentityImage
+                sources={[
+                  assetSource(leader.photo, (value) => `/images/players/${value.replace(/\.(png|jpe?g|webp)$/i, "")}.webp`),
+                  assetSource(leader.teamLogo, teamLogo),
+                ]}
+                name={leader.player}
+                alt=""
+                className={styles.leaderImage}
+                fallbackClassName={styles.leaderFallback}
+              />
+              <div><strong>{leader.player}</strong><small>{leader.team}</small></div>
+              <div className={styles.leaderMetric}>
+                <strong>{score(leader.points)}</strong>
+                <small>{leader.wins}-{leader.losses}-{leader.halves}</small>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div className={styles.emptyState}>
+          <strong>Leaderboard will appear after the first completed match.</strong>
+          <span>Standings update as official results are finalized.</span>
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default function TournamentCommandCenter({ tournament, liveData }) {
   const rounds = liveData?.rounds || [];
   const liveTournament = liveData?.tournament || tournament;
-  const currentRound = liveTournament.currentRound && liveTournament.currentRound !== "Not started"
-    ? `Round ${liveTournament.currentRound}`
-    : "Round in progress";
   const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
-  const featured = featuredMatchModel({ tournament: liveTournament, rounds });
-  const timelineEvents = buildTournamentTimeline({ tournament: liveTournament, rounds });
-  const remainingPoints = liveTournament.state?.remainingPoints ?? "—";
+  const schedule = todaysSchedule(liveData?.schedule || [], {
+    timeZone: liveTournament.timeZone,
+  });
+  const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
+  const logo = assetSource(liveTournament.logo, tournamentLogo);
 
   return (
     <div className={styles.page}>
+      <header className={styles.homeHeader}>
+        <MobileIdentityImage
+          sources={[logo]}
+          name="Sandbagger Invitational"
+          alt="Sandbagger Invitational"
+          className={styles.tournamentLogo}
+          fallbackClassName={styles.tournamentLogoFallback}
+        />
+        <div>
+          <p>{liveTournament.year} Tournament</p>
+          <h1>Sandbagger Invitational</h1>
+          <span>{liveTournament.location || "Tournament week"}</span>
+        </div>
+        <span className={styles.headerLive}><i aria-hidden="true" /> Live</span>
+      </header>
+
       <PersonalizedPlayerHome />
-      <section className={styles.pulse} aria-labelledby="tournament-pulse-title">
-        <div className={styles.pulseTopline}>
-          <span className={styles.liveBadge}><i aria-hidden="true" /> Live</span>
-          <span>{liveTournament.year} Sandbagger Invitational</span>
-        </div>
-        <div className={styles.pulseHeading}>
-          <div>
-            <p>Tournament Pulse</p>
-            <h1 id="tournament-pulse-title">{currentRound}</h1>
-            <span>{liveTournament.location}</span>
-          </div>
-          <div className={styles.pulseLeader}>
-            <small>Tournament progress</small>
-            <strong>{progress.completedMatches} of {progress.totalMatches}</strong>
-            <span>
-              {progress.remainingMatches} matches remaining
-              {progress.liveMatches ? ` · ${progress.liveMatches} live` : ""}
-            </span>
-          </div>
-        </div>
-        <div className={styles.pulseMetrics}>
-          <div><span>Current team points</span><strong>{liveTournament.teamOne.score ?? 0}–{liveTournament.teamTwo.score ?? 0}</strong></div>
-          <div><span>Projected points</span><strong>—</strong></div>
-          <div><span>Matches complete</span><strong>{progress.completedMatches}</strong></div>
-          <div><span>Remaining matches</span><strong>{progress.remainingMatches}</strong></div>
-        </div>
-      </section>
-
-      <section className={styles.featured} aria-labelledby="featured-match-title">
-        <div className={styles.sectionLabel}>
-          <div>
-            <p>Featured Match</p>
-            <h2 id="featured-match-title">{featured?.label || "Match spotlight"}</h2>
-          </div>
-          <span>{featured ? [featured.format, featured.course].filter(Boolean).join(" · ") : "No match available"}</span>
-        </div>
-        {featured ? (
-          <div className={styles.featuredMatch}>
-            <div className={styles.featuredTeam}>
-              <span>{featured.teamOneName}</span>
-              {featured.teamOnePlayers ? <b>{featured.teamOnePlayers}</b> : null}
-              <strong>—</strong>
-              <small>Win probability</small>
-            </div>
-            <div className={styles.featuredStatus}>
-              <span>{featured.holeLabel}</span>
-              <b>{featured.status}</b>
-              <small>{featured.momentum}</small>
-            </div>
-            <div className={`${styles.featuredTeam} ${styles.featuredTeamRight}`}>
-              <span>{featured.teamTwoName}</span>
-              {featured.teamTwoPlayers ? <b>{featured.teamTwoPlayers}</b> : null}
-              <strong>—</strong>
-              <small>Win probability</small>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.featuredEmpty}>No configured match is available for the current round.</div>
-        )}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 22 }}>
-          <Link href="/score" style={{ marginTop: 0, padding: "12px 18px", borderRadius: 999, background: "#0b4435", color: "#fff", textDecoration: "none" }}>My Match <span aria-hidden="true">→</span></Link>
-          <Link href="/live">Open Match Center <span aria-hidden="true">→</span></Link>
-        </div>
-      </section>
-
-      <section className={styles.scoreboard} aria-labelledby="team-scoreboard-title">
-        <div className={styles.sectionLabel}>
-          <div>
-            <p>Live Team Scoreboard</p>
-            <h2 id="team-scoreboard-title">The race for the Cup</h2>
-          </div>
-          <span>{progress.liveMatches ? `${progress.liveMatches} matches live` : `${progress.remainingMatches} matches remaining`}</span>
-        </div>
-        <div className={styles.teamGrid}>
-          <TeamScore
-            team={liveTournament.teamOne}
-            side="one"
-            progress={progress}
-            remainingPoints={remainingPoints}
-          />
-          <TeamScore
-            team={liveTournament.teamTwo}
-            side="two"
-            progress={progress}
-            remainingPoints={remainingPoints}
-          />
-        </div>
-      </section>
-
-      <div className={styles.split}>
-        <section className={styles.timeline} aria-labelledby="timeline-title">
-          <div className={styles.sectionLabel}>
-            <div>
-              <p>Tournament Timeline</p>
-              <h2 id="timeline-title">What’s happening</h2>
-            </div>
-          </div>
-          {timelineEvents.length ? (
-            <ol>
-              {timelineEvents.map((event) => (
-                <li key={event.id}>
-                  <time>{event.time}</time>
-                  <span className={styles.timelineIcon} data-type={event.type} aria-hidden="true">
-                    {timelineIcons[event.type] || "•"}
-                  </span>
-                  <div><strong>{event.title}</strong><p>{event.detail}</p></div>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <div className={styles.timelineEmpty}>Tournament events will appear when tee times or scoring activity are recorded.</div>
-          )}
-        </section>
-
-        <section className={styles.leaderboards} aria-labelledby="leaderboards-title">
-          <div className={styles.sectionLabel}>
-            <div>
-              <p>Live Player Leaderboards</p>
-              <h2 id="leaderboards-title">Tournament leaders</h2>
-            </div>
-          </div>
-          <div className={styles.leaderboardGrid}>
-            {leaderboards.map((board) => (
-              <article key={board.label}>
-                <span>{board.label}</span>
-                <strong>{board.value}</strong>
-                <b>{board.name}</b>
-                <small>{board.detail}</small>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <section className={styles.records} aria-labelledby="live-records-title">
-        <div className={styles.sectionLabel}>
-          <div>
-            <p>Live Records</p>
-            <h2 id="live-records-title">History in motion</h2>
-          </div>
-          <span>Verified scorecards only</span>
-        </div>
-        <div className={styles.recordGrid}>
-          {recordAlerts.map((record) => (
-            <article key={record.label}>
-              <span aria-hidden="true">!</span>
-              <div><strong>{record.label}</strong><p>{record.detail}</p></div>
-            </article>
-          ))}
-        </div>
-      </section>
+      <TournamentSchedule items={schedule} />
+      <TournamentPulse
+        tournament={liveTournament}
+        progress={progress}
+        roundCount={rounds.length}
+      />
+      <TournamentLeaders leaders={leaders} />
     </div>
   );
 }
