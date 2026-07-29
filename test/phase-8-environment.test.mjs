@@ -5,6 +5,7 @@ import {
   assertLiveScoringWriteEnvironment,
   assertPreviewSpreadsheetIsolation,
   liveTournamentV2Enabled,
+  previewEnvironmentDiagnostic,
 } from "../lib/spreadsheet-environment.js";
 import fs from "node:fs";
 
@@ -65,16 +66,77 @@ test("Phase 8 is enabled only by its explicit feature flag", () => {
   });
 });
 
-test("preview routes expose a test-data label and a redacted environment check", () => {
+test("preview routes expose a safe environment check", () => {
   const scorePage = fs.readFileSync(new URL("../app/score/page.js", import.meta.url), "utf8");
   const livePage = fs.readFileSync(new URL("../app/live/page.js", import.meta.url), "utf8");
   const adminPage = fs.readFileSync(new URL("../app/admin/page.js", import.meta.url), "utf8");
   const diagnostic = fs.readFileSync(new URL("../app/api/preview-environment/route.js", import.meta.url), "utf8");
+  const environmentHelper = fs.readFileSync(new URL("../lib/spreadsheet-environment.js", import.meta.url), "utf8");
   assert.match(scorePage, /PreviewModeBadge/);
   assert.match(livePage, /PreviewModeBadge/);
   assert.match(adminPage, /previewMode/);
-  assert.match(diagnostic, /productionIsolated/);
+  assert.match(diagnostic, /previewEnvironmentDiagnostic/);
+  assert.match(environmentHelper, /productionIsolated/);
   assert.doesNotMatch(diagnostic, /GOOGLE_PRIVATE_KEY|GOOGLE_SERVICE_ACCOUNT_EMAIL/);
+  assert.doesNotMatch(environmentHelper, /GOOGLE_PRIVATE_KEY|GOOGLE_SERVICE_ACCOUNT_EMAIL/);
+});
+
+test("preview diagnostic exposes only safe environment state", () => {
+  withEnvironment({
+    GOOGLE_SHEETS_ID: "isolated-preview-sheet",
+    SCORING_ENVIRONMENT: "test",
+    NEXT_PUBLIC_LIVE_TOURNAMENT_V2_ENABLED: "true",
+  }, () => {
+    const diagnostic = previewEnvironmentDiagnostic();
+    assert.deepEqual(Object.keys(diagnostic), [
+      "environment",
+      "productionIsolated",
+      "scoringEnvironment",
+      "liveTournamentV2Enabled",
+      "scoringEnabled",
+      "tournamentModeEnabled",
+      "googleSheetsIdConfigured",
+    ]);
+    assert.deepEqual(diagnostic, {
+      environment: "preview",
+      productionIsolated: true,
+      scoringEnvironment: "test",
+      liveTournamentV2Enabled: true,
+      scoringEnabled: true,
+      tournamentModeEnabled: true,
+      googleSheetsIdConfigured: true,
+    });
+    assert.equal(JSON.stringify(diagnostic).includes("isolated-preview-sheet"), false);
+  });
+});
+
+test("preview diagnostic blocks scoring when data is missing or production-backed", () => {
+  withEnvironment({
+    GOOGLE_SHEETS_ID: undefined,
+    SCORING_ENVIRONMENT: "test",
+    NEXT_PUBLIC_LIVE_TOURNAMENT_V2_ENABLED: undefined,
+  }, () => {
+    assert.deepEqual(previewEnvironmentDiagnostic(), {
+      environment: "preview",
+      productionIsolated: false,
+      scoringEnvironment: "test",
+      liveTournamentV2Enabled: false,
+      scoringEnabled: false,
+      tournamentModeEnabled: false,
+      googleSheetsIdConfigured: false,
+    });
+  });
+
+  withEnvironment({
+    GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID,
+    SCORING_ENVIRONMENT: "test",
+    NEXT_PUBLIC_LIVE_TOURNAMENT_V2_ENABLED: "true",
+  }, () => {
+    const diagnostic = previewEnvironmentDiagnostic();
+    assert.equal(diagnostic.productionIsolated, false);
+    assert.equal(diagnostic.scoringEnabled, false);
+    assert.equal(diagnostic.googleSheetsIdConfigured, true);
+  });
 });
 
 test("Tournament Mode replaces only the live flagged homepage", () => {
