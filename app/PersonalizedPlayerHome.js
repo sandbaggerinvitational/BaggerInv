@@ -10,15 +10,27 @@ import {
 } from "../lib/player-home";
 import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app";
 import { courseLogo, teamLogo } from "../lib/asset-paths";
+import { formatHomeTime } from "../lib/home-dashboard";
 import MobileIdentityImage from "./MobileIdentityImage";
 import styles from "./personalized-player-home.module.css";
 
-function matchMeta(match) {
+function roundMatchMeta(match) {
   return [
     match?.round ? `Round ${match.round}` : "",
     match?.match ? `Match ${match.match}` : "",
-    match?.format,
-  ].filter(Boolean).join(" · ");
+  ].filter(Boolean).join(" • ");
+}
+
+function matchLabel(match) {
+  return [roundMatchMeta(match), match?.format].filter(Boolean).join(", ");
+}
+
+function MatchHeading({ match, id, compact = false, semantic = false }) {
+  const Element = semantic ? "h2" : "div";
+  return <Element className={compact ? styles.compactMatchHeading : styles.matchHeading} id={id}>
+    <span>{roundMatchMeta(match)}</span>
+    {match?.format ? <strong>{match.format}</strong> : null}
+  </Element>;
 }
 
 function teeLabel(value) {
@@ -44,7 +56,7 @@ function MatchPeople({ match, currentPlayer }) {
       <strong>{match.team?.name || "Your team"}</strong>
       <PlayerLines names={match.participantNames} currentPlayer={currentPlayer} />
     </div>
-    <b>VS</b>
+    <b aria-label="versus">VS</b>
     <div>
       <MobileIdentityImage sources={[teamLogo(match.opponentTeam?.logo)]} name={match.opponentTeam?.name} className={styles.teamLogo} fallbackClassName={styles.teamLogoFallback} />
       <strong>{match.opponentTeam?.name || "Opposing team"}</strong>
@@ -78,10 +90,13 @@ function MyRounds({ matches, emphasizedId, currentPlayer }) {
           className={styles.roundCard}
           data-current={match.matchId === emphasizedId}
           href={`/live?view=matchups&round=${match.round}#match-${match.matchId}`}
-          aria-label={`${matchMeta(match)} at ${match.course || "course to be announced"}`}
+          aria-label={`${matchLabel(match)} at ${match.course || "course to be announced"}`}
         >
           <div className={styles.roundTop}>
-            <div><span>{matchMeta(match)}</span><strong>{match.course || "Course to be announced"}</strong></div>
+            <div>
+              <MatchHeading match={match} compact />
+              <strong className={styles.roundCourse}>{match.course || "Course to be announced"}</strong>
+            </div>
             <b>{formatMatchResult(match, match.team?.side) || appMatchStatus(match)}</b>
           </div>
           <div className={styles.roundVenue}>
@@ -92,7 +107,7 @@ function MyRounds({ matches, emphasizedId, currentPlayer }) {
               className={styles.roundCourseLogo}
               fallbackClassName={styles.roundCourseLogoFallback}
             />
-            <small>{[tee, match.teeTime || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
+            <small>{[tee, formatHomeTime(match.teeTime) || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
           </div>
           <div className={styles.roundMatchup}>
             <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} currentPlayer={currentPlayer} /></div>
@@ -199,12 +214,14 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
       <span className={styles.intro}>More than one match is open. Choose the scorecard you intend to update.</span>
       <div className={styles.choices}>{selection.choices.map((match) =>
         <button key={match.matchId} disabled={busyId === match.matchId} onClick={() => openMatch(match)}>
-          <span>{matchMeta(match)}</span><strong>{match.course || "Course TBA"}</strong><small>{match.teeTime || "Tee time TBD"} · Open Scorecard</small>
+          <MatchHeading match={match} compact />
+          <strong>{match.course || "Course TBA"}</strong>
+          <small>{formatHomeTime(match.teeTime) || "Tee time TBD"} · Open Scorecard</small>
         </button>
       )}</div>
     </div> : <div className={styles.card}>
       <div className={styles.cardTop}>
-        <div><p>Your Match</p><h2 id="player-home-title">{matchMeta(primary)}</h2></div>
+        <div><p>Your Match</p><MatchHeading match={primary} id="player-home-title" semantic /></div>
         <span data-status={normalizedMatchStatus(primary)}>{appMatchStatus(primary)}</span>
       </div>
       <div className={styles.venue}>
@@ -216,7 +233,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
         />
         <div>
           <strong>{primary.course || "Course to be announced"}</strong>
-          <span>{primary.teeTime || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
+          <span>{formatHomeTime(primary.teeTime) || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
         </div>
       </div>
       <MatchPeople match={primary} currentPlayer={player?.name} />

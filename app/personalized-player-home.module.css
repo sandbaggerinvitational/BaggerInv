@@ -31,10 +31,41 @@
 }
 
 .card h2,
-.empty h2 {
+.empty h2,
+.matchHeading {
   margin: 7px 0 0;
   color: #0a4032;
   font: 700 clamp(2rem, 5vw, 3.6rem) / 0.95 Georgia, serif;
+}
+
+.matchHeading,
+.compactMatchHeading {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.matchHeading > span,
+.compactMatchHeading > span {
+  color: #8d6a26;
+  font-family: Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.matchHeading > strong {
+  color: #0a4032;
+  font: 700 clamp(1.55rem, 4vw, 2.25rem) / 1 Georgia, serif;
+  white-space: nowrap;
+}
+
+.compactMatchHeading > strong {
+  color: #17382d;
+  font: 700 0.9rem / 1.05 Georgia, serif;
+  white-space: nowrap;
 }
 
 .cardTop > span {
@@ -92,80 +123,87 @@
 .people {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: flex-start;
+  align-items: stretch;
   gap: 14px;
   margin: 18px 0;
 }
 
 .people > div {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  align-items: flex-start;
-  gap: 4px 8px;
+  grid-template-rows: 34px minmax(1.6em, auto) auto;
+  align-content: start;
+  justify-items: center;
+  gap: 3px;
   min-width: 0;
+  text-align: center;
 }
 
 .people > div:last-child {
-  text-align: right;
+  text-align: center;
 }
 
 .people > div > strong {
-  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
   color: #8c6a26;
   font-size: 0.63rem;
   font-weight: 900;
   letter-spacing: 0.08em;
-  text-overflow: ellipsis;
+  line-height: 1.15;
   text-transform: uppercase;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .people > b {
   align-self: center;
   color: #b2252c;
   font-size: 0.72rem;
+  line-height: 1;
 }
 
 .playerLines {
-  grid-column: 2;
   display: grid;
-  gap: 4px;
+  justify-items: center;
+  gap: 3px;
   min-width: 0;
+  width: 100%;
 }
 
 .playerLines > span {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   min-width: 0;
+  max-width: 100%;
+  text-align: center;
   color: #17362c;
   font: 700 clamp(0.88rem, 2vw, 1.08rem) / 1.15 Georgia, serif;
   overflow-wrap: anywhere;
 }
 
 .people > div:last-child .playerLines > span {
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .playerLines small {
   flex: 0 0 auto;
-  padding: 2px 4px;
+  padding: 1px 3px;
   border-radius: 999px;
-  background: #e9f0ec;
+  background: #edf2ef;
   color: #0b503d;
-  font: 900 0.46rem / 1.1 Arial, sans-serif;
-  letter-spacing: 0.07em;
+  font: 850 0.42rem / 1.1 Arial, sans-serif;
+  letter-spacing: 0.05em;
 }
 
 .playerTbd {
-  grid-column: 2;
   color: #737d78;
   font-size: 0.76rem;
 }
 
 .teamLogo,
 .teamLogoFallback {
-  grid-row: 1 / span 2;
+  justify-self: center;
   width: 34px;
   height: 34px;
   padding: 4px;
@@ -181,11 +219,6 @@
   color: #0b4435;
   font-size: 0.52rem;
   font-weight: 900;
-}
-
-.people > div:last-child .teamLogo,
-.people > div:last-child .teamLogoFallback {
-  justify-self: end;
 }
 
 .courseLogo,
@@ -344,18 +377,12 @@
   min-width: 0;
 }
 
-.roundTop span {
-  color: #8d6a26;
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.roundTop strong {
+.roundCourse {
   overflow: hidden;
-  color: #17382d;
-  font-size: 0.86rem;
+  margin-top: 2px;
+  color: #596a63;
+  font-size: 0.76rem;
+  font-weight: 750;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -443,15 +470,18 @@
 }
 
 .roundMatchup .playerLines {
-  grid-column: auto;
+  justify-items: start;
 }
 
 .roundMatchup .playerLines > span {
   font-size: 0.75rem;
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .roundMatchup > div:last-child .playerLines > span {
   justify-content: flex-end;
+  text-align: right;
 }
 
 .choices {
@@ -571,6 +601,10 @@
 
   .card h2,
   .empty h2 {
+    font-size: 1.55rem;
+  }
+
+  .matchHeading > strong {
     font-size: 1.55rem;
   }
 

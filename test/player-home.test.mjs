@@ -6,6 +6,10 @@ import {
   matchAction,
   selectRelevantPlayerMatches,
 } from "../lib/player-home.js";
+import {
+  formatHomeTime,
+  todaysSchedule,
+} from "../lib/home-dashboard.js";
 
 test("an in-progress player match is prioritized", () => {
   const result = selectRelevantPlayerMatches([
@@ -50,6 +54,21 @@ test("countdown never returns a negative duration", () => {
   );
 });
 
+test("Home times consistently include AM or PM without duplicate suffixes", () => {
+  assert.equal(formatHomeTime("8:10"), "8:10 AM");
+  assert.equal(formatHomeTime("14:40"), "2:40 PM");
+  assert.equal(formatHomeTime("8:10 am"), "8:10 AM");
+  assert.equal(formatHomeTime("12:00"), "12:00 PM");
+  assert.equal(formatHomeTime("00:00"), "12:00 AM");
+});
+
+test("Today’s Schedule uses the shared Home time display", () => {
+  const [event] = todaysSchedule([
+    { id: "dinner", date: "2026-09-25", startTime: "18:30", title: "Dinner" },
+  ], { now: new Date("2026-09-25T12:00:00") });
+  assert.equal(event.startTime, "6:30 PM");
+});
+
 test("personalized home keeps Passport authorization server-side", async () => {
   const [component, route, commandCenter, sheetsWrite] = await Promise.all([
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
@@ -68,6 +87,12 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(component, /opponentNames/);
   assert.match(component, /teeLabel\(match\.tee\)/);
   assert.match(component, /courseLogo\(match\.courseLogo\)/);
+  assert.match(component, /roundMatchMeta\(match\)/);
+  assert.match(component, /join\(" • "\)/);
+  assert.doesNotMatch(component, /Match \$\{match\.match\}.*·/);
+  assert.match(component, /formatHomeTime\(primary\.teeTime\)/);
+  assert.match(component, /formatHomeTime\(match\.teeTime\)/);
+  assert.match(component, /aria-label="versus"/);
   assert.match(route, /authorizePassportMatch/);
   assert.match(route, /verifyPlayerPassportSession/);
   assert.match(sheetsWrite, /tee: String\(match\["Tee Played"\]/);
@@ -96,4 +121,21 @@ test("Home refinement keeps tournament identity and itinerary distinct from play
   assert.match(commandCenter, /tournamentPulse=\{pulse\}/);
   assert.ok(commandCenter.indexOf("PersonalizedPlayerHome") < commandCenter.indexOf("TournamentSchedule items"));
   assert.doesNotMatch(component, /join\(" \+ "\)/);
+});
+
+test("Home match layout keeps format, logos, teams, and players in separate layers", async () => {
+  const [component, styles, commandStyles] = await Promise.all([
+    readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/personalized-player-home.module.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/tournament-command-center.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(component, /className=\{compact \? styles\.compactMatchHeading : styles\.matchHeading\}/);
+  assert.match(component, /match\?\.format \? <strong>/);
+  assert.match(styles, /\.matchHeading > strong[\s\S]*white-space:\s*nowrap/);
+  assert.match(styles, /\.people > div[\s\S]*grid-template-rows:\s*34px/);
+  assert.match(styles, /\.teamLogo,[\s\S]*justify-self:\s*center/);
+  assert.match(styles, /\.playerLines small[\s\S]*font:\s*850 0\.42rem/);
+  assert.match(commandStyles, /\.scoreboard strong\{font-size:3\.1rem/);
+  assert.match(commandStyles, /font-variant-numeric:tabular-nums/);
+  assert.match(commandStyles, /font-size:2\.7rem/);
 });
