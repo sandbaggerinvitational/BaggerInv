@@ -4,7 +4,7 @@ import Link from "next/link";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { appMatchStatus } from "../../lib/mobile-tournament-app";
-import { selectRelevantPlayerMatches } from "../../lib/player-home";
+import { normalizedMatchStatus, selectRelevantPlayerMatches } from "../../lib/player-home";
 import styles from "./my-match-dashboard.module.css";
 
 const initials = (value) => String(value || "SBI")
@@ -27,6 +27,12 @@ function formatTime(value) {
   if (hour === 12) return `12:${match[2]} PM`;
   if (hour === 0) return `12:${match[2]} AM`;
   return `${hour}:${match[2]} AM`;
+}
+
+function formatTee(value) {
+  const tee = String(value || "").trim();
+  if (!tee) return "";
+  return /\btees?$/i.test(tee) ? tee : `${tee} Tees`;
 }
 
 function Logo({ filename, name, type, tournamentLogoFilename }) {
@@ -93,7 +99,7 @@ function statusSupport(match, status) {
 function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) {
   const status = appMatchStatus(match);
   const result = participantResult(match);
-  const courseMeta = [match.tee, formatTime(match.teeTime)].filter(Boolean).join(" · ");
+  const courseMeta = [formatTee(match.tee), formatTime(match.teeTime)].filter(Boolean).join(" • ");
   const support = statusSupport(match, status);
   const detailsHref = `/live?view=matchups&round=${match.round}#match-${match.matchId}`;
   const action = status === "Live"
@@ -130,7 +136,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
     </div>
     <footer>
       <span>{support}</span>
-      <strong>{action}<i aria-hidden="true">›</i></strong>
+      <strong className={styles.cardAction}>{action}<i aria-hidden="true">→</i></strong>
     </footer>
   </>;
 
@@ -157,7 +163,14 @@ export default function MyMatchDashboard({ player, tournament, matches, busy, on
     Number(left.round || 0) - Number(right.round || 0) ||
     Number(left.match || 0) - Number(right.match || 0)
   );
-  const relevant = selectRelevantPlayerMatches(matches, tournament?.currentRound).primary;
+  const selection = selectRelevantPlayerMatches(matches, tournament?.currentRound);
+  const allFinal = matches.length && matches.every((match) => normalizedMatchStatus(match) === "FINAL");
+  const relevant = allFinal
+    ? [...matches].sort((left, right) =>
+      Number(right.round || 0) - Number(left.round || 0) ||
+      Number(right.match || 0) - Number(left.match || 0)
+    )[0]
+    : selection.primary || selection.choices[0] || selection.ordered[0];
 
   return <section className={styles.page}>
     <header className={styles.pageHeader}>
