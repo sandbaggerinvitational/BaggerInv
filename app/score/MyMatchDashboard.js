@@ -135,7 +135,10 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
       <TeamBlock team={match.opponentTeam} players={match.opponentNames} tournamentLogoFilename={tournamentLogoFilename} />
     </div>
     <div className={styles.actionRow}>
-      <span>{support}</span>
+      <span className={styles.supportText}>
+        {status === "Locked" ? <i aria-hidden="true">🔒</i> : null}
+        {support}
+      </span>
       <strong className={styles.cardAction}>{action}<i aria-hidden="true">→</i></strong>
     </div>
   </>;

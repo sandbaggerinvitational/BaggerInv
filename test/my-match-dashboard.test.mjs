@@ -48,6 +48,7 @@ test("My Match keeps status, scoring access, and final results distinct", async 
   assert.match(source, /href=\{detailsHref\}/);
   assert.match(source, /className=\{styles\.cardAction\}/);
   assert.match(source, /className=\{styles\.actionRow\}/);
+  assert.match(source, /status === "Locked" \? <i aria-hidden="true">🔒<\/i>/);
   assert.doesNotMatch(source, /<footer>/);
   assert.match(source, /Start Scoring/);
   assert.match(source, /Continue Scoring/);
@@ -73,6 +74,9 @@ test("My Match formats tees, highlights one relevant card, and uses compact outl
   assert.match(styles, /\.cardAction\{[^}]*background:#fffdf8/);
   assert.doesNotMatch(styles, /\.cardAction\{[^}]*background:#(?:0b|15|17)[0-9a-f]{4}/i);
   assert.match(styles, /\.actionRow\{[^}]*background:transparent/);
+  assert.match(styles, /\.supportText\{[^}]*display:inline-flex/);
+  assert.match(styles, /\.cardAction\{[^}]*min-height:27px/);
+  assert.match(styles, /\.cardState\{[^}]*gap:5px/);
   assert.doesNotMatch(styles, /\.matchCard footer/);
 });
 
@@ -102,8 +106,9 @@ test("My Match provides compact special states and mobile-safe card geometry", a
   assert.match(styles, /padding:18px 16px calc\(82px \+ env\(safe-area-inset-bottom\)\)/);
   assert.match(styles, /\.matchList\{display:grid;gap:8px\}/);
   assert.match(styles, /\.matchCard\{[^}]*padding:11px 12px/);
-  assert.match(styles, /\.logoPlate\[data-type=course\]\{width:40px;height:40px\}/);
-  assert.match(styles, /\.courseLine\{[^}]*border-bottom:1px solid #ebe3d7/);
+  assert.match(styles, /\.logoPlate\[data-type=course\]\{width:44px;height:44px\}/);
+  assert.match(styles, /\.courseLine\{[^}]*border-bottom:1px solid #f0eadf/);
+  assert.match(styles, /\.courseLine strong\{[^}]*font-size:.82rem/);
   assert.doesNotMatch(styles, /overflow-x:\s*(auto|scroll)/);
   assert.match(styles, /@media\(max-width:420px\)/);
 });
