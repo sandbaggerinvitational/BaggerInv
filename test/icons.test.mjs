@@ -60,10 +60,10 @@ test("favicon contains standard browser icon sizes", async () => {
 test("manifest references production app icons", () => {
   const appManifest = manifest();
 
-  assert.equal(appManifest.id, SITE_URL);
-  assert.equal(appManifest.start_url, SITE_URL);
-  assert.equal(appManifest.scope, `${SITE_URL}/`);
-  assert.deepEqual(appManifest.icons, [
+  assert.equal(appManifest.id, "/");
+  assert.equal(appManifest.start_url, "/");
+  assert.equal(appManifest.scope, "/");
+  assert.deepEqual(appManifest.icons.slice(0, 2), [
     {
       src: `${SITE_URL}/icon-192.png`,
       sizes: "192x192",
@@ -77,4 +77,5 @@ test("manifest references production app icons", () => {
       purpose: "any",
     },
   ]);
+  assert.equal(appManifest.icons[2].purpose, "maskable");
 });

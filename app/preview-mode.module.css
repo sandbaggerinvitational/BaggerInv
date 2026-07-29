@@ -1,0 +1,17 @@
+.badge {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 7px 13px;
+  border: 1px solid rgba(212, 177, 95, 0.85);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  background: #fff8e5;
+  color: #6f5018;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

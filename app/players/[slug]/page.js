@@ -28,6 +28,9 @@ import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import { filterScorecards } from "../../../lib/scorecard-analytics";
 import { buildPlayerIntelligence } from "../../../lib/player-intelligence";
 import PlayerIntelligenceSections from "./PlayerIntelligenceSections";
+import { cookies } from "next/headers";
+import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport";
+import { resolvePlayerPassportToken } from "../../../lib/player-passport-server";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -96,6 +99,10 @@ export default async function PlayerPage({ params, searchParams }) {
   );
   const player = getPlayerBySlug(slug);
   if (!player) notFound();
+  const cookieStore = await cookies();
+  const passportIdentity = await resolvePlayerPassportToken(
+    cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""
+  );
 
   const stats = getPlayerStats(player["Player ID"]);
   const formatMatchHistory = getPlayerFormatMatchHistory(
@@ -142,9 +149,13 @@ export default async function PlayerPage({ params, searchParams }) {
     <main>
       <Header />
       <ContextBackLink
-        href={playerDirectoryReturnHref}
-        label="Back to All Sandbaggers"
+        href={passportIdentity ? "/" : playerDirectoryReturnHref}
+        label={passportIdentity ? "Back to My Tournament" : "Back to All Sandbaggers"}
       />
+      {passportIdentity ? <ContextBackLink
+        href={playerDirectoryReturnHref}
+        label="Browse All Sandbaggers"
+      /> : null}
 
       <section className={styles.pageHero}>
         <div className={styles.profileHeader}>
