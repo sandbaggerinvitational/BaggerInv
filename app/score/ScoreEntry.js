@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
+import MyMatchDashboard from "./MyMatchDashboard";
 import styles from "./score.module.css";
 
 const jsonScores = (value) => {
@@ -61,6 +62,7 @@ export default function ScoreEntry() {
   const [restoring, setRestoring] = useState(true);
   const [passportPlayer, setPassportPlayer] = useState(null);
   const [passportMatches, setPassportMatches] = useState([]);
+  const [passportTournament, setPassportTournament] = useState(null);
 
   const request = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -112,7 +114,10 @@ export default function ScoreEntry() {
           setPassportPlayer(identity.player);
           const matches = await fetch("/api/player-passport/matches", { cache: "no-store" });
           const payload = await matches.json();
-          if (matches.ok) setPassportMatches(payload.data?.matches || []);
+          if (matches.ok) {
+            setPassportMatches(payload.data?.matches || []);
+            setPassportTournament(payload.data?.tournament || null);
+          }
         }
         if (session.ok) {
           const payload = await session.json();
@@ -310,23 +315,17 @@ export default function ScoreEntry() {
     <div className={styles.brand}><span>SBI LIVE</span><h1>Opening scoring…</h1><p>Restoring your authorized match.</p></div>
   </section>;
 
+  if (!authorized && passportPlayer) return <MyMatchDashboard
+      player={passportPlayer}
+      tournament={passportTournament}
+      matches={passportMatches}
+      busy={busy}
+      onOpen={openPassportMatch}
+      message={status}
+    />;
+
   if (!authorized) return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>{passportPlayer ? `Welcome, ${passportPlayer.name}. Choose one of your tournament matches.` : "Activate Player Passport or enter a participant match code."}</p></div>
-    {passportPlayer ? <div className={styles.matchChoices} aria-label="Your Player Passport matches">
-      {passportMatches.map((item) => <button type="button" disabled={!item.scoringEnabled || busy} onClick={() => openPassportMatch(item)} key={item.matchId}>
-        <span>Round {item.round} · Match {item.match}{item.teeTime ? ` · ${item.teeTime}` : ""}</span>
-        <strong>{item.format || "Format TBA"} · {item.course || "Course TBA"}</strong>
-        <small>{item.scoringEnabled ? "Open Scorecard" : String(item.status).toLowerCase() === "final" ? "Match complete" : "Not open for scoring yet"}</small>
-      </button>)}
-      {!passportMatches.length && <p className={styles.status}>No tournament matches are assigned to your Player Passport yet.</p>}
-      <button type="button" className={styles.clearAccess} onClick={async () => {
-        await fetch("/api/player-passport/session", { method: "DELETE" });
-        setPassportPlayer(null); setPassportMatches([]);
-        window.dispatchEvent(new Event("player-passport-cleared"));
-        await loadMatchOptions();
-      }}>This isn’t me · Remove Player Passport</button>
-      <ParticipantLinks player={passportPlayer} />
-    </div> : <>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Select your Player Passport to view your matches, or use a participant match code.</p></div>
     <Link className={styles.primary} href="/activate">Activate Player Passport</Link>
     <div className={styles.matchChoices} role="radiogroup" aria-label="Choose your match">
       {matchOptions.map((item) => <button type="button" role="radio" aria-checked={selectedMatch === item.selector} data-active={selectedMatch === item.selector} disabled={!item.accessAvailable} onClick={() => setSelectedMatch(item.selector)} key={item.selector || `${item.round}-${item.match}`}>
@@ -339,7 +338,6 @@ export default function ScoreEntry() {
     <label>Your name<input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} /></label>
     <label>Match code<input type="password" inputMode="numeric" autoComplete="one-time-code" value={credential} onChange={(event) => setCredential(event.target.value)} /></label>
     <button className={styles.primary} disabled={busy || !selectedMatch || !name.trim() || !credential.trim()} onClick={login}>Open My Match</button>
-    </>}
     {status && <p className={styles.status}>{status}</p>}
   </section>;
   if (!data) return <section className={styles.login}><div className={styles.brand}><span>SBI LIVE</span><h1>Unable to open match</h1></div><button className={styles.primary} onClick={clearAccess}>Clear match access</button>{status && <p className={styles.status}>{status}</p>}</section>;
