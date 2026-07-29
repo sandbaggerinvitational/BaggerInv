@@ -436,7 +436,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: flex-start;
-  gap: 8px;
+  column-gap: 6px;
   padding-top: 8px;
   border-top: 1px solid #eee7da;
 }
@@ -444,7 +444,7 @@
 .roundMatchup > div {
   display: grid;
   justify-items: center;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
   text-align: center;
 }
@@ -474,6 +474,7 @@
 }
 
 .roundMatchup .playerLines {
+  gap: 2px;
   justify-items: center;
 }
 
@@ -678,7 +679,7 @@
   }
 
   .roundMatchup {
-    gap: 5px;
+    column-gap: 4px;
   }
 
   .roundMatchup .playerLines > span {

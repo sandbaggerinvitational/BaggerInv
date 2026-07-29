@@ -146,6 +146,9 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(styles, /\.teamLogo,[\s\S]*justify-self:\s*center/);
   assert.match(styles, /\.roundMatchup > div[\s\S]*justify-items:\s*center/);
   assert.match(styles, /\.roundMatchup em[\s\S]*text-align:\s*center|\.roundMatchup > div[\s\S]*text-align:\s*center/);
+  assert.match(styles, /\.roundMatchup[\s\S]*column-gap:\s*6px/);
+  assert.match(styles, /\.roundMatchup > div[\s\S]*gap:\s*2px/);
+  assert.match(styles, /\.roundMatchup \.playerLines\s*\{[\s\S]*gap:\s*2px/);
   assert.match(styles, /\.playerLines small[\s\S]*font:\s*850 0\.42rem/);
   assert.match(commandStyles, /--home-eyebrow-color:#b58a25/);
   assert.match(commandStyles, /\.homeHeader p,\.sectionHeader p,\.pulseHeader p[\s\S]*line-height:1\.2/);
