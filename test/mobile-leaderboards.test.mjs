@@ -6,6 +6,7 @@ import {
   rankPlayerRows,
   roundScoreRows,
   searchPlayerRows,
+  teamLeaderInsight,
   teamStandings,
   tournamentInsights,
 } from "../lib/mobile-leaderboards.js";
@@ -84,6 +85,65 @@ test("insights publish only supported trusted metrics", () => {
   assert.deepEqual(insights.undefeated.map((row) => row.id), ["p1", "p3"]);
   assert.equal(insights.lowestGross.id, "p1");
   assert.equal(insights.leadingTeam.name, "The Pickles");
+});
+
+test("team leader insight distinguishes sole leaders from official points ties", () => {
+  const sole = teamLeaderInsight([
+    { side: 1, name: "The Pickles", points: 4 },
+    { side: 2, name: "Lipp It and Rip It", points: 3 },
+  ]);
+  assert.equal(sole.label, "Team Leader");
+  assert.equal(sole.tied, false);
+  assert.equal(sole.pointsLabel, "4 points");
+
+  const tied = teamLeaderInsight([
+    { side: 1, name: "The Pickles", points: 3 },
+    { side: 2, name: "Lipp It and Rip It", points: 3 },
+  ]);
+  assert.equal(tied.label, "Team Leaders");
+  assert.equal(tied.tied, true);
+  assert.equal(tied.namesLabel, "The Pickles and Lipp It and Rip It");
+  assert.equal(tied.pointsLabel, "3 points each");
+  assert.equal(tied.accessibleLabel, "Team leaders tied at 3 points: The Pickles and Lipp It and Rip It");
+});
+
+test("team leader insight supports multiple ties, singular points, and official tie-break resolution", () => {
+  const teams = [
+    { side: 1, name: "A Very Long First Team Name", points: 1 },
+    { side: 2, name: "A Very Long Second Team Name", points: 1 },
+    { side: 3, name: "A Very Long Third Team Name", points: 1 },
+  ];
+  const tied = teamLeaderInsight(teams);
+  assert.equal(tied.leaders.length, 3);
+  assert.equal(tied.pointsLabel, "1 point each");
+  assert.match(tied.namesLabel, /First Team Name, A Very Long Second Team Name, and A Very Long Third Team Name/);
+
+  const resolved = teamLeaderInsight(teams, { state: { complete: true, championSide: 2 } });
+  assert.equal(resolved.tied, false);
+  assert.equal(resolved.label, "Team Leader");
+  assert.equal(resolved.leaders[0].side, 2);
+});
+
+test("Insights compact undefeated lists reveal every qualified player", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /undefeated\.length > 3/);
+  assert.match(source, /undefeated\.slice\(0, 2\)/);
+  assert.match(source, /\+\{undefeated\.length - 2\} more/);
+  assert.match(source, /Show all \$\{undefeated\.length\} undefeated players/);
+  assert.match(source, /undefeated\.map\(\(row\) => <li/);
+  assert.match(source, /qualified player\{undefeated\.length === 1/);
+});
+
+test("Insights tied leaders use accessible compact presentation without overflow-prone names", async () => {
+  const [source, insightStyles] = await Promise.all([
+    readFile(componentUrl, "utf8"),
+    readFile(new URL("../app/live/leaderboards-insights.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(source, /aria-label=\{insights\.teamLeader\.accessibleLabel\}/);
+  assert.match(source, /insights\.teamLeader\.label/);
+  assert.match(source, />Tied<\/em>/);
+  assert.match(insightStyles, /white-space: pre-line/);
+  assert.match(insightStyles, /min-width: 0/);
 });
 
 test("Leaderboards use shared tournament identity, URL tabs, search, expansion, and Passport highlighting", async () => {

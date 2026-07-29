@@ -1,0 +1,46 @@
+.tieLabel {
+  width: max-content;
+  padding: 2px 6px;
+  border: 1px solid #c8a24d;
+  border-radius: 999px;
+  color: #795c19;
+  font-size: .55rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.undefeated details {
+  min-width: 0;
+}
+
+.undefeated summary {
+  display: grid;
+  gap: 3px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.undefeated summary::-webkit-details-marker {
+  display: none;
+}
+
+.undefeated summary strong {
+  white-space: pre-line;
+}
+
+.undefeated summary em {
+  color: #795c19;
+  font-size: .6rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.undefeated ul {
+  display: grid;
+  gap: 3px;
+  margin: 7px 0 0;
+  padding: 7px 0 0 15px;
+  border-top: 1px solid #e4dccd;
+  color: #0b4938;
+  font-size: .63rem;
+}

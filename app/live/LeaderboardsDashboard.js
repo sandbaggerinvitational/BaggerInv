@@ -16,6 +16,7 @@ import {
   tournamentInsights,
 } from "../../lib/mobile-leaderboards";
 import styles from "./leaderboards-dashboard.module.css";
+import insightStyles from "./leaderboards-insights.module.css";
 
 const clean = (value) => String(value ?? "").trim();
 const initials = (name) => clean(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -128,17 +129,36 @@ function Teams({ data, selectedRound, currentPlayer }) {
 function Insights({ data }) {
   const players = useMemo(() => playerPerformanceRows(data.leaderboard || [], data.scoreLeaderboard || []), [data]);
   const teams = useMemo(() => teamStandings(data.rounds || [], data.tournament || {}, "overall"), [data]);
-  const insights = useMemo(() => tournamentInsights(players, teams), [players, teams]);
+  const insights = useMemo(() => tournamentInsights(players, teams, data.tournament || {}), [data.tournament, players, teams]);
   const cards = [
     insights.pointsLeader ? ["Points Leader", insights.pointsLeader.player, `${formatPoints(insights.pointsLeader.points)} points`] : null,
-    insights.leadingTeam ? ["Team Leader", insights.leadingTeam.name, `${formatPoints(insights.leadingTeam.points)} points`] : null,
-    insights.undefeated.length ? ["Undefeated", insights.undefeated.map((row) => row.player).join(", "), `${insights.undefeated.length} qualified player${insights.undefeated.length === 1 ? "" : "s"}`] : null,
     insights.lowestGross ? ["Lowest Gross Average", insights.lowestGross.player, average(insights.lowestGross.grossAvg)] : null,
     insights.lowestNet ? ["Lowest Net Average", insights.lowestNet.player, average(insights.lowestNet.netAvg)] : null,
   ].filter(Boolean);
+  const undefeated = insights.undefeated;
+  const compactUndefeated = undefeated.length > 3;
   return <section className={styles.insights}>
     <header><small>Tournament Insights</small><h2>Trusted live trends</h2><p>Current-tournament results only. Unavailable metrics remain hidden.</p></header>
-    {cards.length ? <div>{cards.map(([label, name, value]) => <article key={label}><span>{label}</span><strong>{name}</strong><b>{value}</b></article>)}</div> : <div className={styles.empty}><strong>Insights will appear as results are finalized.</strong><span>No trends are published before enough trusted data exists.</span></div>}
+    {cards.length || insights.teamLeader || undefeated.length ? <div>
+      {cards.map(([label, name, value]) => <article key={label}><span>{label}</span><strong>{name}</strong><b>{value}</b></article>)}
+      {insights.teamLeader ? <article aria-label={insights.teamLeader.accessibleLabel}>
+        <span>{insights.teamLeader.label}</span>
+        {insights.teamLeader.tied ? <em className={insightStyles.tieLabel}>Tied</em> : null}
+        <strong>{insights.teamLeader.namesLabel}</strong>
+        <b>{formatPoints(insights.teamLeader.points)} {insights.teamLeader.points === 1 ? "point" : "points"}{insights.teamLeader.tied ? " each" : ""}</b>
+      </article> : null}
+      {undefeated.length ? <article className={insightStyles.undefeated}>
+        <span>Undefeated</span>
+        {compactUndefeated ? <details>
+          <summary aria-label={`Show all ${undefeated.length} undefeated players`}>
+            <strong>{undefeated.slice(0, 2).map((row) => row.player).join("\n")}</strong>
+            <em>+{undefeated.length - 2} more</em>
+          </summary>
+          <ul>{undefeated.map((row) => <li key={row.id}>{row.player}</li>)}</ul>
+        </details> : <strong>{undefeated.map((row) => row.player).join(", ")}</strong>}
+        <b>{undefeated.length} qualified player{undefeated.length === 1 ? "" : "s"}</b>
+      </article> : null}
+    </div> : <div className={styles.empty}><strong>Insights will appear as results are finalized.</strong><span>No trends are published before enough trusted data exists.</span></div>}
   </section>;
 }
 
