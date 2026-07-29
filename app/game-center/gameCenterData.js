@@ -30,6 +30,8 @@ export async function getGameCenterData(matchId) {
   const holes = gameCenterHoles(scoring.holeScores, scoring.courseHoles);
   const points = gameCenterPoints(match, scoring.holeScores);
   const state = gameCenterState(match, scoring.holeScores);
+  const storedResult = officialMatchResult(match, teamNames);
+  const result = liveMatchResult(match, scoring.holeScores, teamNames);
 
   return {
     tournament: tournamentData.tournament,
@@ -39,9 +41,9 @@ export async function getGameCenterData(matchId) {
     points,
     stats: gameCenterStats(holes),
     state,
-    result: state === "final"
-      ? officialMatchResult(match, teamNames)
-      : liveMatchResult(match, scoring.holeScores, teamNames),
+    result,
+    storedResult,
+    resultConflict: state === "final" && Boolean(storedResult) && storedResult.toUpperCase() !== result.toUpperCase(),
     canConfirm: scoring.canConfirm,
   };
 }

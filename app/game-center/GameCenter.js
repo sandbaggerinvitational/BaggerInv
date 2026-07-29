@@ -72,6 +72,12 @@ function winnerName(winner, teamNames) {
   return "";
 }
 
+function teamMarker(name) {
+  const words = clean(name).split(/\s+/).filter(Boolean);
+  const meaningful = words.find((word) => !/^(the|a|an)$/i.test(word)) || words[0] || "T";
+  return meaningful[0]?.toUpperCase() || "T";
+}
+
 function ResultSegments({ data }) {
   const format = clean(data.match.format || data.match.Format).toUpperCase();
   const options = format === "SI"
@@ -85,7 +91,12 @@ function ResultSegments({ data }) {
   };
   const winner = winners[selected];
   const teamNames = data.display.teamNames;
-  const pointValue = selected === "overall" && format === "SI" ? 3 : 1;
+  const totalPoints = hasValue(data.points.team1Points) && hasValue(data.points.team2Points)
+    ? Number(data.points.team1Points) + Number(data.points.team2Points)
+    : null;
+  const pointValue = Number.isFinite(totalPoints)
+    ? format === "SI" ? totalPoints : totalPoints / 3
+    : null;
 
   return <section className={styles.results}>
     <div className={styles.segmented} role="tablist" aria-label="Match result segment">
@@ -99,11 +110,13 @@ function ResultSegments({ data }) {
       >{label}</button>)}
     </div>
     <div className={styles.segmentResult} role="tabpanel">
-      <span>{options.find(([key]) => key === selected)?.[1]}{selected !== "overall" ? " 9" : ""}</span>
-      <strong>{winnerName(winner, teamNames) || "Result pending"}</strong>
-      {winner ? <small>{/halved/i.test(winner)
-        ? `${formatPoints(pointValue / 2)} point${pointValue / 2 === 1 ? "" : "s"} to each team`
-        : `${winnerName(winner, teamNames)} — ${pointValue} point${pointValue === 1 ? "" : "s"}`}</small> : null}
+      {winner ? <>
+        <span>{/halved/i.test(winner) ? "Halved" : "Winner"}</span>
+        <strong>{/halved/i.test(winner) ? "Halved" : winnerName(winner, teamNames)}</strong>
+        {pointValue !== null ? <small>{/halved/i.test(winner)
+          ? `${formatPoints(pointValue / 2)} Point${pointValue / 2 === 1 ? "" : "s"} Each`
+          : `${formatPoints(pointValue)} Point${pointValue === 1 ? "" : "s"}`}</small> : null}
+      </> : <strong>Result pending</strong>}
     </div>
     {data.points.team1Points !== null && data.points.team2Points !== null ? <div className={styles.matchPoints}>
       <span><small>Match Total</small><strong>{teamNames[1]} {formatPoints(data.points.team1Points)}</strong></span>
@@ -117,11 +130,14 @@ function HoleTracker({ data, selected, onSelect }) {
   const current = Number(data.match.currentHole || data.match["Current Hole"] || data.stats.played || 1);
   const teamNames = data.display.teamNames;
   return <section className={styles.tracker}>
-    <header><div><span>Hole-by-Hole</span><h2>Match Tracker</h2></div><small>{data.stats.played} of 18 recorded</small></header>
+    <header><h2>Hole Tracker</h2><small>{data.stats.played} of 18 recorded</small></header>
     <div className={styles.holeGrid}>
       {data.holes.map((hole) => {
         const state = hole.winner === "Team 1" ? "team-one" : hole.winner === "Team 2" ? "team-two" : hole.winner === "Halved" ? "halved" : "unplayed";
-        const label = hole.winner === "Team 1" ? initials(teamNames[1]) : hole.winner === "Team 2" ? initials(teamNames[2]) : hole.winner === "Halved" ? "H" : "—";
+        const label = hole.winner === "Team 1" ? teamMarker(teamNames[1]) : hole.winner === "Team 2" ? teamMarker(teamNames[2]) : hole.winner === "Halved" ? "½" : "—";
+        const outcome = hole.winner === "Team 1" || hole.winner === "Team 2"
+          ? `won by ${winnerName(hole.winner, teamNames)}`
+          : hole.winner === "Halved" ? "halved" : "not played";
         return <button
           type="button"
           key={hole.number}
@@ -129,7 +145,7 @@ function HoleTracker({ data, selected, onSelect }) {
           data-current={hole.number === current ? "true" : undefined}
           data-selected={hole.number === selected ? "true" : undefined}
           onClick={() => onSelect(hole.number)}
-          aria-label={`Hole ${hole.number}: ${hole.winner ? winnerName(hole.winner, teamNames) : "unplayed"}${hole.number === current ? ", current hole" : ""}`}
+          aria-label={`Hole ${hole.number}, ${outcome}${hole.number === current ? ", current hole" : ""}`}
         ><small>{hole.number}</small><strong>{label}</strong></button>;
       })}
     </div>
@@ -289,7 +305,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       </div>
     </section>
 
-    <section className={styles.scoreboard} aria-label={`${teamNames[1]} versus ${teamNames[2]}. ${data.result}${through ? ` through ${through}` : ""}`}>
+    <section className={styles.scoreboard} aria-label={`${teamNames[1]} versus ${teamNames[2]}. ${data.result}${data.state !== "final" && through ? ` through ${through}` : ""}`}>
       <div><Logo filename={data.display.teams[1].logo || data.tournament.teamOne.logo} name={teamNames[1]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[1]}</strong></div>
       <span>
         {data.state === "final" && finalWinner ? <small>{finalWinner}</small> : null}
@@ -309,7 +325,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       {data.state === "pre" ? <p><span aria-hidden="true">🔒</span> Scoring opens before {teeTime || "the scheduled tee time"}.</p> : null}
       {data.state === "live" ? <button type="button" disabled={opening} onClick={openScoring}>{opening ? "Opening…" : data.stats.played ? "Continue Scoring" : "Start Scoring"}</button> : null}
       {data.state === "final" ? <a href="#scorecard">View Final Scorecard</a> : null}
-      <small>{updatedLabel}{data.match.updatedBy || data.match["Updated By"] ? ` • ${data.match.updatedBy || data.match["Updated By"]}` : ""}</small>
+      <small>{updatedLabel}</small>
       {error ? <span className={styles.refreshError} role="status">{error} <button type="button" onClick={refresh}>Retry</button></span> : null}
     </section>
 

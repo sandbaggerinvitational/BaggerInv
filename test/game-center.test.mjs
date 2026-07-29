@@ -7,6 +7,7 @@ import {
   gameCenterState,
   gameCenterStats,
   liveMatchResult,
+  matchPlayNotation,
   officialMatchResult,
 } from "../lib/game-center.js";
 
@@ -72,6 +73,31 @@ test("Final result preserves official wording and halved matches", () => {
     "Team 1 Points": 1.5,
     "Team 2 Points": 1.5,
   }, names), "HALVED");
+});
+
+test("Final match-play notation derives standard early and 18-hole results", () => {
+  const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
+  const result = (team1Holes, team2Holes, halved = 0) => [
+    ...Array.from({ length: team1Holes }, () => "Team 1"),
+    ...Array.from({ length: team2Holes }, () => "Team 2"),
+    ...Array.from({ length: halved }, () => "Halved"),
+  ].map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
+
+  assert.equal(matchPlayNotation(result(8, 0, 3), names), "The Pickles 8 & 7");
+  assert.equal(matchPlayNotation(result(4, 0, 11), names), "The Pickles 4 & 3");
+  assert.equal(matchPlayNotation(result(2, 0, 15), names), "The Pickles 2 & 1");
+  const alternating = Array.from({ length: 16 }, (_, index) => index % 2 ? "Team 2" : "Team 1");
+  const holes = (winners) => winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
+  assert.equal(matchPlayNotation(holes([...alternating, "Team 1", "Team 1"]), names), "The Pickles 2 UP");
+  assert.equal(matchPlayNotation(holes([...alternating, "Halved", "Team 1"]), names), "The Pickles 1 UP");
+  assert.equal(matchPlayNotation(holes([...alternating, "Team 1", "Team 2"]), names), "HALVED");
+});
+
+test("Preview Match 2026-R1-1 finalized sequence resolves to 7 & 6, not 8 & 7", () => {
+  const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
+  const winners = ["Halved", "Team 2", "Halved", "Halved", "Team 2", "Team 2", "Halved", "Team 2", "Team 2", "Team 2", "Halved", "Team 2", "Team 1", "Halved", "Team 2", "Team 2", "Halved", "Halved"];
+  const holes = winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
+  assert.equal(matchPlayNotation(holes, names), "Lipp It and Rip It 7 & 6");
 });
 
 test("Hole tracker preserves won, lost, halved, current, and unplayed data", () => {
@@ -177,11 +203,41 @@ test("Tournament and My Match View Match destinations route to Game Center witho
 test("Game Center layout protects mobile widths and localizes hole interaction", async () => {
   const styles = await readFile(stylesUrl, "utf8");
   assert.match(styles, /\.content\{width:min\(100%,760px\)/);
-  assert.match(styles, /\.scoreboard\{[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(112px,auto\) minmax\(0,1fr\)/);
+  assert.match(styles, /\.scoreboard\{[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(104px,auto\) minmax\(0,1fr\)/);
   assert.match(styles, /\.teamGrid\{[^}]*grid-template-columns:minmax\(0,1fr\) 20px minmax\(0,1fr\)/);
   assert.match(styles, /\.holeGrid\{[^}]*grid-template-columns:repeat\(9,minmax\(0,1fr\)\)/);
   assert.match(styles, /@media\(max-width:420px\)/);
   assert.doesNotMatch(styles, /overflow-x:(auto|scroll)/);
+});
+
+test("Hole Tracker uses clear single-character outcomes and accessible labels", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /<h2>Hole Tracker<\/h2>/);
+  assert.match(source, /"½"/);
+  assert.match(source, /teamMarker\(teamNames\[1\]\)/);
+  assert.match(source, /teamMarker\(teamNames\[2\]\)/);
+  assert.match(source, /won by \$\{winnerName/);
+  assert.match(source, /"not played"/);
+  assert.match(source, /current hole/);
+  assert.doesNotMatch(source, /Hole-by-Hole/);
+  assert.doesNotMatch(source, /initials\(teamNames\[[12]\]\)/);
+});
+
+test("Result segments avoid repeated headings and updater names", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /"Winner"/);
+  assert.match(source, /"Halved"/);
+  assert.match(source, /Point\$\{pointValue === 1/);
+  assert.doesNotMatch(source, /options\.find\(\(\[key\]\) => key === selected\)/);
+  assert.match(source, /<small>\{updatedLabel\}<\/small>/);
+  assert.match(source, /Scorecard confirmed/);
+  assert.match(source, /by \$\{data\.match\.updatedBy/);
+});
+
+test("Frozen Home, My Match, and Tournament remain outside this refinement", async () => {
+  const [tournament, myMatch] = await Promise.all([readFile(tournamentUrl, "utf8"), readFile(myMatchUrl, "utf8")]);
+  assert.match(tournament, /TournamentIdentityHeader/);
+  assert.match(myMatch, /My Match/);
 });
 
 test("Game Center data is assembled server-side without exposing access fields", async () => {
