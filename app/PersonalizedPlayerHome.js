@@ -8,14 +8,10 @@ import {
   normalizedMatchStatus,
   selectRelevantPlayerMatches,
 } from "../lib/player-home";
-import { appMatchStatus, formatMatchResult, imageFallbackSources } from "../lib/mobile-tournament-app";
-import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../lib/asset-paths";
+import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app";
+import { courseLogo, teamLogo } from "../lib/asset-paths";
 import MobileIdentityImage from "./MobileIdentityImage";
 import styles from "./personalized-player-home.module.css";
-
-function firstName(name) {
-  return String(name || "").trim().split(/\s+/)[0] || "Sandbagger";
-}
 
 function matchMeta(match) {
   return [
@@ -25,20 +21,34 @@ function matchMeta(match) {
   ].filter(Boolean).join(" · ");
 }
 
-function MatchPeople({ match }) {
-  const participant = match.partnerNames?.length
-    ? `Partner: ${match.partnerNames.join(" + ")}`
-    : match.format === "Singles" ? "Singles" : "Your side";
-  const opponents = match.opponentNames?.join(" + ") || "Opponents TBD";
+function teeLabel(value) {
+  const tee = String(value || "").trim();
+  if (!tee) return "";
+  return /\btees?\b/i.test(tee) ? tee : `${tee.replace(/\b\w/g, (letter) => letter.toUpperCase())} Tees`;
+}
+
+function PlayerLines({ names, currentPlayer }) {
+  if (!names?.length) return <span className={styles.playerTbd}>Players TBD</span>;
+  return <div className={styles.playerLines}>{names.map((name) =>
+    <span key={name}>
+      {name}
+      {name === currentPlayer ? <small>YOU</small> : null}
+    </span>
+  )}</div>;
+}
+
+function MatchPeople({ match, currentPlayer }) {
   return <div className={styles.people}>
     <div>
       <MobileIdentityImage sources={[teamLogo(match.team?.logo)]} name={match.team?.name} className={styles.teamLogo} fallbackClassName={styles.teamLogoFallback} />
-      <span>{match.team?.name || "Your team"}</span><strong>{participant}</strong>
+      <strong>{match.team?.name || "Your team"}</strong>
+      <PlayerLines names={match.participantNames} currentPlayer={currentPlayer} />
     </div>
     <b>VS</b>
     <div>
       <MobileIdentityImage sources={[teamLogo(match.opponentTeam?.logo)]} name={match.opponentTeam?.name} className={styles.teamLogo} fallbackClassName={styles.teamLogoFallback} />
-      <span>{match.opponentTeam?.name || "Opposing team"}</span><strong>{opponents}</strong>
+      <strong>{match.opponentTeam?.name || "Opposing team"}</strong>
+      <PlayerLines names={match.opponentNames} currentPlayer={currentPlayer} />
     </div>
   </div>;
 }
@@ -54,26 +64,48 @@ function Action({ match, busy, onOpen }) {
   </button>;
 }
 
-function Schedule({ matches, emphasizedId }) {
-  return <details className={styles.schedule}>
-    <summary><span>My Schedule</span><small>{matches.length} match{matches.length === 1 ? "" : "es"}</small></summary>
+function MyRounds({ matches, emphasizedId, currentPlayer }) {
+  return <section className={styles.schedule} aria-labelledby="my-rounds-title">
+    <header>
+      <div><p>Your Golf</p><h2 id="my-rounds-title">My Rounds</h2></div>
+      <small>{matches.length} match{matches.length === 1 ? "" : "es"}</small>
+    </header>
     <div className={styles.scheduleList}>
       {matches.map((match) => {
-        const action = matchAction(match);
-        return <article key={match.matchId} data-current={match.matchId === emphasizedId}>
-          <div>
-            <span>{matchMeta(match)}</span>
-            <strong>{match.course || "Course to be announced"}</strong>
-            <small>{match.teeTime || "Tee time TBD"} · {match.opponentNames?.join(" + ") || "Opponents TBD"}</small>
+        const tee = teeLabel(match.tee);
+        return <Link
+          key={match.matchId}
+          className={styles.roundCard}
+          data-current={match.matchId === emphasizedId}
+          href={`/live?view=matchups&round=${match.round}#match-${match.matchId}`}
+          aria-label={`${matchMeta(match)} at ${match.course || "course to be announced"}`}
+        >
+          <div className={styles.roundTop}>
+            <div><span>{matchMeta(match)}</span><strong>{match.course || "Course to be announced"}</strong></div>
+            <b>{formatMatchResult(match, match.team?.side) || appMatchStatus(match)}</b>
           </div>
-          <div><b>{formatMatchResult(match, match.team?.side) || appMatchStatus(match)}</b><small>{action.label}</small></div>
-        </article>;
+          <div className={styles.roundVenue}>
+            <MobileIdentityImage
+              sources={[courseLogo(match.courseLogo)]}
+              name={match.course}
+              alt=""
+              className={styles.roundCourseLogo}
+              fallbackClassName={styles.roundCourseLogoFallback}
+            />
+            <small>{[tee, match.teeTime || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
+          </div>
+          <div className={styles.roundMatchup}>
+            <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} currentPlayer={currentPlayer} /></div>
+            <i>VS</i>
+            <div><em>{match.opponentTeam?.name || "Opposing team"}</em><PlayerLines names={match.opponentNames} currentPlayer={currentPlayer} /></div>
+          </div>
+        </Link>;
       })}
     </div>
-  </details>;
+  </section>;
 }
 
-export default function PersonalizedPlayerHome() {
+export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
   const [payload, setPayload] = useState(null);
   const [state, setState] = useState("loading");
   const [busyId, setBusyId] = useState("");
@@ -127,43 +159,36 @@ export default function PersonalizedPlayerHome() {
     }
   };
 
-  if (state === "loading") return <section className={styles.loading} aria-live="polite">
-    <span className={styles.skeleton} />
-    <span className={styles.skeleton} />
-    <span className={styles.skeleton} />
-    <span className={styles.visuallyHidden}>Checking your Player Passport…</span>
-  </section>;
-  if (state === "public") return <section className={styles.empty}>
-    <p>Your Match</p>
-    <h2 id="player-home-title">Find your tournament match</h2>
-    <span>Activate Player Passport to see your partner, opponents, course, and tee time.</span>
-    <Link className={styles.primaryAction} href="/activate">Activate Player Passport</Link>
-  </section>;
-  if (state === "error") return <section className={styles.error}>
-    <strong>We couldn’t load your tournament right now.</strong>
-    <button onClick={refresh}>Try again</button>
-  </section>;
+  if (state === "loading") return <>
+    <section className={styles.loading} aria-live="polite">
+      <span className={styles.skeleton} />
+      <span className={styles.skeleton} />
+      <span className={styles.skeleton} />
+      <span className={styles.visuallyHidden}>Checking your Player Passport…</span>
+    </section>
+    {tournamentPulse}
+  </>;
+  if (state === "public") return <>
+    <section className={styles.empty}>
+      <p>Your Match</p>
+      <h2 id="player-home-title">Find your tournament match</h2>
+      <span>Activate Player Passport to see your partner, opponents, course, and tee time.</span>
+      <Link className={styles.primaryAction} href="/activate">Activate Player Passport</Link>
+    </section>
+    {tournamentPulse}
+  </>;
+  if (state === "error") return <>
+    <section className={styles.error}>
+      <strong>We couldn’t load your tournament right now.</strong>
+      <button onClick={refresh}>Try again</button>
+    </section>
+    {tournamentPulse}
+  </>;
 
   const player = payload?.player;
   const matches = selection.ordered;
 
   return <section className={styles.wrap} aria-labelledby="player-home-title">
-    <div className={styles.identity}>
-      <div className={styles.identityPlayer}>
-        <MobileIdentityImage
-          sources={imageFallbackSources({
-            playerPhoto: playerPhoto(player?.photo),
-            teamLogo: teamLogo(player?.teamLogo),
-            tournamentLogo: tournamentLogo(payload?.tournament?.logo),
-          })}
-          name={player?.name}
-          className={styles.identityImage}
-          fallbackClassName={styles.identityFallback}
-        />
-        <div><span>Player Passport</span><strong>Welcome back, {firstName(player?.name)}</strong></div>
-      </div>
-    </div>
-
     {!matches.length ? <div className={styles.empty}>
       <p>Your Tournament</p>
       <h2 id="player-home-title">No assigned matches yet</h2>
@@ -177,7 +202,6 @@ export default function PersonalizedPlayerHome() {
           <span>{matchMeta(match)}</span><strong>{match.course || "Course TBA"}</strong><small>{match.teeTime || "Tee time TBD"} · Open Scorecard</small>
         </button>
       )}</div>
-      <Schedule matches={matches} />
     </div> : <div className={styles.card}>
       <div className={styles.cardTop}>
         <div><p>Your Match</p><h2 id="player-home-title">{matchMeta(primary)}</h2></div>
@@ -195,7 +219,7 @@ export default function PersonalizedPlayerHome() {
           <span>{primary.teeTime || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
         </div>
       </div>
-      <MatchPeople match={primary} />
+      <MatchPeople match={primary} currentPlayer={player?.name} />
       {normalizedMatchStatus(primary) === "LIVE" ? <div className={styles.progress}>
         <span>Through {primary.currentHole || primary.holesRecorded || "—"}</span>
         {primary.updatedAt ? <small>Last updated {new Date(primary.updatedAt).toLocaleString()}</small> : null}
@@ -205,13 +229,9 @@ export default function PersonalizedPlayerHome() {
       {normalizedMatchStatus(primary) === "LOCKED" ? <p className={styles.note}>The tournament director has locked scoring for this match.</p> : null}
       {normalizedMatchStatus(primary) === "UPCOMING" ? <p className={styles.note}>Scoring will become available when participant access opens.</p> : null}
       {message ? <p className={styles.message} role="alert">{message}</p> : null}
-      <Schedule matches={matches} emphasizedId={primary.matchId} />
     </div>}
 
-    {payload?.snapshot ? <div className={styles.snapshot}>
-      <div><span>Match Points</span><strong>{payload.snapshot.points}</strong></div>
-      <div><span>Record</span><strong>{payload.snapshot.record.wins}-{payload.snapshot.record.losses}-{payload.snapshot.record.halves}</strong></div>
-      <div><span>Matches Played</span><strong>{payload.snapshot.matchesPlayed}</strong></div>
-    </div> : null}
+    {tournamentPulse}
+    {matches.length ? <MyRounds matches={matches} emphasizedId={primary?.matchId} currentPlayer={player?.name} /> : null}
   </section>;
 }

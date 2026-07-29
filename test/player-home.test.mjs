@@ -51,17 +51,26 @@ test("countdown never returns a negative duration", () => {
 });
 
 test("personalized home keeps Passport authorization server-side", async () => {
-  const [component, route, commandCenter] = await Promise.all([
+  const [component, route, commandCenter, sheetsWrite] = await Promise.all([
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/player-passport/matches/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
   ]);
   assert.match(commandCenter, /PersonalizedPlayerHome/);
   assert.match(component, /api\/player-passport\/matches/);
   assert.doesNotMatch(component, /This isn’t me/);
-  assert.match(component, /My Schedule/);
+  assert.match(component, /My Rounds/);
+  assert.doesNotMatch(component, /My Schedule/);
+  assert.doesNotMatch(component, /Welcome back/);
+  assert.doesNotMatch(component, /Partner:/);
+  assert.match(component, /participantNames/);
+  assert.match(component, /opponentNames/);
+  assert.match(component, /teeLabel\(match\.tee\)/);
+  assert.match(component, /courseLogo\(match\.courseLogo\)/);
   assert.match(route, /authorizePassportMatch/);
   assert.match(route, /verifyPlayerPassportSession/);
+  assert.match(sheetsWrite, /tee: String\(match\["Tee Played"\]/);
 });
 
 test("the public Tournament Command Center offers Passport activation without exposing scoring", async () => {
@@ -71,5 +80,20 @@ test("the public Tournament Command Center offers Passport activation without ex
   ]);
   assert.match(component, /Activate Player Passport/);
   assert.match(component, /href="\/activate"/);
-  assert.match(styles, /\.empty a\.primaryAction\{color:#fff\}/);
+  assert.match(styles, /\.empty a\.primaryAction\s*\{\s*color:\s*#fff/);
+});
+
+test("Home refinement keeps tournament identity and itinerary distinct from player rounds", async () => {
+  const [component, commandCenter] = await Promise.all([
+    readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+  ]);
+  assert.doesNotMatch(component, /playerPhoto|identityImage|Player Passport<\/span>/);
+  assert.match(commandCenter, /tournamentLogo\(`sandbagger-\$\{liveTournament\.year\}`\)/);
+  assert.match(commandCenter, /View Tournament Guide/);
+  assert.match(commandCenter, /No additional events scheduled today/);
+  assert.match(commandCenter, /liveData\?\.schedule/);
+  assert.match(commandCenter, /tournamentPulse=\{pulse\}/);
+  assert.ok(commandCenter.indexOf("PersonalizedPlayerHome") < commandCenter.indexOf("TournamentSchedule items"));
+  assert.doesNotMatch(component, /join\(" \+ "\)/);
 });

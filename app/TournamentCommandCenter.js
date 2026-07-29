@@ -40,7 +40,7 @@ function TournamentSchedule({ items }) {
           <p>Today</p>
           <h2 id="today-schedule-title">Today’s Schedule</h2>
         </div>
-        <Link href="/tournament-guide#itinerary">Full schedule</Link>
+        <Link href="/tournament-guide#itinerary">View Tournament Guide</Link>
       </header>
       {items.length ? (
         <ol>
@@ -60,8 +60,8 @@ function TournamentSchedule({ items }) {
         </ol>
       ) : (
         <div className={styles.emptyState}>
-          <strong>Today’s schedule is not published yet.</strong>
-          <span>Check the Tournament Guide for the full week itinerary.</span>
+          <strong>No additional events scheduled today.</strong>
+          <span>View the Tournament Guide for the full itinerary.</span>
         </div>
       )}
     </section>
@@ -181,7 +181,15 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
     timeZone: liveTournament.timeZone,
   });
   const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
-  const logo = assetSource(liveTournament.logo, tournamentLogo);
+  const logo = assetSource(liveTournament.logo, tournamentLogo) ||
+    tournamentLogo(`sandbagger-${liveTournament.year}`);
+  const pulse = (
+    <TournamentPulse
+      tournament={liveTournament}
+      progress={progress}
+      roundCount={rounds.length}
+    />
+  );
 
   return (
     <div className={styles.page}>
@@ -201,13 +209,8 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
         <span className={styles.headerLive}><i aria-hidden="true" /> Live</span>
       </header>
 
-      <PersonalizedPlayerHome />
+      <PersonalizedPlayerHome tournamentPulse={pulse} />
       <TournamentSchedule items={schedule} />
-      <TournamentPulse
-        tournament={liveTournament}
-        progress={progress}
-        roundCount={rounds.length}
-      />
       <TournamentLeaders leaders={leaders} />
     </div>
   );
