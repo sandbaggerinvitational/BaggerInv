@@ -50,6 +50,13 @@ function number(value) {
   const parsed = Number.parseFloat(clean(value).replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : null;
 }
+function firstNumber(row, fields) {
+  for (const field of fields) {
+    const value = number(row?.[field]);
+    if (value !== null) return value;
+  }
+  return null;
+}
 const truthy = (value) => ["true", "yes", "1"].includes(clean(value).toLowerCase());
 
 function table(rows) {
@@ -110,19 +117,22 @@ function scoreArray(value) {
   }
 }
 
-function buildIndividualScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
+function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
   const totals = new Map();
   const metadataFor = (match, holeNumber) => courseHoles.find((row) =>
     clean(row["Course ID"]) === clean(match["Course ID"]) &&
     Number(row["Hole Number"]) === Number(holeNumber) &&
     (!clean(match.Tee || match["Tee Played"]) || !clean(row.Tee) || clean(row.Tee) === clean(match.Tee || match["Tee Played"]))
   );
-  const add = ({ playerId, round, gross, net, par, holeNumber }) => {
-    if (!playerId || gross === null || net === null || par === null) return;
-    const key = `${round}:${playerId}`;
+  const add = ({ entityId, playerIds, name, format, round, gross, net, par, holeNumber }) => {
+    if (!entityId || gross === null || net === null || par === null) return;
+    const key = `${round}:${entityId}`;
     if (!totals.has(key)) totals.set(key, {
-      id: playerId, round, name: playerMap[playerId]?.name || playerId,
-      slug: playerMap[playerId]?.slug || "", photo: playerMap[playerId]?.photo || "",
+      id: entityId, round, name, format,
+      entityType: format === "SC" ? "PAIRING" : "PLAYER",
+      playerIds,
+      slug: format === "SC" ? "" : playerMap[playerIds[0]]?.slug || "",
+      photo: format === "SC" ? "" : playerMap[playerIds[0]]?.photo || "",
       gross: 0, net: 0, par: 0, holes: 0, scorecard: [],
     });
     const row = totals.get(key);
@@ -146,14 +156,40 @@ function buildIndividualScoreLeaderboard(holeScores, matchMap, courseHoles, play
     for (const side of [1, 2]) {
       const grossScores = scoreArray(row[`Team ${side} Gross Scores`]);
       const playerIds = [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]].map(clean).filter(Boolean);
-      playerIds.forEach((playerId, index) => {
-        const gross = format === "SC" ? (grossScores[0] ?? null) : (grossScores[index] ?? null);
-        const allocated = format === "SC"
-          ? (clean(match[`Team ${side} Stroke`]) || match[`Team ${side} Playing HCP`])
-          : (clean(match[`Team ${side} Player ${index + 1} Stroke`]) || match[`Team ${side} Player ${index + 1} Playing HCP`]);
+      if (format === "SC") {
+        const gross = grossScores[0] ?? null;
+        const allocated = clean(match[`Team ${side} Stroke`]) || match[`Team ${side} Playing HCP`];
         const strokes = getStrokesOnHole(allocated, strokeIndex);
-        const net = format === "SC" ? number(row[`Team ${side} Net Score`]) : gross === null ? null : gross - strokes;
-        add({ playerId, round, gross, net, par, holeNumber: row["Hole Number"] });
+        const net = number(row[`Team ${side} Net Score`]) ?? (gross === null ? null : gross - strokes);
+        add({
+          entityId: `${clean(match["Match ID"])}:team-${side}`,
+          playerIds,
+          name: playerIds.map((id) => playerMap[id]?.name || id).join(" / "),
+          format,
+          round,
+          gross,
+          net,
+          par,
+          holeNumber: row["Hole Number"],
+        });
+        continue;
+      }
+      playerIds.forEach((playerId, index) => {
+        const gross = grossScores[index] ?? null;
+        const allocated = clean(match[`Team ${side} Player ${index + 1} Stroke`]) || match[`Team ${side} Player ${index + 1} Playing HCP`];
+        const strokes = getStrokesOnHole(allocated, strokeIndex);
+        const net = gross === null ? null : gross - strokes;
+        add({
+          entityId: playerId,
+          playerIds: [playerId],
+          name: playerMap[playerId]?.name || playerId,
+          format,
+          round,
+          gross,
+          net,
+          par,
+          holeNumber: row["Hole Number"],
+        });
       });
     }
   }
@@ -175,9 +211,32 @@ function playerEntry(row, side, slot, playerMap) {
     slug: player.slug || "",
     photo: player.photo || "",
     captain: Boolean(player.captain),
-    playingHcp: number(row[`Team ${side} Player ${slot} Playing HCP`] || row[`T${side} P${slot} Playing HCP`]),
-    stroke: number(row[`Team ${side} Player ${slot} Stroke`]),
+    playingHcp: firstNumber(row, [
+      `Team ${side} Player ${slot} Playing HCP`,
+      `T${side} P${slot} Playing HCP`,
+      `Team ${side} Player ${slot} Playing Handicap`,
+      `Team ${side} Player ${slot} HCP`,
+    ]),
+    stroke: firstNumber(row, [
+      `Team ${side} Player ${slot} Stroke`,
+      `T${side} P${slot} Stroke`,
+      `Team ${side} Player ${slot} Strokes`,
+    ]),
   };
+}
+
+function completeMatchMap(rows) {
+  const map = new Map();
+  for (const row of rows) {
+    const matchId = clean(row["Match ID"]);
+    if (!matchId) continue;
+    const merged = { ...(map.get(matchId) || {}) };
+    for (const [field, value] of Object.entries(row)) {
+      if (clean(value)) merged[field] = value;
+    }
+    map.set(matchId, merged);
+  }
+  return map;
 }
 
 function resultFields(source, fallback) {
@@ -289,8 +348,8 @@ export async function getTournamentData() {
   const rulesByRound = Object.fromEntries(rules.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year)).map((row) => [Number(clean(row.Round).match(/\d+/)?.[0]), row]));
   const configuredMatches = permanentRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
   const currentLiveRows = liveRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
-  const liveMap = new Map(currentLiveRows.map((row) => [clean(row["Match ID"]), row]));
-  const permanentMap = new Map(configuredMatches.map((row) => [clean(row["Match ID"]), row]));
+  const liveMap = completeMatchMap(currentLiveRows);
+  const permanentMap = completeMatchMap(configuredMatches);
   const sourceIds = [...new Set([...configuredMatches, ...currentLiveRows].map((row) => clean(row["Match ID"])).filter(Boolean))];
   const scoringMatchMap = new Map(sourceIds.map((matchId) => {
     const merged = { ...(permanentMap.get(matchId) || {}) };
@@ -341,10 +400,10 @@ export async function getTournamentData() {
         currentHole: number(authoritative["Current Hole"]) ?? 0,
         team1Players: [playerEntry(matchRow, 1, 1, playerMap), playerEntry(matchRow, 1, 2, playerMap)].filter(Boolean),
         team2Players: [playerEntry(matchRow, 2, 1, playerMap), playerEntry(matchRow, 2, 2, playerMap)].filter(Boolean),
-        team1PlayingHcp: number(matchRow["Team 1 Playing HCP"]),
-        team2PlayingHcp: number(matchRow["Team 2 Playing HCP"]),
-        team1Stroke: number(matchRow["Team 1 Stroke"]),
-        team2Stroke: number(matchRow["Team 2 Stroke"]),
+        team1PlayingHcp: firstNumber(matchRow, ["Team 1 Playing HCP", "Team 1 Playing Handicap", "Team 1 HCP"]),
+        team2PlayingHcp: firstNumber(matchRow, ["Team 2 Playing HCP", "Team 2 Playing Handicap", "Team 2 HCP"]),
+        team1Stroke: firstNumber(matchRow, ["Team 1 Stroke", "Team 1 Strokes"]),
+        team2Stroke: firstNumber(matchRow, ["Team 2 Stroke", "Team 2 Strokes"]),
         matchupWinner: publicResultAllowed ? normalizeWinner(authoritative["Matchup Winner"]) : "",
         frontWinner: publicResultAllowed ? normalizeWinner(authoritative["Front 9 Winner"]) : "",
         backWinner: publicResultAllowed ? normalizeWinner(authoritative["Back 9 Winner"]) : "",
@@ -422,7 +481,7 @@ export async function getTournamentData() {
     remainingByRound: remainingByRound(rounds),
     momentum: getTeamMomentum(rounds),
     leaderboard: buildLeaderboard(matches, playerMap, teams),
-    scoreLeaderboard: buildIndividualScoreLeaderboard(
+    scoreLeaderboard: buildScoreLeaderboard(
       liveHoleScores.filter((row) => liveMap.has(clean(row["Match ID"]))),
       scoringMatchMap,
       courseHoles,

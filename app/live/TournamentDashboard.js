@@ -45,19 +45,24 @@ function matchResult(match, tournament) {
   return `${winner} WON`;
 }
 
-function playerMeta(player) {
+function playerMeta(player, format) {
   if (!player) return "";
   const values = [];
   if (hasValue(player.playingHcp)) values.push(`HCP ${formatHandicap(player.playingHcp)}`);
-  if (hasValue(player.stroke)) values.push(Number(player.stroke) === 0 ? "No strokes" : `+${player.stroke} stroke${Number(player.stroke) === 1 ? "" : "s"}`);
+  if (format !== "SC" && hasValue(player.stroke)) values.push(Number(player.stroke) === 0 ? "No strokes" : `+${player.stroke} stroke${Number(player.stroke) === 1 ? "" : "s"}`);
   return values.join(" • ");
 }
 
-function Team({ team, players = [] }) {
+function Team({ team, players = [], format, playingHcp, stroke }) {
+  const teamStroke = Number(stroke);
   return <div className={styles.matchTeam}>
     <Logo filename={team.logo} name={team.name} size="team" />
     <strong>{team.name}</strong>
-    <div>{players.map((player, index) => <span key={player?.id || player?.name || index}><b>{player?.name || "Player TBA"}</b>{playerMeta(player) ? <small>{playerMeta(player)}</small> : null}</span>)}</div>
+    <div>{players.map((player, index) => <span key={player?.id || player?.name || index}><b>{player?.name || "Player TBA"}</b>{playerMeta(player, format) ? <small>{playerMeta(player, format)}</small> : null}</span>)}</div>
+    {format === "SC" && hasValue(playingHcp) ? <span className={styles.teamHandicap}>
+      <small>Team Playing Handicap: {formatHandicap(playingHcp)}</small>
+      {Number.isFinite(teamStroke) && teamStroke > 0 ? <b aria-label={`${teamStroke} team stroke${teamStroke === 1 ? "" : "s"}`}>+{teamStroke} team stroke{teamStroke === 1 ? "" : "s"}</b> : null}
+    </span> : null}
   </div>;
 }
 
@@ -77,9 +82,9 @@ function TournamentMatchCard({ match, round, tournament }) {
       <span><strong>{match.course?.name || "Course TBA"}</strong><small>{[tee, match.teeTime].filter(Boolean).join(" • ") || "Details to be announced"}</small></span>
     </div>
     <div className={styles.versus}>
-      <Team team={tournament.teamOne} players={match.team1Players} />
+      <Team team={tournament.teamOne} players={match.team1Players} format={match.format} playingHcp={match.team1PlayingHcp} stroke={match.team1Stroke} />
       <b aria-label="versus">VS</b>
-      <Team team={tournament.teamTwo} players={match.team2Players} />
+      <Team team={tournament.teamTwo} players={match.team2Players} format={match.format} playingHcp={match.team2PlayingHcp} stroke={match.team2Stroke} />
     </div>
     <span className={styles.viewMatch}>View Match <i aria-hidden="true">›</i></span>
   </Link>;
@@ -104,13 +109,12 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
       <div><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="score" /><strong>{tournament.teamTwo.name}</strong><b>{formatPoints(tournament.teamTwo.score)}</b></div>
     </div>
     <div className={styles.snapshotMeta}>
-      <span><small>Current Round</small><strong>{round?.label || "Overall"}</strong></span>
-      <span><small>Live Matches</small><strong>{state.liveMatches}</strong></span>
-      <span><small>Matches Remaining</small><strong>{state.remainingMatches}</strong></span>
-      <span><small>Final Matches</small><strong>{state.totalMatches - state.remainingMatches}</strong></span>
+      <span><small aria-label="Live matches">LIVE</small><strong>{state.liveMatches}</strong></span>
+      <span><small aria-label="Matches remaining">REMAINING</small><strong>{state.remainingMatches}</strong></span>
+      <span><small aria-label="Final matches">FINAL</small><strong>{state.totalMatches - state.remainingMatches}</strong></span>
     </div>
     <div className={styles.progress}>
-      <span><strong>{progress.completedMatches} of {progress.totalMatches} matches complete</strong><small>{progress.liveMatches} live • {progress.scheduledMatches} upcoming</small></span>
+      <span><strong>{round?.label || "Overall"} • {progress.completedMatches} of {progress.totalMatches} matches complete</strong><small>{progress.liveMatches} live • {progress.scheduledMatches} upcoming</small></span>
       <i><b style={{ width: `${Math.min(100, progress.percent || 0)}%` }} /></i>
     </div>
     <div className={styles.insights}><span><small>Points to Clinch</small><strong>{clinchText}</strong></span><span><small>Momentum</small><strong>{momentumText}</strong></span></div>
@@ -118,7 +122,7 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
   </section>;
 }
 
-function ScoreLeaderboard({ rows = [], round }) {
+function ScoreLeaderboard({ rows = [], round, format }) {
   const [sort, setSort] = useState({ key: "netToPar", direction: "asc" });
   const eligible = useMemo(() => rows.filter((row) => row.holes && (!round || Number(row.round) === Number(round))), [rows, round]);
   const sorted = useMemo(() => [...eligible].sort((a, b) => {
@@ -127,11 +131,21 @@ function ScoreLeaderboard({ rows = [], round }) {
   }), [eligible, sort]);
   const select = (key) => setSort((current) => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
   const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"]];
+  const pairing = format === "Scramble" || format === "SC";
+  const ranks = useMemo(() => {
+    const map = new Map();
+    sorted.forEach((row, index) => {
+      const previous = sorted[index - 1];
+      const tied = previous && Number(previous[sort.key]) === Number(row[sort.key]);
+      map.set(row.id, tied ? map.get(previous.id) : index + 1);
+    });
+    return map;
+  }, [sort.key, sorted]);
   return <section className={styles.leaderboard}>
-    <header><span><small>Round Leaderboard</small><h2>Individual Gross &amp; Net</h2></span>{eligible.length ? <em>Live</em> : null}</header>
+    <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross &amp; Net"}</h2></span>{eligible.length ? <em>Live</em> : null}</header>
     {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>
-      <div className={styles.leaderRow} data-header="true"><span>Player</span>{columns.map(([key,label]) => <button type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
-      {sorted.slice(0, 10).map((row, index) => <div className={styles.leaderRow} key={`${row.round}-${row.id}`}><strong><i>{index + 1}</i>{row.name}</strong><span>{row.holes >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
+      <div className={styles.leaderRow} data-header="true"><span>Rank</span><span>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key,label]) => <button type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
+      {sorted.slice(0, 10).map((row) => <div className={styles.leaderRow} key={`${row.round}-${row.id}`} aria-label={pairing ? `Scramble pairing ${row.name}` : undefined}><i>{ranks.get(row.id)}</i><strong>{row.name}</strong><span>{row.holes >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
     </div>}
   </section>;
 }
@@ -226,13 +240,13 @@ export default function TournamentDashboard({ initialData, loadError }) {
           return next;
         });
       }} key={round.number}>
-        <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><span><b>{tournament.teamOne.name} {formatPoints(teamOneScore)} – {formatPoints(teamTwoScore)} {tournament.teamTwo.name}</b><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></span></summary>
+        <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><div className={styles.roundSummaryResult}><span className={styles.roundScore} aria-label={`${tournament.teamOne.name} ${formatPoints(teamOneScore)}, ${tournament.teamTwo.name} ${formatPoints(teamTwoScore)}`}><span>{tournament.teamOne.name}</span><b>{formatPoints(teamOneScore)} – {formatPoints(teamTwoScore)}</b><span>{tournament.teamTwo.name}</span></span><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></div></summary>
         <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <div className={styles.empty}><strong>{filterEmptyMessage(filter, round)}</strong><span>Choose another filter or check back after the next update.</span></div>}</div>
       </details>;
     })}</div>
     {selectedRound === "overall"
       ? <OverallLeaderboard rows={data?.leaderboard || []} />
-      : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} />}
+      : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} format={activeRound?.format} />}
     {loadError ? <p className={styles.note}>{loadError}</p> : null}
   </section>;
 }

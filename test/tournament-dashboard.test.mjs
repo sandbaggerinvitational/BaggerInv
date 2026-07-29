@@ -47,7 +47,7 @@ test("Tournament controls are dynamic, accessible, and client-side", async () =>
 test("Tournament match cards remain compact and preserve official match data", async () => {
   const [source, styles, dataSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(dataUrl, "utf8")]);
   assert.match(source, /Round \{round\.number\}\{match\.match \? ` • Match/);
-  assert.match(source, /playerMeta\(player\)/);
+  assert.match(source, /playerMeta\(player, format\)/);
   assert.match(source, /HCP \$\{formatHandicap\(player\.playingHcp\)\}/);
   assert.match(source, /\+\$\{player\.stroke\} stroke/);
   assert.match(source, /matchResult\(match, tournament\)/);
@@ -57,8 +57,12 @@ test("Tournament match cards remain compact and preserve official match data", a
   assert.match(styles, /\.viewMatch\{[^}]*padding:3px 1px/);
   assert.doesNotMatch(styles, /\.viewMatch\{[^}]*(border|border-radius|background):/);
   assert.match(dataSource, /const matchRow = scoringMatchMap\.get\(matchId\) \|\| liveRow/);
+  assert.match(dataSource, /function completeMatchMap\(rows\)/);
+  assert.match(dataSource, /if \(clean\(value\)\) merged\[field\] = value/);
   assert.match(dataSource, /playerEntry\(matchRow, 1, 1, playerMap\)/);
   assert.match(dataSource, /playerEntry\(matchRow, 2, 2, playerMap\)/);
+  assert.match(dataSource, /`Team \$\{side\} Player \$\{slot\} Playing Handicap`/);
+  assert.match(dataSource, /`T\$\{side\} P\$\{slot\} Stroke`/);
   assert.match(styles, /\.matchCard\{[^}]*padding:10px/);
   assert.match(styles, /\.versus\{[^}]*grid-template-columns:minmax\(0,1fr\) 20px minmax\(0,1fr\)/);
   assert.doesNotMatch(styles, /overflow-x:\s*(auto|scroll).*\\.page/);
@@ -74,7 +78,28 @@ test("Round score leaderboard sorts from headers and handles partial and empty s
   assert.match(source, /Partial standings publish as valid holes are confirmed/);
   assert.match(source, /aria-label=\{key === "netToPar" \? "Net score relative to par"/);
   assert.match(source, /Number\(value\) === 0 \? "E"/);
+  assert.match(source, /<span>Rank<\/span><span>\{pairing \? "Pairing" : "Player"\}<\/span>/);
   for (const label of ["Gross", "Net", "Net +/-"]) assert.equal(source.includes(`"${label}"`), true);
+});
+
+test("Scramble cards use golfer handicaps and one team-level stroke treatment", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /format !== "SC" && hasValue\(player\.stroke\)/);
+  assert.match(source, /format === "SC" && hasValue\(playingHcp\)/);
+  assert.match(source, /Team Playing Handicap: \{formatHandicap\(playingHcp\)\}/);
+  assert.match(source, /teamStroke > 0/);
+  assert.match(source, /team stroke\{teamStroke === 1 \? "" : "s"\}/);
+});
+
+test("Scramble leaderboard creates one shared pairing row while other formats remain individual", async () => {
+  const [source, dataSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8")]);
+  assert.match(dataSource, /if \(format === "SC"\) \{/);
+  assert.match(dataSource, /entityId: `\$\{clean\(match\["Match ID"\]\)\}:team-\$\{side\}`/);
+  assert.match(dataSource, /name: playerIds\.map\(\(id\) => playerMap\[id\]\?\.name \|\| id\)\.join\(" \/ "\)/);
+  assert.match(dataSource, /entityType: format === "SC" \? "PAIRING" : "PLAYER"/);
+  assert.match(source, /Scramble Pairing Leaderboard/);
+  assert.match(source, /aria-label=\{pairing \? `Scramble pairing \$\{row\.name\}`/);
+  assert.match(source, /const pairing = format === "Scramble" \|\| format === "SC"/);
 });
 
 test("Overall uses official points and record standings instead of cumulative strokes", async () => {
@@ -83,17 +108,35 @@ test("Overall uses official points and record standings instead of cumulative st
   assert.match(source, /Individual Points &amp; Record/);
   for (const label of ["Rank", "Player", "Record", "Points"]) assert.match(source, new RegExp(`>${label}(?: <|<)`));
   assert.match(source, /<OverallLeaderboard rows=\{data\?\.leaderboard \|\| \[\]\} \/>/);
-  assert.match(source, /<ScoreLeaderboard rows=\{data\?\.scoreLeaderboard \|\| \[\]\} round=\{activeRound\?\.number\} \/>/);
+  assert.match(source, /<ScoreLeaderboard rows=\{data\?\.scoreLeaderboard \|\| \[\]\} round=\{activeRound\?\.number\} format=\{activeRound\?\.format\} \/>/);
   assert.doesNotMatch(source.slice(source.indexOf("function OverallLeaderboard"), source.indexOf("export default function")), /gross|netToPar|cumulative/i);
 });
 
 test("Snapshot counts use distinct live, remaining, and final labels", async () => {
-  const source = await readFile(componentUrl, "utf8");
-  assert.match(source, /<small>Live Matches<\/small>/);
-  assert.match(source, /<small>Matches Remaining<\/small>/);
-  assert.match(source, /<small>Final Matches<\/small>/);
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /<small aria-label="Live matches">LIVE<\/small>/);
+  assert.match(source, /<small aria-label="Matches remaining">REMAINING<\/small>/);
+  assert.match(source, /<small aria-label="Final matches">FINAL<\/small>/);
   assert.match(source, /state\.totalMatches - state\.remainingMatches/);
   assert.doesNotMatch(source, /<small>Still On Course<\/small>/);
+  assert.match(styles, /\.snapshotMeta\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(styles, /\.snapshotMeta span\{[^}]*min-height:52px/);
+  assert.match(styles, /\.snapshotMeta small\{[^}]*white-space:nowrap/);
+});
+
+test("Round summaries center team names around an independent score", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /className=\{styles\.roundScore\}/);
+  assert.match(source, /\{formatPoints\(teamOneScore\)\} – \{formatPoints\(teamTwoScore\)\}/);
+  assert.match(styles, /\.roundScore\{[^}]*grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)/);
+  assert.match(styles, /\.roundScore>span\{[^}]*text-align:center|\.roundScore\{[^}]*text-align:center/);
+  assert.match(styles, /\.roundScore>b\{[^}]*white-space:nowrap/);
+});
+
+test("Overall leaderboard uses compact proportional columns with team under player", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(styles, /\.overallRow\{[^}]*grid-template-columns:12% minmax\(0,48%\) 20% 20%/);
+  assert.match(source, /<small><Logo filename=\{row\.teamLogo\} name=\{row\.team\} size="mini" \/>\{row\.team\}<\/small>/);
 });
 
 test("Tournament tee times reuse the approved formatter and never construct Invalid Date", async () => {
