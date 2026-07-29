@@ -101,7 +101,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
   const result = participantResult(match);
   const courseMeta = [formatTee(match.tee), formatTime(match.teeTime)].filter(Boolean).join(" • ");
   const support = statusSupport(match, status);
-  const detailsHref = `/live?view=matchups&round=${match.round}#match-${match.matchId}`;
+  const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=my-match`;
   const action = status === "Live"
     ? match.holesRecorded ? "Continue Scoring" : "Start Scoring"
     : status === "Final" ? "View Final" : "View Match";

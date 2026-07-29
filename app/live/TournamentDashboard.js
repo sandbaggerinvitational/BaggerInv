@@ -83,7 +83,7 @@ function TournamentMatchCard({ match, round, tournament }) {
   const result = matchResult(match, tournament);
   const finalResult = finalResultParts(match, tournament);
   const tee = match.course?.tee ? `${match.course.tee} Tees` : "";
-  const href = `/live?view=matchups&round=${round.number}#match-${match.id}`;
+  const href = `/game-center/${encodeURIComponent(match.id)}?from=tournament`;
   return <Link className={styles.matchCard} href={href} aria-label={`Round ${round.number}, Match ${match.match}, ${match.formatName || round.format}, ${status}${result ? `, ${result}` : ""}`}>
     <div className={styles.matchHead}>
       <span><small>Round {round.number}{match.match ? ` • Match ${match.match}` : ""}</small><strong>{match.formatName || round.format || "Format TBA"}</strong></span>
