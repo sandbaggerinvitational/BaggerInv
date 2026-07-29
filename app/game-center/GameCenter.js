@@ -111,7 +111,6 @@ function ResultSegments({ data }) {
     </div>
     <div className={styles.segmentResult} role="tabpanel">
       {winner ? <>
-        <span>{/halved/i.test(winner) ? "Halved" : "Winner"}</span>
         <strong>{/halved/i.test(winner) ? "Halved" : winnerName(winner, teamNames)}</strong>
         {pointValue !== null ? <small>{/halved/i.test(winner)
           ? `${formatPoints(pointValue / 2)} Point${pointValue / 2 === 1 ? "" : "s"} Each`
@@ -119,9 +118,11 @@ function ResultSegments({ data }) {
       </> : <strong>Result pending</strong>}
     </div>
     {data.points.team1Points !== null && data.points.team2Points !== null ? <div className={styles.matchPoints}>
-      <span><small>Match Total</small><strong>{teamNames[1]} {formatPoints(data.points.team1Points)}</strong></span>
-      <b aria-hidden="true">–</b>
-      <span><small>Final Points</small><strong>{formatPoints(data.points.team2Points)} {teamNames[2]}</strong></span>
+      <h3>Match Total</h3>
+      <div>
+        <span><small>{teamNames[1]}</small><strong>{formatPoints(data.points.team1Points)}</strong></span>
+        <span><small>{teamNames[2]}</small><strong>{formatPoints(data.points.team2Points)}</strong></span>
+      </div>
     </div> : null}
   </section>;
 }
@@ -213,6 +214,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   const [updatedLabel, setUpdatedLabel] = useState("Updated just now");
   const [error, setError] = useState("");
   const [opening, setOpening] = useState(false);
+  const [navigating, setNavigating] = useState(false);
   const requestActive = useRef(false);
   const teamNames = data.display.teamNames;
   const format = clean(data.match.format || data.match.Format).toUpperCase();
@@ -292,9 +294,36 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     minute: "2-digit",
     timeZone: data.tournament.timeZone || "America/Chicago",
   }).format(new Date(confirmedAt)) : "";
+  const matchHref = (destination) => destination
+    ? `/game-center/${encodeURIComponent(destination.id)}?from=${encodeURIComponent(backTo)}`
+    : "";
+  const beginMatchNavigation = (event) => {
+    if (navigating) {
+      event.preventDefault();
+      return;
+    }
+    setNavigating(true);
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
 
   return <article className={styles.gameCenter}>
-    <Link className={styles.backLink} href={backHref}>‹ {backLabel}</Link>
+    <nav className={styles.matchNavigation} aria-label="Game Center match navigation">
+      <Link className={styles.backLink} href={backHref}>‹ {backLabel}</Link>
+      <span>
+        {data.navigation?.previous ? <Link
+          href={matchHref(data.navigation.previous)}
+          aria-label={`Previous match: ${data.navigation.previous.label}`}
+          aria-disabled={navigating}
+          onClick={beginMatchNavigation}
+        >‹ Previous Match</Link> : null}
+        {data.navigation?.next ? <Link
+          href={matchHref(data.navigation.next)}
+          aria-label={`Next match: ${data.navigation.next.label}`}
+          aria-disabled={navigating}
+          onClick={beginMatchNavigation}
+        >Next Match ›</Link> : null}
+      </span>
+    </nav>
 
     <section className={styles.matchIdentity}>
       <div><small>Round {data.match.round || data.match.Round}{matchNumber ? ` • Match ${matchNumber}` : ""}</small><h1>{data.match.formatName || data.display.formatName || format}</h1></div>

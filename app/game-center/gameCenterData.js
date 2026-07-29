@@ -3,6 +3,7 @@ import { readLiveScoringMatch } from "../../lib/google-sheets-write.js";
 import { getTournamentData } from "../live/sheetData.js";
 import {
   gameCenterHoles,
+  gameCenterNavigation,
   gameCenterPoints,
   gameCenterState,
   gameCenterStats,
@@ -44,6 +45,7 @@ export async function getGameCenterData(matchId) {
     result,
     storedResult,
     resultConflict: state === "final" && Boolean(storedResult) && storedResult.toUpperCase() !== result.toUpperCase(),
+    navigation: gameCenterNavigation(tournamentData.rounds, id),
     canConfirm: scoring.canConfirm,
   };
 }

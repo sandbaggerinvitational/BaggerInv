@@ -75,6 +75,14 @@ function TeamBlock({ team, players, tournamentLogoFilename }) {
 
 function participantResult(match) {
   if (!match.result) return "";
+  const shared = String(match.result.officialResult || "").trim();
+  if (/^halved$/i.test(shared)) return "HALVED";
+  const sharedWinner = [match.team?.name, match.opponentTeam?.name]
+    .find((name) => name && shared.toLowerCase().startsWith(String(name).toLowerCase()));
+  if (sharedWinner) {
+    const notation = shared.slice(sharedWinner.length).trim().toUpperCase();
+    return `${sharedWinner === match.team?.name ? "WON" : "LOST"} ${notation}`.trim();
+  }
   if (match.result.winner === "Halved") return "HALVED";
   const won = match.result.winner === match.team?.name;
   const official = String(match.result.statusText || "").trim();

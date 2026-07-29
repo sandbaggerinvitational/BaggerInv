@@ -18,6 +18,7 @@ import { getStrokesOnHole } from "../../lib/scorecard-net";
 import { resolveSpreadsheetId } from "../../lib/spreadsheet-environment";
 import { formatHomeTime } from "../../lib/home-dashboard";
 import { mergeRowsByStableMatchId } from "../../lib/live-match-source";
+import { finalizedMatchResult } from "../../lib/game-center";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -372,6 +373,10 @@ export async function getTournamentData() {
       const courseId = matchRow["Course ID"] || "";
       const course = courseMap[courseId] || { id: courseId, name: courseId, logo: "", tee: "" };
       const rule = rulesByRound[round] || {};
+      const matchHoleScores = liveHoleScores.filter((row) => clean(row["Match ID"]) === matchId);
+      const standardFinalResult = permanentFinal
+        ? finalizedMatchResult(authoritative, matchHoleScores, { 1: teams[1].name, 2: teams[2].name })
+        : "";
       return {
         id: matchId,
         round,
@@ -386,6 +391,7 @@ export async function getTournamentData() {
         updatedBy: authoritative["Updated By"] || liveRow["Updated By"] || "",
         notes: publicResultAllowed ? replaceTeamIds(authoritative.Notes, teams) : "",
         liveStatusText: publicResultAllowed ? replaceTeamIds(authoritative["Match Status Text"], teams) : "",
+        finalResult: standardFinalResult,
         team1HolesWon: number(authoritative["Team 1 Holes Won"]) ?? 0,
         team2HolesWon: number(authoritative["Team 2 Holes Won"]) ?? 0,
         currentHole: number(authoritative["Current Hole"]) ?? 0,

@@ -40,6 +40,7 @@ function matchResult(match, tournament) {
     return `${Number(match.team1HolesWon) > Number(match.team2HolesWon) ? tournament.teamOne.name : tournament.teamTwo.name} ${difference} Up`;
   }
   if (state !== "final") return "";
+  if (match.finalResult) return match.finalResult.toUpperCase();
   if (match.liveStatusText) return match.liveStatusText.toUpperCase();
   if ([match.overallWinner, match.matchupWinner].includes("Halved") || Number(match.team1Points) === Number(match.team2Points)) return "HALVED";
   const winner = Number(match.team1Points) > Number(match.team2Points) ? tournament.teamOne.name : tournament.teamTwo.name;

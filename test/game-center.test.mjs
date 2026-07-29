@@ -3,11 +3,13 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   gameCenterHoles,
+  gameCenterNavigation,
   gameCenterPoints,
   gameCenterState,
   gameCenterStats,
   liveMatchResult,
   matchPlayNotation,
+  finalizedMatchResult,
   officialMatchResult,
 } from "../lib/game-center.js";
 
@@ -98,6 +100,37 @@ test("Preview Match 2026-R1-1 finalized sequence resolves to 7 & 6, not 8 & 7", 
   const winners = ["Halved", "Team 2", "Halved", "Halved", "Team 2", "Team 2", "Halved", "Team 2", "Team 2", "Team 2", "Halved", "Team 2", "Team 1", "Halved", "Team 2", "Team 2", "Halved", "Halved"];
   const holes = winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
   assert.equal(matchPlayNotation(holes, names), "Lipp It and Rip It 7 & 6");
+});
+
+test("shared final formatter overrides stale stored wording with trusted hole history", () => {
+  const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
+  const winners = ["Halved", "Team 2", "Halved", "Halved", "Team 2", "Team 2", "Halved", "Team 2", "Team 2", "Team 2", "Halved", "Team 2"];
+  const holes = winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
+  const match = { "Match Status": "Final", "Match Status Text": "Team 2 8 UP through 18" };
+  assert.equal(finalizedMatchResult(match, holes, names), "Lipp It and Rip It 7 & 6");
+});
+
+test("Game Center navigation stays within official tournament order and boundaries", () => {
+  const rounds = [
+    { number: 1, matches: [
+      { id: "2026-R1-2", match: 2, teeTime: "8:20 AM" },
+      { id: "2026-R1-1", match: 1, teeTime: "7:40 AM" },
+    ] },
+    { number: 2, matches: [{ id: "2026-R2-1", match: 1, teeTime: "2:40 PM" }] },
+  ];
+  assert.deepEqual(gameCenterNavigation(rounds, "2026-R1-1"), {
+    previous: null,
+    next: { id: "2026-R1-2", label: "Round 1, Match 2" },
+  });
+  assert.deepEqual(gameCenterNavigation(rounds, "2026-R1-2"), {
+    previous: { id: "2026-R1-1", label: "Round 1, Match 1" },
+    next: { id: "2026-R2-1", label: "Round 2, Match 1" },
+  });
+  assert.deepEqual(gameCenterNavigation(rounds, "2026-R2-1"), {
+    previous: { id: "2026-R1-2", label: "Round 1, Match 2" },
+    next: null,
+  });
+  assert.deepEqual(gameCenterNavigation(rounds, "2025-R3-1"), { previous: null, next: null });
 });
 
 test("Hole tracker preserves won, lost, halved, current, and unplayed data", () => {
@@ -225,13 +258,42 @@ test("Hole Tracker uses clear single-character outcomes and accessible labels", 
 
 test("Result segments avoid repeated headings and updater names", async () => {
   const source = await readFile(componentUrl, "utf8");
-  assert.match(source, /"Winner"/);
   assert.match(source, /"Halved"/);
   assert.match(source, /Point\$\{pointValue === 1/);
   assert.doesNotMatch(source, /options\.find\(\(\[key\]\) => key === selected\)/);
   assert.match(source, /<small>\{updatedLabel\}<\/small>/);
   assert.match(source, /Scorecard confirmed/);
   assert.match(source, /by \$\{data\.match\.updatedBy/);
+  assert.match(source, /<h3>Match Total<\/h3>/);
+  assert.doesNotMatch(source, /Final Points/);
+});
+
+test("Game Center provides compact previous and next navigation with origin and loading protection", async () => {
+  const [source, data] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8")]);
+  assert.match(data, /gameCenterNavigation\(tournamentData\.rounds, id\)/);
+  assert.match(source, /Previous Match/);
+  assert.match(source, /Next Match/);
+  assert.match(source, /from=\$\{encodeURIComponent\(backTo\)\}/);
+  assert.match(source, /aria-label=\{`Previous match:/);
+  assert.match(source, /aria-label=\{`Next match:/);
+  assert.match(source, /if \(navigating\)/);
+  assert.match(source, /window\.scrollTo\(\{ top: 0, behavior: "auto" \}\)/);
+  assert.match(source, /<Link className=\{styles\.backLink\} href=\{backHref\}>/);
+});
+
+test("Tournament, My Match, and Home consume shared final result data", async () => {
+  const homeAppUrl = new URL("../lib/mobile-tournament-app.js", import.meta.url);
+  const sheetUrl = new URL("../app/live/sheetData.js", import.meta.url);
+  const [tournament, myMatch, homeApp, sheet] = await Promise.all([
+    readFile(tournamentUrl, "utf8"),
+    readFile(myMatchUrl, "utf8"),
+    readFile(homeAppUrl, "utf8"),
+    readFile(sheetUrl, "utf8"),
+  ]);
+  assert.match(sheet, /finalizedMatchResult\(authoritative, matchHoleScores/);
+  assert.match(tournament, /match\.finalResult/);
+  assert.match(myMatch, /match\.result\.officialResult/);
+  assert.match(homeApp, /match\.result\?\.officialResult/);
 });
 
 test("Frozen Home, My Match, and Tournament remain outside this refinement", async () => {
