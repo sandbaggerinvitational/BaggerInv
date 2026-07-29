@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
-import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
+import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPoints } from "../../lib/formatters";
 import { filterEmptyMessage, filterMatches, matchState, relativeUpdatedLabel } from "../../lib/live-match-ux";
 import styles from "./tournament-dashboard.module.css";
@@ -39,9 +39,10 @@ function matchResult(match, tournament) {
     return `${Number(match.team1HolesWon) > Number(match.team2HolesWon) ? tournament.teamOne.name : tournament.teamTwo.name} ${difference} Up`;
   }
   if (state !== "final") return "";
+  if (match.liveStatusText) return match.liveStatusText.toUpperCase();
   if ([match.overallWinner, match.matchupWinner].includes("Halved") || Number(match.team1Points) === Number(match.team2Points)) return "HALVED";
   const winner = Number(match.team1Points) > Number(match.team2Points) ? tournament.teamOne.name : tournament.teamTwo.name;
-  return match.liveStatusText || `${winner} WON`;
+  return `${winner} WON`;
 }
 
 function playerMeta(player) {
@@ -80,7 +81,7 @@ function TournamentMatchCard({ match, round, tournament }) {
       <b aria-label="versus">VS</b>
       <Team team={tournament.teamTwo} players={match.team2Players} />
     </div>
-    <span className={styles.viewMatch}>View Match <i aria-hidden="true">→</i></span>
+    <span className={styles.viewMatch}>View Match <i aria-hidden="true">›</i></span>
   </Link>;
 }
 
@@ -104,9 +105,9 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
     </div>
     <div className={styles.snapshotMeta}>
       <span><small>Current Round</small><strong>{round?.label || "Overall"}</strong></span>
-      <span><small>Live</small><strong>{state.liveMatches} matches</strong></span>
-      <span><small>Still On Course</small><strong>{state.remainingMatches}</strong></span>
-      <span><small>Points Remaining</small><strong>{formatPoints(state.remainingPoints)}</strong></span>
+      <span><small>Live Matches</small><strong>{state.liveMatches}</strong></span>
+      <span><small>Matches Remaining</small><strong>{state.remainingMatches}</strong></span>
+      <span><small>Final Matches</small><strong>{state.totalMatches - state.remainingMatches}</strong></span>
     </div>
     <div className={styles.progress}>
       <span><strong>{progress.completedMatches} of {progress.totalMatches} matches complete</strong><small>{progress.liveMatches} live • {progress.scheduledMatches} upcoming</small></span>
@@ -129,8 +130,43 @@ function ScoreLeaderboard({ rows = [], round }) {
   return <section className={styles.leaderboard}>
     <header><span><small>Round Leaderboard</small><h2>Individual Gross &amp; Net</h2></span>{eligible.length ? <em>Live</em> : null}</header>
     {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>
-      <div className={styles.leaderRow} data-header="true"><button type="button" onClick={() => select("name")} aria-sort={sort.key === "name" ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>Player</button>{columns.map(([key,label]) => <button type="button" key={key} onClick={() => select(key)} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
+      <div className={styles.leaderRow} data-header="true"><span>Player</span>{columns.map(([key,label]) => <button type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
       {sorted.slice(0, 10).map((row, index) => <div className={styles.leaderRow} key={`${row.round}-${row.id}`}><strong><i>{index + 1}</i>{row.name}</strong><span>{row.holes >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
+    </div>}
+  </section>;
+}
+
+function OverallLeaderboard({ rows = [] }) {
+  const [direction, setDirection] = useState("desc");
+  const sorted = useMemo(() => [...rows].sort((a, b) => {
+    const factor = direction === "asc" ? 1 : -1;
+    return (Number(a.points) - Number(b.points)) * factor ||
+      (Number(a.wins) - Number(b.wins)) * factor ||
+      a.player.localeCompare(b.player);
+  }), [rows, direction]);
+  const ranked = useMemo(() => {
+    const officialOrder = [...rows].sort((a, b) =>
+      Number(b.points) - Number(a.points) || Number(b.wins) - Number(a.wins) ||
+      Number(a.losses) - Number(b.losses) || a.player.localeCompare(b.player)
+    );
+    const rankById = new Map();
+    officialOrder.forEach((row, index) => {
+      const previous = officialOrder[index - 1];
+      const tied = previous && Number(previous.points) === Number(row.points);
+      rankById.set(row.id, tied ? rankById.get(previous.id) : index + 1);
+    });
+    return rankById;
+  }, [rows]);
+  return <section className={styles.leaderboard}>
+    <header><span><small>Overall Leaderboard</small><h2>Individual Points &amp; Record</h2></span>{rows.length ? <em>Official</em> : null}</header>
+    {!rows.length ? <div className={styles.empty}><strong>Standings will appear after the first official result.</strong><span>Points and records update as matches are finalized.</span></div> : <div className={styles.overallLeaderboard}>
+      <div className={styles.overallRow} data-header="true"><span>Rank</span><span>Player</span><span>Record</span><button type="button" onClick={() => setDirection((current) => current === "desc" ? "asc" : "desc")} aria-sort={direction === "desc" ? "descending" : "ascending"}>Points <i aria-hidden="true">{direction === "desc" ? "↓" : "↑"}</i></button></div>
+      {sorted.slice(0, 10).map((row) => <div className={styles.overallRow} key={row.id}>
+        <strong>{ranked.get(row.id)}</strong>
+        <span className={styles.overallPlayer}><span className={styles.playerImage}><AssetImage src={playerPhoto(row.photo)} alt="" fallbackClassName={styles.playerFallback} fallback={initials(row.player)} inferFallback={false} /></span><span><b>{row.player}</b><small><Logo filename={row.teamLogo} name={row.team} size="mini" />{row.team}</small></span></span>
+        <span>{row.wins}-{row.losses}-{row.halves}</span>
+        <b>{formatPoints(row.points)}</b>
+      </div>)}
     </div>}
   </section>;
 }
@@ -139,6 +175,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const [data, setData] = useState(initialData);
   const [selectedRound, setSelectedRound] = useState(() => initialData?.tournament?.currentRound || initialData?.rounds?.[0]?.number || "overall");
   const [filter, setFilter] = useState("all");
+  const [openRounds, setOpenRounds] = useState(() => new Set());
   const [lastRefresh, setLastRefresh] = useState(Date.now());
   const [clock, setClock] = useState(Date.now());
   const [refreshState, setRefreshState] = useState("current");
@@ -175,13 +212,27 @@ export default function TournamentDashboard({ initialData, loadError }) {
     <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
     <div className={styles.roundGroups}>{selectedRounds.map((round) => {
       const matches = filterMatches(round.matches || [], filter);
-      const complete = round.status === "Complete";
-      return <details className={styles.roundGroup} open={!complete || selectedRound !== "overall"} key={round.number}>
-        <summary><span><small>{round.label}</small><strong>{round.format}</strong><em>{round.course?.name || "Course TBA"}</em></span><span><b>{round.progress.completedMatches}/{round.progress.totalMatches} final</b><i aria-hidden="true">⌄</i></span></summary>
+      const isOverall = selectedRound === "overall";
+      const isOpen = !isOverall || openRounds.has(round.number);
+      const liveCount = (round.matches || []).filter((match) => matchState(match) === "live").length;
+      const teamOneScore = (round.matches || []).reduce((sum, match) => sum + (Number(match.team1Points) || 0), 0);
+      const teamTwoScore = (round.matches || []).reduce((sum, match) => sum + (Number(match.team2Points) || 0), 0);
+      return <details className={styles.roundGroup} open={isOpen} onToggle={(event) => {
+        if (!isOverall) return;
+        const expanded = event.currentTarget.open;
+        setOpenRounds((current) => {
+          const next = new Set(current);
+          if (expanded) next.add(round.number); else next.delete(round.number);
+          return next;
+        });
+      }} key={round.number}>
+        <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><span><b>{tournament.teamOne.name} {formatPoints(teamOneScore)} – {formatPoints(teamTwoScore)} {tournament.teamTwo.name}</b><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></span></summary>
         <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <div className={styles.empty}><strong>{filterEmptyMessage(filter, round)}</strong><span>Choose another filter or check back after the next update.</span></div>}</div>
       </details>;
     })}</div>
-    <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} />
+    {selectedRound === "overall"
+      ? <OverallLeaderboard rows={data?.leaderboard || []} />
+      : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} />}
     {loadError ? <p className={styles.note}>{loadError}</p> : null}
   </section>;
 }

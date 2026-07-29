@@ -16,6 +16,7 @@ import {
 } from "../../lib/tournament-identifiers";
 import { getStrokesOnHole } from "../../lib/scorecard-net";
 import { resolveSpreadsheetId } from "../../lib/spreadsheet-environment";
+import { formatHomeTime } from "../../lib/home-dashboard";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -78,12 +79,8 @@ function formatTime(value) {
   const raw = clean(value);
   if (!raw) return "";
   const match = raw.match(/Date\(\d+,\d+,\d+,(\d+),(\d+),(\d+)\)/);
-  if (match) return new Date(2000, 0, 1, Number(match[1]), Number(match[2]), Number(match[3])).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  if (/^\d{1,2}:\d{2}/.test(raw)) {
-    const [hours, minutes] = raw.split(":").map(Number);
-    return new Date(2000, 0, 1, hours, minutes).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  }
-  return raw;
+  if (match) return formatHomeTime(`${match[1]}:${match[2]}`);
+  return formatHomeTime(raw);
 }
 
 function normalizeWinner(value) {
@@ -187,7 +184,7 @@ function resultFields(source, fallback) {
   const result = { ...fallback };
   for (const field of [
     "Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner",
-    "Team 1 Points", "Team 2 Points", "Match Status", "Notes", "Finalized At", "Finalized By",
+    "Team 1 Points", "Team 2 Points", "Match Status", "Match Status Text", "Notes", "Finalized At", "Finalized By",
   ]) {
     if (clean(source?.[field])) result[field] = source[field];
   }
@@ -314,24 +311,25 @@ export async function getTournamentData() {
       const permanentStatus = clean(permanent["Match Status"]);
       const permanentFinal = /^(final|finalized|ghost match)$/i.test(permanentStatus) || clean(permanent["Finalized At"]);
       const authoritative = permanentFinal ? resultFields(permanent, liveRow) : liveRow;
+      const matchRow = scoringMatchMap.get(matchId) || liveRow;
       const rawStatus = clean(authoritative["Match Status"] || liveRow["Match Status"]);
       const publicResultAllowed = permanentFinal || isLiveMatch({ status: rawStatus });
       const status = permanentFinal
         ? (/^ghost match$/i.test(permanentStatus) ? "Ghost Match" : "Final")
         : isLiveMatch({ status: rawStatus }) ? rawStatus : "Scheduled";
-      const format = clean(liveRow.Format || permanent.Format).toUpperCase();
-      const round = Number(liveRow.Round || permanent.Round) || 1;
-      const courseId = liveRow["Course ID"] || permanent["Course ID"] || "";
+      const format = clean(matchRow.Format).toUpperCase();
+      const round = Number(matchRow.Round) || 1;
+      const courseId = matchRow["Course ID"] || "";
       const course = courseMap[courseId] || { id: courseId, name: courseId, logo: "", tee: "" };
       const rule = rulesByRound[round] || {};
       return {
         id: matchId,
         round,
-        match: liveRow.Match || permanent.Match || "",
+        match: matchRow.Match || "",
         format,
         formatName: displayFormat(format),
         course,
-        teeTime: formatTime(liveRow["Tee Time"] || permanent["Tee Time"]),
+        teeTime: formatTime(matchRow["Tee Time"]),
         status,
         finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",
         updatedAt: authoritative["Updated At"] || liveRow["Updated At"] || "",
@@ -341,12 +339,12 @@ export async function getTournamentData() {
         team1HolesWon: number(authoritative["Team 1 Holes Won"]) ?? 0,
         team2HolesWon: number(authoritative["Team 2 Holes Won"]) ?? 0,
         currentHole: number(authoritative["Current Hole"]) ?? 0,
-        team1Players: [playerEntry(liveRow, 1, 1, playerMap), playerEntry(liveRow, 1, 2, playerMap)].filter(Boolean),
-        team2Players: [playerEntry(liveRow, 2, 1, playerMap), playerEntry(liveRow, 2, 2, playerMap)].filter(Boolean),
-        team1PlayingHcp: number(liveRow["Team 1 Playing HCP"]),
-        team2PlayingHcp: number(liveRow["Team 2 Playing HCP"]),
-        team1Stroke: number(liveRow["Team 1 Stroke"]),
-        team2Stroke: number(liveRow["Team 2 Stroke"]),
+        team1Players: [playerEntry(matchRow, 1, 1, playerMap), playerEntry(matchRow, 1, 2, playerMap)].filter(Boolean),
+        team2Players: [playerEntry(matchRow, 2, 1, playerMap), playerEntry(matchRow, 2, 2, playerMap)].filter(Boolean),
+        team1PlayingHcp: number(matchRow["Team 1 Playing HCP"]),
+        team2PlayingHcp: number(matchRow["Team 2 Playing HCP"]),
+        team1Stroke: number(matchRow["Team 1 Stroke"]),
+        team2Stroke: number(matchRow["Team 2 Stroke"]),
         matchupWinner: publicResultAllowed ? normalizeWinner(authoritative["Matchup Winner"]) : "",
         frontWinner: publicResultAllowed ? normalizeWinner(authoritative["Front 9 Winner"]) : "",
         backWinner: publicResultAllowed ? normalizeWinner(authoritative["Back 9 Winner"]) : "",
