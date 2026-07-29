@@ -40,6 +40,7 @@ test("official player standings preserve points, records, ties, and alternate me
   assert.equal(rankPlayerRows(rows, "grossAvg")[0].id, "p1");
   assert.equal(rankPlayerRows(rows, "points").find((row) => row.id === "p3").displayRank, 2);
   assert.equal(searchPlayerRows(rows, "clay")[0].id, "p2");
+  assert.equal(searchPlayerRows(rankPlayerRows(rows, "points"), "clay")[0].displayRank, 2);
   assert.deepEqual(searchPlayerRows(rows, "missing"), []);
 });
 

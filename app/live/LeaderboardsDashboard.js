@@ -64,7 +64,7 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
   const availableMetrics = useMemo(() => PLAYER_METRICS.filter(([key]) =>
     ["points", "wins", "winPct"].includes(key) || performance.some((row) => row[key] !== null)
   ), [performance]);
-  const ranked = useMemo(() => rankPlayerRows(searchPlayerRows(performance, query), metric, direction || undefined), [direction, metric, performance, query]);
+  const ranked = useMemo(() => searchPlayerRows(rankPlayerRows(performance, metric, direction || undefined), query), [direction, metric, performance, query]);
   const changeSort = () => setDirection((current) => current === "asc" ? "desc" : "asc");
   return <>
     <div className={styles.playerTools}>
