@@ -134,10 +134,10 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
       <b aria-label="versus">VS</b>
       <TeamBlock team={match.opponentTeam} players={match.opponentNames} tournamentLogoFilename={tournamentLogoFilename} />
     </div>
-    <footer>
+    <div className={styles.actionRow}>
       <span>{support}</span>
       <strong className={styles.cardAction}>{action}<i aria-hidden="true">→</i></strong>
-    </footer>
+    </div>
   </>;
 
   if (status === "Live") {

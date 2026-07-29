@@ -47,6 +47,8 @@ test("My Match keeps status, scoring access, and final results distinct", async 
   assert.match(source, /onClick=\{\(\) => onOpen\(match\)\}/);
   assert.match(source, /href=\{detailsHref\}/);
   assert.match(source, /className=\{styles\.cardAction\}/);
+  assert.match(source, /className=\{styles\.actionRow\}/);
+  assert.doesNotMatch(source, /<footer>/);
   assert.match(source, /Start Scoring/);
   assert.match(source, /Continue Scoring/);
   assert.match(source, /View Final/);
@@ -70,6 +72,8 @@ test("My Match formats tees, highlights one relevant card, and uses compact outl
   assert.match(styles, /\.cardAction\{[^}]*border:1px solid #1b5946/);
   assert.match(styles, /\.cardAction\{[^}]*background:#fffdf8/);
   assert.doesNotMatch(styles, /\.cardAction\{[^}]*background:#(?:0b|15|17)[0-9a-f]{4}/i);
+  assert.match(styles, /\.actionRow\{[^}]*background:transparent/);
+  assert.doesNotMatch(styles, /\.matchCard footer/);
 });
 
 test("My Match removes Passport removal and duplicate navigation from its list state", async () => {
