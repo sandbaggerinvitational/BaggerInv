@@ -125,6 +125,7 @@ function ResultSegments({ data }) {
         <span><small>{teamNames[2]}</small><strong>{formatPoints(data.points.team2Points)}</strong></span>
       </div>
     </div> : null}
+    {data.state === "final" && data.finalSummary ? <p className={styles.finalSummary}>{data.finalSummary}</p> : null}
   </section>;
 }
 
@@ -331,19 +332,19 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   return <article className={styles.gameCenter}>
     <nav className={styles.matchNavigation} aria-label="Game Center match navigation">
       <Link className={styles.backLink} href={backHref}>‹ {backLabel}</Link>
-      <span>
+      <span className={styles.matchNavigationGroup}>
         {data.navigation?.previous ? <Link
           href={matchHref(data.navigation.previous)}
           aria-label={`Previous match: ${data.navigation.previous.label}`}
           aria-disabled={navigating}
           onClick={beginMatchNavigation}
-        >‹ Previous Match</Link> : null}
+        >‹ <span className={styles.navigationFull}>Previous Match</span><span className={styles.navigationCompact}>Previous</span></Link> : null}
         {data.navigation?.next ? <Link
           href={matchHref(data.navigation.next)}
           aria-label={`Next match: ${data.navigation.next.label}`}
           aria-disabled={navigating}
           onClick={beginMatchNavigation}
-        >Next Match ›</Link> : null}
+        ><span className={styles.navigationFull}>Next Match</span><span className={styles.navigationCompact}>Next</span> ›</Link> : null}
       </span>
     </nav>
 

@@ -8,6 +8,7 @@ import {
   gameCenterState,
   gameCenterStats,
   gameCenterUserTeamSide,
+  finalMatchSummary,
   liveMatchResult,
   matchPlayNotation,
   finalizedMatchResult,
@@ -324,6 +325,35 @@ test("Result segments avoid repeated headings and updater names", async () => {
   assert.doesNotMatch(source, /Final Points/);
 });
 
+test("final match summary is factual and hidden outside reliable final states", () => {
+  const final = { "Match Status": "Final" };
+  const live = { "Match Status": "Live" };
+  const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
+  const score = (winners) => winners.map((winner, index) => ({
+    "Hole Number": index + 1,
+    "Hole Winner": winner,
+  }));
+  assert.equal(
+    finalMatchSummary(final, score([...Array(7).fill("Team 2"), ...Array(5).fill("Halved")]), names),
+    "Lipp It and Rip It clinched on Hole 12."
+  );
+  assert.equal(
+    finalMatchSummary(final, score([...Array(4).fill("Team 1"), ...Array(11).fill("Halved")]), names),
+    "The Pickles clinched on Hole 15."
+  );
+  assert.equal(
+    finalMatchSummary(final, score(["Team 1", ...Array(17).fill("Halved")]), names),
+    "The Pickles won 1 UP after 18 holes."
+  );
+  assert.equal(
+    finalMatchSummary(final, score(Array(18).fill("Halved")), names),
+    "Match was halved after 18 holes."
+  );
+  assert.equal(finalMatchSummary(final, score(Array(5).fill("Halved")), names), "");
+  assert.equal(finalMatchSummary(live, score(Array(18).fill("Halved")), names), "");
+  assert.equal(finalMatchSummary({}, [], names), "");
+});
+
 test("Game Center provides compact previous and next navigation with origin and loading protection", async () => {
   const [source, data] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8")]);
   assert.match(data, /gameCenterNavigation\(tournamentData\.rounds, id\)/);
@@ -335,6 +365,20 @@ test("Game Center provides compact previous and next navigation with origin and 
   assert.match(source, /if \(navigating\)/);
   assert.match(source, /window\.scrollTo\(\{ top: 0, behavior: "auto" \}\)/);
   assert.match(source, /<Link className=\{styles\.backLink\} href=\{backHref\}>/);
+  assert.match(source, /className=\{styles\.matchNavigationGroup\}/);
+  assert.match(source, /styles\.navigationCompact/);
+});
+
+test("navigation and Match Total use compact balanced mobile presentation", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(styles, /\.matchNavigationGroup\{[^}]*display:flex/);
+  assert.match(styles, /\.navigationCompact\{display:none\}/);
+  assert.match(styles, /@media\(max-width:420px\)\{\.navigationFull\{display:none\}\.navigationCompact\{display:inline\}/);
+  assert.match(styles, /\.matchPoints>div\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(styles, /\.matchPoints strong\{font-size:1\.12rem\}/);
+  assert.match(styles, /font-variant-numeric:tabular-nums/);
+  assert.doesNotMatch(source, /Final Points/);
+  assert.match(source, /data\.state === "final" && data\.finalSummary/);
 });
 
 test("Tournament, My Match, and Home consume shared final result data", async () => {

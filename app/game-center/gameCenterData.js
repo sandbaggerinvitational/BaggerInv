@@ -8,6 +8,7 @@ import {
   gameCenterState,
   gameCenterStats,
   gameCenterUserTeamSide,
+  finalMatchSummary,
   liveMatchResult,
   officialMatchResult,
 } from "../../lib/game-center.js";
@@ -44,6 +45,7 @@ export async function getGameCenterData(matchId, currentPlayerId = "") {
     stats: gameCenterStats(holes),
     state,
     result,
+    finalSummary: finalMatchSummary(match, scoring.holeScores, teamNames),
     storedResult,
     resultConflict: state === "final" && Boolean(storedResult) && storedResult.toUpperCase() !== result.toUpperCase(),
     navigation: gameCenterNavigation(tournamentData.rounds, id),
