@@ -6,6 +6,7 @@ import AssetImage from "../AssetImage";
 import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPoints } from "../../lib/formatters";
 import { filterEmptyMessage, filterMatches, matchState, relativeUpdatedLabel } from "../../lib/live-match-ux";
+import homeStyles from "../tournament-command-center.module.css";
 import styles from "./tournament-dashboard.module.css";
 
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
@@ -220,7 +221,11 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
   if (!tournament) return <section className={styles.page}><div className={styles.empty}><strong>Tournament data is unavailable.</strong><span>{loadError || "Please try again shortly."}</span></div></section>;
   return <section className={styles.page}>
-    <header className={styles.pageHeader}><Logo filename={tournament.logo || `sandbagger-${tournament.year}`} name={`${tournament.year} ${tournament.name || "Sandbagger Invitational"}`} type="tournament" size="header" /><span><small>{tournament.year} Tournament</small><h1>{tournament.name || "Sandbagger Invitational"}</h1><p>{tournament.location || "Location TBA"}</p></span><em data-state={String(tournament.status).toLowerCase()}>{tournament.status}</em></header>
+    <header className={homeStyles.homeHeader}>
+      <AssetImage src={tournamentLogo(tournament.logo || `sandbagger-${tournament.year}`)} alt={`${tournament.year} ${tournament.name || "Sandbagger Invitational"} logo`} className={homeStyles.tournamentLogo} fallbackClassName={homeStyles.tournamentLogoFallback} fallback={String(tournament.year)} inferFallback={false} />
+      <div><p>{tournament.year} Tournament</p><h1>{tournament.name || "Sandbagger Invitational"}</h1><span>{tournament.location || "Location TBA"}</span></div>
+      <span className={homeStyles.headerLive}><i aria-hidden="true" />{tournament.status}</span>
+    </header>
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />
     <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Overall"], ...rounds.map((round) => [round.number, round.label])].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
     <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
@@ -240,7 +245,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
           return next;
         });
       }} key={round.number}>
-        <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><div className={styles.roundSummaryResult}><span className={styles.roundScore} aria-label={`${tournament.teamOne.name} ${formatPoints(teamOneScore)}, ${tournament.teamTwo.name} ${formatPoints(teamTwoScore)}`}><span>{tournament.teamOne.name}</span><b>{formatPoints(teamOneScore)} – {formatPoints(teamTwoScore)}</b><span>{tournament.teamTwo.name}</span></span><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></div></summary>
+        <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><div className={styles.roundSummaryResult}><span className={styles.roundScore} aria-label={`${tournament.teamOne.name} ${formatPoints(teamOneScore)}, ${tournament.teamTwo.name} ${formatPoints(teamTwoScore)}`}><span><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="summary" /><em>{tournament.teamOne.name}</em></span><b>{formatPoints(teamOneScore)} – {formatPoints(teamTwoScore)}</b><span><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="summary" /><em>{tournament.teamTwo.name}</em></span></span><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></div></summary>
         <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <div className={styles.empty}><strong>{filterEmptyMessage(filter, round)}</strong><span>Choose another filter or check back after the next update.</span></div>}</div>
       </details>;
     })}</div>

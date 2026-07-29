@@ -12,16 +12,38 @@ const pageUrl = new URL("../app/live/page.js", import.meta.url);
 test("Tournament dashboard uses the approved compact branded hierarchy", async () => {
   const [source, styles, center] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(centerUrl, "utf8")]);
   assert.match(center, /<TournamentDashboard \{\.\.\.props\} \/>/);
+  assert.match(source, /import homeStyles from "\.\.\/tournament-command-center\.module\.css"/);
+  assert.match(source, /className=\{homeStyles\.homeHeader\}/);
+  assert.match(source, /className=\{homeStyles\.tournamentLogo\}/);
+  assert.match(source, /className=\{homeStyles\.headerLive\}/);
   assert.match(source, /tournamentLogo\(filename\)/);
   assert.match(source, /tournament\.logo \|\| `sandbagger-\$\{tournament\.year\}`/);
   assert.match(source, /<h1>\{tournament\.name \|\| "Sandbagger Invitational"\}<\/h1>/);
-  assert.match(source, /<small>\{tournament\.year\} Tournament<\/small>/);
-  assert.match(source, /<p>\{tournament\.location \|\| "Location TBA"\}<\/p>/);
+  assert.match(source, /<p>\{tournament\.year\} Tournament<\/p>/);
+  assert.match(source, /<span>\{tournament\.location \|\| "Location TBA"\}<\/span>/);
   assert.match(source, /<Snapshot tournament=/);
   assert.match(source, /Points to Clinch/);
   assert.match(source, /Momentum/);
   assert.match(styles, /\.scoreValue\{[^}]*font-variant-numeric:tabular-nums/);
   assert.doesNotMatch(source, />My Tournament<|>My Match<|Refresh live scores/);
+});
+
+test("Collapsed round summaries are compact and include both team logos", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /size="summary"/);
+  assert.equal((source.match(/size="summary"/g) || []).length, 2);
+  assert.match(styles, /\.logo\[data-size=summary\]\{width:20px;height:20px/);
+  assert.match(styles, /\.roundGroup>summary\{gap:8px;min-height:51px;padding-block:7px/);
+  assert.match(styles, /\.roundScore>span\{grid-template-columns:20px minmax\(0,1fr\)/);
+  assert.match(styles, /\.roundScore>span:last-child>\.logo\{grid-column:2\}/);
+});
+
+test("Snapshot score receives final emphasis without losing protected responsive sizing", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+  assert.match(styles, /\.scoreValue\{font-size:clamp\(1\.92rem,9\.1vw,3\.2rem\)\}/);
+  assert.match(styles, /@media\(max-width:420px\)\{\.scoreValue\{font-size:clamp\(1\.7rem,8\.7vw,2\.35rem\)\}\}/);
+  assert.match(styles, /\.scoreValue\{[^}]*white-space:nowrap/);
+  assert.match(styles, /\.scoreValue\{[^}]*font-variant-numeric:tabular-nums/);
 });
 
 test("Tournament data refreshes on open, focus, visibility, and a guarded interval", async () => {

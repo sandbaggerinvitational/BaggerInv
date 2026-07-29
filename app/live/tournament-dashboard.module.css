@@ -15,3 +15,17 @@
 @media(max-width:520px){.roundGroup>summary{align-items:flex-start;flex-direction:column}.roundSummaryResult{width:100%}.roundScore{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}}
 @media(max-width:699px){.tournamentFooter{display:none}}
 @media(display-mode:standalone){.tournamentFooter{display:none}}
+
+/* Final tournament-dashboard polish. The Home header styles are reused directly
+   in the component so both pages retain one approved visual treatment. */
+.logo[data-size=summary]{width:20px;height:20px;border-width:0}
+.scoreValue{font-size:clamp(1.92rem,9.1vw,3.2rem)}
+.roundGroup>summary{gap:8px;min-height:51px;padding-block:7px}
+.roundSummaryResult{gap:6px}
+.roundScore{gap:4px}
+.roundScore>span{grid-template-columns:20px minmax(0,1fr);min-height:2.15em;padding-block:0;line-height:1.08}
+.roundScore>span:last-child{grid-template-columns:minmax(0,1fr) 20px}
+.roundScore>span:last-child>.logo{grid-column:2}
+.roundScore>span:last-child>em{grid-column:1;grid-row:1}
+.roundScore>span>em{font-style:normal;white-space:normal}
+@media(max-width:420px){.scoreValue{font-size:clamp(1.7rem,8.7vw,2.35rem)}}
