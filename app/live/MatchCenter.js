@@ -11,6 +11,7 @@ import { formatPoints } from "../../lib/formatters";
 import { clinchingScenariosEligible } from "../../lib/live-tournament";
 import { MATCH_FILTERS, defaultMatchFilter, filterEmptyMessage, filterMatches, relativeUpdatedLabel } from "../../lib/live-match-ux";
 import TournamentLeaderboard from "../TournamentLeaderboard";
+import TournamentDashboard from "./TournamentDashboard";
 import styles from "./live.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
@@ -189,7 +190,7 @@ function PlayerLiveScorecard({ row }) {
   </div>;
 }
 
-export default function MatchCenter({ initialData, loadError }) {
+function MatchCenterExperience({ initialData, loadError }) {
   const searchParams = useSearchParams();
   const [passportPlayer, setPassportPlayer] = useState(null);
   const [data, setData] = useState(initialData);
@@ -307,4 +308,11 @@ export default function MatchCenter({ initialData, loadError }) {
       {loadError ? <p className={styles.testNote}>{loadError}</p> : null}
     </section>
   </>;
+}
+
+export default function MatchCenter(props) {
+  const searchParams = useSearchParams();
+  return searchParams.get("view")
+    ? <MatchCenterExperience {...props} />
+    : <TournamentDashboard {...props} />;
 }
