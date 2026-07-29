@@ -12,6 +12,7 @@ import { clinchingScenariosEligible } from "../../lib/live-tournament";
 import { MATCH_FILTERS, defaultMatchFilter, filterEmptyMessage, filterMatches, relativeUpdatedLabel } from "../../lib/live-match-ux";
 import TournamentLeaderboard from "../TournamentLeaderboard";
 import TournamentDashboard from "./TournamentDashboard";
+import LeaderboardsDashboard from "./LeaderboardsDashboard";
 import styles from "./live.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
@@ -312,6 +313,7 @@ function MatchCenterExperience({ initialData, loadError }) {
 
 export default function MatchCenter(props) {
   const searchParams = useSearchParams();
+  if (searchParams.get("view") === "leaderboards") return <LeaderboardsDashboard {...props} />;
   return searchParams.get("view")
     ? <MatchCenterExperience {...props} />
     : <TournamentDashboard {...props} />;
