@@ -150,6 +150,11 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(styles, /\.roundMatchup > div[\s\S]*gap:\s*2px/);
   assert.match(styles, /\.roundMatchup \.playerLines\s*\{[\s\S]*gap:\s*2px/);
   assert.match(styles, /\.playerLines small[\s\S]*font:\s*850 0\.42rem/);
+  assert.match(component, /data-current=\{name === currentPlayer \? "true" : undefined\}/);
+  assert.match(styles, /\.playerLines > span\[data-current="true"\][\s\S]*position:\s*relative/);
+  assert.match(styles, /\.playerLines > span\[data-current="true"\][\s\S]*padding-inline:\s*22px/);
+  assert.match(styles, /\.playerLines small[\s\S]*position:\s*absolute/);
+  assert.match(styles, /\.playerLines small[\s\S]*right:\s*0/);
   assert.match(commandStyles, /--home-eyebrow-color:#b58a25/);
   assert.match(commandStyles, /\.homeHeader p,\.sectionHeader p,\.pulseHeader p[\s\S]*line-height:1\.2/);
   assert.match(commandStyles, /\.scoreboard strong\{font-size:3\.1rem/);

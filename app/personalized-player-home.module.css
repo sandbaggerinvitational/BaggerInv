@@ -188,8 +188,18 @@
   justify-content: center;
 }
 
+.playerLines > span[data-current="true"] {
+  position: relative;
+  width: 100%;
+  padding-inline: 22px;
+  box-sizing: border-box;
+}
+
 .playerLines small {
-  flex: 0 0 auto;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
   padding: 1px 3px;
   border-radius: 999px;
   background: #edf2ef;

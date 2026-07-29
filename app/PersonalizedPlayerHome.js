@@ -49,7 +49,7 @@ function matchTime(match, timeZone) {
 function PlayerLines({ names, currentPlayer }) {
   if (!names?.length) return <span className={styles.playerTbd}>Players TBD</span>;
   return <div className={styles.playerLines}>{names.map((name) =>
-    <span key={name}>
+    <span key={name} data-current={name === currentPlayer ? "true" : undefined}>
       {name}
       {name === currentPlayer ? <small>YOU</small> : null}
     </span>
