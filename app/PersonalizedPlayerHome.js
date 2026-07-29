@@ -46,14 +46,15 @@ function matchTime(match, timeZone) {
   });
 }
 
-function PlayerLines({ names, currentPlayer }) {
+function PlayerLines({ names, currentPlayer, showCurrentBadge = true }) {
   if (!names?.length) return <span className={styles.playerTbd}>Players TBD</span>;
-  return <div className={styles.playerLines}>{names.map((name) =>
-    <span key={name} data-current={name === currentPlayer ? "true" : undefined}>
-      {name}
-      {name === currentPlayer ? <small>YOU</small> : null}
-    </span>
-  )}</div>;
+  return <div className={styles.playerLines}>{names.map((name) => {
+    const showBadge = showCurrentBadge && name === currentPlayer;
+    return <span key={name} data-current={showBadge ? "true" : undefined}>
+      <span className={styles.playerNameText}>{name}</span>
+      {showBadge ? <small aria-label="Current player">YOU</small> : null}
+    </span>;
+  })}</div>;
 }
 
 function MatchPeople({ match, currentPlayer }) {
@@ -117,9 +118,9 @@ function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
             <small>{[tee, matchTime(match, timeZone) || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
           </div>
           <div className={styles.roundMatchup}>
-            <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} currentPlayer={currentPlayer} /></div>
+            <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} currentPlayer={currentPlayer} showCurrentBadge={false} /></div>
             <i>VS</i>
-            <div><em>{match.opponentTeam?.name || "Opposing team"}</em><PlayerLines names={match.opponentNames} currentPlayer={currentPlayer} /></div>
+            <div><em>{match.opponentTeam?.name || "Opposing team"}</em><PlayerLines names={match.opponentNames} currentPlayer={currentPlayer} showCurrentBadge={false} /></div>
           </div>
         </Link>;
       })}

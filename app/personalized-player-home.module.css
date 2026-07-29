@@ -189,22 +189,31 @@
 }
 
 .playerLines > span[data-current="true"] {
-  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+  column-gap: 5px;
   width: 100%;
-  padding-inline: 22px;
-  box-sizing: border-box;
+}
+
+.playerNameText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.playerLines > span[data-current="true"] .playerNameText {
+  grid-column: 2;
 }
 
 .playerLines small {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
+  grid-column: 3;
+  align-self: center;
+  justify-self: start;
   padding: 1px 3px;
+  border: 1px solid #b8c9c1;
   border-radius: 999px;
-  background: #edf2ef;
-  color: #0b503d;
-  font: 850 0.42rem / 1.1 Arial, sans-serif;
+  background: transparent;
+  color: #537168;
+  font: 800 0.4rem / 1.1 Arial, sans-serif;
   letter-spacing: 0.05em;
 }
 
