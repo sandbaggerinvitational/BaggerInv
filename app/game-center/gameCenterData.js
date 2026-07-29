@@ -7,13 +7,14 @@ import {
   gameCenterPoints,
   gameCenterState,
   gameCenterStats,
+  gameCenterUserTeamSide,
   liveMatchResult,
   officialMatchResult,
 } from "../../lib/game-center.js";
 
 const clean = (value) => String(value ?? "").trim();
 
-export async function getGameCenterData(matchId) {
+export async function getGameCenterData(matchId, currentPlayerId = "") {
   const id = clean(matchId);
   if (!id) notFound();
 
@@ -46,6 +47,7 @@ export async function getGameCenterData(matchId) {
     storedResult,
     resultConflict: state === "final" && Boolean(storedResult) && storedResult.toUpperCase() !== result.toUpperCase(),
     navigation: gameCenterNavigation(tournamentData.rounds, id),
+    userTeamSide: gameCenterUserTeamSide(match, currentPlayerId),
     canConfirm: scoring.canConfirm,
   };
 }

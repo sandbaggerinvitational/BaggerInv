@@ -7,11 +7,13 @@ import {
   gameCenterPoints,
   gameCenterState,
   gameCenterStats,
+  gameCenterUserTeamSide,
   liveMatchResult,
   matchPlayNotation,
   finalizedMatchResult,
   officialMatchResult,
 } from "../lib/game-center.js";
+import { liveProgressLabel } from "../lib/game-center-display.js";
 
 const componentUrl = new URL("../app/game-center/GameCenter.js", import.meta.url);
 const pageUrl = new URL("../app/game-center/[matchId]/page.js", import.meta.url);
@@ -33,7 +35,7 @@ test("Game Center uses the exact shared tournament header and a compact match id
   assert.match(page, /import TournamentIdentityHeader from "\.\.\/\.\.\/TournamentIdentityHeader"/);
   assert.match(page, /<TournamentIdentityHeader/);
   assert.match(page, /year=\{initialData\.tournament\.year\}/);
-  assert.match(source, /Round \{data\.match\.round \|\| data\.match\.Round\}/);
+  assert.match(source, /const matchContext = roundPosition\?\.total/);
   assert.match(source, /Match \$\{matchNumber\}/);
   assert.match(source, /courseLine/);
   assert.doesNotMatch(source, /Invalid Date/);
@@ -121,16 +123,50 @@ test("Game Center navigation stays within official tournament order and boundari
   assert.deepEqual(gameCenterNavigation(rounds, "2026-R1-1"), {
     previous: null,
     next: { id: "2026-R1-2", label: "Round 1, Match 2" },
+    position: { round: 1, index: 1, total: 2 },
   });
   assert.deepEqual(gameCenterNavigation(rounds, "2026-R1-2"), {
     previous: { id: "2026-R1-1", label: "Round 1, Match 1" },
     next: { id: "2026-R2-1", label: "Round 2, Match 1" },
+    position: { round: 1, index: 2, total: 2 },
   });
   assert.deepEqual(gameCenterNavigation(rounds, "2026-R2-1"), {
     previous: { id: "2026-R1-2", label: "Round 1, Match 2" },
     next: null,
+    position: { round: 2, index: 1, total: 1 },
   });
-  assert.deepEqual(gameCenterNavigation(rounds, "2025-R3-1"), { previous: null, next: null });
+  assert.deepEqual(gameCenterNavigation(rounds, "2025-R3-1"), { previous: null, next: null, position: null });
+});
+
+test("Game Center match context uses round-scoped position totals", () => {
+  const rounds = [
+    { number: 1, matches: [{ id: "R1-1", match: 1 }, { id: "R1-2", match: 2 }, { id: "R1-3", match: 3 }] },
+    { number: 2, matches: [{ id: "R2-1", match: 1 }, { id: "R2-2", match: 2 }] },
+  ];
+  assert.deepEqual(gameCenterNavigation(rounds, "R1-1").position, { round: 1, index: 1, total: 3 });
+  assert.deepEqual(gameCenterNavigation(rounds, "R1-2").position, { round: 1, index: 2, total: 3 });
+  assert.deepEqual(gameCenterNavigation(rounds, "R1-3").position, { round: 1, index: 3, total: 3 });
+  assert.deepEqual(gameCenterNavigation(rounds, "R2-2").position, { round: 2, index: 2, total: 2 });
+});
+
+test("live progress is accurate and absent outside genuinely live matches", () => {
+  assert.equal(liveProgressLabel("live", 11), "Through 11 • 7 Holes Remaining");
+  assert.equal(liveProgressLabel("live", 17), "Through 17 • 1 Hole Remaining");
+  assert.equal(liveProgressLabel("live", 0), "Match in progress");
+  assert.equal(liveProgressLabel("pre", 0), "");
+  assert.equal(liveProgressLabel("final", 12), "");
+  assert.doesNotMatch(liveProgressLabel("final", 18), /Through 18/);
+});
+
+test("current Player Passport identity resolves only the participating team", () => {
+  const match = {
+    team1Players: [{ id: "P-1" }, { id: "P-2" }],
+    team2Players: [{ id: "P-3" }, { id: "P-4" }],
+  };
+  assert.equal(gameCenterUserTeamSide(match, "P-1"), 1);
+  assert.equal(gameCenterUserTeamSide(match, "P-4"), 2);
+  assert.equal(gameCenterUserTeamSide(match, "P-9"), 0);
+  assert.equal(gameCenterUserTeamSide(match, ""), 0);
 });
 
 test("Hole tracker preserves won, lost, halved, current, and unplayed data", () => {
@@ -241,6 +277,26 @@ test("Game Center layout protects mobile widths and localizes hole interaction",
   assert.match(styles, /\.holeGrid\{[^}]*grid-template-columns:repeat\(9,minmax\(0,1fr\)\)/);
   assert.match(styles, /@media\(max-width:420px\)/);
   assert.doesNotMatch(styles, /overflow-x:(auto|scroll)/);
+});
+
+test("Game Center polish balances scoreboard identity and respects reduced motion", async () => {
+  const [source, styles, page] = await Promise.all([
+    readFile(componentUrl, "utf8"),
+    readFile(stylesUrl, "utf8"),
+    readFile(pageUrl, "utf8"),
+  ]);
+  assert.match(styles, /\.logo\[data-size=score\]\{width:56px;height:56px\}/);
+  assert.match(source, /liveProgressLabel\(data\.state, through\)/);
+  assert.match(source, /className=\{styles\.yourTeam\}/);
+  assert.match(source, /aria-label=\{`\$\{teamNames\[[12]\]\} is your team`\}/);
+  assert.match(source, /Match \$\{roundPosition\.index\} of \$\{roundPosition\.total\}/);
+  assert.match(page, /resolvePlayerPassportToken/);
+  assert.match(styles, /data-newly-updated=true/);
+  assert.match(styles, /animation:holeRecorded \.55s ease-out/);
+  assert.match(styles, /transition:background-color \.2s ease/);
+  assert.match(styles, /prefers-reduced-motion:reduce/);
+  assert.match(styles, /animation:none!important/);
+  assert.doesNotMatch(source, /setUpdatedHoles\(payload\.data\.holes\.map/);
 });
 
 test("Hole Tracker uses clear single-character outcomes and accessible labels", async () => {

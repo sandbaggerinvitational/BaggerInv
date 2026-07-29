@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPoints } from "../../lib/formatters";
+import { liveProgressLabel } from "../../lib/game-center-display";
 import styles from "./game-center.module.css";
 
 const clean = (value) => String(value ?? "").trim();
@@ -127,7 +128,7 @@ function ResultSegments({ data }) {
   </section>;
 }
 
-function HoleTracker({ data, selected, onSelect }) {
+function HoleTracker({ data, selected, onSelect, updatedHoles = [] }) {
   const current = Number(data.match.currentHole || data.match["Current Hole"] || data.stats.played || 1);
   const teamNames = data.display.teamNames;
   return <section className={styles.tracker}>
@@ -144,6 +145,7 @@ function HoleTracker({ data, selected, onSelect }) {
           key={hole.number}
           data-state={state}
           data-current={hole.number === current ? "true" : undefined}
+          data-newly-updated={updatedHoles.includes(hole.number) ? "true" : undefined}
           data-selected={hole.number === selected ? "true" : undefined}
           onClick={() => onSelect(hole.number)}
           aria-label={`Hole ${hole.number}, ${outcome}${hole.number === current ? ", current hole" : ""}`}
@@ -215,7 +217,10 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   const [error, setError] = useState("");
   const [opening, setOpening] = useState(false);
   const [navigating, setNavigating] = useState(false);
+  const [updatedHoles, setUpdatedHoles] = useState([]);
   const requestActive = useRef(false);
+  const updateHighlightTimer = useRef();
+  const dataRef = useRef(initialData);
   const teamNames = data.display.teamNames;
   const format = clean(data.match.format || data.match.Format).toUpperCase();
   const matchNumber = data.match.match || data.match.Match;
@@ -223,6 +228,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   const course = data.display.course;
   const stateLabel = data.state === "final" ? "Final" : data.state === "live" ? "Live" : "Locked";
   const through = Number(data.match.currentHole || data.match["Current Hole"] || data.stats.played || 0);
+  const progressLabel = liveProgressLabel(data.state, through);
 
   const refresh = useCallback(async () => {
     if (requestActive.current || document.visibilityState === "hidden") return;
@@ -231,7 +237,16 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       const response = await fetch(`/api/game-center/${encodeURIComponent(matchId)}`, { cache: "no-store" });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Unable to refresh Game Center.");
+      const newlyRecorded = payload.data.holes
+        .filter((hole) => hole.winner && !dataRef.current.holes.find((prior) => prior.number === hole.number)?.winner)
+        .map((hole) => hole.number);
+      dataRef.current = payload.data;
       setData(payload.data);
+      if (newlyRecorded.length) {
+        setUpdatedHoles(newlyRecorded);
+        clearTimeout(updateHighlightTimer.current);
+        updateHighlightTimer.current = setTimeout(() => setUpdatedHoles([]), 550);
+      }
       setUpdatedLabel("Updated just now");
       setError("");
     } catch (caught) {
@@ -263,7 +278,10 @@ export default function GameCenter({ initialData, matchId, backTo }) {
 
   useEffect(() => {
     const timer = setInterval(() => setUpdatedLabel((label) => label === "Updated just now" ? "Updated less than a minute ago" : label), 30_000);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(updateHighlightTimer.current);
+    };
   }, []);
 
   const openScoring = async () => {
@@ -305,6 +323,10 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     setNavigating(true);
     window.scrollTo({ top: 0, behavior: "auto" });
   };
+  const roundPosition = data.navigation?.position;
+  const matchContext = roundPosition?.total
+    ? `Round ${roundPosition.round} • Match ${roundPosition.index} of ${roundPosition.total}`
+    : `Round ${data.match.round || data.match.Round}${matchNumber ? ` • Match ${matchNumber}` : ""}`;
 
   return <article className={styles.gameCenter}>
     <nav className={styles.matchNavigation} aria-label="Game Center match navigation">
@@ -326,7 +348,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     </nav>
 
     <section className={styles.matchIdentity}>
-      <div><small>Round {data.match.round || data.match.Round}{matchNumber ? ` • Match ${matchNumber}` : ""}</small><h1>{data.match.formatName || data.display.formatName || format}</h1></div>
+      <div><small aria-label={matchContext.replace(" • ", ", ")}>{matchContext}</small><h1>{data.match.formatName || data.display.formatName || format}</h1></div>
       <span data-state={data.state}>{stateLabel}</span>
       <div className={styles.identityCourse}>
         <Logo filename={course.logo || data.match.course?.logo} name={course.name} type="course" size="identity" tournamentYear={data.tournament.year} />
@@ -335,13 +357,13 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     </section>
 
     <section className={styles.scoreboard} aria-label={`${teamNames[1]} versus ${teamNames[2]}. ${data.result}${data.state !== "final" && through ? ` through ${through}` : ""}`}>
-      <div><Logo filename={data.display.teams[1].logo || data.tournament.teamOne.logo} name={teamNames[1]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[1]}</strong></div>
+      <div data-your-team={data.userTeamSide === 1 ? "true" : undefined}><Logo filename={data.display.teams[1].logo || data.tournament.teamOne.logo} name={teamNames[1]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[1]}</strong>{data.userTeamSide === 1 ? <small className={styles.yourTeam} aria-label={`${teamNames[1]} is your team`}>Your Team</small> : null}</div>
       <span>
         {data.state === "final" && finalWinner ? <small>{finalWinner}</small> : null}
         <b>{data.state === "final" ? finalText || "FINAL" : data.result}</b>
-        <em>{data.state === "final" ? "FINAL" : through ? `THROUGH ${through}` : "NOT STARTED"}</em>
+        <em>{data.state === "final" ? "FINAL" : data.state === "live" ? progressLabel : "MATCH NOT STARTED"}</em>
       </span>
-      <div><Logo filename={data.display.teams[2].logo || data.tournament.teamTwo.logo} name={teamNames[2]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[2]}</strong></div>
+      <div data-your-team={data.userTeamSide === 2 ? "true" : undefined}><Logo filename={data.display.teams[2].logo || data.tournament.teamTwo.logo} name={teamNames[2]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[2]}</strong>{data.userTeamSide === 2 ? <small className={styles.yourTeam} aria-label={`${teamNames[2]} is your team`}>Your Team</small> : null}</div>
     </section>
 
     <div className={styles.teamGrid}>
@@ -359,7 +381,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     </section>
 
     <div id="scorecard" className={styles.scorecardSections}>
-      <HoleTracker data={data} selected={selectedHole} onSelect={setSelectedHole} />
+      <HoleTracker data={data} selected={selectedHole} onSelect={setSelectedHole} updatedHoles={updatedHoles} />
       <HoleDetails data={data} selected={selectedHole} />
     </div>
     <ResultSegments data={data} />
