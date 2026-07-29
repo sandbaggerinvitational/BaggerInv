@@ -18,7 +18,8 @@ test("Tournament dashboard uses the exact shared Home identity header", async ()
   assert.match(home, /import TournamentIdentityHeader from "\.\/TournamentIdentityHeader"/);
   assert.match(source, /<TournamentIdentityHeader year=\{tournament\.year\}/);
   assert.match(home, /<TournamentIdentityHeader/);
-  assert.match(header, /className=\{styles\.homeHeader\}/);
+  assert.match(header, /className=\{`\$\{styles\.homeHeader\} \$\{headerStyles\.tokens\}`\}/);
+  assert.match(header, /tournament-identity-header\.module\.css/);
   assert.match(header, /className=\{styles\.tournamentLogo\}/);
   assert.match(header, /className=\{styles\.headerLive\}/);
   assert.match(source, /tournamentLogo\(filename\)/);

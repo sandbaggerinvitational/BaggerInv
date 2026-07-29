@@ -1,5 +1,6 @@
 import MobileIdentityImage from "./MobileIdentityImage";
 import { tournamentLogo } from "../lib/asset-paths";
+import headerStyles from "./tournament-identity-header.module.css";
 import styles from "./tournament-command-center.module.css";
 
 function logoSource(value, year) {
@@ -18,7 +19,7 @@ export default function TournamentIdentityHeader({
   status = "Live",
 }) {
   return (
-    <header className={styles.homeHeader}>
+    <header className={`${styles.homeHeader} ${headerStyles.tokens}`}>
       <MobileIdentityImage
         sources={[logoSource(logo, year)]}
         name={name}
