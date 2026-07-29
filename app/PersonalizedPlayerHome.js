@@ -39,6 +39,13 @@ function teeLabel(value) {
   return /\btees?\b/i.test(tee) ? tee : `${tee.replace(/\b\w/g, (letter) => letter.toUpperCase())} Tees`;
 }
 
+function matchTime(match, timeZone) {
+  return formatHomeTime(match?.teeTime, {
+    scheduledAt: match?.teeTimeAt,
+    timeZone,
+  });
+}
+
 function PlayerLines({ names, currentPlayer }) {
   if (!names?.length) return <span className={styles.playerTbd}>Players TBD</span>;
   return <div className={styles.playerLines}>{names.map((name) =>
@@ -76,7 +83,7 @@ function Action({ match, busy, onOpen }) {
   </button>;
 }
 
-function MyRounds({ matches, emphasizedId, currentPlayer }) {
+function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
   return <section className={styles.schedule} aria-labelledby="my-rounds-title">
     <header>
       <div><p>Your Golf</p><h2 id="my-rounds-title">My Rounds</h2></div>
@@ -107,7 +114,7 @@ function MyRounds({ matches, emphasizedId, currentPlayer }) {
               className={styles.roundCourseLogo}
               fallbackClassName={styles.roundCourseLogoFallback}
             />
-            <small>{[tee, formatHomeTime(match.teeTime) || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
+            <small>{[tee, matchTime(match, timeZone) || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
           </div>
           <div className={styles.roundMatchup}>
             <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} currentPlayer={currentPlayer} /></div>
@@ -216,7 +223,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
         <button key={match.matchId} disabled={busyId === match.matchId} onClick={() => openMatch(match)}>
           <MatchHeading match={match} compact />
           <strong>{match.course || "Course TBA"}</strong>
-          <small>{formatHomeTime(match.teeTime) || "Tee time TBD"} · Open Scorecard</small>
+          <small>{matchTime(match, payload?.tournament?.timeZone) || "Tee time TBD"} · Open Scorecard</small>
         </button>
       )}</div>
     </div> : <div className={styles.card}>
@@ -233,7 +240,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
         />
         <div>
           <strong>{primary.course || "Course to be announced"}</strong>
-          <span>{formatHomeTime(primary.teeTime) || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
+          <span>{matchTime(primary, payload?.tournament?.timeZone) || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
         </div>
       </div>
       <MatchPeople match={primary} currentPlayer={player?.name} />
@@ -249,6 +256,11 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
     </div>}
 
     {tournamentPulse}
-    {matches.length ? <MyRounds matches={matches} emphasizedId={primary?.matchId} currentPlayer={player?.name} /> : null}
+    {matches.length ? <MyRounds
+      matches={matches}
+      emphasizedId={primary?.matchId}
+      currentPlayer={player?.name}
+      timeZone={payload?.tournament?.timeZone}
+    /> : null}
   </section>;
 }

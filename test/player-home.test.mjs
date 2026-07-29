@@ -58,6 +58,14 @@ test("Home times consistently include AM or PM without duplicate suffixes", () =
   assert.equal(formatHomeTime("8:10"), "8:10 AM");
   assert.equal(formatHomeTime("14:40"), "2:40 PM");
   assert.equal(formatHomeTime("8:10 am"), "8:10 AM");
+  assert.equal(formatHomeTime("2:40", {
+    scheduledAt: "2026-09-25T14:40:00-05:00",
+    timeZone: "America/Chicago",
+  }), "2:40 PM");
+  assert.equal(formatHomeTime("10:50", {
+    scheduledAt: "2026-09-27T10:50:00-05:00",
+    timeZone: "America/Chicago",
+  }), "10:50 AM");
   assert.equal(formatHomeTime("12:00"), "12:00 PM");
   assert.equal(formatHomeTime("00:00"), "12:00 AM");
 });
@@ -90,8 +98,8 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(component, /roundMatchMeta\(match\)/);
   assert.match(component, /join\(" • "\)/);
   assert.doesNotMatch(component, /Match \$\{match\.match\}.*·/);
-  assert.match(component, /formatHomeTime\(primary\.teeTime\)/);
-  assert.match(component, /formatHomeTime\(match\.teeTime\)/);
+  assert.match(component, /scheduledAt:\s*match\?\.teeTimeAt/);
+  assert.match(component, /timeZone/);
   assert.match(component, /aria-label="versus"/);
   assert.match(route, /authorizePassportMatch/);
   assert.match(route, /verifyPlayerPassportSession/);
@@ -132,9 +140,15 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(component, /className=\{compact \? styles\.compactMatchHeading : styles\.matchHeading\}/);
   assert.match(component, /match\?\.format \? <strong>/);
   assert.match(styles, /\.matchHeading > strong[\s\S]*white-space:\s*nowrap/);
+  assert.match(styles, /\.matchHeading > span,[\s\S]*color:\s*#285246/);
+  assert.match(styles, /\.matchHeading > span,[\s\S]*font-weight:\s*750/);
   assert.match(styles, /\.people > div[\s\S]*grid-template-rows:\s*34px/);
   assert.match(styles, /\.teamLogo,[\s\S]*justify-self:\s*center/);
+  assert.match(styles, /\.roundMatchup > div[\s\S]*justify-items:\s*center/);
+  assert.match(styles, /\.roundMatchup em[\s\S]*text-align:\s*center|\.roundMatchup > div[\s\S]*text-align:\s*center/);
   assert.match(styles, /\.playerLines small[\s\S]*font:\s*850 0\.42rem/);
+  assert.match(commandStyles, /--home-eyebrow-color:#b58a25/);
+  assert.match(commandStyles, /\.homeHeader p,\.sectionHeader p,\.pulseHeader p[\s\S]*line-height:1\.2/);
   assert.match(commandStyles, /\.scoreboard strong\{font-size:3\.1rem/);
   assert.match(commandStyles, /font-variant-numeric:tabular-nums/);
   assert.match(commandStyles, /font-size:2\.7rem/);

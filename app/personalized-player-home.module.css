@@ -23,10 +23,11 @@
 .empty p,
 .schedule > header p {
   margin: 0;
-  color: #9a7427;
-  font-size: 0.68rem;
-  font-weight: 900;
+  color: var(--home-eyebrow-color, #b58a25);
+  font-size: var(--home-eyebrow-size, 0.66rem);
+  font-weight: var(--home-eyebrow-weight, 900);
   letter-spacing: 0.15em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -41,19 +42,20 @@
 .matchHeading,
 .compactMatchHeading {
   display: grid;
-  gap: 3px;
+  gap: 4px;
   min-width: 0;
 }
 
 .matchHeading > span,
 .compactMatchHeading > span {
-  color: #8d6a26;
+  color: #285246;
   font-family: Arial, sans-serif;
   font-size: 0.68rem;
-  font-weight: 900;
+  font-weight: 750;
   letter-spacing: 0.08em;
   line-height: 1.2;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .matchHeading > strong {
@@ -441,24 +443,26 @@
 
 .roundMatchup > div {
   display: grid;
+  justify-items: center;
   gap: 3px;
   min-width: 0;
+  text-align: center;
 }
 
 .roundMatchup > div:last-child {
-  text-align: right;
+  text-align: center;
 }
 
 .roundMatchup em {
-  overflow: hidden;
+  max-width: 100%;
   color: #9a7427;
   font-size: 0.53rem;
   font-style: normal;
   font-weight: 900;
   letter-spacing: 0.06em;
-  text-overflow: ellipsis;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .roundMatchup i {
@@ -470,18 +474,18 @@
 }
 
 .roundMatchup .playerLines {
-  justify-items: start;
+  justify-items: center;
 }
 
 .roundMatchup .playerLines > span {
   font-size: 0.75rem;
-  justify-content: flex-start;
-  text-align: left;
+  justify-content: center;
+  text-align: center;
 }
 
 .roundMatchup > div:last-child .playerLines > span {
-  justify-content: flex-end;
-  text-align: right;
+  justify-content: center;
+  text-align: center;
 }
 
 .choices {
