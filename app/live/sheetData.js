@@ -17,6 +17,7 @@ import {
 import { getStrokesOnHole } from "../../lib/scorecard-net";
 import { resolveSpreadsheetId } from "../../lib/spreadsheet-environment";
 import { formatHomeTime } from "../../lib/home-dashboard";
+import { mergeRowsByStableMatchId } from "../../lib/live-match-source";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -225,20 +226,6 @@ function playerEntry(row, side, slot, playerMap) {
   };
 }
 
-function completeMatchMap(rows) {
-  const map = new Map();
-  for (const row of rows) {
-    const matchId = clean(row["Match ID"]);
-    if (!matchId) continue;
-    const merged = { ...(map.get(matchId) || {}) };
-    for (const [field, value] of Object.entries(row)) {
-      if (clean(value)) merged[field] = value;
-    }
-    map.set(matchId, merged);
-  }
-  return map;
-}
-
 function resultFields(source, fallback) {
   const result = { ...fallback };
   for (const field of [
@@ -348,9 +335,13 @@ export async function getTournamentData() {
   const rulesByRound = Object.fromEntries(rules.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year)).map((row) => [Number(clean(row.Round).match(/\d+/)?.[0]), row]));
   const configuredMatches = permanentRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
   const currentLiveRows = liveRows.filter((row) => recordBelongsToTournament(row, selectedTournamentId, year));
-  const liveMap = completeMatchMap(currentLiveRows);
-  const permanentMap = completeMatchMap(configuredMatches);
   const sourceIds = [...new Set([...configuredMatches, ...currentLiveRows].map((row) => clean(row["Match ID"])).filter(Boolean))];
+  // Older preview rows can store the original assignment without tournament
+  // metadata, while the finalized row carries the scoped result. Once a match
+  // is in the selected tournament, join every row for that stable Match ID so
+  // finalization cannot discard its original handicap allocation.
+  const liveMap = mergeRowsByStableMatchId(liveRows, sourceIds);
+  const permanentMap = mergeRowsByStableMatchId(permanentRows, sourceIds);
   const scoringMatchMap = new Map(sourceIds.map((matchId) => {
     const merged = { ...(permanentMap.get(matchId) || {}) };
     for (const [field, value] of Object.entries(liveMap.get(matchId) || {})) {
@@ -436,6 +427,7 @@ export async function getTournamentData() {
   const tournament = {
     id: selectedTournamentId,
     year,
+    name: tournamentRow["Tournament Name"] || tournamentRow.Name || "Sandbagger Invitational",
     status,
     configuredStatus,
     statusMode,

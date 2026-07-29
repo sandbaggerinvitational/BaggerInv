@@ -103,10 +103,10 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
     ? (momentum.teamOne.includes("last") ? `${tournament.teamOne.name}: ${momentum.teamOne}` : `${tournament.teamTwo.name}: ${momentum.teamTwo}`)
     : "No decided-point momentum yet";
   return <section className={styles.snapshot} aria-label="Tournament snapshot">
-    <div className={styles.score}>
-      <div><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="score" /><strong>{tournament.teamOne.name}</strong><b>{formatPoints(tournament.teamOne.score)}</b></div>
-      <em aria-hidden="true">–</em>
-      <div><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="score" /><strong>{tournament.teamTwo.name}</strong><b>{formatPoints(tournament.teamTwo.score)}</b></div>
+    <div className={styles.score} aria-label={`${tournament.teamOne.name} ${formatPoints(tournament.teamOne.score)}, ${tournament.teamTwo.name} ${formatPoints(tournament.teamTwo.score)}`}>
+      <div className={styles.scoreTeam}><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="score" /><strong>{tournament.teamOne.name}</strong></div>
+      <b className={styles.scoreValue}>{formatPoints(tournament.teamOne.score)} <i aria-hidden="true">–</i> {formatPoints(tournament.teamTwo.score)}</b>
+      <div className={styles.scoreTeam}><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="score" /><strong>{tournament.teamTwo.name}</strong></div>
     </div>
     <div className={styles.snapshotMeta}>
       <span><small aria-label="Live matches">LIVE</small><strong>{state.liveMatches}</strong></span>
@@ -142,7 +142,7 @@ function ScoreLeaderboard({ rows = [], round, format }) {
     return map;
   }, [sort.key, sorted]);
   return <section className={styles.leaderboard}>
-    <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross &amp; Net"}</h2></span>{eligible.length ? <em>Live</em> : null}</header>
+    <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{eligible.length ? <em>Live</em> : null}</header>
     {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>
       <div className={styles.leaderRow} data-header="true"><span>Rank</span><span>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key,label]) => <button type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
       {sorted.slice(0, 10).map((row) => <div className={styles.leaderRow} key={`${row.round}-${row.id}`} aria-label={pairing ? `Scramble pairing ${row.name}` : undefined}><i>{ranks.get(row.id)}</i><strong>{row.name}</strong><span>{row.holes >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
@@ -172,7 +172,7 @@ function OverallLeaderboard({ rows = [] }) {
     return rankById;
   }, [rows]);
   return <section className={styles.leaderboard}>
-    <header><span><small>Overall Leaderboard</small><h2>Individual Points &amp; Record</h2></span>{rows.length ? <em>Official</em> : null}</header>
+    <header><span><small>Overall Leaderboard</small><h2>Individual Points & Record</h2></span>{rows.length ? <em>Official</em> : null}</header>
     {!rows.length ? <div className={styles.empty}><strong>Standings will appear after the first official result.</strong><span>Points and records update as matches are finalized.</span></div> : <div className={styles.overallLeaderboard}>
       <div className={styles.overallRow} data-header="true"><span>Rank</span><span>Player</span><span>Record</span><button type="button" onClick={() => setDirection((current) => current === "desc" ? "asc" : "desc")} aria-sort={direction === "desc" ? "descending" : "ascending"}>Points <i aria-hidden="true">{direction === "desc" ? "↓" : "↑"}</i></button></div>
       {sorted.slice(0, 10).map((row) => <div className={styles.overallRow} key={row.id}>
@@ -220,7 +220,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
   if (!tournament) return <section className={styles.page}><div className={styles.empty}><strong>Tournament data is unavailable.</strong><span>{loadError || "Please try again shortly."}</span></div></section>;
   return <section className={styles.page}>
-    <header className={styles.pageHeader}><Logo filename={tournament.logo || `sandbagger-${tournament.year}`} name={`${tournament.year} Sandbagger Invitational`} type="tournament" size="header" /><span><small>{tournament.year} Tournament</small><h1>Tournament</h1><p>{tournament.location || "Sandbagger Invitational"}</p></span><em data-state={String(tournament.status).toLowerCase()}>{tournament.status}</em></header>
+    <header className={styles.pageHeader}><Logo filename={tournament.logo || `sandbagger-${tournament.year}`} name={`${tournament.year} ${tournament.name || "Sandbagger Invitational"}`} type="tournament" size="header" /><span><small>{tournament.year} Tournament</small><h1>{tournament.name || "Sandbagger Invitational"}</h1><p>{tournament.location || "Location TBA"}</p></span><em data-state={String(tournament.status).toLowerCase()}>{tournament.status}</em></header>
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />
     <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Overall"], ...rounds.map((round) => [round.number, round.label])].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
     <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
