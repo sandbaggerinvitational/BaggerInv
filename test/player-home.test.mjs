@@ -117,12 +117,14 @@ test("the public Tournament Command Center offers Passport activation without ex
 });
 
 test("Home refinement keeps tournament identity and itinerary distinct from player rounds", async () => {
-  const [component, commandCenter] = await Promise.all([
+  const [component, commandCenter, identityHeader] = await Promise.all([
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/TournamentIdentityHeader.js", import.meta.url), "utf8"),
   ]);
   assert.doesNotMatch(component, /playerPhoto|identityImage|Player Passport<\/span>/);
-  assert.match(commandCenter, /tournamentLogo\(`sandbagger-\$\{liveTournament\.year\}`\)/);
+  assert.match(commandCenter, /<TournamentIdentityHeader/);
+  assert.match(identityHeader, /tournamentLogo\(`sandbagger-\$\{year\}`\)/);
   assert.match(commandCenter, /View Tournament Guide/);
   assert.match(commandCenter, /No additional events scheduled today/);
   assert.match(commandCenter, /liveData\?\.schedule/);

@@ -8,19 +8,21 @@ const stylesUrl = new URL("../app/live/tournament-dashboard.module.css", import.
 const centerUrl = new URL("../app/live/MatchCenter.js", import.meta.url);
 const dataUrl = new URL("../app/live/sheetData.js", import.meta.url);
 const pageUrl = new URL("../app/live/page.js", import.meta.url);
+const homeUrl = new URL("../app/TournamentCommandCenter.js", import.meta.url);
+const identityHeaderUrl = new URL("../app/TournamentIdentityHeader.js", import.meta.url);
 
-test("Tournament dashboard uses the approved compact branded hierarchy", async () => {
-  const [source, styles, center] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(centerUrl, "utf8")]);
+test("Tournament dashboard uses the exact shared Home identity header", async () => {
+  const [source, styles, center, home, header] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(centerUrl, "utf8"), readFile(homeUrl, "utf8"), readFile(identityHeaderUrl, "utf8")]);
   assert.match(center, /<TournamentDashboard \{\.\.\.props\} \/>/);
-  assert.match(source, /import homeStyles from "\.\.\/tournament-command-center\.module\.css"/);
-  assert.match(source, /className=\{homeStyles\.homeHeader\}/);
-  assert.match(source, /className=\{homeStyles\.tournamentLogo\}/);
-  assert.match(source, /className=\{homeStyles\.headerLive\}/);
+  assert.match(source, /import TournamentIdentityHeader from "\.\.\/TournamentIdentityHeader"/);
+  assert.match(home, /import TournamentIdentityHeader from "\.\/TournamentIdentityHeader"/);
+  assert.match(source, /<TournamentIdentityHeader year=\{tournament\.year\}/);
+  assert.match(home, /<TournamentIdentityHeader/);
+  assert.match(header, /className=\{styles\.homeHeader\}/);
+  assert.match(header, /className=\{styles\.tournamentLogo\}/);
+  assert.match(header, /className=\{styles\.headerLive\}/);
   assert.match(source, /tournamentLogo\(filename\)/);
-  assert.match(source, /tournament\.logo \|\| `sandbagger-\$\{tournament\.year\}`/);
-  assert.match(source, /<h1>\{tournament\.name \|\| "Sandbagger Invitational"\}<\/h1>/);
-  assert.match(source, /<p>\{tournament\.year\} Tournament<\/p>/);
-  assert.match(source, /<span>\{tournament\.location \|\| "Location TBA"\}<\/span>/);
+  assert.doesNotMatch(styles, /\.pageHeader(?:\{| )|\.pageHeader h1/);
   assert.match(source, /<Snapshot tournament=/);
   assert.match(source, /Points to Clinch/);
   assert.match(source, /Momentum/);
@@ -135,7 +137,10 @@ test("Round score leaderboard sorts from headers and handles partial and empty s
   assert.match(source, /Partial standings publish as valid holes are confirmed/);
   assert.match(source, /aria-label=\{key === "netToPar" \? "Net score relative to par"/);
   assert.match(source, /Number\(value\) === 0 \? "E"/);
-  assert.match(source, /<span>Rank<\/span><span>\{pairing \? "Pairing" : "Player"\}<\/span>/);
+  assert.match(source, /className=\{styles\.leaderHeading\}>Rank/);
+  assert.match(source, /className=\{styles\.leaderHeading\}>\{pairing \? "Pairing" : "Player"\}/);
+  assert.match(source, /button className=\{styles\.leaderHeading\}/);
+  assert.match(styles, /\.leaderHeading\{[^}]*text-transform:uppercase/);
   assert.match(source, /Individual Gross & Net/);
   assert.doesNotMatch(source, /Individual Gross &amp; Net/);
   assert.match(styles, /--round-leader-columns:/);
@@ -144,6 +149,20 @@ test("Round score leaderboard sorts from headers and handles partial and empty s
   assert.match(styles, /\.leaderRow>i\{[^}]*text-align:center/);
   assert.match(styles, /\.leaderRow>strong\{[^}]*text-align:left/);
   for (const label of ["Gross", "Net", "Net +/-"]) assert.equal(source.includes(`"${label}"`), true);
+});
+
+test("Final match results separate the official team name from the result line", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /function finalResultParts/);
+  assert.match(source, /\[tournament\.teamOne\.name, tournament\.teamTwo\.name\]/);
+  assert.match(source, /result\.slice\(winner\.length\)\.trim\(\)/);
+  assert.match(source, /result === "HALVED"/);
+  assert.match(source, /className=\{styles\.finalResult\}/);
+  assert.match(source, /<small>\{finalResult\.team\}<\/small>/);
+  assert.match(source, /<strong>\{finalResult\.result\}<\/strong>/);
+  assert.match(styles, /\.finalResult\{[^}]*text-align:center/);
+  assert.match(styles, /\.finalResult small\{[^}]*overflow-wrap:anywhere/);
+  assert.match(styles, /\.finalResult strong\{[^}]*font-size:\.68rem/);
 });
 
 test("Scramble cards use golfer handicaps and one team-level stroke treatment", async () => {

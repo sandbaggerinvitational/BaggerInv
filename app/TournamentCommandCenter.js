@@ -1,7 +1,8 @@
 import Link from "next/link";
 import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
 import MobileIdentityImage from "./MobileIdentityImage";
-import { teamLogo, tournamentLogo } from "../lib/asset-paths";
+import TournamentIdentityHeader from "./TournamentIdentityHeader";
+import { teamLogo } from "../lib/asset-paths";
 import {
   compactTournamentLeaders,
   todaysSchedule,
@@ -181,8 +182,6 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
     timeZone: liveTournament.timeZone,
   });
   const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
-  const logo = assetSource(liveTournament.logo, tournamentLogo) ||
-    tournamentLogo(`sandbagger-${liveTournament.year}`);
   const pulse = (
     <TournamentPulse
       tournament={liveTournament}
@@ -193,21 +192,13 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
 
   return (
     <div className={styles.page}>
-      <header className={styles.homeHeader}>
-        <MobileIdentityImage
-          sources={[logo]}
-          name="Sandbagger Invitational"
-          alt="Sandbagger Invitational"
-          className={styles.tournamentLogo}
-          fallbackClassName={styles.tournamentLogoFallback}
-        />
-        <div>
-          <p>{liveTournament.year} Tournament</p>
-          <h1>Sandbagger Invitational</h1>
-          <span>{liveTournament.location || "Tournament week"}</span>
-        </div>
-        <span className={styles.headerLive}><i aria-hidden="true" /> Live</span>
-      </header>
+      <TournamentIdentityHeader
+        year={liveTournament.year}
+        name={liveTournament.name || "Sandbagger Invitational"}
+        location={liveTournament.location || "Tournament week"}
+        logo={liveTournament.logo}
+        status="Live"
+      />
 
       <PersonalizedPlayerHome tournamentPulse={pulse} />
       <TournamentSchedule items={schedule} />

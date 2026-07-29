@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
+import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPoints } from "../../lib/formatters";
 import { filterEmptyMessage, filterMatches, matchState, relativeUpdatedLabel } from "../../lib/live-match-ux";
-import homeStyles from "../tournament-command-center.module.css";
 import styles from "./tournament-dashboard.module.css";
 
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
@@ -46,6 +46,16 @@ function matchResult(match, tournament) {
   return `${winner} WON`;
 }
 
+function finalResultParts(match, tournament) {
+  const result = matchResult(match, tournament);
+  if (matchState(match) !== "final" || !result || result === "HALVED") return { team: "", result };
+  const winner = [tournament.teamOne.name, tournament.teamTwo.name]
+    .find((name) => result.toUpperCase().startsWith(String(name).toUpperCase()));
+  return winner
+    ? { team: winner, result: result.slice(winner.length).trim() }
+    : { team: "", result };
+}
+
 function playerMeta(player, format) {
   if (!player) return "";
   const values = [];
@@ -71,12 +81,13 @@ function TournamentMatchCard({ match, round, tournament }) {
   const state = matchState(match);
   const status = statusLabel(match);
   const result = matchResult(match, tournament);
+  const finalResult = finalResultParts(match, tournament);
   const tee = match.course?.tee ? `${match.course.tee} Tees` : "";
   const href = `/live?view=matchups&round=${round.number}#match-${match.id}`;
   return <Link className={styles.matchCard} href={href} aria-label={`Round ${round.number}, Match ${match.match}, ${match.formatName || round.format}, ${status}${result ? `, ${result}` : ""}`}>
     <div className={styles.matchHead}>
       <span><small>Round {round.number}{match.match ? ` • Match ${match.match}` : ""}</small><strong>{match.formatName || round.format || "Format TBA"}</strong></span>
-      <span className={styles.matchState}><em data-state={state}>{status}</em>{result ? <b>{result}</b> : null}{state === "live" && match.currentHole ? <small>Through {match.currentHole}</small> : null}</span>
+      <span className={styles.matchState}><em data-state={state}>{status}</em>{state === "final" && result ? <b className={styles.finalResult}>{finalResult.team ? <small>{finalResult.team}</small> : null}<strong>{finalResult.result}</strong></b> : result ? <b>{result}</b> : null}{state === "live" && match.currentHole ? <small>Through {match.currentHole}</small> : null}</span>
     </div>
     <div className={styles.course}>
       <Logo filename={match.course?.logo} name={match.course?.name || "Course"} type="course" size="course" />
@@ -145,7 +156,7 @@ function ScoreLeaderboard({ rows = [], round, format }) {
   return <section className={styles.leaderboard}>
     <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{eligible.length ? <em>Live</em> : null}</header>
     {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>
-      <div className={styles.leaderRow} data-header="true"><span>Rank</span><span>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key,label]) => <button type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
+      <div className={styles.leaderRow} data-header="true"><span className={styles.leaderHeading}>Rank</span><span className={styles.leaderHeading}>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key,label]) => <button className={styles.leaderHeading} type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
       {sorted.slice(0, 10).map((row) => <div className={styles.leaderRow} key={`${row.round}-${row.id}`} aria-label={pairing ? `Scramble pairing ${row.name}` : undefined}><i>{ranks.get(row.id)}</i><strong>{row.name}</strong><span>{row.holes >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
     </div>}
   </section>;
@@ -221,11 +232,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
   if (!tournament) return <section className={styles.page}><div className={styles.empty}><strong>Tournament data is unavailable.</strong><span>{loadError || "Please try again shortly."}</span></div></section>;
   return <section className={styles.page}>
-    <header className={homeStyles.homeHeader}>
-      <AssetImage src={tournamentLogo(tournament.logo || `sandbagger-${tournament.year}`)} alt={`${tournament.year} ${tournament.name || "Sandbagger Invitational"} logo`} className={homeStyles.tournamentLogo} fallbackClassName={homeStyles.tournamentLogoFallback} fallback={String(tournament.year)} inferFallback={false} />
-      <div><p>{tournament.year} Tournament</p><h1>{tournament.name || "Sandbagger Invitational"}</h1><span>{tournament.location || "Location TBA"}</span></div>
-      <span className={homeStyles.headerLive}><i aria-hidden="true" />{tournament.status}</span>
-    </header>
+    <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />
     <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Overall"], ...rounds.map((round) => [round.number, round.label])].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
     <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
