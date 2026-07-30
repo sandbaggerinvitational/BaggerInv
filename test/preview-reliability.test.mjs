@@ -37,8 +37,15 @@ test("normalized workbook reads batch, dedupe, timeout, and expose safe diagnost
   assert.match(sourceText, /values:batchGet/);
   assert.match(sourceText, /pendingReads\.has/);
   assert.match(sourceText, /AbortSignal\.timeout/);
+  assert.match(sourceText, /jti:\s*randomUUID\(\)/);
   assert.match(sourceText, /id\.slice\(-6\)/);
   assert.doesNotMatch(sourceText, /privateKey.*console|access_token.*console/);
+});
+
+test("read and Passport OAuth assertions remain unique across serverless instances", async () => {
+  const passportSource = await source("lib/google-sheets-write.js");
+  assert.match(passportSource, /jti:\s*randomUUID\(\)/);
+  assert.match(passportSource, /pendingGoogleToken/);
 });
 
 test("participant base tournament reads are one batched snapshot with transient fallback", async () => {
