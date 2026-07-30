@@ -69,6 +69,9 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
   const playerNames = Object.fromEntries(players.map((player) => [player.id, player.name]));
   const review = finalizationReview({ match, draft, teamOne: sideOne, teamTwo: sideTwo, playerNames });
   const change = (field, value) => { setFeedback(""); setDraft((current) => ({ ...current, [field]: value })); };
+  useEffect(() => {
+    setDraft(Object.fromEntries([...EDITABLE, ...PAIRING_FIELDS].map((field) => [field, match[field] || ""])));
+  }, [match["Updated At"], match["Match Status"]]);
   useEffect(() => { onDirtyChange(match["Match ID"], dirty); return () => onDirtyChange(match["Match ID"], false); }, [dirty, match, onDirtyChange]);
   useEffect(() => {
     if (!dirty) return undefined;
