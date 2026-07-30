@@ -17,7 +17,7 @@ export function Header({ activeNavigationHref = "", homeHref = "/" } = {}) {
         </div>
       </Link>
 
-      <Menu activeNavigationHref={activeNavigationHref} />
+      <Menu activeNavigationHref={activeNavigationHref} homeHref={homeHref} />
     </header>
   );
 }

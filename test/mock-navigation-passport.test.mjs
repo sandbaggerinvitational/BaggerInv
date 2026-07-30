@@ -8,9 +8,10 @@ import { playerPassportCookie } from "../lib/player-passport.js";
 const source = async (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("participant Home navigation uses the canonical same-origin dashboard", async () => {
-  const [navigation, mobileHome, activation, score, tournament, profile] = await Promise.all([
+  const [navigation, mobileHome, menu, activation, score, tournament, profile] = await Promise.all([
     source("app/ParticipantIdentity.js"),
     source("app/home/page.js"),
+    source("app/Menu.js"),
     source("app/activate/PlayerPassportActivation.js"),
     source("app/score/ScoreEntry.js"),
     source("app/live/MatchCenter.js"),
@@ -21,6 +22,7 @@ test("participant Home navigation uses the canonical same-origin dashboard", asy
   assert.match(mobileHome, /getTournamentData/);
   assert.match(mobileHome, /MobileTournamentHome/);
   assert.doesNotMatch(mobileHome, /refreshHistoricalData|kiawahHero|Website Feed/);
+  assert.match(menu, /link\.href === "\/" \? homeHref : link\.href/);
   for (const participantSource of [activation, score, tournament, profile]) {
     assert.match(participantSource, /\/home/);
   }

@@ -26,7 +26,7 @@ function activeNavigationHrefForPath(pathname, hash) {
     .sort((a, b) => b.href.length - a.href.length)[0]?.href || "";
 }
 
-export default function Menu({ activeNavigationHref = "" }) {
+export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const [isOpen, setIsOpen] = useState(false);
   const [hash, setHash] = useState("");
   const pathname = usePathname();
@@ -108,7 +108,7 @@ export default function Menu({ activeNavigationHref = "" }) {
                     className={`sideNavHome ${
                       activeHref === link.href ? "current" : ""
                     }`}
-                    href={link.href}
+                    href={link.href === "/" ? homeHref : link.href}
                     key={link.href}
                     onClick={() => setIsOpen(false)}
                   >
