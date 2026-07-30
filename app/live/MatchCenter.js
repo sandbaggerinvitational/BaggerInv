@@ -254,7 +254,7 @@ function MatchCenterExperience({ initialData, loadError }) {
   const focusedRoundData = rounds.find((round) => round.number === focusedRound) || active;
   const focusedPoints = addTournamentRanks(data?.roundLeaderboards?.[focusedRound] || [], "points");
   const focusedBack = passportPlayer
-    ? <Link href="/">← Back to My Tournament</Link>
+    ? <Link href="/home">← Back to My Tournament</Link>
     : <Link href="/live">← Back to Match Center</Link>;
 
   if (focusedView === "matchups") return <section className={styles.focusedLiveView}>
@@ -281,7 +281,7 @@ function MatchCenterExperience({ initialData, loadError }) {
     {championshipMode ? <ChampionshipBanner tournament={tournament} /> : <LiveBanner tournament={tournament} />}
     <section className={styles.content}>
       <div className={styles.liveControls}>
-        {passportPlayer ? <Link href="/" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, border: "1px solid #0b4938", color: "#0b4938", fontWeight: 900, textDecoration: "none" }}>My Tournament</Link> : null}
+        {passportPlayer ? <Link href="/home" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, border: "1px solid #0b4938", color: "#0b4938", fontWeight: 900, textDecoration: "none" }}>My Tournament</Link> : null}
         <Link href="/score" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, background: "#0b4938", color: "#fff", fontWeight: 900, textDecoration: "none" }}>My Match</Link>
         <div className={styles.freshness} data-state={refreshState} role="status" aria-live="polite">
           <span aria-hidden="true" />

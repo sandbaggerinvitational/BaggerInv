@@ -62,7 +62,7 @@ test("active tournament header reports its day when a start date is available", 
 
 test("live mobile Home clips the closed navigation drawer without card overflow", async () => {
   const [page, globals] = await Promise.all([
-    readFile(new URL("../app/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/MobileTournamentHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   ]);
   assert.match(page, /className="mobileHomeMain"/);

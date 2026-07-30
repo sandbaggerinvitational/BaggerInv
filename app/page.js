@@ -9,8 +9,8 @@ import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
 import { tournamentStartTimestamp } from "../lib/tournament-countdown";
 import AssetImage from "./AssetImage";
 import TournamentStatusHero from "./TournamentStatusHero";
-import TournamentCommandCenter from "./TournamentCommandCenter";
 import { mobileTournamentDashboardEnabled } from "../lib/spreadsheet-environment";
+import MobileTournamentHome from "./MobileTournamentHome";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -117,13 +117,7 @@ export default async function Home() {
   };
 
   if (mobileTournamentDashboardEnabled(liveData?.tournament)) {
-    return (
-      <main className="mobileHomeMain">
-        <Header activeNavigationHref="/live" />
-        <TournamentCommandCenter tournament={statusHeroTournament} liveData={liveData} />
-        <Footer />
-      </main>
-    );
+    return <MobileTournamentHome liveData={liveData} />;
   }
 
   return (

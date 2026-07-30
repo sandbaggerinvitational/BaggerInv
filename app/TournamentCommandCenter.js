@@ -7,6 +7,7 @@ import {
   compactTournamentLeaders,
   todaysSchedule,
   tournamentDayLabel,
+  tournamentStatusLabel,
 } from "../lib/home-dashboard";
 import { tournamentProgressModel } from "../lib/live-command-center";
 import styles from "./tournament-command-center.module.css";
@@ -72,6 +73,7 @@ function TournamentSchedule({ items }) {
 function TournamentPulse({ tournament, progress, roundCount }) {
   const total = Math.max(progress.totalMatches, 1);
   const percentage = Math.min(100, Math.round((progress.completedMatches / total) * 100));
+  const status = tournamentStatusLabel(tournament.status);
   return (
     <section className={styles.pulse} aria-labelledby="tournament-pulse-title">
       <header className={styles.pulseHeader}>
@@ -85,7 +87,10 @@ function TournamentPulse({ tournament, progress, roundCount }) {
             })}
           </h2>
         </div>
-        <span className={styles.liveBadge}><i aria-hidden="true" /> Live</span>
+        <span className={styles.liveBadge}>
+          {status === "Live" ? <i aria-hidden="true" /> : null}
+          {status}
+        </span>
       </header>
       <div className={styles.scoreboard} aria-label="Current tournament score">
         <div>
@@ -182,6 +187,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
     timeZone: liveTournament.timeZone,
   });
   const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
+  const status = tournamentStatusLabel(liveTournament.status);
   const pulse = (
     <TournamentPulse
       tournament={liveTournament}
@@ -197,7 +203,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
         name={liveTournament.name || "Sandbagger Invitational"}
         location={liveTournament.location || "Tournament week"}
         logo={liveTournament.logo}
-        status="Live"
+        status={status}
       />
 
       <PersonalizedPlayerHome tournamentPulse={pulse} />

@@ -9,7 +9,7 @@ import styles from "./participant-navigation.module.css";
 const PARTICIPANT_SHELL_KEY = "sbi-participant-shell";
 
 const itemsFor = (player) => [
-  { href: "/", label: "Home", icon: "⌂" },
+  { href: "/home", label: "Home", icon: "⌂" },
   { href: "/score", label: "My Match", icon: "○" },
   { href: "/live", label: "Tournament", icon: "◆" },
   { href: "/live?view=leaderboards", label: "Leaderboards", icon: "≡" },

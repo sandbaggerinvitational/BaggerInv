@@ -149,7 +149,7 @@ export default async function PlayerPage({ params, searchParams }) {
     <main>
       <Header />
       <ContextBackLink
-        href={passportIdentity ? "/" : playerDirectoryReturnHref}
+        href={passportIdentity ? "/home" : playerDirectoryReturnHref}
         label={passportIdentity ? "Back to My Tournament" : "Back to All Sandbaggers"}
       />
       {passportIdentity ? <ContextBackLink

@@ -164,6 +164,7 @@ test("Participant Mode shell preserves verified identity across temporary revali
 
 test("Participant Mode active destinations cover direct and nested routes", () => {
   assert.equal(participantDestination("/", "", "clay-beltran"), "Home");
+  assert.equal(participantDestination("/home", "", "clay-beltran"), "Home");
   assert.equal(participantDestination("/score", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/score/access/token", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/live", "", "clay-beltran"), "Tournament");

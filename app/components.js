@@ -2,10 +2,10 @@ import Link from "next/link";
 import Menu from "./Menu";
 import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
 
-export function Header({ activeNavigationHref = "" } = {}) {
+export function Header({ activeNavigationHref = "", homeHref = "/" } = {}) {
   return (
     <header className="siteHeader">
-      <Link href="/" className="brand">
+      <Link href={homeHref} className="brand">
         <img
           src="/images/sandbagger-logo.png"
           alt="Sandbagger Invitational"

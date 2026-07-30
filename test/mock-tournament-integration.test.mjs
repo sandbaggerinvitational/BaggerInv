@@ -23,6 +23,7 @@ function withEnvironment(values, callback) {
 
 const sheetData = fs.readFileSync(new URL("../app/live/sheetData.js", import.meta.url), "utf8");
 const homePage = fs.readFileSync(new URL("../app/page.js", import.meta.url), "utf8");
+const mobileHome = fs.readFileSync(new URL("../app/MobileTournamentHome.js", import.meta.url), "utf8");
 const livePage = fs.readFileSync(new URL("../app/live/page.js", import.meta.url), "utf8");
 const matchCenter = fs.readFileSync(new URL("../app/live/MatchCenter.js", import.meta.url), "utf8");
 const myMatch = fs.readFileSync(new URL("../app/score/page.js", import.meta.url), "utf8");
@@ -64,7 +65,8 @@ test("Home, Tournament, and Leaderboards share the normalized tournament payload
 });
 
 test("Upcoming normalized tournaments retain mobile dashboard and empty standings behavior", () => {
-  assert.match(homePage, /TournamentCommandCenter/);
+  assert.match(homePage, /MobileTournamentHome/);
+  assert.match(mobileHome, /TournamentCommandCenter/);
   assert.match(matchCenter, /Player Standings/);
   assert.match(matchCenter, /No points have been decided in this round yet/);
   assert.match(matchCenter, /tournament\.teamOne\.score/);

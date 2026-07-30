@@ -37,7 +37,7 @@ function holeWinnerMark(score, teamNames) {
 
 function ParticipantLinks({ player }) {
   return <nav className={styles.liveLinks} aria-label="Player Passport navigation">
-    <Link href="/">My Tournament</Link>
+    <Link href="/home">My Tournament</Link>
     <Link href="/live">Tournament Coverage</Link>
     <Link href="/live?view=points">Live Leaderboard</Link>
     <Link href={player?.slug ? `/players/${player.slug}` : "/players"}>My Profile</Link>

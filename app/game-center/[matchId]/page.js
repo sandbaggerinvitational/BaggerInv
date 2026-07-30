@@ -24,7 +24,7 @@ export default async function GameCenterPage({ params, searchParams }) {
 
   return <main className={styles.page}>
     <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
-    <Header />
+    <Header homeHref="/home" />
     <div className={styles.content}>
       <TournamentIdentityHeader
         year={initialData.tournament.year}

@@ -32,7 +32,10 @@ export default function TournamentIdentityHeader({
         <h1>{name}</h1>
         <span>{location}</span>
       </div>
-      <span className={styles.headerLive}><i aria-hidden="true" />{status}</span>
+      <span className={styles.headerLive}>
+        {status === "Live" ? <i aria-hidden="true" /> : null}
+        {status}
+      </span>
     </header>
   );
 }
