@@ -11,6 +11,8 @@ const preferenceKey = "sbi-notification-preferences";
 export default function ParticipantProfile() {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [identityState, setIdentityState] = useState("loading");
+  const [attempt, setAttempt] = useState(0);
   const [confirming, setConfirming] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [preferences, setPreferences] = useState(() =>
@@ -18,15 +20,33 @@ export default function ParticipantProfile() {
   );
 
   useEffect(() => {
+    let current = true;
     try {
       const saved = JSON.parse(window.localStorage.getItem(preferenceKey) || "null");
       if (saved) setPreferences((current) => ({ ...current, ...saved }));
     } catch {}
+    try {
+      const remembered = JSON.parse(window.localStorage.getItem("sbi-participant-shell") || "null");
+      if (remembered?.id && remembered?.name) setPlayer(remembered);
+    } catch {}
+    setLoading(true);
     fetch("/api/player-passport/session", { cache: "no-store" })
-      .then(async (response) => response.ok ? (await response.json()).player : null)
-      .then(setPlayer)
-      .finally(() => setLoading(false));
-  }, []);
+      .then(async (response) => {
+        if (!current) return;
+        if (response.ok) {
+          setPlayer((await response.json()).player);
+          setIdentityState("active");
+        } else if (response.status === 401) {
+          setPlayer(null);
+          setIdentityState("inactive");
+        } else {
+          setIdentityState("unavailable");
+        }
+      })
+      .catch(() => { if (current) setIdentityState("unavailable"); })
+      .finally(() => { if (current) setLoading(false); });
+    return () => { current = false; };
+  }, [attempt]);
 
   const toggle = (id) => {
     setPreferences((current) => {
@@ -62,7 +82,8 @@ export default function ParticipantProfile() {
     }
   };
 
-  if (loading) return <section className={styles.state}>Loading your Player Passport…</section>;
+  if (loading && !player) return <section className={styles.state}>Loading your Player Passport…</section>;
+  if (identityState === "unavailable" && !player) return <section className={styles.state}><h1>Player Passport temporarily unavailable</h1><p>We couldn’t verify your Player Passport right now.</p><button type="button" onClick={() => setAttempt((value) => value + 1)}>Retry</button></section>;
   if (!player) return <section className={styles.state}><h1>Player Passport required</h1><Link href="/activate">Activate Player Passport</Link></section>;
 
   return <section className={styles.page}>

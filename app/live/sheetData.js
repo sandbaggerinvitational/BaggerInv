@@ -22,7 +22,10 @@ import { finalizedMatchResult } from "../../lib/game-center";
 import {
   authenticatedPreviewReadsEnabled,
   readNormalizedSheetValues,
+  readNormalizedSheetsValues,
+  normalizedReadDiagnostics,
 } from "../../lib/google-sheets-server-read";
+import { isTransientGoogleError } from "../../lib/google-api-reliability";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -297,14 +300,42 @@ function tieAdvantageSide(tournamentRow, teams) {
   return null;
 }
 
-export async function getTournamentData() {
-  const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows] = await Promise.all([
-    fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
-    fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
-    fetchOptionalSheet("Live Hole Scores"),
-    fetchOptionalSheet("Course Holes"),
-    fetchOptionalSheet("Tournament Itinerary"),
-  ]);
+async function buildTournamentData() {
+  let sheets;
+  if (authenticatedPreviewReadsEnabled()) {
+    const names = [
+      "Live Matches", "Matches", "Live Tournaments", "Players", "Team Names",
+      "Tournaments", "Courses", "Tournament Rules", "Live Hole Scores",
+      "Course Holes", "Tournament Itinerary",
+    ];
+    const values = await readNormalizedSheetsValues(names);
+    sheets = Object.fromEntries(names.map((name) => [name, table(values[name] || [])]));
+  } else {
+    const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows] = await Promise.all([
+      fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
+      fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
+      fetchOptionalSheet("Live Hole Scores"), fetchOptionalSheet("Course Holes"), fetchOptionalSheet("Tournament Itinerary"),
+    ]);
+    sheets = {
+      "Live Matches": liveRows, Matches: permanentRows, "Live Tournaments": liveTournaments,
+      Players: players, "Team Names": teamRows, Tournaments: tournaments, Courses: courses,
+      "Tournament Rules": rules, "Live Hole Scores": liveHoleScores, "Course Holes": courseHoles,
+      "Tournament Itinerary": itineraryRows,
+    };
+  }
+  const {
+    "Live Matches": liveRows,
+    Matches: permanentRows,
+    "Live Tournaments": liveTournaments,
+    Players: players,
+    "Team Names": teamRows,
+    Tournaments: tournaments,
+    Courses: courses,
+    "Tournament Rules": rules,
+    "Live Hole Scores": liveHoleScores,
+    "Course Holes": courseHoles,
+    "Tournament Itinerary": itineraryRows,
+  } = sheets;
 
   const active = [...liveTournaments]
     .filter((row) => tournamentYear(row))
@@ -499,5 +530,55 @@ export async function getTournamentData() {
       ])
     ),
     schedule,
+  };
+}
+
+let pendingTournamentData;
+let lastGoodTournamentData;
+let lastGoodAt = 0;
+const loaderDiagnostics = {
+  result: "idle",
+  cacheBehavior: "miss",
+  staleFallbacks: 0,
+  errorCategory: "",
+  requiredSheetsFound: false,
+};
+
+export async function getTournamentData() {
+  if (pendingTournamentData) {
+    loaderDiagnostics.cacheBehavior = "in-flight-dedupe";
+    return pendingTournamentData;
+  }
+  loaderDiagnostics.cacheBehavior = "miss";
+  pendingTournamentData = buildTournamentData()
+    .then((data) => {
+      lastGoodTournamentData = data;
+      lastGoodAt = Date.now();
+      loaderDiagnostics.result = "success";
+      loaderDiagnostics.errorCategory = "";
+      loaderDiagnostics.requiredSheetsFound = true;
+      return data;
+    })
+    .catch((error) => {
+      loaderDiagnostics.result = "error";
+      loaderDiagnostics.errorCategory = error?.category || "unknown";
+      if (isTransientGoogleError(error) && lastGoodTournamentData && Date.now() - lastGoodAt < 60_000) {
+        loaderDiagnostics.cacheBehavior = "stale-on-transient-error";
+        loaderDiagnostics.staleFallbacks += 1;
+        return lastGoodTournamentData;
+      }
+      throw error;
+    })
+    .finally(() => {
+      pendingTournamentData = undefined;
+    });
+  return pendingTournamentData;
+}
+
+export function tournamentLoaderDiagnostics() {
+  return {
+    ...loaderDiagnostics,
+    lastGoodAgeMs: lastGoodAt ? Date.now() - lastGoodAt : null,
+    google: normalizedReadDiagnostics(),
   };
 }

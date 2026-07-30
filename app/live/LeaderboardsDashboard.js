@@ -199,7 +199,11 @@ export default function LeaderboardsDashboard({ initialData, loadError }) {
     return () => { window.clearInterval(timer); window.removeEventListener("focus", poll); document.removeEventListener("visibilitychange", poll); };
   }, [refresh]);
   const tournament = data?.tournament;
-  if (!tournament) return <section className={styles.page}><div className={styles.empty}><strong>Leaderboards are unavailable.</strong><span>{loadError || "Please try again shortly."}</span></div></section>;
+  if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
+    <strong>{refreshState === "refreshing" ? "Loading leaderboards…" : "Tournament data is temporarily unavailable."}</strong>
+    <span>{refreshState === "refreshing" ? "Retrying official standings." : loadError || "Please try again shortly."}</span>
+    {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
+  </div></section>;
   return <section className={styles.page}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Individual, team, and round standings</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>

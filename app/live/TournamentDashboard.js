@@ -218,7 +218,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
     return pending.current;
   }, []);
   useEffect(() => {
-    refresh();
+    if (!initialData) refresh();
     const poll = () => { if (document.visibilityState === "visible") refresh(); };
     const timer = window.setInterval(poll, 45_000);
     const clockTimer = window.setInterval(() => setClock(Date.now()), 10_000);
@@ -231,7 +231,11 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const activeRound = rounds.find((round) => Number(round.number) === Number(selectedRound)) || rounds.find((round) => Number(round.number) === Number(tournament?.currentRound)) || rounds[0];
   const selectedRounds = selectedRound === "overall" ? rounds : activeRound ? [activeRound] : [];
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
-  if (!tournament) return <section className={styles.page}><div className={styles.empty}><strong>Tournament data is unavailable.</strong><span>{loadError || "Please try again shortly."}</span></div></section>;
+  if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
+    <strong>{refreshState === "refreshing" ? "Loading tournament…" : "Tournament data is temporarily unavailable."}</strong>
+    <span>{refreshState === "refreshing" ? "Retrying the normalized tournament workbook." : loadError || "Please try again shortly."}</span>
+    {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
+  </div></section>;
   return <section className={styles.page}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />

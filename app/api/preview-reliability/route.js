@@ -1,0 +1,24 @@
+import { NextResponse } from "next/server";
+import { loadParticipantRequestContext } from "../../../lib/participant-request-context.js";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(request) {
+  if (process.env.VERCEL_ENV !== "preview") {
+    return NextResponse.json({ error: "Not found." }, { status: 404 });
+  }
+  const context = await loadParticipantRequestContext(request, { route: "/api/preview-reliability" });
+  const google = context.diagnostics.google;
+  return NextResponse.json({
+    normalizedWorkbookReachable: Boolean(context.tournamentData),
+    requiredSheetsFound: Boolean(context.diagnostics.requiredSheetsFound),
+    activeTournamentResolved: Boolean(context.tournamentData?.tournament),
+    tournamentStatus: context.tournamentData?.tournament?.state || "unavailable",
+    googleApiLatencyMs: google.lastLatencyMs,
+    retryCount: google.retries,
+    cacheBehavior: context.diagnostics.cacheBehavior,
+    passportCookieDetected: context.passportCookiePresent,
+    trustedDeviceLookupSuccessful: context.identity.status === "active",
+    playerResolved: Boolean(context.identity.identity?.player),
+  });
+}

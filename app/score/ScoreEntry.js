@@ -63,6 +63,8 @@ export default function ScoreEntry() {
   const [passportPlayer, setPassportPlayer] = useState(null);
   const [passportMatches, setPassportMatches] = useState([]);
   const [passportTournament, setPassportTournament] = useState(null);
+  const [passportState, setPassportState] = useState("loading");
+  const [restoreAttempt, setRestoreAttempt] = useState(0);
 
   const request = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -103,7 +105,9 @@ export default function ScoreEntry() {
   };
 
   useEffect(() => {
+    let current = true;
     const restore = async () => {
+      setPassportState("loading");
       try {
         const [session, passport] = await Promise.all([
           fetch("/api/scoring/session", { cache: "no-store" }),
@@ -111,13 +115,23 @@ export default function ScoreEntry() {
         ]);
         if (passport.ok) {
           const identity = await passport.json();
+          if (!current) return;
           setPassportPlayer(identity.player);
+          setPassportState("active");
           const matches = await fetch("/api/player-passport/matches", { cache: "no-store" });
           const payload = await matches.json();
           if (matches.ok) {
+            if (!current) return;
             setPassportMatches(payload.data?.matches || []);
             setPassportTournament(payload.data?.tournament || null);
+          } else if (matches.status !== 401) {
+            setPassportState("unavailable");
+            setStatus(payload.error || "We couldn’t verify your Player Passport right now.");
           }
+        } else if (passport.status === 401) {
+          setPassportState("inactive");
+        } else {
+          setPassportState("unavailable");
         }
         if (session.ok) {
           const payload = await session.json();
@@ -126,16 +140,16 @@ export default function ScoreEntry() {
           await loadMatch();
           return;
         }
-        if (!passport.ok) await loadMatchOptions();
+        if (passport.status === 401) await loadMatchOptions();
       } catch {
-        setAuthorized(false);
-        setData(null);
+        if (current) setPassportState("unavailable");
       } finally {
-        setRestoring(false);
+        if (current) setRestoring(false);
       }
     };
     restore();
-  }, []);
+    return () => { current = false; };
+  }, [restoreAttempt]);
 
   const login = async () => {
     setBusy(true); setStatus("Opening scoring…");
@@ -323,6 +337,11 @@ export default function ScoreEntry() {
       onOpen={openPassportMatch}
       message={status}
     />;
+
+  if (!authorized && passportState === "unavailable") return <section className={styles.login}>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>We couldn’t verify your Player Passport right now.</p></div>
+    <button className={styles.primary} type="button" onClick={() => { setRestoring(true); setRestoreAttempt((value) => value + 1); }}>Retry</button>
+  </section>;
 
   if (!authorized) return <section className={styles.login}>
     <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Select your Player Passport to view your matches, or use a participant match code.</p></div>

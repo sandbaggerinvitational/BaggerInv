@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { participantDestination } from "../lib/participant-shell";
 import styles from "./participant-navigation.module.css";
 
@@ -20,17 +20,21 @@ export default function ParticipantIdentity() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [player, setPlayer] = useState(null);
+  const requestSequence = useRef(0);
 
   const refresh = useCallback(() => {
+    const sequence = ++requestSequence.current;
     fetch("/api/player-passport/session", { cache: "no-store" })
       .then(async (response) => {
+        if (sequence !== requestSequence.current) return;
         if (response.ok) {
           const nextPlayer = (await response.json()).player;
+          if (sequence !== requestSequence.current) return;
           setPlayer(nextPlayer);
           window.localStorage.setItem(PARTICIPANT_SHELL_KEY, JSON.stringify(nextPlayer));
           return;
         }
-        if (response.status === 401) {
+        if (response.status === 401 && sequence === requestSequence.current) {
           setPlayer(null);
           window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
         }
@@ -76,14 +80,14 @@ export default function ParticipantIdentity() {
     <nav className={styles.mobile} aria-label={`${player.name}'s tournament navigation`}>
       {items.map((item) => {
         const active = currentDestination === item.label;
-        return <Link href={item.href} aria-current={active ? "page" : undefined} key={item.label}>
+        return <Link href={item.href} prefetch={false} aria-current={active ? "page" : undefined} key={item.label}>
           <span aria-hidden="true">{item.icon}</span><b>{item.label}</b>
         </Link>;
       })}
     </nav>
     <nav className={styles.desktop} aria-label={`${player.name}'s Player Passport`}>
       <span>Welcome, {player.name}</span>
-      {items.map((item) => <Link href={item.href} key={item.label}>{item.label}</Link>)}
+      {items.map((item) => <Link href={item.href} prefetch={false} key={item.label}>{item.label}</Link>)}
     </nav>
   </>;
 }
