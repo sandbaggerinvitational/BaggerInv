@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { finalizedMatchResult } from "../../lib/match-result.js";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import MyMatchDashboard from "./MyMatchDashboard";
 import styles from "./score.module.css";
@@ -208,6 +209,9 @@ export default function ScoreEntry() {
   const teamNames = display.teamNames || {};
   const playerNames = display.playerNames || {};
   const isFinal = match["Match Status"] === "Final";
+  const finalResult = isFinal
+    ? finalizedMatchResult(match, data?.holeScores || [], teamNames)
+    : "";
   const format = String(match.Format || "").toUpperCase();
   const slots = format === "BB" ? 2 : 1;
   const savedHole = data?.holeScores?.find((item) => Number(item["Hole Number"]) === holeNumber);
@@ -365,7 +369,7 @@ export default function ScoreEntry() {
     <header><div><span>{display.formatName || format} · Round {match.Round}</span><h1>{display.matchName || `Match ${match.Match}`}</h1><p>{display.courseName || match["Course ID"]} · Scorecard review</p></div><b>{completed.size}/18</b></header>
     <div className={styles.reviewStatus}>
       <span>{isFinal ? "FINAL SCORECARD" : "REVIEW BEFORE SUBMITTING"}</span>
-      <strong>{completed.size ? namedMatchStatus(data?.holeScores, teamNames) : lastSaved || "Check every hole before confirmation."}</strong>
+      <strong>{isFinal ? finalResult || "Final" : completed.size ? namedMatchStatus(data?.holeScores, teamNames) : lastSaved || "Check every hole before confirmation."}</strong>
     </div>
     {[scorecardHoles.slice(0, 9), scorecardHoles.slice(9)].map((nine, nineIndex) => <div className={styles.scorecard} key={nineIndex}>
       <div className={styles.scorecardRow} data-header="true"><strong>Player / Team</strong>{nine.map(({ number }) => <b key={number}>{number}</b>)}</div>
@@ -390,7 +394,13 @@ export default function ScoreEntry() {
     {!isFinal && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
     {leaderboardLinks}
     {passportPlayer ? <ParticipantLinks player={passportPlayer} /> : null}
-    {isFinal ? <div className={styles.result}><span>Match finalized</span><strong>{namedMatchStatus(data?.holeScores, teamNames)}</strong><small>Only an administrator can reopen this scorecard.</small></div> : confirming ? <div className={styles.confirmPanel}>
+    {isFinal ? <>
+      <div className={styles.result}><span>Match finalized</span><strong>{finalResult || "Final"}</strong><small>Only an administrator can reopen this scorecard.</small></div>
+      <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
+        <Link className={styles.primary} href="/score">Return to My Match</Link>
+        <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>View Match Result</Link>
+      </nav>
+    </> : confirming ? <div className={styles.confirmPanel}>
       <strong>Submit this scorecard as final?</strong>
       <p>Golfers will no longer be able to edit it unless an administrator reopens the match.</p>
       <div><button disabled={busy} onClick={() => setConfirming(false)}>Keep reviewing</button><button className={styles.danger} disabled={busy} onClick={confirmScorecard}>Confirm final scorecard</button></div>
@@ -429,8 +439,11 @@ export default function ScoreEntry() {
     </div>
     {savedHole && <div className={styles.result}><span>Match status</span><strong>{namedMatchStatus(data?.holeScores, teamNames)}</strong><small>Hole {holeNumber}: {holeWinnerMark(savedHole, teamNames)}</small></div>}
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
-    {isFinal && <div className={styles.result}><span>Match complete</span><strong>{namedMatchStatus(data?.holeScores, teamNames)}</strong><small>An administrator can reopen the match for corrections.</small></div>}
-    <button className={styles.primary} disabled={isFinal || busy || !scoresComplete} onClick={save}>{isFinal ? "Match finalized" : savedHole ? "Update hole" : "Save hole"}</button>
+    {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
+    {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
+      <Link className={styles.primary} href="/score">Return to My Match</Link>
+      <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>View Match Result</Link>
+    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete} onClick={save}>{savedHole ? "Update hole" : "Save hole"}</button>}
     {status && <p className={styles.status}>{status}</p>}
     {leaderboardLinks}
   </section>;

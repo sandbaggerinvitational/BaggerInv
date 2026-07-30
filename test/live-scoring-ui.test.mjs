@@ -19,7 +19,13 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.doesNotMatch(source, /sessionStorage/);
   assert.match(source, /\/api\/scoring\/current/);
   assert.match(source, /Restoring your authorized match/);
-  assert.match(source, /<strong>{namedMatchStatus\(data\?\.holeScores, teamNames\)}<\/strong>/);
+  assert.match(source, /finalizedMatchResult\(match, data\?\.holeScores \|\| \[\], teamNames\)/);
+  assert.match(source, /Return to My Match/);
+  assert.match(source, /href="\/score"/);
+  assert.match(source, /View Match Result/);
+  assert.match(source, /game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match/);
+  assert.doesNotMatch(source, /isFinal \? "Match finalized"/);
+  assert.doesNotMatch(source, /view=matchups/);
 });
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {
