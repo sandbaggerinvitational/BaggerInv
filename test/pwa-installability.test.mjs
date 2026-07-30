@@ -45,7 +45,7 @@ test("iPhone release metadata uses safe-area viewport, launch images, and a mask
   assert.match(layout, /startupImage/);
   assert.match(manifestSource, /icon-maskable-512\.png/);
   assert.match(manifestSource, /shortcuts/);
-  assert.match(manifestSource, /\/score\?source=shortcut/);
+  assert.match(manifestSource, /\/my-match\?source=shortcut/);
 });
 
 test("participant profile exposes the native Web Share API with a copy fallback", async () => {

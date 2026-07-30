@@ -112,7 +112,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
   const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=my-match`;
   const action = status === "Live"
     ? match.holesRecorded ? "Continue Scoring" : "Start Scoring"
-    : status === "Final" ? "View Final" : "View Match";
+    : status === "Final" ? "View Match Result" : "View Match";
   const accessible = [
     `Round ${match.round}`,
     match.match ? `Match ${match.match}` : "",
@@ -128,7 +128,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
     <div className={styles.cardTop}>
       <MatchHeading match={match} />
       <div className={styles.cardState}>
-        {emphasized ? <small>{status === "Live" ? "Current Match" : "Next Match"}</small> : null}
+        {emphasized ? <small>{status === "Live" ? "Current Match" : status === "Final" ? "Match Complete" : "Upcoming Match"}</small> : null}
         <span data-status={status.toUpperCase().replaceAll(" ", "-")}>{status}</span>
         {result ? <strong aria-label={`Final result: ${result}`}>{result}</strong> : null}
       </div>

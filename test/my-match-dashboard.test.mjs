@@ -52,7 +52,7 @@ test("My Match keeps status, scoring access, and final results distinct", async 
   assert.doesNotMatch(source, /<footer>/);
   assert.match(source, /Start Scoring/);
   assert.match(source, /Continue Scoring/);
-  assert.match(source, /View Final/);
+  assert.match(source, /View Match Result/);
   assert.match(source, /"HALVED"/);
   assert.equal(source.includes('"WON"'), true);
   assert.equal(source.includes('"LOST"'), true);

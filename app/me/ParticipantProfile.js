@@ -92,7 +92,7 @@ export default function ParticipantProfile() {
       <h2>Your SBI</h2>
       <div className={styles.links}>
         <Link href={player.slug ? `/players/${player.slug}` : "/players"}><strong>Player Profile</strong><span>Career statistics, history, and achievements</span></Link>
-        <Link href="/score"><strong>My Matches</strong><span>Your tournament assignments and scorecards</span></Link>
+        <Link href="/my-match"><strong>My Matches</strong><span>Your tournament assignments and scorecards</span></Link>
         <Link href="/tournament-guide"><strong>Tournament Guide</strong><span>Schedule, rules, and important information</span></Link>
         <button className={nativeStyles.share} type="button" onClick={shareApp}><strong>Share SBI</strong><span>Open the iPhone Share Sheet or copy the website link</span></button>
       </div>

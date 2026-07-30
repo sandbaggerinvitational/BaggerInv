@@ -83,7 +83,7 @@ test("heavy participant navigation disables automatic route prefetch only at the
   assert.match(navigation, /prefetch=\{false\}/);
   assert.match(navigation, /href:\s*"\/home"/);
   assert.match(navigation, /href:\s*"\/live"/);
-  assert.match(navigation, /href:\s*"\/score"/);
+  assert.match(navigation, /href:\s*"\/my-match"/);
 });
 
 test("Tournament avoids immediate duplicate refresh and all failure screens offer retry", async () => {

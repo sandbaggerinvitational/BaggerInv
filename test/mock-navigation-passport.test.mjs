@@ -29,6 +29,30 @@ test("participant Home navigation uses the canonical same-origin dashboard", asy
   assert.equal(participantDestination("/home"), "Home");
 });
 
+test("My Match navigation always opens the dashboard instead of restoring a scorecard", async () => {
+  const [navigation, dashboardPage, scoreEntry, gameCenter, profile, activation, manifest] = await Promise.all([
+    source("app/ParticipantIdentity.js"),
+    source("app/my-match/page.js"),
+    source("app/score/ScoreEntry.js"),
+    source("app/game-center/GameCenter.js"),
+    source("app/me/ParticipantProfile.js"),
+    source("app/activate/PlayerPassportActivation.js"),
+    source("app/manifest.js"),
+  ]);
+
+  assert.match(navigation, /href:\s*"\/my-match",\s*label:\s*"My Match"/);
+  assert.match(dashboardPage, /<ScoreEntry dashboardOnly \/>/);
+  assert.match(scoreEntry, /dashboardOnly \? Promise\.resolve\(null\)/);
+  assert.match(scoreEntry, /if \(dashboardOnly\) \{\s*window\.location\.assign\("\/score"\)/);
+  assert.match(scoreEntry, /Return to My Match<\/Link>/);
+  assert.match(scoreEntry, /href="\/my-match"/);
+  assert.doesNotMatch(scoreEntry, /Return to My Match<\/Link>[\s\S]{0,100}href="\/score"/);
+  assert.match(gameCenter, /backTo === "my-match" \? "\/my-match"/);
+  assert.match(profile, /href="\/my-match"/);
+  assert.match(activation, /href="\/my-match">Open My Match/);
+  assert.match(manifest, /url:\s*"\/my-match\?source=shortcut"/);
+});
+
 test("mobile app navigation contains no absolute deployment or Production targets", async () => {
   const paths = [
     "app/ParticipantIdentity.js",

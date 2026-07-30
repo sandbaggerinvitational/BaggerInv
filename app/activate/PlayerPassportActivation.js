@@ -67,7 +67,7 @@ export default function PlayerPassportActivation({ invitedReference = "", active
     <span className={styles.eyebrow}>Player Passport active</span>
     <h1>Welcome back, {activated.name}.</h1>
     <p>This device remembers you. Your Passport can open scorecards only for matches in which you are participating.</p>
-    <div className={styles.actions}><Link href="/home">Open My Tournament</Link><Link href="/score">Open My Match</Link></div>
+    <div className={styles.actions}><Link href="/home">Open My Tournament</Link><Link href="/my-match">Open My Match</Link></div>
     <button type="button" className={styles.fallback} onClick={clearPassport}>This isn’t me</button>
     <p className={styles.note}>For the app experience, use your browser’s Add to Home Screen option.</p>
   </section>;

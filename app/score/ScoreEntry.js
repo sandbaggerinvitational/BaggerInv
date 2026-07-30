@@ -45,7 +45,7 @@ function ParticipantLinks({ player }) {
   </nav>;
 }
 
-export default function ScoreEntry() {
+export default function ScoreEntry({ dashboardOnly = false }) {
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
   const [authorized, setAuthorized] = useState(false);
@@ -111,7 +111,7 @@ export default function ScoreEntry() {
       setPassportState("loading");
       try {
         const [session, passport] = await Promise.all([
-          fetch("/api/scoring/session", { cache: "no-store" }),
+          dashboardOnly ? Promise.resolve(null) : fetch("/api/scoring/session", { cache: "no-store" }),
           fetch("/api/player-passport/session", { cache: "no-store" }),
         ]);
         if (passport.ok) {
@@ -134,14 +134,14 @@ export default function ScoreEntry() {
         } else {
           setPassportState("unavailable");
         }
-        if (session.ok) {
+        if (session?.ok) {
           const payload = await session.json();
           setName(payload.scorerName || "");
           setAuthorized(true);
           await loadMatch();
           return;
         }
-        if (passport.status === 401) await loadMatchOptions();
+        if (passport.status === 401 && !dashboardOnly) await loadMatchOptions();
       } catch {
         if (current) setPassportState("unavailable");
       } finally {
@@ -150,7 +150,7 @@ export default function ScoreEntry() {
     };
     restore();
     return () => { current = false; };
-  }, [restoreAttempt]);
+  }, [dashboardOnly, restoreAttempt]);
 
   const login = async () => {
     setBusy(true); setStatus("Opening scoring…");
@@ -177,6 +177,10 @@ export default function ScoreEntry() {
         method: "POST",
         body: JSON.stringify({ matchId: passportMatch.matchId }),
       });
+      if (dashboardOnly) {
+        window.location.assign("/score");
+        return;
+      }
       setName(passportPlayer?.name || "");
       setAuthorized(true);
       await loadMatch();
@@ -397,7 +401,7 @@ export default function ScoreEntry() {
     {isFinal ? <>
       <div className={styles.result}><span>Match finalized</span><strong>{finalResult || "Final"}</strong><small>Only an administrator can reopen this scorecard.</small></div>
       <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
-        <Link className={styles.primary} href="/score">Return to My Match</Link>
+        <Link className={styles.primary} href="/my-match">Return to My Match</Link>
         <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>View Match Result</Link>
       </nav>
     </> : confirming ? <div className={styles.confirmPanel}>
@@ -441,7 +445,7 @@ export default function ScoreEntry() {
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
-      <Link className={styles.primary} href="/score">Return to My Match</Link>
+      <Link className={styles.primary} href="/my-match">Return to My Match</Link>
       <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>View Match Result</Link>
     </nav> : <button className={styles.primary} disabled={busy || !scoresComplete} onClick={save}>{savedHole ? "Update hole" : "Save hole"}</button>}
     {status && <p className={styles.status}>{status}</p>}

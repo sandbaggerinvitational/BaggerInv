@@ -10,7 +10,7 @@ const PARTICIPANT_SHELL_KEY = "sbi-participant-shell";
 
 const itemsFor = (player) => [
   { href: "/home", label: "Home", icon: "⌂" },
-  { href: "/score", label: "My Match", icon: "○" },
+  { href: "/my-match", label: "My Match", icon: "○" },
   { href: "/live", label: "Tournament", icon: "◆" },
   { href: "/live?view=leaderboards", label: "Leaderboards", icon: "≡" },
   { href: "/me", label: "Me", icon: "●" },

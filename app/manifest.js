@@ -25,7 +25,7 @@ export default function manifest() {
         name: "My Match",
         short_name: "My Match",
         description: "Open your current SBI match.",
-        url: "/score?source=shortcut",
+        url: "/my-match?source=shortcut",
         icons: [{ src: absoluteUrl("/icon-192.png"), sizes: "192x192" }],
       },
       {

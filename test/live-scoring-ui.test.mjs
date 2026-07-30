@@ -21,7 +21,7 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /Restoring your authorized match/);
   assert.match(source, /finalizedMatchResult\(match, data\?\.holeScores \|\| \[\], teamNames\)/);
   assert.match(source, /Return to My Match/);
-  assert.match(source, /href="\/score"/);
+  assert.match(source, /href="\/my-match"/);
   assert.match(source, /View Match Result/);
   assert.match(source, /game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match/);
   assert.doesNotMatch(source, /isFinal \? "Match finalized"/);
