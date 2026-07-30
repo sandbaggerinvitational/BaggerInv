@@ -13,6 +13,8 @@ test("formats plus handicaps with parentheses", () => {
 test("normalizes accounting-style handicap values from Google Sheets", () => {
   assert.equal(parseNumericValue("(0.6)"), -0.6);
   assert.equal(parseNumericValue("-1.5"), -1.5);
+  assert.equal(parseNumericValue("'12.8"), 12.8);
+  assert.equal(parseNumericValue("'-1.5"), -1.5);
   assert.equal(parseNumericValue("0"), 0);
 });
 

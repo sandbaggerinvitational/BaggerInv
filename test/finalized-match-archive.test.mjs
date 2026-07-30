@@ -16,9 +16,9 @@ const liveMatch = {
   "Team 1 Player 2": "MS01",
   "Team 2 Player 1": "WO01",
   "Team 2 Player 2": "PN01",
-  "Team 1 Player 1 Playing HCP": "13",
+  "Team 1 Player 1 Playing HCP": "'12.8",
   "Team 1 Player 2 Playing Handicap": "8",
-  "Team 2 Player 1 Playing HCP": "4",
+  "Team 2 Player 1 Playing HCP": "'-1.5",
   "Team 2 Player 2 Playing HCP": "10",
   "Team 1 Player 1 Stroke": "9",
   "Team 1 Player 2 Strokes Received": "4",
@@ -56,8 +56,11 @@ test("finalized archive snapshot is self-contained", () => {
   assert.equal(snapshot["Match Number"], "5");
   assert.equal(snapshot["Team 1 Player Names"], "Clay Beltran / Matthew Smith");
   assert.equal(snapshot["Team 2 Player Names"], "Will Oliver / Patrick Noonan");
-  assert.equal(snapshot["Team 1 Player 2 Playing HCP"], "8");
-  assert.equal(snapshot["Team 1 Player 2 Stroke"], "4");
+  assert.equal(snapshot["Team 1 Player 1 Playing HCP"], 12.8);
+  assert.equal(snapshot["Team 1 Player 2 Playing HCP"], 8);
+  assert.equal(snapshot["Team 2 Player 1 Playing HCP"], -1.5);
+  assert.equal(snapshot["Team 1 Player 2 Stroke"], 4);
+  assert.equal(snapshot["Team 2 Player 1 Stroke"], 0);
   assert.equal(snapshot.Course, "Turtle Point Golf Course");
   assert.equal(snapshot.Tee, "Gold");
   assert.equal(snapshot["Tee Time"], "8:10 AM");
@@ -87,7 +90,7 @@ test("re-finalization retains historical metadata when a live source field is bl
   });
   assert.equal(snapshot["Tee Time"], "8:10 AM");
   assert.equal(snapshot["Starting Hole"], "1");
-  assert.equal(snapshot["Team 1 Player 1 Playing HCP"], "13");
+  assert.equal(snapshot["Team 1 Player 1 Playing HCP"], 13);
   assert.equal(snapshot["Completed At"], "2026-07-30T13:55:00.000Z");
   assert.equal(snapshot["Finalized At"], "2026-07-30T14:05:00.000Z");
 });
@@ -117,4 +120,5 @@ test("Admin refreshes its draft from the authoritative returned Match Status", a
   assert.match(source, /\[match\["Updated At"\], match\["Match Status"\]\]/);
   assert.match(source, /data-status=\{match\["Match Status"\] \|\| "Scheduled"\}/);
   assert.match(source, /<strong>\{match\["Match Status"\] \|\| "Scheduled"\}<\/strong>/);
+  assert.match(source, /\{isFinal \? <option>Final<\/option> : null\}/);
 });
