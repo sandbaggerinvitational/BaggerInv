@@ -5,6 +5,7 @@ import {
   assertLiveScoringWriteEnvironment,
   assertPreviewSpreadsheetIsolation,
   liveTournamentV2Enabled,
+  mobileTournamentDashboardEnabled,
   previewEnvironmentDiagnostic,
 } from "../lib/spreadsheet-environment.js";
 import fs from "node:fs";
@@ -139,12 +140,17 @@ test("preview diagnostic blocks scoring when data is missing or production-backe
   });
 });
 
-test("Tournament Mode replaces only the live flagged homepage", () => {
+test("Tournament Mode replaces the flagged homepage for upcoming and live tournaments", () => {
   const homePage = fs.readFileSync(new URL("../app/page.js", import.meta.url), "utf8");
   const commandCenter = fs.readFileSync(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8");
   const menu = fs.readFileSync(new URL("../app/Menu.js", import.meta.url), "utf8");
 
-  assert.match(homePage, /liveTournamentV2Enabled\(\) && normalizedStatus === "LIVE"/);
+  withEnvironment({ NEXT_PUBLIC_LIVE_TOURNAMENT_V2_ENABLED: "true" }, () => {
+    assert.equal(mobileTournamentDashboardEnabled({ status: "Upcoming" }), true);
+    assert.equal(mobileTournamentDashboardEnabled({ status: "Live" }), true);
+    assert.equal(mobileTournamentDashboardEnabled(null), false);
+  });
+  assert.match(homePage, /mobileTournamentDashboardEnabled\(liveData\?\.tournament\)/);
   assert.equal(homePage.includes('activeNavigationHref="/live"'), true);
   for (const section of [
     "Today’s Schedule",

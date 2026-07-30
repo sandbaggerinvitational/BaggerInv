@@ -19,6 +19,10 @@ import { resolveSpreadsheetId } from "../../lib/spreadsheet-environment";
 import { formatHomeTime } from "../../lib/home-dashboard";
 import { mergeRowsByStableMatchId } from "../../lib/live-match-source";
 import { finalizedMatchResult } from "../../lib/game-center";
+import {
+  authenticatedPreviewReadsEnabled,
+  readNormalizedSheetValues,
+} from "../../lib/google-sheets-server-read";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -69,6 +73,9 @@ function table(rows) {
 }
 
 async function fetchSheet(sheetName) {
+  if (authenticatedPreviewReadsEnabled()) {
+    return table(await readNormalizedSheetValues(sheetName));
+  }
   const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
   if (!response.ok) throw new Error(`${sheetName} returned ${response.status}.`);
   const text = await response.text();

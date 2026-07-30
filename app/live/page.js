@@ -21,7 +21,7 @@ export default async function LivePage() {
   } catch (caughtError) {
     console.error(caughtError);
     error =
-      "The live results could not be loaded. Confirm the Website Feed tab is publicly viewable.";
+      "Tournament data is temporarily unavailable. Confirm the normalized tournament workbook is configured for this environment.";
   }
 
   return (

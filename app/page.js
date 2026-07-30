@@ -10,7 +10,7 @@ import { tournamentStartTimestamp } from "../lib/tournament-countdown";
 import AssetImage from "./AssetImage";
 import TournamentStatusHero from "./TournamentStatusHero";
 import TournamentCommandCenter from "./TournamentCommandCenter";
-import { liveTournamentV2Enabled } from "../lib/spreadsheet-environment";
+import { mobileTournamentDashboardEnabled } from "../lib/spreadsheet-environment";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -116,7 +116,7 @@ export default async function Home() {
     },
   };
 
-  if (liveTournamentV2Enabled() && normalizedStatus === "LIVE") {
+  if (mobileTournamentDashboardEnabled(liveData?.tournament)) {
     return (
       <main className="mobileHomeMain">
         <Header activeNavigationHref="/live" />
