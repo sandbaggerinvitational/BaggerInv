@@ -38,6 +38,8 @@ test("normalized workbook reads batch, dedupe, timeout, and expose safe diagnost
   assert.match(sourceText, /pendingReads\.has/);
   assert.match(sourceText, /AbortSignal\.timeout/);
   assert.match(sourceText, /jti:\s*randomUUID\(\)/);
+  assert.match(sourceText, /urn:ietf:params:oauth:grant-type:jwt-bearer/);
+  assert.doesNotMatch(sourceText, /oauth-2\.0/);
   assert.match(sourceText, /id\.slice\(-6\)/);
   assert.doesNotMatch(sourceText, /privateKey.*console|access_token.*console/);
 });
