@@ -20,7 +20,7 @@ export default async function GameCenterPage({ params, searchParams }) {
     cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""
   );
   const initialData = await getGameCenterData(matchId, identity?.player?.id || "");
-  const backTo = query?.from === "my-match" ? "my-match" : "tournament";
+  const backTo = ["home", "my-match"].includes(query?.from) ? query.from : "tournament";
 
   return <main className={styles.page}>
     <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />

@@ -270,6 +270,21 @@ test("Tournament and My Match View Match destinations route to Game Center witho
   assert.match(myMatch, /`\/game-center\/\$\{encodeURIComponent\(match\.matchId\)\}\?from=my-match`/);
 });
 
+test("Home result and details destinations use same-origin Game Center with Home return context", async () => {
+  const [home, page, center, scoring] = await Promise.all([
+    readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
+    readFile(pageUrl, "utf8"),
+    readFile(componentUrl, "utf8"),
+    readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(home, /`\/game-center\/\$\{encodeURIComponent\(match\.matchId\)\}\?from=home`/);
+  assert.doesNotMatch(home, /view=matchups/);
+  assert.match(page, /\["home", "my-match"\]\.includes\(query\?\.from\)/);
+  assert.match(center, /backTo === "home" \? "\/home"/);
+  assert.match(scoring, /`\/game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match`/);
+  assert.doesNotMatch(scoring, /view=matchups/);
+});
+
 test("Game Center layout protects mobile widths and localizes hole interaction", async () => {
   const styles = await readFile(stylesUrl, "utf8");
   assert.match(styles, /\.content\{width:min\(100%,760px\)/);

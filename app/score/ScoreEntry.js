@@ -320,7 +320,7 @@ export default function ScoreEntry() {
   };
 
   const leaderboardLinks = <nav className={styles.liveLinks} aria-label="Live tournament links">
-    <Link href={`/live?view=matchups&round=${match.Round}#match-${matchId}`}>Matchups</Link>
+    <Link href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>Game Center</Link>
     <Link href={`/live?view=scores&round=${match.Round}`}>Gross &amp; net</Link>
     <Link href={`/live?view=points&round=${match.Round}`}>Player points</Link>
   </nav>;

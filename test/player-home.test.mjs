@@ -101,6 +101,8 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(component, /scheduledAt:\s*match\?\.teeTimeAt/);
   assert.match(component, /timeZone/);
   assert.match(component, /aria-label="versus"/);
+  assert.match(component, /`\/game-center\/\$\{encodeURIComponent\(match\.matchId\)\}\?from=home`/);
+  assert.doesNotMatch(component, /view=matchups/);
   assert.match(route, /authorizePassportMatch/);
   assert.match(route, /verifyPlayerPassportSession/);
   assert.match(sheetsWrite, /tee: String\(match\["Tee Played"\]/);

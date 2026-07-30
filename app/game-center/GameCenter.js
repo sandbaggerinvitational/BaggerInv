@@ -302,8 +302,8 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   const finalResult = data.state === "final" ? data.result.toUpperCase() : "";
   const finalWinner = [teamNames[1], teamNames[2]].find((name) => finalResult.startsWith(clean(name).toUpperCase()));
   const finalText = finalWinner ? finalResult.slice(finalWinner.length).trim() : finalResult;
-  const backHref = backTo === "my-match" ? "/score" : "/live";
-  const backLabel = backTo === "my-match" ? "Back to My Match" : "Back to Tournament";
+  const backHref = backTo === "home" ? "/home" : backTo === "my-match" ? "/score" : "/live";
+  const backLabel = backTo === "home" ? "Back to Home" : backTo === "my-match" ? "Back to My Match" : "Back to Tournament";
   const courseLine = [course.tee ? `${course.tee} Tees` : "", teeTime].filter(Boolean).join(" • ");
   const confirmedAt = data.match.updatedAt || data.match["Updated At"];
   const confirmedLabel = confirmedAt ? new Intl.DateTimeFormat("en-US", {

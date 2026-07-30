@@ -75,10 +75,11 @@ function MatchPeople({ match, currentPlayer }) {
 
 function Action({ match, busy, onOpen }) {
   const action = matchAction(match);
+  const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=home`;
   if (action.kind === "result") {
-    return <Link className={styles.primaryAction} href={`/live?view=matchups&round=${match.round}#match-${match.matchId}`}>{action.label}</Link>;
+    return <Link className={styles.primaryAction} href={detailsHref}>{action.label}</Link>;
   }
-  if (!action.enabled) return <Link className={styles.secondaryAction} href={`/live?view=matchups&round=${match.round}#match-${match.matchId}`}>View Match Details</Link>;
+  if (!action.enabled) return <Link className={styles.secondaryAction} href={detailsHref}>View Match Details</Link>;
   return <button className={styles.primaryAction} disabled={busy} onClick={() => onOpen(match)}>
     {busy ? "Opening…" : action.label === "Open Scorecard" ? "Start Scoring" : action.label}
   </button>;
@@ -97,7 +98,7 @@ function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
           key={match.matchId}
           className={styles.roundCard}
           data-current={match.matchId === emphasizedId}
-          href={`/live?view=matchups&round=${match.round}#match-${match.matchId}`}
+          href={`/game-center/${encodeURIComponent(match.matchId)}?from=home`}
           aria-label={`${matchLabel(match)} at ${match.course || "course to be announced"}`}
         >
           <div className={styles.roundTop}>
