@@ -2,16 +2,31 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import AssetImage from "../AssetImage";
+import { playerPhoto, teamLogo } from "../../lib/asset-paths";
+import { formatHandicap, formatPlayerPoints } from "../../lib/formatters";
 import { NOTIFICATION_CATEGORIES } from "../../lib/tournament-notifications";
 import styles from "./me.module.css";
 import nativeStyles from "./native-actions.module.css";
 
 const preferenceKey = "sbi-notification-preferences";
 
+function initials(name) {
+  return String(name || "Player").split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+}
+
+function ordinal(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "";
+  const suffix = number % 10 === 1 && number % 100 !== 11 ? "st" : number % 10 === 2 && number % 100 !== 12 ? "nd" : number % 10 === 3 && number % 100 !== 13 ? "rd" : "th";
+  return `${number}${suffix}`;
+}
+
 export default function ParticipantProfile() {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [identityState, setIdentityState] = useState("loading");
+  const [tournamentData, setTournamentData] = useState(null);
   const [attempt, setAttempt] = useState(0);
   const [confirming, setConfirming] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
@@ -36,6 +51,8 @@ export default function ParticipantProfile() {
         if (response.ok) {
           setPlayer((await response.json()).player);
           setIdentityState("active");
+          const tournamentResponse = await fetch("/api/player-passport/matches", { cache: "no-store" });
+          if (current && tournamentResponse.ok) setTournamentData((await tournamentResponse.json()).data);
         } else if (response.status === 401) {
           setPlayer(null);
           setIdentityState("inactive");
@@ -86,20 +103,71 @@ export default function ParticipantProfile() {
   if (identityState === "unavailable" && !player) return <section className={styles.state}><h1>Player Passport temporarily unavailable</h1><p>We couldn’t verify your Player Passport right now.</p><button type="button" onClick={() => setAttempt((value) => value + 1)}>Retry</button></section>;
   if (!player) return <section className={styles.state}><h1>Player Passport required</h1><Link href="/activate">Activate Player Passport</Link></section>;
 
+  const profile = tournamentData?.player || player;
+  const tournament = tournamentData?.tournament;
+  const snapshot = tournamentData?.snapshot;
+  const record = snapshot?.record ? `${snapshot.record.wins}-${snapshot.record.losses}-${snapshot.record.halves}` : "";
+  const standing = ordinal(snapshot?.standing);
+  const handicap = profile.tournamentHandicap === null || profile.tournamentHandicap === undefined || profile.tournamentHandicap === ""
+    ? ""
+    : formatHandicap(profile.tournamentHandicap);
+  const snapshotItems = [
+    tournament?.currentRound && { label: "Current Round", value: `Round ${tournament.currentRound}` },
+    profile.teamName && { label: "Current Team", value: profile.teamName },
+    snapshot && { label: "Tournament Points", value: formatPlayerPoints(snapshot.points) },
+    record && { label: "Current Record", value: record },
+    standing && { label: "Current Standing", value: standing },
+    handicap && { label: "Tournament Handicap", value: handicap },
+  ].filter(Boolean);
+
   return <section className={styles.page}>
-    <header><span>Player Passport</span><h1>Me</h1><p>{player.name}</p></header>
+    <header className={styles.playerHero}>
+      <div className={styles.photoPlate}>
+        <AssetImage src={playerPhoto(profile.photo)} alt={`${profile.name} profile photo`} className={styles.playerPhoto} fallbackClassName={styles.playerFallback} fallback={initials(profile.name)} inferFallback={false} />
+      </div>
+      <div className={styles.heroIdentity}>
+        <span>{tournament?.year ? `${tournament.year} Tournament Player` : "Player Passport"}</span>
+        <h1>{profile.name}</h1>
+        {profile.teamName ? <p className={styles.teamLine}>{profile.teamLogo ? <AssetImage src={teamLogo(profile.teamLogo)} alt="" className={styles.teamMark} fallbackClassName={styles.teamMarkFallback} fallback="" inferFallback={false} /> : null}{profile.teamName}</p> : null}
+      </div>
+      {(record || snapshot || standing || handicap) ? <div className={styles.heroStats} aria-label="Current tournament performance">
+        {record ? <span><b>{record}</b><small>Record</small></span> : null}
+        {snapshot ? <span><b>{formatPlayerPoints(snapshot.points)}</b><small>Points</small></span> : null}
+        {standing ? <span><b>{standing}</b><small>Standing</small></span> : null}
+        {handicap ? <span><b>{handicap}</b><small>Handicap</small></span> : null}
+      </div> : null}
+    </header>
+
+    {snapshotItems.length ? <section className={`${styles.card} ${styles.snapshot}`} aria-labelledby="tournament-snapshot-title">
+      <div className={styles.sectionHeading}><span>Your Tournament</span><h2 id="tournament-snapshot-title">Tournament Snapshot</h2></div>
+      <div className={styles.snapshotGrid}>{snapshotItems.map((item) => <div key={item.label}><small>{item.label}</small><strong>{item.value}</strong></div>)}</div>
+    </section> : null}
+
     <section className={styles.card}>
-      <h2>Your SBI</h2>
+      <div className={styles.sectionHeading}><span>Your Game</span><h2>Player Profile</h2></div>
       <div className={styles.links}>
-        <Link href={player.slug ? `/players/${player.slug}` : "/players"}><strong>Player Profile</strong><span>Career statistics, history, and achievements</span></Link>
+        <Link href={profile.slug ? `/players/${profile.slug}` : "/players"}><strong>Career, history, and achievements</strong><span>Explore your Sandbagger Invitational player profile</span></Link>
         <Link href="/my-match"><strong>My Matches</strong><span>Your tournament assignments and scorecards</span></Link>
+      </div>
+    </section>
+
+    <section className={`${styles.card} ${styles.history}`}>
+      <div className={styles.sectionHeading}><span>Sandbagger Invitational</span><h2>Tournament History</h2></div>
+      <p>Past appearances, match records, and tournament achievements live in your player profile.</p>
+      <Link href={profile.slug ? `/players/${profile.slug}` : "/players"}>View tournament history <span aria-hidden="true">›</span></Link>
+    </section>
+
+    <section className={styles.card}>
+      <div className={styles.sectionHeading}><span>Resources</span><h2>Utilities</h2></div>
+      <div className={styles.links}>
         <Link href="/tournament-guide"><strong>Tournament Guide</strong><span>Schedule, rules, and important information</span></Link>
         <button className={nativeStyles.share} type="button" onClick={shareApp}><strong>Share SBI</strong><span>Open the iPhone Share Sheet or copy the website link</span></button>
       </div>
       {shareMessage ? <p className={nativeStyles.feedback} role="status">{shareMessage}</p> : null}
     </section>
+
     <section className={styles.card}>
-      <h2>Notification preferences</h2>
+      <div className={styles.sectionHeading}><span>Preferences</span><h2>Notifications</h2></div>
       <p className={styles.note}>Preferences are ready for browser notifications. Push delivery is not enabled yet.</p>
       <div className={styles.preferences}>
         {NOTIFICATION_CATEGORIES.map((category) => <label key={category.id}>
@@ -109,7 +177,7 @@ export default function ParticipantProfile() {
       </div>
     </section>
     <section className={styles.card}>
-      <h2>Player Passport</h2>
+      <div className={styles.sectionHeading}><span>Account Management</span><h2>Player Passport</h2></div>
       <p className={styles.note}>Removing this device does not change your player record or activation credentials.</p>
       {!confirming ? <button className={styles.remove} onClick={() => setConfirming(true)}>This isn’t me</button> : <div className={styles.confirm}>
         <strong>Remove Player Passport from this device?</strong>

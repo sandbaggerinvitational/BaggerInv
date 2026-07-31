@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { authorizePassportMatch, readPlayerPassportMatches } from "../../../../lib/google-sheets-write.js";
 import { createScoringSession, scoringSessionCookie } from "../../../../lib/scoring-access.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
+import { getTournamentData } from "../../../live/sheetData.js";
+import { playerPerformanceRows, rankPlayerRows } from "../../../../lib/mobile-leaderboards.js";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +19,19 @@ export async function GET(request) {
     return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });
   }
   try {
-    return NextResponse.json({ data: await readPlayerPassportMatches(session) });
+    const data = await readPlayerPassportMatches(session);
+    try {
+      const tournamentData = await getTournamentData();
+      const standings = rankPlayerRows(
+        playerPerformanceRows(tournamentData.leaderboard || [], tournamentData.scoreLeaderboard || []),
+        "points"
+      );
+      const standing = standings.find((row) => String(row.id) === String(data.player.id));
+      if (standing && data.snapshot) data.snapshot.standing = standing.displayRank;
+    } catch {
+      // Identity and match data remain useful when optional standings are unavailable.
+    }
+    return NextResponse.json({ data });
   } catch (error) {
     if (/no longer active|not active in this tournament/i.test(String(error?.message || ""))) {
       return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });
