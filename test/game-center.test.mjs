@@ -433,6 +433,7 @@ test("Game Center hero and story sections follow the live-match hierarchy", asyn
   assert.match(source, /const resultWinner = \[teamNames\[1\], teamNames\[2\]\]\.find/);
   assert.match(source, /result=\{data\.state === "pre" \? "" : resultText/);
   assert.match(source, /className=\{styles\.holeStory\}/);
+  assert.match(source, /The match was already decided on Hole \$\{clinchHole\}/);
   assert.match(source, /<ResultSegments data=\{data\} \/>[\s\S]*<GameCenterScorecard data=\{data\} \/>[\s\S]*<MatchStats data=\{data\} \/>[\s\S]*<CourseInformation data=\{data\} \/>/);
   assert.match(styles, /\.matchHero\{[^}]*border-radius:20px/);
   assert.match(styles, /\.scoreboard\{[^}]*min-height:150px/);

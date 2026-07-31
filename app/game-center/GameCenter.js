@@ -166,9 +166,13 @@ function HoleDetails({ data, selected }) {
   const teamNames = data.display.teamNames;
   const team1Gross = jsonScores(hole.team1Gross);
   const team2Gross = jsonScores(hole.team2Gross);
+  const clinchHole = Number(clean(data.finalSummary).match(/Hole\s+(\d+)/i)?.[1] || 0);
+  const story = data.state === "final" && clinchHole && selected >= clinchHole
+    ? selected === clinchHole ? data.finalSummary : `The match was already decided on Hole ${clinchHole}.`
+    : holeStory(data.holes, selected, teamNames);
   return <section className={styles.holeDetails} aria-label={`Hole ${selected} details`}>
     <header><span><small>Selected Hole</small><h2>Hole {selected}</h2></span><strong>{hole.par ? `Par ${hole.par}` : "Par TBA"}</strong></header>
-    <p className={styles.holeStory}>{holeStory(data.holes, selected, teamNames)}</p>
+    <p className={styles.holeStory}>{story}</p>
     <div className={styles.holeMeta}>
       {hole.yardage ? <span><small>Yardage</small><strong>{hole.yardage}</strong></span> : null}
       {hole.strokeIndex ? <span><small>Stroke Index</small><strong>{hole.strokeIndex}</strong></span> : null}
