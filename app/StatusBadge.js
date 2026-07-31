@@ -6,7 +6,6 @@ const SUPPORTED = new Set([
   "UPCOMING",
   "FINAL",
   "CURRENT MATCH",
-  "MATCH COMPLETE",
   "LOCKED",
 ]);
 
@@ -15,7 +14,6 @@ function resolvedLabel(status, label) {
   if (explicit) return explicit;
   const source = String(status || "").trim();
   if (/^current match$/i.test(source)) return "Current Match";
-  if (/^match complete$/i.test(source)) return "Match Complete";
   return formatStatusLabel(source);
 }
 

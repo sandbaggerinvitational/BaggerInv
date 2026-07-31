@@ -63,7 +63,7 @@ test("centralizes participant-facing status wording", () => {
   assert.equal(formatStatusLabel("completed"), "Final");
   assert.equal(formatStatusLabel("closed"), "Locked");
   assert.equal(formatStatusLabel("live", { current: true }), "Current Match");
-  assert.equal(formatStatusLabel("final", { complete: true }), "Match Complete");
+  assert.equal(formatStatusLabel("final", { complete: true }), "Final");
 });
 
 test("centralizes live, final, and participant match-result wording", () => {

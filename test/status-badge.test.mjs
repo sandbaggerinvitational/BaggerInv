@@ -11,7 +11,7 @@ test("shared StatusBadge owns the supported status language and live dot", async
     read("app/status-badge.module.css"),
     read("app/globals.css"),
   ]);
-  for (const status of ["LIVE", "UPCOMING", "FINAL", "CURRENT MATCH", "MATCH COMPLETE", "LOCKED"]) {
+  for (const status of ["LIVE", "UPCOMING", "FINAL", "CURRENT MATCH", "LOCKED"]) {
     assert.match(component, new RegExp(`\"${status}\"`));
   }
   assert.match(component, /supported === "LIVE" \? <i aria-hidden="true" \/>/);
@@ -77,9 +77,23 @@ test("shared MatchStatusBlock aligns one badge with its result", async () => {
   assert.equal((component.match(/<StatusBadge/g) || []).length, 1);
   assert.match(component, /result \? <strong/);
   assert.match(styles, /justify-items: end/);
+  assert.match(styles, /gap: 2px/);
   assert.match(styles, /width: 104px/);
   assert.match(styles, /text-align: center/);
-  assert.match(styles, /\.badge \{[^}]*width: 100%/s);
+  assert.match(styles, /\.badge \{[^}]*width: 104px/s);
+  assert.doesNotMatch(styles, /data-prominent="true"\][^{]*\{[^}]*gap:/s);
+});
+
+test("completed statuses use FINAL exclusively", async () => {
+  const [component, formatter, styles] = await Promise.all([
+    read("app/StatusBadge.js"),
+    read("lib/formatters.js"),
+    read("app/status-badge.module.css"),
+  ]);
+  assert.doesNotMatch(component, /MATCH COMPLETE|Match Complete/);
+  assert.doesNotMatch(formatter, /Match Complete/);
+  assert.doesNotMatch(styles, /MATCH-COMPLETE/);
+  assert.match(formatter, /if \(complete\) return "Final"/);
 });
 
 test("completed participant matches resolve Final before stale scoring flags", async () => {

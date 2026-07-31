@@ -38,8 +38,7 @@
   background: #f2f1ed;
 }
 
-.badge[data-status="FINAL"],
-.badge[data-status="MATCH-COMPLETE"] {
+.badge[data-status="FINAL"] {
   border-color: #c8dbd1;
   color: var(--status-final-neutral);
   background: #dcece4;
