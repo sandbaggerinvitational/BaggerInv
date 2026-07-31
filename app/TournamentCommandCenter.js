@@ -31,6 +31,11 @@ function ScheduleIcon({ type }) {
   return <span aria-hidden="true">{icon}</span>;
 }
 
+function remainingMatchesLabel(value) {
+  const count = Number(value) || 0;
+  return `${count} Match${count === 1 ? "" : "es"} Remaining`;
+}
+
 function TournamentSchedule({ items }) {
   return (
     <section className={styles.schedule} aria-labelledby="today-schedule-title">
@@ -114,7 +119,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
       <div className={styles.progressLabel}>
         <span>{progress.completedMatches} complete</span>
         <span>{progress.liveMatches} live</span>
-        <span>{progress.remainingMatches} remaining</span>
+        <span>{remainingMatchesLabel(progress.remainingMatches)}</span>
       </div>
       <div
         className={styles.progressTrack}

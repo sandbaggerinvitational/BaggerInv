@@ -1,4 +1,4 @@
-import { Footer, Header } from "./components";
+import { Header } from "./components";
 import TournamentCommandCenter from "./TournamentCommandCenter";
 
 export default function MobileTournamentHome({ liveData }) {
@@ -9,7 +9,6 @@ export default function MobileTournamentHome({ liveData }) {
         tournament={liveData?.tournament || {}}
         liveData={liveData}
       />
-      <Footer />
     </main>
   );
 }

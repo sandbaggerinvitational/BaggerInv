@@ -76,3 +76,41 @@ test("live mobile Home clips the closed navigation drawer without card overflow"
   assert.match(page, /className="mobileHomeMain"/);
   assert.match(globals, /\.mobileHomeMain\s*\{[^}]*overflow-x:\s*clip/s);
 });
+
+test("participant Home omits the website footer and preserves dashboard order", async () => {
+  const [shell, commandCenter, personalized] = await Promise.all([
+    readFile(new URL("../app/MobileTournamentHome.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
+  ]);
+  assert.doesNotMatch(shell, /Footer/);
+  assert.ok(commandCenter.indexOf("<PersonalizedPlayerHome") < commandCenter.indexOf("<TournamentSchedule"));
+  assert.ok(commandCenter.indexOf("<TournamentSchedule") < commandCenter.indexOf("<TournamentLeaders"));
+  assert.ok(personalized.indexOf("{tournamentPulse}") < personalized.indexOf("<MyRounds"));
+});
+
+test("Home polish shares vertical rhythm and distinguishes completed rounds", async () => {
+  const [commandCenter, commandStyles, personalized, personalizedStyles] = await Promise.all([
+    readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/tournament-command-center.module.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/personalized-player-home.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(commandCenter, /Match\$\{count === 1 \? "" : "es"\} Remaining/);
+  assert.match(commandCenter, /No additional events scheduled today\./);
+  assert.match(commandStyles, /--home-section-gap:12px/);
+  assert.match(commandStyles, /--home-card-radius:20px/);
+  assert.match(commandStyles, /--home-card-shadow:/);
+  assert.match(commandStyles, /\.emptyState\{[^}]*text-align:center/);
+  assert.match(commandStyles, /\.leaderMetric\{[^}]*font-variant-numeric:tabular-nums/);
+  assert.match(personalized, /data-complete=\{status === "Final" \? "true" : undefined\}/);
+  assert.match(personalizedStyles, /\.roundCard\[data-complete="true"\]/);
+  assert.match(personalizedStyles, /margin-top: var\(--home-section-gap, 12px\)/);
+});
+
+test("Home match-state hierarchy remains available for no match, upcoming, live, and final", () => {
+  assert.equal(appMatchStatus({ status: "Scheduled" }), "Upcoming");
+  assert.equal(appMatchStatus({ status: "In Progress", scoringEnabled: true }), "Live");
+  assert.equal(appMatchStatus({ status: "Final", result: { officialResult: "2 UP" } }), "Final");
+  assert.equal(appMatchStatus({}), "Upcoming");
+});

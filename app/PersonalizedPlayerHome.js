@@ -95,10 +95,12 @@ function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
     <div className={styles.scheduleList}>
       {matches.map((match) => {
         const tee = teeLabel(match.tee);
+        const status = appMatchStatus(match);
         return <Link
           key={match.matchId}
           className={styles.roundCard}
           data-current={match.matchId === emphasizedId}
+          data-complete={status === "Final" ? "true" : undefined}
           href={`/game-center/${encodeURIComponent(match.matchId)}?from=home`}
           aria-label={`${matchLabel(match)} at ${match.course || "course to be announced"}`}
         >
