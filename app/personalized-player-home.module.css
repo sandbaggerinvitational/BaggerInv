@@ -235,8 +235,7 @@
   font-weight: 900;
 }
 
-.progress,
-.complete {
+.progress {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -257,11 +256,6 @@
 
 .progress small {
   color: #68756f;
-}
-
-.complete strong {
-  color: #0b4032;
-  font: 700 1.05rem Georgia, serif;
 }
 
 .primaryAction,
@@ -629,8 +623,7 @@
     font-size: 0.88rem;
   }
 
-  .progress,
-  .complete {
+  .progress {
     align-items: flex-start;
     flex-direction: column;
     gap: 4px;

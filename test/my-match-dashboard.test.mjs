@@ -67,15 +67,16 @@ test("My Match formats tees, highlights one relevant card, and uses compact outl
   assert.match(source, /\.join\(" • "\)/);
   assert.match(source, /emphasized=\{match\.matchId === relevant\?\.matchId\}/);
   assert.match(source, /selection\.primary \|\| selection\.choices\[0\] \|\| selection\.ordered\[0\]/);
-  assert.match(source, /<StatusBadge status=\{formatStatusLabel\(status,/);
-  assert.match(source, /<StatusBadge status=\{status\} \/>/);
+  assert.match(source, /const displayStatus = emphasized \? formatStatusLabel\(status,/);
+  assert.match(source, /<MatchStatusBlock status=\{displayStatus\} result=\{result\} \/>/);
+  assert.equal((source.match(/<MatchStatusBlock/g) || []).length, 1);
   assert.match(styles, /\.cardAction\{[^}]*border:1px solid #1b5946/);
   assert.match(styles, /\.cardAction\{[^}]*background:#fffdf8/);
   assert.doesNotMatch(styles, /\.cardAction\{[^}]*background:#(?:0b|15|17)[0-9a-f]{4}/i);
   assert.match(styles, /\.actionRow\{[^}]*background:transparent/);
   assert.match(styles, /\.supportText\{[^}]*display:inline-flex/);
   assert.match(styles, /\.cardAction\{[^}]*min-height:27px/);
-  assert.match(styles, /\.cardState\{[^}]*gap:5px/);
+  assert.match(styles, /\.cardState\{[^}]*justify-items:end/);
   assert.doesNotMatch(styles, /\.matchCard footer/);
 });
 

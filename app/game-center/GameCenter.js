@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import StatusBadge from "../StatusBadge";
+import MatchStatusBlock from "../MatchStatusBlock";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
@@ -351,7 +351,6 @@ export default function GameCenter({ initialData, matchId, backTo }) {
 
     <section className={styles.matchIdentity}>
       <div><small aria-label={matchContext.replace(" • ", ", ")}>{matchContext}</small><h1>{data.match.formatName || data.display.formatName || format}</h1></div>
-      <StatusBadge status={stateLabel} />
       <div className={styles.identityCourse}>
         <Logo filename={course.logo || data.match.course?.logo} name={course.name} type="course" size="identity" tournamentYear={data.tournament.year} />
         <p><strong>{course.name}</strong>{courseLine ? <small>{courseLine}</small> : null}</p>
@@ -360,11 +359,15 @@ export default function GameCenter({ initialData, matchId, backTo }) {
 
     <section className={styles.scoreboard} aria-label={`${teamNames[1]} versus ${teamNames[2]}. ${data.result}${data.state !== "final" && through ? ` through ${through}` : ""}`}>
       <div data-your-team={data.userTeamSide === 1 ? "true" : undefined}><Logo filename={data.display.teams[1].logo || data.tournament.teamOne.logo} name={teamNames[1]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[1]}</strong>{data.userTeamSide === 1 ? <small className={styles.yourTeam} aria-label={`${teamNames[1]} is your team`}>Your Team</small> : null}</div>
-      <span>
-        {data.state === "final" && finalWinner ? <small>{finalWinner}</small> : null}
-        <b>{data.state === "final" ? finalText || "FINAL" : data.result}</b>
-        <em>{data.state === "final" ? "FINAL" : data.state === "live" ? progressLabel : "MATCH NOT STARTED"}</em>
-      </span>
+      <MatchStatusBlock
+        status={stateLabel}
+        detail={data.state === "final" ? finalWinner : ""}
+        result={data.state === "pre" ? "" : data.state === "final" ? finalText || "FINAL" : data.result}
+        meta={data.state === "live" ? progressLabel : ""}
+        align="center"
+        prominent
+        tone="dark"
+      />
       <div data-your-team={data.userTeamSide === 2 ? "true" : undefined}><Logo filename={data.display.teams[2].logo || data.tournament.teamTwo.logo} name={teamNames[2]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[2]}</strong>{data.userTeamSide === 2 ? <small className={styles.yourTeam} aria-label={`${teamNames[2]} is your team`}>Your Team</small> : null}</div>
     </section>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import StatusBadge from "../StatusBadge";
+import MatchStatusBlock from "../MatchStatusBlock";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { appMatchStatus, formatMatchResult } from "../../lib/mobile-tournament-app";
@@ -87,6 +87,10 @@ function statusSupport(match, status) {
 function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) {
   const status = appMatchStatus(match);
   const result = formatMatchResult(match, match.team?.side);
+  const displayStatus = emphasized ? formatStatusLabel(status, {
+    current: status === "Live",
+    complete: status === "Final",
+  }) : status;
   const courseMeta = [formatTee(match.tee), formatTime(match.teeTime)].filter(Boolean).join(" • ");
   const support = statusSupport(match, status);
   const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=my-match`;
@@ -108,12 +112,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
     <div className={styles.cardTop}>
       <MatchHeading match={match} />
       <div className={styles.cardState}>
-        {emphasized ? <StatusBadge status={formatStatusLabel(status, {
-          current: status === "Live",
-          complete: status === "Final",
-        })} /> : null}
-        <StatusBadge status={status} />
-        {result ? <strong aria-label={`Final result: ${result}`}>{result}</strong> : null}
+        <MatchStatusBlock status={displayStatus} result={result} />
       </div>
     </div>
     <div className={styles.courseLine}>

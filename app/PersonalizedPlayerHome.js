@@ -9,11 +9,10 @@ import {
   selectRelevantPlayerMatches,
 } from "../lib/player-home";
 import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app";
-import { formatStatusLabel } from "../lib/formatters";
 import { courseLogo, teamLogo } from "../lib/asset-paths";
 import { formatHomeTime } from "../lib/home-dashboard";
 import MobileIdentityImage from "./MobileIdentityImage";
-import StatusBadge from "./StatusBadge";
+import MatchStatusBlock from "./MatchStatusBlock";
 import styles from "./personalized-player-home.module.css";
 
 function roundMatchMeta(match) {
@@ -213,6 +212,8 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
 
   const player = payload?.player;
   const matches = selection.ordered;
+  const primaryStatus = primary ? appMatchStatus(primary) : "";
+  const primaryResult = primary ? formatMatchResult(primary, primary.team?.side) : "";
 
   return <section className={styles.wrap} aria-labelledby="player-home-title">
     {!matches.length ? <div className={styles.empty}>
@@ -233,7 +234,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
     </div> : <div className={styles.card}>
       <div className={styles.cardTop}>
         <div><p>Your Match</p><MatchHeading match={primary} id="player-home-title" semantic /></div>
-        <StatusBadge status={appMatchStatus(primary)} />
+        <MatchStatusBlock status={primaryStatus} result={primaryResult} />
       </div>
       <div className={styles.venue}>
         <MobileIdentityImage
@@ -252,7 +253,6 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
         <span>Through {primary.currentHole || primary.holesRecorded || "—"}</span>
         {primary.updatedAt ? <small>Last updated {new Date(primary.updatedAt).toLocaleString()}</small> : null}
       </div> : null}
-      {primary.result ? <div className={styles.complete}><StatusBadge status={formatStatusLabel("Final", { complete: true })} /><strong>{formatMatchResult(primary, primary.team?.side)}</strong></div> : null}
       <Action match={primary} busy={busyId === primary.matchId} onOpen={openMatch} />
       {normalizedMatchStatus(primary) === "LOCKED" ? <p className={styles.note}>The tournament director has locked scoring for this match.</p> : null}
       {normalizedMatchStatus(primary) === "UPCOMING" ? <p className={styles.note}>Scoring will become available when participant access opens.</p> : null}

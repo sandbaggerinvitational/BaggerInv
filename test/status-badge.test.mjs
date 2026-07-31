@@ -24,23 +24,29 @@ test("shared StatusBadge owns the supported status language and live dot", async
   assert.match(styles, /\.badge\[data-status="LIVE"\] i/);
 });
 
-test("participant, admin, and historical status pills consume StatusBadge", async () => {
-  const paths = [
+test("standalone status pills and match status blocks use the shared status system", async () => {
+  const badgePaths = [
     "app/TournamentIdentityHeader.js",
     "app/TournamentCommandCenter.js",
+    "app/live/LeaderboardsDashboard.js",
+    "app/live/MatchCenter.js",
+    "app/admin/live-matches/LiveMatchControl.js",
+    "app/history/[year]/page.js",
+  ];
+  for (const path of badgePaths) {
+    const source = await read(path);
+    assert.match(source, /StatusBadge/, path);
+  }
+  const blockPaths = [
     "app/PersonalizedPlayerHome.js",
     "app/score/MyMatchDashboard.js",
     "app/live/TournamentDashboard.js",
     "app/game-center/GameCenter.js",
-    "app/live/LeaderboardsDashboard.js",
-    "app/live/MatchCenter.js",
-    "app/admin/live-matches/LiveMatchControl.js",
     "app/PublicMatchCard.js",
-    "app/history/[year]/page.js",
   ];
-  for (const path of paths) {
+  for (const path of blockPaths) {
     const source = await read(path);
-    assert.match(source, /StatusBadge/, path);
+    assert.match(source, /MatchStatusBlock/, path);
   }
 });
 
@@ -60,4 +66,49 @@ test("legacy page-specific status-pill selectors are removed", async () => {
   assert.doesNotMatch(combined, /matchIdentity>span\[data-state/);
   assert.doesNotMatch(combined, /matchState em\[data-state/);
   assert.doesNotMatch(combined, /roundBoard header em/);
+});
+
+test("shared MatchStatusBlock aligns one badge with its result", async () => {
+  const [component, styles] = await Promise.all([
+    read("app/MatchStatusBlock.js"),
+    read("app/match-status-block.module.css"),
+  ]);
+  assert.match(component, /<StatusBadge status=\{status\}/);
+  assert.equal((component.match(/<StatusBadge/g) || []).length, 1);
+  assert.match(component, /result \? <strong/);
+  assert.match(styles, /justify-items: end/);
+  assert.match(styles, /width: 104px/);
+  assert.match(styles, /text-align: center/);
+  assert.match(styles, /\.badge \{[^}]*width: 100%/s);
+});
+
+test("completed participant matches resolve Final before stale scoring flags", async () => {
+  const { appMatchStatus } = await import("../lib/mobile-tournament-app.js");
+  assert.equal(appMatchStatus({
+    status: "Final",
+    scoringEnabled: true,
+    accessActive: true,
+    result: { officialResult: "The Pickles 2 UP" },
+  }), "Final");
+  assert.equal(appMatchStatus({
+    status: "Scheduled",
+    accessActive: true,
+    result: { winner: "Halved" },
+  }), "Final");
+});
+
+test("match cards render exactly one shared status-result block", async () => {
+  for (const path of [
+    "app/PersonalizedPlayerHome.js",
+    "app/score/MyMatchDashboard.js",
+    "app/live/TournamentDashboard.js",
+    "app/game-center/GameCenter.js",
+    "app/PublicMatchCard.js",
+  ]) {
+    const source = await read(path);
+    assert.match(source, /MatchStatusBlock/, path);
+  }
+  const myMatch = await read("app/score/MyMatchDashboard.js");
+  assert.equal((myMatch.match(/<MatchStatusBlock/g) || []).length, 1);
+  assert.doesNotMatch(myMatch, /<StatusBadge/);
 });

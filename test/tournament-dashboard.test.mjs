@@ -80,7 +80,7 @@ test("Tournament match cards remain compact and preserve official match data", a
   assert.match(source, /HCP \$\{formatHandicap\(player\.playingHcp\)\}/);
   assert.match(source, /\+\$\{player\.stroke\} stroke/);
   assert.match(source, /matchResult\(match, tournament\)/);
-  assert.match(source, /Through \{match\.currentHole\}/);
+  assert.match(source, /`Through \$\{match\.currentHole\}`/);
   assert.match(source, /href=\{href\}/);
   assert.match(source, /View Match <i aria-hidden="true">›/);
   assert.match(styles, /\.viewMatch\{[^}]*padding:3px 1px/);
@@ -153,17 +153,14 @@ test("Round score leaderboard sorts from headers and handles partial and empty s
 });
 
 test("Final match results separate the official team name from the result line", async () => {
-  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  const source = await readFile(componentUrl, "utf8");
   assert.match(source, /function finalResultParts/);
   assert.match(source, /\[tournament\.teamOne\.name, tournament\.teamTwo\.name\]/);
   assert.match(source, /result\.slice\(winner\.length\)\.trim\(\)/);
   assert.match(source, /\/\^halved\$\/i\.test\(result\)/);
-  assert.match(source, /className=\{styles\.finalResult\}/);
-  assert.match(source, /<small>\{finalResult\.team\}<\/small>/);
-  assert.match(source, /<strong>\{finalResult\.result\}<\/strong>/);
-  assert.match(styles, /\.finalResult\{[^}]*text-align:center/);
-  assert.match(styles, /\.finalResult small\{[^}]*overflow-wrap:anywhere/);
-  assert.match(styles, /\.finalResult strong\{[^}]*font-size:\.68rem/);
+  assert.match(source, /<MatchStatusBlock/);
+  assert.match(source, /detail=\{state === "final" \? finalResult\.team : ""\}/);
+  assert.match(source, /result=\{state === "final" \? finalResult\.result : result\}/);
 });
 
 test("Scramble cards use golfer handicaps and one team-level stroke treatment", async () => {

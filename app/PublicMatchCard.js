@@ -1,5 +1,5 @@
 import Link from "next/link";
-import StatusBadge from "./StatusBadge";
+import MatchStatusBlock from "./MatchStatusBlock";
 import { Fragment } from "react";
 import AssetImage from "./AssetImage";
 import { teamLogo } from "../lib/asset-paths";
@@ -151,8 +151,14 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
 
   return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle} data-match-state={state} aria-label={`Match ${match.match}: ${statusText}`} tabIndex="0">
     <div className={styles.matchTop}><span>{topLabel}</span><span>{state === "upcoming" ? match.teeTime || match.status : match.status}</span></div>
-    <div className={styles.matchMeta}><span>Match {match.match} · {match.formatName || round?.format}</span><StatusBadge status={state} /></div>
-    <div className={styles.primaryMatchState}><strong>{statusText}</strong>{state === "live" && match.currentHole ? <span>THRU {match.currentHole}</span> : null}</div>
+    <div className={styles.matchMeta}>
+      <span>Match {match.match} · {match.formatName || round?.format}</span>
+      <MatchStatusBlock
+        status={state}
+        result={state === "upcoming" ? "" : statusText}
+        meta={state === "live" && match.currentHole ? `Through ${match.currentHole}` : ""}
+      />
+    </div>
     {variant === "historical" && isGhostMatch ? (
       <div className={styles.ghostMatchNotice}>
         <strong>GHOST MATCH</strong>

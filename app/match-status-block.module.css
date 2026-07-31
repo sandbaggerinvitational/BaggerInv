@@ -1,0 +1,69 @@
+.block {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  width: 104px;
+  max-width: 100%;
+  color: var(--tournament-green);
+  text-align: center;
+}
+
+.block[data-align="center"] {
+  justify-items: center;
+  margin-inline: auto;
+}
+
+.badge {
+  width: 100%;
+}
+
+.block small,
+.block strong,
+.block em {
+  display: block;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.block small {
+  color: #6c7771;
+  font-size: .55rem;
+  font-weight: 850;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.block strong {
+  color: var(--tournament-green);
+  font-size: .72rem;
+  font-weight: 900;
+  line-height: 1.08;
+}
+
+.block em {
+  color: #6f7974;
+  font-size: .57rem;
+  font-style: normal;
+  line-height: 1.1;
+}
+
+.block[data-prominent="true"] {
+  width: min(100%, 180px);
+  gap: 6px;
+}
+
+.block[data-prominent="true"] strong {
+  font: 700 clamp(1.45rem, 6vw, 2rem) / 1 Georgia, serif;
+  white-space: nowrap;
+}
+
+.block[data-tone="dark"] small,
+.block[data-tone="dark"] strong {
+  color: #f2d275;
+}
+
+.block[data-tone="dark"] em {
+  color: #dfe9e4;
+}

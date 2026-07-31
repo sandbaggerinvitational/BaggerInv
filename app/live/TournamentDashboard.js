@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
+import MatchStatusBlock from "../MatchStatusBlock";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
@@ -77,7 +78,14 @@ function TournamentMatchCard({ match, round, tournament }) {
   return <Link className={styles.matchCard} href={href} aria-label={`Round ${round.number}, Match ${match.match}, ${match.formatName || round.format}, ${status}${result ? `, ${result}` : ""}`}>
     <div className={styles.matchHead}>
       <span><small>Round {round.number}{match.match ? ` • Match ${match.match}` : ""}</small><strong>{match.formatName || round.format || "Format TBA"}</strong></span>
-      <span className={styles.matchState}><StatusBadge status={status} />{state === "final" && result ? <b className={styles.finalResult}>{finalResult.team ? <small>{finalResult.team}</small> : null}<strong>{finalResult.result}</strong></b> : result ? <b>{result}</b> : null}{state === "live" && match.currentHole ? <small>Through {match.currentHole}</small> : null}</span>
+      <span className={styles.matchState}>
+        <MatchStatusBlock
+          status={status}
+          detail={state === "final" ? finalResult.team : ""}
+          result={state === "final" ? finalResult.result : result}
+          meta={state === "live" && match.currentHole ? `Through ${match.currentHole}` : ""}
+        />
+      </span>
     </div>
     <div className={styles.course}>
       <Logo filename={match.course?.logo} name={match.course?.name || "Course"} type="course" size="course" />

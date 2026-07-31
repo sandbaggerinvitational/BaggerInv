@@ -678,7 +678,6 @@
 .liveMessage { margin-top: 24px; padding: 13px 16px; border: 1px solid rgba(255,255,255,.18); border-radius: 12px; background: rgba(255,255,255,.08); max-width: 700px; }
 .errorBox { max-width: 760px; margin: 40px auto; padding: 32px; border: 1px solid #ddd6c8; border-radius: 18px; background: white; }
 .matchMeta { padding: 12px 18px 0; display:flex; justify-content:space-between; color:#6d746f; font-size:.76rem; }
-.matchMeta strong { color:#0b3529; }
 .ghostMatchNotice {
   margin: 10px 18px 0;
   padding: 9px 12px;
@@ -1292,9 +1291,6 @@
 .emptyState { min-height: 180px; padding: 30px 22px; display: grid; place-content: center; gap: 8px; border: 1px dashed #c9c2b4; border-radius: 20px; background: #fbf8f1; text-align: center; }
 .emptyState strong { color: #0b3529; font: 700 1.35rem Georgia,serif; }
 .emptyState span { color: #66726c; font-size: .82rem; }
-.primaryMatchState { margin: 14px 18px 4px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.primaryMatchState strong { color: #0b3529; font: 700 1.25rem Georgia,serif; }
-.primaryMatchState span { padding: 6px 9px; border-radius: 999px; background: #0b4938; color: #fff; font-size: .66rem; font-weight: 900; letter-spacing: .08em; }
 .pairingPending { margin: 18px; padding: 24px 16px; display: grid; gap: 6px; border-radius: 14px; background: #f6f2e9; text-align: center; }
 .pairingPending strong { color: #153529; font-family: Georgia,serif; }
 .pairingPending span { color: #6a746f; font-size: .75rem; }
@@ -1325,8 +1321,6 @@
   .matchFilters button { min-height: 44px; padding: 6px 5px; gap: 4px; font-size: .67rem; }
   .matchFilters button span { min-width: 18px; padding: 2px 4px; font-size: .55rem; }
   .roundHeader { margin-top: 14px; }
-  .primaryMatchState { margin-inline: 14px; }
-  .primaryMatchState strong { font-size: 1.12rem; }
   .matchFreshness { padding-inline: 14px; }
 }
 
