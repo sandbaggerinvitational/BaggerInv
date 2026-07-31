@@ -304,9 +304,9 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     }
   };
 
-  const finalResult = data.state === "final" ? data.result.toUpperCase() : "";
-  const finalWinner = [teamNames[1], teamNames[2]].find((name) => finalResult.startsWith(clean(name).toUpperCase()));
-  const finalText = finalWinner ? finalResult.slice(finalWinner.length).trim() : finalResult;
+  const displayResult = data.state === "pre" ? "" : clean(data.result).toUpperCase();
+  const resultWinner = [teamNames[1], teamNames[2]].find((name) => displayResult.startsWith(clean(name).toUpperCase()));
+  const resultText = resultWinner ? displayResult.slice(clean(resultWinner).length).trim() : displayResult;
   const backHref = backTo === "home" ? "/home" : backTo === "my-match" ? "/my-match" : "/live";
   const backLabel = backTo === "home" ? "Back to Home" : backTo === "my-match" ? "Back to My Match" : "Back to Tournament";
   const courseLine = [course.tee ? `${course.tee} Tees` : "", teeTime].filter(Boolean).join(" • ");
@@ -366,8 +366,8 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       <div data-your-team={data.userTeamSide === 1 ? "true" : undefined}><Logo filename={data.display.teams[1].logo || data.tournament.teamOne.logo} name={teamNames[1]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[1]}</strong>{data.userTeamSide === 1 ? <small className={styles.yourTeam} aria-label={`${teamNames[1]} is your team`}>Your Team</small> : null}</div>
       <MatchStatusBlock
         status={stateLabel}
-        detail={data.state === "final" ? finalWinner : ""}
-        result={data.state === "pre" ? "" : data.state === "final" ? finalText || "FINAL" : data.result}
+        detail={resultWinner || ""}
+        result={data.state === "pre" ? "" : resultText || (data.state === "final" ? "FINAL" : data.result)}
         meta={data.state === "live" ? progressLabel : ""}
         align="center"
         prominent

@@ -429,10 +429,13 @@ test("navigation and official scorecard use compact balanced mobile presentation
 test("Game Center hero and story sections follow the live-match hierarchy", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
   assert.match(source, /className=\{styles\.matchHero\}/);
+  assert.match(source, /const resultWinner = \[teamNames\[1\], teamNames\[2\]\]\.find/);
+  assert.match(source, /result=\{data\.state === "pre" \? "" : resultText/);
   assert.match(source, /className=\{styles\.holeStory\}/);
   assert.match(source, /<ResultSegments data=\{data\} \/>[\s\S]*<GameCenterScorecard data=\{data\} \/>[\s\S]*<MatchStats data=\{data\} \/>[\s\S]*<CourseInformation data=\{data\} \/>/);
   assert.match(styles, /\.matchHero\{[^}]*border-radius:20px/);
   assert.match(styles, /\.scoreboard\{[^}]*min-height:150px/);
+  assert.match(styles, /\.scoreboard \[data-prominent=true\] strong\{font-size:clamp\(1\.15rem,5\.2vw,1\.6rem\);white-space:normal\}/);
   assert.match(styles, /\.holeGrid button\{min-height:48px/);
   assert.match(styles, /\.courseInfo\{border-color:#ded6c6;box-shadow:0 4px 14px/);
 });

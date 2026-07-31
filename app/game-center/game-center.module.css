@@ -28,6 +28,7 @@
 .scoreboard{grid-template-columns:minmax(0,1fr) minmax(112px,34%) minmax(0,1fr);min-height:150px;padding:16px 10px;background:radial-gradient(circle at 50% 0,rgba(206,168,67,.16),transparent 43%),linear-gradient(145deg,#064b37,#07382c)}
 .scoreboard>div{align-self:stretch;align-content:center;grid-template-rows:auto minmax(2.2em,auto) auto}
 .scoreboard>div strong{display:grid;place-items:center;max-width:100%;font-size:.7rem;line-height:1.15}
+.scoreboard [data-prominent=true]{max-width:100%;min-width:0;width:100%}.scoreboard [data-prominent=true] strong{font-size:clamp(1.15rem,5.2vw,1.6rem);white-space:normal}.scoreboard [data-prominent=true] small,.scoreboard [data-prominent=true] em{padding-inline:2px;line-height:1.15}
 .scoreboard .logo[data-size=score]{width:62px;height:62px}
 .teamGrid{padding:14px 10px 16px;border-top:1px solid #e5ddcc!important;background:#fffdf7}
 .teamPanel h3{min-height:auto;margin-bottom:3px}
