@@ -264,6 +264,38 @@ test("Frozen Home and My Match implementations remain untouched by Tournament st
   assert.doesNotMatch(styles, /PersonalizedPlayerHome|MyMatchDashboard|my-match-dashboard/);
 });
 
+test("Tournament polish preserves a clear round, matches, leaderboard rhythm", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.ok(source.indexOf("className={styles.roundGroups}") < source.indexOf("<OverallLeaderboard"));
+  assert.match(styles, /--tournament-section-gap:14px/);
+  assert.match(styles, /--tournament-card-radius:17px/);
+  assert.match(styles, /--tournament-card-shadow:/);
+  assert.match(styles, /\.roundGroups\{[^}]*gap:11px/);
+  assert.match(styles, /\.leaderboard\{[^}]*box-shadow:var\(--tournament-card-shadow\)/);
+  assert.match(styles, /\.leaderboard>header\{[^}]*background:#fffcf6/);
+});
+
+test("Tournament controls and collapsed or expanded rounds retain confident states", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /<details className=\{styles\.roundGroup\} open=\{isOpen\}/);
+  assert.match(source, /aria-pressed=\{String\(selectedRound\) === String\(value\)\}/);
+  assert.match(source, /aria-pressed=\{filter === value\}/);
+  assert.match(styles, /\.rounds button,\s*\.filters button\{[^}]*min-height:42px/s);
+  assert.match(styles, /\.roundGroup\[open\]\{[^}]*border-color:#ccb87f/);
+  assert.match(styles, /\.roundGroup\[open\]>summary\{[^}]*background:#fffcf6/);
+  assert.match(styles, /focus-visible/);
+});
+
+test("Tournament match cards expose state-aware scanning without changing destinations", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /className=\{styles\.matchCard\} data-state=\{state\}/);
+  assert.match(source, /href=\{href\}/);
+  assert.match(styles, /\.matchCard\[data-state="live"\]/);
+  assert.match(styles, /\.course\{[^}]*padding:4px 0 7px/);
+  assert.match(styles, /\.versus\{[^}]*padding-block:1px/);
+  assert.match(styles, /\.viewMatch\{[^}]*min-height:30px/);
+});
+
 test("preview Player Passport invitations remain origin-specific and Admin-authenticated", async () => {
   const [admin, route] = await Promise.all([
     readFile(new URL("../app/admin/PlayerPassportAdmin.js", import.meta.url), "utf8"),

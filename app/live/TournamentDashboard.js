@@ -75,7 +75,7 @@ function TournamentMatchCard({ match, round, tournament }) {
   const finalResult = finalResultParts(match, tournament);
   const tee = match.course?.tee ? `${match.course.tee} Tees` : "";
   const href = `/game-center/${encodeURIComponent(match.id)}?from=tournament`;
-  return <Link className={styles.matchCard} href={href} aria-label={`Round ${round.number}, Match ${match.match}, ${match.formatName || round.format}, ${status}${result ? `, ${result}` : ""}`}>
+  return <Link className={styles.matchCard} data-state={state} href={href} aria-label={`Round ${round.number}, Match ${match.match}, ${match.formatName || round.format}, ${status}${result ? `, ${result}` : ""}`}>
     <div className={styles.matchHead}>
       <span><small>Round {round.number}{match.match ? ` • Match ${match.match}` : ""}</small><strong>{match.formatName || round.format || "Format TBA"}</strong></span>
       <span className={styles.matchState}>
