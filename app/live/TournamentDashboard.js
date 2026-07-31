@@ -5,7 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
-import { formatHandicap, formatPoints } from "../../lib/formatters";
+import { formatHandicap, formatPlayerPoints, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
+import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterEmptyMessage, filterMatches, matchState, relativeUpdatedLabel } from "../../lib/live-match-ux";
 import styles from "./tournament-dashboard.module.css";
 
@@ -23,33 +24,20 @@ function Logo({ filename, name, type = "team", size = "medium" }) {
 
 function statusLabel(match) {
   const state = matchState(match);
-  if (state === "live") return "Live";
-  if (state === "final") return "Final";
   const source = String(match.status || "").toLowerCase();
-  if (source.includes("lock")) return "Locked";
-  if (source.includes("open")) return "Scoring Opens Soon";
-  return "Upcoming";
+  return formatStatusLabel(source.includes("lock") ? "Locked" : state);
 }
 
 function matchResult(match, tournament) {
-  const state = matchState(match);
-  if (state === "live") {
-    if (match.liveStatusText) return match.liveStatusText;
-    const difference = Math.abs(Number(match.team1HolesWon || 0) - Number(match.team2HolesWon || 0));
-    if (!difference) return "All Square";
-    return `${Number(match.team1HolesWon) > Number(match.team2HolesWon) ? tournament.teamOne.name : tournament.teamTwo.name} ${difference} Up`;
-  }
-  if (state !== "final") return "";
-  if (match.finalResult) return match.finalResult.toUpperCase();
-  if (match.liveStatusText) return match.liveStatusText.toUpperCase();
-  if ([match.overallWinner, match.matchupWinner].includes("Halved") || Number(match.team1Points) === Number(match.team2Points)) return "HALVED";
-  const winner = Number(match.team1Points) > Number(match.team2Points) ? tournament.teamOne.name : tournament.teamTwo.name;
-  return `${winner} WON`;
+  return formatStoredMatchResult(match, {
+    1: tournament.teamOne.name,
+    2: tournament.teamTwo.name,
+  });
 }
 
 function finalResultParts(match, tournament) {
   const result = matchResult(match, tournament);
-  if (matchState(match) !== "final" || !result || result === "HALVED") return { team: "", result };
+  if (matchState(match) !== "final" || !result || /^halved$/i.test(result)) return { team: "", result };
   const winner = [tournament.teamOne.name, tournament.teamTwo.name]
     .find((name) => result.toUpperCase().startsWith(String(name).toUpperCase()));
   return winner
@@ -111,14 +99,14 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
     ? [tournament.teamOne, state.teamOne] : [tournament.teamTwo, state.teamTwo];
   const clinchText = state.clinched
     ? `${state.championSide === 2 ? tournament.teamTwo.name : tournament.teamOne.name} have clinched`
-    : state.totalPoints ? `${leading[0].name} need ${formatPoints(leading[1].pointsToClinch)} more points` : "Clinching target unavailable";
+    : state.totalPoints ? `${leading[0].name} need ${formatTeamPoints(leading[1].pointsToClinch)} more points` : "Clinching target unavailable";
   const momentumText = momentum
     ? (momentum.teamOne.includes("last") ? `${tournament.teamOne.name}: ${momentum.teamOne}` : `${tournament.teamTwo.name}: ${momentum.teamTwo}`)
     : "No decided-point momentum yet";
   return <section className={styles.snapshot} aria-label="Tournament snapshot">
-    <div className={styles.score} aria-label={`${tournament.teamOne.name} ${formatPoints(tournament.teamOne.score)}, ${tournament.teamTwo.name} ${formatPoints(tournament.teamTwo.score)}`}>
+    <div className={styles.score} aria-label={`${tournament.teamOne.name} ${formatTeamPoints(tournament.teamOne.score)}, ${tournament.teamTwo.name} ${formatTeamPoints(tournament.teamTwo.score)}`}>
       <div className={styles.scoreTeam}><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="score" /><strong>{tournament.teamOne.name}</strong></div>
-      <b className={styles.scoreValue}>{formatPoints(tournament.teamOne.score)} <i aria-hidden="true">–</i> {formatPoints(tournament.teamTwo.score)}</b>
+      <b className={styles.scoreValue}>{formatTeamPoints(tournament.teamOne.score)} <i aria-hidden="true">–</i> {formatTeamPoints(tournament.teamTwo.score)}</b>
       <div className={styles.scoreTeam}><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="score" /><strong>{tournament.teamTwo.name}</strong></div>
     </div>
     <div className={styles.snapshotMeta}>
@@ -192,7 +180,7 @@ function OverallLeaderboard({ rows = [] }) {
         <strong>{ranked.get(row.id)}</strong>
         <span className={styles.overallPlayer}><span className={styles.playerImage}><AssetImage src={playerPhoto(row.photo)} alt="" fallbackClassName={styles.playerFallback} fallback={initials(row.player)} inferFallback={false} /></span><span><b>{row.player}</b><small><Logo filename={row.teamLogo} name={row.team} size="mini" />{row.team}</small></span></span>
         <span>{row.wins}-{row.losses}-{row.halves}</span>
-        <b>{formatPoints(row.points)}</b>
+        <b>{formatPlayerPoints(row.points)}</b>
       </div>)}
     </div>}
   </section>;
@@ -257,7 +245,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
           return next;
         });
       }} key={round.number}>
-        <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><div className={styles.roundSummaryResult}><span className={styles.roundScore} aria-label={`${tournament.teamOne.name} ${formatPoints(teamOneScore)}, ${tournament.teamTwo.name} ${formatPoints(teamTwoScore)}`}><span><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="summary" /><em>{tournament.teamOne.name}</em></span><b>{formatPoints(teamOneScore)} – {formatPoints(teamTwoScore)}</b><span><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="summary" /><em>{tournament.teamTwo.name}</em></span></span><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></div></summary>
+        <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><div className={styles.roundSummaryResult}><span className={styles.roundScore} aria-label={`${tournament.teamOne.name} ${formatTeamPoints(teamOneScore)}, ${tournament.teamTwo.name} ${formatTeamPoints(teamTwoScore)}`}><span><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="summary" /><em>{tournament.teamOne.name}</em></span><b>{formatTeamPoints(teamOneScore)} – {formatTeamPoints(teamTwoScore)}</b><span><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="summary" /><em>{tournament.teamTwo.name}</em></span></span><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></div></summary>
         <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <div className={styles.empty}><strong>{filterEmptyMessage(filter, round)}</strong><span>Choose another filter or check back after the next update.</span></div>}</div>
       </details>;
     })}</div>

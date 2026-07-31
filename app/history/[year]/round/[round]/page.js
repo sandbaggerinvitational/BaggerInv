@@ -15,14 +15,14 @@ import {
   getHistoricalRound,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
-import { formatPoints } from "../../../../../lib/formatters";
+import { formatTeamPoints } from "../../../../../lib/formatters";
 import { pageMetadata } from "../../../../../lib/seo";
 import { loadScorecardAnalytics } from "../../../../../lib/scorecard-data";
 import { buildScoringHighlights, filterScorecards } from "../../../../../lib/scorecard-analytics";
 import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
 
 function displayPoints(value) {
-  return formatPoints(value);
+  return formatTeamPoints(value);
 }
 
 export async function generateMetadata({ params }) {

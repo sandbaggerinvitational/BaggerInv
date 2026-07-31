@@ -47,7 +47,7 @@ test("home image sources preserve player, team, tournament fallback order", () =
 test("home match statuses use the compact shared vocabulary", () => {
   assert.equal(appMatchStatus({ status: "In Progress" }), "Live");
   assert.equal(appMatchStatus({ status: "Finalized" }), "Final");
-  assert.equal(appMatchStatus({ status: "Scheduled", accessActive: true }), "Scoring Opens Soon");
+  assert.equal(appMatchStatus({ status: "Scheduled", accessActive: true }), "Upcoming");
   assert.equal(appMatchStatus({ status: "Scheduled" }), "Upcoming");
 });
 

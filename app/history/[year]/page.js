@@ -21,7 +21,6 @@ import {
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
-import { formatPoints } from "../../../lib/formatters";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 import { getDraftByYear } from "../../../lib/draft";
 import { loadScorecardAnalytics } from "../../../lib/scorecard-data";

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
-import { formatHandicap, formatPoints } from "../../lib/formatters";
+import { formatHandicap, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
 import { liveProgressLabel } from "../../lib/game-center-display";
 import styles from "./game-center.module.css";
 
@@ -114,15 +114,15 @@ function ResultSegments({ data }) {
       {winner ? <>
         <strong>{/halved/i.test(winner) ? "Halved" : winnerName(winner, teamNames)}</strong>
         {pointValue !== null ? <small>{/halved/i.test(winner)
-          ? `${formatPoints(pointValue / 2)} Point${pointValue / 2 === 1 ? "" : "s"} Each`
-          : `${formatPoints(pointValue)} Point${pointValue === 1 ? "" : "s"}`}</small> : null}
+          ? `${formatTeamPoints(pointValue / 2)} Point${pointValue / 2 === 1 ? "" : "s"} Each`
+          : `${formatTeamPoints(pointValue)} Point${pointValue === 1 ? "" : "s"}`}</small> : null}
       </> : <strong>Result pending</strong>}
     </div>
     {data.points.team1Points !== null && data.points.team2Points !== null ? <div className={styles.matchPoints}>
       <h3>Match Total</h3>
       <div>
-        <span><small>{teamNames[1]}</small><strong>{formatPoints(data.points.team1Points)}</strong></span>
-        <span><small>{teamNames[2]}</small><strong>{formatPoints(data.points.team2Points)}</strong></span>
+        <span><small>{teamNames[1]}</small><strong>{formatTeamPoints(data.points.team1Points)}</strong></span>
+        <span><small>{teamNames[2]}</small><strong>{formatTeamPoints(data.points.team2Points)}</strong></span>
       </div>
     </div> : null}
     {data.state === "final" && data.finalSummary ? <p className={styles.finalSummary}>{data.finalSummary}</p> : null}
@@ -227,7 +227,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   const matchNumber = data.match.match || data.match.Match;
   const teeTime = data.match.teeTime || data.match["Tee Time"];
   const course = data.display.course;
-  const stateLabel = data.state === "final" ? "Final" : data.state === "live" ? "Live" : "Locked";
+  const stateLabel = formatStatusLabel(data.state === "pre" ? "Locked" : data.state);
   const through = Number(data.match.currentHole || data.match["Current Hole"] || data.stats.played || 0);
   const progressLabel = liveProgressLabel(data.state, through);
 

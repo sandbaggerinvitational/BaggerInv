@@ -40,9 +40,8 @@ test("My Match keeps status, scoring access, and final results distinct", async 
     readFile(componentUrl, "utf8"),
     readFile(sheetUrl, "utf8"),
   ]);
-  for (const status of ["Live", "Final", "Locked", "Scoring Opens Soon", "Upcoming"]) {
-    assert.equal(source.includes(status), true);
-  }
+  assert.match(source, /appMatchStatus\(match\)/);
+  assert.match(source, /formatStatusLabel\(status/);
   assert.match(source, /status === "Live"/);
   assert.match(source, /onClick=\{\(\) => onOpen\(match\)\}/);
   assert.match(source, /href=\{detailsHref\}/);
@@ -53,9 +52,8 @@ test("My Match keeps status, scoring access, and final results distinct", async 
   assert.match(source, /Start Scoring/);
   assert.match(source, /Continue Scoring/);
   assert.match(source, /View Match Result/);
-  assert.match(source, /"HALVED"/);
-  assert.equal(source.includes('"WON"'), true);
-  assert.equal(source.includes('"LOST"'), true);
+  assert.match(source, /formatMatchResult\(match, match\.team\?\.side\)/);
+  assert.doesNotMatch(source, /function participantResult/);
   assert.match(sheet, /statusText: String\(match\["Match Status Text"\]/);
   assert.match(sheet, /match\["18-Hole Winner"\] \|\| match\["Matchup Winner"\]/);
 });

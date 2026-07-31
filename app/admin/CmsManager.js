@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import styles from "./cms-manager.module.css";
 
 const truthy = (value) => value === true || /^(true|yes|y|1|active)$/i.test(String(value ?? ""));
@@ -109,7 +110,7 @@ export function StandingsPanel({ secret, year }) {
   const [data, setData] = useState(null), [status, setStatus] = useState("");
   const load = () => { setStatus("Recalculating…"); adminRequest(secret, "standings", { year }).then((result) => { setData(result); setStatus(""); }).catch((error) => setStatus(error.message)); };
   useEffect(load, [secret, year]);
-  return <section className={styles.manager}><header className={styles.heading}><div><p>Official results</p><h2>Standings</h2><span>Calculated live from finalized matches. Public pages continue to use the same source rows.</span></div><button type="button" onClick={load}>Recalculate</button></header>{status ? <div className={styles.notice}>{status}</div> : null}{data ? <><div className={styles.teamStandings}>{data.teams.map((team, index) => { const side = data.tournamentState?.[index ? "teamTwo" : "teamOne"]; return <article key={team.side}><span>{team.name}<small>{side?.pointsToClinch > 0 ? `Need ${side.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></span><strong>{team.points.toFixed(1)}</strong></article>; })}</div><div className={styles.standingsTable}><div><b>Rank</b><b>Player</b><b>Record</b><b>Points</b></div>{data.players.map((player, index) => <div key={player.id}><span>{index + 1}</span><strong>{player.name}</strong><span>{player.wins}-{player.losses}-{player.halves}</span><b>{player.points.toFixed(2)}</b></div>)}</div></> : null}</section>;
+  return <section className={styles.manager}><header className={styles.heading}><div><p>Official results</p><h2>Standings</h2><span>Calculated live from finalized matches. Public pages continue to use the same source rows.</span></div><button type="button" onClick={load}>Recalculate</button></header>{status ? <div className={styles.notice}>{status}</div> : null}{data ? <><div className={styles.teamStandings}>{data.teams.map((team, index) => { const side = data.tournamentState?.[index ? "teamTwo" : "teamOne"]; return <article key={team.side}><span>{team.name}<small>{side?.pointsToClinch > 0 ? `Need ${formatTeamPoints(side.pointsToClinch)} to clinch` : "At clinching target"}</small></span><strong>{formatTeamPoints(team.points)}</strong></article>; })}</div><div className={styles.standingsTable}><div><b>Rank</b><b>Player</b><b>Record</b><b>Points</b></div>{data.players.map((player, index) => <div key={player.id}><span>{index + 1}</span><strong>{player.name}</strong><span>{player.wins}-{player.losses}-{player.halves}</span><b>{formatPlayerPoints(player.points)}</b></div>)}</div></> : null}</section>;
 }
 
 export function AuditLogPanel({ secret }) {

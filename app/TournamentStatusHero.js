@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import AssetImage from "./AssetImage";
 import { teamLogo } from "../lib/asset-paths";
 import { countdownParts } from "../lib/tournament-countdown";
-import { formatPoints } from "../lib/formatters";
+import { formatTeamPoints } from "../lib/formatters";
 import styles from "./tournament-status-hero.module.css";
 
 const clean = (value) => String(value ?? "").trim();
@@ -123,12 +123,12 @@ export default function TournamentStatusHero({
           {[tournament.teamOne, tournament.teamTwo].map((team) => <div key={team.id || team.name}>
             <TeamMark team={team} />
             <span>{team.name}</span>
-            <b>{formatPoints(team.score)}</b>
+            <b>{formatTeamPoints(team.score)}</b>
           </div>)}
         </div>
         <div className={styles.liveMeta}>
           <span>{tournament.liveMatches} {tournament.liveMatches === 1 ? "Match" : "Matches"} Live</span>
-          <span>{formatPoints(tournament.remainingPoints)} Points Remaining</span>
+          <span>{formatTeamPoints(tournament.remainingPoints)} Points Remaining</span>
         </div>
       </> : <>
         <header className={styles.championHeader}>
@@ -137,7 +137,7 @@ export default function TournamentStatusHero({
           <TeamMark team={champion} champion />
           <h2>{champion?.name || "Champion"}</h2>
           <strong>Final Score</strong>
-          <b>{formatPoints(tournament.teamOne.score)} – {formatPoints(tournament.teamTwo.score)}</b>
+          <b>{formatTeamPoints(tournament.teamOne.score)} – {formatTeamPoints(tournament.teamTwo.score)}</b>
         </header>
       </>}
       <Actions state={state} year={tournament.year} hasPairings={hasPairings} />

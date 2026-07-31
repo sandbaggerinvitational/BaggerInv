@@ -3,7 +3,7 @@
 import Link from "next/link";
 import AssetImage from "./AssetImage";
 import { defaultAssets, playerPhoto } from "../lib/asset-paths";
-import { formatPoints } from "../lib/formatters";
+import { formatPlayerPoints } from "../lib/formatters";
 import styles from "./tournament-leaderboard.module.css";
 
 function playerValue(row, field) {
@@ -70,7 +70,7 @@ export default function TournamentLeaderboard({ rows = [], pointsTracked = true,
         <LeaderboardRank rank={row.rank} />
         <LeaderboardPlayer name={row.name} slug={row.slug} photo={row.photo} />
         <span className={styles.record}><b>{row.wins} W</b><i>•</i><b>{row.losses} L</b><i>•</i><b>{row.halves} T</b></span>
-        {pointsTracked ? <strong className={styles.points}>{formatPoints(row.points)}</strong> : null}
+        {pointsTracked ? <strong className={styles.points}>{formatPlayerPoints(row.points)}</strong> : null}
       </div>;
     }) : <div className={styles.empty}>{emptyMessage}</div>}
   </div>;

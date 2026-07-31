@@ -6,6 +6,7 @@ import pairingStyles from "./pairing-editor.module.css";
 import accessStyles from "./participant-access.module.css";
 import { getTournamentState } from "../../../lib/live-tournament";
 import { finalizationReview, hasUnsavedMatchChanges } from "../../../lib/live-admin-ux";
+import { formatStatusLabel, formatTeamPoints } from "../../../lib/formatters";
 
 const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Match Status", "Notes"];
 const PAIRING_FIELDS = ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"];
@@ -92,7 +93,7 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
   return <article className={styles.matchCard} data-status={match["Match Status"] || "Scheduled"} data-live-match-dirty={dirty ? "true" : undefined}>
     <header>
       <div><span>Match {match.Match}</span><h2>{match["Match ID"]}</h2><p>Round {match.Round} · {match.Format} · {match["Course ID"] || "Course TBA"}{match["Tee Time"] ? ` · ${match["Tee Time"]}` : ""}</p></div>
-      <strong>{match["Match Status"] || "Scheduled"}</strong>
+      <strong>{formatStatusLabel(match["Match Status"])}</strong>
     </header>
     <div className={styles.pairing}>
       <PairingSide side={1} team={sideOne} match={match} draft={draft} players={players} rosters={rosters} singles={isSingles} disabled={isFinal || busy} onChange={change} />
@@ -230,9 +231,9 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
       </div>
       {status ? <div className={styles.status}>{status}</div> : null}
       <div className={styles.clinchSummary}>
-        <div><span>{teamName(data.teams, year, 1)}</span><strong>{tournamentState.teamOne.score}</strong><small>{tournamentState.teamOne.pointsToClinch > 0 ? `Need ${tournamentState.teamOne.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
+        <div><span>{teamName(data.teams, year, 1)}</span><strong>{formatTeamPoints(tournamentState.teamOne.score)}</strong><small>{tournamentState.teamOne.pointsToClinch > 0 ? `Need ${formatTeamPoints(tournamentState.teamOne.pointsToClinch)} to clinch` : "At clinching target"}</small></div>
         <p>{tournamentState.remainingMatches} matches · {tournamentState.remainingPoints} points remaining</p>
-        <div><span>{teamName(data.teams, year, 2)}</span><strong>{tournamentState.teamTwo.score}</strong><small>{tournamentState.teamTwo.pointsToClinch > 0 ? `Need ${tournamentState.teamTwo.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
+        <div><span>{teamName(data.teams, year, 2)}</span><strong>{formatTeamPoints(tournamentState.teamTwo.score)}</strong><small>{tournamentState.teamTwo.pointsToClinch > 0 ? `Need ${formatTeamPoints(tournamentState.teamTwo.pointsToClinch)} to clinch` : "At clinching target"}</small></div>
       </div>
       {busy ? <div className={styles.loadingState} role="status">Loading live matches…</div> : matches.length ? <div className={styles.grid}>{matches.map((match) => <MatchEditor key={match["Match ID"]} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} onDirtyChange={updateDirty} busy={busyMatchId === match["Match ID"]} access={accessByMatch[match["Match ID"]] || null} />)}</div> : <div className={styles.empty}>No matches are configured for this selection.</div>}
     </>}

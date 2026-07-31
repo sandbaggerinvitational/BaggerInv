@@ -11,7 +11,8 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /gross score/);
   assert.match(source, /Submit final scorecard/);
   assert.match(source, /strokeDots/);
-  assert.match(source, /namedMatchStatus/);
+  assert.match(source, /formatLiveMatchResult/);
+  assert.doesNotMatch(source, /function namedMatchStatus/);
   assert.match(source, /holeNavigator/);
   assert.match(source, /scorecardRow/);
   assert.match(source, /Gross &amp; net/);

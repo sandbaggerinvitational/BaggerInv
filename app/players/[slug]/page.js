@@ -17,7 +17,7 @@ import {
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
-import { formatPoints } from "../../../lib/formatters";
+import { formatPlayerPoints } from "../../../lib/formatters";
 import { formatPlayerCareerYears } from "../../../lib/player-career";
 import { safePlayerDirectoryReturnHref } from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
@@ -348,7 +348,7 @@ export default async function PlayerPage({ params, searchParams }) {
                   photo={row.player["Photo Filename"]}
                 />
                 <span>{formatRecord(row.record)}</span>
-                <strong>{formatPoints(row.record.points)}</strong>
+                <strong>{formatPlayerPoints(row.record.points)}</strong>
               </div>
             ))}
           </div>

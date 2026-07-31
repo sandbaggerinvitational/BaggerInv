@@ -157,7 +157,7 @@ test("Final match results separate the official team name from the result line",
   assert.match(source, /function finalResultParts/);
   assert.match(source, /\[tournament\.teamOne\.name, tournament\.teamTwo\.name\]/);
   assert.match(source, /result\.slice\(winner\.length\)\.trim\(\)/);
-  assert.match(source, /result === "HALVED"/);
+  assert.match(source, /\/\^halved\$\/i\.test\(result\)/);
   assert.match(source, /className=\{styles\.finalResult\}/);
   assert.match(source, /<small>\{finalResult\.team\}<\/small>/);
   assert.match(source, /<strong>\{finalResult\.result\}<\/strong>/);
@@ -213,7 +213,7 @@ test("Snapshot counts use distinct live, remaining, and final labels", async () 
 test("Round summaries center team names around an independent score", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
   assert.match(source, /className=\{styles\.roundScore\}/);
-  assert.match(source, /\{formatPoints\(teamOneScore\)\} – \{formatPoints\(teamTwoScore\)\}/);
+  assert.match(source, /\{formatTeamPoints\(teamOneScore\)\} – \{formatTeamPoints\(teamTwoScore\)\}/);
   assert.match(styles, /\.roundScore\{[^}]*grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)/);
   assert.match(styles, /\.roundScore>span\{[^}]*text-align:center|\.roundScore\{[^}]*text-align:center/);
   assert.match(styles, /\.roundScore>span\{[^}]*min-height:2\.4em/);
@@ -234,7 +234,7 @@ test("Overall leaderboard uses compact proportional columns with team under play
 test("Snapshot protects whole and half-point scores in an independent center column", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
   assert.match(source, /className=\{styles\.scoreValue\}/);
-  assert.match(source, /formatPoints\(tournament\.teamOne\.score\).*formatPoints\(tournament\.teamTwo\.score\)/s);
+  assert.match(source, /formatTeamPoints\(tournament\.teamOne\.score\).*formatTeamPoints\(tournament\.teamTwo\.score\)/s);
   assert.match(styles, /\.score\{[^}]*grid-template-columns:minmax\(72px,1fr\) minmax\(116px,auto\) minmax\(72px,1fr\)/);
   assert.match(styles, /\.scoreValue\{[^}]*font:700 clamp/);
   assert.match(styles, /\.scoreValue\{[^}]*white-space:nowrap/);
@@ -252,7 +252,7 @@ test("Tournament tee times reuse the approved formatter and never construct Inva
 test("Official final result text is retained from the finalized row", async () => {
   const [source, dataSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8")]);
   assert.match(dataSource, /"Match Status Text"/);
-  assert.match(source, /if \(match\.liveStatusText\) return match\.liveStatusText\.toUpperCase\(\)/);
+  assert.match(source, /formatStoredMatchResult\(match/);
 });
 
 test("Tournament-only footer is compact in mobile browser and absent in standalone mode", async () => {

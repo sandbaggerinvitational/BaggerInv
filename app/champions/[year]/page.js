@@ -15,7 +15,7 @@ import {
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
-import { formatPoints } from "../../../lib/formatters";
+import { formatPlayerPoints, formatTeamPoints } from "../../../lib/formatters";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
 
@@ -122,7 +122,7 @@ export default async function ChampionshipDetailPage({ params }) {
                   <span>
                     Record {standing ? `${standing.wins}-${standing.losses}-${standing.halves}` : "—"}
                   </span>
-                  {pointsTracked ? <b>{formatPoints(standing?.points)} pts</b> : null}
+                  {pointsTracked ? <b>{formatPlayerPoints(standing?.points)} pts</b> : null}
                 </Link>
               );
             })}
@@ -139,8 +139,8 @@ export default async function ChampionshipDetailPage({ params }) {
                   <span>Round {number} · {getFormatName(course.Format)}</span>
                   <strong>{archive.roundWinner}</strong>
                 </div>
-                <p><b>{champion.name}</b><strong>{formatPoints(winningSide.points)}</strong></p>
-                <p><b>{opponent?.name || opposingSide.name}</b><strong>{formatPoints(opposingSide.points)}</strong></p>
+                <p><b>{champion.name}</b><strong>{formatTeamPoints(winningSide.points)}</strong></p>
+                <p><b>{opponent?.name || opposingSide.name}</b><strong>{formatTeamPoints(opposingSide.points)}</strong></p>
               </Link>
             ))}
           </div>

@@ -9,6 +9,7 @@ import {
   selectRelevantPlayerMatches,
 } from "../lib/player-home";
 import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app";
+import { formatStatusLabel } from "../lib/formatters";
 import { courseLogo, teamLogo } from "../lib/asset-paths";
 import { formatHomeTime } from "../lib/home-dashboard";
 import MobileIdentityImage from "./MobileIdentityImage";
@@ -250,7 +251,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
         <span>Through {primary.currentHole || primary.holesRecorded || "—"}</span>
         {primary.updatedAt ? <small>Last updated {new Date(primary.updatedAt).toLocaleString()}</small> : null}
       </div> : null}
-      {primary.result ? <div className={styles.complete}><span>Match Complete</span><strong>{formatMatchResult(primary, primary.team?.side)}</strong></div> : null}
+      {primary.result ? <div className={styles.complete}><span>{formatStatusLabel("Final", { complete: true })}</span><strong>{formatMatchResult(primary, primary.team?.side)}</strong></div> : null}
       <Action match={primary} busy={busyId === primary.matchId} onOpen={openMatch} />
       {normalizedMatchStatus(primary) === "LOCKED" ? <p className={styles.note}>The tournament director has locked scoring for this match.</p> : null}
       {normalizedMatchStatus(primary) === "UPCOMING" ? <p className={styles.note}>Scoring will become available when participant access opens.</p> : null}

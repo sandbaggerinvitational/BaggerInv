@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AssetImage from "../AssetImage";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { playerPhoto, teamLogo } from "../../lib/asset-paths";
-import { formatPoints } from "../../lib/formatters";
+import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -23,7 +23,7 @@ const initials = (name) => clean(name || "SBI").split(/\s+/).filter(Boolean).map
 const toPar = (value) => Number(value) === 0 ? "E" : Number(value) > 0 ? `+${value}` : String(value);
 const average = (value) => Number.isFinite(Number(value)) ? Number(value).toFixed(1) : "—";
 const metricValue = (row, metric) => {
-  if (metric === "points") return `${formatPoints(row.points)} pts`;
+  if (metric === "points") return `${formatPlayerPoints(row.points)} pts`;
   if (metric === "wins") return String(row.wins ?? "—");
   if (metric === "winPct") return row.winPct === null ? "—" : `${row.winPct.toFixed(0)}%`;
   return average(row[metric]);
@@ -50,10 +50,10 @@ function PlayerDetails({ row, roundLeaderboards = {} }) {
   return <div className={styles.playerDetails}>
     <div><span>Team</span><strong>{row.team}</strong></div>
     <div><span>Overall Record</span><strong>{row.record}</strong></div>
-    <div><span>Points</span><strong>{formatPoints(row.points)}</strong></div>
+    <div><span>Points</span><strong>{formatPlayerPoints(row.points)}</strong></div>
     {row.grossAvg !== null ? <div><span>Gross Average</span><strong>{average(row.grossAvg)}</strong></div> : null}
     {row.netAvg !== null ? <div><span>Net Average</span><strong>{average(row.netAvg)}</strong></div> : null}
-    {roundResults.length ? <p>{roundResults.map(({ round, result }) => `Round ${round}: ${result.wins}-${result.losses}-${result.halves}, ${formatPoints(result.points)} pts`).join(" • ")}</p> : null}
+    {roundResults.length ? <p>{roundResults.map(({ round, result }) => `Round ${round}: ${result.wins}-${result.losses}-${result.halves}, ${formatPlayerPoints(result.points)} pts`).join(" • ")}</p> : null}
   </div>;
 }
 
@@ -120,7 +120,7 @@ function Teams({ data, selectedRound, currentPlayer }) {
       return <article data-current={currentTeam || undefined} key={team.side}>
         <strong>{team.rank}</strong>
         <span><TeamMark filename={team.logo} name={team.name} size="large" /><span><b>{team.name}{currentTeam ? <em>YOUR TEAM</em> : null}</b><small>{team.remaining} match{team.remaining === 1 ? "" : "es"} remaining</small></span></span>
-        <span>{team.record}</span><b>{formatPoints(team.points)}</b>
+        <span>{team.record}</span><b>{formatTeamPoints(team.points)}</b>
       </article>;
     })}
   </section>;
@@ -131,7 +131,7 @@ function Insights({ data }) {
   const teams = useMemo(() => teamStandings(data.rounds || [], data.tournament || {}, "overall"), [data]);
   const insights = useMemo(() => tournamentInsights(players, teams, data.tournament || {}), [data.tournament, players, teams]);
   const cards = [
-    insights.pointsLeader ? ["Points Leader", insights.pointsLeader.player, `${formatPoints(insights.pointsLeader.points)} points`] : null,
+    insights.pointsLeader ? ["Points Leader", insights.pointsLeader.player, `${formatPlayerPoints(insights.pointsLeader.points)} points`] : null,
     insights.lowestGross ? ["Lowest Gross Average", insights.lowestGross.player, average(insights.lowestGross.grossAvg)] : null,
     insights.lowestNet ? ["Lowest Net Average", insights.lowestNet.player, average(insights.lowestNet.netAvg)] : null,
   ].filter(Boolean);
@@ -145,7 +145,7 @@ function Insights({ data }) {
         <span>{insights.teamLeader.label}</span>
         {insights.teamLeader.tied ? <em className={insightStyles.tieLabel}>Tied</em> : null}
         <strong>{insights.teamLeader.namesLabel}</strong>
-        <b>{formatPoints(insights.teamLeader.points)} {insights.teamLeader.points === 1 ? "point" : "points"}{insights.teamLeader.tied ? " each" : ""}</b>
+        <b>{formatTeamPoints(insights.teamLeader.points)} {insights.teamLeader.points === 1 ? "point" : "points"}{insights.teamLeader.tied ? " each" : ""}</b>
       </article> : null}
       {undefeated.length ? <article className={insightStyles.undefeated}>
         <span>Undefeated</span>

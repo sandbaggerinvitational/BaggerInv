@@ -2,7 +2,7 @@ import Link from "next/link";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
 import { formatPercentage, formatRecord } from "../../../lib/stats";
-import { formatPoints } from "../../../lib/formatters";
+import { formatPlayerPoints } from "../../../lib/formatters";
 import TeamLogoPlate from "../../TeamLogoPlate";
 import styles from "../../historical.module.css";
 
@@ -70,7 +70,7 @@ function TournamentHistoryRow({ season }) {
         <em className={styles.playerTournamentFinish}>{season.finish}</em>
       </span>
       <span data-label="Record">{upcoming ? "—" : season.recordDisplay}</span>
-      <span data-label="Points">{upcoming ? "—" : formatPoints(season.points)}</span>
+      <span data-label="Points">{upcoming ? "—" : formatPlayerPoints(season.points)}</span>
       <span data-label="Avg Score">
         {upcoming || season.averageScore === null
           ? "—"
@@ -97,7 +97,7 @@ export default function PlayerIntelligenceSections({
         <ScoringStatGrid dense items={[
           { label: "Overall Record", value: official.recordDisplay },
           { label: "Win Percentage", value: formatPercentage(official.winPercentage) },
-          { label: "Career Points", value: formatPoints(official.careerPoints) },
+          { label: "Career Points", value: formatPlayerPoints(official.careerPoints) },
           { label: "Tournament Appearances", value: official.appearances },
           { label: "Championships", value: official.championships },
           { label: "Runner-Up Finishes", value: official.runnerUps },

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
-import { appMatchStatus } from "../../lib/mobile-tournament-app";
+import { appMatchStatus, formatMatchResult } from "../../lib/mobile-tournament-app";
+import { formatStatusLabel } from "../../lib/formatters";
 import { normalizedMatchStatus, selectRelevantPlayerMatches } from "../../lib/player-home";
 import styles from "./my-match-dashboard.module.css";
 
@@ -73,30 +74,8 @@ function TeamBlock({ team, players, tournamentLogoFilename }) {
   </div>;
 }
 
-function participantResult(match) {
-  if (!match.result) return "";
-  const shared = String(match.result.officialResult || "").trim();
-  if (/^halved$/i.test(shared)) return "HALVED";
-  const sharedWinner = [match.team?.name, match.opponentTeam?.name]
-    .find((name) => name && shared.toLowerCase().startsWith(String(name).toLowerCase()));
-  if (sharedWinner) {
-    const notation = shared.slice(sharedWinner.length).trim().toUpperCase();
-    return `${sharedWinner === match.team?.name ? "WON" : "LOST"} ${notation}`.trim();
-  }
-  if (match.result.winner === "Halved") return "HALVED";
-  const won = match.result.winner === match.team?.name;
-  const official = String(match.result.statusText || "").trim();
-  const margin = official.match(/\bwins?\s+(.+)$/i)?.[1];
-  if (margin) return `${won ? "WON" : "LOST"} ${margin.toUpperCase()}`;
-  const difference = Math.abs(Number(match.result.teamOneHoles || 0) - Number(match.result.teamTwoHoles || 0));
-  return `${won ? "WON" : "LOST"}${difference ? ` ${difference} ${won ? "UP" : "DOWN"}` : ""}`;
-}
-
 function statusSupport(match, status) {
   if (status === "Live") return match.currentHole ? `Through Hole ${match.currentHole}` : "Scoring is open";
-  if (status === "Scoring Opens Soon") return match.teeTime
-    ? `Scoring opens before the ${formatTime(match.teeTime)} tee time`
-    : "Round scoring opens soon";
   if (status === "Locked") return "Locked by Tournament Director";
   if (status === "Upcoming") return match.teeTime
     ? `Scoring opens before ${formatTime(match.teeTime)}`
@@ -106,7 +85,7 @@ function statusSupport(match, status) {
 
 function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) {
   const status = appMatchStatus(match);
-  const result = participantResult(match);
+  const result = formatMatchResult(match, match.team?.side);
   const courseMeta = [formatTee(match.tee), formatTime(match.teeTime)].filter(Boolean).join(" • ");
   const support = statusSupport(match, status);
   const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=my-match`;
@@ -128,7 +107,10 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
     <div className={styles.cardTop}>
       <MatchHeading match={match} />
       <div className={styles.cardState}>
-        {emphasized ? <small>{status === "Live" ? "Current Match" : status === "Final" ? "Match Complete" : "Upcoming Match"}</small> : null}
+        {emphasized ? <small>{formatStatusLabel(status, {
+          current: status === "Live",
+          complete: status === "Final",
+        })}</small> : null}
         <span data-status={status.toUpperCase().replaceAll(" ", "-")}>{status}</span>
         {result ? <strong aria-label={`Final result: ${result}`}>{result}</strong> : null}
       </div>

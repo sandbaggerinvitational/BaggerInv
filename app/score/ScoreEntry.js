@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { finalizedMatchResult } from "../../lib/match-result.js";
+import { finalizedMatchResult, formatLiveMatchResult } from "../../lib/match-result.js";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import MyMatchDashboard from "./MyMatchDashboard";
 import styles from "./score.module.css";
@@ -12,14 +12,6 @@ const jsonScores = (value) => {
 };
 function playerIds(match, side) {
   return [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]].filter(Boolean);
-}
-
-function namedMatchStatus(scores = [], teamNames = {}) {
-  const team1 = scores.filter((score) => score?.["Hole Winner"] === "Team 1").length;
-  const team2 = scores.filter((score) => score?.["Hole Winner"] === "Team 2").length;
-  if (team1 === team2) return "All square";
-  const side = team1 > team2 ? 1 : 2;
-  return `${teamNames[side] || `Team ${side}`} ${Math.abs(team1 - team2)} UP`;
 }
 
 function strokeDots(count) {
@@ -274,7 +266,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       const nextScores = (data?.holeScores || [])
         .filter((item) => Number(item["Hole Number"]) !== holeNumber)
         .concat(payload.result?.hole || []);
-      const savedStatus = namedMatchStatus(nextScores, teamNames);
+      const savedStatus = formatLiveMatchResult(nextScores, teamNames);
       setLastSaved(`Hole ${holeNumber} saved · ${savedStatus}`);
       const nextData = {
         ...data,
@@ -373,7 +365,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     <header><div><span>{display.formatName || format} · Round {match.Round}</span><h1>{display.matchName || `Match ${match.Match}`}</h1><p>{display.courseName || match["Course ID"]} · Scorecard review</p></div><b>{completed.size}/18</b></header>
     <div className={styles.reviewStatus}>
       <span>{isFinal ? "FINAL SCORECARD" : "REVIEW BEFORE SUBMITTING"}</span>
-      <strong>{isFinal ? finalResult || "Final" : completed.size ? namedMatchStatus(data?.holeScores, teamNames) : lastSaved || "Check every hole before confirmation."}</strong>
+      <strong>{isFinal ? finalResult || "Final" : completed.size ? formatLiveMatchResult(data?.holeScores, teamNames) : lastSaved || "Check every hole before confirmation."}</strong>
     </div>
     {[scorecardHoles.slice(0, 9), scorecardHoles.slice(9)].map((nine, nineIndex) => <div className={styles.scorecard} key={nineIndex}>
       <div className={styles.scorecardRow} data-header="true"><strong>Player / Team</strong>{nine.map(({ number }) => <b key={number}>{number}</b>)}</div>
@@ -441,7 +433,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       })}
       <div className={styles.holeCardWinner}><strong>Hole winner</strong><b>{preview.winner ? holeWinnerMark({ "Hole Winner": preview.winner }, teamNames) : holeWinnerMark(savedHole, teamNames) || "Pending"}</b></div>
     </div>
-    {savedHole && <div className={styles.result}><span>Match status</span><strong>{namedMatchStatus(data?.holeScores, teamNames)}</strong><small>Hole {holeNumber}: {holeWinnerMark(savedHole, teamNames)}</small></div>}
+    {savedHole && <div className={styles.result}><span>Match status</span><strong>{formatLiveMatchResult(data?.holeScores, teamNames)}</strong><small>Hole {holeNumber}: {holeWinnerMark(savedHole, teamNames)}</small></div>}
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">

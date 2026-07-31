@@ -59,11 +59,11 @@ test("Live scoreboard supports All Square, one up, and two up", () => {
   ], names), "All Square");
   assert.equal(liveMatchResult(match, [
     { "Hole Number": 1, "Hole Winner": "Team 1" },
-  ], names), "The Pickles 1 Up");
+  ], names), "The Pickles 1 UP");
   assert.equal(liveMatchResult(match, [
     { "Hole Number": 1, "Hole Winner": "Team 2" },
     { "Hole Number": 2, "Hole Winner": "Team 2" },
-  ], names), "Lipp It and Rip It 2 Up");
+  ], names), "Lipp It and Rip It 2 UP");
 });
 
 test("Final result preserves official wording and halved matches", () => {
@@ -88,9 +88,9 @@ test("Final match-play notation derives standard early and 18-hole results", () 
     ...Array.from({ length: halved }, () => "Halved"),
   ].map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
 
-  assert.equal(matchPlayNotation(result(8, 0, 3), names), "The Pickles 8 & 7");
-  assert.equal(matchPlayNotation(result(4, 0, 11), names), "The Pickles 4 & 3");
-  assert.equal(matchPlayNotation(result(2, 0, 15), names), "The Pickles 2 & 1");
+  assert.equal(matchPlayNotation(result(8, 0, 3), names), "The Pickles 8&7");
+  assert.equal(matchPlayNotation(result(4, 0, 11), names), "The Pickles 4&3");
+  assert.equal(matchPlayNotation(result(2, 0, 15), names), "The Pickles 2&1");
   const alternating = Array.from({ length: 16 }, (_, index) => index % 2 ? "Team 2" : "Team 1");
   const holes = (winners) => winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
   assert.equal(matchPlayNotation(holes([...alternating, "Team 1", "Team 1"]), names), "The Pickles 2 UP");
@@ -102,7 +102,7 @@ test("Preview Match 2026-R1-1 finalized sequence resolves to 7 & 6, not 8 & 7", 
   const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
   const winners = ["Halved", "Team 2", "Halved", "Halved", "Team 2", "Team 2", "Halved", "Team 2", "Team 2", "Team 2", "Halved", "Team 2", "Team 1", "Halved", "Team 2", "Team 2", "Halved", "Halved"];
   const holes = winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
-  assert.equal(matchPlayNotation(holes, names), "Lipp It and Rip It 7 & 6");
+  assert.equal(matchPlayNotation(holes, names), "Lipp It and Rip It 7&6");
 });
 
 test("shared final formatter overrides stale stored wording with trusted hole history", () => {
@@ -110,7 +110,7 @@ test("shared final formatter overrides stale stored wording with trusted hole hi
   const winners = ["Halved", "Team 2", "Halved", "Halved", "Team 2", "Team 2", "Halved", "Team 2", "Team 2", "Team 2", "Halved", "Team 2"];
   const holes = winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
   const match = { "Match Status": "Final", "Match Status Text": "Team 2 8 UP through 18" };
-  assert.equal(finalizedMatchResult(match, holes, names), "Lipp It and Rip It 7 & 6");
+  assert.equal(finalizedMatchResult(match, holes, names), "Lipp It and Rip It 7&6");
 });
 
 test("Game Center navigation stays within official tournament order and boundaries", () => {
@@ -406,9 +406,9 @@ test("Tournament, My Match, and Home consume shared final result data", async ()
     readFile(sheetUrl, "utf8"),
   ]);
   assert.match(sheet, /finalizedMatchResult\(authoritative, matchHoleScores/);
-  assert.match(tournament, /match\.finalResult/);
-  assert.match(myMatch, /match\.result\.officialResult/);
-  assert.match(homeApp, /match\.result\?\.officialResult/);
+  assert.match(tournament, /formatStoredMatchResult/);
+  assert.match(myMatch, /formatMatchResult/);
+  assert.match(homeApp, /formatParticipantMatchResult/);
 });
 
 test("Frozen Home, My Match, and Tournament remain outside this refinement", async () => {
