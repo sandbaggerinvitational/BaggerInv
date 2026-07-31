@@ -35,21 +35,11 @@ function ScorecardCell({ readOnly, disabled, onEdit, children, label }) {
   return <button type="button" disabled={disabled} onClick={onEdit} aria-label={label}>{children}</button>;
 }
 
-function ParticipantLinks({ player }) {
-  return <nav className={styles.liveLinks} aria-label="Player Passport navigation">
-    <Link href="/home">My Tournament</Link>
-    <Link href="/live">Tournament Coverage</Link>
-    <Link href="/live?view=points">Live Leaderboard</Link>
-    <Link href={player?.slug ? `/players/${player.slug}` : "/players"}>My Profile</Link>
-  </nav>;
-}
-
 export default function ScoreEntry({ dashboardOnly = false }) {
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
   const [authorized, setAuthorized] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState("");
-  const [matchId, setMatchId] = useState("");
   const [matchOptions, setMatchOptions] = useState([]);
   const [data, setData] = useState(null);
   const [holeNumber, setHoleNumber] = useState(1);
@@ -85,7 +75,6 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Unable to load the match.");
-    setMatchId(payload.data.match["Match ID"]);
     setData(payload.data);
     setShowReview(payload.data.match["Match Status"] === "Final" || Boolean(payload.data.canConfirm));
     setConfirming(false);
@@ -218,6 +207,13 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   const finalResult = isFinal
     ? finalizedMatchResult(match, data?.holeScores || [], teamNames)
     : "";
+  const finalWinner = (() => {
+    const winner = String(match["Matchup Winner"] || match["18-Hole Winner"] || "").trim();
+    if (/^(halved|tie|tied)$/i.test(winner) || /^halved$/i.test(finalResult)) return "Match Halved";
+    if (/^(team 1|1)$/i.test(winner)) return teamNames[1] || "Team 1";
+    if (/^(team 2|2)$/i.test(winner)) return teamNames[2] || "Team 2";
+    return [teamNames[1], teamNames[2]].find((name) => name && finalResult.toLowerCase().startsWith(String(name).toLowerCase())) || winner || "Final result recorded";
+  })();
   const format = String(match.Format || "").toUpperCase();
   const slots = format === "BB" ? 2 : 1;
   const savedHole = data?.holeScores?.find((item) => Number(item["Hole Number"]) === holeNumber);
@@ -261,6 +257,13 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     next[index] = value;
     return { ...current, [side]: next };
   });
+
+  const keepScoreVisible = (event) => {
+    const input = event.currentTarget;
+    const scroll = () => input.scrollIntoView({ block: "center", behavior: "smooth" });
+    requestAnimationFrame(scroll);
+    window.setTimeout(scroll, 280);
+  };
 
   const save = async () => {
     setBusy(true); setStatus(`Saving hole ${holeNumber}…`);
@@ -331,12 +334,6 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     setStatus(`Editing hole ${number}.`);
   };
 
-  const leaderboardLinks = <nav className={styles.liveLinks} aria-label="Live tournament links">
-    <Link href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>Game Center</Link>
-    <Link href={`/live?view=scores&round=${match.Round}`}>Gross &amp; net</Link>
-    <Link href={`/live?view=points&round=${match.Round}`}>Player points</Link>
-  </nav>;
-
   if (restoring) return <section className={styles.login}>
     <div className={styles.brand}><span>SBI LIVE</span><h1>Opening scoring…</h1><p>Restoring your authorized match.</p></div>
   </section>;
@@ -375,20 +372,32 @@ export default function ScoreEntry({ dashboardOnly = false }) {
 
   if (showReview) return <section className={`${styles.shell} ${styles.reviewShell}`} data-scorecard-state={isFinal ? "final" : "review"}>
     <header><div><span>Round {match.Round} • {display.formatName || format}</span><h1>{isFinal ? "Official Match Scorecard" : "Review Scorecard"}</h1><p>{display.matchName || `Match ${match.Match}`} • {display.courseName || match["Course ID"]}{teeName ? ` • ${teeName} Tees` : ""}</p></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
-    <div className={styles.reviewStatus}>
-      <div className={styles.reviewBadge}><StatusBadge status={isFinal ? "Final" : "Current Match"} /></div>
-      <span>{isFinal ? "OFFICIAL TOURNAMENT RECORD" : "REVIEW BEFORE SUBMITTING"}</span>
-      <strong>{isFinal ? finalResult || "Final" : completed.size ? formatLiveMatchResult(data?.holeScores, teamNames) : lastSaved || "Check every hole before confirmation."}</strong>
-      <small>{isFinal ? `${completed.size} holes recorded • Read-only` : "Tap a recorded hole below to make a correction."}</small>
-    </div>
-    <div className={styles.officialCourse}>
+    {!isFinal ? <div className={styles.reviewStatus}>
+      <div className={styles.reviewBadge}><StatusBadge status="Current Match" /></div>
+      <span>REVIEW BEFORE SUBMITTING</span>
+      <strong>{completed.size ? formatLiveMatchResult(data?.holeScores, teamNames) : lastSaved || "Check every hole before confirmation."}</strong>
+      <small>Tap a recorded hole below to make a correction.</small>
+    </div> : null}
+    {isFinal ? <section className={styles.finalMatchSummary} aria-label="Final match summary">
+      <div className={styles.finalSummaryLead}><span>OFFICIAL TOURNAMENT RECORD</span><StatusBadge status="Final" /><small>Winning Team</small><strong>{finalWinner}</strong><b>{finalResult || "Final"}</b><em>{completed.size} holes recorded • Read-only</em></div>
+      <div className={styles.finalSummaryMeta}>
+        <span><small>Round</small><strong>{match.Round || "—"}</strong></span>
+        <span><small>Match Number</small><strong>{match.Match || "—"}</strong></span>
+        <span><small>Course</small><strong>{display.courseName || match["Course ID"] || "—"}</strong></span>
+        <span><small>Tees</small><strong>{teeName || "—"}</strong></span>
+        <span><small>Tee Time</small><strong>{teeTime || "—"}</strong></span>
+        <span><small>Starting Hole</small><strong>{startingHole || "—"}</strong></span>
+      </div>
+    </section> : <div className={styles.officialCourse}>
       <span><small>Course</small><strong>{display.courseName || match["Course ID"] || "Course recorded with match"}</strong></span>
       {teeName ? <span><small>Tees</small><strong>{teeName}</strong></span> : null}
       {teeTime ? <span><small>Tee Time</small><strong>{teeTime}</strong></span> : null}
       {startingHole ? <span><small>Starting Hole</small><strong>{startingHole}</strong></span> : null}
-    </div>
+    </div>}
     <div className={styles.officialRecord}>
-      {[1, 2].map((side) => <div key={side}><small>Team {side}</small><strong>{teamNames[side] || `Team ${side}`}</strong><span>{playerIds(match, side).map((id) => playerNames[id] || id).filter(Boolean).join(" • ") || "Players recorded with match"}</span></div>)}
+      <div><strong>{teamNames[1] || "Team 1"}</strong><span>{playerIds(match, 1).map((id) => playerNames[id] || id).filter(Boolean).join(" • ") || "Players recorded with match"}</span></div>
+      <b className={styles.versus} aria-hidden="true">VS</b>
+      <div><strong>{teamNames[2] || "Team 2"}</strong><span>{playerIds(match, 2).map((id) => playerNames[id] || id).filter(Boolean).join(" • ") || "Players recorded with match"}</span></div>
     </div>
     {[scorecardHoles.slice(0, 9), scorecardHoles.slice(9)].map((nine, nineIndex) => <div className={styles.scorecard} role="table" aria-label={`${nineIndex ? "Back" : "Front"} nine scorecard`} key={nineIndex}>
       <div className={styles.scorecardRow} data-header="true" role="row"><strong role="columnheader">Player / Team</strong>{nine.map(({ number }) => <b role="columnheader" key={number}>{number}</b>)}</div>
@@ -417,13 +426,10 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       })}</div>
     </div>)}
     {!isFinal && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
-    {leaderboardLinks}
-    {passportPlayer ? <ParticipantLinks player={passportPlayer} /> : null}
     {isFinal ? <>
-      <div className={styles.result}><span>Final</span><strong>{finalResult || "Final"}</strong><small>Scorecard confirmed • Only an administrator can reopen this official record.</small></div>
+      <p className={styles.finalConfirmation}>Scorecard confirmed • Only an administrator can reopen this official record.</p>
       <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
         <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-        <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>View Match Result</Link>
       </nav>
     </> : confirming ? <div className={styles.confirmPanel}>
       <strong>Submit this scorecard as final?</strong>
@@ -434,12 +440,10 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   </section>;
 
   return <section className={styles.shell}>
-    <button type="button" className={styles.clearAccess} onClick={clearAccess}>Leave My Match</button>
-    {passportPlayer ? <ParticipantLinks player={passportPlayer} /> : null}
     <header><div><span>Round {match.Round} • {display.formatName || format}</span><h1>{display.matchName || `Match ${match.Match}`}</h1><p>{display.courseName || match["Course ID"]}{teeName ? ` • ${teeName} Tees` : ""}</p></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
     <section className={styles.scoringContext} aria-label="Current match progress">
       <div><small>Current match status</small><strong>{currentMatchStatus}</strong></div>
-      <span><b>Hole {progress.currentHole} of 18</b><small>{progress.remaining} hole{progress.remaining === 1 ? "" : "s"} remaining</small></span>
+      <span><b>{savedHole ? `Reviewing Hole ${progress.currentHole}` : `Hole ${progress.currentHole} of 18`}</b><small>{savedHole ? "Editing recorded scores" : `${progress.remaining} hole${progress.remaining === 1 ? "" : "s"} remaining`}</small></span>
       <i aria-hidden="true"><b style={{ width: `${progress.percent}%` }} /></i>
     </section>
     <nav className={styles.holeNavigator} aria-label="Choose hole">
@@ -457,7 +461,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
           const dots = strokeDots(strokesFor(side, index));
           return <label className={styles.holeCardPlayer} key={`${side}-${index}`}>
             <span><strong>{playerLabel}</strong>{dots ? <em aria-label={`${strokesFor(side, index)} stroke received`}>{dots}</em> : null}</span>
-            <input aria-label={`${playerLabel} gross score`} disabled={isFinal} type="number" inputMode="numeric" min="1" max="20" value={gross[key][index] || ""} onChange={(event) => setScore(key, index, event.target.value)} />
+            <input aria-label={`${playerLabel} gross score`} disabled={isFinal} type="number" inputMode="numeric" enterKeyHint="next" min="1" max="20" value={gross[key][index] || ""} onFocus={keepScoreVisible} onChange={(event) => setScore(key, index, event.target.value)} />
           </label>;
         });
         return playerRows.concat(<div className={styles.holeCardTeam} key={`team-${side}`}>
@@ -472,9 +476,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-      <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(matchId)}?from=my-match`}>View Match Result</Link>
     </nav> : <button className={styles.primary} disabled={busy || !scoresComplete} onClick={save}>{savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
     {status && <p className={styles.status}>{status}</p>}
-    {leaderboardLinks}
   </section>;
 }

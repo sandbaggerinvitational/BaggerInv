@@ -116,8 +116,7 @@ test("active Passport replaces onboarding with participant destinations", async 
   assert.match(navigation, /Tournament/);
   assert.match(navigation, /Leaderboard/);
   assert.match(navigation, /Me/);
-  assert.match(score, /My Tournament/);
-  assert.match(score, /Live Leaderboard/);
+  assert.doesNotMatch(score, /My Tournament|Live Leaderboard/);
   assert.match(live, /Back to My Tournament/);
   assert.match(live, />My Tournament</);
   assert.match(profile, /Back to My Tournament/);

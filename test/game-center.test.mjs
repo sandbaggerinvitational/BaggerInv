@@ -282,7 +282,7 @@ test("Home result and details destinations use same-origin Game Center with Home
   assert.doesNotMatch(home, /view=matchups/);
   assert.match(page, /\["home", "my-match"\]\.includes\(query\?\.from\)/);
   assert.match(center, /backTo === "home" \? "\/home"/);
-  assert.match(scoring, /`\/game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match`/);
+  assert.doesNotMatch(scoring, /`\/game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match`/);
   assert.doesNotMatch(scoring, /view=matchups/);
 });
 

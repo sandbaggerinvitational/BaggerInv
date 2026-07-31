@@ -26,3 +26,26 @@
 .officialCourse{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,.7fr));gap:6px;padding:9px;border:1px solid #d8cfbd;border-radius:13px;background:#fff}.officialCourse span{display:grid;align-content:center;gap:2px;min-width:0}.officialCourse small{color:#806322;font-size:.5rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.officialCourse strong{color:#23443a;font-size:.65rem;line-height:1.2;overflow-wrap:anywhere}.officialCourse span:not(:first-child){text-align:center}
 @media(max-width:480px){.shell{padding:10px 9px calc(88px + env(safe-area-inset-bottom))}.shell>header{padding:10px}.shell>header h1{font-size:1.25rem}.shell>header b{width:48px;height:48px}.scoringContext{padding:9px 10px}.scoringContext strong{font-size:.86rem}.holeCardPlayer{min-height:66px}.holeCardPlayer input{width:68px;min-height:48px}.reviewShell{padding-inline:6px}.reviewShell>header{padding-inline:9px}.officialCourse{grid-template-columns:repeat(3,minmax(0,1fr))}.officialCourse span:first-child{grid-column:1/-1;text-align:left}.scorecardRow{grid-template-columns:88px repeat(9,minmax(22px,1fr))}.scorecardRow>*{font-size:.59rem}.scorecardRow>strong{font-size:.54rem}.scorecardRow[data-running=true]>button,.scorecardRow[data-running=true]>span{font-size:.42rem}}
 @media(prefers-reduced-motion:reduce){.scoringContext>i b{transition:none}}
+
+/* Sprint 5.1: focused scoring and official-record distinction. */
+.officialCourse{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 14px;padding:12px}
+.officialCourse span:not(:first-child){text-align:left}
+.officialCourse strong{font-size:.68rem}
+.officialRecord{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);gap:0;background:#fff}
+.officialRecord>div{gap:4px;padding:11px 8px}
+.versus{display:grid;place-items:center;color:#947329;font-size:.55rem;letter-spacing:.08em}
+.finalMatchSummary{overflow:hidden;border:1px solid #bda75f;border-radius:16px;background:#fff;box-shadow:0 7px 18px rgba(20,54,42,.06)}
+.finalMatchSummary small{color:#806322;font-size:.5rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.finalSummaryLead{display:grid;justify-items:center;gap:3px;padding:14px 12px;background:linear-gradient(140deg,#073d30,#0a503d);color:#fff;text-align:center}
+.finalSummaryLead small{color:#e2cc83}
+.finalSummaryLead>span{color:#e2cc83;font-size:.52rem;font-weight:900;letter-spacing:.12em}
+.finalSummaryLead strong{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+.finalSummaryLead b{color:#f2d47d;font:700 1.5rem/1 Georgia,serif}
+.finalSummaryLead em{color:#cbd9d3;font-size:.58rem;font-style:normal}
+.finalSummaryMeta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;padding:12px}
+.finalSummaryMeta span{display:grid;gap:2px;min-width:0}
+.finalSummaryMeta strong{color:#23443a;font-size:.68rem;overflow-wrap:anywhere}
+.holeCardPlayer input{scroll-margin-block:180px}
+.shell:focus-within>.primary{bottom:max(8px,env(safe-area-inset-bottom))}
+.finalConfirmation{margin:0;padding:9px 12px;border-radius:10px;background:#edf3ef;color:#53665d;text-align:center;font-size:.66rem}
+@media(max-width:480px){.officialCourse{grid-template-columns:repeat(2,minmax(0,1fr))}.officialCourse span:first-child{grid-column:auto}}

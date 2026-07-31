@@ -15,7 +15,7 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.doesNotMatch(source, /function namedMatchStatus/);
   assert.match(source, /holeNavigator/);
   assert.match(source, /scorecardRow/);
-  assert.match(source, /Gross &amp; net/);
+  assert.doesNotMatch(source, /Gross &amp; net|Player points|Tournament Coverage|Live Leaderboard|My Profile/);
   assert.match(source, /expectedRevision/);
   assert.doesNotMatch(source, /sessionStorage/);
   assert.match(source, /\/api\/scoring\/current/);
@@ -23,8 +23,7 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /finalizedMatchResult\(match, data\?\.holeScores \|\| \[\], teamNames\)/);
   assert.match(source, /Return to My Match/);
   assert.match(source, /href="\/my-match"/);
-  assert.match(source, /View Match Result/);
-  assert.match(source, /game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match/);
+  assert.doesNotMatch(source, /View Match Result/);
   assert.doesNotMatch(source, /isFinal \? "Match finalized"/);
   assert.doesNotMatch(source, /view=matchups/);
 });
@@ -36,7 +35,7 @@ test("active scoring keeps hole, match status, progress, and next action visible
   ]);
   assert.match(source, /className=\{styles\.scoringContext\}/);
   assert.match(source, /Current match status/);
-  assert.match(source, /Hole \{progress\.currentHole\} of 18/);
+  assert.match(source, /`Hole \$\{progress\.currentHole\} of 18`/);
   assert.match(source, /progress\.remaining/);
   assert.match(source, /Save & Continue/);
   assert.match(source, /Save Hole & Review/);
@@ -50,6 +49,9 @@ test("final scorecard is a read-only official record with running match status",
   assert.match(source, /Official Match Scorecard/);
   assert.match(source, /OFFICIAL TOURNAMENT RECORD/);
   assert.match(source, /className=\{styles\.officialCourse\}/);
+  assert.match(source, /className=\{styles\.finalMatchSummary\}/);
+  assert.match(source, /Winning Team/);
+  assert.match(source, /Match Number/);
   assert.match(source, /Tee Time/);
   assert.match(source, /Starting Hole/);
   assert.match(source, /role="table"/);
@@ -58,6 +60,22 @@ test("final scorecard is a read-only official record with running match status",
   assert.match(source, /if \(readOnly\) return <span/);
   assert.match(source, /Scorecard confirmed/);
   assert.match(source, /Return to My Match/);
+  assert.doesNotMatch(source, /<small>Team \{side\}<\/small>/);
+});
+
+test("review and active scoring stay focused and keyboard-aware", async () => {
+  const [source, styles] = await Promise.all([
+    readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/score/score.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(source, /Reviewing Hole \$\{progress\.currentHole\}/);
+  assert.match(source, /Editing recorded scores/);
+  assert.match(source, /onFocus=\{keepScoreVisible\}/);
+  assert.match(source, /scrollIntoView\(\{ block: "center", behavior: "smooth" \}\)/);
+  assert.match(source, /enterKeyHint="next"/);
+  assert.doesNotMatch(source, /ParticipantLinks|leaderboardLinks/);
+  assert.match(styles, /scroll-margin-block:180px/);
+  assert.match(styles, /\.shell:focus-within>\.primary/);
 });
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {
