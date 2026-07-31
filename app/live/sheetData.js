@@ -486,6 +486,11 @@ async function buildTournamentData() {
     lastUpdated: active["Last Updated"] || "",
     logo: tournamentRow["Tournament Logo Filename"] || tournamentRow["Logo Filename"] || "",
     tieAdvantageSide: tieAdvantageSide(tournamentRow, teams),
+    directorAutomation: {
+      enabled: truthy(tournamentRow["Director Automation Enabled"]),
+      autoOpenRound: truthy(tournamentRow["Auto Open Round"]),
+      autoSetMatchesLive: truthy(tournamentRow["Auto Set Matches Live"]),
+    },
     teamOne: { ...teams[1], score: finalizedScore.teamOne },
     teamTwo: { ...teams[2], score: finalizedScore.teamTwo },
   };

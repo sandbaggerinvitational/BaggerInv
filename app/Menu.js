@@ -30,6 +30,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const [isOpen, setIsOpen] = useState(false);
   const [hash, setHash] = useState("");
   const pathname = usePathname();
+  const [director, setDirector] = useState(false);
   const activeHref = activeNavigationHref || activeNavigationHrefForPath(pathname, hash);
 
   useEffect(() => {
@@ -47,6 +48,15 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   }, [isOpen]);
 
   useEffect(() => setIsOpen(false), [pathname]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/player-passport/session", { cache: "no-store" })
+      .then(async (response) => response.ok ? (await response.json()).player : null)
+      .then((player) => { if (active) setDirector(player?.role === "DIRECTOR"); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [pathname]);
 
   return (
     <>
@@ -118,6 +128,8 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
               )
             )}
           </nav>
+
+          {director ? <Link className="directorMenuLink" href="/admin/director" onClick={() => setIsOpen(false)}>🎯 Tournament Director</Link> : null}
 
           <div className="sideMenuFooter">24 players · Two teams · One trophy</div>
         </div>

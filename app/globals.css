@@ -251,6 +251,18 @@ button:disabled { cursor: not-allowed; }
   transform: translateY(-50%);
 }
 .sideMenuFooter { padding: 28px 0 10px; color: #cbd7d1; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.11em; }
+.directorMenuLink {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  margin-top: 18px;
+  padding: 13px 14px;
+  border: 1px solid rgba(212,177,95,.48);
+  border-radius: 12px;
+  color: var(--gold-soft);
+  font: 700 1rem/1.2 Arial, Helvetica, sans-serif;
+  text-decoration: none;
+}
 
 @media (max-width: 560px) {
   .sideMenu { width: 100vw; }
