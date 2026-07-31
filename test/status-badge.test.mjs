@@ -68,7 +68,7 @@ test("legacy page-specific status-pill selectors are removed", async () => {
   assert.doesNotMatch(combined, /roundBoard header em/);
 });
 
-test("shared MatchStatusBlock aligns one badge with its result", async () => {
+test("shared MatchStatusBlock centers one badge and every result on one fixed axis", async () => {
   const [component, styles] = await Promise.all([
     read("app/MatchStatusBlock.js"),
     read("app/match-status-block.module.css"),
@@ -76,12 +76,25 @@ test("shared MatchStatusBlock aligns one badge with its result", async () => {
   assert.match(component, /<StatusBadge status=\{status\}/);
   assert.equal((component.match(/<StatusBadge/g) || []).length, 1);
   assert.match(component, /result \? <strong/);
-  assert.match(styles, /justify-items: end/);
+  assert.match(styles, /justify-items: center/);
   assert.match(styles, /gap: 2px/);
-  assert.match(styles, /width: 104px/);
+  assert.match(styles, /\.block \{[^}]*width: 112px/s);
+  assert.match(styles, /\.block \{[^}]*min-width: 112px/s);
   assert.match(styles, /text-align: center/);
   assert.match(styles, /\.badge \{[^}]*width: 104px/s);
-  assert.doesNotMatch(styles, /data-prominent="true"\][^{]*\{[^}]*gap:/s);
+  assert.doesNotMatch(styles, /justify-self: end|justify-items: end/);
+  assert.match(styles, /\.block strong \{[^}]*white-space: nowrap/s);
+  for (const result of [
+    "Won 1 UP",
+    "Won 2 UP",
+    "Won 3&2",
+    "Won 5&4",
+    "Halved",
+    "Lost 1 UP",
+    "Lost 2&1",
+  ]) {
+    assert.ok(result.length <= 9, `${result} fits the shared non-wrapping result width`);
+  }
 });
 
 test("completed statuses use FINAL exclusively", async () => {
