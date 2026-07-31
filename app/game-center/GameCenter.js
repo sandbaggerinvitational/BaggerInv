@@ -5,8 +5,9 @@ import MatchStatusBlock from "../MatchStatusBlock";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
-import { formatHandicap, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
-import { liveProgressLabel } from "../../lib/game-center-display";
+import { formatHandicap, formatStatusLabel } from "../../lib/formatters";
+import { holeStory, liveProgressLabel, segmentMatchResult } from "../../lib/game-center-display";
+import { runningMatchStatusAtHole } from "../../lib/scoring-experience";
 import styles from "./game-center.module.css";
 
 const clean = (value) => String(value ?? "").trim();
@@ -85,49 +86,51 @@ function ResultSegments({ data }) {
   const options = format === "SI"
     ? [["overall", "Overall"]]
     : [["front", "Front"], ["back", "Back"], ["overall", "Overall"]];
-  const [selected, setSelected] = useState(options[0][0]);
-  const winners = {
-    front: data.points.frontWinner,
-    back: data.points.backWinner,
-    overall: data.points.overallWinner,
-  };
-  const winner = winners[selected];
   const teamNames = data.display.teamNames;
-  const totalPoints = hasValue(data.points.team1Points) && hasValue(data.points.team2Points)
-    ? Number(data.points.team1Points) + Number(data.points.team2Points)
-    : null;
-  const pointValue = Number.isFinite(totalPoints)
-    ? format === "SI" ? totalPoints : totalPoints / 3
-    : null;
+  const ranges = { front: [1, 9], back: [10, 18], overall: [1, 18] };
+  const segments = options.map(([key, label]) => {
+    const [start, end] = ranges[key];
+    return { key, label, ...segmentMatchResult(data.holes, start, end, teamNames, key === "overall" && data.state === "final" ? data.result : "") };
+  });
 
-  return <section className={styles.results}>
-    <div className={styles.segmented} role="tablist" aria-label="Match result segment">
-      {options.map(([key, label]) => <button
-        type="button"
-        role="tab"
-        aria-selected={selected === key}
-        data-active={selected === key}
-        onClick={() => setSelected(key)}
-        key={key}
-      >{label}</button>)}
+  return <section className={styles.results} aria-labelledby="match-flow-heading">
+    <header className={styles.sectionHeading}><span>Match Flow</span><h2 id="match-flow-heading">Front • Back • Overall</h2></header>
+    <div className={styles.segmentCards}>
+      {segments.map((segment) => <article key={segment.key} aria-label={`${segment.label}: ${segment.team ? `${segment.team}, ` : ""}${segment.result}`}>
+        <small>{segment.label}</small>
+        <strong>{segment.team || (segment.result === "All Square" ? "Halved" : "—")}</strong>
+        <b>{segment.result}</b>
+      </article>)}
     </div>
-    <div className={styles.segmentResult} role="tabpanel">
-      {winner ? <>
-        <strong>{/halved/i.test(winner) ? "Halved" : winnerName(winner, teamNames)}</strong>
-        {pointValue !== null ? <small>{/halved/i.test(winner)
-          ? `${formatTeamPoints(pointValue / 2)} Point${pointValue / 2 === 1 ? "" : "s"} Each`
-          : `${formatTeamPoints(pointValue)} Point${pointValue === 1 ? "" : "s"}`}</small> : null}
-      </> : <strong>Result pending</strong>}
-    </div>
-    {data.points.team1Points !== null && data.points.team2Points !== null ? <div className={styles.matchPoints}>
-      <h3>Match Total</h3>
-      <div>
-        <span><small>{teamNames[1]}</small><strong>{formatTeamPoints(data.points.team1Points)}</strong></span>
-        <span><small>{teamNames[2]}</small><strong>{formatTeamPoints(data.points.team2Points)}</strong></span>
-      </div>
-    </div> : null}
     {data.state === "final" && data.finalSummary ? <p className={styles.finalSummary}>{data.finalSummary}</p> : null}
   </section>;
+}
+
+function compactTeam(value) {
+  const name = clean(value).replace(/^the\s+/i, "");
+  return name.split(/\s+and\s+/i)[0] || name;
+}
+
+function scoreValue(hole, side, type) {
+  if (type === "net") return hole[`team${side}Net`] ?? "—";
+  const values = jsonScores(hole[`team${side}Gross`]);
+  return values.length ? values.join("/") : "—";
+}
+
+function GameCenterScorecard({ data }) {
+  const teamNames = data.display.teamNames;
+  return <details className={styles.officialScorecard}>
+    <summary><span><small>Official Record</small><strong>Hole-by-Hole Scorecard</strong></span><b aria-hidden="true">⌄</b></summary>
+    <div className={styles.scorecardBody}>
+      {[data.holes.slice(0, 9), data.holes.slice(9)].map((nine, index) => <div className={styles.scorecardTable} role="table" aria-label={`${index ? "Back" : "Front"} nine scorecard`} key={index}>
+        <div className={styles.scorecardRow} data-header="true" role="row"><strong role="columnheader">{index ? "Back" : "Front"}</strong>{nine.map((hole) => <b role="columnheader" key={hole.number}>{hole.number}</b>)}</div>
+        {[1, 2].map((side) => <div className={styles.scorecardRow} role="row" key={`gross-${side}`}><strong role="rowheader">{compactTeam(teamNames[side])}<small>Gross</small></strong>{nine.map((hole) => <span key={hole.number}>{scoreValue(hole, side, "gross")}</span>)}</div>)}
+        {[1, 2].map((side) => <div className={styles.scorecardRow} data-net="true" role="row" key={`net-${side}`}><strong role="rowheader">{compactTeam(teamNames[side])}<small>Net</small></strong>{nine.map((hole) => <span key={hole.number}>{scoreValue(hole, side, "net")}</span>)}</div>)}
+        <div className={styles.scorecardRow} data-winner="true" role="row"><strong role="rowheader">Winner</strong>{nine.map((hole) => <span aria-label={`Hole ${hole.number}, ${winnerName(hole.winner, teamNames) || "not recorded"}`} key={hole.number}>{hole.winner === "Team 1" ? teamMarker(teamNames[1]) : hole.winner === "Team 2" ? teamMarker(teamNames[2]) : hole.winner === "Halved" ? "½" : "—"}</span>)}</div>
+        <div className={styles.scorecardRow} data-running="true" role="row"><strong role="rowheader">Status</strong>{nine.map((hole) => { const status = hole.winner ? runningMatchStatusAtHole(data.holes.map((item) => ({ "Hole Number": item.number, "Hole Winner": item.winner })), hole.number, teamNames) : ""; return <span aria-label={`After hole ${hole.number}, ${status || "not recorded"}`} key={hole.number}>{status ? status.replace(`${teamNames[1]} `, "").replace(`${teamNames[2]} `, "") : "—"}</span>; })}</div>
+      </div>)}
+    </div>
+  </details>;
 }
 
 function HoleTracker({ data, selected, onSelect, updatedHoles = [] }) {
@@ -165,6 +168,7 @@ function HoleDetails({ data, selected }) {
   const team2Gross = jsonScores(hole.team2Gross);
   return <section className={styles.holeDetails} aria-label={`Hole ${selected} details`}>
     <header><span><small>Selected Hole</small><h2>Hole {selected}</h2></span><strong>{hole.par ? `Par ${hole.par}` : "Par TBA"}</strong></header>
+    <p className={styles.holeStory}>{holeStory(data.holes, selected, teamNames)}</p>
     <div className={styles.holeMeta}>
       {hole.yardage ? <span><small>Yardage</small><strong>{hole.yardage}</strong></span> : null}
       {hole.strokeIndex ? <span><small>Stroke Index</small><strong>{hole.strokeIndex}</strong></span> : null}
@@ -357,7 +361,8 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       </div>
     </section>
 
-    <section className={styles.scoreboard} aria-label={`${teamNames[1]} versus ${teamNames[2]}. ${data.result}${data.state !== "final" && through ? ` through ${through}` : ""}`}>
+    <section className={styles.matchHero} aria-label="Match summary">
+    <div className={styles.scoreboard} aria-label={`${teamNames[1]} versus ${teamNames[2]}. ${data.result}${data.state !== "final" && through ? ` through ${through}` : ""}`}>
       <div data-your-team={data.userTeamSide === 1 ? "true" : undefined}><Logo filename={data.display.teams[1].logo || data.tournament.teamOne.logo} name={teamNames[1]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[1]}</strong>{data.userTeamSide === 1 ? <small className={styles.yourTeam} aria-label={`${teamNames[1]} is your team`}>Your Team</small> : null}</div>
       <MatchStatusBlock
         status={stateLabel}
@@ -369,13 +374,14 @@ export default function GameCenter({ initialData, matchId, backTo }) {
         tone="dark"
       />
       <div data-your-team={data.userTeamSide === 2 ? "true" : undefined}><Logo filename={data.display.teams[2].logo || data.tournament.teamTwo.logo} name={teamNames[2]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[2]}</strong>{data.userTeamSide === 2 ? <small className={styles.yourTeam} aria-label={`${teamNames[2]} is your team`}>Your Team</small> : null}</div>
-    </section>
+    </div>
 
     <div className={styles.teamGrid}>
       <TeamPanel team={{ ...data.display.teams[1], logo: data.display.teams[1].logo || data.tournament.teamOne.logo }} players={data.match.team1Players || []} format={format} playingHcp={data.match.team1PlayingHcp} stroke={data.match.team1Stroke} tournamentYear={data.tournament.year} />
       <b aria-label="versus">VS</b>
       <TeamPanel team={{ ...data.display.teams[2], logo: data.display.teams[2].logo || data.tournament.teamTwo.logo }} players={data.match.team2Players || []} format={format} playingHcp={data.match.team2PlayingHcp} stroke={data.match.team2Stroke} tournamentYear={data.tournament.year} />
     </div>
+    </section>
 
     <section className={styles.actionPanel}>
       {data.state === "pre" ? <p><span aria-hidden="true">🔒</span> Scoring opens before {teeTime || "the scheduled tee time"}.</p> : null}
@@ -390,6 +396,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       <HoleDetails data={data} selected={selectedHole} />
     </div>
     <ResultSegments data={data} />
+    <GameCenterScorecard data={data} />
     <MatchStats data={data} />
     <CourseInformation data={data} />
     {data.state === "pre" && !data.stats.played ? <p className={styles.preMatchNote}>Hole results and match statistics will appear when scoring begins.</p> : null}

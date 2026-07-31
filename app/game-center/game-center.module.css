@@ -21,3 +21,42 @@
 @media(max-width:420px){.navigationFull{display:none}.navigationCompact{display:inline}.matchNavigationGroup{gap:9px}}
 @keyframes gameCenterEnter{from{opacity:.92;transform:translateY(2px)}to{opacity:1;transform:none}}@keyframes holeRecorded{0%{box-shadow:0 0 0 0 rgba(196,155,52,.45)}55%{box-shadow:0 0 0 5px rgba(196,155,52,.16)}100%{box-shadow:none}}
 @media(prefers-reduced-motion:reduce){.gameCenter,.gameCenter *{scroll-behavior:auto!important;transition:none!important;animation:none!important}.loading span{animation:none}}
+
+/* Sprint 6B: live match-center hierarchy. */
+.matchHero{overflow:hidden;border:1px solid #bca86c;border-radius:20px;background:#fffdf7;box-shadow:0 12px 30px rgba(20,54,42,.09)}
+.matchHero .scoreboard,.matchHero .teamGrid{border:0;border-radius:0;box-shadow:none}
+.scoreboard{grid-template-columns:minmax(0,1fr) minmax(112px,34%) minmax(0,1fr);min-height:150px;padding:16px 10px;background:radial-gradient(circle at 50% 0,rgba(206,168,67,.16),transparent 43%),linear-gradient(145deg,#064b37,#07382c)}
+.scoreboard>div{align-self:stretch;align-content:center;grid-template-rows:auto minmax(2.2em,auto) auto}
+.scoreboard>div strong{display:grid;place-items:center;max-width:100%;font-size:.7rem;line-height:1.15}
+.scoreboard .logo[data-size=score]{width:62px;height:62px}
+.teamGrid{padding:14px 10px 16px;border-top:1px solid #e5ddcc!important;background:#fffdf7}
+.teamPanel h3{min-height:auto;margin-bottom:3px}
+.players strong{font-size:.74rem}
+.actionPanel{padding-block:3px 6px}
+.scorecardSections{gap:10px}
+.tracker{padding:14px}
+.tracker header{margin-bottom:12px}
+.holeGrid{gap:6px}
+.holeGrid button{min-height:48px;border-radius:9px}
+.holeGrid button[data-selected=true]{border-color:#0b4938;box-shadow:inset 0 0 0 2px #0b4938,0 3px 8px rgba(11,73,56,.13)}
+.holeDetails{padding:14px}
+.holeStory{margin:0 0 10px!important;padding:10px 11px;border-left:3px solid #c39b37;border-radius:0 9px 9px 0;background:#f7f1e4;color:#294239!important;font:700 .72rem/1.4 Georgia,serif!important}
+.holeMeta span{min-height:54px;align-content:center}
+.holeScores span{min-height:54px;align-content:center;background:#fff}
+.sectionHeading{display:grid;gap:2px;margin-bottom:10px}.sectionHeading span{color:#8e6b23;font-size:.58rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.sectionHeading h2{margin:0;color:#0b4938;font:700 1.08rem/1.1 Georgia,serif}
+.results{padding:14px}
+.segmentCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.segmentCards article{display:grid;align-content:center;justify-items:center;gap:4px;min-width:0;min-height:102px;padding:10px 6px;border:1px solid #ded5c3;border-radius:12px;background:#f6f1e7;text-align:center}
+.segmentCards article small{color:#806322;font-size:.55rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+.segmentCards article strong{min-height:2.3em;display:grid;place-items:center;color:#294239;font-size:.65rem;line-height:1.12;overflow-wrap:anywhere}
+.segmentCards article b{color:#0b4938;font:700 1.05rem/1 Georgia,serif;text-transform:uppercase}
+.officialScorecard{overflow:hidden;border:1px solid #d3c8ad;border-radius:18px;background:#fffdf7;box-shadow:0 8px 24px rgba(33,46,39,.055)}
+.officialScorecard>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:12px 14px;cursor:pointer;list-style:none}
+.officialScorecard>summary::-webkit-details-marker{display:none}.officialScorecard>summary span{display:grid;gap:2px}.officialScorecard>summary small{color:#8e6b23;font-size:.57rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.officialScorecard>summary strong{color:#0b4938;font:700 1.02rem/1.1 Georgia,serif}.officialScorecard>summary>b{display:grid;place-items:center;width:28px;height:28px;border:1px solid #d8ceba;border-radius:50%;color:#0b4938;transition:transform .2s ease}.officialScorecard[open]>summary>b{transform:rotate(180deg)}
+.scorecardBody{display:grid;gap:10px;padding:0 10px 12px;border-top:1px solid #eee7d9}
+.scorecardTable{overflow:hidden;margin-top:10px;border:1px solid #d8cfbd;border-radius:10px;background:#fff}
+.scorecardRow{display:grid;grid-template-columns:82px repeat(9,minmax(0,1fr));min-height:30px;border-top:1px solid #eee8dd}
+.scorecardRow:first-child{border-top:0}.scorecardRow>*{display:grid;place-items:center;min-width:0;padding:3px 1px;border-left:1px solid #eee8dd;color:#33483f;font-size:.52rem;line-height:1;text-align:center;font-variant-numeric:tabular-nums}.scorecardRow>*:first-child{border-left:0;padding-inline:4px}.scorecardRow>strong{justify-items:start;color:#1b3b30;font-size:.53rem;text-align:left}.scorecardRow>strong small{margin-top:2px;color:#7a827d;font-size:.4rem;text-transform:uppercase}.scorecardRow[data-header=true]{border:0;background:#0b4938}.scorecardRow[data-header=true]>*{border-color:rgba(255,255,255,.14);color:#fff;font-weight:900}.scorecardRow[data-net=true]{background:#f6f1e7}.scorecardRow[data-winner=true]{background:#fff8e7}.scorecardRow[data-running=true]>*:not(:first-child){font-size:.42rem}
+.stats{padding:14px}.stats header{display:grid;gap:2px}.stats div{gap:7px}.stats div span{min-height:62px;align-content:center;border:1px solid #e6dfd2;background:#f8f5ee}.stats div strong{color:#0b4938;font:700 1.02rem/1 Georgia,serif}
+.courseInfo{border-color:#ded6c6;box-shadow:0 4px 14px rgba(33,46,39,.035)}.courseInfo header{margin-bottom:8px}.courseInfo h2{font-size:1rem}.courseInfo>div span{background:#f6f3ec}
+@media(max-width:420px){.scoreboard{grid-template-columns:minmax(0,1fr) minmax(104px,36%) minmax(0,1fr);min-height:144px;padding-inline:6px}.scoreboard .logo[data-size=score]{width:58px;height:58px}.segmentCards{gap:5px}.segmentCards article{min-height:98px;padding-inline:4px}.scorecardBody{padding-inline:6px}.scorecardRow{grid-template-columns:76px repeat(9,minmax(0,1fr))}.scorecardRow>*{font-size:.48rem}.holeGrid{gap:4px}.holeGrid button{min-height:46px}}

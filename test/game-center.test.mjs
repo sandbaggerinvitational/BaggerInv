@@ -14,7 +14,7 @@ import {
   finalizedMatchResult,
   officialMatchResult,
 } from "../lib/game-center.js";
-import { liveProgressLabel } from "../lib/game-center-display.js";
+import { holeStory, liveProgressLabel, segmentMatchResult } from "../lib/game-center-display.js";
 
 const componentUrl = new URL("../app/game-center/GameCenter.js", import.meta.url);
 const pageUrl = new URL("../app/game-center/[matchId]/page.js", import.meta.url);
@@ -325,20 +325,46 @@ test("Hole Tracker uses clear single-character outcomes and accessible labels", 
   assert.match(source, /won by \$\{winnerName/);
   assert.match(source, /"not played"/);
   assert.match(source, /current hole/);
-  assert.doesNotMatch(source, /Hole-by-Hole/);
+  assert.match(source, /Hole-by-Hole Scorecard/);
   assert.doesNotMatch(source, /initials\(teamNames\[[12]\]\)/);
 });
 
-test("Result segments avoid repeated headings and updater names", async () => {
+test("Front, Back, and Overall present match-play results instead of points", async () => {
   const source = await readFile(componentUrl, "utf8");
-  assert.match(source, /"Halved"/);
-  assert.match(source, /Point\$\{pointValue === 1/);
-  assert.doesNotMatch(source, /options\.find\(\(\[key\]\) => key === selected\)/);
+  assert.match(source, /segmentMatchResult\(data\.holes/);
+  assert.match(source, /Front • Back • Overall/);
+  assert.match(source, /className=\{styles\.segmentCards\}/);
+  assert.doesNotMatch(source, /pointValue/);
+  assert.doesNotMatch(source, /formatTeamPoints/);
   assert.match(source, /<small>\{updatedLabel\}<\/small>/);
   assert.match(source, /Scorecard confirmed/);
   assert.match(source, /by \$\{data\.match\.updatedBy/);
-  assert.match(source, /<h3>Match Total<\/h3>/);
   assert.doesNotMatch(source, /Final Points/);
+});
+
+test("segment match-play results describe front, back, overall, and all-square states", () => {
+  const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
+  const holes = ["Team 1", "Team 1", "Halved", "Team 2", "Team 1", "Team 2", "Team 1", "Halved", "Team 1", "Team 2"]
+    .map((winner, index) => ({ number: index + 1, winner }));
+  assert.deepEqual(segmentMatchResult(holes, 1, 9, names), { team: "The Pickles", result: "3 UP", recorded: 9 });
+  assert.deepEqual(segmentMatchResult(holes, 10, 18, names), { team: "Lipp It and Rip It", result: "1 UP", recorded: 1 });
+  assert.equal(segmentMatchResult([{ number: 1, winner: "Team 1" }, { number: 2, winner: "Team 2" }], 1, 9, names).result, "All Square");
+  assert.deepEqual(segmentMatchResult([], 10, 18, names), { team: "", result: "Not started", recorded: 0 });
+  assert.equal(segmentMatchResult(holes, 1, 18, names, "The Pickles 3&2").result, "3&2");
+});
+
+test("selected-hole storytelling explains wins, halves, and lead movement", () => {
+  const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
+  const holes = [
+    { number: 1, winner: "Team 1" },
+    { number: 2, winner: "Team 1" },
+    { number: 3, winner: "Halved" },
+    { number: 4, winner: "Team 2" },
+  ];
+  assert.equal(holeStory(holes, 2, names), "The Pickles won Hole 2. The lead increases to 2 UP.");
+  assert.equal(holeStory(holes, 3, names), "Hole 3 was halved. The lead remains 2 UP.");
+  assert.equal(holeStory(holes, 4, names), "Lipp It and Rip It won Hole 4. The lead is reduced to 1 UP.");
+  assert.equal(holeStory(holes, 5, names), "This hole has not been recorded yet.");
 });
 
 test("final match summary is factual and hidden outside reliable final states", () => {
@@ -385,16 +411,30 @@ test("Game Center provides compact previous and next navigation with origin and 
   assert.match(source, /styles\.navigationCompact/);
 });
 
-test("navigation and Match Total use compact balanced mobile presentation", async () => {
+test("navigation and official scorecard use compact balanced mobile presentation", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
   assert.match(styles, /\.matchNavigationGroup\{[^}]*display:flex/);
   assert.match(styles, /\.navigationCompact\{display:none\}/);
   assert.match(styles, /@media\(max-width:420px\)\{\.navigationFull\{display:none\}\.navigationCompact\{display:inline\}/);
-  assert.match(styles, /\.matchPoints>div\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.match(styles, /\.matchPoints strong\{font-size:1\.12rem\}/);
+  assert.match(source, /<details className=\{styles\.officialScorecard\}>/);
+  assert.match(source, /Official Record/);
+  assert.match(source, /runningMatchStatusAtHole/);
+  assert.match(styles, /\.scorecardRow\{display:grid;grid-template-columns:82px repeat\(9,minmax\(0,1fr\)\)/);
+  assert.match(styles, /\.officialScorecard>summary/);
   assert.match(styles, /font-variant-numeric:tabular-nums/);
   assert.doesNotMatch(source, /Final Points/);
   assert.match(source, /data\.state === "final" && data\.finalSummary/);
+});
+
+test("Game Center hero and story sections follow the live-match hierarchy", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /className=\{styles\.matchHero\}/);
+  assert.match(source, /className=\{styles\.holeStory\}/);
+  assert.match(source, /<ResultSegments data=\{data\} \/>[\s\S]*<GameCenterScorecard data=\{data\} \/>[\s\S]*<MatchStats data=\{data\} \/>[\s\S]*<CourseInformation data=\{data\} \/>/);
+  assert.match(styles, /\.matchHero\{[^}]*border-radius:20px/);
+  assert.match(styles, /\.scoreboard\{[^}]*min-height:150px/);
+  assert.match(styles, /\.holeGrid button\{min-height:48px/);
+  assert.match(styles, /\.courseInfo\{border-color:#ded6c6;box-shadow:0 4px 14px/);
 });
 
 test("Tournament, My Match, and Home consume shared final result data", async () => {
