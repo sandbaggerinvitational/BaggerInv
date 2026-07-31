@@ -30,11 +30,11 @@ function RoundPerformance({ rounds }) {
     <div className={styles.performanceList}>{rounds.map((round) => {
       const available = round.gross !== null || round.grossRankLabel || round.outcomes?.length || round.points !== null;
       return <article key={round.round} data-upcoming={available ? undefined : "true"}>
-        <header><strong>Round {round.round}</strong>{!available ? <span>Upcoming</span> : null}</header>
+        <header><strong>Round {round.round}{round.format ? ` • ${round.format}` : ""}</strong>{!available ? <span>Upcoming</span> : null}</header>
         {available ? <div className={styles.performanceMetrics}>
           {round.gross !== null ? <div><b>{round.gross}</b><small>Gross Score</small></div> : null}
           {round.grossRankLabel ? <div><b>{round.grossRankLabel}</b><small>Gross Rank</small></div> : null}
-          {round.outcomes?.length ? <div><b>{round.outcomes.join(" • ")}</b><small>Match Outcome</small></div> : null}
+          {round.outcomes?.length ? <div><b>{round.outcomes.join(" • ")}</b><small>Result</small></div> : null}
           {round.points !== null ? <div><b>{formatPlayerPoints(round.points)}</b><small>Points Earned</small></div> : null}
         </div> : <p>Your round performance will appear after play.</p>}
       </article>;

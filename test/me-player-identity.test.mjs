@@ -38,6 +38,9 @@ test("Me gracefully omits unavailable tournament values instead of rendering pla
   assert.match(profile, /round\.outcomes\?\.length \?/);
   assert.match(profile, /round\.points !== null \?/);
   assert.match(profile, /Upcoming/);
+  assert.match(profile, /round\.format \? ` • \$\{round\.format\}`/);
+  assert.match(profile, /<small>Result<\/small>/);
+  assert.doesNotMatch(profile, /Match Outcome/);
   assert.doesNotMatch(profile, /Tournament Snapshot/);
   assert.doesNotMatch(profile, /Current Standing[^\n]*[—-]/);
   assert.doesNotMatch(profile, /Tournament Handicap[^\n]*[—-]/);
@@ -94,14 +97,15 @@ test("round performance uses official gross ranks, round points, and match outco
   };
   const rows = playerRoundPerformance(tournamentData, passportData);
   assert.deepEqual(rows[0], {
-    round: 1, status: "Complete", gross: 74, grossRank: 2,
+    round: 1, format: "Best Ball", status: "Complete", gross: 74, grossRank: 2,
     grossRankLabel: "🥈 T-2", outcomes: ["Won"], points: 1.5,
   });
   assert.deepEqual(rows[1], {
-    round: 2, status: "Complete", gross: 65, grossRank: 1,
+    round: 2, format: "Scramble", status: "Complete", gross: 65, grossRank: 1,
     grossRankLabel: "🥇 1st", outcomes: ["Halved"], points: 0.75,
   });
   assert.equal(rows[2].status, "Upcoming");
+  assert.equal(rows[2].format, "Singles");
   assert.equal(rows[2].gross, null);
   assert.equal(rows[2].points, null);
 });
