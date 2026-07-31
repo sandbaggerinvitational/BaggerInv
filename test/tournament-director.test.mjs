@@ -49,7 +49,7 @@ test("Mission Control resolves operating round and the next scheduled event", ()
   assert.equal(model.operatingRound.name, "Round 2");
   assert.equal(model.operatingRound.format, "Scramble");
   assert.equal(model.nextEvent.title, "Round 2 Opens");
-  assert.equal(model.nextEvent.countdown, "Opens in 18 minutes");
+  assert.equal(model.nextEvent.countdown, "Round 2 Opens in 18 minutes");
   assert.equal(model.nextEvent.round, 2);
 });
 
@@ -98,6 +98,24 @@ test("overdue round events provide operational guidance instead of elapsed time"
   assert.doesNotMatch(model.nextEvent.countdown, /hrs? ago|min overdue/);
 });
 
+test("adaptive primary action follows the official round workflow", () => {
+  const player = (id) => ({ id, playingHcp: 2 });
+  const match = (status, id = "M1") => ({ id, match: 1, status, teeTime: "8:00 AM", team1Players: [player("A")], team2Players: [player("B")] });
+  const model = (tournament, matches) => tournamentDirectorModel({ tournament: { directorAutomation: { enabled: true }, ...tournament }, schedule: [], rounds: [{ number: 1, label: "Round 1", format: "Best Ball", matches }] }, new Date("2026-07-02T07:00:00"));
+  assert.equal(model({ currentRound: 1, status: "Upcoming" }, [match("Scheduled")]).primaryAction.action, "open-round");
+  assert.equal(model({ currentRound: 1, status: "Live" }, [match("Scheduled"), { ...match("Live", "M2"), match: 2 }]).primaryAction.action, "set-live");
+  assert.equal(model({ currentRound: 1, status: "Live" }, [match("Live")]).primaryAction.kind, "status");
+  assert.equal(model({ currentRound: 1, status: "Live" }, [match("Final")]).primaryAction.action, "close-round");
+  const complete = model({ currentRound: "Final", status: "Final" }, [match("Final")]);
+  assert.equal(complete.primaryAction.label, "🏆 Tournament Complete");
+  assert.equal(complete.health.status.label, "Tournament Complete");
+});
+
+test("natural next-event wording includes the event name and action", () => {
+  const model = tournamentDirectorModel({ tournament: { currentRound: 2, directorAutomation: { enabled: true } }, rounds: [], schedule: [{ title: "Awards Ceremony", type: "Ceremony", date: "2026-07-02", startTime: "8:00 AM" }] }, new Date("2026-07-02T07:15:00"));
+  assert.equal(model.nextEvent.countdown, "Awards Ceremony begins in 45 minutes");
+});
+
 test("repeated operational issues are grouped with expandable match detail", () => {
   const match = (id, number) => ({ id, match: number, status: "Scheduled", teeTime: "8:00 AM", course: { name: "Ocean" }, team1Players: [], team2Players: [] });
   const model = tournamentDirectorModel({ tournament: { currentRound: 1, directorAutomation: { enabled: true } }, schedule: [], rounds: [{ number: 1, matches: [match("M2", 2), match("M3", 3), match("M4", 4)] }] }, new Date("2026-07-02T07:00:00"));
@@ -130,13 +148,15 @@ test("Director API requires Passport DIRECTOR authorization and uses audited wri
 
 test("Director dashboard contains operations, health, attention, automation, and Full Admin access", () => {
   const dashboard = source("app/admin/director/DirectorDashboard.js");
-  for (const label of ["Round Status", "Tournament Health", "Attention Required", "Quick Actions", "Open Round", "Set All LIVE", "Close Round", "Reopen Match", "Leaderboards", "Tournament Overview", "Automation", "Recent Activity", "Open Full Admin"]) assert.match(dashboard, new RegExp(label));
+  for (const label of ["Round Status", "Tournament Health", "Attention Required", "Quick Actions", "Reopen Match", "Leaderboards", "Tournament Overview", "Automation", "Recent Activity", "Open Full Admin"]) assert.match(dashboard, new RegExp(label));
   assert.match(source("app/admin/director/director.module.css"), /env\(safe-area-inset-bottom\)/);
   assert.match(dashboard, /setInterval\(check, 60_000\)/);
   assert.doesNotMatch(dashboard, />Manual operating round</);
   assert.match(dashboard, /<summary>Override Operating Round<\/summary>/);
-  assert.ok(dashboard.indexOf("Set All LIVE") < dashboard.indexOf("Open Round"));
-  for (const label of ["Operational Overview", "Next Event", "Tournament countdown", "Auto Open", "Auto LIVE", "Immediate Action Required", "No score submitted", "READY"]) assert.match(dashboard + source("lib/tournament-director.js"), new RegExp(label));
+  assert.match(dashboard, /data-current=\{item\.number === data\.operatingRound\?\.number/);
+  assert.match(dashboard, /act\(data\.primaryAction\.action, \{ round: data\.operatingRound\?\.number \}\)/);
+  assert.doesNotMatch(dashboard, /disabled=\{Boolean\(busy\) \|\| Boolean\(round\?\.open\)\}/);
+  for (const label of ["Operational Overview", "Next Event", "Tournament countdown", "Auto Open", "Auto LIVE", "Immediate Action Required", "No score submitted", "Recommended next step"]) assert.match(dashboard + source("lib/tournament-director.js"), new RegExp(label));
 });
 
 test("PLAYER accounts are redirected away from the Director page", () => {
