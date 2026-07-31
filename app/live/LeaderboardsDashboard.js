@@ -132,31 +132,16 @@ function Insights({ data }) {
   const players = useMemo(() => playerPerformanceRows(data.leaderboard || [], data.scoreLeaderboard || []), [data]);
   const teams = useMemo(() => teamStandings(data.rounds || [], data.tournament || {}, "overall"), [data]);
   const insights = useMemo(() => tournamentInsights(players, teams, data.tournament || {}), [data.tournament, players, teams]);
-  const storylines = useMemo(() => tournamentStorylines(data).filter((item) => !["team-race", "undefeated"].includes(item.id)), [data]);
+  const storylines = useMemo(() => tournamentStorylines(data), [data]);
   const undefeated = insights.undefeated;
-  const hasTeamRace = Number(insights.teamLeader?.points) > 0;
   const compactUndefeated = undefeated.length > 3;
   return <section className={styles.insights}>
-    <header><small>Tournament Storylines</small><h2>Why this tournament matters</h2><p>Stories drawn only from official current-tournament results.</p></header>
-    {storylines.length || hasTeamRace || undefeated.length ? <div>
-      {storylines.map((item) => <article key={item.id}><i className={insightStyles.storyIcon} aria-hidden="true">{item.icon}</i><span>{item.label}</span><strong>{item.headline}</strong><b>{item.detail}</b></article>)}
-      {hasTeamRace ? <article aria-label={insights.teamLeader.accessibleLabel}>
-        <span>{insights.teamLeader.label}</span>
-        {insights.teamLeader.tied ? <em className={insightStyles.tieLabel}>Tied</em> : null}
-        <strong>{insights.teamLeader.namesLabel}</strong>
-        <b>{insights.teamLeader.tied ? `The tournament race is level at ${formatTeamPoints(insights.teamLeader.points)} points each.` : `${formatTeamPoints(insights.teamLeader.points)} points set the pace in the team race.`}</b>
-      </article> : null}
-      {undefeated.length ? <article className={insightStyles.undefeated}>
-        <span>Undefeated</span>
-        {compactUndefeated ? <details>
-          <summary aria-label={`Show all ${undefeated.length} undefeated players`}>
-            <strong>{undefeated.slice(0, 2).map((row) => row.player).join("\n")}</strong>
-            <em>+{undefeated.length - 2} more</em>
-          </summary>
-          <ul>{undefeated.map((row) => <li key={row.id}>{row.player}</li>)}</ul>
-        </details> : <strong>{undefeated.map((row) => row.player).join(", ")}</strong>}
-        <b>{undefeated.length === 1 ? `${undefeated[0].player} has not lost a completed match.` : `${undefeated.length} players have not lost a completed match.`}</b>
-      </article> : null}
+    <header><small>Around the Tournament</small><h2>Tournament Headlines</h2><p>The biggest stories drawn from official current-tournament results.</p></header>
+    {storylines.length ? <div>
+      {storylines.map((item) => item.id === "undefeated" && compactUndefeated ? <article className={insightStyles.undefeated} aria-label={item.accessibleLabel} key={item.id}>
+        <i className={insightStyles.storyIcon} aria-hidden="true">{item.icon}</i><span>{item.label}</span><strong>{item.headline}</strong>
+        <details><summary aria-label={`Show all ${undefeated.length} undefeated players`}><b>{undefeated.slice(0, 2).map((row) => row.player).join("\n")}</b><em>+{undefeated.length - 2} more</em></summary><ul>{undefeated.map((row) => <li key={row.id}>{row.player}</li>)}</ul></details><b>{item.detail}</b>
+      </article> : <article aria-label={item.accessibleLabel} key={item.id}><i className={insightStyles.storyIcon} aria-hidden="true">{item.icon}</i><span>{item.label}</span><strong>{item.headline}</strong><b>{item.detail}</b></article>)}
     </div> : <div className={styles.empty}><strong>No storylines yet.</strong><span>Meaningful moments will appear as official results are finalized.</span></div>}
   </section>;
 }

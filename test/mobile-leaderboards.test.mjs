@@ -131,18 +131,18 @@ test("Insights compact undefeated lists reveal every qualified player", async ()
   assert.match(source, /\+\{undefeated\.length - 2\} more/);
   assert.match(source, /Show all \$\{undefeated\.length\} undefeated players/);
   assert.match(source, /undefeated\.map\(\(row\) => <li/);
-  assert.match(source, /has not lost a completed match/);
-  assert.match(source, /players have not lost a completed match/);
+  assert.match(source, /<b>\{item\.detail\}<\/b>/);
+  assert.match(source, /item\.id === "undefeated"/);
 });
 
-test("Insights tied leaders use accessible compact presentation without overflow-prone names", async () => {
+test("Insights storylines preserve accessible labels and compact presentation without overflow-prone names", async () => {
   const [source, insightStyles] = await Promise.all([
     readFile(componentUrl, "utf8"),
     readFile(new URL("../app/live/leaderboards-insights.module.css", import.meta.url), "utf8"),
   ]);
-  assert.match(source, /aria-label=\{insights\.teamLeader\.accessibleLabel\}/);
-  assert.match(source, /insights\.teamLeader\.label/);
-  assert.match(source, />Tied<\/em>/);
+  assert.match(source, /aria-label=\{item\.accessibleLabel\}/);
+  assert.match(source, /item\.headline/);
+  assert.match(source, /tournamentStorylines\(data\)/);
   assert.match(insightStyles, /white-space: pre-line/);
   assert.match(insightStyles, /min-width: 0/);
 });
