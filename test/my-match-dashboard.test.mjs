@@ -51,7 +51,8 @@ test("My Match keeps status, scoring access, and final results distinct", async 
   assert.doesNotMatch(source, /<footer>/);
   assert.match(source, /Start Scoring/);
   assert.match(source, /Continue Scoring/);
-  assert.match(source, /View Match Result/);
+  assert.match(source, /View Final Scorecard/);
+  assert.match(source, /\["Live", "Final"\]\.includes\(status\)/);
   assert.match(source, /formatMatchResult\(match, match\.team\?\.side\)/);
   assert.doesNotMatch(source, /function participantResult/);
   assert.match(sheet, /statusText: String\(match\["Match Status Text"\]/);

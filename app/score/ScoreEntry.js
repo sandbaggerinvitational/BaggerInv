@@ -6,6 +6,7 @@ import { finalizedMatchResult, formatLiveMatchResult } from "../../lib/match-res
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-experience.js";
 import StatusBadge from "../StatusBadge";
+import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
 import styles from "./score.module.css";
 
@@ -163,7 +164,10 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     try {
       await request("/api/player-passport/matches", {
         method: "POST",
-        body: JSON.stringify({ matchId: passportMatch.matchId }),
+        body: JSON.stringify({
+          matchId: passportMatch.matchId,
+          viewFinalScorecard: String(passportMatch.status || passportMatch.matchStatus || "").toLowerCase() === "final",
+        }),
       });
       if (dashboardOnly) {
         window.location.assign("/score");
@@ -221,6 +225,14 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   const completed = useMemo(() => new Set((data?.holeScores || []).map((item) => Number(item["Hole Number"]))), [data]);
   const progress = scoringProgress(data?.holeScores || [], holeNumber);
   const currentMatchStatus = completed.size ? formatLiveMatchResult(data?.holeScores || [], teamNames) : "All Square";
+  const tournamentIdentity = <TournamentIdentityHeader
+    compact
+    showStatus={false}
+    year={match.Year || passportTournament?.year}
+    name={passportTournament?.name || "Sandbagger Invitational"}
+    location={`Round ${match.Round || "—"} • Match ${match.Match || "—"} • ${display.courseName || match["Course ID"] || "Course TBA"}`}
+    logo={passportTournament?.logo}
+  />;
   const scorecardHoles = useMemo(() => Array.from({ length: 18 }, (_, index) => {
     const number = index + 1;
     const score = data?.holeScores?.find((item) => Number(item["Hole Number"]) === number);
@@ -371,7 +383,8 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   if (!data) return <section className={styles.login}><div className={styles.brand}><span>SBI LIVE</span><h1>Unable to open match</h1></div><button className={styles.primary} onClick={clearAccess}>Clear match access</button>{status && <p className={styles.status}>{status}</p>}</section>;
 
   if (showReview) return <section className={`${styles.shell} ${styles.reviewShell}`} data-scorecard-state={isFinal ? "final" : "review"}>
-    <header><div><span>Round {match.Round} • {display.formatName || format}</span><h1>{isFinal ? "Official Match Scorecard" : "Review Scorecard"}</h1><p>{display.matchName || `Match ${match.Match}`} • {display.courseName || match["Course ID"]}{teeName ? ` • ${teeName} Tees` : ""}</p></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
+    {tournamentIdentity}
+    <header className={styles.scorecardHeading}><div><span>{display.formatName || format}</span><h1>{isFinal ? "Official Match Scorecard" : "Review Scorecard"}</h1></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
     {!isFinal ? <div className={styles.reviewStatus}>
       <div className={styles.reviewBadge}><StatusBadge status="Current Match" /></div>
       <span>REVIEW BEFORE SUBMITTING</span>
@@ -430,6 +443,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       <p className={styles.finalConfirmation}>Scorecard confirmed • Only an administrator can reopen this official record.</p>
       <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
         <Link className={styles.primary} href="/my-match">Return to My Match</Link>
+        <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(match["Match ID"])}?from=my-match`}>View Game Center →</Link>
       </nav>
     </> : confirming ? <div className={styles.confirmPanel}>
       <strong>Submit this scorecard as final?</strong>
@@ -440,7 +454,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   </section>;
 
   return <section className={styles.shell}>
-    <header><div><span>Round {match.Round} • {display.formatName || format}</span><h1>{display.matchName || `Match ${match.Match}`}</h1><p>{display.courseName || match["Course ID"]}{teeName ? ` • ${teeName} Tees` : ""}</p></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
+    {tournamentIdentity}
     <section className={styles.scoringContext} aria-label="Current match progress">
       <div><small>Current match status</small><strong>{currentMatchStatus}</strong></div>
       <span><b>{savedHole ? `Reviewing Hole ${progress.currentHole}` : `Hole ${progress.currentHole} of 18`}</b><small>{savedHole ? "Editing recorded scores" : `${progress.remaining} hole${progress.remaining === 1 ? "" : "s"} remaining`}</small></span>
@@ -457,7 +471,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
         const ids = playerIds(match, side);
         const key = side === 1 ? "team1" : "team2";
         const playerRows = Array.from({ length: slots }, (_, index) => {
-          const playerLabel = format === "SC" ? `${teamNames[side] || `Team ${side}`} scramble` : playerNames[ids[index]] || ids[index] || `Player ${index + 1}`;
+          const playerLabel = format === "SC" ? teamNames[side] || `Team ${side}` : playerNames[ids[index]] || ids[index] || `Player ${index + 1}`;
           const dots = strokeDots(strokesFor(side, index));
           return <label className={styles.holeCardPlayer} key={`${side}-${index}`}>
             <span><strong>{playerLabel}</strong>{dots ? <em aria-label={`${strokesFor(side, index)} stroke received`}>{dots}</em> : null}</span>
@@ -471,7 +485,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       })}
       <div className={styles.holeCardWinner}><strong>Hole winner</strong><b>{preview.winner ? holeWinnerMark({ "Hole Winner": preview.winner }, teamNames) : holeWinnerMark(savedHole, teamNames) || "Pending"}</b></div>
     </div>
-    {savedHole && <div className={styles.result}><span>Match status</span><strong>{formatLiveMatchResult(data?.holeScores, teamNames)}</strong><small>Hole {holeNumber}: {holeWinnerMark(savedHole, teamNames)}</small></div>}
+    {savedHole && <div className={styles.result}><span>Recorded hole</span><strong>{savedHole["Hole Winner"] === "Halved" ? "Halved" : holeWinnerMark(savedHole, teamNames)}</strong><small>Hole {holeNumber} result • Running status remains above</small></div>}
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">

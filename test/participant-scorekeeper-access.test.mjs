@@ -24,6 +24,25 @@ test("disabled, regenerated, and expired access invalidates the participant sess
   assert.equal(participantSessionMatchesAccess(session, { "Match ID": "M-A", "Access Active": "TRUE", "Access Version": 2, "Access Expires At": "2020-01-01T00:00:00Z" }), false);
 });
 
+test("final scorecard sessions are read-only and remain viewable after scoring access closes", () => {
+  const secret = "test-session-secret-with-32-characters";
+  const session = verifyScoringSession(createScoringSession({ matchId: "M-FINAL", accessVersion: 4, readOnly: true }, secret), secret);
+  assert.equal(session.readOnly, true);
+  assert.equal(participantSessionMatchesAccess(session, {
+    "Match ID": "M-FINAL",
+    "Match Status": "Final",
+    "Access Active": "FALSE",
+    "Access Version": 4,
+    "Access Expires At": "2020-01-01T00:00:00Z",
+  }), true);
+  assert.equal(participantSessionMatchesAccess(session, {
+    "Match ID": "M-FINAL",
+    "Match Status": "Live",
+    "Access Active": "FALSE",
+    "Access Version": 4,
+  }), false);
+});
+
 test("codes and QR tokens are securely matched and invalid values are rejected", () => {
   const codeHash = hashAccessCode("482193", salt);
   const tokenHash = hashAccessToken("secure-random-token", salt);

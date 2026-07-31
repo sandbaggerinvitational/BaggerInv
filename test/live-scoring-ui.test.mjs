@@ -78,6 +78,28 @@ test("review and active scoring stay focused and keyboard-aware", async () => {
   assert.match(styles, /\.shell:focus-within>\.primary/);
 });
 
+test("scoring uses compact tournament identity and unique status context", async () => {
+  const source = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
+  assert.match(source, /import TournamentIdentityHeader/);
+  assert.match(source, /<TournamentIdentityHeader/);
+  assert.match(source, /compact/);
+  assert.match(source, /showStatus=\{false\}/);
+  assert.match(source, /Round \$\{match\.Round/);
+  assert.match(source, /Match \$\{match\.Match/);
+  assert.match(source, /Recorded hole/);
+  assert.match(source, /Running status remains above/);
+  assert.doesNotMatch(source, /`\$\{teamNames\[side\].*\} scramble`/);
+});
+
+test("final scorecard is the primary My Match record with secondary Game Center access", async () => {
+  const source = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
+  assert.match(source, /viewFinalScorecard/);
+  assert.match(source, /View Game Center →/);
+  assert.match(source, /Final match summary/);
+  assert.match(source, /Winning Team/);
+  assert.match(source, /Official Match Scorecard/);
+});
+
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {
   const source = await readFile(new URL("../app/live/MatchCenter.js", import.meta.url), "utf8");
   assert.match(source, /setInterval\(poll, 30_000\)/);

@@ -19,6 +19,7 @@ export default function TournamentIdentityHeader({
   logo,
   status = "Live",
   compact = false,
+  showStatus = true,
 }) {
   return (
     <header className={`${styles.homeHeader} ${headerStyles.tokens}`} data-density={compact ? "compact" : "standard"}>
@@ -34,7 +35,7 @@ export default function TournamentIdentityHeader({
         <h1>{name}</h1>
         <span>{location}</span>
       </div>
-      <StatusBadge status={status} />
+      {showStatus ? <StatusBadge status={status} /> : null}
     </header>
   );
 }

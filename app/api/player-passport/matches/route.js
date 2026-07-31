@@ -37,9 +37,9 @@ export async function POST(request) {
     return NextResponse.json({ error: "This match is not available for Player Passport scoring." }, { status: 403 });
   }
   try {
-    const { matchId } = await request.json();
-    const access = await authorizePassportMatch(session, matchId);
-    const token = createScoringSession({ scope: "match", matchId: access.matchId, accessVersion: access.accessVersion, scorerName: access.player.name });
+    const { matchId, viewFinalScorecard = false } = await request.json();
+    const access = await authorizePassportMatch(session, matchId, { allowFinal: viewFinalScorecard === true });
+    const token = createScoringSession({ scope: "match", matchId: access.matchId, accessVersion: access.accessVersion, scorerName: access.player.name, readOnly: access.readOnly });
     const response = NextResponse.json({ authorized: true });
     response.cookies.set(scoringSessionCookie(token));
     return response;

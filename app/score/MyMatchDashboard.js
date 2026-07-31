@@ -96,7 +96,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
   const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=my-match`;
   const action = status === "Live"
     ? match.holesRecorded ? "Continue Scoring" : "Start Scoring"
-    : status === "Final" ? "View Match Result" : "View Match";
+    : status === "Final" ? "View Final Scorecard" : "View Match";
   const accessible = [
     `Round ${match.round}`,
     match.match ? `Match ${match.match}` : "",
@@ -133,7 +133,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
     </div>
   </>;
 
-  if (status === "Live") {
+  if (["Live", "Final"].includes(status)) {
     return <button
       type="button"
       className={styles.matchCard}
