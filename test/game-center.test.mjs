@@ -288,6 +288,7 @@ test("Home result and details destinations use same-origin Game Center with Home
 
 test("Game Center layout protects mobile widths and localizes hole interaction", async () => {
   const styles = await readFile(stylesUrl, "utf8");
+  assert.match(styles, /:global\(html\):has\(\.page\),:global\(body\):has\(\.page\)\{overflow-x:hidden\}/);
   assert.match(styles, /\.content\{width:min\(100%,760px\)/);
   assert.match(styles, /\.scoreboard\{[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(104px,auto\) minmax\(0,1fr\)/);
   assert.match(styles, /\.teamGrid\{[^}]*grid-template-columns:minmax\(0,1fr\) 20px minmax\(0,1fr\)/);
