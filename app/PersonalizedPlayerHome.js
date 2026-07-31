@@ -132,7 +132,7 @@ function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
   </section>;
 }
 
-export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
+export default function PersonalizedPlayerHome({ tournamentPulse = null, tournamentMoments = null }) {
   const [payload, setPayload] = useState(null);
   const [state, setState] = useState("loading");
   const [busyId, setBusyId] = useState("");
@@ -194,6 +194,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
       <span className={styles.visuallyHidden}>Checking your Player Passport…</span>
     </section>
     {tournamentPulse}
+    {tournamentMoments}
   </>;
   if (state === "public") return <>
     <section className={styles.empty}>
@@ -203,6 +204,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
       <Link className={styles.primaryAction} href="/activate">Activate Player Passport</Link>
     </section>
     {tournamentPulse}
+    {tournamentMoments}
   </>;
   if (state === "error") return <>
     <section className={styles.error}>
@@ -210,6 +212,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
       <button onClick={refresh}>Try again</button>
     </section>
     {tournamentPulse}
+    {tournamentMoments}
   </>;
 
   const player = payload?.player;
@@ -262,6 +265,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null }) {
     </div>}
 
     {tournamentPulse}
+    {tournamentMoments}
     {matches.length ? <MyRounds
       matches={matches}
       emphasizedId={primary?.matchId}

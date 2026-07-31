@@ -3,6 +3,7 @@ import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
 import MobileIdentityImage from "./MobileIdentityImage";
 import StatusBadge from "./StatusBadge";
 import TournamentIdentityHeader from "./TournamentIdentityHeader";
+import TournamentMoments from "./TournamentMoments";
 import { teamLogo } from "../lib/asset-paths";
 import {
   compactTournamentLeaders,
@@ -12,6 +13,7 @@ import {
 } from "../lib/home-dashboard";
 import { formatPlayerPoints, formatTeamPoints } from "../lib/formatters";
 import { tournamentProgressModel } from "../lib/live-command-center";
+import { tournamentMoments } from "../lib/tournament-storylines";
 import styles from "./tournament-command-center.module.css";
 
 function assetSource(value, resolver) {
@@ -186,6 +188,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
     timeZone: liveTournament.timeZone,
   });
   const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
+  const moments = tournamentMoments(liveData);
   const status = tournamentStatusLabel(liveTournament.status);
   const pulse = (
     <TournamentPulse
@@ -205,7 +208,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
         status={status}
       />
 
-      <PersonalizedPlayerHome tournamentPulse={pulse} />
+      <PersonalizedPlayerHome tournamentPulse={pulse} tournamentMoments={<TournamentMoments moments={moments} />} />
       <TournamentSchedule items={schedule} />
       <TournamentLeaders leaders={leaders} />
     </div>

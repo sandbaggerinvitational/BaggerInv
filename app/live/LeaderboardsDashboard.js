@@ -7,6 +7,7 @@ import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { playerPhoto, teamLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
+import { tournamentStorylines } from "../../lib/tournament-storylines";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -131,22 +132,19 @@ function Insights({ data }) {
   const players = useMemo(() => playerPerformanceRows(data.leaderboard || [], data.scoreLeaderboard || []), [data]);
   const teams = useMemo(() => teamStandings(data.rounds || [], data.tournament || {}, "overall"), [data]);
   const insights = useMemo(() => tournamentInsights(players, teams, data.tournament || {}), [data.tournament, players, teams]);
-  const cards = [
-    insights.pointsLeader ? ["Points Leader", insights.pointsLeader.player, `${formatPlayerPoints(insights.pointsLeader.points)} points`] : null,
-    insights.lowestGross ? ["Lowest Gross Average", insights.lowestGross.player, average(insights.lowestGross.grossAvg)] : null,
-    insights.lowestNet ? ["Lowest Net Average", insights.lowestNet.player, average(insights.lowestNet.netAvg)] : null,
-  ].filter(Boolean);
+  const storylines = useMemo(() => tournamentStorylines(data).filter((item) => !["team-race", "undefeated"].includes(item.id)), [data]);
   const undefeated = insights.undefeated;
+  const hasTeamRace = Number(insights.teamLeader?.points) > 0;
   const compactUndefeated = undefeated.length > 3;
   return <section className={styles.insights}>
-    <header><small>Tournament Insights</small><h2>Trusted live trends</h2><p>Current-tournament results only. Unavailable metrics remain hidden.</p></header>
-    {cards.length || insights.teamLeader || undefeated.length ? <div>
-      {cards.map(([label, name, value]) => <article key={label}><span>{label}</span><strong>{name}</strong><b>{value}</b></article>)}
-      {insights.teamLeader ? <article aria-label={insights.teamLeader.accessibleLabel}>
+    <header><small>Tournament Storylines</small><h2>Why this tournament matters</h2><p>Stories drawn only from official current-tournament results.</p></header>
+    {storylines.length || hasTeamRace || undefeated.length ? <div>
+      {storylines.map((item) => <article key={item.id}><i className={insightStyles.storyIcon} aria-hidden="true">{item.icon}</i><span>{item.label}</span><strong>{item.headline}</strong><b>{item.detail}</b></article>)}
+      {hasTeamRace ? <article aria-label={insights.teamLeader.accessibleLabel}>
         <span>{insights.teamLeader.label}</span>
         {insights.teamLeader.tied ? <em className={insightStyles.tieLabel}>Tied</em> : null}
         <strong>{insights.teamLeader.namesLabel}</strong>
-        <b>{formatTeamPoints(insights.teamLeader.points)} {insights.teamLeader.points === 1 ? "point" : "points"}{insights.teamLeader.tied ? " each" : ""}</b>
+        <b>{insights.teamLeader.tied ? `The tournament race is level at ${formatTeamPoints(insights.teamLeader.points)} points each.` : `${formatTeamPoints(insights.teamLeader.points)} points set the pace in the team race.`}</b>
       </article> : null}
       {undefeated.length ? <article className={insightStyles.undefeated}>
         <span>Undefeated</span>
@@ -157,9 +155,9 @@ function Insights({ data }) {
           </summary>
           <ul>{undefeated.map((row) => <li key={row.id}>{row.player}</li>)}</ul>
         </details> : <strong>{undefeated.map((row) => row.player).join(", ")}</strong>}
-        <b>{undefeated.length} qualified player{undefeated.length === 1 ? "" : "s"}</b>
+        <b>{undefeated.length === 1 ? `${undefeated[0].player} has not lost a completed match.` : `${undefeated.length} players have not lost a completed match.`}</b>
       </article> : null}
-    </div> : <div className={styles.empty}><strong>Insights will appear as results are finalized.</strong><span>No trends are published before enough trusted data exists.</span></div>}
+    </div> : <div className={styles.empty}><strong>No storylines yet.</strong><span>Meaningful moments will appear as official results are finalized.</span></div>}
   </section>;
 }
 
