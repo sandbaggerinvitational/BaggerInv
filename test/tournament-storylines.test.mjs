@@ -38,6 +38,7 @@ test("live moments turn official standings into concise narratives", () => {
   assert.equal(stories.find((item) => item.id === "points-leader").label, "Hot Player");
   assert.equal(stories.find((item) => item.id === "points-leader").detail, "3.00 points through 2 completed matches.");
   assert.match(stories.find((item) => item.id === "undefeated").headline, /remains undefeated/);
+  assert.doesNotMatch(stories.find((item) => item.id === "undefeated").detail, /Clay Beltran, Jason Powell/);
   assert.match(stories.find((item) => item.id === "lowest-gross").detail, /^72\.0 is the lowest eligible gross average/);
   assert.equal(stories.some((item) => /comeback|straight holes|fastest/i.test(item.headline)), false);
 });
