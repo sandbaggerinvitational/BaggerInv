@@ -35,6 +35,7 @@ test("Game Center uses the exact shared tournament header and a compact match id
   const [page, source] = await Promise.all([readFile(pageUrl, "utf8"), readFile(componentUrl, "utf8")]);
   assert.match(page, /import TournamentIdentityHeader from "\.\.\/\.\.\/TournamentIdentityHeader"/);
   assert.match(page, /<TournamentIdentityHeader/);
+  assert.match(page, /status=\{initialData\.tournament\.status\}[\s\S]*compact/);
   assert.match(page, /year=\{initialData\.tournament\.year\}/);
   assert.match(source, /const matchContext = roundPosition\?\.total/);
   assert.match(source, /Match \$\{matchNumber\}/);

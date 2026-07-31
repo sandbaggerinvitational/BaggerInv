@@ -296,6 +296,22 @@ test("Tournament match cards expose state-aware scanning without changing destin
   assert.match(styles, /\.viewMatch\{[^}]*min-height:30px/);
 });
 
+test("Overall status filters render only rounds containing matching matches", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /const filteredRounds = selectedRounds\.map/);
+  assert.match(source, /selectedRound === "overall" && filter !== "all"/);
+  assert.match(source, /filteredRounds\.filter\(\(\{ matches \}\) => matches\.length\)/);
+  assert.match(source, /visibleRounds\.map\(\(\{ round, matches \}\)/);
+  assert.match(source, /!visibleRounds\.length/);
+});
+
+test("Tournament uses the shared lifecycle-aware empty-state component contract", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /import MatchFilterEmptyState/);
+  assert.match(source, /<MatchFilterEmptyState filter=\{filter\} round=\{round\} className=\{styles\.empty\}/);
+  assert.doesNotMatch(source, /filterEmptyMessage/);
+});
+
 test("preview Player Passport invitations remain origin-specific and Admin-authenticated", async () => {
   const [admin, route] = await Promise.all([
     readFile(new URL("../app/admin/PlayerPassportAdmin.js", import.meta.url), "utf8"),

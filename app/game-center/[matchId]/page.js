@@ -32,6 +32,7 @@ export default async function GameCenterPage({ params, searchParams }) {
         location={initialData.tournament.location}
         logo={initialData.tournament.logo}
         status={initialData.tournament.status}
+        compact
       />
       <GameCenter initialData={initialData} matchId={matchId} backTo={backTo} />
     </div>

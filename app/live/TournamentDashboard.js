@@ -6,10 +6,11 @@ import AssetImage from "../AssetImage";
 import MatchStatusBlock from "../MatchStatusBlock";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
+import MatchFilterEmptyState from "./MatchFilterEmptyState";
 import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPlayerPoints, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
 import { formatStoredMatchResult } from "../../lib/match-result";
-import { filterEmptyMessage, filterMatches, matchState, relativeUpdatedLabel } from "../../lib/live-match-ux";
+import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
 import styles from "./tournament-dashboard.module.css";
 
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
@@ -227,6 +228,15 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const rounds = data?.rounds || [];
   const activeRound = rounds.find((round) => Number(round.number) === Number(selectedRound)) || rounds.find((round) => Number(round.number) === Number(tournament?.currentRound)) || rounds[0];
   const selectedRounds = selectedRound === "overall" ? rounds : activeRound ? [activeRound] : [];
+  const filteredRounds = selectedRounds.map((round) => ({ round, matches: filterMatches(round.matches || [], filter) }));
+  const visibleRounds = selectedRound === "overall" && filter !== "all"
+    ? filteredRounds.filter(({ matches }) => matches.length)
+    : filteredRounds;
+  const overallEmptyState = resolveMatchFilterEmptyState(filter, {
+    label: "Tournament",
+    status: tournament?.status,
+    matches: selectedRounds.flatMap((round) => round.matches || []),
+  });
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
   if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
     <strong>{refreshState === "refreshing" ? "Loading tournament…" : "Tournament data is temporarily unavailable."}</strong>
@@ -238,8 +248,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />
     <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Overall"], ...rounds.map((round) => [round.number, round.label])].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
     <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
-    <div className={styles.roundGroups}>{selectedRounds.map((round) => {
-      const matches = filterMatches(round.matches || [], filter);
+    <div className={styles.roundGroups}>{visibleRounds.map(({ round, matches }) => {
       const isOverall = selectedRound === "overall";
       const isOpen = !isOverall || openRounds.has(round.number);
       const liveCount = (round.matches || []).filter((match) => matchState(match) === "live").length;
@@ -255,9 +264,9 @@ export default function TournamentDashboard({ initialData, loadError }) {
         });
       }} key={round.number}>
         <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><div className={styles.roundSummaryResult}><span className={styles.roundScore} aria-label={`${tournament.teamOne.name} ${formatTeamPoints(teamOneScore)}, ${tournament.teamTwo.name} ${formatTeamPoints(teamTwoScore)}`}><span><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="summary" /><em>{tournament.teamOne.name}</em></span><b>{formatTeamPoints(teamOneScore)} – {formatTeamPoints(teamTwoScore)}</b><span><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="summary" /><em>{tournament.teamTwo.name}</em></span></span><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></div></summary>
-        <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <div className={styles.empty}><strong>{filterEmptyMessage(filter, round)}</strong><span>Choose another filter or check back after the next update.</span></div>}</div>
+        <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <MatchFilterEmptyState filter={filter} round={round} className={styles.empty} />}</div>
       </details>;
-    })}</div>
+    })}{!visibleRounds.length ? <div className={styles.empty} data-empty-reason={overallEmptyState.reason} role="status"><strong>{overallEmptyState.title}</strong><span>{overallEmptyState.detail}</span></div> : null}</div>
     {selectedRound === "overall"
       ? <OverallLeaderboard rows={data?.leaderboard || []} />
       : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} format={activeRound?.format} />}

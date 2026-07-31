@@ -8,6 +8,7 @@ import {
   filterMatches,
   matchState,
   relativeUpdatedLabel,
+  resolveMatchFilterEmptyState,
 } from "../lib/live-match-ux.js";
 import { finalizationReview, hasUnsavedMatchChanges } from "../lib/live-admin-ux.js";
 
@@ -37,6 +38,34 @@ test("empty states and update labels remain useful", () => {
   assert.equal(filterEmptyMessage("upcoming", { label: "Round 1", matches: [{ teeTime: "7:30 AM" }] }), "Round 1 begins at 7:30 AM.");
   assert.equal(filterEmptyMessage("upcoming", { matches: [] }), "Pairings have not been announced yet.");
   assert.equal(relativeUpdatedLabel(1_000, 12_000), "Updated 11 seconds ago");
+});
+
+test("round empty states explain the tournament lifecycle rather than only the filter", () => {
+  const final = { id: "final", status: "Final", team1Points: 2, team2Points: 1 };
+  const scheduled = { id: "scheduled", status: "Scheduled", teeTime: "8:10 AM" };
+  assert.deepEqual(resolveMatchFilterEmptyState("upcoming", {
+    label: "Round 1", status: "Complete", matches: [final],
+  }), {
+    reason: "round-complete",
+    title: "All matches in this round have been completed.",
+    detail: "Select Final to review the completed matches.",
+  });
+  assert.equal(resolveMatchFilterEmptyState("upcoming", {
+    label: "Round 2", status: "Live", matches: [{ ...final, id: "one" }],
+  }).title, "All matches in this round have been completed.");
+  assert.equal(resolveMatchFilterEmptyState("upcoming", {
+    label: "Round 2", status: "Live", matches: [{ ...scheduled, status: "Live" }],
+  }).title, "No upcoming matches remain in this round.");
+  assert.equal(resolveMatchFilterEmptyState("upcoming", {
+    label: "Round 3", status: "Upcoming", matches: [scheduled],
+  }).title, "Round 3 begins at 8:10 AM.");
+});
+
+test("smart empty states distinguish live, final, unconfigured, and generic filter misses", () => {
+  assert.equal(resolveMatchFilterEmptyState("live", { status: "Live", matches: [{ status: "Scheduled" }] }).reason, "no-live-matches");
+  assert.equal(resolveMatchFilterEmptyState("final", { status: "Upcoming", matches: [{ status: "Scheduled" }] }).reason, "no-final-matches");
+  assert.equal(resolveMatchFilterEmptyState("all", { matches: [] }).reason, "no-pairings");
+  assert.equal(resolveMatchFilterEmptyState("other", { matches: [{ status: "Scheduled" }] }).reason, "filter-empty");
 });
 
 test("refresh guard prevents overlapping requests and permits a later refresh", async () => {

@@ -18,9 +18,10 @@ export default function TournamentIdentityHeader({
   location = "Tournament week",
   logo,
   status = "Live",
+  compact = false,
 }) {
   return (
-    <header className={`${styles.homeHeader} ${headerStyles.tokens}`}>
+    <header className={`${styles.homeHeader} ${headerStyles.tokens}`} data-density={compact ? "compact" : "standard"}>
       <MobileIdentityImage
         sources={[logoSource(logo, year)]}
         name={name}
