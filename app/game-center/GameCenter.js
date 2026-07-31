@@ -75,6 +75,13 @@ function winnerName(winner, teamNames) {
   return "";
 }
 
+function MatchFlowIcon({ segment }) {
+  const common = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true };
+  if (segment === "front") return <svg {...common}><path d="M6 21V4"/><path d="M6 5h10l-2.5 3L16 11H6"/></svg>;
+  if (segment === "back") return <svg {...common}><path d="M7 21V3"/><path d="M7 4h9l-2.2 3L16 10H7"/><path d="M3.5 21c0-1.7 3.8-3 8.5-3s8.5 1.3 8.5 3"/></svg>;
+  return <svg {...common}><path d="M8 4h8v4.5a4 4 0 0 1-8 0Z"/><path d="M8 6H4.5v1.5A3.5 3.5 0 0 0 8 11M16 6h3.5v1.5A3.5 3.5 0 0 1 16 11M12 12.5V17M8.5 21h7M9.5 17h5"/></svg>;
+}
+
 function teamMarker(name) {
   const words = clean(name).split(/\s+/).filter(Boolean);
   const meaningful = words.find((word) => !/^(the|a|an)$/i.test(word)) || words[0] || "T";
@@ -97,7 +104,7 @@ function ResultSegments({ data }) {
     <header className={styles.sectionHeading}><span>Match Flow</span><h2 id="match-flow-heading">Front • Back • Overall</h2></header>
     <div className={styles.segmentCards}>
       {segments.map((segment) => <article key={segment.key} aria-label={`${segment.label}: ${segment.team ? `${segment.team}, ` : ""}${segment.result}`}>
-        <small>{segment.label}</small>
+        <small><MatchFlowIcon segment={segment.key} />{segment.label}</small>
         <strong>{segment.team || (segment.result === "All Square" ? "Halved" : "—")}</strong>
         <b>{segment.result}</b>
       </article>)}

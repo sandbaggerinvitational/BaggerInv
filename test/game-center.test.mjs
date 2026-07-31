@@ -437,9 +437,20 @@ test("Game Center hero and story sections follow the live-match hierarchy", asyn
   assert.match(source, /<ResultSegments data=\{data\} \/>[\s\S]*<GameCenterScorecard data=\{data\} \/>[\s\S]*<MatchStats data=\{data\} \/>[\s\S]*<CourseInformation data=\{data\} \/>/);
   assert.match(styles, /\.matchHero\{[^}]*border-radius:20px/);
   assert.match(styles, /\.scoreboard\{[^}]*min-height:150px/);
-  assert.match(styles, /\.scoreboard \[data-prominent=true\] strong\{font-size:clamp\(1\.15rem,5\.2vw,1\.6rem\);white-space:normal\}/);
+  assert.match(styles, /\.scoreboard \[data-prominent=true\] strong\{font-size:clamp\(1\.28rem,5\.6vw,1\.72rem\);letter-spacing:-\.02em;white-space:normal\}/);
   assert.match(styles, /\.holeGrid button\{min-height:48px/);
   assert.match(styles, /\.courseInfo\{border-color:#ded6c6;box-shadow:0 4px 14px/);
+});
+
+test("final Game Center polish emphasizes the result and uses cohesive Match Flow icons", async () => {
+  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
+  assert.match(source, /function MatchFlowIcon/);
+  assert.match(source, /strokeWidth: 1\.8/);
+  assert.match(source, /segment === "front"/);
+  assert.match(source, /segment === "back"/);
+  assert.match(source, /<MatchFlowIcon segment=\{segment\.key\} \/>/);
+  assert.match(styles, /\.segmentCards article small svg\{[^}]*width:13px;height:13px;stroke-width:1\.8/);
+  assert.match(styles, /\.segmentCards article\{[^}]*justify-items:center/);
 });
 
 test("Tournament, My Match, and Home consume shared final result data", async () => {
