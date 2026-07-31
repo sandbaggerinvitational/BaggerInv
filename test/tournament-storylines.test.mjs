@@ -44,6 +44,7 @@ test("completed rounds celebrate only fully finalized official results", () => {
     ] }],
   });
   assert.equal(complete.find((item) => item.id === "round-2").headline, "The Pickles clinched Round 2.");
+  assert.equal(complete[0].id, "round-2");
 
   const incomplete = tournamentStorylines({
     tournament,
