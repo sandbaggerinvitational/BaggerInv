@@ -9,7 +9,7 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /selectedMatch/);
   assert.match(source, /format === "BB" \? 2 : 1/);
   assert.match(source, /gross score/);
-  assert.match(source, /Submit final scorecard/);
+  assert.match(source, /Submit Final/);
   assert.match(source, /strokeDots/);
   assert.match(source, /formatLiveMatchResult/);
   assert.doesNotMatch(source, /function namedMatchStatus/);
@@ -27,6 +27,37 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match/);
   assert.doesNotMatch(source, /isFinal \? "Match finalized"/);
   assert.doesNotMatch(source, /view=matchups/);
+});
+
+test("active scoring keeps hole, match status, progress, and next action visible", async () => {
+  const [source, styles] = await Promise.all([
+    readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/score/score.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(source, /className=\{styles\.scoringContext\}/);
+  assert.match(source, /Current match status/);
+  assert.match(source, /Hole \{progress\.currentHole\} of 18/);
+  assert.match(source, /progress\.remaining/);
+  assert.match(source, /Save & Continue/);
+  assert.match(source, /Save Hole & Review/);
+  assert.match(styles, /\.scoringContext\{/);
+  assert.match(styles, /\.shell>\.primary\{[^}]*position:sticky/);
+});
+
+test("final scorecard is a read-only official record with running match status", async () => {
+  const source = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
+  assert.match(source, /data-scorecard-state=\{isFinal \? "final" : "review"\}/);
+  assert.match(source, /Official Match Scorecard/);
+  assert.match(source, /OFFICIAL TOURNAMENT RECORD/);
+  assert.match(source, /className=\{styles\.officialCourse\}/);
+  assert.match(source, /Tee Time/);
+  assert.match(source, /Starting Hole/);
+  assert.match(source, /role="table"/);
+  assert.match(source, /data-running="true"/);
+  assert.match(source, /runningMatchStatusAtHole/);
+  assert.match(source, /if \(readOnly\) return <span/);
+  assert.match(source, /Scorecard confirmed/);
+  assert.match(source, /Return to My Match/);
 });
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {
