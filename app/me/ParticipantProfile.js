@@ -8,6 +8,7 @@ import { formatHandicap, formatPlayerPoints } from "../../lib/formatters";
 import { NOTIFICATION_CATEGORIES } from "../../lib/tournament-notifications";
 import styles from "./me.module.css";
 import nativeStyles from "./native-actions.module.css";
+import logoStyles from "../live/live.module.css";
 
 const preferenceKey = "sbi-notification-preferences";
 
@@ -116,7 +117,7 @@ export default function ParticipantProfile() {
     profile.teamName && { label: "Current Team", value: profile.teamName },
     snapshot && { label: "Tournament Points", value: formatPlayerPoints(snapshot.points) },
     record && { label: "Current Record", value: record },
-    standing && { label: "Current Standing", value: standing },
+    standing && { label: "Current Position", value: standing },
     handicap && { label: "Tournament Handicap", value: handicap },
   ].filter(Boolean);
 
@@ -126,14 +127,14 @@ export default function ParticipantProfile() {
         <AssetImage src={playerPhoto(profile.photo)} alt={`${profile.name} profile photo`} className={styles.playerPhoto} fallbackClassName={styles.playerFallback} fallback={initials(profile.name)} inferFallback={false} />
       </div>
       <div className={styles.heroIdentity}>
-        <span>{tournament?.year ? `${tournament.year} Tournament Player` : "Player Passport"}</span>
+        <span>{tournament?.year ? `${tournament.year} Sandbagger` : "Player Passport"}</span>
         <h1>{profile.name}</h1>
-        {profile.teamName ? <p className={styles.teamLine}>{profile.teamLogo ? <AssetImage src={teamLogo(profile.teamLogo)} alt="" className={styles.teamMark} fallbackClassName={styles.teamMarkFallback} fallback="" inferFallback={false} /> : null}{profile.teamName}</p> : null}
+        {profile.teamName ? <p className={styles.teamLine}>{profile.teamLogo ? <span className={logoStyles.logoPlate} data-size="small"><AssetImage src={teamLogo(profile.teamLogo)} alt={`${profile.teamName} logo`} className={logoStyles.logoImage} fallbackClassName={logoStyles.logoFallback} fallback={initials(profile.teamName)} inferFallback={false} /></span> : null}<span>{profile.teamName}</span></p> : null}
       </div>
       {(record || snapshot || standing || handicap) ? <div className={styles.heroStats} aria-label="Current tournament performance">
         {record ? <span><b>{record}</b><small>Record</small></span> : null}
         {snapshot ? <span><b>{formatPlayerPoints(snapshot.points)}</b><small>Points</small></span> : null}
-        {standing ? <span><b>{standing}</b><small>Standing</small></span> : null}
+        {standing ? <span><b>{standing}</b><small>Position</small></span> : null}
         {handicap ? <span><b>{handicap}</b><small>Handicap</small></span> : null}
       </div> : null}
     </header>

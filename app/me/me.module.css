@@ -6,8 +6,7 @@
 .playerFallback{display:grid;place-items:center;background:#f1eadb;color:#0a4032;font:800 1.45rem Georgia,serif}
 .heroIdentity{min-width:0;align-self:center}.heroIdentity>span,.sectionHeading>span{display:block;color:#cba852;font-size:.64rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
 .heroIdentity h1{margin:5px 0 7px;color:#fff;font:700 clamp(1.65rem,7vw,2.2rem)/1.03 Georgia,serif;letter-spacing:-.025em}
-.teamLine{display:flex;align-items:center;gap:7px;margin:0;color:#eef1eb;font-size:.8rem;font-weight:800;line-height:1.25}
-.teamMark,.teamMarkFallback{width:18px;height:18px;object-fit:contain}.teamMarkFallback{display:none}
+.teamLine{display:flex;align-items:center;gap:8px;margin:0;color:#eef1eb;font-size:.8rem;font-weight:800;line-height:1.25}.teamLine>span[data-size=small]{transform:translateY(1px)}
 .heroStats{position:relative;z-index:1;grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(72px,1fr));margin-top:2px;padding-top:15px;border-top:1px solid rgba(255,255,255,.15)}
 .heroStats span{display:grid;place-items:center;gap:3px;min-width:0;padding:0 8px;border-left:1px solid rgba(255,255,255,.12);text-align:center}.heroStats span:first-child{border-left:0}
 .heroStats b{font:700 1.1rem/1 Georgia,serif;font-variant-numeric:tabular-nums}.heroStats small{color:#cfdad5;font-size:.58rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}

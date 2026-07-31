@@ -15,12 +15,19 @@ test("Me leads with the authenticated golfer and trusted tournament performance"
   assert.match(profile, /playerPhoto\(profile\.photo\)/);
   assert.match(profile, /fallback=\{initials\(profile\.name\)\}/);
   assert.match(profile, /profile\.teamName/);
+  assert.match(profile, /className=\{logoStyles\.logoPlate\}/);
+  assert.match(profile, /data-size="small"/);
+  assert.match(profile, /className=\{logoStyles\.logoImage\}/);
   assert.match(profile, /formatHandicap\(profile\.tournamentHandicap\)/);
   assert.match(profile, /formatPlayerPoints\(snapshot\.points\)/);
   assert.match(profile, /Current tournament performance/);
   assert.match(route, /rankPlayerRows/);
   assert.match(route, /data\.snapshot\.standing = standing\.displayRank/);
   assert.match(write, /tournamentHandicap: playerHandicap/);
+  assert.match(profile, /\$\{tournament\.year\} Sandbagger/);
+  assert.doesNotMatch(profile, /Tournament Player/);
+  assert.match(profile, /Current Position/);
+  assert.doesNotMatch(profile, /Current Standing/);
 });
 
 test("Me gracefully omits unavailable tournament values instead of rendering placeholders", async () => {
@@ -59,6 +66,7 @@ test("Me layout supports compact portrait, player-photo fallback, and landscape"
   assert.match(css, /@media\(max-width:390px\)/);
   assert.match(css, /@media\(orientation:landscape\)/);
   assert.match(css, /\.playerFallback/);
+  assert.match(css, /translateY\(1px\)/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(css, /overflow-wrap:anywhere/);
 });
