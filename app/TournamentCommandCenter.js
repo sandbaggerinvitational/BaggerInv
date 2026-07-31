@@ -9,6 +9,7 @@ import {
   tournamentDayLabel,
   tournamentStatusLabel,
 } from "../lib/home-dashboard";
+import { formatPlayerPoints, formatTeamPoints } from "../lib/formatters";
 import { tournamentProgressModel } from "../lib/live-command-center";
 import styles from "./tournament-command-center.module.css";
 
@@ -18,11 +19,6 @@ function assetSource(value, resolver) {
   return /^(https?:)?\/\//i.test(source) || source.startsWith("/")
     ? source
     : resolver(source);
-}
-
-function score(value) {
-  const number = Number(value || 0);
-  return Number.isInteger(number) ? String(number) : number.toFixed(1);
 }
 
 function ScheduleIcon({ type }) {
@@ -102,7 +98,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
             fallbackClassName={styles.scoreLogoFallback}
           />
           <span>{tournament.teamOne?.name}</span>
-          <strong>{score(tournament.teamOne?.score)}</strong>
+          <strong>{formatTeamPoints(tournament.teamOne?.score)}</strong>
         </div>
         <b>–</b>
         <div>
@@ -114,7 +110,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
             fallbackClassName={styles.scoreLogoFallback}
           />
           <span>{tournament.teamTwo?.name}</span>
-          <strong>{score(tournament.teamTwo?.score)}</strong>
+          <strong>{formatTeamPoints(tournament.teamTwo?.score)}</strong>
         </div>
       </div>
       <div className={styles.progressLabel}>
@@ -163,7 +159,7 @@ function TournamentLeaders({ leaders }) {
               />
               <div><strong>{leader.player}</strong><small>{leader.team}</small></div>
               <div className={styles.leaderMetric}>
-                <strong>{score(leader.points)}</strong>
+                <strong>{formatPlayerPoints(leader.points)}</strong>
                 <small>{leader.wins}-{leader.losses}-{leader.halves}</small>
               </div>
             </li>

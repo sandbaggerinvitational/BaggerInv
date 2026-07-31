@@ -51,6 +51,14 @@ test("home match statuses use the compact shared vocabulary", () => {
   assert.equal(appMatchStatus({ status: "Scheduled" }), "Upcoming");
 });
 
+test("Home Tournament Leaders use the shared player-points formatter", async () => {
+  const source = await readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8");
+  assert.match(source, /formatPlayerPoints\(leader\.points\)/);
+  assert.match(source, /formatTeamPoints\(tournament\.teamOne\?\.score\)/);
+  assert.match(source, /formatTeamPoints\(tournament\.teamTwo\?\.score\)/);
+  assert.doesNotMatch(source, /function score\(/);
+});
+
 test("active tournament header reports its day when a start date is available", () => {
   assert.equal(tournamentDayLabel({
     startDate: "2026-09-25",
