@@ -23,6 +23,25 @@ function ordinal(value) {
   return `${number}${suffix}`;
 }
 
+function RoundPerformance({ rounds }) {
+  if (!rounds?.length) return null;
+  return <section className={`${styles.card} ${styles.performance}`} aria-labelledby="round-performance-title">
+    <div className={styles.sectionHeading}><span>Your Tournament</span><h2 id="round-performance-title">Round Performance</h2></div>
+    <div className={styles.performanceList}>{rounds.map((round) => {
+      const available = round.gross !== null || round.grossRankLabel || round.outcomes?.length || round.points !== null;
+      return <article key={round.round} data-upcoming={available ? undefined : "true"}>
+        <header><strong>Round {round.round}</strong>{!available ? <span>Upcoming</span> : null}</header>
+        {available ? <div className={styles.performanceMetrics}>
+          {round.gross !== null ? <div><b>{round.gross}</b><small>Gross Score</small></div> : null}
+          {round.grossRankLabel ? <div><b>{round.grossRankLabel}</b><small>Gross Rank</small></div> : null}
+          {round.outcomes?.length ? <div><b>{round.outcomes.join(" • ")}</b><small>Match Outcome</small></div> : null}
+          {round.points !== null ? <div><b>{formatPlayerPoints(round.points)}</b><small>Points Earned</small></div> : null}
+        </div> : <p>Your round performance will appear after play.</p>}
+      </article>;
+    })}</div>
+  </section>;
+}
+
 export default function ParticipantProfile() {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -112,14 +131,6 @@ export default function ParticipantProfile() {
   const handicap = profile.tournamentHandicap === null || profile.tournamentHandicap === undefined || profile.tournamentHandicap === ""
     ? ""
     : formatHandicap(profile.tournamentHandicap);
-  const snapshotItems = [
-    tournament?.currentRound && { label: "Current Round", value: `Round ${tournament.currentRound}` },
-    profile.teamName && { label: "Current Team", value: profile.teamName },
-    snapshot && { label: "Tournament Points", value: formatPlayerPoints(snapshot.points) },
-    record && { label: "Current Record", value: record },
-    standing && { label: "Current Position", value: standing },
-    handicap && { label: "Tournament Handicap", value: handicap },
-  ].filter(Boolean);
 
   return <section className={styles.page}>
     <header className={styles.playerHero}>
@@ -139,10 +150,7 @@ export default function ParticipantProfile() {
       </div> : null}
     </header>
 
-    {snapshotItems.length ? <section className={`${styles.card} ${styles.snapshot}`} aria-labelledby="tournament-snapshot-title">
-      <div className={styles.sectionHeading}><span>Your Tournament</span><h2 id="tournament-snapshot-title">Tournament Snapshot</h2></div>
-      <div className={styles.snapshotGrid}>{snapshotItems.map((item) => <div key={item.label}><small>{item.label}</small><strong>{item.value}</strong></div>)}</div>
-    </section> : null}
+    <RoundPerformance rounds={tournamentData?.roundPerformance} />
 
     <section className={styles.card}>
       <div className={styles.sectionHeading}><span>Your Game</span><h2>Player Profile</h2></div>

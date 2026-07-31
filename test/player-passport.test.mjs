@@ -115,7 +115,7 @@ test("active Passport replaces onboarding with participant destinations", async 
   assert.match(navigation, /My Match/);
   assert.match(navigation, /Tournament/);
   assert.match(navigation, /Leaderboard/);
-  assert.match(navigation, /Me/);
+  assert.match(navigation, /Player/);
   assert.doesNotMatch(score, /My Tournament|Live Leaderboard/);
   assert.match(live, /Back to My Tournament/);
   assert.match(live, />My Tournament</);
@@ -192,7 +192,7 @@ test("Participant Mode active destinations cover direct and nested routes", () =
   assert.equal(participantDestination("/score/access/token", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/live", "", "clay-beltran"), "Tournament");
   assert.equal(participantDestination("/live", "?view=points", "clay-beltran"), "Leaderboards");
-  assert.equal(participantDestination("/players/clay-beltran", "", "clay-beltran"), "Me");
+  assert.equal(participantDestination("/players/clay-beltran", "", "clay-beltran"), "Player");
   assert.equal(participantDestination("/players/another-player", "", "clay-beltran"), "");
   assert.equal(participantDestination("/records", "", "clay-beltran"), "");
 });

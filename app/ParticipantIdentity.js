@@ -13,7 +13,7 @@ const itemsFor = (player) => [
   { href: "/my-match", label: "My Match", icon: "golf" },
   { href: "/live", label: "Tournament", icon: "trophy" },
   { href: "/live?view=leaderboards", label: "Leaderboards", icon: "podium" },
-  { href: "/me", label: "Me", icon: "profile" },
+  { href: "/me", label: "Player", icon: "profile" },
 ];
 
 function NavIcon({ name }) {

@@ -4,6 +4,7 @@ import { createScoringSession, scoringSessionCookie } from "../../../../lib/scor
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { getTournamentData } from "../../../live/sheetData.js";
 import { playerPerformanceRows, rankPlayerRows } from "../../../../lib/mobile-leaderboards.js";
+import { playerRoundPerformance } from "../../../../lib/player-round-performance.js";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,7 @@ export async function GET(request) {
       );
       const standing = standings.find((row) => String(row.id) === String(data.player.id));
       if (standing && data.snapshot) data.snapshot.standing = standing.displayRank;
+      data.roundPerformance = playerRoundPerformance(tournamentData, data);
     } catch {
       // Identity and match data remain useful when optional standings are unavailable.
     }
