@@ -15,6 +15,13 @@ function timestamp(value) {
   return Number.isNaN(date.getTime()) ? "Not available" : date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
+function activityIcon(status) {
+  if (status === "Final") return "🟢";
+  if (status === "Reopened") return "🟡";
+  if (status === "Live") return "🔵";
+  return "⚪";
+}
+
 export default function DirectorDashboard({ directorName }) {
   const [data, setData] = useState(null);
   const [busy, setBusy] = useState("");
@@ -48,36 +55,50 @@ export default function DirectorDashboard({ directorName }) {
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
+  const resolveIssue = (item) => {
+    if (item.action === "enable-automation") return act("automation", { enabled: true, autoOpenRound: true, autoSetMatchesLive: true });
+    if (item.action === "open-round") { if (item.id.startsWith("round:")) setSelectedRound(item.id.split(":")[1]); return act("open-round", { round: Number(item.id.split(":")[1] || selectedRound) }); }
+    if (item.action === "retry") return load().catch((error) => setMessage(error.message));
+    return null;
+  };
   if (!data) return <section className={styles.shell}><div className={styles.loading} role="status">{message || "Opening Tournament Director…"}</div></section>;
   const finalMatches = data.rounds.find((item) => String(item.number) === selectedRound)?.final || 0;
   return <section className={styles.shell}>
     <header className={styles.hero}><span>Director Mode</span><h1>Tournament Director</h1><p>{directorName} · {data.tournament.year} {data.tournament.name}</p><StatusBadge status={data.tournament.status} /></header>
 
     <section className={styles.command} aria-labelledby="command-title">
-      <div><span>Mission Control</span><h2 id="command-title">Round {data.tournament.currentRound || "—"}</h2><p>{data.tournament.location || "Tournament operations"}</p></div>
-      <label>Operating round<select value={selectedRound} onChange={(event) => setSelectedRound(event.target.value)}>{data.rounds.map((item) => <option value={item.number} key={item.number}>{item.name}</option>)}</select></label>
+      <header><span>Mission Control</span><h2 id="command-title">Operational Overview</h2></header>
+      <div className={styles.commandGrid}>
+        <div><small>Tournament</small><strong>{data.tournament.name}</strong><span>{data.tournament.year} · {data.tournament.location || "Location unavailable"}</span></div>
+        <div><small>Operating Round</small><strong>{data.operatingRound ? `${data.operatingRound.name} • ${data.operatingRound.format}` : "Tournament Complete"}</strong><span>{data.operatingRound?.course || ""}</span></div>
+        <div><small>Current Status</small><strong>{data.operatingRound?.status || data.tournament.status}</strong><span>{data.operatingRound ? `${data.operatingRound.final} of ${data.operatingRound.total} Final` : "All rounds complete"}</span></div>
+        <div><small>Next Event</small><strong>{data.nextEvent?.title || "No event scheduled"}</strong><span>{data.nextEvent?.countdown || "Tournament schedule complete"}</span></div>
+      </div>
+      <label>Manual operating round<select value={selectedRound} onChange={(event) => setSelectedRound(event.target.value)}>{data.rounds.map((item) => <option value={item.number} key={item.number}>{item.name}</option>)}</select></label>
     </section>
+
+    <section className={styles.nextEvent} aria-labelledby="next-event-title"><header><span>Tournament countdown</span><h2 id="next-event-title">Next Event</h2></header>{data.nextEvent ? <div><div><strong>{data.nextEvent.title}</strong><span>{data.nextEvent.subtitle}</span><small>{data.nextEvent.startTime}</small></div><div><b>{data.nextEvent.countdown}</b><span>{data.nextEvent.automatic ? "Automatic" : "Scheduled"}</span></div></div> : <p>No additional tournament events are scheduled.</p>}</section>
 
     <section className={styles.rounds} aria-labelledby="round-status-title"><header><span>Competition</span><h2 id="round-status-title">Round Status</h2></header>{data.rounds.map((item) => <article key={item.number} data-state={item.status}>
       <div><strong>{item.name}</strong><span>{item.format}{item.course ? ` · ${item.course}` : ""}</span><small>{item.firstTeeTime ? `First tee ${item.firstTeeTime}` : "Tee time unavailable"}</small></div>
       <div><StatusBadge status={item.status} /><b>{item.final} / {item.total} Final</b><small>{item.live ? `${item.live} Live · ` : ""}{item.upcoming} Upcoming</small></div>
     </article>)}</section>
 
-    <section className={styles.health} aria-labelledby="health-title"><header><span>At a glance</span><h2 id="health-title">Tournament Health</h2></header><div>{HEALTH.map(([key, label]) => <article data-attention={["awaitingConfirmation", "reopened", "errors"].includes(key) && data.health[key] ? "true" : undefined} key={key}><strong>{data.health[key]}</strong><span>{label}</span></article>)}</div><p>Last synchronization: {timestamp(data.health.lastSynchronization)}</p></section>
+    <section className={styles.health} data-level={data.health.status.level} aria-labelledby="health-title"><header><div><span>At a glance</span><h2 id="health-title">Tournament Health</h2></div><strong className={styles.healthStatus}>{data.health.status.icon} {data.health.status.label}</strong></header><div>{HEALTH.map(([key, label]) => <article data-attention={["awaitingConfirmation", "reopened", "errors"].includes(key) && data.health[key] ? "true" : undefined} key={key}><strong>{data.health[key]}</strong><span>{label}</span></article>)}</div><p>{data.health.issueCount ? `${data.health.issueCount} operational item${data.health.issueCount === 1 ? "" : "s"} detected · ` : "No operational issues · "}Last synchronization: {timestamp(data.health.lastSynchronization)}</p></section>
 
-    {(data.health.awaitingConfirmation || data.health.reopened || data.health.errors || !data.automation.enabled) ? <section className={styles.attention}><span>Attention Required</span><h2>Operational checks</h2><ul>{data.health.awaitingConfirmation ? <li>{data.health.awaitingConfirmation} match{data.health.awaitingConfirmation === 1 ? " is" : "es are"} awaiting confirmation.</li> : null}{data.health.reopened ? <li>{data.health.reopened} reopened match{data.health.reopened === 1 ? " requires" : "es require"} review.</li> : null}{data.health.errors ? <li>{data.health.errors} match configuration issue{data.health.errors === 1 ? "" : "s"} detected.</li> : null}{!data.automation.enabled ? <li>Round automation is disabled. Manual controls remain available.</li> : null}</ul></section> : null}
+    {data.issues.length ? <section className={styles.attention}><span>Attention Required</span><h2>Operational actions</h2><div>{data.issues.map((item) => <article data-severity={item.severity} key={item.id}><i aria-hidden="true">{item.severity === "critical" ? "⚠" : "●"}</i><div><strong>{item.title}</strong><p>{item.message}</p></div>{item.action ? <button disabled={Boolean(busy)} onClick={() => resolveIssue(item)}>{item.actionLabel}</button> : <Link href={item.href}>{item.actionLabel}</Link>}</article>)}</div></section> : null}
 
-    <section className={styles.actions} aria-labelledby="actions-title"><header><span>One-tap operations</span><h2 id="actions-title">Quick Actions</h2></header><div>
-      <button disabled={Boolean(busy)} onClick={() => act("open-round")}>Open Round {selectedRound}</button>
+    <section className={styles.actions} id="quick-actions" aria-labelledby="actions-title"><header><span>One-tap operations</span><h2 id="actions-title">Quick Actions</h2></header><div>
+      <button className={!round?.open ? styles.readyAction : styles.openedAction} disabled={Boolean(busy) || Boolean(round?.open)} onClick={() => act("open-round")}>{!round?.open ? <>🟢 <span>READY</span> Open Round {selectedRound}</> : <>✓ Round {selectedRound} Open</>}</button>
       <button disabled={Boolean(busy)} onClick={() => act("set-live")}>Set All LIVE</button>
       <button disabled={Boolean(busy) || !round || finalMatches !== round.total} onClick={() => act("close-round")}>Close Round</button>
       <label><span>Reopen finalized match</span><select value={reopenId} onChange={(event) => setReopenId(event.target.value)}><option value="">Select match</option>{(data.finalizedMatches || []).filter((item) => String(item.round) === selectedRound).map((item) => <option value={item.id} key={item.id}>Match {item.match} · {item.id}</option>)}</select><button disabled={Boolean(busy) || !reopenId} onClick={() => act("reopen-match", { matchId: reopenId })}>Reopen Match</button></label>
       <Link href="/live?view=leaderboards">Leaderboards</Link><Link href="/live">Tournament Overview</Link>
     </div>{message ? <p role="status">{message}</p> : null}</section>
 
-    <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><p>Open a round 30 minutes before its earliest tee time and optionally set scheduled matches LIVE. Manual controls always remain available.</p><div><b>{data.automation.enabled ? "Automation enabled" : "Automation disabled"}</b><span>Auto open: {data.automation.autoOpenRound ? "On" : "Off"} · Set LIVE: {data.automation.autoSetMatchesLive ? "On" : "Off"}</span></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation" : "Enable automation"}</button></section>
+    <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><div className={styles.automationGrid}><article data-enabled={data.automation.enabled && data.automation.autoOpenRound ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoOpenRound ? "🟢" : "⚪"} Auto Open</span><strong>{data.automation.enabled && data.automation.autoOpenRound ? "Enabled" : "Disabled"}</strong><small>{data.nextEvent?.round ? `${data.nextEvent.title} · ${data.nextEvent.countdown}` : "No round action scheduled"}</small></article><article data-enabled={data.automation.enabled && data.automation.autoSetMatchesLive ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoSetMatchesLive ? "🟢" : "⚪"} Auto LIVE</span><strong>{data.automation.enabled && data.automation.autoSetMatchesLive ? "Enabled" : "Disabled"}</strong><small>{data.automation.autoSetMatchesLive ? "Runs when the round opens" : "Manual Set All LIVE required"}</small></article></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation · Manual override" : "Enable automation"}</button></section>
 
-    <section className={styles.activity}><header><span>Audit trail</span><h2>Recent Activity</h2></header>{data.recentActivity.length ? <ul>{data.recentActivity.map((item) => <li key={item.id}><div><strong>Round {item.round} · Match {item.match}</strong><span>{item.status}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No recent match activity.</p>}</section>
+    <section className={styles.activity}><header><span>Audit trail</span><h2>Recent Activity</h2></header>{data.recentActivity.length ? <ul>{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>Round {item.round} · Match {item.match}</strong><span>{item.status}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No recent match activity.</p>}</section>
     <Link className={styles.fullAdmin} href="/admin">Open Full Admin →</Link>
   </section>;
 }

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 import { isTournamentDirector, normalizePlayerRole } from "../lib/player-role.js";
-import { directorAutomationDue, directorRoundStatus, tournamentDirectorModel } from "../lib/tournament-director.js";
+import { countdownLabel, directorAutomationDue, directorRoundStatus, tournamentDirectorModel } from "../lib/tournament-director.js";
 
 const source = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -36,6 +36,54 @@ test("round and tournament health summarize authoritative match statuses", () =>
   assert.deepEqual({ live: model.health.live, upcoming: model.health.upcoming, final: model.health.final, awaiting: model.health.awaitingConfirmation, reopened: model.health.reopened }, { live: 2, upcoming: 1, final: 1, awaiting: 1, reopened: 1 });
 });
 
+test("Mission Control resolves operating round and the next scheduled event", () => {
+  const data = {
+    tournament: { currentRound: 2, name: "Sandbagger Invitational", year: 2026, directorAutomation: { enabled: true, autoOpenRound: true } },
+    rounds: [
+      { number: 1, label: "Round 1", format: "Best Ball", course: { name: "Ocean" }, matches: [{ id: "M1", match: 1, status: "Final", teeTime: "8:00 AM", team1Players: [{ id: "A", playingHcp: 2 }], team2Players: [{ id: "B", playingHcp: 4 }], course: { name: "Ocean" } }] },
+      { number: 2, label: "Round 2", format: "Scramble", course: { name: "Osprey" }, matches: [{ id: "M2", match: 1, status: "Scheduled", teeTime: "8:00 AM", team1Players: [{ id: "A", playingHcp: 2 }], team2Players: [{ id: "B", playingHcp: 4 }], course: { name: "Osprey" } }] },
+    ],
+    schedule: [{ title: "Round 2 Opens", type: "Round", date: "2026-07-02", startTime: "8:00 AM", roundId: "Round 2" }],
+  };
+  const model = tournamentDirectorModel(data, new Date("2026-07-02T07:42:00"));
+  assert.equal(model.operatingRound.name, "Round 2");
+  assert.equal(model.operatingRound.format, "Scramble");
+  assert.equal(model.nextEvent.title, "Round 2 Opens");
+  assert.equal(model.nextEvent.countdown, "18 minutes");
+  assert.equal(model.nextEvent.round, 2);
+});
+
+test("health rolls actionable issues into healthy, attention, and action-needed states", () => {
+  const player = (id, playingHcp = 3) => ({ id, playingHcp });
+  const base = { tournament: { currentRound: 1, directorAutomation: { enabled: true, autoOpenRound: true, autoSetMatchesLive: true } }, schedule: [] };
+  const healthy = tournamentDirectorModel({ ...base, rounds: [{ number: 1, matches: [{ id: "M1", match: 1, status: "Final", teeTime: "8:00 AM", course: { name: "Ocean" }, team1Players: [player("A")], team2Players: [player("B")] }] }] }, new Date("2026-07-02T09:00:00"));
+  assert.equal(healthy.health.status.label, "Healthy");
+  const attention = tournamentDirectorModel({ ...base, tournament: { ...base.tournament, directorAutomation: { enabled: false } }, rounds: [{ number: 1, matches: [{ id: "M1", match: 1, status: "Final", teeTime: "8:00 AM", course: { name: "Ocean" }, team1Players: [player("A")], team2Players: [player("B")] }] }] }, new Date("2026-07-02T09:00:00"));
+  assert.equal(attention.health.status.label, "Attention Required");
+  assert.equal(attention.issues.find((item) => item.id === "automation").action, "enable-automation");
+  const action = tournamentDirectorModel({ ...base, rounds: [{ number: 1, matches: [{ id: "M2", match: 2, status: "Live", currentHole: 18, teeTime: "8:10 AM", course: { name: "Ocean" }, team1Players: [player("A")], team2Players: [player("B")] }] }] }, new Date("2026-07-02T09:00:00"));
+  assert.equal(action.health.status.label, "Action Needed");
+  assert.match(action.issues.find((item) => item.id === "confirm:M2").message, /Awaiting final confirmation/);
+});
+
+test("operational intelligence identifies stale scoring and concrete configuration failures", () => {
+  const model = tournamentDirectorModel({
+    tournament: { currentRound: 1, directorAutomation: { enabled: true } }, schedule: [],
+    rounds: [{ number: 1, matches: [{ id: "M6", match: 6, status: "Live", currentHole: 7, updatedAt: "2026-07-02T09:00:00Z", teeTime: "", course: { name: "Ocean" }, team1Players: [{ id: "A", playingHcp: null }], team2Players: [] }] }],
+  }, new Date("2026-07-02T09:22:00Z"));
+  assert.match(model.issues.find((item) => item.id === "stale:M6").message, /22 minutes/);
+  assert.match(model.issues.find((item) => item.id === "players:M6").message, /Players have not been assigned/);
+  assert.match(model.issues.find((item) => item.id === "tee:M6").message, /Tee time is missing/);
+  assert.match(model.issues.find((item) => item.id === "hcp:M6").message, /playing handicaps are missing/);
+  assert.equal(model.issues.find((item) => item.id === "stale:M6").href, "/game-center/M6?from=tournament");
+});
+
+test("countdown labels remain operational across minutes, hours, and tomorrow", () => {
+  assert.equal(countdownLabel(18), "18 minutes");
+  assert.equal(countdownLabel(134), "2 hrs 14 min");
+  assert.equal(countdownLabel(24 * 60, "7:30 AM"), "Tomorrow 7:30 AM");
+});
+
 test("automation becomes due only within the configured 30-minute opening window", () => {
   const model = { automation: { enabled: true, autoOpenRound: true, windowMinutes: 30 }, rounds: [{ number: 2, status: "UPCOMING", firstTeeTime: "8:00 AM" }] };
   assert.equal(directorAutomationDue(model, new Date("2026-07-01T07:35:00")), 2);
@@ -60,6 +108,7 @@ test("Director dashboard contains operations, health, attention, automation, and
   for (const label of ["Round Status", "Tournament Health", "Attention Required", "Quick Actions", "Open Round", "Set All LIVE", "Close Round", "Reopen Match", "Leaderboards", "Tournament Overview", "Automation", "Recent Activity", "Open Full Admin"]) assert.match(dashboard, new RegExp(label));
   assert.match(source("app/admin/director/director.module.css"), /env\(safe-area-inset-bottom\)/);
   assert.match(dashboard, /setInterval\(check, 60_000\)/);
+  for (const label of ["Operational Overview", "Next Event", "Tournament countdown", "Auto Open", "Auto LIVE", "Action Needed", "No score submitted", "READY"]) assert.match(dashboard + source("lib/tournament-director.js"), new RegExp(label));
 });
 
 test("PLAYER accounts are redirected away from the Director page", () => {

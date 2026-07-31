@@ -1,6 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { getTournamentData } from "../../live/sheetData.js";
+import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
 import { playerPassportTokenFromRequest } from "../../../lib/player-passport.js";
 import { inspectPlayerPassportToken } from "../../../lib/player-passport-server.js";
 import { isTournamentDirector } from "../../../lib/player-role.js";
@@ -24,7 +24,8 @@ export async function GET(request) {
   const identity = await authorize(request);
   if (!identity) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
   try {
-    return NextResponse.json({ data: tournamentDirectorModel(await getTournamentData()) }, { headers: { "Cache-Control": "no-store" } });
+    const tournamentData = await getTournamentData();
+    return NextResponse.json({ data: tournamentDirectorModel({ ...tournamentData, diagnostics: tournamentLoaderDiagnostics() }) }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Director dashboard is temporarily unavailable." }, { status: 503 });
   }
