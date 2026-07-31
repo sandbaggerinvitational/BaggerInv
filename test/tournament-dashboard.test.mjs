@@ -21,7 +21,7 @@ test("Tournament dashboard uses the exact shared Home identity header", async ()
   assert.match(header, /className=\{`\$\{styles\.homeHeader\} \$\{headerStyles\.tokens\}`\}/);
   assert.match(header, /tournament-identity-header\.module\.css/);
   assert.match(header, /className=\{styles\.tournamentLogo\}/);
-  assert.match(header, /className=\{styles\.headerLive\}/);
+  assert.match(header, /<StatusBadge status=\{status\} \/>/);
   assert.match(source, /tournamentLogo\(filename\)/);
   assert.doesNotMatch(styles, /\.pageHeader(?:\{| )|\.pageHeader h1/);
   assert.match(source, /<Snapshot tournament=/);

@@ -119,6 +119,6 @@ test("Admin refreshes its draft from the authoritative returned Match Status", a
   assert.match(source, /setDraft\(Object\.fromEntries\(\[\.\.\.EDITABLE, \.\.\.PAIRING_FIELDS\]/);
   assert.match(source, /\[match\["Updated At"\], match\["Match Status"\]\]/);
   assert.match(source, /data-status=\{match\["Match Status"\] \|\| "Scheduled"\}/);
-  assert.match(source, /<strong>\{formatStatusLabel\(match\["Match Status"\]\)\}<\/strong>/);
+  assert.match(source, /<StatusBadge status=\{formatStatusLabel\(match\["Match Status"\]\)\} \/>/);
   assert.match(source, /\{isFinal \? <option>Final<\/option> : null\}/);
 });

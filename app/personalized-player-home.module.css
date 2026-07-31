@@ -70,32 +70,6 @@
   white-space: nowrap;
 }
 
-.cardTop > span {
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: #e7e1d6;
-  color: #4b5a54;
-  font-size: 0.66rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.cardTop > span[data-status="LIVE"] {
-  background: #174f3e;
-  color: #fff;
-}
-
-.cardTop > span[data-status="OPEN"] {
-  background: #dfc36f;
-  color: #263d34;
-}
-
-.cardTop > span[data-status="FINAL"] {
-  background: #dcece4;
-  color: #174635;
-}
-
 .venue {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -273,8 +247,7 @@
   background: #eaf2ed;
 }
 
-.progress span,
-.complete span {
+.progress span {
   color: #16503e;
   font-size: 0.66rem;
   font-weight: 900;
@@ -630,11 +603,6 @@
 
   .matchHeading > strong {
     font-size: 1.55rem;
-  }
-
-  .cardTop > span {
-    padding: 6px 9px;
-    font-size: 0.58rem;
   }
 
   .venue {

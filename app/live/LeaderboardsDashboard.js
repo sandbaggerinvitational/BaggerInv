@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AssetImage from "../AssetImage";
+import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { playerPhoto, teamLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
@@ -102,7 +103,7 @@ function RoundPlayers({ data, selectedRound }) {
   const select = (key) => setSort((current) => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
   const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"]];
   return <section className={styles.roundBoard} aria-label={pairing ? "Scramble pairing leaderboard" : `${round?.label || "Round"} player leaderboard`}>
-    <header><span><small>{round?.label}</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{rows.length ? <em>Live</em> : null}</header>
+    <header><span><small>{round?.label}</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{rows.length ? <StatusBadge status="Live" /> : null}</header>
     {!rows.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div>
       <div className={styles.roundRow} data-header="true"><span>Rank</span><span>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key, label]) => <button type="button" onClick={() => select(key)} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"} aria-label={key === "netToPar" ? "Net score relative to par" : label} key={key}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
       {rows.map((row) => <div className={styles.roundRow} key={`${row.round}-${row.id}`}><strong>{row.displayRank}</strong><b>{row.name}</b><span>{Number(row.holes) >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}

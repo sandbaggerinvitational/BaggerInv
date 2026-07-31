@@ -1,0 +1,58 @@
+.badge {
+  box-sizing: border-box;
+  min-height: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: max-content;
+  max-width: 100%;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--status-upcoming-gray);
+  background: #eceae5;
+  font: 900 .62rem/1 Arial, sans-serif;
+  letter-spacing: .08em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge[data-status="LIVE"] {
+  color: var(--tournament-green);
+  background: #e8f1ec;
+}
+
+.badge[data-status="LIVE"] i {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: var(--status-live-red);
+}
+
+.badge[data-status="UPCOMING"] {
+  border-color: #d8d7d1;
+  color: var(--status-upcoming-gray);
+  background: #f2f1ed;
+}
+
+.badge[data-status="FINAL"],
+.badge[data-status="MATCH-COMPLETE"] {
+  border-color: #c8dbd1;
+  color: var(--status-final-neutral);
+  background: #dcece4;
+}
+
+.badge[data-status="CURRENT-MATCH"] {
+  border-color: #d0b56c;
+  color: #745716;
+  background: #fff8df;
+}
+
+.badge[data-status="LOCKED"] {
+  border-color: #d7d3ca;
+  color: var(--status-locked-neutral);
+  background: #ebe8e0;
+}

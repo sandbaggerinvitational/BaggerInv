@@ -920,8 +920,6 @@
 .mobileInsights { display: none; }
 .leaderboardHeader h2 { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .leaderboardHeader h2 em { padding: 6px 9px; border-radius: 999px; font: 900 .59rem Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
-.leaderboardHeader h2 em[data-mode="live"] { background: #dcefe5; color: #0d6b48; }
-.leaderboardHeader h2 em[data-mode="final"] { background: #f5e9be; color: #715615; }
 
 @media (max-width: 1050px) {
   .matchGrid { grid-template-columns: 1fr; }
@@ -1297,10 +1295,6 @@
 .primaryMatchState { margin: 14px 18px 4px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .primaryMatchState strong { color: #0b3529; font: 700 1.25rem Georgia,serif; }
 .primaryMatchState span { padding: 6px 9px; border-radius: 999px; background: #0b4938; color: #fff; font-size: .66rem; font-weight: 900; letter-spacing: .08em; }
-.matchMeta strong[data-state] { padding: 5px 8px; border-radius: 999px; font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; }
-.matchMeta strong[data-state="live"] { background: #f8dfe1; color: #a3232c; }
-.matchMeta strong[data-state="upcoming"] { background: #eeeae1; color: #5e665f; }
-.matchMeta strong[data-state="final"] { background: #dcebe4; color: #0b563f; }
 .pairingPending { margin: 18px; padding: 24px 16px; display: grid; gap: 6px; border-radius: 14px; background: #f6f2e9; text-align: center; }
 .pairingPending strong { color: #153529; font-family: Georgia,serif; }
 .pairingPending span { color: #6a746f; font-size: .75rem; }

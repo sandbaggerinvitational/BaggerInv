@@ -67,7 +67,8 @@ test("My Match formats tees, highlights one relevant card, and uses compact outl
   assert.match(source, /\.join\(" • "\)/);
   assert.match(source, /emphasized=\{match\.matchId === relevant\?\.matchId\}/);
   assert.match(source, /selection\.primary \|\| selection\.choices\[0\] \|\| selection\.ordered\[0\]/);
-  assert.match(styles, /\.cardState>small\{[^}]*border:1px solid #d0b56c/);
+  assert.match(source, /<StatusBadge status=\{formatStatusLabel\(status,/);
+  assert.match(source, /<StatusBadge status=\{status\} \/>/);
   assert.match(styles, /\.cardAction\{[^}]*border:1px solid #1b5946/);
   assert.match(styles, /\.cardAction\{[^}]*background:#fffdf8/);
   assert.doesNotMatch(styles, /\.cardAction\{[^}]*background:#(?:0b|15|17)[0-9a-f]{4}/i);

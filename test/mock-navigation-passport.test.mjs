@@ -113,5 +113,5 @@ test("Upcoming Home renders its resolved status rather than a hard-coded Live ba
   assert.match(commandCenter, /tournamentStatusLabel\(liveTournament\.status\)/);
   assert.match(commandCenter, /status=\{status\}/);
   assert.doesNotMatch(commandCenter, /status="Live"/);
-  assert.match(header, /status === "Live"/);
+  assert.match(header, /<StatusBadge status=\{status\} \/>/);
 });

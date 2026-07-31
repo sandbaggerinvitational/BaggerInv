@@ -1,4 +1,5 @@
 import MobileIdentityImage from "./MobileIdentityImage";
+import StatusBadge from "./StatusBadge";
 import { tournamentLogo } from "../lib/asset-paths";
 import headerStyles from "./tournament-identity-header.module.css";
 import styles from "./tournament-command-center.module.css";
@@ -32,10 +33,7 @@ export default function TournamentIdentityHeader({
         <h1>{name}</h1>
         <span>{location}</span>
       </div>
-      <span className={styles.headerLive}>
-        {status === "Live" ? <i aria-hidden="true" /> : null}
-        {status}
-      </span>
+      <StatusBadge status={status} />
     </header>
   );
 }

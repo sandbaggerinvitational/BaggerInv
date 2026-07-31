@@ -11,6 +11,7 @@ import AssetImage from "./AssetImage";
 import TournamentStatusHero from "./TournamentStatusHero";
 import { mobileTournamentDashboardEnabled } from "../lib/spreadsheet-environment";
 import MobileTournamentHome from "./MobileTournamentHome";
+import StatusBadge from "./StatusBadge";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -275,7 +276,7 @@ export default async function Home() {
                   tournament.Location ||
                   "Tournament destination"}
               </p>
-              {Number(tournament.year) === Number(year) && !tournament.championTeamId ? <em>Upcoming</em> : null}
+              {Number(tournament.year) === Number(year) && !tournament.championTeamId ? <StatusBadge status="Upcoming" /> : null}
               <strong>View tournament</strong>
             </Link>
           ))}

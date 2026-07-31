@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
 import MobileIdentityImage from "./MobileIdentityImage";
+import StatusBadge from "./StatusBadge";
 import TournamentIdentityHeader from "./TournamentIdentityHeader";
 import { teamLogo } from "../lib/asset-paths";
 import {
@@ -83,10 +84,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
             })}
           </h2>
         </div>
-        <span className={styles.liveBadge}>
-          {status === "Live" ? <i aria-hidden="true" /> : null}
-          {status}
-        </span>
+        <StatusBadge status={status} />
       </header>
       <div className={styles.scoreboard} aria-label="Current tournament score">
         <div>

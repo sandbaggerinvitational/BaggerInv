@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import StatusBadge from "../../StatusBadge";
 import styles from "./live-match-control.module.css";
 import pairingStyles from "./pairing-editor.module.css";
 import accessStyles from "./participant-access.module.css";
@@ -93,7 +94,7 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
   return <article className={styles.matchCard} data-status={match["Match Status"] || "Scheduled"} data-live-match-dirty={dirty ? "true" : undefined}>
     <header>
       <div><span>Match {match.Match}</span><h2>{match["Match ID"]}</h2><p>Round {match.Round} · {match.Format} · {match["Course ID"] || "Course TBA"}{match["Tee Time"] ? ` · ${match["Tee Time"]}` : ""}</p></div>
-      <strong>{formatStatusLabel(match["Match Status"])}</strong>
+      <StatusBadge status={formatStatusLabel(match["Match Status"])} />
     </header>
     <div className={styles.pairing}>
       <PairingSide side={1} team={sideOne} match={match} draft={draft} players={players} rosters={rosters} singles={isSingles} disabled={isFinal || busy} onChange={change} />

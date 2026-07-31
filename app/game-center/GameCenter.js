@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import StatusBadge from "../StatusBadge";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
@@ -350,7 +351,7 @@ export default function GameCenter({ initialData, matchId, backTo }) {
 
     <section className={styles.matchIdentity}>
       <div><small aria-label={matchContext.replace(" • ", ", ")}>{matchContext}</small><h1>{data.match.formatName || data.display.formatName || format}</h1></div>
-      <span data-state={data.state}>{stateLabel}</span>
+      <StatusBadge status={stateLabel} />
       <div className={styles.identityCourse}>
         <Logo filename={course.logo || data.match.course?.logo} name={course.name} type="course" size="identity" tournamentYear={data.tournament.year} />
         <p><strong>{course.name}</strong>{courseLine ? <small>{courseLine}</small> : null}</p>

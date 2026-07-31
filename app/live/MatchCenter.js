@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import PublicMatchCard from "../PublicMatchCard";
+import StatusBadge from "../StatusBadge";
 import { addTournamentRanks } from "../../lib/rankings";
 import { courseLogo, teamLogo } from "../../lib/asset-paths";
 import { formatTeamPoints } from "../../lib/formatters";
@@ -52,7 +53,7 @@ function LiveBanner({ tournament }) {
   return <section className={styles.scoreboard}>
     <TeamIdentity team={tournament.teamOne} side="one" score={tournament.teamOne.score} />
     <div className={styles.scoreCenter}>
-      <span>{tournament.status}</span>
+      <StatusBadge status={tournament.status} />
       <strong>Tournament Score</strong>
       <b>Round {tournament.currentRound}</b>
     </div>
@@ -67,7 +68,7 @@ function RoundNavigation({ rounds, activeRound, onSelect }) {
   return <div className={styles.roundNavigation} role="tablist" aria-label="Tournament rounds">
     {rounds.map((round) => <button type="button" role="tab" aria-selected={round.number === activeRound} className={round.number === activeRound ? styles.activeRound : ""} onClick={() => onSelect(round.number)} key={round.number}>
       <Logo filename={round.course.logo} name={round.course.name || round.label} type="course" size="round" />
-      <span><b>{round.label}</b><strong>{round.format}</strong><small>{round.course.name || "Course to be announced"}</small><em data-status={round.status}>{round.status}</em></span>
+      <span><b>{round.label}</b><strong>{round.format}</strong><small>{round.course.name || "Course to be announced"}</small><StatusBadge status={round.status} /></span>
     </button>)}
   </div>;
 }
@@ -160,7 +161,7 @@ function IndividualScoreLeaderboard({ rows = [], round }) {
     ["gross", "Low gross"],
   ];
   return <section className={styles.liveScoreLeaderboard} id="individual-score-leaderboard">
-    <div className={styles.leaderboardHeader}><div><span>Round {round} Live Scoring</span><h2>Individual Gross &amp; Net <em data-mode="live">Live</em></h2></div></div>
+    <div className={styles.leaderboardHeader}><div><span>Round {round} Live Scoring</span><h2>Individual Gross &amp; Net <StatusBadge status="Live" /></h2></div></div>
     <div className={styles.scoreSorts} aria-label="Sort leaderboard">
       {sortOptions.map(([key, label]) => <button type="button" data-active={sortBy === key ? "true" : undefined} onClick={() => setSortBy(key)} key={key}>{label}</button>)}
     </div>
@@ -303,7 +304,7 @@ function MatchCenterExperience({ initialData, loadError }) {
       <div className={styles.desktopInsights}>{active ? <RoundProgress round={active} /> : null}<TournamentStats tournament={tournament} rounds={rounds} remainingByRound={data?.remainingByRound || []} momentum={data?.momentum} /></div>
       <MobileTournamentInsights tournament={tournament} round={active} rounds={rounds} remainingByRound={data?.remainingByRound || []} momentum={data?.momentum} />
       <IndividualScoreLeaderboard rows={data?.scoreLeaderboard || []} round={active?.number} />
-      {rankedLeaderboard.length ? <section id="individual-points-leaderboard"><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>{leaderboardTitle} {isLive || championshipMode ? <em data-mode={championshipMode ? "final" : "live"}>{championshipMode ? "Final" : "Live"}</em> : null}</h2></div></div>
+      {rankedLeaderboard.length ? <section id="individual-points-leaderboard"><div className={styles.leaderboardHeader}><div><span>Individual Leaders</span><h2>{leaderboardTitle} {isLive || championshipMode ? <StatusBadge status={championshipMode ? "Final" : "Live"} /> : null}</h2></div></div>
         <TournamentLeaderboard rows={leaderboard} />
         {rankedLeaderboard.length > 5 ? <button className={styles.leaderboardToggle} type="button" onClick={() => setShowLeaderboard((value) => !value)}>{showLeaderboard ? "Show Top Five" : "View Full Leaderboard →"}</button> : null}</section> : null}
       {loadError ? <p className={styles.testNote}>{loadError}</p> : null}

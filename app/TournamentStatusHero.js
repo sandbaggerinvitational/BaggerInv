@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import AssetImage from "./AssetImage";
+import StatusBadge from "./StatusBadge";
 import { teamLogo } from "../lib/asset-paths";
 import { countdownParts } from "../lib/tournament-countdown";
 import { formatTeamPoints } from "../lib/formatters";
@@ -102,7 +103,7 @@ export default function TournamentStatusHero({
     } : undefined}>
       {state === "UPCOMING" ? <>
         <header>
-          <span>Upcoming Tournament</span>
+          <StatusBadge status="Upcoming" />
           <h2>{tournament.name}</h2>
           <p>{tournament.location}</p>
           <strong>{tournament.dates}</strong>
@@ -116,7 +117,7 @@ export default function TournamentStatusHero({
         </div> : <div className={styles.comingSoon}><b>Tee-off countdown coming soon</b><span>Add the tournament Start Date to begin the clock.</span></div>}
       </> : state === "LIVE" ? <>
         <header className={styles.liveHeader}>
-          <span><i /> Live</span>
+          <StatusBadge status="Live" />
           <h2>Round {tournament.currentRound}</h2>
         </header>
         <div className={styles.liveScore}>

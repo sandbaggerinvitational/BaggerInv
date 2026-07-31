@@ -634,7 +634,6 @@ h2 {
 }
 .yearCardLogo img { width: 100%; height: 100%; object-fit: contain; }
 .yearCardLogo + span { margin-top: 14px; }
-.yearCard em { margin-top: 10px; color: #846625; text-transform: uppercase; font-style: normal; font-size: .66rem; font-weight: 800; letter-spacing: .1em; }
 
 .yearCard span {
   font-family: Georgia, "Times New Roman", serif;
@@ -899,4 +898,12 @@ footer span {
     scroll-behavior: auto !important;
     transition-duration: .01ms !important;
   }
+}
+:root {
+  --tournament-green: #0b523f;
+  --tournament-gold: #b58a25;
+  --status-live-red: #c83239;
+  --status-upcoming-gray: #66716c;
+  --status-final-neutral: #174635;
+  --status-locked-neutral: #4c5a54;
 }

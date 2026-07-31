@@ -22,6 +22,7 @@ import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
+import StatusBadge from "../../StatusBadge";
 import { getDraftByYear } from "../../../lib/draft";
 import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
@@ -170,7 +171,7 @@ export default async function TournamentYearPage({ params }) {
             </strong>
           </div>
           <div className={styles.finalScoreCenter}>
-            <span>{status.label}</span>
+            <StatusBadge status={status.label} />
             {status.score ? <b>{status.score}</b> : null}
           </div>
           <div>

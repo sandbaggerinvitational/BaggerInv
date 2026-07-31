@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import StatusBadge from "../StatusBadge";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { appMatchStatus, formatMatchResult } from "../../lib/mobile-tournament-app";
@@ -107,11 +108,11 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
     <div className={styles.cardTop}>
       <MatchHeading match={match} />
       <div className={styles.cardState}>
-        {emphasized ? <small>{formatStatusLabel(status, {
+        {emphasized ? <StatusBadge status={formatStatusLabel(status, {
           current: status === "Live",
           complete: status === "Final",
-        })}</small> : null}
-        <span data-status={status.toUpperCase().replaceAll(" ", "-")}>{status}</span>
+        })} /> : null}
+        <StatusBadge status={status} />
         {result ? <strong aria-label={`Final result: ${result}`}>{result}</strong> : null}
       </div>
     </div>

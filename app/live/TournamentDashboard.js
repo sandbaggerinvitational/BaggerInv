@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
+import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPlayerPoints, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
@@ -76,7 +77,7 @@ function TournamentMatchCard({ match, round, tournament }) {
   return <Link className={styles.matchCard} href={href} aria-label={`Round ${round.number}, Match ${match.match}, ${match.formatName || round.format}, ${status}${result ? `, ${result}` : ""}`}>
     <div className={styles.matchHead}>
       <span><small>Round {round.number}{match.match ? ` • Match ${match.match}` : ""}</small><strong>{match.formatName || round.format || "Format TBA"}</strong></span>
-      <span className={styles.matchState}><em data-state={state}>{status}</em>{state === "final" && result ? <b className={styles.finalResult}>{finalResult.team ? <small>{finalResult.team}</small> : null}<strong>{finalResult.result}</strong></b> : result ? <b>{result}</b> : null}{state === "live" && match.currentHole ? <small>Through {match.currentHole}</small> : null}</span>
+      <span className={styles.matchState}><StatusBadge status={status} />{state === "final" && result ? <b className={styles.finalResult}>{finalResult.team ? <small>{finalResult.team}</small> : null}<strong>{finalResult.result}</strong></b> : result ? <b>{result}</b> : null}{state === "live" && match.currentHole ? <small>Through {match.currentHole}</small> : null}</span>
     </div>
     <div className={styles.course}>
       <Logo filename={match.course?.logo} name={match.course?.name || "Course"} type="course" size="course" />
@@ -143,7 +144,7 @@ function ScoreLeaderboard({ rows = [], round, format }) {
     return map;
   }, [sort.key, sorted]);
   return <section className={styles.leaderboard}>
-    <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{eligible.length ? <em>Live</em> : null}</header>
+    <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{eligible.length ? <StatusBadge status="Live" /> : null}</header>
     {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>
       <div className={styles.leaderRow} data-header="true"><span className={styles.leaderHeading}>Rank</span><span className={styles.leaderHeading}>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key,label]) => <button className={styles.leaderHeading} type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
       {sorted.slice(0, 10).map((row) => <div className={styles.leaderRow} key={`${row.round}-${row.id}`} aria-label={pairing ? `Scramble pairing ${row.name}` : undefined}><i>{ranks.get(row.id)}</i><strong>{row.name}</strong><span>{row.holes >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
