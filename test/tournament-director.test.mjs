@@ -58,6 +58,7 @@ test("health rolls actionable issues into healthy, attention, and action-needed 
   const base = { tournament: { currentRound: 1, directorAutomation: { enabled: true, autoOpenRound: true, autoSetMatchesLive: true } }, schedule: [] };
   const healthy = tournamentDirectorModel({ ...base, rounds: [{ number: 1, matches: [{ id: "M1", match: 1, status: "Final", teeTime: "8:00 AM", course: { name: "Ocean" }, team1Players: [player("A")], team2Players: [player("B")] }] }] }, new Date("2026-07-02T09:00:00"));
   assert.equal(healthy.health.status.label, "Tournament Healthy");
+  assert.equal(healthy.health.status.message, "No action required.");
   const attention = tournamentDirectorModel({ ...base, tournament: { ...base.tournament, directorAutomation: { enabled: false } }, rounds: [{ number: 1, matches: [{ id: "M1", match: 1, status: "Live", currentHole: 5, updatedAt: "2026-07-02T08:30:00", teeTime: "8:00 AM", course: { name: "Ocean" }, team1Players: [player("A")], team2Players: [player("B")] }] }] }, new Date("2026-07-02T09:00:00"));
   assert.equal(attention.health.status.label, "Attention Required");
   assert.equal(attention.issues.find((item) => item.id === "automation").action, "enable-automation");
@@ -85,6 +86,16 @@ test("countdown labels remain operational across minutes, hours, and tomorrow", 
   assert.equal(countdownLabel(134), "in 2 hrs 14 min");
   assert.equal(countdownLabel(24 * 60, "7:30 AM"), "Tomorrow at 7:30 AM");
   assert.equal(countdownLabel(-664), "Started 11 hrs ago");
+});
+
+test("overdue round events provide operational guidance instead of elapsed time", () => {
+  const model = tournamentDirectorModel({
+    tournament: { currentRound: 3, directorAutomation: { enabled: true } },
+    schedule: [],
+    rounds: [{ number: 3, label: "Round 3", format: "Singles", matches: [{ id: "M1", match: 1, status: "Scheduled", teeTime: "7:30 AM", team1Players: [{ id: "A", playingHcp: 2 }], team2Players: [{ id: "B", playingHcp: 4 }] }] }],
+  }, new Date("2026-07-03T18:34:00"));
+  assert.equal(model.nextEvent.countdown, "Round 3 should now be open");
+  assert.doesNotMatch(model.nextEvent.countdown, /hrs? ago|min overdue/);
 });
 
 test("repeated operational issues are grouped with expandable match detail", () => {
@@ -122,6 +133,9 @@ test("Director dashboard contains operations, health, attention, automation, and
   for (const label of ["Round Status", "Tournament Health", "Attention Required", "Quick Actions", "Open Round", "Set All LIVE", "Close Round", "Reopen Match", "Leaderboards", "Tournament Overview", "Automation", "Recent Activity", "Open Full Admin"]) assert.match(dashboard, new RegExp(label));
   assert.match(source("app/admin/director/director.module.css"), /env\(safe-area-inset-bottom\)/);
   assert.match(dashboard, /setInterval\(check, 60_000\)/);
+  assert.doesNotMatch(dashboard, />Manual operating round</);
+  assert.match(dashboard, /<summary>Override Operating Round<\/summary>/);
+  assert.ok(dashboard.indexOf("Set All LIVE") < dashboard.indexOf("Open Round"));
   for (const label of ["Operational Overview", "Next Event", "Tournament countdown", "Auto Open", "Auto LIVE", "Immediate Action Required", "No score submitted", "READY"]) assert.match(dashboard + source("lib/tournament-director.js"), new RegExp(label));
 });
 
