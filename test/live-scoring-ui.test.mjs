@@ -50,10 +50,10 @@ test("final scorecard is a read-only official record with running match status",
   assert.match(source, /OFFICIAL TOURNAMENT RECORD/);
   assert.match(source, /className=\{styles\.officialCourse\}/);
   assert.match(source, /className=\{styles\.finalMatchSummary\}/);
-  assert.match(source, /Winning Team/);
+  assert.match(source, /finalResultText/);
   assert.match(source, /Match Number/);
   assert.match(source, /Tee Time/);
-  assert.match(source, /Starting Hole/);
+  assert.doesNotMatch(source, /Starting Hole/);
   assert.match(source, /role="table"/);
   assert.match(source, /data-running="true"/);
   assert.match(source, /runningMatchStatusAtHole/);
@@ -96,8 +96,24 @@ test("final scorecard is the primary My Match record with secondary Game Center 
   assert.match(source, /viewFinalScorecard/);
   assert.match(source, /View Game Center →/);
   assert.match(source, /Final match summary/);
-  assert.match(source, /Winning Team/);
+  assert.match(source, /finalResultSummary/);
   assert.match(source, /Official Match Scorecard/);
+});
+
+test("final scorecard uses compact aligned hole winners and a non-redundant summary", async () => {
+  const [source, styles] = await Promise.all([
+    readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/score/score.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(source, /function compactTeamName/);
+  assert.match(source, /split\(\/\\s\+and\\s\+\/i\)\[0\]/);
+  assert.match(source, /compactHoleWinnerMark\(score, teamNames\)/);
+  assert.match(source, /function finalResultSummary/);
+  assert.match(source, /`Won \$\{notation\}`/);
+  assert.doesNotMatch(source, /<small>Winning Team<\/small>/);
+  assert.doesNotMatch(source, /Starting Hole/);
+  assert.match(styles, /\.scorecardRow\[data-winner=true\]>button[^}]*white-space:nowrap/);
+  assert.match(styles, /\.finalCourse\{[^}]*grid-column:1\/-1/);
 });
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {

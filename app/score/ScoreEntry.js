@@ -31,6 +31,31 @@ function holeWinnerMark(score, teamNames) {
   return score?.["Hole Winner"] === "Halved" ? "—" : "";
 }
 
+function compactTeamName(value) {
+  const name = String(value || "").trim().replace(/^the\s+/i, "");
+  return name.split(/\s+and\s+/i)[0] || name;
+}
+
+function compactHoleWinnerMark(score, teamNames) {
+  if (score?.["Hole Winner"] === "Team 1") return compactTeamName(teamNames[1] || "Team 1");
+  if (score?.["Hole Winner"] === "Team 2") return compactTeamName(teamNames[2] || "Team 2");
+  return "—";
+}
+
+function finalResultSummary(result, teamNames) {
+  if (/^halved$/i.test(String(result || "").trim())) return "Halved";
+  let notation = String(result || "").trim();
+  for (const name of [teamNames[1], teamNames[2]]) {
+    if (name && notation.toLowerCase().startsWith(String(name).toLowerCase())) {
+      notation = notation.slice(String(name).length).trim();
+      break;
+    }
+  }
+  if (!notation) return "Final";
+  if (/^won\b/i.test(notation)) return notation.replace(/^won\b/i, "Won");
+  return `Won ${notation}`;
+}
+
 function ScorecardCell({ readOnly, disabled, onEdit, children, label }) {
   if (readOnly) return <span aria-label={label}>{children}</span>;
   return <button type="button" disabled={disabled} onClick={onEdit} aria-label={label}>{children}</button>;
@@ -204,7 +229,6 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   const display = data?.display || {};
   const teeName = display.course?.tee || match.Tee || match["Tee Played"] || "";
   const teeTime = match["Tee Time"] || "";
-  const startingHole = match["Starting Hole"] || "";
   const teamNames = display.teamNames || {};
   const playerNames = display.playerNames || {};
   const isFinal = match["Match Status"] === "Final";
@@ -218,6 +242,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     if (/^(team 2|2)$/i.test(winner)) return teamNames[2] || "Team 2";
     return [teamNames[1], teamNames[2]].find((name) => name && finalResult.toLowerCase().startsWith(String(name).toLowerCase())) || winner || "Final result recorded";
   })();
+  const finalResultText = finalResultSummary(finalResult, teamNames);
   const format = String(match.Format || "").toUpperCase();
   const slots = format === "BB" ? 2 : 1;
   const savedHole = data?.holeScores?.find((item) => Number(item["Hole Number"]) === holeNumber);
@@ -392,20 +417,18 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       <small>Tap a recorded hole below to make a correction.</small>
     </div> : null}
     {isFinal ? <section className={styles.finalMatchSummary} aria-label="Final match summary">
-      <div className={styles.finalSummaryLead}><span>OFFICIAL TOURNAMENT RECORD</span><StatusBadge status="Final" /><small>Winning Team</small><strong>{finalWinner}</strong><b>{finalResult || "Final"}</b><em>{completed.size} holes recorded • Read-only</em></div>
+      <div className={styles.finalSummaryLead}><span>OFFICIAL TOURNAMENT RECORD</span><StatusBadge status="Final" /><strong>{finalWinner}</strong>{finalResultText !== "Halved" ? <b>{finalResultText}</b> : null}<em>{completed.size} holes recorded • Read-only</em></div>
       <div className={styles.finalSummaryMeta}>
         <span><small>Round</small><strong>{match.Round || "—"}</strong></span>
         <span><small>Match Number</small><strong>{match.Match || "—"}</strong></span>
-        <span><small>Course</small><strong>{display.courseName || match["Course ID"] || "—"}</strong></span>
+        <span className={styles.finalCourse}><small>Course</small><strong>{display.courseName || match["Course ID"] || "—"}</strong></span>
         <span><small>Tees</small><strong>{teeName || "—"}</strong></span>
         <span><small>Tee Time</small><strong>{teeTime || "—"}</strong></span>
-        <span><small>Starting Hole</small><strong>{startingHole || "—"}</strong></span>
       </div>
     </section> : <div className={styles.officialCourse}>
       <span><small>Course</small><strong>{display.courseName || match["Course ID"] || "Course recorded with match"}</strong></span>
       {teeName ? <span><small>Tees</small><strong>{teeName}</strong></span> : null}
       {teeTime ? <span><small>Tee Time</small><strong>{teeTime}</strong></span> : null}
-      {startingHole ? <span><small>Starting Hole</small><strong>{startingHole}</strong></span> : null}
     </div>}
     <div className={styles.officialRecord}>
       <div><strong>{teamNames[1] || "Team 1"}</strong><span>{playerIds(match, 1).map((id) => playerNames[id] || id).filter(Boolean).join(" • ") || "Players recorded with match"}</span></div>
@@ -431,7 +454,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
         <strong role="rowheader">{teamNames[side] || `Team ${side}`}<small>NET {format === "BB" ? "BEST BALL" : format === "SC" ? "SCRAMBLE" : "SCORE"}</small></strong>
         {nine.map(({ number, score }) => <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${teamNames[side] || `Team ${side}`} net ${score?.[`Team ${side} Net Score`] || "not recorded"}`} key={number}>{score?.[`Team ${side} Net Score`] || "—"}</ScorecardCell>)}
       </div>)}
-      <div className={styles.scorecardRow} data-winner="true" role="row"><strong role="rowheader">Hole winner</strong>{nine.map(({ number, score }) => <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${holeWinnerMark(score, teamNames) || "not recorded"}`} key={number}>{holeWinnerMark(score, teamNames) || "—"}</ScorecardCell>)}</div>
+      <div className={styles.scorecardRow} data-winner="true" role="row"><strong role="rowheader">Hole winner</strong>{nine.map(({ number, score }) => <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${holeWinnerMark(score, teamNames) || "not recorded"}`} key={number}>{compactHoleWinnerMark(score, teamNames)}</ScorecardCell>)}</div>
       <div className={styles.scorecardRow} data-running="true" role="row"><strong role="rowheader">Match status</strong>{nine.map(({ number, score }) => {
         const running = runningMatchStatusAtHole(data?.holeScores, number, teamNames);
         const compact = running.replace(`${teamNames[1]} `, "").replace(`${teamNames[2]} `, "");
