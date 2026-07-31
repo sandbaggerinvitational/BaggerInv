@@ -12,6 +12,7 @@
   --muted: #6d746f;
   --line: #ddd6c8;
   --shadow: 0 22px 60px rgba(15, 35, 25, 0.10);
+  --participant-nav-height: 68px;
 }
 
 .liveControlEmbedded {
@@ -143,8 +144,13 @@ button:disabled { cursor: not-allowed; }
 
 @media (max-width: 760px) {
   body.passport-navigation-active {
-    padding-bottom: calc(82px + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--participant-nav-height) + env(safe-area-inset-bottom));
+    scroll-padding-bottom: calc(var(--participant-nav-height) + env(safe-area-inset-bottom));
   }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  :root { --participant-nav-height: 58px; }
 }
 
 

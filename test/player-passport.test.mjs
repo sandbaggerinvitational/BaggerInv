@@ -161,6 +161,29 @@ test("Participant Mode shell preserves verified identity across temporary revali
   assert.match(globals, /body\.passport-navigation-active/);
 });
 
+test("participant navigation uses one fixed safe-area-aware native shell", async () => {
+  const [navigation, styles, globals] = await Promise.all([
+    readFile(new URL("../app/ParticipantIdentity.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/participant-navigation.module.css", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(navigation, /function NavIcon/);
+  assert.match(navigation, /icon: "home"/);
+  assert.match(navigation, /icon: "golf"/);
+  assert.match(navigation, /icon: "trophy"/);
+  assert.match(navigation, /icon: "podium"/);
+  assert.match(navigation, /icon: "profile"/);
+  assert.match(navigation, /strokeWidth: 1\.8/);
+  assert.match(styles, /position:fixed!important/);
+  assert.match(styles, /inset:auto 0 0!important/);
+  assert.match(styles, /safe-area-inset-left/);
+  assert.match(styles, /safe-area-inset-right/);
+  assert.match(styles, /orientation:landscape/);
+  assert.match(styles, /prefers-reduced-motion:reduce/);
+  assert.match(globals, /--participant-nav-height: 68px/);
+  assert.match(globals, /scroll-padding-bottom: calc\(var\(--participant-nav-height\) \+ env\(safe-area-inset-bottom\)\)/);
+});
+
 test("Participant Mode active destinations cover direct and nested routes", () => {
   assert.equal(participantDestination("/", "", "clay-beltran"), "Home");
   assert.equal(participantDestination("/home", "", "clay-beltran"), "Home");

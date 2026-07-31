@@ -9,12 +9,29 @@ import styles from "./participant-navigation.module.css";
 const PARTICIPANT_SHELL_KEY = "sbi-participant-shell";
 
 const itemsFor = (player) => [
-  { href: "/home", label: "Home", icon: "⌂" },
-  { href: "/my-match", label: "My Match", icon: "○" },
-  { href: "/live", label: "Tournament", icon: "◆" },
-  { href: "/live?view=leaderboards", label: "Leaderboards", icon: "≡" },
-  { href: "/me", label: "Me", icon: "●" },
+  { href: "/home", label: "Home", icon: "home" },
+  { href: "/my-match", label: "My Match", icon: "golf" },
+  { href: "/live", label: "Tournament", icon: "trophy" },
+  { href: "/live?view=leaderboards", label: "Leaderboards", icon: "podium" },
+  { href: "/me", label: "Me", icon: "profile" },
 ];
+
+function NavIcon({ name }) {
+  const common = {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+  };
+  if (name === "home") return <svg {...common}><path d="m3.5 10.5 8.5-7 8.5 7"/><path d="M5.5 9.4V21h13V9.4"/><path d="M9.5 21v-6h5v6"/></svg>;
+  if (name === "golf") return <svg {...common}><path d="M7 21V3"/><path d="M7 4h9l-2.2 3L16 10H7"/><path d="M3.5 21c0-1.7 3.8-3 8.5-3s8.5 1.3 8.5 3"/><circle cx="16.5" cy="14.5" r="1.2"/></svg>;
+  if (name === "trophy") return <svg {...common}><path d="M8 4h8v4.5a4 4 0 0 1-8 0Z"/><path d="M8 6H4.5v1.5A3.5 3.5 0 0 0 8 11"/><path d="M16 6h3.5v1.5A3.5 3.5 0 0 1 16 11"/><path d="M12 12.5V17M8.5 21h7M9.5 17h5"/></svg>;
+  if (name === "podium") return <svg {...common}><path d="M3 21v-7h6v7M9 21V8h6v13M15 21v-10h6v10"/><path d="M11 4.5 12 3l1 1.5 1.7.4-1.1 1.3.1 1.8L12 7.3 10.3 8l.1-1.8-1.1-1.3Z"/></svg>;
+  return <svg {...common}><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg>;
+}
 
 export default function ParticipantIdentity() {
   const pathname = usePathname();
@@ -81,7 +98,7 @@ export default function ParticipantIdentity() {
       {items.map((item) => {
         const active = currentDestination === item.label;
         return <Link href={item.href} prefetch={false} aria-current={active ? "page" : undefined} key={item.label}>
-          <span aria-hidden="true">{item.icon}</span><b>{item.label}</b>
+          <span aria-hidden="true"><NavIcon name={item.icon} /></span><b>{item.label}</b>
         </Link>;
       })}
     </nav>
