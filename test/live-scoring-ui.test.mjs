@@ -46,7 +46,8 @@ test("active scoring keeps hole, match status, progress, and next action visible
 test("final scorecard is a read-only official record with running match status", async () => {
   const source = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
   assert.match(source, /data-scorecard-state=\{isFinal \? "final" : "review"\}/);
-  assert.match(source, /Official Match Scorecard/);
+  assert.match(source, /Official Tournament Scorecard/);
+  assert.doesNotMatch(source, /Official Match Scorecard/);
   assert.match(source, /OFFICIAL TOURNAMENT RECORD/);
   assert.match(source, /className=\{styles\.officialCourse\}/);
   assert.match(source, /className=\{styles\.finalMatchSummary\}/);
@@ -97,7 +98,7 @@ test("final scorecard is the primary My Match record with secondary Game Center 
   assert.match(source, /View Game Center →/);
   assert.match(source, /Final match summary/);
   assert.match(source, /finalResultSummary/);
-  assert.match(source, /Official Match Scorecard/);
+  assert.match(source, /Official Tournament Scorecard/);
 });
 
 test("final scorecard uses compact aligned hole winners and a non-redundant summary", async () => {
@@ -114,6 +115,13 @@ test("final scorecard uses compact aligned hole winners and a non-redundant summ
   assert.doesNotMatch(source, /Starting Hole/);
   assert.match(styles, /\.scorecardRow\[data-winner=true\]>button[^}]*white-space:nowrap/);
   assert.match(styles, /\.finalCourse\{[^}]*grid-column:1\/-1/);
+});
+
+test("scramble scorecard team rows omit redundant gross terminology", async () => {
+  const source = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
+  assert.match(source, /format === "SC" \? teamNames\[side\] \|\| `Team \$\{side\}`/);
+  assert.doesNotMatch(source, /`\$\{teamNames\[side\].*\} gross`/);
+  assert.match(source, /format === "SC" \? "SCRAMBLE"/);
 });
 
 test("public Match Center refreshes while visible and stops its timer cleanly", async () => {

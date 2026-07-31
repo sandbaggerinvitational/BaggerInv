@@ -409,7 +409,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
 
   if (showReview) return <section className={`${styles.shell} ${styles.reviewShell}`} data-scorecard-state={isFinal ? "final" : "review"}>
     {tournamentIdentity}
-    <header className={styles.scorecardHeading}><div><span>{display.formatName || format}</span><h1>{isFinal ? "Official Match Scorecard" : "Review Scorecard"}</h1></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
+    <header className={styles.scorecardHeading}><div><span>{display.formatName || format}</span><h1>{isFinal ? "Official Tournament Scorecard" : "Review Scorecard"}</h1></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
     {!isFinal ? <div className={styles.reviewStatus}>
       <div className={styles.reviewBadge}><StatusBadge status="Current Match" /></div>
       <span>REVIEW BEFORE SUBMITTING</span>
@@ -440,7 +440,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       {[1, 2].flatMap((side) => {
         const ids = playerIds(match, side);
         return Array.from({ length: slots }, (_, index) => <div className={styles.scorecardRow} role="row" key={`${side}-${index}`}>
-          <strong role="rowheader">{format === "SC" ? `${teamNames[side] || `Team ${side}`} gross` : playerNames[ids[index]] || ids[index]}</strong>
+          <strong role="rowheader">{format === "SC" ? teamNames[side] || `Team ${side}` : playerNames[ids[index]] || ids[index]}</strong>
           {nine.map(({ number, score }) => {
             const metadata = data?.courseHoles?.find((item) => Number(item["Hole Number"]) === number);
             const total = format === "SC" ? match[`Team ${side} Stroke`] : match[`Team ${side} Player ${index + 1} Stroke`];
