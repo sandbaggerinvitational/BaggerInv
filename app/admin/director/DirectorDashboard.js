@@ -56,9 +56,10 @@ export default function DirectorDashboard({ directorName }) {
     finally { setBusy(""); }
   };
   const resolveIssue = (item) => {
-    if (item.action === "enable-automation") return act("automation", { enabled: true, autoOpenRound: true, autoSetMatchesLive: true });
-    if (item.action === "open-round") { if (item.id.startsWith("round:")) setSelectedRound(item.id.split(":")[1]); return act("open-round", { round: Number(item.id.split(":")[1] || selectedRound) }); }
-    if (item.action === "retry") return load().catch((error) => setMessage(error.message));
+    const source = item.items?.[0] || item;
+    if (source.action === "enable-automation") return act("automation", { enabled: true, autoOpenRound: true, autoSetMatchesLive: true });
+    if (source.action === "open-round") { if (source.id.startsWith("round:")) setSelectedRound(source.id.split(":")[1]); return act("open-round", { round: Number(source.id.split(":")[1] || selectedRound) }); }
+    if (source.action === "retry") return load().catch((error) => setMessage(error.message));
     return null;
   };
   if (!data) return <section className={styles.shell}><div className={styles.loading} role="status">{message || "Opening Tournament Director…"}</div></section>;
@@ -84,13 +85,13 @@ export default function DirectorDashboard({ directorName }) {
       <div><StatusBadge status={item.status} /><b>{item.final} / {item.total} Final</b><small>{item.live ? `${item.live} Live · ` : ""}{item.upcoming} Upcoming</small></div>
     </article>)}</section>
 
-    <section className={styles.health} data-level={data.health.status.level} aria-labelledby="health-title"><header><div><span>At a glance</span><h2 id="health-title">Tournament Health</h2></div><strong className={styles.healthStatus}>{data.health.status.icon} {data.health.status.label}</strong></header><div>{HEALTH.map(([key, label]) => <article data-attention={["awaitingConfirmation", "reopened", "errors"].includes(key) && data.health[key] ? "true" : undefined} key={key}><strong>{data.health[key]}</strong><span>{label}</span></article>)}</div><p>{data.health.issueCount ? `${data.health.issueCount} operational item${data.health.issueCount === 1 ? "" : "s"} detected · ` : "No operational issues · "}Last synchronization: {timestamp(data.health.lastSynchronization)}</p></section>
+    <section className={styles.health} data-level={data.health.status.level} aria-labelledby="health-title"><header><div><span>At a glance</span><h2 id="health-title">Tournament Health</h2></div></header><div className={styles.healthBanner}><strong>{data.health.status.icon} {data.health.status.label}</strong><span>{data.health.status.message}</span></div><div>{HEALTH.map(([key, label]) => <article data-attention={["awaitingConfirmation", "reopened", "errors"].includes(key) && data.health[key] ? "true" : undefined} key={key}><strong>{data.health[key]}</strong><span>{label}</span></article>)}</div><p>Last synchronization: {timestamp(data.health.lastSynchronization)}</p></section>
 
-    {data.issues.length ? <section className={styles.attention}><span>Attention Required</span><h2>Operational actions</h2><div>{data.issues.map((item) => <article data-severity={item.severity} key={item.id}><i aria-hidden="true">{item.severity === "critical" ? "⚠" : "●"}</i><div><strong>{item.title}</strong><p>{item.message}</p></div>{item.action ? <button disabled={Boolean(busy)} onClick={() => resolveIssue(item)}>{item.actionLabel}</button> : <Link href={item.href}>{item.actionLabel}</Link>}</article>)}</div></section> : null}
+    {data.issueGroups.length ? <section className={styles.attention}><span>Attention Required</span><h2>Operational actions</h2><div>{data.issueGroups.map((item) => <article data-severity={item.severity} key={item.id}><i aria-hidden="true">{item.severity === "critical" ? "●" : item.severity === "warning" ? "▲" : "ℹ"}</i><div><strong>{item.title}</strong><p>{item.message}</p><small>{item.impact}</small>{item.items.length > 1 ? <details><summary>View {item.items.length} matches</summary><ul>{item.items.map((matchIssue) => <li key={matchIssue.id}>{matchIssue.title} · {matchIssue.message}</li>)}</ul></details> : null}</div>{item.action ? <button disabled={Boolean(busy)} onClick={() => resolveIssue(item)}>{item.actionLabel}</button> : <Link href={item.href}>{item.actionLabel}</Link>}</article>)}</div></section> : null}
 
     <section className={styles.actions} id="quick-actions" aria-labelledby="actions-title"><header><span>One-tap operations</span><h2 id="actions-title">Quick Actions</h2></header><div>
-      <button className={!round?.open ? styles.readyAction : styles.openedAction} disabled={Boolean(busy) || Boolean(round?.open)} onClick={() => act("open-round")}>{!round?.open ? <>🟢 <span>READY</span> Open Round {selectedRound}</> : <>✓ Round {selectedRound} Open</>}</button>
       <button disabled={Boolean(busy)} onClick={() => act("set-live")}>Set All LIVE</button>
+      <button className={!round?.open ? styles.readyAction : styles.openedAction} disabled={Boolean(busy) || Boolean(round?.open)} onClick={() => act("open-round")}>{!round?.open ? <>🟢 <span>READY</span> Open Round {selectedRound}</> : <>✓ Round {selectedRound} Open</>}</button>
       <button disabled={Boolean(busy) || !round || finalMatches !== round.total} onClick={() => act("close-round")}>Close Round</button>
       <label><span>Reopen finalized match</span><select value={reopenId} onChange={(event) => setReopenId(event.target.value)}><option value="">Select match</option>{(data.finalizedMatches || []).filter((item) => String(item.round) === selectedRound).map((item) => <option value={item.id} key={item.id}>Match {item.match} · {item.id}</option>)}</select><button disabled={Boolean(busy) || !reopenId} onClick={() => act("reopen-match", { matchId: reopenId })}>Reopen Match</button></label>
       <Link href="/live?view=leaderboards">Leaderboards</Link><Link href="/live">Tournament Overview</Link>
