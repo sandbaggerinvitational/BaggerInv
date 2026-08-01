@@ -2,6 +2,7 @@ import { privatePageMetadata } from "../../lib/seo";
 import MobileTournamentHome from "../MobileTournamentHome";
 import PreviewModeBadge from "../PreviewModeBadge";
 import { getTournamentData } from "../live/sheetData";
+import { workbookInitializationMessage } from "../../lib/tournament-workbook-initialization";
 
 export const dynamic = "force-dynamic";
 export const metadata = privatePageMetadata("Home | Sandbagger Invitational");
@@ -14,7 +15,7 @@ export default async function MobileHomePage() {
     liveData = await getTournamentData();
   } catch (caughtError) {
     console.error("Mobile tournament dashboard could not be loaded.", caughtError);
-    error = "The tournament dashboard is temporarily unavailable.";
+    error = workbookInitializationMessage(caughtError, "The tournament dashboard is temporarily unavailable.");
   }
 
   if (!liveData?.tournament) {

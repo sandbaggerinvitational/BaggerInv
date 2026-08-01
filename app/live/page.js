@@ -5,6 +5,7 @@ import { getTournamentData } from "./sheetData";
 import { pageMetadata } from "../../lib/seo";
 import PreviewModeBadge from "../PreviewModeBadge";
 import styles from "./tournament-dashboard.module.css";
+import { workbookInitializationMessage } from "../../lib/tournament-workbook-initialization";
 
 export const metadata = pageMetadata({
   title: "Match Center | Sandbagger Invitational",
@@ -20,8 +21,10 @@ export default async function LivePage() {
     data = await getTournamentData();
   } catch (caughtError) {
     console.error(caughtError);
-    error =
-      "Tournament data is temporarily unavailable. Confirm the normalized tournament workbook is configured for this environment.";
+    error = workbookInitializationMessage(
+      caughtError,
+      "Tournament data is temporarily unavailable. Confirm the normalized tournament workbook is configured for this environment."
+    );
   }
 
   return (

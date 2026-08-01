@@ -27,6 +27,7 @@ import {
 } from "../../lib/google-sheets-server-read";
 import { isTransientGoogleError } from "../../lib/google-api-reliability";
 import { calculateNetSkins } from "../../lib/net-skins";
+import { initializeTournamentWorkbook } from "../../lib/tournament-workbook-initialization";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -308,15 +309,22 @@ function tieAdvantageSide(tournamentRow, teams) {
 
 async function buildTournamentData() {
   let sheets;
+  let workbookChecks = { required: {}, optional: {} };
   if (authenticatedPreviewReadsEnabled()) {
-    const names = [
+    const requiredNames = [
       "Live Matches", "Matches", "Live Tournaments", "Players", "Team Names",
       "Tournaments", "Courses", "Tournament Rules", "Live Hole Scores",
       "Course Holes", "Tournament Itinerary",
-      "Net Skins", "Net Skins Result",
     ];
-    const values = await readNormalizedSheetsValues(names);
-    sheets = Object.fromEntries(names.map((name) => [name, table(values[name] || [])]));
+    const optionalNames = ["Net Skins", "Net Skins Result"];
+    const initialized = await initializeTournamentWorkbook({
+      requiredNames,
+      optionalNames,
+      readRequired: readNormalizedSheetsValues,
+      readSheet: readNormalizedSheetValues,
+    });
+    sheets = Object.fromEntries([...requiredNames, ...optionalNames].map((name) => [name, table(initialized.sheets[name] || [])]));
+    workbookChecks = initialized.checks;
   } else {
     const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows, netSkinsRows, netSkinsResultRows] = await Promise.all([
       fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
@@ -555,6 +563,7 @@ async function buildTournamentData() {
   netSkins.storedResults = netSkinsResultRows.filter((row) => Number(row.Year) === Number(year));
 
   return {
+    workbookChecks,
     tournament: { ...tournament, state },
     rounds,
     remainingByRound: remainingByRound(rounds),
@@ -580,6 +589,7 @@ const loaderDiagnostics = {
   cacheBehavior: "miss",
   staleFallbacks: 0,
   errorCategory: "",
+  workbookCheck: "",
   requiredSheetsFound: false,
 };
 
@@ -595,12 +605,14 @@ export async function getTournamentData() {
       lastGoodAt = Date.now();
       loaderDiagnostics.result = "success";
       loaderDiagnostics.errorCategory = "";
+      loaderDiagnostics.workbookCheck = "";
       loaderDiagnostics.requiredSheetsFound = true;
       return data;
     })
     .catch((error) => {
       loaderDiagnostics.result = "error";
       loaderDiagnostics.errorCategory = error?.category || "unknown";
+      loaderDiagnostics.workbookCheck = error?.workbookCheck || "";
       if (isTransientGoogleError(error) && lastGoodTournamentData && Date.now() - lastGoodAt < 60_000) {
         loaderDiagnostics.cacheBehavior = "stale-on-transient-error";
         loaderDiagnostics.staleFallbacks += 1;
