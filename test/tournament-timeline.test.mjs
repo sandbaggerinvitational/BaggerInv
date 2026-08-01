@@ -125,6 +125,6 @@ test("Home and Director hide operational schedule sections when Timeline is unav
   assert.match(director, /No remaining scheduled events today\./);
   assert.match(loader, /console\.warn\(timeline\.diagnostic\)/);
   assert.match(loader, /schedule: timeline\.events/);
-  assert.match(loader, /previewDate: process\.env\.PREVIEW_TIMELINE_DATE/);
+  assert.match(loader, /previewDate: process\.env\.PREVIEW_TIMELINE_DATE \|\| tournamentRow\["Preview Timeline Date"\]/);
   assert.match(loader, /previewEnabled: process\.env\.VERCEL_ENV === "preview"/);
 });
