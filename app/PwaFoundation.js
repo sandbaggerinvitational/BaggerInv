@@ -9,6 +9,7 @@ export default function PwaFoundation() {
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [online, setOnline] = useState(true);
   const [updateReady, setUpdateReady] = useState(false);
+  const [showGlobalInstall, setShowGlobalInstall] = useState(false);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -29,6 +30,7 @@ export default function PwaFoundation() {
     window.addEventListener("online", syncOnlineState);
     window.addEventListener("offline", syncOnlineState);
     setDismissed(window.localStorage.getItem("sbi-pwa-prompt-dismissed") === "true");
+    setShowGlobalInstall(window.location.pathname !== "/home");
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
@@ -36,12 +38,20 @@ export default function PwaFoundation() {
     setShowIosHelp(ios && !standalone);
     const capture = (event) => {
       event.preventDefault();
+      window.__sbiInstallPrompt = event;
+      window.dispatchEvent(new Event("sbi:pwa-installable"));
       setPrompt(event);
       setDismissed(false);
     };
+    const installed = () => {
+      window.__sbiInstallPrompt = null;
+      window.dispatchEvent(new Event("sbi:pwa-installed"));
+    };
     window.addEventListener("beforeinstallprompt", capture);
+    window.addEventListener("appinstalled", installed);
     return () => {
       window.removeEventListener("beforeinstallprompt", capture);
+      window.removeEventListener("appinstalled", installed);
       window.removeEventListener("online", syncOnlineState);
       window.removeEventListener("offline", syncOnlineState);
     };
@@ -49,7 +59,7 @@ export default function PwaFoundation() {
 
   if (!online) return <aside className={styles.offline} role="status" aria-live="polite"><i aria-hidden="true" />Offline · scores require a connection</aside>;
   if (updateReady) return <aside className={styles.update} role="status"><p>A newer version of SBI is ready.</p><button type="button" onClick={() => window.location.reload()}>Update</button></aside>;
-  if (dismissed || (!prompt && !showIosHelp)) return null;
+  if (!showGlobalInstall || dismissed || (!prompt && !showIosHelp)) return null;
   return <aside className={styles.install} aria-label="Install SBI app">
     {prompt ? (
       <button type="button" onClick={async () => {

@@ -5,7 +5,7 @@ import { playerPassportTokenFromRequest } from "../../../lib/player-passport.js"
 import { inspectPlayerPassportToken } from "../../../lib/player-passport-server.js";
 import { isTournamentDirector } from "../../../lib/player-role.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
+import { readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 
 export const dynamic = "force-dynamic";
@@ -24,8 +24,8 @@ export async function GET(request) {
   const identity = await authorize(request);
   if (!identity) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
   try {
-    const tournamentData = await getTournamentData();
-    return NextResponse.json({ data: tournamentDirectorModel({ ...tournamentData, diagnostics: tournamentLoaderDiagnostics() }) }, { headers: { "Cache-Control": "no-store" } });
+    const [tournamentData, readiness] = await Promise.all([getTournamentData(), readTournamentReadiness()]);
+    return NextResponse.json({ data: tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() }) }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Director dashboard is temporarily unavailable." }, { status: 503 });
   }

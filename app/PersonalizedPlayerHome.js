@@ -13,6 +13,7 @@ import { courseLogo, teamLogo } from "../lib/asset-paths";
 import { formatHomeTime } from "../lib/home-dashboard";
 import MobileIdentityImage from "./MobileIdentityImage";
 import MatchStatusBlock from "./MatchStatusBlock";
+import PlayerSetupBanner from "./PlayerSetupBanner";
 import styles from "./personalized-player-home.module.css";
 
 function roundMatchMeta(match) {
@@ -236,6 +237,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
   const primaryResult = primary ? formatMatchResult(primary, primary.team?.side) : "";
 
   return <section className={styles.wrap} aria-labelledby="player-home-title">
+    <PlayerSetupBanner readiness={payload?.readiness} onUpdated={refresh} />
     {!matches.length ? <div className={styles.empty}>
       <p>Your Tournament</p>
       <h2 id="player-home-title">No assigned matches yet</h2>
