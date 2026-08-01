@@ -121,8 +121,12 @@ test("Net Skins polish exposes official summary terminology and participant high
   for (const label of ["Net Skins Competition", "Round Pot", "Entrants", "Skins Awarded", "Value Per Skin"]) assert.match(source, new RegExp(label));
   assert.doesNotMatch(source, /Independent Competition|Current Skin Value/);
   assert.match(source, /row\.playerIds\?\.includes\(currentPlayer\.id\)/);
-  assert.match(source, /💰 Hole \{skin\.hole\}/);
+  assert.match(source, /skinCoin/);
+  const netSkinsSource = source.slice(source.indexOf("function NetSkins"), source.indexOf("export default function"));
+  assert.doesNotMatch(netSkinsSource, /<em>YOU<\/em>|💰 Hole/);
   assert.match(css, /\.entry\[data-current="true"\]/);
+  assert.match(css, /background:\s*#fffaf0/);
+  assert.match(css, /inset 3px 0 #c49b34/);
 });
 
 test("Home Net Skins card is participant-only and links to official standings", async () => {
@@ -133,6 +137,8 @@ test("Home Net Skins card is participant-only and links to official standings", 
   assert.match(home, /if \(!playerId \|\| !entries\.length\) return null/);
   assert.match(home, /Your Skins/);
   assert.match(home, /Current Winnings/);
+  assert.match(home, /Your Competitions/);
+  assert.match(home, /View Net Skins/);
   assert.match(home, /\/live\?view=leaderboards&tab=skins/);
   assert.match(command, /netSkins=\{liveData\?\.netSkins\}/);
 });

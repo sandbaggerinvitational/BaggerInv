@@ -173,9 +173,9 @@ function NetSkinsBoard({ data, currentPlayer }) {
         <div className={skinsStyles.row} data-header="true"><span>Rank</span><span>{round.format === "SC" ? "Team" : "Player"}</span><span>Skins</span><span>Winnings</span></div>
         {round.leaderboard.map((row) => { const isCurrent = Boolean(currentPlayer?.id && row.playerIds?.includes(currentPlayer.id)); return <div className={skinsStyles.entry} data-current={isCurrent || undefined} key={row.id}>
           <button type="button" className={skinsStyles.row} aria-expanded={expanded === row.id} aria-label={`${row.name}, ${row.skinsWon} skins, ${currency(row.totalWinnings)} winnings${isCurrent ? ", your entry" : ""}`} onClick={() => setExpanded((current) => current === row.id ? "" : row.id)}>
-            <strong>{row.displayRank}</strong><b>{row.name}{isCurrent ? <em>YOU</em> : null}</b><span>{row.skinsWon}</span><strong>{currency(row.totalWinnings)}</strong>
+            <strong>{row.displayRank}</strong><b>{row.name}</b><span>{row.skinsWon}</span><strong>{currency(row.totalWinnings)}</strong>
           </button>
-          {expanded === row.id ? <div className={skinsStyles.details}>{row.winningHoles.length ? row.winningHoles.map((skin) => <div key={skin.hole}><span>💰 Hole {skin.hole}</span><small>{round.format === "SC" ? "Scramble" : round.format === "SI" ? "Singles" : "Best Ball"}<br />Net {skin.winningNetScore}</small><strong>+{currency(skin.skinValue)}</strong></div>) : <p>No skins won in this round.</p>}</div> : null}
+          {expanded === row.id ? <div className={skinsStyles.details}>{row.winningHoles.length ? row.winningHoles.map((skin) => <div key={skin.hole}><span><i className={skinsStyles.skinCoin} aria-hidden="true">S</i>Hole {skin.hole}</span><small>{round.format === "SC" ? "Scramble" : round.format === "SI" ? "Singles" : "Best Ball"}<br />Net {skin.winningNetScore}</small><strong>+{currency(skin.skinValue)}</strong></div>) : <p>No skins won in this round.</p>}</div> : null}
         </div>; })}
       </div>}
       {!round.complete ? <p className={skinsStyles.note}>{round.completedHoles} of 18 holes have a complete eligible field. Values recalculate as official scores arrive.</p> : null}

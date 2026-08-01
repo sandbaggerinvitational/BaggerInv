@@ -142,7 +142,7 @@ function PlayerNetSkins({ netSkins, playerId }) {
   const skins = entries.reduce((sum, row) => sum + (Number(row.skinsWon) || 0), 0);
   const winnings = entries.reduce((sum, row) => sum + (Number(row.totalWinnings) || 0), 0);
   return <section className={styles.netSkins} aria-labelledby="home-net-skins-title">
-    <header><span aria-hidden="true">💰</span><div><p>Net Skins</p><h2 id="home-net-skins-title">Your Competition</h2></div><Link href="/live?view=leaderboards&tab=skins">View standings</Link></header>
+    <header><span className={styles.skinCoin} aria-hidden="true">S</span><div><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2></div><Link href="/live?view=leaderboards&tab=skins">View Net Skins <i aria-hidden="true">→</i></Link></header>
     <div><span><small>Your Skins</small><strong>{skins}</strong></span><span><small>Current Winnings</small><strong>{skinsCurrency(winnings)}</strong></span></div>
   </section>;
 }

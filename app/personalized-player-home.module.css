@@ -14,9 +14,11 @@
 
 .netSkins > header { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 9px; }
 .netSkins > header > span { font-size: 1.15rem; }
+.netSkins .skinCoin { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid #9a741e; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f7de8d, #c49b34 62%, #98701c); box-shadow: inset 0 0 0 3px #f2d77c, 0 2px 4px rgba(67, 49, 12, .16); color: #fffdf6; font: 900 .72rem/1 Georgia, serif; }
 .netSkins p { margin: 0; color: var(--home-eyebrow-color, #b58a25); font-size: .57rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
 .netSkins h2 { margin: 2px 0 0; color: #0a4032; font: 700 1.08rem/1 Georgia, serif; }
 .netSkins a { min-height: 44px; display: inline-flex; align-items: center; color: #0b4435; font-size: .69rem; font-weight: 900; text-decoration: none; }
+.netSkins a i { margin-left: 4px; font-style: normal; }
 .netSkins > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 10px; border-top: 1px solid #e5dbc7; }
 .netSkins > div > span { display: grid; justify-items: center; gap: 3px; padding: 10px 6px 0; text-align: center; }
 .netSkins > div > span + span { border-left: 1px solid #e5dbc7; }
