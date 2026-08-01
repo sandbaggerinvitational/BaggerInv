@@ -51,6 +51,24 @@ test("workbook initialization exposes populated Net Skins sheets as ready", asyn
   assert.equal(result.checks.optional["Net Skins Result"], "ready");
 });
 
+test("Tournament Timeline remains optional when missing, header-only, or populated", async () => {
+  const cases = [
+    { values: [], expected: "missing" },
+    { values: [["Year", "Event Date", "Start Time", "Title"]], expected: "empty" },
+    { values: [["Year", "Event Date", "Start Time", "Title"], [2026, "2026-09-25", "7:30 AM", "Round 1 Opens"]], expected: "ready" },
+  ];
+  for (const { values, expected } of cases) {
+    const result = await initializeTournamentWorkbook({
+      requiredNames: ["Tournaments", "Players"],
+      optionalNames: ["Tournament Timeline"],
+      readRequired: async () => requiredValues,
+      readSheet: async () => values,
+    });
+    assert.equal(result.checks.optional["Tournament Timeline"], expected);
+    assert.equal(result.checks.required.Tournaments, "ready");
+  }
+});
+
 test("a required-sheet failure reports the exact workbook check", async () => {
   await assert.rejects(
     initializeTournamentWorkbook({
@@ -74,7 +92,8 @@ test("the normalized loader keeps Net Skins outside its required batch", async (
   const source = await readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8");
   const requiredBlock = source.slice(source.indexOf("const requiredNames"), source.indexOf("const optionalNames"));
   assert.doesNotMatch(requiredBlock, /Net Skins/);
-  assert.match(source, /const optionalNames = \["Net Skins", "Net Skins Result"\]/);
+  assert.match(source, /const optionalNames = \["Net Skins", "Net Skins Result", "Tournament Timeline"\]/);
+  assert.doesNotMatch(requiredBlock, /Tournament Timeline/);
   assert.match(source, /workbookChecks/);
 });
 

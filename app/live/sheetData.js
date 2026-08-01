@@ -28,6 +28,7 @@ import {
 import { isTransientGoogleError } from "../../lib/google-api-reliability";
 import { calculateNetSkins } from "../../lib/net-skins";
 import { initializeTournamentWorkbook } from "../../lib/tournament-workbook-initialization";
+import { normalizeTournamentTimeline } from "../../lib/tournament-timeline";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -91,6 +92,18 @@ async function fetchSheet(sheetName) {
 async function fetchOptionalSheet(sheetName) {
   try {
     return await fetchSheet(sheetName);
+  } catch {
+    return [];
+  }
+}
+
+async function fetchOptionalSheetValues(sheetName) {
+  try {
+    const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
+    if (!response.ok) return [];
+    const text = await response.text();
+    if (!text.trim() || text.trim().startsWith("<")) return [];
+    return parseCsv(text);
   } catch {
     return [];
   }
@@ -311,6 +324,7 @@ function tieAdvantageSide(tournamentRow, teams) {
 
 async function buildTournamentData() {
   let sheets;
+  let timelineValues;
   let workbookChecks = { required: {}, optional: {} };
   if (authenticatedPreviewReadsEnabled()) {
     const requiredNames = [
@@ -318,7 +332,7 @@ async function buildTournamentData() {
       "Tournaments", "Courses", "Tournament Rules", "Live Hole Scores",
       "Course Holes", "Tournament Itinerary",
     ];
-    const optionalNames = ["Net Skins", "Net Skins Result"];
+    const optionalNames = ["Net Skins", "Net Skins Result", "Tournament Timeline"];
     const initialized = await initializeTournamentWorkbook({
       requiredNames,
       optionalNames,
@@ -326,20 +340,26 @@ async function buildTournamentData() {
       readSheet: readNormalizedSheetValues,
     });
     sheets = Object.fromEntries([...requiredNames, ...optionalNames].map((name) => [name, table(initialized.sheets[name] || [])]));
+    timelineValues = initialized.sheets["Tournament Timeline"] || [];
     workbookChecks = initialized.checks;
   } else {
-    const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows, netSkinsRows, netSkinsResultRows] = await Promise.all([
+    const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows] = await Promise.all([
       fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
       fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
       fetchOptionalSheet("Live Hole Scores"), fetchOptionalSheet("Course Holes"), fetchOptionalSheet("Tournament Itinerary"),
-      fetchOptionalSheet("Net Skins"), fetchOptionalSheet("Net Skins Result"),
     ]);
+    const [netSkinsRows, netSkinsResultRows, publicTimelineValues] = await Promise.all([
+      fetchOptionalSheet("Net Skins"), fetchOptionalSheet("Net Skins Result"), fetchOptionalSheetValues("Tournament Timeline"),
+    ]);
+    timelineValues = publicTimelineValues;
+    const tournamentTimelineRows = table(publicTimelineValues);
     sheets = {
       "Live Matches": liveRows, Matches: permanentRows, "Live Tournaments": liveTournaments,
       Players: players, "Team Names": teamRows, Tournaments: tournaments, Courses: courses,
       "Tournament Rules": rules, "Live Hole Scores": liveHoleScores, "Course Holes": courseHoles,
       "Tournament Itinerary": itineraryRows,
       "Net Skins": netSkinsRows, "Net Skins Result": netSkinsResultRows,
+      "Tournament Timeline": tournamentTimelineRows,
     };
   }
   const {
@@ -356,6 +376,7 @@ async function buildTournamentData() {
     "Tournament Itinerary": itineraryRows,
     "Net Skins": netSkinsRows,
     "Net Skins Result": netSkinsResultRows,
+    "Tournament Timeline": tournamentTimelineRows,
   } = sheets;
 
   const active = [...liveTournaments]
@@ -528,26 +549,15 @@ async function buildTournamentData() {
     teamTwo: { ...teams[2], score: finalizedScore.teamTwo },
   };
   const state = getTournamentState({ tournament, rounds });
-  const schedule = itineraryRows
-    .filter((row) => recordBelongsToTournament(row, selectedTournamentId, year))
-    .filter((row) => !clean(row.Status) || clean(row.Status).toLowerCase() === "published")
-    .map((row) => ({
-      id: row["Event ID"] || `${row["Event Date"]}:${row["Start Time"]}:${row.Title}`,
-      date: row["Event Date"] || "",
-      dayLabel: row["Day Label"] || "",
-      startTime: formatTime(row["Start Time"]),
-      endTime: formatTime(row["End Time"]),
-      type: row["Event Type"] || "Tournament",
-      title: row.Title || "Tournament event",
-      subtitle: row.Subtitle || "",
-      location: row.Location || "",
-      details: row.Details || "",
-      roundId: row["Round ID"] || "",
-      courseId: row["Course ID"] || "",
-      featured: truthy(row.Featured),
-      order: number(row["Display Order"]) ?? 9999,
-    }))
-    .sort((a, b) => clean(a.date).localeCompare(clean(b.date)) || a.order - b.order);
+  const timeline = normalizeTournamentTimeline({
+    rows: tournamentTimelineRows,
+    values: timelineValues,
+    activeYear: year,
+    tournamentStatus: status,
+    timeZone: tournament.timeZone,
+    sheetState: workbookChecks.optional?.["Tournament Timeline"],
+  });
+  if (timeline.diagnostic) console.warn(timeline.diagnostic);
 
   const scoreLeaderboard = buildScoreLeaderboard(
     liveHoleScores.filter((row) => liveMap.has(clean(row["Match ID"]))),
@@ -579,7 +589,8 @@ async function buildTournamentData() {
         buildLeaderboard(matches.filter((match) => match.round === round), playerMap, teams),
       ])
     ),
-    schedule,
+    timeline,
+    schedule: timeline.events,
   };
 }
 

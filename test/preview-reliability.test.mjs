@@ -53,7 +53,7 @@ test("read and Passport OAuth assertions remain unique across serverless instanc
 test("participant base tournament reads are one batched snapshot with transient fallback", async () => {
   const sourceText = await source("app/live/sheetData.js");
   assert.match(sourceText, /readRequired: readNormalizedSheetsValues/);
-  assert.match(sourceText, /optionalNames = \["Net Skins", "Net Skins Result"\]/);
+  assert.match(sourceText, /optionalNames = \["Net Skins", "Net Skins Result", "Tournament Timeline"\]/);
   assert.match(sourceText, /pendingTournamentData/);
   assert.match(sourceText, /stale-on-transient-error/);
   assert.match(sourceText, /Date\.now\(\) - lastGoodAt < 60_000/);

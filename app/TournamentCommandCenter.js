@@ -184,7 +184,8 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
   const rounds = liveData?.rounds || [];
   const liveTournament = liveData?.tournament || tournament;
   const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
-  const schedule = todaysSchedule(liveData?.schedule || [], {
+  const timelineAvailable = Boolean(liveData?.timeline?.available);
+  const schedule = todaysSchedule((liveData?.timeline?.events || []).filter((event) => event.displayOnHome), {
     timeZone: liveTournament.timeZone,
   });
   const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
@@ -209,7 +210,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
       />
 
       <PersonalizedPlayerHome tournamentPulse={pulse} tournamentMoments={<TournamentMoments moments={moments} />} netSkins={liveData?.netSkins} />
-      <TournamentSchedule items={schedule} />
+      {timelineAvailable ? <TournamentSchedule items={schedule} /> : null}
       <TournamentLeaders leaders={leaders} />
     </div>
   );

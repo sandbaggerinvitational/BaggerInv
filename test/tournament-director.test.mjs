@@ -43,7 +43,7 @@ test("Mission Control resolves operating round and the next scheduled event", ()
       { number: 1, label: "Round 1", format: "Best Ball", course: { name: "Ocean" }, matches: [{ id: "M1", match: 1, status: "Final", teeTime: "8:00 AM", team1Players: [{ id: "A", playingHcp: 2 }], team2Players: [{ id: "B", playingHcp: 4 }], course: { name: "Ocean" } }] },
       { number: 2, label: "Round 2", format: "Scramble", course: { name: "Osprey" }, matches: [{ id: "M2", match: 1, status: "Scheduled", teeTime: "8:00 AM", team1Players: [{ id: "A", playingHcp: 2 }], team2Players: [{ id: "B", playingHcp: 4 }], course: { name: "Osprey" } }] },
     ],
-    schedule: [{ title: "Round 2 Opens", type: "Round", date: "2026-07-02", startTime: "8:00 AM", roundId: "Round 2" }],
+    timeline: { available: true, events: [{ title: "Round 2 Opens", type: "Round", date: "2026-07-02", startTime: "8:00 AM", endTime: "9:00 AM", statusOverride: "" }] },
   };
   const model = tournamentDirectorModel(data, new Date("2026-07-02T07:42:00"));
   assert.equal(model.operatingRound.name, "Round 2");
@@ -88,14 +88,14 @@ test("countdown labels remain operational across minutes, hours, and tomorrow", 
   assert.equal(countdownLabel(-664), "Started 11 hrs ago");
 });
 
-test("overdue round events provide operational guidance instead of elapsed time", () => {
+test("Director no longer invents a Next Event from round tee times when Timeline has no remaining event", () => {
   const model = tournamentDirectorModel({
     tournament: { currentRound: 3, directorAutomation: { enabled: true } },
-    schedule: [],
+    timeline: { available: true, events: [] },
     rounds: [{ number: 3, label: "Round 3", format: "Singles", matches: [{ id: "M1", match: 1, status: "Scheduled", teeTime: "7:30 AM", team1Players: [{ id: "A", playingHcp: 2 }], team2Players: [{ id: "B", playingHcp: 4 }] }] }],
   }, new Date("2026-07-03T18:34:00"));
-  assert.equal(model.nextEvent.countdown, "Round 3 should now be open");
-  assert.doesNotMatch(model.nextEvent.countdown, /hrs? ago|min overdue/);
+  assert.equal(model.nextEvent, null);
+  assert.equal(model.timelineAvailable, true);
 });
 
 test("adaptive primary action follows the official round workflow", () => {
@@ -112,7 +112,7 @@ test("adaptive primary action follows the official round workflow", () => {
 });
 
 test("natural next-event wording includes the event name and action", () => {
-  const model = tournamentDirectorModel({ tournament: { currentRound: 2, directorAutomation: { enabled: true } }, rounds: [], schedule: [{ title: "Awards Ceremony", type: "Ceremony", date: "2026-07-02", startTime: "8:00 AM" }] }, new Date("2026-07-02T07:15:00"));
+  const model = tournamentDirectorModel({ tournament: { currentRound: 2, timeZone: "America/Chicago", directorAutomation: { enabled: true } }, rounds: [], timeline: { available: true, events: [{ title: "Awards Ceremony", type: "Ceremony", date: "2026-07-02", startTime: "8:00 AM", endTime: "10:00 AM", statusOverride: "" }] } }, new Date("2026-07-02T07:15:00"));
   assert.equal(model.nextEvent.countdown, "Awards Ceremony begins in 45 minutes");
 });
 

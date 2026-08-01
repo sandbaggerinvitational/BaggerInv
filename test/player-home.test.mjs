@@ -129,7 +129,8 @@ test("Home refinement keeps tournament identity and itinerary distinct from play
   assert.match(identityHeader, /tournamentLogo\(`sandbagger-\$\{year\}`\)/);
   assert.match(commandCenter, /View Tournament Guide/);
   assert.match(commandCenter, /No additional events scheduled today/);
-  assert.match(commandCenter, /liveData\?\.schedule/);
+  assert.match(commandCenter, /liveData\?\.timeline\?\.events/);
+  assert.match(commandCenter, /event\.displayOnHome/);
   assert.match(commandCenter, /tournamentPulse=\{pulse\}/);
   assert.ok(commandCenter.indexOf("PersonalizedPlayerHome") < commandCenter.indexOf("TournamentSchedule items"));
   assert.doesNotMatch(component, /join\(" \+ "\)/);
