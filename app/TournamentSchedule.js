@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { todaysSchedule } from "../lib/home-dashboard";
-import { timelineEventIcon, timelineOptionalText } from "../lib/tournament-timeline";
+import { isGolfTimelineEvent, timelineEventIcon, timelineOptionalText } from "../lib/tournament-timeline";
 import StatusBadge from "./StatusBadge";
 import styles from "./tournament-command-center.module.css";
 
@@ -12,10 +12,6 @@ function scheduleNow(initialNow, mountedAt) {
   const initial = new Date(initialNow);
   if (Number.isNaN(initial.getTime())) return new Date();
   return new Date(initial.getTime() + Date.now() - mountedAt);
-}
-
-function isGolfEvent(type) {
-  return /golf|round|tee|match/i.test(String(type || ""));
 }
 
 export default function TournamentSchedule({ events, timeZone, initialNow = "" }) {
@@ -36,7 +32,7 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "" }
       {items.length ? <ol>{items.map((item) => {
         const subtitle = timelineOptionalText(item.subtitle);
         const location = timelineOptionalText(item.location);
-        const golfEvent = isGolfEvent(item.type);
+        const golfEvent = isGolfTimelineEvent(item.type);
         return (
         <li key={item.id} data-state={item.state} aria-current={item.state === "live" ? "true" : undefined}>
           <time>{item.startTime}</time>
@@ -48,6 +44,8 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "" }
           </div>
           {golfEvent && item.state === "live" ? <div className={styles.scheduleStatus}><StatusBadge status="Live" /></div>
             : golfEvent && item.state === "complete" ? <div className={styles.scheduleStatus}><StatusBadge status="Final" /></div>
+            : golfEvent && item.state === "upcoming" && item.isNext && item.minutesUntil <= 60 ? <b className={styles.countdown}>{item.countdown}</b>
+            : golfEvent && item.state === "upcoming" ? <div className={styles.scheduleStatus}><StatusBadge status="Upcoming" /></div>
             : item.state === "live" ? <b>Live</b>
             : item.state === "complete" ? <b className={styles.completed}>✓ Completed</b>
             : item.isNext ? <b className={styles.countdown}>{item.countdown}</b>

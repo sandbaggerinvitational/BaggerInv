@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   normalizeTournamentTimeline,
   resolveTimelineNow,
+  isGolfTimelineEvent,
   timelineEventIcon,
   timelineOptionalText,
   timelineEventStatus,
@@ -50,6 +51,13 @@ test("Golf Timeline events derive state from the associated round instead of End
   assert.equal(timelineEventStatus(event, { now, timeZone: "America/Chicago", rounds: [{ number: 2, format: "Scramble", status: "Live" }] }), "Live");
   assert.equal(timelineEventStatus(event, { now: new Date("2026-09-25T11:00:00Z"), timeZone: "America/Chicago", rounds: [{ number: 2, format: "Scramble", status: "Complete" }] }), "Completed");
   assert.equal(timelineEventStatus(event, { now: new Date("2026-09-25T14:00:00Z"), timeZone: "America/Chicago", rounds: [{ number: 2, format: "Scramble", status: "Upcoming" }] }), "Upcoming");
+});
+
+test("Golf Timeline events never fall back to time or non-golf overrides", () => {
+  const event = { type: "Golf", title: "Unmatched Golf", date: "2026-09-25", startTime: "7:30 AM", endTime: "8:00 AM", statusOverride: "Cancelled" };
+  assert.equal(timelineEventStatus(event, { now: new Date("2026-09-25T20:00:00Z"), timeZone: "America/Chicago", rounds: [] }), "Upcoming");
+  assert.equal(isGolfTimelineEvent("Round"), true);
+  assert.equal(isGolfTimelineEvent("Meal"), false);
 });
 
 test("Non-golf Timeline events continue deriving state from Start and End Time", () => {
@@ -170,6 +178,8 @@ test("Home and Director hide operational schedule sections when Timeline is unav
   assert.match(schedule, /import StatusBadge from "\.\/StatusBadge"/);
   assert.match(schedule, /golfEvent && item\.state === "live" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Live"/);
   assert.match(schedule, /golfEvent && item\.state === "complete" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Final"/);
+  assert.match(schedule, /golfEvent && item\.state === "upcoming" && item\.isNext && item\.minutesUntil <= 60/);
+  assert.match(schedule, /golfEvent && item\.state === "upcoming" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Upcoming"/);
   assert.match(schedule, /✓ Completed/);
   assert.match(schedule, /item\.isNext \? <b className=\{styles\.countdown\}>\{item\.countdown\}/);
   assert.match(schedule, /location \? <small className=\{styles\.scheduleLocation\}>/);
