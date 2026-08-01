@@ -167,6 +167,9 @@ test("Home and Director hide operational schedule sections when Timeline is unav
   ]);
   assert.match(home, /timelineAvailable \? <TournamentSchedule/);
   assert.match(schedule, /aria-current=\{item\.state === "live"/);
+  assert.match(schedule, /import StatusBadge from "\.\/StatusBadge"/);
+  assert.match(schedule, /golfEvent && item\.state === "live" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Live"/);
+  assert.match(schedule, /golfEvent && item\.state === "complete" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Final"/);
   assert.match(schedule, /✓ Completed/);
   assert.match(schedule, /item\.isNext \? <b className=\{styles\.countdown\}>\{item\.countdown\}/);
   assert.match(schedule, /location \? <small className=\{styles\.scheduleLocation\}>/);
