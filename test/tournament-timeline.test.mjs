@@ -44,6 +44,33 @@ test("Timeline status honors override before tournament time and uses tournament
   assert.equal(timelineEventStatus({ ...event, statusOverride: "" }, { now: new Date("2026-09-25T13:00:00Z"), timeZone: "America/Chicago" }), "Live");
 });
 
+test("Golf Timeline events derive state from the associated round instead of End Time", () => {
+  const event = { type: "Golf", title: "Round 2", subtitle: "Scramble", date: "2026-09-25", startTime: "7:30 AM", endTime: "12:00 PM", statusOverride: "" };
+  const now = new Date("2026-09-25T20:00:00Z");
+  assert.equal(timelineEventStatus(event, { now, timeZone: "America/Chicago", rounds: [{ number: 2, format: "Scramble", status: "Live" }] }), "Live");
+  assert.equal(timelineEventStatus(event, { now: new Date("2026-09-25T11:00:00Z"), timeZone: "America/Chicago", rounds: [{ number: 2, format: "Scramble", status: "Complete" }] }), "Completed");
+  assert.equal(timelineEventStatus(event, { now: new Date("2026-09-25T14:00:00Z"), timeZone: "America/Chicago", rounds: [{ number: 2, format: "Scramble", status: "Upcoming" }] }), "Upcoming");
+});
+
+test("Non-golf Timeline events continue deriving state from Start and End Time", () => {
+  const meal = { type: "Meal", title: "Lunch", date: "2026-09-25", startTime: "12:00 PM", endTime: "1:00 PM", statusOverride: "" };
+  const rounds = [{ number: 2, format: "Scramble", status: "Live" }];
+  assert.equal(timelineEventStatus(meal, { now: new Date("2026-09-25T16:00:00Z"), timeZone: "America/Chicago", rounds }), "Upcoming");
+  assert.equal(timelineEventStatus(meal, { now: new Date("2026-09-25T17:30:00Z"), timeZone: "America/Chicago", rounds }), "Live");
+  assert.equal(timelineEventStatus(meal, { now: new Date("2026-09-25T19:00:00Z"), timeZone: "America/Chicago", rounds }), "Completed");
+});
+
+test("normalized golf events retain their authoritative round-derived state on Home", () => {
+  const timeline = normalizeTournamentTimeline({
+    values: [headers, row], activeYear: 2026, tournamentStatus: "Live", timeZone: "America/Chicago",
+    rounds: [{ number: 1, format: "Best Ball", status: "Live" }], now: new Date("2026-09-25T20:00:00Z"),
+  });
+  assert.equal(timeline.events[0].status, "Live");
+  assert.equal(timeline.events[0].roundStatusDerived, true);
+  const home = todaysSchedule(timeline.events, { now: new Date("2026-09-25T20:00:00Z"), timeZone: "America/Chicago" });
+  assert.equal(home[0].state, "live");
+});
+
 test("Timeline event types use one shared icon vocabulary", () => {
   assert.equal(timelineEventIcon("Golf"), "⛳");
   assert.equal(timelineEventIcon("Meal"), "🍽️");

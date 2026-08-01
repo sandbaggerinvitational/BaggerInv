@@ -555,6 +555,7 @@ async function buildTournamentData() {
     activeYear: year,
     tournamentStatus: status,
     timeZone: tournament.timeZone,
+    rounds,
     sheetState: workbookChecks.optional?.["Tournament Timeline"],
     previewDate: process.env.PREVIEW_TIMELINE_DATE || tournamentRow["Preview Timeline Date"],
     previewEnabled: process.env.VERCEL_ENV === "preview",
