@@ -205,6 +205,38 @@ test("unsupported hole history never produces invented momentum or comeback stor
   assert.equal(stories.some((item) => ["momentum", "comeback", "lead-change"].includes(item.category)), false);
 });
 
+test("Version 1 stories are scoped exclusively to the active tournament", () => {
+  const stories = tournamentStorylines({
+    tournament: { ...tournament, id: "SBI-2026", year: 2026 },
+    rounds: [
+      { tournamentId: "SBI-2025", year: 2025, number: 3, matches: [{ tournamentId: "SBI-2025", year: 2025, status: "Final", team1Points: 9, team2Points: 0 }] },
+      { tournamentId: "SBI-2026", year: 2026, number: 1, matches: [{ tournamentId: "SBI-2026", year: 2026, round: 1, match: 1, status: "Live", currentHole: 16, liveStatusText: "All Square through 16" }] },
+    ],
+    leaderboard: [
+      { tournamentId: "SBI-2025", year: 2025, id: "career-star", player: "Career Star", wins: 20, losses: 0, points: 30, matchesPlayed: 20 },
+      { tournamentId: "SBI-2026", year: 2026, id: "clay", player: "Clay Beltran", wins: 1, losses: 0, points: 1.5, matchesPlayed: 1 },
+    ],
+    historicalMatches: [{ year: 2024, player: "Historical Champion", wins: 99 }],
+    careerRecords: [{ player: "Career Star", points: 100 }],
+  });
+  assert.equal(stories.some((item) => /Career Star|Historical Champion|2025/.test(`${item.headline} ${item.detail}`)), false);
+  assert.ok(stories.some((item) => item.id === "closest-match"));
+  assert.ok(stories.every((item) => item.scope === "CURRENT_TOURNAMENT"));
+});
+
+test("mismatched tournament matches cannot create live, momentum, or completed-round stories", () => {
+  const stories = tournamentStorylines({
+    tournament: { ...tournament, id: "SBI-2026", year: 2026 },
+    rounds: [{ tournamentId: "SBI-2026", year: 2026, number: 2, matches: [
+      { tournamentId: "SBI-2025", year: 2025, id: "old-live", round: 2, match: 1, status: "Live", holeResults: [
+        { holeNumber: 10, winner: "Team 1" }, { holeNumber: 11, winner: "Team 1" }, { holeNumber: 12, winner: "Team 1" },
+      ] },
+    ] }],
+  });
+  assert.equal(stories.some((item) => /old-live/.test(item.id)), false);
+  assert.equal(stories.some((item) => ["live", "momentum", "comeback", "round"].includes(item.category)), false);
+});
+
 test("the normalized loader projects only official hole outcome fields into story data", async () => {
   const source = await readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8");
   assert.match(source, /holeResults: matchHoleScores\.map/);
