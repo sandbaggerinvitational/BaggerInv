@@ -153,7 +153,7 @@ test("Leaderboards use shared tournament identity, URL tabs, search, expansion, 
   assert.match(matchCenter, /<LeaderboardsDashboard/);
   assert.match(source, /import TournamentIdentityHeader/);
   assert.match(source, /<TournamentIdentityHeader/);
-  assert.match(source, /\[\["players", "Players"\], \["teams", "Teams"\], \["insights", "Insights"\]\]/);
+  assert.match(source, /\[\["players", "Players"\], \["teams", "Teams"\], \["skins", "Net Skins"\], \["insights", "Insights"\]\]/);
   assert.match(source, /params\.set\("view", "leaderboards"\)/);
   assert.match(source, /placeholder="Search players"/);
   assert.match(source, /aria-expanded=\{isOpen\}/);

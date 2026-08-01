@@ -19,11 +19,13 @@ import {
 } from "../../lib/mobile-leaderboards";
 import styles from "./leaderboards-dashboard.module.css";
 import insightStyles from "./leaderboards-insights.module.css";
+import skinsStyles from "./net-skins.module.css";
 
 const clean = (value) => String(value ?? "").trim();
 const initials = (name) => clean(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
 const toPar = (value) => Number(value) === 0 ? "E" : Number(value) > 0 ? `+${value}` : String(value);
 const average = (value) => Number.isFinite(Number(value)) ? Number(value).toFixed(1) : "—";
+const currency = (value) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: Number(value) % 1 ? 2 : 0 }).format(Number(value) || 0);
 const metricValue = (row, metric) => {
   if (metric === "points") return `${formatPlayerPoints(row.points)} pts`;
   if (metric === "wins") return String(row.wins ?? "—");
@@ -146,6 +148,41 @@ function Insights({ data }) {
   </section>;
 }
 
+function NetSkinsBoard({ data }) {
+  const rounds = data.netSkins?.rounds || [];
+  const [selectedRound, setSelectedRound] = useState(String(rounds[0]?.round || ""));
+  const [expanded, setExpanded] = useState("");
+  useEffect(() => {
+    if (!rounds.some((round) => String(round.round) === selectedRound)) setSelectedRound(String(rounds[0]?.round || ""));
+  }, [rounds, selectedRound]);
+  const round = rounds.find((item) => String(item.round) === selectedRound);
+  if (!rounds.length) return <section className={skinsStyles.board}><div className={styles.empty}><strong>Net Skins will appear when participation is configured.</strong><span>Eligibility is managed from the official Net Skins worksheet.</span></div></section>;
+  return <section className={skinsStyles.experience} aria-label="Net Skins standings">
+    <nav className={styles.roundSelector} aria-label="Net Skins round">
+      {rounds.map((item) => <button type="button" aria-pressed={String(item.round) === selectedRound} onClick={() => { setSelectedRound(String(item.round)); setExpanded(""); }} key={item.round}>Round {item.round}</button>)}
+    </nav>
+    <section className={skinsStyles.board}>
+      <header><span><small>Independent Competition</small><h2>Round {round.round} Net Skins</h2></span><b>{round.format === "SC" ? "Scramble Teams" : "Individual Golfers"}</b></header>
+      <div className={skinsStyles.summary}>
+        <div><span>Round Pot</span><strong>{currency(round.pot)}</strong></div>
+        <div><span>Skins Awarded</span><strong>{round.skinsAwarded}</strong></div>
+        <div><span>Current Skin Value</span><strong>{round.skinsAwarded ? currency(round.skinValue) : "—"}</strong></div>
+      </div>
+      {!round.leaderboard.length ? <div className={styles.empty}><strong>No eligible participants yet.</strong><span>The leaderboard will calculate automatically from official net scores.</span></div> : <div>
+        <div className={skinsStyles.row} data-header="true"><span>Rank</span><span>{round.format === "SC" ? "Team" : "Player"}</span><span>Skins</span><span>Winnings</span></div>
+        {round.leaderboard.map((row) => <div className={skinsStyles.entry} key={row.id}>
+          <button type="button" className={skinsStyles.row} aria-expanded={expanded === row.id} onClick={() => setExpanded((current) => current === row.id ? "" : row.id)}>
+            <strong>{row.displayRank}</strong><b>{row.name}</b><span>{row.skinsWon}</span><strong>{currency(row.totalWinnings)}</strong>
+          </button>
+          {expanded === row.id ? <div className={skinsStyles.details}>{row.winningHoles.length ? row.winningHoles.map((skin) => <div key={skin.hole}><span>Round {skin.round} · Hole {skin.hole}</span><small>{round.format === "SC" ? "Scramble" : round.format === "SI" ? "Singles" : "Best Ball"} · Net {skin.winningNetScore}</small><strong>+{currency(skin.skinValue)}</strong></div>) : <p>No skins won in this round.</p>}</div> : null}
+        </div>)}
+      </div>}
+      {!round.complete ? <p className={skinsStyles.note}>{round.completedHoles} of 18 holes have a complete eligible field. Values recalculate as official scores arrive.</p> : null}
+      {round.complete && !round.skinsAwarded ? <p className={skinsStyles.note}>No skins awarded. Tied low-net scores do not carry over.</p> : null}
+    </section>
+  </section>;
+}
+
 export default function LeaderboardsDashboard({ initialData, loadError }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -154,7 +191,7 @@ export default function LeaderboardsDashboard({ initialData, loadError }) {
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [refreshState, setRefreshState] = useState("current");
   const pending = useRef(null);
-  const tab = ["players", "teams", "insights"].includes(searchParams.get("tab")) ? searchParams.get("tab") : "players";
+  const tab = ["players", "teams", "skins", "insights"].includes(searchParams.get("tab")) ? searchParams.get("tab") : "players";
   const roundValues = new Set((data?.rounds || []).map((round) => String(round.number)));
   const selectedRound = roundValues.has(searchParams.get("round")) ? searchParams.get("round") : "overall";
   const metric = PLAYER_METRICS.some(([key]) => key === searchParams.get("metric")) ? searchParams.get("metric") : "points";
@@ -191,11 +228,12 @@ export default function LeaderboardsDashboard({ initialData, loadError }) {
   return <section className={styles.page}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Individual, team, and round standings</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
-    <nav className={styles.tabs} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
-    {tab !== "insights" ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
+    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["skins", "Net Skins"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
+    {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
+    {tab === "skins" ? <NetSkinsBoard data={data} /> : null}
     {tab === "insights" ? <Insights data={data} /> : null}
     {loadError ? <p className={styles.loadNote}>{loadError}</p> : null}
   </section>;

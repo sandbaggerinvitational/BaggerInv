@@ -26,6 +26,7 @@ import {
   normalizedReadDiagnostics,
 } from "../../lib/google-sheets-server-read";
 import { isTransientGoogleError } from "../../lib/google-api-reliability";
+import { calculateNetSkins } from "../../lib/net-skins";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -136,11 +137,11 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
     Number(row["Hole Number"]) === Number(holeNumber) &&
     (!clean(match.Tee || match["Tee Played"]) || !clean(row.Tee) || clean(row.Tee) === clean(match.Tee || match["Tee Played"]))
   );
-  const add = ({ entityId, playerIds, name, format, round, gross, net, par, holeNumber }) => {
+  const add = ({ entityId, playerIds, name, format, round, match, gross, net, par, holeNumber }) => {
     if (!entityId || gross === null || net === null || par === null) return;
     const key = `${round}:${entityId}`;
     if (!totals.has(key)) totals.set(key, {
-      id: entityId, round, name, format,
+      id: entityId, round, match, name, format,
       entityType: format === "SC" ? "PAIRING" : "PLAYER",
       playerIds,
       slug: format === "SC" ? "" : playerMap[playerIds[0]]?.slug || "",
@@ -151,9 +152,11 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
     row.gross += gross; row.net += net; row.par += par; row.holes += 1;
     row.scorecard.push({
       hole: Number(holeNumber),
+      match,
       gross,
       net,
       par,
+      strokeIndex,
       strokes: Math.max(0, gross - net),
     });
   };
@@ -162,6 +165,7 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
     if (!match) continue;
     const round = Number(match.Round) || 1;
     const format = clean(match.Format).toUpperCase();
+    const matchNumber = clean(match.Match);
     const metadata = metadataFor(match, row["Hole Number"]);
     const par = number(metadata?.Par);
     const strokeIndex = number(metadata?.["Stroke Index"]);
@@ -179,6 +183,7 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
           name: playerIds.map((id) => playerMap[id]?.name || id).join(" / "),
           format,
           round,
+          match: matchNumber,
           gross,
           net,
           par,
@@ -197,6 +202,7 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
           name: playerMap[playerId]?.name || playerId,
           format,
           round,
+          match: matchNumber,
           gross,
           net,
           par,
@@ -307,20 +313,23 @@ async function buildTournamentData() {
       "Live Matches", "Matches", "Live Tournaments", "Players", "Team Names",
       "Tournaments", "Courses", "Tournament Rules", "Live Hole Scores",
       "Course Holes", "Tournament Itinerary",
+      "Net Skins", "Net Skins Result",
     ];
     const values = await readNormalizedSheetsValues(names);
     sheets = Object.fromEntries(names.map((name) => [name, table(values[name] || [])]));
   } else {
-    const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows] = await Promise.all([
+    const [liveRows, permanentRows, liveTournaments, players, teamRows, tournaments, courses, rules, liveHoleScores, courseHoles, itineraryRows, netSkinsRows, netSkinsResultRows] = await Promise.all([
       fetchSheet("Live Matches"), fetchSheet("Matches"), fetchSheet("Live Tournaments"), fetchSheet("Players"),
       fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
       fetchOptionalSheet("Live Hole Scores"), fetchOptionalSheet("Course Holes"), fetchOptionalSheet("Tournament Itinerary"),
+      fetchOptionalSheet("Net Skins"), fetchOptionalSheet("Net Skins Result"),
     ]);
     sheets = {
       "Live Matches": liveRows, Matches: permanentRows, "Live Tournaments": liveTournaments,
       Players: players, "Team Names": teamRows, Tournaments: tournaments, Courses: courses,
       "Tournament Rules": rules, "Live Hole Scores": liveHoleScores, "Course Holes": courseHoles,
       "Tournament Itinerary": itineraryRows,
+      "Net Skins": netSkinsRows, "Net Skins Result": netSkinsResultRows,
     };
   }
   const {
@@ -335,6 +344,8 @@ async function buildTournamentData() {
     "Live Hole Scores": liveHoleScores,
     "Course Holes": courseHoles,
     "Tournament Itinerary": itineraryRows,
+    "Net Skins": netSkinsRows,
+    "Net Skins Result": netSkinsResultRows,
   } = sheets;
 
   const active = [...liveTournaments]
@@ -528,18 +539,29 @@ async function buildTournamentData() {
     }))
     .sort((a, b) => clean(a.date).localeCompare(clean(b.date)) || a.order - b.order);
 
+  const scoreLeaderboard = buildScoreLeaderboard(
+    liveHoleScores.filter((row) => liveMap.has(clean(row["Match ID"]))),
+    scoringMatchMap,
+    courseHoles,
+    playerMap
+  );
+  const netSkins = calculateNetSkins({ entries: netSkinsRows, scoreRows: scoreLeaderboard, activeYear: year });
+  netSkins.rounds = netSkins.rounds.map((skinsRound) => ({
+    ...skinsRound,
+    finalized: skinsRound.complete && skinsRound.matches.every((matchNumber) =>
+      matches.some((match) => Number(match.round) === Number(skinsRound.round) && clean(match.match) === clean(matchNumber) && isOfficialMatchResult(match))
+    ),
+  }));
+  netSkins.storedResults = netSkinsResultRows.filter((row) => Number(row.Year) === Number(year));
+
   return {
     tournament: { ...tournament, state },
     rounds,
     remainingByRound: remainingByRound(rounds),
     momentum: getTeamMomentum(rounds),
     leaderboard: buildLeaderboard(matches, playerMap, teams),
-    scoreLeaderboard: buildScoreLeaderboard(
-      liveHoleScores.filter((row) => liveMap.has(clean(row["Match ID"]))),
-      scoringMatchMap,
-      courseHoles,
-      playerMap
-    ),
+    scoreLeaderboard,
+    netSkins,
     roundLeaderboards: Object.fromEntries(
       [...new Set(matches.map((match) => match.round))].map((round) => [
         round,
