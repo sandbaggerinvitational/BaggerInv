@@ -556,6 +556,8 @@ async function buildTournamentData() {
     tournamentStatus: status,
     timeZone: tournament.timeZone,
     sheetState: workbookChecks.optional?.["Tournament Timeline"],
+    previewDate: process.env.PREVIEW_TIMELINE_DATE,
+    previewEnabled: process.env.VERCEL_ENV === "preview",
   });
   if (timeline.diagnostic) console.warn(timeline.diagnostic);
 

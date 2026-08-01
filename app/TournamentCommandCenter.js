@@ -186,6 +186,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
   const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
   const timelineAvailable = Boolean(liveData?.timeline?.available);
   const schedule = todaysSchedule((liveData?.timeline?.events || []).filter((event) => event.displayOnHome), {
+    now: liveData?.timeline?.previewDateActive && liveData.timeline.effectiveNow ? new Date(liveData.timeline.effectiveNow) : undefined,
     timeZone: liveTournament.timeZone,
   });
   const leaders = compactTournamentLeaders(liveData?.leaderboard || []);

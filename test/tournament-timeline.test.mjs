@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   normalizeTournamentTimeline,
+  resolveTimelineNow,
   timelineEventStatus,
   tournamentDateTime,
 } from "../lib/tournament-timeline.js";
@@ -41,6 +42,60 @@ test("Timeline status honors override before tournament time and uses tournament
   assert.equal(timelineEventStatus({ ...event, statusOverride: "" }, { now: new Date("2026-09-25T13:00:00Z"), timeZone: "America/Chicago" }), "Live");
 });
 
+test("Preview Timeline Date preserves tournament-local time on the selected date", () => {
+  const actual = new Date("2026-08-01T17:15:30Z");
+  const preview = resolveTimelineNow({
+    now: actual,
+    timeZone: "America/Chicago",
+    previewDate: "2026-09-25",
+    previewEnabled: true,
+  });
+  assert.equal(preview.toISOString(), "2026-09-25T17:15:30.000Z");
+});
+
+test("Preview Timeline Date is ignored unless Preview is enabled", () => {
+  const actual = new Date("2026-08-01T17:15:30Z");
+  assert.equal(resolveTimelineNow({ now: actual, timeZone: "America/Chicago", previewDate: "2026-09-25", previewEnabled: false }), actual);
+  assert.equal(resolveTimelineNow({ now: actual, timeZone: "America/Chicago", previewDate: "", previewEnabled: true }), actual);
+  assert.equal(resolveTimelineNow({ now: actual, timeZone: "America/Chicago", previewDate: "not-a-date", previewEnabled: true }), actual);
+});
+
+test("Home, Director, and notification consumers share the Preview Timeline date", () => {
+  const previewDate = "2026-09-25";
+  const actual = new Date("2026-08-01T12:00:00Z");
+  const timeline = normalizeTournamentTimeline({
+    values: [headers, row], activeYear: 2026, tournamentStatus: "Upcoming", timeZone: "America/Chicago",
+    now: actual, previewDate, previewEnabled: true,
+  });
+  assert.equal(timeline.previewDateActive, true);
+  assert.equal(timeline.effectiveDate, previewDate);
+  assert.equal(timeline.notificationEvents[0].notificationMinutes, 30);
+  const home = todaysSchedule(timeline.events.filter((event) => event.displayOnHome), {
+    now: new Date(timeline.effectiveNow), timeZone: "America/Chicago",
+  });
+  assert.deepEqual(home.map((event) => event.title), ["Round 1 Opens"]);
+  const director = tournamentDirectorModel({ tournament: { year: 2026, status: "Upcoming", timeZone: "America/Chicago", directorAutomation: {} }, rounds: [], timeline }, actual);
+  assert.equal(director.nextEvent.title, "Round 1 Opens");
+});
+
+test("Preview Timeline Date can select Thursday, Friday, or Saturday without editing events", () => {
+  const datedRows = [
+    [2026, "Thursday", "2026-09-24", "7:30 AM", "8:00 AM", "Welcome", "Thursday Event", "", "Clubhouse", true, 15, 1, ""],
+    row,
+    [2026, "Saturday", "2026-09-26", "7:30 AM", "8:00 AM", "Round", "Saturday Event", "Singles", "Ocean Course", true, 15, 3, ""],
+  ];
+  for (const [previewDate, expectedTitle] of [["2026-09-24", "Thursday Event"], ["2026-09-25", "Round 1 Opens"], ["2026-09-26", "Saturday Event"]]) {
+    const timeline = normalizeTournamentTimeline({
+      values: [headers, ...datedRows], activeYear: 2026, tournamentStatus: "Upcoming", timeZone: "America/Chicago",
+      now: new Date("2026-08-01T11:00:00Z"), previewDate, previewEnabled: true,
+    });
+    const schedule = todaysSchedule(timeline.events.filter((event) => event.displayOnHome), {
+      now: new Date(timeline.effectiveNow), timeZone: "America/Chicago",
+    });
+    assert.deepEqual(schedule.map((event) => event.title), [expectedTitle]);
+  }
+});
+
 test("Home schedule displays only Timeline events enabled for Home on the tournament-local day", () => {
   const timeline = normalizeTournamentTimeline({ values: [headers, row, [2026, "Friday", "2026-09-25", "6:30 PM", "8:00 PM", "Meal", "Dinner", "", "Clubhouse", false, "", 2, ""]], activeYear: 2026, timeZone: "America/Chicago", now: new Date("2026-09-25T11:00:00Z") });
   const home = todaysSchedule(timeline.events.filter((event) => event.displayOnHome), { now: new Date("2026-09-25T13:00:00Z"), timeZone: "America/Chicago" });
@@ -70,5 +125,6 @@ test("Home and Director hide operational schedule sections when Timeline is unav
   assert.match(director, /No remaining scheduled events today\./);
   assert.match(loader, /console\.warn\(timeline\.diagnostic\)/);
   assert.match(loader, /schedule: timeline\.events/);
+  assert.match(loader, /previewDate: process\.env\.PREVIEW_TIMELINE_DATE/);
+  assert.match(loader, /previewEnabled: process\.env\.VERCEL_ENV === "preview"/);
 });
-
