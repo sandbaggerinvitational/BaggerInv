@@ -301,3 +301,30 @@ test("Insights consume the same shared storyline model and explain why data matt
   assert.match(source, /No storylines yet\./);
   assert.match(source, /item\.accessibleLabel/);
 });
+
+test("official finalized Net Skins results create a current-tournament money storyline", () => {
+  const stories = tournamentStorylines({
+    tournament: { id: "2026", year: 2026, status: "Live", currentRound: 2, teamOne: {}, teamTwo: {} },
+    rounds: [], leaderboard: [], scoreLeaderboard: [],
+    netSkins: { rounds: [{
+      round: 1,
+      finalized: true,
+      skins: [
+        { winner: "Clay Beltran", winnerPlayerId: "P1", winnerPlayerId2: "", skinValue: 150 },
+        { winner: "Clay Beltran", winnerPlayerId: "P1", winnerPlayerId2: "", skinValue: 150 },
+      ],
+    }] },
+  }, { now: Date.parse("2026-07-27T12:00:00Z") });
+  const skins = stories.find((item) => item.id === "net-skins-leader");
+  assert.equal(skins.headline, "Clay Beltran has captured 2 skins.");
+  assert.match(skins.detail, /\$300\.00 earned from official finalized results/);
+});
+
+test("provisional Net Skins never create an official tournament story", () => {
+  const stories = tournamentStorylines({
+    tournament: { id: "2026", year: 2026, status: "Live", currentRound: 1, teamOne: {}, teamTwo: {} },
+    rounds: [], leaderboard: [], scoreLeaderboard: [],
+    netSkins: { rounds: [{ round: 1, finalized: false, skins: [{ winner: "Clay Beltran", winnerPlayerId: "P1", skinValue: 150 }] }] },
+  });
+  assert.equal(stories.some((item) => item.category === "net-skins"), false);
+});

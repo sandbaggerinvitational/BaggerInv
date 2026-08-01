@@ -208,7 +208,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
         status={status}
       />
 
-      <PersonalizedPlayerHome tournamentPulse={pulse} tournamentMoments={<TournamentMoments moments={moments} />} />
+      <PersonalizedPlayerHome tournamentPulse={pulse} tournamentMoments={<TournamentMoments moments={moments} />} netSkins={liveData?.netSkins} />
       <TournamentSchedule items={schedule} />
       <TournamentLeaders leaders={leaders} />
     </div>

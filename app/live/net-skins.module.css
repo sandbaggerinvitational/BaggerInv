@@ -51,7 +51,7 @@
 
 .summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   border-bottom: 1px solid #eee8de;
   background: #faf7ef;
 }
@@ -66,7 +66,7 @@
 }
 
 .summary > div + div { border-left: 1px solid #eee8de; }
-.summary span { color: #6f7974; font-size: .5rem; font-weight: 800; text-transform: uppercase; }
+.summary span { color: #6f7974; font-size: .48rem; font-weight: 800; line-height: 1.15; text-transform: uppercase; }
 .summary strong { color: #0b4938; font: 700 1rem Georgia, serif; font-variant-numeric: tabular-nums; }
 
 .row {
@@ -87,7 +87,11 @@
 .row[data-header="true"] { min-height: 35px; background: #f4f0e8; color: #526059; font-size: .52rem; font-weight: 900; text-transform: uppercase; }
 .row > span:not(:nth-child(2)), .row > strong { text-align: center; font-variant-numeric: tabular-nums; }
 .row > b { overflow-wrap: anywhere; }
+.row > b em { display: inline-block; margin-left: 5px; padding: 2px 4px; border-radius: 999px; background: #e8ddbd; color: #72551a; font: 900 .42rem/1 Arial, sans-serif; letter-spacing: .06em; vertical-align: middle; }
 .entry:last-child > .row { border-bottom: 0; }
+.entry[data-current="true"] { background: #fff9e9; box-shadow: inset 3px 0 #b58a25; }
+.entry[data-current="true"] .row { background: transparent; }
+.entry .row > strong:last-child { color: #8c6b20; }
 
 .details { display: grid; gap: 5px; padding: 8px 10px 10px; border-bottom: 1px solid #eee8de; background: #faf7ef; }
 .details > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; padding: 6px 8px; border-radius: 8px; background: #fff; }
@@ -101,5 +105,8 @@
   .tabs button { font-size: .58rem; }
   .board > header { align-items: flex-start; }
   .summary strong { font-size: .88rem; }
+  .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary > div:nth-child(3) { border-top: 1px solid #eee8de; border-left: 0; }
+  .summary > div:nth-child(4) { border-top: 1px solid #eee8de; }
   .row { padding-inline: 6px; }
 }

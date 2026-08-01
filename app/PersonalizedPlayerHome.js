@@ -132,7 +132,22 @@ function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
   </section>;
 }
 
-export default function PersonalizedPlayerHome({ tournamentPulse = null, tournamentMoments = null }) {
+const skinsCurrency = (value) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: Number(value) % 1 ? 2 : 0 }).format(Number(value) || 0);
+
+function PlayerNetSkins({ netSkins, playerId }) {
+  const entries = (netSkins?.rounds || []).flatMap((round) => (round.leaderboard || [])
+    .filter((row) => row.playerIds?.includes(playerId))
+    .map((row) => ({ ...row, round: round.round })));
+  if (!playerId || !entries.length) return null;
+  const skins = entries.reduce((sum, row) => sum + (Number(row.skinsWon) || 0), 0);
+  const winnings = entries.reduce((sum, row) => sum + (Number(row.totalWinnings) || 0), 0);
+  return <section className={styles.netSkins} aria-labelledby="home-net-skins-title">
+    <header><span aria-hidden="true">💰</span><div><p>Net Skins</p><h2 id="home-net-skins-title">Your Competition</h2></div><Link href="/live?view=leaderboards&tab=skins">View standings</Link></header>
+    <div><span><small>Your Skins</small><strong>{skins}</strong></span><span><small>Current Winnings</small><strong>{skinsCurrency(winnings)}</strong></span></div>
+  </section>;
+}
+
+export default function PersonalizedPlayerHome({ tournamentPulse = null, tournamentMoments = null, netSkins = null }) {
   const [payload, setPayload] = useState(null);
   const [state, setState] = useState("loading");
   const [busyId, setBusyId] = useState("");
@@ -266,6 +281,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
 
     {tournamentPulse}
     {tournamentMoments}
+    <PlayerNetSkins netSkins={netSkins} playerId={player?.id} />
     {matches.length ? <MyRounds
       matches={matches}
       emphasizedId={primary?.matchId}

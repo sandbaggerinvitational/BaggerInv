@@ -106,9 +106,33 @@ test("Leaderboards exposes Net Skins pot, payouts, and expandable winning-hole d
   assert.match(source, /\["skins", "Net Skins"\]/);
   assert.match(source, /Round Pot/);
   assert.match(source, /Skins Awarded/);
-  assert.match(source, /Current Skin Value/);
+  assert.match(source, /Value Per Skin/);
   assert.match(source, /winningHoles\.map/);
   assert.match(source, /Winning|Winnings/);
   assert.match(css, /grid-template-columns:\s*repeat\(4/);
   assert.doesNotMatch(css, /overflow-x:\s*(?:scroll|auto)/);
+});
+
+test("Net Skins polish exposes official summary terminology and participant highlighting", async () => {
+  const [source, css] = await Promise.all([
+    readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/net-skins.module.css", import.meta.url), "utf8"),
+  ]);
+  for (const label of ["Net Skins Competition", "Round Pot", "Entrants", "Skins Awarded", "Value Per Skin"]) assert.match(source, new RegExp(label));
+  assert.doesNotMatch(source, /Independent Competition|Current Skin Value/);
+  assert.match(source, /row\.playerIds\?\.includes\(currentPlayer\.id\)/);
+  assert.match(source, /💰 Hole \{skin\.hole\}/);
+  assert.match(css, /\.entry\[data-current="true"\]/);
+});
+
+test("Home Net Skins card is participant-only and links to official standings", async () => {
+  const [home, command] = await Promise.all([
+    readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(home, /if \(!playerId \|\| !entries\.length\) return null/);
+  assert.match(home, /Your Skins/);
+  assert.match(home, /Current Winnings/);
+  assert.match(home, /\/live\?view=leaderboards&tab=skins/);
+  assert.match(command, /netSkins=\{liveData\?\.netSkins\}/);
 });
