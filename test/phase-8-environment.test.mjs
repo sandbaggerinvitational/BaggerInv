@@ -144,6 +144,7 @@ test("Tournament Mode replaces the flagged homepage for upcoming and live tourna
   const homePage = fs.readFileSync(new URL("../app/page.js", import.meta.url), "utf8");
   const mobileHome = fs.readFileSync(new URL("../app/MobileTournamentHome.js", import.meta.url), "utf8");
   const commandCenter = fs.readFileSync(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8");
+  const tournamentSchedule = fs.readFileSync(new URL("../app/TournamentSchedule.js", import.meta.url), "utf8");
   const menu = fs.readFileSync(new URL("../app/Menu.js", import.meta.url), "utf8");
 
   withEnvironment({ NEXT_PUBLIC_LIVE_TOURNAMENT_V2_ENABLED: "true" }, () => {
@@ -158,7 +159,7 @@ test("Tournament Mode replaces the flagged homepage for upcoming and live tourna
     "Tournament Pulse",
     "Tournament Leaders",
   ]) {
-    assert.match(commandCenter, new RegExp(section));
+    assert.match(`${commandCenter}\n${tournamentSchedule}`, new RegExp(section));
   }
   assert.doesNotMatch(commandCenter, /Featured Match|Tournament Timeline|Live Records/);
   assert.match(menu, /activeNavigationHref \|\| activeNavigationHrefForPath/);

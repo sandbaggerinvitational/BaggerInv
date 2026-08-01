@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   normalizeTournamentTimeline,
   resolveTimelineNow,
+  timelineEventIcon,
   timelineEventStatus,
   tournamentDateTime,
 } from "../lib/tournament-timeline.js";
@@ -40,6 +41,14 @@ test("Timeline status honors override before tournament time and uses tournament
   assert.equal(timelineEventStatus(event, { now: new Date("2026-09-25T13:00:00Z"), timeZone: "America/Chicago" }), "Delayed");
   assert.equal(tournamentDateTime(event.date, event.startTime, "America/Chicago").toISOString(), "2026-09-25T12:30:00.000Z");
   assert.equal(timelineEventStatus({ ...event, statusOverride: "" }, { now: new Date("2026-09-25T13:00:00Z"), timeZone: "America/Chicago" }), "Live");
+});
+
+test("Timeline event types use one shared icon vocabulary", () => {
+  assert.equal(timelineEventIcon("Golf"), "⛳");
+  assert.equal(timelineEventIcon("Meal"), "🍽️");
+  assert.equal(timelineEventIcon("Check-In"), "📍");
+  assert.equal(timelineEventIcon("Awards"), "🏆");
+  assert.equal(timelineEventIcon("Meeting"), "👥");
 });
 
 test("Preview Timeline Date preserves tournament-local time on the selected date", () => {
@@ -115,13 +124,20 @@ test("Director Next Event consumes Timeline and gracefully handles no remaining 
 });
 
 test("Home and Director hide operational schedule sections when Timeline is unavailable", async () => {
-  const [home, director, loader] = await Promise.all([
+  const [home, schedule, director, loader] = await Promise.all([
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/TournamentSchedule.js", import.meta.url), "utf8"),
     readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8"),
   ]);
   assert.match(home, /timelineAvailable \? <TournamentSchedule/);
+  assert.match(schedule, /aria-current=\{item\.state === "live"/);
+  assert.match(schedule, /✓ Completed/);
+  assert.match(schedule, /item\.isNext \? <b className=\{styles\.countdown\}>\{item\.countdown\}/);
+  assert.match(schedule, /item\.location \? <small className=\{styles\.scheduleLocation\}>/);
   assert.match(director, /data\.timelineAvailable \? <section className=\{styles\.nextEvent\}/);
+  assert.match(director, /data\.nextEvent\.icon/);
+  assert.match(director, /data\.nextEvent\.location \?/);
   assert.match(director, /No remaining scheduled events today\./);
   assert.match(loader, /console\.warn\(timeline\.diagnostic\)/);
   assert.match(loader, /schedule: timeline\.events/);

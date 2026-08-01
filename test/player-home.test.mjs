@@ -119,20 +119,21 @@ test("the public Tournament Command Center offers Passport activation without ex
 });
 
 test("Home refinement keeps tournament identity and itinerary distinct from player rounds", async () => {
-  const [component, commandCenter, identityHeader] = await Promise.all([
+  const [component, commandCenter, schedule, identityHeader] = await Promise.all([
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/TournamentSchedule.js", import.meta.url), "utf8"),
     readFile(new URL("../app/TournamentIdentityHeader.js", import.meta.url), "utf8"),
   ]);
   assert.doesNotMatch(component, /playerPhoto|identityImage|Player Passport<\/span>/);
   assert.match(commandCenter, /<TournamentIdentityHeader/);
   assert.match(identityHeader, /tournamentLogo\(`sandbagger-\$\{year\}`\)/);
-  assert.match(commandCenter, /View Tournament Guide/);
-  assert.match(commandCenter, /No additional events scheduled today/);
+  assert.match(schedule, /View Tournament Guide/);
+  assert.match(schedule, /No additional events scheduled today/);
   assert.match(commandCenter, /liveData\?\.timeline\?\.events/);
   assert.match(commandCenter, /event\.displayOnHome/);
   assert.match(commandCenter, /tournamentPulse=\{pulse\}/);
-  assert.ok(commandCenter.indexOf("PersonalizedPlayerHome") < commandCenter.indexOf("TournamentSchedule items"));
+  assert.ok(commandCenter.indexOf("PersonalizedPlayerHome") < commandCenter.indexOf("TournamentSchedule events"));
   assert.doesNotMatch(component, /join\(" \+ "\)/);
 });
 

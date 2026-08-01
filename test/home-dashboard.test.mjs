@@ -22,7 +22,23 @@ test("today schedule uses tournament local time, orders events, and marks the ne
   });
   assert.deepEqual(items.map((item) => item.id), ["breakfast", "lunch"]);
   assert.equal(items[0].state, "complete");
-  assert.equal(items[1].state, "next");
+  assert.equal(items[1].state, "upcoming");
+  assert.equal(items[1].isNext, true);
+  assert.equal(items[1].countdown, "Starts in 1 hr 30 min");
+});
+
+test("today schedule retains completed events, highlights the current event, and promotes the next event", () => {
+  const items = todaysSchedule([
+    { id: "check-in", date: "2026-09-25", startTime: "7:00 AM", endTime: "8:00 AM", title: "Check-In" },
+    { id: "golf", date: "2026-09-25", startTime: "8:30 AM", endTime: "12:30 PM", title: "Round 1" },
+    { id: "meal", date: "2026-09-25", startTime: "1:00 PM", endTime: "2:00 PM", title: "Lunch" },
+  ], { now: new Date("2026-09-25T15:00:00Z"), timeZone: "America/Chicago" });
+  assert.deepEqual(items.map(({ id, state, isNext }) => ({ id, state, isNext })), [
+    { id: "check-in", state: "complete", isNext: false },
+    { id: "golf", state: "live", isNext: false },
+    { id: "meal", state: "upcoming", isNext: true },
+  ]);
+  assert.equal(items[2].countdown, "Starts in 3 hr");
 });
 
 test("tournament leaders exclude players without an official completed match", () => {
@@ -90,14 +106,15 @@ test("participant Home omits the website footer and preserves dashboard order", 
 });
 
 test("Home polish shares vertical rhythm and distinguishes completed rounds", async () => {
-  const [commandCenter, commandStyles, personalized, personalizedStyles] = await Promise.all([
+  const [commandCenter, schedule, commandStyles, personalized, personalizedStyles] = await Promise.all([
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/TournamentSchedule.js", import.meta.url), "utf8"),
     readFile(new URL("../app/tournament-command-center.module.css", import.meta.url), "utf8"),
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/personalized-player-home.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(commandCenter, /Match\$\{count === 1 \? "" : "es"\} Remaining/);
-  assert.match(commandCenter, /No additional events scheduled today\./);
+  assert.match(schedule, /No additional events scheduled today\./);
   assert.match(commandStyles, /--home-section-gap:12px/);
   assert.match(commandStyles, /--home-card-radius:20px/);
   assert.match(commandStyles, /--home-card-shadow:/);

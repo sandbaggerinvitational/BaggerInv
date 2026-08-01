@@ -4,10 +4,10 @@ import MobileIdentityImage from "./MobileIdentityImage";
 import StatusBadge from "./StatusBadge";
 import TournamentIdentityHeader from "./TournamentIdentityHeader";
 import TournamentMoments from "./TournamentMoments";
+import TournamentSchedule from "./TournamentSchedule";
 import { teamLogo } from "../lib/asset-paths";
 import {
   compactTournamentLeaders,
-  todaysSchedule,
   tournamentDayLabel,
   tournamentStatusLabel,
 } from "../lib/home-dashboard";
@@ -24,54 +24,9 @@ function assetSource(value, resolver) {
     : resolver(source);
 }
 
-function ScheduleIcon({ type }) {
-  const value = String(type || "").toLowerCase();
-  const icon = value.includes("meal") || value.includes("breakfast") ||
-    value.includes("lunch") || value.includes("dinner") ? "◆"
-    : value.includes("transport") ? "→"
-    : value.includes("golf") || value.includes("round") ? "●" : "•";
-  return <span aria-hidden="true">{icon}</span>;
-}
-
 function remainingMatchesLabel(value) {
   const count = Number(value) || 0;
   return `${count} Match${count === 1 ? "" : "es"} Remaining`;
-}
-
-function TournamentSchedule({ items }) {
-  return (
-    <section className={styles.schedule} aria-labelledby="today-schedule-title">
-      <header className={styles.sectionHeader}>
-        <div>
-          <p>Today</p>
-          <h2 id="today-schedule-title">Today’s Schedule</h2>
-        </div>
-        <Link href="/tournament-guide#itinerary">View Tournament Guide</Link>
-      </header>
-      {items.length ? (
-        <ol>
-          {items.map((item) => (
-            <li key={item.id} data-state={item.state}>
-              <time>{item.startTime || "TBD"}</time>
-              <ScheduleIcon type={item.type} />
-              <div>
-                <strong>{item.title}</strong>
-                {item.location || item.subtitle ? (
-                  <small>{[item.location, item.subtitle].filter(Boolean).join(" · ")}</small>
-                ) : null}
-              </div>
-              {item.state === "next" ? <b>Next</b> : null}
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <div className={styles.emptyState}>
-          <strong>No additional events scheduled today.</strong>
-          <span>View the Tournament Guide for the full itinerary.</span>
-        </div>
-      )}
-    </section>
-  );
 }
 
 function TournamentPulse({ tournament, progress, roundCount }) {
@@ -185,10 +140,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
   const liveTournament = liveData?.tournament || tournament;
   const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
   const timelineAvailable = Boolean(liveData?.timeline?.available);
-  const schedule = todaysSchedule((liveData?.timeline?.events || []).filter((event) => event.displayOnHome), {
-    now: liveData?.timeline?.previewDateActive && liveData.timeline.effectiveNow ? new Date(liveData.timeline.effectiveNow) : undefined,
-    timeZone: liveTournament.timeZone,
-  });
+  const scheduleEvents = (liveData?.timeline?.events || []).filter((event) => event.displayOnHome);
   const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
   const moments = tournamentMoments(liveData);
   const status = tournamentStatusLabel(liveTournament.status);
@@ -211,7 +163,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
       />
 
       <PersonalizedPlayerHome tournamentPulse={pulse} tournamentMoments={<TournamentMoments moments={moments} />} netSkins={liveData?.netSkins} />
-      {timelineAvailable ? <TournamentSchedule items={schedule} /> : null}
+      {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
       <TournamentLeaders leaders={leaders} />
     </div>
   );
