@@ -86,3 +86,9 @@ test("participant failure surfaces use safe workbook-check diagnostics", async (
   ]);
   files.forEach((source) => assert.match(source, /workbookInitializationMessage/));
 });
+
+test("recorded hole scores pass stroke index into every Net Skins scorecard row", async () => {
+  const source = await readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8");
+  assert.match(source, /const add = \(\{[^}]*strokeIndex[^}]*\}\) =>/);
+  assert.equal((source.match(/holeNumber: row\["Hole Number"\],\s*strokeIndex,/g) || []).length, 2);
+});

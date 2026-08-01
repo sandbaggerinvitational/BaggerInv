@@ -138,7 +138,7 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
     Number(row["Hole Number"]) === Number(holeNumber) &&
     (!clean(match.Tee || match["Tee Played"]) || !clean(row.Tee) || clean(row.Tee) === clean(match.Tee || match["Tee Played"]))
   );
-  const add = ({ entityId, playerIds, name, format, round, match, gross, net, par, holeNumber }) => {
+  const add = ({ entityId, playerIds, name, format, round, match, gross, net, par, holeNumber, strokeIndex }) => {
     if (!entityId || gross === null || net === null || par === null) return;
     const key = `${round}:${entityId}`;
     if (!totals.has(key)) totals.set(key, {
@@ -189,6 +189,7 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
           net,
           par,
           holeNumber: row["Hole Number"],
+          strokeIndex,
         });
         continue;
       }
@@ -208,6 +209,7 @@ function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {
           net,
           par,
           holeNumber: row["Hole Number"],
+          strokeIndex,
         });
       });
     }
