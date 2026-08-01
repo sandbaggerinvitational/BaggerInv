@@ -29,6 +29,26 @@ function activityLabel(status) {
   return "Match Updated";
 }
 
+function ReadinessPanel({ readiness }) {
+  return <section className={styles.readiness} aria-labelledby="readiness-title">
+    <header><span>Before the first tee</span><h2 id="readiness-title">Tournament Readiness</h2></header>
+    <div className={styles.readinessBanner} data-ready={readiness.tournamentReady ? "true" : "false"}>
+      <strong>{readiness.tournamentReady ? "🟢 Tournament Ready" : "🟡 Player Setup In Progress"}</strong>
+      <span>{readiness.readyPlayers} / {readiness.totalPlayers} Players Ready</span>
+    </div>
+    <div className={styles.readinessList}>{readiness.items.map((item) => {
+      const percent = item.total ? Math.round((item.complete / item.total) * 100) : 0;
+      return <details key={item.id}>
+        <summary aria-label={`${item.label}: ${item.complete} of ${item.total}`}>
+          <span><strong>{item.complete === item.total && item.total ? "🟢" : "🟡"} {item.label}</strong><small>{item.complete} / {item.total}</small></span>
+          <i><b style={{ width: `${percent}%` }} /></i>
+        </summary>
+        <div><strong>{item.missing.length ? "Players needing setup" : "Everyone is ready"}</strong>{item.missing.length ? <ul>{item.missing.map((player) => <li key={player.id}>{player.name}</li>)}</ul> : <p>No outstanding setup.</p>}</div>
+      </details>;
+    })}</div>
+  </section>;
+}
+
 export default function DirectorDashboard({ directorName }) {
   const [data, setData] = useState(null);
   const [busy, setBusy] = useState("");
@@ -89,23 +109,9 @@ export default function DirectorDashboard({ directorName }) {
       </div>
     </section>
 
-    {data.readiness ? <section className={styles.readiness} aria-labelledby="readiness-title">
-      <header><span>Before the first tee</span><h2 id="readiness-title">Tournament Readiness</h2></header>
-      <div className={styles.readinessBanner} data-ready={data.readiness.tournamentReady ? "true" : "false"}>
-        <strong>{data.readiness.tournamentReady ? "🟢 Tournament Ready" : "🟡 Player Setup In Progress"}</strong>
-        <span>{data.readiness.readyPlayers} / {data.readiness.totalPlayers} Players Ready</span>
-      </div>
-      <div className={styles.readinessList}>{data.readiness.items.map((item) => {
-        const percent = item.total ? Math.round((item.complete / item.total) * 100) : 0;
-        return <details key={item.id}>
-          <summary aria-label={`${item.label}: ${item.complete} of ${item.total}`}>
-            <span><strong>{item.complete === item.total && item.total ? "🟢" : "🟡"} {item.label}</strong><small>{item.complete} / {item.total}</small></span>
-            <i><b style={{ width: `${percent}%` }} /></i>
-          </summary>
-          <div><strong>{item.missing.length ? "Players needing setup" : "Everyone is ready"}</strong>{item.missing.length ? <ul>{item.missing.map((player) => <li key={player.id}>{player.name}</li>)}</ul> : <p>No outstanding setup.</p>}</div>
-        </details>;
-      })}</div>
-    </section> : null}
+    {data.readiness && data.readinessLifecycle === "setup" ? <ReadinessPanel readiness={data.readiness} />
+      : data.readiness ? <details className={styles.readinessArchive}><summary>Pre-Tournament Setup</summary><ReadinessPanel readiness={data.readiness} /></details>
+      : null}
 
     {data.timelineAvailable ? <section className={styles.nextEvent} aria-labelledby="next-event-title"><header><span>Tournament countdown</span><h2 id="next-event-title">Next Event</h2></header>{data.nextEvent ? <div><div><strong><span aria-hidden="true">{data.nextEvent.icon}</span> {data.nextEvent.title}</strong>{data.nextEvent.subtitle ? <span>{data.nextEvent.subtitle}</span> : null}{data.nextEvent.location ? <small>{data.nextEvent.location}</small> : null}<small>{data.nextEvent.startTime}</small></div><div><b>{data.nextEvent.countdown}</b><span>{data.nextEvent.status}</span></div></div> : <p>No remaining scheduled events today.</p>}</section> : null}
 

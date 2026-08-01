@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { tournamentReadiness } from "../lib/tournament-readiness.js";
+import { directorReadinessLifecycle } from "../lib/tournament-director.js";
 
 const future = "2099-01-01T00:00:00.000Z";
 const players = [
@@ -47,6 +48,12 @@ test("24 of 24 complete produces Tournament Ready", () => {
   assert.equal(model.readyPlayers, 24);
 });
 
+test("Readiness is primary only before the first round opens", () => {
+  assert.equal(directorReadinessLifecycle([{ status: "UPCOMING" }, { status: "UPCOMING" }]), "setup");
+  assert.equal(directorReadinessLifecycle([{ status: "LIVE" }, { status: "UPCOMING" }]), "operations");
+  assert.equal(directorReadinessLifecycle([{ status: "FINAL" }, { status: "UPCOMING" }]), "operations");
+});
+
 test("Director drill-down and Home setup banners consume shared readiness", async () => {
   const [director, home, banner, route, writer] = await Promise.all([
     readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8"),
@@ -58,6 +65,8 @@ test("Director drill-down and Home setup banners consume shared readiness", asyn
   assert.match(director, /Tournament Readiness/);
   assert.match(director, /Players needing setup/);
   assert.match(director, /Players Ready/);
+  assert.match(director, /data\.readinessLifecycle === "setup"/);
+  assert.match(director, /<summary>Pre-Tournament Setup<\/summary>/);
   assert.match(home, /<PlayerSetupBanner readiness=\{payload\?\.readiness\}/);
   assert.match(banner, /Get the full tournament experience/);
   assert.match(banner, /Never miss a match update/);
