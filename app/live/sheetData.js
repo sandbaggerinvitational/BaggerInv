@@ -450,6 +450,15 @@ async function buildTournamentData() {
         team2Points: publicResultAllowed ? number(authoritative["Team 2 Points"]) : null,
         pointsAvailable: number(rule["Points Available"]) ?? 3,
         expectedRoundMatchCount: expectedByRound.get(round) || 0,
+        // Storytelling receives only the official, non-score hole outcome
+        // projection. This keeps editorial intelligence grounded in the same
+        // normalized source as Game Center without exposing or duplicating the
+        // score-entry model.
+        holeResults: matchHoleScores.map((row) => ({
+          holeNumber: number(row["Hole Number"]),
+          winner: normalizeWinner(row["Hole Winner"]),
+          updatedAt: row["Updated At"] || authoritative["Updated At"] || "",
+        })).filter((row) => row.holeNumber !== null && row.winner),
       };
     });
 
