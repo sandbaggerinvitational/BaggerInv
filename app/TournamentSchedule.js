@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { todaysSchedule } from "../lib/home-dashboard";
-import { timelineEventIcon } from "../lib/tournament-timeline";
+import { timelineEventIcon, timelineOptionalText } from "../lib/tournament-timeline";
 import styles from "./tournament-command-center.module.css";
 
 function scheduleNow(initialNow, mountedAt) {
@@ -28,14 +28,17 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "" }
         <div><p>Today</p><h2 id="today-schedule-title">Today’s Schedule</h2></div>
         <Link href="/tournament-guide#itinerary">View Tournament Guide</Link>
       </header>
-      {items.length ? <ol>{items.map((item) => (
+      {items.length ? <ol>{items.map((item) => {
+        const subtitle = timelineOptionalText(item.subtitle);
+        const location = timelineOptionalText(item.location);
+        return (
         <li key={item.id} data-state={item.state} aria-current={item.state === "live" ? "true" : undefined}>
           <time>{item.startTime}</time>
           <span className={styles.scheduleIcon} aria-hidden="true">{timelineEventIcon(item.type)}</span>
           <div>
             <strong>{item.title}</strong>
-            {item.subtitle ? <small>{item.subtitle}</small> : null}
-            {item.location ? <small className={styles.scheduleLocation}>{item.location}</small> : null}
+            {subtitle ? <small>{subtitle}</small> : null}
+            {location ? <small className={styles.scheduleLocation}>{location}</small> : null}
           </div>
           {item.state === "live" ? <b>Live</b>
             : item.state === "complete" ? <b className={styles.completed}>✓ Completed</b>
@@ -43,7 +46,7 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "" }
             : item.state === "delayed" || item.state === "cancelled" ? <b>{item.state}</b>
             : null}
         </li>
-      ))}</ol> : <div className={styles.emptyState}>
+      );})}</ol> : <div className={styles.emptyState}>
         <strong>No additional events scheduled today.</strong>
         <span>View the Tournament Guide for the full itinerary.</span>
       </div>}

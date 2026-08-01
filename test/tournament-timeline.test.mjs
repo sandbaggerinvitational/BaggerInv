@@ -5,6 +5,7 @@ import {
   normalizeTournamentTimeline,
   resolveTimelineNow,
   timelineEventIcon,
+  timelineOptionalText,
   timelineEventStatus,
   tournamentDateTime,
 } from "../lib/tournament-timeline.js";
@@ -49,6 +50,13 @@ test("Timeline event types use one shared icon vocabulary", () => {
   assert.equal(timelineEventIcon("Check-In"), "📍");
   assert.equal(timelineEventIcon("Awards"), "🏆");
   assert.equal(timelineEventIcon("Meeting"), "👥");
+});
+
+test("Timeline hides blank and placeholder locations without inventing a value", () => {
+  assert.equal(timelineOptionalText(""), "");
+  assert.equal(timelineOptionalText("TBD"), "");
+  assert.equal(timelineOptionalText("N/A"), "");
+  assert.equal(timelineOptionalText("Turtle Point Clubhouse"), "Turtle Point Clubhouse");
 });
 
 test("Preview Timeline Date preserves tournament-local time on the selected date", () => {
@@ -134,7 +142,8 @@ test("Home and Director hide operational schedule sections when Timeline is unav
   assert.match(schedule, /aria-current=\{item\.state === "live"/);
   assert.match(schedule, /✓ Completed/);
   assert.match(schedule, /item\.isNext \? <b className=\{styles\.countdown\}>\{item\.countdown\}/);
-  assert.match(schedule, /item\.location \? <small className=\{styles\.scheduleLocation\}>/);
+  assert.match(schedule, /location \? <small className=\{styles\.scheduleLocation\}>/);
+  assert.match(schedule, /timelineOptionalText\(item\.location\)/);
   assert.match(director, /data\.timelineAvailable \? <section className=\{styles\.nextEvent\}/);
   assert.match(director, /data\.nextEvent\.icon/);
   assert.match(director, /data\.nextEvent\.location \?/);
