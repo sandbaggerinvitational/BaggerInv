@@ -457,6 +457,10 @@ async function buildTournamentData() {
       const standardFinalResult = permanentFinal
         ? finalizedMatchResult(authoritative, matchHoleScores, { 1: teams[1].name, 2: teams[2].name })
         : "";
+      const accessExpiresAt = clean(liveRow["Access Expires At"]);
+      const accessExpiry = Date.parse(accessExpiresAt);
+      const accessActive = truthy(liveRow["Access Active"]);
+      const accessCurrent = !Number.isFinite(accessExpiry) || accessExpiry > Date.now();
       return {
         id: matchId,
         round,
@@ -467,6 +471,9 @@ async function buildTournamentData() {
         teeTime: formatTime(matchRow["Tee Time"]),
         status,
         sourceStatus: rawStatus,
+        accessActive,
+        accessExpiresAt,
+        scoringEnabled: !permanentFinal && accessActive && accessCurrent,
         archiveFinal: permanentFinal,
         scoreConflict: truthy(liveRow["Score Conflict"] || liveRow["Scoring Conflict"] || liveRow.Conflict),
         finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",

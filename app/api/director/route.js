@@ -5,7 +5,7 @@ import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../
 import { inspectPlayerPassportToken } from "../../../lib/player-passport-server.js";
 import { isTournamentDirectorActor } from "../../../lib/player-role.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { currentPushDevice, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
 import { NOTIFICATION_TEMPLATE_OPTIONS } from "../../../lib/notification-templates.js";
@@ -20,6 +20,13 @@ async function authorize(request) {
 function refresh() {
   revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
   for (const path of ["/admin/director", "/home", "/live", "/my-match"]) revalidatePath(path);
+}
+
+async function setMatchesLiveAndOpenScoring(matches, updatedBy) {
+  await Promise.all(matches.filter((match) => match.status !== "Final").map(async (match) => {
+    await updateLiveMatch(match.id, { "Match Status": "Live" }, updatedBy);
+    await enableLiveMatchAccess(match.id, updatedBy);
+  }));
 }
 
 export async function GET(request) {
@@ -67,12 +74,16 @@ export async function POST(request) {
       if (!dueRound) return NextResponse.json({ ok: true, changed: false });
       const dueMatches = data.rounds.find((item) => Number(item.number) === dueRound)?.matches || [];
       await updateTournamentAdminData(data.tournament.id, { "Status Mode": "Manual Override", "Tournament Status": "Live", "Current Round": String(dueRound) }, "Tournament Director automation");
-      if (data.tournament.directorAutomation?.autoSetMatchesLive) await Promise.all(dueMatches.filter((match) => match.status !== "Final").map((match) => updateLiveMatch(match.id, { "Match Status": "Live" }, "Tournament Director automation")));
+      if (data.tournament.directorAutomation?.autoSetMatchesLive) await setMatchesLiveAndOpenScoring(dueMatches, "Tournament Director automation");
     } else if (input.action === "set-live") {
-      await Promise.all(matches.filter((match) => match.status !== "Final").map((match) => updateLiveMatch(match.id, { "Match Status": "Live" }, updatedBy)));
+      await setMatchesLiveAndOpenScoring(matches, updatedBy);
     } else if (input.action === "open-round") {
       await updateTournamentAdminData(data.tournament.id, { "Status Mode": "Manual Override", "Tournament Status": "Live", "Current Round": String(round) }, updatedBy);
-      if (data.tournament.directorAutomation?.autoSetMatchesLive) await Promise.all(matches.filter((match) => match.status !== "Final").map((match) => updateLiveMatch(match.id, { "Match Status": "Live" }, updatedBy)));
+      if (data.tournament.directorAutomation?.autoSetMatchesLive) await setMatchesLiveAndOpenScoring(matches, updatedBy);
+    } else if (input.action === "unlock-scoring") {
+      await Promise.all(matches.filter((match) => match.status !== "Final").map((match) => enableLiveMatchAccess(match.id, updatedBy)));
+    } else if (input.action === "lock-scoring") {
+      await Promise.all(matches.filter((match) => match.status !== "Final").map((match) => disableLiveMatchAccess(match.id, updatedBy)));
     } else if (input.action === "close-round") {
       if (matches.some((match) => match.status !== "Final")) throw new Error("Every match must be Final before the round can close.");
       const next = data.rounds.find((item) => Number(item.number) > round)?.number;

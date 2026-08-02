@@ -31,7 +31,7 @@ test("round and tournament health summarize authoritative match statuses", () =>
     { id: "M3", status: "Reopened", course: { name: "Ocean" }, team1Players: [{}], team2Players: [{}] },
     { id: "M4", status: "Scheduled", course: { name: "Ocean" }, team1Players: [{}], team2Players: [{}] },
   ];
-  assert.deepEqual(directorRoundStatus({ matches }), { final: 1, live: 2, upcoming: 1, total: 4, status: "LIVE" });
+  assert.deepEqual(directorRoundStatus({ matches }), { final: 1, live: 2, upcoming: 1, scoringLocked: 0, total: 4, status: "LIVE" });
   const model = tournamentDirectorModel({ tournament: { currentRound: 1 }, rounds: [{ number: 1, matches }] });
   assert.deepEqual({ live: model.health.live, upcoming: model.health.upcoming, final: model.health.final, awaiting: model.health.awaitingConfirmation, reopened: model.health.reopened }, { live: 2, upcoming: 1, final: 1, awaiting: 1, reopened: 1 });
 });
@@ -109,6 +109,30 @@ test("adaptive primary action follows the official round workflow", () => {
   const complete = model({ currentRound: "Final", status: "Final" }, [match("Final")]);
   assert.equal(complete.primaryAction.label, "🏆 Tournament Complete");
   assert.equal(complete.health.status.label, "Tournament Complete");
+});
+
+test("LIVE matches with disabled participant scoring require Director action", () => {
+  const player = (id) => ({ id, playingHcp: 2 });
+  const locked = { id: "M1", match: 1, status: "Live", scoringEnabled: false, teeTime: "8:00 AM", course: { name: "Ocean" }, team1Players: [player("A")], team2Players: [player("B")] };
+  const model = tournamentDirectorModel({
+    tournament: { currentRound: 1, status: "Live", directorAutomation: { enabled: true } },
+    rounds: [{ number: 1, label: "Round 1", format: "Best Ball", matches: [locked] }],
+  }, new Date("2026-07-02T08:00:00"));
+  assert.equal(model.operatingRound.scoringLocked, 1);
+  assert.equal(model.health.scoringLocked, 1);
+  assert.equal(model.primaryAction.action, "unlock-scoring");
+  assert.equal(model.health.status.label, "Immediate Action Required");
+  assert.match(model.issues.find((item) => item.id === "scoring:M1").message, /LIVE but participant scoring is locked/);
+});
+
+test("Director LIVE transitions also open scoring and explicit lock controls remain available", () => {
+  const route = source("app/api/director/route.js");
+  assert.match(route, /setMatchesLiveAndOpenScoring/);
+  assert.match(route, /enableLiveMatchAccess\(match\.id, updatedBy\)/);
+  assert.match(route, /input\.action === "unlock-scoring"/);
+  assert.match(route, /input\.action === "lock-scoring"/);
+  const dashboard = source("app/admin/director/DirectorDashboard.js");
+  assert.match(dashboard, /data\.operatingRound\.scoringLocked \? "unlock-scoring" : "lock-scoring"/);
 });
 
 test("natural next-event wording includes the event name and action", () => {

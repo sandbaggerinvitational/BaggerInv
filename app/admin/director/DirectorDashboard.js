@@ -8,7 +8,7 @@ import styles from "./director.module.css";
 
 const HEALTH = [
   ["live", "Live Matches"], ["upcoming", "Upcoming Matches"], ["final", "Final Matches"],
-  ["awaitingConfirmation", "Awaiting Confirmation"], ["reopened", "Reopened Matches"], ["errors", "Errors"],
+  ["scoringLocked", "Scoring Locked"], ["awaitingConfirmation", "Awaiting Confirmation"], ["reopened", "Reopened Matches"], ["errors", "Errors"],
 ];
 
 function timestamp(value) {
@@ -127,6 +127,7 @@ export default function DirectorDashboard({ directorName }) {
     const source = item.items?.[0] || item;
     if (source.action === "enable-automation") return act("automation", { enabled: true, autoOpenRound: true, autoSetMatchesLive: true });
     if (source.action === "open-round") { if (source.id.startsWith("round:")) setSelectedRound(source.id.split(":")[1]); return act("open-round", { round: Number(source.id.split(":")[1] || selectedRound) }); }
+    if (source.action === "unlock-scoring") return act("unlock-scoring", { round: data.operatingRound?.number });
     if (source.action === "retry") return load().catch((error) => setMessage(error.message));
     return null;
   };
@@ -169,6 +170,7 @@ export default function DirectorDashboard({ directorName }) {
     <section className={styles.actions} id="quick-actions" aria-labelledby="actions-title"><header><span>Recommended next step</span><h2 id="actions-title">Quick Actions</h2></header><div className={styles.primaryAction} data-kind={data.primaryAction.kind}>
       {data.primaryAction.kind === "action" ? <button disabled={Boolean(busy)} onClick={() => act(data.primaryAction.action, { round: data.operatingRound?.number })}>{data.primaryAction.label}</button> : <strong>{data.primaryAction.label}</strong>}<span>{data.primaryAction.message}</span>
     </div><div className={styles.secondaryActions}>
+      {data.operatingRound?.status === "LIVE" ? <button disabled={Boolean(busy)} onClick={() => act(data.operatingRound.scoringLocked ? "unlock-scoring" : "lock-scoring", { round: data.operatingRound.number })}>{data.operatingRound.scoringLocked ? "Unlock Scoring" : "Lock Scoring"}</button> : null}
       {finalMatches ? <label><span>Reopen finalized match</span><select value={reopenId} onChange={(event) => setReopenId(event.target.value)}><option value="">Select match</option>{(data.finalizedMatches || []).filter((item) => String(item.round) === selectedRound).map((item) => <option value={item.id} key={item.id}>Match {item.match} · {item.id}</option>)}</select><button disabled={Boolean(busy) || !reopenId} onClick={() => act("reopen-match", { matchId: reopenId })}>Reopen Match</button></label> : null}
       <Link href="/live?view=leaderboards">Leaderboards</Link><Link href="/live">Tournament Overview</Link>
     </div><details className={styles.roundOverride}><summary>Override Operating Round</summary><label>Operating round<select value={selectedRound} onChange={(event) => setSelectedRound(event.target.value)}>{data.rounds.map((item) => <option value={item.number} key={item.number}>{item.name} • {item.format}</option>)}</select></label></details>{message ? <p role="status">{message}</p> : null}</section>
