@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { notificationReady, parsePushSubscription, previewPushConfiguration } from "../lib/web-push-notifications.js";
 import { tournamentReadiness } from "../lib/tournament-readiness.js";
-import { NOTIFICATION_TEMPLATE_OPTIONS, NOTIFICATION_TITLE, notificationTemplateOptions, previewNotificationTemplate } from "../lib/notification-templates.js";
+import { NOTIFICATION_TEMPLATE_OPTIONS, NOTIFICATION_TITLE, notificationTemplate, previewNotificationTemplate, previewNotificationTemplateOptions } from "../lib/notification-templates.js";
 
 const valid = { endpoint: "https://push.example/device", keys: { p256dh: "key", auth: "secret" } };
 
@@ -104,7 +104,16 @@ test("approved Version 1.0 notification copy and deep links remain exact", () =>
 
 test("sandbox button labels are the exact titles generated for its current golfer context", () => {
   const context = { round: 2, format: "Scramble", event: "Awards Ceremony", eventIcon: "🏆" };
-  for (const option of notificationTemplateOptions(context)) {
+  for (const option of previewNotificationTemplateOptions(context)) {
     assert.equal(option.label, previewNotificationTemplate(option.id, context).title);
   }
+});
+
+test("production template generation never inherits Preview Round 3 mock values", () => {
+  const runtime = notificationTemplate("tee-time-reminder", {
+    round: 1, format: "Best Ball", teeTime: "7:40 AM", tee: "Blue", course: "Turtle Point",
+  });
+  assert.equal(runtime.body, "Round 1 • Best Ball\n7:40 AM • Blue Tees\nTurtle Point");
+  assert.doesNotMatch(`${runtime.title}\n${runtime.body}`, /Round 3|Singles|10:50 AM|Gold Tees|The Ocean Course/);
+  assert.throws(() => notificationTemplate("tee-time-reminder", { round: 1 }), /missing runtime fields: format, teeTime, tee, course/);
 });
