@@ -5,6 +5,7 @@ import {
   initializeTournamentWorkbook,
   workbookInitializationMessage,
 } from "../lib/tournament-workbook-initialization.js";
+import { GoogleReadError } from "../lib/google-api-reliability.js";
 
 const requiredValues = { Tournaments: [["Year"], [2026]], Players: [["Player ID"], ["P1"]] };
 
@@ -86,6 +87,45 @@ test("a required-sheet failure reports the exact workbook check", async () => {
       return true;
     }
   );
+});
+
+test("cold-start transient snapshot failures retry before required-sheet validation", async () => {
+  let attempts = 0;
+  let diagnosticReads = 0;
+  const result = await initializeTournamentWorkbook({
+    requiredNames: ["Tournaments", "Players", "Live Matches"],
+    readRequired: async () => {
+      attempts += 1;
+      if (attempts < 3) throw new GoogleReadError("startup timeout", { category: "timeout" });
+      return { ...requiredValues, "Live Matches": [["Match ID"], ["M1"]] };
+    },
+    readSheet: async () => { diagnosticReads += 1; return []; },
+  });
+  assert.equal(attempts, 3);
+  assert.equal(diagnosticReads, 0);
+  assert.equal(result.checks.required["Live Matches"], "ready");
+});
+
+test("persistent transient startup failure is not mislabeled as a missing sheet", async () => {
+  let attempts = 0;
+  let diagnosticReads = 0;
+  await assert.rejects(
+    initializeTournamentWorkbook({
+      requiredNames: ["Live Matches"],
+      readRequired: async () => {
+        attempts += 1;
+        throw new GoogleReadError("startup timeout", { status: 503, category: "upstream" });
+      },
+      readSheet: async () => { diagnosticReads += 1; return []; },
+    }),
+    (error) => {
+      assert.equal(error.workbookCheck, "required normalized-sheet snapshot");
+      assert.equal(error.category, "upstream");
+      return true;
+    }
+  );
+  assert.equal(attempts, 3);
+  assert.equal(diagnosticReads, 0);
 });
 
 test("the normalized loader keeps Net Skins outside its required batch", async () => {
