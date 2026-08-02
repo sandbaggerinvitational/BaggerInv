@@ -47,7 +47,7 @@ test("iPhone release metadata uses safe-area viewport, launch images, and a mask
   assert.match(layout, /statusBarStyle: "black-translucent"/);
   assert.match(layout, /title: "The Bagger"/);
   assert.match(layout, /applicationName: "The Bagger"/);
-  assert.match(layout, /url: "\/apple-icon\.png"/);
+  assert.match(layout, /url: "\/apple-touch-icon\.png"/);
   assert.match(layout, /startupImage/);
   assert.match(manifestSource, /icon-maskable-512\.png/);
   assert.match(manifestSource, /name: "The Bagger"/);
@@ -55,6 +55,17 @@ test("iPhone release metadata uses safe-area viewport, launch images, and a mask
   assert.doesNotMatch(manifestSource, /absoluteUrl\("\/icon/);
   assert.match(manifestSource, /shortcuts/);
   assert.match(manifestSource, /\/my-match\?source=shortcut/);
+});
+
+test("mobile Home exposes an unambiguous iOS Home Screen title", async () => {
+  const source = await readFile(
+    new URL("../app/home/page.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /title:\s*\{ absolute: "The Bagger" \}/);
+  assert.match(source, /applicationName: "The Bagger"/);
+  assert.doesNotMatch(source, /Home \| Sandbagger Invitational/);
 });
 
 test("participant profile exposes the native Web Share API with a copy fallback", async () => {

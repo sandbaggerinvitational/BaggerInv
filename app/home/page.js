@@ -5,7 +5,13 @@ import { getTournamentData } from "../live/sheetData";
 import { workbookInitializationMessage } from "../../lib/tournament-workbook-initialization";
 
 export const dynamic = "force-dynamic";
-export const metadata = privatePageMetadata("Home | Sandbagger Invitational");
+export const metadata = {
+  ...privatePageMetadata("The Bagger"),
+  // iOS Add to Home Screen can fall back to the document title. An absolute
+  // title prevents the root title template from appending the public-site name.
+  title: { absolute: "The Bagger" },
+  applicationName: "The Bagger",
+};
 
 export default async function MobileHomePage() {
   let liveData;

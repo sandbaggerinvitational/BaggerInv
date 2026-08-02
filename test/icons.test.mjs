@@ -21,6 +21,7 @@ test("production PNG icons use the expected dimensions", async () => {
   const icons = [
     ["../app/icon.png", 1024],
     ["../app/apple-icon.png", 180],
+    ["../public/apple-touch-icon.png", 180],
     ["../public/favicon-16x16.png", 16],
     ["../public/favicon-32x32.png", 32],
     ["../public/icon-192.png", 192],
