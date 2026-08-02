@@ -39,7 +39,7 @@ test("service worker, participant subscription, Director sandbox, and log are wi
   ]);
   assert.match(worker, /addEventListener\("push"/);
   assert.match(worker, /addEventListener\("notificationclick"/);
-  assert.match(worker, /payload\.title \|\| "The Bagger"/);
+  assert.match(worker, /payload\.title \|\| "Tournament Update"/);
   assert.match(banner, /pushManager\.subscribe/);
   const pushFlow = banner.slice(banner.indexOf("async function syncPushSubscription"), banner.indexOf("function standalone"));
   assert.ok(pushFlow.indexOf("Notification.requestPermission()") < pushFlow.indexOf('fetch("/api/player-passport/notifications"'), "permission must be requested before the first awaited network call");
@@ -60,8 +60,8 @@ test("service worker, participant subscription, Director sandbox, and log are wi
   assert.doesNotMatch(testRoute, /cron|schedule|match finalized|round opened/i);
 });
 
-test("Preview sandbox exposes every approved production notification template", () => {
-  assert.equal(NOTIFICATION_TITLE, "The Bagger");
+test("Preview sandbox exposes event titles while iOS supplies The Bagger attribution once", () => {
+  assert.equal(NOTIFICATION_TITLE, "Tournament Update");
   assert.deepEqual(NOTIFICATION_TEMPLATE_OPTIONS.map(({ label }) => label), [
     "Test Notification", "Tee Time Reminder", "Match Ready", "Match Finalized", "Match Reopened",
     "Singles Pairing", "Timeline Event", "Round Started", "Round Clinched", "Round Tied",
@@ -69,7 +69,8 @@ test("Preview sandbox exposes every approved production notification template", 
   ]);
   for (const option of NOTIFICATION_TEMPLATE_OPTIONS) {
     const template = previewNotificationTemplate(option.id);
-    assert.equal(template.title, "The Bagger");
+    assert.notEqual(template.title, "The Bagger");
+    assert.match(template.title, new RegExp(option.label === "Net Skins Round Results" ? "Net Skins Results" : option.label));
     assert.ok(template.body.length > 10);
     assert.match(template.url, /^\//);
   }
