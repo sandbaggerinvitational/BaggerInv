@@ -90,7 +90,7 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("push", (event) => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; } catch { payload = {}; }
-  event.waitUntil(self.registration.showNotification(payload.title || "Sandbagger Invitational", {
+  event.waitUntil(self.registration.showNotification(payload.title || "The Bagger", {
     body: payload.body || "Tournament update",
     icon: payload.icon || "/icon-192.png",
     badge: payload.badge || "/icon-192.png",

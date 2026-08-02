@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { notificationReady, parsePushSubscription, previewPushConfiguration } from "../lib/web-push-notifications.js";
 import { tournamentReadiness } from "../lib/tournament-readiness.js";
+import { NOTIFICATION_TEMPLATE_OPTIONS, NOTIFICATION_TITLE, previewNotificationTemplate } from "../lib/notification-templates.js";
 
 const valid = { endpoint: "https://push.example/device", keys: { p256dh: "key", auth: "secret" } };
 
@@ -38,6 +39,7 @@ test("service worker, participant subscription, Director sandbox, and log are wi
   ]);
   assert.match(worker, /addEventListener\("push"/);
   assert.match(worker, /addEventListener\("notificationclick"/);
+  assert.match(worker, /payload\.title \|\| "The Bagger"/);
   assert.match(banner, /pushManager\.subscribe/);
   const pushFlow = banner.slice(banner.indexOf("async function syncPushSubscription"), banner.indexOf("function standalone"));
   assert.ok(pushFlow.indexOf("Notification.requestPermission()") < pushFlow.indexOf('fetch("/api/player-passport/notifications"'), "permission must be requested before the first awaited network call");
@@ -51,7 +53,24 @@ test("service worker, participant subscription, Director sandbox, and log are wi
   assert.match(director, /Notification Permission/);
   assert.match(director, /Push Subscription/);
   assert.match(director, /Ready To Send/);
+  assert.match(director, /notificationSandbox\.templates\.map/);
   assert.match(director, /Notification Log/);
   assert.match(writer, /"Notification Permission"[\s\S]*"Push Subscription"[\s\S]*"Device Last Seen"/);
+  assert.match(writer, /"Notification Preview Template"/);
   assert.doesNotMatch(testRoute, /cron|schedule|match finalized|round opened/i);
+});
+
+test("Preview sandbox exposes every approved production notification template", () => {
+  assert.equal(NOTIFICATION_TITLE, "The Bagger");
+  assert.deepEqual(NOTIFICATION_TEMPLATE_OPTIONS.map(({ label }) => label), [
+    "Test Notification", "Tee Time Reminder", "Match Ready", "Match Finalized", "Match Reopened",
+    "Singles Pairing", "Tournament Timeline Event", "Round Started", "Round Clinched", "Round Tied",
+    "Championship Singles LIVE", "Tournament Champions", "Net Skins Round Results", "Tournament Complete",
+  ]);
+  for (const option of NOTIFICATION_TEMPLATE_OPTIONS) {
+    const template = previewNotificationTemplate(option.id);
+    assert.equal(template.title, "The Bagger");
+    assert.ok(template.body.length > 10);
+    assert.match(template.url, /^\//);
+  }
 });

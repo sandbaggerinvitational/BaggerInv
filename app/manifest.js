@@ -8,7 +8,7 @@ export default function manifest() {
   return {
     id: "/",
     name: SITE_NAME,
-    short_name: "SBI",
+    short_name: "The Bagger",
     lang: "en-US",
     dir: "ltr",
     description: DEFAULT_DESCRIPTION,

@@ -63,6 +63,8 @@ test("manifest references production app icons", () => {
   assert.equal(appManifest.id, "/");
   assert.equal(appManifest.start_url, "/");
   assert.equal(appManifest.scope, "/");
+  assert.equal(appManifest.name, "The Sandbagger Invitational");
+  assert.equal(appManifest.short_name, "The Bagger");
   assert.deepEqual(appManifest.icons.slice(0, 2), [
     {
       src: `${SITE_URL}/icon-192.png`,

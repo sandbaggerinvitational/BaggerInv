@@ -8,6 +8,7 @@ import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tou
 import { currentPushDevice, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
+import { NOTIFICATION_TEMPLATE_OPTIONS } from "../../../lib/notification-templates.js";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,7 @@ export async function GET(request) {
       ...tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() }),
       notificationSandbox: preview.preview ? {
         configured: preview.configured, currentDeviceReady: readyToSend,
-        health: { pwaInstalled, permissionGranted, pushSubscription, readyToSend }, log: notificationLog,
+        health: { pwaInstalled, permissionGranted, pushSubscription, readyToSend }, templates: NOTIFICATION_TEMPLATE_OPTIONS, log: notificationLog,
       } : null,
     } }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
