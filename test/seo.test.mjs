@@ -60,11 +60,11 @@ test("root metadata configures the production title template and icons", async (
   );
 
   assert.match(layout, /template: `%s \| \$\{SITE_NAME\}`/);
-  assert.match(layout, /absoluteUrl\("\/favicon\.ico"\)/);
-  assert.match(layout, /absoluteUrl\("\/favicon-16x16\.png"\)/);
-  assert.match(layout, /absoluteUrl\("\/favicon-32x32\.png"\)/);
-  assert.match(layout, /absoluteUrl\("\/icon\.png"\)/);
-  assert.match(layout, /absoluteUrl\("\/apple-icon\.png"\)/);
+  assert.match(layout, /url: "\/favicon\.ico"/);
+  assert.match(layout, /url: "\/favicon-16x16\.png"/);
+  assert.match(layout, /url: "\/favicon-32x32\.png"/);
+  assert.match(layout, /url: "\/icon\.png"/);
+  assert.match(layout, /url: "\/apple-icon\.png"/);
 });
 
 test("root layout enables Vercel Web Analytics site-wide", async () => {

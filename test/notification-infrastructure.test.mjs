@@ -64,7 +64,7 @@ test("Preview sandbox exposes every approved production notification template", 
   assert.equal(NOTIFICATION_TITLE, "The Bagger");
   assert.deepEqual(NOTIFICATION_TEMPLATE_OPTIONS.map(({ label }) => label), [
     "Test Notification", "Tee Time Reminder", "Match Ready", "Match Finalized", "Match Reopened",
-    "Singles Pairing", "Tournament Timeline Event", "Round Started", "Round Clinched", "Round Tied",
+    "Singles Pairing", "Timeline Event", "Round Started", "Round Clinched", "Round Tied",
     "Championship Singles LIVE", "Tournament Champions", "Net Skins Round Results", "Tournament Complete",
   ]);
   for (const option of NOTIFICATION_TEMPLATE_OPTIONS) {

@@ -926,3 +926,4 @@ footer span {
   --status-locked-neutral: #4c5a54;
 }
 body.preview-impersonation-active{padding-top:54px}
+.pwaInstallGuidance>div{display:grid;gap:4px;padding:4px 6px}.pwaInstallGuidance>div>strong{font-size:.8rem}.pwaInstallGuidance ol{display:flex;gap:5px;margin:0;padding:0;list-style:none;font-size:.72rem}.pwaInstallGuidance li:not(:last-child)::after{margin-left:5px;color:#a17b25;content:"→"}@media(max-width:390px){.pwaInstallGuidance ol{align-items:flex-start;flex-direction:column;gap:2px}.pwaInstallGuidance li:not(:last-child)::after{content:"↓"}}

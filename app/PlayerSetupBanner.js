@@ -40,18 +40,13 @@ function standalone() {
 }
 
 export default function PlayerSetupBanner({ readiness, onUpdated }) {
-  const [installPrompt, setInstallPrompt] = useState(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const capture = () => setInstallPrompt(window.__sbiInstallPrompt || null);
     const installed = () => saveReadiness({ pwaInstalled: true }).then(onUpdated).catch(() => {});
-    capture();
-    window.addEventListener("sbi:pwa-installable", capture);
     window.addEventListener("sbi:pwa-installed", installed);
     return () => {
-      window.removeEventListener("sbi:pwa-installable", capture);
       window.removeEventListener("sbi:pwa-installed", installed);
     };
   }, [onUpdated]);
@@ -71,18 +66,7 @@ export default function PlayerSetupBanner({ readiness, onUpdated }) {
   if (!readiness || (readiness.pwaInstalled && (readiness.notificationReady || readiness.notificationsEnabled))) return null;
 
   if (!readiness.pwaInstalled) return <aside className={styles.banner} aria-label="Tournament app setup">
-    <span aria-hidden="true">📱</span><div><strong>Get the full tournament experience</strong><p>Add Sandbagger Invitational to your Home Screen.</p>{message ? <small role="status">{message}</small> : null}</div>
-    <button disabled={busy} onClick={async () => {
-      setBusy(true); setMessage("");
-      try {
-        const prompt = installPrompt || window.__sbiInstallPrompt;
-        if (prompt) {
-          await prompt.prompt();
-          const choice = await prompt.userChoice;
-          if (choice?.outcome === "accepted") setMessage("Finishing installation…");
-        } else setMessage("Tap Share, then Add to Home Screen.");
-      } finally { setBusy(false); }
-    }}>Install</button>
+    <span aria-hidden="true">📱</span><div><strong>Get the full tournament experience</strong><p>Add The Bagger to your Home Screen:</p><ol aria-label="Installation steps"><li>Tap Share</li><li>Add to Home Screen</li><li>Tap Add</li></ol>{message ? <small role="status">{message}</small> : null}</div>
   </aside>;
 
   return <aside className={styles.banner} aria-label="Tournament notification setup">

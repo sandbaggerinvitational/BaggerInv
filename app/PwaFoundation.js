@@ -60,17 +60,8 @@ export default function PwaFoundation() {
   if (!online) return <aside className={styles.offline} role="status" aria-live="polite"><i aria-hidden="true" />Offline · scores require a connection</aside>;
   if (updateReady) return <aside className={styles.update} role="status"><p>A newer version of SBI is ready.</p><button type="button" onClick={() => window.location.reload()}>Update</button></aside>;
   if (!showGlobalInstall || dismissed || (!prompt && !showIosHelp)) return null;
-  return <aside className={styles.install} aria-label="Install SBI app">
-    {prompt ? (
-      <button type="button" onClick={async () => {
-        await prompt.prompt();
-        setPrompt(null);
-      }}>Install SBI</button>
-    ) : (
-      <p>
-        Install SBI: tap Share, then <strong>Add to Home Screen</strong>.
-      </p>
-    )}
+  return <aside className={`${styles.install} pwaInstallGuidance`} aria-label="Install The Bagger app">
+    <div><strong>Install The Bagger</strong><ol aria-label="Installation steps"><li>Tap Share</li><li>Add to Home Screen</li><li>Tap Add</li></ol></div>
     <button className={styles.dismiss} type="button" aria-label="Dismiss install guidance" onClick={() => { setDismissed(true); window.localStorage.setItem("sbi-pwa-prompt-dismissed", "true"); }}>×</button>
   </aside>;
 }

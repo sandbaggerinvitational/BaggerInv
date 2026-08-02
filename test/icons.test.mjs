@@ -3,7 +3,6 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import manifest from "../app/manifest.js";
-import { SITE_URL } from "../lib/seo.js";
 
 const PNG_SIGNATURE = "89504e470d0a1a0a";
 
@@ -63,17 +62,17 @@ test("manifest references production app icons", () => {
   assert.equal(appManifest.id, "/");
   assert.equal(appManifest.start_url, "/");
   assert.equal(appManifest.scope, "/");
-  assert.equal(appManifest.name, "The Sandbagger Invitational");
+  assert.equal(appManifest.name, "The Bagger");
   assert.equal(appManifest.short_name, "The Bagger");
   assert.deepEqual(appManifest.icons.slice(0, 2), [
     {
-      src: `${SITE_URL}/icon-192.png`,
+      src: "/icon-192.png",
       sizes: "192x192",
       type: "image/png",
       purpose: "any",
     },
     {
-      src: `${SITE_URL}/icon-512.png`,
+      src: "/icon-512.png",
       sizes: "512x512",
       type: "image/png",
       purpose: "any",

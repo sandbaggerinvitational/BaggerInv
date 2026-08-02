@@ -10,6 +10,9 @@ test("PWA foundation registers the service worker and supports install guidance"
   assert.match(source, /serviceWorker\.register\("\/sw\.js"\)/);
   assert.match(source, /beforeinstallprompt/);
   assert.match(source, /Add to Home Screen/);
+  assert.match(source, /Tap Share/);
+  assert.match(source, /Tap Add/);
+  assert.doesNotMatch(source, /prompt\.prompt\(/);
   assert.match(source, /display-mode: standalone/);
   assert.match(source, /navigator\.onLine/);
   assert.match(source, /newer version of SBI is ready/);
@@ -42,8 +45,14 @@ test("iPhone release metadata uses safe-area viewport, launch images, and a mask
   ]);
   assert.match(layout, /viewportFit: "cover"/);
   assert.match(layout, /statusBarStyle: "black-translucent"/);
+  assert.match(layout, /title: "The Bagger"/);
+  assert.match(layout, /applicationName: "The Bagger"/);
+  assert.match(layout, /url: "\/apple-icon\.png"/);
   assert.match(layout, /startupImage/);
   assert.match(manifestSource, /icon-maskable-512\.png/);
+  assert.match(manifestSource, /name: "The Bagger"/);
+  assert.match(manifestSource, /short_name: "The Bagger"/);
+  assert.doesNotMatch(manifestSource, /absoluteUrl\("\/icon/);
   assert.match(manifestSource, /shortcuts/);
   assert.match(manifestSource, /\/my-match\?source=shortcut/);
 });

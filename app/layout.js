@@ -19,7 +19,7 @@ const homeMetadata = pageMetadata({
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
-  applicationName: SITE_NAME,
+  applicationName: "The Bagger",
   category: "sports",
   keywords: [
     "Sandbagger Invitational",
@@ -39,28 +39,28 @@ export const metadata = {
   icons: {
     icon: [
       {
-        url: absoluteUrl("/favicon.ico"),
+        url: "/favicon.ico",
         sizes: "any",
       },
       {
-        url: absoluteUrl("/favicon-16x16.png"),
+        url: "/favicon-16x16.png",
         type: "image/png",
         sizes: "16x16",
       },
       {
-        url: absoluteUrl("/favicon-32x32.png"),
+        url: "/favicon-32x32.png",
         type: "image/png",
         sizes: "32x32",
       },
       {
-        url: absoluteUrl("/icon.png"),
+        url: "/icon.png",
         type: "image/png",
         sizes: "1024x1024",
       },
     ],
-    shortcut: absoluteUrl("/favicon.ico"),
+    shortcut: "/favicon.ico",
     apple: {
-      url: absoluteUrl("/apple-icon.png"),
+      url: "/apple-icon.png",
       type: "image/png",
       sizes: "180x180",
     },
@@ -69,7 +69,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "SBI",
+    title: "The Bagger",
     startupImage: [
       {
         url: "/splash/iphone-1170x2532.png",
