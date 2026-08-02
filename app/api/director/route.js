@@ -7,7 +7,7 @@ import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tou
 import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
-import { NOTIFICATION_TEMPLATE_OPTIONS } from "../../../lib/notification-templates.js";
+import { notificationPreviewContextForPlayer, notificationTemplateOptions } from "../../../lib/notification-templates.js";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +53,9 @@ export async function GET(request) {
       ...tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() }),
       notificationSandbox: preview.preview ? {
         configured: preview.configured, currentDeviceReady: readyToSend,
-        health: { pwaInstalled, permissionGranted, pushSubscription, readyToSend }, templates: NOTIFICATION_TEMPLATE_OPTIONS, log: notificationLog,
+        health: { pwaInstalled, permissionGranted, pushSubscription, readyToSend },
+        templates: notificationTemplateOptions(notificationPreviewContextForPlayer(tournamentData, identity.player)),
+        log: notificationLog,
       } : null,
       qaTools: preview.preview ? {
         players: tournamentData.players || [],

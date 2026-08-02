@@ -58,15 +58,15 @@ test("notification previews resolve selected-player match context", () => {
   const data = {
     tournament: { year: 2026, teamOne: { name: "The Pickles" }, teamTwo: { name: "Lipp It and Rip It" } },
     rounds: [{ matches: [{
-      id: "2026-R1-5", round: 1, match: 5, status: "Scheduled", teeTime: "8:20 AM",
-      course: { name: "Turtle Point" }, team1Players: [player], team2Players: [{ id: "P9", name: "Jack Samis" }],
+      id: "2026-R1-5", round: 1, match: 5, status: "Scheduled", teeTime: "8:20 AM", formatName: "Singles",
+      course: { name: "Turtle Point", tee: "Gold" }, team1Players: [player], team2Players: [{ id: "P9", name: "Jack Samis" }],
     }] }],
   };
   const context = notificationPreviewContextForPlayer(data, player);
   assert.equal(context.player, "Patrick Noonan");
   assert.equal(context.opponent, "Jack Samis");
   assert.equal(context.teeTime, "8:20 AM");
-  assert.match(previewNotificationTemplate("singles-pairing", context).body, /Patrick Noonan vs\. Jack Samis/);
+  assert.equal(previewNotificationTemplate("singles-pairing", context).body, "Round 1 • Singles\nvs Jack Samis\n8:20 AM • Gold Tees\nTurtle Point");
 });
 
 test("Director Mode stays inside the installed PWA through same-origin client routing", async () => {

@@ -477,6 +477,7 @@ async function buildTournamentData() {
         archiveFinal: permanentFinal,
         scoreConflict: truthy(liveRow["Score Conflict"] || liveRow["Scoring Conflict"] || liveRow.Conflict),
         finalizedAt: permanentFinal ? (authoritative["Finalized At"] || "") : "",
+        finalizedBy: permanentFinal ? (authoritative["Finalized By"] || "") : "",
         updatedAt: authoritative["Updated At"] || liveRow["Updated At"] || "",
         updatedBy: authoritative["Updated By"] || liveRow["Updated By"] || "",
         notes: publicResultAllowed ? replaceTeamIds(authoritative.Notes, teams) : "",
