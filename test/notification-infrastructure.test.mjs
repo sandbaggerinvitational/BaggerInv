@@ -39,11 +39,18 @@ test("service worker, participant subscription, Director sandbox, and log are wi
   assert.match(worker, /addEventListener\("push"/);
   assert.match(worker, /addEventListener\("notificationclick"/);
   assert.match(banner, /pushManager\.subscribe/);
+  const pushFlow = banner.slice(banner.indexOf("async function syncPushSubscription"), banner.indexOf("function standalone"));
+  assert.ok(pushFlow.indexOf("Notification.requestPermission()") < pushFlow.indexOf('fetch("/api/player-passport/notifications"'), "permission must be requested before the first awaited network call");
   assert.match(playerRoute, /currentPushDevice/);
   assert.match(playerRoute, /previewPushConfiguration\(\)\.preview/);
   assert.match(testRoute, /previewPushConfiguration\(\)\.preview/);
   assert.match(testRoute, /inspected\.identity\.player\.name/);
   assert.match(director, /Notification Sandbox/);
+  assert.match(director, /Notification Health/);
+  assert.match(director, /PWA Installed/);
+  assert.match(director, /Notification Permission/);
+  assert.match(director, /Push Subscription/);
+  assert.match(director, /Ready To Send/);
   assert.match(director, /Notification Log/);
   assert.match(writer, /"Notification Permission"[\s\S]*"Push Subscription"[\s\S]*"Device Last Seen"/);
   assert.doesNotMatch(testRoute, /cron|schedule|match finalized|round opened/i);

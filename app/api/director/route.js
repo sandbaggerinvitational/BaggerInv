@@ -31,9 +31,16 @@ export async function GET(request) {
       getTournamentData(), readTournamentReadiness(), preview.preview ? currentPushDevice(session) : null,
       preview.preview ? readNotificationLog() : [],
     ]);
+    const pwaInstalled = ["true", "yes", "1"].includes(String(device?.row?.record?.["PWA Installed"] || "").trim().toLowerCase());
+    const permissionGranted = String(device?.row?.record?.["Notification Permission"] || "").trim().toLowerCase() === "granted";
+    const pushSubscription = Boolean(device?.subscription);
+    const readyToSend = preview.configured && pwaInstalled && permissionGranted && pushSubscription;
     return NextResponse.json({ data: {
       ...tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() }),
-      notificationSandbox: preview.preview ? { configured: preview.configured, currentDeviceReady: Boolean(device?.ready), log: notificationLog } : null,
+      notificationSandbox: preview.preview ? {
+        configured: preview.configured, currentDeviceReady: readyToSend,
+        health: { pwaInstalled, permissionGranted, pushSubscription, readyToSend }, log: notificationLog,
+      } : null,
     } }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Director dashboard is temporarily unavailable." }, { status: 503 });

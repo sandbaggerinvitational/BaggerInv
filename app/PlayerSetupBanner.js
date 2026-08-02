@@ -21,10 +21,12 @@ function applicationServerKey(value) {
 
 async function syncPushSubscription(requestPermission = false) {
   if (!("serviceWorker" in navigator) || !("PushManager" in window) || typeof Notification === "undefined") throw new Error("Notifications are not supported on this device.");
+  // Keep the permission request inside the original tap's user activation.
+  // Awaiting configuration first causes iOS to discard the gesture and require another tap.
+  const permission = requestPermission ? await Notification.requestPermission() : Notification.permission;
   const configResponse = await fetch("/api/player-passport/notifications", { cache: "no-store" });
   const config = await configResponse.json();
   if (!configResponse.ok || !config.available || !config.publicKey) throw new Error("Notifications are not available in this Preview yet.");
-  const permission = requestPermission ? await Notification.requestPermission() : Notification.permission;
   const registration = await navigator.serviceWorker.ready;
   let subscription = await registration.pushManager.getSubscription();
   if (permission === "granted" && !subscription) subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: applicationServerKey(config.publicKey) });
