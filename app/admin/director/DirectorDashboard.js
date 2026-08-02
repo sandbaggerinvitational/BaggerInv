@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
 import styles from "./director.module.css";
@@ -69,6 +70,7 @@ function NotificationHealth({ sandbox }) {
 }
 
 export default function DirectorDashboard({ directorName }) {
+  const router = useRouter();
   const [data, setData] = useState(null);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
@@ -118,7 +120,7 @@ export default function DirectorDashboard({ directorName }) {
       const response = await fetch("/api/director/impersonation", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Preview player could not be selected.");
-      window.location.assign("/home");
+      router.push("/home");
     } catch (error) { setMessage(error.message); setBusy(""); }
   };
   const resolveIssue = (item) => {

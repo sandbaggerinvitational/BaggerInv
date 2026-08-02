@@ -129,7 +129,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
             )}
           </nav>
 
-          {director ? <Link className="directorMenuLink" href="/admin/director" onClick={() => setIsOpen(false)}>🎯 Tournament Director</Link> : null}
+          {director ? <Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={() => setIsOpen(false)}>🎯 Tournament Director</Link> : null}
 
           <div className="sideMenuFooter">24 players · Two teams · One trophy</div>
         </div>

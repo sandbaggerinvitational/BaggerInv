@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { participantDestination } from "../lib/participant-shell";
 import styles from "./participant-navigation.module.css";
@@ -35,6 +35,7 @@ function NavIcon({ name }) {
 
 export default function ParticipantIdentity() {
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [player, setPlayer] = useState(null);
   const [impersonation, setImpersonation] = useState(null);
@@ -106,7 +107,7 @@ export default function ParticipantIdentity() {
       <span><b>Preview Mode</b><small>Viewing as</small><strong>{impersonation.player.name}</strong></span>
       <button type="button" onClick={async () => {
         const response = await fetch("/api/director/impersonation", { method: "DELETE" });
-        if (response.ok) window.location.assign("/admin/director");
+        if (response.ok) router.push("/admin/director");
       }}>Return to Director</button>
     </aside> : null}
     <nav className={styles.mobile} aria-label={`${player.name}'s tournament navigation`}>

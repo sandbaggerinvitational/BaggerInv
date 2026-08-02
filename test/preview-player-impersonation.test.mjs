@@ -68,3 +68,22 @@ test("notification previews resolve selected-player match context", () => {
   assert.equal(context.teeTime, "8:20 AM");
   assert.match(previewNotificationTemplate("singles-pairing", context).body, /Patrick Noonan vs\. Jack Samis/);
 });
+
+test("Director Mode stays inside the installed PWA through same-origin client routing", async () => {
+  const [menu, participantShell, dashboard, templates] = await Promise.all([
+    source("app/Menu.js"),
+    source("app/ParticipantIdentity.js"),
+    source("app/admin/director/DirectorDashboard.js"),
+    source("lib/notification-templates.js"),
+  ]);
+  assert.match(menu, /<Link className="directorMenuLink" href="\/admin\/director" prefetch=\{false\}/);
+  assert.doesNotMatch(menu, /directorMenuLink[^\n]*(target=|window\.open|https?:\/\/)/);
+  assert.match(participantShell, /useRouter/);
+  assert.match(participantShell, /router\.push\("\/admin\/director"\)/);
+  assert.doesNotMatch(participantShell, /window\.location\.assign\("\/admin\/director"\)/);
+  assert.match(dashboard, /router\.push\("\/home"\)/);
+  assert.doesNotMatch(dashboard, /window\.location\.(?:assign|replace)|window\.open|target="_blank"/);
+  for (const match of templates.matchAll(/url: \([^)]*\) => ([^,}\n]+)/g)) {
+    assert.doesNotMatch(match[1], /https?:\/\//);
+  }
+});
