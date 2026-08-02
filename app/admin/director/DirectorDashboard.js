@@ -79,7 +79,7 @@ export default function DirectorDashboard({ directorName }) {
   const [testPlayerId, setTestPlayerId] = useState("");
   const load = useCallback(async () => {
     setMessage("");
-    const response = await fetch("/api/director", { cache: "no-store" });
+    const response = await fetch("/api/director", { cache: "no-store", credentials: "same-origin" });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Director dashboard is unavailable.");
     setData(payload.data);
@@ -89,7 +89,7 @@ export default function DirectorDashboard({ directorName }) {
   useEffect(() => { load().catch((error) => setMessage(error.message)); }, [load]);
   useEffect(() => {
     if (!data?.automation?.enabled) return undefined;
-    const check = () => fetch("/api/director", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "automation-check" }) }).then((response) => response.ok ? response.json() : null).then((result) => { if (result?.changed) load(); }).catch(() => {});
+    const check = () => fetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "automation-check" }) }).then((response) => response.ok ? response.json() : null).then((result) => { if (result?.changed) load(); }).catch(() => {});
     check();
     const timer = window.setInterval(check, 60_000);
     return () => window.clearInterval(timer);
@@ -97,7 +97,7 @@ export default function DirectorDashboard({ directorName }) {
   const act = async (action, extra = {}) => {
     setBusy(action); setMessage("");
     try {
-      const response = await fetch("/api/director", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, round: Number(selectedRound), ...extra }) });
+      const response = await fetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, round: Number(selectedRound), ...extra }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Director action failed.");
       await load(); setMessage("Tournament operation completed.");
@@ -107,7 +107,7 @@ export default function DirectorDashboard({ directorName }) {
   const sendTestNotification = async (template) => {
     setBusy(`notification-${template.id}`); setMessage("");
     try {
-      const response = await fetch("/api/director/notifications/sandbox", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ templateId: template.id }) });
+      const response = await fetch("/api/director/notifications/sandbox", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ templateId: template.id }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Test notification could not be sent.");
       await load(); setMessage(`${template.label} sent to this device.`);
@@ -117,7 +117,7 @@ export default function DirectorDashboard({ directorName }) {
   const previewAsPlayer = async (playerId) => {
     setBusy("impersonation"); setMessage("");
     try {
-      const response = await fetch("/api/director/impersonation", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId }) });
+      const response = await fetch("/api/director/impersonation", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Preview player could not be selected.");
       router.push("/home");

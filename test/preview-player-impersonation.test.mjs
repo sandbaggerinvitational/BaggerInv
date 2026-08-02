@@ -26,7 +26,7 @@ test("impersonation API and QA Tools are strictly Preview gated", async () => {
     source("app/api/director/route.js"),
   ]);
   assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
-  assert.match(route, /isTournamentDirectorActor/);
+  assert.match(route, /inspectTournamentDirectorToken/);
   assert.match(route, /playerPassportCookie\(sessionToken/);
   assert.match(route, /export async function DELETE/);
   assert.match(directorRoute, /qaTools: preview\.preview/);

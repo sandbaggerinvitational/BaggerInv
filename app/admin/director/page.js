@@ -2,8 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Header } from "../../components.js";
 import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport.js";
-import { inspectPlayerPassportToken } from "../../../lib/player-passport-server.js";
-import { isTournamentDirectorActor } from "../../../lib/player-role.js";
+import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import DirectorDashboard from "./DirectorDashboard.js";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +10,7 @@ export const metadata = { title: "Tournament Director | Sandbagger Invitational"
 
 export default async function DirectorPage() {
   const store = await cookies();
-  const result = await inspectPlayerPassportToken(store.get(PLAYER_PASSPORT_COOKIE)?.value || "");
-  if (result.status !== "active" || !isTournamentDirectorActor(result.identity)) redirect("/home");
+  const result = await inspectTournamentDirectorToken(store.get(PLAYER_PASSPORT_COOKIE)?.value || "");
+  if (result.status !== "active") redirect("/home");
   return <main><Header homeHref="/home" /><DirectorDashboard directorName={result.identity.actor.name} /></main>;
 }

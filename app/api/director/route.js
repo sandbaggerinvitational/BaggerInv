@@ -2,8 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
-import { inspectPlayerPassportToken } from "../../../lib/player-passport-server.js";
-import { isTournamentDirectorActor } from "../../../lib/player-role.js";
+import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
 import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
@@ -13,8 +12,14 @@ import { NOTIFICATION_TEMPLATE_OPTIONS } from "../../../lib/notification-templat
 export const dynamic = "force-dynamic";
 
 async function authorize(request) {
-  const result = await inspectPlayerPassportToken(playerPassportTokenFromRequest(request));
-  return result.status === "active" && isTournamentDirectorActor(result.identity) ? result.identity : null;
+  return inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+}
+
+function authorizationFailure(result) {
+  if (result.status === "unavailable") {
+    return NextResponse.json({ error: "Tournament Director identity could not be verified right now. Retry." }, { status: 503, headers: { "Retry-After": "1" } });
+  }
+  return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
 }
 
 function refresh() {
@@ -30,8 +35,9 @@ async function setMatchesLiveAndOpenScoring(matches, updatedBy) {
 }
 
 export async function GET(request) {
-  const identity = await authorize(request);
-  if (!identity) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
+  const authorization = await authorize(request);
+  if (authorization.status !== "active") return authorizationFailure(authorization);
+  const identity = authorization.identity;
   try {
     const preview = previewPushConfiguration();
     const session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
@@ -61,8 +67,9 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const identity = await authorize(request);
-  if (!identity) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
+  const authorization = await authorize(request);
+  if (authorization.status !== "active") return authorizationFailure(authorization);
+  const identity = authorization.identity;
   try {
     const input = await request.json();
     const data = await getTournamentData();

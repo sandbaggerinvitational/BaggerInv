@@ -160,9 +160,10 @@ test("automation becomes due only within the configured 30-minute opening window
 
 test("Director API requires Passport DIRECTOR authorization and uses audited writers", () => {
   const route = source("app/api/director/route.js");
-  assert.match(route, /inspectPlayerPassportToken/);
-  assert.match(route, /isTournamentDirector/);
+  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /authorization\.status !== "active"/);
   assert.match(route, /status: 403/);
+  assert.match(route, /status: 503/);
   assert.match(route, /updateLiveMatch/);
   assert.match(route, /reopenLiveMatch/);
   assert.match(route, /updateTournamentAdminData/);
@@ -185,5 +186,21 @@ test("Director dashboard contains operations, health, attention, automation, and
 
 test("PLAYER accounts are redirected away from the Director page", () => {
   const page = source("app/admin/director/page.js");
-  assert.match(page, /!isTournamentDirectorActor\(result\.identity\)\) redirect\("\/home"\)/);
+  assert.match(page, /inspectTournamentDirectorToken/);
+  assert.match(page, /result\.status !== "active"\) redirect\("\/home"\)/);
+});
+
+test("Director page, actions, impersonation, and sandbox share one actor-aware authorization resolver", () => {
+  const resolver = source("lib/player-passport-server.js");
+  const consumers = [
+    source("app/admin/director/page.js"),
+    source("app/api/director/route.js"),
+    source("app/api/director/impersonation/route.js"),
+    source("app/api/director/notifications/sandbox/route.js"),
+  ];
+  assert.match(resolver, /export async function inspectTournamentDirectorToken/);
+  assert.match(resolver, /isTournamentDirectorActor\(result\.identity\)/);
+  for (const consumer of consumers) assert.match(consumer, /inspectTournamentDirectorToken/);
+  const dashboard = source("app/admin/director/DirectorDashboard.js");
+  assert.equal((dashboard.match(/credentials: "same-origin"/g) || []).length, 5);
 });

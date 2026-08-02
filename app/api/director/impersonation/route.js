@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createPlayerPassportSession, playerPassportCookie, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
-import { inspectPlayerPassportToken } from "../../../../lib/player-passport-server.js";
-import { isTournamentDirectorActor } from "../../../../lib/player-role.js";
+import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { getTournamentData } from "../../../live/sheetData.js";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +10,8 @@ const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 4
 async function directorSession(request) {
   if (process.env.VERCEL_ENV !== "preview") return null;
   const token = playerPassportTokenFromRequest(request);
-  const identity = await inspectPlayerPassportToken(token);
-  if (identity.status !== "active" || !isTournamentDirectorActor(identity.identity)) return null;
+  const identity = await inspectTournamentDirectorToken(token);
+  if (identity.status !== "active") return null;
   return { session: verifyPlayerPassportSession(token), identity: identity.identity };
 }
 
