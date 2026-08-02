@@ -1,12 +1,13 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
-import { playerPassportTokenFromRequest } from "../../../lib/player-passport.js";
+import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectPlayerPassportToken } from "../../../lib/player-passport-server.js";
 import { isTournamentDirector } from "../../../lib/player-role.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
+import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
 
 export const dynamic = "force-dynamic";
 
@@ -24,8 +25,16 @@ export async function GET(request) {
   const identity = await authorize(request);
   if (!identity) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
   try {
-    const [tournamentData, readiness] = await Promise.all([getTournamentData(), readTournamentReadiness()]);
-    return NextResponse.json({ data: tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() }) }, { headers: { "Cache-Control": "no-store" } });
+    const preview = previewPushConfiguration();
+    const session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
+    const [tournamentData, readiness, device, notificationLog] = await Promise.all([
+      getTournamentData(), readTournamentReadiness(), preview.preview ? currentPushDevice(session) : null,
+      preview.preview ? readNotificationLog() : [],
+    ]);
+    return NextResponse.json({ data: {
+      ...tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() }),
+      notificationSandbox: preview.preview ? { configured: preview.configured, currentDeviceReady: Boolean(device?.ready), log: notificationLog } : null,
+    } }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Director dashboard is temporarily unavailable." }, { status: 503 });
   }

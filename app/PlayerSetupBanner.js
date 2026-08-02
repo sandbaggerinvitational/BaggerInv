@@ -13,6 +13,26 @@ async function saveReadiness(update) {
   return response.json();
 }
 
+function applicationServerKey(value) {
+  const padding = "=".repeat((4 - value.length % 4) % 4);
+  const raw = window.atob((value + padding).replace(/-/g, "+").replace(/_/g, "/"));
+  return Uint8Array.from(raw, (character) => character.charCodeAt(0));
+}
+
+async function syncPushSubscription(requestPermission = false) {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || typeof Notification === "undefined") throw new Error("Notifications are not supported on this device.");
+  const configResponse = await fetch("/api/player-passport/notifications", { cache: "no-store" });
+  const config = await configResponse.json();
+  if (!configResponse.ok || !config.available || !config.publicKey) throw new Error("Notifications are not available in this Preview yet.");
+  const permission = requestPermission ? await Notification.requestPermission() : Notification.permission;
+  const registration = await navigator.serviceWorker.ready;
+  let subscription = await registration.pushManager.getSubscription();
+  if (permission === "granted" && !subscription) subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: applicationServerKey(config.publicKey) });
+  const response = await fetch("/api/player-passport/notifications", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ permission, subscription: permission === "granted" ? subscription?.toJSON() : null }) });
+  if (!response.ok) throw new Error("Notification readiness could not be saved.");
+  return { permission, ...(await response.json()) };
+}
+
 function standalone() {
   return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 }
@@ -40,11 +60,13 @@ export default function PlayerSetupBanner({ readiness, onUpdated }) {
   }, [readiness, onUpdated]);
 
   useEffect(() => {
-    if (!readiness || readiness.notificationsEnabled || typeof Notification === "undefined" || Notification.permission !== "granted") return;
-    saveReadiness({ notificationsEnabled: true }).then(onUpdated).catch(() => {});
+    if (!readiness || typeof Notification === "undefined") return;
+    const needsSubscription = Notification.permission === "granted" && !readiness.notificationReady;
+    const permissionWasRemoved = Notification.permission !== "granted" && readiness.notificationReady;
+    if (needsSubscription || permissionWasRemoved) syncPushSubscription(false).then(onUpdated).catch(() => {});
   }, [readiness, onUpdated]);
 
-  if (!readiness || (readiness.pwaInstalled && readiness.notificationsEnabled)) return null;
+  if (!readiness || (readiness.pwaInstalled && (readiness.notificationReady || readiness.notificationsEnabled))) return null;
 
   if (!readiness.pwaInstalled) return <aside className={styles.banner} aria-label="Tournament app setup">
     <span aria-hidden="true">📱</span><div><strong>Get the full tournament experience</strong><p>Add Sandbagger Invitational to your Home Screen.</p>{message ? <small role="status">{message}</small> : null}</div>
@@ -67,8 +89,8 @@ export default function PlayerSetupBanner({ readiness, onUpdated }) {
       setBusy(true); setMessage("");
       try {
         if (typeof Notification === "undefined") return setMessage("Notifications are not supported on this device.");
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") { await saveReadiness({ notificationsEnabled: true }); await onUpdated?.(); }
+        const { permission } = await syncPushSubscription(true);
+        if (permission === "granted") { await onUpdated?.(); }
         else setMessage("Notifications remain off. You can enable them in device settings.");
       } catch { setMessage("Notifications could not be enabled right now."); }
       finally { setBusy(false); }

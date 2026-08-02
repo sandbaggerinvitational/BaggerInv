@@ -5,6 +5,7 @@ import { tournamentReadiness } from "../lib/tournament-readiness.js";
 import { directorReadinessLifecycle } from "../lib/tournament-director.js";
 
 const future = "2099-01-01T00:00:00.000Z";
+const subscription = JSON.stringify({ endpoint: "https://push.example/subscription", keys: { p256dh: "public-key", auth: "auth-key" } });
 const players = [
   { id: "P1", name: "Ready Player", photo: "ready.webp" },
   { id: "P2", name: "Needs Setup", photo: "" },
@@ -14,7 +15,7 @@ const passports = [
   { "Tournament ID": "T1", "Player ID": "P2", "Activation Used At": "" },
 ];
 const devices = [
-  { "Tournament ID": "T1", "Player ID": "P1", "Expires At": future, "PWA Installed": "TRUE", "Notifications Enabled": "TRUE" },
+  { "Tournament ID": "T1", "Player ID": "P1", "Expires At": future, "PWA Installed": "TRUE", "Notification Permission": "granted", "Push Subscription": subscription },
 ];
 const handicaps = [{ "Player ID": "P1", "Team ID": "TEAM-1" }];
 
@@ -40,7 +41,7 @@ test("team assignment can come from official match participation", () => {
 
 test("24 of 24 complete produces Tournament Ready", () => {
   const completePlayers = Array.from({ length: 24 }, (_, index) => ({ id: `P${index}`, name: `Player ${index}`, photo: `${index}.webp` }));
-  const completeDevices = completePlayers.map((player) => ({ "Tournament ID": "T1", "Player ID": player.id, "Expires At": future, "PWA Installed": "TRUE", "Notifications Enabled": "TRUE" }));
+  const completeDevices = completePlayers.map((player) => ({ "Tournament ID": "T1", "Player ID": player.id, "Expires At": future, "PWA Installed": "TRUE", "Notification Permission": "granted", "Push Subscription": subscription }));
   const completePassports = completePlayers.map((player) => ({ "Tournament ID": "T1", "Player ID": player.id, "Activation Used At": "2026-01-01" }));
   const completeHandicaps = completePlayers.map((player) => ({ "Player ID": player.id, "Team ID": "TEAM-1" }));
   const model = tournamentReadiness({ tournamentId: "T1", players: completePlayers, passports: completePassports, devices: completeDevices, handicaps: completeHandicaps });
