@@ -31,8 +31,11 @@ test("impersonation API and QA Tools are strictly Preview gated", async () => {
   assert.match(route, /export async function DELETE/);
   assert.match(directorRoute, /qaTools: preview\.preview/);
   assert.match(dashboard, /QA Tools/);
-  assert.match(dashboard, /Test As/);
-  assert.match(dashboard, /Change Player/);
+  assert.match(dashboard, /Preview As/);
+  assert.match(dashboard, /Preview the app as the selected golfer\./);
+  assert.match(dashboard, /onChange=\{\(event\) => \{ const playerId = event\.target\.value; setTestPlayerId\(playerId\); previewAsPlayer\(playerId\); \}\}/);
+  assert.doesNotMatch(dashboard, /Change Player/);
+  assert.ok(dashboard.indexOf("qa-tools-title") < dashboard.indexOf("notification-sandbox-title"));
 });
 
 test("participant shell exposes a persistent and reversible Preview identity banner", async () => {
