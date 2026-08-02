@@ -594,6 +594,7 @@ async function buildTournamentData() {
     ),
     timeline,
     schedule: timeline.events,
+    players: Object.entries(playerMap).filter(([, player]) => player.active).map(([id, player]) => ({ id, name: player.name, slug: player.slug })),
   };
 }
 

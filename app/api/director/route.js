@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectPlayerPassportToken } from "../../../lib/player-passport-server.js";
-import { isTournamentDirector } from "../../../lib/player-role.js";
+import { isTournamentDirectorActor } from "../../../lib/player-role.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
 import { currentPushDevice, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 async function authorize(request) {
   const result = await inspectPlayerPassportToken(playerPassportTokenFromRequest(request));
-  return result.status === "active" && isTournamentDirector(result.identity) ? result.identity : null;
+  return result.status === "active" && isTournamentDirectorActor(result.identity) ? result.identity : null;
 }
 
 function refresh() {
@@ -42,6 +42,11 @@ export async function GET(request) {
         configured: preview.configured, currentDeviceReady: readyToSend,
         health: { pwaInstalled, permissionGranted, pushSubscription, readyToSend }, templates: NOTIFICATION_TEMPLATE_OPTIONS, log: notificationLog,
       } : null,
+      qaTools: preview.preview ? {
+        players: tournamentData.players || [],
+        impersonating: Boolean(identity.impersonating),
+        selectedPlayer: identity.impersonating ? identity.player : null,
+      } : null,
     } }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Director dashboard is temporarily unavailable." }, { status: 503 });
@@ -56,7 +61,7 @@ export async function POST(request) {
     const data = await getTournamentData();
     const round = Number(input.round || data.tournament.currentRound);
     const matches = data.rounds.find((item) => Number(item.number) === round)?.matches || [];
-    const updatedBy = identity.player.name;
+    const updatedBy = identity.actor.name;
     if (input.action === "automation-check") {
       const dueRound = directorAutomationDue(tournamentDirectorModel(data));
       if (!dueRound) return NextResponse.json({ ok: true, changed: false });

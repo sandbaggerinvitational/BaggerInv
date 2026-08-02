@@ -7,7 +7,15 @@ export const dynamic = "force-dynamic";
 export async function GET(request) {
   const result = await inspectPlayerPassportToken(playerPassportTokenFromRequest(request));
   if (result.status === "active") {
-    return NextResponse.json({ active: true, player: result.identity.player });
+    return NextResponse.json({
+      active: true,
+      player: result.identity.player,
+      impersonation: result.identity.impersonating ? {
+        active: true,
+        player: result.identity.player,
+        director: result.identity.actor,
+      } : null,
+    });
   }
   if (result.status === "unavailable") {
     return NextResponse.json(

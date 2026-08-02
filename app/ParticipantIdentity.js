@@ -37,6 +37,7 @@ export default function ParticipantIdentity() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [player, setPlayer] = useState(null);
+  const [impersonation, setImpersonation] = useState(null);
   const requestSequence = useRef(0);
 
   const refresh = useCallback(() => {
@@ -45,14 +46,17 @@ export default function ParticipantIdentity() {
       .then(async (response) => {
         if (sequence !== requestSequence.current) return;
         if (response.ok) {
-          const nextPlayer = (await response.json()).player;
+          const payload = await response.json();
+          const nextPlayer = payload.player;
           if (sequence !== requestSequence.current) return;
           setPlayer(nextPlayer);
+          setImpersonation(payload.impersonation || null);
           window.localStorage.setItem(PARTICIPANT_SHELL_KEY, JSON.stringify(nextPlayer));
           return;
         }
         if (response.status === 401 && sequence === requestSequence.current) {
           setPlayer(null);
+          setImpersonation(null);
           window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
         }
       })
@@ -87,13 +91,24 @@ export default function ParticipantIdentity() {
 
   useEffect(() => {
     document.body.classList.toggle("passport-navigation-active", Boolean(player));
-    return () => document.body.classList.remove("passport-navigation-active");
-  }, [player]);
+    document.body.classList.toggle("preview-impersonation-active", Boolean(impersonation));
+    return () => {
+      document.body.classList.remove("passport-navigation-active");
+      document.body.classList.remove("preview-impersonation-active");
+    };
+  }, [player, impersonation]);
 
   if (!player || pathname.startsWith("/admin")) return null;
   const items = itemsFor(player);
   const currentDestination = participantDestination(pathname, searchParams.toString(), player.slug);
   return <>
+    {impersonation ? <aside className={styles.impersonation} role="status" aria-label={`Preview Mode. Viewing as ${impersonation.player.name}`}>
+      <span><b>Preview Mode</b><small>Viewing as</small><strong>{impersonation.player.name}</strong></span>
+      <button type="button" onClick={async () => {
+        const response = await fetch("/api/director/impersonation", { method: "DELETE" });
+        if (response.ok) window.location.assign("/admin/director");
+      }}>Return to Director</button>
+    </aside> : null}
     <nav className={styles.mobile} aria-label={`${player.name}'s tournament navigation`}>
       {items.map((item) => {
         const active = currentDestination === item.label;

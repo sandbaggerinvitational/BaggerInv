@@ -161,5 +161,5 @@ test("Director dashboard contains operations, health, attention, automation, and
 
 test("PLAYER accounts are redirected away from the Director page", () => {
   const page = source("app/admin/director/page.js");
-  assert.match(page, /!isTournamentDirector\(result\.identity\)\) redirect\("\/home"\)/);
+  assert.match(page, /!isTournamentDirectorActor\(result\.identity\)\) redirect\("\/home"\)/);
 });

@@ -74,12 +74,14 @@ export default function DirectorDashboard({ directorName }) {
   const [message, setMessage] = useState("");
   const [selectedRound, setSelectedRound] = useState("");
   const [reopenId, setReopenId] = useState("");
+  const [testPlayerId, setTestPlayerId] = useState("");
   const load = useCallback(async () => {
     setMessage("");
     const response = await fetch("/api/director", { cache: "no-store" });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Director dashboard is unavailable.");
     setData(payload.data);
+    setTestPlayerId((current) => current || payload.data.qaTools?.selectedPlayer?.id || payload.data.qaTools?.players?.[0]?.id || "");
     setSelectedRound((current) => current || String(payload.data.tournament.currentRound || payload.data.rounds.find((round) => round.status !== "FINAL")?.number || payload.data.rounds[0]?.number || ""));
   }, []);
   useEffect(() => { load().catch((error) => setMessage(error.message)); }, [load]);
@@ -109,6 +111,15 @@ export default function DirectorDashboard({ directorName }) {
       await load(); setMessage(`${template.label} sent to this device.`);
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
+  };
+  const testAsPlayer = async () => {
+    setBusy("impersonation"); setMessage("");
+    try {
+      const response = await fetch("/api/director/impersonation", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId: testPlayerId }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Preview player could not be selected.");
+      window.location.assign("/home");
+    } catch (error) { setMessage(error.message); setBusy(""); }
   };
   const resolveIssue = (item) => {
     const source = item.items?.[0] || item;
@@ -164,6 +175,7 @@ export default function DirectorDashboard({ directorName }) {
 
     <section className={styles.activity}><header><span>Audit trail</span><h2>Recent Activity</h2></header>{data.recentActivity.length ? <ul>{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No recent match activity.</p>}</section>
     {data.notificationSandbox ? <section className={styles.notificationSandbox} aria-labelledby="notification-sandbox-title"><header><span>Preview only</span><h2 id="notification-sandbox-title">Notification Sandbox</h2></header><NotificationHealth sandbox={data.notificationSandbox} /><div className={styles.notificationTemplates}>{data.notificationSandbox.templates.map((template) => <button disabled={Boolean(busy) || !data.notificationSandbox.currentDeviceReady} onClick={() => sendTestNotification(template)} key={template.id}>{template.label}</button>)}</div><h3>Notification Log</h3>{data.notificationSandbox.log.length ? <div className={styles.notificationLog}>{data.notificationSandbox.log.map((item) => <article key={item.id}><div><strong>{item.type}</strong><span>{item.recipient}{item.template ? ` · ${item.template}` : ""}</span></div><time>{timestamp(item.sentAt)}</time><b data-status={item.status === "Failed" ? "failed" : "sent"}>{item.status}</b>{item.failure ? <small>{item.failure}</small> : null}</article>)}</div> : <p>No test notifications have been sent.</p>}</section> : null}
+    {data.qaTools ? <section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Test As</span><select value={testPlayerId} onChange={(event) => setTestPlayerId(event.target.value)}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><button type="button" disabled={Boolean(busy) || !testPlayerId} onClick={testAsPlayer}>{busy === "impersonation" ? "Changing Player…" : "Change Player"}</button><p>Participant pages and notification previews use the selected golfer until you return to Director Mode.</p></section> : null}
     <Link className={styles.fullAdmin} href="/admin">Open Full Admin →</Link>
   </section>;
 }

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../../lib/player-passport.js";
 import { inspectPlayerPassportToken } from "../../../../../lib/player-passport-server.js";
-import { isTournamentDirector } from "../../../../../lib/player-role.js";
+import { isTournamentDirectorActor } from "../../../../../lib/player-role.js";
 import { appendNotificationLog, currentPushDevice, invalidatePushDevice } from "../../../../../lib/google-sheets-write.js";
 import { previewPushConfiguration, sendPreviewPush } from "../../../../../lib/web-push-notifications.js";
-import { previewNotificationTemplate } from "../../../../../lib/notification-templates.js";
+import { notificationPreviewContextForPlayer, previewNotificationTemplate } from "../../../../../lib/notification-templates.js";
+import { getTournamentData } from "../../../../live/sheetData.js";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +14,10 @@ export async function POST(request) {
   let session;
   try { session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request)); } catch { return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 }); }
   const inspected = await inspectPlayerPassportToken(playerPassportTokenFromRequest(request));
-  if (inspected.status !== "active" || !isTournamentDirector(inspected.identity)) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
+  if (inspected.status !== "active" || !isTournamentDirectorActor(inspected.identity)) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
   const input = await request.json().catch(() => ({}));
-  const template = previewNotificationTemplate(input?.templateId);
+  const tournamentData = await getTournamentData();
+  const template = previewNotificationTemplate(input?.templateId, notificationPreviewContextForPlayer(tournamentData, inspected.identity.player));
   try {
     const device = await currentPushDevice(session);
     await sendPreviewPush(device.subscription, {

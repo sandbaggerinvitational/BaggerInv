@@ -925,3 +925,4 @@ footer span {
   --status-final-neutral: #174635;
   --status-locked-neutral: #4c5a54;
 }
+body.preview-impersonation-active{padding-top:54px}
