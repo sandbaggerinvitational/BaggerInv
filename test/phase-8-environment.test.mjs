@@ -162,5 +162,5 @@ test("Tournament Mode replaces the flagged homepage for upcoming and live tourna
     assert.match(`${commandCenter}\n${tournamentSchedule}`, new RegExp(section));
   }
   assert.doesNotMatch(commandCenter, /Featured Match|Tournament Timeline|Live Records/);
-  assert.match(menu, /activeNavigationHref \|\| activeNavigationHrefForPath/);
+  assert.match(menu, /Open Tournament Hub/);
 });

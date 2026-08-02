@@ -21,7 +21,7 @@ test("Players roles are data-driven and safely default to PLAYER", () => {
 test("Director menu is exposed only after the authenticated role resolves", () => {
   const menu = source("app/Menu.js");
   assert.match(menu, /setDirector\(player\?\.role === "DIRECTOR"\)/);
-  assert.match(menu, /director \? <Link className="directorMenuLink" href="\/admin\/director"/);
+  assert.match(menu, /director \? <section[\s\S]*className="directorMenuLink" href="\/admin\/director"/);
 });
 
 test("round and tournament health summarize authoritative match statuses", () => {

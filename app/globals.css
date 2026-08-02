@@ -34,6 +34,7 @@ body {
   margin: 0;
   min-height: 100vh;
   min-height: 100svh;
+  overflow-x: clip;
   background: var(--paper);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
@@ -186,6 +187,7 @@ button:disabled { cursor: not-allowed; }
 }
 
 .sideMenuTop div { display: flex; flex-direction: column; gap: 6px; }
+.sideMenuTop small { color: var(--gold); font-size: .66rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
 .sideMenuTop strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.28rem; }
 .sideMenuTop span { color: #cbd7d1; font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; }
 
@@ -229,16 +231,31 @@ button:disabled { cursor: not-allowed; }
   letter-spacing: .2em;
   text-transform: uppercase;
 }
-.sideNavGroup > div { display: flex; flex-direction: column; }
-.sideNavGroup a {
+.sideNavGroup > div { display: flex; flex-direction: column; gap: 2px; }
+.sideNavGroup a, .sideNavGroup button {
   position: relative;
-  padding: 13px 14px;
+  width: 100%;
+  min-height: 50px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 0;
   border-radius: 10px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.28rem;
+  background: transparent;
+  color: inherit;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .98rem;
+  text-align: left;
+  text-decoration: none;
   transition: background .18s ease, color .18s ease, transform .18s ease;
 }
-.sideNav a:hover, .sideNav a.current { background: rgba(255,255,255,.08); color: var(--gold-soft); transform: translateX(3px); }
+.sideNavGroup a > span, .sideNavGroup button > span { display: grid; width: 28px; height: 28px; place-items: center; font-size: 1rem; }
+.sideNavGroup a > b, .sideNavGroup button > b { min-width: 0; font-weight: 750; }
+.sideNavGroup a > i, .sideNavGroup button > i { color: rgba(255,255,255,.5); font: normal 1.45rem/1 Arial, sans-serif; }
+.sideNavGroup button:disabled { opacity: .65; }
+.sideNav a:hover, .sideNav button:hover, .sideNav a.current { background: rgba(255,255,255,.08); color: var(--gold-soft); transform: translateX(3px); }
 .sideNav a.current::before {
   content: "";
   position: absolute;
@@ -250,19 +267,27 @@ button:disabled { cursor: not-allowed; }
   background: var(--gold);
   transform: translateY(-50%);
 }
-.sideMenuFooter { padding: 28px 0 10px; color: #cbd7d1; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.11em; }
-.directorMenuLink {
-  display: flex;
-  min-height: 48px;
-  align-items: center;
-  margin-top: 18px;
-  padding: 13px 14px;
-  border: 1px solid rgba(212,177,95,.48);
-  border-radius: 12px;
-  color: var(--gold-soft);
-  font: 700 1rem/1.2 Arial, Helvetica, sans-serif;
-  text-decoration: none;
+.sideNavDirector { border-bottom: 0; }
+.sideNavDirector a { border: 1px solid rgba(212,177,95,.48); color: var(--gold-soft); }
+
+.externalLinkDialog {
+  width: min(calc(100vw - 36px), 390px);
+  padding: 0;
+  border: 1px solid rgba(11,73,56,.16);
+  border-radius: 22px;
+  background: #fffdf8;
+  color: #153c31;
+  box-shadow: 0 28px 80px rgba(0,0,0,.3);
 }
+.externalLinkDialog::backdrop { background: rgba(4,28,22,.68); backdrop-filter: blur(3px); }
+.externalLinkDialog > div { display: grid; justify-items: center; gap: 10px; padding: 28px 24px 22px; text-align: center; }
+.externalLinkDialog > div > span { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; background: #f3e6c5; color: #835f12; font-size: 1.25rem; }
+.externalLinkDialog h2, .externalLinkDialog p { margin: 0; }
+.externalLinkDialog h2 { font: 700 1.45rem/1.15 Georgia, serif; }
+.externalLinkDialog p { color: #61706a; font-size: .9rem; }
+.externalLinkDialog > div > div { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.externalLinkDialog button { min-height: 46px; border: 1px solid rgba(11,73,56,.2); border-radius: 12px; background: transparent; color: #0b4938; font-weight: 800; }
+.externalLinkDialog button:last-child { border-color: #0b4938; background: #0b4938; color: white; }
 
 @media (max-width: 560px) {
   .sideMenu { width: 100vw; }
@@ -270,7 +295,15 @@ button:disabled { cursor: not-allowed; }
   .sideMenuScroll { padding: 10px 24px calc(26px + env(safe-area-inset-bottom)); }
   .sideNavHome { font-size: 1.42rem; }
   .sideNavGroup { padding-top: 18px; }
-  .sideNavGroup a { font-size: 1.16rem; padding: 11px 12px; }
+  .sideNavGroup a, .sideNavGroup button { font-size: .94rem; padding: 9px 10px; }
+}
+
+@media (max-width: 760px) {
+  body.passport-navigation-active .sideMenuScroll { padding-bottom: calc(24px + var(--participant-nav-height) + env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sideMenu, .menuBackdrop, .sideNavGroup a, .sideNavGroup button { transition: none; }
 }
 
 .kiawahHero {

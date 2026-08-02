@@ -152,7 +152,7 @@ export default function ParticipantProfile() {
 
     <RoundPerformance rounds={tournamentData?.roundPerformance} />
 
-    <section className={styles.card}>
+    <section className={styles.card} id="notification-preferences">
       <div className={styles.sectionHeading}><span>Your Game</span><h2>Player Profile</h2></div>
       <div className={styles.links}>
         <Link href={profile.slug ? `/players/${profile.slug}` : "/players"}><strong>Career, history, and achievements</strong><span>Explore your Sandbagger Invitational player profile</span></Link>

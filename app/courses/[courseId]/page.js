@@ -10,6 +10,7 @@ import {
 import { getCourse, getFormatName } from "../../../lib/stats";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
+import ExternalLinkConfirm from "../../ExternalLinkConfirm";
 import Link from "next/link";
 import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import {
@@ -116,14 +117,12 @@ export default async function CoursePage({ params }) {
             </div>
 
             {website ? (
-              <a
+              <ExternalLinkConfirm
                 className={styles.courseWebsiteLink}
                 href={website}
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 Visit Course Website →
-              </a>
+              </ExternalLinkConfirm>
             ) : null}
           </div>
 

@@ -1,37 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { navigationSections } from "./navigation";
-import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
+import { usePathname, useRouter } from "next/navigation";
 
-function activeNavigationHrefForPath(pathname, hash) {
-  const links = navigationSections.flatMap((section) => section.links);
-  const hashMatch = links.find(({ href }) => {
-    if (!href.includes("#")) return false;
-    const [linkPath, linkHash] = href.split("#");
-    return pathname === linkPath && hash === `#${linkHash}`;
-  });
-
-  if (hashMatch) return hashMatch.href;
-
-  return links
-    .filter(({ href }) => !href.includes("#"))
-    .filter(({ href }) =>
-      href === "/"
-        ? pathname === "/"
-        : pathname === href || pathname.startsWith(`${href}/`)
-    )
-    .sort((a, b) => b.href.length - a.href.length)[0]?.href || "";
-}
+const hubSections = [
+  { label: "Tournament", links: [
+    { icon: "📖", label: "Tournament Guide", href: "/tournament-guide" },
+    { icon: "📅", label: "Schedule", href: "/home#today-schedule-title" },
+    { icon: "📍", label: "Courses", href: "/courses" },
+    { icon: "🏆", label: "Tournament History", href: "/history" },
+  ] },
+  { label: "Information", links: [
+    { icon: "📜", label: "Rules", href: "/tournament-guide#rules" },
+    { icon: "📞", label: "Contact Tournament Director", href: "/tournament-guide#important-information" },
+  ] },
+  { label: "App", links: [
+    { icon: "🔔", label: "Notification Preferences", href: "/me#notification-preferences" },
+  ] },
+];
 
 export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [hash, setHash] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
+  const [hash, setHash] = useState("");
   const [director, setDirector] = useState(false);
-  const activeHref = activeNavigationHref || activeNavigationHrefForPath(pathname, hash);
+  const [tournament, setTournament] = useState({ location: "Kiawah Island", year: "2026" });
+  const [refreshing, setRefreshing] = useState(false);
+  const closeButton = useRef(null);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) closeButton.current?.focus();
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const closeOnEscape = (event) => { if (event.key === "Escape") setIsOpen(false); };
+    window.addEventListener("keydown", closeOnEscape);
+    fetch("/api/live", { cache: "no-store" })
+      .then(async (response) => response.ok ? (await response.json()).data?.tournament : null)
+      .then((active) => {
+        if (!active) return;
+        setTournament({ location: active.location || active.Location || "Kiawah Island", year: active.year || "2026" });
+      })
+      .catch(() => {});
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isOpen]);
+
+  useEffect(() => setIsOpen(false), [pathname]);
 
   useEffect(() => {
     const updateHash = () => setHash(window.location.hash);
@@ -39,15 +60,6 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
     window.addEventListener("hashchange", updateHash);
     return () => window.removeEventListener("hashchange", updateHash);
   }, [pathname]);
-
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  useEffect(() => setIsOpen(false), [pathname]);
 
   useEffect(() => {
     let active = true;
@@ -63,7 +75,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
       <button
         className={`menuButton ${isOpen ? "active" : ""}`}
         type="button"
-        aria-label="Open navigation menu"
+        aria-label="Open Tournament Hub"
         aria-expanded={isOpen}
         onClick={() => setIsOpen(true)}
       >
@@ -77,13 +89,15 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
         onClick={() => setIsOpen(false)}
       />
 
-      <aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen}>
+      <aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Tournament Hub">
         <div className="sideMenuTop">
           <div>
-            <strong>Sandbagger Invitational</strong>
-            <span>Established {SITE_ESTABLISHED_YEAR}</span>
+            <small>Tournament Hub</small>
+            <strong>The Bagger</strong>
+            <span>{tournament.location} • {tournament.year}</span>
           </div>
           <button
+            ref={closeButton}
             className="closeMenuButton"
             type="button"
             aria-label="Close navigation menu"
@@ -94,44 +108,29 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
         </div>
 
         <div className="sideMenuScroll">
-          <nav className="sideNav" aria-label="Site navigation">
-            {navigationSections.map((group) =>
-              group.label ? (
-                <section className="sideNavGroup" key={group.label}>
-                  <h2>{group.label}</h2>
-                  <div>
-                    {group.links.map((link) => (
-                      <Link
-                        className={activeHref === link.href ? "current" : ""}
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              ) : (
-                group.links.map((link) => (
-                  <Link
-                    className={`sideNavHome ${
-                      activeHref === link.href ? "current" : ""
-                    }`}
-                    href={link.href === "/" ? homeHref : link.href}
-                    key={link.href}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))
-              )
-            )}
+          <nav className="sideNav" aria-label="Tournament Hub navigation">
+            {hubSections.map((group) => <section className="sideNavGroup" key={group.label}>
+              <h2>{group.label}</h2>
+              <div>{group.links.map((link) => <Link
+                className={(() => {
+                  const [linkPath, linkHash] = link.href.split("#");
+                  return pathname === linkPath && (linkHash ? hash === `#${linkHash}` : !hash) ? "current" : "";
+                })()}
+                key={link.href}
+                href={link.href}
+                prefetch={false}
+                onClick={() => setIsOpen(false)}
+              ><span aria-hidden="true">{link.icon}</span><b>{link.label}</b><i aria-hidden="true">›</i></Link>)}
+              {group.label === "App" ? <button type="button" disabled={refreshing} onClick={() => {
+                setRefreshing(true);
+                router.refresh();
+                window.dispatchEvent(new Event("focus"));
+                window.setTimeout(() => { setRefreshing(false); setIsOpen(false); }, 350);
+              }}><span aria-hidden="true">🔄</span><b>{refreshing ? "Refreshing Tournament Data…" : "Refresh Tournament Data"}</b><i aria-hidden="true">›</i></button> : null}</div>
+            </section>)}
           </nav>
 
-          {director ? <Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={() => setIsOpen(false)}>🎯 Tournament Director</Link> : null}
-
-          <div className="sideMenuFooter">24 players · Two teams · One trophy</div>
+          {director ? <section className="sideNavGroup sideNavDirector"><h2>Director</h2><div><Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={() => setIsOpen(false)}><span aria-hidden="true">🎯</span><b>Tournament Director</b><i aria-hidden="true">›</i></Link></div></section> : null}
         </div>
       </aside>
     </>

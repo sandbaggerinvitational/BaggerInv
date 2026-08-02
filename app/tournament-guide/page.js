@@ -14,6 +14,7 @@ import {
 } from "../../lib/tournament-guide";
 import styles from "./tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
+import ExternalLinkConfirm from "../ExternalLinkConfirm";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
@@ -32,7 +33,7 @@ function InformationCards({ records }) {
       {item.Label ? <span>{item.Label}</span> : null}
       <h3>{item.Title}</h3>
       <Text value={item.Body} />
-      {item["Link URL"] && item["Link Text"] ? <a href={item["Link URL"]} target="_blank" rel="noreferrer">{item["Link Text"]} →</a> : null}
+      {item["Link URL"] && item["Link Text"] ? <ExternalLinkConfirm href={item["Link URL"]}>{item["Link Text"]} →</ExternalLinkConfirm> : null}
     </article>
   ))}</div>;
 }
