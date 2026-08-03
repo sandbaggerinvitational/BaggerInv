@@ -13,7 +13,8 @@ function tournamentEdition(tournament) {
 }
 
 function tournamentDates(tournament) {
-  return tournament?.["Tournament Dates"] || tournament?.Dates || tournament?.dates || tournament?.Date || "";
+  const dates = tournament?.["Tournament Dates"] || tournament?.Dates || tournament?.dates || tournament?.Date || "";
+  return String(dates).replace(/\s+-\s+/g, "–");
 }
 
 export default function TournamentGuideHero({ tournament }) {

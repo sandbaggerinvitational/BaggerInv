@@ -6,10 +6,11 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 
 test("Tournament Guide leads with app-first actionable destinations", async () => {
   const page = await source("app/tournament-guide/page.js");
-  for (const title of ["Schedule", "Courses", "Rules & Formats", "Dining", "Getting Around", "Important Contacts"]) {
+  for (const title of ["Schedule", "Courses", "Rules & Formats", "Dining", "Local Guide", "Important Contacts"]) {
     assert.match(page, new RegExp(`title: "${title.replace(/[&]/g, "&")}"`));
   }
-  assert.ok(page.indexOf("<GuideDirectory />") < page.indexOf("className={styles.overview}"));
+  assert.match(page, /className=\{styles\.directory\}/);
+  assert.doesNotMatch(page, /className=\{styles\.overview\}/);
   assert.match(page, /Quick access to the information golfers use most\./);
 });
 
@@ -68,17 +69,20 @@ test("Tournament Guide modules share one workbook-driven tournament identity her
 });
 
 test("page titles remain in content and no longer repeat inside the shared hero", async () => {
-  const [hero, guide, detail] = await Promise.all([
+  const [hero, guide, detail, css] = await Promise.all([
     source("app/tournament-guide/TournamentGuideHero.js"),
     source("app/tournament-guide/page.js"),
     source("app/tournament-guide/GuideDetailPage.js"),
+    source("app/tournament-guide/tournament-guide.module.css"),
   ]);
   assert.doesNotMatch(hero, /Schedule|Courses|Rules & Formats|Dining|Local Guide|Important Contacts/);
-  assert.match(guide, /className=\{styles\.guidePageHeading\}/);
-  assert.match(guide, /<h1>Tournament Guide<\/h1>/);
+  assert.doesNotMatch(guide, /className=\{styles\.guidePageHeading\}|<h1>Tournament Guide<\/h1>/);
+  assert.match(guide, /<h2 id="guide-directory-title">Find what you need<\/h2>/);
   for (const title of ["Schedule", "Rules & Formats", "Dining"]) assert.match(detail, new RegExp(`<h1>${title.replace("&", "&")}<\\/h1>`));
   assert.doesNotMatch(guide, /\[\["Edition"/);
   assert.doesNotMatch(guide, /\["Dates"/);
+  assert.match(hero, /"–"/);
+  assert.doesNotMatch(css, /\.tournamentIdentityCopy p\{[^}]*text-transform:uppercase/);
 });
 
 test("implemented Guide modules use approved sheets while unfinished content remains placeholder-only", async () => {
@@ -91,14 +95,14 @@ test("implemented Guide modules use approved sheets while unfinished content rem
   assert.match(sheets, /importantContacts: "Important Contacts"/);
 });
 
-test("Guide preserves shared app chrome and moves welcome below navigation", async () => {
+test("Guide preserves shared app chrome and ends naturally after quick access", async () => {
   const [page, css, schedule, rules] = await Promise.all([
     source("app/tournament-guide/page.js"), source("app/tournament-guide/tournament-guide.module.css"),
     source("app/TournamentSchedule.js"), source("app/rules/page.js"),
   ]);
   assert.match(page, /<Header \/>/);
   assert.match(page, /<Footer \/>/);
-  assert.match(page, /<p className=\{styles\.eyebrow\}>Welcome<\/p>/);
+  assert.doesNotMatch(page, /Welcome|overviewItems|sectionDescription|className=\{styles\.overview\}/);
   assert.match(css, /\.directory/);
   assert.match(css, /padding:18px 0 92px/);
   assert.match(schedule, /\/tournament-guide\/schedule/);
