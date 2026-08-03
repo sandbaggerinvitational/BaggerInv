@@ -7,6 +7,7 @@ import {
   sectionSlug,
   visibleGuideSections,
 } from "../lib/tournament-guide.js";
+import { validateTournamentGuideHeaders } from "../lib/tournament-guide-content.js";
 
 const tournament = { id: "SBI-2026", year: 2026 };
 
@@ -51,4 +52,18 @@ test("empty optional sections are removed from navigation", () => {
   const data = { itinerary: [], rules: [], information: [{ Section: "Golf Genius" }] };
   assert.deepEqual(visibleGuideSections(data).map(([slug]) => slug), ["overview", "golf-genius"]);
   assert.equal(informationForSection(data.information, "golf-genius").length, 1);
+});
+
+test("shared Guide schema diagnostics identify exact missing workbook columns", () => {
+  const result = validateTournamentGuideHeaders({
+    "Tournament Itinerary": ["Event ID", "Year", "Event Date", "Day Label", "Start Time", "Event Type", "Title", "Display Order", "Status"],
+    Courses: ["Course ID", "Year", "Round", "Format", "Course", "City", "State"],
+    "Rule Book": ["Rule ID", "Tournament ID", "Category", "Title", "Body", "Display Order", "Status"],
+    "Tournament Rules": ["Year", "Round", "Format", "Points Available"],
+    Rounds: ["Format ID", "Name"],
+  });
+  assert.equal(result.schedule.valid, true);
+  assert.equal(result.courses.valid, true);
+  assert.equal(result.rules.valid, false);
+  assert.deepEqual(result.rules.sheets.Rounds.missing, ["Team Size"]);
 });

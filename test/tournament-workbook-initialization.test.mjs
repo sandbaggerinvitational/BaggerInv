@@ -132,7 +132,7 @@ test("the normalized loader keeps Net Skins outside its required batch", async (
   const source = await readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8");
   const requiredBlock = source.slice(source.indexOf("const requiredNames"), source.indexOf("const optionalNames"));
   assert.doesNotMatch(requiredBlock, /Net Skins/);
-  assert.match(source, /const optionalNames = \["Net Skins", "Net Skins Result", "Tournament Timeline"\]/);
+  assert.match(source, /const optionalNames = \[[^\]]*"Net Skins"[^\]]*"Tournament Timeline"[^\]]*"Guide Sections"[^\]]*"Rule Book"[^\]]*"Rounds"[^\]]*\]/);
   assert.doesNotMatch(requiredBlock, /Tournament Timeline/);
   assert.match(source, /workbookChecks/);
 });

@@ -2,10 +2,9 @@ import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { tournamentLogo } from "../../lib/asset-paths";
-import { loadTournamentGuideSheets } from "../../lib/google-sheets-data";
-import { getFormatName, getRoundFormats, getTournamentRules, getTournaments, refreshHistoricalData } from "../../lib/stats";
-import { groupBy, isTruthy, paragraphs, publicGuideRecords } from "../../lib/tournament-guide";
-import { getTournamentData } from "../live/sheetData";
+import { getFormatName } from "../../lib/stats";
+import { groupBy, isTruthy, paragraphs } from "../../lib/tournament-guide";
+import { resolveTournamentGuideContent } from "./resolveGuideContent";
 import styles from "./tournament-guide.module.css";
 
 const titles = { schedule: "Schedule", rules: "Rules & Formats", dining: "Dining", "getting-around": "Getting Around", contacts: "Important Contacts" };
@@ -46,14 +45,9 @@ function Rules({ ruleBook, tournamentRules, rounds }) {
 function Placeholder({ title, detail }) { return <section className={styles.placeholder}><span>Tournament Guide</span><h1>{title}</h1><p>{detail}</p></section>; }
 
 export default async function GuideDetailPage({ section }) {
-  const [liveResult, , sheets] = await Promise.all([getTournamentData().then((value) => ({ value })).catch((error) => ({ error })), refreshHistoricalData(), loadTournamentGuideSheets()]);
-  const liveData = liveResult.value || null;
-  if (liveResult.error) console.error("Tournament Guide could not refresh normalized tournament data; using last confirmed Guide data.", liveResult.error);
-  const tournament = getTournaments().find((item) => Number(item.year) === Number(liveData?.tournament?.year)) || getTournaments()[0];
-  if (!tournament) throw new Error("Tournament Guide could not resolve the current tournament.");
-  const itinerary = liveData?.guide?.itinerary?.length ? liveData.guide.itinerary : publicGuideRecords(sheets.itinerary, tournament);
-  const ruleBook = publicGuideRecords(sheets.rules, tournament);
-  const descriptions = Object.fromEntries(publicGuideRecords(sheets.sections, tournament).map((item) => [item["Section Slug"], item.Description]));
+  const content = await resolveTournamentGuideContent();
+  const { tournament, schedule: itinerary, ruleBook } = content;
+  const descriptions = Object.fromEntries(content.overview.map((item) => [item["Section Slug"], item.Description]));
   const title = titles[section];
-  return <main><Header /><section className={`${styles.hero} ${styles.heroCompact}`}><div><p>Tournament Guide</p><h1>{title}</h1><strong>{tournament.editionTitle || `${tournament.year} Sandbagger Invitational`}</strong><span>{[tournament.Location, tournament.Dates || tournament.Date].filter(Boolean).join(" • ")}</span></div><div className={styles.logoPlate}><div className={styles.logoInner}><AssetImage src={tournamentLogo(tournament.logoFileName)} alt={`${tournament.year} tournament logo`} fallback={String(tournament.year)} className={styles.logo} fallbackClassName={styles.logoFallback} /></div></div></section><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={tournament} records={itinerary} description={descriptions.itinerary} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={getTournamentRules(tournament.year)} rounds={getRoundFormats()} /> : null}{section === "dining" ? <Placeholder title="Dining" detail="Tournament dining information will be available here once its shared content structure is finalized." /> : null}{section === "getting-around" ? <Placeholder title="Getting Around" detail="Tournament transportation and arrival information will be available here once its shared content structure is finalized." /> : null}{section === "contacts" ? <Placeholder title="Important Contacts" detail="Tournament contact information will be available here once its shared content structure is finalized." /> : null}</div><Footer /></main>;
+  return <main><Header /><section className={`${styles.hero} ${styles.heroCompact}`}><div><p>Tournament Guide</p><h1>{title}</h1><strong>{tournament.editionTitle || `${tournament.year} Sandbagger Invitational`}</strong><span>{[tournament.Location, tournament.Dates || tournament.Date].filter(Boolean).join(" • ")}</span></div><div className={styles.logoPlate}><div className={styles.logoInner}><AssetImage src={tournamentLogo(tournament.logoFileName)} alt={`${tournament.year} tournament logo`} fallback={String(tournament.year)} className={styles.logo} fallbackClassName={styles.logoFallback} /></div></div></section><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={tournament} records={itinerary} description={descriptions.itinerary} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Placeholder title="Dining" detail="Tournament dining information will be available here once its shared content structure is finalized." /> : null}{section === "getting-around" ? <Placeholder title="Getting Around" detail="Tournament transportation and arrival information will be available here once its shared content structure is finalized." /> : null}{section === "contacts" ? <Placeholder title="Important Contacts" detail="Tournament contact information will be available here once its shared content structure is finalized." /> : null}</div><Footer /></main>;
 }

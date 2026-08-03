@@ -3,9 +3,8 @@ import { redirect } from "next/navigation";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { tournamentLogo } from "../../lib/asset-paths";
-import { loadTournamentGuideSheets } from "../../lib/google-sheets-data";
-import { getTournaments, refreshHistoricalData } from "../../lib/stats";
-import { paragraphs, publicGuideRecords } from "../../lib/tournament-guide";
+import { paragraphs } from "../../lib/tournament-guide";
+import { resolveTournamentGuideContent } from "./resolveGuideContent";
 import styles from "./tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
 
@@ -36,11 +35,7 @@ export default async function TournamentGuidePage({ searchParams }) {
     if (["schedule", "rules", "dining", "getting-around", "contacts"].includes(destination)) redirect(`/tournament-guide/${destination}`);
   }
 
-  await refreshHistoricalData();
-  const tournament = getTournaments()[0];
-  if (!tournament) throw new Error("Tournament Guide could not resolve the current tournament.");
-  const sheets = await loadTournamentGuideSheets();
-  const sections = publicGuideRecords(sheets.sections, tournament);
+  const { tournament, overview: sections } = await resolveTournamentGuideContent();
   const sectionDescription = Object.fromEntries(sections.map((item) => [item["Section Slug"], item.Description]));
   const rosterCount = (tournament.team1?.roster?.length || 0) + (tournament.team2?.roster?.length || 0);
   const listedTeamSize = Number(tournament["Team Size"]);

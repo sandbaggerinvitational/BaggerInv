@@ -1,11 +1,10 @@
 export const dynamic = "force-dynamic";
-import { refreshHistoricalData } from "../../lib/stats";
 import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
-import { getCourses, getFormatName, getTournaments } from "../../lib/stats";
-import { getTournamentData } from "../live/sheetData";
+import { getFormatName } from "../../lib/stats";
+import { resolveTournamentGuideContent } from "../tournament-guide/resolveGuideContent";
 import styles from "../historical.module.css";
 import guideStyles from "../tournament-guide/tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
@@ -17,14 +16,12 @@ export const metadata = pageMetadata({
 });
 
 export default async function CoursesPage({ searchParams }) {
-  const [liveResult] = await Promise.allSettled([getTournamentData(), refreshHistoricalData()]);
-  const liveData = liveResult.status === "fulfilled" ? liveResult.value : null;
-  if (liveResult.status === "rejected") console.error("Courses could not refresh normalized tournament data; using last confirmed historical data.", liveResult.reason);
-  const tournament = getTournaments().find((item) => Number(item.year) === Number(liveData?.tournament?.year)) || getTournaments()[0];
+  const content = await resolveTournamentGuideContent();
+  const { tournament } = content;
   const archive = String((await searchParams)?.view || "") === "archive";
   const courses = archive
-    ? getCourses()
-    : [...new Map((liveData?.guide?.courses?.length ? liveData.guide.courses : tournament?.courses || []).map((course) => [course["Course ID"], course])).values()];
+    ? content.courseArchive
+    : [...new Map(content.courses.map((course) => [course["Course ID"], course])).values()];
 
   return (
     <main>
