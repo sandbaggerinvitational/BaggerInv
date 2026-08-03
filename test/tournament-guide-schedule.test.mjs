@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { itineraryGroups, itineraryViewModel } from "../lib/tournament-guide-schedule.js";
+import { itineraryGroups, itineraryViewModel, structureItineraryDetails } from "../lib/tournament-guide-schedule.js";
 
 const tournament = { status: "Live", timeZone: "America/New_York" };
 const courses = [
@@ -63,21 +63,33 @@ test("Schedule preserves details behind disclosure and provides safe location ac
   assert.equal(golf.details, "Full scoring notes");
   assert.equal(golf.location, "Turtle Point");
   assert.equal(golf.courseHref, "/courses/TP");
-  assert.equal(golf.mapHref, "https://maps.example/tp");
+  assert.equal("mapHref" in golf, false);
 });
 
-test("Schedule app presentation uses expandable cards, shared badges, and Leave The Bagger confirmation", async () => {
-  const [component, detail, external] = await Promise.all([
+test("long workbook notes are structured into readable itinerary sections", () => {
+  const sections = structureItineraryDetails("Green Tees. Nassau scoring: 1 point per segment. 90% handicap allocation. $25 net skins. Walking caddies are available.");
+  assert.deepEqual(sections.map((section) => section.label), ["Tee Information", "Scoring", "Handicap", "Net Skins", "Caddies"]);
+  assert.match(sections.find((section) => section.label === "Handicap").text, /90%/);
+});
+
+test("current tournament-local day is marked for the Schedule header", () => {
+  const model = itineraryViewModel({ records, tournament, courses, now: new Date("2026-09-25T16:00:00Z") });
+  assert.equal(model.events.find((event) => event.id === "breakfast").isToday, true);
+  assert.equal(model.events.find((event) => event.id === "awards").isToday, false);
+});
+
+test("Schedule app presentation uses tappable disclosures and shared badges without map actions", async () => {
+  const [component, detail] = await Promise.all([
     readFile(new URL("../app/tournament-guide/ScheduleItinerary.js", import.meta.url), "utf8"),
     readFile(new URL("../app/tournament-guide/GuideDetailPage.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/ExternalLinkConfirm.js", import.meta.url), "utf8"),
   ]);
   assert.match(component, /<details/);
   assert.match(component, /<StatusBadge/);
-  assert.match(component, /<ExternalLinkConfirm/);
+  assert.match(component, /interaction\.target\.closest\("a, button, summary"\)/);
+  assert.doesNotMatch(component, /View Map|ExternalLinkConfirm|maps\.apple/);
+  assert.match(component, /View Course/);
+  assert.match(component, /Today/);
   assert.match(component, /Up Next/);
   assert.match(detail, /<ScheduleItinerary/);
   assert.doesNotMatch(detail, /className=\{styles\.timeline\}/);
-  assert.match(external, /Leave The Bagger\?/);
-  assert.match(external, /useId/);
 });

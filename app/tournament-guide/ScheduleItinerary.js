@@ -2,29 +2,37 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import ExternalLinkConfirm from "../ExternalLinkConfirm";
 import StatusBadge from "../StatusBadge";
-import { itineraryGroups, itineraryViewModel } from "../../lib/tournament-guide-schedule";
+import { itineraryGroups, itineraryViewModel, structureItineraryDetails } from "../../lib/tournament-guide-schedule";
 import styles from "./tournament-guide.module.css";
 
 function SupportingDetails({ event }) {
   const context = [event.roundNumber ? `Round ${event.roundNumber}` : "", event.format, event.tee ? `${event.tee} Tees` : ""].filter(Boolean);
+  const sections = structureItineraryDetails(event.details);
   return <>
     {context.length ? <p className={styles.scheduleContext}>{context.join(" • ")}</p> : null}
-    {event.details ? <div className={styles.eventNotes}>{event.details.split(/\n\s*\n/).filter(Boolean).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div> : <p className={styles.eventNotesEmpty}>No additional details published.</p>}
+    {sections.length ? <div className={styles.eventNotes}>{sections.map((section) => <section key={section.label}><h4>{section.label}</h4><p>{section.text}</p></section>)}</div> : <p className={styles.eventNotesEmpty}>No additional details published.</p>}
   </>;
 }
 
 function LocationActions({ event }) {
-  if (!event.courseHref && !event.mapHref) return null;
+  if (!event.courseHref) return null;
   return <div className={styles.locationActions}>
-    {event.courseHref ? <Link href={event.courseHref}>View Course</Link> : null}
-    {event.mapHref ? <ExternalLinkConfirm className={styles.externalLocation} href={event.mapHref}>View Map</ExternalLinkConfirm> : null}
+    <Link href={event.courseHref}>View Course</Link>
   </div>;
 }
 
+function EventStatus({ event }) {
+  if (event.status === "Completed") return <b className={styles.scheduleCompleted}>✓ Completed</b>;
+  if (event.status === "Upcoming") return <span className={styles.scheduleUpcoming}><i aria-hidden="true">⏳</i><StatusBadge status="Upcoming" /></span>;
+  return <StatusBadge status={event.status} />;
+}
+
 function EventCard({ event }) {
-  return <details className={`${styles.itineraryCard} ${event.emphasized ? styles.itineraryCardEmphasized : ""}`}>
+  return <details className={`${styles.itineraryCard} ${event.emphasized ? styles.itineraryCardEmphasized : ""}`} onClick={(interaction) => {
+    if (interaction.target.closest("a, button, summary")) return;
+    interaction.currentTarget.open = !interaction.currentTarget.open;
+  }}>
     <summary>
       <div className={styles.eventIcon} aria-hidden="true">{event.icon}</div>
       <div className={styles.eventPrimary}>
@@ -34,7 +42,7 @@ function EventCard({ event }) {
         {event.location ? <strong>{event.location}</strong> : null}
       </div>
       <div className={styles.eventState}>
-        {event.status === "Completed" ? <b className={styles.scheduleCompleted}>✓ Completed</b> : <StatusBadge status={event.status} />}
+        <EventStatus event={event} />
         <span aria-hidden="true">⌄</span>
       </div>
     </summary>
@@ -66,7 +74,7 @@ export default function ScheduleItinerary({ records, tournament, rounds, courses
     </section>
     <div className={styles.itineraryDays}>
       {[...groups.entries()].map(([day, events]) => <section className={styles.itineraryDay} key={day}>
-        <header><span>{events[0]?.dateLabel || "Tournament itinerary"}</span><h2>{events[0]?.dayHeading || day}</h2></header>
+        <header><div><h2>{events[0]?.dayHeading || day}</h2><span>{events[0]?.dateLabel || "Tournament itinerary"}</span></div>{events.some((event) => event.isToday) ? <b>Today</b> : null}</header>
         <div>{events.map((event) => <EventCard event={event} key={event.id} />)}</div>
       </section>)}
     </div>
