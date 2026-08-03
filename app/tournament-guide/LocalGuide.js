@@ -1,5 +1,5 @@
 import ExternalLinkConfirm from "../ExternalLinkConfirm";
-import { localGuideDirections, localGuideGroups, localGuidePhone, localGuideSectionIcon, localGuideViewModel } from "../../lib/tournament-guide-local";
+import { localGuideDirections, localGuideGroups, localGuidePhone, localGuideSectionIcon, localGuideViewModel, localGuideWebsite } from "../../lib/tournament-guide-local";
 import styles from "./tournament-guide.module.css";
 
 function LocalGuideCard({ record }) {
@@ -8,7 +8,7 @@ function LocalGuideCard({ record }) {
     {record.address || record.phone || record.website ? <div className={styles.localGuideActions}>
       {record.address ? <a href={localGuideDirections(record.address)}>📍 Directions</a> : null}
       {record.phone ? <a href={localGuidePhone(record.phone)}>📞 Call</a> : null}
-      {record.website ? <ExternalLinkConfirm href={record.website}>🌐 Website</ExternalLinkConfirm> : null}
+      {record.website ? <ExternalLinkConfirm href={localGuideWebsite(record.website)}>🌐 Website</ExternalLinkConfirm> : null}
     </div> : null}
   </article>;
 }

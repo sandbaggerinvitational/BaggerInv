@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { localGuideDirections, localGuideGroups, localGuidePhone, localGuideSectionIcon, localGuideViewModel } from "../lib/tournament-guide-local.js";
+import { localGuideDirections, localGuideGroups, localGuidePhone, localGuideSectionIcon, localGuideViewModel, localGuideWebsite } from "../lib/tournament-guide-local.js";
 
 const records = [
   { Year: 2026, Section: "Medical", Title: "Urgent Care", Description: "Nearest walk-in clinic.", Address: "10 Main St", Phone: "(843) 555-1212", Website: "https://example.com/clinic", "Sort Order": 3 },
@@ -18,6 +18,8 @@ test("Local Guide groups records by Section and preserves workbook Sort Order", 
 test("Local Guide creates native maps and telephone actions safely", () => {
   assert.equal(localGuideDirections("10 Main St, Kiawah Island"), "https://maps.apple.com/?daddr=10%20Main%20St%2C%20Kiawah%20Island");
   assert.equal(localGuidePhone("(843) 555-1212"), "tel:8435551212");
+  assert.equal(localGuideWebsite("Www.kiawahisland.com"), "https://Www.kiawahisland.com");
+  assert.equal(localGuideWebsite("https://example.com"), "https://example.com");
   assert.equal(localGuideSectionIcon("Medical"), "🏥");
   assert.equal(localGuideSectionIcon("Transportation", [{ title: "Tournament Shuttle" }]), "🚌");
   assert.equal(localGuideSectionIcon("Transportation", [{ title: "Airport Transfer" }]), "🚐");
@@ -44,7 +46,7 @@ test("Local Guide uses only approved workbook fields and data-backed actions", a
   assert.match(component, /<h1>Local Guide<\/h1>/);
   assert.match(component, /localGuideSectionIcon\(section, sectionRecords\)/);
   assert.match(component, /Local information is being prepared\./);
-  assert.match(component, /<ExternalLinkConfirm href=\{record\.website\}/);
+  assert.match(component, /<ExternalLinkConfirm href=\{localGuideWebsite\(record\.website\)\}/);
   assert.match(component, /localGuideDirections\(record\.address\)/);
   assert.match(component, /localGuidePhone\(record\.phone\)/);
   assert.match(normalized, /fetchOptionalSheet\("Local Guide"\)/);
