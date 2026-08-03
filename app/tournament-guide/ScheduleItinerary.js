@@ -64,14 +64,6 @@ export default function ScheduleItinerary({ records, tournament, rounds, courses
   const model = useMemo(() => itineraryViewModel({ records, tournament, rounds, courses, now: new Date(initialTime + elapsed) }), [records, tournament, rounds, courses, initialTime, elapsed]);
   const groups = itineraryGroups(model.events);
   return <>
-    <section className={`${styles.upNext} ${model.complete ? styles.upNextComplete : ""}`} aria-labelledby="up-next-title">
-      <div>
-        <span>{model.complete ? "Tournament itinerary" : "Up Next"}</span>
-        <h2 id="up-next-title">{model.complete ? "Tournament Complete" : model.focus.title}</h2>
-        {!model.complete ? <><strong>{model.focus.timeLabel}</strong>{model.focus.location ? <p>{model.focus.location}</p> : null}</> : <p>No future tournament events remain.</p>}
-      </div>
-      {!model.complete ? <div className={styles.upNextIcon} aria-hidden="true">{model.focus.icon}</div> : null}
-    </section>
     <div className={styles.itineraryDays}>
       {[...groups.entries()].map(([day, events]) => <section className={styles.itineraryDay} key={day}>
         <header><div><h2>{events[0]?.dayHeading || day}</h2><span>{events[0]?.dateLabel || "Tournament itinerary"}</span></div>{events.some((event) => event.isToday) ? <b>Today</b> : null}</header>

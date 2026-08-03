@@ -50,7 +50,7 @@ test("non-golf itinerary status uses tournament-local Start and End Time", () =>
   assert.equal(after.events.find((event) => event.id === "breakfast").status, "Completed");
 });
 
-test("Up Next prioritizes a live event and otherwise the next future event", () => {
+test("itinerary emphasis prioritizes a live event and otherwise the next future event", () => {
   const live = itineraryViewModel({ records, tournament, courses, now: new Date("2026-09-25T10:30:00Z") });
   assert.equal(live.focus.id, "breakfast");
   const before = itineraryViewModel({ records, tournament: { ...tournament, status: "Upcoming" }, courses, now: new Date("2026-09-25T08:00:00Z") });
@@ -89,7 +89,7 @@ test("Schedule app presentation uses tappable disclosures and shared badges with
   assert.doesNotMatch(component, /View Map|ExternalLinkConfirm|maps\.apple/);
   assert.match(component, /View Course/);
   assert.match(component, /Today/);
-  assert.match(component, /Up Next/);
+  assert.doesNotMatch(component, /Up Next|up-next-title|Tournament Complete/);
   assert.match(detail, /<ScheduleItinerary/);
   assert.doesNotMatch(detail, /className=\{styles\.timeline\}/);
 });
