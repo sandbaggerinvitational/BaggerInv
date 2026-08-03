@@ -28,7 +28,7 @@ test("Guide destinations are focused same-origin views using existing workbook c
   assert.match(resolver, /validateTournamentGuideHeaders/);
   assert.match(resolver, /lastGood/);
   assert.match(normalized, /publicGuideRecords\(itineraryRows, guideTournament\)/);
-  for (const sheet of ["Tournament Itinerary", "Courses", "Rule Book", "Tournament Rules", "Rounds", "Dining"]) assert.match(schema, new RegExp(sheet));
+  for (const sheet of ["Tournament Itinerary", "Courses", "Rule Book", "Tournament Rules", "Rounds", "Dining", "Local Guide"]) assert.match(schema, new RegExp(sheet));
   assert.doesNotMatch(detail, /target="_blank"|window\.open|https?:\/\//);
   assert.match(detail, /<Link className=\{styles\.backToGuide\} href="\/tournament-guide">‹ Tournament Guide<\/Link>/);
   assert.doesNotMatch(detail, /Find what you need|className=\{styles\.directory\}/);
@@ -44,13 +44,14 @@ test("Courses defaults to the active tournament and offers the historical archiv
   assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
 });
 
-test("unfinished Guide content remains placeholder-only without new workbook tabs", async () => {
+test("implemented Guide modules use approved sheets while unfinished content remains placeholder-only", async () => {
   const [detail, sheets] = await Promise.all([source("app/tournament-guide/GuideDetailPage.js"), source("lib/google-sheets-data.js")]);
   assert.match(detail, /<Dining records=\{content\.dining\}/);
   assert.match(sheets, /dining: "Dining"/);
-  assert.match(detail, /<Placeholder title="Getting Around"/);
+  assert.match(detail, /<LocalGuide records=\{content\.localGuide\}/);
   assert.match(detail, /<Placeholder title="Important Contacts"/);
-  assert.doesNotMatch(sheets, /Getting Around|Important Contacts/);
+  assert.match(sheets, /localGuide: "Local Guide"/);
+  assert.doesNotMatch(sheets, /Important Contacts/);
 });
 
 test("Guide preserves shared app chrome and moves welcome below navigation", async () => {
