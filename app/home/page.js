@@ -1,6 +1,7 @@
 import { privatePageMetadata } from "../../lib/seo";
 import MobileTournamentHome from "../MobileTournamentHome";
 import PreviewModeBadge from "../PreviewModeBadge";
+import PwaSplashIdentityBridge from "../PwaSplashIdentityBridge";
 import { getTournamentData } from "../live/sheetData";
 import { workbookInitializationMessage } from "../../lib/tournament-workbook-initialization";
 
@@ -27,6 +28,7 @@ export default async function MobileHomePage() {
   if (!liveData?.tournament) {
     return (
       <main className="mobileHomeMain">
+        <PwaSplashIdentityBridge tournament={null} />
         <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
         <section className="mobileHomeLoadError" role="alert">
           <h1>Tournament dashboard</h1>
@@ -39,6 +41,7 @@ export default async function MobileHomePage() {
 
   return (
     <>
+      <PwaSplashIdentityBridge tournament={liveData.tournament} />
       <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
       <MobileTournamentHome liveData={liveData} />
     </>

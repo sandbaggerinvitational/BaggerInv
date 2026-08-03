@@ -18,25 +18,31 @@ export default function PwaLaunchSplash() {
     }
 
     let active = true;
-    fetch("/api/live", { cache: "no-store" })
-      .then(async (response) => response.ok ? (await response.json()).data?.tournament : null)
-      .then((tournament) => {
-        if (!active || !tournament) return;
+    const completeLaunch = (tournament) => {
+      if (!active) return;
+      if (tournament) {
         setIdentity({
           name: tournament.name || tournament.Name || "",
           edition: formatTournamentEdition(tournament.edition || tournament["Tournament Edition"] || tournament.Annual),
           dates: formatTournamentDates(tournament.dates || tournament["Tournament Dates"] || tournament.Dates),
+          location: tournament.location || tournament.Location || tournament.Destination || "",
           logo: tournament.logo || tournament["Tournament Logo Filename"] || (tournament.year ? `sandbagger-${tournament.year}` : ""),
           year: tournament.year || tournament.Year || "",
         });
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!active) return;
-        requestAnimationFrame(() => requestAnimationFrame(() => setPhase("exiting")));
-      });
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() => setPhase("exiting")));
+    };
+    const onTournamentReady = (event) => completeLaunch(event.detail);
 
-    return () => { active = false; };
+    window.addEventListener("sbi:tournament-ready", onTournamentReady, { once: true });
+    if (Object.prototype.hasOwnProperty.call(window, "__sbiTournamentIdentity")) {
+      completeLaunch(window.__sbiTournamentIdentity);
+    }
+
+    return () => {
+      active = false;
+      window.removeEventListener("sbi:tournament-ready", onTournamentReady);
+    };
   }, []);
 
   const finish = (event) => {
@@ -64,6 +70,7 @@ export default function PwaLaunchSplash() {
       </div>
       {identity?.edition ? <p>{identity.edition}</p> : null}
       {identity?.name ? <h1>{identity.name}</h1> : null}
+      {identity?.location ? <strong>{identity.location}</strong> : null}
       {identity?.dates ? <span>{identity.dates}</span> : null}
     </div>
     <div className={styles.loading} role="status">

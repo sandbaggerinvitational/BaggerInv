@@ -120,7 +120,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;var key="sbi-pwa-launch-seen";if(standalone&&!window.sessionStorage.getItem(key)){window.sessionStorage.setItem(key,"1");document.documentElement.classList.add("pwa-cold-launch");}}catch(error){}})();` }} />
+        <style dangerouslySetInnerHTML={{ __html: `html{background:#092f25}html.pwa-cold-launch,html.pwa-cold-launch body{margin:0;background:#092f25}` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;var launchRoute=window.location.pathname==="/"||window.location.pathname==="/home";var key="sbi-pwa-launch-seen";if(standalone&&launchRoute&&!window.sessionStorage.getItem(key)){window.sessionStorage.setItem(key,"1");document.documentElement.classList.add("pwa-cold-launch");}}catch(error){}})();` }} />
       </head>
       <body>
         <PwaLaunchSplash />

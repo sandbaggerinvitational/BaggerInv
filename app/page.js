@@ -12,6 +12,7 @@ import TournamentStatusHero from "./TournamentStatusHero";
 import { mobileTournamentDashboardEnabled } from "../lib/spreadsheet-environment";
 import MobileTournamentHome from "./MobileTournamentHome";
 import StatusBadge from "./StatusBadge";
+import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -118,11 +119,16 @@ export default async function Home() {
   };
 
   if (mobileTournamentDashboardEnabled(liveData?.tournament)) {
-    return <MobileTournamentHome liveData={liveData} />;
+    return <>
+      <PwaSplashIdentityBridge tournament={liveData?.tournament || null} />
+      <MobileTournamentHome liveData={liveData} />
+    </>;
   }
 
   return (
-    <main>
+    <>
+      <PwaSplashIdentityBridge tournament={liveData?.tournament || null} />
+      <main>
       <Header />
 
       <section className="kiawahHero">
@@ -284,6 +290,7 @@ export default async function Home() {
       </section>
 
       <Footer />
-    </main>
+      </main>
+    </>
   );
 }
