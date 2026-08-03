@@ -32,6 +32,20 @@ function TextSections({ sections }) {
   return <div className={styles.textSections}>{sections.map(([title, value]) => <article key={title}><h3>{title}</h3>{String(value).split(/\n\s*\n/).filter(Boolean).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</article>)}</div>;
 }
 
+function NineScorecard({ holes, label }) {
+  if (!holes.length) return null;
+  return <div className={styles.nine}>
+    <h3>{label}</h3>
+    <table aria-label={`${label} scorecard`}>
+      <thead><tr><th>Hole</th>{holes.map((hole) => <th key={`h-${hole["Hole Number"]}`}>{hole["Hole Number"]}</th>)}</tr></thead>
+      <tbody>
+        <tr><th>Par</th>{holes.map((hole) => <td key={`p-${hole["Hole Number"]}`}>{hole.Par || "—"}</td>)}</tr>
+        <tr><th>HCP</th>{holes.map((hole) => <td key={`s-${hole["Hole Number"]}`}>{hole["Stroke Index"] || "—"}</td>)}</tr>
+      </tbody>
+    </table>
+  </div>;
+}
+
 export default async function CoursePage({ params }) {
   const { courseId } = await params;
   const model = await resolveCourse(courseId);
@@ -59,7 +73,7 @@ export default async function CoursePage({ params }) {
 
       {model.images.length > 1 ? <section className={styles.section}><header><span>Course gallery</span><h2>On the Course</h2></header><div className={styles.gallery}>{model.images.map((image, index) => <AssetImage src={courseHero(image)} alt={`${course.Course} view ${index + 1}`} className={styles.galleryImage} fallbackClassName={styles.galleryFallback} fallback={course.Course} key={image} />)}</div></section> : null}
 
-      {model.holes.length ? <section className={`${styles.section} ${styles.scorecardSection}`} id="course-scorecard"><header><span>Hole by hole</span><h2>Course Scorecard</h2></header><div className={styles.scorecard} role="table" aria-label={`${course.Course} scorecard`}><div role="row"><b role="columnheader">Hole</b>{model.holes.map((hole) => <b role="columnheader" key={`h-${hole["Hole Number"]}`}>{hole["Hole Number"]}</b>)}</div><div role="row"><span role="rowheader">Par</span>{model.holes.map((hole) => <span role="cell" key={`p-${hole["Hole Number"]}`}>{hole.Par || "—"}</span>)}</div><div role="row"><span role="rowheader">HCP</span>{model.holes.map((hole) => <span role="cell" key={`s-${hole["Hole Number"]}`}>{hole["Stroke Index"] || "—"}</span>)}</div></div></section> : null}
+      {model.holes.length ? <section className={`${styles.section} ${styles.scorecardSection}`} id="course-scorecard"><header><span>Hole by hole</span><h2>Course Scorecard</h2></header><div className={styles.scorecard}><NineScorecard holes={model.holes.slice(0, 9)} label="Front Nine" /><NineScorecard holes={model.holes.slice(9, 18)} label="Back Nine" /></div></section> : null}
 
       <div className={styles.actions}>{model.holes.length ? <Link href="#course-scorecard">View Scorecard</Link> : null}{website ? <ExternalLinkConfirm href={website}>Visit Official Course Website →</ExternalLinkConfirm> : null}</div>
     </div>

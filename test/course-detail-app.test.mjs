@@ -36,10 +36,19 @@ test("Course Detail exposes compact course facts without tournament duplication"
 
 test("Course Detail reuses optional workbook content without inventing missing sections", () => {
   const model = courseDetailModel("OCGC01", content);
-  assert.deepEqual(model.experience.map(([label]) => label), ["Course Overview", "Playing Tips", "History"]);
+  assert.deepEqual(model.experience.map(([label]) => label), ["Course Overview", "Playing Tips", "Signature Holes", "Course History"]);
+  assert.equal(model.experience[0][1], "A championship seaside course.");
   assert.equal(model.images.length, 1);
   assert.equal(model.holes.length, 18);
   assert.equal(model.website, "https://example.test/ocean");
+});
+
+test("Course Detail uses stable static course copy only when workbook narrative is absent", () => {
+  const model = courseDetailModel("TPGC01", {
+    courses: [{ "Course ID": "TPGC01", Course: "Turtle Point Golf Course" }],
+  });
+  assert.deepEqual(model.experience.map(([label]) => label), ["Course Overview", "Playing Tips", "Signature Holes", "Course History"]);
+  assert.match(model.experience[0][1], /Jack Nicklaus/);
 });
 
 test("Course Detail hides unavailable optional facts, content, and scorecard data", () => {
@@ -67,12 +76,21 @@ test("Course Detail uses the resilient Guide resolver and removes the failing le
 });
 
 test("Course Detail remains inside The Bagger and has no map action", async () => {
-  const page = await readFile(new URL("../app/courses/[courseId]/page.js", import.meta.url), "utf8");
+  const [page, css] = await Promise.all([
+    readFile(new URL("../app/courses/[courseId]/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/courses/[courseId]/course-detail.module.css", import.meta.url), "utf8"),
+  ]);
   assert.match(page, /<Header homeHref="\/home"/);
   assert.match(page, /href="\/courses">‹ Courses/);
   assert.match(page, /View Scorecard/);
+  assert.match(page, /Front Nine/);
+  assert.match(page, /Back Nine/);
   assert.match(page, /Visit Official Course Website/);
   assert.match(page, /<ExternalLinkConfirm href=\{website\}/);
   for (const duplicated of ["Tournament Information", "Round Assignment", "Tee Assignment", "First Tee Time", "Walking Caddies", "Net Skins"]) assert.doesNotMatch(page, new RegExp(duplicated));
   assert.doesNotMatch(page, /View Map|GPS Link|maps\.apple|google\.com\/maps/);
+  assert.match(css, /overflow-x:\s*clip/);
+  assert.match(css, /table-layout:\s*fixed/);
+  assert.match(css, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.doesNotMatch(css, /min-width:\s*760px;|overflow-x:\s*auto/);
 });

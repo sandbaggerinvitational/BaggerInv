@@ -2,6 +2,7 @@
   min-height: 100vh;
   padding-bottom: calc(var(--participant-nav-height, 72px) + env(safe-area-inset-bottom));
   background: #f7f4ed;
+  overflow-x: clip;
 }
 
 .hero {
@@ -93,6 +94,7 @@
 }
 
 .identity > div:last-child {
+  min-width: 0;
   display: grid;
   gap: 5px;
 }
@@ -108,6 +110,7 @@
 .identity h1 {
   margin: 0;
   font: 700 clamp(2.3rem, 7vw, 4.5rem)/.98 Georgia, serif;
+  overflow-wrap: anywhere;
 }
 
 .identity p {
@@ -216,11 +219,7 @@
 
 .gallery {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(78%, 1fr);
-  gap: 10px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  gap: 12px;
 }
 
 .galleryImage,
@@ -229,7 +228,6 @@
   height: 250px;
   border-radius: 15px;
   object-fit: cover;
-  scroll-snap-align: start;
 }
 
 .galleryFallback {
@@ -244,41 +242,56 @@
 }
 
 .scorecard {
-  overflow-x: auto;
+  display: grid;
+  gap: 16px;
+}
+
+.nine {
+  min-width: 0;
+  overflow: hidden;
   border: 1px solid #ded7ca;
   border-radius: 14px;
   background: #fff;
 }
 
-.scorecard > div {
-  min-width: 760px;
-  display: grid;
-  grid-template-columns: 64px repeat(18, 1fr);
+.nine h3 {
+  margin: 0;
+  padding: 10px 12px;
+  background: #f2ead7;
+  color: #765a1c;
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
 }
 
-.scorecard > div + div {
-  border-top: 1px solid #ded7ca;
+.nine table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.scorecard b,
-.scorecard span {
-  min-height: 38px;
-  display: grid;
-  place-items: center;
-  padding: 5px;
+.nine th,
+.nine td {
+  height: 36px;
+  padding: 2px 0;
+  border-top: 1px solid #ece6db;
   border-right: 1px solid #ece6db;
+  text-align: center;
   color: #33413b;
-  font-size: .67rem;
+  font-size: clamp(.57rem, 2.25vw, .7rem);
   font-variant-numeric: tabular-nums;
 }
 
-.scorecard b:first-child,
-.scorecard span:first-child {
-  position: sticky;
-  left: 0;
+.nine th:first-child {
+  width: 42px;
   background: #f2ead7;
   color: #765a1c;
   font-weight: 900;
+}
+
+.nine tr > :last-child {
+  border-right: 0;
 }
 
 .actions {
@@ -312,11 +325,30 @@
   .heroContent { padding-bottom: 26px; }
   .identity { align-items: flex-start; gap: 14px; }
   .logoPlate { width: 72px; height: 72px; flex-basis: 72px; padding: 11px; }
-  .identity h1 { font-size: 2.35rem; }
+  .identity h1 { font-size: clamp(1.85rem, 9vw, 2.35rem); }
   .shell { width: calc(100% - 28px); padding-top: 22px; gap: 20px; }
   .section { padding: 20px 16px; }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts > div { min-width: 0; padding: 12px 10px; }
+  .facts dt { overflow-wrap: anywhere; }
+  .facts dd { font-size: 1.08rem; overflow-wrap: anywhere; }
+  .scorecardSection { padding-inline: 12px; }
   .actions { display: grid; }
   .actions a { width: 100%; }
-  .gallery { grid-auto-columns: 90%; }
+  .galleryImage, .galleryFallback { height: 220px; }
+}
+
+@media (max-width: 350px) {
+  .heroContent { width: calc(100% - 24px); }
+  .identity { gap: 10px; }
+  .logoPlate { width: 62px; height: 62px; flex-basis: 62px; padding: 9px; }
+  .shell { width: calc(100% - 20px); }
+  .section { padding-inline: 13px; }
+  .nine th:first-child { width: 37px; }
+  .nine th, .nine td { font-size: .54rem; }
+}
+
+@media (min-width: 760px) {
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scorecard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
