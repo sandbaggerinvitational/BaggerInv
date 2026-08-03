@@ -12,8 +12,8 @@ const hubSections = [
     { icon: "🏆", label: "Tournament History", href: "/history" },
   ] },
   { label: "Information", links: [
-    { icon: "📜", label: "Rules", href: "/tournament-guide?section=rules" },
-    { icon: "📞", label: "Contact Tournament Director", href: "/tournament-guide?section=contacts" },
+    { icon: "📜", label: "Rules", href: "/tournament-guide/rules" },
+    { icon: "📞", label: "Contact Tournament Director", href: "/tournament-guide/contacts" },
   ] },
   { label: "App", links: [
     { icon: "🔔", label: "Notification Preferences", href: "/me#notification-preferences" },

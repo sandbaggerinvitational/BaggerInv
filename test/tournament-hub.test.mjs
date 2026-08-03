@@ -9,7 +9,7 @@ test("Tournament Hub replaces the website navigation with native participant des
   for (const label of ["Tournament Guide", "Schedule", "Courses", "Tournament History", "Rules", "Contact Tournament Director", "Notification Preferences", "Refresh Tournament Data"]) {
     assert.match(menu, new RegExp(label));
   }
-  for (const href of ["/tournament-guide", "/home#today-schedule-title", "/courses", "/history", "/tournament-guide?section=rules", "/tournament-guide?section=contacts", "/me#notification-preferences"]) {
+  for (const href of ["/tournament-guide", "/home#today-schedule-title", "/courses", "/history", "/tournament-guide/rules", "/tournament-guide/contacts", "/me#notification-preferences"]) {
     assert.ok(menu.includes(`href: "${href}"`), href);
   }
   assert.doesNotMatch(menu, /navigationSections|Odds Center|War Room|Admin Center/);
@@ -32,15 +32,14 @@ test("Tournament Hub remains accessible and keeps the participant shell visible"
 });
 
 test("external tournament content asks before leaving The Bagger", async () => {
-  const [confirmation, guide, course] = await Promise.all([
-    source("app/ExternalLinkConfirm.js"), source("app/tournament-guide/page.js"), source("app/courses/[courseId]/page.js"),
+  const [confirmation, course] = await Promise.all([
+    source("app/ExternalLinkConfirm.js"), source("app/courses/[courseId]/page.js"),
   ]);
   assert.match(confirmation, /Leave The Bagger\?/);
   assert.match(confirmation, /This content will open in Safari\./);
   assert.match(confirmation, />Cancel</);
   assert.match(confirmation, />Continue</);
   assert.match(confirmation, /showModal\(\)/);
-  assert.match(guide, /<ExternalLinkConfirm href=\{item\["Link URL"\]\}/);
   assert.match(course, /<ExternalLinkConfirm[\s\S]*href=\{website\}/);
 });
 

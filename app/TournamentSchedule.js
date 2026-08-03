@@ -27,7 +27,7 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "" }
     <section className={styles.schedule} aria-labelledby="today-schedule-title">
       <header className={styles.sectionHeader}>
         <div><p>Today</p><h2 id="today-schedule-title">Today’s Schedule</h2></div>
-        <Link href="/tournament-guide?section=schedule">View Tournament Guide</Link>
+        <Link href="/tournament-guide/schedule">View Tournament Guide</Link>
       </header>
       {items.length ? <ol>{items.map((item) => {
         const subtitle = timelineOptionalText(item.subtitle);

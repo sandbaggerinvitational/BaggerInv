@@ -22,8 +22,12 @@ test("public guide exposes only published non-sensitive tournament records", () 
 });
 
 test("guide matching supports the tournament year during ID migration", () => {
-  const records = [{ "Item ID": "1", "Tournament ID": "2026", Status: "Published" }];
-  assert.equal(publicGuideRecords(records, tournament).length, 1);
+  const records = [
+    { "Item ID": "1", "Tournament ID": "2026", Status: "Published" },
+    { "Item ID": "2", "Tournament Year": "2026", Status: "Published" },
+    { "Item ID": "3", Year: 2025, "Tournament ID": "SBI-2026", Status: "Published" },
+  ];
+  assert.deepEqual(publicGuideRecords(records, tournament).map((row) => row["Item ID"]), ["1", "2"]);
 });
 
 test("section names normalize into stable public slugs", () => {

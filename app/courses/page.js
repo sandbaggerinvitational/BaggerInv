@@ -4,8 +4,9 @@ import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
-import { getCourses } from "../../lib/stats";
+import { getCourses, getFormatName, getTournaments } from "../../lib/stats";
 import styles from "../historical.module.css";
+import guideStyles from "../tournament-guide/tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
 
 export const metadata = pageMetadata({
@@ -14,24 +15,25 @@ export const metadata = pageMetadata({
   path: "/courses",
 });
 
-export default async function CoursesPage() {
+export default async function CoursesPage({ searchParams }) {
   await refreshHistoricalData();
-  const courses = getCourses();
+  const tournament = getTournaments()[0];
+  const archive = String((await searchParams)?.view || "") === "archive";
+  const courses = archive
+    ? getCourses()
+    : [...new Map((tournament?.courses || []).map((course) => [course["Course ID"], course])).values()];
 
   return (
     <main>
       <Header />
 
-      <section className={styles.pageHero}>
-        <p className={styles.eyebrow}>The Venues</p>
-        <h1>Courses</h1>
-        <p>
-          Every course that has hosted a round of The Sandbagger
-          Invitational.
-        </p>
-      </section>
-
-      <section className={styles.content}>
+      <section className={`${styles.content} ${guideStyles.guideDetailShell}`}>
+        <Link className={guideStyles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>
+        <header className={guideStyles.detailHeading}>
+          <p className={styles.eyebrow}>{archive ? "Course Archive" : `${tournament?.year || "Current"} Tournament`}</p>
+          <h1>{archive ? "Every Tournament Course" : "Courses"}</h1>
+          <p>{archive ? "Every venue that has hosted a Sandbagger Invitational round." : "The courses being played during the active tournament."}</p>
+        </header>
         <div className={styles.courseIndexGrid}>
           {courses.map((course) => (
             <Link
@@ -50,10 +52,11 @@ export default async function CoursesPage() {
               <p>
                 {course.City}, {course.State}
               </p>
-              <span>{course.Designer}</span>
+              <span>{archive ? course.Designer : [course.Round, getFormatName(course.Format), course["Tee Played"] ? `${course["Tee Played"]} Tees` : ""].filter(Boolean).join(" • ")}</span>
             </Link>
           ))}
         </div>
+        <Link className={guideStyles.secondaryAction} href={archive ? "/courses" : "/courses?view=archive"}>{archive ? "View Current Tournament" : "View Course Archive"} →</Link>
       </section>
 
       <Footer />

@@ -6,24 +6,50 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 
 test("Tournament Guide leads with app-first actionable destinations", async () => {
   const page = await source("app/tournament-guide/page.js");
-  for (const title of ["Schedule", "Courses", "Rules & Formats", "Match Formats", "Dining", "Travel", "Important Contacts"]) {
+  for (const title of ["Schedule", "Courses", "Rules & Formats", "Dining", "Getting Around", "Important Contacts"]) {
     assert.match(page, new RegExp(`title: "${title.replace(/[&]/g, "&")}"`));
   }
   assert.ok(page.indexOf("<GuideDirectory />") < page.indexOf("className={styles.overview}"));
   assert.match(page, /Quick access to the information golfers use most\./);
 });
 
-test("Guide destinations are focused same-origin views using published content", async () => {
-  const page = await source("app/tournament-guide/page.js");
-  for (const section of ["schedule", "rules", "match-formats", "dining", "travel", "contacts"]) {
-    assert.match(page, new RegExp(`section === "${section}"`));
+test("Guide destinations are focused same-origin views using existing workbook content", async () => {
+  const [page, detail, route, stats, sheets] = await Promise.all([
+    source("app/tournament-guide/page.js"), source("app/tournament-guide/GuideDetailPage.js"),
+    source("app/tournament-guide/[section]/page.js"), source("lib/stats.js"), source("lib/google-sheets-data.js"),
+  ]);
+  for (const destination of ["schedule", "rules", "dining", "getting-around", "contacts"]) {
+    assert.match(page, new RegExp(`/tournament-guide/${destination}`));
+    assert.match(route, new RegExp(`"${destination}"`));
   }
-  assert.match(page, /publicGuideRecords\(sheets\.itinerary, tournament\)/);
-  assert.match(page, /publicGuideRecords\(sheets\.rules, tournament\)/);
-  assert.match(page, /publicGuideRecords\(sheets\.information, tournament\)/);
-  assert.doesNotMatch(page, /target="_blank"|window\.open|https?:\/\//);
-  assert.doesNotMatch(page, /<GuideDirectory compact/);
-  assert.match(page, /section \? <Link className=\{styles\.backToGuide\} href="\/tournament-guide">‹ Tournament Guide<\/Link>/);
+  assert.match(detail, /publicGuideRecords\(sheets\.itinerary, tournament\)/);
+  assert.match(detail, /publicGuideRecords\(sheets\.rules, tournament\)/);
+  assert.match(detail, /getTournamentRules\(tournament\.year\)/);
+  assert.match(detail, /getRoundFormats\(\)/);
+  assert.match(stats, /historicalData\.rules/);
+  assert.match(stats, /historicalData\.rounds/);
+  assert.match(sheets, /itinerary: "Tournament Itinerary"/);
+  assert.match(sheets, /rules: "Rule Book"/);
+  assert.doesNotMatch(detail, /target="_blank"|window\.open|https?:\/\//);
+  assert.match(detail, /<Link className=\{styles\.backToGuide\} href="\/tournament-guide">‹ Tournament Guide<\/Link>/);
+  assert.doesNotMatch(detail, /Find what you need|className=\{styles\.directory\}/);
+});
+
+test("Courses defaults to the active tournament and offers the historical archive", async () => {
+  const courses = await source("app/courses/page.js");
+  assert.match(courses, /const tournament = getTournaments\(\)\[0\]/);
+  assert.match(courses, /tournament\?\.courses \|\| \[\]/);
+  assert.match(courses, /View Course Archive/);
+  assert.match(courses, /\/courses\?view=archive/);
+  assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
+});
+
+test("unfinished Guide content remains placeholder-only without new workbook tabs", async () => {
+  const [detail, sheets] = await Promise.all([source("app/tournament-guide/GuideDetailPage.js"), source("lib/google-sheets-data.js")]);
+  assert.match(detail, /<Placeholder title="Dining"/);
+  assert.match(detail, /<Placeholder title="Getting Around"/);
+  assert.match(detail, /<Placeholder title="Important Contacts"/);
+  assert.doesNotMatch(sheets, /Dining|Getting Around|Important Contacts/);
 });
 
 test("Guide preserves shared app chrome and moves welcome below navigation", async () => {
@@ -36,6 +62,6 @@ test("Guide preserves shared app chrome and moves welcome below navigation", asy
   assert.match(page, /<p className=\{styles\.eyebrow\}>Welcome<\/p>/);
   assert.match(css, /\.directory/);
   assert.match(css, /padding:18px 0 92px/);
-  assert.match(schedule, /\/tournament-guide\?section=schedule/);
-  assert.match(rules, /\/tournament-guide\?section=rules/);
+  assert.match(schedule, /\/tournament-guide\/schedule/);
+  assert.match(rules, /\/tournament-guide\/rules/);
 });
