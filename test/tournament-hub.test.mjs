@@ -4,13 +4,19 @@ import test from "node:test";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("Tournament Hub replaces the website navigation with native participant destinations", async () => {
+test("Tournament Hub exposes major destinations without duplicating Tournament Guide navigation", async () => {
   const menu = await source("app/Menu.js");
-  for (const label of ["Tournament Guide", "Schedule", "Courses", "Tournament History", "Rules", "Contact Tournament Director", "Notification Preferences", "Refresh Tournament Data"]) {
+  for (const label of ["Tournament Guide", "Tournament History", "Important Contacts", "Notification Preferences", "Refresh Tournament Data"]) {
     assert.match(menu, new RegExp(label));
   }
-  for (const href of ["/tournament-guide", "/home#today-schedule-title", "/courses", "/history", "/tournament-guide/rules", "/tournament-guide/contacts", "/me#notification-preferences"]) {
+  for (const href of ["/tournament-guide", "/history", "/tournament-guide/contacts", "/me#notification-preferences"]) {
     assert.ok(menu.includes(`href: "${href}"`), href);
+  }
+  for (const duplicate of ["Schedule", "Courses", "Rules", "Dining", "Local Guide", "Contact Tournament Director"]) {
+    assert.doesNotMatch(menu, new RegExp(`label: "${duplicate}"`));
+  }
+  for (const duplicateHref of ["/home#today-schedule-title", "/courses", "/tournament-guide/rules", "/tournament-guide/dining", "/tournament-guide/getting-around"]) {
+    assert.ok(!menu.includes(`href: "${duplicateHref}"`), duplicateHref);
   }
   assert.doesNotMatch(menu, /navigationSections|Odds Center|War Room|Admin Center/);
   assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
@@ -49,4 +55,10 @@ test("Tournament Hub content routes retain shared headers and notification ancho
   ]);
   for (const page of [guide, courses, history]) assert.match(page, /<Header \/>/);
   assert.match(profile, /id="notification-preferences"/);
+});
+
+test("Notification Preferences remains a direct same-origin Player deep link", async () => {
+  const menu = await source("app/Menu.js");
+  assert.match(menu, /label: "Notification Preferences", href: "\/me#notification-preferences"/);
+  assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
 });

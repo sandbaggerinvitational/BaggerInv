@@ -7,13 +7,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 const hubSections = [
   { label: "Tournament", links: [
     { icon: "📖", label: "Tournament Guide", href: "/tournament-guide" },
-    { icon: "📅", label: "Schedule", href: "/home#today-schedule-title" },
-    { icon: "📍", label: "Courses", href: "/courses" },
     { icon: "🏆", label: "Tournament History", href: "/history" },
   ] },
   { label: "Information", links: [
-    { icon: "📜", label: "Rules", href: "/tournament-guide/rules" },
-    { icon: "📞", label: "Contact Tournament Director", href: "/tournament-guide/contacts" },
+    { icon: "📞", label: "Important Contacts", href: "/tournament-guide/contacts" },
   ] },
   { label: "App", links: [
     { icon: "🔔", label: "Notification Preferences", href: "/me#notification-preferences" },

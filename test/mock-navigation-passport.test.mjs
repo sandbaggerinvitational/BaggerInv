@@ -23,7 +23,7 @@ test("participant Home navigation uses the canonical same-origin dashboard", asy
   assert.match(mobileHome, /MobileTournamentHome/);
   assert.doesNotMatch(mobileHome, /refreshHistoricalData|kiawahHero|Website Feed/);
   assert.match(menu, /aria-label="Tournament Hub"/);
-  assert.match(menu, /href: "\/home#today-schedule-title"/);
+  assert.doesNotMatch(menu, /href: "\/home#today-schedule-title"/);
   for (const participantSource of [activation, tournament, profile]) {
     assert.match(participantSource, /\/home/);
   }
