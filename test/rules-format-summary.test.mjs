@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { formatRuleSummary } from "../lib/rules-format-summary.js";
+import { formatRuleHeading, formatRuleSummary } from "../lib/rules-format-summary.js";
 
 test("Best Ball summary derives official points, allocation, and Nassau format", () => {
   const summary = formatRuleSummary("BB", [
@@ -29,4 +29,15 @@ test("Singles summary derives full allocation and 18-hole match play", () => {
 test("explicit workbook summary fields take precedence and missing values stay hidden", () => {
   assert.deepEqual(formatRuleSummary("BB", [{ "Handicap Allocation": "85% Allocation", "Scoring Format": "Modified Match Play" }], ""), ["85% Allocation", "Modified Match Play"]);
   assert.deepEqual(formatRuleSummary("BB", [], null), []);
+});
+
+test("format rule headings remove redundant format names without changing rule bodies", () => {
+  assert.equal(formatRuleHeading("Fourball Handicap Allocation"), "Handicap");
+  assert.equal(formatRuleHeading("Tournament Scoring"), "Scoring");
+  assert.equal(formatRuleHeading("Fourball Mulligans"), "Mulligans");
+  assert.equal(formatRuleHeading("Scramble Ball Placement"), "Ball Placement");
+  assert.equal(formatRuleHeading("Scramble Handicap Allocation"), "Handicap");
+  assert.equal(formatRuleHeading("Scramble Mulligans"), "Mulligans");
+  assert.equal(formatRuleHeading("Singles Handicap Allocation"), "Handicap");
+  assert.equal(formatRuleHeading("Singles Mulligans"), "Mulligans");
 });
