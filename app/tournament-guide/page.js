@@ -18,7 +18,7 @@ const destinations = [
   { icon: "📍", title: "Courses", detail: "Venues, tees, and course details", href: "/courses" },
   { icon: "📜", title: "Rules & Formats", detail: "Rules, points, and match formats", href: "/tournament-guide/rules" },
   { icon: "🍽️", title: "Dining", detail: "Meals and tournament gatherings", href: "/tournament-guide/dining" },
-  { icon: "🧳", title: "Local Guide", detail: "Tournament-week local concierge", href: "/tournament-guide/getting-around" },
+  { icon: "🧳", title: "Local Guide", detail: "Local resources and transportation", href: "/tournament-guide/getting-around" },
   { icon: "📞", title: "Important Contacts", detail: "Tournament-week assistance", href: "/tournament-guide/contacts" },
 ];
 

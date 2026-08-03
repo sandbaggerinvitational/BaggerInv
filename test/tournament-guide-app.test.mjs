@@ -12,6 +12,8 @@ test("Tournament Guide leads with app-first actionable destinations", async () =
   assert.match(page, /className=\{styles\.directory\}/);
   assert.doesNotMatch(page, /className=\{styles\.overview\}/);
   assert.match(page, /Quick access to the information golfers use most\./);
+  assert.match(page, /title: "Local Guide", detail: "Local resources and transportation"/);
+  assert.doesNotMatch(page, /Tournament-week local concierge/);
 });
 
 test("Guide destinations are focused same-origin views using existing workbook content", async () => {
