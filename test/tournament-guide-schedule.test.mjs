@@ -17,8 +17,13 @@ const records = [
 
 test("Schedule groups the approved itinerary by workbook day labels", () => {
   const model = itineraryViewModel({ records, tournament, courses, rounds: [], now: new Date("2026-09-25T10:30:00Z") });
-  assert.deepEqual([...itineraryGroups(model.events).keys()], ["2026-09-25", "2026-09-26"]);
+  assert.deepEqual([...itineraryGroups(model.events).keys()], ["Friday", "Saturday"]);
   assert.equal(model.events[0].dayHeading, "Friday");
+});
+
+test("Schedule consolidates granular day labels into one calendar-day section", () => {
+  const model = itineraryViewModel({ records: [records[0], { ...records[1], "Day Label": "Friday Night" }], tournament, now: new Date("2026-09-24T12:00:00Z") });
+  assert.deepEqual([...itineraryGroups(model.events).keys()], ["Friday"]);
 });
 
 test("Schedule normalizes Google Sheets Date values before grouping and display", () => {
