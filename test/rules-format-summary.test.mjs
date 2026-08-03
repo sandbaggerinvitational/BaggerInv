@@ -21,7 +21,7 @@ test("Scramble summary normalizes the official two-player allocation", () => {
 test("Singles summary derives full allocation and 18-hole match play", () => {
   const summary = formatRuleSummary("SI", [
     { Body: "Singles uses 100% handicap allocation." },
-    { Body: "Singles is one 18-hole match worth three points." },
+    { Body: "Fourball and Scramble use Nassau scoring. Singles is one 18-hole match worth three points." },
   ], 3);
   assert.deepEqual(summary, ["3 Points", "100% Handicap Allocation", "18-Hole Match Play"]);
 });
