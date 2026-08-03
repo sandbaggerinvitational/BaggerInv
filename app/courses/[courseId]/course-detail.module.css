@@ -7,7 +7,7 @@
 
 .hero {
   position: relative;
-  min-height: 390px;
+  min-height: 420px;
   display: grid;
   align-items: end;
   overflow: hidden;
@@ -162,7 +162,7 @@
 }
 
 .facts > div {
-  padding: 14px;
+  padding: 11px 14px;
   border-radius: 13px;
   background: #f6f2e9;
 }
@@ -321,7 +321,7 @@
 }
 
 @media (max-width: 620px) {
-  .hero { min-height: 350px; }
+  .hero { min-height: 380px; }
   .heroContent { padding-bottom: 26px; }
   .identity { align-items: flex-start; gap: 14px; }
   .logoPlate { width: 72px; height: 72px; flex-basis: 72px; padding: 11px; }
@@ -329,7 +329,7 @@
   .shell { width: calc(100% - 28px); padding-top: 22px; gap: 20px; }
   .section { padding: 20px 16px; }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .facts > div { min-width: 0; padding: 12px 10px; }
+  .facts > div { min-width: 0; padding: 10px; }
   .facts dt { overflow-wrap: anywhere; }
   .facts dd { font-size: 1.08rem; overflow-wrap: anywhere; }
   .scorecardSection { padding-inline: 12px; }

@@ -15,7 +15,10 @@ const content = {
   courseArchive: [{ "Course ID": "OCGC01", Year: 2025, Course: "The Ocean Course", Designer: "Old value", Notes: "Historical course note." }],
   liveRounds: [{ number: 3, format: "Singles", status: "Upcoming", course: { tee: "Gold" }, matches: [{ teeTime: "10:30 AM" }] }],
   schedule: [{ "Event ID": "r3", "Round ID": "3", "Start Time": "10:30 AM", Details: "Gold Tees. 100% handicap allocation. $25/person net skins. Walking caddies: $100/bag." }],
-  courseHoles: Array.from({ length: 18 }, (_, index) => ({ "Course ID": "OCGC01", Tee: "Gold", "Hole Number": index + 1, Par: index % 3 === 0 ? 5 : 4, "Stroke Index": 18 - index })),
+  courseHoles: [
+    ...Array.from({ length: 18 }, (_, index) => ({ "Course ID": "OCGC01", Tee: "Gold", "Hole Number": index + 1, Yardage: 360 + index, Par: index % 3 === 0 ? 5 : 4, "Stroke Index": 18 - index })),
+    ...Array.from({ length: 18 }, (_, index) => ({ "Course ID": "OCGC01", Tee: "Black", "Hole Number": index + 1, Yardage: 410 + index, Par: 4, "Stroke Index": index + 1 })),
+  ],
 };
 
 test("Course Detail binds the active normalized course over historical fallback data", () => {
@@ -40,6 +43,8 @@ test("Course Detail reuses optional workbook content without inventing missing s
   assert.equal(model.experience[0][1], "A championship seaside course.");
   assert.equal(model.images.length, 1);
   assert.equal(model.holes.length, 18);
+  assert.equal(model.holes.every((hole) => hole.Tee === "Gold"), true);
+  assert.equal(model.holes[0].Yardage, 360);
   assert.equal(model.website, "https://example.test/ocean");
 });
 
@@ -85,6 +90,8 @@ test("Course Detail remains inside The Bagger and has no map action", async () =
   assert.match(page, /View Scorecard/);
   assert.match(page, /Front Nine/);
   assert.match(page, /Back Nine/);
+  assert.match(page, /model\.tee \? `\$\{model\.tee\} Tees Scorecard`/);
+  assert.match(page, />Yds</);
   assert.match(page, /Visit Official Course Website/);
   assert.match(page, /<ExternalLinkConfirm href=\{website\}/);
   for (const duplicated of ["Tournament Information", "Round Assignment", "Tee Assignment", "First Tee Time", "Walking Caddies", "Net Skins"]) assert.doesNotMatch(page, new RegExp(duplicated));
