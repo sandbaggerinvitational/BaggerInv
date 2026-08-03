@@ -28,8 +28,8 @@ test("Dining normalizes time, dress code, reservations, and multiline Notes", ()
 
 test("Dining icons derive dynamically from Cuisine with a neutral fallback", () => {
   assert.deepEqual([
-    "Breakfast", "Steakhouse", "Seafood", "Mexican", "Italian", "BBQ", "Bar & Grill", "Pub / Bar", "Coffee", "Dessert", "Reception / Cocktail Hour", "Unknown",
-  ].map(diningIcon), ["🍳", "🥩", "🦞", "🌮", "🍝", "🍖", "🍔", "🍺", "☕", "🍰", "🥂", "🍽️"]);
+    "Breakfast", "Steakhouse", "Seafood", "Mexican", "Italian", "BBQ", "Bar & Grill", "Pub / Brewery", "Coffee", "Dessert", "Reception / Cocktail Hour", "Fine Dining / Generic Dinner", "Unknown",
+  ].map(diningIcon), ["🍳", "🥩", "🦞", "🌮", "🍝", "🍖", "🍔", "🍺", "☕", "🍰", "🥂", "🍽️", "🍽️"]);
 });
 
 test("Dining hides reservation status when the workbook value is blank", () => {
@@ -55,6 +55,9 @@ test("Dining uses only the approved workbook fields and renders Notes behind dis
   assert.match(component, /Reservation Required/);
   assert.match(component, /meal\.reservationLabel \?/);
   assert.match(component, /meal\.icon/);
+  assert.ok(component.indexOf("meal.time") < component.indexOf("<h3>{meal.meal}</h3>"));
+  assert.match(component, /function DressCodeIcon/);
+  assert.doesNotMatch(component, /👕/);
   assert.match(model, /Open Seating/);
   assert.match(component, /interaction\.target\.closest\("a, button, summary"\)/);
   assert.match(detail, /<DiningItinerary records=\{records\}/);
@@ -62,4 +65,6 @@ test("Dining uses only the approved workbook fields and renders Notes behind dis
   assert.match(normalized, /recordMatchesTournament\(row, guideTournament\)/);
   assert.match(normalized, /left\["Sort Order"\]/);
   assert.match(css, /white-space:pre-line/);
+  assert.match(css, /\.diningDressIcon\{[^}]*color:#0b4938/);
+  assert.match(css, /\.diningDressIcon path\{[^}]*fill:#f4ecd9/);
 });

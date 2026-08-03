@@ -3,6 +3,10 @@
 import { diningGroups, diningViewModel } from "../../lib/tournament-guide-dining";
 import styles from "./tournament-guide.module.css";
 
+function DressCodeIcon() {
+  return <svg className={styles.diningDressIcon} viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4 4 6l-2 4 3 1.5V20h14v-8.5l3-1.5-2-4-4-2c-.7 1.4-1.7 2-4 2s-3.3-.6-4-2Z" /></svg>;
+}
+
 function DiningCard({ meal }) {
   return <details className={`${styles.itineraryCard} ${styles.diningCard}`} onClick={(interaction) => {
     if (interaction.target.closest("a, button, summary")) return;
@@ -11,10 +15,10 @@ function DiningCard({ meal }) {
     <summary>
       <div className={styles.eventIcon} aria-hidden="true">{meal.icon}</div>
       <div className={styles.eventPrimary}>
-        <h3>{meal.meal}</h3>
         {meal.time ? <span className={styles.eventTime}>{meal.time}</span> : null}
+        <h3>{meal.meal}</h3>
         {meal.location ? <strong>{meal.location}</strong> : null}
-        {meal.dressCode ? <p className={styles.diningDress}><span aria-hidden="true">👕</span>{meal.dressCode}</p> : null}
+        {meal.dressCode ? <p className={styles.diningDress}><DressCodeIcon />{meal.dressCode}</p> : null}
       </div>
       <div className={styles.eventState}>
         {meal.reservationLabel ? <span className={meal.reservationLabel === "Reservation Required" ? styles.reservationRequired : styles.openSeating}>{meal.reservationLabel}</span> : null}
