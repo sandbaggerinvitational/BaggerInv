@@ -5,27 +5,20 @@ import { tournamentLogo } from "../../lib/asset-paths";
 import { getFormatName } from "../../lib/stats";
 import { groupBy, isTruthy, paragraphs } from "../../lib/tournament-guide";
 import { resolveTournamentGuideContent } from "./resolveGuideContent";
+import ScheduleItinerary from "./ScheduleItinerary";
 import styles from "./tournament-guide.module.css";
 
 const titles = { schedule: "Schedule", rules: "Rules & Formats", dining: "Dining", "getting-around": "Getting Around", contacts: "Important Contacts" };
 const formatTerms = { BB: ["best ball", "four-ball", "four ball"], SC: ["scramble"], SI: ["singles", "single match"] };
 const text = (record) => Object.values(record || {}).join(" ").toLowerCase();
 const code = (value) => String(value || "").trim().toUpperCase();
-const roundNumber = (value) => { const parsed = Number(String(value ?? "").replace(/\D/g, "")); return Number.isFinite(parsed) && parsed > 0 ? parsed : null; };
-const timeRange = (event) => [event["Start Time"], event["End Time"]].filter(Boolean).join(" – ");
 
 function Text({ value }) { return paragraphs(value).map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>); }
 function Empty({ title }) { return <div className={styles.empty}><span>Tournament Guide</span><h2>{title}</h2><p>Published tournament information will appear here when available.</p></div>; }
 
-function Schedule({ tournament, records, description }) {
+function Schedule({ tournament, records, description, rounds, courses, initialNow }) {
   if (!records.length) return <Empty title="Schedule" />;
-  return <section className={styles.focusedContent}><header><p className={styles.eyebrow}>Tournament Week</p><h1>Schedule</h1><Text value={description} /></header><div className={styles.timeline}>{Object.entries(groupBy(records, "Day Label")).map(([day, events]) => <section className={styles.day} key={day}><h3>{day}</h3>{events.map((event) => {
-    const eventRound = roundNumber(event["Round ID"]);
-    const round = eventRound ? tournament.courses.find((course) => roundNumber(course.Round) === eventRound) : null;
-    const venue = round?.Course || event.Location;
-    const meta = round ? [`Round ${roundNumber(round.Round)}`, getFormatName(round.Format), round["Tee Played"] ? `${round["Tee Played"]} Tees` : ""].filter(Boolean) : [];
-    return <article className={`${styles.event} ${isTruthy(event.Featured) ? styles.featured : ""}`} key={event["Event ID"]}><div className={styles.eventTime}>{timeRange(event) || event["Event Date"]}</div><div><span>{event["Event Type"]}</span><h4>{event.Title}</h4>{event.Subtitle ? <strong>{event.Subtitle}</strong> : null}{venue ? <p className={styles.location}>{venue}</p> : null}{meta.length ? <p className={styles.roundMeta}>{meta.join(" • ")}</p> : null}<Text value={event.Details} /></div></article>;
-  })}</section>)}</div></section>;
+  return <section className={`${styles.focusedContent} ${styles.scheduleExperience}`}><header><p className={styles.eyebrow}>Tournament Week</p><h1>Schedule</h1><Text value={description} /></header><ScheduleItinerary records={records} tournament={tournament} rounds={rounds} courses={courses} initialNow={initialNow} /></section>;
 }
 
 function RuleList({ records }) { return <div className={styles.rules}>{Object.entries(groupBy(records, "Category")).map(([category, rules]) => <section key={category}><h3>{category}</h3>{rules.map((rule) => <details className={isTruthy(rule.Important) ? styles.important : ""} key={rule["Rule ID"]} open={isTruthy(rule.Important)}><summary><span>{rule.Subcategory || "Rule"}</span>{rule.Title}</summary><div><Text value={rule.Body} />{rule["Effective Year"] ? <small>Effective {rule["Effective Year"]}</small> : null}</div></details>)}</section>)}</div>; }
@@ -49,5 +42,5 @@ export default async function GuideDetailPage({ section }) {
   const { tournament, schedule: itinerary, ruleBook } = content;
   const descriptions = Object.fromEntries(content.overview.map((item) => [item["Section Slug"], item.Description]));
   const title = titles[section];
-  return <main><Header /><section className={`${styles.hero} ${styles.heroCompact}`}><div><p>Tournament Guide</p><h1>{title}</h1><strong>{tournament.editionTitle || `${tournament.year} Sandbagger Invitational`}</strong><span>{[tournament.Location, tournament.Dates || tournament.Date].filter(Boolean).join(" • ")}</span></div><div className={styles.logoPlate}><div className={styles.logoInner}><AssetImage src={tournamentLogo(tournament.logoFileName)} alt={`${tournament.year} tournament logo`} fallback={String(tournament.year)} className={styles.logo} fallbackClassName={styles.logoFallback} /></div></div></section><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={tournament} records={itinerary} description={descriptions.itinerary} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Placeholder title="Dining" detail="Tournament dining information will be available here once its shared content structure is finalized." /> : null}{section === "getting-around" ? <Placeholder title="Getting Around" detail="Tournament transportation and arrival information will be available here once its shared content structure is finalized." /> : null}{section === "contacts" ? <Placeholder title="Important Contacts" detail="Tournament contact information will be available here once its shared content structure is finalized." /> : null}</div><Footer /></main>;
+  return <main><Header /><section className={`${styles.hero} ${styles.heroCompact}`}><div><p>Tournament Guide</p><h1>{title}</h1><strong>{tournament.editionTitle || `${tournament.year} Sandbagger Invitational`}</strong><span>{[tournament.Location, tournament.Dates || tournament.Date].filter(Boolean).join(" • ")}</span></div><div className={styles.logoPlate}><div className={styles.logoInner}><AssetImage src={tournamentLogo(tournament.logoFileName)} alt={`${tournament.year} tournament logo`} fallback={String(tournament.year)} className={styles.logo} fallbackClassName={styles.logoFallback} /></div></div></section><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Placeholder title="Dining" detail="Tournament dining information will be available here once its shared content structure is finalized." /> : null}{section === "getting-around" ? <Placeholder title="Getting Around" detail="Tournament transportation and arrival information will be available here once its shared content structure is finalized." /> : null}{section === "contacts" ? <Placeholder title="Important Contacts" detail="Tournament contact information will be available here once its shared content structure is finalized." /> : null}</div><Footer /></main>;
 }

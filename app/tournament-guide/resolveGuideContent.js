@@ -33,6 +33,8 @@ async function loadGuideContent() {
   return {
     tournament,
     liveTournament: liveData.tournament,
+    liveRounds: liveData.rounds || [],
+    timelineNow: liveData.timeline?.effectiveNow || new Date().toISOString(),
     overview: guide.sections || [],
     schedule: guide.itinerary || [],
     courses: guide.courses || [],
