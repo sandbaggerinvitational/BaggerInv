@@ -21,6 +21,14 @@ test("public guide exposes only published non-sensitive tournament records", () 
   assert.deepEqual(publicGuideRecords(records, tournament).map((row) => row["Item ID"]), ["1", "3"]);
 });
 
+test("published boolean is accepted when an itinerary has no Status column", () => {
+  const records = [
+    { "Event ID": "yes", "Tournament Year": 2026, Published: "TRUE", "Display Order": 2 },
+    { "Event ID": "no", "Tournament Year": 2026, Published: "FALSE", "Display Order": 1 },
+  ];
+  assert.deepEqual(publicGuideRecords(records, tournament).map((row) => row["Event ID"]), ["yes"]);
+});
+
 test("guide matching supports the tournament year during ID migration", () => {
   const records = [
     { "Item ID": "1", "Tournament ID": "2026", Status: "Published" },

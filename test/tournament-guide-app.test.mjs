@@ -23,6 +23,7 @@ test("Guide destinations are focused same-origin views using existing workbook c
     assert.match(route, new RegExp(`"${destination}"`));
   }
   assert.match(detail, /publicGuideRecords\(sheets\.itinerary, tournament\)/);
+  assert.match(detail, /liveData\?\.guide\?\.itinerary\?\.length/);
   assert.match(detail, /publicGuideRecords\(sheets\.rules, tournament\)/);
   assert.match(detail, /getTournamentRules\(tournament\.year\)/);
   assert.match(detail, /getRoundFormats\(\)/);
@@ -36,9 +37,12 @@ test("Guide destinations are focused same-origin views using existing workbook c
 });
 
 test("Courses defaults to the active tournament and offers the historical archive", async () => {
-  const courses = await source("app/courses/page.js");
-  assert.match(courses, /const tournament = getTournaments\(\)\[0\]/);
-  assert.match(courses, /tournament\?\.courses \|\| \[\]/);
+  const [courses, normalized] = await Promise.all([source("app/courses/page.js"), source("app/live/sheetData.js")]);
+  assert.match(courses, /getTournamentData\(\)/);
+  assert.match(courses, /Promise\.allSettled/);
+  assert.match(courses, /liveData\?\.guide\?\.courses\?\.length/);
+  assert.match(normalized, /guide: \{ itinerary: guideItinerary, courses: guideCourses \}/);
+  assert.match(normalized, /publicGuideRecords\(itineraryRows, guideTournament\)/);
   assert.match(courses, /View Course Archive/);
   assert.match(courses, /\/courses\?view=archive/);
   assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);

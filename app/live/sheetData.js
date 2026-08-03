@@ -29,6 +29,7 @@ import { isTransientGoogleError } from "../../lib/google-api-reliability";
 import { calculateNetSkins } from "../../lib/net-skins";
 import { initializeTournamentWorkbook } from "../../lib/tournament-workbook-initialization";
 import { normalizeTournamentTimeline } from "../../lib/tournament-timeline";
+import { publicGuideRecords, recordMatchesTournament } from "../../lib/tournament-guide";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -584,6 +585,15 @@ async function buildTournamentData() {
     ),
   }));
   netSkins.storedResults = netSkinsResultRows.filter((row) => Number(row.Year) === Number(year));
+  const guideTournament = { id: selectedTournamentId, year };
+  const guideItinerary = publicGuideRecords(itineraryRows, guideTournament);
+  const guideCourses = courses
+    .filter((row) => recordMatchesTournament(row, guideTournament))
+    .map((row) => ({
+      ...row,
+      Course: row.Course || row["Course Name"] || row["Full Course Name"] || row["Course ID"],
+    }))
+    .sort((left, right) => Number(clean(left.Round).match(/\d+/)?.[0] || 999) - Number(clean(right.Round).match(/\d+/)?.[0] || 999));
 
   return {
     workbookChecks,
@@ -602,6 +612,7 @@ async function buildTournamentData() {
     ),
     timeline,
     schedule: timeline.events,
+    guide: { itinerary: guideItinerary, courses: guideCourses },
     players: Object.entries(playerMap).filter(([, player]) => player.active).map(([id, player]) => ({ id, name: player.name, slug: player.slug })),
   };
 }

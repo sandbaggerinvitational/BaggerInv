@@ -5,6 +5,7 @@ import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
 import { getCourses, getFormatName, getTournaments } from "../../lib/stats";
+import { getTournamentData } from "../live/sheetData";
 import styles from "../historical.module.css";
 import guideStyles from "../tournament-guide/tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
@@ -16,12 +17,14 @@ export const metadata = pageMetadata({
 });
 
 export default async function CoursesPage({ searchParams }) {
-  await refreshHistoricalData();
-  const tournament = getTournaments()[0];
+  const [liveResult] = await Promise.allSettled([getTournamentData(), refreshHistoricalData()]);
+  const liveData = liveResult.status === "fulfilled" ? liveResult.value : null;
+  if (liveResult.status === "rejected") console.error("Courses could not refresh normalized tournament data; using last confirmed historical data.", liveResult.reason);
+  const tournament = getTournaments().find((item) => Number(item.year) === Number(liveData?.tournament?.year)) || getTournaments()[0];
   const archive = String((await searchParams)?.view || "") === "archive";
   const courses = archive
     ? getCourses()
-    : [...new Map((tournament?.courses || []).map((course) => [course["Course ID"], course])).values()];
+    : [...new Map((liveData?.guide?.courses?.length ? liveData.guide.courses : tournament?.courses || []).map((course) => [course["Course ID"], course])).values()];
 
   return (
     <main>

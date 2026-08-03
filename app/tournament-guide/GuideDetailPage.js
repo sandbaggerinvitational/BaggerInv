@@ -5,6 +5,7 @@ import { tournamentLogo } from "../../lib/asset-paths";
 import { loadTournamentGuideSheets } from "../../lib/google-sheets-data";
 import { getFormatName, getRoundFormats, getTournamentRules, getTournaments, refreshHistoricalData } from "../../lib/stats";
 import { groupBy, isTruthy, paragraphs, publicGuideRecords } from "../../lib/tournament-guide";
+import { getTournamentData } from "../live/sheetData";
 import styles from "./tournament-guide.module.css";
 
 const titles = { schedule: "Schedule", rules: "Rules & Formats", dining: "Dining", "getting-around": "Getting Around", contacts: "Important Contacts" };
@@ -45,11 +46,12 @@ function Rules({ ruleBook, tournamentRules, rounds }) {
 function Placeholder({ title, detail }) { return <section className={styles.placeholder}><span>Tournament Guide</span><h1>{title}</h1><p>{detail}</p></section>; }
 
 export default async function GuideDetailPage({ section }) {
-  await refreshHistoricalData();
-  const tournament = getTournaments()[0];
+  const [liveResult, , sheets] = await Promise.all([getTournamentData().then((value) => ({ value })).catch((error) => ({ error })), refreshHistoricalData(), loadTournamentGuideSheets()]);
+  const liveData = liveResult.value || null;
+  if (liveResult.error) console.error("Tournament Guide could not refresh normalized tournament data; using last confirmed Guide data.", liveResult.error);
+  const tournament = getTournaments().find((item) => Number(item.year) === Number(liveData?.tournament?.year)) || getTournaments()[0];
   if (!tournament) throw new Error("Tournament Guide could not resolve the current tournament.");
-  const sheets = await loadTournamentGuideSheets();
-  const itinerary = publicGuideRecords(sheets.itinerary, tournament);
+  const itinerary = liveData?.guide?.itinerary?.length ? liveData.guide.itinerary : publicGuideRecords(sheets.itinerary, tournament);
   const ruleBook = publicGuideRecords(sheets.rules, tournament);
   const descriptions = Object.fromEntries(publicGuideRecords(sheets.sections, tournament).map((item) => [item["Section Slug"], item.Description]));
   const title = titles[section];
