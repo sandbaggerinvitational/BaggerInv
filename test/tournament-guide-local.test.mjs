@@ -38,6 +38,8 @@ test("Local Guide uses only approved workbook fields and data-backed actions", a
   assert.match(component, /record\.address \?/);
   assert.match(component, /record\.phone \?/);
   assert.match(component, /record\.website \?/);
+  assert.match(component, /groups\.size \?/);
+  assert.match(component, /Local information is being prepared\./);
   assert.match(component, /<ExternalLinkConfirm href=\{record\.website\}/);
   assert.match(component, /localGuideDirections\(record\.address\)/);
   assert.match(component, /localGuidePhone\(record\.phone\)/);

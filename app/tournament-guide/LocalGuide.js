@@ -17,11 +17,11 @@ export default function LocalGuide({ records = [] }) {
   const groups = localGuideGroups(localGuideViewModel(records));
   return <section className={`${styles.focusedContent} ${styles.localGuideExperience}`}>
     <header><p className={styles.eyebrow}>Local Concierge</p><h1>Getting Around</h1><p>Everything you may need beyond the golf course during tournament weekend.</p></header>
-    <div className={styles.localGuideSections}>
+    {groups.size ? <div className={styles.localGuideSections}>
       {[...groups.entries()].map(([section, sectionRecords]) => <section key={section}>
         <h2><span aria-hidden="true">{localGuideSectionIcon(section)}</span>{section}</h2>
         <div>{sectionRecords.map((record) => <LocalGuideCard record={record} key={record.id} />)}</div>
       </section>)}
-    </div>
+    </div> : <div className={styles.empty}><span>Local Guide</span><h2>Local information is being prepared.</h2><p>Curated tournament-weekend recommendations will appear here when published.</p></div>}
   </section>;
 }
