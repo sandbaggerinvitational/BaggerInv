@@ -333,7 +333,7 @@ async function buildTournamentData() {
       "Tournaments", "Courses", "Tournament Rules", "Live Hole Scores",
       "Course Holes", "Tournament Itinerary",
     ];
-    const optionalNames = ["Net Skins", "Net Skins Result", "Tournament Timeline", "Guide Sections", "Rule Book", "Rounds"];
+    const optionalNames = ["Net Skins", "Net Skins Result", "Tournament Timeline", "Guide Sections", "Rule Book", "Rounds", "Dining"];
     const initialized = await initializeTournamentWorkbook({
       requiredNames,
       optionalNames,
@@ -349,9 +349,9 @@ async function buildTournamentData() {
       fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
       fetchOptionalSheet("Live Hole Scores"), fetchOptionalSheet("Course Holes"), fetchOptionalSheet("Tournament Itinerary"),
     ]);
-    const [netSkinsRows, netSkinsResultRows, publicTimelineValues, guideSections, ruleBook, roundFormats] = await Promise.all([
+    const [netSkinsRows, netSkinsResultRows, publicTimelineValues, guideSections, ruleBook, roundFormats, diningRows] = await Promise.all([
       fetchOptionalSheet("Net Skins"), fetchOptionalSheet("Net Skins Result"), fetchOptionalSheetValues("Tournament Timeline"),
-      fetchOptionalSheet("Guide Sections"), fetchOptionalSheet("Rule Book"), fetchOptionalSheet("Rounds"),
+      fetchOptionalSheet("Guide Sections"), fetchOptionalSheet("Rule Book"), fetchOptionalSheet("Rounds"), fetchOptionalSheet("Dining"),
     ]);
     timelineValues = publicTimelineValues;
     const tournamentTimelineRows = table(publicTimelineValues);
@@ -362,7 +362,7 @@ async function buildTournamentData() {
       "Tournament Itinerary": itineraryRows,
       "Net Skins": netSkinsRows, "Net Skins Result": netSkinsResultRows,
       "Tournament Timeline": tournamentTimelineRows,
-      "Guide Sections": guideSections, "Rule Book": ruleBook, Rounds: roundFormats,
+      "Guide Sections": guideSections, "Rule Book": ruleBook, Rounds: roundFormats, Dining: diningRows,
     };
   }
   const {
@@ -383,6 +383,7 @@ async function buildTournamentData() {
     "Guide Sections": guideSections,
     "Rule Book": ruleBook,
     Rounds: roundFormats,
+    Dining: diningRows,
   } = sheets;
 
   const active = [...liveTournaments]
@@ -624,6 +625,9 @@ async function buildTournamentData() {
       ruleBook: publicGuideRecords(ruleBook, guideTournament),
       tournamentRules: rules.filter((row) => recordMatchesTournament(row, guideTournament)),
       rounds: roundFormats,
+      dining: diningRows
+        .filter((row) => recordMatchesTournament(row, guideTournament))
+        .sort((left, right) => Number(left["Sort Order"] || 9999) - Number(right["Sort Order"] || 9999)),
       courseHoles,
       headers: {
         "Tournament Itinerary": Object.keys(itineraryRows[0] || {}),
@@ -632,6 +636,7 @@ async function buildTournamentData() {
         "Rule Book": Object.keys(ruleBook[0] || {}),
         "Tournament Rules": Object.keys(rules[0] || {}),
         Rounds: Object.keys(roundFormats[0] || {}),
+        Dining: Object.keys(diningRows[0] || {}),
       },
     },
     players: Object.entries(playerMap).filter(([, player]) => player.active).map(([id, player]) => ({ id, name: player.name, slug: player.slug })),

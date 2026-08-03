@@ -42,6 +42,7 @@ async function loadGuideContent() {
     ruleBook: guide.ruleBook || [],
     tournamentRules: guide.tournamentRules || [],
     rounds: guide.rounds || [],
+    dining: guide.dining || [],
     courseHoles: guide.courseHoles || [],
     diagnostics,
   };
