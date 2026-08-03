@@ -37,9 +37,9 @@ function InformationCards({ records }) {
   </article>)}</div>;
 }
 
-function GuideDirectory({ compact = false }) {
-  return <section className={`${styles.directory} ${compact ? styles.directoryCompact : ""}`} aria-labelledby={compact ? "more-guide-title" : "guide-directory-title"}>
-    <header><p className={styles.eyebrow}>{compact ? "Explore the Guide" : "Tournament Weekend"}</p><h2 id={compact ? "more-guide-title" : "guide-directory-title"}>Find what you need</h2>{compact ? null : <span>Quick access to the information golfers use most.</span>}</header>
+function GuideDirectory() {
+  return <section className={styles.directory} aria-labelledby="guide-directory-title">
+    <header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header>
     <div>{destinations.map((item) => <Link href={item.href} prefetch={false} key={item.id}><i aria-hidden="true">{item.icon}</i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div>
   </section>;
 }
@@ -116,7 +116,7 @@ export default async function TournamentGuidePage({ searchParams }) {
       {section === "dining" ? <InformationSection records={dining} title="Dining" eyebrow="Meals & Gatherings" /> : null}
       {section === "travel" ? <InformationSection records={travel} title="Travel" eyebrow="Getting There" /> : null}
       {section === "contacts" ? <InformationSection records={contacts} title="Important Contacts" eyebrow="Tournament Assistance" /> : null}
-      {section ? <GuideDirectory compact /> : <section className={styles.overview} id="overview"><p className={styles.eyebrow}>Welcome</p><h2>{tournament.Location || `${tournament.year} Tournament Week`}</h2><Text value={sectionDescription.overview || "Schedules, rules, tournament tools, and important details for Sandbagger Invitational week."} />{overviewItems.length ? <dl>{overviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl> : null}</section>}
+      {!section ? <section className={styles.overview} id="overview"><p className={styles.eyebrow}>Welcome</p><h2>{tournament.Location || `${tournament.year} Tournament Week`}</h2><Text value={sectionDescription.overview || "Schedules, rules, tournament tools, and important details for Sandbagger Invitational week."} />{overviewItems.length ? <dl>{overviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl> : null}</section> : null}
     </div><Footer />
   </main>;
 }

@@ -22,6 +22,8 @@ test("Guide destinations are focused same-origin views using published content",
   assert.match(page, /publicGuideRecords\(sheets\.rules, tournament\)/);
   assert.match(page, /publicGuideRecords\(sheets\.information, tournament\)/);
   assert.doesNotMatch(page, /target="_blank"|window\.open|https?:\/\//);
+  assert.doesNotMatch(page, /<GuideDirectory compact/);
+  assert.match(page, /section \? <Link className=\{styles\.backToGuide\} href="\/tournament-guide">‹ Tournament Guide<\/Link>/);
 });
 
 test("Guide preserves shared app chrome and moves welcome below navigation", async () => {
