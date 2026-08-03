@@ -11,7 +11,7 @@ import DiningItinerary from "./DiningItinerary";
 import LocalGuide from "./LocalGuide";
 import styles from "./tournament-guide.module.css";
 
-const titles = { schedule: "Schedule", rules: "Rules & Formats", dining: "Dining", "getting-around": "Getting Around", contacts: "Important Contacts" };
+const titles = { schedule: "Schedule", rules: "Rules & Formats", dining: "Dining", "getting-around": "Local Guide", contacts: "Important Contacts" };
 const formatTerms = { BB: ["best ball", "four-ball", "four ball", "fourball"], SC: ["scramble"], SI: ["singles", "single match"] };
 const ruleSections = [
   { id: "tournament", icon: "🏆", title: "Competition Rules", matches: /tournament|handicap|scoring/i },

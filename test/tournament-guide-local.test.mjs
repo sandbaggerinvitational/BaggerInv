@@ -19,6 +19,8 @@ test("Local Guide creates native maps and telephone actions safely", () => {
   assert.equal(localGuideDirections("10 Main St, Kiawah Island"), "https://maps.apple.com/?daddr=10%20Main%20St%2C%20Kiawah%20Island");
   assert.equal(localGuidePhone("(843) 555-1212"), "tel:8435551212");
   assert.equal(localGuideSectionIcon("Medical"), "🏥");
+  assert.equal(localGuideSectionIcon("Transportation", [{ title: "Tournament Shuttle" }]), "🚌");
+  assert.equal(localGuideSectionIcon("Transportation", [{ title: "Airport Transfer" }]), "🚐");
   assert.equal(localGuideSectionIcon("Unknown"), "📍");
 });
 
@@ -39,6 +41,8 @@ test("Local Guide uses only approved workbook fields and data-backed actions", a
   assert.match(component, /record\.phone \?/);
   assert.match(component, /record\.website \?/);
   assert.match(component, /groups\.size \?/);
+  assert.match(component, /<h1>Local Guide<\/h1>/);
+  assert.match(component, /localGuideSectionIcon\(section, sectionRecords\)/);
   assert.match(component, /Local information is being prepared\./);
   assert.match(component, /<ExternalLinkConfirm href=\{record\.website\}/);
   assert.match(component, /localGuideDirections\(record\.address\)/);
@@ -46,4 +50,6 @@ test("Local Guide uses only approved workbook fields and data-backed actions", a
   assert.match(normalized, /fetchOptionalSheet\("Local Guide"\)/);
   assert.match(normalized, /localGuideRows[\s\S]*recordMatchesTournament\(row, guideTournament\)/);
   assert.match(css, /@media\(max-width:700px\)\{\.localGuideSections>section>div\{grid-template-columns:1fr\}\}/);
+  assert.match(css, /width:36px;height:36px/);
+  assert.match(css, /\.localGuideActions>a\{[^}]*flex:0 0 100px/);
 });
