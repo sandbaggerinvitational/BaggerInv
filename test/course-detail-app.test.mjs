@@ -87,7 +87,7 @@ test("Course Detail remains inside The Bagger and has no map action", async () =
   ]);
   assert.match(page, /<Header homeHref="\/home"/);
   assert.match(page, /href="\/courses">‹ Courses/);
-  assert.match(page, /View Scorecard/);
+  assert.doesNotMatch(page, /View Scorecard|href="#course-scorecard"/);
   assert.match(page, /Front Nine/);
   assert.match(page, /Back Nine/);
   assert.match(page, /model\.tee \? `\$\{model\.tee\} Tees Scorecard`/);

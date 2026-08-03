@@ -76,7 +76,7 @@ export default async function CoursePage({ params }) {
 
       {model.holes.length ? <section className={`${styles.section} ${styles.scorecardSection}`} id="course-scorecard"><header><span>Hole by hole</span><h2>{model.tee ? `${model.tee} Tees Scorecard` : "Course Scorecard"}</h2></header><div className={styles.scorecard}><NineScorecard holes={model.holes.slice(0, 9)} label="Front Nine" /><NineScorecard holes={model.holes.slice(9, 18)} label="Back Nine" /></div></section> : null}
 
-      <div className={styles.actions}>{model.holes.length ? <Link href="#course-scorecard">View Scorecard</Link> : null}{website ? <ExternalLinkConfirm href={website}>Visit Official Course Website →</ExternalLinkConfirm> : null}</div>
+      {website ? <div className={styles.actions}><ExternalLinkConfirm href={website}>Visit Official Course Website →</ExternalLinkConfirm></div> : null}
     </div>
   </main>;
 }
