@@ -136,6 +136,7 @@ test("format-specific rules are owned by Round Formats instead of repeated below
   assert.match(detail, /const remaining = ruleBook\.filter\(\(rule\) => !formatIds\.has\(rule\["Rule ID"\]\)\)/);
   assert.doesNotMatch(detail, /governingCategory/);
   assert.match(detail, /rules=\{forFormat\(formatCode\)\}/);
+  assert.match(detail, /formatIds = new Set\(Object\.keys\(formatTerms\).*forFormat\(format\)/);
 });
 
 test("every non-format rule uses the same compact expandable card pattern", async () => {
@@ -150,4 +151,10 @@ test("every non-format rule uses the same compact expandable card pattern", asyn
   assert.doesNotMatch(detail, /open=\{isTruthy\(rule\.Important\)\}/);
   assert.match(css, /\.ruleCards\{display:grid;gap:10px\}/);
   assert.match(css, /\.ruleCard>summary\{min-height:88px/);
+});
+
+test("Shotgun Mulligans uses the tournament-tradition beer mug icon", async () => {
+  const detail = await source("app/tournament-guide/GuideDetailPage.js");
+  assert.match(detail, /id: "shotgun", icon: "🍺", title: "Shotgun Mulligans"/);
+  assert.doesNotMatch(detail, /id: "shotgun", icon: "🎯"/);
 });

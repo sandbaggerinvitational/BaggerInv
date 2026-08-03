@@ -16,7 +16,7 @@ const ruleSections = [
   { id: "local", icon: "📍", title: "Local Rules", matches: /local/i },
   { id: "equipment", icon: "📏", title: "Equipment", matches: /equipment|device|distance|rangefinder/i },
   { id: "practice", icon: "👨‍🦯", title: "Practice & Caddies", matches: /practice|cadd/i },
-  { id: "shotgun", icon: "🎯", title: "Shotgun Mulligans", matches: /shotgun|mulligan/i },
+  { id: "shotgun", icon: "🍺", title: "Shotgun Mulligans", matches: /shotgun|mulligan/i },
   { id: "general", icon: "📋", title: "General Rules", matches: /general|competition/i },
 ];
 const categoryTitles = {
