@@ -333,7 +333,7 @@ async function buildTournamentData() {
       "Tournaments", "Courses", "Tournament Rules", "Live Hole Scores",
       "Course Holes", "Tournament Itinerary",
     ];
-    const optionalNames = ["Net Skins", "Net Skins Result", "Tournament Timeline", "Guide Sections", "Rule Book", "Rounds", "Dining", "Local Guide"];
+    const optionalNames = ["Net Skins", "Net Skins Result", "Tournament Timeline", "Guide Sections", "Rule Book", "Rounds", "Dining", "Local Guide", "Important Contacts"];
     const initialized = await initializeTournamentWorkbook({
       requiredNames,
       optionalNames,
@@ -349,9 +349,9 @@ async function buildTournamentData() {
       fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
       fetchOptionalSheet("Live Hole Scores"), fetchOptionalSheet("Course Holes"), fetchOptionalSheet("Tournament Itinerary"),
     ]);
-    const [netSkinsRows, netSkinsResultRows, publicTimelineValues, guideSections, ruleBook, roundFormats, diningRows, localGuideRows] = await Promise.all([
+    const [netSkinsRows, netSkinsResultRows, publicTimelineValues, guideSections, ruleBook, roundFormats, diningRows, localGuideRows, importantContactRows] = await Promise.all([
       fetchOptionalSheet("Net Skins"), fetchOptionalSheet("Net Skins Result"), fetchOptionalSheetValues("Tournament Timeline"),
-      fetchOptionalSheet("Guide Sections"), fetchOptionalSheet("Rule Book"), fetchOptionalSheet("Rounds"), fetchOptionalSheet("Dining"), fetchOptionalSheet("Local Guide"),
+      fetchOptionalSheet("Guide Sections"), fetchOptionalSheet("Rule Book"), fetchOptionalSheet("Rounds"), fetchOptionalSheet("Dining"), fetchOptionalSheet("Local Guide"), fetchOptionalSheet("Important Contacts"),
     ]);
     timelineValues = publicTimelineValues;
     const tournamentTimelineRows = table(publicTimelineValues);
@@ -362,7 +362,7 @@ async function buildTournamentData() {
       "Tournament Itinerary": itineraryRows,
       "Net Skins": netSkinsRows, "Net Skins Result": netSkinsResultRows,
       "Tournament Timeline": tournamentTimelineRows,
-      "Guide Sections": guideSections, "Rule Book": ruleBook, Rounds: roundFormats, Dining: diningRows, "Local Guide": localGuideRows,
+      "Guide Sections": guideSections, "Rule Book": ruleBook, Rounds: roundFormats, Dining: diningRows, "Local Guide": localGuideRows, "Important Contacts": importantContactRows,
     };
   }
   const {
@@ -385,6 +385,7 @@ async function buildTournamentData() {
     Rounds: roundFormats,
     Dining: diningRows,
     "Local Guide": localGuideRows,
+    "Important Contacts": importantContactRows,
   } = sheets;
 
   const active = [...liveTournaments]
@@ -632,6 +633,9 @@ async function buildTournamentData() {
       localGuide: localGuideRows
         .filter((row) => recordMatchesTournament(row, guideTournament))
         .sort((left, right) => Number(left["Sort Order"] || 9999) - Number(right["Sort Order"] || 9999)),
+      importantContacts: importantContactRows
+        .filter((row) => recordMatchesTournament(row, guideTournament))
+        .sort((left, right) => Number(left["Sort Order"] || 9999) - Number(right["Sort Order"] || 9999)),
       courseHoles,
       headers: {
         "Tournament Itinerary": Object.keys(itineraryRows[0] || {}),
@@ -642,6 +646,7 @@ async function buildTournamentData() {
         Rounds: Object.keys(roundFormats[0] || {}),
         Dining: Object.keys(diningRows[0] || {}),
         "Local Guide": Object.keys(localGuideRows[0] || {}),
+        "Important Contacts": Object.keys(importantContactRows[0] || {}),
       },
     },
     players: Object.entries(playerMap).filter(([, player]) => player.active).map(([id, player]) => ({ id, name: player.name, slug: player.slug })),

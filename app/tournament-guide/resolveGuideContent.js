@@ -44,6 +44,7 @@ async function loadGuideContent() {
     rounds: guide.rounds || [],
     dining: guide.dining || [],
     localGuide: guide.localGuide || [],
+    importantContacts: guide.importantContacts || [],
     courseHoles: guide.courseHoles || [],
     diagnostics,
   };
