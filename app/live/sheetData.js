@@ -624,6 +624,7 @@ async function buildTournamentData() {
       ruleBook: publicGuideRecords(ruleBook, guideTournament),
       tournamentRules: rules.filter((row) => recordMatchesTournament(row, guideTournament)),
       rounds: roundFormats,
+      courseHoles,
       headers: {
         "Tournament Itinerary": Object.keys(itineraryRows[0] || {}),
         Courses: Object.keys(courses[0] || {}),

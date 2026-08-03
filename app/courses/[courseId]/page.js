@@ -1,236 +1,69 @@
 export const dynamic = "force-dynamic";
-import { refreshHistoricalData } from "../../../lib/stats";
-import { notFound } from "next/navigation";
-import { Header, Footer } from "../../components";
-import AssetImage from "../../AssetImage";
-import {
-  courseHero,
-  courseLogo,
-} from "../../../lib/asset-paths";
-import { getCourse, getFormatName } from "../../../lib/stats";
-import styles from "../../historical.module.css";
-import { pageMetadata } from "../../../lib/seo";
-import ExternalLinkConfirm from "../../ExternalLinkConfirm";
+
 import Link from "next/link";
-import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
-import {
-  buildScoringHighlights,
-  filterScorecards,
-  summarizeScorecards,
-} from "../../../lib/scorecard-analytics";
-import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
+import { notFound } from "next/navigation";
+import { Header } from "../../components";
+import AssetImage from "../../AssetImage";
+import ExternalLinkConfirm from "../../ExternalLinkConfirm";
+import { courseHero, courseLogo } from "../../../lib/asset-paths";
+import { courseDetailModel } from "../../../lib/course-detail";
+import { pageMetadata } from "../../../lib/seo";
+import { resolveTournamentGuideContent } from "../../tournament-guide/resolveGuideContent";
+import styles from "./course-detail.module.css";
+
+async function resolveCourse(courseId) {
+  const content = await resolveTournamentGuideContent();
+  return { content, model: courseDetailModel(courseId, content) };
+}
 
 export async function generateMetadata({ params }) {
-  await refreshHistoricalData();
   const { courseId } = await params;
-  const course = getCourse(courseId);
-
-  const title = course
-    ? `${course.Course} | The Sandbagger Invitational`
-    : "Course | The Sandbagger Invitational";
+  const { model } = await resolveCourse(courseId);
   return pageMetadata({
-    title,
-    description: course
-      ? `${course.Course} tournament details and Sandbagger Invitational history.`
-      : "Sandbagger Invitational course details and tournament history.",
+    title: model ? `${model.course.Course} | The Sandbagger Invitational` : "Course | The Sandbagger Invitational",
+    description: model ? `${model.course.Course} tournament course details.` : "Sandbagger Invitational course details.",
     path: `/courses/${encodeURIComponent(courseId)}`,
-    image: course?.["Course Profile Image"]
-      ? courseHero(course["Course Profile Image"])
-      : undefined,
+    image: model?.images[0] ? courseHero(model.images[0]) : undefined,
   });
 }
 
+function TextSections({ sections }) {
+  if (!sections.length) return null;
+  return <div className={styles.textSections}>{sections.map(([title, value]) => <article key={title}><h3>{title}</h3>{String(value).split(/\n\s*\n/).filter(Boolean).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</article>)}</div>;
+}
+
 export default async function CoursePage({ params }) {
-  const scorecardAnalyticsPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
   const { courseId } = await params;
-  const course = getCourse(courseId);
-  if (!course) notFound();
-
-  const website = course.Website || "";
-  const scorecardAnalytics = await scorecardAnalyticsPromise;
-  const courseScorecards = filterScorecards(scorecardAnalytics.usableScorecards, { courseId });
-  const missingCourseScorecards = scorecardAnalytics.missingScorecards.filter(
-    (scorecard) => String(scorecard.courseId).toUpperCase() === String(courseId).toUpperCase()
-  );
-  const courseStatistics = summarizeScorecards(
-    courseScorecards,
-    courseScorecards.length + missingCourseScorecards.length
-  );
-  const courseHighlights = buildScoringHighlights(
-    courseScorecards,
-    courseScorecards.length + missingCourseScorecards.length
-  );
-  const holeStatistics = scorecardAnalytics.courseHoleSummaries.filter(
-    (hole) => String(hole.courseId).toUpperCase() === String(courseId).toUpperCase()
-  );
-
-  return (
-    <main>
-      <Header />
-
-      <section className={styles.courseProfileHero}>
-        <AssetImage
-          src={courseHero(course["Course Profile Image"])}
-          alt={`${course.Course} course`}
-          className={styles.courseProfileHeroImage}
-          fallbackClassName={styles.courseProfileHeroFallback}
-          fallback={course.Course}
-          loading="eager"
-        />
-        <div className={styles.courseProfileHeroShade} />
-
-        <div className={styles.courseProfileHeroContent}>
-          <div className={styles.courseProfileLogoWrap}>
-            <AssetImage
-              src={courseLogo(course["Course Logo"])}
-              alt={`${course.Course} logo`}
-              className={styles.courseProfileLogo}
-              fallbackClassName={styles.courseProfileLogoFallback}
-              fallback="⛳"
-              loading="eager"
-            />
-          </div>
-
-          <div>
-            <p className={styles.eyebrow}>
-              {course.City}, {course.State}
-            </p>
-            <h1>{course.Course}</h1>
-            <p>
-              Designed by {course.Designer} · Opened {course["Year Opened"]}
-            </p>
-          </div>
+  const { content, model } = await resolveCourse(courseId);
+  if (!model) notFound();
+  const { course } = model;
+  const website = model.website;
+  return <main className={styles.page}>
+    <Header homeHref="/home" />
+    <section className={styles.hero}>
+      {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" /> : null}
+      <div className={styles.heroShade} />
+      <div className={styles.heroContent}>
+        <Link href="/courses">‹ Courses</Link>
+        <div className={styles.identity}>
+          <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
+          <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}<strong>{model.subtitle}</strong>{model.tee ? <b>{model.tee} Tees</b> : null}</div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section className={styles.content}>
-        <div className={styles.courseDetailGrid}>
-          <div className={styles.detailCard}>
-            <h2>Course Details</h2>
-            <div className={styles.detailList}>
-              <div><span>Par</span><strong>{course.Par ?? "—"}</strong></div>
-              <div><span>Yardage</span><strong>{course.Yardage ?? "—"}</strong></div>
-              <div><span>Rating</span><strong>{course.Rating ?? "—"}</strong></div>
-              <div><span>Slope</span><strong>{course.Slope ?? "—"}</strong></div>
-              <div><span>Tee Played</span><strong>{course["Tee Played"] ?? "—"}</strong></div>
-            </div>
+    <div className={styles.shell}>
+      {model.facts.length ? <section className={styles.section}><header><span>At a glance</span><h2>Course Quick Facts</h2></header><dl className={styles.facts}>{model.facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section> : null}
 
-            {website ? (
-              <ExternalLinkConfirm
-                className={styles.courseWebsiteLink}
-                href={website}
-              >
-                Visit Course Website →
-              </ExternalLinkConfirm>
-            ) : null}
-          </div>
+      <section className={`${styles.section} ${styles.tournamentSection}`}><header><span>{content.liveTournament?.name || "Sandbagger Invitational"}</span><h2>Tournament Information</h2></header><dl>{model.tournamentDetails.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>{model.competitionNotes.length ? <div className={styles.competitionNotes}>{model.competitionNotes.map((note) => <article key={note.label}><h3>{note.label}</h3><p>{note.text}</p></article>)}</div> : null}</section>
 
-          <div className={styles.detailCard}>
-            <h2>Sandbagger History</h2>
-            <div className={styles.detailList}>
-              {course.appearances.map((appearance) => (
-                <div key={`${appearance.Year}-${appearance.Round}`}>
-                  <span>{appearance.Year} · {appearance.Round}</span>
-                  <strong>{getFormatName(appearance.Format)}</strong>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      {model.experience.length ? <section className={styles.section}><header><span>Know before you play</span><h2>Course Experience</h2></header><TextSections sections={model.experience} /></section> : null}
 
-        <section className={styles.section}>
-          <span className={styles.sectionLabel}>Available Scorecard History</span>
-          <h2>Course Statistics</h2>
-          <ScoringStatGrid items={[
-            {
-              label: "Average Score",
-              value: formatScoringNumber(courseStatistics.recordedScoringAverage.value),
-              sample: courseStatistics.recordedScoringAverage.label,
-            },
-            {
-              label: "Average To Par",
-              value: formatScoringNumber(courseStatistics.averageToPar.value, { signed: true }),
-              sample: courseStatistics.averageToPar.label,
-            },
-            {
-              label: "Hardest Hole",
-              value: courseHighlights.hardestHole ? `#${courseHighlights.hardestHole.holeNumber}` : "—",
-              detail: courseHighlights.hardestHole?.tee,
-              sample: courseHighlights.hardestHole?.averageToPar.label,
-            },
-            {
-              label: "Easiest Hole",
-              value: courseHighlights.easiestHole ? `#${courseHighlights.easiestHole.holeNumber}` : "—",
-              detail: courseHighlights.easiestHole?.tee,
-              sample: courseHighlights.easiestHole?.averageToPar.label,
-            },
-            {
-              label: "Lowest Round",
-              value: formatScoringNumber(courseStatistics.lowestRecordedRound.value),
-              sample: courseStatistics.lowestRecordedRound.label,
-            },
-            {
-              label: "Birdie %",
-              value: formatScoringNumber(courseStatistics.birdiePercentage.value, { percentage: true }),
-              sample: courseStatistics.birdiePercentage.label,
-            },
-            {
-              label: "Par %",
-              value: formatScoringNumber(courseStatistics.parPercentage.value, { percentage: true }),
-              sample: courseStatistics.parPercentage.label,
-            },
-            {
-              label: "Bogey %",
-              value: formatScoringNumber(courseStatistics.bogeyPercentage.value, { percentage: true }),
-              sample: courseStatistics.bogeyPercentage.label,
-            },
-            {
-              label: "Double+ %",
-              value: formatScoringNumber(courseStatistics.doubleOrWorsePercentage.value, { percentage: true }),
-              sample: courseStatistics.doubleOrWorsePercentage.label,
-            },
-            {
-              label: "Average Front",
-              value: formatScoringNumber(courseStatistics.averageFrontNine.value),
-              sample: courseStatistics.averageFrontNine.label,
-            },
-            {
-              label: "Average Back",
-              value: formatScoringNumber(courseStatistics.averageBackNine.value),
-              sample: courseStatistics.averageBackNine.label,
-            },
-            {
-              label: "Recorded Scorecards",
-              value: `${courseStatistics.scorecardCoverage.available} of ${courseStatistics.scorecardCoverage.expected}`,
-              sample: courseStatistics.scorecardCoverage.label,
-            },
-          ]} />
-        </section>
+      {model.images.length > 1 ? <section className={styles.section}><header><span>Course gallery</span><h2>On the Course</h2></header><div className={styles.gallery}>{model.images.map((image, index) => <AssetImage src={courseHero(image)} alt={`${course.Course} view ${index + 1}`} className={styles.galleryImage} fallbackClassName={styles.galleryFallback} fallback={course.Course} key={image} />)}</div></section> : null}
 
-        <section className={styles.section}>
-          <span className={styles.sectionLabel}>Hole Analytics</span>
-          <h2>Course Holes</h2>
-          {holeStatistics.length ? (
-            <div className={styles.courseHoleGrid}>
-              {holeStatistics.map((hole) => (
-                <Link
-                  href={`/courses/${encodeURIComponent(courseId)}/holes/${hole.holeNumber}${hole.tee ? `?tee=${encodeURIComponent(hole.tee)}` : ""}`}
-                  key={`${hole.tee}-${hole.holeNumber}`}
-                >
-                  <span>Hole {hole.holeNumber}</span>
-                  <strong>{formatScoringNumber(hole.scoringAverage.value)}</strong>
-                  <small>{hole.tee || "Recorded tee"} · {hole.scoringAverage.label}</small>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.roundArchiveEmpty}>Scorecard unavailable for this course.</div>
-          )}
-        </section>
-      </section>
+      {model.holes.length ? <section className={styles.section} id="course-scorecard"><header><span>{model.tee ? `${model.tee} Tees` : "Tournament tees"}</span><h2>Scorecard</h2></header><div className={styles.scorecard} role="table" aria-label={`${course.Course} scorecard`}><div role="row"><b role="columnheader">Hole</b>{model.holes.map((hole) => <b role="columnheader" key={`h-${hole["Hole Number"]}`}>{hole["Hole Number"]}</b>)}</div><div role="row"><span role="rowheader">Par</span>{model.holes.map((hole) => <span role="cell" key={`p-${hole["Hole Number"]}`}>{hole.Par || "—"}</span>)}</div><div role="row"><span role="rowheader">HCP</span>{model.holes.map((hole) => <span role="cell" key={`s-${hole["Hole Number"]}`}>{hole["Stroke Index"] || "—"}</span>)}</div></div></section> : null}
 
-      <Footer />
-    </main>
-  );
+      <div className={styles.actions}>{model.holes.length ? <Link href="#course-scorecard">View Scorecard</Link> : null}{website ? <ExternalLinkConfirm href={website}>Visit Course Website →</ExternalLinkConfirm> : null}</div>
+    </div>
+  </main>;
 }

@@ -20,13 +20,15 @@ test("Phase 2 public pages consume the shared scorecard analytics service", asyn
     await Promise.all(Object.entries(paths).map(async ([key, path]) => [key, await readFile(path, "utf8")]))
   );
 
-  for (const key of ["round", "tournament", "player", "course", "hole", "records"]) {
+  for (const key of ["round", "tournament", "player", "hole", "records"]) {
     assert.match(sources[key], /scorecard-(?:data|analytics)/, `${key} must use the shared scorecard layer`);
   }
   assert.match(sources.round, /Round Statistics/);
   assert.match(sources.tournament, /Tournament Scoring Statistics/);
   assert.match(sources.player, /PlayerIntelligenceSections/);
-  assert.match(sources.course, /Course Statistics/);
+  assert.match(sources.course, /resolveTournamentGuideContent/);
+  assert.match(sources.course, /model\.holes/);
+  assert.doesNotMatch(sources.course, /loadScorecardAnalytics/);
   assert.match(sources.hole, /Hole Statistics/);
   assert.match(sources.records, /Scoring Records/);
   assert.match(sources.playerHistory, /ScorecardTable/);
