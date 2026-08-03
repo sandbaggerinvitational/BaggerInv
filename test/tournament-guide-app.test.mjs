@@ -120,7 +120,7 @@ test("Rule accordion titles use golfer-friendly terminology", async () => {
   for (const title of ["General Rules", "Handicaps", "Scoring", "Practice Rules", "Equipment"]) {
     assert.match(detail, new RegExp(title.replace("&", "&")));
   }
-  assert.match(detail, /categoryTitle\(category\)/);
+  assert.match(detail, /categoryTitle\(rule\.Category\)/);
 });
 
 test("format summaries render only inside their expandable Round Format cards", async () => {
@@ -131,9 +131,23 @@ test("format summaries render only inside their expandable Round Format cards", 
   assert.doesNotMatch(detail, /Front 9:|Back 9:|points available/);
 });
 
-test("Competition Rules retain governing handicap and scoring subsections", async () => {
+test("format-specific rules are owned by Round Formats instead of repeated below", async () => {
   const detail = await source("app/tournament-guide/GuideDetailPage.js");
-  assert.match(detail, /governingCategory/);
-  assert.match(detail, /handicap\|scoring\|hole results/);
-  assert.match(detail, /!formatIds\.has\(rule\["Rule ID"\]\) \|\| governingCategory\(rule\)/);
+  assert.match(detail, /const remaining = ruleBook\.filter\(\(rule\) => !formatIds\.has\(rule\["Rule ID"\]\)\)/);
+  assert.doesNotMatch(detail, /governingCategory/);
+  assert.match(detail, /rules=\{forFormat\(formatCode\)\}/);
+});
+
+test("every non-format rule uses the same compact expandable card pattern", async () => {
+  const [detail, css] = await Promise.all([
+    source("app/tournament-guide/GuideDetailPage.js"),
+    source("app/tournament-guide/tournament-guide.module.css"),
+  ]);
+  assert.match(detail, /function RuleCard/);
+  assert.match(detail, /styles\.formatCard.*styles\.ruleCard/);
+  assert.match(detail, /<RuleCard rule=\{rule\}/);
+  assert.doesNotMatch(detail, /function RuleList|groupBy\(records/);
+  assert.doesNotMatch(detail, /open=\{isTruthy\(rule\.Important\)\}/);
+  assert.match(css, /\.ruleCards\{display:grid;gap:10px\}/);
+  assert.match(css, /\.ruleCard>summary\{min-height:88px/);
 });

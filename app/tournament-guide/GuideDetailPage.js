@@ -4,7 +4,7 @@ import AssetImage from "../AssetImage";
 import { tournamentLogo } from "../../lib/asset-paths";
 import { formatRuleSummary } from "../../lib/rules-format-summary";
 import { getFormatName } from "../../lib/stats";
-import { groupBy, isTruthy, paragraphs } from "../../lib/tournament-guide";
+import { isTruthy, paragraphs } from "../../lib/tournament-guide";
 import { resolveTournamentGuideContent } from "./resolveGuideContent";
 import ScheduleItinerary from "./ScheduleItinerary";
 import styles from "./tournament-guide.module.css";
@@ -39,7 +39,11 @@ function Schedule({ tournament, records, description, rounds, courses, initialNo
   return <section className={`${styles.focusedContent} ${styles.scheduleExperience}`}><header><p className={styles.eyebrow}>Tournament Week</p><h1>Schedule</h1><Text value={description} /></header><ScheduleItinerary records={records} tournament={tournament} rounds={rounds} courses={courses} initialNow={initialNow} /></section>;
 }
 
-function RuleList({ records }) { return <div className={styles.rules}>{Object.entries(groupBy(records, "Category")).map(([category, rules]) => <section key={category}><h3>{categoryTitle(category)}</h3>{rules.map((rule) => <details className={isTruthy(rule.Important) ? styles.important : ""} key={rule["Rule ID"]} open={isTruthy(rule.Important)}><summary><span>{rule.Subcategory || "Rule"}</span>{rule.Title}</summary><div><Text value={rule.Body} />{rule["Effective Year"] ? <small>Effective {rule["Effective Year"]}</small> : null}</div></details>)}</section>)}</div>; }
+function RuleCard({ rule }) {
+  const category = categoryTitle(rule.Category);
+  const label = rule.Subcategory && rule.Subcategory !== rule.Title ? rule.Subcategory : category;
+  return <details className={`${styles.formatCard} ${styles.ruleCard} ${isTruthy(rule.Important) ? styles.ruleCardImportant : ""}`}><summary><span>{category}</span><div><h3>{rule.Title || label}</h3>{label && label !== rule.Title ? <p>{label}</p> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}><Text value={rule.Body} />{rule["Effective Year"] ? <small>Effective {rule["Effective Year"]}</small> : null}</div></details>;
+}
 function FormatCard({ format, configuration, rules }) {
   const formatCode = code(format["Format ID"] || format.Format);
   const description = format.Description || configuration?.Description;
@@ -52,14 +56,13 @@ function FormatCard({ format, configuration, rules }) {
 
 function RuleSection({ id, icon, title, records }) {
   if (!records.length) return null;
-  return <section className={`${styles.ruleCollection} ${id === "local" ? styles.localRules : ""}`}><h2><span aria-hidden="true">{icon}</span>{title}</h2><RuleList records={records} /></section>;
+  return <section className={styles.ruleCollection}><h2><span aria-hidden="true">{icon}</span>{title}</h2><div className={styles.ruleCards}>{records.map((rule) => <RuleCard rule={rule} key={rule["Rule ID"]} />)}</div></section>;
 }
 
 function Rules({ ruleBook, tournamentRules, rounds }) {
   const forFormat = (format) => ruleBook.filter((rule) => formatTerms[format].some((term) => text(rule).includes(term)));
   const formatIds = new Set(Object.keys(formatTerms).flatMap((format) => forFormat(format).map((rule) => rule["Rule ID"])));
-  const governingCategory = (rule) => /handicap|scoring|hole results/i.test(String(rule.Category || ""));
-  const remaining = ruleBook.filter((rule) => !formatIds.has(rule["Rule ID"]) || governingCategory(rule));
+  const remaining = ruleBook.filter((rule) => !formatIds.has(rule["Rule ID"]));
   const sectionRecords = Object.fromEntries(ruleSections.map((section) => [section.id, []]));
   remaining.forEach((rule) => {
     const searchable = [rule.Category, rule.Subcategory, rule.Title].filter(Boolean).join(" ");
