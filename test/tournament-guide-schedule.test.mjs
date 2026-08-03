@@ -17,7 +17,14 @@ const records = [
 
 test("Schedule groups the approved itinerary by workbook day labels", () => {
   const model = itineraryViewModel({ records, tournament, courses, rounds: [], now: new Date("2026-09-25T10:30:00Z") });
-  assert.deepEqual([...itineraryGroups(model.events).keys()], ["Friday", "Saturday"]);
+  assert.deepEqual([...itineraryGroups(model.events).keys()], ["2026-09-25", "2026-09-26"]);
+  assert.equal(model.events[0].dayHeading, "Friday");
+});
+
+test("Schedule normalizes Google Sheets Date values before grouping and display", () => {
+  const model = itineraryViewModel({ records: [{ ...records[0], "Event Date": "Date(2026,8,25)" }], tournament, now: new Date("2026-09-24T12:00:00Z") });
+  assert.equal(model.events[0].date, "2026-09-25");
+  assert.equal(model.events[0].dateLabel, "September 25");
 });
 
 test("golf itinerary status follows its authoritative round instead of End Time", () => {

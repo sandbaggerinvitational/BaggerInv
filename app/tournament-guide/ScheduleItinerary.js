@@ -66,7 +66,7 @@ export default function ScheduleItinerary({ records, tournament, rounds, courses
     </section>
     <div className={styles.itineraryDays}>
       {[...groups.entries()].map(([day, events]) => <section className={styles.itineraryDay} key={day}>
-        <header><span>{events[0]?.dateLabel || "Tournament itinerary"}</span><h2>{day}</h2></header>
+        <header><span>{events[0]?.dateLabel || "Tournament itinerary"}</span><h2>{events[0]?.dayHeading || day}</h2></header>
         <div>{events.map((event) => <EventCard event={event} key={event.id} />)}</div>
       </section>)}
     </div>
