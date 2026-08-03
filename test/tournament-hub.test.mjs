@@ -62,3 +62,18 @@ test("Notification Preferences remains a direct same-origin Player deep link", a
   assert.match(menu, /label: "Notification Preferences", href: "\/me#notification-preferences"/);
   assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
 });
+
+test("Tournament Hub identity is populated from the active Tournament workbook model", async () => {
+  const [menu, normalized, css] = await Promise.all([
+    source("app/Menu.js"), source("app/live/sheetData.js"), source("app/globals.css"),
+  ]);
+  assert.match(normalized, /edition: tournamentRow\["Tournament Edition"\] \|\| tournamentRow\.Annual/);
+  assert.match(menu, /name: active\.name \|\| active\.Name/);
+  assert.match(menu, /edition: tournamentEdition\(active\.edition/);
+  assert.match(menu, /location: active\.location \|\| active\.Location/);
+  assert.match(menu, /year: active\.year \|\| active\.Year/);
+  assert.match(menu, /<strong>\{tournament\.name \|\| "Tournament"\}<\/strong>/);
+  assert.match(menu, /className="sideMenuEdition">\{tournament\.edition\}/);
+  assert.doesNotMatch(menu, /<strong>The Bagger<\/strong>|location: "Kiawah Island", year: "2026"/);
+  assert.match(css, /\.sideMenuTop \.sideMenuEdition\{?[^}]*text-transform: none/);
+});

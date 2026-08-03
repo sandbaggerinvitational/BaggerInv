@@ -543,6 +543,7 @@ async function buildTournamentData() {
     id: selectedTournamentId,
     year,
     name: tournamentRow["Tournament Name"] || tournamentRow.Name || "Sandbagger Invitational",
+    edition: tournamentRow["Tournament Edition"] || tournamentRow.Annual || "",
     status,
     configuredStatus,
     statusMode,

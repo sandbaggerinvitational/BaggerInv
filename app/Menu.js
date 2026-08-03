@@ -17,6 +17,12 @@ const hubSections = [
   ] },
 ];
 
+function tournamentEdition(value) {
+  const edition = String(value || "").trim();
+  if (!edition) return "";
+  return /annual$/i.test(edition) ? edition : `${edition} Annual`;
+}
+
 export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -24,7 +30,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const searchParams = useSearchParams();
   const [hash, setHash] = useState("");
   const [director, setDirector] = useState(false);
-  const [tournament, setTournament] = useState({ location: "Kiawah Island", year: "2026" });
+  const [tournament, setTournament] = useState({ name: "", edition: "", location: "", year: "" });
   const [refreshing, setRefreshing] = useState(false);
   const closeButton = useRef(null);
 
@@ -44,7 +50,12 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
       .then(async (response) => response.ok ? (await response.json()).data?.tournament : null)
       .then((active) => {
         if (!active) return;
-        setTournament({ location: active.location || active.Location || "Kiawah Island", year: active.year || "2026" });
+        setTournament({
+          name: active.name || active.Name || "",
+          edition: tournamentEdition(active.edition || active["Tournament Edition"] || active.Annual),
+          location: active.location || active.Location || "",
+          year: active.year || active.Year || "",
+        });
       })
       .catch(() => {});
     return () => window.removeEventListener("keydown", closeOnEscape);
@@ -91,8 +102,9 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
         <div className="sideMenuTop">
           <div>
             <small>Tournament Hub</small>
-            <strong>The Bagger</strong>
-            <span>{tournament.location} • {tournament.year}</span>
+            <strong>{tournament.name || "Tournament"}</strong>
+            {tournament.edition ? <span className="sideMenuEdition">{tournament.edition}</span> : null}
+            {tournament.location || tournament.year ? <span>{[tournament.location, tournament.year].filter(Boolean).join(" • ")}</span> : null}
           </div>
           <button
             ref={closeButton}

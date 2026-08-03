@@ -190,6 +190,7 @@ button:disabled { cursor: not-allowed; }
 .sideMenuTop small { color: var(--gold); font-size: .66rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
 .sideMenuTop strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.28rem; }
 .sideMenuTop span { color: #cbd7d1; font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; }
+.sideMenuTop .sideMenuEdition { color: var(--gold); font: 700 .8rem/1.1 Georgia, "Times New Roman", serif; letter-spacing: .06em; text-transform: none; }
 
 .closeMenuButton {
   width: 48px;
