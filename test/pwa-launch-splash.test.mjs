@@ -54,10 +54,10 @@ test("launch is an opaque splash scene followed by a separate Home entrance", as
   assert.match(manifest, /background_color: "#092f25"/);
 });
 
-test("fast initialization preserves a brief reading period without extending slow launches", async () => {
+test("fast initialization preserves a two-second reading period without extending slow launches", async () => {
   const [layout, splash] = await Promise.all([source("app/layout.js"), source("app/PwaLaunchSplash.js")]);
   assert.match(layout, /window\.__sbiPwaLaunchStartedAt=performance\.now\(\)/);
-  assert.match(splash, /Math\.max\(0, 950 - \(performance\.now\(\) - startedAt\)\)/);
+  assert.match(splash, /Math\.max\(0, 2000 - \(performance\.now\(\) - startedAt\)\)/);
   assert.match(splash, /window\.setTimeout/);
   assert.match(splash, /window\.clearTimeout/);
 });

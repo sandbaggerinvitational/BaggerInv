@@ -34,7 +34,7 @@ export default function PwaLaunchSplash() {
         });
       }
       const startedAt = Number(window.__sbiPwaLaunchStartedAt) || performance.now();
-      const readingTimeRemaining = Math.max(0, 950 - (performance.now() - startedAt));
+      const readingTimeRemaining = Math.max(0, 2000 - (performance.now() - startedAt));
       exitTimer.current = window.setTimeout(() => {
         requestAnimationFrame(() => requestAnimationFrame(() => setPhase("exiting")));
       }, readingTimeRemaining);
