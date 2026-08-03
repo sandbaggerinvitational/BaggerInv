@@ -96,19 +96,22 @@ test("Rules & Formats follows golfer-first information architecture", async () =
 });
 
 test("Round Formats are expandable and summarize official workbook values", async () => {
-  const [detail, css] = await Promise.all([
+  const [detail, css, summary] = await Promise.all([
     source("app/tournament-guide/GuideDetailPage.js"),
     source("app/tournament-guide/tournament-guide.module.css"),
+    source("lib/rules-format-summary.js"),
   ]);
   assert.match(detail, /<details className=\{styles\.formatCard\}>/);
   assert.match(detail, /"Points Available"/);
-  assert.match(detail, /"Handicap Allocation"/);
-  assert.match(detail, /"Scoring Format"/);
-  assert.match(detail, /summary\.join\(" • "\)/);
+  assert.match(detail, /formatRuleSummary\(formatCode, sources, points\)/);
+  assert.match(detail, /<ul>\{summary\.map/);
+  assert.match(summary, /"Handicap Allocation"/);
+  assert.match(summary, /"Scoring Format"/);
   assert.match(detail, /format\.Description \|\| configuration\?\.Description/);
   assert.match(detail, /formatRules\.map/);
   assert.match(detail, /rules\.map/);
   assert.match(css, /\.formatCard>summary/);
+  assert.match(css, /\.formatCard>summary ul/);
   assert.match(css, /@media\(max-width:560px\).*\.formatCard>summary/);
 });
 

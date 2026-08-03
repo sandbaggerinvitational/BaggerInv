@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { tournamentLogo } from "../../lib/asset-paths";
+import { formatRuleSummary } from "../../lib/rules-format-summary";
 import { getFormatName } from "../../lib/stats";
 import { groupBy, isTruthy, paragraphs } from "../../lib/tournament-guide";
 import { resolveTournamentGuideContent } from "./resolveGuideContent";
@@ -9,7 +10,7 @@ import ScheduleItinerary from "./ScheduleItinerary";
 import styles from "./tournament-guide.module.css";
 
 const titles = { schedule: "Schedule", rules: "Rules & Formats", dining: "Dining", "getting-around": "Getting Around", contacts: "Important Contacts" };
-const formatTerms = { BB: ["best ball", "four-ball", "four ball"], SC: ["scramble"], SI: ["singles", "single match"] };
+const formatTerms = { BB: ["best ball", "four-ball", "four ball", "fourball"], SC: ["scramble"], SI: ["singles", "single match"] };
 const ruleSections = [
   { id: "tournament", icon: "🏆", title: "Tournament Rules", matches: /tournament|handicap|scoring/i },
   { id: "local", icon: "📍", title: "Local Rules", matches: /local/i },
@@ -29,8 +30,6 @@ const categoryTitles = {
 const text = (record) => Object.values(record || {}).join(" ").toLowerCase();
 const code = (value) => String(value || "").trim().toUpperCase();
 const categoryTitle = (value) => categoryTitles[String(value || "").trim().toLowerCase()] || value || "Competition Rules";
-const firstValue = (records, fields) => fields.map((field) => records.find((record) => record?.[field])?.[field]).find(Boolean);
-const phrase = (records, expression) => records.map(text).join(" ").match(expression)?.[0];
 
 function Text({ value }) { return paragraphs(value).map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>); }
 function Empty({ title }) { return <div className={styles.empty}><span>Tournament Guide</span><h2>{title}</h2><p>Published tournament information will appear here when available.</p></div>; }
@@ -48,15 +47,13 @@ function FormatCard({ format, configuration, rules }) {
   const formatRules = [format.Rules, configuration?.Rules].filter(Boolean);
   const sources = [configuration, format, ...rules].filter(Boolean);
   const points = configuration?.["Points Available"];
-  const handicap = firstValue(sources, ["Handicap Allocation", "Handicap", "Handicap Rules", "Playing Handicap"]) || phrase(sources, /\b\d{1,3}%\s+(?:playing\s+)?handicap(?:\s+allocation)?\b/i);
-  const scoring = firstValue(sources, ["Scoring Format", "Scoring", "Match Format"]) || phrase(sources, /\b(?:nassau\s+match\s+play|match\s+play|stroke\s+play)\b/i);
-  const summary = [points !== null && points !== undefined && points !== "" ? `${points} Points` : "", handicap, scoring].filter(Boolean);
-  return <details className={styles.formatCard}><summary><span>{formatCode}</span><div><h3>{format.Name || getFormatName(formatCode)}</h3>{summary.length ? <p>{summary.join(" • ")}</p> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}>{description ? <Text value={description} /> : null}{formatRules.map((value, index) => <Text value={value} key={`${formatCode}-${index}`} />)}{rules.length ? <div className={styles.formatRules}>{rules.map((rule) => <div key={rule["Rule ID"]}><b>{rule.Title}</b><Text value={rule.Body} /></div>)}</div> : null}</div></details>;
+  const summary = formatRuleSummary(formatCode, sources, points);
+  return <details className={styles.formatCard}><summary><span>{formatCode}</span><div><h3>{format.Name || getFormatName(formatCode)}</h3>{summary.length ? <ul>{summary.map((item) => <li key={item}>{item}</li>)}</ul> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}>{description ? <Text value={description} /> : null}{formatRules.map((value, index) => <Text value={value} key={`${formatCode}-${index}`} />)}{rules.length ? <div className={styles.formatRules}>{rules.map((rule) => <div key={rule["Rule ID"]}><b>{rule.Title}</b><Text value={rule.Body} /></div>)}</div> : null}</div></details>;
 }
 
-function RuleSection({ icon, title, records, children }) {
+function RuleSection({ id, icon, title, records, children }) {
   if (!records.length && !children) return null;
-  return <section className={styles.ruleCollection}><h2><span aria-hidden="true">{icon}</span>{title}</h2>{records.length ? <RuleList records={records} /> : null}{children}</section>;
+  return <section className={`${styles.ruleCollection} ${id === "local" ? styles.localRules : ""}`}><h2><span aria-hidden="true">{icon}</span>{title}</h2>{records.length ? <RuleList records={records} /> : null}{children}</section>;
 }
 
 function Rules({ ruleBook, tournamentRules, rounds }) {
