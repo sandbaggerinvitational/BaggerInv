@@ -90,7 +90,7 @@ test("Rules & Formats follows golfer-first information architecture", async () =
     return position;
   }, -1);
   assert.ok(detail.lastIndexOf("styles.formatCollection") < detail.lastIndexOf("ruleSections.map"));
-  for (const heading of ["Round Formats", "Tournament Rules", "Local Rules", "Equipment & Devices", "Practice & Caddies", "Shotgun Mulligans", "General Competition Rules"]) {
+  for (const heading of ["Round Formats", "Competition Rules", "Local Rules", "Equipment", "Practice & Caddies", "Shotgun Mulligans", "General Rules"]) {
     assert.match(detail, new RegExp(heading.replace("&", "&")));
   }
 });
@@ -117,8 +117,16 @@ test("Round Formats are expandable and summarize official workbook values", asyn
 
 test("Rule accordion titles use golfer-friendly terminology", async () => {
   const detail = await source("app/tournament-guide/GuideDetailPage.js");
-  for (const title of ["General Competition Rules", "Handicap Rules", "Scoring Rules", "Practice Rules", "Equipment & Distance Devices"]) {
+  for (const title of ["General Rules", "Handicaps", "Scoring", "Practice Rules", "Equipment"]) {
     assert.match(detail, new RegExp(title.replace("&", "&")));
   }
   assert.match(detail, /categoryTitle\(category\)/);
+});
+
+test("format summaries render only inside their expandable Round Format cards", async () => {
+  const detail = await source("app/tournament-guide/GuideDetailPage.js");
+  assert.match(detail, /<details className=\{styles\.formatCard\}>/);
+  assert.match(detail, /formatRuleSummary\(formatCode, sources, points\)/);
+  assert.doesNotMatch(detail, /TournamentRuleSummary|tournamentRuleSummary/);
+  assert.doesNotMatch(detail, /Front 9:|Back 9:|points available/);
 });
