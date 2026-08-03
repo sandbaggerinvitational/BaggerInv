@@ -58,7 +58,8 @@ function RuleSection({ id, icon, title, records }) {
 function Rules({ ruleBook, tournamentRules, rounds }) {
   const forFormat = (format) => ruleBook.filter((rule) => formatTerms[format].some((term) => text(rule).includes(term)));
   const formatIds = new Set(Object.keys(formatTerms).flatMap((format) => forFormat(format).map((rule) => rule["Rule ID"])));
-  const remaining = ruleBook.filter((rule) => !formatIds.has(rule["Rule ID"]));
+  const governingCategory = (rule) => /handicap|scoring|hole results/i.test(String(rule.Category || ""));
+  const remaining = ruleBook.filter((rule) => !formatIds.has(rule["Rule ID"]) || governingCategory(rule));
   const sectionRecords = Object.fromEntries(ruleSections.map((section) => [section.id, []]));
   remaining.forEach((rule) => {
     const searchable = [rule.Category, rule.Subcategory, rule.Title].filter(Boolean).join(" ");

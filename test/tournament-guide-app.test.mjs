@@ -130,3 +130,10 @@ test("format summaries render only inside their expandable Round Format cards", 
   assert.doesNotMatch(detail, /TournamentRuleSummary|tournamentRuleSummary/);
   assert.doesNotMatch(detail, /Front 9:|Back 9:|points available/);
 });
+
+test("Competition Rules retain governing handicap and scoring subsections", async () => {
+  const detail = await source("app/tournament-guide/GuideDetailPage.js");
+  assert.match(detail, /governingCategory/);
+  assert.match(detail, /handicap\|scoring\|hole results/);
+  assert.match(detail, /!formatIds\.has\(rule\["Rule ID"\]\) \|\| governingCategory\(rule\)/);
+});
