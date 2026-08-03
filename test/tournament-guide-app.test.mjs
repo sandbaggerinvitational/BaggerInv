@@ -73,3 +73,49 @@ test("Guide schema diagnostics are header-only and Preview isolated", async () =
   assert.match(route, /modules: content\.diagnostics/);
   assert.doesNotMatch(route, /GOOGLE_SHEETS_ID|privateKey|service.account|cookie|token/i);
 });
+
+test("Rules & Formats follows golfer-first information architecture", async () => {
+  const detail = await source("app/tournament-guide/GuideDetailPage.js");
+  const orderedSections = [
+    'id: "tournament"',
+    'id: "local"',
+    'id: "equipment"',
+    'id: "practice"',
+    'id: "shotgun"',
+    'id: "general"',
+  ];
+  orderedSections.reduce((previous, section) => {
+    const position = detail.indexOf(section);
+    assert.ok(position > previous, `${section} should follow the preceding Rules section`);
+    return position;
+  }, -1);
+  assert.ok(detail.lastIndexOf("styles.formatCollection") < detail.lastIndexOf("ruleSections.map"));
+  for (const heading of ["Round Formats", "Tournament Rules", "Local Rules", "Equipment & Devices", "Practice & Caddies", "Shotgun Mulligans", "General Competition Rules"]) {
+    assert.match(detail, new RegExp(heading.replace("&", "&")));
+  }
+});
+
+test("Round Formats are expandable and summarize official workbook values", async () => {
+  const [detail, css] = await Promise.all([
+    source("app/tournament-guide/GuideDetailPage.js"),
+    source("app/tournament-guide/tournament-guide.module.css"),
+  ]);
+  assert.match(detail, /<details className=\{styles\.formatCard\}>/);
+  assert.match(detail, /"Points Available"/);
+  assert.match(detail, /"Handicap Allocation"/);
+  assert.match(detail, /"Scoring Format"/);
+  assert.match(detail, /summary\.join\(" • "\)/);
+  assert.match(detail, /format\.Description \|\| configuration\?\.Description/);
+  assert.match(detail, /formatRules\.map/);
+  assert.match(detail, /rules\.map/);
+  assert.match(css, /\.formatCard>summary/);
+  assert.match(css, /@media\(max-width:560px\).*\.formatCard>summary/);
+});
+
+test("Rule accordion titles use golfer-friendly terminology", async () => {
+  const detail = await source("app/tournament-guide/GuideDetailPage.js");
+  for (const title of ["General Competition Rules", "Handicap Rules", "Scoring Rules", "Practice Rules", "Equipment & Distance Devices"]) {
+    assert.match(detail, new RegExp(title.replace("&", "&")));
+  }
+  assert.match(detail, /categoryTitle\(category\)/);
+});
