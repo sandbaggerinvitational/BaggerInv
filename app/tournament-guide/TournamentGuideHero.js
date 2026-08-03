@@ -1,6 +1,6 @@
 import AssetImage from "../AssetImage";
 import { tournamentLogo } from "../../lib/asset-paths";
-import { formatTournamentEdition } from "../../lib/tournament-branding";
+import { formatTournamentDates, formatTournamentEdition } from "../../lib/tournament-branding";
 import styles from "./tournament-guide.module.css";
 
 function tournamentName(tournament) {
@@ -13,7 +13,7 @@ function tournamentEdition(tournament) {
 
 function tournamentDates(tournament) {
   const dates = tournament?.["Tournament Dates"] || tournament?.Dates || tournament?.dates || tournament?.Date || "";
-  return String(dates).replace(/\s+-\s+/g, "–");
+  return formatTournamentDates(dates);
 }
 
 export default function TournamentGuideHero({ tournament }) {

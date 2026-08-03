@@ -9,6 +9,7 @@ import {
 } from "../lib/seo";
 import PwaFoundation from "./PwaFoundation";
 import ParticipantIdentity from "./ParticipantIdentity";
+import PwaLaunchSplash from "./PwaLaunchSplash";
 import { Suspense } from "react";
 
 const homeMetadata = pageMetadata({
@@ -118,7 +119,11 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;var key="sbi-pwa-launch-seen";if(standalone&&!window.sessionStorage.getItem(key)){window.sessionStorage.setItem(key,"1");document.documentElement.classList.add("pwa-cold-launch");}}catch(error){}})();` }} />
+      </head>
       <body>
+        <PwaLaunchSplash />
         {children}
         <Analytics />
         <PwaFoundation />

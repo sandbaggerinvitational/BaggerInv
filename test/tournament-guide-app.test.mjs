@@ -83,7 +83,7 @@ test("page titles remain in content and no longer repeat inside the shared hero"
   for (const title of ["Schedule", "Rules & Formats", "Dining"]) assert.match(detail, new RegExp(`<h1>${title.replace("&", "&")}<\\/h1>`));
   assert.doesNotMatch(guide, /\[\["Edition"/);
   assert.doesNotMatch(guide, /\["Dates"/);
-  assert.match(hero, /"–"/);
+  assert.match(hero, /formatTournamentDates\(dates\)/);
   assert.doesNotMatch(css, /\.tournamentIdentityCopy p\{[^}]*text-transform:uppercase/);
 });
 
