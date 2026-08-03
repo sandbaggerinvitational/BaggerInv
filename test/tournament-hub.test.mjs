@@ -69,7 +69,7 @@ test("Tournament Hub identity is populated from the active Tournament workbook m
   ]);
   assert.match(normalized, /edition: tournamentRow\["Tournament Edition"\] \|\| tournamentRow\.Annual/);
   assert.match(menu, /name: active\.name \|\| active\.Name/);
-  assert.match(menu, /edition: tournamentEdition\(active\.edition/);
+  assert.match(menu, /edition: formatTournamentEdition\(active\.edition/);
   assert.match(menu, /location: active\.location \|\| active\.Location/);
   assert.match(menu, /year: active\.year \|\| active\.Year/);
   assert.match(menu, /<strong>\{tournament\.name \|\| "Tournament"\}<\/strong>/);

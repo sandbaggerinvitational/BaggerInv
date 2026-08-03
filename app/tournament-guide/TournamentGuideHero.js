@@ -1,5 +1,6 @@
 import AssetImage from "../AssetImage";
 import { tournamentLogo } from "../../lib/asset-paths";
+import { formatTournamentEdition } from "../../lib/tournament-branding";
 import styles from "./tournament-guide.module.css";
 
 function tournamentName(tournament) {
@@ -7,9 +8,7 @@ function tournamentName(tournament) {
 }
 
 function tournamentEdition(tournament) {
-  const edition = String(tournament?.["Tournament Edition"] || tournament?.editionTitle || tournament?.Annual || "").trim();
-  if (!edition) return "";
-  return /annual$/i.test(edition) ? edition : `${edition} Annual`;
+  return formatTournamentEdition(tournament?.["Tournament Edition"] || tournament?.editionTitle || tournament?.Annual);
 }
 
 function tournamentDates(tournament) {

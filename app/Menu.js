@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { formatTournamentEdition } from "../lib/tournament-branding";
 
 const hubSections = [
   { label: "Tournament", links: [
@@ -16,12 +17,6 @@ const hubSections = [
     { icon: "🔔", label: "Notification Preferences", href: "/me#notification-preferences" },
   ] },
 ];
-
-function tournamentEdition(value) {
-  const edition = String(value || "").trim();
-  if (!edition) return "";
-  return /annual$/i.test(edition) ? edition : `${edition} Annual`;
-}
 
 export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,7 +47,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
         if (!active) return;
         setTournament({
           name: active.name || active.Name || "",
-          edition: tournamentEdition(active.edition || active["Tournament Edition"] || active.Annual),
+          edition: formatTournamentEdition(active.edition || active["Tournament Edition"] || active.Annual),
           location: active.location || active.Location || "",
           year: active.year || active.Year || "",
         });
