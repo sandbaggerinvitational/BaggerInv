@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const hubSections = [
   { label: "Tournament", links: [
@@ -12,8 +12,8 @@ const hubSections = [
     { icon: "🏆", label: "Tournament History", href: "/history" },
   ] },
   { label: "Information", links: [
-    { icon: "📜", label: "Rules", href: "/tournament-guide#rules" },
-    { icon: "📞", label: "Contact Tournament Director", href: "/tournament-guide#important-information" },
+    { icon: "📜", label: "Rules", href: "/tournament-guide?section=rules" },
+    { icon: "📞", label: "Contact Tournament Director", href: "/tournament-guide?section=contacts" },
   ] },
   { label: "App", links: [
     { icon: "🔔", label: "Notification Preferences", href: "/me#notification-preferences" },
@@ -24,6 +24,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [hash, setHash] = useState("");
   const [director, setDirector] = useState(false);
   const [tournament, setTournament] = useState({ location: "Kiawah Island", year: "2026" });
@@ -113,8 +114,9 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
               <h2>{group.label}</h2>
               <div>{group.links.map((link) => <Link
                 className={(() => {
-                  const [linkPath, linkHash] = link.href.split("#");
-                  return pathname === linkPath && (linkHash ? hash === `#${linkHash}` : !hash) ? "current" : "";
+                  const [pathAndQuery, linkHash = ""] = link.href.split("#");
+                  const [linkPath, linkQuery = ""] = pathAndQuery.split("?");
+                  return pathname === linkPath && searchParams.toString() === linkQuery && (linkHash ? hash === `#${linkHash}` : !hash) ? "current" : "";
                 })()}
                 key={link.href}
                 href={link.href}

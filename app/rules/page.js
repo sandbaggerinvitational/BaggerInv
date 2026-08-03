@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function RulesPage() {
-  redirect("/tournament-guide#rules");
+  redirect("/tournament-guide?section=rules");
 }

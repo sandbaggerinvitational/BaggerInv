@@ -9,13 +9,13 @@ test("Tournament Hub replaces the website navigation with native participant des
   for (const label of ["Tournament Guide", "Schedule", "Courses", "Tournament History", "Rules", "Contact Tournament Director", "Notification Preferences", "Refresh Tournament Data"]) {
     assert.match(menu, new RegExp(label));
   }
-  for (const href of ["/tournament-guide", "/home#today-schedule-title", "/courses", "/history", "/tournament-guide#rules", "/tournament-guide#important-information", "/me#notification-preferences"]) {
+  for (const href of ["/tournament-guide", "/home#today-schedule-title", "/courses", "/history", "/tournament-guide?section=rules", "/tournament-guide?section=contacts", "/me#notification-preferences"]) {
     assert.ok(menu.includes(`href: "${href}"`), href);
   }
   assert.doesNotMatch(menu, /navigationSections|Odds Center|War Room|Admin Center/);
   assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
   assert.match(menu, /router\.refresh\(\)/);
-  assert.match(menu, /linkHash \? hash === `#\$\{linkHash\}` : !hash/);
+  assert.match(menu, /searchParams\.toString\(\) === linkQuery/);
 });
 
 test("Tournament Hub remains accessible and keeps the participant shell visible", async () => {
