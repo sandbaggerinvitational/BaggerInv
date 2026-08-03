@@ -34,7 +34,7 @@ export default async function TournamentGuidePage({ searchParams }) {
     if (["schedule", "rules", "dining", "getting-around", "contacts"].includes(destination)) redirect(`/tournament-guide/${destination}`);
   }
 
-  const { tournament, overview: sections } = await resolveTournamentGuideContent();
+  const { tournament, tournamentIdentity, overview: sections } = await resolveTournamentGuideContent();
   const sectionDescription = Object.fromEntries(sections.map((item) => [item["Section Slug"], item.Description]));
   const rosterCount = (tournament.team1?.roster?.length || 0) + (tournament.team2?.roster?.length || 0);
   const listedTeamSize = Number(tournament["Team Size"]);
@@ -42,7 +42,7 @@ export default async function TournamentGuidePage({ searchParams }) {
   const overviewItems = [["Field", playerCount ? `${playerCount} players` : "Two teams"]].filter(([, value]) => String(value ?? "").trim());
 
   return <main><Header />
-    <TournamentGuideHero tournament={tournament} />
+    <TournamentGuideHero tournament={tournamentIdentity} />
     <div className={styles.shell}>
       <header className={styles.guidePageHeading}><p className={styles.eyebrow}>Official Player Resource</p><h1>Tournament Guide</h1></header>
       <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{destinations.map((item) => <Link href={item.href} prefetch={false} key={item.href}><i aria-hidden="true">{item.icon}</i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section>

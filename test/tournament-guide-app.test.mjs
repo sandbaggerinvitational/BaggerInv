@@ -45,21 +45,25 @@ test("Courses defaults to the active tournament and offers the historical archiv
 });
 
 test("Tournament Guide modules share one workbook-driven tournament identity hero", async () => {
-  const [hero, guide, detail, courses, courseDetail] = await Promise.all([
+  const [hero, guide, detail, courses, courseDetail, resolver] = await Promise.all([
     source("app/tournament-guide/TournamentGuideHero.js"),
     source("app/tournament-guide/page.js"),
     source("app/tournament-guide/GuideDetailPage.js"),
     source("app/courses/page.js"),
     source("app/courses/[courseId]/page.js"),
+    source("app/tournament-guide/resolveGuideContent.js"),
   ]);
   for (const field of ["Tournament Name", "Tournament Edition", "Tournament Dates", "Tournament Logo"]) {
     assert.match(hero, new RegExp(field));
   }
   assert.match(hero, /tournamentLogo\(logoFileName\)/);
   assert.match(hero, /Annual/);
-  assert.match(guide, /<TournamentGuideHero tournament=\{tournament\} \/>/);
-  assert.match(detail, /<TournamentGuideHero tournament=\{tournament\} \/>/);
-  assert.match(courses, /<TournamentGuideHero tournament=\{tournament\} \/>/);
+  assert.match(resolver, /tournamentIdentity/);
+  assert.match(resolver, /liveData\.tournament\?\.name/);
+  assert.match(resolver, /liveData\.tournament\?\.logo/);
+  assert.match(guide, /<TournamentGuideHero tournament=\{tournamentIdentity\} \/>/);
+  assert.match(detail, /<TournamentGuideHero tournament=\{content\.tournamentIdentity\} \/>/);
+  assert.match(courses, /<TournamentGuideHero tournament=\{content\.tournamentIdentity\} \/>/);
   assert.doesNotMatch(courseDetail, /TournamentGuideHero/);
 });
 

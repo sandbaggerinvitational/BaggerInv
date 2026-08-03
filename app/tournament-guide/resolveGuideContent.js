@@ -30,8 +30,15 @@ async function loadGuideContent() {
   const guide = liveData.guide || {};
   const diagnostics = validateTournamentGuideHeaders(guide.headers);
   reportSchemaIssues(diagnostics);
+  const tournamentIdentity = {
+    ...tournament,
+    name: tournament["Tournament Name"] || tournament.Name || liveData.tournament?.name || "",
+    dates: tournament["Tournament Dates"] || tournament.Dates || liveData.tournament?.dates || "",
+    logoFileName: tournament["Tournament Logo"] || tournament["Tournament Logo Filename"] || tournament.logoFileName || liveData.tournament?.logo || (tournament.year ? `sandbagger-${tournament.year}` : ""),
+  };
   return {
     tournament,
+    tournamentIdentity,
     liveTournament: liveData.tournament,
     liveRounds: liveData.rounds || [],
     timelineNow: liveData.timeline?.effectiveNow || new Date().toISOString(),

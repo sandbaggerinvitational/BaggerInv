@@ -27,7 +27,7 @@ export default async function CoursesPage({ searchParams }) {
   return (
     <main>
       <Header />
-      <TournamentGuideHero tournament={tournament} />
+      <TournamentGuideHero tournament={content.tournamentIdentity} />
 
       <section className={`${styles.content} ${guideStyles.guideDetailShell}`}>
         <Link className={guideStyles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>
