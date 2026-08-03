@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AssetImage from "./AssetImage";
 import { tournamentLogo } from "../lib/asset-paths";
 import { formatTournamentDates, formatTournamentEdition } from "../lib/tournament-branding";
@@ -9,6 +9,7 @@ import styles from "./pwa-launch-splash.module.css";
 export default function PwaLaunchSplash() {
   const [identity, setIdentity] = useState(null);
   const [phase, setPhase] = useState("visible");
+  const exitTimer = useRef(null);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -18,8 +19,10 @@ export default function PwaLaunchSplash() {
     }
 
     let active = true;
+    let completed = false;
     const completeLaunch = (tournament) => {
-      if (!active) return;
+      if (!active || completed) return;
+      completed = true;
       if (tournament) {
         setIdentity({
           name: tournament.name || tournament.Name || "",
@@ -30,7 +33,11 @@ export default function PwaLaunchSplash() {
           year: tournament.year || tournament.Year || "",
         });
       }
-      requestAnimationFrame(() => requestAnimationFrame(() => setPhase("exiting")));
+      const startedAt = Number(window.__sbiPwaLaunchStartedAt) || performance.now();
+      const readingTimeRemaining = Math.max(0, 950 - (performance.now() - startedAt));
+      exitTimer.current = window.setTimeout(() => {
+        requestAnimationFrame(() => requestAnimationFrame(() => setPhase("exiting")));
+      }, readingTimeRemaining);
     };
     const onTournamentReady = (event) => completeLaunch(event.detail);
 
@@ -41,14 +48,18 @@ export default function PwaLaunchSplash() {
 
     return () => {
       active = false;
+      window.clearTimeout(exitTimer.current);
       window.removeEventListener("sbi:tournament-ready", onTournamentReady);
     };
   }, []);
 
   const finish = (event) => {
     if (phase !== "exiting" || event.target !== event.currentTarget) return;
-    document.documentElement.classList.remove("pwa-cold-launch");
+    const root = document.documentElement;
+    root.classList.add("pwa-home-entering");
+    root.classList.remove("pwa-cold-launch");
     setPhase("hidden");
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("pwa-home-entering")));
   };
 
   return <section

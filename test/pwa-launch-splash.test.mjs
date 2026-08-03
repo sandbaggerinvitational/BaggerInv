@@ -15,7 +15,7 @@ test("custom splash is gated to a cold installed-PWA launch", async () => {
   assert.match(layout, /document\.documentElement\.classList\.add\("pwa-cold-launch"\)/);
   assert.match(layout, /html\{background:#092f25\}/);
   assert.match(layout, /<PwaLaunchSplash \/>/);
-  assert.match(css, /:global\(html\.pwa-cold-launch\) \.splash\{display:grid\}/);
+  assert.match(css, /:global\(html\.pwa-cold-launch\) \.splash\s*\{\s*display:\s*grid/);
   assert.match(splash, /classList\.remove\("pwa-cold-launch"\)/);
 });
 
@@ -38,7 +38,28 @@ test("splash consumes Home's completed initialization without starting a second 
   assert.match(splash, /formatTournamentDates/);
   assert.match(splash, /requestAnimationFrame/);
   assert.match(splash, /onTransitionEnd=\{finish\}/);
-  assert.doesNotMatch(splash, /setTimeout|router|usePathname|window\.location/);
+  assert.doesNotMatch(splash, /router|usePathname|window\.location/);
+});
+
+test("launch is an opaque splash scene followed by a separate Home entrance", async () => {
+  const [layout, splash, manifest] = await Promise.all([
+    source("app/layout.js"), source("app/PwaLaunchSplash.js"), source("app/manifest.js"),
+  ]);
+  assert.match(layout, /className="pwa-app-scene"/);
+  assert.match(layout, /html\.pwa-cold-launch \.pwa-app-scene,html\.pwa-home-entering \.pwa-app-scene\{opacity:0\}/);
+  assert.match(layout, /\.pwa-app-scene\{opacity:1;transition:opacity \.36s ease\}/);
+  assert.match(splash, /classList\.add\("pwa-home-entering"\)/);
+  assert.match(splash, /classList\.remove\("pwa-cold-launch"\)/);
+  assert.match(splash, /classList\.remove\("pwa-home-entering"\)/);
+  assert.match(manifest, /background_color: "#092f25"/);
+});
+
+test("fast initialization preserves a brief reading period without extending slow launches", async () => {
+  const [layout, splash] = await Promise.all([source("app/layout.js"), source("app/PwaLaunchSplash.js")]);
+  assert.match(layout, /window\.__sbiPwaLaunchStartedAt=performance\.now\(\)/);
+  assert.match(splash, /Math\.max\(0, 950 - \(performance\.now\(\) - startedAt\)\)/);
+  assert.match(splash, /window\.setTimeout/);
+  assert.match(splash, /window\.clearTimeout/);
 });
 
 test("splash animation remains understated and accessible", async () => {
@@ -47,13 +68,14 @@ test("splash animation remains understated and accessible", async () => {
   ]);
   assert.match(splash, /Loading Tournament\.\.\./);
   assert.match(splash, /aria-live="polite"/);
-  assert.match(css, /transition:opacity \.48s ease/);
-  assert.match(css, /transform:scale\(\.975\)/);
-  assert.match(css, /height:2px/);
-  assert.match(css, /width:168px;height:168px/);
-  assert.match(css, /width:146px;height:146px/);
-  assert.match(css, /position:absolute;right:0;bottom:/);
+  assert.match(css, /transition:\s*opacity \.48s ease/);
+  assert.match(css, /transform:\s*scale\(\.975\)/);
+  assert.match(css, /height:\s*2px/);
+  assert.match(css, /width:\s*168px/);
+  assert.match(css, /width:\s*146px/);
+  assert.match(css, /position:\s*absolute[\s\S]*right:\s*0[\s\S]*bottom:/);
+  assert.match(css, /clamp\(30px, 5\.5vh, 58px\)/);
   assert.match(splash, /identity\?\.location/);
-  assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   assert.doesNotMatch(css, /bounce|spin|rotate/);
 });

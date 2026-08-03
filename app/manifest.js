@@ -13,7 +13,7 @@ export default function manifest() {
     display: "standalone",
     display_override: ["standalone", "minimal-ui"],
     orientation: "portrait-primary",
-    background_color: "#f7f3ea",
+    background_color: "#092f25",
     theme_color: "#0b3529",
     categories: ["sports", "lifestyle"],
     shortcuts: [
