@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { localGuideDirections, localGuideGroups, localGuidePhone, localGuideSectionIcon, localGuideViewModel, localGuideWebsite } from "../lib/tournament-guide-local.js";
+import { localGuideDirections, localGuideGroups, localGuidePhone, localGuideRecordIcon, localGuideSectionIcon, localGuideViewModel, localGuideWebsite } from "../lib/tournament-guide-local.js";
 
 const records = [
   { Year: 2026, Section: "Medical", Title: "Urgent Care", Description: "Nearest walk-in clinic.", Address: "10 Main St", Phone: "(843) 555-1212", Website: "https://example.com/clinic", "Sort Order": 3 },
@@ -21,8 +21,11 @@ test("Local Guide creates native maps and telephone actions safely", () => {
   assert.equal(localGuideWebsite("Www.kiawahisland.com"), "https://Www.kiawahisland.com");
   assert.equal(localGuideWebsite("https://example.com"), "https://example.com");
   assert.equal(localGuideSectionIcon("Medical"), "🏥");
-  assert.equal(localGuideSectionIcon("Transportation", [{ title: "Tournament Shuttle" }]), "🚌");
-  assert.equal(localGuideSectionIcon("Transportation", [{ title: "Airport Transfer" }]), "🚐");
+  assert.equal(localGuideSectionIcon("Transportation"), "🚐");
+  assert.equal(localGuideSectionIcon("Airport"), "✈️");
+  assert.equal(localGuideSectionIcon("Aiport"), "✈️");
+  assert.equal(localGuideRecordIcon("Tournament Shuttle"), "🚌");
+  assert.equal(localGuideRecordIcon("Airport Transfer"), "");
   assert.equal(localGuideSectionIcon("Unknown"), "📍");
 });
 
@@ -44,7 +47,8 @@ test("Local Guide uses only approved workbook fields and data-backed actions", a
   assert.match(component, /record\.website \?/);
   assert.match(component, /groups\.size \?/);
   assert.match(component, /<h1>Local Guide<\/h1>/);
-  assert.match(component, /localGuideSectionIcon\(section, sectionRecords\)/);
+  assert.match(component, /localGuideSectionIcon\(section\)/);
+  assert.match(component, /localGuideRecordIcon\(record\.title\)/);
   assert.match(component, /Local information is being prepared\./);
   assert.match(component, /<ExternalLinkConfirm href=\{localGuideWebsite\(record\.website\)\}/);
   assert.match(component, /localGuideDirections\(record\.address\)/);
