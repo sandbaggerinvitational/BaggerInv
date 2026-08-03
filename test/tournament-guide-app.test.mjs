@@ -44,6 +44,39 @@ test("Courses defaults to the active tournament and offers the historical archiv
   assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
 });
 
+test("Tournament Guide modules share one workbook-driven tournament identity hero", async () => {
+  const [hero, guide, detail, courses, courseDetail] = await Promise.all([
+    source("app/tournament-guide/TournamentGuideHero.js"),
+    source("app/tournament-guide/page.js"),
+    source("app/tournament-guide/GuideDetailPage.js"),
+    source("app/courses/page.js"),
+    source("app/courses/[courseId]/page.js"),
+  ]);
+  for (const field of ["Tournament Name", "Tournament Edition", "Tournament Dates", "Tournament Logo"]) {
+    assert.match(hero, new RegExp(field));
+  }
+  assert.match(hero, /tournamentLogo\(logoFileName\)/);
+  assert.match(hero, /Annual/);
+  assert.match(guide, /<TournamentGuideHero tournament=\{tournament\} \/>/);
+  assert.match(detail, /<TournamentGuideHero tournament=\{tournament\} \/>/);
+  assert.match(courses, /<TournamentGuideHero tournament=\{tournament\} \/>/);
+  assert.doesNotMatch(courseDetail, /TournamentGuideHero/);
+});
+
+test("page titles remain in content and no longer repeat inside the shared hero", async () => {
+  const [hero, guide, detail] = await Promise.all([
+    source("app/tournament-guide/TournamentGuideHero.js"),
+    source("app/tournament-guide/page.js"),
+    source("app/tournament-guide/GuideDetailPage.js"),
+  ]);
+  assert.doesNotMatch(hero, /Schedule|Courses|Rules & Formats|Dining|Local Guide|Important Contacts/);
+  assert.match(guide, /className=\{styles\.guidePageHeading\}/);
+  assert.match(guide, /<h1>Tournament Guide<\/h1>/);
+  for (const title of ["Schedule", "Rules & Formats", "Dining"]) assert.match(detail, new RegExp(`<h1>${title.replace("&", "&")}<\\/h1>`));
+  assert.doesNotMatch(guide, /\[\["Edition"/);
+  assert.doesNotMatch(guide, /\["Dates"/);
+});
+
 test("implemented Guide modules use approved sheets while unfinished content remains placeholder-only", async () => {
   const [detail, sheets] = await Promise.all([source("app/tournament-guide/GuideDetailPage.js"), source("lib/google-sheets-data.js")]);
   assert.match(detail, /<Dining records=\{content\.dining\}/);

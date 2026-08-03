@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { Header, Footer } from "../components";
-import AssetImage from "../AssetImage";
-import { tournamentLogo } from "../../lib/asset-paths";
 import { formatRuleHeading, formatRuleSummary } from "../../lib/rules-format-summary";
 import { getFormatName } from "../../lib/stats";
 import { isTruthy, paragraphs } from "../../lib/tournament-guide";
@@ -10,9 +8,9 @@ import ScheduleItinerary from "./ScheduleItinerary";
 import DiningItinerary from "./DiningItinerary";
 import LocalGuide from "./LocalGuide";
 import ImportantContacts from "./ImportantContacts";
+import TournamentGuideHero from "./TournamentGuideHero";
 import styles from "./tournament-guide.module.css";
 
-const titles = { schedule: "Schedule", rules: "Rules & Formats", dining: "Dining", "getting-around": "Local Guide", contacts: "Important Contacts" };
 const formatTerms = { BB: ["best ball", "four-ball", "four ball", "fourball"], SC: ["scramble"], SI: ["singles", "single match"] };
 const ruleSections = [
   { id: "tournament", icon: "🏆", title: "Competition Rules", matches: /tournament|handicap|scoring/i },
@@ -89,6 +87,5 @@ export default async function GuideDetailPage({ section }) {
   const content = await resolveTournamentGuideContent();
   const { tournament, schedule: itinerary, ruleBook } = content;
   const descriptions = Object.fromEntries(content.overview.map((item) => [item["Section Slug"], item.Description]));
-  const title = titles[section];
-  return <main><Header /><section className={`${styles.hero} ${styles.heroCompact}`}><div><p>Tournament Guide</p><h1>{title}</h1><strong>{tournament.editionTitle || `${tournament.year} Sandbagger Invitational`}</strong><span>{[tournament.Location, tournament.Dates || tournament.Date].filter(Boolean).join(" • ")}</span></div><div className={styles.logoPlate}><div className={styles.logoInner}><AssetImage src={tournamentLogo(tournament.logoFileName)} alt={`${tournament.year} tournament logo`} fallback={String(tournament.year)} className={styles.logo} fallbackClassName={styles.logoFallback} /></div></div></section><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;
+  return <main><Header /><TournamentGuideHero tournament={tournament} /><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;
 }
