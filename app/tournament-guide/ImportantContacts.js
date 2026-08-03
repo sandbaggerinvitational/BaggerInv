@@ -3,12 +3,13 @@ import { contactCallHref, contactCategoryIcon, contactEmailHref, contactGroups, 
 import styles from "./tournament-guide.module.css";
 
 function ActionIcon({ icon, label }) {
-  return <><span aria-hidden="true">{icon}</span><span className={styles.visuallyHidden}>{label}</span></>;
+  return <><span className={styles.contactActionGlyph} aria-hidden="true">{icon}</span><span className={styles.visuallyHidden}>{label}</span></>;
 }
 
 function ContactCard({ contact }) {
   const hasActions = contact.phone || contact.email || contact.website;
-  return <article className={styles.contactCard}>
+  const isTournamentDirector = String(contact.role || "").trim().toLowerCase() === "tournament director";
+  return <article className={`${styles.contactCard} ${isTournamentDirector ? styles.primaryContactCard : ""}`}>
     <div><h3>{contact.name}</h3>{contact.role ? <p>{contact.role}</p> : null}</div>
     {hasActions ? <div className={styles.contactActions}>
       {contact.phone ? <a href={contactCallHref(contact.phone)}><ActionIcon icon="📞" label={`Call ${contact.name}`} /></a> : null}
@@ -25,7 +26,7 @@ export default function ImportantContacts({ records = [] }) {
     <header><p className={styles.eyebrow}>Tournament Concierge</p><h1>Important Contacts</h1><p>One-tap access to the people and services you may need during tournament weekend.</p></header>
     {groups.size ? <div className={styles.contactSections}>
       {[...groups.entries()].map(([category, contacts]) => <section key={category}>
-        <h2><span aria-hidden="true">{contactCategoryIcon(category)}</span>{category}</h2>
+        <h2 className={category === "Emergency" ? styles.emergencyContactHeading : ""}><span aria-hidden="true">{contactCategoryIcon(category)}</span>{category}</h2>
         <div>{contacts.map((contact) => <ContactCard contact={contact} key={contact.id} />)}</div>
       </section>)}
     </div> : <div className={styles.empty}><span>Important Contacts</span><h2>Contact information is being prepared.</h2><p>Tournament-weekend contacts will appear here when published.</p></div>}

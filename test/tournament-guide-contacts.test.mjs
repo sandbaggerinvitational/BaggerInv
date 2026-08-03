@@ -53,3 +53,17 @@ test("Important Contacts exposes only workbook-supported icon actions", async ()
   assert.match(css, /\.contactActions>a\{[^}]*width:46px;height:46px;flex:0 0 46px/);
   assert.match(css, /@media\(max-width:700px\)\{\.contactSections>section>div\{grid-template-columns:1fr\}\}/);
 });
+
+test("Important Contacts final polish emphasizes actions and priority contacts without changing visibility", async () => {
+  const [component, css] = await Promise.all([
+    readFile(new URL("../app/tournament-guide/ImportantContacts.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/tournament-guide/tournament-guide.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(component, /className=\{styles\.contactActionGlyph\}/);
+  assert.match(css, /\.contactActionGlyph\{font-size:1\.18rem;line-height:1\}/);
+  assert.match(css, /\.contactCard\{[^}]*grid-template-rows:1fr auto;[^}]*align-items:center/);
+  assert.match(component, /isTournamentDirector[\s\S]*styles\.primaryContactCard/);
+  assert.match(css, /\.primaryContactCard p\{color:#9a7627;font-weight:800\}/);
+  assert.match(component, /category === "Emergency" \? styles\.emergencyContactHeading/);
+  assert.match(css, /\.emergencyContactHeading>span\{[^}]*background:#fff0ed/);
+});
