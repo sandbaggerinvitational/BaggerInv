@@ -13,12 +13,12 @@ import styles from "./course-detail.module.css";
 
 async function resolveCourse(courseId) {
   const content = await resolveTournamentGuideContent();
-  return { content, model: courseDetailModel(courseId, content) };
+  return courseDetailModel(courseId, content);
 }
 
 export async function generateMetadata({ params }) {
   const { courseId } = await params;
-  const { model } = await resolveCourse(courseId);
+  const model = await resolveCourse(courseId);
   return pageMetadata({
     title: model ? `${model.course.Course} | The Sandbagger Invitational` : "Course | The Sandbagger Invitational",
     description: model ? `${model.course.Course} tournament course details.` : "Sandbagger Invitational course details.",
@@ -34,7 +34,7 @@ function TextSections({ sections }) {
 
 export default async function CoursePage({ params }) {
   const { courseId } = await params;
-  const { content, model } = await resolveCourse(courseId);
+  const model = await resolveCourse(courseId);
   if (!model) notFound();
   const { course } = model;
   const website = model.website;
@@ -47,7 +47,7 @@ export default async function CoursePage({ params }) {
         <Link href="/courses">‹ Courses</Link>
         <div className={styles.identity}>
           <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
-          <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}<strong>{model.subtitle}</strong>{model.tee ? <b>{model.tee} Tees</b> : null}</div>
+          <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>
         </div>
       </div>
     </section>
@@ -55,15 +55,13 @@ export default async function CoursePage({ params }) {
     <div className={styles.shell}>
       {model.facts.length ? <section className={styles.section}><header><span>At a glance</span><h2>Course Quick Facts</h2></header><dl className={styles.facts}>{model.facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section> : null}
 
-      <section className={`${styles.section} ${styles.tournamentSection}`}><header><span>{content.liveTournament?.name || "Sandbagger Invitational"}</span><h2>Tournament Information</h2></header><dl>{model.tournamentDetails.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>{model.competitionNotes.length ? <div className={styles.competitionNotes}>{model.competitionNotes.map((note) => <article key={note.label}><h3>{note.label}</h3><p>{note.text}</p></article>)}</div> : null}</section>
-
-      {model.experience.length ? <section className={styles.section}><header><span>Know before you play</span><h2>Course Experience</h2></header><TextSections sections={model.experience} /></section> : null}
+      {model.experience.length ? <section className={`${styles.section} ${styles.experienceSection}`}><header><span>Explore the course</span><h2>Course Guide</h2></header><TextSections sections={model.experience} /></section> : null}
 
       {model.images.length > 1 ? <section className={styles.section}><header><span>Course gallery</span><h2>On the Course</h2></header><div className={styles.gallery}>{model.images.map((image, index) => <AssetImage src={courseHero(image)} alt={`${course.Course} view ${index + 1}`} className={styles.galleryImage} fallbackClassName={styles.galleryFallback} fallback={course.Course} key={image} />)}</div></section> : null}
 
-      {model.holes.length ? <section className={styles.section} id="course-scorecard"><header><span>{model.tee ? `${model.tee} Tees` : "Tournament tees"}</span><h2>Scorecard</h2></header><div className={styles.scorecard} role="table" aria-label={`${course.Course} scorecard`}><div role="row"><b role="columnheader">Hole</b>{model.holes.map((hole) => <b role="columnheader" key={`h-${hole["Hole Number"]}`}>{hole["Hole Number"]}</b>)}</div><div role="row"><span role="rowheader">Par</span>{model.holes.map((hole) => <span role="cell" key={`p-${hole["Hole Number"]}`}>{hole.Par || "—"}</span>)}</div><div role="row"><span role="rowheader">HCP</span>{model.holes.map((hole) => <span role="cell" key={`s-${hole["Hole Number"]}`}>{hole["Stroke Index"] || "—"}</span>)}</div></div></section> : null}
+      {model.holes.length ? <section className={`${styles.section} ${styles.scorecardSection}`} id="course-scorecard"><header><span>Hole by hole</span><h2>Course Scorecard</h2></header><div className={styles.scorecard} role="table" aria-label={`${course.Course} scorecard`}><div role="row"><b role="columnheader">Hole</b>{model.holes.map((hole) => <b role="columnheader" key={`h-${hole["Hole Number"]}`}>{hole["Hole Number"]}</b>)}</div><div role="row"><span role="rowheader">Par</span>{model.holes.map((hole) => <span role="cell" key={`p-${hole["Hole Number"]}`}>{hole.Par || "—"}</span>)}</div><div role="row"><span role="rowheader">HCP</span>{model.holes.map((hole) => <span role="cell" key={`s-${hole["Hole Number"]}`}>{hole["Stroke Index"] || "—"}</span>)}</div></div></section> : null}
 
-      <div className={styles.actions}>{model.holes.length ? <Link href="#course-scorecard">View Scorecard</Link> : null}{website ? <ExternalLinkConfirm href={website}>Visit Course Website →</ExternalLinkConfirm> : null}</div>
+      <div className={styles.actions}>{model.holes.length ? <Link href="#course-scorecard">View Scorecard</Link> : null}{website ? <ExternalLinkConfirm href={website}>Visit Official Course Website →</ExternalLinkConfirm> : null}</div>
     </div>
   </main>;
 }

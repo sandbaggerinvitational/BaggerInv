@@ -22,22 +22,21 @@ test("Course Detail binds the active normalized course over historical fallback 
   const model = courseDetailModel("ocgc01", content);
   assert.equal(model.course.Designer, "Pete Dye");
   assert.equal(model.location, "Kiawah Island, SC");
-  assert.equal(model.subtitle, "Round 3 • Singles");
   assert.equal(model.tee, "Gold");
   assert.equal(model.active, true);
 });
 
-test("Course Detail exposes compact facts and tournament-specific information", () => {
+test("Course Detail exposes compact course facts without tournament duplication", () => {
   const model = courseDetailModel("OCGC01", content);
   assert.deepEqual(model.facts.map(([label]) => label), ["Par", "Yardage", "Slope", "Course Rating", "Architect", "Opened"]);
-  assert.equal(model.tournamentDetails.find(([label]) => label === "First Tee Time")[1], "10:30 AM");
-  assert.match(model.tournamentDetails.find(([label]) => label === "Walking Caddies")[1], /\$100\/bag/);
-  assert.match(model.tournamentDetails.find(([label]) => label === "Net Skins")[1], /\$25\/person/);
+  assert.equal("tournamentDetails" in model, false);
+  assert.equal("competitionNotes" in model, false);
+  assert.equal("subtitle" in model, false);
 });
 
 test("Course Detail reuses optional workbook content without inventing missing sections", () => {
   const model = courseDetailModel("OCGC01", content);
-  assert.deepEqual(model.experience.map(([label]) => label), ["Course Overview", "Playing Tips", "Course Notes"]);
+  assert.deepEqual(model.experience.map(([label]) => label), ["Course Overview", "Playing Tips", "History"]);
   assert.equal(model.images.length, 1);
   assert.equal(model.holes.length, 18);
   assert.equal(model.website, "https://example.test/ocean");
@@ -72,6 +71,8 @@ test("Course Detail remains inside The Bagger and has no map action", async () =
   assert.match(page, /<Header homeHref="\/home"/);
   assert.match(page, /href="\/courses">‹ Courses/);
   assert.match(page, /View Scorecard/);
+  assert.match(page, /Visit Official Course Website/);
   assert.match(page, /<ExternalLinkConfirm href=\{website\}/);
+  for (const duplicated of ["Tournament Information", "Round Assignment", "Tee Assignment", "First Tee Time", "Walking Caddies", "Net Skins"]) assert.doesNotMatch(page, new RegExp(duplicated));
   assert.doesNotMatch(page, /View Map|GPS Link|maps\.apple|google\.com\/maps/);
 });
