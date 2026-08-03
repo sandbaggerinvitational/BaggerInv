@@ -9,15 +9,15 @@ function DiningCard({ meal }) {
     interaction.currentTarget.open = !interaction.currentTarget.open;
   }}>
     <summary>
-      <div className={styles.eventIcon} aria-hidden="true">🍽️</div>
+      <div className={styles.eventIcon} aria-hidden="true">{meal.icon}</div>
       <div className={styles.eventPrimary}>
-        <span className={styles.eventTime}>{meal.time}</span>
         <h3>{meal.meal}</h3>
+        {meal.time ? <span className={styles.eventTime}>{meal.time}</span> : null}
         {meal.location ? <strong>{meal.location}</strong> : null}
-        {meal.dressCode ? <p>Dress Code: {meal.dressCode}</p> : null}
+        {meal.dressCode ? <p className={styles.diningDress}><span aria-hidden="true">👕</span>{meal.dressCode}</p> : null}
       </div>
       <div className={styles.eventState}>
-        <span className={meal.reservationLabel === "Reservation Required" ? styles.reservationRequired : styles.openSeating}>{meal.reservationLabel}</span>
+        {meal.reservationLabel ? <span className={meal.reservationLabel === "Reservation Required" ? styles.reservationRequired : styles.openSeating}>{meal.reservationLabel}</span> : null}
         <span aria-hidden="true">⌄</span>
       </div>
     </summary>

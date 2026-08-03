@@ -61,7 +61,7 @@ test("shared Guide schema diagnostics identify exact missing workbook columns", 
     "Rule Book": ["Rule ID", "Tournament ID", "Category", "Title", "Body", "Display Order", "Status"],
     "Tournament Rules": ["Year", "Round", "Format", "Points Available"],
     Rounds: ["Format ID", "Name"],
-    Dining: ["Year", "Day", "Meal", "Start Time", "End Time", "Location", "Dress Code", "Reservations Required", "Notes", "Sort Order"],
+    Dining: ["Year", "Day", "Meal", "Cuisine", "Start Time", "End Time", "Location", "Dress Code", "Reservations Required", "Notes", "Sort Order"],
   });
   assert.equal(result.schedule.valid, true);
   assert.equal(result.courses.valid, true);

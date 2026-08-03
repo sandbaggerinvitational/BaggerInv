@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { diningGroups, diningViewModel } from "../lib/tournament-guide-dining.js";
+import { diningGroups, diningIcon, diningViewModel } from "../lib/tournament-guide-dining.js";
 
 const records = [
-  { Year: 2026, Day: "Saturday", Meal: "Championship Dinner", "Start Time": "7:00 PM", "End Time": "9:30 PM", Location: "The Ocean Room", "Dress Code": "Jacket Requested", "Reservations Required": "TRUE", Notes: "Cocktails at 7.\nDinner at 7:30.", "Sort Order": 3 },
-  { Year: 2026, Day: "Friday", Meal: "Breakfast", "Start Time": "6:00 AM", "End Time": "7:00 AM", Location: "Clubhouse", "Dress Code": "Golf Attire", "Reservations Required": "FALSE", Notes: "Coffee and breakfast available.", "Sort Order": 1 },
-  { Year: 2026, Day: "Friday", Meal: "Team Dinner", "Start Time": "6:30 PM", Location: "River Room", "Dress Code": "Resort Casual", "Reservations Required": "Yes", Notes: "Meet in the lobby.\nTransportation departs at 6:10.", "Sort Order": 2 },
+  { Year: 2026, Day: "Saturday", Meal: "Championship Dinner", Cuisine: "Steakhouse", "Start Time": "7:00 PM", "End Time": "9:30 PM", Location: "The Ocean Room", "Dress Code": "Jacket Requested", "Reservations Required": "TRUE", Notes: "Cocktails at 7.\nDinner at 7:30.", "Sort Order": 3 },
+  { Year: 2026, Day: "Friday", Meal: "Breakfast", Cuisine: "Breakfast", "Start Time": "6:00 AM", "End Time": "7:00 AM", Location: "Clubhouse", "Dress Code": "Golf Atire", "Reservations Required": "FALSE", Notes: "Coffee and breakfast available.", "Sort Order": 1 },
+  { Year: 2026, Day: "Friday", Meal: "Team Dinner", Cuisine: "Italian", "Start Time": "6:30 PM", Location: "River Room", "Dress Code": "Resort Casual", "Reservations Required": "Yes", Notes: "Meet in the lobby.\nTransportation departs at 6:10.", "Sort Order": 2 },
 ];
 
 test("Dining groups active records by workbook Day and preserves Sort Order", () => {
@@ -20,9 +20,21 @@ test("Dining normalizes time, dress code, reservations, and multiline Notes", ()
   const meals = diningViewModel(records);
   assert.equal(meals[0].time, "6:00 AM – 7:00 AM");
   assert.equal(meals[0].dressCode, "Golf Attire");
+  assert.equal(meals[0].icon, "🍳");
   assert.equal(meals[0].reservationLabel, "Open Seating");
   assert.equal(meals[1].reservationLabel, "Reservation Required");
   assert.equal(meals[1].notes, "Meet in the lobby.\nTransportation departs at 6:10.");
+});
+
+test("Dining icons derive dynamically from Cuisine with a neutral fallback", () => {
+  assert.deepEqual([
+    "Breakfast", "Steakhouse", "Seafood", "Mexican", "Italian", "BBQ", "Bar & Grill", "Pub / Bar", "Coffee", "Dessert", "Reception / Cocktail Hour", "Unknown",
+  ].map(diningIcon), ["🍳", "🥩", "🦞", "🌮", "🍝", "🍖", "🍔", "🍺", "☕", "🍰", "🥂", "🍽️"]);
+});
+
+test("Dining hides reservation status when the workbook value is blank", () => {
+  const [meal] = diningViewModel([{ Year: 2026, Day: "Friday", Meal: "Lunch", Cuisine: "Seafood", "Reservations Required": "" }]);
+  assert.equal(meal.reservationLabel, "");
 });
 
 test("Dining uses only the approved workbook fields and renders Notes behind disclosure", async () => {
@@ -34,13 +46,15 @@ test("Dining uses only the approved workbook fields and renders Notes behind dis
     readFile(new URL("../lib/tournament-guide-content.js", import.meta.url), "utf8"),
     readFile(new URL("../app/tournament-guide/tournament-guide.module.css", import.meta.url), "utf8"),
   ]);
-  for (const field of ["Year", "Day", "Meal", "Start Time", "End Time", "Location", "Dress Code", "Reservations Required", "Notes", "Sort Order"]) {
+  for (const field of ["Year", "Day", "Meal", "Cuisine", "Start Time", "End Time", "Location", "Dress Code", "Reservations Required", "Notes", "Sort Order"]) {
     assert.match(model, new RegExp(field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
     assert.match(schema, new RegExp(field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   assert.match(component, /<details/);
   assert.doesNotMatch(component, /<details[^>]* open/);
   assert.match(component, /Reservation Required/);
+  assert.match(component, /meal\.reservationLabel \?/);
+  assert.match(component, /meal\.icon/);
   assert.match(model, /Open Seating/);
   assert.match(component, /interaction\.target\.closest\("a, button, summary"\)/);
   assert.match(detail, /<DiningItinerary records=\{records\}/);
