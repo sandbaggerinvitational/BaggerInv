@@ -51,7 +51,7 @@ function FormatCard({ format, configuration, rules }) {
   const sources = [configuration, format, ...rules].filter(Boolean);
   const points = configuration?.["Points Available"];
   const summary = formatRuleSummary(formatCode, sources, points);
-  return <details className={`${styles.formatCard} ${styles.formatOverviewCard}`} open><summary><div><h3>{format.Name || getFormatName(formatCode)}</h3>{summary.length ? <ul>{summary.map((item) => <li key={item}>{item}</li>)}</ul> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}>{description ? <Text value={description} /> : null}{formatRules.map((value, index) => <Text value={value} key={`${formatCode}-${index}`} />)}{rules.length ? <div className={styles.formatRules}>{rules.map((rule) => <div key={rule["Rule ID"]}><b>{formatRuleHeading(rule.Title)}</b><Text value={rule.Body} /></div>)}</div> : null}</div></details>;
+  return <details className={`${styles.formatCard} ${styles.formatOverviewCard}`}><summary><div><h3>{format.Name || getFormatName(formatCode)}</h3>{summary.length ? <ul>{summary.map((item) => <li key={item}>{item}</li>)}</ul> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}>{description ? <Text value={description} /> : null}{formatRules.map((value, index) => <Text value={value} key={`${formatCode}-${index}`} />)}{rules.length ? <div className={styles.formatRules}>{rules.map((rule) => <div key={rule["Rule ID"]}><b>{formatRuleHeading(rule.Title)}</b><Text value={rule.Body} /></div>)}</div> : null}</div></details>;
 }
 
 function RuleSection({ id, icon, title, records }) {

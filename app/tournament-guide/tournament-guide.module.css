@@ -27,7 +27,8 @@
 @media(max-width:800px){.formatCollection>div,.tournamentRuleSummary{grid-template-columns:1fr}.guideDetailShell{padding-top:22px}}
 @media(max-width:560px){.rulesExperience{gap:30px}.formatCard>summary{min-height:106px;padding:15px 16px}.formatDetails{padding:0 16px 16px}.ruleCollection>h2,.formatCollection h2{font-size:1.55rem}.localRules .rules>section{padding:16px 12px}.localRules .rules details{padding-inline:10px}}
 @media(prefers-reduced-motion:reduce){.formatCard>summary>b{transition:none}}
-.formatOverviewCard>summary{grid-template-columns:minmax(0,1fr) auto}.formatOverviewCard>summary>div{grid-column:1}.formatOverviewCard>summary>b{grid-column:2}
+.formatOverviewCard>summary{grid-template-columns:minmax(0,1fr) auto}.formatOverviewCard:not([open])>summary{min-height:0;padding:15px 18px}.formatOverviewCard>summary>div{grid-column:1}.formatOverviewCard>summary>b{grid-column:2}
+@media(max-width:560px){.formatOverviewCard:not([open])>summary{padding:14px 16px}}
 .ruleCards{display:grid;gap:10px}.ruleCard>summary{min-height:88px;align-items:center}.ruleCard>summary>span{max-width:105px;padding-top:0;overflow-wrap:anywhere;line-height:1.25}.ruleCard>summary>div{gap:4px}.ruleCard>summary>div>p{margin:0;color:#68716d;font-size:.72rem;line-height:1.3}.ruleCard .formatDetails{display:grid;gap:8px}.ruleCard .formatDetails p{margin:0}.ruleCard .formatDetails small{color:#8b6b25;font-size:.7rem;font-weight:800}.ruleCardImportant{border-color:#d4b15f;background:#fffdf7}@media(max-width:560px){.ruleCard>summary{min-height:82px}.ruleCard>summary>span{max-width:82px;font-size:.62rem}}
 
 /* Schedule app experience. */

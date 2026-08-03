@@ -101,7 +101,7 @@ test("Round Formats are expandable and summarize official workbook values", asyn
     source("app/tournament-guide/tournament-guide.module.css"),
     source("lib/rules-format-summary.js"),
   ]);
-  assert.match(detail, /styles\.formatCard.*styles\.formatOverviewCard.*open/);
+  assert.match(detail, /styles\.formatCard.*styles\.formatOverviewCard/);
   assert.match(detail, /"Points Available"/);
   assert.match(detail, /formatRuleSummary\(formatCode, sources, points\)/);
   assert.match(detail, /<ul>\{summary\.map/);
@@ -125,7 +125,7 @@ test("Rule accordion titles use golfer-friendly terminology", async () => {
 
 test("format summaries render only inside their expandable Round Format cards", async () => {
   const detail = await source("app/tournament-guide/GuideDetailPage.js");
-  assert.match(detail, /styles\.formatCard.*styles\.formatOverviewCard.*open/);
+  assert.match(detail, /styles\.formatCard.*styles\.formatOverviewCard/);
   assert.match(detail, /formatRuleSummary\(formatCode, sources, points\)/);
   assert.doesNotMatch(detail, /TournamentRuleSummary|tournamentRuleSummary/);
   assert.doesNotMatch(detail, /Front 9:|Back 9:|points available/);
@@ -159,15 +159,17 @@ test("Shotgun Mulligans uses the tournament-tradition beer mug icon", async () =
   assert.doesNotMatch(detail, /id: "shotgun", icon: "🎯"/);
 });
 
-test("Round Formats open by default without BB, SC, or SI labels", async () => {
+test("Round Formats are collapsed by default without BB, SC, or SI labels", async () => {
   const [detail, css] = await Promise.all([
     source("app/tournament-guide/GuideDetailPage.js"),
     source("app/tournament-guide/tournament-guide.module.css"),
   ]);
-  assert.match(detail, /<details className=\{`\$\{styles\.formatCard\} \$\{styles\.formatOverviewCard\}`\} open>/);
+  assert.match(detail, /<details className=\{`\$\{styles\.formatCard\} \$\{styles\.formatOverviewCard\}`\}>/);
+  assert.doesNotMatch(detail, /styles\.formatOverviewCard\}`\} open/);
   assert.doesNotMatch(detail, /<span>\{formatCode\}<\/span>/);
   assert.match(detail, /formatRuleHeading\(rule\.Title\)/);
   assert.match(css, /\.formatOverviewCard>summary\{grid-template-columns:minmax\(0,1fr\) auto\}/);
+  assert.match(css, /\.formatOverviewCard:not\(\[open\]\)>summary\{min-height:0;padding:15px 18px\}/);
   const ruleCardSource = detail.slice(detail.indexOf("function RuleCard"), detail.indexOf("function FormatCard"));
   assert.doesNotMatch(ruleCardSource, /<details[^>]*\sopen/);
 });

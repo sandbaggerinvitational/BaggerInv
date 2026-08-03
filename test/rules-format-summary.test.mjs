@@ -7,7 +7,7 @@ test("Best Ball summary derives official points, allocation, and Nassau format",
     { Body: "Fourball uses 90% handicap allocation." },
     { Body: "Fourball and Scramble use Nassau scoring." },
   ], 3);
-  assert.deepEqual(summary, ["3 Points", "90% Handicap Allocation", "Nassau Match Play"]);
+  assert.deepEqual(summary, ["Points: 3", "Handicap: 90%", "Scoring: Nassau Match Play"]);
 });
 
 test("Scramble summary normalizes the official two-player allocation", () => {
@@ -15,7 +15,7 @@ test("Scramble summary normalizes the official two-player allocation", () => {
     { Body: "Scramble team handicap is calculated using 35% of the low handicap and 15% of the high handicap." },
     { Body: "Fourball and Scramble use Nassau scoring." },
   ], 3);
-  assert.deepEqual(summary, ["3 Points", "35% / 15% Team Handicap", "Nassau Match Play"]);
+  assert.deepEqual(summary, ["Points: 3", "Handicap: 35% / 15% Team Handicap", "Scoring: Nassau Match Play"]);
 });
 
 test("Singles summary derives full allocation and 18-hole match play", () => {
@@ -23,12 +23,12 @@ test("Singles summary derives full allocation and 18-hole match play", () => {
     { Body: "Singles uses 100% handicap allocation." },
     { Body: "Fourball and Scramble use Nassau scoring. Singles is one 18-hole match worth three points." },
   ], 3);
-  assert.deepEqual(summary, ["3 Points", "100% Handicap Allocation", "18-Hole Match Play"]);
+  assert.deepEqual(summary, ["Points: 3", "Handicap: 100%", "Scoring: 18-Hole Match Play"]);
 });
 
-test("explicit workbook summary fields take precedence and missing values stay hidden", () => {
-  assert.deepEqual(formatRuleSummary("BB", [{ "Handicap Allocation": "85% Allocation", "Scoring Format": "Modified Match Play" }], ""), ["85% Allocation", "Modified Match Play"]);
-  assert.deepEqual(formatRuleSummary("BB", [], null), []);
+test("explicit workbook summary fields take precedence while every card keeps three bullets", () => {
+  assert.deepEqual(formatRuleSummary("BB", [{ "Handicap Allocation": "85% Allocation", "Scoring Format": "Modified Match Play" }], ""), ["Points: 3", "Handicap: 85% Allocation", "Scoring: Modified Match Play"]);
+  assert.deepEqual(formatRuleSummary("BB", [], null), ["Points: 3", "Handicap: 90%", "Scoring: Nassau Match Play"]);
 });
 
 test("format rule headings remove redundant format names without changing rule bodies", () => {
