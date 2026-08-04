@@ -147,6 +147,22 @@ test("Insights uses compact responsive odds presentation without overflow-prone 
   assert.match(insightStyles, /@media\(max-width:390px\)/);
 });
 
+test("Championship Odds promotes the favorite and supplied Top 10 without changing odds data", async () => {
+  const [source, insightStyles] = await Promise.all([
+    readFile(componentUrl, "utf8"),
+    readFile(new URL("../app/live/leaderboards-insights.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(source, /🥇 Tournament Favorite/);
+  assert.match(source, /playerPhotos/);
+  assert.match(source, /insights\.players\.slice\(0, 10\)/);
+  assert.match(source, /insights\.players\.slice\(10\)/);
+  assert.match(source, /First Projection/);
+  assert.match(source, /Movement begins after the next published Championship Odds update\./);
+  assert.match(insightStyles, /favoritePortrait/);
+  assert.match(insightStyles, /topPlayers/);
+  assert.match(insightStyles, /text-overflow:ellipsis/);
+});
+
 test("Leaderboards use shared tournament identity, URL tabs, search, expansion, and Passport highlighting", async () => {
   const [source, matchCenter] = await Promise.all([readFile(componentUrl, "utf8"), readFile(matchCenterUrl, "utf8")]);
   assert.match(matchCenter, /searchParams\.get\("view"\) === "leaderboards"/);

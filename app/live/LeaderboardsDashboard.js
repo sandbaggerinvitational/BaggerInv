@@ -140,11 +140,13 @@ function Insights({ data }) {
     return () => controller.abort();
   }, [data.tournament?.year]);
   const insights = useMemo(() => publishedOddsInsights(snapshots || []), [snapshots]);
+  const playerPhotos = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.photo])), [data.leaderboard]);
   const percent = (value) => `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
   const publicationTime = insights.current?.publishedAt ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(insights.current.publishedAt)) : "—";
   const trend = (player) => player?.change === null || player?.change === undefined
-    ? <span className={insightStyles.neutral}>—</span>
+    ? <span className={insightStyles.initial}>First Projection</span>
     : <span className={player.change > 0 ? insightStyles.up : player.change < 0 ? insightStyles.down : insightStyles.neutral}>{player.change > 0 ? "▲ +" : player.change < 0 ? "▼ " : "— "}{player.change ? `${player.change.toFixed(1)}%` : "Even"}</span>;
+  const portrait = (player, className = "") => <span className={`${insightStyles.portrait} ${className}`.trim()}><AssetImage src={playerPhoto(playerPhotos.get(String(player.id)))} alt="" fallbackClassName={insightStyles.portraitFallback} fallback={initials(player.name)} inferFallback={false} /></span>;
 
   if (snapshots === null) return <section className={insightStyles.experience} aria-busy="true"><div className={styles.empty}><strong>Loading Championship Odds…</strong><span>Retrieving the latest published tournament projection.</span></div></section>;
   if (!insights.current) return <section className={insightStyles.experience}><div className={styles.empty}><strong>Championship Odds</strong><span>Tournament projections will publish after official pairings are finalized.</span></div></section>;
@@ -155,19 +157,24 @@ function Insights({ data }) {
       <div><p><small>Round Phase</small><strong>{insights.current.phase}</strong></p><p><small>Published</small><strong>{publicationTime}</strong></p></div>
     </header>
     <section className={insightStyles.favorite} aria-label="Tournament Favorite">
-      <span>Tournament Favorite</span><h3>{insights.favorite.name}</h3>
+      <span>🥇 Tournament Favorite</span>{portrait(insights.favorite, insightStyles.favoritePortrait)}<h3>{insights.favorite.name}</h3>
       <div><p><small>Probability</small><strong>{percent(insights.favorite.probability)}</strong></p><p><small>American Odds</small><strong>{insights.favorite.americanOdds}</strong></p><p><small>Trend</small>{trend(insights.favorite)}</p></div>
     </section>
     <section className={insightStyles.movers} aria-label="Biggest Movers">
       <header><span>Biggest Movers</span><h3>Since the previous published projection</h3></header>
       {insights.movers && (insights.movers.riser || insights.movers.faller) ? <div>
         {[['Largest Positive Movement', insights.movers.riser], ['Largest Negative Movement', insights.movers.faller]].map(([label, player]) => player ? <article key={label}><span>{label}</span><strong>{player.name}</strong><p>{player.previous.americanOdds} <i aria-hidden="true">→</i> {player.americanOdds}</p>{trend(player)}</article> : null)}
-      </div> : <p className={insightStyles.movementEmpty}>Movement will appear after the next published odds snapshot.</p>}
+      </div> : <div className={insightStyles.movementEmpty}><strong>First projection published</strong><p>Movement begins after the next published Championship Odds update.</p></div>}
     </section>
     <section className={insightStyles.board} aria-label="Full Odds Board">
-      <header><span>Full Odds Board</span><h3>Published player projections</h3></header>
-      <div className={insightStyles.row} data-header="true"><span>Rank</span><span>Player</span><span>Probability</span><span>Odds</span><span>Trend</span></div>
-      {insights.players.map((player) => <div className={insightStyles.row} key={player.id}><strong>{player.rank}</strong><b>{player.name}</b><span>{percent(player.probability)}</span><span>{player.americanOdds}</span>{trend(player)}</div>)}
+      <header><span>Championship Odds Board</span><h3>Published player projections</h3></header>
+      <div className={insightStyles.topPlayers}>{insights.players.slice(0, 10).map((player) => <article className={insightStyles.topPlayer} key={player.id}>
+        <strong className={insightStyles.rank}>#{player.rank}</strong>{portrait(player)}<b>{player.name}</b>
+        <div><p><small>Probability</small><strong>{percent(player.probability)}</strong></p><p><small>American Odds</small><strong>{player.americanOdds}</strong></p></div>
+        <p className={insightStyles.cardTrend}><small>Trend</small>{trend(player)}</p>
+      </article>)}</div>
+      {insights.players.length > 10 ? <div className={insightStyles.remaining}><div className={insightStyles.remainingTitle}>Remaining Field</div><div className={insightStyles.row} data-header="true"><span>Rank</span><span>Player</span><span>Probability</span><span>Odds</span><span>Trend</span></div>
+        {insights.players.slice(10).map((player) => <div className={insightStyles.row} key={player.id}><strong>{player.rank}</strong><b>{player.name}</b><span>{percent(player.probability)}</span><span>{player.americanOdds}</span>{trend(player)}</div>)}</div> : null}
     </section>
     <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: {insights.current.phase}</strong><small>{publicationTime}</small><p>Official Sandbagger Odds Engine projection. Not live odds.</p></footer>
   </section>;
