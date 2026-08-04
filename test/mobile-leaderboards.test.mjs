@@ -157,9 +157,15 @@ test("Championship Odds promotes the favorite and supplied Top 10 without changi
   assert.match(source, /insights\.players\.slice\(0, 10\)/);
   assert.match(source, /insights\.players\.slice\(10\)/);
   assert.match(source, /First Projection/);
-  assert.match(source, /Movement begins after the next published Championship Odds update\./);
+  assert.match(source, /Movement tracking begins after the next published Championship Projection\./);
+  assert.match(source, /Projected Tournament Champion/);
+  assert.match(source, /rankMark/);
+  assert.match(source, /data-medal=\{player\.rank <= 3 \|\| undefined\}/);
   assert.match(insightStyles, /favoritePortrait/);
+  assert.match(insightStyles, /favoriteProbability/);
   assert.match(insightStyles, /topPlayers/);
+  assert.match(insightStyles, /min-height:235px/);
+  assert.match(insightStyles, /moversEmpty/);
   assert.match(insightStyles, /text-overflow:ellipsis/);
 });
 
