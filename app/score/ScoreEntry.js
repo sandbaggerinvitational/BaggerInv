@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { finalizedMatchResult, formatLiveMatchResult } from "../../lib/match-result.js";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-experience.js";
+import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -126,14 +127,14 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       try {
         const [session, passport] = await Promise.all([
           dashboardOnly ? Promise.resolve(null) : fetch("/api/scoring/session", { cache: "no-store" }),
-          fetch("/api/player-passport/session", { cache: "no-store" }),
+          fetchWithTransientRetry("/api/player-passport/session", { cache: "no-store" }),
         ]);
         if (passport.ok) {
           const identity = await passport.json();
           if (!current) return;
           setPassportPlayer(identity.player);
           setPassportState("active");
-          const matches = await fetch("/api/player-passport/matches", { cache: "no-store" });
+          const matches = await fetchWithTransientRetry("/api/player-passport/matches", { cache: "no-store" });
           const payload = await matches.json();
           if (matches.ok) {
             if (!current) return;

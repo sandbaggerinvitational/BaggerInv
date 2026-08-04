@@ -65,6 +65,8 @@ test("reset endpoint is Preview-only, Director-authorized, and refreshes partici
   assert.match(route, /Tournament Director access is required/);
   assert.match(route, /Preview Tournament Reset Complete/);
   assert.match(route, /Ready for Dress Rehearsal\./);
+  assert.match(route, /invalidateTournamentDataCache/);
+  assert.match(route, /readPlayerPassportMatches\(session\)/);
   for (const path of ["/admin/director", "/home", "/live", "/my-match", "/leaderboards"]) assert.match(route, new RegExp(path.replace("/", "\\/")));
 });
 

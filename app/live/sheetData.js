@@ -657,6 +657,7 @@ async function buildTournamentData() {
 let pendingTournamentData;
 let lastGoodTournamentData;
 let lastGoodAt = 0;
+let tournamentDataGeneration = 0;
 const loaderDiagnostics = {
   result: "idle",
   cacheBehavior: "miss",
@@ -672,10 +673,13 @@ export async function getTournamentData() {
     return pendingTournamentData;
   }
   loaderDiagnostics.cacheBehavior = "miss";
-  pendingTournamentData = buildTournamentData()
+  const generation = tournamentDataGeneration;
+  const request = buildTournamentData()
     .then((data) => {
-      lastGoodTournamentData = data;
-      lastGoodAt = Date.now();
+      if (generation === tournamentDataGeneration) {
+        lastGoodTournamentData = data;
+        lastGoodAt = Date.now();
+      }
       loaderDiagnostics.result = "success";
       loaderDiagnostics.errorCategory = "";
       loaderDiagnostics.workbookCheck = "";
@@ -694,9 +698,22 @@ export async function getTournamentData() {
       throw error;
     })
     .finally(() => {
-      pendingTournamentData = undefined;
+      if (pendingTournamentData === request) pendingTournamentData = undefined;
     });
-  return pendingTournamentData;
+  pendingTournamentData = request;
+  return request;
+}
+
+export function invalidateTournamentDataCache() {
+  tournamentDataGeneration += 1;
+  pendingTournamentData = undefined;
+  lastGoodTournamentData = undefined;
+  lastGoodAt = 0;
+  loaderDiagnostics.result = "invalidated";
+  loaderDiagnostics.cacheBehavior = "miss";
+  loaderDiagnostics.errorCategory = "";
+  loaderDiagnostics.workbookCheck = "";
+  loaderDiagnostics.requiredSheetsFound = false;
 }
 
 export function tournamentLoaderDiagnostics() {

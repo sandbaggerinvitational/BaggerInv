@@ -1,10 +1,10 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { getTournamentData } from "../../../live/sheetData.js";
-import { playerPassportTokenFromRequest } from "../../../../lib/player-passport.js";
+import { getTournamentData, invalidateTournamentDataCache } from "../../../live/sheetData.js";
+import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data.js";
-import { resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
+import { readPlayerPassportMatches, resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,8 @@ const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 4
 
 export async function POST(request) {
   if (process.env.VERCEL_ENV !== "preview") return unavailable();
-  const authorization = await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+  const token = playerPassportTokenFromRequest(request);
+  const authorization = await inspectTournamentDirectorToken(token);
   if (authorization.status === "unavailable") {
     return NextResponse.json({ error: "Tournament Director identity could not be verified right now. Retry." }, { status: 503, headers: { "Retry-After": "1" } });
   }
@@ -24,6 +25,12 @@ export async function POST(request) {
     const result = await resetPreviewTournament(data.tournament.id, authorization.identity.actor.name);
     revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
     for (const path of ["/admin/director", "/home", "/live", "/my-match", "/leaderboards"]) revalidatePath(path);
+    invalidateTournamentDataCache();
+    const session = verifyPlayerPassportSession(token);
+    await Promise.all([
+      getTournamentData(),
+      readPlayerPassportMatches(session),
+    ]);
     return NextResponse.json({
       ok: true,
       message: "Preview Tournament Reset Complete",

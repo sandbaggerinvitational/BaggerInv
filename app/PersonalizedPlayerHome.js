@@ -11,6 +11,7 @@ import {
 import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app";
 import { courseLogo, teamLogo } from "../lib/asset-paths";
 import { formatHomeTime } from "../lib/home-dashboard";
+import { fetchWithTransientRetry } from "../lib/transient-fetch";
 import MobileIdentityImage from "./MobileIdentityImage";
 import MatchStatusBlock from "./MatchStatusBlock";
 import PlayerSetupBanner from "./PlayerSetupBanner";
@@ -157,7 +158,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
 
   const refresh = useCallback(async () => {
     try {
-      const response = await fetch("/api/player-passport/matches", { cache: "no-store" });
+      const response = await fetchWithTransientRetry("/api/player-passport/matches", { cache: "no-store" });
       if (response.status === 401) {
         setPayload(null); setState("public"); return;
       }
