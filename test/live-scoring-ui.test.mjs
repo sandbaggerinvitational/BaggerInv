@@ -19,7 +19,7 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /expectedRevision/);
   assert.doesNotMatch(source, /sessionStorage/);
   assert.match(source, /\/api\/scoring\/current/);
-  assert.match(source, /Restoring your authorized match/);
+  assert.match(source, /Please wait while your Player Passport and match are refreshed/);
   assert.match(source, /finalizedMatchResult\(match, data\?\.holeScores \|\| \[\], teamNames\)/);
   assert.match(source, /Return to My Match/);
   assert.match(source, /href="\/my-match"/);

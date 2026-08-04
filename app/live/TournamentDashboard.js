@@ -11,6 +11,7 @@ import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/ass
 import { formatHandicap, formatPlayerPoints, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
 import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
+import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import styles from "./tournament-dashboard.module.css";
 
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
@@ -203,12 +204,12 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const [openRounds, setOpenRounds] = useState(() => new Set());
   const [lastRefresh, setLastRefresh] = useState(Date.now());
   const [clock, setClock] = useState(Date.now());
-  const [refreshState, setRefreshState] = useState("current");
+  const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
   const pending = useRef(null);
   const refresh = useCallback(() => {
     if (pending.current) return pending.current;
     setRefreshState("refreshing");
-    pending.current = fetch("/api/live", { cache: "no-store" }).then(async (response) => {
+    pending.current = fetchWithTransientRetry("/api/live", { cache: "no-store" }).then(async (response) => {
       const payload = await response.json();
       if (!response.ok || !payload.data) throw new Error(payload.error || "Unable to refresh tournament data.");
       setData(payload.data); setLastRefresh(Date.now()); setRefreshState("current");
@@ -239,8 +240,8 @@ export default function TournamentDashboard({ initialData, loadError }) {
   });
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
   if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
-    <strong>{refreshState === "refreshing" ? "Loading tournament…" : "Tournament data is temporarily unavailable."}</strong>
-    <span>{refreshState === "refreshing" ? "Retrying the normalized tournament workbook." : loadError || "Please try again shortly."}</span>
+    <strong>{refreshState === "refreshing" ? "Preparing Tournament…" : "Tournament data is temporarily unavailable."}</strong>
+    <span>{refreshState === "refreshing" ? "Please wait while tournament data is refreshed." : "Automatic recovery could not be completed."}</span>
     {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
   </div></section>;
   return <section className={styles.page}>
@@ -270,6 +271,5 @@ export default function TournamentDashboard({ initialData, loadError }) {
     {selectedRound === "overall"
       ? <OverallLeaderboard rows={data?.leaderboard || []} />
       : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} format={activeRound?.format} />}
-    {loadError ? <p className={styles.note}>{loadError}</p> : null}
   </section>;
 }

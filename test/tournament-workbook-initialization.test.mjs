@@ -137,13 +137,15 @@ test("the normalized loader keeps Net Skins outside its required batch", async (
   assert.match(source, /workbookChecks/);
 });
 
-test("participant failure surfaces use safe workbook-check diagnostics", async () => {
-  const files = await Promise.all([
+test("server diagnostics stay internal while participant recovery uses friendly copy", async () => {
+  const diagnosticFiles = await Promise.all([
     readFile(new URL("../app/api/live/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/page.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/home/page.js", import.meta.url), "utf8"),
   ]);
-  files.forEach((source) => assert.match(source, /workbookInitializationMessage/));
+  diagnosticFiles.forEach((source) => assert.match(source, /workbookInitializationMessage/));
+  const home = await readFile(new URL("../app/home/page.js", import.meta.url), "utf8");
+  assert.match(home, /TournamentInitializationRecovery/);
+  assert.doesNotMatch(home, /workbookInitializationMessage/);
 });
 
 test("recorded hole scores pass stroke index into every Net Skins scorecard row", async () => {

@@ -95,7 +95,7 @@ test("Tournament avoids immediate duplicate refresh and all failure screens offe
   assert.match(tournament, /if \(!initialData\) refresh\(\)/);
   assert.match(tournament, />Retry</);
   assert.match(leaderboards, />Retry</);
-  assert.match(leaderboards, /Loading leaderboards/);
+  assert.match(leaderboards, /Preparing Tournament/);
 });
 
 test("Preview reliability diagnostic is preview-only and exposes no sensitive values", async () => {

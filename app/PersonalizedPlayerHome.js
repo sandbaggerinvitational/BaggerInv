@@ -157,6 +157,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
   const [now, setNow] = useState(Date.now());
 
   const refresh = useCallback(async () => {
+    setState((current) => current === "ready" ? current : "loading");
     try {
       const response = await fetchWithTransientRetry("/api/player-passport/matches", { cache: "no-store" });
       if (response.status === 401) {
@@ -208,7 +209,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
       <span className={styles.skeleton} />
       <span className={styles.skeleton} />
       <span className={styles.skeleton} />
-      <span className={styles.visuallyHidden}>Checking your Player Passport…</span>
+      <span className={styles.visuallyHidden}>Preparing your tournament…</span>
     </section>
     {tournamentPulse}
     {tournamentMoments}

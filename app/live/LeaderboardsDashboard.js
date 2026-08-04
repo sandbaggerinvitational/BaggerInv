@@ -11,6 +11,7 @@ import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import { publishedOddsInsights } from "../../lib/championship-odds-insights";
 import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from "../../lib/projection-editorial";
 import { tournamentIntelligenceStorylines } from "../../lib/tournament-intelligence-storylines";
+import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -262,7 +263,7 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
   const searchParams = useSearchParams();
   const [data, setData] = useState(initialData);
   const [currentPlayer, setCurrentPlayer] = useState(null);
-  const [refreshState, setRefreshState] = useState("current");
+  const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
   const pending = useRef(null);
   const tab = ["players", "teams", "skins", "insights"].includes(searchParams.get("tab")) ? searchParams.get("tab") : "players";
   const roundValues = new Set((data?.rounds || []).map((round) => String(round.number)));
@@ -277,7 +278,7 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
   const refresh = useCallback(() => {
     if (pending.current) return pending.current;
     setRefreshState("refreshing");
-    pending.current = fetch("/api/live", { cache: "no-store" }).then(async (response) => {
+    pending.current = fetchWithTransientRetry("/api/live", { cache: "no-store" }).then(async (response) => {
       const payload = await response.json();
       if (!response.ok || !payload.data) throw new Error(payload.error || "Unable to refresh standings.");
       setData(payload.data); setRefreshState("current");
@@ -294,8 +295,8 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
   }, [refresh]);
   const tournament = data?.tournament;
   if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
-    <strong>{refreshState === "refreshing" ? "Loading leaderboards…" : "Tournament data is temporarily unavailable."}</strong>
-    <span>{refreshState === "refreshing" ? "Retrying official standings." : loadError || "Please try again shortly."}</span>
+    <strong>{refreshState === "refreshing" ? "Preparing Tournament…" : "Tournament data is temporarily unavailable."}</strong>
+    <span>{refreshState === "refreshing" ? "Please wait while tournament data is refreshed." : "Automatic recovery could not be completed."}</span>
     {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
   </div></section>;
   return <section className={styles.page}>
@@ -308,6 +309,5 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "skins" ? <NetSkinsBoard data={data} currentPlayer={currentPlayer} /> : null}
     {tab === "insights" ? <Insights data={data} previewMode={previewMode} /> : null}
-    {loadError ? <p className={styles.loadNote}>{loadError}</p> : null}
   </section>;
 }

@@ -62,3 +62,25 @@ test("Home and My Match retry transient Passport reads without manual action", a
   assert.match(score, /fetchWithTransientRetry\("\/api\/player-passport\/session"/);
   assert.match(score, /fetchWithTransientRetry\("\/api\/player-passport\/matches"/);
 });
+
+test("recovering participant screens hide implementation diagnostics until retries finish", async () => {
+  const [recovery, homePage, home, score, tournament, leaderboards] = await Promise.all([
+    source("app/TournamentInitializationRecovery.js"),
+    source("app/home/page.js"),
+    source("app/PersonalizedPlayerHome.js"),
+    source("app/score/ScoreEntry.js"),
+    source("app/live/TournamentDashboard.js"),
+    source("app/live/LeaderboardsDashboard.js"),
+  ]);
+  assert.match(recovery, /Preparing Tournament/);
+  assert.match(recovery, /fetchWithTransientRetry\("\/api\/live"/);
+  assert.match(recovery, /state === "failed"/);
+  assert.match(homePage, /TournamentInitializationRecovery/);
+  assert.match(home, /Preparing your tournament/);
+  assert.match(score, /Preparing your tournament/);
+  assert.match(tournament, /Preparing Tournament/);
+  assert.match(leaderboards, /Preparing Tournament/);
+  for (const participantSource of [recovery, homePage, home, score, tournament, leaderboards]) {
+    assert.doesNotMatch(participantSource, /Workbook check failed|Required normalized-sheet snapshot|Passport verification failed/);
+  }
+});

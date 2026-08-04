@@ -373,7 +373,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   };
 
   if (restoring) return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>Opening scoring…</h1><p>Restoring your authorized match.</p></div>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>Please wait while your Player Passport and match are refreshed.</p></div>
   </section>;
 
   if (!authorized && passportPlayer) return <MyMatchDashboard

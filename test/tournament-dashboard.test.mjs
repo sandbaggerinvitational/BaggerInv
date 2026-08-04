@@ -52,7 +52,7 @@ test("Snapshot score receives final emphasis without losing protected responsive
 test("Tournament data refreshes on open, focus, visibility, and a guarded interval", async () => {
   const source = await readFile(componentUrl, "utf8");
   assert.match(source, /if \(pending\.current\) return pending\.current/);
-  assert.match(source, /fetch\("\/api\/live", \{ cache: "no-store" \}\)/);
+  assert.match(source, /fetchWithTransientRetry\("\/api\/live", \{ cache: "no-store" \}\)/);
   assert.match(source, /refresh\(\);\s*const poll/);
   assert.match(source, /window\.setInterval\(poll, 45_000\)/);
   assert.match(source, /window\.addEventListener\("focus", poll\)/);

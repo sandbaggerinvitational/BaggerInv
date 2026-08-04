@@ -2,8 +2,8 @@ import { privatePageMetadata } from "../../lib/seo";
 import MobileTournamentHome from "../MobileTournamentHome";
 import PreviewModeBadge from "../PreviewModeBadge";
 import PwaSplashIdentityBridge from "../PwaSplashIdentityBridge";
+import TournamentInitializationRecovery from "../TournamentInitializationRecovery";
 import { getTournamentData } from "../live/sheetData";
-import { workbookInitializationMessage } from "../../lib/tournament-workbook-initialization";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -16,13 +16,10 @@ export const metadata = {
 
 export default async function MobileHomePage() {
   let liveData;
-  let error = "";
-
   try {
     liveData = await getTournamentData();
   } catch (caughtError) {
     console.error("Mobile tournament dashboard could not be loaded.", caughtError);
-    error = workbookInitializationMessage(caughtError, "The tournament dashboard is temporarily unavailable.");
   }
 
   if (!liveData?.tournament) {
@@ -30,11 +27,7 @@ export default async function MobileHomePage() {
       <main className="mobileHomeMain">
         <PwaSplashIdentityBridge tournament={null} />
         <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
-        <section className="mobileHomeLoadError" role="alert">
-          <h1>Tournament dashboard</h1>
-          <p>{error || "Tournament data is not available yet."}</p>
-          <a href="/home">Retry</a>
-        </section>
+        <TournamentInitializationRecovery />
       </main>
     );
   }
