@@ -9,6 +9,7 @@ import {
   readCmsResource,
   reorderCmsRecord,
   saveCmsRecord,
+  withWorkbookWriteDiagnostics,
 } from "../../../../lib/google-sheets-write";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
@@ -24,6 +25,10 @@ function authorized(request) {
 
 const deny = () => NextResponse.json({ error: "Invalid admin password." }, { status: 401 });
 const filtersFrom = (source) => ({ tournament: source.get("tournament") || "", year: source.get("year") || "" });
+const saveTransactions = globalThis.__sbiCmsSaveTransactions || new Map();
+globalThis.__sbiCmsSaveTransactions = saveTransactions;
+const REVALIDATED_PATHS = ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/tournament-guide"];
+const MATCH_REVALIDATED_PATHS = ["/home", "/admin", "/players", "/live"];
 
 export async function GET(request) {
   if (!authorized(request)) return deny();
@@ -48,20 +53,58 @@ export async function POST(request) {
   try {
     body = await request.json();
     const { resource, action = "save", key, record, tournament, year, updatedBy, direction } = body;
+    const transactionId = String(request.headers.get("x-save-transaction-id") || body.transactionId || "").trim();
     const filters = { tournament: String(tournament || ""), year: String(year || "") };
     if (filters.tournament) assertValidTournamentId(filters.tournament);
-    let data;
-    if (action === "save") data = await saveCmsRecord(resource, record, { key, ...filters, updatedBy });
-    else if (action === "archive") data = await archiveCmsRecord(resource, key, updatedBy);
-    else if (action === "delete") data = await deleteCmsRecord(resource, key, updatedBy);
-    else if (action === "reorder") data = await reorderCmsRecord(resource, key, direction, filters, updatedBy);
-    else throw new Error("Unknown Admin Center action.");
-    revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
-    invalidateScorecardAnalyticsCache();
-    for (const path of ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/tournament-guide"]) revalidatePath(path);
-    return NextResponse.json({ data });
+    const execute = async () => {
+      const measured = await withWorkbookWriteDiagnostics(`cms:${resource}:${action}`, async () => {
+        if (action === "save") return saveCmsRecord(resource, record, { key, ...filters, updatedBy });
+        if (action === "archive") return archiveCmsRecord(resource, key, updatedBy);
+        if (action === "delete") return deleteCmsRecord(resource, key, updatedBy);
+        if (action === "reorder") return reorderCmsRecord(resource, key, direction, filters, updatedBy);
+        throw new Error("Unknown Admin Center action.");
+      });
+      const revalidatedPaths = resource === "matches" ? MATCH_REVALIDATED_PATHS : REVALIDATED_PATHS;
+      revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
+      invalidateScorecardAnalyticsCache();
+      for (const path of revalidatedPaths) revalidatePath(path);
+      return {
+        data: measured.result,
+        diagnostics: {
+          transactionId,
+          incomingHttpRequests: 1,
+          ...measured.diagnostics,
+          duplicateSubmissions: 0,
+          cacheInvalidations: 2 + revalidatedPaths.length,
+          downstreamOperations: { scorecardAnalyticsCache: 1, pageRevalidations: revalidatedPaths.length },
+        },
+      };
+    };
+    let result;
+    const existing = transactionId ? saveTransactions.get(transactionId) : null;
+    if (existing) {
+      result = await existing;
+      result = { ...result, diagnostics: { ...result.diagnostics, duplicateSubmissions: result.diagnostics.duplicateSubmissions + 1 } };
+    } else {
+      const pending = execute();
+      if (transactionId) {
+        saveTransactions.set(transactionId, pending);
+        setTimeout(() => saveTransactions.delete(transactionId), 30_000).unref?.();
+      }
+      result = await pending;
+    }
+    console.info("Admin CMS save transaction", { resource, action, key, ...result.diagnostics });
+    return NextResponse.json(result);
   } catch (error) {
-    console.error("Admin CMS save failed", { resource: body.resource, action: body.action, key: body.key, reason: error?.message || String(error), stack: error?.stack });
+    console.error("Admin CMS save failed", {
+      resource: body.resource,
+      action: body.action,
+      key: body.key,
+      transactionId: body.transactionId || "",
+      ...(error?.workbookDiagnostics || {}),
+      reason: error?.message || String(error),
+      stack: error?.stack,
+    });
     return NextResponse.json({ error: error?.message || "Unable to save Admin Center data." }, { status: 400 });
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import styles from "./cms-manager.module.css";
 
@@ -9,9 +9,10 @@ const displayValue = (value) => value === "TRUE" ? "Yes" : value === "FALSE" ? "
 
 async function adminRequest(secret, resource, { method = "GET", tournament = "", year = "", body } = {}) {
   const query = new URLSearchParams({ resource, tournament: String(tournament || ""), year: String(year || "") });
+  const transactionId = String(body?.transactionId || "");
   const response = await fetch(`/api/admin/cms?${query}`, {
     method,
-    headers: { "content-type": "application/json", "x-admin-secret": secret },
+    headers: { "content-type": "application/json", "x-admin-secret": secret, ...(transactionId ? { "x-save-transaction-id": transactionId } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   });
   const payload = await response.json();
@@ -40,6 +41,7 @@ export default function CmsManager({ resource, secret, tournamentId, year, updat
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const pendingSubmission = useRef(null);
 
   async function load(message = "Loading…") {
     setBusy(true); setStatus(message);
@@ -67,18 +69,30 @@ export default function CmsManager({ resource, secret, tournamentId, year, updat
   function change(name, value) { setDraft((current) => ({ ...current, [name]: value })); }
 
   async function act(action, row, extras = {}) {
+    if (pendingSubmission.current) return pendingSubmission.current;
     if (!updatedBy.trim()) { setStatus("Enter your name in the Admin Center bar before making changes."); return; }
     if (action === "delete" && !window.confirm(`Permanently delete this ${data.singular.toLowerCase()}? The action will be recorded in the Audit Log.`)) return;
     if (action === "archive" && !window.confirm(`Archive this ${data.singular.toLowerCase()}?`)) return;
-    setBusy(true); setStatus(`${action === "save" ? "Saving" : action === "reorder" ? "Reordering" : `${action[0].toUpperCase()}${action.slice(1)}ing`}…`);
-    try {
-      await adminRequest(secret, resource, {
+    const transactionId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const operation = (async () => {
+      setBusy(true); setStatus(`${action === "save" ? "Saving" : action === "reorder" ? "Reordering" : `${action[0].toUpperCase()}${action.slice(1)}ing`}…`);
+      try {
+      const saved = await adminRequest(secret, resource, {
         method: "POST", tournament: tournamentId, year,
-        body: { resource, action, key: row?.__key || editingKey, record: action === "save" ? draft : undefined, tournament: tournamentId, year, updatedBy, ...extras },
+        body: { resource, action, key: row?.__key || editingKey, record: action === "save" ? draft : undefined, tournament: tournamentId, year, updatedBy, transactionId, ...extras },
       });
-      setDraft(null); setEditingKey(""); await load("Refreshing…"); setStatus("Saved successfully.");
-    } catch (error) { setStatus(error.message); }
-    finally { setBusy(false); }
+      if (action === "save" && resource === "matches" && editingKey) {
+        setData((current) => ({ ...current, rows: current.rows.map((item) => item.__key === editingKey ? saved : item) }));
+        setDraft(null); setEditingKey(""); setStatus("Saved successfully.");
+      } else {
+        setDraft(null); setEditingKey(""); await load("Refreshing…"); setStatus("Saved successfully.");
+      }
+      } catch (error) { setStatus(error.message); }
+      finally { setBusy(false); }
+    })();
+    pendingSubmission.current = operation;
+    try { return await operation; }
+    finally { pendingSubmission.current = null; }
   }
 
   if (!data) return <section className={styles.manager}><div className={styles.notice}>{status || "Loading…"}</div></section>;
