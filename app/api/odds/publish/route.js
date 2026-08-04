@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { loadOddsInputs } from "../../../../lib/odds-data";
 import { ODDS_PHASES, simulateTournamentOdds, validateOpeningMatchups, validateRoundThreePairings } from "../../../../lib/tournament-odds";
 import { publishOddsSnapshot, readOddsSnapshots } from "../../../../lib/google-sheets-write";
+import { directorTransactionError } from "../../../../lib/director-transaction-error";
 
 export const dynamic = "force-dynamic";
 export async function POST(request) {
@@ -22,7 +23,20 @@ export async function POST(request) {
     const inputs = await loadOddsInputs();
     diagnostic.stepReached = "Pairing validation";
     const matchupStatus = validateOpeningMatchups(inputs.sheets);
-    if (!matchupStatus.ready) return NextResponse.json({ error: matchupStatus.message }, { status: 409 });
+    if (!matchupStatus.ready) {
+      const prerequisiteDiagnostic = {
+        stepReached: "Pairing validation",
+        worksheet: matchupStatus.roundReports?.find((report) => !report.ready)?.worksheet || "Unknown",
+        firstFailure: matchupStatus.firstFailure,
+        roundReports: matchupStatus.roundReports,
+      };
+      if (process.env.VERCEL_ENV === "preview") console.error("Championship projection prerequisite failed", prerequisiteDiagnostic);
+      else console.error("Championship projection prerequisite failed", { stepReached: prerequisiteDiagnostic.stepReached });
+      return NextResponse.json({
+        error: process.env.VERCEL_ENV === "preview" ? matchupStatus.firstFailure : "Championship projection pairing prerequisites are incomplete.",
+        ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: matchupStatus } : {}),
+      }, { status: 409 });
+    }
     if (["Round 3 Pairings Announced", "Final Results"].includes(phase)) {
       const roundThreeStatus = validateRoundThreePairings(inputs.sheets);
       if (!roundThreeStatus.ready) return NextResponse.json({ error: roundThreeStatus.message }, { status: 409 });
@@ -59,6 +73,6 @@ export async function POST(request) {
     };
     if (process.env.VERCEL_ENV === "preview") console.error("Championship projection publication failed", details);
     else console.error("Championship projection publication failed", { stepReached: details.stepReached, simulationPhase: details.simulationPhase });
-    return NextResponse.json({ error: "Championship projections could not be published. Please try again." }, { status: 500 });
+    return NextResponse.json({ error: directorTransactionError(error, "Championship projections could not be published. Please try again.", true) }, { status: 500 });
   }
 }
