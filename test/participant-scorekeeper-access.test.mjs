@@ -65,8 +65,8 @@ test("participant routes use HTTP-only cookies and server-side current-match aut
   assert.match(current, /requireWritable/);
   assert.doesNotMatch(scoreEntry, /sessionStorage/);
   assert.match(scoreEntry, /expectedUpdatedAt/);
-  assert.match(sheets, /appendDimension/);
-  assert.match(sheets, /requiredColumnCount - currentColumnCount/);
+  assert.match(sheets, /Workbook structure was not modified/);
+  assert.doesNotMatch(sheets, /appendDimension/);
   assert.match(adminControl, /key=\{match\["Match ID"\]\}/);
   assert.doesNotMatch(adminControl, /key=\{`\$\{match\["Match ID"\]\}-\$\{match\["Updated At"\]\}/);
   assert.match(adminControl, /accessByMatch/);

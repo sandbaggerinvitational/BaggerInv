@@ -94,10 +94,10 @@ test("normalized tournament payload reads both dedicated sheets without changing
 test("finalization and reopening automatically synchronize only the Net Skins Result sheet", async () => {
   const source = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
   assert.match(source, /synchronizeNetSkinsAfterMatch\(nextLive\)/g);
-  assert.match(source, /ensureTabHeaders\("Net Skins Result", NET_SKINS_RESULT_HEADERS\)/);
-  assert.match(source, /replaceTab\("Net Skins Result"/);
+  assert.match(source, /requireTabHeaders\("Net Skins Result", NET_SKINS_RESULT_HEADERS\)/);
+  assert.match(source, /replaceRuntimeRecords\("Net Skins Result"/);
   assert.match(source, /calculated\?\.finalized[\s\S]*netSkinsResultRecords/);
-  assert.doesNotMatch(source, /replaceTab\("(?:Live Matches|Live Hole Scores|Matches)"/);
+  assert.doesNotMatch(source, /replaceRuntimeRecords\("(?:Live Matches|Live Hole Scores|Matches)"/);
 });
 
 test("Leaderboards exposes Net Skins pot, payouts, and expandable winning-hole detail", async () => {

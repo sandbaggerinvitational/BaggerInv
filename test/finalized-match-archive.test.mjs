@@ -106,12 +106,13 @@ test("archive schema contains identity, competition, result, and audit fields", 
   ]) assert.ok(FINALIZED_MATCH_ARCHIVE_HEADERS.includes(field), field);
 });
 
-test("finalization writes the full archive snapshot on both insert and update", async () => {
+test("finalization writes only approved archive fields and preserves formula-owned Match ID", async () => {
   const source = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
-  assert.match(source, /ensureTabHeaders\("Matches", FINALIZED_MATCH_ARCHIVE_HEADERS\)/);
+  assert.match(source, /requireTabHeaders\("Matches", FINALIZED_MATCH_ARCHIVE_HEADERS\)/);
   assert.match(source, /buildFinalizedMatchArchiveSnapshot\(/);
-  assert.match(source, /matchesSheet\.headers\.map\(\(header\) => \[header, permanent\[header\]/);
-  assert.match(source, /appendSheetRow\("Matches", matchesSheet\.headers, permanent\)/);
+  assert.match(source, /writableFields\("Matches"\)/);
+  assert.match(source, /requires a workbook-generated Match ID row/);
+  assert.doesNotMatch(source, /appendSheetFields\("Matches"/);
 });
 
 test("Admin refreshes its draft from the authoritative returned Match Status", async () => {
