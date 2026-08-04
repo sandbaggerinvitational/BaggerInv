@@ -184,12 +184,12 @@ function Insights({ data, previewMode = false }) {
       <span>Published Tournament Projection</span><h2>🏆 Championship Odds</h2>
       <div><p><small>Round Phase</small><strong>{insights.current.phase}</strong></p><p><small>Published</small><strong>{publicationTime}</strong></p></div>
     </header>
+    {storyline ? <section className={insightStyles.storyline} aria-label="Projection Story"><span>Projection Story</span><p>{storyline}</p></section> : null}
     <section className={insightStyles.favorite} aria-label="Tournament Favorite">
-      <span>🥇 Tournament Favorite</span>{portrait(insights.favorite, insightStyles.favoritePortrait)}<h3>{insights.favorite.name}</h3>
-      <p className={insightStyles.favoriteStory}>Current Projection Favorite</p>
+      <span>🏆 Current Projection Favorite</span>{portrait(insights.favorite, insightStyles.favoritePortrait)}<h3>{insights.favorite.name}</h3>
+      <p className={insightStyles.favoriteStory}>Projected Tournament Champion</p>
       <div><p className={insightStyles.favoriteProbability}><small>Probability</small><strong>{percent(insights.favorite.probability)}</strong></p><p><small>American Odds</small><strong>{insights.favorite.americanOdds}</strong></p></div>
     </section>
-    {storyline ? <section className={insightStyles.storyline} aria-label="Tournament Storyline"><span>Tournament Storyline</span><p>{storyline}</p></section> : null}
     {insights.movers && (insights.movers.riser || insights.movers.faller) ? <section className={insightStyles.movers} aria-label="Biggest Movers">
       <header><span>Biggest Movers</span><h3>Since the previous published projection</h3></header><div>
         {[['Largest Positive Movement', insights.movers.riser], ['Largest Negative Movement', insights.movers.faller]].map(([label, player]) => player ? <article key={label}><span>{label}</span><strong>{player.name}</strong><dl><div><dt>Rank</dt><dd>{player.previous ? `${insights.previous.players.findIndex((entry) => String(entry.id) === String(player.id)) + 1} → ${player.rank}` : `#${player.rank}`}</dd></div><div><dt>Probability</dt><dd>{percent(player.previous?.probability)} → {percent(player.probability)}</dd></div><div><dt>Odds</dt><dd>{player.previous?.americanOdds} → {player.americanOdds}</dd></div></dl>{trend(player)}</article> : null)}
