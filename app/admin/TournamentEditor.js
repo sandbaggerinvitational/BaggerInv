@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { directorFetch } from "../../lib/director-client-transaction";
 import styles from "./admin-center.module.css";
 
 const LABELS = {
@@ -17,7 +18,7 @@ export default function TournamentEditor({ tournamentId, secret, sharedUpdatedBy
   const [data, setData] = useState(null), [draft, setDraft] = useState({}), [updatedBy, setUpdatedBy] = useState(sharedUpdatedBy), [status, setStatus] = useState(""), [busy, setBusy] = useState(false), [dirty, setDirty] = useState(false);
   const fields = useMemo(() => data?.editableFields || [], [data]);
   async function request(method, body) {
-    const response = await fetch(`/api/admin/tournament?tournament=${encodeURIComponent(tournamentId)}`, { method, headers: { "content-type": "application/json", "x-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
+    const response = await directorFetch(`/api/admin/tournament?tournament=${encodeURIComponent(tournamentId)}`, { method, headers: { "content-type": "application/json", "x-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
     const payload = await response.json(); if (!response.ok) throw new Error(payload.error || "Tournament request failed."); return payload;
   }
   async function load() { setBusy(true); setStatus("Loading tournament settings…"); try { const payload = await request("GET"); setData(payload); setDraft(payload.record); setDirty(Boolean(payload.recoveredIdentifier)); setStatus(payload.recoveredIdentifier ? `The tournament year was recovered as ${payload.record.Year}. Save Tournament to repair the blank Year cell.` : ""); } catch (error) { setStatus(error.message); } finally { setBusy(false); } }

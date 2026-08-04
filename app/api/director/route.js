@@ -8,6 +8,7 @@ import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readN
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
 import { notificationPreviewContextForPlayer, previewNotificationTemplateOptions } from "../../../lib/notification-templates.js";
+import { directorTransactionError } from "../../../lib/director-transaction-error.js";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +111,6 @@ export async function POST(request) {
     refresh();
     return NextResponse.json({ ok: true, changed: input.action === "automation-check" });
   } catch (error) {
-    return NextResponse.json({ error: error?.message || "Director action failed." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }
 }

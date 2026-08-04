@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { directorFetch } from "../../../lib/director-client-transaction";
 import { useCallback, useEffect, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
 import styles from "./director.module.css";
@@ -91,7 +92,7 @@ export default function DirectorDashboard({ directorName }) {
   useEffect(() => { load().catch((error) => setMessage(error.message)); }, [load]);
   useEffect(() => {
     if (!data?.automation?.enabled) return undefined;
-    const check = () => fetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "automation-check" }) }).then((response) => response.ok ? response.json() : null).then((result) => { if (result?.changed) load(); }).catch(() => {});
+    const check = () => directorFetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "automation-check" }) }).then((response) => response.ok ? response.json() : null).then((result) => { if (result?.changed) load(); }).catch(() => {});
     check();
     const timer = window.setInterval(check, 60_000);
     return () => window.clearInterval(timer);
@@ -99,7 +100,7 @@ export default function DirectorDashboard({ directorName }) {
   const act = async (action, extra = {}) => {
     setBusy(action); setMessage("");
     try {
-      const response = await fetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, round: Number(selectedRound), ...extra }) });
+      const response = await directorFetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, round: Number(selectedRound), ...extra }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Director action failed.");
       await load(); setMessage("Tournament operation completed.");
@@ -109,7 +110,7 @@ export default function DirectorDashboard({ directorName }) {
   const sendTestNotification = async (template) => {
     setBusy(`notification-${template.id}`); setMessage("");
     try {
-      const response = await fetch("/api/director/notifications/sandbox", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ templateId: template.id }) });
+      const response = await directorFetch("/api/director/notifications/sandbox", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ templateId: template.id }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Test notification could not be sent.");
       await load(); setMessage(`${template.label} sent to this device.`);
@@ -119,7 +120,7 @@ export default function DirectorDashboard({ directorName }) {
   const previewAsPlayer = async (playerId) => {
     setBusy("impersonation"); setMessage("");
     try {
-      const response = await fetch("/api/director/impersonation", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId }) });
+      const response = await directorFetch("/api/director/impersonation", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Preview player could not be selected.");
       router.push("/home");
@@ -128,7 +129,7 @@ export default function DirectorDashboard({ directorName }) {
   const resetPreviewTournament = async () => {
     setBusy("preview-reset"); setMessage("");
     try {
-      const response = await fetch("/api/director/reset-preview", { method: "POST", credentials: "same-origin" });
+      const response = await directorFetch("/api/director/reset-preview", { method: "POST", credentials: "same-origin" });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Preview tournament reset failed.");
       setResetOpen(false); setResetComplete(true); setSelectedRound("1"); setReopenId("");

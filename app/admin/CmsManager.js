@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import styles from "./cms-manager.module.css";
+import { directorFetch } from "../../lib/director-client-transaction";
 
 const truthy = (value) => value === true || /^(true|yes|y|1|active)$/i.test(String(value ?? ""));
 const displayValue = (value) => value === "TRUE" ? "Yes" : value === "FALSE" ? "No" : String(value ?? "").trim() || "—";
@@ -10,7 +11,7 @@ const displayValue = (value) => value === "TRUE" ? "Yes" : value === "FALSE" ? "
 async function adminRequest(secret, resource, { method = "GET", tournament = "", year = "", body } = {}) {
   const query = new URLSearchParams({ resource, tournament: String(tournament || ""), year: String(year || "") });
   const transactionId = String(body?.transactionId || "");
-  const response = await fetch(`/api/admin/cms?${query}`, {
+  const response = await directorFetch(`/api/admin/cms?${query}`, {
     method,
     headers: { "content-type": "application/json", "x-admin-secret": secret, ...(transactionId ? { "x-save-transaction-id": transactionId } : {}) },
     body: body ? JSON.stringify(body) : undefined,

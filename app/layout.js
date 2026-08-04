@@ -10,6 +10,7 @@ import {
 import PwaFoundation from "./PwaFoundation";
 import ParticipantIdentity from "./ParticipantIdentity";
 import PwaLaunchSplash from "./PwaLaunchSplash";
+import DirectorTransactionStatus from "./DirectorTransactionStatus";
 import { Suspense } from "react";
 
 const homeMetadata = pageMetadata({
@@ -165,6 +166,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <PwaLaunchSplash />
+        <DirectorTransactionStatus />
         <div className="pwa-app-scene">{children}</div>
         <Analytics />
         <PwaFoundation />

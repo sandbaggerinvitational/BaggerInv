@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { loadOddsInputs } from "../../../../lib/odds-data";
 import { ODDS_PHASES, simulateTournamentOdds, validateOpeningMatchups, validateRoundThreePairings } from "../../../../lib/tournament-odds";
 import { publishOddsSnapshot, readOddsSnapshots } from "../../../../lib/google-sheets-write";
+import { directorTransactionError } from "../../../../lib/director-transaction-error";
 
 export const dynamic = "force-dynamic";
 export async function POST(request) {
@@ -25,5 +26,5 @@ export async function POST(request) {
     if (phase === "Pre-Tournament" && existing.some((row) => row.phase !== "Pre-Tournament")) return NextResponse.json({ error: "Pre-Tournament is locked because the tournament has started." }, { status: 409 });
     const snapshot = await publishOddsSnapshot(preview);
     return NextResponse.json({ ok: true, snapshot });
-  } catch (error) { return NextResponse.json({ error: error.message || "Unable to publish odds." }, { status: 500 }); }
+  } catch (error) { return NextResponse.json({ error: directorTransactionError(error, "Championship projections could not be published. Please try again.") }, { status: 500 }); }
 }

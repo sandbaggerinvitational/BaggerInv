@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "./guide-editor.module.css";
+import { directorFetch } from "../../../lib/director-client-transaction";
 
 const TYPES = [
   ["sections", "Sections", "Section ID"],
@@ -46,7 +47,7 @@ export default function GuideEditor({ tournaments, embedded = false, sharedSecre
   useEffect(() => { if (embedded && sharedSecret && !data) load(); }, [embedded, sharedSecret]);
 
   async function request(method, body) {
-    const response = await fetch("/api/tournament-guide", { method, headers: { "content-type": "application/json", "x-guide-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
+    const response = await directorFetch("/api/tournament-guide", { method, headers: { "content-type": "application/json", "x-guide-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Guide Editor request failed.");
     return payload;

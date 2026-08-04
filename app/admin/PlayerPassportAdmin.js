@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { directorFetch } from "../../lib/director-client-transaction";
 import styles from "./player-passport-admin.module.css";
 
 export default function PlayerPassportAdmin({ secret, updatedBy }) {
@@ -10,7 +11,7 @@ export default function PlayerPassportAdmin({ secret, updatedBy }) {
   const [busy, setBusy] = useState(false);
 
   const request = async (method = "GET", body) => {
-    const response = await fetch("/api/player-passport/admin", {
+    const response = await directorFetch("/api/player-passport/admin", {
       method,
       headers: { "content-type": "application/json", "x-live-admin-secret": secret },
       body: body ? JSON.stringify({ ...body, updatedBy }) : undefined,

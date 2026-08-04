@@ -12,6 +12,7 @@ import {
 } from "../../../lib/google-sheets-write";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../lib/scorecard-data";
+import { directorTransactionError } from "../../../lib/director-transaction-error";
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +73,6 @@ export async function POST(request) {
     return NextResponse.json({ match: safeMatch });
   } catch (error) {
     console.error("Live Match Control action failed", { sheet: "Live Matches / Matches / Match Update Log", reason: error?.message || String(error), stack: error?.stack });
-    return NextResponse.json({ error: error?.message || "Unable to update the match." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error, "The match update could not be completed. Please try again.") }, { status: 400 });
   }
 }

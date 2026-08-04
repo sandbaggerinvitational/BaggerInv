@@ -6,6 +6,7 @@ import {
   readPlayerPassportAdminData,
   revokePlayerPassportDevices,
 } from "../../../../lib/google-sheets-write.js";
+import { directorTransactionError } from "../../../../lib/director-transaction-error.js";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,6 @@ export async function POST(request) {
     }
     throw new Error("Unknown Player Passport action.");
   } catch (error) {
-    return NextResponse.json({ error: error?.message || "Unable to update Player Passport." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }
 }

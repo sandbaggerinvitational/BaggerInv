@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteTournamentGuideRecord, readTournamentGuideAdminData, saveTournamentGuideRecord } from "../../../lib/google-sheets-write";
+import { directorTransactionError } from "../../../lib/director-transaction-error";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export async function POST(request) {
     return NextResponse.json({ record: await saveTournamentGuideRecord(type, record, updatedBy) });
   } catch (error) {
     console.error("Tournament Guide save failed", { sheet: "Guide tabs", reason: error?.message || String(error), stack: error?.stack });
-    return NextResponse.json({ error: error?.message || "Unable to save Tournament Guide content." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }
 }
 
@@ -41,6 +42,6 @@ export async function DELETE(request) {
     return NextResponse.json(await deleteTournamentGuideRecord(type, id, updatedBy));
   } catch (error) {
     console.error("Tournament Guide delete failed", { sheet: "Guide tabs", reason: error?.message || String(error), stack: error?.stack });
-    return NextResponse.json({ error: error?.message || "Unable to delete Tournament Guide content." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }
 }

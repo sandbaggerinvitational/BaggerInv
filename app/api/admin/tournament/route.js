@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { readTournamentAdminData, updateTournamentAdminData } from "../../../../lib/google-sheets-write";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
+import { directorTransactionError } from "../../../../lib/director-transaction-error";
 
 export const dynamic = "force-dynamic";
 function authorized(request) {
@@ -32,6 +33,6 @@ export async function POST(request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Tournament admin save failed", { sheet: "Tournaments", reason: error?.message || String(error), stack: error?.stack });
-    return NextResponse.json({ error: error?.message || "Unable to save tournament settings." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }
 }

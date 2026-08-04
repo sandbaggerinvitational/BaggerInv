@@ -6,6 +6,7 @@ import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data.js";
 import { resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
 import { initializeParticipantTournament, invalidateParticipantInitialization } from "../../../../lib/participant-initialization.js";
+import { directorTransactionError } from "../../../../lib/director-transaction-error.js";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,6 @@ export async function POST(request) {
       result,
     });
   } catch (error) {
-    return NextResponse.json({ error: error?.message || "Preview tournament reset failed." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error, "Preview tournament reset could not be completed. Please try again.") }, { status: 400 });
   }
 }

@@ -14,6 +14,7 @@ import {
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
 import { assertValidTournamentId } from "../../../../lib/tournament-identifiers";
+import { directorTransactionError } from "../../../../lib/director-transaction-error";
 
 export const dynamic = "force-dynamic";
 
@@ -105,6 +106,6 @@ export async function POST(request) {
       reason: error?.message || String(error),
       stack: error?.stack,
     });
-    return NextResponse.json({ error: error?.message || "Unable to save Admin Center data." }, { status: 400 });
+    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }
 }

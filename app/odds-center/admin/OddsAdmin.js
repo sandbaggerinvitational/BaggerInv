@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ODDS_PHASES } from "../../../lib/tournament-odds";
 import styles from "../odds.module.css";
+import { directorFetch } from "../../../lib/director-client-transaction";
 
 const COUNTS = [10_000, 25_000, 50_000, 100_000];
 
@@ -17,7 +18,7 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "" }) {
   async function publish() {
     setBusy(true); setPreview(null); setStatus(`Running ${iterations.toLocaleString()} tournament simulations…`);
     try {
-      const response = await fetch("/api/odds/publish", { method: "POST", headers: { "content-type": "application/json", "x-odds-admin-secret": secret }, body: JSON.stringify({ phase, iterations }) });
+      const response = await directorFetch("/api/odds/publish", { method: "POST", headers: { "content-type": "application/json", "x-odds-admin-secret": secret }, body: JSON.stringify({ phase, iterations }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Publishing failed.");
       setPreview(data.snapshot); setStatus(`${phase} published successfully from ${iterations.toLocaleString()} simulations.`);

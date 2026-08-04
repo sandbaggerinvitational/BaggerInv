@@ -8,6 +8,7 @@ import accessStyles from "./participant-access.module.css";
 import { getTournamentState } from "../../../lib/live-tournament";
 import { finalizationReview, hasUnsavedMatchChanges } from "../../../lib/live-admin-ux";
 import { formatStatusLabel, formatTeamPoints } from "../../../lib/formatters";
+import { directorFetch, runDirectorTransaction } from "../../../lib/director-client-transaction";
 
 const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Match Status", "Notes"];
 const PAIRING_FIELDS = ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"];
@@ -166,7 +167,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   useEffect(() => { if (embedded && sharedSecret && !data) load(); }, [embedded, sharedSecret]);
 
   const request = async (body) => {
-    const response = await fetch("/api/live-matches", { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-live-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
+    const response = await directorFetch("/api/live-matches", { method: body ? "POST" : "GET", headers: { "content-type": "application/json", "x-live-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Live Match Control request failed.");
     return payload;
@@ -175,7 +176,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const load = async () => {
     setBusy(true); setStatus("Loading matches…");
     try {
-      const payload = await request();
+      const payload = await runDirectorTransaction(() => request());
       setData(payload.data);
       const years = [...new Set(payload.data.matches.map((match) => String(match.Year)).filter(Boolean))].sort((a, b) => Number(b) - Number(a));
       setYear(String(selectedYear || years[0] || "")); setRound(""); setStatus("");
