@@ -5,10 +5,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AssetImage from "../AssetImage";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
+import TournamentIntelligenceStorylines from "./TournamentIntelligenceStorylines";
 import { playerPhoto, teamLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import { publishedOddsInsights } from "../../lib/championship-odds-insights";
 import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from "../../lib/projection-editorial";
+import { tournamentIntelligenceStorylines } from "../../lib/tournament-intelligence-storylines";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -168,6 +170,7 @@ function Insights({ data, previewMode = false }) {
   const selectedPlayer = insights.players.find((player) => String(player.id) === selectedPlayerId) || null;
   const selectedHistory = selectedPlayer ? projectionHistoryHighlights(publishedPlayerHistory(presentedSnapshots, selectedPlayerId)) : [];
   const storyline = tournamentProjectionStory({ current: insights.current, previous: insights.previous, playerTeams });
+  const intelligenceStorylines = tournamentIntelligenceStorylines({ snapshots: presentedSnapshots, playerTeams });
   useEffect(() => {
     if (!selectedPlayer) return undefined;
     const close = (event) => { if (event.key === "Escape") setSelectedPlayerId(""); };
@@ -204,6 +207,7 @@ function Insights({ data, previewMode = false }) {
         {insights.players.slice(10).map((player) => <button type="button" className={insightStyles.row} onClick={() => setSelectedPlayerId(String(player.id))} aria-label={`Open projection history for ${player.name}`} key={player.id}><strong>{player.rank}</strong><b>{player.name}</b><span>{percent(player.probability)}</span><span>{player.americanOdds}</span>{trend(player)}</button>)}</div> : null}
     </section>
     <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: {insights.current.phase}</strong><small>{publicationTime}</small><p>Official Sandbagger Odds Engine projection. Not live odds.</p></footer>
+    <TournamentIntelligenceStorylines stories={intelligenceStorylines} />
     {selectedPlayer ? <div className={insightStyles.sheetLayer} role="presentation"><button type="button" className={insightStyles.sheetBackdrop} onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details" /><section className={insightStyles.sheet} role="dialog" aria-modal="true" aria-labelledby="projection-player-name">
       <header><span>Player Projection</span><button type="button" onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details">×</button></header>
       <div className={insightStyles.sheetIdentity}>{portrait(selectedPlayer, insightStyles.sheetPortrait)}<div><h3 id="projection-player-name">{selectedPlayer.name}</h3><p>Current Championship Projection</p></div></div>
