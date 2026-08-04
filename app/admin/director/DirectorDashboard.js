@@ -77,6 +77,8 @@ export default function DirectorDashboard({ directorName }) {
   const [selectedRound, setSelectedRound] = useState("");
   const [reopenId, setReopenId] = useState("");
   const [testPlayerId, setTestPlayerId] = useState("");
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetComplete, setResetComplete] = useState(false);
   const load = useCallback(async () => {
     setMessage("");
     const response = await fetch("/api/director", { cache: "no-store", credentials: "same-origin" });
@@ -122,6 +124,18 @@ export default function DirectorDashboard({ directorName }) {
       if (!response.ok) throw new Error(payload.error || "Preview player could not be selected.");
       router.push("/home");
     } catch (error) { setMessage(error.message); setBusy(""); }
+  };
+  const resetPreviewTournament = async () => {
+    setBusy("preview-reset"); setMessage("");
+    try {
+      const response = await fetch("/api/director/reset-preview", { method: "POST", credentials: "same-origin" });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Preview tournament reset failed.");
+      setResetOpen(false); setResetComplete(true); setSelectedRound("1"); setReopenId("");
+      await load();
+      setMessage(`${payload.message}\n${payload.detail}`);
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(""); }
   };
   const resolveIssue = (item) => {
     const source = item.items?.[0] || item;
@@ -178,8 +192,9 @@ export default function DirectorDashboard({ directorName }) {
     <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><div className={styles.automationGrid}><article data-enabled={data.automation.enabled && data.automation.autoOpenRound ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoOpenRound ? "🟢" : "⚪"} Auto Open</span><strong>{data.automation.enabled && data.automation.autoOpenRound ? "Enabled" : "Disabled"}</strong><small>{data.nextEvent?.round ? `${data.nextEvent.title} · ${data.nextEvent.countdown}` : "No round action scheduled"}</small></article><article data-enabled={data.automation.enabled && data.automation.autoSetMatchesLive ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoSetMatchesLive ? "🟢" : "⚪"} Auto LIVE</span><strong>{data.automation.enabled && data.automation.autoSetMatchesLive ? "Enabled" : "Disabled"}</strong><small>{data.automation.autoSetMatchesLive ? "Runs when the round opens" : "Manual Set All LIVE required"}</small></article></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation · Manual override" : "Enable automation"}</button></section>
 
     <section className={styles.activity}><header><span>Audit trail</span><h2>Recent Activity</h2></header>{data.recentActivity.length ? <ul>{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No recent match activity.</p>}</section>
-    {data.qaTools ? <section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p></section> : null}
+    {data.qaTools ? <section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p>{resetComplete ? <div className={styles.resetComplete} role="status"><strong>Preview Tournament Reset Complete</strong><span>Ready for Dress Rehearsal.</span></div> : null}<div className={styles.resetUtility}><div><strong>Dress Rehearsal</strong><span>Clear runtime tournament results while preserving setup and content.</span></div><button disabled={Boolean(busy)} onClick={() => { setResetComplete(false); setResetOpen(true); }}>🔄 Reset Preview Tournament</button></div></section> : null}
     {data.notificationSandbox ? <section className={styles.notificationSandbox} aria-labelledby="notification-sandbox-title"><header><span>Preview only</span><h2 id="notification-sandbox-title">Notification Sandbox</h2></header><NotificationHealth sandbox={data.notificationSandbox} /><div className={styles.notificationTemplates}>{data.notificationSandbox.templates.map((template) => <button disabled={Boolean(busy) || !data.notificationSandbox.currentDeviceReady} onClick={() => sendTestNotification(template)} key={template.id}>{template.label}</button>)}</div><h3>Notification Log</h3>{data.notificationSandbox.log.length ? <div className={styles.notificationLog}>{data.notificationSandbox.log.map((item) => <article key={item.id}><div><strong>{item.type}</strong><span>{item.recipient}{item.template ? ` · ${item.template}` : ""}</span></div><time>{timestamp(item.sentAt)}</time><b data-status={item.status === "Failed" ? "failed" : "sent"}>{item.status}</b>{item.failure ? <small>{item.failure}</small> : null}</article>)}</div> : <p>No test notifications have been sent.</p>}</section> : null}
     <Link className={styles.fullAdmin} href="/admin">Open Full Admin →</Link>
+    {resetOpen ? <div className={styles.resetBackdrop} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) setResetOpen(false); }}><section className={styles.resetDialog} role="dialog" aria-modal="true" aria-labelledby="reset-preview-title"><span>Preview only</span><h2 id="reset-preview-title">Reset Preview Tournament?</h2><p>This will return the Preview tournament to the beginning of tournament week.</p><strong>Production data will NOT be affected.</strong><div><button disabled={Boolean(busy)} onClick={() => setResetOpen(false)}>Cancel</button><button disabled={Boolean(busy)} onClick={resetPreviewTournament}>{busy === "preview-reset" ? "Resetting…" : "Reset Preview"}</button></div></section></div> : null}
   </section>;
 }

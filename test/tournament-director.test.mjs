@@ -197,10 +197,11 @@ test("Director page, actions, impersonation, and sandbox share one actor-aware a
     source("app/api/director/route.js"),
     source("app/api/director/impersonation/route.js"),
     source("app/api/director/notifications/sandbox/route.js"),
+    source("app/api/director/reset-preview/route.js"),
   ];
   assert.match(resolver, /export async function inspectTournamentDirectorToken/);
   assert.match(resolver, /isTournamentDirectorActor\(result\.identity\)/);
   for (const consumer of consumers) assert.match(consumer, /inspectTournamentDirectorToken/);
   const dashboard = source("app/admin/director/DirectorDashboard.js");
-  assert.equal((dashboard.match(/credentials: "same-origin"/g) || []).length, 5);
+  assert.equal((dashboard.match(/credentials: "same-origin"/g) || []).length, 6);
 });
