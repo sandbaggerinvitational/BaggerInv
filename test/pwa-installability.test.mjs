@@ -49,6 +49,10 @@ test("iPhone release metadata uses safe-area viewport, launch images, and a mask
   assert.match(layout, /applicationName: "The Bagger"/);
   assert.match(layout, /url: "\/apple-touch-icon\.png"/);
   assert.match(layout, /startupImage/);
+  assert.match(layout, /<meta name="apple-mobile-web-app-capable" content="yes" \/>/);
+  assert.match(layout, /<meta name="apple-mobile-web-app-title" content="The Bagger" \/>/);
+  assert.match(layout, /<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" \/>/);
+  assert.match(layout, /rel="apple-touch-startup-image" href=\{url\} media=\{media\}/);
   for (const dimensions of [
     "640x1136", "750x1334", "1242x2208", "1125x2436", "1170x2532", "1179x2556",
     "1206x2622", "828x1792", "1242x2688", "1284x2778", "1290x2796", "1320x2868",
