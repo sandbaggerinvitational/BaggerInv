@@ -158,15 +158,34 @@ test("Championship Odds promotes the favorite and supplied Top 10 without changi
   assert.match(source, /insights\.players\.slice\(10\)/);
   assert.match(source, /First Projection/);
   assert.match(source, /Movement tracking begins after the next published Championship Projection\./);
-  assert.match(source, /Projected Tournament Champion/);
+  assert.match(source, /Current Projection Favorite/);
   assert.match(source, /rankMark/);
   assert.match(source, /data-medal=\{player\.rank <= 3 \|\| undefined\}/);
   assert.match(insightStyles, /favoritePortrait/);
   assert.match(insightStyles, /favoriteProbability/);
   assert.match(insightStyles, /topPlayers/);
-  assert.match(insightStyles, /min-height:235px/);
+  assert.match(insightStyles, /min-height:250px/);
   assert.match(insightStyles, /moversEmpty/);
   assert.match(insightStyles, /text-overflow:ellipsis/);
+});
+
+test("Championship Projections opens in-place player details from every published field", async () => {
+  const [source, insightStyles] = await Promise.all([
+    readFile(componentUrl, "utf8"),
+    readFile(new URL("../app/live/leaderboards-insights.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(source, /selectedPlayerId/);
+  assert.match(source, /role="dialog" aria-modal="true"/);
+  assert.match(source, /Current Championship Projection/);
+  assert.match(source, /Projection History/);
+  assert.match(source, /This is the first published Championship Projection\./);
+  assert.match(source, /\(snapshot\.players \|\| \[\]\)\.find/);
+  assert.match(source, /setSelectedPlayerId\(String\(player\.id\)\)/);
+  assert.doesNotMatch(source, /router\.push\([^\n]*projection/);
+  assert.match(insightStyles, /sheetLayer\{position:fixed/);
+  assert.match(insightStyles, /data-podium="1"/);
+  assert.match(insightStyles, /data-podium="2"/);
+  assert.match(insightStyles, /data-podium="3"/);
 });
 
 test("Leaderboards use shared tournament identity, URL tabs, search, expansion, and Passport highlighting", async () => {

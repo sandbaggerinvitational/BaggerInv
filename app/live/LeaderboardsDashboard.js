@@ -131,6 +131,7 @@ function Teams({ data, selectedRound, currentPlayer }) {
 
 function Insights({ data }) {
   const [snapshots, setSnapshots] = useState(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState("");
   useEffect(() => {
     const controller = new AbortController();
     fetch(`/api/leaderboards/insights?year=${encodeURIComponent(data.tournament?.year || "")}`, { cache: "no-store", signal: controller.signal })
@@ -148,6 +149,17 @@ function Insights({ data }) {
     : <span className={player.change > 0 ? insightStyles.up : player.change < 0 ? insightStyles.down : insightStyles.neutral}>{player.change > 0 ? "▲ +" : player.change < 0 ? "▼ " : "— "}{player.change ? `${player.change.toFixed(1)}%` : "Even"}</span>;
   const portrait = (player, className = "") => <span className={`${insightStyles.portrait} ${className}`.trim()}><AssetImage src={playerPhoto(playerPhotos.get(String(player.id)))} alt="" fallbackClassName={insightStyles.portraitFallback} fallback={initials(player.name)} inferFallback={false} /></span>;
   const rankMark = (rank) => ["🥇", "🥈", "🥉"][rank - 1] || `#${rank}`;
+  const selectedPlayer = insights.players.find((player) => String(player.id) === selectedPlayerId) || null;
+  const selectedHistory = selectedPlayer ? (snapshots || []).map((snapshot) => {
+    const player = (snapshot.players || []).find((entry) => String(entry.id) === selectedPlayerId);
+    return player ? { phase: snapshot.phase, publishedAt: snapshot.publishedAt, player } : null;
+  }).filter(Boolean) : [];
+  useEffect(() => {
+    if (!selectedPlayer) return undefined;
+    const close = (event) => { if (event.key === "Escape") setSelectedPlayerId(""); };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [selectedPlayer]);
 
   if (snapshots === null) return <section className={insightStyles.experience} aria-busy="true"><div className={styles.empty}><strong>Loading Championship Odds…</strong><span>Retrieving the latest published tournament projection.</span></div></section>;
   if (!insights.current) return <section className={insightStyles.experience}><div className={styles.empty}><strong>Championship Odds</strong><span>Tournament projections will publish after official pairings are finalized.</span></div></section>;
@@ -159,7 +171,7 @@ function Insights({ data }) {
     </header>
     <section className={insightStyles.favorite} aria-label="Tournament Favorite">
       <span>🥇 Tournament Favorite</span>{portrait(insights.favorite, insightStyles.favoritePortrait)}<h3>{insights.favorite.name}</h3>
-      <p className={insightStyles.favoriteStory}>Projected Tournament Champion</p>
+      <p className={insightStyles.favoriteStory}>Current Projection Favorite</p>
       <div><p className={insightStyles.favoriteProbability}><small>Probability</small><strong>{percent(insights.favorite.probability)}</strong></p><p><small>American Odds</small><strong>{insights.favorite.americanOdds}</strong></p></div>
     </section>
     {insights.movers && (insights.movers.riser || insights.movers.faller) ? <section className={insightStyles.movers} aria-label="Biggest Movers">
@@ -168,15 +180,23 @@ function Insights({ data }) {
       </div></section> : <section className={`${insightStyles.movers} ${insightStyles.moversEmpty}`} aria-label="Biggest Movers"><span>Biggest Movers</span><p>Movement tracking begins after the next published Championship Projection.</p></section>}
     <section className={insightStyles.board} aria-label="Full Odds Board">
       <header><span>Championship Odds Board</span><h3>Published player projections</h3></header>
-      <div className={insightStyles.topPlayers}>{insights.players.slice(0, 10).map((player) => <article className={insightStyles.topPlayer} key={player.id}>
+      <div className={insightStyles.topPlayers}>{insights.players.slice(0, 10).map((player) => <button type="button" className={insightStyles.topPlayer} data-podium={player.rank <= 3 ? player.rank : undefined} onClick={() => setSelectedPlayerId(String(player.id))} aria-label={`Open projection history for ${player.name}`} key={player.id}>
         <strong className={insightStyles.rank} data-medal={player.rank <= 3 || undefined}>{rankMark(player.rank)}</strong>{portrait(player)}<b>{player.name}</b>
         <div><p className={insightStyles.cardProbability}><small>Probability</small><strong>{percent(player.probability)}</strong></p><p><small>American Odds</small><strong>{player.americanOdds}</strong></p></div>
         <p className={insightStyles.cardTrend}><small>Trend</small>{trend(player)}</p>
-      </article>)}</div>
+      </button>)}</div>
       {insights.players.length > 10 ? <div className={insightStyles.remaining}><div className={insightStyles.remainingTitle}>Remaining Field</div><div className={insightStyles.row} data-header="true"><span>Rank</span><span>Player</span><span>Probability</span><span>Odds</span><span>Trend</span></div>
-        {insights.players.slice(10).map((player) => <div className={insightStyles.row} key={player.id}><strong>{player.rank}</strong><b>{player.name}</b><span>{percent(player.probability)}</span><span>{player.americanOdds}</span>{trend(player)}</div>)}</div> : null}
+        {insights.players.slice(10).map((player) => <button type="button" className={insightStyles.row} onClick={() => setSelectedPlayerId(String(player.id))} aria-label={`Open projection history for ${player.name}`} key={player.id}><strong>{player.rank}</strong><b>{player.name}</b><span>{percent(player.probability)}</span><span>{player.americanOdds}</span>{trend(player)}</button>)}</div> : null}
     </section>
     <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: {insights.current.phase}</strong><small>{publicationTime}</small><p>Official Sandbagger Odds Engine projection. Not live odds.</p></footer>
+    {selectedPlayer ? <div className={insightStyles.sheetLayer} role="presentation"><button type="button" className={insightStyles.sheetBackdrop} onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details" /><section className={insightStyles.sheet} role="dialog" aria-modal="true" aria-labelledby="projection-player-name">
+      <header><span>Player Projection</span><button type="button" onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details">×</button></header>
+      <div className={insightStyles.sheetIdentity}>{portrait(selectedPlayer, insightStyles.sheetPortrait)}<div><h3 id="projection-player-name">{selectedPlayer.name}</h3><p>Current Championship Projection</p></div></div>
+      <div className={insightStyles.sheetSummary}><p><small>Rank</small><strong>#{selectedPlayer.rank}</strong></p><p><small>Probability</small><strong>{percent(selectedPlayer.probability)}</strong></p><p><small>American Odds</small><strong>{selectedPlayer.americanOdds}</strong></p><p><small>Trend</small>{trend(selectedPlayer)}</p></div>
+      <section className={insightStyles.history}><header><span>Projection History</span><p>Official published snapshots</p></header>
+        {selectedHistory.length > 1 ? <ol>{selectedHistory.map(({ phase, publishedAt, player }) => <li key={`${phase}-${publishedAt}`}><div><strong>{phase}</strong><small>{publishedAt ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(publishedAt)) : "Published"}</small></div><span><b>{player.americanOdds}</b><strong>{percent(player.probability)}</strong></span></li>)}</ol> : <p className={insightStyles.firstHistory}>This is the first published Championship Projection.</p>}
+      </section>
+    </section></div> : null}
   </section>;
 }
 
