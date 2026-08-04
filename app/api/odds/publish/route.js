@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { loadOddsInputs } from "../../../../lib/odds-data";
 import { ODDS_PHASES, simulateTournamentOdds, validateOpeningMatchups, validateRoundThreePairings } from "../../../../lib/tournament-odds";
 import { publishOddsSnapshot, readOddsSnapshots } from "../../../../lib/google-sheets-write";
@@ -25,6 +26,7 @@ export async function POST(request) {
     const existing = (await readOddsSnapshots()).filter((row) => row.year === preview.year);
     if (phase === "Pre-Tournament" && existing.some((row) => row.phase !== "Pre-Tournament")) return NextResponse.json({ error: "Pre-Tournament is locked because the tournament has started." }, { status: 409 });
     const snapshot = await publishOddsSnapshot(preview);
+    for (const path of ["/odds-center", "/live", "/home"]) revalidatePath(path);
     return NextResponse.json({ ok: true, snapshot });
   } catch (error) { return NextResponse.json({ error: directorTransactionError(error, "Championship projections could not be published. Please try again.") }, { status: 500 }); }
 }

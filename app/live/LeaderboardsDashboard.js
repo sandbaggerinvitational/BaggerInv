@@ -12,6 +12,7 @@ import { publishedOddsInsights } from "../../lib/championship-odds-insights";
 import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from "../../lib/projection-editorial";
 import { tournamentIntelligenceStorylines } from "../../lib/tournament-intelligence-storylines";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
+import { isTournamentRecapPhase, projectionPresentationLabel, tournamentRecapFromSnapshot } from "../../lib/projection-phases";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -134,9 +135,11 @@ function Teams({ data, selectedRound, currentPlayer }) {
 }
 
 const PREVIEW_ODDS_SCENARIOS = [
-  { label: "Pre-Tournament", phases: ["Pre-Tournament"] },
-  { label: "Round 2 Pairings", phases: ["Round 2 Pairings", "After Round 1"] },
-  { label: "Round 3 Pairings", phases: ["Round 3 Pairings", "Round 3 Pairings Announced", "After Round 2"] },
+  { label: "Opening Championship Projection", phases: ["Pre-Tournament"] },
+  { label: "Round 2 Pairings Projection", phases: ["After Round 1"] },
+  { label: "Championship Outlook", phases: ["After Round 2"] },
+  { label: "Championship Singles Projection", phases: ["Round 3 Pairings Announced"] },
+  { label: "Tournament Recap", phases: ["Final Results"] },
 ];
 
 function Insights({ data, previewMode = false }) {
@@ -182,11 +185,23 @@ function Insights({ data, previewMode = false }) {
   if (snapshots === null) return <section className={insightStyles.experience} aria-busy="true"><div className={styles.empty}><strong>Loading Championship Odds…</strong><span>Retrieving the latest published tournament projection.</span></div></section>;
   if (!insights.current) return <section className={insightStyles.experience}><div className={styles.empty}><strong>Championship Odds</strong><span>Tournament projections will publish after official pairings are finalized.</span></div></section>;
 
+  if (isTournamentRecapPhase(insights.current.phase)) {
+    const recap = tournamentRecapFromSnapshot(insights.current);
+    const tied = recap.champions.length > 1;
+    return <section className={insightStyles.experience} aria-label="Tournament Recap">
+      {previewMode && previewScenarios.length ? <section className={insightStyles.scenarioSelector} aria-label="Preview Odds Scenarios"><label><span>Preview Odds Scenario</span><select value={insights.current.phase} onChange={(event) => { setPreviewPhase(event.target.value); setSelectedPlayerId(""); }}>{previewScenarios.map((scenario) => <option value={scenario.snapshot.phase} key={scenario.label}>{scenario.label}</option>)}</select></label><p>Preview only · official published snapshots</p></section> : null}
+      <header className={insightStyles.hero}><span>Official Tournament Result</span><h2>🏆 Tournament Recap</h2><div><p><small>Published</small><strong>{publicationTime}</strong></p></div></header>
+      <section className={insightStyles.favorite} aria-label={tied ? "Tournament tied" : "Tournament champions"}><span>{tied ? "Tournament Result" : "Tournament Champions"}</span><h3>{recap.champions.map((team) => team.name).join(" and ")}</h3><div>{recap.teams.map((team) => <p key={team.side}><small>{team.name}</small><strong>{formatTeamPoints(team.expectedPoints)}</strong></p>)}</div></section>
+      <section className={insightStyles.board} aria-label="Tournament points leaders"><header><span>Tournament Points Leaders</span><h3>Final individual standings</h3></header><div className={insightStyles.topPlayers}>{recap.players.slice(0, 10).map((player, index) => <div className={insightStyles.topPlayer} key={player.id}><strong className={insightStyles.rank}>{rankMark(index + 1)}</strong>{portrait(player)}<b>{player.name}</b><div><p className={insightStyles.cardProbability}><small>Final Points</small><strong>{formatPlayerPoints(player.expectedPoints)}</strong></p><p><small>Final Record</small><strong>{player.expectedRecord}</strong></p></div></div>)}</div></section>
+      <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: Tournament Recap</strong><small>{publicationTime}</small><p>Official completed tournament outcome. Championship Projections are now closed.</p></footer>
+    </section>;
+  }
+
   return <section className={insightStyles.experience} aria-label="Championship Odds">
     {previewMode && previewScenarios.length ? <section className={insightStyles.scenarioSelector} aria-label="Preview Odds Scenarios"><label><span>Preview Odds Scenario</span><select value={insights.current.phase} onChange={(event) => { setPreviewPhase(event.target.value); setSelectedPlayerId(""); }}>{previewScenarios.map((scenario) => <option value={scenario.snapshot.phase} key={scenario.label}>{scenario.label}</option>)}</select></label><p>Preview only · official published snapshots</p></section> : null}
     <header className={insightStyles.hero}>
       <span>Published Tournament Projection</span><h2>🏆 Championship Odds</h2>
-      <div><p><small>Round Phase</small><strong>{insights.current.phase}</strong></p><p><small>Published</small><strong>{publicationTime}</strong></p></div>
+      <div><p><small>Projection Milestone</small><strong>{projectionPresentationLabel(insights.current.phase)}</strong></p><p><small>Published</small><strong>{publicationTime}</strong></p></div>
     </header>
     {storyline ? <section className={insightStyles.storyline} aria-label="Projection Story"><span>Projection Story</span><p>{storyline}</p></section> : null}
     <section className={insightStyles.favorite} aria-label="Tournament Favorite">
@@ -207,7 +222,7 @@ function Insights({ data, previewMode = false }) {
       {insights.players.length > 10 ? <div className={insightStyles.remaining}><div className={insightStyles.remainingTitle}>Remaining Field</div><div className={insightStyles.row} data-header="true"><span>Rank</span><span>Player</span><span>Probability</span><span>Odds</span><span>Trend</span></div>
         {insights.players.slice(10).map((player) => <button type="button" className={insightStyles.row} onClick={() => setSelectedPlayerId(String(player.id))} aria-label={`Open projection history for ${player.name}`} key={player.id}><strong>{player.rank}</strong><b>{player.name}</b><span>{percent(player.probability)}</span><span>{player.americanOdds}</span>{trend(player)}</button>)}</div> : null}
     </section>
-    <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: {insights.current.phase}</strong><small>{publicationTime}</small><p>Official Sandbagger Odds Engine projection. Not live odds.</p></footer>
+    <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: {projectionPresentationLabel(insights.current.phase)}</strong><small>{publicationTime}</small><p>Official Sandbagger Odds Engine projection. Not live odds.</p></footer>
     <TournamentIntelligenceStorylines stories={intelligenceStorylines} />
     {selectedPlayer ? <div className={insightStyles.sheetLayer} role="presentation"><button type="button" className={insightStyles.sheetBackdrop} onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details" /><section className={insightStyles.sheet} role="dialog" aria-modal="true" aria-labelledby="projection-player-name">
       <header><span>Player Projection</span><button type="button" onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details">×</button></header>

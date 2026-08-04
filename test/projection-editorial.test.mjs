@@ -24,7 +24,7 @@ test("published player history preserves milestones and existing values", () => 
     snapshot("Round 3 Pairings Announced", [player("a", "Clay Beltran", 18, "+450")]),
   ], "a");
   assert.deepEqual(history.map(({ phase, probability, americanOdds }) => [phase, probability, americanOdds]), [
-    ["Pre-Tournament", 9, "+1200"], ["Round 2 Pairings", 15, "+650"], ["Round 3 Pairings", 18, "+450"],
+    ["Opening Championship Projection", 9, "+1200"], ["Round 2 Pairings Projection", 15, "+650"], ["Championship Singles Projection", 18, "+450"],
   ]);
   assert.equal(history.at(-1).current, true);
 });
