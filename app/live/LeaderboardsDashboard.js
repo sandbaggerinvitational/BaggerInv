@@ -8,6 +8,7 @@ import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { playerPhoto, teamLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import { publishedOddsInsights } from "../../lib/championship-odds-insights";
+import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from "../../lib/projection-editorial";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -156,6 +157,7 @@ function Insights({ data, previewMode = false }) {
   const presentedSnapshots = selectedScenarioIndex >= 0 ? snapshots.slice(0, selectedScenarioIndex + 1) : (snapshots || []);
   const insights = useMemo(() => publishedOddsInsights(presentedSnapshots), [presentedSnapshots]);
   const playerPhotos = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.photo])), [data.leaderboard]);
+  const playerTeams = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.team])), [data.leaderboard]);
   const percent = (value) => `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
   const publicationTime = insights.current?.publishedAt ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(insights.current.publishedAt)) : "—";
   const trend = (player) => player?.change === null || player?.change === undefined
@@ -164,10 +166,8 @@ function Insights({ data, previewMode = false }) {
   const portrait = (player, className = "") => <span className={`${insightStyles.portrait} ${className}`.trim()}><AssetImage src={playerPhoto(playerPhotos.get(String(player.id)))} alt="" fallbackClassName={insightStyles.portraitFallback} fallback={initials(player.name)} inferFallback={false} /></span>;
   const rankMark = (rank) => ["🥇", "🥈", "🥉"][rank - 1] || `#${rank}`;
   const selectedPlayer = insights.players.find((player) => String(player.id) === selectedPlayerId) || null;
-  const selectedHistory = selectedPlayer ? presentedSnapshots.map((snapshot) => {
-    const player = (snapshot.players || []).find((entry) => String(entry.id) === selectedPlayerId);
-    return player ? { phase: snapshot.phase, publishedAt: snapshot.publishedAt, player } : null;
-  }).filter(Boolean) : [];
+  const selectedHistory = selectedPlayer ? projectionHistoryHighlights(publishedPlayerHistory(presentedSnapshots, selectedPlayerId)) : [];
+  const storyline = tournamentProjectionStory({ current: insights.current, previous: insights.previous, playerTeams });
   useEffect(() => {
     if (!selectedPlayer) return undefined;
     const close = (event) => { if (event.key === "Escape") setSelectedPlayerId(""); };
@@ -189,9 +189,10 @@ function Insights({ data, previewMode = false }) {
       <p className={insightStyles.favoriteStory}>Current Projection Favorite</p>
       <div><p className={insightStyles.favoriteProbability}><small>Probability</small><strong>{percent(insights.favorite.probability)}</strong></p><p><small>American Odds</small><strong>{insights.favorite.americanOdds}</strong></p></div>
     </section>
+    {storyline ? <section className={insightStyles.storyline} aria-label="Tournament Storyline"><span>Tournament Storyline</span><p>{storyline}</p></section> : null}
     {insights.movers && (insights.movers.riser || insights.movers.faller) ? <section className={insightStyles.movers} aria-label="Biggest Movers">
       <header><span>Biggest Movers</span><h3>Since the previous published projection</h3></header><div>
-        {[['Largest Positive Movement', insights.movers.riser], ['Largest Negative Movement', insights.movers.faller]].map(([label, player]) => player ? <article key={label}><span>{label}</span><strong>{player.name}</strong><p>{player.previous.americanOdds} <i aria-hidden="true">→</i> {player.americanOdds}</p>{trend(player)}</article> : null)}
+        {[['Largest Positive Movement', insights.movers.riser], ['Largest Negative Movement', insights.movers.faller]].map(([label, player]) => player ? <article key={label}><span>{label}</span><strong>{player.name}</strong><dl><div><dt>Rank</dt><dd>{player.previous ? `${insights.previous.players.findIndex((entry) => String(entry.id) === String(player.id)) + 1} → ${player.rank}` : `#${player.rank}`}</dd></div><div><dt>Probability</dt><dd>{percent(player.previous?.probability)} → {percent(player.probability)}</dd></div><div><dt>Odds</dt><dd>{player.previous?.americanOdds} → {player.americanOdds}</dd></div></dl>{trend(player)}</article> : null)}
       </div></section> : <section className={`${insightStyles.movers} ${insightStyles.moversEmpty}`} aria-label="Biggest Movers"><span>Biggest Movers</span><p>Movement tracking begins after the next published Championship Projection.</p></section>}
     <section className={insightStyles.board} aria-label="Full Odds Board">
       <header><span>Championship Odds Board</span><h3>Published player projections</h3></header>
@@ -208,8 +209,9 @@ function Insights({ data, previewMode = false }) {
       <header><span>Player Projection</span><button type="button" onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details">×</button></header>
       <div className={insightStyles.sheetIdentity}>{portrait(selectedPlayer, insightStyles.sheetPortrait)}<div><h3 id="projection-player-name">{selectedPlayer.name}</h3><p>Current Championship Projection</p></div></div>
       <div className={insightStyles.sheetSummary}><p><small>Rank</small><strong>#{selectedPlayer.rank}</strong></p><p><small>Probability</small><strong>{percent(selectedPlayer.probability)}</strong></p><p><small>American Odds</small><strong>{selectedPlayer.americanOdds}</strong></p><p><small>Trend</small>{trend(selectedPlayer)}</p></div>
+      <p className={insightStyles.playerSummary}>{playerProjectionSummary(selectedPlayer.name, selectedHistory)}</p>
       <section className={insightStyles.history}><header><span>Projection History</span><p>Official published snapshots</p></header>
-        {selectedHistory.length > 1 ? <ol>{selectedHistory.map(({ phase, publishedAt, player }) => <li key={`${phase}-${publishedAt}`}><div><strong>{phase}</strong><small>{publishedAt ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(publishedAt)) : "Published"}</small></div><span><b>{player.americanOdds}</b><strong>{percent(player.probability)}</strong></span></li>)}</ol> : <p className={insightStyles.firstHistory}>This is the first published Championship Projection.</p>}
+        {selectedHistory.length > 1 ? <ol>{selectedHistory.map(({ phase, publishedAt, americanOdds, probability: projectedProbability, highlights }) => <li key={`${phase}-${publishedAt}`}><div><strong>{phase}</strong><small>{publishedAt ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(publishedAt)) : "Published"}</small>{highlights.length ? <em>{highlights.join(" · ")}</em> : null}</div><span><b>{americanOdds}</b><strong>{percent(projectedProbability)}</strong></span></li>)}</ol> : <p className={insightStyles.firstHistory}>This is the first published Championship Projection.</p>}
       </section>
     </section></div> : null}
   </section>;

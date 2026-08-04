@@ -179,7 +179,7 @@ test("Championship Projections opens in-place player details from every publishe
   assert.match(source, /Current Championship Projection/);
   assert.match(source, /Projection History/);
   assert.match(source, /This is the first published Championship Projection\./);
-  assert.match(source, /\(snapshot\.players \|\| \[\]\)\.find/);
+  assert.match(source, /publishedPlayerHistory\(presentedSnapshots, selectedPlayerId\)/);
   assert.match(source, /setSelectedPlayerId\(String\(player\.id\)\)/);
   assert.doesNotMatch(source, /router\.push\([^\n]*projection/);
   assert.match(insightStyles, /sheetLayer\{position:fixed/);
