@@ -159,7 +159,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
   const refresh = useCallback(async () => {
     setState((current) => current === "ready" ? current : "loading");
     try {
-      const response = await fetchWithTransientRetry("/api/player-passport/matches", { cache: "no-store" });
+      const response = await fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store" });
       if (response.status === 401) {
         setPayload(null); setState("public"); return;
       }
@@ -206,10 +206,11 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
 
   if (state === "loading") return <>
     <section className={styles.loading} aria-live="polite">
+      <strong>Preparing Tournament…</strong>
+      <span>Please wait while your tournament is prepared.</span>
       <span className={styles.skeleton} />
       <span className={styles.skeleton} />
       <span className={styles.skeleton} />
-      <span className={styles.visuallyHidden}>Preparing your tournament…</span>
     </section>
     {tournamentPulse}
     {tournamentMoments}

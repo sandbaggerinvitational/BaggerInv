@@ -127,23 +127,15 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       try {
         const [session, passport] = await Promise.all([
           dashboardOnly ? Promise.resolve(null) : fetch("/api/scoring/session", { cache: "no-store" }),
-          fetchWithTransientRetry("/api/player-passport/session", { cache: "no-store" }),
+          fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store" }),
         ]);
         if (passport.ok) {
           const identity = await passport.json();
           if (!current) return;
           setPassportPlayer(identity.player);
           setPassportState("active");
-          const matches = await fetchWithTransientRetry("/api/player-passport/matches", { cache: "no-store" });
-          const payload = await matches.json();
-          if (matches.ok) {
-            if (!current) return;
-            setPassportMatches(payload.data?.matches || []);
-            setPassportTournament(payload.data?.tournament || null);
-          } else if (matches.status !== 401) {
-            setPassportState("unavailable");
-            setStatus(payload.error || "We couldn’t verify your Player Passport right now.");
-          }
+          setPassportMatches(identity.data?.matches || []);
+          setPassportTournament(identity.data?.tournament || null);
         } else if (passport.status === 401) {
           setPassportState("inactive");
         } else {

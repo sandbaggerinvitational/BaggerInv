@@ -33,7 +33,7 @@ export default function PlayerPassportActivation({ invitedReference = "", active
     : null, [data, reference]);
 
   const activate = async () => {
-    setBusy(true); setStatus("Activating Player Passport…");
+    setBusy(true); setStatus("Preparing Tournament…");
     try {
       const response = await fetch("/api/player-passport/activation", {
         method: "POST",

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { activatePlayerPassport, readPlayerPassportActivationOptions } from "../../../../lib/google-sheets-write.js";
-import { createPlayerPassportSession, playerPassportCookie } from "../../../../lib/player-passport.js";
+import { createPlayerPassportSession, playerPassportCookie, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
+import { initializeParticipantTournament, invalidateParticipantInitialization } from "../../../../lib/participant-initialization.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +25,22 @@ export async function POST(request) {
     if (!rate.allowed) return NextResponse.json({ error: "Too many attempts. Wait 15 minutes, then generate a new code and try again." }, { status: 429 });
     const activated = await activatePlayerPassport({ reference, code: activationCode, deviceLabel });
     const token = createPlayerPassportSession(activated);
-    const response = NextResponse.json({ activated: true, player: activated.player });
+    const session = verifyPlayerPassportSession(token);
+    invalidateParticipantInitialization(session);
+    let initialized = false;
+    try {
+      await initializeParticipantTournament(session);
+      initialized = true;
+    } catch (error) {
+      // Activation is already committed. Home continues the same initialization
+      // transaction instead of asking the player to reuse a consumed code.
+      console.warn("Player Passport activated; tournament initialization is still recovering", {
+        tournamentId: session.tournamentId,
+        playerId: session.playerId,
+        reason: error?.message || String(error),
+      });
+    }
+    const response = NextResponse.json({ activated: true, initialized, player: activated.player });
     response.cookies.set(playerPassportCookie(token));
     return response;
   } catch (error) {

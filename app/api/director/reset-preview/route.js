@@ -4,7 +4,8 @@ import { getTournamentData, invalidateTournamentDataCache } from "../../../live/
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data.js";
-import { readPlayerPassportMatches, resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
+import { resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
+import { initializeParticipantTournament, invalidateParticipantInitialization } from "../../../../lib/participant-initialization.js";
 
 export const dynamic = "force-dynamic";
 
@@ -27,10 +28,8 @@ export async function POST(request) {
     for (const path of ["/admin/director", "/home", "/live", "/my-match", "/leaderboards"]) revalidatePath(path);
     invalidateTournamentDataCache();
     const session = verifyPlayerPassportSession(token);
-    await Promise.all([
-      getTournamentData(),
-      readPlayerPassportMatches(session),
-    ]);
+    invalidateParticipantInitialization(session);
+    await initializeParticipantTournament(session);
     return NextResponse.json({
       ok: true,
       message: "Preview Tournament Reset Complete",

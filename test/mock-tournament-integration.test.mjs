@@ -76,7 +76,7 @@ test("Upcoming normalized tournaments retain mobile dashboard and empty standing
 test("My Match, Passport identity, Me, and Preview isolation remain wired", () => {
   assert.match(myMatch, /ScoreEntry/);
   assert.match(scoreEntry, /api\/player-passport\/matches/);
-  assert.match(scoreEntry, /api\/player-passport\/session/);
+  assert.match(scoreEntry, /api\/player-passport\/initialize/);
   assert.match(mePage, /ParticipantProfile/);
   assert.match(diagnostic, /previewEnvironmentDiagnostic/);
   assert.doesNotMatch(sheetData, /PRODUCTION_SPREADSHEET_ID/);

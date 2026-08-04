@@ -5,6 +5,7 @@ import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../
 import { getTournamentData } from "../../../live/sheetData.js";
 import { playerPerformanceRows, rankPlayerRows } from "../../../../lib/mobile-leaderboards.js";
 import { playerRoundPerformance } from "../../../../lib/player-round-performance.js";
+import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,8 @@ export async function GET(request) {
     return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });
   }
   try {
-    const data = await readPlayerPassportMatches(session);
+    const initialized = await initializeParticipantTournament(session);
+    const data = initialized.personalized;
     try {
       const tournamentData = await getTournamentData();
       const standings = rankPlayerRows(
