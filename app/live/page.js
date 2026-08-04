@@ -31,7 +31,7 @@ export default async function LivePage() {
     <main>
       <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
       <Header homeHref="/home" />
-      <MatchCenter initialData={data} loadError={error} />
+      <MatchCenter initialData={data} loadError={error} previewMode={process.env.VERCEL_ENV === "preview"} />
       <div className={styles.tournamentFooter}><Footer /></div>
     </main>
   );

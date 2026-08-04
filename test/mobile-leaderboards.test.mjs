@@ -127,7 +127,7 @@ test("team leader insight supports multiple ties, singular points, and official 
 test("Insights renders published Championship Odds without invoking the odds engine", async () => {
   const source = await readFile(componentUrl, "utf8");
   assert.match(source, /\/api\/leaderboards\/insights\?year=/);
-  assert.match(source, /publishedOddsInsights\(snapshots \|\| \[\]\)/);
+  assert.match(source, /publishedOddsInsights\(presentedSnapshots\)/);
   assert.match(source, /🏆 Championship Odds/);
   assert.match(source, /Tournament Favorite/);
   assert.match(source, /Full Odds Board/);

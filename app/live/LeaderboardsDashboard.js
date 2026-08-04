@@ -129,9 +129,16 @@ function Teams({ data, selectedRound, currentPlayer }) {
   </section>;
 }
 
-function Insights({ data }) {
+const PREVIEW_ODDS_SCENARIOS = [
+  { label: "Pre-Tournament", phases: ["Pre-Tournament"] },
+  { label: "Round 2 Pairings", phases: ["Round 2 Pairings", "After Round 1"] },
+  { label: "Round 3 Pairings", phases: ["Round 3 Pairings", "Round 3 Pairings Announced", "After Round 2"] },
+];
+
+function Insights({ data, previewMode = false }) {
   const [snapshots, setSnapshots] = useState(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState("");
+  const [previewPhase, setPreviewPhase] = useState("");
   useEffect(() => {
     const controller = new AbortController();
     fetch(`/api/leaderboards/insights?year=${encodeURIComponent(data.tournament?.year || "")}`, { cache: "no-store", signal: controller.signal })
@@ -140,7 +147,14 @@ function Insights({ data }) {
       .catch((error) => { if (error.name !== "AbortError") setSnapshots([]); });
     return () => controller.abort();
   }, [data.tournament?.year]);
-  const insights = useMemo(() => publishedOddsInsights(snapshots || []), [snapshots]);
+  const previewScenarios = useMemo(() => previewMode ? PREVIEW_ODDS_SCENARIOS.map((scenario) => ({
+    ...scenario,
+    snapshot: scenario.phases.map((phase) => (snapshots || []).find((item) => item.phase === phase)).find(Boolean),
+  })).filter((scenario) => scenario.snapshot) : [], [previewMode, snapshots]);
+  const effectivePreviewPhase = previewMode ? (previewPhase || previewScenarios.at(-1)?.snapshot.phase || "") : "";
+  const selectedScenarioIndex = effectivePreviewPhase ? (snapshots || []).findIndex((snapshot) => snapshot.phase === effectivePreviewPhase) : -1;
+  const presentedSnapshots = selectedScenarioIndex >= 0 ? snapshots.slice(0, selectedScenarioIndex + 1) : (snapshots || []);
+  const insights = useMemo(() => publishedOddsInsights(presentedSnapshots), [presentedSnapshots]);
   const playerPhotos = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.photo])), [data.leaderboard]);
   const percent = (value) => `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
   const publicationTime = insights.current?.publishedAt ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(insights.current.publishedAt)) : "—";
@@ -150,7 +164,7 @@ function Insights({ data }) {
   const portrait = (player, className = "") => <span className={`${insightStyles.portrait} ${className}`.trim()}><AssetImage src={playerPhoto(playerPhotos.get(String(player.id)))} alt="" fallbackClassName={insightStyles.portraitFallback} fallback={initials(player.name)} inferFallback={false} /></span>;
   const rankMark = (rank) => ["🥇", "🥈", "🥉"][rank - 1] || `#${rank}`;
   const selectedPlayer = insights.players.find((player) => String(player.id) === selectedPlayerId) || null;
-  const selectedHistory = selectedPlayer ? (snapshots || []).map((snapshot) => {
+  const selectedHistory = selectedPlayer ? presentedSnapshots.map((snapshot) => {
     const player = (snapshot.players || []).find((entry) => String(entry.id) === selectedPlayerId);
     return player ? { phase: snapshot.phase, publishedAt: snapshot.publishedAt, player } : null;
   }).filter(Boolean) : [];
@@ -165,6 +179,7 @@ function Insights({ data }) {
   if (!insights.current) return <section className={insightStyles.experience}><div className={styles.empty}><strong>Championship Odds</strong><span>Tournament projections will publish after official pairings are finalized.</span></div></section>;
 
   return <section className={insightStyles.experience} aria-label="Championship Odds">
+    {previewMode && previewScenarios.length ? <section className={insightStyles.scenarioSelector} aria-label="Preview Odds Scenarios"><label><span>Preview Odds Scenario</span><select value={insights.current.phase} onChange={(event) => { setPreviewPhase(event.target.value); setSelectedPlayerId(""); }}>{previewScenarios.map((scenario) => <option value={scenario.snapshot.phase} key={scenario.label}>{scenario.label}</option>)}</select></label><p>Preview only · official published snapshots</p></section> : null}
     <header className={insightStyles.hero}>
       <span>Published Tournament Projection</span><h2>🏆 Championship Odds</h2>
       <div><p><small>Round Phase</small><strong>{insights.current.phase}</strong></p><p><small>Published</small><strong>{publicationTime}</strong></p></div>
@@ -236,7 +251,7 @@ function NetSkinsBoard({ data, currentPlayer }) {
   </section>;
 }
 
-export default function LeaderboardsDashboard({ initialData, loadError }) {
+export default function LeaderboardsDashboard({ initialData, loadError, previewMode = false }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -287,7 +302,7 @@ export default function LeaderboardsDashboard({ initialData, loadError }) {
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "skins" ? <NetSkinsBoard data={data} currentPlayer={currentPlayer} /> : null}
-    {tab === "insights" ? <Insights data={data} /> : null}
+    {tab === "insights" ? <Insights data={data} previewMode={previewMode} /> : null}
     {loadError ? <p className={styles.loadNote}>{loadError}</p> : null}
   </section>;
 }

@@ -49,3 +49,19 @@ test("Insights API reads published snapshots and never imports simulation logic"
   assert.match(route, /Number\(snapshot\.year\) === year/);
   assert.doesNotMatch(`${route}\n${component}`, /simulateTournamentOdds|previewOddsSnapshot|americanOddsFromProbability/);
 });
+
+test("Preview Odds Scenarios select only existing engine-published snapshots and stay hidden in Production", async () => {
+  const [page, component] = await Promise.all([
+    readFile(new URL("../app/live/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /previewMode=\{process\.env\.VERCEL_ENV === "preview"\}/);
+  assert.match(component, /PREVIEW_ODDS_SCENARIOS/);
+  assert.match(component, /Pre-Tournament/);
+  assert.match(component, /Round 2 Pairings/);
+  assert.match(component, /Round 3 Pairings/);
+  assert.match(component, /scenario\.phases\.map\(\(phase\) => \(snapshots \|\| \[\]\)\.find/);
+  assert.match(component, /previewMode && previewScenarios\.length/);
+  assert.match(component, /snapshots\.slice\(0, selectedScenarioIndex \+ 1\)/);
+  assert.doesNotMatch(component, /simulateTournamentOdds|previewOddsSnapshot|americanOddsFromProbability/);
+});
