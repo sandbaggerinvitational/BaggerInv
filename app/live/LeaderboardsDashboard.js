@@ -186,8 +186,7 @@ function Insights({ data, previewMode = false }) {
     </header>
     {storyline ? <section className={insightStyles.storyline} aria-label="Projection Story"><span>Projection Story</span><p>{storyline}</p></section> : null}
     <section className={insightStyles.favorite} aria-label="Tournament Favorite">
-      <span>🏆 Current Projection Favorite</span>{portrait(insights.favorite, insightStyles.favoritePortrait)}<h3>{insights.favorite.name}</h3>
-      <p className={insightStyles.favoriteStory}>Projected Tournament Champion</p>
+      <span>🏆 Tournament Favorite</span>{portrait(insights.favorite, insightStyles.favoritePortrait)}<h3>{insights.favorite.name}</h3>
       <div><p className={insightStyles.favoriteProbability}><small>Probability</small><strong>{percent(insights.favorite.probability)}</strong></p><p><small>American Odds</small><strong>{insights.favorite.americanOdds}</strong></p></div>
     </section>
     {insights.movers && (insights.movers.riser || insights.movers.faller) ? <section className={insightStyles.movers} aria-label="Biggest Movers">

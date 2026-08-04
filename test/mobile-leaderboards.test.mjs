@@ -152,13 +152,13 @@ test("Championship Odds promotes the favorite and supplied Top 10 without changi
     readFile(componentUrl, "utf8"),
     readFile(new URL("../app/live/leaderboards-insights.module.css", import.meta.url), "utf8"),
   ]);
-  assert.match(source, /🏆 Current Projection Favorite/);
+  assert.match(source, /🏆 Tournament Favorite/);
   assert.match(source, /playerPhotos/);
   assert.match(source, /insights\.players\.slice\(0, 10\)/);
   assert.match(source, /insights\.players\.slice\(10\)/);
   assert.match(source, /First Projection/);
   assert.match(source, /Movement tracking begins after the next published Championship Projection\./);
-  assert.match(source, /Projected Tournament Champion/);
+  assert.doesNotMatch(source, /Current Projection Favorite|Projected Tournament Champion/);
   assert.match(source, /rankMark/);
   assert.match(source, /data-medal=\{player\.rank <= 3 \|\| undefined\}/);
   assert.match(insightStyles, /favoritePortrait/);
