@@ -1,52 +1,7 @@
-.tieLabel {
-  width: max-content;
-  padding: 2px 6px;
-  border: 1px solid #c8a24d;
-  border-radius: 999px;
-  color: #795c19;
-  font-size: .55rem;
-  font-style: normal;
-  font-weight: 900;
-}
-
-.storyIcon {
-  font-size: 1rem;
-  font-style: normal;
-  line-height: 1;
-}
-
-.undefeated details {
-  min-width: 0;
-}
-
-.undefeated summary {
-  display: grid;
-  gap: 3px;
-  cursor: pointer;
-  list-style: none;
-}
-
-.undefeated summary::-webkit-details-marker {
-  display: none;
-}
-
-.undefeated summary strong {
-  white-space: pre-line;
-}
-
-.undefeated summary em {
-  color: #795c19;
-  font-size: .6rem;
-  font-style: normal;
-  font-weight: 900;
-}
-
-.undefeated ul {
-  display: grid;
-  gap: 3px;
-  margin: 7px 0 0;
-  padding: 7px 0 0 15px;
-  border-top: 1px solid #e4dccd;
-  color: #0b4938;
-  font-size: .63rem;
-}
+.experience{display:grid;gap:10px;min-width:0}.experience>section,.hero,.publication{overflow:hidden;border:1px solid #d7cebd;border-radius:17px;background:#fff;box-shadow:0 8px 24px rgba(33,46,39,.045)}
+.hero{padding:18px;background:linear-gradient(145deg,#092f27,#0d4a3a);color:#fff}.hero>span,.favorite>span,.movers header>span,.board header>span,.publication>span{color:#caa64c;font-size:.58rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.hero h2{margin:5px 0 18px;font:700 1.45rem/1.05 Georgia,serif}.hero>div,.favorite>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hero p,.favorite p{display:grid;gap:3px;margin:0}.hero small,.favorite small{font-size:.54rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.72}.hero strong{font-size:.72rem;line-height:1.25}
+.favorite{padding:16px;background:linear-gradient(145deg,#fff,#fbf4e4)}.favorite h3{margin:5px 0 14px;color:#0b4938;font:700 1.35rem Georgia,serif}.favorite>div{grid-template-columns:repeat(3,minmax(0,1fr))}.favorite p{padding:9px;border-radius:10px;background:#f5f0e5}.favorite strong,.favorite p>span{color:#17362c;font-size:.9rem;font-weight:900;font-variant-numeric:tabular-nums}
+.movers header,.board header{padding:12px 14px;border-bottom:1px solid #eee8de}.movers h3,.board h3{margin:3px 0 0;color:#0b4938;font:700 .94rem Georgia,serif}.movers>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px}.movers article{display:grid;gap:5px;padding:11px;border:1px solid #e4dccd;border-radius:12px;background:#faf7ef}.movers article>span:first-child{color:#756b5b;font-size:.5rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.movers article strong{overflow-wrap:anywhere;color:#0b4938;font:700 .82rem Georgia,serif}.movers article p{margin:0;color:#56655e;font-size:.65rem;font-weight:800}.movers article i{font-style:normal;color:#a59983}.movementEmpty{margin:0;padding:20px 14px;color:#6e7973;font-size:.68rem;text-align:center}
+.row{display:grid;grid-template-columns:34px minmax(0,1fr) 76px 58px 64px;align-items:center;min-height:43px;padding:6px 9px;border-bottom:1px solid #eee8de;color:#17362c;font-size:.64rem}.row:last-child{border-bottom:0}.row[data-header=true]{min-height:35px;background:#f4f0e8;color:#526059;font-size:.49rem;font-weight:900;text-transform:uppercase}.row>*:not(:nth-child(2)){text-align:center}.row>b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row>span{font-variant-numeric:tabular-nums}
+.up,.down,.neutral{font-size:.62rem!important;font-weight:900;font-variant-numeric:tabular-nums}.up{color:#17704f!important}.down{color:#a33b34!important}.neutral{color:#7c837f!important}.publication{display:grid;gap:4px;padding:14px}.publication strong{color:#0b4938;font:700 .88rem Georgia,serif}.publication small{color:#637068;font-size:.63rem}.publication p{margin:4px 0 0;color:#788079;font-size:.59rem}
+@media(max-width:390px){.hero{padding:16px 14px}.row{grid-template-columns:29px minmax(0,1fr) 68px 53px 57px;padding-inline:6px;font-size:.58rem}.row[data-header=true]{font-size:.44rem}.favorite{padding:14px}.favorite>div{gap:5px}.favorite p{padding:8px 5px}.favorite strong,.favorite p>span{font-size:.76rem}.movers>div{gap:6px;padding:8px}}

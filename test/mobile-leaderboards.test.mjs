@@ -124,27 +124,27 @@ test("team leader insight supports multiple ties, singular points, and official 
   assert.equal(resolved.leaders[0].side, 2);
 });
 
-test("Insights compact undefeated lists reveal every qualified player", async () => {
+test("Insights renders published Championship Odds without invoking the odds engine", async () => {
   const source = await readFile(componentUrl, "utf8");
-  assert.match(source, /undefeated\.length > 3/);
-  assert.match(source, /undefeated\.slice\(0, 2\)/);
-  assert.match(source, /\+\{undefeated\.length - 2\} more/);
-  assert.match(source, /Show all \$\{undefeated\.length\} undefeated players/);
-  assert.match(source, /undefeated\.map\(\(row\) => <li/);
-  assert.match(source, /<b>\{item\.detail\}<\/b>/);
-  assert.match(source, /item\.id === "undefeated"/);
+  assert.match(source, /\/api\/leaderboards\/insights\?year=/);
+  assert.match(source, /publishedOddsInsights\(snapshots \|\| \[\]\)/);
+  assert.match(source, /🏆 Championship Odds/);
+  assert.match(source, /Tournament Favorite/);
+  assert.match(source, /Full Odds Board/);
+  assert.doesNotMatch(source, /simulateTournamentOdds|calculateAmericanOdds/);
 });
 
-test("Insights storylines preserve accessible labels and compact presentation without overflow-prone names", async () => {
+test("Insights uses compact responsive odds presentation without overflow-prone names", async () => {
   const [source, insightStyles] = await Promise.all([
     readFile(componentUrl, "utf8"),
     readFile(new URL("../app/live/leaderboards-insights.module.css", import.meta.url), "utf8"),
   ]);
-  assert.match(source, /aria-label=\{item\.accessibleLabel\}/);
-  assert.match(source, /item\.headline/);
-  assert.match(source, /tournamentStorylines\(data\)/);
-  assert.match(insightStyles, /white-space: pre-line/);
-  assert.match(insightStyles, /min-width: 0/);
+  assert.match(source, /aria-label="Biggest Movers"/);
+  assert.match(source, /aria-label="Full Odds Board"/);
+  assert.match(source, /Tournament projections will publish after official pairings are finalized\./);
+  assert.match(insightStyles, /grid-template-columns:34px minmax\(0,1fr\) 76px 58px 64px/);
+  assert.match(insightStyles, /text-overflow:ellipsis/);
+  assert.match(insightStyles, /@media\(max-width:390px\)/);
 });
 
 test("Leaderboards use shared tournament identity, URL tabs, search, expansion, and Passport highlighting", async () => {

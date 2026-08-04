@@ -7,7 +7,7 @@ import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import { playerPhoto, teamLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
-import { tournamentStorylines } from "../../lib/tournament-storylines";
+import { publishedOddsInsights } from "../../lib/championship-odds-insights";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -15,7 +15,6 @@ import {
   roundScoreRows,
   searchPlayerRows,
   teamStandings,
-  tournamentInsights,
 } from "../../lib/mobile-leaderboards";
 import styles from "./leaderboards-dashboard.module.css";
 import insightStyles from "./leaderboards-insights.module.css";
@@ -131,20 +130,46 @@ function Teams({ data, selectedRound, currentPlayer }) {
 }
 
 function Insights({ data }) {
-  const players = useMemo(() => playerPerformanceRows(data.leaderboard || [], data.scoreLeaderboard || []), [data]);
-  const teams = useMemo(() => teamStandings(data.rounds || [], data.tournament || {}, "overall"), [data]);
-  const insights = useMemo(() => tournamentInsights(players, teams, data.tournament || {}), [data.tournament, players, teams]);
-  const storylines = useMemo(() => tournamentStorylines(data), [data]);
-  const undefeated = insights.undefeated;
-  const compactUndefeated = undefeated.length > 3;
-  return <section className={styles.insights}>
-    <header><small>Around the Tournament</small><h2>Tournament Headlines</h2><p>The biggest stories drawn from official current-tournament results.</p></header>
-    {storylines.length ? <div>
-      {storylines.map((item) => item.id === "undefeated" && compactUndefeated ? <article className={insightStyles.undefeated} aria-label={item.accessibleLabel} key={item.id}>
-        <i className={insightStyles.storyIcon} aria-hidden="true">{item.icon}</i><span>{item.label}</span><strong>{item.headline}</strong>
-        <details><summary aria-label={`Show all ${undefeated.length} undefeated players`}><b>{undefeated.slice(0, 2).map((row) => row.player).join("\n")}</b><em>+{undefeated.length - 2} more</em></summary><ul>{undefeated.map((row) => <li key={row.id}>{row.player}</li>)}</ul></details><b>{item.detail}</b>
-      </article> : <article aria-label={item.accessibleLabel} key={item.id}><i className={insightStyles.storyIcon} aria-hidden="true">{item.icon}</i><span>{item.label}</span><strong>{item.headline}</strong><b>{item.detail}</b></article>)}
-    </div> : <div className={styles.empty}><strong>No storylines yet.</strong><span>Meaningful moments will appear as official results are finalized.</span></div>}
+  const [snapshots, setSnapshots] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/leaderboards/insights?year=${encodeURIComponent(data.tournament?.year || "")}`, { cache: "no-store", signal: controller.signal })
+      .then(async (response) => response.ok ? response.json() : Promise.reject(new Error("Odds unavailable")))
+      .then((payload) => setSnapshots(Array.isArray(payload.snapshots) ? payload.snapshots : []))
+      .catch((error) => { if (error.name !== "AbortError") setSnapshots([]); });
+    return () => controller.abort();
+  }, [data.tournament?.year]);
+  const insights = useMemo(() => publishedOddsInsights(snapshots || []), [snapshots]);
+  const percent = (value) => `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
+  const publicationTime = insights.current?.publishedAt ? new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(insights.current.publishedAt)) : "—";
+  const trend = (player) => player?.change === null || player?.change === undefined
+    ? <span className={insightStyles.neutral}>—</span>
+    : <span className={player.change > 0 ? insightStyles.up : player.change < 0 ? insightStyles.down : insightStyles.neutral}>{player.change > 0 ? "▲ +" : player.change < 0 ? "▼ " : "— "}{player.change ? `${player.change.toFixed(1)}%` : "Even"}</span>;
+
+  if (snapshots === null) return <section className={insightStyles.experience} aria-busy="true"><div className={styles.empty}><strong>Loading Championship Odds…</strong><span>Retrieving the latest published tournament projection.</span></div></section>;
+  if (!insights.current) return <section className={insightStyles.experience}><div className={styles.empty}><strong>Championship Odds</strong><span>Tournament projections will publish after official pairings are finalized.</span></div></section>;
+
+  return <section className={insightStyles.experience} aria-label="Championship Odds">
+    <header className={insightStyles.hero}>
+      <span>Published Tournament Projection</span><h2>🏆 Championship Odds</h2>
+      <div><p><small>Round Phase</small><strong>{insights.current.phase}</strong></p><p><small>Published</small><strong>{publicationTime}</strong></p></div>
+    </header>
+    <section className={insightStyles.favorite} aria-label="Tournament Favorite">
+      <span>Tournament Favorite</span><h3>{insights.favorite.name}</h3>
+      <div><p><small>Probability</small><strong>{percent(insights.favorite.probability)}</strong></p><p><small>American Odds</small><strong>{insights.favorite.americanOdds}</strong></p><p><small>Trend</small>{trend(insights.favorite)}</p></div>
+    </section>
+    <section className={insightStyles.movers} aria-label="Biggest Movers">
+      <header><span>Biggest Movers</span><h3>Since the previous published projection</h3></header>
+      {insights.movers && (insights.movers.riser || insights.movers.faller) ? <div>
+        {[['Largest Positive Movement', insights.movers.riser], ['Largest Negative Movement', insights.movers.faller]].map(([label, player]) => player ? <article key={label}><span>{label}</span><strong>{player.name}</strong><p>{player.previous.americanOdds} <i aria-hidden="true">→</i> {player.americanOdds}</p>{trend(player)}</article> : null)}
+      </div> : <p className={insightStyles.movementEmpty}>Movement will appear after the next published odds snapshot.</p>}
+    </section>
+    <section className={insightStyles.board} aria-label="Full Odds Board">
+      <header><span>Full Odds Board</span><h3>Published player projections</h3></header>
+      <div className={insightStyles.row} data-header="true"><span>Rank</span><span>Player</span><span>Probability</span><span>Odds</span><span>Trend</span></div>
+      {insights.players.map((player) => <div className={insightStyles.row} key={player.id}><strong>{player.rank}</strong><b>{player.name}</b><span>{percent(player.probability)}</span><span>{player.americanOdds}</span>{trend(player)}</div>)}
+    </section>
+    <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: {insights.current.phase}</strong><small>{publicationTime}</small><p>Official Sandbagger Odds Engine projection. Not live odds.</p></footer>
   </section>;
 }
 

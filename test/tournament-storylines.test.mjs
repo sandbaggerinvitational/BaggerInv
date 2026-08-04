@@ -293,13 +293,12 @@ test("Home places Tournament Moments immediately beneath Tournament Pulse", asyn
   assert.ok(home.indexOf("{tournamentMoments}") < home.indexOf("<MyRounds"));
 });
 
-test("Insights consume the same shared storyline model and explain why data matters", async () => {
+test("Insights presents published Championship Odds while tournament storytelling remains shared elsewhere", async () => {
   const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
-  assert.match(source, /tournamentStorylines\(data\)/);
-  assert.match(source, /Around the Tournament/);
-  assert.match(source, /Tournament Headlines/);
-  assert.match(source, /No storylines yet\./);
-  assert.match(source, /item\.accessibleLabel/);
+  assert.match(source, /publishedOddsInsights/);
+  assert.match(source, /Championship Odds/);
+  assert.match(source, /Official Sandbagger Odds Engine projection\. Not live odds\./);
+  assert.doesNotMatch(source, /tournamentStorylines\(data\)/);
 });
 
 test("official finalized Net Skins results create a current-tournament money storyline", () => {
