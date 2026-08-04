@@ -29,7 +29,8 @@ test("Website and PWA consume the same authoritative published snapshot", async 
   const writer = await read("lib/google-sheets-write.js");
   assert.match(website, /readOddsSnapshots/);
   assert.match(pwa, /readOddsSnapshots/);
-  assert.match(writer, /replaceRuntimeRecords\("Odds Snapshots"/);
+  assert.match(writer, /replaceRuntimeRecordSets\(\[/);
+  assert.match(writer, /tab: "Odds Snapshots"/);
   assert.doesNotMatch(`${website}\n${pwa}`, /simulateTournamentOdds/);
 });
 
