@@ -16,6 +16,7 @@ import TournamentLeaderboard from "../TournamentLeaderboard";
 import TournamentDashboard from "./TournamentDashboard";
 import LeaderboardsDashboard from "./LeaderboardsDashboard";
 import styles from "./live.module.css";
+import scoreStyles from "../score-typography.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const initials = (name) => String(name ?? "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -31,7 +32,7 @@ function Logo({ filename, name, type = "team", size = "medium" }) {
 function TeamIdentity({ team, side, score, compact = false }) {
   return <div className={styles.bannerTeam} data-side={side} data-compact={compact ? "true" : "false"}>
     <Logo filename={team.logo} name={team.name} size={compact ? "small" : "large"} />
-    <div><strong>{team.name}</strong>{hasValue(score) ? <b>{formatTeamPoints(score)}</b> : null}</div>
+    <div><strong>{team.name}</strong>{hasValue(score) ? <b className={scoreStyles.centeredScore}>{formatTeamPoints(score)}</b> : null}</div>
   </div>;
 }
 
@@ -43,7 +44,7 @@ function ChampionshipBanner({ tournament }) {
     <p>🏆 {tournament.year} Sandbagger Champions</p>
     <Logo filename={winner.logo} name={winner.name} size="champion" />
     <h2>{winner.name}</h2>
-    <strong>Final Score · {formatTeamPoints(tournament.teamOne.score)}–{formatTeamPoints(tournament.teamTwo.score)}</strong>
+    <strong>Final Score · <span className={scoreStyles.score}>{formatTeamPoints(tournament.teamOne.score)}<i className={scoreStyles.separator} aria-hidden="true">–</i>{formatTeamPoints(tournament.teamTwo.score)}</span></strong>
     <span>over {loser.name}</span>
     <Link href={`/champions/${tournament.year}`}>View Final Results →</Link>
   </section>;
@@ -298,7 +299,7 @@ function MatchCenterExperience({ initialData, loadError }) {
         <div className={styles.matchFilters} role="tablist" aria-label="Filter matches by status">
           {MATCH_FILTERS.map(([value, label]) => <button type="button" role="tab" aria-selected={matchFilter === value} onClick={() => setMatchFilter(value)} key={value}>{label}<span>{value === "all" ? active.matches.length : filterMatches(active.matches, value).length}</span></button>)}
         </div>
-        <div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong>{formatTeamPoints(roundTotals.teamOne)} – {formatTeamPoints(roundTotals.teamTwo)}</strong></div></div>
+        <div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong className={scoreStyles.score}>{formatTeamPoints(roundTotals.teamOne)}<i className={scoreStyles.separator} aria-hidden="true">–</i>{formatTeamPoints(roundTotals.teamTwo)}</strong></div></div>
         {visibleMatches.length ? <div className={styles.matchGrid}>{visibleMatches.map((match) => <PublicMatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div> : <MatchFilterEmptyState filter={matchFilter} round={active} className={styles.emptyState} />}
       </section> : null}
       {rounds.length ? <div className={styles.roundSelectorSection}><span>Browse rounds</span><RoundNavigation rounds={rounds} activeRound={active?.number} onSelect={setActiveRound} /></div> : null}

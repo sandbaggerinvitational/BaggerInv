@@ -15,6 +15,7 @@ import { formatPlayerPoints, formatTeamPoints } from "../lib/formatters";
 import { tournamentProgressModel } from "../lib/live-command-center";
 import { tournamentMoments } from "../lib/tournament-storylines";
 import styles from "./tournament-command-center.module.css";
+import scoreStyles from "./score-typography.module.css";
 
 function assetSource(value, resolver) {
   const source = String(value || "").trim();
@@ -58,9 +59,9 @@ function TournamentPulse({ tournament, progress, roundCount }) {
             fallbackClassName={styles.scoreLogoFallback}
           />
           <span>{tournament.teamOne?.name}</span>
-          <strong>{formatTeamPoints(tournament.teamOne?.score)}</strong>
+          <strong className={scoreStyles.centeredScore}>{formatTeamPoints(tournament.teamOne?.score)}</strong>
         </div>
-        <b>–</b>
+        <b className={scoreStyles.separator}>–</b>
         <div>
           <MobileIdentityImage
             sources={[assetSource(tournament.teamTwo?.logo, teamLogo)]}
@@ -70,7 +71,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
             fallbackClassName={styles.scoreLogoFallback}
           />
           <span>{tournament.teamTwo?.name}</span>
-          <strong>{formatTeamPoints(tournament.teamTwo?.score)}</strong>
+          <strong className={scoreStyles.centeredScore}>{formatTeamPoints(tournament.teamTwo?.score)}</strong>
         </div>
       </div>
       <div className={styles.progressLabel}>

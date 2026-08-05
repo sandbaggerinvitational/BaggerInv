@@ -6,6 +6,7 @@ import AssetImage from "./AssetImage";
 import { teamLogo } from "../lib/asset-paths";
 import { formatHandicap, formatTeamPoints } from "../lib/formatters";
 import styles from "./live/live.module.css";
+import scoreStyles from "./score-typography.module.css";
 import ScorecardTable from "./ScorecardTable";
 import { matchState } from "../lib/live-match-ux";
 import MatchProgressionSummary from "./MatchProgressionSummary";
@@ -197,8 +198,8 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         <strong>{halved ? "Match Halved" : winningSide === 1 ? tournament.teamOne.name : tournament.teamTwo.name}</strong>
       </div> : null}
       {(hasValue(match.team1Points) || hasValue(match.team2Points)) ? <div className={styles.matchScoreTable}>
-        <div className={`${styles.matchScoreRow} ${winningSide === 1 ? styles.matchScoreWinner : ""}`} data-team="one"><span><i aria-hidden="true" />{tournament.teamOne.name}</span><strong>{formatTeamPoints(match.team1Points)}</strong></div>
-        <div className={`${styles.matchScoreRow} ${winningSide === 2 ? styles.matchScoreWinner : ""}`} data-team="two"><span><i aria-hidden="true" />{tournament.teamTwo.name}</span><strong>{formatTeamPoints(match.team2Points)}</strong></div>
+        <div className={`${styles.matchScoreRow} ${winningSide === 1 ? styles.matchScoreWinner : ""}`} data-team="one"><span><i aria-hidden="true" />{tournament.teamOne.name}</span><strong className={scoreStyles.centeredScore}>{formatTeamPoints(match.team1Points)}</strong></div>
+        <div className={`${styles.matchScoreRow} ${winningSide === 2 ? styles.matchScoreWinner : ""}`} data-team="two"><span><i aria-hidden="true" />{tournament.teamTwo.name}</span><strong className={scoreStyles.centeredScore}>{formatTeamPoints(match.team2Points)}</strong></div>
       </div> : null}
     </div> : null}
     <footer className={styles.matchFreshness}>{match.updatedAt ? <>Last confirmed {match.updatedAt}{match.updatedBy ? ` by ${match.updatedBy}` : ""}</> : state === "live" ? "Waiting for the next confirmed update" : state === "final" ? "Official result" : `${match.course?.name || round?.course?.name || "Course TBA"} · ${match.formatName || round?.format || "Format TBA"}`}</footer>

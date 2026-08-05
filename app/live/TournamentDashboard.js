@@ -13,6 +13,7 @@ import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import styles from "./tournament-dashboard.module.css";
+import scoreStyles from "../score-typography.module.css";
 
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
 const initials = (name) => String(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -117,7 +118,7 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
   return <section className={styles.snapshot} aria-label="Tournament snapshot">
     <div className={styles.score} aria-label={`${tournament.teamOne.name} ${formatTeamPoints(tournament.teamOne.score)}, ${tournament.teamTwo.name} ${formatTeamPoints(tournament.teamTwo.score)}`}>
       <div className={styles.scoreTeam}><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="score" /><strong>{tournament.teamOne.name}</strong></div>
-      <b className={styles.scoreValue}>{formatTeamPoints(tournament.teamOne.score)} <i aria-hidden="true">–</i> {formatTeamPoints(tournament.teamTwo.score)}</b>
+      <b className={`${styles.scoreValue} ${scoreStyles.score}`}>{formatTeamPoints(tournament.teamOne.score)}<i className={scoreStyles.separator} aria-hidden="true">–</i>{formatTeamPoints(tournament.teamTwo.score)}</b>
       <div className={styles.scoreTeam}><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="score" /><strong>{tournament.teamTwo.name}</strong></div>
     </div>
     <div className={styles.snapshotMeta}>

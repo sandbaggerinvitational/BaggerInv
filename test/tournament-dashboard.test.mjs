@@ -230,7 +230,7 @@ test("Overall leaderboard uses compact proportional columns with team under play
 
 test("Snapshot protects whole and half-point scores in an independent center column", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
-  assert.match(source, /className=\{styles\.scoreValue\}/);
+  assert.match(source, /className=\{`\$\{styles\.scoreValue\} \$\{scoreStyles\.score\}`\}/);
   assert.match(source, /formatTeamPoints\(tournament\.teamOne\.score\).*formatTeamPoints\(tournament\.teamTwo\.score\)/s);
   assert.match(styles, /\.score\{[^}]*grid-template-columns:minmax\(72px,1fr\) minmax\(116px,auto\) minmax\(72px,1fr\)/);
   assert.match(styles, /\.scoreValue\{[^}]*font:700 clamp/);

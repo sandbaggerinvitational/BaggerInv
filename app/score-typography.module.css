@@ -1,0 +1,24 @@
+.score {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  text-align: center;
+  text-rendering: optimizeLegibility;
+}
+
+.centeredScore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1em;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  text-align: center;
+}
+
+.separator {
+  display: inline-block;
+  align-self: center;
+  padding-inline: 0.24em;
+  font-style: normal;
+  line-height: 1;
+}

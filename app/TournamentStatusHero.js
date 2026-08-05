@@ -9,6 +9,7 @@ import { teamLogo } from "../lib/asset-paths";
 import { countdownParts } from "../lib/tournament-countdown";
 import { formatTeamPoints } from "../lib/formatters";
 import styles from "./tournament-status-hero.module.css";
+import scoreStyles from "./score-typography.module.css";
 
 const clean = (value) => String(value ?? "").trim();
 const initials = (name) => clean(name).split(/\s+/).map((part) => part[0]).slice(0, 3).join("").toUpperCase() || "SBI";
@@ -124,7 +125,7 @@ export default function TournamentStatusHero({
           {[tournament.teamOne, tournament.teamTwo].map((team) => <div key={team.id || team.name}>
             <TeamMark team={team} />
             <span>{team.name}</span>
-            <b>{formatTeamPoints(team.score)}</b>
+            <b className={scoreStyles.centeredScore}>{formatTeamPoints(team.score)}</b>
           </div>)}
         </div>
         <div className={styles.liveMeta}>
@@ -138,7 +139,7 @@ export default function TournamentStatusHero({
           <TeamMark team={champion} champion />
           <h2>{champion?.name || "Champion"}</h2>
           <strong>Final Score</strong>
-          <b>{formatTeamPoints(tournament.teamOne.score)} – {formatTeamPoints(tournament.teamTwo.score)}</b>
+          <b className={scoreStyles.score}>{formatTeamPoints(tournament.teamOne.score)}<i className={scoreStyles.separator} aria-hidden="true">–</i>{formatTeamPoints(tournament.teamTwo.score)}</b>
         </header>
       </>}
       <Actions state={state} year={tournament.year} hasPairings={hasPairings} />
