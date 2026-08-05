@@ -13,6 +13,7 @@ import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import styles from "./tournament-dashboard.module.css";
+import containerStyles from "../primary-page-container.module.css";
 
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
 const initials = (name) => String(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -239,12 +240,12 @@ export default function TournamentDashboard({ initialData, loadError }) {
     matches: selectedRounds.flatMap((round) => round.matches || []),
   });
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
-  if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
+  if (!tournament) return <section className={`${styles.page} ${containerStyles.primary}`}><div className={styles.empty} role="status">
     <strong>{refreshState === "refreshing" ? "Preparing Tournament…" : "Tournament data is temporarily unavailable."}</strong>
     <span>{refreshState === "refreshing" ? "Please wait while tournament data is refreshed." : "Automatic recovery could not be completed."}</span>
     {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
   </div></section>;
-  return <section className={styles.page}>
+  return <section className={`${styles.page} ${containerStyles.primary}`}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />
     <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Overall"], ...rounds.map((round) => [round.number, round.label])].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
