@@ -1,0 +1,28 @@
+.identityLine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  width: 100%;
+}
+
+.playerName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  flex: none;
+  white-space: nowrap;
+  padding: 2px 4px;
+  border: 1px solid #c8a24d;
+  border-radius: 999px;
+  color: #8b691e;
+  font-size: 0.42rem;
+  font-style: normal;
+  line-height: 1;
+}

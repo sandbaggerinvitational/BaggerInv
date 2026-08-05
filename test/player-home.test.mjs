@@ -158,7 +158,8 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(component, /showCurrentBadge = true/);
   assert.match(component, /showCurrentBadge=\{false\}/);
   assert.match(component, /aria-label="Current player"/);
-  assert.match(styles, /\.playerLines > span\[data-current="true"\][\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, auto\) minmax\(0, 1fr\)/);
+  assert.match(styles, /\.playerLines > span\[data-current="true"\][\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+  assert.match(styles, /\.playerLines small[\s\S]*white-space:\s*nowrap/);
   assert.match(styles, /\.playerLines > span\[data-current="true"\][\s\S]*column-gap:\s*5px/);
   assert.match(styles, /\.playerLines small[\s\S]*border:\s*1px solid #b8c9c1/);
   assert.match(styles, /\.playerLines small[\s\S]*font:\s*800 0\.4rem/);

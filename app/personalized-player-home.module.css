@@ -186,7 +186,7 @@
 
 .playerLines > span[data-current="true"] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 5px;
   width: 100%;
 }
@@ -197,13 +197,16 @@
 }
 
 .playerLines > span[data-current="true"] .playerNameText {
-  grid-column: 2;
+  grid-column: 1;
+  overflow-wrap: anywhere;
 }
 
 .playerLines small {
-  grid-column: 3;
+  grid-column: 2;
   align-self: center;
-  justify-self: start;
+  justify-self: end;
+  flex: none;
+  white-space: nowrap;
   padding: 1px 3px;
   border: 1px solid #b8c9c1;
   border-radius: 999px;

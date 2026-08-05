@@ -23,6 +23,7 @@ import {
   teamStandings,
 } from "../../lib/mobile-leaderboards";
 import styles from "./leaderboards-dashboard.module.css";
+import badgeStyles from "../responsive-player-badge.module.css";
 import insightStyles from "./leaderboards-insights.module.css";
 import skinsStyles from "./net-skins.module.css";
 
@@ -93,7 +94,7 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
           return <div className={styles.playerEntry} data-current={isCurrent || undefined} key={row.id}>
             <button className={styles.overallRow} type="button" aria-expanded={isOpen} aria-label={`${row.player}, rank ${row.displayRank || "unranked"}, record ${row.record}, ${metricValue(row, metric)}${isCurrent ? ", your position" : ""}`} onClick={() => setExpanded((current) => current === row.id ? "" : row.id)}>
               <strong>{row.displayRank || "—"}</strong>
-              <span className={styles.playerIdentity}><span className={styles.playerPhoto}><AssetImage src={playerPhoto(row.photo)} alt="" fallbackClassName={styles.playerFallback} fallback={initials(row.player)} inferFallback={false} /></span><span><b>{row.player}{isCurrent ? <em>YOU</em> : null}</b><small><TeamMark filename={row.teamLogo} name={row.team} />{row.team}</small></span></span>
+              <span className={styles.playerIdentity}><span className={styles.playerPhoto}><AssetImage src={playerPhoto(row.photo)} alt="" fallbackClassName={styles.playerFallback} fallback={initials(row.player)} inferFallback={false} /></span><span><span className={badgeStyles.identityLine}><b className={badgeStyles.playerName} title={row.player}>{row.player}</b>{isCurrent ? <em className={badgeStyles.badge} aria-label="Current player">YOU</em> : null}</span><small><TeamMark filename={row.teamLogo} name={row.team} />{row.team}</small></span></span>
               <span>{row.record}</span><b>{metricValue(row, metric)}</b>
             </button>
             {isOpen ? <PlayerDetails row={row} roundLeaderboards={data.roundLeaderboards || {}} /> : null}
