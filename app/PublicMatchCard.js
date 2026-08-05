@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MatchStatusBlock from "./MatchStatusBlock";
+import { formatOfficialMatchResult } from "../lib/match-result";
 import { Fragment } from "react";
 import AssetImage from "./AssetImage";
 import { teamLogo } from "../lib/asset-paths";
@@ -144,7 +145,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   const hasSegments = Boolean(match.frontWinner || match.backWinner || overallWinner);
   const winnerName = halved ? "Match halved" : winningSide === 1 ? tournament.teamOne.name : winningSide === 2 ? tournament.teamTwo.name : "";
   const statusText = state === "final"
-    ? (match.finalResult || winnerName || "Final")
+    ? (formatOfficialMatchResult(match.finalResult) || winnerName || "Final")
     : state === "live"
       ? (match.liveStatusText || (liveLeader ? `${liveLeader === 1 ? tournament.teamOne.name : tournament.teamTwo.name} ${Math.abs(Number(match.team1HolesWon) - Number(match.team2HolesWon))} UP` : "All square"))
       : (match.teeTime ? `Tee time ${match.teeTime}` : "Scheduled");

@@ -87,13 +87,13 @@ test("shared MatchStatusBlock centers one badge and every result on one fixed ax
   for (const result of [
     "Won 1 UP",
     "Won 2 UP",
-    "Won 3&2",
-    "Won 5&4",
+    "Won 3 & 2",
+    "Won 5 & 4",
     "Halved",
     "Lost 1 UP",
-    "Lost 2&1",
+    "Lost 2 & 1",
   ]) {
-    assert.ok(result.length <= 9, `${result} fits the shared non-wrapping result width`);
+    assert.ok(result.length <= 10, `${result} fits the shared non-wrapping result width`);
   }
 });
 

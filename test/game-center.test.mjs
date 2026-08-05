@@ -89,9 +89,9 @@ test("Final match-play notation derives standard early and 18-hole results", () 
     ...Array.from({ length: halved }, () => "Halved"),
   ].map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
 
-  assert.equal(matchPlayNotation(result(8, 0, 3), names), "The Pickles 8&7");
-  assert.equal(matchPlayNotation(result(4, 0, 11), names), "The Pickles 4&3");
-  assert.equal(matchPlayNotation(result(2, 0, 15), names), "The Pickles 2&1");
+  assert.equal(matchPlayNotation(result(8, 0, 3), names), "The Pickles 8 & 7");
+  assert.equal(matchPlayNotation(result(4, 0, 11), names), "The Pickles 4 & 3");
+  assert.equal(matchPlayNotation(result(2, 0, 15), names), "The Pickles 2 & 1");
   const alternating = Array.from({ length: 16 }, (_, index) => index % 2 ? "Team 2" : "Team 1");
   const holes = (winners) => winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
   assert.equal(matchPlayNotation(holes([...alternating, "Team 1", "Team 1"]), names), "The Pickles 2 UP");
@@ -103,7 +103,7 @@ test("Preview Match 2026-R1-1 finalized sequence resolves to 7 & 6, not 8 & 7", 
   const names = { 1: "The Pickles", 2: "Lipp It and Rip It" };
   const winners = ["Halved", "Team 2", "Halved", "Halved", "Team 2", "Team 2", "Halved", "Team 2", "Team 2", "Team 2", "Halved", "Team 2", "Team 1", "Halved", "Team 2", "Team 2", "Halved", "Halved"];
   const holes = winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
-  assert.equal(matchPlayNotation(holes, names), "Lipp It and Rip It 7&6");
+  assert.equal(matchPlayNotation(holes, names), "Lipp It and Rip It 7 & 6");
 });
 
 test("shared final formatter overrides stale stored wording with trusted hole history", () => {
@@ -111,7 +111,7 @@ test("shared final formatter overrides stale stored wording with trusted hole hi
   const winners = ["Halved", "Team 2", "Halved", "Halved", "Team 2", "Team 2", "Halved", "Team 2", "Team 2", "Team 2", "Halved", "Team 2"];
   const holes = winners.map((winner, index) => ({ "Hole Number": index + 1, "Hole Winner": winner }));
   const match = { "Match Status": "Final", "Match Status Text": "Team 2 8 UP through 18" };
-  assert.equal(finalizedMatchResult(match, holes, names), "Lipp It and Rip It 7&6");
+  assert.equal(finalizedMatchResult(match, holes, names), "Lipp It and Rip It 7 & 6");
 });
 
 test("Game Center navigation stays within official tournament order and boundaries", () => {
@@ -351,7 +351,7 @@ test("segment match-play results describe front, back, overall, and all-square s
   assert.deepEqual(segmentMatchResult(holes, 10, 18, names), { team: "Lipp It and Rip It", result: "1 UP", recorded: 1 });
   assert.equal(segmentMatchResult([{ number: 1, winner: "Team 1" }, { number: 2, winner: "Team 2" }], 1, 9, names).result, "All Square");
   assert.deepEqual(segmentMatchResult([], 10, 18, names), { team: "", result: "Not started", recorded: 0 });
-  assert.equal(segmentMatchResult(holes, 1, 18, names, "The Pickles 3&2").result, "3&2");
+  assert.equal(segmentMatchResult(holes, 1, 18, names, "The Pickles 3&2").result, "3 & 2");
 });
 
 test("selected-hole storytelling explains wins, halves, and lead movement", () => {

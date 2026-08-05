@@ -9,6 +9,7 @@ import {
 } from "../lib/formatters.js";
 import {
   formatLiveMatchResult,
+  formatOfficialMatchResult,
   formatParticipantMatchResult,
   formatStoredMatchResult,
 } from "../lib/match-result.js";
@@ -77,18 +78,29 @@ test("centralizes live, final, and participant match-result wording", () => {
   assert.equal(formatStoredMatchResult({
     status: "Final",
     finalResult: "The Pickles 3 & 1",
-  }, teams), "The Pickles 3&1");
+  }, teams), "The Pickles 3 & 1");
   assert.equal(formatParticipantMatchResult({
     team: { name: "The Pickles" },
     opponentTeam: { name: "Lipp It and Rip It" },
     result: { officialResult: "The Pickles 3 & 1" },
-  }, 1), "Won 3&1");
+  }, 1), "Won 3 & 1");
   assert.equal(formatParticipantMatchResult({
     team: { name: "The Pickles" },
     opponentTeam: { name: "Lipp It and Rip It" },
     result: { officialResult: "Lipp It and Rip It 2 & 1" },
-  }, 1), "Lost 2&1");
+  }, 1), "Lost 2 & 1");
   assert.equal(formatParticipantMatchResult({
     result: { officialResult: "Halved" },
   }, 1), "Halved");
+});
+
+test("official match typography spaces numeric ampersands without changing live states or team names", () => {
+  for (const [input, expected] of [
+    ["4&3", "4 & 3"],
+    ["3 &2", "3 & 2"],
+    ["5& 4", "5 & 4"],
+    ["1&0", "1 & 0"],
+    ["Lipp It and Rip It 3&2", "Lipp It and Rip It 3 & 2"],
+  ]) assert.equal(formatOfficialMatchResult(input), expected);
+  for (const live of ["1 UP", "2 UP", "AS", "Dormie"]) assert.equal(formatOfficialMatchResult(live), live);
 });

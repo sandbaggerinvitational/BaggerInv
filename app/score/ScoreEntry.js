@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { finalizedMatchResult, formatLiveMatchResult } from "../../lib/match-result.js";
+import { finalizedMatchResult, formatLiveMatchResult, formatOfficialMatchResult } from "../../lib/match-result.js";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-experience.js";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
@@ -45,7 +45,7 @@ function compactHoleWinnerMark(score, teamNames) {
 
 function finalResultSummary(result, teamNames) {
   if (/^halved$/i.test(String(result || "").trim())) return "Halved";
-  let notation = String(result || "").trim();
+  let notation = formatOfficialMatchResult(result);
   for (const name of [teamNames[1], teamNames[2]]) {
     if (name && notation.toLowerCase().startsWith(String(name).toLowerCase())) {
       notation = notation.slice(String(name).length).trim();
