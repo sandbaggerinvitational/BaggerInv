@@ -25,7 +25,6 @@ import {
 import styles from "./leaderboards-dashboard.module.css";
 import insightStyles from "./leaderboards-insights.module.css";
 import skinsStyles from "./net-skins.module.css";
-import containerStyles from "../primary-page-container.module.css";
 
 const clean = (value) => String(value ?? "").trim();
 const initials = (name) => clean(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -346,12 +345,12 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
     return () => { window.clearInterval(timer); window.removeEventListener("focus", poll); document.removeEventListener("visibilitychange", poll); };
   }, [refresh]);
   const tournament = data?.tournament;
-  if (!tournament) return <section className={`${styles.page} ${containerStyles.primary}`}><div className={styles.empty} role="status">
+  if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
     <strong>{refreshState === "refreshing" ? "Preparing Tournament…" : "Tournament data is temporarily unavailable."}</strong>
     <span>{refreshState === "refreshing" ? "Please wait while tournament data is refreshed." : "Automatic recovery could not be completed."}</span>
     {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
   </div></section>;
-  return <section className={`${styles.page} ${containerStyles.primary}`}>
+  return <section className={styles.page}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Individual, team, and round standings</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
     <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["skins", "Net Skins"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
