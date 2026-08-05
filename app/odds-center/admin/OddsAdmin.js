@@ -26,6 +26,9 @@ function DiagnosticsPanel({ diagnostics }) {
       <div><dt>Workbook operation</dt><dd>{display(diagnostics.workbookOperation)}</dd></div>
       <div><dt>Function</dt><dd>{display(diagnostics.function)}</dd></div>
       <div><dt>Exception</dt><dd>{display(diagnostics.exception)}</dd></div>
+      <div><dt>Request</dt><dd><pre>{display(diagnostics.requestPayload)}</pre></dd></div>
+      <div><dt>HTTP status</dt><dd>{display(diagnostics.httpStatus)}</dd></div>
+      <div><dt>Response body</dt><dd><pre>{display(diagnostics.responseBody)}</pre></dd></div>
       <div><dt>Stack trace</dt><dd><pre>{display(diagnostics.stack)}</pre></dd></div>
     </dl> : null}
   </details>;
@@ -43,25 +46,36 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
 
   async function publish() {
     setBusy(true); setPreview(null); setDiagnostics(null); setStatus(`Running ${iterations.toLocaleString()} tournament simulations…`);
+    const endpoint = "/api/odds/publish";
+    const requestPayload = { phase, iterations };
+    const requestBody = JSON.stringify(requestPayload);
+    const requestStack = new Error("Championship Projection request initiated").stack;
     try {
-      const response = await directorFetch("/api/odds/publish", { method: "POST", headers: { "content-type": "application/json", "x-odds-admin-secret": secret }, body: JSON.stringify({ phase, iterations }) });
+      if (!ODDS_PHASES.includes(phase)) throw new TypeError(`Unsupported Championship Projection milestone: ${phase}`);
+      console.info("Championship Projection request", { endpoint, method: "POST", payload: requestPayload });
+      const headers = { "content-type": "application/json" };
+      if (secret) headers["x-odds-admin-secret"] = secret;
+      const response = await directorFetch(endpoint, { method: "POST", credentials: "same-origin", headers, body: requestBody });
       const body = await response.text();
+      console.info("Championship Projection response", { endpoint, status: response.status, body });
       let data;
       try { data = JSON.parse(body); }
       catch {
         const error = new Error(`Publication endpoint returned an unreadable ${response.status} response.`);
-        error.diagnostics = { stepReached: "Director response", rootCause: body || "Empty response body", worksheet: "None", workbookOperation: "Read publication response", function: "OddsAdmin.publish", exception: "ResponseParseError", stack: "Client response parsing failed.", trace: { stages: [] } };
+        error.diagnostics = { stepReached: "Director response", rootCause: body || "Empty response body", worksheet: "None", workbookOperation: "Read publication response", function: "OddsAdmin.publish", exception: "ResponseParseError", requestPayload: requestBody, httpStatus: response.status, responseBody: body || "Empty response body", stack: error.stack || requestStack, trace: { stages: [] } };
         throw error;
       }
       if (!response.ok) {
         const error = new Error(data.error || "Publishing failed.");
-        error.diagnostics = data.diagnostics || null;
+        error.diagnostics = { ...(data.diagnostics || {}), stepReached: data.diagnostics?.stepReached || "Director response", rootCause: data.diagnostics?.rootCause || data.error || "Publishing failed.", function: data.diagnostics?.function || "OddsAdmin.publish", exception: data.diagnostics?.exception || error.name, requestPayload: requestBody, httpStatus: response.status, responseBody: body, stack: data.diagnostics?.stack || error.stack || requestStack, trace: data.diagnostics?.trace || { stages: [] } };
         throw error;
       }
       setDiagnostics(data.diagnostics || null);
       setPreview(data.snapshot); setStatus(`${projectionPresentationLabel(phase)} published successfully. Website, PWA, Tournament Intelligence, Storylines, and Projection History now share this official snapshot.`); onPublished?.(data.snapshot);
     } catch (error) {
-      setDiagnostics(error.diagnostics || { stepReached: "Director request", rootCause: error.message, worksheet: "None", workbookOperation: "Request publication", function: "OddsAdmin.publish", exception: error.name || "Error", stack: error.stack || "Unavailable", trace: { stages: [] } });
+      const clientDiagnostics = error.diagnostics || { stepReached: "Director request", rootCause: error.message, worksheet: "None", workbookOperation: "Request publication", function: "OddsAdmin.publish", exception: error.name || "Error", requestPayload: requestBody, httpStatus: "No response received", responseBody: "No response body received", stack: error.stack || requestStack, trace: { stages: [] } };
+      console.error("Championship Projection client failure", clientDiagnostics);
+      setDiagnostics(clientDiagnostics);
       setStatus("Championship projections could not be published. Please try again.");
     } finally { setBusy(false); }
   }

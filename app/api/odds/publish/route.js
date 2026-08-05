@@ -10,6 +10,7 @@ import { playerPassportTokenFromRequest } from "../../../../lib/player-passport"
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function POST(request) {
   const trace = createPublicationTrace();
