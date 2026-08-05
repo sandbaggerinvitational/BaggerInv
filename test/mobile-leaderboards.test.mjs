@@ -82,7 +82,8 @@ test("insights publish only supported trusted metrics", () => {
   ]);
   const insights = tournamentInsights(performance, [{ name: "The Pickles", points: 12.5 }]);
   assert.equal(insights.pointsLeader.id, "p1");
-  assert.deepEqual(insights.undefeated.map((row) => row.id), ["p1", "p3"]);
+  assert.deepEqual(insights.unbeaten.map((row) => row.id), ["p1", "p3"]);
+  assert.equal(insights.unbeaten.find((row) => row.id === "p3").record, "2-0-1");
   assert.equal(insights.lowestGross.id, "p1");
   assert.equal(insights.leadingTeam.name, "The Pickles");
 });

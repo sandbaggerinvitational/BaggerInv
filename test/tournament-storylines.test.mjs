@@ -37,10 +37,28 @@ test("live moments turn official standings into concise narratives", () => {
   assert.match(stories.find((item) => item.id === "team-race").headline, /narrow tournament lead/);
   assert.equal(stories.find((item) => item.id === "points-leader").label, "Hot Player");
   assert.equal(stories.find((item) => item.id === "points-leader").detail, "3.00 points through 2 completed matches.");
-  assert.match(stories.find((item) => item.id === "undefeated").headline, /remains undefeated/);
-  assert.doesNotMatch(stories.find((item) => item.id === "undefeated").detail, /Clay Beltran, Jason Powell/);
+  assert.match(stories.find((item) => item.id === "unbeaten").headline, /final unbeaten player/);
+  assert.doesNotMatch(stories.find((item) => item.id === "unbeaten").detail, /Clay Beltran, Jason Powell/);
   assert.match(stories.find((item) => item.id === "lowest-gross").detail, /^72\.0 is the lowest eligible gross average/);
   assert.equal(stories.some((item) => /comeback|straight holes|fastest/i.test(item.headline)), false);
+});
+
+test("tied matches preserve unbeaten storyline eligibility", () => {
+  const stories = tournamentStorylines({
+    tournament,
+    leaderboard: [
+      { id: "caleb", player: "Caleb Lewis", wins: 2, losses: 0, halves: 1, points: 2.5, matchesPlayed: 3 },
+      { id: "alex", player: "Alex Monteleone", wins: 1, losses: 0, halves: 2, points: 2, matchesPlayed: 3 },
+      { id: "clay", player: "Clay Beltran", wins: 2, losses: 1, halves: 0, points: 2, matchesPlayed: 3 },
+    ],
+    rounds: [],
+  });
+  const unbeaten = stories.find((item) => item.id === "unbeaten");
+
+  assert.equal(unbeaten.label, "Unbeaten");
+  assert.equal(unbeaten.headline, "2 players remain unbeaten.");
+  assert.match(unbeaten.detail, /zero match losses/);
+  assert.doesNotMatch(JSON.stringify(unbeaten), /undefeated/i);
 });
 
 test("closest live match becomes a pressure storyline from trusted live status", () => {
