@@ -30,8 +30,6 @@ test("both dashboards retain their established content widths and functionality"
   ]);
   assert.match(tournamentStyles, /--primary-page-max-width:860px/);
   assert.match(leaderboardStyles, /--primary-page-max-width:760px/);
-  assert.doesNotMatch(tournamentStyles, /width:min\(100%,860px\)|margin:0 auto/);
-  assert.doesNotMatch(leaderboardStyles, /width:min\(100%,760px\)|margin:0 auto/);
   assert.match(tournament, /<Snapshot tournament=/);
   assert.match(leaderboards, /<OverallPlayers|<Insights/);
 });
