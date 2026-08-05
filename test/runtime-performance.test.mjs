@@ -95,4 +95,5 @@ test("published projections use a semi-static cache refreshed by publish and res
   assert.match(workbook, /pendingOddsSnapshotRead/);
   assert.match(workbook, /oddsSnapshotCache = all/);
   assert.match(workbook, /invalidateOddsSnapshotCache\(\);\s*return saved/);
+  assert.match(workbook, /method !== "GET"[\s\S]*invalidateNormalizedSheetCache\(\)/);
 });
