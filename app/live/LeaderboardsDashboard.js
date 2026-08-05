@@ -6,13 +6,14 @@ import AssetImage from "../AssetImage";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import TournamentIntelligenceStorylines from "./TournamentIntelligenceStorylines";
-import { playerPhoto, teamLogo } from "../../lib/asset-paths";
+import { playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import { publishedOddsInsights } from "../../lib/championship-odds-insights";
 import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from "../../lib/projection-editorial";
 import { tournamentIntelligenceStorylines } from "../../lib/tournament-intelligence-storylines";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
-import { isTournamentRecapPhase, projectionPresentationLabel, tournamentRecapFromSnapshot } from "../../lib/projection-phases";
+import { isTournamentRecapPhase, projectionPresentationLabel } from "../../lib/projection-phases";
+import { buildTournamentRecapIntelligence, finishLabel } from "../../lib/tournament-recap-intelligence";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -142,6 +143,46 @@ const PREVIEW_ODDS_SCENARIOS = [
   { label: "Tournament Recap", phases: ["Final Results"] },
 ];
 
+function RecapMetric({ label, player, value }) {
+  if (!player) return null;
+  return <article><span>{label}</span><strong>{player.name}</strong><p>{value}</p></article>;
+}
+
+function TournamentRecapExperience({ recap, tournament, publicationTime, portrait, rankMark, selectedPlayerId, setSelectedPlayerId, previewSelector }) {
+  const selected = recap.journeys.find((player) => String(player.id) === String(selectedPlayerId)) || null;
+  const championNames = recap.champion.champions.map((team) => team.name).join(" and ");
+  const pct = (value) => `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
+  const movement = (value, unit = "") => `${Number(value) > 0 ? "+" : ""}${Number(value || 0).toFixed(1).replace(/\.0$/, "")}${unit}`;
+  const logo = tournament.logo ? tournamentLogo(tournament.logo) : tournamentLogo(`sandbagger-${tournament.year}`);
+  return <section className={insightStyles.experience} aria-label="Tournament Recap">
+    {previewSelector}
+    <header className={`${insightStyles.hero} ${insightStyles.recapHero}`}><AssetImage src={logo} alt={`${tournament.name} logo`} className={insightStyles.recapLogo} fallbackClassName={insightStyles.recapLogoFallback} fallback="SBI" inferFallback={false} /><div><span>🏆 Champion</span><h2>{recap.champion.tied ? "Tournament Tied" : championNames}</h2><p>{tournament.dates}</p></div></header>
+    <section className={insightStyles.recapScore} aria-label="Official tournament result"><div><span>Final Score</span><strong>{recap.champion.finalScore}</strong></div><div><span>Tournament MVP</span><strong>{recap.mvp?.name || "—"}</strong><small>{recap.mvp ? `${formatPlayerPoints(recap.mvp.points)} points` : "Official points leader"}</small></div><div><span>Winning Margin</span><strong>{recap.champion.tied ? "Tied" : `${recap.champion.winningMargin.toFixed(1).replace(/\.0$/, "")} pts`}</strong></div></section>
+    <section className={insightStyles.recapStory}><span>Tournament Intelligence Story</span><p>{recap.story}</p></section>
+    <section className={insightStyles.recapSection}><header><span>Projection Accuracy</span><h3>Opening projection vs. actual finish</h3></header><div className={insightStyles.recapMetrics}>
+      <RecapMetric label="Opening Favorite" player={recap.accuracy.openingFavorite} value={`Finished ${finishLabel(recap.accuracy.openingFavorite?.actualRank)}`} />
+      <RecapMetric label="Tournament MVP" player={recap.accuracy.mvpOpening ? recap.mvp : null} value={`${pct(recap.accuracy.mvpOpening?.openingProbability)} → ${finishLabel(recap.mvp?.rank)}`} />
+      <RecapMetric label="Biggest Surprise" player={recap.accuracy.biggestSurprise} value={`Projected #${recap.accuracy.biggestSurprise?.openingRank} → ${finishLabel(recap.accuracy.biggestSurprise?.actualRank)}`} />
+    </div></section>
+    <section className={insightStyles.recapSection}><header><span>Biggest Movers</span><h3>Across all forward-looking projections</h3></header><div className={insightStyles.recapMetrics}>
+      <RecapMetric label="Largest Rise" player={recap.movers.largestRise} value={`${movement(recap.movers.largestRise?.rankMovement)} positions`} />
+      <RecapMetric label="Largest Fall" player={recap.movers.largestFall} value={`${movement(recap.movers.largestFall?.rankMovement)} positions`} />
+      <RecapMetric label="Largest Probability Gain" player={recap.movers.largestProbabilityGain} value={movement(recap.movers.largestProbabilityGain?.probabilityMovement, "%")} />
+      <RecapMetric label="Largest Probability Loss" player={recap.movers.largestProbabilityLoss} value={movement(recap.movers.largestProbabilityLoss?.probabilityMovement, "%")} />
+    </div></section>
+    {recap.captainImpact.length ? <section className={insightStyles.recapSection}><header><span>Captain Impact</span><h3>Championship Outlook → Championship Singles Projection</h3></header><div className={insightStyles.captainImpact}>{recap.captainImpact.map((team) => <article key={team.name}><strong>{team.name}</strong><p><span>{pct(team.before)}</span><i>→</i><span>{pct(team.after)}</span></p><b>{movement(team.change, "%")}</b><small>Captain Pairings</small></article>)}</div></section> : null}
+    <section className={insightStyles.recapSection}><header><span>Model Accuracy</span><h3>How the Opening Championship Projection performed</h3></header><div className={insightStyles.recapMetrics}>
+      <RecapMetric label="Opening Team Favorite" player={recap.modelAccuracy.openingTeamFavorite} value={`Finished ${finishLabel(recap.modelAccuracy.openingTeamFinished)}`} />
+      <RecapMetric label="Closest Projection" player={recap.modelAccuracy.closestProjection} value={`${recap.modelAccuracy.closestProjection?.projectedFinish.toFixed(1)} projected • ${finishLabel(recap.modelAccuracy.closestProjection?.actualRank)} actual`} />
+      <RecapMetric label="Largest Miss" player={recap.modelAccuracy.largestMiss} value={`${recap.modelAccuracy.largestMiss?.finishError.toFixed(1)} finishing positions`} />
+      <RecapMetric label="Accuracy Summary" player={{ name: "Average finishing-position error" }} value={recap.modelAccuracy.meanFinishError === null ? "Not available" : recap.modelAccuracy.meanFinishError.toFixed(1)} />
+    </div></section>
+    <section className={`${insightStyles.board} ${insightStyles.recapJourneys}`} aria-label="Player projection journeys"><header><span>Projection Journey</span><h3>Every player’s path through tournament week</h3></header><div className={insightStyles.topPlayers}>{recap.journeys.map((player) => <button type="button" className={insightStyles.topPlayer} onClick={() => setSelectedPlayerId(String(player.id))} aria-label={`Open completed projection journey for ${player.name}`} key={player.id}><strong className={insightStyles.rank}>{rankMark(player.rank)}</strong>{portrait(player)}<b>{player.name}</b><div><p className={insightStyles.cardProbability}><small>Actual Finish</small><strong>{finishLabel(player.rank)}</strong></p><p><small>Final Points</small><strong>{formatPlayerPoints(player.points)}</strong></p></div></button>)}</div></section>
+    <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: Tournament Recap</strong><small>{publicationTime}</small><p>Official completed tournament outcome. Championship Projections are now closed.</p></footer>
+    {selected ? <div className={insightStyles.sheetLayer} role="presentation"><button type="button" className={insightStyles.sheetBackdrop} onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details" /><section className={insightStyles.sheet} role="dialog" aria-modal="true" aria-labelledby="recap-player-name"><header><span>Completed Projection Journey</span><button type="button" onClick={() => setSelectedPlayerId("")} aria-label="Close player projection details">×</button></header><div className={insightStyles.sheetIdentity}>{portrait(selected, insightStyles.sheetPortrait)}<div><h3 id="recap-player-name">{selected.name}</h3><p>Actual finish: {finishLabel(selected.rank)} • {formatPlayerPoints(selected.points)} points</p></div></div><section className={insightStyles.history}><header><span>Projection Journey</span><p>Official published milestones</p></header><ol>{selected.milestones.map((milestone) => <li key={`${milestone.phase}-${milestone.publishedAt}`}><div><strong>{milestone.label}</strong><small>{milestone.phase === "Final Results" ? "Tournament Recap" : `Projected rank #${milestone.projectedRank}`}</small></div><span><b>{milestone.phase === "Final Results" ? finishLabel(selected.rank) : milestone.americanOdds}</b><strong>{milestone.phase === "Final Results" ? "Actual" : pct(milestone.probability)}</strong></span></li>)}<li><div><strong>Actual Finish</strong><small>Official tournament result</small></div><span><b>{finishLabel(selected.rank)}</b><strong>{formatPlayerPoints(selected.points)} pts</strong></span></li></ol></section></section></div> : null}
+  </section>;
+}
+
 function Insights({ data, previewMode = false }) {
   const [snapshots, setSnapshots] = useState(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState("");
@@ -162,6 +203,7 @@ function Insights({ data, previewMode = false }) {
   const selectedScenarioIndex = effectivePreviewPhase ? (snapshots || []).findIndex((snapshot) => snapshot.phase === effectivePreviewPhase) : -1;
   const presentedSnapshots = selectedScenarioIndex >= 0 ? snapshots.slice(0, selectedScenarioIndex + 1) : (snapshots || []);
   const insights = useMemo(() => publishedOddsInsights(presentedSnapshots), [presentedSnapshots]);
+  const tournamentRecap = useMemo(() => buildTournamentRecapIntelligence({ snapshots: presentedSnapshots, tournament: data.tournament, leaderboard: data.leaderboard }), [data.leaderboard, data.tournament, presentedSnapshots]);
   const playerPhotos = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.photo])), [data.leaderboard]);
   const playerTeams = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.team])), [data.leaderboard]);
   const percent = (value) => `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
@@ -176,29 +218,23 @@ function Insights({ data, previewMode = false }) {
   const storyline = tournamentProjectionStory({ current: insights.current, previous: insights.previous, playerTeams });
   const intelligenceStorylines = tournamentIntelligenceStorylines({ snapshots: presentedSnapshots, playerTeams });
   useEffect(() => {
-    if (!selectedPlayer) return undefined;
+    if (!selectedPlayerId) return undefined;
     const close = (event) => { if (event.key === "Escape") setSelectedPlayerId(""); };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
-  }, [selectedPlayer]);
+  }, [selectedPlayerId]);
 
   if (snapshots === null) return <section className={insightStyles.experience} aria-busy="true"><div className={styles.empty}><strong>Loading Championship Odds…</strong><span>Retrieving the latest published tournament projection.</span></div></section>;
   if (!insights.current) return <section className={insightStyles.experience}><div className={styles.empty}><strong>Championship Odds</strong><span>Tournament projections will publish after official pairings are finalized.</span></div></section>;
 
+  const previewSelector = previewMode && previewScenarios.length ? <section className={insightStyles.scenarioSelector} aria-label="Preview Odds Scenarios"><label><span>Preview Odds Scenario</span><select value={insights.current.phase} onChange={(event) => { setPreviewPhase(event.target.value); setSelectedPlayerId(""); }}>{previewScenarios.map((scenario) => <option value={scenario.snapshot.phase} key={scenario.label}>{scenario.label}</option>)}</select></label><p>Preview only · official published snapshots</p></section> : null;
+
   if (isTournamentRecapPhase(insights.current.phase)) {
-    const recap = tournamentRecapFromSnapshot(insights.current);
-    const tied = recap.champions.length > 1;
-    return <section className={insightStyles.experience} aria-label="Tournament Recap">
-      {previewMode && previewScenarios.length ? <section className={insightStyles.scenarioSelector} aria-label="Preview Odds Scenarios"><label><span>Preview Odds Scenario</span><select value={insights.current.phase} onChange={(event) => { setPreviewPhase(event.target.value); setSelectedPlayerId(""); }}>{previewScenarios.map((scenario) => <option value={scenario.snapshot.phase} key={scenario.label}>{scenario.label}</option>)}</select></label><p>Preview only · official published snapshots</p></section> : null}
-      <header className={insightStyles.hero}><span>Official Tournament Result</span><h2>🏆 Tournament Recap</h2><div><p><small>Published</small><strong>{publicationTime}</strong></p></div></header>
-      <section className={insightStyles.favorite} aria-label={tied ? "Tournament tied" : "Tournament champions"}><span>{tied ? "Tournament Result" : "Tournament Champions"}</span><h3>{recap.champions.map((team) => team.name).join(" and ")}</h3><div>{recap.teams.map((team) => <p key={team.side}><small>{team.name}</small><strong>{formatTeamPoints(team.expectedPoints)}</strong></p>)}</div></section>
-      <section className={insightStyles.board} aria-label="Tournament points leaders"><header><span>Tournament Points Leaders</span><h3>Final individual standings</h3></header><div className={insightStyles.topPlayers}>{recap.players.slice(0, 10).map((player, index) => <div className={insightStyles.topPlayer} key={player.id}><strong className={insightStyles.rank}>{rankMark(index + 1)}</strong>{portrait(player)}<b>{player.name}</b><div><p className={insightStyles.cardProbability}><small>Final Points</small><strong>{formatPlayerPoints(player.expectedPoints)}</strong></p><p><small>Final Record</small><strong>{player.expectedRecord}</strong></p></div></div>)}</div></section>
-      <footer className={insightStyles.publication}><span>Publication Information</span><strong>Published: Tournament Recap</strong><small>{publicationTime}</small><p>Official completed tournament outcome. Championship Projections are now closed.</p></footer>
-    </section>;
+    return tournamentRecap ? <TournamentRecapExperience recap={tournamentRecap} tournament={data.tournament || {}} publicationTime={publicationTime} portrait={portrait} rankMark={rankMark} selectedPlayerId={selectedPlayerId} setSelectedPlayerId={setSelectedPlayerId} previewSelector={previewSelector} /> : <section className={insightStyles.experience}><div className={styles.empty}><strong>Tournament Recap</strong><span>Official tournament results are being finalized.</span></div></section>;
   }
 
   return <section className={insightStyles.experience} aria-label="Championship Odds">
-    {previewMode && previewScenarios.length ? <section className={insightStyles.scenarioSelector} aria-label="Preview Odds Scenarios"><label><span>Preview Odds Scenario</span><select value={insights.current.phase} onChange={(event) => { setPreviewPhase(event.target.value); setSelectedPlayerId(""); }}>{previewScenarios.map((scenario) => <option value={scenario.snapshot.phase} key={scenario.label}>{scenario.label}</option>)}</select></label><p>Preview only · official published snapshots</p></section> : null}
+    {previewSelector}
     <header className={insightStyles.hero}>
       <span>Published Tournament Projection</span><h2>🏆 Championship Odds</h2>
       <div><p><small>Projection Milestone</small><strong>{projectionPresentationLabel(insights.current.phase)}</strong></p><p><small>Published</small><strong>{publicationTime}</strong></p></div>
