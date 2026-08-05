@@ -34,7 +34,7 @@ function DiagnosticsPanel({ diagnostics }) {
   </details>;
 }
 
-export default function OddsAdmin({ embedded = false, sharedSecret = "", directorAuthorized = false, initialPhase = "", publicationReady = true, regenerationPhases = [], onPublished }) {
+export default function OddsAdmin({ embedded = false, sharedSecret = "", directorAuthorized = false, initialPhase = "", publicationReady = true, regenerationPhases = [], previewMode = false, onPublished }) {
   const [phase, setPhase] = useState(ODDS_PHASES.includes(initialPhase) ? initialPhase : ODDS_PHASES[0]);
   const [iterations, setIterations] = useState(10_000);
   const [secret, setSecret] = useState(sharedSecret);
@@ -48,7 +48,7 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
 
   async function publish() {
     setBusy(true); setPreview(null); setDiagnostics(null); setStatus(`Running ${iterations.toLocaleString()} tournament simulations…`);
-    const endpoint = "/api/odds/publish";
+    const endpoint = previewMode ? "/api/odds/publish-preview" : "/api/odds/publish";
     const requestPayload = { phase, iterations };
     const requestBody = JSON.stringify(requestPayload);
     const requestStack = new Error("Championship Projection request initiated").stack;

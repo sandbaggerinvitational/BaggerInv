@@ -99,7 +99,7 @@ export default function AdminCenter({ tournaments, previewMode = false, liveTour
         : null}
         {active === "standings" ? <StandingsPanel secret={secret} year={tournament?.year} /> : null}
         {active === "guide" ? <GuideEditor tournaments={tournaments} embedded sharedSecret={secret} sharedUpdatedBy={updatedBy} selectedTournamentId={tournamentId} onTournamentChange={selectTournament} /> : null}
-        {active === "odds" ? <OddsAdmin embedded sharedSecret={secret} /> : null}
+        {active === "odds" ? <OddsAdmin embedded sharedSecret={secret} previewMode={previewMode} /> : null}
         {active === "media" ? <CmsManager resource="media" {...shared} description="Catalog approved logos, hero images, course photos, player photos, and championship artwork for use throughout the site." /> : null}
         {active === "history" ? <CmsManager resource="awards" {...shared} title="History & Awards" description="Manage year-specific awards and winners. Championship team and final score remain in the Tournament record." /> : null}
         {active === "calibration" ? <ScorecardCalibration {...shared} /> : null}

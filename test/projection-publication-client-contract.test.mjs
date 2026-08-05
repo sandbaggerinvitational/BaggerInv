@@ -18,9 +18,9 @@ test("every presentation milestone submits its unchanged internal phase identifi
   for (const [phase, label] of expected) assert.equal(projectionPresentationLabel(phase), label);
 });
 
-test("all milestones share one publication endpoint and payload contract", async () => {
+test("all milestones share one publication handler and payload contract", async () => {
   const source = await readFile(new URL("../app/odds-center/admin/OddsAdmin.js", import.meta.url), "utf8");
-  assert.match(source, /const endpoint = "\/api\/odds\/publish"/);
+  assert.match(source, /const endpoint = previewMode \? "\/api\/odds\/publish-preview" : "\/api\/odds\/publish"/);
   assert.match(source, /const requestPayload = \{ phase, iterations \}/);
   assert.match(source, /body: requestBody/);
   assert.match(source, /credentials: "same-origin"/);
