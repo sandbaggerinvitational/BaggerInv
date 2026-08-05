@@ -78,6 +78,11 @@ test("Calcutta derives future Scramble net scores with the existing 35/15 team c
   assert.deepEqual(results.map((row) => row["Net Score"]), [67, 67]);
 });
 
+test("Calcutta stays unpublished when official purchases or award structures are incomplete", () => {
+  const model = buildCalcuttaModel({ year: 2026, players, roundResults: [{ Year: 2026, Round: 1, "Player ID": "A", "Net Score": 70 }] });
+  assert.equal(model.available, false);
+});
+
 test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet scroller", async () => {
   const [dashboard, component, css, loader, protection] = await Promise.all([
     readFile(new URL("../app/live/TournamentDashboard.js", import.meta.url), "utf8"),
