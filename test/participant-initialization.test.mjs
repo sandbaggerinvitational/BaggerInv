@@ -14,7 +14,7 @@ test("every participant entry point uses one shared initialization pipeline", as
     source("app/score/ScoreEntry.js"),
     source("app/api/director/reset-preview/route.js"),
   ]);
-  assert.match(pipeline, /await getTournamentData\(\)[\s\S]*await readPlayerPassportMatches\(session\)/);
+  assert.match(pipeline, /await getTournamentData\(\)[\s\S]*await readPlayerPassportMatches\(session,/);
   assert.match(pipeline, /const cache = new Map/);
   assert.match(pipeline, /const pending = new Map/);
   assert.match(activation, /initializeParticipantTournament\(session\)/);
@@ -25,13 +25,13 @@ test("every participant entry point uses one shared initialization pipeline", as
   assert.match(reset, /invalidateParticipantInitialization\(session\)[\s\S]*initializeParticipantTournament\(session\)/);
 });
 
-test("personalized Home stays in Preparing Tournament until initialization resolves", async () => {
+test("personalized Home uses a focused loading state until initialization resolves", async () => {
   const [home, route] = await Promise.all([
     source("app/PersonalizedPlayerHome.js"),
     source("app/api/player-passport/initialize/route.js"),
   ]);
   assert.match(home, /state === "loading"/);
-  assert.match(home, /Preparing Tournament/);
+  assert.match(home, /Loading your personalized tournament/);
   assert.match(route, /initializing: true/);
   assert.match(route, /status: 503/);
   assert.doesNotMatch(route, /Workbook check failed|Required normalized-sheet snapshot|Passport verification failed/);

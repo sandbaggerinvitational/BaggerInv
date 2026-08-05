@@ -100,9 +100,9 @@ test("participant Home omits the website footer and preserves dashboard order", 
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
   ]);
   assert.doesNotMatch(shell, /Footer/);
-  assert.ok(commandCenter.indexOf("<PersonalizedPlayerHome") < commandCenter.indexOf("<TournamentSchedule"));
+  assert.ok(commandCenter.indexOf("<TournamentSchedule") < commandCenter.indexOf("<PersonalizedPlayerHome"));
   assert.ok(commandCenter.indexOf("<TournamentSchedule") < commandCenter.indexOf("<TournamentLeaders"));
-  assert.ok(personalized.indexOf("{tournamentPulse}") < personalized.indexOf("<MyRounds"));
+  assert.doesNotMatch(personalized, /tournamentPulse|tournamentMoments/);
 });
 
 test("Home polish shares vertical rhythm and distinguishes completed rounds", async () => {

@@ -149,7 +149,14 @@ function PlayerNetSkins({ netSkins, playerId }) {
   </section>;
 }
 
-export default function PersonalizedPlayerHome({ tournamentPulse = null, tournamentMoments = null, netSkins = null }) {
+function parseServerTiming(value = "") {
+  return Object.fromEntries(String(value).split(",").map((entry) => {
+    const [name, duration] = entry.trim().split(";dur=");
+    return [name, Number(duration) || 0];
+  }).filter(([name]) => name));
+}
+
+export default function PersonalizedPlayerHome({ netSkins = null }) {
   const [payload, setPayload] = useState(null);
   const [state, setState] = useState("loading");
   const [busyId, setBusyId] = useState("");
@@ -157,6 +164,7 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
   const [now, setNow] = useState(Date.now());
 
   const refresh = useCallback(async () => {
+    const clientStartedAt = performance.now();
     setState((current) => current === "ready" ? current : "loading");
     try {
       const response = await fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store" });
@@ -165,6 +173,11 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
       }
       const result = await response.json();
       if (!response.ok) throw new Error();
+      console.info("Personalized Home load timing", {
+        ...parseServerTiming(response.headers.get("server-timing") || ""),
+        clientTotal: Math.round(performance.now() - clientStartedAt),
+        cache: response.headers.get("x-home-initialization-cache") || "unknown",
+      });
       setPayload(result.data); setState("ready");
     } catch {
       setState("error");
@@ -206,14 +219,12 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
 
   if (state === "loading") return <>
     <section className={styles.loading} aria-live="polite">
-      <strong>Preparing Tournament…</strong>
-      <span>Please wait while your tournament is prepared.</span>
+      <strong>Loading your personalized tournament…</strong>
+      <span>Your match, setup, and player details are loading.</span>
       <span className={styles.skeleton} />
       <span className={styles.skeleton} />
       <span className={styles.skeleton} />
     </section>
-    {tournamentPulse}
-    {tournamentMoments}
   </>;
   if (state === "public") return <>
     <section className={styles.empty}>
@@ -222,16 +233,12 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
       <span>Activate Player Passport to see your partner, opponents, course, and tee time.</span>
       <Link className={styles.primaryAction} href="/activate">Activate Player Passport</Link>
     </section>
-    {tournamentPulse}
-    {tournamentMoments}
   </>;
   if (state === "error") return <>
     <section className={styles.error}>
       <strong>We couldn’t load your tournament right now.</strong>
       <button onClick={refresh}>Try again</button>
     </section>
-    {tournamentPulse}
-    {tournamentMoments}
   </>;
 
   const player = payload?.player;
@@ -284,8 +291,6 @@ export default function PersonalizedPlayerHome({ tournamentPulse = null, tournam
       {message ? <p className={styles.message} role="alert">{message}</p> : null}
     </div>}
 
-    {tournamentPulse}
-    {tournamentMoments}
     <PlayerNetSkins netSkins={netSkins} playerId={player?.id} />
     {matches.length ? <MyRounds
       matches={matches}

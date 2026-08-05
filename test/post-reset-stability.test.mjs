@@ -75,7 +75,7 @@ test("recovering participant screens hide implementation diagnostics until retri
   assert.match(recovery, /fetchWithTransientRetry\("\/api\/live"/);
   assert.match(recovery, /state === "failed"/);
   assert.match(homePage, /TournamentInitializationRecovery/);
-  assert.match(home, /Preparing Tournament/);
+  assert.match(home, /Loading your personalized tournament/);
   assert.match(score, /Preparing your tournament/);
   assert.match(tournament, /Preparing Tournament/);
   assert.match(leaderboards, /Preparing Tournament/);

@@ -162,8 +162,10 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
         status={status}
       />
 
-      <PersonalizedPlayerHome tournamentPulse={pulse} tournamentMoments={<TournamentMoments moments={moments} />} netSkins={liveData?.netSkins} />
+      {pulse}
+      <TournamentMoments moments={moments} />
       {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
+      <PersonalizedPlayerHome netSkins={liveData?.netSkins} />
       <TournamentLeaders leaders={leaders} />
     </div>
   );

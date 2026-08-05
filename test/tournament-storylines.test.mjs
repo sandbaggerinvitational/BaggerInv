@@ -289,7 +289,7 @@ test("Home places Tournament Moments immediately beneath Tournament Pulse", asyn
   ]);
   assert.match(commandCenter, /tournamentMoments\(liveData\)/);
   assert.match(commandCenter, /<TournamentMoments moments=\{moments\}/);
-  assert.ok(home.indexOf("{tournamentPulse}") < home.indexOf("{tournamentMoments}"));
+  assert.ok(commandCenter.indexOf("{pulse}") < commandCenter.indexOf("<TournamentMoments"));
   assert.ok(home.indexOf("{tournamentMoments}") < home.indexOf("<MyRounds"));
 });
 
