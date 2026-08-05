@@ -15,13 +15,14 @@ async function directorSession(request) {
   return { session: verifyPlayerPassportSession(token), identity: identity.identity };
 }
 
-function sessionToken(session, impersonatedPlayerId = "") {
+function sessionToken(session, impersonatedPlayerId = "", previewDirector = null) {
   return createPlayerPassportSession({
     playerId: session.playerId,
     tournamentId: session.tournamentId,
     deviceId: session.deviceId,
     sessionVersion: session.sessionVersion,
     impersonatedPlayerId,
+    previewDirector,
     expiresInSeconds: Math.max(3600, Number(session.exp || 0) - Math.floor(Date.now() / 1000)),
   });
 }
@@ -35,7 +36,7 @@ export async function POST(request) {
   const player = data.players?.find((item) => item.id === playerId);
   if (!player) return NextResponse.json({ error: "Select an active tournament player." }, { status: 400 });
   const response = NextResponse.json({ ok: true, player });
-  response.cookies.set(playerPassportCookie(sessionToken(authorized.session, player.id)));
+  response.cookies.set(playerPassportCookie(sessionToken(authorized.session, player.id, authorized.identity.actor)));
   return response;
 }
 

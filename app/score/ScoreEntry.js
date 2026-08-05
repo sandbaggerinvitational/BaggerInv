@@ -81,6 +81,9 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   const [passportMatches, setPassportMatches] = useState([]);
   const [passportTournament, setPassportTournament] = useState(null);
   const [passportState, setPassportState] = useState("loading");
+  const [previewMode, setPreviewMode] = useState(() =>
+    typeof window !== "undefined" && window.localStorage.getItem("sbi-preview-session") === "true"
+  );
   const [restoreAttempt, setRestoreAttempt] = useState(0);
 
   const request = async (url, options = {}) => {
@@ -132,6 +135,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
         if (passport.ok) {
           const identity = await passport.json();
           if (!current) return;
+          setPreviewMode(Boolean(identity.previewMode));
           setPassportPlayer(identity.player);
           setPassportState("active");
           setPassportMatches(identity.data?.matches || []);
@@ -365,7 +369,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   };
 
   if (restoring) return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>Please wait while your Player Passport and match are refreshed.</p></div>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>{previewMode ? "Loading the selected player’s tournament experience." : "Please wait while your Player Passport and match are refreshed."}</p></div>
   </section>;
 
   if (!authorized && passportPlayer) return <MyMatchDashboard
@@ -378,7 +382,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     />;
 
   if (!authorized && passportState === "unavailable") return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>We couldn’t verify your Player Passport right now.</p></div>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>{previewMode ? "The selected player’s tournament experience is still loading." : "We couldn’t verify your Player Passport right now."}</p></div>
     <button className={styles.primary} type="button" onClick={() => { setRestoring(true); setRestoreAttempt((value) => value + 1); }}>Retry</button>
   </section>;
 

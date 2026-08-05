@@ -123,6 +123,7 @@ export default function DirectorDashboard({ directorName }) {
       const response = await directorFetch("/api/director/impersonation", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ playerId }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Preview player could not be selected.");
+      window.dispatchEvent(new Event("player-passport-changed"));
       router.push("/home");
     } catch (error) { setMessage(error.message); setBusy(""); }
   };

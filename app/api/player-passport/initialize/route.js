@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
+import { isPreviewImpersonationSession, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
 import { attachRuntimeTiming, createRuntimeProfile } from "../../../../lib/runtime-performance.js";
 
@@ -35,7 +35,7 @@ export async function GET(request) {
       ...timing,
       slowestStage,
     });
-    const response = NextResponse.json({ active: true, player: initialized.player, data: initialized.personalized });
+    const response = NextResponse.json({ active: true, previewMode: isPreviewImpersonationSession(session), player: initialized.player, data: initialized.personalized });
     response.headers.set("Server-Timing", [
       `session;dur=${timing.sessionValidationMs}`,
       `passport;dur=${timing.passportLookupMs}`,

@@ -84,7 +84,7 @@ test("personalized match assembly reuses the initialized tournament model", asyn
   ]);
   assert.match(initialization, /tournamentData,/);
   assert.match(matches, /const tournamentData = initialized\.tournamentData/);
-  assert.match(workbook, /const sheets = await readSheets\(\[\s*"Trusted Devices", "Player Passport", "Players", "Tournaments", "Handicaps"/);
+  assert.match(workbook, /: \["Trusted Devices", "Player Passport", "Players", "Tournaments", "Handicaps"/);
   assert.match(workbook, /validatePlayerPassport\(session, sheets\)/);
   assert.match(workbook, /passportTournamentContext\(sheets\)/);
 });

@@ -39,5 +39,5 @@ test("Home initialization exposes every requested timing stage without changing 
   assert.match(pipeline, /tournamentDataMs/);
   assert.match(passport, /personalizedDataMs/);
   assert.match(home, /clientTotal/);
-  assert.match(route, /NextResponse\.json\(\{ active: true, player: initialized\.player, data: initialized\.personalized \}\)/);
+  assert.match(route, /NextResponse\.json\(\{ active: true, previewMode: isPreviewImpersonationSession\(session\), player: initialized\.player, data: initialized\.personalized \}\)/);
 });

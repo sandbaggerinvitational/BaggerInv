@@ -7,6 +7,7 @@ import { participantDestination } from "../lib/participant-shell";
 import styles from "./participant-navigation.module.css";
 
 const PARTICIPANT_SHELL_KEY = "sbi-participant-shell";
+const PREVIEW_SESSION_KEY = "sbi-preview-session";
 
 const itemsFor = (player) => [
   { href: "/home", label: "Home", icon: "home" },
@@ -53,12 +54,15 @@ export default function ParticipantIdentity() {
           setPlayer(nextPlayer);
           setImpersonation(payload.impersonation || null);
           window.localStorage.setItem(PARTICIPANT_SHELL_KEY, JSON.stringify(nextPlayer));
+          if (payload.impersonation?.active) window.localStorage.setItem(PREVIEW_SESSION_KEY, "true");
+          else window.localStorage.removeItem(PREVIEW_SESSION_KEY);
           return;
         }
         if (response.status === 401 && sequence === requestSequence.current) {
           setPlayer(null);
           setImpersonation(null);
           window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
+          window.localStorage.removeItem(PREVIEW_SESSION_KEY);
         }
       })
       .catch(() => {
@@ -73,6 +77,7 @@ export default function ParticipantIdentity() {
       if (remembered?.id && remembered?.name) setPlayer(remembered);
     } catch {
       window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
+      window.localStorage.removeItem(PREVIEW_SESSION_KEY);
     }
     refresh();
     const changed = () => refresh();
@@ -105,10 +110,17 @@ export default function ParticipantIdentity() {
   return <>
     {impersonation ? <aside className={styles.impersonation} role="status" aria-label={`Preview Mode. Viewing as ${impersonation.player.name}`}>
       <span><b>Preview Mode</b><small>Viewing as</small><strong>{impersonation.player.name}</strong></span>
-      <button type="button" onClick={async () => {
-        const response = await fetch("/api/director/impersonation", { method: "DELETE" });
-        if (response.ok) router.push("/admin/director");
-      }}>Return to Director</button>
+      <div className={styles.previewActions}>
+        <button type="button" onClick={() => router.push("/admin/director#qa-tools")}>Change Preview Player</button>
+        <button type="button" onClick={async () => {
+          const response = await fetch("/api/director/impersonation", { method: "DELETE" });
+          if (response.ok) {
+            window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
+            window.localStorage.removeItem(PREVIEW_SESSION_KEY);
+            router.replace("/admin/director");
+          }
+        }}>Exit Preview</button>
+      </div>
     </aside> : null}
     <nav className={styles.mobile} aria-label={`${player.name}'s tournament navigation`}>
       {items.map((item) => {

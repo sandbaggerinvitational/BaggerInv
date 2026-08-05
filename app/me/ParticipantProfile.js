@@ -46,6 +46,7 @@ export default function ParticipantProfile() {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [identityState, setIdentityState] = useState("loading");
+  const [previewMode, setPreviewMode] = useState(false);
   const [tournamentData, setTournamentData] = useState(null);
   const [attempt, setAttempt] = useState(0);
   const [confirming, setConfirming] = useState(false);
@@ -69,7 +70,9 @@ export default function ParticipantProfile() {
       .then(async (response) => {
         if (!current) return;
         if (response.ok) {
-          setPlayer((await response.json()).player);
+          const identity = await response.json();
+          setPlayer(identity.player);
+          setPreviewMode(Boolean(identity.impersonation?.active));
           setIdentityState("active");
           const tournamentResponse = await fetch("/api/player-passport/matches", { cache: "no-store" });
           if (current && tournamentResponse.ok) setTournamentData((await tournamentResponse.json()).data);
@@ -185,13 +188,13 @@ export default function ParticipantProfile() {
         </label>)}
       </div>
     </section>
-    <section className={styles.card}>
+    {!previewMode ? <section className={styles.card}>
       <div className={styles.sectionHeading}><span>Account Management</span><h2>Player Passport</h2></div>
       <p className={styles.note}>Removing this device does not change your player record or activation credentials.</p>
       {!confirming ? <button className={styles.remove} onClick={() => setConfirming(true)}>This isn’t me</button> : <div className={styles.confirm}>
         <strong>Remove Player Passport from this device?</strong>
         <div><button onClick={() => setConfirming(false)}>Keep Passport</button><button onClick={remove}>Remove</button></div>
       </div>}
-    </section>
+    </section> : null}
   </section>;
 }
