@@ -80,7 +80,7 @@ export async function POST(request) {
     start("Snapshot validation", { workbookOperation: "Validate snapshot identity, values, and publication lifecycle", worksheet: "Odds Snapshots", function: "validateProjectionSnapshot" });
     validateProjectionSnapshot(preview);
     const existing = (await readOddsSnapshots()).filter((row) => row.year === preview.year);
-    if (phase === "Pre-Tournament" && existing.some((row) => row.phase !== "Pre-Tournament")) throw new Error("Pre-Tournament is locked because the tournament has started.");
+    if (process.env.VERCEL_ENV !== "preview" && phase === "Pre-Tournament" && existing.some((row) => row.phase !== "Pre-Tournament")) throw new Error("Pre-Tournament is locked because the tournament has started.");
     pass("Snapshot validation", { worksheet: "Odds Snapshots", function: "validateProjectionSnapshot", existingSnapshots: existing.length });
 
     start("Batch workbook write", { workbookOperation: "Atomic field-scoped replacement of projection runtime records", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });

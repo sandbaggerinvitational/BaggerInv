@@ -195,6 +195,10 @@ test("Championship Projections opens in-place player details from every publishe
   assert.match(source, /setSelectedPlayerId\(String\(player\.id\)\)/);
   assert.doesNotMatch(source, /router\.push\([^\n]*projection/);
   assert.match(insightStyles, /sheetLayer\{position:fixed/);
+  assert.match(insightStyles, /height:100dvh;overflow:hidden/);
+  assert.match(insightStyles, /overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch/);
+  assert.match(insightStyles, /sheet>header\{position:sticky/);
+  assert.match(insightStyles, /env\(safe-area-inset-bottom\)/);
   assert.match(insightStyles, /data-podium="1"/);
   assert.match(insightStyles, /data-podium="2"/);
   assert.match(insightStyles, /data-podium="3"/);

@@ -19,9 +19,26 @@ test("Mission Control advances projection milestones without changing publicatio
   });
 
   assert.equal(status.currentLabel, "Opening Championship Projection");
+  assert.deepEqual(status.publishedPhases, ["Pre-Tournament"]);
   assert.equal(status.nextPhase, "After Round 1");
   assert.equal(status.nextLabel, "Round 2 Pairings Projection");
   assert.equal(status.ready, true);
+});
+
+test("Preview regeneration exposes published milestones without creating a second publisher", async () => {
+  const [dashboard, publisher, publishRoute, workbook] = await Promise.all([
+    source("app/admin/director/DirectorDashboard.js"),
+    source("app/odds-center/admin/OddsAdmin.js"),
+    source("app/api/odds/publish/route.js"),
+    source("lib/google-sheets-write.js"),
+  ]);
+  assert.match(dashboard, /regenerationPhases=\{data\.qaTools \? data\.championshipProjections\.publishedPhases : \[\]\}/);
+  assert.match(publisher, /Preview Regeneration/);
+  assert.match(publisher, /Regenerate Official Projection/);
+  assert.match(publisher, /regenerationPhases\.includes\(phase\)/);
+  assert.match(publishRoute, /process\.env\.VERCEL_ENV !== "preview"/);
+  assert.match(workbook, /row\.phase === snapshot\.phase/);
+  assert.match(workbook, /phaseOrder - b\.phaseOrder/);
 });
 
 test("next projection remains locked until its operational prerequisite is complete", () => {
