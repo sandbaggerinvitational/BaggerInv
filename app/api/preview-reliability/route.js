@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadParticipantRequestContext } from "../../../lib/participant-request-context.js";
+import { runtimePerformanceReport } from "../../../lib/runtime-performance.js";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,13 @@ export async function GET(request) {
     googleApiLatencyMs: google.lastLatencyMs,
     retryCount: google.retries,
     cacheBehavior: context.diagnostics.cacheBehavior,
+    cacheHitRate: google.sheetCacheHitRate,
+    tournamentModelCacheHitRate: context.diagnostics.modelCacheHitRate,
+    cachedSheets: google.cachedSheets,
+    googleApiRequests: google.apiRequests,
+    googleRangesRequested: google.rangesRequested,
+    tournamentModelTiming: context.diagnostics.lastTiming,
+    slowestOperations: runtimePerformanceReport(),
     passportCookieDetected: context.passportCookiePresent,
     trustedDeviceLookupSuccessful: context.identity.status === "active",
     playerResolved: Boolean(context.identity.identity?.player),

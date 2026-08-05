@@ -24,6 +24,7 @@ import {
   readNormalizedSheetValues,
   readNormalizedSheetsValues,
   normalizedReadDiagnostics,
+  invalidateNormalizedSheetCache,
 } from "../../lib/google-sheets-server-read";
 import { isTransientGoogleError } from "../../lib/google-api-reliability";
 import { calculateNetSkins } from "../../lib/net-skins";
@@ -324,6 +325,8 @@ function tieAdvantageSide(tournamentRow, teams) {
 }
 
 async function buildTournamentData() {
+  const buildStartedAt = Date.now();
+  let workbookReadMs = 0;
   let sheets;
   let timelineValues;
   let workbookChecks = { required: {}, optional: {} };
@@ -339,6 +342,7 @@ async function buildTournamentData() {
       optionalNames,
       readRequired: readNormalizedSheetsValues,
       readSheet: readNormalizedSheetValues,
+      readOptionalBatch: readNormalizedSheetsValues,
     });
     sheets = Object.fromEntries([...requiredNames, ...optionalNames].map((name) => [name, table(initialized.sheets[name] || [])]));
     timelineValues = initialized.sheets["Tournament Timeline"] || [];
@@ -387,6 +391,7 @@ async function buildTournamentData() {
     "Local Guide": localGuideRows,
     "Important Contacts": importantContactRows,
   } = sheets;
+  workbookReadMs = Date.now() - buildStartedAt;
 
   const active = [...liveTournaments]
     .filter((row) => tournamentYear(row))
@@ -604,7 +609,7 @@ async function buildTournamentData() {
     }))
     .sort((left, right) => Number(clean(left.Round).match(/\d+/)?.[0] || 999) - Number(clean(right.Round).match(/\d+/)?.[0] || 999));
 
-  return {
+  const normalizedData = {
     workbookChecks,
     tournament: { ...tournament, state },
     rounds,
@@ -652,11 +657,18 @@ async function buildTournamentData() {
     },
     players: Object.entries(playerMap).filter(([, player]) => player.active).map(([id, player]) => ({ id, name: player.name, slug: player.slug })),
   };
+  loaderDiagnostics.lastTiming = {
+    googleSheetsReadMs: workbookReadMs,
+    workbookNormalizationMs: Date.now() - buildStartedAt - workbookReadMs,
+    totalTournamentModelMs: Date.now() - buildStartedAt,
+  };
+  return normalizedData;
 }
 
 let pendingTournamentData;
 let lastGoodTournamentData;
 let lastGoodAt = 0;
+const TOURNAMENT_MODEL_TTL_MS = 2_500;
 let tournamentDataGeneration = 0;
 const loaderDiagnostics = {
   result: "idle",
@@ -665,14 +677,23 @@ const loaderDiagnostics = {
   errorCategory: "",
   workbookCheck: "",
   requiredSheetsFound: false,
+  lastTiming: null,
+  modelCacheHits: 0,
+  modelCacheMisses: 0,
 };
 
 export async function getTournamentData() {
+  if (lastGoodTournamentData && Date.now() - lastGoodAt < TOURNAMENT_MODEL_TTL_MS) {
+    loaderDiagnostics.cacheBehavior = "model-cache-hit";
+    loaderDiagnostics.modelCacheHits += 1;
+    return lastGoodTournamentData;
+  }
   if (pendingTournamentData) {
     loaderDiagnostics.cacheBehavior = "in-flight-dedupe";
     return pendingTournamentData;
   }
   loaderDiagnostics.cacheBehavior = "miss";
+  loaderDiagnostics.modelCacheMisses += 1;
   const generation = tournamentDataGeneration;
   const request = buildTournamentData()
     .then((data) => {
@@ -709,6 +730,7 @@ export function invalidateTournamentDataCache() {
   pendingTournamentData = undefined;
   lastGoodTournamentData = undefined;
   lastGoodAt = 0;
+  invalidateNormalizedSheetCache();
   loaderDiagnostics.result = "invalidated";
   loaderDiagnostics.cacheBehavior = "miss";
   loaderDiagnostics.errorCategory = "";
@@ -719,6 +741,9 @@ export function invalidateTournamentDataCache() {
 export function tournamentLoaderDiagnostics() {
   return {
     ...loaderDiagnostics,
+    modelCacheHitRate: loaderDiagnostics.modelCacheHits + loaderDiagnostics.modelCacheMisses
+      ? loaderDiagnostics.modelCacheHits / (loaderDiagnostics.modelCacheHits + loaderDiagnostics.modelCacheMisses)
+      : 0,
     lastGoodAgeMs: lastGoodAt ? Date.now() - lastGoodAt : null,
     google: normalizedReadDiagnostics(),
   };

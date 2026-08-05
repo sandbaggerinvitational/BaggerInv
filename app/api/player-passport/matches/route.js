@@ -24,7 +24,7 @@ export async function GET(request) {
     const initialized = await initializeParticipantTournament(session);
     const data = initialized.personalized;
     try {
-      const tournamentData = await getTournamentData();
+      const tournamentData = initialized.tournamentData;
       const standings = rankPlayerRows(
         playerPerformanceRows(tournamentData.leaderboard || [], tournamentData.scoreLeaderboard || []),
         "points"

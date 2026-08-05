@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
+import { attachRuntimeTiming, createRuntimeProfile } from "../../../../lib/runtime-performance.js";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
+  const profile = createRuntimeProfile("GET /api/player-passport/initialize");
   const requestStartedAt = Date.now();
   const sessionStartedAt = Date.now();
   let session;
@@ -42,7 +44,7 @@ export async function GET(request) {
       `total;dur=${timing.totalHomeLoadMs}`,
     ].join(", "));
     response.headers.set("X-Home-Initialization-Cache", timing.cacheHit ? "hit" : "miss");
-    return response;
+    return attachRuntimeTiming(response, profile.finish({ ...timing, cache: timing.cacheHit ? "hit" : "miss" }));
   } catch (error) {
     if (/no longer active|not active in this tournament/i.test(String(error?.message || ""))) {
       return NextResponse.json({ active: false }, { status: 401 });
