@@ -6,11 +6,12 @@ import { formatTeamPoints } from "../lib/formatters.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("shared score typography preserves the font and enables tabular lining figures", async () => {
+test("shared score typography uses the system scoreboard face with tabular lining figures", async () => {
   const css = await source("app/score-typography.module.css");
 
   assert.match(css, /font-variant-numeric:\s*tabular-nums lining-nums/);
   assert.match(css, /font-feature-settings:\s*"tnum" 1, "lnum" 1/);
+  assert.match(css, /font-family:\s*-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important/);
   assert.match(css, /padding-inline:\s*0\.24em/);
   assert.match(css, /align-items:\s*center/);
 });
@@ -36,6 +37,15 @@ test("prominent tournament, match, and leaderboard scores share the typography t
 });
 
 test("decimal team-score formatting remains unchanged", () => {
-  assert.equal(formatTeamPoints(8.5), "8.5");
-  assert.equal(formatTeamPoints(3.5), "3.5");
+  assert.equal(formatTeamPoints(12.5), "12.5");
+  assert.equal(formatTeamPoints(5.5), "5.5");
+});
+
+test("Championship Projections use lining tabular figures without changing their layout", async () => {
+  const css = await source("app/live/leaderboards-insights.module.css");
+
+  assert.match(css, /\.favorite p strong,[\s\S]*\.captainImpact b/);
+  assert.match(css, /font-family:\s*-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif/);
+  assert.match(css, /font-variant-numeric:\s*tabular-nums lining-nums/);
+  assert.match(css, /font-feature-settings:\s*"tnum" 1, "lnum" 1/);
 });

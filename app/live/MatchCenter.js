@@ -264,9 +264,9 @@ function MatchCenterExperience({ initialData, loadError }) {
     <div className={styles.focusedHeader}>{focusedBack}<span>Round {focusedRound}</span><h1>Live Matchups</h1><p>The leading side is highlighted as scores are entered.</p></div>
     <div className={styles.focusedTournamentScore}>
       <span>Tournament score</span>
-      <div><strong>{tournament.teamOne.name}</strong><b>{formatTeamPoints(tournament.teamOne.score)}</b></div>
+      <div><strong>{tournament.teamOne.name}</strong><b className={scoreStyles.centeredScore}>{formatTeamPoints(tournament.teamOne.score)}</b></div>
       <em>—</em>
-      <div><b>{formatTeamPoints(tournament.teamTwo.score)}</b><strong>{tournament.teamTwo.name}</strong></div>
+      <div><b className={scoreStyles.centeredScore}>{formatTeamPoints(tournament.teamTwo.score)}</b><strong>{tournament.teamTwo.name}</strong></div>
     </div>
     {focusedRoundData ? <div className={styles.matchGrid}>{focusedRoundData.matches.map((match) => <PublicMatchCard match={match} round={focusedRoundData} tournament={tournament} key={match.id} />)}</div> : null}
   </section>;

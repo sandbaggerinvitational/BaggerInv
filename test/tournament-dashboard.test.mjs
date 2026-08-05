@@ -210,7 +210,7 @@ test("Snapshot counts use distinct live, remaining, and final labels", async () 
 test("Round summaries center team names around an independent score", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
   assert.match(source, /className=\{styles\.roundScore\}/);
-  assert.match(source, /\{formatTeamPoints\(teamOneScore\)\} – \{formatTeamPoints\(teamTwoScore\)\}/);
+  assert.match(source, /\{formatTeamPoints\(teamOneScore\)\}<i className=\{scoreStyles\.separator\}[^>]*>–<\/i>\{formatTeamPoints\(teamTwoScore\)\}/);
   assert.match(styles, /\.roundScore\{[^}]*grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)/);
   assert.match(styles, /\.roundScore>span\{[^}]*text-align:center|\.roundScore\{[^}]*text-align:center/);
   assert.match(styles, /\.roundScore>span\{[^}]*min-height:2\.4em/);

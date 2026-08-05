@@ -18,3 +18,19 @@
 .recapSection{overflow:hidden}.recapSection>header,.recapJourneys>header{padding:13px 14px;border-bottom:1px solid #eee8de}.recapSection h3,.recapJourneys h3{margin:3px 0 0;color:#0b4938;font:700 .94rem Georgia,serif}.recapMetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px}.recapMetrics article{display:grid;align-content:start;gap:5px;min-height:100px;padding:12px;border:1px solid #e4dccd;border-radius:12px;background:#faf7ef}.recapMetrics article>span{color:#756b5b;font-size:.49rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.recapMetrics article strong{color:#0b4938;font:700 .84rem/1.2 Georgia,serif}.recapMetrics article p{margin:0;color:#5d6963;font-size:.63rem;font-weight:800;line-height:1.35}
 .captainImpact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px}.captainImpact article{display:grid;justify-items:center;gap:5px;padding:14px 10px;border:1px solid #dfd3b8;border-radius:12px;background:#fffaf0;text-align:center}.captainImpact article>strong{color:#0b4938;font:700 .86rem Georgia,serif}.captainImpact p{display:flex;align-items:center;gap:8px;margin:2px 0;color:#17362c;font-size:.84rem;font-weight:900}.captainImpact i{color:#aa9361;font-style:normal}.captainImpact b{color:#8b6a20;font-size:.72rem}.captainImpact small{color:#707a75;font-size:.5rem;font-weight:800;text-transform:uppercase}.recapJourneys .topPlayer{min-height:205px}
 @media(max-width:390px){.recapHero{gap:12px}.recapLogo,.recapLogoFallback{flex-basis:68px;width:68px;height:68px}.recapScore>div{padding-inline:6px}.recapScore strong{font-size:.79rem}.recapMetrics{gap:6px;padding:8px}.recapMetrics article{padding:10px}.captainImpact{gap:6px;padding:8px}}
+
+/* Projection figures share the professional scoreboard numeral face. */
+.favorite p strong,
+.topPlayer p strong,
+.remaining .row > strong,
+.remaining .row > span,
+.sheetSummary strong,
+.history li > span,
+.recapScore strong,
+.recapMetrics article p,
+.captainImpact p,
+.captainImpact b {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
