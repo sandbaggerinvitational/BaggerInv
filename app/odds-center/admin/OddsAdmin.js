@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ODDS_PHASES } from "../../../lib/tournament-odds";
 import styles from "../odds.module.css";
 import { directorFetch } from "../../../lib/director-client-transaction";
@@ -31,14 +31,15 @@ function DiagnosticsPanel({ diagnostics }) {
   </details>;
 }
 
-export default function OddsAdmin({ embedded = false, sharedSecret = "" }) {
-  const [phase, setPhase] = useState(ODDS_PHASES[0]);
+export default function OddsAdmin({ embedded = false, sharedSecret = "", directorAuthorized = false, initialPhase = "", publicationReady = true, onPublished }) {
+  const [phase, setPhase] = useState(ODDS_PHASES.includes(initialPhase) ? initialPhase : ODDS_PHASES[0]);
   const [iterations, setIterations] = useState(10_000);
   const [secret, setSecret] = useState(sharedSecret);
   const [status, setStatus] = useState("");
   const [preview, setPreview] = useState(null);
   const [diagnostics, setDiagnostics] = useState(null);
   const [busy, setBusy] = useState(false);
+  useEffect(() => { if (ODDS_PHASES.includes(initialPhase)) setPhase(initialPhase); }, [initialPhase]);
 
   async function publish() {
     setBusy(true); setPreview(null); setDiagnostics(null); setStatus(`Running ${iterations.toLocaleString()} tournament simulations…`);
@@ -58,12 +59,12 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "" }) {
         throw error;
       }
       setDiagnostics(data.diagnostics || null);
-      setPreview(data.snapshot); setStatus(`${projectionPresentationLabel(phase)} published successfully. Website, PWA, Tournament Intelligence, Storylines, and Projection History now share this official snapshot.`);
+      setPreview(data.snapshot); setStatus(`${projectionPresentationLabel(phase)} published successfully. Website, PWA, Tournament Intelligence, Storylines, and Projection History now share this official snapshot.`); onPublished?.(data.snapshot);
     } catch (error) {
       setDiagnostics(error.diagnostics || { stepReached: "Director request", rootCause: error.message, worksheet: "None", workbookOperation: "Request publication", function: "OddsAdmin.publish", exception: error.name || "Error", stack: error.stack || "Unavailable", trace: { stages: [] } });
       setStatus("Championship projections could not be published. Please try again.");
     } finally { setBusy(false); }
   }
 
-  return <section className={styles.admin}><p>Official Tournament Intelligence</p><h1>Championship Projections</h1><label>Official milestone<select value={phase} onChange={(event) => setPhase(event.target.value)}>{ODDS_PHASES.map((item) => <option value={item} key={item}>{projectionPresentationLabel(item)}</option>)}</select></label><label>Simulation count<select value={iterations} onChange={(event) => setIterations(Number(event.target.value))}>{COUNTS.map((count) => <option value={count} key={count}>{count.toLocaleString()}</option>)}</select></label>{!embedded ? <label>Publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label> : null}<button disabled={!secret || busy} onClick={publish}>{busy ? "Generating official projection…" : "Generate & Publish Official Projection"}</button>{status ? <div>{status}</div> : null}<DiagnosticsPanel diagnostics={diagnostics} />{preview ? <div><span>Published Official Snapshot</span><strong>{projectionPresentationLabel(preview.phase)}</strong><br /><strong>{preview.teams?.[0]?.name}: {preview.teams?.[0]?.probability}%</strong><br /><strong>{preview.teams?.[1]?.name}: {preview.teams?.[1]?.probability}%</strong><br /><span>{preview.totalPointsAvailable} total tournament points modeled</span></div> : null}<small>The opening projection may be updated until a later official milestone is published. Every participant experience reads the same authoritative snapshot.</small></section>;
+  return <section className={styles.admin}><p>Official Tournament Intelligence</p><h1>Championship Projections</h1><label>Official milestone{directorAuthorized ? <strong>{projectionPresentationLabel(phase)}</strong> : <select value={phase} onChange={(event) => setPhase(event.target.value)}>{ODDS_PHASES.map((item) => <option value={item} key={item}>{projectionPresentationLabel(item)}</option>)}</select>}</label><label>Simulation count<select value={iterations} onChange={(event) => setIterations(Number(event.target.value))}>{COUNTS.map((count) => <option value={count} key={count}>{count.toLocaleString()}</option>)}</select></label>{!embedded ? <label>Publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label> : null}<button disabled={!publicationReady || (!secret && !directorAuthorized) || busy} onClick={publish}>{busy ? "Generating official projection…" : "Generate & Publish Official Projection"}</button>{status ? <div>{status}</div> : null}<DiagnosticsPanel diagnostics={diagnostics} />{preview ? <div><span>Published Official Snapshot</span><strong>{projectionPresentationLabel(preview.phase)}</strong><br /><strong>{preview.teams?.[0]?.name}: {preview.teams?.[0]?.probability}%</strong><br /><strong>{preview.teams?.[1]?.name}: {preview.teams?.[1]?.probability}%</strong><br /><span>{preview.totalPointsAvailable} total tournament points modeled</span></div> : null}<small>The opening projection may be updated until a later official milestone is published. Every participant experience reads the same authoritative snapshot.</small></section>;
 }

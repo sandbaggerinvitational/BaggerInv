@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { directorFetch } from "../../../lib/director-client-transaction";
 import { useCallback, useEffect, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
+import OddsAdmin from "../../odds-center/admin/OddsAdmin.js";
 import styles from "./director.module.css";
 
 const HEALTH = [
@@ -190,6 +191,16 @@ export default function DirectorDashboard({ directorName }) {
       {finalMatches ? <label><span>Reopen finalized match</span><select value={reopenId} onChange={(event) => setReopenId(event.target.value)}><option value="">Select match</option>{(data.finalizedMatches || []).filter((item) => String(item.round) === selectedRound).map((item) => <option value={item.id} key={item.id}>Match {item.match} · {item.id}</option>)}</select><button disabled={Boolean(busy) || !reopenId} onClick={() => act("reopen-match", { matchId: reopenId })}>Reopen Match</button></label> : null}
       <Link href="/live?view=leaderboards">Leaderboards</Link><Link href="/live">Tournament Overview</Link>
     </div><details className={styles.roundOverride}><summary>Override Operating Round</summary><label>Operating round<select value={selectedRound} onChange={(event) => setSelectedRound(event.target.value)}>{data.rounds.map((item) => <option value={item.number} key={item.number}>{item.name} • {item.format}</option>)}</select></label></details>{message ? <p role="status">{message}</p> : null}</section>
+
+    <section className={styles.projections} data-ready={data.championshipProjections.ready ? "true" : "false"} aria-labelledby="projections-title">
+      <header><span>Tournament Intelligence</span><h2 id="projections-title">Championship Projections</h2></header>
+      <div className={styles.projectionStatus}>
+        <article><small>Current Publication</small><strong>{data.championshipProjections.currentLabel}</strong><span>{data.championshipProjections.publishedAt ? timestamp(data.championshipProjections.publishedAt) : "No official projection published"}</span></article>
+        <article><small>Next Milestone</small><strong>{data.championshipProjections.nextLabel}</strong><span>{data.championshipProjections.ready ? "Ready to publish" : "Not ready"}</span></article>
+      </div>
+      <p>{data.championshipProjections.reason}</p>
+      {data.championshipProjections.nextPhase ? <details className={styles.projectionPublisher}><summary>{data.championshipProjections.ready ? "Publish Championship Projection" : "Review Publication Requirements"}</summary><OddsAdmin embedded directorAuthorized initialPhase={data.championshipProjections.nextPhase} publicationReady={data.championshipProjections.ready} onPublished={() => load().catch((error) => setMessage(error.message))} /></details> : null}
+    </section>
 
     <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><div className={styles.automationGrid}><article data-enabled={data.automation.enabled && data.automation.autoOpenRound ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoOpenRound ? "🟢" : "⚪"} Auto Open</span><strong>{data.automation.enabled && data.automation.autoOpenRound ? "Enabled" : "Disabled"}</strong><small>{data.nextEvent?.round ? `${data.nextEvent.title} · ${data.nextEvent.countdown}` : "No round action scheduled"}</small></article><article data-enabled={data.automation.enabled && data.automation.autoSetMatchesLive ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoSetMatchesLive ? "🟢" : "⚪"} Auto LIVE</span><strong>{data.automation.enabled && data.automation.autoSetMatchesLive ? "Enabled" : "Disabled"}</strong><small>{data.automation.autoSetMatchesLive ? "Runs when the round opens" : "Manual Set All LIVE required"}</small></article></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation · Manual override" : "Enable automation"}</button></section>
 

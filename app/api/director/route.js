@@ -4,11 +4,16 @@ import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheet
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readNotificationLog, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
 import { notificationPreviewContextForPlayer, previewNotificationTemplateOptions } from "../../../lib/notification-templates.js";
 import { directorTransactionError } from "../../../lib/director-transaction-error.js";
+import { loadPredictionSheets } from "../../../lib/prediction-data.js";
+import { bindOfficialProjectionMatches } from "../../../lib/odds-pairing-source.js";
+import { currentTournamentYear } from "../../../lib/tournament-context.js";
+import { validateOpeningMatchups, validateRoundThreePairings } from "../../../lib/tournament-odds.js";
+import { championshipProjectionMissionStatus } from "../../../lib/projection-mission-control.js";
 
 export const dynamic = "force-dynamic";
 
@@ -42,16 +47,27 @@ export async function GET(request) {
   try {
     const preview = previewPushConfiguration();
     const session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
-    const [tournamentData, readiness, device, notificationLog] = await Promise.all([
+    const [tournamentData, readiness, device, notificationLog, projectionSheets, projectionSnapshots] = await Promise.all([
       getTournamentData(), readTournamentReadiness(), preview.preview ? currentPushDevice(session) : null,
-      preview.preview ? readNotificationLog() : [],
+      preview.preview ? readNotificationLog() : [], loadPredictionSheets().catch(() => null), readOddsSnapshots().catch(() => []),
     ]);
+    const directorModel = tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() });
+    const projectionYear = projectionSheets ? currentTournamentYear(projectionSheets) : directorModel.tournament.year;
+    const boundProjectionSheets = projectionSheets ? bindOfficialProjectionMatches(projectionSheets, projectionYear) : null;
+    const championshipProjections = championshipProjectionMissionStatus({
+      snapshots: projectionSnapshots.filter((snapshot) => Number(snapshot.year) === Number(projectionYear)),
+      rounds: directorModel.rounds,
+      tournament: directorModel.tournament,
+      openingStatus: boundProjectionSheets ? validateOpeningMatchups(boundProjectionSheets, projectionYear) : { ready: false, message: "Projection readiness is temporarily unavailable." },
+      roundThreeStatus: boundProjectionSheets ? validateRoundThreePairings(boundProjectionSheets, projectionYear) : { ready: false, message: "Projection readiness is temporarily unavailable." },
+    });
     const pwaInstalled = ["true", "yes", "1"].includes(String(device?.row?.record?.["PWA Installed"] || "").trim().toLowerCase());
     const permissionGranted = String(device?.row?.record?.["Notification Permission"] || "").trim().toLowerCase() === "granted";
     const pushSubscription = Boolean(device?.subscription);
     const readyToSend = preview.configured && pwaInstalled && permissionGranted && pushSubscription;
     return NextResponse.json({ data: {
-      ...tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() }),
+      ...directorModel,
+      championshipProjections,
       notificationSandbox: preview.preview ? {
         configured: preview.configured, currentDeviceReady: readyToSend,
         health: { pwaInstalled, permissionGranted, pushSubscription, readyToSend },
