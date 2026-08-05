@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("current-player badges are independent responsive layout elements", async () => {
+test("Home omits its redundant current-player badge while leaderboards retain identification", async () => {
   const [home, homeStyles, leaderboards, badgeStyles] = await Promise.all([
     read("app/PersonalizedPlayerHome.js"),
     read("app/personalized-player-home.module.css"),
@@ -12,10 +12,9 @@ test("current-player badges are independent responsive layout elements", async (
     read("app/responsive-player-badge.module.css"),
   ]);
   assert.match(home, /playerNameText/);
-  assert.match(home, /aria-label="Current player">YOU/);
-  assert.match(homeStyles, /grid-template-columns:\s*minmax\(0,\s*1fr\) auto/);
-  assert.match(homeStyles, /\.playerLines small \{[^}]*white-space:\s*nowrap/s);
-  assert.match(homeStyles, /\.playerLines small \{[^}]*justify-self:\s*end/s);
+  assert.doesNotMatch(home, /aria-label="Current player">YOU/);
+  assert.doesNotMatch(home, />YOU</);
+  assert.match(homeStyles, /\.playerNameText/);
   assert.match(leaderboards, /badgeStyles\.identityLine/);
   assert.match(leaderboards, /aria-label="Current player">YOU/);
   assert.match(badgeStyles, /grid-template-columns:\s*minmax\(0,\s*1fr\) auto/);

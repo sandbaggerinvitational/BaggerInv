@@ -49,29 +49,27 @@ function matchTime(match, timeZone) {
   });
 }
 
-function PlayerLines({ names, currentPlayer, showCurrentBadge = true }) {
+function PlayerLines({ names }) {
   if (!names?.length) return <span className={styles.playerTbd}>Players TBD</span>;
-  return <div className={styles.playerLines}>{names.map((name) => {
-    const showBadge = showCurrentBadge && name === currentPlayer;
-    return <span key={name} data-current={showBadge ? "true" : undefined}>
+  return <div className={styles.playerLines}>{names.map((name) => (
+    <span key={name}>
       <span className={styles.playerNameText}>{name}</span>
-      {showBadge ? <small aria-label="Current player">YOU</small> : null}
-    </span>;
-  })}</div>;
+    </span>
+  ))}</div>;
 }
 
-function MatchPeople({ match, currentPlayer }) {
+function MatchPeople({ match }) {
   return <div className={styles.people}>
     <div>
       <MobileIdentityImage sources={[teamLogo(match.team?.logo)]} name={match.team?.name} className={styles.teamLogo} fallbackClassName={styles.teamLogoFallback} />
       <strong>{match.team?.name || "Your team"}</strong>
-      <PlayerLines names={match.participantNames} currentPlayer={currentPlayer} />
+      <PlayerLines names={match.participantNames} />
     </div>
     <b aria-label="versus">VS</b>
     <div>
       <MobileIdentityImage sources={[teamLogo(match.opponentTeam?.logo)]} name={match.opponentTeam?.name} className={styles.teamLogo} fallbackClassName={styles.teamLogoFallback} />
       <strong>{match.opponentTeam?.name || "Opposing team"}</strong>
-      <PlayerLines names={match.opponentNames} currentPlayer={currentPlayer} />
+      <PlayerLines names={match.opponentNames} />
     </div>
   </div>;
 }
@@ -88,7 +86,7 @@ function Action({ match, busy, onOpen }) {
   </button>;
 }
 
-function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
+function MyRounds({ matches, emphasizedId, timeZone }) {
   return <section className={styles.schedule} aria-labelledby="my-rounds-title">
     <header>
       <div><p>Your Golf</p><h2 id="my-rounds-title">My Rounds</h2></div>
@@ -124,9 +122,9 @@ function MyRounds({ matches, emphasizedId, currentPlayer, timeZone }) {
             <small>{[tee, matchTime(match, timeZone) || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
           </div>
           <div className={styles.roundMatchup}>
-            <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} currentPlayer={currentPlayer} showCurrentBadge={false} /></div>
+            <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} /></div>
             <i>VS</i>
-            <div><em>{match.opponentTeam?.name || "Opposing team"}</em><PlayerLines names={match.opponentNames} currentPlayer={currentPlayer} showCurrentBadge={false} /></div>
+            <div><em>{match.opponentTeam?.name || "Opposing team"}</em><PlayerLines names={match.opponentNames} /></div>
           </div>
         </Link>;
       })}
@@ -280,7 +278,7 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
           <span>{matchTime(primary, payload?.tournament?.timeZone) || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>
         </div>
       </div>
-      <MatchPeople match={primary} currentPlayer={player?.name} />
+      <MatchPeople match={primary} />
       {normalizedMatchStatus(primary) === "LIVE" ? <div className={styles.progress}>
         <span>Through {primary.currentHole || primary.holesRecorded || "—"}</span>
         {primary.updatedAt ? <small>Last updated {new Date(primary.updatedAt).toLocaleString()}</small> : null}
@@ -295,7 +293,6 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
     {matches.length ? <MyRounds
       matches={matches}
       emphasizedId={primary?.matchId}
-      currentPlayer={player?.name}
       timeZone={payload?.tournament?.timeZone}
     /> : null}
   </section>;
