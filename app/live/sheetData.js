@@ -31,6 +31,7 @@ import { calculateNetSkins } from "../../lib/net-skins";
 import { initializeTournamentWorkbook } from "../../lib/tournament-workbook-initialization";
 import { normalizeTournamentTimeline } from "../../lib/tournament-timeline";
 import { publicGuideRecords, recordMatchesTournament } from "../../lib/tournament-guide";
+import { buildCalcuttaModel, deriveCalcuttaRoundResults } from "../../lib/calcutta";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -336,7 +337,7 @@ async function buildTournamentData() {
       "Tournaments", "Courses", "Tournament Rules", "Live Hole Scores",
       "Course Holes", "Tournament Itinerary",
     ];
-    const optionalNames = ["Net Skins", "Net Skins Result", "Tournament Timeline", "Guide Sections", "Rule Book", "Rounds", "Dining", "Local Guide", "Important Contacts"];
+    const optionalNames = ["Net Skins", "Net Skins Result", "Tournament Timeline", "Guide Sections", "Rule Book", "Rounds", "Dining", "Local Guide", "Important Contacts", "Round Results", "Handicaps", "Live Round Handicaps", "Tournament Results", "Calcutta Purchases", "Calcutta Ownership", "Calcutta Point Structure", "Calcutta Payout", "Calcutta Round Results", "Calcutta Standings", "Calcutta Owner Leaderboard"];
     const initialized = await initializeTournamentWorkbook({
       requiredNames,
       optionalNames,
@@ -353,9 +354,11 @@ async function buildTournamentData() {
       fetchSheet("Team Names"), fetchSheet("Tournaments"), fetchSheet("Courses"), fetchSheet("Tournament Rules"),
       fetchOptionalSheet("Live Hole Scores"), fetchOptionalSheet("Course Holes"), fetchOptionalSheet("Tournament Itinerary"),
     ]);
-    const [netSkinsRows, netSkinsResultRows, publicTimelineValues, guideSections, ruleBook, roundFormats, diningRows, localGuideRows, importantContactRows] = await Promise.all([
+    const [netSkinsRows, netSkinsResultRows, publicTimelineValues, guideSections, ruleBook, roundFormats, diningRows, localGuideRows, importantContactRows, roundResults, handicaps, liveRoundHandicaps, tournamentResults, calcuttaPurchases, calcuttaOwnership, calcuttaPointStructure, calcuttaPayout, calcuttaRoundResults, calcuttaStandings, calcuttaOwnerLeaderboard] = await Promise.all([
       fetchOptionalSheet("Net Skins"), fetchOptionalSheet("Net Skins Result"), fetchOptionalSheetValues("Tournament Timeline"),
       fetchOptionalSheet("Guide Sections"), fetchOptionalSheet("Rule Book"), fetchOptionalSheet("Rounds"), fetchOptionalSheet("Dining"), fetchOptionalSheet("Local Guide"), fetchOptionalSheet("Important Contacts"),
+      fetchOptionalSheet("Round Results"), fetchOptionalSheet("Handicaps"), fetchOptionalSheet("Live Round Handicaps"), fetchOptionalSheet("Tournament Results"),
+      fetchOptionalSheet("Calcutta Purchases"), fetchOptionalSheet("Calcutta Ownership"), fetchOptionalSheet("Calcutta Point Structure"), fetchOptionalSheet("Calcutta Payout"), fetchOptionalSheet("Calcutta Round Results"), fetchOptionalSheet("Calcutta Standings"), fetchOptionalSheet("Calcutta Owner Leaderboard"),
     ]);
     timelineValues = publicTimelineValues;
     const tournamentTimelineRows = table(publicTimelineValues);
@@ -367,6 +370,8 @@ async function buildTournamentData() {
       "Net Skins": netSkinsRows, "Net Skins Result": netSkinsResultRows,
       "Tournament Timeline": tournamentTimelineRows,
       "Guide Sections": guideSections, "Rule Book": ruleBook, Rounds: roundFormats, Dining: diningRows, "Local Guide": localGuideRows, "Important Contacts": importantContactRows,
+      "Round Results": roundResults, Handicaps: handicaps, "Live Round Handicaps": liveRoundHandicaps, "Tournament Results": tournamentResults,
+      "Calcutta Purchases": calcuttaPurchases, "Calcutta Ownership": calcuttaOwnership, "Calcutta Point Structure": calcuttaPointStructure, "Calcutta Payout": calcuttaPayout, "Calcutta Round Results": calcuttaRoundResults, "Calcutta Standings": calcuttaStandings, "Calcutta Owner Leaderboard": calcuttaOwnerLeaderboard,
     };
   }
   const {
@@ -390,6 +395,17 @@ async function buildTournamentData() {
     Dining: diningRows,
     "Local Guide": localGuideRows,
     "Important Contacts": importantContactRows,
+    "Round Results": roundResults,
+    Handicaps: handicaps,
+    "Live Round Handicaps": liveRoundHandicaps,
+    "Tournament Results": tournamentResults,
+    "Calcutta Purchases": calcuttaPurchases,
+    "Calcutta Ownership": calcuttaOwnership,
+    "Calcutta Point Structure": calcuttaPointStructure,
+    "Calcutta Payout": calcuttaPayout,
+    "Calcutta Round Results": calcuttaRoundResults,
+    "Calcutta Standings": calcuttaStandings,
+    "Calcutta Owner Leaderboard": calcuttaOwnerLeaderboard,
   } = sheets;
   workbookReadMs = Date.now() - buildStartedAt;
 
@@ -618,6 +634,17 @@ async function buildTournamentData() {
     leaderboard: buildLeaderboard(matches, playerMap, teams),
     scoreLeaderboard,
     netSkins,
+    calcutta: buildCalcuttaModel({
+      year,
+      players: playerMap,
+      purchases: calcuttaPurchases,
+      ownership: calcuttaOwnership,
+      pointStructure: calcuttaPointStructure,
+      payoutStructure: calcuttaPayout,
+      roundResults: calcuttaRoundResults.length ? calcuttaRoundResults : deriveCalcuttaRoundResults({ year, roundResults, liveRoundHandicaps, handicaps }),
+      standings: calcuttaStandings,
+      ownerLeaderboard: calcuttaOwnerLeaderboard,
+    }),
     roundLeaderboards: Object.fromEntries(
       [...new Set(matches.map((match) => match.round))].map((round) => [
         round,

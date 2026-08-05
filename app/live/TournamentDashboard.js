@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
 import MatchStatusBlock from "../MatchStatusBlock";
@@ -14,6 +15,10 @@ import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmpt
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import styles from "./tournament-dashboard.module.css";
 import scoreStyles from "../score-typography.module.css";
+
+const CalcuttaExperience = dynamic(() => import("./CalcuttaExperience"), {
+  loading: () => <div className={styles.empty} role="status"><strong>Loading Calcutta…</strong><span>Preparing official purchases, ownership, and results.</span></div>,
+});
 
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
 const initials = (name) => String(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -229,12 +234,13 @@ export default function TournamentDashboard({ initialData, loadError }) {
   const tournament = data?.tournament;
   const rounds = data?.rounds || [];
   const activeRound = rounds.find((round) => Number(round.number) === Number(selectedRound)) || rounds.find((round) => Number(round.number) === Number(tournament?.currentRound)) || rounds[0];
-  const selectedRounds = selectedRound === "overall" ? rounds : activeRound ? [activeRound] : [];
-  const filteredRounds = selectedRounds.map((round) => ({ round, matches: filterMatches(round.matches || [], filter) }));
-  const visibleRounds = selectedRound === "overall" && filter !== "all"
+  const selectedRounds = selectedRound === "overall" ? rounds : selectedRound === "calcutta" ? [] : activeRound ? [activeRound] : [];
+  const activeFilter = selectedRound === "overall" ? "all" : filter;
+  const filteredRounds = selectedRounds.map((round) => ({ round, matches: filterMatches(round.matches || [], activeFilter) }));
+  const visibleRounds = selectedRound === "overall" && activeFilter !== "all"
     ? filteredRounds.filter(({ matches }) => matches.length)
     : filteredRounds;
-  const overallEmptyState = resolveMatchFilterEmptyState(filter, {
+  const overallEmptyState = resolveMatchFilterEmptyState(activeFilter, {
     label: "Tournament",
     status: tournament?.status,
     matches: selectedRounds.flatMap((round) => round.matches || []),
@@ -247,9 +253,10 @@ export default function TournamentDashboard({ initialData, loadError }) {
   </div></section>;
   return <section className={styles.page}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
+    <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Tournament"], ...rounds.map((round) => [round.number, round.label]), ["calcutta", "Calcutta"]].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
+    {selectedRound === "calcutta" ? <CalcuttaExperience model={data?.calcutta} /> : <>
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />
-    <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Overall"], ...rounds.map((round) => [round.number, round.label])].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
-    <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
+    {selectedRound !== "overall" ? <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div> : null}
     <div className={styles.roundGroups}>{visibleRounds.map(({ round, matches }) => {
       const isOverall = selectedRound === "overall";
       const isOpen = !isOverall || openRounds.has(round.number);
@@ -266,11 +273,12 @@ export default function TournamentDashboard({ initialData, loadError }) {
         });
       }} key={round.number}>
         <summary><span><small>{round.label}</small><strong>{round.format} • {round.course?.name || "Course TBA"}</strong><em>{round.progress.completedMatches} of {round.progress.totalMatches} Final{liveCount ? ` • ${liveCount} Live` : ""}</em></span><div className={styles.roundSummaryResult}><span className={styles.roundScore} aria-label={`${tournament.teamOne.name} ${formatTeamPoints(teamOneScore)}, ${tournament.teamTwo.name} ${formatTeamPoints(teamTwoScore)}`}><span><Logo filename={tournament.teamOne.logo} name={tournament.teamOne.name} size="summary" /><em>{tournament.teamOne.name}</em></span><b className={scoreStyles.score}>{formatTeamPoints(teamOneScore)}<i className={scoreStyles.separator} aria-hidden="true">–</i>{formatTeamPoints(teamTwoScore)}</b><span><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="summary" /><em>{tournament.teamTwo.name}</em></span></span><i aria-hidden="true">{isOpen ? "⌃" : "⌄"}</i></div></summary>
-        <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <MatchFilterEmptyState filter={filter} round={round} className={styles.empty} />}</div>
+        <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <MatchFilterEmptyState filter={activeFilter} round={round} className={styles.empty} />}</div>
       </details>;
     })}{!visibleRounds.length ? <div className={styles.empty} data-empty-reason={overallEmptyState.reason} role="status"><strong>{overallEmptyState.title}</strong><span>{overallEmptyState.detail}</span></div> : null}</div>
     {selectedRound === "overall"
       ? <OverallLeaderboard rows={data?.leaderboard || []} />
       : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} format={activeRound?.format} />}
+    </>}
   </section>;
 }

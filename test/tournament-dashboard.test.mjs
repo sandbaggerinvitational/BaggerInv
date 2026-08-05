@@ -63,10 +63,11 @@ test("Tournament data refreshes on open, focus, visibility, and a guarded interv
 
 test("Tournament controls are dynamic, accessible, and client-side", async () => {
   const source = await readFile(componentUrl, "utf8");
-  assert.match(source, /\[\["overall","Overall"\], \.\.\.rounds\.map/);
+  assert.match(source, /\[\["overall","Tournament"\], \.\.\.rounds\.map/);
+  assert.match(source, /\["calcutta", "Calcutta"\]/);
   assert.match(source, /aria-pressed=\{String\(selectedRound\) === String\(value\)\}/);
   for (const label of ["All", "Live", "Upcoming", "Final"]) assert.equal(source.includes(`"${label}"`), true);
-  assert.match(source, /filterMatches\(round\.matches \|\| \[\], filter\)/);
+  assert.match(source, /filterMatches\(round\.matches \|\| \[\], activeFilter\)/);
   assert.match(source, /const \[openRounds, setOpenRounds\] = useState\(\(\) => new Set\(\)\)/);
   assert.match(source, /const isOpen = !isOverall \|\| openRounds\.has\(round\.number\)/);
   assert.match(source, /open=\{isOpen\}/);
@@ -296,10 +297,11 @@ test("Tournament match cards expose state-aware scanning without changing destin
   assert.match(styles, /\.viewMatch\{[^}]*min-height:30px/);
 });
 
-test("Overall status filters render only rounds containing matching matches", async () => {
+test("Tournament shows every match while round selections expose status filters", async () => {
   const source = await readFile(componentUrl, "utf8");
   assert.match(source, /const filteredRounds = selectedRounds\.map/);
-  assert.match(source, /selectedRound === "overall" && filter !== "all"/);
+  assert.match(source, /const activeFilter = selectedRound === "overall" \? "all" : filter/);
+  assert.match(source, /selectedRound !== "overall" \? <div className=\{styles\.filters\}/);
   assert.match(source, /filteredRounds\.filter\(\(\{ matches \}\) => matches\.length\)/);
   assert.match(source, /visibleRounds\.map\(\(\{ round, matches \}\)/);
   assert.match(source, /!visibleRounds\.length/);
@@ -308,7 +310,7 @@ test("Overall status filters render only rounds containing matching matches", as
 test("Tournament uses the shared lifecycle-aware empty-state component contract", async () => {
   const source = await readFile(componentUrl, "utf8");
   assert.match(source, /import MatchFilterEmptyState/);
-  assert.match(source, /<MatchFilterEmptyState filter=\{filter\} round=\{round\} className=\{styles\.empty\}/);
+  assert.match(source, /<MatchFilterEmptyState filter=\{activeFilter\} round=\{round\} className=\{styles\.empty\}/);
   assert.doesNotMatch(source, /filterEmptyMessage/);
 });
 

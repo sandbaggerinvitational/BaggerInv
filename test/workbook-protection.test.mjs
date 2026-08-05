@@ -15,7 +15,7 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 
 test("Protected Column Map classifies every registered column exactly once", () => {
   const allowed = new Set(Object.values(COLUMN_PURPOSE));
-  assert.equal(Object.keys(PROTECTED_COLUMN_MAP).length, 42);
+  assert.equal(Object.keys(PROTECTED_COLUMN_MAP).length, 49);
   for (const [sheet, fields] of Object.entries(PROTECTED_COLUMN_MAP)) {
     assert.ok(Object.keys(fields).length, sheet);
     for (const [field, purpose] of Object.entries(fields)) {
