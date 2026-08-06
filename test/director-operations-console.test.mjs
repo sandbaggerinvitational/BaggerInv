@@ -37,7 +37,7 @@ test("operational editors mount on demand and close only after verified success"
   const css = source("app/admin/director/director.module.css");
   assert.match(consoleSource, /active\?\.type === "match"/);
   assert.match(consoleSource, /const success = await saveOperation[\s\S]*if \(success\) close\(\)/);
-  assert.match(dashboard, /setToast\("Changes saved\."\)/);
+  assert.match(dashboard, /setToast\("✓ Changes Saved"\)/);
   assert.match(css, /operationSheetScroller\{[^}]*overflow-y:auto/);
   assert.match(css, /operationSheet>header/);
   assert.match(css, /min-height:44px/);
@@ -75,6 +75,9 @@ test("Net Skins eligibility is edited, batch-written, and verified across config
   assert.match(editors, /Round \{item\.round\} • \{item\.format\}/);
   assert.match(editors, /role="switch"/);
   assert.match(editors, /Unsaved Changes/);
+  assert.match(editors, /data-highlighted=\{highlightedRound === item\.round/);
+  assert.match(editors, /aria-label=\{`Unsaved Changes\. \$\{pending\.length\} update/);
+  assert.doesNotMatch(editors, /<span>\{eligible \? "Eligible" : "Ineligible"\}<\/span>/);
   assert.match(editors, /Save Changes/);
   assert.match(editors, /updates: pending\.map/);
   assert.match(writes, /fields: \["Eligible"\]/);
