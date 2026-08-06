@@ -12,6 +12,8 @@ const HEALTH = [
   ["live", "Live Matches"], ["upcoming", "Upcoming Matches"], ["final", "Final Matches"],
   ["scoringLocked", "Scoring Locked"], ["awaitingConfirmation", "Awaiting Confirmation"], ["reopened", "Reopened Matches"], ["errors", "Errors"],
 ];
+const DIRECTOR_LOAD_RETRY_DELAYS = [400, 650, 1000, 1500, 2250, 3000];
+const DIRECTOR_LOAD_FAILURE = "Tournament Director could not be opened after multiple attempts. Please try again.";
 
 function timestamp(value) {
   const date = new Date(value);
@@ -85,10 +87,11 @@ export default function DirectorDashboard({ directorName }) {
     setMessage("");
     const response = await fetch("/api/director", { cache: "no-store", credentials: "same-origin" });
     const payload = await response.json();
-    if (response.status === 503 && attempt < 3) {
-      await new Promise((resolve) => window.setTimeout(resolve, 300 * (attempt + 1)));
+    if (response.status === 503 && attempt < DIRECTOR_LOAD_RETRY_DELAYS.length) {
+      await new Promise((resolve) => window.setTimeout(resolve, DIRECTOR_LOAD_RETRY_DELAYS[attempt]));
       return load(attempt + 1);
     }
+    if (response.status === 503) throw new Error(DIRECTOR_LOAD_FAILURE);
     if (!response.ok) throw new Error(payload.error || "Director dashboard is unavailable.");
     setData(payload.data);
     setTestPlayerId((current) => current || payload.data.qaTools?.selectedPlayer?.id || payload.data.qaTools?.players?.[0]?.id || "");

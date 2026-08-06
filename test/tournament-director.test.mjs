@@ -194,9 +194,15 @@ test("PLAYER accounts are redirected away from the Director page", () => {
 test("transient Director authorization remains on Mission Control while the protected API recovers", () => {
   const page = source("app/admin/director/page.js");
   const dashboard = source("app/admin/director/DirectorDashboard.js");
+  const resolver = source("lib/player-passport-server.js");
   assert.match(page, /result\.identity\?\.actor\?\.name \|\| "Tournament Director"/);
-  assert.match(dashboard, /response\.status === 503 && attempt < 3/);
+  assert.match(dashboard, /DIRECTOR_LOAD_RETRY_DELAYS = \[400, 650, 1000, 1500, 2250, 3000\]/);
+  assert.match(dashboard, /response\.status === 503 && attempt < DIRECTOR_LOAD_RETRY_DELAYS\.length/);
   assert.match(dashboard, /return load\(attempt \+ 1\)/);
+  assert.match(dashboard, /if \(response\.status === 503\) throw new Error\(DIRECTOR_LOAD_FAILURE\)/);
+  assert.doesNotMatch(dashboard, /payload\.error.*identity could not be verified/);
+  assert.match(resolver, /DIRECTOR_VERIFICATION_RETRY_DELAYS = \[150, 350, 750\]/);
+  assert.match(resolver, /for \(const delay of DIRECTOR_VERIFICATION_RETRY_DELAYS\)/);
   assert.match(dashboard, /credentials: "same-origin"/);
 });
 
