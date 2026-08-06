@@ -34,6 +34,10 @@ test("Scramble compares one eligible pairing per team at $50 without individual 
   assert.equal(round.pot, 100);
   assert.deepEqual(round.skins.map((skin) => skin.winner), ["Clay / Miles", "Taylor / Jason"]);
   assert.equal(round.leaderboard.length, 2);
+  assert.deepEqual(round.leaderboard[0].holeResults.map(({ hole, wonSkin, tiedLow }) => ({ hole, wonSkin, tiedLow })), [
+    { hole: 1, wonSkin: true, tiedLow: false },
+    { hole: 2, wonSkin: false, tiedLow: false },
+  ]);
 });
 
 test("Scramble Team Handicap determines net comparison from official gross and stroke index", () => {
@@ -100,14 +104,22 @@ test("finalization and reopening automatically synchronize only the Net Skins Re
   assert.doesNotMatch(source, /replaceRuntimeRecords\("(?:Live Matches|Live Hole Scores|Matches)"/);
 });
 
-test("Leaderboards exposes Net Skins pot, payouts, and expandable winning-hole detail", async () => {
+test("Leaderboards exposes the Scramble Net Skins live experience and lazy team sheet", async () => {
   const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/live/net-skins.module.css", import.meta.url), "utf8");
   assert.match(source, /\["skins", "Net Skins"\]/);
   assert.match(source, /Round Pot/);
   assert.match(source, /Skins Awarded/);
   assert.match(source, /Value Per Skin/);
-  assert.match(source, /winningHoles\.map/);
+  assert.match(source, /Largest Skin/);
+  assert.match(source, /Eligible Holes Remaining/);
+  assert.match(source, /"Teams" : "Golfers"/);
+  assert.match(source, /Net Skins Storylines/);
+  assert.match(source, /selectedTeam \?/);
+  assert.match(source, /Hole Results/);
+  assert.match(source, /Skin Lost \(Tie\)/);
+  assert.match(source, /\.join\(" & "\)/);
+  assert.doesNotMatch(source, /complete eligible field/);
   assert.match(source, /Winning|Winnings/);
   assert.match(css, /grid-template-columns:\s*repeat\(4/);
   assert.doesNotMatch(css, /overflow-x:\s*(?:scroll|auto)/);
