@@ -192,6 +192,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(writer, /rowsPresentAfterWrite/);
   assert.match(writer, /isTransientGoogleError/);
   assert.match(writer, /result\.trace\?\.exception\?\.transient/);
+  assert.match(writer, /readCalcuttaPublicationSheets/);
+  assert.match(writer, /Calcutta input worksheet '\$\{tab\}' could not be read/);
   for (const sheet of ["Calcutta Purchases", "Calcutta Ownership", "Calcutta Point Structure", "Calcutta Payout", "Calcutta Round Results", "Calcutta Standings", "Calcutta Owner Leaderboard"]) {
     assert.match(loader, new RegExp(`fetchOptionalSheet\\(\\"${sheet}\\"\\)|\\"${sheet}\\"`));
     assert.match(protection, new RegExp(`\\"${sheet}\\"`));
