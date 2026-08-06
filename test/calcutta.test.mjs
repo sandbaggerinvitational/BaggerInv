@@ -206,6 +206,9 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.doesNotMatch(writer, /rows\("Round Results"\)/);
   assert.match(writer, /trace\.workbookSchemas/);
   assert.match(writer, /expected, actual, missing/);
+  const standingsHeaderDeclaration = writer.match(/const CALCUTTA_STANDINGS_HEADERS = \[([^;]+)\];/)?.[1] || "";
+  assert.doesNotMatch(standingsHeaderDeclaration, /Overall Payout %/);
+  assert.match(standingsHeaderDeclaration, /Total Payout %/);
   assert.match(writer, /replaceScopedRuntimeRecords/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(nextLive\)/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(next\)/);
