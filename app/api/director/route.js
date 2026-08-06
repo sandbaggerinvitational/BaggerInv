@@ -52,6 +52,12 @@ function verifyActionReadBack(action, input, data, round) {
   }
   if (action === "calcutta-management") {
     const calcutta = data.operations?.calcutta;
+    if (input.operation === "calcutta-session") {
+      const purchaseVerified = calcutta?.purchases.some((item) => item.golferPlayerId === input.golferPlayerId && Number(item.purchasePrice) === Number(input.purchasePrice));
+      const actual = (calcutta?.ownership || []).filter((item) => item.golferPlayerId === input.golferPlayerId).map((item) => `${item.ownerPlayerId}:${Number(item.ownershipPercentage)}`).sort();
+      const expected = (input.owners || []).map((item) => `${item.ownerPlayerId}:${Number(item.ownershipPercentage)}`).sort();
+      return Boolean(purchaseVerified) && actual.length === expected.length && actual.every((item, index) => item === expected[index]);
+    }
     if (input.operation === "purchase") return calcutta?.purchases.some((item) => item.golferPlayerId === input.golferPlayerId && Number(item.purchasePrice) === Number(input.purchasePrice));
     if (input.operation === "owner-group") {
       const actual = (calcutta?.ownership || []).filter((item) => item.golferPlayerId === input.golferPlayerId).map((item) => `${item.ownerPlayerId}:${Number(item.ownershipPercentage)}`).sort();

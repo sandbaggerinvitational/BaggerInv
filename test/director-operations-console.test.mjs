@@ -87,7 +87,7 @@ test("Net Skins eligibility is edited, batch-written, and verified across config
   assert.match(route, /updates\.every/);
 });
 
-test("Calcutta ownership is edited and verified as one complete group", () => {
+test("Calcutta purchase and ownership are edited and verified as one transaction", () => {
   const editors = source("app/admin/director/DirectorOperationEditors.js");
   const writes = source("lib/google-sheets-write.js");
   const route = source("app/api/director/route.js");
@@ -101,11 +101,19 @@ test("Calcutta ownership is edited and verified as one complete group", () => {
   assert.match(editors, /aria-label=\{`Remove owner \$\{index \+ 1\}`\}/);
   assert.match(editors, /Ownership percentages must total exactly 100%/);
   assert.match(editors, /Each owner may only appear once/);
-  assert.match(editors, /operation: "owner-group"/);
+  assert.match(editors, /operation: "calcutta-session"/);
+  assert.match(editors, /purchasePrice: Number\(price\), owners:/);
+  assert.doesNotMatch(editors, /operation: "purchase"/);
+  assert.match(editors, /Purchase Price modified/);
+  assert.match(editors, /Ownership updated/);
+  assert.match(editors, /owner change/);
   assert.match(editors, /Save Changes/);
-  assert.match(writes, /input\.operation === "owner-group"/);
+  assert.match(writes, /input\.operation === "calcutta-session"/);
   assert.match(writes, /replaceScopedRuntimeRecordSets/);
+  assert.match(writes, /tab: "Calcutta Purchases", sheet: purchaseSheet, fields: \["Purchase Price"\]/);
+  assert.match(writes, /tab: "Calcutta Ownership", sheet: ownershipSheet/);
   assert.match(writes, /belongsToScope: \(record\) => String\(record\.Year\) === year && String\(record\["Golfer Player ID"\]\) === golferPlayerId/);
-  assert.match(route, /input\.operation === "owner-group"/);
+  assert.match(route, /input\.operation === "calcutta-session"/);
+  assert.match(route, /purchaseVerified/);
   assert.match(route, /actual\.length === expected\.length/);
 });
