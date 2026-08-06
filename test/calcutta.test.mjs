@@ -225,7 +225,11 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
   const componentPromise = readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8");
   return componentPromise.then((component) => {
     assert.match(component, /Guaranteed Winnings/);
-    assert.match(component, /Guaranteed Dollars/);
+    assert.match(component, /Round \$\{round\} Winnings/);
+    assert.match(component, /Calcutta Points/);
+    assert.match(component, /Round not yet completed\./);
+    assert.match(component, /Results will appear once official\./);
+    assert.match(component, /Current Rank/);
     assert.doesNotMatch(component, /<small>Round Payout<\/small>/);
     assert.match(component, /Projected Tournament Value/);
     assert.match(component, /Final Tournament Winnings/);
@@ -237,8 +241,9 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
 });
 
 test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet scroller", async () => {
-  const [dashboard, component, css, loader, protection, writer] = await Promise.all([
+  const [dashboard, dashboardCss, component, css, loader, protection, writer] = await Promise.all([
     readFile(new URL("../app/live/TournamentDashboard.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/tournament-dashboard.module.css", import.meta.url), "utf8"),
     readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/calcutta.module.css", import.meta.url), "utf8"),
     readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8"),
@@ -248,6 +253,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(dashboard, /\["calcutta", "Calcutta"\]/);
   assert.match(dashboard, /selectedRound === "calcutta" \? <CalcuttaExperience/);
   assert.match(dashboard, /selectedRound !== "overall" \? <div className=\{styles\.filters\}/);
+  assert.match(dashboardCss, /\.rounds\{[^}]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+  assert.match(dashboardCss, /\.rounds\{[^}]*overflow:visible/);
   assert.match(component, /Current Pot/);
   assert.match(component, /Golfers/);
   assert.match(component, /Portfolios/);
