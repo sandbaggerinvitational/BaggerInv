@@ -58,7 +58,11 @@ test("Mission Control writes remain field-scoped and protected-map aware", () =>
 test("Starting Hole is capability-gated by both the protected map and active sheet header", () => {
   const writes = source("lib/google-sheets-write.js");
   const workbookMap = source("lib/workbook-protection.js");
+  const editors = source("app/admin/director/DirectorOperationEditors.js");
   assert.match(writes, /startingHole: sheets\["Live Matches"\]\.headers\.includes\("Starting Hole"\) && writableFields\("Live Matches"\)\.includes\("Starting Hole"\)/);
   const liveMap = workbookMap.slice(workbookMap.indexOf('"Live Matches"'), workbookMap.indexOf("Matches: merge"));
   assert.match(liveMap, /columns\(WRITABLE,[^\n]*"Starting Hole"/);
+  assert.match(editors, /operations\.capabilities\.startingHole \? \{ "Starting Hole": clean\(match\.startingHole\) \} : \{\}/);
+  assert.match(editors, /operations\.capabilities\.startingHole \? <label>Starting Hole/);
+  assert.doesNotMatch(editors, /Starting Hole is not writable|capabilityNote/);
 });

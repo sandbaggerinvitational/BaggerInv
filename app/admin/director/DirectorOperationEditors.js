@@ -17,12 +17,12 @@ function NotificationHealth({ sandbox }) {
 
 function MatchEditor({ match, operations, busy, save }) {
   const bySlot = (side, slot) => match.players.find((player) => player.side === side && player.slot === slot)?.id || "";
-  const [form, setForm] = useState({ Round: clean(match.round), Match: clean(match.match), "Course ID": clean(match.courseId), "Tee Time": clean(match.teeTime), "Starting Hole": clean(match.startingHole), "Team 1 Player 1": bySlot(1, 1), "Team 1 Player 2": bySlot(1, 2), "Team 2 Player 1": bySlot(2, 1), "Team 2 Player 2": bySlot(2, 2) });
+  const [form, setForm] = useState(() => ({ Round: clean(match.round), Match: clean(match.match), "Course ID": clean(match.courseId), "Tee Time": clean(match.teeTime), ...(operations.capabilities.startingHole ? { "Starting Hole": clean(match.startingHole) } : {}), "Team 1 Player 1": bySlot(1, 1), "Team 1 Player 2": bySlot(1, 2), "Team 2 Player 1": bySlot(2, 1), "Team 2 Player 2": bySlot(2, 2) }));
   const update = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
   return <form className={styles.operationsForm} onSubmit={(event) => { event.preventDefault(); save("match-management", { matchId: match.id, updates: form }); }}>
     <div className={styles.formGrid}><label>Round<input value={form.Round} onChange={update("Round")} inputMode="numeric" /></label><label>Match<input value={form.Match} onChange={update("Match")} inputMode="numeric" /></label><label>Tee Time<input value={form["Tee Time"]} onChange={update("Tee Time")} /></label><label>Course<select value={form["Course ID"]} onChange={update("Course ID")}>{operations.courses.map((course) => <option value={course.id} key={course.id}>{course.name}</option>)}</select></label></div>
     <div className={styles.pairingGrid}>{[1, 2].flatMap((side) => [1, 2].map((slot) => { const field = `Team ${side} Player ${slot}`; return <label key={field}>Team {side} · Player {slot}<select value={form[field]} onChange={update(field)}><option value="">Unassigned</option>{operations.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label>; }))}</div>
-    {operations.capabilities.startingHole ? <label>Starting Hole<input value={form["Starting Hole"]} onChange={update("Starting Hole")} /></label> : <p className={styles.capabilityNote}>Starting Hole is not writable in the verified Live Matches schema.</p>}
+    {operations.capabilities.startingHole ? <label>Starting Hole<input value={form["Starting Hole"]} onChange={update("Starting Hole")} /></label> : null}
     <button disabled={Boolean(busy)} type="submit">Save</button>
   </form>;
 }
