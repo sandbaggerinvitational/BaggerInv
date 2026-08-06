@@ -285,6 +285,7 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(css, /\.sheet\{[^}]*overflow-y:auto/);
   assert.match(css, /-webkit-overflow-scrolling:touch/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
+  assert.match(css, /\.investments article>span:first-child\{grid-column:1\/-1\}/);
   assert.match(loader, /buildCalcuttaModel/);
   assert.doesNotMatch(loader, /fetchOptionalSheet\("Round Results"\)/);
   assert.match(loader, /roundResults: calcuttaRoundResults/);
