@@ -236,7 +236,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
       {status ? <div className={styles.status}>{status}</div> : null}
       {calcuttaTrace ? <details className={styles.status} open>
         <summary>Preview Calcutta Publication Diagnostics</summary>
-        <pre>{JSON.stringify(calcuttaTrace.trace || calcuttaTrace, null, 2)}</pre>
+        <pre style={{ maxWidth: "100%", whiteSpace: "pre-wrap", overflowWrap: "anywhere", fontSize: ".72rem", lineHeight: 1.45 }}>{JSON.stringify(calcuttaTrace.trace || calcuttaTrace, null, 2)}</pre>
       </details> : null}
       <div className={styles.clinchSummary}>
         <div><span>{teamName(data.teams, year, 1)}</span><strong>{formatTeamPoints(tournamentState.teamOne.score)}</strong><small>{tournamentState.teamOne.pointsToClinch > 0 ? `Need ${formatTeamPoints(tournamentState.teamOne.pointsToClinch)} to clinch` : "At clinching target"}</small></div>

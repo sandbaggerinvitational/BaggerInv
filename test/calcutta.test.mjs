@@ -184,12 +184,14 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(writer, /replaceScopedRuntimeRecords/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(nextLive\)/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(next\)/);
-  assert.match(writer, /reason !== "no-completed-rounds"/);
+  assert.match(writer, /const retryable = result\.reason === "no-completed-rounds"/);
   assert.match(writer, /Calcutta publication trace/);
   assert.match(writer, /generatedRoundResultRows/);
   assert.match(writer, /firstFiveGeneratedRows/);
   assert.match(writer, /readBackVerified/);
   assert.match(writer, /rowsPresentAfterWrite/);
+  assert.match(writer, /isTransientGoogleError/);
+  assert.match(writer, /result\.trace\?\.exception\?\.transient/);
   for (const sheet of ["Calcutta Purchases", "Calcutta Ownership", "Calcutta Point Structure", "Calcutta Payout", "Calcutta Round Results", "Calcutta Standings", "Calcutta Owner Leaderboard"]) {
     assert.match(loader, new RegExp(`fetchOptionalSheet\\(\\"${sheet}\\"\\)|\\"${sheet}\\"`));
     assert.match(protection, new RegExp(`\\"${sheet}\\"`));
