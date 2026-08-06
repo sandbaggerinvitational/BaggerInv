@@ -73,7 +73,7 @@ test("reset endpoint is Preview-only, Director-authorized, and refreshes partici
 
 test("Director UI requires explicit confirmation and exposes reset only with Preview QA tools", async () => {
   const dashboard = await source("app/admin/director/DirectorDashboard.js");
-  assert.match(dashboard, /data\.qaTools \? <section/);
+  assert.match(dashboard, /data\.qaTools \? <OperationsSection id="preview-tools"/);
   assert.match(dashboard, /🔄 Reset Preview Tournament/);
   assert.match(dashboard, /Reset Preview Tournament\?/);
   assert.match(dashboard, /Production data will NOT be affected\./);

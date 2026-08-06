@@ -6,6 +6,7 @@ import { directorFetch } from "../../../lib/director-client-transaction";
 import { useCallback, useEffect, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
 import OddsAdmin from "../../odds-center/admin/OddsAdmin.js";
+import { CalcuttaManagement, DirectorSearch, MatchManagement, NetSkinsManagement, OperationsSection } from "./DirectorOperationsConsole.js";
 import styles from "./director.module.css";
 
 const HEALTH = [
@@ -18,6 +19,7 @@ const ACTION_LABELS = {
   "unlock-scoring": "Scoring unlocked", "lock-scoring": "Scoring locked", "set-live": "Round matches opened for live scoring",
   "open-round": "Round opened", "close-round": "Round closed", "reopen-match": "Match reopened",
   automation: "Automation updated", "automation-check": "Automation verified",
+  "match-management": "Match updated", "calcutta-management": "Calcutta updated", "net-skins-eligibility": "Net Skins eligibility updated",
 };
 
 function timestamp(value) {
@@ -144,8 +146,8 @@ export default function DirectorDashboard({ directorName }) {
       const response = await directorFetch("/api/director/notifications/sandbox", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ templateId: template.id }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Test notification could not be sent.");
-      await load(); setMessage(`${template.label} sent to this device.`);
-    } catch (error) { setMessage(error.message); }
+      await load(); recordOperation(`${template.label} sent`, "success", "Notification delivery recorded"); setMessage(`${template.label} sent to this device.`);
+    } catch (error) { recordOperation(`${template.label} notification`, "failed", error.message); setMessage(error.message); }
     finally { setBusy(""); }
   };
   const previewAsPlayer = async (playerId) => {
@@ -166,6 +168,7 @@ export default function DirectorDashboard({ directorName }) {
       if (!response.ok) throw new Error(payload.error || "Preview tournament reset failed.");
       setResetOpen(false); setResetComplete(true); setSelectedRound("1"); setReopenId("");
       await load();
+      recordOperation("Preview tournament reset", "success", "Workbook reset and verification complete");
       setMessage(`${payload.message}\n${payload.detail}`);
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
@@ -188,6 +191,8 @@ export default function DirectorDashboard({ directorName }) {
   });
   return <section className={styles.shell}>
     <header className={styles.hero}><span>Director Mode</span><h1>Tournament Director</h1><p>{directorName} · {data.tournament.year} {data.tournament.name}</p><StatusBadge status={data.tournament.status} /></header>
+
+    <DirectorSearch operations={data.operations} notificationTemplates={data.notificationSandbox?.templates || []} />
 
     <section className={styles.command} aria-labelledby="command-title">
       <header><span>Mission Control</span><h2 id="command-title">Operational Overview</h2></header>
@@ -226,6 +231,7 @@ export default function DirectorDashboard({ directorName }) {
 
     {data.issueGroups.length ? <section className={styles.attention}><span>Attention Required</span><h2>Operational actions</h2><div>{data.issueGroups.map((item) => <article data-severity={item.severity} key={item.id}><i aria-hidden="true">{item.severity === "critical" ? "●" : item.severity === "warning" ? "▲" : "ℹ"}</i><div><strong>{item.title}</strong><p>{item.message}</p><small>{item.impact}</small>{item.items.length > 1 ? <details><summary>View {item.items.length} matches</summary><ul>{item.items.map((matchIssue) => <li key={matchIssue.id}>{matchIssue.title} · {matchIssue.message}</li>)}</ul></details> : null}</div>{item.action ? <button disabled={Boolean(busy)} onClick={() => resolveIssue(item)}>{item.actionLabel}</button> : <Link href={item.href}>{item.actionLabel}</Link>}</article>)}</div></section> : null}
 
+    <OperationsSection id="competition" eyebrow="Tournament workflow" title="Competition" summary="Open, score, close, and publish the active round." open>
     <section className={styles.actions} id="quick-actions" aria-labelledby="actions-title"><header><span>Recommended next step</span><h2 id="actions-title">Quick Actions</h2></header><div className={styles.primaryAction} data-kind={data.primaryAction.kind}>
       {data.primaryAction.kind === "action" ? <button disabled={Boolean(busy)} onClick={() => act(data.primaryAction.action, { round: data.operatingRound?.number })}>{data.primaryAction.label}</button> : <strong>{data.primaryAction.label}</strong>}<span>{data.primaryAction.message}</span>
     </div><div className={styles.secondaryActions}>
@@ -246,10 +252,23 @@ export default function DirectorDashboard({ directorName }) {
     </section>
 
     <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><div className={styles.automationGrid}><article data-enabled={data.automation.enabled && data.automation.autoOpenRound ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoOpenRound ? "🟢" : "⚪"} Auto Open</span><strong>{data.automation.enabled && data.automation.autoOpenRound ? "Enabled" : "Disabled"}</strong><small>{data.nextEvent?.round ? `${data.nextEvent.title} · ${data.nextEvent.countdown}` : "No round action scheduled"}</small></article><article data-enabled={data.automation.enabled && data.automation.autoSetMatchesLive ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoSetMatchesLive ? "🟢" : "⚪"} Auto LIVE</span><strong>{data.automation.enabled && data.automation.autoSetMatchesLive ? "Enabled" : "Disabled"}</strong><small>{data.automation.autoSetMatchesLive ? "Runs when the round opens" : "Manual Set All LIVE required"}</small></article></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation · Manual override" : "Enable automation"}</button></section>
+    </OperationsSection>
 
-    <section className={styles.activity}><header><span>Director only</span><h2>Operational Log</h2></header>{operationLog.length || data.recentActivity.length ? <ul>{operationLog.map((item) => <li data-status={item.status} key={item.id}><i aria-hidden="true">{item.status === "success" ? "🟢" : "🔴"}</i><div><strong>{item.label}</strong><span>{item.detail}</span></div><time>{timestamp(item.at)}</time></li>)}{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No operations recorded yet. Completed Director actions will appear here.</p>}</section>
-    {data.qaTools ? <section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p>{resetComplete ? <div className={styles.resetComplete} role="status"><strong>Preview Tournament Reset Complete</strong><span>Ready for Dress Rehearsal.</span></div> : null}<div className={styles.resetUtility}><div><strong>Dress Rehearsal</strong><span>Clear runtime tournament results while preserving setup and content.</span></div><button disabled={Boolean(busy)} onClick={() => { setResetComplete(false); setResetOpen(true); }}>🔄 Reset Preview Tournament</button></div></section> : null}
-    {data.notificationSandbox ? <section className={styles.notificationSandbox} aria-labelledby="notification-sandbox-title"><header><span>Preview only</span><h2 id="notification-sandbox-title">Notification Sandbox</h2></header><NotificationHealth sandbox={data.notificationSandbox} /><div className={styles.notificationTemplates}>{data.notificationSandbox.templates.map((template) => <button disabled={Boolean(busy) || !data.notificationSandbox.currentDeviceReady} onClick={() => sendTestNotification(template)} key={template.id}>{template.label}</button>)}</div><h3>Notification Log</h3>{data.notificationSandbox.log.length ? <div className={styles.notificationLog}>{data.notificationSandbox.log.map((item) => <article key={item.id}><div><strong>{item.type}</strong><span>{item.recipient}{item.template ? ` · ${item.template}` : ""}</span></div><time>{timestamp(item.sentAt)}</time><b data-status={item.status === "Failed" ? "failed" : "sent"}>{item.status}</b>{item.failure ? <small>{item.failure}</small> : null}</article>)}</div> : <p>No test notifications have been sent.</p>}</section> : null}
+    <OperationsSection id="match-management" eyebrow="Pairings and logistics" title="Match Management" summary="Edit active match assignments and schedule details.">
+      <MatchManagement operations={data.operations} busy={busy} act={act} />
+    </OperationsSection>
+
+    <OperationsSection id="calcutta-management" eyebrow="Auction operations" title="Calcutta" summary="Manage purchase prices and ownership from the verified workbook records.">
+      <CalcuttaManagement operations={data.operations} busy={busy} act={act} />
+    </OperationsSection>
+
+    <OperationsSection id="net-skins-management" eyebrow="Round eligibility" title="Net Skins" summary="Search participants and update official eligibility.">
+      <NetSkinsManagement operations={data.operations} busy={busy} act={act} />
+    </OperationsSection>
+
+    {data.notificationSandbox ? <OperationsSection id="notifications" eyebrow="Tournament communications" title="Notifications" summary="Send approved tournament messages and verify delivery."><section className={styles.notificationSandbox} aria-labelledby="notification-sandbox-title"><header><span>Preview only</span><h2 id="notification-sandbox-title">Notification Sandbox</h2></header><NotificationHealth sandbox={data.notificationSandbox} /><div className={styles.notificationTemplates}>{data.notificationSandbox.templates.map((template) => <button disabled={Boolean(busy) || !data.notificationSandbox.currentDeviceReady} onClick={() => sendTestNotification(template)} key={template.id}>{template.label}</button>)}</div><h3>Notification Log</h3>{data.notificationSandbox.log.length ? <div className={styles.notificationLog}>{data.notificationSandbox.log.map((item) => <article key={item.id}><div><strong>{item.type}</strong><span>{item.recipient}{item.template ? ` · ${item.template}` : ""}</span></div><time>{timestamp(item.sentAt)}</time><b data-status={item.status === "Failed" ? "failed" : "sent"}>{item.status}</b>{item.failure ? <small>{item.failure}</small> : null}</article>)}</div> : <p>No test notifications have been sent.</p>}</section></OperationsSection> : null}
+    {data.qaTools ? <OperationsSection id="preview-tools" eyebrow="Preview only" title="Preview Tools" summary="Impersonate a golfer or reset Dress Rehearsal runtime state."><section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p>{resetComplete ? <div className={styles.resetComplete} role="status"><strong>Preview Tournament Reset Complete</strong><span>Ready for Dress Rehearsal.</span></div> : null}<div className={styles.resetUtility}><div><strong>Dress Rehearsal</strong><span>Clear runtime tournament results while preserving setup and content.</span></div><button disabled={Boolean(busy)} onClick={() => { setResetComplete(false); setResetOpen(true); }}>🔄 Reset Preview Tournament</button></div></section></OperationsSection> : null}
+    <OperationsSection id="operational-log" eyebrow="Director only" title="Operational Log" summary="Verified actions and official match activity."><section className={styles.activity}>{operationLog.length || data.recentActivity.length ? <ul>{operationLog.map((item) => <li data-status={item.status} key={item.id}><i aria-hidden="true">{item.status === "success" ? "🟢" : "🔴"}</i><div><strong>{item.label}</strong><span>{item.detail}</span></div><time>{timestamp(item.at)}</time></li>)}{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No operations recorded yet. Completed Director actions will appear here.</p>}</section></OperationsSection>
     <Link className={styles.fullAdmin} href="/admin">Open Full Admin →</Link>
     {resetOpen ? <div className={styles.resetBackdrop} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) setResetOpen(false); }}><section className={styles.resetDialog} role="dialog" aria-modal="true" aria-labelledby="reset-preview-title"><span>Preview only</span><h2 id="reset-preview-title">Reset Preview Tournament?</h2><p>This will return the Preview tournament to the beginning of tournament week.</p><strong>Production data will NOT be affected.</strong><div><button disabled={Boolean(busy)} onClick={() => setResetOpen(false)}>Cancel</button><button disabled={Boolean(busy)} onClick={resetPreviewTournament}>{busy === "preview-reset" ? "Resetting…" : "Reset Preview"}</button></div></section></div> : null}
   </section>;
