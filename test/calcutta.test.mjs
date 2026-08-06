@@ -277,8 +277,11 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
     assert.match(component, /Final Winnings Distributed/);
     assert.match(component, /If the tournament ended today\./);
     assert.match(component, /ordinalPlace/);
-    assert.match(component, /golfer\.owners\.length > 1 \? "— " : ""/);
+    assert.doesNotMatch(component, /golfer\.owners\.length > 1 \? "— " : ""/);
+    assert.match(component, /<b>\{payoutPercent\(owner\.ownership\)\}<\/b>/);
     assert.doesNotMatch(component, /\{payoutPercent\(owner\.ownership\)\} Ownership/);
+    assert.match(component, /tournamentComplete \? "Final ROI" : "Projected ROI"/);
+    assert.match(component, /tournamentComplete \? null : "If the tournament ended today\."/);
     assert.match(component, /Golfers Owned/);
     assert.match(component, /Portfolio Performance/);
     assert.match(component, /Portfolio Summary/);
