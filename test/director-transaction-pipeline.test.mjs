@@ -11,7 +11,7 @@ test("Director mutations share one serialized client transaction pipeline", asyn
   assert.match(pipeline, /if \(method === "GET"\) return fetch\(input, init\)/);
   assert.match(pipeline, /x-director-retryable/);
   assert.match(pipeline, /RETRY_DELAYS = \[350, 800, 1600\]/);
-  for (const phase of ["verifying", "reconnecting", "updating", "verifyingChanges", "updated"]) assert.match(pipeline, new RegExp(phase));
+  for (const phase of ["verifying", "loadingWorkbook", "reconnecting", "updating", "verifyingChanges", "updated"]) assert.match(pipeline, new RegExp(phase));
 
   for (const path of [
     "app/admin/CmsManager.js",
@@ -34,6 +34,8 @@ test("Director transaction status locks controls through completion", async () =
   assert.match(component, /Verifying Director/);
   assert.match(component, /Reconnecting Automatically/);
   assert.match(component, /Verifying Changes/);
+  assert.match(component, /Loading Workbook/);
+  assert.match(component, /data-state=/);
   assert.match(layout, /<DirectorTransactionStatus/);
 });
 
