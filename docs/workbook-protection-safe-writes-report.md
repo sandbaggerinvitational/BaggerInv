@@ -112,3 +112,4 @@ The exported workbook continues to report 168 Excel `#NAME?` compatibility resul
 
 The Protected Column Map is now enforced in code, not only documented. Future workbook writes must register each field by purpose and pass through the protected field writer. Unknown or ambiguous columns remain read-only by default.
 
+Workbook reads are additionally governed by the [Workbook Data Source Architecture](./workbook-data-source-architecture.md). Worksheet names must be verified against the active Preview workbook, and existing authoritative application services must be reused instead of introducing parallel workbook assumptions.

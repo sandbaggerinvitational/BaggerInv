@@ -83,3 +83,11 @@ test("Preview Reset, Guide administration, CMS, and finalization use field-scope
   assert.match(writer, /clearSheetFields\(schema\.tab/);
   assert.doesNotMatch(writer, /headers\.map\(\(header\) => header \? record\[header\]/);
 });
+
+test("repository architecture forbids inferred worksheet dependencies", async () => {
+  const architecture = await readFile(new URL("../docs/workbook-data-source-architecture.md", import.meta.url), "utf8");
+  assert.match(architecture, /existing authoritative services, loaders, and normalized runtime models/);
+  assert.match(architecture, /verify every directly referenced worksheet title against the active Preview workbook schema/i);
+  assert.match(architecture, /never introduce a worksheet dependency based on an inferred or convenient name/i);
+  assert.match(architecture, /stop and report the missing dependency/i);
+});
