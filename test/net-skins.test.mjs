@@ -93,7 +93,7 @@ test("normalized tournament payload reads both dedicated sheets without changing
 
 test("finalization and reopening automatically synchronize only the Net Skins Result sheet", async () => {
   const source = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
-  assert.match(source, /synchronizeNetSkinsAfterMatch\(nextLive\)/g);
+  assert.match(source, /synchronizeNetSkinsAfterMatch\(nextLive, \{ tournamentModel \}\)/g);
   assert.match(source, /requireTabHeaders\("Net Skins Result", NET_SKINS_RESULT_HEADERS\)/);
   assert.match(source, /replaceRuntimeRecords\("Net Skins Result"/);
   assert.match(source, /calculated\?\.finalized[\s\S]*netSkinsResultRecords/);

@@ -209,8 +209,9 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   const standingsHeaderDeclaration = writer.match(/const CALCUTTA_STANDINGS_HEADERS = \[([^;]+)\];/)?.[1] || "";
   assert.doesNotMatch(standingsHeaderDeclaration, /Overall Payout %/);
   assert.match(standingsHeaderDeclaration, /Total Payout %/);
-  assert.match(writer, /replaceScopedRuntimeRecords/);
-  assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(nextLive\)/);
+  assert.match(writer, /replaceScopedRuntimeRecordSets/);
+  assert.match(writer, /withWorkbookWriteDiagnostics\("calcutta-publication"/);
+  assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(nextLive, \{ tournamentModel \}\)/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(next\)/);
   assert.match(writer, /const retryable = result\.reason === "no-completed-rounds"/);
   assert.match(writer, /Calcutta publication trace/);
