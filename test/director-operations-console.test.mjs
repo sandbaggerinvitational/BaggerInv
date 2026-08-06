@@ -79,3 +79,20 @@ test("Net Skins eligibility is selected, written, and verified for one configure
   assert.match(writes, /recordId: `\$\{playerId\}:R\$\{round\}`/);
   assert.match(route, /item\.playerIds\.includes\(input\.playerId\) && Number\(item\.round\) === Number\(input\.round\)/);
 });
+
+test("Calcutta ownership is edited and verified as one complete group", () => {
+  const editors = source("app/admin/director/DirectorOperationEditors.js");
+  const writes = source("lib/google-sheets-write.js");
+  const route = source("app/api/director/route.js");
+  assert.match(editors, /\+ Add Owner/);
+  assert.match(editors, /Ownership Total/);
+  assert.match(editors, /Ownership percentages must total exactly 100%/);
+  assert.match(editors, /Each owner may only appear once/);
+  assert.match(editors, /operation: "owner-group"/);
+  assert.match(editors, /Save Ownership Group/);
+  assert.match(writes, /input\.operation === "owner-group"/);
+  assert.match(writes, /replaceScopedRuntimeRecordSets/);
+  assert.match(writes, /belongsToScope: \(record\) => String\(record\.Year\) === year && String\(record\["Golfer Player ID"\]\) === golferPlayerId/);
+  assert.match(route, /input\.operation === "owner-group"/);
+  assert.match(route, /actual\.length === expected\.length/);
+});
