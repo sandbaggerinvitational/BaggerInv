@@ -9,6 +9,7 @@ import {
   reopenLiveMatch,
   updateLiveMatch,
   updateLiveMatchPairing,
+  withWorkbookWriteDiagnostics,
 } from "../../../lib/google-sheets-write";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../lib/scorecard-data";
@@ -52,23 +53,27 @@ export async function POST(request) {
   if (!authorized(request)) return deny();
   try {
     const { action, matchId, updates, updatedBy } = await request.json();
-    let match;
-    let access;
-    if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
-    else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
-    else if (action === "finalize") match = await finalizeLiveMatch(matchId, updates, updatedBy, { includeCalcuttaPublicationTrace: process.env.VERCEL_ENV === "preview" });
-    else if (action === "reopen") match = await reopenLiveMatch(matchId, updatedBy);
-    else if (action === "access-generate") {
-      access = await generateLiveMatchAccess(matchId, updatedBy);
-      const accessUrl = `${new URL(request.url).origin}/score/access/${encodeURIComponent(access.token)}`;
-      const qrDataUrl = await QRCode.toDataURL(accessUrl, { width: 420, margin: 2, color: { dark: "#0b4938", light: "#fffdf8" } });
-      match = Object.fromEntries(Object.entries(access.match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key)));
-      refreshMatchData();
-      return NextResponse.json({ match, access: { code: access.code, accessUrl, qrDataUrl, expiresAt: access.expiresAt } });
-    }
-    else if (action === "access-disable") match = await disableLiveMatchAccess(matchId, updatedBy);
-    else throw new Error("Unknown live-match action.");
+    const measured = await withWorkbookWriteDiagnostics(`live-matches:${action}`, async () => {
+      let match;
+      if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
+      else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
+      else if (action === "finalize") match = await finalizeLiveMatch(matchId, updates, updatedBy, { includeCalcuttaPublicationTrace: process.env.VERCEL_ENV === "preview" });
+      else if (action === "reopen") match = await reopenLiveMatch(matchId, updatedBy);
+      else if (action === "access-generate") {
+        const access = await generateLiveMatchAccess(matchId, updatedBy);
+        const accessUrl = `${new URL(request.url).origin}/score/access/${encodeURIComponent(access.token)}`;
+        const qrDataUrl = await QRCode.toDataURL(accessUrl, { width: 420, margin: 2, color: { dark: "#0b4938", light: "#fffdf8" } });
+        match = Object.fromEntries(Object.entries(access.match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key)));
+        return { match, access: { code: access.code, accessUrl, qrDataUrl, expiresAt: access.expiresAt } };
+      }
+      else if (action === "access-disable") match = await disableLiveMatchAccess(matchId, updatedBy);
+      else throw new Error("Unknown live-match action.");
+      return { match };
+    });
+    const { match, access } = measured.result;
     refreshMatchData();
+    console.info("Live Match Control transaction", { action, matchId, ...measured.diagnostics });
+    if (access) return NextResponse.json({ match, access });
     const calcuttaPublication = match?.__calcuttaPublication;
     const safeMatch = Object.fromEntries(Object.entries(match).filter(([key]) => !["Access Code Hash", "Access Token Hash", "__calcuttaPublication"].includes(key)));
     return NextResponse.json({ match: safeMatch, ...(process.env.VERCEL_ENV === "preview" && calcuttaPublication ? { calcuttaPublication } : {}) });

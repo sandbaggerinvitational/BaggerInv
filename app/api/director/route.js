@@ -4,7 +4,8 @@ import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheet
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
+import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server-read.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
 import { notificationPreviewContextForPlayer, previewNotificationTemplateOptions } from "../../../lib/notification-templates.js";
@@ -47,10 +48,12 @@ export async function GET(request) {
   try {
     const preview = previewPushConfiguration();
     const session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
-    const [tournamentData, readiness, device, notificationLog, projectionSheets, projectionSnapshots] = await Promise.all([
+    const measured = await withWorkbookWriteDiagnostics("director-dashboard", () => withNormalizedReadDiagnostics("GET /api/director", () => Promise.all([
       getTournamentData(), readTournamentReadiness(), preview.preview ? currentPushDevice(session) : null,
       preview.preview ? readNotificationLog() : [], loadPredictionSheets().catch(() => null), readOddsSnapshots().catch(() => []),
-    ]);
+    ])));
+    const [tournamentData, readiness, device, notificationLog, projectionSheets, projectionSnapshots] = measured.result.result;
+    console.info("Director workbook access", { normalized: measured.result.diagnostics, authenticated: measured.diagnostics });
     const directorModel = tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() });
     const projectionYear = projectionSheets ? currentTournamentYear(projectionSheets) : directorModel.tournament.year;
     const boundProjectionSheets = projectionSheets ? bindOfficialProjectionMatches(projectionSheets, projectionYear) : null;

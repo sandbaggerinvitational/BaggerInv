@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { authorizePassportMatch, readPlayerPassportMatches } from "../../../../lib/google-sheets-write.js";
+import { authorizePassportMatch, readPlayerPassportMatches, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { createScoringSession, scoringSessionCookie } from "../../../../lib/scoring-access.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { getTournamentData } from "../../../live/sheetData.js";
 import { playerPerformanceRows, rankPlayerRows } from "../../../../lib/mobile-leaderboards.js";
 import { playerRoundPerformance } from "../../../../lib/player-round-performance.js";
 import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
+import { withNormalizedReadDiagnostics } from "../../../../lib/google-sheets-server-read.js";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,14 @@ export async function GET(request) {
     return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });
   }
   try {
-    const initialized = await initializeParticipantTournament(session);
+    const measured = await withWorkbookWriteDiagnostics("participant-match-initialization", () =>
+      withNormalizedReadDiagnostics("GET /api/player-passport/matches", () => initializeParticipantTournament(session))
+    );
+    const initialized = measured.result.result;
+    console.info("Participant match workbook access", {
+      normalized: measured.result.diagnostics,
+      authenticated: measured.diagnostics,
+    });
     const data = initialized.personalized;
     try {
       const tournamentData = initialized.tournamentData;

@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { loadOddsInputs } from "../../../../lib/odds-data";
 import { loadPredictionDiagnostics } from "../../../../lib/prediction-data";
 import { ODDS_PHASES, simulateTournamentOdds, validateOpeningMatchups, validateRoundThreePairings } from "../../../../lib/tournament-odds";
-import { publishOddsSnapshot, readOddsSnapshots, verifyPublishedOddsSnapshot } from "../../../../lib/google-sheets-write";
+import { publishOddsSnapshot, readOddsSnapshots, verifyPublishedOddsSnapshot, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
 import { createPublicationTrace, validateProjectionSnapshot } from "../../../../lib/projection-publication-diagnostics";
 import { playerPassportTokenFromRequest } from "../../../../lib/player-passport";
@@ -12,7 +12,7 @@ import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-export async function POST(request) {
+async function publishProjection(request) {
   const trace = createPublicationTrace();
   const diagnostic = { stepReached: "Authorization", workbookOperation: "None", simulationPhase: "Unknown", worksheet: "None", function: "POST /api/odds/publish" };
   const start = (name, details = {}) => { diagnostic.stepReached = name; Object.assign(diagnostic, details); trace.start(name, details); };
@@ -130,4 +130,10 @@ export async function POST(request) {
       ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: details } : {}),
     }, { status: 500 });
   }
+}
+
+export async function POST(request) {
+  const measured = await withWorkbookWriteDiagnostics("championship-projection-publication", () => publishProjection(request));
+  console.info("Championship projection workbook access", measured.diagnostics);
+  return measured.result;
 }

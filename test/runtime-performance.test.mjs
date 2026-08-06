@@ -71,7 +71,7 @@ test("normalized reads classify static, semi-static, and live sheets and cache b
   assert.match(reader, /sheetCacheHitRate/);
   assert.match(model, /TOURNAMENT_MODEL_TTL_MS = 2_500/);
   assert.match(model, /readOptionalBatch: readNormalizedSheetsValues/);
-  assert.match(model, /invalidateNormalizedSheetCache\(\)/);
+  assert.match(model, /invalidateNormalizedSheetCache\(Array\.isArray\(sheetNames\) \? sheetNames : undefined\)/);
   assert.match(liveRoute, /Server-Timing|attachRuntimeTiming/);
   assert.match(diagnostic, /slowestOperations: runtimePerformanceReport\(\)/);
 });
@@ -95,5 +95,23 @@ test("published projections use a semi-static cache refreshed by publish and res
   assert.match(workbook, /pendingOddsSnapshotRead/);
   assert.match(workbook, /oddsSnapshotCache = all/);
   assert.match(workbook, /invalidateOddsSnapshotCache\(\);\s*return saved/);
-  assert.match(workbook, /method !== "GET"[\s\S]*invalidateNormalizedSheetCache\(\)/);
+  assert.match(workbook, /method !== "GET"[\s\S]*invalidateNormalizedSheetCache\(affectedSheets\.length \? affectedSheets : undefined\)/);
+});
+
+test("request-scoped workbook access reuses sheets and workbook metadata", async () => {
+  const [reader, workbook, director, publication] = await Promise.all([
+    source("lib/google-sheets-server-read.js"),
+    source("lib/google-sheets-write.js"),
+    source("app/api/director/route.js"),
+    source("app/api/odds/publish/route.js"),
+  ]);
+  assert.match(reader, /withNormalizedReadDiagnostics/);
+  assert.match(reader, /new AsyncLocalStorage\(\)/);
+  assert.match(reader, /duplicateWorksheetReads/);
+  assert.match(workbook, /_sheetSnapshots: new Map\(\)/);
+  assert.match(workbook, /_workbookMetadata/);
+  assert.match(workbook, /missing\.forEach\(\(tab\) => query\.append\("ranges"/);
+  assert.match(workbook, /readWorkbookMetadata\(\)/);
+  assert.match(director, /withWorkbookWriteDiagnostics\("director-dashboard"/);
+  assert.match(publication, /withWorkbookWriteDiagnostics\("championship-projection-publication"/);
 });

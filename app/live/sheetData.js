@@ -751,12 +751,12 @@ export async function getTournamentData() {
   return request;
 }
 
-export function invalidateTournamentDataCache() {
+export function invalidateTournamentDataCache(sheetNames) {
   tournamentDataGeneration += 1;
   pendingTournamentData = undefined;
   lastGoodTournamentData = undefined;
   lastGoodAt = 0;
-  invalidateNormalizedSheetCache();
+  invalidateNormalizedSheetCache(Array.isArray(sheetNames) ? sheetNames : undefined);
   loaderDiagnostics.result = "invalidated";
   loaderDiagnostics.cacheBehavior = "miss";
   loaderDiagnostics.errorCategory = "";

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { isPreviewImpersonationSession, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
 import { attachRuntimeTiming, createRuntimeProfile } from "../../../../lib/runtime-performance.js";
+import { withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
+import { withNormalizedReadDiagnostics } from "../../../../lib/google-sheets-server-read.js";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +19,10 @@ export async function GET(request) {
   }
   const sessionValidationMs = Date.now() - sessionStartedAt;
   try {
-    const initialized = await initializeParticipantTournament(session);
+    const measured = await withWorkbookWriteDiagnostics("participant-home-initialization", () =>
+      withNormalizedReadDiagnostics("GET /api/player-passport/initialize", () => initializeParticipantTournament(session))
+    );
+    const initialized = measured.result.result;
     const totalHomeLoadMs = Date.now() - requestStartedAt;
     const timing = {
       sessionValidationMs,
@@ -34,6 +39,10 @@ export async function GET(request) {
       tournamentId: session.tournamentId,
       ...timing,
       slowestStage,
+      workbookAccess: {
+        normalized: measured.result.diagnostics,
+        authenticated: measured.diagnostics,
+      },
     });
     const response = NextResponse.json({ active: true, previewMode: isPreviewImpersonationSession(session), player: initialized.player, data: initialized.personalized });
     response.headers.set("Server-Timing", [
