@@ -123,6 +123,17 @@ test("Calcutta publication readiness identifies the exact players blocking a com
   assert.equal(readiness.rounds[0].availablePlayers.length, 2);
 });
 
+test("Preview finalization exposes generated rows and workbook read-back diagnostics", async () => {
+  const [route, control] = await Promise.all([
+    readFile(new URL("../app/api/live-matches/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/admin/live-matches/LiveMatchControl.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(route, /includeCalcuttaPublicationTrace: process\.env\.VERCEL_ENV === "preview"/);
+  assert.match(route, /calcuttaPublication/);
+  assert.match(control, /Preview Calcutta Publication Diagnostics/);
+  assert.match(control, /JSON\.stringify\(calcuttaTrace\.trace \|\| calcuttaTrace/);
+});
+
 test("published Calcutta sheets are authoritative on the application read path", () => {
   const calculated = fixture();
   const publishedRoundResults = calculated.golfers.flatMap((golfer) => Object.values(golfer.rounds).map((round) => ({
@@ -175,6 +186,10 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(next\)/);
   assert.match(writer, /reason !== "no-completed-rounds"/);
   assert.match(writer, /Calcutta publication trace/);
+  assert.match(writer, /generatedRoundResultRows/);
+  assert.match(writer, /firstFiveGeneratedRows/);
+  assert.match(writer, /readBackVerified/);
+  assert.match(writer, /rowsPresentAfterWrite/);
   for (const sheet of ["Calcutta Purchases", "Calcutta Ownership", "Calcutta Point Structure", "Calcutta Payout", "Calcutta Round Results", "Calcutta Standings", "Calcutta Owner Leaderboard"]) {
     assert.match(loader, new RegExp(`fetchOptionalSheet\\(\\"${sheet}\\"\\)|\\"${sheet}\\"`));
     assert.match(protection, new RegExp(`\\"${sheet}\\"`));

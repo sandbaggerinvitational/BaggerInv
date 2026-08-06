@@ -154,6 +154,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const [dirtyMatches, setDirtyMatches] = useState(() => new Set());
   const [year, setYear] = useState("");
   const [round, setRound] = useState("");
+  const [calcuttaTrace, setCalcuttaTrace] = useState(null);
   const updateDirty = useCallback((matchId, dirty) => setDirtyMatches((current) => {
     const next = new Set(current);
     if (dirty) next.add(matchId); else next.delete(matchId);
@@ -203,6 +204,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
     setBusyMatchId(match["Match ID"]);
     try {
       const payload = await request({ action, matchId: match["Match ID"], updates, updatedBy });
+      if (action === "finalize") setCalcuttaTrace(payload.calcuttaPublication || null);
       if (payload.access) {
         setAccessByMatch((current) => ({ ...current, [match["Match ID"]]: payload.access }));
       } else if (action === "access-disable") {
@@ -232,6 +234,10 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
         <strong>{matches.length} matches</strong>
       </div>
       {status ? <div className={styles.status}>{status}</div> : null}
+      {calcuttaTrace ? <details className={styles.status} open>
+        <summary>Preview Calcutta Publication Diagnostics</summary>
+        <pre>{JSON.stringify(calcuttaTrace.trace || calcuttaTrace, null, 2)}</pre>
+      </details> : null}
       <div className={styles.clinchSummary}>
         <div><span>{teamName(data.teams, year, 1)}</span><strong>{formatTeamPoints(tournamentState.teamOne.score)}</strong><small>{tournamentState.teamOne.pointsToClinch > 0 ? `Need ${formatTeamPoints(tournamentState.teamOne.pointsToClinch)} to clinch` : "At clinching target"}</small></div>
         <p>{tournamentState.remainingMatches} matches · {tournamentState.remainingPoints} points remaining</p>

@@ -56,7 +56,7 @@ export async function POST(request) {
     let access;
     if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
     else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
-    else if (action === "finalize") match = await finalizeLiveMatch(matchId, updates, updatedBy);
+    else if (action === "finalize") match = await finalizeLiveMatch(matchId, updates, updatedBy, { includeCalcuttaPublicationTrace: process.env.VERCEL_ENV === "preview" });
     else if (action === "reopen") match = await reopenLiveMatch(matchId, updatedBy);
     else if (action === "access-generate") {
       access = await generateLiveMatchAccess(matchId, updatedBy);
@@ -69,8 +69,9 @@ export async function POST(request) {
     else if (action === "access-disable") match = await disableLiveMatchAccess(matchId, updatedBy);
     else throw new Error("Unknown live-match action.");
     refreshMatchData();
-    const safeMatch = Object.fromEntries(Object.entries(match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key)));
-    return NextResponse.json({ match: safeMatch });
+    const calcuttaPublication = match?.__calcuttaPublication;
+    const safeMatch = Object.fromEntries(Object.entries(match).filter(([key]) => !["Access Code Hash", "Access Token Hash", "__calcuttaPublication"].includes(key)));
+    return NextResponse.json({ match: safeMatch, ...(process.env.VERCEL_ENV === "preview" && calcuttaPublication ? { calcuttaPublication } : {}) });
   } catch (error) {
     console.error("Live Match Control action failed", { sheet: "Live Matches / Matches / Match Update Log", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: directorTransactionError(error, "The match update could not be completed. Please try again.") }, { status: 400 });
