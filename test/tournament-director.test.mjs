@@ -240,6 +240,11 @@ test("Director actions log every transaction boundary and verify workbook read-b
   const route = source("app/api/director/route.js");
   for (const stage of ["Identity verification", "Action authorization", "Workbook verification", "Action execution", "Workbook write", "Read-back verification", "Success", "Failure"]) assert.match(route, new RegExp(stage));
   assert.match(route, /verifyActionReadBack/);
+  assert.match(route, /verifyDirectorReadBack/);
+  assert.match(route, /invalidateTournamentDataCache/);
+  assert.match(route, /Cache invalidation attempt/);
+  assert.match(route, /Verification read attempt/);
+  assert.match(route, /googleWriteCompletedAt/);
   assert.match(route, /Director action transaction/);
   assert.match(route, /X-Director-Retryable/);
 });

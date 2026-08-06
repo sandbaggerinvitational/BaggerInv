@@ -1,6 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
+import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
@@ -15,6 +15,7 @@ import { bindOfficialProjectionMatches } from "../../../lib/odds-pairing-source.
 import { currentTournamentYear } from "../../../lib/tournament-context.js";
 import { validateOpeningMatchups, validateRoundThreePairings } from "../../../lib/tournament-odds.js";
 import { championshipProjectionMissionStatus } from "../../../lib/projection-mission-control.js";
+import { verifyDirectorReadBack } from "../../../lib/director-readback-verification.js";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +50,23 @@ function verifyActionReadBack(action, input, data, round) {
   if (action === "close-round") return Number(data.tournament.currentRound) !== Number(round) || /^(Final|Complete)$/i.test(String(data.tournament.status));
   if (action === "automation-check") return true;
   return false;
+}
+
+function verificationValues(action, input, data, round) {
+  const matches = data.rounds.find((item) => Number(item.number) === Number(round))?.matches || [];
+  return {
+    action,
+    requestedRound: Number(round),
+    tournamentStatus: data.tournament.status,
+    currentRound: data.tournament.currentRound,
+    automationEnabled: Boolean(data.tournament.directorAutomation?.enabled),
+    matchId: input.matchId || "",
+    matches: matches.map((match) => ({
+      id: match.id,
+      status: match.status,
+      scoringEnabled: match.scoringEnabled !== false,
+    })),
+  };
 }
 
 function refresh() {
@@ -119,8 +137,13 @@ export async function GET(request) {
 
 export async function POST(request) {
   const trace = transactionTrace("director-action");
+  const directorVerificationStartedAt = Date.now();
   const authorization = await authorize(request);
-  trace.stage("Identity verification", authorization.status === "active" ? "PASS" : "FAIL", authorization.status);
+  trace.stage("Identity verification", authorization.status === "active" ? "PASS" : "FAIL", JSON.stringify({
+    status: authorization.status,
+    startedAt: directorVerificationStartedAt,
+    completedAt: Date.now(),
+  }));
   if (authorization.status !== "active") return authorizationFailure(authorization);
   const identity = authorization.identity;
   try {
@@ -131,6 +154,7 @@ export async function POST(request) {
     const round = Number(input.round || data.tournament.currentRound);
     const matches = data.rounds.find((item) => Number(item.number) === round)?.matches || [];
     const updatedBy = identity.actor.name;
+    const workbookWriteStartedAt = Date.now();
     if (input.action === "automation-check") {
       const dueRound = directorAutomationDue(tournamentDirectorModel(data));
       if (!dueRound) return NextResponse.json({ ok: true, changed: false });
@@ -160,13 +184,44 @@ export async function POST(request) {
         "Auto Set Matches Live": input.autoSetMatchesLive,
       }, updatedBy);
     } else throw new Error("Unknown Director action.");
+    const googleWriteCompletedAt = Date.now();
     trace.stage("Action execution", "PASS");
-    trace.stage("Workbook write", "PASS");
+    trace.stage("Workbook write", "PASS", JSON.stringify({
+      startedAt: workbookWriteStartedAt,
+      googleWriteCompletedAt,
+      elapsedMs: googleWriteCompletedAt - workbookWriteStartedAt,
+    }));
     refresh();
-    const verifiedData = await getTournamentData();
-    const verified = verifyActionReadBack(input.action, input, verifiedData, round);
-    trace.stage("Read-back verification", verified ? "PASS" : "FAIL");
-    if (!verified) throw new Error("The workbook update could not be verified after it completed.");
+    const verification = await verifyDirectorReadBack({
+      invalidate: () => invalidateTournamentDataCache(["Live Matches", "Matches", "Tournaments", "Match Update Log", "Admin Audit Log"]),
+      read: getTournamentData,
+      verify: (verifiedData) => verifyActionReadBack(input.action, input, verifiedData, round),
+      summarize: (verifiedData) => verificationValues(input.action, input, verifiedData, round),
+      onAttempt: (attempt) => {
+        trace.stage(`Cache invalidation attempt ${attempt.attempt}`, "PASS", JSON.stringify({
+          startedAt: attempt.invalidationStartedAt,
+          completedAt: attempt.invalidationCompletedAt,
+          elapsedMs: attempt.invalidationCompletedAt - attempt.invalidationStartedAt,
+        }));
+        trace.stage(`Verification read attempt ${attempt.attempt}`, attempt.success ? "PASS" : "RETRY", JSON.stringify({
+          startedAt: attempt.readStartedAt,
+          completedAt: attempt.readCompletedAt,
+          elapsedMs: attempt.readCompletedAt - attempt.readStartedAt,
+          values: attempt.values,
+          error: attempt.error,
+        }));
+      },
+    });
+    trace.stage("Read-back verification", verification.success ? "PASS" : "FAIL", JSON.stringify({
+      attempts: verification.attempts.length,
+      googleWriteCompletedAt,
+      verificationStartedAt: verification.attempts[0]?.readStartedAt,
+      verificationCompletedAt: verification.attempts.at(-1)?.readCompletedAt,
+    }));
+    if (!verification.success) throw Object.assign(
+      new Error("The workbook update could not be verified after it completed."),
+      { verificationAttempts: verification.attempts },
+    );
     trace.stage("Success", "PASS");
     console.info("Director action transaction", trace.report({ round, updatedBy }));
     return NextResponse.json({ ok: true, changed: input.action === "automation-check" });
