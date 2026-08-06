@@ -211,6 +211,24 @@ test("golfer and fully allocated owner payouts conserve the distributed prize po
   assert.equal(ownerTotal, model.pot);
   assert.equal(model.distributedPrizePool, model.pot);
   assert.equal(model.golfers[0].rounds[1].payoutPercent, 0.2);
+  assert.equal(model.completedRounds.join(","), "1");
+  assert.equal(model.tournamentComplete, false);
+  assert.equal(model.golfers.reduce((sum, golfer) => sum + golfer.guaranteedWinnings, 0), model.guaranteedDistributed);
+  assert.equal(model.remainingPrizePool, model.pot - model.guaranteedDistributed);
+  assert.equal(model.portfolios.reduce((sum, owner) => sum + owner.guaranteedWinnings, 0), model.guaranteedDistributed);
+});
+
+test("Round 3 completion transitions projected Calcutta wording to final winnings", () => {
+  const componentPromise = readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8");
+  return componentPromise.then((component) => {
+    assert.match(component, /Guaranteed Winnings/);
+    assert.match(component, /Projected Tournament Value/);
+    assert.match(component, /Final Tournament Winnings/);
+    assert.match(component, /Based on completed rounds\./);
+    assert.match(component, /ordinalPlace/);
+    assert.match(component, /100% Ownership|Ownership/);
+    assert.match(component, /Golfers Owned/);
+  });
 });
 
 test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet scroller", async () => {
