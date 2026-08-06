@@ -90,4 +90,6 @@ test("repository architecture forbids inferred worksheet dependencies", async ()
   assert.match(architecture, /verify every directly referenced worksheet title against the active Preview workbook schema/i);
   assert.match(architecture, /never introduce a worksheet dependency based on an inferred or convenient name/i);
   assert.match(architecture, /stop and report the missing dependency/i);
+  assert.match(architecture, /one authoritative application publisher calculates and writes that output/i);
+  assert.match(architecture, /Consumers must not independently recalculate the same derived workbook data/i);
 });

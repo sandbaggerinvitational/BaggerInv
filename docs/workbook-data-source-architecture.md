@@ -16,4 +16,14 @@ Official scores, round results, standings, handicaps, match status, players, and
 
 Workbook integration is incomplete until every referenced worksheet has been verified in the active Preview workbook. Unknown worksheet names and unverified logical sources fail closed; the application must not create, rename, or infer workbook structure.
 
+## Derived tournament outputs
+
+When a verified worksheet exists specifically to store a derived tournament output, one authoritative application publisher calculates and writes that output to the worksheet. Every Website, PWA, analytics, history, and administrative consumer then reads the published output.
+
+The architecture is:
+
+Authoritative source data → one publisher → verified derived-output worksheet → many readers.
+
+Consumers must not independently recalculate the same derived workbook data. Runtime derivation may be used only when explicitly approved as a temporary Preview fallback; it must not become a parallel source of truth or diverge from the official publisher.
+
 The attempted Calcutta dependency on `Round Results` is recorded as a violation of this rule. It must not be treated as an authoritative source unless that worksheet is first verified in the active workbook. Calcutta publication must instead bind to an existing verified application source, or remain blocked with the missing dependency reported explicitly.
