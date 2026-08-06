@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { buildCalcuttaModel, calcuttaPublicationRecords, deriveCalcuttaRoundResults, rankWithTieAverages } from "../lib/calcutta.js";
+import { buildCalcuttaModel, calcuttaPublicationReadiness, calcuttaPublicationRecords, deriveCalcuttaRoundResults, rankWithTieAverages } from "../lib/calcutta.js";
 
 const players = {
   A: { name: "Clay Beltran" }, B: { name: "Patrick Noonan" }, C: { name: "David Tatum" },
@@ -109,6 +109,20 @@ test("official Calcutta publication writes only fully completed rounds and tie-a
   assert.ok(output.standings.every((row) => row["Updated At"]));
 });
 
+test("Calcutta publication readiness identifies the exact players blocking a completed round", () => {
+  const readiness = calcuttaPublicationReadiness({
+    year: 2026,
+    purchases: ["A", "B", "C"].map((id) => ({ Year: 2026, "Golfer Player ID": id })),
+    roundResults: [
+      { Year: 2026, Round: 1, Format: "Singles", "Player ID": "A", "Gross Score": 75 },
+      { Year: 2026, Round: 1, Format: "Singles", "Player ID": "B", "Gross Score": 76 },
+    ],
+  });
+  assert.equal(readiness.rounds[0].qualifies, false);
+  assert.deepEqual(readiness.rounds[0].missingPlayers, ["C"]);
+  assert.equal(readiness.rounds[0].availablePlayers.length, 2);
+});
+
 test("published Calcutta sheets are authoritative on the application read path", () => {
   const calculated = fixture();
   const publishedRoundResults = calculated.golfers.flatMap((golfer) => Object.values(golfer.rounds).map((round) => ({
@@ -159,6 +173,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(writer, /replaceScopedRuntimeRecords/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(nextLive\)/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(next\)/);
+  assert.match(writer, /reason !== "no-completed-rounds"/);
+  assert.match(writer, /Calcutta publication trace/);
   for (const sheet of ["Calcutta Purchases", "Calcutta Ownership", "Calcutta Point Structure", "Calcutta Payout", "Calcutta Round Results", "Calcutta Standings", "Calcutta Owner Leaderboard"]) {
     assert.match(loader, new RegExp(`fetchOptionalSheet\\(\\"${sheet}\\"\\)|\\"${sheet}\\"`));
     assert.match(protection, new RegExp(`\\"${sheet}\\"`));
