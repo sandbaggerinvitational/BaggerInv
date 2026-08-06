@@ -204,6 +204,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(writer, /getTournamentData\(\)/);
   assert.match(writer, /calcuttaRoundResultsFromTournamentModel/);
   assert.doesNotMatch(writer, /rows\("Round Results"\)/);
+  assert.match(writer, /trace\.workbookSchemas/);
+  assert.match(writer, /expected, actual, missing/);
   assert.match(writer, /replaceScopedRuntimeRecords/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(nextLive\)/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(next\)/);
