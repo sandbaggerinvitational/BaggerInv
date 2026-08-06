@@ -99,6 +99,17 @@ test("legacy public site remains separate from participant Home", async () => {
   assert.match(admin, /Open public site/);
 });
 
+test("every administrative brand header returns to PWA Home", async () => {
+  const [adminPage, directorPage] = await Promise.all([
+    source("app/admin/page.js"),
+    source("app/admin/director/page.js"),
+  ]);
+  assert.match(adminPage, /<Header homeHref="\/home"/);
+  assert.match(directorPage, /<Header homeHref="\/home"/);
+  assert.doesNotMatch(adminPage, /<Header\s*\/>/);
+  assert.doesNotMatch(directorPage, /<Header\s*\/>/);
+});
+
 test("Home status follows the resolved tournament state", () => {
   assert.equal(tournamentStatusLabel("Upcoming"), "Upcoming");
   assert.equal(tournamentStatusLabel("LIVE"), "Live");

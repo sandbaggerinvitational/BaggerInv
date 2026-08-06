@@ -25,5 +25,5 @@ export default async function AdminPage() {
     captainOne: item.team1?.captain?.["Display Name"] || "",
     captainTwo: item.team2?.captain?.["Display Name"] || "",
   }));
-  return <main><Header /><AdminCenter tournaments={tournaments} previewMode={process.env.VERCEL_ENV === "preview"} liveTournamentV2={liveTournamentV2Enabled()} /><Footer /></main>;
+  return <main><Header homeHref="/home" /><AdminCenter tournaments={tournaments} previewMode={process.env.VERCEL_ENV === "preview"} liveTournamentV2={liveTournamentV2Enabled()} /><Footer /></main>;
 }
