@@ -641,7 +641,11 @@ async function buildTournamentData() {
       ownership: calcuttaOwnership,
       pointStructure: calcuttaPointStructure,
       payoutStructure: calcuttaPayout,
-      roundResults: calcuttaRoundResults.length ? calcuttaRoundResults : deriveCalcuttaRoundResults({ year, roundResults, liveRoundHandicaps, handicaps }),
+      roundResults: calcuttaRoundResults.length
+        ? calcuttaRoundResults
+        : process.env.VERCEL_ENV === "preview"
+          ? deriveCalcuttaRoundResults({ year, roundResults, liveRoundHandicaps, handicaps })
+          : [],
       standings: calcuttaStandings,
       ownerLeaderboard: calcuttaOwnerLeaderboard,
     }),
