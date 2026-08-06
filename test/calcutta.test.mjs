@@ -314,6 +314,7 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(component, /Calcutta Storylines/);
   assert.match(component, /BB: "Best Ball", SC: "Scramble", SI: "Singles"/);
   assert.match(css, /\.sheet\{[^}]*overflow-y:auto/);
+  assert.match(css, /\.sheet\{align-content:start;grid-auto-rows:max-content\}/);
   assert.match(css, /-webkit-overflow-scrolling:touch/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(css, /\.investments article>span:first-child\{grid-column:1\/-1\}/);
