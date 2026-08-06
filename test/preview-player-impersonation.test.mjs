@@ -38,7 +38,7 @@ test("impersonation API and QA Tools are strictly Preview gated", async () => {
   assert.match(dashboard, /onChange=\{\(event\) => \{ const playerId = event\.target\.value; setTestPlayerId\(playerId\); previewAsPlayer\(playerId\); \}\}/);
   assert.match(dashboard, /window\.dispatchEvent\(new Event\("player-passport-changed"\)\)[\s\S]*router\.push\("\/home"\)/);
   assert.doesNotMatch(dashboard, /Change Player/);
-  assert.ok(dashboard.indexOf("notification-sandbox-title") < dashboard.indexOf("qa-tools-title"));
+  assert.match(dashboard, /DirectorOperationsHub/);
   assert.match(dashboard, /title="Preview Tools"/);
 });
 

@@ -34,7 +34,7 @@ test("service worker, participant subscription, Director sandbox, and log are wi
     readFile(new URL("../app/PlayerSetupBanner.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/player-passport/notifications/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/director/notifications/sandbox/route.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/admin/director/DirectorOperationEditors.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
   ]);
   assert.match(worker, /addEventListener\("push"/);
@@ -53,7 +53,7 @@ test("service worker, participant subscription, Director sandbox, and log are wi
   assert.match(director, /Notification Permission/);
   assert.match(director, /Push Subscription/);
   assert.match(director, /Ready To Send/);
-  assert.match(director, /notificationSandbox\.templates\.map/);
+  assert.match(director, /sandbox\.templates/);
   assert.match(director, /Notification Log/);
   assert.match(writer, /"Notification Permission"[\s\S]*"Push Subscription"[\s\S]*"Device Last Seen"/);
   assert.match(writer, /"Notification Preview Template"/);

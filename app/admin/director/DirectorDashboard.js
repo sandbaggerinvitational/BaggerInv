@@ -6,7 +6,7 @@ import { directorFetch } from "../../../lib/director-client-transaction";
 import { useCallback, useEffect, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
 import OddsAdmin from "../../odds-center/admin/OddsAdmin.js";
-import { CalcuttaManagement, DirectorSearch, MatchManagement, NetSkinsManagement, OperationsSection } from "./DirectorOperationsConsole.js";
+import { DirectorOperationsHub, OperationsSection } from "./DirectorOperationsConsole.js";
 import styles from "./director.module.css";
 
 const HEALTH = [
@@ -61,25 +61,6 @@ function ReadinessPanel({ readiness }) {
   </section>;
 }
 
-function NotificationHealth({ sandbox }) {
-  const checks = [
-    ["pwaInstalled", "PWA Installed"],
-    ["permissionGranted", "Notification Permission"],
-    ["pushSubscription", "Push Subscription"],
-    ["readyToSend", "Ready To Send"],
-  ];
-  const blocker = !sandbox.configured ? "Preview push keys are not configured."
-    : !sandbox.health.pwaInstalled ? "Install and open the PWA on this device."
-      : !sandbox.health.permissionGranted ? "Allow notifications for this PWA."
-        : !sandbox.health.pushSubscription ? "Register this device's push subscription from the Home setup banner."
-          : "This device can receive test notifications.";
-  return <div className={styles.notificationHealth} aria-label="Notification Health">
-    <h3>Notification Health</h3>
-    <ul>{checks.map(([key, label]) => <li data-ready={sandbox.health[key] ? "true" : "false"} key={key}><span aria-hidden="true">{sandbox.health[key] ? "✅" : "○"}</span><strong>{label}</strong></li>)}</ul>
-    <p role="status">{blocker}</p>
-  </div>;
-}
-
 export default function DirectorDashboard({ directorName }) {
   const router = useRouter();
   const [data, setData] = useState(null);
@@ -93,6 +74,8 @@ export default function DirectorDashboard({ directorName }) {
   const [loadFailed, setLoadFailed] = useState(false);
   const [retryOperation, setRetryOperation] = useState(null);
   const [operationLog, setOperationLog] = useState([]);
+  const [toast, setToast] = useState("");
+  const [loadStartedAt] = useState(() => typeof performance === "undefined" ? 0 : performance.now());
   const recordOperation = useCallback((label, status = "success", detail = "") => {
     setOperationLog((current) => [{ id: `${Date.now()}-${label}`, label, status, detail, at: new Date().toISOString() }, ...current].slice(0, 8));
   }, []);
@@ -111,7 +94,8 @@ export default function DirectorDashboard({ directorName }) {
     setMessage(""); setLoadFailed(false); setRetryOperation(null);
     setTestPlayerId((current) => current || payload.data.qaTools?.selectedPlayer?.id || payload.data.qaTools?.players?.[0]?.id || "");
     setSelectedRound((current) => current || String(payload.data.tournament.currentRound || payload.data.rounds.find((round) => round.status !== "FINAL")?.number || payload.data.rounds[0]?.number || ""));
-  }, []);
+    if (!attempt && loadStartedAt) console.info("Director Mission Control performance", { operation: "initial-load", elapsedMs: Math.round(performance.now() - loadStartedAt), apiRequests: 1 });
+  }, [loadStartedAt]);
   useEffect(() => { load().catch((error) => { setMessage(error.message); setLoadFailed(true); }); }, [load]);
   useEffect(() => {
     if (!data?.automation?.enabled) return undefined;
@@ -132,11 +116,13 @@ export default function DirectorDashboard({ directorName }) {
       const label = ACTION_LABELS[action] || "Tournament operation completed";
       recordOperation(label, "success", `${elapsed} ms · workbook verified`);
       setMessage(`${label}. Changes verified.`);
+      return true;
     } catch (error) {
       const detail = error instanceof Error ? error.message : "Director action failed.";
       recordOperation(ACTION_LABELS[action] || "Tournament operation", "failed", detail);
       setRetryOperation(() => () => act(action, extra));
       setMessage(detail);
+      return false;
     }
     finally { setBusy(""); }
   };
@@ -147,7 +133,8 @@ export default function DirectorDashboard({ directorName }) {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Test notification could not be sent.");
       await load(); recordOperation(`${template.label} sent`, "success", "Notification delivery recorded"); setMessage(`${template.label} sent to this device.`);
-    } catch (error) { recordOperation(`${template.label} notification`, "failed", error.message); setMessage(error.message); }
+      return true;
+    } catch (error) { recordOperation(`${template.label} notification`, "failed", error.message); setMessage(error.message); return false; }
     finally { setBusy(""); }
   };
   const previewAsPlayer = async (playerId) => {
@@ -192,7 +179,7 @@ export default function DirectorDashboard({ directorName }) {
   return <section className={styles.shell}>
     <header className={styles.hero}><span>Director Mode</span><h1>Tournament Director</h1><p>{directorName} · {data.tournament.year} {data.tournament.name}</p><StatusBadge status={data.tournament.status} /></header>
 
-    <DirectorSearch operations={data.operations} notificationTemplates={data.notificationSandbox?.templates || []} />
+    <DirectorOperationsHub operations={data.operations} notificationSandbox={data.notificationSandbox} busy={busy} saveOperation={async (...args) => { const saved = await act(...args); if (saved) { setToast("Changes saved."); window.setTimeout(() => setToast(""), 2400); } return saved; }} sendNotification={async (...args) => { const sent = await sendTestNotification(...args); if (sent) { setToast("Changes saved."); window.setTimeout(() => setToast(""), 2400); } return sent; }} />
 
     <section className={styles.command} aria-labelledby="command-title">
       <header><span>Mission Control</span><h2 id="command-title">Operational Overview</h2></header>
@@ -254,22 +241,10 @@ export default function DirectorDashboard({ directorName }) {
     <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><div className={styles.automationGrid}><article data-enabled={data.automation.enabled && data.automation.autoOpenRound ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoOpenRound ? "🟢" : "⚪"} Auto Open</span><strong>{data.automation.enabled && data.automation.autoOpenRound ? "Enabled" : "Disabled"}</strong><small>{data.nextEvent?.round ? `${data.nextEvent.title} · ${data.nextEvent.countdown}` : "No round action scheduled"}</small></article><article data-enabled={data.automation.enabled && data.automation.autoSetMatchesLive ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoSetMatchesLive ? "🟢" : "⚪"} Auto LIVE</span><strong>{data.automation.enabled && data.automation.autoSetMatchesLive ? "Enabled" : "Disabled"}</strong><small>{data.automation.autoSetMatchesLive ? "Runs when the round opens" : "Manual Set All LIVE required"}</small></article></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation · Manual override" : "Enable automation"}</button></section>
     </OperationsSection>
 
-    <OperationsSection id="match-management" eyebrow="Pairings and logistics" title="Match Management" summary="Edit active match assignments and schedule details.">
-      <MatchManagement operations={data.operations} busy={busy} act={act} />
-    </OperationsSection>
-
-    <OperationsSection id="calcutta-management" eyebrow="Auction operations" title="Calcutta" summary="Manage purchase prices and ownership from the verified workbook records.">
-      <CalcuttaManagement operations={data.operations} busy={busy} act={act} />
-    </OperationsSection>
-
-    <OperationsSection id="net-skins-management" eyebrow="Round eligibility" title="Net Skins" summary="Search participants and update official eligibility.">
-      <NetSkinsManagement operations={data.operations} busy={busy} act={act} />
-    </OperationsSection>
-
-    {data.notificationSandbox ? <OperationsSection id="notifications" eyebrow="Tournament communications" title="Notifications" summary="Send approved tournament messages and verify delivery."><section className={styles.notificationSandbox} aria-labelledby="notification-sandbox-title"><header><span>Preview only</span><h2 id="notification-sandbox-title">Notification Sandbox</h2></header><NotificationHealth sandbox={data.notificationSandbox} /><div className={styles.notificationTemplates}>{data.notificationSandbox.templates.map((template) => <button disabled={Boolean(busy) || !data.notificationSandbox.currentDeviceReady} onClick={() => sendTestNotification(template)} key={template.id}>{template.label}</button>)}</div><h3>Notification Log</h3>{data.notificationSandbox.log.length ? <div className={styles.notificationLog}>{data.notificationSandbox.log.map((item) => <article key={item.id}><div><strong>{item.type}</strong><span>{item.recipient}{item.template ? ` · ${item.template}` : ""}</span></div><time>{timestamp(item.sentAt)}</time><b data-status={item.status === "Failed" ? "failed" : "sent"}>{item.status}</b>{item.failure ? <small>{item.failure}</small> : null}</article>)}</div> : <p>No test notifications have been sent.</p>}</section></OperationsSection> : null}
     {data.qaTools ? <OperationsSection id="preview-tools" eyebrow="Preview only" title="Preview Tools" summary="Impersonate a golfer or reset Dress Rehearsal runtime state."><section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p>{resetComplete ? <div className={styles.resetComplete} role="status"><strong>Preview Tournament Reset Complete</strong><span>Ready for Dress Rehearsal.</span></div> : null}<div className={styles.resetUtility}><div><strong>Dress Rehearsal</strong><span>Clear runtime tournament results while preserving setup and content.</span></div><button disabled={Boolean(busy)} onClick={() => { setResetComplete(false); setResetOpen(true); }}>🔄 Reset Preview Tournament</button></div></section></OperationsSection> : null}
     <OperationsSection id="operational-log" eyebrow="Director only" title="Operational Log" summary="Verified actions and official match activity."><section className={styles.activity}>{operationLog.length || data.recentActivity.length ? <ul>{operationLog.map((item) => <li data-status={item.status} key={item.id}><i aria-hidden="true">{item.status === "success" ? "🟢" : "🔴"}</i><div><strong>{item.label}</strong><span>{item.detail}</span></div><time>{timestamp(item.at)}</time></li>)}{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No operations recorded yet. Completed Director actions will appear here.</p>}</section></OperationsSection>
     <Link className={styles.fullAdmin} href="/admin">Open Full Admin →</Link>
+    {toast ? <div className={styles.operationToast} role="status">{toast}</div> : null}
     {resetOpen ? <div className={styles.resetBackdrop} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) setResetOpen(false); }}><section className={styles.resetDialog} role="dialog" aria-modal="true" aria-labelledby="reset-preview-title"><span>Preview only</span><h2 id="reset-preview-title">Reset Preview Tournament?</h2><p>This will return the Preview tournament to the beginning of tournament week.</p><strong>Production data will NOT be affected.</strong><div><button disabled={Boolean(busy)} onClick={() => setResetOpen(false)}>Cancel</button><button disabled={Boolean(busy)} onClick={resetPreviewTournament}>{busy === "preview-reset" ? "Resetting…" : "Reset Preview"}</button></div></section></div> : null}
   </section>;
 }
