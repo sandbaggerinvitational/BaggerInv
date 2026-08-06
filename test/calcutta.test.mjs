@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { buildCalcuttaModel, calcuttaPublicationReadiness, calcuttaPublicationRecords, deriveCalcuttaRoundResults, rankWithTieAverages } from "../lib/calcutta.js";
+import { buildCalcuttaModel, calcuttaPublicationReadiness, calcuttaPublicationRecords, calcuttaRoundResultsFromTournamentModel, deriveCalcuttaRoundResults, rankWithTieAverages } from "../lib/calcutta.js";
 
 const players = {
   A: { name: "Clay Beltran" }, B: { name: "Patrick Noonan" }, C: { name: "David Tatum" },
@@ -76,6 +76,25 @@ test("Calcutta derives future Scramble net scores with the existing 35/15 team c
   assert.equal(results.length, 2);
   assert.deepEqual(results.map((row) => row["Full Course Handicap"]), [5, 5]);
   assert.deepEqual(results.map((row) => row["Net Score"]), [67, 67]);
+});
+
+test("Calcutta publication consumes completed results from the authoritative tournament model", () => {
+  const results = calcuttaRoundResultsFromTournamentModel({
+    year: 2026,
+    rounds: [
+      { number: 1, status: "FINAL", matches: [{ status: "final" }] },
+      { number: 2, status: "LIVE", matches: [{ status: "live" }] },
+    ],
+    scoreLeaderboard: [
+      { round: 1, format: "Best Ball", playerIds: ["A"], gross: 75, net: 70 },
+      { round: 1, format: "Scramble", playerIds: ["B", "C"], gross: 72, net: 67 },
+      { round: 2, format: "Scramble", playerIds: ["A", "B"], gross: 35, net: 32 },
+    ],
+  });
+  assert.deepEqual(results, [
+    { Year: 2026, Round: 1, Format: "Best Ball", "Player IDs": "A", "Gross Score": 75, "Net Score": 70, "Full Course Handicap": 5 },
+    { Year: 2026, Round: 1, Format: "Scramble", "Player IDs": "B,C", "Gross Score": 72, "Net Score": 67, "Full Course Handicap": 5 },
+  ]);
 });
 
 test("Calcutta stays unpublished when official purchases or award structures are incomplete", () => {
@@ -179,8 +198,12 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(css, /-webkit-overflow-scrolling:touch/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(loader, /buildCalcuttaModel/);
-  assert.match(loader, /process\.env\.VERCEL_ENV === "preview"/);
+  assert.doesNotMatch(loader, /fetchOptionalSheet\("Round Results"\)/);
+  assert.match(loader, /roundResults: calcuttaRoundResults/);
   assert.match(writer, /export async function publishOfficialCalcutta/);
+  assert.match(writer, /getTournamentData\(\)/);
+  assert.match(writer, /calcuttaRoundResultsFromTournamentModel/);
+  assert.doesNotMatch(writer, /rows\("Round Results"\)/);
   assert.match(writer, /replaceScopedRuntimeRecords/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(nextLive\)/);
   assert.match(writer, /await synchronizeCalcuttaAfterOfficialUpdate\(next\)/);
