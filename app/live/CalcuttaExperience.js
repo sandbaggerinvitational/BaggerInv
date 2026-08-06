@@ -8,6 +8,7 @@ import styles from "./calcutta.module.css";
 const money = (value) => Number(value || 0).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const percent = (value) => `${Number(value || 0) >= 0 ? "+" : ""}${Math.round(Number(value || 0) * 100)}%`;
 const payoutPercent = (value) => `${(Number(value || 0) * 100).toFixed(1).replace(/\.0$/, "")}%`;
+const formatName = (value) => ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[String(value || "").trim().toUpperCase()] || value;
 const place = (value) => value ? `#${value}` : "—";
 const initials = (name) => String(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
 
@@ -34,7 +35,7 @@ function GolferSheet({ golfer, close }) {
     <div className={styles.identity}><Portrait player={golfer.player} large /><div><h3 id="calcutta-golfer-name">{golfer.player.name}</h3><p>Current rank {place(golfer.rank)}</p></div></div>
     <div className={styles.metrics}><p><small>Purchase Price</small><strong>{money(golfer.purchasePrice)}</strong></p><p><small>Current Value</small><strong>{money(golfer.currentPayoutValue)}</strong></p><p><small>ROI</small><strong data-positive={golfer.roi > 0 || undefined}>{percent(golfer.roi)}</strong></p><p><small>Total Points</small><strong>{golfer.totalPoints.toFixed(2).replace(/\.00$/, "")}</strong></p></div>
     <section className={styles.owners}><header><span>Owners</span></header>{golfer.owners?.length ? golfer.owners.map((owner) => <div key={owner.ownerId}><span><Portrait player={owner.owner} /><strong>{owner.owner.name}</strong></span><b>{payoutPercent(owner.ownership)}</b></div>) : <p>Ownership has not been published.</p>}</section>
-    <section className={styles.roundDetails}><header><span>Round Performance</span></header>{[1,2,3].map((round) => { const result = golfer.rounds[round]; return <article key={round}><h4>Round {round}{result?.format ? ` • ${result.format}` : ""}</h4>{result ? <div><p><small>Gross</small><strong>{result.gross}</strong></p><p><small>Net</small><strong>{result.net}</strong></p><p><small>Place</small><strong>{place(result.place)}{result.tieSize > 1 ? " T" : ""}</strong></p><p><small>Points</small><strong>{result.points.toFixed(2).replace(/\.00$/, "")}</strong></p><p><small>Round Payout</small><strong>{payoutPercent(result.payoutPercent)}</strong></p></div> : <p>Results have not been posted.</p>}</article>; })}</section>
+    <section className={styles.roundDetails}><header><span>Round Performance</span></header>{[1,2,3].map((round) => { const result = golfer.rounds[round]; return <article key={round}><h4>Round {round}{result?.format ? ` • ${formatName(result.format)}` : ""}</h4>{result ? <div><p><small>Gross</small><strong>{result.gross}</strong></p><p><small>Net</small><strong>{result.net}</strong></p><p><small>Place</small><strong>{place(result.place)}{result.tieSize > 1 ? " T" : ""}</strong></p><p><small>Points</small><strong>{result.points.toFixed(2).replace(/\.00$/, "")}</strong></p><p><small>Round Payout</small><strong>{payoutPercent(result.payoutPercent)}</strong></p></div> : <p>Results have not been posted.</p>}</article>; })}</section>
     <footer><span>Total Payout</span><strong>{payoutPercent(golfer.totalPayoutPercent)} • {money(golfer.currentPayoutValue)}</strong></footer>
   </section></div>;
 }
@@ -67,4 +68,3 @@ export default function CalcuttaExperience({ model }) {
     {selected && tab === "portfolios" ? <OwnerSheet portfolio={selected} close={() => setSelected(null)} /> : null}
   </section>;
 }
-

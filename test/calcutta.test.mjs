@@ -153,7 +153,7 @@ test("Preview finalization exposes generated rows and workbook read-back diagnos
   assert.match(control, /JSON\.stringify\(calcuttaTrace\.trace \|\| calcuttaTrace/);
 });
 
-test("published Calcutta sheets are authoritative on the application read path", () => {
+test("published results remain authoritative while payouts are derived exclusively from Calcutta Payout", () => {
   const calculated = fixture();
   const publishedRoundResults = calculated.golfers.flatMap((golfer) => Object.values(golfer.rounds).map((round) => ({
     Year: 2026, Round: round.round, Format: round.format, "Player ID": golfer.playerId,
@@ -166,16 +166,51 @@ test("published Calcutta sheets are authoritative on the application read path",
     "Round 1 Payout %": golfer.rounds[1]?.payoutPercent || 0, "Overall Payout %": golfer.overallPayoutPercent,
     "Total Payout %": golfer.totalPayoutPercent, "Current Payout Value": golfer.currentPayoutValue, ROI: golfer.roi,
   }));
-  publishedStandings[0]["Current Payout Value"] = 123.45;
+  publishedStandings[0]["Current Payout Value"] = 999999;
+  publishedStandings[0]["Round 1 Payout %"] = 9.99;
+  publishedStandings[0]["Total Payout %"] = 9.99;
   const official = buildCalcuttaModel({
     year: 2026, players,
     purchases: [{ Year: 2026, "Golfer Player ID": "A", "Purchase Price": 100 }, { Year: 2026, "Golfer Player ID": "B", "Purchase Price": 200 }, { Year: 2026, "Golfer Player ID": "C", "Purchase Price": 50 }],
     ownership: [], pointStructure: [{ Year: 2026, Place: 1, "Round 1 Award": 999 }],
-    payoutStructure: [{ Year: 2026, Place: 1, "Round 1 Award %": "99%", "Overall Award %": "99%" }],
+    payoutStructure: [
+      { Year: 2026, Place: 1, "Round 1 Award %": "10%", "Overall Award %": "20%" },
+      { Year: 2026, Place: 2, "Round 1 Award %": "5%", "Overall Award %": "10%" },
+      { Year: 2026, Place: 3, "Round 1 Award %": "3%", "Overall Award %": "5%" },
+    ],
     roundResults: publishedRoundResults, standings: publishedStandings,
   });
   assert.equal(official.source.mode, "official");
-  assert.equal(official.golfers.find((row) => row.playerId === publishedStandings[0]["Player ID"]).currentPayoutValue, 123.45);
+  const publishedLeader = official.golfers.find((row) => row.playerId === publishedStandings[0]["Player ID"]);
+  assert.notEqual(publishedLeader.currentPayoutValue, 999999);
+  assert.ok(publishedLeader.currentPayoutValue <= official.pot);
+  assert.equal(official.golfers.reduce((sum, golfer) => sum + golfer.currentPayoutValue, 0), official.distributedPrizePool);
+});
+
+test("golfer and fully allocated owner payouts conserve the distributed prize pool", () => {
+  const model = buildCalcuttaModel({
+    year: 2026,
+    players,
+    purchases: ["A", "B", "C"].map((id) => ({ Year: 2026, "Golfer Player ID": id, "Purchase Price": 100 })),
+    ownership: ["A", "B", "C"].map((id) => ({ Year: 2026, "Golfer Player ID": id, "Owner Player ID": "O1", "Ownership %": "100%" })),
+    pointStructure: [1000, 500, 250].map((points, index) => ({ Year: 2026, Place: index + 1, "Round 1 Award": points })),
+    payoutStructure: [
+      { Year: 2026, Place: 1, "Round 1 Award %": "20%", "Overall Award %": "30%" },
+      { Year: 2026, Place: 2, "Round 1 Award %": "10%", "Overall Award %": "20%" },
+      { Year: 2026, Place: 3, "Round 1 Award %": "5%", "Overall Award %": "15%" },
+    ],
+    roundResults: [
+      { Year: 2026, Round: 1, Format: "BB", "Player ID": "A", "Gross Score": 70, "Net Score": 65 },
+      { Year: 2026, Round: 1, Format: "BB", "Player ID": "B", "Gross Score": 72, "Net Score": 67 },
+      { Year: 2026, Round: 1, Format: "BB", "Player ID": "C", "Gross Score": 74, "Net Score": 69 },
+    ],
+  });
+  const golferTotal = model.golfers.reduce((sum, golfer) => sum + golfer.currentPayoutValue, 0);
+  const ownerTotal = model.portfolios.reduce((sum, owner) => sum + owner.currentPayoutValue, 0);
+  assert.equal(golferTotal, model.pot);
+  assert.equal(ownerTotal, model.pot);
+  assert.equal(model.distributedPrizePool, model.pot);
+  assert.equal(model.golfers[0].rounds[1].payoutPercent, 0.2);
 });
 
 test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet scroller", async () => {
@@ -194,6 +229,7 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(component, /Golfers/);
   assert.match(component, /Portfolios/);
   assert.match(component, /Calcutta Storylines/);
+  assert.match(component, /BB: "Best Ball", SC: "Scramble", SI: "Singles"/);
   assert.match(css, /\.sheet\{[^}]*overflow-y:auto/);
   assert.match(css, /-webkit-overflow-scrolling:touch/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
