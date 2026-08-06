@@ -278,6 +278,12 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
     assert.match(component, /golfer\.owners\.length > 1 \? "— " : ""/);
     assert.doesNotMatch(component, /\{payoutPercent\(owner\.ownership\)\} Ownership/);
     assert.match(component, /Golfers Owned/);
+    assert.match(component, /Portfolio Performance/);
+    assert.match(component, /Since Opening Auction/);
+    assert.match(component, /Investment Breakdown/);
+    assert.match(component, /projectedTotal > 0 \? Number\(investment\.currentPayoutValue \|\| 0\) \/ projectedTotal : equalContribution/);
+    assert.match(component, /role="progressbar"/);
+    assert.match(component, /aria-valuenow=\{contributionPercent\}/);
   });
 });
 
@@ -311,6 +317,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(css, /-webkit-overflow-scrolling:touch/);
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(css, /\.investments article>span:first-child\{grid-column:1\/-1\}/);
+  assert.match(css, /\.investmentBreakdown article>i\{[^}]*height:7px/);
+  assert.match(css, /\.portfolioPerformance>div\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(loader, /buildCalcuttaModel/);
   assert.doesNotMatch(loader, /fetchOptionalSheet\("Round Results"\)/);
   assert.match(loader, /roundResults: calcuttaRoundResults/);
