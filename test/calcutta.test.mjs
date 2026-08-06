@@ -63,6 +63,11 @@ test("Calcutta derives its pot, standings, payouts, and post-payout ownership", 
   assert.equal(taylor.purchaseCost, 250);
   assert.ok(Math.abs(taylor.currentPayoutValue - (118.125 / 0.54)) < 1e-12);
   assert.equal(taylor.investments[0].ownership + taylor.investments[1].ownership, 1.5);
+  assert.match(model.storylines.find((story) => story.title === "Highest ROI").detail, /leads the return board/);
+  assert.match(model.storylines.find((story) => story.title === "Largest Guaranteed Winner").detail, /has secured the most/);
+  assert.match(model.storylines.find((story) => story.title === "Highest Remaining Upside").detail, /still in play/);
+  assert.match(model.storylines.find((story) => story.title === "Most Valuable Portfolio").detail, /currently holds the most valuable portfolio/);
+  assert.match(model.storylines.find((story) => story.title === "Most Expensive Purchase").detail, /most expensive purchase/);
 });
 
 test("Calcutta derives future Scramble net scores with the existing 35/15 team course handicap", () => {
@@ -219,23 +224,34 @@ test("golfer and fully allocated owner payouts conserve the distributed prize po
   assert.equal(model.golfers.reduce((sum, golfer) => sum + golfer.guaranteedWinnings, 0), model.guaranteedDistributed);
   assert.equal(model.remainingPrizePool, model.pot - model.guaranteedDistributed);
   assert.equal(model.portfolios.reduce((sum, owner) => sum + owner.guaranteedWinnings, 0), model.guaranteedDistributed);
+  for (const golfer of model.golfers) {
+    assert.equal(golfer.currentPayoutValue, golfer.guaranteedWinnings + golfer.remainingUpside);
+    for (const round of Object.values(golfer.rounds)) {
+      assert.equal(round.guaranteedWinnings, model.pot * round.payoutPercent);
+      assert.ok(round.configuredPayoutPercent >= 0);
+    }
+  }
 });
 
 test("Round 3 completion transitions projected Calcutta wording to final winnings", () => {
   const componentPromise = readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8");
   return componentPromise.then((component) => {
     assert.match(component, /Guaranteed Winnings/);
-    assert.match(component, /Round \$\{round\} Winnings/);
+    assert.match(component, /<small>Guaranteed<\/small>/);
     assert.match(component, /Calcutta Points/);
+    assert.doesNotMatch(component, /Total Points/);
+    assert.match(component, /If the tournament ended today\./);
+    assert.match(component, /<small>Finish<\/small>/);
     assert.match(component, /Round not yet completed\./);
     assert.match(component, /Results will appear once official\./);
     assert.match(component, /Current Rank/);
     assert.doesNotMatch(component, /<small>Round Payout<\/small>/);
     assert.match(component, /Projected Tournament Value/);
     assert.match(component, /Final Tournament Winnings/);
-    assert.match(component, /Based on completed rounds\./);
+    assert.match(component, /If the tournament ended today\./);
     assert.match(component, /ordinalPlace/);
-    assert.match(component, /100% Ownership|Ownership/);
+    assert.match(component, /golfer\.owners\.length > 1 \? "— " : ""/);
+    assert.doesNotMatch(component, /\{payoutPercent\(owner\.ownership\)\} Ownership/);
     assert.match(component, /Golfers Owned/);
   });
 });

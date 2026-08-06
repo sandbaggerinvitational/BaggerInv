@@ -7,3 +7,5 @@
 .roundDetails article>p{display:grid;gap:3px}
 .roundDetails article>p strong{color:#40564f;font-size:.66rem}
 .roundDetails article>p span{line-height:1.35}
+.metricHelper{color:#7a817d;font-size:.48rem;line-height:1.25}
+.stories article>span{gap:4px}.stories p{color:#40564f;font-size:.64rem;line-height:1.45}
