@@ -63,11 +63,11 @@ test("Calcutta derives its pot, standings, payouts, and post-payout ownership", 
   assert.equal(taylor.purchaseCost, 250);
   assert.ok(Math.abs(taylor.currentPayoutValue - 118.125) < 1e-12);
   assert.equal(taylor.investments[0].ownership + taylor.investments[1].ownership, 1.5);
-  assert.match(model.storylines.find((story) => story.title === "Highest ROI").detail, /leads the return board/);
-  assert.match(model.storylines.find((story) => story.title === "Largest Guaranteed Winner").detail, /has secured the most/);
-  assert.match(model.storylines.find((story) => story.title === "Highest Remaining Upside").detail, /still in play/);
-  assert.match(model.storylines.find((story) => story.title === "Most Valuable Portfolio").detail, /currently holds the most valuable portfolio/);
-  assert.match(model.storylines.find((story) => story.title === "Most Expensive Purchase").detail, /most expensive purchase/);
+  assert.match(model.storylines.find((story) => story.title === "Highest ROI").detail, /leads at .* since the opening auction/);
+  assert.match(model.storylines.find((story) => story.title === "Largest Guaranteed Winner").detail, /has already secured/);
+  assert.match(model.storylines.find((story) => story.title === "Highest Remaining Upside").detail, /left to play for/);
+  assert.match(model.storylines.find((story) => story.title === "Most Valuable Portfolio").detail, /portfolio leads at/);
+  assert.match(model.storylines.find((story) => story.title === "Most Expensive Purchase").detail, /opening auction's top price/);
 });
 
 test("Calcutta derives future Scramble net scores with the existing 35/15 team course handicap", () => {
@@ -281,11 +281,18 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
     assert.doesNotMatch(component, /\{payoutPercent\(owner\.ownership\)\} Ownership/);
     assert.match(component, /Golfers Owned/);
     assert.match(component, /Portfolio Performance/);
+    assert.match(component, /Portfolio Summary/);
     assert.match(component, /Since Opening Auction/);
     assert.match(component, /Investment Breakdown/);
     assert.match(component, /projectedTotal > 0 \? Number\(investment\.currentPayoutValue \|\| 0\) \/ projectedTotal : equalContribution/);
     assert.match(component, /role="progressbar"/);
     assert.match(component, /aria-valuenow=\{contributionPercent\}/);
+    assert.ok(component.indexOf('aria-label="Portfolio Summary"') < component.indexOf('aria-label="Portfolio Performance"'));
+    assert.ok(component.indexOf('aria-label="Portfolio Performance"') < component.indexOf('className={styles.investments}'));
+    assert.ok(component.indexOf('className={styles.investments}') < component.indexOf('aria-label="Investment Breakdown"'));
+    assert.match(component, /Updates after official round results\./);
+    assert.match(component, /Updates as official results are published\./);
+    assert.match(component, /data-zero=\{!investment\.currentPayoutValue/);
   });
 });
 
@@ -353,6 +360,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(css, /\.investments article>span:first-child\{grid-column:1\/-1\}/);
   assert.match(css, /\.investmentBreakdown article>i\{[^}]*height:7px/);
   assert.match(css, /\.portfolioPerformance>div\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(css, /\.investmentBreakdown article\[data-zero=true\]\{opacity:\.58\}/);
+  assert.match(css, /\.hero>div p:last-child:nth-child\(odd\)\{grid-column:1\/-1/);
   assert.match(loader, /buildCalcuttaModel/);
   assert.doesNotMatch(loader, /fetchOptionalSheet\("Round Results"\)/);
   assert.match(loader, /roundResults: calcuttaRoundResults/);
