@@ -19,10 +19,10 @@ function Portrait({ player, large = false }) {
 function Hero({ model }) {
   const { hero } = model;
   return <section className={styles.hero} aria-label="Calcutta snapshot">
-    <header><span>Sandbagger Calcutta</span><h2>Current Market</h2><p>Official results, ownership, and tournament value.</p></header>
+    <header><span>Sandbagger Calcutta</span><h2>{model.tournamentComplete ? "Final Calcutta" : "Current Market"}</h2><p>{model.tournamentComplete ? "Official final results, ownership, and winnings." : "Official results, ownership, and tournament value."}</p></header>
     <div>
       <p><small>Current Pot</small><strong>{money(model.pot)}</strong></p>
-      <p><small>Guaranteed Distributed</small><strong>{money(model.guaranteedDistributed)}</strong><span>Completed rounds</span></p>
+      <p><small>{model.tournamentComplete ? "Final Winnings Distributed" : "Guaranteed Distributed"}</small><strong>{money(model.guaranteedDistributed)}</strong><span>{model.tournamentComplete ? "Tournament complete" : "Completed rounds"}</span></p>
       <p><small>Remaining Prize Pool</small><strong>{money(model.remainingPrizePool)}</strong><span>Still in play</span></p>
       {hero.highestGuaranteed ? <p><small>Highest Guaranteed Winner</small><strong>{hero.highestGuaranteed.player.name}</strong><span>{money(hero.highestGuaranteed.guaranteedWinnings)} secured</span></p> : null}
       {!model.tournamentComplete && hero.highestUpside ? <p><small>Highest Remaining Upside</small><strong>{hero.highestUpside.player.name}</strong><span>{money(hero.highestUpside.remainingUpside)} projected upside</span></p> : null}

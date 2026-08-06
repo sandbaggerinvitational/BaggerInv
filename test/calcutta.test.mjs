@@ -273,6 +273,8 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
     assert.doesNotMatch(component, /<small>Round Payout<\/small>/);
     assert.match(component, /Projected Tournament Value/);
     assert.match(component, /Final Tournament Winnings/);
+    assert.match(component, /Final Calcutta/);
+    assert.match(component, /Final Winnings Distributed/);
     assert.match(component, /If the tournament ended today\./);
     assert.match(component, /ordinalPlace/);
     assert.match(component, /golfer\.owners\.length > 1 \? "— " : ""/);
@@ -285,6 +287,37 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
     assert.match(component, /role="progressbar"/);
     assert.match(component, /aria-valuenow=\{contributionPercent\}/);
   });
+});
+
+test("Calcutta financial presentation progresses cleanly from opening through final", () => {
+  const purchases = [
+    { Year: 2026, "Golfer Player ID": "A", "Purchase Price": 400 },
+    { Year: 2026, "Golfer Player ID": "B", "Purchase Price": 350 },
+    { Year: 2026, "Golfer Player ID": "C", "Purchase Price": 250 },
+  ];
+  const pointStructure = [30, 20, 10].map((award, index) => ({ Year: 2026, Place: index + 1, "Round 1 Award": award, "Round 2 Award": award, "Round 3 Award": award }));
+  const payoutStructure = [
+    { Year: 2026, Place: 1, "Round 1 Award %": 5, "Round 2 Award %": 5, "Round 3 Award %": 5, "Overall Award %": 50 },
+    { Year: 2026, Place: 2, "Round 1 Award %": 3, "Round 2 Award %": 3, "Round 3 Award %": 3, "Overall Award %": 15 },
+    { Year: 2026, Place: 3, "Round 1 Award %": 2, "Round 2 Award %": 2, "Round 3 Award %": 2, "Overall Award %": 5 },
+  ];
+  const roundRows = (round, order) => order.map((playerId, index) => ({ Year: 2026, Round: round, Format: round === 3 ? "Singles" : round === 2 ? "Scramble" : "Best Ball", "Player ID": playerId, "Gross Score": 70 + index, "Net Score": 60 + index }));
+  const build = (roundResults) => buildCalcuttaModel({ year: 2026, players, purchases, pointStructure, payoutStructure, roundResults });
+  const opening = build([]);
+  const afterRound1 = build(roundRows(1, ["A", "B", "C"]));
+  const afterRound2 = build([...roundRows(1, ["A", "B", "C"]), ...roundRows(2, ["B", "A", "C"])]);
+  const final = build([...roundRows(1, ["A", "B", "C"]), ...roundRows(2, ["B", "A", "C"]), ...roundRows(3, ["A", "B", "C"])]);
+  assert.deepEqual(opening.completedRounds, []);
+  assert.equal(opening.guaranteedDistributed, 0);
+  assert.deepEqual(afterRound1.completedRounds, [1]);
+  assert.equal(afterRound1.guaranteedDistributed, 100);
+  assert.deepEqual(afterRound2.completedRounds, [1, 2]);
+  assert.equal(afterRound2.guaranteedDistributed, 200);
+  assert.equal(final.tournamentComplete, true);
+  assert.deepEqual(final.completedRounds, [1, 2, 3]);
+  assert.equal(final.distributedPrizePool, 1000);
+  assert.equal(final.guaranteedDistributed, 1000);
+  assert.equal(final.remainingPrizePool, 0);
 });
 
 test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet scroller", async () => {
