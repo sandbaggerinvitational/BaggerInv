@@ -54,6 +54,7 @@ test("Calcutta derives its pot, standings, payouts, and post-payout ownership", 
   assert.equal(model.pot, 350);
   const clay = model.golfers.find((row) => row.playerId === "A");
   assert.equal(clay.rounds[1].points, 8);
+  assert.ok(Math.abs(clay.rounds[1].configuredPayoutPercent - 0.075) < 1e-12);
   assert.ok(Math.abs(clay.rounds[1].payoutPercent - (0.075 / 0.54)) < 1e-12);
   assert.ok(Math.abs(clay.overallPayoutPercent - (0.15 / 0.54)) < 1e-12);
   assert.ok(Math.abs(clay.currentPayoutValue - (350 * 0.225 / 0.54)) < 1e-12);
@@ -211,6 +212,8 @@ test("golfer and fully allocated owner payouts conserve the distributed prize po
   assert.equal(ownerTotal, model.pot);
   assert.equal(model.distributedPrizePool, model.pot);
   assert.equal(model.golfers[0].rounds[1].payoutPercent, 0.2);
+  assert.equal(model.golfers[0].rounds[1].configuredPayoutPercent, 0.2);
+  assert.equal(model.golfers[0].rounds[1].guaranteedWinnings, model.pot * model.golfers[0].rounds[1].payoutPercent);
   assert.equal(model.completedRounds.join(","), "1");
   assert.equal(model.tournamentComplete, false);
   assert.equal(model.golfers.reduce((sum, golfer) => sum + golfer.guaranteedWinnings, 0), model.guaranteedDistributed);
@@ -222,6 +225,8 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
   const componentPromise = readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8");
   return componentPromise.then((component) => {
     assert.match(component, /Guaranteed Winnings/);
+    assert.match(component, /Guaranteed Dollars/);
+    assert.doesNotMatch(component, /<small>Round Payout<\/small>/);
     assert.match(component, /Projected Tournament Value/);
     assert.match(component, /Final Tournament Winnings/);
     assert.match(component, /Based on completed rounds\./);
