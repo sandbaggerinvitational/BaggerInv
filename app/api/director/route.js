@@ -24,9 +24,31 @@ async function authorize(request) {
 
 function authorizationFailure(result) {
   if (result.status === "unavailable") {
-    return NextResponse.json({ error: "Tournament Director identity could not be verified right now. Retry." }, { status: 503, headers: { "Retry-After": "1" } });
+    return NextResponse.json({ error: "Director verification expired. Reconnecting automatically…" }, { status: 503, headers: { "Retry-After": "1", "X-Director-Retryable": "identity" } });
   }
   return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
+}
+
+function transactionTrace(action) {
+  const startedAt = Date.now();
+  const stages = [];
+  return {
+    stage(name, result = "PASS", detail = "") { stages.push({ name, result, detail, elapsedMs: Date.now() - startedAt }); },
+    report(extra = {}) { return { action, elapsedMs: Date.now() - startedAt, stages, ...extra }; },
+  };
+}
+
+function verifyActionReadBack(action, input, data, round) {
+  const matches = data.rounds.find((item) => Number(item.number) === Number(round))?.matches || [];
+  if (action === "open-round") return Number(data.tournament.currentRound) === Number(round) && String(data.tournament.status).toLowerCase() === "live";
+  if (action === "set-live") return matches.filter((match) => match.status !== "Final").every((match) => /^(Live|Reopened)$/i.test(match.status) && match.scoringEnabled !== false);
+  if (action === "unlock-scoring") return matches.filter((match) => match.status !== "Final").every((match) => match.scoringEnabled !== false);
+  if (action === "lock-scoring") return matches.filter((match) => match.status !== "Final").every((match) => match.scoringEnabled === false);
+  if (action === "reopen-match") return matches.some((match) => match.id === input.matchId && /^Reopened$/i.test(match.status));
+  if (action === "automation") return Boolean(data.tournament.directorAutomation?.enabled) === Boolean(input.enabled);
+  if (action === "close-round") return Number(data.tournament.currentRound) !== Number(round) || /^(Final|Complete)$/i.test(String(data.tournament.status));
+  if (action === "automation-check") return true;
+  return false;
 }
 
 function refresh() {
@@ -42,7 +64,9 @@ async function setMatchesLiveAndOpenScoring(matches, updatedBy) {
 }
 
 export async function GET(request) {
+  const trace = transactionTrace("dashboard-load");
   const authorization = await authorize(request);
+  trace.stage("Identity verification", authorization.status === "active" ? "PASS" : "FAIL", authorization.status);
   if (authorization.status !== "active") return authorizationFailure(authorization);
   const identity = authorization.identity;
   try {
@@ -53,6 +77,7 @@ export async function GET(request) {
       preview.preview ? readNotificationLog() : [], loadPredictionSheets().catch(() => null), readOddsSnapshots().catch(() => []),
     ])));
     const [tournamentData, readiness, device, notificationLog, projectionSheets, projectionSnapshots] = measured.result.result;
+    trace.stage("Workbook verification", "PASS");
     console.info("Director workbook access", { normalized: measured.result.diagnostics, authenticated: measured.diagnostics });
     const directorModel = tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() });
     const projectionYear = projectionSheets ? currentTournamentYear(projectionSheets) : directorModel.tournament.year;
@@ -68,6 +93,8 @@ export async function GET(request) {
     const permissionGranted = String(device?.row?.record?.["Notification Permission"] || "").trim().toLowerCase() === "granted";
     const pushSubscription = Boolean(device?.subscription);
     const readyToSend = preview.configured && pwaInstalled && permissionGranted && pushSubscription;
+    trace.stage("Dashboard assembly", "PASS");
+    console.info("Director dashboard transaction", trace.report({ workbook: measured.result.diagnostics, authorization: measured.diagnostics }));
     return NextResponse.json({ data: {
       ...directorModel,
       championshipProjections,
@@ -84,17 +111,23 @@ export async function GET(request) {
       } : null,
     } }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    trace.stage("Dashboard assembly", "FAIL", error instanceof Error ? error.message : String(error));
+    console.error("Director dashboard transaction", trace.report());
     return NextResponse.json({ error: error?.message || "Director dashboard is temporarily unavailable." }, { status: 503 });
   }
 }
 
 export async function POST(request) {
+  const trace = transactionTrace("director-action");
   const authorization = await authorize(request);
+  trace.stage("Identity verification", authorization.status === "active" ? "PASS" : "FAIL", authorization.status);
   if (authorization.status !== "active") return authorizationFailure(authorization);
   const identity = authorization.identity;
   try {
     const input = await request.json();
+    trace.stage("Action authorization", "PASS", String(input.action || "unknown"));
     const data = await getTournamentData();
+    trace.stage("Workbook verification", "PASS");
     const round = Number(input.round || data.tournament.currentRound);
     const matches = data.rounds.find((item) => Number(item.number) === round)?.matches || [];
     const updatedBy = identity.actor.name;
@@ -127,9 +160,19 @@ export async function POST(request) {
         "Auto Set Matches Live": input.autoSetMatchesLive,
       }, updatedBy);
     } else throw new Error("Unknown Director action.");
+    trace.stage("Action execution", "PASS");
+    trace.stage("Workbook write", "PASS");
     refresh();
+    const verifiedData = await getTournamentData();
+    const verified = verifyActionReadBack(input.action, input, verifiedData, round);
+    trace.stage("Read-back verification", verified ? "PASS" : "FAIL");
+    if (!verified) throw new Error("The workbook update could not be verified after it completed.");
+    trace.stage("Success", "PASS");
+    console.info("Director action transaction", trace.report({ round, updatedBy }));
     return NextResponse.json({ ok: true, changed: input.action === "automation-check" });
   } catch (error) {
+    trace.stage("Failure", "FAIL", error instanceof Error ? error.message : String(error));
+    console.error("Director action transaction", trace.report());
     return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }
 }

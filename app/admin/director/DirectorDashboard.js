@@ -13,7 +13,12 @@ const HEALTH = [
   ["scoringLocked", "Scoring Locked"], ["awaitingConfirmation", "Awaiting Confirmation"], ["reopened", "Reopened Matches"], ["errors", "Errors"],
 ];
 const DIRECTOR_LOAD_RETRY_DELAYS = [400, 650, 1000, 1500, 2250, 3000];
-const DIRECTOR_LOAD_FAILURE = "Tournament Director could not be opened after multiple attempts. Please try again.";
+const DIRECTOR_LOAD_FAILURE = "Unable to verify Director credentials after automatic recovery.";
+const ACTION_LABELS = {
+  "unlock-scoring": "Scoring unlocked", "lock-scoring": "Scoring locked", "set-live": "Round matches opened for live scoring",
+  "open-round": "Round opened", "close-round": "Round closed", "reopen-match": "Match reopened",
+  automation: "Automation updated", "automation-check": "Automation verified",
+};
 
 function timestamp(value) {
   const date = new Date(value);
@@ -83,21 +88,29 @@ export default function DirectorDashboard({ directorName }) {
   const [testPlayerId, setTestPlayerId] = useState("");
   const [resetOpen, setResetOpen] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [retryOperation, setRetryOperation] = useState(null);
+  const [operationLog, setOperationLog] = useState([]);
+  const recordOperation = useCallback((label, status = "success", detail = "") => {
+    setOperationLog((current) => [{ id: `${Date.now()}-${label}`, label, status, detail, at: new Date().toISOString() }, ...current].slice(0, 8));
+  }, []);
   const load = useCallback(async (attempt = 0) => {
-    setMessage("");
+    if (!attempt) { setMessage(""); setLoadFailed(false); }
     const response = await fetch("/api/director", { cache: "no-store", credentials: "same-origin" });
     const payload = await response.json();
     if (response.status === 503 && attempt < DIRECTOR_LOAD_RETRY_DELAYS.length) {
+      setMessage("Director verification expired. Reconnecting automatically…");
       await new Promise((resolve) => window.setTimeout(resolve, DIRECTOR_LOAD_RETRY_DELAYS[attempt]));
       return load(attempt + 1);
     }
     if (response.status === 503) throw new Error(DIRECTOR_LOAD_FAILURE);
     if (!response.ok) throw new Error(payload.error || "Director dashboard is unavailable.");
     setData(payload.data);
+    setMessage(""); setLoadFailed(false); setRetryOperation(null);
     setTestPlayerId((current) => current || payload.data.qaTools?.selectedPlayer?.id || payload.data.qaTools?.players?.[0]?.id || "");
     setSelectedRound((current) => current || String(payload.data.tournament.currentRound || payload.data.rounds.find((round) => round.status !== "FINAL")?.number || payload.data.rounds[0]?.number || ""));
   }, []);
-  useEffect(() => { load().catch((error) => setMessage(error.message)); }, [load]);
+  useEffect(() => { load().catch((error) => { setMessage(error.message); setLoadFailed(true); }); }, [load]);
   useEffect(() => {
     if (!data?.automation?.enabled) return undefined;
     const check = () => directorFetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "automation-check" }) }).then((response) => response.ok ? response.json() : null).then((result) => { if (result?.changed) load(); }).catch(() => {});
@@ -106,13 +119,23 @@ export default function DirectorDashboard({ directorName }) {
     return () => window.clearInterval(timer);
   }, [data?.automation?.enabled, load]);
   const act = async (action, extra = {}) => {
-    setBusy(action); setMessage("");
+    const startedAt = Date.now();
+    setBusy(action); setMessage(""); setRetryOperation(null);
     try {
       const response = await directorFetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, round: Number(selectedRound), ...extra }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Director action failed.");
-      await load(); setMessage("Tournament operation completed.");
-    } catch (error) { setMessage(error.message); }
+      await load();
+      const elapsed = Date.now() - startedAt;
+      const label = ACTION_LABELS[action] || "Tournament operation completed";
+      recordOperation(label, "success", `${elapsed} ms · workbook verified`);
+      setMessage(`${label}. Changes verified.`);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : "Director action failed.";
+      recordOperation(ACTION_LABELS[action] || "Tournament operation", "failed", detail);
+      setRetryOperation(() => () => act(action, extra));
+      setMessage(detail);
+    }
     finally { setBusy(""); }
   };
   const sendTestNotification = async (template) => {
@@ -155,7 +178,7 @@ export default function DirectorDashboard({ directorName }) {
     if (source.action === "retry") return load().catch((error) => setMessage(error.message));
     return null;
   };
-  if (!data) return <section className={styles.shell}><div className={styles.loading} role="status">{message || "Opening Tournament Director…"}</div></section>;
+  if (!data) return <section className={styles.shell}><div className={styles.loading} role="status"><strong>{loadFailed ? "Director connection needs attention" : "Opening Tournament Director…"}</strong><span>{message || "Verifying Director and loading tournament operations…"}</span>{loadFailed ? <button type="button" onClick={() => load().catch((error) => { setMessage(error.message); setLoadFailed(true); })}>Retry</button> : null}</div></section>;
   const finalMatches = data.rounds.find((item) => String(item.number) === selectedRound)?.final || 0;
   const displayRounds = [...data.rounds].sort((left, right) => {
     if (left.number === data.operatingRound?.number) return -1;
@@ -174,6 +197,18 @@ export default function DirectorDashboard({ directorName }) {
         <div><small>Current Status</small><strong>{data.operatingRound?.status || data.tournament.status}</strong><span>{data.operatingRound ? `${data.operatingRound.final} of ${data.operatingRound.total} Final` : "All rounds complete"}</span></div>
         {data.timelineAvailable ? <div><small>Next Event</small><strong>{data.nextEvent ? `${data.nextEvent.icon} ${data.nextEvent.title}` : "No remaining scheduled events today."}</strong><span>{data.nextEvent?.countdown || ""}</span></div> : null}
       </div>
+    </section>
+
+    <section className={styles.directorHealth} aria-labelledby="director-health-title">
+      <header><span>Operations systems</span><h2 id="director-health-title">Director Health</h2></header>
+      <div>
+        <article><i aria-hidden="true">🟢</i><strong>Director Authenticated</strong><span>Secure session verified</span></article>
+        <article><i aria-hidden="true">🟢</i><strong>Workbook Connected</strong><span>Latest tournament model loaded</span></article>
+        <article><i aria-hidden="true">🟢</i><strong>Google Connected</strong><span>Workbook read completed</span></article>
+        <article data-ready={data.championshipProjections.ready ? "true" : "attention"}><i aria-hidden="true">{data.championshipProjections.ready ? "🟢" : "🟡"}</i><strong>Publication {data.championshipProjections.ready ? "Ready" : "Pending"}</strong><span>{data.championshipProjections.nextLabel}</span></article>
+        <article data-ready={data.operatingRound?.scoringLocked ? "attention" : "true"}><i aria-hidden="true">{data.operatingRound?.scoringLocked ? "🟡" : "🟢"}</i><strong>Scoring {data.operatingRound?.scoringLocked ? "Locked" : "Ready"}</strong><span>{data.operatingRound?.name || "Tournament complete"}</span></article>
+      </div>
+      <footer><p><small>Last Successful Publication</small><strong>{data.championshipProjections.publishedAt ? timestamp(data.championshipProjections.publishedAt) : "Not yet published"}</strong></p><p><small>Outstanding Actions</small><strong>{data.issueGroups.length}</strong></p><p><small>Pending Warnings</small><strong>{data.issueGroups.filter((item) => item.severity === "warning").length}</strong></p><p><small>Upcoming Required Action</small><strong>{data.primaryAction.label}</strong></p></footer>
     </section>
 
     {data.readiness && data.readinessLifecycle === "setup" ? <ReadinessPanel readiness={data.readiness} />
@@ -195,9 +230,10 @@ export default function DirectorDashboard({ directorName }) {
       {data.primaryAction.kind === "action" ? <button disabled={Boolean(busy)} onClick={() => act(data.primaryAction.action, { round: data.operatingRound?.number })}>{data.primaryAction.label}</button> : <strong>{data.primaryAction.label}</strong>}<span>{data.primaryAction.message}</span>
     </div><div className={styles.secondaryActions}>
       {data.operatingRound?.status === "LIVE" ? <button disabled={Boolean(busy)} onClick={() => act(data.operatingRound.scoringLocked ? "unlock-scoring" : "lock-scoring", { round: data.operatingRound.number })}>{data.operatingRound.scoringLocked ? "Unlock Scoring" : "Lock Scoring"}</button> : null}
+      {data.championshipProjections.ready ? <a href="#projections-title">Publish Championship Projection</a> : null}
       {finalMatches ? <label><span>Reopen finalized match</span><select value={reopenId} onChange={(event) => setReopenId(event.target.value)}><option value="">Select match</option>{(data.finalizedMatches || []).filter((item) => String(item.round) === selectedRound).map((item) => <option value={item.id} key={item.id}>Match {item.match} · {item.id}</option>)}</select><button disabled={Boolean(busy) || !reopenId} onClick={() => act("reopen-match", { matchId: reopenId })}>Reopen Match</button></label> : null}
       <Link href="/live?view=leaderboards">Leaderboards</Link><Link href="/live">Tournament Overview</Link>
-    </div><details className={styles.roundOverride}><summary>Override Operating Round</summary><label>Operating round<select value={selectedRound} onChange={(event) => setSelectedRound(event.target.value)}>{data.rounds.map((item) => <option value={item.number} key={item.number}>{item.name} • {item.format}</option>)}</select></label></details>{message ? <p role="status">{message}</p> : null}</section>
+    </div><details className={styles.roundOverride}><summary>Override Operating Round</summary><label>Operating round<select value={selectedRound} onChange={(event) => setSelectedRound(event.target.value)}>{data.rounds.map((item) => <option value={item.number} key={item.number}>{item.name} • {item.format}</option>)}</select></label></details>{message ? <div className={styles.actionMessage} role="status"><span>{message}</span>{retryOperation ? <button type="button" disabled={Boolean(busy)} onClick={retryOperation}>Retry Action</button> : null}</div> : null}</section>
 
     <section className={styles.projections} data-ready={data.championshipProjections.ready ? "true" : "false"} aria-labelledby="projections-title">
       <header><span>Tournament Intelligence</span><h2 id="projections-title">Championship Projections</h2></header>
@@ -206,12 +242,12 @@ export default function DirectorDashboard({ directorName }) {
         <article><small>Next Milestone</small><strong>{data.championshipProjections.nextLabel}</strong><span>{data.championshipProjections.ready ? "Ready to publish" : "Not ready"}</span></article>
       </div>
       <p>{data.championshipProjections.reason}</p>
-      {data.championshipProjections.nextPhase || data.qaTools && data.championshipProjections.publishedPhases.length ? <details className={styles.projectionPublisher}><summary>{data.qaTools && data.championshipProjections.publishedPhases.length ? "Publish or Regenerate Championship Projection" : data.championshipProjections.ready ? "Publish Championship Projection" : "Review Publication Requirements"}</summary><OddsAdmin embedded directorAuthorized previewMode={Boolean(data.qaTools)} initialPhase={data.championshipProjections.nextPhase || data.championshipProjections.currentPhase} publicationReady={data.championshipProjections.ready} regenerationPhases={data.qaTools ? data.championshipProjections.publishedPhases : []} onPublished={() => load().catch((error) => setMessage(error.message))} /></details> : null}
+      {data.championshipProjections.nextPhase || data.qaTools && data.championshipProjections.publishedPhases.length ? <details className={styles.projectionPublisher}><summary>{data.qaTools && data.championshipProjections.publishedPhases.length ? "Publish or Regenerate Championship Projection" : data.championshipProjections.ready ? "Publish Championship Projection" : "Review Publication Requirements"}</summary><OddsAdmin embedded directorAuthorized previewMode={Boolean(data.qaTools)} initialPhase={data.championshipProjections.nextPhase || data.championshipProjections.currentPhase} publicationReady={data.championshipProjections.ready} regenerationPhases={data.qaTools ? data.championshipProjections.publishedPhases : []} onPublished={() => { recordOperation("Championship Projection published", "success", "Official snapshot verified"); load().catch((error) => setMessage(error.message)); }} /></details> : null}
     </section>
 
     <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><div className={styles.automationGrid}><article data-enabled={data.automation.enabled && data.automation.autoOpenRound ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoOpenRound ? "🟢" : "⚪"} Auto Open</span><strong>{data.automation.enabled && data.automation.autoOpenRound ? "Enabled" : "Disabled"}</strong><small>{data.nextEvent?.round ? `${data.nextEvent.title} · ${data.nextEvent.countdown}` : "No round action scheduled"}</small></article><article data-enabled={data.automation.enabled && data.automation.autoSetMatchesLive ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoSetMatchesLive ? "🟢" : "⚪"} Auto LIVE</span><strong>{data.automation.enabled && data.automation.autoSetMatchesLive ? "Enabled" : "Disabled"}</strong><small>{data.automation.autoSetMatchesLive ? "Runs when the round opens" : "Manual Set All LIVE required"}</small></article></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation · Manual override" : "Enable automation"}</button></section>
 
-    <section className={styles.activity}><header><span>Audit trail</span><h2>Recent Activity</h2></header>{data.recentActivity.length ? <ul>{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No recent match activity.</p>}</section>
+    <section className={styles.activity}><header><span>Director only</span><h2>Operational Log</h2></header>{operationLog.length || data.recentActivity.length ? <ul>{operationLog.map((item) => <li data-status={item.status} key={item.id}><i aria-hidden="true">{item.status === "success" ? "🟢" : "🔴"}</i><div><strong>{item.label}</strong><span>{item.detail}</span></div><time>{timestamp(item.at)}</time></li>)}{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No operations recorded yet. Completed Director actions will appear here.</p>}</section>
     {data.qaTools ? <section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p>{resetComplete ? <div className={styles.resetComplete} role="status"><strong>Preview Tournament Reset Complete</strong><span>Ready for Dress Rehearsal.</span></div> : null}<div className={styles.resetUtility}><div><strong>Dress Rehearsal</strong><span>Clear runtime tournament results while preserving setup and content.</span></div><button disabled={Boolean(busy)} onClick={() => { setResetComplete(false); setResetOpen(true); }}>🔄 Reset Preview Tournament</button></div></section> : null}
     {data.notificationSandbox ? <section className={styles.notificationSandbox} aria-labelledby="notification-sandbox-title"><header><span>Preview only</span><h2 id="notification-sandbox-title">Notification Sandbox</h2></header><NotificationHealth sandbox={data.notificationSandbox} /><div className={styles.notificationTemplates}>{data.notificationSandbox.templates.map((template) => <button disabled={Boolean(busy) || !data.notificationSandbox.currentDeviceReady} onClick={() => sendTestNotification(template)} key={template.id}>{template.label}</button>)}</div><h3>Notification Log</h3>{data.notificationSandbox.log.length ? <div className={styles.notificationLog}>{data.notificationSandbox.log.map((item) => <article key={item.id}><div><strong>{item.type}</strong><span>{item.recipient}{item.template ? ` · ${item.template}` : ""}</span></div><time>{timestamp(item.sentAt)}</time><b data-status={item.status === "Failed" ? "failed" : "sent"}>{item.status}</b>{item.failure ? <small>{item.failure}</small> : null}</article>)}</div> : <p>No test notifications have been sent.</p>}</section> : null}
     <Link className={styles.fullAdmin} href="/admin">Open Full Admin →</Link>

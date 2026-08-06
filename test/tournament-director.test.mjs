@@ -173,7 +173,7 @@ test("Director API requires Passport DIRECTOR authorization and uses audited wri
 
 test("Director dashboard contains operations, health, attention, automation, and Full Admin access", () => {
   const dashboard = source("app/admin/director/DirectorDashboard.js");
-  for (const label of ["Round Status", "Tournament Health", "Attention Required", "Quick Actions", "Reopen Match", "Leaderboards", "Tournament Overview", "Automation", "Recent Activity", "Open Full Admin"]) assert.match(dashboard, new RegExp(label));
+  for (const label of ["Round Status", "Tournament Health", "Director Health", "Attention Required", "Quick Actions", "Reopen Match", "Leaderboards", "Tournament Overview", "Automation", "Operational Log", "Open Full Admin"]) assert.match(dashboard, new RegExp(label));
   assert.match(source("app/admin/director/director.module.css"), /env\(safe-area-inset-bottom\)/);
   assert.match(dashboard, /setInterval\(check, 60_000\)/);
   assert.doesNotMatch(dashboard, />Manual operating round</);
@@ -182,6 +182,9 @@ test("Director dashboard contains operations, health, attention, automation, and
   assert.match(dashboard, /act\(data\.primaryAction\.action, \{ round: data\.operatingRound\?\.number \}\)/);
   assert.doesNotMatch(dashboard, /disabled=\{Boolean\(busy\) \|\| Boolean\(round\?\.open\)\}/);
   for (const label of ["Operational Overview", "Next Event", "Tournament countdown", "Auto Open", "Auto LIVE", "Immediate Action Required", "No score submitted", "Recommended next step"]) assert.match(dashboard + source("lib/tournament-director.js"), new RegExp(label));
+  for (const label of ["Director Authenticated", "Workbook Connected", "Google Connected", "Last Successful Publication", "Outstanding Actions", "Pending Warnings", "Upcoming Required Action", "Publish Championship Projection"]) assert.match(dashboard, new RegExp(label));
+  assert.match(dashboard, /Retry Action/);
+  assert.match(dashboard, /Changes verified/);
 });
 
 test("PLAYER accounts are redirected away from the Director page", () => {
@@ -220,4 +223,23 @@ test("Director page, actions, impersonation, and sandbox share one actor-aware a
   for (const consumer of consumers) assert.match(consumer, /inspectTournamentDirectorToken/);
   const dashboard = source("app/admin/director/DirectorDashboard.js");
   assert.equal((dashboard.match(/credentials: "same-origin"/g) || []).length, 6);
+});
+
+test("Director identity is reused safely within a signed session", () => {
+  const resolver = source("lib/player-passport-server.js");
+  assert.match(resolver, /verifyPlayerPassportSession\(token\)/);
+  assert.match(resolver, /DIRECTOR_IDENTITY_TTL_MS = 5 \* 60 \* 1000/);
+  assert.match(resolver, /directorIdentityCache/);
+  assert.match(resolver, /pendingDirectorInspections/);
+  assert.match(resolver, /authorized\.status === "active"/);
+  assert.match(resolver, /directorIdentityCache\.delete\(key\)/);
+  assert.match(resolver, /tournamentDirectorIdentityDiagnostics/);
+});
+
+test("Director actions log every transaction boundary and verify workbook read-back", () => {
+  const route = source("app/api/director/route.js");
+  for (const stage of ["Identity verification", "Action authorization", "Workbook verification", "Action execution", "Workbook write", "Read-back verification", "Success", "Failure"]) assert.match(route, new RegExp(stage));
+  assert.match(route, /verifyActionReadBack/);
+  assert.match(route, /Director action transaction/);
+  assert.match(route, /X-Director-Retryable/);
 });
