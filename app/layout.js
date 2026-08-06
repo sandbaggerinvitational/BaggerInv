@@ -11,6 +11,7 @@ import PwaFoundation from "./PwaFoundation";
 import ParticipantIdentity from "./ParticipantIdentity";
 import PwaLaunchSplash from "./PwaLaunchSplash";
 import DirectorTransactionStatus from "./DirectorTransactionStatus";
+import ParticipantRouteFrame from "./ParticipantRouteFrame";
 import { Suspense } from "react";
 
 const homeMetadata = pageMetadata({
@@ -167,7 +168,7 @@ export default function RootLayout({ children }) {
       <body>
         <PwaLaunchSplash />
         <DirectorTransactionStatus />
-        <div className="pwa-app-scene">{children}</div>
+        <ParticipantRouteFrame>{children}</ParticipantRouteFrame>
         <Analytics />
         <PwaFoundation />
         <Suspense fallback={null}>

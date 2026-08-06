@@ -31,6 +31,23 @@ test("participant Home navigation uses the canonical same-origin dashboard", asy
   assert.equal(participantDestination("/home"), "Home");
 });
 
+test("Home and Tournament page trees are isolated by pathname in the shared PWA shell", async () => {
+  const [layout, frame, home, tournament] = await Promise.all([
+    source("app/layout.js"),
+    source("app/ParticipantRouteFrame.js"),
+    source("app/home/page.js"),
+    source("app/live/page.js"),
+  ]);
+  assert.match(layout, /<ParticipantRouteFrame>\{children\}<\/ParticipantRouteFrame>/);
+  assert.match(frame, /usePathname\(\)/);
+  assert.match(frame, /key=\{pathname\}/);
+  assert.match(frame, /data-participant-route=\{pathname\}/);
+  assert.match(home, /<MobileTournamentHome liveData=\{liveData\}/);
+  assert.doesNotMatch(home, /TournamentDashboard|MatchCenter/);
+  assert.match(tournament, /<MatchCenter initialData=\{data\}/);
+  assert.doesNotMatch(tournament, /MobileTournamentHome|TournamentCommandCenter/);
+});
+
 test("My Match navigation always opens the dashboard instead of restoring a scorecard", async () => {
   const [navigation, dashboardPage, scoreEntry, gameCenter, profile, activation, manifest] = await Promise.all([
     source("app/ParticipantIdentity.js"),

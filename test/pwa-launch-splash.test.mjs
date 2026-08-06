@@ -42,10 +42,11 @@ test("splash consumes Home's completed initialization without starting a second 
 });
 
 test("launch is an opaque splash scene followed by a separate Home entrance", async () => {
-  const [layout, splash, manifest] = await Promise.all([
-    source("app/layout.js"), source("app/PwaLaunchSplash.js"), source("app/manifest.js"),
+  const [layout, frame, splash, manifest] = await Promise.all([
+    source("app/layout.js"), source("app/ParticipantRouteFrame.js"), source("app/PwaLaunchSplash.js"), source("app/manifest.js"),
   ]);
-  assert.match(layout, /className="pwa-app-scene"/);
+  assert.match(layout, /<ParticipantRouteFrame>\{children\}<\/ParticipantRouteFrame>/);
+  assert.match(frame, /className="pwa-app-scene"/);
   assert.match(layout, /html\.pwa-cold-launch \.pwa-app-scene,html\.pwa-home-entering \.pwa-app-scene\{opacity:0\}/);
   assert.match(layout, /\.pwa-app-scene\{opacity:1;transition:opacity \.36s ease\}/);
   assert.match(splash, /classList\.add\("pwa-home-entering"\)/);
