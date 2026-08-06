@@ -55,13 +55,13 @@ test("Calcutta derives its pot, standings, payouts, and post-payout ownership", 
   const clay = model.golfers.find((row) => row.playerId === "A");
   assert.equal(clay.rounds[1].points, 8);
   assert.ok(Math.abs(clay.rounds[1].configuredPayoutPercent - 0.075) < 1e-12);
-  assert.ok(Math.abs(clay.rounds[1].payoutPercent - (0.075 / 0.54)) < 1e-12);
-  assert.ok(Math.abs(clay.overallPayoutPercent - (0.15 / 0.54)) < 1e-12);
-  assert.ok(Math.abs(clay.currentPayoutValue - (350 * 0.225 / 0.54)) < 1e-12);
+  assert.ok(Math.abs(clay.rounds[1].payoutPercent - 0.075) < 1e-12);
+  assert.ok(Math.abs(clay.overallPayoutPercent - 0.15) < 1e-12);
+  assert.ok(Math.abs(clay.currentPayoutValue - (350 * 0.225)) < 1e-12);
   assert.equal(clay.owners.reduce((sum, owner) => sum + owner.ownership, 0), 1);
   const taylor = model.portfolios.find((row) => row.ownerId === "O1");
   assert.equal(taylor.purchaseCost, 250);
-  assert.ok(Math.abs(taylor.currentPayoutValue - (118.125 / 0.54)) < 1e-12);
+  assert.ok(Math.abs(taylor.currentPayoutValue - 118.125) < 1e-12);
   assert.equal(taylor.investments[0].ownership + taylor.investments[1].ownership, 1.5);
   assert.match(model.storylines.find((story) => story.title === "Highest ROI").detail, /leads the return board/);
   assert.match(model.storylines.find((story) => story.title === "Largest Guaranteed Winner").detail, /has secured the most/);
@@ -82,6 +82,31 @@ test("Calcutta derives future Scramble net scores with the existing 35/15 team c
   assert.equal(results.length, 2);
   assert.deepEqual(results.map((row) => row["Full Course Handicap"]), [5, 5]);
   assert.deepEqual(results.map((row) => row["Net Score"]), [67, 67]);
+});
+
+test("Calcutta payout percentage points apply directly to the total pot", () => {
+  const model = buildCalcuttaModel({
+    year: 2026,
+    players,
+    purchases: [
+      { Year: 2026, "Golfer Player ID": "A", "Purchase Price": 400 },
+      { Year: 2026, "Golfer Player ID": "B", "Purchase Price": 350 },
+      { Year: 2026, "Golfer Player ID": "C", "Purchase Price": 250 },
+    ],
+    pointStructure: [96, 92, 88].map((award, index) => ({ Year: 2026, Place: index + 1, "Round 1 Award": award })),
+    payoutStructure: [1.25, 1, 0.75].map((award, index) => ({ Year: 2026, Place: index + 1, "Round 1 Award %": award })),
+    roundResults: [
+      { Year: 2026, Round: 1, Format: "Best Ball", "Player ID": "A", "Gross Score": 70, "Net Score": 60 },
+      { Year: 2026, Round: 1, Format: "Best Ball", "Player ID": "B", "Gross Score": 71, "Net Score": 61 },
+      { Year: 2026, Round: 1, Format: "Best Ball", "Player ID": "C", "Gross Score": 72, "Net Score": 62 },
+    ],
+  });
+  assert.equal(model.pot, 1000);
+  assert.equal(model.golfers[0].rounds[1].payoutPercent, 0.0125);
+  assert.equal(model.golfers[0].rounds[1].guaranteedWinnings, 12.5);
+  assert.equal(model.golfers[1].rounds[1].guaranteedWinnings, 10);
+  assert.equal(model.golfers[2].rounds[1].guaranteedWinnings, 7.5);
+  assert.equal(model.guaranteedDistributed, 30);
 });
 
 test("Calcutta publication consumes completed results from the authoritative tournament model", () => {
