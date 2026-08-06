@@ -54,13 +54,13 @@ test("Calcutta derives its pot, standings, payouts, and post-payout ownership", 
   assert.equal(model.pot, 350);
   const clay = model.golfers.find((row) => row.playerId === "A");
   assert.equal(clay.rounds[1].points, 8);
-  assert.ok(Math.abs(clay.rounds[1].payoutPercent - 0.075) < 1e-12);
-  assert.ok(Math.abs(clay.overallPayoutPercent - 0.15) < 1e-12);
-  assert.ok(Math.abs(clay.currentPayoutValue - 78.75) < 1e-12);
+  assert.ok(Math.abs(clay.rounds[1].payoutPercent - (0.075 / 0.54)) < 1e-12);
+  assert.ok(Math.abs(clay.overallPayoutPercent - (0.15 / 0.54)) < 1e-12);
+  assert.ok(Math.abs(clay.currentPayoutValue - (350 * 0.225 / 0.54)) < 1e-12);
   assert.equal(clay.owners.reduce((sum, owner) => sum + owner.ownership, 0), 1);
   const taylor = model.portfolios.find((row) => row.ownerId === "O1");
   assert.equal(taylor.purchaseCost, 250);
-  assert.ok(Math.abs(taylor.currentPayoutValue - 118.125) < 1e-12);
+  assert.ok(Math.abs(taylor.currentPayoutValue - (118.125 / 0.54)) < 1e-12);
   assert.equal(taylor.investments[0].ownership + taylor.investments[1].ownership, 1.5);
 });
 
