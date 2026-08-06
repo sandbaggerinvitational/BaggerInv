@@ -57,7 +57,7 @@ function verifyActionReadBack(action, input, data, round) {
     return calcutta?.ownership.some((item) => item.golferPlayerId === input.golferPlayerId && item.ownerPlayerId === input.ownerPlayerId && Number(item.ownershipPercentage) === Number(input.ownershipPercentage));
   }
   if (action === "net-skins-eligibility") {
-    const entries = data.operations?.netSkins.filter((item) => item.playerIds.includes(input.playerId)) || [];
+    const entries = data.operations?.netSkins.filter((item) => item.playerIds.includes(input.playerId) && Number(item.round) === Number(input.round)) || [];
     return Boolean(entries.length) && entries.every((item) => item.eligible === Boolean(input.eligible));
   }
   const matches = data.rounds.find((item) => Number(item.number) === Number(round))?.matches || [];

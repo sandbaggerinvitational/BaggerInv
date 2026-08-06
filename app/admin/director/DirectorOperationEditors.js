@@ -45,9 +45,17 @@ export function CalcuttaManagement({ operations, busy, save, initialContext = {}
 }
 
 export function NetSkinsManagement({ operations, busy, save, initialContext = {} }) {
-  const playerIds = [...new Set(operations.netSkins.flatMap((entry) => entry.playerIds))]; const [playerId, setPlayerId] = useState(playerIds.includes(initialContext.playerId) ? initialContext.playerId : playerIds[0] || "");
-  const entries = operations.netSkins.filter((entry) => entry.playerIds.includes(playerId)); const player = operations.players.find((item) => item.id === playerId); const eligible = entries.length > 0 && entries.every((entry) => entry.eligible);
-  return <div className={styles.managementPanel}><label>Player<select value={playerId} onChange={(event) => setPlayerId(event.target.value)}>{playerIds.map((id) => <option value={id} key={id}>{operations.players.find((item) => item.id === id)?.name || id}</option>)}</select></label>{playerId ? <div className={styles.eligibilityControl}><div><strong>{player?.name || playerId}</strong><span>{entries.length} configured round entr{entries.length === 1 ? "y" : "ies"}</span></div><b data-eligible={eligible ? "true" : "false"}>{eligible ? "Eligible" : "Ineligible"}</b><button disabled={Boolean(busy)} onClick={() => save("net-skins-eligibility", { playerId, eligible: !eligible })}>Save as {eligible ? "Ineligible" : "Eligible"}</button></div> : <p>No Net Skins entries are configured.</p>}</div>;
+  const formatName = (value) => ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[String(value || "").toUpperCase()] || String(value || "");
+  const playerIds = [...new Set(operations.netSkins.flatMap((entry) => entry.playerIds))];
+  const configuredRounds = [...new Map([...operations.netSkins, ...operations.matches].map((entry) => [Number(entry.round), { round: Number(entry.round), format: formatName(entry.format) }])).values()].filter((entry) => Number.isFinite(entry.round)).sort((left, right) => left.round - right.round);
+  const initialPlayerId = playerIds.includes(initialContext.playerId) ? initialContext.playerId : playerIds[0] || "";
+  const initialRound = operations.netSkins.find((entry) => entry.playerIds.includes(initialPlayerId))?.round || configuredRounds[0]?.round || "";
+  const [playerId, setPlayerId] = useState(initialPlayerId);
+  const [round, setRound] = useState(String(initialRound));
+  const entries = operations.netSkins.filter((entry) => entry.playerIds.includes(playerId) && Number(entry.round) === Number(round));
+  const player = operations.players.find((item) => item.id === playerId);
+  const eligible = entries.length > 0 && entries.every((entry) => entry.eligible);
+  return <div className={styles.managementPanel}><label>Player<select value={playerId} onChange={(event) => setPlayerId(event.target.value)}>{playerIds.map((id) => <option value={id} key={id}>{operations.players.find((item) => item.id === id)?.name || id}</option>)}</select></label><label>Round<select value={round} onChange={(event) => setRound(event.target.value)}>{configuredRounds.map((item) => <option value={item.round} key={item.round}>Round {item.round} • {item.format}</option>)}</select></label>{playerId && entries.length ? <div className={styles.eligibilityControl}><div><span>Current Status</span><strong>{eligible ? "Eligible" : "Ineligible"}</strong><small>{player?.name || playerId} · Round {round}</small></div><b data-eligible={eligible ? "true" : "false"}>{eligible ? "Eligible" : "Ineligible"}</b><button disabled={Boolean(busy)} onClick={() => save("net-skins-eligibility", { playerId, round: Number(round), eligible: !eligible })}>Save as {eligible ? "Ineligible" : "Eligible"}</button></div> : <p>No Net Skins eligibility record is configured for this player and round.</p>}</div>;
 }
 
 export function NotificationManagement({ sandbox, busy, send, initialContext = {} }) {

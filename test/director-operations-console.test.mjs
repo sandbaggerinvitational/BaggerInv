@@ -66,3 +66,16 @@ test("Starting Hole is capability-gated by both the protected map and active she
   assert.match(editors, /operations\.capabilities\.startingHole \? <label>Starting Hole/);
   assert.doesNotMatch(editors, /Starting Hole is not writable|capabilityNote/);
 });
+
+test("Net Skins eligibility is selected, written, and verified for one configured round", () => {
+  const editors = source("app/admin/director/DirectorOperationEditors.js");
+  const writes = source("lib/google-sheets-write.js");
+  const route = source("app/api/director/route.js");
+  assert.match(editors, /<label>Round<select value=\{round\}/);
+  assert.match(editors, /Round \{item\.round\} • \{item\.format\}/);
+  assert.match(editors, /Current Status/);
+  assert.match(editors, /save\("net-skins-eligibility", \{ playerId, round: Number\(round\), eligible: !eligible \}\)/);
+  assert.match(writes, /Number\(record\.Round\) === round/);
+  assert.match(writes, /recordId: `\$\{playerId\}:R\$\{round\}`/);
+  assert.match(route, /item\.playerIds\.includes\(input\.playerId\) && Number\(item\.round\) === Number\(input\.round\)/);
+});
