@@ -57,8 +57,8 @@ export default function CalcuttaExperience({ model }) {
   if (!model?.available) return <section className={styles.empty} role="status"><strong>Calcutta</strong><span>Purchases and ownership will appear when the official Calcutta is published.</span></section>;
   const rows = tab === "golfers" ? model.golfers : model.portfolios;
   return <section className={styles.experience} aria-label="Calcutta">
-    <Hero model={model} />
     <nav className={styles.tabs} aria-label="Calcutta view"><button type="button" aria-pressed={tab === "golfers"} onClick={() => { setTab("golfers"); setSelected(null); }}>Golfers</button><button type="button" aria-pressed={tab === "portfolios"} onClick={() => { setTab("portfolios"); setSelected(null); }}>Portfolios</button></nav>
+    <Hero model={model} />
     <section className={styles.board} aria-label={tab === "golfers" ? "Calcutta golfer standings" : "Calcutta portfolio standings"}>
       <header><span>{tab === "golfers" ? "Golfer Market" : "Owner Portfolios"}</span><h3>{tab === "golfers" ? "Current Calcutta Standings" : "Portfolio Leaderboard"}</h3></header>
       <div className={styles.row} data-header="true"><span>Rank</span><span>{tab === "golfers" ? "Golfer" : "Owner"}</span><span>{tab === "golfers" ? "Purchase" : "Cost"}</span><span>{model.tournamentComplete ? "Final" : "Projected"}</span><span>ROI</span></div>

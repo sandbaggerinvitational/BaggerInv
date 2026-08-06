@@ -250,14 +250,20 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
     readFile(new URL("../lib/workbook-protection.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
   ]);
-  assert.match(dashboard, /\["calcutta", "Calcutta"\]/);
+  assert.match(dashboard, /aria-label="Select tournament destination"/);
+  assert.match(dashboard, />Tournament<\/button>/);
+  assert.match(dashboard, />Calcutta<\/button>/);
   assert.match(dashboard, /selectedRound === "calcutta" \? <CalcuttaExperience/);
-  assert.match(dashboard, /selectedRound !== "overall" \? <div className=\{styles\.filters\}/);
-  assert.match(dashboardCss, /\.rounds\{[^}]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
-  assert.match(dashboardCss, /\.rounds\{[^}]*overflow:visible/);
+  assert.match(dashboard, /aria-label="Select tournament round"/);
+  assert.match(dashboard, /aria-label="Filter tournament matches"/);
+  assert.match(dashboardCss, /\.destinations\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(dashboardCss, /\.rounds\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(dashboardCss, /\.filters\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(dashboardCss, /\.destinations,.rounds,.filters\{[^}]*overflow:visible/);
   assert.match(component, /Current Pot/);
   assert.match(component, /Golfers/);
   assert.match(component, /Portfolios/);
+  assert.ok(component.indexOf('className={styles.tabs}') < component.indexOf('<Hero model={model} />'));
   assert.match(component, /Calcutta Storylines/);
   assert.match(component, /BB: "Best Ball", SC: "Scramble", SI: "Singles"/);
   assert.match(css, /\.sheet\{[^}]*overflow-y:auto/);

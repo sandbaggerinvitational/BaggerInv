@@ -63,9 +63,9 @@ test("Tournament data refreshes on open, focus, visibility, and a guarded interv
 
 test("Tournament controls are dynamic, accessible, and client-side", async () => {
   const source = await readFile(componentUrl, "utf8");
-  assert.match(source, /\[\["overall","Tournament"\], \.\.\.rounds\.map/);
-  assert.match(source, /\["calcutta", "Calcutta"\]/);
-  assert.match(source, /aria-pressed=\{String\(selectedRound\) === String\(value\)\}/);
+  assert.match(source, /aria-label="Select tournament destination"/);
+  assert.match(source, /rounds\.map\(\(round\) => <button/);
+  assert.match(source, /aria-pressed=\{String\(selectedRound\) === String\(round\.number\)\}/);
   for (const label of ["All", "Live", "Upcoming", "Final"]) assert.equal(source.includes(`"${label}"`), true);
   assert.match(source, /filterMatches\(round\.matches \|\| \[\], activeFilter\)/);
   assert.match(source, /const \[openRounds, setOpenRounds\] = useState\(\(\) => new Set\(\)\)/);
@@ -279,7 +279,7 @@ test("Tournament polish preserves a clear round, matches, leaderboard rhythm", a
 test("Tournament controls and collapsed or expanded rounds retain confident states", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
   assert.match(source, /<details className=\{styles\.roundGroup\} open=\{isOpen\}/);
-  assert.match(source, /aria-pressed=\{String\(selectedRound\) === String\(value\)\}/);
+  assert.match(source, /aria-pressed=\{String\(selectedRound\) === String\(round\.number\)\}/);
   assert.match(source, /aria-pressed=\{filter === value\}/);
   assert.match(styles, /\.rounds button,\s*\.filters button\{[^}]*min-height:42px/s);
   assert.match(styles, /\.roundGroup\[open\]\{[^}]*border-color:#ccb87f/);
@@ -297,11 +297,13 @@ test("Tournament match cards expose state-aware scanning without changing destin
   assert.match(styles, /\.viewMatch\{[^}]*min-height:30px/);
 });
 
-test("Tournament shows every match while round selections expose status filters", async () => {
+test("Tournament destination exposes round selections and status filters", async () => {
   const source = await readFile(componentUrl, "utf8");
   assert.match(source, /const filteredRounds = selectedRounds\.map/);
   assert.match(source, /const activeFilter = selectedRound === "overall" \? "all" : filter/);
-  assert.match(source, /selectedRound !== "overall" \? <div className=\{styles\.filters\}/);
+  assert.match(source, /aria-label="Select tournament destination"/);
+  assert.match(source, /aria-label="Select tournament round"/);
+  assert.match(source, /aria-label="Filter tournament matches"/);
   assert.match(source, /filteredRounds\.filter\(\(\{ matches \}\) => matches\.length\)/);
   assert.match(source, /visibleRounds\.map\(\(\{ round, matches \}\)/);
   assert.match(source, /!visibleRounds\.length/);

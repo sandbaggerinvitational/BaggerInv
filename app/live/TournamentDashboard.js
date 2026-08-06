@@ -253,10 +253,14 @@ export default function TournamentDashboard({ initialData, loadError }) {
   </div></section>;
   return <section className={styles.page}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
-    <nav className={styles.rounds} aria-label="Select tournament round">{[["overall","Tournament"], ...rounds.map((round) => [round.number, round.label]), ["calcutta", "Calcutta"]].map(([value,label]) => <button type="button" aria-pressed={String(selectedRound) === String(value)} onClick={() => setSelectedRound(value)} key={value}>{label}</button>)}</nav>
+    <nav className={styles.destinations} aria-label="Select tournament destination">
+      <button type="button" aria-pressed={selectedRound !== "calcutta"} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</button>
+      <button type="button" aria-pressed={selectedRound === "calcutta"} onClick={() => setSelectedRound("calcutta")}>Calcutta</button>
+    </nav>
     {selectedRound === "calcutta" ? <CalcuttaExperience model={data?.calcutta} /> : <>
+    <nav className={styles.rounds} aria-label="Select tournament round">{rounds.map((round) => <button type="button" aria-pressed={String(selectedRound) === String(round.number)} onClick={() => setSelectedRound(round.number)} key={round.number}>{round.label}</button>)}</nav>
+    <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />
-    {selectedRound !== "overall" ? <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div> : null}
     <div className={styles.roundGroups}>{visibleRounds.map(({ round, matches }) => {
       const isOverall = selectedRound === "overall";
       const isOpen = !isOverall || openRounds.has(round.number);
