@@ -62,8 +62,8 @@ function verifyActionReadBack(action, input, data, round) {
     return calcutta?.ownership.some((item) => item.golferPlayerId === input.golferPlayerId && item.ownerPlayerId === input.ownerPlayerId && Number(item.ownershipPercentage) === Number(input.ownershipPercentage));
   }
   if (action === "net-skins-eligibility") {
-    const entries = data.operations?.netSkins.filter((item) => item.playerIds.includes(input.playerId) && Number(item.round) === Number(input.round)) || [];
-    return Boolean(entries.length) && entries.every((item) => item.eligible === Boolean(input.eligible));
+    const updates = Array.isArray(input.updates) ? input.updates : [{ round: input.round, eligible: input.eligible }];
+    return updates.length > 0 && updates.every((update) => { const entries = data.operations?.netSkins.filter((item) => item.playerIds.includes(input.playerId) && Number(item.round) === Number(update.round)) || []; return Boolean(entries.length) && entries.every((item) => item.eligible === Boolean(update.eligible)); });
   }
   const matches = data.rounds.find((item) => Number(item.number) === Number(round))?.matches || [];
   if (action === "open-round") return Number(data.tournament.currentRound) === Number(round) && String(data.tournament.status).toLowerCase() === "live";

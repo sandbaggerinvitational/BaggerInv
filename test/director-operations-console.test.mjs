@@ -51,7 +51,7 @@ test("Mission Control writes remain field-scoped and protected-map aware", () =>
   assert.match(writes, /writeSheetFields\("Calcutta Purchases"/);
   assert.match(writes, /writeSheetFields\("Calcutta Ownership"/);
   assert.match(writes, /appendSheetFields\("Calcutta Ownership"/);
-  assert.match(writes, /writeSheetFields\("Net Skins"/);
+  assert.match(writes, /tab: "Net Skins", sheet, fields: \["Eligible"\]/);
   assert.doesNotMatch(writes, /updateDirector(?:MatchManagement|Calcutta|NetSkins)[\s\S]{0,2500}(?:appendDimension|insertDimension|addSheet)/);
 });
 
@@ -67,17 +67,21 @@ test("Starting Hole is capability-gated by both the protected map and active she
   assert.doesNotMatch(editors, /Starting Hole is not writable|capabilityNote/);
 });
 
-test("Net Skins eligibility is selected, written, and verified for one configured round", () => {
+test("Net Skins eligibility is edited, batch-written, and verified across configured rounds", () => {
   const editors = source("app/admin/director/DirectorOperationEditors.js");
   const writes = source("lib/google-sheets-write.js");
   const route = source("app/api/director/route.js");
-  assert.match(editors, /<label>Round<select value=\{round\}/);
+  assert.match(editors, /skinsBulkEditor/);
   assert.match(editors, /Round \{item\.round\} • \{item\.format\}/);
-  assert.match(editors, /Current Status/);
-  assert.match(editors, /save\("net-skins-eligibility", \{ playerId, round: Number\(round\), eligible: !eligible \}\)/);
-  assert.match(writes, /Number\(record\.Round\) === round/);
-  assert.match(writes, /recordId: `\$\{playerId\}:R\$\{round\}`/);
-  assert.match(route, /item\.playerIds\.includes\(input\.playerId\) && Number\(item\.round\) === Number\(input\.round\)/);
+  assert.match(editors, /role="switch"/);
+  assert.match(editors, /Unsaved Changes/);
+  assert.match(editors, /Save Changes/);
+  assert.match(editors, /updates: pending\.map/);
+  assert.match(writes, /fields: \["Eligible"\]/);
+  assert.match(writes, /replaceScopedRuntimeRecordSets/);
+  assert.match(writes, /action: "Bulk Eligibility Updated"/);
+  assert.match(route, /Array\.isArray\(input\.updates\)/);
+  assert.match(route, /updates\.every/);
 });
 
 test("Calcutta ownership is edited and verified as one complete group", () => {
