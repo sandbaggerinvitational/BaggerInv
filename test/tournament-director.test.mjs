@@ -187,7 +187,17 @@ test("Director dashboard contains operations, health, attention, automation, and
 test("PLAYER accounts are redirected away from the Director page", () => {
   const page = source("app/admin/director/page.js");
   assert.match(page, /inspectTournamentDirectorToken/);
-  assert.match(page, /result\.status !== "active"\) redirect\("\/home"\)/);
+  assert.match(page, /\["inactive", "forbidden"\]\.includes\(result\.status\)\) redirect\("\/home"\)/);
+  assert.doesNotMatch(page, /result\.status !== "active"\) redirect/);
+});
+
+test("transient Director authorization remains on Mission Control while the protected API recovers", () => {
+  const page = source("app/admin/director/page.js");
+  const dashboard = source("app/admin/director/DirectorDashboard.js");
+  assert.match(page, /result\.identity\?\.actor\?\.name \|\| "Tournament Director"/);
+  assert.match(dashboard, /response\.status === 503 && attempt < 3/);
+  assert.match(dashboard, /return load\(attempt \+ 1\)/);
+  assert.match(dashboard, /credentials: "same-origin"/);
 });
 
 test("Director page, actions, impersonation, and sandbox share one actor-aware authorization resolver", () => {

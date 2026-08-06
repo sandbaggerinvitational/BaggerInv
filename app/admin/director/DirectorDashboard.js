@@ -81,10 +81,14 @@ export default function DirectorDashboard({ directorName }) {
   const [testPlayerId, setTestPlayerId] = useState("");
   const [resetOpen, setResetOpen] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
-  const load = useCallback(async () => {
+  const load = useCallback(async (attempt = 0) => {
     setMessage("");
     const response = await fetch("/api/director", { cache: "no-store", credentials: "same-origin" });
     const payload = await response.json();
+    if (response.status === 503 && attempt < 3) {
+      await new Promise((resolve) => window.setTimeout(resolve, 300 * (attempt + 1)));
+      return load(attempt + 1);
+    }
     if (!response.ok) throw new Error(payload.error || "Director dashboard is unavailable.");
     setData(payload.data);
     setTestPlayerId((current) => current || payload.data.qaTools?.selectedPlayer?.id || payload.data.qaTools?.players?.[0]?.id || "");
