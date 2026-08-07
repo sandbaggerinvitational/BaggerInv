@@ -297,11 +297,30 @@ function NetSkinsBoard({ data, currentPlayer }) {
   const isScramble = round?.format === "SC";
   const participantNoun = isScramble ? "team" : "golfer";
   const largestSkin = round?.skins.length ? round.skins.reduce((best, skin) => skin.skinValue > best.skinValue ? skin : best, round.skins[0]) : null;
-  const winningBirdie = round?.leaderboard.flatMap((row) => row.holeResults.map((result) => ({ ...result, name: teamName(row) }))).find((result) => result.wonSkin && scoreName(result) === "Birdie");
+  const mostValuableHole = largestSkin ? round?.leaderboard.flatMap((row) => row.holeResults.map((result) => ({ ...result, name: teamName(row) }))).find((result) => result.wonSkin && result.hole === largestSkin.hole) : null;
+  const competitionStage = round?.complete ? "complete" : round?.completedHoles > 0 ? "live" : "opening";
+  const holderCount = round?.leaderboard.filter((row) => row.skinsWon > 0).length || 0;
+  const heroMetrics = round ? competitionStage === "opening" ? [
+    ["Round Pot", currency(round.pot)],
+    ["Entrants", `${round.eligibleCount} ${round.format === "SC" ? (round.eligibleCount === 1 ? "Team" : "Teams") : (round.eligibleCount === 1 ? "Golfer" : "Golfers")}`],
+    ["Eligible Holes", "18"],
+    ["Competition Status", round.eligibleCount ? "Ready for Play" : "Awaiting Field"],
+  ] : competitionStage === "live" ? [
+    ["Round Pot", currency(round.pot)],
+    ["Current Skin Value", round.skinsAwarded ? currency(round.skinValue) : "Pending"],
+    ["Skins Awarded", String(round.skinsAwarded)],
+    ["Remaining Eligible Holes", String(Math.max(0, 18 - round.completedHoles))],
+  ] : [
+    ["Round Pot", currency(round.pot)],
+    ["Final Skin Value", round.skinsAwarded ? currency(round.skinValue) : "—"],
+    ["Skins Awarded", String(round.skinsAwarded)],
+    [`${isScramble ? "Teams" : "Golfers"} Holding Skins`, String(holderCount)],
+  ] : [];
   const stories = round ? [
     leaders.length ? { label: "Current Skin Leaders", copy: leaders.length === 1 ? `${teamName(leaders[0])} leads with ${leaders[0].skinsWon} ${leaders[0].skinsWon === 1 ? "skin" : "skins"}.` : `${leaders.map(teamName).join(" and ")} share the lead with ${topSkinCount} ${topSkinCount === 1 ? "skin" : "skins"}.` } : null,
-    winningBirdie ? { label: "Most Valuable Birdie", copy: `${winningBirdie.name}'s birdie on Hole ${winningBirdie.hole} is currently worth ${currency(round.skinValue)}.` } : largestSkin ? { label: "Largest Current Skin", copy: `Hole ${largestSkin.hole} is currently worth ${currency(largestSkin.skinValue)}.` } : null,
-    round.completedHoles < 18 ? { label: "Most Skins Remaining", copy: `${18 - round.completedHoles} eligible ${18 - round.completedHoles === 1 ? "hole remains" : "holes remain"} before the competition is complete.` } : null,
+    mostValuableHole ? { label: "Most Valuable Hole", copy: `${mostValuableHole.name}'s ${scoreName(mostValuableHole).toLowerCase()} on Hole ${mostValuableHole.hole} is worth ${currency(largestSkin.skinValue)}.` } : null,
+    largestSkin && !mostValuableHole ? { label: "Largest Current Skin", copy: `Hole ${largestSkin.hole} carries the largest current skin at ${currency(largestSkin.skinValue)}.` } : null,
+    round.completedHoles < 18 ? { label: "Remaining Skin Opportunities", copy: `${18 - round.completedHoles} eligible ${18 - round.completedHoles === 1 ? "hole remains" : "holes remain"} to shape the competition.` } : null,
   ].filter(Boolean) : [];
   if (!rounds.length) return <section className={skinsStyles.board}><div className={styles.empty}><strong>Net Skins have not started yet.</strong><span>Competition details will appear when the tournament field is ready.</span></div></section>;
   return <section className={skinsStyles.experience} aria-label="Net Skins standings">
@@ -310,15 +329,7 @@ function NetSkinsBoard({ data, currentPlayer }) {
     </nav>
     <section className={skinsStyles.board}>
       <header><span><small>Net Skins Competition</small><h2>Round {round.round} Net Skins</h2></span><b>{round.format === "SC" ? "Scramble Teams" : "Individual Golfers"}</b></header>
-      <div className={skinsStyles.summary}>
-        <div><span>Round Pot</span><strong>{currency(round.pot)}</strong></div>
-        <div><span>Entrants</span><strong>{round.eligibleCount} {round.format === "SC" ? (round.eligibleCount === 1 ? "Team" : "Teams") : (round.eligibleCount === 1 ? "Golfer" : "Golfers")}</strong></div>
-        <div><span>Skins Awarded</span><strong>{round.skinsAwarded}</strong></div>
-        <div><span>Value Per Skin</span><strong>{round.skinsAwarded ? currency(round.skinValue) : "—"}</strong></div>
-        {leaders.length ? <div><span>Current Skin {leaders.length === 1 ? "Leader" : "Leaders"}</span><strong>{leaders.length === 1 ? teamName(leaders[0]) : `${leaders.length} Tied`}</strong></div> : null}
-        {largestSkin ? <div><span>Largest Current Skin</span><strong>{currency(largestSkin.skinValue)}</strong></div> : null}
-        {round.completedHoles < 18 ? <div><span>Remaining Eligible Holes</span><strong>{18 - round.completedHoles}</strong></div> : null}
-      </div>
+      <div className={skinsStyles.summary} data-stage={competitionStage}>{heroMetrics.map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
       {!round.leaderboard.length ? <div className={styles.empty}><strong>No eligible participants yet.</strong><span>The leaderboard will calculate automatically from official net scores.</span></div> : <div>
         <div className={skinsStyles.row} data-header="true"><span>Rank</span><span>{round.format === "SC" ? "Team" : "Golfer"}</span><span>Skins</span><span>Current Winnings</span></div>
         {round.leaderboard.map((row) => { const isCurrent = Boolean(currentPlayer?.id && row.playerIds?.includes(currentPlayer.id)); return <div className={skinsStyles.entry} data-current={isCurrent || undefined} key={`${row.id}-${row.skinsWon}-${row.totalWinnings}`}>
@@ -330,8 +341,8 @@ function NetSkinsBoard({ data, currentPlayer }) {
       {!round.complete ? <p className={skinsStyles.note}><strong>Waiting for official scores.</strong><span>Net Skins will begin calculating as eligible {isScramble ? "teams" : "golfers"} complete each hole.</span></p> : null}
       {round.complete && !round.skinsAwarded ? <p className={skinsStyles.note}>No skins awarded. Tied low-net scores do not carry over.</p> : null}
     </section>
-    {stories.length ? <section className={skinsStyles.stories}><header><small>Tournament Intelligence</small><h3>{isScramble ? "Scramble" : round.format === "SI" ? "Singles" : "Best Ball"} Net Skins Storylines</h3></header><div>{stories.map((story) => <article key={story.label}><span aria-hidden="true">{story.label === "Most Skins Remaining" ? "⛳" : "🏆"}</span><p><small>{story.label}</small><strong>{story.copy}</strong></p></article>)}</div></section> : null}
-    {selectedTeam ? <div className={skinsStyles.sheetLayer} role="presentation"><button type="button" className={skinsStyles.backdrop} onClick={() => setSelectedTeamId("")} aria-label="Close team details" /><section className={skinsStyles.sheet} role="dialog" aria-modal="true" aria-labelledby="skins-team-name"><header><span>{isScramble ? "Scramble" : round.format === "SI" ? "Singles" : "Best Ball"} Net Skins</span><button type="button" onClick={() => setSelectedTeamId("")} aria-label="Close team details">×</button></header><div className={skinsStyles.sheetIdentity}><div className={skinsStyles.avatars}>{teamMembers(selectedTeam).map((player) => <span key={player.id}><PlayerAvatar player={player} fallbackClassName={skinsStyles.avatarFallback} /></span>)}</div><div><small>{isScramble ? "Team" : "Golfer"}</small><h3 id="skins-team-name">{teamName(selectedTeam)}</h3></div></div><div className={skinsStyles.sheetMetrics}><p><small><i className={skinsStyles.skinCoin} aria-hidden="true">S</i> Current Skins</small><strong>{selectedTeam.skinsWon}</strong></p><p><small>Current Winnings</small><strong>{currency(selectedTeam.totalWinnings)}</strong></p><p><small>Winning Holes</small><strong>{selectedTeam.winningHoles.length ? selectedTeam.winningHoles.map((skin) => skin.hole).join(", ") : "None yet"}</strong></p><p><small>Eligible Status</small><strong>Eligible</strong></p></div><section className={skinsStyles.holeResults}><header><small>Hole-by-Hole Net Skins Results</small><strong>{selectedTeam.holeResults.length} official</strong></header>{selectedTeam.holeResults.length ? selectedTeam.holeResults.map((result) => <article key={result.hole} data-won={result.wonSkin || undefined}><span><strong>Hole {result.hole}</strong><small>{scoreName(result)} · Net {result.net}</small></span><b>{result.wonSkin ? "Won Skin" : result.tiedLow ? "Lost Skin (Tie)" : "No Skin"}</b></article>) : <p>Hole results will appear as official scores arrive.</p>}</section></section></div> : null}
+    {stories.length ? <section className={skinsStyles.stories}><header><small>Tournament Intelligence</small><h3>{isScramble ? "Scramble" : round.format === "SI" ? "Singles" : "Best Ball"} Net Skins Storylines</h3></header><div>{stories.map((story) => <article key={story.label}><span aria-hidden="true">{story.label === "Remaining Skin Opportunities" ? "⛳" : story.label === "Most Valuable Hole" ? "◆" : "🏆"}</span><p><small>{story.label}</small><strong>{story.copy}</strong></p></article>)}</div></section> : null}
+    {selectedTeam ? <div className={skinsStyles.sheetLayer} role="presentation"><button type="button" className={skinsStyles.backdrop} onClick={() => setSelectedTeamId("")} aria-label="Close team details" /><section className={skinsStyles.sheet} role="dialog" aria-modal="true" aria-labelledby="skins-team-name"><header><span>{isScramble ? "Scramble" : round.format === "SI" ? "Singles" : "Best Ball"} Net Skins</span><button type="button" onClick={() => setSelectedTeamId("")} aria-label="Close team details">×</button></header><div className={skinsStyles.sheetIdentity}><div className={skinsStyles.avatars}>{teamMembers(selectedTeam).map((player) => <span key={player.id}><PlayerAvatar player={player} fallbackClassName={skinsStyles.avatarFallback} /></span>)}</div><div><small>{isScramble ? "Team" : "Golfer"}</small><h3 id="skins-team-name">{teamName(selectedTeam)}</h3></div></div>{selectedTeam.skinsWon ? <section className={skinsStyles.winnerSummary} aria-label="Current winner summary"><p><small>Winning {selectedTeam.winningHoles.length === 1 ? "Hole" : "Holes"}</small><strong>{selectedTeam.winningHoles.map((skin) => skin.hole).join(", ")}</strong></p><p><small><i className={skinsStyles.skinCoin} aria-hidden="true">S</i> Current Skins</small><strong>{selectedTeam.skinsWon}</strong></p><p><small>Current Winnings</small><strong>{currency(selectedTeam.totalWinnings)}</strong></p></section> : <div className={skinsStyles.sheetMetrics}><p><small>Eligible Status</small><strong>Eligible</strong></p><p><small>Current Winnings</small><strong>{currency(selectedTeam.totalWinnings)}</strong></p></div>}<section className={skinsStyles.holeResults}><header><small>Hole-by-Hole Net Skins Results</small><strong>{selectedTeam.holeResults.length} official</strong></header>{selectedTeam.holeResults.length ? selectedTeam.holeResults.map((result) => { const resultState = result.wonSkin ? "won" : result.tiedLow ? "tie" : "none"; return <article key={result.hole} data-result={resultState}><span><strong>Hole {result.hole}</strong><small>{scoreName(result)} · Net {result.net}</small></span><b className={skinsStyles.resultBadge} data-result={resultState}>{result.wonSkin ? "🟢 Won Skin" : result.tiedLow ? "🟡 Lost Skin (Tie)" : "⚪ No Skin"}</b></article>; }) : <p>Hole results will appear as official scores arrive.</p>}</section></section></div> : null}
   </section>;
 }
 

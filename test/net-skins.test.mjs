@@ -110,7 +110,9 @@ test("Leaderboards exposes the Scramble Net Skins live experience and lazy team 
   assert.match(source, /\["skins", "Net Skins"\]/);
   assert.match(source, /Round Pot/);
   assert.match(source, /Skins Awarded/);
-  assert.match(source, /Value Per Skin/);
+  assert.match(source, /Current Skin Value/);
+  assert.match(source, /Final Skin Value/);
+  assert.match(source, /Competition Status/);
   assert.match(source, /Largest Current Skin/);
   assert.match(source, /Remaining Eligible Holes/);
   assert.match(source, /Current Skin Leaders/);
@@ -118,6 +120,8 @@ test("Leaderboards exposes the Scramble Net Skins live experience and lazy team 
   assert.match(source, /Net Skins Storylines/);
   assert.match(source, /selectedTeam \?/);
   assert.match(source, /Lost Skin \(Tie\)/);
+  assert.match(source, /data-result=\{resultState\}/);
+  assert.match(source, /Current winner summary/);
   assert.match(source, /Hole-by-Hole Net Skins Results/);
   assert.match(source, /Current Winnings/);
   assert.match(source, /\.join\(" & "\)/);
@@ -132,8 +136,8 @@ test("Net Skins polish exposes official summary terminology and participant high
     readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/net-skins.module.css", import.meta.url), "utf8"),
   ]);
-  for (const label of ["Net Skins Competition", "Round Pot", "Entrants", "Skins Awarded", "Value Per Skin"]) assert.match(source, new RegExp(label));
-  assert.doesNotMatch(source, /Independent Competition|Current Skin Value/);
+  for (const label of ["Net Skins Competition", "Round Pot", "Entrants", "Eligible Holes", "Competition Status", "Current Skin Value", "Skins Awarded", "Remaining Eligible Holes", "Final Skin Value", "Holding Skins"]) assert.match(source, new RegExp(label));
+  assert.doesNotMatch(source, /Independent Competition|Value Per Skin/);
   assert.match(source, /row\.playerIds\?\.includes\(currentPlayer\.id\)/);
   assert.match(source, /skinCoin/);
   const netSkinsSource = source.slice(source.indexOf("function NetSkins"), source.indexOf("export default function"));
@@ -141,6 +145,9 @@ test("Net Skins polish exposes official summary terminology and participant high
   assert.match(css, /\.entry\[data-current="true"\]/);
   assert.match(css, /background:\s*#fffaf0/);
   assert.match(css, /inset 3px 0 #c49b34/);
+  assert.match(css, /\.winnerSummary/);
+  assert.match(css, /\.resultBadge\[data-result="won"\]/);
+  assert.match(css, /\.holeResults article\[data-result="won"\]/);
 });
 
 test("Home Net Skins card is participant-only and links to official standings", async () => {

@@ -66,8 +66,6 @@
 }
 
 .summary > div + div { border-left: 1px solid #eee8de; }
-.summary > div:nth-child(n + 5) { border-top: 1px solid #eee8de; }
-.summary > div:nth-child(5) { border-left: 0; }
 .summary span { color: #6f7974; font-size: .48rem; font-weight: 800; line-height: 1.15; text-transform: uppercase; }
 .summary strong { color: #0b4938; font: 700 1rem Georgia, serif; font-variant-numeric: tabular-nums; }
 
@@ -128,17 +126,23 @@
 .sheetMetrics p { display: grid; gap: 3px; margin: 0; padding: 10px; border: 1px solid #e3dbc9; border-radius: 11px; background: #fff; }
 .sheetMetrics small { color: #747c77; font-size: .48rem; font-weight: 900; text-transform: uppercase; }
 .sheetMetrics strong { color: #0b4938; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.winnerSummary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; padding: 10px; border: 1px solid #d9d0bd; border-radius: 14px; background: linear-gradient(135deg,#fffdf7,#f3ead5); }
+.winnerSummary p { display: grid; align-content: center; gap: 4px; min-width: 0; margin: 0; text-align: center; }
+.winnerSummary p + p { border-left: 1px solid #ded4bf; }
+.winnerSummary small { color: #747c77; font-size: .46rem; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
+.winnerSummary strong { color: #0b4938; font: 700 .9rem Georgia,serif; font-variant-numeric: tabular-nums; }
 .holeResults { overflow: hidden; border: 1px solid #ddd4c2; border-radius: 14px; background: #fff; }
 .holeResults > header { display: flex; justify-content: space-between; padding: 11px 12px; border-bottom: 1px solid #eee8de; }
 .holeResults > header strong { color: #68736e; font-size: .56rem; }
 .holeResults article { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 12px; border-bottom: 1px solid #eee8de; }
 .holeResults article:last-child { border-bottom: 0; }
-.holeResults article[data-won="true"] { background: #fffaf0; box-shadow: inset 3px 0 #c49b34; }
+.holeResults article[data-result="won"] { background: #f1f7f1; box-shadow: inset 3px 0 #5f8c6b; }
 .holeResults article > span { display: grid; gap: 2px; }
 .holeResults article > span strong { color: #17362c; font-size: .66rem; }
 .holeResults article small { color: #6d7772; font-size: .52rem; }
-.holeResults article > b { color: #66726c; font-size: .56rem; }
-.holeResults article[data-won="true"] > b { color: #8c6b20; }
+.resultBadge { display: inline-flex; align-items: center; justify-content: center; min-height: 25px; padding: 4px 8px; border: 1px solid #dce0dd; border-radius: 999px; background: #f6f7f6; color: #66726c; font-size: .51rem; white-space: nowrap; }
+.resultBadge[data-result="won"] { border-color: #b8d0bd; background: #e7f2e9; color: #356044; }
+.resultBadge[data-result="tie"] { border-color: #dfd1a6; background: #faf3dc; color: #80651f; }
 .holeResults > p { margin: 0; padding: 18px 12px; color: #6d7772; font-size: .62rem; text-align: center; }
 
 @media (max-width: 420px) {
@@ -149,6 +153,8 @@
   .summary > div:nth-child(odd) { border-left: 0; }
   .summary > div:nth-child(n + 3) { border-top: 1px solid #eee8de; }
   .row { padding-inline: 6px; }
+  .winnerSummary { gap: 5px; padding-inline: 7px; }
+  .winnerSummary strong { font-size: .8rem; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
