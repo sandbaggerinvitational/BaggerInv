@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import AssetImage from "../AssetImage";
+import PlayerAvatar from "../PlayerAvatar";
 import TeamLogoPlate from "../TeamLogoPlate";
-import { playerPhoto } from "../../lib/asset-paths";
 import {
   buildComparisonSummary,
   compareMetricValues,
@@ -90,12 +90,11 @@ function IntelligenceSection({ eyebrow, title, children, open = false }) {
 function PlayerHeader({ player }) {
   return (
     <article className={styles.playerHeader}>
-      <AssetImage
-        src={playerPhoto(player.photo)}
+      <PlayerAvatar
+        player={player}
         alt={player.name}
         className={styles.playerPhoto}
         fallbackClassName={styles.playerPhotoFallback}
-        fallback={player.name.split(" ").map((part) => part[0]).slice(0, 2).join("")}
         loading="eager"
       />
       <div className={styles.playerHeaderCopy}>

@@ -13,8 +13,7 @@ test("Me leads with the authenticated golfer and trusted tournament performance"
   ]);
 
   assert.match(profile, /className=\{styles\.playerHero\}/);
-  assert.match(profile, /playerPhoto\(profile\.photo\)/);
-  assert.match(profile, /fallback=\{initials\(profile\.name\)\}/);
+  assert.match(profile, /<PlayerAvatar player=\{profile\}/);
   assert.match(profile, /profile\.teamName/);
   assert.match(profile, /className=\{logoStyles\.logoPlate\}/);
   assert.match(profile, /data-size="small"/);

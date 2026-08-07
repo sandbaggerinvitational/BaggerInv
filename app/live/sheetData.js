@@ -681,7 +681,7 @@ async function buildTournamentData() {
         "Important Contacts": Object.keys(importantContactRows[0] || {}),
       },
     },
-    players: Object.entries(playerMap).filter(([, player]) => player.active).map(([id, player]) => ({ id, name: player.name, slug: player.slug })),
+    players: Object.entries(playerMap).filter(([, player]) => player.active).map(([id, player]) => ({ id, name: player.name, slug: player.slug, photo: player.photo })),
   };
   loaderDiagnostics.lastTiming = {
     googleSheetsReadMs: workbookReadMs,

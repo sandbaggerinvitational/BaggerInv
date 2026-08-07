@@ -4,11 +4,12 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
+import PlayerAvatar from "../PlayerAvatar";
 import MatchStatusBlock from "../MatchStatusBlock";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MatchFilterEmptyState from "./MatchFilterEmptyState";
-import { courseLogo, playerPhoto, teamLogo, tournamentLogo } from "../../lib/asset-paths";
+import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPlayerPoints, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
 import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
@@ -195,7 +196,7 @@ function OverallLeaderboard({ rows = [] }) {
       <div className={styles.overallRow} data-header="true"><span>Rank</span><span>Player</span><span>Record</span><button type="button" onClick={() => setDirection((current) => current === "desc" ? "asc" : "desc")} aria-sort={direction === "desc" ? "descending" : "ascending"}>Points <i aria-hidden="true">{direction === "desc" ? "↓" : "↑"}</i></button></div>
       {sorted.slice(0, 10).map((row) => <div className={styles.overallRow} key={row.id}>
         <strong>{ranked.get(row.id)}</strong>
-        <span className={styles.overallPlayer}><span className={styles.playerImage}><AssetImage src={playerPhoto(row.photo)} alt="" fallbackClassName={styles.playerFallback} fallback={initials(row.player)} inferFallback={false} /></span><span><b>{row.player}</b><small><Logo filename={row.teamLogo} name={row.team} size="mini" />{row.team}</small></span></span>
+        <span className={styles.overallPlayer}><span className={styles.playerImage}><PlayerAvatar filename={row.photo} name={row.player} fallbackClassName={styles.playerFallback} /></span><span><b>{row.player}</b><small><Logo filename={row.teamLogo} name={row.team} size="mini" />{row.team}</small></span></span>
         <span>{row.wins}-{row.losses}-{row.halves}</span>
         <b>{formatPlayerPoints(row.points)}</b>
       </div>)}

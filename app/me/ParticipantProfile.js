@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import AssetImage from "../AssetImage";
-import { playerPhoto, teamLogo } from "../../lib/asset-paths";
+import PlayerAvatar from "../PlayerAvatar";
+import { teamLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatPlayerPoints } from "../../lib/formatters";
 import { NOTIFICATION_CATEGORIES } from "../../lib/tournament-notifications";
 import styles from "./me.module.css";
@@ -138,7 +139,7 @@ export default function ParticipantProfile() {
   return <section className={styles.page}>
     <header className={styles.playerHero}>
       <div className={styles.photoPlate}>
-        <AssetImage src={playerPhoto(profile.photo)} alt={`${profile.name} profile photo`} className={styles.playerPhoto} fallbackClassName={styles.playerFallback} fallback={initials(profile.name)} inferFallback={false} />
+        <PlayerAvatar player={profile} alt={`${profile.name} profile photo`} className={styles.playerPhoto} fallbackClassName={styles.playerFallback} />
       </div>
       <div className={styles.heroIdentity}>
         <span>{tournament?.year ? `${tournament.year} Sandbagger` : "Player Passport"}</span>

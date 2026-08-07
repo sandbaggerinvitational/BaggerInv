@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import AssetImage from "./AssetImage";
-import { defaultAssets, playerPhoto } from "../lib/asset-paths";
+import PlayerAvatar from "./PlayerAvatar";
 import { formatPlayerPoints } from "../lib/formatters";
 import styles from "./tournament-leaderboard.module.css";
 
@@ -44,14 +43,12 @@ export function LeaderboardPlayer({ name, slug, photo, compact = false }) {
   const label = slug ? <Link href={`/players/${slug}`}>{name}</Link> : <strong>{name}</strong>;
   return <span className={styles.player} data-compact={compact ? "true" : undefined}>
     <span className={styles.avatar}>
-      <AssetImage
-        src={playerPhoto(photo) || defaultAssets.player}
-        fallbackSrc={defaultAssets.player}
-        inferFallback={false}
+      <PlayerAvatar
+        filename={photo}
+        name={name}
         alt={name}
         className={styles.avatarImage}
         fallbackClassName={styles.avatarFallback}
-        fallback="SBI"
       />
     </span>
     {label}

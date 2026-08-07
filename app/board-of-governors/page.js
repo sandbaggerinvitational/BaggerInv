@@ -2,9 +2,8 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { Header, Footer } from "../components";
-import AssetImage from "../AssetImage";
+import PlayerAvatar from "../PlayerAvatar";
 import { CompactHonors } from "../HonorBadges";
-import { playerPhoto } from "../../lib/asset-paths";
 import {
   refreshHistoricalData,
   formatHandicap,
@@ -53,12 +52,11 @@ export default async function BoardOfGovernorsPage() {
               <Link className={styles.playerCard} href={`/players/${player.slug}`} key={player["Player ID"]}>
                 <div className={styles.playerTop}>
                   <div className={styles.playerCardAvatarColumn}>
-                    <AssetImage
-                      src={playerPhoto(player["Photo Filename"])}
+                    <PlayerAvatar
+                      player={player}
                       alt={player["Display Name"]}
                       className={styles.playerCardPhoto}
                       fallbackClassName={styles.playerCardPhotoFallback}
-                      fallback={player["Display Name"].split(" ").map((part) => part[0]).slice(0, 2).join("")}
                     />
                     <b className={player.active ? styles.activeBadge : styles.inactiveBadge}>
                       {player.active ? "Active" : "Alumni"}

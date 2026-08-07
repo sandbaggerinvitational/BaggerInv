@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import ContextBackLink from "../../ContextBackLink";
-import AssetImage from "../../AssetImage";
+import PlayerAvatar from "../../PlayerAvatar";
 import { CareerHonors } from "../../HonorBadges";
 import { playerPhoto } from "../../../lib/asset-paths";
 import {
@@ -159,16 +159,11 @@ export default async function PlayerPage({ params, searchParams }) {
 
       <section className={styles.pageHero}>
         <div className={styles.profileHeader}>
-          <AssetImage
-            src={playerPhoto(player["Photo Filename"])}
+          <PlayerAvatar
+            player={player}
             alt={player["Display Name"]}
             className={styles.profilePhoto}
             fallbackClassName={styles.profilePhotoFallback}
-            fallback={player["Display Name"]
-              .split(" ")
-              .map((part) => part[0])
-              .slice(0, 2)
-              .join("")}
             loading="eager"
           />
           <div>

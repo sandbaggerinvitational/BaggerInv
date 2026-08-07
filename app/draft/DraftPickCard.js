@@ -1,17 +1,7 @@
-import AssetImage from "../AssetImage";
+import PlayerAvatar from "../PlayerAvatar";
 import TeamLogoPlate from "../TeamLogoPlate";
 import { formatHandicap } from "../../lib/formatters";
 import styles from "./draft.module.css";
-
-function initials(name) {
-  return String(name ?? "")
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase() || "SBI";
-}
 
 export default function DraftPickCard({ pick, compact = false }) {
   return (
@@ -20,13 +10,12 @@ export default function DraftPickCard({ pick, compact = false }) {
       style={{ "--draft-team": pick.team?.primaryColor || "#0b4a3a" }}
     >
       <div className={styles.pickNumber}>Pick {pick.pickNumber}</div>
-      <AssetImage
+      <PlayerAvatar
         src={pick.player.image}
+        name={pick.player.name}
         alt={pick.player.name}
         className={styles.playerImage}
         fallbackClassName={styles.playerFallback}
-        fallback={initials(pick.player.name)}
-        inferFallback={false}
       />
       <h3>{pick.player.name}</h3>
       <p>Handicap {formatHandicap(pick.player.handicap)}</p>

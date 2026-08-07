@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AssetImage from "../AssetImage";
-import { playerPhoto } from "../../lib/asset-paths";
+import PlayerAvatar from "../PlayerAvatar";
 import styles from "./calcutta.module.css";
 
 const money = (value) => Number(value || 0).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -15,7 +14,7 @@ const ordinalPlace = (value) => { const number = Number(value); if (!number) ret
 const initials = (name) => String(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
 
 function Portrait({ player, large = false }) {
-  return <span className={styles.portrait} data-large={large || undefined}><AssetImage src={playerPhoto(player?.photo)} alt="" fallbackClassName={styles.portraitFallback} fallback={initials(player?.name)} inferFallback={false} /></span>;
+  return <span className={styles.portrait} data-large={large || undefined}><PlayerAvatar player={player} fallbackClassName={styles.portraitFallback} /></span>;
 }
 
 function Hero({ model }) {
