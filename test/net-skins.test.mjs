@@ -121,7 +121,7 @@ test("Leaderboards exposes the Scramble Net Skins live experience and lazy team 
   assert.match(source, /selectedTeam \?/);
   assert.match(source, /Lost Skin \(Tie\)/);
   assert.match(source, /data-result=\{resultState\}/);
-  assert.match(source, /Current winner summary/);
+  assert.match(source, /Current competition summary/);
   assert.match(source, /Hole-by-Hole Net Skins Results/);
   assert.match(source, /Current Winnings/);
   assert.match(source, /\.join\(" & "\)/);
@@ -145,7 +145,12 @@ test("Net Skins polish exposes official summary terminology and participant high
   assert.match(css, /\.entry\[data-current="true"\]/);
   assert.match(css, /background:\s*#fffaf0/);
   assert.match(css, /inset 3px 0 #c49b34/);
-  assert.match(css, /\.winnerSummary/);
+  assert.match(source, /No Skins Yet/);
+  assert.match(source, /waitingField[\s\S]*localeCompare/);
+  assert.match(source, /skinHolders\.map\(\(row\) => renderEntry\(row, true\)\)/);
+  assert.match(source, /ranked \? rankLabel\(row\) : ""/);
+  assert.match(css, /\.noSkinsDivider/);
+  assert.match(css, /\.sheetMetrics\[data-winning="true"\]/);
   assert.match(css, /\.resultBadge\[data-result="won"\]/);
   assert.match(css, /\.holeResults article\[data-result="won"\]/);
 });
