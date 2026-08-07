@@ -15,6 +15,7 @@ import {
   tournamentYear,
 } from "../../lib/tournament-identifiers";
 import { getStrokesOnHole } from "../../lib/scorecard-net";
+import { grossScoresFromCell } from "../../lib/live-score-values";
 import { resolveSpreadsheetId } from "../../lib/spreadsheet-environment";
 import { formatHomeTime } from "../../lib/home-dashboard";
 import { mergeRowsByStableMatchId } from "../../lib/live-match-source";
@@ -139,12 +140,7 @@ function displayFormat(code) {
 }
 
 function scoreArray(value) {
-  try {
-    const parsed = JSON.parse(clean(value) || "[]");
-    return Array.isArray(parsed) ? parsed.map(number).filter((item) => item !== null) : [];
-  } catch {
-    return [];
-  }
+  return grossScoresFromCell(value).map(number).filter((item) => item !== null);
 }
 
 function buildScoreLeaderboard(holeScores, matchMap, courseHoles, playerMap) {

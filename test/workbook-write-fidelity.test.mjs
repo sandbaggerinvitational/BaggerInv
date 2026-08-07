@@ -36,6 +36,12 @@ test("numeric fields reject apostrophe-prefixed text instead of silently storing
   assert.throws(() => normalizeWorkbookWriteValue("Calcutta Ownership", "Ownership %", "'50"), /apostrophe-prefixed text/);
 });
 
+test("Live Hole Scores accept only native scalar or structured numeric values", () => {
+  assert.equal(normalizeWorkbookWriteValue("Live Hole Scores", "Team 1 Gross Scores", 3), 3);
+  assert.equal(normalizeWorkbookWriteValue("Live Hole Scores", "Team 1 Gross Scores", [4, 5]), "[4,5]");
+  assert.throws(() => normalizeWorkbookWriteValue("Live Hole Scores", "Team 1 Gross Scores", "3"), /native numeric score values/);
+});
+
 test("every shared batch-write path applies native value normalization while retaining RAW formula safety", async () => {
   const source = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
   assert.match(source, /values: \[\[normalizeWorkbookWriteValue\(tab, header, value\)\]\]/);

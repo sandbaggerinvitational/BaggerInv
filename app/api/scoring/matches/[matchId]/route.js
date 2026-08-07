@@ -7,6 +7,8 @@ import {
   validateParticipantSession,
 } from "../../../../../lib/google-sheets-write.js";
 import { clientAddress, consumeRateLimit } from "../../../../../lib/rate-limit.js";
+import { normalizeLiveScoringRequest } from "../../../../../lib/live-score-values.js";
+import { logScoringFailure, participantScoringError } from "../../../../../lib/scoring-api-errors.js";
 
 export const dynamic = "force-dynamic";
 
@@ -45,15 +47,17 @@ export async function POST(request, { params }) {
         }
       );
     }
-    const input = await request.json();
+    const submitted = await request.json();
+    const input = submitted.action === "confirm" ? submitted : normalizeLiveScoringRequest(submitted);
     const result = input.action === "confirm"
       ? await confirmLiveMatchScorecard(matchId, current.scorerName || "Authorized scorer")
       : await saveLiveHoleScore(matchId, input, current.scorerName || "Authorized scorer");
     return NextResponse.json({ result });
   } catch (error) {
     const conflict = /updated by someone else/i.test(error?.message || "");
+    logScoringFailure(error, { route: "/api/scoring/matches/[matchId]", conflict });
     return NextResponse.json(
-      { error: error?.message || "Unable to save the hole." },
+      { error: participantScoringError(error) },
       { status: conflict ? 409 : 400 }
     );
   }

@@ -8,19 +8,13 @@ import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatStatusLabel } from "../../lib/formatters";
 import { holeStory, liveProgressLabel, segmentMatchResult } from "../../lib/game-center-display";
 import { runningMatchStatusAtHole } from "../../lib/scoring-experience";
+import { grossScoresFromCell } from "../../lib/live-score-values";
 import styles from "./game-center.module.css";
 
 const clean = (value) => String(value ?? "").trim();
 const hasValue = (value) => value !== null && value !== undefined && clean(value) !== "";
 const initials = (value) => clean(value || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
-const jsonScores = (value) => {
-  try {
-    const scores = JSON.parse(value || "[]");
-    return Array.isArray(scores) ? scores : [];
-  } catch {
-    return [];
-  }
-};
+const jsonScores = grossScoresFromCell;
 
 function Logo({ filename, name, type = "team", size = "medium", tournamentYear }) {
   const fallbackTournament = tournamentLogo(`sandbagger-${tournamentYear}`);

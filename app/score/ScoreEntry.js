@@ -6,14 +6,13 @@ import { finalizedMatchResult, formatLiveMatchResult, formatOfficialMatchResult 
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-experience.js";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
+import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
 import styles from "./score.module.css";
 
-const jsonScores = (value) => {
-  try { return JSON.parse(value || "[]"); } catch { return []; }
-};
+const jsonScores = grossScoresFromCell;
 function playerIds(match, side) {
   return [match[`Team ${side} Player 1`], match[`Team ${side} Player 2`]].filter(Boolean);
 }
@@ -288,7 +287,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
 
   const setScore = (side, index, value) => setGross((current) => {
     const next = [...current[side]];
-    next[index] = value;
+    next[index] = normalizeLiveScoreInput(value);
     return { ...current, [side]: next };
   });
 
