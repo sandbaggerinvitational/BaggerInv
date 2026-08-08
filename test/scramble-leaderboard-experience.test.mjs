@@ -30,7 +30,7 @@ test("Scramble pairing details use the shared summary sheet and canonical scorec
     readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/LeaderboardRow.js", import.meta.url), "utf8"),
   ]);
-  for (const label of ["Team Members", "Scramble Pairing"]) assert.match(source, new RegExp(label));
+  assert.match(source, /Scramble Pairing/);
   for (const label of ["Current Rank", "Final Rank", "Gross Score", "Net Score", "View Scorecard"]) assert.match(shared, new RegExp(label));
   assert.match(source, /matchForPairing\(row, matches\)/);
   assert.doesNotMatch(source, /row\.scorecard|Hole-by-Hole Scoring/);

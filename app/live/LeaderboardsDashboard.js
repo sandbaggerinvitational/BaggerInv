@@ -58,16 +58,21 @@ function Controls({ rounds, selectedRound, onRound }) {
   </nav>;
 }
 
-function OverallPlayerSheet({ row, roundLeaderboards = {}, complete, onClose }) {
-  const roundResults = [1, 2, 3].map((round) => ({ round, result: (roundLeaderboards[round] || []).find((item) => item.id === row.id) }));
-  return <LeaderboardDetailSheet title="Overall Player" identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} large />} context={{ primary: row.team, secondary: "Tournament Team" }} status={complete ? "Final" : "Live"} metrics={[
+function formatName(value) {
+  const format = clean(value).toUpperCase();
+  return format === "SC" || format === "SCRAMBLE" ? "Scramble" : format === "SI" || format === "SINGLES" ? "Singles" : "Best Ball";
+}
+
+function OverallPlayerSheet({ row, rounds = [], roundLeaderboards = {}, complete, onClose }) {
+  const roundResults = rounds.map((round) => ({ round, result: (roundLeaderboards[round.number] || []).find((item) => item.id === row.id) }));
+  return <LeaderboardDetailSheet title="Overall Player" identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} large />} status={complete ? "Final" : "Live"} metrics={[
     { label: complete ? "Final Rank" : "Current Rank", value: row.displayRank },
     { label: "Overall Record", value: row.record },
     { label: "Points", value: formatPlayerPoints(row.points), featured: true },
     { label: "Gross Average", value: row.grossAvg !== null ? average(row.grossAvg) : "—" },
     { label: "Net Average", value: row.netAvg !== null ? average(row.netAvg) : "—" },
   ]} onClose={onClose}>
-    <section className={leaderboardStyles.roundBreakdown}><header><span>Round Breakdown</span><small>Official record and points</small></header>{roundResults.map(({ round, result }) => <article key={round}><strong>Round {round}</strong><span>{result ? `${result.wins}-${result.losses}-${result.halves}` : "Not available"}</span><b>{result ? `${formatPlayerPoints(result.points)} pts` : "—"}</b></article>)}</section>
+    <section className={leaderboardStyles.roundBreakdown}><header><span>Round Breakdown</span><small>Official record and points</small></header>{roundResults.map(({ round, result }) => <article key={round.number}><strong>{round.label} • {formatName(round.format)}</strong><span><small>Record</small>{result ? `${result.wins}-${result.losses}-${result.halves}` : "0-0-0"}</span><b><small>Points</small>{result ? formatPlayerPoints(result.points) : formatPlayerPoints(0)}</b></article>)}</section>
   </LeaderboardDetailSheet>;
 }
 
@@ -99,32 +104,33 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
           const isCurrent = currentPlayer?.id === row.id;
           return <LeaderboardEntry rank={row.displayRank} current={isCurrent} state={complete ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} current={isCurrent} />} metrics={<LeaderboardMetrics variant="overall" metrics={[{ label: "Record", value: row.record }, { label: availableMetrics.find(([key]) => key === metric)?.[1] || "Points", value: metricValue(row, metric), emphasis: complete ? "final" : "live" }]} />} label={`${row.player}, rank ${row.displayRank || "unranked"}, record ${row.record}, ${metricValue(row, metric)}${isCurrent ? ", your position" : ""}`} onClick={() => setSelectedId(row.id)} key={row.id} />;
         })}</div>
-        {selected ? <OverallPlayerSheet row={selected} roundLeaderboards={data.roundLeaderboards || {}} complete={complete} onClose={() => setSelectedId("")} /> : null}
+        {selected ? <OverallPlayerSheet row={selected} rounds={data.rounds || []} roundLeaderboards={data.roundLeaderboards || {}} complete={complete} onClose={() => setSelectedId("")} /> : null}
       </section>}
   </>;
 }
 
-function RoundPlayers({ data, selectedRound }) {
+function RoundPlayers({ data, selectedRound, currentPlayer }) {
   const round = data.rounds.find((item) => String(item.number) === selectedRound);
   const [sort, setSort] = useState({ key: "netToPar", direction: "asc" });
   const [selectedId, setSelectedId] = useState("");
   const rows = useMemo(() => roundScoreRows(data.scoreLeaderboard || [], round?.number, round?.format, sort), [data.scoreLeaderboard, round, sort]);
   const selected = rows.find((row) => row.id === selectedId);
   const selectedMatch = selected ? (round?.matches || []).find((match) => [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => String(player.id) === String(selected.id))) : null;
+  const selectedTeam = selected ? (data.leaderboard || []).find((player) => String(player.id) === String(selected.id))?.team : "";
   const pairing = ["SC", "SCRAMBLE"].includes(clean(round?.format).toUpperCase());
   const roundContext = [round?.label, round?.course?.name].filter(Boolean).join(" · ");
   const returnTo = `/live?view=leaderboards&tab=players&round=${encodeURIComponent(selectedRound)}`;
-  if (pairing) return <ScrambleLeaderboard rows={data.scoreLeaderboard || []} round={round?.number} players={data.players || []} matches={round?.matches || []} eyebrow={roundContext || "Round 2"} roundLabel={round?.label} courseName={round?.course?.name} returnTo={returnTo} />;
+  if (pairing) return <ScrambleLeaderboard rows={data.scoreLeaderboard || []} round={round?.number} players={data.players || []} matches={round?.matches || []} currentPlayerId={currentPlayer?.id} eyebrow={roundContext || "Round 2"} roundLabel={round?.label} courseName={round?.course?.name} returnTo={returnTo} />;
   const select = (key) => setSort((current) => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
   const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"]];
   const complete = rows.length > 0 && rows.every((row) => Number(row.holes) >= 18);
   return <section className={leaderboardStyles.board} aria-label={`${round?.label || "Round"} player leaderboard`}>
     <header><span><small>{roundContext}</small><h2>{clean(round?.format).toUpperCase() === "SI" ? "Singles Player Leaderboard" : "Best Ball Player Leaderboard"}</h2></span>{rows.length ? <StatusBadge status={complete ? "Final" : "Live"} /> : null}</header>
-    {!rows.length ? <div className={leaderboardStyles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <>
+    {!rows.length ? <div className={leaderboardStyles.empty}><strong>{(round?.matches || []).length ? "Scores pending." : "Round not started."}</strong><span>{(round?.matches || []).length ? "The leaderboard will update as official scores are recorded." : "Pairings and scores will appear when the round opens."}</span></div> : <>
       <LeaderboardColumnHeader columns={columns.map(([key, label]) => ({ key, label }))} sort={sort} onSelect={select} label={`Sort ${round?.label || "round"} player leaderboard`} />
-      <div className={leaderboardStyles.entries}>{rows.map((row) => { const final = Number(row.holes) >= 18; return <LeaderboardEntry rank={row.displayRank} state={final ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.name, photo: row.photo }} />} metrics={<LeaderboardMetrics metrics={[{ label: "THRU", value: final ? "F" : row.holes, emphasis: final ? "" : "live" }, { label: "Gross", value: row.gross, secondary: !final }, { label: "Net", value: row.net, emphasis: final ? "final" : "live" }, { label: "Net +/-", value: toPar(row.netToPar), emphasis: "live" }]} />} onClick={() => setSelectedId(row.id)} label={`Open ${row.name}, rank ${row.displayRank}, ${final ? "final" : `through ${row.holes}`}, net ${row.net}, ${toPar(row.netToPar)}`} key={`${row.round}-${row.id}`} />; })}</div>
+      <div className={leaderboardStyles.entries}>{rows.map((row) => { const final = Number(row.holes) >= 18; const isCurrent = String(currentPlayer?.id || "") === String(row.id); return <LeaderboardEntry rank={row.displayRank} current={isCurrent} state={final ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.name, photo: row.photo }} current={isCurrent} />} metrics={<LeaderboardMetrics metrics={[{ label: "THRU", value: final ? "F" : row.holes, emphasis: final ? "" : "live" }, { label: "Gross", value: row.gross, secondary: !final }, { label: "Net", value: row.net, emphasis: final ? "final" : "live" }, { label: "Net +/-", value: toPar(row.netToPar), emphasis: "live" }]} />} onClick={() => setSelectedId(row.id)} label={`Open ${row.name}, rank ${row.displayRank}, ${final ? "final" : `through ${row.holes}`}, net ${row.net}, ${toPar(row.netToPar)}${isCurrent ? ", your position" : ""}`} key={`${row.round}-${row.id}`} />; })}</div>
     </>}
-    {selected ? <RoundLeaderboardSheet title={clean(round?.format).toUpperCase() === "SI" ? "Singles Player" : "Best Ball Player"} identity={<PlayerLeaderboardIdentity player={{ name: selected.name, photo: selected.photo }} large />} roundLabel={round?.label} formatLabel={clean(round?.format).toUpperCase() === "SI" ? "Singles" : "Best Ball"} courseName={round?.course?.name} rank={selected.displayRank} holes={selected.holes} gross={selected.gross} net={selected.net} netToPar={toPar(selected.netToPar)} matchId={selectedMatch?.id} returnTo={returnTo} onClose={() => setSelectedId("")} /> : null}
+    {selected ? <RoundLeaderboardSheet title={clean(round?.format).toUpperCase() === "SI" ? "Singles Player" : "Best Ball Player"} identity={<PlayerLeaderboardIdentity player={{ name: selected.name, photo: selected.photo }} team={selectedTeam} large />} roundLabel={round?.label} formatLabel={clean(round?.format).toUpperCase() === "SI" ? "Singles" : "Best Ball"} courseName={round?.course?.name} rank={selected.displayRank} holes={selected.holes} gross={selected.gross} net={selected.net} netToPar={toPar(selected.netToPar)} matchId={selectedMatch?.id} returnTo={returnTo} onClose={() => setSelectedId("")} /> : null}
   </section>;
 }
 
@@ -409,11 +415,11 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
   </div></section>;
   return <section className={styles.page}>
     <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
-    <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Individual, team, and round standings</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
+    <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Player, team, round standings, and Championship projections.</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
     <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["skins", "Net Skins"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
     {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
-    {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} /> : null}
+    {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "skins" ? <NetSkinsBoard data={data} currentPlayer={currentPlayer} /> : null}
     {tab === "insights" ? <Insights data={data} previewMode={previewMode} /> : null}

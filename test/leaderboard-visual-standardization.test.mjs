@@ -20,8 +20,9 @@ test("leaderboard headers and rows share one responsive column grid", async () =
 test("Overall uses the shared centered detail sheet and complete round breakdown", async () => {
   const source = await read("app/live/LeaderboardsDashboard.js");
   assert.match(source, /<LeaderboardDetailSheet title="Overall Player"/);
-  for (const label of ["Tournament Team", "Overall Record", "Points", "Gross Average", "Net Average", "Round Breakdown"]) assert.match(source, new RegExp(label));
-  assert.match(source, /\[1, 2, 3\]\.map/);
+  for (const label of ["Overall Record", "Points", "Gross Average", "Net Average", "Round Breakdown"]) assert.match(source, new RegExp(label));
+  assert.match(source, /team=\{row\.team\}/);
+  assert.match(source, /rounds\.map/);
   assert.doesNotMatch(source, /className=\{leaderboardStyles\.details\}><PlayerDetails/);
 });
 
@@ -34,6 +35,7 @@ test("all round sheets share context, status, metric cards, and canonical scorec
   assert.match(shared, /View Scorecard/);
   assert.match(dashboard, /formatLabel=\{clean\(round\?\.format\).*"Singles" : "Best Ball"\}/);
   assert.match(scramble, /formatLabel="Scramble"/);
+  assert.doesNotMatch(scramble, />Team Members</);
   assert.doesNotMatch(scramble, /Hole-by-Hole Scoring|row\.scorecard/);
 });
 

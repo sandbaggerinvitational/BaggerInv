@@ -26,12 +26,19 @@ export function LeaderboardDetailSheet({ title, identity, context, status, metri
     <section className={styles.sheet} role="dialog" aria-modal="true" aria-labelledby="leaderboard-detail-subject">
       <header><span>{title}</span><button type="button" onClick={onClose} aria-label={`Close ${title} details`}>×</button></header>
       <div className={styles.sheetIdentity} id="leaderboard-detail-subject">{identity}</div>
-      {context ? <div className={styles.sheetContext}><span><strong>{context.primary}</strong>{context.secondary ? <small>{context.secondary}</small> : null}</span>{status ? <StatusBadge status={status} /> : null}</div> : null}
+      {context || status ? <div className={styles.sheetContext}><span>{context?.primary ? <strong>{context.primary}</strong> : null}{context?.secondary ? <small>{context.secondary}</small> : null}</span>{status ? <StatusBadge status={status} /> : null}</div> : null}
       <section className={styles.sheetMetrics} aria-label={`${title} summary`}>{metrics.map((metric) => <p data-featured={metric.featured || undefined} key={metric.label}><small>{metric.label}</small><strong>{metric.value}</strong></p>)}</section>
       {children}
       {action}
     </section>
   </div>;
+}
+
+function netPerformanceSummary(netToPar, final) {
+  const value = String(netToPar).trim().toUpperCase() === "E" ? 0 : Number(netToPar);
+  if (!Number.isFinite(value)) return "";
+  const position = value === 0 ? "even par net" : `${Math.abs(value)} ${value < 0 ? "under" : "over"} net`;
+  return `${final ? "Finished" : "Currently playing"} ${position}.`;
 }
 
 export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, matchId, returnTo = "/live?view=leaderboards", onClose }) {
@@ -43,7 +50,7 @@ export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel
     { label: "Gross Score", value: gross },
     { label: "Net Score", value: net },
     { label: "Net +/-", value: netToPar, featured: true },
-  ]} action={scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null} onClose={onClose} />;
+  ]} action={<>{netPerformanceSummary(netToPar, final) ? <p className={styles.performanceSummary}>{netPerformanceSummary(netToPar, final)}</p> : null}{scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null}</>} onClose={onClose} />;
 }
 
 export function LeaderboardMetrics({ metrics = [], variant = "round" }) {
