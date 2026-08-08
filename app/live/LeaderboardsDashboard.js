@@ -9,7 +9,7 @@ import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import TournamentIntelligenceStorylines from "./TournamentIntelligenceStorylines";
 import ScrambleLeaderboard from "./ScrambleLeaderboard";
 import ScrambleTeamIdentity from "./ScrambleTeamIdentity";
-import { LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity } from "./LeaderboardRow";
+import { LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity, RoundLeaderboardSheet } from "./LeaderboardRow";
 import { teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import { publishedOddsInsights } from "../../lib/championship-odds-insights";
@@ -110,10 +110,14 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
 function RoundPlayers({ data, selectedRound }) {
   const round = data.rounds.find((item) => String(item.number) === selectedRound);
   const [sort, setSort] = useState({ key: "netToPar", direction: "asc" });
+  const [selectedId, setSelectedId] = useState("");
   const rows = useMemo(() => roundScoreRows(data.scoreLeaderboard || [], round?.number, round?.format, sort), [data.scoreLeaderboard, round, sort]);
+  const selected = rows.find((row) => row.id === selectedId);
+  const selectedMatch = selected ? (round?.matches || []).find((match) => [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => String(player.id) === String(selected.id))) : null;
   const pairing = ["SC", "SCRAMBLE"].includes(clean(round?.format).toUpperCase());
   const roundContext = [round?.label, round?.course?.name].filter(Boolean).join(" · ");
-  if (pairing) return <ScrambleLeaderboard rows={data.scoreLeaderboard || []} round={round?.number} players={data.players || []} eyebrow={roundContext || "Round 2"} />;
+  const returnTo = `/live?view=leaderboards&tab=players&round=${encodeURIComponent(selectedRound)}`;
+  if (pairing) return <ScrambleLeaderboard rows={data.scoreLeaderboard || []} round={round?.number} players={data.players || []} matches={round?.matches || []} eyebrow={roundContext || "Round 2"} returnTo={returnTo} />;
   const select = (key) => setSort((current) => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
   const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"]];
   const complete = rows.length > 0 && rows.every((row) => Number(row.holes) >= 18);
@@ -121,8 +125,9 @@ function RoundPlayers({ data, selectedRound }) {
     <header><span><small>{roundContext}</small><h2>{clean(round?.format).toUpperCase() === "SI" ? "Singles Player Leaderboard" : "Best Ball Player Leaderboard"}</h2></span>{rows.length ? <StatusBadge status={complete ? "Final" : "Live"} /> : null}</header>
     {!rows.length ? <div className={leaderboardStyles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <>
       <div className={leaderboardStyles.sorts} role="group" aria-label={`Sort ${round?.label || "round"} player leaderboard`}>{columns.map(([key, label]) => <button type="button" onClick={() => select(key)} aria-pressed={sort.key === key} aria-label={key === "netToPar" ? "Net score relative to par" : label} key={key}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
-      <div className={leaderboardStyles.entries}>{rows.map((row) => { const final = Number(row.holes) >= 18; return <LeaderboardEntry rank={row.displayRank} state={final ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.name, photo: row.photo }} />} metrics={<LeaderboardMetrics metrics={[{ label: "THRU", value: final ? "F" : row.holes, emphasis: final ? "" : "live" }, { label: "Gross", value: row.gross, secondary: !final }, { label: "Net", value: row.net, emphasis: final ? "final" : "live" }, { label: "Net +/-", value: toPar(row.netToPar), emphasis: "live" }]} />} key={`${row.round}-${row.id}`} />; })}</div>
+      <div className={leaderboardStyles.entries}>{rows.map((row) => { const final = Number(row.holes) >= 18; return <LeaderboardEntry rank={row.displayRank} state={final ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.name, photo: row.photo }} />} metrics={<LeaderboardMetrics metrics={[{ label: "THRU", value: final ? "F" : row.holes, emphasis: final ? "" : "live" }, { label: "Gross", value: row.gross, secondary: !final }, { label: "Net", value: row.net, emphasis: final ? "final" : "live" }, { label: "Net +/-", value: toPar(row.netToPar), emphasis: "live" }]} />} onClick={() => setSelectedId(row.id)} label={`Open ${row.name}, rank ${row.displayRank}, ${final ? "final" : `through ${row.holes}`}, net ${row.net}, ${toPar(row.netToPar)}`} key={`${row.round}-${row.id}`} />; })}</div>
     </>}
+    {selected ? <RoundLeaderboardSheet title={clean(round?.format).toUpperCase() === "SI" ? "Singles Player" : "Best Ball Player"} identity={<PlayerLeaderboardIdentity player={{ name: selected.name, photo: selected.photo }} large />} rank={selected.displayRank} holes={selected.holes} gross={selected.gross} net={selected.net} netToPar={toPar(selected.netToPar)} matchId={selectedMatch?.id} returnTo={returnTo} onClose={() => setSelectedId("")} /> : null}
   </section>;
 }
 

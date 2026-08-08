@@ -4,34 +4,26 @@ import { useMemo, useState } from "react";
 import StatusBadge from "../StatusBadge";
 import { roundScoreRows } from "../../lib/mobile-leaderboards";
 import ScrambleTeamIdentity, { scrambleTeamName } from "./ScrambleTeamIdentity";
-import { LeaderboardEntry, LeaderboardMetrics } from "./LeaderboardRow";
+import { LeaderboardEntry, LeaderboardMetrics, RoundLeaderboardSheet } from "./LeaderboardRow";
 import styles from "./scramble-leaderboard.module.css";
 
 const toPar = (value) => Number(value) === 0 ? "E" : Number(value) > 0 ? `+${value}` : String(value);
 const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"]];
 
-function PairingSheet({ row, players, onClose }) {
-  const name = scrambleTeamName(row.playerIds, players);
-  const final = Number(row.holes) >= 18;
-  const scorecard = [...(row.scorecard || [])].sort((a, b) => Number(a.hole) - Number(b.hole));
-  return <div className={styles.sheetLayer} role="presentation">
-    <button type="button" className={styles.backdrop} onClick={onClose} aria-label="Close Scramble pairing details" />
-    <section className={styles.sheet} role="dialog" aria-modal="true" aria-labelledby="scramble-pairing-name">
-      <header><span>Scramble Pairing</span><button type="button" onClick={onClose} aria-label="Close Scramble pairing details">×</button></header>
-      <div className={styles.sheetIdentity}><ScrambleTeamIdentity playerIds={row.playerIds} players={players} large /><div><small>Team Members</small><h3 id="scramble-pairing-name">{name}</h3></div></div>
-      <section className={styles.sheetMetrics} aria-label="Scramble pairing summary">
-        <p><small>Current Rank</small><strong>{row.displayRank}</strong></p>
-        <p><small>THRU</small><strong>{final ? "F" : row.holes}</strong></p>
-        <p><small>Gross Score</small><strong>{row.gross}</strong></p>
-        <p><small>Net Score</small><strong>{row.net}</strong></p>
-        <p><small>Net +/-</small><strong>{toPar(row.netToPar)}</strong></p>
-      </section>
-      {scorecard.length ? <section className={styles.holes}><header><small>Hole-by-Hole Scoring</small><strong>{scorecard.length} of 18</strong></header>{scorecard.map((hole) => <article key={`${hole.match}-${hole.hole}`}><strong>Hole {hole.hole}</strong><span><small>Gross</small><b>{hole.gross}</b></span><span><small>Net</small><b>{hole.net}</b></span></article>)}</section> : null}
-    </section>
-  </div>;
+function matchForPairing(row, matches) {
+  return matches.find((match) => row.id.startsWith(`${match.id}:team-`)) || matches.find((match) => {
+    const ids = [...(match.team1Players || []), ...(match.team2Players || [])].map((player) => String(player.id));
+    return row.playerIds.every((id) => ids.includes(String(id)));
+  });
 }
 
-export default function ScrambleLeaderboard({ rows = [], round, players = [], eyebrow = "Round Leaderboard" }) {
+function PairingSheet({ row, players, matches, returnTo, onClose }) {
+  const name = scrambleTeamName(row.playerIds, players);
+  const match = matchForPairing(row, matches);
+  return <RoundLeaderboardSheet title="Scramble Pairing" identity={<><ScrambleTeamIdentity playerIds={row.playerIds} players={players} large /><div><small>Team Members</small><h3>{name}</h3></div></>} rank={row.displayRank} holes={row.holes} gross={row.gross} net={row.net} netToPar={toPar(row.netToPar)} matchId={match?.id} returnTo={returnTo} onClose={onClose} />;
+}
+
+export default function ScrambleLeaderboard({ rows = [], round, players = [], matches = [], eyebrow = "Round Leaderboard", returnTo = "/live?view=leaderboards&tab=players&round=2" }) {
   const [sort, setSort] = useState({ key: "netToPar", direction: "asc" });
   const [selectedId, setSelectedId] = useState("");
   const ranked = useMemo(() => roundScoreRows(rows, round, "SC", sort), [rows, round, sort]);
@@ -48,6 +40,6 @@ export default function ScrambleLeaderboard({ rows = [], round, players = [], ey
         return <LeaderboardEntry rank={row.displayRank} identity={<ScrambleTeamIdentity playerIds={row.playerIds} players={players} />} metrics={<LeaderboardMetrics metrics={[{ label: "THRU", value: final ? "F" : row.holes, emphasis: final ? "" : "live" }, { label: "Gross", value: row.gross, secondary: true }, { label: "Net", value: row.net, emphasis: final ? "final" : "live" }, { label: "Net +/-", value: toPar(row.netToPar), emphasis: "live" }]} />} state={final ? "final" : "live"} onClick={() => setSelectedId(row.id)} label={`Open ${name}, rank ${row.displayRank}, ${final ? "final" : `through ${row.holes}`}, net ${row.net}, ${toPar(row.netToPar)}`} key={`${row.round}-${row.id}`} />;
       })}</div>
     </>}
-    {selected ? <PairingSheet row={selected} players={players} onClose={() => setSelectedId("")} /> : null}
+    {selected ? <PairingSheet row={selected} players={players} matches={matches} returnTo={returnTo} onClose={() => setSelectedId("")} /> : null}
   </section>;
 }

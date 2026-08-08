@@ -181,7 +181,8 @@ test("Scramble leaderboard creates one shared pairing row while other formats re
   assert.match(dataSource, /entityType: format === "SC" \? "PAIRING" : "PLAYER"/);
   assert.match(scrambleSource, /Scramble Pairing Leaderboard/);
   assert.match(scrambleSource, /<ScrambleTeamIdentity/);
-  assert.match(scrambleSource, /Hole-by-Hole Scoring/);
+  assert.match(scrambleSource, /<RoundLeaderboardSheet/);
+  assert.doesNotMatch(scrambleSource, /Hole-by-Hole Scoring/);
   assert.match(source, /const pairing = format === "Scramble" \|\| format === "SC"/);
 });
 
@@ -191,7 +192,7 @@ test("Overall uses official points and record standings instead of cumulative st
   assert.match(source, /Individual Points & Record/);
   for (const label of ["Rank", "Player", "Record", "Points"]) assert.match(source, new RegExp(`>${label}(?: <|<)`));
   assert.match(source, /<OverallLeaderboard rows=\{data\?\.leaderboard \|\| \[\]\} \/>/);
-  assert.match(source, /<ScoreLeaderboard rows=\{data\?\.scoreLeaderboard \|\| \[\]\} round=\{activeRound\?\.number\} format=\{activeRound\?\.format\} players=\{data\?\.players \|\| \[\]\} \/>/);
+  assert.match(source, /<ScoreLeaderboard rows=\{data\?\.scoreLeaderboard \|\| \[\]\} round=\{activeRound\?\.number\} format=\{activeRound\?\.format\} players=\{data\?\.players \|\| \[\]\} matches=\{activeRound\?\.matches \|\| \[\]\} \/>/);
   assert.doesNotMatch(source.slice(source.indexOf("function OverallLeaderboard"), source.indexOf("export default function")), /gross|netToPar|cumulative/i);
 });
 

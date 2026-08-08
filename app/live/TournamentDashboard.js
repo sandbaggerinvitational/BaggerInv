@@ -142,7 +142,7 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
   </section>;
 }
 
-function ScoreLeaderboard({ rows = [], round, format, players = [] }) {
+function ScoreLeaderboard({ rows = [], round, format, players = [], matches = [] }) {
   const [sort, setSort] = useState({ key: "netToPar", direction: "asc" });
   const eligible = useMemo(() => rows.filter((row) => row.holes && (!round || Number(row.round) === Number(round))), [rows, round]);
   const sorted = useMemo(() => [...eligible].sort((a, b) => {
@@ -161,7 +161,7 @@ function ScoreLeaderboard({ rows = [], round, format, players = [] }) {
     });
     return map;
   }, [sort.key, sorted]);
-  if (pairing) return <ScrambleLeaderboard rows={rows} round={round} players={players} />;
+  if (pairing) return <ScrambleLeaderboard rows={rows} round={round} players={players} matches={matches} returnTo="/live?view=tournament" />;
   return <section className={styles.leaderboard}>
     <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{eligible.length ? <StatusBadge status="Live" /> : null}</header>
     {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>
@@ -285,7 +285,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
     })}{!visibleRounds.length ? <div className={styles.empty} data-empty-reason={overallEmptyState.reason} role="status"><strong>{overallEmptyState.title}</strong><span>{overallEmptyState.detail}</span></div> : null}</div>
     {selectedRound === "overall"
       ? <OverallLeaderboard rows={data?.leaderboard || []} />
-      : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} format={activeRound?.format} players={data?.players || []} />}
+      : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} format={activeRound?.format} players={data?.players || []} matches={activeRound?.matches || []} />}
     </>}
   </section>;
 }

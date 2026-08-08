@@ -25,11 +25,16 @@ test("Scramble rows prioritize team identity and retain every official competiti
   assert.match(source, /Number\(row\.holes\) >= 18/);
 });
 
-test("Scramble pairing details use existing scorecard data and add no workbook access", async () => {
-  const source = await readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8");
-  for (const label of ["Team Members", "Current Rank", "Gross Score", "Net Score", "Hole-by-Hole Scoring"]) assert.match(source, new RegExp(label));
-  assert.match(source, /row\.scorecard \|\| \[\]/);
-  assert.doesNotMatch(source, /fetch\(|google|workbook|spreadsheet/i);
+test("Scramble pairing details use the shared summary sheet and canonical scorecard route", async () => {
+  const [source, shared] = await Promise.all([
+    readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/LeaderboardRow.js", import.meta.url), "utf8"),
+  ]);
+  for (const label of ["Team Members", "Scramble Pairing"]) assert.match(source, new RegExp(label));
+  for (const label of ["Current Rank", "Final Rank", "Gross Score", "Net Score", "View Scorecard"]) assert.match(shared, new RegExp(label));
+  assert.match(source, /matchForPairing\(row, matches\)/);
+  assert.doesNotMatch(source, /row\.scorecard|Hole-by-Hole Scoring/);
+  assert.doesNotMatch(`${source}\n${shared}`, /fetch\(|google|workbook|spreadsheet/i);
 });
 
 test("Scramble leaderboard remains mobile stacked without horizontal scrolling", async () => {
