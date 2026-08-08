@@ -125,7 +125,7 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
     </div>
     {!ranked.length ? <div className={styles.empty}><strong>No players match this search.</strong><span>Clear the search to see the tournament standings.</span></div> :
       <section className={leaderboardStyles.board} aria-label={metric === "points" ? "Official player standings" : `${availableMetrics.find(([key]) => key === metric)?.[1]} performance standings`}>
-        <header><span><small>Overall</small><h2>Player Leaderboard</h2></span><StatusBadge status={complete ? "Final" : "Live"} /></header>
+        <header><span><small>Overall</small><h2>Player Leaderboard</h2></span></header>
         <LeaderboardColumnHeader variant="overall" columns={[{ key: "record", label: "Record", sortable: false }, { key: metric, label: availableMetrics.find(([key]) => key === metric)?.[1] || "Points" }]} sort={{ key: metric, direction: direction || "desc" }} onSelect={changeSort} label="Overall player leaderboard columns" />
         <div className={leaderboardStyles.entries}>{ranked.map((row) => {
           const isCurrent = currentPlayer?.id === row.id;

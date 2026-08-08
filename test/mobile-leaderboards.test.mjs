@@ -375,6 +375,17 @@ test("Team Summary owns responsive round rows without duplicating global status"
   assert.match(teamStyles, /@media \(max-width: 340px\) \{[\s\S]*\.teamRoundHeader \{ grid-template-columns: minmax\(0, 1fr\); \}/);
 });
 
+test("Overall Players delegates global status to the shared Tournament Hero", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  const overallStart = source.indexOf("function OverallPlayers");
+  const roundStart = source.indexOf("function RoundPlayers", overallStart);
+  const overall = source.slice(overallStart, roundStart);
+  assert.match(overall, /<small>Overall<\/small><h2>Player Leaderboard<\/h2>/);
+  assert.doesNotMatch(overall, /<small>Overall<\/small><h2>Player Leaderboard<\/h2><\/span><StatusBadge/);
+  assert.match(source, /<TournamentIdentityHeader[^>]*status=\{tournament\.status\}/);
+  assert.match(source.slice(roundStart), /<StatusBadge status=\{complete \? "Final" : "Live"\}/);
+});
+
 test("Team result groups use section-level hierarchy above unchanged match cards", async () => {
   const teamStyles = await readFile(new URL("../app/live/teams-leaderboard.module.css", import.meta.url), "utf8");
   assert.match(teamStyles, /\.teamResultGroup \{[^}]*gap: 10px;[^}]*padding-top: 5px;/s);
