@@ -56,3 +56,23 @@ test("Singles recap exposes Overall only and keeps unfinished matches in progres
   assert.deepEqual(live.groups.inProgress[0].segments, [{ label: "Overall", points: null }]);
   assert.equal(teamRoundPointsReconcile(live, 1), true);
 });
+
+test("long participant names and round labels remain intact for natural UI wrapping", () => {
+  const names = [
+    "Brian Atkinson", "Matthew Smith", "Chase Patterson", "Chris Micheal",
+    "Alex Monteleone", "Miles Berger", "Lipp it and Rip it",
+  ];
+  const recap = teamRoundRecap({ number: 1, label: "Round 1", format: "Best Ball", matches: [final({
+    id: "long-names",
+    matchupWinner: "Team 1",
+    frontWinner: "Team 1",
+    backWinner: "Team 2",
+    overallWinner: "Team 1",
+    team1Points: 2,
+    team2Points: 1,
+    team1Players: [player("long-1", names[0]), player("long-2", names[1])],
+  })] }, 1);
+  assert.equal(recap.groups.wins[0].players.map((entry) => entry.name).join(" & "), "Brian Atkinson & Matthew Smith");
+  for (const value of names) assert.equal(value.includes(" "), true);
+  for (const label of ["Round 1 • Best Ball", "Round 2 • Scramble", "Round 3 • Singles"]) assert.equal(label.includes(" • "), true);
+});

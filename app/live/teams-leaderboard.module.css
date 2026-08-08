@@ -78,14 +78,16 @@
 }
 .teamRoundHeader {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(min-content, 1fr) auto;
   align-items: center;
   gap: 10px;
   min-width: 0;
 }
 .teamRoundHeader > strong {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
   color: #17362c;
   font-size: .72rem !important;
   line-height: 1.25 !important;
@@ -143,13 +145,25 @@
 }
 .teamResultGroup article > header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 7px;
   min-width: 0;
 }
-.teamResultGroup article > header strong { min-width: 0; color: #17362c; font-size: .7rem; line-height: 1.25; overflow-wrap: anywhere; }
-.teamResultGroup article > header b { color: #967326; font-size: .7rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.teamResultGroup article > header > span { display: grid; gap: 3px; min-width: 0; }
+.teamResultGroup article > header > span:first-child { width: 100%; }
+.teamResultGroup article > header > span:last-child { justify-items: start; padding-top: 7px; border-top: 1px solid #eee8de; }
+.teamResultGroup article > header small { color: #77817c; font-size: .43rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.teamResultGroup article > header strong {
+  min-width: 0;
+  color: #17362c;
+  font-size: .72rem;
+  line-height: 1.3;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+.teamResultGroup article > header b { color: #967326; font-size: .78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .teamResultGroup article > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; min-width: 0; }
 .teamResultGroup article > div span { display: grid; gap: 4px; min-width: 0; padding: 8px 4px; border-radius: 8px; background: #f7f4ec; text-align: center; }
 .teamResultGroup article > div small { color: #77817c; font-size: .43rem; font-weight: 900; text-transform: uppercase; }
@@ -171,7 +185,7 @@
   .teamRoundHeader { align-items: start; gap: 8px; }
   .teamRoundHeader > strong { padding-top: 2px; font-size: .68rem !important; }
   .teamResultGroup article { padding: 10px; }
-  .teamResultGroup article > header { align-items: start; gap: 7px; }
+  .teamResultGroup article > header { gap: 7px; }
 }
 
 @media (max-width: 340px) {
