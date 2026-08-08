@@ -19,6 +19,7 @@ import { tournamentIntelligenceStorylines } from "../../lib/tournament-intellige
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import { isTournamentRecapPhase, projectionPresentationLabel } from "../../lib/projection-phases";
 import { buildTournamentRecapIntelligence, finishLabel } from "../../lib/tournament-recap-intelligence";
+import { playerRoundBreakdown } from "../../lib/leaderboard-round-breakdown";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -63,8 +64,11 @@ function formatName(value) {
   return format === "SC" || format === "SCRAMBLE" ? "Scramble" : format === "SI" || format === "SINGLES" ? "Singles" : "Best Ball";
 }
 
-function OverallPlayerSheet({ row, rounds = [], roundLeaderboards = {}, complete, onClose }) {
-  const roundResults = rounds.map((round) => ({ round, result: (roundLeaderboards[round.number] || []).find((item) => item.id === row.id) }));
+function OverallPlayerSheet({ row, rounds = [], roundLeaderboards = {}, tournament = {}, complete, onClose }) {
+  const roundResults = rounds.map((round) => {
+    const result = (roundLeaderboards[round.number] || []).find((item) => item.id === row.id);
+    return { round, breakdown: playerRoundBreakdown(round, row.id, result, tournament) };
+  });
   return <LeaderboardDetailSheet title="Overall Player" identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} large />} status={complete ? "Final" : "Live"} metrics={[
     { label: complete ? "Final Rank" : "Current Rank", value: row.displayRank },
     { label: "Overall Record", value: row.record },
@@ -72,7 +76,7 @@ function OverallPlayerSheet({ row, rounds = [], roundLeaderboards = {}, complete
     { label: "Gross Average", value: row.grossAvg !== null ? average(row.grossAvg) : "—" },
     { label: "Net Average", value: row.netAvg !== null ? average(row.netAvg) : "—" },
   ]} onClose={onClose}>
-    <section className={leaderboardStyles.roundBreakdown}><header><span>Round Breakdown</span><small>Official record and points</small></header>{roundResults.map(({ round, result }) => <article key={round.number}><strong>{round.label} • {formatName(round.format)}</strong><span><small>Record</small>{result ? `${result.wins}-${result.losses}-${result.halves}` : "0-0-0"}</span><b><small>Points</small>{result ? formatPlayerPoints(result.points) : formatPlayerPoints(0)}</b></article>)}</section>
+    <section className={leaderboardStyles.roundBreakdown}><header><span>Round Breakdown</span><small>Official match results</small></header>{roundResults.map(({ round, breakdown }) => <article data-state={breakdown.state} key={round.number}><header><strong>{round.label} • {formatName(round.format)}</strong><StatusBadge status={breakdown.label} /></header>{breakdown.state === "pending" ? <p>Pending</p> : <div>{breakdown.segments.map((segment) => <span key={segment.label}><small>{segment.label}</small><strong>{segment.value}</strong></span>)}{breakdown.points !== null ? <span data-points="true"><small>Points</small><strong>{formatPlayerPoints(breakdown.points)}</strong></span> : null}</div>}</article>)}</section>
   </LeaderboardDetailSheet>;
 }
 
@@ -104,7 +108,7 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
           const isCurrent = currentPlayer?.id === row.id;
           return <LeaderboardEntry rank={row.displayRank} current={isCurrent} state={complete ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} current={isCurrent} />} metrics={<LeaderboardMetrics variant="overall" metrics={[{ label: "Record", value: row.record }, { label: availableMetrics.find(([key]) => key === metric)?.[1] || "Points", value: metricValue(row, metric), emphasis: complete ? "final" : "live" }]} />} label={`${row.player}, rank ${row.displayRank || "unranked"}, record ${row.record}, ${metricValue(row, metric)}${isCurrent ? ", your position" : ""}`} onClick={() => setSelectedId(row.id)} key={row.id} />;
         })}</div>
-        {selected ? <OverallPlayerSheet row={selected} rounds={data.rounds || []} roundLeaderboards={data.roundLeaderboards || {}} complete={complete} onClose={() => setSelectedId("")} /> : null}
+        {selected ? <OverallPlayerSheet row={selected} rounds={data.rounds || []} roundLeaderboards={data.roundLeaderboards || {}} tournament={data.tournament || {}} complete={complete} onClose={() => setSelectedId("")} /> : null}
       </section>}
   </>;
 }

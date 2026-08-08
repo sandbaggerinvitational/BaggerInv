@@ -24,12 +24,13 @@ test("round summaries use authoritative values and one presentation-only net sen
   assert.match(shared, /netPerformanceSummary\(netToPar, final\)/);
 });
 
-test("Overall round breakdown uses format-aware cards for every configured round", async () => {
+test("Overall round breakdown uses format-aware official match cards", async () => {
   const source = await read("app/live/LeaderboardsDashboard.js");
   assert.match(source, /rounds\.map\(\(round\)/);
   assert.match(source, /\{round\.label\} • \{formatName\(round\.format\)\}/);
-  assert.match(source, /<small>Record<\/small>/);
+  for (const label of ["Front 9", "Back 9", "Overall"]) assert.match(await read("lib/leaderboard-round-breakdown.js"), new RegExp(label));
   assert.match(source, /<small>Points<\/small>/);
+  assert.doesNotMatch(source, /0-0-0/);
 });
 
 test("leaderboard hero and empty states use complete participant-facing language", async () => {
