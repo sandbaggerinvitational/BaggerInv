@@ -164,27 +164,35 @@
 .teamMatchResults > header small { color: #77817c; font-size: .5rem; }
 .teamResultGroup { display: grid; gap: 7px; min-width: 0; }
 .teamResultGroup h3 { margin: 0; padding-inline: 2px; }
-.teamResultGroup article {
-  display: grid;
+.teamMatchCard {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
   gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
   min-width: 0;
   padding: 11px;
   border: 1px solid #e3dbc9;
   border-radius: 12px;
   background: #fff;
 }
-.teamResultGroup article > header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: stretch;
-  gap: 7px;
+.teamMatchIdentity {
+  display: flex !important;
+  flex: 0 0 auto;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 3px;
+  box-sizing: border-box;
+  width: 100% !important;
   min-width: 0;
 }
-.teamResultGroup article > header > span { display: grid; gap: 3px; min-width: 0; }
-.teamResultGroup article > header > span:first-child { width: 100%; }
-.teamResultGroup article > header > span:last-child { justify-items: start; padding-top: 7px; border-top: 1px solid #eee8de; }
-.teamResultGroup article > header small { color: #77817c; font-size: .43rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
-.teamResultGroup article > header strong {
+.teamMatchIdentity small,
+.teamMatchTotal small,
+.teamSegmentPoints > small { color: #77817c; font-size: .43rem; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.teamMatchIdentity strong {
+  display: block;
+  width: 100%;
   min-width: 0;
   color: #17362c;
   font-size: .72rem;
@@ -193,11 +201,13 @@
   word-break: normal;
   hyphens: none;
 }
-.teamResultGroup article > header b { color: #967326; font-size: .78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.teamResultGroup article > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; min-width: 0; }
-.teamResultGroup article > div span { display: grid; gap: 4px; min-width: 0; padding: 8px 4px; border-radius: 8px; background: #f7f4ec; text-align: center; }
-.teamResultGroup article > div small { color: #77817c; font-size: .43rem; font-weight: 900; text-transform: uppercase; }
-.teamResultGroup article > div strong { color: #0b4938; font-size: .7rem; font-variant-numeric: tabular-nums; }
+.teamMatchTotal { display: grid; flex: 0 0 auto; gap: 3px; width: 100%; padding-top: 7px; border-top: 1px solid #eee8de; }
+.teamMatchTotal b { color: #967326; font-size: .78rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.teamSegmentPoints { display: grid; flex: 0 0 auto; gap: 6px; width: 100%; min-width: 0; }
+.teamSegmentPoints > div { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 6px; width: 100%; min-width: 0; }
+.teamSegmentPoints > div span { display: grid; gap: 4px; min-width: 0; padding: 8px 4px; border-radius: 8px; background: #f7f4ec; text-align: center; }
+.teamSegmentPoints > div small { color: #77817c; font-size: .43rem; font-weight: 900; text-transform: uppercase; }
+.teamSegmentPoints > div strong { color: #0b4938; font-size: .7rem; font-variant-numeric: tabular-nums; }
 .teamResultGroup[data-result="inProgress"] article { background: #fffcf6; }
 .teamResultGroup[data-result="losses"] article { background: #fbfaf7; }
 
@@ -214,8 +224,7 @@
   .teamRoundBreakdown article { padding: 11px; }
   .teamRoundHeader { align-items: start; gap: 8px; }
   .teamRoundHeader > strong { padding-top: 2px; font-size: .68rem !important; }
-  .teamResultGroup article { padding: 10px; }
-  .teamResultGroup article > header { gap: 7px; }
+  .teamMatchCard { padding: 10px; }
 }
 
 @media (max-width: 340px) {

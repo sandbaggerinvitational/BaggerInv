@@ -385,11 +385,13 @@ test("Team sheet names own the center track independently from YOUR TEAM", async
 
 test("Team sheet identities keep full-width natural wrapping above independent metrics", async () => {
   const [source, teamStyles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(new URL("../app/live/teams-leaderboard.module.css", import.meta.url), "utf8")]);
-  assert.match(source, /<small>\{recap\.singles \? "Golfer" : "Pairing"\}<\/small><strong>\{match\.players/);
-  assert.match(source, /<span><small>Total Points<\/small><b>\{pointsLabel\(match\.totalPoints\)\}<\/b><\/span>/);
-  assert.match(teamStyles, /\.teamResultGroup article > header \{[^}]*grid-template-columns: minmax\(0, 1fr\);/s);
-  assert.match(teamStyles, /\.teamResultGroup article > header > span:first-child \{ width: 100%; \}/);
-  assert.match(teamStyles, /\.teamResultGroup article > header strong \{[^}]*overflow-wrap: normal;[^}]*word-break: normal;[^}]*hyphens: none;/s);
+  assert.match(source, /className=\{teamStyles\.teamMatchIdentity\}><small>\{recap\.singles \? "Golfer" : "Pairing"\}<\/small><strong>\{match\.players/);
+  assert.match(source, /className=\{teamStyles\.teamMatchTotal\}><small>Total Points<\/small><b>\{pointsLabel\(match\.totalPoints\)\}<\/b>/);
+  assert.match(source, /className=\{teamStyles\.teamSegmentPoints\}><small>Segment Points<\/small><div>/);
+  assert.match(teamStyles, /\.teamMatchCard \{[^}]*display: flex !important;[^}]*flex-direction: column !important;[^}]*width: 100%;/s);
+  assert.match(teamStyles, /\.teamMatchIdentity \{[^}]*flex-direction: column !important;[^}]*width: 100% !important;/s);
+  assert.match(teamStyles, /\.teamMatchIdentity strong \{[^}]*width: 100%;[^}]*overflow-wrap: normal;[^}]*word-break: normal;[^}]*hyphens: none;/s);
+  assert.match(teamStyles, /\.teamSegmentPoints > div \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\) !important;[^}]*width: 100%;/s);
   assert.doesNotMatch(teamStyles, /word-break:\s*break-all/);
 });
 

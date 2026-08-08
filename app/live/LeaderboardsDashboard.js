@@ -212,9 +212,10 @@ function TeamRoundDetailSheet({ team, round, standing, state, current, onClose }
   >
     {upcoming ? <section className={teamStyles.teamRoundUpcoming}><strong>Upcoming</strong><p>Match results will appear once play begins.</p></section> : <section className={teamStyles.teamMatchResults}>
       <header><span>Match Results</span><small>Official team points</small></header>
-      {RESULT_GROUPS.map(([key, label]) => recap.groups[key].length ? <section className={teamStyles.teamResultGroup} data-result={key} key={key}><h3>{label}</h3>{recap.groups[key].map((match) => <article key={match.id}>
-        <header><span><small>{recap.singles ? "Golfer" : "Pairing"}</small><strong>{match.players.map((player) => player.name).join(" & ") || "Pairing pending"}</strong></span><span><small>Total Points</small><b>{pointsLabel(match.totalPoints)}</b></span></header>
-        <div>{match.segments.map((segment) => <span key={segment.label}><small>{segment.label}</small><strong>{segment.points === null || segment.points === undefined ? "—" : formatMeaningfulNumber(segment.points)}</strong></span>)}</div>
+      {RESULT_GROUPS.map(([key, label]) => recap.groups[key].length ? <section className={teamStyles.teamResultGroup} data-result={key} key={key}><h3>{label}</h3>{recap.groups[key].map((match) => <article className={teamStyles.teamMatchCard} key={match.id}>
+        <header className={teamStyles.teamMatchIdentity}><small>{recap.singles ? "Golfer" : "Pairing"}</small><strong>{match.players.map((player) => player.name).join(" & ") || "Pairing pending"}</strong></header>
+        <div className={teamStyles.teamMatchTotal}><small>Total Points</small><b>{pointsLabel(match.totalPoints)}</b></div>
+        <section className={teamStyles.teamSegmentPoints}><small>Segment Points</small><div>{match.segments.map((segment) => <span key={segment.label}><small>{segment.label}</small><strong>{segment.points === null || segment.points === undefined ? "—" : formatMeaningfulNumber(segment.points)}</strong></span>)}</div></section>
       </article>)}</section> : null)}
     </section>}
   </LeaderboardDetailSheet>;
