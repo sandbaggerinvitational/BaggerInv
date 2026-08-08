@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   formatHandicap,
+  formatCalcuttaPoints,
   formatPlayerPoints,
   formatStatusLabel,
   formatTeamPoints,
@@ -56,6 +57,15 @@ test("formats team points with exactly one decimal place", () => {
   assert.equal(formatTeamPoints(7), "7.0");
   assert.equal(formatTeamPoints(14.5), "14.5");
   assert.equal(formatTeamPoints(null), "—");
+});
+
+test("formats Calcutta points with only meaningful decimal precision", () => {
+  assert.equal(formatCalcuttaPoints(276), "276");
+  assert.equal(formatCalcuttaPoints(88.00), "88");
+  assert.equal(formatCalcuttaPoints(76.50), "76.5");
+  assert.equal(formatCalcuttaPoints(76.25), "76.25");
+  assert.equal(formatCalcuttaPoints(76.125), "76.125");
+  assert.equal(formatCalcuttaPoints(null), "—");
 });
 
 test("centralizes participant-facing status wording", () => {

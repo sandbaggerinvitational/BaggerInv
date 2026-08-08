@@ -45,7 +45,10 @@ test("participant ranking reuses in-memory model data and leaves publication ran
   assert.match(component, /rankCalcuttaGolfers\(model\.golfers\)/);
   assert.match(component, /rankCalcuttaPortfolios\(model\.portfolios\)/);
   assert.match(component, />Calcutta Points</);
-  assert.match(component, /points\(row\.totalPoints\)/);
+  assert.match(component, /formatCalcuttaPoints\(row\.totalPoints\)/);
+  assert.match(component, /formatCalcuttaPoints\(golfer\.totalPoints\)/);
+  assert.match(component, /formatCalcuttaPoints\(result\.points\)/);
+  assert.doesNotMatch(component, /totalPoints\.toFixed|result\.points\.toFixed/);
   assert.doesNotMatch(component, /fetch\(|google|workbook|spreadsheet/i);
   assert.match(model, /Rank: golfer\.rank/);
 });
