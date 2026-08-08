@@ -47,3 +47,17 @@ test("shared sheet geometry centers identity and preserves sticky safe-area scro
   assert.match(css, /env\(safe-area-inset-bottom\)/);
   assert.match(css, /-webkit-overflow-scrolling:touch/);
 });
+
+test("round sheets use one equal two-column metric grid without redundant finish copy", async () => {
+  const [source, dashboard, css] = await Promise.all([
+    read("app/live/LeaderboardRow.js"),
+    read("app/live/LeaderboardsDashboard.js"),
+    read("app/live/scramble-leaderboard.module.css"),
+  ]);
+  assert.match(css, /\.sheetMetrics\{[^}]*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)[^}]*grid-auto-rows:minmax\(62px,auto\)/);
+  assert.doesNotMatch(css, /\.sheetMetrics p\[data-[^{]+\{[^}]*grid-column/);
+  assert.match(source, /data-emphasis=\{metric\.emphasis/);
+  assert.match(source, /label: "Net \+\/-", value: netToPar, emphasis: "score"/);
+  assert.match(dashboard, /label: "Points", value: formatPlayerPoints\(row\.points\), emphasis: "points"/);
+  assert.doesNotMatch(source, /netPerformanceSummary|Finished.*under net|Currently playing.*net/);
+});

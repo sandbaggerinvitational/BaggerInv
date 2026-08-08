@@ -15,13 +15,10 @@ test("current golfer treatment is shared by Overall, Best Ball, Scramble, and Si
   assert.match(shared, /data-current=\{current \|\| undefined\}/);
 });
 
-test("round summaries use authoritative values and one presentation-only net sentence", async () => {
+test("round summaries use authoritative values without redundant net-result copy", async () => {
   const shared = await read("app/live/LeaderboardRow.js");
-  assert.match(shared, /function netPerformanceSummary/);
-  assert.match(shared, /final \? "Finished" : "Currently playing"/);
-  assert.match(shared, /value < 0 \? "under" : "over"/);
-  assert.match(shared, /Currently playing/);
-  assert.match(shared, /netPerformanceSummary\(netToPar, final\)/);
+  assert.match(shared, /label: "Net \+\/-", value: netToPar/);
+  assert.doesNotMatch(shared, /netPerformanceSummary|Finished.*under net|Currently playing.*net/);
 });
 
 test("Overall round breakdown uses format-aware official match cards", async () => {

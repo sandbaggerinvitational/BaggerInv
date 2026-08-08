@@ -72,7 +72,7 @@ function OverallPlayerSheet({ row, rounds = [], roundLeaderboards = {}, tourname
   return <LeaderboardDetailSheet title="Overall Player" identity={<><PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} large /><StatusBadge status={complete ? "Final" : "Live"} /></>} metrics={[
     { label: complete ? "Final Rank" : "Current Rank", value: row.displayRank },
     { label: "Overall Record", value: row.record },
-    { label: "Points", value: formatPlayerPoints(row.points), featured: true },
+    { label: "Points", value: formatPlayerPoints(row.points), emphasis: "points" },
     { label: "Gross Average", value: row.grossAvg !== null ? average(row.grossAvg) : "—" },
     { label: "Net Average", value: row.netAvg !== null ? average(row.netAvg) : "—" },
   ]} onClose={onClose}>
