@@ -7,11 +7,10 @@ import TournamentMoments from "./TournamentMoments";
 import TournamentSchedule from "./TournamentSchedule";
 import { teamLogo } from "../lib/asset-paths";
 import {
-  compactTournamentLeaders,
   tournamentDayLabel,
   tournamentStatusLabel,
 } from "../lib/home-dashboard";
-import { formatPlayerPoints, formatTeamPoints } from "../lib/formatters";
+import { formatTeamPoints } from "../lib/formatters";
 import { tournamentProgressModel } from "../lib/live-command-center";
 import { tournamentMoments } from "../lib/tournament-storylines";
 import styles from "./tournament-command-center.module.css";
@@ -89,49 +88,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
       >
         <span style={{ width: `${percentage}%` }} />
       </div>
-    </section>
-  );
-}
-
-function TournamentLeaders({ leaders }) {
-  return (
-    <section className={styles.leaders} aria-labelledby="tournament-leaders-title">
-      <header className={styles.sectionHeader}>
-        <div>
-          <p>Live Standings</p>
-          <h2 id="tournament-leaders-title">Tournament Leaders</h2>
-        </div>
-        <Link href="/live?view=leaderboards">View all</Link>
-      </header>
-      {leaders.length ? (
-        <ol>
-          {leaders.map((leader) => (
-            <li key={leader.id}>
-              <span className={styles.rank}>{leader.rank}</span>
-              <MobileIdentityImage
-                sources={[
-                  assetSource(leader.photo, (value) => `/images/players/${value.replace(/\.(png|jpe?g|webp)$/i, "")}.webp`),
-                  assetSource(leader.teamLogo, teamLogo),
-                ]}
-                name={leader.player}
-                alt=""
-                className={styles.leaderImage}
-                fallbackClassName={styles.leaderFallback}
-              />
-              <div><strong>{leader.player}</strong><small>{leader.team}</small></div>
-              <div className={styles.leaderMetric}>
-                <strong>{formatPlayerPoints(leader.points)}</strong>
-                <small>{leader.wins}-{leader.losses}-{leader.halves}</small>
-              </div>
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <div className={styles.emptyState}>
-          <strong>Leaderboard will appear after the first completed match.</strong>
-          <span>Standings update as official results are finalized.</span>
-        </div>
-      )}
+      <Link className={styles.leaderboardsCta} href="/live?view=leaderboards">View Leaderboards <span aria-hidden="true">→</span></Link>
     </section>
   );
 }
@@ -142,7 +99,6 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
   const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
   const timelineAvailable = Boolean(liveData?.timeline?.available);
   const scheduleEvents = (liveData?.timeline?.events || []).filter((event) => event.displayOnHome);
-  const leaders = compactTournamentLeaders(liveData?.leaderboard || []);
   const moments = tournamentMoments(liveData);
   const status = tournamentStatusLabel(liveTournament.status);
   const pulse = (
@@ -167,7 +123,6 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
       <TournamentMoments moments={moments} />
       {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
       <PersonalizedPlayerHome netSkins={liveData?.netSkins} />
-      <TournamentLeaders leaders={leaders} />
     </div>
   );
 }

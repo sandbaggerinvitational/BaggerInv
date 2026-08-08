@@ -67,11 +67,12 @@ test("home match statuses use the compact shared vocabulary", () => {
   assert.equal(appMatchStatus({ status: "Scheduled" }), "Upcoming");
 });
 
-test("Home Tournament Leaders use the shared player-points formatter", async () => {
+test("Home keeps compact team score context and delegates rankings to Leaderboards", async () => {
   const source = await readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8");
-  assert.match(source, /formatPlayerPoints\(leader\.points\)/);
   assert.match(source, /formatTeamPoints\(tournament\.teamOne\?\.score\)/);
   assert.match(source, /formatTeamPoints\(tournament\.teamTwo\?\.score\)/);
+  assert.match(source, /href="\/live\?view=leaderboards">View Leaderboards/);
+  assert.doesNotMatch(source, /function TournamentLeaders|compactTournamentLeaders|Live Standings/);
   assert.doesNotMatch(source, /function score\(/);
 });
 
@@ -101,7 +102,7 @@ test("participant Home omits the website footer and preserves dashboard order", 
   ]);
   assert.doesNotMatch(shell, /Footer/);
   assert.ok(commandCenter.indexOf("<TournamentSchedule") < commandCenter.indexOf("<PersonalizedPlayerHome"));
-  assert.ok(commandCenter.indexOf("<TournamentSchedule") < commandCenter.indexOf("<TournamentLeaders"));
+  assert.doesNotMatch(commandCenter, /<TournamentLeaders/);
   assert.doesNotMatch(personalized, /tournamentPulse|tournamentMoments/);
 });
 
@@ -119,7 +120,7 @@ test("Home polish shares vertical rhythm and distinguishes completed rounds", as
   assert.match(commandStyles, /--home-card-radius:20px/);
   assert.match(commandStyles, /--home-card-shadow:/);
   assert.match(commandStyles, /\.emptyState\{[^}]*text-align:center/);
-  assert.match(commandStyles, /\.leaderMetric\{[^}]*font-variant-numeric:tabular-nums/);
+  assert.match(commandStyles, /\.leaderboardsCta\{[^}]*min-height:44px/);
   assert.match(personalized, /data-complete=\{status === "Final" \? "true" : undefined\}/);
   assert.match(personalizedStyles, /\.roundCard\[data-complete="true"\]/);
   assert.match(personalizedStyles, /margin-top: var\(--home-section-gap, 12px\)/);

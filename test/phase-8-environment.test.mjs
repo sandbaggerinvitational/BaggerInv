@@ -157,10 +157,11 @@ test("Tournament Mode replaces the flagged homepage for upcoming and live tourna
   for (const section of [
     "Today’s Schedule",
     "Tournament Pulse",
-    "Tournament Leaders",
   ]) {
     assert.match(`${commandCenter}\n${tournamentSchedule}`, new RegExp(section));
   }
+  assert.match(commandCenter, /View Leaderboards/);
+  assert.doesNotMatch(commandCenter, /Tournament Leaders/);
   assert.doesNotMatch(commandCenter, /Featured Match|Tournament Timeline|Live Records/);
   assert.match(menu, /Open Tournament Hub/);
 });

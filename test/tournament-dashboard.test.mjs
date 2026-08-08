@@ -144,30 +144,6 @@ test("Round 1 Match 1 joins its incomplete final result to the original stable-I
   assert.equal(match["Match Status"], "Final");
 });
 
-test("Round score leaderboard sorts from headers and handles partial and empty states", async () => {
-  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
-  assert.match(source, /aria-sort=/);
-  assert.match(source, /current\.key === key && current\.direction === "asc" \? "desc" : "asc"/);
-  assert.match(source, /Number\(a\[sort\.key\]\) - Number\(b\[sort\.key\]\)/);
-  assert.match(source, /\|\| a\.name\.localeCompare\(b\.name\)/);
-  assert.match(source, /Standings will appear after the first recorded score/);
-  assert.match(source, /Partial standings publish as valid holes are confirmed/);
-  assert.match(source, /aria-label=\{key === "netToPar" \? "Net score relative to par"/);
-  assert.match(source, /Number\(value\) === 0 \? "E"/);
-  assert.match(source, /className=\{styles\.leaderHeading\}>Rank/);
-  assert.match(source, /className=\{styles\.leaderHeading\}>\{pairing \? "Pairing" : "Player"\}/);
-  assert.match(source, /button className=\{styles\.leaderHeading\}/);
-  assert.match(styles, /\.leaderHeading\{[^}]*text-transform:uppercase/);
-  assert.match(source, /Individual Gross & Net/);
-  assert.doesNotMatch(source, /Individual Gross &amp; Net/);
-  assert.match(styles, /--round-leader-columns:/);
-  assert.match(styles, /grid-template-columns:var\(--round-leader-columns\)/);
-  assert.match(styles, /\.leaderRow button\{[^}]*text-align:center/);
-  assert.match(styles, /\.leaderRow>i\{[^}]*text-align:center/);
-  assert.match(styles, /\.leaderRow>strong\{[^}]*text-align:left/);
-  for (const label of ["Gross", "Net", "Net +/-"]) assert.equal(source.includes(`"${label}"`), true);
-});
-
 test("Final match results separate the official team name from the result line", async () => {
   const source = await readFile(componentUrl, "utf8");
   assert.match(source, /function finalResultParts/);
@@ -188,7 +164,7 @@ test("Scramble cards use golfer handicaps and one team-level stroke treatment", 
   assert.match(source, /team stroke\{teamStroke === 1 \? "" : "s"\}/);
 });
 
-test("Scramble leaderboard creates one shared pairing row while other formats remain individual", async () => {
+test("dedicated Leaderboards retains Scramble pairing rows after Tournament removes duplicate standings", async () => {
   const [source, dataSource, scrambleSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8"), readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8")]);
   assert.match(dataSource, /if \(format === "SC"\) \{/);
   assert.match(dataSource, /entityId: `\$\{clean\(match\["Match ID"\]\)\}:team-\$\{side\}`/);
@@ -198,17 +174,13 @@ test("Scramble leaderboard creates one shared pairing row while other formats re
   assert.match(scrambleSource, /<ScrambleTeamIdentity/);
   assert.match(scrambleSource, /<RoundLeaderboardSheet/);
   assert.doesNotMatch(scrambleSource, /Hole-by-Hole Scoring/);
-  assert.match(source, /const pairing = format === "Scramble" \|\| format === "SC"/);
+  assert.doesNotMatch(source, /ScrambleLeaderboard|ScoreLeaderboard/);
 });
 
-test("Overall uses official points and record standings instead of cumulative strokes", async () => {
+test("Tournament delegates all full standings to the dedicated Leaderboards destination", async () => {
   const source = await readFile(componentUrl, "utf8");
-  assert.match(source, /function OverallLeaderboard/);
-  assert.match(source, /Individual Points & Record/);
-  for (const label of ["Rank", "Player", "Record", "Points"]) assert.match(source, new RegExp(`>${label}(?: <|<)`));
-  assert.match(source, /<OverallLeaderboard rows=\{data\?\.leaderboard \|\| \[\]\} \/>/);
-  assert.match(source, /<ScoreLeaderboard rows=\{data\?\.scoreLeaderboard \|\| \[\]\} round=\{activeRound\?\.number\} format=\{activeRound\?\.format\} players=\{data\?\.players \|\| \[\]\} matches=\{activeRound\?\.matches \|\| \[\]\} \/>/);
-  assert.doesNotMatch(source.slice(source.indexOf("function OverallLeaderboard"), source.indexOf("export default function")), /gross|netToPar|cumulative/i);
+  assert.doesNotMatch(source, /function OverallLeaderboard|function ScoreLeaderboard|Round Leaderboard|Individual Gross & Net/);
+  assert.match(source, /href="\/live\?view=leaderboards">View Leaderboards/);
 });
 
 test("Snapshot counts use distinct live, remaining, and final labels", async () => {
@@ -216,13 +188,23 @@ test("Snapshot counts use distinct live, remaining, and final labels", async () 
   assert.match(source, /<small aria-label="Live matches">LIVE<\/small>/);
   assert.match(source, /<small aria-label="Matches remaining">REMAINING<\/small>/);
   assert.match(source, /<small aria-label="Final matches">FINAL<\/small>/);
-  assert.match(source, /state\.totalMatches - state\.remainingMatches/);
+  assert.match(source, /\{progress\.liveMatches\}/);
+  assert.match(source, /\{progress\.scheduledMatches\}/);
+  assert.match(source, /\{progress\.completedMatches\}/);
+  assert.doesNotMatch(source, /state\.liveMatches|state\.remainingMatches|state\.totalMatches - state\.remainingMatches/);
   assert.doesNotMatch(source, /<small>Still On Course<\/small>/);
   assert.match(styles, /\.snapshotMeta\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(styles, /\.snapshotMeta span\{[^}]*min-height:52px/);
   assert.match(styles, /\.snapshotMeta small\{[^}]*white-space:nowrap/);
   assert.match(styles, /\.snapshotMeta strong\{[^}]*font-size:clamp/);
   assert.match(styles, /\.snapshotMeta strong\{[^}]*font-variant-numeric:tabular-nums/);
+});
+
+test("selected-round counters do not alter the canonical tournament clinch calculation", async () => {
+  const source = await readFile(componentUrl, "utf8");
+  assert.match(source, /state\.teamOne\.pointsToClinch <= state\.teamTwo\.pointsToClinch/);
+  assert.match(source, /\$\{leading\[0\]\.name\} need \$\{formatTeamPoints\(leading\[1\]\.pointsToClinch\)\} more points/);
+  assert.match(source, /<small>Points to Clinch<\/small><strong>\{clinchText\}<\/strong>/);
 });
 
 test("Round summaries center team names around an independent score", async () => {
@@ -234,16 +216,6 @@ test("Round summaries center team names around an independent score", async () =
   assert.match(styles, /\.roundScore>span\{[^}]*min-height:2\.4em/);
   assert.match(styles, /\.roundScore>span\{[^}]*place-items:center/);
   assert.match(styles, /\.roundScore>b\{[^}]*white-space:nowrap/);
-});
-
-test("Overall leaderboard uses compact proportional columns with team under player", async () => {
-  const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
-  assert.match(styles, /--overall-columns:10% minmax\(0,50%\) 20% 20%/);
-  assert.match(styles, /grid-template-columns:var\(--overall-columns\)/);
-  assert.match(styles, /\.overallRow>strong\{[^}]*text-align:center/);
-  assert.match(styles, /\.overallRow>span:nth-child\(3\),\.overallRow>b\{[^}]*text-align:center/);
-  assert.match(styles, /\.overallRow\[data-header=true\] button\{[^}]*text-align:center/);
-  assert.match(source, /<small><Logo filename=\{row\.teamLogo\} name=\{row\.team\} size="mini" \/>\{row\.team\}<\/small>/);
 });
 
 test("Snapshot protects whole and half-point scores in an independent center column", async () => {
@@ -282,15 +254,14 @@ test("Frozen Home and My Match implementations remain untouched by Tournament st
   assert.doesNotMatch(styles, /PersonalizedPlayerHome|MyMatchDashboard|my-match-dashboard/);
 });
 
-test("Tournament polish preserves a clear round, matches, leaderboard rhythm", async () => {
+test("Tournament polish preserves a clear round and match rhythm with one Leaderboards CTA", async () => {
   const [source, styles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8")]);
-  assert.ok(source.indexOf("className={styles.roundGroups}") < source.indexOf("<OverallLeaderboard"));
+  assert.ok(source.indexOf("className={styles.roundGroups}") < source.indexOf("className={styles.leaderboardsCta}"));
   assert.match(styles, /--tournament-section-gap:14px/);
   assert.match(styles, /--tournament-card-radius:17px/);
   assert.match(styles, /--tournament-card-shadow:/);
   assert.match(styles, /\.roundGroups\{[^}]*gap:11px/);
-  assert.match(styles, /\.leaderboard\{[^}]*box-shadow:var\(--tournament-card-shadow\)/);
-  assert.match(styles, /\.leaderboard>header\{[^}]*background:#fffcf6/);
+  assert.match(styles, /\.leaderboardsCta\{[^}]*min-height:48px/);
 });
 
 test("Tournament controls and collapsed or expanded rounds retain confident states", async () => {

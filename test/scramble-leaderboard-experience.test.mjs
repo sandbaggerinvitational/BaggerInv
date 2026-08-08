@@ -2,14 +2,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("Round 2 uses one shared Scramble team presentation across Tournament, Leaderboards, and Net Skins", async () => {
-  const [tournament, leaderboards, board, identity] = await Promise.all([
-    readFile(new URL("../app/live/TournamentDashboard.js", import.meta.url), "utf8"),
+test("Round 2 uses one shared Scramble team presentation across Leaderboards and Net Skins", async () => {
+  const [leaderboards, board, identity] = await Promise.all([
     readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/ScrambleTeamIdentity.js", import.meta.url), "utf8"),
   ]);
-  assert.match(tournament, /<ScrambleLeaderboard/);
   assert.match(leaderboards, /<ScrambleLeaderboard/);
   assert.match(leaderboards, /<ScrambleTeamIdentity[^>]+playerIds=\{row\.playerIds\}/);
   assert.match(board, /<ScrambleTeamIdentity/);

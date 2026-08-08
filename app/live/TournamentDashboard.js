@@ -4,14 +4,11 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AssetImage from "../AssetImage";
-import PlayerAvatar from "../PlayerAvatar";
 import MatchStatusBlock from "../MatchStatusBlock";
-import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MatchFilterEmptyState from "./MatchFilterEmptyState";
-import ScrambleLeaderboard from "./ScrambleLeaderboard";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
-import { formatHandicap, formatPlayerPoints, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
+import { formatHandicap, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
 import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
@@ -25,7 +22,6 @@ const CalcuttaExperience = dynamic(() => import("./CalcuttaExperience"), {
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
 const initials = (name) => String(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
-const toPar = (value) => Number(value) === 0 ? "E" : Number(value) > 0 ? `+${value}` : String(value);
 
 function Logo({ filename, name, type = "team", size = "medium" }) {
   const src = type === "tournament" ? tournamentLogo(filename) : type === "course" ? courseLogo(filename) : teamLogo(filename);
@@ -129,9 +125,9 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
       <div className={styles.scoreTeam}><Logo filename={tournament.teamTwo.logo} name={tournament.teamTwo.name} size="score" /><strong>{tournament.teamTwo.name}</strong></div>
     </div>
     <div className={styles.snapshotMeta}>
-      <span><small aria-label="Live matches">LIVE</small><strong>{state.liveMatches}</strong></span>
-      <span><small aria-label="Matches remaining">REMAINING</small><strong>{state.remainingMatches}</strong></span>
-      <span><small aria-label="Final matches">FINAL</small><strong>{state.totalMatches - state.remainingMatches}</strong></span>
+      <span><small aria-label="Live matches">LIVE</small><strong>{progress.liveMatches}</strong></span>
+      <span><small aria-label="Matches remaining">REMAINING</small><strong>{progress.scheduledMatches}</strong></span>
+      <span><small aria-label="Final matches">FINAL</small><strong>{progress.completedMatches}</strong></span>
     </div>
     <div className={styles.progress}>
       <span><strong>{round?.label || "Overall"} • {progress.completedMatches} of {progress.totalMatches} matches complete</strong><small>{progress.liveMatches} live • {progress.scheduledMatches} upcoming</small></span>
@@ -139,70 +135,6 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
     </div>
     <div className={styles.insights}><span><small>Points to Clinch</small><strong>{clinchText}</strong></span><span><small>Momentum</small><strong>{momentumText}</strong></span></div>
     <p>{updatedLabel}</p>
-  </section>;
-}
-
-function ScoreLeaderboard({ rows = [], round, format, players = [], matches = [] }) {
-  const [sort, setSort] = useState({ key: "netToPar", direction: "asc" });
-  const eligible = useMemo(() => rows.filter((row) => row.holes && (!round || Number(row.round) === Number(round))), [rows, round]);
-  const sorted = useMemo(() => [...eligible].sort((a, b) => {
-    const factor = sort.direction === "asc" ? 1 : -1;
-    return (Number(a[sort.key]) - Number(b[sort.key])) * factor || a.name.localeCompare(b.name);
-  }), [eligible, sort]);
-  const select = (key) => setSort((current) => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
-  const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"]];
-  const pairing = format === "Scramble" || format === "SC";
-  const ranks = useMemo(() => {
-    const map = new Map();
-    sorted.forEach((row, index) => {
-      const previous = sorted[index - 1];
-      const tied = previous && Number(previous[sort.key]) === Number(row[sort.key]);
-      map.set(row.id, tied ? map.get(previous.id) : index + 1);
-    });
-    return map;
-  }, [sort.key, sorted]);
-  if (pairing) return <ScrambleLeaderboard rows={rows} round={round} players={players} matches={matches} roundLabel={`Round ${round}`} returnTo="/live?view=tournament" />;
-  return <section className={styles.leaderboard}>
-    <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{eligible.length ? <StatusBadge status="Live" /> : null}</header>
-    {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>
-      <div className={styles.leaderRow} data-header="true"><span className={styles.leaderHeading}>Rank</span><span className={styles.leaderHeading}>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key,label]) => <button className={styles.leaderHeading} type="button" key={key} onClick={() => select(key)} aria-label={key === "netToPar" ? "Net score relative to par" : label} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
-      {sorted.slice(0, 10).map((row) => <div className={styles.leaderRow} key={`${row.round}-${row.id}`} aria-label={pairing ? `Scramble pairing ${row.name}` : undefined}><i>{ranks.get(row.id)}</i><strong>{row.name}</strong><span>{row.holes >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
-    </div>}
-  </section>;
-}
-
-function OverallLeaderboard({ rows = [] }) {
-  const [direction, setDirection] = useState("desc");
-  const sorted = useMemo(() => [...rows].sort((a, b) => {
-    const factor = direction === "asc" ? 1 : -1;
-    return (Number(a.points) - Number(b.points)) * factor ||
-      (Number(a.wins) - Number(b.wins)) * factor ||
-      a.player.localeCompare(b.player);
-  }), [rows, direction]);
-  const ranked = useMemo(() => {
-    const officialOrder = [...rows].sort((a, b) =>
-      Number(b.points) - Number(a.points) || Number(b.wins) - Number(a.wins) ||
-      Number(a.losses) - Number(b.losses) || a.player.localeCompare(b.player)
-    );
-    const rankById = new Map();
-    officialOrder.forEach((row, index) => {
-      const previous = officialOrder[index - 1];
-      const tied = previous && Number(previous.points) === Number(row.points);
-      rankById.set(row.id, tied ? rankById.get(previous.id) : index + 1);
-    });
-    return rankById;
-  }, [rows]);
-  return <section className={styles.leaderboard}>
-    <header><span><small>Overall Leaderboard</small><h2>Individual Points & Record</h2></span>{rows.length ? <em>Official</em> : null}</header>
-    {!rows.length ? <div className={styles.empty}><strong>Standings will appear after the first official result.</strong><span>Points and records update as matches are finalized.</span></div> : <div className={styles.overallLeaderboard}>
-      <div className={styles.overallRow} data-header="true"><span>Rank</span><span>Player</span><span>Record</span><button type="button" onClick={() => setDirection((current) => current === "desc" ? "asc" : "desc")} aria-sort={direction === "desc" ? "descending" : "ascending"}>Points <i aria-hidden="true">{direction === "desc" ? "↓" : "↑"}</i></button></div>
-      {sorted.slice(0, 10).map((row) => <div className={styles.overallRow} key={row.id}>
-        <strong>{ranked.get(row.id)}</strong>
-        <span className={styles.overallPlayer}><span className={styles.playerImage}><PlayerAvatar filename={row.photo} name={row.player} fallbackClassName={styles.playerFallback} /></span><span><b>{row.player}</b><small><Logo filename={row.teamLogo} name={row.team} size="mini" />{row.team}</small></span></span>
-        <span>{row.wins}-{row.losses}-{row.halves}</span>
-        <b>{formatPlayerPoints(row.points)}</b>
-      </div>)}
-    </div>}
   </section>;
 }
 
@@ -283,9 +215,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
         <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <MatchFilterEmptyState filter={activeFilter} round={round} className={styles.empty} />}</div>
       </details>;
     })}{!visibleRounds.length ? <div className={styles.empty} data-empty-reason={overallEmptyState.reason} role="status"><strong>{overallEmptyState.title}</strong><span>{overallEmptyState.detail}</span></div> : null}</div>
-    {selectedRound === "overall"
-      ? <OverallLeaderboard rows={data?.leaderboard || []} />
-      : <ScoreLeaderboard rows={data?.scoreLeaderboard || []} round={activeRound?.number} format={activeRound?.format} players={data?.players || []} matches={activeRound?.matches || []} />}
+    <Link className={styles.leaderboardsCta} href="/live?view=leaderboards">View Leaderboards <span aria-hidden="true">→</span></Link>
     </>}
   </section>;
 }
