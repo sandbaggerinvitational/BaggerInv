@@ -32,6 +32,7 @@ import styles from "./leaderboards-dashboard.module.css";
 import insightStyles from "./leaderboards-insights.module.css";
 import skinsStyles from "./net-skins.module.css";
 import leaderboardStyles from "./scramble-leaderboard.module.css";
+import teamStyles from "./teams-leaderboard.module.css";
 
 const clean = (value) => String(value ?? "").trim();
 const initials = (name) => clean(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -46,8 +47,15 @@ const metricValue = (row, metric) => {
 };
 
 function TeamMark({ filename, name, size = "small" }) {
-  return <span className={styles.teamMark} data-size={size}>
+  return <span className={`${styles.teamMark} ${size === "sheet" ? teamStyles.sheetTeamMark : ""}`.trim()} data-size={size}>
     <AssetImage src={teamLogo(filename)} alt={`${name} logo`} className={styles.teamLogo} fallbackClassName={styles.teamFallback} fallback={initials(name)} inferFallback={false} />
+  </span>;
+}
+
+function TeamLeaderboardIdentity({ team, current = false, large = false }) {
+  return <span className={teamStyles.teamSheetIdentity} data-large={large || undefined}>
+    <TeamMark filename={team.logo} name={team.name} size="sheet" />
+    <span><strong>{team.name}</strong>{current ? <em>YOUR TEAM</em> : null}</span>
   </span>;
 }
 
@@ -136,19 +144,55 @@ function RoundPlayers({ data, selectedRound, currentPlayer }) {
   </section>;
 }
 
-function Teams({ data, selectedRound, currentPlayer }) {
+function teamRoundState(round) {
+  const matches = round?.matches || [];
+  const official = matches.filter((match) => ["final", "finalized"].includes(clean(match.status).toLowerCase()) || match.finalizedAt || match["Finalized At"]);
+  if (!official.length) return "upcoming";
+  return matches.length > 0 && official.length === matches.length ? "final" : "live";
+}
+
+function TeamDetailSheet({ team, data, selectedRound, odds, current, onClose }) {
+  const complete = (data.rounds || []).length > 0 && (data.rounds || []).every((round) => teamRoundState(round) === "final");
+  const roundRows = (data.rounds || []).map((round) => {
+    const standings = teamStandings(data.rounds || [], data.tournament || {}, String(round.number));
+    const standing = standings.find((item) => Number(item.side) === Number(team.side));
+    return { round, standing, state: teamRoundState(round) };
+  }).sort((left, right) => String(left.round.number) === String(selectedRound) ? -1 : String(right.round.number) === String(selectedRound) ? 1 : Number(left.round.number) - Number(right.round.number));
+  return <LeaderboardDetailSheet title="Team Summary" identity={<TeamLeaderboardIdentity team={team} current={current} large />} status={complete ? "Final" : "Live"} metrics={[
+    { label: complete ? "Final Rank" : "Current Rank", value: team.rank },
+    { label: "Tournament Points", value: formatTeamPoints(team.points), emphasis: "points" },
+    { label: "Overall Record", value: team.record },
+    { label: "Championship Odds", value: odds === null ? "Pending" : formatChampionshipOdds(odds), emphasis: "points" },
+  ]} onClose={onClose}>
+    <section className={`${leaderboardStyles.roundBreakdown} ${teamStyles.teamRoundBreakdown}`}><header><span>Round Breakdown</span><small>Official team results</small></header>{roundRows.map(({ round, standing, state }) => <article data-state={state === "upcoming" ? "pending" : state} key={round.number}><header><strong>{round.label} • {formatName(round.format)}</strong><StatusBadge status={state} /></header>{state === "upcoming" ? <p>Pending</p> : <div><span><small>Record</small><strong>{standing.record}</strong></span><span data-points="true"><small>Points</small><strong>{formatTeamPoints(standing.points)}</strong></span></div>}</article>)}</section>
+  </LeaderboardDetailSheet>;
+}
+
+function Teams({ data, selectedRound, currentPlayer, snapshots }) {
   const standings = useMemo(() => teamStandings(data.rounds || [], data.tournament || {}, selectedRound), [data, selectedRound]);
+  const overallStandings = useMemo(() => teamStandings(data.rounds || [], data.tournament || {}, "overall"), [data]);
+  const [selectedSide, setSelectedSide] = useState("");
   const currentTeamSide = (data.leaderboard || []).find((row) => row.id === currentPlayer?.id)?.teamSide;
+  const latestTeamSnapshot = useMemo(() => (snapshots || []).filter((snapshot) => Array.isArray(snapshot.teams) && snapshot.teams.length).slice().sort((left, right) => Number(left.phaseOrder || 0) - Number(right.phaseOrder || 0)).at(-1) || null, [snapshots]);
+  const oddsBySide = useMemo(() => new Map((latestTeamSnapshot?.teams || []).map((team) => [Number(team.side), team.americanOdds])), [latestTeamSnapshot]);
+  const selectedTeam = overallStandings.find((team) => String(team.side) === selectedSide);
+  const selectedRoundModel = selectedRound === "overall" ? null : (data.rounds || []).find((round) => String(round.number) === String(selectedRound));
+  const state = selectedRound === "overall" ? ((data.rounds || []).every((round) => teamRoundState(round) === "final") ? "final" : "live") : teamRoundState(selectedRoundModel);
+  const overall = selectedRound === "overall";
   return <section className={styles.teams} aria-label="Team standings">
-    <div className={styles.teamHeader}><span>Rank</span><span>Team</span><span>Record</span><span>Points</span></div>
+    <header className={teamStyles.teamBoardTitle}><span><small>{overall ? "Overall" : selectedRoundModel?.label}</small><strong>Team Leaderboard</strong></span><StatusBadge status={state} /></header>
+    <div className={`${styles.teamHeader} ${teamStyles.teamHeader}`} data-overall={overall || undefined}><span>Rank</span><span>Team</span><span>Record</span><span>Points</span>{overall ? <span>Odds</span> : null}</div>
     {standings.map((team) => {
       const currentTeam = Number(currentTeamSide) === Number(team.side);
-      return <article data-current={currentTeam || undefined} key={team.side}>
-        <strong>{team.rank}</strong>
+      const pending = !overall && state === "upcoming";
+      const odds = oddsBySide.has(Number(team.side)) ? oddsBySide.get(Number(team.side)) : null;
+      return <button type="button" className={teamStyles.teamRow} data-overall={overall || undefined} data-current={currentTeam || undefined} onClick={() => setSelectedSide(String(team.side))} aria-label={`Open ${team.name} team summary${currentTeam ? ", your team" : ""}`} key={team.side}>
+        <strong>{pending ? "—" : team.rank}</strong>
         <span><TeamMark filename={team.logo} name={team.name} size="large" /><span><b>{team.name}{currentTeam ? <em>YOUR TEAM</em> : null}</b><small>{team.remaining} match{team.remaining === 1 ? "" : "es"} remaining</small></span></span>
-        <span>{team.record}</span><b>{formatTeamPoints(team.points)}</b>
-      </article>;
+        {pending ? <span className={teamStyles.teamPending}>Pending</span> : <><span>{team.record}</span><b>{formatTeamPoints(team.points)}</b></>}{overall ? <b>{odds === null ? "Pending" : formatChampionshipOdds(odds)}</b> : null}
+      </button>;
     })}
+    {selectedTeam ? <TeamDetailSheet team={selectedTeam} data={data} selectedRound={selectedRound} odds={oddsBySide.has(Number(selectedTeam.side)) ? oddsBySide.get(Number(selectedTeam.side)) : null} current={Number(currentTeamSide) === Number(selectedTeam.side)} onClose={() => setSelectedSide("")} /> : null}
   </section>;
 }
 
@@ -200,18 +244,9 @@ function TournamentRecapExperience({ recap, tournament, publicationTime, portrai
   </section>;
 }
 
-function Insights({ data, previewMode = false }) {
-  const [snapshots, setSnapshots] = useState(null);
+function Insights({ data, snapshots, previewMode = false }) {
   const [selectedPlayerId, setSelectedPlayerId] = useState("");
   const [previewPhase, setPreviewPhase] = useState("");
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch(`/api/leaderboards/insights?year=${encodeURIComponent(data.tournament?.year || "")}`, { cache: "no-store", signal: controller.signal })
-      .then(async (response) => response.ok ? response.json() : Promise.reject(new Error("Odds unavailable")))
-      .then((payload) => setSnapshots(Array.isArray(payload.snapshots) ? payload.snapshots : []))
-      .catch((error) => { if (error.name !== "AbortError") setSnapshots([]); });
-    return () => controller.abort();
-  }, [data.tournament?.year]);
   const previewScenarios = useMemo(() => previewMode ? PREVIEW_ODDS_SCENARIOS.map((scenario) => ({
     ...scenario,
     snapshot: scenario.phases.map((phase) => (snapshots || []).find((item) => item.phase === phase)).find(Boolean),
@@ -378,6 +413,7 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
   const searchParams = useSearchParams();
   const [data, setData] = useState(initialData);
   const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [oddsSnapshots, setOddsSnapshots] = useState(null);
   const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
   const pending = useRef(null);
   const navigationStartedAt = useRef(null);
@@ -389,6 +425,15 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
   }), [roundValues]);
   const [selection, setSelection] = useState(() => selectionFrom(searchParams));
   const { tab, round: selectedRound, metric } = selection;
+  useEffect(() => {
+    if (!data?.tournament?.year || oddsSnapshots !== null || !["teams", "insights"].includes(tab)) return undefined;
+    const controller = new AbortController();
+    fetch(`/api/leaderboards/insights?year=${encodeURIComponent(data.tournament.year)}`, { cache: "no-store", signal: controller.signal })
+      .then(async (response) => response.ok ? response.json() : Promise.reject(new Error("Odds unavailable")))
+      .then((payload) => setOddsSnapshots(Array.isArray(payload.snapshots) ? payload.snapshots : []))
+      .catch((error) => { if (error.name !== "AbortError") setOddsSnapshots([]); });
+    return () => controller.abort();
+  }, [data?.tournament?.year, oddsSnapshots, tab]);
   const updateQuery = useCallback((changes) => {
     const params = new URLSearchParams(typeof window === "undefined" ? searchParams.toString() : window.location.search);
     params.set("view", "leaderboards");
@@ -447,8 +492,8 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
     {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
-    {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
+    {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} snapshots={oddsSnapshots} /> : null}
     {tab === "skins" ? <NetSkinsBoard data={data} currentPlayer={currentPlayer} /> : null}
-    {tab === "insights" ? <Insights data={data} previewMode={previewMode} /> : null}
+    {tab === "insights" ? <Insights data={data} snapshots={oddsSnapshots} previewMode={previewMode} /> : null}
   </section>;
 }

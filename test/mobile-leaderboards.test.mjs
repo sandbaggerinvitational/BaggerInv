@@ -123,6 +123,42 @@ test("team standings use official overall points and round-scoped finalized reco
   assert.equal(round[1].points, 0.5);
 });
 
+test("Teams reuse published team odds and one shared detail-sheet experience", async () => {
+  const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/live/teams-leaderboard.module.css", import.meta.url), "utf8");
+  assert.match(source, /function TeamDetailSheet/);
+  assert.match(source, /title="Team Summary"/);
+  assert.match(source, /Championship Odds/);
+  assert.match(source, /latestTeamSnapshot/);
+  assert.match(source, /snapshot\.teams/);
+  assert.match(source, /formatChampionshipOdds\(odds\)/);
+  assert.match(source, /odds === null \? "Pending"/);
+  assert.match(source, /Round Breakdown/);
+  assert.match(source, /Official team results/);
+  assert.match(source, /setSelectedSide\(String\(team\.side\)\)/);
+  assert.match(source, /YOUR TEAM/);
+  assert.match(css, /grid-template-columns: 8% minmax\(0, 44%\) 16% 16% 16%/);
+  assert.doesNotMatch(css, /overflow-x:\s*(?:auto|scroll)/);
+});
+
+test("Teams show Pending until a round has an official result", async () => {
+  const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
+  assert.match(source, /if \(!official\.length\) return "upcoming"/);
+  assert.match(source, /pending \? <span className=\{teamStyles\.teamPending\}>Pending<\/span>/);
+  assert.match(source, /pending \? "—" : team\.rank/);
+  assert.match(source, /StatusBadge status=\{state\}/);
+});
+
+test("Teams and Insights share one retained odds request without tab-switch duplication", async () => {
+  const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
+  assert.match(source, /const \[oddsSnapshots, setOddsSnapshots\] = useState\(null\)/);
+  assert.match(source, /oddsSnapshots !== null/);
+  assert.match(source, /!\["teams", "insights"\]\.includes\(tab\)/);
+  assert.match(source, /<Teams[^>]*snapshots=\{oddsSnapshots\}/);
+  assert.match(source, /<Insights[^>]*snapshots=\{oddsSnapshots\}/);
+  assert.equal((source.match(/fetch\(`\/api\/leaderboards\/insights/g) || []).length, 1);
+});
+
 test("insights publish only supported trusted metrics", () => {
   const performance = playerPerformanceRows(players, [
     { id: "p1", round: 1, entityType: "PLAYER", holes: 18, gross: 72, net: 68 },
