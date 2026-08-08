@@ -143,7 +143,7 @@ test("Match Management exposes contextual lifecycle controls through the verifie
   assert.match(route, /match-reopen[\s\S]*reopenLiveMatch\(input\.matchId, updatedBy\)/);
   assert.match(route, /verifyDirectorReadBack/);
   assert.match(route, /operationsAction = \[[^\]]*"match-finalize"[^\]]*"match-reopen"/);
-  assert.match(writes, /scoringUnlocked: truthy\(record\["Access Active"\]\) && !accessExpired\(record\)/);
+  assert.match(writes, /scoringUnlocked: truthy\(record\["Access Active"\]\) && !accessExpired\(record\) && !\/\^Final\$\/i\.test/);
 });
 
 test("match status and scoring access remain separate authoritative capabilities", () => {
