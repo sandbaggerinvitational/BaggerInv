@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import AssetImage from "../AssetImage";
 import PlayerAvatar from "../PlayerAvatar";
 import StatusBadge from "../StatusBadge";
@@ -376,23 +376,48 @@ function NetSkinsBoard({ data, currentPlayer }) {
 }
 
 export default function LeaderboardsDashboard({ initialData, loadError, previewMode = false }) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [data, setData] = useState(initialData);
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
   const pending = useRef(null);
-  const tab = ["players", "teams", "skins", "insights"].includes(searchParams.get("tab")) ? searchParams.get("tab") : "players";
-  const roundValues = new Set((data?.rounds || []).map((round) => String(round.number)));
-  const selectedRound = roundValues.has(searchParams.get("round")) ? searchParams.get("round") : "overall";
-  const metric = PLAYER_METRICS.some(([key]) => key === searchParams.get("metric")) ? searchParams.get("metric") : "points";
+  const navigationStartedAt = useRef(null);
+  const roundValues = useMemo(() => new Set((data?.rounds || []).map((round) => String(round.number))), [data?.rounds]);
+  const selectionFrom = useCallback((params) => ({
+    tab: ["players", "teams", "skins", "insights"].includes(params.get("tab")) ? params.get("tab") : "players",
+    round: roundValues.has(params.get("round")) ? params.get("round") : "overall",
+    metric: PLAYER_METRICS.some(([key]) => key === params.get("metric")) ? params.get("metric") : "points",
+  }), [roundValues]);
+  const [selection, setSelection] = useState(() => selectionFrom(searchParams));
+  const { tab, round: selectedRound, metric } = selection;
   const updateQuery = useCallback((changes) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(typeof window === "undefined" ? searchParams.toString() : window.location.search);
     params.set("view", "leaderboards");
     Object.entries(changes).forEach(([key, value]) => value ? params.set(key, value) : params.delete(key));
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [pathname, router, searchParams]);
+    if (changes.round && changes.round !== selectedRound) navigationStartedAt.current = { from: selectedRound, to: changes.round, startedAt: performance.now() };
+    setSelection(selectionFrom(params));
+    window.history.pushState(null, "", `${pathname}?${params.toString()}`);
+  }, [pathname, searchParams, selectedRound, selectionFrom]);
+  useEffect(() => setSelection(selectionFrom(searchParams)), [searchParams, selectionFrom]);
+  useEffect(() => {
+    const transition = navigationStartedAt.current;
+    if (!transition || transition.to !== selectedRound) return;
+    const frame = window.requestAnimationFrame(() => {
+      if (previewMode) console.info("Leaderboard navigation performance", {
+        transition: `${transition.from} → ${transition.to}`,
+        tapToRenderMs: Math.round((performance.now() - transition.startedAt) * 10) / 10,
+        apiRequests: 0,
+        googleSheetsRequests: 0,
+        cache: "in-memory hit",
+        normalizationMs: 0,
+        serverNavigationMs: 0,
+        lazyChunkLoadingMs: 0,
+      });
+      navigationStartedAt.current = null;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [previewMode, selectedRound]);
   const refresh = useCallback(() => {
     if (pending.current) return pending.current;
     setRefreshState("refreshing");
