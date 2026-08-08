@@ -76,6 +76,8 @@ export function MatchManagement({ operations, busy, save, operate, initialContex
 }
 
 export function CourseTeesManagement({ operations, busy, save }) {
+  const formatName = (value) => ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[clean(value).toUpperCase()] || clean(value);
+  const setupLabel = (option) => option ? `${option.tee} • ${option.yardage.toLocaleString()} yd • ${option.rating} / ${option.slope}` : "Not configured";
   const configuration = operations.courseTees || { year: "", courses: [] };
   const [saved, setSaved] = useState(() => Object.fromEntries(configuration.courses.map((course) => [course.id, course.currentTee])));
   const [draft, setDraft] = useState(() => ({ ...saved }));
@@ -87,14 +89,18 @@ export function CourseTeesManagement({ operations, busy, save }) {
     if (success) setSaved({ ...draft });
   };
   return <form className={`${styles.managementPanel} ${styles.courseTeesEditor}`} onSubmit={submit}>
-    <header><span>Course Tees</span><h3>{configuration.year} Sandbagger Invitational</h3><p>Selections apply to every match using the active tournament year’s course configuration.</p></header>
+    <header><h3>{configuration.year} Sandbagger Invitational</h3><p>Set the tees used by each tournament course.</p></header>
     <div className={styles.courseTeeList}>{configuration.courses.map((course) => {
+      const current = course.options.find((option) => option.tee === saved[course.id]);
       const selected = course.options.find((option) => option.tee === draft[course.id]);
+      const changedCourse = Boolean(selected && selected.tee !== saved[course.id]);
       return <article key={course.id} data-finalized={course.finalized ? "true" : "false"}>
-        <div><small>Round {course.round} • {course.format}</small><strong>{course.name}</strong><span>Course ID: {course.id}</span></div>
-        <dl><div><dt>Current Tee</dt><dd>{course.currentTee || "Not configured"}</dd></div>{selected ? <div><dt>Selected Setup</dt><dd>{selected.yardage.toLocaleString()} yd • {selected.rating} / {selected.slope}</dd></div> : null}</dl>
-        <label>Change To<select value={draft[course.id] || ""} disabled={Boolean(busy) || course.finalized} onChange={(event) => setDraft((current) => ({ ...current, [course.id]: event.target.value }))}>{course.options.map((option) => <option value={option.tee} key={option.tee}>{option.tee} • {option.yardage.toLocaleString()} yd • {option.rating} / {option.slope}</option>)}</select></label>
-        {course.finalized ? <p role="note">This course belongs to a finalized round. Reopen the official round workflow before changing its configuration.</p> : null}
+        <header><small>Round {course.round} • {formatName(course.format)}</small>{course.finalized ? <span className={styles.finalizedTeeStatus}>🔒 Finalized</span> : changedCourse ? <span className={styles.changedTeeStatus}>Changed</span> : null}</header>
+        <strong className={styles.courseTeeName}>{course.name}</strong>
+        <div className={styles.currentTeeSetup}><small>Current</small><b>{current?.tee || course.currentTee || "Not configured"}</b>{current ? <span>{current.yardage.toLocaleString()} yd • {current.rating} / {current.slope}</span> : null}</div>
+        {course.finalized
+          ? <p className={styles.finalizedTeeNote} role="note">Reopen Round {course.round} to change tees.</p>
+          : <label className={styles.courseTeeSelector}>Change To<select value={draft[course.id] || ""} disabled={Boolean(busy)} onChange={(event) => setDraft((state) => ({ ...state, [course.id]: event.target.value }))}>{course.options.map((option) => <option value={option.tee} key={option.tee}>{setupLabel(option)}</option>)}</select>{changedCourse ? <span className={styles.newTeeSetup}><small>New</small><b>{selected.tee}</b><em>{selected.yardage.toLocaleString()} yd • {selected.rating} / {selected.slope}</em></span> : null}</label>}
       </article>;
     })}</div>
     {changed.length ? <div className={styles.unsavedChanges} role="status"><strong><span aria-hidden="true">●</span> Unsaved Changes</strong><small>{changed.length} course update{changed.length === 1 ? "" : "s"} pending.</small></div> : null}

@@ -14,7 +14,22 @@ test("Mission Control exposes one active-year Course Tees bulk editor", async ()
   assert.match(editor, /configuration\.year.*Sandbagger Invitational/s);
   assert.match(editor, /Save Tee Selections/);
   assert.match(editor, /changed\.map\(\(course\) => \(\{ courseId: course\.id, tee: draft\[course\.id\] \}\)\)/);
+  assert.match(editor, /Set the tees used by each tournament course\./);
+  assert.match(editor, /Round \{course\.round\} • \{formatName\(course\.format\)\}/);
+  assert.match(editor, /Reopen Round \{course\.round\} to change tees\./);
+  assert.match(editor, /className=\{styles\.changedTeeStatus\}>Changed/);
+  assert.doesNotMatch(editor, /Course ID:/);
+  assert.doesNotMatch(editor, /Selected Setup/);
   assert.doesNotMatch(editor, /Active Tee/);
+});
+
+test("Course Tees mobile cards separate finalized and editable presentation", async () => {
+  const styles = await read("app/admin/director/director.module.css");
+  assert.match(styles, /\.courseTeeList article\[data-finalized=true\]/);
+  assert.match(styles, /\.currentTeeSetup\{[^}]*grid-template-columns:auto minmax\(0,1fr\)/s);
+  assert.match(styles, /\.courseTeeSelector select\{[^}]*min-height:48px/s);
+  assert.match(styles, /\.finalizedTeeStatus,\.changedTeeStatus/);
+  assert.match(styles, /\.newTeeSetup\{[^}]*grid-template-columns:auto minmax\(0,1fr\)/s);
 });
 
 test("course tee writes remain year-scoped, field-scoped, and use verified existing configurations", async () => {
