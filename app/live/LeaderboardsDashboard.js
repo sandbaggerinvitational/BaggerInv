@@ -11,7 +11,7 @@ import ScrambleLeaderboard from "./ScrambleLeaderboard";
 import ScrambleTeamIdentity from "./ScrambleTeamIdentity";
 import { LeaderboardColumnHeader, LeaderboardDetailSheet, LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity, RoundLeaderboardSheet } from "./LeaderboardRow";
 import { teamLogo, tournamentLogo } from "../../lib/asset-paths";
-import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
+import { formatMeaningfulNumber, formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import { publishedOddsInsights } from "../../lib/championship-odds-insights";
 import { formatChampionshipOdds } from "../../lib/championship-odds-format";
 import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from "../../lib/projection-editorial";
@@ -20,6 +20,7 @@ import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import { isTournamentRecapPhase, projectionPresentationLabel } from "../../lib/projection-phases";
 import { buildTournamentRecapIntelligence, finishLabel } from "../../lib/tournament-recap-intelligence";
 import { participantRoundBreakdown, playerRoundBreakdown } from "../../lib/leaderboard-round-breakdown";
+import { teamRoundRecap } from "../../lib/team-round-recap";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -165,6 +166,10 @@ function TeamDetailSheet({ team, data, selectedRound, odds, current, onClose }) 
     const standing = standings.find((item) => Number(item.side) === Number(team.side));
     return { round, standing, state: teamRoundState(round) };
   }).sort((left, right) => String(left.round.number) === String(selectedRound) ? -1 : String(right.round.number) === String(selectedRound) ? 1 : Number(left.round.number) - Number(right.round.number));
+  if (selectedRound !== "overall") {
+    const selected = roundRows.find(({ round }) => String(round.number) === String(selectedRound));
+    if (selected) return <TeamRoundDetailSheet team={team} round={selected.round} standing={selected.standing} state={selected.state} current={current} onClose={onClose} />;
+  }
   return <LeaderboardDetailSheet title="Team Summary" identity={<TeamLeaderboardIdentity team={team} current={current} large />} metrics={[
     { label: complete ? "Final Rank" : "Current Rank", value: team.rank },
     { label: "Tournament Points", value: formatTeamPoints(team.points), emphasis: "points" },
@@ -172,6 +177,39 @@ function TeamDetailSheet({ team, data, selectedRound, odds, current, onClose }) 
     { label: "Championship Odds", value: odds === null ? "Pending" : formatChampionshipOdds(odds), emphasis: "points" },
   ]} onClose={onClose}>
     <section className={`${leaderboardStyles.roundBreakdown} ${teamStyles.teamRoundBreakdown}`}><header><span>Round Breakdown</span><small>Official team results</small></header>{roundRows.map(({ round, standing, state }) => <article data-state={state === "upcoming" ? "pending" : state} key={round.number}><header className={teamStyles.teamRoundHeader}><strong>{round.label} • {formatName(round.format)}</strong><StatusBadge status={state} /></header>{state === "upcoming" ? <p className={teamStyles.teamRoundPending}>Pending</p> : <div className={teamStyles.teamRoundMetrics}><span><small>Record</small><strong>{standing.record}</strong></span><span data-points="true"><small>Points</small><strong>{formatTeamPoints(standing.points)}</strong></span></div>}</article>)}</section>
+  </LeaderboardDetailSheet>;
+}
+
+const RESULT_GROUPS = [["wins", "Wins"], ["ties", "Ties"], ["losses", "Losses"], ["inProgress", "In Progress"]];
+
+function pointsLabel(value) {
+  if (value === null || value === undefined) return "—";
+  return `${formatMeaningfulNumber(value)} ${Number(value) === 1 ? "pt" : "pts"}`;
+}
+
+function TeamRoundDetailSheet({ team, round, standing, state, current, onClose }) {
+  const recap = teamRoundRecap(round, team.side);
+  const upcoming = state === "upcoming";
+  return <LeaderboardDetailSheet
+    title="Team Round Detail"
+    identity={<TeamLeaderboardIdentity team={team} current={current} large />}
+    context={{ primary: `${round.label} • ${formatName(round.format)}`, secondary: round.course?.name || "Course pending" }}
+    status={state}
+    metrics={[
+      { label: "Round Rank", value: upcoming ? "—" : standing?.rank ?? "—" },
+      { label: "Round Record", value: upcoming ? "Pending" : standing?.record || "—" },
+      { label: "Round Points", value: upcoming ? "—" : formatMeaningfulNumber(standing?.points), emphasis: "points" },
+      { label: "Matches Remaining", value: standing?.remaining ?? (round.matches || []).length },
+    ]}
+    onClose={onClose}
+  >
+    {upcoming ? <section className={teamStyles.teamRoundUpcoming}><strong>Upcoming</strong><p>Match results will appear once play begins.</p></section> : <section className={teamStyles.teamMatchResults}>
+      <header><span>Match Results</span><small>Official team points</small></header>
+      {RESULT_GROUPS.map(([key, label]) => recap.groups[key].length ? <section className={teamStyles.teamResultGroup} data-result={key} key={key}><h3>{label}</h3>{recap.groups[key].map((match) => <article key={match.id}>
+        <header><strong>{match.players.map((player) => player.name).join(" & ") || "Pairing pending"}</strong><b>{pointsLabel(match.totalPoints)}</b></header>
+        <div>{match.segments.map((segment) => <span key={segment.label}><small>{segment.label}</small><strong>{segment.points === null || segment.points === undefined ? "—" : formatMeaningfulNumber(segment.points)}</strong></span>)}</div>
+      </article>)}</section> : null)}
+    </section>}
   </LeaderboardDetailSheet>;
 }
 

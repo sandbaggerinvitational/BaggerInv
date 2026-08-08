@@ -141,6 +141,17 @@ test("Teams reuse published team odds and one shared detail-sheet experience", a
   assert.doesNotMatch(css, /overflow-x:\s*(?:auto|scroll)/);
 });
 
+test("round-origin Team taps render an in-memory recap while Overall stays tournament-focused", async () => {
+  const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
+  assert.match(source, /selectedRound !== "overall"/);
+  assert.match(source, /<TeamRoundDetailSheet team=\{team\}/);
+  assert.match(source, /teamRoundRecap\(round, team\.side\)/);
+  assert.match(source, /\[\["wins", "Wins"\], \["ties", "Ties"\], \["losses", "Losses"\], \["inProgress", "In Progress"\]\]/);
+  assert.match(source, /Match results will appear once play begins\./);
+  assert.match(source, /match\.players\.map\(\(player\) => player\.name\)\.join\(" & "\)/);
+  assert.equal((source.match(/fetchWithTransientRetry\("\/api\/live"/g) || []).length, 1);
+});
+
 test("Teams show Pending until a round has an official result", async () => {
   const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
   assert.match(source, /if \(!official\.length\) return "upcoming"/);

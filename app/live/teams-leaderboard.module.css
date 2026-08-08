@@ -108,6 +108,54 @@
   padding: 6px 2px 2px;
   line-height: 1.35;
 }
+.teamRoundUpcoming {
+  display: grid;
+  gap: 5px;
+  padding: 18px 14px;
+  border: 1px solid #e3dbc9;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+.teamRoundUpcoming strong { color: #967326; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; }
+.teamRoundUpcoming p { margin: 0; color: #68746e; font-size: .68rem; line-height: 1.4; }
+.teamMatchResults { display: grid; gap: 12px; min-width: 0; }
+.teamMatchResults > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 2px 0;
+}
+.teamMatchResults > header span,
+.teamResultGroup h3 { color: #967326; font-size: .54rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.teamMatchResults > header small { color: #77817c; font-size: .5rem; }
+.teamResultGroup { display: grid; gap: 7px; min-width: 0; }
+.teamResultGroup h3 { margin: 0; padding-inline: 2px; }
+.teamResultGroup article {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #e3dbc9;
+  border-radius: 12px;
+  background: #fff;
+}
+.teamResultGroup article > header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.teamResultGroup article > header strong { min-width: 0; color: #17362c; font-size: .7rem; line-height: 1.25; overflow-wrap: anywhere; }
+.teamResultGroup article > header b { color: #967326; font-size: .7rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.teamResultGroup article > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; min-width: 0; }
+.teamResultGroup article > div span { display: grid; gap: 4px; min-width: 0; padding: 8px 4px; border-radius: 8px; background: #f7f4ec; text-align: center; }
+.teamResultGroup article > div small { color: #77817c; font-size: .43rem; font-weight: 900; text-transform: uppercase; }
+.teamResultGroup article > div strong { color: #0b4938; font-size: .7rem; font-variant-numeric: tabular-nums; }
+.teamResultGroup[data-result="inProgress"] article { background: #fffcf6; }
+.teamResultGroup[data-result="losses"] article { background: #fbfaf7; }
 
 @media (max-width: 420px) {
   .teamHeader,
@@ -122,6 +170,8 @@
   .teamRoundBreakdown article { padding: 11px; }
   .teamRoundHeader { align-items: start; gap: 8px; }
   .teamRoundHeader > strong { padding-top: 2px; font-size: .68rem !important; }
+  .teamResultGroup article { padding: 10px; }
+  .teamResultGroup article > header { align-items: start; gap: 7px; }
 }
 
 @media (max-width: 340px) {
