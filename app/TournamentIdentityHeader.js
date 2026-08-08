@@ -20,17 +20,19 @@ export default function TournamentIdentityHeader({
   status = "Live",
   compact = false,
   showStatus = true,
+  variant = "default",
 }) {
+  const hero = variant === "hero";
   return (
-    <header className={`${styles.homeHeader} ${headerStyles.tokens}`} data-density={compact ? "compact" : "standard"}>
+    <header className={`${styles.homeHeader} ${headerStyles.tokens} ${hero ? headerStyles.hero : ""}`.trim()} data-density={compact ? "compact" : "standard"} data-variant={variant}>
       <MobileIdentityImage
         sources={[logoSource(logo, year)]}
         name={name}
         alt={name}
-        className={styles.tournamentLogo}
-        fallbackClassName={styles.tournamentLogoFallback}
+        className={`${styles.tournamentLogo} ${hero ? headerStyles.heroLogo : ""}`.trim()}
+        fallbackClassName={`${styles.tournamentLogoFallback} ${hero ? headerStyles.heroLogoFallback : ""}`.trim()}
       />
-      <div>
+      <div className={hero ? headerStyles.heroIdentity : undefined}>
         <p>{year} Tournament</p>
         <h1>{name}</h1>
         <span>{location}</span>

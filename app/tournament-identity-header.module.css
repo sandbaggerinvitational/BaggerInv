@@ -4,3 +4,61 @@
   --home-eyebrow-size: 0.66rem;
   --home-eyebrow-weight: 900;
 }
+
+.hero.hero {
+  box-sizing: border-box;
+  width: min(100%, 732px);
+  min-height: 78px;
+  margin: 0 auto;
+  padding: 13px 15px;
+  border: 1px solid #ded4c1;
+  border-radius: 20px;
+  background: #fffefa;
+  box-shadow: 0 8px 24px rgba(12, 55, 43, .055);
+}
+
+.heroIdentity { min-width: 0; }
+.hero.hero .heroIdentity p { margin: 0; }
+.hero.hero .heroIdentity h1 {
+  overflow-wrap: anywhere;
+  margin: 4px 0;
+  color: #083f31;
+  font: 700 clamp(1.17rem, 3vw, 1.45rem)/1 Georgia, serif;
+}
+.hero.hero .heroIdentity > span { color: #6c7873; font-size: .72rem; }
+.heroLogo,
+.heroLogoFallback {
+  box-sizing: border-box;
+  width: 48px;
+  height: 48px;
+  padding: 4px;
+  border: 1px solid #d5ba70;
+  border-radius: 50%;
+  background: #fffaf0;
+}
+
+@media (max-width: 640px) {
+  .hero.hero {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    min-height: 68px;
+    padding: 10px 12px;
+    border-radius: 18px;
+  }
+  .heroLogo,
+  .heroLogoFallback { width: 42px; height: 42px; }
+  .hero.hero .heroIdentity h1 { font-size: 1.17rem; }
+  .hero.hero .heroIdentity > span { font-size: .68rem; }
+}
+
+@media (max-width: 370px) {
+  .hero.hero {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding-inline: 10px;
+  }
+  .heroLogo,
+  .heroLogoFallback { width: 38px; height: 38px; }
+  .hero.hero .heroIdentity h1 { font-size: 1.03rem; }
+  .hero.hero .heroIdentity p { font-size: .54rem; }
+}

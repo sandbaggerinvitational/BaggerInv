@@ -493,7 +493,7 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
     {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
   </div></section>;
   return <section className={styles.page}>
-    <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
+    <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Player, team, round standings, and Championship projections.</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
     <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["skins", "Net Skins"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
     {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}

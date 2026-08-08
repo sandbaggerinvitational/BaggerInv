@@ -10,17 +10,18 @@ const dataUrl = new URL("../app/live/sheetData.js", import.meta.url);
 const pageUrl = new URL("../app/live/page.js", import.meta.url);
 const homeUrl = new URL("../app/TournamentCommandCenter.js", import.meta.url);
 const identityHeaderUrl = new URL("../app/TournamentIdentityHeader.js", import.meta.url);
+const identityStylesUrl = new URL("../app/tournament-identity-header.module.css", import.meta.url);
 
-test("Tournament dashboard uses the exact shared Home identity header", async () => {
+test("Tournament dashboard uses the shared tournament identity header", async () => {
   const [source, styles, center, home, header] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(centerUrl, "utf8"), readFile(homeUrl, "utf8"), readFile(identityHeaderUrl, "utf8")]);
   assert.match(center, /<TournamentDashboard \{\.\.\.props\} \/>/);
   assert.match(source, /import TournamentIdentityHeader from "\.\.\/TournamentIdentityHeader"/);
   assert.match(home, /import TournamentIdentityHeader from "\.\/TournamentIdentityHeader"/);
-  assert.match(source, /<TournamentIdentityHeader year=\{tournament\.year\}/);
+  assert.match(source, /<TournamentIdentityHeader variant="hero" year=\{tournament\.year\}/);
   assert.match(home, /<TournamentIdentityHeader/);
-  assert.match(header, /className=\{`\$\{styles\.homeHeader\} \$\{headerStyles\.tokens\}`\}/);
+  assert.match(header, /hero \? headerStyles\.hero/);
   assert.match(header, /tournament-identity-header\.module\.css/);
-  assert.match(header, /className=\{styles\.tournamentLogo\}/);
+  assert.match(header, /hero \? headerStyles\.heroLogo/);
   assert.match(header, /<StatusBadge status=\{status\} \/>/);
   assert.match(source, /tournamentLogo\(filename\)/);
   assert.doesNotMatch(styles, /\.pageHeader(?:\{| )|\.pageHeader h1/);
@@ -29,6 +30,20 @@ test("Tournament dashboard uses the exact shared Home identity header", async ()
   assert.match(source, /Momentum/);
   assert.match(styles, /\.scoreValue\{[^}]*font-variant-numeric:tabular-nums/);
   assert.doesNotMatch(source, />My Tournament<|>My Match<|Refresh live scores/);
+});
+
+test("Tournament and Leaderboards share one self-contained rounded hero geometry", async () => {
+  const [tournament, leaderboards, header, heroStyles] = await Promise.all([
+    readFile(componentUrl, "utf8"),
+    readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8"),
+    readFile(identityHeaderUrl, "utf8"),
+    readFile(identityStylesUrl, "utf8"),
+  ]);
+  assert.match(tournament, /<TournamentIdentityHeader variant="hero"/);
+  assert.match(leaderboards, /<TournamentIdentityHeader variant="hero"/);
+  assert.match(header, /<StatusBadge status=\{status\} \/>/);
+  assert.match(heroStyles, /\.hero\.hero \{[^}]*width: min\(100%, 732px\);[^}]*min-height: 78px;[^}]*border: 1px solid #ded4c1;[^}]*border-radius: 20px;[^}]*background: #fffefa;[^}]*box-shadow:/s);
+  assert.match(heroStyles, /@media \(max-width: 640px\) \{[\s\S]*min-height: 68px;[\s\S]*border-radius: 18px;/);
 });
 
 test("Collapsed round summaries are compact and include both team logos", async () => {

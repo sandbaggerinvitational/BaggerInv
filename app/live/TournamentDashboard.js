@@ -255,7 +255,7 @@ export default function TournamentDashboard({ initialData, loadError }) {
     {refreshState !== "refreshing" ? <button type="button" onClick={refresh}>Retry</button> : null}
   </div></section>;
   return <section className={styles.page}>
-    <TournamentIdentityHeader year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
+    <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <nav className={styles.destinations} aria-label="Select tournament destination">
       <button type="button" aria-pressed={selectedRound !== "calcutta"} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</button>
       <button type="button" aria-pressed={selectedRound === "calcutta"} onClick={() => setSelectedRound("calcutta")}>Calcutta</button>
