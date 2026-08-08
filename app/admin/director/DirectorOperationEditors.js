@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import StatusBadge from "../../StatusBadge.js";
 import styles from "./director.module.css";
 
 const clean = (value) => String(value || "").trim();
@@ -27,11 +28,51 @@ function MatchEditor({ match, operations, busy, save }) {
   </form>;
 }
 
-export function MatchManagement({ operations, busy, save, initialContext = {} }) {
+function MatchConfirmation({ action, match, busy, onCancel, onConfirm }) {
+  const finalizing = action === "match-finalize";
+  return <div className={styles.matchConfirmBackdrop} role="presentation">
+    <section className={styles.matchConfirm} role="alertdialog" aria-modal="true" aria-labelledby="match-confirm-title" aria-describedby="match-confirm-copy">
+      <span>Match Management</span>
+      <h3 id="match-confirm-title">{finalizing ? "Finalize Match?" : "Reopen Match?"}</h3>
+      <p id="match-confirm-copy">{finalizing
+        ? "This will mark the match official and update tournament results and leaderboards."
+        : "This match is currently official. Reopening allows the Director to correct scoring or match information before finalizing it again."}</p>
+      <small>Round {match.round} · Match {match.match}</small>
+      <div><button type="button" onClick={onCancel} disabled={Boolean(busy)}>Cancel</button><button className={finalizing ? styles.confirmFinal : styles.confirmReopen} type="button" onClick={onConfirm} disabled={Boolean(busy)}>{finalizing ? "Mark Final" : "Reopen Match"}</button></div>
+    </section>
+  </div>;
+}
+
+function MatchControls({ match, operations, busy, operate }) {
+  const [confirmAction, setConfirmAction] = useState("");
+  const status = clean(match.status) || "Upcoming";
+  const final = /^Final$/i.test(status);
+  const live = /^Live$/i.test(status);
+  const reopened = /^Reopened$/i.test(status);
+  const unlocked = match.scoringUnlocked === true;
+  const run = async (action) => {
+    const success = await operate(action, { matchId: match.id, round: Number(match.round) });
+    if (success) setConfirmAction("");
+  };
+  return <section className={styles.matchControls} aria-labelledby={`match-controls-${match.id}`}>
+    <header><span>Match Controls</span><h3 id={`match-controls-${match.id}`}>Lifecycle &amp; scoring</h3></header>
+    <dl><div><dt>Status</dt><dd><StatusBadge status={status} /></dd></div><div><dt>Scoring Access</dt><dd data-access={unlocked ? "unlocked" : "locked"}>{unlocked ? "Unlocked" : "Locked"}</dd></div></dl>
+    <div className={styles.matchControlActions}>
+      {!final && operations.capabilities.scoringAccess && !unlocked ? <button type="button" disabled={Boolean(busy)} onClick={() => run("match-unlock-scoring")}>Unlock Scoring</button> : null}
+      {!final && operations.capabilities.scoringAccess && unlocked ? <button type="button" disabled={Boolean(busy)} onClick={() => run("match-lock-scoring")}>Lock Scoring</button> : null}
+      {!final && !live && operations.capabilities.matchStatus ? <button type="button" disabled={Boolean(busy)} onClick={() => run("match-mark-live")}>Mark Live</button> : null}
+      {(live || reopened) && operations.capabilities.matchStatus ? <button className={styles.finalAction} type="button" disabled={Boolean(busy)} onClick={() => setConfirmAction("match-finalize")}>Mark Final</button> : null}
+      {final && operations.capabilities.matchStatus ? <button className={styles.reopenAction} type="button" disabled={Boolean(busy)} onClick={() => setConfirmAction("match-reopen")}>Reopen Match</button> : null}
+    </div>
+    {confirmAction ? <MatchConfirmation action={confirmAction} match={match} busy={busy} onCancel={() => setConfirmAction("")} onConfirm={() => run(confirmAction)} /> : null}
+  </section>;
+}
+
+export function MatchManagement({ operations, busy, save, operate, initialContext = {} }) {
   const initialMatch = operations.matches.find((item) => item.id === initialContext.matchId || item.players.some((player) => player.id === initialContext.playerId));
   const [matchId, setMatchId] = useState(initialMatch?.id || operations.matches[0]?.id || "");
   const match = operations.matches.find((item) => item.id === matchId);
-  return <div className={styles.managementPanel}><label>Find match<select value={matchId} onChange={(event) => setMatchId(event.target.value)}>{operations.matches.map((item) => <option value={item.id} key={item.id}>Round {item.round} · Match {item.match} · {item.players.map((player) => player.name).join(" / ")}</option>)}</select></label>{match ? <MatchEditor key={match.id} match={match} operations={operations} busy={busy} save={save} /> : <p>No matches are configured.</p>}</div>;
+  return <div className={styles.managementPanel}><label>Find match<select value={matchId} onChange={(event) => setMatchId(event.target.value)}>{operations.matches.map((item) => <option value={item.id} key={item.id}>Round {item.round} · Match {item.match} · {item.players.map((player) => player.name).join(" / ")}</option>)}</select></label>{match ? <><MatchEditor key={match.id} match={match} operations={operations} busy={busy} save={save} /><MatchControls match={match} operations={operations} busy={busy} operate={operate} /></> : <p>No matches are configured.</p>}</div>;
 }
 
 export function CalcuttaManagement({ operations, busy, save, initialContext = {} }) {

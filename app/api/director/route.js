@@ -4,7 +4,7 @@ import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagn
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorMatchManagement, updateDirectorNetSkins, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorMatchManagement, updateDirectorNetSkins, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
 import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server-read.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
@@ -40,6 +40,15 @@ function transactionTrace(action) {
 }
 
 function verifyActionReadBack(action, input, data, round) {
+  if (["match-unlock-scoring", "match-lock-scoring", "match-mark-live", "match-finalize", "match-reopen"].includes(action)) {
+    const match = data.operations?.matches.find((item) => item.id === input.matchId);
+    if (!match) return false;
+    if (action === "match-unlock-scoring") return match.scoringUnlocked === true;
+    if (action === "match-lock-scoring") return match.scoringUnlocked === false;
+    if (action === "match-mark-live") return /^Live$/i.test(match.status);
+    if (action === "match-finalize") return /^Final$/i.test(match.status);
+    return /^Reopened$/i.test(match.status);
+  }
   if (action === "match-management") {
     const match = data.operations?.matches.find((item) => item.id === input.matchId);
     return Boolean(match) && Object.entries(input.updates || {}).every(([field, value]) => ({
@@ -187,6 +196,7 @@ export async function POST(request) {
     trace.stage("Workbook verification", "PASS");
     const round = Number(input.round || data.tournament.currentRound);
     const matches = data.rounds.find((item) => Number(item.number) === round)?.matches || [];
+    const selectedMatch = data.rounds.flatMap((item) => item.matches || []).find((match) => match.id === input.matchId);
     const updatedBy = identity.actor.name;
     const workbookWriteStartedAt = Date.now();
     if (input.action === "automation-check") {
@@ -211,6 +221,22 @@ export async function POST(request) {
     } else if (input.action === "reopen-match") {
       if (!input.matchId || !matches.some((match) => match.id === input.matchId && match.status === "Final")) throw new Error("Select a finalized match from the active round.");
       await reopenLiveMatch(input.matchId, updatedBy);
+    } else if (input.action === "match-unlock-scoring") {
+      if (!selectedMatch || selectedMatch.status === "Final") throw new Error("Reopen this Final match before unlocking scoring.");
+      await enableLiveMatchAccess(input.matchId, updatedBy);
+    } else if (input.action === "match-lock-scoring") {
+      if (!selectedMatch) throw new Error("The selected match could not be found.");
+      await disableLiveMatchAccess(input.matchId, updatedBy);
+    } else if (input.action === "match-mark-live") {
+      if (!selectedMatch || selectedMatch.status === "Final") throw new Error("Reopen this Final match before marking it Live.");
+      await updateLiveMatch(input.matchId, { "Match Status": "Live" }, updatedBy);
+    } else if (input.action === "match-finalize") {
+      if (!selectedMatch) throw new Error("The selected match could not be found.");
+      if (selectedMatch.status === "Final") throw new Error("This match is already Final.");
+      await finalizeLiveMatch(input.matchId, {}, updatedBy);
+    } else if (input.action === "match-reopen") {
+      if (!selectedMatch || selectedMatch.status !== "Final") throw new Error("Only a Final match can be reopened.");
+      await reopenLiveMatch(input.matchId, updatedBy);
     } else if (input.action === "automation") {
       await updateTournamentAdminData(data.tournament.id, {
         "Director Automation Enabled": input.enabled,
@@ -232,7 +258,7 @@ export async function POST(request) {
       elapsedMs: googleWriteCompletedAt - workbookWriteStartedAt,
     }));
     refresh();
-    const operationsAction = ["match-management", "calcutta-management", "net-skins-eligibility"].includes(input.action);
+    const operationsAction = ["match-management", "calcutta-management", "net-skins-eligibility", "match-unlock-scoring", "match-lock-scoring", "match-mark-live", "match-finalize", "match-reopen"].includes(input.action);
     const verification = await verifyDirectorReadBack({
       invalidate: () => invalidateTournamentDataCache(["Live Matches", "Matches", "Tournaments", "Match Update Log", "Admin Audit Log", "Calcutta Purchases", "Calcutta Ownership", "Calcutta Standings", "Net Skins", "Net Skins Result"]),
       read: operationsAction

@@ -18,6 +18,8 @@ const DIRECTOR_LOAD_FAILURE = "Unable to verify Director credentials after autom
 const ACTION_LABELS = {
   "unlock-scoring": "Scoring unlocked", "lock-scoring": "Scoring locked", "set-live": "Round matches opened for live scoring",
   "open-round": "Round opened", "close-round": "Round closed", "reopen-match": "Match reopened",
+  "match-unlock-scoring": "Scoring unlocked", "match-lock-scoring": "Scoring locked", "match-mark-live": "Match marked Live",
+  "match-finalize": "Match finalized", "match-reopen": "Match reopened",
   automation: "Automation updated", "automation-check": "Automation verified",
   "match-management": "Match updated", "calcutta-management": "Calcutta updated", "net-skins-eligibility": "Net Skins eligibility updated",
 };
@@ -179,7 +181,7 @@ export default function DirectorDashboard({ directorName }) {
   return <section className={styles.shell}>
     <header className={styles.hero}><span>Director Mode</span><h1>Tournament Director</h1><p>{directorName} · {data.tournament.year} {data.tournament.name}</p><StatusBadge status={data.tournament.status} /></header>
 
-    <DirectorOperationsHub operations={data.operations} notificationSandbox={data.notificationSandbox} busy={busy} saveOperation={async (...args) => { const saved = await act(...args); if (saved) { setToast("✓ Changes Saved"); window.setTimeout(() => setToast(""), 2400); } return saved; }} sendNotification={async (...args) => { const sent = await sendTestNotification(...args); if (sent) { setToast("✓ Changes Saved"); window.setTimeout(() => setToast(""), 2400); } return sent; }} />
+    <DirectorOperationsHub operations={data.operations} notificationSandbox={data.notificationSandbox} busy={busy} saveOperation={async (...args) => { const saved = await act(...args); if (saved) { setToast("✓ Changes Saved"); window.setTimeout(() => setToast(""), 2400); } return saved; }} operateMatch={async (...args) => { const saved = await act(...args); if (saved) { setToast("✓ Match Updated"); window.setTimeout(() => setToast(""), 2400); } return saved; }} sendNotification={async (...args) => { const sent = await sendTestNotification(...args); if (sent) { setToast("✓ Changes Saved"); window.setTimeout(() => setToast(""), 2400); } return sent; }} />
 
     <section className={styles.command} aria-labelledby="command-title">
       <header><span>Mission Control</span><h2 id="command-title">Operational Overview</h2></header>

@@ -43,7 +43,7 @@ function DirectorBottomSheet({ active, onClose, children }) {
   </div>;
 }
 
-export function DirectorOperationsHub({ operations, notificationSandbox, busy, saveOperation, sendNotification }) {
+export function DirectorOperationsHub({ operations, notificationSandbox, busy, saveOperation, operateMatch, sendNotification }) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(null);
   const openedAt = useRef(0);
@@ -87,7 +87,7 @@ export function DirectorOperationsHub({ operations, notificationSandbox, busy, s
       </div>
     </section>
     <DirectorBottomSheet active={active} onClose={close}>
-      {active?.type === "match" ? <MatchManagement operations={operations} busy={busy} save={save} initialContext={active.context} /> : null}
+      {active?.type === "match" ? <MatchManagement operations={operations} busy={busy} save={save} operate={operateMatch} initialContext={active.context} /> : null}
       {active?.type === "calcutta" ? <CalcuttaManagement operations={operations} busy={busy} save={save} initialContext={active.context} /> : null}
       {active?.type === "skins" ? <NetSkinsManagement operations={operations} busy={busy} save={save} initialContext={active.context} /> : null}
       {active?.type === "notifications" ? <NotificationManagement sandbox={notificationSandbox} busy={busy} send={notify} initialContext={active.context} /> : null}

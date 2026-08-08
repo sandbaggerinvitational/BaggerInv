@@ -117,3 +117,40 @@ test("Calcutta purchase and ownership are edited and verified as one transaction
   assert.match(route, /purchaseVerified/);
   assert.match(route, /actual\.length === expected\.length/);
 });
+
+test("Match Management exposes contextual lifecycle controls through the verified Director pipeline", () => {
+  const editors = source("app/admin/director/DirectorOperationEditors.js");
+  const consoleSource = source("app/admin/director/DirectorOperationsConsole.js");
+  const dashboard = source("app/admin/director/DirectorDashboard.js");
+  const route = source("app/api/director/route.js");
+  const writes = source("lib/google-sheets-write.js");
+
+  assert.match(editors, /Match Controls/);
+  assert.match(editors, /Scoring Access/);
+  for (const label of ["Unlock Scoring", "Lock Scoring", "Mark Live", "Mark Final", "Reopen Match"]) assert.match(editors, new RegExp(label));
+  assert.match(editors, /Finalize Match\?/);
+  assert.match(editors, /Reopen Match\?/);
+  assert.match(editors, /final && operations\.capabilities\.matchStatus/);
+  assert.match(editors, /!final && operations\.capabilities\.scoringAccess && !unlocked/);
+  assert.match(editors, /!final && operations\.capabilities\.scoringAccess && unlocked/);
+  assert.match(consoleSource, /operate=\{operateMatch\}/);
+  assert.match(dashboard, /operateMatch=\{async/);
+
+  assert.match(route, /match-unlock-scoring[\s\S]*enableLiveMatchAccess/);
+  assert.match(route, /match-lock-scoring[\s\S]*disableLiveMatchAccess/);
+  assert.match(route, /match-mark-live[\s\S]*updateLiveMatch\(input\.matchId, \{ "Match Status": "Live" \}/);
+  assert.match(route, /match-finalize[\s\S]*finalizeLiveMatch\(input\.matchId, \{\}, updatedBy\)/);
+  assert.match(route, /match-reopen[\s\S]*reopenLiveMatch\(input\.matchId, updatedBy\)/);
+  assert.match(route, /verifyDirectorReadBack/);
+  assert.match(route, /operationsAction = \[[^\]]*"match-finalize"[^\]]*"match-reopen"/);
+  assert.match(writes, /scoringUnlocked: truthy\(record\["Access Active"\]\) && !accessExpired\(record\)/);
+});
+
+test("match status and scoring access remain separate authoritative capabilities", () => {
+  const writes = source("lib/google-sheets-write.js");
+  const editors = source("app/admin/director/DirectorOperationEditors.js");
+  assert.match(writes, /matchStatus: sheets\["Live Matches"\]\.headers\.includes\("Match Status"\) && writableFields\("Live Matches"\)\.includes\("Match Status"\)/);
+  assert.match(writes, /scoringAccess: MATCH_ACCESS_HEADERS\.every/);
+  assert.match(editors, /const unlocked = match\.scoringUnlocked === true/);
+  assert.doesNotMatch(editors, /unlocked\s*=\s*live|live\s*=\s*unlocked/);
+});
