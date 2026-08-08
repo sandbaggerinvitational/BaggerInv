@@ -161,7 +161,7 @@ function ScoreLeaderboard({ rows = [], round, format, players = [], matches = []
     });
     return map;
   }, [sort.key, sorted]);
-  if (pairing) return <ScrambleLeaderboard rows={rows} round={round} players={players} matches={matches} returnTo="/live?view=tournament" />;
+  if (pairing) return <ScrambleLeaderboard rows={rows} round={round} players={players} matches={matches} roundLabel={`Round ${round}`} returnTo="/live?view=tournament" />;
   return <section className={styles.leaderboard}>
     <header><span><small>Round Leaderboard</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{eligible.length ? <StatusBadge status="Live" /> : null}</header>
     {!eligible.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div className={styles.leaderTable}>

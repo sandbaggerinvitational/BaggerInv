@@ -33,7 +33,8 @@ test("View Scorecard targets the canonical Game Center and preserves leaderboard
 
 test("Overall keeps its expanded tournament summary and Net Skins keeps hole storytelling", async () => {
   const dashboard = await read("app/live/LeaderboardsDashboard.js");
-  assert.match(dashboard, /isOpen \? <div className=\{leaderboardStyles\.details\}><PlayerDetails/);
+  assert.match(dashboard, /<OverallPlayerSheet row=\{selected\}/);
+  assert.match(dashboard, /<LeaderboardDetailSheet title="Overall Player"/);
   assert.doesNotMatch(dashboard.slice(dashboard.indexOf("function OverallPlayers"), dashboard.indexOf("function RoundPlayers")), /Hole-by-Hole/);
   assert.match(dashboard, /Hole-by-Hole Net Skins Results/);
   assert.match(dashboard, /holeResults/);

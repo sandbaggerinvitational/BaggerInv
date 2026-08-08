@@ -1,4 +1,5 @@
 import PlayerAvatar from "../PlayerAvatar";
+import StatusBadge from "../StatusBadge";
 import styles from "./scramble-leaderboard.module.css";
 
 export function LeaderboardRank({ value }) {
@@ -12,24 +13,37 @@ export function PlayerLeaderboardIdentity({ player, current = false, team = "", 
   </span>;
 }
 
-export function RoundLeaderboardSheet({ title, identity, rank, holes, gross, net, netToPar, matchId, returnTo = "/live?view=leaderboards", onClose }) {
-  const final = Number(holes) >= 18;
-  const scorecardHref = matchId ? `/game-center/${encodeURIComponent(matchId)}?from=${encodeURIComponent(returnTo)}` : "";
+export function LeaderboardColumnHeader({ identityLabel = "Player", columns = [], sort, onSelect, variant = "round", label = "Leaderboard columns" }) {
+  return <div className={styles.columnGrid} data-variant={variant} role="group" aria-label={label}>
+    <span>Rank</span><span>{identityLabel}</span>
+    <span className={styles.columnMetrics}>{columns.map(({ key, label: columnLabel, sortable = true }) => sortable && onSelect ? <button type="button" onClick={() => onSelect(key)} aria-pressed={sort?.key === key} aria-label={key === "netToPar" ? "Net score relative to par" : columnLabel} key={key}>{columnLabel}{sort?.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button> : <span key={key}>{columnLabel}</span>)}</span>
+  </div>;
+}
+
+export function LeaderboardDetailSheet({ title, identity, context, status, metrics = [], children, action, onClose }) {
   return <div className={styles.sheetLayer} role="presentation">
     <button type="button" className={styles.backdrop} onClick={onClose} aria-label={`Close ${title} details`} />
-    <section className={styles.sheet} role="dialog" aria-modal="true" aria-labelledby="round-leaderboard-subject">
+    <section className={styles.sheet} role="dialog" aria-modal="true" aria-labelledby="leaderboard-detail-subject">
       <header><span>{title}</span><button type="button" onClick={onClose} aria-label={`Close ${title} details`}>×</button></header>
-      <div className={styles.sheetIdentity} id="round-leaderboard-subject">{identity}</div>
-      <section className={styles.sheetMetrics} aria-label={`${title} summary`}>
-        <p><small>{final ? "Final Rank" : "Current Rank"}</small><strong>{rank}</strong></p>
-        <p><small>THRU</small><strong>{final ? "F" : holes}</strong></p>
-        <p><small>Gross Score</small><strong>{gross}</strong></p>
-        <p><small>Net Score</small><strong>{net}</strong></p>
-        <p><small>Net +/-</small><strong>{netToPar}</strong></p>
-      </section>
-      {scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null}
+      <div className={styles.sheetIdentity} id="leaderboard-detail-subject">{identity}</div>
+      {context ? <div className={styles.sheetContext}><span><strong>{context.primary}</strong>{context.secondary ? <small>{context.secondary}</small> : null}</span>{status ? <StatusBadge status={status} /> : null}</div> : null}
+      <section className={styles.sheetMetrics} aria-label={`${title} summary`}>{metrics.map((metric) => <p data-featured={metric.featured || undefined} key={metric.label}><small>{metric.label}</small><strong>{metric.value}</strong></p>)}</section>
+      {children}
+      {action}
     </section>
   </div>;
+}
+
+export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, matchId, returnTo = "/live?view=leaderboards", onClose }) {
+  const final = Number(holes) >= 18;
+  const scorecardHref = matchId ? `/game-center/${encodeURIComponent(matchId)}?from=${encodeURIComponent(returnTo)}` : "";
+  return <LeaderboardDetailSheet title={title} identity={identity} context={{ primary: [roundLabel, formatLabel].filter(Boolean).join(" • "), secondary: courseName }} status={final ? "Final" : "Live"} metrics={[
+    { label: final ? "Final Rank" : "Current Rank", value: rank },
+    { label: "THRU", value: final ? "F" : holes },
+    { label: "Gross Score", value: gross },
+    { label: "Net Score", value: net },
+    { label: "Net +/-", value: netToPar, featured: true },
+  ]} action={scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null} onClose={onClose} />;
 }
 
 export function LeaderboardMetrics({ metrics = [], variant = "round" }) {

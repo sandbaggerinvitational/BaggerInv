@@ -204,7 +204,7 @@ test("Championship Projections opens in-place player details from every publishe
   assert.match(insightStyles, /data-podium="3"/);
 });
 
-test("Leaderboards use shared tournament identity, URL tabs, search, expansion, and Passport highlighting", async () => {
+test("Leaderboards use shared tournament identity, URL tabs, search, detail sheets, and Passport highlighting", async () => {
   const [source, matchCenter, sharedRow] = await Promise.all([readFile(componentUrl, "utf8"), readFile(matchCenterUrl, "utf8"), readFile(new URL("../app/live/LeaderboardRow.js", import.meta.url), "utf8")]);
   assert.match(matchCenter, /searchParams\.get\("view"\) === "leaderboards"/);
   assert.match(matchCenter, /<LeaderboardsDashboard/);
@@ -213,7 +213,8 @@ test("Leaderboards use shared tournament identity, URL tabs, search, expansion, 
   assert.match(source, /\[\["players", "Players"\], \["teams", "Teams"\], \["skins", "Net Skins"\], \["insights", "Insights"\]\]/);
   assert.match(source, /params\.set\("view", "leaderboards"\)/);
   assert.match(source, /placeholder="Search players"/);
-  assert.match(source, /expanded=\{isOpen\}/);
+  assert.match(source, /<OverallPlayerSheet row=\{selected\}/);
+  assert.match(source, /onClick=\{\(\) => setSelectedId\(row\.id\)\}/);
   assert.match(sharedRow, /aria-expanded=\{expanded\}/);
   assert.match(source, /fetch\("\/api\/player-passport\/session"/);
   assert.match(sharedRow, />YOU<\/em>/);
