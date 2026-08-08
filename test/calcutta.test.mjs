@@ -351,6 +351,21 @@ test("Calcutta financial values use shared positive, negative, and neutral prese
   assert.doesNotMatch(css, /\.row\[data-portfolio=true\][^{]*overflow-x/);
 });
 
+test("Current Market gives Current Pot a full-width hero above two balanced metric rows", async () => {
+  const [component, css] = await Promise.all([
+    readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/calcutta.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(component, /data-current-market=\{!model\.tournamentComplete \|\| undefined\}/);
+  assert.match(component, /className=\{styles\.heroPot\}[^>]*><small>Current Pot<\/small><strong>\{money\(model\.pot\)\}<\/strong>/);
+  assert.match(component, /Total Calcutta prize pool/);
+  assert.match(css, /\.hero>div\[data-current-market=true\] \.heroPot\{grid-column:1\/-1/);
+  assert.match(css, /\.hero>div\[data-current-market=true\] \.heroPot strong\{font-size:2rem\}/);
+  assert.match(css, /p:nth-child\(2n\+2\)\{border-right:1px/);
+  assert.match(css, /p:nth-child\(2n\+3\)\{border-right:0\}/);
+  assert.match(css, /p:last-child\{grid-column:auto\}/);
+});
+
 test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet scroller", async () => {
   const [dashboard, dashboardCss, component, css, loader, protection, writer] = await Promise.all([
     readFile(new URL("../app/live/TournamentDashboard.js", import.meta.url), "utf8"),
@@ -385,7 +400,7 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(css, /\.investmentBreakdown article>i\{[^}]*height:7px/);
   assert.match(css, /\.portfolioPerformance>div\{[^}]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(css, /\.investmentBreakdown article\[data-zero=true\]\{opacity:\.58\}/);
-  assert.match(css, /\.hero>div p:last-child:nth-child\(odd\)\{grid-column:1\/-1/);
+  assert.match(css, /\.hero>div:not\(\[data-current-market=true\]\) p:last-child:nth-child\(odd\)\{grid-column:1\/-1/);
   assert.match(loader, /buildCalcuttaModel/);
   assert.doesNotMatch(loader, /fetchOptionalSheet\("Round Results"\)/);
   assert.match(loader, /roundResults: calcuttaRoundResults/);

@@ -25,8 +25,8 @@ function Hero({ model }) {
   const { hero } = model;
   return <section className={styles.hero} aria-label="Calcutta snapshot">
     <header><span>Sandbagger Calcutta</span><h2>{model.tournamentComplete ? "Final Calcutta" : "Current Market"}</h2><p>{model.tournamentComplete ? "Official final results, ownership, and winnings." : "Official results, ownership, and tournament value."}</p></header>
-    <div>
-      <p><small>Current Pot</small><strong>{money(model.pot)}</strong></p>
+    <div data-current-market={!model.tournamentComplete || undefined}>
+      <p className={styles.heroPot}><small>Current Pot</small><strong>{money(model.pot)}</strong>{!model.tournamentComplete ? <span>Total Calcutta prize pool</span> : null}</p>
       <p><small>{model.tournamentComplete ? "Final Winnings Distributed" : "Guaranteed Distributed"}</small><strong>{money(model.guaranteedDistributed)}</strong><span>{model.tournamentComplete ? "Tournament complete" : model.completedRounds.length ? "Completed rounds" : "Updates after official results"}</span></p>
       <p><small>Remaining Prize Pool</small><strong>{money(model.remainingPrizePool)}</strong><span>Still in play</span></p>
       {hero.highestGuaranteed ? <p><small>Highest Guaranteed Winner</small><strong>{hero.highestGuaranteed.player.name}</strong><span>{money(hero.highestGuaranteed.guaranteedWinnings)} secured</span></p> : null}
