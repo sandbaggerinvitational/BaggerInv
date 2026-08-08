@@ -365,12 +365,21 @@ test("Team Summary owns responsive round rows without duplicating global status"
   const detailEnd = source.indexOf("function Teams", detailStart);
   const detail = source.slice(detailStart, detailEnd);
   assert.doesNotMatch(detail, /<LeaderboardDetailSheet[^>]*status=/);
+  assert.match(detail, /className=\{teamStyles\.teamRoundCard\}/);
   assert.match(detail, /className=\{teamStyles\.teamRoundHeader\}/);
   assert.match(detail, /className=\{teamStyles\.teamRoundMetrics\}/);
   assert.match(detail, /className=\{teamStyles\.teamRoundPending\}>Pending/);
   assert.match(teamStyles, /\.teamRoundHeader \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*min-width: 0;/s);
   assert.match(teamStyles, /\.teamRoundMetrics \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\) !important;/s);
+  assert.match(teamStyles, /\.teamRoundBreakdown \.teamRoundCard \{[^}]*display: flex !important;[^}]*flex-direction: column !important;[^}]*width: 100%;/s);
   assert.match(teamStyles, /@media \(max-width: 340px\) \{[\s\S]*\.teamRoundHeader \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+});
+
+test("Team result groups use section-level hierarchy above unchanged match cards", async () => {
+  const teamStyles = await readFile(new URL("../app/live/teams-leaderboard.module.css", import.meta.url), "utf8");
+  assert.match(teamStyles, /\.teamResultGroup \{[^}]*gap: 10px;[^}]*padding-top: 5px;/s);
+  assert.match(teamStyles, /\.teamResultGroup h3 \{[^}]*font: 900 \.72rem\/1\.2 Arial, sans-serif;[^}]*letter-spacing: \.11em;/s);
+  assert.match(teamStyles, /\.teamResultGroup \+ \.teamResultGroup \{ margin-top: 5px; \}/);
 });
 
 test("Team sheet names own the center track independently from YOUR TEAM", async () => {

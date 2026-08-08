@@ -97,7 +97,10 @@
   line-height: 1;
   white-space: nowrap;
 }
-.teamRoundBreakdown article {
+.teamRoundBreakdown .teamRoundCard {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -113,6 +116,8 @@
   min-width: 0;
 }
 .teamRoundHeader > strong {
+  display: block;
+  width: 100%;
   min-width: 0;
   overflow-wrap: normal;
   word-break: normal;
@@ -128,6 +133,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 7px !important;
   min-width: 0;
+  width: 100%;
 }
 .teamRoundMetrics > span {
   box-sizing: border-box;
@@ -159,11 +165,18 @@
   gap: 10px;
   padding: 2px 2px 0;
 }
-.teamMatchResults > header span,
-.teamResultGroup h3 { color: #967326; font-size: .54rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.teamMatchResults > header span { color: #967326; font-size: .54rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .teamMatchResults > header small { color: #77817c; font-size: .5rem; }
-.teamResultGroup { display: grid; gap: 7px; min-width: 0; }
-.teamResultGroup h3 { margin: 0; padding-inline: 2px; }
+.teamResultGroup { display: grid; gap: 10px; min-width: 0; padding-top: 5px; }
+.teamResultGroup + .teamResultGroup { margin-top: 5px; }
+.teamResultGroup h3 {
+  margin: 0;
+  padding: 2px 2px 1px;
+  color: #795c18;
+  font: 900 .72rem/1.2 Arial, sans-serif;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
 .teamMatchCard {
   display: flex !important;
   flex-direction: column !important;
@@ -221,7 +234,7 @@
   .teamRow small { font-size: .49rem; }
   .teamRow > span:nth-child(3),
   .teamRow > b { font-size: .64rem; }
-  .teamRoundBreakdown article { padding: 11px; }
+  .teamRoundBreakdown .teamRoundCard { padding: 11px; }
   .teamRoundHeader { align-items: start; gap: 8px; }
   .teamRoundHeader > strong { padding-top: 2px; font-size: .68rem !important; }
   .teamMatchCard { padding: 10px; }
