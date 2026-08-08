@@ -37,6 +37,18 @@ test("Scramble pairing details use the shared summary sheet and canonical scorec
   assert.doesNotMatch(`${source}\n${shared}`, /fetch\(|google|workbook|spreadsheet/i);
 });
 
+test("Scramble presentation distinguishes team points from individual credits", async () => {
+  const [source, shared] = await Promise.all([
+    readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/LeaderboardRow.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(source, /pointsLabel="Team Points"/);
+  assert.match(source, /playerPoints=\{playerPoints\}/);
+  assert.match(source, /\["points", "Team Points"\]/);
+  assert.match(shared, />Player Points</);
+  assert.match(shared, /formatPlayerPoints\(player\.points\).*pts/);
+});
+
 test("Scramble leaderboard remains mobile stacked without horizontal scrolling", async () => {
   const css = await readFile(new URL("../app/live/scramble-leaderboard.module.css", import.meta.url), "utf8");
   assert.match(css, /@media\(max-width:620px\)/);

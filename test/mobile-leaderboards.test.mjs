@@ -76,11 +76,32 @@ test("competition round standings rank by official points, then net, then stable
   assert.deepEqual(ranked.map((row) => row.points), [1.5, 1, 1, 1]);
 });
 
-test("Scramble standings expose each partner's official player points without doubling them", () => {
+test("Scramble standings rank by summed team points and retain each partner's official credit", () => {
   const scores = [{ id: "match-1:team-1", playerIds: ["p1", "p2"], round: 2, entityType: "PAIRING", name: "Alpha / Bravo", net: 62 }];
   const official = [{ id: "p1", points: 1.25 }, { id: "p2", points: 1.25 }];
   const matches = [{ status: "Final", team1Players: [{ id: "p1" }, { id: "p2" }], team2Players: [] }];
-  assert.equal(roundCompetitionRows(scores, 2, "SC", official, matches)[0].points, 1.25);
+  const [pairing] = roundCompetitionRows(scores, 2, "SC", official, matches);
+  assert.equal(pairing.points, 2.5);
+  assert.deepEqual(pairing.playerPoints, [{ playerId: "p1", points: 1.25 }, { playerId: "p2", points: 1.25 }]);
+  assert.equal(pairing.playerPoints.reduce((sum, player) => sum + player.points, 0), pairing.points);
+});
+
+test("Scramble pairing rank uses team points before net score", () => {
+  const scores = [
+    { id: "m1:team-1", playerIds: ["p1", "p2"], round: 2, entityType: "PAIRING", name: "Alpha", net: 70 },
+    { id: "m2:team-1", playerIds: ["p3", "p4"], round: 2, entityType: "PAIRING", name: "Bravo", net: 62 },
+    { id: "m3:team-1", playerIds: ["p5", "p6"], round: 2, entityType: "PAIRING", name: "Charlie", net: 64 },
+  ];
+  const official = [
+    { id: "p1", points: 1.5 }, { id: "p2", points: 1.5 },
+    { id: "p3", points: 1 }, { id: "p4", points: 1 },
+    { id: "p5", points: 1 }, { id: "p6", points: 1 },
+  ];
+  const matches = scores.map((row) => ({ status: "Final", team1Players: row.playerIds.map((id) => ({ id })), team2Players: [] }));
+  const ranked = roundCompetitionRows(scores, 2, "Scramble", official, matches);
+  assert.deepEqual(ranked.map((row) => row.id), ["m1:team-1", "m2:team-1", "m3:team-1"]);
+  assert.deepEqual(ranked.map((row) => row.points), [3, 2, 2]);
+  assert.deepEqual(ranked.map((row) => row.displayRank), [1, 2, 3]);
 });
 
 test("team standings use official overall points and round-scoped finalized records", () => {

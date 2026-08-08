@@ -9,7 +9,7 @@ test("all round rows and shared headers include consistently formatted Points", 
     read("app/live/LeaderboardsDashboard.js"), read("app/live/ScrambleLeaderboard.js"), read("app/live/scramble-leaderboard.module.css"),
   ]);
   assert.match(dashboard, /\["points", "Points"\]/);
-  assert.match(scramble, /\["points", "Points"\]/);
+  assert.match(scramble, /\["points", "Team Points"\]/);
   assert.match(`${dashboard}\n${scramble}`, /formatPlayerPoints\(row\.points\)/);
   assert.match(css, /\.columnMetrics\{[^}]*repeat\(5/);
   assert.match(css, /\.metrics\{[^}]*repeat\(5/);

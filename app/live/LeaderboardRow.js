@@ -40,11 +40,11 @@ export function MatchBreakdown({ breakdown }) {
   const singles = breakdown.segments.length === 1;
   return <section className={styles.matchBreakdown}>
     <header><span>{singles ? "Match Result" : "Match Breakdown"}</span><StatusBadge status={breakdown.label} /></header>
-    {breakdown.state === "pending" ? <p>Pending</p> : <div>{breakdown.segments.map((segment) => <span key={segment.label}><small>{segment.label}</small><strong>{segment.value}</strong></span>)}{breakdown.points !== null ? <span data-points="true"><small>Points</small><strong>{formatPlayerPoints(breakdown.points)}</strong></span> : null}</div>}
+    {breakdown.state === "pending" ? <p>Pending</p> : <div>{breakdown.segments.map((segment) => <span key={segment.label}><small>{segment.label}</small><strong>{segment.value}</strong></span>)}{breakdown.points !== null ? <span data-points="true"><small>{breakdown.pointsLabel || "Points"}</small><strong>{formatPlayerPoints(breakdown.points)}</strong></span> : null}</div>}
   </section>;
 }
 
-export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, points, breakdown, officialFinal, matchId, returnTo = "/live?view=leaderboards", onClose }) {
+export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, points, pointsLabel = "Round Points", playerPoints = [], breakdown, officialFinal, matchId, returnTo = "/live?view=leaderboards", onClose }) {
   const final = officialFinal ?? Number(holes) >= 18;
   const scorecardHref = matchId ? `/game-center/${encodeURIComponent(matchId)}?from=${encodeURIComponent(returnTo)}` : "";
   return <LeaderboardDetailSheet title={title} identity={identity} context={{ primary: [roundLabel, formatLabel].filter(Boolean).join(" • "), secondary: courseName }} status={final ? "Final" : "Live"} metrics={[
@@ -53,8 +53,8 @@ export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel
     { label: "Gross Score", value: gross },
     { label: "Net Score", value: net },
     { label: "Net +/-", value: netToPar, emphasis: "score" },
-    { label: "Round Points", value: points === null || points === undefined ? "—" : formatPlayerPoints(points) },
-  ]} action={<><MatchBreakdown breakdown={breakdown} />{scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null}</>} onClose={onClose} />;
+    { label: pointsLabel, value: points === null || points === undefined ? "—" : formatPlayerPoints(points), emphasis: "points" },
+  ]} action={<><MatchBreakdown breakdown={breakdown} />{playerPoints.length ? <section className={styles.playerPoints}><header>Player Points</header>{playerPoints.map((player) => <p key={player.id}><span>{player.name}</span><strong>{formatPlayerPoints(player.points)} pts</strong></p>)}</section> : null}{scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null}</>} onClose={onClose} />;
 }
 
 export function LeaderboardMetrics({ metrics = [], variant = "round" }) {
