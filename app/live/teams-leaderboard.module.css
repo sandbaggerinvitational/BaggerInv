@@ -41,11 +41,33 @@
 .teamRow > b { font-size: .7rem; font-variant-numeric: tabular-nums; }
 .teamPending { grid-column: 3 / 5; color: #6f7974; font-size: .68rem; font-weight: 850; }
 
+.teamNameLine {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 7px;
+  min-width: 0;
+}
+.teamNameLine strong { min-width: 0; color: #17362c; font-size: .7rem; line-height: 1.15; }
+.teamNameLine em {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border: 1px solid rgba(150, 115, 38, .28);
+  border-radius: 999px;
+  background: #f5eedc;
+  color: #795c18;
+  font-size: .46rem;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: .08em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .teamSheetIdentity { display: flex; align-items: center; flex-direction: column; justify-content: center; gap: 9px; width: 100%; text-align: center; }
 .sheetTeamMark { width: 72px; height: 72px; flex-basis: 72px; border: 1px solid #d8cfbd; }
-.teamSheetIdentity > span:last-child { display: grid; justify-items: center; gap: 5px; }
-.teamSheetIdentity > span > strong { color: #17362c; font: 700 1.15rem Georgia, serif; }
-.teamSheetIdentity em { padding: 3px 7px; border-radius: 999px; background: #e8dfc8; color: #795c18; font-size: .48rem; font-style: normal; font-weight: 900; letter-spacing: .08em; }
+.teamSheetIdentity .teamNameLine { justify-content: center; }
+.teamSheetIdentity .teamNameLine strong { font: 700 1.15rem Georgia, serif; }
 .teamRoundBreakdown article > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 @media (max-width: 420px) {

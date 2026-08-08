@@ -334,7 +334,17 @@ test("Leaderboards use shared tournament identity, URL tabs, search, detail shee
   assert.match(sharedRow, /aria-expanded=\{expanded\}/);
   assert.match(source, /fetch\("\/api\/player-passport\/session"/);
   assert.match(sharedRow, />YOU<\/em>/);
-  assert.match(source, />YOUR TEAM<\/em>/);
+  assert.match(source, /function TeamNameWithBadge/);
+  assert.match(source, /<TeamNameWithBadge name=\{team\.name\} current=\{currentTeam\}/);
+  assert.match(source, /<TeamNameWithBadge name=\{team\.name\} current=\{current\}/);
+});
+
+test("Teams delegate global status to the hero and keep round status in the board header", async () => {
+  const [source, teamStyles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(new URL("../app/live/teams-leaderboard.module.css", import.meta.url), "utf8")]);
+  assert.match(source, /<TournamentIdentityHeader[^>]*status=\{tournament\.status\}/);
+  assert.match(source, /\{overall \? null : <StatusBadge status=\{state\} \/>\}/);
+  assert.match(teamStyles, /\.teamNameLine \{[^}]*display: flex !important;[^}]*flex-wrap: wrap;[^}]*gap: 4px 7px;/s);
+  assert.match(teamStyles, /\.teamNameLine em \{[^}]*border-radius: 999px;[^}]*white-space: nowrap;/s);
 });
 
 test("Leaderboards remain compact without horizontal page scrolling", async () => {

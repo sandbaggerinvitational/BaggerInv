@@ -52,10 +52,17 @@ function TeamMark({ filename, name, size = "small" }) {
   </span>;
 }
 
+function TeamNameWithBadge({ name, current = false }) {
+  return <span className={teamStyles.teamNameLine}>
+    <strong>{name}</strong>
+    {current ? <em>YOUR TEAM</em> : null}
+  </span>;
+}
+
 function TeamLeaderboardIdentity({ team, current = false, large = false }) {
   return <span className={teamStyles.teamSheetIdentity} data-large={large || undefined}>
     <TeamMark filename={team.logo} name={team.name} size="sheet" />
-    <span><strong>{team.name}</strong>{current ? <em>YOUR TEAM</em> : null}</span>
+    <TeamNameWithBadge name={team.name} current={current} />
   </span>;
 }
 
@@ -180,7 +187,7 @@ function Teams({ data, selectedRound, currentPlayer, snapshots }) {
   const state = selectedRound === "overall" ? ((data.rounds || []).every((round) => teamRoundState(round) === "final") ? "final" : "live") : teamRoundState(selectedRoundModel);
   const overall = selectedRound === "overall";
   return <section className={styles.teams} aria-label="Team standings">
-    <header className={teamStyles.teamBoardTitle}><span><small>{overall ? "Overall" : selectedRoundModel?.label}</small><strong>Team Leaderboard</strong></span><StatusBadge status={state} /></header>
+    <header className={teamStyles.teamBoardTitle}><span><small>{overall ? "Overall" : selectedRoundModel?.label}</small><strong>Team Leaderboard</strong></span>{overall ? null : <StatusBadge status={state} />}</header>
     <div className={`${styles.teamHeader} ${teamStyles.teamHeader}`} data-overall={overall || undefined}><span>Rank</span><span>Team</span><span>Record</span><span>Points</span>{overall ? <span>Odds</span> : null}</div>
     {standings.map((team) => {
       const currentTeam = Number(currentTeamSide) === Number(team.side);
@@ -188,7 +195,7 @@ function Teams({ data, selectedRound, currentPlayer, snapshots }) {
       const odds = oddsBySide.has(Number(team.side)) ? oddsBySide.get(Number(team.side)) : null;
       return <button type="button" className={teamStyles.teamRow} data-overall={overall || undefined} data-current={currentTeam || undefined} onClick={() => setSelectedSide(String(team.side))} aria-label={`Open ${team.name} team summary${currentTeam ? ", your team" : ""}`} key={team.side}>
         <strong>{pending ? "—" : team.rank}</strong>
-        <span><TeamMark filename={team.logo} name={team.name} size="large" /><span><b>{team.name}{currentTeam ? <em>YOUR TEAM</em> : null}</b><small>{team.remaining} match{team.remaining === 1 ? "" : "es"} remaining</small></span></span>
+        <span><TeamMark filename={team.logo} name={team.name} size="large" /><span><TeamNameWithBadge name={team.name} current={currentTeam} /><small>{team.remaining} match{team.remaining === 1 ? "" : "es"} remaining</small></span></span>
         {pending ? <span className={teamStyles.teamPending}>Pending</span> : <><span>{team.record}</span><b>{formatTeamPoints(team.points)}</b></>}{overall ? <b>{odds === null ? "Pending" : formatChampionshipOdds(odds)}</b> : null}
       </button>;
     })}
