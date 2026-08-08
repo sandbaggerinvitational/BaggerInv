@@ -165,13 +165,13 @@ function TeamDetailSheet({ team, data, selectedRound, odds, current, onClose }) 
     const standing = standings.find((item) => Number(item.side) === Number(team.side));
     return { round, standing, state: teamRoundState(round) };
   }).sort((left, right) => String(left.round.number) === String(selectedRound) ? -1 : String(right.round.number) === String(selectedRound) ? 1 : Number(left.round.number) - Number(right.round.number));
-  return <LeaderboardDetailSheet title="Team Summary" identity={<TeamLeaderboardIdentity team={team} current={current} large />} status={complete ? "Final" : "Live"} metrics={[
+  return <LeaderboardDetailSheet title="Team Summary" identity={<TeamLeaderboardIdentity team={team} current={current} large />} metrics={[
     { label: complete ? "Final Rank" : "Current Rank", value: team.rank },
     { label: "Tournament Points", value: formatTeamPoints(team.points), emphasis: "points" },
     { label: "Overall Record", value: team.record },
     { label: "Championship Odds", value: odds === null ? "Pending" : formatChampionshipOdds(odds), emphasis: "points" },
   ]} onClose={onClose}>
-    <section className={`${leaderboardStyles.roundBreakdown} ${teamStyles.teamRoundBreakdown}`}><header><span>Round Breakdown</span><small>Official team results</small></header>{roundRows.map(({ round, standing, state }) => <article data-state={state === "upcoming" ? "pending" : state} key={round.number}><header><strong>{round.label} • {formatName(round.format)}</strong><StatusBadge status={state} /></header>{state === "upcoming" ? <p>Pending</p> : <div><span><small>Record</small><strong>{standing.record}</strong></span><span data-points="true"><small>Points</small><strong>{formatTeamPoints(standing.points)}</strong></span></div>}</article>)}</section>
+    <section className={`${leaderboardStyles.roundBreakdown} ${teamStyles.teamRoundBreakdown}`}><header><span>Round Breakdown</span><small>Official team results</small></header>{roundRows.map(({ round, standing, state }) => <article data-state={state === "upcoming" ? "pending" : state} key={round.number}><header className={teamStyles.teamRoundHeader}><strong>{round.label} • {formatName(round.format)}</strong><StatusBadge status={state} /></header>{state === "upcoming" ? <p className={teamStyles.teamRoundPending}>Pending</p> : <div className={teamStyles.teamRoundMetrics}><span><small>Record</small><strong>{standing.record}</strong></span><span data-points="true"><small>Points</small><strong>{formatTeamPoints(standing.points)}</strong></span></div>}</article>)}</section>
   </LeaderboardDetailSheet>;
 }
 

@@ -347,6 +347,20 @@ test("Teams delegate global status to the hero and keep round status in the boar
   assert.match(teamStyles, /\.teamNameLine em \{[^}]*border-radius: 999px;[^}]*white-space: nowrap;/s);
 });
 
+test("Team Summary owns responsive round rows without duplicating global status", async () => {
+  const [source, teamStyles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(new URL("../app/live/teams-leaderboard.module.css", import.meta.url), "utf8")]);
+  const detailStart = source.indexOf("function TeamDetailSheet");
+  const detailEnd = source.indexOf("function Teams", detailStart);
+  const detail = source.slice(detailStart, detailEnd);
+  assert.doesNotMatch(detail, /<LeaderboardDetailSheet[^>]*status=/);
+  assert.match(detail, /className=\{teamStyles\.teamRoundHeader\}/);
+  assert.match(detail, /className=\{teamStyles\.teamRoundMetrics\}/);
+  assert.match(detail, /className=\{teamStyles\.teamRoundPending\}>Pending/);
+  assert.match(teamStyles, /\.teamRoundHeader \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*min-width: 0;/s);
+  assert.match(teamStyles, /\.teamRoundMetrics \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\) !important;/s);
+  assert.match(teamStyles, /@media \(max-width: 340px\) \{[\s\S]*\.teamRoundHeader \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+});
+
 test("Leaderboards remain compact without horizontal page scrolling", async () => {
   const styles = await readFile(stylesUrl, "utf8");
   assert.match(styles, /:global\(body\):has\(\.page\)\{overflow-x:hidden\}/);

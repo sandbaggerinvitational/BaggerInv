@@ -68,7 +68,46 @@
 .sheetTeamMark { width: 72px; height: 72px; flex-basis: 72px; border: 1px solid #d8cfbd; }
 .teamSheetIdentity .teamNameLine { justify-content: center; }
 .teamSheetIdentity .teamNameLine strong { font: 700 1.15rem Georgia, serif; }
-.teamRoundBreakdown article > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.teamRoundBreakdown article {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  gap: 11px;
+  padding: 12px;
+  border-radius: 12px;
+}
+.teamRoundHeader {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.teamRoundHeader > strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #17362c;
+  font-size: .72rem !important;
+  line-height: 1.25 !important;
+}
+.teamRoundHeader > :last-child { justify-self: end; }
+.teamRoundMetrics {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  min-width: 0;
+}
+.teamRoundMetrics > span {
+  box-sizing: border-box;
+  min-height: 54px;
+  padding: 9px 6px !important;
+}
+.teamRoundPending {
+  min-height: 28px;
+  margin: 0 !important;
+  padding: 6px 2px 2px;
+  line-height: 1.35;
+}
 
 @media (max-width: 420px) {
   .teamHeader,
@@ -80,4 +119,12 @@
   .teamRow small { font-size: .49rem; }
   .teamRow > span:nth-child(3),
   .teamRow > b { font-size: .64rem; }
+  .teamRoundBreakdown article { padding: 11px; }
+  .teamRoundHeader { align-items: start; gap: 8px; }
+  .teamRoundHeader > strong { padding-top: 2px; font-size: .68rem !important; }
+}
+
+@media (max-width: 340px) {
+  .teamRoundHeader { grid-template-columns: minmax(0, 1fr); }
+  .teamRoundHeader > :last-child { justify-self: start; }
 }
