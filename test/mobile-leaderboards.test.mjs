@@ -346,8 +346,9 @@ test("Leaderboards use shared tournament identity, URL tabs, search, detail shee
   assert.match(source, /fetch\("\/api\/player-passport\/session"/);
   assert.match(sharedRow, />YOU<\/em>/);
   assert.match(source, /function TeamNameWithBadge/);
+  assert.match(source, /function TeamSheetName/);
   assert.match(source, /<TeamNameWithBadge name=\{team\.name\} current=\{currentTeam\}/);
-  assert.match(source, /<TeamNameWithBadge name=\{team\.name\} current=\{current\}/);
+  assert.match(source, /<TeamSheetName name=\{team\.name\} current=\{current\}/);
 });
 
 test("Teams delegate global status to the hero and keep round status in the board header", async () => {
@@ -367,9 +368,19 @@ test("Team Summary owns responsive round rows without duplicating global status"
   assert.match(detail, /className=\{teamStyles\.teamRoundHeader\}/);
   assert.match(detail, /className=\{teamStyles\.teamRoundMetrics\}/);
   assert.match(detail, /className=\{teamStyles\.teamRoundPending\}>Pending/);
-  assert.match(teamStyles, /\.teamRoundHeader \{[^}]*grid-template-columns: minmax\(min-content, 1fr\) auto;[^}]*min-width: 0;/s);
+  assert.match(teamStyles, /\.teamRoundHeader \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto;[^}]*min-width: 0;/s);
   assert.match(teamStyles, /\.teamRoundMetrics \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\) !important;/s);
   assert.match(teamStyles, /@media \(max-width: 340px\) \{[\s\S]*\.teamRoundHeader \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+});
+
+test("Team sheet names own the center track independently from YOUR TEAM", async () => {
+  const [source, teamStyles] = await Promise.all([readFile(componentUrl, "utf8"), readFile(new URL("../app/live/teams-leaderboard.module.css", import.meta.url), "utf8")]);
+  assert.match(source, /function TeamSheetName/);
+  assert.match(source, /<TeamSheetName name=\{team\.name\} current=\{current\}/);
+  assert.match(teamStyles, /\.teamSheetName \{[^}]*grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);[^}]*width: 100%;/s);
+  assert.match(teamStyles, /\.teamSheetName strong \{[^}]*grid-column: 2;[^}]*text-align: center;/s);
+  assert.match(teamStyles, /\.teamSheetName em \{[^}]*grid-column: 3;[^}]*justify-self: start;/s);
+  assert.match(teamStyles, /@media \(max-width: 340px\) \{[\s\S]*\.teamSheetName \{ grid-template-columns: minmax\(0, 1fr\); justify-items: center;/);
 });
 
 test("Team sheet identities keep full-width natural wrapping above independent metrics", async () => {

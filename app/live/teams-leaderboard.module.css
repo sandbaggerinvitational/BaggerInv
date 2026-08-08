@@ -66,8 +66,37 @@
 
 .teamSheetIdentity { display: flex; align-items: center; flex-direction: column; justify-content: center; gap: 9px; width: 100%; text-align: center; }
 .sheetTeamMark { width: 72px; height: 72px; flex-basis: 72px; border: 1px solid #d8cfbd; }
-.teamSheetIdentity .teamNameLine { justify-content: center; }
-.teamSheetIdentity .teamNameLine strong { font: 700 1.15rem Georgia, serif; }
+.teamSheetName {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.teamSheetName strong {
+  grid-column: 2;
+  color: #17362c;
+  font: 700 1.15rem/1.15 Georgia, serif;
+  text-align: center;
+  white-space: normal;
+  word-break: normal;
+}
+.teamSheetName em {
+  grid-column: 3;
+  justify-self: start;
+  padding: 3px 7px;
+  border: 1px solid rgba(150, 115, 38, .28);
+  border-radius: 999px;
+  background: #f5eedc;
+  color: #795c18;
+  font-size: .46rem;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: .08em;
+  line-height: 1;
+  white-space: nowrap;
+}
 .teamRoundBreakdown article {
   box-sizing: border-box;
   width: 100%;
@@ -78,7 +107,7 @@
 }
 .teamRoundHeader {
   display: grid !important;
-  grid-template-columns: minmax(min-content, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   min-width: 0;
@@ -88,6 +117,7 @@
   overflow-wrap: normal;
   word-break: normal;
   hyphens: none;
+  white-space: nowrap;
   color: #17362c;
   font-size: .72rem !important;
   line-height: 1.25 !important;
@@ -191,4 +221,7 @@
 @media (max-width: 340px) {
   .teamRoundHeader { grid-template-columns: minmax(0, 1fr); }
   .teamRoundHeader > :last-child { justify-self: start; }
+  .teamSheetName { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 6px; }
+  .teamSheetName strong,
+  .teamSheetName em { grid-column: 1; justify-self: center; }
 }

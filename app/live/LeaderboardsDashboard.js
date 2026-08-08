@@ -60,10 +60,17 @@ function TeamNameWithBadge({ name, current = false }) {
   </span>;
 }
 
+function TeamSheetName({ name, current = false }) {
+  return <span className={teamStyles.teamSheetName}>
+    <strong>{name}</strong>
+    {current ? <em>YOUR TEAM</em> : null}
+  </span>;
+}
+
 function TeamLeaderboardIdentity({ team, current = false, large = false }) {
   return <span className={teamStyles.teamSheetIdentity} data-large={large || undefined}>
     <TeamMark filename={team.logo} name={team.name} size="sheet" />
-    <TeamNameWithBadge name={team.name} current={current} />
+    <TeamSheetName name={team.name} current={current} />
   </span>;
 }
 
