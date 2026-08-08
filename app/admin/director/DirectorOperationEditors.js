@@ -75,6 +75,33 @@ export function MatchManagement({ operations, busy, save, operate, initialContex
   return <div className={styles.managementPanel}><label>Find match<select value={matchId} onChange={(event) => setMatchId(event.target.value)}>{operations.matches.map((item) => <option value={item.id} key={item.id}>Round {item.round} · Match {item.match} · {item.players.map((player) => player.name).join(" / ")}</option>)}</select></label>{match ? <><MatchEditor key={match.id} match={match} operations={operations} busy={busy} save={save} /><MatchControls match={match} operations={operations} busy={busy} operate={operate} /></> : <p>No matches are configured.</p>}</div>;
 }
 
+export function CourseTeesManagement({ operations, busy, save }) {
+  const configuration = operations.courseTees || { year: "", courses: [] };
+  const [saved, setSaved] = useState(() => Object.fromEntries(configuration.courses.map((course) => [course.id, course.currentTee])));
+  const [draft, setDraft] = useState(() => ({ ...saved }));
+  const changed = configuration.courses.filter((course) => draft[course.id] && draft[course.id] !== saved[course.id]);
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!changed.length) return;
+    const success = await save("course-tees", { updates: changed.map((course) => ({ courseId: course.id, tee: draft[course.id] })) });
+    if (success) setSaved({ ...draft });
+  };
+  return <form className={`${styles.managementPanel} ${styles.courseTeesEditor}`} onSubmit={submit}>
+    <header><span>Course Tees</span><h3>{configuration.year} Sandbagger Invitational</h3><p>Selections apply to every match using the active tournament year’s course configuration.</p></header>
+    <div className={styles.courseTeeList}>{configuration.courses.map((course) => {
+      const selected = course.options.find((option) => option.tee === draft[course.id]);
+      return <article key={course.id} data-finalized={course.finalized ? "true" : "false"}>
+        <div><small>Round {course.round} • {course.format}</small><strong>{course.name}</strong><span>Course ID: {course.id}</span></div>
+        <dl><div><dt>Current Tee</dt><dd>{course.currentTee || "Not configured"}</dd></div>{selected ? <div><dt>Selected Setup</dt><dd>{selected.yardage.toLocaleString()} yd • {selected.rating} / {selected.slope}</dd></div> : null}</dl>
+        <label>Change To<select value={draft[course.id] || ""} disabled={Boolean(busy) || course.finalized} onChange={(event) => setDraft((current) => ({ ...current, [course.id]: event.target.value }))}>{course.options.map((option) => <option value={option.tee} key={option.tee}>{option.tee} • {option.yardage.toLocaleString()} yd • {option.rating} / {option.slope}</option>)}</select></label>
+        {course.finalized ? <p role="note">This course belongs to a finalized round. Reopen the official round workflow before changing its configuration.</p> : null}
+      </article>;
+    })}</div>
+    {changed.length ? <div className={styles.unsavedChanges} role="status"><strong><span aria-hidden="true">●</span> Unsaved Changes</strong><small>{changed.length} course update{changed.length === 1 ? "" : "s"} pending.</small></div> : null}
+    <button disabled={Boolean(busy) || !changed.length} type="submit">Save Tee Selections</button>
+  </form>;
+}
+
 export function CalcuttaManagement({ operations, busy, save, initialContext = {} }) {
   const purchases = operations.calcutta.purchases;
   const initial = purchases.find((item) => item.golferPlayerId === initialContext.playerId);

@@ -4,7 +4,7 @@ import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagn
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorMatchManagement, updateDirectorNetSkins, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorCourseTees, updateDirectorMatchManagement, updateDirectorNetSkins, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
 import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server-read.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
@@ -79,6 +79,10 @@ function verifyActionReadBack(action, input, data, round) {
   if (action === "net-skins-eligibility") {
     const updates = Array.isArray(input.updates) ? input.updates : [{ round: input.round, eligible: input.eligible }];
     return updates.length > 0 && updates.every((update) => { const entries = data.operations?.netSkins.filter((item) => item.playerIds.includes(input.playerId) && Number(item.round) === Number(update.round)) || []; return Boolean(entries.length) && entries.every((item) => item.eligible === Boolean(update.eligible)); });
+  }
+  if (action === "course-tees") {
+    const courses = data.operations?.courseTees?.courses || [];
+    return (input.updates || []).every((update) => courses.some((course) => course.id === update.courseId && String(course.currentTee).toLowerCase() === String(update.tee).toLowerCase() && course.handicapVerified));
   }
   const matches = data.rounds.find((item) => Number(item.number) === Number(round))?.matches || [];
   if (action === "open-round") return Number(data.tournament.currentRound) === Number(round) && String(data.tournament.status).toLowerCase() === "live";
@@ -249,6 +253,8 @@ export async function POST(request) {
       await updateDirectorCalcutta({ ...input, year: data.tournament.year }, updatedBy);
     } else if (input.action === "net-skins-eligibility") {
       await updateDirectorNetSkins({ ...input, year: data.tournament.year }, updatedBy);
+    } else if (input.action === "course-tees") {
+      await updateDirectorCourseTees({ ...input, year: data.tournament.year }, updatedBy);
     } else throw new Error("Unknown Director action.");
     const googleWriteCompletedAt = Date.now();
     trace.stage("Action execution", "PASS");
@@ -258,9 +264,9 @@ export async function POST(request) {
       elapsedMs: googleWriteCompletedAt - workbookWriteStartedAt,
     }));
     refresh();
-    const operationsAction = ["match-management", "calcutta-management", "net-skins-eligibility", "match-unlock-scoring", "match-lock-scoring", "match-mark-live", "match-finalize", "match-reopen"].includes(input.action);
+    const operationsAction = ["match-management", "calcutta-management", "net-skins-eligibility", "course-tees", "match-unlock-scoring", "match-lock-scoring", "match-mark-live", "match-finalize", "match-reopen"].includes(input.action);
     const verification = await verifyDirectorReadBack({
-      invalidate: () => invalidateTournamentDataCache(["Live Matches", "Matches", "Tournaments", "Match Update Log", "Admin Audit Log", "Calcutta Purchases", "Calcutta Ownership", "Calcutta Standings", "Net Skins", "Net Skins Result"]),
+      invalidate: () => invalidateTournamentDataCache(["Live Matches", "Matches", "Tournaments", "Courses", "Course Scorecards", "Course Holes", "Live Round Handicaps", "Match Update Log", "Admin Audit Log", "Calcutta Purchases", "Calcutta Ownership", "Calcutta Standings", "Net Skins", "Net Skins Result"]),
       read: operationsAction
         ? async () => ({ operations: await readDirectorOperationsData(data.tournament.year) })
         : getTournamentData,

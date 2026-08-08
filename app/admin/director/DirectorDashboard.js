@@ -22,6 +22,7 @@ const ACTION_LABELS = {
   "match-finalize": "Match finalized", "match-reopen": "Match reopened",
   automation: "Automation updated", "automation-check": "Automation verified",
   "match-management": "Match updated", "calcutta-management": "Calcutta updated", "net-skins-eligibility": "Net Skins eligibility updated",
+  "course-tees": "Course tee selections updated",
 };
 
 function timestamp(value) {

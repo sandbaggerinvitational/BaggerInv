@@ -6,12 +6,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./director.module.css";
 
 const MatchManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.MatchManagement), { loading: () => <EditorLoading /> });
+const CourseTeesManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.CourseTeesManagement), { loading: () => <EditorLoading /> });
 const CalcuttaManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.CalcuttaManagement), { loading: () => <EditorLoading /> });
 const NetSkinsManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.NetSkinsManagement), { loading: () => <EditorLoading /> });
 const NotificationManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.NotificationManagement), { loading: () => <EditorLoading /> });
 
 const clean = (value) => String(value || "").trim();
-const TITLES = { match: "Match Management", calcutta: "Calcutta", skins: "Net Skins", notifications: "Notifications" };
+const TITLES = { match: "Match Management", courseTees: "Course Tees", calcutta: "Calcutta", skins: "Net Skins", notifications: "Notifications" };
 
 function EditorLoading() { return <div className={styles.editorLoading} role="status">Opening operation…</div>; }
 
@@ -83,11 +84,12 @@ export function DirectorOperationsHub({ operations, notificationSandbox, busy, s
         ? <Link href={result.href} key={result.id}><span>{result.label}</span><small>{result.type}</small></Link>
         : <button type="button" onClick={() => open(result.operation, result.context)} key={result.id}><span>{result.label}</span><small>{result.type}</small></button>) : <p>No Director tools match “{query}”.</p>}</div> : null}
       <div className={styles.operationLaunchers} aria-label="Director operations">
-        <button type="button" onClick={() => open("match")}>Match Management</button><button type="button" onClick={() => open("calcutta")}>Calcutta</button><button type="button" onClick={() => open("skins")}>Net Skins</button><button type="button" onClick={() => open("notifications")}>Notifications</button>
+        <button type="button" onClick={() => open("match")}>Match Management</button><button type="button" onClick={() => open("courseTees")}>Course Tees</button><button type="button" onClick={() => open("calcutta")}>Calcutta</button><button type="button" onClick={() => open("skins")}>Net Skins</button><button type="button" onClick={() => open("notifications")}>Notifications</button>
       </div>
     </section>
     <DirectorBottomSheet active={active} onClose={close}>
       {active?.type === "match" ? <MatchManagement operations={operations} busy={busy} save={save} operate={operateMatch} initialContext={active.context} /> : null}
+      {active?.type === "courseTees" ? <CourseTeesManagement operations={operations} busy={busy} save={save} /> : null}
       {active?.type === "calcutta" ? <CalcuttaManagement operations={operations} busy={busy} save={save} initialContext={active.context} /> : null}
       {active?.type === "skins" ? <NetSkinsManagement operations={operations} busy={busy} save={save} initialContext={active.context} /> : null}
       {active?.type === "notifications" ? <NotificationManagement sandbox={notificationSandbox} busy={busy} send={notify} initialContext={active.context} /> : null}
