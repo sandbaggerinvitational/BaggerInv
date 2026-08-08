@@ -5,21 +5,22 @@ import test from "node:test";
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("Home omits its redundant current-player badge while leaderboards retain identification", async () => {
-  const [home, homeStyles, leaderboards, badgeStyles] = await Promise.all([
+  const [home, homeStyles, leaderboards, leaderboardRow, leaderboardStyles] = await Promise.all([
     read("app/PersonalizedPlayerHome.js"),
     read("app/personalized-player-home.module.css"),
     read("app/live/LeaderboardsDashboard.js"),
-    read("app/responsive-player-badge.module.css"),
+    read("app/live/LeaderboardRow.js"),
+    read("app/live/scramble-leaderboard.module.css"),
   ]);
   assert.match(home, /playerNameText/);
   assert.doesNotMatch(home, /aria-label="Current player">YOU/);
   assert.doesNotMatch(home, />YOU</);
   assert.match(homeStyles, /\.playerNameText/);
-  assert.match(leaderboards, /badgeStyles\.identityLine/);
-  assert.match(leaderboards, /aria-label="Current player">YOU/);
-  assert.match(badgeStyles, /grid-template-columns:\s*minmax\(0,\s*1fr\) auto/);
-  assert.match(badgeStyles, /\.playerName \{[^}]*text-overflow:\s*ellipsis/s);
-  assert.match(badgeStyles, /\.badge \{[^}]*white-space:\s*nowrap/s);
+  assert.match(leaderboards, /current=\{isCurrent\}/);
+  assert.match(leaderboardRow, /aria-label="Current player">YOU/);
+  assert.match(leaderboardStyles, /\.identity\{[^}]*min-width:0/);
+  assert.match(leaderboardStyles, /\.names strong\{[^}]*overflow-wrap:anywhere/);
+  assert.match(leaderboardStyles, /\.names em\{[^}]*border-radius:999px/);
 });
 
 test("requested long-name fixtures remain independent from badge content", () => {

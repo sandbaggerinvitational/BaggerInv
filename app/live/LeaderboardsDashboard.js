@@ -9,6 +9,7 @@ import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import TournamentIntelligenceStorylines from "./TournamentIntelligenceStorylines";
 import ScrambleLeaderboard from "./ScrambleLeaderboard";
 import ScrambleTeamIdentity from "./ScrambleTeamIdentity";
+import { LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity } from "./LeaderboardRow";
 import { teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import { publishedOddsInsights } from "../../lib/championship-odds-insights";
@@ -27,9 +28,9 @@ import {
   teamStandings,
 } from "../../lib/mobile-leaderboards";
 import styles from "./leaderboards-dashboard.module.css";
-import badgeStyles from "../responsive-player-badge.module.css";
 import insightStyles from "./leaderboards-insights.module.css";
 import skinsStyles from "./net-skins.module.css";
+import leaderboardStyles from "./scramble-leaderboard.module.css";
 
 const clean = (value) => String(value ?? "").trim();
 const initials = (name) => clean(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -80,6 +81,7 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
     ["points", "wins", "winPct"].includes(key) || performance.some((row) => row[key] !== null)
   ), [performance]);
   const ranked = useMemo(() => searchPlayerRows(rankPlayerRows(performance, metric, direction || undefined), query), [direction, metric, performance, query]);
+  const complete = (data.rounds || []).length > 0 && (data.rounds || []).every((round) => (round.matches || []).length > 0 && round.matches.every((match) => ["final", "finalized"].includes(clean(match.status).toLowerCase())));
   const changeSort = () => setDirection((current) => current === "asc" ? "desc" : "asc");
   return <>
     <div className={styles.playerTools}>
@@ -90,20 +92,17 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
       {metric !== "points" ? <p>Performance view · switch to Points for official tournament standings.</p> : null}
     </div>
     {!ranked.length ? <div className={styles.empty}><strong>No players match this search.</strong><span>Clear the search to see the tournament standings.</span></div> :
-      <section className={styles.playerTable} aria-label={metric === "points" ? "Official player standings" : `${availableMetrics.find(([key]) => key === metric)?.[1]} performance standings`}>
-        <div className={styles.overallRow} data-header="true"><span>Rank</span><span>Player</span><span>Record</span><button type="button" onClick={changeSort} aria-sort={direction === "asc" ? "ascending" : "descending"}>{availableMetrics.find(([key]) => key === metric)?.[1]} <i aria-hidden="true">{direction === "asc" ? "↑" : "↓"}</i></button></div>
-        {ranked.map((row) => {
+      <section className={leaderboardStyles.board} aria-label={metric === "points" ? "Official player standings" : `${availableMetrics.find(([key]) => key === metric)?.[1]} performance standings`}>
+        <header><span><small>Overall</small><h2>Player Leaderboard</h2></span><StatusBadge status={complete ? "Final" : "Live"} /></header>
+        <div className={leaderboardStyles.sorts} data-overall="true" role="group" aria-label="Sort overall player leaderboard"><button type="button" onClick={changeSort} aria-pressed="true">{availableMetrics.find(([key]) => key === metric)?.[1]} <i aria-hidden="true">{direction === "asc" ? "↑" : "↓"}</i></button></div>
+        <div className={leaderboardStyles.entries}>{ranked.map((row) => {
           const isCurrent = currentPlayer?.id === row.id;
           const isOpen = expanded === row.id;
-          return <div className={styles.playerEntry} data-current={isCurrent || undefined} key={row.id}>
-            <button className={styles.overallRow} type="button" aria-expanded={isOpen} aria-label={`${row.player}, rank ${row.displayRank || "unranked"}, record ${row.record}, ${metricValue(row, metric)}${isCurrent ? ", your position" : ""}`} onClick={() => setExpanded((current) => current === row.id ? "" : row.id)}>
-              <strong>{row.displayRank || "—"}</strong>
-              <span className={styles.playerIdentity}><span className={styles.playerPhoto}><PlayerAvatar filename={row.photo} name={row.player} fallbackClassName={styles.playerFallback} /></span><span><span className={badgeStyles.identityLine}><b className={badgeStyles.playerName} title={row.player}>{row.player}</b>{isCurrent ? <em className={badgeStyles.badge} aria-label="Current player">YOU</em> : null}</span><small><TeamMark filename={row.teamLogo} name={row.team} />{row.team}</small></span></span>
-              <span>{row.record}</span><b>{metricValue(row, metric)}</b>
-            </button>
-            {isOpen ? <PlayerDetails row={row} roundLeaderboards={data.roundLeaderboards || {}} /> : null}
+          return <div className={leaderboardStyles.entryGroup} key={row.id}>
+            <LeaderboardEntry rank={row.displayRank} current={isCurrent} state={complete ? "final" : "live"} expanded={isOpen} identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} current={isCurrent} />} metrics={<LeaderboardMetrics variant="overall" metrics={[{ label: "Record", value: row.record }, { label: availableMetrics.find(([key]) => key === metric)?.[1] || "Points", value: metricValue(row, metric), emphasis: complete ? "final" : "live" }]} />} label={`${row.player}, rank ${row.displayRank || "unranked"}, record ${row.record}, ${metricValue(row, metric)}${isCurrent ? ", your position" : ""}`} onClick={() => setExpanded((current) => current === row.id ? "" : row.id)} />
+            {isOpen ? <div className={leaderboardStyles.details}><PlayerDetails row={row} roundLeaderboards={data.roundLeaderboards || {}} /></div> : null}
           </div>;
-        })}
+        })}</div>
       </section>}
   </>;
 }
@@ -113,15 +112,17 @@ function RoundPlayers({ data, selectedRound }) {
   const [sort, setSort] = useState({ key: "netToPar", direction: "asc" });
   const rows = useMemo(() => roundScoreRows(data.scoreLeaderboard || [], round?.number, round?.format, sort), [data.scoreLeaderboard, round, sort]);
   const pairing = ["SC", "SCRAMBLE"].includes(clean(round?.format).toUpperCase());
-  if (pairing) return <ScrambleLeaderboard rows={data.scoreLeaderboard || []} round={round?.number} players={data.players || []} eyebrow={round?.label || "Round 2"} />;
+  const roundContext = [round?.label, round?.course?.name].filter(Boolean).join(" · ");
+  if (pairing) return <ScrambleLeaderboard rows={data.scoreLeaderboard || []} round={round?.number} players={data.players || []} eyebrow={roundContext || "Round 2"} />;
   const select = (key) => setSort((current) => ({ key, direction: current.key === key && current.direction === "asc" ? "desc" : "asc" }));
   const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"]];
-  return <section className={styles.roundBoard} aria-label={pairing ? "Scramble pairing leaderboard" : `${round?.label || "Round"} player leaderboard`}>
-    <header><span><small>{round?.label}</small><h2>{pairing ? "Scramble Pairing Leaderboard" : "Individual Gross & Net"}</h2></span>{rows.length ? <StatusBadge status="Live" /> : null}</header>
-    {!rows.length ? <div className={styles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <div>
-      <div className={styles.roundRow} data-header="true"><span>Rank</span><span>{pairing ? "Pairing" : "Player"}</span>{columns.map(([key, label]) => <button type="button" onClick={() => select(key)} aria-sort={sort.key === key ? (sort.direction === "asc" ? "ascending" : "descending") : "none"} aria-label={key === "netToPar" ? "Net score relative to par" : label} key={key}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
-      {rows.map((row) => <div className={styles.roundRow} key={`${row.round}-${row.id}`}><strong>{row.displayRank}</strong><b>{row.name}</b><span>{Number(row.holes) >= 18 ? "F" : row.holes}</span><span>{row.gross}</span><span>{row.net}</span><span>{toPar(row.netToPar)}</span></div>)}
-    </div>}
+  const complete = rows.length > 0 && rows.every((row) => Number(row.holes) >= 18);
+  return <section className={leaderboardStyles.board} aria-label={`${round?.label || "Round"} player leaderboard`}>
+    <header><span><small>{roundContext}</small><h2>{clean(round?.format).toUpperCase() === "SI" ? "Singles Player Leaderboard" : "Best Ball Player Leaderboard"}</h2></span>{rows.length ? <StatusBadge status={complete ? "Final" : "Live"} /> : null}</header>
+    {!rows.length ? <div className={leaderboardStyles.empty}><strong>Standings will appear after the first recorded score.</strong><span>Partial standings publish as valid holes are confirmed.</span></div> : <>
+      <div className={leaderboardStyles.sorts} role="group" aria-label={`Sort ${round?.label || "round"} player leaderboard`}>{columns.map(([key, label]) => <button type="button" onClick={() => select(key)} aria-pressed={sort.key === key} aria-label={key === "netToPar" ? "Net score relative to par" : label} key={key}>{label}{sort.key === key ? <i aria-hidden="true">{sort.direction === "asc" ? "↑" : "↓"}</i> : null}</button>)}</div>
+      <div className={leaderboardStyles.entries}>{rows.map((row) => { const final = Number(row.holes) >= 18; return <LeaderboardEntry rank={row.displayRank} state={final ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.name, photo: row.photo }} />} metrics={<LeaderboardMetrics metrics={[{ label: "THRU", value: final ? "F" : row.holes, emphasis: final ? "" : "live" }, { label: "Gross", value: row.gross, secondary: !final }, { label: "Net", value: row.net, emphasis: final ? "final" : "live" }, { label: "Net +/-", value: toPar(row.netToPar), emphasis: "live" }]} />} key={`${row.round}-${row.id}`} />; })}</div>
+    </>}
   </section>;
 }
 

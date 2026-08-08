@@ -20,7 +20,7 @@ test("Round 2 uses one shared Scramble team presentation across Tournament, Lead
 test("Scramble rows prioritize team identity and retain every official competition metric", async () => {
   const source = await readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8");
   for (const label of ["Rank", "THRU", "Gross", "Net", "Net +/-"]) assert.match(source, new RegExp(label.replace(/[+]/g, "\\+")));
-  assert.match(source, /data-state=\{final \? "final" : "live"\}/);
+  assert.match(source, /state=\{final \? "final" : "live"\}/);
   assert.match(source, /roundScoreRows\(rows, round, "SC", sort\)/);
   assert.match(source, /Number\(row\.holes\) >= 18/);
 });

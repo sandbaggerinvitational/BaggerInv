@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import StatusBadge from "../StatusBadge";
 import { roundScoreRows } from "../../lib/mobile-leaderboards";
 import ScrambleTeamIdentity, { scrambleTeamName } from "./ScrambleTeamIdentity";
+import { LeaderboardEntry, LeaderboardMetrics } from "./LeaderboardRow";
 import styles from "./scramble-leaderboard.module.css";
 
 const toPar = (value) => Number(value) === 0 ? "E" : Number(value) > 0 ? `+${value}` : String(value);
@@ -44,11 +45,7 @@ export default function ScrambleLeaderboard({ rows = [], round, players = [], ey
       <div className={styles.entries}>{ranked.map((row) => {
         const final = Number(row.holes) >= 18;
         const name = scrambleTeamName(row.playerIds, players);
-        return <button type="button" className={styles.entry} data-state={final ? "final" : "live"} onClick={() => setSelectedId(row.id)} aria-label={`Open ${name}, rank ${row.displayRank}, ${final ? "final" : `through ${row.holes}`}, net ${row.net}, ${toPar(row.netToPar)}`} key={`${row.round}-${row.id}`}>
-          <span className={styles.rank}><small>Rank</small><strong>{row.displayRank}</strong></span>
-          <ScrambleTeamIdentity playerIds={row.playerIds} players={players} />
-          <span className={styles.metrics}><span><small>THRU</small><strong>{final ? "F" : row.holes}</strong></span><span className={styles.gross}><small>Gross</small><strong>{row.gross}</strong></span><span><small>Net</small><strong>{row.net}</strong></span><span><small>Net +/-</small><strong>{toPar(row.netToPar)}</strong></span></span>
-        </button>;
+        return <LeaderboardEntry rank={row.displayRank} identity={<ScrambleTeamIdentity playerIds={row.playerIds} players={players} />} metrics={<LeaderboardMetrics metrics={[{ label: "THRU", value: final ? "F" : row.holes, emphasis: final ? "" : "live" }, { label: "Gross", value: row.gross, secondary: true }, { label: "Net", value: row.net, emphasis: final ? "final" : "live" }, { label: "Net +/-", value: toPar(row.netToPar), emphasis: "live" }]} />} state={final ? "final" : "live"} onClick={() => setSelectedId(row.id)} label={`Open ${name}, rank ${row.displayRank}, ${final ? "final" : `through ${row.holes}`}, net ${row.net}, ${toPar(row.netToPar)}`} key={`${row.round}-${row.id}`} />;
       })}</div>
     </>}
     {selected ? <PairingSheet row={selected} players={players} onClose={() => setSelectedId("")} /> : null}
