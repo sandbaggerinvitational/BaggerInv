@@ -27,7 +27,7 @@ function Hero({ model }) {
     <header><span>Sandbagger Calcutta</span><h2>{model.tournamentComplete ? "Final Calcutta" : "Current Market"}</h2><p>{model.tournamentComplete ? "Official final results, ownership, and winnings." : "Official results, ownership, and tournament value."}</p></header>
     <div data-current-market={!model.tournamentComplete || undefined}>
       <p className={styles.heroPot}><small>Calcutta Pot</small><strong>{money(model.pot)}</strong>{!model.tournamentComplete ? <span>Total prize pool</span> : null}</p>
-      <p><small>{model.tournamentComplete ? "Final Winnings Distributed" : "Guaranteed Distributed"}</small><strong>{money(model.guaranteedDistributed)}</strong><span>{model.tournamentComplete ? "Tournament complete" : model.completedRounds.length ? "Completed rounds" : "Updates after official results"}</span></p>
+      <p><small>{model.tournamentComplete ? "Final Winnings Distributed" : "Guaranteed Winnings"}</small><strong>{money(model.guaranteedDistributed)}</strong><span>{model.tournamentComplete ? "Tournament complete" : model.completedRounds.length ? "Already secured" : "Updates after official results"}</span></p>
       <p><small>Remaining Prize Pool</small><strong>{money(model.remainingPrizePool)}</strong><span>Still in play</span></p>
       {hero.highestGuaranteed ? <p><small>Highest Guaranteed Winner</small><strong>{hero.highestGuaranteed.player.name}</strong><span>{money(hero.highestGuaranteed.guaranteedWinnings)} secured</span></p> : null}
       {!model.tournamentComplete && hero.highestUpside ? <p><small>Highest Remaining Upside</small><strong>{hero.highestUpside.player.name}</strong><span>{money(hero.highestUpside.remainingUpside)} projected upside</span></p> : null}

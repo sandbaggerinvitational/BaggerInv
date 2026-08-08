@@ -275,6 +275,9 @@ test("Round 3 completion transitions projected Calcutta wording to final winning
     assert.match(component, /Final Tournament Value/);
     assert.match(component, /Final Calcutta/);
     assert.match(component, /Final Winnings Distributed/);
+    assert.match(component, /Guaranteed Winnings/);
+    assert.match(component, /Already secured/);
+    assert.doesNotMatch(component, /Guaranteed Distributed/);
     assert.match(component, /If the tournament ended today\./);
     assert.match(component, /ordinalPlace/);
     assert.doesNotMatch(component, /golfer\.owners\.length > 1 \? "— " : ""/);
