@@ -332,6 +332,25 @@ test("Calcutta financial presentation progresses cleanly from opening through fi
   assert.equal(final.remainingPrizePool, 0);
 });
 
+test("Calcutta financial values use shared positive, negative, and neutral presentation", async () => {
+  const [component, css] = await Promise.all([
+    readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/calcutta.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(component, /const financialState = \(value\) => \(\{ "data-positive": Number\(value\) > 0 \|\| undefined, "data-negative": Number\(value\) < 0 \|\| undefined \}\)/);
+  assert.match(component, /const signedMoney/);
+  assert.match(component, /<small>Net Profit<\/small><strong \{\.\.\.financialState\(portfolio\.netProfit\)\}>\{signedMoney\(portfolio\.netProfit\)\}/);
+  assert.match(component, /financialState\(investment\.roi\)/);
+  assert.match(component, /financialState\(golfer\.roi\)/);
+  assert.match(component, /financialState\(row\.roi\)/);
+  assert.match(component, /data-portfolio=\{portfolio \|\| undefined\}/);
+  assert.match(component, /financialState\(row\.netProfit\).*signedMoney\(row\.netProfit\)/);
+  assert.match(css, /\[data-positive=true\][^{]*\{color:#17704f\}/);
+  assert.match(css, /\[data-negative=true\][^{]*\{color:#8b4338\}/);
+  assert.match(css, /\.row\[data-portfolio=true\]\{grid-template-columns:/);
+  assert.doesNotMatch(css, /\.row\[data-portfolio=true\][^{]*overflow-x/);
+});
+
 test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet scroller", async () => {
   const [dashboard, dashboardCss, component, css, loader, protection, writer] = await Promise.all([
     readFile(new URL("../app/live/TournamentDashboard.js", import.meta.url), "utf8"),

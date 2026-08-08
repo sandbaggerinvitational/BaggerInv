@@ -14,3 +14,9 @@
 .investmentBreakdown article>i span{min-width:0}
 .sheet{align-content:start;grid-auto-rows:max-content}
 .hero>div p:last-child:nth-child(odd){grid-column:1/-1;border-right:0}.portfolioSummary{overflow:hidden;border:1px solid #ddd4c2;border-radius:14px;background:#fff}.portfolioSummary>header{padding:11px 12px;border-bottom:1px solid #eee8de}.portfolioSummary>header span{color:#c09a3d;font-size:.56rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.portfolioSummary>.metrics{gap:1px;background:#eee8de}.portfolioSummary>.metrics p{border:0;border-radius:0}.investmentBreakdown article{transition:opacity .18s ease}.investmentBreakdown article[data-zero=true]{opacity:.58}.investmentBreakdown article>i span{transition:width .28s ease}.breakdownNote,.emptyDetail{margin:0;padding:11px 12px;color:#6b7670;font-size:.61rem;line-height:1.4}.breakdownNote{border-bottom:1px solid #eee8de;background:#faf7ef}@media(prefers-reduced-motion:reduce){.investmentBreakdown article,.investmentBreakdown article>i span{transition:none}}
+
+/* Shared participant-facing financial states and portfolio leaderboard geometry. */
+.row [data-positive=true],.metrics [data-positive=true],.investments [data-positive=true],.portfolioPerformance [data-positive=true]{color:#17704f}
+.row [data-negative=true],.metrics [data-negative=true],.investments [data-negative=true],.portfolioPerformance [data-negative=true]{color:#8b4338}
+.row[data-portfolio=true]{grid-template-columns:32px minmax(92px,1fr) 54px 64px 68px 48px;padding-inline:5px;font-size:.56rem}
+@media(max-width:390px){.row[data-portfolio=true]{grid-template-columns:28px minmax(82px,1fr) 45px 56px 60px 43px;padding-inline:3px;font-size:.52rem}.row[data-portfolio=true] .portrait{width:25px;height:25px;flex-basis:25px}.row[data-portfolio=true] .person{gap:4px}}
