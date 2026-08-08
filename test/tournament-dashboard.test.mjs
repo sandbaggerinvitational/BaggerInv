@@ -174,13 +174,14 @@ test("Scramble cards use golfer handicaps and one team-level stroke treatment", 
 });
 
 test("Scramble leaderboard creates one shared pairing row while other formats remain individual", async () => {
-  const [source, dataSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8")]);
+  const [source, dataSource, scrambleSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8"), readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8")]);
   assert.match(dataSource, /if \(format === "SC"\) \{/);
   assert.match(dataSource, /entityId: `\$\{clean\(match\["Match ID"\]\)\}:team-\$\{side\}`/);
   assert.match(dataSource, /name: playerIds\.map\(\(id\) => playerMap\[id\]\?\.name \|\| id\)\.join\(" \/ "\)/);
   assert.match(dataSource, /entityType: format === "SC" \? "PAIRING" : "PLAYER"/);
-  assert.match(source, /Scramble Pairing Leaderboard/);
-  assert.match(source, /aria-label=\{pairing \? `Scramble pairing \$\{row\.name\}`/);
+  assert.match(scrambleSource, /Scramble Pairing Leaderboard/);
+  assert.match(scrambleSource, /<ScrambleTeamIdentity/);
+  assert.match(scrambleSource, /Hole-by-Hole Scoring/);
   assert.match(source, /const pairing = format === "Scramble" \|\| format === "SC"/);
 });
 
@@ -190,7 +191,7 @@ test("Overall uses official points and record standings instead of cumulative st
   assert.match(source, /Individual Points & Record/);
   for (const label of ["Rank", "Player", "Record", "Points"]) assert.match(source, new RegExp(`>${label}(?: <|<)`));
   assert.match(source, /<OverallLeaderboard rows=\{data\?\.leaderboard \|\| \[\]\} \/>/);
-  assert.match(source, /<ScoreLeaderboard rows=\{data\?\.scoreLeaderboard \|\| \[\]\} round=\{activeRound\?\.number\} format=\{activeRound\?\.format\} \/>/);
+  assert.match(source, /<ScoreLeaderboard rows=\{data\?\.scoreLeaderboard \|\| \[\]\} round=\{activeRound\?\.number\} format=\{activeRound\?\.format\} players=\{data\?\.players \|\| \[\]\} \/>/);
   assert.doesNotMatch(source.slice(source.indexOf("function OverallLeaderboard"), source.indexOf("export default function")), /gross|netToPar|cumulative/i);
 });
 
