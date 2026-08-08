@@ -8,6 +8,8 @@ import { directorTransactionError } from "../../../../lib/director-transaction-e
 import { createPublicationTrace, validateProjectionSnapshot } from "../../../../lib/projection-publication-diagnostics";
 import { playerPassportTokenFromRequest } from "../../../../lib/player-passport";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server";
+import { formatChampionshipOdds } from "../../../../lib/championship-odds-format";
+import { oddsPersistenceDiagnostics } from "../../../../lib/odds-workbook-persistence";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -79,9 +81,10 @@ async function publishProjection(request) {
 
     start("Snapshot validation", { workbookOperation: "Validate snapshot identity, values, and publication lifecycle", worksheet: "Odds Snapshots", function: "validateProjectionSnapshot" });
     validateProjectionSnapshot(preview);
+    const oddsPersistence = oddsPersistenceDiagnostics(preview, formatChampionshipOdds);
     const existing = (await readOddsSnapshots()).filter((row) => row.year === preview.year);
     if (process.env.VERCEL_ENV !== "preview" && phase === "Pre-Tournament" && existing.some((row) => row.phase !== "Pre-Tournament")) throw new Error("Pre-Tournament is locked because the tournament has started.");
-    pass("Snapshot validation", { worksheet: "Odds Snapshots", function: "validateProjectionSnapshot", existingSnapshots: existing.length });
+    pass("Snapshot validation", { worksheet: "Odds Snapshots", function: "validateProjectionSnapshot", existingSnapshots: existing.length, oddsPersistence });
 
     start("Batch workbook write", { workbookOperation: "Atomic field-scoped replacement of projection runtime records", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
     const snapshot = await publishOddsSnapshot(preview);
