@@ -351,14 +351,14 @@ test("Calcutta financial values use shared positive, negative, and neutral prese
   assert.doesNotMatch(css, /\.row\[data-portfolio=true\][^{]*overflow-x/);
 });
 
-test("Current Market gives Current Pot a full-width hero above two balanced metric rows", async () => {
+test("Current Market gives Calcutta Pot a full-width hero above two balanced metric rows", async () => {
   const [component, css] = await Promise.all([
     readFile(new URL("../app/live/CalcuttaExperience.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/calcutta.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(component, /data-current-market=\{!model\.tournamentComplete \|\| undefined\}/);
-  assert.match(component, /className=\{styles\.heroPot\}[^>]*><small>Current Pot<\/small><strong>\{money\(model\.pot\)\}<\/strong>/);
-  assert.match(component, /Total Calcutta prize pool/);
+  assert.match(component, /className=\{styles\.heroPot\}[^>]*><small>Calcutta Pot<\/small><strong>\{money\(model\.pot\)\}<\/strong>/);
+  assert.match(component, /Total prize pool/);
   assert.match(css, /\.hero>div\[data-current-market=true\] \.heroPot\{grid-column:1\/-1/);
   assert.match(css, /\.hero>div\[data-current-market=true\] \.heroPot strong\{font-size:2rem\}/);
   assert.match(css, /p:nth-child\(2n\+2\)\{border-right:1px/);
@@ -386,7 +386,7 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(dashboardCss, /\.rounds\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(dashboardCss, /\.filters\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(dashboardCss, /\.destinations,.rounds,.filters\{[^}]*overflow:visible/);
-  assert.match(component, /Current Pot/);
+  assert.match(component, /Calcutta Pot/);
   assert.match(component, /Golfers/);
   assert.match(component, /Portfolios/);
   assert.ok(component.indexOf('className={styles.tabs}') < component.indexOf('<Hero model={model} />'));
