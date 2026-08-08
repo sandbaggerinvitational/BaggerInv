@@ -84,7 +84,7 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState("");
   const [direction, setDirection] = useState("");
-  const performance = useMemo(() => playerPerformanceRows(data.leaderboard || [], data.scoreLeaderboard || []), [data]);
+  const performance = useMemo(() => playerPerformanceRows(data.leaderboard || [], data.scoreLeaderboard || [], data.rounds || []), [data]);
   const availableMetrics = useMemo(() => PLAYER_METRICS.filter(([key]) =>
     ["points", "wins", "winPct"].includes(key) || performance.some((row) => row[key] !== null)
   ), [performance]);

@@ -34,7 +34,7 @@ export async function GET(request) {
     try {
       const tournamentData = initialized.tournamentData;
       const standings = rankPlayerRows(
-        playerPerformanceRows(tournamentData.leaderboard || [], tournamentData.scoreLeaderboard || []),
+        playerPerformanceRows(tournamentData.leaderboard || [], tournamentData.scoreLeaderboard || [], tournamentData.rounds || []),
         "points"
       );
       const standing = standings.find((row) => String(row.id) === String(data.player.id));

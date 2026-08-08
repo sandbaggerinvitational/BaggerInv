@@ -29,10 +29,13 @@ test("live moments turn official standings into concise narratives", () => {
     tournament,
     leaderboard,
     scoreLeaderboard: [
-      { id: "clay", entityType: "PLAYER", holes: 18, gross: 72, net: 68 },
-      { id: "jason", entityType: "PLAYER", holes: 18, gross: 75, net: 71 },
+      { id: "clay", round: 1, entityType: "PLAYER", holes: 18, gross: 72, net: 68 },
+      { id: "jason", round: 1, entityType: "PLAYER", holes: 18, gross: 75, net: 71 },
     ],
-    rounds: [],
+    rounds: [{ number: 1, format: "Best Ball", matches: [{
+      id: "r1", status: "Final", team1Points: 1.5, team2Points: 1.5,
+      team1Players: [{ id: "clay" }], team2Players: [{ id: "jason" }],
+    }] }],
   });
   assert.match(stories.find((item) => item.id === "team-race").headline, /narrow tournament lead/);
   assert.equal(stories.find((item) => item.id === "points-leader").label, "Hot Player");

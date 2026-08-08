@@ -28,12 +28,13 @@ const players = [
 
 test("official player standings preserve points, records, ties, and alternate metrics", () => {
   const scores = [
-    { id: "p1", entityType: "PLAYER", holes: 18, gross: 72, net: 68 },
-    { id: "p1", entityType: "PLAYER", holes: 9, gross: 34, net: 31 },
-    { id: "p2", entityType: "PLAYER", holes: 18, gross: 74, net: 70 },
-    { id: "pair", entityType: "PAIRING", holes: 18, gross: 65, net: 62 },
+    { id: "p1", round: 1, entityType: "PLAYER", holes: 18, gross: 72, net: 68 },
+    { id: "p1", round: 1, entityType: "PLAYER", holes: 9, gross: 34, net: 31 },
+    { id: "p2", round: 1, entityType: "PLAYER", holes: 18, gross: 74, net: 70 },
+    { id: "pair", round: 2, entityType: "PAIRING", holes: 18, gross: 65, net: 62 },
   ];
-  const rows = playerPerformanceRows(players, scores);
+  const rounds = [{ number: 1, format: "Best Ball", matches: [{ status: "Final", team1Points: 1.5, team2Points: 1.5, team1Players: [{ id: "p1" }], team2Players: [{ id: "p2" }] }] }];
+  const rows = playerPerformanceRows(players, scores, rounds);
   assert.equal(rows[0].record, "3-0-0");
   assert.equal(rows[0].grossAvg, 72);
   assert.equal(rows[0].winPct, 100);
@@ -103,15 +104,47 @@ test("team standings use official overall points and round-scoped finalized reco
 
 test("insights publish only supported trusted metrics", () => {
   const performance = playerPerformanceRows(players, [
-    { id: "p1", entityType: "PLAYER", holes: 18, gross: 72, net: 68 },
-    { id: "p2", entityType: "PLAYER", holes: 18, gross: 74, net: 70 },
-  ]);
+    { id: "p1", round: 1, entityType: "PLAYER", holes: 18, gross: 72, net: 68 },
+    { id: "p2", round: 1, entityType: "PLAYER", holes: 18, gross: 74, net: 70 },
+  ], [{ number: 1, format: "BB", matches: [{ status: "Final", team1Points: 1.5, team2Points: 1.5, team1Players: [{ id: "p1" }], team2Players: [{ id: "p2" }] }] }]);
   const insights = tournamentInsights(performance, [{ name: "The Pickles", points: 12.5 }]);
   assert.equal(insights.pointsLeader.id, "p1");
   assert.deepEqual(insights.unbeaten.map((row) => row.id), ["p1", "p3"]);
   assert.equal(insights.unbeaten.find((row) => row.id === "p3").record, "2-0-1");
   assert.equal(insights.lowestGross.id, "p1");
   assert.equal(insights.leadingTeam.name, "The Pickles");
+});
+
+test("individual averages use only official Best Ball and Singles scores", () => {
+  const playerRows = [{ id: "p1", player: "Player One", wins: 0, losses: 0, halves: 0 }];
+  const scores = [
+    { id: "p1", round: 1, format: "BB", entityType: "PLAYER", holes: 18, gross: 69, net: 65 },
+    { id: "pair-1", playerIds: ["p1", "p2"], round: 2, format: "SC", entityType: "PAIRING", holes: 18, gross: 62, net: 60 },
+    { id: "p1", round: 3, format: "SI", entityType: "PLAYER", holes: 18, gross: 75, net: 71 },
+  ];
+  const finalMatch = (round) => ({ id: `m${round}`, status: "Final", team1Points: 3, team2Points: 0, team1Players: [{ id: "p1" }], team2Players: [{ id: "opponent" }] });
+  const round1Only = [
+    { number: 1, format: "Best Ball", matches: [finalMatch(1)] },
+    { number: 2, format: "Scramble", matches: [finalMatch(2)] },
+    { number: 3, format: "Singles", matches: [{ status: "Scheduled", team1Players: [{ id: "p1" }] }] },
+  ];
+  assert.deepEqual(
+    (({ grossAvg, netAvg }) => ({ grossAvg, netAvg }))(playerPerformanceRows(playerRows, scores, round1Only)[0]),
+    { grossAvg: 69, netAvg: 65 }
+  );
+  const throughRound3 = round1Only.map((round) => round.number === 3 ? { ...round, matches: [finalMatch(3)] } : round);
+  assert.deepEqual(
+    (({ grossAvg, netAvg }) => ({ grossAvg, netAvg }))(playerPerformanceRows(playerRows, scores, throughRound3)[0]),
+    { grossAvg: 72, netAvg: 68 }
+  );
+});
+
+test("pending, incomplete, and missing individual rounds never become fake zeroes", () => {
+  const playerRows = [{ id: "p1", player: "Player One" }];
+  const rounds = [{ number: 1, format: "BB", matches: [{ status: "Final", team1Points: 3, team2Points: 0, team1Players: [{ id: "p1" }], team2Players: [] }] }];
+  assert.equal(playerPerformanceRows(playerRows, [], rounds)[0].grossAvg, null);
+  assert.equal(playerPerformanceRows(playerRows, [{ id: "p1", round: 1, entityType: "PLAYER", holes: 17, gross: 68, net: 64 }], rounds)[0].netAvg, null);
+  assert.equal(playerPerformanceRows(playerRows, [{ id: "p1", round: 1, entityType: "PLAYER", holes: 18, gross: 0, net: 0 }], [{ number: 1, format: "SC", matches: rounds[0].matches }])[0].grossAvg, null);
 });
 
 test("team leader insight distinguishes sole leaders from official points ties", () => {
