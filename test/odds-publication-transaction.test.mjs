@@ -16,7 +16,9 @@ test("official projection reporting views publish in one field-scoped Sheets mut
   assert.match(publication, /Odds Player Results/);
   assert.doesNotMatch(publication, /replaceRuntimeRecords\(/);
   assert.match(source, /await google\("\/values:batchUpdate"/);
-  assert.match(source, /validateFieldWrite\(tab, sheet\.headers, updates\)/);
+  assert.match(source, /normalizeWorkbookProducerRecord\(tab, updates\)/);
+  assert.match(source, /validateFieldWrite\(tab, sheet\.headers, normalized\)/);
+  assert.match(publication, /normalizeWorkbookProducerRecord\("Odds Player Results"/);
 });
 
 test("Preview publication logs exact server diagnostics while returning generic copy", async () => {

@@ -119,6 +119,7 @@ async function publishProjection(request) {
       exception: error?.name || "Error",
       rootCause: error?.cause?.message || error?.message || String(error),
       stack: error?.stack || "Unavailable",
+      workbookContract: error?.workbookContract || null,
       pairingDiagnostics: error?.pairingDiagnostics || null,
       transactionRollback: diagnostic.stepReached === "Batch workbook write" ? "The atomic Google Sheets batch was rejected without a partial commit." : "No rollback was required for the stage that failed.",
       trace: trace.snapshot(),
