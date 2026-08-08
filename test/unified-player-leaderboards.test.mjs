@@ -24,7 +24,7 @@ test("individual and pairing formats retain their distinct official metrics and 
     read("app/live/LeaderboardRow.js"),
   ]);
   for (const label of ["Record", "Points", "THRU", "Gross", "Net", "Net +/-"]) assert.match(dashboard, new RegExp(label.replace("+", "\\+")));
-  assert.match(dashboard, /roundScoreRows\(data\.scoreLeaderboard \|\| \[\], round\?\.number, round\?\.format, sort\)/);
+  assert.match(dashboard, /roundCompetitionRows\(data\.scoreLeaderboard \|\| \[\], round\?\.number, round\?\.format/);
   assert.match(scramble, /ScrambleTeamIdentity/);
   assert.match(row, /PlayerAvatar/);
   assert.match(dashboard, /round\?\.course\?\.name/);

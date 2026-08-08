@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   playerPerformanceRows,
   rankPlayerRows,
+  roundCompetitionRows,
   roundScoreRows,
   searchPlayerRows,
   teamLeaderInsight,
@@ -54,6 +55,31 @@ test("round standings keep Scramble pairings singular and individual formats sep
   assert.deepEqual(roundScoreRows(rows, 2, "SC").map((row) => row.id), ["pair-a"]);
   assert.deepEqual(roundScoreRows(rows, 1, "BB").map((row) => row.id), ["p1"]);
   assert.equal(roundScoreRows(rows, 1, "BB")[0].displayRank, 1);
+});
+
+test("competition round standings rank by official points, then net, then stable order", () => {
+  const scores = [
+    { id: "p1", playerIds: ["p1"], round: 1, entityType: "PLAYER", name: "Alpha", net: 70, netToPar: -2 },
+    { id: "p2", playerIds: ["p2"], round: 1, entityType: "PLAYER", name: "Bravo", net: 62, netToPar: -10 },
+    { id: "p3", playerIds: ["p3"], round: 1, entityType: "PLAYER", name: "Charlie", net: 64, netToPar: -8 },
+    { id: "p4", playerIds: ["p4"], round: 1, entityType: "PLAYER", name: "Delta", net: 64, netToPar: -8 },
+  ];
+  const official = [
+    { id: "p1", points: 1.5 }, { id: "p2", points: 1 },
+    { id: "p3", points: 1 }, { id: "p4", points: 1 },
+  ];
+  const matches = scores.map((row) => ({ status: "Final", team1Players: [{ id: row.id }], team2Players: [] }));
+  const ranked = roundCompetitionRows(scores, 1, "BB", official, matches);
+  assert.deepEqual(ranked.map((row) => row.id), ["p1", "p2", "p3", "p4"]);
+  assert.deepEqual(ranked.map((row) => row.displayRank), [1, 2, 3, 3]);
+  assert.deepEqual(ranked.map((row) => row.points), [1.5, 1, 1, 1]);
+});
+
+test("Scramble standings expose each partner's official player points without doubling them", () => {
+  const scores = [{ id: "match-1:team-1", playerIds: ["p1", "p2"], round: 2, entityType: "PAIRING", name: "Alpha / Bravo", net: 62 }];
+  const official = [{ id: "p1", points: 1.25 }, { id: "p2", points: 1.25 }];
+  const matches = [{ status: "Final", team1Players: [{ id: "p1" }, { id: "p2" }], team2Players: [] }];
+  assert.equal(roundCompetitionRows(scores, 2, "SC", official, matches)[0].points, 1.25);
 });
 
 test("team standings use official overall points and round-scoped finalized records", () => {

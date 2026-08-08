@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { playerRoundBreakdown } from "../lib/leaderboard-round-breakdown.js";
+import { participantRoundBreakdown, playerRoundBreakdown } from "../lib/leaderboard-round-breakdown.js";
 
 const tournament = { teamOne: { name: "The Pickles" }, teamTwo: { name: "Lipp it and Rip it" } };
 const holes = (frontOne, backOne) => Array.from({ length: 18 }, (_, index) => ({
@@ -33,11 +33,21 @@ test("halved segments use participant-facing match language", () => {
 
 test("unplayed rounds are Pending and never imply a zero record or points", () => {
   const result = playerRoundBreakdown({ matches: [] }, "CB01", null, tournament);
-  assert.deepEqual(result, { state: "pending", label: "Pending", segments: [], points: null });
+  assert.deepEqual(result, { state: "pending", label: "Upcoming", segments: [], points: null });
 });
 
 test("live rounds expose LIVE without assigning official points", () => {
   const result = playerRoundBreakdown({ matches: [{ status: "Live", team1Players: [{ id: "CB01" }], holeResults: [] }] }, "CB01", null, tournament);
   assert.equal(result.label, "LIVE");
   assert.equal(result.points, null);
+});
+
+test("Singles breakdown includes only the overall result and points", () => {
+  const round = { format: "SI", matches: [{
+    status: "Final", archiveFinal: true, finalResult: "The Pickles 2&1",
+    team1Players: [{ id: "CB01" }], team2Players: [{ id: "AM01" }], holeResults: [],
+  }] };
+  const result = participantRoundBreakdown(round, ["CB01"], 1, tournament);
+  assert.deepEqual(result.segments, [{ label: "Overall", value: "2 & 1" }]);
+  assert.equal(result.points, 1);
 });

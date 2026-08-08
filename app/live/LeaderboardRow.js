@@ -1,5 +1,6 @@
 import PlayerAvatar from "../PlayerAvatar";
 import StatusBadge from "../StatusBadge";
+import { formatPlayerPoints } from "../../lib/formatters";
 import styles from "./scramble-leaderboard.module.css";
 
 export function LeaderboardRank({ value }) {
@@ -41,8 +42,17 @@ function netPerformanceSummary(netToPar, final) {
   return `${final ? "Finished" : "Currently playing"} ${position}.`;
 }
 
-export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, matchId, returnTo = "/live?view=leaderboards", onClose }) {
-  const final = Number(holes) >= 18;
+export function MatchBreakdown({ breakdown }) {
+  if (!breakdown) return null;
+  const singles = breakdown.segments.length === 1;
+  return <section className={styles.matchBreakdown}>
+    <header><span>{singles ? "Match Result" : "Match Breakdown"}</span><StatusBadge status={breakdown.label} /></header>
+    {breakdown.state === "pending" ? <p>Pending</p> : <div>{breakdown.segments.map((segment) => <span key={segment.label}><small>{segment.label}</small><strong>{segment.value}</strong></span>)}{breakdown.points !== null ? <span data-points="true"><small>Points</small><strong>{formatPlayerPoints(breakdown.points)}</strong></span> : null}</div>}
+  </section>;
+}
+
+export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, points, breakdown, officialFinal, matchId, returnTo = "/live?view=leaderboards", onClose }) {
+  const final = officialFinal ?? Number(holes) >= 18;
   const scorecardHref = matchId ? `/game-center/${encodeURIComponent(matchId)}?from=${encodeURIComponent(returnTo)}` : "";
   return <LeaderboardDetailSheet title={title} identity={identity} context={{ primary: [roundLabel, formatLabel].filter(Boolean).join(" • "), secondary: courseName }} status={final ? "Final" : "Live"} metrics={[
     { label: final ? "Final Rank" : "Current Rank", value: rank },
@@ -50,7 +60,8 @@ export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel
     { label: "Gross Score", value: gross },
     { label: "Net Score", value: net },
     { label: "Net +/-", value: netToPar, featured: true },
-  ]} action={<>{netPerformanceSummary(netToPar, final) ? <p className={styles.performanceSummary}>{netPerformanceSummary(netToPar, final)}</p> : null}{scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null}</>} onClose={onClose} />;
+    { label: "Round Points", value: points === null || points === undefined ? "—" : formatPlayerPoints(points) },
+  ]} action={<><MatchBreakdown breakdown={breakdown} />{netPerformanceSummary(netToPar, final) ? <p className={styles.performanceSummary}>{netPerformanceSummary(netToPar, final)}</p> : null}{scorecardHref ? <a className={styles.scorecardAction} href={scorecardHref}>View Scorecard</a> : null}</>} onClose={onClose} />;
 }
 
 export function LeaderboardMetrics({ metrics = [], variant = "round" }) {
