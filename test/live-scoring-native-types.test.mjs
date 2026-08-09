@@ -52,8 +52,9 @@ test("both scoring APIs normalize requests and preserve technical diagnostics", 
   }
   assert.match(writer, /grossScoresForWorkbook/);
   assert.match(writer, /Live scoring read-back verification failed/);
-  assert.match(writer, /delays: \[0, 250, 600, 1200\]/);
+  assert.match(writer, /delays: \[0, 300, 750, 1500, 3000\]/);
   assert.match(writer, /liveScoreMutationQueues/);
+  assert.match(writer, /idempotentReplay: true/);
 });
 
 test("scoring UI serializes taps, retains failed drafts, and renders one success confirmation", async () => {
