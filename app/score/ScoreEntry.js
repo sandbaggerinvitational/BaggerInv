@@ -96,10 +96,6 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       },
     });
     const payload = await response.json();
-    if (!response.ok && payload.diagnostics) {
-      window.__SBI_PREVIEW_SCORING_DIAGNOSTICS__ = { httpStatus: response.status, ...payload.diagnostics };
-      console.error("Preview scoring diagnostics", payload.diagnostics);
-    }
     if (!response.ok) throw new Error(payload.error || "The scoring request failed.");
     return payload;
   };

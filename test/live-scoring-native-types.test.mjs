@@ -39,7 +39,7 @@ test("technical workbook failures stay in diagnostics and out of participant cop
   assert.equal(participantScoringError(new Error("This hole was updated by someone else.")), "This hole was updated by someone else.");
 });
 
-test("both scoring APIs normalize requests and preserve technical diagnostics", async () => {
+test("both scoring APIs normalize requests and keep technical diagnostics server-side", async () => {
   const [current, match, writer] = await Promise.all([
     readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/matches/[matchId]/route.js", import.meta.url), "utf8"),
@@ -49,13 +49,18 @@ test("both scoring APIs normalize requests and preserve technical diagnostics", 
     assert.match(source, /normalizeLiveScoringRequest\(submitted\)/);
     assert.match(source, /participantScoringError\(error\)/);
     assert.match(source, /logScoringFailure/);
-    assert.match(source, /process\.env\.VERCEL_ENV === "preview"/);
+    assert.doesNotMatch(source, /technicalMessage|verificationAttempts/);
   }
   assert.match(writer, /grossScoresForWorkbook/);
   assert.match(writer, /Live scoring read-back verification failed/);
   assert.match(writer, /delays: \[0, 300, 750, 1500, 3000\]/);
   assert.match(writer, /liveScoreMutationQueues/);
   assert.match(writer, /idempotentReplay: true/);
+  assert.match(writer, /Live Hole Scores is the authoritative scoring record/);
+  assert.doesNotMatch(
+    writer.match(/verify: \(verifiedSheets\) => \{[\s\S]*?summarize:/)?.[0] || "",
+    /Number\(verifiedMatch\?\.\["Current Hole"\]\).*Number\(liveStatus\.currentHole\)/
+  );
 });
 
 test("scoring UI serializes taps, retains failed drafts, and renders one success confirmation", async () => {

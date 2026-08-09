@@ -40,7 +40,6 @@ export async function POST(request) {
     logScoringFailure(error, { route: "/api/scoring/current", conflict });
     return NextResponse.json({
       error: participantScoringError(error),
-      ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: { technicalMessage: error?.message, verificationAttempts: error?.verificationAttempts } } : {}),
     }, { status: conflict ? 409 : 400 });
   }
 }
