@@ -129,6 +129,9 @@ export default function ScoreEntry({ dashboardOnly = false }) {
 
   useEffect(() => {
     let current = true;
+    const controller = new AbortController();
+    const cancelForNavigation = () => { current = false; controller.abort(); };
+    window.addEventListener("participant-navigation-start", cancelForNavigation);
     const restore = async () => {
       const cached = dashboardOnly ? readParticipantInitializationCache() : null;
       if (cached) {
@@ -141,8 +144,8 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       } else setPassportState("loading");
       try {
         const [session, passport] = await Promise.all([
-          dashboardOnly ? Promise.resolve(null) : fetch("/api/scoring/session", { cache: "no-store" }),
-          fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store" }),
+          dashboardOnly ? Promise.resolve(null) : fetch("/api/scoring/session", { cache: "no-store", signal: controller.signal }),
+          fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store", signal: controller.signal }),
         ]);
         if (passport.ok) {
           const identity = await passport.json();
@@ -178,7 +181,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       }
     };
     restore();
-    return () => { current = false; };
+    return () => { current = false; controller.abort(); window.removeEventListener("participant-navigation-start", cancelForNavigation); };
   }, [dashboardOnly, restoreAttempt]);
 
   const login = async () => {
@@ -218,7 +221,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       if (sequence !== matchOpenSequence.current) return;
       const payload = await response.json();
       if (!response.ok) throw new Error(response.status >= 500
-        ? "Scorecard refresh was interrupted. Tap Continue Scoring again."
+        ? "Scorecard could not be opened. Please try again."
         : payload.error || "This match is not available for scoring.");
       if (dashboardOnly) {
         window.location.assign("/score");
@@ -238,6 +241,16 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   useEffect(() => () => {
     matchOpenSequence.current += 1;
     matchOpenController.current?.abort();
+  }, []);
+  useEffect(() => {
+    const cancelForNavigation = () => {
+      matchOpenSequence.current += 1;
+      matchOpenController.current?.abort();
+      setStatus("");
+      setBusy(false);
+    };
+    window.addEventListener("participant-navigation-start", cancelForNavigation);
+    return () => window.removeEventListener("participant-navigation-start", cancelForNavigation);
   }, []);
 
   const clearAccess = async () => {

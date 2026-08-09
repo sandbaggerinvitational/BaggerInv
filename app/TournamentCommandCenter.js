@@ -3,6 +3,7 @@ import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
 import MobileIdentityImage from "./MobileIdentityImage";
 import TournamentIdentityHeader from "./TournamentIdentityHeader";
 import TournamentMoments from "./TournamentMoments";
+import DeferredHomeContent from "./DeferredHomeContent";
 import TournamentSchedule from "./TournamentSchedule";
 import { teamLogo } from "../lib/asset-paths";
 import {
@@ -117,7 +118,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
       />
 
       {pulse}
-      <TournamentMoments moments={moments} />
+      <DeferredHomeContent><TournamentMoments moments={moments} /></DeferredHomeContent>
       {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
       <PersonalizedPlayerHome netSkins={liveData?.netSkins} />
     </div>

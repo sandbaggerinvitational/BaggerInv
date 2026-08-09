@@ -162,7 +162,9 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
   const [busyId, setBusyId] = useState("");
   const [message, setMessage] = useState("");
   const [now, setNow] = useState(Date.now());
+  const [secondaryReady, setSecondaryReady] = useState(false);
   const refreshSequence = useRef(0);
+  const refreshController = useRef(null);
 
   const refresh = useCallback(async (signal) => {
     const sequence = ++refreshSequence.current;
@@ -193,6 +195,7 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
 
   useEffect(() => {
     const controller = new AbortController();
+    refreshController.current = controller;
     if (!cachedInitialization) refresh(controller.signal);
     else {
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 800));
@@ -207,11 +210,26 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
     const focus = () => {
       controller?.abort();
       controller = new AbortController();
+      refreshController.current = controller;
       refresh(controller.signal);
     };
     window.addEventListener("focus", focus);
     return () => { controller?.abort(); window.removeEventListener("focus", focus); };
   }, [refresh]);
+  useEffect(() => {
+    const cancelForNavigation = () => {
+      refreshSequence.current += 1;
+      refreshController.current?.abort();
+    };
+    window.addEventListener("participant-navigation-start", cancelForNavigation);
+    return () => window.removeEventListener("participant-navigation-start", cancelForNavigation);
+  }, []);
+  useEffect(() => {
+    const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 500));
+    const cancel = window.cancelIdleCallback || window.clearTimeout;
+    const task = schedule(() => setSecondaryReady(true), { timeout: 1200 });
+    return () => cancel(task);
+  }, []);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30000);
     return () => window.clearInterval(timer);
@@ -313,8 +331,8 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
       {message ? <p className={styles.message} role="alert">{message}</p> : null}
     </div>}
 
-    <PlayerNetSkins netSkins={netSkins} playerId={player?.id} />
-    {matches.length ? <MyRounds
+    {secondaryReady ? <PlayerNetSkins netSkins={netSkins} playerId={player?.id} /> : null}
+    {secondaryReady && matches.length ? <MyRounds
       matches={matches}
       emphasizedId={primary?.matchId}
       timeZone={payload?.tournament?.timeZone}

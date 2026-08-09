@@ -86,7 +86,8 @@ test("cached participant state keeps transient freshness failures silent", async
   assert.match(score, /matchOpenSequence/);
   assert.match(score, /matchOpenController\.current\?\.abort\(\)/);
   assert.match(score, /error\?\.name !== "AbortError"/);
-  assert.match(score, /Scorecard refresh was interrupted\. Tap Continue Scoring again\./);
+  assert.doesNotMatch(score, /Scorecard refresh was interrupted/);
+  assert.match(score, /Scorecard could not be opened\. Please try again\./);
   assert.match(matches, /signedPassportValid: true/);
   assert.match(matches, /match-authorization-workbook-read/);
   assert.doesNotMatch(matches, /We couldn’t verify your Player Passport right now/);
@@ -104,8 +105,23 @@ test("participant navigation cancels obsolete Home and scorecard freshness work"
   assert.match(home, /sequence !== refreshSequence\.current/);
   assert.match(score, /signal: controller\.signal/);
   assert.match(score, /sequence !== matchOpenSequence\.current/);
+  assert.match(score, /participant-navigation-start/);
+  assert.match(score, /setStatus\(""\)/);
   assert.match(retry, /error\?\.name === "AbortError"/);
   assert.match(retry, /signal\?\.aborted/);
+});
+
+test("primary navigation cancels obsolete screen work at tap time", async () => {
+  const [navigation, home, score] = await Promise.all([
+    source("app/ParticipantIdentity.js"),
+    source("app/PersonalizedPlayerHome.js"),
+    source("app/score/ScoreEntry.js"),
+  ]);
+  assert.match(navigation, /window\.dispatchEvent\(new Event\("participant-navigation-start"\)\)/);
+  assert.match(home, /addEventListener\("participant-navigation-start", cancelForNavigation\)/);
+  assert.match(home, /refreshController\.current\?\.abort\(\)/);
+  assert.match(score, /controller\.abort\(\)/);
+  assert.match(score, /matchOpenController\.current\?\.abort\(\)/);
 });
 
 test("stale identity responses cannot overwrite a newer successful response", async () => {

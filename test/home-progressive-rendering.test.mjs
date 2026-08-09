@@ -21,6 +21,18 @@ test("personalized loading copy does not block or duplicate shared Home modules"
   assert.doesNotMatch(personalized, /Preparing Tournament|TournamentPulse|TournamentMoments|TournamentSchedule/);
 });
 
+test("Home defers secondary stories, Net Skins, and completed-round history until idle", async () => {
+  const [commandCenter, deferred, personalized] = await Promise.all([
+    source("app/TournamentCommandCenter.js"),
+    source("app/DeferredHomeContent.js"),
+    source("app/PersonalizedPlayerHome.js"),
+  ]);
+  assert.match(commandCenter, /<DeferredHomeContent><TournamentMoments/);
+  assert.match(deferred, /requestIdleCallback/);
+  assert.match(personalized, /secondaryReady \? <PlayerNetSkins/);
+  assert.match(personalized, /secondaryReady && matches\.length \? <MyRounds/);
+});
+
 test("Home initialization exposes every requested timing stage without changing JSON data", async () => {
   const [pipeline, passport, route, home] = await Promise.all([
     source("lib/participant-initialization.js"),

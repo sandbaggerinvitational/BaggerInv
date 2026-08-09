@@ -125,14 +125,14 @@ export default function ParticipantIdentity() {
     <nav className={styles.mobile} aria-label={`${player.name}'s tournament navigation`}>
       {items.map((item) => {
         const active = currentDestination === item.label;
-        return <Link href={item.href} prefetch={false} aria-current={active ? "page" : undefined} key={item.label}>
+        return <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} aria-current={active ? "page" : undefined} key={item.label}>
           <span aria-hidden="true"><NavIcon name={item.icon} /></span><b>{item.label}</b>
         </Link>;
       })}
     </nav>
     <nav className={styles.desktop} aria-label={`${player.name}'s Player Passport`}>
       <span>Welcome, {player.name}</span>
-      {items.map((item) => <Link href={item.href} prefetch={false} key={item.label}>{item.label}</Link>)}
+      {items.map((item) => <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} key={item.label}>{item.label}</Link>)}
     </nav>
   </>;
 }
