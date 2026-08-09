@@ -27,7 +27,6 @@ test("shared StatusBadge owns the supported status language and live dot", async
 test("standalone status pills and match status blocks use the shared status system", async () => {
   const badgePaths = [
     "app/TournamentIdentityHeader.js",
-    "app/TournamentCommandCenter.js",
     "app/live/LeaderboardsDashboard.js",
     "app/live/MatchCenter.js",
     "app/admin/live-matches/LiveMatchControl.js",

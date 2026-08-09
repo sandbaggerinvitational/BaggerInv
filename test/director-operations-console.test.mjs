@@ -21,7 +21,7 @@ test("new operations reuse the verified Director transaction and read-back pipel
   const route = source("app/api/director/route.js");
   const dashboard = source("app/admin/director/DirectorDashboard.js");
   const editors = source("app/admin/director/DirectorOperationEditors.js");
-  for (const action of ["match-management", "calcutta-management", "net-skins-eligibility"]) {
+  for (const action of ["match-management", "round-pairings", "calcutta-management", "net-skins-eligibility"]) {
     assert.match(route, new RegExp(action));
     assert.match(editors, new RegExp(action));
   }
@@ -36,11 +36,31 @@ test("operational editors mount on demand and close only after verified success"
   const dashboard = source("app/admin/director/DirectorDashboard.js");
   const css = source("app/admin/director/director.module.css");
   assert.match(consoleSource, /active\?\.type === "match"/);
-  assert.match(consoleSource, /const success = await saveOperation[\s\S]*if \(success\) close\(\)/);
+  assert.match(consoleSource, /const success = await saveOperation[\s\S]*if \(success\) \{ setPairingsDirty\(false\); setActive\(null\); \}/);
   assert.match(dashboard, /setToast\("✓ Changes Saved"\)/);
   assert.match(css, /operationSheetScroller\{[^}]*overflow-y:auto/);
   assert.match(css, /operationSheet>header/);
   assert.match(css, /min-height:44px/);
+});
+
+test("Round Pairings uses the active-year team roster and one verified batch mutation", () => {
+  const consoleSource = source("app/admin/director/DirectorOperationsConsole.js");
+  const editors = source("app/admin/director/DirectorOperationEditors.js");
+  const writes = source("lib/google-sheets-write.js");
+  const route = source("app/api/director/route.js");
+  assert.match(consoleSource, /Round Pairings/);
+  assert.match(consoleSource, /Unsaved Pairing Changes/);
+  assert.match(editors, /pairingSlotsForFormat/);
+  assert.match(editors, /player\.side\) === side/);
+  assert.match(editors, /Save Round Pairings/);
+  assert.match(editors, /const updates = changedMatches\.map[\s\S]*roundPairingDraft/);
+  assert.match(writes, /const rosterRows = records\("Handicaps"\)/);
+  assert.match(writes, /allPlayers\.filter\(\(player\) => rosterById\.has\(player\.id\)\)/);
+  assert.match(writes, /updateDirectorRoundPairings/);
+  assert.match(writes, /writeSheetFieldBatch\("Live Matches"/);
+  assert.match(writes, /action: "Round Pairings Updated"/);
+  assert.match(route, /action === "round-pairings"/);
+  assert.match(route, /verifyActionReadBack/);
 });
 
 test("Mission Control writes remain field-scoped and protected-map aware", () => {

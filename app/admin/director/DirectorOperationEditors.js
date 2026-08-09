@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
+import { pairingSlotsForFormat, roundPairingDraft, validateRoundPairings } from "../../../lib/round-pairings.js";
 import styles from "./director.module.css";
 
 const clean = (value) => String(value || "").trim();
@@ -18,11 +19,12 @@ function NotificationHealth({ sandbox }) {
 
 function MatchEditor({ match, operations, busy, save }) {
   const bySlot = (side, slot) => match.players.find((player) => player.side === side && player.slot === slot)?.id || "";
+  const slots = pairingSlotsForFormat(match.format);
   const [form, setForm] = useState(() => ({ Round: clean(match.round), Match: clean(match.match), "Course ID": clean(match.courseId), "Tee Time": clean(match.teeTime), ...(operations.capabilities.startingHole ? { "Starting Hole": clean(match.startingHole) } : {}), "Team 1 Player 1": bySlot(1, 1), "Team 1 Player 2": bySlot(1, 2), "Team 2 Player 1": bySlot(2, 1), "Team 2 Player 2": bySlot(2, 2) }));
   const update = (field) => (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
   return <form className={styles.operationsForm} onSubmit={(event) => { event.preventDefault(); save("match-management", { matchId: match.id, updates: form }); }}>
     <div className={styles.formGrid}><label>Round<input value={form.Round} onChange={update("Round")} inputMode="numeric" /></label><label>Match<input value={form.Match} onChange={update("Match")} inputMode="numeric" /></label><label>Tee Time<input value={form["Tee Time"]} onChange={update("Tee Time")} /></label><label>Course<select value={form["Course ID"]} onChange={update("Course ID")}>{operations.courses.map((course) => <option value={course.id} key={course.id}>{course.name}</option>)}</select></label></div>
-    <div className={styles.pairingGrid}>{[1, 2].flatMap((side) => [1, 2].map((slot) => { const field = `Team ${side} Player ${slot}`; return <label key={field}>Team {side} · Player {slot}<select value={form[field]} onChange={update(field)}><option value="">Unassigned</option>{operations.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label>; }))}</div>
+    <div className={styles.pairingGrid}>{[1, 2].flatMap((side) => Array.from({ length: slots }, (_, index) => index + 1).map((slot) => { const field = `Team ${side} Player ${slot}`; return <label key={field}>{operations.teamNames?.[side] || `Team ${side}`} · Player {slot}<select value={form[field]} onChange={update(field)}><option value="">Unassigned</option>{operations.players.filter((player) => Number(player.side) === side).map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label>; }))}</div>
     {operations.capabilities.startingHole ? <label>Starting Hole<input value={form["Starting Hole"]} onChange={update("Starting Hole")} /></label> : null}
     <button disabled={Boolean(busy)} type="submit">Save</button>
   </form>;
@@ -73,6 +75,63 @@ export function MatchManagement({ operations, busy, save, operate, initialContex
   const [matchId, setMatchId] = useState(initialMatch?.id || operations.matches[0]?.id || "");
   const match = operations.matches.find((item) => item.id === matchId);
   return <div className={styles.managementPanel}><label>Find match<select value={matchId} onChange={(event) => setMatchId(event.target.value)}>{operations.matches.map((item) => <option value={item.id} key={item.id}>Round {item.round} · Match {item.match} · {item.players.map((player) => player.name).join(" / ")}</option>)}</select></label>{match ? <><MatchEditor key={match.id} match={match} operations={operations} busy={busy} save={save} /><MatchControls match={match} operations={operations} busy={busy} operate={operate} /></> : <p>No matches are configured.</p>}</div>;
+}
+
+export function RoundPairingsManagement({ operations, busy, save, onDirtyChange }) {
+  const formatName = (value) => ({ BB: "Best Ball", SC: "Scramble", SI: "Singles" })[clean(value).toUpperCase()] || clean(value);
+  const rounds = [...new Map(operations.matches.map((match) => [Number(match.round), { round: Number(match.round), format: match.format }])).values()].sort((left, right) => left.round - right.round);
+  const firstEditable = rounds.find((item) => operations.matches.some((match) => Number(match.round) === item.round && !/^Final$/i.test(clean(match.status)))) || rounds[0];
+  const [selectedRound, setSelectedRound] = useState(firstEditable?.round || 1);
+  const roundMatches = operations.matches.filter((match) => Number(match.round) === Number(selectedRound)).sort((left, right) => Number(left.match) - Number(right.match));
+  const roundFormat = roundMatches[0]?.format || rounds.find((item) => item.round === Number(selectedRound))?.format || "";
+  const createDraft = (matches) => Object.fromEntries(matches.map((match) => [match.id, roundPairingDraft(match)]));
+  const [savedDraft, setSavedDraft] = useState(() => createDraft(roundMatches));
+  const [draft, setDraft] = useState(() => createDraft(roundMatches));
+  const [liveConfirmed, setLiveConfirmed] = useState(false);
+  const finalRound = roundMatches.some((match) => /^Final$/i.test(clean(match.status)));
+  const liveRound = roundMatches.some((match) => /^(Live|Reopened)$/i.test(clean(match.status)));
+  const fields = [1, 2].flatMap((side) => Array.from({ length: pairingSlotsForFormat(roundFormat) }, (_, index) => `Team ${side} Player ${index + 1}`));
+  const changedMatches = roundMatches.filter((match) => fields.some((field) => clean(draft[match.id]?.[field]) !== clean(savedDraft[match.id]?.[field])));
+  const validation = validateRoundPairings({ year: operations.roster.year, round: selectedRound, format: roundFormat, matches: roundMatches.map((match) => ({ ...match, assignments: draft[match.id] })), players: operations.players });
+  const dirty = changedMatches.length > 0;
+  useEffect(() => { onDirtyChange?.(dirty); }, [dirty, onDirtyChange]);
+  useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
+  const chooseRound = (round) => {
+    const matches = operations.matches.filter((match) => Number(match.round) === Number(round)).sort((left, right) => Number(left.match) - Number(right.match));
+    const next = createDraft(matches); setSelectedRound(Number(round)); setSavedDraft(next); setDraft(next); setLiveConfirmed(false);
+  };
+  const update = (matchId, field, value) => setDraft((current) => ({ ...current, [matchId]: { ...current[matchId], [field]: value } }));
+  const assignedElsewhere = (matchId, field) => new Set(roundMatches.flatMap((match) => fields.map((item) => match.id === matchId && item === field ? "" : clean(draft[match.id]?.[item]))).filter(Boolean));
+  const optionsFor = (side, matchId, field) => {
+    const unavailable = assignedElsewhere(matchId, field);
+    const current = clean(draft[matchId]?.[field]);
+    return operations.players.filter((player) => Number(player.side) === side && (!unavailable.has(player.id) || player.id === current));
+  };
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!dirty || !validation.valid || finalRound || (liveRound && !liveConfirmed)) return;
+    const updates = changedMatches.map((match) => ({ matchId: match.id, updates: roundPairingDraft({ assignments: draft[match.id] }) }));
+    const success = await save("round-pairings", { round: Number(selectedRound), confirmLive: liveConfirmed, updates });
+    if (success) setSavedDraft({ ...draft });
+  };
+  return <form className={`${styles.managementPanel} ${styles.roundPairingsEditor}`} onSubmit={submit}>
+    <label>Round<select value={selectedRound} disabled={Boolean(busy) || dirty} onChange={(event) => chooseRound(event.target.value)}>{rounds.map((item) => <option value={item.round} key={item.round}>Round {item.round} • {formatName(item.format)}</option>)}</select></label>
+    <div className={styles.pairingSummary} data-complete={validation.valid ? "true" : "false"}><strong>{validation.assignedCount} / {validation.expectedPlayerCount} golfers assigned</strong><span>{validation.remainingCount ? `${validation.remainingCount} remaining` : "Complete field assigned"}</span><small>{roundMatches.length} matches • {formatName(roundFormat)}</small></div>
+    {finalRound ? <div className={styles.pairingSafeguard} role="status"><strong>🔒 Round Final</strong><span>Reopen finalized matches before changing round pairings.</span></div> : null}
+    {liveRound && !finalRound ? <label className={styles.livePairingWarning}><input type="checkbox" checked={liveConfirmed} onChange={(event) => setLiveConfirmed(event.target.checked)} /><span><strong>Round is LIVE</strong> I understand these changes affect active pairings.</span></label> : null}
+    <div className={styles.roundPairingList}>{roundMatches.map((match) => {
+      const slots = pairingSlotsForFormat(match.format);
+      const names = [1, 2].map((side) => Array.from({ length: slots }, (_, index) => operations.players.find((player) => player.id === draft[match.id]?.[`Team ${side} Player ${index + 1}`])?.name || "Unassigned").join(" & "));
+      const course = operations.courses.find((item) => clean(item.id) === clean(match.courseId));
+      return <details key={match.id} data-changed={changedMatches.some((item) => item.id === match.id) ? "true" : undefined}>
+        <summary><span><small>Match {match.match} • {match.teeTime || "Tee time pending"}</small><strong>{names[0]} <b aria-hidden="true">vs</b> {names[1]}</strong><em>{course?.name || match.courseId || "Course pending"}</em></span><i aria-hidden="true">Edit</i></summary>
+        <div>{[1, 2].map((side) => <fieldset key={side}><legend>{operations.teamNames?.[side] || `Team ${side}`}</legend>{Array.from({ length: slots }, (_, index) => { const field = `Team ${side} Player ${index + 1}`; return <label key={field}>Player {slots > 1 ? index + 1 : ""}<select value={draft[match.id]?.[field] || ""} disabled={Boolean(busy) || finalRound} onChange={(event) => update(match.id, field, event.target.value)}><option value="">Unassigned</option>{optionsFor(side, match.id, field).map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label>; })}</fieldset>)}</div>
+      </details>;
+    })}</div>
+    {!validation.valid ? <div className={styles.pairingValidation} role="alert"><strong>Cannot Save Round Pairings</strong>{validation.errors.slice(0, 5).map((error) => <p key={error}>{error}</p>)}</div> : null}
+    {dirty ? <div className={styles.unsavedChanges} role="status"><strong><span aria-hidden="true">●</span> Unsaved Pairing Changes</strong><small>{changedMatches.length} match{changedMatches.length === 1 ? "" : "es"} updated.</small></div> : null}
+    <button type="submit" disabled={Boolean(busy) || !dirty || !validation.valid || finalRound || (liveRound && !liveConfirmed)}>Save Round Pairings</button>
+  </form>;
 }
 
 export function CourseTeesManagement({ operations, busy, save }) {

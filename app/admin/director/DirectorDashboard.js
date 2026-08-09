@@ -21,7 +21,7 @@ const ACTION_LABELS = {
   "match-unlock-scoring": "Scoring unlocked", "match-lock-scoring": "Scoring locked", "match-mark-live": "Match marked Live",
   "match-finalize": "Match finalized", "match-reopen": "Match reopened",
   automation: "Automation updated", "automation-check": "Automation verified",
-  "match-management": "Match updated", "calcutta-management": "Calcutta updated", "net-skins-eligibility": "Net Skins eligibility updated",
+  "match-management": "Match updated", "round-pairings": "Round Pairings updated", "calcutta-management": "Calcutta updated", "net-skins-eligibility": "Net Skins eligibility updated",
   "course-tees": "Course tee selections updated",
 };
 

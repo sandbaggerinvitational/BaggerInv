@@ -6,13 +6,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./director.module.css";
 
 const MatchManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.MatchManagement), { loading: () => <EditorLoading /> });
+const RoundPairingsManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.RoundPairingsManagement), { loading: () => <EditorLoading /> });
 const CourseTeesManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.CourseTeesManagement), { loading: () => <EditorLoading /> });
 const CalcuttaManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.CalcuttaManagement), { loading: () => <EditorLoading /> });
 const NetSkinsManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.NetSkinsManagement), { loading: () => <EditorLoading /> });
 const NotificationManagement = dynamic(() => import("./DirectorOperationEditors.js").then((module) => module.NotificationManagement), { loading: () => <EditorLoading /> });
 
 const clean = (value) => String(value || "").trim();
-const TITLES = { match: "Match Management", courseTees: "Course Tees", calcutta: "Calcutta", skins: "Net Skins", notifications: "Notifications" };
+const TITLES = { match: "Match Management", pairings: "Round Pairings", courseTees: "Course Tees", calcutta: "Calcutta", skins: "Net Skins", notifications: "Notifications" };
 
 function EditorLoading() { return <div className={styles.editorLoading} role="status">Opening operation…</div>; }
 
@@ -47,10 +48,12 @@ function DirectorBottomSheet({ active, onClose, children }) {
 export function DirectorOperationsHub({ operations, notificationSandbox, busy, saveOperation, operateMatch, sendNotification }) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(null);
+  const [pairingsDirty, setPairingsDirty] = useState(false);
+  const [discardOpen, setDiscardOpen] = useState(false);
   const openedAt = useRef(0);
-  const open = (type, context = {}) => { openedAt.current = performance.now(); setActive({ type, context }); };
-  const close = () => setActive(null);
-  const save = async (...args) => { const success = await saveOperation(...args); if (success) close(); return success; };
+  const open = (type, context = {}) => { openedAt.current = performance.now(); setPairingsDirty(false); setDiscardOpen(false); setActive({ type, context }); };
+  const close = () => { if (active?.type === "pairings" && pairingsDirty) { setDiscardOpen(true); return; } setActive(null); };
+  const save = async (...args) => { const success = await saveOperation(...args); if (success) { setPairingsDirty(false); setActive(null); } return success; };
   const notify = async (...args) => { const success = await sendNotification(...args); if (success) close(); return success; };
   const templates = notificationSandbox?.templates || [];
   const results = useMemo(() => {
@@ -84,15 +87,17 @@ export function DirectorOperationsHub({ operations, notificationSandbox, busy, s
         ? <Link href={result.href} key={result.id}><span>{result.label}</span><small>{result.type}</small></Link>
         : <button type="button" onClick={() => open(result.operation, result.context)} key={result.id}><span>{result.label}</span><small>{result.type}</small></button>) : <p>No Director tools match “{query}”.</p>}</div> : null}
       <div className={styles.operationLaunchers} aria-label="Director operations">
-        <button type="button" onClick={() => open("match")}>Match Management</button><button type="button" onClick={() => open("courseTees")}>Course Tees</button><button type="button" onClick={() => open("calcutta")}>Calcutta</button><button type="button" onClick={() => open("skins")}>Net Skins</button><button type="button" onClick={() => open("notifications")}>Notifications</button>
+        <button type="button" onClick={() => open("pairings")}>Round Pairings</button><button type="button" onClick={() => open("match")}>Match Management</button><button type="button" onClick={() => open("courseTees")}>Course Tees</button><button type="button" onClick={() => open("calcutta")}>Calcutta</button><button type="button" onClick={() => open("skins")}>Net Skins</button><button type="button" onClick={() => open("notifications")}>Notifications</button>
       </div>
     </section>
     <DirectorBottomSheet active={active} onClose={close}>
       {active?.type === "match" ? <MatchManagement operations={operations} busy={busy} save={save} operate={operateMatch} initialContext={active.context} /> : null}
+      {active?.type === "pairings" ? <RoundPairingsManagement operations={operations} busy={busy} save={save} onDirtyChange={setPairingsDirty} /> : null}
       {active?.type === "courseTees" ? <CourseTeesManagement operations={operations} busy={busy} save={save} /> : null}
       {active?.type === "calcutta" ? <CalcuttaManagement operations={operations} busy={busy} save={save} initialContext={active.context} /> : null}
       {active?.type === "skins" ? <NetSkinsManagement operations={operations} busy={busy} save={save} initialContext={active.context} /> : null}
       {active?.type === "notifications" ? <NotificationManagement sandbox={notificationSandbox} busy={busy} send={notify} initialContext={active.context} /> : null}
     </DirectorBottomSheet>
+    {discardOpen ? <div className={styles.matchConfirmBackdrop} role="presentation"><section className={styles.matchConfirm} role="alertdialog" aria-modal="true" aria-labelledby="discard-pairings-title"><span>Round Pairings</span><h3 id="discard-pairings-title">Unsaved Pairing Changes</h3><p>Your round pairing edits have not been saved.</p><div><button type="button" onClick={() => { setPairingsDirty(false); setDiscardOpen(false); setActive(null); }}>Discard</button><button type="button" onClick={() => setDiscardOpen(false)}>Continue Editing</button></div></section></div> : null}
   </>;
 }

@@ -4,7 +4,7 @@ import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagn
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorCourseTees, updateDirectorMatchManagement, updateDirectorNetSkins, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorCourseTees, updateDirectorMatchManagement, updateDirectorNetSkins, updateDirectorRoundPairings, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
 import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server-read.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
@@ -58,6 +58,18 @@ function verifyActionReadBack(action, input, data, round) {
       "Team 2 Player 1": match.players.find((player) => player.side === 2 && player.slot === 1)?.id || "",
       "Team 2 Player 2": match.players.find((player) => player.side === 2 && player.slot === 2)?.id || "",
     })[field] === String(value ?? "").trim());
+  }
+  if (action === "round-pairings") {
+    return (input.updates || []).every((update) => {
+      const match = data.operations?.matches.find((item) => item.id === update.matchId);
+      if (!match) return false;
+      return Object.entries(update.updates || {}).every(([field, value]) => ({
+        "Team 1 Player 1": match.players.find((player) => player.side === 1 && player.slot === 1)?.id || "",
+        "Team 1 Player 2": match.players.find((player) => player.side === 1 && player.slot === 2)?.id || "",
+        "Team 2 Player 1": match.players.find((player) => player.side === 2 && player.slot === 1)?.id || "",
+        "Team 2 Player 2": match.players.find((player) => player.side === 2 && player.slot === 2)?.id || "",
+      })[field] === String(value ?? "").trim());
+    });
   }
   if (action === "calcutta-management") {
     const calcutta = data.operations?.calcutta;
@@ -249,6 +261,8 @@ export async function POST(request) {
       }, updatedBy);
     } else if (input.action === "match-management") {
       await updateDirectorMatchManagement(input.matchId, input.updates, updatedBy);
+    } else if (input.action === "round-pairings") {
+      await updateDirectorRoundPairings({ ...input, year: data.tournament.year, round }, updatedBy);
     } else if (input.action === "calcutta-management") {
       await updateDirectorCalcutta({ ...input, year: data.tournament.year }, updatedBy);
     } else if (input.action === "net-skins-eligibility") {
@@ -264,7 +278,7 @@ export async function POST(request) {
       elapsedMs: googleWriteCompletedAt - workbookWriteStartedAt,
     }));
     refresh();
-    const operationsAction = ["match-management", "calcutta-management", "net-skins-eligibility", "course-tees", "match-unlock-scoring", "match-lock-scoring", "match-mark-live", "match-finalize", "match-reopen"].includes(input.action);
+    const operationsAction = ["match-management", "round-pairings", "calcutta-management", "net-skins-eligibility", "course-tees", "match-unlock-scoring", "match-lock-scoring", "match-mark-live", "match-finalize", "match-reopen"].includes(input.action);
     const verification = await verifyDirectorReadBack({
       invalidate: () => invalidateTournamentDataCache(["Live Matches", "Matches", "Tournaments", "Courses", "Course Scorecards", "Course Holes", "Live Round Handicaps", "Match Update Log", "Admin Audit Log", "Calcutta Purchases", "Calcutta Ownership", "Calcutta Standings", "Net Skins", "Net Skins Result"]),
       read: operationsAction
