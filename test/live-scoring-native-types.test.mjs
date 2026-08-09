@@ -49,6 +49,7 @@ test("both scoring APIs normalize requests and preserve technical diagnostics", 
     assert.match(source, /normalizeLiveScoringRequest\(submitted\)/);
     assert.match(source, /participantScoringError\(error\)/);
     assert.match(source, /logScoringFailure/);
+    assert.match(source, /process\.env\.VERCEL_ENV === "preview"/);
   }
   assert.match(writer, /grossScoresForWorkbook/);
   assert.match(writer, /Live scoring read-back verification failed/);

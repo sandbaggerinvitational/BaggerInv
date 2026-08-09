@@ -38,6 +38,9 @@ export async function POST(request) {
   } catch (error) {
     const conflict = /updated by someone else/i.test(error?.message || "");
     logScoringFailure(error, { route: "/api/scoring/current", conflict });
-    return NextResponse.json({ error: participantScoringError(error) }, { status: conflict ? 409 : 400 });
+    return NextResponse.json({
+      error: participantScoringError(error),
+      ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: { verificationAttempts: error?.verificationAttempts } } : {}),
+    }, { status: conflict ? 409 : 400 });
   }
 }
