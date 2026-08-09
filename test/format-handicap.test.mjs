@@ -85,6 +85,12 @@ test("centralizes live, final, and participant match-result wording", () => {
     { "Hole Winner": "Team 1" },
     { "Hole Winner": "Team 2" },
   ], teams, { includeWinner: false }), "1 UP");
+  const clinchedThenCompleted = Array.from({ length: 18 }, (_, index) => ({
+    "Hole Number": index + 1,
+    "Hole Winner": index < 6 ? "Team 1" : index < 12 ? "Halved" : index === 12 ? "Team 1" : "Team 2",
+  }));
+  assert.equal(formatLiveMatchResult(clinchedThenCompleted, teams), "The Pickles 7 & 5");
+  assert.equal(formatLiveMatchResult(clinchedThenCompleted, teams, { includeWinner: false }), "7 & 5");
   assert.equal(formatStoredMatchResult({
     status: "Final",
     finalResult: "The Pickles 3 & 1",
