@@ -51,5 +51,17 @@ test("both scoring APIs normalize requests and preserve technical diagnostics", 
     assert.match(source, /logScoringFailure/);
   }
   assert.match(writer, /grossScoresForWorkbook/);
-  assert.match(writer, /Live Hole Scores read-back verification failed/);
+  assert.match(writer, /Live scoring read-back verification failed/);
+  assert.match(writer, /delays: \[0, 250, 600, 1200\]/);
+  assert.match(writer, /liveScoreMutationQueues/);
+});
+
+test("scoring UI serializes taps, retains failed drafts, and renders one success confirmation", async () => {
+  const component = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
+  assert.match(component, /saveInFlight\.current/);
+  assert.match(component, /Score not saved\. Please try again\./);
+  assert.match(component, /saveFailed \? "Try Again"/);
+  assert.match(component, /Discard unsaved score changes for this hole\?/);
+  assert.equal((component.match(/setLastSaved\(`/g) || []).length, 1);
+  assert.doesNotMatch(component, /setStatus\(`Hole \$\{holeNumber\} saved/);
 });

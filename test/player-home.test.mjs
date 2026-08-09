@@ -4,12 +4,33 @@ import { readFile } from "node:fs/promises";
 import {
   countdownParts,
   matchAction,
+  orderPlayerMatches,
   selectRelevantPlayerMatches,
 } from "../lib/player-home.js";
 import {
   formatHomeTime,
   todaysSchedule,
 } from "../lib/home-dashboard.js";
+
+test("My Matches puts the actionable current round before finals and orders finals newest first", () => {
+  const ordered = orderPlayerMatches([
+    { matchId: "r1", round: 1, match: 4, status: "Final" },
+    { matchId: "r2", round: 2, match: 5, status: "Final" },
+    { matchId: "r3", round: 3, match: 2, status: "Scheduled", accessActive: false },
+  ], 3);
+  assert.deepEqual(ordered.map((match) => match.matchId), ["r3", "r2", "r1"]);
+});
+
+test("My Matches prioritizes live, ready, current locked, future, then completed", () => {
+  const ordered = orderPlayerMatches([
+    { matchId: "final", round: 2, status: "Final" },
+    { matchId: "future", round: 4, status: "Scheduled", accessActive: true },
+    { matchId: "locked", round: 3, status: "Locked", accessActive: false },
+    { matchId: "ready", round: 3, scoringEnabled: true },
+    { matchId: "live", round: 3, status: "Live" },
+  ], 3);
+  assert.deepEqual(ordered.map((match) => match.matchId), ["live", "ready", "locked", "future", "final"]);
+});
 
 test("an in-progress player match is prioritized", () => {
   const result = selectRelevantPlayerMatches([

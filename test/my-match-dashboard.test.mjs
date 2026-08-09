@@ -15,7 +15,9 @@ test("My Match uses a compact tournament header and ordered match cards", async 
   assert.match(source, /<h1 className=\{headerStyles\.heroTitle\}>My Matches<\/h1>/);
   assert.match(source, /tournamentLogo\(filename\)/);
   assert.match(sheet, /`sandbagger-\$\{context\.year\}`/);
-  assert.match(source, /Number\(left\.round \|\| 0\) - Number\(right\.round \|\| 0\)/);
+  assert.match(source, /orderPlayerMatches\(matches, tournament\?\.currentRound\)/);
+  assert.match(source, /Current \/ Upcoming/);
+  assert.match(source, /Completed/);
   assert.match(source, /Round \$\{match\.round\} • Match \$\{match\.match\}/);
   assert.match(source, /<strong>{match\.format \|\| "Format TBA"}<\/strong>/);
   assert.doesNotMatch(source, /Welcome, .*Choose one of your tournament matches/);
@@ -105,7 +107,7 @@ test("My Match provides compact special states and mobile-safe card geometry", a
   assert.match(styles, /width:min\(100%,760px\)/);
   assert.match(styles, /minmax\(0,1fr\)/);
   assert.match(styles, /padding:18px 16px calc\(82px \+ env\(safe-area-inset-bottom\)\)/);
-  assert.match(styles, /\.matchList\{display:grid;gap:8px\}/);
+  assert.match(styles, /\.matchGroups,\.matchGroup,\.matchList\{display:grid;gap:8px\}/);
   assert.match(styles, /\.matchCard\{[^}]*padding:11px 12px/);
   assert.match(styles, /\.logoPlate\[data-type=course\]\{width:44px;height:44px\}/);
   assert.match(styles, /\.courseLine\{[^}]*border-bottom:1px solid #f0eadf/);

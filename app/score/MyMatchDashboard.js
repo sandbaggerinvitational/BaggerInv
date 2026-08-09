@@ -6,7 +6,7 @@ import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { appMatchStatus, formatMatchResult } from "../../lib/mobile-tournament-app";
 import { formatStatusLabel } from "../../lib/formatters";
-import { normalizedMatchStatus, selectRelevantPlayerMatches } from "../../lib/player-home";
+import { normalizedMatchStatus, orderPlayerMatches, selectRelevantPlayerMatches } from "../../lib/player-home";
 import styles from "./my-match-dashboard.module.css";
 import headerStyles from "../tournament-identity-header.module.css";
 
@@ -153,10 +153,7 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
 }
 
 export default function MyMatchDashboard({ player, tournament, matches, busy, onOpen, message }) {
-  const ordered = [...matches].sort((left, right) =>
-    Number(left.round || 0) - Number(right.round || 0) ||
-    Number(left.match || 0) - Number(right.match || 0)
-  );
+  const ordered = orderPlayerMatches(matches, tournament?.currentRound);
   const selection = selectRelevantPlayerMatches(matches, tournament?.currentRound);
   const allFinal = matches.length && matches.every((match) => normalizedMatchStatus(match) === "FINAL");
   const relevant = allFinal
@@ -176,15 +173,24 @@ export default function MyMatchDashboard({ player, tournament, matches, busy, on
       </div>
     </header>
     {message ? <p className={styles.message} role="status">{message}</p> : null}
-    {ordered.length ? <div className={styles.matchList} aria-label="Your tournament matches">
-      {ordered.map((match) => <MatchCard
+    {ordered.length ? <div className={styles.matchGroups} aria-label="Your tournament matches">
+      {[{
+        label: "Current / Upcoming",
+        matches: ordered.filter((match) => normalizedMatchStatus(match) !== "FINAL"),
+      }, {
+        label: "Completed",
+        matches: ordered.filter((match) => normalizedMatchStatus(match) === "FINAL"),
+      }].filter((group) => group.matches.length).map((group) => <section className={styles.matchGroup} key={group.label}>
+        <h2>{group.label}</h2>
+        <div className={styles.matchList}>{group.matches.map((match) => <MatchCard
         key={match.matchId}
         match={match}
         emphasized={match.matchId === relevant?.matchId}
         busy={busy}
         onOpen={onOpen}
         tournamentLogoFilename={tournament?.logo}
-      />)}
+        />)}</div>
+      </section>)}
     </div> : <div className={styles.empty}>
       <strong>No tournament matches are assigned yet.</strong>
       <span>Your matches will appear here when tournament pairings are published.</span>

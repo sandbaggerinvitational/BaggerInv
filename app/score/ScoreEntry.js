@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { finalizedMatchResult, formatLiveMatchResult, formatOfficialMatchResult } from "../../lib/match-result.js";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-experience.js";
@@ -73,6 +73,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [lastSaved, setLastSaved] = useState("");
+  const [saveFailed, setSaveFailed] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [restoring, setRestoring] = useState(true);
@@ -84,6 +85,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     typeof window !== "undefined" && window.localStorage.getItem("sbi-preview-session") === "true"
   );
   const [restoreAttempt, setRestoreAttempt] = useState(0);
+  const saveInFlight = useRef(false);
 
   const request = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -284,12 +286,25 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   }, [courseHole, format, gross, match, slots]);
 
   const scoresComplete = preview.team1 !== null && preview.team2 !== null;
+  const draftDirty = useMemo(() =>
+    JSON.stringify(gross.team1) !== JSON.stringify(jsonScores(savedHole?.["Team 1 Gross Scores"])) ||
+    JSON.stringify(gross.team2) !== JSON.stringify(jsonScores(savedHole?.["Team 2 Gross Scores"])),
+  [gross, savedHole]);
 
-  const setScore = (side, index, value) => setGross((current) => {
+  const setScore = (side, index, value) => {
+    let normalized;
+    try { normalized = normalizeLiveScoreInput(value); }
+    catch {
+      setStatus("Enter a whole-number gross score from 1 to 20.");
+      return;
+    }
+    setStatus("");
+    setGross((current) => {
     const next = [...current[side]];
-    next[index] = normalizeLiveScoreInput(value);
+    next[index] = normalized;
     return { ...current, [side]: next };
-  });
+    });
+  };
 
   const keepScoreVisible = (event) => {
     const input = event.currentTarget;
@@ -299,6 +314,9 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   };
 
   const save = async () => {
+    if (saveInFlight.current) return;
+    saveInFlight.current = true;
+    setSaveFailed(false);
     setBusy(true); setStatus(`Saving hole ${holeNumber}…`);
     try {
       const payload = await request("/api/scoring/current", {
@@ -341,9 +359,15 @@ export default function ScoreEntry({ dashboardOnly = false }) {
         setShowReview(true);
         setConfirming(false);
       }
-      setStatus(`Hole ${holeNumber} saved. ${savedStatus}.`);
-    } catch (error) { setStatus(error.message); }
-    finally { setBusy(false); }
+      setStatus("");
+    } catch (error) {
+      setSaveFailed(true);
+      const reason = String(error.message || "").trim();
+      setStatus(reason === "Your score could not be saved. Please try again."
+        ? "Score not saved. Please try again."
+        : `Score not saved. ${reason || "Please try again."}`);
+    }
+    finally { saveInFlight.current = false; setBusy(false); }
   };
 
   const confirmScorecard = async () => {
@@ -365,6 +389,13 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     setConfirming(false);
     selectHole(number);
     setStatus(`Editing hole ${number}.`);
+  };
+
+  const navigateHole = (number) => {
+    if (draftDirty && !window.confirm("Discard unsaved score changes for this hole?")) return;
+    selectHole(number);
+    setSaveFailed(false);
+    setStatus("");
   };
 
   if (restoring) return <section className={styles.login}>
@@ -480,9 +511,9 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       <i aria-hidden="true"><b style={{ width: `${progress.percent}%` }} /></i>
     </section>
     <nav className={styles.holeNavigator} aria-label="Choose hole">
-      <button disabled={holeNumber === 1} onClick={() => selectHole(holeNumber - 1)} aria-label="Previous hole">‹</button>
+      <button disabled={holeNumber === 1} onClick={() => navigateHole(holeNumber - 1)} aria-label="Previous hole">‹</button>
       <div><span>Current Hole • {holeNumber} of 18</span><strong>Par {courseHole?.Par || "—"} • {courseHole?.Yardage || "—"} yards</strong><small>Hole handicap {courseHole?.["Stroke Index"] || "—"}</small></div>
-      <button disabled={holeNumber === 18} onClick={() => selectHole(holeNumber + 1)} aria-label="Next hole">›</button>
+      <button disabled={holeNumber === 18} onClick={() => navigateHole(holeNumber + 1)} aria-label="Next hole">›</button>
     </nav>
     <div className={styles.holeCard}>
       <div className={styles.holeCardHead}><strong>Player / Team</strong><b>Gross</b></div>
@@ -509,7 +540,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete} onClick={save}>{savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
-    {status && <p className={styles.status}>{status}</p>}
+    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
+    {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
   </section>;
 }

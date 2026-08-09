@@ -155,6 +155,10 @@ test("Participant Mode shell preserves verified identity across temporary revali
   assert.match(session, /status === "unavailable"/);
   assert.match(session, /status: 503/);
   assert.match(server, /Player Passport validation temporarily unavailable/);
+  assert.match(server, /PLAYER_IDENTITY_TTL_MS = 15 \* 1000/);
+  assert.match(server, /pendingPlayerInspections/);
+  assert.match(server, /PLAYER_VERIFICATION_RETRY_DELAYS = \[150, 350, 750\]/);
+  assert.match(server, /playerPassportIdentityDiagnostics/);
   assert.match(styles, /position:fixed/);
   assert.match(styles, /env\(safe-area-inset-bottom\)/);
   assert.match(styles, /z-index:110/);
