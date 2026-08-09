@@ -83,10 +83,29 @@ test("cached participant state keeps transient freshness failures silent", async
   assert.match(score, /setPassportState\(cached \? "freshness-degraded" : "unavailable"\)/);
   assert.match(score, /fetchWithTransientRetry\("\/api\/player-passport\/matches"/);
   assert.match(score, /delays: \[150, 350, 750\]/);
-  assert.match(score, /Scoring is temporarily unavailable\. Please try again\./);
+  assert.match(score, /matchOpenSequence/);
+  assert.match(score, /matchOpenController\.current\?\.abort\(\)/);
+  assert.match(score, /error\?\.name !== "AbortError"/);
+  assert.match(score, /Scorecard refresh was interrupted\. Tap Continue Scoring again\./);
   assert.match(matches, /signedPassportValid: true/);
   assert.match(matches, /match-authorization-workbook-read/);
   assert.doesNotMatch(matches, /We couldn’t verify your Player Passport right now/);
+});
+
+test("participant navigation cancels obsolete Home and scorecard freshness work", async () => {
+  const [home, score, retry] = await Promise.all([
+    source("app/PersonalizedPlayerHome.js"),
+    source("app/score/ScoreEntry.js"),
+    source("lib/transient-fetch.js"),
+  ]);
+  assert.match(home, /new AbortController\(\)/);
+  assert.match(home, /controller\.abort\(\)/);
+  assert.match(home, /requestIdleCallback/);
+  assert.match(home, /sequence !== refreshSequence\.current/);
+  assert.match(score, /signal: controller\.signal/);
+  assert.match(score, /sequence !== matchOpenSequence\.current/);
+  assert.match(retry, /error\?\.name === "AbortError"/);
+  assert.match(retry, /signal\?\.aborted/);
 });
 
 test("stale identity responses cannot overwrite a newer successful response", async () => {

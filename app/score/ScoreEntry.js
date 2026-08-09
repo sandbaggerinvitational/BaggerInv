@@ -81,6 +81,8 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   const [passportPlayer, setPassportPlayer] = useState(null);
   const [passportMatches, setPassportMatches] = useState([]);
   const [passportTournament, setPassportTournament] = useState(null);
+  const matchOpenSequence = useRef(0);
+  const matchOpenController = useRef(null);
   const [passportState, setPassportState] = useState("loading");
   const [previewMode, setPreviewMode] = useState(() =>
     typeof window !== "undefined" && window.localStorage.getItem("sbi-preview-session") === "true"
@@ -198,19 +200,25 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   };
 
   const openPassportMatch = async (passportMatch) => {
+    matchOpenController.current?.abort();
+    const controller = new AbortController();
+    matchOpenController.current = controller;
+    const sequence = ++matchOpenSequence.current;
     setBusy(true); setStatus("Opening your scorecard…");
     try {
       const response = await fetchWithTransientRetry("/api/player-passport/matches", {
         method: "POST",
+        signal: controller.signal,
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           matchId: passportMatch.matchId,
           viewFinalScorecard: String(passportMatch.status || passportMatch.matchStatus || "").toLowerCase() === "final",
         }),
       }, { delays: [150, 350, 750] });
+      if (sequence !== matchOpenSequence.current) return;
       const payload = await response.json();
       if (!response.ok) throw new Error(response.status >= 500
-        ? "Scoring is temporarily unavailable. Please try again."
+        ? "Scorecard refresh was interrupted. Tap Continue Scoring again."
         : payload.error || "This match is not available for scoring.");
       if (dashboardOnly) {
         window.location.assign("/score");
@@ -220,9 +228,17 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       setAuthorized(true);
       await loadMatch();
       setStatus("");
-    } catch (error) { setStatus(error.message); }
-    finally { setBusy(false); }
+    } catch (error) {
+      if (error?.name !== "AbortError" && sequence === matchOpenSequence.current) setStatus(error.message);
+    } finally {
+      if (sequence === matchOpenSequence.current) setBusy(false);
+    }
   };
+
+  useEffect(() => () => {
+    matchOpenSequence.current += 1;
+    matchOpenController.current?.abort();
+  }, []);
 
   const clearAccess = async () => {
     await fetch("/api/scoring/session", { method: "DELETE" });

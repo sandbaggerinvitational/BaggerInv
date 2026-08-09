@@ -30,6 +30,23 @@ test("participant retry does not mask an inactive Passport", async () => {
   assert.equal(attempts, 1);
 });
 
+test("participant retry stops immediately when navigation aborts obsolete work", async () => {
+  const controller = new AbortController();
+  let attempts = 0;
+  await assert.rejects(
+    fetchWithTransientRetry("/api/player-passport/initialize", { signal: controller.signal }, {
+      delays: [0, 0],
+      fetcher: async () => {
+        attempts += 1;
+        controller.abort();
+        throw new DOMException("This operation was aborted", "AbortError");
+      },
+    }),
+    { name: "AbortError" }
+  );
+  assert.equal(attempts, 1);
+});
+
 test("reset invalidates and warms tournament plus selected Passport identity before responding", async () => {
   const route = await source("app/api/director/reset-preview/route.js");
   const reset = route.indexOf("await resetPreviewTournament");

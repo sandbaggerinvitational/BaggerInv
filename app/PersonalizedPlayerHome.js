@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   countdownParts,
   matchAction,
@@ -162,12 +162,15 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
   const [busyId, setBusyId] = useState("");
   const [message, setMessage] = useState("");
   const [now, setNow] = useState(Date.now());
+  const refreshSequence = useRef(0);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (signal) => {
+    const sequence = ++refreshSequence.current;
     const clientStartedAt = performance.now();
     setState((current) => current === "ready" ? current : "loading");
     try {
-      const response = await fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store" });
+      const response = await fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store", signal });
+      if (sequence !== refreshSequence.current) return;
       if (response.status === 401) {
         clearParticipantInitializationCache();
         setPayload(null); setState("public"); return;
@@ -180,17 +183,34 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
         cache: response.headers.get("x-home-initialization-cache") || "unknown",
       });
       writeParticipantInitializationCache(result);
+      if (sequence !== refreshSequence.current) return;
       setPayload(result.data); setState("ready");
-    } catch {
+    } catch (error) {
+      if (error?.name === "AbortError" || sequence !== refreshSequence.current) return;
       setState("error");
     }
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
   useEffect(() => {
-    const focus = () => refresh();
+    const controller = new AbortController();
+    if (!cachedInitialization) refresh(controller.signal);
+    else {
+      const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 800));
+      const cancel = window.cancelIdleCallback || window.clearTimeout;
+      const task = schedule(() => refresh(controller.signal), { timeout: 1500 });
+      return () => { controller.abort(); cancel(task); refreshSequence.current += 1; };
+    }
+    return () => { controller.abort(); refreshSequence.current += 1; };
+  }, [cachedInitialization, refresh]);
+  useEffect(() => {
+    let controller;
+    const focus = () => {
+      controller?.abort();
+      controller = new AbortController();
+      refresh(controller.signal);
+    };
     window.addEventListener("focus", focus);
-    return () => window.removeEventListener("focus", focus);
+    return () => { controller?.abort(); window.removeEventListener("focus", focus); };
   }, [refresh]);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30000);
