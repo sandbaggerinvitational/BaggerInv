@@ -8,6 +8,7 @@ import { appMatchStatus, formatMatchResult } from "../../lib/mobile-tournament-a
 import { formatStatusLabel } from "../../lib/formatters";
 import { normalizedMatchStatus, selectRelevantPlayerMatches } from "../../lib/player-home";
 import styles from "./my-match-dashboard.module.css";
+import headerStyles from "../tournament-identity-header.module.css";
 
 const initials = (value) => String(value || "SBI")
   .split(/\s+/)
@@ -170,7 +171,7 @@ export default function MyMatchDashboard({ player, tournament, matches, busy, on
       <Logo filename={tournament?.logo} name={`${tournament?.year || ""} ${tournament?.name || "Tournament"}`} type="tournament" />
       <div>
         <span>{tournament?.year ? `${tournament.year} Tournament` : "Tournament Matches"}</span>
-        <h1>My Match</h1>
+        <h1 className={headerStyles.heroTitle}>My Matches</h1>
         <p>{player?.name ? `${player.name} · ` : ""}{tournament?.name || "Sandbagger Invitational"}</p>
       </div>
     </header>

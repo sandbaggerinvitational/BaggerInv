@@ -12,7 +12,7 @@ test("My Match uses a compact tournament header and ordered match cards", async 
     readFile(componentUrl, "utf8"),
     readFile(sheetUrl, "utf8"),
   ]);
-  assert.match(source, /<h1>My Match<\/h1>/);
+  assert.match(source, /<h1 className=\{headerStyles\.heroTitle\}>My Matches<\/h1>/);
   assert.match(source, /tournamentLogo\(filename\)/);
   assert.match(sheet, /`sandbagger-\$\{context\.year\}`/);
   assert.match(source, /Number\(left\.round \|\| 0\) - Number\(right\.round \|\| 0\)/);

@@ -19,7 +19,8 @@
 
 .heroIdentity { min-width: 0; }
 .hero.hero .heroIdentity p { margin: 0; }
-.hero.hero .heroIdentity h1 {
+.hero.hero .heroIdentity h1,
+.heroTitle {
   overflow-wrap: anywhere;
   margin: 4px 0;
   color: #083f31;
@@ -47,7 +48,8 @@
   }
   .heroLogo,
   .heroLogoFallback { width: 42px; height: 42px; }
-  .hero.hero .heroIdentity h1 { font-size: 1.17rem; }
+  .hero.hero .heroIdentity h1,
+  .heroTitle { font-size: 1.17rem; }
   .hero.hero .heroIdentity > span { font-size: .68rem; }
 }
 
@@ -59,6 +61,7 @@
   }
   .heroLogo,
   .heroLogoFallback { width: 38px; height: 38px; }
-  .hero.hero .heroIdentity h1 { font-size: 1.03rem; }
+  .hero.hero .heroIdentity h1,
+  .heroTitle { font-size: 1.03rem; }
   .hero.hero .heroIdentity p { font-size: .54rem; }
 }

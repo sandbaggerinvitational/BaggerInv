@@ -34,7 +34,7 @@ export default function TournamentIdentityHeader({
       />
       <div className={hero ? headerStyles.heroIdentity : undefined}>
         <p>{year} Tournament</p>
-        <h1>{name}</h1>
+        <h1 className={headerStyles.heroTitle}>{name}</h1>
         <span>{location}</span>
       </div>
       {showStatus ? <StatusBadge status={status} /> : null}
