@@ -7,6 +7,7 @@ import { getStrokesOnHole } from "../../lib/scorecard-net.js";
 import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-experience.js";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
+import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -127,7 +128,15 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   useEffect(() => {
     let current = true;
     const restore = async () => {
-      setPassportState("loading");
+      const cached = dashboardOnly ? readParticipantInitializationCache() : null;
+      if (cached) {
+        setPreviewMode(Boolean(cached.previewMode));
+        setPassportPlayer(cached.player);
+        setPassportState("active");
+        setPassportMatches(cached.data?.matches || []);
+        setPassportTournament(cached.data?.tournament || null);
+        setRestoring(false);
+      } else setPassportState("loading");
       try {
         const [session, passport] = await Promise.all([
           dashboardOnly ? Promise.resolve(null) : fetch("/api/scoring/session", { cache: "no-store" }),
@@ -141,9 +150,11 @@ export default function ScoreEntry({ dashboardOnly = false }) {
           setPassportState("active");
           setPassportMatches(identity.data?.matches || []);
           setPassportTournament(identity.data?.tournament || null);
+          writeParticipantInitializationCache(identity);
         } else if (passport.status === 401) {
+          clearParticipantInitializationCache();
           setPassportState("inactive");
-        } else {
+        } else if (!cached) {
           setPassportState("unavailable");
         }
         if (session?.ok) {
@@ -155,7 +166,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
         }
         if (passport.status === 401 && !dashboardOnly) await loadMatchOptions();
       } catch {
-        if (current) setPassportState("unavailable");
+        if (current && !cached) setPassportState("unavailable");
       } finally {
         if (current) setRestoring(false);
       }

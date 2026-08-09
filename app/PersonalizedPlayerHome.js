@@ -12,6 +12,7 @@ import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app"
 import { courseLogo, teamLogo } from "../lib/asset-paths";
 import { formatHomeTime } from "../lib/home-dashboard";
 import { fetchWithTransientRetry } from "../lib/transient-fetch";
+import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../lib/participant-initialization-cache";
 import MobileIdentityImage from "./MobileIdentityImage";
 import MatchStatusBlock from "./MatchStatusBlock";
 import PlayerSetupBanner from "./PlayerSetupBanner";
@@ -155,8 +156,9 @@ function parseServerTiming(value = "") {
 }
 
 export default function PersonalizedPlayerHome({ netSkins = null }) {
-  const [payload, setPayload] = useState(null);
-  const [state, setState] = useState("loading");
+  const cachedInitialization = useMemo(() => readParticipantInitializationCache(), []);
+  const [payload, setPayload] = useState(cachedInitialization?.data || null);
+  const [state, setState] = useState(cachedInitialization ? "ready" : "loading");
   const [busyId, setBusyId] = useState("");
   const [message, setMessage] = useState("");
   const [now, setNow] = useState(Date.now());
@@ -167,6 +169,7 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
     try {
       const response = await fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store" });
       if (response.status === 401) {
+        clearParticipantInitializationCache();
         setPayload(null); setState("public"); return;
       }
       const result = await response.json();
@@ -176,6 +179,7 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
         clientTotal: Math.round(performance.now() - clientStartedAt),
         cache: response.headers.get("x-home-initialization-cache") || "unknown",
       });
+      writeParticipantInitializationCache(result);
       setPayload(result.data); setState("ready");
     } catch {
       setState("error");
