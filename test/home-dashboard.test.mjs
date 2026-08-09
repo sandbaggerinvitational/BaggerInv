@@ -73,6 +73,8 @@ test("Home keeps compact team score context and delegates rankings to Leaderboar
   assert.match(source, /formatTeamPoints\(tournament\.teamTwo\?\.score\)/);
   assert.match(source, /href="\/live\?view=leaderboards">View Leaderboards/);
   assert.doesNotMatch(source, /function TournamentLeaders|compactTournamentLeaders|Live Standings/);
+  assert.doesNotMatch(source, /StatusBadge/);
+  assert.match(source, /\{progress\.liveMatches\} live/);
   assert.doesNotMatch(source, /function score\(/);
 });
 

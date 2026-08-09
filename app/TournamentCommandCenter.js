@@ -1,7 +1,6 @@
 import Link from "next/link";
 import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
 import MobileIdentityImage from "./MobileIdentityImage";
-import StatusBadge from "./StatusBadge";
 import TournamentIdentityHeader from "./TournamentIdentityHeader";
 import TournamentMoments from "./TournamentMoments";
 import TournamentSchedule from "./TournamentSchedule";
@@ -32,7 +31,6 @@ function remainingMatchesLabel(value) {
 function TournamentPulse({ tournament, progress, roundCount }) {
   const total = Math.max(progress.totalMatches, 1);
   const percentage = Math.min(100, Math.round((progress.completedMatches / total) * 100));
-  const status = tournamentStatusLabel(tournament.status);
   return (
     <section className={styles.pulse} aria-labelledby="tournament-pulse-title">
       <header className={styles.pulseHeader}>
@@ -46,7 +44,6 @@ function TournamentPulse({ tournament, progress, roundCount }) {
             })}
           </h2>
         </div>
-        <StatusBadge status={status} />
       </header>
       <div className={styles.scoreboard} aria-label="Current tournament score">
         <div>
