@@ -63,6 +63,20 @@ test("Round Pairings uses the active-year team roster and one verified batch mut
   assert.match(route, /verifyActionReadBack/);
 });
 
+test("Round Pairings renders every format as an always-editable lineup sheet", () => {
+  const editors = source("app/admin/director/DirectorOperationEditors.js");
+  const css = source("app/admin/director/director.module.css");
+  const pairings = editors.slice(editors.indexOf("export function RoundPairingsManagement"), editors.indexOf("export function CourseTeesManagement"));
+  assert.match(pairings, /roundPairingCard/);
+  assert.match(pairings, /roundPairingSides/);
+  assert.match(pairings, /pairingSlotsForFormat\(match\.format\)/);
+  assert.match(pairings, /Save Round Pairings/);
+  assert.doesNotMatch(pairings, /<details|<summary|>Edit</);
+  assert.match(css, /\.roundPairingSides\{[^}]*grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)/);
+  assert.match(css, /@media\(max-width:430px\)\{\.roundPairingSides\{grid-template-columns:1fr/);
+  assert.match(css, /\.roundPairingSides select\{[^}]*min-height:46px/);
+});
+
 test("Mission Control writes remain field-scoped and protected-map aware", () => {
   const writes = source("lib/google-sheets-write.js");
   assert.match(writes, /updateDirectorMatchManagement/);
