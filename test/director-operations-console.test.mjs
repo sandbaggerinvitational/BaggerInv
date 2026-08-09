@@ -56,6 +56,7 @@ test("Round Pairings uses the active-year team roster and one verified batch mut
   assert.match(editors, /const updates = changedMatches\.map[\s\S]*roundPairingDraft/);
   assert.match(writes, /const rosterRows = records\("Handicaps"\)/);
   assert.match(writes, /allPlayers\.filter\(\(player\) => rosterById\.has\(player\.id\)\)/);
+  assert.match(writes, /record\["Team Names"\]/);
   assert.match(writes, /updateDirectorRoundPairings/);
   assert.match(writes, /writeSheetFieldBatch\("Live Matches"/);
   assert.match(writes, /action: "Round Pairings Updated"/);
