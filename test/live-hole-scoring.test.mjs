@@ -6,6 +6,7 @@ import {
   calculateLiveMatchStatus,
   calculateMatchPoints,
   hashAccessCode,
+  isScorecardComplete,
 } from "../lib/live-hole-scoring.js";
 
 test("best ball uses the lowest player net score on each side", () => {
@@ -66,6 +67,30 @@ test("singles closes early once the lead exceeds holes remaining", () => {
     frontWinner: "", backWinner: "", overallWinner: "Team 1",
     team1Points: 3, team2Points: 0,
   });
+});
+
+test("a clinched Singles match remains scoreable through all 18 holes", () => {
+  const firstThirteen = ["Team 1", "Team 2", "Team 1", "Team 2", "Team 1", "Team 2", "Team 1", "Team 1", "Team 1", "Team 1", "Team 1", "Team 1", "Team 1"];
+  const holes = firstThirteen.map((winner, index) => ({ holeNumber: index + 1, winner }));
+  const clinched = calculateLiveMatchStatus(holes, "SI");
+  assert.equal(clinched.complete, true);
+  assert.equal(clinched.statusText, "Team 1 wins 7 & 5");
+  assert.equal(isScorecardComplete(holes), false);
+
+  for (let holeNumber = 14; holeNumber <= 18; holeNumber += 1) {
+    holes.push({ holeNumber, winner: "Team 2" });
+    assert.equal(isScorecardComplete(holes), holeNumber === 18);
+    assert.equal(calculateLiveMatchStatus(holes, "SI").statusText, "Team 1 wins 7 & 5");
+    assert.equal(calculateMatchPoints("SI", holes).overallWinner, "Team 1");
+  }
+});
+
+test("scorecard completeness requires every hole for every supported format", () => {
+  for (const format of ["BB", "SC", "SI"]) {
+    const incomplete = Array.from({ length: 17 }, (_, index) => ({ holeNumber: index + 1, winner: "Halved" }));
+    assert.equal(isScorecardComplete(incomplete), false, `${format} must not complete at 17 holes`);
+    assert.equal(isScorecardComplete([...incomplete, { holeNumber: 18, winner: "Halved" }]), true, `${format} completes at 18 holes`);
+  }
 });
 
 test("best ball and scramble award front, back, and overall independently", () => {
