@@ -69,8 +69,24 @@ test("Passport APIs distinguish transient lookup failures from inactive identity
   assert.match(matches, /status:\s*503/);
   assert.match(matches, /status:\s*401/);
   assert.match(score, /passportState === "unavailable"/);
-  assert.match(score, /We couldn’t verify your Player Passport right now/);
+  assert.match(score, /freshness-degraded/);
+  assert.match(score, /Tournament information is temporarily unavailable/);
+  assert.doesNotMatch(score, /We couldn’t verify your Player Passport right now/);
   assert.match(me, /identityState === "unavailable"/);
+});
+
+test("cached participant state keeps transient freshness failures silent", async () => {
+  const [score, matches] = await Promise.all([
+    source("app/score/ScoreEntry.js"),
+    source("app/api/player-passport/matches/route.js"),
+  ]);
+  assert.match(score, /setPassportState\(cached \? "freshness-degraded" : "unavailable"\)/);
+  assert.match(score, /fetchWithTransientRetry\("\/api\/player-passport\/matches"/);
+  assert.match(score, /delays: \[150, 350, 750\]/);
+  assert.match(score, /Scoring is temporarily unavailable\. Please try again\./);
+  assert.match(matches, /signedPassportValid: true/);
+  assert.match(matches, /match-authorization-workbook-read/);
+  assert.doesNotMatch(matches, /We couldn’t verify your Player Passport right now/);
 });
 
 test("stale identity responses cannot overwrite a newer successful response", async () => {

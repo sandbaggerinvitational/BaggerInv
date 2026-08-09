@@ -154,7 +154,11 @@ export default function ScoreEntry({ dashboardOnly = false }) {
         } else if (passport.status === 401) {
           clearParticipantInitializationCache();
           setPassportState("inactive");
-        } else if (!cached) {
+        } else if (cached) {
+          // The signed identity and recently verified snapshot remain usable.
+          // Treat this as silent freshness degradation, not Passport failure.
+          setPassportState("freshness-degraded");
+        } else {
           setPassportState("unavailable");
         }
         if (session?.ok) {
@@ -166,7 +170,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
         }
         if (passport.status === 401 && !dashboardOnly) await loadMatchOptions();
       } catch {
-        if (current && !cached) setPassportState("unavailable");
+        if (current) setPassportState(cached ? "freshness-degraded" : "unavailable");
       } finally {
         if (current) setRestoring(false);
       }
@@ -196,13 +200,18 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   const openPassportMatch = async (passportMatch) => {
     setBusy(true); setStatus("Opening your scorecard…");
     try {
-      await request("/api/player-passport/matches", {
+      const response = await fetchWithTransientRetry("/api/player-passport/matches", {
         method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({
           matchId: passportMatch.matchId,
           viewFinalScorecard: String(passportMatch.status || passportMatch.matchStatus || "").toLowerCase() === "final",
         }),
-      });
+      }, { delays: [150, 350, 750] });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(response.status >= 500
+        ? "Scoring is temporarily unavailable. Please try again."
+        : payload.error || "This match is not available for scoring.");
       if (dashboardOnly) {
         window.location.assign("/score");
         return;
@@ -423,7 +432,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     />;
 
   if (!authorized && passportState === "unavailable") return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>{previewMode ? "The selected player’s tournament experience is still loading." : "We couldn’t verify your Player Passport right now."}</p></div>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Tournament information is temporarily unavailable. Please try again.</p></div>
     <button className={styles.primary} type="button" onClick={() => { setRestoring(true); setRestoreAttempt((value) => value + 1); }}>Retry</button>
   </section>;
 

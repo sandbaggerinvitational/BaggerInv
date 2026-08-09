@@ -124,7 +124,7 @@ export default function ParticipantProfile() {
   };
 
   if (loading && !player) return <section className={styles.state}>Loading your Player Passport…</section>;
-  if (identityState === "unavailable" && !player) return <section className={styles.state}><h1>Player Passport temporarily unavailable</h1><p>We couldn’t verify your Player Passport right now.</p><button type="button" onClick={() => setAttempt((value) => value + 1)}>Retry</button></section>;
+  if (identityState === "unavailable" && !player) return <section className={styles.state}><h1>Player information temporarily unavailable</h1><p>Your tournament information could not be refreshed. Please try again.</p><button type="button" onClick={() => setAttempt((value) => value + 1)}>Retry</button></section>;
   if (!player) return <section className={styles.state}><h1>Player Passport required</h1><Link href="/activate">Activate Player Passport</Link></section>;
 
   const profile = tournamentData?.player || player;

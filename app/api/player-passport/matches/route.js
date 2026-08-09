@@ -48,8 +48,14 @@ export async function GET(request) {
     if (/no longer active|not active in this tournament/i.test(String(error?.message || ""))) {
       return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });
     }
+    console.error("Player Passport match freshness temporarily unavailable", {
+      route: "GET /api/player-passport/matches",
+      signedPassportValid: true,
+      stage: "tournament-workbook-read",
+      reason: error?.message || String(error),
+    });
     return NextResponse.json(
-      { error: "We couldn’t verify your Player Passport right now.", transient: true },
+      { error: "Tournament information is temporarily unavailable. Please try again.", transient: true },
       { status: 503, headers: { "retry-after": "1" } }
     );
   }
@@ -73,8 +79,14 @@ export async function POST(request) {
     if (/not available|not active|not assigned/i.test(String(error?.message || ""))) {
       return NextResponse.json({ error: "This match is not available for Player Passport scoring." }, { status: 403 });
     }
+    console.error("Player Passport scoring authorization temporarily unavailable", {
+      route: "POST /api/player-passport/matches",
+      signedPassportValid: true,
+      stage: "match-authorization-workbook-read",
+      reason: error?.message || String(error),
+    });
     return NextResponse.json(
-      { error: "We couldn’t verify your Player Passport right now.", transient: true },
+      { error: "Scoring is temporarily unavailable. Please try again.", transient: true },
       { status: 503, headers: { "retry-after": "1" } }
     );
   }

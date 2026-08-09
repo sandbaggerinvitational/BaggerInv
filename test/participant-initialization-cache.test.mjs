@@ -15,7 +15,7 @@ test("participant navigation reuses a short-lived identity-scoped snapshot while
   assert.match(cache, /CACHE_TTL_MS = 60_000/);
   assert.match(score, /readParticipantInitializationCache\(\)/);
   assert.match(score, /writeParticipantInitializationCache\(identity\)/);
-  assert.match(score, /if \(current && !cached\) setPassportState\("unavailable"\)/);
+  assert.match(score, /setPassportState\(cached \? "freshness-degraded" : "unavailable"\)/);
   assert.match(home, /cachedInitialization \? "ready" : "loading"/);
   assert.match(home, /writeParticipantInitializationCache\(result\)/);
 });
