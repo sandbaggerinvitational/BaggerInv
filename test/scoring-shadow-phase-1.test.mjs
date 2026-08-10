@@ -8,6 +8,7 @@ import {
   buildScoringShadowObservation,
   deliverScoringShadowObservation,
   scoringShadowPayloadHash,
+  shouldScheduleScoringShadowObservation,
 } from "../lib/scoring-shadow.js";
 import { reconcileScoringShadowRecords, scoringShadowObservationsFromWorkbook } from "../lib/scoring-shadow-reconciliation.js";
 
@@ -39,6 +40,28 @@ test("disabled mirror does not perform a network request", async () => {
   } finally {
     globalThis.fetch = original;
   }
+});
+
+test("normal verified Google save schedules one shadow observation only when required verified data exists", () => {
+  const participantResult = { hole: { "Match ID": "M1", "Hole Number": 7 } };
+  const shadow = { match: { "Match ID": "M1" }, calculated: {}, allHoleResults: [] };
+  const scheduled = [
+    shouldScheduleScoringShadowObservation({ gate: { enabled: true }, participantResult, shadow }),
+  ].filter(Boolean);
+  assert.equal(scheduled.length, 1);
+  assert.equal(shouldScheduleScoringShadowObservation({ gate: { enabled: false }, participantResult, shadow }), false);
+  assert.equal(shouldScheduleScoringShadowObservation({ gate: { enabled: true }, participantResult: {}, shadow }), false);
+  assert.equal(shouldScheduleScoringShadowObservation({ gate: { enabled: true }, participantResult, shadow: {} }), false);
+  assert.equal(shouldScheduleScoringShadowObservation({ gate: { enabled: true }, participantResult: undefined, shadow }), false, "failed Google verification has no verified participant result");
+});
+
+test("idempotent shadow replay retains one logical current hole and mutation identity", async () => {
+  const migration = await readFile(new URL("../supabase/migrations/202608100001_preview_scoring_shadow.sql", import.meta.url), "utf8");
+  assert.match(migration, /unique \(source_workbook_id, mutation_key\)/);
+  assert.match(migration, /primary key \(source_workbook_id, match_id, hole_number\)/);
+  assert.match(migration, /on conflict \(source_workbook_id, match_id, hole_number, google_revision\)/i);
+  assert.match(migration, /delivery_count = public\.score_mirror_events\.delivery_count \+ 1/i);
+  assert.match(migration, /on conflict \(source_workbook_id, match_id, hole_number\)/i);
 });
 
 test("verified observation preserves native scores, stable hashes, revisions, and shared calculations", () => {
@@ -124,6 +147,9 @@ test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirro
   for (const scoringRoute of [route, legacyRoute]) {
     assert.match(scoringRoute, /after\(async \(\) =>/);
     assert.match(scoringRoute, /const \{ _shadow, \.\.\.participantResult \} = result/);
+    assert.match(scoringRoute, /shouldScheduleScoringShadowObservation\(\{ gate, participantResult, shadow: _shadow \}\)/);
+    assert.match(scoringRoute, /hole: participantResult\.hole/);
+    assert.doesNotMatch(scoringRoute, /_shadow\?\.hole/);
   }
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /supabase|hole_score_mirror|live_match_mirror/i);
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /realtime|createClient\(/i);

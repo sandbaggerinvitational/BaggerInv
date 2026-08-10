@@ -10,7 +10,7 @@ import {
 import { clientAddress, consumeRateLimit } from "../../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../../lib/live-score-values.js";
 import { logScoringFailure, participantScoringError } from "../../../../../lib/scoring-api-errors.js";
-import { buildScoringShadowObservation, deliverScoringShadowObservation } from "../../../../../lib/scoring-shadow.js";
+import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldScheduleScoringShadowObservation } from "../../../../../lib/scoring-shadow.js";
 import { scoringShadowEnvironment } from "../../../../../lib/scoring-shadow-gate.js";
 
 export const dynamic = "force-dynamic";
@@ -63,13 +63,13 @@ export async function POST(request, { params }) {
     const googleAuthoritativeMs = Date.now() - googleStartedAt;
     const { _shadow, ...participantResult } = result;
     const gate = scoringShadowEnvironment();
-    if (gate.enabled && _shadow?.hole) {
+    if (shouldScheduleScoringShadowObservation({ gate, participantResult, shadow: _shadow })) {
       const observation = buildScoringShadowObservation({
         sourceWorkbookId: gate.sourceWorkbookId,
         tournamentId: _shadow.match?.["Tournament ID"] || _shadow.match?.Year,
         tournamentYear: _shadow.match?.Year,
         match: _shadow.match,
-        hole: participantResult.hole || _shadow.hole,
+        hole: participantResult.hole,
         calculated: _shadow.calculated,
         allHoleResults: _shadow.allHoleResults,
         mutationKey: input.clientMutationId || `finalize:${matchId}:${participantResult["Finalized At"] || participantResult["Updated At"]}`,
