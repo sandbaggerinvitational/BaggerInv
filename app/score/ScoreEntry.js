@@ -812,7 +812,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? "Resolve score sync issue" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
+    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? activeSyncIssue?.failureKind === "conflict" ? "Choose Device or Server Score Above" : "Resolve Scoring Restriction Above" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
   </section>;
 }
