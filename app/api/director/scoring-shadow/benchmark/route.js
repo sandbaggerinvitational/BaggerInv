@@ -15,6 +15,7 @@ import {
   buildScoringShadowObservation,
   deliverScoringShadowObservation,
   inspectScoringShadow,
+  readScoringShadowRows,
   replayExistingScoringShadowObservation,
 } from "../../../../../lib/scoring-shadow.js";
 import { rebuildAndReconcileScoringShadow } from "../../../../../lib/scoring-shadow-reconciliation.js";
@@ -195,19 +196,26 @@ async function runCorrections(gate, sampleCount = 1, startIndex = 0) {
 }
 
 async function repairInterruptedBaseline(gate) {
+  const currentRows = await readScoringShadowRows("hole_score_mirror", `source_workbook_id=eq.${encodeURIComponent(gate.sourceWorkbookId)}&match_id=eq.2026-R3-9&select=*`);
+  const interrupted = (currentRows.payload || []).find((item) => /^benchmark:baseline:/.test(clean(item.mutation_key)) && !/:restore$/.test(clean(item.mutation_key)));
+  if (!interrupted) return { restored: false, reason: "no-interrupted-baseline" };
+  const history = await readScoringShadowRows("score_mirror_events", `source_workbook_id=eq.${encodeURIComponent(gate.sourceWorkbookId)}&match_id=eq.2026-R3-9&hole_number=eq.${Number(interrupted.hole_number)}&select=google_revision,mutation_key,canonical_payload&order=google_revision.desc`);
+  const prior = (history.payload || []).find((item) => Number(item.google_revision) < Number(interrupted.google_revision));
+  if (!prior?.canonical_payload) throw new Error("The prior verified shadow value required for restoration was not found.");
   const rows = await workbookState();
-  const { match, hole } = matchAndHole(rows, "2026-R3-9", 3);
+  const holeNumber = Number(interrupted.hole_number);
+  const { match, hole } = matchAndHole(rows, "2026-R3-9", holeNumber);
   const restored = await measuredMutation({
     gate,
     match,
     hole,
-    team1: [4],
-    team2: [5],
+    team1: prior.canonical_payload.team_1_gross_scores,
+    team2: prior.canonical_payload.team_2_gross_scores,
     mutationKey: `benchmark:interrupted-baseline:restore:${Date.now()}`,
   });
   return {
     matchId: "2026-R3-9",
-    holeNumber: 3,
+    holeNumber,
     revision: Number(restored.participantResult.hole?.Revision || 0),
     team1: grossScoresFromCell(restored.participantResult.hole?.["Team 1 Gross Scores"]),
     team2: grossScoresFromCell(restored.participantResult.hole?.["Team 2 Gross Scores"]),
