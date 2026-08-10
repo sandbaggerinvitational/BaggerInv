@@ -124,31 +124,45 @@ function summaries(samples) {
   };
 }
 
-async function runBaseline(gate, sampleCount = 20) {
+async function runBaseline(gate, sampleCount = 1, startIndex = 0, label = "baseline") {
   const samples = [];
   for (let index = 0; index < sampleCount; index += 1) {
     const rows = await workbookState();
-    const holeNumber = (index % 18) + 1;
+    const sampleIndex = startIndex + index;
+    const holeNumber = (sampleIndex % 18) + 1;
     const { match, hole } = matchAndHole(rows, "2026-R3-9", holeNumber);
-    const scores = changedScores(hole, match.Format, index % 2 ? 2 : 1);
-    const forward = await measuredMutation({ gate, match, hole, team1: scores.team1, team2: scores.team2, mutationKey: `benchmark:baseline:${index}:${Date.now()}` });
+    const scores = changedScores(hole, match.Format, sampleIndex % 2 ? 2 : 1);
+    const forward = await measuredMutation({ gate, match, hole, team1: scores.team1, team2: scores.team2, mutationKey: `benchmark:${label}:${sampleIndex}:${Date.now()}` });
     await restoredMutation({ gate, matchId: clean(match["Match ID"]), holeNumber, team1: scores.originalTeam1, team2: scores.originalTeam2, prior: forward, suffix: "restore" });
     samples.push(forward);
   }
-  return { sampleCount: samples.length, ...summaries(samples), errors: 0 };
+  return {
+    sampleCount: samples.length,
+    ...summaries(samples),
+    raw: {
+      google: samples.map((item) => item.googleAuthoritativeMs),
+      supabase: samples.map((item) => item.supabaseTransactionMs),
+      shadowCalculation: samples.map((item) => item.shadowCalculationMs),
+      mirrorLag: samples.map((item) => item.mirrorLagMs),
+      retries: samples.map((item) => Number(item.googleDiagnostics?.retryLoops || 0)),
+    },
+    errors: 0,
+    restored: true,
+  };
 }
 
-async function runCorrections(gate, sampleCount = 12) {
+async function runCorrections(gate, sampleCount = 1, startIndex = 0) {
   const samples = [];
   const revisions = [];
   for (let index = 0; index < sampleCount; index += 1) {
     const rows = await workbookState();
-    const holeNumber = (index % 18) + 1;
+    const sampleIndex = startIndex + index;
+    const holeNumber = (sampleIndex % 18) + 1;
     const { match, hole } = matchAndHole(rows, "2026-R3-9", holeNumber);
-    const scores = changedScores(hole, match.Format, index % 2 ? 2 : 1);
+    const scores = changedScores(hole, match.Format, sampleIndex % 2 ? 2 : 1);
     const correction = await measuredMutation({
       gate, match, hole, team1: scores.team1, team2: scores.team2,
-      mutationKey: `benchmark:correction:${index}:${Date.now()}`,
+      mutationKey: `benchmark:correction:${sampleIndex}:${Date.now()}`,
     });
     const restored = await restoredMutation({
       gate, matchId: clean(match["Match ID"]), holeNumber,
@@ -166,9 +180,39 @@ async function runCorrections(gate, sampleCount = 12) {
   return {
     sampleCount: samples.length,
     ...summaries(samples),
+    raw: {
+      google: samples.map((item) => item.googleAuthoritativeMs),
+      supabase: samples.map((item) => item.supabaseTransactionMs),
+      shadowCalculation: samples.map((item) => item.shadowCalculationMs),
+      mirrorLag: samples.map((item) => item.mirrorLagMs),
+      retries: samples.map((item) => Number(item.googleDiagnostics?.retryLoops || 0)),
+    },
     monotonicRevisions: revisions.every((item) => item.before < item.correction && item.correction < item.restored),
     revisions,
     errors: 0,
+    restored: true,
+  };
+}
+
+async function repairInterruptedBaseline(gate) {
+  const rows = await workbookState();
+  const { match, hole } = matchAndHole(rows, "2026-R3-9", 3);
+  const restored = await measuredMutation({
+    gate,
+    match,
+    hole,
+    team1: [4],
+    team2: [5],
+    mutationKey: `benchmark:interrupted-baseline:restore:${Date.now()}`,
+  });
+  return {
+    matchId: "2026-R3-9",
+    holeNumber: 3,
+    revision: Number(restored.participantResult.hole?.Revision || 0),
+    team1: grossScoresFromCell(restored.participantResult.hole?.["Team 1 Gross Scores"]),
+    team2: grossScoresFromCell(restored.participantResult.hole?.["Team 2 Gross Scores"]),
+    googleAuthoritativeMs: restored.googleAuthoritativeMs,
+    supabaseTransactionMs: restored.supabaseTransactionMs,
     restored: true,
   };
 }
@@ -458,9 +502,14 @@ export async function POST(request) {
     const action = clean(input.action);
     const startedAt = now();
     let result;
+    const baselineMatch = action.match(/^baseline-(\d+)$/);
+    const correctionMatch = action.match(/^correction-(\d+)$/);
     if (action === "preflight") result = await runPreflight(context.gate);
-    else if (action === "baseline") result = await runBaseline(context.gate, 20);
-    else if (action === "corrections") result = await runCorrections(context.gate, 12);
+    else if (action === "repair-interrupted-baseline") result = await repairInterruptedBaseline(context.gate);
+    else if (baselineMatch) result = await runBaseline(context.gate, 1, Number(baselineMatch[1]) - 1, "baseline");
+    else if (correctionMatch) result = await runCorrections(context.gate, 1, Number(correctionMatch[1]) - 1);
+    else if (action === "baseline") result = await runBaseline(context.gate, 1);
+    else if (action === "corrections") result = await runCorrections(context.gate, 1);
     else if (action === "replay") result = await runReplay(context.gate, 30);
     else if (["gate-a", "gate-b", "final-rebuild"].includes(action)) result = await runRebuild(context.gate, context.identity.actor.name);
     else if (action === "burst") result = await runBurst(context.gate);
