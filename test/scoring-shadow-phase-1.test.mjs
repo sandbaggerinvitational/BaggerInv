@@ -250,15 +250,67 @@ test("authoritative zero-hole matches receive match mirrors without manufactured
   assert.equal(holeRows.some((row) => row.match_id === "ZERO"), false);
 });
 
-test("rebuild migration independently seeds matches before processing holes and remains server-only", async () => {
-  const migration = await readFile(new URL("../supabase/migrations/202608100003_preview_scoring_shadow_match_seed.sql", import.meta.url), "utf8");
+test("rebuild migration finalizes current match authority after historical holes and remains server-only", async () => {
+  const migration = await readFile(new URL("../supabase/migrations/202608100004_preview_scoring_shadow_match_authority.sql", import.meta.url), "utf8");
   assert.match(migration, /match_observations jsonb/);
-  assert.match(migration, /jsonb_array_elements\(coalesce\(match_observations/);
-  assert.match(migration, /insert into public\.live_match_mirror/);
-  assert.match(migration, /jsonb_array_elements\(coalesce\(observations/);
-  assert.match(migration, /perform public\.record_scoring_shadow_observation/);
+  const holesAt = migration.indexOf("jsonb_array_elements(coalesce(observations");
+  const matchesAt = migration.indexOf("jsonb_array_elements(coalesce(match_observations");
+  assert.ok(holesAt >= 0 && matchesAt > holesAt, "authoritative match observations must be finalized after holes");
+  assert.match(migration, /perform public\.upsert_scoring_shadow_match_observation\(item\)/);
+  assert.match(migration, /match_google_revision/);
+  assert.match(migration, /google_revision = excluded\.google_revision/);
+  assert.match(migration, /where excluded\.google_revision >= public\.live_match_mirror\.google_revision/);
   assert.match(migration, /revoke all on function .* from public, anon, authenticated/i);
   assert.match(migration, /grant execute on function .* to service_role/i);
+});
+
+test("historical hole context never owns current match state or revision", () => {
+  const archived = {
+    "Match ID": "M1", "Tournament ID": "T2026", Year: 2026, Round: 1, Format: "BB",
+    "Match Status": "Final", Revision: 3, "Updated At": "2026-07-01T12:00:00Z",
+    "Team 1 Player 1": "P1", "Team 1 Player 2": "P2", "Team 2 Player 1": "P3", "Team 2 Player 2": "P4",
+    "Team 1 Player 1 Stroke": 0, "Team 1 Player 2 Stroke": 13,
+    "Team 2 Player 1 Stroke": 0, "Team 2 Player 2 Stroke": 0,
+    Tee: "Gold",
+  };
+  const current = {
+    ...archived, Revision: 41, "Updated At": "2026-08-10T12:00:00Z", Tee: "Silver",
+    "Scoring Locked": true, "Matchup Winner": "Team 1",
+  };
+  const hole = {
+    "Match ID": "M1", "Hole Number": 1, "Stroke Index": 9,
+    "Team 1 Gross Scores": "[4,4]", "Team 2 Gross Scores": "[4,4]",
+    "Team 1 Net Score": 3, "Team 2 Net Score": 4, "Hole Winner": "Team 1",
+    Revision: 99, "Updated At": "2026-07-01T12:01:00Z",
+  };
+  const [observation] = scoringShadowObservationsFromWorkbook({
+    sourceWorkbookId: "preview", matches: [current], holes: [hole], matchSnapshots: [archived],
+  });
+  assert.equal(observation.team_1_strokes[1], 1, "historical stroke snapshot still drives hole calculation");
+  assert.equal(observation.match.course.tee, "Silver", "current Live Matches state owns the match mirror");
+  assert.equal(observation.match.finalized, true);
+  assert.equal(observation.match.scoring_locked, true);
+  assert.equal(observation.google_revision, 99, "hole revision remains in the hole domain");
+  assert.equal(observation.match_google_revision, 41, "match revision remains in the match domain");
+  assert.equal(observation.match_google_updated_at, current["Updated At"]);
+});
+
+test("match revision remains authoritative when hole revisions are lower or higher", () => {
+  const current = {
+    "Match ID": "M2", "Tournament ID": "T2026", Year: 2026, Round: 3, Format: "SI",
+    "Match Status": "Live", Revision: 12, "Updated At": "2026-08-10T12:00:00Z",
+    "Team 1 Player 1": "P1", "Team 2 Player 1": "P2",
+  };
+  const holes = [1, 2].map((holeNumber, index) => ({
+    "Match ID": "M2", "Hole Number": holeNumber, "Stroke Index": holeNumber,
+    "Team 1 Gross Scores": 4, "Team 2 Gross Scores": 5,
+    "Team 1 Net Score": 4, "Team 2 Net Score": 5, "Hole Winner": "Team 1",
+    Revision: index ? 80 : 2,
+  }));
+  const observations = scoringShadowObservationsFromWorkbook({ sourceWorkbookId: "preview", matches: [current], holes });
+  assert.deepEqual(observations.map((row) => row.google_revision), [2, 80]);
+  assert.deepEqual(observations.map((row) => row.match_google_revision), [12, 12]);
+  assert.ok(observations.every((row) => row.match.status === "Live"));
 });
 
 test("finalized historical scoring snapshot remains stable when current configuration differs", () => {
