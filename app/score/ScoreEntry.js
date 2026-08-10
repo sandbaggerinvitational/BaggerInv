@@ -632,9 +632,10 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const finalizationReview = scoringFinalizationReview(syncEntries);
   const activeSyncIssue = attentionEntries.find((entry) => Number(entry.holeNumber) === holeNumber) || null;
   const activeSyncIssueKind = scoringSyncIssueKind(activeSyncIssue);
-  const unsafeSyncBlock = syncEntries.some((entry) =>
-    entry.status === "conflict" || entry.status === "action-required"
-  );
+  const unsafeSyncBlock = syncEntries.some((entry) => {
+    const kind = scoringSyncIssueKind(entry);
+    return kind === "conflict" || (entry.status === "action-required" && kind !== "confirmed");
+  });
   const reviewFirstSyncIssue = () => {
     const issue = attentionEntries[0];
     if (!issue) return;

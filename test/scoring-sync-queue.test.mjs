@@ -229,6 +229,48 @@ test("legacy durable conflicts normalize from mismatch evidence instead of falli
   queue.stop();
 });
 
+test("identical authoritative scores auto-resolve despite stale conflict metadata and revision", async () => {
+  const identical = {
+    ...mutation(8), id: "2026:2026-R3-2:H8:V1", version: 1, sequence: 1,
+    clientMutationId: "equivalent-conflict", status: "conflict", failureKind: "conflict", attempts: 1, createdAt: 1,
+    participantMessage: "Server score differs from this device. Review before continuing.",
+    authoritativeHole: { "Hole Number": 8, "Team 1 Gross Scores": "4", "Team 2 Gross Scores": "5", Revision: 7 },
+  };
+  assert.equal(scoringSyncIssueKind(identical), "confirmed");
+  assert.equal(actionableScoringEntries([identical]).length, 0);
+  assert.equal(scoringSyncSummary([identical], true).text, "All scores synced");
+
+  const store = createMemoryScoringStore([identical]);
+  let writes = 0;
+  const events = [];
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => { writes += 1; return {}; } });
+  queue.subscribe((event) => events.push(event));
+  await queue.reconcile("2026-R3-2", [{ "Hole Number": 8, "Team 1 Gross Scores": 4, "Team 2 Gross Scores": 5, Revision: 8 }], { "Updated At": "server-v8", canConfirm: true });
+  assert.equal((await queue.entries("2026-R3-2")).length, 0);
+  assert.equal(writes, 0);
+  assert.equal(events.some((event) => event.event === "confirmed" && event.equivalent && event.result.matchComplete), true);
+  queue.stop();
+});
+
+test("an equivalent issue disappears while the next genuine mismatch remains actionable", async () => {
+  const equivalent = {
+    ...mutation(8), id: "equivalent", version: 1, sequence: 1, status: "conflict", failureKind: "conflict",
+    authoritativeHole: { "Hole Number": 8, "Team 1 Gross Scores": 4, "Team 2 Gross Scores": 5, Revision: 2 },
+  };
+  const mismatch = {
+    ...mutation(10), id: "mismatch", version: 1, sequence: 2, status: "conflict", failureKind: "conflict",
+    authoritativeHole: { "Hole Number": 10, "Team 1 Gross Scores": 3, "Team 2 Gross Scores": 5, Revision: 2 },
+  };
+  assert.deepEqual(actionableScoringEntries([equivalent, mismatch]).map((entry) => entry.holeNumber), [10]);
+  const store = createMemoryScoringStore([equivalent, mismatch]);
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => ({}) });
+  await queue.reconcile("2026-R3-2", [equivalent.authoritativeHole, mismatch.authoritativeHole]);
+  const remaining = await queue.entries("2026-R3-2");
+  assert.deepEqual(remaining.map((entry) => entry.holeNumber), [10]);
+  assert.equal(scoringSyncIssueKind(remaining[0]), "conflict");
+  queue.stop();
+});
+
 test("actionable holes are reviewed oldest-first", () => {
   const entries = actionableScoringEntries([
     { status: "conflict", holeNumber: 9, sequence: 4 },
@@ -285,6 +327,34 @@ test("a reviewed conflict resolves explicitly to the server or newest device sco
   assert.equal(sent.expectedUpdatedAt, "server-v2");
   await until(async () => (await deviceStore.list()).length === 0);
   deviceQueue.stop();
+});
+
+test("a rejected stale mutation auto-confirms when authoritative scores are already equivalent", async () => {
+  const store = createMemoryScoringStore();
+  let sendAttempts = 0;
+  const events = [];
+  const queue = createScoringSyncQueue({
+    store,
+    send: async () => {
+      sendAttempts += 1;
+      const error = new Error("The scorecard changed after this device loaded it.");
+      error.status = 409;
+      throw error;
+    },
+    readAuthoritative: async () => ({
+      holeScores: [{ "Hole Number": 8, "Team 1 Gross Scores": "4", "Team 2 Gross Scores": 5, Revision: 9 }],
+      match: { "Updated At": "server-v9" },
+      canConfirm: true,
+    }),
+  });
+  queue.subscribe((event) => events.push(event));
+  await queue.enqueue(mutation(8));
+  await until(async () => (await store.list()).length === 0);
+  assert.equal(sendAttempts, 1);
+  assert.equal(events.some((event) => event.event === "conflict"), false);
+  assert.equal(events.some((event) => event.event === "confirmed" && event.equivalent && event.result.matchComplete), true);
+  assert.equal(scoringSyncSummary(await store.list(), true).text, "All scores synced");
+  queue.stop();
 });
 
 test("multiple conflicts clear oldest-first and expose the next affected hole", async () => {
