@@ -81,6 +81,23 @@ test("legacy service-role JWTs retain their bearer authorization header", async 
   }
 });
 
+test("Supabase 5xx, timeout, and malformed delivery fail independently of verified Google state", async () => {
+  const verifiedGoogle = { hole: { "Match ID": "M1", "Hole Number": 4, Revision: 2 } };
+  const original = globalThis.fetch;
+  try {
+    for (const failure of [
+      async () => new Response(JSON.stringify({ code: "PGRST500" }), { status: 503 }),
+      async () => { throw Object.assign(new Error("timed out"), { name: "TimeoutError" }); },
+    ]) {
+      globalThis.fetch = failure;
+      await assert.rejects(() => deliverScoringShadowObservation({ malformed: true }, { env: allowed, timeoutMs: 5 }), /Scoring shadow request failed|timed out/);
+      assert.equal(verifiedGoogle.hole.Revision, 2, "the verified Google result remains successful and unchanged");
+    }
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test("normal verified Google save schedules one shadow observation only when required verified data exists", () => {
   const participantResult = { hole: { "Match ID": "M1", "Hole Number": 7 } };
   const shadow = { match: { "Match ID": "M1" }, calculated: {}, allHoleResults: [] };
@@ -392,6 +409,29 @@ test("benchmark reporting includes percentiles and correctness counters", () => 
     count: 4, min: 1, p50: 2, p95: 100, p99: 100, max: 100,
     errorCount: 1, retryCount: 2, duplicateCount: 3, lostLogicalScoreCount: 4,
   });
+});
+
+test("Preview benchmark administration is Director-gated, reversible, and covers every authorized stage", async () => {
+  const [route, writer] = await Promise.all([
+    readFile(new URL("../app/api/director/scoring-shadow/benchmark/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
+  assert.match(route, /assertScoringShadowAdministrativeEnvironment/);
+  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /restorePreviewScoringBenchmarkRows/);
+  for (const action of [
+    "preflight", "baseline", "corrections", "replay", "gate-a", "burst", "concurrency",
+    "two-device", "finalization-race", "gate-b", "supabase-failure", "google-failure", "final-rebuild",
+  ]) assert.match(route, new RegExp(`action === "${action}"|\\[.*"${action}"`), `${action} must be available`);
+  assert.match(route, /SUPABASE_SCORING_MIRROR_URL: "https:\/\/127\.0\.0\.1\.invalid"/);
+  assert.match(route, /malformedPayloadRejected/);
+  assert.match(route, /staleWriteRejected/);
+  assert.match(route, /finalizationBlocked/);
+  assert.match(writer, /export async function restorePreviewScoringBenchmarkRows/);
+  assert.match(writer, /requireIsolatedScoringSheet\(\)/);
+  assert.match(writer, /process\.env\.VERCEL_ENV !== "preview"/);
+  assert.doesNotMatch(route, /PRODUCTION_SPREADSHEET_ID|SUPABASE_SCORING_MIRROR_SECRET_KEY.*NextResponse/);
 });
 
 test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirror-back", async () => {
