@@ -175,6 +175,8 @@ export default function DirectorDashboard({ directorName }) {
       if (!response.ok) throw new Error(payload.error || "Scoring shadow inspection failed.");
       setShadowInspection(payload.inspection);
       if (payload.inspection?.observation?.google_revision != null) setShadowSelection((current) => ({ ...current, googleRevision: String(payload.inspection.observation.google_revision) }));
+      const report = payload.inspection?.latestRun?.summary;
+      if (report) setMessage(`Shadow ${payload.inspection.latestRun.status} · Missing holes ${report.missing?.length || 0} · Missing matches ${report.missingMatches?.length || 0} · Calculations ${report.calculationDivergence?.length || 0} · Payload ${report.payloadDivergence?.length || 0} · Revisions ${(report.revisionMismatch?.length || 0) + (report.matchRevisionDivergence?.length || 0)} · Stale ${report.stale?.length || 0} · Orphans ${(report.orphan?.length || 0) + (report.orphanMatches?.length || 0)}`);
       return payload.inspection;
     } catch (error) { setMessage(error.message); return null; }
     finally { setBusy(""); }
