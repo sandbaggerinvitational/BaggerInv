@@ -113,7 +113,7 @@ export async function GET(request) {
     return NextResponse.json({ ok: true, report });
   } catch (error) {
     console.error("Scoring shadow reconciliation failed", { message: error?.message, status: error?.status || 0 });
-    return NextResponse.json({ error: "Scoring shadow reconciliation failed." }, { status: 503 });
+    return NextResponse.json({ error: "Scoring shadow reconciliation failed.", previewDiagnostic: error?.message || "Unknown failure" }, { status: 503 });
   }
 }
 

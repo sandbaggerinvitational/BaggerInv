@@ -178,7 +178,7 @@ export default function DirectorDashboard({ directorName }) {
         const auditQuery = new URLSearchParams({ action: "historical-match-audit", matchId: shadowSelection.matchId });
         const auditResponse = await directorFetch(`/api/director/scoring-shadow?${auditQuery}`, { credentials: "same-origin" });
         const auditPayload = await auditResponse.json();
-        if (!auditResponse.ok) throw new Error(auditPayload.error || "Historical match audit failed.");
+        if (!auditResponse.ok) throw new Error(auditPayload.previewDiagnostic || auditPayload.error || "Historical match audit failed.");
         setMessage(JSON.stringify(auditPayload.audit));
         return payload.inspection;
       }
