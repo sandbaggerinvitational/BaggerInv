@@ -45,6 +45,42 @@ test("disabled mirror does not perform a network request", async () => {
   }
 });
 
+test("current Supabase server secrets are sent only as API keys, never as bearer JWTs", async () => {
+  const original = globalThis.fetch;
+  let captured;
+  globalThis.fetch = async (_url, init = {}) => {
+    captured = init.headers;
+    return new Response(JSON.stringify({ comparison_status: "PASS" }), { status: 200 });
+  };
+  try {
+    await deliverScoringShadowObservation({}, {
+      env: { ...allowed, SUPABASE_SCORING_MIRROR_SECRET_KEY: "sb_secret_preview_test" },
+    });
+    assert.equal(captured.apikey, "sb_secret_preview_test");
+    assert.equal(captured.authorization, undefined);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("legacy service-role JWTs retain their bearer authorization header", async () => {
+  const original = globalThis.fetch;
+  let captured;
+  globalThis.fetch = async (_url, init = {}) => {
+    captured = init.headers;
+    return new Response(JSON.stringify({ comparison_status: "PASS" }), { status: 200 });
+  };
+  try {
+    await deliverScoringShadowObservation({}, {
+      env: { ...allowed, SUPABASE_SCORING_MIRROR_SECRET_KEY: "legacy.service.role" },
+    });
+    assert.equal(captured.apikey, "legacy.service.role");
+    assert.equal(captured.authorization, "Bearer legacy.service.role");
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test("normal verified Google save schedules one shadow observation only when required verified data exists", () => {
   const participantResult = { hole: { "Match ID": "M1", "Hole Number": 7 } };
   const shadow = { match: { "Match ID": "M1" }, calculated: {}, allHoleResults: [] };
