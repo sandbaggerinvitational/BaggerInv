@@ -777,6 +777,10 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         <span><small>This device</small><b>{displayQueuedGross(activeSyncIssue.optimisticHole?.["Team 1 Gross Scores"])} vs {displayQueuedGross(activeSyncIssue.optimisticHole?.["Team 2 Gross Scores"])}</b></span>
         <span><small>Server</small><b>{activeSyncIssue.authoritativeHole ? `${displayQueuedGross(activeSyncIssue.authoritativeHole["Team 1 Gross Scores"])} vs ${displayQueuedGross(activeSyncIssue.authoritativeHole["Team 2 Gross Scores"])}` : "Refresh pending"}</b></span>
       </div> : null}
+      {activeSyncIssue.failureKind === "conflict" && activeSyncIssue.authoritativeHole ? <div className={styles.syncResolution}>
+        <button type="button" onClick={() => syncQueue.current?.resolveConflict(activeSyncIssue.id, "server")}>Use Server Score</button>
+        <button type="button" onClick={() => syncQueue.current?.resolveConflict(activeSyncIssue.id, "device")}>Retry This Device Score</button>
+      </div> : null}
       {activeSyncIssue.status === "retryable" ? <button type="button" onClick={() => syncQueue.current?.retry()}>Retry Sync</button> : null}
       {activeSyncIssue.status === "action-required" ? <button type="button" onClick={() => syncQueue.current?.retryEntry(activeSyncIssue.id)}>Check Again</button> : null}
     </section> : null}

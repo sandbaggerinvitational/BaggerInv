@@ -215,6 +215,33 @@ test("a lifecycle-blocked hole can be checked again after Director action", asyn
   queue.stop();
 });
 
+test("a reviewed conflict resolves explicitly to the server or newest device score", async () => {
+  const conflict = {
+    ...mutation(16), id: "2026:2026-R3-2:H16:V1", version: 1, sequence: 1,
+    clientMutationId: "conflict", status: "conflict", failureKind: "conflict", attempts: 1, createdAt: 1,
+    authoritativeHole: { "Hole Number": 16, "Team 1 Gross Scores": 3, "Team 2 Gross Scores": 4, Revision: 2 },
+    authoritativeMatchUpdatedAt: "server-v2",
+  };
+  const serverStore = createMemoryScoringStore([conflict]);
+  const serverQueue = createScoringSyncQueue({ store: serverStore, send: async () => assert.fail("server resolution must not rewrite") });
+  assert.equal(await serverQueue.resolveConflict(conflict.id, "server"), true);
+  assert.equal((await serverStore.list()).length, 0);
+  serverQueue.stop();
+
+  const deviceStore = createMemoryScoringStore([conflict]);
+  let sent;
+  const deviceQueue = createScoringSyncQueue({ store: deviceStore, send: async (entry) => {
+    sent = entry;
+    return { hole: { "Hole Number": 16, Revision: 3 }, updatedAt: "server-v3" };
+  }});
+  assert.equal(await deviceQueue.resolveConflict(conflict.id, "device"), true);
+  await until(() => Boolean(sent));
+  assert.equal(sent.expectedRevision, 2);
+  assert.equal(sent.expectedUpdatedAt, "server-v2");
+  await until(async () => (await deviceStore.list()).length === 0);
+  deviceQueue.stop();
+});
+
 test("Preview alone enables local-first scoring while Production keeps verified save-before-advance", async () => {
   const { readFile } = await import("node:fs/promises");
   const [scorePage, myMatchPage, component] = await Promise.all([
@@ -231,5 +258,7 @@ test("Preview alone enables local-first scoring while Production keeps verified 
   assert.match(component, /participantScoringSyncIssue/);
   assert.match(component, /Retry Sync/);
   assert.match(component, /Check Again/);
+  assert.match(component, /Use Server Score/);
+  assert.match(component, /Retry This Device Score/);
   assert.match(component, /save = localFirstEnabled \? saveLocally : saveAuthoritatively/);
 });
