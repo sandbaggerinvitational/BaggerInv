@@ -318,10 +318,16 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     });
     syncQueue.current = queue;
     const matchId = String(data.match["Match ID"]);
-    const unsubscribe = queue.subscribe(({ entries, event, result, stale }) => {
+    const unsubscribe = queue.subscribe(({ entries, event, result, stale, resolution }) => {
       const relevant = entries.filter((entry) => entry.matchId === matchId);
       setSyncEntries(relevant);
       if (event === "confirmed" && result && !stale) {
+        if (resolution === "server" && result.hole) {
+          setGross({
+            team1: jsonScores(result.hole["Team 1 Gross Scores"]),
+            team2: jsonScores(result.hole["Team 2 Gross Scores"]),
+          });
+        }
         setData((current) => {
           if (!current) return current;
           const newerLocal = relevant.some((entry) => entry.holeNumber === Number(result.hole?.["Hole Number"]));
