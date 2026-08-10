@@ -8,7 +8,7 @@ import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-exp
 import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
-import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, scoringFinalizationReview, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
+import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -364,7 +364,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       }
     });
     queue.hydrate(matchId).then(async (entries) => {
-      await queue.reconcile(matchId, data.holeScores || [], data.match || {});
+      await queue.reconcile(matchId, data.holeScores || [], { ...(data.match || {}), canConfirm: data.canConfirm });
       const currentEntries = await queue.entries(matchId);
       setSyncEntries(currentEntries);
       if (entries.length) {
@@ -631,6 +631,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const attentionEntries = actionableScoringEntries(syncEntries);
   const finalizationReview = scoringFinalizationReview(syncEntries);
   const activeSyncIssue = attentionEntries.find((entry) => Number(entry.holeNumber) === holeNumber) || null;
+  const activeSyncIssueKind = scoringSyncIssueKind(activeSyncIssue);
   const unsafeSyncBlock = syncEntries.some((entry) =>
     entry.status === "conflict" || entry.status === "action-required"
   );
@@ -793,16 +794,16 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
     {localFirstEnabled ? syncBanner : null}
     {localFirstEnabled && activeSyncIssue ? <section className={styles.syncIssue} data-kind={activeSyncIssue.failureKind || activeSyncIssue.status} aria-live="polite">
-      <span>{activeSyncIssue.failureKind === "conflict" ? `Hole ${activeSyncIssue.holeNumber} score conflict` : activeSyncIssue.status === "retryable" ? `Hole ${activeSyncIssue.holeNumber} has not synced yet` : `Hole ${activeSyncIssue.holeNumber} needs action`}</span>
+      <span>{activeSyncIssueKind === "conflict" ? `Hole ${activeSyncIssue.holeNumber} score conflict` : activeSyncIssueKind === "retryable" ? `Hole ${activeSyncIssue.holeNumber} has not synced yet` : `Hole ${activeSyncIssue.holeNumber} needs action`}</span>
       <strong>{participantScoringSyncIssue(activeSyncIssue)}</strong>
-      {activeSyncIssue.failureKind === "conflict" ? <><div className={styles.syncComparison}>
+      {activeSyncIssueKind === "conflict" ? <><div className={styles.syncComparison}>
         {[["This device", activeSyncIssue.optimisticHole], ["Server", activeSyncIssue.authoritativeHole]].map(([source, score]) => <div key={source}><small>{source}</small>{[1, 2].flatMap((side) => {
           const ids = playerIds(match, side);
           const values = jsonScores(score?.[`Team ${side} Gross Scores`]);
           return Array.from({ length: slots }, (_, index) => <span key={`${source}-${side}-${index}`}><b>{format === "SC" ? teamNames[side] || `Team ${side}` : playerNames[ids[index]] || ids[index] || `Player ${index + 1}`}</b><strong>{values[index] ?? "—"}</strong></span>);
         })}</div>)}
       </div><p className={styles.syncChoicePrompt}>Choose the correct score for Hole {activeSyncIssue.holeNumber}.</p></> : null}
-      {activeSyncIssue.failureKind === "conflict" && activeSyncIssue.authoritativeHole ? <div className={styles.syncResolution}>
+      {activeSyncIssueKind === "conflict" && activeSyncIssue.authoritativeHole ? <div className={styles.syncResolution}>
         <button type="button" onClick={() => syncQueue.current?.resolveConflict(activeSyncIssue.id, "device")}><strong>Use This Device Score</strong><small>Sync the score entered on this device.</small></button>
         <button type="button" onClick={() => syncQueue.current?.resolveConflict(activeSyncIssue.id, "server")}><strong>Use Server Score</strong><small>Keep the score already recorded on the server.</small></button>
       </div> : null}
@@ -812,7 +813,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? activeSyncIssue?.failureKind === "conflict" ? "Choose Device or Server Score Above" : "Resolve Scoring Restriction Above" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
+    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? activeSyncIssueKind === "conflict" ? "Choose Device or Server Score Above" : "Resolve Scoring Restriction Above" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
   </section>;
 }

@@ -8,6 +8,7 @@ import {
   participantScoringSyncIssue,
   sameGrossScores,
   scoringFinalizationReview,
+  scoringSyncIssueKind,
   scoringSyncSummary,
 } from "../lib/scoring-sync-queue.js";
 
@@ -206,6 +207,27 @@ test("failure classification produces participant-safe retry, conflict, authoriz
   assert.equal(participantScoringSyncIssue({ failureKind: "locked", participantMessage: "Scoring has been locked by the Tournament Director." }), "Scoring has been locked by the Tournament Director.");
 });
 
+test("legacy durable conflicts normalize from mismatch evidence instead of falling through to lifecycle UI", async () => {
+  const legacy = {
+    ...mutation(8), id: "2026:2026-R3-2:H8:V1", version: 1, sequence: 1,
+    clientMutationId: "legacy-conflict", status: "action-required", attempts: 1, createdAt: 1,
+    participantMessage: "Server score differs from this device. Review before continuing.",
+  };
+  assert.equal(scoringSyncIssueKind(legacy), "conflict");
+  assert.equal(scoringSyncIssueKind({ status: "action-required", failureKind: "locked" }), "locked");
+  assert.equal(scoringSyncIssueKind({ status: "retryable" }), "retryable");
+
+  const store = createMemoryScoringStore([legacy]);
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => ({}) });
+  await queue.reconcile("2026-R3-2", [{ "Hole Number": 8, "Team 1 Gross Scores": 3, "Team 2 Gross Scores": 5, Revision: 2 }], { "Updated At": "server-v2", canConfirm: true });
+  const repaired = (await queue.entries("2026-R3-2"))[0];
+  assert.equal(repaired.status, "conflict");
+  assert.equal(repaired.failureKind, "conflict");
+  assert.equal(repaired.authoritativeHole["Team 1 Gross Scores"], 3);
+  assert.equal(repaired.authoritativeCanConfirm, true);
+  queue.stop();
+});
+
 test("actionable holes are reviewed oldest-first", () => {
   const entries = actionableScoringEntries([
     { status: "conflict", holeNumber: 9, sequence: 4 },
@@ -306,7 +328,8 @@ test("Preview alone enables local-first scoring while Production keeps verified 
   assert.match(component, /Keep the score already recorded on the server/);
   assert.match(component, /Choose Device or Server Score Above/);
   assert.match(component, /has not synced yet/);
-  assert.match(component, /activeSyncIssue\.failureKind === "conflict" && activeSyncIssue\.authoritativeHole/);
+  assert.match(component, /activeSyncIssueKind === "conflict" && activeSyncIssue\.authoritativeHole/);
+  assert.doesNotMatch(component, /activeSyncIssue\?\.failureKind === "conflict"/);
   assert.match(component, /finalizationReview\.buttonText/);
   assert.match(component, /save = localFirstEnabled \? saveLocally : saveAuthoritatively/);
 });
