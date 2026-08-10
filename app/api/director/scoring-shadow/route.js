@@ -65,8 +65,12 @@ export async function GET(request) {
       readScoringShadowRows("hole_score_mirror", `source_workbook_id=eq.${encodeURIComponent(context.gate.sourceWorkbookId)}&tournament_id=eq.${encodeURIComponent(tournamentId)}&select=*`),
       readScoringShadowRows("score_mirror_events", `source_workbook_id=eq.${encodeURIComponent(context.gate.sourceWorkbookId)}&tournament_id=eq.${encodeURIComponent(tournamentId)}&select=delivery_count`),
     ]);
-    const authoritative = rows.holes.map((hole) => ({ ...hole, Year: first.Year, "Tournament ID": tournamentId }));
-    const report = reconcileScoringShadowRecords(authoritative, mirror.payload || [], events.payload || []);
+    const matchById = new Map(rows.matches.map((match) => [String(match["Match ID"] || "").trim(), match]));
+    const authoritative = rows.holes.map((hole) => {
+      const match = matchById.get(String(hole["Match ID"] || "").trim()) || first;
+      return { ...hole, Year: match.Year, Round: match.Round, "Tournament ID": tournamentId };
+    });
+    const report = reconcileScoringShadowRecords(authoritative, mirror.payload || [], events.payload || [], rows.matches);
     await recordScoringShadowReconciliation({
       sourceWorkbookId: context.gate.sourceWorkbookId,
       tournamentId,
@@ -115,13 +119,14 @@ export async function POST(request) {
       sourceWorkbookId: context.gate.sourceWorkbookId,
       ...rows,
       requestedBy: context.identity.actor.name,
+      googleReadDurationMs,
     });
     return NextResponse.json({
       ok: true,
       message: "Shadow Rebuild Complete",
       summary: result.report,
       rebuild: result.rebuilt,
-      timings: { googleReadDurationMs, ...result.timings, totalRequestDurationMs: Date.now() - startedAt },
+      timings: { ...result.timings, totalRequestDurationMs: Date.now() - startedAt },
     });
   } catch (error) {
     console.error(`Scoring shadow ${operation} failed`, { message: error?.message, status: error?.status || 0 });

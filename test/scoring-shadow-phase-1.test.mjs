@@ -7,6 +7,7 @@ import {
   benchmarkSummary,
   buildScoringShadowObservation,
   deliverScoringShadowObservation,
+  normalizeScoringShadowPayload,
   observationFromScoringShadowRows,
   replayExistingScoringShadowObservation,
   scoringShadowPayloadHash,
@@ -191,6 +192,42 @@ test("workbook rebuild observations retain correction revisions and one logical 
   assert.deepEqual(rows[0].team_1_strokes, [0]);
   assert.deepEqual(rows[0].team_2_strokes, [0]);
   assert.equal(rows[0].comparison_status, "PASS");
+});
+
+test("Best Ball, Scramble, and Singles share one deterministic canonical payload across mirror, rebuild, reconciliation, and replay", () => {
+  for (const [round, format, team1Gross, team2Gross] of [
+    [1, "BB", "[4,5]", "[5,5]"],
+    [2, "SC", "[4,4]", "[5,5]"],
+    [3, "SI", "4", "5"],
+  ]) {
+    const match = {
+      "Match ID": `M${round}`, "Tournament ID": "T2026", Year: 2026, Round: round, Format: format, "Match Status": "Live",
+      "Team 1 Player 1": "P1", "Team 2 Player 1": "P3", "Team 1 Player 1 Playing HCP": 0, "Team 2 Player 1 Playing HCP": 0,
+      ...(format === "SI" ? {} : { "Team 1 Player 2": "P2", "Team 2 Player 2": "P4", "Team 1 Player 2 Playing HCP": 0, "Team 2 Player 2 Playing HCP": 0 }),
+    };
+    const hole = {
+      "Hole Score ID": `M${round}-H1`, "Match ID": `M${round}`, "Hole Number": 1, "Stroke Index": 3,
+      "Team 1 Gross Scores": team1Gross, "Team 2 Gross Scores": team2Gross,
+      "Team 1 Net Score": 4, "Team 2 Net Score": 5, "Hole Winner": "Team 1",
+      Revision: 2, "Updated At": "2026-08-10T12:00:00Z",
+    };
+    const live = buildScoringShadowObservation({ sourceWorkbookId: "preview", tournamentId: "T2026", tournamentYear: 2026, match, hole, mutationKey: `live-${round}` });
+    const [rebuilt] = scoringShadowObservationsFromWorkbook({ sourceWorkbookId: "preview", matches: [match], holes: [hole] });
+    const reconciliationPayload = normalizeScoringShadowPayload({ tournamentId: "T2026", tournamentYear: 2026, match, hole });
+    const replayPayload = normalizeScoringShadowPayload({ tournamentId: live.tournament_id, tournamentYear: live.tournament_year, match, hole });
+    const hashes = [live.payload_hash, rebuilt.payload_hash, scoringShadowPayloadHash(reconciliationPayload), scoringShadowPayloadHash(replayPayload)];
+    assert.equal(new Set(hashes).size, 1, `${format} canonical hashes must match`);
+
+    const report = reconcileScoringShadowRecords(
+      [{ ...hole, "Tournament ID": "T2026", Year: 2026, Round: round }],
+      [{ ...live, mirrored_at: hole["Updated At"] }],
+      [], [match], [], [rebuilt],
+    );
+    assert.deepEqual(report.payloadDivergence, [], `${format} must reconcile without payload divergence`);
+
+    const changed = normalizeScoringShadowPayload({ tournamentId: "T2026", tournamentYear: 2026, match, hole: { ...hole, "Team 2 Gross Scores": format === "SI" ? "6" : "[6,6]" } });
+    assert.notEqual(scoringShadowPayloadHash(changed), live.payload_hash, `${format} genuine score changes must diverge`);
+  }
 });
 
 test("benchmark reporting includes percentiles and correctness counters", () => {
