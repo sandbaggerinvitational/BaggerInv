@@ -7,6 +7,8 @@ import {
   benchmarkSummary,
   buildScoringShadowObservation,
   deliverScoringShadowObservation,
+  observationFromScoringShadowRows,
+  replayExistingScoringShadowObservation,
   scoringShadowPayloadHash,
   shouldScheduleScoringShadowObservation,
 } from "../lib/scoring-shadow.js";
@@ -62,6 +64,67 @@ test("idempotent shadow replay retains one logical current hole and mutation ide
   assert.match(migration, /on conflict \(source_workbook_id, match_id, hole_number, google_revision\)/i);
   assert.match(migration, /delivery_count = public\.score_mirror_events\.delivery_count \+ 1/i);
   assert.match(migration, /on conflict \(source_workbook_id, match_id, hole_number\)/i);
+  assert.match(migration, /where excluded\.google_revision >= public\.hole_score_mirror\.google_revision/i);
+  assert.match(migration, /google_revision = greatest\(public\.live_match_mirror\.google_revision, excluded\.google_revision\)/i);
+});
+
+test("stored verified observation is reconstructed exactly and replayed once", async () => {
+  const canonical = { match_id: "2026-R3-9", hole_number: 17, gross: { team_1: [4], team_2: [6] } };
+  const hash = scoringShadowPayloadHash(canonical);
+  const event = {
+    source_workbook_id: "preview-workbook", tournament_id: "2026", tournament_year: 2026,
+    round_number: 3, match_id: "2026-R3-9", hole_number: 17, google_hole_score_id: "hs-17",
+    google_revision: 2, google_updated_at: "2026-08-10T12:00:00Z", mutation_key: "canary-17",
+    payload_hash: hash, canonical_payload: canonical, google_result: { hole_winner: "Team 1" },
+    shadow_result: { hole_winner: "Team 1" }, comparison_status: "PASS", comparison_diagnostics: {},
+    actor_id: "P1", actor_name: "Brian Atkinson", google_verified_at: "2026-08-10T12:00:01Z",
+  };
+  const hole = {
+    ...event, format: "SI", stroke_index: 17, team_1_gross_scores: [4], team_2_gross_scores: [6],
+    team_1_strokes: [0], team_2_strokes: [0], team_1_net_score: 4, team_2_net_score: 6,
+    hole_winner: "Team 1",
+  };
+  const match = {
+    source_workbook_id: "preview-workbook", match_id: "2026-R3-9", payload_hash: "a".repeat(64),
+    status: "Live", current_hole: 17, holes_remaining: 1, team_1_holes_won: 10, team_2_holes_won: 5,
+    running_result: "5 UP", result_winner: "Team 1", clinched: true, scorecard_complete: false,
+    finalized: false, finalized_at: "",
+  };
+  const rebuilt = observationFromScoringShadowRows({ event, hole, match });
+  assert.equal(rebuilt.mutation_key, "canary-17");
+  assert.equal(rebuilt.payload_hash, hash);
+  assert.deepEqual(rebuilt.team_2_gross_scores, [6]);
+
+  const original = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, init = {}) => {
+    requests.push({ url: String(url), init });
+    if (String(url).includes("score_mirror_events?")) return new Response(JSON.stringify([event]), { status: 200 });
+    if (String(url).includes("hole_score_mirror?")) return new Response(JSON.stringify([hole]), { status: 200 });
+    if (String(url).includes("live_match_mirror?")) return new Response(JSON.stringify([match]), { status: 200 });
+    if (String(url).endsWith("/rest/v1/rpc/record_scoring_shadow_observation")) return new Response(JSON.stringify({ comparison_status: "PASS" }), { status: 200 });
+    throw new Error(`Unexpected request: ${url}`);
+  };
+  try {
+    const result = await replayExistingScoringShadowObservation({ sourceWorkbookId: "preview-workbook", matchId: "2026-R3-9", holeNumber: 17, googleRevision: 2 }, { env: allowed });
+    const rpc = requests.filter((request) => request.url.includes("/rpc/record_scoring_shadow_observation"));
+    assert.equal(rpc.length, 1);
+    const delivered = JSON.parse(rpc[0].init.body).observation;
+    assert.equal(delivered.mutation_key, "canary-17");
+    assert.equal(delivered.payload_hash, hash);
+    assert.equal(result.observation.comparisonStatus, "PASS");
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("stored replay rejects mismatched identity or payload before delivery", () => {
+  const canonical = { hole_number: 17, gross: [4, 6] };
+  const event = { source_workbook_id: "preview", tournament_id: "2026", tournament_year: 2026, round_number: 3, match_id: "M1", hole_number: 17, google_revision: 2, mutation_key: "m1", payload_hash: scoringShadowPayloadHash(canonical), canonical_payload: canonical };
+  const hole = { ...event, mutation_key: "different" };
+  const match = { source_workbook_id: "preview", match_id: "M1" };
+  assert.throws(() => observationFromScoringShadowRows({ event, hole, match }), /identity does not match/);
+  assert.throws(() => observationFromScoringShadowRows({ event: { ...event, canonical_payload: { ...canonical, gross: [3, 6] } }, hole: { ...event }, match }), /identity does not match/);
 });
 
 test("verified observation preserves native scores, stable hashes, revisions, and shared calculations", () => {
@@ -135,7 +198,7 @@ test("benchmark reporting includes percentiles and correctness counters", () => 
 });
 
 test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirror-back", async () => {
-  const [route, legacyRoute, scorePage, scoreEntry, migration, serviceAccessMigration, envExample] = await Promise.all([
+  const [route, legacyRoute, scorePage, scoreEntry, migration, serviceAccessMigration, envExample, directorShadowRoute] = await Promise.all([
     readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/matches/[matchId]/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/score/page.js", import.meta.url), "utf8"),
@@ -143,6 +206,7 @@ test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirro
     readFile(new URL("../supabase/migrations/202608100001_preview_scoring_shadow.sql", import.meta.url), "utf8"),
     readFile(new URL("../supabase/migrations/202608100002_preview_scoring_shadow_service_access.sql", import.meta.url), "utf8"),
     readFile(new URL("../.env.example", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/director/scoring-shadow/route.js", import.meta.url), "utf8"),
   ]);
   for (const scoringRoute of [route, legacyRoute]) {
     assert.match(scoringRoute, /after\(async \(\) =>/);
@@ -161,4 +225,10 @@ test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirro
   assert.match(serviceAccessMigration, /revoke all .* from anon, authenticated/g);
   assert.doesNotMatch(envExample, /NEXT_PUBLIC_SUPABASE/);
   assert.doesNotMatch(route, /Live Hole Scores.*(?:write|update)|SUPABASE.*GOOGLE/i);
+  assert.match(directorShadowRoute, /process\.env\.VERCEL_ENV !== "preview"/);
+  assert.match(directorShadowRoute, /assertScoringShadowAdministrativeEnvironment/);
+  assert.match(directorShadowRoute, /inspectTournamentDirectorToken/);
+  assert.match(directorShadowRoute, /input\.action === "replay"/);
+  assert.match(directorShadowRoute, /replayExistingScoringShadowObservation/);
+  assert.doesNotMatch(directorShadowRoute, /SUPABASE_SCORING_MIRROR_SECRET_KEY.*NextResponse/);
 });

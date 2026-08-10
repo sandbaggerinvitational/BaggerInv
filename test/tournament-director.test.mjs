@@ -222,7 +222,7 @@ test("Director page, actions, impersonation, and sandbox share one actor-aware a
   assert.match(resolver, /isTournamentDirectorActor\(result\.identity\)/);
   for (const consumer of consumers) assert.match(consumer, /inspectTournamentDirectorToken/);
   const dashboard = source("app/admin/director/DirectorDashboard.js");
-  assert.equal((dashboard.match(/credentials: "same-origin"/g) || []).length, 6);
+  assert.equal((dashboard.match(/credentials: "same-origin"/g) || []).length, 8);
 });
 
 test("Director identity is reused safely within a signed session", () => {

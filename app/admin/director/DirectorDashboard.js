@@ -74,6 +74,8 @@ export default function DirectorDashboard({ directorName }) {
   const [testPlayerId, setTestPlayerId] = useState("");
   const [resetOpen, setResetOpen] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
+  const [shadowInspection, setShadowInspection] = useState(null);
+  const [shadowSelection, setShadowSelection] = useState({ matchId: "2026-R3-9", holeNumber: "17", googleRevision: "2" });
   const [loadFailed, setLoadFailed] = useState(false);
   const [retryOperation, setRetryOperation] = useState(null);
   const [operationLog, setOperationLog] = useState([]);
@@ -163,6 +165,31 @@ export default function DirectorDashboard({ directorName }) {
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
+  const inspectShadow = async () => {
+    setBusy("shadow-inspect"); setMessage("");
+    try {
+      const query = new URLSearchParams({ action: "inspect", matchId: shadowSelection.matchId, holeNumber: shadowSelection.holeNumber });
+      const response = await directorFetch(`/api/director/scoring-shadow?${query}`, { credentials: "same-origin" });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Scoring shadow inspection failed.");
+      setShadowInspection(payload.inspection);
+      if (payload.inspection?.observation?.google_revision != null) setShadowSelection((current) => ({ ...current, googleRevision: String(payload.inspection.observation.google_revision) }));
+      return payload.inspection;
+    } catch (error) { setMessage(error.message); return null; }
+    finally { setBusy(""); }
+  };
+  const replayShadow = async () => {
+    setBusy("shadow-replay"); setMessage("");
+    try {
+      const response = await directorFetch("/api/director/scoring-shadow", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "replay", matchId: shadowSelection.matchId, holeNumber: Number(shadowSelection.holeNumber), googleRevision: Number(shadowSelection.googleRevision) }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Scoring shadow replay failed.");
+      setShadowInspection(payload.after);
+      recordOperation("Scoring shadow replay", "success", `${payload.replayDurationMs} ms · ${payload.replay.comparisonStatus}`);
+      setMessage(`Shadow replay verified · ${payload.replay.comparisonStatus} · ${payload.replayDurationMs} ms`);
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(""); }
+  };
   const resolveIssue = (item) => {
     const source = item.items?.[0] || item;
     if (source.action === "enable-automation") return act("automation", { enabled: true, autoOpenRound: true, autoSetMatchesLive: true });
@@ -244,7 +271,7 @@ export default function DirectorDashboard({ directorName }) {
     <section className={styles.automation}><header><span>Safeguards</span><h2>Automation</h2></header><div className={styles.automationGrid}><article data-enabled={data.automation.enabled && data.automation.autoOpenRound ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoOpenRound ? "🟢" : "⚪"} Auto Open</span><strong>{data.automation.enabled && data.automation.autoOpenRound ? "Enabled" : "Disabled"}</strong><small>{data.nextEvent?.round ? `${data.nextEvent.title} · ${data.nextEvent.countdown}` : "No round action scheduled"}</small></article><article data-enabled={data.automation.enabled && data.automation.autoSetMatchesLive ? "true" : "false"}><span>{data.automation.enabled && data.automation.autoSetMatchesLive ? "🟢" : "⚪"} Auto LIVE</span><strong>{data.automation.enabled && data.automation.autoSetMatchesLive ? "Enabled" : "Disabled"}</strong><small>{data.automation.autoSetMatchesLive ? "Runs when the round opens" : "Manual Set All LIVE required"}</small></article></div><button disabled={Boolean(busy)} onClick={() => act("automation", { enabled: !data.automation.enabled, autoOpenRound: !data.automation.enabled, autoSetMatchesLive: !data.automation.enabled })}>{data.automation.enabled ? "Disable automation · Manual override" : "Enable automation"}</button></section>
     </OperationsSection>
 
-    {data.qaTools ? <OperationsSection id="preview-tools" eyebrow="Preview only" title="Preview Tools" summary="Impersonate a golfer or reset Dress Rehearsal runtime state."><section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p>{resetComplete ? <div className={styles.resetComplete} role="status"><strong>Preview Tournament Reset Complete</strong><span>Ready for Dress Rehearsal.</span></div> : null}<div className={styles.resetUtility}><div><strong>Dress Rehearsal</strong><span>Clear runtime tournament results while preserving setup and content.</span></div><button disabled={Boolean(busy)} onClick={() => { setResetComplete(false); setResetOpen(true); }}>🔄 Reset Preview Tournament</button></div></section></OperationsSection> : null}
+    {data.qaTools ? <OperationsSection id="preview-tools" eyebrow="Preview only" title="Preview Tools" summary="Impersonate a golfer, inspect the scoring shadow, or reset Dress Rehearsal runtime state."><section className={styles.qaTools} aria-labelledby="qa-tools-title"><header><span>Preview only</span><h2 id="qa-tools-title">QA Tools</h2></header><label><span>Preview As</span><select value={testPlayerId} disabled={Boolean(busy)} onChange={(event) => { const playerId = event.target.value; setTestPlayerId(playerId); previewAsPlayer(playerId); }}>{data.qaTools.players.map((player) => <option value={player.id} key={player.id}>{player.name}</option>)}</select></label><p>{busy === "impersonation" ? "Opening player preview…" : "Preview the app as the selected golfer."}</p>{resetComplete ? <div className={styles.resetComplete} role="status"><strong>Preview Tournament Reset Complete</strong><span>Ready for Dress Rehearsal.</span></div> : null}<div className={styles.shadowUtility}><div><strong>Scoring Shadow Diagnostics</strong><span>Inspect and replay one existing Google-verified observation. This never writes Google.</span></div><label><span>Match ID</span><input value={shadowSelection.matchId} onChange={(event) => setShadowSelection((current) => ({ ...current, matchId: event.target.value }))} /></label><label><span>Hole</span><input inputMode="numeric" value={shadowSelection.holeNumber} onChange={(event) => setShadowSelection((current) => ({ ...current, holeNumber: event.target.value }))} /></label><div className={styles.shadowActions}><button disabled={Boolean(busy)} onClick={inspectShadow}>{busy === "shadow-inspect" ? "Inspecting…" : "Inspect Shadow"}</button><button disabled={Boolean(busy) || !shadowInspection?.observation} onClick={replayShadow}>{busy === "shadow-replay" ? "Replaying…" : "Replay Exact Observation"}</button></div>{shadowInspection ? <div className={styles.shadowResult} role="status"><strong>{shadowInspection.observation ? `${shadowInspection.observation.match_id} · Hole ${shadowInspection.observation.hole_number} · ${shadowInspection.observation.comparison_status}` : "No matching observation"}</strong><span>Events {shadowInspection.counts.score_mirror_events} · Holes {shadowInspection.counts.hole_score_mirror} · Matches {shadowInspection.counts.live_match_mirror} · Delivery {shadowInspection.observation?.delivery_count || 0}</span></div> : null}</div><div className={styles.resetUtility}><div><strong>Dress Rehearsal</strong><span>Clear runtime tournament results while preserving setup and content.</span></div><button disabled={Boolean(busy)} onClick={() => { setResetComplete(false); setResetOpen(true); }}>🔄 Reset Preview Tournament</button></div></section></OperationsSection> : null}
     <OperationsSection id="operational-log" eyebrow="Director only" title="Operational Log" summary="Verified actions and official match activity."><section className={styles.activity}>{operationLog.length || data.recentActivity.length ? <ul>{operationLog.map((item) => <li data-status={item.status} key={item.id}><i aria-hidden="true">{item.status === "success" ? "🟢" : "🔴"}</i><div><strong>{item.label}</strong><span>{item.detail}</span></div><time>{timestamp(item.at)}</time></li>)}{data.recentActivity.map((item) => <li key={item.id}><i aria-hidden="true">{activityIcon(item.status)}</i><div><strong>{activityLabel(item.status)}</strong><span>Round {item.round} · Match {item.match}{item.updatedBy ? ` · ${item.updatedBy}` : ""}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p>No operations recorded yet. Completed Director actions will appear here.</p>}</section></OperationsSection>
     <Link className={styles.fullAdmin} href="/admin">Open Full Admin →</Link>
     {toast ? <div className={styles.operationToast} role="status">{toast}</div> : null}

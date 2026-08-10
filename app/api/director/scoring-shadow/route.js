@@ -8,7 +8,7 @@ import {
   reconcileScoringShadowRecords,
   recordScoringShadowReconciliation,
 } from "../../../../lib/scoring-shadow-reconciliation.js";
-import { readScoringShadowRows } from "../../../../lib/scoring-shadow.js";
+import { inspectScoringShadow, readScoringShadowRows, replayExistingScoringShadowObservation } from "../../../../lib/scoring-shadow.js";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +50,13 @@ export async function GET(request) {
   const context = await authorize(request);
   if (context.response) return context.response;
   try {
+    const url = new URL(request.url);
+    if (url.searchParams.get("action") === "inspect") {
+      const matchId = String(url.searchParams.get("matchId") || "").trim();
+      const holeNumber = Number(url.searchParams.get("holeNumber") || 0);
+      const inspection = await inspectScoringShadow({ sourceWorkbookId: context.gate.sourceWorkbookId, matchId, holeNumber });
+      return NextResponse.json({ ok: true, inspection });
+    }
     const startedAt = Date.now();
     const rows = scopedRows(await authoritativeRows());
     const first = rows.matches[0] || {};
@@ -78,8 +85,27 @@ export async function GET(request) {
 export async function POST(request) {
   const context = await authorize(request);
   if (context.response) return context.response;
+  let operation = "rebuild";
   try {
     const input = await request.json().catch(() => ({}));
+    if (input.action === "replay") {
+      operation = "replay";
+      const matchId = String(input.matchId || "").trim();
+      const holeNumber = Number(input.holeNumber || 0);
+      const googleRevision = Number(input.googleRevision || 0);
+      if (!matchId || !Number.isInteger(holeNumber) || holeNumber < 1 || holeNumber > 18 || !Number.isInteger(googleRevision) || googleRevision < 0) {
+        return NextResponse.json({ error: "Select one valid stored shadow observation." }, { status: 400 });
+      }
+      const before = await inspectScoringShadow({ sourceWorkbookId: context.gate.sourceWorkbookId, matchId, holeNumber });
+      const replay = await replayExistingScoringShadowObservation({ sourceWorkbookId: context.gate.sourceWorkbookId, matchId, holeNumber, googleRevision });
+      const after = await inspectScoringShadow({ sourceWorkbookId: context.gate.sourceWorkbookId, matchId, holeNumber });
+      console.info("Scoring shadow idempotent replay", {
+        matchId, holeNumber, googleRevision, comparisonStatus: replay.observation.comparisonStatus,
+        durationMs: replay.replay.totalDurationMs, before: before.counts, after: after.counts,
+        requestedBy: context.identity.actor.name,
+      });
+      return NextResponse.json({ ok: true, before, replay: replay.observation, replayDurationMs: replay.replay.totalDurationMs, after });
+    }
     if (input.action !== "rebuild") return NextResponse.json({ error: "Unsupported action." }, { status: 400 });
     const rows = scopedRows(await authoritativeRows());
     const result = await rebuildAndReconcileScoringShadow({
@@ -94,7 +120,7 @@ export async function POST(request) {
       rebuild: result.rebuilt,
     });
   } catch (error) {
-    console.error("Scoring shadow rebuild failed", { message: error?.message, status: error?.status || 0 });
-    return NextResponse.json({ error: "Scoring shadow rebuild failed." }, { status: 503 });
+    console.error(`Scoring shadow ${operation} failed`, { message: error?.message, status: error?.status || 0 });
+    return NextResponse.json({ error: `Scoring shadow ${operation} failed.` }, { status: 503 });
   }
 }
