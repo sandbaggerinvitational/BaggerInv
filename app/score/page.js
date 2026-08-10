@@ -10,5 +10,5 @@ export const metadata = privatePageMetadata("Enter Live Scores | Sandbagger Invi
 export default function ScorePage() {
   if (!liveTournamentV2Enabled()) notFound();
   const previewMode = process.env.VERCEL_ENV === "preview";
-  return <main><PreviewModeBadge visible={previewMode} /><ScoreEntry /></main>;
+  return <main><PreviewModeBadge visible={previewMode} /><ScoreEntry localFirstEnabled={previewMode} /></main>;
 }

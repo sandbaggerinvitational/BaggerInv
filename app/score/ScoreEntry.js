@@ -8,6 +8,7 @@ import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-exp
 import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
+import { createIndexedDbScoringStore, createScoringSyncQueue, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -62,7 +63,7 @@ function ScorecardCell({ readOnly, disabled, onEdit, children, label }) {
   return <button type="button" disabled={disabled} onClick={onEdit} aria-label={label}>{children}</button>;
 }
 
-export default function ScoreEntry({ dashboardOnly = false }) {
+export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = false }) {
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
   const [authorized, setAuthorized] = useState(false);
@@ -89,6 +90,10 @@ export default function ScoreEntry({ dashboardOnly = false }) {
   );
   const [restoreAttempt, setRestoreAttempt] = useState(0);
   const saveInFlight = useRef(false);
+  const syncQueue = useRef(null);
+  const [syncEntries, setSyncEntries] = useState([]);
+  const [syncReady, setSyncReady] = useState(!localFirstEnabled);
+  const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine !== false);
 
   const request = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -118,6 +123,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       : Array.from({ length: 18 }, (_, index) => index + 1)
         .find((hole) => !scored.includes(hole)) || 18;
     selectHole(targetHole, payload.data);
+    return payload.data;
   };
 
   const loadMatchOptions = async () => {
@@ -272,6 +278,92 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     });
   };
 
+  useEffect(() => {
+    if (!localFirstEnabled || !authorized || !data?.match?.["Match ID"] || syncQueue.current) return;
+    setSyncReady(false);
+    const queue = createScoringSyncQueue({
+      store: createIndexedDbScoringStore(),
+      send: async (entry) => {
+        const response = await fetch("/api/scoring/current", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            holeNumber: entry.holeNumber,
+            team1GrossScores: entry.team1GrossScores,
+            team2GrossScores: entry.team2GrossScores,
+            expectedRevision: entry.expectedRevision,
+            expectedUpdatedAt: entry.expectedUpdatedAt,
+            clientMutationId: entry.clientMutationId,
+          }),
+        });
+        const payload = await response.json();
+        if (!response.ok) {
+          const error = new Error(payload.error || "Your score could not be synchronized.");
+          error.status = response.status;
+          throw error;
+        }
+        return payload.result;
+      },
+    });
+    syncQueue.current = queue;
+    const matchId = String(data.match["Match ID"]);
+    const unsubscribe = queue.subscribe(({ entries, event, result, stale }) => {
+      const relevant = entries.filter((entry) => entry.matchId === matchId);
+      setSyncEntries(relevant);
+      if (event === "confirmed" && result && !stale) {
+        setData((current) => {
+          if (!current) return current;
+          const newerLocal = relevant.some((entry) => entry.holeNumber === Number(result.hole?.["Hole Number"]));
+          const nextScores = newerLocal ? current.holeScores : current.holeScores
+            .filter((item) => Number(item["Hole Number"]) !== Number(result.hole?.["Hole Number"]))
+            .concat(result.hole || []);
+          return {
+            ...current,
+            match: {
+              ...current.match,
+              "Match Status": "Live",
+              "Current Hole": result.liveStatus?.currentHole ?? current.match["Current Hole"],
+              "Team 1 Holes Won": result.liveStatus?.team1HolesWon ?? current.match["Team 1 Holes Won"],
+              "Team 2 Holes Won": result.liveStatus?.team2HolesWon ?? current.match["Team 2 Holes Won"],
+              "Holes Remaining": result.liveStatus?.holesRemaining ?? current.match["Holes Remaining"],
+              "Match Status Text": result.liveStatus?.statusText ?? current.match["Match Status Text"],
+              "Updated At": result.updatedAt || current.match["Updated At"],
+              "Updated By": result.updatedBy || current.match["Updated By"],
+            },
+            holeScores: nextScores,
+            canConfirm: Boolean(result.matchComplete) && relevant.length === 0,
+          };
+        });
+      }
+    });
+    queue.hydrate(matchId).then(async (entries) => {
+      await queue.reconcile(matchId, data.holeScores || [], data.match || {});
+      const currentEntries = await queue.entries(matchId);
+      setSyncEntries(currentEntries);
+      if (entries.length) {
+        setData((current) => current ? {
+          ...current,
+          holeScores: current.holeScores
+            .filter((hole) => !currentEntries.some((entry) => entry.holeNumber === Number(hole["Hole Number"])))
+            .concat(currentEntries.map((entry) => entry.optimisticHole)),
+          canConfirm: false,
+        } : current);
+      }
+      setSyncReady(true);
+    }).catch(() => setStatus("Secure device storage is temporarily unavailable. Please try again."));
+    const handleOnline = () => { setOnline(true); queue.retry().catch(() => {}); };
+    const handleOffline = () => setOnline(false);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      unsubscribe();
+      queue.stop();
+      syncQueue.current = null;
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [authorized, data?.match?.["Match ID"], localFirstEnabled]);
+
   const match = data?.match || {};
   const display = data?.display || {};
   const teeName = display.course?.tee || match.Tee || match["Tee Played"] || "";
@@ -362,7 +454,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     window.setTimeout(scroll, 280);
   };
 
-  const save = async () => {
+  const saveAuthoritatively = async () => {
     if (saveInFlight.current) return;
     saveInFlight.current = true;
     setSaveFailed(false);
@@ -419,9 +511,70 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     finally { saveInFlight.current = false; setBusy(false); }
   };
 
+  const saveLocally = async () => {
+    if (saveInFlight.current || !syncQueue.current) return;
+    saveInFlight.current = true;
+    setSaveFailed(false);
+    const savedNumber = holeNumber;
+    const expectedRevision = Number(savedHole?.Revision || 0);
+    const optimisticHole = {
+      ...(savedHole || {}),
+      "Hole Score ID": `${match["Match ID"]}-H${savedNumber}`,
+      "Match ID": match["Match ID"],
+      "Hole Number": savedNumber,
+      "Stroke Index": Number(courseHole?.["Stroke Index"]),
+      Format: format,
+      "Team 1 Gross Scores": [...gross.team1],
+      "Team 2 Gross Scores": [...gross.team2],
+      "Team 1 Net Score": preview.team1,
+      "Team 2 Net Score": preview.team2,
+      "Hole Winner": preview.winner,
+      Revision: expectedRevision + 1,
+      "Local Pending": true,
+    };
+    try {
+      await syncQueue.current.enqueue({
+        tournamentId: String(match["Tournament ID"] || match.Year || passportTournament?.year || ""),
+        matchId: String(match["Match ID"]),
+        holeNumber: savedNumber,
+        team1GrossScores: [...gross.team1],
+        team2GrossScores: [...gross.team2],
+        expectedRevision,
+        expectedUpdatedAt: match["Updated At"] || "",
+        optimisticHole,
+      });
+      const nextScores = (data?.holeScores || [])
+        .filter((item) => Number(item["Hole Number"]) !== savedNumber)
+        .concat(optimisticHole);
+      const nextData = { ...data, holeScores: nextScores, canConfirm: false };
+      setData(nextData);
+      const scored = new Set(nextScores.map((item) => Number(item["Hole Number"])));
+      const nextHole = Array.from({ length: 18 }, (_, index) => index + 1).find((number) => !scored.has(number));
+      if (nextHole) selectHole(nextHole, nextData);
+      else { setShowReview(true); setConfirming(false); }
+      setStatus("");
+    } catch (error) {
+      setSaveFailed(true);
+      setStatus(`Score not saved on this device. ${error.message || "Please try again."}`);
+    } finally {
+      saveInFlight.current = false;
+    }
+  };
+
+  const save = localFirstEnabled ? saveLocally : saveAuthoritatively;
+
   const confirmScorecard = async () => {
+    if (localFirstEnabled && syncEntries.length) {
+      setStatus("Syncing remaining scores before final submission…");
+      await syncQueue.current?.retry();
+      return;
+    }
     setBusy(true); setStatus("Submitting final scorecard…");
     try {
+      if (localFirstEnabled) {
+        const authoritative = await loadMatch();
+        if (!authoritative?.canConfirm) throw new Error("All 18 holes must be confirmed before final submission.");
+      }
       await request("/api/scoring/current", {
         method: "POST",
         body: JSON.stringify({ action: "confirm" }),
@@ -446,6 +599,8 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     setSaveFailed(false);
     setStatus("");
   };
+
+  const syncStatus = scoringSyncSummary(syncEntries, online);
 
   if (restoring) return <section className={styles.login}>
     <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>{previewMode ? "Loading the selected player’s tournament experience." : "Please wait while your Player Passport and match are refreshed."}</p></div>
@@ -538,6 +693,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       })}</div>
     </div>)}
     {!isFinal && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
+    {localFirstEnabled && !isFinal ? <button type="button" className={styles.syncStatus} data-state={syncStatus.state} onClick={() => syncQueue.current?.retry()}>{syncStatus.text}</button> : null}
     {isFinal ? <>
       <p className={styles.finalConfirmation}>Scorecard confirmed • Only an administrator can reopen this official record.</p>
       <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
@@ -548,7 +704,7 @@ export default function ScoreEntry({ dashboardOnly = false }) {
       <strong>Submit this scorecard as final?</strong>
       <p>Golfers will no longer be able to edit it unless an administrator reopens the match.</p>
       <div><button disabled={busy} onClick={() => setConfirming(false)}>Keep reviewing</button><button className={styles.danger} disabled={busy} onClick={confirmScorecard}>Confirm final scorecard</button></div>
-    </div> : <div className={styles.reviewActions}><button type="button" onClick={() => { setShowReview(false); selectHole(Math.max(1, ...completed)); }}>Continue Match</button><button className={styles.primary} disabled={busy || !data?.canConfirm} onClick={() => setConfirming(true)}>Submit Final</button></div>}
+    </div> : <div className={styles.reviewActions}><button type="button" onClick={() => { setShowReview(false); selectHole(Math.max(1, ...completed)); }}>Continue Match</button><button className={styles.primary} disabled={busy || !data?.canConfirm || (localFirstEnabled && syncEntries.length > 0)} onClick={() => setConfirming(true)}>{localFirstEnabled && syncEntries.length ? "Syncing scores…" : "Submit Final"}</button></div>}
     {status && <p className={styles.status}>{status}</p>}
   </section>;
 
@@ -586,10 +742,11 @@ export default function ScoreEntry({ dashboardOnly = false }) {
     </div>
     {savedHole && <div className={styles.result}><span>Recorded hole</span><strong>{savedHole["Hole Winner"] === "Halved" ? "Halved" : holeWinnerMark(savedHole, teamNames)}</strong><small>Hole {holeNumber} result • Running status remains above</small></div>}
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
+    {localFirstEnabled ? <button type="button" className={styles.syncStatus} data-state={syncStatus.state} onClick={() => syncQueue.current?.retry()}>{syncStatus.text}</button> : null}
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
+    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && !syncReady)} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
   </section>;
 }

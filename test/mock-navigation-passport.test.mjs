@@ -60,7 +60,7 @@ test("My Match navigation always opens the dashboard instead of restoring a scor
   ]);
 
   assert.match(navigation, /href:\s*"\/my-match",\s*label:\s*"My Match"/);
-  assert.match(dashboardPage, /<ScoreEntry dashboardOnly \/>/);
+  assert.match(dashboardPage, /<ScoreEntry dashboardOnly localFirstEnabled=\{previewMode\} \/>/);
   assert.match(scoreEntry, /dashboardOnly \? Promise\.resolve\(null\)/);
   assert.match(scoreEntry, /if \(dashboardOnly\) \{\s*window\.location\.assign\("\/score"\)/);
   assert.match(scoreEntry, /Return to My Match<\/Link>/);

@@ -10,5 +10,5 @@ export const metadata = privatePageMetadata("My Match | Sandbagger Invitational"
 export default function MyMatchPage() {
   if (!liveTournamentV2Enabled()) notFound();
   const previewMode = process.env.VERCEL_ENV === "preview";
-  return <main><PreviewModeBadge visible={previewMode} /><ScoreEntry dashboardOnly /></main>;
+  return <main><PreviewModeBadge visible={previewMode} /><ScoreEntry dashboardOnly localFirstEnabled={previewMode} /></main>;
 }
