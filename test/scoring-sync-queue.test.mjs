@@ -5,6 +5,7 @@ import {
   classifyScoringSyncFailure,
   createMemoryScoringStore,
   createScoringSyncQueue,
+  hasAuthoritativeGrossScores,
   participantScoringSyncIssue,
   sameGrossScores,
   scoringFinalizationReview,
@@ -252,6 +253,70 @@ test("identical authoritative scores auto-resolve despite stale conflict metadat
   queue.stop();
 });
 
+test("a blank authoritative hole is retryable rather than a competing score", async () => {
+  const blankConflict = {
+    ...mutation(13), id: "blank-conflict", version: 1, sequence: 1,
+    status: "conflict", failureKind: "conflict", attempts: 1, createdAt: 1,
+    participantMessage: "Server score differs from this device. Review before continuing.",
+    authoritativeHole: { "Hole Number": 13, "Team 1 Gross Scores": "", "Team 2 Gross Scores": null, Revision: 0 },
+  };
+  assert.equal(hasAuthoritativeGrossScores(blankConflict.authoritativeHole), false);
+  assert.equal(scoringSyncIssueKind(blankConflict), "retryable");
+  assert.equal(participantScoringSyncIssue(blankConflict), "Score saved on this device. Tap Retry Sync.");
+
+  const store = createMemoryScoringStore([blankConflict]);
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => assert.fail("reconcile must not write") });
+  await queue.reconcile("2026-R3-2", [blankConflict.authoritativeHole], { "Updated At": "server-blank" });
+  const repaired = (await queue.entries("2026-R3-2"))[0];
+  assert.equal(repaired.status, "retryable");
+  assert.equal(repaired.failureKind, "retryable");
+  assert.equal(repaired.authoritativeHole, null);
+  queue.stop();
+});
+
+test("a newer local edit coalesces a blank-server issue into the newest durable mutation", async () => {
+  const old = {
+    ...mutation(13, {
+      team1GrossScores: [5], team2GrossScores: [3],
+      optimisticHole: { "Hole Number": 13, "Team 1 Gross Scores": [5], "Team 2 Gross Scores": [3] },
+    }),
+    id: "old-blank-conflict", version: 1, sequence: 1, status: "conflict", failureKind: "conflict",
+    authoritativeHole: { "Hole Number": 13, "Team 1 Gross Scores": "", "Team 2 Gross Scores": "" },
+  };
+  const store = createMemoryScoringStore([old]);
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => ({}) });
+  await queue.enqueue(mutation(13, {
+    team1GrossScores: [5], team2GrossScores: [4],
+    optimisticHole: { "Hole Number": 13, "Team 1 Gross Scores": [5], "Team 2 Gross Scores": [4] },
+  }));
+  const entries = await queue.entries("2026-R3-2");
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].version, 2);
+  assert.deepEqual(entries[0].team1GrossScores, [5]);
+  assert.deepEqual(entries[0].team2GrossScores, [4]);
+  assert.deepEqual(entries[0].optimisticHole["Team 2 Gross Scores"], [4]);
+  assert.equal(entries[0].status, "queued");
+  queue.stop();
+});
+
+test("a real server value appearing after a blank-server issue remains a genuine conflict", async () => {
+  const old = {
+    ...mutation(13, {
+      team1GrossScores: [5], team2GrossScores: [4],
+      optimisticHole: { "Hole Number": 13, "Team 1 Gross Scores": [5], "Team 2 Gross Scores": [4] },
+    }),
+    id: "blank-then-server", version: 2, sequence: 1, status: "conflict", failureKind: "conflict",
+    authoritativeHole: { "Hole Number": 13, "Team 1 Gross Scores": "", "Team 2 Gross Scores": "" },
+  };
+  const store = createMemoryScoringStore([old]);
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => ({}) });
+  await queue.reconcile("2026-R3-2", [{ "Hole Number": 13, "Team 1 Gross Scores": [5], "Team 2 Gross Scores": [3], Revision: 3 }]);
+  const conflict = (await queue.entries("2026-R3-2"))[0];
+  assert.equal(scoringSyncIssueKind(conflict), "conflict");
+  assert.deepEqual(conflict.authoritativeHole["Team 2 Gross Scores"], [3]);
+  queue.stop();
+});
+
 test("an equivalent issue disappears while the next genuine mismatch remains actionable", async () => {
   const equivalent = {
     ...mutation(8), id: "equivalent", version: 1, sequence: 1, status: "conflict", failureKind: "conflict",
@@ -357,6 +422,42 @@ test("a rejected stale mutation auto-confirms when authoritative scores are alre
   queue.stop();
 });
 
+test("a rejected mutation with a blank server hole becomes retryable and then verifies", async () => {
+  const store = createMemoryScoringStore();
+  let attempts = 0;
+  const queue = createScoringSyncQueue({
+    store,
+    schedule: () => 1,
+    send: async (entry) => {
+      attempts += 1;
+      if (attempts === 1) {
+        const error = new Error("The scorecard changed after this device loaded it.");
+        error.status = 409;
+        throw error;
+      }
+      assert.deepEqual(entry.team1GrossScores, [5]);
+      assert.deepEqual(entry.team2GrossScores, [4]);
+      assert.equal(entry.expectedUpdatedAt, "server-blank");
+      return { hole: { "Hole Number": 13, "Team 1 Gross Scores": [5], "Team 2 Gross Scores": [4], Revision: 1 }, updatedAt: "server-saved" };
+    },
+    readAuthoritative: async () => ({
+      holeScores: [{ "Hole Number": 13, "Team 1 Gross Scores": "", "Team 2 Gross Scores": "", Revision: 0 }],
+      match: { "Updated At": "server-blank" },
+      canConfirm: false,
+    }),
+  });
+  await queue.enqueue(mutation(13, {
+    team1GrossScores: [5], team2GrossScores: [4],
+    optimisticHole: { "Hole Number": 13, "Team 1 Gross Scores": [5], "Team 2 Gross Scores": [4] },
+  }));
+  await until(async () => (await store.list())[0]?.status === "retryable");
+  assert.equal(scoringSyncIssueKind((await store.list())[0]), "retryable");
+  await queue.retryEntry((await store.list())[0].id);
+  await until(async () => (await store.list()).length === 0);
+  assert.equal(attempts, 2);
+  queue.stop();
+});
+
 test("multiple conflicts clear oldest-first and expose the next affected hole", async () => {
   const conflicts = [8, 10, 11].map((holeNumber, index) => ({
     ...mutation(holeNumber), id: `2026:2026-R3-2:H${holeNumber}:V1`, version: 1, sequence: index + 1,
@@ -398,8 +499,10 @@ test("Preview alone enables local-first scoring while Production keeps verified 
   assert.match(component, /Use Server Score/);
   assert.match(component, /Keep the score already recorded on the server/);
   assert.match(component, /Choose Device or Server Score Above/);
+  assert.match(component, /Save Updated Score/);
+  assert.match(component, /canResolveScoreConflict/);
   assert.match(component, /has not synced yet/);
-  assert.match(component, /activeSyncIssueKind === "conflict" && activeSyncIssue\.authoritativeHole/);
+  assert.match(component, /canResolveScoreConflict \? <div className=\{styles\.syncResolution\}>/);
   assert.doesNotMatch(component, /activeSyncIssue\?\.failureKind === "conflict"/);
   assert.match(component, /finalizationReview\.buttonText/);
   assert.match(component, /save = localFirstEnabled \? saveLocally : saveAuthoritatively/);
