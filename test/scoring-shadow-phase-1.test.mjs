@@ -112,12 +112,13 @@ test("benchmark reporting includes percentiles and correctness counters", () => 
 });
 
 test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirror-back", async () => {
-  const [route, legacyRoute, scorePage, scoreEntry, migration, envExample] = await Promise.all([
+  const [route, legacyRoute, scorePage, scoreEntry, migration, serviceAccessMigration, envExample] = await Promise.all([
     readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/matches/[matchId]/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/score/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
     readFile(new URL("../supabase/migrations/202608100001_preview_scoring_shadow.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608100002_preview_scoring_shadow_service_access.sql", import.meta.url), "utf8"),
     readFile(new URL("../.env.example", import.meta.url), "utf8"),
   ]);
   for (const scoringRoute of [route, legacyRoute]) {
@@ -128,6 +129,10 @@ test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirro
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /realtime|createClient\(/i);
   assert.match(migration, /enable row level security/g);
   assert.match(migration, /revoke all .* from anon, authenticated/g);
+  assert.match(serviceAccessMigration, /grant select on table public\.score_mirror_events to service_role/);
+  assert.match(serviceAccessMigration, /grant select, insert on table public\.mirror_reconciliation_runs to service_role/);
+  assert.doesNotMatch(serviceAccessMigration, /grant (?:update|delete|all).*service_role/i);
+  assert.match(serviceAccessMigration, /revoke all .* from anon, authenticated/g);
   assert.doesNotMatch(envExample, /NEXT_PUBLIC_SUPABASE/);
   assert.doesNotMatch(route, /Live Hole Scores.*(?:write|update)|SUPABASE.*GOOGLE/i);
 });
