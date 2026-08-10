@@ -216,6 +216,7 @@ test("legacy durable conflicts normalize from mismatch evidence instead of falli
   assert.equal(scoringSyncIssueKind(legacy), "conflict");
   assert.equal(scoringSyncIssueKind({ status: "action-required", failureKind: "locked" }), "locked");
   assert.equal(scoringSyncIssueKind({ status: "retryable" }), "retryable");
+  assert.equal(scoringSyncIssueKind(null), "action-required");
 
   const store = createMemoryScoringStore([legacy]);
   const queue = createScoringSyncQueue({ store, online: () => false, send: async () => ({}) });
