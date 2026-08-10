@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  actionableScoringEntries,
+  classifyScoringSyncFailure,
   createMemoryScoringStore,
   createScoringSyncQueue,
+  participantScoringSyncIssue,
   sameGrossScores,
   scoringSyncSummary,
 } from "../lib/scoring-sync-queue.js";
@@ -140,7 +143,7 @@ test("network, timeout, abort, 500, and 503 failures retry while authorization/l
   const cases = [
     ["network", 0, "retryable"], ["timeout", 0, "retryable"], ["AbortError", 0, "retryable"],
     ["server", 500, "retryable"], ["freshness", 503, "retryable"],
-    ["passport", 401, "conflict"], ["locked", 400, "conflict"], ["finalized", 400, "conflict"],
+    ["passport", 401, "action-required"], ["locked", 400, "action-required"], ["finalized", 400, "action-required"],
   ];
   for (const [message, status, expected] of cases) {
     const store = createMemoryScoringStore();
@@ -156,13 +159,60 @@ test("network, timeout, abort, 500, and 503 failures retry while authorization/l
   }
 });
 
-test("sync summaries distinguish confirmed, syncing, offline, retry, and conflict states", () => {
+test("sync summaries identify the exact actionable holes without exposing technical errors", () => {
   assert.equal(scoringSyncSummary([], true).text, "All scores synced");
   assert.equal(scoringSyncSummary([{ status: "queued" }, { status: "syncing" }], true).text, "Syncing 2 holes…");
   assert.match(scoringSyncSummary([{ status: "queued" }], false).text, /saved on this device/);
-  assert.match(scoringSyncSummary([{ status: "retryable" }], true).text, /Tap to retry sync/);
-  assert.match(scoringSyncSummary([{ status: "conflict" }], true).text, /needs attention/);
+  assert.equal(scoringSyncSummary([{ status: "retryable", holeNumber: 7, sequence: 1 }], true).text, "HOLE 7 NEEDS ATTENTION · TAP TO REVIEW");
+  assert.equal(scoringSyncSummary([
+    { status: "retryable", holeNumber: 7, sequence: 1 },
+    { status: "conflict", holeNumber: 9, sequence: 2 },
+  ], true).text, "2 SCORES NEED ATTENTION · HOLES 7, 9");
+  assert.equal(scoringSyncSummary([
+    { status: "retryable", holeNumber: 2, sequence: 1 },
+    { status: "retryable", holeNumber: 4, sequence: 2 },
+    { status: "retryable", holeNumber: 6, sequence: 3 },
+    { status: "retryable", holeNumber: 8, sequence: 4 },
+  ], true).text, "4 SCORES NEED ATTENTION · TAP TO REVIEW");
   assert.equal(sameGrossScores(mutation(1), { "Team 1 Gross Scores": 4, "Team 2 Gross Scores": 5 }), true);
+});
+
+test("failure classification produces participant-safe retry, conflict, authorization, lock, and finalized guidance", () => {
+  assert.deepEqual(classifyScoringSyncFailure({ status: 503, message: "workbook unavailable" }), {
+    status: "retryable", kind: "retryable", message: "Score saved on this device. Tap Retry Sync.",
+  });
+  assert.equal(classifyScoringSyncFailure({ status: 409, message: "updated by someone else" }).kind, "conflict");
+  assert.equal(classifyScoringSyncFailure({ status: 400, message: "Scoring has been locked" }).kind, "locked");
+  assert.equal(classifyScoringSyncFailure({ status: 400, message: "This match is Final. Reopen it." }).kind, "finalized");
+  assert.equal(classifyScoringSyncFailure({ status: 401, message: "Player Passport expired" }).kind, "authorization");
+  assert.equal(participantScoringSyncIssue({ failureKind: "locked", participantMessage: "Scoring has been locked by the Tournament Director." }), "Scoring has been locked by the Tournament Director.");
+});
+
+test("actionable holes are reviewed oldest-first", () => {
+  const entries = actionableScoringEntries([
+    { status: "conflict", holeNumber: 9, sequence: 4 },
+    { status: "queued", holeNumber: 10, sequence: 5 },
+    { status: "retryable", holeNumber: 7, sequence: 2 },
+    { status: "action-required", holeNumber: 8, sequence: 3 },
+  ]);
+  assert.deepEqual(entries.map((entry) => entry.holeNumber), [7, 8, 9]);
+});
+
+test("a lifecycle-blocked hole can be checked again after Director action", async () => {
+  const blocked = {
+    ...mutation(15), id: "2026:2026-R3-2:H15:V1", version: 1, sequence: 1,
+    clientMutationId: "blocked", status: "action-required", failureKind: "locked", attempts: 1, createdAt: 1,
+  };
+  const store = createMemoryScoringStore([blocked]);
+  let sent = 0;
+  const queue = createScoringSyncQueue({ store, send: async () => {
+    sent += 1;
+    return { hole: { "Hole Number": 15, Revision: 1 }, updatedAt: "unlocked" };
+  }});
+  await queue.retryEntry(blocked.id);
+  await until(() => sent === 1);
+  await until(async () => (await store.list()).length === 0);
+  queue.stop();
 });
 
 test("Preview alone enables local-first scoring while Production keeps verified save-before-advance", async () => {
@@ -177,5 +227,9 @@ test("Preview alone enables local-first scoring while Production keeps verified 
   assert.match(component, /createIndexedDbScoringStore/);
   assert.match(component, /syncQueue\.current\.enqueue/);
   assert.match(component, /Syncing remaining scores before final submission/);
+  assert.match(component, /reviewFirstSyncIssue/);
+  assert.match(component, /participantScoringSyncIssue/);
+  assert.match(component, /Retry Sync/);
+  assert.match(component, /Check Again/);
   assert.match(component, /save = localFirstEnabled \? saveLocally : saveAuthoritatively/);
 });

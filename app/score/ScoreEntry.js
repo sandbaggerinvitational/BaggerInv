@@ -8,7 +8,7 @@ import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-exp
 import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
-import { createIndexedDbScoringStore, createScoringSyncQueue, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
+import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -56,6 +56,11 @@ function finalResultSummary(result, teamNames) {
   if (!notation) return "Final";
   if (/^won\b/i.test(notation)) return notation.replace(/^won\b/i, "Won");
   return `Won ${notation}`;
+}
+
+function displayQueuedGross(value) {
+  const scores = grossScoresFromCell(value);
+  return scores.length ? scores.join(" / ") : "Not recorded";
 }
 
 function ScorecardCell({ readOnly, disabled, onEdit, children, label }) {
@@ -303,6 +308,12 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
           throw error;
         }
         return payload.result;
+      },
+      readAuthoritative: async () => {
+        const response = await fetch("/api/scoring/current", { cache: "no-store" });
+        if (!response.ok) return null;
+        const payload = await response.json();
+        return payload.data;
       },
     });
     syncQueue.current = queue;
@@ -601,6 +612,22 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   };
 
   const syncStatus = scoringSyncSummary(syncEntries, online);
+  const attentionEntries = actionableScoringEntries(syncEntries);
+  const activeSyncIssue = attentionEntries.find((entry) => Number(entry.holeNumber) === holeNumber) || null;
+  const unsafeSyncBlock = syncEntries.some((entry) =>
+    entry.status === "conflict" || entry.status === "action-required"
+  );
+  const reviewFirstSyncIssue = () => {
+    const issue = attentionEntries[0];
+    if (!issue) return;
+    setShowReview(false);
+    setConfirming(false);
+    selectHole(Number(issue.holeNumber));
+    setStatus("");
+  };
+  const syncBanner = syncStatus.actionable
+    ? <button type="button" className={styles.syncStatus} data-state={syncStatus.state} onClick={reviewFirstSyncIssue}>{syncStatus.text}</button>
+    : <div className={styles.syncStatus} data-state={syncStatus.state} role="status">{syncStatus.text}</div>;
 
   if (restoring) return <section className={styles.login}>
     <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>{previewMode ? "Loading the selected player’s tournament experience." : "Please wait while your Player Passport and match are refreshed."}</p></div>
@@ -693,7 +720,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       })}</div>
     </div>)}
     {!isFinal && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
-    {localFirstEnabled && !isFinal ? <button type="button" className={styles.syncStatus} data-state={syncStatus.state} onClick={() => syncQueue.current?.retry()}>{syncStatus.text}</button> : null}
+    {localFirstEnabled && !isFinal ? syncBanner : null}
     {isFinal ? <>
       <p className={styles.finalConfirmation}>Scorecard confirmed • Only an administrator can reopen this official record.</p>
       <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
@@ -742,11 +769,21 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     </div>
     {savedHole && <div className={styles.result}><span>Recorded hole</span><strong>{savedHole["Hole Winner"] === "Halved" ? "Halved" : holeWinnerMark(savedHole, teamNames)}</strong><small>Hole {holeNumber} result • Running status remains above</small></div>}
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
-    {localFirstEnabled ? <button type="button" className={styles.syncStatus} data-state={syncStatus.state} onClick={() => syncQueue.current?.retry()}>{syncStatus.text}</button> : null}
+    {localFirstEnabled ? syncBanner : null}
+    {localFirstEnabled && activeSyncIssue ? <section className={styles.syncIssue} data-kind={activeSyncIssue.failureKind || activeSyncIssue.status} aria-live="polite">
+      <span>Hole {activeSyncIssue.holeNumber}</span>
+      <strong>{participantScoringSyncIssue(activeSyncIssue)}</strong>
+      {activeSyncIssue.failureKind === "conflict" ? <div className={styles.syncComparison}>
+        <span><small>This device</small><b>{displayQueuedGross(activeSyncIssue.optimisticHole?.["Team 1 Gross Scores"])} vs {displayQueuedGross(activeSyncIssue.optimisticHole?.["Team 2 Gross Scores"])}</b></span>
+        <span><small>Server</small><b>{activeSyncIssue.authoritativeHole ? `${displayQueuedGross(activeSyncIssue.authoritativeHole["Team 1 Gross Scores"])} vs ${displayQueuedGross(activeSyncIssue.authoritativeHole["Team 2 Gross Scores"])}` : "Refresh pending"}</b></span>
+      </div> : null}
+      {activeSyncIssue.status === "retryable" ? <button type="button" onClick={() => syncQueue.current?.retry()}>Retry Sync</button> : null}
+      {activeSyncIssue.status === "action-required" ? <button type="button" onClick={() => syncQueue.current?.retryEntry(activeSyncIssue.id)}>Check Again</button> : null}
+    </section> : null}
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && !syncReady)} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
+    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? "Resolve score sync issue" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
   </section>;
 }
