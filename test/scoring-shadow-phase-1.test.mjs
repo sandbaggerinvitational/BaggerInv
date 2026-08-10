@@ -13,7 +13,7 @@ import {
   scoringShadowPayloadHash,
   shouldScheduleScoringShadowObservation,
 } from "../lib/scoring-shadow.js";
-import { reconcileScoringShadowRecords, scoringShadowMatchObservationsFromWorkbook, scoringShadowObservationsFromWorkbook } from "../lib/scoring-shadow-reconciliation.js";
+import { calculateScoringShadowHoleFromSnapshot, historicalScoringSnapshotForMatch, reconcileScoringShadowRecords, scoringShadowMatchObservationsFromWorkbook, scoringShadowObservationsFromWorkbook } from "../lib/scoring-shadow-reconciliation.js";
 
 const allowed = {
   VERCEL_ENV: "preview",
@@ -223,6 +223,44 @@ test("rebuild migration independently seeds matches before processing holes and 
   assert.match(migration, /perform public\.record_scoring_shadow_observation/);
   assert.match(migration, /revoke all on function .* from public, anon, authenticated/i);
   assert.match(migration, /grant execute on function .* to service_role/i);
+});
+
+test("finalized historical scoring snapshot remains stable when current configuration differs", () => {
+  const archived = {
+    "Match ID": "M1", "Match Status": "Final", Format: "BB",
+    "Team 1 Player 1": "HM01", "Team 1 Player 1 Stroke": 1,
+    "Team 1 Player 2": "JK02", "Team 1 Player 2 Stroke": 13,
+    "Team 2 Player 1": "MM01", "Team 2 Player 1 Stroke": 1,
+    "Team 2 Player 2": "MS01", "Team 2 Player 2 Stroke": 0,
+  };
+  const current = { ...archived, "Team 1 Player 2 Stroke": 8, Tee: "Silver" };
+  assert.equal(historicalScoringSnapshotForMatch(current, archived), archived);
+  const hole = { "Hole Number": 1, "Stroke Index": 9, Format: "BB", "Team 1 Gross Scores": "[4,4]", "Team 2 Gross Scores": "[4,4]" };
+  const historical = calculateScoringShadowHoleFromSnapshot(archived, hole);
+  const drifted = calculateScoringShadowHoleFromSnapshot(current, hole);
+  assert.equal(historical.team1.netScore, 3);
+  assert.equal(historical.winner, "Team 1");
+  assert.equal(drifted.team1.netScore, 4);
+  assert.equal(drifted.winner, "Halved");
+});
+
+test("Best Ball snapshot allocates a player stroke and can change Halved to Team 1", () => {
+  const match = {
+    Format: "BB", "Team 1 Player 1": "HM01", "Team 1 Player 1 Stroke": 1,
+    "Team 1 Player 2": "JK02", "Team 1 Player 2 Stroke": 13,
+    "Team 2 Player 1": "MM01", "Team 2 Player 1 Stroke": 1,
+    "Team 2 Player 2": "MS01", "Team 2 Player 2 Stroke": 0,
+  };
+  for (const [holeNumber, strokeIndex, team1Gross, team2Gross, expectedTeamNet] of [
+    [1, 9, "[4,4]", "[4,4]", 3],
+    [4, 13, "[6,4]", "[5,5]", 3],
+    [6, 11, "[3,3]", "[4,3]", 2],
+  ]) {
+    const result = calculateScoringShadowHoleFromSnapshot(match, { "Hole Number": holeNumber, "Stroke Index": strokeIndex, "Team 1 Gross Scores": team1Gross, "Team 2 Gross Scores": team2Gross });
+    assert.equal(result.team1.grossScores[1].strokes, 1);
+    assert.equal(result.team1.netScore, expectedTeamNet);
+    assert.equal(result.winner, "Team 1");
+  }
 });
 
 test("Best Ball, Scramble, and Singles share one deterministic canonical payload across mirror, rebuild, reconciliation, and replay", () => {

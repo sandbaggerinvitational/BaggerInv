@@ -174,14 +174,6 @@ export default function DirectorDashboard({ directorName }) {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Scoring shadow inspection failed.");
       setShadowInspection(payload.inspection);
-      if (shadowSelection.matchId === "2026-R1-6") {
-        const auditQuery = new URLSearchParams({ action: "historical-match-audit", matchId: shadowSelection.matchId });
-        const auditResponse = await directorFetch(`/api/director/scoring-shadow?${auditQuery}`, { credentials: "same-origin" });
-        const auditPayload = await auditResponse.json();
-        if (!auditResponse.ok) throw new Error(auditPayload.previewDiagnostic || auditPayload.error || "Historical match audit failed.");
-        setMessage(JSON.stringify(auditPayload.audit));
-        return payload.inspection;
-      }
       if (payload.inspection?.observation?.google_revision != null) setShadowSelection((current) => ({ ...current, googleRevision: String(payload.inspection.observation.google_revision) }));
       const report = payload.inspection?.latestRun?.summary;
       if (report) setMessage(`Shadow ${payload.inspection.latestRun.status} · Missing holes ${report.missing?.length || 0} · Missing matches ${report.missingMatches?.length || 0}${report.missingMatches?.length ? ` (${report.missingMatches.join(", ")})` : ""} · Calculations ${report.calculationDivergence?.length || 0}${report.calculationDivergence?.length ? ` (${report.calculationDivergence.join(", ")})` : ""} · Payload ${report.payloadDivergence?.length || 0} · Revisions ${(report.revisionMismatch?.length || 0) + (report.matchRevisionDivergence?.length || 0)} · Stale ${report.stale?.length || 0} · Orphans ${(report.orphan?.length || 0) + (report.orphanMatches?.length || 0)}`);
