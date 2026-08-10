@@ -13,7 +13,7 @@ import {
   scoringShadowPayloadHash,
   shouldScheduleScoringShadowObservation,
 } from "../lib/scoring-shadow.js";
-import { reconcileScoringShadowRecords, scoringShadowObservationsFromWorkbook } from "../lib/scoring-shadow-reconciliation.js";
+import { reconcileScoringShadowRecords, scoringShadowMatchObservationsFromWorkbook, scoringShadowObservationsFromWorkbook } from "../lib/scoring-shadow-reconciliation.js";
 
 const allowed = {
   VERCEL_ENV: "preview",
@@ -192,6 +192,37 @@ test("workbook rebuild observations retain correction revisions and one logical 
   assert.deepEqual(rows[0].team_1_strokes, [0]);
   assert.deepEqual(rows[0].team_2_strokes, [0]);
   assert.equal(rows[0].comparison_status, "PASS");
+});
+
+test("authoritative zero-hole matches receive match mirrors without manufactured hole observations", () => {
+  const matches = [
+    { "Match ID": "ZERO", "Tournament ID": "T2026", Year: 2026, Round: 3, Format: "SI", "Match Status": "Upcoming", "Team 1 Player 1": "P1", "Team 2 Player 1": "P2", "Course ID": "OCGC01", Course: "The Ocean Course", Tee: "Gold" },
+    { "Match ID": "SCORED", "Tournament ID": "T2026", Year: 2026, Round: 3, Format: "SI", "Match Status": "Live", "Team 1 Player 1": "P3", "Team 2 Player 1": "P4" },
+  ];
+  const holes = [{ "Match ID": "SCORED", "Hole Number": 1, "Stroke Index": 1, "Team 1 Gross Scores": 4, "Team 2 Gross Scores": 5, "Team 1 Net Score": 4, "Team 2 Net Score": 5, "Hole Winner": "Team 1", Revision: 1 }];
+  const matchRows = scoringShadowMatchObservationsFromWorkbook({ sourceWorkbookId: "preview", matches, holes });
+  const holeRows = scoringShadowObservationsFromWorkbook({ sourceWorkbookId: "preview", matches, holes });
+  assert.equal(matchRows.length, 2);
+  assert.equal(holeRows.length, 1);
+  const zero = matchRows.find((row) => row.match_id === "ZERO");
+  assert.equal(zero.match.scored_holes, 0);
+  assert.equal(zero.match.current_hole, 0);
+  assert.equal(zero.match.holes_remaining, 18);
+  assert.equal(zero.match.scorecard_complete, false);
+  assert.deepEqual(zero.match.participants, { team_1: ["P1"], team_2: ["P2"] });
+  assert.equal(zero.match.course.course_id, "OCGC01");
+  assert.equal(holeRows.some((row) => row.match_id === "ZERO"), false);
+});
+
+test("rebuild migration independently seeds matches before processing holes and remains server-only", async () => {
+  const migration = await readFile(new URL("../supabase/migrations/202608100003_preview_scoring_shadow_match_seed.sql", import.meta.url), "utf8");
+  assert.match(migration, /match_observations jsonb/);
+  assert.match(migration, /jsonb_array_elements\(coalesce\(match_observations/);
+  assert.match(migration, /insert into public\.live_match_mirror/);
+  assert.match(migration, /jsonb_array_elements\(coalesce\(observations/);
+  assert.match(migration, /perform public\.record_scoring_shadow_observation/);
+  assert.match(migration, /revoke all on function .* from public, anon, authenticated/i);
+  assert.match(migration, /grant execute on function .* to service_role/i);
 });
 
 test("Best Ball, Scramble, and Singles share one deterministic canonical payload across mirror, rebuild, reconciliation, and replay", () => {

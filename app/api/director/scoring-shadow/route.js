@@ -51,6 +51,37 @@ export async function GET(request) {
   if (context.response) return context.response;
   try {
     const url = new URL(request.url);
+    if (url.searchParams.get("action") === "historical-match-audit") {
+      const matchId = String(url.searchParams.get("matchId") || "").trim();
+      if (!/^2026-R[1-3]-\d{1,2}$/.test(matchId)) return NextResponse.json({ error: "Select one valid 2026 Preview match." }, { status: 400 });
+      const sheets = await readWorkbookSheetsByName([
+        "Live Matches", "Matches", "Live Hole Scores", "Players", "Handicaps",
+        "Live Round Handicaps", "Courses", "Course Holes", "Match Update Log", "Admin Audit Log",
+      ]);
+      const records = (tab) => sheets[tab].records.map(({ record }) => record);
+      const liveMatch = records("Live Matches").find((row) => String(row["Match ID"] || "").trim() === matchId) || null;
+      const archivedMatch = records("Matches").find((row) => String(row["Match ID"] || "").trim() === matchId) || null;
+      const match = archivedMatch || liveMatch || {};
+      const playerIds = [1, 2].flatMap((side) => [1, 2].map((slot) => String(match[`Team ${side} Player ${slot}`] || liveMatch?.[`Team ${side} Player ${slot}`] || "").trim())).filter(Boolean);
+      const courseIds = new Set([match["Course ID"], liveMatch?.["Course ID"]].map((value) => String(value || "").trim()).filter(Boolean));
+      const mentionsMatch = (row) => String(row["Match ID"] || row["Record ID"] || "").trim() === matchId || JSON.stringify(row).includes(matchId);
+      return NextResponse.json({
+        ok: true,
+        audit: {
+          matchId,
+          liveMatch,
+          archivedMatch,
+          holes: records("Live Hole Scores").filter((row) => String(row["Match ID"] || "").trim() === matchId),
+          players: records("Players").filter((row) => playerIds.includes(String(row["Player ID"] || "").trim())),
+          handicaps: records("Handicaps").filter((row) => Number(row.Year) === 2026 && playerIds.includes(String(row["Player ID"] || "").trim())),
+          liveRoundHandicaps: records("Live Round Handicaps").filter((row) => Number(row.Year) === 2026 && Number(row.Round) === 1 && playerIds.includes(String(row["Player ID"] || "").trim())),
+          courses: records("Courses").filter((row) => Number(row.Year) === 2026 && courseIds.has(String(row["Course ID"] || "").trim())),
+          courseHoles: records("Course Holes").filter((row) => courseIds.has(String(row["Course ID"] || "").trim())),
+          matchUpdateLog: records("Match Update Log").filter(mentionsMatch),
+          adminAuditLog: records("Admin Audit Log").filter(mentionsMatch),
+        },
+      });
+    }
     if (url.searchParams.get("action") === "inspect") {
       const matchId = String(url.searchParams.get("matchId") || "").trim();
       const holeNumber = Number(url.searchParams.get("holeNumber") || 0);
