@@ -7,6 +7,7 @@ import {
   createScoringSyncQueue,
   participantScoringSyncIssue,
   sameGrossScores,
+  scoringFinalizationReview,
   scoringSyncSummary,
 } from "../lib/scoring-sync-queue.js";
 
@@ -177,6 +178,23 @@ test("sync summaries identify the exact actionable holes without exposing techni
   assert.equal(sameGrossScores(mutation(1), { "Team 1 Gross Scores": 4, "Team 2 Gross Scores": 5 }), true);
 });
 
+test("Final submission review names every unresolved hole and updates its count", () => {
+  const three = [
+    { status: "conflict", holeNumber: 8, sequence: 1 },
+    { status: "conflict", holeNumber: 10, sequence: 2 },
+    { status: "conflict", holeNumber: 11, sequence: 3 },
+  ];
+  assert.deepEqual(scoringFinalizationReview(three), {
+    count: 3,
+    holes: [8, 10, 11],
+    reviewText: "3 scores need review before Final submission · Holes 8, 10, 11",
+    buttonText: "Resolve 3 score issues before submitting Final.",
+  });
+  assert.equal(scoringFinalizationReview(three.slice(1)).buttonText, "Resolve 2 score issues before submitting Final.");
+  assert.equal(scoringFinalizationReview(three.slice(2)).reviewText, "1 score needs review before Final submission · Hole 11");
+  assert.equal(scoringFinalizationReview([]).count, 0);
+});
+
 test("failure classification produces participant-safe retry, conflict, authorization, lock, and finalized guidance", () => {
   assert.deepEqual(classifyScoringSyncFailure({ status: 503, message: "workbook unavailable" }), {
     status: "retryable", kind: "retryable", message: "Score saved on this device. Tap Retry Sync.",
@@ -221,11 +239,15 @@ test("a reviewed conflict resolves explicitly to the server or newest device sco
     clientMutationId: "conflict", status: "conflict", failureKind: "conflict", attempts: 1, createdAt: 1,
     authoritativeHole: { "Hole Number": 16, "Team 1 Gross Scores": 3, "Team 2 Gross Scores": 4, Revision: 2 },
     authoritativeMatchUpdatedAt: "server-v2",
+    authoritativeCanConfirm: true,
   };
   const serverStore = createMemoryScoringStore([conflict]);
   const serverQueue = createScoringSyncQueue({ store: serverStore, send: async () => assert.fail("server resolution must not rewrite") });
+  let serverResult;
+  serverQueue.subscribe((event) => { if (event.resolution === "server") serverResult = event.result; });
   assert.equal(await serverQueue.resolveConflict(conflict.id, "server"), true);
   assert.equal((await serverStore.list()).length, 0);
+  assert.equal(serverResult.matchComplete, true);
   serverQueue.stop();
 
   const deviceStore = createMemoryScoringStore([conflict]);
@@ -240,6 +262,24 @@ test("a reviewed conflict resolves explicitly to the server or newest device sco
   assert.equal(sent.expectedUpdatedAt, "server-v2");
   await until(async () => (await deviceStore.list()).length === 0);
   deviceQueue.stop();
+});
+
+test("multiple conflicts clear oldest-first and expose the next affected hole", async () => {
+  const conflicts = [8, 10, 11].map((holeNumber, index) => ({
+    ...mutation(holeNumber), id: `2026:2026-R3-2:H${holeNumber}:V1`, version: 1, sequence: index + 1,
+    clientMutationId: `conflict-${holeNumber}`, status: "conflict", failureKind: "conflict", attempts: 1, createdAt: index + 1,
+    authoritativeHole: { "Hole Number": holeNumber, "Team 1 Gross Scores": 3, "Team 2 Gross Scores": 4, Revision: 2 },
+  }));
+  const store = createMemoryScoringStore(conflicts);
+  const queue = createScoringSyncQueue({ store, send: async () => assert.fail("server resolution must not write") });
+  assert.deepEqual((await queue.entries("2026-R3-2")).map((entry) => entry.holeNumber), [8, 10, 11]);
+  await queue.resolveConflict(conflicts[0].id, "server");
+  assert.deepEqual(actionableScoringEntries(await queue.entries("2026-R3-2")).map((entry) => entry.holeNumber), [10, 11]);
+  await queue.resolveConflict(conflicts[1].id, "server");
+  assert.deepEqual(actionableScoringEntries(await queue.entries("2026-R3-2")).map((entry) => entry.holeNumber), [11]);
+  await queue.resolveConflict(conflicts[2].id, "server");
+  assert.equal((await queue.entries("2026-R3-2")).length, 0);
+  queue.stop();
 });
 
 test("Preview alone enables local-first scoring while Production keeps verified save-before-advance", async () => {
@@ -258,7 +298,14 @@ test("Preview alone enables local-first scoring while Production keeps verified 
   assert.match(component, /participantScoringSyncIssue/);
   assert.match(component, /Retry Sync/);
   assert.match(component, /Check Again/);
+  assert.match(component, /Hole .* score conflict/);
+  assert.match(component, /Choose the correct score for Hole/);
+  assert.match(component, /Use This Device Score/);
+  assert.match(component, /Sync the score entered on this device/);
   assert.match(component, /Use Server Score/);
-  assert.match(component, /Retry This Device Score/);
+  assert.match(component, /Keep the score already recorded on the server/);
+  assert.match(component, /has not synced yet/);
+  assert.match(component, /activeSyncIssue\.failureKind === "conflict" && activeSyncIssue\.authoritativeHole/);
+  assert.match(component, /finalizationReview\.buttonText/);
   assert.match(component, /save = localFirstEnabled \? saveLocally : saveAuthoritatively/);
 });
