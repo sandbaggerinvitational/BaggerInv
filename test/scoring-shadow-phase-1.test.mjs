@@ -182,12 +182,15 @@ test("reconciliation detects missing, payload, revision, stale, orphan, and dupl
 });
 
 test("workbook rebuild observations retain correction revisions and one logical current key", () => {
-  const matches = [{ "Match ID": "M1", "Tournament ID": "T2026", Year: 2026, Round: 3, Format: "SI", "Match Status": "Live" }];
+  const matches = [{ "Match ID": "M1", "Tournament ID": "T2026", Year: 2026, Round: 3, Format: "SI", "Match Status": "Live", "Team 1 Player 1": "P1", "Team 2 Player 1": "P2", "Team 1 Player 1 Playing HCP": 0, "Team 2 Player 1 Playing HCP": 0 }];
   const holes = [{ "Hole Score ID": "M1-H1", "Match ID": "M1", "Hole Number": 1, "Stroke Index": 1, Format: "SI", "Team 1 Gross Scores": 4, "Team 2 Gross Scores": 5, "Team 1 Net Score": 4, "Team 2 Net Score": 5, "Hole Winner": "Team 1", Revision: 3, "Updated At": "2026-08-10T12:00:00Z" }];
   const rows = scoringShadowObservationsFromWorkbook({ sourceWorkbookId: "preview", matches, holes });
   assert.equal(rows.length, 1);
   assert.equal(rows[0].mutation_key, "rebuild:M1:H1:R3");
   assert.equal(rows[0].tournament_id, "T2026");
+  assert.deepEqual(rows[0].team_1_strokes, [0]);
+  assert.deepEqual(rows[0].team_2_strokes, [0]);
+  assert.equal(rows[0].comparison_status, "PASS");
 });
 
 test("benchmark reporting includes percentiles and correctness counters", () => {

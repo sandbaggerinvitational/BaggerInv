@@ -107,7 +107,10 @@ export async function POST(request) {
       return NextResponse.json({ ok: true, before, replay: replay.observation, replayDurationMs: replay.replay.totalDurationMs, after });
     }
     if (input.action !== "rebuild") return NextResponse.json({ error: "Unsupported action." }, { status: 400 });
+    const startedAt = Date.now();
+    const googleReadAt = Date.now();
     const rows = scopedRows(await authoritativeRows());
+    const googleReadDurationMs = Date.now() - googleReadAt;
     const result = await rebuildAndReconcileScoringShadow({
       sourceWorkbookId: context.gate.sourceWorkbookId,
       ...rows,
@@ -118,6 +121,7 @@ export async function POST(request) {
       message: "Shadow Rebuild Complete",
       summary: result.report,
       rebuild: result.rebuilt,
+      timings: { googleReadDurationMs, ...result.timings, totalRequestDurationMs: Date.now() - startedAt },
     });
   } catch (error) {
     console.error(`Scoring shadow ${operation} failed`, { message: error?.message, status: error?.status || 0 });
