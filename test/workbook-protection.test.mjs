@@ -91,6 +91,10 @@ test("the authorized Preview participant identity schema initializer creates onl
   assert.match(writer, /VERCEL_ENV !== "preview"/);
   assert.match(writer, /requireIsolatedScoringSheet\(\)/);
   assert.match(writer, /addProtectedRange/);
+  assert.match(writer, /before\.sheetExists/);
+  const contract = await source("lib/participant-identity-workbook.js");
+  assert.match(contract, /valueInputOption: "RAW"/);
+  assert.match(contract, /Participant Identity Configuration!A1:I\$\{seedRows\.length \+ 1\}/);
 });
 
 test("Preview Reset, Guide administration, CMS, and finalization use field-scoped writes", async () => {

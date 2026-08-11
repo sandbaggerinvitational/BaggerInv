@@ -10,6 +10,12 @@ import {
   validateParticipantIdentityConfiguration,
 } from "../lib/participant-identity.js";
 import { participantIdentityAuthorityEnvironment } from "../lib/participant-identity-authority.js";
+import {
+  PARTICIPANT_IDENTITY_CONFIGURATION_HEADERS,
+  isRecoverableParticipantIdentityConfigurationSheet,
+  participantIdentityConfigurationSeedRows,
+  participantIdentityConfigurationValuesRequest,
+} from "../lib/participant-identity-workbook.js";
 import { PRODUCTION_SPREADSHEET_ID } from "../lib/spreadsheet-environment.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -36,6 +42,33 @@ test("a complete explicit roster mapping passes and produces a stable fingerprin
   assert.equal(first.quality.playersWithEmail, 2);
   assert.equal(first.fingerprint, second.fingerprint);
   assert.equal(first.fingerprint, participantIdentityFingerprint(first.contacts));
+});
+
+test("Preview identity initialization uses the Google values.update contract and seeds 24 canonical Player IDs", () => {
+  const players = Array.from({ length: 24 }, (_, index) => ({
+    playerId: `P${String(index + 1).padStart(2, "0")}`,
+    participationStatus: "ACTIVE",
+  }));
+  const seedRows = participantIdentityConfigurationSeedRows({
+    tournamentId: "SBI-2026",
+    players,
+    updatedBy: "Preview Director",
+    updatedAt: "2026-08-11T20:00:00.000Z",
+  });
+  const request = participantIdentityConfigurationValuesRequest(seedRows);
+  const [path, query] = request.path.split("?");
+  const body = JSON.parse(request.options.body);
+  assert.match(path, /^\/values\//);
+  assert.equal(new URLSearchParams(query).get("valueInputOption"), "RAW");
+  assert.equal(request.options.method, "PUT");
+  assert.equal(body.range, "Participant Identity Configuration!A1:I25");
+  assert.equal(body.majorDimension, "ROWS");
+  assert.deepEqual(body.values[0], PARTICIPANT_IDENTITY_CONFIGURATION_HEADERS);
+  assert.equal(body.values.length, 25);
+  assert.deepEqual(body.values[1], ["SBI-2026", "P01", "", "FALSE", 1, "", "", "2026-08-11T20:00:00.000Z", "Preview Director"]);
+  assert.deepEqual(body.values.at(-1).slice(0, 5), ["SBI-2026", "P24", "", "FALSE", 1]);
+  assert.equal(isRecoverableParticipantIdentityConfigurationSheet({ headers: [], records: [] }), true);
+  assert.equal(isRecoverableParticipantIdentityConfigurationSheet({ headers: ["Tournament ID"], records: [] }), false);
 });
 
 test("missing, duplicate, malformed, shared, inactive, unknown, and duplicate-player mappings fail closed", () => {
@@ -101,6 +134,8 @@ test("Director identity operations are Preview-only and no participant login or 
   assert.match(route, /VERCEL_ENV !== "preview"/);
   assert.match(route, /inspectTournamentDirectorToken/);
   assert.match(route, /initialize-source/);
+  assert.match(route, /readPreviewParticipantIdentityTournamentId/);
+  assert.match(route, /players\.length !== 24/);
   assert.match(route, /refresh/);
   assert.match(route, /approve/);
   assert.doesNotMatch(route, /createUser|signInWithOtp|sendOtp/);

@@ -11,6 +11,7 @@ import {
 } from "../../../../lib/participant-identity-supabase.js";
 import {
   initializePreviewParticipantIdentityConfiguration,
+  readPreviewParticipantIdentityTournamentId,
   readPreviewParticipantIdentityConfiguration,
 } from "../../../../lib/google-sheets-write.js";
 
@@ -44,7 +45,8 @@ function safeLatestRun(run) {
 }
 
 async function loadReview() {
-  const admin = await readParticipantIdentityAdmin("");
+  const tournamentId = await readPreviewParticipantIdentityTournamentId();
+  const admin = await readParticipantIdentityAdmin(tournamentId);
   const source = await readPreviewParticipantIdentityConfiguration();
   const current = admin.payload?.data || {};
   const roster = (current.players || []).map((player) => ({
@@ -53,14 +55,14 @@ async function loadReview() {
     teamId: player.teamId,
     participationStatus: player.participationStatus,
   }));
-  const tournamentId = clean(current.tournamentId);
+  const resolvedTournamentId = clean(current.tournamentId);
   const validation = validateParticipantIdentityConfiguration({
-    tournamentId,
+    tournamentId: resolvedTournamentId,
     roster,
     records: source.records.map(({ record }) => record),
   });
   return {
-    tournamentId,
+    tournamentId: resolvedTournamentId,
     source: { exists: source.exists, headers: source.headers, rowCount: source.records.length },
     review: validation.review,
     quality: validation.quality,
@@ -97,7 +99,17 @@ export async function POST(request) {
   const director = authorization.identity?.actor?.name || "Tournament Director";
   try {
     if (action === "initialize-source") {
-      const source = await initializePreviewParticipantIdentityConfiguration(director);
+      const tournamentId = await readPreviewParticipantIdentityTournamentId();
+      const admin = await readParticipantIdentityAdmin(tournamentId);
+      const current = admin.payload?.data || {};
+      const players = (current.players || []).filter((player) => clean(player.participationStatus).toUpperCase() === "ACTIVE");
+      if (!clean(current.tournamentId) || players.length !== 24) {
+        return NextResponse.json({ error: "The canonical Preview tournament roster must contain exactly 24 active Player IDs before initialization." }, { status: 409 });
+      }
+      const source = await initializePreviewParticipantIdentityConfiguration(director, {
+        tournamentId: current.tournamentId,
+        players,
+      });
       return NextResponse.json({ ok: true, action, source: { changed: source.changed, exists: source.exists, headers: source.headers, rowCount: source.records.length } });
     }
     if (action === "refresh") {
