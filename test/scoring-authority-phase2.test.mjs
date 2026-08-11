@@ -107,6 +107,7 @@ test("Google outbox delivery uses checkpoint revisions and verifies before advan
   assert.equal(completed[0].google_hole_revision, 4);
   assert.equal(result.checkpoint.last_supabase_match_revision, 2);
   assert.equal(googleOutboxDeliveryInput(event, checkpoint).expectedGoogleHoleRevision, 3);
+  assert.equal(googleOutboxDeliveryInput(event, { ...checkpoint, google_match_updated_at: "2026-08-10T12:00:00+00:00" }).expectedGoogleMatchUpdatedAt, "2026-08-10T12:00:00.000Z");
 });
 
 test("Google outbox failure remains retryable and never advances checkpoint", async () => {
