@@ -166,8 +166,19 @@ async function recordSample({ fixtureSet, operation, matchId, holeNumber, author
   return sample;
 }
 
+async function verifiedBaseFixtures() {
+  const response = await readScoringAuthorityDryRun({ fixture_set: MAIN_SET, mode: "TOURNAMENT_SUMMARY" });
+  const rows = response.payload?.data;
+  if (!response.payload?.ok || !Array.isArray(rows) || rows.length !== 24) {
+    throw new Error("Seed the 24 authoritative Preview fixtures before running an isolated benchmark.");
+  }
+  return rows.map(fixtureFromMatchRow);
+}
+
 async function seed(fixtureSet = MAIN_SET, transform = (fixtures) => fixtures) {
-  const source = await authoritativeFixtures();
+  const source = fixtureSet === MAIN_SET
+    ? await authoritativeFixtures()
+    : { fixtures: await verifiedBaseFixtures(), matches: [], holes: [] };
   const fixtures = transform(source.fixtures);
   const reset = await resetScoringAuthorityDryRun(fixtureSet, fixtures);
   return { ...source, fixtures, reset: reset.payload, fixtureSet };

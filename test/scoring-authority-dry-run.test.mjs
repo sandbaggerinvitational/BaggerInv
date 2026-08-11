@@ -156,6 +156,8 @@ test("Preview administrative route is Director-gated and leaves participant scor
   assert.match(route, /Tournament Director access is required/);
   assert.doesNotMatch(route, /SCORING_AUTHORITY\s*=\s*["']supabase/i);
   assert.match(route, /saveLiveHoleScore/, "Google timing samples retain the existing authoritative pipeline");
+  assert.match(route, /verifiedBaseFixtures[\s\S]+TOURNAMENT_SUMMARY/);
+  assert.match(route, /fixtureSet === MAIN_SET[\s\S]+authoritativeFixtures/);
 });
 
 test("Google scoring diagnostics separate pre-read, write, invalidation, verification, and audit timing", async () => {
