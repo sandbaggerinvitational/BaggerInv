@@ -6,6 +6,7 @@ import { assertScoringShadowAdministrativeEnvironment } from "../../../../lib/sc
 import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.js";
 import {
   abortAuthorityEpoch,
+  backfillCanonicalFinalMatchLocks,
   buildCanonicalScoringAuthorityImport,
   canonicalAuthorityFingerprint,
   commitAuthorityEpoch,
@@ -20,7 +21,7 @@ import {
 } from "../../../../lib/scoring-authority-supabase.js";
 import { benchmarkSummary } from "../../../../lib/scoring-shadow.js";
 import { drainGoogleOutbox, inspectGoogleMatchState, processNextGoogleOutboxEvent } from "../../../../lib/scoring-google-outbox.js";
-import { readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
+import { inspectPreviewLiveMatchScoringLockMigration, migratePreviewLiveMatchScoringLock, readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { grossScoresFromCell } from "../../../../lib/live-score-values.js";
 
 export const dynamic = "force-dynamic";
@@ -231,6 +232,50 @@ async function repairFinalizationParity(actorId, matchIdValue) {
     googleDiagnostics: google.diagnostics,
     reconciliation: reconciled.report,
     counts: source.imported.counts,
+  };
+}
+
+async function migratePreviewScoringLockSchema(actorId) {
+  const authority = scoringAuthorityEnvironment();
+  if (authority.resolved !== "supabase") throw Object.assign(new Error("Supabase must remain the active Preview scoring authority."), { code: "SUPABASE_NOT_AUTHORITY" });
+  const [diagnostics, matchBefore, security, workbookBefore] = await Promise.all([
+    readCanonicalScoringAuthority({ tournament_id: "2026", mode: "DIAGNOSTICS" }),
+    readCanonicalScoringAuthority({ match_id: "2026-R3-4", mode: "MATCH" }),
+    inspectCanonicalAuthoritySecurity(),
+    inspectPreviewLiveMatchScoringLockMigration(),
+  ]);
+  const ingress = diagnostics.payload?.data?.ingress || {};
+  const match = matchBefore.payload?.data;
+  const securityState = security.payload || {};
+  if (!diagnostics.payload?.ok || clean(ingress.authority).toUpperCase() !== "SUPABASE" || clean(ingress.state).toUpperCase() !== "OPEN"
+      || number(diagnostics.payload?.data?.pending_outbox) !== 0) {
+    throw Object.assign(new Error("Preview authority ingress or outbox pre-flight is not clean."), { code: "SCHEMA_MIGRATION_PREFLIGHT_FAILED" });
+  }
+  if (!matchBefore.payload?.ok || clean(match?.status).toUpperCase() !== "FINAL" || match?.scoring_locked !== true || number(match?.match_revision) !== 20) {
+    throw Object.assign(new Error("Match 2026-R3-4 is not the verified locked Final revision 20."), { code: "MATCH4_PREFLIGHT_FAILED" });
+  }
+  if (number(securityState.tables) !== number(securityState.rls_enabled) || number(securityState.policies) !== 0
+      || number(securityState.participant_rpc_grants) !== 0 || number(securityState.participant_table_grants) !== 0) {
+    throw Object.assign(new Error("Canonical Supabase access posture is not clean."), { code: "SECURITY_PREFLIGHT_FAILED" });
+  }
+  const migrated = await withWorkbookWriteDiagnostics("preview-live-matches-scoring-locked-schema", () =>
+    migratePreviewLiveMatchScoringLock({ expectedFingerprint: workbookBefore.fingerprint }));
+  const backfilled = await backfillCanonicalFinalMatchLocks({
+    environment: "PREVIEW", director_authorized: true, tournament_id: match.tournament_id, actor_id: actorId,
+  });
+  if (!backfilled.payload?.ok) throw Object.assign(new Error(`Canonical Final lock backfill failed (${backfilled.payload?.code || "unknown"}).`), { code: backfilled.payload?.code });
+  const repaired = await repairFinalizationParity(actorId, "2026-R3-4");
+  if (!repaired.reconciliation?.pass) throw Object.assign(new Error("Post-migration reconciliation is not clean."), {
+    code: "SCHEMA_MIGRATION_RECONCILIATION_FAILED", shadowDiagnostics: { details: JSON.stringify(repaired.reconciliation) },
+  });
+  return {
+    preflight: { authority: authority.resolved, ingress, pendingOutbox: diagnostics.payload.data.pending_outbox,
+      match4: { status: match.status, scoringLocked: match.scoring_locked, matchRevision: match.match_revision },
+      security: securityState, workbook: workbookBefore },
+    migration: migrated.result,
+    googleDiagnostics: migrated.diagnostics,
+    canonicalFinalLockBackfill: backfilled.payload,
+    match4Repair: repaired,
   };
 }
 
@@ -472,6 +517,8 @@ export async function POST(request) {
         supabaseReadMs: reconciled.readMs, reconciliation: reconciled.report };
     } else if (action === "repair-finalization-parity") {
       result = await repairFinalizationParity(actorId, input.matchId);
+    } else if (action === "migrate-preview-scoring-lock-schema") {
+      result = await migratePreviewScoringLockSchema(actorId);
     } else if (action === "outbox-rehearsal") result = await outboxRehearsal(actorId, number(input.cycles, 5));
     else if (action === "outbox-failures") result = await outboxFailureRehearsal(actorId);
     else if (action === "cutover-rollback-rehearsal") result = await cutoverRollbackRehearsal(actorId);

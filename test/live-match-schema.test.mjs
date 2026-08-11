@@ -2,8 +2,24 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   LIVE_MATCH_CORE_SCORE_HEADERS,
+  LIVE_MATCH_SCORING_LOCK_SCHEMA,
   existingLiveMatchProgressUpdates,
+  liveMatchScoringLockColumnIndex,
 } from "../lib/live-match-schema.js";
+
+test("Scoring Locked has one canonical lifecycle placement in the 46-column schema", () => {
+  const headers = Array.from({ length: 45 }, (_, index) => `Field ${index + 1}`);
+  headers[4] = "Match Status";
+  headers[5] = "Notes";
+  assert.equal(liveMatchScoringLockColumnIndex(headers), 5);
+  headers.splice(5, 0, "Scoring Locked");
+  assert.equal(headers.length, 46);
+  assert.equal(liveMatchScoringLockColumnIndex(headers), 5);
+  assert.deepEqual(LIVE_MATCH_SCORING_LOCK_SCHEMA, {
+    header: "Scoring Locked", after: "Match Status", before: "Notes",
+    sourceColumnCount: 45, targetColumnCount: 46,
+  });
+});
 
 test("live scoring supports the established Live Matches schema without derived progress columns", () => {
   const headers = [

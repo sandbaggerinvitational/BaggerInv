@@ -224,6 +224,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const ingress = await readFile(new URL("../supabase/migrations/202608120007_preview_scoring_authority_cutover_ingress.sql", import.meta.url), "utf8");
   const diagnostics = await readFile(new URL("../supabase/migrations/202608120008_preview_scoring_client_diagnostics.sql", import.meta.url), "utf8");
   const finalizationPermissions = await readFile(new URL("../supabase/migrations/202608120010_preview_scoring_authority_finalization_permissions.sql", import.meta.url), "utf8");
+  const scoringLockedBackfill = await readFile(new URL("../supabase/migrations/202608120011_preview_live_matches_scoring_locked_backfill.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -271,6 +272,32 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
     "the one-time repair preserves the authoritative match revision");
   assert.match(finalizationPermissions, /revoke all on function public\.repair_preview_finalization_parity\(jsonb\) from public, anon, authenticated/i);
   assert.match(finalizationPermissions, /grant execute on function public\.repair_preview_finalization_parity\(jsonb\) to service_role/i);
+  assert.match(scoringLockedBackfill, /status = 'FINAL' and not scoring_locked/i);
+  assert.match(scoringLockedBackfill, /match_revision_unchanged.*hole_revisions_unchanged.*permission_revision_unchanged/is);
+  assert.doesNotMatch(scoringLockedBackfill, /set[\s\S]{0,120}match_revision\s*=/i);
+  assert.doesNotMatch(scoringLockedBackfill, /update scoring_authority\.hole_scores/i);
+  assert.match(scoringLockedBackfill, /revoke all on function public\.backfill_preview_final_match_locks\(jsonb\) from public, anon, authenticated/i);
+  assert.match(scoringLockedBackfill, /grant execute on function public\.backfill_preview_final_match_locks\(jsonb\) to service_role/i);
+});
+
+test("Preview Live Matches migration inserts exactly one canonical column and verifies preservation", async () => {
+  const writer = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
+  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
+  const migration = writer.match(/export async function migratePreviewLiveMatchScoringLock[\s\S]+?\n}\n/)?.[0] || "";
+  assert.equal((migration.match(/insertDimension/g) || []).length, 1);
+  assert.match(migration, /endIndex: targetIndex \+ 1/);
+  assert.match(migration, /boolValue: \/\^final\$\/i/);
+  assert.match(migration, /Live Matches schema migration is Preview-only/);
+  for (const field of ["headers", "rowCount", "matchIds", "existingValues", "formulaTopology", "holeScores", "archivedMatches"]) {
+    assert.match(migration, new RegExp(`${field}:`));
+  }
+  assert.match(route, /action === "migrate-preview-scoring-lock-schema"/);
+  assert.match(route, /pending_outbox/);
+  assert.match(route, /matchRevision\) !== 20|match_revision\) !== 20/);
+  assert.match(route, /backfillCanonicalFinalMatchLocks/);
+  assert.match(route, /repairFinalizationParity\(actorId, "2026-R3-4"\)/);
+  assert.match(dashboard, /Migrate Preview Scoring Lock/);
 });
 
 test("Preview Director repair is gated, audited, and never re-finalizes or changes holes", async () => {

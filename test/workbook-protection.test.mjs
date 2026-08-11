@@ -74,6 +74,16 @@ test("Google Sheets mutations contain no whole-row, whole-tab, or schema-creatio
   assert.match(writer, /protected-column validation failed/);
 });
 
+test("the authorized Preview schema migration is one isolated column insertion", async () => {
+  const writer = await source("lib/google-sheets-write.js");
+  assert.equal((writer.match(/insertDimension/g) || []).length, 1);
+  assert.match(writer, /migratePreviewLiveMatchScoringLock/);
+  assert.match(writer, /sourceColumnCount/);
+  assert.match(writer, /expectedFingerprint/);
+  assert.match(writer, /existingValues: after\.logicalDataHash === before\.logicalDataHash/);
+  assert.doesNotMatch(writer, /appendDimension|addSheet/);
+});
+
 test("Preview Reset, Guide administration, CMS, and finalization use field-scoped writes", async () => {
   const writer = await source("lib/google-sheets-write.js");
   assert.match(writer, /fieldScopedChanges\("Live Matches"/);
