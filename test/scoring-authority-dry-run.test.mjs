@@ -74,6 +74,24 @@ test("historical scoring participants fall back to the current authoritative cou
   assert.equal(resolved.match["Team 1 Player 2 Stroke"], 13, "historical scoring allocation remains immutable");
 });
 
+test("course identity resolves from authoritative year and format when match rows omit it", () => {
+  const current = { ...match("BB"), "Course ID": "", Tee: "" };
+  const historical = { ...current, "Team 1 Player 2 Stroke": 13 };
+  const resolved = resolveScoringAuthorityCourseSnapshot({
+    historicalMatch: historical,
+    currentMatch: current,
+    courses: [
+      { "Course ID": "OCEAN", Year: 2026, Format: "Singles", "Tee Played": "Gold" },
+      { "Course ID": "TURTLE", Year: 2026, Format: "Best Ball", "Tee Played": "Gold" },
+    ],
+    courseHoles: courseHoles.map((hole) => ({ ...hole, "Course ID": "TURTLE", Tee: "Gold" })),
+  });
+  assert.equal(resolved.courseId, "TURTLE");
+  assert.equal(resolved.tee, "Gold");
+  assert.equal(resolved.match["Team 1 Player 2 Stroke"], 13);
+  assert.equal(resolved.courseHoles.length, 18);
+});
+
 test("dry-run mutation carries independent expected match/hole revisions and trusted Passport context", () => {
   const fixture = buildScoringAuthorityDryRunFixture({ match: match("SI"), courseHoles, course: {}, round: {} });
   const input = dryRunMutationInput({ fixtureSet: "fixture", fixture, holeNumber: 7, team1: [4], team2: [5], expectedMatchRevision: 9, expectedHoleRevision: 2, mutationKey: "same-key" });
