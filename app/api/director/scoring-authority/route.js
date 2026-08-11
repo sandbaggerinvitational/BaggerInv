@@ -194,7 +194,10 @@ async function outboxRehearsal(actorId, cycles = 5) {
         matchRevision = number(submitted.response.payload.match_revision);
         holeRevision = number(submitted.response.payload.hole_revision);
         const worker = await processNextGoogleOutboxEvent({ actor: `Phase 2 outbox rehearsal · ${actorId}` });
-        if (!worker.ok) throw new Error(`Google outbox rehearsal failed (${worker.errorCode || "unknown"}).`);
+        if (!worker.ok) throw Object.assign(
+          new Error(`Google outbox rehearsal failed at ${worker.errorStage || "unknown"} (${worker.errorCode || "unknown"}): ${worker.errorMessage || "No safe diagnostic was returned."}`),
+          { code: worker.errorCode || "GOOGLE_OUTBOX_REHEARSAL_FAILED" },
+        );
         samples.push({ cycle, kind, supabaseCommitMs: submitted.totalCommitMs,
           googleDeliveryMs: worker.googleDurationMs, totalMirrorLagMs: Date.now() - mutationStartedAt,
           checkpointRevision: worker.checkpoint?.last_supabase_match_revision });

@@ -119,7 +119,25 @@ test("Google outbox failure remains retryable and never advances checkpoint", as
   } });
   assert.equal(result.ok, false);
   assert.equal(result.errorCode, "429");
+  assert.equal(result.errorStage, "google-writer");
+  assert.equal(result.errorMessage, "429");
   assert.equal(failed.length, 1);
+});
+
+test("Google outbox diagnostics distinguish writer failure from checkpoint failure", async () => {
+  const event = { id: "00000000-0000-0000-0000-000000000003", event_type: "HOLE_SCORE_UPSERTED", match_id: "M1", match_revision: 2,
+    hole_number: 7, mutation_key: "m-checkpoint", attempts: 1, payload: { gross: { team_1: [4], team_2: [5] } } };
+  const result = await processNextGoogleOutboxEvent({ dependencies: {
+    claimGoogleOutbox: async () => ({ payload: { event, checkpoint: { google_hole_revisions: { 7: 1 } } } }),
+    saveLiveHoleScore: async () => ({ hole: { Revision: 2, "Updated At": "2026-08-10T12:00:01.000Z" } }),
+    measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
+    completeGoogleOutbox: async () => ({ payload: { ok: false, code: "CHECKPOINT_OUT_OF_ORDER" } }),
+    failGoogleOutbox: async () => {},
+  } });
+  assert.equal(result.ok, false);
+  assert.equal(result.errorCode, "CHECKPOINT_OUT_OF_ORDER");
+  assert.equal(result.errorStage, "checkpoint");
+  assert.match(result.errorMessage, /Checkpoint update failed/);
 });
 
 test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cutover, and rollback guards", async () => {
