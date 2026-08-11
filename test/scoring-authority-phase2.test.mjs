@@ -148,6 +148,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const precision = await readFile(new URL("../supabase/migrations/202608120004_preview_scoring_authority_course_handicap_precision.sql", import.meta.url), "utf8");
   const playingPrecision = await readFile(new URL("../supabase/migrations/202608120005_preview_scoring_authority_playing_handicap_precision.sql", import.meta.url), "utf8");
   const deleteOrder = await readFile(new URL("../supabase/migrations/202608120006_preview_scoring_authority_import_delete_order.sql", import.meta.url), "utf8");
+  const ingress = await readFile(new URL("../supabase/migrations/202608120007_preview_scoring_authority_cutover_ingress.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -173,6 +174,13 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.match(playingPrecision, /set playing_handicap = nullif\(item->>'playing_handicap', ''\)::numeric/i);
   assert.ok(deleteOrder.indexOf("delete from scoring_authority.matches") < deleteOrder.indexOf("delete from scoring_authority.scoring_snapshots"));
   assert.match(deleteOrder, /revoke all on function public\.replace_preview_scoring_authority_import_phase2_delete_inner/i);
+  assert.match(ingress, /create table if not exists scoring_authority\.scoring_ingress_leases/i);
+  assert.match(ingress, /enable row level security/i);
+  assert.match(ingress, /where tournament_id = tournament_key for update/i);
+  assert.match(ingress, /SCORING_INGRESS_PAUSED/i);
+  assert.match(ingress, /AUTHORITY_BOUNDARY_MISMATCH/i);
+  assert.match(ingress, /requested_type = 'CUTOVER'.*GOOGLE_OUTBOX_NOT_DRAINED/is);
+  assert.match(ingress, /grant execute on function %s to service_role/i);
 });
 
 test("participant scoring routes preserve the API and delegate persistence server-side", async () => {
@@ -186,9 +194,19 @@ test("participant scoring routes preserve the API and delegate persistence serve
   }
 });
 
-test("Preview Google outbox rehearsal stays below the observed quota burst", async () => {
+test("Preview Director exposes only the explicit prepared cutover and rollback controls", async () => {
   const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
-  assert.match(dashboard, /runPhase2Authority\("outbox-rehearsal", \{ cycles: 2 \}\)/);
+  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
+  const adapter = await readFile(new URL("../lib/scoring-persistence-adapter.js", import.meta.url), "utf8");
+  assert.match(dashboard, /Pause \+ Prepare Cutover/);
+  assert.match(dashboard, /Commit Cutover Epoch/);
+  assert.match(dashboard, /Pause \+ Prepare Rollback/);
+  assert.match(dashboard, /Drain \+ Commit Rollback/);
+  assert.match(route, /requireCutoverSnapshot/);
+  assert.match(route, /action === "prepare-cutover"/);
+  assert.match(route, /action === "commit-cutover"/);
+  assert.match(adapter, /beginScoringIngress/);
+  assert.match(adapter, /completeScoringIngress/);
 });
 
 test("Phase 2 Director diagnostics retain safe PostgREST errors without exposing credentials", async () => {

@@ -65,6 +65,98 @@ async function importMain(requestedBy) {
   return { ...source, write: write.payload, writeMs, ...reconciled };
 }
 
+async function cutoverSnapshot(requestedBy) {
+  const source = await authoritativeImport(requestedBy);
+  const reconciled = await currentAndReconcile(source.imported);
+  const tournamentId = source.imported.payload.tournament.tournament_id;
+  const diagnostics = await readCanonicalScoringAuthority({ tournament_id: tournamentId, mode: "DIAGNOSTICS" });
+  const security = await inspectCanonicalAuthoritySecurity();
+  return { source, ...reconciled, tournamentId, diagnostics: diagnostics.payload?.data || {}, security: security.payload || {} };
+}
+
+function requireCutoverSnapshot(snapshot, { ingressState = "OPEN", authority = "GOOGLE", epochId = "" } = {}) {
+  const ingress = snapshot.diagnostics?.ingress || {};
+  const security = snapshot.security || {};
+  const ready = snapshot.report.pass && number(snapshot.diagnostics?.pending_outbox) === 0 &&
+    number(ingress.unresolved_client_queues) === 0 && clean(ingress.state).toUpperCase() === ingressState &&
+    clean(ingress.authority).toUpperCase() === authority && (!epochId || clean(ingress.active_epoch_id) === clean(epochId)) &&
+    number(security.tables) === number(security.rls_enabled) && number(security.policies) === 0 &&
+    number(security.participant_rpc_grants) === 0 && number(security.participant_table_grants) === 0;
+  if (!ready) throw Object.assign(new Error("The verified cutover preconditions are not satisfied."), {
+    code: "CUTOVER_PRECONDITION_FAILED",
+    shadowDiagnostics: { code: "CUTOVER_PRECONDITION_FAILED", message: "The verified cutover preconditions are not satisfied.",
+      details: JSON.stringify({ reconciliation: snapshot.report, ingress, pendingOutbox: snapshot.diagnostics?.pending_outbox, security }) },
+  });
+  return true;
+}
+
+function epochInput(snapshot, actorId, epochType) {
+  return {
+    tournament_id: snapshot.tournamentId,
+    epoch_type: epochType,
+    reconciliation_fingerprint: snapshot.report.fingerprint,
+    google_checkpoints: snapshot.current.checkpoints,
+    supabase_match_revisions: snapshot.current.matches.map((row) => ({ match_id: row.match_id, revision: row.match_revision })),
+    deployment_commit: process.env.VERCEL_GIT_COMMIT_SHA || "local",
+    actor_id: actorId,
+    reason: epochType === "CUTOVER" ? "First controlled Preview Supabase authority activation" : "Controlled Preview authority rollback",
+  };
+}
+
+async function prepareMainCutover(actorId) {
+  const authority = scoringAuthorityEnvironment();
+  if (authority.resolved !== "google") throw Object.assign(new Error("Preview runtime authority must still be Google before preparing cutover."), { code: "RUNTIME_AUTHORITY_NOT_GOOGLE" });
+  const snapshot = await cutoverSnapshot(actorId);
+  requireCutoverSnapshot(snapshot);
+  const prepared = await prepareAuthorityEpoch(epochInput(snapshot, actorId, "CUTOVER"));
+  if (!prepared.payload?.ok) throw Object.assign(new Error(`Cutover prepare failed (${prepared.payload?.code || "unknown"}).`), { code: prepared.payload?.code });
+  return { prepared: prepared.payload, counts: snapshot.source.imported.counts, reconciliation: snapshot.report,
+    ingressBefore: snapshot.diagnostics.ingress, pendingOutbox: snapshot.diagnostics.pending_outbox,
+    security: snapshot.security, deploymentCommit: process.env.VERCEL_GIT_COMMIT_SHA || "local" };
+}
+
+async function commitMainCutover(actorId, epochId) {
+  if (!clean(epochId)) throw Object.assign(new Error("A prepared cutover epoch is required."), { code: "EPOCH_REQUIRED" });
+  const snapshot = await cutoverSnapshot(actorId);
+  requireCutoverSnapshot(snapshot, { ingressState: "PAUSED", authority: "GOOGLE", epochId });
+  const committed = await commitAuthorityEpoch({ epoch_id: epochId, actor_id: actorId });
+  if (!committed.payload?.ok || committed.payload.authority !== "SUPABASE") {
+    throw Object.assign(new Error(`Cutover commit failed (${committed.payload?.code || "unknown"}).`), { code: committed.payload?.code });
+  }
+  const after = await readCanonicalScoringAuthority({ tournament_id: snapshot.tournamentId, mode: "DIAGNOSTICS" });
+  return { committed: committed.payload, reconciliation: snapshot.report, counts: snapshot.source.imported.counts,
+    ingressBeforeCommit: snapshot.diagnostics.ingress, ingressAfterCommit: after.payload?.data?.ingress,
+    pendingOutbox: after.payload?.data?.pending_outbox, security: snapshot.security };
+}
+
+async function prepareMainRollback(actorId) {
+  const current = await readCanonicalScoringAuthority({ tournament_id: "2026", mode: "CURRENT_STATE" });
+  const diagnostics = await readCanonicalScoringAuthority({ tournament_id: "2026", mode: "DIAGNOSTICS" });
+  if (!current.payload?.ok || clean(diagnostics.payload?.data?.authority).toUpperCase() !== "SUPABASE") {
+    throw Object.assign(new Error("Supabase is not the current canonical Preview authority."), { code: "SUPABASE_NOT_AUTHORITY" });
+  }
+  const fingerprint = canonicalAuthorityFingerprint(current.payload.data);
+  const prepared = await prepareAuthorityEpoch({ tournament_id: "2026", epoch_type: "ROLLBACK", reconciliation_fingerprint: fingerprint,
+    google_checkpoints: current.payload.data.checkpoints,
+    supabase_match_revisions: current.payload.data.matches.map((row) => ({ match_id: row.match_id, revision: row.match_revision })),
+    deployment_commit: process.env.VERCEL_GIT_COMMIT_SHA || "local", actor_id: actorId, reason: "Controlled Preview authority rollback" });
+  if (!prepared.payload?.ok) throw Object.assign(new Error(`Rollback prepare failed (${prepared.payload?.code || "unknown"}).`), { code: prepared.payload?.code });
+  return { prepared: prepared.payload, diagnosticsBefore: diagnostics.payload.data, fingerprint };
+}
+
+async function commitMainRollback(actorId, epochId) {
+  if (!clean(epochId)) throw Object.assign(new Error("A prepared rollback epoch is required."), { code: "EPOCH_REQUIRED" });
+  const drained = await drainGoogleOutbox({ maximum: 100, actor: `Phase 2 rollback · ${actorId}` });
+  if (!drained.ok) throw Object.assign(new Error("Rollback stopped because Google did not fully verify."), { code: "GOOGLE_OUTBOX_NOT_DRAINED" });
+  const snapshot = await cutoverSnapshot(actorId);
+  requireCutoverSnapshot(snapshot, { ingressState: "PAUSED", authority: "SUPABASE", epochId });
+  const committed = await commitAuthorityEpoch({ epoch_id: epochId, actor_id: actorId });
+  if (!committed.payload?.ok || committed.payload.authority !== "GOOGLE") {
+    throw Object.assign(new Error(`Rollback commit failed (${committed.payload?.code || "unknown"}).`), { code: committed.payload?.code });
+  }
+  return { drained, reconciliation: snapshot.report, committed: committed.payload, security: snapshot.security };
+}
+
 function rehearsalPayload(source, targetMatchId, targetHole) {
   const base = source.payload;
   const tournamentId = `${base.tournament.tournament_id}-PHASE2-REHEARSAL`;
@@ -249,22 +341,18 @@ async function cutoverRollbackRehearsal(actorId) {
   if (!committedCutover.payload?.ok || committedCutover.payload.authority !== "SUPABASE") throw new Error("Cutover rehearsal commit failed.");
   const pending = await submitRehearsalScore({ setup, team1: setup.originalTeam1, team2: setup.originalTeam2,
     matchRevision: 0, holeRevision: 0, actorId, label: "rollback-gate" });
-  const blockedRollback = await prepareAuthorityEpoch({ ...epochInput, epoch_type: "ROLLBACK",
+  const preparedRollback = await prepareAuthorityEpoch({ ...epochInput, epoch_type: "ROLLBACK",
     supabase_match_revisions: [{ match_id: setup.rehearsal.matches[0].match_id, revision: pending.response.payload.match_revision }] });
+  if (!preparedRollback.payload?.ok) throw new Error(`Rollback rehearsal prepare failed (${preparedRollback.payload?.code}).`);
+  const blockedRollback = await commitAuthorityEpoch({ epoch_id: preparedRollback.payload.epoch_id, actor_id: actorId });
   const drained = await drainGoogleOutbox({ maximum: 5, actor: `Phase 2 rollback rehearsal · ${actorId}` });
   if (!drained.ok) throw new Error("Rollback rehearsal could not drain Google outbox.");
-  const caughtUpState = await readCanonicalScoringAuthority({ tournament_id: tournamentId, mode: "CURRENT_STATE" });
-  const preparedRollback = await prepareAuthorityEpoch({ ...epochInput, epoch_type: "ROLLBACK",
-    reconciliation_fingerprint: canonicalAuthorityFingerprint(caughtUpState.payload.data),
-    google_checkpoints: caughtUpState.payload.data.checkpoints,
-    supabase_match_revisions: caughtUpState.payload.data.matches.map((row) => ({ match_id: row.match_id, revision: row.match_revision })) });
-  if (!preparedRollback.payload?.ok) throw new Error(`Rollback rehearsal prepare failed (${preparedRollback.payload?.code}).`);
   const committedRollback = await commitAuthorityEpoch({ epoch_id: preparedRollback.payload.epoch_id, actor_id: actorId });
   const refreshed = await importMain(actorId);
   return { preparedCutover: preparedCutover.payload, committedCutover: committedCutover.payload,
     blockedRollback: blockedRollback.payload, drained, preparedRollback: preparedRollback.payload,
     committedRollback: committedRollback.payload, mainParityRestored: refreshed.report.pass,
-    pass: committedCutover.payload.authority === "SUPABASE" && blockedRollback.payload.code === "GOOGLE_OUTBOX_NOT_DRAINED" &&
+    pass: committedCutover.payload.authority === "SUPABASE" && preparedRollback.payload.ingress === "PAUSED" && blockedRollback.payload.code === "GOOGLE_OUTBOX_NOT_DRAINED" &&
       drained.ok && committedRollback.payload.authority === "GOOGLE" && refreshed.report.pass };
 }
 
@@ -308,6 +396,10 @@ export async function POST(request) {
     } else if (action === "outbox-rehearsal") result = await outboxRehearsal(actorId, number(input.cycles, 5));
     else if (action === "outbox-failures") result = await outboxFailureRehearsal(actorId);
     else if (action === "cutover-rollback-rehearsal") result = await cutoverRollbackRehearsal(actorId);
+    else if (action === "prepare-cutover") result = await prepareMainCutover(actorId);
+    else if (action === "commit-cutover") result = await commitMainCutover(actorId, clean(input.epochId));
+    else if (action === "prepare-rollback") result = await prepareMainRollback(actorId);
+    else if (action === "commit-rollback") result = await commitMainRollback(actorId, clean(input.epochId));
     else if (action === "readiness") {
       const source = await authoritativeImport(actorId);
       const reconciled = await currentAndReconcile(source.imported);
