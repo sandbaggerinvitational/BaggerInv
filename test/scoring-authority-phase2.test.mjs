@@ -164,6 +164,11 @@ test("participant scoring routes preserve the API and delegate persistence serve
   }
 });
 
+test("Preview Google outbox rehearsal stays below the observed quota burst", async () => {
+  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
+  assert.match(dashboard, /runPhase2Authority\("outbox-rehearsal", \{ cycles: 2 \}\)/);
+});
+
 test("Phase 2 Director diagnostics retain safe PostgREST errors without exposing credentials", async () => {
   const shadow = await readFile(new URL("../lib/scoring-shadow.js", import.meta.url), "utf8");
   const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
