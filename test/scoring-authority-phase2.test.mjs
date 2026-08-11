@@ -128,6 +128,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const authorization = await readFile(new URL("../supabase/migrations/202608120003_preview_scoring_authority_authorization_guards.sql", import.meta.url), "utf8");
   const precision = await readFile(new URL("../supabase/migrations/202608120004_preview_scoring_authority_course_handicap_precision.sql", import.meta.url), "utf8");
   const playingPrecision = await readFile(new URL("../supabase/migrations/202608120005_preview_scoring_authority_playing_handicap_precision.sql", import.meta.url), "utf8");
+  const deleteOrder = await readFile(new URL("../supabase/migrations/202608120006_preview_scoring_authority_import_delete_order.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -151,6 +152,8 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.match(precision, /revoke all on function public\.replace_preview_scoring_authority_import_phase2_inner/i);
   assert.match(playingPrecision, /alter column playing_handicap type numeric/i);
   assert.match(playingPrecision, /set playing_handicap = nullif\(item->>'playing_handicap', ''\)::numeric/i);
+  assert.ok(deleteOrder.indexOf("delete from scoring_authority.matches") < deleteOrder.indexOf("delete from scoring_authority.scoring_snapshots"));
+  assert.match(deleteOrder, /revoke all on function public\.replace_preview_scoring_authority_import_phase2_delete_inner/i);
 });
 
 test("participant scoring routes preserve the API and delegate persistence server-side", async () => {
