@@ -171,4 +171,6 @@ test("Phase 2 Director diagnostics retain safe PostgREST errors without exposing
   assert.match(route, /diagnostics\.message \|\| error\?\.message/);
   assert.doesNotMatch(route, /SUPABASE_SCORING_MIRROR_SECRET_KEY/);
   assert.match(route, /tournament_year: number\(base\.tournament\.tournament_year\) \+ 1000/);
+  assert.match(route, /phase2-rehearsal-cleanup/);
+  assert.match(route, /const cleanup = await cleanupRehearsal\(setup, actorId\)/);
 });

@@ -18,7 +18,7 @@ import {
 } from "../../../../lib/scoring-authority-supabase.js";
 import { benchmarkSummary } from "../../../../lib/scoring-shadow.js";
 import { drainGoogleOutbox, inspectGoogleMatchState, processNextGoogleOutboxEvent } from "../../../../lib/scoring-google-outbox.js";
-import { readWorkbookSheetsByName } from "../../../../lib/google-sheets-write.js";
+import { readWorkbookSheetsByName, saveLiveHoleScore } from "../../../../lib/google-sheets-write.js";
 import { grossScoresFromCell } from "../../../../lib/live-score-values.js";
 
 export const dynamic = "force-dynamic";
@@ -144,35 +144,71 @@ async function submitRehearsalScore({ setup, team1, team2, matchRevision, holeRe
   return { response, committedAt: Date.now(), totalCommitMs: Date.now() - startedAt };
 }
 
+const sameScores = (left, right) => JSON.stringify(left || []) === JSON.stringify(right || []);
+
+async function restoreRehearsalGoogleScore(setup, actorId) {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const current = await inspectGoogleMatchState(setup.targetMatchId);
+      const hole = current.holes.find((row) => number(row["Hole Number"]) === setup.targetHole);
+      if (!current.match || !hole) throw new Error("The reversible Google rehearsal score could not be inspected.");
+      const team1 = grossScoresFromCell(hole["Team 1 Gross Scores"]);
+      const team2 = grossScoresFromCell(hole["Team 2 Gross Scores"]);
+      if (sameScores(team1, setup.originalTeam1) && sameScores(team2, setup.originalTeam2)) {
+        return { restored: true, writeRequired: false, attempts: attempt, revision: number(hole.Revision) };
+      }
+      await saveLiveHoleScore(setup.targetMatchId, {
+        holeNumber: setup.targetHole,
+        team1GrossScores: setup.originalTeam1,
+        team2GrossScores: setup.originalTeam2,
+        expectedRevision: number(hole.Revision),
+        expectedUpdatedAt: clean(current.match["Updated At"]),
+        clientMutationId: `phase2-rehearsal-cleanup:${setup.targetMatchId}:${setup.targetHole}:${randomUUID()}`,
+      }, `Phase 2 rehearsal cleanup · ${actorId}`);
+    } catch (error) {
+      if (attempt === 3) throw error;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+    }
+  }
+  throw new Error("The reversible Google rehearsal score could not be restored.");
+}
+
+async function cleanupRehearsal(setup, actorId) {
+  const reset = await replaceCanonicalScoringAuthorityImport(setup.rehearsal);
+  if (!reset.payload?.ok) throw new Error(`Rehearsal outbox cleanup failed (${reset.payload?.code || "unknown"}).`);
+  return restoreRehearsalGoogleScore(setup, actorId);
+}
+
 async function outboxRehearsal(actorId, cycles = 5) {
   const setup = await setupRehearsal(actorId);
   const changed = [...setup.originalTeam1];
   changed[0] = changed[0] >= 10 ? changed[0] - 1 : changed[0] + 1;
   let matchRevision = 0; let holeRevision = 0;
   const samples = [];
-  for (let cycle = 1; cycle <= cycles; cycle += 1) {
-    for (const [kind, team1] of [["change", changed], ["restore", setup.originalTeam1]]) {
-      const mutationStartedAt = Date.now();
-      const submitted = await submitRehearsalScore({ setup, team1, team2: setup.originalTeam2, matchRevision, holeRevision, actorId, label: `${cycle}:${kind}` });
-      matchRevision = number(submitted.response.payload.match_revision);
-      holeRevision = number(submitted.response.payload.hole_revision);
-      const worker = await processNextGoogleOutboxEvent({ actor: `Phase 2 outbox rehearsal · ${actorId}` });
-      if (!worker.ok) throw new Error(`Google outbox rehearsal failed (${worker.errorCode || "unknown"}).`);
-      samples.push({ cycle, kind, supabaseCommitMs: submitted.totalCommitMs,
-        googleDeliveryMs: worker.googleDurationMs, totalMirrorLagMs: Date.now() - mutationStartedAt,
-        checkpointRevision: worker.checkpoint?.last_supabase_match_revision });
+  let rehearsalError = null;
+  try {
+    for (let cycle = 1; cycle <= cycles; cycle += 1) {
+      for (const [kind, team1] of [["change", changed], ["restore", setup.originalTeam1]]) {
+        const mutationStartedAt = Date.now();
+        const submitted = await submitRehearsalScore({ setup, team1, team2: setup.originalTeam2, matchRevision, holeRevision, actorId, label: `${cycle}:${kind}` });
+        matchRevision = number(submitted.response.payload.match_revision);
+        holeRevision = number(submitted.response.payload.hole_revision);
+        const worker = await processNextGoogleOutboxEvent({ actor: `Phase 2 outbox rehearsal · ${actorId}` });
+        if (!worker.ok) throw new Error(`Google outbox rehearsal failed (${worker.errorCode || "unknown"}).`);
+        samples.push({ cycle, kind, supabaseCommitMs: submitted.totalCommitMs,
+          googleDeliveryMs: worker.googleDurationMs, totalMirrorLagMs: Date.now() - mutationStartedAt,
+          checkpointRevision: worker.checkpoint?.last_supabase_match_revision });
+      }
     }
-  }
-  const googleAfter = await inspectGoogleMatchState(setup.targetMatchId);
-  const restored = googleAfter.holes.find((row) => number(row["Hole Number"]) === setup.targetHole);
-  const restorationPass = JSON.stringify(grossScoresFromCell(restored?.["Team 1 Gross Scores"])) === JSON.stringify(setup.originalTeam1) &&
-    JSON.stringify(grossScoresFromCell(restored?.["Team 2 Gross Scores"])) === JSON.stringify(setup.originalTeam2);
+  } catch (error) { rehearsalError = error; }
+  const cleanup = await cleanupRehearsal(setup, actorId);
   const refreshed = await importMain(actorId);
+  if (rehearsalError) throw rehearsalError;
   return { setup: { matchId: setup.targetMatchId, hole: setup.targetHole, originalGoogleRevision: setup.originalGoogleRevision,
-    finalGoogleRevision: number(restored?.Revision), cycles }, samples,
+    finalGoogleRevision: cleanup.revision, cycles }, samples,
     performance: { supabaseCommit: benchmarkSummary(samples.map((row) => row.supabaseCommitMs)),
       googleDelivery: benchmarkSummary(samples.map((row) => row.googleDeliveryMs)), mirrorLag: benchmarkSummary(samples.map((row) => row.totalMirrorLagMs)) },
-    restorationPass, mainParityRestored: refreshed.report.pass, rehearsalTournamentId: setup.rehearsal.tournament.tournament_id };
+    restorationPass: cleanup.restored, cleanup, mainParityRestored: refreshed.report.pass, rehearsalTournamentId: setup.rehearsal.tournament.tournament_id };
 }
 
 async function outboxFailureRehearsal(actorId) {
