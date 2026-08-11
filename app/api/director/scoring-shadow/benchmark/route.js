@@ -4,7 +4,6 @@ import { inspectTournamentDirectorToken } from "../../../../../lib/player-passpo
 import {
   confirmLiveMatchScorecard,
   readWorkbookSheetsByName,
-  reopenLiveMatch,
   restorePreviewScoringBenchmarkRows,
   saveLiveHoleScore,
   withWorkbookWriteDiagnostics,
@@ -275,13 +274,73 @@ async function runBurst(gate) {
   return { sampleCount: samples.length, maximumQueueDepth: 11, ...summaries(samples), errors: 0, restored: true };
 }
 
+async function priorShadowGrossScores(gate, matchId, holeNumber, currentRevision) {
+  const history = await readScoringShadowRows("score_mirror_events", `source_workbook_id=eq.${encodeURIComponent(gate.sourceWorkbookId)}&match_id=eq.${encodeURIComponent(matchId)}&hole_number=eq.${Number(holeNumber)}&select=google_revision,canonical_payload&order=google_revision.desc`);
+  const prior = (history.payload || []).find((item) => Number(item.google_revision) < Number(currentRevision));
+  if (!prior?.canonical_payload) throw new Error(`The prior verified score for ${matchId} hole ${holeNumber} was not found.`);
+  return {
+    team1: prior.canonical_payload.team_1_gross_scores,
+    team2: prior.canonical_payload.team_2_gross_scores,
+  };
+}
+
+async function runBurstSegment(gate, segment, mode) {
+  const ranges = [[1, 3], [4, 6], [7, 9], [10, 11]];
+  const [startHole, endHole] = ranges[segment - 1] || [];
+  if (!startHole) throw new Error("A valid burst segment is required.");
+  const matchId = "2026-R3-9";
+  const samples = [];
+  const startedAt = now();
+  let rows = await workbookState();
+  let currentMatch = matchAndHole(rows, matchId, startHole).match;
+  for (let holeNumber = startHole; holeNumber <= endHole; holeNumber += 1) {
+    const currentHole = rows.holes.find((item) => clean(item["Match ID"]) === matchId && Number(item["Hole Number"]) === holeNumber);
+    let team1;
+    let team2;
+    if (mode === "restore") {
+      const prior = await priorShadowGrossScores(gate, matchId, holeNumber, currentHole.Revision);
+      team1 = prior.team1;
+      team2 = prior.team2;
+    } else {
+      const changed = changedScores(currentHole, currentMatch.Format, 1);
+      team1 = changed.team1;
+      team2 = changed.team2;
+    }
+    const sample = await measuredMutation({
+      gate,
+      match: currentMatch,
+      hole: currentHole,
+      team1,
+      team2,
+      mutationKey: `benchmark:burst:${mode}:${holeNumber}:${Date.now()}`,
+    });
+    samples.push(sample);
+    currentMatch = { ...currentMatch, "Updated At": sample.participantResult.updatedAt };
+    rows = { ...rows, holes: rows.holes.map((item) => clean(item["Match ID"]) === matchId && Number(item["Hole Number"]) === holeNumber ? sample.participantResult.hole : item) };
+  }
+  return {
+    segment,
+    mode,
+    holes: Array.from({ length: endHole - startHole + 1 }, (_, index) => startHole + index),
+    sampleCount: samples.length,
+    segmentDurationMs: now() - startedAt,
+    maximumQueueDepth: mode === "forward" ? 11 : 0,
+    ...summaries(samples),
+    raw: {
+      google: samples.map((item) => item.googleAuthoritativeMs),
+      supabase: samples.map((item) => item.supabaseTransactionMs),
+      shadowCalculation: samples.map((item) => item.shadowCalculationMs),
+      mirrorLag: samples.map((item) => item.mirrorLagMs),
+      retries: samples.map((item) => Number(item.googleDiagnostics?.retryLoops || 0)),
+    },
+  };
+}
+
 async function runConcurrency(gate) {
   const initial = await workbookState();
   const round3 = initial.matches.filter((match) => Number(match.Round) === 3).slice(0, 12);
   if (round3.length !== 12) throw new Error("Twelve Round 3 matches are required.");
-  const finals = round3.filter((match) => /^final$/i.test(clean(match["Match Status"])));
-  for (const match of finals) await reopenLiveMatch(clean(match["Match ID"]), ACTOR);
-  const ready = await workbookState();
+  const ready = initial;
   const prepared = round3.map((originalMatch) => {
     const matchId = clean(originalMatch["Match ID"]);
     const match = ready.matches.find((item) => clean(item["Match ID"]) === matchId);
@@ -296,6 +355,7 @@ async function runConcurrency(gate) {
   })));
   const samples = settled.filter((item) => item.status === "fulfilled").map((item) => item.value);
   const errors = settled.filter((item) => item.status === "rejected").map((item) => clean(item.reason?.message));
+  const directRestores = { matches: [], holes: [] };
   for (let index = 0; index < prepared.length; index += 1) {
     const preparedItem = prepared[index];
     const result = settled[index];
@@ -303,14 +363,56 @@ async function runConcurrency(gate) {
     if (preparedItem.hole) {
       await restoredMutation({ gate, matchId: clean(preparedItem.match["Match ID"]), holeNumber: 1, team1: preparedItem.scores.originalTeam1, team2: preparedItem.scores.originalTeam2, prior: result.value, suffix: "restore" });
     } else {
-      await restorePreviewScoringBenchmarkRows({
-        matches: [{ matchId: clean(preparedItem.originalMatch["Match ID"]), record: preparedItem.originalMatch }],
-        holes: [{ matchId: clean(preparedItem.originalMatch["Match ID"]), holeNumber: 1, record: null }],
-      });
+      directRestores.matches.push({ matchId: clean(preparedItem.originalMatch["Match ID"]), record: preparedItem.originalMatch });
+      directRestores.holes.push({ matchId: clean(preparedItem.originalMatch["Match ID"]), holeNumber: 1, record: null });
     }
   }
-  for (const original of finals) await confirmLiveMatchScorecard(clean(original["Match ID"]), ACTOR);
-  return { concurrentRequests: 12, successful: samples.length, errors, totalMs: now() - startedAt, ...summaries(samples), restored: true };
+  if (directRestores.matches.length || directRestores.holes.length) await restorePreviewScoringBenchmarkRows(directRestores);
+  return {
+    concurrentRequests: 12,
+    eligibleNonFinalRequests: round3.filter((match) => !/^final$/i.test(clean(match["Match Status"]))).length,
+    successful: samples.length,
+    errors,
+    lifecycleBlocks: errors.filter((message) => /reopen|final/i.test(message)).length,
+    totalMs: now() - startedAt,
+    ...summaries(samples),
+    raw: {
+      google: samples.map((item) => item.googleAuthoritativeMs),
+      supabase: samples.map((item) => item.supabaseTransactionMs),
+      mirrorLag: samples.map((item) => item.mirrorLagMs),
+    },
+    restored: true,
+  };
+}
+
+async function runSupabaseConcurrency(gate) {
+  const events = await readScoringShadowRows("score_mirror_events", `source_workbook_id=eq.${encodeURIComponent(gate.sourceWorkbookId)}&select=match_id,hole_number,google_revision&order=observed_at.desc`);
+  const unique = [];
+  const seen = new Set();
+  for (const event of events.payload || []) {
+    if (seen.has(event.match_id)) continue;
+    seen.add(event.match_id);
+    unique.push(event);
+    if (unique.length === 12) break;
+  }
+  if (unique.length !== 12) throw new Error("Twelve stored match observations are required for Supabase concurrency.");
+  const startedAt = now();
+  const settled = await Promise.allSettled(unique.map((event) => replayExistingScoringShadowObservation({
+    sourceWorkbookId: gate.sourceWorkbookId,
+    matchId: event.match_id,
+    holeNumber: Number(event.hole_number),
+    googleRevision: Number(event.google_revision),
+  })));
+  const fulfilled = settled.filter((item) => item.status === "fulfilled").map((item) => item.value);
+  return {
+    concurrentRequests: 12,
+    distinctMatches: unique.map((item) => item.match_id),
+    successful: fulfilled.length,
+    errors: settled.filter((item) => item.status === "rejected").map((item) => clean(item.reason?.message)),
+    totalMs: now() - startedAt,
+    transaction: benchmarkSummary(fulfilled.map((item) => item.replay.totalDurationMs)),
+    googleTouched: false,
+  };
 }
 
 async function runTwoDeviceConflict(gate) {
@@ -512,6 +614,7 @@ export async function POST(request) {
     let result;
     const baselineMatch = action.match(/^baseline-(\d+)$/);
     const correctionMatch = action.match(/^correction-(\d+)$/);
+    const burstMatch = action.match(/^burst-(forward|restore)-(\d+)$/);
     if (action === "preflight") result = await runPreflight(context.gate);
     else if (action === "repair-interrupted-baseline") result = await repairInterruptedBaseline(context.gate);
     else if (baselineMatch) result = await runBaseline(context.gate, 1, Number(baselineMatch[1]) - 1, "baseline");
@@ -522,6 +625,8 @@ export async function POST(request) {
     else if (["gate-a", "gate-b", "final-rebuild"].includes(action)) result = await runRebuild(context.gate, context.identity.actor.name);
     else if (action === "burst") result = await runBurst(context.gate);
     else if (action === "concurrency") result = await runConcurrency(context.gate);
+    else if (action === "supabase-concurrency") result = await runSupabaseConcurrency(context.gate);
+    else if (burstMatch) result = await runBurstSegment(context.gate, Number(burstMatch[2]), burstMatch[1]);
     else if (action === "two-device") result = await runTwoDeviceConflict(context.gate);
     else if (action === "finalization-race") result = await runFinalizationGate(context.gate);
     else if (action === "supabase-failure") result = await runSupabaseFailureIsolation(context.gate);
