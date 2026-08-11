@@ -282,6 +282,8 @@ test("Preview Director repair is gated, audited, and never re-finalizes or chang
   assert.match(route, /repairFinalizedLiveMatchParity/);
   assert.match(route, /completeCanonicalFinalizationParityRepair/);
   assert.match(writer, /Only a finalized Preview match can be parity-repaired/);
+  assert.match(writer, /if \(!sheet\.headers\.includes\("Scoring Locked"\)\)/);
+  assert.match(writer, /range: `Live Matches!\$\{headerColumn\}1`/);
   assert.match(writer, /"Scoring Locked": "TRUE"/);
   assert.match(writer, /"Access Active": "FALSE"/);
   assert.match(writer, /Finalized Preview lifecycle parity did not verify from Google/);
