@@ -121,6 +121,14 @@ test("Phase 2 dry-run migration enforces isolation, cross-instance locking, revi
   assert.match(sql, /grant execute on function public\.submit_hole_score_dry_run\(jsonb\) to service_role/i);
 });
 
+test("dry-run hashing resolves pgcrypto through a versioned hardened search-path migration", async () => {
+  const sql = await readFile(new URL("../supabase/migrations/202608110002_preview_scoring_authority_dry_run_extensions.sql", import.meta.url), "utf8");
+  assert.match(sql, /alter function public\.submit_hole_score_dry_run\(jsonb\)[\s\S]*extensions/i);
+  assert.match(sql, /alter function public\.finalize_match_dry_run\(jsonb\)[\s\S]*extensions/i);
+  assert.match(sql, /notify pgrst, 'reload schema'/i);
+  assert.doesNotMatch(sql, /grant\s+execute[\s\S]+(?:anon|authenticated)/i);
+});
+
 test("dry-run RPC preserves post-clinch scoring and prevents a non-contiguous false clinch", async () => {
   const sql = await readFile(new URL("../supabase/migrations/202608110001_preview_scoring_authority_dry_run.sql", import.meta.url), "utf8");
   assert.match(sql, /contiguous and clinch_hole is not null/i);
