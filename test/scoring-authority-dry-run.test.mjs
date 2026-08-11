@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildScoringAuthorityDryRunFixture,
   dryRunMutationInput,
+  mergeScoringAuthorityHoleResults,
   resolveScoringAuthorityCourseSnapshot,
   scoringDryRunAuthorization,
 } from "../lib/scoring-authority-dry-run.js";
@@ -100,6 +101,17 @@ test("dry-run mutation carries independent expected match/hole revisions and tru
   assert.deepEqual(input.authorization, scoringDryRunAuthorization(fixture));
   assert.equal(input.authorization.passport_verified, true);
   assert.equal(input.authorization.permission_revision, 3);
+});
+
+test("benchmark equivalence merges prior confirmed holes before comparing match progress", () => {
+  const newest = { holeNumber: 2, winner: "Team 1" };
+  assert.deepEqual(mergeScoringAuthorityHoleResults([
+    { hole_number: 1, hole_winner: "Team 1" },
+    { hole_number: 2, hole_winner: "Halved" },
+  ], newest), [
+    { holeNumber: 1, winner: "Team 1" },
+    newest,
+  ]);
 });
 
 test("Phase 2 dry-run migration enforces isolation, cross-instance locking, revisions, idempotency, and atomic outbox", async () => {

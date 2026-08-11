@@ -7,6 +7,7 @@ import {
   buildScoringAuthorityDryRunFixture,
   dryRunMutationInput,
   finalizeScoringAuthorityDryRun,
+  mergeScoringAuthorityHoleResults,
   readScoringAuthorityDryRun,
   recordScoringAuthorityDryRunSample,
   resetScoringAuthorityDryRun,
@@ -188,7 +189,8 @@ async function baselineSample(index, authorizationMs) {
   });
   const response = await submitScoringAuthorityDryRun(input);
   const calculated = expectedCalculation(fixture, holeNumber, team1, team2);
-  const equivalence = comparison(response.payload, calculated);
+  const expectedScorecard = mergeScoringAuthorityHoleResults(current.holes, calculated);
+  const equivalence = comparison(response.payload, calculated, expectedScorecard, fixture.format);
   const pass = response.payload?.ok && Object.values(equivalence).every(Boolean);
   const sample = await recordSample({ fixtureSet: MAIN_SET, operation: "MUTATION_BASELINE", matchId, holeNumber, authorizationMs, response, outcome: pass ? "PASS" : "DIVERGENCE", diagnostics: equivalence });
   return { index: index + 1, matchId, holeNumber, result: response.payload, equivalence, sample };
