@@ -9,16 +9,18 @@ import {
   buildCanonicalScoringAuthorityImport,
   canonicalAuthorityFingerprint,
   commitAuthorityEpoch,
+  completeCanonicalFinalizationParityRepair,
   inspectCanonicalAuthoritySecurity,
   prepareAuthorityEpoch,
   readCanonicalScoringAuthority,
   reconcileCanonicalScoringAuthority,
+  repairCanonicalFinalizationParity,
   replaceCanonicalScoringAuthorityImport,
   submitCanonicalHoleScore,
 } from "../../../../lib/scoring-authority-supabase.js";
 import { benchmarkSummary } from "../../../../lib/scoring-shadow.js";
 import { drainGoogleOutbox, inspectGoogleMatchState, processNextGoogleOutboxEvent } from "../../../../lib/scoring-google-outbox.js";
-import { readWorkbookSheetsByName, saveLiveHoleScore } from "../../../../lib/google-sheets-write.js";
+import { readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { grossScoresFromCell } from "../../../../lib/live-score-values.js";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +28,7 @@ export const maxDuration = 300;
 
 const clean = (value) => String(value ?? "").trim();
 const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+const truthy = (value) => /^(true|yes|1|locked)$/i.test(clean(value));
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404 });
 const WORKBOOK_TABS = ["Tournaments", "Players", "Handicaps", "Team Names", "Rounds", "Courses", "Course Holes", "Live Matches", "Matches", "Live Hole Scores"];
 
@@ -155,6 +158,80 @@ async function commitMainRollback(actorId, epochId) {
     throw Object.assign(new Error(`Rollback commit failed (${committed.payload?.code || "unknown"}).`), { code: committed.payload?.code });
   }
   return { drained, reconciliation: snapshot.report, committed: committed.payload, security: snapshot.security };
+}
+
+async function repairFinalizationParity(actorId, matchIdValue) {
+  const matchId = clean(matchIdValue);
+  if (!matchId) throw Object.assign(new Error("A finalized match is required."), { code: "MATCH_REQUIRED" });
+  const authority = scoringAuthorityEnvironment();
+  if (authority.resolved !== "supabase") throw Object.assign(new Error("Supabase must be the active Preview scoring authority."), { code: "SUPABASE_NOT_AUTHORITY" });
+  const before = await readCanonicalScoringAuthority({ match_id: matchId, mode: "MATCH" });
+  const match = before.payload?.data;
+  if (!before.payload?.ok || !match || clean(match.status).toUpperCase() !== "FINAL" || match.scoring_locked !== true) {
+    throw Object.assign(new Error("The selected match is not in the canonical locked Final state."), { code: "FINAL_LOCK_REQUIRED" });
+  }
+  const repairKey = `finalization-parity:${matchId}:R${number(match.match_revision)}`;
+  const repaired = await repairCanonicalFinalizationParity({
+    environment: "PREVIEW",
+    director_authorized: true,
+    tournament_id: match.tournament_id,
+    match_id: matchId,
+    expected_match_revision: number(match.match_revision),
+    repair_key: repairKey,
+    actor_id: actorId,
+  });
+  if (!repaired.payload?.ok) throw Object.assign(new Error(`Supabase Final permission repair failed (${repaired.payload?.code || "unknown"}).`), { code: repaired.payload?.code });
+  const permissionRevision = number(repaired.payload.permission_revision);
+  const google = await withWorkbookWriteDiagnostics("finalization-parity-repair", () => repairFinalizedLiveMatchParity(
+    matchId, { permissionRevision }, `Finalization parity repair · ${actorId}`,
+  ));
+  const googleMatch = google.result?.match || {};
+  const googleUpdatedAt = clean(googleMatch["Updated At"] || google.result?.updatedAt);
+  const verifiedFingerprint = canonicalAuthorityFingerprint({
+    match_id: matchId,
+    match_revision: number(match.match_revision),
+    permission_revision: permissionRevision,
+    status: "FINAL",
+    scoring_locked: true,
+    access_active: false,
+    google_match_updated_at: googleUpdatedAt,
+    operation: "FINALIZATION_PARITY_REPAIR",
+  });
+  const completed = await completeCanonicalFinalizationParityRepair({
+    environment: "PREVIEW",
+    director_authorized: true,
+    tournament_id: match.tournament_id,
+    match_id: matchId,
+    expected_match_revision: number(match.match_revision),
+    repair_key: repairKey,
+    actor_id: actorId,
+    google_match_updated_at: googleUpdatedAt,
+    google_match_revision: number(googleMatch.Revision),
+    verified_fingerprint: verifiedFingerprint,
+  });
+  if (!completed.payload?.ok) throw Object.assign(new Error(`Finalization parity checkpoint failed (${completed.payload?.code || "unknown"}).`), { code: completed.payload?.code });
+  const source = await authoritativeImport(actorId);
+  const reconciled = await currentAndReconcile(source.imported);
+  return {
+    matchId,
+    matchRevisionBefore: number(match.match_revision),
+    matchRevisionAfter: number(repaired.payload.match_revision),
+    previousPermissionRevision: number(repaired.payload.previous_permission_revision, permissionRevision),
+    permissionRevision,
+    supabase: repaired.payload,
+    google: {
+      status: clean(googleMatch["Match Status"]),
+      scoringLocked: truthy(googleMatch["Scoring Locked"]),
+      accessActive: truthy(googleMatch["Access Active"]),
+      accessVersion: number(googleMatch["Access Version"]),
+      updatedAt: googleUpdatedAt,
+      changed: Boolean(google.result?.changed),
+    },
+    checkpoint: completed.payload.checkpoint,
+    googleDiagnostics: google.diagnostics,
+    reconciliation: reconciled.report,
+    counts: source.imported.counts,
+  };
 }
 
 function rehearsalPayload(source, targetMatchId, targetHole) {
@@ -393,6 +470,8 @@ export async function POST(request) {
       const reconciled = await currentAndReconcile(source.imported);
       result = { counts: source.imported.counts, googleReadMs: source.googleReadMs, normalizationMs: source.normalizationMs,
         supabaseReadMs: reconciled.readMs, reconciliation: reconciled.report };
+    } else if (action === "repair-finalization-parity") {
+      result = await repairFinalizationParity(actorId, input.matchId);
     } else if (action === "outbox-rehearsal") result = await outboxRehearsal(actorId, number(input.cycles, 5));
     else if (action === "outbox-failures") result = await outboxFailureRehearsal(actorId);
     else if (action === "cutover-rollback-rehearsal") result = await cutoverRollbackRehearsal(actorId);

@@ -152,6 +152,68 @@ test("Google outbox diagnostics distinguish writer failure from checkpoint failu
   assert.match(result.errorMessage, /Checkpoint update failed/);
 });
 
+test("Finalization outbox mirrors and verifies the separate Google lock and access state", async () => {
+  const calls = [];
+  let completed = 0;
+  const event = { id: "00000000-0000-0000-0000-000000000004", event_type: "MATCH_FINALIZED", match_id: "M1",
+    match_revision: 20, mutation_key: "finalize-M1", attempts: 1,
+    payload: { permission_revision: 2, scoring_locked: true, access_active: false } };
+  const result = await processNextGoogleOutboxEvent({ dependencies: {
+    claimGoogleOutbox: async () => ({ payload: { event, checkpoint: { last_supabase_match_revision: 19 } } }),
+    finalizeLiveMatch: async (matchId, updates) => { calls.push({ matchId, updates }); return { "Match ID": matchId }; },
+    readWorkbookSheetsByName: async (_tabs, options) => {
+      calls.push({ fresh: options?.fresh });
+      return { "Live Matches": sheet([{ "Match ID": "M1", "Match Status": "Final", "Scoring Locked": true,
+        "Access Active": false, "Access Version": 2, "Updated At": "2026-08-11T12:00:00.000Z" }]) };
+    },
+    measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
+    completeGoogleOutbox: async () => { completed += 1; return { payload: { ok: true, checkpoint: { last_supabase_match_revision: 20 } } }; },
+    failGoogleOutbox: async () => { throw new Error("should not fail"); },
+  } });
+  assert.equal(result.ok, true);
+  assert.deepEqual(calls[0], { matchId: "M1", updates: { "Scoring Locked": true, "Access Active": false, "Access Version": 2 } });
+  assert.deepEqual(calls[1], { fresh: true });
+  assert.equal(completed, 1);
+});
+
+test("Finalization outbox remains retryable until Google confirms the lock field", async () => {
+  let completed = 0;
+  let failed = 0;
+  const event = { id: "00000000-0000-0000-0000-000000000005", event_type: "MATCH_FINALIZED", match_id: "M1",
+    match_revision: 20, mutation_key: "finalize-M1-unverified", attempts: 1, payload: { permission_revision: 2 } };
+  const result = await processNextGoogleOutboxEvent({ dependencies: {
+    claimGoogleOutbox: async () => ({ payload: { event, checkpoint: {} } }),
+    finalizeLiveMatch: async () => ({ "Match ID": "M1" }),
+    readWorkbookSheetsByName: async () => ({ "Live Matches": sheet([{ "Match ID": "M1", "Match Status": "Final",
+      "Scoring Locked": false, "Access Active": false, "Access Version": 2 }]) }),
+    measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
+    completeGoogleOutbox: async () => { completed += 1; return { payload: { ok: true } }; },
+    failGoogleOutbox: async () => { failed += 1; },
+  } });
+  assert.equal(result.ok, false);
+  assert.equal(result.errorCode, "GOOGLE_LIFECYCLE_VERIFICATION_FAILED");
+  assert.equal(result.errorStage, "google-verification");
+  assert.equal(completed, 0);
+  assert.equal(failed, 1);
+});
+
+test("Reopen outbox restores versioned Google access and verifies the inverse lifecycle", async () => {
+  let reopenCall;
+  const event = { id: "00000000-0000-0000-0000-000000000006", event_type: "MATCH_REOPENED", match_id: "M1",
+    match_revision: 21, mutation_key: "reopen-M1", attempts: 1, payload: { permission_revision: 3 } };
+  const result = await processNextGoogleOutboxEvent({ dependencies: {
+    claimGoogleOutbox: async () => ({ payload: { event, checkpoint: { last_supabase_match_revision: 20 } } }),
+    reopenLiveMatch: async (matchId, actor, updates) => { reopenCall = { matchId, actor, updates }; return { "Match ID": matchId }; },
+    readWorkbookSheetsByName: async () => ({ "Live Matches": sheet([{ "Match ID": "M1", "Match Status": "Reopened",
+      "Scoring Locked": false, "Access Active": true, "Access Version": 3, "Updated At": "2026-08-11T12:01:00.000Z" }]) }),
+    measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
+    completeGoogleOutbox: async () => ({ payload: { ok: true, checkpoint: { last_supabase_match_revision: 21 } } }),
+    failGoogleOutbox: async () => { throw new Error("should not fail"); },
+  } });
+  assert.equal(result.ok, true);
+  assert.deepEqual(reopenCall.updates, { "Scoring Locked": false, "Access Active": true, "Access Version": 3 });
+});
+
 test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cutover, and rollback guards", async () => {
   const schema = await readFile(new URL("../supabase/migrations/202608120001_preview_scoring_authority_schema.sql", import.meta.url), "utf8");
   const transactions = await readFile(new URL("../supabase/migrations/202608120002_preview_scoring_authority_transactions.sql", import.meta.url), "utf8");
@@ -161,6 +223,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const deleteOrder = await readFile(new URL("../supabase/migrations/202608120006_preview_scoring_authority_import_delete_order.sql", import.meta.url), "utf8");
   const ingress = await readFile(new URL("../supabase/migrations/202608120007_preview_scoring_authority_cutover_ingress.sql", import.meta.url), "utf8");
   const diagnostics = await readFile(new URL("../supabase/migrations/202608120008_preview_scoring_client_diagnostics.sql", import.meta.url), "utf8");
+  const finalizationPermissions = await readFile(new URL("../supabase/migrations/202608120010_preview_scoring_authority_finalization_permissions.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -200,6 +263,30 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.match(diagnostics, /create or replace function public\.read_preview_scoring_participant_context\(input jsonb\)/i);
   assert.match(diagnostics, /permission_ok and match_row\.status <> 'FINAL' and not match_row\.scoring_locked/i);
   assert.match(diagnostics, /revoke all on function public\.read_preview_scoring_participant_context\(jsonb\) from public, anon, authenticated/i);
+  assert.match(finalizationPermissions, /permission_revision = next_permission_revision/i);
+  assert.match(finalizationPermissions, /can_score = false[\s\S]+revoked_at = transition_at/i);
+  assert.match(finalizationPermissions, /can_score = true[\s\S]+revoked_at = null/i);
+  assert.match(finalizationPermissions, /FINALIZATION_PERMISSION_REPAIRED/i);
+  assert.match(finalizationPermissions, /match_row\.match_revision, match_row\.match_revision/i,
+    "the one-time repair preserves the authoritative match revision");
+  assert.match(finalizationPermissions, /revoke all on function public\.repair_preview_finalization_parity\(jsonb\) from public, anon, authenticated/i);
+  assert.match(finalizationPermissions, /grant execute on function public\.repair_preview_finalization_parity\(jsonb\) to service_role/i);
+});
+
+test("Preview Director repair is gated, audited, and never re-finalizes or changes holes", async () => {
+  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
+  const writer = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
+  assert.match(route, /action === "repair-finalization-parity"/);
+  assert.match(route, /expected_match_revision: number\(match\.match_revision\)/);
+  assert.match(route, /repairFinalizedLiveMatchParity/);
+  assert.match(route, /completeCanonicalFinalizationParityRepair/);
+  assert.match(writer, /Only a finalized Preview match can be parity-repaired/);
+  assert.match(writer, /"Scoring Locked": "TRUE"/);
+  assert.match(writer, /"Access Active": "FALSE"/);
+  assert.match(writer, /Finalized Preview lifecycle parity did not verify from Google/);
+  assert.doesNotMatch(writer.match(/export async function repairFinalizedLiveMatchParity[\s\S]+?\n}\n/)?.[0] || "", /Live Hole Scores/);
+  assert.match(dashboard, /Repair Selected Final Parity/);
 });
 
 test("participant scoring routes preserve the API and delegate persistence server-side", async () => {
