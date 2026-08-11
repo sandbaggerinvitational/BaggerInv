@@ -127,6 +127,17 @@ test("migration creates service-only RLS tables, uniqueness, and no silent relin
   assert.match(migration, /references auth\.users/);
 });
 
+test("Preview identity RPCs resolve and execute the hosted pgcrypto digest signature", async () => {
+  const migration = await source("supabase/migrations/202608120013_preview_participant_identity_pgcrypto.sql");
+  assert.match(migration, /create extension if not exists pgcrypto with schema extensions/i);
+  assert.match(migration, /alter function public\.import_participant_identity_configuration\(jsonb\)[\s\S]*extensions, pg_temp/i);
+  assert.match(migration, /alter function public\.admin_link_auth_user_to_player\(jsonb\)[\s\S]*extensions, pg_temp/i);
+  assert.match(migration, /extensions\.digest\([\s\S]*::text[\s\S]*'sha256'::text/i);
+  assert.match(migration, /a484de7736d931eaed53ab7afebb8e973d8e8691850c1880ba4ec877bedbf2e0/);
+  assert.match(migration, /notify pgrst, 'reload schema'/i);
+  assert.doesNotMatch(migration, /grant\s+execute[\s\S]+(?:anon|authenticated)/i);
+});
+
 test("Director identity operations are Preview-only and no participant login or Auth-user creation route exists", async () => {
   const route = await source("app/api/director/participant-identity/route.js");
   const context = await source("app/api/participant/context/route.js");
