@@ -473,7 +473,9 @@ test("Phase 1 remains read-inactive while Phase 2 mirror-back is isolated behind
   assert.match(serviceAccessMigration, /grant select, insert on table public\.mirror_reconciliation_runs to service_role/);
   assert.doesNotMatch(serviceAccessMigration, /grant (?:update|delete|all).*service_role/i);
   assert.match(serviceAccessMigration, /revoke all .* from anon, authenticated/g);
-  assert.doesNotMatch(envExample, /NEXT_PUBLIC_SUPABASE/);
+  assert.match(envExample, /NEXT_PUBLIC_SUPABASE_AUTH_URL/);
+  assert.match(envExample, /NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY/);
+  assert.doesNotMatch(envExample, /NEXT_PUBLIC_(?:SUPABASE_SCORING_MIRROR_SECRET_KEY|SUPABASE_DB_URL|SUPABASE_SERVER_SECRET)/);
   assert.match(route, /measured\.authority === "supabase"/);
   assert.match(route, /drainGoogleOutbox/);
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /SUPABASE_SCORING_MIRROR_SECRET_KEY|createClient\(/i);

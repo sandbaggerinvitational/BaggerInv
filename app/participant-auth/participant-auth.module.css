@@ -1,0 +1,15 @@
+.page { min-height: 100svh; display: grid; place-items: center; padding: 28px 18px; background: linear-gradient(155deg, #061f18, #0b4435 58%, #d4b15f); }
+.card { width: min(100%, 460px); padding: 30px 24px; border-radius: 24px; background: #fffdf8; box-shadow: 0 24px 70px rgba(0,0,0,.28); }
+.eyebrow { color: #8b6a24; font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.card h1 { margin: 10px 0 8px; color: #0b3529; font-family: Georgia, "Times New Roman", serif; font-size: 2rem; }
+.card p { color: #56625c; line-height: 1.55; }
+.card form { display: grid; gap: 12px; margin-top: 20px; }
+.card label { display: grid; gap: 7px; color: #21372f; font-size: .84rem; font-weight: 800; }
+.card input { min-height: 50px; width: 100%; padding: 10px 13px; border: 1px solid #c7cec9; border-radius: 12px; background: white; color: #172019; font-size: 16px; }
+.card button { min-height: 48px; padding: 10px 17px; border: 0; border-radius: 999px; background: #0b4435; color: white; font-weight: 800; }
+.card button:disabled { opacity: .56; }
+.session { display: grid; gap: 9px; margin: 22px 0; padding: 18px; border: 1px solid #c8ddcf; border-radius: 16px; background: #eff8f1; }
+.session strong { color: #0b4435; }
+.session span { color: #56625c; font-size: .88rem; }
+.message { padding: 12px 14px; border-radius: 12px; background: #f5f0e6; color: #172019 !important; font-weight: 700; }
+.card small { display: block; margin-top: 18px; color: #7b827e; }

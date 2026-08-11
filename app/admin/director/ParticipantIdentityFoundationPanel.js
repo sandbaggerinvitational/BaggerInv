@@ -33,6 +33,7 @@ export default function ParticipantIdentityFoundationPanel() {
       await load();
       setMessage(action === "initialize-source" ? "Preview identity configuration sheet initialized."
         : action === "refresh" ? "Identity configuration imported and validated."
+        : action === "provision-single-auth" ? "One approved Preview Auth user and Player link are prepared. No sign-in email was sent."
         : "Identity mapping fingerprint approved. No Auth users were created.");
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
@@ -41,6 +42,7 @@ export default function ParticipantIdentityFoundationPanel() {
   const review = data.review;
   const clean = review.quality?.pass === true;
   const latestApproved = review.latestRun?.status === "APPROVED" && review.latestRun?.fingerprint === review.fingerprint;
+  const rehearsal = data.authRehearsal;
   return <section className={styles.identityFoundation} aria-labelledby="identity-foundation-title">
     <header><span>Preview only · Non-activating</span><h3 id="identity-foundation-title">Participant Identity Foundation</h3>
       <p>Passport remains authoritative. Shadow Auth is disabled. This surface validates explicit Player ID/email ownership without creating users or sending email.</p></header>
@@ -53,6 +55,9 @@ export default function ParticipantIdentityFoundationPanel() {
       <button disabled={Boolean(busy) || review.source.exists} onClick={() => act("initialize-source")}>{review.source.exists ? "Configuration Sheet Ready" : "Initialize Configuration Sheet"}</button>
       <button disabled={Boolean(busy) || !review.source.exists} onClick={() => act("refresh")}>Refresh Participant Identity Configuration</button>
       <button disabled={Boolean(busy) || !clean || latestApproved || review.latestRun?.fingerprint !== review.fingerprint} onClick={() => act("approve")}>Approve Mapping Fingerprint</button>
+      <button disabled={Boolean(busy) || !latestApproved || !rehearsal?.ready || Boolean(rehearsal?.rehearsal)} onClick={() => act("provision-single-auth")}>
+        {rehearsal?.rehearsal ? "Single Auth Rehearsal Prepared" : "Provision One Preview Auth User"}
+      </button>
     </div>
     {!review.source.exists ? <p className={styles.identityInstruction}>Initialize the dedicated Preview worksheet. Then enter one explicit Tournament ID, Player ID, Email, and Identity Active value per golfer.</p> : null}
     <div className={styles.identityReview} role="region" aria-label="Participant identity mapping review">
@@ -62,6 +67,7 @@ export default function ParticipantIdentityFoundationPanel() {
       </article>)}
     </div>
     {review.latestRun ? <p className={styles.identityRun}>Latest import: {review.latestRun.status} · revision {review.latestRun.configurationRevision} · fingerprint {review.latestRun.fingerprint.slice(0, 12)}…{review.latestRun.approvedAt ? ` · approved ${new Date(review.latestRun.approvedAt).toLocaleString()}` : ""}</p> : null}
+    {rehearsal?.candidate ? <p className={styles.identityRun}>Single rehearsal candidate: {rehearsal.candidate.displayName} · {rehearsal.candidate.playerId} · {rehearsal.candidate.maskedEmail}. Dummy Auth users: {rehearsal.dummyAuthUsers}. No email is sent by provisioning.</p> : null}
     {message ? <p className={styles.identityMessage} role="status">{message}</p> : null}
   </section>;
 }

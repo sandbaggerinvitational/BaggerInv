@@ -138,7 +138,7 @@ test("Preview identity RPCs resolve and execute the hosted pgcrypto digest signa
   assert.doesNotMatch(migration, /grant\s+execute[\s\S]+(?:anon|authenticated)/i);
 });
 
-test("Director identity operations are Preview-only and no participant login or Auth-user creation route exists", async () => {
+test("Director foundation remains Preview-only and the single-user rehearsal is an explicit separate action", async () => {
   const route = await source("app/api/director/participant-identity/route.js");
   const context = await source("app/api/participant/context/route.js");
   const dashboard = await source("app/admin/director/ParticipantIdentityFoundationPanel.js");
@@ -149,7 +149,8 @@ test("Director identity operations are Preview-only and no participant login or 
   assert.match(route, /players\.length !== 24/);
   assert.match(route, /refresh/);
   assert.match(route, /approve/);
-  assert.doesNotMatch(route, /createUser|signInWithOtp|sendOtp/);
+  assert.match(route, /provision-single-auth/);
+  assert.doesNotMatch(route, /signInWithOtp|sendOtp/);
   assert.match(context, /identityAuthority/);
   assert.match(context, /readParticipantIdentityContext/);
   assert.match(dashboard, /No Auth users were created/);

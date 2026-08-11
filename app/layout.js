@@ -12,6 +12,7 @@ import ParticipantIdentity from "./ParticipantIdentity";
 import PwaLaunchSplash from "./PwaLaunchSplash";
 import DirectorTransactionStatus from "./DirectorTransactionStatus";
 import ParticipantRouteFrame from "./ParticipantRouteFrame";
+import ParticipantAuthDiagnostics from "./ParticipantAuthDiagnostics";
 import { Suspense } from "react";
 
 const homeMetadata = pageMetadata({
@@ -173,6 +174,7 @@ export default function RootLayout({ children }) {
         <PwaFoundation />
         <Suspense fallback={null}>
           <ParticipantIdentity />
+          <ParticipantAuthDiagnostics />
         </Suspense>
       </body>
     </html>

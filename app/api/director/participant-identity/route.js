@@ -5,10 +5,16 @@ import { assertParticipantIdentityAdministrativeEnvironment, participantIdentity
 import { validateParticipantIdentityConfiguration } from "../../../../lib/participant-identity.js";
 import {
   approveParticipantIdentityConfiguration,
+  configureSingleParticipantAuthRehearsal,
   importParticipantIdentityConfiguration,
   inspectParticipantIdentitySecurity,
+  linkAuthUserToPlayer,
   readParticipantIdentityAdmin,
+  readSingleParticipantAuthRehearsalPreflight,
+  setSingleParticipantAuthRehearsalStatus,
 } from "../../../../lib/participant-identity-supabase.js";
+import { assertSingleParticipantAuthPreflight, safeParticipantAuthCandidate } from "../../../../lib/participant-auth-rehearsal.js";
+import { createParticipantAuthAdminClient, provisionApprovedAuthUser } from "../../../../lib/supabase-auth-admin.js";
 import {
   initializePreviewParticipantIdentityConfiguration,
   readPreviewParticipantIdentityTournamentId,
@@ -74,16 +80,47 @@ async function loadReview() {
   };
 }
 
+async function loadAuthRehearsal(tournamentId) {
+  const result = await readSingleParticipantAuthRehearsalPreflight(tournamentId);
+  const data = result.payload || {};
+  return {
+    approved: data.approved === true,
+    ready: data.ready === true,
+    approvedFingerprint: data.approvedFingerprint || "",
+    activePlayers: Number(data.activePlayers || 0),
+    realIdentityCount: Number(data.realIdentityCount || 0),
+    dummyIdentityCount: Number(data.dummyIdentityCount || 0),
+    participantAuthUsers: Number(data.participantAuthUsers || 0),
+    dummyAuthUsers: Number(data.dummyAuthUsers || 0),
+    participantLinks: Number(data.participantLinks || 0),
+    dummyLinks: Number(data.dummyLinks || 0),
+    candidate: safeParticipantAuthCandidate(data.candidate),
+    rehearsal: data.rehearsal ? {
+      playerId: data.rehearsal.playerId,
+      status: data.rehearsal.status,
+      shadowEnabled: data.rehearsal.shadowEnabled === true,
+      rehearsalRevision: Number(data.rehearsal.rehearsalRevision || 0),
+      configuredAt: data.rehearsal.configuredAt,
+      configuredBy: data.rehearsal.configuredBy,
+    } : null,
+  };
+}
+
 export async function GET(request) {
   const authorization = await authorize(request);
   if (authorization.response) return authorization.response;
   try {
-    const [review, security] = await Promise.all([loadReview(), inspectParticipantIdentitySecurity()]);
+    const review = await loadReview();
+    const [security, authRehearsal] = await Promise.all([
+      inspectParticipantIdentitySecurity(),
+      loadAuthRehearsal(review.tournamentId),
+    ]);
     return NextResponse.json({
       ok: true,
       identity: participantIdentityAuthorityEnvironment(),
       review: { ...review, contacts: undefined },
       security: security.payload,
+      authRehearsal,
     }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     console.error("Participant identity review failed", { message: error?.message, code: error?.identityDiagnostics?.code || "" });
@@ -134,6 +171,66 @@ export async function POST(request) {
       }
       const approved = await approveParticipantIdentityConfiguration({ runId, fingerprint, approvedBy: director });
       return NextResponse.json({ ok: true, action, result: approved.payload });
+    }
+    if (action === "provision-single-auth") {
+      const review = await loadReview();
+      const raw = await readSingleParticipantAuthRehearsalPreflight(review.tournamentId);
+      const preflight = raw.payload || {};
+      const candidate = assertSingleParticipantAuthPreflight(preflight);
+      if (review.latestRun?.status !== "APPROVED" || review.latestRun.fingerprint !== preflight.approvedFingerprint || review.fingerprint !== preflight.approvedFingerprint) {
+        return NextResponse.json({ error: "The Director-approved mapping fingerprint is no longer current." }, { status: 409 });
+      }
+      const adminClient = createParticipantAuthAdminClient();
+      const provisioned = await provisionApprovedAuthUser({
+        email: candidate.emailNormalized,
+        playerId: candidate.playerId,
+        tournamentId: review.tournamentId,
+      }, { client: adminClient });
+      if (!provisioned.created && provisioned.user?.app_metadata?.provisioning_scope !== "preview_phase_a_single_player") {
+        return NextResponse.json({ error: "An existing Auth identity requires explicit Director review before linking." }, { status: 409 });
+      }
+      try {
+        const linked = await linkAuthUserToPlayer({
+          auth_user_id: provisioned.user.id,
+          player_id: candidate.playerId,
+          tournament_id: review.tournamentId,
+          linked_by: director,
+        });
+        const configured = await configureSingleParticipantAuthRehearsal({
+          auth_user_id: provisioned.user.id,
+          player_id: candidate.playerId,
+          tournament_id: review.tournamentId,
+          approved_fingerprint: preflight.approvedFingerprint,
+          configured_by: director,
+        });
+        const verified = await loadAuthRehearsal(review.tournamentId);
+        if (verified.dummyAuthUsers !== 0 || verified.dummyLinks !== 0 || verified.participantAuthUsers !== 1 || verified.participantLinks !== 1) {
+          throw new Error("Single-player provisioning verification failed closed.");
+        }
+        return NextResponse.json({ ok: true, action, created: provisioned.created,
+          linkCreated: linked.payload?.created === true, configured: configured.payload?.ok === true,
+          authRehearsal: verified });
+      } catch (error) {
+        if (provisioned.created) await adminClient.auth.admin.deleteUser(provisioned.user.id).catch(() => null);
+        throw error;
+      }
+    }
+    if (action === "suspend-single-auth" || action === "resume-single-auth") {
+      const review = await loadReview();
+      const raw = await readSingleParticipantAuthRehearsalPreflight(review.tournamentId);
+      const authUserId = raw.payload?.rehearsal?.authUserId;
+      if (!authUserId) return NextResponse.json({ error: "Prepared single-player Auth rehearsal was not found." }, { status: 409 });
+      const nextStatus = action === "suspend-single-auth" ? "SUSPENDED" : "PREPARED";
+      const adminClient = createParticipantAuthAdminClient();
+      const { error: authError } = await adminClient.auth.admin.updateUserById(authUserId, {
+        ban_duration: nextStatus === "SUSPENDED" ? "876000h" : "none",
+      });
+      if (authError) throw authError;
+      const changed = await setSingleParticipantAuthRehearsalStatus({
+        tournament_id: review.tournamentId, status: nextStatus, actor: director,
+        reason: nextStatus === "SUSPENDED" ? "Director suspended Preview Auth rehearsal" : "",
+      });
+      return NextResponse.json({ ok: true, action, result: changed.payload });
     }
     return NextResponse.json({ error: "Unsupported identity operation." }, { status: 400 });
   } catch (error) {
