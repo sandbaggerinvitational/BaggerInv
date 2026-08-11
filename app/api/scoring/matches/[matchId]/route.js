@@ -1,17 +1,16 @@
 import { after, NextResponse } from "next/server";
 import { canScoreMatch, scoringTokenFromRequest, verifyScoringSession } from "../../../../../lib/scoring-access.js";
 import {
-  confirmLiveMatchScorecard,
   readLiveScoringMatch,
-  saveLiveHoleScore,
   validateParticipantSession,
-  withWorkbookWriteDiagnostics,
 } from "../../../../../lib/google-sheets-write.js";
 import { clientAddress, consumeRateLimit } from "../../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../../lib/live-score-values.js";
 import { logScoringFailure, participantScoringError } from "../../../../../lib/scoring-api-errors.js";
 import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldScheduleScoringShadowObservation } from "../../../../../lib/scoring-shadow.js";
 import { scoringShadowEnvironment } from "../../../../../lib/scoring-shadow-gate.js";
+import { persistParticipantScore } from "../../../../../lib/scoring-persistence-adapter.js";
+import { drainGoogleOutbox } from "../../../../../lib/scoring-google-outbox.js";
 
 export const dynamic = "force-dynamic";
 
@@ -54,16 +53,15 @@ export async function POST(request, { params }) {
     }
     const submitted = await request.json();
     const input = submitted.action === "confirm" ? submitted : normalizeLiveScoringRequest(submitted);
-    const googleStartedAt = Date.now();
-    const measured = await withWorkbookWriteDiagnostics("participant-score", () => input.action === "confirm"
-      ? confirmLiveMatchScorecard(matchId, current.scorerName || "Authorized scorer")
-      : saveLiveHoleScore(matchId, input, current.scorerName || "Authorized scorer"));
+    const persistenceStartedAt = Date.now();
+    const measured = await persistParticipantScore({ matchId, input, current,
+      updatedBy: current.scorerName || "Authorized scorer" });
     const result = measured.result;
     const googleDiagnostics = measured.diagnostics;
-    const googleAuthoritativeMs = Date.now() - googleStartedAt;
+    const googleAuthoritativeMs = measured.authority === "google" ? Date.now() - persistenceStartedAt : 0;
     const { _shadow, ...participantResult } = result;
     const gate = scoringShadowEnvironment();
-    if (shouldScheduleScoringShadowObservation({ gate, participantResult, shadow: _shadow })) {
+    if (measured.authority === "google" && shouldScheduleScoringShadowObservation({ gate, participantResult, shadow: _shadow })) {
       const observation = buildScoringShadowObservation({
         sourceWorkbookId: gate.sourceWorkbookId,
         tournamentId: _shadow.match?.["Tournament ID"] || _shadow.match?.Year,
@@ -93,15 +91,21 @@ export async function POST(request, { params }) {
         }
       });
     }
+    if (measured.authority === "supabase") {
+      after(async () => {
+        const drained = await drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" });
+        if (!drained.ok) console.error("Supabase Google outbox remains pending", { matchId, failed: drained.failed });
+      });
+    }
     return NextResponse.json({ result: participantResult });
   } catch (error) {
-    const conflict = /updated by someone else/i.test(error?.message || "");
+    const conflict = Number(error?.status) === 409 || /updated by someone else/i.test(error?.message || "");
     logScoringFailure(error, { route: "/api/scoring/matches/[matchId]", conflict });
     return NextResponse.json(
       {
         error: participantScoringError(error),
       },
-      { status: conflict ? 409 : 400 }
+      { status: conflict ? 409 : Number(error?.status) === 403 ? 403 : 400 }
     );
   }
 }

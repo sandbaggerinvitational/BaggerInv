@@ -14,6 +14,8 @@ import {
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../lib/scorecard-data";
 import { directorTransactionError } from "../../../lib/director-transaction-error";
+import { persistDirectorMatchLifecycle } from "../../../lib/scoring-persistence-adapter";
+import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox";
 
 export const dynamic = "force-dynamic";
 
@@ -57,8 +59,24 @@ export async function POST(request) {
       let match;
       if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
       else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
-      else if (action === "finalize") match = await finalizeLiveMatch(matchId, updates, updatedBy, { includeCalcuttaPublicationTrace: process.env.VERCEL_ENV === "preview" });
-      else if (action === "reopen") match = await reopenLiveMatch(matchId, updatedBy);
+      else if (action === "finalize") {
+        const lifecycle = await persistDirectorMatchLifecycle({ action: "finalize", matchId, updatedBy });
+        if (!lifecycle.delegated) match = await finalizeLiveMatch(matchId, updates, updatedBy, { includeCalcuttaPublicationTrace: process.env.VERCEL_ENV === "preview" });
+        else {
+          const drained = await drainGoogleOutbox({ maximum: 4, actor: updatedBy });
+          if (!drained.ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
+          match = lifecycle.result;
+        }
+      }
+      else if (action === "reopen") {
+        const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId, updatedBy });
+        if (!lifecycle.delegated) match = await reopenLiveMatch(matchId, updatedBy);
+        else {
+          const drained = await drainGoogleOutbox({ maximum: 4, actor: updatedBy });
+          if (!drained.ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
+          match = lifecycle.result;
+        }
+      }
       else if (action === "access-generate") {
         const access = await generateLiveMatchAccess(matchId, updatedBy);
         const accessUrl = `${new URL(request.url).origin}/score/access/${encodeURIComponent(access.token)}`;

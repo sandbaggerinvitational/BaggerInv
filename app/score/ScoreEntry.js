@@ -299,6 +299,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
             team1GrossScores: entry.team1GrossScores,
             team2GrossScores: entry.team2GrossScores,
             expectedRevision: entry.expectedRevision,
+            expectedMatchRevision: entry.expectedMatchRevision,
             expectedUpdatedAt: entry.expectedUpdatedAt,
             clientMutationId: entry.clientMutationId,
           }),
@@ -501,6 +502,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
           team1GrossScores: gross.team1,
           team2GrossScores: gross.team2,
           expectedRevision: Number(savedHole?.Revision || 0),
+          expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
           expectedUpdatedAt: match["Updated At"] || "",
         }),
       });
@@ -521,6 +523,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
           "Match Status Text": payload.result?.liveStatus?.statusText,
           "Updated At": payload.result?.updatedAt,
           "Updated By": payload.result?.updatedBy,
+          Revision: payload.result?.matchRevision ?? data.match.Revision,
         },
         holeScores: nextScores,
         canConfirm: Boolean(payload.result?.matchComplete),
@@ -580,6 +583,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         team1GrossScores: [...gross.team1],
         team2GrossScores: [...gross.team2],
         expectedRevision,
+        expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
         expectedUpdatedAt: match["Updated At"] || "",
         optimisticHole,
       });

@@ -71,7 +71,8 @@ export async function POST(request) {
   try {
     const { matchId, viewFinalScorecard = false } = await request.json();
     const access = await authorizePassportMatch(session, matchId, { allowFinal: viewFinalScorecard === true });
-    const token = createScoringSession({ scope: "match", matchId: access.matchId, accessVersion: access.accessVersion, scorerName: access.player.name, readOnly: access.readOnly });
+    const token = createScoringSession({ scope: "match", matchId: access.matchId, tournamentId: session.tournamentId,
+      accessVersion: access.accessVersion, scorerName: access.player.name, playerId: access.player.id, readOnly: access.readOnly });
     const response = NextResponse.json({ authorized: true });
     response.cookies.set(scoringSessionCookie(token));
     return response;

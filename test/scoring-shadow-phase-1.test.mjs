@@ -447,7 +447,7 @@ test("Preview benchmark administration is Director-gated, reversible, and covers
   assert.doesNotMatch(route, /PRODUCTION_SPREADSHEET_ID|SUPABASE_SCORING_MIRROR_SECRET_KEY.*NextResponse/);
 });
 
-test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirror-back", async () => {
+test("Phase 1 remains read-inactive while Phase 2 mirror-back is isolated behind server authority", async () => {
   const [route, legacyRoute, scorePage, scoreEntry, migration, serviceAccessMigration, envExample, directorShadowRoute] = await Promise.all([
     readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/matches/[matchId]/route.js", import.meta.url), "utf8"),
@@ -474,7 +474,9 @@ test("Phase 1 has no participant Supabase reads, auth, realtime, or Google mirro
   assert.doesNotMatch(serviceAccessMigration, /grant (?:update|delete|all).*service_role/i);
   assert.match(serviceAccessMigration, /revoke all .* from anon, authenticated/g);
   assert.doesNotMatch(envExample, /NEXT_PUBLIC_SUPABASE/);
-  assert.doesNotMatch(route, /Live Hole Scores.*(?:write|update)|SUPABASE.*GOOGLE/i);
+  assert.match(route, /measured\.authority === "supabase"/);
+  assert.match(route, /drainGoogleOutbox/);
+  assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /SUPABASE_SCORING_MIRROR_SECRET_KEY|createClient\(/i);
   assert.match(directorShadowRoute, /process\.env\.VERCEL_ENV !== "preview"/);
   assert.match(directorShadowRoute, /assertScoringShadowAdministrativeEnvironment/);
   assert.match(directorShadowRoute, /inspectTournamentDirectorToken/);

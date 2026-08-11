@@ -16,6 +16,8 @@ import { currentTournamentYear } from "../../../lib/tournament-context.js";
 import { validateOpeningMatchups, validateRoundThreePairings } from "../../../lib/tournament-odds.js";
 import { championshipProjectionMissionStatus } from "../../../lib/projection-mission-control.js";
 import { verifyDirectorReadBack } from "../../../lib/director-readback-verification.js";
+import { persistDirectorMatchLifecycle } from "../../../lib/scoring-persistence-adapter.js";
+import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox.js";
 
 export const dynamic = "force-dynamic";
 
@@ -236,7 +238,9 @@ export async function POST(request) {
       await updateTournamentAdminData(data.tournament.id, { "Status Mode": "Manual Override", "Tournament Status": next ? "Live" : "Final", "Current Round": next ? String(next) : "Final" }, updatedBy);
     } else if (input.action === "reopen-match") {
       if (!input.matchId || !matches.some((match) => match.id === input.matchId && match.status === "Final")) throw new Error("Select a finalized match from the active round.");
-      await reopenLiveMatch(input.matchId, updatedBy);
+      const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId: input.matchId, updatedBy });
+      if (!lifecycle.delegated) await reopenLiveMatch(input.matchId, updatedBy);
+      else if (!(await drainGoogleOutbox({ maximum: 4, actor: updatedBy })).ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
     } else if (input.action === "match-unlock-scoring") {
       if (!selectedMatch || selectedMatch.status === "Final") throw new Error("Reopen this Final match before unlocking scoring.");
       await enableLiveMatchAccess(input.matchId, updatedBy);
@@ -249,10 +253,14 @@ export async function POST(request) {
     } else if (input.action === "match-finalize") {
       if (!selectedMatch) throw new Error("The selected match could not be found.");
       if (selectedMatch.status === "Final") throw new Error("This match is already Final.");
-      await finalizeLiveMatch(input.matchId, {}, updatedBy);
+      const lifecycle = await persistDirectorMatchLifecycle({ action: "finalize", matchId: input.matchId, updatedBy });
+      if (!lifecycle.delegated) await finalizeLiveMatch(input.matchId, {}, updatedBy);
+      else if (!(await drainGoogleOutbox({ maximum: 4, actor: updatedBy })).ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
     } else if (input.action === "match-reopen") {
       if (!selectedMatch || selectedMatch.status !== "Final") throw new Error("Only a Final match can be reopened.");
-      await reopenLiveMatch(input.matchId, updatedBy);
+      const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId: input.matchId, updatedBy });
+      if (!lifecycle.delegated) await reopenLiveMatch(input.matchId, updatedBy);
+      else if (!(await drainGoogleOutbox({ maximum: 4, actor: updatedBy })).ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
     } else if (input.action === "automation") {
       await updateTournamentAdminData(data.tournament.id, {
         "Director Automation Enabled": input.enabled,
