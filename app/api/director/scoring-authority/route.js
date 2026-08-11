@@ -279,6 +279,16 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, action, requestMs: Date.now() - startedAt, result });
   } catch (error) {
     console.error("Phase 2 authority rehearsal failed", { message: error?.message, code: error?.code || "" });
-    return NextResponse.json({ error: clean(error?.message || "Phase 2 authority rehearsal failed."), code: clean(error?.code) }, { status: 503 });
+    const diagnostics = error?.shadowDiagnostics || {};
+    return NextResponse.json({
+      error: clean(diagnostics.message || error?.message || "Phase 2 authority rehearsal failed."),
+      code: clean(diagnostics.code || error?.code),
+      diagnostics: {
+        status: Number(error?.status) || 0,
+        path: clean(diagnostics.path),
+        details: clean(diagnostics.details),
+        hint: clean(diagnostics.hint),
+      },
+    }, { status: 503 });
   }
 }

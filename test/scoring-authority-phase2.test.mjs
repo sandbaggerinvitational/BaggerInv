@@ -156,3 +156,11 @@ test("participant scoring routes preserve the API and delegate persistence serve
     assert.match(source, /NextResponse\.json\(\{ result: participantResult \}\)/);
   }
 });
+
+test("Phase 2 Director diagnostics retain safe PostgREST errors without exposing credentials", async () => {
+  const shadow = await readFile(new URL("../lib/scoring-shadow.js", import.meta.url), "utf8");
+  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
+  assert.match(shadow, /message: payload\?\.message/);
+  assert.match(route, /diagnostics\.message \|\| error\?\.message/);
+  assert.doesNotMatch(route, /SUPABASE_SCORING_MIRROR_SECRET_KEY/);
+});
