@@ -13,6 +13,7 @@ import {
   scoringShadowPayloadHash,
   shouldScheduleScoringShadowObservation,
 } from "../lib/scoring-shadow.js";
+import { selectBurstBaselineObservation } from "../lib/scoring-shadow-benchmark.js";
 import { calculateScoringShadowHoleFromSnapshot, historicalScoringSnapshotForMatch, reconcileScoringShadowRecords, scoringShadowMatchObservationsFromWorkbook, scoringShadowObservationsFromWorkbook } from "../lib/scoring-shadow-reconciliation.js";
 
 const allowed = {
@@ -409,6 +410,18 @@ test("benchmark reporting includes percentiles and correctness counters", () => 
     count: 4, min: 1, p50: 2, p95: 100, p99: 100, max: 100,
     errorCount: 1, retryCount: 2, duplicateCount: 3, lostLogicalScoreCount: 4,
   });
+});
+
+test("burst restoration always selects the pre-benchmark baseline after a partial retry", () => {
+  const baseline = { google_revision: 1, mutation_key: "shadow-rebuild:2026-R3-9:1", canonical_payload: { team_1_gross_scores: [4], team_2_gross_scores: [5] } };
+  const history = [
+    { google_revision: 4, mutation_key: "benchmark:burst:restore:1:retry", canonical_payload: { team_1_gross_scores: [4], team_2_gross_scores: [5] } },
+    { google_revision: 3, mutation_key: "benchmark:burst:restore:1:first", canonical_payload: { team_1_gross_scores: [4], team_2_gross_scores: [5] } },
+    { google_revision: 2, mutation_key: "benchmark:burst:forward:1", canonical_payload: { team_1_gross_scores: [5], team_2_gross_scores: [5] } },
+    baseline,
+  ];
+  assert.equal(selectBurstBaselineObservation(history), baseline);
+  assert.equal(selectBurstBaselineObservation(history.slice(0, 3)), null);
 });
 
 test("Preview benchmark administration is Director-gated, reversible, and covers every authorized stage", async () => {

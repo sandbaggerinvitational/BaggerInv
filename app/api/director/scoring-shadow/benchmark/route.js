@@ -19,6 +19,7 @@ import {
 } from "../../../../../lib/scoring-shadow.js";
 import { rebuildAndReconcileScoringShadow } from "../../../../../lib/scoring-shadow-reconciliation.js";
 import { grossScoresFromCell } from "../../../../../lib/live-score-values.js";
+import { selectBurstBaselineObservation } from "../../../../../lib/scoring-shadow-benchmark.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -275,8 +276,10 @@ async function runBurst(gate) {
 }
 
 async function priorShadowGrossScores(gate, matchId, holeNumber, currentRevision) {
-  const history = await readScoringShadowRows("score_mirror_events", `source_workbook_id=eq.${encodeURIComponent(gate.sourceWorkbookId)}&match_id=eq.${encodeURIComponent(matchId)}&hole_number=eq.${Number(holeNumber)}&select=google_revision,canonical_payload&order=google_revision.desc`);
-  const prior = (history.payload || []).find((item) => Number(item.google_revision) < Number(currentRevision));
+  const history = await readScoringShadowRows("score_mirror_events", `source_workbook_id=eq.${encodeURIComponent(gate.sourceWorkbookId)}&match_id=eq.${encodeURIComponent(matchId)}&hole_number=eq.${Number(holeNumber)}&select=google_revision,mutation_key,canonical_payload&order=google_revision.desc`);
+  const prior = selectBurstBaselineObservation(
+    (history.payload || []).filter((item) => Number(item.google_revision) < Number(currentRevision)),
+  );
   if (!prior?.canonical_payload) throw new Error(`The prior verified score for ${matchId} hole ${holeNumber} was not found.`);
   return {
     team1: prior.canonical_payload.team_1_gross_scores,
