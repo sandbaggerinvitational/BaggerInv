@@ -22,6 +22,7 @@ import { historicalScoringSnapshotForMatch } from "../../../../../lib/scoring-sh
 import { benchmarkSummary } from "../../../../../lib/scoring-shadow.js";
 import {
   readWorkbookSheetsByName,
+  restorePreviewScoringBenchmarkRows,
   saveLiveHoleScore,
   withWorkbookWriteDiagnostics,
 } from "../../../../../lib/google-sheets-write.js";
@@ -385,6 +386,14 @@ async function runReads() {
       samples.push(response.rpcTotalMs);
     }
     results[mode] = benchmarkSummary(samples);
+    await recordScoringAuthorityDryRunSample({
+      fixture_set: MAIN_SET,
+      operation: `READ_${mode}`,
+      outcome: "PASS",
+      rpc_total_ms: results[mode].p50,
+      total_server_ms: results[mode].p50,
+      diagnostics: { samples, summary: results[mode] },
+    });
   }
   return results;
 }
@@ -430,10 +439,12 @@ async function runFailures() {
 }
 
 async function runGoogleTiming(index, authorizationMs, gate) {
-  const rows = await authoritativeFixtures();
-  const match = rows.matches.find((item) => clean(item["Match ID"]) === "2026-R3-9");
+  const sheets = await readWorkbookSheetsByName(["Live Matches", "Live Hole Scores"]);
+  const matches = sheets["Live Matches"].records.map(({ record }) => record);
+  const holes = sheets["Live Hole Scores"].records.map(({ record }) => record);
+  const match = matches.find((item) => clean(item["Match ID"]) === "2026-R3-9");
   const holeNumber = 15 + (index % 3);
-  const hole = rows.holes.find((item) => clean(item["Match ID"]) === "2026-R3-9" && number(item["Hole Number"]) === holeNumber);
+  const hole = holes.find((item) => clean(item["Match ID"]) === "2026-R3-9" && number(item["Hole Number"]) === holeNumber);
   if (!match || !hole) throw new Error("A reversible Preview Google score is required.");
   const originalTeam1 = grossScoresFromCell(hole["Team 1 Gross Scores"]);
   const originalTeam2 = grossScoresFromCell(hole["Team 2 Gross Scores"]);
@@ -448,15 +459,49 @@ async function runGoogleTiming(index, authorizationMs, gate) {
     clientMutationId: `phase2-google-timing:${index}:${randomUUID()}`,
   }, ACTOR));
   const authoritativeMs = Date.now() - startedAt;
-  const restored = await withWorkbookWriteDiagnostics("phase-2-google-timing-restore", () => saveLiveHoleScore("2026-R3-9", {
-    holeNumber,
-    team1GrossScores: originalTeam1,
-    team2GrossScores: originalTeam2,
-    expectedRevision: number(changed.result.hole.Revision),
-    expectedUpdatedAt: clean(changed.result.updatedAt),
-    clientMutationId: `phase2-google-timing:restore:${index}:${randomUUID()}`,
-  }, ACTOR));
-  return { index, authorizationMs, authoritativeMs, diagnostics: changed.diagnostics, restoredRevision: restored.result.hole.Revision, mirrorConfigured: Boolean(gate.enabled) };
+  const restoreMutationId = `phase2-google-timing:restore:${index}:${randomUUID()}`;
+  let restored;
+  let restoreAttempts = 0;
+  let restoreError;
+  while (!restored && restoreAttempts < 3) {
+    restoreAttempts += 1;
+    try {
+      restored = await withWorkbookWriteDiagnostics("phase-2-google-timing-restore", () => saveLiveHoleScore("2026-R3-9", {
+        holeNumber,
+        team1GrossScores: originalTeam1,
+        team2GrossScores: originalTeam2,
+        expectedRevision: number(changed.result.hole.Revision),
+        expectedUpdatedAt: clean(changed.result.updatedAt),
+        clientMutationId: restoreMutationId,
+      }, ACTOR));
+    } catch (error) {
+      restoreError = error;
+      if (restoreAttempts < 3) await new Promise((resolve) => setTimeout(resolve, restoreAttempts * 750));
+    }
+  }
+  let restoredBySnapshot = false;
+  if (!restored) {
+    await restorePreviewScoringBenchmarkRows({
+      matches: [{ matchId: "2026-R3-9", record: match }],
+      holes: [{ matchId: "2026-R3-9", holeNumber, record: hole }],
+    }).catch(() => { throw restoreError; });
+    restoredBySnapshot = true;
+  }
+  await recordScoringAuthorityDryRunSample({
+    fixture_set: MAIN_SET,
+    operation: "GOOGLE_AUTHORITY_TIMING",
+    match_id: "2026-R3-9",
+    hole_number: holeNumber,
+    outcome: "PASS",
+    authorization_ms: authorizationMs,
+    total_server_ms: authorizationMs + authoritativeMs,
+    diagnostics: { ...changed.diagnostics, authoritativeMs, restoreAttempts, restoredBySnapshot },
+  });
+  return {
+    index, authorizationMs, authoritativeMs, diagnostics: changed.diagnostics,
+    restoredRevision: restored?.result?.hole?.Revision || hole.Revision,
+    restoreAttempts, restoredBySnapshot, mirrorConfigured: Boolean(gate.enabled),
+  };
 }
 
 async function runDiagnostics() {

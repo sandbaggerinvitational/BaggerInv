@@ -171,6 +171,9 @@ test("Preview administrative route is Director-gated and leaves participant scor
   assert.match(route, /Tournament Director access is required/);
   assert.doesNotMatch(route, /SCORING_AUTHORITY\s*=\s*["']supabase/i);
   assert.match(route, /saveLiveHoleScore/, "Google timing samples retain the existing authoritative pipeline");
+  assert.match(route, /restorePreviewScoringBenchmarkRows/, "Google timing samples retain a Preview-only recovery fallback");
+  assert.match(route, /GOOGLE_AUTHORITY_TIMING/, "separated Google timings are persisted for percentile reporting");
+  assert.match(route, /READ_\$\{mode\}/, "read benchmark sample arrays are persisted");
   assert.match(route, /verifiedBaseFixtures[\s\S]+TOURNAMENT_SUMMARY/);
   assert.match(route, /fixtureSet === MAIN_SET[\s\S]+authoritativeFixtures/);
 });
