@@ -10,6 +10,7 @@ import {
   readScoringAuthorityDryRun,
   recordScoringAuthorityDryRunSample,
   resetScoringAuthorityDryRun,
+  resolveScoringAuthorityCourseSnapshot,
   scoringAuthorityDryRunTimeoutProbe,
   scoringDryRunAuthorization,
   submitScoringAuthorityDryRun,
@@ -55,13 +56,11 @@ async function authoritativeFixtures() {
   const rounds = sheets.Rounds.records.map(({ record }) => record);
   const holes = sheets["Live Hole Scores"].records.map(({ record }) => record);
   const fixtures = matches.map((current) => {
-    const match = historicalScoringSnapshotForMatch(current, archived.get(clean(current["Match ID"]))) || current;
-    const courseId = clean(match["Course ID"]);
-    const tee = clean(match.Tee || match["Tee Played"]);
-    const course = courses.find((item) => clean(item["Course ID"]) === courseId && (!item.Year || number(item.Year) === number(match.Year))) || {};
-    const metadata = courseHoles.filter((item) => clean(item["Course ID"]) === courseId && (!tee || !item.Tee || clean(item.Tee) === tee));
+    const historicalMatch = historicalScoringSnapshotForMatch(current, archived.get(clean(current["Match ID"]))) || current;
+    const resolved = resolveScoringAuthorityCourseSnapshot({ historicalMatch, currentMatch: current, courses, courseHoles });
+    const match = resolved.match;
     const round = rounds.find((item) => number(item.Year) === number(match.Year) && number(String(item.Round).replace(/\D/g, "")) === number(match.Round)) || {};
-    return buildScoringAuthorityDryRunFixture({ match, course, courseHoles: metadata, round, forceWritable: true });
+    return buildScoringAuthorityDryRunFixture({ match, course: resolved.course, courseHoles: resolved.courseHoles, round, forceWritable: true });
   });
   return { fixtures, matches, holes };
 }

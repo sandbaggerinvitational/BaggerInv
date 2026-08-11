@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildScoringAuthorityDryRunFixture,
   dryRunMutationInput,
+  resolveScoringAuthorityCourseSnapshot,
   scoringDryRunAuthorization,
 } from "../lib/scoring-authority-dry-run.js";
 import { scoringAuthority } from "../lib/scoring-authority.js";
@@ -56,6 +57,21 @@ test("dry-run fixture captures immutable scoring configuration for all formats",
     assert.equal(fixture.scoring_snapshot.participants.all_ids.length, format === "BB" ? 4 : 2);
     assert.equal(fixture.scoring_snapshot.participants.team_2[0].final_strokes, 4);
   }
+});
+
+test("historical scoring participants fall back to the current authoritative course and tee identity", () => {
+  const current = match("BB");
+  const historical = { ...current, "Course ID": "", Tee: "", "Team 1 Player 2 Stroke": 13 };
+  const resolved = resolveScoringAuthorityCourseSnapshot({
+    historicalMatch: historical,
+    currentMatch: current,
+    courses: [{ "Course ID": "OCEAN", Year: 2026, Tee: "Gold", Rating: 71.9 }],
+    courseHoles: courseHoles.map((hole) => ({ ...hole, "Course ID": "OCEAN", Tee: "Gold" })),
+  });
+  assert.equal(resolved.courseId, "OCEAN");
+  assert.equal(resolved.tee, "Gold");
+  assert.equal(resolved.courseHoles.length, 18);
+  assert.equal(resolved.match["Team 1 Player 2 Stroke"], 13, "historical scoring allocation remains immutable");
 });
 
 test("dry-run mutation carries independent expected match/hole revisions and trusted Passport context", () => {
