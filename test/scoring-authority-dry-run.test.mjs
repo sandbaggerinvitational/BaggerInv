@@ -6,6 +6,7 @@ import {
   dryRunMutationInput,
   mergeScoringAuthorityHoleResults,
   resolveScoringAuthorityCourseSnapshot,
+  scoringAuthorityDryRunFixtureFromRow,
   scoringDryRunAuthorization,
 } from "../lib/scoring-authority-dry-run.js";
 import { scoringAuthority } from "../lib/scoring-authority.js";
@@ -112,6 +113,20 @@ test("benchmark equivalence merges prior confirmed holes before comparing match 
     { holeNumber: 1, winner: "Team 1" },
     newest,
   ]);
+});
+
+test("isolated benchmark clones retain required immutable fixture metadata", () => {
+  const cloned = scoringAuthorityDryRunFixtureFromRow({
+    match_id: "2026-R3-1", tournament_id: "2026", tournament_year: 2026,
+    round_number: 3, format: "SI", permission_revision: 4,
+    scoring_rules_version: "sandbagger-2026-v1", scoring_snapshot: { scoring_rules_version: "sandbagger-2026-v1" },
+    status: "FINAL", scoring_locked: true, match_revision: 17,
+  });
+  assert.equal(cloned.scoring_rules_version, "sandbagger-2026-v1");
+  assert.equal(cloned.status, "LIVE");
+  assert.equal(cloned.scoring_locked, false);
+  assert.equal(cloned.match_revision, 0);
+  assert.equal(cloned.permission_revision, 4);
 });
 
 test("Phase 2 dry-run migration enforces isolation, cross-instance locking, revisions, idempotency, and atomic outbox", async () => {

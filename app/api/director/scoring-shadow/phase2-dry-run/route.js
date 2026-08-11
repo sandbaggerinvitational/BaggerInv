@@ -12,6 +12,7 @@ import {
   recordScoringAuthorityDryRunSample,
   resetScoringAuthorityDryRun,
   resolveScoringAuthorityCourseSnapshot,
+  scoringAuthorityDryRunFixtureFromRow,
   scoringAuthorityDryRunTimeoutProbe,
   scoringDryRunAuthorization,
   submitScoringAuthorityDryRun,
@@ -67,15 +68,7 @@ async function authoritativeFixtures() {
 }
 
 function fixtureFromMatchRow(row) {
-  return {
-    match_id: row.match_id,
-    tournament_id: row.tournament_id,
-    tournament_year: number(row.tournament_year),
-    round_number: number(row.round_number),
-    format: row.format,
-    permission_revision: number(row.permission_revision, 1),
-    scoring_snapshot: row.scoring_snapshot,
-  };
+  return scoringAuthorityDryRunFixtureFromRow(row);
 }
 
 async function scorecard(fixtureSet, matchId) {
