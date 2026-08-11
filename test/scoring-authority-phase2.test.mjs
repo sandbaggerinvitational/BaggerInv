@@ -126,6 +126,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const schema = await readFile(new URL("../supabase/migrations/202608120001_preview_scoring_authority_schema.sql", import.meta.url), "utf8");
   const transactions = await readFile(new URL("../supabase/migrations/202608120002_preview_scoring_authority_transactions.sql", import.meta.url), "utf8");
   const authorization = await readFile(new URL("../supabase/migrations/202608120003_preview_scoring_authority_authorization_guards.sql", import.meta.url), "utf8");
+  const precision = await readFile(new URL("../supabase/migrations/202608120004_preview_scoring_authority_course_handicap_precision.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -144,6 +145,9 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.match(authorization, /where match_id = target_match for update/i);
   assert.match(authorization, /permission_row\.permission_revision <> match_row\.permission_revision/i);
   assert.match(authorization, /revoke all on function public\.finalize_match_authoritative_phase2_inner/i);
+  assert.match(precision, /alter column course_handicap type numeric/i);
+  assert.match(precision, /set course_handicap = nullif\(item->>'course_handicap', ''\)::numeric/i);
+  assert.match(precision, /revoke all on function public\.replace_preview_scoring_authority_import_phase2_inner/i);
 });
 
 test("participant scoring routes preserve the API and delegate persistence server-side", async () => {
