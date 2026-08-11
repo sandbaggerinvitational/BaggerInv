@@ -1,0 +1,129 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+import {
+  compareParticipantIdentityContexts,
+  isValidParticipantEmail,
+  maskParticipantEmail,
+  normalizeParticipantEmail,
+  participantIdentityFingerprint,
+  validateParticipantIdentityConfiguration,
+} from "../lib/participant-identity.js";
+import { participantIdentityAuthorityEnvironment } from "../lib/participant-identity-authority.js";
+import { PRODUCTION_SPREADSHEET_ID } from "../lib/spreadsheet-environment.js";
+
+const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const roster = [
+  { playerId: "P1", displayName: "Player One", teamId: "T1", participationStatus: "ACTIVE" },
+  { playerId: "P2", displayName: "Player Two", teamId: "T2", participationStatus: "ACTIVE" },
+];
+const row = (playerId, email, extra = {}) => ({
+  "Tournament ID": "SBI-2026", "Player ID": playerId, Email: email,
+  "Identity Active": true, "Configuration Revision": 1, ...extra,
+});
+test("participant identity email normalization is deterministic and reports masked values", () => {
+  assert.equal(normalizeParticipantEmail("  Player.One@Example.COM "), "player.one@example.com");
+  assert.equal(isValidParticipantEmail("player.one@example.com"), true);
+  assert.equal(isValidParticipantEmail("player@localhost"), false);
+  assert.equal(maskParticipantEmail("player.one@example.com"), "p********@e***.com");
+  assert.equal(maskParticipantEmail(""), "Missing");
+});
+
+test("a complete explicit roster mapping passes and produces a stable fingerprint", () => {
+  const first = validateParticipantIdentityConfiguration({ tournamentId: "SBI-2026", roster, records: [row("P1", "ONE@example.com"), row("P2", "two@example.com")] });
+  const second = validateParticipantIdentityConfiguration({ tournamentId: "SBI-2026", roster, records: [row("P2", "two@example.com"), row("P1", "one@example.com")] });
+  assert.equal(first.quality.pass, true);
+  assert.equal(first.quality.playersWithEmail, 2);
+  assert.equal(first.fingerprint, second.fingerprint);
+  assert.equal(first.fingerprint, participantIdentityFingerprint(first.contacts));
+});
+
+test("missing, duplicate, malformed, shared, inactive, unknown, and duplicate-player mappings fail closed", () => {
+  const duplicate = validateParticipantIdentityConfiguration({ tournamentId: "SBI-2026", roster, records: [row("P1", "same@example.com"), row("P2", "SAME@example.com")] });
+  assert.equal(duplicate.quality.pass, false);
+  assert.equal(duplicate.quality.duplicateEmail, 1);
+  assert.equal(duplicate.quality.sharedEmail, 1);
+  const malformed = validateParticipantIdentityConfiguration({ tournamentId: "SBI-2026", roster, records: [row("P1", "not-an-email"), row("P2", "two@example.com")] });
+  assert.equal(malformed.quality.malformedEmail, 1);
+  const unknown = validateParticipantIdentityConfiguration({ tournamentId: "SBI-2026", roster, records: [row("P1", "one@example.com"), row("PX", "x@example.com")] });
+  assert.equal(unknown.quality.missingEmail, 1);
+  assert.equal(unknown.quality.unknownPlayerIds, 1);
+  assert.equal(unknown.quality.mappingConflicts, 1);
+  const inactive = validateParticipantIdentityConfiguration({ tournamentId: "SBI-2026", roster, records: [row("P1", "one@example.com"), row("P2", "two@example.com", { "Identity Active": false })] });
+  assert.equal(inactive.quality.inactiveIdentityRecords, 1);
+  const playerConflict = validateParticipantIdentityConfiguration({ tournamentId: "SBI-2026", roster, records: [row("P1", "one@example.com"), row("P1", "other@example.com"), row("P2", "two@example.com")] });
+  assert.equal(playerConflict.quality.mappingConflicts, 1);
+});
+
+test("identity authority defaults to Passport, shadow defaults off, and Production hard-blocks Supabase", () => {
+  assert.deepEqual(participantIdentityAuthorityEnvironment({}).resolved, "passport");
+  assert.equal(participantIdentityAuthorityEnvironment({}).shadowEnabled, false);
+  const preview = {
+    VERCEL_ENV: "preview", PARTICIPANT_IDENTITY_AUTHORITY: "supabase", SUPABASE_PARTICIPANT_IDENTITY_SHADOW_ENABLED: "true",
+    GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
+    NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co", NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "publishable",
+    SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret",
+  };
+  assert.equal(participantIdentityAuthorityEnvironment(preview).resolved, "supabase");
+  assert.equal(participantIdentityAuthorityEnvironment(preview).shadowEnabled, true);
+  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "passport");
+  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).productionBlocked, true);
+  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID }).resolved, "passport");
+});
+
+test("shadow comparison covers stable player, tournament, team, membership, matches, and permissions", () => {
+  const context = { playerId: "P1", tournamentId: "SBI-2026", teamId: "T1", membershipActive: true, matchIds: ["M2", "M1"], scoringPermissions: { M1: 2 } };
+  assert.deepEqual(compareParticipantIdentityContexts({ passport: context, auth: { ...context, matchIds: ["M1", "M2"] } }), { status: "PASS", diagnostics: {} });
+  const mismatch = compareParticipantIdentityContexts({ passport: context, auth: { ...context, playerId: "P2" } });
+  assert.equal(mismatch.status, "MISMATCH");
+  assert.deepEqual(mismatch.diagnostics.playerId, { passport: "P1", auth: "P2" });
+});
+
+test("migration creates service-only RLS tables, uniqueness, and no silent relink path", async () => {
+  const migration = await source("supabase/migrations/202608120012_preview_participant_identity_foundation.sql");
+  for (const table of ["participant_identity_contacts", "user_player_links", "tournament_roles", "identity_config_import_runs", "identity_context_revisions", "participant_identity_shadow_observations", "identity_audit_events"]) {
+    assert.match(migration, new RegExp(`create table participant_identity\\.${table}`));
+  }
+  assert.match(migration, /enable row level security/);
+  assert.match(migration, /revoke all on all tables in schema participant_identity from public, anon, authenticated/);
+  assert.doesNotMatch(migration, /create policy|using\s*\(\s*true\s*\)/i);
+  assert.match(migration, /grant execute on function %s to service_role/);
+  assert.match(migration, /participant_identity_active_email_idx/);
+  assert.match(migration, /participant_identity_current_player_link_idx/);
+  assert.match(migration, /Existing Auth user or Player link requires an explicit audited link-change operation/);
+  assert.match(migration, /references auth\.users/);
+});
+
+test("Director identity operations are Preview-only and no participant login or Auth-user creation route exists", async () => {
+  const route = await source("app/api/director/participant-identity/route.js");
+  const context = await source("app/api/participant/context/route.js");
+  const dashboard = await source("app/admin/director/ParticipantIdentityFoundationPanel.js");
+  assert.match(route, /VERCEL_ENV !== "preview"/);
+  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /initialize-source/);
+  assert.match(route, /refresh/);
+  assert.match(route, /approve/);
+  assert.doesNotMatch(route, /createUser|signInWithOtp|sendOtp/);
+  assert.match(context, /identityAuthority/);
+  assert.match(context, /readParticipantIdentityContext/);
+  assert.match(dashboard, /No Auth users were created/);
+  const files = await Promise.all([source("lib/supabase-auth-browser.js"), source("lib/supabase-auth-server.js")]);
+  assert.match(files[0], /createBrowserClient/);
+  assert.match(files[1], /getClaims/);
+  assert.ok(files.every((value) => !/signInWithOtp|createUser/.test(value)));
+});
+
+test("Preview impersonation remains the signed Director Passport mechanism", async () => {
+  const route = await source("app/api/director/impersonation/route.js");
+  assert.match(route, /createPlayerPassportSession/);
+  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.doesNotMatch(route, /supabase|auth\.users|createUser/i);
+});
+
+test("approved Auth SDK packages are installed without exposing server credentials to browser variables", async () => {
+  const pkg = JSON.parse(await source("package.json"));
+  assert.ok(pkg.dependencies["@supabase/supabase-js"]);
+  assert.ok(pkg.dependencies["@supabase/ssr"]);
+  const browser = await source("lib/supabase-auth-browser.js");
+  assert.doesNotMatch(browser, /SUPABASE_SCORING_MIRROR_SECRET_KEY|service_role|sb_secret_/);
+});

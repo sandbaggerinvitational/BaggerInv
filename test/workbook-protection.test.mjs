@@ -15,7 +15,7 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 
 test("Protected Column Map classifies every registered column exactly once", () => {
   const allowed = new Set(Object.values(COLUMN_PURPOSE));
-  assert.equal(Object.keys(PROTECTED_COLUMN_MAP).length, 49);
+  assert.equal(Object.keys(PROTECTED_COLUMN_MAP).length, 50);
   for (const [sheet, fields] of Object.entries(PROTECTED_COLUMN_MAP)) {
     assert.ok(Object.keys(fields).length, sheet);
     for (const [field, purpose] of Object.entries(fields)) {
@@ -66,7 +66,6 @@ test("Google Sheets mutations contain no whole-row, whole-tab, or schema-creatio
     /function replaceTab/,
     /insertDataOption=INSERT_ROWS/,
     /appendDimension/,
-    /addSheet/,
     /!A:ZZ[^\n]*:clear/,
   ]) assert.doesNotMatch(writer, forbidden);
   assert.match(writer, /validateFieldWrite\(tab, headers, updates\)/);
@@ -81,7 +80,17 @@ test("the authorized Preview schema migration is one isolated column insertion",
   assert.match(writer, /sourceColumnCount/);
   assert.match(writer, /expectedFingerprint/);
   assert.match(writer, /existingValues: after\.logicalDataHash === before\.logicalDataHash/);
-  assert.doesNotMatch(writer, /appendDimension|addSheet/);
+  assert.doesNotMatch(writer, /appendDimension/);
+});
+
+test("the authorized Preview participant identity schema initializer creates only its protected sheet", async () => {
+  const writer = await source("lib/google-sheets-write.js");
+  assert.equal((writer.match(/addSheet/g) || []).length, 1);
+  assert.match(writer, /initializePreviewParticipantIdentityConfiguration/);
+  assert.match(writer, /Participant Identity Configuration/);
+  assert.match(writer, /VERCEL_ENV !== "preview"/);
+  assert.match(writer, /requireIsolatedScoringSheet\(\)/);
+  assert.match(writer, /addProtectedRange/);
 });
 
 test("Preview Reset, Guide administration, CMS, and finalization use field-scoped writes", async () => {
