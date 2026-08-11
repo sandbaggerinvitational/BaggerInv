@@ -8,6 +8,9 @@ import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldS
 import { scoringShadowEnvironment } from "../../../../lib/scoring-shadow-gate.js";
 import { persistParticipantScore } from "../../../../lib/scoring-persistence-adapter.js";
 import { drainGoogleOutbox } from "../../../../lib/scoring-google-outbox.js";
+import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.js";
+import { readPreviewScoringParticipantContext } from "../../../../lib/scoring-authority-supabase.js";
+import { mergeParticipantScoringAuthorityState } from "../../../../lib/scoring-participant-authority-state.js";
 
 export const dynamic = "force-dynamic";
 
@@ -20,10 +23,31 @@ function session(request) {
 export async function GET(request) {
   try {
     const current = session(request);
-    await validateParticipantSession(current);
-    return NextResponse.json({ data: await readLiveScoringMatch(current.matchId) });
+    const requireWritable = new URL(request.url).searchParams.get("syncRebase") === "1";
+    await validateParticipantSession(current, requireWritable ? { requireWritable: true } : undefined);
+    const googleData = await readLiveScoringMatch(current.matchId);
+    const authority = scoringAuthorityEnvironment();
+    if (authority.resolved !== "supabase") return NextResponse.json({ data: googleData });
+    const canonical = await readPreviewScoringParticipantContext({
+      tournament_id: String(current.tournamentId || current.year || "2026"),
+      match_id: current.matchId,
+      player_id: String(current.playerId || `match-access:${current.matchId}`),
+      permission_revision: Number(current.accessVersion || 1),
+      passport_verified: true,
+      role: current.playerId ? "PLAYER" : "MATCH_ACCESS",
+    });
+    if (!canonical.payload?.ok || !canonical.payload?.data?.match) {
+      if (requireWritable) return NextResponse.json({ error: "Authoritative scoring state is temporarily unavailable." }, { status: 503 });
+      return NextResponse.json({ data: googleData });
+    }
+    return NextResponse.json({
+      data: mergeParticipantScoringAuthorityState(googleData, canonical.payload.data, {
+        authorizationVerified: canonical.payload.data.authorization?.verified === true,
+      }),
+    });
   } catch (error) {
-    return NextResponse.json({ error: error?.message || "Unable to load scoring." }, { status: 403 });
+    const status = Number(error?.status) || (/temporarily unavailable/i.test(error?.message || "") ? 503 : 403);
+    return NextResponse.json({ error: error?.message || "Unable to load scoring." }, { status });
   }
 }
 
@@ -91,9 +115,12 @@ export async function POST(request) {
     return NextResponse.json({ result: participantResult });
   } catch (error) {
     const conflict = Number(error?.status) === 409 || /updated by someone else/i.test(error?.message || "");
+    const diagnostics = error?.authoritativeDiagnostics || {};
     logScoringFailure(error, { route: "/api/scoring/current", conflict });
     return NextResponse.json({
       error: participantScoringError(error),
+      code: error?.code || diagnostics.code || "",
+      currentMatchRevision: Number.isFinite(Number(diagnostics.current_match_revision)) ? Number(diagnostics.current_match_revision) : undefined,
     }, { status: conflict ? 409 : Number(error?.status) === 403 ? 403 : 400 });
   }
 }

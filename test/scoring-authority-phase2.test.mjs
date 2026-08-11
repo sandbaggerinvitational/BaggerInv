@@ -72,6 +72,17 @@ test("canonical reconciliation detects parity and genuine score drift", () => {
   assert.deepEqual(reconcileCanonicalScoringAuthority(imported, drifted).scoreDivergence, ["M1:1"]);
 });
 
+test("snapshot parity ignores mutable Live Matches Updated At but detects scoring configuration drift", () => {
+  const imported = buildCanonicalScoringAuthorityImport({ sheets: workbook(), sourceWorkbookId: "preview-sheet" });
+  const current = { matches: imported.payload.matches, holes: imported.payload.hole_scores,
+    players: imported.payload.tournament_players,
+    snapshots: imported.payload.snapshots.map((snapshot) => ({ ...snapshot, effective_at: "2026-08-11T09:00:00.000Z", canonical_hash: "f".repeat(64) })),
+    permissions: imported.payload.permissions };
+  assert.deepEqual(reconcileCanonicalScoringAuthority(imported, current).snapshotDivergence, []);
+  const changed = { ...current, snapshots: [{ ...current.snapshots[0], tee: "Silver" }] };
+  assert.deepEqual(reconcileCanonicalScoringAuthority(imported, changed).snapshotDivergence, ["M1"]);
+});
+
 test("authority feature flag defaults to Google and hard-blocks Production", () => {
   assert.equal(scoringAuthority({}), "google");
   const preview = { VERCEL_ENV: "preview", SCORING_AUTHORITY: "supabase", PREVIEW_SCORING_SHEET_ID: "preview", GOOGLE_SHEETS_SPREADSHEET_ID: "preview",
@@ -149,6 +160,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const playingPrecision = await readFile(new URL("../supabase/migrations/202608120005_preview_scoring_authority_playing_handicap_precision.sql", import.meta.url), "utf8");
   const deleteOrder = await readFile(new URL("../supabase/migrations/202608120006_preview_scoring_authority_import_delete_order.sql", import.meta.url), "utf8");
   const ingress = await readFile(new URL("../supabase/migrations/202608120007_preview_scoring_authority_cutover_ingress.sql", import.meta.url), "utf8");
+  const diagnostics = await readFile(new URL("../supabase/migrations/202608120008_preview_scoring_client_diagnostics.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -181,6 +193,13 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.match(ingress, /AUTHORITY_BOUNDARY_MISMATCH/i);
   assert.match(ingress, /requested_type = 'CUTOVER'.*GOOGLE_OUTBOX_NOT_DRAINED/is);
   assert.match(ingress, /grant execute on function %s to service_role/i);
+  assert.match(diagnostics, /create table scoring_authority\.client_diagnostics/i);
+  assert.match(diagnostics, /enable row level security/i);
+  assert.match(diagnostics, /revoke all on table scoring_authority\.client_diagnostics from public, anon, authenticated/i);
+  assert.match(diagnostics, /grant execute on function public\.record_preview_scoring_client_diagnostic\(jsonb\) to service_role/i);
+  assert.match(diagnostics, /create or replace function public\.read_preview_scoring_participant_context\(input jsonb\)/i);
+  assert.match(diagnostics, /permission_ok and match_row\.status <> 'FINAL' and not match_row\.scoring_locked/i);
+  assert.match(diagnostics, /revoke all on function public\.read_preview_scoring_participant_context\(jsonb\) from public, anon, authenticated/i);
 });
 
 test("participant scoring routes preserve the API and delegate persistence server-side", async () => {

@@ -17,6 +17,8 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /scorecardRow/);
   assert.doesNotMatch(source, /Gross &amp; net|Player points|Tournament Coverage|Live Leaderboard|My Profile/);
   assert.match(source, /expectedRevision/);
+  assert.match(source, /Revision: result\.matchRevision \?\?/);
+  assert.match(source, /matchRevision: result\.matchRevision \?\?/);
   assert.doesNotMatch(source, /sessionStorage/);
   assert.match(source, /\/api\/scoring\/current/);
   assert.match(source, /Please wait while your Player Passport and match are refreshed/);

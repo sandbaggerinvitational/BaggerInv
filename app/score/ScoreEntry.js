@@ -9,6 +9,7 @@ import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
 import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
+import { createIndexedDbScoringDiagnosticsStore } from "../../lib/scoring-client-diagnostics.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -25,6 +26,10 @@ function strokeDots(count) {
 
 function grossAt(score, side, index) {
   return jsonScores(score?.[`Team ${side} Gross Scores`])?.[index] ?? "";
+}
+
+function timingLabel(value) {
+  return Number.isFinite(Number(value)) ? `${Number(value).toFixed(1)} ms` : "—";
 }
 
 function holeWinnerMark(score, teamNames) {
@@ -96,11 +101,39 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine !== false);
   const [scoringDiagnosticsEnabled] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("scoringDiagnostics") === "1");
   const [scoringTimingSamples, setScoringTimingSamples] = useState([]);
+  const scoringDiagnosticsStore = useRef(null);
 
-  const recordScoringTiming = (sample) => {
+  const recordScoringTiming = async (sample) => {
     if (!scoringDiagnosticsEnabled) return;
-    setScoringTimingSamples((current) => [...current, sample].slice(-25));
+    try {
+      if (!scoringDiagnosticsStore.current) scoringDiagnosticsStore.current = createIndexedDbScoringDiagnosticsStore();
+      const persisted = await scoringDiagnosticsStore.current.upsert(sample);
+      setScoringTimingSamples((current) => [...current.filter((item) => item.id !== persisted.id), persisted].slice(-25));
+      fetch("/api/scoring/diagnostics", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(persisted),
+        keepalive: true,
+      }).catch(() => {});
+    } catch {}
   };
+
+  useEffect(() => {
+    if (!scoringDiagnosticsEnabled) return;
+    if (!scoringDiagnosticsStore.current) scoringDiagnosticsStore.current = createIndexedDbScoringDiagnosticsStore();
+    scoringDiagnosticsStore.current.list()
+      .then((samples) => {
+        const retained = samples.slice(-25);
+        setScoringTimingSamples(retained);
+        retained.forEach((sample) => fetch("/api/scoring/diagnostics", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(sample),
+          keepalive: true,
+        }).catch(() => {}));
+      })
+      .catch(() => {});
+  }, [scoringDiagnosticsEnabled]);
 
   const request = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -291,6 +324,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     const queue = createScoringSyncQueue({
       store: createIndexedDbScoringStore(),
       send: async (entry) => {
+        const authorityStartedAt = typeof performance === "undefined" ? Date.now() : performance.now();
         const response = await fetch("/api/scoring/current", {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -308,12 +342,22 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         if (!response.ok) {
           const error = new Error(payload.error || "Your score could not be synchronized.");
           error.status = response.status;
+          error.code = payload.code || "";
+          error.currentMatchRevision = payload.currentMatchRevision;
           throw error;
         }
+        const authorityFinishedAt = typeof performance === "undefined" ? Date.now() : performance.now();
+        recordScoringTiming({
+          matchId: entry.matchId,
+          holeNumber: entry.holeNumber,
+          clientMutationId: entry.clientMutationId,
+          authoritativeConfirmationMs: Math.max(0, authorityFinishedAt - authorityStartedAt),
+          authoritativeConfirmedAt: new Date().toISOString(),
+        });
         return payload.result;
       },
       readAuthoritative: async () => {
-        const response = await fetch("/api/scoring/current", { cache: "no-store" });
+        const response = await fetch("/api/scoring/current?syncRebase=1", { cache: "no-store" });
         if (!response.ok) return null;
         const payload = await response.json();
         return payload.data;
@@ -321,10 +365,17 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     });
     syncQueue.current = queue;
     const matchId = String(data.match["Match ID"]);
-    const unsubscribe = queue.subscribe(({ entries, event, result, stale, resolution }) => {
+    const unsubscribe = queue.subscribe(({ entries, event, result, stale, resolution, entry }) => {
       const relevant = entries.filter((entry) => entry.matchId === matchId);
       setSyncEntries(relevant);
       if (event === "confirmed" && result && !stale) {
+        recordScoringTiming({
+          matchId,
+          holeNumber: Number(result.hole?.["Hole Number"] || 0),
+          clientMutationId: entry?.clientMutationId,
+          queueClearMs: Math.max(0, Date.now() - Number(entry?.createdAt || Date.now())),
+          queueClearedAt: new Date().toISOString(),
+        });
         if (resolution === "server" && result.hole) {
           setGross({
             team1: jsonScores(result.hole["Team 1 Gross Scores"]),
@@ -349,6 +400,8 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
               "Match Status Text": result.liveStatus?.statusText ?? current.match["Match Status Text"],
               "Updated At": result.updatedAt || current.match["Updated At"],
               "Updated By": result.updatedBy || current.match["Updated By"],
+              Revision: result.matchRevision ?? current.match.Revision,
+              matchRevision: result.matchRevision ?? current.match.matchRevision,
             },
             holeScores: nextScores,
             canConfirm: Boolean(result.matchComplete) && relevant.length === 0,
@@ -372,7 +425,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       }
     });
     queue.hydrate(matchId).then(async (entries) => {
-      await queue.reconcile(matchId, data.holeScores || [], { ...(data.match || {}), canConfirm: data.canConfirm });
+      await queue.reconcile(matchId, data.holeScores || [], { ...(data.match || {}), canConfirm: data.canConfirm, authority: data.authority });
       const currentEntries = await queue.entries(matchId);
       setSyncEntries(currentEntries);
       if (entries.length) {
@@ -576,7 +629,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       gross.team2.forEach((value) => normalizeLiveScoreInput(value));
       const validationFinishedAt = typeof performance === "undefined" ? Date.now() : performance.now();
       const commitStartedAt = validationFinishedAt;
-      await syncQueue.current.enqueue({
+      const queuedEntry = await syncQueue.current.enqueue({
         tournamentId: String(match["Tournament ID"] || match.Year || passportTournament?.year || ""),
         matchId: String(match["Match ID"]),
         holeNumber: savedNumber,
@@ -600,6 +653,8 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       setStatus("");
       if (scoringDiagnosticsEnabled) {
         const sample = {
+          matchId: String(match["Match ID"]),
+          clientMutationId: queuedEntry.clientMutationId,
           holeNumber: savedNumber,
           validationMs: Math.max(0, validationFinishedAt - validationStartedAt),
           indexedDbCommitMs: Math.max(0, commitFinishedAt - commitStartedAt),
@@ -831,7 +886,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     {savedHole && <div className={styles.result}><span>Recorded hole</span><strong>{savedHole["Hole Winner"] === "Halved" ? "Halved" : holeWinnerMark(savedHole, teamNames)}</strong><small>Hole {holeNumber} result • Running status remains above</small></div>}
     {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
     {localFirstEnabled ? syncBanner : null}
-    {previewMode && scoringDiagnosticsEnabled ? <aside className={styles.scoringDiagnostics} aria-label="Preview scoring performance diagnostics"><strong>Preview scoring diagnostics</strong><span>{scoringTimingSamples.length ? `Hole ${scoringTimingSamples.at(-1).holeNumber} · IndexedDB ${scoringTimingSamples.at(-1).indexedDbCommitMs.toFixed(1)} ms · Visual ${scoringTimingSamples.at(-1).tapToVisualAdvanceMs.toFixed(1)} ms · Usable ${scoringTimingSamples.at(-1).nextHoleUsableMs.toFixed(1)} ms` : "Enter a score to capture physical-device timing."}</span><small>{scoringTimingSamples.length} local sample{scoringTimingSamples.length === 1 ? "" : "s"} retained for this Preview session.</small></aside> : null}
+    {previewMode && scoringDiagnosticsEnabled ? <aside className={styles.scoringDiagnostics} aria-label="Preview scoring performance diagnostics"><strong>Preview scoring diagnostics</strong><span>{scoringTimingSamples.length ? `Hole ${scoringTimingSamples.at(-1).holeNumber} · IndexedDB ${timingLabel(scoringTimingSamples.at(-1).indexedDbCommitMs)} · Visual ${timingLabel(scoringTimingSamples.at(-1).tapToVisualAdvanceMs)} · Usable ${timingLabel(scoringTimingSamples.at(-1).nextHoleUsableMs)} · Authority ${timingLabel(scoringTimingSamples.at(-1).authoritativeConfirmationMs)} · Queue clear ${timingLabel(scoringTimingSamples.at(-1).queueClearMs)}` : "Enter a score to capture physical-device timing."}</span><small>{scoringTimingSamples.length} durable Preview sample{scoringTimingSamples.length === 1 ? "" : "s"} retained on this device and uploaded without score values.</small></aside> : null}
     {localFirstEnabled && activeSyncIssue ? <section className={styles.syncIssue} data-kind={activeSyncIssue.failureKind || activeSyncIssue.status} aria-live="polite">
       <span>{activeSyncIssueKind === "conflict" ? `Hole ${activeSyncIssue.holeNumber} score conflict` : activeSyncIssueKind === "retryable" ? `Hole ${activeSyncIssue.holeNumber} has not synced yet` : `Hole ${activeSyncIssue.holeNumber} needs action`}</span>
       <strong>{participantScoringSyncIssue(activeSyncIssue)}</strong>
