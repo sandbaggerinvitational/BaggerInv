@@ -8,7 +8,7 @@ import { runningMatchStatusAtHole, scoringProgress } from "../../lib/scoring-exp
 import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
-import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
+import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, sameGrossScores, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import { createIndexedDbScoringDiagnosticsStore } from "../../lib/scoring-client-diagnostics.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
@@ -30,6 +30,19 @@ function grossAt(score, side, index) {
 
 function timingLabel(value) {
   return Number.isFinite(Number(value)) ? `${Number(value).toFixed(1)} ms` : "—";
+}
+
+const SCORING_DIAGNOSTICS_OPT_IN = "sbi-preview-scoring-diagnostics-enabled";
+
+function scoringDiagnosticsOptIn(localFirstEnabled) {
+  if (!localFirstEnabled || typeof window === "undefined") return false;
+  try {
+    const requested = new URLSearchParams(window.location.search).get("scoringDiagnostics") === "1";
+    if (requested) window.localStorage.setItem(SCORING_DIAGNOSTICS_OPT_IN, "true");
+    return requested || window.localStorage.getItem(SCORING_DIAGNOSTICS_OPT_IN) === "true";
+  } catch {
+    return new URLSearchParams(window.location.search).get("scoringDiagnostics") === "1";
+  }
 }
 
 function holeWinnerMark(score, teamNames) {
@@ -99,9 +112,19 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const [syncEntries, setSyncEntries] = useState([]);
   const [syncReady, setSyncReady] = useState(!localFirstEnabled);
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine !== false);
-  const [scoringDiagnosticsEnabled] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("scoringDiagnostics") === "1");
+  const [scoringDiagnosticsEnabled] = useState(() => scoringDiagnosticsOptIn(localFirstEnabled));
   const [scoringTimingSamples, setScoringTimingSamples] = useState([]);
   const scoringDiagnosticsStore = useRef(null);
+
+  const uploadScoringTiming = async (sample) => {
+    const response = await fetch("/api/scoring/diagnostics", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(sample),
+      keepalive: true,
+    });
+    if (!response.ok) throw new Error("Preview scoring diagnostics upload was not accepted.");
+  };
 
   const recordScoringTiming = async (sample) => {
     if (!scoringDiagnosticsEnabled) return;
@@ -109,12 +132,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       if (!scoringDiagnosticsStore.current) scoringDiagnosticsStore.current = createIndexedDbScoringDiagnosticsStore();
       const persisted = await scoringDiagnosticsStore.current.upsert(sample);
       setScoringTimingSamples((current) => [...current.filter((item) => item.id !== persisted.id), persisted].slice(-25));
-      fetch("/api/scoring/diagnostics", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(persisted),
-        keepalive: true,
-      }).catch(() => {});
+      uploadScoringTiming(persisted).catch(() => {});
     } catch {}
   };
 
@@ -125,12 +143,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       .then((samples) => {
         const retained = samples.slice(-25);
         setScoringTimingSamples(retained);
-        retained.forEach((sample) => fetch("/api/scoring/diagnostics", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(sample),
-          keepalive: true,
-        }).catch(() => {}));
+        retained.forEach((sample) => uploadScoringTiming(sample).catch(() => {}));
       })
       .catch(() => {});
   }, [scoringDiagnosticsEnabled]);
@@ -519,6 +532,10 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     JSON.stringify(gross.team1) !== JSON.stringify(jsonScores(savedHole?.["Team 1 Gross Scores"])) ||
     JSON.stringify(gross.team2) !== JSON.stringify(jsonScores(savedHole?.["Team 2 Gross Scores"])),
   [gross, savedHole]);
+  const unchangedSavedScore = Boolean(savedHole && sameGrossScores({
+    team1GrossScores: gross.team1,
+    team2GrossScores: gross.team2,
+  }, savedHole));
 
   const setScore = (side, index, value) => {
     let normalized;
@@ -603,6 +620,11 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
 
   const saveLocally = async () => {
     if (saveInFlight.current || !syncQueue.current) return;
+    if (unchangedSavedScore) {
+      setSaveFailed(false);
+      setStatus(`Hole ${holeNumber} already has these scores.`);
+      return;
+    }
     const tapStartedAt = typeof performance === "undefined" ? Date.now() : performance.now();
     saveInFlight.current = true;
     setSaveFailed(false);
@@ -639,11 +661,13 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
         expectedUpdatedAt: match["Updated At"] || "",
         optimisticHole,
+        authoritativeHole: savedHole || null,
       });
       const commitFinishedAt = typeof performance === "undefined" ? Date.now() : performance.now();
+      const effectiveOptimisticHole = queuedEntry.optimisticHole || savedHole || optimisticHole;
       const nextScores = (data?.holeScores || [])
         .filter((item) => Number(item["Hole Number"]) !== savedNumber)
-        .concat(optimisticHole);
+        .concat(effectiveOptimisticHole);
       const nextData = { ...data, holeScores: nextScores, canConfirm: false };
       setData(nextData);
       const scored = new Set(nextScores.map((item) => Number(item["Hole Number"])));
@@ -651,7 +675,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       if (nextHole) selectHole(nextHole, nextData);
       else { setShowReview(true); setConfirming(false); }
       setStatus("");
-      if (scoringDiagnosticsEnabled) {
+      if (scoringDiagnosticsEnabled && !queuedEntry.unchanged) {
         const sample = {
           matchId: String(match["Match ID"]),
           clientMutationId: queuedEntry.clientMutationId,
@@ -907,7 +931,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
     {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? canResolveScoreConflict ? "Choose Device or Server Score Above" : "Resolve Scoring Restriction Above" : activeSyncIssueKind === "retryable" && savedHole ? "Save Updated Score" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
+    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || unchangedSavedScore || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? canResolveScoreConflict ? "Choose Device or Server Score Above" : "Resolve Scoring Restriction Above" : unchangedSavedScore ? "Score Already Saved" : activeSyncIssueKind === "retryable" && savedHole ? "Save Updated Score" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
   </section>;
 }

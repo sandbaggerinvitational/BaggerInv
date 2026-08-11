@@ -8,6 +8,7 @@ import {
   hasAuthoritativeGrossScores,
   participantScoringSyncIssue,
   sameGrossScores,
+  sameScoringIntent,
   scoringFinalizationReview,
   scoringSyncIssueKind,
   scoringSyncSummary,
@@ -62,6 +63,102 @@ test("a queued correction coalesces and the newest unsent score wins", async () 
   assert.equal(entries.length, 1);
   assert.deepEqual(entries[0].team1GrossScores, [3]);
   assert.equal(entries[0].version, 2);
+  queue.stop();
+});
+
+test("an unchanged queued score reuses its durable identity instead of creating another mutation", async () => {
+  const store = createMemoryScoringStore();
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => assert.fail("offline queue must not send") });
+  const first = await queue.enqueue(mutation(3, { clientMutationId: "durable-hole-3" }));
+  const repeated = await queue.enqueue(mutation(3));
+  const entries = await queue.entries("2026-R3-2");
+  assert.equal(entries.length, 1);
+  assert.equal(repeated.clientMutationId, first.clientMutationId);
+  assert.equal(repeated.coalesced, true);
+  assert.equal(entries[0].version, 1);
+  queue.stop();
+});
+
+test("an unchanged score submitted while its first request is syncing keeps the same identity", async () => {
+  const store = createMemoryScoringStore();
+  let release;
+  const gate = new Promise((resolve) => { release = resolve; });
+  const sent = [];
+  const queue = createScoringSyncQueue({ store, send: async (entry) => {
+    sent.push(entry.clientMutationId);
+    await gate;
+    return { hole: { "Hole Number": 3, Revision: 1 }, matchRevision: 1 };
+  }});
+  const first = await queue.enqueue(mutation(3, { clientMutationId: "syncing-hole-3" }));
+  await until(() => sent.length === 1);
+  const repeated = await queue.enqueue(mutation(3));
+  assert.equal(repeated.clientMutationId, first.clientMutationId);
+  assert.equal(repeated.coalesced, true);
+  release();
+  await until(async () => (await store.list()).length === 0);
+  assert.deepEqual(sent, ["syncing-hole-3"]);
+  queue.stop();
+});
+
+test("an unchanged authoritative hole is a client no-op with no queue write", async () => {
+  const store = createMemoryScoringStore();
+  let sends = 0;
+  const queue = createScoringSyncQueue({ store, send: async () => { sends += 1; return {}; } });
+  const unchanged = await queue.enqueue(mutation(3, {
+    authoritativeHole: { "Hole Number": 3, "Team 1 Gross Scores": [4], "Team 2 Gross Scores": [5], Revision: 7 },
+  }));
+  assert.equal(unchanged.noChange, true);
+  assert.equal(unchanged.clientMutationId, "");
+  assert.equal((await store.list()).length, 0);
+  assert.equal(sends, 0);
+  queue.stop();
+});
+
+test("route remount, IndexedDB hydration, and authoritative reconciliation do not synthesize a mutation", async () => {
+  const store = createMemoryScoringStore();
+  let sends = 0;
+  const queue = createScoringSyncQueue({ store, send: async () => { sends += 1; return {}; } });
+  assert.deepEqual(await queue.hydrate("2026-R3-2"), []);
+  await queue.reconcile("2026-R3-2", [
+    { "Hole Number": 3, "Team 1 Gross Scores": [4], "Team 2 Gross Scores": [5], Revision: 1 },
+  ], { Revision: 3, matchRevision: 3 });
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  assert.equal(sends, 0);
+  assert.equal((await store.list()).length, 0);
+  queue.stop();
+});
+
+test("a genuine canonical correction creates a new durable mutation", async () => {
+  const store = createMemoryScoringStore();
+  const queue = createScoringSyncQueue({ store, online: () => false, send: async () => ({}) });
+  const original = await queue.enqueue(mutation(3, { clientMutationId: "original-hole-3" }));
+  const correction = await queue.enqueue(mutation(3, { team2GrossScores: [4], clientMutationId: "corrected-hole-3" }));
+  assert.equal(sameScoringIntent(original, correction), false);
+  assert.notEqual(correction.clientMutationId, original.clientMutationId);
+  assert.deepEqual((await queue.entries("2026-R3-2")).map((entry) => entry.clientMutationId), ["corrected-hole-3"]);
+  queue.stop();
+});
+
+test("rapid five-hole scoring creates exactly one logical mutation per unchanged hole", async () => {
+  const store = createMemoryScoringStore();
+  let releaseFirst;
+  const first = new Promise((resolve) => { releaseFirst = resolve; });
+  const sent = [];
+  const queue = createScoringSyncQueue({ store, send: async (entry) => {
+    sent.push({ hole: entry.holeNumber, key: entry.clientMutationId, expectedMatchRevision: entry.expectedMatchRevision });
+    if (entry.holeNumber === 3) await first;
+    return { hole: { "Hole Number": entry.holeNumber, Revision: 1 }, matchRevision: entry.holeNumber };
+  }});
+  for (const hole of [3, 4, 5, 6, 7]) await queue.enqueue(mutation(hole, {
+    expectedMatchRevision: 2,
+    clientMutationId: `rapid-hole-${hole}`,
+  }));
+  releaseFirst();
+  await until(() => sent.length === 5);
+  await until(async () => (await store.list()).length === 0);
+  assert.deepEqual(sent.map((entry) => entry.hole), [3, 4, 5, 6, 7]);
+  assert.equal(new Set(sent.map((entry) => entry.key)).size, 5);
+  assert.deepEqual(sent.map((entry) => entry.expectedMatchRevision), [2, 3, 4, 5, 6]);
   queue.stop();
 });
 
