@@ -170,4 +170,5 @@ test("Phase 2 Director diagnostics retain safe PostgREST errors without exposing
   assert.match(shadow, /message: payload\?\.message/);
   assert.match(route, /diagnostics\.message \|\| error\?\.message/);
   assert.doesNotMatch(route, /SUPABASE_SCORING_MIRROR_SECRET_KEY/);
+  assert.match(route, /tournament_year: number\(base\.tournament\.tournament_year\) \+ 1000/);
 });

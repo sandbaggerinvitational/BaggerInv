@@ -81,7 +81,8 @@ function rehearsalPayload(source, targetMatchId, targetHole) {
   const rounds = base.rounds.map((row) => ({ ...row, tournament_id: tournamentId }));
   return {
     environment: "PREVIEW", source_workbook_id: base.source_workbook_id, requested_by: "Phase 2 rehearsal",
-    tournament: { tournament_id: tournamentId, tournament_year: base.tournament.tournament_year, name: `${base.tournament.name} Phase 2 Rehearsal` },
+    tournament: { tournament_id: tournamentId, tournament_year: number(base.tournament.tournament_year) + 1000,
+      name: `${base.tournament.name} Phase 2 Rehearsal` },
     players: base.players, teams, tournament_players: tournamentPlayers, rounds,
     snapshots: [{ ...snapshot, tournament_id: tournamentId, match_id: matchId, snapshot_id: snapshotId, snapshot_revision: 1,
       canonical_hash: canonicalAuthorityFingerprint({ ...snapshot, tournament_id: tournamentId, match_id: matchId, snapshot_id: snapshotId, snapshot_revision: 1 }) }],
