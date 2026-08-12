@@ -10,11 +10,18 @@ import {
   inspectParticipantIdentitySecurity,
   linkAuthUserToPlayer,
   readParticipantIdentityAdmin,
+  readSingleParticipantAuthRequestAudit,
   readSingleParticipantAuthRehearsalPreflight,
+  recordSingleParticipantAuthEmailConfirmation,
   setSingleParticipantAuthRehearsalStatus,
 } from "../../../../lib/participant-identity-supabase.js";
 import { assertSingleParticipantAuthPreflight, safeParticipantAuthCandidate } from "../../../../lib/participant-auth-rehearsal.js";
-import { createParticipantAuthAdminClient, provisionApprovedAuthUser } from "../../../../lib/supabase-auth-admin.js";
+import {
+  assertApprovedParticipantAuthUser,
+  createParticipantAuthAdminClient,
+  provisionApprovedAuthUser,
+  safeParticipantAuthUserState,
+} from "../../../../lib/supabase-auth-admin.js";
 import {
   initializePreviewParticipantIdentityConfiguration,
   readPreviewParticipantIdentityTournamentId,
@@ -83,6 +90,15 @@ async function loadReview() {
 async function loadAuthRehearsal(tournamentId) {
   const result = await readSingleParticipantAuthRehearsalPreflight(tournamentId);
   const data = result.payload || {};
+  let authUser = { exists: false, emailConfirmed: false, emailConfirmedAt: null, lastSignInAt: null };
+  if (data.rehearsal?.authUserId && data.candidate) {
+    const adminClient = createParticipantAuthAdminClient();
+    const lookup = await adminClient.auth.admin.getUserById(data.rehearsal.authUserId);
+    if (lookup.error) throw lookup.error;
+    assertApprovedParticipantAuthUser({ user: lookup.data?.user, candidate: data.candidate, tournamentId });
+    authUser = safeParticipantAuthUserState(lookup.data.user);
+  }
+  const requestAudit = await readSingleParticipantAuthRequestAudit(tournamentId).then((value) => value.payload).catch(() => null);
   return {
     approved: data.approved === true,
     ready: data.ready === true,
@@ -95,6 +111,8 @@ async function loadAuthRehearsal(tournamentId) {
     participantLinks: Number(data.participantLinks || 0),
     dummyLinks: Number(data.dummyLinks || 0),
     candidate: safeParticipantAuthCandidate(data.candidate),
+    authUser,
+    requestAudit,
     rehearsal: data.rehearsal ? {
       playerId: data.rehearsal.playerId,
       status: data.rehearsal.status,
@@ -214,6 +232,48 @@ export async function POST(request) {
         if (provisioned.created) await adminClient.auth.admin.deleteUser(provisioned.user.id).catch(() => null);
         throw error;
       }
+    }
+    if (action === "confirm-single-auth-email") {
+      const review = await loadReview();
+      const raw = await readSingleParticipantAuthRehearsalPreflight(review.tournamentId);
+      const preflight = raw.payload || {};
+      const candidate = assertSingleParticipantAuthPreflight(preflight);
+      if (review.latestRun?.status !== "APPROVED" || review.latestRun.fingerprint !== preflight.approvedFingerprint || review.fingerprint !== preflight.approvedFingerprint) {
+        return NextResponse.json({ error: "The Director-approved mapping fingerprint is no longer current." }, { status: 409 });
+      }
+      if (preflight.participantAuthUsers !== 1 || preflight.participantLinks !== 1 || preflight.dummyAuthUsers !== 0 || preflight.dummyLinks !== 0 ||
+          preflight.rehearsal?.playerId !== candidate.playerId || !preflight.rehearsal?.authUserId) {
+        return NextResponse.json({ error: "The single-player Auth rehearsal is not in the required isolated state." }, { status: 409 });
+      }
+      const adminClient = createParticipantAuthAdminClient();
+      const beforeLookup = await adminClient.auth.admin.getUserById(preflight.rehearsal.authUserId);
+      if (beforeLookup.error) throw beforeLookup.error;
+      const beforeUser = assertApprovedParticipantAuthUser({ user: beforeLookup.data?.user, candidate, tournamentId: review.tournamentId });
+      const before = safeParticipantAuthUserState(beforeUser);
+      let afterUser = beforeUser;
+      if (!before.emailConfirmed) {
+        const updated = await adminClient.auth.admin.updateUserById(beforeUser.id, { email_confirm: true });
+        if (updated.error) throw updated.error;
+        const afterLookup = await adminClient.auth.admin.getUserById(beforeUser.id);
+        if (afterLookup.error) throw afterLookup.error;
+        afterUser = assertApprovedParticipantAuthUser({ user: afterLookup.data?.user, candidate, tournamentId: review.tournamentId });
+      }
+      const after = safeParticipantAuthUserState(afterUser);
+      if (!after.emailConfirmed) throw new Error("Supabase did not confirm the approved Preview participant email.");
+      const audited = await recordSingleParticipantAuthEmailConfirmation({
+        tournament_id: review.tournamentId,
+        player_id: candidate.playerId,
+        auth_user_id: afterUser.id,
+        approved_fingerprint: preflight.approvedFingerprint,
+        actor: director,
+        previously_confirmed: before.emailConfirmed,
+      });
+      const verified = await loadAuthRehearsal(review.tournamentId);
+      if (!verified.authUser.emailConfirmed || verified.participantAuthUsers !== 1 || verified.participantLinks !== 1 ||
+          verified.dummyAuthUsers !== 0 || verified.dummyLinks !== 0) {
+        throw new Error("CB01 email confirmation verification failed closed.");
+      }
+      return NextResponse.json({ ok: true, action, before, after: verified.authUser, audit: audited.payload, authRehearsal: verified });
     }
     if (action === "suspend-single-auth" || action === "resume-single-auth") {
       const review = await loadReview();

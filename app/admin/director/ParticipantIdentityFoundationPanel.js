@@ -34,6 +34,7 @@ export default function ParticipantIdentityFoundationPanel() {
       setMessage(action === "initialize-source" ? "Preview identity configuration sheet initialized."
         : action === "refresh" ? "Identity configuration imported and validated."
         : action === "provision-single-auth" ? "One approved Preview Auth user and Player link are prepared. No sign-in email was sent."
+        : action === "confirm-single-auth-email" ? "The approved Preview Auth email is administratively confirmed. No OTP was sent."
         : "Identity mapping fingerprint approved. No Auth users were created.");
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
@@ -58,6 +59,9 @@ export default function ParticipantIdentityFoundationPanel() {
       <button disabled={Boolean(busy) || !latestApproved || !rehearsal?.ready || Boolean(rehearsal?.rehearsal)} onClick={() => act("provision-single-auth")}>
         {rehearsal?.rehearsal ? "Single Auth Rehearsal Prepared" : "Provision One Preview Auth User"}
       </button>
+      <button disabled={Boolean(busy) || !rehearsal?.rehearsal || rehearsal?.authUser?.emailConfirmed !== false} onClick={() => act("confirm-single-auth-email")}>
+        {rehearsal?.authUser?.emailConfirmed ? "Approved Auth Email Confirmed" : "Confirm Approved Auth Email"}
+      </button>
     </div>
     {!review.source.exists ? <p className={styles.identityInstruction}>Initialize the dedicated Preview worksheet. Then enter one explicit Tournament ID, Player ID, Email, and Identity Active value per golfer.</p> : null}
     <div className={styles.identityReview} role="region" aria-label="Participant identity mapping review">
@@ -68,6 +72,9 @@ export default function ParticipantIdentityFoundationPanel() {
     </div>
     {review.latestRun ? <p className={styles.identityRun}>Latest import: {review.latestRun.status} · revision {review.latestRun.configurationRevision} · fingerprint {review.latestRun.fingerprint.slice(0, 12)}…{review.latestRun.approvedAt ? ` · approved ${new Date(review.latestRun.approvedAt).toLocaleString()}` : ""}</p> : null}
     {rehearsal?.candidate ? <p className={styles.identityRun}>Single rehearsal candidate: {rehearsal.candidate.displayName} · {rehearsal.candidate.playerId} · {rehearsal.candidate.maskedEmail}. Dummy Auth users: {rehearsal.dummyAuthUsers}. No email is sent by provisioning.</p> : null}
+    {rehearsal?.rehearsal ? <p className={styles.identityRun}>Auth participants: {rehearsal.participantAuthUsers} · Active links: {rehearsal.participantLinks} · Dummy users: {rehearsal.dummyAuthUsers} · Dummy links: {rehearsal.dummyLinks} · Email {rehearsal.authUser?.emailConfirmed ? "confirmed" : "unconfirmed"}.</p> : null}
+    {rehearsal?.requestAudit?.latestAttempt ? <p className={styles.identityRun}>Latest OTP request: {rehearsal.requestAudit.latestAttempt.status} · {rehearsal.requestAudit.latestAttempt.safeReason || "recorded"} · attempts recorded {rehearsal.requestAudit.attemptCount}. OTP values and tokens are never retained.</p> : null}
+    {rehearsal?.requestAudit?.authLogActions?.length ? <p className={styles.identityRun}>Safe Auth log: {rehearsal.requestAudit.authLogActions.map((entry) => `${entry.action || entry.logType || "recorded"} at ${new Date(entry.createdAt).toLocaleString()}`).join(" · ")}. No Auth payload, token, code, or IP is exposed.</p> : null}
     {message ? <p className={styles.identityMessage} role="status">{message}</p> : null}
   </section>;
 }

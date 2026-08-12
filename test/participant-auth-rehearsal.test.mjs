@@ -69,11 +69,11 @@ test("migration enforces one rehearsal identity, durable OTP limits, RLS, and se
   assert.doesNotMatch(migration, /grant execute[\s\S]+(?:anon|authenticated)/i);
 });
 
-test("provisioning creates no password and no email, requires explicit approved Player ID, and compensates failure", async () => {
+test("provisioning administratively confirms the Director-approved email without sending mail or creating a password", async () => {
   const admin = await source("lib/supabase-auth-admin.js");
   const route = await source("app/api/director/participant-identity/route.js");
   assert.match(admin, /auth\.admin\.createUser/);
-  assert.match(admin, /email_confirm: false/);
+  assert.match(admin, /email_confirm: true/);
   assert.doesNotMatch(admin, /password\s*:/);
   assert.doesNotMatch(admin, /inviteUserByEmail|signInWithOtp/);
   assert.match(route, /assertSingleParticipantAuthPreflight/);
@@ -81,6 +81,43 @@ test("provisioning creates no password and no email, requires explicit approved 
   assert.match(route, /approved_fingerprint/);
   assert.match(route, /deleteUser/);
   assert.match(route, /dummyAuthUsers !== 0 \|\| verified\.dummyLinks !== 0/);
+});
+
+test("existing single-player repair confirms only the approved linked user and records safe audit evidence", async () => {
+  const admin = await source("lib/supabase-auth-admin.js");
+  const route = await source("app/api/director/participant-identity/route.js");
+  const migration = await source("supabase/migrations/202608120016_preview_single_participant_auth_email_confirmation.sql");
+  assert.match(route, /action === "confirm-single-auth-email"/);
+  assert.match(route, /participantAuthUsers !== 1/);
+  assert.match(route, /participantLinks !== 1/);
+  assert.match(route, /dummyAuthUsers !== 0/);
+  assert.match(route, /dummyLinks !== 0/);
+  assert.match(route, /updateUserById\(beforeUser\.id, \{ email_confirm: true \}\)/);
+  assert.match(admin, /provisioning_scope !== "preview_phase_a_single_player"/);
+  assert.match(admin, /app_metadata\?\.player_id/);
+  assert.match(admin, /app_metadata\?\.tournament_id/);
+  assert.match(migration, /AUTH_EMAIL_ADMIN_CONFIRMED/);
+  assert.match(migration, /DIRECTOR_APPROVED_IDENTITY_MAPPING/);
+  assert.match(migration, /emailValueStored', false/);
+  assert.match(migration, /email_confirmed_at[\s\S]*auth\.users u/);
+  assert.doesNotMatch(migration, /token_hash|refresh_token|access_token|otp_value/i);
+});
+
+test("safe Auth request audit exposes only action and delivery metadata", async () => {
+  const migration = await source("supabase/migrations/202608120016_preview_single_participant_auth_email_confirmation.sql");
+  const panel = await source("app/admin/director/ParticipantIdentityFoundationPanel.js");
+  assert.match(migration, /read_single_participant_auth_request_audit/);
+  assert.match(migration, /auth\.audit_log_entries/);
+  assert.match(migration, /'action'/);
+  assert.match(migration, /'logType'/);
+  assert.match(migration, /'safeReason'/);
+  assert.match(migration, /revoke all on function public\.read_single_participant_auth_request_audit\(text\) from public, anon, authenticated/);
+  assert.match(migration, /grant execute on function public\.read_single_participant_auth_request_audit\(text\) to service_role/);
+  assert.doesNotMatch(migration, /payload\s*(?:,|as)|jsonb_agg\(payload\)|TokenHash|ConfirmationURL/i);
+  assert.match(panel, /Auth participants:/);
+  assert.match(panel, /attempts recorded/);
+  assert.match(panel, /Safe Auth log:/);
+  assert.match(panel, /No Auth payload, token, code, or IP is exposed/);
 });
 
 test("OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior", async () => {
