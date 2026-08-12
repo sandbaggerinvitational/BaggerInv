@@ -390,6 +390,35 @@ function netSkinsHistoricalRegression(calculated) {
   return { ...result, pass: result.jackKeffler.gross === 80 && result.jackKeffler.net === 67 && result.jackKeffler.skins === 1 && result.jackKeffler.winnings === 120 && result.jackKeffler.winningHoles.includes(6) && result.maxMarkley.skins === 1 && result.maxMarkley.winnings === 120 && result.holmanMoores.skins === 0 && result.memoSaldana.skins === 0 };
 }
 
+function netSkinsCanonicalInputDivergences(expectedRows = [], actualRows = []) {
+  const key = (row) => `${number(row.round)}:${(row.playerIds || []).map(clean).sort().join("|")}`;
+  const scoreNumber = (value) => value === null || value === undefined || clean(value) === "" ? null : number(value, null);
+  const expectedByKey = new Map(expectedRows.map((row) => [key(row), row]));
+  const actualByKey = new Map(actualRows.map((row) => [key(row), row]));
+  const divergences = [];
+  for (const entryKey of new Set([...expectedByKey.keys(), ...actualByKey.keys()])) {
+    const expected = expectedByKey.get(entryKey);
+    const actual = actualByKey.get(entryKey);
+    if (!expected || !actual) {
+      divergences.push({ key: entryKey, code: expected ? "MISSING_SUPABASE_ENTRY" : "EXTRA_SUPABASE_ENTRY" });
+      continue;
+    }
+    const expectedHoles = new Map((expected.scorecard || []).map((hole) => [number(hole.hole), hole]));
+    const actualHoles = new Map((actual.scorecard || []).map((hole) => [number(hole.hole), hole]));
+    for (const holeNumber of new Set([...expectedHoles.keys(), ...actualHoles.keys()])) {
+      const wanted = expectedHoles.get(holeNumber);
+      const found = actualHoles.get(holeNumber);
+      const fields = ["gross", "strokes", "net", "par", "strokeIndex"];
+      if (!wanted || !found || fields.some((field) => scoreNumber(wanted?.[field]) !== scoreNumber(found?.[field]))) {
+        divergences.push({ key: entryKey, playerIds: actual.playerIds, name: actual.name, hole: holeNumber,
+          expected: wanted ? Object.fromEntries(fields.map((field) => [field, wanted[field] ?? null])) : null,
+          actual: found ? Object.fromEntries(fields.map((field) => [field, found[field] ?? null])) : null });
+      }
+    }
+  }
+  return divergences.slice(0, 100);
+}
+
 async function netSkinsReadiness(actorId, { refreshConfiguration = false, samples = 25 } = {}) {
   const source = await authoritativeImport(actorId);
   const googleStartedAt = performance.now();
@@ -436,6 +465,7 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
     resultPostgresMs.push(number(resultView.payload.data.query_ms));
   }
   const comparison = compareNetSkinsParity(expected.netSkins, calculated.netSkins);
+  const canonicalInputDivergences = netSkinsCanonicalInputDivergences(expected.scoreLeaderboard, calculated.scoreRows);
   const officialRounds = calculated.netSkins.rounds.filter((round) => round.finalized);
   const calculatedOfficialRows = normalizedOfficialNetSkinsRows(netSkinsResultRecords({ results: officialRounds.flatMap((round) => round.skins || []) }));
   const googleOfficialRows = normalizedOfficialNetSkinsRows(expected.netSkins?.storedResults || []);
@@ -461,6 +491,7 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
       googleConfigurationReadMs,
     },
     canonicalInput: calculated.canonicalInputVerification,
+    canonicalInputDivergences,
     sourceFingerprint: calculated.sourceFingerprint,
     sourceFingerprintByRound: calculated.sourceFingerprintByRound,
     parity: comparison,
@@ -504,7 +535,8 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
       staleOfficialSnapshotRetainedOnFailure: true,
       hiddenGoogleFallback: false,
     },
-    pass: comparison.pass && publicationParity && historicalRegression.pass && Boolean(configuredScramble) && snapshots.length === configuration.rounds.length && jobs.every((job) => job.status === "SUCCEEDED"),
+    pass: comparison.pass && publicationParity && historicalRegression.pass && Boolean(configuredScramble) &&
+      snapshots.length === configuration.rounds.filter((round) => round.enabled).length && jobs.every((job) => job.status === "SUCCEEDED"),
   };
 }
 

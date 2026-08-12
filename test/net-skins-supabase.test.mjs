@@ -120,13 +120,18 @@ test("source flag is Preview-only, server-controlled, and Production fail-closed
   assert.equal(netSkinsReadEnvironment({ ...common, VERCEL_ENV: "production" }).reason, "production-hard-block");
 });
 
-test("migration is service-only, versioned, event-invalidated, and never calculates inside scoring", async () => {
-  const migration = await readFile(new URL("../supabase/migrations/202608120029_preview_net_skins_derived_state.sql", import.meta.url), "utf8");
+test("migrations are service-only, versioned, event-invalidated, and never calculate inside scoring", async () => {
+  const [migration, disabledStateMigration] = await Promise.all([
+    readFile(new URL("../supabase/migrations/202608120029_preview_net_skins_derived_state.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608120030_preview_net_skins_disabled_round_state.sql", import.meta.url), "utf8"),
+  ]);
   for (const table of ["net_skins_configurations", "net_skins_configuration_entries", "competition_derived_snapshots", "competition_recalculation_jobs"]) assert.match(migration, new RegExp(`alter table scoring_authority\\.${table} enable row level security`));
   assert.match(migration, /revoke all on function public\.read_net_skins_result_view\(text\) from public, anon, authenticated/);
   assert.match(migration, /after insert or update or delete on scoring_authority\.hole_scores/);
   assert.match(migration, /status = 'PENDING'/);
   assert.doesNotMatch(migration, /calculateNetSkins/);
+  assert.match(disabledStateMigration, /not c\.enabled/);
+  assert.match(disabledStateMigration, /revoke all on function public\.clear_disabled_net_skins_operational_state\(text\) from public, anon, authenticated/);
 });
 
 test("participant module has zero Google fallback and remains isolated from core standings", async () => {
