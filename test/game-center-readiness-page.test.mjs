@@ -11,3 +11,13 @@ test("isolated Director Game Center readiness page exposes only explicit refresh
   assert.match(client, /game-center-parity/);
   assert.doesNotMatch(client, /getTournamentData|readWorkbookSheetsByName/);
 });
+
+test("signed Preview Director impersonation can reach isolated diagnostics without a Google freshness read", () => {
+  const resolver = fs.readFileSync(new URL("../lib/player-passport-server.js", import.meta.url), "utf8");
+  const directorStart = resolver.indexOf("export async function inspectTournamentDirectorToken");
+  const fastPath = resolver.indexOf("if (isPreviewImpersonationSession(session))", directorStart);
+  const cachePath = resolver.indexOf("const key = directorTokenKey(token)", directorStart);
+  assert.ok(directorStart >= 0 && fastPath > directorStart && cachePath > fastPath);
+  assert.match(resolver.slice(fastPath, cachePath), /status: "active"/);
+  assert.match(resolver.slice(fastPath, cachePath), /actor: session\.previewDirector/);
+});
