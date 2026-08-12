@@ -94,6 +94,18 @@ test("Supabase projection retains complete milestone history for movement", () =
   assert.equal(actual[1].players[0].probability - actual[0].players[0].probability, 5);
 });
 
+test("published Odds parity ignores JSONB object-key ordering but not value changes", () => {
+  const imported = buildPublishedOddsImport({ sheets: sheets(), tournamentId: "2026", tournamentYear: 2026,
+    sourceWorkbookId: "preview", requestedBy: "Director" });
+  const reorder = (value) => Array.isArray(value) ? value.map(reorder) : value && typeof value === "object"
+    ? Object.fromEntries(Object.entries(value).reverse().map(([key, item]) => [key, reorder(item)])) : value;
+  const expected = imported.snapshots.map((item) => item.published_payload);
+  const jsonbOrdered = reorder(expected);
+  assert.equal(comparePublishedOddsParity(expected, jsonbOrdered).pass, true);
+  jsonbOrdered[1].players[0].probability += 0.1;
+  assert.equal(comparePublishedOddsParity(expected, jsonbOrdered).pass, false);
+});
+
 test("published Odds source is Preview-only and Production fail-closed", () => {
   const base = { PUBLISHED_ODDS_READ_SOURCE: "supabase", GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
     SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "server" };
