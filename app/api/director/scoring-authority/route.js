@@ -19,7 +19,7 @@ import {
   replaceCanonicalScoringAuthorityImport,
   submitCanonicalHoleScore,
 } from "../../../../lib/scoring-authority-supabase.js";
-import { benchmarkSummary } from "../../../../lib/scoring-shadow.js";
+import { benchmarkSummary, canonicalJson } from "../../../../lib/scoring-shadow.js";
 import { drainGoogleOutbox, inspectGoogleMatchState, processNextGoogleOutboxEvent } from "../../../../lib/scoring-google-outbox.js";
 import { inspectPreviewLiveMatchScoringLockMigration, migratePreviewLiveMatchScoringLock, readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { grossScoresFromCell } from "../../../../lib/live-score-values.js";
@@ -608,8 +608,8 @@ async function competitionDerivedReadiness(actorId, { refresh = false, samples =
     resultPostgresSamples.push(number(stateRead.payload.data.query_ms));
   }
   const prepared = competitionDerivedDataFromView(stateRead.payload.data, { now: referenceTime });
-  const momentumStoredPass = JSON.stringify(prepared.momentum) === JSON.stringify(calculated.momentum.value);
-  const storylinesStoredPass = JSON.stringify(prepared.storylines) === JSON.stringify(calculated.storylines.stories);
+  const momentumStoredPass = canonicalJson(prepared.momentum) === canonicalJson(calculated.momentum.value);
+  const storylinesStoredPass = canonicalJson(prepared.storylines) === canonicalJson(calculated.storylines.stories);
   return {
     engines: {
       momentum: { module: "lib/live-tournament.js#getTeamMomentum", engineVersion: TEAM_MOMENTUM_ENGINE_VERSION,

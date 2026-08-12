@@ -127,11 +127,12 @@ test("migration preserves restrictive RLS and event-driven coalesced jobs", asyn
 });
 
 test("participant reads consume prepared state and never calculate Storylines on Home", async () => {
-  const [home, command, tournament, scoring] = await Promise.all([
+  const [home, command, tournament, scoring, readiness] = await Promise.all([
     readFile(new URL("../app/api/participant/home/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/tournament/live/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8"),
   ]);
   assert.match(home, /currentCompetitionDerivedState/);
   assert.match(command, /preparedStorylines/);
@@ -139,6 +140,7 @@ test("participant reads consume prepared state and never calculate Storylines on
   assert.doesNotMatch(home, /tournamentStorylines\(/);
   assert.match(scoring, /after\(async \(\) =>/);
   assert.match(scoring, /recalculateCompetitionDerivedTournament/);
+  assert.match(readiness, /canonicalJson\(prepared\.storylines\) === canonicalJson\(calculated\.storylines\.stories\)/);
 });
 
 test("secondary failures retain the core Home and Tournament payload with explicit unavailable state", async () => {
