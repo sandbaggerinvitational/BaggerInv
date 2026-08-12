@@ -44,6 +44,9 @@ test("Tournament primary request and default Preview page are Google-free under 
   assert.match(page, /source\.resolved === "supabase"/);
   assert.match(page, /<TournamentSupabaseRead/);
   assert.match(route, /readTournamentLiveView/);
+  assert.match(route, /resolveSupabaseParticipantIdentity/);
+  assert.match(route, /readTournamentLiveView\(identity\.tournamentId\)/);
+  assert.match(route, /Cache-Control.*private, no-store/);
   assert.match(route, /X-Tournament-Google-Requests/);
   assert.doesNotMatch(route, /getTournamentData|google-sheets|\/api\/live/);
   assert.match(wrapper, /\/api\/tournament\/live/);
@@ -131,6 +134,7 @@ test("secondary failures remain isolated from the canonical Tournament live rout
     source("app/api/tournament/live/route.js"), source("app/api/tournament/secondary/route.js"), source("app/live/TournamentDashboard.js"),
   ]);
   assert.doesNotMatch(primary, /readTournamentSecondaryView|calcutta/);
+  assert.match(secondary, /readTournamentSecondaryView\(\{ tournamentId: identity\.tournamentId, module \}\)/);
   assert.match(secondary, /This Tournament section is temporarily unavailable/);
   assert.match(dashboard, /The live Tournament remains available/);
   assert.match(dashboard, /no-store/);
