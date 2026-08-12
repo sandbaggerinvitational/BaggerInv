@@ -175,7 +175,7 @@ begin
     if upper(round_value->>'format') <> 'SC' and upper(round_value->>'entry_type') <> 'INDIVIDUAL' then
       return jsonb_build_object('ok', false, 'code', 'INDIVIDUAL_CONFIGURATION_REQUIRED');
     end if;
-    if (round_value->>'buy_in_per_entry')::numeric <> case when upper(round_value->>'format') = 'SC' then 50 else 25 end
+    if (round_value->>'buy_in_per_entry')::numeric <> (case when upper(round_value->>'format') = 'SC' then 50 else 25 end)
         or (round_value->>'expected_pot')::numeric <> (select count(*) * (round_value->>'buy_in_per_entry')::numeric
           from jsonb_array_elements(round_value->'entries') e where coalesce((e->>'eligible')::boolean, true)) then
       return jsonb_build_object('ok', false, 'code', 'NET_SKINS_FINANCIAL_CONTRACT_MISMATCH');
