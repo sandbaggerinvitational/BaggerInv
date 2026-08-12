@@ -5,6 +5,7 @@ import {
   activePreparedStorylines,
   calculateCompetitionDerivedFromData,
   competitionDerivedDataFromView,
+  storylineSemanticRecord,
   TEAM_MOMENTUM_ENGINE_VERSION,
   TOURNAMENT_STORYLINES_ENGINE_VERSION,
 } from "../lib/competition-derived-supabase.js";
@@ -74,6 +75,20 @@ test("prepared Storylines persist semantic copy without time-relative labels", (
     assert.equal(typeof story.headline, "string");
     assert.equal(typeof story.detail, "string");
   }
+});
+
+test("semantic Storylines exclude transport timestamps while recent clinches retain expiry", () => {
+  const transportOnly = storylineSemanticRecord({
+    id: "closest-match", headline: "Closest", updatedAt: referenceTime,
+  });
+  assert.equal(transportOnly.updatedAt, null);
+  assert.equal(transportOnly.expiresAt, null);
+
+  const recentClinch = storylineSemanticRecord({
+    id: "clinch-2026-R3-4", headline: "Clinched", updatedAt: referenceTime,
+  });
+  assert.equal(recentClinch.updatedAt, referenceTime);
+  assert.equal(recentClinch.expiresAt, "2026-08-12T19:00:00.000Z");
 });
 
 test("read-time expiry removes a prepared recent-clinch story without recalculating the engine", () => {
