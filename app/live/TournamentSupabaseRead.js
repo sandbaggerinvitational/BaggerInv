@@ -56,6 +56,7 @@ export default function TournamentSupabaseRead() {
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 450));
       schedule(() => {
         router.prefetch("/my-match");
+        router.prefetch("/live?view=leaderboards");
         const match = likelyGameCenter(result.data);
         if (match?.id) router.prefetch(`/game-center/${encodeURIComponent(match.id)}?from=tournament`);
         recordParticipantAuthDiagnostic("TOURNAMENT_PREFETCH_COMPLETE", { routeTo: "/live", durationMs: performance.now() - startedAt });

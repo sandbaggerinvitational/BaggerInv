@@ -166,11 +166,17 @@ test("Scramble cards use golfer handicaps and one team-level stroke treatment", 
 });
 
 test("dedicated Leaderboards retains Scramble pairing rows after Tournament removes duplicate standings", async () => {
-  const [source, dataSource, scrambleSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(dataUrl, "utf8"), readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8")]);
-  assert.match(dataSource, /if \(format === "SC"\) \{/);
-  assert.match(dataSource, /entityId: `\$\{clean\(match\["Match ID"\]\)\}:team-\$\{side\}`/);
-  assert.match(dataSource, /name: playerIds\.map\(\(id\) => playerMap\[id\]\?\.name \|\| id\)\.join\(" \/ "\)/);
-  assert.match(dataSource, /entityType: format === "SC" \? "PAIRING" : "PLAYER"/);
+  const [source, dataSource, coreEngine, scrambleSource] = await Promise.all([
+    readFile(componentUrl, "utf8"),
+    readFile(dataUrl, "utf8"),
+    readFile(new URL("../lib/leaderboards-core-engine.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/ScrambleLeaderboard.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(dataSource, /leaderboards-core-engine/);
+  assert.match(coreEngine, /if \(format === "SC"\) \{/);
+  assert.match(coreEngine, /entityId: `\$\{clean\(match\["Match ID"\]\)\}:team-\$\{side\}`/);
+  assert.match(coreEngine, /name: playerIds\.map\(\(id\) => playerMap\[id\]\?\.name \|\| id\)\.join\(" \/ "\)/);
+  assert.match(coreEngine, /entityType: format === "SC" \? "PAIRING" : "PLAYER"/);
   assert.match(scrambleSource, /Scramble Pairing Leaderboard/);
   assert.match(scrambleSource, /<ScrambleTeamIdentity/);
   assert.match(scrambleSource, /<RoundLeaderboardSheet/);

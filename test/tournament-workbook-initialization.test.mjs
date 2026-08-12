@@ -149,7 +149,11 @@ test("server diagnostics stay internal while participant recovery uses friendly 
 });
 
 test("recorded hole scores pass stroke index into every Net Skins scorecard row", async () => {
-  const source = await readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8");
-  assert.match(source, /const add = \(\{[^}]*strokeIndex[^}]*\}\) =>/);
-  assert.equal((source.match(/holeNumber: row\["Hole Number"\],\s*strokeIndex,/g) || []).length, 2);
+  const [loader, engine] = await Promise.all([
+    readFile(new URL("../app/live/sheetData.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/leaderboards-core-engine.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(loader, /buildScoreLeaderboard/);
+  assert.match(engine, /const add = \(\{[^}]*strokeIndex[^}]*\}\) =>/);
+  assert.equal((engine.match(/holeNumber: row\["Hole Number"\],\s*strokeIndex,/g) || []).length, 2);
 });

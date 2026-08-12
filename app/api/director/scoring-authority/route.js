@@ -49,6 +49,12 @@ import {
   readTournamentLiveView,
   tournamentLiveDataFromSupabaseView,
 } from "../../../../lib/tournament-live-supabase.js";
+import {
+  compareLeaderboardsCoreParity,
+  expectedLeaderboardsCoreView,
+  leaderboardsCoreDataFromSupabaseView,
+  readLeaderboardsCoreView,
+} from "../../../../lib/leaderboards-core-supabase.js";
 import { getTournamentData } from "../../../live/sheetData.js";
 import {
   MATCH_ACCESS_ACTIONS,
@@ -63,6 +69,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 const clean = (value) => String(value ?? "").trim();
+const upper = (value) => clean(value).toUpperCase();
 const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const truthy = (value) => /^(true|yes|1|locked)$/i.test(clean(value));
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404 });
@@ -259,6 +266,83 @@ async function tournamentReadiness(actorId, { refresh = false, samples = 25 } = 
     },
     googleRequestsPerParticipantLiveRead: 0,
     pass: comparison.pass && matches.length === 24 && actual.rounds?.length === 3,
+  };
+}
+
+async function leaderboardsCoreReadiness(actorId, { samples = 25 } = {}) {
+  const source = await authoritativeImport(actorId);
+  const expected = await getTournamentData();
+  const presentation = buildGameCenterPresentationImport({
+    sheets: source.sheets,
+    sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
+    requestedBy: actorId,
+  });
+  const homePresentation = buildParticipantHomePresentationImport({
+    liveData: expected,
+    sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
+    requestedBy: actorId,
+  });
+  const importedView = expectedLeaderboardsCoreView(source.imported, presentation, {
+    presentation: homePresentation.presentation,
+    source_fingerprint: "",
+  });
+  const imported = leaderboardsCoreDataFromSupabaseView(importedView);
+  const importComparison = compareLeaderboardsCoreParity(expected, imported);
+  const postgresQueryMs = [];
+  const supabaseServiceMs = [];
+  const calculationMs = [];
+  const fullServerMs = [];
+  const sourceFingerprints = [];
+  let actual;
+  const sampleCount = Math.max(1, Math.min(50, number(samples, 25)));
+  for (let index = 0; index < sampleCount; index += 1) {
+    const began = performance.now();
+    const read = await readLeaderboardsCoreView(source.imported.payload.tournament.tournament_id);
+    if (!read.payload?.ok) throw Object.assign(new Error(`Leaderboards core read failed (${read.payload?.code || "unknown"}).`), { code: read.payload?.code });
+    actual = leaderboardsCoreDataFromSupabaseView(read.payload.data);
+    sourceFingerprints.push(actual.sourceFingerprint);
+    fullServerMs.push(performance.now() - began);
+    postgresQueryMs.push(number(read.payload.data.query_ms));
+    supabaseServiceMs.push(number(read.durationMs));
+    calculationMs.push(number(actual.calculationMs));
+  }
+  const comparison = compareLeaderboardsCoreParity(expected, actual);
+  const matches = (actual.rounds || []).flatMap((round) => round.matches || []);
+  const scoreRows = actual.scoreLeaderboard || [];
+  return {
+    comparison,
+    importComparison,
+    sourceFingerprint: actual.sourceFingerprint,
+    sourceFingerprintDeterministic: new Set(sourceFingerprints).size === 1,
+    importedSourceFingerprint: imported.sourceFingerprint,
+    slotVerification: actual.slotVerification,
+    coverage: {
+      players: actual.players?.length || 0,
+      teams: 2,
+      matches: matches.length,
+      rounds: actual.rounds?.length || 0,
+      formats: [...new Set(matches.map((match) => upper(match.format)))].sort(),
+      finalMatches: matches.filter((match) => upper(match.status) === "FINAL").length,
+      liveMatches: matches.filter((match) => upper(match.status) === "LIVE").length,
+      zeroHoleMatches: matches.filter((match) => !(match.holeResults || []).length).length,
+      clinchedMatches: matches.filter((match) => match.clinched).length,
+      individualScoreRows: scoreRows.filter((row) => row.entityType === "PLAYER").length,
+      scramblePairingRows: scoreRows.filter((row) => row.entityType === "PAIRING").length,
+      historicalCorrectionMatch: matches.some((match) => match.id === "2026-R1-6"),
+      supabaseFinalizedMatch: matches.some((match) => match.id === "2026-R3-4" && upper(match.status) === "FINAL"),
+    },
+    performance: {
+      samples: sampleCount,
+      postgresQuery: benchmarkSummary(postgresQueryMs),
+      supabaseService: benchmarkSummary(supabaseServiceMs),
+      standingsCalculation: benchmarkSummary(calculationMs),
+      fullServer: benchmarkSummary(fullServerMs),
+    },
+    googleRequestsPerParticipantCoreRead: 0,
+    secondaryModulesUnchanged: ["Net Skins", "Calcutta", "Insights", "Championship Odds", "Storylines", "Tournament Intelligence"],
+    pass: comparison.pass && importComparison.pass && actual.slotVerification.pass &&
+      actual.players?.length === 24 && matches.length === 24 && actual.rounds?.length === 3 &&
+      ["BB", "SC", "SI"].every((format) => matches.some((match) => upper(match.format) === format)),
   };
 }
 
@@ -831,6 +915,8 @@ export async function POST(request) {
       result = await tournamentReadiness(actorId, { refresh: true, samples: input.samples });
     } else if (action === "tournament-parity") {
       result = await tournamentReadiness(actorId, { samples: input.samples });
+    } else if (action === "leaderboards-core-parity") {
+      result = await leaderboardsCoreReadiness(actorId, { samples: input.samples });
     } else if (action === "match-authorization-parity") {
       const source = await authoritativeImport(actorId);
       result = await matchAuthorizationParity(source);

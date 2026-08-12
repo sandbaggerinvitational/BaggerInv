@@ -461,15 +461,29 @@ function NetSkinsBoard({ data, currentPlayer }) {
   </section>;
 }
 
-export default function LeaderboardsDashboard({ initialData, loadError, previewMode = false }) {
+export default function LeaderboardsDashboard({
+  initialData,
+  initialCurrentPlayer = null,
+  loadError,
+  previewMode = false,
+  coreReadSource = "google",
+  coreReadUrl = "/api/live",
+  secondaryReadUrl = "/api/live",
+  onConfirmedCore,
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [data, setData] = useState(initialData);
-  const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [currentPlayer, setCurrentPlayer] = useState(initialCurrentPlayer);
   const [oddsSnapshots, setOddsSnapshots] = useState(null);
+  const [secondaryData, setSecondaryData] = useState(null);
+  const [secondaryState, setSecondaryState] = useState("idle");
   const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
   const pending = useRef(null);
+  const secondaryPending = useRef(null);
+  const lastConfirmedAt = useRef(Date.now());
   const navigationStartedAt = useRef(null);
+  const supabaseCore = coreReadSource === "supabase";
   const roundValues = useMemo(() => new Set((data?.rounds || []).map((round) => String(round.number))), [data?.rounds]);
   const selectionFrom = useCallback((params) => ({
     tab: ["players", "teams", "skins", "insights"].includes(params.get("tab")) ? params.get("tab") : "players",
@@ -517,21 +531,45 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
   const refresh = useCallback(() => {
     if (pending.current) return pending.current;
     setRefreshState("refreshing");
-    pending.current = fetchWithTransientRetry("/api/live", { cache: "no-store" }).then(async (response) => {
+    pending.current = fetchWithTransientRetry(coreReadUrl, { cache: "no-store", credentials: "same-origin" }).then(async (response) => {
       const payload = await response.json();
       if (!response.ok || !payload.data) throw new Error(payload.error || "Unable to refresh standings.");
-      setData(payload.data); setRefreshState("current");
+      setData(payload.data);
+      if (payload.player) setCurrentPlayer(payload.player);
+      lastConfirmedAt.current = Date.now();
+      onConfirmedCore?.(payload.data, payload.player);
+      setRefreshState("current");
     }).catch(() => setRefreshState("error")).finally(() => { pending.current = null; });
     return pending.current;
-  }, []);
+  }, [coreReadUrl, onConfirmedCore]);
+
+  const loadSecondary = useCallback(() => {
+    if (!supabaseCore || secondaryPending.current || secondaryData) return secondaryPending.current;
+    setSecondaryState("loading");
+    secondaryPending.current = fetchWithTransientRetry(secondaryReadUrl, { cache: "no-store" }).then(async (response) => {
+      const payload = await response.json();
+      if (!response.ok || !payload.data) throw new Error(payload.error || "Secondary standings are unavailable.");
+      setSecondaryData(payload.data);
+      setSecondaryState("ready");
+    }).catch(() => setSecondaryState("error")).finally(() => { secondaryPending.current = null; });
+    return secondaryPending.current;
+  }, [secondaryData, secondaryReadUrl, supabaseCore]);
+
   useEffect(() => {
-    fetch("/api/player-passport/session", { cache: "no-store" }).then(async (response) => response.ok ? (await response.json()).player : null).then(setCurrentPlayer).catch(() => {});
+    if (tab === "skins") loadSecondary();
+  }, [loadSecondary, tab]);
+
+  useEffect(() => {
+    if (!supabaseCore) {
+      fetch("/api/player-passport/session", { cache: "no-store" }).then(async (response) => response.ok ? (await response.json()).player : null).then(setCurrentPlayer).catch(() => {});
+    }
     const poll = () => { if (document.visibilityState === "visible") refresh(); };
-    const timer = window.setInterval(poll, 45_000);
-    window.addEventListener("focus", poll);
-    document.addEventListener("visibilitychange", poll);
-    return () => { window.clearInterval(timer); window.removeEventListener("focus", poll); document.removeEventListener("visibilitychange", poll); };
-  }, [refresh]);
+    const focus = () => { if (Date.now() - lastConfirmedAt.current >= 10_000) poll(); };
+    const timer = window.setInterval(poll, supabaseCore ? 30_000 : 45_000);
+    window.addEventListener("focus", focus);
+    document.addEventListener("visibilitychange", focus);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", focus); document.removeEventListener("visibilitychange", focus); };
+  }, [refresh, supabaseCore]);
   const tournament = data?.tournament;
   if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
     <strong>{refreshState === "refreshing" ? "Preparing Tournament…" : "Tournament data is temporarily unavailable."}</strong>
@@ -546,7 +584,12 @@ export default function LeaderboardsDashboard({ initialData, loadError, previewM
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} snapshots={oddsSnapshots} /> : null}
-    {tab === "skins" ? <NetSkinsBoard data={data} currentPlayer={currentPlayer} /> : null}
+    {tab === "skins" && (!supabaseCore || secondaryData) ? <NetSkinsBoard data={secondaryData || data} currentPlayer={currentPlayer} /> : null}
+    {tab === "skins" && supabaseCore && !secondaryData ? <section className={skinsStyles.board}><div className={styles.empty} role="status">
+      <strong>{secondaryState === "error" ? "Net Skins are temporarily unavailable." : "Loading Net Skins…"}</strong>
+      <span>{secondaryState === "error" ? "Core team and player standings remain available." : "Retrieving the independently published competition module."}</span>
+      {secondaryState === "error" ? <button type="button" onClick={loadSecondary}>Try again</button> : null}
+    </div></section> : null}
     {tab === "insights" ? <Insights data={data} snapshots={oddsSnapshots} previewMode={previewMode} /> : null}
   </section>;
 }

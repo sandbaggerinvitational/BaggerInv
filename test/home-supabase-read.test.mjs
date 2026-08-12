@@ -31,7 +31,7 @@ test("Home presentation imports schedule and participant-only Net Skins display 
   const imported = buildParticipantHomePresentationImport({ sourceWorkbookId: "preview-workbook", requestedBy: "Director", liveData: {
     tournament: { id: "2026", year: 2026, name: "Sandbagger Invitational", status: "Live", currentRound: 3, timeZone: "America/Chicago" },
     timeline: { available: true, events: [{ id: "breakfast", displayOnHome: true }, { id: "hidden", displayOnHome: false }] },
-    players: [{ id: "CB01" }, { id: "HM01" }],
+    players: [{ id: "CB01", slug: "clay-beltran", photo: "clay-beltran-pic", captain: true }, { id: "HM01" }],
     netSkins: { rounds: [{ round: 3, format: "SI", leaderboard: [
       { playerIds: ["CB01"], skinsWon: 2, totalWinnings: 40 },
       { playerIds: ["HM01"], skinsWon: 1, totalWinnings: 20 },
@@ -42,6 +42,8 @@ test("Home presentation imports schedule and participant-only Net Skins display 
   assert.deepEqual(imported.presentation.netSkinsByPlayer.CB01.rounds, [
     { round: 3, format: "SI", playerIds: ["CB01"], skinsWon: 2, totalWinnings: 40 },
   ]);
+  assert.deepEqual(imported.presentation.leaderboardsPlayers.CB01,
+    { slug: "clay-beltran", photo: "clay-beltran-pic", captain: true });
 });
 
 test("Home migration and request path are service-only, participant-scoped, and Google-free", async () => {

@@ -149,7 +149,7 @@ test("round-origin Team taps render an in-memory recap while Overall stays tourn
   assert.match(source, /\[\["wins", "Wins"\], \["ties", "Ties"\], \["losses", "Losses"\], \["inProgress", "In Progress"\]\]/);
   assert.match(source, /Match results will appear once play begins\./);
   assert.match(source, /match\.players\.map\(\(player\) => player\.name\)\.join\(" & "\)/);
-  assert.equal((source.match(/fetchWithTransientRetry\("\/api\/live"/g) || []).length, 1);
+  assert.equal((source.match(/fetchWithTransientRetry\(secondaryReadUrl/g) || []).length, 1);
 });
 
 test("Teams show Pending until a round has an official result", async () => {

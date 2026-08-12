@@ -53,6 +53,7 @@ export default function ParticipantSupabaseHome() {
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 450));
       schedule(() => {
         router.prefetch("/my-match");
+        router.prefetch("/live?view=leaderboards");
         const selected = selectRelevantPlayerMatches(next.participant?.matches || [], next.participant?.tournament?.currentRound).primary;
         if (selected?.matchId) router.prefetch(`/game-center/${encodeURIComponent(selected.matchId)}?from=home`);
         recordParticipantAuthDiagnostic("HOME_SECONDARY_COMPLETE", { routeTo: "/home", durationMs: performance.now() - startedAt });
