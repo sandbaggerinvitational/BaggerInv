@@ -92,6 +92,18 @@ test("canonical Supabase live state produces deterministic points, progress, and
   assert.equal(data.tournament.teamOne.score + data.tournament.teamTwo.score, 6);
   assert.equal(data.tournament.state.remainingMatches, 0);
   assert.equal(compareTournamentLiveParity(data, structuredClone(data)).pass, true);
+
+  const unstartedView = structuredClone(view);
+  unstartedView.matches = [{
+    ...unstartedView.matches[0],
+    match: { ...unstartedView.matches[0].match, status: "LIVE", scoring_locked: false,
+      current_hole: 0, scored_holes: 0, holes_remaining: 18, result_winner: "" },
+    scores: [],
+  }];
+  const unstarted = tournamentLiveDataFromSupabaseView(unstartedView).rounds[0].matches[0];
+  assert.equal(unstarted.currentHole, 0);
+  assert.equal(unstarted.team1Points, null);
+  assert.equal(unstarted.team2Points, null);
 });
 
 test("Tournament display cache is revisioned and cannot authorize scoring", () => {
