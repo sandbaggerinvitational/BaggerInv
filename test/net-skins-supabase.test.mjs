@@ -27,9 +27,9 @@ function singlesView() {
   const scores = holes.map((hole) => ({
     hole_number: hole.hole_number,
     hole_revision: 1,
-    team_1_gross_scores: [5], team_2_gross_scores: [5],
+    team_1_gross_scores: [5], team_2_gross_scores: [hole.hole_number <= 5 ? 4 : 5],
     team_1_strokes: [hole.hole_number === 6 ? 1 : 0], team_2_strokes: [0],
-    team_1_net_score: hole.hole_number === 6 ? 4 : 5, team_2_net_score: 5,
+    team_1_net_score: hole.hole_number === 6 ? 4 : 5, team_2_net_score: hole.hole_number <= 5 ? 4 : 5,
   }));
   return {
     tournament: { tournament_id: "2026", tournament_year: 2026 },
@@ -44,8 +44,8 @@ function singlesView() {
       match: { match_id: "2026-R1-1", round_number: 1, format: "SI", status: "FINAL", scorecard_complete: true, result_winner: "Team 1" },
       presentation: { display_match_number: "1" },
       participants: [
-        { player_id: "P1", display_name: "Player One", team_side: 1, player_slot: 1 },
-        { player_id: "P2", display_name: "Player Two", team_side: 2, player_slot: 1 },
+        { player_id: "P1", display_name: "Player One", team_side: 1, player_slot: 1, playing_handicap: 6, final_strokes: 6 },
+        { player_id: "P2", display_name: "Player Two", team_side: 2, player_slot: 1, playing_handicap: 0, final_strokes: 0 },
       ],
       holes, scores,
     }],
@@ -73,10 +73,19 @@ test("configuration import rejects a financial reinterpretation", () => {
   assert.throws(() => buildNetSkinsConfigurationImport({ sheets: { "Net Skins": sheet(rows) }, tournamentId: "2026", tournamentYear: 2026 }), (error) => error.code === "NET_SKINS_BUY_IN_CONTRACT_MISMATCH");
 });
 
-test("canonical adapter consumes stored gross and applied strokes without legacy handicap recalculation", () => {
-  const rows = netSkinsScoreRowsFromSupabaseView(singlesView());
+test("canonical adapter uses stored gross and immutable full-round stroke allocation", () => {
+  const view = singlesView();
+  view.matches[0].scores[5].team_1_strokes = [0];
+  view.matches[0].scores[5].team_1_net_score = 5;
+  const rows = netSkinsScoreRowsFromSupabaseView(view);
   assert.equal(rows.length, 2);
   assert.deepEqual(rows[0].scorecard.find((hole) => hole.hole === 6), { hole: 6, match: "1", gross: 5, strokes: 1, net: 4, strokeIndex: 6, par: 4 });
+});
+
+test("canonical adapter does not synthesize empty rows for unscored matches", () => {
+  const view = singlesView();
+  view.matches[0].scores = [];
+  assert.deepEqual(netSkinsScoreRowsFromSupabaseView(view), []);
 });
 
 test("unchanged engine produces one no-carry skin and an official deterministic snapshot", () => {
@@ -121,9 +130,10 @@ test("source flag is Preview-only, server-controlled, and Production fail-closed
 });
 
 test("migrations are service-only, versioned, event-invalidated, and never calculate inside scoring", async () => {
-  const [migration, disabledStateMigration] = await Promise.all([
+  const [migration, disabledStateMigration, allocationMigration] = await Promise.all([
     readFile(new URL("../supabase/migrations/202608120029_preview_net_skins_derived_state.sql", import.meta.url), "utf8"),
     readFile(new URL("../supabase/migrations/202608120030_preview_net_skins_disabled_round_state.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608120031_preview_net_skins_full_handicap_input.sql", import.meta.url), "utf8"),
   ]);
   for (const table of ["net_skins_configurations", "net_skins_configuration_entries", "competition_derived_snapshots", "competition_recalculation_jobs"]) assert.match(migration, new RegExp(`alter table scoring_authority\\.${table} enable row level security`));
   assert.match(migration, /revoke all on function public\.read_net_skins_result_view\(text\) from public, anon, authenticated/);
@@ -132,6 +142,8 @@ test("migrations are service-only, versioned, event-invalidated, and never calcu
   assert.doesNotMatch(migration, /calculateNetSkins/);
   assert.match(disabledStateMigration, /not c\.enabled/);
   assert.match(disabledStateMigration, /revoke all on function public\.clear_disabled_net_skins_operational_state\(text\) from public, anon, authenticated/);
+  assert.match(allocationMigration, /'playing_handicap', mp\.playing_handicap, 'final_strokes', mp\.final_strokes/);
+  assert.match(allocationMigration, /revoke all on function public\.read_net_skins_input_view\(text\) from public, anon, authenticated/);
 });
 
 test("participant module has zero Google fallback and remains isolated from core standings", async () => {
