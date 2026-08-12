@@ -593,6 +593,10 @@ function normalizedPublishedFraction(value) {
   return raw.includes("%") ? parsed / 100 : parsed;
 }
 
+function normalizedPublishedRoi(value) {
+  return Math.round(normalizedPublishedFraction(value) * 10_000_000_000) / 10_000_000_000;
+}
+
 function normalizedCalcuttaStandingRows(rows = []) {
   return rows.map((row) => ({
     year: number(row.Year), rank: number(row.Rank), playerId: clean(row["Player ID"]),
@@ -603,7 +607,7 @@ function normalizedCalcuttaStandingRows(rows = []) {
     // The protected publication schema intentionally rolls the Overall award into Total Payout %.
     // Overall Payout % is verified in the operational result, not invented in the Google readback.
     totalPayout: normalizedPublishedFraction(row["Total Payout %"]),
-    currentPayoutValue: number(row["Current Payout Value"]), roi: normalizedPublishedFraction(row.ROI),
+    currentPayoutValue: number(row["Current Payout Value"]), roi: normalizedPublishedRoi(row.ROI),
   })).sort((left, right) => left.playerId.localeCompare(right.playerId));
 }
 
