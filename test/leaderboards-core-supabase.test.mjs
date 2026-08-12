@@ -231,11 +231,13 @@ test("revisioned display cache is participant-scoped and cannot authorize scorin
 });
 
 test("Google-backed secondary failures are isolated from the core route", async () => {
-  const [route, dashboard] = await Promise.all([
+  const [route, dashboard, readiness] = await Promise.all([
     source("app/api/leaderboards/core/route.js"), source("app/live/LeaderboardsDashboard.js"),
+    source("app/admin/director/game-center-readiness/GameCenterReadinessClient.js"),
   ]);
   assert.doesNotMatch(route, /Net Skins|Calcutta|Odds|Storylines|Tournament Intelligence/);
   assert.match(dashboard, /Core team and player standings remain available/);
   assert.match(dashboard, /secondaryState === "error"/);
   assert.match(dashboard, /setOddsSnapshots\(\[\]\)/);
+  assert.match(readiness, /leaderboards-core-parity/);
 });

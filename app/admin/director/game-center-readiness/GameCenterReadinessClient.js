@@ -37,7 +37,7 @@ export default function GameCenterReadinessClient() {
   }
 
   return <section style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem", display: "grid", gap: "1rem" }}>
-    <div><p>Preview only · Director authorized</p><h1>Live Read Readiness</h1><p>This surface is isolated from the Google-backed Director dashboard. Refresh imports presentation configuration once; parity verifies canonical Game Center, My Match, Home, and participant match-authorization views.</p></div>
+    <div><p>Preview only · Director authorized</p><h1>Live Read Readiness</h1><p>This surface is isolated from the Google-backed Director dashboard. Refresh imports presentation configuration once; parity verifies canonical Game Center, My Match, Home, Tournament, Leaderboards core, and participant match-authorization views.</p></div>
     <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-game-center-presentations")}>Refresh Game Center Presentation</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("game-center-parity")}>Verify Game Center Parity</button>
@@ -46,6 +46,7 @@ export default function GameCenterReadinessClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run("home-parity")}>Verify Home Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-tournament-presentation", { samples: 25 })}>Refresh Tournament Projection</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("tournament-parity", { samples: 25 })}>Verify Tournament Parity</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("leaderboards-core-parity", { samples: 25 })}>Verify Leaderboards Core Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("match-authorization-parity")}>Verify Match Authorization Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={inspectShadow}>Inspect Auth Shadow</button>
     </div>
