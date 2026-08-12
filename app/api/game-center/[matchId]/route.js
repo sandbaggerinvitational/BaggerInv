@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getGameCenterData } from "../../../game-center/gameCenterData.js";
-import { playerPassportTokenFromRequest } from "../../../../lib/player-passport.js";
-import { resolvePlayerPassportToken } from "../../../../lib/player-passport-server.js";
+import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { attachRuntimeTiming, createRuntimeProfile } from "../../../../lib/runtime-performance.js";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +9,12 @@ export async function GET(request, { params }) {
   const profile = createRuntimeProfile("GET /api/game-center/[matchId]");
   try {
     const { matchId } = await params;
-    const identity = await profile.measure("passport", () => resolvePlayerPassportToken(playerPassportTokenFromRequest(request)));
-    const data = await profile.measure("gameCenterAssembly", () => getGameCenterData(matchId, identity?.player?.id || ""));
+    let currentPlayerId = "";
+    await profile.measure("passportSignedSession", async () => {
+      try { currentPlayerId = playerPassportEffectivePlayerId(verifyPlayerPassportSession(playerPassportTokenFromRequest(request))); }
+      catch { currentPlayerId = ""; }
+    });
+    const data = await profile.measure("gameCenterAssembly", () => getGameCenterData(matchId, currentPlayerId));
     return attachRuntimeTiming(NextResponse.json({ data }, { headers: { "Cache-Control": "no-store" } }), profile.finish());
   } catch (error) {
     profile.finish({ failed: true });

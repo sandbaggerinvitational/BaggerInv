@@ -308,7 +308,7 @@ test("Game Center polish balances scoreboard identity and respects reduced motio
   assert.match(source, /className=\{styles\.yourTeam\}/);
   assert.match(source, /aria-label=\{`\$\{teamNames\[[12]\]\} is your team`\}/);
   assert.match(source, /Match \$\{roundPosition\.index\} of \$\{roundPosition\.total\}/);
-  assert.match(page, /resolvePlayerPassportToken/);
+  assert.match(page, /playerPassportEffectivePlayerId\(verifyPlayerPassportSession/);
   assert.match(styles, /data-newly-updated=true/);
   assert.match(styles, /animation:holeRecorded \.55s ease-out/);
   assert.match(styles, /transition:background-color \.2s ease/);

@@ -138,17 +138,43 @@ test("OTP route is no-signup, six-digit, scoped, durably audited, and returns ge
 test("SSR session, logout, shadow comparison, and participant context stay Passport-authoritative", async () => {
   const session = await source("app/api/participant/auth/session/route.js");
   const context = await source("app/api/participant/context/route.js");
+  const shadow = await source("lib/participant-identity-shadow.js");
+  const diagnostics = await source("app/ParticipantAuthDiagnostics.js");
   const page = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   assert.match(session, /verifyParticipantAuthClaims/);
   assert.match(session, /signOut\(\{ scope: "global" \}\)/);
   assert.match(session, /recordSingleParticipantAuthLogout/);
   assert.match(context, /passportShadowDiagnostics/);
-  assert.match(context, /isSingleParticipantAuthShadowEnabled/);
-  assert.match(context, /recordParticipantIdentityShadowObservation/);
+  assert.match(context, /observeParticipantIdentityShadow/);
+  assert.match(session, /observeParticipantIdentityShadow/);
+  assert.match(session, /verifyPlayerPassportSession/);
+  assert.match(shadow, /isSingleParticipantAuthShadowEnabled/);
+  assert.match(shadow, /recordParticipantIdentityShadowObservation/);
+  assert.match(shadow, /passport_context_revision/);
+  assert.match(shadow, /linked_context_revision/);
+  assert.match(diagnostics, /fetch\("\/api\/participant\/auth\/session"/);
   assert.match(context, /identityAuthority: "passport"/);
   assert.match(context, /Participant Auth shadow comparison unavailable/);
   assert.match(page, /clearParticipantAuthClientState/);
   assert.doesNotMatch(`${session}\n${context}\n${page}`, /from\(["'](?:hole_scores|matches|score_mutations)["']\).*?(?:insert|update|delete)/is);
+});
+
+test("formal shadow comparison includes context and permission revisions without becoming participant-blocking", async () => {
+  const identity = await import("../lib/participant-identity.js");
+  const equal = identity.compareParticipantIdentityContexts({
+    passport: { playerId: "CB01", tournamentId: "2026", teamId: "PICKLES", membershipActive: true,
+      matchIds: ["M2", "M1"], scoringPermissions: { M1: { canScore: false, permissionRevision: 2 } }, contextRevision: 4 },
+    auth: { playerId: "CB01", tournamentId: "2026", teamId: "PICKLES", membershipActive: true,
+      matchIds: ["M1", "M2"], scoringPermissions: { M1: { canScore: false, permissionRevision: 2 } }, contextRevision: 4 },
+  });
+  assert.deepEqual(equal, { status: "PASS", diagnostics: {} });
+  const changed = identity.compareParticipantIdentityContexts({ passport: { contextRevision: 4 }, auth: { contextRevision: 5 } });
+  assert.equal(changed.status, "MISMATCH");
+  assert.deepEqual(changed.diagnostics.contextRevision, { passport: 4, auth: 5 });
+  const migration = await source("supabase/migrations/202608120017_preview_game_center_reads.sql");
+  assert.match(migration, /add column passport_context_revision bigint/);
+  assert.match(migration, /add column linked_context_revision bigint/);
+  assert.match(migration, /comparison_status/);
 });
 
 test("forward migration preserves the applied migration and adds durable physical-device diagnostics", async () => {

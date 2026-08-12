@@ -1,11 +1,10 @@
 import { cookies } from "next/headers";
-import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../lib/participant-identity-authority.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { inspectPlayerPassportToken } from "../../../../lib/player-passport-server.js";
-import { compareParticipantIdentityContexts } from "../../../../lib/participant-identity.js";
-import { isSingleParticipantAuthShadowEnabled, readParticipantIdentityContext, readParticipantIdentityContextForAuth, recordParticipantIdentityShadowObservation } from "../../../../lib/participant-identity-supabase.js";
+import { readParticipantIdentityContext, readParticipantIdentityContextForAuth } from "../../../../lib/participant-identity-supabase.js";
+import { observeParticipantIdentityShadow } from "../../../../lib/participant-identity-shadow.js";
 import { verifyParticipantAuthClaims } from "../../../../lib/supabase-auth-server.js";
 
 export const dynamic = "force-dynamic";
@@ -13,20 +12,6 @@ export const dynamic = "force-dynamic";
 function response(payload, status = 200) {
   return NextResponse.json(payload, { status, headers: { "Cache-Control": "private, no-store" } });
 }
-function comparable(context = {}) {
-  return {
-    playerId: context.playerId || "",
-    tournamentId: context.tournament?.id || "",
-    teamId: context.team?.id || "",
-    membershipActive: context.membership?.active === true,
-    matchIds: (context.matches || []).map((match) => match.matchId),
-    scoringPermissions: Object.fromEntries((context.matches || []).map((match) => [match.matchId, {
-      canScore: match.canScore === true,
-      permissionRevision: Number(match.permissionRevision || 0),
-    }])),
-  };
-}
-
 async function passportShadowDiagnostics({ authority, passportContext, tournamentId }) {
   const timings = {};
   if (!authority.authRehearsalEnabled || !authority.publicAuthConfigured) {
@@ -38,27 +23,17 @@ async function passportShadowDiagnostics({ authority, passportContext, tournamen
     timings.supabaseSessionVerificationMs = Math.round(performance.now() - sessionStarted);
     if (verified.status !== "active") return { supabaseAuth: { sessionPresent: false, linkedPlayerId: null }, shadowComparison: { status: "UNAVAILABLE" }, timings };
     const contextStarted = performance.now();
-    const authResult = await readParticipantIdentityContextForAuth({ authUserId: verified.claims.sub, tournamentId });
-    timings.supabaseLinkedContextMs = Math.round(performance.now() - contextStarted);
-    if (!authResult.payload?.ok) return { supabaseAuth: { sessionPresent: true, linkedPlayerId: null }, shadowComparison: { status: "UNAVAILABLE" }, timings };
-    const scoped = await isSingleParticipantAuthShadowEnabled({ authUserId: verified.claims.sub, tournamentId });
-    if (scoped.payload !== true) return { supabaseAuth: { sessionPresent: true, linkedPlayerId: authResult.payload.data.playerId }, shadowComparison: { status: "UNAVAILABLE" }, timings };
-    const passport = comparable(passportContext);
-    const auth = comparable(authResult.payload.data);
-    const comparison = compareParticipantIdentityContexts({ passport, auth });
     const recordStarted = performance.now();
-    await recordParticipantIdentityShadowObservation({
-      request_id: randomUUID(), tournament_id: tournamentId, auth_user_id: verified.claims.sub,
-      passport_player_id: passport.playerId, linked_player_id: auth.playerId,
-      passport_team_id: passport.teamId, linked_team_id: auth.teamId,
-      passport_membership_active: passport.membershipActive, linked_membership_active: auth.membershipActive,
-      passport_match_ids: passport.matchIds, linked_match_ids: auth.matchIds,
-      passport_scoring_permissions: passport.scoringPermissions, linked_scoring_permissions: auth.scoringPermissions,
-      comparison_status: comparison.status, comparison_diagnostics: comparison.diagnostics,
+    const observed = await observeParticipantIdentityShadow({
+      authUserId: verified.claims.sub,
+      tournamentId,
+      passportPlayerId: passportContext.playerId,
+      passportContext,
     });
+    timings.supabaseLinkedContextMs = Math.round(performance.now() - contextStarted);
     timings.shadowObservationMs = Math.round(performance.now() - recordStarted);
-    return { supabaseAuth: { sessionPresent: true, linkedPlayerId: auth.playerId },
-      shadowComparison: { status: comparison.status, diagnostics: comparison.diagnostics }, timings };
+    return { supabaseAuth: { sessionPresent: true, linkedPlayerId: observed.linkedPlayerId || null },
+      shadowComparison: { status: observed.status, diagnostics: observed.diagnostics || {} }, timings };
   } catch (error) {
     console.error("Participant Auth shadow comparison unavailable", { message: error?.message || String(error) });
     return { supabaseAuth: { sessionPresent: false, linkedPlayerId: null }, shadowComparison: { status: "UNAVAILABLE" }, timings };

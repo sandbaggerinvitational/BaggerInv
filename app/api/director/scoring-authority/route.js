@@ -23,6 +23,14 @@ import { benchmarkSummary } from "../../../../lib/scoring-shadow.js";
 import { drainGoogleOutbox, inspectGoogleMatchState, processNextGoogleOutboxEvent } from "../../../../lib/scoring-google-outbox.js";
 import { inspectPreviewLiveMatchScoringLockMigration, migratePreviewLiveMatchScoringLock, readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { grossScoresFromCell } from "../../../../lib/live-score-values.js";
+import {
+  buildGameCenterPresentationImport,
+  compareGameCenterParity,
+  expectedGameCenterView,
+  gameCenterDataFromSupabaseView,
+  readGameCenterView,
+  replaceGameCenterPresentations,
+} from "../../../../lib/game-center-supabase.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -50,6 +58,52 @@ async function authoritativeImport(requestedBy) {
   const builtAt = Date.now();
   const imported = buildCanonicalScoringAuthorityImport({ sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy });
   return { sheets, imported, googleReadMs, normalizationMs: Date.now() - builtAt };
+}
+
+async function gameCenterParity(source, presentation) {
+  const divergences = [];
+  const postgresQueryMs = [];
+  const supabaseRequestMs = [];
+  for (const match of source.imported.payload.matches) {
+    const expectedView = expectedGameCenterView(source.imported, presentation, match.match_id);
+    const read = await readGameCenterView(match.match_id);
+    if (!read.payload?.ok) {
+      divergences.push({ matchId: match.match_id, code: read.payload?.code || "READ_FAILED" });
+      continue;
+    }
+    const expected = gameCenterDataFromSupabaseView(expectedView);
+    const actual = gameCenterDataFromSupabaseView(read.payload.data);
+    const comparison = compareGameCenterParity(expected, actual);
+    if (!comparison.pass) divergences.push({ matchId: match.match_id, expected: comparison.expected, actual: comparison.actual });
+    postgresQueryMs.push(number(read.payload.data.query_ms));
+    supabaseRequestMs.push(number(read.durationMs));
+  }
+  return {
+    matchesCompared: source.imported.payload.matches.length,
+    divergences,
+    pass: divergences.length === 0,
+    postgresQuery: benchmarkSummary(postgresQueryMs),
+    supabaseRequest: benchmarkSummary(supabaseRequestMs),
+    zeroGoogleRequestsPerGameCenterRead: true,
+  };
+}
+
+async function refreshGameCenterPresentations(actorId) {
+  const source = await authoritativeImport(actorId);
+  const presentation = buildGameCenterPresentationImport({
+    sheets: source.sheets,
+    sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
+    requestedBy: actorId,
+  });
+  const written = await replaceGameCenterPresentations(presentation);
+  if (!written.payload?.ok) throw Object.assign(new Error(`Game Center presentation refresh failed (${written.payload?.code || "unknown"}).`), { code: written.payload?.code });
+  const parity = await gameCenterParity(source, presentation);
+  return {
+    presentation: written.payload,
+    fields: ["course name/logo", "team logos/colors", "tee time", "starting hole", "display match number", "tournament location/logo"],
+    googleConfigurationReadMs: source.googleReadMs,
+    parity,
+  };
 }
 
 async function currentAndReconcile(imported) {
@@ -519,6 +573,12 @@ export async function POST(request) {
       result = await repairFinalizationParity(actorId, input.matchId);
     } else if (action === "migrate-preview-scoring-lock-schema") {
       result = await migratePreviewScoringLockSchema(actorId);
+    } else if (action === "refresh-game-center-presentations") {
+      result = await refreshGameCenterPresentations(actorId);
+    } else if (action === "game-center-parity") {
+      const source = await authoritativeImport(actorId);
+      const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
+      result = await gameCenterParity(source, presentation);
     } else if (action === "outbox-rehearsal") result = await outboxRehearsal(actorId, number(input.cycles, 5));
     else if (action === "outbox-failures") result = await outboxFailureRehearsal(actorId);
     else if (action === "cutover-rollback-rehearsal") result = await cutoverRollbackRehearsal(actorId);

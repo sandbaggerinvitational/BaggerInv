@@ -19,6 +19,7 @@ export default function ParticipantAuthDiagnostics() {
   }, [pathname]);
   useEffect(() => {
     if (!participantAuthDiagnosticsEnabled()) return;
+    fetch("/api/participant/auth/session", { cache: "no-store", credentials: "same-origin" }).catch(() => null);
     const navigation = performance.getEntriesByType("navigation")[0];
     recordParticipantAuthDiagnostic("PWA_REOPEN", { routeTo: location.pathname,
       durationMs: navigation?.duration, navigationType: navigation?.type || "" });
