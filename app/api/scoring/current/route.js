@@ -14,6 +14,7 @@ import { readPreviewScoringParticipantContext } from "../../../../lib/scoring-au
 import { mergeParticipantScoringAuthorityState } from "../../../../lib/scoring-participant-authority-state.js";
 import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
+import { recalculateCalcuttaTournament } from "../../../../lib/calcutta-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -113,16 +114,22 @@ export async function POST(request) {
     }
     if (measured.authority === "supabase") {
       after(async () => {
-        const [drained, derived] = await Promise.allSettled([
+        const [drained, derived, calcutta] = await Promise.allSettled([
           drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" }),
           recalculateCompetitionDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring derived-state worker · ${current.playerId || "participant"}`,
+          }),
+          recalculateCalcuttaTournament(String(current.tournamentId || current.year || ""), {
+            calculatedBy: `Scoring Calcutta worker · ${current.playerId || "participant"}`,
           }),
         ]);
         const mirror = drained.status === "fulfilled" ? drained.value : { ok: false, failed: 1 };
         if (!mirror.ok) console.error("Supabase Google outbox remains pending", { matchId: current.matchId, failed: mirror.failed });
         if (derived.status === "rejected") console.error("Competition derived-state recalculation remains pending", {
           matchId: current.matchId, code: derived.reason?.code || "DERIVED_STATE_RECALCULATION_FAILED",
+        });
+        if (calcutta.status === "rejected") console.error("Calcutta recalculation remains pending", {
+          matchId: current.matchId, code: calcutta.reason?.code || "CALCUTTA_RECALCULATION_FAILED",
         });
       });
     }

@@ -7,6 +7,7 @@ import PlayerAvatar from "../PlayerAvatar";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import TournamentIntelligenceStorylines from "./TournamentIntelligenceStorylines";
+import CalcuttaExperience from "./CalcuttaExperience";
 import ScrambleLeaderboard from "./ScrambleLeaderboard";
 import ScrambleTeamIdentity from "./ScrambleTeamIdentity";
 import { LeaderboardColumnHeader, LeaderboardDetailSheet, LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity, RoundLeaderboardSheet } from "./LeaderboardRow";
@@ -470,6 +471,7 @@ export default function LeaderboardsDashboard({
   coreReadSource = "google",
   coreReadUrl = "/api/live",
   secondaryReadUrl = "/api/live",
+  calcuttaReadUrl = "/api/live",
   onConfirmedCore,
 }) {
   const pathname = usePathname();
@@ -479,15 +481,18 @@ export default function LeaderboardsDashboard({
   const [oddsSnapshots, setOddsSnapshots] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [secondaryState, setSecondaryState] = useState("idle");
+  const [calcuttaData, setCalcuttaData] = useState(coreReadSource === "supabase" ? null : initialData?.calcutta || null);
+  const [calcuttaState, setCalcuttaState] = useState(coreReadSource === "supabase" ? "idle" : initialData?.calcutta ? "ready" : "idle");
   const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
   const pending = useRef(null);
   const secondaryPending = useRef(null);
+  const calcuttaPending = useRef(null);
   const lastConfirmedAt = useRef(Date.now());
   const navigationStartedAt = useRef(null);
   const supabaseCore = coreReadSource === "supabase";
   const roundValues = useMemo(() => new Set((data?.rounds || []).map((round) => String(round.number))), [data?.rounds]);
   const selectionFrom = useCallback((params) => ({
-    tab: ["players", "teams", "skins", "insights"].includes(params.get("tab")) ? params.get("tab") : "players",
+    tab: ["players", "teams", "skins", "calcutta", "insights"].includes(params.get("tab")) ? params.get("tab") : "players",
     round: roundValues.has(params.get("round")) ? params.get("round") : "overall",
     metric: PLAYER_METRICS.some(([key]) => key === params.get("metric")) ? params.get("metric") : "points",
   }), [roundValues]);
@@ -572,9 +577,22 @@ export default function LeaderboardsDashboard({
     return secondaryPending.current;
   }, [secondaryData, secondaryReadUrl, supabaseCore]);
 
+  const loadCalcutta = useCallback(() => {
+    if (!supabaseCore || calcuttaPending.current || calcuttaData) return calcuttaPending.current;
+    setCalcuttaState("loading");
+    calcuttaPending.current = fetchWithTransientRetry(calcuttaReadUrl, { cache: "no-store", credentials: "same-origin" }).then(async (response) => {
+      const payload = await response.json();
+      if (!response.ok || !payload.data) throw new Error(payload.error || "Calcutta is unavailable.");
+      setCalcuttaData(payload.data.calcutta || payload.data);
+      setCalcuttaState("ready");
+    }).catch(() => setCalcuttaState("error")).finally(() => { calcuttaPending.current = null; });
+    return calcuttaPending.current;
+  }, [calcuttaData, calcuttaReadUrl, supabaseCore]);
+
   useEffect(() => {
     if (tab === "skins") loadSecondary();
-  }, [loadSecondary, tab]);
+    if (tab === "calcutta") loadCalcutta();
+  }, [loadCalcutta, loadSecondary, tab]);
 
   useEffect(() => {
     if (!supabaseCore) {
@@ -596,8 +614,8 @@ export default function LeaderboardsDashboard({
   return <section className={styles.page}>
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Player, team, round standings, and Championship projections.</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
-    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["skins", "Net Skins"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
-    {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
+    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["skins", "Net Skins"], ["calcutta", "Calcutta"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
+    {!["insights", "skins", "calcutta"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} snapshots={oddsSnapshots} /> : null}
@@ -606,6 +624,12 @@ export default function LeaderboardsDashboard({
       <strong>{secondaryState === "error" ? "Net Skins are temporarily unavailable." : "Loading Net Skins…"}</strong>
       <span>{secondaryState === "error" ? "Core team and player standings remain available." : "Retrieving the independently published competition module."}</span>
       {secondaryState === "error" ? <button type="button" onClick={loadSecondary}>Try again</button> : null}
+    </div></section> : null}
+    {tab === "calcutta" && calcuttaData ? <CalcuttaExperience model={calcuttaData} /> : null}
+    {tab === "calcutta" && !calcuttaData ? <section className={skinsStyles.board}><div className={styles.empty} role="status">
+      <strong>{calcuttaState === "error" ? "Calcutta is temporarily unavailable." : "Loading Calcutta…"}</strong>
+      <span>{calcuttaState === "error" ? "Core team and player standings remain available." : "Retrieving the independently prepared financial competition result."}</span>
+      {calcuttaState === "error" ? <button type="button" onClick={loadCalcutta}>Try again</button> : null}
     </div></section> : null}
     {tab === "insights" ? <Insights data={data} snapshots={oddsSnapshots} previewMode={previewMode} /> : null}
   </section>;

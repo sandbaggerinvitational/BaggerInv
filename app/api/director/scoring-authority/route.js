@@ -68,6 +68,17 @@ import {
 } from "../../../../lib/net-skins-supabase.js";
 import { netSkinsResultRecords } from "../../../../lib/net-skins.js";
 import {
+  buildCalcuttaConfigurationImport,
+  CALCUTTA_ENGINE_VERSION,
+  CALCUTTA_WORKBOOK_TABS,
+  calculateCalcuttaFromSupabaseViews,
+  compareCalcuttaParity,
+  currentCalcuttaOperationalResult,
+  readCalcuttaConfigurationView,
+  recalculateCalcuttaTournament,
+  replaceCalcuttaConfiguration,
+} from "../../../../lib/calcutta-supabase.js";
+import {
   calculateCompetitionDerivedFromData,
   compareCompetitionDerivedParity,
   competitionDerivedDataFromView,
@@ -563,6 +574,169 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
     },
     pass: comparison.pass && publicationParity && historicalRegression.pass && Boolean(configuredScramble) &&
       snapshots.length === configuration.rounds.filter((round) => round.enabled).length && jobs.every((job) => job.status === "SUCCEEDED"),
+  };
+}
+
+function normalizedCalcuttaRoundRows(rows = []) {
+  return rows.map((row) => ({
+    year: number(row.Year), round: number(row.Round), format: upper(row.Format), playerId: clean(row["Player ID"]),
+    gross: number(row["Gross Score"]), net: number(row["Net Score"]), handicap: number(row["Full Course Handicap"]),
+    place: number(row.Place), points: number(row["Calcutta Points"]),
+  })).sort((left, right) => left.round - right.round || left.playerId.localeCompare(right.playerId));
+}
+
+function normalizedCalcuttaStandingRows(rows = []) {
+  return rows.map((row) => ({
+    year: number(row.Year), rank: number(row.Rank), playerId: clean(row["Player ID"]),
+    purchasePrice: number(row["Purchase Price"]), round1: number(row["Round 1 Points"]),
+    round2: number(row["Round 2 Points"]), round3: number(row["Round 3 Points"]),
+    totalPoints: number(row["Total Points"]), round1Payout: number(row["Round 1 Payout %"]),
+    round2Payout: number(row["Round 2 Payout %"]), round3Payout: number(row["Round 3 Payout %"]),
+    // The protected publication schema intentionally rolls the Overall award into Total Payout %.
+    // Overall Payout % is verified in the operational result, not invented in the Google readback.
+    totalPayout: number(row["Total Payout %"]),
+    currentPayoutValue: number(row["Current Payout Value"]), roi: number(row.ROI),
+  })).sort((left, right) => left.playerId.localeCompare(right.playerId));
+}
+
+async function calcuttaReadiness(actorId, { refresh = false, samples = 25 } = {}) {
+  const source = await authoritativeImport(actorId);
+  const googleStartedAt = performance.now();
+  const sheets = await readWorkbookSheetsByName(CALCUTTA_WORKBOOK_TABS, { fresh: true });
+  const googleConfigurationReadMs = performance.now() - googleStartedAt;
+  invalidateTournamentDataCache(CALCUTTA_WORKBOOK_TABS.concat(["Live Matches", "Matches", "Live Hole Scores"]));
+  const expected = await getTournamentData();
+  const tournament = source.imported.payload.tournament;
+  const configuration = buildCalcuttaConfigurationImport({
+    sheets, tournamentId: tournament.tournament_id, tournamentYear: tournament.tournament_year,
+    sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId,
+  });
+  let configurationWrite = null;
+  let recalculation = null;
+  if (refresh) {
+    configurationWrite = await replaceCalcuttaConfiguration(configuration);
+    if (!configurationWrite.payload?.ok) throw Object.assign(new Error(`Calcutta configuration import failed (${configurationWrite.payload?.code || "unknown"}).`), { code: configurationWrite.payload?.code });
+    recalculation = await recalculateCalcuttaTournament(tournament.tournament_id, {
+      calculatedBy: `Director ${actorId}`, force: true, debounceMs: 0,
+    });
+  }
+
+  const sampleCount = Math.max(1, Math.min(50, number(samples, 25)));
+  const inputServiceSamples = [], inputPostgresSamples = [], calculationSamples = [];
+  let calculated;
+  for (let index = 0; index < sampleCount; index += 1) {
+    const [configRead, coreRead] = await Promise.all([
+      readCalcuttaConfigurationView(tournament.tournament_id), readLeaderboardsCoreView(tournament.tournament_id),
+    ]);
+    if (!configRead.payload?.ok || !coreRead.payload?.ok) throw Object.assign(new Error("Calcutta canonical inputs are unavailable."), {
+      code: configRead.payload?.code || coreRead.payload?.code || "CALCUTTA_INPUT_UNAVAILABLE",
+    });
+    calculated = calculateCalcuttaFromSupabaseViews(configRead.payload.data, coreRead.payload.data);
+    inputServiceSamples.push(number(configRead.durationMs) + number(coreRead.durationMs));
+    inputPostgresSamples.push(number(configRead.payload.data.query_ms) + number(coreRead.payload.data.query_ms));
+    calculationSamples.push(number(calculated.calculationMs));
+  }
+  const resultServiceSamples = [], resultPostgresSamples = [];
+  let operational;
+  for (let index = 0; index < sampleCount; index += 1) {
+    operational = await currentCalcuttaOperationalResult(tournament.tournament_id, { recalculatePending: false });
+    resultServiceSamples.push(number(operational.serviceMs));
+    resultPostgresSamples.push(number(operational.queryMs));
+  }
+
+  const parity = compareCalcuttaParity(expected.calcutta, calculated.calcutta);
+  const storedParity = compareCalcuttaParity(calculated.calcutta, operational.calcutta || {});
+  const googleRoundRows = normalizedCalcuttaRoundRows((sheets["Calcutta Round Results"]?.records || []).map(({ record }) => record)
+    .filter((row) => number(row.Year) === number(tournament.tournament_year)));
+  const generatedRoundRows = normalizedCalcuttaRoundRows(calculated.publication.roundResults);
+  const roundPublicationParity = canonicalJson(googleRoundRows) === canonicalJson(generatedRoundRows);
+  const googleStandingRows = normalizedCalcuttaStandingRows((sheets["Calcutta Standings"]?.records || []).map(({ record }) => record)
+    .filter((row) => number(row.Year) === number(tournament.tournament_year)));
+  const generatedStandingRows = normalizedCalcuttaStandingRows(calculated.publication.standings);
+  const standingPublicationParity = canonicalJson(googleStandingRows) === canonicalJson(generatedStandingRows);
+  const known = Object.fromEntries(["Holman Moores", "Memo Saldana"].map((name) => {
+    const golfer = (calculated.calcutta.golfers || []).find((row) => clean(row.player?.name) === name);
+    return [name, golfer ? { playerId: golfer.playerId, points: golfer.totalPoints } : null];
+  }));
+  const knownValueRegression = {
+    market: { expected: 16800, actual: calculated.calcutta.pot, pass: number(calculated.calcutta.pot) === 16800 },
+    holman: { expected: 66, actual: known["Holman Moores"]?.points ?? null, pass: number(known["Holman Moores"]?.points, NaN) === 66 },
+    memo: { expected: 56, actual: known["Memo Saldana"]?.points ?? null, pass: number(known["Memo Saldana"]?.points, NaN) === 56 },
+  };
+  const financial = configuration.financial_contract;
+  const ownerPortfolioValue = (calculated.calcutta.portfolios || []).reduce((sum, row) => sum + number(row.currentPayoutValue), 0);
+  const ownerPortfolioCost = (calculated.calcutta.portfolios || []).reduce((sum, row) => sum + number(row.purchaseCost), 0);
+  const financialConservation = {
+    ownershipByAsset: Object.entries(financial.ownership_totals).map(([playerId, total]) => ({ playerId, total, pass: Math.abs(number(total) - 1) < 0.000001 })),
+    totalMarketValue: financial.total_market_value,
+    payoutAllocation: financial.payout_allocation,
+    totalPayoutFraction: financial.total_payout_fraction,
+    calculatedDistributedValue: calculated.calcutta.distributedPrizePool,
+    ownerPortfolioCost,
+    ownerPortfolioValue,
+    pass: Object.values(financial.ownership_totals).every((value) => Math.abs(number(value) - 1) < 0.000001)
+      && Math.abs(number(financial.total_payout_fraction) - 1) < 0.000001
+      && Math.abs(ownerPortfolioCost - number(financial.total_market_value)) < 0.005
+      && Math.abs(ownerPortfolioValue - number(calculated.calcutta.distributedPrizePool)) < 0.005,
+  };
+  return {
+    engine: { module: "lib/calcutta.js", engineVersion: CALCUTTA_ENGINE_VERSION, changed: false,
+      rulesOwner: "existing JavaScript application engine" },
+    googleConfiguration: {
+      source: "Director-managed Preview workbook", tabs: CALCUTTA_WORKBOOK_TABS.slice(0, 4),
+      outputTabs: CALCUTTA_WORKBOOK_TABS.slice(4), explicitRefresh: true,
+      normalParticipantDependency: false, readMs: googleConfigurationReadMs,
+    },
+    configuration: {
+      fingerprint: configuration.configuration_fingerprint,
+      revision: configurationWrite?.payload?.configuration_revision ?? null,
+      import: configurationWrite?.payload || null,
+      purchases: configuration.purchases, ownership: configuration.ownership,
+      pointStructure: configuration.point_structure, payoutStructure: configuration.payout_structure,
+      financialContract: financial,
+    },
+    canonicalInput: calculated.canonicalInputVerification,
+    sourceFingerprint: calculated.sourceFingerprint,
+    resultState: calculated.resultState,
+    parity,
+    storedParity,
+    roundPublicationParity: { pass: roundPublicationParity, googleRows: googleRoundRows.length, supabaseRows: generatedRoundRows.length },
+    standingPublicationParity: { pass: standingPublicationParity, googleRows: googleStandingRows.length, supabaseRows: generatedStandingRows.length },
+    financialConservation,
+    knownValueRegression,
+    scramble: {
+      rule: "Round 2 pairing ranks once; occupied-place points/payout are divided equally between the two purchased player assets",
+      canonicalPairingRows: calculated.canonicalInputVerification.scramblePairingRows,
+      parity: parity.pass,
+    },
+    derivedState: {
+      snapshot: operational.snapshot, job: operational.job, stale: operational.stale,
+      recalculation: recalculation ? { inputReadMs: recalculation.inputReadMs,
+        engineMs: recalculation.calculated.calculationMs, writeMs: recalculation.writeMs,
+        logicalReplay: recalculation.write.logical_replay } : null,
+    },
+    triggers: ["configuration revision", "relevant Finalization", "Director Reopen", "official-result correction", "explicit Director rebuild"],
+    googlePublication: {
+      destinations: ["Calcutta Round Results", "Calcutta Standings"],
+      ownerLeaderboard: "read-only optional published/reporting table",
+      operationalParticipantDependency: false, durableReportingSeparation: true,
+    },
+    failureIsolation: {
+      scoringTransactionDependency: false, coreLeaderboardsDependency: false,
+      homeDependency: false, tournamentLiveDependency: false, netSkinsDependency: false,
+      oddsDependency: false, staleVerifiedSnapshotRetained: true, hiddenGoogleFallback: false,
+    },
+    performance: {
+      samples: sampleCount, canonicalInputPostgres: benchmarkSummary(inputPostgresSamples),
+      canonicalInputService: benchmarkSummary(inputServiceSamples), engineCalculation: benchmarkSummary(calculationSamples),
+      derivedWrite: benchmarkSummary(recalculation ? [number(recalculation.writeMs)] : []),
+      participantResultPostgres: benchmarkSummary(resultPostgresSamples),
+      participantResultService: benchmarkSummary(resultServiceSamples),
+    },
+    googleRequestsPerParticipantRead: 0,
+    pass: parity.pass && storedParity.pass && roundPublicationParity && standingPublicationParity
+      && financialConservation.pass && Object.values(knownValueRegression).every((row) => row.pass)
+      && !operational.stale && clean(operational.job?.status).toUpperCase() === "SUCCEEDED",
   };
 }
 
@@ -1280,6 +1454,10 @@ export async function POST(request) {
       result = await netSkinsReadiness(actorId, { refreshConfiguration: true, samples: input.samples });
     } else if (action === "net-skins-parity") {
       result = await netSkinsReadiness(actorId, { samples: input.samples });
+    } else if (action === "refresh-calcutta-configuration") {
+      result = await calcuttaReadiness(actorId, { refresh: true, samples: input.samples });
+    } else if (action === "calcutta-parity") {
+      result = await calcuttaReadiness(actorId, { samples: input.samples });
     } else if (action === "refresh-published-odds-snapshots") {
       result = await publishedOddsReadiness(actorId, { refresh: true, samples: input.samples });
     } else if (action === "published-odds-parity") {

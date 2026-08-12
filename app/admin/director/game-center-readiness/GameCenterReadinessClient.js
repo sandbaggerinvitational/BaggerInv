@@ -49,6 +49,8 @@ export default function GameCenterReadinessClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run("leaderboards-core-parity", { samples: 25 })}>Verify Leaderboards Core Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-net-skins-configuration", { samples: 25 })}>Refresh Net Skins Configuration</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("net-skins-parity", { samples: 25 })}>Verify Net Skins Parity</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-calcutta-configuration", { samples: 25 })}>Refresh Calcutta Configuration</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("calcutta-parity", { samples: 25 })}>Verify Calcutta Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-published-odds-snapshots", { samples: 25 })}>Refresh Published Odds Snapshots</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("published-odds-parity", { samples: 25 })}>Verify Published Odds Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-competition-derived-state", { samples: 25 })}>Refresh Momentum + Storylines</button>

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { readTournamentSecondaryView } from "../../../../lib/tournament-live-supabase.js";
 import { requireTournamentReadSource } from "../../../../lib/tournament-read-source.js";
+import { currentCalcuttaOperationalResult } from "../../../../lib/calcutta-supabase.js";
+import { requireCalcuttaReadSource } from "../../../../lib/calcutta-read-source.js";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +14,21 @@ export async function GET(request) {
     if (source.resolved !== "supabase") return NextResponse.json({ error: "Not found." }, { status: 404, headers });
     const module = new URL(request.url).searchParams.get("module") || "";
     if (module !== "calcutta") return NextResponse.json({ error: "Tournament module is not available." }, { status: 400, headers });
+    const calcuttaSource = requireCalcuttaReadSource();
+    if (calcuttaSource.resolved === "supabase") {
+      const operational = await currentCalcuttaOperationalResult("", {
+        recalculatePending: true, calculatedBy: "Tournament Calcutta participant read",
+      });
+      if (!operational.calcutta) throw Object.assign(new Error("Tournament Calcutta is unavailable."), { code: "CALCUTTA_RESULT_REQUIRED" });
+      const response = NextResponse.json({ data: operational.calcutta, module, operational: {
+        stale: operational.stale, snapshot: operational.snapshot, job: operational.job,
+      } }, { headers });
+      response.headers.set("X-Tournament-Read-Source", "supabase-calcutta-operational");
+      response.headers.set("X-Tournament-Google-Requests", "0");
+      response.headers.set("X-Calcutta-Read-Source", "supabase");
+      response.headers.set("Server-Timing", `postgres;dur=${Number(operational.queryMs || 0).toFixed(1)}, supabase;dur=${Number(operational.serviceMs || 0).toFixed(1)}`);
+      return response;
+    }
     const read = await readTournamentSecondaryView({ module });
     if (!read.payload?.ok) throw Object.assign(new Error("Tournament module is unavailable."), { code: read.payload?.code });
     const response = NextResponse.json({ data: read.payload.data, module, presentation: {

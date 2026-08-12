@@ -19,6 +19,7 @@ import { verifyDirectorReadBack } from "../../../lib/director-readback-verificat
 import { persistDirectorMatchLifecycle } from "../../../lib/scoring-persistence-adapter.js";
 import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox.js";
 import { recalculateCompetitionDerivedTournament } from "../../../lib/competition-derived-supabase.js";
+import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -289,7 +290,10 @@ export async function POST(request) {
     refresh();
     if (process.env.VERCEL_ENV === "preview" && ["reopen-match", "match-finalize", "match-reopen"].includes(input.action)) after(async () => {
       try {
-        await recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` });
+        await Promise.all([
+          recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
+          recalculateCalcuttaTournament("", { calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}` }),
+        ]);
       } catch (error) {
         console.error("Competition derived-state Director lifecycle recalculation remains pending", {
           action: input.action, code: error?.code || "DERIVED_STATE_RECALCULATION_FAILED",
