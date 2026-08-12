@@ -155,10 +155,10 @@ function parseServerTiming(value = "") {
   }).filter(([name]) => name));
 }
 
-export default function PersonalizedPlayerHome({ netSkins = null }) {
-  const cachedInitialization = useMemo(() => readParticipantInitializationCache(), []);
-  const [payload, setPayload] = useState(cachedInitialization?.data || null);
-  const [state, setState] = useState(cachedInitialization ? "ready" : "loading");
+export default function PersonalizedPlayerHome({ netSkins = null, initialData = null, managed = false }) {
+  const cachedInitialization = useMemo(() => managed ? null : readParticipantInitializationCache(), [managed]);
+  const [payload, setPayload] = useState(initialData || cachedInitialization?.data || null);
+  const [state, setState] = useState(initialData || cachedInitialization ? "ready" : "loading");
   const [busyId, setBusyId] = useState("");
   const [message, setMessage] = useState("");
   const [now, setNow] = useState(Date.now());
@@ -167,6 +167,7 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
   const refreshController = useRef(null);
 
   const refresh = useCallback(async (signal) => {
+    if (managed) return;
     const sequence = ++refreshSequence.current;
     const clientStartedAt = performance.now();
     setState((current) => current === "ready" ? current : "loading");
@@ -191,9 +192,16 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
       if (error?.name === "AbortError" || sequence !== refreshSequence.current) return;
       setState("error");
     }
-  }, []);
+  }, [managed]);
 
   useEffect(() => {
+    if (!managed || !initialData) return;
+    setPayload(initialData);
+    setState("ready");
+  }, [initialData, managed]);
+
+  useEffect(() => {
+    if (managed) return undefined;
     const controller = new AbortController();
     refreshController.current = controller;
     if (!cachedInitialization) refresh(controller.signal);
@@ -204,8 +212,9 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
       return () => { controller.abort(); cancel(task); refreshSequence.current += 1; };
     }
     return () => { controller.abort(); refreshSequence.current += 1; };
-  }, [cachedInitialization, refresh]);
+  }, [cachedInitialization, managed, refresh]);
   useEffect(() => {
+    if (managed) return undefined;
     let controller;
     const focus = () => {
       controller?.abort();
@@ -215,7 +224,7 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
     };
     window.addEventListener("focus", focus);
     return () => { controller?.abort(); window.removeEventListener("focus", focus); };
-  }, [refresh]);
+  }, [managed, refresh]);
   useEffect(() => {
     const cancelForNavigation = () => {
       refreshSequence.current += 1;

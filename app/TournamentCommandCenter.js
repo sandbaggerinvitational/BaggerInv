@@ -91,7 +91,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
   );
 }
 
-export default function TournamentCommandCenter({ tournament, liveData }) {
+export default function TournamentCommandCenter({ tournament, liveData, initialParticipantData = null }) {
   const rounds = liveData?.rounds || [];
   const liveTournament = liveData?.tournament || tournament;
   const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
@@ -120,7 +120,7 @@ export default function TournamentCommandCenter({ tournament, liveData }) {
       {pulse}
       <DeferredHomeContent><TournamentMoments moments={moments} /></DeferredHomeContent>
       {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
-      <PersonalizedPlayerHome netSkins={liveData?.netSkins} />
+      <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed={Boolean(initialParticipantData)} />
     </div>
   );
 }

@@ -41,9 +41,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
     if (!isOpen) return;
     const closeOnEscape = (event) => { if (event.key === "Escape") setIsOpen(false); };
     window.addEventListener("keydown", closeOnEscape);
-    fetch("/api/live", { cache: "no-store" })
-      .then(async (response) => response.ok ? (await response.json()).data?.tournament : null)
-      .then((active) => {
+    const applyTournament = (active) => {
         if (!active) return;
         setTournament({
           name: active.name || active.Name || "",
@@ -51,7 +49,15 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
           location: active.location || active.Location || "",
           year: active.year || active.Year || "",
         });
-      })
+    };
+    const active = window.__sbiTournamentIdentity;
+    if (active) applyTournament(active);
+    else fetch("/api/live", { cache: "no-store" })
+      .then(async (response) => response.ok ? (await response.json()).data?.tournament : null)
+      .then(applyTournament).catch(() => {});
+    fetch("/api/player-passport/session", { cache: "no-store" })
+      .then(async (response) => response.ok ? (await response.json()).player : null)
+      .then((player) => setDirector(player?.role === "DIRECTOR"))
       .catch(() => {});
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isOpen]);
@@ -63,15 +69,6 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
     updateHash();
     window.addEventListener("hashchange", updateHash);
     return () => window.removeEventListener("hashchange", updateHash);
-  }, [pathname]);
-
-  useEffect(() => {
-    let active = true;
-    fetch("/api/player-passport/session", { cache: "no-store" })
-      .then(async (response) => response.ok ? (await response.json()).player : null)
-      .then((player) => { if (active) setDirector(player?.role === "DIRECTOR"); })
-      .catch(() => {});
-    return () => { active = false; };
   }, [pathname]);
 
   return (

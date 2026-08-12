@@ -4,6 +4,8 @@ import PreviewModeBadge from "../PreviewModeBadge";
 import PwaSplashIdentityBridge from "../PwaSplashIdentityBridge";
 import TournamentInitializationRecovery from "../TournamentInitializationRecovery";
 import { getTournamentData } from "../live/sheetData";
+import ParticipantSupabaseHome from "../ParticipantSupabaseHome";
+import { requireHomeReadSource } from "../../lib/home-read-source";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -15,6 +17,9 @@ export const metadata = {
 };
 
 export default async function MobileHomePage() {
+  const source = requireHomeReadSource();
+  if (source.resolved === "supabase") return <ParticipantSupabaseHome />;
+
   let liveData;
   try {
     liveData = await getTournamentData();

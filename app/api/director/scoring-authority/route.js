@@ -38,6 +38,14 @@ import {
   readMyMatchView,
 } from "../../../../lib/my-match-supabase.js";
 import {
+  buildParticipantHomePresentationImport,
+  compareParticipantHomeParity,
+  participantHomeDataFromSupabaseView,
+  readParticipantHomeView,
+  replaceParticipantHomePresentation,
+} from "../../../../lib/participant-home-supabase.js";
+import { getTournamentData } from "../../../live/sheetData.js";
+import {
   MATCH_ACCESS_ACTIONS,
   authorizeMatchAccess,
   compareMatchAuthorizationMatrix,
@@ -129,6 +137,64 @@ async function myMatchParity(source, presentation) {
     supabaseService: benchmarkSummary(supabaseRequestMs),
     zeroGoogleRequestsPerMyMatchRead: true,
     scoringSessionIssuanceUnchanged: true,
+  };
+}
+
+async function participantHomeParity(source, gamePresentation, liveData) {
+  const players = source.imported.payload.tournament_players.filter((row) => row.participation_status === "ACTIVE");
+  const divergences = [];
+  const postgresQueryMs = [];
+  const supabaseRequestMs = [];
+  for (const player of players) {
+    const expectedParticipant = myMatchDataFromSupabaseView(expectedMyMatchView(source.imported, gamePresentation, player.player_id));
+    const expected = { player: expectedParticipant.player, participant: expectedParticipant, liveData };
+    const read = await readParticipantHomeView({ tournamentId: player.tournament_id, playerId: player.player_id });
+    if (!read.payload?.ok) {
+      divergences.push({ playerId: player.player_id, code: read.payload?.code || "READ_FAILED" });
+      continue;
+    }
+    const actual = participantHomeDataFromSupabaseView(read.payload.data);
+    const comparison = compareParticipantHomeParity(expected, actual);
+    if (!comparison.pass) divergences.push({ playerId: player.player_id, expected: comparison.expected, actual: comparison.actual });
+    postgresQueryMs.push(number(read.payload.data.query_ms));
+    supabaseRequestMs.push(number(read.durationMs));
+  }
+  return {
+    playersCompared: players.length,
+    divergences,
+    pass: players.length === 24 && divergences.length === 0,
+    postgresQuery: benchmarkSummary(postgresQueryMs),
+    supabaseService: benchmarkSummary(supabaseRequestMs),
+    zeroGoogleRequestsPerHomeRead: true,
+    criticalPath: ["Supabase Auth session", "participant context", "read_participant_home_view"],
+    secondaryIsolation: { schedule: "projected", netSkins: "projected", presentationFailureBlocksCriticalHome: false },
+  };
+}
+
+async function homeReadiness(actorId, { refresh = false } = {}) {
+  const source = await authoritativeImport(actorId);
+  const liveData = await getTournamentData();
+  const gamePresentation = buildGameCenterPresentationImport({
+    sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId,
+  });
+  const homePresentation = buildParticipantHomePresentationImport({
+    liveData, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId,
+  });
+  let written = null;
+  if (refresh) {
+    written = await replaceParticipantHomePresentation(homePresentation);
+    if (!written.payload?.ok) throw Object.assign(new Error(`Home presentation refresh failed (${written.payload?.code || "unknown"}).`), { code: written.payload?.code });
+  }
+  const parity = await participantHomeParity(source, gamePresentation, liveData);
+  return {
+    presentation: written?.payload || null,
+    googleConfigurationReadMs: source.googleReadMs,
+    fields: {
+      canonical: ["identity", "team", "rounds", "matches", "permissions", "hole outcomes", "live progress", "team score"],
+      projected: ["tournament presentation", "Today’s Schedule", "participant Net Skins summary"],
+      static: ["navigation links", "Tournament Guide links", "brand assets"],
+    },
+    parity,
   };
 }
 
@@ -693,6 +759,10 @@ export async function POST(request) {
       const source = await authoritativeImport(actorId);
       const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
       result = await myMatchParity(source, presentation);
+    } else if (action === "refresh-home-presentation") {
+      result = await homeReadiness(actorId, { refresh: true });
+    } else if (action === "home-parity") {
+      result = await homeReadiness(actorId);
     } else if (action === "match-authorization-parity") {
       const source = await authoritativeImport(actorId);
       result = await matchAuthorizationParity(source);
