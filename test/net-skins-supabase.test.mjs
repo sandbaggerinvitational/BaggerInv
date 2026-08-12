@@ -91,6 +91,19 @@ test("configuration import rejects missing individual allocation instead of infe
     (error) => error.code === "NET_SKINS_INDIVIDUAL_ALLOCATION_REQUIRED");
 });
 
+test("configuration import preserves the legacy Stroke then Playing HCP then zero allocation contract", () => {
+  const rows = liveMatchRows();
+  rows[0]["Team 1 Player 1 Stroke"] = "";
+  rows[0]["Team 1 Player 1 Playing HCP"] = 6;
+  rows[0]["Team 2 Player 1 Stroke"] = "";
+  rows[0]["Team 2 Player 1 Playing HCP"] = "";
+  const imported = buildNetSkinsConfigurationImport({
+    sheets: { "Net Skins": sheet(configurationRows()), "Live Matches": sheet(rows) },
+    tournamentId: "2026", tournamentYear: 2026,
+  });
+  assert.deepEqual(imported.rounds[0].entries.map((entry) => entry.individual_stroke_allocation), [6, 0]);
+});
+
 test("canonical adapter uses stored gross and explicit configured stroke allocation", () => {
   const view = singlesView();
   view.matches[0].scores[5].team_1_strokes = [0];

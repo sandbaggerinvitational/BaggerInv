@@ -465,7 +465,13 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
     resultPostgresMs.push(number(resultView.payload.data.query_ms));
   }
   const comparison = compareNetSkinsParity(expected.netSkins, calculated.netSkins);
-  const canonicalInputDivergences = netSkinsCanonicalInputDivergences(expected.scoreLeaderboard, calculated.scoreRows);
+  const configuredEntryKeys = new Set(configuration.rounds.filter((round) => round.enabled)
+    .flatMap((round) => round.entries.filter((entry) => entry.eligible).map((entry) =>
+      `${number(round.round_number)}:${[entry.player_id_1, entry.player_id_2].map(clean).filter(Boolean).sort().join("|")}`)));
+  const configuredScoreRows = (rows = []) => rows.filter((row) =>
+    configuredEntryKeys.has(`${number(row.round)}:${(row.playerIds || []).map(clean).filter(Boolean).sort().join("|")}`));
+  const canonicalInputDivergences = netSkinsCanonicalInputDivergences(
+    configuredScoreRows(expected.scoreLeaderboard), configuredScoreRows(calculated.scoreRows));
   const officialRounds = calculated.netSkins.rounds.filter((round) => round.finalized);
   const calculatedOfficialRows = normalizedOfficialNetSkinsRows(netSkinsResultRecords({ results: officialRounds.flatMap((round) => round.skins || []) }));
   const googleOfficialRows = normalizedOfficialNetSkinsRows(expected.netSkins?.storedResults || []);
