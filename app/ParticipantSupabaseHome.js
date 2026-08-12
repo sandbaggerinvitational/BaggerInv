@@ -18,13 +18,37 @@ function parseTiming(value = "") {
   }).filter(([name]) => name));
 }
 
-export default function ParticipantSupabaseHome() {
+export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" }) {
   const router = useRouter();
   const initial = useMemo(() => readParticipantHomeCache(), []);
   const [payload, setPayload] = useState(initial);
   const [state, setState] = useState(initial ? "ready" : "loading");
   const requestSequence = useRef(0);
   const controllerRef = useRef(null);
+  const secondaryControllerRef = useRef(null);
+
+  const hydrateNetSkins = useCallback(async () => {
+    if (netSkinsReadSource !== "supabase") return;
+    secondaryControllerRef.current?.abort();
+    const controller = new AbortController();
+    secondaryControllerRef.current = controller;
+    try {
+      const response = await fetch("/api/leaderboards/net-skins", {
+        cache: "no-store", credentials: "same-origin", signal: controller.signal,
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.data?.netSkins) throw new Error(result.code || "NET_SKINS_READ_UNAVAILABLE");
+      setPayload((current) => {
+        if (!current?.liveData) return current;
+        const next = { ...current, liveData: { ...current.liveData, netSkins: result.data.netSkins } };
+        writeParticipantHomeCache(next);
+        return next;
+      });
+      recordParticipantAuthDiagnostic("HOME_NET_SKINS_READY", { routeTo: "/home", durationMs: 0 });
+    } catch (error) {
+      if (error?.name !== "AbortError") console.info("Home Net Skins secondary module is temporarily unavailable.");
+    }
+  }, [netSkinsReadSource]);
 
   const refresh = useCallback(async () => {
     const sequence = ++requestSequence.current;
@@ -52,6 +76,7 @@ export default function ParticipantSupabaseHome() {
         cachedPresentation: Boolean(initial), googleRequests: Number(response.headers.get("x-home-google-requests") || 0) });
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 450));
       schedule(() => {
+        hydrateNetSkins();
         router.prefetch("/my-match");
         router.prefetch("/live?view=leaderboards");
         const selected = selectRelevantPlayerMatches(next.participant?.matches || [], next.participant?.tournament?.currentRound).primary;
@@ -63,7 +88,7 @@ export default function ParticipantSupabaseHome() {
       if (error?.name === "AbortError" || sequence !== requestSequence.current) return;
       setState((current) => current === "ready" ? "ready" : "error");
     }
-  }, [initial, router]);
+  }, [hydrateNetSkins, initial, router]);
 
   useEffect(() => {
     if (initial) {
@@ -77,6 +102,7 @@ export default function ParticipantSupabaseHome() {
     window.addEventListener("participant-navigation-start", navigating);
     return () => {
       controllerRef.current?.abort();
+      secondaryControllerRef.current?.abort();
       window.removeEventListener("focus", focus);
       window.removeEventListener("participant-navigation-start", navigating);
     };

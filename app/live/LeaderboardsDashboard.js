@@ -584,7 +584,7 @@ export default function LeaderboardsDashboard({
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} snapshots={oddsSnapshots} /> : null}
-    {tab === "skins" && (!supabaseCore || secondaryData) ? <NetSkinsBoard data={secondaryData || data} currentPlayer={currentPlayer} /> : null}
+    {tab === "skins" && (!supabaseCore || secondaryData) ? <NetSkinsBoard data={secondaryData ? { ...data, ...secondaryData } : data} currentPlayer={currentPlayer} /> : null}
     {tab === "skins" && supabaseCore && !secondaryData ? <section className={skinsStyles.board}><div className={styles.empty} role="status">
       <strong>{secondaryState === "error" ? "Net Skins are temporarily unavailable." : "Loading Net Skins…"}</strong>
       <span>{secondaryState === "error" ? "Core team and player standings remain available." : "Retrieving the independently published competition module."}</span>

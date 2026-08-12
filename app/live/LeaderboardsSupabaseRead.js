@@ -14,7 +14,7 @@ function parseTiming(value = "") {
   }).filter(([name]) => name));
 }
 
-export default function LeaderboardsSupabaseRead({ previewMode = false }) {
+export default function LeaderboardsSupabaseRead({ previewMode = false, netSkinsReadSource = "google" }) {
   const router = useRouter();
   const initial = useMemo(() => readLeaderboardsCoreCache(), []);
   const [payload, setPayload] = useState(initial);
@@ -81,7 +81,7 @@ export default function LeaderboardsSupabaseRead({ previewMode = false }) {
     previewMode={previewMode}
     coreReadSource="supabase"
     coreReadUrl="/api/leaderboards/core"
-    secondaryReadUrl="/api/live"
+    secondaryReadUrl={netSkinsReadSource === "supabase" ? "/api/leaderboards/net-skins" : "/api/live"}
     onConfirmedCore={(data, player) => acceptData({ data, player: player || payload.player })}
   />;
 

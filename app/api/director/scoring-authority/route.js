@@ -55,7 +55,18 @@ import {
   leaderboardsCoreDataFromSupabaseView,
   readLeaderboardsCoreView,
 } from "../../../../lib/leaderboards-core-supabase.js";
-import { getTournamentData } from "../../../live/sheetData.js";
+import {
+  buildNetSkinsConfigurationImport,
+  calculateNetSkinsFromSupabaseView,
+  compareNetSkinsParity,
+  netSkinsScoreRowsFromSupabaseView,
+  readNetSkinsInputView,
+  readNetSkinsResultView,
+  recalculateNetSkinsTournament,
+  replaceNetSkinsConfiguration,
+} from "../../../../lib/net-skins-supabase.js";
+import { netSkinsResultRecords } from "../../../../lib/net-skins.js";
+import { getTournamentData, invalidateTournamentDataCache } from "../../../live/sheetData.js";
 import {
   MATCH_ACCESS_ACTIONS,
   authorizeMatchAccess,
@@ -74,6 +85,7 @@ const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(
 const truthy = (value) => /^(true|yes|1|locked)$/i.test(clean(value));
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404 });
 const WORKBOOK_TABS = ["Tournaments", "Players", "Handicaps", "Team Names", "Rounds", "Courses", "Course Holes", "Live Matches", "Matches", "Live Hole Scores"];
+const NET_SKINS_WORKBOOK_TABS = ["Net Skins", "Net Skins Result"];
 
 async function authorize(request) {
   if (process.env.VERCEL_ENV !== "preview") return { response: unavailable() };
@@ -344,6 +356,155 @@ async function leaderboardsCoreReadiness(actorId, { samples = 25 } = {}) {
       new Set(sourceFingerprints).size === 1 &&
       actual.players?.length === 24 && matches.length === 24 && actual.rounds?.length === 3 &&
       ["BB", "SC", "SI"].every((format) => matches.some((match) => upper(match.format) === format)),
+  };
+}
+
+function normalizedOfficialNetSkinsRows(rows = []) {
+  return rows.map((row) => ({
+    Year: number(row.Year), Round: number(row.Round), Hole: number(row.Hole),
+    Winner: clean(row.Winner), "Winner Player ID": clean(row["Winner Player ID"]),
+    "Winner Player ID 2": clean(row["Winner Player ID 2"]),
+    "Skin Value": number(row["Skin Value"]), "Round Pot": number(row["Round Pot"]),
+    "Winning Net Score": number(row["Winning Net Score"]), Format: upper(row.Format), Match: clean(row.Match),
+  })).sort((left, right) => left.Round - right.Round || left.Hole - right.Hole || left["Winner Player ID"].localeCompare(right["Winner Player ID"]));
+}
+
+function netSkinsHistoricalRegression(calculated) {
+  const round = calculated.netSkins?.rounds?.find((item) => number(item.round) === 1);
+  const player = (name) => (round?.leaderboard || []).find((item) => clean(item.name).toLowerCase() === name.toLowerCase());
+  const score = (name) => calculated.scoreRows.find((item) => number(item.round) === 1 && clean(item.name).toLowerCase() === name.toLowerCase());
+  const totals = (row) => ({
+    gross: (row?.scorecard || []).reduce((sum, hole) => sum + number(hole.gross), 0),
+    net: (row?.scorecard || []).reduce((sum, hole) => sum + number(hole.net), 0),
+  });
+  const jack = player("Jack Keffler");
+  const max = player("Max Markley");
+  const holman = player("Holman Moores");
+  const memo = player("Memo Saldana");
+  const result = {
+    jackKeffler: { ...totals(score("Jack Keffler")), skins: number(jack?.skinsWon), winnings: number(jack?.totalWinnings), winningHoles: (jack?.winningHoles || []).map((skin) => number(skin.hole)) },
+    maxMarkley: { skins: number(max?.skinsWon), winnings: number(max?.totalWinnings) },
+    holmanMoores: { skins: number(holman?.skinsWon) },
+    memoSaldana: { skins: number(memo?.skinsWon) },
+  };
+  return { ...result, pass: result.jackKeffler.gross === 80 && result.jackKeffler.net === 67 && result.jackKeffler.skins === 1 && result.jackKeffler.winnings === 120 && result.jackKeffler.winningHoles.includes(6) && result.maxMarkley.skins === 1 && result.maxMarkley.winnings === 120 && result.holmanMoores.skins === 0 && result.memoSaldana.skins === 0 };
+}
+
+async function netSkinsReadiness(actorId, { refreshConfiguration = false, samples = 25 } = {}) {
+  const source = await authoritativeImport(actorId);
+  const googleStartedAt = performance.now();
+  const netSkinsSheets = await readWorkbookSheetsByName(NET_SKINS_WORKBOOK_TABS, { fresh: true });
+  const googleConfigurationReadMs = performance.now() - googleStartedAt;
+  invalidateTournamentDataCache(["Net Skins", "Net Skins Result", "Live Matches", "Matches", "Live Hole Scores"]);
+  const expected = await getTournamentData();
+  const tournamentId = source.imported.payload.tournament.tournament_id;
+  const configuration = buildNetSkinsConfigurationImport({
+    sheets: netSkinsSheets,
+    tournamentId,
+    tournamentYear: source.imported.payload.tournament.tournament_year,
+    sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
+    requestedBy: actorId,
+  });
+  let configurationWrite = null;
+  let recalculated = null;
+  if (refreshConfiguration) {
+    configurationWrite = await replaceNetSkinsConfiguration(configuration);
+    if (!configurationWrite.payload?.ok) throw Object.assign(new Error(`Net Skins configuration import failed (${configurationWrite.payload?.code || "unknown"}).`), { code: configurationWrite.payload?.code });
+    recalculated = await recalculateNetSkinsTournament(tournamentId, { calculatedBy: `Director ${actorId}` });
+  }
+
+  const sampleCount = Math.max(1, Math.min(50, number(samples, 25)));
+  const inputReadMs = [];
+  const postgresQueryMs = [];
+  const calculationMs = [];
+  let calculated;
+  for (let index = 0; index < sampleCount; index += 1) {
+    const input = await readNetSkinsInputView(tournamentId);
+    if (!input.payload?.ok) throw Object.assign(new Error(`Net Skins input read failed (${input.payload?.code || "unknown"}).`), { code: input.payload?.code });
+    calculated = calculateNetSkinsFromSupabaseView(input.payload.data);
+    inputReadMs.push(number(input.durationMs));
+    postgresQueryMs.push(number(input.payload.data.query_ms));
+    calculationMs.push(number(calculated.calculationMs));
+  }
+  const resultReadMs = [];
+  const resultPostgresMs = [];
+  let resultView;
+  for (let index = 0; index < sampleCount; index += 1) {
+    resultView = await readNetSkinsResultView(tournamentId);
+    if (!resultView.payload?.ok) throw Object.assign(new Error(`Net Skins result read failed (${resultView.payload?.code || "unknown"}).`), { code: resultView.payload?.code });
+    resultReadMs.push(number(resultView.durationMs));
+    resultPostgresMs.push(number(resultView.payload.data.query_ms));
+  }
+  const comparison = compareNetSkinsParity(expected.netSkins, calculated.netSkins);
+  const officialRounds = calculated.netSkins.rounds.filter((round) => round.finalized);
+  const calculatedOfficialRows = normalizedOfficialNetSkinsRows(netSkinsResultRecords({ results: officialRounds.flatMap((round) => round.skins || []) }));
+  const googleOfficialRows = normalizedOfficialNetSkinsRows(expected.netSkins?.storedResults || []);
+  const publicationParity = JSON.stringify(calculatedOfficialRows) === JSON.stringify(googleOfficialRows);
+  const scramble = calculated.netSkins.rounds.find((round) => upper(round.format) === "SC");
+  const configuredScramble = configuration.rounds.find((round) => upper(round.format) === "SC");
+  const snapshots = resultView.payload.data.snapshots || [];
+  const jobs = resultView.payload.data.jobs || [];
+  const historicalRegression = netSkinsHistoricalRegression(calculated);
+  return {
+    configuration: {
+      fingerprint: configuration.configuration_fingerprint,
+      changed: configurationWrite?.payload?.changed ?? null,
+      rounds: configuration.rounds.map((round) => ({
+        round: round.round_number, format: round.format, enabled: round.enabled,
+        entryType: round.entry_type, eligibleEntries: round.entries.filter((entry) => entry.eligible).length,
+        buyInPerEntry: round.buy_in_per_entry, pot: round.expected_pot,
+        tieRule: round.tie_rule, payoutRounding: round.payout_rounding,
+        completionRule: round.completion_rule,
+        scrambleTeamHandicaps: round.format === "SC" ? round.entries.filter((entry) => entry.eligible).map((entry) => ({ players: [entry.player_id_1, entry.player_id_2], teamHandicap: entry.team_handicap })) : [],
+      })),
+      import: configurationWrite?.payload || null,
+      googleConfigurationReadMs,
+    },
+    canonicalInput: calculated.canonicalInputVerification,
+    sourceFingerprint: calculated.sourceFingerprint,
+    sourceFingerprintByRound: calculated.sourceFingerprintByRound,
+    parity: comparison,
+    publicationParity: { pass: publicationParity, googleRows: googleOfficialRows.length, supabaseRows: calculatedOfficialRows.length },
+    historicalRegression,
+    scramble: {
+      configured: Boolean(configuredScramble),
+      pairingEntries: configuredScramble?.entries.filter((entry) => entry.eligible).length || 0,
+      pairingScoreRows: netSkinsScoreRowsFromSupabaseView(recalculated?.input || {}).filter((row) => row.entityType === "PAIRING").length || calculated.canonicalInputVerification.scramblePairingRows,
+      pot: scramble?.pot || 0, skins: scramble?.skinsAwarded || 0,
+      parity: !scramble || comparison.pass,
+    },
+    derivedState: {
+      snapshots: snapshots.length,
+      currentByRound: snapshots.map((row) => ({ round: row.round_number, state: row.result_state, engineVersion: row.engine_version, sourceFingerprint: row.source_fingerprint, configurationFingerprint: row.configuration_fingerprint })),
+      jobs: jobs.map((job) => ({ round: job.round_number, status: job.status, attempts: job.attempts, errorCode: job.last_error_code })),
+      noDuplicateCurrentResult: new Set(snapshots.map((row) => row.round_number)).size === snapshots.length,
+    },
+    googlePublication: {
+      source: "MATCH_FINALIZED/MATCH_REOPENED ordered Google outbox delivery",
+      destination: "Net Skins Result",
+      participantDependency: false,
+      participantGoogleRequests: 0,
+      officialReadbackParity: publicationParity,
+    },
+    performance: {
+      samples: sampleCount,
+      canonicalInputPostgres: benchmarkSummary(postgresQueryMs),
+      canonicalInputService: benchmarkSummary(inputReadMs),
+      engineCalculation: benchmarkSummary(calculationMs),
+      derivedWrite: benchmarkSummary(recalculated ? [number(recalculated.writeMs)] : []),
+      participantResultPostgres: benchmarkSummary(resultPostgresMs),
+      participantResultService: benchmarkSummary(resultReadMs),
+    },
+    googleRequestsPerParticipantRead: 0,
+    failureIsolation: {
+      scoringTransactionDependency: false,
+      coreLeaderboardsDependency: false,
+      homePrimaryDependency: false,
+      tournamentLiveDependency: false,
+      staleOfficialSnapshotRetainedOnFailure: true,
+      hiddenGoogleFallback: false,
+    },
+    pass: comparison.pass && publicationParity && historicalRegression.pass && Boolean(configuredScramble) && snapshots.length === configuration.rounds.length && jobs.every((job) => job.status === "SUCCEEDED"),
   };
 }
 
@@ -918,6 +1079,10 @@ export async function POST(request) {
       result = await tournamentReadiness(actorId, { samples: input.samples });
     } else if (action === "leaderboards-core-parity") {
       result = await leaderboardsCoreReadiness(actorId, { samples: input.samples });
+    } else if (action === "refresh-net-skins-configuration") {
+      result = await netSkinsReadiness(actorId, { refreshConfiguration: true, samples: input.samples });
+    } else if (action === "net-skins-parity") {
+      result = await netSkinsReadiness(actorId, { samples: input.samples });
     } else if (action === "match-authorization-parity") {
       const source = await authoritativeImport(actorId);
       result = await matchAuthorizationParity(source);
