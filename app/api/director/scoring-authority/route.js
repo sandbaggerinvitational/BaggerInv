@@ -78,6 +78,7 @@ import {
   recalculateCalcuttaTournament,
   replaceCalcuttaConfiguration,
 } from "../../../../lib/calcutta-supabase.js";
+import { calcuttaReadEnvironment } from "../../../../lib/calcutta-read-source.js";
 import {
   calculateCompetitionDerivedFromData,
   compareCompetitionDerivedParity,
@@ -717,6 +718,7 @@ async function calcuttaReadiness(actorId, { refresh = false, samples = 25 } = {}
       && Math.abs(ownerPortfolioValue - number(calculated.calcutta.distributedPrizePool)) < 0.005,
   };
   return {
+    readSource: calcuttaReadEnvironment(),
     engine: { module: "lib/calcutta.js", engineVersion: CALCUTTA_ENGINE_VERSION, changed: false,
       rulesOwner: "existing JavaScript application engine" },
     googleConfiguration: {
