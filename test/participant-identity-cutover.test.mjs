@@ -120,8 +120,9 @@ test("authority-boundary, link mismatch, revoked permission, and locked/final sc
 });
 
 test("cutover migration and routes preserve RLS, audit, rollback, and zero-Google identity semantics", async () => {
-  const [migration, contextRoute, matchRoute, scoring, session, initialize, impersonation] = await Promise.all([
+  const [migration, tournamentContextMigration, contextRoute, matchRoute, scoring, session, initialize, impersonation] = await Promise.all([
     source("supabase/migrations/202608120022_preview_participant_identity_cutover.sql"),
+    source("supabase/migrations/202608120023_preview_participant_tournament_context.sql"),
     source("app/api/participant/context/route.js"), source("app/api/player-passport/matches/route.js"),
     source("lib/scoring-participant-authorization.js"), source("app/api/player-passport/session/route.js"),
     source("app/api/player-passport/initialize/route.js"), source("app/api/director/impersonation/route.js"),
@@ -131,6 +132,13 @@ test("cutover migration and routes preserve RLS, audit, rollback, and zero-Googl
   assert.match(migration, /PREVIEW_IMPERSONATION_ENDED/);
   assert.match(migration, /revoke all on function[\s\S]*from public, anon, authenticated/);
   assert.doesNotMatch(migration, /create policy|using\s*\(\s*true\s*\)/i);
+  assert.match(tournamentContextMigration, /resolve_approved_participant_tournament/);
+  assert.match(tournamentContextMigration, /participant_identity_contacts/);
+  assert.match(tournamentContextMigration, /status = 'APPROVED'/);
+  assert.match(tournamentContextMigration, /APPROVED_TOURNAMENT_CONTEXT_REQUIRED/);
+  assert.match(tournamentContextMigration, /inspect_participant_identity_tournament_resolution/);
+  assert.doesNotMatch(tournamentContextMigration, /order by t\.tournament_year desc/);
+  assert.doesNotMatch(tournamentContextMigration, /create policy|using\s*\(\s*true\s*\)/i);
   for (const route of [contextRoute, matchRoute, session, initialize]) {
     assert.match(route, /resolveSupabaseParticipantIdentity/);
     assert.match(route, /X-Participant-Identity-Google-Requests|Google-Requests/);

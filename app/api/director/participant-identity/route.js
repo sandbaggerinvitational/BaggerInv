@@ -7,6 +7,7 @@ import {
   approveParticipantIdentityConfiguration,
   configureSingleParticipantAuthRehearsal,
   importParticipantIdentityConfiguration,
+  inspectParticipantIdentityTournamentResolution,
   inspectParticipantIdentitySecurity,
   linkAuthUserToPlayer,
   readParticipantIdentityAdmin,
@@ -99,6 +100,9 @@ async function loadAuthRehearsal(tournamentId) {
     authUser = safeParticipantAuthUserState(lookup.data.user);
   }
   const requestAudit = await readSingleParticipantAuthRequestAudit(tournamentId).then((value) => value.payload).catch(() => null);
+  const tournamentResolution = data.rehearsal?.authUserId
+    ? await inspectParticipantIdentityTournamentResolution(data.rehearsal.authUserId).then((value) => value.payload).catch(() => null)
+    : null;
   return {
     approved: data.approved === true,
     ready: data.ready === true,
@@ -113,6 +117,7 @@ async function loadAuthRehearsal(tournamentId) {
     candidate: safeParticipantAuthCandidate(data.candidate),
     authUser,
     requestAudit,
+    tournamentResolution,
     rehearsal: data.rehearsal ? {
       playerId: data.rehearsal.playerId,
       status: data.rehearsal.status,
