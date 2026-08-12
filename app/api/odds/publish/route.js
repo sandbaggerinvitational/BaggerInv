@@ -3,13 +3,14 @@ import { revalidatePath } from "next/cache";
 import { loadOddsInputs } from "../../../../lib/odds-data";
 import { loadPredictionDiagnostics } from "../../../../lib/prediction-data";
 import { ODDS_PHASES, simulateTournamentOdds, validateOpeningMatchups, validateRoundThreePairings } from "../../../../lib/tournament-odds";
-import { publishOddsSnapshot, readOddsSnapshots, verifyPublishedOddsSnapshot, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write";
+import { publishOddsSnapshot, readOddsSnapshots, readWorkbookSheetsByName, verifyPublishedOddsSnapshot, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
 import { createPublicationTrace, validateProjectionSnapshot } from "../../../../lib/projection-publication-diagnostics";
 import { playerPassportTokenFromRequest } from "../../../../lib/player-passport";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server";
 import { formatChampionshipOdds } from "../../../../lib/championship-odds-format";
 import { oddsPersistenceDiagnostics } from "../../../../lib/odds-workbook-persistence";
+import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, readPublishedOddsView, replacePublishedOddsSnapshots } from "../../../../lib/published-odds-supabase.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -93,6 +94,20 @@ async function publishProjection(request) {
     start("Workbook verification", { workbookOperation: "Read back and verify published projection rows", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot" });
     const verification = await verifyPublishedOddsSnapshot(snapshot);
     pass("Workbook verification", { worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot", verification });
+
+    if (process.env.VERCEL_ENV === "preview") {
+      start("Supabase publication projection", { workbookOperation: "Project verified published values without recalculation", worksheet: PUBLISHED_ODDS_WORKBOOK_TABS.join(", "), function: "replacePublishedOddsSnapshots" });
+      const scope = await readPublishedOddsView({ sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
+      if (!scope.payload?.ok) throw Object.assign(new Error("Published Odds tournament scope is unavailable."), { code: scope.payload?.code });
+      const publicationSheets = await readWorkbookSheetsByName(PUBLISHED_ODDS_WORKBOOK_TABS);
+      const projection = buildPublishedOddsImport({ sheets: publicationSheets,
+        tournamentId: scope.payload.data.tournament.tournament_id, tournamentYear: scope.payload.data.tournament.tournament_year,
+        sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: director?.identity?.player?.id || "Director publication" });
+      const projected = await replacePublishedOddsSnapshots(projection);
+      if (!projected.payload?.ok) throw Object.assign(new Error("Published Odds Supabase projection failed after verified Google publication."), { code: projected.payload?.code });
+      pass("Supabase publication projection", { function: "replacePublishedOddsSnapshots", snapshots: projected.payload.snapshots,
+        importFingerprint: projected.payload.import_fingerprint, valuesRecalculated: false });
+    }
 
     start("Cache invalidation", { workbookOperation: "Invalidate shared projection API cache", worksheet: "None", function: "revalidatePath" });
     revalidatePath("/api/leaderboards/insights");

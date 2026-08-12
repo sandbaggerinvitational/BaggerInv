@@ -20,6 +20,7 @@ import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import { isTournamentRecapPhase, projectionPresentationLabel } from "../../lib/projection-phases";
 import { buildTournamentRecapIntelligence, finishLabel } from "../../lib/tournament-recap-intelligence";
 import { participantRoundBreakdown, playerRoundBreakdown } from "../../lib/leaderboard-round-breakdown";
+import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../../lib/participant-auth-client-diagnostics";
 import { teamRoundRecap } from "../../lib/team-round-recap";
 import {
   PLAYER_METRICS,
@@ -495,12 +496,28 @@ export default function LeaderboardsDashboard({
   useEffect(() => {
     if (!data?.tournament?.year || oddsSnapshots !== null || !["teams", "insights"].includes(tab)) return undefined;
     const controller = new AbortController();
+    const startedAt = performance.now();
     fetch(`/api/leaderboards/insights?year=${encodeURIComponent(data.tournament.year)}`, { cache: "no-store", signal: controller.signal })
-      .then(async (response) => response.ok ? response.json() : Promise.reject(new Error("Odds unavailable")))
-      .then((payload) => setOddsSnapshots(Array.isArray(payload.snapshots) ? payload.snapshots : []))
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Odds unavailable");
+        return { payload: await response.json(), response };
+      })
+      .then(({ payload, response }) => {
+        setOddsSnapshots(Array.isArray(payload.snapshots) ? payload.snapshots : []);
+        const durationMs = performance.now() - startedAt;
+        recordParticipantAuthDiagnostic("PUBLISHED_ODDS_MODULE_USABLE", { routeTo: "/live?view=leaderboards&tab=insights", durationMs });
+        if (previewMode) console.info("Published Odds module timing", {
+          durationMs: Math.round(durationMs),
+          source: response.headers.get("x-published-odds-read-source") || "unknown",
+          googleRequests: Number(response.headers.get("x-published-odds-google-requests") || 0),
+          serverTiming: response.headers.get("server-timing") || "",
+          fingerprint: response.headers.get("x-published-odds-fingerprint") || "",
+        });
+        flushParticipantAuthDiagnostics().catch(() => null);
+      })
       .catch((error) => { if (error.name !== "AbortError") setOddsSnapshots([]); });
     return () => controller.abort();
-  }, [data?.tournament?.year, oddsSnapshots, tab]);
+  }, [data?.tournament?.year, oddsSnapshots, previewMode, tab]);
   const updateQuery = useCallback((changes) => {
     const params = new URLSearchParams(typeof window === "undefined" ? searchParams.toString() : window.location.search);
     params.set("view", "leaderboards");

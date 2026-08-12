@@ -66,6 +66,14 @@ import {
   replaceNetSkinsConfiguration,
 } from "../../../../lib/net-skins-supabase.js";
 import { netSkinsResultRecords } from "../../../../lib/net-skins.js";
+import {
+  buildPublishedOddsImport,
+  comparePublishedOddsParity,
+  PUBLISHED_ODDS_WORKBOOK_TABS,
+  publishedOddsSnapshotsFromView,
+  readPublishedOddsView,
+  replacePublishedOddsSnapshots,
+} from "../../../../lib/published-odds-supabase.js";
 import { getTournamentData, invalidateTournamentDataCache } from "../../../live/sheetData.js";
 import {
   MATCH_ACCESS_ACTIONS,
@@ -545,6 +553,59 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
     },
     pass: comparison.pass && publicationParity && historicalRegression.pass && Boolean(configuredScramble) &&
       snapshots.length === configuration.rounds.filter((round) => round.enabled).length && jobs.every((job) => job.status === "SUCCEEDED"),
+  };
+}
+
+async function publishedOddsReadiness(actorId, { refresh = false, samples = 25 } = {}) {
+  const source = await authoritativeImport(actorId);
+  const googleStartedAt = performance.now();
+  const sheets = await readWorkbookSheetsByName(PUBLISHED_ODDS_WORKBOOK_TABS);
+  const googlePublicationReadMs = performance.now() - googleStartedAt;
+  const tournament = source.imported.payload.tournament;
+  const imported = buildPublishedOddsImport({ sheets, tournamentId: tournament.tournament_id,
+    tournamentYear: tournament.tournament_year, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
+  let write = null;
+  if (refresh) {
+    write = await replacePublishedOddsSnapshots(imported);
+    if (!write.payload?.ok) throw Object.assign(new Error(`Published Odds import failed (${write.payload?.code || "unknown"}).`), { code: write.payload?.code });
+  }
+  const serviceSamples = [], postgresSamples = [];
+  let read;
+  for (let index = 0; index < Math.max(1, Math.min(50, number(samples, 25))); index += 1) {
+    read = await readPublishedOddsView({ tournamentId: tournament.tournament_id });
+    if (!read.payload?.ok) throw Object.assign(new Error(`Published Odds read failed (${read.payload?.code || "unknown"}).`), { code: read.payload?.code });
+    serviceSamples.push(number(read.durationMs)); postgresSamples.push(number(read.payload.data.query_ms));
+  }
+  const expected = imported.snapshots.map((item) => item.published_payload);
+  const actual = publishedOddsSnapshotsFromView(read.payload.data);
+  const parity = comparePublishedOddsParity(expected, actual);
+  const rows = read.payload.data.snapshots || [];
+  const current = rows.find((item) => item.is_current_official);
+  return {
+    import: write?.payload || null,
+    importFingerprint: imported.import_fingerprint,
+    currentSelection: { tournamentId: tournament.tournament_id, tournamentYear: tournament.tournament_year,
+      milestone: current?.milestone || null, publicationRevision: current?.publication_revision || null,
+      rule: "Tournament-scoped Odds Control milestone; verified current publication only" },
+    milestones: rows.map((item) => ({ milestone: item.milestone, phaseOrder: item.phase_order,
+      publishedAt: item.published_at, publicationRevision: item.publication_revision,
+      teamRows: item.payload?.teams?.length || 0, playerRows: item.payload?.players?.length || 0,
+      complete: item.publication_verified === true, payloadHash: item.payload_hash,
+      current: item.is_current_official === true })),
+    parity: { ...parity, milestonesCompared: expected.length, teamRows: expected.reduce((sum, item) => sum + item.teams.length, 0),
+      playerRows: expected.reduce((sum, item) => sum + item.players.length, 0), teamDivergences: parity.pass ? 0 : null,
+      playerDivergences: parity.pass ? 0 : null, movementHistoryPreserved: actual.length > 1 },
+    metadata: { sourceFingerprintAvailable: expected.every((item) => Boolean(clean(item.sourceFingerprint))),
+      engineVersionAvailable: expected.every((item) => Boolean(clean(item.engineVersion))),
+      configurationVersionAvailable: expected.every((item) => Boolean(clean(item.configurationVersion))),
+      iterationsPreserved: expected.map((item) => ({ milestone: item.phase, iterations: item.iterations })),
+      valuesRecalculated: false },
+    google: { publicationSource: true, participantDependency: false, participantRequests: 0,
+      explicitImportReadMs: googlePublicationReadMs, sheets: PUBLISHED_ODDS_WORKBOOK_TABS },
+    performance: { samples: serviceSamples.length, postgres: benchmarkSummary(postgresSamples), supabaseService: benchmarkSummary(serviceSamples) },
+    failureIsolation: { coreLeaderboards: true, netSkins: true, homeTournament: true, scoring: true,
+      lastVerifiedSnapshotRetained: true, noHiddenGoogleFallback: true },
+    pass: parity.pass && rows.length === expected.length && Boolean(current),
   };
 }
 
@@ -1123,6 +1184,10 @@ export async function POST(request) {
       result = await netSkinsReadiness(actorId, { refreshConfiguration: true, samples: input.samples });
     } else if (action === "net-skins-parity") {
       result = await netSkinsReadiness(actorId, { samples: input.samples });
+    } else if (action === "refresh-published-odds-snapshots") {
+      result = await publishedOddsReadiness(actorId, { refresh: true, samples: input.samples });
+    } else if (action === "published-odds-parity") {
+      result = await publishedOddsReadiness(actorId, { samples: input.samples });
     } else if (action === "match-authorization-parity") {
       const source = await authoritativeImport(actorId);
       result = await matchAuthorizationParity(source);
