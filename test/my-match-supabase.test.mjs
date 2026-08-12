@@ -86,6 +86,16 @@ test("My Match parity detects lifecycle, permission, and participant differences
   assert.equal(compareMyMatchParity(expected, myMatchDataFromSupabaseView(changed)).pass, false);
 });
 
+test("Google My Match parity excludes the Supabase-only match concurrency revision while retaining permission revision", () => {
+  const data = fixture();
+  const expected = myMatchDataFromSupabaseView(expectedMyMatchView(data.payload, data.presentation, "CB01"));
+  const changed = structuredClone(expected);
+  changed.matches[0].matchRevision = 99;
+  assert.equal(compareMyMatchParity(expected, changed).pass, true);
+  changed.matches[0].accessVersion = 99;
+  assert.equal(compareMyMatchParity(expected, changed).pass, false);
+});
+
 test("My Match RPC is indexed, RLS-compatible service-only, and unavailable to participant roles", async () => {
   const migration = await source("supabase/migrations/202608120019_preview_my_match_reads.sql");
   assert.match(migration, /create index if not exists scoring_authority_match_participants_player_idx/);
