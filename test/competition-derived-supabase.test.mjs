@@ -89,6 +89,15 @@ test("prepared Storylines persist semantic copy without time-relative labels", (
     assert.equal(typeof story.headline, "string");
     assert.equal(typeof story.detail, "string");
   }
+  assert.equal(Object.hasOwn(calculated.storylines.timeRelativeContract, "referenceTime"), false);
+});
+
+test("the same authoritative state produces the same Storyline payload across wall-clock time", () => {
+  const fresh = calculateCompetitionDerivedFromData(data(), { referenceTime });
+  const later = calculateCompetitionDerivedFromData(data(), { referenceTime: referenceTime + 2 * 60 * 60_000 });
+  assert.deepEqual(later.storylines.stories, fresh.storylines.stories);
+  assert.deepEqual(later.storylines.moments, fresh.storylines.moments);
+  assert.deepEqual(later.storylines.timeRelativeContract, fresh.storylines.timeRelativeContract);
 });
 
 test("semantic Storylines exclude transport timestamps while recent clinches retain expiry", () => {
