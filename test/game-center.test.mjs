@@ -241,8 +241,9 @@ test("Game Center exposes one state-aware primary action and preserves scoring a
   assert.match(source, /View Final Scorecard/);
   assert.match(source, /Scoring opens before/);
   assert.match(source, /fetch\("\/api\/player-passport\/matches"/);
-  assert.match(source, /body: JSON\.stringify\(\{ matchId \}\)/);
-  assert.match(source, /window\.location\.assign\(response\.ok \? "\/score"/);
+  assert.match(source, /body: JSON\.stringify\(\{ matchId, requestedAction: "START_SCORING" \}\)/);
+  assert.match(source, /if \(!response\.ok\)/);
+  assert.match(source, /window\.location\.assign\("\/score"\)/);
 });
 
 test("Game Center refreshes without overlapping requests and pauses while hidden", async () => {

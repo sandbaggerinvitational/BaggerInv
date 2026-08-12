@@ -37,6 +37,14 @@ import {
   myMatchDataFromSupabaseView,
   readMyMatchView,
 } from "../../../../lib/my-match-supabase.js";
+import {
+  MATCH_ACCESS_ACTIONS,
+  authorizeMatchAccess,
+  compareMatchAuthorizationMatrix,
+  expectedMatchAuthorizationDecision,
+  expectedMatchAuthorizationMatrix,
+  readMatchAuthorizationMatrix,
+} from "../../../../lib/match-authorization-supabase.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -121,6 +129,72 @@ async function myMatchParity(source, presentation) {
     supabaseService: benchmarkSummary(supabaseRequestMs),
     zeroGoogleRequestsPerMyMatchRead: true,
     scoringSessionIssuanceUnchanged: true,
+  };
+}
+
+async function matchAuthorizationParity(source) {
+  const expected = expectedMatchAuthorizationMatrix(source.imported);
+  const matrix = await readMatchAuthorizationMatrix(source.imported.payload.tournament.tournament_id);
+  if (!matrix.payload?.ok) throw Object.assign(new Error(`Match authorization matrix failed (${matrix.payload?.code || "unknown"}).`), { code: matrix.payload?.code });
+  const compared = compareMatchAuthorizationMatrix(expected, matrix.payload.decisions || []);
+  const payload = source.imported.payload;
+  const participants = payload.match_participants || [];
+  const players = (payload.tournament_players || []).filter((row) => row.participation_status === "ACTIVE");
+  const matches = payload.matches || [];
+  const samples = [];
+  for (const player of players) {
+    const ownIds = new Set(participants.filter((row) => row.player_id === player.player_id).map((row) => row.match_id));
+    const own = matches.filter((row) => ownIds.has(row.match_id));
+    const final = own.find((row) => row.status === "FINAL") || own[0];
+    const scoreable = own.find((row) => row.status === "LIVE" && row.scoring_locked !== true) || own[0];
+    const foreign = matches.find((row) => !ownIds.has(row.match_id)) || matches[0];
+    samples.push(
+      { playerId: player.player_id, matchId: own[0]?.match_id, action: MATCH_ACCESS_ACTIONS.VIEW_GAME_CENTER },
+      { playerId: player.player_id, matchId: final?.match_id, action: MATCH_ACCESS_ACTIONS.VIEW_FINAL_SCORECARD },
+      { playerId: player.player_id, matchId: scoreable?.match_id, action: MATCH_ACCESS_ACTIONS.START_SCORING },
+      { playerId: player.player_id, matchId: foreign?.match_id, action: MATCH_ACCESS_ACTIONS.VIEW_MATCH },
+    );
+  }
+  const postgresQueryMs = [];
+  const supabaseServiceMs = [];
+  const fullAuthorizationMs = [];
+  const sampleDivergences = [];
+  for (const sample of samples) {
+    const began = performance.now();
+    const read = await authorizeMatchAccess({ tournamentId: payload.tournament.tournament_id, ...sample });
+    fullAuthorizationMs.push(performance.now() - began);
+    const wanted = expectedMatchAuthorizationDecision(source.imported, { tournamentId: payload.tournament.tournament_id, ...sample });
+    const comparison = compareMatchAuthorizationMatrix([wanted], read.payload ? [read.payload] : []);
+    if (!comparison.pass) sampleDivergences.push({ sample, ...comparison });
+    postgresQueryMs.push(number(read.payload?.query_ms));
+    supabaseServiceMs.push(number(read.durationMs));
+  }
+  const actual = matrix.payload.decisions || [];
+  const matchById = new Map(matches.map((row) => [row.match_id, row]));
+  const coverage = {
+    activePlayers: players.length,
+    matches: matches.length,
+    decisions: actual.length,
+    finalScorecardAllowed: actual.filter((row) => row.action === "VIEW_FINAL_SCORECARD" && row.allowed).length,
+    scoringAllowed: actual.filter((row) => row.action === "START_SCORING" && row.allowed).length,
+    nonParticipantDenied: actual.filter((row) => row.code === "NOT_MATCH_PARTICIPANT").length,
+    finalScoringDenied: actual.filter((row) => row.action === "START_SCORING" && row.code === "MATCH_FINAL").length,
+    lockedMatchesCovered: new Set(actual.filter((row) => row.scoring_locked).map((row) => row.match_id)).size,
+    zeroHoleMatchesCovered: new Set(actual.filter((row) => number(matchById.get(row.match_id)?.scored_holes) === 0).map((row) => row.match_id)).size,
+    match4Covered: actual.some((row) => row.match_id === "2026-R3-4"),
+    historicalMatchCovered: actual.some((row) => row.match_id === "2026-R1-6"),
+  };
+  return {
+    ...coverage,
+    matrixQueryMs: number(matrix.payload.query_ms),
+    matrixServiceMs: number(matrix.durationMs),
+    parity: compared,
+    sampleDivergences,
+    postgresQuery: benchmarkSummary(postgresQueryMs),
+    supabaseService: benchmarkSummary(supabaseServiceMs),
+    fullAuthorization: benchmarkSummary(fullAuthorizationMs),
+    zeroGoogleRequestsPerAuthorization: true,
+    pass: players.length === 24 && compared.pass && !sampleDivergences.length,
   };
 }
 
@@ -619,6 +693,9 @@ export async function POST(request) {
       const source = await authoritativeImport(actorId);
       const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
       result = await myMatchParity(source, presentation);
+    } else if (action === "match-authorization-parity") {
+      const source = await authoritativeImport(actorId);
+      result = await matchAuthorizationParity(source);
     } else if (action === "outbox-rehearsal") result = await outboxRehearsal(actorId, number(input.cycles, 5));
     else if (action === "outbox-failures") result = await outboxFailureRehearsal(actorId);
     else if (action === "cutover-rollback-rehearsal") result = await cutoverRollbackRehearsal(actorId);

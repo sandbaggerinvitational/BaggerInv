@@ -301,9 +301,15 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       const response = await fetch("/api/player-passport/matches", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ matchId }),
+        body: JSON.stringify({ matchId, requestedAction: "START_SCORING" }),
       });
-      window.location.assign(response.ok ? "/score" : `/score?match=${encodeURIComponent(matchId)}`);
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || "This scorecard is not available right now.");
+      }
+      window.location.assign("/score");
+    } catch (caught) {
+      setError(caught?.message || "This scorecard is not available right now.");
     } finally {
       setOpening(false);
     }

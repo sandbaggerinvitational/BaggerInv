@@ -275,6 +275,8 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         body: JSON.stringify({
           matchId: passportMatch.matchId,
           viewFinalScorecard: String(passportMatch.status || passportMatch.matchStatus || "").toLowerCase() === "final",
+          requestedAction: String(passportMatch.status || passportMatch.matchStatus || "").toLowerCase() === "final"
+            ? "VIEW_FINAL_SCORECARD" : "START_SCORING",
         }),
       }, { delays: [150, 350, 750] });
       if (sequence !== matchOpenSequence.current) return;

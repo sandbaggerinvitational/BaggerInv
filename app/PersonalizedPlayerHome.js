@@ -247,7 +247,7 @@ export default function PersonalizedPlayerHome({ netSkins = null }) {
       const response = await fetch("/api/player-passport/matches", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ matchId: match.matchId }),
+        body: JSON.stringify({ matchId: match.matchId, requestedAction: "START_SCORING" }),
       });
       if (!response.ok) throw new Error();
       window.location.assign("/score");

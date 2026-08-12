@@ -129,6 +129,7 @@ test("Start Scoring remains on the existing Passport authorization route and Fin
   const action = await source("app/api/player-passport/matches/route.js");
   assert.match(score, /fetchWithTransientRetry\("\/api\/player-passport\/matches"/);
   assert.match(action, /authorizePassportMatch/);
+  assert.match(action, /authorizeMatchAccess/);
   assert.match(dashboard, /\["Live", "Final"\]\.includes\(status\)/);
   assert.match(dashboard, /status === "Live"/);
   assert.match(dashboard, /status === "Locked"/);
