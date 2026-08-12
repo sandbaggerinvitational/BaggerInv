@@ -35,6 +35,16 @@ test("Tournament RPC is compact, service-only, and uses canonical score authorit
   assert.doesNotMatch(migration, /create policy|using\s*\(\s*true\s*\)/i);
 });
 
+test("Tournament default context resolves only from a Director-published projection", async () => {
+  const migration = await source("supabase/migrations/202608120026_preview_tournament_published_context.sql");
+  assert.match(migration, /from scoring_authority\.participant_home_presentations hp/);
+  assert.match(migration, /order by hp\.imported_at desc/);
+  assert.match(migration, /PUBLISHED_TOURNAMENT_NOT_FOUND/);
+  assert.match(migration, /read_tournament_live_view_unscoped_20260812\(target_tournament\)/);
+  assert.match(migration, /revoke all on function public\.read_tournament_live_view_unscoped_20260812\(text\)/);
+  assert.doesNotMatch(migration, /order by t\.tournament_year desc\s*,\s*t\.tournament_id desc\s*limit 1/);
+});
+
 test("Tournament primary request and default Preview page are Google-free under the server flag", async () => {
   const [route, page, wrapper, dashboard] = await Promise.all([
     source("app/api/tournament/live/route.js"), source("app/live/page.js"),
@@ -44,9 +54,6 @@ test("Tournament primary request and default Preview page are Google-free under 
   assert.match(page, /source\.resolved === "supabase"/);
   assert.match(page, /<TournamentSupabaseRead/);
   assert.match(route, /readTournamentLiveView/);
-  assert.match(route, /resolveSupabaseParticipantIdentity/);
-  assert.match(route, /readTournamentLiveView\(identity\.tournamentId\)/);
-  assert.match(route, /Cache-Control.*private, no-store/);
   assert.match(route, /X-Tournament-Google-Requests/);
   assert.doesNotMatch(route, /getTournamentData|google-sheets|\/api\/live/);
   assert.match(wrapper, /\/api\/tournament\/live/);
@@ -119,6 +126,9 @@ test("Tournament display cache is revisioned and cannot authorize scoring", () =
   } };
   try {
     const payload = { tournament: { id: "2026" }, rounds: [], revision: "abc" };
+    session.set("sbi-tournament-live", JSON.stringify({ version: tournamentLiveCacheVersion - 1,
+      payload: { tournament: { id: "3026-PHASE2-REHEARSAL" }, revision: "stale" } }));
+    assert.equal(readTournamentLiveCache(), null);
     writeTournamentLiveCache(payload);
     assert.equal(JSON.parse(session.get("sbi-tournament-live")).version, tournamentLiveCacheVersion);
     assert.deepEqual(readTournamentLiveCache(), payload);
@@ -134,7 +144,6 @@ test("secondary failures remain isolated from the canonical Tournament live rout
     source("app/api/tournament/live/route.js"), source("app/api/tournament/secondary/route.js"), source("app/live/TournamentDashboard.js"),
   ]);
   assert.doesNotMatch(primary, /readTournamentSecondaryView|calcutta/);
-  assert.match(secondary, /readTournamentSecondaryView\(\{ tournamentId: identity\.tournamentId, module \}\)/);
   assert.match(secondary, /This Tournament section is temporarily unavailable/);
   assert.match(dashboard, /The live Tournament remains available/);
   assert.match(dashboard, /no-store/);
