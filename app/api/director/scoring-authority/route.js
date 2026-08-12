@@ -85,7 +85,7 @@ const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(
 const truthy = (value) => /^(true|yes|1|locked)$/i.test(clean(value));
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404 });
 const WORKBOOK_TABS = ["Tournaments", "Players", "Handicaps", "Team Names", "Rounds", "Courses", "Course Holes", "Live Matches", "Matches", "Live Hole Scores"];
-const NET_SKINS_WORKBOOK_TABS = ["Net Skins", "Net Skins Result"];
+const NET_SKINS_WORKBOOK_TABS = ["Net Skins", "Net Skins Result", "Live Matches"];
 
 async function authorize(request) {
   if (process.env.VERCEL_ENV !== "preview") return { response: unavailable() };
@@ -485,6 +485,8 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
         buyInPerEntry: round.buy_in_per_entry, pot: round.expected_pot,
         tieRule: round.tie_rule, payoutRounding: round.payout_rounding,
         completionRule: round.completion_rule,
+        individualStrokeAllocations: round.format !== "SC" ? round.entries.filter((entry) => entry.eligible)
+          .map((entry) => ({ playerId: entry.player_id_1, strokes: entry.individual_stroke_allocation })) : [],
         scrambleTeamHandicaps: round.format === "SC" ? round.entries.filter((entry) => entry.eligible).map((entry) => ({ players: [entry.player_id_1, entry.player_id_2], teamHandicap: entry.team_handicap })) : [],
       })),
       import: configurationWrite?.payload || null,
