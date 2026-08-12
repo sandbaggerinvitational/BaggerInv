@@ -607,6 +607,28 @@ function normalizedCalcuttaStandingRows(rows = []) {
   })).sort((left, right) => left.playerId.localeCompare(right.playerId));
 }
 
+function calcuttaPublicationComparison(expected = [], actual = []) {
+  const mismatches = [];
+  const count = Math.max(expected.length, actual.length);
+  for (let index = 0; index < count && mismatches.length < 20; index += 1) {
+    const left = expected[index] || null;
+    const right = actual[index] || null;
+    if (!left || !right) {
+      mismatches.push({ index, google: left, supabase: right });
+      continue;
+    }
+    for (const field of [...new Set([...Object.keys(left), ...Object.keys(right)])].sort()) {
+      if (canonicalJson(left[field]) !== canonicalJson(right[field])) {
+        mismatches.push({ index, playerId: left.playerId || right.playerId,
+          field, google: left[field], supabase: right[field] });
+        if (mismatches.length >= 20) break;
+      }
+    }
+  }
+  return { pass: expected.length === actual.length && mismatches.length === 0,
+    googleRows: expected.length, supabaseRows: actual.length, mismatches };
+}
+
 async function calcuttaReadiness(actorId, { refresh = false, samples = 25 } = {}) {
   const source = await authoritativeImport(actorId);
   const googleStartedAt = performance.now();
@@ -662,7 +684,8 @@ async function calcuttaReadiness(actorId, { refresh = false, samples = 25 } = {}
   const googleStandingRows = normalizedCalcuttaStandingRows((sheets["Calcutta Standings"]?.records || []).map(({ record }) => record)
     .filter((row) => number(row.Year) === number(tournament.tournament_year)));
   const generatedStandingRows = normalizedCalcuttaStandingRows(calculated.publication.standings);
-  const standingPublicationParity = canonicalJson(googleStandingRows) === canonicalJson(generatedStandingRows);
+  const standingPublicationComparison = calcuttaPublicationComparison(googleStandingRows, generatedStandingRows);
+  const standingPublicationParity = standingPublicationComparison.pass;
   const known = Object.fromEntries(["Holman Moores", "Memo Saldana"].map((name) => {
     const golfer = (calculated.calcutta.golfers || []).find((row) => clean(row.player?.name) === name);
     return [name, golfer ? { playerId: golfer.playerId, points: golfer.totalPoints } : null];
@@ -711,7 +734,7 @@ async function calcuttaReadiness(actorId, { refresh = false, samples = 25 } = {}
     storedParity,
     roundPublicationParity: { pass: roundPublicationParity, googleRows: googleRoundRows.length, supabaseRows: generatedRoundRows.length,
       ignoredIncompleteOrStaleGoogleRows: googleRoundRowsAll.length - googleRoundRows.length },
-    standingPublicationParity: { pass: standingPublicationParity, googleRows: googleStandingRows.length, supabaseRows: generatedStandingRows.length },
+    standingPublicationParity: standingPublicationComparison,
     financialConservation,
     knownValueRegression,
     scramble: {
