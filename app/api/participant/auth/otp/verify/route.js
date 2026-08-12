@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   const authority = participantIdentityAuthorityEnvironment();
-  if (!authority.authRehearsalEnabled || authority.resolved !== "passport") return NextResponse.json({ error: "Not found." }, { status: 404 });
+  if (!authority.participantAuthEnabled) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const input = await request.json().catch(() => ({}));
   const email = String(input.email || "").trim().toLowerCase();
   const token = String(input.token || "").replace(/\s/g, "");

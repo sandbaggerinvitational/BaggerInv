@@ -7,6 +7,6 @@ export const metadata = { title: "Preview Participant Sign-In", robots: { index:
 
 export default function ParticipantAuthPage() {
   const authority = participantIdentityAuthorityEnvironment();
-  if (!authority.authRehearsalEnabled || authority.resolved !== "passport") notFound();
+  if (!authority.participantAuthEnabled) notFound();
   return <ParticipantAuthRehearsal />;
 }

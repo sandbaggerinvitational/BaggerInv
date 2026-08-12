@@ -3,9 +3,10 @@ import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../lib/participant-identity-authority.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { inspectPlayerPassportToken } from "../../../../lib/player-passport-server.js";
-import { readParticipantIdentityContext, readParticipantIdentityContextForAuth } from "../../../../lib/participant-identity-supabase.js";
+import { readParticipantIdentityContext } from "../../../../lib/participant-identity-supabase.js";
 import { observeParticipantIdentityShadow } from "../../../../lib/participant-identity-shadow.js";
 import { verifyParticipantAuthClaims } from "../../../../lib/supabase-auth-server.js";
+import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 
 export const dynamic = "force-dynamic";
 
@@ -44,11 +45,19 @@ export async function GET(request) {
   const authority = participantIdentityAuthorityEnvironment();
   try {
     if (authority.resolved === "supabase") {
-      const verified = await verifyParticipantAuthClaims(await cookies());
-      if (verified.status !== "active") return response({ identityAuthority: "supabase", session: { status: verified.status }, error: "Participant session is not active." }, 401);
-      const result = await readParticipantIdentityContextForAuth({ authUserId: verified.claims.sub });
-      if (!result.payload?.ok) return response({ identityAuthority: "supabase", session: { status: "active" }, error: result.payload?.code || "Participant context is unavailable." }, 403);
-      return response({ identityAuthority: "supabase", session: { status: "active" }, ...result.payload.data });
+      const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+      const result = NextResponse.json({
+        identityAuthority: "supabase",
+        session: { status: resolved.sessionStatus },
+        ...resolved.context,
+        previewMode: resolved.previewMode,
+        impersonation: resolved.impersonation,
+        identityTimings: resolved.timings,
+      }, { status: 200, headers: { "Cache-Control": "private, no-store" } });
+      result.headers.set("X-Participant-Identity-Authority", "supabase");
+      result.headers.set("X-Participant-Identity-Google-Requests", "0");
+      result.headers.set("Server-Timing", `session;dur=${Number(resolved.timings.sessionVerificationMs || 0).toFixed(1)}, context;dur=${Number(resolved.timings.participantContextMs || 0).toFixed(1)}, identity;dur=${Number(resolved.timings.totalIdentityMs || resolved.timings.participantContextMs || 0).toFixed(1)}`);
+      return result;
     }
 
     const token = playerPassportTokenFromRequest(request);
@@ -71,6 +80,8 @@ export async function GET(request) {
       identityTimings: { passportVerificationMs, passportContextMs, ...shadow.timings } });
   } catch (error) {
     console.error("Participant context foundation failed", { authority: authority.resolved, message: error?.message || String(error) });
-    return response({ identityAuthority: authority.resolved, session: { status: "unavailable" }, error: "Participant context is temporarily unavailable." }, 503);
+    const safe = authority.resolved === "supabase" ? participantIdentityPublicError(error) : null;
+    return response({ identityAuthority: authority.resolved, session: { status: safe?.status === 401 ? "inactive" : "unavailable" },
+      error: safe?.message || "Participant context is temporarily unavailable.", code: safe?.code }, safe?.status || 503);
   }
 }

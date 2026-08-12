@@ -7,7 +7,7 @@ import { verifyParticipantAuthClaims } from "../../../../../lib/supabase-auth-se
 export const dynamic = "force-dynamic";
 export async function POST(request) {
   const authority = participantIdentityAuthorityEnvironment();
-  if (!authority.authRehearsalEnabled || authority.resolved !== "passport") return NextResponse.json({ error: "Not found." }, { status: 404 });
+  if (!authority.participantAuthEnabled) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const verified = await verifyParticipantAuthClaims(await cookies());
   if (verified.status !== "active") return NextResponse.json({ error: "Preview Auth session required." }, { status: 401, headers: { "Cache-Control": "private, no-store" } });
   const input = await request.json().catch(() => ({}));

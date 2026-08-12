@@ -1,7 +1,8 @@
 import { after, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { initializeParticipantTournament } from "../../../lib/participant-initialization.js";
-import { participantIdentityAuthorityEnvironment } from "../../../lib/participant-identity-authority.js";
+import { requireParticipantIdentityAuthority } from "../../../lib/participant-identity-authority.js";
+import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver.js";
 import { observeParticipantIdentityShadow } from "../../../lib/participant-identity-shadow.js";
 import { requireMyMatchReadSource } from "../../../lib/my-match-read-source.js";
 import { myMatchDataFromSupabaseView, readMyMatchView } from "../../../lib/my-match-supabase.js";
@@ -28,13 +29,29 @@ function safeError(status = 503) {
 export async function GET(request) {
   const requestStartedAt = performance.now();
   let session;
-  try { session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request)); }
-  catch { return safeError(401); }
+  let resolvedIdentity;
+  let identity;
+  try {
+    identity = requireParticipantIdentityAuthority();
+    if (identity.resolved === "supabase") {
+      resolvedIdentity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+    } else {
+      session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
+    }
+  } catch (error) {
+    if (identity?.resolved === "supabase") {
+      const safe = participantIdentityPublicError(error);
+      return NextResponse.json({ active: safe.status === 401 ? false : null, initializing: safe.status !== 401,
+        error: safe.message, code: safe.code }, { status: safe.status, headers: privateHeaders });
+    }
+    return safeError(401);
+  }
   const sessionValidationMs = performance.now() - requestStartedAt;
   const source = requireMyMatchReadSource();
 
   try {
     if (source.resolved === "google") {
+      if (identity.resolved === "supabase") throw Object.assign(new Error("Supabase identity cannot use the Google My Match foreground adapter."), { code: "MY_MATCH_SOURCE_MISMATCH" });
       const initialized = await initializeParticipantTournament(session);
       const totalMs = performance.now() - requestStartedAt;
       return NextResponse.json({
@@ -46,8 +63,9 @@ export async function GET(request) {
       }, { headers: { ...privateHeaders, "Server-Timing": `session;dur=${sessionValidationMs.toFixed(1)}, total;dur=${totalMs.toFixed(1)}` } });
     }
 
-    const playerId = playerPassportEffectivePlayerId(session);
-    const read = await readMyMatchView({ tournamentId: session.tournamentId, playerId });
+    const playerId = identity.resolved === "supabase" ? resolvedIdentity.playerId : playerPassportEffectivePlayerId(session);
+    const tournamentId = identity.resolved === "supabase" ? resolvedIdentity.tournamentId : session.tournamentId;
+    const read = await readMyMatchView({ tournamentId, playerId });
     if (!read.payload?.ok) {
       const error = new Error("My Match Supabase read failed.");
       error.code = read.payload?.code || "MY_MATCH_SUPABASE_READ_FAILED";
@@ -56,7 +74,6 @@ export async function GET(request) {
     const personalized = myMatchDataFromSupabaseView(read.payload.data);
     const totalMs = performance.now() - requestStartedAt;
 
-    const identity = participantIdentityAuthorityEnvironment();
     if (identity.authRehearsalEnabled) {
       const cookieStore = await cookies();
       after(async () => {
@@ -65,7 +82,7 @@ export async function GET(request) {
           if (verified.status !== "active") return;
           const observed = await observeParticipantIdentityShadow({
             authUserId: verified.claims.sub,
-            tournamentId: session.tournamentId,
+            tournamentId,
             passportPlayerId: playerId,
             passportContext: personalized.identityContext,
           });
@@ -83,7 +100,7 @@ export async function GET(request) {
 
     return NextResponse.json({
       active: true,
-      previewMode: isPreviewImpersonationSession(session),
+      previewMode: identity.resolved === "supabase" ? resolvedIdentity.previewMode : isPreviewImpersonationSession(session),
       player: personalized.player,
       data: { player: personalized.player, tournament: personalized.tournament, matches: personalized.matches, snapshot: personalized.snapshot },
       readDiagnostics: {
@@ -93,6 +110,7 @@ export async function GET(request) {
         totalServerMs: totalMs,
         googleRequests: 0,
         identityAuthority: identity.resolved,
+        identityTimings: identity.resolved === "supabase" ? resolvedIdentity.timings : { passportSignedSessionMs: sessionValidationMs },
       },
     }, { headers: { ...privateHeaders,
       "Server-Timing": `session;dur=${sessionValidationMs.toFixed(1)}, postgres;dur=${personalized.queryMs.toFixed(1)}, supabase;dur=${read.durationMs.toFixed(1)}, total;dur=${totalMs.toFixed(1)}`,
@@ -100,7 +118,7 @@ export async function GET(request) {
       "X-My-Match-Google-Requests": "0",
     } });
   } catch (error) {
-    console.error("My Match read failed", { source: source.resolved, playerId: playerPassportEffectivePlayerId(session),
+    console.error("My Match read failed", { source: source.resolved, playerId: resolvedIdentity?.playerId || playerPassportEffectivePlayerId(session),
       code: error?.code || "", message: error?.message || String(error) });
     return safeError(503);
   }

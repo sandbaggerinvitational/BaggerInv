@@ -10,7 +10,7 @@ const json = (payload, status = 200) => NextResponse.json(payload, { status, hea
 
 export async function POST(request) {
   const authority = participantIdentityAuthorityEnvironment();
-  if (!authority.authRehearsalEnabled || authority.resolved !== "passport") return json({ error: "Not found." }, 404);
+  if (!authority.participantAuthEnabled) return json({ error: "Not found." }, 404);
   const input = await request.json().catch(() => ({}));
   const email = String(input.email || "").trim().toLowerCase();
   const clientIdentity = `${request.headers.get("x-forwarded-for") || ""}|${request.headers.get("user-agent") || ""}|${process.env.SUPABASE_SCORING_MIRROR_SECRET_KEY || ""}`;

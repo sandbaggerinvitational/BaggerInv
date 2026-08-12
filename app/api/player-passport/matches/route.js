@@ -1,14 +1,17 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { authorizePassportMatch, readPlayerPassportMatches, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
+import { authorizePassportMatch, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { MATCH_ACCESS_ACTIONS, authorizeMatchAccess } from "../../../../lib/match-authorization-supabase.js";
 import { requireMatchAuthorizationSource } from "../../../../lib/match-authorization-source.js";
 import { createScoringSession, scoringSessionCookie } from "../../../../lib/scoring-access.js";
 import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
-import { getTournamentData } from "../../../live/sheetData.js";
 import { playerPerformanceRows, rankPlayerRows } from "../../../../lib/mobile-leaderboards.js";
 import { playerRoundPerformance } from "../../../../lib/player-round-performance.js";
 import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
 import { withNormalizedReadDiagnostics } from "../../../../lib/google-sheets-server-read.js";
+import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
+import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
+import { myMatchDataFromSupabaseView, readMyMatchView } from "../../../../lib/my-match-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -16,16 +19,39 @@ function passport(request) {
   return verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
 }
 
+async function participant(request) {
+  const authority = requireParticipantIdentityAuthority();
+  if (authority.resolved === "supabase") {
+    const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+    return { authority, resolved, playerId: resolved.playerId, tournamentId: resolved.tournamentId,
+      scorerName: resolved.displayName, previewMode: resolved.previewMode };
+  }
+  const session = passport(request);
+  return { authority, session, playerId: playerPassportEffectivePlayerId(session), tournamentId: session.tournamentId,
+    scorerName: "", previewMode: false };
+}
+
 export async function GET(request) {
-  let session;
+  let identity;
   try {
-    session = passport(request);
-  } catch {
+    identity = await participant(request);
+  } catch (error) {
+    if (error?.code) {
+      const safe = participantIdentityPublicError(error);
+      return NextResponse.json({ error: safe.message, code: safe.code }, { status: safe.status });
+    }
     return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });
   }
   try {
+    if (identity.authority.resolved === "supabase") {
+      const read = await readMyMatchView({ tournamentId: identity.tournamentId, playerId: identity.playerId });
+      if (!read.payload?.ok) throw Object.assign(new Error("Participant match context is unavailable."), { code: read.payload?.code });
+      const data = myMatchDataFromSupabaseView(read.payload.data);
+      return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store",
+        "X-Participant-Identity-Authority": "supabase", "X-Participant-Identity-Google-Requests": "0" } });
+    }
     const measured = await withWorkbookWriteDiagnostics("participant-match-initialization", () =>
-      withNormalizedReadDiagnostics("GET /api/player-passport/matches", () => initializeParticipantTournament(session))
+      withNormalizedReadDiagnostics("GET /api/player-passport/matches", () => initializeParticipantTournament(identity.session))
     );
     const initialized = measured.result.result;
     console.info("Participant match workbook access", {
@@ -65,11 +91,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   const startedAt = performance.now();
-  let session;
+  let identity;
   try {
-    session = passport(request);
-  } catch {
-    return NextResponse.json({ error: "This match is not available for Player Passport scoring." }, { status: 403 });
+    identity = await participant(request);
+  } catch (error) {
+    const safe = participantIdentityPublicError(error);
+    return NextResponse.json({ error: safe.message, code: safe.code }, { status: safe.status });
   }
   let source;
   try { source = requireMatchAuthorizationSource(); }
@@ -84,8 +111,8 @@ export async function POST(request) {
     let postgresMs = 0;
     let serviceMs = 0;
     if (source.resolved === "supabase") {
-      const playerId = playerPassportEffectivePlayerId(session);
-      const authorized = await authorizeMatchAccess({ tournamentId: session.tournamentId, playerId, matchId, action });
+      const playerId = identity.playerId;
+      const authorized = await authorizeMatchAccess({ tournamentId: identity.tournamentId, playerId, matchId, action });
       if (!authorized.payload || typeof authorized.payload.allowed !== "boolean") throw Object.assign(new Error("Supabase match authorization returned no decision."), { code: "AUTHORIZATION_UNAVAILABLE" });
       if (!authorized.payload.allowed) {
         const status = ["NOT_MATCH_PARTICIPANT", "TOURNAMENT_MEMBERSHIP_INACTIVE"].includes(authorized.payload.code) ? 403 : 409;
@@ -106,10 +133,12 @@ export async function POST(request) {
         readOnly: authorized.payload.read_only === true,
       };
     } else {
-      access = await authorizePassportMatch(session, matchId, { allowFinal: viewFinalScorecard === true });
+      if (identity.authority.resolved === "supabase") throw Object.assign(new Error("Supabase identity requires Supabase match authorization."), { code: "AUTHORIZATION_SOURCE_MISMATCH" });
+      access = await authorizePassportMatch(identity.session, matchId, { allowFinal: viewFinalScorecard === true });
     }
-    const token = createScoringSession({ scope: "match", matchId: access.matchId, tournamentId: session.tournamentId,
-      accessVersion: access.accessVersion, scorerName: access.player.name, playerId: access.player.id, readOnly: access.readOnly });
+    const token = createScoringSession({ scope: "match", matchId: access.matchId, tournamentId: identity.tournamentId,
+      accessVersion: access.accessVersion, scorerName: access.player.name, playerId: access.player.id, readOnly: access.readOnly,
+      identityAuthority: identity.authority.resolved });
     const totalMs = performance.now() - startedAt;
     console.info("Player Passport match authorization", { source: source.resolved, action, matchId: access.matchId,
       playerId: access.player.id, readOnly: access.readOnly, postgresMs, serviceMs, totalMs, googleRequests: source.resolved === "supabase" ? 0 : null });
@@ -123,7 +152,7 @@ export async function POST(request) {
   } catch (error) {
     if (source.resolved === "supabase") {
       console.error("Supabase match authorization unavailable", { route: "POST /api/player-passport/matches",
-        signedPassportValid: true, stage: "match-authorization-supabase-read", code: error?.code || "AUTHORIZATION_UNAVAILABLE",
+        identityAuthority: identity?.authority?.resolved || "unknown", stage: "match-authorization-supabase-read", code: error?.code || "AUTHORIZATION_UNAVAILABLE",
         reason: error?.message || String(error) });
       return NextResponse.json({ error: "Scorecard authorization is temporarily unavailable.", code: "AUTHORIZATION_UNAVAILABLE" },
         { status: 503, headers: { "X-Match-Authorization-Source": "supabase", "X-Match-Authorization-Google-Requests": "0" } });

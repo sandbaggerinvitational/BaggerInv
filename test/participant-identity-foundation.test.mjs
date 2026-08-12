@@ -160,11 +160,13 @@ test("Director foundation remains Preview-only and the single-user rehearsal is 
   assert.ok(files.every((value) => !/signInWithOtp|createUser/.test(value)));
 });
 
-test("Preview impersonation remains the signed Director Passport mechanism", async () => {
+test("Preview impersonation remains a signed Director lease without fake Auth users", async () => {
   const route = await source("app/api/director/impersonation/route.js");
   assert.match(route, /createPlayerPassportSession/);
   assert.match(route, /inspectTournamentDirectorToken/);
-  assert.doesNotMatch(route, /supabase|auth\.users|createUser/i);
+  assert.match(route, /beginPreviewIdentityImpersonation/);
+  assert.match(route, /endPreviewIdentityImpersonation/);
+  assert.doesNotMatch(route, /auth\.users|createUser|verifyOtp/i);
 });
 
 test("approved Auth SDK packages are installed without exposing server credentials to browser variables", async () => {

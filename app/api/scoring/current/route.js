@@ -1,6 +1,7 @@
 import { after, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { scoringTokenFromRequest, verifyScoringSession } from "../../../../lib/scoring-access.js";
-import { readLiveScoringMatch, validateParticipantSession } from "../../../../lib/google-sheets-write.js";
+import { readLiveScoringMatch } from "../../../../lib/google-sheets-write.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../lib/live-score-values.js";
 import { logScoringFailure, participantScoringError } from "../../../../lib/scoring-api-errors.js";
@@ -11,6 +12,7 @@ import { drainGoogleOutbox } from "../../../../lib/scoring-google-outbox.js";
 import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.js";
 import { readPreviewScoringParticipantContext } from "../../../../lib/scoring-authority-supabase.js";
 import { mergeParticipantScoringAuthorityState } from "../../../../lib/scoring-participant-authority-state.js";
+import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
 
 export const dynamic = "force-dynamic";
 
@@ -24,18 +26,20 @@ export async function GET(request) {
   try {
     const current = session(request);
     const requireWritable = new URL(request.url).searchParams.get("syncRebase") === "1";
-    await validateParticipantSession(current, requireWritable ? { requireWritable: true } : undefined);
+    const authorization = await validateAuthoritativeParticipantSession(request, current,
+      { requireWritable, cookieStore: await cookies() });
     const googleData = await readLiveScoringMatch(current.matchId);
     const authority = scoringAuthorityEnvironment();
     if (authority.resolved !== "supabase") return NextResponse.json({ data: googleData });
-    const canonical = await readPreviewScoringParticipantContext({
+    const canonical = authorization.canonical ? { payload: { ok: true, data: authorization.canonical } }
+      : await readPreviewScoringParticipantContext({
       tournament_id: String(current.tournamentId || current.year || "2026"),
       match_id: current.matchId,
       player_id: String(current.playerId || `match-access:${current.matchId}`),
       permission_revision: Number(current.accessVersion || 1),
       passport_verified: true,
       role: current.playerId ? "PLAYER" : "MATCH_ACCESS",
-    });
+      });
     if (!canonical.payload?.ok || !canonical.payload?.data?.match) {
       if (requireWritable) return NextResponse.json({ error: "Authoritative scoring state is temporarily unavailable." }, { status: 503 });
       return NextResponse.json({ data: googleData });
@@ -55,7 +59,7 @@ export async function POST(request) {
   try {
     const authorizationStartedAt = Date.now();
     const current = session(request);
-    await validateParticipantSession(current, { requireWritable: true });
+    await validateAuthoritativeParticipantSession(request, current, { requireWritable: true, cookieStore: await cookies() });
     const authorizationMs = Date.now() - authorizationStartedAt;
     const rate = consumeRateLimit(`scoring-write:${clientAddress(request)}:${current.matchId}`, { limit: 30, windowMs: 60_000 });
     if (!rate.allowed) return NextResponse.json({ error: "Too many score updates. Wait a moment and try again." }, { status: 429 });

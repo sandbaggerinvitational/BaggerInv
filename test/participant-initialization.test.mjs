@@ -19,7 +19,10 @@ test("every participant entry point uses one shared initialization pipeline", as
   assert.match(pipeline, /const pending = new Map/);
   assert.match(activation, /initializeParticipantTournament\(session\)/);
   assert.match(initializeRoute, /initializeParticipantTournament\(session\)/);
-  assert.match(matches, /initializeParticipantTournament\(session\)/);
+  assert.match(initializeRoute, /resolveSupabaseParticipantIdentity/);
+  assert.match(initializeRoute, /readMyMatchView/);
+  assert.match(matches, /initializeParticipantTournament\(identity\.session\)/);
+  assert.match(matches, /resolveSupabaseParticipantIdentity/);
   assert.match(home, /\/api\/player-passport\/initialize/);
   assert.match(score, /\/api\/player-passport\/initialize/);
   assert.match(reset, /invalidateParticipantInitialization\(session\)[\s\S]*initializeParticipantTournament\(session\)/);

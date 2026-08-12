@@ -1,8 +1,8 @@
 import { after, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { canScoreMatch, scoringTokenFromRequest, verifyScoringSession } from "../../../../../lib/scoring-access.js";
 import {
   readLiveScoringMatch,
-  validateParticipantSession,
 } from "../../../../../lib/google-sheets-write.js";
 import { clientAddress, consumeRateLimit } from "../../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../../lib/live-score-values.js";
@@ -11,6 +11,7 @@ import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldS
 import { scoringShadowEnvironment } from "../../../../../lib/scoring-shadow-gate.js";
 import { persistParticipantScore } from "../../../../../lib/scoring-persistence-adapter.js";
 import { drainGoogleOutbox } from "../../../../../lib/scoring-google-outbox.js";
+import { validateAuthoritativeParticipantSession } from "../../../../../lib/scoring-participant-authorization.js";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ export async function GET(request, { params }) {
     const current = session(request);
     const { matchId } = await params;
     if (!canScoreMatch(current, matchId)) throw new Error("This code cannot access that match.");
-    await validateParticipantSession(current);
+    await validateAuthoritativeParticipantSession(request, current, { cookieStore: await cookies() });
     return NextResponse.json({ data: await readLiveScoringMatch(matchId) });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Unable to load scoring." }, { status: 403 });
@@ -36,7 +37,7 @@ export async function POST(request, { params }) {
     const current = session(request);
     const { matchId } = await params;
     if (!canScoreMatch(current, matchId)) throw new Error("This code cannot update that match.");
-    await validateParticipantSession(current, { requireWritable: true });
+    await validateAuthoritativeParticipantSession(request, current, { requireWritable: true, cookieStore: await cookies() });
     const authorizationMs = Date.now() - authorizationStartedAt;
     const rateLimit = consumeRateLimit(`scoring-write:${clientAddress(request)}:${matchId}`, {
       limit: 30,

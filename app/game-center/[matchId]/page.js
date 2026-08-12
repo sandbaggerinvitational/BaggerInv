@@ -6,6 +6,8 @@ import GameCenter from "../GameCenter";
 import { getGameCenterData } from "../gameCenterData";
 import { cookies } from "next/headers";
 import { PLAYER_PASSPORT_COOKIE, playerPassportEffectivePlayerId, verifyPlayerPassportSession } from "../../../lib/player-passport";
+import { requireParticipantIdentityAuthority } from "../../../lib/participant-identity-authority";
+import { resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver";
 import styles from "../game-center.module.css";
 
 export const dynamic = "force-dynamic";
@@ -16,10 +18,11 @@ export default async function GameCenterPage({ params, searchParams }) {
   const query = await searchParams;
   const cookieStore = await cookies();
   let currentPlayerId = "";
+  const authority = requireParticipantIdentityAuthority();
   try {
-    currentPlayerId = playerPassportEffectivePlayerId(verifyPlayerPassportSession(
-      cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""
-    ));
+    currentPlayerId = authority.resolved === "supabase"
+      ? (await resolveSupabaseParticipantIdentity({ cookieStore })).playerId
+      : playerPassportEffectivePlayerId(verifyPlayerPassportSession(cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""));
   } catch {}
   const initialData = await getGameCenterData(matchId, currentPlayerId);
   const backTo = ["home", "my-match"].includes(query?.from) ? query.from : "tournament";

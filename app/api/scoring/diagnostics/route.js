@@ -1,8 +1,9 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { scoringTokenFromRequest, verifyScoringSession } from "../../../../lib/scoring-access.js";
-import { validateParticipantSession } from "../../../../lib/google-sheets-write.js";
 import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.js";
 import { recordPreviewScoringClientDiagnostic } from "../../../../lib/scoring-authority-supabase.js";
+import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ export async function POST(request) {
   try {
     const current = verifyScoringSession(scoringTokenFromRequest(request));
     if (current.scope !== "match") return unavailable();
-    await validateParticipantSession(current);
+    await validateAuthoritativeParticipantSession(request, current, { cookieStore: await cookies() });
     const submitted = await request.json();
     const matchId = clean(submitted.matchId);
     const mutationKey = clean(submitted.clientMutationId);

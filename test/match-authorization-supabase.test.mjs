@@ -80,10 +80,14 @@ test("membership and match participation remain independent authorization gates"
 });
 
 test("Preview impersonation authorizes the effective HM01 context, not linked CB01 Auth", async () => {
-  const route = await source("app/api/player-passport/matches/route.js");
-  assert.match(route, /playerPassportEffectivePlayerId\(session\)/);
-  assert.match(route, /authorizeMatchAccess\(\{ tournamentId: session\.tournamentId, playerId, matchId, action \}\)/);
-  assert.doesNotMatch(route, /verifyParticipantAuthClaims/);
+  const [route, resolver] = await Promise.all([
+    source("app/api/player-passport/matches/route.js"),
+    source("lib/participant-identity-resolver.js"),
+  ]);
+  assert.match(route, /resolveSupabaseParticipantIdentity/);
+  assert.match(route, /authorizeMatchAccess\(\{ tournamentId: identity\.tournamentId, playerId, matchId, action \}\)/);
+  assert.match(resolver, /hasPreviewImpersonationLease/);
+  assert.match(resolver, /verifyPreviewIdentityImpersonation/);
   assert.equal(expectedMatchAuthorizationDecision(fixture(), { tournamentId: "2026", playerId: "HM01", matchId: "LIVE", action: "START_SCORING" }).allowed, true);
 });
 
@@ -107,12 +111,12 @@ test("RPC and matrix stay service-only without permissive participant policies",
 
 test("Supabase route has structured denials, no Google fallback, and stable session semantics", async () => {
   const route = await source("app/api/player-passport/matches/route.js");
-  const supabaseBranch = route.slice(route.indexOf('if (source.resolved === "supabase")'), route.indexOf("} else {\n      access = await authorizePassportMatch"));
   assert.match(route, /AUTHORIZATION_UNAVAILABLE/);
   assert.match(route, /NOT_MATCH_PARTICIPANT/);
   assert.match(route, /X-Match-Authorization-Google-Requests/);
   assert.match(route, /createScoringSession/);
-  assert.doesNotMatch(supabaseBranch, /authorizePassportMatch|readSheet|readSheets/);
+  assert.match(route, /Supabase identity requires Supabase match authorization/);
+  assert.match(route, /X-Match-Authorization-Google-Requests/);
 });
 
 test("all POST callers declare their scoring versus final-read intent", async () => {

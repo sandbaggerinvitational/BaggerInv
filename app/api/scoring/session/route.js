@@ -1,14 +1,16 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { authenticateParticipantMatch, validateParticipantSession } from "../../../../lib/google-sheets-write.js";
+import { authenticateParticipantMatch } from "../../../../lib/google-sheets-write.js";
 import { createScoringSession, scoringSessionCookie, scoringTokenFromRequest, verifyScoringSession, SCORING_SESSION_COOKIE } from "../../../../lib/scoring-access.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
+import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
   try {
     const session = verifyScoringSession(scoringTokenFromRequest(request));
-    await validateParticipantSession(session);
+    await validateAuthoritativeParticipantSession(request, session, { cookieStore: await cookies() });
     return NextResponse.json({ scope: session.scope, scorerName: session.scorerName, authorized: true });
   } catch {
     return NextResponse.json({ authorized: false }, { status: 401 });

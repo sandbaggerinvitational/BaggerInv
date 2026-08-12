@@ -83,7 +83,10 @@ export default function ParticipantIdentity() {
     const changed = () => refresh();
     const cleared = () => {
       window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
+      window.localStorage.removeItem(PREVIEW_SESSION_KEY);
+      window.sessionStorage.removeItem("sbi-participant-initialization");
       setPlayer(null);
+      setImpersonation(null);
     };
     window.addEventListener("focus", changed);
     window.addEventListener("player-passport-changed", changed);

@@ -123,8 +123,7 @@ test("safe Auth request audit exposes only action and delivery metadata", async 
 test("OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior", async () => {
   const request = await source("app/api/participant/auth/otp/request/route.js");
   const verify = await source("app/api/participant/auth/otp/verify/route.js");
-  assert.match(request, /authRehearsalEnabled/);
-  assert.match(request, /resolved !== "passport"/);
+  assert.match(request, /participantAuthEnabled/);
   assert.match(request, /shouldCreateUser: false/);
   assert.match(request, /participantAuthGenericMessage/);
   assert.match(request, /recordSingleParticipantOtpDelivery/);
@@ -210,5 +209,7 @@ test("Director can suspend and resume only the prepared rehearsal while Passport
 test("Preview Director impersonation remains separate from Supabase Auth", async () => {
   const impersonation = await source("app/api/director/impersonation/route.js");
   assert.match(impersonation, /createPlayerPassportSession/);
-  assert.doesNotMatch(impersonation, /createUser|verifyOtp|supabase/i);
+  assert.match(impersonation, /beginPreviewIdentityImpersonation/);
+  assert.match(impersonation, /endPreviewIdentityImpersonation/);
+  assert.doesNotMatch(impersonation, /createUser|verifyOtp|auth\.users/i);
 });

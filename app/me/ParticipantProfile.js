@@ -98,10 +98,12 @@ export default function ParticipantProfile() {
   };
 
   const remove = async () => {
-    await fetch("/api/player-passport/session", { method: "DELETE" });
+    const response = await fetch("/api/player-passport/session", { method: "DELETE" });
+    const result = await response.json().catch(() => ({}));
     window.localStorage.removeItem("sbi-participant-shell");
+    window.sessionStorage.removeItem("sbi-participant-initialization");
     window.dispatchEvent(new Event("player-passport-cleared"));
-    window.location.replace("/activate");
+    window.location.replace(result.identityAuthority === "supabase" ? "/participant-auth" : "/activate");
   };
 
   const shareApp = async () => {

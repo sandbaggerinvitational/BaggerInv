@@ -61,7 +61,7 @@ test("participant routes use HTTP-only cookies and server-side current-match aut
     readFile(new URL("../app/admin/live-matches/LiveMatchControl.js", import.meta.url), "utf8"),
   ]);
   assert.match(session, /scoringSessionCookie/);
-  assert.match(current, /validateParticipantSession/);
+  assert.match(current, /validateAuthoritativeParticipantSession/);
   assert.match(current, /requireWritable/);
   assert.doesNotMatch(scoreEntry, /sessionStorage/);
   assert.match(scoreEntry, /expectedUpdatedAt/);
