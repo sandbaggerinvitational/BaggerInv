@@ -596,7 +596,7 @@ async function competitionDerivedReadiness(actorId, { refresh = false, samples =
   const parity = compareCompetitionDerivedParity(expected, actual, { referenceTime });
   let recalculation = null;
   if (refresh) recalculation = await recalculateCompetitionDerivedTournament(tournamentId, {
-    calculatedBy: `Director ${actorId}`, referenceTime,
+    calculatedBy: `Director ${actorId}`, referenceTime, force: true, debounceMs: 0,
   });
   const resultServiceSamples = [];
   const resultPostgresSamples = [];

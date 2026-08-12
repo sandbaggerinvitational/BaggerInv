@@ -66,6 +66,20 @@ test("an official result transition changes the Momentum dependency and output",
   assert.match(after.momentum.value.teamOne, /last/);
 });
 
+test("claimed engine selection avoids recalculating unrelated derived engines", () => {
+  const storylinesOnly = calculateCompetitionDerivedFromData(data(), {
+    referenceTime, engineKeys: ["TOURNAMENT_STORYLINES"],
+  });
+  assert.equal(storylinesOnly.momentum.value, null);
+  assert.ok(storylinesOnly.storylines.stories.length > 0);
+
+  const momentumOnly = calculateCompetitionDerivedFromData(data(), {
+    referenceTime, engineKeys: ["TEAM_MOMENTUM"],
+  });
+  assert.ok(momentumOnly.momentum.value);
+  assert.deepEqual(momentumOnly.storylines.stories, []);
+});
+
 test("prepared Storylines persist semantic copy without time-relative labels", () => {
   const calculated = calculateCompetitionDerivedFromData(data(), { referenceTime });
   assert.ok(calculated.storylines.stories.length > 0);
@@ -117,12 +131,21 @@ test("Preview flags fail closed to application outside an isolated Preview deplo
 });
 
 test("migration preserves restrictive RLS and event-driven coalesced jobs", async () => {
-  const sql = await readFile(new URL("../supabase/migrations/202608120035_preview_momentum_storylines_derived_state.sql", import.meta.url), "utf8");
+  const [foundation, claims] = await Promise.all([
+    readFile(new URL("../supabase/migrations/202608120035_preview_momentum_storylines_derived_state.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608120036_preview_competition_derived_job_claims.sql", import.meta.url), "utf8"),
+  ]);
+  const sql = `${foundation}\n${claims}`;
   assert.match(sql, /competition_derived_runs enable row level security/);
   assert.match(sql, /revoke all on scoring_authority\.competition_derived_runs from public, anon, authenticated/);
   assert.match(sql, /TOURNAMENT_STORYLINES', 'SCORE_CHANGE'/);
   assert.match(sql, /TEAM_MOMENTUM', 'OFFICIAL_RESULT_CHANGE'/);
   assert.match(sql, /on conflict \(tournament_id, round_number, engine_key\) do update/);
+  assert.match(claims, /for update skip locked/);
+  assert.match(claims, /status = 'RUNNING'/);
+  assert.match(claims, /and j\.started_at = target_claim_started_at/);
+  assert.match(claims, /'STALE_DERIVED_JOB'/);
+  assert.match(claims, /revoke all on function public\.claim_competition_derived_jobs\(jsonb\) from public, anon, authenticated/);
   assert.doesNotMatch(sql, /using\s*\(true\)/i);
 });
 
