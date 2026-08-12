@@ -9,7 +9,18 @@ test("isolated Director Game Center readiness page exposes only explicit refresh
   assert.match(page, /result\.status !== "active"/);
   assert.match(client, /refresh-game-center-presentations/);
   assert.match(client, /game-center-parity/);
+  assert.match(client, /identity-shadow-diagnostics/);
   assert.doesNotMatch(client, /getTournamentData|readWorkbookSheetsByName/);
+});
+
+test("formal Auth shadow diagnostics are Director/service only and omit sensitive identity fields", () => {
+  const route = fs.readFileSync(new URL("../app/api/director/identity-shadow-diagnostics/route.js", import.meta.url), "utf8");
+  const migration = fs.readFileSync(new URL("../supabase/migrations/202608120018_preview_identity_shadow_diagnostics.sql", import.meta.url), "utf8");
+  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /VERCEL_ENV !== "preview"/);
+  assert.match(migration, /revoke all on function public\.read_participant_identity_shadow_diagnostics\(text\) from public, anon, authenticated/);
+  assert.match(migration, /grant execute .* to service_role/);
+  assert.doesNotMatch(migration, /'email'|'authUserId'|'authUserUuid'/);
 });
 
 test("signed Preview Director impersonation can reach isolated diagnostics without a Google freshness read", () => {
