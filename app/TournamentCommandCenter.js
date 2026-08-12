@@ -97,7 +97,9 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
   const progress = tournamentProgressModel({ tournament: liveTournament, rounds });
   const timelineAvailable = Boolean(liveData?.timeline?.available);
   const scheduleEvents = (liveData?.timeline?.events || []).filter((event) => event.displayOnHome);
-  const moments = tournamentMoments(liveData);
+  const moments = liveData?.storylinesSource === "supabase"
+    ? (liveData.preparedStorylines || [])
+    : tournamentMoments(liveData);
   const status = tournamentStatusLabel(liveTournament.status);
   const pulse = (
     <TournamentPulse

@@ -1,5 +1,5 @@
 import { revalidatePath, revalidateTag } from "next/cache";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
@@ -18,6 +18,7 @@ import { championshipProjectionMissionStatus } from "../../../lib/projection-mis
 import { verifyDirectorReadBack } from "../../../lib/director-readback-verification.js";
 import { persistDirectorMatchLifecycle } from "../../../lib/scoring-persistence-adapter.js";
 import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox.js";
+import { recalculateCompetitionDerivedTournament } from "../../../lib/competition-derived-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -286,6 +287,15 @@ export async function POST(request) {
       elapsedMs: googleWriteCompletedAt - workbookWriteStartedAt,
     }));
     refresh();
+    if (process.env.VERCEL_ENV === "preview" && ["reopen-match", "match-finalize", "match-reopen"].includes(input.action)) after(async () => {
+      try {
+        await recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` });
+      } catch (error) {
+        console.error("Competition derived-state Director lifecycle recalculation remains pending", {
+          action: input.action, code: error?.code || "DERIVED_STATE_RECALCULATION_FAILED",
+        });
+      }
+    });
     const operationsAction = ["match-management", "round-pairings", "calcutta-management", "net-skins-eligibility", "course-tees", "match-unlock-scoring", "match-lock-scoring", "match-mark-live", "match-finalize", "match-reopen"].includes(input.action);
     const verification = await verifyDirectorReadBack({
       invalidate: () => invalidateTournamentDataCache(["Live Matches", "Matches", "Tournaments", "Courses", "Course Scorecards", "Course Holes", "Live Round Handicaps", "Match Update Log", "Admin Audit Log", "Calcutta Purchases", "Calcutta Ownership", "Calcutta Standings", "Net Skins", "Net Skins Result"]),

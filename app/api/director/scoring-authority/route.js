@@ -59,6 +59,7 @@ import {
   buildNetSkinsConfigurationImport,
   calculateNetSkinsFromSupabaseView,
   compareNetSkinsParity,
+  netSkinsDataFromResultView,
   netSkinsScoreRowsFromSupabaseView,
   readNetSkinsInputView,
   readNetSkinsResultView,
@@ -66,6 +67,15 @@ import {
   replaceNetSkinsConfiguration,
 } from "../../../../lib/net-skins-supabase.js";
 import { netSkinsResultRecords } from "../../../../lib/net-skins.js";
+import {
+  calculateCompetitionDerivedFromData,
+  compareCompetitionDerivedParity,
+  competitionDerivedDataFromView,
+  readCompetitionDerivedState,
+  recalculateCompetitionDerivedTournament,
+  TEAM_MOMENTUM_ENGINE_VERSION,
+  TOURNAMENT_STORYLINES_ENGINE_VERSION,
+} from "../../../../lib/competition-derived-supabase.js";
 import {
   buildPublishedOddsImport,
   comparePublishedOddsParity,
@@ -553,6 +563,92 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
     },
     pass: comparison.pass && publicationParity && historicalRegression.pass && Boolean(configuredScramble) &&
       snapshots.length === configuration.rounds.filter((round) => round.enabled).length && jobs.every((job) => job.status === "SUCCEEDED"),
+  };
+}
+
+async function competitionDerivedReadiness(actorId, { refresh = false, samples = 25 } = {}) {
+  const referenceTime = Date.now();
+  invalidateTournamentDataCache(["Live Matches", "Matches", "Live Hole Scores", "Net Skins", "Net Skins Result"]);
+  const expected = await getTournamentData();
+  const tournamentId = clean(expected.tournament?.id || expected.tournament?.year);
+  const sampleCount = Math.max(1, Math.min(50, number(samples, 25)));
+  const inputServiceSamples = [];
+  const inputPostgresSamples = [];
+  const calculationSamples = [];
+  let actual;
+  let calculated;
+  for (let index = 0; index < sampleCount; index += 1) {
+    const [coreRead, skinsRead] = await Promise.all([
+      readLeaderboardsCoreView(tournamentId), readNetSkinsResultView(tournamentId),
+    ]);
+    if (!coreRead.payload?.ok || !skinsRead.payload?.ok) throw Object.assign(
+      new Error("Competition derived-state canonical inputs are unavailable."),
+      { code: coreRead.payload?.code || skinsRead.payload?.code || "COMPETITION_INPUT_UNAVAILABLE" },
+    );
+    const core = leaderboardsCoreDataFromSupabaseView(coreRead.payload.data);
+    const skins = netSkinsDataFromResultView(skinsRead.payload.data);
+    actual = { ...core, netSkins: skins.netSkins };
+    calculated = calculateCompetitionDerivedFromData(actual, { referenceTime });
+    inputServiceSamples.push(number(coreRead.durationMs) + number(skinsRead.durationMs));
+    inputPostgresSamples.push(number(coreRead.payload.data.query_ms) + number(skinsRead.payload.data.query_ms));
+    calculationSamples.push(number(calculated.calculationMs));
+  }
+  const parity = compareCompetitionDerivedParity(expected, actual, { referenceTime });
+  let recalculation = null;
+  if (refresh) recalculation = await recalculateCompetitionDerivedTournament(tournamentId, {
+    calculatedBy: `Director ${actorId}`, referenceTime,
+  });
+  const resultServiceSamples = [];
+  const resultPostgresSamples = [];
+  let stateRead;
+  for (let index = 0; index < sampleCount; index += 1) {
+    stateRead = await readCompetitionDerivedState(tournamentId);
+    if (!stateRead.payload?.ok) throw Object.assign(new Error("Competition derived-state read is unavailable."), { code: stateRead.payload?.code });
+    resultServiceSamples.push(number(stateRead.durationMs));
+    resultPostgresSamples.push(number(stateRead.payload.data.query_ms));
+  }
+  const prepared = competitionDerivedDataFromView(stateRead.payload.data, { now: referenceTime });
+  const momentumStoredPass = JSON.stringify(prepared.momentum) === JSON.stringify(calculated.momentum.value);
+  const storylinesStoredPass = JSON.stringify(prepared.storylines) === JSON.stringify(calculated.storylines.stories);
+  return {
+    engines: {
+      momentum: { module: "lib/live-tournament.js#getTeamMomentum", engineVersion: TEAM_MOMENTUM_ENGINE_VERSION,
+        contract: "Official results only; round/match order; Singles overall point; Best Ball/Scramble front/back/overall decided points; halves ignored; last-five/streak descriptions." },
+      storylines: { module: "lib/tournament-storylines.js#tournamentStorylines", engineVersion: TOURNAMENT_STORYLINES_ENGINE_VERSION,
+        contract: "Current-tournament semantic story candidates, existing priority/editorial order, six Home moments; time-relative labels are not persisted as semantic content." },
+    },
+    tournamentId,
+    referenceTime: new Date(referenceTime).toISOString(),
+    parity,
+    storedParity: { pass: momentumStoredPass && storylinesStoredPass,
+      momentum: momentumStoredPass, storylines: storylinesStoredPass,
+      storyCount: prepared.storylines.length, momentCount: prepared.moments.length },
+    fingerprints: {
+      momentum: { source: calculated.momentum.sourceFingerprint, configuration: calculated.momentum.configurationFingerprint },
+      storylines: { source: calculated.storylines.sourceFingerprint, configuration: calculated.storylines.configurationFingerprint },
+    },
+    state: prepared.metadata,
+    jobs: stateRead.payload.data.jobs || [],
+    recalculation: recalculation ? {
+      inputReadMs: recalculation.inputReadMs, engineMs: recalculation.calculated.calculationMs,
+      logicalReplay: recalculation.writes.every((write) => write.logical_replay === true),
+      writes: recalculation.writes,
+    } : null,
+    triggers: {
+      momentum: ["Finalize", "Director Reopen", "official-result correction", "explicit rebuild"],
+      storylines: ["accepted hole/correction", "Finalize", "Director Reopen", "Net Skins result change", "explicit rebuild"],
+      scoringTransactionCoupled: false,
+    },
+    performance: {
+      samples: sampleCount,
+      canonicalInputPostgres: benchmarkSummary(inputPostgresSamples),
+      canonicalInputService: benchmarkSummary(inputServiceSamples),
+      engineCalculation: benchmarkSummary(calculationSamples),
+      participantReadPostgres: benchmarkSummary(resultPostgresSamples),
+      participantReadService: benchmarkSummary(resultServiceSamples),
+    },
+    googleRequests: { participantMomentum: 0, participantStorylines: 0, parityDiagnosticOnly: true },
+    pass: parity.pass && momentumStoredPass && storylinesStoredPass,
   };
 }
 
@@ -1188,6 +1284,10 @@ export async function POST(request) {
       result = await publishedOddsReadiness(actorId, { refresh: true, samples: input.samples });
     } else if (action === "published-odds-parity") {
       result = await publishedOddsReadiness(actorId, { samples: input.samples });
+    } else if (action === "refresh-competition-derived-state") {
+      result = await competitionDerivedReadiness(actorId, { refresh: true, samples: input.samples });
+    } else if (action === "competition-derived-parity") {
+      result = await competitionDerivedReadiness(actorId, { samples: input.samples });
     } else if (action === "match-authorization-parity") {
       const source = await authoritativeImport(actorId);
       result = await matchAuthorizationParity(source);

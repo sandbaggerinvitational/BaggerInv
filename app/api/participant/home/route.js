@@ -4,6 +4,8 @@ import { requireHomeReadSource } from "../../../../lib/home-read-source.js";
 import { participantHomeDataFromSupabaseView, readParticipantHomeView } from "../../../../lib/participant-home-supabase.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
+import { currentCompetitionDerivedState } from "../../../../lib/competition-derived-supabase.js";
+import { requireStorylinesReadSource } from "../../../../lib/competition-derived-read-source.js";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,7 @@ export async function GET(request) {
   const startedAt = performance.now();
   try {
     const source = requireHomeReadSource();
+    const storylinesSource = requireStorylinesReadSource();
     const authority = requireParticipantIdentityAuthority();
     if (source.resolved !== "supabase" || authority.resolved !== "supabase") {
       return NextResponse.json({ error: "Participant Home Supabase read is not active." }, { status: 404, headers });
@@ -21,10 +24,22 @@ export async function GET(request) {
     const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
     const identityMs = performance.now() - identityStarted;
     const serviceStarted = performance.now();
-    const read = await readParticipantHomeView({ tournamentId: resolved.tournamentId, playerId: resolved.playerId });
+    const [read, prepared] = await Promise.all([
+      readParticipantHomeView({ tournamentId: resolved.tournamentId, playerId: resolved.playerId }),
+      storylinesSource.resolved === "supabase"
+        ? currentCompetitionDerivedState(resolved.tournamentId, { engineKeys: ["TOURNAMENT_STORYLINES"] }).catch((error) => ({
+          storylines: [], moments: [], metadata: { storylines: { stale: true, unavailable: true, code: error?.code || "STORYLINES_UNAVAILABLE" } }, serviceMs: 0,
+        }))
+        : Promise.resolve(null),
+    ]);
     const serviceMs = performance.now() - serviceStarted;
     if (!read.payload?.ok) throw Object.assign(new Error("Participant Home is unavailable."), { code: read.payload?.code });
     const data = participantHomeDataFromSupabaseView(read.payload.data);
+    if (storylinesSource.resolved === "supabase") {
+      data.liveData.preparedStorylines = prepared?.moments || [];
+      data.liveData.storylinesSource = "supabase";
+      data.liveData.storylinesFreshness = prepared?.metadata?.storylines || { stale: true, unavailable: true };
+    }
     const totalMs = performance.now() - startedAt;
     const response = NextResponse.json({
       active: true,
@@ -38,11 +53,14 @@ export async function GET(request) {
         fullServerMs: totalMs,
         googleRequests: 0,
         presentation: data.presentation,
+        storylines: prepared?.metadata?.storylines || { source: storylinesSource.resolved },
       },
     }, { headers });
     response.headers.set("X-Home-Read-Source", "supabase");
     response.headers.set("X-Home-Google-Requests", "0");
     response.headers.set("X-Participant-Identity-Authority", "supabase");
+    response.headers.set("X-Storylines-Read-Source", storylinesSource.resolved);
+    response.headers.set("X-Storylines-Google-Requests", "0");
     response.headers.set("Server-Timing", `identity;dur=${identityMs.toFixed(1)}, postgres;dur=${Number(data.queryMs || 0).toFixed(1)}, supabase;dur=${Number(read.durationMs || serviceMs).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;
   } catch (error) {

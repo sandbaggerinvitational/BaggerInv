@@ -13,6 +13,7 @@ import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.j
 import { readPreviewScoringParticipantContext } from "../../../../lib/scoring-authority-supabase.js";
 import { mergeParticipantScoringAuthorityState } from "../../../../lib/scoring-participant-authority-state.js";
 import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
+import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -112,8 +113,17 @@ export async function POST(request) {
     }
     if (measured.authority === "supabase") {
       after(async () => {
-        const drained = await drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" });
-        if (!drained.ok) console.error("Supabase Google outbox remains pending", { matchId: current.matchId, failed: drained.failed });
+        const [drained, derived] = await Promise.allSettled([
+          drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" }),
+          recalculateCompetitionDerivedTournament(String(current.tournamentId || current.year || ""), {
+            calculatedBy: `Scoring derived-state worker · ${current.playerId || "participant"}`,
+          }),
+        ]);
+        const mirror = drained.status === "fulfilled" ? drained.value : { ok: false, failed: 1 };
+        if (!mirror.ok) console.error("Supabase Google outbox remains pending", { matchId: current.matchId, failed: mirror.failed });
+        if (derived.status === "rejected") console.error("Competition derived-state recalculation remains pending", {
+          matchId: current.matchId, code: derived.reason?.code || "DERIVED_STATE_RECALCULATION_FAILED",
+        });
       });
     }
     return NextResponse.json({ result: participantResult });
