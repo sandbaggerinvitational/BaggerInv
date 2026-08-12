@@ -115,8 +115,9 @@ test("published Odds source is Preview-only and Production fail-closed", () => {
 });
 
 test("published Odds migration and participant adapter are service-only and calculation-free", async () => {
-  const [migration, route, publisher, oddsEngine] = await Promise.all([
+  const [migration, scopeMigration, route, publisher, oddsEngine] = await Promise.all([
     readFile(new URL("../supabase/migrations/202608120033_preview_published_odds_snapshots.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608120034_harden_published_odds_scope.sql", import.meta.url), "utf8"),
     readFile(new URL("../app/api/leaderboards/insights/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/odds/publish/route.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/tournament-odds.js", import.meta.url), "utf8"),
@@ -126,6 +127,9 @@ test("published Odds migration and participant adapter are service-only and calc
   assert.match(migration, /unique \(tournament_id, milestone, published_at, payload_hash\)/);
   assert.match(migration, /publication_revision/);
   assert.match(migration, /DUPLICATE_PUBLISHED_ODDS_MILESTONE/);
+  assert.match(scopeMigration, /published_tournament_count <> 1/);
+  assert.match(scopeMigration, /PUBLISHED_ODDS_TOURNAMENT_AMBIGUOUS/);
+  assert.doesNotMatch(scopeMigration, /order by t\.tournament_year desc|3026|2026/);
   assert.match(route, /X-Published-Odds-Google-Requests", "0"/);
   assert.match(route, /resolveSupabaseParticipantIdentity/);
   assert.match(publisher, /Supabase publication projection/);
