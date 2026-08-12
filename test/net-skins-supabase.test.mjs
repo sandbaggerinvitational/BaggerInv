@@ -44,7 +44,7 @@ function singlesView() {
       match: { match_id: "2026-R1-1", round_number: 1, format: "SI", status: "FINAL", scorecard_complete: true, result_winner: "Team 1" },
       presentation: { display_match_number: "1" },
       participants: [
-        { player_id: "P1", display_name: "Player One", team_side: 1, player_slot: 1, playing_handicap: 6, final_strokes: 6 },
+        { player_id: "P1", display_name: "Player One", team_side: 1, player_slot: 1, playing_handicap: 6, final_strokes: 0 },
         { player_id: "P2", display_name: "Player Two", team_side: 2, player_slot: 1, playing_handicap: 0, final_strokes: 0 },
       ],
       holes, scores,
