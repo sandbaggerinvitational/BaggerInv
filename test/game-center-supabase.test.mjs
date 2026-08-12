@@ -134,3 +134,12 @@ test("active Supabase Game Center branch has no Google or tournament-model read 
   assert.match(`${page}\n${route}`, /verifyPlayerPassportSession/);
   assert.doesNotMatch(`${page}\n${route}`, /resolvePlayerPassportToken|inspectPlayerPassportToken/);
 });
+
+test("Director exposes explicit Preview presentation refresh and parity operations", async () => {
+  const dashboard = await source("app/admin/director/DirectorDashboard.js");
+  const route = await source("app/api/director/scoring-authority/route.js");
+  assert.match(dashboard, /runPhase2Authority\("refresh-game-center-presentations"\)/);
+  assert.match(dashboard, /runPhase2Authority\("game-center-parity"\)/);
+  assert.match(route, /action === "refresh-game-center-presentations"/);
+  assert.match(route, /action === "game-center-parity"/);
+});
