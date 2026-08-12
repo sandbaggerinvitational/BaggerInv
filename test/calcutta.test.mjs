@@ -382,7 +382,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
   assert.match(dashboard, /aria-label="Select tournament destination"/);
   assert.match(dashboard, />Tournament<\/button>/);
   assert.match(dashboard, />Calcutta<\/button>/);
-  assert.match(dashboard, /selectedRound === "calcutta" \? <CalcuttaExperience/);
+  assert.match(dashboard, /selectedRound === "calcutta" \? data\?\.calcutta \? <CalcuttaExperience/);
+  assert.match(dashboard, /secondaryReadUrl \+ "\?module=calcutta"/);
   assert.match(dashboard, /aria-label="Select tournament round"/);
   assert.match(dashboard, /aria-label="Filter tournament matches"/);
   assert.match(dashboardCss, /\.destinations\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);

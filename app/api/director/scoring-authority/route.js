@@ -44,6 +44,11 @@ import {
   readParticipantHomeView,
   replaceParticipantHomePresentation,
 } from "../../../../lib/participant-home-supabase.js";
+import {
+  compareTournamentLiveParity,
+  readTournamentLiveView,
+  tournamentLiveDataFromSupabaseView,
+} from "../../../../lib/tournament-live-supabase.js";
 import { getTournamentData } from "../../../live/sheetData.js";
 import {
   MATCH_ACCESS_ACTIONS,
@@ -195,6 +200,65 @@ async function homeReadiness(actorId, { refresh = false } = {}) {
       static: ["navigation links", "Tournament Guide links", "brand assets"],
     },
     parity,
+  };
+}
+
+async function tournamentReadiness(actorId, { refresh = false, samples = 25 } = {}) {
+  const source = await authoritativeImport(actorId);
+  const expected = await getTournamentData();
+  let written = null;
+  if (refresh) {
+    const presentation = buildParticipantHomePresentationImport({
+      liveData: expected, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId,
+    });
+    written = await replaceParticipantHomePresentation(presentation);
+    if (!written.payload?.ok) throw Object.assign(new Error(`Tournament presentation refresh failed (${written.payload?.code || "unknown"}).`), { code: written.payload?.code });
+  }
+  const postgresQueryMs = [];
+  const supabaseServiceMs = [];
+  const fullServerMs = [];
+  let actual;
+  const sampleCount = Math.max(1, Math.min(50, number(samples, 25)));
+  for (let index = 0; index < sampleCount; index += 1) {
+    const began = performance.now();
+    const read = await readTournamentLiveView(source.imported.payload.tournament.tournament_id);
+    fullServerMs.push(performance.now() - began);
+    if (!read.payload?.ok) throw Object.assign(new Error(`Tournament live read failed (${read.payload?.code || "unknown"}).`), { code: read.payload?.code });
+    actual = tournamentLiveDataFromSupabaseView(read.payload.data);
+    postgresQueryMs.push(number(read.payload.data.query_ms));
+    supabaseServiceMs.push(number(read.durationMs));
+  }
+  const comparison = compareTournamentLiveParity(expected, actual);
+  const roundScores = (actual.rounds || []).map((round) => ({
+    round: round.number,
+    teamOne: (round.matches || []).reduce((sum, match) => sum + number(match.team1Points), 0),
+    teamTwo: (round.matches || []).reduce((sum, match) => sum + number(match.team2Points), 0),
+    final: round.progress?.completedMatches || 0,
+    live: round.progress?.liveMatches || 0,
+    upcoming: round.progress?.scheduledMatches || 0,
+  }));
+  const matches = (actual.rounds || []).flatMap((round) => round.matches || []);
+  return {
+    presentation: written?.payload || null,
+    googleConfigurationReadMs: source.googleReadMs,
+    comparison,
+    coverage: {
+      matches: matches.length,
+      rounds: actual.rounds?.length || 0,
+      zeroHoleMatches: matches.filter((match) => !(match.holeResults || []).length).length,
+      finalMatches: matches.filter((match) => clean(match.status).toUpperCase() === "FINAL").length,
+      liveMatches: matches.filter((match) => clean(match.status).toUpperCase() === "LIVE").length,
+      roundScores,
+      tournamentScore: { teamOne: actual.tournament?.teamOne?.score, teamTwo: actual.tournament?.teamTwo?.score },
+    },
+    performance: {
+      samples: sampleCount,
+      postgresQuery: benchmarkSummary(postgresQueryMs),
+      supabaseService: benchmarkSummary(supabaseServiceMs),
+      fullServer: benchmarkSummary(fullServerMs),
+    },
+    googleRequestsPerParticipantLiveRead: 0,
+    pass: comparison.pass && matches.length === 24 && actual.rounds?.length === 3,
   };
 }
 
@@ -763,6 +827,10 @@ export async function POST(request) {
       result = await homeReadiness(actorId, { refresh: true });
     } else if (action === "home-parity") {
       result = await homeReadiness(actorId);
+    } else if (action === "refresh-tournament-presentation") {
+      result = await tournamentReadiness(actorId, { refresh: true, samples: input.samples });
+    } else if (action === "tournament-parity") {
+      result = await tournamentReadiness(actorId, { samples: input.samples });
     } else if (action === "match-authorization-parity") {
       const source = await authoritativeImport(actorId);
       result = await matchAuthorizationParity(source);

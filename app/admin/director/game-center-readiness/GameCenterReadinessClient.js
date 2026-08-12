@@ -8,14 +8,14 @@ export default function GameCenterReadinessClient() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
-  async function run(action) {
+  async function run(action, input = {}) {
     setBusy(action); setResult(null); setError("");
     try {
       const response = await directorFetch("/api/director/scoring-authority", {
         method: "POST",
         credentials: "same-origin",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, ...input }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || `Request failed (${response.status}).`);
@@ -44,6 +44,8 @@ export default function GameCenterReadinessClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run("my-match-parity")}>Verify My Match Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-home-presentation")}>Refresh Home Presentation</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("home-parity")}>Verify Home Parity</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-tournament-presentation", { samples: 25 })}>Refresh Tournament Projection</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("tournament-parity", { samples: 25 })}>Verify Tournament Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("match-authorization-parity")}>Verify Match Authorization Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={inspectShadow}>Inspect Auth Shadow</button>
     </div>
