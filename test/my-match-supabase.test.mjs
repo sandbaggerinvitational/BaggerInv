@@ -103,6 +103,11 @@ test("My Match RPC is indexed, RLS-compatible service-only, and unavailable to p
   assert.match(migration, /revoke all on function public\.read_my_match_view\(text, text\) from public, anon, authenticated/);
   assert.match(migration, /grant execute on function public\.read_my_match_view\(text, text\) to service_role/);
   assert.doesNotMatch(migration, /create policy|using\s*\(\s*true\s*\)/i);
+  const compact = await source("supabase/migrations/202608120020_preview_my_match_compact_scores.sql");
+  assert.match(compact, /'hole_number', hs\.hole_number/);
+  assert.match(compact, /'hole_winner', hs\.hole_winner/);
+  assert.doesNotMatch(compact, /team_1_gross_scores|team_1_net_score/);
+  assert.match(compact, /revoke all on function public\.read_my_match_view\(text, text\) from public, anon, authenticated/);
 });
 
 test("active Supabase My Match path removes Google match reads and keeps Passport identity", async () => {
