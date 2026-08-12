@@ -127,6 +127,14 @@ test("financial result fingerprints and logical payload are deterministic", () =
   assert.equal(compareCalcuttaParity(calculated.calcutta, first.result_payload).pass, true);
 });
 
+test("financial parity is insensitive only to owner and portfolio investment ordering", () => {
+  const model = calculateCalcuttaFromSupabaseViews(configurationView(), coreData()).calcutta;
+  const reordered = structuredClone(model);
+  reordered.golfers.forEach((golfer) => golfer.owners?.reverse());
+  reordered.portfolios.forEach((portfolio) => portfolio.investments?.reverse());
+  assert.equal(compareCalcuttaParity(model, reordered).pass, true);
+});
+
 test("stored financial result exposes explicit provisional/stale state", () => {
   const calculated = calculateCalcuttaFromSupabaseViews(configurationView(), coreData());
   const write = buildCalcuttaDerivedWrite(configurationView(), calculated, { claim_started_at: "2026-01-01T00:00:00.000Z" }, "test");

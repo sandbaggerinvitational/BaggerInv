@@ -577,12 +577,20 @@ async function netSkinsReadiness(actorId, { refreshConfiguration = false, sample
   };
 }
 
-function normalizedCalcuttaRoundRows(rows = []) {
-  return rows.map((row) => ({
+function normalizedCalcuttaRoundRows(rows = [], completedRounds = null) {
+  const eligibleRounds = completedRounds ? new Set(completedRounds.map(number)) : null;
+  return rows.filter((row) => clean(row["Player ID"]) && clean(row["Net Score"]) !== ""
+    && (!eligibleRounds || eligibleRounds.has(number(row.Round)))).map((row) => ({
     year: number(row.Year), round: number(row.Round), format: upper(row.Format), playerId: clean(row["Player ID"]),
     gross: number(row["Gross Score"]), net: number(row["Net Score"]), handicap: number(row["Full Course Handicap"]),
     place: number(row.Place), points: number(row["Calcutta Points"]),
   })).sort((left, right) => left.round - right.round || left.playerId.localeCompare(right.playerId));
+}
+
+function normalizedPublishedFraction(value) {
+  const raw = clean(value);
+  const parsed = number(raw);
+  return raw.includes("%") ? parsed / 100 : parsed;
 }
 
 function normalizedCalcuttaStandingRows(rows = []) {
@@ -590,12 +598,12 @@ function normalizedCalcuttaStandingRows(rows = []) {
     year: number(row.Year), rank: number(row.Rank), playerId: clean(row["Player ID"]),
     purchasePrice: number(row["Purchase Price"]), round1: number(row["Round 1 Points"]),
     round2: number(row["Round 2 Points"]), round3: number(row["Round 3 Points"]),
-    totalPoints: number(row["Total Points"]), round1Payout: number(row["Round 1 Payout %"]),
-    round2Payout: number(row["Round 2 Payout %"]), round3Payout: number(row["Round 3 Payout %"]),
+    totalPoints: number(row["Total Points"]), round1Payout: normalizedPublishedFraction(row["Round 1 Payout %"]),
+    round2Payout: normalizedPublishedFraction(row["Round 2 Payout %"]), round3Payout: normalizedPublishedFraction(row["Round 3 Payout %"]),
     // The protected publication schema intentionally rolls the Overall award into Total Payout %.
     // Overall Payout % is verified in the operational result, not invented in the Google readback.
-    totalPayout: number(row["Total Payout %"]),
-    currentPayoutValue: number(row["Current Payout Value"]), roi: number(row.ROI),
+    totalPayout: normalizedPublishedFraction(row["Total Payout %"]),
+    currentPayoutValue: number(row["Current Payout Value"]), roi: normalizedPublishedFraction(row.ROI),
   })).sort((left, right) => left.playerId.localeCompare(right.playerId));
 }
 
@@ -646,8 +654,9 @@ async function calcuttaReadiness(actorId, { refresh = false, samples = 25 } = {}
 
   const parity = compareCalcuttaParity(expected.calcutta, calculated.calcutta);
   const storedParity = compareCalcuttaParity(calculated.calcutta, operational.calcutta || {});
-  const googleRoundRows = normalizedCalcuttaRoundRows((sheets["Calcutta Round Results"]?.records || []).map(({ record }) => record)
-    .filter((row) => number(row.Year) === number(tournament.tournament_year)));
+  const googleRoundRowsAll = (sheets["Calcutta Round Results"]?.records || []).map(({ record }) => record)
+    .filter((row) => number(row.Year) === number(tournament.tournament_year));
+  const googleRoundRows = normalizedCalcuttaRoundRows(googleRoundRowsAll, calculated.calcutta.completedRounds);
   const generatedRoundRows = normalizedCalcuttaRoundRows(calculated.publication.roundResults);
   const roundPublicationParity = canonicalJson(googleRoundRows) === canonicalJson(generatedRoundRows);
   const googleStandingRows = normalizedCalcuttaStandingRows((sheets["Calcutta Standings"]?.records || []).map(({ record }) => record)
@@ -700,7 +709,8 @@ async function calcuttaReadiness(actorId, { refresh = false, samples = 25 } = {}
     resultState: calculated.resultState,
     parity,
     storedParity,
-    roundPublicationParity: { pass: roundPublicationParity, googleRows: googleRoundRows.length, supabaseRows: generatedRoundRows.length },
+    roundPublicationParity: { pass: roundPublicationParity, googleRows: googleRoundRows.length, supabaseRows: generatedRoundRows.length,
+      ignoredIncompleteOrStaleGoogleRows: googleRoundRowsAll.length - googleRoundRows.length },
     standingPublicationParity: { pass: standingPublicationParity, googleRows: googleStandingRows.length, supabaseRows: generatedStandingRows.length },
     financialConservation,
     knownValueRegression,
