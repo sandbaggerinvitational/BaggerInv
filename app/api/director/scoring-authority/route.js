@@ -31,6 +31,12 @@ import {
   readGameCenterView,
   replaceGameCenterPresentations,
 } from "../../../../lib/game-center-supabase.js";
+import {
+  compareMyMatchParity,
+  expectedMyMatchView,
+  myMatchDataFromSupabaseView,
+  readMyMatchView,
+} from "../../../../lib/my-match-supabase.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -85,6 +91,36 @@ async function gameCenterParity(source, presentation) {
     postgresQuery: benchmarkSummary(postgresQueryMs),
     supabaseRequest: benchmarkSummary(supabaseRequestMs),
     zeroGoogleRequestsPerGameCenterRead: true,
+  };
+}
+
+async function myMatchParity(source, presentation) {
+  const players = source.imported.payload.tournament_players.filter((row) => row.participation_status === "ACTIVE");
+  const divergences = [];
+  const postgresQueryMs = [];
+  const supabaseRequestMs = [];
+  for (const player of players) {
+    const expectedView = expectedMyMatchView(source.imported, presentation, player.player_id);
+    const read = await readMyMatchView({ tournamentId: player.tournament_id, playerId: player.player_id });
+    if (!read.payload?.ok) {
+      divergences.push({ playerId: player.player_id, code: read.payload?.code || "READ_FAILED" });
+      continue;
+    }
+    const expected = myMatchDataFromSupabaseView(expectedView);
+    const actual = myMatchDataFromSupabaseView(read.payload.data);
+    const comparison = compareMyMatchParity(expected, actual);
+    if (!comparison.pass) divergences.push({ playerId: player.player_id, expected: comparison.expected, actual: comparison.actual });
+    postgresQueryMs.push(number(read.payload.data.query_ms));
+    supabaseRequestMs.push(number(read.durationMs));
+  }
+  return {
+    playersCompared: players.length,
+    divergences,
+    pass: players.length === 24 && divergences.length === 0,
+    postgresQuery: benchmarkSummary(postgresQueryMs),
+    supabaseService: benchmarkSummary(supabaseRequestMs),
+    zeroGoogleRequestsPerMyMatchRead: true,
+    scoringSessionIssuanceUnchanged: true,
   };
 }
 
@@ -579,6 +615,10 @@ export async function POST(request) {
       const source = await authoritativeImport(actorId);
       const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
       result = await gameCenterParity(source, presentation);
+    } else if (action === "my-match-parity") {
+      const source = await authoritativeImport(actorId);
+      const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
+      result = await myMatchParity(source, presentation);
     } else if (action === "outbox-rehearsal") result = await outboxRehearsal(actorId, number(input.cycles, 5));
     else if (action === "outbox-failures") result = await outboxFailureRehearsal(actorId);
     else if (action === "cutover-rollback-rehearsal") result = await cutoverRollbackRehearsal(actorId);

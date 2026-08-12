@@ -204,7 +204,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       try {
         const [session, passport] = await Promise.all([
           dashboardOnly ? Promise.resolve(null) : fetch("/api/scoring/session", { cache: "no-store", signal: controller.signal }),
-          fetchWithTransientRetry("/api/player-passport/initialize", { cache: "no-store", signal: controller.signal }),
+          fetchWithTransientRetry(dashboardOnly ? "/api/my-match" : "/api/player-passport/initialize", { cache: "no-store", signal: controller.signal }),
         ]);
         if (passport.ok) {
           const identity = await passport.json();

@@ -70,13 +70,13 @@ test("cache invalidation prevents an old in-flight snapshot from becoming author
   assert.match(loader, /lastGoodTournamentData = undefined/);
 });
 
-test("Home and My Match retry transient Passport reads without manual action", async () => {
+test("Home retries transient Passport reads while My Match retries its selected server read without manual action", async () => {
   const [home, score] = await Promise.all([
     source("app/PersonalizedPlayerHome.js"),
     source("app/score/ScoreEntry.js"),
   ]);
   assert.match(home, /fetchWithTransientRetry\("\/api\/player-passport\/initialize"/);
-  assert.match(score, /fetchWithTransientRetry\("\/api\/player-passport\/initialize"/);
+  assert.match(score, /fetchWithTransientRetry\(dashboardOnly \? "\/api\/my-match" : "\/api\/player-passport\/initialize"/);
 });
 
 test("recovering participant screens hide implementation diagnostics until retries finish", async () => {
