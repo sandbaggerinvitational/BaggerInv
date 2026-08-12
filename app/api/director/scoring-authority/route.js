@@ -594,7 +594,8 @@ function normalizedPublishedFraction(value) {
 }
 
 function normalizedPublishedRoi(value) {
-  return Math.round(normalizedPublishedFraction(value) * 10_000_000_000) / 10_000_000_000;
+  const parsed = normalizedPublishedFraction(value);
+  return parsed ? Number(parsed.toPrecision(10)) : 0;
 }
 
 function normalizedCalcuttaStandingRows(rows = []) {
