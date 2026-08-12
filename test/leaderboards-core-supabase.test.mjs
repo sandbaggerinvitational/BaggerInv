@@ -123,6 +123,7 @@ function fixture() {
     } } },
     source_revision: {
       tournamentId: "2026",
+      presentationFingerprint: "b".repeat(64),
       matches: matches.map((entryValue) => ({ matchId: entryValue.match.match_id,
         matchRevision: entryValue.match.match_revision, status: entryValue.match.status,
         scoringLocked: entryValue.match.scoring_locked, scorecardComplete: entryValue.match.scorecard_complete,
@@ -144,7 +145,10 @@ test("Leaderboards core source is Preview-only and Production fails closed", () 
 });
 
 test("service-only RPC returns canonical inputs without recreating standings in SQL", async () => {
-  const migration = await source("supabase/migrations/202608120027_preview_leaderboards_core_reads.sql");
+  const [migration, revisionMigration] = await Promise.all([
+    source("supabase/migrations/202608120027_preview_leaderboards_core_reads.sql"),
+    source("supabase/migrations/202608120028_preview_leaderboards_core_presentation_revision.sql"),
+  ]);
   assert.match(migration, /create or replace function public\.read_leaderboards_core_view/);
   assert.match(migration, /from scoring_authority\.matches m/);
   assert.match(migration, /from scoring_authority\.hole_scores hs/);
@@ -154,6 +158,7 @@ test("service-only RPC returns canonical inputs without recreating standings in 
   assert.match(migration, /revoke all on function public\.read_leaderboards_core_view\(text\) from public, anon, authenticated/);
   assert.match(migration, /grant execute on function public\.read_leaderboards_core_view\(text\) to service_role/);
   assert.doesNotMatch(migration, /create policy|using\s*\(\s*true\s*\)|dense_rank|row_number|calculateMatchPoints/i);
+  assert.match(revisionMigration, /presentationFingerprint/);
 });
 
 test("existing JavaScript engines preserve BB, Scramble pairing, Singles, Live, Final, clinched, and zero-hole behavior", () => {
@@ -175,6 +180,9 @@ test("source fingerprint is deterministic and changes for a hole revision", () =
   const changed = fixture();
   changed.source_revision.holes[0].holeRevision += 1;
   assert.notEqual(first.sourceFingerprint, leaderboardsCoreDataFromSupabaseView(changed).sourceFingerprint);
+  const presentationChanged = fixture();
+  presentationChanged.source_revision.presentationFingerprint = "c".repeat(64);
+  assert.notEqual(first.sourceFingerprint, leaderboardsCoreDataFromSupabaseView(presentationChanged).sourceFingerprint);
 });
 
 test("slot validation rejects array/participant mismatches instead of misattributing a score", () => {
@@ -185,6 +193,28 @@ test("slot validation rejects array/participant mismatches instead of misattribu
   const result = validateLeaderboardsCoreAttribution(broken, data.scoreLeaderboard);
   assert.equal(result.pass, false);
   assert.ok(result.issues.some((issue) => issue.code === "SCORE_SLOT_COUNT"));
+});
+
+test("versioned match presentation preserves legacy full-handicap player stats without changing match scoring", () => {
+  const view = fixture();
+  view.tournament_presentation.presentation.tournamentMatchDisplay = {
+    "2026-R1-6": {
+      team1Players: [{ id: "P1", playingHcp: 6, stroke: null }, { id: "P2", playingHcp: 1, stroke: 1 }],
+      team2Players: [{ id: "P3", playingHcp: 2, stroke: 2 }, { id: "P4", playingHcp: 3, stroke: 3 }],
+      currentHole: 0,
+      archiveFinal: false,
+    },
+  };
+  const data = leaderboardsCoreDataFromSupabaseView(view);
+  const player = data.scoreLeaderboard.find((row) => row.id === "P1" && row.round === 1);
+  const match = data.rounds.flatMap((round) => round.matches).find((row) => row.id === "2026-R1-6");
+  assert.equal(player.gross, 72);
+  assert.equal(player.net, 66);
+  assert.equal(match.currentHole, 0);
+  assert.equal(match.archiveFinal, false);
+  assert.equal(data.slotVerification.pass, true, JSON.stringify(data.slotVerification.issues));
+  assert.ok(data.slotVerification.matchAppliedStrokeCells > 0);
+  assert.ok(data.slotVerification.leaderboardStrokeCells > 0);
 });
 
 test("Preview page and API use Supabase core with no Google fallback or Passport-named identity request", async () => {

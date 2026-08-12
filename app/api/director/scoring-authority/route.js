@@ -341,6 +341,7 @@ async function leaderboardsCoreReadiness(actorId, { samples = 25 } = {}) {
     googleRequestsPerParticipantCoreRead: 0,
     secondaryModulesUnchanged: ["Net Skins", "Calcutta", "Insights", "Championship Odds", "Storylines", "Tournament Intelligence"],
     pass: comparison.pass && importComparison.pass && actual.slotVerification.pass &&
+      new Set(sourceFingerprints).size === 1 &&
       actual.players?.length === 24 && matches.length === 24 && actual.rounds?.length === 3 &&
       ["BB", "SC", "SI"].every((format) => matches.some((match) => upper(match.format) === format)),
   };
