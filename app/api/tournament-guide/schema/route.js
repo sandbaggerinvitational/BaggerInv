@@ -9,6 +9,10 @@ export async function GET() {
   return NextResponse.json({
     environment: "preview",
     activeTournamentYear: content.tournament.year,
+    source: content.projection?.source || "google",
+    projectionRevision: content.projection?.revision || null,
+    contentFingerprint: content.projection?.fingerprint || null,
+    googleRequests: content.projection?.googleRequests ?? null,
     modules: content.diagnostics,
   });
 }

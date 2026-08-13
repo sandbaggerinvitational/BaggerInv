@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { Header } from "../../components";
 import AssetImage from "../../AssetImage";
 import ExternalLinkConfirm from "../../ExternalLinkConfirm";
@@ -11,14 +12,17 @@ import { pageMetadata } from "../../../lib/seo";
 import { resolveTournamentGuideContent } from "../../tournament-guide/resolveGuideContent";
 import styles from "./course-detail.module.css";
 
-async function resolveCourse(courseId) {
-  const content = await resolveTournamentGuideContent();
+const resolveCourse = cache(async (courseId, archive = false) => {
+  const content = archive
+    ? await import("../../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleTournamentGuideContent())
+    : await resolveTournamentGuideContent({ surface: "course" });
   return courseDetailModel(courseId, content);
-}
+});
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params, searchParams }) {
   const { courseId } = await params;
-  const model = await resolveCourse(courseId);
+  const archive = String((await searchParams)?.view || "") === "archive";
+  const model = await resolveCourse(courseId, archive);
   return pageMetadata({
     title: model ? `${model.course.Course} | The Sandbagger Invitational` : "Course | The Sandbagger Invitational",
     description: model ? `${model.course.Course} tournament course details.` : "Sandbagger Invitational course details.",
@@ -47,9 +51,10 @@ function NineScorecard({ holes, label }) {
   </div>;
 }
 
-export default async function CoursePage({ params }) {
+export default async function CoursePage({ params, searchParams }) {
   const { courseId } = await params;
-  const model = await resolveCourse(courseId);
+  const archive = String((await searchParams)?.view || "") === "archive";
+  const model = await resolveCourse(courseId, archive);
   if (!model) notFound();
   const { course } = model;
   const website = model.website;
@@ -59,7 +64,7 @@ export default async function CoursePage({ params }) {
       {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" /> : null}
       <div className={styles.heroShade} />
       <div className={styles.heroContent}>
-        <Link href="/courses">‹ Courses</Link>
+        <Link href={archive ? "/courses?view=archive" : "/courses"}>‹ Courses</Link>
         <div className={styles.identity}>
           <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
           <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>

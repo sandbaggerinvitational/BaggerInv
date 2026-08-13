@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
-import { getFormatName } from "../../lib/stats";
 import { resolveTournamentGuideContent } from "../tournament-guide/resolveGuideContent";
 import TournamentGuideHero from "../tournament-guide/TournamentGuideHero";
 import styles from "../historical.module.css";
@@ -16,10 +15,14 @@ export const metadata = pageMetadata({
   path: "/courses",
 });
 
+const formatName = (value) => ({ BB: "2v2 Best Ball", SC: "Scramble", SI: "Singles" })[String(value || "").trim().toUpperCase()] || value || "";
+
 export default async function CoursesPage({ searchParams }) {
-  const content = await resolveTournamentGuideContent();
-  const { tournament } = content;
   const archive = String((await searchParams)?.view || "") === "archive";
+  const content = archive
+    ? await import("../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleTournamentGuideContent())
+    : await resolveTournamentGuideContent({ surface: "course" });
+  const { tournament } = content;
   const courses = archive
     ? content.courseArchive
     : [...new Map(content.courses.map((course) => [course["Course ID"], course])).values()];
@@ -40,7 +43,7 @@ export default async function CoursesPage({ searchParams }) {
           {courses.map((course) => (
             <Link
               className={styles.courseIndexCard}
-              href={`/courses/${course["Course ID"]}`}
+              href={`/courses/${course["Course ID"]}${archive ? "?view=archive" : ""}`}
               key={course["Course ID"]}
             >
               <AssetImage
@@ -54,7 +57,7 @@ export default async function CoursesPage({ searchParams }) {
               <p>
                 {course.City}, {course.State}
               </p>
-              <span>{archive ? course.Designer : [course.Round, getFormatName(course.Format), course["Tee Played"] ? `${course["Tee Played"]} Tees` : ""].filter(Boolean).join(" • ")}</span>
+              <span>{archive ? course.Designer : [course.Round, formatName(course.Format), course["Tee Played"] ? `${course["Tee Played"]} Tees` : ""].filter(Boolean).join(" • ")}</span>
             </Link>
           ))}
         </div>

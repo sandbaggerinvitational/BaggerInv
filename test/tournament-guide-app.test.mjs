@@ -16,7 +16,7 @@ test("Tournament Guide leads with app-first actionable destinations", async () =
   assert.doesNotMatch(page, /Tournament-week local concierge/);
 });
 
-test("Guide destinations are focused same-origin views using existing workbook content", async () => {
+test("Guide destinations are focused same-origin Supabase views with a flag-gated legacy rollback boundary", async () => {
   const [page, detail, route, resolver, normalized, schema] = await Promise.all([
     source("app/tournament-guide/page.js"), source("app/tournament-guide/GuideDetailPage.js"),
     source("app/tournament-guide/[section]/page.js"), source("app/tournament-guide/resolveGuideContent.js"),
@@ -27,9 +27,11 @@ test("Guide destinations are focused same-origin views using existing workbook c
     assert.match(route, new RegExp(`"${destination}"`));
   }
   assert.match(detail, /resolveTournamentGuideContent\(\)/);
-  assert.match(resolver, /getTournamentData\(\)/);
-  assert.match(resolver, /validateTournamentGuideHeaders/);
-  assert.match(resolver, /lastGood/);
+  assert.match(resolver, /requireGuideReadSource/);
+  assert.match(resolver, /readGuideProjection\(\{ surface \}\)/);
+  assert.match(resolver, /guideContentWithCanonicalCourses/);
+  assert.match(resolver, /source\.source\.resolved === "google"/);
+  assert.doesNotMatch(resolver, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName|validateTournamentGuideHeaders|lastGood/);
   assert.match(normalized, /publicGuideRecords\(itineraryRows, guideTournament\)/);
   for (const sheet of ["Tournament Itinerary", "Courses", "Rule Book", "Tournament Rules", "Rounds", "Dining", "Local Guide", "Important Contacts"]) assert.match(schema, new RegExp(sheet));
   assert.doesNotMatch(detail, /target="_blank"|window\.open|https?:\/\//);
@@ -39,15 +41,16 @@ test("Guide destinations are focused same-origin views using existing workbook c
 
 test("Courses defaults to the active tournament and offers the historical archive", async () => {
   const [courses, resolver] = await Promise.all([source("app/courses/page.js"), source("app/tournament-guide/resolveGuideContent.js")]);
-  assert.match(courses, /resolveTournamentGuideContent\(\)/);
+  assert.match(courses, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
+  assert.match(courses, /archive\s*\?\s*await import\("\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
   assert.doesNotMatch(courses, /getTournamentData|refreshHistoricalData|loadTournamentGuideSheets/);
-  assert.match(resolver, /courses: guide\.courses/);
+  assert.match(resolver, /courses: stored\.courses \|\| \[\]/);
   assert.match(courses, /View Course Archive/);
   assert.match(courses, /\/courses\?view=archive/);
   assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
 });
 
-test("Tournament Guide modules share one workbook-driven tournament identity hero", async () => {
+test("Tournament Guide modules share one published projection-driven tournament identity hero", async () => {
   const [hero, guide, detail, courses, courseDetail, resolver] = await Promise.all([
     source("app/tournament-guide/TournamentGuideHero.js"),
     source("app/tournament-guide/page.js"),
@@ -62,8 +65,9 @@ test("Tournament Guide modules share one workbook-driven tournament identity her
   assert.match(hero, /tournamentLogo\(logoFileName\)/);
   assert.match(hero, /Annual/);
   assert.match(resolver, /tournamentIdentity/);
-  assert.match(resolver, /liveData\.tournament\?\.name/);
-  assert.match(resolver, /liveData\.tournament\?\.logo/);
+  assert.match(resolver, /data\.tournament\?\.name \|\| stored\.tournamentIdentity\?\.name/);
+  assert.match(resolver, /stored\.tournamentIdentity\?\.dates/);
+  assert.match(resolver, /stored\.tournamentIdentity\?\.location/);
   assert.match(guide, /<TournamentGuideHero tournament=\{tournamentIdentity\} \/>/);
   assert.match(detail, /<TournamentGuideHero tournament=\{content\.tournamentIdentity\} \/>/);
   assert.match(courses, /<TournamentGuideHero tournament=\{content\.tournamentIdentity\} \/>/);

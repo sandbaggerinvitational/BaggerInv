@@ -36,6 +36,24 @@ export default function GameCenterReadinessClient() {
     finally { setBusy(""); }
   }
 
+  async function guideOperation(action) {
+    setBusy(action); setResult(null); setError("");
+    try {
+      const response = action === "guide-sync-status"
+        ? await fetch("/api/director/guide-content", { cache: "no-store", credentials: "same-origin" })
+        : await directorFetch("/api/director/guide-content", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "refresh" }),
+        });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || payload.result?.message || `Request failed (${response.status}).`);
+      setResult({ action, requestMs: 0, result: payload });
+    } catch (caught) { setError(caught?.message || "Guide synchronization operation failed."); }
+    finally { setBusy(""); }
+  }
+
   return <section style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem", display: "grid", gap: "1rem" }}>
     <div><p>Preview only · Director authorized</p><h1>Live Read Readiness</h1><p>This surface is isolated from the Google-backed Director dashboard. Refresh imports presentation or competition configuration explicitly; parity verifies canonical participant views without changing scoring.</p></div>
     <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
@@ -60,6 +78,8 @@ export default function GameCenterReadinessClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run("intelligence-derived-readiness")}>Verify Tournament Intelligence</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("match-authorization-parity")}>Verify Match Authorization Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={inspectShadow}>Inspect Auth Shadow</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => guideOperation("refresh-guide-content")}>Refresh Guide Content</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => guideOperation("guide-sync-status")}>Guide Sync Status</button>
     </div>
     {busy ? <p role="status">Running {busy}…</p> : null}
     {error ? <p role="alert">{error}</p> : null}

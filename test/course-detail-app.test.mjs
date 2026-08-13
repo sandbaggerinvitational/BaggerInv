@@ -69,15 +69,20 @@ test("Course Detail returns null only when neither normalized nor archived cours
   assert.equal(courseDetailModel("missing", content), null);
 });
 
-test("Course Detail uses the resilient Guide resolver and removes the failing legacy loader", async () => {
+test("current Course Detail uses the Supabase Guide resolver while archive transport remains an explicit legacy boundary", async () => {
   const [page, loader] = await Promise.all([
     readFile(new URL("../app/courses/[courseId]/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/tournament-guide/resolveGuideContent.js", import.meta.url), "utf8"),
   ]);
   assert.match(page, /resolveTournamentGuideContent/);
+  assert.match(page, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
+  assert.match(page, /archive\s*\?\s*await import\("\.\.\/\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
   assert.match(page, /courseDetailModel/);
   assert.doesNotMatch(page, /refreshHistoricalData|loadScorecardAnalytics|getCourse\(/);
-  assert.match(loader, /courseHoles: guide\.courseHoles/);
+  assert.match(loader, /guideContentWithCanonicalCourses\(projection\.content \|\| projection, data\.course_context \|\| \[\]\)/);
+  assert.match(loader, /courseHoles: stored\.courseHoles \|\| \[\]/);
+  assert.match(loader, /readGuideProjection\(\{ surface \}\)/);
+  assert.doesNotMatch(loader, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
 });
 
 test("Course Detail remains inside The Bagger and has no map action", async () => {
@@ -86,7 +91,7 @@ test("Course Detail remains inside The Bagger and has no map action", async () =
     readFile(new URL("../app/courses/[courseId]/course-detail.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(page, /<Header homeHref="\/home"/);
-  assert.match(page, /href="\/courses">‹ Courses/);
+  assert.match(page, /href=\{archive \? "\/courses\?view=archive" : "\/courses"\}>‹ Courses/);
   assert.doesNotMatch(page, /View Scorecard|href="#course-scorecard"/);
   assert.match(page, /Front Nine/);
   assert.match(page, /Back Nine/);

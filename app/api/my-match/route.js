@@ -13,6 +13,9 @@ import {
   verifyPlayerPassportSession,
 } from "../../../lib/player-passport.js";
 import { verifyParticipantAuthClaims } from "../../../lib/supabase-auth-server.js";
+import { guideReadEnvironment } from "../../../lib/guide-read-source.js";
+import { readGuideProjection } from "../../../lib/guide-supabase.js";
+import { applyGuideCoursesToMyMatch, guideParticipantProjection } from "../../../lib/guide-participant-adapter.js";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +51,7 @@ export async function GET(request) {
   }
   const sessionValidationMs = performance.now() - requestStartedAt;
   const source = requireMyMatchReadSource();
+  const guideSource = guideReadEnvironment().course;
 
   try {
     if (source.resolved === "google") {
@@ -65,13 +69,21 @@ export async function GET(request) {
 
     const playerId = identity.resolved === "supabase" ? resolvedIdentity.playerId : playerPassportEffectivePlayerId(session);
     const tournamentId = identity.resolved === "supabase" ? resolvedIdentity.tournamentId : session.tournamentId;
-    const read = await readMyMatchView({ tournamentId, playerId });
+    const [read, guideRead] = await Promise.all([
+      readMyMatchView({ tournamentId, playerId }),
+      guideSource.resolved === "supabase"
+        ? readGuideProjection({ tournamentId, surface: "course" }).catch((error) => ({
+          payload: { ok: false, code: error?.code || "GUIDE_PROJECTION_UNAVAILABLE" }, durationMs: 0,
+        }))
+        : Promise.resolve(null),
+    ]);
     if (!read.payload?.ok) {
       const error = new Error("My Match Supabase read failed.");
       error.code = read.payload?.code || "MY_MATCH_SUPABASE_READ_FAILED";
       throw error;
     }
-    const personalized = myMatchDataFromSupabaseView(read.payload.data);
+    let personalized = myMatchDataFromSupabaseView(read.payload.data);
+    if (guideRead?.payload?.ok) personalized = applyGuideCoursesToMyMatch(personalized, guideRead);
     const totalMs = performance.now() - requestStartedAt;
 
     if (identity.authRehearsalEnabled) {
@@ -111,11 +123,16 @@ export async function GET(request) {
         googleRequests: 0,
         identityAuthority: identity.resolved,
         identityTimings: identity.resolved === "supabase" ? resolvedIdentity.timings : { passportSignedSessionMs: sessionValidationMs },
+        guideCoursePresentation: guideRead?.payload?.ok
+          ? { ...guideParticipantProjection(guideRead).metadata, googleRequests: 0 }
+          : { source: "my-match-presentation", unavailable: guideSource.resolved === "supabase", googleRequests: 0 },
       },
     }, { headers: { ...privateHeaders,
       "Server-Timing": `session;dur=${sessionValidationMs.toFixed(1)}, postgres;dur=${personalized.queryMs.toFixed(1)}, supabase;dur=${read.durationMs.toFixed(1)}, total;dur=${totalMs.toFixed(1)}`,
       "X-My-Match-Read-Source": "supabase",
       "X-My-Match-Google-Requests": "0",
+      "X-Course-Presentation-Read-Source": guideRead?.payload?.ok ? "supabase-guide" : "my-match-presentation",
+      "X-Course-Presentation-Google-Requests": "0",
     } });
   } catch (error) {
     console.error("My Match read failed", { source: source.resolved, playerId: resolvedIdentity?.playerId || playerPassportEffectivePlayerId(session),

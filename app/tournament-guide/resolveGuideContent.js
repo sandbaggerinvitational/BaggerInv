@@ -1,71 +1,93 @@
-import { getCourses, getTournaments, refreshHistoricalData } from "../../lib/stats";
-import { isTransientGoogleError } from "../../lib/google-api-reliability";
-import { validateTournamentGuideHeaders } from "../../lib/tournament-guide-content";
-import { getTournamentData } from "../live/sheetData";
+import { requireGuideReadSource } from "../../lib/guide-read-source.js";
+import { readGuideProjection } from "../../lib/guide-supabase.js";
+import { guideContentWithCanonicalCourses, timelineFromGuideProjection } from "../../lib/tournament-guide-projection.js";
 
-let pending;
-let lastGood;
-let lastGoodAt = 0;
-const reportedSchemaIssues = new Set();
+let legacyResolver;
 
-function reportSchemaIssues(diagnostics) {
-  for (const [moduleName, module] of Object.entries(diagnostics).filter(([, item]) => !item.valid)) {
-    for (const [sheetName, sheet] of Object.entries(module.sheets).filter(([, item]) => !item.valid)) {
-      const key = `${moduleName}:${sheetName}:${sheet.missing.join("|")}`;
-      if (reportedSchemaIssues.has(key)) continue;
-      reportedSchemaIssues.add(key);
-      console.warn("Tournament Guide workbook schema mismatch", {
-        module: moduleName,
-        sheet: sheetName,
-        missingColumns: sheet.missing,
-      });
-    }
-  }
+async function resolveGoogleGuideContent() {
+  if (!legacyResolver) legacyResolver = import("./resolveGuideContentGoogle.js");
+  return (await legacyResolver).resolveGoogleTournamentGuideContent();
 }
 
-async function loadGuideContent() {
-  const [liveData] = await Promise.all([getTournamentData(), refreshHistoricalData()]);
-  const tournament = getTournaments().find((item) => Number(item.year) === Number(liveData?.tournament?.year)) || getTournaments()[0];
-  if (!tournament) throw new Error("Tournament Guide could not resolve the current tournament.");
-  const guide = liveData.guide || {};
-  const diagnostics = validateTournamentGuideHeaders(guide.headers);
-  reportSchemaIssues(diagnostics);
-  const tournamentIdentity = {
-    ...tournament,
-    name: tournament["Tournament Name"] || tournament.Name || liveData.tournament?.name || "",
-    dates: tournament["Tournament Dates"] || tournament.Dates || liveData.tournament?.dates || "",
-    logoFileName: tournament["Tournament Logo"] || tournament["Tournament Logo Filename"] || tournament.logoFileName || liveData.tournament?.logo || (tournament.year ? `sandbagger-${tournament.year}` : ""),
+function number(value, fallback = 0) {
+  return Number.isFinite(Number(value)) ? Number(value) : fallback;
+}
+
+function liveRounds(courseContext = []) {
+  return courseContext.flatMap((course) => (course.rounds || []).map((round) => ({
+    number: number(round.round_number),
+    label: round.name || `Round ${number(round.round_number)}`,
+    format: round.format || "",
+    status: round.status || "Upcoming",
+    course: { id: course.course_id, tee: course.tee },
+    matches: [],
+  }))).sort((left, right) => left.number - right.number);
+}
+
+function tournamentStatus(rounds = []) {
+  const statuses = rounds.map((round) => String(round.status || "").trim().toLowerCase());
+  if (statuses.length && statuses.every((status) => ["final", "complete", "completed"].includes(status))) return "Final";
+  if (statuses.some((status) => ["final", "complete", "completed", "live", "active", "in progress", "in-progress"].includes(status))) return "Live";
+  return "Upcoming";
+}
+
+function contentFromSupabase(payload = {}) {
+  const data = payload.data || {};
+  const projection = data.content || {};
+  const stored = guideContentWithCanonicalCourses(projection.content || projection, data.course_context || []);
+  const rounds = liveRounds(data.course_context || []);
+  const liveTournament = {
+    id: data.tournament?.tournament_id || stored.tournamentIdentity?.id || "2026",
+    year: number(data.tournament?.tournament_year || stored.tournamentIdentity?.year, 2026),
+    name: data.tournament?.name || stored.tournamentIdentity?.name || "",
+    dates: stored.tournamentIdentity?.dates || "",
+    location: stored.tournamentIdentity?.location || "",
+    timeZone: stored.tournamentIdentity?.timeZone || "America/Chicago",
+    status: tournamentStatus(rounds),
   };
+  const timeline = timelineFromGuideProjection(stored, {
+    tournament: liveTournament,
+    rounds,
+    previewDate: process.env.PREVIEW_TIMELINE_DATE,
+    previewEnabled: process.env.VERCEL_ENV === "preview",
+  });
   return {
-    tournament,
-    tournamentIdentity,
-    liveTournament: liveData.tournament,
-    liveRounds: liveData.rounds || [],
-    timelineNow: liveData.timeline?.effectiveNow || new Date().toISOString(),
-    overview: guide.sections || [],
-    schedule: guide.itinerary || [],
-    courses: guide.courses || [],
-    courseArchive: getCourses(),
-    ruleBook: guide.ruleBook || [],
-    tournamentRules: guide.tournamentRules || [],
-    rounds: guide.rounds || [],
-    dining: guide.dining || [],
-    localGuide: guide.localGuide || [],
-    importantContacts: guide.importantContacts || [],
-    courseHoles: guide.courseHoles || [],
-    diagnostics,
+    tournament: { ...stored.tournament, year: liveTournament.year },
+    tournamentIdentity: stored.tournamentIdentity || liveTournament,
+    liveTournament,
+    liveRounds: rounds,
+    timelineNow: timeline.effectiveNow || new Date().toISOString(),
+    overview: stored.overview || [],
+    schedule: stored.schedule || [],
+    courses: stored.courses || [],
+    courseArchive: [],
+    ruleBook: stored.ruleBook || [],
+    tournamentRules: stored.tournamentRules || [],
+    rounds: stored.rounds || [],
+    dining: stored.dining || [],
+    localGuide: stored.localGuide || [],
+    importantContacts: stored.importantContacts || [],
+    courseHoles: stored.courseHoles || [],
+    diagnostics: stored.diagnostics || {},
+    projection: {
+      source: "supabase",
+      revision: number(data.projection_revision),
+      fingerprint: data.delivery_fingerprint || data.content_fingerprint || "",
+      publishedAt: data.published_at || "",
+      queryMs: number(data.query_ms),
+      googleRequests: 0,
+    },
   };
 }
 
-export async function resolveTournamentGuideContent() {
-  if (pending) return pending;
-  pending = loadGuideContent().then((content) => {
-    lastGood = content;
-    lastGoodAt = Date.now();
-    return content;
-  }).catch((error) => {
-    if (isTransientGoogleError(error) && lastGood && Date.now() - lastGoodAt < 60_000) return lastGood;
+export async function resolveTournamentGuideContent({ surface = "guide" } = {}) {
+  const source = requireGuideReadSource(process.env, surface === "course" ? "course" : "guide");
+  if (source.source.resolved === "google") return resolveGoogleGuideContent();
+  const read = await readGuideProjection({ surface });
+  if (!read.payload?.ok) {
+    const error = new Error("Tournament Guide is temporarily unavailable.");
+    error.code = read.payload?.code || "GUIDE_PROJECTION_UNAVAILABLE";
     throw error;
-  }).finally(() => { pending = undefined; });
-  return pending;
+  }
+  return contentFromSupabase(read.payload);
 }
