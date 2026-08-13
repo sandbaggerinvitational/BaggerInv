@@ -13,9 +13,19 @@ export const maxDuration = 300;
 // Preview deployment health only. This intentionally returns no configuration
 // or tournament payload; it exists so a failed PostgREST schema exposure can be
 // distinguished from Director authentication and Google projection failures.
-export async function GET() {
+export async function GET(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
   try {
+    if (new URL(request.url).searchParams.get("verify") === "current") {
+      const director = await directorFor(request);
+      if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
+      const inputs = await loadSupabaseOddsInputs(director.identity?.tournamentId || "2026");
+      const generated = simulateTournamentOdds({ ...inputs, phase: "Round 3 Pairings Announced", iterations: 10_000 });
+      const publishedView = await readPublishedOddsView({ tournamentId: String(generated.year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
+      const retained = publishedOddsSnapshotsFromView(publishedView.payload?.data || {}).find((row) => row.phase === generated.phase);
+      return NextResponse.json({ ok: true, phase: generated.phase, parity: retained ? compareOddsDeterministicParity(retained, generated) : null,
+        metadata: inputs.metadata, timings: inputs.diagnostics });
+    }
     const result = await loadSupabaseOddsInputs("2026");
     return NextResponse.json({ ok: true, source: "supabase", queryMs: result.diagnostics?.queryMs, serviceMs: result.diagnostics?.serviceMs });
   } catch (error) {
