@@ -20,10 +20,12 @@ export async function GET(request) {
       const director = await directorFor(request);
       if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
       const inputs = await loadSupabaseOddsInputs(director.identity?.tournamentId || "2026");
-      const generated = simulateTournamentOdds({ ...inputs, phase: "Round 3 Pairings Announced", iterations: 10_000 });
-      const publishedView = await readPublishedOddsView({ tournamentId: String(generated.year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
-      const retained = publishedOddsSnapshotsFromView(publishedView.payload?.data || {}).find((row) => row.phase === generated.phase);
-      return NextResponse.json({ ok: true, phase: generated.phase, parity: retained ? compareOddsDeterministicParity(retained, generated) : null,
+      const phase = "Round 3 Pairings Announced";
+      const year = inputs.sheets.tournaments?.[0]?.Year;
+      const publishedView = await readPublishedOddsView({ tournamentId: String(year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
+      const retained = publishedOddsSnapshotsFromView(publishedView.payload?.data || {}).find((row) => row.phase === phase);
+      const generated = retained ? simulateTournamentOdds({ ...inputs, phase, iterations: Number(retained.iterations) }) : null;
+      return NextResponse.json({ ok: true, phase, parity: retained ? compareOddsDeterministicParity(retained, generated) : null,
         metadata: inputs.metadata, timings: inputs.diagnostics });
     }
     const result = await loadSupabaseOddsInputs("2026");
@@ -65,10 +67,11 @@ export async function POST(request) {
     }
     if (action !== "verify-current") return NextResponse.json({ error: "Unsupported Odds input action." }, { status: 400 });
     const inputs = await loadSupabaseOddsInputs(director.identity?.tournamentId || "2026");
-    const generated = simulateTournamentOdds({ ...inputs, phase, iterations: Number(iterations) });
-    const publishedView = await readPublishedOddsView({ tournamentId: String(generated.year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
+    const year = inputs.sheets.tournaments?.[0]?.Year;
+    const publishedView = await readPublishedOddsView({ tournamentId: String(year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
     if (!publishedView.payload?.ok) throw Object.assign(new Error("Published Odds history is unavailable."), { code: publishedView.payload?.code });
     const retained = publishedOddsSnapshotsFromView(publishedView.payload.data).find((row) => row.phase === phase);
+    const generated = simulateTournamentOdds({ ...inputs, phase, iterations: Number(retained?.iterations || iterations) });
     if (!retained) return NextResponse.json({ ok: true, action, phase, reproducible: false, reason: "NO_RETAINED_PUBLICATION", generated, metadata: inputs.metadata });
     const parity = compareOddsDeterministicParity(retained, generated);
     return NextResponse.json({ ok: true, action, phase, parity, metadata: inputs.metadata, timings: inputs.diagnostics });
