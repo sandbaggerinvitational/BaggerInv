@@ -123,6 +123,18 @@ test("projection normalizes the official singular Dining reservation header", ()
   assert.equal(Object.hasOwn(dining[0], "Reservation Required"), false);
 });
 
+test("projection preserves current CMS source order when optional ordering, status, or time fields are blank", () => {
+  const sheets = officialSheets();
+  for (const row of sheets["Tournament Timeline"]) delete row["Status Override"];
+  const dining = { ...sheets.Dining[0], Meal: "Arrival Hospitality", "Start Time": "", "End Time": "", "Sort Order": "" };
+  sheets.Dining.push(dining);
+  for (const row of sheets["Local Guide"]) delete row["Sort Order"];
+  const content = build({ sheets }).content;
+  assert.equal(content.dining.find((row) => row.Meal === "Arrival Hospitality")["Start Time"], "");
+  assert.deepEqual(content.localGuide.map((row) => row["Sort Order"]), ["1", "2"]);
+  assert.equal(content.timelineRows[0]["Status Override"], "");
+});
+
 test("rules projection preserves every participant presentation field without becoming course scoring authority", () => {
   const sheets = officialSheets();
   const presentation = {
@@ -273,6 +285,12 @@ test("projection rejects missing, duplicate, or scoring-inconsistent course assi
   assert.throws(() => build({ sheets: wrongFormat }), (error) =>
     error.issues.some((issue) => /Courses TPGC01:1 format does not match canonical configuration/.test(issue))
   );
+
+  const presentationYardage = officialSheets();
+  presentationYardage.Courses[1].Yardage = "9999";
+  const projection = build({ sheets: presentationYardage });
+  assert.equal(projection.content.courses[0].Yardage, undefined);
+  assert.notEqual(guideContentWithCanonicalCourses(projection.content, canonicalCourses()).courses[0].Yardage, 9999);
 });
 
 test("projection fails closed when canonical course scoring configuration is inconsistent", () => {
