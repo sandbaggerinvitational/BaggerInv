@@ -321,3 +321,14 @@ test("cron endpoint requires the server-only Preview flag and worker secret", as
   assert.match(route, /maximum: 5/);
   assert.doesNotMatch(route, /NEXT_PUBLIC_/);
 });
+
+test("archive Google writer uses a module-scoped normalizer", async () => {
+  const writer = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
+  assert.match(writer, /const archiveClean = /);
+  const start = writer.indexOf("export async function inspectRoundScorecardsArchiveReadback");
+  const end = writer.indexOf("async function requireTabHeaders", start);
+  assert.ok(start >= 0 && end > start);
+  const archiveWriter = writer.slice(start, end);
+  assert.match(archiveWriter, /archiveClean\(/);
+  assert.doesNotMatch(archiveWriter, /\bclean\(/);
+});
