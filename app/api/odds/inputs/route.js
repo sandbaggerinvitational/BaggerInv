@@ -46,7 +46,11 @@ export async function POST(request) {
     const parity = compareOddsDeterministicParity(retained, generated);
     return NextResponse.json({ ok: true, action, phase, parity, metadata: inputs.metadata, timings: inputs.diagnostics });
   } catch (error) {
-    console.error("Championship Odds input verification failed", { code: error?.code || "ODDS_INPUT_VERIFICATION_FAILED", message: error?.message || String(error) });
-    return NextResponse.json({ error: "Championship Odds inputs could not be verified.", code: error?.code || "ODDS_INPUT_VERIFICATION_FAILED" }, { status: 503 });
+    const diagnostics = error?.shadowDiagnostics || null;
+    console.error("Championship Odds input verification failed", { code: error?.code || diagnostics?.code || "ODDS_INPUT_VERIFICATION_FAILED",
+      message: error?.message || String(error), diagnostics });
+    return NextResponse.json({ error: "Championship Odds inputs could not be verified.",
+      code: error?.code || diagnostics?.code || "ODDS_INPUT_VERIFICATION_FAILED",
+      ...(process.env.VERCEL_ENV === "preview" ? { diagnostics } : {}) }, { status: 503 });
   }
 }
