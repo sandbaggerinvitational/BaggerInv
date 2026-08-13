@@ -24,9 +24,11 @@ export async function GET(request) {
       const year = inputs.sheets.tournaments?.[0]?.Year;
       const publishedView = await readPublishedOddsView({ tournamentId: String(year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
       const retained = publishedOddsSnapshotsFromView(publishedView.payload?.data || {}).find((row) => row.phase === phase);
+      const calculationStartedAt = Date.now();
       const generated = retained ? simulateTournamentOdds({ ...inputs, phase, iterations: Number(retained.iterations) }) : null;
       return NextResponse.json({ ok: true, phase, parity: retained ? compareOddsDeterministicParity(retained, generated) : null,
-        metadata: inputs.metadata, timings: inputs.diagnostics });
+        metadata: inputs.metadata, timings: { ...inputs.diagnostics, calculationMs: Date.now() - calculationStartedAt,
+          iterations: Number(retained?.iterations || 0) } });
     }
     const result = await loadSupabaseOddsInputs(director.identity?.tournamentId || "2026");
     return NextResponse.json({ ok: true, source: "supabase", queryMs: result.diagnostics?.queryMs, serviceMs: result.diagnostics?.serviceMs });
@@ -71,10 +73,12 @@ export async function POST(request) {
     const publishedView = await readPublishedOddsView({ tournamentId: String(year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
     if (!publishedView.payload?.ok) throw Object.assign(new Error("Published Odds history is unavailable."), { code: publishedView.payload?.code });
     const retained = publishedOddsSnapshotsFromView(publishedView.payload.data).find((row) => row.phase === phase);
+    const calculationStartedAt = Date.now();
     const generated = simulateTournamentOdds({ ...inputs, phase, iterations: Number(retained?.iterations || iterations) });
     if (!retained) return NextResponse.json({ ok: true, action, phase, reproducible: false, reason: "NO_RETAINED_PUBLICATION", generated, metadata: inputs.metadata });
     const parity = compareOddsDeterministicParity(retained, generated);
-    return NextResponse.json({ ok: true, action, phase, parity, metadata: inputs.metadata, timings: inputs.diagnostics });
+    return NextResponse.json({ ok: true, action, phase, parity, metadata: inputs.metadata,
+      timings: { ...inputs.diagnostics, calculationMs: Date.now() - calculationStartedAt, iterations: Number(retained.iterations) } });
   } catch (error) {
     const diagnostics = error?.shadowDiagnostics || null;
     console.error("Championship Odds input verification failed", { code: error?.code || diagnostics?.code || "ODDS_INPUT_VERIFICATION_FAILED",
