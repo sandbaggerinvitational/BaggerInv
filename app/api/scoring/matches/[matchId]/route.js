@@ -15,6 +15,7 @@ import { validateAuthoritativeParticipantSession } from "../../../../../lib/scor
 import { recalculateCompetitionDerivedTournament } from "../../../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../../../lib/calcutta-supabase.js";
+import { drainScorecardArchiveJobs } from "../../../../../lib/scorecard-archive-worker.js";
 
 export const dynamic = "force-dynamic";
 
@@ -97,8 +98,9 @@ export async function POST(request, { params }) {
     }
     if (measured.authority === "supabase") {
       after(async () => {
-        const [drained, derived, calcutta] = await Promise.allSettled([
+        const [drained, archive, derived, intelligence, calcutta] = await Promise.allSettled([
           drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" }),
+          drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false }),
           recalculateCompetitionDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring derived-state worker · ${current.playerId || "participant"}`,
           }),
@@ -111,8 +113,14 @@ export async function POST(request, { params }) {
         ]);
         const mirror = drained.status === "fulfilled" ? drained.value : { ok: false, failed: 1 };
         if (!mirror.ok) console.error("Supabase Google outbox remains pending", { matchId, failed: mirror.failed });
+        if (archive.status === "rejected" || !archive.value?.ok) console.error("Round Scorecards archive remains pending", {
+          matchId, code: archive.reason?.code || archive.value?.deliveries?.find((item) => !item.ok)?.errorCode || "ARCHIVE_PENDING",
+        });
         if (derived.status === "rejected") console.error("Competition derived-state recalculation remains pending", {
           matchId, code: derived.reason?.code || "DERIVED_STATE_RECALCULATION_FAILED",
+        });
+        if (intelligence.status === "rejected") console.error("Intelligence recalculation remains pending", {
+          matchId, code: intelligence.reason?.code || "INTELLIGENCE_RECALCULATION_FAILED",
         });
         if (calcutta.status === "rejected") console.error("Calcutta recalculation remains pending", {
           matchId, code: calcutta.reason?.code || "CALCUTTA_RECALCULATION_FAILED",

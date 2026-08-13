@@ -20,6 +20,7 @@ import { persistDirectorMatchLifecycle } from "../../../lib/scoring-persistence-
 import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox.js";
 import { recalculateCompetitionDerivedTournament } from "../../../lib/competition-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
+import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
 
 export const dynamic = "force-dynamic";
 
@@ -291,6 +292,7 @@ export async function POST(request) {
     if (process.env.VERCEL_ENV === "preview" && ["reopen-match", "match-finalize", "match-reopen"].includes(input.action)) after(async () => {
       try {
         await Promise.all([
+          drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false }),
           recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
           recalculateCalcuttaTournament("", { calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}` }),
         ]);

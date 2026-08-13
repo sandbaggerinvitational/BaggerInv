@@ -19,6 +19,7 @@ import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox";
 import { recalculateCompetitionDerivedTournament } from "../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
+import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,7 @@ export async function POST(request) {
     if (process.env.VERCEL_ENV === "preview" && ["finalize", "reopen"].includes(action)) after(async () => {
       try {
         await Promise.all([
+          drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false }),
           recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
           recalculateIntelligenceDerivedTournament("", { calculatedBy: `Director lifecycle intelligence worker · ${updatedBy || "Director"}` }),
           recalculateCalcuttaTournament("", { calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}` }),

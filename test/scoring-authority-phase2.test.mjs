@@ -8,6 +8,12 @@ import { createScoringSession, verifyScoringSession } from "../lib/scoring-acces
 
 const secret = "phase-2-scoring-session-secret-long-enough";
 const sheet = (rows) => ({ records: rows.map((record, index) => ({ record, rowNumber: index + 2 })), headers: Object.keys(rows[0] || {}) });
+const finalizedSummary = { "Match ID": "M1", Year: 2026, Round: 1, Match: 1, Format: "BB", "Course ID": "C1",
+  "Team 1 Player 1": "P1", "Team 1 Player 2": "P2", "Team 2 Player 1": "P3", "Team 2 Player 2": "P4",
+  "Match Status": "Final", "Final Result": "Team 1 1 UP", Winner: "Team 1", "Matchup Winner": "Team 1",
+  "Completed At": "2026-08-11T12:00:00.000Z", "Finalized At": "2026-08-11T12:00:00.000Z", "Finalized By": "Director" };
+const reopenedSummary = { ...finalizedSummary, "Match Status": "Reopened", "Final Result": "", Winner: "", "Matchup Winner": "",
+  "Completed At": "", "Finalized At": "", "Finalized By": "" };
 
 function workbook({ holes = 1 } = {}) {
   const players = [
@@ -164,7 +170,7 @@ test("Finalization outbox mirrors and verifies the separate Google lock and acce
     readWorkbookSheetsByName: async (_tabs, options) => {
       calls.push({ fresh: options?.fresh });
       return { "Live Matches": sheet([{ "Match ID": "M1", "Match Status": "Final", "Scoring Locked": true,
-        "Access Active": false, "Access Version": 2, "Updated At": "2026-08-11T12:00:00.000Z" }]) };
+        "Access Active": false, "Access Version": 2, "Updated At": "2026-08-11T12:00:00.000Z" }]), Matches: sheet([finalizedSummary]) };
     },
     measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
     completeGoogleOutbox: async () => { completed += 1; return { payload: { ok: true, checkpoint: { last_supabase_match_revision: 20 } } }; },
@@ -185,7 +191,7 @@ test("Finalization outbox remains retryable until Google confirms the lock field
     claimGoogleOutbox: async () => ({ payload: { event, checkpoint: {} } }),
     finalizeLiveMatch: async () => ({ "Match ID": "M1" }),
     readWorkbookSheetsByName: async () => ({ "Live Matches": sheet([{ "Match ID": "M1", "Match Status": "Final",
-      "Scoring Locked": false, "Access Active": false, "Access Version": 2 }]) }),
+      "Scoring Locked": false, "Access Active": false, "Access Version": 2 }]), Matches: sheet([finalizedSummary]) }),
     measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
     completeGoogleOutbox: async () => { completed += 1; return { payload: { ok: true } }; },
     failGoogleOutbox: async () => { failed += 1; },
@@ -205,7 +211,7 @@ test("Reopen outbox restores versioned Google access and verifies the inverse li
     claimGoogleOutbox: async () => ({ payload: { event, checkpoint: { last_supabase_match_revision: 20 } } }),
     reopenLiveMatch: async (matchId, actor, updates) => { reopenCall = { matchId, actor, updates }; return { "Match ID": matchId }; },
     readWorkbookSheetsByName: async () => ({ "Live Matches": sheet([{ "Match ID": "M1", "Match Status": "Reopened",
-      "Scoring Locked": false, "Access Active": true, "Access Version": 3, "Updated At": "2026-08-11T12:01:00.000Z" }]) }),
+      "Scoring Locked": false, "Access Active": true, "Access Version": 3, "Updated At": "2026-08-11T12:01:00.000Z" }]), Matches: sheet([reopenedSummary]) }),
     measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
     completeGoogleOutbox: async () => ({ payload: { ok: true, checkpoint: { last_supabase_match_revision: 21 } } }),
     failGoogleOutbox: async () => { throw new Error("should not fail"); },
