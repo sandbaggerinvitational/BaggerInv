@@ -247,6 +247,8 @@ test("Director diagnostics expose a read-only 24-match scoring contract parity a
   assert.match(route, /matchIds\.length === 24/);
   assert.match(route, /correctedBestBall2026R16/);
   assert.match(route, /finalizedSingles2026R34/);
+  assert.match(route, /canonicalView\.match\.match_revision/);
+  assert.match(route, /scores:\s*canonicalView\.scores/);
   const branch = route.split('action === "scoring-read-parity"')[1].split('action === "my-match-parity"')[0];
   assert.doesNotMatch(branch, /replace|submit|persist|finalize|reopen/i);
   assert.match(client, /run\("scoring-read-parity", \{ samples: 3 \}\)/);

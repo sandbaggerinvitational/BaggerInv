@@ -169,10 +169,37 @@ async function gameCenterParity(source, presentation) {
   };
 }
 
-function expectedScoringReadData(view = {}) {
-  const data = scoringMatchDataFromSupabaseView(view, {
+function expectedScoringReadData(view = {}, canonicalView = null) {
+  // Before the read cutover, the participant path loaded presentation and
+  // scorecard configuration from Google, then overlaid canonical Supabase
+  // lifecycle, score rows, and match revision. Reconstruct that exact
+  // participant contract here. Live Matches has no authoritative match
+  // revision column, so comparing a raw Google default (0) with the canonical
+  // revision would be a diagnostic error rather than a participant divergence.
+  const expectedView = canonicalView?.match ? {
+    ...view,
+    match: {
+      ...(view.match || {}),
+      status: canonicalView.match.status,
+      scoring_locked: canonicalView.match.scoring_locked,
+      scorecard_complete: canonicalView.match.scorecard_complete,
+      unresolved_mutations: canonicalView.match.unresolved_mutations,
+      match_revision: canonicalView.match.match_revision,
+      permission_revision: canonicalView.match.permission_revision,
+      current_hole: canonicalView.match.current_hole,
+      holes_remaining: canonicalView.match.holes_remaining,
+      team_1_holes_won: canonicalView.match.team_1_holes_won,
+      team_2_holes_won: canonicalView.match.team_2_holes_won,
+      running_result: canonicalView.match.running_result,
+      result_winner: canonicalView.match.result_winner,
+      finalized_at: canonicalView.match.finalized_at,
+      authority_updated_at: canonicalView.match.authority_updated_at,
+    },
+    scores: canonicalView.scores || view.scores || [],
+  } : view;
+  const data = scoringMatchDataFromSupabaseView(expectedView, {
     authorizationVerified: true,
-    writable: clean(view.match?.status).toUpperCase() !== "FINAL" && view.match?.scoring_locked !== true,
+    writable: clean(expectedView.match?.status).toUpperCase() !== "FINAL" && expectedView.match?.scoring_locked !== true,
   });
   return scoringReadParityProjection(data);
 }
@@ -225,7 +252,7 @@ async function scoringReadParity(source, presentation, samples = 3) {
       readSamples.push({ read, actual, adapterMs: currentAdapterMs, totalMs: performance.now() - startedAt });
     }
     if (!readSamples.length) continue;
-    const expected = expectedScoringReadData(expectedView);
+    const expected = expectedScoringReadData(expectedView, readSamples[0].read.payload.data);
     const fields = scoringReadDivergence(expected, readSamples[0].actual);
     if (fields.length) divergences.push({ matchId: match.match_id, fields });
     for (const sample of readSamples) {
