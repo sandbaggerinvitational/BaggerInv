@@ -18,18 +18,38 @@ test("published Guide endpoint is a participant-safe Supabase read with revision
   assert.doesNotMatch(route, /export async function (?:POST|PUT|PATCH|DELETE)/);
 });
 
-test("scheduled Guide endpoint is POST-only, Preview-gated, and requires application authorization", () => {
+test("protected Guide worker endpoint is POST-only, Preview-gated, and requires application authorization before every action", () => {
   const route = source("app/api/cron/guide-sync/route.js");
   const gate = route.indexOf("assertGuideSyncEnvironment");
   const authorization = route.indexOf("guideWorkerAuthorized(request)");
+  const action = route.indexOf("const action = String(body.action");
   const sync = route.indexOf("synchronizeGuideContent({ triggerType: \"SCHEDULED\"");
   assert.match(route, /VERCEL_ENV !== "preview"/);
-  assert.ok(gate >= 0 && authorization > gate && sync > authorization);
+  assert.ok(gate >= 0 && authorization > gate && action > authorization && sync > action);
   assert.match(route, /GUIDE_WORKER_UNAUTHORIZED/);
   assert.match(route, /status: 401/);
   assert.match(route, /lastKnownGoodPreserved: true/);
   assert.doesNotMatch(route, /export async function GET/);
   assert.doesNotMatch(route, /console\.(?:log|error)|GUIDE_SYNC_WORKER_SECRET|VERCEL_AUTOMATION_BYPASS_SECRET/);
+});
+
+test("protected worker configure/status actions use deployment configuration and return only allowlisted safe status", () => {
+  const route = source("app/api/cron/guide-sync/route.js");
+  const gate = source("lib/guide-read-source.js");
+  assert.match(route, /action === "configure"/);
+  assert.match(route, /action === "status"/);
+  assert.match(route, /configureGuideSyncWorker\(\{/);
+  assert.match(route, /readGuideWorkerStatus\(\)/);
+  assert.match(route, /readGuideSyncStatus\(\)/);
+  assert.match(route, /guideWorkerServerConfiguration\(\)/);
+  assert.match(route, /actorId: "preview-guide-worker-control"/);
+  assert.match(route, /safeWorkerStatus/);
+  assert.match(route, /safeSyncStatus/);
+  assert.match(gate, /PREVIEW_GUIDE_SYNC_WORKER_ENDPOINT/);
+  assert.match(gate, /workerSecret = clean\(env\.GUIDE_SYNC_WORKER_SECRET\)/);
+  assert.doesNotMatch(route, /workerSecret:\s*body|endpointUrl:\s*body/);
+  assert.doesNotMatch(route, /vercel_protection_bypass|worker_secret|GUIDE_SYNC_WORKER_SECRET/);
+  assert.doesNotMatch(route, /worker:\s*(?:workerRead|result\.payload)|sync:\s*syncRead/);
 });
 
 test("Director Guide route authorizes signed Director sessions and shares the canonical sync service", () => {

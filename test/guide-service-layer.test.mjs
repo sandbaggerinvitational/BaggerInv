@@ -5,6 +5,7 @@ import {
   guideReadEnvironment,
   guideSyncEnvironment,
   guideWorkerAuthorized,
+  guideWorkerServerConfiguration,
 } from "../lib/guide-read-source.js";
 import { synchronizeGuideContent } from "../lib/guide-sync-service.js";
 import { GuideProjectionValidationError } from "../lib/tournament-guide-projection.js";
@@ -82,6 +83,16 @@ test("Guide worker requires the separate application bearer secret", () => {
   assert.equal(guideWorkerAuthorized({ headers: new Headers() }, previewEnv), false);
   assert.equal(guideWorkerAuthorized({ headers: new Headers({ authorization: "Bearer wrong-secret" }) }, previewEnv), false);
   assert.equal(guideWorkerAuthorized({ headers: new Headers({ authorization: `Bearer ${workerSecret}` }) }, previewEnv), true);
+});
+
+test("Guide worker bootstrap takes its fixed endpoint and bearer only from server deployment configuration", () => {
+  const configuration = guideWorkerServerConfiguration(previewEnv);
+  assert.equal(configuration.ready, true);
+  assert.equal(configuration.workerSecret, workerSecret);
+  assert.equal(configuration.endpointUrl,
+    "https://bagger-inv-git-feature-mock-tour-b4f752-sandbagger-invitational.vercel.app/api/cron/guide-sync");
+  assert.equal(guideWorkerServerConfiguration({ ...previewEnv, GUIDE_SYNC_WORKER_SECRET: "short" }).ready, false);
+  assert.equal(guideWorkerServerConfiguration({ ...previewEnv, GUIDE_AUTO_SYNC_ENABLED: "false" }).ready, false);
 });
 
 test("canonical sync claims before Google, publishes one validated projection, and reports a no-op safely", async () => {
