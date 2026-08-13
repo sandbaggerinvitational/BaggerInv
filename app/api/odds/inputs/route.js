@@ -16,9 +16,9 @@ export const maxDuration = 300;
 export async function GET(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
   try {
+    const director = await directorFor(request);
+    if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
     if (new URL(request.url).searchParams.get("verify") === "current") {
-      const director = await directorFor(request);
-      if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
       const inputs = await loadSupabaseOddsInputs(director.identity?.tournamentId || "2026");
       const phase = "Round 3 Pairings Announced";
       const year = inputs.sheets.tournaments?.[0]?.Year;
@@ -28,7 +28,7 @@ export async function GET(request) {
       return NextResponse.json({ ok: true, phase, parity: retained ? compareOddsDeterministicParity(retained, generated) : null,
         metadata: inputs.metadata, timings: inputs.diagnostics });
     }
-    const result = await loadSupabaseOddsInputs("2026");
+    const result = await loadSupabaseOddsInputs(director.identity?.tournamentId || "2026");
     return NextResponse.json({ ok: true, source: "supabase", queryMs: result.diagnostics?.queryMs, serviceMs: result.diagnostics?.serviceMs });
   } catch (error) {
     return NextResponse.json({ ok: false, status: error?.status || 503, code: error?.code || error?.shadowDiagnostics?.code || "ODDS_INPUT_HEALTH_FAILED",

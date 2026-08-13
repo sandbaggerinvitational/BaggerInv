@@ -58,9 +58,11 @@ test("Preview flags fail closed in Production", () => {
 });
 
 test("migration and route are service/Director-only, idempotent, isolated, and keep the engine unchanged", async () => {
-  const [migration, route, engine] = await Promise.all([
+  const [migration, guards, route, inputRoute, engine] = await Promise.all([
     readFile(new URL("../supabase/migrations/202608120038_preview_championship_odds_inputs_publication.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608120040_preview_championship_odds_runtime_guards.sql", import.meta.url), "utf8"),
     readFile(new URL("../app/api/odds/publish/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/odds/inputs/route.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/tournament-odds.js", import.meta.url), "utf8"),
   ]);
   assert.match(migration, /odds_input_configurations enable row level security/);
@@ -68,8 +70,13 @@ test("migration and route are service/Director-only, idempotent, isolated, and k
   assert.match(migration, /odds_native_publication_idempotency_idx/);
   assert.match(migration, /FINAL_RESULTS_NOT_READY/);
   assert.match(migration, /STALE_ODDS_INPUT_CONFIGURATION/);
+  assert.match(guards, /STALE_ODDS_SOURCE_STATE/);
+  assert.match(guards, /input->'historical_ratings' = '\{\}'::jsonb/);
   assert.match(route, /inspectTournamentDirectorToken/);
   assert.match(route, /Google reporting mirror delayed/);
+  assert.match(inputRoute, /readWorkbookSheetsByName\(\["Prediction Settings"\]\)/);
+  assert.match(inputRoute, /Number\(retained\.iterations\)/);
+  assert.match(inputRoute, /Tournament Director access is required/);
   assert.match(engine, /odds-v2-nassau/);
   assert.match(engine, /iterations = 10_000/);
 });
