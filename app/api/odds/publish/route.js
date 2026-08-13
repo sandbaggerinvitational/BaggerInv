@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { after } from "next/server";
 import { revalidatePath } from "next/cache";
 import { loadOddsInputs } from "../../../../lib/odds-data";
 import { loadPredictionDiagnostics } from "../../../../lib/prediction-data";
@@ -14,6 +15,7 @@ import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, publishedOddsSn
 import { buildSupabaseOddsPublication, completeSupabaseOddsGoogleMirror, loadSupabaseOddsInputs, publishSupabaseOddsSnapshot } from "../../../../lib/championship-odds-supabase.js";
 import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
 import { scoringShadowPayloadHash } from "../../../../lib/scoring-shadow.js";
+import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -157,6 +159,10 @@ async function publishProjection(request) {
     start("PWA refresh", { workbookOperation: "Invalidate participant Tournament Intelligence views", worksheet: "None", function: "revalidatePath" });
     for (const path of ["/live", "/home"]) revalidatePath(path);
     pass("PWA refresh", { function: "revalidatePath", paths: ["/live", "/home"] });
+
+    if (process.env.VERCEL_ENV === "preview") after(() => recalculateIntelligenceDerivedTournament(String(preview.year), {
+      calculatedBy: `Odds publication intelligence worker · ${director?.identity?.player?.id || "Director"}`,
+    }).catch((error) => console.error("Odds intelligence recalculation remains pending", { code: error?.code || "INTELLIGENCE_RECALCULATION_FAILED" })));
 
     trace.complete("Publication complete", { function: "POST /api/odds/publish" });
     return NextResponse.json({ ok: true, snapshot, source: { inputs: source.inputSource, publication: source.publicationAuthority }, nativePublication: nativePublication?.payload || null,

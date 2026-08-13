@@ -299,7 +299,7 @@ function TournamentRecapExperience({ recap, tournament, publicationTime, portrai
   </section>;
 }
 
-function Insights({ data, snapshots, previewMode = false }) {
+function Insights({ data, snapshots, derived = null, previewMode = false }) {
   const [selectedPlayerId, setSelectedPlayerId] = useState("");
   const [previewPhase, setPreviewPhase] = useState("");
   const previewScenarios = useMemo(() => previewMode ? PREVIEW_ODDS_SCENARIOS.map((scenario) => ({
@@ -309,8 +309,11 @@ function Insights({ data, snapshots, previewMode = false }) {
   const effectivePreviewPhase = previewMode ? (previewPhase || previewScenarios.at(-1)?.snapshot.phase || "") : "";
   const selectedScenarioIndex = effectivePreviewPhase ? (snapshots || []).findIndex((snapshot) => snapshot.phase === effectivePreviewPhase) : -1;
   const presentedSnapshots = selectedScenarioIndex >= 0 ? snapshots.slice(0, selectedScenarioIndex + 1) : (snapshots || []);
-  const insights = useMemo(() => publishedOddsInsights(presentedSnapshots), [presentedSnapshots]);
-  const tournamentRecap = useMemo(() => buildTournamentRecapIntelligence({ snapshots: presentedSnapshots, tournament: data.tournament, leaderboard: data.leaderboard }), [data.leaderboard, data.tournament, presentedSnapshots]);
+  const canUseDerived = !effectivePreviewPhase || effectivePreviewPhase === snapshots?.at(-1)?.phase;
+  const insights = useMemo(() => canUseDerived && derived?.projectionEditorial?.result?.insights
+    ? derived.projectionEditorial.result.insights : publishedOddsInsights(presentedSnapshots), [canUseDerived, derived, presentedSnapshots]);
+  const tournamentRecap = useMemo(() => canUseDerived && derived?.finalRecap?.result
+    ? derived.finalRecap.result : buildTournamentRecapIntelligence({ snapshots: presentedSnapshots, tournament: data.tournament, leaderboard: data.leaderboard }), [canUseDerived, data.leaderboard, data.tournament, derived, presentedSnapshots]);
   const playerPhotos = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.photo])), [data.leaderboard]);
   const playerTeams = useMemo(() => new Map((data.leaderboard || []).map((player) => [String(player.id), player.team])), [data.leaderboard]);
   const percent = (value) => `${Number(value || 0).toFixed(1).replace(/\.0$/, "")}%`;
@@ -322,8 +325,10 @@ function Insights({ data, snapshots, previewMode = false }) {
   const rankMark = (rank) => ["🥇", "🥈", "🥉"][rank - 1] || `#${rank}`;
   const selectedPlayer = insights.players.find((player) => String(player.id) === selectedPlayerId) || null;
   const selectedHistory = selectedPlayer ? projectionHistoryHighlights(publishedPlayerHistory(presentedSnapshots, selectedPlayerId)) : [];
-  const storyline = tournamentProjectionStory({ current: insights.current, previous: insights.previous, playerTeams });
-  const intelligenceStorylines = tournamentIntelligenceStorylines({ snapshots: presentedSnapshots, playerTeams });
+  const storyline = canUseDerived && derived?.projectionEditorial?.result?.tournamentStory !== undefined
+    ? derived.projectionEditorial.result.tournamentStory : tournamentProjectionStory({ current: insights.current, previous: insights.previous, playerTeams });
+  const intelligenceStorylines = canUseDerived && Array.isArray(derived?.tournamentIntelligence?.result?.storylines)
+    ? derived.tournamentIntelligence.result.storylines : tournamentIntelligenceStorylines({ snapshots: presentedSnapshots, playerTeams });
   useEffect(() => {
     if (!selectedPlayerId) return undefined;
     const close = (event) => { if (event.key === "Escape") setSelectedPlayerId(""); };
@@ -479,6 +484,7 @@ export default function LeaderboardsDashboard({
   const [data, setData] = useState(initialData);
   const [currentPlayer, setCurrentPlayer] = useState(initialCurrentPlayer);
   const [oddsSnapshots, setOddsSnapshots] = useState(null);
+  const [intelligenceDerived, setIntelligenceDerived] = useState(null);
   const [secondaryData, setSecondaryData] = useState(null);
   const [secondaryState, setSecondaryState] = useState("idle");
   const [calcuttaData, setCalcuttaData] = useState(coreReadSource === "supabase" ? null : initialData?.calcutta || null);
@@ -509,6 +515,7 @@ export default function LeaderboardsDashboard({
       })
       .then(({ payload, response }) => {
         setOddsSnapshots(Array.isArray(payload.snapshots) ? payload.snapshots : []);
+        setIntelligenceDerived(payload.derived || null);
         const durationMs = performance.now() - startedAt;
         recordParticipantAuthDiagnostic("PUBLISHED_ODDS_MODULE_USABLE", { routeTo: "/live?view=leaderboards&tab=insights", durationMs });
         if (previewMode) console.info("Published Odds module timing", {
@@ -631,6 +638,6 @@ export default function LeaderboardsDashboard({
       <span>{calcuttaState === "error" ? "Core team and player standings remain available." : "Retrieving the independently prepared financial competition result."}</span>
       {calcuttaState === "error" ? <button type="button" onClick={loadCalcutta}>Try again</button> : null}
     </div></section> : null}
-    {tab === "insights" ? <Insights data={data} snapshots={oddsSnapshots} previewMode={previewMode} /> : null}
+    {tab === "insights" ? <Insights data={data} snapshots={oddsSnapshots} derived={intelligenceDerived} previewMode={previewMode} /> : null}
   </section>;
 }

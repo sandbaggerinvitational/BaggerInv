@@ -17,6 +17,7 @@ import { directorTransactionError } from "../../../lib/director-transaction-erro
 import { persistDirectorMatchLifecycle } from "../../../lib/scoring-persistence-adapter";
 import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox";
 import { recalculateCompetitionDerivedTournament } from "../../../lib/competition-derived-supabase.js";
+import { recalculateIntelligenceDerivedTournament } from "../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
 
 export const dynamic = "force-dynamic";
@@ -97,6 +98,7 @@ export async function POST(request) {
       try {
         await Promise.all([
           recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
+          recalculateIntelligenceDerivedTournament("", { calculatedBy: `Director lifecycle intelligence worker · ${updatedBy || "Director"}` }),
           recalculateCalcuttaTournament("", { calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}` }),
         ]);
       } catch (error) {

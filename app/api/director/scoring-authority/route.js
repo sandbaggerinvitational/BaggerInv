@@ -88,6 +88,7 @@ import {
   TEAM_MOMENTUM_ENGINE_VERSION,
   TOURNAMENT_STORYLINES_ENGINE_VERSION,
 } from "../../../../lib/competition-derived-supabase.js";
+import { currentIntelligenceDerivedState, recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import {
   buildPublishedOddsImport,
   comparePublishedOddsParity,
@@ -866,6 +867,24 @@ async function competitionDerivedReadiness(actorId, { refresh = false, samples =
   };
 }
 
+async function intelligenceDerivedReadiness(actorId, { refresh = false } = {}) {
+  const scope = await readLeaderboardsCoreView("");
+  if (!scope.payload?.ok) throw Object.assign(new Error("Intelligence tournament scope is unavailable."), { code: scope.payload?.code });
+  const tournamentId = clean(scope.payload.data.tournament?.tournament_id);
+  const recalculation = refresh ? await recalculateIntelligenceDerivedTournament(tournamentId, { calculatedBy: `Director ${actorId}` }) : null;
+  const current = await currentIntelligenceDerivedState(tournamentId);
+  return { tournamentId, recalculation: recalculation ? {
+    sourceFingerprint: recalculation.calculated.sourceFingerprint,
+    finalGate: recalculation.calculated.recap.gate,
+    inputReadMs: recalculation.inputs.inputReadMs,
+    postgresMs: recalculation.inputs.postgresMs,
+    serviceMs: recalculation.inputs.serviceMs,
+    engineMs: recalculation.calculated.calculationMs,
+    written: recalculation.write.written,
+  } : null, current, googleRequests: 0,
+    pass: Boolean(current.tournamentIntelligence && current.projectionEditorial && !current.finalRecap) };
+}
+
 async function publishedOddsReadiness(actorId, { refresh = false, samples = 25 } = {}) {
   const source = await authoritativeImport(actorId);
   const googleStartedAt = performance.now();
@@ -1506,6 +1525,10 @@ export async function POST(request) {
       result = await competitionDerivedReadiness(actorId, { refresh: true, samples: input.samples });
     } else if (action === "competition-derived-parity") {
       result = await competitionDerivedReadiness(actorId, { samples: input.samples });
+    } else if (action === "refresh-intelligence-derived-state") {
+      result = await intelligenceDerivedReadiness(actorId, { refresh: true });
+    } else if (action === "intelligence-derived-readiness") {
+      result = await intelligenceDerivedReadiness(actorId);
     } else if (action === "match-authorization-parity") {
       const source = await authoritativeImport(actorId);
       result = await matchAuthorizationParity(source);

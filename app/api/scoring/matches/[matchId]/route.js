@@ -13,6 +13,7 @@ import { persistParticipantScore } from "../../../../../lib/scoring-persistence-
 import { drainGoogleOutbox } from "../../../../../lib/scoring-google-outbox.js";
 import { validateAuthoritativeParticipantSession } from "../../../../../lib/scoring-participant-authorization.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../../lib/competition-derived-supabase.js";
+import { recalculateIntelligenceDerivedTournament } from "../../../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../../../lib/calcutta-supabase.js";
 
 export const dynamic = "force-dynamic";
@@ -100,6 +101,9 @@ export async function POST(request, { params }) {
           drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" }),
           recalculateCompetitionDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring derived-state worker · ${current.playerId || "participant"}`,
+          }),
+          recalculateIntelligenceDerivedTournament(String(current.tournamentId || current.year || ""), {
+            calculatedBy: `Scoring intelligence worker · ${current.playerId || "participant"}`,
           }),
           recalculateCalcuttaTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring Calcutta worker · ${current.playerId || "participant"}`,

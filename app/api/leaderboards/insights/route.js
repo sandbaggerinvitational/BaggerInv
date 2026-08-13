@@ -5,6 +5,8 @@ import { attachRuntimeTiming, createRuntimeProfile } from "../../../../lib/runti
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { readPublishedOddsView, publishedOddsSnapshotsFromView } from "../../../../lib/published-odds-supabase.js";
 import { requirePublishedOddsReadSource } from "../../../../lib/published-odds-read-source.js";
+import { currentIntelligenceDerivedState } from "../../../../lib/intelligence-derived-supabase.js";
+import { requireIntelligenceDerivedReadSources } from "../../../../lib/intelligence-derived-read-source.js";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +17,7 @@ export async function GET(request) {
     return NextResponse.json({ error: "A valid tournament year is required." }, { status: 400 });
   }
   const source = requirePublishedOddsReadSource();
+  const intelligenceSources = requireIntelligenceDerivedReadSources();
   if (source.resolved === "google") {
     const measured = await profile.measure("googleSheetsRead", () => withWorkbookWriteDiagnostics("GET /api/leaderboards/insights", readOddsSnapshots));
     const loadedSnapshots = measured.result;
@@ -28,18 +31,27 @@ export async function GET(request) {
   const startedAt = performance.now();
   try {
     const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
-    const read = await readPublishedOddsView({ tournamentId: identity.tournamentId });
+    const [read, derived] = await Promise.all([
+      readPublishedOddsView({ tournamentId: identity.tournamentId }),
+      Object.values(intelligenceSources).some((state) => state.resolved === "supabase")
+        ? currentIntelligenceDerivedState(identity.tournamentId).catch((error) => ({ unavailable: true, code: error?.code || "INTELLIGENCE_DERIVED_UNAVAILABLE" }))
+        : Promise.resolve(null),
+    ]);
     if (!read.payload?.ok) throw Object.assign(new Error("Published Odds state is unavailable."), { code: read.payload?.code });
     const tournamentYear = Number(read.payload.data.tournament?.tournament_year);
     if (tournamentYear !== year) return NextResponse.json({ error: "The requested tournament is unavailable.", code: "WRONG_TOURNAMENT" }, { status: 403 });
     const snapshots = publishedOddsSnapshotsFromView(read.payload.data);
     const totalMs = performance.now() - startedAt;
-    const response = NextResponse.json({ snapshots, publication: {
+    const response = NextResponse.json({ snapshots, derived, publication: {
       currentMilestone: (read.payload.data.snapshots || []).find((item) => item.is_current_official)?.milestone || null,
       historyCount: read.payload.data.history_count, stale: false,
     } }, { headers: { "Cache-Control": "private, no-store", Vary: "Cookie" } });
     response.headers.set("X-Published-Odds-Read-Source", "supabase");
     response.headers.set("X-Published-Odds-Google-Requests", "0");
+    response.headers.set("X-Intelligence-Google-Requests", "0");
+    response.headers.set("X-Tournament-Intelligence-Read-Source", intelligenceSources.tournamentIntelligence.resolved);
+    response.headers.set("X-Projection-Editorial-Read-Source", intelligenceSources.projectionEditorial.resolved);
+    response.headers.set("X-Final-Recap-Read-Source", intelligenceSources.finalRecap.resolved);
     response.headers.set("X-Published-Odds-Fingerprint", (read.payload.data.snapshots || []).find((item) => item.is_current_official)?.payload_hash || "");
     response.headers.set("Server-Timing", `postgres;dur=${Number(read.payload.data.query_ms || 0).toFixed(1)}, supabase;dur=${Number(read.durationMs || 0).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;

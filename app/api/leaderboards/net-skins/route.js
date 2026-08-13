@@ -5,6 +5,7 @@ import { requireNetSkinsReadSource } from "../../../../lib/net-skins-read-source
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
+import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,9 @@ export async function GET(request) {
       try {
         await recalculateCompetitionDerivedTournament(identity.tournamentId, {
           calculatedBy: `Net Skins dependency worker · ${identity.playerId}`,
+        });
+        await recalculateIntelligenceDerivedTournament(identity.tournamentId, {
+          calculatedBy: `Net Skins intelligence worker · ${identity.playerId}`,
         });
       } catch (error) {
         console.error("Storyline recalculation after Net Skins remains pending", { code: error?.code || "STORYLINES_RECALCULATION_FAILED" });
