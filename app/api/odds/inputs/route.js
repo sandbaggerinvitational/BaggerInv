@@ -11,6 +11,20 @@ import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
+// Preview deployment health only. This intentionally returns no configuration
+// or tournament payload; it exists so a failed PostgREST schema exposure can be
+// distinguished from Director authentication and Google projection failures.
+export async function GET() {
+  if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
+  try {
+    const result = await loadSupabaseOddsInputs("2026");
+    return NextResponse.json({ ok: true, source: "supabase", queryMs: result.diagnostics?.queryMs, serviceMs: result.diagnostics?.serviceMs });
+  } catch (error) {
+    return NextResponse.json({ ok: false, status: error?.status || 503, code: error?.code || error?.shadowDiagnostics?.code || "ODDS_INPUT_HEALTH_FAILED",
+      diagnostics: error?.shadowDiagnostics || null }, { status: 503 });
+  }
+}
+
 async function directorFor(request) {
   const result = await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
   return result?.status === "active" ? result : null;
