@@ -55,6 +55,8 @@ export default function GameCenterReadinessClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run("published-odds-parity", { samples: 25 })}>Verify Published Odds Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-competition-derived-state", { samples: 25 })}>Refresh Momentum + Storylines</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("competition-derived-parity", { samples: 25 })}>Verify Momentum + Storylines Parity</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-intelligence-derived-state")}>Refresh Tournament Intelligence</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("intelligence-derived-readiness")}>Verify Tournament Intelligence</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("match-authorization-parity")}>Verify Match Authorization Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={inspectShadow}>Inspect Auth Shadow</button>
     </div>
