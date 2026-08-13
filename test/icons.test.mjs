@@ -61,7 +61,7 @@ test("manifest references production app icons", () => {
   const appManifest = manifest();
 
   assert.equal(appManifest.id, "/");
-  assert.equal(appManifest.start_url, "/");
+  assert.equal(appManifest.start_url, "/home");
   assert.equal(appManifest.scope, "/");
   assert.equal(appManifest.name, "The Bagger");
   assert.equal(appManifest.short_name, "The Bagger");

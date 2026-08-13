@@ -77,7 +77,7 @@ test("participant routes use HTTP-only cookies and server-side current-match aut
 test("PWA manifest is standalone and uses safe local navigation scope", () => {
   const value = manifest();
   assert.equal(value.display, "standalone");
-  assert.equal(value.start_url, "/");
+  assert.equal(value.start_url, "/home");
   assert.equal(value.scope, "/");
   assert.ok(value.icons.some((icon) => icon.sizes === "192x192"));
   assert.ok(value.icons.some((icon) => icon.sizes === "512x512"));

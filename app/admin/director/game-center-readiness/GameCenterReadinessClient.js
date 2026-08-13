@@ -41,6 +41,7 @@ export default function GameCenterReadinessClient() {
     <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-game-center-presentations")}>Refresh Game Center Presentation</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("game-center-parity")}>Verify Game Center Parity</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("scoring-read-parity", { samples: 3 })}>Verify Scoring Read Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("my-match-parity")}>Verify My Match Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-home-presentation")}>Refresh Home Presentation</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("home-parity")}>Verify Home Parity</button>

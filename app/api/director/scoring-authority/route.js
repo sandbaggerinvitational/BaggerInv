@@ -38,6 +38,10 @@ import {
   readMyMatchView,
 } from "../../../../lib/my-match-supabase.js";
 import {
+  scoringMatchDataFromSupabaseView,
+  scoringReadParityProjection,
+} from "../../../../lib/scoring-read-supabase.js";
+import {
   buildParticipantHomePresentationImport,
   compareParticipantHomeParity,
   participantHomeDataFromSupabaseView,
@@ -162,6 +166,101 @@ async function gameCenterParity(source, presentation) {
     postgresQuery: benchmarkSummary(postgresQueryMs),
     supabaseRequest: benchmarkSummary(supabaseRequestMs),
     zeroGoogleRequestsPerGameCenterRead: true,
+  };
+}
+
+function expectedScoringReadData(view = {}) {
+  const data = scoringMatchDataFromSupabaseView(view, {
+    authorizationVerified: true,
+    writable: clean(view.match?.status).toUpperCase() !== "FINAL" && view.match?.scoring_locked !== true,
+  });
+  return scoringReadParityProjection(data);
+}
+
+function scoringReadDivergence(expected = {}, actual = {}) {
+  const fields = [];
+  const walk = (left, right, path = "") => {
+    if (fields.length >= 100) return;
+    if (JSON.stringify(left) === JSON.stringify(right)) return;
+    if (Array.isArray(left) || Array.isArray(right)) {
+      const leftArray = Array.isArray(left) ? left : [];
+      const rightArray = Array.isArray(right) ? right : [];
+      const size = Math.max(leftArray.length, rightArray.length);
+      for (let index = 0; index < size; index += 1) walk(leftArray[index], rightArray[index], `${path}[${index}]`);
+      return;
+    }
+    if (left && right && typeof left === "object" && typeof right === "object") {
+      for (const key of new Set([...Object.keys(left), ...Object.keys(right)])) {
+        walk(left[key], right[key], path ? `${path}.${key}` : key);
+      }
+      return;
+    }
+    fields.push({ field: path, expected: left ?? null, actual: right ?? null });
+  };
+  walk(expected, actual);
+  return fields;
+}
+
+async function scoringReadParity(source, presentation, samples = 3) {
+  const divergences = [];
+  const coverage = { BB: 0, SC: 0, SI: 0, FINAL: 0, LIVE: 0, UPCOMING: 0, ZERO_HOLE: 0, PARTIAL: 0 };
+  const postgresQueryMs = [];
+  const supabaseRequestMs = [];
+  const adapterMs = [];
+  const totalMs = [];
+  const sampleCount = Math.max(1, Math.min(10, number(samples, 3)));
+  for (const match of source.imported.payload.matches) {
+    const expectedView = expectedGameCenterView(source.imported, presentation, match.match_id);
+    const readSamples = [];
+    for (let index = 0; index < sampleCount; index += 1) {
+      const startedAt = performance.now();
+      const read = await readGameCenterView(match.match_id);
+      if (!read.payload?.ok) {
+        divergences.push({ matchId: match.match_id, code: read.payload?.code || "READ_FAILED" });
+        break;
+      }
+      const adapterStartedAt = performance.now();
+      const actual = expectedScoringReadData(read.payload.data);
+      const currentAdapterMs = performance.now() - adapterStartedAt;
+      readSamples.push({ read, actual, adapterMs: currentAdapterMs, totalMs: performance.now() - startedAt });
+    }
+    if (!readSamples.length) continue;
+    const expected = expectedScoringReadData(expectedView);
+    const fields = scoringReadDivergence(expected, readSamples[0].actual);
+    if (fields.length) divergences.push({ matchId: match.match_id, fields });
+    for (const sample of readSamples) {
+      postgresQueryMs.push(number(sample.read.payload.data.query_ms));
+      supabaseRequestMs.push(number(sample.read.durationMs));
+      adapterMs.push(number(sample.adapterMs));
+      totalMs.push(number(sample.totalMs));
+    }
+    const format = upper(match.format);
+    const status = upper(match.status);
+    coverage[format] = number(coverage[format]) + 1;
+    coverage[status] = number(coverage[status]) + 1;
+    const scoredHoles = number(match.scored_holes);
+    if (scoredHoles === 0) coverage.ZERO_HOLE += 1;
+    else if (scoredHoles < 18) coverage.PARTIAL += 1;
+  }
+  const matchIds = source.imported.payload.matches.map((match) => match.match_id);
+  return {
+    matchesCompared: matchIds.length,
+    coverage,
+    requiredEvidence: {
+      correctedBestBall2026R16: matchIds.includes("2026-R1-6") && !divergences.some((item) => item.matchId === "2026-R1-6"),
+      finalizedSingles2026R34: matchIds.includes("2026-R3-4") && !divergences.some((item) => item.matchId === "2026-R3-4"),
+    },
+    divergences,
+    pass: matchIds.length === 24 && divergences.length === 0 && coverage.BB === 6 && coverage.SC === 6 && coverage.SI === 12,
+    samplesPerMatch: sampleCount,
+    performance: {
+      postgresQuery: benchmarkSummary(postgresQueryMs),
+      supabaseService: benchmarkSummary(supabaseRequestMs),
+      adapter: benchmarkSummary(adapterMs),
+      fullScoringRead: benchmarkSummary(totalMs),
+    },
+    participantGoogleRequestsPerRead: 0,
+    googleFallback: false,
   };
 }
 
@@ -1495,6 +1594,10 @@ export async function POST(request) {
       const source = await authoritativeImport(actorId);
       const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
       result = await gameCenterParity(source, presentation);
+    } else if (action === "scoring-read-parity") {
+      const source = await authoritativeImport(actorId);
+      const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });
+      result = await scoringReadParity(source, presentation, input.samples);
     } else if (action === "my-match-parity") {
       const source = await authoritativeImport(actorId);
       const presentation = buildGameCenterPresentationImport({ sheets: source.sheets, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID, requestedBy: actorId });

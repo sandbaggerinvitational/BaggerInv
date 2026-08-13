@@ -329,7 +329,7 @@ test("participant scoring routes preserve the API and delegate persistence serve
     assert.match(source, /persistParticipantScore/);
     assert.match(source, /measured\.authority === "supabase"/);
     assert.match(source, /drainGoogleOutbox/);
-    assert.match(source, /NextResponse\.json\(\{ result: participantResult \}\)/);
+    assert.match(source, /NextResponse\.json\(\{\s*result: participantResult/);
   }
 });
 

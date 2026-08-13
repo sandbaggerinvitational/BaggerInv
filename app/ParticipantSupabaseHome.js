@@ -61,7 +61,9 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
       const result = await response.json().catch(() => ({}));
       if (sequence !== requestSequence.current) return;
       if (response.status === 401) {
-        clearParticipantHomeCache(); setPayload(null); setState("signed-out"); return;
+        clearParticipantHomeCache(); setPayload(null); setState("signed-out");
+        router.replace("/participant-auth?next=/home");
+        return;
       }
       if (!response.ok) throw new Error(result.code || "HOME_READ_UNAVAILABLE");
       const next = result.data;

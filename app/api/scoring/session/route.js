@@ -11,7 +11,14 @@ export async function GET(request) {
   try {
     const session = verifyScoringSession(scoringTokenFromRequest(request));
     await validateAuthoritativeParticipantSession(request, session, { cookieStore: await cookies() });
-    return NextResponse.json({ scope: session.scope, scorerName: session.scorerName, authorized: true });
+    return NextResponse.json({
+      scope: session.scope,
+      scorerName: session.scorerName,
+      matchId: session.matchId,
+      tournamentId: session.tournamentId,
+      readOnly: session.readOnly === true,
+      authorized: true,
+    });
   } catch {
     return NextResponse.json({ authorized: false }, { status: 401 });
   }

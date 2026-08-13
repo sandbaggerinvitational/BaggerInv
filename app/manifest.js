@@ -8,7 +8,7 @@ export default function manifest() {
     lang: "en-US",
     dir: "ltr",
     description: DEFAULT_DESCRIPTION,
-    start_url: "/",
+    start_url: "/home",
     scope: "/",
     display: "standalone",
     display_override: ["standalone", "minimal-ui"],

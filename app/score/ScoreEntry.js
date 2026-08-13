@@ -10,6 +10,7 @@ import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-sco
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
 import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, sameGrossScores, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import { createIndexedDbScoringDiagnosticsStore } from "../../lib/scoring-client-diagnostics.js";
+import { applyParticipantFinalizationResult } from "../../lib/scoring-finalization-state.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -109,12 +110,28 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const [restoreAttempt, setRestoreAttempt] = useState(0);
   const saveInFlight = useRef(false);
   const syncQueue = useRef(null);
+  const scoringStore = useRef(null);
   const [syncEntries, setSyncEntries] = useState([]);
   const [syncReady, setSyncReady] = useState(!localFirstEnabled);
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine !== false);
   const [scoringDiagnosticsEnabled] = useState(() => scoringDiagnosticsOptIn(localFirstEnabled));
   const [scoringTimingSamples, setScoringTimingSamples] = useState([]);
   const scoringDiagnosticsStore = useRef(null);
+
+  const durableScoringStore = () => {
+    if (!scoringStore.current) scoringStore.current = createIndexedDbScoringStore();
+    return scoringStore.current;
+  };
+
+  const restoreLocalEntries = async (matchId) => {
+    if (!localFirstEnabled || !matchId) return [];
+    setSyncReady(false);
+    const entries = (await durableScoringStore().list())
+      .filter((entry) => entry.matchId === String(matchId) && entry.status !== "confirmed")
+      .sort((left, right) => Number(left.sequence || 0) - Number(right.sequence || 0));
+    setSyncEntries(entries);
+    return entries;
+  };
 
   const uploadScoringTiming = async (sample) => {
     const response = await fetch("/api/scoring/diagnostics", {
@@ -229,6 +246,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
           const payload = await session.json();
           setName(payload.scorerName || "");
           setAuthorized(true);
+          await restoreLocalEntries(payload.matchId).catch(() => {});
           await loadMatch();
           return;
         }
@@ -290,6 +308,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       }
       setName(passportPlayer?.name || "");
       setAuthorized(true);
+      await restoreLocalEntries(passportMatch.matchId).catch(() => {});
       await loadMatch();
       setStatus("");
     } catch (error) {
@@ -337,7 +356,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     if (!localFirstEnabled || !authorized || !data?.match?.["Match ID"] || syncQueue.current) return;
     setSyncReady(false);
     const queue = createScoringSyncQueue({
-      store: createIndexedDbScoringStore(),
+      store: durableScoringStore(),
       send: async (entry) => {
         const authorityStartedAt = typeof performance === "undefined" ? Date.now() : performance.now();
         const response = await fetch("/api/scoring/current", {
@@ -719,11 +738,23 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         const authoritative = await loadMatch();
         if (!authoritative?.canConfirm) throw new Error("All 18 holes must be confirmed before final submission.");
       }
-      await request("/api/scoring/current", {
+      const finalized = await request("/api/scoring/current", {
         method: "POST",
-        body: JSON.stringify({ action: "confirm" }),
+        body: JSON.stringify({
+          action: "confirm",
+          expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
+          clientMutationId: `finalize:${match["Match ID"]}:${Number(match.Revision || match.matchRevision || 0)}`,
+        }),
       });
-      await loadMatch();
+      if (finalized.authoritativeData?.match?.["Match Status"] === "Final") {
+        setData(finalized.authoritativeData);
+        const scored = finalized.authoritativeData.holeScores?.map((item) => Number(item["Hole Number"])) || [];
+        selectHole(Math.max(1, ...scored), finalized.authoritativeData);
+        setShowReview(true);
+        setConfirming(false);
+      } else {
+        setData((current) => applyParticipantFinalizationResult(current, finalized.result));
+      }
       setShowReview(true);
       setStatus("Scorecard finalized.");
     } catch (error) { setStatus(error.message); }

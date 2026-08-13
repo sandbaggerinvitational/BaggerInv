@@ -27,6 +27,7 @@ export async function GET(request) {
           name: resolved.displayName,
           teamName: resolved.context.team?.name || "",
         },
+        tournament: resolved.context.tournament,
         impersonation: resolved.previewMode ? { active: true, player: {
           id: resolved.playerId, name: resolved.displayName,
         }, director: resolved.impersonation?.director || null, expiresAt: resolved.impersonation?.expiresAt || null } : null,

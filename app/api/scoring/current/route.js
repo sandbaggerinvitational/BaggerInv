@@ -1,7 +1,6 @@
 import { after, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { scoringTokenFromRequest, verifyScoringSession } from "../../../../lib/scoring-access.js";
-import { readLiveScoringMatch } from "../../../../lib/google-sheets-write.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../lib/live-score-values.js";
 import { logScoringFailure, participantScoringError } from "../../../../lib/scoring-api-errors.js";
@@ -9,10 +8,9 @@ import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldS
 import { scoringShadowEnvironment } from "../../../../lib/scoring-shadow-gate.js";
 import { persistParticipantScore } from "../../../../lib/scoring-persistence-adapter.js";
 import { drainGoogleOutbox } from "../../../../lib/scoring-google-outbox.js";
-import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.js";
-import { readPreviewScoringParticipantContext } from "../../../../lib/scoring-authority-supabase.js";
-import { mergeParticipantScoringAuthorityState } from "../../../../lib/scoring-participant-authority-state.js";
 import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
+import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../../../lib/scoring-read-service.js";
+import { readScoringMatchView } from "../../../../lib/scoring-read-supabase.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../../lib/calcutta-supabase.js";
@@ -31,30 +29,23 @@ export async function GET(request) {
     const requireWritable = new URL(request.url).searchParams.get("syncRebase") === "1";
     const authorization = await validateAuthoritativeParticipantSession(request, current,
       { requireWritable, cookieStore: await cookies() });
-    const googleData = await readLiveScoringMatch(current.matchId);
-    const authority = scoringAuthorityEnvironment();
-    if (authority.resolved !== "supabase") return NextResponse.json({ data: googleData });
-    const canonical = authorization.canonical ? { payload: { ok: true, data: authorization.canonical } }
-      : await readPreviewScoringParticipantContext({
-      tournament_id: String(current.tournamentId || current.year || "2026"),
-      match_id: current.matchId,
-      player_id: String(current.playerId || `match-access:${current.matchId}`),
-      permission_revision: Number(current.accessVersion || 1),
-      passport_verified: true,
-      role: current.playerId ? "PLAYER" : "MATCH_ACCESS",
-      });
-    if (!canonical.payload?.ok || !canonical.payload?.data?.match) {
-      if (requireWritable) return NextResponse.json({ error: "Authoritative scoring state is temporarily unavailable." }, { status: 503 });
-      return NextResponse.json({ data: googleData });
-    }
-    return NextResponse.json({
-      data: mergeParticipantScoringAuthorityState(googleData, canonical.payload.data, {
-        authorizationVerified: canonical.payload.data.authorization?.verified === true,
-      }),
+    const scoring = await readParticipantScoringMatch({
+      matchId: current.matchId,
+      currentPlayerId: current.playerId,
+      authorization: {
+        verified: current.scope === "admin" || authorization.canonical?.authorization?.verified === true ||
+          authorization.authorization?.allowed === true,
+        writable: authorization.writable === true,
+      },
+      canonicalData: authorization.canonical,
     });
+    return NextResponse.json({
+      data: { ...scoring.data, readDiagnostics: scoring.diagnostics },
+    }, { headers: scoringReadResponseHeaders(scoring.diagnostics) });
   } catch (error) {
     const status = Number(error?.status) || (/temporarily unavailable/i.test(error?.message || "") ? 503 : 403);
-    return NextResponse.json({ error: error?.message || "Unable to load scoring." }, { status });
+    return NextResponse.json({ error: error?.message || "Unable to load scoring.", code: error?.code || "" },
+      { status, headers: { "Cache-Control": "no-store" } });
   }
 }
 
@@ -75,6 +66,23 @@ export async function POST(request) {
     const googleDiagnostics = measured.diagnostics;
     const googleAuthoritativeMs = measured.authority === "google" ? Date.now() - persistenceStartedAt : 0;
     const { _shadow, ...participantResult } = result;
+    let authoritativeFinal = null;
+    if (measured.authority === "supabase" && input.action === "confirm") {
+      try {
+        authoritativeFinal = await readScoringMatchView(current.matchId, {
+          currentPlayerId: current.playerId,
+          authorizationVerified: true,
+          writable: false,
+        });
+      } catch (error) {
+        // The Finalization transaction already committed. A follow-up read can
+        // recover on the next scorecard open and must not reverse success.
+        console.error("Supabase Finalization confirmation read remains pending", {
+          matchId: current.matchId,
+          code: error?.code || "SCORING_FINAL_READ_UNAVAILABLE",
+        });
+      }
+    }
     const gate = scoringShadowEnvironment();
     if (measured.authority === "google" && shouldScheduleScoringShadowObservation({ gate, participantResult, shadow: _shadow })) {
         const observation = buildScoringShadowObservation({
@@ -137,7 +145,12 @@ export async function POST(request) {
         });
       });
     }
-    return NextResponse.json({ result: participantResult });
+    return NextResponse.json({
+      result: participantResult,
+      ...(authoritativeFinal ? {
+        authoritativeData: { ...authoritativeFinal.data, readDiagnostics: authoritativeFinal.diagnostics },
+      } : {}),
+    }, { headers: authoritativeFinal ? scoringReadResponseHeaders(authoritativeFinal.diagnostics) : { "Cache-Control": "no-store" } });
   } catch (error) {
     const conflict = Number(error?.status) === 409 || /updated by someone else/i.test(error?.message || "");
     const diagnostics = error?.authoritativeDiagnostics || {};

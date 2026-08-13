@@ -1,9 +1,6 @@
 import { after, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { canScoreMatch, scoringTokenFromRequest, verifyScoringSession } from "../../../../../lib/scoring-access.js";
-import {
-  readLiveScoringMatch,
-} from "../../../../../lib/google-sheets-write.js";
 import { clientAddress, consumeRateLimit } from "../../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../../lib/live-score-values.js";
 import { logScoringFailure, participantScoringError } from "../../../../../lib/scoring-api-errors.js";
@@ -16,6 +13,7 @@ import { recalculateCompetitionDerivedTournament } from "../../../../../lib/comp
 import { recalculateIntelligenceDerivedTournament } from "../../../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../../../lib/calcutta-supabase.js";
 import { drainScorecardArchiveJobs } from "../../../../../lib/scorecard-archive-worker.js";
+import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../../../../lib/scoring-read-service.js";
 
 export const dynamic = "force-dynamic";
 
@@ -28,10 +26,22 @@ export async function GET(request, { params }) {
     const current = session(request);
     const { matchId } = await params;
     if (!canScoreMatch(current, matchId)) throw new Error("This code cannot access that match.");
-    await validateAuthoritativeParticipantSession(request, current, { cookieStore: await cookies() });
-    return NextResponse.json({ data: await readLiveScoringMatch(matchId) });
+    const authorization = await validateAuthoritativeParticipantSession(request, current, { cookieStore: await cookies() });
+    const scoring = await readParticipantScoringMatch({
+      matchId,
+      currentPlayerId: current.playerId,
+      authorization: {
+        verified: current.scope === "admin" || authorization.canonical?.authorization?.verified === true ||
+          authorization.authorization?.allowed === true,
+        writable: authorization.writable === true,
+      },
+      canonicalData: authorization.canonical,
+    });
+    return NextResponse.json({ data: { ...scoring.data, readDiagnostics: scoring.diagnostics } },
+      { headers: scoringReadResponseHeaders(scoring.diagnostics) });
   } catch (error) {
-    return NextResponse.json({ error: error?.message || "Unable to load scoring." }, { status: 403 });
+    return NextResponse.json({ error: error?.message || "Unable to load scoring.", code: error?.code || "" },
+      { status: Number(error?.status) || 403, headers: { "Cache-Control": "no-store" } });
   }
 }
 

@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./participant-auth.module.css";
 import { clearParticipantAuthClientState, enableParticipantAuthDiagnostics, flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../../lib/participant-auth-client-diagnostics.js";
 
 export default function ParticipantAuthRehearsal() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [requestId, setRequestId] = useState("");
@@ -49,7 +52,10 @@ export default function ParticipantAuthRehearsal() {
       recordParticipantAuthDiagnostic("OTP_VERIFICATION", { durationMs: duration, routeTo: location.pathname });
       setSession({ session: "active", linkedPlayerId: payload.linkedPlayerId, otpVerificationMs: duration });
       flushParticipantAuthDiagnostics().catch(() => null);
-      setMessage("Preview Auth session established. Player Passport remains authoritative.");
+      setMessage("Participant session established.");
+      const requestedNext = String(searchParams.get("next") || "");
+      const next = /^\/(?:home|my-match|score|live|me)(?:[/?#]|$)/.test(requestedNext) ? requestedNext : "";
+      if (next) router.replace(next);
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
@@ -61,9 +67,9 @@ export default function ParticipantAuthRehearsal() {
   };
   return <main className={styles.page}>
     <section className={styles.card}>
-      <span className={styles.eyebrow}>Preview only · Shadow identity rehearsal</span>
+      <span className={styles.eyebrow}>Preview only · Secure participant access</span>
       <h1>Participant sign-in</h1>
-      <p>Use the one Director-approved rehearsal email. This session is compared with Player Passport but does not authorize scoring or navigation.</p>
+      <p>Use your approved tournament email to request a secure sign-in code. Scoring authorization remains match-specific and server enforced.</p>
       {session?.session === "active" ? <div className={styles.session}><strong>Supabase session active</strong><span>Linked Player ID: {session.linkedPlayerId}</span><button onClick={logout} disabled={Boolean(busy)}>Log out of Preview Auth</button></div>
         : <>
           <form onSubmit={requestCode}><label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required /></label>
@@ -72,7 +78,7 @@ export default function ParticipantAuthRehearsal() {
             <button disabled={Boolean(busy) || token.length !== 6}>{busy === "verify" ? "Verifying…" : "Verify code"}</button></form> : null}
         </>}
       {message ? <p className={styles.message} role="status">{message}</p> : null}
-      <small>Identity authority: Player Passport · Scoring authority remains server-controlled</small>
+      <small>Identity authority: Supabase · Scoring authority: Supabase server transaction</small>
     </section>
   </main>;
 }

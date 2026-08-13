@@ -52,12 +52,13 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
     };
     const active = window.__sbiTournamentIdentity;
     if (active) applyTournament(active);
-    else fetch("/api/live", { cache: "no-store" })
-      .then(async (response) => response.ok ? (await response.json()).data?.tournament : null)
-      .then(applyTournament).catch(() => {});
     fetch("/api/player-passport/session", { cache: "no-store" })
-      .then(async (response) => response.ok ? (await response.json()).player : null)
-      .then((player) => setDirector(player?.role === "DIRECTOR"))
+      .then(async (response) => response.ok ? await response.json() : null)
+      .then((payload) => {
+        const player = payload?.player;
+        setDirector(player?.role === "DIRECTOR");
+        if (!active) applyTournament(payload?.tournament);
+      })
       .catch(() => {});
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isOpen]);
