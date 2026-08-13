@@ -70,3 +70,14 @@ test("migration is service-only and Final Recap is gated", async () => {
   assert.match(sql, /revoke all on function public\.write_intelligence_derived_bundle\(jsonb\) from public, anon, authenticated/);
   assert.match(sql, /grant execute on function public\.write_intelligence_derived_bundle\(jsonb\) to service_role/);
 });
+
+test("newest-source migration claims work and rejects superseded workers", async () => {
+  const sql = await readFile(new URL("../supabase/migrations/202608120043_intelligence_newest_source_wins.sql", import.meta.url), "utf8");
+  assert.match(sql, /claim_intelligence_derived_bundle/);
+  assert.match(sql, /claim_started_at/);
+  assert.match(sql, /intelligence_claim_is_current/);
+  assert.match(sql, /STALE_INTELLIGENCE_WORKER/);
+  assert.match(sql, /status='RUNNING' and started_at=target_claim/);
+  assert.match(sql, /grant execute on function public\.claim_intelligence_derived_bundle\(jsonb\) to service_role/);
+  assert.match(sql, /revoke all on function public\.claim_intelligence_derived_bundle\(jsonb\) from public,anon,authenticated/);
+});
