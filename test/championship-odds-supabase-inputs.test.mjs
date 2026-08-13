@@ -45,6 +45,7 @@ test("native publication carries reproducibility metadata without changing engin
   const snapshot = simulateTournamentOdds({ ...inputs, phase: "Round 3 Pairings Announced", iterations: 10_000 });
   const publication = buildSupabaseOddsPublication({ snapshot, tournamentId: "2026", actorId: "DIRECTOR", metadata: inputs.metadata });
   assert.equal(publication.deterministic_seed, "2026|Round 3 Pairings Announced|odds-v2-nassau");
+  assert.deepEqual(publication.source_revision, core.source_revision);
   assert.equal(publication.simulation_metadata.iterations, 10_000);
   assert.deepEqual(publication.published_payload, snapshot);
 });
