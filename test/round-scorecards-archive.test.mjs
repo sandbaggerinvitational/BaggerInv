@@ -12,7 +12,7 @@ import {
   roundScorecardsArchiveEnvironment,
   verifyRoundScorecardsArchiveReadback,
 } from "../lib/round-scorecards-archive.js";
-import { processNextScorecardArchiveJob, reconcileRoundScorecardsArchives } from "../lib/scorecard-archive-worker.js";
+import { processNextScorecardArchiveJob, reconcileRoundScorecardsArchives, scorecardArchiveFailureCode } from "../lib/scorecard-archive-worker.js";
 
 const previewEnv = {
   VERCEL_ENV: "preview",
@@ -158,6 +158,13 @@ test("archive feature flag is Preview/Supabase-only and Production-hard-blocked"
   assert.equal(production.enabled, false);
   assert.equal(production.productionBlocked, true);
   assert.equal(roundScorecardsArchiveEnvironment({ ...previewEnv, ROUND_SCORECARDS_ARCHIVE_ENABLED: "false" }).enabled, false);
+});
+
+test("archive writer failures expose only fixed diagnostic classifications", () => {
+  assert.equal(scorecardArchiveFailureCode(new Error("Google Sheets write credentials are not configured.")), "GOOGLE_SHEETS_CREDENTIALS_MISSING");
+  assert.equal(scorecardArchiveFailureCode(new Error("Google Sheets request failed (403): private provider detail")), "GOOGLE_SHEETS_HTTP_403");
+  assert.equal(scorecardArchiveFailureCode(new Error("Round Scorecards columns are not in the canonical protected order.")), "ROUND_SCORECARDS_SCHEMA_MISMATCH");
+  assert.equal(scorecardArchiveFailureCode(new Error("unexpected internal detail")), "ARCHIVE_DELIVERY_FAILED");
 });
 
 function claimedJob(eventType = "SCORECARD_ARCHIVE_UPSERT") {
