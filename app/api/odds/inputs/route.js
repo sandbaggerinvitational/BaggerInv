@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildOddsInputProjection, compareOddsDeterministicParity, importOddsInputProjection, loadSupabaseOddsInputs } from "../../../../lib/championship-odds-supabase.js";
-import { loadPredictionSheets } from "../../../../lib/prediction-data.js";
-import { refreshHistoricalData, getAllPlayerStats } from "../../../../lib/stats.js";
-import { currentTournamentYear } from "../../../../lib/tournament-context.js";
+import { getAllPlayerStats } from "../../../../lib/stats.js";
+import { readWorkbookSheetsByName } from "../../../../lib/google-sheets-write.js";
 import { simulateTournamentOdds } from "../../../../lib/tournament-odds.js";
 import { readPublishedOddsView, publishedOddsSnapshotsFromView } from "../../../../lib/published-odds-supabase.js";
 import { playerPassportTokenFromRequest } from "../../../../lib/player-passport.js";
@@ -38,12 +37,16 @@ export async function POST(request) {
     const { action = "verify-current", phase = "Round 3 Pairings Announced", iterations = 10_000 } = await request.json();
     const actorId = director.identity?.player?.id || "Director";
     if (action === "refresh") {
-      const sheets = await loadPredictionSheets();
-      const year = currentTournamentYear(sheets);
-      await refreshHistoricalData();
+      const scope = await readPublishedOddsView({ sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
+      if (!scope.payload?.ok) throw Object.assign(new Error("Published Odds tournament scope is unavailable."), { code: scope.payload?.code });
+      const tournament = scope.payload.data.tournament;
+      const predictionSettings = await readWorkbookSheetsByName(["Prediction Settings"]);
+      const settings = (predictionSettings["Prediction Settings"]?.records || []).map(({ record }) => record);
+      if (!settings.length) throw Object.assign(new Error("Prediction Settings are unavailable."), { code: "PREDICTION_SETTINGS_REQUIRED" });
+      const year = Number(tournament.tournament_year);
       const historical = Object.fromEntries(getAllPlayerStats().map(({ player, stats }) => [player["Player ID"], { sandbaggerRatings: stats.sandbaggerRatings || {} }]));
-      const input = buildOddsInputProjection({ tournamentId: String(year), tournamentYear: year, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
-        settings: sheets.settings || [], historical, requestedBy: actorId });
+      const input = buildOddsInputProjection({ tournamentId: tournament.tournament_id, tournamentYear: year, sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
+        settings, historical, requestedBy: actorId });
       const imported = await importOddsInputProjection(input);
       if (!imported.payload?.ok) throw Object.assign(new Error("Odds input projection failed."), { code: imported.payload?.code });
       return NextResponse.json({ ok: true, action, projection: imported.payload, fingerprints: {
