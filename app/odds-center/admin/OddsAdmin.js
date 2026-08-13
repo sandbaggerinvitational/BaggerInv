@@ -46,6 +46,24 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
   const selectablePhases = ODDS_PHASES.filter((item) => item === initialPhase || regenerationPhases.includes(item));
   const regeneration = regenerationPhases.includes(phase);
 
+  async function refreshSupabaseInputs() {
+    setBusy(true); setStatus("Versioning Championship Odds inputs…"); setDiagnostics(null);
+    try {
+      const response = await directorFetch("/api/odds/inputs", { method: "POST", credentials: "same-origin",
+        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "refresh" }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Odds inputs could not be refreshed.");
+      const verificationResponse = await directorFetch("/api/odds/inputs", { method: "POST", credentials: "same-origin",
+        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "verify-current", phase: "Round 3 Pairings Announced", iterations: 10_000 }) });
+      const verification = await verificationResponse.json();
+      if (!verificationResponse.ok) throw new Error(verification.error || "Odds input parity could not be verified.");
+      setStatus(verification.parity?.pass
+        ? `${data.projection?.changed ? "Championship Odds inputs versioned" : "Championship Odds inputs unchanged"} · current milestone exact parity verified.`
+        : "Championship Odds inputs were versioned, but current milestone parity requires review.");
+    } catch (error) { setStatus(error.message); }
+    finally { setBusy(false); }
+  }
+
   async function publish() {
     setBusy(true); setPreview(null); setDiagnostics(null); setStatus(`Running ${iterations.toLocaleString()} tournament simulations…`);
     const endpoint = previewMode ? "/api/odds/publish-preview" : "/api/odds/publish";
@@ -82,5 +100,5 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
     } finally { setBusy(false); }
   }
 
-  return <section className={styles.admin}><p>Official Tournament Intelligence</p><h1>Championship Projections</h1>{regenerationPhases.length ? <div><strong>Preview Regeneration</strong><br /><span>Choose a published milestone to replace it using the current engine.</span></div> : null}<label>Official milestone{directorAuthorized && selectablePhases.length <= 1 ? <strong>{projectionPresentationLabel(phase)}</strong> : <select value={phase} onChange={(event) => setPhase(event.target.value)}>{(directorAuthorized ? selectablePhases : ODDS_PHASES).map((item) => <option value={item} key={item}>{projectionPresentationLabel(item)}{regenerationPhases.includes(item) ? " · Regenerate" : ""}</option>)}</select>}</label><label>Simulation count<select value={iterations} onChange={(event) => setIterations(Number(event.target.value))}>{COUNTS.map((count) => <option value={count} key={count}>{count.toLocaleString()}</option>)}</select></label>{!embedded ? <label>Publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label> : null}<button disabled={(!publicationReady && !regeneration) || (!secret && !directorAuthorized) || busy} onClick={publish}>{busy ? "Generating official projection…" : regeneration ? "Regenerate Official Projection" : "Generate & Publish Official Projection"}</button>{status ? <div>{status}</div> : null}<DiagnosticsPanel diagnostics={diagnostics} />{preview ? <div><span>Published Official Snapshot</span><strong>{projectionPresentationLabel(preview.phase)}</strong><br /><strong>{preview.teams?.[0]?.name}: {preview.teams?.[0]?.probability}%</strong><br /><strong>{preview.teams?.[1]?.name}: {preview.teams?.[1]?.probability}%</strong><br /><span>{preview.totalPointsAvailable} total tournament points modeled</span></div> : null}<small>The opening projection may be updated until a later official milestone is published. Every participant experience reads the same authoritative snapshot.</small></section>;
+  return <section className={styles.admin}><p>Official Tournament Intelligence</p><h1>Championship Projections</h1>{previewMode ? <button type="button" disabled={busy} onClick={refreshSupabaseInputs}>Verify Supabase Odds Inputs</button> : null}{regenerationPhases.length ? <div><strong>Preview Regeneration</strong><br /><span>Choose a published milestone to replace it using the current engine.</span></div> : null}<label>Official milestone{directorAuthorized && selectablePhases.length <= 1 ? <strong>{projectionPresentationLabel(phase)}</strong> : <select value={phase} onChange={(event) => setPhase(event.target.value)}>{(directorAuthorized ? selectablePhases : ODDS_PHASES).map((item) => <option value={item} key={item}>{projectionPresentationLabel(item)}{regenerationPhases.includes(item) ? " · Regenerate" : ""}</option>)}</select>}</label><label>Simulation count<select value={iterations} onChange={(event) => setIterations(Number(event.target.value))}>{COUNTS.map((count) => <option value={count} key={count}>{count.toLocaleString()}</option>)}</select></label>{!embedded ? <label>Publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label> : null}<button disabled={(!publicationReady && !regeneration) || (!secret && !directorAuthorized) || busy} onClick={publish}>{busy ? "Generating official projection…" : regeneration ? "Regenerate Official Projection" : "Generate & Publish Official Projection"}</button>{status ? <div>{status}</div> : null}<DiagnosticsPanel diagnostics={diagnostics} />{preview ? <div><span>Published Official Snapshot</span><strong>{projectionPresentationLabel(preview.phase)}</strong><br /><strong>{preview.teams?.[0]?.name}: {preview.teams?.[0]?.probability}%</strong><br /><strong>{preview.teams?.[1]?.name}: {preview.teams?.[1]?.probability}%</strong><br /><span>{preview.totalPointsAvailable} total tournament points modeled</span></div> : null}<small>The opening projection may be updated until a later official milestone is published. Every participant experience reads the same authoritative snapshot.</small></section>;
 }

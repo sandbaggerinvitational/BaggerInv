@@ -10,7 +10,10 @@ import { playerPassportTokenFromRequest } from "../../../../lib/player-passport"
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server";
 import { formatChampionshipOdds } from "../../../../lib/championship-odds-format";
 import { oddsPersistenceDiagnostics } from "../../../../lib/odds-workbook-persistence";
-import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, readPublishedOddsView, replacePublishedOddsSnapshots } from "../../../../lib/published-odds-supabase.js";
+import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, publishedOddsSnapshotsFromView, readPublishedOddsView, replacePublishedOddsSnapshots } from "../../../../lib/published-odds-supabase.js";
+import { buildSupabaseOddsPublication, completeSupabaseOddsGoogleMirror, loadSupabaseOddsInputs, publishSupabaseOddsSnapshot } from "../../../../lib/championship-odds-supabase.js";
+import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
+import { scoringShadowPayloadHash } from "../../../../lib/scoring-shadow.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -31,19 +34,26 @@ async function publishProjection(request) {
     const iterations = Number(requestedIterations);
     if (![10_000, 25_000, 50_000, 100_000].includes(iterations)) return NextResponse.json({ error: "Invalid simulation count." }, { status: 400 });
 
-    start("Workbook validation", { workbookOperation: "Validate projection worksheet discovery and required schemas", function: "loadPredictionDiagnostics" });
-    const workbook = await loadPredictionDiagnostics();
-    const invalidSheet = Object.values(workbook.sheets).find((sheet) => sheet.required && sheet.status === "error");
-    if (invalidSheet) {
-      const error = new Error(`${invalidSheet.label} could not be loaded.`);
-      error.worksheet = invalidSheet.label; error.workbookOperation = "Validate required projection worksheet"; error.functionName = "loadPredictionDiagnostics";
-      throw error;
+    const source = oddsCalculationEnvironment();
+    let inputs;
+    if (source.inputSource === "supabase") {
+      start("Input loading", { workbookOperation: "None", worksheet: "Supabase scoring authority + versioned Odds inputs", function: "loadSupabaseOddsInputs" });
+      inputs = await loadSupabaseOddsInputs(director?.identity?.tournamentId || "2026");
+      pass("Input loading", { worksheet: inputs.sheets.projectionMatchSource, function: "loadSupabaseOddsInputs", diagnostics: inputs.diagnostics, metadata: inputs.metadata });
+    } else {
+      start("Workbook validation", { workbookOperation: "Validate projection worksheet discovery and required schemas", function: "loadPredictionDiagnostics" });
+      const workbook = await loadPredictionDiagnostics();
+      const invalidSheet = Object.values(workbook.sheets).find((sheet) => sheet.required && sheet.status === "error");
+      if (invalidSheet) {
+        const error = new Error(`${invalidSheet.label} could not be loaded.`);
+        error.worksheet = invalidSheet.label; error.workbookOperation = "Validate required projection worksheet"; error.functionName = "loadPredictionDiagnostics";
+        throw error;
+      }
+      pass("Workbook validation", { worksheet: "Required projection worksheets", function: "loadPredictionDiagnostics" });
+      start("Input loading", { workbookOperation: "Load normalized projection inputs", worksheet: "Prediction workbook", function: "loadOddsInputs" });
+      inputs = await loadOddsInputs();
+      pass("Input loading", { worksheet: inputs.sheets.projectionMatchSource || "Matches", function: "loadOddsInputs" });
     }
-    pass("Workbook validation", { worksheet: "Required projection worksheets", function: "loadPredictionDiagnostics" });
-
-    start("Input loading", { workbookOperation: "Load normalized projection inputs", worksheet: "Prediction workbook", function: "loadOddsInputs" });
-    const inputs = await loadOddsInputs();
-    pass("Input loading", { worksheet: inputs.sheets.projectionMatchSource || "Matches", function: "loadOddsInputs" });
 
     start("Pairing validation", { workbookOperation: "Validate official Round 1 and Round 2 pairings", worksheet: inputs.sheets.projectionMatchSource || "Matches", function: "validateOpeningMatchups" });
     const matchupStatus = validateOpeningMatchups(inputs.sheets);
@@ -83,19 +93,46 @@ async function publishProjection(request) {
     start("Snapshot validation", { workbookOperation: "Validate snapshot identity, values, and publication lifecycle", worksheet: "Odds Snapshots", function: "validateProjectionSnapshot" });
     validateProjectionSnapshot(preview);
     const oddsPersistence = oddsPersistenceDiagnostics(preview, formatChampionshipOdds);
-    const existing = (await readOddsSnapshots()).filter((row) => row.year === preview.year);
+    const existing = source.inputSource === "supabase"
+      ? publishedOddsSnapshotsFromView((await readPublishedOddsView({ tournamentId: String(preview.year), sourceWorkbookId: process.env.GOOGLE_SHEETS_ID })).payload?.data || {})
+      : (await readOddsSnapshots()).filter((row) => row.year === preview.year);
     if (process.env.VERCEL_ENV !== "preview" && phase === "Pre-Tournament" && existing.some((row) => row.phase !== "Pre-Tournament")) throw new Error("Pre-Tournament is locked because the tournament has started.");
     pass("Snapshot validation", { worksheet: "Odds Snapshots", function: "validateProjectionSnapshot", existingSnapshots: existing.length, oddsPersistence });
 
-    start("Batch workbook write", { workbookOperation: "Atomic field-scoped replacement of projection runtime records", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
-    const snapshot = await publishOddsSnapshot(preview);
-    pass("Batch workbook write", { worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
+    let snapshot = preview;
+    let verification = null;
+    let nativePublication = null;
+    if (source.publicationAuthority === "supabase") {
+      start("Supabase publication", { workbookOperation: "None", worksheet: "odds_published_snapshots", function: "publishSupabaseOddsSnapshot" });
+      const publication = buildSupabaseOddsPublication({ snapshot: preview, tournamentId: inputs.sheets.tournaments?.[0]?.["Tournament ID"] || preview.year,
+        actorId: director?.identity?.player?.id || "Director publication", metadata: inputs.metadata });
+      nativePublication = await publishSupabaseOddsSnapshot(publication);
+      if (!nativePublication.payload?.ok) throw Object.assign(new Error("Supabase Odds publication failed."), { code: nativePublication.payload?.code });
+      pass("Supabase publication", { function: "publishSupabaseOddsSnapshot", publication: nativePublication.payload });
+      try {
+        start("Google reporting mirror", { workbookOperation: "Atomic reporting mirror", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
+        snapshot = await publishOddsSnapshot(preview);
+        verification = await verifyPublishedOddsSnapshot(snapshot);
+        await completeSupabaseOddsGoogleMirror({ environment: "PREVIEW", snapshot_id: nativePublication.payload?.snapshot_id,
+          status: "SUCCEEDED", google_publication_fingerprint: scoringShadowPayloadHash({ verification, snapshot }),
+          google_publication_reference: { sheets: PUBLISHED_ODDS_WORKBOOK_TABS, verification } });
+        pass("Google reporting mirror", { function: "verifyPublishedOddsSnapshot", verification });
+      } catch (mirrorError) {
+        await completeSupabaseOddsGoogleMirror({ environment: "PREVIEW", snapshot_id: nativePublication.payload?.snapshot_id,
+          status: "FAILED", error_safe: "Google reporting mirror is delayed." }).catch(() => null);
+        console.error("Championship Odds Google reporting mirror delayed", { code: mirrorError?.code || "ODDS_GOOGLE_MIRROR_FAILED", message: mirrorError?.message || String(mirrorError), snapshotId: nativePublication.payload?.snapshot_id });
+        pass("Google reporting mirror delayed", { function: "publishOddsSnapshot", snapshotId: nativePublication.payload?.snapshot_id, participantPublicationRetained: true });
+      }
+    } else {
+      start("Batch workbook write", { workbookOperation: "Atomic field-scoped replacement of projection runtime records", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
+      snapshot = await publishOddsSnapshot(preview);
+      pass("Batch workbook write", { worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
+      start("Workbook verification", { workbookOperation: "Read back and verify published projection rows", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot" });
+      verification = await verifyPublishedOddsSnapshot(snapshot);
+      pass("Workbook verification", { worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot", verification });
+    }
 
-    start("Workbook verification", { workbookOperation: "Read back and verify published projection rows", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot" });
-    const verification = await verifyPublishedOddsSnapshot(snapshot);
-    pass("Workbook verification", { worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot", verification });
-
-    if (process.env.VERCEL_ENV === "preview") {
+    if (process.env.VERCEL_ENV === "preview" && verification) {
       start("Supabase publication projection", { workbookOperation: "Project verified published values without recalculation", worksheet: PUBLISHED_ODDS_WORKBOOK_TABS.join(", "), function: "replacePublishedOddsSnapshots" });
       const scope = await readPublishedOddsView({ sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
       if (!scope.payload?.ok) throw Object.assign(new Error("Published Odds tournament scope is unavailable."), { code: scope.payload?.code });
@@ -122,7 +159,8 @@ async function publishProjection(request) {
     pass("PWA refresh", { function: "revalidatePath", paths: ["/live", "/home"] });
 
     trace.complete("Publication complete", { function: "POST /api/odds/publish" });
-    return NextResponse.json({ ok: true, snapshot, ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: trace.snapshot() } : {}) });
+    return NextResponse.json({ ok: true, snapshot, source: { inputs: source.inputSource, publication: source.publicationAuthority }, nativePublication: nativePublication?.payload || null,
+      ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: trace.snapshot() } : {}) });
   } catch (error) {
     trace.fail(error, {
       workbookOperation: error?.workbookOperation || diagnostic.workbookOperation,
