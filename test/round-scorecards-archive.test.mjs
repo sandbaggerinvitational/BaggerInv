@@ -268,6 +268,7 @@ test("migration provides snapshots, jobs, checkpoints, trigger, RLS, service-onl
   const fixture = await readFile(new URL("../supabase/migrations/202608130003_preview_round_scorecards_archive_fixture_test.sql", import.meta.url), "utf8");
   const fixtureYear = await readFile(new URL("../supabase/migrations/202608130004_preview_round_scorecards_archive_fixture_year.sql", import.meta.url), "utf8");
   const fixtureCleanup = await readFile(new URL("../supabase/migrations/202608130005_preview_round_scorecards_archive_fixture_cleanup.sql", import.meta.url), "utf8");
+  const protectedDrain = await readFile(new URL("../supabase/migrations/202608130006_preview_round_scorecards_archive_protected_drain.sql", import.meta.url), "utf8");
   for (const table of ["finalized_scorecard_snapshots", "scorecard_archive_jobs", "scorecard_archive_checkpoints"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -296,6 +297,11 @@ test("migration provides snapshots, jobs, checkpoints, trigger, RLS, service-onl
   assert.match(fixtureYear, /not exists \(select 1 from scoring_authority\.tournaments where tournament_year = candidate\)/i);
   assert.match(fixtureYear, /logical_google_writes', 0/);
   assert.match(fixtureCleanup, /delete from scoring_authority\.matches where tournament_id = fixture_tournament;\s+delete from scoring_authority\.tournaments where tournament_id = fixture_tournament;/i);
+  assert.match(protectedDrain, /x-vercel-protection-bypass/);
+  assert.match(protectedDrain, /PREVIEW_AUTOMATION_BYPASS_REQUIRED/);
+  assert.match(protectedDrain, /length\(bypass_value\) < 32/);
+  assert.match(protectedDrain, /timeout_milliseconds := 60000/);
+  assert.match(protectedDrain, /revoke all on function public\.configure_preview_scorecard_archive_worker\(jsonb\) from public, anon, authenticated/i);
 });
 
 test("cron endpoint requires the server-only Preview flag and worker secret", async () => {
