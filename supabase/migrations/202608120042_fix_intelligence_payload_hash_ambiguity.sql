@@ -1,5 +1,5 @@
--- Preview-only Tournament Intelligence, Projection Editorial, and gated Final Recap.
--- Reuses the shared competition derived tables and keeps all administration service-only.
+-- Replace the Preview intelligence writer after the initial deployment exposed
+-- a PL/pgSQL local-variable/table-column name collision before any write.
 
 create or replace function public.write_intelligence_derived_bundle(input jsonb)
 returns jsonb
@@ -40,16 +40,13 @@ begin
     if target_engine_key = 'TOURNAMENT_FINAL_RECAP' and coalesce((input#>>'{final_gate,eligible}')::boolean, false) is not true then
       return jsonb_build_object('ok', false, 'code', 'FINAL_RECAP_GATE_REQUIRED');
     end if;
-    select id into snapshot_id from scoring_authority.competition_derived_snapshots
-    where tournament_id = target_tournament and round_number = 0
-      and scoring_authority.competition_derived_snapshots.engine_key = target_engine_key
-      and scoring_authority.competition_derived_snapshots.engine_version = target_engine_version
-      and source_fingerprint = target_source
-      and scoring_authority.competition_derived_snapshots.payload_hash = target_payload_hash limit 1;
-    update scoring_authority.competition_derived_snapshots set is_current = false
-    where tournament_id = target_tournament and round_number = 0
-      and scoring_authority.competition_derived_snapshots.engine_key = target_engine_key and is_current
-      and id is distinct from snapshot_id;
+    select s.id into snapshot_id from scoring_authority.competition_derived_snapshots s
+    where s.tournament_id = target_tournament and s.round_number = 0
+      and s.engine_key = target_engine_key and s.engine_version = target_engine_version
+      and s.source_fingerprint = target_source and s.payload_hash = target_payload_hash limit 1;
+    update scoring_authority.competition_derived_snapshots s set is_current = false
+    where s.tournament_id = target_tournament and s.round_number = 0
+      and s.engine_key = target_engine_key and s.is_current and s.id is distinct from snapshot_id;
     if snapshot_id is null then
       insert into scoring_authority.competition_derived_snapshots (
         tournament_id, round_number, engine_key, engine_version, configuration_fingerprint,
@@ -87,5 +84,4 @@ $$;
 
 revoke all on function public.write_intelligence_derived_bundle(jsonb) from public, anon, authenticated;
 grant execute on function public.write_intelligence_derived_bundle(jsonb) to service_role;
-
 notify pgrst, 'reload schema';
