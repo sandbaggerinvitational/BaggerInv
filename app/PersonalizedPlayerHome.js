@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   countdownParts,
@@ -11,7 +12,7 @@ import {
   selectRelevantPlayerMatches,
 } from "../lib/player-home";
 import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app";
-import { courseLogo, teamLogo } from "../lib/asset-paths";
+import { courseLogoSources, teamLogo } from "../lib/asset-paths";
 import { formatHomeTime } from "../lib/home-dashboard";
 import { fetchWithTransientRetry } from "../lib/transient-fetch";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../lib/participant-initialization-cache";
@@ -77,6 +78,41 @@ function MatchPeople({ match }) {
   </div>;
 }
 
+function identityInitials(name) {
+  return String(name || "SBI").trim().split(/\s+/).filter(Boolean).slice(0, 2)
+    .map((part) => part[0]?.toUpperCase()).join("") || "SBI";
+}
+
+function OptimizedCourseIdentity({ sources, name, compact, loading }) {
+  const [index, setIndex] = useState(0);
+  const source = sources[index];
+  if (!source) return <span
+    className={compact ? styles.roundCourseLogoFallback : styles.courseLogoFallback}
+    aria-hidden="true"
+  >{identityInitials(name)}</span>;
+  return <Image
+    src={source}
+    alt=""
+    width={48}
+    height={48}
+    loading={loading}
+    sizes={compact ? "40px" : "48px"}
+    className={compact ? styles.roundCourseLogo : styles.courseLogo}
+    onError={() => setIndex((current) => current + 1)}
+  />;
+}
+
+function CourseIdentity({ match, compact = false, loading = "eager" }) {
+  const sources = courseLogoSources({ courseId: match?.courseId, filename: match?.courseLogo });
+  return <OptimizedCourseIdentity
+    key={sources.join("|")}
+    sources={sources}
+    name={match?.course}
+    compact={compact}
+    loading={loading}
+  />;
+}
+
 function Action({ match, busy, onOpen }) {
   const action = matchAction(match);
   const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=home`;
@@ -108,6 +144,7 @@ function MyRounds({ matches, totalCount, timeZone }) {
           href={`/game-center/${encodeURIComponent(match.matchId)}?from=home`}
           aria-label={`${matchLabel(match)} at ${match.course || "course to be announced"}`}
         >
+          <CourseIdentity match={match} compact loading="lazy" />
           <div className={styles.roundTop}>
             <div>
               <strong className={styles.roundIdentity}>{[match.round ? `Round ${match.round}` : "Round", homeFormatLabel(match.format)].filter(Boolean).join(" · ")}</strong>
@@ -132,7 +169,7 @@ function PlayerNetSkins({ netSkins, playerId }) {
   const skins = entries.reduce((sum, row) => sum + (Number(row.skinsWon) || 0), 0);
   const winnings = entries.reduce((sum, row) => sum + (Number(row.totalWinnings) || 0), 0);
   return <section className={styles.netSkins} aria-labelledby="home-net-skins-title">
-    <header><div><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2></div><Link href="/live?view=leaderboards&tab=skins">View <i aria-hidden="true">→</i></Link></header>
+    <header><span className={styles.skinCoin} aria-hidden="true">S</span><div><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2></div><Link href="/live?view=leaderboards&tab=skins">View <i aria-hidden="true">→</i></Link></header>
     <div className={styles.netSkinsSummary}><strong>{skins} skin{skins === 1 ? "" : "s"}</strong><span aria-hidden="true">·</span><strong>{skinsCurrency(winnings)} winnings</strong></div>
   </section>;
 }
@@ -315,6 +352,7 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
       <span className={styles.intro}>More than one match is open. Choose the scorecard you intend to update.</span>
       <div className={styles.choices}>{selection.choices.map((match) =>
         <button key={match.matchId} disabled={busyId === match.matchId} onClick={() => openMatch(match)}>
+          <CourseIdentity match={match} compact />
           <span className={styles.choiceDetails}>
             <MatchHeading match={match} compact />
             <strong>{match.course || "Course TBA"}</strong>
@@ -329,12 +367,7 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
         <MatchStatusBlock status={primaryStatus} result={primaryResult} />
       </div>
       <div className={styles.venue}>
-        <MobileIdentityImage
-          sources={[courseLogo(primary.courseLogo)]}
-          name={primary.course}
-          className={styles.courseLogo}
-          fallbackClassName={styles.courseLogoFallback}
-        />
+        <CourseIdentity match={primary} />
         <div>
           <strong>{primary.course || "Course to be announced"}</strong>
           <span>{matchTime(primary, payload?.tournament?.timeZone) || "Tee time TBD"}{countdown ? ` · ${countdown.label}` : ""}</span>

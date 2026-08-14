@@ -37,7 +37,7 @@ test("multiple promoted scorecards stay in one compact selector and out of My Ro
   assert.match(component, /data-variant="choices"/);
   assert.match(component, /More than one match is open/);
   assert.match(component, /Open Scorecard/);
-  assert.match(styles, /\.choices button\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto[\s\S]*min-height:\s*70px/);
+  assert.match(styles, /\.choices button\s*\{[\s\S]*grid-template-columns:\s*40px minmax\(0, 1fr\) auto[\s\S]*min-height:\s*70px/);
   assert.match(styles, /\.card\[data-variant="choices"\] h2\s*\{[^}]*font-size:\s*clamp\(1\.3rem, 3\.8vw, 1\.65rem\)/);
 });
 

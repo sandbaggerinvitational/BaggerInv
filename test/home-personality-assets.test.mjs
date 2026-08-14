@@ -1,0 +1,87 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+import {
+  canonicalCourseLogoFilenames,
+  courseLogoSources,
+  defaultAssets,
+} from "../lib/asset-paths.js";
+
+const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+
+test("Home course artwork resolves from canonical Course ID with the existing fallback", () => {
+  assert.deepEqual(canonicalCourseLogoFilenames, {
+    TPGC01: "turtle-point-logo",
+    CPGC01: "cougar-point-logo",
+    OCGC01: "ocean-course-logo",
+  });
+  assert.deepEqual(courseLogoSources({ courseId: "TPGC01" }), [
+    "/images/courses/logos/turtle-point-logo.png",
+    defaultAssets.courseLogo,
+  ]);
+  assert.deepEqual(courseLogoSources({ courseId: "CPGC01", filename: "cougar-point-logo" }), [
+    "/images/courses/logos/cougar-point-logo.png",
+    defaultAssets.courseLogo,
+  ]);
+  assert.deepEqual(courseLogoSources({ courseId: "OCGC01", filename: "presentation-ocean" }), [
+    "/images/courses/logos/presentation-ocean.png",
+    "/images/courses/logos/ocean-course-logo.png",
+    defaultAssets.courseLogo,
+  ]);
+  assert.deepEqual(courseLogoSources({ courseId: "UNKNOWN" }), [defaultAssets.courseLogo]);
+});
+
+test("Home reuses course identity for primary, multiple-match, and grouped-round presentations", async () => {
+  const [component, styles] = await Promise.all([
+    source("app/PersonalizedPlayerHome.js"),
+    source("app/personalized-player-home.module.css"),
+  ]);
+  assert.match(component, /function CourseIdentity/);
+  assert.match(component, /courseLogoSources\(\{ courseId: match\?\.courseId, filename: match\?\.courseLogo \}\)/);
+  assert.equal((component.match(/<CourseIdentity match=/g) || []).length, 3);
+  assert.match(component, /<CourseIdentity match=\{match\} compact loading="lazy" \/>[\s\S]*className=\{styles\.roundTop\}/);
+  assert.match(component, /className=\{styles\.choices\}[\s\S]*<CourseIdentity match=\{match\} compact \/>/);
+  assert.match(component, /function OptimizedCourseIdentity/);
+  assert.match(component, /<Image[\s\S]*loading=\{loading\}[\s\S]*sizes=\{compact \? "40px" : "48px"\}/);
+  assert.match(styles, /\.roundCourseLogo,[\s\S]*width:\s*30px;[\s\S]*object-fit:\s*contain/);
+  assert.match(styles, /\.choices \.roundCourseLogo,[\s\S]*width:\s*40px;[\s\S]*height:\s*40px/);
+});
+
+test("Home restores the original Net Skins medallion treatment without a replacement asset", async () => {
+  const [component, styles] = await Promise.all([
+    source("app/PersonalizedPlayerHome.js"),
+    source("app/personalized-player-home.module.css"),
+  ]);
+  assert.match(component, /className=\{styles\.skinCoin\} aria-hidden="true">S<\/span>/);
+  assert.match(styles, /\.skinCoin\s*\{[^}]*radial-gradient[^}]*inset 0 0 0 3px #f2d77c/);
+  assert.doesNotMatch(component, /net-skins.*\.(png|webp|svg)/i);
+});
+
+test("compact tournament identity is again a rounded branded surface using the canonical logo component", async () => {
+  const [identity, command, styles] = await Promise.all([
+    source("app/TournamentIdentityHeader.js"),
+    source("app/TournamentCommandCenter.js"),
+    source("app/tournament-command-center.module.css"),
+  ]);
+  assert.match(identity, /tournamentLogo\(`sandbagger-\$\{year\}`\)/);
+  assert.match(command, /<TournamentIdentityHeader[\s\S]*compact/);
+  assert.match(styles, /\.homeHeader\[data-density=compact\]\{[^}]*border:1px solid[^}]*border-radius:16px[^}]*background:linear-gradient[^}]*box-shadow/);
+});
+
+test("asset restoration leaves Home hierarchy, deduplication, casing, and request topology intact", async () => {
+  const [command, component, participant] = await Promise.all([
+    source("app/TournamentCommandCenter.js"),
+    source("app/PersonalizedPlayerHome.js"),
+    source("app/ParticipantSupabaseHome.js"),
+  ]);
+  const branch = command.slice(command.indexOf("if (supabaseCommandCenter)"), command.indexOf("return <div className={styles.page}>", command.indexOf("if (supabaseCommandCenter)") + 1));
+  const order = ["<TournamentIdentityHeader", "<PersonalizedPlayerHome", "{pulse}", "<TournamentSchedule compact", "<TournamentMoments", "<PersonalizedPlayerHomeSecondary"].map((token) => branch.indexOf(token));
+  assert.ok(order.every((position) => position >= 0));
+  assert.deepEqual(order, [...order].sort((a, b) => a - b));
+  assert.match(component, /homeRoundSummaryMatches\(matches, promotedMatchIds\(selection\)\)/);
+  assert.match(component, /`Round \$\{match\.round\}`/);
+  assert.match(component, /homeFormatLabel\(match\.format\)/);
+  assert.equal((participant.match(/\/api\/participant\/home/g) || []).length, 2);
+  assert.equal((participant.match(/\/api\/leaderboards\/net-skins/g) || []).length, 1);
+  assert.doesNotMatch([command, component, participant].join("\n"), /Google Sheets|gviz|opensheet|spreadsheets\.google/i);
+});

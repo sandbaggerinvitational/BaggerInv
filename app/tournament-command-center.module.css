@@ -7,7 +7,7 @@
 .schedule[data-density=next]{padding:13px 15px}.schedule[data-density=next] .sectionHeader h2{font-size:1.08rem}.schedule[data-density=next] ol{margin-top:7px}.schedule[data-density=next] li{min-height:48px;border-bottom:0}.schedule[data-density=next] .sectionHeader>a{font-size:.7rem}
 
 /* Participant Home composition: differentiated Sandbagger surfaces with compact hierarchy. */
-.homeHeader[data-density=compact]{margin-bottom:7px;padding:3px 2px 7px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.homeHeader[data-density=compact]{margin-bottom:9px;padding:9px 11px;border:1px solid var(--home-card-border);border-radius:16px;background:linear-gradient(145deg,#fffdf8,#faf5e9);box-shadow:0 5px 16px rgba(12,55,43,.045)}
 .pulse{padding:15px 16px 10px}.pulse .scoreboard{margin-top:10px}.pulse .progressLabel{margin-top:9px}.pulse .leaderboardsCta{margin-top:8px;padding-block:6px}
 .schedule[data-density=next]{padding:13px 15px 10px;border:1px solid var(--home-card-border);border-radius:calc(var(--home-card-radius) - 2px);background:linear-gradient(145deg,#fffdf8,#faf5e9);box-shadow:0 5px 16px rgba(12,55,43,.045)}
 .schedule[data-density=next] .sectionHeader{align-items:center}.schedule[data-density=next] .sectionHeader h2{max-width:17rem;color:#24483c;font:900 .76rem/1.2 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.schedule[data-density=next] .sectionHeader>a{flex:0 0 auto}.schedule[data-density=next] ol{margin-top:5px}

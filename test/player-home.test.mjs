@@ -118,7 +118,7 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(component, /participantNames/);
   assert.match(component, /opponentNames/);
   assert.match(component, /teeLabel\(match\.tee\)/);
-  assert.match(component, /courseLogo\(primary\.courseLogo\)/);
+  assert.match(component, /courseLogoSources\(\{ courseId: match\?\.courseId, filename: match\?\.courseLogo \}\)/);
   assert.match(component, /roundMatchMeta\(match\)/);
   assert.match(component, /join\(" · "\)/);
   assert.doesNotMatch(component, /Match \$\{match\.match\}.*·/);
@@ -178,7 +178,7 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(component, /homeRoundSummaryMatches\(matches, promotedMatchIds\(selection\)\)/);
   assert.match(component, /className=\{styles\.roundIdentity\}/);
   assert.match(component, /<MyRounds matches=\{summaryMatches\} totalCount=\{matches\.length\}/);
-  assert.match(styles, /\.roundCard\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+  assert.match(styles, /\.roundCard\s*\{[\s\S]*grid-template-columns:\s*30px minmax\(0, 1fr\) auto/);
   assert.doesNotMatch(styles.match(/\.roundIdentity\s*\{[^}]*\}/)?.[0] || "", /text-transform:\s*uppercase/);
   assert.doesNotMatch(component, /aria-label="Current player"/);
   assert.doesNotMatch(component, />YOU</);
