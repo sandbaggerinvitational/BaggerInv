@@ -3,12 +3,14 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
   countdownParts,
+  homeRoundSummaryMatches,
   matchAction,
   orderPlayerMatches,
   selectRelevantPlayerMatches,
 } from "../lib/player-home.js";
 import {
   formatHomeTime,
+  homeSchedulePreview,
   todaysSchedule,
 } from "../lib/home-dashboard.js";
 
@@ -115,7 +117,7 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(component, /participantNames/);
   assert.match(component, /opponentNames/);
   assert.match(component, /teeLabel\(match\.tee\)/);
-  assert.match(component, /courseLogo\(match\.courseLogo\)/);
+  assert.match(component, /courseLogo\(primary\.courseLogo\)/);
   assert.match(component, /roundMatchMeta\(match\)/);
   assert.match(component, /join\(" • "\)/);
   assert.doesNotMatch(component, /Match \$\{match\.match\}.*·/);
@@ -150,8 +152,8 @@ test("Home refinement keeps tournament identity and itinerary distinct from play
   assert.doesNotMatch(component, /playerPhoto|identityImage|Player Passport<\/span>/);
   assert.match(commandCenter, /<TournamentIdentityHeader/);
   assert.match(identityHeader, /tournamentLogo\(`sandbagger-\$\{year\}`\)/);
-  assert.match(schedule, /View Tournament Guide/);
-  assert.match(schedule, /No additional events scheduled today/);
+  assert.match(schedule, /View Full Schedule/);
+  assert.match(schedule, /homeSchedulePreview/);
   assert.match(commandCenter, /liveData\?\.timeline\?\.events/);
   assert.match(commandCenter, /event\.displayOnHome/);
   assert.match(commandCenter, /\{pulse\}[\s\S]*<TournamentMoments moments=\{moments\}/);
@@ -172,11 +174,11 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(styles, /\.matchHeading > span,[\s\S]*font-weight:\s*750/);
   assert.match(styles, /\.people > div[\s\S]*grid-template-rows:\s*34px/);
   assert.match(styles, /\.teamLogo,[\s\S]*justify-self:\s*center/);
-  assert.match(styles, /\.roundMatchup > div[\s\S]*justify-items:\s*center/);
-  assert.match(styles, /\.roundMatchup em[\s\S]*text-align:\s*center|\.roundMatchup > div[\s\S]*text-align:\s*center/);
-  assert.match(styles, /\.roundMatchup[\s\S]*column-gap:\s*6px/);
-  assert.match(styles, /\.roundMatchup > div[\s\S]*gap:\s*2px/);
-  assert.match(styles, /\.roundMatchup \.playerLines\s*\{[\s\S]*gap:\s*2px/);
+  assert.match(component, /homeRoundSummaryMatches\(matches, selection\.primary\?\.matchId\)/);
+  assert.match(component, /className=\{styles\.roundIdentity\}/);
+  assert.match(component, /<MyRounds matches=\{summaryMatches\} totalCount=\{matches\.length\}/);
+  assert.match(styles, /\.roundCard\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+  assert.match(styles, /\.roundIdentity\s*\{[\s\S]*text-transform:\s*uppercase/);
   assert.doesNotMatch(component, /aria-label="Current player"/);
   assert.doesNotMatch(component, />YOU</);
   assert.match(commandStyles, /--home-eyebrow-color:#b58a25/);
@@ -184,4 +186,35 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(commandStyles, /\.scoreboard strong\{font-size:3\.1rem/);
   assert.match(commandStyles, /font-variant-numeric:tabular-nums/);
   assert.match(commandStyles, /font-size:2\.7rem/);
+});
+
+test("Home round summaries exclude the primary match while preserving every other match", () => {
+  const matches = [
+    { matchId: "2026-R3-2", round: 3 },
+    { matchId: "2026-R1-2", round: 1 },
+    { matchId: "2026-R2-2", round: 2 },
+  ];
+  assert.deepEqual(homeRoundSummaryMatches(matches, "2026-R3-2").map((match) => match.matchId), ["2026-R1-2", "2026-R2-2"]);
+  assert.deepEqual(homeRoundSummaryMatches(matches, "missing"), matches);
+});
+
+test("Home schedule preview shows one meaningful event or one concise empty state", () => {
+  const options = { now: new Date("2026-09-25T20:00:00Z"), timeZone: "America/Chicago" };
+  const next = homeSchedulePreview([
+    { id: "dinner", date: "2026-09-25", startTime: "6:30 PM", endTime: "8:00 PM", title: "Dinner" },
+  ], { now: new Date("2026-09-25T20:00:00Z"), timeZone: "America/Chicago" });
+  assert.equal(next.kind, "event");
+  assert.equal(next.event.id, "dinner");
+
+  const done = homeSchedulePreview([
+    { id: "breakfast", date: "2026-09-25", startTime: "7:00 AM", endTime: "8:00 AM", title: "Breakfast" },
+  ], options);
+  assert.deepEqual(done, { kind: "empty", eyebrow: "Today", title: "No more events scheduled today." });
+
+  const tomorrow = homeSchedulePreview([
+    { id: "round-two", date: "2026-09-26", startTime: "8:10 AM", title: "Round 2" },
+  ], options);
+  assert.equal(tomorrow.kind, "event");
+  assert.equal(tomorrow.dayLabel, "Tomorrow");
+  assert.equal(tomorrow.event.startTime, "8:10 AM");
 });

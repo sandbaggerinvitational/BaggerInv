@@ -117,6 +117,7 @@ test("Home polish shares vertical rhythm and distinguishes completed rounds", as
     readFile(new URL("../app/personalized-player-home.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(commandCenter, /Match\$\{count === 1 \? "" : "es"\} Remaining/);
+  assert.match(schedule, /homeSchedulePreview/);
   assert.match(schedule, /No additional events scheduled today\./);
   assert.match(commandStyles, /--home-section-gap:12px/);
   assert.match(commandStyles, /--home-card-radius:20px/);
@@ -126,6 +127,7 @@ test("Home polish shares vertical rhythm and distinguishes completed rounds", as
   assert.match(personalized, /data-complete=\{status === "Final" \? "true" : undefined\}/);
   assert.match(personalizedStyles, /\.roundCard\[data-complete="true"\]/);
   assert.match(personalizedStyles, /margin-top: var\(--home-section-gap, 12px\)/);
+  assert.match(personalizedStyles, /\.roundCard\s*\{[\s\S]*border-top:\s*1px solid/);
 });
 
 test("Home match-state hierarchy remains available for no match, upcoming, live, and final", () => {

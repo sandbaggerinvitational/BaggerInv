@@ -98,10 +98,10 @@ test("Supabase Home command-center order starts with identity and actionable mat
   const match = branch.indexOf("<PersonalizedPlayerHome");
   const pulse = branch.indexOf("{pulse}");
   const next = branch.indexOf("<TournamentSchedule compact");
-  const full = branch.indexOf("<TournamentSchedule events");
   const moments = branch.indexOf("<TournamentMoments");
   const secondary = branch.indexOf("<PersonalizedPlayerHomeSecondary");
-  assert.ok(identity >= 0 && identity < match && match < pulse && pulse < next && next < full && full < moments && moments < secondary, { identity, match, pulse, next, full, moments, secondary });
+  assert.ok(identity >= 0 && identity < match && match < pulse && pulse < next && next < moments && moments < secondary, { identity, match, pulse, next, moments, secondary });
+  assert.equal(branch.match(/<TournamentSchedule/g)?.length, 1);
   assert.match(command, /showSecondary=\{false\}/);
   assert.match(command, /ModuleSkeleton/);
 });

@@ -32,7 +32,7 @@ test("Home defers secondary stories, Net Skins, and completed-round history unti
   assert.match(deferred, /requestIdleCallback/);
   assert.match(commandCenter, /<PersonalizedPlayerHomeSecondary/);
   assert.match(personalized, /showSecondary && secondaryReady \? <PlayerNetSkins/);
-  assert.match(personalized, /showSecondary && secondaryReady && matches\.length \? <MyRounds/);
+  assert.match(personalized, /showSecondary && secondaryReady && summaryMatches\.length \? <MyRounds/);
 });
 
 test("Home initialization exposes every requested timing stage without changing JSON data", async () => {

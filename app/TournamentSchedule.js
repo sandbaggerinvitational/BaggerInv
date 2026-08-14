@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { todaysSchedule } from "../lib/home-dashboard";
+import { homeSchedulePreview, todaysSchedule } from "../lib/home-dashboard";
 import { isGolfTimelineEvent, timelineEventIcon, timelineOptionalText } from "../lib/tournament-timeline";
 import StatusBadge from "./StatusBadge";
 import styles from "./tournament-command-center.module.css";
@@ -22,17 +22,16 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "", 
     return () => window.clearInterval(timer);
   }, [initialNow, mountedAt]);
   const items = useMemo(() => todaysSchedule(events, { now, timeZone }), [events, now, timeZone]);
-  const displayedItems = compact
-    ? [items.find((item) => item.state === "live") || items.find((item) => item.isNext) || items.find((item) => item.state === "upcoming") || items.at(-1)].filter(Boolean)
-    : items;
+  const preview = useMemo(() => homeSchedulePreview(events, { now, timeZone }), [events, now, timeZone]);
+  const displayedItems = compact && preview.kind === "event" ? [preview.event] : items;
 
   return (
     <section className={styles.schedule} data-density={compact ? "next" : "full"} aria-labelledby={compact ? "next-schedule-title" : "today-schedule-title"}>
       <header className={styles.sectionHeader}>
-        <div><p>{compact ? "Next up" : "Today"}</p><h2 id={compact ? "next-schedule-title" : "today-schedule-title"}>{compact ? "Your next event" : "Today’s Schedule"}</h2></div>
-        <Link href="/tournament-guide/schedule">View Tournament Guide</Link>
+        <div><p>{compact ? preview.eyebrow : "Today"}</p><h2 id={compact ? "next-schedule-title" : "today-schedule-title"}>{compact ? (preview.kind === "event" ? preview.dayLabel : preview.title) : "Today’s Schedule"}</h2></div>
+        <Link href="/tournament-guide/schedule">{compact ? <>View Full Schedule <span aria-hidden="true">→</span></> : "View Tournament Guide"}</Link>
       </header>
-      {displayedItems.length ? <ol>{displayedItems.map((item) => {
+      {(!compact || preview.kind === "event") && displayedItems.length ? <ol>{displayedItems.map((item) => {
         const subtitle = timelineOptionalText(item.subtitle);
         const location = timelineOptionalText(item.location);
         const golfEvent = isGolfTimelineEvent(item.type);
@@ -55,7 +54,7 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "", 
             : item.state === "delayed" || item.state === "cancelled" ? <b>{item.state}</b>
             : null}
         </li>
-      );})}</ol> : <div className={styles.emptyState}>
+      );})}</ol> : compact ? null : <div className={styles.emptyState}>
         <strong>No additional events scheduled today.</strong>
         <span>View the Tournament Guide for the full itinerary.</span>
       </div>}

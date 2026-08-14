@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   countdownParts,
+  homeRoundSummaryMatches,
   matchAction,
   normalizedMatchStatus,
   selectRelevantPlayerMatches,
@@ -87,46 +88,33 @@ function Action({ match, busy, onOpen }) {
   </button>;
 }
 
-function MyRounds({ matches, emphasizedId, timeZone }) {
+function MyRounds({ matches, totalCount, timeZone }) {
   return <section className={styles.schedule} aria-labelledby="my-rounds-title">
     <header>
       <div><p>Your Golf</p><h2 id="my-rounds-title">My Rounds</h2></div>
-      <small>{matches.length} match{matches.length === 1 ? "" : "es"}</small>
+      <small>{totalCount} match{totalCount === 1 ? "" : "es"}</small>
+      <Link href="/my-match">View All <span aria-hidden="true">→</span></Link>
     </header>
     <div className={styles.scheduleList}>
       {matches.map((match) => {
         const tee = teeLabel(match.tee);
         const status = appMatchStatus(match);
+        const result = formatMatchResult(match, match.team?.side) || status;
         return <Link
           key={match.matchId}
           className={styles.roundCard}
-          data-current={match.matchId === emphasizedId}
           data-complete={status === "Final" ? "true" : undefined}
           href={`/game-center/${encodeURIComponent(match.matchId)}?from=home`}
           aria-label={`${matchLabel(match)} at ${match.course || "course to be announced"}`}
         >
           <div className={styles.roundTop}>
             <div>
-              <MatchHeading match={match} compact />
-              <strong className={styles.roundCourse}>{match.course || "Course to be announced"}</strong>
+              <strong className={styles.roundIdentity}>{[match.round ? `R${match.round}` : "Round", match.format].filter(Boolean).join(" · ")}</strong>
+              <span className={styles.roundCourse}>{match.course || "Course to be announced"}</span>
             </div>
-            <b>{formatMatchResult(match, match.team?.side) || appMatchStatus(match)}</b>
+            <b>{result}</b>
           </div>
-          <div className={styles.roundVenue}>
-            <MobileIdentityImage
-              sources={[courseLogo(match.courseLogo)]}
-              name={match.course}
-              alt=""
-              className={styles.roundCourseLogo}
-              fallbackClassName={styles.roundCourseLogoFallback}
-            />
-            <small>{[tee, matchTime(match, timeZone) || "Tee time TBD"].filter(Boolean).join(" · ")}</small>
-          </div>
-          <div className={styles.roundMatchup}>
-            <div><em>{match.team?.name || "Your team"}</em><PlayerLines names={match.participantNames} /></div>
-            <i>VS</i>
-            <div><em>{match.opponentTeam?.name || "Opposing team"}</em><PlayerLines names={match.opponentNames} /></div>
-          </div>
+          <small className={styles.roundMeta}>{[tee, status === "Upcoming" ? matchTime(match, timeZone) || "Tee time TBD" : ""].filter(Boolean).join(" · ")}</small>
         </Link>;
       })}
     </div>
@@ -143,8 +131,8 @@ function PlayerNetSkins({ netSkins, playerId }) {
   const skins = entries.reduce((sum, row) => sum + (Number(row.skinsWon) || 0), 0);
   const winnings = entries.reduce((sum, row) => sum + (Number(row.totalWinnings) || 0), 0);
   return <section className={styles.netSkins} aria-labelledby="home-net-skins-title">
-    <header><span className={styles.skinCoin} aria-hidden="true">S</span><div><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2></div><Link href="/live?view=leaderboards&tab=skins">View Net Skins <i aria-hidden="true">→</i></Link></header>
-    <div><span><small>Your Skins</small><strong>{skins}</strong></span><span><small>Current Winnings</small><strong>{skinsCurrency(winnings)}</strong></span></div>
+    <header><div><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2></div><Link href="/live?view=leaderboards&tab=skins">View <i aria-hidden="true">→</i></Link></header>
+    <div className={styles.netSkinsSummary}><strong>{skins} skin{skins === 1 ? "" : "s"}</strong><span aria-hidden="true">·</span><strong>{skinsCurrency(winnings)} winnings</strong></div>
   </section>;
 }
 
@@ -158,10 +146,11 @@ function parseServerTiming(value = "") {
 export function PersonalizedPlayerHomeSecondary({ netSkins = null, data = null }) {
   const selection = selectRelevantPlayerMatches(data?.matches || [], data?.tournament?.currentRound);
   const matches = selection.ordered;
+  const summaryMatches = homeRoundSummaryMatches(matches, selection.primary?.matchId);
   if (!data) return null;
   return <>
     <PlayerNetSkins netSkins={netSkins} playerId={data?.player?.id} />
-    {matches.length ? <MyRounds matches={matches} emphasizedId={selection.primary?.matchId} timeZone={data?.tournament?.timeZone} /> : null}
+    {summaryMatches.length ? <MyRounds matches={summaryMatches} totalCount={matches.length} timeZone={data?.tournament?.timeZone} /> : null}
   </>;
 }
 
@@ -258,7 +247,10 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
     selectRelevantPlayerMatches(payload?.matches || [], payload?.tournament?.currentRound),
   [payload]);
   const primary = selection.primary;
-  const countdown = countdownParts(primary?.teeTimeAt, now);
+  const primaryLifecycle = primary ? normalizedMatchStatus(primary) : "";
+  const countdown = ["UPCOMING", "OPEN"].includes(primaryLifecycle)
+    ? countdownParts(primary?.teeTimeAt, now)
+    : null;
 
   const openMatch = async (match) => {
     setBusyId(match.matchId); setMessage("");
@@ -302,6 +294,7 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
 
   const player = payload?.player;
   const matches = selection.ordered;
+  const summaryMatches = homeRoundSummaryMatches(matches, primary?.matchId);
   const primaryStatus = primary ? appMatchStatus(primary) : "";
   const primaryResult = primary ? formatMatchResult(primary, primary.team?.side) : "";
 
@@ -340,20 +333,20 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
         </div>
       </div>
       <MatchPeople match={primary} />
-      {normalizedMatchStatus(primary) === "LIVE" ? <div className={styles.progress}>
+      {primaryLifecycle === "LIVE" ? <div className={styles.progress}>
         <span>Through {primary.currentHole || primary.holesRecorded || "—"}</span>
         {primary.updatedAt ? <small>Last updated {new Date(primary.updatedAt).toLocaleString()}</small> : null}
       </div> : null}
       <Action match={primary} busy={busyId === primary.matchId} onOpen={openMatch} />
-      {normalizedMatchStatus(primary) === "LOCKED" ? <p className={styles.note}>The tournament director has locked scoring for this match.</p> : null}
-      {normalizedMatchStatus(primary) === "UPCOMING" ? <p className={styles.note}>Scoring will become available when participant access opens.</p> : null}
+      {primaryLifecycle === "LOCKED" ? <p className={styles.note}>The tournament director has locked scoring for this match.</p> : null}
+      {primaryLifecycle === "UPCOMING" ? <p className={styles.note}>Scoring will become available when participant access opens.</p> : null}
       {message ? <p className={styles.message} role="alert">{message}</p> : null}
     </div>}
 
     {showSecondary && secondaryReady ? <PlayerNetSkins netSkins={netSkins} playerId={player?.id} /> : null}
-    {showSecondary && secondaryReady && matches.length ? <MyRounds
-      matches={matches}
-      emphasizedId={primary?.matchId}
+    {showSecondary && secondaryReady && summaryMatches.length ? <MyRounds
+      matches={summaryMatches}
+      totalCount={matches.length}
       timeZone={payload?.tournament?.timeZone}
     /> : null}
   </section>;

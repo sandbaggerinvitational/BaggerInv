@@ -124,7 +124,6 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
       <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed participantIdentityAuthority={participantIdentityAuthority} showSecondary={false} />
       {pulse}
       {timelineAvailable ? <TournamentSchedule compact events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
-      {timelineAvailable ? <DeferredHomeContent fallback={<ModuleSkeleton label="Loading today’s schedule" />}><TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /></DeferredHomeContent> : null}
       <DeferredHomeContent fallback={<ModuleSkeleton label="Loading tournament moments" />}><TournamentMoments moments={moments} /></DeferredHomeContent>
       <DeferredHomeContent fallback={<ModuleSkeleton label="Loading your tournament details" />}><PersonalizedPlayerHomeSecondary netSkins={liveData?.netSkins} data={initialParticipantData} /></DeferredHomeContent>
     </div>

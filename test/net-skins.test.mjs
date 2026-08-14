@@ -155,16 +155,16 @@ test("Net Skins polish exposes official summary terminology and participant high
   assert.match(css, /\.holeResults article\[data-result="won"\]/);
 });
 
-test("Home Net Skins card is participant-only and links to official standings", async () => {
+test("Home Net Skins summary is participant-only and links to official standings", async () => {
   const [home, command] = await Promise.all([
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
   ]);
   assert.match(home, /if \(!playerId \|\| !entries\.length\) return null/);
-  assert.match(home, /Your Skins/);
-  assert.match(home, /Current Winnings/);
+  assert.match(home, /\{skins\} skin/);
+  assert.match(home, /\{skinsCurrency\(winnings\)\} winnings/);
   assert.match(home, /Your Competitions/);
-  assert.match(home, /View Net Skins/);
+  assert.match(home, />View <i aria-hidden="true">→<\/i>/);
   assert.match(home, /\/live\?view=leaderboards&tab=skins/);
   assert.match(command, /netSkins=\{liveData\?\.netSkins\}/);
 });
