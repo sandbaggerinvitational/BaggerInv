@@ -130,6 +130,7 @@ test("responsive match surfaces preserve 44px actions, stable course logos, and 
   assert.match(matchStyles, /@media\(max-width:355px\)/);
   assert.match(centerStyles, /\.logo\[data-size=identity\]\{width:40px;height:40px\}/);
   assert.match(centerStyles, /@media\(max-width:420px\)/);
+  assert.match(centerStyles, /\.holeGrid button\{min-height:44px\}/);
   assert.match(centerStyles, /prefers-reduced-motion:reduce/);
   assert.doesNotMatch(matchStyles + centerStyles, /overflow-x:(auto|scroll)/);
 });
