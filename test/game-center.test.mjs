@@ -31,14 +31,14 @@ function completedWinners(teamOne = 10, teamTwo = 8) {
   }));
 }
 
-test("Game Center uses the exact shared tournament header and a compact match identity", async () => {
+test("Game Center removes duplicated tournament masthead and uses a compact match identity", async () => {
   const [page, source] = await Promise.all([readFile(pageUrl, "utf8"), readFile(componentUrl, "utf8")]);
-  assert.match(page, /import TournamentIdentityHeader from "\.\.\/\.\.\/TournamentIdentityHeader"/);
-  assert.match(page, /<TournamentIdentityHeader/);
-  assert.match(page, /status=\{initialData\.tournament\.status\}[\s\S]*compact/);
-  assert.match(page, /year=\{initialData\.tournament\.year\}/);
-  assert.match(source, /const matchContext = roundPosition\?\.total/);
+  assert.doesNotMatch(page, /TournamentIdentityHeader/);
+  assert.match(page, /<Header homeHref="\/home" \/>/);
+  assert.match(page, /safeReturnContext/);
+  assert.match(source, /const matchContext = `Round \$\{roundNumber\}/);
   assert.match(source, /Match \$\{matchNumber\}/);
+  assert.match(source, /className=\{styles\.matchIdentity\}/);
   assert.match(source, /courseLine/);
   assert.doesNotMatch(source, /Invalid Date/);
 });
@@ -238,7 +238,9 @@ test("Game Center exposes one state-aware primary action and preserves scoring a
   const source = await readFile(componentUrl, "utf8");
   assert.match(source, /"Continue Scoring"/);
   assert.match(source, /"Start Scoring"/);
-  assert.match(source, /View Final Scorecard/);
+  assert.match(source, /Final Scorecard/);
+  assert.match(source, /View Scorecard/);
+  assert.match(source, /data\.state === "live" && data\.userTeamSide/);
   assert.match(source, /Scoring opens before/);
   assert.match(source, /fetch\("\/api\/player-passport\/matches"/);
   assert.match(source, /body: JSON\.stringify\(\{ matchId, requestedAction: "START_SCORING" \}\)/);
@@ -281,8 +283,10 @@ test("Home result and details destinations use same-origin Game Center with Home
   ]);
   assert.match(home, /`\/game-center\/\$\{encodeURIComponent\(match\.matchId\)\}\?from=home`/);
   assert.doesNotMatch(home, /view=matchups/);
-  assert.match(page, /\["home", "my-match"\]\.includes\(query\?\.from\)/);
-  assert.match(center, /backTo === "home" \? "\/home"/);
+  assert.match(page, /\["home", "my-match", "tournament"\]\.includes\(context\)/);
+  assert.match(page, /context\.startsWith\("\/live\?view=leaderboards"\)/);
+  assert.match(center, /backTo === "home"[\s\S]*\? "\/home"/);
+  assert.match(center, /leaderboardReturn \? backTo : "\/my-match"/);
   assert.doesNotMatch(scoring, /`\/game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match`/);
   assert.doesNotMatch(scoring, /view=matchups/);
 });
@@ -308,7 +312,7 @@ test("Game Center polish balances scoreboard identity and respects reduced motio
   assert.match(source, /liveProgressLabel\(data\.state, through\)/);
   assert.match(source, /className=\{styles\.yourTeam\}/);
   assert.match(source, /aria-label=\{`\$\{teamNames\[[12]\]\} is your team`\}/);
-  assert.match(source, /Match \$\{roundPosition\.index\} of \$\{roundPosition\.total\}/);
+  assert.match(source, /const roundNumber = data\.match\.round \|\| data\.match\.Round \|\| roundPosition\?\.round/);
   assert.match(page, /playerPassportEffectivePlayerId\(verifyPlayerPassportSession/);
   assert.match(styles, /data-newly-updated=true/);
   assert.match(styles, /animation:holeRecorded \.55s ease-out/);

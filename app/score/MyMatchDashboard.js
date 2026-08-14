@@ -6,7 +6,7 @@ import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { appMatchStatus, formatMatchResult } from "../../lib/mobile-tournament-app";
 import { formatStatusLabel } from "../../lib/formatters";
-import { normalizedMatchStatus, orderPlayerMatches, selectRelevantPlayerMatches } from "../../lib/player-home";
+import { homeFormatLabel, normalizedMatchStatus, orderPlayerMatches, selectRelevantPlayerMatches } from "../../lib/player-home";
 import styles from "./my-match-dashboard.module.css";
 import headerStyles from "../tournament-identity-header.module.css";
 
@@ -57,11 +57,11 @@ function Logo({ filename, name, type, tournamentLogoFilename }) {
 
 function MatchHeading({ match }) {
   const roundMatch = match.match
-    ? `Round ${match.round} • Match ${match.match}`
+    ? `Round ${match.round} · Match ${match.match}`
     : `Round ${match.round}`;
   return <div className={styles.matchHeading}>
     <span>{roundMatch}</span>
-    <strong>{match.format || "Format TBA"}</strong>
+    <strong>{homeFormatLabel(match.format) || "Format TBA"}</strong>
   </div>;
 }
 
@@ -77,7 +77,7 @@ function TeamBlock({ team, players, tournamentLogoFilename }) {
 }
 
 function statusSupport(match, status) {
-  if (status === "Live") return match.currentHole ? `Through Hole ${match.currentHole}` : "Scoring is open";
+  if (status === "Live") return match.currentHole ? `Through ${match.currentHole}` : "Ready to score";
   if (status === "Locked") return "Locked by Tournament Director";
   if (status === "Upcoming") return match.teeTime
     ? `Scoring opens before ${formatTime(match.teeTime)}`
@@ -85,23 +85,46 @@ function statusSupport(match, status) {
   return "";
 }
 
-function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) {
+function playerList(players = []) {
+  return players.length ? players.join(" + ") : "Players TBA";
+}
+
+function CompactMatchup({ match }) {
+  return <div className={styles.compactMatchup}>
+    <span><small>Your side</small><strong>{playerList(match.participantNames)}</strong></span>
+    <i aria-label="versus">vs</i>
+    <span><small>Opponents</small><strong>{playerList(match.opponentNames)}</strong></span>
+  </div>;
+}
+
+function MatchActions({ match, status, busy, onOpen, detailsHref }) {
+  const scorecardAction = status === "Live"
+    ? match.holesRecorded ? "Continue Scoring" : "Start Scoring"
+    : status === "Final" ? "Final Scorecard" : "";
+  if (!scorecardAction) return <div className={styles.actions}>
+    <Link className={styles.primaryAction} href={detailsHref}>View Match <i aria-hidden="true">→</i></Link>
+  </div>;
+  return <div className={styles.actions}>
+    <Link className={styles.secondaryAction} href={detailsHref}>Game Center <i aria-hidden="true">→</i></Link>
+    <button className={styles.primaryAction} type="button" disabled={busy} onClick={() => onOpen(match)}>{scorecardAction}</button>
+  </div>;
+}
+
+function MatchCard({ match, tier = "compact", availableChoice = false, busy, onOpen, tournamentLogoFilename }) {
   const status = appMatchStatus(match);
   const result = formatMatchResult(match, match.team?.side);
-  const displayStatus = emphasized ? formatStatusLabel(status, {
-    current: status === "Live",
+  const primary = tier === "primary";
+  const displayStatus = primary ? formatStatusLabel(status, {
+    current: status === "Live" && !availableChoice,
     complete: status === "Final",
   }) : status;
   const courseMeta = [formatTee(match.tee), formatTime(match.teeTime)].filter(Boolean).join(" • ");
-  const support = statusSupport(match, status);
+  const support = primary && status === "Live" ? "" : statusSupport(match, status);
   const detailsHref = `/game-center/${encodeURIComponent(match.matchId)}?from=my-match`;
-  const action = status === "Live"
-    ? match.holesRecorded ? "Continue Scoring" : "Start Scoring"
-    : status === "Final" ? "View Final Scorecard" : "View Match";
   const accessible = [
     `Round ${match.round}`,
     match.match ? `Match ${match.match}` : "",
-    match.format,
+    homeFormatLabel(match.format),
     `against ${match.opponentTeam?.name || "opponent"}`,
     match.course,
     formatTime(match.teeTime),
@@ -109,59 +132,56 @@ function MatchCard({ match, emphasized, busy, onOpen, tournamentLogoFilename }) 
     result,
   ].filter(Boolean).join(", ");
 
-  const contents = <>
+  return <article className={styles.matchCard} data-tier={tier} aria-label={accessible}>
     <div className={styles.cardTop}>
       <MatchHeading match={match} />
       <div className={styles.cardState}>
-        <MatchStatusBlock status={displayStatus} result={result} />
+        <MatchStatusBlock status={displayStatus} result={result} meta={primary && status === "Live" && match.currentHole ? `Through ${match.currentHole}` : ""} />
       </div>
     </div>
     <div className={styles.courseLine}>
       <Logo filename={match.courseLogo} name={match.course || "Course"} type="course" tournamentLogoFilename={tournamentLogoFilename} />
       <div><strong>{match.course || "Course TBA"}</strong>{courseMeta ? <span>{courseMeta}</span> : null}</div>
     </div>
-    <div className={styles.matchup}>
+    {primary ? <div className={styles.matchup}>
       <TeamBlock team={match.team} players={match.participantNames} tournamentLogoFilename={tournamentLogoFilename} />
       <b aria-label="versus">VS</b>
       <TeamBlock team={match.opponentTeam} players={match.opponentNames} tournamentLogoFilename={tournamentLogoFilename} />
-    </div>
+    </div> : <CompactMatchup match={match} />}
     <div className={styles.actionRow}>
       <span className={styles.supportText}>
         {status === "Locked" ? <i aria-hidden="true">🔒</i> : null}
         {support}
       </span>
-      <strong className={styles.cardAction}>{action}<i aria-hidden="true">→</i></strong>
+      <MatchActions match={match} status={status} busy={busy} onOpen={onOpen} detailsHref={detailsHref} />
     </div>
-  </>;
-
-  if (["Live", "Final"].includes(status)) {
-    return <button
-      type="button"
-      className={styles.matchCard}
-      data-emphasized={emphasized ? "true" : undefined}
-      disabled={busy}
-      aria-label={accessible}
-      onClick={() => onOpen(match)}
-    >{contents}</button>;
-  }
-  return <Link
-    href={detailsHref}
-    className={styles.matchCard}
-    data-emphasized={emphasized ? "true" : undefined}
-    aria-label={accessible}
-  >{contents}</Link>;
+  </article>;
 }
 
 export default function MyMatchDashboard({ player, tournament, matches, busy, onOpen, message }) {
   const ordered = orderPlayerMatches(matches, tournament?.currentRound);
   const selection = selectRelevantPlayerMatches(matches, tournament?.currentRound);
-  const allFinal = matches.length && matches.every((match) => normalizedMatchStatus(match) === "FINAL");
-  const relevant = allFinal
-    ? [...matches].sort((left, right) =>
-      Number(right.round || 0) - Number(left.round || 0) ||
-      Number(right.match || 0) - Number(left.match || 0)
-    )[0]
-    : selection.primary || selection.choices[0] || selection.ordered[0];
+  const actionable = ordered.filter((match) => ["LIVE", "OPEN"].includes(normalizedMatchStatus(match)));
+  const nonFinal = ordered.filter((match) => normalizedMatchStatus(match) !== "FINAL");
+  const promoted = actionable.length
+    ? actionable
+    : selection.primary && normalizedMatchStatus(selection.primary) !== "FINAL"
+      ? [selection.primary]
+      : nonFinal.slice(0, 1);
+  const promotedIds = new Set(promoted.map((match) => match.matchId));
+  const upcoming = nonFinal.filter((match) => !promotedIds.has(match.matchId));
+  const completed = ordered.filter((match) => normalizedMatchStatus(match) === "FINAL");
+  const groups = [
+    promoted.length ? {
+      label: actionable.length > 1 ? "Available to Score" : actionable.length ? "Current Match" : "Next Match",
+      description: actionable.length > 1 ? `${actionable.length} scorecards are available. Choose the match you intend to update.` : "",
+      matches: promoted,
+      tier: "primary",
+      availableChoice: actionable.length > 1,
+    } : null,
+    upcoming.length ? { label: "Coming Up", matches: upcoming, tier: "upcoming" } : null,
+    completed.length ? { label: "Completed", matches: completed, tier: "completed" } : null,
+  ].filter(Boolean);
 
   return <section className={styles.page}>
     <header className={styles.pageHeader}>
@@ -174,18 +194,13 @@ export default function MyMatchDashboard({ player, tournament, matches, busy, on
     </header>
     {message ? <p className={styles.message} role="status">{message}</p> : null}
     {ordered.length ? <div className={styles.matchGroups} aria-label="Your tournament matches">
-      {[{
-        label: "Current / Upcoming",
-        matches: ordered.filter((match) => normalizedMatchStatus(match) !== "FINAL"),
-      }, {
-        label: "Completed",
-        matches: ordered.filter((match) => normalizedMatchStatus(match) === "FINAL"),
-      }].filter((group) => group.matches.length).map((group) => <section className={styles.matchGroup} key={group.label}>
-        <h2>{group.label}</h2>
+      {groups.map((group) => <section className={styles.matchGroup} data-tier={group.tier} key={group.label}>
+        <header><h2>{group.label}</h2>{group.description ? <p>{group.description}</p> : null}</header>
         <div className={styles.matchList}>{group.matches.map((match) => <MatchCard
         key={match.matchId}
         match={match}
-        emphasized={match.matchId === relevant?.matchId}
+        tier={group.tier}
+        availableChoice={group.availableChoice}
         busy={busy}
         onOpen={onOpen}
         tournamentLogoFilename={tournament?.logo}

@@ -318,8 +318,13 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   const displayResult = data.state === "pre" ? "" : clean(data.result).toUpperCase();
   const resultWinner = [teamNames[1], teamNames[2]].find((name) => displayResult.startsWith(clean(name).toUpperCase()));
   const resultText = resultWinner ? displayResult.slice(clean(resultWinner).length).trim() : displayResult;
-  const backHref = backTo === "home" ? "/home" : backTo === "my-match" ? "/my-match" : "/live";
-  const backLabel = backTo === "home" ? "Back to Home" : backTo === "my-match" ? "Back to My Match" : "Back to Tournament";
+  const leaderboardReturn = clean(backTo).startsWith("/live?view=leaderboards");
+  const backHref = backTo === "home"
+    ? "/home"
+    : backTo === "tournament" ? "/live" : leaderboardReturn ? backTo : "/my-match";
+  const backLabel = backTo === "home"
+    ? "Back to Home"
+    : backTo === "tournament" ? "Back to Tournament" : leaderboardReturn ? "Back to Leaderboards" : "Back to My Match";
   const courseLine = [course.tee ? `${course.tee} Tees` : "", teeTime].filter(Boolean).join(" • ");
   const confirmedAt = data.match.updatedAt || data.match["Updated At"];
   const confirmedLabel = confirmedAt ? new Intl.DateTimeFormat("en-US", {
@@ -341,9 +346,8 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     window.scrollTo({ top: 0, behavior: "auto" });
   };
   const roundPosition = data.navigation?.position;
-  const matchContext = roundPosition?.total
-    ? `Round ${roundPosition.round} • Match ${roundPosition.index} of ${roundPosition.total}`
-    : `Round ${data.match.round || data.match.Round}${matchNumber ? ` • Match ${matchNumber}` : ""}`;
+  const roundNumber = data.match.round || data.match.Round || roundPosition?.round;
+  const matchContext = `Round ${roundNumber}${matchNumber ? ` · Match ${matchNumber}` : ""}`;
 
   return <article className={styles.gameCenter}>
     <nav className={styles.matchNavigation} aria-label="Game Center match navigation">
@@ -364,15 +368,12 @@ export default function GameCenter({ initialData, matchId, backTo }) {
       </span>
     </nav>
 
-    <section className={styles.matchIdentity}>
-      <div><small aria-label={matchContext.replace(" • ", ", ")}>{matchContext}</small><h1>{data.match.formatName || data.display.formatName || format}</h1></div>
-      <div className={styles.identityCourse}>
-        <Logo filename={course.logo || data.match.course?.logo} name={course.name} type="course" size="identity" tournamentYear={data.tournament.year} />
-        <p><strong>{course.name}</strong>{courseLine ? <small>{courseLine}</small> : null}</p>
-      </div>
+    <section className={styles.matchIdentity} aria-label={`${matchContext}, ${data.match.formatName || data.display.formatName || format}, ${course.name}`}>
+      <Logo filename={course.logo || data.match.course?.logo} name={course.name} type="course" size="identity" tournamentYear={data.tournament.year} />
+      <div><small>{matchContext}</small><h1>{data.match.formatName || data.display.formatName || format}</h1><p><strong>{course.name}</strong>{courseLine ? <span>{courseLine}</span> : null}</p></div>
     </section>
 
-    <section className={styles.matchHero} aria-label="Match summary">
+    <section className={styles.matchHero} data-state={data.state} aria-label="Match summary">
     <div className={styles.scoreboard} aria-label={`${teamNames[1]} versus ${teamNames[2]}. ${data.result}${data.state !== "final" && through ? ` through ${through}` : ""}`}>
       <div data-your-team={data.userTeamSide === 1 ? "true" : undefined}><Logo filename={data.display.teams[1].logo || data.tournament.teamOne.logo} name={teamNames[1]} size="score" tournamentYear={data.tournament.year} /><strong>{teamNames[1]}</strong>{data.userTeamSide === 1 ? <small className={styles.yourTeam} aria-label={`${teamNames[1]} is your team`}>Your Team</small> : null}</div>
       <MatchStatusBlock
@@ -396,8 +397,9 @@ export default function GameCenter({ initialData, matchId, backTo }) {
 
     <section className={styles.actionPanel}>
       {data.state === "pre" ? <p><span aria-hidden="true">🔒</span> Scoring opens before {teeTime || "the scheduled tee time"}.</p> : null}
-      {data.state === "live" ? <button type="button" disabled={opening} onClick={openScoring}>{opening ? "Opening…" : data.stats.played ? "Continue Scoring" : "Start Scoring"}</button> : null}
-      {data.state === "final" ? <a href="#scorecard">View Final Scorecard</a> : null}
+      {data.state === "live" && data.userTeamSide ? <button type="button" disabled={opening} onClick={openScoring}>{opening ? "Opening…" : data.stats.played ? "Continue Scoring" : "Start Scoring"}</button> : null}
+      {data.state === "live" && !data.userTeamSide ? <a href="#scorecard">View Scorecard</a> : null}
+      {data.state === "final" ? <a href="#scorecard">Final Scorecard</a> : null}
       <small>{updatedLabel}</small>
       {error ? <span className={styles.refreshError} role="status">{error} <button type="button" onClick={refresh}>Retry</button></span> : null}
     </section>

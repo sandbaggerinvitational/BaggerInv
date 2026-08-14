@@ -66,7 +66,7 @@ test("My Match navigation always opens the dashboard instead of restoring a scor
   assert.match(scoreEntry, /Return to My Match<\/Link>/);
   assert.match(scoreEntry, /href="\/my-match"/);
   assert.doesNotMatch(scoreEntry, /Return to My Match<\/Link>[\s\S]{0,100}href="\/score"/);
-  assert.match(gameCenter, /backTo === "my-match" \? "\/my-match"/);
+  assert.match(gameCenter, /leaderboardReturn \? backTo : "\/my-match"/);
   assert.match(profile, /href="\/my-match"/);
   assert.match(activation, /href="\/my-match">Open My Match/);
   assert.match(manifest, /url:\s*"\/my-match\?source=shortcut"/);

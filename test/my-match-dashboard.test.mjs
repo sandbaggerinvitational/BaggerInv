@@ -7,7 +7,7 @@ const scoreUrl = new URL("../app/score/ScoreEntry.js", import.meta.url);
 const styleUrl = new URL("../app/score/my-match-dashboard.module.css", import.meta.url);
 const sheetUrl = new URL("../lib/google-sheets-write.js", import.meta.url);
 
-test("My Match uses a compact tournament header and ordered match cards", async () => {
+test("My Match uses a compact tournament header and tiered assignment groups", async () => {
   const [source, sheet] = await Promise.all([
     readFile(componentUrl, "utf8"),
     readFile(sheetUrl, "utf8"),
@@ -16,20 +16,26 @@ test("My Match uses a compact tournament header and ordered match cards", async 
   assert.match(source, /tournamentLogo\(filename\)/);
   assert.match(sheet, /`sandbagger-\$\{context\.year\}`/);
   assert.match(source, /orderPlayerMatches\(matches, tournament\?\.currentRound\)/);
-  assert.match(source, /Current \/ Upcoming/);
+  assert.match(source, /Available to Score/);
+  assert.match(source, /Current Match/);
+  assert.match(source, /Next Match/);
+  assert.match(source, /Coming Up/);
   assert.match(source, /Completed/);
-  assert.match(source, /Round \$\{match\.round\} • Match \$\{match\.match\}/);
-  assert.match(source, /<strong>{match\.format \|\| "Format TBA"}<\/strong>/);
+  assert.match(source, /`Round \$\{match\.round\} · Match \$\{match\.match\}`/);
+  assert.match(source, /homeFormatLabel\(match\.format\)/);
+  assert.match(source, /data-tier=\{group\.tier\}/);
   assert.doesNotMatch(source, /Welcome, .*Choose one of your tournament matches/);
 });
 
-test("My Match presents balanced teams with stacked player names and logo fallbacks", async () => {
+test("My Match presents full names in detailed and compact matchup summaries", async () => {
   const [source, styles] = await Promise.all([
     readFile(componentUrl, "utf8"),
     readFile(styleUrl, "utf8"),
   ]);
   assert.match(source, /players\.map\(\(name\) => <span key=\{name\}>\{name\}<\/span>\)/);
-  assert.doesNotMatch(source, /join\(" \+ "\)/);
+  assert.match(source, /players\.join\(" \+ "\)/);
+  assert.match(source, /<small>Your side<\/small>/);
+  assert.match(source, /<small>Opponents<\/small>/);
   assert.match(source, /fallbackSrc=\{type === "tournament" \? undefined : tournamentLogo\(tournamentLogoFilename\)\}/);
   assert.match(styles, /\.matchup\{[^}]*grid-template-columns:minmax\(0,1fr\) 22px minmax\(0,1fr\)/);
   assert.match(styles, /\.teamBlock\{[^}]*justify-items:center/);
@@ -37,7 +43,7 @@ test("My Match presents balanced teams with stacked player names and logo fallba
   assert.match(styles, /overflow-wrap:anywhere/);
 });
 
-test("My Match keeps status, scoring access, and final results distinct", async () => {
+test("My Match keeps status, scoring access, Game Center, and final results distinct", async () => {
   const [source, sheet] = await Promise.all([
     readFile(componentUrl, "utf8"),
     readFile(sheetUrl, "utf8"),
@@ -47,38 +53,40 @@ test("My Match keeps status, scoring access, and final results distinct", async 
   assert.match(source, /status === "Live"/);
   assert.match(source, /onClick=\{\(\) => onOpen\(match\)\}/);
   assert.match(source, /href=\{detailsHref\}/);
-  assert.match(source, /className=\{styles\.cardAction\}/);
+  assert.match(source, /className=\{styles\.primaryAction\}/);
+  assert.match(source, /className=\{styles\.secondaryAction\}/);
   assert.match(source, /className=\{styles\.actionRow\}/);
   assert.match(source, /status === "Locked" \? <i aria-hidden="true">🔒<\/i>/);
   assert.doesNotMatch(source, /<footer>/);
   assert.match(source, /Start Scoring/);
   assert.match(source, /Continue Scoring/);
-  assert.match(source, /View Final Scorecard/);
-  assert.match(source, /\["Live", "Final"\]\.includes\(status\)/);
+  assert.match(source, /Final Scorecard/);
+  assert.match(source, /Game Center/);
+  assert.match(source, /if \(!scorecardAction\)/);
   assert.match(source, /formatMatchResult\(match, match\.team\?\.side\)/);
   assert.doesNotMatch(source, /function participantResult/);
   assert.match(sheet, /statusText: String\(match\["Match Status Text"\]/);
   assert.match(sheet, /match\["18-Hole Winner"\] \|\| match\["Matchup Winner"\]/);
 });
 
-test("My Match formats tees, highlights one relevant card, and uses compact outlined actions", async () => {
+test("My Match formats tees, promotes actionable matches, and uses one dominant action", async () => {
   const [source, styles] = await Promise.all([
     readFile(componentUrl, "utf8"),
     readFile(styleUrl, "utf8"),
   ]);
   assert.match(source, /return \/\\btees\?\$\/i\.test\(tee\) \? tee : `\$\{tee\} Tees`/);
   assert.match(source, /\.join\(" • "\)/);
-  assert.match(source, /emphasized=\{match\.matchId === relevant\?\.matchId\}/);
-  assert.match(source, /selection\.primary \|\| selection\.choices\[0\] \|\| selection\.ordered\[0\]/);
-  assert.match(source, /const displayStatus = emphasized \? formatStatusLabel\(status,/);
-  assert.match(source, /<MatchStatusBlock status=\{displayStatus\} result=\{result\} \/>/);
+  assert.match(source, /const actionable = ordered\.filter/);
+  assert.match(source, /const promotedIds = new Set/);
+  assert.match(source, /tier=\{group\.tier\}/);
+  assert.match(source, /const displayStatus = primary \? formatStatusLabel\(status,/);
+  assert.match(source, /<MatchStatusBlock status=\{displayStatus\} result=\{result\}/);
   assert.equal((source.match(/<MatchStatusBlock/g) || []).length, 1);
-  assert.match(styles, /\.cardAction\{[^}]*border:1px solid #1b5946/);
-  assert.match(styles, /\.cardAction\{[^}]*background:#fffdf8/);
-  assert.doesNotMatch(styles, /\.cardAction\{[^}]*background:#(?:0b|15|17)[0-9a-f]{4}/i);
-  assert.match(styles, /\.actionRow\{[^}]*background:transparent/);
+  assert.match(styles, /\.matchCard\[data-tier=primary\]\{[^}]*border:1\.5px solid #bd963b/);
+  assert.match(styles, /\.primaryAction,\.secondaryAction\{[^}]*min-height:44px/);
+  assert.match(styles, /\.primaryAction\{[^}]*background:#0b4938/);
+  assert.match(styles, /\.secondaryAction\{[^}]*background:transparent/);
   assert.match(styles, /\.supportText\{[^}]*display:inline-flex/);
-  assert.match(styles, /\.cardAction\{[^}]*min-height:27px/);
   assert.match(styles, /\.cardState\{[^}]*justify-items:end/);
   assert.doesNotMatch(styles, /\.matchCard footer/);
 });
@@ -107,11 +115,13 @@ test("My Match provides compact special states and mobile-safe card geometry", a
   assert.match(styles, /width:min\(100%,760px\)/);
   assert.match(styles, /minmax\(0,1fr\)/);
   assert.match(styles, /padding:18px 16px calc\(var\(--participant-nav-total\) \+ 20px\)/);
-  assert.match(styles, /\.matchGroups,\.matchGroup,\.matchList\{display:grid;gap:8px\}/);
+  assert.match(styles, /\.matchGroups,\.matchGroup,\.matchList\{display:grid\}/);
+  assert.match(styles, /\.matchGroup\[data-tier=upcoming\] \.matchList,\.matchGroup\[data-tier=completed\] \.matchList\{[^}]*overflow:hidden/);
   assert.match(styles, /\.matchCard\{[^}]*padding:11px 12px/);
   assert.match(styles, /\.logoPlate\[data-type=course\]\{width:44px;height:44px\}/);
-  assert.match(styles, /\.courseLine\{[^}]*border-bottom:1px solid #f0eadf/);
+  assert.match(styles, /\.courseLine\{[^}]*border-bottom:1px solid #eee7da/);
   assert.match(styles, /\.courseLine strong\{[^}]*font-size:.82rem/);
+  assert.match(styles, /\.compactMatchup strong\{[^}]*overflow-wrap:anywhere/);
   assert.doesNotMatch(styles, /overflow-x:\s*(auto|scroll)/);
   assert.match(styles, /@media\(max-width:420px\)/);
 });

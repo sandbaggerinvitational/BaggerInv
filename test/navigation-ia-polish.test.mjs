@@ -90,7 +90,7 @@ test("My Match remains the assignment summary and Game Center remains one-match 
   assert.doesNotMatch(myMatch, /This isn’t me|This isn't me|Not you\?|Change player/i);
   assert.match(gameCenter, /Match Flow/);
   assert.match(gameCenter, /scorecardTable/);
-  assert.match(gameCenter, /backTo === "my-match" \? "\/my-match"/);
+  assert.match(gameCenter, /leaderboardReturn \? backTo : "\/my-match"/);
   assert.match(scoreStyles, /participant-scoring-focus-active \[data-participant-navigation\]/);
 });
 
