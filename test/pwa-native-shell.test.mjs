@@ -51,6 +51,7 @@ test("safe-area, dynamic-height, transition, and reduced-motion contracts are sh
   assert.match(globals, /@supports \(height: 100dvh\)/);
   assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(sheetCss, /var\(--app-height\)/);
+  assert.match(sheetCss, /\.panel:global\(\.sideMenu\).*background:var\(--green-dark\)/);
   assert.match(sheetCss, /prefers-reduced-motion:reduce/);
   assert.match(headerCss, /var\(--safe-top\)/);
 });
