@@ -23,12 +23,14 @@ test("formal Auth shadow diagnostics are Director/service only and omit sensitiv
   assert.doesNotMatch(migration, /'email'|'authUserId'|'authUserUuid'/);
 });
 
-test("signed Preview Director impersonation can reach isolated diagnostics without a Google freshness read", () => {
+test("signed Preview Director impersonation requires a current lease and Director freshness", () => {
   const resolver = fs.readFileSync(new URL("../lib/player-passport-server.js", import.meta.url), "utf8");
   const directorStart = resolver.indexOf("export async function inspectTournamentDirectorToken");
   const fastPath = resolver.indexOf("if (isPreviewImpersonationSession(session))", directorStart);
   const cachePath = resolver.indexOf("const key = directorTokenKey(token)", directorStart);
   assert.ok(directorStart >= 0 && fastPath > directorStart && cachePath > fastPath);
-  assert.match(resolver.slice(fastPath, cachePath), /status: "active"/);
-  assert.match(resolver.slice(fastPath, cachePath), /actor: session\.previewDirector/);
+  assert.match(resolver.slice(fastPath, cachePath), /inspectPreviewImpersonationDirectorSession/);
+  assert.match(resolver, /verifyPreviewIdentityImpersonation/);
+  assert.match(resolver, /validateDirector\(directorPassportSession\(session\)\)/);
+  assert.doesNotMatch(resolver.slice(fastPath, cachePath), /actor: session\.previewDirector/);
 });

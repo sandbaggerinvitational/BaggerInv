@@ -31,6 +31,8 @@ import PlayerIntelligenceSections from "./PlayerIntelligenceSections";
 import { cookies } from "next/headers";
 import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport";
 import { resolvePlayerPassportToken } from "../../../lib/player-passport-server";
+import { participantIdentityAuthorityEnvironment } from "../../../lib/participant-identity-authority";
+import { resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver";
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();
@@ -100,9 +102,20 @@ export default async function PlayerPage({ params, searchParams }) {
   const player = getPlayerBySlug(slug);
   if (!player) notFound();
   const cookieStore = await cookies();
-  const passportIdentity = await resolvePlayerPassportToken(
-    cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""
-  );
+  const participantIdentityAuthority = participantIdentityAuthorityEnvironment();
+  let participantIdentity = null;
+  if (participantIdentityAuthority.resolved === "supabase") {
+    try {
+      participantIdentity = await resolveSupabaseParticipantIdentity({ cookieStore });
+    } catch {
+      // Player profiles are public. Missing participant identity only changes
+      // the contextual back-link and must not make the profile unavailable.
+    }
+  } else {
+    participantIdentity = await resolvePlayerPassportToken(
+      cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""
+    );
+  }
 
   const stats = getPlayerStats(player["Player ID"]);
   const formatMatchHistory = getPlayerFormatMatchHistory(
@@ -149,10 +162,10 @@ export default async function PlayerPage({ params, searchParams }) {
     <main>
       <Header />
       <ContextBackLink
-        href={passportIdentity ? "/home" : playerDirectoryReturnHref}
-        label={passportIdentity ? "Back to My Tournament" : "Back to All Sandbaggers"}
+        href={participantIdentity ? "/home" : playerDirectoryReturnHref}
+        label={participantIdentity ? "Back to My Tournament" : "Back to All Sandbaggers"}
       />
-      {passportIdentity ? <ContextBackLink
+      {participantIdentity ? <ContextBackLink
         href={playerDirectoryReturnHref}
         label="Browse All Sandbaggers"
       /> : null}

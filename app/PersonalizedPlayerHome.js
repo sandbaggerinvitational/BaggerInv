@@ -155,7 +155,7 @@ function parseServerTiming(value = "") {
   }).filter(([name]) => name));
 }
 
-export default function PersonalizedPlayerHome({ netSkins = null, initialData = null, managed = false }) {
+export default function PersonalizedPlayerHome({ netSkins = null, initialData = null, managed = false, participantIdentityAuthority = "passport" }) {
   const cachedInitialization = useMemo(() => managed ? null : readParticipantInitializationCache(), [managed]);
   const [payload, setPayload] = useState(initialData || cachedInitialization?.data || null);
   const [state, setState] = useState(initialData || cachedInitialization ? "ready" : "loading");
@@ -279,8 +279,8 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
     <section className={styles.empty}>
       <p>Your Match</p>
       <h2 id="player-home-title">Find your tournament match</h2>
-      <span>Activate Player Passport to see your partner, opponents, course, and tee time.</span>
-      <Link className={styles.primaryAction} href="/activate">Activate Player Passport</Link>
+      <span>{participantIdentityAuthority === "supabase" ? "Sign in to see your partner, opponents, course, and tee time." : "Activate Player Passport to see your partner, opponents, course, and tee time."}</span>
+      <Link className={styles.primaryAction} href={participantIdentityAuthority === "supabase" ? "/participant-auth?next=/home" : "/activate"}>{participantIdentityAuthority === "supabase" ? "Participant sign-in" : "Activate Player Passport"}</Link>
     </section>
   </>;
   if (state === "error") return <>

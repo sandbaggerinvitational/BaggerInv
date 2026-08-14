@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { privatePageMetadata } from "../../lib/seo";
 import { liveTournamentV2Enabled } from "../../lib/spreadsheet-environment";
+import { requireParticipantIdentityAuthority } from "../../lib/participant-identity-authority";
 import ScoreEntry from "./ScoreEntry";
 import PreviewModeBadge from "../PreviewModeBadge";
 
@@ -10,5 +11,6 @@ export const metadata = privatePageMetadata("Enter Live Scores | Sandbagger Invi
 export default function ScorePage() {
   if (!liveTournamentV2Enabled()) notFound();
   const previewMode = process.env.VERCEL_ENV === "preview";
-  return <main><PreviewModeBadge visible={previewMode} /><ScoreEntry localFirstEnabled={previewMode} /></main>;
+  const participantIdentityAuthority = requireParticipantIdentityAuthority().resolved;
+  return <main><PreviewModeBadge visible={previewMode} /><ScoreEntry localFirstEnabled={previewMode} participantIdentityAuthority={participantIdentityAuthority} /></main>;
 }

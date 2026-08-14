@@ -82,7 +82,7 @@ function ScorecardCell({ readOnly, disabled, onEdit, children, label }) {
   return <button type="button" disabled={disabled} onClick={onEdit} aria-label={label}>{children}</button>;
 }
 
-export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = false }) {
+export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = false, participantIdentityAuthority = "passport" }) {
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
   const [authorized, setAuthorized] = useState(false);
@@ -117,6 +117,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const [scoringDiagnosticsEnabled] = useState(() => scoringDiagnosticsOptIn(localFirstEnabled));
   const [scoringTimingSamples, setScoringTimingSamples] = useState([]);
   const scoringDiagnosticsStore = useRef(null);
+  const supabaseParticipantIdentity = participantIdentityAuthority === "supabase";
 
   const durableScoringStore = () => {
     if (!scoringStore.current) scoringStore.current = createIndexedDbScoringStore();
@@ -250,7 +251,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
           await loadMatch();
           return;
         }
-        if (passport.status === 401 && !dashboardOnly) await loadMatchOptions();
+        if (passport.status === 401 && !dashboardOnly && !supabaseParticipantIdentity) await loadMatchOptions();
       } catch {
         if (current) setPassportState(cached ? "freshness-degraded" : "unavailable");
       } finally {
@@ -259,7 +260,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     };
     restore();
     return () => { current = false; controller.abort(); window.removeEventListener("participant-navigation-start", cancelForNavigation); };
-  }, [dashboardOnly, restoreAttempt]);
+  }, [dashboardOnly, restoreAttempt, supabaseParticipantIdentity]);
 
   const login = async () => {
     setBusy(true); setStatus("Opening scoring…");
@@ -339,6 +340,11 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     setData(null);
     setCredential("");
     setSelectedMatch("");
+    if (supabaseParticipantIdentity) {
+      setRestoring(true);
+      setRestoreAttempt((value) => value + 1);
+      return;
+    }
     await loadMatchOptions();
     setStatus("Match access cleared.");
   };
@@ -798,7 +804,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     : <div className={styles.syncStatus} data-state={syncStatus.state} role="status">{syncStatus.text}</div>;
 
   if (restoring) return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>{previewMode ? "Loading the selected player’s tournament experience." : "Please wait while your Player Passport and match are refreshed."}</p></div>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>{previewMode ? "Loading the selected player’s tournament experience." : supabaseParticipantIdentity ? "Please wait while your participant session and match are refreshed." : "Please wait while your Player Passport and match are refreshed."}</p></div>
   </section>;
 
   if (!authorized && passportPlayer) return <MyMatchDashboard
@@ -813,6 +819,12 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   if (!authorized && passportState === "unavailable") return <section className={styles.login}>
     <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Tournament information is temporarily unavailable. Please try again.</p></div>
     <button className={styles.primary} type="button" onClick={() => { setRestoring(true); setRestoreAttempt((value) => value + 1); }}>Retry</button>
+  </section>;
+
+  if (!authorized && supabaseParticipantIdentity) return <section className={styles.login}>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Sign in with your approved tournament email to open your assigned scorecard.</p></div>
+    <Link className={styles.primary} href={`/participant-auth?next=${dashboardOnly ? "/my-match" : "/score"}`}>Participant sign-in</Link>
+    {status && <p className={styles.status}>{status}</p>}
   </section>;
 
   if (!authorized) return <section className={styles.login}>

@@ -44,6 +44,7 @@ export default function PlayerSetupBanner({ readiness, onUpdated }) {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (!readiness) return undefined;
     const installed = () => saveReadiness({ pwaInstalled: true }).then(onUpdated).catch(() => {});
     window.addEventListener("sbi:pwa-installed", installed);
     return () => {

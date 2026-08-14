@@ -129,13 +129,14 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(sheetsWrite, /tee: String\(match\["Tee Played"\]/);
 });
 
-test("the public Tournament Command Center offers Passport activation without exposing scoring", async () => {
+test("the Tournament Command Center keeps legacy activation only outside Supabase participant delivery", async () => {
   const [component, styles] = await Promise.all([
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/personalized-player-home.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(component, /Activate Player Passport/);
-  assert.match(component, /href="\/activate"/);
+  assert.match(component, /participantIdentityAuthority === "supabase"/);
+  assert.match(component, /"\/participant-auth\?next=\/home" : "\/activate"/);
   assert.match(styles, /\.empty a\.primaryAction\s*\{\s*color:\s*#fff/);
 });
 

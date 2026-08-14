@@ -115,7 +115,7 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
   if (payload?.liveData) return <>
     <PwaSplashIdentityBridge tournament={payload.liveData.tournament} />
     <PreviewModeBadge visible />
-    <MobileTournamentHome liveData={payload.liveData} initialParticipantData={payload.participant} />
+    <MobileTournamentHome liveData={payload.liveData} initialParticipantData={payload.participant} participantIdentityAuthority="supabase" />
   </>;
 
   return <main className="mobileHomeMain">

@@ -447,7 +447,7 @@ test("Preview benchmark administration is Director-gated, reversible, and covers
   assert.doesNotMatch(route, /PRODUCTION_SPREADSHEET_ID|SUPABASE_SCORING_MIRROR_SECRET_KEY.*NextResponse/);
 });
 
-test("Phase 1 remains read-inactive while Phase 2 mirror-back is isolated behind server authority", async () => {
+test("participant scoring client remains database-inactive while server authority selects the current source", async () => {
   const [route, legacyRoute, scorePage, scoreEntry, migration, serviceAccessMigration, envExample, directorShadowRoute] = await Promise.all([
     readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/scoring/matches/[matchId]/route.js", import.meta.url), "utf8"),
@@ -465,7 +465,8 @@ test("Phase 1 remains read-inactive while Phase 2 mirror-back is isolated behind
     assert.match(scoringRoute, /hole: participantResult\.hole/);
     assert.doesNotMatch(scoringRoute, /_shadow\?\.hole/);
   }
-  assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /supabase|hole_score_mirror|live_match_mirror/i);
+  assert.match(scorePage, /requireParticipantIdentityAuthority\(\)\.resolved/);
+  assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /hole_score_mirror|live_match_mirror/i);
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /realtime|createClient\(/i);
   assert.match(migration, /enable row level security/g);
   assert.match(migration, /revoke all .* from anon, authenticated/g);

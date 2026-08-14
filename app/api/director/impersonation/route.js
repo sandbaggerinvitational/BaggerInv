@@ -16,7 +16,11 @@ async function directorSession(request) {
   return { session: verifyPlayerPassportSession(token), identity: identity.identity };
 }
 
-function sessionToken(session, impersonatedPlayerId = "", previewDirector = null, previewImpersonationLeaseId = "") {
+function remainingSessionSeconds(session) {
+  return Math.max(0, Number(session.exp || 0) - Math.floor(Date.now() / 1000));
+}
+
+function sessionToken(session, impersonatedPlayerId = "", previewDirector = null, previewImpersonationLeaseId = "", maxAge = remainingSessionSeconds(session)) {
   return createPlayerPassportSession({
     playerId: session.playerId,
     tournamentId: session.tournamentId,
@@ -25,7 +29,7 @@ function sessionToken(session, impersonatedPlayerId = "", previewDirector = null
     impersonatedPlayerId,
     previewImpersonationLeaseId,
     previewDirector,
-    expiresInSeconds: Math.max(3600, Number(session.exp || 0) - Math.floor(Date.now() / 1000)),
+    expiresInSeconds: Math.min(remainingSessionSeconds(session), Math.max(0, Number(maxAge) || 0)),
   });
 }
 
@@ -45,8 +49,13 @@ export async function POST(request) {
     lease_seconds: 4 * 60 * 60,
   });
   if (!lease.payload?.ok) return NextResponse.json({ error: "Preview impersonation is temporarily unavailable." }, { status: 503 });
+  const leaseMaxAge = Math.max(0, Math.floor((Date.parse(lease.payload.expiresAt) - Date.now()) / 1000));
+  if (!leaseMaxAge) return NextResponse.json({ error: "Preview impersonation is temporarily unavailable." }, { status: 503 });
   const response = NextResponse.json({ ok: true, player });
-  response.cookies.set(playerPassportCookie(sessionToken(authorized.session, player.id, authorized.identity.actor, lease.payload.leaseId)));
+  response.cookies.set(playerPassportCookie(
+    sessionToken(authorized.session, player.id, authorized.identity.actor, lease.payload.leaseId, leaseMaxAge),
+    leaseMaxAge,
+  ));
   return response;
 }
 
@@ -61,6 +70,7 @@ export async function DELETE(request) {
     });
   }
   const response = NextResponse.json({ ok: true, player: authorized.identity.actor });
-  response.cookies.set(playerPassportCookie(sessionToken(authorized.session)));
+  const maxAge = remainingSessionSeconds(authorized.session);
+  response.cookies.set(playerPassportCookie(sessionToken(authorized.session, "", null, "", maxAge), maxAge));
   return response;
 }

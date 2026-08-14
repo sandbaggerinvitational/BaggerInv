@@ -43,7 +43,7 @@ function RoundPerformance({ rounds }) {
   </section>;
 }
 
-export default function ParticipantProfile() {
+export default function ParticipantProfile({ participantIdentityAuthority = "passport" }) {
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [identityState, setIdentityState] = useState("loading");
@@ -125,9 +125,11 @@ export default function ParticipantProfile() {
     }
   };
 
-  if (loading && !player) return <section className={styles.state}>Loading your Player Passport…</section>;
+  if (loading && !player) return <section className={styles.state}>{participantIdentityAuthority === "supabase" ? "Loading your participant profile…" : "Loading your Player Passport…"}</section>;
   if (identityState === "unavailable" && !player) return <section className={styles.state}><h1>Player information temporarily unavailable</h1><p>Your tournament information could not be refreshed. Please try again.</p><button type="button" onClick={() => setAttempt((value) => value + 1)}>Retry</button></section>;
-  if (!player) return <section className={styles.state}><h1>Player Passport required</h1><Link href="/activate">Activate Player Passport</Link></section>;
+  if (!player) return participantIdentityAuthority === "supabase"
+    ? <section className={styles.state}><h1>Participant sign-in required</h1><Link href="/participant-auth?next=/me">Sign in</Link></section>
+    : <section className={styles.state}><h1>Player Passport required</h1><Link href="/activate">Activate Player Passport</Link></section>;
 
   const profile = tournamentData?.player || player;
   const tournament = tournamentData?.tournament;
