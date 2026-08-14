@@ -44,11 +44,13 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   }, [appShell, isOpen]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    // The participant shell warms account-scoped capability after Supabase
+    // session restoration so the Director row is ready before the Hub opens.
+    if (!appShell && !isOpen) return;
     let cancelled = false;
     const readDirectorAccess = async () => {
       for (let attempt = 0; attempt < 2; attempt += 1) {
-        const response = await fetch("/api/director/access", { cache: "no-store" }).catch(() => null);
+        const response = await fetch("/api/director/access", { cache: "no-store", credentials: "same-origin" }).catch(() => null);
         if (response?.ok) return response.json().catch(() => null);
         if (response?.status !== 503 || attempt === 1) return null;
         await new Promise((resolve) => window.setTimeout(resolve, 750));
@@ -78,7 +80,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
       if (!active) applyTournament(session?.tournament);
     });
     return () => { cancelled = true; };
-  }, [capabilityRevision, isOpen]);
+  }, [appShell, capabilityRevision, isOpen]);
 
   useEffect(() => {
     const refreshCapability = () => setCapabilityRevision((value) => value + 1);

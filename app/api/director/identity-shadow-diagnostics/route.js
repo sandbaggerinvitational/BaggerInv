@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { tournamentDirectorTokenFromRequest } from "../../../../lib/player-passport.js";
-import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
+import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import { assertParticipantIdentityAdministrativeEnvironment } from "../../../../lib/participant-identity-authority.js";
 import { readParticipantIdentityShadowDiagnostics } from "../../../../lib/participant-identity-supabase.js";
 
@@ -10,7 +9,7 @@ export async function GET(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
   try { assertParticipantIdentityAdministrativeEnvironment(); }
   catch { return NextResponse.json({ error: "Not found." }, { status: 404 }); }
-  const authorization = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
+  const authorization = await authorizePreviewDirector({ request, allowBootstrap: true });
   if (authorization.status !== "active") return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
   const tournamentId = String(request.nextUrl.searchParams.get("tournamentId") || "2026").trim();
   const diagnostics = await readParticipantIdentityShadowDiagnostics(tournamentId);

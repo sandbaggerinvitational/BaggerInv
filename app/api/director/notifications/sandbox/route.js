@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { tournamentDirectorTokenFromRequest, verifyPlayerPassportSession } from "../../../../../lib/player-passport.js";
-import { inspectTournamentDirectorToken } from "../../../../../lib/player-passport-server.js";
+import { authorizePreviewDirector } from "../../../../../lib/preview-director-authorization.js";
 import { appendNotificationLog, currentPushDevice, invalidatePushDevice } from "../../../../../lib/google-sheets-write.js";
 import { previewPushConfiguration, sendPreviewPush } from "../../../../../lib/web-push-notifications.js";
 import { notificationPreviewContextForPlayer, previewNotificationTemplate } from "../../../../../lib/notification-templates.js";
@@ -10,11 +9,13 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   if (!previewPushConfiguration().preview) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  let session;
-  try { session = verifyPlayerPassportSession(tournamentDirectorTokenFromRequest(request)); } catch { return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 }); }
-  const inspected = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
+  const inspected = await authorizePreviewDirector({ request, allowBootstrap: true });
   if (inspected.status === "unavailable") return NextResponse.json({ error: "Tournament Director identity could not be verified right now. Retry." }, { status: 503 });
   if (inspected.status !== "active") return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
+  const session = inspected.identity.session;
+  if (session.type !== "player-passport") {
+    return NextResponse.json({ error: "This notification test still requires the legacy registered device context." }, { status: 409 });
+  }
   const input = await request.json().catch(() => ({}));
   const tournamentData = await getTournamentData();
   const template = previewNotificationTemplate(input?.templateId, notificationPreviewContextForPlayer(tournamentData, inspected.identity.player));

@@ -213,7 +213,7 @@ test("expired or revoked lease denials clear the cached impersonation presentati
   assert.match(shell, /Preserve the last verified presentation shell during temporary failures/);
 });
 
-test("participant identity also rejects expired/revoked/missing leases without Auth fallback", async () => withPreview(async () => {
+test("participant identity binds impersonation to Auth before rejecting expired/revoked/missing leases", async () => withPreview(async () => {
   const { token } = signedSession();
   for (const code of ["IMPERSONATION_LEASE_EXPIRED", "IMPERSONATION_LEASE_REVOKED", "IMPERSONATION_LEASE_NOT_FOUND"]) {
     let authFallback = false;
@@ -225,7 +225,7 @@ test("participant identity also rejects expired/revoked/missing leases without A
         verifyClaims: async () => { authFallback = true; return { status: "active", claims: { sub: "auth-user" } }; },
       },
     }), (error) => error instanceof ParticipantIdentityResolutionError && error.code === code);
-    assert.equal(authFallback, false);
+    assert.equal(authFallback, true);
   }
 }));
 
@@ -259,6 +259,7 @@ test("expired impersonation cannot authorize an existing scoring session", async
       env: previewEnv,
       identityDependencies: {
         passportSecret: secret,
+        verifyClaims: async () => ({ status: "active", claims: { sub: "11111111-1111-4111-8111-111111111111" } }),
         verifyImpersonation: async () => ({ payload: { ok: false, code: "IMPERSONATION_LEASE_EXPIRED" } }),
       },
       readScoringContext: async () => { throw new Error("must not reach scoring context"); },

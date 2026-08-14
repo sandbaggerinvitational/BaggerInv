@@ -1,8 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getTournamentData, invalidateTournamentDataCache } from "../../../live/sheetData.js";
-import { tournamentDirectorTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
-import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
+import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data.js";
 import { resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
 import { initializeParticipantTournament, invalidateParticipantInitialization } from "../../../../lib/participant-initialization.js";
@@ -14,8 +13,7 @@ const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 4
 
 export async function POST(request) {
   if (process.env.VERCEL_ENV !== "preview") return unavailable();
-  const token = tournamentDirectorTokenFromRequest(request);
-  const authorization = await inspectTournamentDirectorToken(token);
+  const authorization = await authorizePreviewDirector({ request, allowBootstrap: true });
   if (authorization.status === "unavailable") {
     return NextResponse.json({ error: "Tournament Director identity could not be verified right now. Retry." }, { status: 503, headers: { "Retry-After": "1" } });
   }
@@ -28,9 +26,9 @@ export async function POST(request) {
     revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
     for (const path of ["/admin/director", "/home", "/live", "/my-match", "/leaderboards"]) revalidatePath(path);
     invalidateTournamentDataCache();
-    const session = verifyPlayerPassportSession(token);
-    invalidateParticipantInitialization(session);
-    await initializeParticipantTournament(session);
+    const session = authorization.identity.session;
+    invalidateParticipantInitialization(session.type === "player-passport" ? session : null);
+    if (session.type === "player-passport") await initializeParticipantTournament(session);
     return NextResponse.json({
       ok: true,
       message: "Preview Tournament Reset Complete",

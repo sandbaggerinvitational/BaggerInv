@@ -60,7 +60,7 @@ test("missing, expired, suspended, revoked, inactive, and wrong-tournament ident
   }
 });
 
-test("Director Preview impersonation is an audited lease and does not require a fake Auth user", async () => {
+test("Director Preview impersonation is an audited lease bound to the real Auth account", async () => {
   const original = process.env.VERCEL_ENV;
   process.env.VERCEL_ENV = "preview";
   try {
@@ -73,14 +73,14 @@ test("Director Preview impersonation is an audited lease and does not require a 
       request: { cookies: { get: () => ({ value: token }) } }, cookieStore: cookieStore(), env: previewEnv,
       dependencies: {
         passportSecret: secret,
-        verifyClaims: async () => { authCalled = true; return { status: "inactive" }; },
+        verifyClaims: async () => { authCalled = true; return { status: "active", claims: { sub: "11111111-1111-4111-8111-111111111111" } }; },
         verifyImpersonation: async () => ({ payload: { ok: true, leaseId: "22222222-2222-4222-8222-222222222222",
           targetPlayerId: "HM01", expiresAt: "2026-08-12T23:00:00Z", context: context("HM01") } }),
       },
     });
     assert.equal(resolved.playerId, "HM01");
     assert.equal(resolved.previewMode, true);
-    assert.equal(authCalled, false);
+    assert.equal(authCalled, true);
   } finally {
     if (original == null) delete process.env.VERCEL_ENV;
     else process.env.VERCEL_ENV = original;

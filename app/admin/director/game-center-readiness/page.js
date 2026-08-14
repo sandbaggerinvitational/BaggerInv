@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Header } from "../../../components.js";
-import { tournamentDirectorTokenFromCookieStore } from "../../../../lib/player-passport.js";
-import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
+import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import GameCenterReadinessClient from "./GameCenterReadinessClient.js";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +9,7 @@ export const metadata = { title: "Game Center Readiness | Sandbagger Invitationa
 
 export default async function GameCenterReadinessPage() {
   const store = await cookies();
-  const result = await inspectTournamentDirectorToken(tournamentDirectorTokenFromCookieStore(store));
+  const result = await authorizePreviewDirector({ cookieStore: store, allowBootstrap: true });
   if (result.status !== "active") redirect("/home");
   return <main><Header homeHref="/home" /><GameCenterReadinessClient /></main>;
 }

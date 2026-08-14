@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
 import {
   createPlayerPassportSession,
-  isPreviewImpersonationSession,
   playerPassportCookie,
-  previewDirectorPassportCookie,
-  tournamentDirectorTokenFromRequest,
-  verifyPlayerPassportSession,
 } from "../../../../lib/player-passport.js";
-import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
+import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import { getTournamentData } from "../../../live/sheetData.js";
 import { beginPreviewIdentityImpersonation, endPreviewIdentityImpersonation } from "../../../../lib/participant-identity-supabase.js";
 
@@ -17,14 +13,13 @@ const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 4
 
 async function directorSession(request) {
   if (process.env.VERCEL_ENV !== "preview") return null;
-  const token = tournamentDirectorTokenFromRequest(request);
-  const identity = await inspectTournamentDirectorToken(token);
+  const identity = await authorizePreviewDirector({ request, allowBootstrap: true });
   if (identity.status !== "active") return null;
-  return { token, session: verifyPlayerPassportSession(token), identity: identity.identity };
+  return { session: identity.identity.session, identity: identity.identity };
 }
 
 function remainingSessionSeconds(session) {
-  return Math.max(0, Number(session.exp || 0) - Math.floor(Date.now() / 1000));
+  return session.exp ? Math.max(0, Number(session.exp) - Math.floor(Date.now() / 1000)) : 4 * 60 * 60;
 }
 
 function sessionToken(session, impersonatedPlayerId = "", previewDirector = null, previewImpersonationLeaseId = "", maxAge = remainingSessionSeconds(session)) {
@@ -51,6 +46,7 @@ export async function POST(request) {
   const lease = await beginPreviewIdentityImpersonation({
     tournament_id: authorized.session.tournamentId,
     director_player_id: authorized.session.playerId,
+    director_auth_user_id: authorized.identity.authUserId,
     director_name: authorized.identity.actor?.name || "Tournament Director",
     target_player_id: player.id,
     lease_seconds: 4 * 60 * 60,
@@ -63,27 +59,20 @@ export async function POST(request) {
     sessionToken(authorized.session, player.id, authorized.identity.actor, lease.payload.leaseId, leaseMaxAge),
     leaseMaxAge,
   ));
-  if (!isPreviewImpersonationSession(authorized.session)) {
-    response.cookies.set(previewDirectorPassportCookie(
-      authorized.token,
-      remainingSessionSeconds(authorized.session),
-    ));
-  }
   return response;
 }
 
 export async function DELETE(request) {
   const authorized = await directorSession(request);
   if (!authorized) return unavailable();
-  if (authorized.session.previewImpersonationLeaseId) {
+  if (authorized.identity.impersonation?.leaseId) {
     await endPreviewIdentityImpersonation({
-      lease_id: authorized.session.previewImpersonationLeaseId,
+      lease_id: authorized.identity.impersonation.leaseId,
       revoked_by: authorized.session.playerId,
       reason: "DIRECTOR_ENDED",
     });
   }
   const response = NextResponse.json({ ok: true, player: authorized.identity.actor });
-  const maxAge = remainingSessionSeconds(authorized.session);
-  response.cookies.set(playerPassportCookie(sessionToken(authorized.session, "", null, "", maxAge), maxAge));
+  response.cookies.set(playerPassportCookie("", 0));
   return response;
 }

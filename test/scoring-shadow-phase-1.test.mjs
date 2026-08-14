@@ -431,7 +431,7 @@ test("Preview benchmark administration is Director-gated, reversible, and covers
   ]);
   assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
   assert.match(route, /assertScoringShadowAdministrativeEnvironment/);
-  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /restorePreviewScoringBenchmarkRows/);
   for (const action of [
     "preflight", "baseline", "corrections", "replay", "gate-a", "burst", "concurrency",
@@ -482,7 +482,7 @@ test("participant scoring client remains database-inactive while server authorit
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /SUPABASE_SCORING_MIRROR_SECRET_KEY|createClient\(/i);
   assert.match(directorShadowRoute, /process\.env\.VERCEL_ENV !== "preview"/);
   assert.match(directorShadowRoute, /assertScoringShadowAdministrativeEnvironment/);
-  assert.match(directorShadowRoute, /inspectTournamentDirectorToken/);
+  assert.match(directorShadowRoute, /authorizePreviewDirector/);
   assert.match(directorShadowRoute, /input\.action === "replay"/);
   assert.match(directorShadowRoute, /replayExistingScoringShadowObservation/);
   assert.doesNotMatch(directorShadowRoute, /SUPABASE_SCORING_MIRROR_SECRET_KEY.*NextResponse/);

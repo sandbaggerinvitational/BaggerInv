@@ -58,7 +58,7 @@ test("reset endpoint is Preview-only, Director-authorized, and refreshes partici
   const route = await source("app/api/director/reset-preview/route.js");
   const handler = route.slice(route.indexOf("export async function POST"));
   const previewGuard = handler.indexOf('process.env.VERCEL_ENV !== "preview"');
-  const authorization = handler.indexOf("inspectTournamentDirectorToken");
+  const authorization = handler.indexOf("authorizePreviewDirector");
   const reset = handler.indexOf("resetPreviewTournament(data.tournament.id");
   assert.ok(previewGuard >= 0 && previewGuard < authorization && authorization < reset);
   assert.match(route, /authorization\.status !== "active"/);
@@ -66,8 +66,8 @@ test("reset endpoint is Preview-only, Director-authorized, and refreshes partici
   assert.match(route, /Preview Tournament Reset Complete/);
   assert.match(route, /Ready for Dress Rehearsal\./);
   assert.match(route, /invalidateTournamentDataCache/);
-  assert.match(route, /invalidateParticipantInitialization\(session\)/);
-  assert.match(route, /initializeParticipantTournament\(session\)/);
+  assert.match(route, /invalidateParticipantInitialization\(session\.type === "player-passport" \? session : null\)/);
+  assert.match(route, /if \(session\.type === "player-passport"\) await initializeParticipantTournament\(session\)/);
   for (const path of ["/admin/director", "/home", "/live", "/my-match", "/leaderboards"]) assert.match(route, new RegExp(path.replace("/", "\\/")));
 });
 

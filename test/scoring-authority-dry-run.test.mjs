@@ -167,7 +167,7 @@ test("Preview administrative route is Director-gated and leaves participant scor
   const route = await readFile(new URL("../app/api/director/scoring-shadow/phase2-dry-run/route.js", import.meta.url), "utf8");
   assert.match(route, /VERCEL_ENV !== "preview"/);
   assert.match(route, /assertScoringShadowAdministrativeEnvironment/);
-  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /Tournament Director access is required/);
   assert.doesNotMatch(route, /SCORING_AUTHORITY\s*=\s*["']supabase/i);
   assert.match(route, /saveLiveHoleScore/, "Google timing samples retain the existing authoritative pipeline");

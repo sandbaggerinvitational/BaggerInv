@@ -5,7 +5,7 @@ import fs from "node:fs";
 test("isolated Director Game Center readiness page exposes only explicit refresh and parity actions", () => {
   const page = fs.readFileSync(new URL("../app/admin/director/game-center-readiness/page.js", import.meta.url), "utf8");
   const client = fs.readFileSync(new URL("../app/admin/director/game-center-readiness/GameCenterReadinessClient.js", import.meta.url), "utf8");
-  assert.match(page, /inspectTournamentDirectorToken/);
+  assert.match(page, /authorizePreviewDirector/);
   assert.match(page, /result\.status !== "active"/);
   assert.match(client, /refresh-game-center-presentations/);
   assert.match(client, /game-center-parity/);
@@ -16,7 +16,7 @@ test("isolated Director Game Center readiness page exposes only explicit refresh
 test("formal Auth shadow diagnostics are Director/service only and omit sensitive identity fields", () => {
   const route = fs.readFileSync(new URL("../app/api/director/identity-shadow-diagnostics/route.js", import.meta.url), "utf8");
   const migration = fs.readFileSync(new URL("../supabase/migrations/202608120018_preview_identity_shadow_diagnostics.sql", import.meta.url), "utf8");
-  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /VERCEL_ENV !== "preview"/);
   assert.match(migration, /revoke all on function public\.read_participant_identity_shadow_diagnostics\(text\) from public, anon, authenticated/);
   assert.match(migration, /grant execute .* to service_role/);

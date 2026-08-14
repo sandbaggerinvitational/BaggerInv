@@ -68,6 +68,6 @@ test("Mission Control embeds the existing publisher and uses Director authorizat
   assert.match(dashboard, /<OddsAdmin embedded directorAuthorized/);
   assert.match(directorRoute, /championshipProjectionMissionStatus/);
   assert.match(publisher, /publicationReady/);
-  assert.match(publishRoute, /inspectTournamentDirectorToken/);
+  assert.match(publishRoute, /authorizePreviewDirector/);
   assert.match(publishRoute, /Tournament Director access is required/);
 });

@@ -47,18 +47,18 @@ test("participant retry stops immediately when navigation aborts obsolete work",
   assert.equal(attempts, 1);
 });
 
-test("reset invalidates and warms tournament plus selected Passport identity before responding", async () => {
+test("reset invalidates and warms tournament plus canonical Director account identity before responding", async () => {
   const route = await source("app/api/director/reset-preview/route.js");
   const reset = route.indexOf("await resetPreviewTournament");
   const nextCache = route.indexOf("revalidateTag(GOOGLE_SHEETS_CACHE_TAG)", reset);
   const invalidate = route.indexOf("invalidateTournamentDataCache()", nextCache);
-  const session = route.indexOf("verifyPlayerPassportSession(token)", invalidate);
-  const invalidateParticipant = route.indexOf("invalidateParticipantInitialization(session)", session);
+  const session = route.indexOf("authorization.identity.session", invalidate);
+  const invalidateParticipant = route.indexOf("invalidateParticipantInitialization(session.type", session);
   const initializeParticipant = route.indexOf("initializeParticipantTournament(session)", invalidateParticipant);
   const response = route.indexOf("return NextResponse.json", initializeParticipant);
   assert.ok(reset >= 0 && reset < nextCache && nextCache < invalidate && invalidate < session);
   assert.ok(session < invalidateParticipant && invalidateParticipant < initializeParticipant && initializeParticipant < response);
-  assert.match(route, /const token = tournamentDirectorTokenFromRequest\(request\)/);
+  assert.match(route, /authorizePreviewDirector\(\{ request, allowBootstrap: true \}\)/);
 });
 
 test("cache invalidation prevents an old in-flight snapshot from becoming authoritative", async () => {

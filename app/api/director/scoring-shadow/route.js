@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { tournamentDirectorTokenFromRequest } from "../../../../lib/player-passport.js";
-import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
+import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import { readWorkbookSheetsByName } from "../../../../lib/google-sheets-write.js";
 import { assertScoringShadowAdministrativeEnvironment } from "../../../../lib/scoring-shadow-gate.js";
 import {
@@ -23,7 +22,7 @@ async function authorize(request) {
     catch { return null; }
   })();
   if (!gate) return { response: unavailable() };
-  const authorization = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
+  const authorization = await authorizePreviewDirector({ request, allowBootstrap: true });
   if (authorization.status === "unavailable") {
     return { response: NextResponse.json({ error: "Director verification is temporarily unavailable." }, { status: 503 }) };
   }

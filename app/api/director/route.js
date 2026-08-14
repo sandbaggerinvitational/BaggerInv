@@ -1,8 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { after, NextResponse } from "next/server";
 import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
-import { tournamentDirectorTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
-import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
+import { authorizePreviewDirector } from "../../../lib/preview-director-authorization.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
 import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorCourseTees, updateDirectorMatchManagement, updateDirectorNetSkins, updateDirectorRoundPairings, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
 import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server-read.js";
@@ -25,7 +24,7 @@ import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker
 export const dynamic = "force-dynamic";
 
 async function authorize(request) {
-  return inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
+  return authorizePreviewDirector({ request, allowBootstrap: true });
 }
 
 function authorizationFailure(result) {
@@ -151,9 +150,9 @@ export async function GET(request) {
   const identity = authorization.identity;
   try {
     const preview = previewPushConfiguration();
-    const session = verifyPlayerPassportSession(tournamentDirectorTokenFromRequest(request));
+    const session = authorization.identity.session;
     const measured = await withWorkbookWriteDiagnostics("director-dashboard", () => withNormalizedReadDiagnostics("GET /api/director", () => Promise.all([
-      getTournamentData(), readTournamentReadiness(), preview.preview ? currentPushDevice(session) : null,
+      getTournamentData(), readTournamentReadiness(), preview.preview && session.type === "player-passport" ? currentPushDevice(session) : null,
       preview.preview ? readNotificationLog() : [], loadPredictionSheets().catch(() => null), readOddsSnapshots().catch(() => []),
     ])));
     const [tournamentData, readiness, device, notificationLog, projectionSheets, projectionSnapshots] = measured.result.result;

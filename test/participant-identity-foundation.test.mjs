@@ -143,7 +143,7 @@ test("Director foundation remains Preview-only and the single-user rehearsal is 
   const context = await source("app/api/participant/context/route.js");
   const dashboard = await source("app/admin/director/ParticipantIdentityFoundationPanel.js");
   assert.match(route, /VERCEL_ENV !== "preview"/);
-  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /initialize-source/);
   assert.match(route, /readPreviewParticipantIdentityTournamentId/);
   assert.match(route, /players\.length !== 24/);
@@ -163,7 +163,7 @@ test("Director foundation remains Preview-only and the single-user rehearsal is 
 test("Preview impersonation remains a signed Director lease without fake Auth users", async () => {
   const route = await source("app/api/director/impersonation/route.js");
   assert.match(route, /createPlayerPassportSession/);
-  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /beginPreviewIdentityImpersonation/);
   assert.match(route, /endPreviewIdentityImpersonation/);
   assert.doesNotMatch(route, /auth\.users|createUser|verifyOtp/i);

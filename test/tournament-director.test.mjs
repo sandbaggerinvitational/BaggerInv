@@ -21,16 +21,13 @@ test("Players roles are data-driven and safely default to PLAYER", () => {
 test("Director menu is exposed only after canonical Director authorization resolves", () => {
   const menu = source("app/Menu.js");
   const access = source("app/api/director/access/route.js");
-  assert.match(menu, /fetch\("\/api\/director\/access", \{ cache: "no-store" \}\)/);
+  assert.match(menu, /fetch\("\/api\/director\/access", \{ cache: "no-store", credentials: "same-origin" \}\)/);
   assert.match(menu, /directorAccess\?\.authorized === true/);
   assert.doesNotMatch(menu, /setDirector\(player\?\.role === "DIRECTOR"\)/);
   assert.match(menu, /director \? <section[\s\S]*className="directorMenuLink" href="\/admin\/director"/);
-  assert.match(access, /inspectTournamentDirectorToken\(token\)/);
-  assert.match(access, /tournamentDirectorTokenFromRequest\(request\)/);
-  assert.match(access, /previewDirectorPassportCookie\(token, maxAge\)/);
+  assert.match(access, /authorizePreviewDirector\(\{ request, allowBootstrap: true \}\)/);
   assert.match(access, /authorization\.status === "active"/);
-  assert.match(access, /process\.env\.VERCEL_ENV !== "preview"/);
-  assert.match(access, /requireParticipantIdentityAuthority\(\)\.resolved === "supabase"/);
+  assert.match(access, /previewDirectorEntitlementEnabled\(\)/);
   assert.match(menu, /player-passport-changed/);
   assert.match(menu, /window\.addEventListener\("focus", refreshCapability\)/);
   assert.match(menu, /response\?\.status !== 503/);
@@ -171,9 +168,9 @@ test("automation becomes due only within the configured 30-minute opening window
   assert.equal(directorAutomationDue({ ...model, automation: { ...model.automation, enabled: false } }, new Date("2026-07-01T07:35:00")), null);
 });
 
-test("Director API requires Passport DIRECTOR authorization and uses audited writers", () => {
+test("Director API requires canonical account Director authorization and uses audited writers", () => {
   const route = source("app/api/director/route.js");
-  assert.match(route, /inspectTournamentDirectorToken/);
+  assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /authorization\.status !== "active"/);
   assert.match(route, /status: 403/);
   assert.match(route, /status: 503/);
@@ -202,7 +199,7 @@ test("Director dashboard contains operations, health, attention, automation, and
 
 test("PLAYER accounts are redirected away from the Director page", () => {
   const page = source("app/admin/director/page.js");
-  assert.match(page, /inspectTournamentDirectorToken/);
+  assert.match(page, /authorizePreviewDirector/);
   assert.match(page, /\["inactive", "forbidden"\]\.includes\(result\.status\)\) redirect\("\/home"\)/);
   assert.doesNotMatch(page, /result\.status !== "active"\) redirect/);
 });
@@ -222,8 +219,8 @@ test("transient Director authorization remains on Mission Control while the prot
   assert.match(dashboard, /credentials: "same-origin"/);
 });
 
-test("Director page, actions, impersonation, and sandbox share one actor-aware authorization resolver", () => {
-  const resolver = source("lib/player-passport-server.js");
+test("Director page, actions, impersonation, and sandbox share one account-aware authorization resolver", () => {
+  const resolver = source("lib/preview-director-authorization.js");
   const consumers = [
     source("app/admin/director/page.js"),
     source("app/api/director/route.js"),
@@ -231,9 +228,9 @@ test("Director page, actions, impersonation, and sandbox share one actor-aware a
     source("app/api/director/notifications/sandbox/route.js"),
     source("app/api/director/reset-preview/route.js"),
   ];
-  assert.match(resolver, /export async function inspectTournamentDirectorToken/);
-  assert.match(resolver, /isTournamentDirectorActor\(result\.identity\)/);
-  for (const consumer of consumers) assert.match(consumer, /inspectTournamentDirectorToken/);
+  assert.match(resolver, /export async function authorizePreviewDirector/);
+  assert.match(resolver, /readPreviewDirectorEntitlement/);
+  for (const consumer of consumers) assert.match(consumer, /authorizePreviewDirector/);
   const dashboard = source("app/admin/director/DirectorDashboard.js");
   assert.equal((dashboard.match(/credentials: "same-origin"/g) || []).length, 12);
 });
