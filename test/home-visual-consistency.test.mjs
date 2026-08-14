@@ -37,8 +37,8 @@ test("multiple promoted scorecards stay in one compact selector and out of My Ro
   assert.match(component, /data-variant="choices"/);
   assert.match(component, /More than one match is open/);
   assert.match(component, /Open Scorecard/);
-  assert.match(styles, /\.choices button\s*\{[\s\S]*grid-template-columns:\s*40px minmax\(0, 1fr\) auto[\s\S]*min-height:\s*70px/);
-  assert.match(styles, /\.card\[data-variant="choices"\] h2\s*\{[^}]*font-size:\s*clamp\(1\.3rem, 3\.8vw, 1\.65rem\)/);
+  assert.match(styles, /\.choices button\s*\{[\s\S]*grid-template-columns:\s*44px minmax\(0, 1fr\) auto[\s\S]*min-height:\s*70px/);
+  assert.match(styles, /\.card\[data-variant="choices"\] h2\s*\{[^}]*font-size:\s*clamp\(1\.18rem, 3\.3vw, 1\.35rem\)/);
 });
 
 test("Home round and format content uses natural casing while status pills stay distinct", async () => {
@@ -51,7 +51,7 @@ test("Home round and format content uses natural casing while status pills stay 
   assert.match(component, /homeFormatLabel\(match\.format\)/);
   assert.doesNotMatch(component, /`R\$\{match\.round\}`/);
   assert.doesNotMatch(styles.match(/\.roundIdentity\s*\{[^}]*\}/)?.[0] || "", /text-transform:\s*uppercase/);
-  assert.match(styles, /\.roundTop > b\s*\{[\s\S]*text-transform:\s*uppercase/);
+  assert.match(styles, /\.roundResult\s*\{[\s\S]*text-transform:\s*uppercase/);
 });
 
 test("Home dates are human friendly without changing canonical schedule selection", () => {

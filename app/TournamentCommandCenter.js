@@ -114,12 +114,12 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
   if (supabaseCommandCenter) return (
     <div className={styles.page}>
       <TournamentIdentityHeader
+        variant="hero"
         year={liveTournament.year}
         name={liveTournament.name || "Sandbagger Invitational"}
         location={liveTournament.location || "Tournament week"}
         logo={liveTournament.logo}
         status={status}
-        compact
       />
       <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed participantIdentityAuthority={participantIdentityAuthority} showSecondary={false} />
       {pulse}

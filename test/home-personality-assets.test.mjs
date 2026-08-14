@@ -44,11 +44,11 @@ test("Home reuses course identity for primary, multiple-match, and grouped-round
   assert.match(component, /function CourseIdentity/);
   assert.match(component, /courseLogoSources\(\{ courseId: match\?\.courseId, filename: match\?\.courseLogo \}\)/);
   assert.equal((component.match(/<CourseIdentity match=/g) || []).length, 3);
-  assert.match(component, /<CourseIdentity match=\{match\} compact \/>[\s\S]*className=\{styles\.roundTop\}/);
+  assert.match(component, /<CourseIdentity match=\{match\} compact \/>[\s\S]*className=\{styles\.roundSummary\}/);
   assert.match(component, /className=\{styles\.choices\}[\s\S]*<CourseIdentity match=\{match\} compact \/>/);
   assert.match(component, /<MobileIdentityImage[\s\S]*optimizedAssetUrl\(source, width\)/);
-  assert.match(styles, /\.roundCourseLogo,[\s\S]*width:\s*30px;[\s\S]*object-fit:\s*contain/);
-  assert.match(styles, /\.choices \.roundCourseLogo,[\s\S]*width:\s*40px;[\s\S]*height:\s*40px/);
+  assert.match(styles, /\.roundCourseLogo,[\s\S]*width:\s*32px;[\s\S]*object-fit:\s*contain/);
+  assert.match(styles, /\.choices \.roundCourseLogo,[\s\S]*width:\s*44px;[\s\S]*height:\s*44px/);
 });
 
 test("Home restores the original Net Skins medallion treatment without a replacement asset", async () => {
@@ -61,15 +61,16 @@ test("Home restores the original Net Skins medallion treatment without a replace
   assert.doesNotMatch(component, /net-skins.*\.(png|webp|svg)/i);
 });
 
-test("compact tournament identity is again a rounded branded surface using the canonical logo component", async () => {
+test("Home adopts the same primary-destination header primitive as Tournament and Leaderboards", async () => {
   const [identity, command, styles] = await Promise.all([
     source("app/TournamentIdentityHeader.js"),
     source("app/TournamentCommandCenter.js"),
     source("app/tournament-command-center.module.css"),
   ]);
   assert.match(identity, /tournamentLogo\(`sandbagger-\$\{year\}`\)/);
-  assert.match(command, /<TournamentIdentityHeader[\s\S]*compact/);
-  assert.match(styles, /\.homeHeader\[data-density=compact\]\{[^}]*border:1px solid[^}]*border-radius:16px[^}]*background:linear-gradient[^}]*box-shadow/);
+  assert.match(command, /<TournamentIdentityHeader[\s\S]*variant="hero"/);
+  assert.doesNotMatch(command.slice(command.indexOf("if (supabaseCommandCenter)"), command.indexOf("<PersonalizedPlayerHome")), /\bcompact\b/);
+  assert.match(styles, /\.page\{background:#f6f3eb\}/);
 });
 
 test("asset restoration leaves Home hierarchy, deduplication, casing, and request topology intact", async () => {

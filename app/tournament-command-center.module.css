@@ -14,3 +14,12 @@
 .schedule[data-density=next] li,.schedule[data-density=next] li[data-state=live],.schedule[data-density=next] li[data-state=next]{min-height:50px;margin-inline:0;padding:7px 0;border:0;border-top:1px solid #e8dfcf;border-radius:0;background:transparent;box-shadow:none}
 .schedule[data-density=next] .emptyState[data-density=compact]{justify-items:start;margin-top:7px;padding:8px 0 2px;border:0;border-top:1px solid #e8dfcf;border-radius:0;background:transparent;text-align:left}.schedule[data-density=next] .emptyState[data-density=compact] strong{color:#425b52;font-size:.8rem;font-weight:750}
 @media(max-width:640px){.page{padding-top:7px}.pulse{padding:13px 14px 8px}.scoreboard strong{font-size:2.35rem}}
+
+/* Final Home finishing pass: use the primary-destination canvas and keep the
+   compact schedule in one event-first scan path. */
+.page{background:#f6f3eb}
+.schedule[data-density=next] li[data-layout=event-first]{grid-template-columns:27px minmax(0,1fr) auto;gap:9px;align-items:center}
+.schedule[data-density=next] li[data-layout=event-first] .scheduleEventBody{gap:2px}
+.schedule[data-density=next] .scheduleEventMeta{color:#66756e!important;font-size:.69rem;font-weight:750;line-height:1.2!important;white-space:normal}
+.schedule[data-density=next] .scheduleEventMeta time{color:inherit;font:inherit}
+@media(max-width:640px){.page{padding:14px 10px 74px}.schedule[data-density=next] li[data-layout=event-first]{grid-template-columns:25px minmax(0,1fr) auto;gap:8px}}

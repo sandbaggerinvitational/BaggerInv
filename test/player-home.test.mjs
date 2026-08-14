@@ -178,7 +178,7 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(component, /homeRoundSummaryMatches\(matches, promotedMatchIds\(selection\)\)/);
   assert.match(component, /className=\{styles\.roundIdentity\}/);
   assert.match(component, /<MyRounds matches=\{summaryMatches\} totalCount=\{matches\.length\}/);
-  assert.match(styles, /\.roundCard\s*\{[\s\S]*grid-template-columns:\s*30px minmax\(0, 1fr\) auto/);
+  assert.match(styles, /\.roundCard\s*\{[\s\S]*grid-template-columns:\s*32px minmax\(0, 1fr\) auto/);
   assert.doesNotMatch(styles.match(/\.roundIdentity\s*\{[^}]*\}/)?.[0] || "", /text-transform:\s*uppercase/);
   assert.doesNotMatch(component, /aria-label="Current player"/);
   assert.doesNotMatch(component, />YOU</);

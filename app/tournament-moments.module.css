@@ -18,8 +18,8 @@
 
 .shell h2 {
   margin: 3px 0 0;
-  color: #083f31;
-  font: 700 clamp(1.05rem, 3vw, 1.32rem) / 1.08 Georgia, serif;
+  color: #5d6d66;
+  font: 700 .84rem / 1.2 Georgia, serif;
 }
 
 .shell article {
@@ -51,7 +51,7 @@
 
 .shell article strong {
   color: #0b4938;
-  font: 700 1.02rem / 1.18 Georgia, serif;
+  font: 700 clamp(1.08rem, 3.2vw, 1.22rem) / 1.16 Georgia, serif;
 }
 
 .shell article p {
@@ -66,7 +66,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 9px;
+  gap: 5px;
   margin-top: 4px;
 }
 

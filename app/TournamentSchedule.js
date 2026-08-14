@@ -37,24 +37,26 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "", 
         const subtitle = timelineOptionalText(item.subtitle);
         const location = timelineOptionalText(item.location);
         const golfEvent = isGolfTimelineEvent(item.type);
+        const statePresentation = golfEvent && item.state === "live" ? <div className={styles.scheduleStatus}><StatusBadge status="Live" /></div>
+          : golfEvent && item.state === "complete" ? <div className={styles.scheduleStatus}><StatusBadge status="Final" /></div>
+          : golfEvent && item.state === "upcoming" && item.isNext && item.minutesUntil <= 60 ? <b className={styles.countdown}>{item.countdown}</b>
+          : golfEvent && item.state === "upcoming" ? <div className={styles.scheduleStatus}><StatusBadge status="Upcoming" /></div>
+          : item.state === "live" ? <b>Live</b>
+          : item.state === "complete" ? <b className={styles.completed}>✓ Completed</b>
+          : item.isNext ? <b className={styles.countdown}>{item.countdown}</b>
+          : item.state === "delayed" || item.state === "cancelled" ? <b>{item.state}</b>
+          : null;
         return (
-        <li key={item.id} data-state={item.state} aria-current={item.state === "live" ? "true" : undefined}>
-          <time>{item.startTime}</time>
+        <li key={item.id} data-state={item.state} data-layout={compact ? "event-first" : undefined} aria-current={item.state === "live" ? "true" : undefined}>
+          {!compact ? <time>{item.startTime}</time> : null}
           <span className={styles.scheduleIcon} aria-hidden="true">{timelineEventIcon(item.type)}</span>
-          <div>
+          <div className={compact ? styles.scheduleEventBody : undefined}>
             <strong>{item.title}</strong>
+            {compact ? <small className={styles.scheduleEventMeta}><time>{item.startTime}</time>{location ? <> · {location}</> : null}</small> : null}
             {subtitle ? <small>{subtitle}</small> : null}
-            {location ? <small className={styles.scheduleLocation}>{location}</small> : null}
+            {!compact && location ? <small className={styles.scheduleLocation}>{location}</small> : null}
           </div>
-          {golfEvent && item.state === "live" ? <div className={styles.scheduleStatus}><StatusBadge status="Live" /></div>
-            : golfEvent && item.state === "complete" ? <div className={styles.scheduleStatus}><StatusBadge status="Final" /></div>
-            : golfEvent && item.state === "upcoming" && item.isNext && item.minutesUntil <= 60 ? <b className={styles.countdown}>{item.countdown}</b>
-            : golfEvent && item.state === "upcoming" ? <div className={styles.scheduleStatus}><StatusBadge status="Upcoming" /></div>
-            : item.state === "live" ? <b>Live</b>
-            : item.state === "complete" ? <b className={styles.completed}>✓ Completed</b>
-            : item.isNext ? <b className={styles.countdown}>{item.countdown}</b>
-            : item.state === "delayed" || item.state === "cancelled" ? <b>{item.state}</b>
-            : null}
+          {statePresentation}
         </li>
       );})}</ol> : compact ? <div className={styles.emptyState} data-density="compact">
         <strong>{preview.title}</strong>

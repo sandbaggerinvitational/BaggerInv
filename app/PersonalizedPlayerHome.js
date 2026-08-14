@@ -78,7 +78,7 @@ function MatchPeople({ match }) {
 }
 
 function CourseIdentity({ match, compact = false }) {
-  const width = compact ? 48 : 64;
+  const width = compact ? 56 : 72;
   return <MobileIdentityImage
     sources={courseLogoSources({ courseId: match?.courseId, filename: match?.courseLogo })
       .map((source) => optimizedAssetUrl(source, width))}
@@ -113,6 +113,11 @@ function MyRounds({ matches, totalCount, timeZone }) {
         const tee = teeLabel(match.tee);
         const status = appMatchStatus(match);
         const result = formatMatchResult(match, match.team?.side) || status;
+        const roundContext = [
+          match.course || "Course to be announced",
+          tee,
+          status === "Upcoming" ? matchTime(match, timeZone) || "Tee time TBD" : "",
+        ].filter(Boolean).join(" · ");
         return <Link
           key={match.matchId}
           className={styles.roundCard}
@@ -121,14 +126,11 @@ function MyRounds({ matches, totalCount, timeZone }) {
           aria-label={`${matchLabel(match)} at ${match.course || "course to be announced"}`}
         >
           <CourseIdentity match={match} compact />
-          <div className={styles.roundTop}>
-            <div>
-              <strong className={styles.roundIdentity}>{[match.round ? `Round ${match.round}` : "Round", homeFormatLabel(match.format)].filter(Boolean).join(" · ")}</strong>
-              <span className={styles.roundCourse}>{match.course || "Course to be announced"}</span>
-            </div>
-            <b>{result}</b>
+          <div className={styles.roundSummary}>
+            <strong className={styles.roundIdentity}>{[match.round ? `Round ${match.round}` : "Round", homeFormatLabel(match.format)].filter(Boolean).join(" · ")}</strong>
+            <span className={styles.roundCourse}>{roundContext}</span>
           </div>
-          <small className={styles.roundMeta}>{[tee, status === "Upcoming" ? matchTime(match, timeZone) || "Tee time TBD" : ""].filter(Boolean).join(" · ")}</small>
+          <b className={styles.roundResult}>{result}</b>
         </Link>;
       })}
     </div>
@@ -145,8 +147,15 @@ function PlayerNetSkins({ netSkins, playerId }) {
   const skins = entries.reduce((sum, row) => sum + (Number(row.skinsWon) || 0), 0);
   const winnings = entries.reduce((sum, row) => sum + (Number(row.totalWinnings) || 0), 0);
   return <section className={styles.netSkins} aria-labelledby="home-net-skins-title">
-    <header><span className={styles.skinCoin} aria-hidden="true">S</span><div><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2></div><Link href="/live?view=leaderboards&tab=skins">View <i aria-hidden="true">→</i></Link></header>
-    <div className={styles.netSkinsSummary}><strong>{skins} skin{skins === 1 ? "" : "s"}</strong><span aria-hidden="true">·</span><strong>{skinsCurrency(winnings)} winnings</strong></div>
+    <div className={styles.netSkinsLayout}>
+      <span className={styles.skinCoin} aria-hidden="true">S</span>
+      <div className={styles.netSkinsCopy}>
+        <p>Your Competitions</p>
+        <h2 id="home-net-skins-title">Net Skins</h2>
+        <div className={styles.netSkinsSummary}><strong>{skins} skin{skins === 1 ? "" : "s"}</strong><span aria-hidden="true">·</span><strong>{skinsCurrency(winnings)} winnings</strong></div>
+      </div>
+      <Link href="/live?view=leaderboards&tab=skins">View <i aria-hidden="true">→</i></Link>
+    </div>
   </section>;
 }
 
