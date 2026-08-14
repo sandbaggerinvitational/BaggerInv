@@ -149,7 +149,7 @@ test("Participant Mode shell preserves verified identity across temporary revali
   assert.match(layout, /<ParticipantIdentity \/>/);
   assert.match(layout, /<Suspense fallback=\{null\}>/);
   assert.match(navigation, /sbi-participant-shell/);
-  assert.match(navigation, /response\.status === 401/);
+  assert.match(navigation, /\[401, 403\]\.includes\(response\.status\)/);
   assert.match(navigation, /Preserve the last verified presentation shell/);
   assert.match(navigation, /pathname\.startsWith\("\/admin"\)/);
   assert.match(session, /status === "unavailable"/);

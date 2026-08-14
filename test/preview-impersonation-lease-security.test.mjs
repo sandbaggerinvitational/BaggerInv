@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { createPlayerPassportSession, verifyPlayerPassportSession } from "../lib/player-passport.js";
 import {
@@ -191,6 +192,12 @@ test("I: retaining the cookie after End Impersonation cannot restore a revoked l
   assert.equal(staleCookie.status, "forbidden");
   assert.equal(staleCookie.code, "IMPERSONATION_LEASE_REVOKED");
 }));
+
+test("expired or revoked lease denials clear the cached impersonation presentation shell", async () => {
+  const shell = await readFile(new URL("../app/ParticipantIdentity.js", import.meta.url), "utf8");
+  assert.match(shell, /\[401, 403\]\.includes\(response\.status\)[\s\S]*setPlayer\(null\)[\s\S]*setImpersonation\(null\)/);
+  assert.match(shell, /Preserve the last verified presentation shell during temporary failures/);
+});
 
 test("participant identity also rejects expired/revoked/missing leases without Auth fallback", async () => withPreview(async () => {
   const { token } = signedSession();

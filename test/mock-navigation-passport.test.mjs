@@ -129,7 +129,7 @@ test("temporary Passport route failures preserve the last verified shell", async
     source("app/ParticipantIdentity.js"),
     source("app/api/player-passport/session/route.js"),
   ]);
-  assert.match(navigation, /response\.status === 401/);
+  assert.match(navigation, /\[401, 403\]\.includes\(response\.status\)/);
   assert.match(navigation, /Preserve the last verified presentation shell/);
   assert.match(session, /status === "unavailable"/);
   assert.match(session, /status:\s*503/);

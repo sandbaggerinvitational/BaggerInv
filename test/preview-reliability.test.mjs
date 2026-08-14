@@ -128,7 +128,7 @@ test("stale identity responses cannot overwrite a newer successful response", as
   const navigation = await source("app/ParticipantIdentity.js");
   assert.match(navigation, /requestSequence/);
   assert.match(navigation, /sequence !== requestSequence\.current/);
-  assert.match(navigation, /response\.status === 401/);
+  assert.match(navigation, /\[401, 403\]\.includes\(response\.status\)/);
 });
 
 test("heavy participant navigation disables automatic route prefetch only at the app shell", async () => {

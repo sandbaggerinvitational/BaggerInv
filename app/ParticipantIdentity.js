@@ -58,7 +58,7 @@ export default function ParticipantIdentity() {
           else window.localStorage.removeItem(PREVIEW_SESSION_KEY);
           return;
         }
-        if (response.status === 401 && sequence === requestSequence.current) {
+        if ([401, 403].includes(response.status) && sequence === requestSequence.current) {
           setPlayer(null);
           setImpersonation(null);
           window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
