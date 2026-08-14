@@ -5,8 +5,11 @@
 
 .netSkins {
   margin-top: var(--home-section-gap, 12px);
-  padding: 15px 3px 12px;
-  border-top: 1px solid #e4dccd;
+  padding: 14px 16px;
+  border: 1px solid var(--home-card-border, #ded4c1);
+  border-radius: calc(var(--home-card-radius, 20px) - 2px);
+  background: linear-gradient(135deg, #fffdf8, #fbf4e4);
+  box-shadow: 0 5px 16px rgba(12, 55, 43, 0.045);
 }
 
 .netSkins > header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 9px; }
@@ -324,8 +327,11 @@
 
 .schedule {
   margin-top: var(--home-section-gap, 12px);
-  padding: 15px 3px 4px;
-  border-top: 1px solid #e4dccd;
+  padding: 14px 15px 5px;
+  border: 1px solid var(--home-card-border, #ded4c1);
+  border-radius: calc(var(--home-card-radius, 20px) - 2px);
+  background: #fff;
+  box-shadow: 0 5px 16px rgba(12, 55, 43, 0.04);
 }
 
 .schedule > header {
@@ -373,7 +379,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 3px 12px;
   min-height: 58px;
-  padding: 10px 2px;
+  padding: 10px 1px;
   border-top: 1px solid #eee7da;
   color: inherit;
   text-decoration: none;
@@ -440,27 +446,77 @@
 
 .choices {
   display: grid;
-  gap: 10px;
-  margin-top: 18px;
+  gap: 7px;
+  margin-top: 12px;
 }
 
 .choices button {
   display: grid;
-  gap: 4px;
-  padding: 16px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 70px;
+  padding: 10px 12px;
   border: 1px solid #d9ccb0;
-  border-radius: 15px;
-  background: #fff;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #17382d;
   text-align: left;
 }
 
-.choices span,
-.choices small {
+.choices button:active {
+  background: #fff8e7;
+  transform: scale(.995);
+}
+
+.choiceDetails {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.choiceDetails small {
   color: #727c77;
 }
 
-.choices strong {
+.choiceDetails > strong {
   color: #17382d;
+  overflow-wrap: anywhere;
+  font-size: .8rem;
+}
+
+.choiceAction {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  color: #0b4435;
+  font-size: .68rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.choiceAction i {
+  color: #9a7427;
+  font-size: .9rem;
+  font-style: normal;
+}
+
+.card[data-variant="choices"] {
+  padding: 16px;
+}
+
+.card[data-variant="choices"] h2 {
+  font-size: clamp(1.45rem, 4.5vw, 2rem);
+}
+
+.card[data-variant="choices"] .intro {
+  display: block;
+  margin-top: 6px;
+  color: #68756f;
+  font-size: .76rem;
+  line-height: 1.35;
 }
 
 .empty span {
@@ -592,7 +648,7 @@
   }
 
   .schedule {
-    padding: 14px 2px 2px;
+    padding: 13px 14px 4px;
   }
 
   .schedule > header h2 {
@@ -622,6 +678,12 @@
 
   .schedule > header {
     gap: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choices button:active {
+    transform: none;
   }
 }
 

@@ -136,6 +136,10 @@ function PlayerNetSkins({ netSkins, playerId }) {
   </section>;
 }
 
+function promotedMatchIds(selection) {
+  return [selection.primary?.matchId, ...(selection.choices || []).map((match) => match.matchId)].filter(Boolean);
+}
+
 function parseServerTiming(value = "") {
   return Object.fromEntries(String(value).split(",").map((entry) => {
     const [name, duration] = entry.trim().split(";dur=");
@@ -146,7 +150,7 @@ function parseServerTiming(value = "") {
 export function PersonalizedPlayerHomeSecondary({ netSkins = null, data = null }) {
   const selection = selectRelevantPlayerMatches(data?.matches || [], data?.tournament?.currentRound);
   const matches = selection.ordered;
-  const summaryMatches = homeRoundSummaryMatches(matches, selection.primary?.matchId);
+  const summaryMatches = homeRoundSummaryMatches(matches, promotedMatchIds(selection));
   if (!data) return null;
   return <>
     <PlayerNetSkins netSkins={netSkins} playerId={data?.player?.id} />
@@ -294,7 +298,7 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
 
   const player = payload?.player;
   const matches = selection.ordered;
-  const summaryMatches = homeRoundSummaryMatches(matches, primary?.matchId);
+  const summaryMatches = homeRoundSummaryMatches(matches, promotedMatchIds(selection));
   const primaryStatus = primary ? appMatchStatus(primary) : "";
   const primaryResult = primary ? formatMatchResult(primary, primary.team?.side) : "";
 
@@ -304,15 +308,18 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
       <p>Your Tournament</p>
       <h2 id="player-home-title">No assigned matches yet</h2>
       <span>When pairings are published, your schedule will appear here automatically.</span>
-    </div> : selection.choices.length ? <div className={styles.card}>
-      <p>Your Tournament</p>
+    </div> : selection.choices.length ? <div className={styles.card} data-variant="choices">
+      <p>Your Match</p>
       <h2 id="player-home-title">Choose a Match</h2>
       <span className={styles.intro}>More than one match is open. Choose the scorecard you intend to update.</span>
       <div className={styles.choices}>{selection.choices.map((match) =>
         <button key={match.matchId} disabled={busyId === match.matchId} onClick={() => openMatch(match)}>
-          <MatchHeading match={match} compact />
-          <strong>{match.course || "Course TBA"}</strong>
-          <small>{matchTime(match, payload?.tournament?.timeZone) || "Tee time TBD"} · Open Scorecard</small>
+          <span className={styles.choiceDetails}>
+            <MatchHeading match={match} compact />
+            <strong>{match.course || "Course TBA"}</strong>
+            <small>{matchTime(match, payload?.tournament?.timeZone) || "Tee time TBD"}</small>
+          </span>
+          <span className={styles.choiceAction}>{busyId === match.matchId ? "Opening…" : <>Open Scorecard <i aria-hidden="true">→</i></>}</span>
         </button>
       )}</div>
     </div> : <div className={styles.card}>

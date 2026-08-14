@@ -70,7 +70,7 @@ test("Supabase command center renders one logistics surface and keeps secondary 
   assert.doesNotMatch(participant, /Google Sheets|gviz|opensheet|spreadsheets\.google/i);
 });
 
-test("Home hierarchy uses two emphasized surfaces and native-style secondary sections", async () => {
+test("Home hierarchy uses differentiated Sandbagger surfaces without restoring equal weight", async () => {
   const [commandStyles, personalizedStyles, momentsStyles] = await Promise.all([
     source("app/tournament-command-center.module.css"),
     source("app/personalized-player-home.module.css"),
@@ -78,11 +78,11 @@ test("Home hierarchy uses two emphasized surfaces and native-style secondary sec
   ]);
   assert.match(personalizedStyles, /\.card,[\s\S]*box-shadow:\s*var\(--home-card-shadow/);
   assert.match(commandStyles, /\.pulse\{[^}]*background:linear-gradient/);
-  assert.match(commandStyles, /\.schedule\[data-density=next\]\{[^}]*border-radius:0[^}]*box-shadow:none/);
-  assert.match(personalizedStyles, /\.netSkins\s*\{[^}]*border-top:[^}]*\}/);
-  assert.doesNotMatch(personalizedStyles.match(/\.netSkins\s*\{[^}]*\}/)?.[0] || "", /box-shadow|border-radius|background/);
-  assert.match(personalizedStyles, /\.schedule\s*\{[^}]*border-top:[^}]*\}/);
-  assert.match(momentsStyles, /\/\* Editorial Home section:[\s\S]*\.shell\{[^}]*border-radius:0[^}]*box-shadow:none/);
+  assert.match(commandStyles, /\.schedule\[data-density=next\]\{[^}]*border-radius:calc[^}]*background:linear-gradient[^}]*box-shadow/);
+  assert.match(personalizedStyles, /\.netSkins\s*\{[^}]*border-radius:[^}]*background:[^}]*box-shadow/);
+  assert.match(personalizedStyles, /\.schedule\s*\{[^}]*border-radius:[^}]*background:\s*#fff[^}]*box-shadow/);
+  assert.match(momentsStyles, /\.shell\s*\{[^}]*border-radius:[^}]*background:\s*linear-gradient[^}]*box-shadow/);
+  assert.doesNotMatch(momentsStyles, /\.shell article\s*\{[^}]*border-radius|\.shell article\s*\{[^}]*background:\s*#fff/);
 });
 
 test("Home routes, identity, facts, and accessible actions remain intact", async () => {

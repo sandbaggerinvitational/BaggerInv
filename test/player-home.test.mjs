@@ -174,7 +174,7 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(styles, /\.matchHeading > span,[\s\S]*font-weight:\s*750/);
   assert.match(styles, /\.people > div[\s\S]*grid-template-rows:\s*34px/);
   assert.match(styles, /\.teamLogo,[\s\S]*justify-self:\s*center/);
-  assert.match(component, /homeRoundSummaryMatches\(matches, selection\.primary\?\.matchId\)/);
+  assert.match(component, /homeRoundSummaryMatches\(matches, promotedMatchIds\(selection\)\)/);
   assert.match(component, /className=\{styles\.roundIdentity\}/);
   assert.match(component, /<MyRounds matches=\{summaryMatches\} totalCount=\{matches\.length\}/);
   assert.match(styles, /\.roundCard\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/);
@@ -195,6 +195,7 @@ test("Home round summaries exclude the primary match while preserving every othe
     { matchId: "2026-R2-2", round: 2 },
   ];
   assert.deepEqual(homeRoundSummaryMatches(matches, "2026-R3-2").map((match) => match.matchId), ["2026-R1-2", "2026-R2-2"]);
+  assert.deepEqual(homeRoundSummaryMatches(matches, ["2026-R3-2", "2026-R2-2"]).map((match) => match.matchId), ["2026-R1-2"]);
   assert.deepEqual(homeRoundSummaryMatches(matches, "missing"), matches);
 });
 

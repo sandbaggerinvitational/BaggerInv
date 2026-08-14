@@ -24,11 +24,13 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "", 
   const items = useMemo(() => todaysSchedule(events, { now, timeZone }), [events, now, timeZone]);
   const preview = useMemo(() => homeSchedulePreview(events, { now, timeZone }), [events, now, timeZone]);
   const displayedItems = compact && preview.kind === "event" ? [preview.event] : items;
+  const compactEyebrow = preview.kind === "event" ? preview.eyebrow : "Coming up";
+  const compactTitle = preview.kind === "event" ? preview.dayLabel : "Today";
 
   return (
     <section className={styles.schedule} data-density={compact ? "next" : "full"} aria-labelledby={compact ? "next-schedule-title" : "today-schedule-title"}>
       <header className={styles.sectionHeader}>
-        <div><p>{compact ? preview.eyebrow : "Today"}</p><h2 id={compact ? "next-schedule-title" : "today-schedule-title"}>{compact ? (preview.kind === "event" ? preview.dayLabel : preview.title) : "Today’s Schedule"}</h2></div>
+        <div><p>{compact ? compactEyebrow : "Today"}</p><h2 id={compact ? "next-schedule-title" : "today-schedule-title"}>{compact ? compactTitle : "Today’s Schedule"}</h2></div>
         <Link href="/tournament-guide/schedule">{compact ? <>View Full Schedule <span aria-hidden="true">→</span></> : "View Tournament Guide"}</Link>
       </header>
       {(!compact || preview.kind === "event") && displayedItems.length ? <ol>{displayedItems.map((item) => {
@@ -54,7 +56,9 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "", 
             : item.state === "delayed" || item.state === "cancelled" ? <b>{item.state}</b>
             : null}
         </li>
-      );})}</ol> : compact ? null : <div className={styles.emptyState}>
+      );})}</ol> : compact ? <div className={styles.emptyState} data-density="compact">
+        <strong>{preview.title}</strong>
+      </div> : <div className={styles.emptyState}>
         <strong>No additional events scheduled today.</strong>
         <span>View the Tournament Guide for the full itinerary.</span>
       </div>}
