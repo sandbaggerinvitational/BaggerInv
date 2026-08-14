@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Header } from "../../components.js";
-import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromCookieStore } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import DirectorDashboard from "./DirectorDashboard.js";
 
@@ -10,7 +10,7 @@ export const metadata = { title: "Tournament Director | Sandbagger Invitational"
 
 export default async function DirectorPage() {
   const store = await cookies();
-  const result = await inspectTournamentDirectorToken(store.get(PLAYER_PASSPORT_COOKIE)?.value || "");
+  const result = await inspectTournamentDirectorToken(tournamentDirectorTokenFromCookieStore(store));
   if (["inactive", "forbidden"].includes(result.status)) redirect("/home");
   return <main><Header homeHref="/home" /><DirectorDashboard directorName={result.identity?.actor?.name || "Tournament Director"} /></main>;
 }

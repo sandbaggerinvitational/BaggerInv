@@ -25,6 +25,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   const router = useRouter();
   const [hash, setHash] = useState("");
   const [director, setDirector] = useState(false);
+  const [capabilityRevision, setCapabilityRevision] = useState(0);
   const [tournament, setTournament] = useState({ name: "", edition: "", location: "", year: "" });
   const [refreshing, setRefreshing] = useState(false);
   const closeButton = useRef(null);
@@ -44,6 +45,16 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
 
   useEffect(() => {
     if (!isOpen) return;
+    let cancelled = false;
+    const readDirectorAccess = async () => {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const response = await fetch("/api/director/access", { cache: "no-store" }).catch(() => null);
+        if (response?.ok) return response.json().catch(() => null);
+        if (response?.status !== 503 || attempt === 1) return null;
+        await new Promise((resolve) => window.setTimeout(resolve, 750));
+      }
+      return null;
+    };
     const applyTournament = (active) => {
         if (!active) return;
         setTournament({
@@ -59,15 +70,28 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
       fetch("/api/player-passport/session", { cache: "no-store" })
         .then(async (response) => response.ok ? await response.json() : null)
         .catch(() => null),
-      fetch("/api/director/access", { cache: "no-store" })
-        .then(async (response) => response.ok ? await response.json() : null)
-        .catch(() => null),
+      readDirectorAccess(),
     ]).then(([session, directorAccess]) => {
+      if (cancelled) return;
       const legacyDirector = session?.identityAuthority !== "supabase" && session?.player?.role === "DIRECTOR";
       setDirector(directorAccess?.authorized === true || legacyDirector);
       if (!active) applyTournament(session?.tournament);
     });
-  }, [isOpen]);
+    return () => { cancelled = true; };
+  }, [capabilityRevision, isOpen]);
+
+  useEffect(() => {
+    const refreshCapability = () => setCapabilityRevision((value) => value + 1);
+    const clearCapability = () => { setDirector(false); refreshCapability(); };
+    window.addEventListener("focus", refreshCapability);
+    window.addEventListener("player-passport-changed", refreshCapability);
+    window.addEventListener("player-passport-cleared", clearCapability);
+    return () => {
+      window.removeEventListener("focus", refreshCapability);
+      window.removeEventListener("player-passport-changed", refreshCapability);
+      window.removeEventListener("player-passport-cleared", clearCapability);
+    };
+  }, []);
 
   useEffect(() => setIsOpen(false), [pathname]);
 

@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
-import { createPlayerPassportSession, playerPassportCookie, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
+import {
+  createPlayerPassportSession,
+  isPreviewImpersonationSession,
+  playerPassportCookie,
+  previewDirectorPassportCookie,
+  tournamentDirectorTokenFromRequest,
+  verifyPlayerPassportSession,
+} from "../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { getTournamentData } from "../../../live/sheetData.js";
 import { beginPreviewIdentityImpersonation, endPreviewIdentityImpersonation } from "../../../../lib/participant-identity-supabase.js";
@@ -10,10 +17,10 @@ const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 4
 
 async function directorSession(request) {
   if (process.env.VERCEL_ENV !== "preview") return null;
-  const token = playerPassportTokenFromRequest(request);
+  const token = tournamentDirectorTokenFromRequest(request);
   const identity = await inspectTournamentDirectorToken(token);
   if (identity.status !== "active") return null;
-  return { session: verifyPlayerPassportSession(token), identity: identity.identity };
+  return { token, session: verifyPlayerPassportSession(token), identity: identity.identity };
 }
 
 function remainingSessionSeconds(session) {
@@ -56,6 +63,12 @@ export async function POST(request) {
     sessionToken(authorized.session, player.id, authorized.identity.actor, lease.payload.leaseId, leaseMaxAge),
     leaseMaxAge,
   ));
+  if (!isPreviewImpersonationSession(authorized.session)) {
+    response.cookies.set(previewDirectorPassportCookie(
+      authorized.token,
+      remainingSessionSeconds(authorized.session),
+    ));
+  }
   return response;
 }
 

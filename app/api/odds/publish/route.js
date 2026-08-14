@@ -7,7 +7,7 @@ import { ODDS_PHASES, simulateTournamentOdds, validateOpeningMatchups, validateR
 import { publishOddsSnapshot, readOddsSnapshots, readWorkbookSheetsByName, verifyPublishedOddsSnapshot, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
 import { createPublicationTrace, validateProjectionSnapshot } from "../../../../lib/projection-publication-diagnostics";
-import { playerPassportTokenFromRequest } from "../../../../lib/player-passport";
+import { tournamentDirectorTokenFromRequest } from "../../../../lib/player-passport";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server";
 import { formatChampionshipOdds } from "../../../../lib/championship-odds-format";
 import { oddsPersistenceDiagnostics } from "../../../../lib/odds-workbook-persistence";
@@ -28,7 +28,7 @@ async function publishProjection(request) {
   try {
     const secret = request.headers.get("x-odds-admin-secret");
     const allowed = [process.env.ADMIN_SECRET, process.env.ODDS_ADMIN_SECRET, process.env.GUIDE_ADMIN_SECRET, process.env.LIVE_ADMIN_SECRET].filter(Boolean);
-    const director = !secret || !allowed.includes(secret) ? await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request)) : null;
+    const director = !secret || !allowed.includes(secret) ? await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request)) : null;
     if ((!secret || !allowed.includes(secret)) && director?.status !== "active") return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
     const { phase, iterations: requestedIterations = 10_000 } = await request.json();
     diagnostic.simulationPhase = phase;

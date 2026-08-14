@@ -108,6 +108,20 @@ test("A: Director Passport, active lease, and signed cookie are all required", a
   assert.equal(strippedDirectorSession.sessionVersion, 7);
 }));
 
+test("normal Director capability requires a valid Passport but no impersonation lease", async () => withPreview(async () => {
+  const token = createPlayerPassportSession({
+    playerId: "DIR01", tournamentId: "2026", deviceId: "director-device-1", sessionVersion: 7,
+  }, secret);
+  let leaseChecked = false;
+  const result = await inspectTournamentDirectorToken(token, {
+    passportSecret: secret,
+    inspectPlayerToken: async () => ({ status: "active", identity: directorIdentity() }),
+    verifyLease: async () => { leaseChecked = true; return activeLease(); },
+  });
+  assert.equal(result.status, "active");
+  assert.equal(leaseChecked, false);
+}));
+
 test("impersonation token lifetime honors the lease-sized lifetime without a one-hour floor", () => {
   const { session } = signedSession({ expiresInSeconds: 30 });
   const remaining = session.exp - Math.floor(Date.now() / 1000);

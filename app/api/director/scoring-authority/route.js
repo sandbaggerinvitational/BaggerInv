@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import { playerPassportTokenFromRequest } from "../../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromRequest } from "../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { assertScoringShadowAdministrativeEnvironment } from "../../../../lib/scoring-shadow-gate.js";
 import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.js";
@@ -127,7 +127,7 @@ async function authorize(request) {
   let shadow;
   try { shadow = assertScoringShadowAdministrativeEnvironment(); }
   catch { return { response: unavailable() }; }
-  const authorization = await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+  const authorization = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
   if (authorization.status !== "active") return { response: NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 }) };
   return { shadow, identity: authorization.identity };
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { playerPassportTokenFromRequest } from "../../../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromRequest } from "../../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../../lib/player-passport-server.js";
 import {
   confirmLiveMatchScorecard,
@@ -35,7 +35,7 @@ async function authorize(request) {
   let gate;
   try { gate = assertScoringShadowAdministrativeEnvironment(); }
   catch { return { response: unavailable() }; }
-  const authorization = await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+  const authorization = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
   if (authorization.status !== "active") {
     return { response: NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 }) };
   }

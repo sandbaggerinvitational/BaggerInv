@@ -58,7 +58,7 @@ test("reset invalidates and warms tournament plus selected Passport identity bef
   const response = route.indexOf("return NextResponse.json", initializeParticipant);
   assert.ok(reset >= 0 && reset < nextCache && nextCache < invalidate && invalidate < session);
   assert.ok(session < invalidateParticipant && invalidateParticipant < initializeParticipant && initializeParticipant < response);
-  assert.match(route, /const token = playerPassportTokenFromRequest\(request\)/);
+  assert.match(route, /const token = tournamentDirectorTokenFromRequest\(request\)/);
 });
 
 test("cache invalidation prevents an old in-flight snapshot from becoming authoritative", async () => {

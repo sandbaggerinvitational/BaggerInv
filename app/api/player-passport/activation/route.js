@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { activatePlayerPassport, readPlayerPassportActivationOptions } from "../../../../lib/google-sheets-write.js";
-import { createPlayerPassportSession, playerPassportCookie, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
+import { createPlayerPassportSession, playerPassportCookie, previewDirectorPassportCookie, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
+import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { initializeParticipantTournament, invalidateParticipantInitialization } from "../../../../lib/participant-initialization.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 
@@ -42,6 +43,10 @@ export async function POST(request) {
     }
     const response = NextResponse.json({ activated: true, initialized, player: activated.player });
     response.cookies.set(playerPassportCookie(token));
+    if (process.env.VERCEL_ENV === "preview") {
+      const director = await inspectTournamentDirectorToken(token);
+      if (director.status === "active") response.cookies.set(previewDirectorPassportCookie(token));
+    }
     return response;
   } catch (error) {
     const reason = String(error?.code || "PASSPORT_ACTIVATION_INTERNAL_ERROR");

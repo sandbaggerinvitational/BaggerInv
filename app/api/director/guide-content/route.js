@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { playerPassportTokenFromRequest } from "../../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromRequest } from "../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { assertGuideSyncEnvironment } from "../../../../lib/guide-read-source.js";
 import { synchronizeGuideContent } from "../../../../lib/guide-sync-service.js";
@@ -17,7 +17,7 @@ async function authorize(request) {
   if (process.env.VERCEL_ENV !== "preview") return { response: unavailable() };
   try { assertGuideSyncEnvironment({ triggerType: "MANUAL" }); }
   catch { return { response: unavailable() }; }
-  const authorization = await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+  const authorization = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
   if (authorization.status === "unavailable") {
     return { response: NextResponse.json({ error: "Director verification is temporarily unavailable." }, {
       status: 503,

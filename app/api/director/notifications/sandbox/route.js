@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromRequest, verifyPlayerPassportSession } from "../../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../../lib/player-passport-server.js";
 import { appendNotificationLog, currentPushDevice, invalidatePushDevice } from "../../../../../lib/google-sheets-write.js";
 import { previewPushConfiguration, sendPreviewPush } from "../../../../../lib/web-push-notifications.js";
@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic";
 export async function POST(request) {
   if (!previewPushConfiguration().preview) return NextResponse.json({ error: "Not found." }, { status: 404 });
   let session;
-  try { session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request)); } catch { return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 }); }
-  const inspected = await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+  try { session = verifyPlayerPassportSession(tournamentDirectorTokenFromRequest(request)); } catch { return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 }); }
+  const inspected = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
   if (inspected.status === "unavailable") return NextResponse.json({ error: "Tournament Director identity could not be verified right now. Retry." }, { status: 503 });
   if (inspected.status !== "active") return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
   const input = await request.json().catch(() => ({}));

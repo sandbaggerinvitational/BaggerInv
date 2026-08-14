@@ -4,7 +4,7 @@ import { getAllPlayerStats } from "../../../../lib/stats.js";
 import { readWorkbookSheetsByName } from "../../../../lib/google-sheets-write.js";
 import { simulateTournamentOdds } from "../../../../lib/tournament-odds.js";
 import { readPublishedOddsView, publishedOddsSnapshotsFromView } from "../../../../lib/published-odds-supabase.js";
-import { playerPassportTokenFromRequest } from "../../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromRequest } from "../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export async function GET(request) {
 }
 
 async function directorFor(request) {
-  const result = await inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+  const result = await inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
   return result?.status === "active" ? result : null;
 }
 

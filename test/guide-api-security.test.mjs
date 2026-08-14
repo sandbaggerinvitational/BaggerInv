@@ -54,7 +54,7 @@ test("protected worker configure/status actions use deployment configuration and
 
 test("Director Guide route authorizes signed Director sessions and shares the canonical sync service", () => {
   const route = source("app/api/director/guide-content/route.js");
-  assert.match(route, /inspectTournamentDirectorToken\(playerPassportTokenFromRequest\(request\)\)/);
+  assert.match(route, /inspectTournamentDirectorToken\(tournamentDirectorTokenFromRequest\(request\)\)/);
   assert.match(route, /assertGuideSyncEnvironment\(\{ triggerType: "MANUAL" \}\)/);
   assert.match(route, /synchronizeGuideContent\(\{/);
   assert.match(route, /triggerType: "MANUAL"/);

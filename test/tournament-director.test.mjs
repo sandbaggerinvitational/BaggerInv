@@ -25,10 +25,15 @@ test("Director menu is exposed only after canonical Director authorization resol
   assert.match(menu, /directorAccess\?\.authorized === true/);
   assert.doesNotMatch(menu, /setDirector\(player\?\.role === "DIRECTOR"\)/);
   assert.match(menu, /director \? <section[\s\S]*className="directorMenuLink" href="\/admin\/director"/);
-  assert.match(access, /inspectTournamentDirectorToken\(playerPassportTokenFromRequest\(request\)\)/);
+  assert.match(access, /inspectTournamentDirectorToken\(token\)/);
+  assert.match(access, /tournamentDirectorTokenFromRequest\(request\)/);
+  assert.match(access, /previewDirectorPassportCookie\(token, maxAge\)/);
   assert.match(access, /authorization\.status === "active"/);
   assert.match(access, /process\.env\.VERCEL_ENV !== "preview"/);
   assert.match(access, /requireParticipantIdentityAuthority\(\)\.resolved === "supabase"/);
+  assert.match(menu, /player-passport-changed/);
+  assert.match(menu, /window\.addEventListener\("focus", refreshCapability\)/);
+  assert.match(menu, /response\?\.status !== 503/);
   assert.doesNotMatch(access, /Player ID|playerId\s*===|Clay Beltran/);
 });
 

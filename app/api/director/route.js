@@ -1,7 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { after, NextResponse } from "next/server";
 import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
-import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromRequest, verifyPlayerPassportSession } from "../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../lib/player-passport-server.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
 import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorCourseTees, updateDirectorMatchManagement, updateDirectorNetSkins, updateDirectorRoundPairings, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
@@ -25,7 +25,7 @@ import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker
 export const dynamic = "force-dynamic";
 
 async function authorize(request) {
-  return inspectTournamentDirectorToken(playerPassportTokenFromRequest(request));
+  return inspectTournamentDirectorToken(tournamentDirectorTokenFromRequest(request));
 }
 
 function authorizationFailure(result) {
@@ -151,7 +151,7 @@ export async function GET(request) {
   const identity = authorization.identity;
   try {
     const preview = previewPushConfiguration();
-    const session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
+    const session = verifyPlayerPassportSession(tournamentDirectorTokenFromRequest(request));
     const measured = await withWorkbookWriteDiagnostics("director-dashboard", () => withNormalizedReadDiagnostics("GET /api/director", () => Promise.all([
       getTournamentData(), readTournamentReadiness(), preview.preview ? currentPushDevice(session) : null,
       preview.preview ? readNotificationLog() : [], loadPredictionSheets().catch(() => null), readOddsSnapshots().catch(() => []),

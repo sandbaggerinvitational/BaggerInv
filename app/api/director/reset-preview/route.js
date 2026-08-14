@@ -1,7 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getTournamentData, invalidateTournamentDataCache } from "../../../live/sheetData.js";
-import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
+import { tournamentDirectorTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data.js";
 import { resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
@@ -14,7 +14,7 @@ const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 4
 
 export async function POST(request) {
   if (process.env.VERCEL_ENV !== "preview") return unavailable();
-  const token = playerPassportTokenFromRequest(request);
+  const token = tournamentDirectorTokenFromRequest(request);
   const authorization = await inspectTournamentDirectorToken(token);
   if (authorization.status === "unavailable") {
     return NextResponse.json({ error: "Tournament Director identity could not be verified right now. Retry." }, { status: 503, headers: { "Retry-After": "1" } });
