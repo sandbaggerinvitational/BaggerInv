@@ -52,14 +52,18 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
     };
     const active = window.__sbiTournamentIdentity;
     if (active) applyTournament(active);
-    fetch("/api/player-passport/session", { cache: "no-store" })
-      .then(async (response) => response.ok ? await response.json() : null)
-      .then((payload) => {
-        const player = payload?.player;
-        setDirector(player?.role === "DIRECTOR");
-        if (!active) applyTournament(payload?.tournament);
-      })
-      .catch(() => {});
+    Promise.all([
+      fetch("/api/player-passport/session", { cache: "no-store" })
+        .then(async (response) => response.ok ? await response.json() : null)
+        .catch(() => null),
+      fetch("/api/director/access", { cache: "no-store" })
+        .then(async (response) => response.ok ? await response.json() : null)
+        .catch(() => null),
+    ]).then(([session, directorAccess]) => {
+      const legacyDirector = session?.identityAuthority !== "supabase" && session?.player?.role === "DIRECTOR";
+      setDirector(directorAccess?.authorized === true || legacyDirector);
+      if (!active) applyTournament(session?.tournament);
+    });
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isOpen]);
 

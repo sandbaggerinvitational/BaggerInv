@@ -261,7 +261,7 @@ test("installed PWA and Tournament Hub avoid the public root and legacy /api/liv
   ]);
   assert.equal(manifest().start_url, "/home");
   assert.match(menu, /fetch\("\/api\/player-passport\/session"/);
-  assert.match(menu, /applyTournament\(payload\?\.tournament\)/);
+  assert.match(menu, /applyTournament\(session\?\.tournament\)/);
   assert.doesNotMatch(menu, /fetch\("\/api\/live"/);
   assert.doesNotMatch(menu, /api\/tournament\/live/);
   assert.match(session, /tournament:\s*resolved\.context\.tournament/);

@@ -18,10 +18,18 @@ test("Players roles are data-driven and safely default to PLAYER", () => {
   assert.match(source("lib/admin-cms-config.js"), /field\("Role", "Tournament role", "select", \{ options: \["PLAYER", "DIRECTOR"\] \}\)/);
 });
 
-test("Director menu is exposed only after the authenticated role resolves", () => {
+test("Director menu is exposed only after canonical Director authorization resolves", () => {
   const menu = source("app/Menu.js");
-  assert.match(menu, /setDirector\(player\?\.role === "DIRECTOR"\)/);
+  const access = source("app/api/director/access/route.js");
+  assert.match(menu, /fetch\("\/api\/director\/access", \{ cache: "no-store" \}\)/);
+  assert.match(menu, /directorAccess\?\.authorized === true/);
+  assert.doesNotMatch(menu, /setDirector\(player\?\.role === "DIRECTOR"\)/);
   assert.match(menu, /director \? <section[\s\S]*className="directorMenuLink" href="\/admin\/director"/);
+  assert.match(access, /inspectTournamentDirectorToken\(playerPassportTokenFromRequest\(request\)\)/);
+  assert.match(access, /authorization\.status === "active"/);
+  assert.match(access, /process\.env\.VERCEL_ENV !== "preview"/);
+  assert.match(access, /requireParticipantIdentityAuthority\(\)\.resolved === "supabase"/);
+  assert.doesNotMatch(access, /Player ID|playerId\s*===|Clay Beltran/);
 });
 
 test("round and tournament health summarize authoritative match statuses", () => {
