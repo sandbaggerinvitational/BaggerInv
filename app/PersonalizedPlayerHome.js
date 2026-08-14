@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   countdownParts,
+  homeFormatLabel,
   homeRoundSummaryMatches,
   matchAction,
   normalizedMatchStatus,
@@ -23,18 +24,18 @@ function roundMatchMeta(match) {
   return [
     match?.round ? `Round ${match.round}` : "",
     match?.match ? `Match ${match.match}` : "",
-  ].filter(Boolean).join(" • ");
+  ].filter(Boolean).join(" · ");
 }
 
 function matchLabel(match) {
-  return [roundMatchMeta(match), match?.format].filter(Boolean).join(", ");
+  return [roundMatchMeta(match), homeFormatLabel(match?.format)].filter(Boolean).join(", ");
 }
 
 function MatchHeading({ match, id, compact = false, semantic = false }) {
   const Element = semantic ? "h2" : "div";
   return <Element className={compact ? styles.compactMatchHeading : styles.matchHeading} id={id}>
     <span>{roundMatchMeta(match)}</span>
-    {match?.format ? <strong>{match.format}</strong> : null}
+    {match?.format ? <strong>{homeFormatLabel(match.format)}</strong> : null}
   </Element>;
 }
 
@@ -109,7 +110,7 @@ function MyRounds({ matches, totalCount, timeZone }) {
         >
           <div className={styles.roundTop}>
             <div>
-              <strong className={styles.roundIdentity}>{[match.round ? `R${match.round}` : "Round", match.format].filter(Boolean).join(" · ")}</strong>
+              <strong className={styles.roundIdentity}>{[match.round ? `Round ${match.round}` : "Round", homeFormatLabel(match.format)].filter(Boolean).join(" · ")}</strong>
               <span className={styles.roundCourse}>{match.course || "Course to be announced"}</span>
             </div>
             <b>{result}</b>

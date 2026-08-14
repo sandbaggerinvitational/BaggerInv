@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { formatHomeDateLabel, homeSchedulePreview } from "../lib/home-dashboard.js";
-import { homeRoundSummaryMatches, selectRelevantPlayerMatches } from "../lib/player-home.js";
+import { homeFormatLabel, homeRoundSummaryMatches, selectRelevantPlayerMatches } from "../lib/player-home.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -38,6 +38,20 @@ test("multiple promoted scorecards stay in one compact selector and out of My Ro
   assert.match(component, /More than one match is open/);
   assert.match(component, /Open Scorecard/);
   assert.match(styles, /\.choices button\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto[\s\S]*min-height:\s*70px/);
+  assert.match(styles, /\.card\[data-variant="choices"\] h2\s*\{[^}]*font-size:\s*clamp\(1\.3rem, 3\.8vw, 1\.65rem\)/);
+});
+
+test("Home round and format content uses natural casing while status pills stay distinct", async () => {
+  const [component, styles] = await Promise.all([
+    source("app/PersonalizedPlayerHome.js"),
+    source("app/personalized-player-home.module.css"),
+  ]);
+  assert.deepEqual(["BB", "SC", "SI"].map(homeFormatLabel), ["Best Ball", "Scramble", "Singles"]);
+  assert.match(component, /`Round \$\{match\.round\}`/);
+  assert.match(component, /homeFormatLabel\(match\.format\)/);
+  assert.doesNotMatch(component, /`R\$\{match\.round\}`/);
+  assert.doesNotMatch(styles.match(/\.roundIdentity\s*\{[^}]*\}/)?.[0] || "", /text-transform:\s*uppercase/);
+  assert.match(styles, /\.roundTop > b\s*\{[\s\S]*text-transform:\s*uppercase/);
 });
 
 test("Home dates are human friendly without changing canonical schedule selection", () => {

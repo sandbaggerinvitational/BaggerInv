@@ -70,9 +70,8 @@
   font-family: Arial, sans-serif;
   font-size: 0.68rem;
   font-weight: 750;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.025em;
   line-height: 1.2;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -418,8 +417,7 @@
   color: #17382d;
   font-size: .76rem;
   font-weight: 900;
-  letter-spacing: .045em;
-  text-transform: uppercase;
+  letter-spacing: .01em;
 }
 
 .roundTop > b {
@@ -508,7 +506,8 @@
 }
 
 .card[data-variant="choices"] h2 {
-  font-size: clamp(1.45rem, 4.5vw, 2rem);
+  font-size: clamp(1.3rem, 3.8vw, 1.65rem);
+  line-height: 1.05;
 }
 
 .card[data-variant="choices"] .intro {

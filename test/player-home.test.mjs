@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
   countdownParts,
+  homeFormatLabel,
   homeRoundSummaryMatches,
   matchAction,
   orderPlayerMatches,
@@ -119,7 +120,7 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(component, /teeLabel\(match\.tee\)/);
   assert.match(component, /courseLogo\(primary\.courseLogo\)/);
   assert.match(component, /roundMatchMeta\(match\)/);
-  assert.match(component, /join\(" • "\)/);
+  assert.match(component, /join\(" · "\)/);
   assert.doesNotMatch(component, /Match \$\{match\.match\}.*·/);
   assert.match(component, /scheduledAt:\s*match\?\.teeTimeAt/);
   assert.match(component, /timeZone/);
@@ -168,7 +169,7 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
     readFile(new URL("../app/tournament-command-center.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(component, /className=\{compact \? styles\.compactMatchHeading : styles\.matchHeading\}/);
-  assert.match(component, /match\?\.format \? <strong>/);
+  assert.match(component, /match\?\.format \? <strong>\{homeFormatLabel\(match\.format\)\}/);
   assert.match(styles, /\.matchHeading > strong[\s\S]*white-space:\s*nowrap/);
   assert.match(styles, /\.matchHeading > span,[\s\S]*color:\s*#285246/);
   assert.match(styles, /\.matchHeading > span,[\s\S]*font-weight:\s*750/);
@@ -178,7 +179,7 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(component, /className=\{styles\.roundIdentity\}/);
   assert.match(component, /<MyRounds matches=\{summaryMatches\} totalCount=\{matches\.length\}/);
   assert.match(styles, /\.roundCard\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/);
-  assert.match(styles, /\.roundIdentity\s*\{[\s\S]*text-transform:\s*uppercase/);
+  assert.doesNotMatch(styles.match(/\.roundIdentity\s*\{[^}]*\}/)?.[0] || "", /text-transform:\s*uppercase/);
   assert.doesNotMatch(component, /aria-label="Current player"/);
   assert.doesNotMatch(component, />YOU</);
   assert.match(commandStyles, /--home-eyebrow-color:#b58a25/);
@@ -186,6 +187,14 @@ test("Home match layout keeps format, logos, teams, and players in separate laye
   assert.match(commandStyles, /\.scoreboard strong\{font-size:3\.1rem/);
   assert.match(commandStyles, /font-variant-numeric:tabular-nums/);
   assert.match(commandStyles, /font-size:2\.7rem/);
+});
+
+test("Home presents canonical golf formats naturally without changing their codes", () => {
+  assert.equal(homeFormatLabel("BB"), "Best Ball");
+  assert.equal(homeFormatLabel("SC"), "Scramble");
+  assert.equal(homeFormatLabel("SI"), "Singles");
+  assert.equal(homeFormatLabel("BEST BALL"), "Best Ball");
+  assert.equal(homeFormatLabel("Alternate Shot"), "Alternate Shot");
 });
 
 test("Home round summaries exclude the primary match while preserving every other match", () => {
