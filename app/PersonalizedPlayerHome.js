@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   countdownParts,
@@ -12,7 +11,7 @@ import {
   selectRelevantPlayerMatches,
 } from "../lib/player-home";
 import { appMatchStatus, formatMatchResult } from "../lib/mobile-tournament-app";
-import { courseLogoSources, teamLogo } from "../lib/asset-paths";
+import { courseLogoSources, optimizedAssetUrl, teamLogo } from "../lib/asset-paths";
 import { formatHomeTime } from "../lib/home-dashboard";
 import { fetchWithTransientRetry } from "../lib/transient-fetch";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../lib/participant-initialization-cache";
@@ -78,38 +77,15 @@ function MatchPeople({ match }) {
   </div>;
 }
 
-function identityInitials(name) {
-  return String(name || "SBI").trim().split(/\s+/).filter(Boolean).slice(0, 2)
-    .map((part) => part[0]?.toUpperCase()).join("") || "SBI";
-}
-
-function OptimizedCourseIdentity({ sources, name, compact, loading }) {
-  const [index, setIndex] = useState(0);
-  const source = sources[index];
-  if (!source) return <span
-    className={compact ? styles.roundCourseLogoFallback : styles.courseLogoFallback}
-    aria-hidden="true"
-  >{identityInitials(name)}</span>;
-  return <Image
-    src={source}
-    alt=""
-    width={48}
-    height={48}
-    loading={loading}
-    sizes={compact ? "40px" : "48px"}
-    className={compact ? styles.roundCourseLogo : styles.courseLogo}
-    onError={() => setIndex((current) => current + 1)}
-  />;
-}
-
-function CourseIdentity({ match, compact = false, loading = "eager" }) {
-  const sources = courseLogoSources({ courseId: match?.courseId, filename: match?.courseLogo });
-  return <OptimizedCourseIdentity
-    key={sources.join("|")}
-    sources={sources}
+function CourseIdentity({ match, compact = false }) {
+  const width = compact ? 48 : 64;
+  return <MobileIdentityImage
+    sources={courseLogoSources({ courseId: match?.courseId, filename: match?.courseLogo })
+      .map((source) => optimizedAssetUrl(source, width))}
     name={match?.course}
-    compact={compact}
-    loading={loading}
+    alt=""
+    className={compact ? styles.roundCourseLogo : styles.courseLogo}
+    fallbackClassName={compact ? styles.roundCourseLogoFallback : styles.courseLogoFallback}
   />;
 }
 
@@ -144,7 +120,7 @@ function MyRounds({ matches, totalCount, timeZone }) {
           href={`/game-center/${encodeURIComponent(match.matchId)}?from=home`}
           aria-label={`${matchLabel(match)} at ${match.course || "course to be announced"}`}
         >
-          <CourseIdentity match={match} compact loading="lazy" />
+          <CourseIdentity match={match} compact />
           <div className={styles.roundTop}>
             <div>
               <strong className={styles.roundIdentity}>{[match.round ? `Round ${match.round}` : "Round", homeFormatLabel(match.format)].filter(Boolean).join(" · ")}</strong>

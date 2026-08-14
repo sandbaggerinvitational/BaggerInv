@@ -5,6 +5,7 @@ import {
   canonicalCourseLogoFilenames,
   courseLogoSources,
   defaultAssets,
+  optimizedAssetUrl,
 } from "../lib/asset-paths.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -29,6 +30,10 @@ test("Home course artwork resolves from canonical Course ID with the existing fa
     defaultAssets.courseLogo,
   ]);
   assert.deepEqual(courseLogoSources({ courseId: "UNKNOWN" }), [defaultAssets.courseLogo]);
+  assert.equal(
+    optimizedAssetUrl("/images/courses/logos/turtle-point-logo.png", 48),
+    "/_next/image?url=%2Fimages%2Fcourses%2Flogos%2Fturtle-point-logo.png&w=48&q=75",
+  );
 });
 
 test("Home reuses course identity for primary, multiple-match, and grouped-round presentations", async () => {
@@ -39,10 +44,9 @@ test("Home reuses course identity for primary, multiple-match, and grouped-round
   assert.match(component, /function CourseIdentity/);
   assert.match(component, /courseLogoSources\(\{ courseId: match\?\.courseId, filename: match\?\.courseLogo \}\)/);
   assert.equal((component.match(/<CourseIdentity match=/g) || []).length, 3);
-  assert.match(component, /<CourseIdentity match=\{match\} compact loading="lazy" \/>[\s\S]*className=\{styles\.roundTop\}/);
+  assert.match(component, /<CourseIdentity match=\{match\} compact \/>[\s\S]*className=\{styles\.roundTop\}/);
   assert.match(component, /className=\{styles\.choices\}[\s\S]*<CourseIdentity match=\{match\} compact \/>/);
-  assert.match(component, /function OptimizedCourseIdentity/);
-  assert.match(component, /<Image[\s\S]*loading=\{loading\}[\s\S]*sizes=\{compact \? "40px" : "48px"\}/);
+  assert.match(component, /<MobileIdentityImage[\s\S]*optimizedAssetUrl\(source, width\)/);
   assert.match(styles, /\.roundCourseLogo,[\s\S]*width:\s*30px;[\s\S]*object-fit:\s*contain/);
   assert.match(styles, /\.choices \.roundCourseLogo,[\s\S]*width:\s*40px;[\s\S]*height:\s*40px/);
 });
