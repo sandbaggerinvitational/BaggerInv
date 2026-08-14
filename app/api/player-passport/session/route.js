@@ -4,6 +4,7 @@ import { PLAYER_PASSPORT_COOKIE, playerPassportCookie, playerPassportTokenFromRe
 import { inspectPlayerPassportToken } from "../../../../lib/player-passport-server.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
+import { isRecoverablePreviewImpersonationCode } from "../../../../lib/participant-impersonation-recovery.js";
 import { createParticipantAuthServerClient } from "../../../../lib/supabase-auth-server.js";
 import { SCORING_SESSION_COOKIE, scoringSessionCookie } from "../../../../lib/scoring-access.js";
 
@@ -38,8 +39,13 @@ export async function GET(request) {
       return response;
     } catch (error) {
       const safe = participantIdentityPublicError(error);
-      return NextResponse.json({ active: safe.status === 401 ? false : null, error: safe.message, code: safe.code },
+      const response = NextResponse.json({ active: safe.status === 401 ? false : null, error: safe.message, code: safe.code },
         { status: safe.status, headers: { "Cache-Control": "private, no-store", "X-Participant-Identity-Authority": "supabase", "X-Participant-Identity-Google-Requests": "0" } });
+      if (process.env.VERCEL_ENV === "preview" && isRecoverablePreviewImpersonationCode(safe.code)) {
+        response.cookies.set({ ...playerPassportCookie("", 0), name: PLAYER_PASSPORT_COOKIE });
+        response.headers.set("X-Preview-Impersonation-Recovery", "cookie-cleared");
+      }
+      return response;
     }
   }
   const result = await inspectPlayerPassportToken(playerPassportTokenFromRequest(request));

@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { participantDestination } from "../lib/participant-shell";
+import { participantDestination, participantNavigationRoute } from "../lib/participant-shell";
+import { isRecoverablePreviewImpersonationCode } from "../lib/participant-impersonation-recovery.js";
 import styles from "./participant-navigation.module.css";
 
 const PARTICIPANT_SHELL_KEY = "sbi-participant-shell";
 const PREVIEW_SESSION_KEY = "sbi-preview-session";
 
-const itemsFor = (player) => [
+const itemsFor = () => [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/my-match", label: "My Match", icon: "golf" },
   { href: "/live", label: "Tournament", icon: "trophy" },
@@ -58,11 +59,15 @@ export default function ParticipantIdentity() {
           else window.localStorage.removeItem(PREVIEW_SESSION_KEY);
           return;
         }
+        const failure = await response.json().catch(() => ({}));
         if ([401, 403].includes(response.status) && sequence === requestSequence.current) {
           setPlayer(null);
           setImpersonation(null);
           window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
           window.localStorage.removeItem(PREVIEW_SESSION_KEY);
+          if (response.status === 403 && isRecoverablePreviewImpersonationCode(failure.code)) {
+            window.setTimeout(() => window.dispatchEvent(new Event("player-passport-changed")), 0);
+          }
         }
       })
       .catch(() => {
@@ -98,18 +103,21 @@ export default function ParticipantIdentity() {
     };
   }, [refresh]);
 
+  const navigationVisible = Boolean(player) || participantNavigationRoute(pathname);
+
   useEffect(() => {
-    document.body.classList.toggle("passport-navigation-active", Boolean(player));
+    document.body.classList.toggle("passport-navigation-active", navigationVisible);
     document.body.classList.toggle("preview-impersonation-active", Boolean(impersonation));
     return () => {
       document.body.classList.remove("passport-navigation-active");
       document.body.classList.remove("preview-impersonation-active");
     };
-  }, [player, impersonation]);
+  }, [navigationVisible, impersonation]);
 
-  if (!player || pathname.startsWith("/admin")) return null;
-  const items = itemsFor(player);
-  const currentDestination = participantDestination(pathname, searchParams.toString(), player.slug);
+  if (!navigationVisible || pathname.startsWith("/admin")) return null;
+  const items = itemsFor();
+  const currentDestination = participantDestination(pathname, searchParams.toString(), player?.slug || "");
+  const navigationLabel = player ? `${player.name}'s tournament navigation` : "Tournament navigation";
   return <>
     {impersonation ? <aside className={styles.impersonation} role="status" aria-label={`Preview Mode. Viewing as ${impersonation.player.name}`}>
       <span><b>Preview Mode</b><small>Viewing as</small><strong>{impersonation.player.name}</strong></span>
@@ -125,7 +133,7 @@ export default function ParticipantIdentity() {
         }}>Exit Preview</button>
       </div>
     </aside> : null}
-    <nav className={styles.mobile} aria-label={`${player.name}'s tournament navigation`}>
+    <nav className={styles.mobile} aria-label={navigationLabel}>
       {items.map((item) => {
         const active = currentDestination === item.label;
         return <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} aria-current={active ? "page" : undefined} key={item.label}>
@@ -133,8 +141,8 @@ export default function ParticipantIdentity() {
         </Link>;
       })}
     </nav>
-    <nav className={styles.desktop} aria-label={`${player.name}'s Player Passport`}>
-      <span>Welcome, {player.name}</span>
+    <nav className={styles.desktop} aria-label={navigationLabel}>
+      {player ? <span>Welcome, {player.name}</span> : null}
       {items.map((item) => <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} key={item.label}>{item.label}</Link>)}
     </nav>
   </>;

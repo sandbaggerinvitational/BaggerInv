@@ -9,6 +9,7 @@ import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
 import { clearParticipantHomeCache, readParticipantHomeCache, writeParticipantHomeCache } from "../lib/participant-home-cache.js";
 import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../lib/participant-auth-client-diagnostics.js";
 import { selectRelevantPlayerMatches } from "../lib/player-home.js";
+import { isRecoverablePreviewImpersonationCode } from "../lib/participant-impersonation-recovery.js";
 import styles from "./personalized-player-home.module.css";
 
 function parseTiming(value = "") {
@@ -57,8 +58,16 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
     controllerRef.current = controller;
     const startedAt = performance.now();
     try {
-      const response = await fetch("/api/participant/home", { cache: "no-store", credentials: "same-origin", signal: controller.signal });
-      const result = await response.json().catch(() => ({}));
+      let recoveredImpersonation = false;
+      let response = await fetch("/api/participant/home", { cache: "no-store", credentials: "same-origin", signal: controller.signal });
+      let result = await response.json().catch(() => ({}));
+      if (response.status === 403 && isRecoverablePreviewImpersonationCode(result.code)) {
+        recoveredImpersonation = true;
+        clearParticipantHomeCache(); setPayload(null); setState("loading");
+        window.dispatchEvent(new Event("player-passport-cleared"));
+        response = await fetch("/api/participant/home", { cache: "no-store", credentials: "same-origin", signal: controller.signal });
+        result = await response.json().catch(() => ({}));
+      }
       if (sequence !== requestSequence.current) return;
       if (response.status === 401) {
         clearParticipantHomeCache(); setPayload(null); setState("signed-out");
@@ -70,6 +79,7 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
       writeParticipantHomeCache(next);
       setPayload(next); setState("ready");
       window.dispatchEvent(new CustomEvent("sbi:participant-session", { detail: { player: next.player } }));
+      if (recoveredImpersonation) window.dispatchEvent(new Event("player-passport-changed"));
       const clientTotal = performance.now() - startedAt;
       const timings = parseTiming(response.headers.get("server-timing") || "");
       recordParticipantAuthDiagnostic("HOME_FRESH_PAYLOAD", { routeTo: "/home", durationMs: clientTotal });

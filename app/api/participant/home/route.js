@@ -9,6 +9,8 @@ import { requireStorylinesReadSource } from "../../../../lib/competition-derived
 import { guideReadEnvironment } from "../../../../lib/guide-read-source.js";
 import { readGuideProjection } from "../../../../lib/guide-supabase.js";
 import { applyGuideProjectionToHome } from "../../../../lib/guide-participant-adapter.js";
+import { isRecoverablePreviewImpersonationCode } from "../../../../lib/participant-impersonation-recovery.js";
+import { PLAYER_PASSPORT_COOKIE, playerPassportCookie } from "../../../../lib/player-passport.js";
 
 export const dynamic = "force-dynamic";
 
@@ -87,9 +89,14 @@ export async function GET(request) {
   } catch (error) {
     const safe = participantIdentityPublicError(error);
     console.error("Participant Home Supabase read failed", { code: error?.code || "HOME_READ_UNAVAILABLE", message: error?.message || String(error) });
-    return NextResponse.json({ active: safe.status === 401 ? false : null,
+    const response = NextResponse.json({ active: safe.status === 401 ? false : null,
       error: safe.status === 401 ? safe.message : "Home is temporarily unavailable.",
       code: error?.code || safe.code || "HOME_READ_UNAVAILABLE" },
     { status: safe.status || 503, headers: { ...headers, "X-Home-Read-Source": "supabase", "X-Home-Google-Requests": "0" } });
+    if (process.env.VERCEL_ENV === "preview" && isRecoverablePreviewImpersonationCode(error?.code || safe.code)) {
+      response.cookies.set({ ...playerPassportCookie("", 0), name: PLAYER_PASSPORT_COOKIE });
+      response.headers.set("X-Preview-Impersonation-Recovery", "cookie-cleared");
+    }
+    return response;
   }
 }
