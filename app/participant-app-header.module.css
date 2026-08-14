@@ -10,5 +10,4 @@
 .header[data-compact=true] .identity small{font-size:.65rem}
 .header[data-compact=true] .identity strong{font-size:.88rem}
 .identity:focus-visible{outline:3px solid #d7b65f;outline-offset:2px}
-@media(min-width:761px){.header{display:none}}
 @media(prefers-reduced-motion:reduce){.header{-webkit-backdrop-filter:none;backdrop-filter:none}}

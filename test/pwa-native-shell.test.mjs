@@ -26,6 +26,7 @@ test("persistent participant shell owns compact header, content scene, and navig
   assert.match(header, /<Menu homeHref="\/home" appShell \/>/);
   assert.match(headerCss, /var\(--safe-top\)/);
   assert.match(headerCss, /min-height:44px/);
+  assert.doesNotMatch(headerCss, /min-width:761px[^}]*\.header\{display:none/s);
   assert.match(globals, /\.participantAppShell \.siteHeader/);
   assert.match(globals, /participantRouteEnter \.14s/);
   assert.match(components, /className="siteHeader"/);
