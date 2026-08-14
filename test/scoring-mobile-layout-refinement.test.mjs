@@ -60,11 +60,12 @@ test("Singles, Scramble, and four-row Best Ball share the responsive scoring wor
   assert.match(styles, /\.keypadGrid button\{[^}]*min-width:56px;min-height:58px/);
 });
 
-test("long player and pairing labels cannot collide with Gross, Strokes, and Net", async () => {
+test("full player and pairing identities receive priority over compact Gross, Strokes, and Net", async () => {
   const styles = await source("app/score/score.module.css");
-  assert.match(styles, /\.playerIdentity>strong\{[^}]*text-overflow:ellipsis;white-space:nowrap/);
-  assert.match(styles, /grid-template-columns:minmax\(0,1fr\) minmax\(132px,44%\)/);
-  assert.match(styles, /\.scoreMetrics\{[^}]*min-width:0;overflow:hidden/);
+  assert.match(styles, /\.playerName,\.pairingIdentity\{[^}]*overflow-wrap:anywhere/);
+  assert.match(styles, /\.playerName\{[^}]*-webkit-line-clamp:2/);
+  assert.match(styles, /grid-template-columns:minmax\(0,1fr\) minmax\(112px,34%\)/);
+  assert.match(styles, /\.scoreMetrics\{[^}]*min-width:0;[^}]*overflow:hidden/);
 });
 
 test("Clear is secondary, only changes the draft, and saved corrections retain confirmation", async () => {

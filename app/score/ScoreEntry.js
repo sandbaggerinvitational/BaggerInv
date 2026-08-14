@@ -12,9 +12,11 @@ import { clearParticipantInitializationCache, readParticipantInitializationCache
 import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, sameGrossScores, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import { createIndexedDbScoringDiagnosticsStore } from "../../lib/scoring-client-diagnostics.js";
 import { applyParticipantFinalizationResult } from "../../lib/scoring-finalization-state.js";
-import { buildScoringSlots, nextScoringSlotIndex, scoreFromKeypad, scoringKeypadActionLabel } from "../../lib/scoring-keypad.js";
+import { buildScoringSlots, buildScoringTeamPresentation, nextScoringSlotIndex, scoreFromKeypad, scoringKeypadActionLabel } from "../../lib/scoring-keypad.js";
+import { teamLogo } from "../../lib/asset-paths.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
+import AssetImage from "../AssetImage";
 import MyMatchDashboard from "./MyMatchDashboard";
 import AlertSheet from "../ui/AlertSheet";
 import ScoringKeypad from "./ScoringKeypad";
@@ -60,6 +62,31 @@ function holeWinnerMark(score, teamNames) {
 function compactTeamName(value) {
   const name = String(value || "").trim().replace(/^the\s+/i, "");
   return name.split(/\s+and\s+/i)[0] || name;
+}
+
+function compactInitials(value) {
+  return String(value || "")
+    .replace(/[^a-zA-Z0-9'’\s-]/g, " ")
+    .split(/[\s-]+/)
+    .filter(Boolean)
+    .map((part) => part.replace(/[^a-zA-Z0-9]/g, "")[0])
+    .filter(Boolean)
+    .slice(0, 3)
+    .join("")
+    .toUpperCase() || "TEAM";
+}
+
+function ScoringTeamLogo({ team }) {
+  return <span className={styles.scoringTeamLogo} role="img" aria-label={`${team.name} team`}>
+    <AssetImage
+      src={teamLogo(team.logo)}
+      alt=""
+      className={styles.scoringTeamLogoImage}
+      fallbackClassName={styles.scoringTeamLogoFallback}
+      fallback={compactInitials(team.name)}
+      inferFallback={false}
+    />
+  </span>;
 }
 
 function compactHoleWinnerMark(score, teamNames) {
@@ -535,6 +562,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const format = String(match.Format || "").toUpperCase();
   const slots = format === "BB" ? 2 : 1;
   const scoringSlots = useMemo(() => buildScoringSlots({ format, match, teamNames, playerNames }), [format, match, playerNames, teamNames]);
+  const scoringTeams = useMemo(() => buildScoringTeamPresentation({ match, display }), [display, match]);
   const selectedSlot = scoringSlots[Math.min(activeSlotIndex, Math.max(0, scoringSlots.length - 1))] || null;
   const savedHole = data?.holeScores?.find((item) => Number(item["Hole Number"]) === holeNumber);
   const courseHole = data?.courseHoles?.find((item) => Number(item["Hole Number"]) === holeNumber);
@@ -1084,20 +1112,27 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         const strokes = strokesFor(slot.side, slot.index);
         const net = value === "" ? null : Number(value) - strokes;
         const selected = index === activeSlotIndex;
+        const team = scoringTeams[slot.side] || { id: "", name: slot.teamName, logo: "" };
+        const pairingNames = slot.kind === "team" ? slot.pairing.split(" + ").filter(Boolean) : [];
+        const entryName = slot.kind === "team" ? slot.pairing || slot.label : slot.label;
         return <button
           type="button"
           className={styles.holeCardPlayer}
           data-selected={selected ? "true" : undefined}
+          data-team-id={team.id || undefined}
           aria-pressed={selected}
-          aria-label={`${slot.label}, ${slot.teamName}, gross ${value || "not entered"}, ${strokes} handicap stroke${strokes === 1 ? "" : "s"}, net ${net ?? "not available"}${selected ? ", selected" : ""}`}
+          aria-label={`${entryName}, ${team.name}, gross ${value || "not entered"}, ${strokes} handicap stroke${strokes === 1 ? "" : "s"}, net ${net ?? "not available"}${selected ? `, ${savedHole ? "correcting score" : "entering now"}` : ""}`}
           onClick={() => selectScoringSlot(index)}
           key={slot.key}
         >
           <span className={styles.playerIdentity}>
-            <small>{slot.teamName}</small>
-            <strong>{slot.label}</strong>
-            {slot.kind === "team" && slot.pairing ? <em>{slot.pairing}</em> : null}
-            {selected ? <b className={styles.selectedMarker}>{savedHole ? "Correcting score" : "Entering now"}</b> : null}
+            <ScoringTeamLogo team={team} />
+            <span className={styles.playerIdentityCopy}>
+              {slot.kind === "team" && pairingNames.length ? <strong className={styles.pairingIdentity} aria-label={entryName}>
+                {pairingNames.map((pairingName) => <span key={pairingName}>{pairingName}</span>)}
+              </strong> : <strong className={styles.playerName}>{entryName}</strong>}
+              {selected ? <b className={styles.selectedMarker}>{savedHole ? "Correcting score" : "Entering now"}</b> : null}
+            </span>
           </span>
           <span className={styles.scoreMetrics} aria-label={`Gross ${value || "not entered"}, strokes ${strokes}, net ${net ?? "not available"}`}>
             <span className={styles.scoreMetric}><small>Gross</small><b>{value || "—"}</b></span>
