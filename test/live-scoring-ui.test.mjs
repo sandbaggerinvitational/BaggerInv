@@ -9,7 +9,7 @@ test("mobile scorer supports participant match selection, every format, and revi
   assert.match(source, /selectedMatch/);
   assert.match(source, /format === "BB" \? 2 : 1/);
   assert.match(source, /gross score/);
-  assert.match(source, /Submit Final/);
+  assert.match(source, /Finalize Match/);
   assert.match(source, /strokeDots/);
   assert.match(source, /formatLiveMatchResult/);
   assert.doesNotMatch(source, /function namedMatchStatus/);
@@ -36,13 +36,13 @@ test("active scoring keeps hole, match status, progress, and next action visible
     readFile(new URL("../app/score/score.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(source, /className=\{styles\.scoringContext\}/);
-  assert.match(source, /Current match status/);
-  assert.match(source, /`Hole \$\{progress\.currentHole\} of 18`/);
+  assert.match(source, /<small>Match<\/small><strong>\{currentMatchStatus\}/);
+  assert.match(source, /Hole \{holeNumber\} of 18/);
   assert.match(source, /progress\.remaining/);
   assert.match(source, /Save & Continue/);
   assert.match(source, /Save Hole & Review/);
   assert.match(styles, /\.scoringContext\{/);
-  assert.match(styles, /\.shell>\.primary\{[^}]*position:sticky/);
+  assert.match(styles, /\.scoringDock\{[^}]*position:sticky/);
 });
 
 test("final scorecard is a read-only official record with running match status", async () => {
@@ -66,19 +66,18 @@ test("final scorecard is a read-only official record with running match status",
   assert.doesNotMatch(source, /<small>Team \{side\}<\/small>/);
 });
 
-test("review and active scoring stay focused and keyboard-aware", async () => {
+test("review and active scoring stay focused without invoking the mobile number keyboard", async () => {
   const [source, styles] = await Promise.all([
     readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
     readFile(new URL("../app/score/score.module.css", import.meta.url), "utf8"),
   ]);
-  assert.match(source, /Reviewing Hole \$\{progress\.currentHole\}/);
-  assert.match(source, /Editing recorded scores/);
-  assert.match(source, /onFocus=\{keepScoreVisible\}/);
-  assert.match(source, /scrollIntoView\(\{ block: "center", behavior: "smooth" \}\)/);
-  assert.match(source, /enterKeyHint="next"/);
+  assert.match(source, /CORRECTING HOLE \$\{holeNumber\}/);
+  assert.match(source, /data-scoring-mode=\{savedHole \? "correction" : "new"\}/);
+  assert.match(source, /<ScoringKeypad/);
+  assert.doesNotMatch(source, /type="number"[^>]*gross score/);
   assert.doesNotMatch(source, /ParticipantLinks|leaderboardLinks/);
-  assert.match(styles, /scroll-margin-block:180px/);
-  assert.match(styles, /\.shell:focus-within>\.primary/);
+  assert.match(styles, /\.scoringDock\{[^}]*position:sticky/);
+  assert.match(styles, /\.keypadGrid button\{[^}]*min-width:56px/);
 });
 
 test("scoring uses compact tournament identity and unique status context", async () => {
@@ -89,8 +88,8 @@ test("scoring uses compact tournament identity and unique status context", async
   assert.match(source, /showStatus=\{false\}/);
   assert.match(source, /Round \$\{match\.Round/);
   assert.match(source, /Match \$\{match\.Match/);
-  assert.match(source, /Recorded hole/);
-  assert.match(source, /Running status remains above/);
+  assert.match(source, /currentMatchStatus/);
+  assert.match(source, /Hole result/);
   assert.doesNotMatch(source, /`\$\{teamNames\[side\].*\} scramble`/);
 });
 

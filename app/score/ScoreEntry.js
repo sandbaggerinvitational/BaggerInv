@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { finalizedMatchResult, formatLiveMatchResult, formatOfficialMatchResult } from "../../lib/match-result.js";
 import { getStrokesOnHole } from "../../lib/scorecard-net.js";
@@ -11,10 +12,13 @@ import { clearParticipantInitializationCache, readParticipantInitializationCache
 import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, sameGrossScores, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import { createIndexedDbScoringDiagnosticsStore } from "../../lib/scoring-client-diagnostics.js";
 import { applyParticipantFinalizationResult } from "../../lib/scoring-finalization-state.js";
+import { buildScoringSlots, nextScoringSlotIndex, scoreFromKeypad } from "../../lib/scoring-keypad.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
 import AlertSheet from "../ui/AlertSheet";
+import ScoringKeypad from "./ScoringKeypad";
+import ScoringSyncIndicator from "./ScoringSyncIndicator";
 import styles from "./score.module.css";
 
 const jsonScores = grossScoresFromCell;
@@ -84,6 +88,7 @@ function ScorecardCell({ readOnly, disabled, onEdit, children, label }) {
 }
 
 export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = false, participantIdentityAuthority = "passport" }) {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
   const [authorized, setAuthorized] = useState(false);
@@ -99,6 +104,11 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const [showReview, setShowReview] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [pendingHoleNavigation, setPendingHoleNavigation] = useState(null);
+  const [pendingExit, setPendingExit] = useState(false);
+  const [pendingReview, setPendingReview] = useState(false);
+  const [pendingCorrectionSave, setPendingCorrectionSave] = useState(false);
+  const [activeSlotIndex, setActiveSlotIndex] = useState(0);
+  const [syncFeedback, setSyncFeedback] = useState({ state: "idle", text: "" });
   const [restoring, setRestoring] = useState(true);
   const [passportPlayer, setPassportPlayer] = useState(null);
   const [passportMatches, setPassportMatches] = useState([]);
@@ -353,6 +363,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
 
   const selectHole = (number, source = data) => {
     setHoleNumber(number);
+    setActiveSlotIndex(0);
     const saved = source?.holeScores?.find((item) => Number(item["Hole Number"]) === number);
     setGross({
       team1: jsonScores(saved?.["Team 1 Gross Scores"]),
@@ -410,7 +421,16 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     const unsubscribe = queue.subscribe(({ entries, event, result, stale, resolution, entry }) => {
       const relevant = entries.filter((entry) => entry.matchId === matchId);
       setSyncEntries(relevant);
+      if (event === "queued") setSyncFeedback({
+        state: typeof navigator !== "undefined" && navigator.onLine === false ? "queued" : "saving",
+        text: typeof navigator !== "undefined" && navigator.onLine === false ? "Saved on this phone" : "Saving…",
+      });
+      if (event === "syncing") setSyncFeedback({ state: "saving", text: "Saving…" });
+      if (["retryable", "offline"].includes(event)) setSyncFeedback({ state: "queued", text: "Saved on this phone" });
+      if (["conflict", "action-required"].includes(event)) setSyncFeedback({ state: "conflict", text: "Score needs review" });
       if (event === "confirmed" && result && !stale) {
+        setSyncFeedback({ state: "synced", text: "Saved" });
+        if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") navigator.vibrate(18);
         recordScoringTiming({
           matchId,
           holeNumber: Number(result.hole?.["Hole Number"] || 0),
@@ -514,6 +534,8 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const finalResultText = finalResultSummary(finalResult, teamNames);
   const format = String(match.Format || "").toUpperCase();
   const slots = format === "BB" ? 2 : 1;
+  const scoringSlots = useMemo(() => buildScoringSlots({ format, match, teamNames, playerNames }), [format, match, playerNames, teamNames]);
+  const selectedSlot = scoringSlots[Math.min(activeSlotIndex, Math.max(0, scoringSlots.length - 1))] || null;
   const savedHole = data?.holeScores?.find((item) => Number(item["Hole Number"]) === holeNumber);
   const courseHole = data?.courseHoles?.find((item) => Number(item["Hole Number"]) === holeNumber);
   const completed = useMemo(() => new Set((data?.holeScores || []).map((item) => Number(item["Hole Number"]))), [data]);
@@ -566,6 +588,18 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     team2GrossScores: gross.team2,
   }, savedHole));
 
+  const activeScoringFocus = Boolean(authorized && data && !isFinal && !showReview);
+  useEffect(() => {
+    document.body.classList.toggle("participant-scoring-focus-active", activeScoringFocus);
+    return () => document.body.classList.remove("participant-scoring-focus-active");
+  }, [activeScoringFocus]);
+
+  useEffect(() => {
+    if (!syncFeedback.text || !["synced"].includes(syncFeedback.state)) return undefined;
+    const timer = window.setTimeout(() => setSyncFeedback({ state: "idle", text: "" }), 1800);
+    return () => window.clearTimeout(timer);
+  }, [syncFeedback]);
+
   const setScore = (side, index, value) => {
     let normalized;
     try { normalized = normalizeLiveScoreInput(value); }
@@ -581,17 +615,34 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     });
   };
 
-  const keepScoreVisible = (event) => {
-    const input = event.currentTarget;
-    const scroll = () => input.scrollIntoView({ block: "center", behavior: "smooth" });
-    requestAnimationFrame(scroll);
-    window.setTimeout(scroll, 280);
+  const selectScoringSlot = (index) => {
+    setActiveSlotIndex(Math.max(0, Math.min(scoringSlots.length - 1, Number(index) || 0)));
+    setStatus(savedHole ? `Correcting Hole ${holeNumber}.` : "");
+  };
+
+  const enterCommonScore = (value) => {
+    if (!selectedSlot || busy) return;
+    const current = gross[selectedSlot.sideKey]?.[selectedSlot.index] ?? "";
+    setScore(selectedSlot.sideKey, selectedSlot.index, scoreFromKeypad(current, value));
+    setActiveSlotIndex((current) => nextScoringSlotIndex(current, scoringSlots.length));
+  };
+
+  const adjustSelectedScore = (action) => {
+    if (!selectedSlot || busy) return;
+    const current = gross[selectedSlot.sideKey]?.[selectedSlot.index] ?? "";
+    setScore(selectedSlot.sideKey, selectedSlot.index, scoreFromKeypad(current, action));
+  };
+
+  const clearSelectedScore = () => {
+    if (!selectedSlot || busy) return;
+    setScore(selectedSlot.sideKey, selectedSlot.index, "");
   };
 
   const saveAuthoritatively = async () => {
     if (saveInFlight.current) return;
     saveInFlight.current = true;
     setSaveFailed(false);
+    setSyncFeedback({ state: "saving", text: "Saving…" });
     setBusy(true); setStatus(`Saving hole ${holeNumber}…`);
     try {
       const payload = await request("/api/scoring/current", {
@@ -637,8 +688,10 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         setConfirming(false);
       }
       setStatus("");
+      setSyncFeedback({ state: "synced", text: "Saved" });
     } catch (error) {
       setSaveFailed(true);
+      setSyncFeedback({ state: "conflict", text: "Score needs review" });
       const reason = String(error.message || "").trim();
       setStatus(reason === "Your score could not be saved. Please try again."
         ? "Score not saved. Please try again."
@@ -657,6 +710,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     const tapStartedAt = typeof performance === "undefined" ? Date.now() : performance.now();
     saveInFlight.current = true;
     setSaveFailed(false);
+    setSyncFeedback({ state: online ? "saving" : "queued", text: online ? "Saving…" : "Saved on this phone" });
     const savedNumber = holeNumber;
     const expectedRevision = Number(savedHole?.Revision || 0);
     const optimisticHole = {
@@ -704,6 +758,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       if (nextHole) selectHole(nextHole, nextData);
       else { setShowReview(true); setConfirming(false); }
       setStatus("");
+      setSyncFeedback({ state: online ? "saving" : "queued", text: online ? "Saving…" : "Saved on this phone" });
       if (scoringDiagnosticsEnabled && !queuedEntry.unchanged) {
         const sample = {
           matchId: String(match["Match ID"]),
@@ -726,6 +781,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       }
     } catch (error) {
       setSaveFailed(true);
+      setSyncFeedback({ state: "conflict", text: "Score needs review" });
       setStatus(`Score not saved on this device. ${error.message || "Please try again."}`);
     } finally {
       saveInFlight.current = false;
@@ -733,6 +789,14 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   };
 
   const save = localFirstEnabled ? saveLocally : saveAuthoritatively;
+
+  const requestSave = () => {
+    if (savedHole && draftDirty) {
+      setPendingCorrectionSave(true);
+      return;
+    }
+    save();
+  };
 
   const confirmScorecard = async () => {
     if (localFirstEnabled && syncEntries.length) {
@@ -765,6 +829,8 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       }
       setShowReview(true);
       setStatus("Scorecard finalized.");
+      setSyncFeedback({ state: "synced", text: "Match final" });
+      if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") navigator.vibrate([22, 45, 22]);
     } catch (error) { setStatus(error.message); }
     finally { setBusy(false); }
   };
@@ -792,6 +858,38 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     setStatus("");
   };
 
+  const requestExitScoring = () => {
+    if (draftDirty) {
+      setPendingExit(true);
+      return;
+    }
+    router.push("/my-match");
+  };
+
+  const discardDraftAndExit = () => {
+    setPendingExit(false);
+    router.push("/my-match");
+  };
+
+  const requestFullScorecard = () => {
+    if (draftDirty) {
+      setPendingReview(true);
+      return;
+    }
+    setShowReview(true);
+  };
+
+  const discardDraftAndReview = () => {
+    setPendingReview(false);
+    selectHole(holeNumber);
+    setShowReview(true);
+  };
+
+  const confirmCorrectionSave = () => {
+    setPendingCorrectionSave(false);
+    save();
+  };
+
   const syncStatus = scoringSyncSummary(syncEntries, online);
   const attentionEntries = actionableScoringEntries(syncEntries);
   const finalizationReview = scoringFinalizationReview(syncEntries);
@@ -810,9 +908,28 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     selectHole(Number(issue.holeNumber));
     setStatus("");
   };
-  const syncBanner = syncStatus.actionable
-    ? <button type="button" className={styles.syncStatus} data-state={syncStatus.state} onClick={reviewFirstSyncIssue}>{syncStatus.text}</button>
-    : <div className={styles.syncStatus} data-state={syncStatus.state} role="status">{syncStatus.text}</div>;
+  const syncPresentation = (() => {
+    if (syncStatus.actionable) return { state: "conflict", text: "Score needs review", actionable: true };
+    if (!online && syncEntries.length) return { state: "queued", text: "Saved on this phone", actionable: false };
+    if (syncEntries.length) return { state: "saving", text: "Saving…", actionable: false };
+    return { ...syncFeedback, actionable: false };
+  })();
+  const syncBanner = <ScoringSyncIndicator {...syncPresentation} onAction={reviewFirstSyncIssue} />;
+  const selectedGross = selectedSlot ? gross[selectedSlot.sideKey]?.[selectedSlot.index] ?? "" : "";
+  const selectedStrokes = selectedSlot ? strokesFor(selectedSlot.side, selectedSlot.index) : 0;
+  const selectedNet = selectedGross === "" ? null : Number(selectedGross) - selectedStrokes;
+  const frontComplete = [...completed].filter((number) => number <= 9).length;
+  const backComplete = [...completed].filter((number) => number > 9).length;
+  const missingScores = scoringSlots.filter((slot) => gross[slot.sideKey]?.[slot.index] === "" || gross[slot.sideKey]?.[slot.index] == null).length;
+  const saveDisabled = busy || !scoresComplete || unchangedSavedScore || (localFirstEnabled && (!syncReady || unsafeSyncBlock));
+  const saveLabel = busy
+    ? `Saving Hole ${holeNumber}…`
+    : saveFailed ? "Try Again"
+      : localFirstEnabled && !syncReady ? "Preparing Scoring…"
+        : unsafeSyncBlock ? canResolveScoreConflict ? "Review Device and Recorded Scores" : "Review Scoring Issue"
+          : unchangedSavedScore ? "Score Already Saved"
+            : savedHole ? "Save Correction"
+              : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue";
 
   if (restoring) return <section className={styles.login}>
     <div className={styles.brand}><span>SBI LIVE</span><h1>Preparing your tournament…</h1><p>{previewMode ? "Loading the selected player’s tournament experience." : supabaseParticipantIdentity ? "Please wait while your participant session and match are refreshed." : "Please wait while your Player Passport and match are refreshed."}</p></div>
@@ -884,7 +1001,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       <b className={styles.versus} aria-hidden="true">VS</b>
       <div><strong>{teamNames[2] || "Team 2"}</strong><span>{playerIds(match, 2).map((id) => playerNames[id] || id).filter(Boolean).join(" • ") || "Players recorded with match"}</span></div>
     </div>
-    {[scorecardHoles.slice(0, 9), scorecardHoles.slice(9)].map((nine, nineIndex) => <div className={styles.scorecard} role="table" aria-label={`${nineIndex ? "Back" : "Front"} nine scorecard`} key={nineIndex}>
+    {[scorecardHoles.slice(0, 9), scorecardHoles.slice(9)].map((nine, nineIndex) => <div className={styles.scorecardScroller} data-nine={nineIndex ? "back" : "front"} key={nineIndex}><div className={styles.scorecard} role="table" aria-label={`${nineIndex ? "Back" : "Front"} nine scorecard`}>
       <div className={styles.scorecardRow} data-header="true" role="row"><strong role="columnheader">Player / Team</strong>{nine.map(({ number }) => <b role="columnheader" key={number}>{number}</b>)}</div>
       {[1, 2].flatMap((side) => {
         const ids = playerIds(match, side);
@@ -909,7 +1026,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         const compact = running.replace(`${teamNames[1]} `, "").replace(`${teamNames[2]} `, "");
         return <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`After hole ${number}, ${running || "not recorded"}`} key={number}>{score ? compact : "—"}</ScorecardCell>;
       })}</div>
-    </div>)}
+    </div></div>)}
     {!isFinal && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
     {localFirstEnabled && !isFinal ? syncBanner : null}
     {!isFinal && completed.size === 18 && finalizationReview.count ? <section className={styles.finalSyncBlock} aria-live="polite">
@@ -923,49 +1040,73 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
         <Link className={styles.primary} href="/my-match">Return to My Match</Link>
         <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(match["Match ID"])}?from=my-match`}>View Game Center →</Link>
       </nav>
-    </> : confirming ? <div className={styles.confirmPanel}>
-      <strong>Submit this scorecard as final?</strong>
-      <p>Golfers will no longer be able to edit it unless an administrator reopens the match.</p>
-      <div><button disabled={busy} onClick={() => setConfirming(false)}>Keep reviewing</button><button className={styles.danger} disabled={busy} onClick={confirmScorecard}>Confirm final scorecard</button></div>
-    </div> : <><div className={styles.reviewActions}><button type="button" onClick={() => { setShowReview(false); selectHole(Math.max(1, ...completed)); }}>Continue Match</button><button className={styles.primary} disabled={busy || !data?.canConfirm || (localFirstEnabled && syncEntries.length > 0)} onClick={() => setConfirming(true)}>Submit Final</button></div>{completed.size === 18 && finalizationReview.count ? <p className={styles.finalBlockedReason}>{finalizationReview.buttonText}</p> : null}</>}
+    </> : <><div className={styles.reviewActions}><button type="button" onClick={() => { setShowReview(false); selectHole(Math.max(1, ...completed)); }}>Continue Match</button><button className={styles.primary} disabled={busy || !data?.canConfirm || (localFirstEnabled && syncEntries.length > 0)} onClick={() => setConfirming(true)}>Finalize Match</button></div>{completed.size === 18 && finalizationReview.count ? <p className={styles.finalBlockedReason}>{finalizationReview.buttonText}</p> : null}</>}
     {status && <p className={styles.status}>{status}</p>}
+    <AlertSheet
+      open={confirming}
+      onClose={() => { if (!busy) setConfirming(false); }}
+      title="Finalize Match?"
+      body={`18 holes complete. ${formatLiveMatchResult(data?.holeScores, teamNames)}. Corrections require the authorized reopen workflow.`}
+      cancelLabel="Review Scorecard"
+      primaryLabel={busy ? "Finalizing…" : "Finalize Match"}
+      primaryDisabled={busy}
+      onPrimary={confirmScorecard}
+      tone="warning"
+    />
   </section>;
 
-  return <section className={styles.shell}>
-    {tournamentIdentity}
+  return <section className={`${styles.shell} ${styles.focusShell}`} data-scoring-mode={savedHole ? "correction" : "new"}>
+    <header className={styles.focusToolbar}>
+      <button type="button" onClick={requestExitScoring} aria-label="Leave scoring">Done</button>
+      <span><small>{savedHole ? `CORRECTING HOLE ${holeNumber}` : display.formatName || format}</small><strong>Round {match.Round || "—"} · Match {match.Match || "—"}</strong></span>
+      <button type="button" onClick={requestFullScorecard}>Scorecard</button>
+    </header>
     <section className={styles.scoringContext} aria-label="Current match progress">
-      <div><small>Current match status</small><strong>{currentMatchStatus}</strong></div>
-      <span><b>{savedHole ? `Reviewing Hole ${progress.currentHole}` : `Hole ${progress.currentHole} of 18`}</b><small>{savedHole ? "Editing recorded scores" : `${progress.remaining} hole${progress.remaining === 1 ? "" : "s"} remaining`}</small></span>
+      <div><small>Match</small><strong>{currentMatchStatus}</strong></div>
+      <span><b>{completed.size} of 18 saved</b><small>{progress.remaining} hole{progress.remaining === 1 ? "" : "s"} remaining</small></span>
       <i aria-hidden="true"><b style={{ width: `${progress.percent}%` }} /></i>
     </section>
     <nav className={styles.holeNavigator} aria-label="Choose hole">
       <button disabled={holeNumber === 1} onClick={() => navigateHole(holeNumber - 1)} aria-label="Previous hole">‹</button>
-      <div><span>Current Hole • {holeNumber} of 18</span><strong>Par {courseHole?.Par || "—"} • {courseHole?.Yardage || "—"} yards</strong><small>Hole handicap {courseHole?.["Stroke Index"] || "—"}</small></div>
+      <div><span>Hole {holeNumber} of 18</span><strong>Par {courseHole?.Par || "—"}{courseHole?.Yardage ? ` · ${courseHole.Yardage} yards` : ""}</strong><small>Stroke index {courseHole?.["Stroke Index"] || "—"}</small></div>
       <button disabled={holeNumber === 18} onClick={() => navigateHole(holeNumber + 1)} aria-label="Next hole">›</button>
     </nav>
-    <div className={styles.holeCard}>
-      <div className={styles.holeCardHead}><strong>Player / Team</strong><b>Gross</b></div>
-      {[1, 2].flatMap((side) => {
-        const ids = playerIds(match, side);
-        const key = side === 1 ? "team1" : "team2";
-        const playerRows = Array.from({ length: slots }, (_, index) => {
-          const playerLabel = format === "SC" ? teamNames[side] || `Team ${side}` : playerNames[ids[index]] || ids[index] || `Player ${index + 1}`;
-          const dots = strokeDots(strokesFor(side, index));
-          return <label className={styles.holeCardPlayer} key={`${side}-${index}`}>
-            <span><strong>{playerLabel}</strong>{dots ? <em aria-label={`${strokesFor(side, index)} stroke received`}>{dots}</em> : null}</span>
-            <input aria-label={`${playerLabel} gross score`} disabled={isFinal} type="number" inputMode="numeric" enterKeyHint="next" min="1" max="20" value={gross[key][index] || ""} onFocus={keepScoreVisible} onChange={(event) => setScore(key, index, event.target.value)} />
-          </label>;
-        });
-        return playerRows.concat(<div className={styles.holeCardTeam} key={`team-${side}`}>
-          <span><strong>{teamNames[side] || `Team ${side}`}</strong><small>NET {format === "BB" ? "BEST BALL" : format === "SC" ? "SCRAMBLE" : "SCORE"}</small></span>
-          <b>{preview[`team${side}`] ?? savedHole?.[`Team ${side} Net Score`] ?? "—"}</b>
-        </div>);
-      })}
-      <div className={styles.holeCardWinner}><strong>Hole winner</strong><b>{preview.winner ? holeWinnerMark({ "Hole Winner": preview.winner }, teamNames) : holeWinnerMark(savedHole, teamNames) || "Pending"}</b></div>
+    <div className={styles.holeProgress} aria-label={`Front nine ${frontComplete} of 9 saved. Back nine ${backComplete} of 9 saved.`}>
+      <span><b>Front 9</b><i aria-hidden="true"><em style={{ width: `${(frontComplete / 9) * 100}%` }} /></i><small>{frontComplete}/9</small></span>
+      <span><b>Back 9</b><i aria-hidden="true"><em style={{ width: `${(backComplete / 9) * 100}%` }} /></i><small>{backComplete}/9</small></span>
     </div>
-    {savedHole && <div className={styles.result}><span>Recorded hole</span><strong>{savedHole["Hole Winner"] === "Halved" ? "Halved" : holeWinnerMark(savedHole, teamNames)}</strong><small>Hole {holeNumber} result • Running status remains above</small></div>}
-    {!savedHole && lastSaved && <div className={styles.savedResult}><strong>{lastSaved}</strong></div>}
-    {localFirstEnabled ? syncBanner : null}
+    {selectedSlot ? <section className={styles.entryFocus} aria-live="polite" aria-label={`${selectedSlot.label} selected for scoring`}>
+      <div><small>{savedHole ? "CORRECTION" : selectedSlot.kind === "team" ? "SELECTED PAIRING" : "SELECTED GOLFER"}</small><strong>{selectedSlot.label}</strong>{selectedSlot.kind === "team" && selectedSlot.pairing ? <span>{selectedSlot.pairing}</span> : <span>{selectedSlot.teamName}</span>}</div>
+      <dl><div><dt>Gross</dt><dd>{selectedGross || "—"}</dd></div><div><dt>Strokes</dt><dd>{selectedStrokes || "—"}</dd></div><div><dt>Net</dt><dd>{selectedNet ?? "—"}</dd></div></dl>
+    </section> : null}
+    <div className={styles.holeCard} aria-label={`Hole ${holeNumber} scoring order`}>
+      {scoringSlots.map((slot, index) => {
+        const value = gross[slot.sideKey]?.[slot.index] ?? "";
+        const strokes = strokesFor(slot.side, slot.index);
+        const net = value === "" ? null : Number(value) - strokes;
+        const selected = index === activeSlotIndex;
+        return <button
+          type="button"
+          className={styles.holeCardPlayer}
+          data-selected={selected ? "true" : undefined}
+          aria-pressed={selected}
+          aria-label={`${slot.label}, ${slot.teamName}, gross ${value || "not entered"}, ${strokes} handicap stroke${strokes === 1 ? "" : "s"}, net ${net ?? "not available"}${selected ? ", selected" : ""}`}
+          onClick={() => selectScoringSlot(index)}
+          key={slot.key}
+        >
+          <span><small>{slot.teamName}</small><strong>{slot.label}</strong>{slot.kind === "team" && slot.pairing ? <em>{slot.pairing}</em> : null}</span>
+          <span className={styles.scoreValues}><b>{value || "—"}</b><small>Gross</small></span>
+          <span className={styles.scoreValues}><b>{strokes || "—"}</b><small>Strokes<span className={styles.srOnly}> received</span></small></span>
+          <span className={styles.scoreValues}><b>{net ?? "—"}</b><small>Net</small></span>
+          {strokes ? <i aria-hidden="true">{strokeDots(strokes)}</i> : null}
+          {selected ? <strong className={styles.selectedMarker}>Entering now</strong> : null}
+        </button>;
+      })}
+      <div className={styles.holeCardTeamResults}>
+        {[1, 2].map((side) => <span key={side}><small>{teamNames[side] || `Team ${side}`} net</small><strong>{preview[`team${side}`] ?? savedHole?.[`Team ${side} Net Score`] ?? "—"}</strong></span>)}
+        <span><small>Hole result</small><strong>{preview.winner ? holeWinnerMark({ "Hole Winner": preview.winner }, teamNames) : holeWinnerMark(savedHole, teamNames) || "Pending"}</strong></span>
+      </div>
+    </div>
     {previewMode && scoringDiagnosticsEnabled ? <aside className={styles.scoringDiagnostics} aria-label="Preview scoring performance diagnostics"><strong>Preview scoring diagnostics</strong><span>{scoringTimingSamples.length ? `Hole ${scoringTimingSamples.at(-1).holeNumber} · IndexedDB ${timingLabel(scoringTimingSamples.at(-1).indexedDbCommitMs)} · Visual ${timingLabel(scoringTimingSamples.at(-1).tapToVisualAdvanceMs)} · Usable ${timingLabel(scoringTimingSamples.at(-1).nextHoleUsableMs)} · Authority ${timingLabel(scoringTimingSamples.at(-1).authoritativeConfirmationMs)} · Queue clear ${timingLabel(scoringTimingSamples.at(-1).queueClearMs)}` : "Enter a score to capture physical-device timing."}</span><small>{scoringTimingSamples.length} durable Preview sample{scoringTimingSamples.length === 1 ? "" : "s"} retained on this device and uploaded without score values.</small></aside> : null}
     {localFirstEnabled && activeSyncIssue ? <section className={styles.syncIssue} data-kind={activeSyncIssue.failureKind || activeSyncIssue.status} aria-live="polite">
       <span>{activeSyncIssueKind === "conflict" ? `Hole ${activeSyncIssue.holeNumber} score conflict` : activeSyncIssueKind === "retryable" ? `Hole ${activeSyncIssue.holeNumber} has not synced yet` : `Hole ${activeSyncIssue.holeNumber} needs action`}</span>
@@ -984,10 +1125,12 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       {activeSyncIssueKind === "retryable" ? <button type="button" onClick={() => syncQueue.current?.retryEntry(activeSyncIssue.id)}>Retry Sync</button> : null}
       {activeSyncIssue.status === "action-required" ? <button type="button" onClick={() => syncQueue.current?.retryEntry(activeSyncIssue.id)}>Check Again</button> : null}
     </section> : null}
-    {isFinal && <div className={styles.result}><span>Match complete</span><strong>{finalResult || "Final"}</strong><small>An administrator can reopen the match for corrections.</small></div>}
-    {isFinal ? <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
-      <Link className={styles.primary} href="/my-match">Return to My Match</Link>
-    </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || unchangedSavedScore || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? canResolveScoreConflict ? "Choose Device or Server Score Above" : "Resolve Scoring Restriction Above" : unchangedSavedScore ? "Score Already Saved" : activeSyncIssueKind === "retryable" && savedHole ? "Save Updated Score" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
+    <div className={styles.scoringDock}>
+      {localFirstEnabled ? syncBanner : null}
+      <ScoringKeypad value={selectedGross} disabled={busy || unsafeSyncBlock} onScore={enterCommonScore} onAdjust={adjustSelectedScore} onClear={clearSelectedScore} />
+      <button className={styles.primary} disabled={saveDisabled} onClick={requestSave} aria-describedby={!scoresComplete ? "score-save-help" : undefined}>{saveLabel}</button>
+      {!scoresComplete ? <small id="score-save-help" className={styles.saveHelp}>{missingScores} score{missingScores === 1 ? "" : "s"} needed before saving this hole.</small> : null}
+    </div>
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
     <AlertSheet
       open={Number.isFinite(pendingHoleNavigation)}
@@ -997,6 +1140,36 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       cancelLabel="Keep editing"
       primaryLabel="Discard changes"
       onPrimary={discardDraftAndNavigate}
+      tone="warning"
+    />
+    <AlertSheet
+      open={pendingExit}
+      onClose={() => setPendingExit(false)}
+      title="Leave scoring?"
+      body={`You have unsaved scores on Hole ${holeNumber}.`}
+      cancelLabel="Continue Scoring"
+      primaryLabel="Leave Without Saving"
+      onPrimary={discardDraftAndExit}
+      tone="warning"
+    />
+    <AlertSheet
+      open={pendingReview}
+      onClose={() => setPendingReview(false)}
+      title="Open the full scorecard?"
+      body={`Your unsaved changes for Hole ${holeNumber} will be cleared.`}
+      cancelLabel="Keep editing"
+      primaryLabel="Discard and Review"
+      onPrimary={discardDraftAndReview}
+      tone="warning"
+    />
+    <AlertSheet
+      open={pendingCorrectionSave}
+      onClose={() => setPendingCorrectionSave(false)}
+      title={`Save correction to Hole ${holeNumber}?`}
+      body="The recorded score will be updated through the existing correction and review process."
+      cancelLabel="Keep editing"
+      primaryLabel="Save Correction"
+      onPrimary={confirmCorrectionSave}
       tone="warning"
     />
   </section>;

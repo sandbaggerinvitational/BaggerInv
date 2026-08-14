@@ -595,8 +595,8 @@ test("Preview alone enables local-first scoring while Production keeps verified 
   assert.match(component, /Sync the score entered on this device/);
   assert.match(component, /Use Server Score/);
   assert.match(component, /Keep the score already recorded on the server/);
-  assert.match(component, /Choose Device or Server Score Above/);
-  assert.match(component, /Save Updated Score/);
+  assert.match(component, /Review Device and Recorded Scores/);
+  assert.match(component, /Save Correction/);
   assert.match(component, /canResolveScoreConflict/);
   assert.match(component, /has not synced yet/);
   assert.match(component, /canResolveScoreConflict \? <div className=\{styles\.syncResolution\}>/);

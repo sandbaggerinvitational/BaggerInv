@@ -55,6 +55,16 @@ body {
 
 body.participant-app-shell-active { background: var(--green-dark); }
 body.participant-overlay-open { overscroll-behavior: none; }
+body.participant-scoring-focus-active [data-participant-navigation] {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+body.participant-scoring-focus-active .participantAppContent,
+body.participant-scoring-focus-active .participantRouteScene {
+  min-height: calc(var(--app-height) - var(--participant-header-height));
+}
 
 .participantAppShell {
   min-height: var(--app-height);
@@ -218,6 +228,10 @@ button:disabled { cursor: not-allowed; }
   body.passport-navigation-active {
     padding-bottom: var(--participant-nav-total);
     scroll-padding-bottom: var(--participant-nav-total);
+  }
+  body.passport-navigation-active.participant-scoring-focus-active {
+    padding-bottom: 0;
+    scroll-padding-bottom: 0;
   }
 }
 

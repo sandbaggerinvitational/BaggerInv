@@ -13,6 +13,7 @@ export default function AlertSheet({
   cancelLabel = "Cancel",
   onPrimary,
   tone = "warning",
+  primaryDisabled = false,
 }) {
   const titleId = useId();
   const cancelRef = useRef(null);
@@ -23,7 +24,7 @@ export default function AlertSheet({
       {body ? <p>{body}</p> : null}
       <div className={styles.actions}>
         <button ref={cancelRef} type="button" onClick={() => close()}>{cancelLabel}</button>
-        <button type="button" data-primary="true" onClick={() => close(onPrimary)}>{primaryLabel}</button>
+        <button type="button" data-primary="true" disabled={primaryDisabled} onClick={() => close(onPrimary)}>{primaryLabel}</button>
       </div>
     </div>}
   </Sheet>;
