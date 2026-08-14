@@ -27,11 +27,31 @@ import { getDraftByYear } from "../../../lib/draft";
 import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
+import {
+  history2026TournamentCard,
+  history2026TournamentPageModel,
+  isSupabaseHistory2026,
+  loadHistory2026View,
+} from "../../../lib/history-2026-service";
+import HistoryUnavailablePage from "../HistoryUnavailable";
 
 export async function generateMetadata({ params }) {
-  await refreshHistoricalData();
   const { year } = await params;
-  const tournament = getTournament(year);
+  let tournament;
+
+  if (isSupabaseHistory2026(year)) {
+    try {
+      tournament = history2026TournamentCard(
+        await loadHistory2026View({ year: Number(year) })
+      );
+    } catch {
+      tournament = null;
+    }
+  } else {
+    await refreshHistoricalData();
+    tournament = getTournament(year);
+  }
+
   return pageMetadata({
     title: `${year} | The Sandbagger Invitational`,
     description: `Complete ${year} Sandbagger Invitational results, teams, courses, matches, awards, and leaderboard.`,
@@ -64,14 +84,54 @@ function tournamentStatus(tournament) {
 }
 
 export default async function TournamentYearPage({ params }) {
-  const scorecardAnalyticsPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
   const { year } = await params;
-  const tournament = getTournament(year);
-  if (!tournament) notFound();
+  const useSupabase2026 = isSupabaseHistory2026(year);
+  let tournament;
+  let roundPoints;
+  let leaderboardRows;
+  let previousYear;
+  let nextYear;
+  let draft = null;
+  let scorecardAnalytics;
 
-  const roundPoints = getTournamentRoundPoints(year);
-  const leaderboardRows = getTournamentPlayerLeaderboard(year);
+  if (useSupabase2026) {
+    try {
+      const model = history2026TournamentPageModel(
+        await loadHistory2026View({ year: Number(year) })
+      );
+      if (
+        !model?.tournament ||
+        !Array.isArray(model.roundPoints) ||
+        !Array.isArray(model.leaderboardRows) ||
+        !model.scorecardAnalytics
+      ) {
+        throw new Error("The 2026 historical view is incomplete.");
+      }
+      ({
+        tournament,
+        roundPoints,
+        leaderboardRows,
+        previousYear,
+        nextYear,
+        scorecardAnalytics,
+      } = model);
+    } catch {
+      return (
+        <HistoryUnavailablePage year={year} section="Tournament History" />
+      );
+    }
+  } else {
+    const scorecardAnalyticsPromise = loadScorecardAnalytics();
+    await refreshHistoricalData();
+    tournament = getTournament(year);
+    if (!tournament) notFound();
+    roundPoints = getTournamentRoundPoints(year);
+    leaderboardRows = getTournamentPlayerLeaderboard(year);
+    ({ previousYear, nextYear } = getAdjacentTournamentYears(year));
+    draft = await getDraftByYear(year);
+    scorecardAnalytics = await scorecardAnalyticsPromise;
+  }
+
   const pointsTracked = leaderboardRows.some((row) => row.pointsTracked);
   const leaderboard = addTournamentRanks(
     leaderboardRows,
@@ -79,11 +139,7 @@ export default async function TournamentYearPage({ params }) {
       ? "points"
       : (row) => `${row.winPercentage.toFixed(6)}|${row.wins}|${row.losses}|${row.halves}`
   );
-  const { previousYear, nextYear } =
-    getAdjacentTournamentYears(year);
   const status = tournamentStatus(tournament);
-  const draft = await getDraftByYear(year);
-  const scorecardAnalytics = await scorecardAnalyticsPromise;
   const tournamentScorecards = filterScorecards(scorecardAnalytics.usableScorecards, { year });
   const missingTournamentScorecards = scorecardAnalytics.missingScorecards.filter(
     (scorecard) => scorecard.year === Number(year)

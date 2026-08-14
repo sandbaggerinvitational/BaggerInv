@@ -20,15 +20,34 @@ import { pageMetadata } from "../../../../../lib/seo";
 import { loadScorecardAnalytics } from "../../../../../lib/scorecard-data";
 import { buildScoringHighlights, filterScorecards } from "../../../../../lib/scorecard-analytics";
 import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
+import {
+  history2026RoundPageModel,
+  isSupabaseHistory2026,
+  loadHistory2026View,
+} from "../../../../../lib/history-2026-service";
+import HistoryUnavailablePage from "../../../HistoryUnavailable";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
 }
 
 export async function generateMetadata({ params }) {
-  await refreshHistoricalData();
   const { year, round } = await params;
-  const archive = getHistoricalRound(year, round);
+  let archive;
+
+  if (isSupabaseHistory2026(year)) {
+    try {
+      archive = history2026RoundPageModel(
+        await loadHistory2026View({ year: Number(year) }),
+        round
+      )?.archive;
+    } catch {
+      archive = null;
+    }
+  } else {
+    await refreshHistoricalData();
+    archive = getHistoricalRound(year, round);
+  }
 
   const title = archive
     ? `${archive.year} Round ${archive.round} | The Sandbagger Invitational`
@@ -46,12 +65,35 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function HistoricalRoundPage({ params }) {
-  const scorecardAnalyticsPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
   const { year, round } = await params;
-  const archive = getHistoricalRound(year, round);
+  const useSupabase2026 = isSupabaseHistory2026(year);
+  let archive;
+  let scorecardAnalytics;
+
+  if (useSupabase2026) {
+    try {
+      const model = history2026RoundPageModel(
+        await loadHistory2026View({ year: Number(year) }),
+        round
+      );
+      if (model?.archive && !model.scorecardAnalytics) {
+        throw new Error("The 2026 historical round view is incomplete.");
+      }
+      archive = model?.archive ?? null;
+      scorecardAnalytics = model?.scorecardAnalytics ?? null;
+    } catch {
+      return (
+        <HistoryUnavailablePage year={year} section={`Round ${round} History`} />
+      );
+    }
+  } else {
+    const scorecardAnalyticsPromise = loadScorecardAnalytics();
+    await refreshHistoricalData();
+    archive = getHistoricalRound(year, round);
+    scorecardAnalytics = await scorecardAnalyticsPromise;
+  }
+
   if (!archive) notFound();
-  const scorecardAnalytics = await scorecardAnalyticsPromise;
   const roundScorecards = filterScorecards(scorecardAnalytics.usableScorecards, {
     year: archive.year,
     round: archive.round,

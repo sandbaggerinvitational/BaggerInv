@@ -1,12 +1,19 @@
 export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../lib/stats";
 import Link from "next/link";
+import { after } from "next/server";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { tournamentHero } from "../../lib/asset-paths";
 import { getTournaments } from "../../lib/stats";
 import styles from "../historical.module.css";
 import { pageMetadata } from "../../lib/seo";
+import {
+  history2026TournamentCard,
+  isSupabaseHistory2026,
+  loadHistory2026View,
+} from "../../lib/history-2026-service";
+import { HistoryUnavailableNotice } from "./HistoryUnavailable";
 
 export const metadata = pageMetadata({
   title: "History | The Sandbagger Invitational",
@@ -15,8 +22,34 @@ export const metadata = pageMetadata({
 });
 
 export default async function HistoryPage() {
-  await refreshHistoricalData();
-  const tournaments = getTournaments();
+  const useSupabase2026 = isSupabaseHistory2026("2026");
+  let tournaments;
+  let currentHistoryUnavailable = false;
+
+  if (useSupabase2026) {
+    // Older years retain their existing legacy authority, but a private GViz
+    // refresh must not sit in front of the explicit Supabase 2026 entry. Render
+    // the already-available immutable legacy archive immediately and refresh
+    // its process cache only after this participant response has completed.
+    const legacyTournaments = getTournaments().filter(
+      (tournament) => Number(tournament.year) !== 2026
+    );
+    after(async () => {
+      await refreshHistoricalData();
+    });
+
+    const currentTournament = await loadHistory2026View({ year: 2026 })
+      .then(history2026TournamentCard)
+      .catch(() => null);
+    currentHistoryUnavailable = !currentTournament;
+
+    tournaments = [currentTournament, ...legacyTournaments]
+      .filter(Boolean)
+      .sort((a, b) => Number(b.year) - Number(a.year));
+  } else {
+    await refreshHistoricalData();
+    tournaments = getTournaments();
+  }
 
   return (
     <main>
@@ -32,6 +65,9 @@ export default async function HistoryPage() {
       </section>
 
       <section className={styles.content} id="champions">
+        {currentHistoryUnavailable ? (
+          <HistoryUnavailableNotice year="2026" />
+        ) : null}
         <div className={styles.historyCardGrid}>
           {tournaments.map((tournament) => (
             <article className={styles.historyPhotoCard} key={tournament.year}>

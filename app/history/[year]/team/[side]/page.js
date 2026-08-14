@@ -5,17 +5,42 @@ import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
 import ContextBackLink from "../../../../ContextBackLink";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
+import PublicMatchCard from "../../../../PublicMatchCard";
 import {
   formatHandicap,
   getTeamSeason,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
 import { pageMetadata } from "../../../../../lib/seo";
+import { filterScorecards } from "../../../../../lib/scorecard-analytics";
+import {
+  history2026TeamPageModel,
+  isSupabaseHistory2026,
+  loadHistory2026View,
+} from "../../../../../lib/history-2026-service";
+import HistoryUnavailablePage from "../../../HistoryUnavailable";
 
 export async function generateMetadata({ params }) {
-  await refreshHistoricalData();
   const { year, side } = await params;
-  const team = getTeamSeason(year, decodeURIComponent(side));
+  const decodedSide = decodeURIComponent(side);
+  let team;
+
+  if (isSupabaseHistory2026(year)) {
+    try {
+      team = history2026TeamPageModel(
+        await loadHistory2026View({ year: Number(year) }),
+        decodedSide
+      );
+      if (team && !Array.isArray(team.roster)) {
+        throw new Error("The 2026 historical team view is incomplete.");
+      }
+    } catch {
+      team = null;
+    }
+  } else {
+    await refreshHistoricalData();
+    team = getTeamSeason(year, decodedSide);
+  }
 
   const title = team
     ? `${team.name} | ${year} | The Sandbagger Invitational`
@@ -30,9 +55,34 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function TeamSeasonPage({ params }) {
-  await refreshHistoricalData();
   const { year, side } = await params;
-  const team = getTeamSeason(year, decodeURIComponent(side));
+  const decodedSide = decodeURIComponent(side);
+  let team;
+
+  if (isSupabaseHistory2026(year)) {
+    try {
+      team = history2026TeamPageModel(
+        await loadHistory2026View({ year: Number(year) }),
+        decodedSide
+      );
+      if (
+        team && (
+          !Array.isArray(team.roster) ||
+          !Array.isArray(team.roundGroups) ||
+          !team.tournament ||
+          !team.scorecardAnalytics
+        )
+      ) {
+        throw new Error("The 2026 historical team match view is incomplete.");
+      }
+    } catch {
+      return <HistoryUnavailablePage year={year} section="Team History" />;
+    }
+  } else {
+    await refreshHistoricalData();
+    team = getTeamSeason(year, decodedSide);
+  }
+
   if (!team) notFound();
 
   return (
@@ -79,6 +129,40 @@ export default async function TeamSeasonPage({ params }) {
             </Link>
           ))}
         </div>
+
+        {team.roundGroups?.length ? (
+          <section className={styles.section}>
+            <span className={styles.sectionLabel}>Tournament Matches</span>
+            <h2>{team.name} by Round</h2>
+            {team.roundGroups.map((group) => (
+              <section className={styles.section} key={group.number}>
+                <span className={styles.sectionLabel}>
+                  {group.label} · {group.course?.Course || group.format}
+                </span>
+                <h3>
+                  {group.opponent?.name
+                    ? `${team.name} vs ${group.opponent.name}`
+                    : `${group.label} Matchups`}
+                </h3>
+                <div className={styles.roundMatchGrid}>
+                  {group.matches.map((match) => (
+                    <PublicMatchCard
+                      key={match.id}
+                      match={match}
+                      round={{ label: group.label, format: group.format }}
+                      tournament={team.tournament}
+                      variant="historical"
+                      scorecards={filterScorecards(
+                        team.scorecardAnalytics.scorecards,
+                        { matchId: match.id }
+                      )}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </section>
+        ) : null}
       </section>
 
       <Footer />
