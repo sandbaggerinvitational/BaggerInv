@@ -96,14 +96,14 @@ test("live mobile Home clips the closed navigation drawer without card overflow"
   assert.match(globals, /\.mobileHomeMain\s*\{[^}]*overflow-x:\s*clip/s);
 });
 
-test("participant Home omits the website footer and preserves dashboard order", async () => {
+test("participant Home omits the website footer and promotes the current match before the schedule", async () => {
   const [shell, commandCenter, personalized] = await Promise.all([
     readFile(new URL("../app/MobileTournamentHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8"),
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
   ]);
   assert.doesNotMatch(shell, /Footer/);
-  assert.ok(commandCenter.indexOf("<TournamentSchedule") < commandCenter.indexOf("<PersonalizedPlayerHome"));
+  assert.ok(commandCenter.indexOf("<PersonalizedPlayerHome") < commandCenter.indexOf("<TournamentSchedule"));
   assert.doesNotMatch(commandCenter, /<TournamentLeaders/);
   assert.doesNotMatch(personalized, /tournamentPulse|tournamentMoments/);
 });

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import PersonalizedPlayerHome from "./PersonalizedPlayerHome";
+import PersonalizedPlayerHome, { PersonalizedPlayerHomeSecondary } from "./PersonalizedPlayerHome";
 import MobileIdentityImage from "./MobileIdentityImage";
 import TournamentIdentityHeader from "./TournamentIdentityHeader";
 import TournamentMoments from "./TournamentMoments";
@@ -15,6 +15,7 @@ import { tournamentProgressModel } from "../lib/live-command-center";
 import { tournamentMoments } from "../lib/tournament-storylines";
 import styles from "./tournament-command-center.module.css";
 import scoreStyles from "./score-typography.module.css";
+import { ModuleSkeleton } from "./ui/StatePrimitives";
 
 function assetSource(value, resolver) {
   const source = String(value || "").trim();
@@ -101,6 +102,7 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
     ? (liveData.preparedStorylines || [])
     : tournamentMoments(liveData);
   const status = tournamentStatusLabel(liveTournament.status);
+  const supabaseCommandCenter = Boolean(initialParticipantData);
   const pulse = (
     <TournamentPulse
       tournament={liveTournament}
@@ -109,7 +111,7 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
     />
   );
 
-  return (
+  if (supabaseCommandCenter) return (
     <div className={styles.page}>
       <TournamentIdentityHeader
         year={liveTournament.year}
@@ -117,12 +119,22 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
         location={liveTournament.location || "Tournament week"}
         logo={liveTournament.logo}
         status={status}
+        compact
       />
-
+      <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed participantIdentityAuthority={participantIdentityAuthority} showSecondary={false} />
       {pulse}
-      <DeferredHomeContent><TournamentMoments moments={moments} /></DeferredHomeContent>
-      {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
-      <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed={Boolean(initialParticipantData)} participantIdentityAuthority={participantIdentityAuthority} />
+      {timelineAvailable ? <TournamentSchedule compact events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
+      {timelineAvailable ? <DeferredHomeContent fallback={<ModuleSkeleton label="Loading today’s schedule" />}><TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /></DeferredHomeContent> : null}
+      <DeferredHomeContent fallback={<ModuleSkeleton label="Loading tournament moments" />}><TournamentMoments moments={moments} /></DeferredHomeContent>
+      <DeferredHomeContent fallback={<ModuleSkeleton label="Loading your tournament details" />}><PersonalizedPlayerHomeSecondary netSkins={liveData?.netSkins} data={initialParticipantData} /></DeferredHomeContent>
     </div>
   );
+
+  return <div className={styles.page}>
+    <TournamentIdentityHeader year={liveTournament.year} name={liveTournament.name || "Sandbagger Invitational"} location={liveTournament.location || "Tournament week"} logo={liveTournament.logo} status={status} />
+    {pulse}
+    <DeferredHomeContent><TournamentMoments moments={moments} /></DeferredHomeContent>
+    {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
+    <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed={false} participantIdentityAuthority={participantIdentityAuthority} />
+  </div>;
 }

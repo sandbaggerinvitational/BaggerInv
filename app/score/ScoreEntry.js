@@ -14,6 +14,7 @@ import { applyParticipantFinalizationResult } from "../../lib/scoring-finalizati
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
+import AlertSheet from "../ui/AlertSheet";
 import styles from "./score.module.css";
 
 const jsonScores = grossScoresFromCell;
@@ -97,6 +98,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const [saveFailed, setSaveFailed] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [pendingHoleNavigation, setPendingHoleNavigation] = useState(null);
   const [restoring, setRestoring] = useState(true);
   const [passportPlayer, setPassportPlayer] = useState(null);
   const [passportMatches, setPassportMatches] = useState([]);
@@ -775,7 +777,16 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   };
 
   const navigateHole = (number) => {
-    if (draftDirty && !window.confirm("Discard unsaved score changes for this hole?")) return;
+    if (draftDirty) { setPendingHoleNavigation(number); return; }
+    selectHole(number);
+    setSaveFailed(false);
+    setStatus("");
+  };
+
+  const discardDraftAndNavigate = () => {
+    const number = pendingHoleNavigation;
+    setPendingHoleNavigation(null);
+    if (!Number.isFinite(number)) return;
     selectHole(number);
     setSaveFailed(false);
     setStatus("");
@@ -978,5 +989,15 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       <Link className={styles.primary} href="/my-match">Return to My Match</Link>
     </nav> : <button className={styles.primary} disabled={busy || !scoresComplete || unchangedSavedScore || (localFirstEnabled && (!syncReady || unsafeSyncBlock))} onClick={save}>{busy ? `Saving hole ${holeNumber}…` : saveFailed ? "Try Again" : localFirstEnabled && !syncReady ? "Preparing secure scoring…" : unsafeSyncBlock ? canResolveScoreConflict ? "Choose Device or Server Score Above" : "Resolve Scoring Restriction Above" : unchangedSavedScore ? "Score Already Saved" : activeSyncIssueKind === "retryable" && savedHole ? "Save Updated Score" : savedHole ? "Update Hole" : holeNumber === 18 ? "Save Hole & Review" : "Save & Continue"}</button>}
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}
+    <AlertSheet
+      open={Number.isFinite(pendingHoleNavigation)}
+      onClose={() => setPendingHoleNavigation(null)}
+      title="Discard unsaved score changes for this hole?"
+      body={`Your unsaved changes for Hole ${holeNumber} will be cleared.`}
+      cancelLabel="Keep editing"
+      primaryLabel="Discard changes"
+      onPrimary={discardDraftAndNavigate}
+      tone="warning"
+    />
   </section>;
 }

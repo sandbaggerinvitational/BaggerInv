@@ -21,20 +21,22 @@ test("Tournament Hub exposes major destinations without duplicating Tournament G
   assert.doesNotMatch(menu, /navigationSections|Odds Center|War Room|Admin Center/);
   assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
   assert.match(menu, /router\.refresh\(\)/);
-  assert.match(menu, /searchParams\.toString\(\) === linkQuery/);
+  assert.match(menu, /currentQuery === linkQuery/);
 });
 
 test("Tournament Hub remains accessible and keeps the participant shell visible", async () => {
-  const [menu, navigation, css] = await Promise.all([
-    source("app/Menu.js"), source("app/ParticipantIdentity.js"), source("app/globals.css"),
+  const [menu, navigation, sheet, sheetCss] = await Promise.all([
+    source("app/Menu.js"), source("app/ParticipantIdentity.js"), source("app/ui/Sheet.js"), source("app/ui/sheet.module.css"),
   ]);
-  assert.match(menu, /role="dialog" aria-label="Tournament Hub"/);
-  assert.match(menu, /aria-modal="true"/);
-  assert.match(menu, /event\.key === "Escape"/);
+  assert.match(menu, /appShell[\s\S]*<Sheet open=\{isOpen\}/);
+  assert.match(menu, /label="Tournament Hub"/);
+  assert.match(sheet, /aria-modal="true"/);
+  assert.match(sheet, /event\.key === "Escape"/);
+  assert.match(sheet, /background\.inert = true/);
+  assert.match(sheet, /returnFocusRef\.current/);
   assert.match(navigation, /position:fixed|className=\{styles\.mobile\}/);
-  assert.match(css, /body\.passport-navigation-active \.sideMenuScroll/);
-  assert.match(css, /var\(--participant-nav-height\)/);
-  assert.match(css, /body \{[\s\S]*overflow-x: clip/);
+  assert.match(sheetCss, /z-index:400/);
+  assert.match(sheetCss, /height:var\(--app-height\)/);
 });
 
 test("external tournament content asks before leaving The Bagger", async () => {

@@ -10,6 +10,7 @@ import { NOTIFICATION_CATEGORIES } from "../../lib/tournament-notifications";
 import styles from "./me.module.css";
 import nativeStyles from "./native-actions.module.css";
 import logoStyles from "../live/live.module.css";
+import { ErrorState, ScreenSkeleton } from "../ui/StatePrimitives";
 
 const preferenceKey = "sbi-notification-preferences";
 
@@ -125,8 +126,8 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
     }
   };
 
-  if (loading && !player) return <section className={styles.state}>{participantIdentityAuthority === "supabase" ? "Loading your participant profile…" : "Loading your Player Passport…"}</section>;
-  if (identityState === "unavailable" && !player) return <section className={styles.state}><h1>Player information temporarily unavailable</h1><p>Your tournament information could not be refreshed. Please try again.</p><button type="button" onClick={() => setAttempt((value) => value + 1)}>Retry</button></section>;
+  if (loading && !player) return <ScreenSkeleton label="Opening Player" cards={2} />;
+  if (identityState === "unavailable" && !player) return <ErrorState title="Player information is temporarily unavailable." message="Check your connection and try again." onRetry={() => setAttempt((value) => value + 1)} />;
   if (!player) return participantIdentityAuthority === "supabase"
     ? <section className={styles.state}><h1>Participant sign-in required</h1><Link href="/participant-auth?next=/me">Sign in</Link></section>
     : <section className={styles.state}><h1>Player Passport required</h1><Link href="/activate">Activate Player Passport</Link></section>;

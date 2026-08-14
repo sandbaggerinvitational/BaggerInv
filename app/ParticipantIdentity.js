@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { participantDestination, participantNavigationRoute } from "../lib/participant-shell";
+import { participantDestination, participantIdlePrefetchRoutes, participantNavigationRoute } from "../lib/participant-shell";
 import { isRecoverablePreviewImpersonationCode } from "../lib/participant-impersonation-recovery.js";
 import styles from "./participant-navigation.module.css";
 
@@ -41,6 +41,7 @@ export default function ParticipantIdentity() {
   const searchParams = useSearchParams();
   const [player, setPlayer] = useState(null);
   const [impersonation, setImpersonation] = useState(null);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const requestSequence = useRef(0);
 
   const refresh = useCallback(() => {
@@ -106,6 +107,25 @@ export default function ParticipantIdentity() {
   const navigationVisible = Boolean(player) || participantNavigationRoute(pathname);
 
   useEffect(() => {
+    if (!navigationVisible) return undefined;
+    const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 650));
+    const cancel = window.cancelIdleCallback || window.clearTimeout;
+    const task = schedule(() => {
+      participantIdlePrefetchRoutes(pathname, searchParams.toString()).forEach((href) => router.prefetch(href));
+    }, { timeout: 1600 });
+    return () => cancel(task);
+  }, [navigationVisible, pathname, router, searchParams]);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return undefined;
+    const update = () => setKeyboardOpen(window.innerHeight - viewport.height > 140);
+    update();
+    viewport.addEventListener("resize", update);
+    return () => viewport.removeEventListener("resize", update);
+  }, []);
+
+  useEffect(() => {
     document.body.classList.toggle("passport-navigation-active", navigationVisible);
     document.body.classList.toggle("preview-impersonation-active", Boolean(impersonation));
     return () => {
@@ -133,7 +153,7 @@ export default function ParticipantIdentity() {
         }}>Exit Preview</button>
       </div>
     </aside> : null}
-    <nav className={styles.mobile} aria-label={navigationLabel}>
+    <nav className={styles.mobile} aria-label={navigationLabel} data-keyboard-open={keyboardOpen ? "true" : undefined} data-participant-navigation>
       {items.map((item) => {
         const active = currentDestination === item.label;
         return <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} aria-current={active ? "page" : undefined} key={item.label}>
@@ -141,7 +161,7 @@ export default function ParticipantIdentity() {
         </Link>;
       })}
     </nav>
-    <nav className={styles.desktop} aria-label={navigationLabel}>
+    <nav className={styles.desktop} aria-label={navigationLabel} data-participant-navigation>
       {player ? <span>Welcome, {player.name}</span> : null}
       {items.map((item) => <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} key={item.label}>{item.label}</Link>)}
     </nav>

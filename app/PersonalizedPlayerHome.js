@@ -155,7 +155,17 @@ function parseServerTiming(value = "") {
   }).filter(([name]) => name));
 }
 
-export default function PersonalizedPlayerHome({ netSkins = null, initialData = null, managed = false, participantIdentityAuthority = "passport" }) {
+export function PersonalizedPlayerHomeSecondary({ netSkins = null, data = null }) {
+  const selection = selectRelevantPlayerMatches(data?.matches || [], data?.tournament?.currentRound);
+  const matches = selection.ordered;
+  if (!data) return null;
+  return <>
+    <PlayerNetSkins netSkins={netSkins} playerId={data?.player?.id} />
+    {matches.length ? <MyRounds matches={matches} emphasizedId={selection.primary?.matchId} timeZone={data?.tournament?.timeZone} /> : null}
+  </>;
+}
+
+export default function PersonalizedPlayerHome({ netSkins = null, initialData = null, managed = false, participantIdentityAuthority = "passport", showSecondary = true }) {
   const cachedInitialization = useMemo(() => managed ? null : readParticipantInitializationCache(), [managed]);
   const [payload, setPayload] = useState(initialData || cachedInitialization?.data || null);
   const [state, setState] = useState(initialData || cachedInitialization ? "ready" : "loading");
@@ -340,8 +350,8 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
       {message ? <p className={styles.message} role="alert">{message}</p> : null}
     </div>}
 
-    {secondaryReady ? <PlayerNetSkins netSkins={netSkins} playerId={player?.id} /> : null}
-    {secondaryReady && matches.length ? <MyRounds
+    {showSecondary && secondaryReady ? <PlayerNetSkins netSkins={netSkins} playerId={player?.id} /> : null}
+    {showSecondary && secondaryReady && matches.length ? <MyRounds
       matches={matches}
       emphasizedId={primary?.matchId}
       timeZone={payload?.tournament?.timeZone}

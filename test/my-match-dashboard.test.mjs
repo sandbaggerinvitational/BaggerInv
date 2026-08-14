@@ -106,7 +106,7 @@ test("My Match provides compact special states and mobile-safe card geometry", a
   assert.match(source, /Locked by Tournament Director/);
   assert.match(styles, /width:min\(100%,760px\)/);
   assert.match(styles, /minmax\(0,1fr\)/);
-  assert.match(styles, /padding:18px 16px calc\(82px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(styles, /padding:18px 16px calc\(var\(--participant-nav-total\) \+ 20px\)/);
   assert.match(styles, /\.matchGroups,\.matchGroup,\.matchList\{display:grid;gap:8px\}/);
   assert.match(styles, /\.matchCard\{[^}]*padding:11px 12px/);
   assert.match(styles, /\.logoPlate\[data-type=course\]\{width:44px;height:44px\}/);

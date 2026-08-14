@@ -6,6 +6,7 @@ import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from
 import { readTournamentLiveCache, writeTournamentLiveCache } from "../../lib/tournament-live-cache.js";
 import TournamentDashboard from "./TournamentDashboard";
 import styles from "./tournament-dashboard.module.css";
+import { ErrorState, ScreenSkeleton } from "../ui/StatePrimitives";
 
 function parseTiming(value = "") {
   return Object.fromEntries(String(value).split(",").map((entry) => {
@@ -91,9 +92,7 @@ export default function TournamentSupabaseRead() {
     onConfirmedData={acceptData}
   />;
 
-  return <section className={styles.page}><div className={styles.empty} role="status">
-    <strong>{state === "error" ? "Tournament is temporarily unavailable." : "Opening Tournament…"}</strong>
-    <span>{state === "error" ? "Live scores are unchanged. Try again when the connection is available." : "Loading the current score and match state."}</span>
-    {state === "error" ? <button type="button" onClick={refresh}>Try again</button> : null}
-  </div></section>;
+  return state === "error"
+    ? <section className={styles.page}><ErrorState kind="inline" headingLevel={2} title="Tournament is temporarily unavailable." message="Live scores are unchanged. Check your connection and try again." onRetry={refresh} /></section>
+    : <ScreenSkeleton label="Opening Tournament" cards={3} />;
 }

@@ -185,7 +185,7 @@ test("participant navigation uses one fixed safe-area-aware native shell", async
   assert.match(styles, /orientation:landscape/);
   assert.match(styles, /prefers-reduced-motion:reduce/);
   assert.match(globals, /--participant-nav-height: 68px/);
-  assert.match(globals, /scroll-padding-bottom: calc\(var\(--participant-nav-height\) \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(globals, /scroll-padding-bottom: var\(--participant-nav-total\)/);
 });
 
 test("Participant Mode active destinations cover direct and nested routes", () => {

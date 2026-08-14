@@ -45,31 +45,33 @@ test("launch is an opaque splash scene followed by a separate Home entrance", as
   const [layout, frame, splash, manifest] = await Promise.all([
     source("app/layout.js"), source("app/ParticipantRouteFrame.js"), source("app/PwaLaunchSplash.js"), source("app/manifest.js"),
   ]);
-  assert.match(layout, /<ParticipantRouteFrame>\{children\}<\/ParticipantRouteFrame>/);
+  assert.match(layout, /<ParticipantRouteFrame navigation=\{<Suspense fallback=\{null\}><ParticipantIdentity \/><\/Suspense>\}>\{children\}<\/ParticipantRouteFrame>/);
   assert.match(frame, /className="pwa-app-scene"/);
+  assert.match(frame, /className="participantAppShell"/);
+  assert.match(frame, /<ParticipantAppHeader \/>/);
   assert.match(layout, /html\.pwa-cold-launch \.pwa-app-scene,html\.pwa-home-entering \.pwa-app-scene\{opacity:0\}/);
-  assert.match(layout, /\.pwa-app-scene\{opacity:1;transition:opacity \.36s ease\}/);
+  assert.match(layout, /\.pwa-app-scene\{opacity:1\}/);
   assert.match(splash, /classList\.add\("pwa-home-entering"\)/);
   assert.match(splash, /classList\.remove\("pwa-cold-launch"\)/);
   assert.match(splash, /classList\.remove\("pwa-home-entering"\)/);
   assert.match(manifest, /background_color: "#092f25"/);
 });
 
-test("fast initialization preserves a two-second reading period without extending slow launches", async () => {
+test("fast initialization exits without an artificial reading delay", async () => {
   const [layout, splash] = await Promise.all([source("app/layout.js"), source("app/PwaLaunchSplash.js")]);
   assert.match(layout, /window\.__sbiPwaLaunchStartedAt=performance\.now\(\)/);
-  assert.match(splash, /Math\.max\(0, 2000 - \(performance\.now\(\) - startedAt\)\)/);
-  assert.match(splash, /window\.setTimeout/);
-  assert.match(splash, /window\.clearTimeout/);
+  assert.doesNotMatch(splash, /2000|readingTimeRemaining|setTimeout/);
+  assert.match(splash, /window\.requestAnimationFrame/);
+  assert.match(splash, /window\.cancelAnimationFrame/);
 });
 
 test("splash animation remains understated and accessible", async () => {
   const [splash, css] = await Promise.all([
     source("app/PwaLaunchSplash.js"), source("app/pwa-launch-splash.module.css"),
   ]);
-  assert.match(splash, /Loading Tournament\.\.\./);
+  assert.match(splash, /Opening The Bagger…/);
   assert.match(splash, /aria-live="polite"/);
-  assert.match(css, /transition:\s*opacity \.48s ease/);
+  assert.match(css, /transition:\s*opacity \.16s ease/);
   assert.match(css, /transform:\s*scale\(\.975\)/);
   assert.match(css, /height:\s*2px/);
   assert.match(css, /width:\s*168px/);

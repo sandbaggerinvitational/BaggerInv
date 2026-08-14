@@ -155,7 +155,7 @@ test("Home refinement keeps tournament identity and itinerary distinct from play
   assert.match(commandCenter, /liveData\?\.timeline\?\.events/);
   assert.match(commandCenter, /event\.displayOnHome/);
   assert.match(commandCenter, /\{pulse\}[\s\S]*<TournamentMoments moments=\{moments\}/);
-  assert.ok(commandCenter.indexOf("<TournamentSchedule events") < commandCenter.indexOf("<PersonalizedPlayerHome"));
+  assert.ok(commandCenter.indexOf("<PersonalizedPlayerHome") < commandCenter.indexOf("<TournamentSchedule events"));
   assert.doesNotMatch(component, /join\(" \+ "\)/);
 });
 

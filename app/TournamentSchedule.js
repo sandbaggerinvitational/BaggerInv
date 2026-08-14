@@ -14,7 +14,7 @@ function scheduleNow(initialNow, mountedAt) {
   return new Date(initial.getTime() + Date.now() - mountedAt);
 }
 
-export default function TournamentSchedule({ events, timeZone, initialNow = "" }) {
+export default function TournamentSchedule({ events, timeZone, initialNow = "", compact = false }) {
   const [mountedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => scheduleNow(initialNow, mountedAt));
   useEffect(() => {
@@ -22,14 +22,17 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "" }
     return () => window.clearInterval(timer);
   }, [initialNow, mountedAt]);
   const items = useMemo(() => todaysSchedule(events, { now, timeZone }), [events, now, timeZone]);
+  const displayedItems = compact
+    ? [items.find((item) => item.state === "live") || items.find((item) => item.isNext) || items.find((item) => item.state === "upcoming") || items.at(-1)].filter(Boolean)
+    : items;
 
   return (
-    <section className={styles.schedule} aria-labelledby="today-schedule-title">
+    <section className={styles.schedule} data-density={compact ? "next" : "full"} aria-labelledby={compact ? "next-schedule-title" : "today-schedule-title"}>
       <header className={styles.sectionHeader}>
-        <div><p>Today</p><h2 id="today-schedule-title">Today’s Schedule</h2></div>
+        <div><p>{compact ? "Next up" : "Today"}</p><h2 id={compact ? "next-schedule-title" : "today-schedule-title"}>{compact ? "Your next event" : "Today’s Schedule"}</h2></div>
         <Link href="/tournament-guide/schedule">View Tournament Guide</Link>
       </header>
-      {items.length ? <ol>{items.map((item) => {
+      {displayedItems.length ? <ol>{displayedItems.map((item) => {
         const subtitle = timelineOptionalText(item.subtitle);
         const location = timelineOptionalText(item.location);
         const golfEvent = isGolfTimelineEvent(item.type);

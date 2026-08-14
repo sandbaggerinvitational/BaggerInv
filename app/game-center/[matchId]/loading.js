@@ -1,11 +1,5 @@
-import styles from "../game-center.module.css";
+import { ScreenSkeleton } from "../../ui/StatePrimitives";
 
 export default function GameCenterLoading() {
-  return <main className={styles.page}>
-    <section className={styles.loading} role="status">
-      <span aria-hidden="true" />
-      <strong>Opening Game Center…</strong>
-      <small>Loading the latest confirmed match data.</small>
-    </section>
-  </main>;
+  return <ScreenSkeleton label="Opening Game Center" cards={3} />;
 }

@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { formatTournamentEdition } from "../lib/tournament-branding";
+import Sheet from "./ui/Sheet";
 
 const hubSections = [
   { label: "Tournament", links: [
@@ -18,11 +19,10 @@ const hubSections = [
   ] },
 ];
 
-export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
+export default function Menu({ activeNavigationHref = "", homeHref = "/", appShell = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [hash, setHash] = useState("");
   const [director, setDirector] = useState(false);
   const [tournament, setTournament] = useState({ name: "", edition: "", location: "", year: "" });
@@ -30,17 +30,20 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
   const closeButton = useRef(null);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    if (isOpen) closeButton.current?.focus();
+    if (appShell || !isOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButton.current?.focus();
+    const closeOnEscape = (event) => { if (event.key === "Escape") setIsOpen(false); };
+    window.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [isOpen]);
+  }, [appShell, isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
-    const closeOnEscape = (event) => { if (event.key === "Escape") setIsOpen(false); };
-    window.addEventListener("keydown", closeOnEscape);
     const applyTournament = (active) => {
         if (!active) return;
         setTournament({
@@ -64,7 +67,6 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
       setDirector(directorAccess?.authorized === true || legacyDirector);
       if (!active) applyTournament(session?.tournament);
     });
-    return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isOpen]);
 
   useEffect(() => setIsOpen(false), [pathname]);
@@ -75,6 +77,44 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
     window.addEventListener("hashchange", updateHash);
     return () => window.removeEventListener("hashchange", updateHash);
   }, [pathname]);
+
+  const hubContent = (close = () => setIsOpen(false)) => <>
+    <div className="sideMenuTop">
+      <div>
+        <small>Tournament Hub</small>
+        <strong>{tournament.name || "Tournament"}</strong>
+        {tournament.edition ? <span className="sideMenuEdition">{tournament.edition}</span> : null}
+        {tournament.location || tournament.year ? <span>{[tournament.location, tournament.year].filter(Boolean).join(" • ")}</span> : null}
+      </div>
+      <button ref={closeButton} className="closeMenuButton" type="button" aria-label="Close navigation menu" onClick={() => close()}>×</button>
+    </div>
+    <div className="sideMenuScroll">
+      <nav className="sideNav" aria-label="Tournament Hub navigation">
+        {hubSections.map((group) => <section className="sideNavGroup" key={group.label}>
+          <h2>{group.label}</h2>
+          <div>{group.links.map((link) => <Link
+            className={(() => {
+              const [pathAndQuery, linkHash = ""] = link.href.split("#");
+              const [linkPath, linkQuery = ""] = pathAndQuery.split("?");
+              const currentQuery = isOpen && typeof window !== "undefined" ? window.location.search.slice(1) : "";
+              return pathname === linkPath && currentQuery === linkQuery && (linkHash ? hash === `#${linkHash}` : !hash) ? "current" : "";
+            })()}
+            key={link.href}
+            href={link.href}
+            prefetch={false}
+            onClick={appShell ? (event) => { event.preventDefault(); close(() => router.push(link.href)); } : () => close()}
+          ><span aria-hidden="true">{link.icon}</span><b>{link.label}</b><i aria-hidden="true">›</i></Link>)}
+          {group.label === "App" ? <button type="button" disabled={refreshing} onClick={() => {
+            setRefreshing(true);
+            router.refresh();
+            window.dispatchEvent(new Event("focus"));
+            window.setTimeout(() => { setRefreshing(false); close(); }, 350);
+          }}><span aria-hidden="true">🔄</span><b>{refreshing ? "Refreshing Tournament Data…" : "Refresh Tournament Data"}</b><i aria-hidden="true">›</i></button> : null}</div>
+        </section>)}
+      </nav>
+      {director ? <section className="sideNavGroup sideNavDirector"><h2>Director</h2><div><Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={appShell ? (event) => { event.preventDefault(); close(() => router.push("/admin/director")); } : () => close()}><span aria-hidden="true">🎯</span><b>Tournament Director</b><i aria-hidden="true">›</i></Link></div></section> : null}
+    </div>
+  </>;
 
   return (
     <>
@@ -90,57 +130,9 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/" }) {
         <span />
       </button>
 
-      <div
-        className={`menuBackdrop ${isOpen ? "show" : ""}`}
-        onClick={() => setIsOpen(false)}
-      />
-
-      <aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Tournament Hub">
-        <div className="sideMenuTop">
-          <div>
-            <small>Tournament Hub</small>
-            <strong>{tournament.name || "Tournament"}</strong>
-            {tournament.edition ? <span className="sideMenuEdition">{tournament.edition}</span> : null}
-            {tournament.location || tournament.year ? <span>{[tournament.location, tournament.year].filter(Boolean).join(" • ")}</span> : null}
-          </div>
-          <button
-            ref={closeButton}
-            className="closeMenuButton"
-            type="button"
-            aria-label="Close navigation menu"
-            onClick={() => setIsOpen(false)}
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="sideMenuScroll">
-          <nav className="sideNav" aria-label="Tournament Hub navigation">
-            {hubSections.map((group) => <section className="sideNavGroup" key={group.label}>
-              <h2>{group.label}</h2>
-              <div>{group.links.map((link) => <Link
-                className={(() => {
-                  const [pathAndQuery, linkHash = ""] = link.href.split("#");
-                  const [linkPath, linkQuery = ""] = pathAndQuery.split("?");
-                  return pathname === linkPath && searchParams.toString() === linkQuery && (linkHash ? hash === `#${linkHash}` : !hash) ? "current" : "";
-                })()}
-                key={link.href}
-                href={link.href}
-                prefetch={false}
-                onClick={() => setIsOpen(false)}
-              ><span aria-hidden="true">{link.icon}</span><b>{link.label}</b><i aria-hidden="true">›</i></Link>)}
-              {group.label === "App" ? <button type="button" disabled={refreshing} onClick={() => {
-                setRefreshing(true);
-                router.refresh();
-                window.dispatchEvent(new Event("focus"));
-                window.setTimeout(() => { setRefreshing(false); setIsOpen(false); }, 350);
-              }}><span aria-hidden="true">🔄</span><b>{refreshing ? "Refreshing Tournament Data…" : "Refresh Tournament Data"}</b><i aria-hidden="true">›</i></button> : null}</div>
-            </section>)}
-          </nav>
-
-          {director ? <section className="sideNavGroup sideNavDirector"><h2>Director</h2><div><Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={() => setIsOpen(false)}><span aria-hidden="true">🎯</span><b>Tournament Director</b><i aria-hidden="true">›</i></Link></div></section> : null}
-        </div>
-      </aside>
+      {appShell
+        ? <Sheet open={isOpen} onClose={() => setIsOpen(false)} placement="right" label="Tournament Hub" initialFocusRef={closeButton} panelClassName="sideMenu open">{({ close }) => hubContent(close)}</Sheet>
+        : <><div className={`menuBackdrop ${isOpen ? "show" : ""}`} onClick={() => setIsOpen(false)} /><aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Tournament Hub">{hubContent()}</aside></>}
     </>
   );
 }

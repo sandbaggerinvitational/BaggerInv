@@ -38,7 +38,7 @@ test("Home and Tournament page trees are isolated by pathname in the shared PWA 
     source("app/home/page.js"),
     source("app/live/page.js"),
   ]);
-  assert.match(layout, /<ParticipantRouteFrame>\{children\}<\/ParticipantRouteFrame>/);
+  assert.match(layout, /<ParticipantRouteFrame navigation=\{<Suspense fallback=\{null\}><ParticipantIdentity \/><\/Suspense>\}>\{children\}<\/ParticipantRouteFrame>/);
   assert.match(frame, /usePathname\(\)/);
   assert.match(frame, /key=\{pathname\}/);
   assert.match(frame, /data-participant-route=\{pathname\}/);

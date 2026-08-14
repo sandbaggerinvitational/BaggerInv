@@ -1,4 +1,4 @@
-.login,.shell{width:min(100%,720px);min-height:100vh;margin:auto;padding:28px 18px 48px;background:#f6f3eb;color:#172319}
+.login,.shell{width:min(100%,720px);min-height:var(--app-height);margin:auto;padding:28px 18px calc(48px + var(--safe-bottom));background:#f6f3eb;color:#172319}
 .brand span,.scorecardHeading span{font-size:.75rem;font-weight:800;letter-spacing:.16em;color:#946f27}.brand h1,.scorecardHeading h1{margin:.25rem 0;font-size:2rem}.brand p,.scorecardHeading p{margin:.25rem 0;color:#586259}
 .login{display:flex;flex-direction:column;gap:18px;justify-content:center}.login label,.teams label{display:grid;gap:7px;font-weight:700}.login input,.login select,.teams input{min-height:52px;border:1px solid #aeb5ad;border-radius:10px;background:white;padding:10px 12px;font-size:1.1rem}
 .mode{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mode button{border:1px solid #b7bcb5;background:#fff;border-radius:9px;padding:11px}.mode button[data-active=true]{background:#173d27;color:white;border-color:#173d27}

@@ -4,14 +4,15 @@ import { readFile } from "node:fs/promises";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("shared Home content renders before personalized tournament content", async () => {
+test("Supabase Home renders the actionable match before shared secondary content", async () => {
   const commandCenter = await source("app/TournamentCommandCenter.js");
-  const identity = commandCenter.indexOf("<TournamentIdentityHeader");
-  const pulse = commandCenter.indexOf("{pulse}", identity);
-  const moments = commandCenter.indexOf("<TournamentMoments", pulse);
-  const schedule = commandCenter.indexOf("<TournamentSchedule", moments);
-  const personalized = commandCenter.indexOf("<PersonalizedPlayerHome", schedule);
-  assert.ok(identity >= 0 && identity < pulse && pulse < moments && moments < schedule && schedule < personalized);
+  const branch = commandCenter.slice(commandCenter.indexOf("if (supabaseCommandCenter)"), commandCenter.indexOf("return <div className={styles.page}>", commandCenter.indexOf("if (supabaseCommandCenter)") + 1));
+  const identity = branch.indexOf("<TournamentIdentityHeader");
+  const personalized = branch.indexOf("<PersonalizedPlayerHome");
+  const pulse = branch.indexOf("{pulse}");
+  const schedule = branch.indexOf("<TournamentSchedule compact");
+  const moments = branch.indexOf("<TournamentMoments", schedule);
+  assert.ok(identity >= 0 && identity < personalized && personalized < pulse && pulse < schedule && schedule < moments);
 });
 
 test("personalized loading copy does not block or duplicate shared Home modules", async () => {
@@ -27,10 +28,11 @@ test("Home defers secondary stories, Net Skins, and completed-round history unti
     source("app/DeferredHomeContent.js"),
     source("app/PersonalizedPlayerHome.js"),
   ]);
-  assert.match(commandCenter, /<DeferredHomeContent><TournamentMoments/);
+  assert.match(commandCenter, /<DeferredHomeContent fallback=\{<ModuleSkeleton label="Loading tournament moments" \/>\}><TournamentMoments/);
   assert.match(deferred, /requestIdleCallback/);
-  assert.match(personalized, /secondaryReady \? <PlayerNetSkins/);
-  assert.match(personalized, /secondaryReady && matches\.length \? <MyRounds/);
+  assert.match(commandCenter, /<PersonalizedPlayerHomeSecondary/);
+  assert.match(personalized, /showSecondary && secondaryReady \? <PlayerNetSkins/);
+  assert.match(personalized, /showSecondary && secondaryReady && matches\.length \? <MyRounds/);
 });
 
 test("Home initialization exposes every requested timing stage without changing JSON data", async () => {

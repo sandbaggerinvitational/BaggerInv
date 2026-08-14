@@ -77,5 +77,5 @@ test("root layout enables Vercel Web Analytics site-wide", async () => {
     layout,
     /import \{ Analytics \} from "@vercel\/analytics\/next";/,
   );
-  assert.match(layout, /<ParticipantRouteFrame>\{children\}<\/ParticipantRouteFrame>\s*<Analytics \/>/);
+  assert.match(layout, /<ParticipantRouteFrame navigation=\{<Suspense fallback=\{null\}><ParticipantIdentity \/><\/Suspense>\}>\{children\}<\/ParticipantRouteFrame>\s*<Analytics \/>/);
 });

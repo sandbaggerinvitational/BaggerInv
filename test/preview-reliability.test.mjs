@@ -131,9 +131,12 @@ test("stale identity responses cannot overwrite a newer successful response", as
   assert.match(navigation, /\[401, 403\]\.includes\(response\.status\)/);
 });
 
-test("heavy participant navigation disables automatic route prefetch only at the app shell", async () => {
+test("participant shell uses selective idle prefetch while retaining explicit heavy-link control", async () => {
   const navigation = await source("app/ParticipantIdentity.js");
   assert.match(navigation, /prefetch=\{false\}/);
+  assert.match(navigation, /participantIdlePrefetchRoutes/);
+  assert.match(navigation, /router\.prefetch\(href\)/);
+  assert.match(navigation, /requestIdleCallback/);
   assert.match(navigation, /href:\s*"\/home"/);
   assert.match(navigation, /href:\s*"\/live"/);
   assert.match(navigation, /href:\s*"\/my-match"/);

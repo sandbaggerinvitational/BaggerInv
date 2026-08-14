@@ -6,6 +6,7 @@ import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from
 import { readLeaderboardsCoreCache, writeLeaderboardsCoreCache } from "../../lib/leaderboards-core-cache.js";
 import LeaderboardsDashboard from "./LeaderboardsDashboard";
 import styles from "./leaderboards-dashboard.module.css";
+import { ErrorState, ScreenSkeleton } from "../ui/StatePrimitives";
 
 function parseTiming(value = "") {
   return Object.fromEntries(String(value).split(",").map((entry) => {
@@ -86,9 +87,7 @@ export default function LeaderboardsSupabaseRead({ previewMode = false, netSkins
     onConfirmedCore={(data, player) => acceptData({ data, player: player || payload.player })}
   />;
 
-  return <section className={styles.page}><div className={styles.empty} role="status">
-    <strong>{state === "error" ? "Core Leaderboards are temporarily unavailable." : "Opening Leaderboards…"}</strong>
-    <span>{state === "error" ? "Tournament scores are unchanged. Try again when the connection is available." : "Loading official team and player standings."}</span>
-    {state === "error" ? <button type="button" onClick={refresh}>Try again</button> : null}
-  </div></section>;
+  return state === "error"
+    ? <section className={styles.page}><ErrorState kind="inline" headingLevel={2} title="Leaderboards are temporarily unavailable." message="Tournament scores are unchanged. Check your connection and try again." onRetry={refresh} /></section>
+    : <ScreenSkeleton label="Opening Leaderboards" cards={3} />;
 }

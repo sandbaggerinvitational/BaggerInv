@@ -9,7 +9,7 @@ import styles from "./pwa-launch-splash.module.css";
 export default function PwaLaunchSplash() {
   const [identity, setIdentity] = useState(null);
   const [phase, setPhase] = useState("visible");
-  const exitTimer = useRef(null);
+  const exitFrame = useRef(null);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -33,22 +33,20 @@ export default function PwaLaunchSplash() {
           year: tournament.year || tournament.Year || "",
         });
       }
-      const startedAt = Number(window.__sbiPwaLaunchStartedAt) || performance.now();
-      const readingTimeRemaining = Math.max(0, 2000 - (performance.now() - startedAt));
-      exitTimer.current = window.setTimeout(() => {
-        requestAnimationFrame(() => requestAnimationFrame(() => setPhase("exiting")));
-      }, readingTimeRemaining);
+      exitFrame.current = window.requestAnimationFrame(() => {
+        exitFrame.current = window.requestAnimationFrame(() => setPhase("exiting"));
+      });
     };
     const onTournamentReady = (event) => completeLaunch(event.detail);
 
     window.addEventListener("sbi:tournament-ready", onTournamentReady, { once: true });
-    if (Object.prototype.hasOwnProperty.call(window, "__sbiTournamentIdentity")) {
-      completeLaunch(window.__sbiTournamentIdentity);
-    }
+    completeLaunch(Object.prototype.hasOwnProperty.call(window, "__sbiTournamentIdentity")
+      ? window.__sbiTournamentIdentity
+      : null);
 
     return () => {
       active = false;
-      window.clearTimeout(exitTimer.current);
+      window.cancelAnimationFrame(exitFrame.current);
       window.removeEventListener("sbi:tournament-ready", onTournamentReady);
     };
   }, []);
@@ -86,7 +84,7 @@ export default function PwaLaunchSplash() {
     </div>
     <div className={styles.loading} role="status">
       <div aria-hidden="true"><i /></div>
-      <span>Loading Tournament...</span>
+      <span>Opening The Bagger…</span>
     </div>
   </section>;
 }

@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Header, Footer } from "../components";
 import styles from "../historical.module.css";
+import { ErrorState } from "../ui/StatePrimitives";
 
 export function HistoryUnavailableNotice({ year = "2026" }) {
+  if (String(year) === "2026") return <ErrorState kind="inline" headingLevel={2} eyebrow="2026 Tournament Archive" title="History is temporarily unavailable." message="Check your connection and try again shortly." />;
   return (
     <div className={styles.roundArchiveEmpty} role="status">
       {year} History is temporarily unavailable. Please try again shortly.
@@ -14,6 +16,7 @@ export default function HistoryUnavailablePage({
   year = "2026",
   section = "History",
 }) {
+  if (String(year) === "2026") return <main><Header /><ErrorState eyebrow="2026 Tournament Archive" title={`${section} is temporarily unavailable.`} message="Check your connection and try again shortly." returnHref="/history" returnLabel="Tournament History" /><Footer /></main>;
   return (
     <main>
       <Header />

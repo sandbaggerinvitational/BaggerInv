@@ -12,8 +12,18 @@
   --muted: #6d746f;
   --line: #ddd6c8;
   --shadow: 0 22px 60px rgba(15, 35, 25, 0.10);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --app-height: 100vh;
+  --participant-header-height: 58px;
   --participant-nav-height: 68px;
+  --participant-nav-total: calc(var(--participant-nav-height) + var(--safe-bottom));
 }
+
+@supports (height: 100svh) { :root { --app-height: 100svh; } }
+@supports (height: 100dvh) { :root { --app-height: 100dvh; } }
 
 .liveControlEmbedded {
   min-height: 0 !important;
@@ -41,6 +51,32 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overscroll-behavior-x: none;
+}
+
+body.participant-app-shell-active { background: var(--green-dark); }
+body.participant-overlay-open { overscroll-behavior: none; }
+
+.participantAppShell {
+  min-height: var(--app-height);
+  background: var(--green-dark);
+}
+
+.participantAppContent {
+  min-height: calc(var(--app-height) - var(--participant-header-height) - var(--participant-nav-total));
+  background: var(--paper);
+}
+
+.participantAppShell .siteHeader,
+.participantAppShell > .participantAppContent footer { display: none; }
+
+.participantRouteScene {
+  min-height: calc(var(--app-height) - var(--participant-header-height) - var(--participant-nav-total));
+  animation: participantRouteEnter .14s ease-out both;
+}
+
+@keyframes participantRouteEnter {
+  from { opacity: .78; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
 }
 
 .mobileHomeMain {
@@ -92,7 +128,7 @@ button, [role="button"], summary { -webkit-user-select: none; user-select: none;
 button:disabled { cursor: not-allowed; }
 
 @media (hover: none) and (pointer: coarse) {
-  button:active, a:active, summary:active { opacity: .78; }
+  button:active, a:active, summary:active { opacity: .9; transform: scale(.985); }
   input, select, textarea { font-size: max(16px, 1em); }
 }
 
@@ -180,8 +216,8 @@ button:disabled { cursor: not-allowed; }
 
 @media (max-width: 760px) {
   body.passport-navigation-active {
-    padding-bottom: calc(var(--participant-nav-height) + env(safe-area-inset-bottom));
-    scroll-padding-bottom: calc(var(--participant-nav-height) + env(safe-area-inset-bottom));
+    padding-bottom: var(--participant-nav-total);
+    scroll-padding-bottom: var(--participant-nav-total);
   }
 }
 
@@ -191,23 +227,20 @@ button:disabled { cursor: not-allowed; }
 
 
 .sideMenu {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 90;
   width: min(100vw, 520px);
-  height: 100vh;
-  height: 100dvh;
+  height: var(--app-height);
+  max-height: var(--app-height) !important;
+  overflow: hidden !important;
   background: var(--green-dark);
   color: white;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
   box-shadow: -24px 0 70px rgba(0,0,0,.28);
 }
 
-.sideMenu.open { transform: translateX(0); }
+.sideMenu.open { transform: none; }
+.siteHeader .sideMenu{position:fixed;top:0;right:0;z-index:90;height:100vh;height:100dvh;max-height:none!important;transform:translateX(100%);transition:transform .3s ease}
+.siteHeader .sideMenu.open{transform:translateX(0)}
 
 .sideMenuTop {
   flex: 0 0 auto;
@@ -334,12 +367,9 @@ button:disabled { cursor: not-allowed; }
   .sideNavGroup a, .sideNavGroup button { font-size: .94rem; padding: 9px 10px; }
 }
 
-@media (max-width: 760px) {
-  body.passport-navigation-active .sideMenuScroll { padding-bottom: calc(24px + var(--participant-nav-height) + env(safe-area-inset-bottom)); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sideMenu, .menuBackdrop, .sideNavGroup a, .sideNavGroup button { transition: none; }
+  .participantRouteScene { animation: none; }
 }
 
 .kiawahHero {

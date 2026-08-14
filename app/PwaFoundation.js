@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import styles from "./pwa-foundation.module.css";
+import { ConnectionBanner } from "./ui/StatePrimitives";
 
 export default function PwaFoundation() {
   const [prompt, setPrompt] = useState(null);
@@ -57,7 +58,7 @@ export default function PwaFoundation() {
     };
   }, []);
 
-  if (!online) return <aside className={styles.offline} role="status" aria-live="polite"><i aria-hidden="true" />Offline · scores require a connection</aside>;
+  if (!online) return <ConnectionBanner state="offline">You’re offline. Saved information stays available.</ConnectionBanner>;
   if (updateReady) return <aside className={styles.update} role="status"><p>A newer version of SBI is ready.</p><button type="button" onClick={() => window.location.reload()}>Update</button></aside>;
   if (!showGlobalInstall || dismissed || (!prompt && !showIosHelp)) return null;
   return <aside className={`${styles.install} pwaInstallGuidance`} aria-label="Install The Bagger app">

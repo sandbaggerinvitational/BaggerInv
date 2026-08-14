@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function DeferredHomeContent({ children }) {
+export default function DeferredHomeContent({ children, fallback = null }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -12,5 +12,5 @@ export default function DeferredHomeContent({ children }) {
     return () => cancel(task);
   }, []);
 
-  return ready ? children : null;
+  return ready ? children : fallback;
 }

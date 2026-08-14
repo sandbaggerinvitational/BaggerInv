@@ -10,7 +10,7 @@ import { clearParticipantHomeCache, readParticipantHomeCache, writeParticipantHo
 import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../lib/participant-auth-client-diagnostics.js";
 import { selectRelevantPlayerMatches } from "../lib/player-home.js";
 import { isRecoverablePreviewImpersonationCode } from "../lib/participant-impersonation-recovery.js";
-import styles from "./personalized-player-home.module.css";
+import { ErrorState, ScreenSkeleton } from "./ui/StatePrimitives";
 
 function parseTiming(value = "") {
   return Object.fromEntries(String(value).split(",").map((entry) => {
@@ -132,10 +132,8 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
     <PwaSplashIdentityBridge tournament={null} />
     <PreviewModeBadge visible />
     <Header activeNavigationHref="/live" homeHref="/home" />
-    <section className={state === "error" ? styles.error : styles.loading} aria-live="polite">
-      <strong>{state === "signed-out" ? "Sign in to open your tournament." : state === "error" ? "Home is temporarily unavailable." : "Opening your tournament…"}</strong>
-      <span>{state === "error" ? "Your score data is unchanged. Try again when the connection is available." : "Your identity and current match are loading."}</span>
-      {state === "error" ? <button type="button" onClick={refresh}>Try again</button> : <><span className={styles.skeleton} /><span className={styles.skeleton} /></>}
-    </section>
+    {state === "error"
+      ? <ErrorState title="Home is temporarily unavailable." message="Your latest saved information is unchanged. Check your connection and try again." onRetry={refresh} />
+      : <ScreenSkeleton label={state === "signed-out" ? "Opening participant sign-in" : "Opening Home"} cards={3} />}
   </main>;
 }

@@ -10,7 +10,7 @@
   background: radial-gradient(circle at 50% 33%, rgba(198, 162, 77, .14), transparent 32%), linear-gradient(180deg, #092f25, #061f19);
   color: #fff;
   opacity: 1;
-  transition: opacity .48s ease;
+  transition: opacity .16s ease;
   isolation: isolate;
 }
 
@@ -28,7 +28,7 @@
   align-items: center;
   margin-top: calc(-1 * clamp(30px, 5.5vh, 58px));
   text-align: center;
-  animation: splashReveal .55s ease-out both;
+  animation: splashReveal .16s ease-out both;
 }
 
 .logoPlate {
