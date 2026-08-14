@@ -161,18 +161,12 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
 
     <RoundPerformance rounds={tournamentData?.roundPerformance} />
 
-    <section className={styles.card} id="notification-preferences">
-      <div className={styles.sectionHeading}><span>Your Game</span><h2>Player Profile</h2></div>
+    <section className={styles.card}>
+      <div className={styles.sectionHeading}><span>Career</span><h2>Profile &amp; Matches</h2></div>
       <div className={styles.links}>
         <Link href={profile.slug ? `/players/${profile.slug}` : "/players"}><strong>Career, history, and achievements</strong><span>Explore your Sandbagger Invitational player profile</span></Link>
         <Link href="/my-match"><strong>My Matches</strong><span>Your tournament assignments and scorecards</span></Link>
       </div>
-    </section>
-
-    <section className={`${styles.card} ${styles.history}`}>
-      <div className={styles.sectionHeading}><span>Sandbagger Invitational</span><h2>Tournament History</h2></div>
-      <p>Past appearances, match records, and tournament achievements live in your player profile.</p>
-      <Link href={profile.slug ? `/players/${profile.slug}` : "/players"}>View tournament history <span aria-hidden="true">›</span></Link>
     </section>
 
     <section className={styles.card}>
@@ -184,8 +178,8 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
       {shareMessage ? <p className={nativeStyles.feedback} role="status">{shareMessage}</p> : null}
     </section>
 
-    <section className={styles.card}>
-      <div className={styles.sectionHeading}><span>Preferences</span><h2>Notifications</h2></div>
+    <section className={styles.card} id="notification-preferences">
+      <div className={styles.sectionHeading}><span>Settings</span><h2>Notification Preferences</h2></div>
       <p className={styles.note}>Preferences are ready for browser notifications. Push delivery is not enabled yet.</p>
       <div className={styles.preferences}>
         {NOTIFICATION_CATEGORIES.map((category) => <label key={category.id}>
@@ -195,11 +189,11 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
       </div>
     </section>
     {!previewMode ? <section className={styles.card}>
-      <div className={styles.sectionHeading}><span>Account Management</span><h2>Player Passport</h2></div>
-      <p className={styles.note}>Removing this device does not change your player record or activation credentials.</p>
-      {!confirming ? <button className={styles.remove} onClick={() => setConfirming(true)}>This isn’t me</button> : <div className={styles.confirm}>
-        <strong>Remove Player Passport from this device?</strong>
-        <div><button onClick={() => setConfirming(false)}>Keep Passport</button><button onClick={remove}>Remove</button></div>
+      <div className={styles.sectionHeading}><span>Settings</span><h2>{participantIdentityAuthority === "supabase" ? "Account & Session" : "Player Passport"}</h2></div>
+      <p className={styles.note}>{participantIdentityAuthority === "supabase" ? "Signing out does not change your player record or tournament assignments." : "Removing this device does not change your player record or activation credentials."}</p>
+      {!confirming ? <button className={styles.remove} type="button" onClick={() => setConfirming(true)}>{participantIdentityAuthority === "supabase" ? "Sign Out" : "This isn’t me"}</button> : <div className={styles.confirm}>
+        <strong>{participantIdentityAuthority === "supabase" ? "Sign out of this participant account?" : "Remove Player Passport from this device?"}</strong>
+        <div><button type="button" onClick={() => setConfirming(false)}>{participantIdentityAuthority === "supabase" ? "Stay Signed In" : "Keep Passport"}</button><button type="button" onClick={remove}>{participantIdentityAuthority === "supabase" ? "Sign Out" : "Remove"}</button></div>
       </div>}
     </section> : null}
   </section>;

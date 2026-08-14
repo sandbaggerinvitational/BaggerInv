@@ -380,8 +380,8 @@ test("Calcutta is integrated into Tournament with one mobile-safe bottom-sheet s
     readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
   ]);
   assert.match(dashboard, /aria-label="Select tournament destination"/);
-  assert.match(dashboard, />Tournament<\/button>/);
-  assert.match(dashboard, />Calcutta<\/button>/);
+  assert.match(dashboard, /href="\/live"[\s\S]*>Tournament<\/Link>/);
+  assert.match(dashboard, /href="\/live\?view=calcutta"[\s\S]*>Calcutta<\/Link>/);
   assert.match(dashboard, /selectedRound === "calcutta" \? data\?\.calcutta \? <CalcuttaExperience/);
   assert.match(dashboard, /secondaryReadUrl \+ "\?module=calcutta"/);
   assert.match(dashboard, /aria-label="Select tournament round"/);

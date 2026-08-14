@@ -45,19 +45,18 @@ test("Me gracefully omits unavailable tournament values instead of rendering pla
   assert.doesNotMatch(profile, /Tournament Handicap[^\n]*[—-]/);
 });
 
-test("profile, history, utilities, notifications, and Passport follow player-first hierarchy", async () => {
+test("career, utilities, and account settings follow player-first hierarchy", async () => {
   const profile = await source("app/me/ParticipantProfile.js");
   const renderedProfile = profile.slice(profile.indexOf("return <section className={styles.page}"));
   const labels = [
     "playerHero",
     "RoundPerformance rounds",
-    "Player Profile",
-    "Tournament History",
+    "Profile &amp; Matches",
     "Utilities",
-    "Notifications",
-    "Player Passport",
+    "Notification Preferences",
+    "Account & Session",
   ];
-  const order = labels.map((label) => label === "Player Passport"
+  const order = labels.map((label) => label === "Account & Session"
     ? renderedProfile.lastIndexOf(label)
     : renderedProfile.indexOf(label));
   order.forEach((position) => assert.notEqual(position, -1));
@@ -65,6 +64,8 @@ test("profile, history, utilities, notifications, and Passport follow player-fir
   assert.match(profile, /NOTIFICATION_CATEGORIES\.map/);
   assert.match(profile, /window\.localStorage\.setItem\(preferenceKey/);
   assert.match(profile, /method: "DELETE"/);
+  assert.doesNotMatch(renderedProfile, /<h2>Tournament History<\/h2>/);
+  assert.match(renderedProfile, /Career, history, and achievements/);
 });
 
 test("round performance uses official gross ranks, round points, and match outcomes", () => {

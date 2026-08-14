@@ -169,17 +169,19 @@ test("migration is versioned, service-only, immutable, and asynchronous from sco
   assert.doesNotMatch(migration, /buildCalcuttaModel|calculateCalcutta/);
 });
 
-test("participant routes share one Supabase operational result with zero Google fallback", async () => {
-  const [route, tournamentRoute, dashboard, wrapper] = await Promise.all([
+test("participant routes share one Tournament-owned Supabase operational result with zero Google fallback", async () => {
+  const [route, tournamentRoute, tournamentDashboard, leaderboardsDashboard, wrapper] = await Promise.all([
     readFile(new URL("../app/api/leaderboards/calcutta/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/tournament/secondary/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/live/TournamentDashboard.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8"),
     readFile(new URL("../app/live/LeaderboardsSupabaseRead.js", import.meta.url), "utf8"),
   ]);
   assert.match(route, /X-Calcutta-Google-Requests/);
   assert.doesNotMatch(route, /getTournamentData|google-sheets/);
   assert.match(tournamentRoute, /currentCalcuttaOperationalResult/);
-  assert.match(wrapper, /\/api\/leaderboards\/calcutta/);
-  assert.match(dashboard, /\["calcutta", "Calcutta"\]/);
-  assert.match(dashboard, /Core team and player standings remain available/);
+  assert.match(tournamentDashboard, /href="\/live\?view=calcutta"/);
+  assert.match(tournamentDashboard, /\?module=calcutta/);
+  assert.doesNotMatch(wrapper, /\/api\/leaderboards\/calcutta/);
+  assert.doesNotMatch(leaderboardsDashboard, /\["calcutta", "Calcutta"\]/);
 });

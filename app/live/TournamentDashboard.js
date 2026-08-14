@@ -138,9 +138,11 @@ function Snapshot({ tournament, activeRound, momentum, updatedLabel }) {
   </section>;
 }
 
-export default function TournamentDashboard({ initialData, loadError, readUrl = "/api/live", secondaryReadUrl = "", onConfirmedData }) {
+export default function TournamentDashboard({ initialData, initialView = "", loadError, readUrl = "/api/live", secondaryReadUrl = "", onConfirmedData }) {
   const [data, setData] = useState(initialData);
-  const [selectedRound, setSelectedRound] = useState(() => initialData?.tournament?.currentRound || initialData?.rounds?.[0]?.number || "overall");
+  const [selectedRound, setSelectedRound] = useState(() => initialView === "calcutta"
+    ? "calcutta"
+    : initialData?.tournament?.currentRound || initialData?.rounds?.[0]?.number || "overall");
   const [filter, setFilter] = useState("all");
   const [openRounds, setOpenRounds] = useState(() => new Set());
   const [lastRefresh, setLastRefresh] = useState(Date.now());
@@ -173,6 +175,15 @@ export default function TournamentDashboard({ initialData, loadError, readUrl = 
     }).catch(() => setSecondaryState("error"));
   }, [data?.calcutta, secondaryReadUrl, secondaryState]);
   useEffect(() => {
+    if (initialView === "calcutta") {
+      openCalcutta();
+      return;
+    }
+    setSelectedRound((current) => current === "calcutta"
+      ? data?.tournament?.currentRound || data?.rounds?.[0]?.number || "overall"
+      : current);
+  }, [data?.rounds, data?.tournament?.currentRound, initialView, openCalcutta]);
+  useEffect(() => {
     if (!initialData) refresh();
     const poll = () => { if (document.visibilityState === "visible") refresh(); };
     const timer = window.setInterval(poll, 45_000);
@@ -204,8 +215,8 @@ export default function TournamentDashboard({ initialData, loadError, readUrl = 
   return <section className={styles.page}>
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <nav className={styles.destinations} aria-label="Select tournament destination">
-      <button type="button" aria-pressed={selectedRound !== "calcutta"} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</button>
-      <button type="button" aria-pressed={selectedRound === "calcutta"} onClick={openCalcutta}>Calcutta</button>
+      <Link href="/live" aria-current={selectedRound !== "calcutta" ? "page" : undefined} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</Link>
+      <Link href="/live?view=calcutta" aria-current={selectedRound === "calcutta" ? "page" : undefined} onClick={openCalcutta}>Calcutta</Link>
     </nav>
     {selectedRound === "calcutta" ? data?.calcutta ? <CalcuttaExperience model={data.calcutta} /> : <div className={styles.empty} role="status"><strong>{secondaryState === "error" ? "Calcutta is temporarily unavailable." : "Loading Calcutta…"}</strong><span>{secondaryState === "error" ? "The live Tournament remains available. This projected section can be retried independently." : "Loading the latest imported Director-published results."}</span>{secondaryState === "error" ? <button type="button" onClick={() => { setSecondaryState("idle"); openCalcutta(); }}>Try again</button> : null}</div> : <>
     <nav className={styles.rounds} aria-label="Select tournament round">{rounds.map((round) => <button type="button" aria-pressed={String(selectedRound) === String(round.number)} onClick={() => setSelectedRound(round.number)} key={round.number}>{round.label}</button>)}</nav>

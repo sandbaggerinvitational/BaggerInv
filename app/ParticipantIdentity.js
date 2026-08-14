@@ -163,7 +163,7 @@ export default function ParticipantIdentity() {
     </nav>
     <nav className={styles.desktop} aria-label={navigationLabel} data-participant-navigation>
       {player ? <span>Welcome, {player.name}</span> : null}
-      {items.map((item) => <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} key={item.label}>{item.label}</Link>)}
+      {items.map((item) => <Link href={item.href} prefetch={false} onClick={() => window.dispatchEvent(new Event("participant-navigation-start"))} aria-current={currentDestination === item.label ? "page" : undefined} key={item.label}>{item.label}</Link>)}
     </nav>
   </>;
 }

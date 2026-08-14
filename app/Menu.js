@@ -8,16 +8,29 @@ import Sheet from "./ui/Sheet";
 
 const hubSections = [
   { label: "Tournament", links: [
-    { icon: "📖", label: "Tournament Guide", href: "/tournament-guide" },
-    { icon: "🏆", label: "Tournament History", href: "/history" },
+    { icon: "guide", label: "Tournament Guide", href: "/tournament-guide" },
+    { icon: "history", label: "Tournament History", href: "/history" },
   ] },
-  { label: "Information", links: [
-    { icon: "📞", label: "Important Contacts", href: "/tournament-guide/contacts" },
-  ] },
-  { label: "App", links: [
-    { icon: "🔔", label: "Notification Preferences", href: "/me#notification-preferences" },
+  { label: "Support", links: [
+    { icon: "contacts", label: "Important Contacts", href: "/tournament-guide/contacts" },
   ] },
 ];
+
+function HubIcon({ name }) {
+  const common = {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+  };
+  if (name === "guide") return <svg {...common}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5Z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5Z"/></svg>;
+  if (name === "history") return <svg {...common}><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2M5.8 5.8 4 4"/></svg>;
+  if (name === "contacts") return <svg {...common}><path d="M7.2 3.5h2.1l1.1 4-1.8 1.5a14 14 0 0 0 6.4 6.4l1.5-1.8 4 1.1v2.1a3.7 3.7 0 0 1-4 3.7A16.2 16.2 0 0 1 3.5 7.5a3.7 3.7 0 0 1 3.7-4Z"/></svg>;
+  return <svg {...common}><path d="M12 3 5 6v5c0 4.7 2.8 8.2 7 10 4.2-1.8 7-5.3 7-10V6Z"/><path d="M9 12.2 11 14l4-4"/></svg>;
+}
 
 export default function Menu({ activeNavigationHref = "", homeHref = "/", appShell = false }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,8 +40,8 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   const [director, setDirector] = useState(false);
   const [capabilityRevision, setCapabilityRevision] = useState(0);
   const [tournament, setTournament] = useState({ name: "", edition: "", location: "", year: "" });
-  const [refreshing, setRefreshing] = useState(false);
   const closeButton = useRef(null);
+  const shellCapabilityRevision = useRef(-1);
 
   useEffect(() => {
     if (appShell || !isOpen) return undefined;
@@ -47,6 +60,10 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
     // The participant shell warms account-scoped capability after Supabase
     // session restoration so the Director row is ready before the Hub opens.
     if (!appShell && !isOpen) return;
+    // Opening an already-mounted participant Hub must not duplicate the warm
+    // capability/session reads. Focus and account-change revisions revalidate.
+    if (appShell && shellCapabilityRevision.current === capabilityRevision) return;
+    if (appShell) shellCapabilityRevision.current = capabilityRevision;
     let cancelled = false;
     const readDirectorAccess = async () => {
       for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -129,16 +146,10 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
             href={link.href}
             prefetch={false}
             onClick={appShell ? (event) => { event.preventDefault(); close(() => router.push(link.href)); } : () => close()}
-          ><span aria-hidden="true">{link.icon}</span><b>{link.label}</b><i aria-hidden="true">›</i></Link>)}
-          {group.label === "App" ? <button type="button" disabled={refreshing} onClick={() => {
-            setRefreshing(true);
-            router.refresh();
-            window.dispatchEvent(new Event("focus"));
-            window.setTimeout(() => { setRefreshing(false); close(); }, 350);
-          }}><span aria-hidden="true">🔄</span><b>{refreshing ? "Refreshing Tournament Data…" : "Refresh Tournament Data"}</b><i aria-hidden="true">›</i></button> : null}</div>
+          ><span><HubIcon name={link.icon} /></span><b>{link.label}</b><i aria-hidden="true">›</i></Link>)}</div>
         </section>)}
+        {director ? <section className="sideNavGroup sideNavDirector"><h2>Director</h2><div><Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={appShell ? (event) => { event.preventDefault(); close(() => router.push("/admin/director")); } : () => close()}><span><HubIcon name="director" /></span><b>Tournament Director</b><i aria-hidden="true">›</i></Link></div></section> : null}
       </nav>
-      {director ? <section className="sideNavGroup sideNavDirector"><h2>Director</h2><div><Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={appShell ? (event) => { event.preventDefault(); close(() => router.push("/admin/director")); } : () => close()}><span aria-hidden="true">🎯</span><b>Tournament Director</b><i aria-hidden="true">›</i></Link></div></section> : null}
     </div>
   </>;
 

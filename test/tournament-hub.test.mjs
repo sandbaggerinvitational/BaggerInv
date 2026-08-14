@@ -6,10 +6,10 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 
 test("Tournament Hub exposes major destinations without duplicating Tournament Guide navigation", async () => {
   const menu = await source("app/Menu.js");
-  for (const label of ["Tournament Guide", "Tournament History", "Important Contacts", "Notification Preferences", "Refresh Tournament Data"]) {
+  for (const label of ["Tournament Guide", "Tournament History", "Important Contacts"]) {
     assert.match(menu, new RegExp(label));
   }
-  for (const href of ["/tournament-guide", "/history", "/tournament-guide/contacts", "/me#notification-preferences"]) {
+  for (const href of ["/tournament-guide", "/history", "/tournament-guide/contacts"]) {
     assert.ok(menu.includes(`href: "${href}"`), href);
   }
   for (const duplicate of ["Schedule", "Courses", "Rules", "Dining", "Local Guide", "Contact Tournament Director"]) {
@@ -20,7 +20,9 @@ test("Tournament Hub exposes major destinations without duplicating Tournament G
   }
   assert.doesNotMatch(menu, /navigationSections|Odds Center|War Room|Admin Center/);
   assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
-  assert.match(menu, /router\.refresh\(\)/);
+  assert.doesNotMatch(menu, /Notification Preferences|Refresh Tournament Data|router\.refresh\(\)/);
+  assert.match(menu, /label: "Tournament"/);
+  assert.match(menu, /label: "Support"/);
   assert.match(menu, /currentQuery === linkQuery/);
 });
 
@@ -59,10 +61,11 @@ test("Tournament Hub content routes retain shared headers and notification ancho
   assert.match(profile, /id="notification-preferences"/);
 });
 
-test("Notification Preferences remains a direct same-origin Player deep link", async () => {
-  const menu = await source("app/Menu.js");
-  assert.match(menu, /label: "Notification Preferences", href: "\/me#notification-preferences"/);
-  assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
+test("Notification Preferences is canonically owned by Player and absent from Hub", async () => {
+  const [menu, profile] = await Promise.all([source("app/Menu.js"), source("app/me/ParticipantProfile.js")]);
+  assert.doesNotMatch(menu, /Notification Preferences|\/me#notification-preferences/);
+  assert.match(profile, /id="notification-preferences"/);
+  assert.match(profile, /<span>Settings<\/span><h2>Notification Preferences<\/h2>/);
 });
 
 test("Tournament Hub identity is populated from the active Tournament workbook model", async () => {

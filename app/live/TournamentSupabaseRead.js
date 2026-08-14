@@ -21,7 +21,7 @@ function likelyGameCenter(data) {
     matches.find((match) => String(match.status).toUpperCase() !== "FINAL") || matches[0];
 }
 
-export default function TournamentSupabaseRead() {
+export default function TournamentSupabaseRead({ initialView = "" }) {
   const router = useRouter();
   const initial = useMemo(() => readTournamentLiveCache(), []);
   const [payload, setPayload] = useState(initial);
@@ -87,6 +87,7 @@ export default function TournamentSupabaseRead() {
 
   if (payload?.tournament) return <TournamentDashboard
     initialData={payload}
+    initialView={initialView}
     readUrl="/api/tournament/live"
     secondaryReadUrl="/api/tournament/secondary"
     onConfirmedData={acceptData}

@@ -335,6 +335,7 @@ button:disabled { cursor: not-allowed; }
   transition: background .18s ease, color .18s ease, transform .18s ease;
 }
 .sideNavGroup a > span, .sideNavGroup button > span { display: grid; width: 28px; height: 28px; place-items: center; font-size: 1rem; }
+.sideNavGroup a > span svg, .sideNavGroup button > span svg { width: 21px; height: 21px; display: block; }
 .sideNavGroup a > b, .sideNavGroup button > b { min-width: 0; font-weight: 750; }
 .sideNavGroup a > i, .sideNavGroup button > i { color: rgba(255,255,255,.5); font: normal 1.45rem/1 Arial, sans-serif; }
 .sideNavGroup button:disabled { opacity: .65; }
@@ -350,8 +351,9 @@ button:disabled { cursor: not-allowed; }
   background: var(--gold);
   transform: translateY(-50%);
 }
-.sideNavDirector { border-bottom: 0; }
+.sideNavDirector { border-bottom: 0; animation: sideNavCapabilityIn .14s ease-out both; }
 .sideNavDirector a { border: 1px solid rgba(212,177,95,.48); color: var(--gold-soft); }
+@keyframes sideNavCapabilityIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 
 .externalLinkDialog {
   width: min(calc(100vw - 36px), 390px);
@@ -383,6 +385,7 @@ button:disabled { cursor: not-allowed; }
 
 @media (prefers-reduced-motion: reduce) {
   .sideMenu, .menuBackdrop, .sideNavGroup a, .sideNavGroup button { transition: none; }
+  .sideNavDirector { animation: none; }
   .participantRouteScene { animation: none; }
 }
 

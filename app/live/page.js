@@ -11,7 +11,7 @@ import { workbookInitializationMessage } from "../../lib/tournament-workbook-ini
 import { requireTournamentReadSource } from "../../lib/tournament-read-source";
 import { requireLeaderboardsCoreReadSource } from "../../lib/leaderboards-core-read-source";
 import { netSkinsReadEnvironment } from "../../lib/net-skins-read-source";
-import { calcuttaReadEnvironment } from "../../lib/calcutta-read-source";
+import { redirect } from "next/navigation";
 
 export const metadata = pageMetadata({
   title: "Match Center | Sandbagger Invitational",
@@ -21,15 +21,16 @@ export const metadata = pageMetadata({
 
 export default async function LivePage({ searchParams }) {
   const query = await searchParams;
+  const view = String(query?.view || "").trim();
+  const leaderboardModule = String(query?.tab || query?.module || "").trim();
+  if (view === "leaderboards" && leaderboardModule === "calcutta") redirect("/live?view=calcutta");
+  if (view === "leaderboards" && leaderboardModule === "net-skins") redirect("/live?view=leaderboards&tab=skins");
   const source = requireTournamentReadSource();
   const leaderboardsSource = requireLeaderboardsCoreReadSource();
   const netSkinsSource = netSkinsReadEnvironment();
   const netSkinsReadSource = netSkinsSource.previewDeployment && netSkinsSource.requested === "supabase" ? "supabase" : netSkinsSource.resolved;
-  const calcuttaSource = calcuttaReadEnvironment();
-  const calcuttaReadSource = calcuttaSource.previewDeployment && calcuttaSource.requested === "supabase" ? "supabase" : calcuttaSource.resolved;
-  const view = String(query?.view || "").trim();
   const supabaseLeaderboards = leaderboardsSource.resolved === "supabase" && view === "leaderboards";
-  const supabaseTournament = source.resolved === "supabase" && !view;
+  const supabaseTournament = source.resolved === "supabase" && (!view || view === "calcutta");
   let data;
   let error = "";
 
@@ -49,8 +50,8 @@ export default async function LivePage({ searchParams }) {
     <main>
       <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
       <Header homeHref="/home" />
-      {supabaseTournament ? <TournamentSupabaseRead /> : supabaseLeaderboards
-        ? <LeaderboardsSupabaseRead previewMode={process.env.VERCEL_ENV === "preview"} netSkinsReadSource={netSkinsReadSource} calcuttaReadSource={calcuttaReadSource} />
+      {supabaseTournament ? <TournamentSupabaseRead initialView={view} /> : supabaseLeaderboards
+        ? <LeaderboardsSupabaseRead previewMode={process.env.VERCEL_ENV === "preview"} netSkinsReadSource={netSkinsReadSource} />
         : <MatchCenter initialData={data} loadError={error} previewMode={process.env.VERCEL_ENV === "preview"} />}
       <div className={styles.tournamentFooter}><Footer /></div>
     </main>
