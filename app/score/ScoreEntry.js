@@ -12,7 +12,7 @@ import { clearParticipantInitializationCache, readParticipantInitializationCache
 import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, sameGrossScores, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
 import { createIndexedDbScoringDiagnosticsStore } from "../../lib/scoring-client-diagnostics.js";
 import { applyParticipantFinalizationResult } from "../../lib/scoring-finalization-state.js";
-import { buildScoringSlots, nextScoringSlotIndex, scoreFromKeypad } from "../../lib/scoring-keypad.js";
+import { buildScoringSlots, nextScoringSlotIndex, scoreFromKeypad, scoringKeypadActionLabel } from "../../lib/scoring-keypad.js";
 import StatusBadge from "../StatusBadge";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MyMatchDashboard from "./MyMatchDashboard";
@@ -916,8 +916,6 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   })();
   const syncBanner = <ScoringSyncIndicator {...syncPresentation} onAction={reviewFirstSyncIssue} />;
   const selectedGross = selectedSlot ? gross[selectedSlot.sideKey]?.[selectedSlot.index] ?? "" : "";
-  const selectedStrokes = selectedSlot ? strokesFor(selectedSlot.side, selectedSlot.index) : 0;
-  const selectedNet = selectedGross === "" ? null : Number(selectedGross) - selectedStrokes;
   const frontComplete = [...completed].filter((number) => number <= 9).length;
   const backComplete = [...completed].filter((number) => number > 9).length;
   const missingScores = scoringSlots.filter((slot) => gross[slot.sideKey]?.[slot.index] === "" || gross[slot.sideKey]?.[slot.index] == null).length;
@@ -1055,10 +1053,15 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     />
   </section>;
 
-  return <section className={`${styles.shell} ${styles.focusShell}`} data-scoring-mode={savedHole ? "correction" : "new"}>
+  return <section
+    className={`${styles.shell} ${styles.focusShell}`}
+    data-scoring-mode={savedHole ? "correction" : "new"}
+    data-format={format}
+    data-slot-count={scoringSlots.length}
+  >
     <header className={styles.focusToolbar}>
       <button type="button" onClick={requestExitScoring} aria-label="Leave scoring">Done</button>
-      <span><small>{savedHole ? `CORRECTING HOLE ${holeNumber}` : display.formatName || format}</small><strong>Round {match.Round || "—"} · Match {match.Match || "—"}</strong></span>
+      <span><small>{savedHole ? `CORRECTING HOLE ${holeNumber}` : display.formatName || format}</small><strong>Round {match.Round || "—"} · Match {match.Match || "—"}</strong><em>{currentMatchStatus} · {completed.size}/18 saved</em></span>
       <button type="button" onClick={requestFullScorecard}>Scorecard</button>
     </header>
     <section className={styles.scoringContext} aria-label="Current match progress">
@@ -1075,10 +1078,6 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       <span><b>Front 9</b><i aria-hidden="true"><em style={{ width: `${(frontComplete / 9) * 100}%` }} /></i><small>{frontComplete}/9</small></span>
       <span><b>Back 9</b><i aria-hidden="true"><em style={{ width: `${(backComplete / 9) * 100}%` }} /></i><small>{backComplete}/9</small></span>
     </div>
-    {selectedSlot ? <section className={styles.entryFocus} aria-live="polite" aria-label={`${selectedSlot.label} selected for scoring`}>
-      <div><small>{savedHole ? "CORRECTION" : selectedSlot.kind === "team" ? "SELECTED PAIRING" : "SELECTED GOLFER"}</small><strong>{selectedSlot.label}</strong>{selectedSlot.kind === "team" && selectedSlot.pairing ? <span>{selectedSlot.pairing}</span> : <span>{selectedSlot.teamName}</span>}</div>
-      <dl><div><dt>Gross</dt><dd>{selectedGross || "—"}</dd></div><div><dt>Strokes</dt><dd>{selectedStrokes || "—"}</dd></div><div><dt>Net</dt><dd>{selectedNet ?? "—"}</dd></div></dl>
-    </section> : null}
     <div className={styles.holeCard} aria-label={`Hole ${holeNumber} scoring order`}>
       {scoringSlots.map((slot, index) => {
         const value = gross[slot.sideKey]?.[slot.index] ?? "";
@@ -1094,12 +1093,17 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
           onClick={() => selectScoringSlot(index)}
           key={slot.key}
         >
-          <span><small>{slot.teamName}</small><strong>{slot.label}</strong>{slot.kind === "team" && slot.pairing ? <em>{slot.pairing}</em> : null}</span>
-          <span className={styles.scoreValues}><b>{value || "—"}</b><small>Gross</small></span>
-          <span className={styles.scoreValues}><b>{strokes || "—"}</b><small>Strokes<span className={styles.srOnly}> received</span></small></span>
-          <span className={styles.scoreValues}><b>{net ?? "—"}</b><small>Net</small></span>
-          {strokes ? <i aria-hidden="true">{strokeDots(strokes)}</i> : null}
-          {selected ? <strong className={styles.selectedMarker}>Entering now</strong> : null}
+          <span className={styles.playerIdentity}>
+            <small>{slot.teamName}</small>
+            <strong>{slot.label}</strong>
+            {slot.kind === "team" && slot.pairing ? <em>{slot.pairing}</em> : null}
+            {selected ? <b className={styles.selectedMarker}>{savedHole ? "Correcting score" : "Entering now"}</b> : null}
+          </span>
+          <span className={styles.scoreMetrics} aria-label={`Gross ${value || "not entered"}, strokes ${strokes}, net ${net ?? "not available"}`}>
+            <span className={styles.scoreMetric}><small>Gross</small><b>{value || "—"}</b></span>
+            <span className={styles.scoreMetric}><small>Strokes</small><b>{strokes || "—"}</b>{strokes ? <i aria-hidden="true">{strokeDots(strokes)}</i> : null}</span>
+            <span className={styles.scoreMetric}><small>Net</small><b>{net ?? "—"}</b></span>
+          </span>
         </button>;
       })}
       <div className={styles.holeCardTeamResults}>
@@ -1127,8 +1131,17 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     </section> : null}
     <div className={styles.scoringDock}>
       {localFirstEnabled ? syncBanner : null}
-      <ScoringKeypad value={selectedGross} disabled={busy || unsafeSyncBlock} onScore={enterCommonScore} onAdjust={adjustSelectedScore} onClear={clearSelectedScore} />
-      <button className={styles.primary} disabled={saveDisabled} onClick={requestSave} aria-describedby={!scoresComplete ? "score-save-help" : undefined}>{saveLabel}</button>
+      <ScoringKeypad value={selectedGross} disabled={busy || unsafeSyncBlock} onScore={enterCommonScore} onAdjust={adjustSelectedScore} />
+      <div className={styles.scoringActions}>
+        <button
+          type="button"
+          className={styles.clearEntry}
+          disabled={busy || unsafeSyncBlock || selectedGross === "" || selectedGross == null}
+          aria-label={scoringKeypadActionLabel("clear", selectedGross)}
+          onClick={clearSelectedScore}
+        >Clear entry</button>
+        {unchangedSavedScore ? <div className={styles.savedScoreState} role="status"><strong>Score recorded</strong><small>Select a row and change its value to correct it.</small></div> : <button className={styles.primary} disabled={saveDisabled} onClick={requestSave} aria-describedby={!scoresComplete ? "score-save-help" : undefined}>{saveLabel}</button>}
+      </div>
       {!scoresComplete ? <small id="score-save-help" className={styles.saveHelp}>{missingScores} score{missingScores === 1 ? "" : "s"} needed before saving this hole.</small> : null}
     </div>
     {status && <p className={styles.status} role={saveFailed ? "alert" : "status"}>{status}</p>}

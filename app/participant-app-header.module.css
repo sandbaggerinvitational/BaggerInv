@@ -9,5 +9,6 @@
 .header[data-compact=true] .identity img{width:30px;height:30px;flex-basis:30px}
 .header[data-compact=true] .identity small{font-size:.65rem}
 .header[data-compact=true] .identity strong{font-size:.88rem}
+:global(body.participant-scoring-focus-active) .header{min-height:48px;padding-top:calc(2px + var(--safe-top));padding-bottom:2px}:global(body.participant-scoring-focus-active) .identity img{width:24px;height:24px;flex-basis:24px}:global(body.participant-scoring-focus-active) .identity small{display:none}:global(body.participant-scoring-focus-active) .identity strong{font-size:.8rem}:global(body.participant-scoring-focus-active) .header :global(.menuButton){width:44px;height:44px}
 .identity:focus-visible{outline:3px solid #d7b65f;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.header{-webkit-backdrop-filter:none;backdrop-filter:none}}

@@ -1039,6 +1039,8 @@ footer span {
   --status-locked-neutral: #4c5a54;
 }
 body.preview-impersonation-active{padding-top:54px}
+body.preview-impersonation-active.participant-scoring-focus-active{padding-top:44px;--participant-header-height:48px}
+body.preview-impersonation-active.participant-scoring-focus-active [data-preview-mode-badge]{display:none}
 .directorTransactionLock{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;background:rgba(5,28,22,.48);backdrop-filter:blur(3px);pointer-events:all}.directorTransactionLock>div{display:grid;gap:6px;width:min(360px,100%);padding:26px 24px;border:1px solid rgba(189,150,62,.45);border-radius:20px;background:#fffdf8;color:#163c31;text-align:center;box-shadow:0 22px 60px rgba(0,0,0,.24)}.directorTransactionLock strong{font-family:Georgia,"Times New Roman",serif;font-size:1.45rem}.directorTransactionLock span{color:#68756f;font-weight:700}
 .directorTransactionLock ol{display:grid;gap:7px;margin:14px 0 0;padding:14px 0 0;border-top:1px solid rgba(22,60,49,.12);list-style:none;text-align:left}.directorTransactionLock li{color:#87918d;font-size:.73rem;font-weight:800}.directorTransactionLock li[data-state=complete]{color:#5d756d}.directorTransactionLock li[data-state=active]{color:#9a7020}
 .pwaInstallGuidance>div{display:grid;gap:4px;padding:4px 6px}.pwaInstallGuidance>div>strong{font-size:.8rem}.pwaInstallGuidance ol{display:flex;gap:5px;margin:0;padding:0;list-style:none;font-size:.72rem}.pwaInstallGuidance li:not(:last-child)::after{margin-left:5px;color:#a17b25;content:"→"}@media(max-width:390px){.pwaInstallGuidance ol{align-items:flex-start;flex-direction:column;gap:2px}.pwaInstallGuidance li:not(:last-child)::after{content:"↓"}}

@@ -142,15 +142,15 @@ export default function ParticipantIdentity() {
     {impersonation ? <aside className={styles.impersonation} role="status" aria-label={`Preview Mode. Viewing as ${impersonation.player.name}`}>
       <span><b>Preview Mode</b><small>Viewing as</small><strong>{impersonation.player.name}</strong></span>
       <div className={styles.previewActions}>
-        <button type="button" onClick={() => router.push("/admin/director#qa-tools")}>Change Preview Player</button>
-        <button type="button" onClick={async () => {
+        <button type="button" aria-label="Change Preview Player" onClick={() => router.push("/admin/director#qa-tools")}><span className={styles.actionFull}>Change Preview Player</span><span className={styles.actionCompact}>Change</span></button>
+        <button type="button" aria-label="Exit Preview" onClick={async () => {
           const response = await fetch("/api/director/impersonation", { method: "DELETE" });
           if (response.ok) {
             window.localStorage.removeItem(PARTICIPANT_SHELL_KEY);
             window.localStorage.removeItem(PREVIEW_SESSION_KEY);
             router.replace("/admin/director");
           }
-        }}>Exit Preview</button>
+        }}><span className={styles.actionFull}>Exit Preview</span><span className={styles.actionCompact}>Exit</span></button>
       </div>
     </aside> : null}
     <nav className={styles.mobile} aria-label={navigationLabel} data-keyboard-open={keyboardOpen ? "true" : undefined} data-participant-navigation>

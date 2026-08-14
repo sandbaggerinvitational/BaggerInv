@@ -20,9 +20,10 @@ const fixture = {
   playerNames: { P1: "One", P2: "Two", P3: "Three", P4: "Four" },
 };
 
-test("golf keypad gives one-tap common scores plus controlled 1 through authoritative 20", () => {
-  assert.deepEqual(COMMON_GOLF_SCORES, [2, 3, 4, 5, 6, 7, 8, 9, 10]);
+test("golf keypad gives one-tap scores 1 through 10 plus controlled authoritative range", () => {
+  assert.deepEqual(COMMON_GOLF_SCORES, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   for (const score of COMMON_GOLF_SCORES) assert.equal(scoreFromKeypad("", score), score);
+  assert.equal(scoreFromKeypad("", 1), 1);
   assert.equal(scoreFromKeypad("", "decrement"), 1);
   assert.equal(scoreFromKeypad("", "increment"), 11);
   let score = 11;
@@ -69,7 +70,7 @@ test("active scoring uses the custom keypad, deliberate sheets, and focus-mode s
   ]);
   assert.match(entry, /<ScoringKeypad/);
   assert.doesNotMatch(entry, /type="number"[^>]*gross score/);
-  assert.match(keypad, /COMMON_GOLF_SCORES\.map/);
+  assert.match(keypad, /COMMON_GOLF_SCORES\.slice\(0, 9\)\.map/);
   assert.match(keypad, /onAdjust\("increment"\)/);
   assert.match(keypad, /onAdjust\("decrement"\)/);
   assert.match(entry, /nextScoringSlotIndex/);
