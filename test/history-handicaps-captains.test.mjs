@@ -138,6 +138,32 @@ test("History preserves signed, zero, missing, and explicit-plus tournament hand
   assert.equal(formatHistoryTournamentHandicap("+1.2"), "+1.2");
 });
 
+test("History converts canonical parenthetical source notation to the stored signed value", () => {
+  const aggregate = makeHistory2026Aggregate();
+  const core = canonicalCoreView(aggregate);
+  core.players[0].tournament_source_payload["Tournament Handicap"] = "(0.6)";
+  core.players[1].tournament_source_payload["Tournament Handicap"] = " (0.6) ";
+  const merged = mergeHistoryTournamentPlayerMetadata(aggregate, core);
+  assert.equal(merged.players[0].tournament_handicap, -0.6);
+  assert.equal(merged.players[1].tournament_handicap, -0.6);
+  assert.equal(formatHistoryTournamentHandicap(merged.players[0].tournament_handicap), "-0.6");
+  assert.equal(formatHistoryTournamentHandicap("(0.6)"), "-0.6");
+});
+
+test("History distinguishes minus-signed numbers from unavailable dash placeholders", () => {
+  for (const [sourceValue, expected] of [
+    ["-0.2", "-0.2"],
+    ["-2.5", "-2.5"],
+    [" -0.2 ", "-0.2"],
+    ["-", "—"],
+    ["—", "—"],
+    ["", "—"],
+    [null, "—"],
+  ]) {
+    assert.equal(formatHistoryTournamentHandicap(sourceValue), expected);
+  }
+});
+
 test("History signed-handicap matrix never changes a canonical numeric sign", () => {
   for (const [sourceValue, expected] of [
     [12.4, "12.4"],
