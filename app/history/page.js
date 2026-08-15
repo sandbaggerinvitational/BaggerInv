@@ -4,8 +4,13 @@ import Link from "next/link";
 import { after } from "next/server";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
-import { tournamentHero } from "../../lib/asset-paths";
+import { defaultAssets, optimizedAssetUrl } from "../../lib/asset-paths";
 import { getTournaments } from "../../lib/stats";
+import {
+  historyEditionLabel,
+  historyHeroPath,
+  historyTournamentCardResult,
+} from "../../lib/history-presentation";
 import styles from "../historical.module.css";
 import pwaStyles from "./history-participant.module.css";
 import { pageMetadata } from "../../lib/seo";
@@ -70,34 +75,37 @@ export default async function HistoryPage() {
           <HistoryUnavailableNotice year="2026" />
         ) : null}
         <div className={`${styles.historyCardGrid} ${pwaStyles.yearGrid}`}>
-          {tournaments.map((tournament) => (
-            <article className={styles.historyPhotoCard} key={tournament.year}>
+          {tournaments.map((tournament, index) => {
+            const heroPath = historyHeroPath(tournament);
+            return <article className={styles.historyPhotoCard} key={tournament.year}>
               <Link
                 className={styles.historyCardPrimary}
                 href={`/history/${tournament.year}`}
+                aria-label={`${tournament.year}, ${historyEditionLabel(tournament.year)}, ${tournament.Destination}, ${tournament.championTeam?.name ? `champion ${tournament.championTeam.name}` : historyTournamentCardResult(tournament)}`}
               >
                 <div className={styles.historyPhotoFrame}>
                   <AssetImage
-                    src={tournamentHero(tournament["Hero Image"])}
-                    alt={`${tournament.year} ${tournament.Destination}`}
+                    src={optimizedAssetUrl(heroPath, 640, 72)}
+                    alt=""
                     className={styles.historyPhoto}
                     fallbackClassName={styles.historyPhotoPlaceholder}
                     fallback={tournament.Destination}
+                    fallbackSrc={optimizedAssetUrl(defaultAssets.tournamentHero, 640, 72)}
+                    loading={index < 2 ? "eager" : "lazy"}
                     width={640}
                     height={360}
                     sizes="(max-width: 720px) 112px, (max-width: 1100px) 50vw, 33vw"
                     decoding="async"
+                    fetchPriority={index === 0 ? "high" : "auto"}
                   />
                   <div className={styles.historyPhotoShade} />
                 </div>
 
                 <div className={styles.historyCardBody}>
-                  <span>{tournament.editionTitle}</span>
+                  <span>{historyEditionLabel(tournament.year)}</span>
                   <h2>{tournament.year}</h2>
                   <p>{tournament.Destination}</p>
-                  <strong>
-                    {tournament.championTeam?.name || (Number(tournament.year) === 2026 ? "Tournament in progress" : "Upcoming Invitational")}
-                  </strong>
+                  <strong>{historyTournamentCardResult(tournament)}</strong>
                 </div>
               </Link>
 
@@ -109,8 +117,8 @@ export default async function HistoryPage() {
                   View {tournament.year} Champion →
                 </Link>
               ) : null}
-            </article>
-          ))}
+            </article>;
+          })}
         </div>
       </section>
 

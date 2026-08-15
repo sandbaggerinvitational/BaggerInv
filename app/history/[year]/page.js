@@ -7,7 +7,7 @@ import AssetImage from "../../AssetImage";
 import TeamLogoPlate from "../../TeamLogoPlate";
 import {
   courseLogo,
-  tournamentHero,
+  teamLogo,
   tournamentLogo,
 } from "../../../lib/asset-paths";
 import {
@@ -19,12 +19,13 @@ import {
   getTournamentRoundPoints,
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
+import { formatPlayerPoints } from "../../../lib/formatters";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 import StatusBadge from "../../StatusBadge";
 import { getDraftByYear } from "../../../lib/draft";
-import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
+import { loadLegacyHistoryAnalytics } from "../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import {
@@ -36,6 +37,11 @@ import {
 import HistoryUnavailablePage from "../HistoryUnavailable";
 import HistoryArchiveNav from "../HistoryArchiveNav";
 import pwaStyles from "../history-participant.module.css";
+import {
+  historyHeroPath,
+  historyStandingsSummary,
+  historyTournamentComplete,
+} from "../../../lib/history-presentation";
 
 export async function generateMetadata({ params }) {
   const { year } = await params;
@@ -59,7 +65,7 @@ export async function generateMetadata({ params }) {
     description: `Complete ${year} Sandbagger Invitational results, teams, courses, matches, awards, and leaderboard.`,
     path: `/history/${year}`,
     image: tournament?.["Hero Image"]
-      ? tournamentHero(tournament["Hero Image"])
+      ? historyHeroPath(tournament)
       : undefined,
   });
 }
@@ -83,6 +89,112 @@ function tournamentStatus(tournament) {
     label: complete ? "Final" : "Upcoming",
     score: score || null,
   };
+}
+
+function leaderboardPlayer(row = {}) {
+  const player = row.player && typeof row.player === "object" ? row.player : {};
+  return {
+    name: row.name || (typeof row.player === "string" ? row.player : player["Display Name"]) || row.id,
+    slug: row.slug || player.slug || "",
+  };
+}
+
+function rankAccessibleLabel(rank) {
+  const value = String(rank || "—");
+  const numeric = Number(value.replace(/\D/g, ""));
+  return value.startsWith("T") && numeric
+    ? `Tied for rank ${numeric}`
+    : `Rank ${value}`;
+}
+
+function scoringItems(scoringStatistics, participant) {
+  return [
+    { label: "Best Individual Round", value: formatScoringNumber(scoringStatistics.lowestRound.value), detail: participant(scoringStatistics.lowestRound), sample: scoringStatistics.lowestRound.label },
+    { label: "Best Team Round", value: formatScoringNumber(scoringStatistics.lowestTeamRound.value), detail: participant(scoringStatistics.lowestTeamRound), sample: scoringStatistics.lowestTeamRound.label },
+    { label: "Average Score", value: formatScoringNumber(scoringStatistics.averageScore.value), sample: scoringStatistics.averageScore.label },
+    { label: "Lowest Front", value: formatScoringNumber(scoringStatistics.lowestFrontNine.value), detail: participant(scoringStatistics.lowestFrontNine), sample: scoringStatistics.lowestFrontNine.label },
+    { label: "Lowest Back", value: formatScoringNumber(scoringStatistics.lowestBackNine.value), detail: participant(scoringStatistics.lowestBackNine), sample: scoringStatistics.lowestBackNine.label },
+    { label: "Birdie Leader", value: formatScoringNumber(scoringStatistics.birdieLeader.value), detail: participant(scoringStatistics.birdieLeader), sample: scoringStatistics.birdieLeader.label },
+    { label: "Hardest Hole", value: scoringStatistics.hardestHole ? `#${scoringStatistics.hardestHole.holeNumber}` : "—", detail: scoringStatistics.hardestHole?.courseId, sample: scoringStatistics.hardestHole?.averageToPar.label },
+    { label: "Easiest Hole", value: scoringStatistics.easiestHole ? `#${scoringStatistics.easiestHole.holeNumber}` : "—", detail: scoringStatistics.easiestHole?.courseId, sample: scoringStatistics.easiestHole?.averageToPar.label },
+    { label: "Scorecard Coverage", value: `${scoringStatistics.scorecardCoverage.available} of ${scoringStatistics.scorecardCoverage.expected}`, detail: "Available scorecards", sample: scoringStatistics.scorecardCoverage.label },
+  ];
+}
+
+function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTracked, scoringStatistics, participant }) {
+  const standings = historyStandingsSummary(leaderboard, 5);
+  const allStatistics = scoringItems(scoringStatistics, participant);
+  const primaryLabels = new Set(["Best Individual Round", "Best Team Round", "Average Score", "Birdie Leader", "Scorecard Coverage"]);
+  const primaryStatistics = allStatistics.filter((item) => primaryLabels.has(item.label));
+  const secondaryStatistics = allStatistics.filter((item) => !primaryLabels.has(item.label));
+
+  return <div className={pwaStyles.overviewSections}>
+    <section className={pwaStyles.overviewSection} aria-labelledby="history-rounds-heading">
+      <span className={styles.sectionLabel}>Rounds</span>
+      <h2 id="history-rounds-heading">Tournament Rounds</h2>
+      <div className={pwaStyles.overviewRoundList}>
+        {tournament.courses.map((course) => {
+          const round = roundNumber(course.Round);
+          const availablePoints = pointsForRound(roundPoints, round);
+          return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
+            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`}>
+              <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
+              <span><b>{course.Round}</b><strong>{course.Course}</strong><small>{getFormatName(course.Format)}{availablePoints !== null ? ` · ${availablePoints} points` : ""}</small></span>
+              <em>View Results <i aria-hidden="true">→</i></em>
+            </Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}`}>Course Profile</Link>
+          </article>;
+        })}
+      </div>
+    </section>
+
+    <section className={pwaStyles.overviewSection} aria-labelledby="history-teams-heading">
+      <span className={styles.sectionLabel}>Teams</span>
+      <h2 id="history-teams-heading">Tournament Sides</h2>
+      <div className={pwaStyles.overviewTeamList}>
+        {tournament.teams.map((team) => <Link className={pwaStyles.overviewTeam} href={`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`} key={team.side}>
+          <AssetImage src={teamLogo(team.logo)} alt="" className={pwaStyles.overviewTeamLogo} fallbackClassName={pwaStyles.overviewTeamFallback} fallback={team.name.slice(0, 1)} inferFallback={false} />
+          <strong>{team.name}</strong><span>View roster <i aria-hidden="true">→</i></span>
+        </Link>)}
+      </div>
+    </section>
+
+    <section className={pwaStyles.overviewSection} aria-labelledby="history-standings-heading">
+      <span className={styles.sectionLabel}>Player Standings</span>
+      <h2 id="history-standings-heading">Leaders</h2>
+      <div className={pwaStyles.standingsSummary} role="list" aria-label="Top player standings">
+        {standings.length ? standings.map((row) => {
+          const player = leaderboardPlayer(row);
+          return <div className={pwaStyles.standingsRow} role="listitem" key={row.id || player.name} aria-label={`${rankAccessibleLabel(row.tournamentRank || row.rank)}, ${player.name}, ${formatPlayerPoints(row.points)} points`}>
+            <strong>{row.tournamentRank || row.rank}</strong>
+            {player.slug ? <Link href={`/players/${player.slug}`}>{player.name}</Link> : <span>{player.name}</span>}
+            <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
+          </div>;
+        }) : <p>No completed matches have been recorded for this tournament yet.</p>}
+      </div>
+      <Link className={pwaStyles.overviewAction} href="/live?view=leaderboards&tab=players">View Full Leaderboard <span aria-hidden="true">→</span></Link>
+    </section>
+
+    <section className={pwaStyles.overviewSection} aria-labelledby="history-records-heading">
+      <span className={styles.sectionLabel}>Tournament Records</span>
+      <h2 id="history-records-heading">Scoring Highlights</h2>
+      <div className={pwaStyles.recordsSummary}>
+        {primaryStatistics.map((item) => <div key={item.label}><span><strong>{item.label}</strong>{item.detail ? <small>{item.detail}</small> : null}</span><b>{item.value}</b></div>)}
+      </div>
+      <details className={pwaStyles.recordsDetails}>
+        <summary>View All Statistics</summary>
+        <ScoringStatGrid items={secondaryStatistics} dense />
+      </details>
+    </section>
+
+    <section className={`${pwaStyles.overviewSection} ${pwaStyles.overviewAwards}`} aria-labelledby="history-awards-heading">
+      <span className={styles.sectionLabel}>Tournament Honors</span>
+      <h2 id="history-awards-heading">Awards</h2>
+      <div className={pwaStyles.awardsSummary}>
+        {tournament.awards.length ? tournament.awards.map((award) => <div key={award.Award}><span>{award.Award}</span><strong>{award.winnerPlayer?.["Display Name"] || award.Winner}</strong></div>) : <div><span>Sandbagger of the Year</span><strong>Not awarded</strong></div>}
+      </div>
+    </section>
+  </div>;
 }
 
 export default async function TournamentYearPage({ params }) {
@@ -123,7 +235,7 @@ export default async function TournamentYearPage({ params }) {
       );
     }
   } else {
-    const scorecardAnalyticsPromise = loadScorecardAnalytics();
+    const scorecardAnalyticsPromise = loadLegacyHistoryAnalytics();
     await refreshHistoricalData();
     tournament = getTournament(year);
     if (!tournament) notFound();
@@ -159,7 +271,7 @@ export default async function TournamentYearPage({ params }) {
 
       <section className={`${styles.tournamentHero} ${useSupabase2026 ? pwaStyles.currentTournamentHero : ""}`}>
         <AssetImage
-          src={tournamentHero(tournament["Hero Image"])}
+          src={historyHeroPath(tournament)}
           alt={`${tournament.year} ${tournament.Destination}`}
           className={styles.tournamentHeroImage}
           fallbackClassName={styles.tournamentHeroFallback}
@@ -230,9 +342,12 @@ export default async function TournamentYearPage({ params }) {
             <b>View Draft →</b>
           </Link>
         ) : null}
-        {useSupabase2026 ? <div className={pwaStyles.currentStatus} role="status">
-          <span>In progress</span>
-          <div><strong>2026 tournament record</strong><p>Final results and scorecards appear here as matches become official.</p></div>
+        {useSupabase2026 ? <div className={pwaStyles.currentStatus} role="status" data-complete={historyTournamentComplete(tournament) ? "true" : "false"}>
+          <span>{historyTournamentComplete(tournament) ? "Final" : "In progress"}</span>
+          <div>
+            <strong>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `${tournament.championTeam.name} champions` : "Tournament complete") : "2026 tournament record"}</strong>
+            <p>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `Official final: ${tournament["Final Score"]}` : "The official champion is pending canonical tournament resolution.") : "Final results and scorecards appear here as matches become official."}</p>
+          </div>
         </div> : <div className={styles.finalScoreCard}>
           <div>
             <span>Champions</span>
@@ -252,6 +367,14 @@ export default async function TournamentYearPage({ params }) {
           </div>
         </div>}
 
+        {useSupabase2026 ? <CurrentHistoryOverview
+          tournament={tournament}
+          roundPoints={roundPoints}
+          leaderboard={leaderboard}
+          pointsTracked={pointsTracked}
+          scoringStatistics={scoringStatistics}
+          participant={participant}
+        /> : <>
         <section className={styles.section}>
           <span className={styles.sectionLabel}>The Teams</span>
           <h2>Rosters</h2>
@@ -430,6 +553,7 @@ export default async function TournamentYearPage({ params }) {
             )}
           </div>
         </section>
+        </>}
       </section>
 
       <nav

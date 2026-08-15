@@ -17,7 +17,7 @@ import {
 import styles from "../../../../historical.module.css";
 import { formatTeamPoints } from "../../../../../lib/formatters";
 import { pageMetadata } from "../../../../../lib/seo";
-import { loadScorecardAnalytics } from "../../../../../lib/scorecard-data";
+import { loadLegacyHistoryAnalytics } from "../../../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../../../lib/scorecard-analytics";
 import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
 import {
@@ -90,7 +90,7 @@ export default async function HistoricalRoundPage({ params }) {
       );
     }
   } else {
-    const scorecardAnalyticsPromise = loadScorecardAnalytics();
+    const scorecardAnalyticsPromise = loadLegacyHistoryAnalytics();
     await refreshHistoricalData();
     archive = getHistoricalRound(year, round);
     scorecardAnalytics = await scorecardAnalyticsPromise;
