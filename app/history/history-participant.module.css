@@ -54,3 +54,21 @@
   .roundHeroContent.roundHeroContent{grid-template-columns:62px minmax(0,1fr)}
   .roundCourseLogo.roundCourseLogo{width:62px;height:62px}
 }
+
+.roundScoreboard.roundScoreboard{padding:17px 18px;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;border-radius:18px}
+.roundScoreTeam.roundScoreTeam{grid-template-columns:58px minmax(0,1fr);gap:4px 9px}
+.roundScoreTeam.roundScoreTeam>div:first-child{grid-row:1 / 3;width:58px;height:58px;padding:8px}
+.roundScoreTeam.roundScoreTeam>strong{overflow-wrap:anywhere;font-size:.9rem;line-height:1.1;white-space:normal}
+.roundScoreTeam.roundScoreTeam>b{grid-column:2;grid-row:2;font-size:1.7rem}
+.roundScoreTeam.roundScoreTeam:last-child{text-align:right}
+.roundScoreWinner.roundScoreWinner{min-width:76px}
+.roundScoreWinner.roundScoreWinner>strong{font-size:.95rem;line-height:1.15}
+
+@media(max-width:360px){
+  .roundScoreboard.roundScoreboard{padding:14px 12px;gap:8px}
+  .roundScoreTeam.roundScoreTeam{grid-template-columns:44px minmax(0,1fr);gap:3px 6px}
+  .roundScoreTeam.roundScoreTeam>div:first-child{width:44px;height:44px;padding:6px}
+  .roundScoreTeam.roundScoreTeam>strong{font-size:.76rem}
+  .roundScoreTeam.roundScoreTeam>b{font-size:1.4rem}
+  .roundScoreWinner.roundScoreWinner{min-width:64px}
+}

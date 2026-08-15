@@ -183,8 +183,8 @@ export default async function HistoricalRoundPage({ params }) {
           position="top"
         /> : null}
 
-        <div className={styles.roundArchiveScoreboard}>
-          <div className={styles.roundArchiveTeam}>
+        <div className={`${styles.roundArchiveScoreboard} ${useSupabase2026 ? pwaStyles.roundScoreboard : ""}`}>
+          <div className={`${styles.roundArchiveTeam} ${useSupabase2026 ? pwaStyles.roundScoreTeam : ""}`}>
             <TeamLogoPlate
               filename={archive.teamOne.logo}
               teamName={archive.teamOne.name}
@@ -194,12 +194,12 @@ export default async function HistoricalRoundPage({ params }) {
             <b>{displayPoints(archive.teamOne.points)}</b>
           </div>
 
-          <div className={styles.roundArchiveWinner}>
+          <div className={`${styles.roundArchiveWinner} ${useSupabase2026 ? pwaStyles.roundScoreWinner : ""}`}>
             <span>Round Winner</span>
             <strong>{archive.roundWinner}</strong>
           </div>
 
-          <div className={styles.roundArchiveTeam}>
+          <div className={`${styles.roundArchiveTeam} ${useSupabase2026 ? pwaStyles.roundScoreTeam : ""}`}>
             <TeamLogoPlate
               filename={archive.teamTwo.logo}
               teamName={archive.teamTwo.name}
