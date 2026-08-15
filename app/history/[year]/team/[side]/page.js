@@ -19,6 +19,7 @@ import {
   isSupabaseHistory2026,
   loadHistory2026View,
 } from "../../../../../lib/history-2026-service";
+import { formatHistoryTournamentHandicap } from "../../../../../lib/history-team-metadata";
 import HistoryUnavailablePage from "../../../HistoryUnavailable";
 import HistoryArchiveNav from "../../../HistoryArchiveNav";
 import pwaStyles from "../../../history-participant.module.css";
@@ -159,7 +160,7 @@ export default async function TeamSeasonPage({ params }) {
             const isCaptain = team.captainId === player["Player ID"];
             const handicapLabel = handicap === null || handicap === undefined
               ? "unavailable"
-              : formatHandicap(handicap);
+              : formatHistoryTournamentHandicap(handicap);
             return (
             <Link
               aria-label={`${player["Display Name"]}${isCaptain ? ", Team Captain" : ""}, Tournament Handicap ${handicapLabel}`}
@@ -173,7 +174,7 @@ export default async function TeamSeasonPage({ params }) {
                   <i className={styles.rosterCaptainMarker} title="Captain" aria-label="Team Captain">C</i>
                 ) : null}
               </span>
-              <strong>{formatHandicap(handicap)}</strong>
+              <strong>{formatHistoryTournamentHandicap(handicap)}</strong>
               <small>Tournament Handicap</small>
             </Link>
             );

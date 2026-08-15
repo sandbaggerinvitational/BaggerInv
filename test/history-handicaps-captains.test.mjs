@@ -7,7 +7,10 @@ import {
   history2026SourceFingerprint,
   history2026TeamPageModel,
 } from "../lib/history-2026-adapter.js";
-import { mergeHistoryTournamentPlayerMetadata } from "../lib/history-team-metadata.js";
+import {
+  formatHistoryTournamentHandicap,
+  mergeHistoryTournamentPlayerMetadata,
+} from "../lib/history-team-metadata.js";
 import { formatHandicap } from "../lib/formatters.js";
 import {
   makeGuideProjection,
@@ -122,16 +125,49 @@ test("a complete canonical handicap set cannot silently collapse to all unavaila
   );
 });
 
-test("missing, zero, and plus handicaps remain distinct", () => {
+test("History preserves signed, zero, missing, and explicit-plus tournament handicaps", () => {
   const aggregate = makeHistory2026Aggregate();
   const core = canonicalCoreView(aggregate);
   core.players[2].tournament_source_payload["Tournament Handicap"] = null;
   const merged = mergeHistoryTournamentPlayerMetadata(aggregate, core);
   assert.equal(merged.players[0].tournament_handicap, 0);
-  assert.equal(formatHandicap(merged.players[0].tournament_handicap), "0.0");
-  assert.equal(formatHandicap(merged.players[1].tournament_handicap), "(1.2)");
+  assert.equal(formatHistoryTournamentHandicap(merged.players[0].tournament_handicap), "0.0");
+  assert.equal(formatHistoryTournamentHandicap(merged.players[1].tournament_handicap), "-1.2");
   assert.equal(merged.players[2].tournament_handicap, null);
-  assert.equal(formatHandicap(merged.players[2].tournament_handicap), "—");
+  assert.equal(formatHistoryTournamentHandicap(merged.players[2].tournament_handicap), "—");
+  assert.equal(formatHistoryTournamentHandicap("+1.2"), "+1.2");
+});
+
+test("History signed-handicap matrix never changes a canonical numeric sign", () => {
+  for (const [sourceValue, expected] of [
+    [12.4, "12.4"],
+    [1.1, "1.1"],
+    [0.6, "0.6"],
+    [0, "0.0"],
+    [-0.2, "-0.2"],
+    [-2.5, "-2.5"],
+  ]) {
+    assert.equal(formatHistoryTournamentHandicap(sourceValue), expected);
+  }
+});
+
+test("bundled historical negative tournament handicaps remain negative", () => {
+  const negativeRows = historicalData.handicaps.filter(
+    (row) => Number(row["Tournament Handicap"]) < 0
+  );
+  assert.deepEqual(
+    negativeRows.map((row) => [Number(row.Year), row["Player ID"], row["Tournament Handicap"]]),
+    [
+      [2020, "RM01", -0.6],
+      [2022, "MS02", -0.5],
+      [2022, "RM01", -0.2],
+      [2023, "RM01", -0.4],
+    ]
+  );
+  assert.deepEqual(
+    negativeRows.map((row) => formatHistoryTournamentHandicap(row["Tournament Handicap"])),
+    ["-0.6", "-0.5", "-0.2", "-0.4"]
+  );
 });
 
 test("partial canonical handicaps do not produce a false team average", () => {
@@ -189,6 +225,7 @@ test("Team History content requests metadata, preserves roster order, and render
   assert.equal((page.match(/includeTournamentPlayerMetadata:\s*true/g) || []).length, 1);
   assert.match(page, /Team Captain/);
   assert.match(page, /Tournament Handicap \$\{handicapLabel\}/);
+  assert.equal((page.match(/formatHistoryTournamentHandicap\(handicap\)/g) || []).length, 2);
   assert.match(page, /rosterCaptainMarker/);
   assert.match(css, /\.rosterCaptainMarker\s*\{[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;/);
   assert.doesNotMatch(adapter, /\.sort\(\(left, right\) => \(number\(left\.handicap/);

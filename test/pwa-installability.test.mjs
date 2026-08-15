@@ -30,6 +30,12 @@ test("service worker never intercepts writes or private scoring routes", async (
   assert.match(source, /url\.pathname\.startsWith\("\/admin"\)/);
   assert.match(source, /fetch\(request\)\.catch/);
   assert.match(source, /const CACHE_VERSION = "sbi-shell-v2"/);
+  const navigationBranch = source.match(
+    /if \(request\.mode === "navigate"\) \{([\s\S]*?)\n  \}/
+  )?.[1] || "";
+  assert.match(navigationBranch, /fetch\(request\)\.catch/);
+  assert.doesNotMatch(navigationBranch, /caches\.match\(request\)|cache\.put/);
+  assert.doesNotMatch(source, /headers\.get\(["']RSC["']\)[\s\S]*respondWith/);
 });
 
 test("offline page does not imply that scores can be saved offline", async () => {
