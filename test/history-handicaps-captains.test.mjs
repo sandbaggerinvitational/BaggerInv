@@ -80,6 +80,25 @@ test("2026 Team History joins canonical tournament metadata by Player ID", () =>
   assert.equal(merged.players[0].captain, true);
 });
 
+test("2026 captain identity accepts an explicit canonical team projection without name inference", () => {
+  const aggregate = makeHistory2026Aggregate();
+  const core = canonicalCoreView(aggregate);
+  core.players = core.players.map((player) => ({
+    ...player,
+    presentation: { captain: false },
+    source_payload: { Captain: false },
+  }));
+  const captain = aggregate.players.find((player) => player.player_id === "PK01");
+  core.teams = [{
+    team_id: "PICKLES",
+    team_side: 1,
+    source_payload: { "Captain Player ID": captain.player_id },
+  }];
+  const merged = mergeHistoryTournamentPlayerMetadata(aggregate, core);
+  assert.equal(merged.players.find((player) => player.player_id === captain.player_id).captain, true);
+  assert.equal(merged.players.filter((player) => player.captain).length, 1);
+});
+
 test("2026 Team History never derives Tournament Handicap from round strokes", () => {
   const aggregate = makeHistory2026Aggregate();
   for (const record of aggregate.matches) {
