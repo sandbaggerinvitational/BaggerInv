@@ -19,10 +19,10 @@ const jsonScores = grossScoresFromCell;
 function Logo({ filename, name, type = "team", size = "medium", tournamentYear }) {
   const fallbackTournament = tournamentLogo(`sandbagger-${tournamentYear}`);
   const src = type === "course" ? courseLogo(filename) : teamLogo(filename);
-  return <span className={styles.logo} data-size={size} data-type={type}>
+  return <span className={styles.logo} data-size={size} data-type={type} aria-hidden={type === "team" ? "true" : undefined}>
     <AssetImage
       src={src || fallbackTournament}
-      alt={`${name} logo`}
+      alt={type === "team" ? "" : `${name} logo`}
       className={styles.logoImage}
       fallbackClassName={styles.logoFallback}
       fallback={initials(name)}
@@ -42,13 +42,11 @@ function playerMeta(player, format) {
   return values.join(" • ");
 }
 
-function TeamPanel({ team, players, format, playingHcp, stroke, tournamentYear }) {
+function TeamPanel({ team, players, format, playingHcp, stroke }) {
   const teamStroke = Number(stroke);
-  return <section className={styles.teamPanel}>
-    <Logo filename={team.logo} name={team.name} size="team" tournamentYear={tournamentYear} />
-    <h3>{team.name}</h3>
-    <div className={styles.players}>
-      {players.map((player, index) => <span key={player.id || player.name || index}>
+  return <section className={styles.teamPanel} aria-label={`${team.name} golfers`}>
+    <div className={styles.players} role="list">
+      {players.map((player, index) => <span role="listitem" key={player.id || player.name || index}>
         <strong>{player.name || "Player TBA"}</strong>
         {playerMeta(player, format) ? <small>{playerMeta(player, format)}</small> : null}
       </span>)}
@@ -414,9 +412,9 @@ export default function GameCenter({ initialData, matchId, backTo }) {
     </div>
 
     <div className={styles.teamGrid}>
-      <TeamPanel team={{ ...data.display.teams[1], logo: data.display.teams[1].logo || data.tournament.teamOne.logo }} players={data.match.team1Players || []} format={format} playingHcp={data.match.team1PlayingHcp} stroke={data.match.team1Stroke} tournamentYear={data.tournament.year} />
+      <TeamPanel team={data.display.teams[1]} players={data.match.team1Players || []} format={format} playingHcp={data.match.team1PlayingHcp} stroke={data.match.team1Stroke} />
       <b aria-label="versus">VS</b>
-      <TeamPanel team={{ ...data.display.teams[2], logo: data.display.teams[2].logo || data.tournament.teamTwo.logo }} players={data.match.team2Players || []} format={format} playingHcp={data.match.team2PlayingHcp} stroke={data.match.team2Stroke} tournamentYear={data.tournament.year} />
+      <TeamPanel team={data.display.teams[2]} players={data.match.team2Players || []} format={format} playingHcp={data.match.team2PlayingHcp} stroke={data.match.team2Stroke} />
     </div>
     </section>
 
