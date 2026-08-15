@@ -28,3 +28,25 @@
 @media(max-width:620px){.columnGrid,.entry{--leaderboard-columns:34px minmax(0,1fr);gap:8px;padding-inline:10px}.columnGrid{padding-block:7px}.columnGrid>.columnMetrics{grid-column:2}.entry>.metrics{grid-column:2;grid-template-columns:repeat(5,minmax(0,1fr));padding-top:8px;border-top:1px solid #eee8de}.entry>.metrics[data-variant=overall]{grid-template-columns:repeat(2,minmax(0,1fr))}.identity{align-items:flex-start}.names strong{font-size:.72rem}.avatars>span{width:36px;height:36px}.singleAvatar{width:38px;height:38px}.gross{opacity:.72}.details{padding-left:52px}}
 @media(max-width:380px){.entry{grid-template-columns:30px minmax(0,1fr);padding-inline:8px}.avatars{padding-left:6px}.avatars>span{width:32px;height:32px;margin-left:-6px}.identity{gap:7px}.names strong{font-size:.66rem}.metrics strong{font-size:.72rem}}
 @media(prefers-reduced-motion:no-preference){.sheet{animation:sheetIn .22s ease-out}.entry{transition:background .18s ease}@keyframes sheetIn{from{transform:translateY(18px);opacity:.65}to{transform:translateY(0);opacity:1}}}
+
+/* Overall standings use a native ranking-list hierarchy on mobile. */
+.nameLine{display:flex;align-items:center;flex-wrap:wrap;gap:4px 7px;min-width:0}
+.nameLine strong{min-width:0}
+.entry[data-variant=overall]{grid-template-columns:40px minmax(0,1fr) minmax(78px,92px);gap:9px;min-height:74px;padding:9px 11px}
+.entry[data-variant=overall]>.metrics{grid-column:3;grid-template-columns:1fr;padding:0;border-top:0}
+.entry[data-variant=overall]>.metrics>span{align-content:center;gap:4px;min-height:48px}
+.entry[data-variant=overall]>.metrics strong{color:#0b4938;font:900 1.04rem/1 Georgia,serif;white-space:nowrap}
+.entry[data-variant=overall]>.metrics small{font-size:.49rem;letter-spacing:.04em}
+.entry[data-variant=overall] .rank small{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.entry[data-variant=overall] .rank strong{font-size:1.14rem}
+.entry[data-variant=overall] .identity[data-individual=true] .names strong{font-size:.86rem;line-height:1.16}
+.entry[data-variant=overall] .names small{font-size:.62rem;line-height:1.25;white-space:normal}
+.entry[data-variant=overall] .singleAvatar{width:42px;height:42px}
+.entry[data-variant=overall][data-podium="1"] .rank strong{color:#8a6714}
+.entry[data-variant=overall][data-podium="2"] .rank strong{color:#68726e}
+.entry[data-variant=overall][data-podium="3"] .rank strong{color:#8f664a}
+.entry[data-variant=overall][data-podium]{background:linear-gradient(90deg,#fffaf0 0,#fff 42%)}
+.entry[data-variant=overall][data-current=true]{position:relative;background:#fff8e9;box-shadow:inset 4px 0 #b98920}
+.entry[data-variant=overall][data-current=true]::after{position:absolute;inset:5px;border:1px solid rgba(185,137,32,.24);border-radius:11px;pointer-events:none;content:""}
+@media(max-width:620px){.entry[data-variant=overall]{grid-template-columns:34px minmax(0,1fr) minmax(72px,84px);gap:7px;padding:9px 10px}.entry[data-variant=overall]>.metrics{grid-column:3;padding:0;border:0}.entry[data-variant=overall] .identity{align-items:center}.entry[data-variant=overall] .singleAvatar{width:40px;height:40px}.entry[data-variant=overall] .details{padding-left:0}}
+@media(max-width:350px){.entry[data-variant=overall]{grid-template-columns:30px minmax(0,1fr) 70px;padding-inline:7px}.entry[data-variant=overall] .singleAvatar{width:36px;height:36px}.entry[data-variant=overall] .identity{gap:6px}.entry[data-variant=overall] .identity[data-individual=true] .names strong{font-size:.8rem}.entry[data-variant=overall]>.metrics strong{font-size:.94rem}}

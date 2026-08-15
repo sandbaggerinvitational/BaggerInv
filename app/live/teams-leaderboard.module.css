@@ -247,3 +247,28 @@
   .teamSheetName strong,
   .teamSheetName em { grid-column: 1; justify-self: center; }
 }
+
+/* Two-team standings are summaries, not a compressed desktop table. */
+.teamRow{
+  display:grid;
+  grid-template-columns:46px minmax(0,1fr) minmax(210px,46%);
+  align-items:center;
+  gap:10px;
+  min-height:88px;
+  padding:10px 12px;
+}
+.teamRow:last-of-type{border-bottom:0}
+.teamRank{display:grid;justify-items:center;gap:2px;text-align:center}
+.teamRank small,.teamMetrics small{color:#77817c;font-size:.48rem;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+.teamRank strong{color:#967326;font:700 1.15rem/1 Georgia,serif}
+.teamIdentity{display:flex!important;align-items:center;gap:9px;min-width:0;text-align:left!important}
+.teamIdentity>span:last-child{display:grid;gap:3px;min-width:0}
+.teamIdentity>span:last-child>small{font-size:.57rem;line-height:1.2}
+.teamMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-self:stretch;align-items:center;min-width:0;border-left:1px solid #eee8de}
+.teamMetrics>span{display:grid;align-content:center;justify-items:center;gap:4px;min-width:0;min-height:54px;padding:4px 6px;text-align:center}
+.teamMetrics>span+span{border-left:1px solid #eee8de}
+.teamMetrics strong{color:#0b4938;font-size:.76rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.teamMetrics>span:first-child strong{color:#8a671b;font:700 1.05rem/1 Georgia,serif}
+.teamPending{grid-column:1/-1;align-self:center!important;color:#6f7974;font-size:.7rem;font-weight:850}
+@media(max-width:620px){.teamRow{grid-template-columns:34px minmax(0,1fr) minmax(132px,46%);gap:7px;min-height:82px;padding:9px 8px}.teamIdentity{gap:6px}.teamIdentity>span:last-child>small{font-size:.53rem}.teamNameLine{gap:3px 5px}.teamNameLine strong{font-size:.7rem}.teamNameLine em{padding-inline:5px}.teamMetrics>span{padding-inline:2px}.teamMetrics small{font-size:.43rem}.teamMetrics strong{font-size:.66rem}.teamMetrics>span:first-child strong{font-size:.9rem}}
+@media(max-width:350px){.teamRow{grid-template-columns:30px minmax(0,1fr) 128px;padding-inline:6px}.teamIdentity>span:first-child{width:34px;height:34px;flex-basis:34px}.teamNameLine strong{font-size:.66rem}.teamMetrics strong{font-size:.61rem}}

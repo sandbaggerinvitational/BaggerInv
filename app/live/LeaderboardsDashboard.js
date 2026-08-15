@@ -76,12 +76,22 @@ function TeamLeaderboardIdentity({ team, current = false, large = false }) {
   </span>;
 }
 
-function Controls({ rounds, selectedRound, onRound }) {
-  return <nav className={styles.roundSelector} aria-label="Leaderboard round">
-    {[["overall", "Overall"], ...rounds.map((round) => [String(round.number), round.label])].map(([value, label]) =>
-      <button type="button" aria-pressed={selectedRound === value} onClick={() => onRound(value)} key={value}>{label}</button>
-    )}
-  </nav>;
+function Controls({ rounds, selectedRound, onRound, metric = "", onMetric }) {
+  return <section className={styles.rankingControls} aria-label="Leaderboard filters">
+    <label>
+      <span>Round</span>
+      <select aria-label="Round filter" value={selectedRound} onChange={(event) => onRound(event.target.value)}>
+        <option value="overall">Overall</option>
+        {rounds.map((round) => <option value={String(round.number)} key={round.number}>{round.label}</option>)}
+      </select>
+    </label>
+    {onMetric ? <label>
+      <span>Rank By</span>
+      <select aria-label="Rank players by" value={metric} onChange={(event) => onMetric(event.target.value)}>
+        {PLAYER_METRICS.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+      </select>
+    </label> : null}
+  </section>;
 }
 
 function formatName(value) {
@@ -105,7 +115,7 @@ function OverallPlayerSheet({ row, rounds = [], roundLeaderboards = {}, tourname
   </LeaderboardDetailSheet>;
 }
 
-function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
+function OverallPlayers({ data, currentPlayer, metric }) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState("");
   const [direction, setDirection] = useState("");
@@ -117,25 +127,20 @@ function OverallPlayers({ data, currentPlayer, metric, setMetric }) {
   const selected = ranked.find((row) => row.id === selectedId);
   const complete = (data.rounds || []).length > 0 && (data.rounds || []).every((round) => (round.matches || []).length > 0 && round.matches.every((match) => ["final", "finalized"].includes(clean(match.status).toLowerCase())));
   const changeSort = () => setDirection((current) => current === "asc" ? "desc" : "asc");
-  return <>
-    <div className={styles.playerTools}>
-      <label><span>Search players</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search players" />{query ? <button type="button" onClick={() => setQuery("")} aria-label="Clear player search">×</button> : null}</label>
-      <div className={styles.metricSelector} role="group" aria-label="Performance metric">
-        {availableMetrics.map(([value, label]) => <button type="button" aria-pressed={metric === value} onClick={() => { setMetric(value); setDirection(""); }} key={value}>{label}</button>)}
-      </div>
-      {metric !== "points" ? <p>Performance view · switch to Points for official tournament standings.</p> : null}
-    </div>
-    {!ranked.length ? <div className={styles.empty}><strong>No players match this search.</strong><span>Clear the search to see the tournament standings.</span></div> :
-      <section className={leaderboardStyles.board} aria-label={metric === "points" ? "Official player standings" : `${availableMetrics.find(([key]) => key === metric)?.[1]} performance standings`}>
-        <header><span><small>Overall</small><h2>Player Leaderboard</h2></span></header>
-        <LeaderboardColumnHeader variant="overall" columns={[{ key: "record", label: "Record", sortable: false }, { key: metric, label: availableMetrics.find(([key]) => key === metric)?.[1] || "Points" }]} sort={{ key: metric, direction: direction || "desc" }} onSelect={changeSort} label="Overall player leaderboard columns" />
-        <div className={leaderboardStyles.entries}>{ranked.map((row) => {
+  useEffect(() => setDirection(""), [metric]);
+  return <section className={leaderboardStyles.board} aria-label={metric === "points" ? "Official player standings" : `${availableMetrics.find(([key]) => key === metric)?.[1]} performance standings`}>
+        <header className={styles.playerBoardHeader}><span><small>Overall</small><h2>Player Leaderboard</h2><em className={styles.playerCount}>{ranked.length} players</em></span><div className={styles.playerBoardTools}>
+          <label><span>Search players</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search players" />{query ? <button type="button" onClick={() => setQuery("")} aria-label="Clear player search">×</button> : null}</label>
+          <button type="button" className={styles.sortDirection} onClick={changeSort} aria-label={`Sort ${availableMetrics.find(([key]) => key === metric)?.[1] || "Points"} ${direction === "asc" ? "descending" : "ascending"}`} aria-pressed={direction === "asc"}>{direction === "asc" ? "↑" : "↓"}</button>
+        </div></header>
+        {metric !== "points" ? <p className={styles.performanceNote}>Performance view · Points remains the official tournament standing.</p> : null}
+        {!ranked.length ? <div className={styles.empty}><strong>No players found.</strong><span>Clear the search to see the tournament standings.</span></div> : <div className={leaderboardStyles.entries}>{ranked.map((row) => {
           const isCurrent = currentPlayer?.id === row.id;
-          return <LeaderboardEntry rank={row.displayRank} current={isCurrent} state={complete ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} current={isCurrent} />} metrics={<LeaderboardMetrics variant="overall" metrics={[{ label: "Record", value: row.record }, { label: availableMetrics.find(([key]) => key === metric)?.[1] || "Points", value: metricValue(row, metric), emphasis: complete ? "final" : "live" }]} />} label={`${row.player}, rank ${row.displayRank || "unranked"}, record ${row.record}, ${metricValue(row, metric)}${isCurrent ? ", your position" : ""}`} onClick={() => setSelectedId(row.id)} key={row.id} />;
-        })}</div>
+          const podium = Number(String(row.displayRank || "").match(/\d+/)?.[0]);
+          return <LeaderboardEntry rank={row.displayRank} variant="overall" podium={podium >= 1 && podium <= 3 ? podium : undefined} current={isCurrent} state={complete ? "final" : "live"} identity={<PlayerLeaderboardIdentity player={{ name: row.player, photo: row.photo }} team={row.team} meta={row.record} current={isCurrent} />} metrics={<LeaderboardMetrics variant="overall" metrics={[{ label: availableMetrics.find(([key]) => key === metric)?.[1] || "Points", value: metricValue(row, metric), emphasis: complete ? "final" : "live" }]} />} label={`${row.player}, rank ${row.displayRank || "unranked"}, record ${row.record}, ${metricValue(row, metric)}${isCurrent ? ", current player, your position" : ""}`} onClick={() => setSelectedId(row.id)} key={row.id} />;
+        })}</div>}
         {selected ? <OverallPlayerSheet row={selected} rounds={data.rounds || []} roundLeaderboards={data.roundLeaderboards || {}} tournament={data.tournament || {}} complete={complete} onClose={() => setSelectedId("")} /> : null}
-      </section>}
-  </>;
+      </section>;
 }
 
 function RoundPlayers({ data, selectedRound, currentPlayer }) {
@@ -236,15 +241,14 @@ function Teams({ data, selectedRound, currentPlayer, snapshots }) {
   const overall = selectedRound === "overall";
   return <section className={styles.teams} aria-label="Team standings">
     <header className={teamStyles.teamBoardTitle}><span><small>{overall ? "Overall" : selectedRoundModel?.label}</small><strong>Team Leaderboard</strong></span>{overall ? null : <StatusBadge status={state} />}</header>
-    <div className={`${styles.teamHeader} ${teamStyles.teamHeader}`} data-overall={overall || undefined}><span>Rank</span><span>Team</span><span>Record</span><span>Points</span>{overall ? <span>Odds</span> : null}</div>
     {standings.map((team) => {
       const currentTeam = Number(currentTeamSide) === Number(team.side);
       const pending = !overall && state === "upcoming";
       const odds = oddsBySide.has(Number(team.side)) ? oddsBySide.get(Number(team.side)) : null;
-      return <button type="button" className={teamStyles.teamRow} data-overall={overall || undefined} data-current={currentTeam || undefined} onClick={() => setSelectedSide(String(team.side))} aria-label={`Open ${team.name} team summary${currentTeam ? ", your team" : ""}`} key={team.side}>
-        <strong>{pending ? "—" : team.rank}</strong>
-        <span><TeamMark filename={team.logo} name={team.name} size="large" /><span><TeamNameWithBadge name={team.name} current={currentTeam} /><small>{team.remaining} match{team.remaining === 1 ? "" : "es"} remaining</small></span></span>
-        {pending ? <span className={teamStyles.teamPending}>Pending</span> : <><span>{team.record}</span><b>{formatTeamPoints(team.points)}</b></>}{overall ? <b>{odds === null ? "Pending" : formatChampionshipOdds(odds)}</b> : null}
+      return <button type="button" className={teamStyles.teamRow} data-current={currentTeam || undefined} onClick={() => setSelectedSide(String(team.side))} aria-label={`Open ${team.name} team summary, rank ${pending ? "pending" : team.rank}, record ${pending ? "pending" : team.record}, ${pending ? "points pending" : `${formatTeamPoints(team.points)} points`}${currentTeam ? ", your team" : ""}`} key={team.side}>
+        <span className={teamStyles.teamRank}><small>Rank</small><strong>{pending ? "—" : team.rank}</strong></span>
+        <span className={teamStyles.teamIdentity}><TeamMark filename={team.logo} name={team.name} size="large" /><span><TeamNameWithBadge name={team.name} current={currentTeam} /><small>{team.remaining} match{team.remaining === 1 ? "" : "es"} remaining</small></span></span>
+        <span className={teamStyles.teamMetrics}>{pending ? <span className={teamStyles.teamPending}>Pending</span> : <><span><small>Points</small><strong>{formatTeamPoints(team.points)}</strong></span><span><small>Record</small><strong>{team.record}</strong></span></>}{overall ? <span><small>Odds</small><strong>{odds === null ? "Pending" : formatChampionshipOdds(odds)}</strong></span> : null}</span>
       </button>;
     })}
     {selectedTeam ? <TeamDetailSheet team={selectedTeam} data={data} selectedRound={selectedRound} odds={oddsBySide.has(Number(selectedTeam.side)) ? oddsBySide.get(Number(selectedTeam.side)) : null} current={Number(currentTeamSide) === Number(selectedTeam.side)} onClose={() => setSelectedSide("")} /> : null}
@@ -420,7 +424,7 @@ function NetSkinsBoard({ data, currentPlayer }) {
     const isCurrent = Boolean(currentPlayer?.id && row.playerIds?.includes(currentPlayer.id));
     return <div className={skinsStyles.entry} data-current={isCurrent || undefined} key={`${row.id}-${row.skinsWon}-${row.totalWinnings}`}>
       <button type="button" className={skinsStyles.row} aria-label={`Open details for ${teamName(row)}, ${row.skinsWon} skins, ${currency(row.totalWinnings)} winnings${isCurrent ? ", your entry" : ""}`} onClick={() => setSelectedTeamId(row.id)}>
-        <strong>{ranked ? rankLabel(row) : ""}</strong>{isScramble ? <ScrambleTeamIdentity playerIds={row.playerIds} players={data.players || []} /> : <span className={skinsStyles.teamIdentity}><span className={skinsStyles.avatars}>{teamMembers(row).map((player) => <span key={player.id}><PlayerAvatar player={player} fallbackClassName={skinsStyles.avatarFallback} /></span>)}</span><b>{teamMembers(row).map((player) => <span key={player.id}>{player.name}</span>)}</b></span>}<span data-animate="true">{row.skinsWon}</span><strong data-animate="true">{currency(row.totalWinnings)}</strong>
+        <strong>{ranked ? rankLabel(row) : ""}</strong>{isScramble ? <ScrambleTeamIdentity playerIds={row.playerIds} players={data.players || []} /> : <span className={skinsStyles.teamIdentity}><span className={skinsStyles.avatars}>{teamMembers(row).map((player) => <span key={player.id}><PlayerAvatar player={player} fallbackClassName={skinsStyles.avatarFallback} /></span>)}</span><b>{teamMembers(row).map((player) => <span key={player.id}>{player.name}</span>)}</b></span>}<span className={skinsStyles.skinMetric} data-animate="true"><small><i className={skinsStyles.skinCoin} aria-hidden="true">S</i> Skins</small><strong>{row.skinsWon}</strong></span><span className={skinsStyles.winningsMetric} data-animate="true"><small>Winnings</small><strong>{currency(row.totalWinnings)}</strong></span>
       </button>
     </div>;
   };
@@ -605,8 +609,8 @@ export default function LeaderboardsDashboard({
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Player, team, round standings, and Championship projections.</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
     <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{LEADERBOARD_MODULES.map(({ value, label }) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
-    {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
-    {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
+    {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} metric={metric} onMetric={tab === "players" && selectedRound === "overall" ? (value) => updateQuery({ metric: value }) : undefined} /> : null}
+    {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} snapshots={oddsSnapshots} /> : null}
     {tab === "skins" && (!supabaseCore || secondaryData) ? <NetSkinsBoard data={secondaryData ? { ...data, ...secondaryData } : data} currentPlayer={currentPlayer} /> : null}
