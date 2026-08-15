@@ -85,10 +85,13 @@ test("legacy scorecards use the established read-only archive and keep optional 
 });
 
 test("Team History batch-reads canonical Tournament Handicap without N+1 requests", async () => {
-  const service = await source("lib/history-2026-service.js");
+  const [service, metadata] = await Promise.all([
+    source("lib/history-2026-service.js"),
+    source("lib/history-team-metadata.js"),
+  ]);
   assert.match(service, /readLeaderboardsCoreView/);
-  assert.match(service, /tournament_source_payload/);
-  assert.match(service, /\["Tournament Handicap"\]/);
+  assert.match(metadata, /tournament_source_payload/);
+  assert.match(metadata, /\["Tournament Handicap"\]/);
   assert.match(service, /includeTournamentPlayerMetadata/);
   assert.doesNotMatch(service, /match_participants[\s\S]*Tournament Handicap/i);
 });

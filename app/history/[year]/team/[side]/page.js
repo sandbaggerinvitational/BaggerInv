@@ -37,10 +37,7 @@ export async function generateMetadata({ params }) {
   if (isSupabaseHistory2026(year)) {
     try {
       team = history2026TeamPageModel(
-        await loadHistory2026View({
-          year: Number(year),
-          includeTournamentPlayerMetadata: true,
-        }),
+        await loadHistory2026View({ year: Number(year) }),
         decodedSide
       );
       if (team && !Array.isArray(team.roster)) {
@@ -75,7 +72,10 @@ export default async function TeamSeasonPage({ params }) {
   if (useSupabase2026) {
     try {
       team = history2026TeamPageModel(
-        await loadHistory2026View({ year: Number(year) }),
+        await loadHistory2026View({
+          year: Number(year),
+          includeTournamentPlayerMetadata: true,
+        }),
         decodedSide
       );
       if (
@@ -155,22 +155,29 @@ export default async function TeamSeasonPage({ params }) {
         <section className={useSupabase2026 ? pwaStyles.teamRoster : ""} aria-labelledby="team-roster-heading">
         {useSupabase2026 ? <><span className={styles.sectionLabel}>2026 Roster</span><h2 id="team-roster-heading">Tournament Handicaps</h2></> : null}
         <div className={styles.rosterGrid}>
-          {team.roster.map(({ player, handicap }) => (
+          {team.roster.map(({ player, handicap }) => {
+            const isCaptain = team.captainId === player["Player ID"];
+            const handicapLabel = handicap === null || handicap === undefined
+              ? "unavailable"
+              : formatHandicap(handicap);
+            return (
             <Link
+              aria-label={`${player["Display Name"]}${isCaptain ? ", Team Captain" : ""}, Tournament Handicap ${handicapLabel}`}
               className={styles.rosterCard}
               href={`/players/${player.slug}`}
               key={player["Player ID"]}
             >
               <span>
                 {player["Display Name"]}
-                {team.captainId === player["Player ID"] ? (
+                {isCaptain ? (
                   <i className={styles.rosterCaptainMarker} title="Captain" aria-label="Team Captain">C</i>
                 ) : null}
               </span>
               <strong>{formatHandicap(handicap)}</strong>
               <small>Tournament Handicap</small>
             </Link>
-          ))}
+            );
+          })}
         </div>
         </section>
 
