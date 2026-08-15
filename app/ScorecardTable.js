@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useId, useState } from "react";
 import styles from "./scorecard.module.css";
+import summaryStyles from "./scorecard-summary.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const toPar = (value) => {
@@ -194,10 +195,26 @@ function ScoreGrid({ scorecards, segment = "full" }) {
   );
 }
 
+function ScorecardSummary({ scorecards }) {
+  return <div className={summaryStyles.summary} aria-label="Scorecard totals">
+    {scorecards.map((scorecard) => (
+      <div className={summaryStyles.row} key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
+        <span><Participant scorecard={scorecard} /></span>
+        <dl>
+          <div><dt>Gross</dt><dd>{scorecard.total ?? "—"}</dd></div>
+          <div><dt>Strokes</dt><dd>{scorecard.strokesReceived ?? "—"}</dd></div>
+          <div><dt>Net</dt><dd>{scorecard.netTotals?.total ?? "—"}</dd></div>
+        </dl>
+      </div>
+    ))}
+  </div>;
+}
+
 export default function ScorecardTable({
   scorecards = [],
   title = "Hole-by-Hole Scorecard",
   compact = false,
+  showSummary = false,
 }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
@@ -253,6 +270,8 @@ export default function ScorecardTable({
               Partial Scorecard · Only recorded holes are shown. Full-round statistics exclude this scorecard.
             </div>
           ) : null}
+
+          {showSummary ? <ScorecardSummary scorecards={available} /> : null}
 
           <div className={styles.desktopGrid}>
             <ScoreGrid scorecards={available} />

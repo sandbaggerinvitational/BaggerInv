@@ -34,6 +34,8 @@ import {
   loadHistory2026View,
 } from "../../../lib/history-2026-service";
 import HistoryUnavailablePage from "../HistoryUnavailable";
+import HistoryArchiveNav from "../HistoryArchiveNav";
+import pwaStyles from "../history-participant.module.css";
 
 export async function generateMetadata({ params }) {
   const { year } = await params;
@@ -155,7 +157,7 @@ export default async function TournamentYearPage({ params }) {
     <main>
       <Header />
 
-      <section className={styles.tournamentHero}>
+      <section className={`${styles.tournamentHero} ${useSupabase2026 ? pwaStyles.currentTournamentHero : ""}`}>
         <AssetImage
           src={tournamentHero(tournament["Hero Image"])}
           alt={`${tournament.year} ${tournament.Destination}`}
@@ -163,10 +165,15 @@ export default async function TournamentYearPage({ params }) {
           fallbackClassName={styles.tournamentHeroFallback}
           fallback={tournament.Destination}
           loading="eager"
+          width={1440}
+          height={720}
+          sizes="100vw"
+          decoding="async"
+          fetchPriority="high"
         />
         <div className={styles.tournamentHeroOverlay} />
 
-        <div className={styles.tournamentHeroContent}>
+        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 ? pwaStyles.currentTournamentHeroContent : ""}`}>
           {tournament.logoFileName ? (
             <AssetImage
               src={tournamentLogo(tournament.logoFileName)}
@@ -175,6 +182,10 @@ export default async function TournamentYearPage({ params }) {
               fallbackClassName={styles.tournamentEditionLogoFallback}
               fallback=""
               loading="eager"
+              width={132}
+              height={132}
+              sizes="(max-width: 720px) 64px, 132px"
+              decoding="async"
             />
           ) : null}
           <p>{tournament.editionTitle}</p>
@@ -184,7 +195,7 @@ export default async function TournamentYearPage({ params }) {
         </div>
       </section>
 
-      <nav className={styles.tournamentYearNavigation}>
+      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : <nav className={styles.tournamentYearNavigation}>
         {previousYear ? (
           <Link href={`/history/${previousYear}`}>
             <span>← Previous Year</span>
@@ -209,7 +220,7 @@ export default async function TournamentYearPage({ params }) {
         ) : (
           <span />
         )}
-      </nav>
+      </nav>}
 
       <section className={styles.content}>
         {draft ? (
@@ -219,7 +230,10 @@ export default async function TournamentYearPage({ params }) {
             <b>View Draft →</b>
           </Link>
         ) : null}
-        <div className={styles.finalScoreCard}>
+        {useSupabase2026 ? <div className={pwaStyles.currentStatus} role="status">
+          <span>In progress</span>
+          <div><strong>2026 tournament record</strong><p>Final results and scorecards appear here as matches become official.</p></div>
+        </div> : <div className={styles.finalScoreCard}>
           <div>
             <span>Champions</span>
             <strong>
@@ -236,7 +250,7 @@ export default async function TournamentYearPage({ params }) {
               {tournament.runnerUpTeam?.name || "To Be Determined"}
             </strong>
           </div>
-        </div>
+        </div>}
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>The Teams</span>

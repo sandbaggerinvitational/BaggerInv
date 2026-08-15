@@ -8,6 +8,7 @@ import TeamLogoPlate from "../../../../TeamLogoPlate";
 import PublicMatchCard from "../../../../PublicMatchCard";
 import {
   formatHandicap,
+  getFormatName,
   getTeamSeason,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
@@ -19,6 +20,9 @@ import {
   loadHistory2026View,
 } from "../../../../../lib/history-2026-service";
 import HistoryUnavailablePage from "../../../HistoryUnavailable";
+import HistoryArchiveNav from "../../../HistoryArchiveNav";
+import HistoricalMatchRow from "../../../HistoricalMatchRow";
+import pwaStyles from "../../../history-participant.module.css";
 
 export async function generateMetadata({ params }) {
   const { year, side } = await params;
@@ -57,9 +61,10 @@ export async function generateMetadata({ params }) {
 export default async function TeamSeasonPage({ params }) {
   const { year, side } = await params;
   const decodedSide = decodeURIComponent(side);
+  const useSupabase2026 = isSupabaseHistory2026(year);
   let team;
 
-  if (isSupabaseHistory2026(year)) {
+  if (useSupabase2026) {
     try {
       team = history2026TeamPageModel(
         await loadHistory2026View({ year: Number(year) }),
@@ -88,12 +93,12 @@ export default async function TeamSeasonPage({ params }) {
   return (
     <main>
       <Header />
-      <ContextBackLink
+      {!useSupabase2026 ? <ContextBackLink
         href={`/history/${team.year}`}
         label={`Back to ${team.year} Tournament`}
-      />
+      /> : null}
 
-      <section className={`${styles.pageHero} ${styles.teamRosterHero}`}>
+      <section className={`${styles.pageHero} ${styles.teamRosterHero} ${useSupabase2026 ? pwaStyles.teamHero : ""}`}>
         <TeamLogoPlate
           filename={team.logo}
           teamName={team.name}
@@ -110,7 +115,9 @@ export default async function TeamSeasonPage({ params }) {
         </div>
       </section>
 
-      <section className={styles.content}>
+      {useSupabase2026 ? <HistoryArchiveNav year={team.year} rounds={team.roundGroups} teams={team.tournament.teams} activeSide={decodedSide} /> : null}
+
+      <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.teamContent : ""}`}>
         <div className={styles.rosterGrid}>
           {team.roster.map(({ player, handicap }) => (
             <Link
@@ -135,7 +142,7 @@ export default async function TeamSeasonPage({ params }) {
             <span className={styles.sectionLabel}>Tournament Matches</span>
             <h2>{team.name} by Round</h2>
             {team.roundGroups.map((group) => (
-              <section className={styles.section} key={group.number}>
+              <section className={`${styles.section} ${useSupabase2026 ? pwaStyles.teamRoundGroup : ""}`} key={group.number}>
                 <span className={styles.sectionLabel}>
                   {group.label} · {group.course?.Course || group.format}
                 </span>
@@ -144,19 +151,9 @@ export default async function TeamSeasonPage({ params }) {
                     ? `${team.name} vs ${group.opponent.name}`
                     : `${group.label} Matchups`}
                 </h3>
-                <div className={styles.roundMatchGrid}>
+                <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.teamMatchList : ""}`}>
                   {group.matches.map((match) => (
-                    <PublicMatchCard
-                      key={match.id}
-                      match={match}
-                      round={{ label: group.label, format: group.format }}
-                      tournament={team.tournament}
-                      variant="historical"
-                      scorecards={filterScorecards(
-                        team.scorecardAnalytics.scorecards,
-                        { matchId: match.id }
-                      )}
-                    />
+                    useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: group.label, format: getFormatName(group.format) }} tournament={team.tournament} scorecards={filterScorecards(team.scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={match} round={{ label: group.label, format: group.format }} tournament={team.tournament} variant="historical" scorecards={filterScorecards(team.scorecardAnalytics.scorecards, { matchId: match.id })} />
                   ))}
                 </div>
               </section>

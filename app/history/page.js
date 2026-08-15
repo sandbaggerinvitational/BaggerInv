@@ -7,6 +7,7 @@ import AssetImage from "../AssetImage";
 import { tournamentHero } from "../../lib/asset-paths";
 import { getTournaments } from "../../lib/stats";
 import styles from "../historical.module.css";
+import pwaStyles from "./history-participant.module.css";
 import { pageMetadata } from "../../lib/seo";
 import {
   history2026TournamentCard,
@@ -55,7 +56,7 @@ export default async function HistoryPage() {
     <main>
       <Header />
 
-      <section className={styles.pageHero}>
+      <section className={`${styles.pageHero} ${pwaStyles.archiveHero}`}>
         <p className={styles.eyebrow}>The Complete Archive</p>
         <h1>Tournament History</h1>
         <p>
@@ -64,11 +65,11 @@ export default async function HistoryPage() {
         </p>
       </section>
 
-      <section className={styles.content} id="champions">
+      <section className={`${styles.content} ${pwaStyles.archiveContent}`} id="champions">
         {currentHistoryUnavailable ? (
           <HistoryUnavailableNotice year="2026" />
         ) : null}
-        <div className={styles.historyCardGrid}>
+        <div className={`${styles.historyCardGrid} ${pwaStyles.yearGrid}`}>
           {tournaments.map((tournament) => (
             <article className={styles.historyPhotoCard} key={tournament.year}>
               <Link
@@ -82,6 +83,10 @@ export default async function HistoryPage() {
                     className={styles.historyPhoto}
                     fallbackClassName={styles.historyPhotoPlaceholder}
                     fallback={tournament.Destination}
+                    width={640}
+                    height={360}
+                    sizes="(max-width: 720px) 112px, (max-width: 1100px) 50vw, 33vw"
+                    decoding="async"
                   />
                   <div className={styles.historyPhotoShade} />
                 </div>
@@ -91,7 +96,7 @@ export default async function HistoryPage() {
                   <h2>{tournament.year}</h2>
                   <p>{tournament.Destination}</p>
                   <strong>
-                    {tournament.championTeam?.name || "Upcoming Invitational"}
+                    {tournament.championTeam?.name || (Number(tournament.year) === 2026 ? "Tournament in progress" : "Upcoming Invitational")}
                   </strong>
                 </div>
               </Link>

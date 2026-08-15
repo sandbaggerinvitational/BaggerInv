@@ -1,0 +1,35 @@
+.archiveHero{padding-block:38px 34px}.archiveContent{padding-top:34px}.yearGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.currentTournamentHero{min-height:330px;padding-block:46px 40px}.currentTournamentHeroContent{display:grid;gap:5px}.currentTournamentHeroContent>p{margin-bottom:2px}.currentTournamentHeroContent>span:last-child{color:#edf3f0}.currentStatus{display:grid;grid-template-columns:auto minmax(0,1fr);gap:15px;align-items:center;padding:20px 22px;border:1px solid #cdb168;border-radius:18px;background:linear-gradient(135deg,#fffaf0,#f3ead4)}.currentStatus>span{display:inline-flex;min-height:27px;align-items:center;padding:5px 9px;border-radius:999px;background:#0b4938;color:#fff;font-size:.61rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase}.currentStatus>div{min-width:0;display:grid;gap:4px}.currentStatus strong{color:#0b3529;font:700 1.35rem/1.1 Georgia,serif}.currentStatus p{margin:0;color:#5d6964;font-size:.82rem;line-height:1.45}.roundHero{min-height:310px;padding-block:40px}.roundHeroContent{grid-template-columns:96px minmax(0,1fr);gap:20px}.roundCourseLogo{width:96px;height:96px;padding:12px;border-radius:18px}.roundHero h1{font-size:clamp(2.4rem,6vw,4.4rem)}.roundHero h2{margin-top:8px}.roundContent{padding-top:22px}.matchList{margin-top:18px;grid-template-columns:1fr;gap:11px}.teamHero{padding-block:34px}.teamContent{padding-top:22px}.teamRoundGroup{margin-top:34px!important;padding-top:18px;border-top:1px solid #ded7ca}.teamRoundGroup:first-of-type{margin-top:22px!important}.teamRoundGroup>h3{margin:7px 0 13px;color:#172019;font:700 1.25rem/1.15 Georgia,serif}.teamMatchList{margin-top:0;grid-template-columns:1fr;gap:11px}
+
+@media(max-width:720px){
+  .archiveHero{padding:28px 20px 26px}
+  .archiveHero h1{font-size:clamp(2.7rem,13vw,4rem);line-height:.92}
+  .archiveHero p:not(:first-child){margin-top:14px;font-size:.92rem;line-height:1.55}
+  .archiveContent{padding:26px 14px calc(88px + var(--safe-bottom))}
+  .yearGrid{grid-template-columns:1fr;gap:11px}
+  .yearGrid article{border-radius:18px}
+  .yearGrid article>a:first-child{display:grid;grid-template-columns:112px minmax(0,1fr);min-height:132px}
+  .yearGrid article>a:first-child>div:first-child{min-height:132px}
+  .yearGrid article>a:first-child>div:last-child{padding:16px}
+  .yearGrid article>a:first-child h2{font-size:1.85rem}
+  .yearGrid article>a:first-child p{margin-bottom:8px;font-size:.82rem}
+  .yearGrid article>a:first-child strong{font-size:.76rem;line-height:1.3}
+  .currentTournamentHero{min-height:236px;padding:26px 18px 24px}
+  .currentTournamentHeroContent{align-content:end}
+  .currentTournamentHeroContent>img{width:64px;height:64px;margin-bottom:5px}
+  .currentTournamentHeroContent h1{font-size:3.55rem;line-height:.84}
+  .currentTournamentHeroContent h2{margin-top:10px;font-size:1.55rem}
+  .currentStatus{grid-template-columns:1fr;gap:9px;padding:17px}
+  .currentStatus>span{width:max-content}
+  .roundHero{min-height:258px;padding:24px 18px}
+  .roundHeroContent{grid-template-columns:72px minmax(0,1fr);gap:14px;align-items:end}
+  .roundCourseLogo{width:72px;height:72px;padding:9px;border-radius:15px}
+  .roundHero h1{font-size:clamp(2rem,8.5vw,2.65rem);line-height:.94}
+  .roundHero h2{font-size:1.05rem}
+  .roundContent{padding:18px 14px calc(88px + var(--safe-bottom))}
+  .matchList{margin-top:14px}
+  .teamHero{padding:26px 18px!important}
+  .teamContent{padding:20px 14px calc(88px + var(--safe-bottom))}
+  .teamRoundGroup{margin-top:30px!important}
+}
+
+@media(max-width:360px){.yearGrid article>a:first-child{grid-template-columns:94px minmax(0,1fr)}.roundHeroContent{grid-template-columns:62px minmax(0,1fr)}.roundCourseLogo{width:62px;height:62px}.roundHero h1{font-size:1.9rem}}

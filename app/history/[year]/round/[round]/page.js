@@ -26,6 +26,9 @@ import {
   loadHistory2026View,
 } from "../../../../../lib/history-2026-service";
 import HistoryUnavailablePage from "../../../HistoryUnavailable";
+import HistoryArchiveNav from "../../../HistoryArchiveNav";
+import HistoricalMatchRow from "../../../HistoricalMatchRow";
+import pwaStyles from "../../../history-participant.module.css";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -115,7 +118,7 @@ export default async function HistoricalRoundPage({ params }) {
     <main>
       <Header />
 
-      <section className={styles.roundArchiveHero}>
+      <section className={`${styles.roundArchiveHero} ${useSupabase2026 ? pwaStyles.roundHero : ""}`}>
         <AssetImage
           src={courseHero(archive.course["Course Profile Image"])}
           alt={`${archive.course.Course} course`}
@@ -123,17 +126,26 @@ export default async function HistoricalRoundPage({ params }) {
           fallbackClassName={styles.roundArchiveHeroFallback}
           fallback={archive.tournament.Destination}
           loading="eager"
+          width={1440}
+          height={720}
+          sizes="100vw"
+          decoding="async"
+          fetchPriority="high"
         />
         <div className={styles.roundArchiveHeroShade} />
 
-        <div className={styles.roundArchiveHeroContent}>
-          <div className={styles.roundArchiveCourseLogo}>
+        <div className={`${styles.roundArchiveHeroContent} ${useSupabase2026 ? pwaStyles.roundHeroContent : ""}`}>
+          <div className={`${styles.roundArchiveCourseLogo} ${useSupabase2026 ? pwaStyles.roundCourseLogo : ""}`}>
             <AssetImage
               src={courseLogo(archive.course["Course Logo"])}
               alt={`${archive.course.Course} logo`}
               className={styles.roundArchiveCourseLogoImage}
               fallbackClassName={styles.roundArchiveCourseLogoFallback}
               fallback="⛳"
+              width={150}
+              height={150}
+              sizes="(max-width: 720px) 72px, 150px"
+              decoding="async"
             />
           </div>
 
@@ -150,8 +162,10 @@ export default async function HistoricalRoundPage({ params }) {
         </div>
       </section>
 
-      <section className={styles.content}>
-        <HistoricalDetailNavigation
+      {useSupabase2026 ? <HistoryArchiveNav year={archive.year} rounds={archive.availableRounds} teams={archive.tournament.teams} activeRound={archive.round} /> : null}
+
+      <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.roundContent : ""}`}>
+        {!useSupabase2026 ? <HistoricalDetailNavigation
           backHref={`/history/${archive.year}`}
           backLabel={`Back to ${archive.year} Tournament`}
           previousHref={
@@ -167,7 +181,7 @@ export default async function HistoricalRoundPage({ params }) {
           }
           nextLabel={archive.nextRound?.label}
           position="top"
-        />
+        /> : null}
 
         <div className={styles.roundArchiveScoreboard}>
           <div className={styles.roundArchiveTeam}>
@@ -201,16 +215,9 @@ export default async function HistoricalRoundPage({ params }) {
             No matchups have been recorded for this round.
           </div>
         ) : (
-          <div className={styles.roundMatchGrid}>
+          <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
-              <PublicMatchCard
-                key={match.id}
-                match={match}
-                round={{ label: `Round ${archive.round}` }}
-                tournament={archive}
-                variant="historical"
-                scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })}
-              />
+              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: getFormatName(archive.format) }} tournament={archive} scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={match} round={{ label: `Round ${archive.round}` }} tournament={archive} variant="historical" scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} />
             ))}
           </div>
         )}
