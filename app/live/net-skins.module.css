@@ -162,10 +162,47 @@
   @keyframes liveUpdate { from { transform: translateY(3px); opacity: .72; } to { transform: translateY(0); opacity: 1; } }
 }
 
-/* Mobile Net Skins rows prioritize golfer identity, skins, and winnings. */
-.skinMetric,.winningsMetric{display:grid;place-items:center;gap:2px;min-width:0;text-align:center;font-variant-numeric:tabular-nums}
-.skinMetric small,.winningsMetric small{display:none;color:#706f68;font-size:.47rem;font-weight:900;letter-spacing:.03em;text-transform:uppercase}
-.skinMetric strong{color:#0b4938;font-size:.72rem}
-.winningsMetric strong{color:#8c6b20;font-size:.72rem}
-@media(max-width:620px){.row[data-header=true]{display:none}.row{grid-template-columns:32px minmax(0,1fr) 88px;grid-template-rows:1fr 1fr;min-height:76px;padding:8px 9px}.row>strong:first-child{grid-column:1;grid-row:1/3;align-self:center}.row>.teamIdentity,.row>:nth-child(2){grid-column:2;grid-row:1/3;align-self:center}.skinMetric{grid-column:3;grid-row:1}.winningsMetric{grid-column:3;grid-row:2}.skinMetric small,.winningsMetric small{display:flex;align-items:center;justify-content:center;gap:4px}.skinMetric strong{font:700 .9rem/1 Georgia,serif}.winningsMetric strong{font-size:.75rem}.skinMetric .skinCoin{width:14px;height:14px;flex-basis:14px;font-size:.38rem}.teamIdentity> b{font-size:.7rem;line-height:1.2}.avatars>span{width:32px;height:32px}}
-@media(max-width:350px){.row{grid-template-columns:28px minmax(0,1fr) 80px;padding-inline:6px}.winningsMetric strong{font-size:.68rem}.teamIdentity{gap:5px}.avatars>span{width:29px;height:29px}}
+/* Native Net Skins ranking rows: rank, identity, then competition outcome. */
+.rankedEntries,.waitingEntries{display:grid}
+.row:not([data-header="true"]){grid-template-columns:48px minmax(0,1fr) minmax(116px,31%);gap:9px;min-height:76px;padding:9px 11px}
+.row[data-header="true"]{grid-template-columns:12% minmax(0,48%) 17% 23%}
+.row:not([data-header="true"])>strong:first-child{color:#967326;font:700 1.02rem/1 Georgia,serif;text-align:center;white-space:nowrap}
+.identityWrap{display:flex;align-items:center;gap:7px;min-width:0}
+.identityWrap>span:first-child{min-width:0}
+.identityWrap strong,.identityWrap b{color:#17362c;font-size:.74rem;line-height:1.2}
+.identityWrap strong{display:block;overflow-wrap:anywhere}
+.identityWrap .teamIdentity>b span{overflow:visible;text-overflow:clip;white-space:normal}
+.currentBadge{flex:0 0 auto;padding:2px 5px;border:1px solid rgba(150,115,38,.28);border-radius:999px;background:#f5eedc;color:#795c18;font-size:.43rem;font-style:normal;font-weight:900;letter-spacing:.07em;line-height:1}
+.outcomes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;min-width:0;font-variant-numeric:tabular-nums}
+.skinMetric,.winningsMetric{display:grid;justify-items:center;gap:3px;min-width:0;text-align:center}
+.skinMetric+.winningsMetric{border-left:1px solid #eee8de}
+.skinMetric strong{color:#0b4938;font:700 1rem/1 Georgia,serif}
+.winningsMetric strong{color:#8c6b20;font-size:.78rem;font-weight:900;white-space:nowrap}
+.skinMetric small,.winningsMetric small{display:flex;align-items:center;justify-content:center;gap:4px;color:#706f68;font-size:.46rem;font-weight:900;letter-spacing:.035em;text-transform:uppercase}
+.skinMetric .skinCoin{width:14px;height:14px;flex-basis:14px;font-size:.38rem}
+.entry[data-ranked="true"][data-leader="true"]{background:linear-gradient(90deg,#fff8e9 0,#fff 56%)}
+.entry[data-ranked="true"][data-leader="true"] .row>strong:first-child{color:#856113}
+.entry[data-current="true"]{position:relative;background:#fff8e9;box-shadow:inset 4px 0 #b98920}
+.entry[data-current="true"]::after{position:absolute;z-index:0;inset:5px;border:1px solid rgba(185,137,32,.22);border-radius:11px;pointer-events:none;content:""}
+.entry[data-current="true"] .row{position:relative;z-index:1}
+.waitingSection{border-top:1px solid #e4ddcf;background:#fbfaf6}
+.noSkinsToggle{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;padding:8px 12px;border:0;background:#f4f0e8;color:#17362c;text-align:left}
+.noSkinsToggle>span{display:grid;gap:2px}
+.noSkinsToggle strong{color:#796022;font-size:.56rem;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+.noSkinsToggle small{color:#6f7974;font-size:.55rem}
+.noSkinsToggle i{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#fff;color:#0b4938;font-size:.9rem;font-style:normal}
+.noSkinsToggle[aria-expanded="true"] i{transform:rotate(180deg)}
+.entry[data-zero="true"] .row{grid-template-columns:12px minmax(0,1fr) auto;gap:7px;min-height:58px;padding-block:7px;background:#fff}
+.entry[data-zero="true"] .outcomes{display:flex;align-items:center;justify-content:flex-end;gap:4px;color:#6f7974}
+.entry[data-zero="true"] .skinMetric,.entry[data-zero="true"] .winningsMetric{display:flex;align-items:baseline;gap:3px;border:0}
+.entry[data-zero="true"] .skinMetric strong,.entry[data-zero="true"] .winningsMetric strong{color:#66716b;font:800 .66rem/1 sans-serif}
+.entry[data-zero="true"] .skinMetric small{font-size:.47rem}
+.entry[data-zero="true"] .skinMetric .skinCoin,.entry[data-zero="true"] .winningsMetric small{display:none}
+.entry[data-zero="true"] .winningsMetric::before{color:#a7aaa7;content:"·"}
+.entry[data-zero="true"] .avatars>span{width:29px;height:29px}
+.entry[data-zero="true"] .identityWrap strong,.entry[data-zero="true"] .identityWrap b{font-size:.67rem}
+.resultBadge{gap:5px}
+.resultBadge i{font-size:.56rem;font-style:normal}
+@media(max-width:620px){.row[data-header="true"]{display:none}.row:not([data-header="true"]){grid-template-columns:38px minmax(0,1fr) 92px;gap:7px;min-height:78px;padding:9px 10px}.outcomes{grid-template-columns:1fr;gap:4px}.skinMetric,.winningsMetric{display:flex;align-items:baseline;justify-content:flex-end;gap:5px}.skinMetric+.winningsMetric{border:0}.skinMetric strong{font-size:1.04rem}.winningsMetric strong{font-size:.78rem}.skinMetric small,.winningsMetric small{font-size:.45rem}.identityWrap .avatars>span{width:34px;height:34px}.entry[data-zero="true"] .row{grid-template-columns:8px minmax(0,1fr) auto;min-height:58px;padding-block:7px}.entry[data-zero="true"] .identityWrap .avatars>span{width:29px;height:29px}}
+@media(max-width:350px){.row:not([data-header="true"]){grid-template-columns:34px minmax(0,1fr) 84px;padding-inline:7px}.identityWrap{gap:5px}.identityWrap strong,.identityWrap b{font-size:.68rem}.skinMetric strong{font-size:.96rem}.winningsMetric strong{font-size:.71rem}.entry[data-zero="true"] .row{grid-template-columns:6px minmax(0,1fr) auto}.entry[data-zero="true"] .identityWrap strong,.entry[data-zero="true"] .identityWrap b{font-size:.64rem}.resultBadge{padding-inline:7px;font-size:.49rem}}
+@media(prefers-reduced-motion:reduce){.noSkinsToggle i{transform:none!important}}

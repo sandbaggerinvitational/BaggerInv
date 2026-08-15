@@ -83,7 +83,7 @@ test("Teams and Net Skins use module-specific native summaries", async () => {
   assert.match(teamCss, /Two-team standings are summaries/);
   assert.match(source, /className=\{skinsStyles\.skinMetric\}/);
   assert.match(source, /className=\{skinsStyles\.winningsMetric\}/);
-  assert.match(skinsCss, /Mobile Net Skins rows prioritize golfer identity, skins, and winnings/);
+  assert.match(skinsCss, /Native Net Skins ranking rows: rank, identity, then competition outcome/);
 });
 
 test("polish is presentation-only and does not add a leaderboard request path", async () => {

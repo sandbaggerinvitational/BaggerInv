@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { calculateNetSkins, netSkinsResultRecords, normalizeNetSkinsEntries } from "../lib/net-skins.js";
+import { netSkinsCountLabel, netSkinsRankAccessibleLabel, netSkinsResultPresentation } from "../lib/net-skins-presentation.js";
 
 const card = (values, match = "1") => values.map((net, index) => ({ hole: index + 1, net, match }));
 
@@ -119,8 +120,8 @@ test("Leaderboards exposes the Scramble Net Skins live experience and lazy team 
   assert.match(source, /isScramble \? "teams" : "golfers"/);
   assert.match(source, /Net Skins Storylines/);
   assert.match(source, /selectedTeam \?/);
-  assert.match(source, /Lost Skin \(Tie\)/);
-  assert.match(source, /data-result=\{resultState\}/);
+  assert.match(source, /netSkinsResultPresentation\(result\)/);
+  assert.match(source, /presentation\.accessibleLabel/);
   assert.match(source, /Current competition summary/);
   assert.match(source, /Hole-by-Hole Net Skins Results/);
   assert.match(source, /Current Winnings/);
@@ -141,18 +142,45 @@ test("Net Skins polish exposes official summary terminology and participant high
   assert.match(source, /row\.playerIds\?\.includes\(currentPlayer\.id\)/);
   assert.match(source, /skinCoin/);
   const netSkinsSource = source.slice(source.indexOf("function NetSkins"), source.indexOf("export default function"));
-  assert.doesNotMatch(netSkinsSource, /<em>YOU<\/em>|💰 Hole/);
+  assert.match(netSkinsSource, /aria-label="Current player">YOU/);
+  assert.match(netSkinsSource, /aria-label="Pairing containing current player">YOU/);
+  assert.doesNotMatch(netSkinsSource, /💰 Hole/);
   assert.match(css, /\.entry\[data-current="true"\]/);
-  assert.match(css, /background:\s*#fffaf0/);
-  assert.match(css, /inset 3px 0 #c49b34/);
+  assert.match(css, /background:#fff8e9/);
+  assert.match(css, /inset 4px 0 #b98920/);
   assert.match(source, /No Skins Yet/);
   assert.match(source, /waitingField[\s\S]*localeCompare/);
   assert.match(source, /skinHolders\.map\(\(row\) => renderEntry\(row, true\)\)/);
-  assert.match(source, /ranked \? rankLabel\(row\) : ""/);
-  assert.match(css, /\.noSkinsDivider/);
+  assert.match(source, /const displayRank = ranked \? rankLabel\(row\) : ""/);
+  assert.match(source, /aria-expanded=\{waitingExpanded\}/);
+  assert.match(css, /\.noSkinsToggle/);
   assert.match(css, /\.sheetMetrics\[data-winning="true"\]/);
   assert.match(css, /\.resultBadge\[data-result="won"\]/);
   assert.match(css, /\.holeResults article\[data-result="won"\]/);
+});
+
+test("participant Net Skins labels distinguish a tied low from an ordinary non-winning hole", () => {
+  assert.deepEqual(netSkinsResultPresentation({ wonSkin: true, tiedLow: false }), { state: "won", label: "Won Skin", accessibleLabel: "Won skin" });
+  assert.deepEqual(netSkinsResultPresentation({ wonSkin: false, tiedLow: true }), { state: "tie", label: "Tied — No Skin", accessibleLabel: "Tied. No skin awarded" });
+  assert.deepEqual(netSkinsResultPresentation({ wonSkin: false, tiedLow: false }), { state: "none", label: "No Skin", accessibleLabel: "No skin" });
+  assert.equal(netSkinsCountLabel(1), "1 skin");
+  assert.equal(netSkinsCountLabel(3), "3 skins");
+  assert.equal(netSkinsRankAccessibleLabel("T-1"), "tied for 1st");
+  assert.equal(netSkinsRankAccessibleLabel("T-2"), "tied for 2nd");
+});
+
+test("the tied-low engine state remains no-award and no-carryover while only participant copy changes", () => {
+  const entries = ["p1", "p2", "p3"].map((id) => ({ Year: 2026, Round: 1, Format: "BB", Match: 1, "Player ID 1": id, Eligible: true }));
+  const round = calculateNetSkins({ entries, activeYear: 2026, scoreRows: [
+    { id: "p1", round: 1, entityType: "PLAYER", name: "Clay", scorecard: card([3, 3]) },
+    { id: "p2", round: 1, entityType: "PLAYER", name: "Miles", scorecard: card([3, 4]) },
+    { id: "p3", round: 1, entityType: "PLAYER", name: "Taylor", scorecard: card([4, 5]) },
+  ] }).rounds[0];
+  assert.equal(round.skinsAwarded, 1);
+  assert.deepEqual(round.skins.map(({ hole, winner }) => [hole, winner]), [[2, "Clay"]]);
+  const clayHole1 = round.leaderboard.find((row) => row.playerIds.includes("p1")).holeResults[0];
+  assert.deepEqual({ wonSkin: clayHole1.wonSkin, tiedLow: clayHole1.tiedLow }, { wonSkin: false, tiedLow: true });
+  assert.equal(netSkinsResultPresentation(clayHole1).label, "Tied — No Skin");
 });
 
 test("Home Net Skins summary is participant-only and links to official standings", async () => {
