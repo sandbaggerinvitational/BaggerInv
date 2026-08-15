@@ -129,7 +129,7 @@ function TrophyIcon() {
   </svg>;
 }
 
-export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [] }) {
+export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], historyDensity = false }) {
   const winningSide = winnerSide(match);
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
   const overallWinner = match.overallWinner || match.matchupWinner;
@@ -176,7 +176,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     </div> : null}
     {variant === "historical" ? (
       <>
-        <ScorecardTable scorecards={scorecards} compact />
+        <ScorecardTable scorecards={scorecards} compact historyDensity={historyDensity} />
         <MatchProgressionSummary scorecards={scorecards} />
       </>
     ) : null}

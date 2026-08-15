@@ -195,7 +195,7 @@ export default async function HistoricalRoundPage({ params }) {
           </div>
 
           <div className={`${styles.roundArchiveWinner} ${useSupabase2026 ? pwaStyles.roundScoreWinner : ""}`}>
-            <span>Round Winner</span>
+            <span>{archive.roundWinner === "In Progress" ? "Round Status" : "Round Winner"}</span>
             <strong>{archive.roundWinner}</strong>
           </div>
 
@@ -217,15 +217,15 @@ export default async function HistoricalRoundPage({ params }) {
         ) : (
           <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
-              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: getFormatName(archive.format) }} tournament={archive} scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={match} round={{ label: `Round ${archive.round}` }} tournament={archive} variant="historical" scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} />
+              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: getFormatName(archive.format) }} tournament={archive} scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={match} round={{ label: `Round ${archive.round}` }} tournament={archive} variant="historical" scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} historyDensity />
             ))}
           </div>
         )}
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Available Scorecard History</span>
-          <h2>Round Statistics</h2>
-          <ScoringStatGrid items={[
+          <h2>{roundScorecards.length ? "Round Statistics" : "Historical Scorecards"}</h2>
+          {roundScorecards.length ? <ScoringStatGrid items={[
             {
               label: "Lowest Round",
               value: formatScoringNumber(roundStatistics.lowestRound.value),
@@ -285,7 +285,7 @@ export default async function HistoricalRoundPage({ params }) {
               detail: "Available scorecards",
               sample: roundStatistics.scorecardCoverage.label,
             },
-          ]} />
+          ]} /> : <p className={pwaStyles.scorecardAvailability}>Detailed historical scorecards are not available for this round.</p>}
         </section>
 
         <HistoricalDetailNavigation

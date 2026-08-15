@@ -34,7 +34,7 @@ test("every submitted historical hero maps to a real public asset", async () => 
     assert.ok(path, `${tournament.Year} should map a History hero`);
     await access(new URL(`../public${path}`, import.meta.url));
   }
-  assert.equal(historyHeroPath({ year: 2026, "Hero Image": "ocean-course-profile.webp" }), "/images/defaults/tournament-hero.webp");
+  assert.equal(historyHeroPath({ year: 2026, "Hero Image": "ocean-course-profile.webp" }), "/images/tournaments/hero/ocean-course.webp");
 });
 
 test("2026 remains in progress until all canonical matches are FINAL", () => {
@@ -109,6 +109,6 @@ test("History landing isolates image fallback and does not change its approved h
   assert.match(page, /historyEditionLabel/);
   assert.match(page, /historyTournamentCardResult/);
   assert.match(css, /archiveHero\.archiveHero\{padding:28px 20px 26px\}/);
-  assert.match(css, /currentTournamentHero\.currentTournamentHero>img:first-child\{opacity:0\}/);
+  assert.match(css, /currentTournamentHero\.currentTournamentHero>img:first-child\{opacity:1\}/);
   assert.doesNotMatch(page, /onError=.*throw|throw new Error/);
 });

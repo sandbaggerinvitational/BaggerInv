@@ -58,7 +58,9 @@ test("public scorecards are collapsed, mapped, responsive, and silent when missi
   assert.match(component, /strokeDots/);
   assert.match(component, /Hole Winner/);
   assert.match(component, /matchNetScoring/);
-  assert.match(component, /Gross and net scoring available/);
+  assert.match(component, /Gross & Net/);
+  assert.match(component, /How to read this scorecard/);
+  assert.match(component, /historyDensity/);
   assert.match(css, /overflow-x:auto/);
   assert.match(css, /position:sticky/);
   assert.match(css, /\.netRow/);

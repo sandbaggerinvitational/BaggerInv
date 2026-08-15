@@ -48,7 +48,8 @@ test("2026 History uses route-backed archive navigation and keeps older-year pre
   assert.match(year, /2026 tournament record/);
   assert.doesNotMatch(year, /Final Recap/);
   assert.match(round, /useSupabase2026[\s\S]*HistoricalMatchRow[\s\S]*PublicMatchCard/);
-  assert.match(team, /useSupabase2026[\s\S]*HistoricalMatchRow[\s\S]*PublicMatchCard/);
+  assert.match(team, /useSupabase2026[\s\S]*teamRoundSummary[\s\S]*View Round/);
+  assert.doesNotMatch(team, /HistoricalMatchRow/);
 });
 
 test("Historical mobile rows expose official scorecards only for finalized matches", async () => {

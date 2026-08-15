@@ -6,6 +6,7 @@ import { formatOfficialMatchResult } from "../../lib/match-result";
 import { matchState } from "../../lib/live-match-ux";
 import { formatTeamPoints } from "../../lib/formatters";
 import styles from "./historical-match-row.module.css";
+import density from "./history-density.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 
@@ -51,29 +52,29 @@ export default function HistoricalMatchRow({ match, round, tournament, scorecard
   const ghost = String(match.status || "").trim().toUpperCase() === "GHOST MATCH";
 
   return <article className={styles.row} data-state={state} aria-label={`Match ${match.match}. ${result}.`}>
-    <header className={styles.header}>
+    <header className={`${styles.header} ${density.matchHeader}`}>
       <div><span>Match {match.match}</span><strong>{match.formatName || round?.format || "Match"}</strong></div>
       <StatusBadge status={state} />
     </header>
 
-    <div className={styles.matchup}>
+    <div className={`${styles.matchup} ${density.matchup}`}>
       <Side team={tournament.teamOne} players={match.team1Players} />
       <b aria-label="versus">VS</b>
       <Side team={tournament.teamTwo} players={match.team2Players} />
     </div>
 
-    <div className={styles.result}>
+    <div className={`${styles.result} ${density.result}`}>
       <div><span>{state === "final" ? "Official result" : state === "live" ? "Current match" : "Match status"}</span><strong>{result}</strong></div>
       {(hasValue(match.team1Points) || hasValue(match.team2Points)) ? <small>{tournament.teamOne.name} {formatTeamPoints(match.team1Points)} · {tournament.teamTwo.name} {formatTeamPoints(match.team2Points)}</small> : null}
     </div>
 
     {ghost ? <p className={styles.notice}><strong>Ghost match.</strong> Selected player results are excluded from official records.</p> : null}
 
-    {state === "final" ? <ScorecardTable scorecards={scorecards} compact showSummary /> : null}
+    {state === "final" ? <ScorecardTable scorecards={scorecards} compact historyDensity showSummary /> : null}
 
     {state === "final" && segments.length ? <details className={styles.story}>
-      <summary>Match story <span aria-hidden="true">⌄</span></summary>
-      <div className={styles.storyBody}>
+      <summary className={density.storySummary}>Match story <span aria-hidden="true">⌄</span></summary>
+      <div className={`${styles.storyBody} ${density.storyBody}`}>
         <div className={styles.segments}>{segments.map(([label, value]) => <div key={label}><span>{label}</span><strong>{teamValue(value, tournament)}</strong></div>)}</div>
         <MatchProgressionSummary scorecards={scorecards} />
       </div>

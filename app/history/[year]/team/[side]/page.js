@@ -11,9 +11,9 @@ import {
   getFormatName,
   getTeamSeason,
 } from "../../../../../lib/stats";
+import { formatTeamPoints } from "../../../../../lib/formatters";
 import styles from "../../../../historical.module.css";
 import { pageMetadata } from "../../../../../lib/seo";
-import { filterScorecards } from "../../../../../lib/scorecard-analytics";
 import {
   history2026TeamPageModel,
   isSupabaseHistory2026,
@@ -21,8 +21,13 @@ import {
 } from "../../../../../lib/history-2026-service";
 import HistoryUnavailablePage from "../../../HistoryUnavailable";
 import HistoryArchiveNav from "../../../HistoryArchiveNav";
-import HistoricalMatchRow from "../../../HistoricalMatchRow";
 import pwaStyles from "../../../history-participant.module.css";
+
+function roundStatusLabel(value) {
+  if (value === "FINAL") return "Final";
+  if (value === "IN PROGRESS" || value === "LIVE") return "In progress";
+  return "Upcoming";
+}
 
 export async function generateMetadata({ params }) {
   const { year, side } = await params;
@@ -32,7 +37,10 @@ export async function generateMetadata({ params }) {
   if (isSupabaseHistory2026(year)) {
     try {
       team = history2026TeamPageModel(
-        await loadHistory2026View({ year: Number(year) }),
+        await loadHistory2026View({
+          year: Number(year),
+          includeTournamentPlayerMetadata: true,
+        }),
         decodedSide
       );
       if (team && !Array.isArray(team.roster)) {
@@ -74,8 +82,7 @@ export default async function TeamSeasonPage({ params }) {
         team && (
           !Array.isArray(team.roster) ||
           !Array.isArray(team.roundGroups) ||
-          !team.tournament ||
-          !team.scorecardAnalytics
+          !team.tournament
         )
       ) {
         throw new Error("The 2026 historical team match view is incomplete.");
@@ -118,6 +125,35 @@ export default async function TeamSeasonPage({ params }) {
       {useSupabase2026 ? <HistoryArchiveNav year={team.year} rounds={team.roundGroups} teams={team.tournament.teams} activeSide={decodedSide} /> : null}
 
       <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.teamContent : ""}`}>
+        {useSupabase2026 && team.roundGroups?.length ? (
+          <section className={pwaStyles.teamRounds} aria-labelledby="team-round-results-heading">
+            <span className={styles.sectionLabel}>Round Results</span>
+            <h2 id="team-round-results-heading">Tournament Performance</h2>
+            <div className={pwaStyles.teamRoundList}>
+              {team.roundGroups.map((group) => (
+                <Link
+                  aria-label={`${group.label}, ${getFormatName(group.format)}, ${group.course?.Course || "course not recorded"}, ${roundStatusLabel(group.lifecycle)}. View round results.`}
+                  className={pwaStyles.teamRoundSummary}
+                  href={`/history/${team.year}/round/${group.number}`}
+                  key={group.number}
+                >
+                  <span>
+                    <b>{group.label} · {getFormatName(group.format)}</b>
+                    <strong>{group.course?.Course || "Course not recorded"}</strong>
+                    <small>{team.name} {formatTeamPoints(group.selectedTeamPoints)} · {group.opponent?.name || "Opponent"} {formatTeamPoints(group.opponentTeamPoints)}</small>
+                  </span>
+                  <span className={pwaStyles.teamRoundAction} data-state={group.lifecycle}>
+                    <i>{roundStatusLabel(group.lifecycle)}</i>
+                    <b>View Round →</b>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <section className={useSupabase2026 ? pwaStyles.teamRoster : ""} aria-labelledby="team-roster-heading">
+        {useSupabase2026 ? <><span className={styles.sectionLabel}>2026 Roster</span><h2 id="team-roster-heading">Tournament Handicaps</h2></> : null}
         <div className={styles.rosterGrid}>
           {team.roster.map(({ player, handicap }) => (
             <Link
@@ -136,8 +172,9 @@ export default async function TeamSeasonPage({ params }) {
             </Link>
           ))}
         </div>
+        </section>
 
-        {team.roundGroups?.length ? (
+        {!useSupabase2026 && team.roundGroups?.length ? (
           <section className={styles.section}>
             <span className={styles.sectionLabel}>Tournament Matches</span>
             <h2>{team.name} by Round</h2>
@@ -153,7 +190,7 @@ export default async function TeamSeasonPage({ params }) {
                 </h3>
                 <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.teamMatchList : ""}`}>
                   {group.matches.map((match) => (
-                    useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: group.label, format: getFormatName(group.format) }} tournament={team.tournament} scorecards={filterScorecards(team.scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={match} round={{ label: group.label, format: group.format }} tournament={team.tournament} variant="historical" scorecards={filterScorecards(team.scorecardAnalytics.scorecards, { matchId: match.id })} />
+                    <PublicMatchCard key={match.id} match={match} round={{ label: group.label, format: group.format }} tournament={team.tournament} variant="historical" />
                   ))}
                 </div>
               </section>

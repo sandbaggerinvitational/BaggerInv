@@ -51,7 +51,7 @@
    History stylesheet regardless of CSS chunk evaluation order. */
 .archiveHero.archiveHero{padding-block:38px 34px}
 .currentTournamentHero.currentTournamentHero{min-height:330px;padding-block:46px 40px}
-.currentTournamentHero.currentTournamentHero>img:first-child{opacity:0}
+.currentTournamentHero.currentTournamentHero>img:first-child{opacity:1}
 .roundHero.roundHero{min-height:310px;padding-block:40px}
 .roundHeroContent.roundHeroContent{grid-template-columns:96px minmax(0,1fr);gap:20px}
 .roundCourseLogo.roundCourseLogo{width:96px;height:96px;padding:12px;border-radius:18px}
@@ -93,3 +93,9 @@
   .roundScoreTeam.roundScoreTeam>strong{grid-column:1;font-size:.82rem;line-height:1.15}
   .roundScoreTeam.roundScoreTeam>b{grid-column:1;grid-row:2;margin-top:4px}
 }
+
+.teamRounds,.teamRoster{margin:0}.teamRounds>h2,.teamRoster>h2{margin:7px 0 14px;color:#172019;font:700 clamp(1.55rem,4vw,2rem)/1.08 Georgia,"Times New Roman",serif}.teamRoster{margin-top:34px}.teamRoundList{overflow:hidden;border:1px solid #ded7ca;border-radius:18px;background:#fff}.teamRoundSummary{min-height:88px;padding:13px 15px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}.teamRoundSummary+.teamRoundSummary{border-top:1px solid #e7e1d7}.teamRoundSummary>span:first-child{min-width:0;display:grid;gap:3px}.teamRoundSummary>span:first-child>b{color:#806424;font-size:.66rem;letter-spacing:.07em;text-transform:uppercase}.teamRoundSummary>span:first-child>strong{overflow-wrap:anywhere;color:#172019;font-size:.98rem;line-height:1.2}.teamRoundSummary>span:first-child>small{color:#68726d;font-size:.72rem;line-height:1.35}.teamRoundAction{display:grid;justify-items:end;gap:8px;text-align:right}.teamRoundAction i{padding:4px 7px;border-radius:999px;background:#edf4f0;color:#0b4938;font-size:.56rem;font-style:normal;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.teamRoundAction[data-state="IN PROGRESS"] i{background:#f3e8c9;color:#765b18}.teamRoundAction b{color:#0b4938;font-size:.72rem;white-space:nowrap}.scorecardAvailability{margin:0;padding:17px 18px;border:1px solid #ded7ca;border-radius:16px;background:#fffdf8;color:#5f6c66;font-size:.9rem;line-height:1.5}
+
+@media(max-width:720px){.teamRoster{margin-top:30px}.teamRoundSummary{min-height:84px;padding:12px 13px;gap:10px}.teamRoundSummary>span:first-child>small{font-size:.68rem}}
+
+@media(max-width:360px){.teamRoundSummary{grid-template-columns:1fr}.teamRoundAction{min-height:44px;grid-template-columns:auto 1fr;align-items:center;justify-items:start;text-align:left}.teamRoundAction b{justify-self:end}}

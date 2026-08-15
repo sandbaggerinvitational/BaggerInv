@@ -255,18 +255,20 @@ test("Best Ball, Singles, and Scramble use stable canonical logical identities",
   assert.equal(new Set(scramble.map((scorecard) => `${scorecard.matchId}:TEAM:${scorecard.teamId}`)).size, 2);
 });
 
-test("2026 team history groups canonical matches by round and reuses embedded scorecards", () => {
+test("2026 team history summarizes canonical rounds without duplicating match scorecards", () => {
   const view = buildHistory2026Adapter(makeHistory2026Aggregate(), { guideProjection: makeGuideProjection() });
   const pickles = history2026TeamPageModel(view, "PICKLES");
   assert.equal(pickles.id, "PICKLES");
   assert.equal(pickles.roundGroups.length, 3);
-  assert.equal(pickles.roundGroups.reduce((count, group) => count + group.matches.length, 0), 24);
+  assert.equal(pickles.roundGroups.reduce((count, group) => count + group.matchCount, 0), 24);
   assert.equal(pickles.roundGroups[0].opponent.id, "LIPPIT");
-  assert.equal(pickles.scorecardAnalytics.scorecards.length, 46);
-  const scramble = pickles.roundGroups.flatMap((group) => group.matches)
-    .find((match) => match.id === "2026-R2-1");
-  assert.equal(scramble.format, "SC");
-  assert.equal(scorecardsFor(view, scramble.id).length, 2);
+  assert.equal(pickles.roundGroups[0].format, "BB");
+  assert.equal(pickles.roundGroups[1].format, "SC");
+  assert.equal(pickles.roundGroups[2].format, "SI");
+  assert.equal(pickles.roundGroups[2].lifecycle, "IN PROGRESS");
+  assert.ok(pickles.roundGroups.every((group) => !("matches" in group)));
+  assert.ok(!("scorecardAnalytics" in pickles));
+  assert.ok(pickles.roster.every((row) => Number.isFinite(row.handicap)));
 });
 
 test("2026-R3-4 Singles preserves official identities and all authoritative gross values", () => {

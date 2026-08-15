@@ -39,6 +39,7 @@ import HistoryArchiveNav from "../HistoryArchiveNav";
 import pwaStyles from "../history-participant.module.css";
 import {
   historyHeroPath,
+  historyCourseDisplayName,
   historyStandingsSummary,
   historyTournamentComplete,
 } from "../../../lib/history-presentation";
@@ -107,7 +108,7 @@ function rankAccessibleLabel(rank) {
     : `Rank ${value}`;
 }
 
-function scoringItems(scoringStatistics, participant) {
+function scoringItems(scoringStatistics, participant, courses) {
   return [
     { label: "Best Individual Round", value: formatScoringNumber(scoringStatistics.lowestRound.value), detail: participant(scoringStatistics.lowestRound), sample: scoringStatistics.lowestRound.label },
     { label: "Best Team Round", value: formatScoringNumber(scoringStatistics.lowestTeamRound.value), detail: participant(scoringStatistics.lowestTeamRound), sample: scoringStatistics.lowestTeamRound.label },
@@ -115,15 +116,15 @@ function scoringItems(scoringStatistics, participant) {
     { label: "Lowest Front", value: formatScoringNumber(scoringStatistics.lowestFrontNine.value), detail: participant(scoringStatistics.lowestFrontNine), sample: scoringStatistics.lowestFrontNine.label },
     { label: "Lowest Back", value: formatScoringNumber(scoringStatistics.lowestBackNine.value), detail: participant(scoringStatistics.lowestBackNine), sample: scoringStatistics.lowestBackNine.label },
     { label: "Birdie Leader", value: formatScoringNumber(scoringStatistics.birdieLeader.value), detail: participant(scoringStatistics.birdieLeader), sample: scoringStatistics.birdieLeader.label },
-    { label: "Hardest Hole", value: scoringStatistics.hardestHole ? `#${scoringStatistics.hardestHole.holeNumber}` : "—", detail: scoringStatistics.hardestHole?.courseId, sample: scoringStatistics.hardestHole?.averageToPar.label },
-    { label: "Easiest Hole", value: scoringStatistics.easiestHole ? `#${scoringStatistics.easiestHole.holeNumber}` : "—", detail: scoringStatistics.easiestHole?.courseId, sample: scoringStatistics.easiestHole?.averageToPar.label },
+    { label: "Hardest Hole", value: scoringStatistics.hardestHole ? `#${scoringStatistics.hardestHole.holeNumber}` : "—", detail: scoringStatistics.hardestHole ? historyCourseDisplayName(scoringStatistics.hardestHole.courseId, courses, scoringStatistics.hardestHole.courseName) : "", sample: scoringStatistics.hardestHole?.averageToPar.label },
+    { label: "Easiest Hole", value: scoringStatistics.easiestHole ? `#${scoringStatistics.easiestHole.holeNumber}` : "—", detail: scoringStatistics.easiestHole ? historyCourseDisplayName(scoringStatistics.easiestHole.courseId, courses, scoringStatistics.easiestHole.courseName) : "", sample: scoringStatistics.easiestHole?.averageToPar.label },
     { label: "Scorecard Coverage", value: `${scoringStatistics.scorecardCoverage.available} of ${scoringStatistics.scorecardCoverage.expected}`, detail: "Available scorecards", sample: scoringStatistics.scorecardCoverage.label },
   ];
 }
 
 function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTracked, scoringStatistics, participant }) {
   const standings = historyStandingsSummary(leaderboard, 5);
-  const allStatistics = scoringItems(scoringStatistics, participant);
+  const allStatistics = scoringItems(scoringStatistics, participant, tournament.courses);
   const primaryLabels = new Set(["Best Individual Round", "Best Team Round", "Average Score", "Birdie Leader", "Scorecard Coverage"]);
   const primaryStatistics = allStatistics.filter((item) => primaryLabels.has(item.label));
   const secondaryStatistics = allStatistics.filter((item) => !primaryLabels.has(item.label));
@@ -473,8 +474,8 @@ export default async function TournamentYearPage({ params }) {
 
         <section className={styles.section}>
           <span className={styles.sectionLabel}>Available Scorecard History</span>
-          <h2>Tournament Scoring Statistics</h2>
-          <ScoringStatGrid items={[
+          <h2>{tournamentScorecards.length ? "Tournament Scoring Statistics" : "Historical Scorecards"}</h2>
+          {tournamentScorecards.length ? <ScoringStatGrid items={[
             {
               label: "Best Individual Round",
               value: formatScoringNumber(scoringStatistics.lowestRound.value),
@@ -513,13 +514,13 @@ export default async function TournamentYearPage({ params }) {
             {
               label: "Hardest Hole",
               value: scoringStatistics.hardestHole ? `#${scoringStatistics.hardestHole.holeNumber}` : "—",
-              detail: scoringStatistics.hardestHole?.courseId,
+              detail: scoringStatistics.hardestHole ? historyCourseDisplayName(scoringStatistics.hardestHole.courseId, tournament.courses, scoringStatistics.hardestHole.courseName) : "",
               sample: scoringStatistics.hardestHole?.averageToPar.label,
             },
             {
               label: "Easiest Hole",
               value: scoringStatistics.easiestHole ? `#${scoringStatistics.easiestHole.holeNumber}` : "—",
-              detail: scoringStatistics.easiestHole?.courseId,
+              detail: scoringStatistics.easiestHole ? historyCourseDisplayName(scoringStatistics.easiestHole.courseId, tournament.courses, scoringStatistics.easiestHole.courseName) : "",
               sample: scoringStatistics.easiestHole?.averageToPar.label,
             },
             {
@@ -528,7 +529,7 @@ export default async function TournamentYearPage({ params }) {
               detail: "Available scorecards",
               sample: scoringStatistics.scorecardCoverage.label,
             },
-          ]} />
+          ]} /> : <p className={pwaStyles.scorecardAvailability}>Detailed historical scorecards are not available for this tournament.</p>}
         </section>
 
         <section className={styles.section}>

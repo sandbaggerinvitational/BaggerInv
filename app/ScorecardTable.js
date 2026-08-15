@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import styles from "./scorecard.module.css";
 import summaryStyles from "./scorecard-summary.module.css";
+import density from "./history/history-density.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const toPar = (value) => {
@@ -198,7 +199,7 @@ function ScoreGrid({ scorecards, segment = "full" }) {
 function ScorecardSummary({ scorecards }) {
   return <div className={summaryStyles.summary} aria-label="Scorecard totals">
     {scorecards.map((scorecard) => (
-      <div className={summaryStyles.row} key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
+      <div className={`${summaryStyles.row} ${density.summaryRow}`} key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
         <span><Participant scorecard={scorecard} /></span>
         <dl>
           <div><dt>Gross</dt><dd>{scorecard.total ?? "—"}</dd></div>
@@ -214,6 +215,7 @@ export default function ScorecardTable({
   scorecards = [],
   title = "Hole-by-Hole Scorecard",
   compact = false,
+  historyDensity = false,
   showSummary = false,
 }) {
   const accordionId = useId();
@@ -242,7 +244,7 @@ export default function ScorecardTable({
       <button
         aria-controls={accordionId}
         aria-expanded={open}
-        className={styles.toggle}
+        className={`${styles.toggle} ${historyDensity ? density.scorecardToggle : ""}`}
         onClick={() => setOpen((current) => !current)}
         type="button"
       >
@@ -251,7 +253,9 @@ export default function ScorecardTable({
           {courseTee ? <small>{courseTee}</small> : null}
           <b>
             {partial ? "Partial Scorecard · " : ""}{recordedHoles} holes recorded
-            {" · "}{netAvailable ? "Gross and net scoring available" : "Gross scoring available"}
+            {" · "}{historyDensity
+              ? (netAvailable ? "Gross & Net" : "Gross only")
+              : (netAvailable ? "Gross and net scoring available" : "Gross scoring available")}
           </b>
         </span>
         <i aria-hidden="true">⌄</i>
@@ -277,7 +281,7 @@ export default function ScorecardTable({
             <ScoreGrid scorecards={available} />
           </div>
 
-          <div className={styles.mobileGrid}>
+          <div className={`${styles.mobileGrid} ${historyDensity ? density.mobileGrid : ""}`}>
             {hasFront ? <section>
               <header><strong>Front 9</strong><span>Holes 1–9</span></header>
               <ScoreGrid scorecards={available} segment="front" />
@@ -288,9 +292,14 @@ export default function ScorecardTable({
             </section> : null}
           </div>
 
-          <p className={styles.legend}>
+          {historyDensity ? <details className={density.legendDetails}>
+            <summary>How to read this scorecard</summary>
+            <p className={density.legend}>
+              Large number: gross score · Small number: gross score to par · Gold dot: handicap stroke · Net row: score after handicap strokes
+            </p>
+          </details> : <p className={styles.legend}>
             Large number: gross score · Small number: gross score to par · Gold dot: handicap stroke · Net row: score after handicap strokes
-          </p>
+          </p>}
         </div>
       </div>
     </section>

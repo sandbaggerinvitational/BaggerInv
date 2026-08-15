@@ -268,6 +268,7 @@ export function makeHistory2026Aggregate() {
           player_id: participant.player_id,
           display_name: participant.display_name,
           slug: participant.slug,
+          tournament_handicap: participant.handicap_index,
         });
       }
     }
