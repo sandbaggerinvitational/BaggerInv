@@ -72,3 +72,10 @@
   .roundScoreTeam.roundScoreTeam>b{font-size:1.4rem}
   .roundScoreWinner.roundScoreWinner{min-width:64px}
 }
+
+@media(max-width:720px){
+  .roundScoreTeam.roundScoreTeam{grid-template-columns:minmax(0,1fr);align-content:center}
+  .roundScoreTeam.roundScoreTeam>div:first-child{display:none}
+  .roundScoreTeam.roundScoreTeam>strong{grid-column:1;font-size:.82rem;line-height:1.15}
+  .roundScoreTeam.roundScoreTeam>b{grid-column:1;grid-row:2;margin-top:4px}
+}
