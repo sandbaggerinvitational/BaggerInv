@@ -30,8 +30,8 @@ test("Tournament canonically owns the existing lazy Calcutta experience", async 
     source("app/live/page.js"), source("app/live/TournamentSupabaseRead.js"),
     source("app/live/TournamentDashboard.js"), source("app/live/LeaderboardsDashboard.js"),
   ]);
-  assert.match(page, /view === "leaderboards" && leaderboardModule === "calcutta"\) redirect\("\/live\?view=calcutta"\)/);
-  assert.ok(page.indexOf("leaderboardModule === \"calcutta\"") < page.indexOf("requireTournamentReadSource()"));
+  assert.match(page, /view === "leaderboards" && \(isLegacyCalcuttaModule\(leaderboardTab\) \|\| isLegacyCalcuttaModule\(leaderboardModule\)\)\) redirect\("\/live\?view=calcutta"\)/);
+  assert.ok(page.indexOf("isLegacyCalcuttaModule(leaderboardTab)") < page.indexOf("requireTournamentReadSource()"));
   assert.match(page, /\(!view \|\| view === "calcutta"\)/);
   assert.match(page, /<TournamentSupabaseRead initialView=\{view\}/);
   assert.match(wrapper, /<TournamentDashboard[\s\S]*initialView=\{initialView\}/);
@@ -45,11 +45,11 @@ test("Leaderboards owns exactly Players, Teams, Net Skins, and Insights", async 
   const [dashboard, wrapper, page] = await Promise.all([
     source("app/live/LeaderboardsDashboard.js"), source("app/live/LeaderboardsSupabaseRead.js"), source("app/live/page.js"),
   ]);
-  assert.match(dashboard, /\[\["players", "Players"\], \["teams", "Teams"\], \["skins", "Net Skins"\], \["insights", "Insights"\]\]/);
+  assert.match(dashboard, /LEADERBOARD_MODULES\.map/);
   assert.match(dashboard, /tab === "skins"/);
   assert.match(dashboard, /tab === "insights"/);
   assert.doesNotMatch(wrapper, /calcuttaReadUrl|leaderboards\/calcutta/);
-  assert.match(page, /leaderboardModule === "net-skins"\) redirect\("\/live\?view=leaderboards&tab=skins"\)/);
+  assert.match(page, /requestedLeaderboardModule === "net-skins"\) redirect\("\/live\?view=leaderboards&tab=skins"\)/);
 });
 
 test("Hub is tournament-focused, capability-safe, and free of participant refresh/settings rows", async () => {

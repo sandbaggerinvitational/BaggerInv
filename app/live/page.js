@@ -12,6 +12,7 @@ import { requireTournamentReadSource } from "../../lib/tournament-read-source";
 import { requireLeaderboardsCoreReadSource } from "../../lib/leaderboards-core-read-source";
 import { netSkinsReadEnvironment } from "../../lib/net-skins-read-source";
 import { redirect } from "next/navigation";
+import { isLegacyCalcuttaModule } from "../../lib/leaderboards-navigation";
 
 export const metadata = pageMetadata({
   title: "Match Center | Sandbagger Invitational",
@@ -22,9 +23,11 @@ export const metadata = pageMetadata({
 export default async function LivePage({ searchParams }) {
   const query = await searchParams;
   const view = String(query?.view || "").trim();
-  const leaderboardModule = String(query?.tab || query?.module || "").trim();
-  if (view === "leaderboards" && leaderboardModule === "calcutta") redirect("/live?view=calcutta");
-  if (view === "leaderboards" && leaderboardModule === "net-skins") redirect("/live?view=leaderboards&tab=skins");
+  const leaderboardTab = String(query?.tab || "").trim();
+  const leaderboardModule = String(query?.module || "").trim();
+  if (view === "leaderboards" && (isLegacyCalcuttaModule(leaderboardTab) || isLegacyCalcuttaModule(leaderboardModule))) redirect("/live?view=calcutta");
+  const requestedLeaderboardModule = leaderboardTab || leaderboardModule;
+  if (view === "leaderboards" && requestedLeaderboardModule === "net-skins") redirect("/live?view=leaderboards&tab=skins");
   const source = requireTournamentReadSource();
   const leaderboardsSource = requireLeaderboardsCoreReadSource();
   const netSkinsSource = netSkinsReadEnvironment();

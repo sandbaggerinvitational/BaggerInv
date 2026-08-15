@@ -14,7 +14,7 @@ export default function PwaFoundation() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").then((registration) => {
+      navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((registration) => {
         if (registration.waiting && navigator.serviceWorker.controller) setUpdateReady(true);
         registration.addEventListener("updatefound", () => {
           const worker = registration.installing;
@@ -24,6 +24,7 @@ export default function PwaFoundation() {
             }
           });
         });
+        registration.update().catch(() => {});
       }).catch(() => {});
     }
     const syncOnlineState = () => setOnline(navigator.onLine);

@@ -107,7 +107,7 @@ test("finalization and reopening automatically synchronize only the Net Skins Re
 test("Leaderboards exposes the Scramble Net Skins live experience and lazy team sheet", async () => {
   const source = await readFile(new URL("../app/live/LeaderboardsDashboard.js", import.meta.url), "utf8");
   const css = await readFile(new URL("../app/live/net-skins.module.css", import.meta.url), "utf8");
-  assert.match(source, /\["skins", "Net Skins"\]/);
+  assert.match(source, /LEADERBOARD_MODULES\.map/);
   assert.match(source, /Round Pot/);
   assert.match(source, /Skins Awarded/);
   assert.match(source, /Current Skin Value/);

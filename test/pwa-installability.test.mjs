@@ -7,7 +7,8 @@ test("PWA foundation registers the service worker and supports install guidance"
     new URL("../app/PwaFoundation.js", import.meta.url),
     "utf8",
   );
-  assert.match(source, /serviceWorker\.register\("\/sw\.js"\)/);
+  assert.match(source, /serviceWorker\.register\("\/sw\.js", \{ updateViaCache: "none" \}\)/);
+  assert.match(source, /registration\.update\(\)/);
   assert.match(source, /beforeinstallprompt/);
   assert.match(source, /Add to Home Screen/);
   assert.match(source, /Tap Share/);
@@ -28,6 +29,7 @@ test("service worker never intercepts writes or private scoring routes", async (
   assert.match(source, /url\.pathname\.startsWith\("\/score"\)/);
   assert.match(source, /url\.pathname\.startsWith\("\/admin"\)/);
   assert.match(source, /fetch\(request\)\.catch/);
+  assert.match(source, /const CACHE_VERSION = "sbi-shell-v2"/);
 });
 
 test("offline page does not imply that scores can be saved offline", async () => {

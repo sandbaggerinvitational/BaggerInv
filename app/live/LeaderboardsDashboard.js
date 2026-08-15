@@ -22,6 +22,7 @@ import { buildTournamentRecapIntelligence, finishLabel } from "../../lib/tournam
 import { participantRoundBreakdown, playerRoundBreakdown } from "../../lib/leaderboard-round-breakdown";
 import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../../lib/participant-auth-client-diagnostics";
 import { teamRoundRecap } from "../../lib/team-round-recap";
+import { LEADERBOARD_MODULES, normalizeLeaderboardModule } from "../../lib/leaderboards-navigation";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -493,7 +494,7 @@ export default function LeaderboardsDashboard({
   const supabaseCore = coreReadSource === "supabase";
   const roundValues = useMemo(() => new Set((data?.rounds || []).map((round) => String(round.number))), [data?.rounds]);
   const selectionFrom = useCallback((params) => ({
-    tab: ["players", "teams", "skins", "insights"].includes(params.get("tab")) ? params.get("tab") : "players",
+    tab: normalizeLeaderboardModule(params.get("tab")),
     round: roundValues.has(params.get("round")) ? params.get("round") : "overall",
     metric: PLAYER_METRICS.some(([key]) => key === params.get("metric")) ? params.get("metric") : "points",
   }), [roundValues]);
@@ -603,7 +604,7 @@ export default function LeaderboardsDashboard({
   return <section className={styles.page}>
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Player, team, round standings, and Championship projections.</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
-    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{[["players", "Players"], ["teams", "Teams"], ["skins", "Net Skins"], ["insights", "Insights"]].map(([value, label]) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
+    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{LEADERBOARD_MODULES.map(({ value, label }) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
     {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} /> : null}
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} setMetric={(value) => updateQuery({ metric: value })} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
