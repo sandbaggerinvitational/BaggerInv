@@ -4,7 +4,6 @@ import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
 import { resolveTournamentGuideContent } from "../tournament-guide/resolveGuideContent";
-import TournamentGuideHero from "../tournament-guide/TournamentGuideHero";
 import styles from "../historical.module.css";
 import guideStyles from "../tournament-guide/tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
@@ -30,8 +29,6 @@ export default async function CoursesPage({ searchParams }) {
   return (
     <main>
       <Header />
-      <TournamentGuideHero tournament={content.tournamentIdentity} />
-
       <section className={`${styles.content} ${guideStyles.guideDetailShell}`}>
         <Link className={guideStyles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>
         <header className={guideStyles.detailHeading}>

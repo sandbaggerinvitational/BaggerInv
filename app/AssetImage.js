@@ -38,6 +38,11 @@ export default function AssetImage({
   fallbackSrc,
   inferFallback = true,
   loading = "lazy",
+  width,
+  height,
+  sizes,
+  decoding,
+  fetchPriority,
 }) {
   const automaticFallback = useMemo(
     () => fallbackSrc || (inferFallback ? inferredFallback(src) : null),
@@ -86,6 +91,11 @@ export default function AssetImage({
       alt={alt}
       className={className}
       loading={loading}
+      width={width}
+      height={height}
+      sizes={sizes}
+      decoding={decoding}
+      fetchPriority={fetchPriority}
       onError={handleError}
     />
   );

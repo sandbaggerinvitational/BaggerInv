@@ -61,7 +61,7 @@ export default async function CoursePage({ params, searchParams }) {
   return <main className={styles.page}>
     <Header homeHref="/home" />
     <section className={styles.hero}>
-      {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" /> : null}
+      {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
       <div className={styles.heroShade} />
       <div className={styles.heroContent}>
         <Link href={archive ? "/courses?view=archive" : "/courses"}>‹ Courses</Link>

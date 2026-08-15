@@ -31,11 +31,16 @@ export default function TournamentGuideHero({ tournament }) {
           fallback={String(tournament?.year || "SBI")}
           className={styles.tournamentIdentityLogo}
           fallbackClassName={styles.tournamentIdentityLogoFallback}
+          width={108}
+          height={108}
+          sizes="(max-width: 560px) 64px, 108px"
+          decoding="async"
         />
       </div>
       <div className={styles.tournamentIdentityCopy}>
         {edition ? <p>{edition}</p> : null}
         {name ? <h1>{name}</h1> : null}
+        <strong>Tournament Guide</strong>
         {dates ? <span>{dates}</span> : null}
       </div>
     </div>

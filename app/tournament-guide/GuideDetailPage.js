@@ -8,7 +8,6 @@ import ScheduleItinerary from "./ScheduleItinerary";
 import DiningItinerary from "./DiningItinerary";
 import LocalGuide from "./LocalGuide";
 import ImportantContacts from "./ImportantContacts";
-import TournamentGuideHero from "./TournamentGuideHero";
 import styles from "./tournament-guide.module.css";
 
 const formatTerms = { BB: ["best ball", "four-ball", "four ball", "fourball"], SC: ["scramble"], SI: ["singles", "single match"] };
@@ -87,5 +86,5 @@ export default async function GuideDetailPage({ section }) {
   const content = await resolveTournamentGuideContent();
   const { tournament, schedule: itinerary, ruleBook } = content;
   const descriptions = Object.fromEntries(content.overview.map((item) => [item["Section Slug"], item.Description]));
-  return <main><Header /><TournamentGuideHero tournament={content.tournamentIdentity} /><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;
+  return <main className={styles.guideDetailPage}><Header /><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;
 }

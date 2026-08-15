@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Header, Footer } from "../components";
 import { resolveTournamentGuideContent } from "./resolveGuideContent";
 import TournamentGuideHero from "./TournamentGuideHero";
+import GuideDirectoryIcon from "./GuideDirectoryIcon";
 import styles from "./tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
 
@@ -14,12 +15,12 @@ export const metadata = pageMetadata({
 });
 
 const destinations = [
-  { icon: "📅", title: "Schedule", detail: "Tournament week itinerary", href: "/tournament-guide/schedule" },
-  { icon: "📍", title: "Courses", detail: "Venues, tees, and course details", href: "/courses" },
-  { icon: "📜", title: "Rules & Formats", detail: "Rules, points, and match formats", href: "/tournament-guide/rules" },
-  { icon: "🍽️", title: "Dining", detail: "Meals and tournament gatherings", href: "/tournament-guide/dining" },
-  { icon: "🧳", title: "Local Guide", detail: "Local resources and transportation", href: "/tournament-guide/getting-around" },
-  { icon: "📞", title: "Important Contacts", detail: "Tournament-week assistance", href: "/tournament-guide/contacts" },
+  { icon: "schedule", title: "Schedule", detail: "Tournament week itinerary", href: "/tournament-guide/schedule" },
+  { icon: "courses", title: "Courses", detail: "Venues, tees, and course details", href: "/courses" },
+  { icon: "rules", title: "Rules & Formats", detail: "Rules, points, and match formats", href: "/tournament-guide/rules" },
+  { icon: "dining", title: "Dining", detail: "Meals and tournament gatherings", href: "/tournament-guide/dining" },
+  { icon: "local", title: "Local Guide", detail: "Local resources and transportation", href: "/tournament-guide/getting-around" },
+  { icon: "contacts", title: "Important Contacts", detail: "Tournament-week assistance", href: "/tournament-guide/contacts" },
 ];
 
 export default async function TournamentGuidePage({ searchParams }) {
@@ -34,7 +35,7 @@ export default async function TournamentGuidePage({ searchParams }) {
   return <main><Header />
     <TournamentGuideHero tournament={tournamentIdentity} />
     <div className={styles.shell}>
-      <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{destinations.map((item) => <Link href={item.href} prefetch={false} key={item.href}><i aria-hidden="true">{item.icon}</i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section>
+      <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{destinations.map((item) => <Link href={item.href} prefetch={false} key={item.href}><i><GuideDirectoryIcon name={item.icon} /></i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section>
     </div><Footer />
   </main>;
 }

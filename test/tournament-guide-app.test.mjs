@@ -50,7 +50,7 @@ test("Courses defaults to the active tournament and offers the historical archiv
   assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
 });
 
-test("Tournament Guide modules share one published projection-driven tournament identity hero", async () => {
+test("Tournament Guide landing owns the published projection-driven identity hero while detail routes stay compact", async () => {
   const [hero, guide, detail, courses, courseDetail, resolver] = await Promise.all([
     source("app/tournament-guide/TournamentGuideHero.js"),
     source("app/tournament-guide/page.js"),
@@ -69,8 +69,10 @@ test("Tournament Guide modules share one published projection-driven tournament 
   assert.match(resolver, /stored\.tournamentIdentity\?\.dates/);
   assert.match(resolver, /stored\.tournamentIdentity\?\.location/);
   assert.match(guide, /<TournamentGuideHero tournament=\{tournamentIdentity\} \/>/);
-  assert.match(detail, /<TournamentGuideHero tournament=\{content\.tournamentIdentity\} \/>/);
-  assert.match(courses, /<TournamentGuideHero tournament=\{content\.tournamentIdentity\} \/>/);
+  assert.doesNotMatch(detail, /TournamentGuideHero/);
+  assert.doesNotMatch(courses, /TournamentGuideHero/);
+  assert.match(detail, /className=\{styles\.backToGuide\}/);
+  assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
   assert.doesNotMatch(courseDetail, /TournamentGuideHero/);
 });
 

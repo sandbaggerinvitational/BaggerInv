@@ -6,12 +6,13 @@ import { participantAppShellRoute, participantIdlePrefetchRoutes, participantRou
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("participant AppShell is explicit and public or legacy route ownership is preserved", () => {
-  for (const route of ["/home", "/my-match", "/live", "/game-center/2026-R1-1", "/score", "/me", "/tournament-guide/rules", "/courses", "/courses/CPGC01", "/history", "/history/2026/round/1", "/odds-center"])
+  for (const route of ["/home", "/my-match", "/live", "/game-center/2026-R1-1", "/score", "/me", "/tournament-guide/rules", "/courses", "/courses/CPGC01", "/courses/CPGC01/holes/1", "/history", "/history/2026/round/1", "/odds-center"])
     assert.equal(participantAppShellRoute(route), true, route);
-  for (const route of ["/", "/players", "/players/holman-moores", "/history/2025", "/courses/CPGC01/holes/1", "/admin/director", "/participant-auth", "/activate", "/score/access/token"])
+  for (const route of ["/", "/players", "/players/holman-moores", "/history/2025", "/admin/director", "/participant-auth", "/activate", "/score/access/token"])
     assert.equal(participantAppShellRoute(route), false, route);
   assert.equal(participantRouteContext("/live", "view=leaderboards"), "Leaderboards");
   assert.equal(participantRouteContext("/score"), "Scorecard");
+  assert.equal(participantRouteContext("/courses/CPGC01/holes/1"), "Course Hole");
 });
 
 test("persistent participant shell owns compact header, content scene, and navigation slot", async () => {
