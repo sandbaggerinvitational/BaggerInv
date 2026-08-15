@@ -77,12 +77,25 @@ function TeamBlock({ team, players, tournamentLogoFilename }) {
 }
 
 function statusSupport(match, status) {
-  if (status === "Live") return match.currentHole ? `Through ${match.currentHole}` : "Ready to score";
+  if (status === "Live") {
+    if (scorecardReadyForReview(match)) return "18 holes scored · Ready to review";
+    return match.currentHole ? `Through ${match.currentHole}` : "Ready to score";
+  }
   if (status === "Locked") return "Locked by Tournament Director";
   if (status === "Upcoming") return match.teeTime
     ? `Scoring opens before ${formatTime(match.teeTime)}`
     : "Round has not opened yet";
   return "";
+}
+
+function scorecardReadyForReview(match) {
+  return Number(match.holesRecorded) >= 18 && Number(match.holesRemaining) === 0;
+}
+
+function matchProgressMeta(match, status) {
+  if (status !== "Live") return "";
+  if (scorecardReadyForReview(match)) return "18 holes scored · Ready to review";
+  return match.currentHole ? `Through ${match.currentHole}` : "";
 }
 
 function playerList(players = []) {
@@ -99,7 +112,7 @@ function CompactMatchup({ match }) {
 
 function MatchActions({ match, status, busy, onOpen, detailsHref }) {
   const scorecardAction = status === "Live"
-    ? match.holesRecorded ? "Continue Scoring" : "Start Scoring"
+    ? scorecardReadyForReview(match) ? "Review & Finalize" : match.holesRecorded ? "Continue Scoring" : "Start Scoring"
     : status === "Final" ? "Final Scorecard" : "";
   if (!scorecardAction) return <div className={styles.actions}>
     <Link className={styles.primaryAction} href={detailsHref}>View Match <i aria-hidden="true">→</i></Link>
@@ -136,7 +149,7 @@ function MatchCard({ match, tier = "compact", availableChoice = false, busy, onO
     <div className={styles.cardTop}>
       <MatchHeading match={match} />
       <div className={styles.cardState}>
-        <MatchStatusBlock status={displayStatus} result={result} meta={primary && status === "Live" && match.currentHole ? `Through ${match.currentHole}` : ""} />
+        <MatchStatusBlock status={displayStatus} result={result} meta={primary ? matchProgressMeta(match, status) : ""} />
       </div>
     </div>
     <div className={styles.courseLine}>

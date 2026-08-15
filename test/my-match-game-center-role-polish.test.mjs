@@ -45,7 +45,7 @@ test("My Match exposes one dominant lifecycle action and a secondary Game Center
     read("app/score/ScoreEntry.js"),
   ]);
 
-  assert.match(dashboard, /match\.holesRecorded \? "Continue Scoring" : "Start Scoring"/);
+  assert.match(dashboard, /scorecardReadyForReview\(match\) \? "Review & Finalize" : match\.holesRecorded \? "Continue Scoring" : "Start Scoring"/);
   assert.match(dashboard, /status === "Final" \? "Final Scorecard"/);
   assert.match(dashboard, /className=\{styles\.secondaryAction\}[^>]*>Game Center/);
   assert.match(dashboard, /className=\{styles\.primaryAction\}/);
@@ -130,7 +130,8 @@ test("responsive match surfaces preserve 44px actions, stable course logos, and 
   assert.match(matchStyles, /@media\(max-width:355px\)/);
   assert.match(centerStyles, /\.logo\[data-size=identity\]\{width:40px;height:40px\}/);
   assert.match(centerStyles, /@media\(max-width:420px\)/);
-  assert.match(centerStyles, /\.holeGrid button\{min-height:44px\}/);
+  assert.match(centerStyles, /\.holeRail button\{[^}]*min-height:48px/);
   assert.match(centerStyles, /prefers-reduced-motion:reduce/);
-  assert.doesNotMatch(matchStyles + centerStyles, /overflow-x:(auto|scroll)/);
+  assert.doesNotMatch(matchStyles, /overflow-x:(auto|scroll)/);
+  assert.match(centerStyles, /\.holeRail\{[^}]*overflow-x:auto/);
 });

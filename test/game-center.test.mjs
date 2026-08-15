@@ -297,9 +297,9 @@ test("Game Center layout protects mobile widths and localizes hole interaction",
   assert.match(styles, /\.content\{width:min\(100%,760px\)/);
   assert.match(styles, /\.scoreboard\{[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(104px,auto\) minmax\(0,1fr\)/);
   assert.match(styles, /\.teamGrid\{[^}]*grid-template-columns:minmax\(0,1fr\) 20px minmax\(0,1fr\)/);
-  assert.match(styles, /\.holeGrid\{[^}]*grid-template-columns:repeat\(9,minmax\(0,1fr\)\)/);
+  assert.match(styles, /\.holeRail\{[^}]*display:flex[^}]*overflow-x:auto/);
   assert.match(styles, /@media\(max-width:420px\)/);
-  assert.doesNotMatch(styles, /overflow-x:(auto|scroll)/);
+  assert.match(styles, /\.holeRail button\{[^}]*flex:0 0 48px[^}]*min-height:48px/);
 });
 
 test("Game Center polish balances scoreboard identity and respects reduced motion", async () => {
@@ -331,6 +331,8 @@ test("Hole Tracker uses clear single-character outcomes and accessible labels", 
   assert.match(source, /won by \$\{winnerName/);
   assert.match(source, /"not played"/);
   assert.match(source, /current hole/);
+  assert.match(source, /clinching hole/);
+  assert.match(source, /data-clinching=/);
   assert.match(source, /Hole-by-Hole Scorecard/);
   assert.doesNotMatch(source, /initials\(teamNames\[[12]\]\)/);
 });
@@ -443,7 +445,7 @@ test("Game Center hero and story sections follow the live-match hierarchy", asyn
   assert.match(styles, /\.matchHero\{[^}]*border-radius:20px/);
   assert.match(styles, /\.scoreboard\{[^}]*min-height:150px/);
   assert.match(styles, /\.scoreboard \[data-prominent=true\] strong\{font-size:clamp\(1\.28rem,5\.6vw,1\.72rem\);letter-spacing:-\.02em;white-space:normal\}/);
-  assert.match(styles, /\.holeGrid button\{min-height:48px/);
+  assert.match(styles, /\.holeRail button\{[^}]*min-height:48px/);
   assert.match(styles, /\.courseInfo\{border-color:#ded6c6;box-shadow:0 4px 14px/);
 });
 

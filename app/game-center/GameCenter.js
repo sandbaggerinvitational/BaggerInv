@@ -82,6 +82,15 @@ function teamMarker(name) {
   return meaningful[0]?.toUpperCase() || "T";
 }
 
+function clinchingHole(data) {
+  if (data.state !== "final") return 0;
+  return Number(clean(data.finalSummary).match(/Hole\s+(\d+)/i)?.[1] || 0);
+}
+
+function initialSelectedHole(data) {
+  return Math.max(1, clinchingHole(data) || Number(data.match.currentHole || data.stats.played || 1));
+}
+
 function ResultSegments({ data }) {
   const format = clean(data.match.format || data.match.Format).toUpperCase();
   const options = format === "SI"
@@ -94,8 +103,8 @@ function ResultSegments({ data }) {
     return { key, label, ...segmentMatchResult(data.holes, start, end, teamNames, key === "overall" && data.state === "final" ? data.result : "") };
   });
 
-  return <section className={styles.results} aria-labelledby="match-flow-heading">
-    <header className={styles.sectionHeading}><span>Match Flow</span><h2 id="match-flow-heading">Front • Back • Overall</h2></header>
+  return <section className={styles.results} data-state={data.state} data-segments={options.length} aria-labelledby="match-flow-heading">
+    <header className={styles.sectionHeading}><span>Match Flow</span><h2 id="match-flow-heading">{options.length === 1 ? "Overall Summary" : "Front • Back • Overall"}</h2></header>
     <div className={styles.segmentCards}>
       {segments.map((segment) => <article key={segment.key} aria-label={`${segment.label}: ${segment.team ? `${segment.team}, ` : ""}${segment.result}`}>
         <small><MatchFlowIcon segment={segment.key} />{segment.label}</small>
@@ -136,10 +145,21 @@ function GameCenterScorecard({ data }) {
 
 function HoleTracker({ data, selected, onSelect, updatedHoles = [] }) {
   const current = Number(data.match.currentHole || data.match["Current Hole"] || data.stats.played || 1);
+  const clinchHole = clinchingHole(data);
   const teamNames = data.display.teamNames;
+  const railRef = useRef(null);
+  useEffect(() => {
+    const rail = railRef.current;
+    const target = rail?.querySelector(`[data-hole="${selected}"]`);
+    if (!rail || !target) return;
+    const left = target.offsetLeft - ((rail.clientWidth - target.offsetWidth) / 2);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    rail.scrollTo({ left: Math.max(0, left), behavior: reducedMotion ? "auto" : "smooth" });
+  }, [selected]);
   return <section className={styles.tracker}>
     <header><h2>Hole Tracker</h2><small>{data.stats.played} of 18 recorded</small></header>
-    <div className={styles.holeGrid}>
+    <div className={styles.holeRailFrame}>
+    <div className={styles.holeRail} ref={railRef}>
       {data.holes.map((hole) => {
         const state = hole.winner === "Team 1" ? "team-one" : hole.winner === "Team 2" ? "team-two" : hole.winner === "Halved" ? "halved" : "unplayed";
         const label = hole.winner === "Team 1" ? teamMarker(teamNames[1]) : hole.winner === "Team 2" ? teamMarker(teamNames[2]) : hole.winner === "Halved" ? "½" : "—";
@@ -149,14 +169,17 @@ function HoleTracker({ data, selected, onSelect, updatedHoles = [] }) {
         return <button
           type="button"
           key={hole.number}
+          data-hole={hole.number}
           data-state={state}
           data-current={hole.number === current ? "true" : undefined}
+          data-clinching={hole.number === clinchHole ? "true" : undefined}
           data-newly-updated={updatedHoles.includes(hole.number) ? "true" : undefined}
           data-selected={hole.number === selected ? "true" : undefined}
           onClick={() => onSelect(hole.number)}
-          aria-label={`Hole ${hole.number}, ${outcome}${hole.number === current ? ", current hole" : ""}`}
+          aria-label={`Hole ${hole.number}, ${outcome}${hole.number === clinchHole ? ", clinching hole" : ""}${hole.number === current ? ", current hole" : ""}`}
         ><small>{hole.number}</small><strong>{label}</strong></button>;
       })}
+    </div>
     </div>
   </section>;
 }
@@ -167,17 +190,16 @@ function HoleDetails({ data, selected }) {
   const teamNames = data.display.teamNames;
   const team1Gross = jsonScores(hole.team1Gross);
   const team2Gross = jsonScores(hole.team2Gross);
-  const clinchHole = Number(clean(data.finalSummary).match(/Hole\s+(\d+)/i)?.[1] || 0);
+  const clinchHole = clinchingHole(data);
   const story = data.state === "final" && clinchHole && selected >= clinchHole
     ? selected === clinchHole ? data.finalSummary : `The match was already decided on Hole ${clinchHole}.`
     : holeStory(data.holes, selected, teamNames);
   return <section className={styles.holeDetails} aria-label={`Hole ${selected} details`}>
     <header><span><small>Selected Hole</small><h2>Hole {selected}</h2></span><strong>{hole.par ? `Par ${hole.par}` : "Par TBA"}</strong></header>
     <p className={styles.holeStory}>{story}</p>
-    <div className={styles.holeMeta}>
-      {hole.yardage ? <span><small>Yardage</small><strong>{hole.yardage}</strong></span> : null}
-      {hole.strokeIndex ? <span><small>Stroke Index</small><strong>{hole.strokeIndex}</strong></span> : null}
-      <span><small>Hole Result</small><strong>{winnerName(hole.winner, teamNames) || "Not played"}</strong></span>
+    <div className={styles.holeFacts}>
+      <span>{[hole.yardage ? `${hole.yardage} yards` : "", hole.strokeIndex ? `Stroke Index ${hole.strokeIndex}` : ""].filter(Boolean).join(" · ")}</span>
+      <strong><small>Hole Result</small>{winnerName(hole.winner, teamNames) || "Not played"}</strong>
     </div>
     {hole.winner ? <div className={styles.holeScores}>
       <span><strong>{teamNames[1]}</strong><small>Gross {team1Gross.join(" / ") || "—"} • Net {hole.team1Net ?? "—"}</small></span>
@@ -208,22 +230,25 @@ function CourseInformation({ data }) {
 function MatchStats({ data }) {
   if (!data.stats.played) return null;
   const teamNames = data.display.teamNames;
-  return <section className={styles.stats}>
+  const showRemaining = data.state !== "final" || Number(data.stats.remaining) > 0;
+  return <section className={styles.stats} data-state={data.state}>
     <header><span>Confirmed Scores</span><h2>Match Stats</h2></header>
-    <div>
+    <div className={styles.statsPrimary} aria-label="Hole results summary">
       <span><small>{teamNames[1]} holes won</small><strong>{data.stats.team1}</strong></span>
       <span><small>Halved</small><strong>{data.stats.halved}</strong></span>
       <span><small>{teamNames[2]} holes won</small><strong>{data.stats.team2}</strong></span>
+    </div>
+    <div className={styles.statsSecondary}>
       <span><small>Biggest lead</small><strong>{data.stats.biggestLead}</strong></span>
       <span><small>Lead changes</small><strong>{data.stats.leadChanges}</strong></span>
-      <span><small>Remaining</small><strong>{data.stats.remaining}</strong></span>
+      {showRemaining ? <span><small>Remaining</small><strong>{data.stats.remaining}</strong></span> : null}
     </div>
   </section>;
 }
 
 export default function GameCenter({ initialData, matchId, backTo }) {
   const [data, setData] = useState(initialData);
-  const [selectedHole, setSelectedHole] = useState(Math.max(1, Number(initialData.match.currentHole || initialData.stats.played || 1)));
+  const [selectedHole, setSelectedHole] = useState(initialSelectedHole(initialData));
   const [updatedLabel, setUpdatedLabel] = useState("Updated just now");
   const [error, setError] = useState("");
   const [opening, setOpening] = useState(false);
