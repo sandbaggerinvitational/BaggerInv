@@ -109,5 +109,6 @@ test("History landing isolates image fallback and does not change its approved h
   assert.match(page, /historyEditionLabel/);
   assert.match(page, /historyTournamentCardResult/);
   assert.match(css, /archiveHero\.archiveHero\{padding:28px 20px 26px\}/);
+  assert.match(css, /currentTournamentHero\.currentTournamentHero>img:first-child\{opacity:0\}/);
   assert.doesNotMatch(page, /onError=.*throw|throw new Error/);
 });
