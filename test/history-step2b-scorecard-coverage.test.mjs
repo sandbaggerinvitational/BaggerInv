@@ -129,6 +129,21 @@ test("unused Singles slots never become expected cards", () => {
   assert.equal(coverage.completeMatchScorecards, 1);
 });
 
+test("explicit source identities preserve a missing ghost-match participant omitted by fallback matches", () => {
+  const match = rawMatch(2023, 3, 5, "SI");
+  match["Team 1 Player 1"] = "";
+  const scorecards = [
+    normalizedCard({ match, playerId: "CP01", status: "MISSING", holes: 0 }),
+    normalizedCard({ match, playerId: match["Team 2 Player 1"] }),
+  ];
+  const coverage = buildLegacyHistoryScorecardCoverage({ year: 2023, matches: [match], scorecards });
+  assert.equal(coverage.expectedLogicalScorecards, 2);
+  assert.equal(coverage.completeLogicalScorecards, 1);
+  assert.equal(coverage.missingLogicalScorecards, 1);
+  assert.equal(coverage.partialMatchScorecards, 1);
+  assert.equal(coverage.completeMatchScorecards, 0);
+});
+
 test("duplicates do not inflate counts and 17 holes remain partial", () => {
   const match = rawMatch(2025, 3, 1, "SI");
   const complete = normalizedCard({ match, playerId: match["Team 1 Player 1"] });
