@@ -77,7 +77,7 @@ body.participant-scoring-focus-active .participantRouteScene {
 }
 
 .participantAppShell .siteHeader,
-.participantAppShell > .participantAppContent footer { display: none; }
+.participantAppShell > .participantAppContent footer:not([data-app-footer="true"]) { display: none; }
 
 .participantRouteScene {
   min-height: calc(var(--app-height) - var(--participant-header-height) - var(--participant-nav-total));

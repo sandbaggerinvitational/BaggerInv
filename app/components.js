@@ -22,15 +22,16 @@ export function Header({ activeNavigationHref = "", homeHref = "/" } = {}) {
   );
 }
 
-export function Footer() {
+export function Footer({ variant = "event" } = {}) {
+  const appIdentity = variant === "app";
   return (
-    <footer>
+    <footer data-app-footer={appIdentity ? "true" : undefined}>
       <div>
-        <strong>Sandbagger Invitational</strong>
+        <strong>{appIdentity ? "The Bagger" : "Sandbagger Invitational"}</strong>
         <span>24 Players • Two Teams • One Trophy</span>
       </div>
 
-      <span>Official Tournament Website</span>
+      {appIdentity ? null : <span>Official Tournament Website</span>}
     </footer>
   );
 }

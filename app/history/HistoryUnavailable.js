@@ -16,7 +16,7 @@ export default function HistoryUnavailablePage({
   year = "2026",
   section = "History",
 }) {
-  if (String(year) === "2026") return <main><Header /><ErrorState eyebrow="2026 Tournament Archive" title={`${section} is temporarily unavailable.`} message="Check your connection and try again shortly." returnHref="/history" returnLabel="Tournament History" /><Footer /></main>;
+  if (String(year) === "2026") return <main><Header /><ErrorState eyebrow="2026 Tournament Archive" title={`${section} is temporarily unavailable.`} message="Check your connection and try again shortly." returnHref="/history" returnLabel="Tournament History" /><Footer variant="app" /></main>;
   return (
     <main>
       <Header />
@@ -28,7 +28,7 @@ export default function HistoryUnavailablePage({
         </p>
         <Link href="/history">Return to Tournament History</Link>
       </section>
-      <Footer />
+      <Footer variant="app" />
     </main>
   );
 }

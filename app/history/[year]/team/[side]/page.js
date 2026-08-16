@@ -207,7 +207,7 @@ export default async function TeamSeasonPage({ params }) {
         ) : null}
       </section>
 
-      <Footer />
+      <Footer variant="app" />
     </main>
   );
 }

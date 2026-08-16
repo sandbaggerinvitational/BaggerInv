@@ -122,7 +122,7 @@ export default async function HistoryPage() {
         </div>
       </section>
 
-      <Footer />
+      <Footer variant="app" />
     </main>
   );
 }

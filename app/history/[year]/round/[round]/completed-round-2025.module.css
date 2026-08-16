@@ -1,0 +1,38 @@
+.matchList { gap: 12px; }
+
+.statistics {
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid #ded7ca;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.statistics > summary {
+  min-height: 48px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+  color: #0b4938;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.statistics > summary::-webkit-details-marker { display: none; }
+.statistics > summary span { color: #a47b24; transition: transform .18s ease; }
+.statistics[open] > summary span { transform: rotate(180deg); }
+.statistics > div { padding: 0 12px 12px; }
+
+@media (max-width: 520px) {
+  .statistics > summary { min-height: 44px; padding-inline: 13px; font-size: .68rem; }
+  .statistics > div { padding-inline: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statistics > summary span { transition: none; }
+}

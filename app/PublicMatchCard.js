@@ -10,6 +10,7 @@ import scoreStyles from "./score-typography.module.css";
 import ScorecardTable from "./ScorecardTable";
 import { matchState } from "../lib/live-match-ux";
 import MatchProgressionSummary from "./MatchProgressionSummary";
+import { reconstructMatchProgression } from "../lib/match-progression";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const initials = (name) => String(name ?? "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -93,6 +94,32 @@ function MatchupRoster({ tournament, match }) {
   </div>;
 }
 
+function CompactHistoricalSide({ team, players = [], teamStroke = null }) {
+  const teamStrokeLabel = strokeText(teamStroke);
+  return <div className={styles.historicalFinalSide}>
+    <span>{team.name}</span>
+    <div>
+      {players.filter(Boolean).map((player) => {
+        const playerStrokeLabel = strokeText(player.stroke);
+        return <div key={player.id || player.slug || player.name}>
+          <strong><PlayerName player={player} /></strong>
+          {playerStrokeLabel ? <small>{playerStrokeLabel}</small> : null}
+        </div>;
+      })}
+    </div>
+    {teamStrokeLabel ? <small>{teamStrokeLabel}</small> : null}
+  </div>;
+}
+
+function reconstructedResult(scorecards = []) {
+  const progression = reconstructMatchProgression(scorecards);
+  if (!progression) return "";
+  if (!progression.winnerSide) return "Match Halved";
+  const winner = progression.winnerSide === "A" ? progression.sideA : progression.sideB;
+  const holder = winner.playerNames?.length ? winner.playerNames.join(" & ") : winner.teamName;
+  return `${holder} ${winner.playerNames?.length > 1 ? "win" : "wins"} ${progression.finalMargin.label}`;
+}
+
 function winnerLabel(value, tournament) {
   if (value === "Team 1") return tournament.teamOne.name;
   if (value === "Team 2") return tournament.teamTwo.name;
@@ -129,7 +156,7 @@ function TrophyIcon() {
   </svg>;
 }
 
-export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], historyDensity = false }) {
+export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], historyDensity = false, completedHistoryCompact = false }) {
   const winningSide = winnerSide(match);
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
   const overallWinner = match.overallWinner || match.matchupWinner;
@@ -141,15 +168,69 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   };
   const liveLeader = Number(match.team1HolesWon) === Number(match.team2HolesWon)
     ? 0 : Number(match.team1HolesWon) > Number(match.team2HolesWon) ? 1 : 2;
-  const state = matchState(match);
+  const state = completedHistoryCompact ? "final" : matchState(match);
   const hasPairing = [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => player?.name);
   const hasSegments = Boolean(match.frontWinner || match.backWinner || overallWinner);
   const winnerName = halved ? "Match halved" : winningSide === 1 ? tournament.teamOne.name : winningSide === 2 ? tournament.teamTwo.name : "";
   const statusText = state === "final"
-    ? (formatOfficialMatchResult(match.finalResult) || winnerName || "Final")
+    ? (formatOfficialMatchResult(match.finalResult) || reconstructedResult(scorecards) || winnerName || "Final")
     : state === "live"
       ? (match.liveStatusText || (liveLeader ? `${liveLeader === 1 ? tournament.teamOne.name : tournament.teamTwo.name} ${Math.abs(Number(match.team1HolesWon) - Number(match.team2HolesWon))} UP` : "All square"))
       : (match.teeTime ? `Tee time ${match.teeTime}` : "Scheduled");
+
+  if (completedHistoryCompact) {
+    const winningPlayers = winningSide === 1
+      ? (match.team1Players || [])
+      : winningSide === 2 ? (match.team2Players || []) : [];
+    const fallbackWinner = winningPlayers.map((player) => player?.name).filter(Boolean).join(" & ");
+    const finalResult = reconstructedResult(scorecards) || (halved
+      ? "Match Halved"
+      : fallbackWinner
+        ? `${fallbackWinner} ${winningPlayers.length === 1 ? "wins" : "win"}`
+        : winningSide ? `${winnerName} win` : "Final result recorded");
+    const sideOneLabel = (match.team1Players || []).map((player) => player?.name).filter(Boolean).join(" and ");
+    const sideTwoLabel = (match.team2Players || []).map((player) => player?.name).filter(Boolean).join(" and ");
+    const participantLabel = `${sideOneLabel} versus ${sideTwoLabel}`;
+    const pointsLabel = `${tournament.teamOne.name} ${formatTeamPoints(match.team1Points)}, ${tournament.teamTwo.name} ${formatTeamPoints(match.team2Points)}`;
+
+    return <article className={`${styles.matchCard} ${styles.historicalFinalCard}`} id={match.id ? `match-${match.id}` : undefined} style={cardStyle} data-match-state="final" aria-label={`Match ${match.match}, Final. ${participantLabel}. ${finalResult}. ${pointsLabel}.`}>
+      <header className={styles.historicalFinalHeader}>
+        <span>Match {match.match} · {match.formatName || round?.format}</span>
+        <MatchStatusBlock status="final" result="" meta="" />
+      </header>
+
+      {variant === "historical" && isGhostMatch ? <div className={styles.ghostMatchNotice}><strong>GHOST MATCH</strong><span>Selected player results are excluded from official records.</span></div> : null}
+
+      <div className={styles.historicalFinalMatchup}>
+        <CompactHistoricalSide team={tournament.teamOne} players={match.team1Players} teamStroke={match.format === "SC" ? match.team1Stroke : null} />
+        <b aria-label="versus">VS</b>
+        <CompactHistoricalSide team={tournament.teamTwo} players={match.team2Players} teamStroke={match.format === "SC" ? match.team2Stroke : null} />
+      </div>
+
+      <div className={styles.historicalFinalResult}>
+        <span>Final result</span>
+        <strong>{finalResult}</strong>
+        <small>{tournament.teamOne.name} {formatTeamPoints(match.team1Points)} <i aria-hidden="true">—</i> {formatTeamPoints(match.team2Points)} {tournament.teamTwo.name}</small>
+      </div>
+
+      {(hasSegments || scorecards.length || match.notes) ? <details className={styles.historicalMatchDetails}>
+        <summary>View Match Details <span aria-hidden="true">⌄</span></summary>
+        <div className={styles.historicalMatchDetailsBody}>
+          {scorecards.length ? <MatchProgressionSummary scorecards={scorecards} /> : null}
+          {hasSegments ? <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
+            {match.format !== "SI" ? <>
+              <Segment label="Front 9" winner={match.frontWinner} tournament={tournament} />
+              <Segment label="Back 9" winner={match.backWinner} tournament={tournament} />
+            </> : null}
+            <Segment label="Overall" winner={overallWinner} tournament={tournament} />
+          </div> : null}
+          {match.notes ? <p className={styles.matchNotes}>{match.notes}</p> : null}
+        </div>
+      </details> : null}
+
+      <ScorecardTable scorecards={scorecards} compact historyDensity={historyDensity} />
+    </article>;
+  }
 
   return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle} data-match-state={state} aria-label={`Match ${match.match}: ${statusText}`} tabIndex="0">
     <div className={styles.matchTop}><span>{topLabel}</span><span>{state === "upcoming" ? match.teeTime || match.status : match.status}</span></div>

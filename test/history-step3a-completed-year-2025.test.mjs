@@ -10,6 +10,10 @@ const [page, css, participantCss, archive, packageJson] = await Promise.all([
   source("lib/historical-data.json").then(JSON.parse),
   source("package.json").then(JSON.parse),
 ]);
+const completedOverview = page.slice(
+  page.indexOf("function CompletedYearOverview"),
+  page.indexOf("function CurrentHistoryOverview")
+);
 
 test("Step 3A intentionally gates the completed-year prototype to 2025", () => {
   assert.match(page, /const useCompleted2025 = !useSupabase2026 && Number\(tournament\.year\) === 2025/);
@@ -26,7 +30,6 @@ test("the collapsed 2025 final state follows the shared History hierarchy", () =
     "data-completed-teams",
     "data-completed-standings",
     "data-completed-records",
-    "data-completed-scorecards",
     "data-completed-honors",
   ];
   const positions = markers.map((marker) => page.indexOf(marker));
@@ -63,7 +66,6 @@ test("direct product labels replace every Step 3A editorial subtitle", () => {
     "The Teams",
     "Final Player Standings",
     "Tournament Records",
-    "Historical Scorecards",
     "Tournament Honors",
   ]) {
     assert.match(page, new RegExp(`>${label}<`, "i"));
@@ -94,11 +96,13 @@ test("Champion result is a single semantic, model-backed surface", () => {
 
 test("all three round summaries reuse canonical course facts and existing routes", () => {
   assert.match(page, /tournament\.courses\.map\(\(course\)/);
-  assert.match(page, /getFormatName\(course\.Format\)/);
+  assert.match(page, /completedFormatName\(course\.Format\)/);
   assert.match(page, /course\.Course/);
   assert.match(page, /href=\{`\/history\/\$\{tournament\.year\}\/round\/\$\{round\}`\}/);
-  assert.match(page, /href=\{`\/courses\/\$\{course\["Course ID"\]\}`\}/);
-  assert.match(page, /Points Available/);
+  assert.match(page, /href=\{`\/courses\/\$\{course\["Course ID"\]\}\?view=archive`\}/);
+  assert.match(completedOverview, /roundResults\.find/);
+  assert.match(completedOverview, /formatTeamPoints\(roundResult\.teamOne\.points\)/);
+  assert.doesNotMatch(completedOverview, /Points Available/);
   assert.doesNotMatch(page, /dramatic|comeback|dominant|clutch/i);
 });
 
@@ -142,9 +146,9 @@ test("Tournament Records shows four intentional defaults and keeps every remaini
   assert.doesNotMatch(page, /CRISPYBOYS|BANDONBROTHERS/);
 });
 
-test("accepted scorecard and Honors semantics remain separate and model-backed", () => {
-  assert.match(page, /scorecardCoverage\.completeMatchScorecards/);
-  assert.match(page, /Scorecard detail available/);
+test("the dead 2025 scorecard summary is removed while Honors remains model-backed", () => {
+  assert.doesNotMatch(completedOverview, /data-completed-scorecards|Historical Scorecards|Scorecard detail available/);
+  assert.match(page, /buildLegacyHistoryScorecardCoverage/);
   assert.doesNotMatch(page, />57 of 78</);
   assert.match(page, /tournament\.awards\.map\(\(award\)/);
   assert.match(page, /award\.winnerPlayer\?\.\["Display Name"\] \|\| award\.Winner/);

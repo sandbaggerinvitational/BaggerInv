@@ -1298,6 +1298,32 @@
 .segmentDetails summary { min-height: 44px; padding: 13px 18px; color: #4f5f57; cursor: pointer; font-size: .72rem; font-weight: 800; }
 .segmentDetails .segmentGrid { margin-top: 0; }
 .matchFreshness { padding: 12px 18px 16px; border-top: 1px solid #eee9df; color: #6c7771; font-size: .66rem; font-weight: 700; }
+.historicalFinalCard { display: block; border-radius: 16px; box-shadow: 0 7px 20px rgba(9,37,27,.045); }
+.historicalFinalHeader { min-height: 50px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #e9e3d8; background: #f8f4eb; }
+.historicalFinalHeader > span { color: #715c27; font-size: .68rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.historicalFinalMatchup { padding: 13px 14px; display: grid; grid-template-columns: minmax(0,1fr) 24px minmax(0,1fr); align-items: start; gap: 7px; }
+.historicalFinalMatchup > b { padding-top: 24px; color: #a37a23; font-size: .62rem; text-align: center; }
+.historicalFinalSide { min-width: 0; display: grid; gap: 7px; }
+.historicalFinalSide:last-child { text-align: right; }
+.historicalFinalSide > span { color: #707a75; font-size: .57rem; font-weight: 900; letter-spacing: .08em; line-height: 1.25; text-transform: uppercase; }
+.historicalFinalSide > div { display: grid; gap: 7px; }
+.historicalFinalSide > div > div { min-width: 0; display: grid; gap: 2px; }
+.historicalFinalSide strong,.historicalFinalSide a { overflow-wrap: anywhere; color: #14251e; font: 700 .94rem/1.15 Georgia,serif; text-decoration: none; }
+.historicalFinalSide small { color: #7d652c; font-size: .59rem; font-weight: 800; line-height: 1.25; text-transform: uppercase; }
+.historicalFinalResult { padding: 11px 14px 12px; display: grid; gap: 4px; border-top: 1px solid #eee8dd; background: #fffdf8; }
+.historicalFinalResult > span { color: #8b6b25; font-size: .58rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+.historicalFinalResult > strong { overflow-wrap: anywhere; color: #0b4938; font: 700 1.02rem/1.18 Georgia,serif; }
+.historicalFinalResult > small { color: #65716b; font-size: .67rem; font-weight: 750; line-height: 1.35; }
+.historicalFinalResult > small i { padding: 0 3px; color: #a47b24; font-style: normal; }
+.historicalMatchDetails { border-top: 1px solid #e9e2d6; }
+.historicalMatchDetails > summary { min-height: 44px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; color: #0b4938; font-size: .68rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.historicalMatchDetails > summary::-webkit-details-marker { display: none; }
+.historicalMatchDetails > summary span { color: #a47b24; transition: transform .18s ease; }
+.historicalMatchDetails[open] > summary span { transform: rotate(180deg); }
+.historicalMatchDetailsBody { padding: 0 12px 12px; display: grid; gap: 10px; }
+.historicalMatchDetailsBody .matchProgression { margin: 0; }
+.historicalMatchDetailsBody .segmentGrid { margin: 0; }
+.historicalFinalCard > section[data-compact="true"] { margin: 0; border: 0; border-top: 1px solid #e9e2d6; border-radius: 0; }
 .matchCard:focus-visible,.matchFilters button:focus-visible,.refreshButton:focus-visible,.roundNavigation button:focus-visible { outline: 3px solid #d5a72d; outline-offset: 3px; }
 @keyframes livePulse { 50% { opacity: .35; transform: scale(.8); } }
 
@@ -1322,9 +1348,13 @@
   .matchFilters button span { min-width: 18px; padding: 2px 4px; font-size: .55rem; }
   .roundHeader { margin-top: 14px; }
   .matchFreshness { padding-inline: 14px; }
+  .historicalFinalHeader { min-height: 48px; }
+  .historicalFinalMatchup { padding-inline: 12px; }
+  .historicalFinalResult { padding-inline: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .freshness[data-state="refreshing"] > span { animation: none; }
   .matchCard,.roundNavigation button,.matchFilters button { scroll-behavior: auto; transition: none !important; }
+  .historicalMatchDetails > summary span { transition: none; }
 }

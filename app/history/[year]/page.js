@@ -14,13 +14,14 @@ import {
   formatHandicap,
   getAdjacentTournamentYears,
   getFormatName,
+  getHistoricalRound,
   getTournament,
   getTournamentMatches,
   getTournamentPlayerLeaderboard,
   getTournamentRoundPoints,
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
-import { formatPlayerPoints } from "../../../lib/formatters";
+import { formatPlayerPoints, formatTeamPoints } from "../../../lib/formatters";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
@@ -84,6 +85,10 @@ function pointsForRound(roundPoints, round) {
   return roundPoints.find((item) => item.round === round)?.pointsAvailable ?? null;
 }
 
+function completedFormatName(value) {
+  return getFormatName(value).replace(/^2v2\s+/i, "");
+}
+
 function tournamentStatus(tournament) {
   const score = String(tournament["Final Score"] ?? "").trim();
   const winner = tournament.championTeamId;
@@ -141,9 +146,9 @@ function completedScore(value) {
 function CompletedYearOverview({
   tournament,
   roundPoints,
+  roundResults,
   leaderboard,
   pointsTracked,
-  scorecardCoverage,
   scorecards,
   matches,
 }) {
@@ -170,10 +175,6 @@ function CompletedYearOverview({
   const remainingRecords = allRecords.filter(
     (item) => !defaultRecordLabels.includes(item.label)
   );
-  const scorecardValue = scorecardCoverage.completeMatchScorecards === scorecardCoverage.canonicalMatches
-    ? `All ${scorecardCoverage.canonicalMatches} matches`
-    : `${scorecardCoverage.completeMatchScorecards} matches`;
-
   const renderRecord = (item, compact = false) => (
     <article className={compact ? completedStyles.recordRow : completedStyles.recordCard} key={item.key || item.label} aria-label={item.accessibleLabel}>
       <span>{item.label}</span>
@@ -221,17 +222,21 @@ function CompletedYearOverview({
         {tournament.courses.map((course) => {
           const round = roundNumber(course.Round);
           const availablePoints = pointsForRound(roundPoints, round);
+          const roundResult = roundResults.find((item) => item.round === round);
+          const resultLabel = roundResult && roundResult.teamOne.points !== null && roundResult.teamTwo.points !== null
+            ? `${roundResult.teamOne.name} ${formatTeamPoints(roundResult.teamOne.points)} — ${formatTeamPoints(roundResult.teamTwo.points)} ${roundResult.teamTwo.name}${roundResult.roundWinner === "Halved" ? " · Halved" : ""}`
+            : null;
           return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
             <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`}>
               <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
               <span>
-                <b>{course.Round} · {getFormatName(course.Format)}</b>
+                <b>{course.Round} · {completedFormatName(course.Format)}</b>
                 <strong>{course.Course}</strong>
-                {availablePoints !== null ? <small>{availablePoints} Points Available</small> : null}
+                {resultLabel ? <small>{resultLabel}</small> : availablePoints !== null ? <small>{availablePoints} Total Points</small> : null}
               </span>
               <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}`}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}?view=archive`}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -277,15 +282,6 @@ function CompletedYearOverview({
         <summary><span className={completedStyles.closedLabel}>View All Tournament Records</span><span className={completedStyles.openLabel}>Hide Tournament Records</span></summary>
         <div className={completedStyles.recordList}>{remainingRecords.map((item) => renderRecord(item, true))}</div>
       </details> : null}
-    </section>
-
-    <section className={pwaStyles.overviewSection} data-completed-scorecards aria-labelledby="completed-scorecards-heading">
-      <span className={styles.sectionLabel}>Scorecards</span>
-      <h2 id="completed-scorecards-heading">Historical Scorecards</h2>
-      <div className={completedStyles.scorecards}>
-        <strong>{scorecardValue}</strong>
-        <span>Scorecard detail available</span>
-      </div>
     </section>
 
     <section className={pwaStyles.overviewSection} data-completed-honors aria-labelledby="completed-honors-heading">
@@ -452,6 +448,11 @@ export default async function TournamentYearPage({ params }) {
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
   const useCompleted2025 = !useSupabase2026 && Number(tournament.year) === 2025;
+  const completedRoundResults = useCompleted2025
+    ? tournament.courses
+      .map((course) => getHistoricalRound(tournament.year, roundNumber(course.Round)))
+      .filter(Boolean)
+    : [];
   return (
     <main>
       <Header />
@@ -557,9 +558,9 @@ export default async function TournamentYearPage({ params }) {
         {useCompleted2025 ? <CompletedYearOverview
           tournament={tournament}
           roundPoints={roundPoints}
+          roundResults={completedRoundResults}
           leaderboard={leaderboard}
           pointsTracked={pointsTracked}
-          scorecardCoverage={legacyScorecardCoverage}
           scorecards={tournamentScorecards}
           matches={tournamentMatches}
         /> : useSupabase2026 ? <CurrentHistoryOverview
@@ -781,7 +782,7 @@ export default async function TournamentYearPage({ params }) {
         )}
       </nav>
 
-      <Footer />
+      <Footer variant="app" />
     </main>
   );
 }
