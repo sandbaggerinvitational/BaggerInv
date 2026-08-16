@@ -220,9 +220,9 @@ function CompletedYearOverview({
   const renderStanding = (row, keyPrefix) => {
     const player = leaderboardPlayer(row);
     const rank = row.tournamentRank || row.rank;
-    return <div className={completedStyles.standingRow} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss", "losses")}, ${standingsCountLabel(row.halves, "tie")}, ${formatPlayerPoints(row.points)} points`}>
+    return <div className={`${pwaStyles.standingsRow} ${completedStyles.standingRow}`} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss", "losses")}, ${standingsCountLabel(row.halves, "tie")}, ${formatPlayerPoints(row.points)} points`}>
       <strong>{rank}</strong>
-      <span>{player.slug ? <Link href={`/players/${player.slug}`}>{player.name}</Link> : player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></span>
+      <span>{player.slug ? <Link href={`/players/${player.slug}`}>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></Link> : <>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></>}</span>
       <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
     </div>;
   };
@@ -230,7 +230,7 @@ function CompletedYearOverview({
   return <div className={completedStyles.story} data-completed-overview={tournament.year}>
     <section className={completedStyles.champion} data-completed-champion aria-labelledby="completed-champion-heading">
       <div className={completedStyles.championHeading}>
-        <span>{tournament.year} Champions</span>
+        <span>Final</span>
         <h2 id="completed-champion-heading">Tournament Final</h2>
       </div>
       <div className={completedStyles.result} role="group" aria-label={`${tournament.championTeam?.name}, ${tournament.year} Champions, ${championScore} points. ${tournament.runnerUpTeam?.name}, Runner-up, ${runnerUpScore} points.`}>
@@ -239,7 +239,7 @@ function CompletedYearOverview({
           <span><small>Champions</small><strong>{tournament.championTeam?.name || "To Be Determined"}</strong></span>
           <b>{championScore}</b>
         </Link>
-        <div className={completedStyles.finalDivider}><span>Final</span><i aria-hidden="true" /></div>
+        <div className={completedStyles.finalDivider}><span>Final score</span><i aria-hidden="true" /></div>
         <Link className={completedStyles.resultTeam} data-runner-up="true" href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.runnerUpTeam?.side || "Team 2")}`}>
           <AssetImage src={teamLogo(tournament.runnerUpTeam?.logo)} alt="" className={completedStyles.resultLogo} fallbackClassName={completedStyles.resultLogoFallback} fallback={tournament.runnerUpTeam?.name?.slice(0, 1) || "R"} inferFallback={false} />
           <span><small>Runner-up</small><strong>{tournament.runnerUpTeam?.name || "To Be Determined"}</strong></span>
@@ -248,93 +248,83 @@ function CompletedYearOverview({
       </div>
     </section>
 
-    <section className={completedStyles.storySection} data-completed-rounds aria-labelledby="completed-rounds-heading">
-      <div className={completedStyles.sectionHeading}>
-        <span>How They Won</span>
-        <h2 id="completed-rounds-heading">Three rounds at {tournament.Destination}</h2>
-      </div>
-      <div className={completedStyles.roundList}>
+    <section className={pwaStyles.overviewSection} data-completed-rounds aria-labelledby="completed-rounds-heading">
+      <span className={styles.sectionLabel}>Rounds</span>
+      <h2 id="completed-rounds-heading">Tournament Rounds</h2>
+      <div className={pwaStyles.overviewRoundList}>
         {tournament.courses.map((course) => {
           const round = roundNumber(course.Round);
           const availablePoints = pointsForRound(roundPoints, round);
-          return <article className={completedStyles.roundRow} key={`${course["Course ID"]}-${course.Round}`}>
-            <Link className={completedStyles.roundPrimary} href={`/history/${tournament.year}/round/${round}`}>
-              <span className={completedStyles.roundNumber}>{round}</span>
-              <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={completedStyles.roundLogo} fallbackClassName={completedStyles.roundLogoFallback} fallback="⛳" />
-              <span className={completedStyles.roundIdentity}>
-                <small>{course.Round} · {getFormatName(course.Format)}</small>
+          return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
+            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`}>
+              <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
+              <span>
+                <b>{course.Round} · {getFormatName(course.Format)}</b>
                 <strong>{course.Course}</strong>
-                {availablePoints !== null ? <em>{availablePoints} Points Available</em> : null}
+                {availablePoints !== null ? <small>{availablePoints} Points Available</small> : null}
               </span>
-              <b>View Round <i aria-hidden="true">→</i></b>
+              <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={completedStyles.courseLink} href={`/courses/${course["Course ID"]}`}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}`}>Course Profile</Link>
           </article>;
         })}
       </div>
     </section>
 
-    <section className={completedStyles.storySection} data-completed-teams aria-labelledby="completed-teams-heading">
-      <div className={completedStyles.sectionHeading}>
-        <span>The Teams</span>
-        <h2 id="completed-teams-heading">The sides that decided {tournament.year}</h2>
-      </div>
-      <div className={completedStyles.teamGrid}>
-        {tournament.teams.map((team) => <Link className={completedStyles.teamCard} href={`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`} key={team.side}>
-          <AssetImage src={teamLogo(team.logo)} alt="" className={completedStyles.teamLogo} fallbackClassName={completedStyles.teamLogoFallback} fallback={team.name.slice(0, 1)} inferFallback={false} />
-          <span>
-            <strong>{team.name}</strong>
+    <section className={pwaStyles.overviewSection} data-completed-teams aria-labelledby="completed-teams-heading">
+      <span className={styles.sectionLabel}>Teams</span>
+      <h2 id="completed-teams-heading">The Teams</h2>
+      <div className={pwaStyles.overviewTeamList}>
+        {tournament.teams.map((team) => <Link className={`${pwaStyles.overviewTeam} ${completedStyles.teamSummary}`} href={`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`} key={team.side}>
+          <AssetImage src={teamLogo(team.logo)} alt="" className={pwaStyles.overviewTeamLogo} fallbackClassName={pwaStyles.overviewTeamFallback} fallback={team.name.slice(0, 1)} inferFallback={false} />
+          <strong>{team.name}</strong>
+          <span className={completedStyles.teamMetadata}>
             <small>Captain · {team.captain?.["Display Name"] || team.captainRecordedName || "Captain not recorded"}</small>
             <small>Avg. Team Handicap · {formatHandicap(team.averageHandicap)}</small>
           </span>
-          <b>View Full Roster <i aria-hidden="true">→</i></b>
+          <b className={completedStyles.teamAction}>View Full Roster <i aria-hidden="true">→</i></b>
         </Link>)}
       </div>
     </section>
 
-    <section className={completedStyles.storySection} data-completed-standings aria-labelledby="completed-standings-heading">
-      <div className={completedStyles.sectionHeading}>
-        <span>Final Player Standings</span>
-        <h2 id="completed-standings-heading">The leaders</h2>
-      </div>
-      <div className={completedStyles.standings} role="list" aria-label="Top final player standings">
+    <section className={pwaStyles.overviewSection} data-completed-standings aria-labelledby="completed-standings-heading">
+      <span className={styles.sectionLabel}>Player Standings</span>
+      <h2 id="completed-standings-heading">Final Player Standings</h2>
+      <div className={`${pwaStyles.standingsSummary} ${completedStyles.standings}`} role="list" aria-label="Top final player standings">
         {standings.map((row) => renderStanding(row, "summary"))}
       </div>
-      <details className={completedStyles.disclosure} data-completed-standings-disclosure>
-        <summary><span className={completedStyles.closedLabel}>View Full Standings</span><span className={completedStyles.openLabel}>Hide Full Standings</span><b aria-hidden="true">↓</b></summary>
+      <details className={`${pwaStyles.recordsDetails} ${completedStyles.disclosure}`} data-completed-standings-disclosure>
+        <summary><span className={completedStyles.closedLabel}>View Full Standings</span><span className={completedStyles.openLabel}>Hide Full Standings</span></summary>
         <div className={completedStyles.disclosureBody}>
-          <div className={`${completedStyles.standings} ${completedStyles.fullStandings}`} role="list" aria-label="Full final player standings">
+          <div className={`${pwaStyles.standingsSummary} ${completedStyles.standings} ${completedStyles.fullStandings}`} role="list" aria-label="Full final player standings">
             {leaderboard.map((row) => renderStanding(row, "full"))}
           </div>
         </div>
       </details>
     </section>
 
-    <section className={completedStyles.storySection} data-completed-records aria-labelledby="completed-records-heading">
-      <div className={completedStyles.sectionHeading}>
-        <span>Tournament Records</span>
-        <h2 id="completed-records-heading">{tournament.year} by the numbers</h2>
-      </div>
+    <section className={pwaStyles.overviewSection} data-completed-records aria-labelledby="completed-records-heading">
+      <span className={styles.sectionLabel}>Records</span>
+      <h2 id="completed-records-heading">Tournament Records</h2>
       <div className={completedStyles.recordGrid}>{defaultRecords.map((item) => renderRecord(item))}</div>
-      {remainingRecords.length ? <details className={completedStyles.disclosure} data-completed-records-disclosure>
-        <summary><span className={completedStyles.closedLabel}>View All Tournament Records</span><span className={completedStyles.openLabel}>Hide Tournament Records</span><b aria-hidden="true">↓</b></summary>
+      {remainingRecords.length ? <details className={`${pwaStyles.recordsDetails} ${completedStyles.disclosure}`} data-completed-records-disclosure>
+        <summary><span className={completedStyles.closedLabel}>View All Tournament Records</span><span className={completedStyles.openLabel}>Hide Tournament Records</span></summary>
         <div className={completedStyles.recordList}>{remainingRecords.map((item) => renderRecord(item, true))}</div>
       </details> : null}
     </section>
 
-    <section className={`${completedStyles.storySection} ${completedStyles.scorecards}`} data-completed-scorecards aria-labelledby="completed-scorecards-heading">
-      <div>
-        <span>Historical Scorecards</span>
-        <h2 id="completed-scorecards-heading">{scorecardValue}</h2>
+    <section className={pwaStyles.overviewSection} data-completed-scorecards aria-labelledby="completed-scorecards-heading">
+      <span className={styles.sectionLabel}>Scorecards</span>
+      <h2 id="completed-scorecards-heading">Historical Scorecards</h2>
+      <div className={completedStyles.scorecards}>
+        <strong>{scorecardValue}</strong>
+        <span>Scorecard detail available</span>
       </div>
-      <p>Scorecard detail available</p>
     </section>
 
-    <section className={`${completedStyles.storySection} ${completedStyles.honors}`} data-completed-honors aria-labelledby="completed-honors-heading">
-      <div className={completedStyles.sectionHeading}>
-        <span>Tournament Honors</span>
-        <h2 id="completed-honors-heading">The closing accolade</h2>
-      </div>
+    <section className={pwaStyles.overviewSection} data-completed-honors aria-labelledby="completed-honors-heading">
+      <span className={styles.sectionLabel}>Honors</span>
+      <h2 id="completed-honors-heading">Tournament Honors</h2>
       <div className={completedStyles.honorList}>
         {tournament.awards.length ? tournament.awards.map((award) => <article key={award.Award}>
           <span>{award.Award}</span>
@@ -499,7 +489,7 @@ export default async function TournamentYearPage({ params }) {
     <main>
       <Header />
 
-      <section className={`${styles.tournamentHero} ${useSupabase2026 ? pwaStyles.currentTournamentHero : ""} ${useCompleted2025 ? completedStyles.hero : ""}`} data-completed-prototype={useCompleted2025 ? "2025" : undefined}>
+      <section className={`${styles.tournamentHero} ${useSupabase2026 || useCompleted2025 ? pwaStyles.currentTournamentHero : ""} ${useCompleted2025 ? completedStyles.hero : ""}`} data-completed-prototype={useCompleted2025 ? "2025" : undefined}>
         <AssetImage
           src={historyHeroPath(tournament)}
           alt={`${tournament.year} ${tournament.Destination}`}
@@ -515,7 +505,7 @@ export default async function TournamentYearPage({ params }) {
         />
         <div className={styles.tournamentHeroOverlay} />
 
-        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 ? pwaStyles.currentTournamentHeroContent : ""} ${useCompleted2025 ? completedStyles.heroContent : ""}`}>
+        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 || useCompleted2025 ? pwaStyles.currentTournamentHeroContent : ""} ${useCompleted2025 ? completedStyles.heroContent : ""}`}>
           {tournament.logoFileName ? (
             <AssetImage
               src={tournamentLogo(tournament.logoFileName)}
@@ -564,7 +554,7 @@ export default async function TournamentYearPage({ params }) {
         )}
       </nav>}
 
-      <section className={`${styles.content} ${useCompleted2025 ? completedStyles.content : ""}`}>
+      <section className={styles.content}>
         {draft ? (
           <Link className={styles.draftHistoryLink} href={`/draft/${year}`}>
             <span>Official Team Selection</span>

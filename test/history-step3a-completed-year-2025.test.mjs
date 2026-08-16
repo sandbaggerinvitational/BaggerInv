@@ -3,9 +3,10 @@ import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [page, css, archive, packageJson] = await Promise.all([
+const [page, css, participantCss, archive, packageJson] = await Promise.all([
   source("app/history/[year]/page.js"),
   source("app/history/[year]/completed-year-2025.module.css"),
+  source("app/history/history-participant.module.css"),
   source("lib/historical-data.json").then(JSON.parse),
   source("package.json").then(JSON.parse),
 ]);
@@ -18,7 +19,7 @@ test("Step 3A intentionally gates the completed-year prototype to 2025", () => {
   assert.doesNotMatch(page, /\[2017,\s*2018|year\s*>=\s*2017|year\s*<=\s*2025/);
 });
 
-test("the collapsed 2025 story follows the approved retrospective hierarchy", () => {
+test("the collapsed 2025 final state follows the shared History hierarchy", () => {
   const markers = [
     "data-completed-champion",
     "data-completed-rounds",
@@ -31,6 +32,42 @@ test("the collapsed 2025 story follows the approved retrospective hierarchy", ()
   const positions = markers.map((marker) => page.indexOf(marker));
   assert.equal(positions.every((position) => position >= 0), true);
   assert.deepEqual([...positions].sort((a, b) => a - b), positions);
+});
+
+test("2025 uses the 2026 History visual contracts without changing the 2026 branch", () => {
+  assert.match(page, /useSupabase2026 \|\| useCompleted2025 \? pwaStyles\.currentTournamentHero/);
+  assert.match(page, /useSupabase2026 \|\| useCompleted2025 \? pwaStyles\.currentTournamentHeroContent/);
+  assert.match(page, /className=\{pwaStyles\.overviewSection\}/);
+  assert.match(page, /className=\{pwaStyles\.overviewRoundList\}/);
+  assert.match(page, /className=\{pwaStyles\.overviewTeamList\}/);
+  assert.match(page, /pwaStyles\.standingsSummary/);
+  assert.match(page, /pwaStyles\.recordsDetails/);
+  assert.match(css, /background:\s*linear-gradient\(135deg, #fffaf0, #f3ead4\)/);
+  assert.match(css, /border-radius:\s*var\(--tsi-radius-md\)/);
+});
+
+test("direct product labels replace every Step 3A editorial subtitle", () => {
+  for (const label of [
+    "How They Won",
+    "Three rounds at",
+    "The sides that decided",
+    "The leaders",
+    "by the numbers",
+    "The closing accolade",
+  ]) {
+    assert.doesNotMatch(page, new RegExp(label, "i"));
+  }
+  for (const label of [
+    "Tournament Final",
+    "Tournament Rounds",
+    "The Teams",
+    "Final Player Standings",
+    "Tournament Records",
+    "Historical Scorecards",
+    "Tournament Honors",
+  ]) {
+    assert.match(page, new RegExp(`>${label}<`, "i"));
+  }
 });
 
 test("year identity keeps the canonical hero, edition, destination, and dates model-driven", async () => {
@@ -132,10 +169,10 @@ test("the 2025 presentation introduces no request, endpoint, data source, or dep
 });
 
 test("mobile presentation has bounded disclosures, touch targets, focus, and reduced-motion rules", () => {
-  assert.match(css, /@media \(max-width: 650px\)/);
+  assert.match(css, /@media \(max-width: 720px\)/);
   assert.match(css, /@media \(max-width: 350px\)/);
   assert.match(css, /\.disclosure:not\(\[open\]\) > \.disclosureBody/);
-  assert.match(css, /min-height:\s*44px/);
+  assert.match(participantCss, /min-height:\s*48px/);
   assert.match(css, /:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.doesNotMatch(css, /white-space:\s*nowrap/);
