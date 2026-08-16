@@ -39,7 +39,9 @@ import {
 import HistoryUnavailablePage from "../HistoryUnavailable";
 import HistoryArchiveNav from "../HistoryArchiveNav";
 import pwaStyles from "../history-participant.module.css";
+import completedStyles from "./completed-year-2025.module.css";
 import {
+  historyEditionLabel,
   historyHeroPath,
   historyCourseDisplayName,
   historyStandingsSummary,
@@ -112,16 +114,231 @@ function rankAccessibleLabel(rank) {
 
 function scoringItems(scoringStatistics, participant, courses) {
   return [
-    { label: "Best Individual Round", value: formatScoringNumber(scoringStatistics.lowestRound.value), detail: participant(scoringStatistics.lowestRound), sample: scoringStatistics.lowestRound.label },
-    { label: "Best Team Round", value: formatScoringNumber(scoringStatistics.lowestTeamRound.value), detail: participant(scoringStatistics.lowestTeamRound), sample: scoringStatistics.lowestTeamRound.label },
+    { label: "Best Individual Round", value: formatScoringNumber(scoringStatistics.lowestRound.value), detail: participant(scoringStatistics.lowestRound), sample: scoringStatistics.lowestRound.label, teamSide: scoringStatistics.lowestRound.scorecard?.scoreType === "TEAM" ? scoringStatistics.lowestRound.scorecard.side : null },
+    { label: "Best Team Round", value: formatScoringNumber(scoringStatistics.lowestTeamRound.value), detail: participant(scoringStatistics.lowestTeamRound), sample: scoringStatistics.lowestTeamRound.label, teamSide: scoringStatistics.lowestTeamRound.scorecard?.side, participantPlayerIds: scoringStatistics.lowestTeamRound.scorecard?.participantPlayerIds },
     { label: "Average Score", value: formatScoringNumber(scoringStatistics.averageScore.value), sample: scoringStatistics.averageScore.label },
-    { label: "Lowest Front", value: formatScoringNumber(scoringStatistics.lowestFrontNine.value), detail: participant(scoringStatistics.lowestFrontNine), sample: scoringStatistics.lowestFrontNine.label },
-    { label: "Lowest Back", value: formatScoringNumber(scoringStatistics.lowestBackNine.value), detail: participant(scoringStatistics.lowestBackNine), sample: scoringStatistics.lowestBackNine.label },
-    { label: "Birdie Leader", value: formatScoringNumber(scoringStatistics.birdieLeader.value), detail: participant(scoringStatistics.birdieLeader), sample: scoringStatistics.birdieLeader.label },
+    { label: "Lowest Front", value: formatScoringNumber(scoringStatistics.lowestFrontNine.value), detail: participant(scoringStatistics.lowestFrontNine), sample: scoringStatistics.lowestFrontNine.label, teamSide: scoringStatistics.lowestFrontNine.scorecard?.scoreType === "TEAM" ? scoringStatistics.lowestFrontNine.scorecard.side : null },
+    { label: "Lowest Back", value: formatScoringNumber(scoringStatistics.lowestBackNine.value), detail: participant(scoringStatistics.lowestBackNine), sample: scoringStatistics.lowestBackNine.label, teamSide: scoringStatistics.lowestBackNine.scorecard?.scoreType === "TEAM" ? scoringStatistics.lowestBackNine.scorecard.side : null },
+    { label: "Birdie Leader", value: formatScoringNumber(scoringStatistics.birdieLeader.value), detail: participant(scoringStatistics.birdieLeader), sample: scoringStatistics.birdieLeader.label, teamSide: null },
     { label: "Hardest Hole", value: scoringStatistics.hardestHole ? `#${scoringStatistics.hardestHole.holeNumber}` : "—", detail: scoringStatistics.hardestHole ? historyCourseDisplayName(scoringStatistics.hardestHole.courseId, courses, scoringStatistics.hardestHole.courseName) : "", sample: scoringStatistics.hardestHole?.averageToPar.label },
     { label: "Easiest Hole", value: scoringStatistics.easiestHole ? `#${scoringStatistics.easiestHole.holeNumber}` : "—", detail: scoringStatistics.easiestHole ? historyCourseDisplayName(scoringStatistics.easiestHole.courseId, courses, scoringStatistics.easiestHole.courseName) : "", sample: scoringStatistics.easiestHole?.averageToPar.label },
     { label: "Scorecard Coverage", value: `${scoringStatistics.scorecardCoverage.available} of ${scoringStatistics.scorecardCoverage.expected}`, detail: "Available scorecards", sample: scoringStatistics.scorecardCoverage.label },
   ];
+}
+
+function completedScore(value) {
+  return String(value ?? "")
+    .trim()
+    .replace(/(\.\d*?[1-9])0+$/, "$1")
+    .replace(/\.0+$/, "");
+}
+
+function completedRecordDetail(item, teams, scorecards) {
+  const value = String(item.detail ?? "").trim();
+  const participantPlayerIds = Array.isArray(item.participantPlayerIds)
+    ? item.participantPlayerIds.map((id) => String(id ?? "").trim()).filter(Boolean)
+    : [];
+  const rosterTeam = participantPlayerIds.length
+    ? teams.find((team) => participantPlayerIds.every((playerId) =>
+      team.roster.some((entry) => String(entry.player?.["Player ID"] ?? "").trim() === playerId)
+    ))
+    : null;
+  const canonicalTeam = rosterTeam || teams.find((team) =>
+    (item.teamSide && String(team.side) === `Team ${item.teamSide}`) ||
+    [team.id, team.name].some((identity) =>
+      String(identity ?? "").trim().toLowerCase() === value.toLowerCase()
+    )
+  );
+  if (canonicalTeam) return canonicalTeam.name;
+
+  const sourceTeamIds = [...new Set(scorecards
+    .filter((scorecard) => scorecard.scoreType === "TEAM" && scorecard.teamId)
+    .map((scorecard) => String(scorecard.teamId).trim()))];
+  const unmatchedSourceTeamIds = sourceTeamIds.filter((sourceId) =>
+    !teams.some((team) => String(team.id).trim().toLowerCase() === sourceId.toLowerCase())
+  );
+  const unmatchedCanonicalTeams = teams.filter((team) =>
+    !sourceTeamIds.some((sourceId) => String(team.id).trim().toLowerCase() === sourceId.toLowerCase())
+  );
+  return unmatchedSourceTeamIds.length === 1 &&
+    unmatchedCanonicalTeams.length === 1 &&
+    unmatchedSourceTeamIds[0].toLowerCase() === value.toLowerCase()
+    ? unmatchedCanonicalTeams[0].name
+    : value;
+}
+
+function CompletedYearOverview({
+  tournament,
+  roundPoints,
+  leaderboard,
+  pointsTracked,
+  scoringStatistics,
+  participant,
+  scorecardCoverage,
+  scorecards,
+}) {
+  const standings = historyStandingsSummary(leaderboard, 5);
+  const scoreParts = String(tournament["Final Score"] ?? "")
+    .split(/\s*[-–—]\s*/)
+    .map(completedScore);
+  const championScore = scoreParts[0] || "—";
+  const runnerUpScore = scoreParts[1] || "—";
+  const allRecords = scoringItems(scoringStatistics, participant, tournament.courses)
+    .filter((item) => item.label !== "Scorecard Coverage")
+    .map((item) => ({
+      ...item,
+      detail: completedRecordDetail(item, tournament.teams, scorecards),
+    }));
+  const defaultRecordLabels = [
+    "Best Individual Round",
+    "Best Team Round",
+    "Birdie Leader",
+    "Average Score",
+  ];
+  const defaultRecords = defaultRecordLabels
+    .map((label) => allRecords.find((item) => item.label === label))
+    .filter(Boolean);
+  const remainingRecords = allRecords.filter(
+    (item) => !defaultRecordLabels.includes(item.label)
+  );
+  const scorecardValue = scorecardCoverage.completeMatchScorecards === scorecardCoverage.canonicalMatches
+    ? `All ${scorecardCoverage.canonicalMatches} matches`
+    : `${scorecardCoverage.completeMatchScorecards} matches`;
+
+  const renderRecord = (item, compact = false) => (
+    <article className={compact ? completedStyles.recordRow : completedStyles.recordCard} key={item.label}>
+      <span>{item.label}</span>
+      <strong>{item.value}</strong>
+      {item.detail ? <b>{item.detail}</b> : null}
+      {item.sample ? <small>{item.sample}</small> : null}
+    </article>
+  );
+  const renderStanding = (row, keyPrefix) => {
+    const player = leaderboardPlayer(row);
+    const rank = row.tournamentRank || row.rank;
+    return <div className={completedStyles.standingRow} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${row.wins} wins, ${row.losses} losses, ${row.halves} ties, ${formatPlayerPoints(row.points)} points`}>
+      <strong>{rank}</strong>
+      <span>{player.slug ? <Link href={`/players/${player.slug}`}>{player.name}</Link> : player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></span>
+      <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
+    </div>;
+  };
+
+  return <div className={completedStyles.story} data-completed-overview={tournament.year}>
+    <section className={completedStyles.champion} data-completed-champion aria-labelledby="completed-champion-heading">
+      <div className={completedStyles.championHeading}>
+        <span>{tournament.year} Champions</span>
+        <h2 id="completed-champion-heading">Tournament Final</h2>
+      </div>
+      <div className={completedStyles.result} role="group" aria-label={`${tournament.championTeam?.name}, ${tournament.year} Champions, ${championScore} points. ${tournament.runnerUpTeam?.name}, Runner-up, ${runnerUpScore} points.`}>
+        <Link className={completedStyles.resultTeam} href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.championTeam?.side || "Team 1")}`}>
+          <AssetImage src={teamLogo(tournament.championTeam?.logo)} alt="" className={completedStyles.resultLogo} fallbackClassName={completedStyles.resultLogoFallback} fallback={tournament.championTeam?.name?.slice(0, 1) || "C"} inferFallback={false} />
+          <span><small>Champions</small><strong>{tournament.championTeam?.name || "To Be Determined"}</strong></span>
+          <b>{championScore}</b>
+        </Link>
+        <div className={completedStyles.finalDivider}><span>Final</span><i aria-hidden="true" /></div>
+        <Link className={completedStyles.resultTeam} data-runner-up="true" href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.runnerUpTeam?.side || "Team 2")}`}>
+          <AssetImage src={teamLogo(tournament.runnerUpTeam?.logo)} alt="" className={completedStyles.resultLogo} fallbackClassName={completedStyles.resultLogoFallback} fallback={tournament.runnerUpTeam?.name?.slice(0, 1) || "R"} inferFallback={false} />
+          <span><small>Runner-up</small><strong>{tournament.runnerUpTeam?.name || "To Be Determined"}</strong></span>
+          <b>{runnerUpScore}</b>
+        </Link>
+      </div>
+    </section>
+
+    <section className={completedStyles.storySection} data-completed-rounds aria-labelledby="completed-rounds-heading">
+      <div className={completedStyles.sectionHeading}>
+        <span>How They Won</span>
+        <h2 id="completed-rounds-heading">Three rounds at {tournament.Destination}</h2>
+      </div>
+      <div className={completedStyles.roundList}>
+        {tournament.courses.map((course) => {
+          const round = roundNumber(course.Round);
+          const availablePoints = pointsForRound(roundPoints, round);
+          return <article className={completedStyles.roundRow} key={`${course["Course ID"]}-${course.Round}`}>
+            <Link className={completedStyles.roundPrimary} href={`/history/${tournament.year}/round/${round}`}>
+              <span className={completedStyles.roundNumber}>{round}</span>
+              <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={completedStyles.roundLogo} fallbackClassName={completedStyles.roundLogoFallback} fallback="⛳" />
+              <span className={completedStyles.roundIdentity}>
+                <small>{course.Round} · {getFormatName(course.Format)}</small>
+                <strong>{course.Course}</strong>
+                {availablePoints !== null ? <em>{availablePoints} Points Available</em> : null}
+              </span>
+              <b>View Round <i aria-hidden="true">→</i></b>
+            </Link>
+            <Link className={completedStyles.courseLink} href={`/courses/${course["Course ID"]}`}>Course Profile</Link>
+          </article>;
+        })}
+      </div>
+    </section>
+
+    <section className={completedStyles.storySection} data-completed-teams aria-labelledby="completed-teams-heading">
+      <div className={completedStyles.sectionHeading}>
+        <span>The Teams</span>
+        <h2 id="completed-teams-heading">The sides that decided {tournament.year}</h2>
+      </div>
+      <div className={completedStyles.teamGrid}>
+        {tournament.teams.map((team) => <Link className={completedStyles.teamCard} href={`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`} key={team.side}>
+          <AssetImage src={teamLogo(team.logo)} alt="" className={completedStyles.teamLogo} fallbackClassName={completedStyles.teamLogoFallback} fallback={team.name.slice(0, 1)} inferFallback={false} />
+          <span>
+            <strong>{team.name}</strong>
+            <small>Captain · {team.captain?.["Display Name"] || team.captainRecordedName || "Captain not recorded"}</small>
+            <small>Avg. Team Handicap · {formatHandicap(team.averageHandicap)}</small>
+          </span>
+          <b>View Full Roster <i aria-hidden="true">→</i></b>
+        </Link>)}
+      </div>
+    </section>
+
+    <section className={completedStyles.storySection} data-completed-standings aria-labelledby="completed-standings-heading">
+      <div className={completedStyles.sectionHeading}>
+        <span>Final Player Standings</span>
+        <h2 id="completed-standings-heading">The leaders</h2>
+      </div>
+      <div className={completedStyles.standings} role="list" aria-label="Top final player standings">
+        {standings.map((row) => renderStanding(row, "summary"))}
+      </div>
+      <details className={completedStyles.disclosure} data-completed-standings-disclosure>
+        <summary><span className={completedStyles.closedLabel}>View Full Standings</span><span className={completedStyles.openLabel}>Hide Full Standings</span><b aria-hidden="true">↓</b></summary>
+        <div className={completedStyles.disclosureBody}>
+          <div className={`${completedStyles.standings} ${completedStyles.fullStandings}`} role="list" aria-label="Full final player standings">
+            {leaderboard.map((row) => renderStanding(row, "full"))}
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section className={completedStyles.storySection} data-completed-records aria-labelledby="completed-records-heading">
+      <div className={completedStyles.sectionHeading}>
+        <span>Tournament Records</span>
+        <h2 id="completed-records-heading">{tournament.year} by the numbers</h2>
+      </div>
+      <div className={completedStyles.recordGrid}>{defaultRecords.map((item) => renderRecord(item))}</div>
+      {remainingRecords.length ? <details className={completedStyles.disclosure} data-completed-records-disclosure>
+        <summary><span className={completedStyles.closedLabel}>View All Tournament Records</span><span className={completedStyles.openLabel}>Hide Tournament Records</span><b aria-hidden="true">↓</b></summary>
+        <div className={completedStyles.recordList}>{remainingRecords.map((item) => renderRecord(item, true))}</div>
+      </details> : null}
+    </section>
+
+    <section className={`${completedStyles.storySection} ${completedStyles.scorecards}`} data-completed-scorecards aria-labelledby="completed-scorecards-heading">
+      <div>
+        <span>Historical Scorecards</span>
+        <h2 id="completed-scorecards-heading">{scorecardValue}</h2>
+      </div>
+      <p>Scorecard detail available</p>
+    </section>
+
+    <section className={`${completedStyles.storySection} ${completedStyles.honors}`} data-completed-honors aria-labelledby="completed-honors-heading">
+      <div className={completedStyles.sectionHeading}>
+        <span>Tournament Honors</span>
+        <h2 id="completed-honors-heading">The closing accolade</h2>
+      </div>
+      <div className={completedStyles.honorList}>
+        {tournament.awards.length ? tournament.awards.map((award) => <article key={award.Award}>
+          <span>{award.Award}</span>
+          <strong>{award.winnerPlayer?.["Display Name"] || award.Winner}</strong>
+        </article>) : <article><span>Sandbagger of the Year</span><strong>Not awarded</strong></article>}
+      </div>
+    </section>
+  </div>;
 }
 
 function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTracked, scoringStatistics, participant }) {
@@ -273,12 +490,12 @@ export default async function TournamentYearPage({ params }) {
   });
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
-
+  const useCompleted2025 = !useSupabase2026 && Number(tournament.year) === 2025;
   return (
     <main>
       <Header />
 
-      <section className={`${styles.tournamentHero} ${useSupabase2026 ? pwaStyles.currentTournamentHero : ""}`}>
+      <section className={`${styles.tournamentHero} ${useSupabase2026 ? pwaStyles.currentTournamentHero : ""} ${useCompleted2025 ? completedStyles.hero : ""}`} data-completed-prototype={useCompleted2025 ? "2025" : undefined}>
         <AssetImage
           src={historyHeroPath(tournament)}
           alt={`${tournament.year} ${tournament.Destination}`}
@@ -294,7 +511,7 @@ export default async function TournamentYearPage({ params }) {
         />
         <div className={styles.tournamentHeroOverlay} />
 
-        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 ? pwaStyles.currentTournamentHeroContent : ""}`}>
+        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 ? pwaStyles.currentTournamentHeroContent : ""} ${useCompleted2025 ? completedStyles.heroContent : ""}`}>
           {tournament.logoFileName ? (
             <AssetImage
               src={tournamentLogo(tournament.logoFileName)}
@@ -309,14 +526,14 @@ export default async function TournamentYearPage({ params }) {
               decoding="async"
             />
           ) : null}
-          <p>{tournament.editionTitle}</p>
+          <p>{useCompleted2025 ? historyEditionLabel(tournament.year) : tournament.editionTitle}</p>
           <h1>{tournament.year}</h1>
           <h2>{tournament.Destination}</h2>
           <span>{tournament.Dates}</span>
         </div>
       </section>
 
-      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : <nav className={styles.tournamentYearNavigation}>
+      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : useCompleted2025 ? null : <nav className={styles.tournamentYearNavigation}>
         {previousYear ? (
           <Link href={`/history/${previousYear}`}>
             <span>← Previous Year</span>
@@ -343,7 +560,7 @@ export default async function TournamentYearPage({ params }) {
         )}
       </nav>}
 
-      <section className={styles.content}>
+      <section className={`${styles.content} ${useCompleted2025 ? completedStyles.content : ""}`}>
         {draft ? (
           <Link className={styles.draftHistoryLink} href={`/draft/${year}`}>
             <span>Official Team Selection</span>
@@ -357,7 +574,7 @@ export default async function TournamentYearPage({ params }) {
             <strong>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `${tournament.championTeam.name} champions` : "Tournament complete") : "2026 tournament record"}</strong>
             <p>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `Official final: ${tournament["Final Score"]}` : "The official champion is pending canonical tournament resolution.") : "Final results and scorecards appear here as matches become official."}</p>
           </div>
-        </div> : <div className={styles.finalScoreCard}>
+        </div> : useCompleted2025 ? null : <div className={styles.finalScoreCard}>
           <div>
             <span>Champions</span>
             <strong>
@@ -376,7 +593,16 @@ export default async function TournamentYearPage({ params }) {
           </div>
         </div>}
 
-        {useSupabase2026 ? <CurrentHistoryOverview
+        {useCompleted2025 ? <CompletedYearOverview
+          tournament={tournament}
+          roundPoints={roundPoints}
+          leaderboard={leaderboard}
+          pointsTracked={pointsTracked}
+          scoringStatistics={scoringStatistics}
+          participant={participant}
+          scorecardCoverage={legacyScorecardCoverage}
+          scorecards={tournamentScorecards}
+        /> : useSupabase2026 ? <CurrentHistoryOverview
           tournament={tournament}
           roundPoints={roundPoints}
           leaderboard={leaderboard}
@@ -567,7 +793,7 @@ export default async function TournamentYearPage({ params }) {
       </section>
 
       <nav
-        className={`${styles.tournamentYearNavigation} ${styles.tournamentYearNavigationBottom}`}
+        className={`${styles.tournamentYearNavigation} ${styles.tournamentYearNavigationBottom} ${useCompleted2025 ? completedStyles.archiveNavigation : ""}`}
       >
         {previousYear ? (
           <Link href={`/history/${previousYear}`}>
