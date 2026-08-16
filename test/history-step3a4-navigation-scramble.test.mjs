@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { build2025ScrambleRoundStatisticHolders } from "../lib/history-2025-tournament-records.js";
+import {
+  build2025ScrambleRoundStatisticHolders,
+  canonicalize2025ScrambleScorecardPresentation,
+} from "../lib/history-2025-tournament-records.js";
 import { historyCourseReturn } from "../lib/history-course-navigation.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -154,6 +157,26 @@ test("Scramble holder presentation never exposes raw team identities", () => {
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestFrontNine/);
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestBackNine/);
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestTeamRound/);
+});
+
+test("Round 2 scorecard disclosures replace raw team labels without changing scoring evidence", () => {
+  const presented = canonicalize2025ScrambleScorecardPresentation({
+    scorecards: [{
+      ...scorecards[3],
+      matchNetScoring: {
+        rows: [{ side: 2, name: "CRISPYBOYS", netTotals: { total: 65 } }],
+        holeWinners: [{ winnerSide: "B", winnerName: "CRISPYBOYS", holeNumber: 1 }],
+      },
+    }],
+    teams,
+  });
+  assert.equal(presented[0].teamName, "The Crispy Boys");
+  assert.equal(presented[0].matchNetScoring.rows[0].name, "The Crispy Boys");
+  assert.equal(presented[0].matchNetScoring.holeWinners[0].winnerName, "The Crispy Boys");
+  assert.equal(presented[0].total, scorecards[3].total);
+  assert.equal(presented[0].holes, scorecards[3].holes);
+  assert.doesNotMatch(JSON.stringify(presented), /CRISPYBOYS|CRIPSYBOYS|BANDONBROTHERS/);
+  assert.match(roundPage, /canonicalize2025ScrambleScorecardPresentation/);
 });
 
 test("aggregate Round 2 statistics remain holder-free and unrecalculated", () => {

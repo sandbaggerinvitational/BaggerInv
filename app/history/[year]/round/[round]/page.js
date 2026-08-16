@@ -33,7 +33,10 @@ import HistoricalMatchRow from "../../../HistoricalMatchRow";
 import pwaStyles from "../../../history-participant.module.css";
 import completedRoundStyles from "./completed-round-2025.module.css";
 import HistoryBackToTop from "../../../HistoryBackToTop";
-import { build2025ScrambleRoundStatisticHolders } from "../../../../../lib/history-2025-tournament-records";
+import {
+  build2025ScrambleRoundStatisticHolders,
+  canonicalize2025ScrambleScorecardPresentation,
+} from "../../../../../lib/history-2025-tournament-records";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -124,6 +127,15 @@ export default async function HistoricalRoundPage({ params }) {
     teamIds: [archive.teamOne.id, archive.teamTwo.id],
   });
   const completeLegacyMatchIds = new Set(legacyScorecardCoverage?.completeMatchIds || []);
+  const displayScorecardsForMatch = (matchId) => {
+    const cards = filterScorecards(scorecardAnalytics.scorecards, { matchId });
+    return completed2025 && Number(archive.round) === 2
+      ? canonicalize2025ScrambleScorecardPresentation({
+        scorecards: cards,
+        teams: archive.tournament.teams,
+      })
+      : cards;
+  };
   const scrambleStatisticHolders = completed2025 && Number(archive.round) === 2
     ? build2025ScrambleRoundStatisticHolders({
       scorecards: roundScorecards,
@@ -275,7 +287,7 @@ export default async function HistoricalRoundPage({ params }) {
         ) : (
           <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""} ${completed2025 ? completedRoundStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
-              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }} round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }} tournament={archive} variant="historical" scorecards={completeLegacyMatchIds.has(match.id) ? filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id }) : []} historyDensity completedHistoryCompact={completed2025} />
+              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} /> : <PublicMatchCard key={match.id} match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }} round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }} tournament={archive} variant="historical" scorecards={completeLegacyMatchIds.has(match.id) ? displayScorecardsForMatch(match.id) : []} historyDensity completedHistoryCompact={completed2025} />
             ))}
           </div>
         )}

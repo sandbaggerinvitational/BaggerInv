@@ -145,7 +145,7 @@ test("Round Statistics are secondary and empty zero-sample categories are filter
 test("round scorecard availability remains gated by accepted complete-match coverage", () => {
   assert.match(roundPage, /buildLegacyHistoryScorecardCoverage/);
   assert.match(roundPage, /completeLegacyMatchIds\.has\(match\.id\)/);
-  assert.match(roundPage, /filterScorecards\(scorecardAnalytics\.scorecards, \{ matchId: match\.id \}\)/);
+  assert.match(roundPage, /displayScorecardsForMatch\(match\.id\)/);
   const completedStatistics = roundPage.slice(
     roundPage.indexOf("{completed2025 ? (applicableRoundStatisticItems.length"),
     roundPage.indexOf(": <section className={styles.section}>", roundPage.indexOf("{completed2025 ? (applicableRoundStatisticItems.length"))
