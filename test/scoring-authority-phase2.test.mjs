@@ -15,7 +15,7 @@ const finalizedSummary = { "Match ID": "M1", Year: 2026, Round: 1, Match: 1, For
 const reopenedSummary = { ...finalizedSummary, "Match Status": "Reopened", "Final Result": "", Winner: "", "Matchup Winner": "",
   "Completed At": "", "Finalized At": "", "Finalized By": "" };
 
-function workbook({ holes = 1 } = {}) {
+function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" } } = {}) {
   const players = [
     { "Player ID": "P1", "Display Name": "Player One" }, { "Player ID": "P2", "Display Name": "Player Two" },
     { "Player ID": "P3", "Display Name": "Player Three" }, { "Player ID": "P4", "Display Name": "Player Four" },
@@ -42,7 +42,10 @@ function workbook({ holes = 1 } = {}) {
   return {
     Tournaments: sheet([{ Year: 2026, "Tournament ID": "SBI-2026", "Tournament Name": "Sandbagger Invitational" }]),
     Players: sheet(players), Handicaps: sheet(handicaps),
-    "Team Names": sheet([{ Year: 2026, "Team Side": "Team 1", "Team ID": "T1", "Team Names": "Pickles" }, { Year: 2026, "Team Side": "Team 2", "Team ID": "T2", "Team Names": "Lipp" }]),
+    "Team Names": sheet([
+      { Year: 2026, "Team Side": "Team 1", "Team ID": "T1", "Team Names": "Pickles", Captain: captains[1] },
+      { Year: 2026, "Team Side": "Team 2", "Team ID": "T2", "Team Names": "Lipp", Captain: captains[2] },
+    ]),
     Rounds: sheet([{ Year: 2026, Round: 1, Format: "BB", "Handicap Allowance": 0.9 }, { Year: 2026, Round: 2, Format: "SC" }, { Year: 2026, Round: 3, Format: "SI" }]),
     Courses: sheet([{ Year: 2026, Format: "BB", "Course ID": "C1", "Tee Played": "Gold", Rating: 71.9, Slope: 136, Par: 72 }]),
     "Course Holes": sheet(courseHoles), "Live Matches": sheet([match]), Matches: sheet([]), "Live Hole Scores": sheet(scores),
@@ -59,6 +62,38 @@ test("canonical import creates an explicit roster and immutable scoring snapshot
   assert.equal(result.payload.match_holes.length, 18);
   assert.equal(result.payload.hole_scores.length, 1);
   assert.equal(result.payload.hole_scores[0].team_1_net_score, 4);
+  assert.deepEqual(result.payload.teams.map((team) => team.source_payload.Captain), ["P1", "P3"]);
+});
+
+test("canonical team import preserves captain IDs idempotently and leaves missing captain unavailable", () => {
+  const first = buildCanonicalScoringAuthorityImport({ sheets: workbook(), sourceWorkbookId: "preview-sheet" });
+  const second = buildCanonicalScoringAuthorityImport({ sheets: workbook(), sourceWorkbookId: "preview-sheet" });
+  assert.deepEqual(second.payload.teams, first.payload.teams);
+  assert.deepEqual(second.payload.tournament_players, first.payload.tournament_players);
+
+  const missing = buildCanonicalScoringAuthorityImport({
+    sheets: workbook({ captains: { 1: "", 2: "P3" } }),
+    sourceWorkbookId: "preview-sheet",
+  });
+  assert.equal(Object.hasOwn(missing.payload.teams[0].source_payload, "Captain"), false);
+  assert.equal(missing.payload.teams[1].source_payload.Captain, "P3");
+});
+
+test("canonical team import rejects unknown and wrong-team captain IDs", () => {
+  assert.throws(
+    () => buildCanonicalScoringAuthorityImport({
+      sheets: workbook({ captains: { 1: "UNKNOWN", 2: "P3" } }),
+      sourceWorkbookId: "preview-sheet",
+    }),
+    /Canonical captain UNKNOWN is not on the 2026 T1 roster/,
+  );
+  assert.throws(
+    () => buildCanonicalScoringAuthorityImport({
+      sheets: workbook({ captains: { 1: "P3", 2: "P1" } }),
+      sourceWorkbookId: "preview-sheet",
+    }),
+    /Canonical captain P3 is not on the 2026 T1 roster/,
+  );
 });
 
 test("zero-hole authoritative matches import without manufactured scores", () => {

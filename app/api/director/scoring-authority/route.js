@@ -1154,14 +1154,21 @@ async function currentAndReconcile(imported) {
   return { current: read.payload.data, report: reconcileCanonicalScoringAuthority(imported, read.payload.data), readMs: read.durationMs };
 }
 
-async function importMain(requestedBy) {
+async function importMain(requestedBy, { scope = "FULL" } = {}) {
   const source = await authoritativeImport(requestedBy);
+  const importScope = upper(scope);
+  if (!new Set(["FULL", "TEAM_METADATA"]).has(importScope)) {
+    throw Object.assign(new Error("Invalid canonical import scope."), { code: "INVALID_IMPORT_SCOPE" });
+  }
+  const importPayload = importScope === "TEAM_METADATA"
+    ? { ...source.imported.payload, import_scope: importScope }
+    : source.imported.payload;
   const writeStartedAt = Date.now();
-  const write = await replaceCanonicalScoringAuthorityImport(source.imported.payload);
+  const write = await replaceCanonicalScoringAuthorityImport(importPayload);
   const writeMs = Date.now() - writeStartedAt;
   if (!write.payload?.ok) throw new Error(`Canonical import failed (${write.payload?.code || "unknown"}).`);
   const reconciled = await currentAndReconcile(source.imported);
-  return { ...source, write: write.payload, writeMs, ...reconciled };
+  return { ...source, importScope, write: write.payload, writeMs, ...reconciled };
 }
 
 async function cutoverSnapshot(requestedBy) {
@@ -1601,8 +1608,8 @@ export async function POST(request) {
     let result;
     if (action === "preflight") result = await preflight(context);
     else if (action === "import") {
-      const imported = await importMain(actorId);
-      result = { counts: imported.imported.counts, fingerprint: imported.imported.fingerprint,
+      const imported = await importMain(actorId, { scope: input.scope || "FULL" });
+      result = { scope: imported.importScope, counts: imported.imported.counts, fingerprint: imported.imported.fingerprint,
         googleReadMs: imported.googleReadMs, normalizationMs: imported.normalizationMs, supabaseImportMs: imported.writeMs,
         supabaseReadMs: imported.readMs, import: imported.write, reconciliation: imported.report };
     } else if (action === "reconcile") {
