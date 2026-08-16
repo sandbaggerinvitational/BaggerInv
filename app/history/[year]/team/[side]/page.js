@@ -102,17 +102,6 @@ export default async function TeamSeasonPage({ params }) {
   return (
     <main>
       <Header />
-      {!useSupabase2026 ? <HistoryNavigation
-        ariaLabel={`${team.year} team history navigation`}
-        left={{
-          href: `/history/${team.year}`,
-          label: `${team.year} Tournament`,
-          direction: "left",
-          ariaLabel: `${team.year} Tournament`,
-        }}
-        surface="team"
-      /> : null}
-
       <section className={`${styles.pageHero} ${styles.teamRosterHero} ${useSupabase2026 ? pwaStyles.teamHero : ""}`}>
         <TeamLogoPlate
           filename={team.logo}
@@ -129,6 +118,17 @@ export default async function TeamSeasonPage({ params }) {
         </p>
         </div>
       </section>
+
+      {!useSupabase2026 ? <HistoryNavigation
+        ariaLabel={`${team.year} team history navigation`}
+        left={{
+          href: `/history/${team.year}`,
+          label: `${team.year} Tournament`,
+          direction: "left",
+          ariaLabel: `${team.year} Tournament`,
+        }}
+        surface="team"
+      /> : null}
 
       {useSupabase2026 ? <HistoryArchiveNav year={team.year} rounds={team.roundGroups} teams={team.tournament.teams} activeSide={decodedSide} /> : null}
 

@@ -72,6 +72,20 @@ export default async function CoursePage({ params, searchParams }) {
   };
   return <main className={styles.page}>
     <Header homeHref="/home" />
+    <section className={styles.hero}>
+      {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
+      <div className={styles.heroShade} />
+      <div className={styles.heroContent}>
+        {historyReturn && !tournamentReturn ? <nav className={styles.historyNavigation} aria-label="History course navigation">
+          <Link href={returnLink.href}>‹ {returnLink.label}</Link>
+        </nav> : !historyReturn ? <Link href={returnLink.href}>‹ {returnLink.label}</Link> : null}
+        <div className={styles.identity}>
+          <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
+          <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>
+        </div>
+      </div>
+    </section>
+
     {tournamentReturn ? <HistoryNavigation
       ariaLabel={`${tournamentReturn.label} course history navigation`}
       left={{
@@ -88,19 +102,6 @@ export default async function CoursePage({ params, searchParams }) {
       } : null}
       surface="course"
     /> : null}
-    <section className={styles.hero}>
-      {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
-      <div className={styles.heroShade} />
-      <div className={styles.heroContent}>
-        {historyReturn && !tournamentReturn ? <nav className={styles.historyNavigation} aria-label="History course navigation">
-          <Link href={returnLink.href}>‹ {returnLink.label}</Link>
-        </nav> : !historyReturn ? <Link href={returnLink.href}>‹ {returnLink.label}</Link> : null}
-        <div className={styles.identity}>
-          <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
-          <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>
-        </div>
-      </div>
-    </section>
 
     <div className={styles.shell}>
       {model.facts.length ? <section className={styles.section}><header><span>At a glance</span><h2>Course Quick Facts</h2></header><dl className={styles.facts}>{model.facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section> : null}

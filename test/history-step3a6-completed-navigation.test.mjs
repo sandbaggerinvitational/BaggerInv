@@ -107,7 +107,11 @@ test("completed Team History uses one shared parent destination without sibling 
   assert.match(teamPage, /label: `\$\{team\.year\} Tournament`/);
   assert.match(teamPage, /direction: "left"/);
   assert.match(teamPage, /surface="team"/);
-  const completedNavigation = teamPage.slice(teamPage.indexOf("!useSupabase2026 ? <HistoryNavigation"), teamPage.indexOf("<section className={`${styles.pageHero}"));
+  const hero = teamPage.indexOf("<section className={`${styles.pageHero}");
+  const navigation = teamPage.indexOf("!useSupabase2026 ? <HistoryNavigation");
+  const content = teamPage.indexOf("{useSupabase2026 ? <HistoryArchiveNav", navigation);
+  assert.ok(hero >= 0 && hero < navigation && navigation < content);
+  const completedNavigation = teamPage.slice(navigation, content);
   assert.doesNotMatch(completedNavigation, /right=|center=|Previous Team|Next Team/);
 });
 
@@ -131,10 +135,13 @@ test("every canonical completed-year course link preserves archive and explicit 
 test("History-context Course navigation orders Tournament left and source Round right", () => {
   const start = coursePage.indexOf("{tournamentReturn ? <HistoryNavigation");
   const end = coursePage.indexOf('surface="course"', start);
+  const hero = coursePage.indexOf("<section className={styles.hero}");
+  const content = coursePage.indexOf("<div className={styles.shell}", end);
   const context = coursePage.slice(start, end);
   const tournament = context.indexOf("href: tournamentReturn.href");
   const round = context.indexOf("href: historyReturn.href");
-  assert.ok(start >= 0 && tournament >= 0 && tournament < round);
+  assert.ok(hero >= 0 && hero < start && start < content);
+  assert.ok(tournament >= 0 && tournament < round);
   assert.match(context, /href: tournamentReturn\.href[\s\S]*direction: "left"/);
   assert.match(context, /href: historyReturn\.href[\s\S]*direction: "right"/);
   assert.match(coursePage, /!historyReturn \? <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
