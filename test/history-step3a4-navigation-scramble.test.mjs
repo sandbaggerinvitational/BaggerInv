@@ -153,7 +153,7 @@ test("Scramble holder presentation never exposes raw team identities", () => {
   const output = JSON.stringify(holders);
   for (const raw of ["CRISPYBOYS", "CRIPSYBOYS", "BANDONBROTHERS", "SOURCE-TYPO"])
     assert.doesNotMatch(output, new RegExp(raw));
-  assert.match(roundPage, /holders: scrambleStatisticHolders\?\.mostBirdies/);
+  assert.match(roundPage, /holders: completed2025 && archive\.format === "SC" \? scrambleStatisticHolders\?\.mostBirdies/);
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestFrontNine/);
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestBackNine/);
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestTeamRound/);

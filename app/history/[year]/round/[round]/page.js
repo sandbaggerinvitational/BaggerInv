@@ -159,15 +159,18 @@ export default async function HistoricalRoundPage({ params }) {
   const holeLabel = (hole) => hole
     ? `Hole ${hole.holeNumber}${hole.tee ? ` · ${hole.tee}` : ""}`
     : "";
+  const roundBirdieLeader = completed2025 && archive.format === "SC"
+    ? roundStatistics.mostBirdies
+    : roundStatistics.birdieLeader;
   const roundStatisticItems = [
     { label: "Lowest Round", value: formatScoringNumber(roundStatistics.lowestRound.value), detail: participant(roundStatistics.lowestRound), sample: roundStatistics.lowestRound.label },
-    { label: "Most Birdies", value: formatScoringNumber(roundStatistics.mostBirdies.value), detail: participant(roundStatistics.mostBirdies), holders: scrambleStatisticHolders?.mostBirdies, sample: roundStatistics.mostBirdies.label },
+    ...(!completed2025 ? [{ label: "Most Birdies", value: formatScoringNumber(roundStatistics.mostBirdies.value), detail: participant(roundStatistics.mostBirdies), sample: roundStatistics.mostBirdies.label }] : []),
     { label: "Lowest Front Nine", value: formatScoringNumber(roundStatistics.lowestFrontNine.value), detail: participant(roundStatistics.lowestFrontNine), holders: scrambleStatisticHolders?.lowestFrontNine, sample: roundStatistics.lowestFrontNine.label },
     { label: "Lowest Back Nine", value: formatScoringNumber(roundStatistics.lowestBackNine.value), detail: participant(roundStatistics.lowestBackNine), holders: scrambleStatisticHolders?.lowestBackNine, sample: roundStatistics.lowestBackNine.label },
     { label: "Average Score", value: formatScoringNumber(roundStatistics.averageScore.value), sample: roundStatistics.averageScore.label },
     { label: "Hardest Hole", value: roundStatistics.hardestHole ? `#${roundStatistics.hardestHole.holeNumber}` : "—", detail: holeLabel(roundStatistics.hardestHole), sample: roundStatistics.hardestHole?.averageToPar.label },
     { label: "Easiest Hole", value: roundStatistics.easiestHole ? `#${roundStatistics.easiestHole.holeNumber}` : "—", detail: holeLabel(roundStatistics.easiestHole), sample: roundStatistics.easiestHole?.averageToPar.label },
-    { label: "Birdie Leader", value: formatScoringNumber(roundStatistics.birdieLeader.value), detail: participant(roundStatistics.birdieLeader), sample: roundStatistics.birdieLeader.label },
+    { label: "Birdie Leader", value: formatScoringNumber(roundBirdieLeader.value), detail: participant(roundBirdieLeader), holders: completed2025 && archive.format === "SC" ? scrambleStatisticHolders?.mostBirdies : undefined, sample: roundBirdieLeader.label },
     { label: "Lowest Team Round", value: formatScoringNumber(roundStatistics.lowestTeamRound.value), detail: participant(roundStatistics.lowestTeamRound), holders: scrambleStatisticHolders?.lowestTeamRound, sample: roundStatistics.lowestTeamRound.label },
   ];
   const applicableRoundStatisticItems = roundStatisticItems.filter((item) =>

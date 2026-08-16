@@ -11,6 +11,10 @@ import ScorecardTable from "./ScorecardTable";
 import { matchState } from "../lib/live-match-ux";
 import MatchProgressionSummary from "./MatchProgressionSummary";
 import { reconstructMatchProgression } from "../lib/match-progression";
+import {
+  historicalPairingPlayerRows,
+  historicalStrokeText,
+} from "../lib/history-match-presentation";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 const initials = (name) => String(name ?? "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
@@ -29,8 +33,7 @@ function TeamLogo({ team }) {
 }
 
 function strokeText(value) {
-  if (!hasValue(value) || Number(value) === 0) return "";
-  return `${value} stroke${Number(value) === 1 ? "" : "s"} received`;
+  return historicalStrokeText(value);
 }
 
 function PlayerName({ player }) {
@@ -108,6 +111,52 @@ function CompactHistoricalSide({ team, players = [], teamStroke = null }) {
       })}
     </div>
     {teamStrokeLabel ? <small>{teamStrokeLabel}</small> : null}
+  </div>;
+}
+
+function CompactHistoricalPlayerName({ player, side, slot }) {
+  if (!player) {
+    return <span className={styles.historicalFinalPlayerName} data-side={side} data-player-slot={slot} aria-hidden="true" />;
+  }
+  return <strong className={styles.historicalFinalPlayerName} data-side={side} data-player-slot={slot}>
+    <PlayerName player={player} />
+  </strong>;
+}
+
+function CompactHistoricalStrokeLine({ label, side, slot }) {
+  const empty = !label;
+  return <small
+    className={`${styles.historicalFinalStrokeLine} ${empty ? styles.historicalFinalStrokePlaceholder : ""}`}
+    data-side={side}
+    data-player-slot={slot}
+    data-empty={empty ? "true" : undefined}
+    aria-hidden={empty ? "true" : undefined}
+  >{label || "\u00a0"}</small>;
+}
+
+function CompactHistoricalPairing({ teamOne, teamTwo, teamOnePlayers = [], teamTwoPlayers = [], teamOneStroke = null, teamTwoStroke = null }) {
+  const playerRows = historicalPairingPlayerRows(teamOnePlayers, teamTwoPlayers);
+  const teamOneStrokeLabel = strokeText(teamOneStroke);
+  const teamTwoStrokeLabel = strokeText(teamTwoStroke);
+  const hasTeamStrokeLine = Boolean(teamOneStrokeLabel || teamTwoStrokeLabel);
+
+  return <div className={`${styles.historicalFinalMatchup} ${styles.historicalFinalPairing}`}>
+    <span className={styles.historicalFinalTeamLabel} data-side="1">{teamOne.name}</span>
+    <span className={styles.historicalFinalPairSpacer} aria-hidden="true" />
+    <span className={styles.historicalFinalTeamLabel} data-side="2">{teamTwo.name}</span>
+    {playerRows.map((row, index) => <Fragment key={`historical-player-slot-${row.slot}`}>
+      <CompactHistoricalPlayerName player={row.left.player} side="1" slot={row.slot} />
+      {index === 0 ? <b aria-label="versus">VS</b> : <span className={styles.historicalFinalPairSpacer} aria-hidden="true" />}
+      <CompactHistoricalPlayerName player={row.right.player} side="2" slot={row.slot} />
+      <CompactHistoricalStrokeLine label={row.left.strokeText} side="1" slot={row.slot} />
+      <span className={styles.historicalFinalPairSpacer} aria-hidden="true" />
+      <CompactHistoricalStrokeLine label={row.right.strokeText} side="2" slot={row.slot} />
+    </Fragment>)}
+    {hasTeamStrokeLine ? <>
+      <small className={styles.historicalFinalTeamStroke} data-side="1">{teamOneStrokeLabel || "\u00a0"}</small>
+      <span className={styles.historicalFinalPairSpacer} aria-hidden="true" />
+      <small className={styles.historicalFinalTeamStroke} data-side="2">{teamTwoStrokeLabel || "\u00a0"}</small>
+    </> : null}
   </div>;
 }
 
@@ -201,11 +250,18 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
 
       {variant === "historical" && isGhostMatch ? <div className={styles.ghostMatchNotice}><strong>GHOST MATCH</strong><span>Selected player results are excluded from official records.</span></div> : null}
 
-      <div className={styles.historicalFinalMatchup}>
-        <CompactHistoricalSide team={tournament.teamOne} players={match.team1Players} teamStroke={match.format === "SC" ? match.team1Stroke : null} />
+      {match.format === "SI" ? <div className={styles.historicalFinalMatchup}>
+        <CompactHistoricalSide team={tournament.teamOne} players={match.team1Players} />
         <b aria-label="versus">VS</b>
-        <CompactHistoricalSide team={tournament.teamTwo} players={match.team2Players} teamStroke={match.format === "SC" ? match.team2Stroke : null} />
-      </div>
+        <CompactHistoricalSide team={tournament.teamTwo} players={match.team2Players} />
+      </div> : <CompactHistoricalPairing
+        teamOne={tournament.teamOne}
+        teamTwo={tournament.teamTwo}
+        teamOnePlayers={match.team1Players}
+        teamTwoPlayers={match.team2Players}
+        teamOneStroke={match.format === "SC" ? match.team1Stroke : null}
+        teamTwoStroke={match.format === "SC" ? match.team2Stroke : null}
+      />}
 
       <div className={styles.historicalFinalResult}>
         <span>Final result</span>

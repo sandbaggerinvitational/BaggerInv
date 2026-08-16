@@ -1310,6 +1310,16 @@
 .historicalFinalSide > div > div { min-width: 0; display: grid; gap: 2px; }
 .historicalFinalSide strong,.historicalFinalSide a { overflow-wrap: anywhere; color: #14251e; font: 700 .94rem/1.15 Georgia,serif; text-decoration: none; }
 .historicalFinalSide small { color: #7d652c; font-size: .59rem; font-weight: 800; line-height: 1.25; text-transform: uppercase; }
+.historicalFinalPairing { row-gap: 2px; }
+.historicalFinalTeamLabel { min-width: 0; color: #707a75; font-size: .57rem; font-weight: 900; letter-spacing: .08em; line-height: 1.25; text-transform: uppercase; overflow-wrap: anywhere; }
+.historicalFinalTeamLabel[data-side="2"] { text-align: right; }
+.historicalFinalPairing > b { align-self: center; padding-top: 5px; }
+.historicalFinalPairSpacer { min-width: 0; }
+.historicalFinalPlayerName { min-width: 0; margin-top: 5px; align-self: start; overflow-wrap: anywhere; color: #14251e; font: 700 .94rem/1.15 Georgia,serif; text-decoration: none; }
+.historicalFinalPlayerName a { color: inherit; text-decoration: none; }
+.historicalFinalPlayerName[data-side="2"],.historicalFinalStrokeLine[data-side="2"],.historicalFinalTeamStroke[data-side="2"] { text-align: right; }
+.historicalFinalStrokeLine,.historicalFinalTeamStroke { min-width: 0; min-height: .7375rem; align-self: stretch; color: #7d652c; font-size: .59rem; font-weight: 800; line-height: 1.25; text-transform: uppercase; overflow-wrap: anywhere; }
+.historicalFinalStrokePlaceholder { visibility: hidden; }
 .historicalFinalResult { padding: 11px 14px 12px; display: grid; gap: 4px; border-top: 1px solid #eee8dd; background: #fffdf8; }
 .historicalFinalResult > span { color: #8b6b25; font-size: .58rem; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
 .historicalFinalResult > strong { overflow-wrap: anywhere; color: #0b4938; font: 700 1.02rem/1.18 Georgia,serif; }
