@@ -161,8 +161,9 @@ test("Scramble holder presentation never exposes raw team identities", () => {
 
 test("Round 2 scorecard disclosures replace raw team labels without changing scoring evidence", () => {
   const presented = canonicalize2025ScrambleScorecardPresentation({
-    scorecards: [{
+    scorecards: [scorecards[2], {
       ...scorecards[3],
+      side: null,
       matchNetScoring: {
         rows: [{ side: 2, name: "CRISPYBOYS", netTotals: { total: 65 } }],
         holeWinners: [{ winnerSide: "B", winnerName: "CRISPYBOYS", holeNumber: 1 }],
@@ -170,11 +171,12 @@ test("Round 2 scorecard disclosures replace raw team labels without changing sco
     }],
     teams,
   });
-  assert.equal(presented[0].teamName, "The Crispy Boys");
-  assert.equal(presented[0].matchNetScoring.rows[0].name, "The Crispy Boys");
-  assert.equal(presented[0].matchNetScoring.holeWinners[0].winnerName, "The Crispy Boys");
-  assert.equal(presented[0].total, scorecards[3].total);
-  assert.equal(presented[0].holes, scorecards[3].holes);
+  assert.equal(presented[1].side, 2);
+  assert.equal(presented[1].teamName, "The Crispy Boys");
+  assert.equal(presented[1].matchNetScoring.rows[0].name, "The Crispy Boys");
+  assert.equal(presented[1].matchNetScoring.holeWinners[0].winnerName, "The Crispy Boys");
+  assert.equal(presented[1].total, scorecards[3].total);
+  assert.equal(presented[1].holes, scorecards[3].holes);
   assert.doesNotMatch(JSON.stringify(presented), /CRISPYBOYS|CRIPSYBOYS|BANDONBROTHERS/);
   assert.match(roundPage, /canonicalize2025ScrambleScorecardPresentation/);
 });
