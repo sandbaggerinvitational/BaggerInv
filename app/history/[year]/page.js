@@ -112,8 +112,8 @@ function rankAccessibleLabel(rank) {
     : `Rank ${value}`;
 }
 
-function standingsCountLabel(value, singular) {
-  return `${value} ${Number(value) === 1 ? singular : `${singular}s`}`;
+function standingsCountLabel(value, singular, plural = `${singular}s`) {
+  return `${value} ${Number(value) === 1 ? singular : plural}`;
 }
 
 function scoringItems(scoringStatistics, participant, courses) {
@@ -220,7 +220,7 @@ function CompletedYearOverview({
   const renderStanding = (row, keyPrefix) => {
     const player = leaderboardPlayer(row);
     const rank = row.tournamentRank || row.rank;
-    return <div className={completedStyles.standingRow} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss")}, ${standingsCountLabel(row.halves, "tie")}, ${formatPlayerPoints(row.points)} points`}>
+    return <div className={completedStyles.standingRow} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss", "losses")}, ${standingsCountLabel(row.halves, "tie")}, ${formatPlayerPoints(row.points)} points`}>
       <strong>{rank}</strong>
       <span>{player.slug ? <Link href={`/players/${player.slug}`}>{player.name}</Link> : player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></span>
       <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
