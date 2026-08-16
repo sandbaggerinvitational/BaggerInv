@@ -81,6 +81,9 @@ test("final standings use the rank-five cutoff and preserve all rows in a native
   assert.match(page, /View Full Standings/);
   assert.match(page, /Hide Full Standings/);
   assert.match(page, /aria-label=\{`\$\{rankAccessibleLabel\(rank\)/);
+  assert.match(page, /standingsCountLabel\(row\.wins, "win"\)/);
+  assert.match(page, /standingsCountLabel\(row\.losses, "loss"\)/);
+  assert.match(page, /standingsCountLabel\(row\.halves, "tie"\)/);
   assert.match(page, /row\.wins/);
   assert.match(page, /row\.losses/);
   assert.match(page, /row\.halves/);
