@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header, Footer } from "../../components";
+import { Header } from "../../components";
 import AssetImage from "../../AssetImage";
 import TeamLogoPlate from "../../TeamLogoPlate";
 import {
@@ -14,14 +14,13 @@ import {
   formatHandicap,
   getAdjacentTournamentYears,
   getFormatName,
-  getHistoricalRound,
   getTournament,
   getTournamentMatches,
   getTournamentPlayerLeaderboard,
   getTournamentRoundPoints,
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
-import { formatPlayerPoints, formatTeamPoints } from "../../../lib/formatters";
+import { formatPlayerPoints } from "../../../lib/formatters";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
@@ -145,8 +144,6 @@ function completedScore(value) {
 
 function CompletedYearOverview({
   tournament,
-  roundPoints,
-  roundResults,
   leaderboard,
   pointsTracked,
   scorecards,
@@ -221,22 +218,16 @@ function CompletedYearOverview({
       <div className={pwaStyles.overviewRoundList}>
         {tournament.courses.map((course) => {
           const round = roundNumber(course.Round);
-          const availablePoints = pointsForRound(roundPoints, round);
-          const roundResult = roundResults.find((item) => item.round === round);
-          const resultLabel = roundResult && roundResult.teamOne.points !== null && roundResult.teamTwo.points !== null
-            ? `${roundResult.teamOne.name} ${formatTeamPoints(roundResult.teamOne.points)} — ${formatTeamPoints(roundResult.teamTwo.points)} ${roundResult.teamTwo.name}${roundResult.roundWinner === "Halved" ? " · Halved" : ""}`
-            : null;
           return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
             <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`}>
               <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
               <span>
                 <b>{course.Round} · {completedFormatName(course.Format)}</b>
                 <strong>{course.Course}</strong>
-                {resultLabel ? <small>{resultLabel}</small> : availablePoints !== null ? <small>{availablePoints} Total Points</small> : null}
               </span>
               <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}?view=archive`}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}?view=archive&source=history&year=${tournament.year}&round=${round}`}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -448,11 +439,6 @@ export default async function TournamentYearPage({ params }) {
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
   const useCompleted2025 = !useSupabase2026 && Number(tournament.year) === 2025;
-  const completedRoundResults = useCompleted2025
-    ? tournament.courses
-      .map((course) => getHistoricalRound(tournament.year, roundNumber(course.Round)))
-      .filter(Boolean)
-    : [];
   return (
     <main>
       <Header />
@@ -557,8 +543,6 @@ export default async function TournamentYearPage({ params }) {
 
         {useCompleted2025 ? <CompletedYearOverview
           tournament={tournament}
-          roundPoints={roundPoints}
-          roundResults={completedRoundResults}
           leaderboard={leaderboard}
           pointsTracked={pointsTracked}
           scorecards={tournamentScorecards}
@@ -781,8 +765,6 @@ export default async function TournamentYearPage({ params }) {
           <span />
         )}
       </nav>
-
-      <Footer variant="app" />
     </main>
   );
 }

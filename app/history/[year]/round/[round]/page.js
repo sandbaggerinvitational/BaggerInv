@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../../../../lib/stats";
 import { notFound } from "next/navigation";
-import { Header, Footer } from "../../../../components";
+import { Header } from "../../../../components";
 import AssetImage from "../../../../AssetImage";
 import HistoricalDetailNavigation from "../../../../HistoricalDetailNavigation";
 import PublicMatchCard from "../../../../PublicMatchCard";
@@ -32,6 +32,8 @@ import HistoryArchiveNav from "../../../HistoryArchiveNav";
 import HistoricalMatchRow from "../../../HistoricalMatchRow";
 import pwaStyles from "../../../history-participant.module.css";
 import completedRoundStyles from "./completed-round-2025.module.css";
+import HistoryBackToTop from "../../../HistoryBackToTop";
+import { build2025ScrambleRoundStatisticHolders } from "../../../../../lib/history-2025-tournament-records";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -122,6 +124,19 @@ export default async function HistoricalRoundPage({ params }) {
     teamIds: [archive.teamOne.id, archive.teamTwo.id],
   });
   const completeLegacyMatchIds = new Set(legacyScorecardCoverage?.completeMatchIds || []);
+  const scrambleStatisticHolders = completed2025 && Number(archive.round) === 2
+    ? build2025ScrambleRoundStatisticHolders({
+      scorecards: roundScorecards,
+      matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
+      teams: archive.tournament.teams,
+      acceptedValues: {
+        mostBirdies: roundStatistics.mostBirdies.value,
+        lowestFrontNine: roundStatistics.lowestFrontNine.value,
+        lowestBackNine: roundStatistics.lowestBackNine.value,
+        lowestTeamRound: roundStatistics.lowestTeamRound.value,
+      },
+    })
+    : null;
   const participant = (record) => {
     if (record?.scorecard?.scoreType === "TEAM") {
       if (Number(record.scorecard.side) === 1) return archive.teamOne.name;
@@ -134,14 +149,14 @@ export default async function HistoricalRoundPage({ params }) {
     : "";
   const roundStatisticItems = [
     { label: "Lowest Round", value: formatScoringNumber(roundStatistics.lowestRound.value), detail: participant(roundStatistics.lowestRound), sample: roundStatistics.lowestRound.label },
-    { label: "Most Birdies", value: formatScoringNumber(roundStatistics.mostBirdies.value), detail: participant(roundStatistics.mostBirdies), sample: roundStatistics.mostBirdies.label },
-    { label: "Lowest Front Nine", value: formatScoringNumber(roundStatistics.lowestFrontNine.value), detail: participant(roundStatistics.lowestFrontNine), sample: roundStatistics.lowestFrontNine.label },
-    { label: "Lowest Back Nine", value: formatScoringNumber(roundStatistics.lowestBackNine.value), detail: participant(roundStatistics.lowestBackNine), sample: roundStatistics.lowestBackNine.label },
+    { label: "Most Birdies", value: formatScoringNumber(roundStatistics.mostBirdies.value), detail: participant(roundStatistics.mostBirdies), holders: scrambleStatisticHolders?.mostBirdies, sample: roundStatistics.mostBirdies.label },
+    { label: "Lowest Front Nine", value: formatScoringNumber(roundStatistics.lowestFrontNine.value), detail: participant(roundStatistics.lowestFrontNine), holders: scrambleStatisticHolders?.lowestFrontNine, sample: roundStatistics.lowestFrontNine.label },
+    { label: "Lowest Back Nine", value: formatScoringNumber(roundStatistics.lowestBackNine.value), detail: participant(roundStatistics.lowestBackNine), holders: scrambleStatisticHolders?.lowestBackNine, sample: roundStatistics.lowestBackNine.label },
     { label: "Average Score", value: formatScoringNumber(roundStatistics.averageScore.value), sample: roundStatistics.averageScore.label },
     { label: "Hardest Hole", value: roundStatistics.hardestHole ? `#${roundStatistics.hardestHole.holeNumber}` : "—", detail: holeLabel(roundStatistics.hardestHole), sample: roundStatistics.hardestHole?.averageToPar.label },
     { label: "Easiest Hole", value: roundStatistics.easiestHole ? `#${roundStatistics.easiestHole.holeNumber}` : "—", detail: holeLabel(roundStatistics.easiestHole), sample: roundStatistics.easiestHole?.averageToPar.label },
     { label: "Birdie Leader", value: formatScoringNumber(roundStatistics.birdieLeader.value), detail: participant(roundStatistics.birdieLeader), sample: roundStatistics.birdieLeader.label },
-    { label: "Lowest Team Round", value: formatScoringNumber(roundStatistics.lowestTeamRound.value), detail: participant(roundStatistics.lowestTeamRound), sample: roundStatistics.lowestTeamRound.label },
+    { label: "Lowest Team Round", value: formatScoringNumber(roundStatistics.lowestTeamRound.value), detail: participant(roundStatistics.lowestTeamRound), holders: scrambleStatisticHolders?.lowestTeamRound, sample: roundStatistics.lowestTeamRound.label },
   ];
   const applicableRoundStatisticItems = roundStatisticItems.filter((item) =>
     item.value !== "—" && !/^Based on 0 recorded/i.test(String(item.sample || ""))
@@ -278,25 +293,8 @@ export default async function HistoricalRoundPage({ params }) {
           {roundScorecards.length ? <ScoringStatGrid items={legacyRoundStatisticItems} /> : <p className={pwaStyles.scorecardAvailability}>Detailed historical scorecards are not available for this round.</p>}
         </section>}
 
-        <HistoricalDetailNavigation
-          backHref={`/history/${archive.year}`}
-          backLabel={`Back to ${archive.year} Tournament`}
-          previousHref={
-            archive.previousRound
-              ? `/history/${archive.year}/round/${archive.previousRound.number}`
-              : null
-          }
-          previousLabel={archive.previousRound?.label}
-          nextHref={
-            archive.nextRound
-              ? `/history/${archive.year}/round/${archive.nextRound.number}`
-              : null
-          }
-          nextLabel={archive.nextRound?.label}
-        />
+        <HistoryBackToTop />
       </section>
-
-      <Footer variant="app" />
     </main>
   );
 }

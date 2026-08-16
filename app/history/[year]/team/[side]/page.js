@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header, Footer } from "../../../../components";
+import { Header } from "../../../../components";
 import ContextBackLink from "../../../../ContextBackLink";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
 import PublicMatchCard from "../../../../PublicMatchCard";
@@ -23,6 +23,7 @@ import { formatHistoryTournamentHandicap } from "../../../../../lib/history-team
 import HistoryUnavailablePage from "../../../HistoryUnavailable";
 import HistoryArchiveNav from "../../../HistoryArchiveNav";
 import pwaStyles from "../../../history-participant.module.css";
+import HistoryBackToTop from "../../../HistoryBackToTop";
 
 function roundStatusLabel(value) {
   if (value === "FINAL") return "Final";
@@ -206,8 +207,7 @@ export default async function TeamSeasonPage({ params }) {
           </section>
         ) : null}
       </section>
-
-      <Footer variant="app" />
+      <HistoryBackToTop />
     </main>
   );
 }

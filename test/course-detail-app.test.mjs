@@ -77,6 +77,7 @@ test("current Course Detail uses the Supabase Guide resolver while archive trans
   assert.match(page, /resolveTournamentGuideContent/);
   assert.match(page, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
   assert.match(page, /archive\s*\?\s*await import\("\.\.\/\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
+  assert.match(page, /resolveGoogleArchivedCourseContent/);
   assert.match(page, /courseDetailModel/);
   assert.doesNotMatch(page, /refreshHistoricalData|loadScorecardAnalytics|getCourse\(/);
   assert.match(loader, /guideContentWithCanonicalCourses\(projection\.content \|\| projection, data\.course_context \|\| \[\]\)/);
@@ -91,7 +92,9 @@ test("Course Detail remains inside The Bagger and has no map action", async () =
     readFile(new URL("../app/courses/[courseId]/course-detail.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(page, /<Header homeHref="\/home"/);
-  assert.match(page, /href=\{archive \? "\/courses\?view=archive" : "\/courses"\}>‹ Courses/);
+  assert.match(page, /historyCourseReturn/);
+  assert.match(page, /href: archive \? "\/courses\?view=archive" : "\/courses"/);
+  assert.match(page, /<Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
   assert.doesNotMatch(page, /View Scorecard|href="#course-scorecard"/);
   assert.match(page, /Front Nine/);
   assert.match(page, /Back Nine/);

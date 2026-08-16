@@ -8,13 +8,14 @@ import AssetImage from "../../AssetImage";
 import ExternalLinkConfirm from "../../ExternalLinkConfirm";
 import { courseHero, courseLogo } from "../../../lib/asset-paths";
 import { courseDetailModel } from "../../../lib/course-detail";
+import { historyCourseReturn } from "../../../lib/history-course-navigation";
 import { pageMetadata } from "../../../lib/seo";
 import { resolveTournamentGuideContent } from "../../tournament-guide/resolveGuideContent";
 import styles from "./course-detail.module.css";
 
 const resolveCourse = cache(async (courseId, archive = false) => {
   const content = archive
-    ? await import("../../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleTournamentGuideContent())
+    ? await import("../../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleArchivedCourseContent())
     : await resolveTournamentGuideContent({ surface: "course" });
   return courseDetailModel(courseId, content);
 });
@@ -53,18 +54,24 @@ function NineScorecard({ holes, label }) {
 
 export default async function CoursePage({ params, searchParams }) {
   const { courseId } = await params;
-  const archive = String((await searchParams)?.view || "") === "archive";
+  const resolvedSearchParams = await searchParams;
+  const archive = String(resolvedSearchParams?.view || "") === "archive";
   const model = await resolveCourse(courseId, archive);
   if (!model) notFound();
   const { course } = model;
   const website = model.website;
+  const historyReturn = archive ? historyCourseReturn(resolvedSearchParams) : null;
+  const returnLink = historyReturn || {
+    href: archive ? "/courses?view=archive" : "/courses",
+    label: "Courses",
+  };
   return <main className={styles.page}>
     <Header homeHref="/home" />
     <section className={styles.hero}>
       {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
       <div className={styles.heroShade} />
       <div className={styles.heroContent}>
-        <Link href={archive ? "/courses?view=archive" : "/courses"}>‹ Courses</Link>
+        <Link href={returnLink.href}>‹ {returnLink.label}</Link>
         <div className={styles.identity}>
           <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
           <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>

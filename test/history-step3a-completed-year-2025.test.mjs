@@ -94,15 +94,15 @@ test("Champion result is a single semantic, model-backed surface", () => {
   assert.doesNotMatch(page, /Bandon Brothers|The Crispy Boys|Caleb Lewis|22 matches/);
 });
 
-test("all three round summaries reuse canonical course facts and existing routes", () => {
+test("all three round summaries keep canonical course facts and defer results to Round History", () => {
   assert.match(page, /tournament\.courses\.map\(\(course\)/);
   assert.match(page, /completedFormatName\(course\.Format\)/);
   assert.match(page, /course\.Course/);
   assert.match(page, /href=\{`\/history\/\$\{tournament\.year\}\/round\/\$\{round\}`\}/);
-  assert.match(page, /href=\{`\/courses\/\$\{course\["Course ID"\]\}\?view=archive`\}/);
-  assert.match(completedOverview, /roundResults\.find/);
-  assert.match(completedOverview, /formatTeamPoints\(roundResult\.teamOne\.points\)/);
+  assert.match(page, /href=\{`\/courses\/\$\{course\["Course ID"\]\}\?view=archive&source=history&year=\$\{tournament\.year\}&round=\$\{round\}`\}/);
+  assert.doesNotMatch(completedOverview, /roundResults|resultLabel|formatTeamPoints/);
   assert.doesNotMatch(completedOverview, /Points Available/);
+  assert.doesNotMatch(completedOverview, /Total Points/);
   assert.doesNotMatch(page, /dramatic|comeback|dominant|clutch/i);
 });
 

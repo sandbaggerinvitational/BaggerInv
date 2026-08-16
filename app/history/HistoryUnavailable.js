@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Header, Footer } from "../components";
+import { Header } from "../components";
 import styles from "../historical.module.css";
 import { ErrorState } from "../ui/StatePrimitives";
 
@@ -16,7 +16,7 @@ export default function HistoryUnavailablePage({
   year = "2026",
   section = "History",
 }) {
-  if (String(year) === "2026") return <main><Header /><ErrorState eyebrow="2026 Tournament Archive" title={`${section} is temporarily unavailable.`} message="Check your connection and try again shortly." returnHref="/history" returnLabel="Tournament History" /><Footer variant="app" /></main>;
+  if (String(year) === "2026") return <main><Header /><ErrorState eyebrow="2026 Tournament Archive" title={`${section} is temporarily unavailable.`} message="Check your connection and try again shortly." returnHref="/history" returnLabel="Tournament History" /></main>;
   return (
     <main>
       <Header />
@@ -28,7 +28,6 @@ export default function HistoryUnavailablePage({
         </p>
         <Link href="/history">Return to Tournament History</Link>
       </section>
-      <Footer variant="app" />
     </main>
   );
 }

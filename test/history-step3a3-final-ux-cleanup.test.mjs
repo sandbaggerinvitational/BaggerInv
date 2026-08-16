@@ -47,7 +47,7 @@ test("participant History routes use The Bagger app shell while event branding r
   assert.match(components, /appIdentity \? null : <span>Official Tournament Website<\/span>/);
   assert.match(yearPage, /9th Annual Sandbagger Invitational|historyEditionLabel/i);
   assert.match(globals, /footer:not\(\[data-app-footer="true"\]\)/);
-  for (const file of [historyPage, yearPage, roundPage, historyTeamPage]) assert.match(file, /<Footer variant="app" \/>/);
+  for (const file of [historyPage, yearPage, roundPage, historyTeamPage]) assert.doesNotMatch(file, /<Footer variant="app" \/>/);
 });
 
 test("the 2025 overview removes only the dead scorecard summary and preserves final order", () => {
@@ -65,13 +65,11 @@ test("the 2025 overview removes only the dead scorecard summary and preserves fi
   assert.deepEqual([...positions].sort((a, b) => a - b), positions);
 });
 
-test("completed round summaries reuse the established Round History model and never say Points Available", () => {
-  assert.match(yearPage, /getHistoricalRound/);
-  assert.match(completedOverview, /roundResults\.find/);
-  assert.match(completedOverview, /formatTeamPoints\(roundResult\.teamOne\.points\)/);
-  assert.match(completedOverview, /roundResult\.roundWinner === "Halved"/);
+test("completed overview round summaries defer results to Round History", () => {
+  assert.doesNotMatch(yearPage, /getHistoricalRound/);
+  assert.doesNotMatch(completedOverview, /roundResults|resultLabel|formatTeamPoints/);
   assert.doesNotMatch(completedOverview, /Points Available/);
-  assert.match(completedOverview, /Total Points/);
+  assert.doesNotMatch(completedOverview, /Total Points/);
 });
 
 test("canonical 2025 round totals reconcile by match, round, and tournament", () => {
@@ -98,9 +96,9 @@ test("canonical 2025 round totals reconcile by match, round, and tournament", ()
 });
 
 test("all three historical Course Profile actions use the existing archive route", () => {
-  assert.match(completedOverview, /\/courses\/\$\{course\["Course ID"\]\}\?view=archive/);
-  assert.match(coursePage, /const archive = String\(\(await searchParams\)\?\.view \|\| ""\) === "archive"/);
-  assert.match(coursePage, /resolveGoogleTournamentGuideContent/);
+  assert.match(completedOverview, /\/courses\/\$\{course\["Course ID"\]\}\?view=archive&source=history&year=\$\{tournament\.year\}&round=\$\{round\}/);
+  assert.match(coursePage, /const archive = String\(resolvedSearchParams\?\.view \|\| ""\) === "archive"/);
+  assert.match(coursePage, /resolveGoogleArchivedCourseContent/);
   assert.doesNotMatch(yearPage, /new course|createCourse|course profile fallback/i);
 });
 

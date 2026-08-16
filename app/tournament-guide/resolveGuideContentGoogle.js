@@ -2,6 +2,7 @@ import { getCourses, getTournaments, refreshHistoricalData } from "../../lib/sta
 import { isTransientGoogleError } from "../../lib/google-api-reliability";
 import { validateTournamentGuideHeaders } from "../../lib/tournament-guide-content";
 import { getTournamentData } from "../live/sheetData";
+import { loadArchivedCourseSheets } from "../../lib/google-sheets-data";
 
 let pending;
 let lastGood;
@@ -53,4 +54,13 @@ export async function resolveGoogleTournamentGuideContent() {
     throw error;
   }).finally(() => { pending = undefined; });
   return pending;
+}
+
+export async function resolveGoogleArchivedCourseContent() {
+  const { courseArchive, courseHoles } = await loadArchivedCourseSheets();
+  return {
+    courses: [],
+    courseArchive,
+    courseHoles,
+  };
 }

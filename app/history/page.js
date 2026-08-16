@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../lib/stats";
 import Link from "next/link";
 import { after } from "next/server";
-import { Header, Footer } from "../components";
+import { Header } from "../components";
 import AssetImage from "../AssetImage";
 import { defaultAssets, optimizedAssetUrl } from "../../lib/asset-paths";
 import { getTournaments } from "../../lib/stats";
@@ -121,8 +121,6 @@ export default async function HistoryPage() {
           })}
         </div>
       </section>
-
-      <Footer variant="app" />
     </main>
   );
 }
