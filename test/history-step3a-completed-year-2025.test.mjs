@@ -99,7 +99,7 @@ test("all three round summaries keep canonical course facts and defer results to
   assert.match(page, /completedFormatName\(course\.Format\)/);
   assert.match(page, /course\.Course/);
   assert.match(page, /href=\{`\/history\/\$\{tournament\.year\}\/round\/\$\{round\}`\}/);
-  assert.match(page, /href=\{`\/courses\/\$\{course\["Course ID"\]\}\?view=archive&source=history&year=\$\{tournament\.year\}&round=\$\{round\}`\}/);
+  assert.match(page, /historyCourseProfileHref\(\{ courseId: course\["Course ID"\], year: tournament\.year, round \}\)/);
   assert.doesNotMatch(completedOverview, /roundResults|resultLabel|formatTeamPoints/);
   assert.doesNotMatch(completedOverview, /Points Available/);
   assert.doesNotMatch(completedOverview, /Total Points/);
@@ -155,11 +155,12 @@ test("the dead 2025 scorecard summary is removed while Honors remains model-back
 });
 
 test("2025 owns one compact top year navigator while preserving canonical destinations", () => {
-  assert.match(page, /useSupabase2026 \? <HistoryArchiveNav[\s\S]*useCompleted2025 \? <nav[\s\S]*data-completed-year-navigation="2025"/);
-  assert.match(page, /\{!useCompleted2025 \? <nav[\s\S]*tournamentYearNavigationBottom[\s\S]*<\/nav> : null\}/);
-  assert.match(page, /href=\{`\/history\/\$\{previousYear\}`\}/);
-  assert.match(page, /href="\/history"/);
-  assert.match(page, /href=\{`\/history\/\$\{nextYear\}`\}/);
+  assert.match(page, /useSupabase2026 \? <HistoryArchiveNav[\s\S]*: <HistoryNavigation/);
+  assert.equal((page.match(/surface="year"/g) || []).length, 1);
+  assert.doesNotMatch(page, /tournamentYearNavigationBottom/);
+  assert.match(page, /href: `\/history\/\$\{previousYear\}`/);
+  assert.match(page, /href: "\/history"/);
+  assert.match(page, /href: `\/history\/\$\{nextYear\}`/);
 });
 
 test("the 2025 presentation introduces no request, endpoint, data source, or dependency", () => {

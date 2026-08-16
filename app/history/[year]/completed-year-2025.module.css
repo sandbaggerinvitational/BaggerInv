@@ -380,33 +380,6 @@
   font: 700 1.05rem/1.2 Georgia, "Times New Roman", serif;
 }
 
-.yearNavigation.yearNavigation {
-  width: min(1120px, calc(100% - 24px));
-  max-width: 1120px;
-  min-height: 62px;
-  margin: 12px auto 0;
-  padding: 8px 12px;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 8px;
-  border: 1px solid var(--tsi-line);
-  border-radius: 14px;
-}
-
-.yearNavigation > a {
-  min-height: 44px;
-  justify-content: center;
-}
-
-.yearNavigationHome.yearNavigationHome {
-  white-space: nowrap;
-  text-align: center;
-}
-
-.yearNavigation a:focus-visible {
-  outline: 3px solid var(--tsi-gold-400);
-  outline-offset: 2px;
-}
-
 .resultTeam:focus-visible,
 .teamSummary:focus-visible,
 .standingRow a:focus-visible,
@@ -416,33 +389,6 @@
 }
 
 @media (max-width: 720px) {
-  .yearNavigation.yearNavigation {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    gap: 6px;
-    padding-inline: 9px;
-  }
-
-  .yearNavigation .yearNavigationHome {
-    grid-column: 2;
-    grid-row: 1;
-    font-size: .56rem;
-    letter-spacing: .08em;
-  }
-
-  .yearNavigation.yearNavigation > a:last-child {
-    grid-column: 3;
-    grid-row: 1;
-  }
-
-  .yearNavigation span {
-    font-size: .5rem;
-    letter-spacing: .07em;
-  }
-
-  .yearNavigation strong {
-    font-size: 1.05rem;
-  }
-
   .story {
     gap: 34px;
   }

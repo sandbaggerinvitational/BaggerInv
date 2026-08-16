@@ -11,14 +11,14 @@ import {
 } from "../lib/history-course-navigation.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [matchCard, matchCss, roundPage, overview, completedCss, coursePage, courseCss, sheetLoader, packageJson] = await Promise.all([
+const [matchCard, matchCss, roundPage, overview, navigation, navigationCss, coursePage, sheetLoader, packageJson] = await Promise.all([
   source("app/PublicMatchCard.js"),
   source("app/live/live.module.css"),
   source("app/history/[year]/round/[round]/page.js"),
   source("app/history/[year]/page.js"),
-  source("app/history/[year]/completed-year-2025.module.css"),
+  source("app/history/HistoryNavigation.js"),
+  source("app/history/history-navigation.module.css"),
   source("app/courses/[courseId]/page.js"),
-  source("app/courses/[courseId]/course-detail.module.css"),
   source("lib/google-sheets-data.js"),
   source("package.json").then(JSON.parse),
 ]);
@@ -85,24 +85,23 @@ test("2025 rounds expose exactly one Birdie Leader while other years keep their 
 
 test("2025 year navigation appears once immediately below the hero with bounded destinations", () => {
   const heroIndex = overview.indexOf("data-completed-prototype={useCompleted2025 ? \"2025\" : undefined}");
-  const yearNavigationIndex = overview.indexOf("data-completed-year-navigation=\"2025\"");
+  const yearNavigationIndex = overview.indexOf('surface="year"');
   const contentIndex = overview.indexOf("<section className={styles.content}>");
-  const bottomNavigationIndex = overview.indexOf("!useCompleted2025 ? <nav");
   assert.ok(heroIndex >= 0 && heroIndex < yearNavigationIndex);
-  assert.ok(yearNavigationIndex < contentIndex && contentIndex < bottomNavigationIndex);
-  assert.equal((overview.match(/data-completed-year-navigation=\"2025\"/g) || []).length, 1);
-  assert.match(overview, /href=\{`\/history\/\$\{previousYear\}`\} aria-label=\{`Previous Year, \$\{previousYear\}`\}/);
-  assert.match(overview, /href="\/history"[\s\S]*aria-label="All Tournament Years"/);
-  assert.match(overview, /href=\{`\/history\/\$\{nextYear\}`\} aria-label=\{`Next Year, \$\{nextYear\}`\}/);
-  assert.match(overview, /\{!useCompleted2025 \? <nav[\s\S]*tournamentYearNavigationBottom[\s\S]*<\/nav> : null\}/);
+  assert.ok(yearNavigationIndex < contentIndex);
+  assert.equal((overview.match(/surface="year"/g) || []).length, 1);
+  assert.match(overview, /href: `\/history\/\$\{previousYear\}`[\s\S]*ariaLabel: `Previous Year, \$\{previousYear\}`/);
+  assert.match(overview, /href: "\/history"[\s\S]*ariaLabel: "All Tournament Years"/);
+  assert.match(overview, /href: `\/history\/\$\{nextYear\}`[\s\S]*ariaLabel: `Next Year, \$\{nextYear\}`/);
+  assert.doesNotMatch(overview, /tournamentYearNavigationBottom/);
 });
 
 test("the completed-year navigation stays compact, focusable, and one row on mobile", () => {
-  assert.match(completedCss, /yearNavigation\.yearNavigation \{[^}]*min-height:\s*62px/);
-  assert.match(completedCss, /yearNavigation > a \{[^}]*min-height:\s*44px/);
-  assert.match(completedCss, /yearNavigation a:focus-visible/);
-  assert.match(completedCss, /@media \(max-width: 720px\)[\s\S]*yearNavigation\.yearNavigation \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) auto minmax\(0, 1fr\)/);
-  assert.match(completedCss, /yearNavigation \.yearNavigationHome \{[^}]*grid-column:\s*2;[^}]*grid-row:\s*1/);
+  assert.match(navigation, /<nav[\s\S]*aria-label=\{ariaLabel\}/);
+  assert.match(navigationCss, /\.navigation \{[^}]*min-height:\s*62px/);
+  assert.match(navigationCss, /\.destination \{[^}]*min-height:\s*44px/);
+  assert.match(navigationCss, /\.destination:focus-visible/);
+  assert.match(navigationCss, /\.navigation\[data-count="3"\] \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) auto minmax\(0, 1fr\)/);
 });
 
 test("2025 History-context Course Profiles expose explicit round and tournament returns", () => {
@@ -116,17 +115,17 @@ test("2025 History-context Course Profiles expose explicit round and tournament 
   });
   assert.equal(historyCourseTournamentReturn({ source: "history", year: "2026", round: "2" }), null);
   assert.equal(historyCourseTournamentReturn({ view: "archive" }), null);
-  assert.match(coursePage, /<nav className=\{styles\.historyNavigation\} aria-label="History course navigation">/);
-  assert.match(coursePage, /<Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
-  assert.match(coursePage, /<Link href=\{tournamentReturn\.href\}>\{tournamentReturn\.label\} →<\/Link>/);
-  assert.match(coursePage, /: <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
+  assert.match(coursePage, /tournamentReturn \? <HistoryNavigation/);
+  assert.match(coursePage, /href: tournamentReturn\.href[\s\S]*direction: "left"/);
+  assert.match(coursePage, /href: historyReturn\.href[\s\S]*direction: "right"/);
+  assert.match(coursePage, /!historyReturn \? <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
 });
 
 test("Course dual navigation is mobile-safe while archived Course reads remain exactly two", () => {
-  assert.match(courseCss, /historyNavigation \{[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap/);
-  assert.match(courseCss, /historyNavigation > a \{[^}]*min-height:\s*44px/);
-  assert.match(courseCss, /historyNavigation > a:focus-visible/);
+  assert.match(navigationCss, /\.navigation\[data-count="2"\] \{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(navigationCss, /\.destination \{[^}]*min-height:\s*44px/);
+  assert.match(navigationCss, /\.destination:focus-visible/);
   const loader = sheetLoader.slice(
     sheetLoader.indexOf("export const loadArchivedCourseSheets"),
     sheetLoader.indexOf("export const loadTournamentGuideSheets")

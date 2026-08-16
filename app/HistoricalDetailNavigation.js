@@ -1,28 +1,4 @@
-import Link from "next/link";
-import styles from "./historical.module.css";
-
-function RoundLink({ direction, href, label }) {
-  if (!href || !label) return <span aria-hidden="true" />;
-
-  const previous = direction === "previous";
-  return (
-    <Link
-      className={
-        previous
-          ? styles.historicalDetailPrevious
-          : styles.historicalDetailNext
-      }
-      href={href}
-    >
-      <small>{previous ? "Previous Round" : "Next Round"}</small>
-      <strong>
-        {previous ? <span aria-hidden="true">←</span> : null}
-        {label}
-        {!previous ? <span aria-hidden="true">→</span> : null}
-      </strong>
-    </Link>
-  );
-}
+import HistoryNavigation from "./history/HistoryNavigation";
 
 export default function HistoricalDetailNavigation({
   backHref,
@@ -34,30 +10,25 @@ export default function HistoricalDetailNavigation({
   position = "bottom",
 }) {
   return (
-    <nav
-      className={`${styles.historicalDetailNavigation} ${
-        position === "top" ? styles.historicalDetailNavigationTop : ""
-      }`}
-      aria-label="Historical round navigation"
-    >
-      <RoundLink
-        direction="previous"
-        href={previousHref}
-        label={previousLabel}
-      />
-
-      <Link
-        className={styles.historicalDetailParent}
-        href={backHref}
-      >
-        {backLabel}
-      </Link>
-
-      <RoundLink
-        direction="next"
-        href={nextHref}
-        label={nextLabel}
-      />
-    </nav>
+    <HistoryNavigation
+      ariaLabel="Historical round navigation"
+      center={{ href: backHref, label: backLabel, ariaLabel: backLabel }}
+      left={previousHref && previousLabel ? {
+        href: previousHref,
+        label: "Previous Round",
+        detail: previousLabel,
+        direction: "left",
+        ariaLabel: `Previous Round, ${previousLabel}`,
+      } : null}
+      placement={position === "top" ? "embedded" : "standalone"}
+      right={nextHref && nextLabel ? {
+        href: nextHref,
+        label: "Next Round",
+        detail: nextLabel,
+        direction: "right",
+        ariaLabel: `Next Round, ${nextLabel}`,
+      } : null}
+      surface="round"
+    />
   );
 }

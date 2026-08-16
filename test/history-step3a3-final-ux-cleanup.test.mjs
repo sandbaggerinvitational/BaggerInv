@@ -96,7 +96,7 @@ test("canonical 2025 round totals reconcile by match, round, and tournament", ()
 });
 
 test("all three historical Course Profile actions use the existing archive route", () => {
-  assert.match(completedOverview, /\/courses\/\$\{course\["Course ID"\]\}\?view=archive&source=history&year=\$\{tournament\.year\}&round=\$\{round\}/);
+  assert.match(completedOverview, /historyCourseProfileHref\(\{ courseId: course\["Course ID"\], year: tournament\.year, round \}\)/);
   assert.match(coursePage, /const archive = String\(resolvedSearchParams\?\.view \|\| ""\) === "archive"/);
   assert.match(coursePage, /resolveGoogleArchivedCourseContent/);
   assert.doesNotMatch(yearPage, /new course|createCourse|course profile fallback/i);

@@ -240,7 +240,7 @@ export default async function HistoricalRoundPage({ params }) {
       <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.roundContent : ""}`}>
         {!useSupabase2026 ? <HistoricalDetailNavigation
           backHref={`/history/${archive.year}`}
-          backLabel={`Back to ${archive.year} Tournament`}
+          backLabel={`${archive.year} Tournament`}
           previousHref={
             archive.previousRound
               ? `/history/${archive.year}/round/${archive.previousRound.number}`

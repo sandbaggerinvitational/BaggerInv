@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { Header } from "../../components";
+import HistoryNavigation from "../../history/HistoryNavigation";
 import AssetImage from "../../AssetImage";
 import ExternalLinkConfirm from "../../ExternalLinkConfirm";
 import { courseHero, courseLogo } from "../../../lib/asset-paths";
@@ -71,16 +72,29 @@ export default async function CoursePage({ params, searchParams }) {
   };
   return <main className={styles.page}>
     <Header homeHref="/home" />
+    {tournamentReturn ? <HistoryNavigation
+      ariaLabel={`${tournamentReturn.label} course history navigation`}
+      left={{
+        href: tournamentReturn.href,
+        label: tournamentReturn.label,
+        direction: "left",
+        ariaLabel: tournamentReturn.label,
+      }}
+      right={historyReturn && Number.isInteger(Number(resolvedSearchParams?.round)) ? {
+        href: historyReturn.href,
+        label: `Round ${Number(resolvedSearchParams.round)}`,
+        direction: "right",
+        ariaLabel: `Round ${Number(resolvedSearchParams.round)}`,
+      } : null}
+      surface="course"
+    /> : null}
     <section className={styles.hero}>
       {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
       <div className={styles.heroShade} />
       <div className={styles.heroContent}>
-        {historyReturn ? <nav className={styles.historyNavigation} aria-label="History course navigation">
+        {historyReturn && !tournamentReturn ? <nav className={styles.historyNavigation} aria-label="History course navigation">
           <Link href={returnLink.href}>‹ {returnLink.label}</Link>
-          {tournamentReturn && tournamentReturn.href !== returnLink.href
-            ? <Link href={tournamentReturn.href}>{tournamentReturn.label} →</Link>
-            : null}
-        </nav> : <Link href={returnLink.href}>‹ {returnLink.label}</Link>}
+        </nav> : !historyReturn ? <Link href={returnLink.href}>‹ {returnLink.label}</Link> : null}
         <div className={styles.identity}>
           <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
           <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>

@@ -3,7 +3,6 @@ import { refreshHistoricalData } from "../../../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "../../../../components";
-import ContextBackLink from "../../../../ContextBackLink";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
 import PublicMatchCard from "../../../../PublicMatchCard";
 import {
@@ -24,6 +23,7 @@ import HistoryUnavailablePage from "../../../HistoryUnavailable";
 import HistoryArchiveNav from "../../../HistoryArchiveNav";
 import pwaStyles from "../../../history-participant.module.css";
 import HistoryBackToTop from "../../../HistoryBackToTop";
+import HistoryNavigation from "../../../HistoryNavigation";
 
 function roundStatusLabel(value) {
   if (value === "FINAL") return "Final";
@@ -102,9 +102,15 @@ export default async function TeamSeasonPage({ params }) {
   return (
     <main>
       <Header />
-      {!useSupabase2026 ? <ContextBackLink
-        href={`/history/${team.year}`}
-        label={`Back to ${team.year} Tournament`}
+      {!useSupabase2026 ? <HistoryNavigation
+        ariaLabel={`${team.year} team history navigation`}
+        left={{
+          href: `/history/${team.year}`,
+          label: `${team.year} Tournament`,
+          direction: "left",
+          ariaLabel: `${team.year} Tournament`,
+        }}
+        surface="team"
       /> : null}
 
       <section className={`${styles.pageHero} ${styles.teamRosterHero} ${useSupabase2026 ? pwaStyles.teamHero : ""}`}>

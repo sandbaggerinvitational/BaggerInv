@@ -39,8 +39,10 @@ import {
 } from "../../../lib/history-2026-service";
 import HistoryUnavailablePage from "../HistoryUnavailable";
 import HistoryArchiveNav from "../HistoryArchiveNav";
+import HistoryNavigation from "../HistoryNavigation";
 import pwaStyles from "../history-participant.module.css";
 import completedStyles from "./completed-year-2025.module.css";
+import { historyCourseProfileHref } from "../../../lib/history-course-navigation";
 import {
   historyEditionLabel,
   historyHeroPath,
@@ -227,7 +229,7 @@ function CompletedYearOverview({
               </span>
               <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}?view=archive&source=history&year=${tournament.year}&round=${round}`}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -481,52 +483,29 @@ export default async function TournamentYearPage({ params }) {
         </div>
       </section>
 
-      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : useCompleted2025 ? <nav
-        className={`${styles.tournamentYearNavigation} ${completedStyles.yearNavigation}`}
-        data-completed-year-navigation="2025"
-        aria-label="2025 tournament year navigation"
-      >
-        <Link href={`/history/${previousYear}`} aria-label={`Previous Year, ${previousYear}`}>
-          <span>← Previous Year</span>
-          <strong>{previousYear}</strong>
-        </Link>
-        <Link
-          className={`${styles.tournamentHistoryHome} ${completedStyles.yearNavigationHome}`}
-          href="/history"
-          aria-label="All Tournament Years"
-        >
-          All Tournament Years
-        </Link>
-        <Link href={`/history/${nextYear}`} aria-label={`Next Year, ${nextYear}`}>
-          <span>Next Year →</span>
-          <strong>{nextYear}</strong>
-        </Link>
-      </nav> : <nav className={styles.tournamentYearNavigation}>
-        {previousYear ? (
-          <Link href={`/history/${previousYear}`}>
-            <span>← Previous Year</span>
-            <strong>{previousYear}</strong>
-          </Link>
-        ) : (
-          <span />
-        )}
-
-        <Link
-          className={styles.tournamentHistoryHome}
-          href="/history"
-        >
-          All Tournament Years
-        </Link>
-
-        {nextYear ? (
-          <Link href={`/history/${nextYear}`}>
-            <span>Next Year →</span>
-            <strong>{nextYear}</strong>
-          </Link>
-        ) : (
-          <span />
-        )}
-      </nav>}
+      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : <HistoryNavigation
+        ariaLabel={`${tournament.year} tournament year navigation`}
+        center={{
+          href: "/history",
+          label: "All Tournament Years",
+          ariaLabel: "All Tournament Years",
+        }}
+        left={previousYear ? {
+          href: `/history/${previousYear}`,
+          label: "Previous Year",
+          detail: String(previousYear),
+          direction: "left",
+          ariaLabel: `Previous Year, ${previousYear}`,
+        } : null}
+        right={nextYear ? {
+          href: `/history/${nextYear}`,
+          label: "Next Year",
+          detail: String(nextYear),
+          direction: "right",
+          ariaLabel: `Next Year, ${nextYear}`,
+        } : null}
+        surface="year"
+      />}
 
       <section className={styles.content}>
         {draft ? (
@@ -654,7 +633,7 @@ export default async function TournamentYearPage({ params }) {
 
                   <Link
                     className={styles.courseProfileLink}
-                    href={`/courses/${course["Course ID"]}`}
+                    href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}
                   >
                     View Course Profile
                   </Link>
@@ -757,34 +736,6 @@ export default async function TournamentYearPage({ params }) {
         </>}
       </section>
 
-      {!useCompleted2025 ? <nav
-        className={`${styles.tournamentYearNavigation} ${styles.tournamentYearNavigationBottom}`}
-      >
-        {previousYear ? (
-          <Link href={`/history/${previousYear}`}>
-            <span>← Previous Year</span>
-            <strong>{previousYear}</strong>
-          </Link>
-        ) : (
-          <span />
-        )}
-
-        <Link
-          className={styles.tournamentHistoryHome}
-          href="/history"
-        >
-          All Tournament Years
-        </Link>
-
-        {nextYear ? (
-          <Link href={`/history/${nextYear}`}>
-            <span>Next Year →</span>
-            <strong>{nextYear}</strong>
-          </Link>
-        ) : (
-          <span />
-        )}
-      </nav> : null}
     </main>
   );
 }
