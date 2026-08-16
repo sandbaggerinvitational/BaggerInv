@@ -220,7 +220,7 @@ test("archived Course Profile uses only the existing Courses and Course Holes so
   assert.equal((loader.match(/fetchSheet\(/g) || []).length, 2);
   assert.match(loader, /HISTORICAL_SHEETS\.courses/);
   assert.match(loader, /SCORECARD_SHEETS\.courseHoles/);
-  assert.match(loader, /PRODUCTION_SPREADSHEET_ID/);
+  assert.equal((loader.match(/spreadsheetId: PRODUCTION_SPREADSHEET_ID/g) || []).length, 2);
   assert.match(guideGoogle, /resolveGoogleArchivedCourseContent/);
   assert.doesNotMatch(guideGoogle.slice(guideGoogle.indexOf("resolveGoogleArchivedCourseContent")), /getTournamentData|refreshHistoricalData/);
   assert.match(coursePage, /resolveGoogleArchivedCourseContent/);
