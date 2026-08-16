@@ -130,13 +130,14 @@ test("the same phantom-slot defect is removed from 2020–2024 with real statist
   }
 });
 
-test("Step 2A leaves scorecard-count presentation and Step 1 roster metadata code untouched", async () => {
+test("Step 2A identity remains frozen while Step 2B owns scorecard-count presentation", async () => {
   const [yearPage, teamPage, metadata] = await Promise.all([
     readFile(new URL("../app/history/[year]/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/history/[year]/team/[side]/page.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/history-team-metadata.js", import.meta.url), "utf8"),
   ]);
-  assert.match(yearPage, /scorecardCoverage\.available} of \$\{scoringStatistics\.scorecardCoverage\.expected/);
+  assert.match(yearPage, /legacyScorecardCoverage\.completeMatchScorecards/);
+  assert.match(yearPage, /label: "Historical Scorecards"/);
   assert.match(teamPage, /team\.captainId === player\["Player ID"\]/);
   assert.match(teamPage, /formatHistoryTournamentHandicap/);
   assert.match(metadata, /export function formatHistoryTournamentHandicap/);

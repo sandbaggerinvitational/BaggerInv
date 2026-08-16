@@ -13,12 +13,14 @@ import {
 import {
   getFormatName,
   getHistoricalRound,
+  getTournamentMatches,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
 import { formatTeamPoints } from "../../../../../lib/formatters";
 import { pageMetadata } from "../../../../../lib/seo";
 import { loadLegacyHistoryAnalytics } from "../../../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../../../lib/scorecard-analytics";
+import { buildLegacyHistoryScorecardCoverage } from "../../../../../lib/legacy-history-scorecard-coverage";
 import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
 import {
   history2026RoundPageModel,
@@ -108,6 +110,13 @@ export default async function HistoricalRoundPage({ params }) {
     roundScorecards,
     roundScorecards.length + missingRoundScorecards.length
   );
+  const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
+    year: archive.year,
+    matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
+    scorecards: scorecardAnalytics.scorecards,
+    teamIds: [archive.teamOne.id, archive.teamTwo.id],
+  });
+  const completeLegacyMatchIds = new Set(legacyScorecardCoverage?.completeMatchIds || []);
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
   const holeLabel = (hole) => hole
@@ -217,7 +226,7 @@ export default async function HistoricalRoundPage({ params }) {
         ) : (
           <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
-              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: getFormatName(archive.format) }} tournament={archive} scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={match} round={{ label: `Round ${archive.round}` }} tournament={archive} variant="historical" scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} historyDensity />
+              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: getFormatName(archive.format) }} tournament={archive} scorecards={filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id })} /> : <PublicMatchCard key={match.id} match={match} round={{ label: `Round ${archive.round}` }} tournament={archive} variant="historical" scorecards={completeLegacyMatchIds.has(match.id) ? filterScorecards(scorecardAnalytics.scorecards, { matchId: match.id }) : []} historyDensity />
             ))}
           </div>
         )}
@@ -280,10 +289,11 @@ export default async function HistoricalRoundPage({ params }) {
               sample: roundStatistics.lowestTeamRound.label,
             },
             {
-              label: "Scorecard Coverage",
-              value: `${roundStatistics.scorecardCoverage.available} of ${roundStatistics.scorecardCoverage.expected}`,
-              detail: "Available scorecards",
-              sample: roundStatistics.scorecardCoverage.label,
+              label: "Historical Scorecards",
+              value: legacyScorecardCoverage.completeMatchScorecards === legacyScorecardCoverage.canonicalMatches
+                ? `All ${legacyScorecardCoverage.canonicalMatches} matches`
+                : `${legacyScorecardCoverage.completeMatchScorecards} matches`,
+              detail: "Scorecard detail available",
             },
           ]} /> : <p className={pwaStyles.scorecardAvailability}>Detailed historical scorecards are not available for this round.</p>}
         </section>

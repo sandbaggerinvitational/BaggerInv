@@ -15,6 +15,7 @@ import {
   getAdjacentTournamentYears,
   getFormatName,
   getTournament,
+  getTournamentMatches,
   getTournamentPlayerLeaderboard,
   getTournamentRoundPoints,
 } from "../../../lib/stats";
@@ -27,6 +28,7 @@ import StatusBadge from "../../StatusBadge";
 import { getDraftByYear } from "../../../lib/draft";
 import { loadLegacyHistoryAnalytics } from "../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
+import { buildLegacyHistoryScorecardCoverage } from "../../../lib/legacy-history-scorecard-coverage";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import {
   history2026TournamentCard,
@@ -263,6 +265,12 @@ export default async function TournamentYearPage({ params }) {
     tournamentScorecards,
     tournamentScorecards.length + missingTournamentScorecards.length
   );
+  const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
+    year,
+    matches: getTournamentMatches(year),
+    scorecards: scorecardAnalytics.scorecards,
+    teamIds: tournament.teams.map((team) => team.id),
+  });
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
 
@@ -524,10 +532,11 @@ export default async function TournamentYearPage({ params }) {
               sample: scoringStatistics.easiestHole?.averageToPar.label,
             },
             {
-              label: "Scorecard Coverage",
-              value: `${scoringStatistics.scorecardCoverage.available} of ${scoringStatistics.scorecardCoverage.expected}`,
-              detail: "Available scorecards",
-              sample: scoringStatistics.scorecardCoverage.label,
+              label: "Historical Scorecards",
+              value: legacyScorecardCoverage.completeMatchScorecards === legacyScorecardCoverage.canonicalMatches
+                ? `All ${legacyScorecardCoverage.canonicalMatches} matches`
+                : `${legacyScorecardCoverage.completeMatchScorecards} matches`,
+              detail: "Scorecard detail available",
             },
           ]} /> : <p className={pwaStyles.scorecardAvailability}>Detailed historical scorecards are not available for this tournament.</p>}
         </section>
