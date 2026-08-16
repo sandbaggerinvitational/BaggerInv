@@ -5,13 +5,21 @@ import {
   historicalPairingPlayerRows,
   historicalStrokeText,
 } from "../lib/history-match-presentation.js";
+import {
+  historyCourseReturn,
+  historyCourseTournamentReturn,
+} from "../lib/history-course-navigation.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [matchCard, matchCss, roundPage, overview, packageJson] = await Promise.all([
+const [matchCard, matchCss, roundPage, overview, completedCss, coursePage, courseCss, sheetLoader, packageJson] = await Promise.all([
   source("app/PublicMatchCard.js"),
   source("app/live/live.module.css"),
   source("app/history/[year]/round/[round]/page.js"),
   source("app/history/[year]/page.js"),
+  source("app/history/[year]/completed-year-2025.module.css"),
+  source("app/courses/[courseId]/page.js"),
+  source("app/courses/[courseId]/course-detail.module.css"),
+  source("lib/google-sheets-data.js"),
   source("package.json").then(JSON.parse),
 ]);
 
@@ -75,11 +83,82 @@ test("2025 rounds expose exactly one Birdie Leader while other years keep their 
   assert.match(roundPage, /label: "Birdie Leader"[\s\S]*holders: completed2025 && archive\.format === "SC" \? scrambleStatisticHolders\?\.mostBirdies/);
 });
 
-test("the micro pass adds no request, dependency, overview change, or scoring calculation", () => {
-  for (const file of [matchCard, roundPage]) {
+test("2025 year navigation appears once immediately below the hero with bounded destinations", () => {
+  const heroIndex = overview.indexOf("data-completed-prototype={useCompleted2025 ? \"2025\" : undefined}");
+  const yearNavigationIndex = overview.indexOf("data-completed-year-navigation=\"2025\"");
+  const contentIndex = overview.indexOf("<section className={styles.content}>");
+  const bottomNavigationIndex = overview.indexOf("!useCompleted2025 ? <nav");
+  assert.ok(heroIndex >= 0 && heroIndex < yearNavigationIndex);
+  assert.ok(yearNavigationIndex < contentIndex && contentIndex < bottomNavigationIndex);
+  assert.equal((overview.match(/data-completed-year-navigation=\"2025\"/g) || []).length, 1);
+  assert.match(overview, /href=\{`\/history\/\$\{previousYear\}`\} aria-label=\{`Previous Year, \$\{previousYear\}`\}/);
+  assert.match(overview, /href="\/history"[\s\S]*aria-label="All Tournament Years"/);
+  assert.match(overview, /href=\{`\/history\/\$\{nextYear\}`\} aria-label=\{`Next Year, \$\{nextYear\}`\}/);
+  assert.match(overview, /\{!useCompleted2025 \? <nav[\s\S]*tournamentYearNavigationBottom[\s\S]*<\/nav> : null\}/);
+});
+
+test("the completed-year navigation stays compact, focusable, and one row on mobile", () => {
+  assert.match(completedCss, /yearNavigation\.yearNavigation \{[^}]*min-height:\s*62px/);
+  assert.match(completedCss, /yearNavigation > a \{[^}]*min-height:\s*44px/);
+  assert.match(completedCss, /yearNavigation a:focus-visible/);
+  assert.match(completedCss, /@media \(max-width: 720px\)[\s\S]*yearNavigation\.yearNavigation \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) auto minmax\(0, 1fr\)/);
+  assert.match(completedCss, /yearNavigation \.yearNavigationHome \{[^}]*grid-column:\s*2;[^}]*grid-row:\s*1/);
+});
+
+test("2025 History-context Course Profiles expose explicit round and tournament returns", () => {
+  assert.deepEqual(historyCourseReturn({ source: "history", year: "2025", round: "2" }), {
+    href: "/history/2025/round/2",
+    label: "Back to 2025 Round 2",
+  });
+  assert.deepEqual(historyCourseTournamentReturn({ source: "history", year: "2025", round: "2" }), {
+    href: "/history/2025",
+    label: "2025 Tournament",
+  });
+  assert.equal(historyCourseTournamentReturn({ source: "history", year: "2026", round: "2" }), null);
+  assert.equal(historyCourseTournamentReturn({ view: "archive" }), null);
+  assert.match(coursePage, /<nav className=\{styles\.historyNavigation\} aria-label="History course navigation">/);
+  assert.match(coursePage, /<Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
+  assert.match(coursePage, /<Link href=\{tournamentReturn\.href\}>\{tournamentReturn\.label\} →<\/Link>/);
+  assert.match(coursePage, /: <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
+  assert.doesNotMatch(coursePage, /history\.back|router\.back/);
+});
+
+test("Course dual navigation is mobile-safe while archived Course reads remain exactly two", () => {
+  assert.match(courseCss, /historyNavigation \{[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap/);
+  assert.match(courseCss, /historyNavigation > a \{[^}]*min-height:\s*44px/);
+  assert.match(courseCss, /historyNavigation > a:focus-visible/);
+  const loader = sheetLoader.slice(
+    sheetLoader.indexOf("export const loadArchivedCourseSheets"),
+    sheetLoader.indexOf("export const loadTournamentGuideSheets")
+  );
+  assert.equal((loader.match(/fetchSheet\(/g) || []).length, 2);
+});
+
+test("2025 request topology remains 14 overview reads, 12 round reads, and 2 Course reads", () => {
+  const historicalSheetBlock = sheetLoader.slice(
+    sheetLoader.indexOf("const HISTORICAL_SHEETS ="),
+    sheetLoader.indexOf("export const GUIDE_SHEETS")
+  );
+  const scorecardSheetBlock = sheetLoader.slice(
+    sheetLoader.indexOf("export const SCORECARD_SHEETS ="),
+    sheetLoader.indexOf("// Historical and recorded-score data")
+  );
+  const draftSheetBlock = sheetLoader.slice(
+    sheetLoader.indexOf("export const DRAFT_SHEETS ="),
+    sheetLoader.indexOf("export const SCORECARD_SHEETS")
+  );
+  assert.equal((historicalSheetBlock.match(/:\s*"[^"]+"/g) || []).length, 10);
+  assert.equal((scorecardSheetBlock.match(/:\s*"[^"]+"/g) || []).length, 2);
+  assert.equal((draftSheetBlock.match(/:\s*"[^"]+"/g) || []).length, 2);
+  assert.match(overview, /await getDraftByYear\(year\)/);
+  assert.doesNotMatch(roundPage, /getDraftByYear/);
+});
+
+test("the micro pass adds no request, dependency, or scoring calculation", () => {
+  for (const file of [matchCard, roundPage, overview, coursePage]) {
     assert.doesNotMatch(file, /fetch\(|\/api\/live|gviz|localStorage|sessionStorage/i);
   }
-  assert.doesNotMatch(overview, /historicalPairingPlayerRows|roundBirdieLeader/);
+  assert.doesNotMatch(overview, /historicalPairingPlayerRows|roundBirdieLeader|history\.back|router\.back/);
   assert.doesNotMatch(roundPage, /build2025TournamentRecords|reduce\(|filter\(.*bird/i);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
     "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "next", "openai", "qrcode", "react", "react-dom", "web-push",

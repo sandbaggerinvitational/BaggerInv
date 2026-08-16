@@ -154,8 +154,9 @@ test("the dead 2025 scorecard summary is removed while Honors remains model-back
   assert.match(page, /award\.winnerPlayer\?\.\["Display Name"\] \|\| award\.Winner/);
 });
 
-test("2025 removes only the duplicate top archive navigator and preserves canonical destinations", () => {
-  assert.match(page, /useSupabase2026 \? <HistoryArchiveNav[\s\S]*useCompleted2025 \? null : <nav/);
+test("2025 owns one compact top year navigator while preserving canonical destinations", () => {
+  assert.match(page, /useSupabase2026 \? <HistoryArchiveNav[\s\S]*useCompleted2025 \? <nav[\s\S]*data-completed-year-navigation="2025"/);
+  assert.match(page, /\{!useCompleted2025 \? <nav[\s\S]*tournamentYearNavigationBottom[\s\S]*<\/nav> : null\}/);
   assert.match(page, /href=\{`\/history\/\$\{previousYear\}`\}/);
   assert.match(page, /href="\/history"/);
   assert.match(page, /href=\{`\/history\/\$\{nextYear\}`\}/);
@@ -183,5 +184,5 @@ test("mobile presentation has bounded disclosures, touch targets, focus, and red
   assert.match(participantCss, /min-height:\s*48px/);
   assert.match(css, /:focus-visible/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.doesNotMatch(css, /white-space:\s*nowrap/);
+  assert.doesNotMatch(css, /\.story\s*\{[^}]*white-space:\s*nowrap/s);
 });

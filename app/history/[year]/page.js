@@ -481,7 +481,27 @@ export default async function TournamentYearPage({ params }) {
         </div>
       </section>
 
-      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : useCompleted2025 ? null : <nav className={styles.tournamentYearNavigation}>
+      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : useCompleted2025 ? <nav
+        className={`${styles.tournamentYearNavigation} ${completedStyles.yearNavigation}`}
+        data-completed-year-navigation="2025"
+        aria-label="2025 tournament year navigation"
+      >
+        <Link href={`/history/${previousYear}`} aria-label={`Previous Year, ${previousYear}`}>
+          <span>← Previous Year</span>
+          <strong>{previousYear}</strong>
+        </Link>
+        <Link
+          className={`${styles.tournamentHistoryHome} ${completedStyles.yearNavigationHome}`}
+          href="/history"
+          aria-label="All Tournament Years"
+        >
+          All Tournament Years
+        </Link>
+        <Link href={`/history/${nextYear}`} aria-label={`Next Year, ${nextYear}`}>
+          <span>Next Year →</span>
+          <strong>{nextYear}</strong>
+        </Link>
+      </nav> : <nav className={styles.tournamentYearNavigation}>
         {previousYear ? (
           <Link href={`/history/${previousYear}`}>
             <span>← Previous Year</span>
@@ -737,8 +757,8 @@ export default async function TournamentYearPage({ params }) {
         </>}
       </section>
 
-      <nav
-        className={`${styles.tournamentYearNavigation} ${styles.tournamentYearNavigationBottom} ${useCompleted2025 ? completedStyles.archiveNavigation : ""}`}
+      {!useCompleted2025 ? <nav
+        className={`${styles.tournamentYearNavigation} ${styles.tournamentYearNavigationBottom}`}
       >
         {previousYear ? (
           <Link href={`/history/${previousYear}`}>
@@ -764,7 +784,7 @@ export default async function TournamentYearPage({ params }) {
         ) : (
           <span />
         )}
-      </nav>
+      </nav> : null}
     </main>
   );
 }

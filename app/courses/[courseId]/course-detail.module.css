@@ -59,6 +59,30 @@
   font-weight: 850;
 }
 
+.historyNavigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.historyNavigation > a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 999px;
+  background: rgba(9, 47, 37, .55);
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 850;
+}
+
+.historyNavigation > a:focus-visible {
+  outline: 3px solid #ead393;
+  outline-offset: 2px;
+}
+
 .identity {
   display: flex;
   align-items: center;

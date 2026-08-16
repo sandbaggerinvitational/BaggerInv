@@ -8,7 +8,10 @@ import AssetImage from "../../AssetImage";
 import ExternalLinkConfirm from "../../ExternalLinkConfirm";
 import { courseHero, courseLogo } from "../../../lib/asset-paths";
 import { courseDetailModel } from "../../../lib/course-detail";
-import { historyCourseReturn } from "../../../lib/history-course-navigation";
+import {
+  historyCourseReturn,
+  historyCourseTournamentReturn,
+} from "../../../lib/history-course-navigation";
 import { pageMetadata } from "../../../lib/seo";
 import { resolveTournamentGuideContent } from "../../tournament-guide/resolveGuideContent";
 import styles from "./course-detail.module.css";
@@ -61,6 +64,7 @@ export default async function CoursePage({ params, searchParams }) {
   const { course } = model;
   const website = model.website;
   const historyReturn = archive ? historyCourseReturn(resolvedSearchParams) : null;
+  const tournamentReturn = archive ? historyCourseTournamentReturn(resolvedSearchParams) : null;
   const returnLink = historyReturn || {
     href: archive ? "/courses?view=archive" : "/courses",
     label: "Courses",
@@ -71,7 +75,12 @@ export default async function CoursePage({ params, searchParams }) {
       {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
       <div className={styles.heroShade} />
       <div className={styles.heroContent}>
-        <Link href={returnLink.href}>‹ {returnLink.label}</Link>
+        {historyReturn ? <nav className={styles.historyNavigation} aria-label="History course navigation">
+          <Link href={returnLink.href}>‹ {returnLink.label}</Link>
+          {tournamentReturn && tournamentReturn.href !== returnLink.href
+            ? <Link href={tournamentReturn.href}>{tournamentReturn.label} →</Link>
+            : null}
+        </nav> : <Link href={returnLink.href}>‹ {returnLink.label}</Link>}
         <div className={styles.identity}>
           <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
           <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>
