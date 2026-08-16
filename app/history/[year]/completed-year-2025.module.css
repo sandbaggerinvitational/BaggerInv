@@ -289,6 +289,13 @@
   color: var(--tsi-muted);
   font-size: .6rem;
   line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.recordCard > .recordContext,
+.recordRow > .recordContext {
+  color: #5f5547;
+  font-weight: 750;
 }
 
 .recordList {

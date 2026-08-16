@@ -29,6 +29,7 @@ import { getDraftByYear } from "../../../lib/draft";
 import { loadLegacyHistoryAnalytics } from "../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
 import { buildLegacyHistoryScorecardCoverage } from "../../../lib/legacy-history-scorecard-coverage";
+import { build2025TournamentRecords } from "../../../lib/history-2025-tournament-records";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import {
   history2026TournamentCard,
@@ -137,49 +138,14 @@ function completedScore(value) {
     .replace(/\.0+$/, "");
 }
 
-function completedRecordDetail(item, teams, scorecards) {
-  const value = String(item.detail ?? "").trim();
-  const participantPlayerIds = Array.isArray(item.participantPlayerIds)
-    ? item.participantPlayerIds.map((id) => String(id ?? "").trim()).filter(Boolean)
-    : [];
-  const rosterTeam = participantPlayerIds.length
-    ? teams.find((team) => participantPlayerIds.every((playerId) =>
-      team.roster.some((entry) => String(entry.player?.["Player ID"] ?? "").trim() === playerId)
-    ))
-    : null;
-  const canonicalTeam = rosterTeam || teams.find((team) =>
-    (item.teamSide && String(team.side) === `Team ${item.teamSide}`) ||
-    [team.id, team.name].some((identity) =>
-      String(identity ?? "").trim().toLowerCase() === value.toLowerCase()
-    )
-  );
-  if (canonicalTeam) return canonicalTeam.name;
-
-  const sourceTeamIds = [...new Set(scorecards
-    .filter((scorecard) => scorecard.scoreType === "TEAM" && scorecard.teamId)
-    .map((scorecard) => String(scorecard.teamId).trim()))];
-  const unmatchedSourceTeamIds = sourceTeamIds.filter((sourceId) =>
-    !teams.some((team) => String(team.id).trim().toLowerCase() === sourceId.toLowerCase())
-  );
-  const unmatchedCanonicalTeams = teams.filter((team) =>
-    !sourceTeamIds.some((sourceId) => String(team.id).trim().toLowerCase() === sourceId.toLowerCase())
-  );
-  return unmatchedSourceTeamIds.length === 1 &&
-    unmatchedCanonicalTeams.length === 1 &&
-    unmatchedSourceTeamIds[0].toLowerCase() === value.toLowerCase()
-    ? unmatchedCanonicalTeams[0].name
-    : value;
-}
-
 function CompletedYearOverview({
   tournament,
   roundPoints,
   leaderboard,
   pointsTracked,
-  scoringStatistics,
-  participant,
   scorecardCoverage,
   scorecards,
+  matches,
 }) {
   const standings = historyStandingsSummary(leaderboard, 5);
   const scoreParts = String(tournament["Final Score"] ?? "")
@@ -187,12 +153,11 @@ function CompletedYearOverview({
     .map(completedScore);
   const championScore = scoreParts[0] || "—";
   const runnerUpScore = scoreParts[1] || "—";
-  const allRecords = scoringItems(scoringStatistics, participant, tournament.courses)
-    .filter((item) => item.label !== "Scorecard Coverage")
-    .map((item) => ({
-      ...item,
-      detail: completedRecordDetail(item, tournament.teams, scorecards),
-    }));
+  const allRecords = build2025TournamentRecords({
+    scorecards,
+    matches,
+    teams: tournament.teams,
+  }).records;
   const defaultRecordLabels = [
     "Best Individual Round",
     "Best Team Round",
@@ -210,10 +175,11 @@ function CompletedYearOverview({
     : `${scorecardCoverage.completeMatchScorecards} matches`;
 
   const renderRecord = (item, compact = false) => (
-    <article className={compact ? completedStyles.recordRow : completedStyles.recordCard} key={item.label}>
+    <article className={compact ? completedStyles.recordRow : completedStyles.recordCard} key={item.key || item.label} aria-label={item.accessibleLabel}>
       <span>{item.label}</span>
       <strong>{item.value}</strong>
       {item.detail ? <b>{item.detail}</b> : null}
+      {item.context ? <small className={completedStyles.recordContext}>{item.context}</small> : null}
       {item.sample ? <small>{item.sample}</small> : null}
     </article>
   );
@@ -476,9 +442,10 @@ export default async function TournamentYearPage({ params }) {
     tournamentScorecards,
     tournamentScorecards.length + missingTournamentScorecards.length
   );
+  const tournamentMatches = useSupabase2026 ? [] : getTournamentMatches(year);
   const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
     year,
-    matches: getTournamentMatches(year),
+    matches: tournamentMatches,
     scorecards: scorecardAnalytics.scorecards,
     teamIds: tournament.teams.map((team) => team.id),
   });
@@ -592,10 +559,9 @@ export default async function TournamentYearPage({ params }) {
           roundPoints={roundPoints}
           leaderboard={leaderboard}
           pointsTracked={pointsTracked}
-          scoringStatistics={scoringStatistics}
-          participant={participant}
           scorecardCoverage={legacyScorecardCoverage}
           scorecards={tournamentScorecards}
+          matches={tournamentMatches}
         /> : useSupabase2026 ? <CurrentHistoryOverview
           tournament={tournament}
           roundPoints={roundPoints}

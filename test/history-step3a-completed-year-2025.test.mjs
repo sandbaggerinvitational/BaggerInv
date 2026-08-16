@@ -134,7 +134,11 @@ test("Tournament Records shows four intentional defaults and keeps every remaini
   assert.match(page, /defaultRecordLabels[\s\S]*defaultRecords[\s\S]*remainingRecords/);
   assert.match(page, /View All Tournament Records/);
   assert.match(page, /remainingRecords\.map/);
-  assert.match(page, /completedRecordDetail\(item, tournament\.teams, scorecards\)/);
+  assert.match(page, /build2025TournamentRecords\(\{/);
+  assert.match(page, /matches,\s*teams: tournament\.teams/);
+  assert.match(page, /aria-label=\{item\.accessibleLabel\}/);
+  assert.match(page, /item\.context/);
+  assert.doesNotMatch(page, /completedRecordDetail/);
   assert.doesNotMatch(page, /CRISPYBOYS|BANDONBROTHERS/);
 });
 
