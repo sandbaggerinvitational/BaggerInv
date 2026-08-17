@@ -101,7 +101,7 @@ test("Patrick Noonan and the 24-row inline standings correction remain frozen", 
   assert.doesNotMatch(yearPage, /View Full Leaderboard|router\.push|fetch\(/);
 });
 
-test("the cleanup is guarded to the 2026 HistoricalMatchRow path", () => {
+test("the approved 2026 reference remains on its dedicated HistoricalMatchRow path", () => {
   assert.match(matchRow, /use2026Presentation = Number\(tournament\?\.year\) === 2026/);
   assert.match(roundPage, /useSupabase2026 \? <HistoricalMatchRow/);
   assert.match(roundPage, /: <PublicMatchCard/);

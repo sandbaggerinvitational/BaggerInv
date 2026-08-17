@@ -129,7 +129,7 @@ test("Match Details holds progression and segment results while scorecard stays 
   assert.match(compact, /<Segment label="Front 9"/);
   assert.match(compact, /<Segment label="Back 9"/);
   assert.match(compact, /<Segment label="Overall"/);
-  assert.match(compact, /<ScorecardTable scorecards=\{scorecards\} compact historyDensity=\{historyDensity\} \/>/);
+  assert.match(compact, /<ScorecardTable[\s\S]*?scorecards=\{scorecards\}[\s\S]*?historyDensity=\{historyDensity\}[\s\S]*?showSummary=\{historyScorecardParity\}/);
   assert.ok(compact.indexOf("<ScorecardTable") > compact.indexOf("</details>"));
 });
 

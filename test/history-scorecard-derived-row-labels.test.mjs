@@ -3,11 +3,12 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [scorecard, scorecardCss, pairingCss, matchRow, packageJson] = await Promise.all([
+const [scorecard, scorecardCss, pairingCss, matchRow, publicMatchCard, packageJson] = await Promise.all([
   source("app/ScorecardTable.js"),
   source("app/scorecard.module.css"),
   source("app/scorecard-pairing.module.css"),
   source("app/history/HistoricalMatchRow.js"),
+  source("app/PublicMatchCard.js"),
   source("package.json").then(JSON.parse),
 ]);
 
@@ -66,9 +67,12 @@ test("the shared label stays compact and bounded at 320, 375, 390, and 430 pixel
   assert.doesNotMatch(derivedCss, /white-space:\s*nowrap|width:\s*max-content/);
 });
 
-test("the label-only derived presentation remains gated to the existing 2026 path", () => {
+test("the shared label-only treatment preserves 2026 and opts in eligible 2023–2025 History scorecards", () => {
   assert.match(matchRow, /use2026Presentation = Number\(tournament\?\.year\) === 2026/);
   assert.match(matchRow, /stackPairingIdentities=\{use2026Presentation\}/);
+  assert.match(publicMatchCard, /historyYear >= 2023 && historyYear <= 2025/);
+  assert.match(publicMatchCard, /scorecards\.length > 0/);
+  assert.match(publicMatchCard, /stackPairingIdentities=\{historyScorecardParity\}/);
   assert.match(netParticipant, /if \(!stackPairingIdentities\) return <><strong>\{netRow\.name\}<\/strong><small>\{netRow\.label\}<\/small><\/>/);
 });
 

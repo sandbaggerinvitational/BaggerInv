@@ -904,6 +904,12 @@
 .playerHandicapSlot small { margin: 0 !important; color: #68716d; font-size: .64rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
 .playerPairSpacer { grid-row: span 3; }
 .scrambleTeamMeta { min-width: 0; display: grid; grid-template-rows: 22px 25px; justify-items: center; }
+.playerSlotWithoutStroke { grid-row: span 2; grid-template-rows: auto 18px; }
+.playerPairSpacerWithoutStroke { grid-row: span 2; }
+.scrambleTeamMetaWithoutStroke { grid-template-rows: 22px; }
+@supports (grid-template-rows: subgrid) {
+  .playerSlotWithoutStroke { grid-template-rows: subgrid; }
+}
 .teamHandicapSlot .teamHandicap { margin: 0 !important; color: #6b6049 !important; font-size: .61rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
 .teamHandicapSlot .teamHandicap b { color: #172019; font-size: 1em; }
 .teamStrokeSlot .strokeBadge { margin: 0; }

@@ -135,6 +135,7 @@ export default async function HistoricalRoundPage({ params }) {
     return completed2025 && Number(archive.round) === 2
       ? canonicalize2025ScrambleScorecardPresentation({
         scorecards: cards,
+        matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
         teams: archive.tournament.teams,
       })
       : cards;

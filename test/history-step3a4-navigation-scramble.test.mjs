@@ -171,12 +171,15 @@ test("Round 2 scorecard disclosures replace raw team labels without changing sco
         holeWinners: [{ winnerSide: "B", winnerName: "CRISPYBOYS", holeNumber: 1 }],
       },
     }],
+    matches,
     teams,
   });
   assert.equal(presented[1].side, 2);
   assert.equal(presented[1].teamName, "The Crispy Boys");
   assert.equal(presented[1].matchNetScoring.rows[0].name, "The Crispy Boys");
   assert.equal(presented[1].matchNetScoring.holeWinners[0].winnerName, "The Crispy Boys");
+  assert.deepEqual(presented[0].participantNames, ["Michael Hunnicutt", "Nick Julian"]);
+  assert.deepEqual(presented[1].participantNames, ["Holman Moores", "David Rees-Jones"]);
   assert.equal(presented[1].total, scorecards[3].total);
   assert.equal(presented[1].holes, scorecards[3].holes);
   assert.doesNotMatch(JSON.stringify(presented), /CRISPYBOYS|CRIPSYBOYS|BANDONBROTHERS/);
