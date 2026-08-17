@@ -95,8 +95,11 @@
   font-style: normal;
 }
 
-.destination:hover {
-  color: var(--tsi-gold-500, #b9913f);
+.destination:visited,
+.destination:hover,
+.destination:active,
+.destination:focus-visible {
+  color: var(--tsi-green-900, #0b3529);
 }
 
 .destination:focus-visible {

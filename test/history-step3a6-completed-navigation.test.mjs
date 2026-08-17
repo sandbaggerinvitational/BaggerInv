@@ -172,6 +172,18 @@ test("all completed navigation variants use the Year rail descriptor and serif d
   assert.match(coursePage, /label: "Tournament",[\s\S]*detail: String\(resolvedSearchParams\.year\)[\s\S]*label: "Round",[\s\S]*detail: `Round \$\{Number\(resolvedSearchParams\.round\)\}`/);
 });
 
+test("all HistoryNavigation destination values keep the approved dark-green token in every interaction state", () => {
+  assert.match(navigationCss, /\.destination \{[^}]*color:\s*var\(--tsi-green-900,\s*#0b3529\)/);
+  assert.match(
+    navigationCss,
+    /\.destination:visited,\s*\.destination:hover,\s*\.destination:active,\s*\.destination:focus-visible\s*\{[^}]*color:\s*var\(--tsi-green-900,\s*#0b3529\)/,
+  );
+  assert.match(navigationCss, /\.destination span \{[^}]*color:\s*var\(--tsi-muted,\s*#687069\)/);
+  assert.match(navigationCss, /\.destination strong \{[^}]*color:\s*inherit/);
+  assert.match(navigationCss, /\.destination b \{[^}]*color:\s*inherit/);
+  assert.doesNotMatch(navigationCss, /\.destination:(?:visited|hover|active|focus-visible)[\s\S]{0,160}color:\s*var\(--tsi-gold/);
+});
+
 test("2026 stays on its existing archive navigation and receives no completed-year Course rail", () => {
   assert.match(yearPage, /useSupabase2026 \? <HistoryArchiveNav/);
   assert.match(roundPage, /useSupabase2026 \? <HistoryArchiveNav/);
