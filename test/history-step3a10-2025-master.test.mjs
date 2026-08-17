@@ -4,11 +4,13 @@ import test from "node:test";
 import { buildScorecardAnalytics } from "../lib/scorecard-analytics.js";
 import { canonicalize2025ScrambleScorecardPresentation } from "../lib/history-2025-tournament-records.js";
 import { buildLegacyHistoryScorecardCoverage } from "../lib/legacy-history-scorecard-coverage.js";
+import { reconstructMatchProgression } from "../lib/match-progression.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [matchCard, scorecard, matchCss, summaryCss, analyticsSource, scramblePresentationSource, roundPage, packageJson, historicalData] = await Promise.all([
+const [matchCard, scorecard, progressionSummary, matchCss, summaryCss, analyticsSource, scramblePresentationSource, roundPage, packageJson, historicalData] = await Promise.all([
   source("app/PublicMatchCard.js"),
   source("app/ScorecardTable.js"),
+  source("app/MatchProgressionSummary.js"),
   source("app/live/live.module.css"),
   source("app/scorecard-summary.module.css"),
   source("lib/scorecard-analytics.js"),
@@ -169,6 +171,41 @@ test("summary repair leaves every approved hole, net-row, and Hole Winner field 
     assert.equal(card.strokesReceived, before.strokesReceived);
     assert.deepEqual(card.netTotals, before.netTotals);
   }
+});
+
+test("all six 2025 Scramble matches reuse the canonical progression model without changing scorecard Hole Winners", () => {
+  const projected = projectedScrambleCards(scrambleFixture());
+  for (let match = 1; match <= 6; match += 1) {
+    const cards = projected.filter((card) => card.matchNumber === match);
+    assert.equal(cards.length, 2);
+    assert.equal(reconstructMatchProgression(cards), null);
+    assert.ok(cards.every((card) => card.historyProgressionMatchNetScoring?.available));
+    const progression = reconstructMatchProgression(cards.map((card) => ({
+      ...card,
+      matchNetScoring: card.historyProgressionMatchNetScoring,
+    })));
+    assert.ok(progression);
+    assert.equal(progression.format, "SC");
+    assert.equal(progression.progression.length, 18);
+    assert.deepEqual(
+      [6, 9, 12, 15].map((holeNumber) => progression.progression.find((step) => step.holeNumber === holeNumber)?.holeNumber),
+      [6, 9, 12, 15]
+    );
+    assert.ok(progression.finalMargin.label);
+  }
+});
+
+test("Scramble progression stays unavailable when canonical stroke evidence is genuinely missing", () => {
+  const cards = projectedScrambleCards(scrambleFixture(2025, { omitSecondStroke: true }));
+  assert.ok(cards.every((card) => !card.historyProgressionMatchNetScoring));
+});
+
+test("Match Intelligence consumes only the 2025 shadow progression projection and reuses existing scoring helpers", () => {
+  assert.match(progressionSummary, /scorecard\.historyProgressionMatchNetScoring/);
+  assert.match(progressionSummary, /matchNetScoring: scorecard\.historyProgressionMatchNetScoring/);
+  assert.match(scramblePresentationSource, /buildMatchNetScoring\(cards, match, scoringTeamRows\)/);
+  assert.match(analyticsSource, /export function buildMatchNetScoring/);
+  assert.doesNotMatch(scramblePresentationSource, /calculateHoleWinner/);
 });
 
 test("eligible 2025 matches put Scorecard before independent Match Details", () => {

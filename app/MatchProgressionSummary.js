@@ -7,7 +7,15 @@ import styles from "./live/live.module.css";
 const MILESTONES = [6, 9, 12, 15];
 
 export default function MatchProgressionSummary({ scorecards = [] }) {
-  const match = reconstructMatchProgression(scorecards);
+  const progressionScorecards = scorecards.map((scorecard) =>
+    scorecard.historyProgressionMatchNetScoring
+      ? {
+        ...scorecard,
+        matchNetScoring: scorecard.historyProgressionMatchNetScoring,
+      }
+      : scorecard
+  );
+  const match = reconstructMatchProgression(progressionScorecards);
   if (!match) return null;
   const finalName = match.winnerSide === "A"
     ? match.sideA.teamName
