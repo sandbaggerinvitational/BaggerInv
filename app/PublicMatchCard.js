@@ -162,8 +162,12 @@ function CompactHistoricalPairing({ teamOne, teamTwo, teamOnePlayers = [], teamT
   </div>;
 }
 
-function reconstructedResult(scorecards = []) {
-  const progression = reconstructMatchProgression(scorecards);
+function reconstructedResult(scorecards = [], useHistoricalProgression = false) {
+  const progression = reconstructMatchProgression(useHistoricalProgression
+    ? scorecards.map((scorecard) => scorecard.historyProgressionMatchNetScoring
+      ? { ...scorecard, matchNetScoring: scorecard.historyProgressionMatchNetScoring }
+      : scorecard)
+    : scorecards);
   if (!progression) return "";
   if (!progression.winnerSide) return "Match Halved";
   const winner = progression.winnerSide === "A" ? progression.sideA : progression.sideB;
@@ -224,7 +228,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   const historyScorecardParity = variant === "historical" &&
     historyYear >= 2023 && historyYear <= 2025 &&
     scorecards.length > 0;
-  const completed2025MatchupCleanup = completedHistoryCompact && historyYear === 2025;
+  const completedHistoryMatchupCleanup = completedHistoryCompact && [2024, 2025].includes(historyYear);
   const hasPairing = [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => player?.name);
   const hasSegments = Boolean(match.frontWinner || match.backWinner || overallWinner);
   const winnerName = halved ? "Match halved" : winningSide === 1 ? tournament.teamOne.name : winningSide === 2 ? tournament.teamTwo.name : "";
@@ -239,7 +243,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       ? (match.team1Players || [])
       : winningSide === 2 ? (match.team2Players || []) : [];
     const fallbackWinner = winningPlayers.map((player) => player?.name).filter(Boolean).join(" & ");
-    const finalResult = reconstructedResult(scorecards) || (halved
+    const finalResult = reconstructedResult(scorecards, historyYear === 2024) || (halved
       ? "Match Halved"
       : fallbackWinner
         ? `${fallbackWinner} ${winningPlayers.length === 1 ? "wins" : "win"}`
@@ -258,9 +262,9 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       {variant === "historical" && isGhostMatch ? <div className={styles.ghostMatchNotice}><strong>GHOST MATCH</strong><span>Selected player results are excluded from official records.</span></div> : null}
 
       {match.format === "SI" ? <div className={styles.historicalFinalMatchup}>
-        <CompactHistoricalSide team={tournament.teamOne} players={match.team1Players} showStroke={!completed2025MatchupCleanup} />
+        <CompactHistoricalSide team={tournament.teamOne} players={match.team1Players} showStroke={!completedHistoryMatchupCleanup} />
         <b aria-label="versus">VS</b>
-        <CompactHistoricalSide team={tournament.teamTwo} players={match.team2Players} showStroke={!completed2025MatchupCleanup} />
+        <CompactHistoricalSide team={tournament.teamTwo} players={match.team2Players} showStroke={!completedHistoryMatchupCleanup} />
       </div> : <CompactHistoricalPairing
         teamOne={tournament.teamOne}
         teamTwo={tournament.teamTwo}
@@ -268,7 +272,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         teamTwoPlayers={match.team2Players}
         teamOneStroke={match.format === "SC" ? match.team1Stroke : null}
         teamTwoStroke={match.format === "SC" ? match.team2Stroke : null}
-        showStroke={!completed2025MatchupCleanup}
+        showStroke={!completedHistoryMatchupCleanup}
       />}
 
       <div className={styles.historicalFinalResult}>

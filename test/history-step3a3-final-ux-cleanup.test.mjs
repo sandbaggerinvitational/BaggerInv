@@ -102,9 +102,11 @@ test("all three historical Course Profile actions use the existing archive route
   assert.doesNotMatch(yearPage, /new course|createCourse|course profile fallback/i);
 });
 
-test("only 2025 legacy Round History opts into the compact final presentation", () => {
+test("2025 remains on the compact final presentation while 2024 deliberately migrates to it", () => {
+  assert.match(roundPage, /const completed2024 = !useSupabase2026 && Number\(archive\.year\) === 2024/);
   assert.match(roundPage, /const completed2025 = !useSupabase2026 && Number\(archive\.year\) === 2025/);
-  assert.match(roundPage, /completedHistoryCompact=\{completed2025\}/);
+  assert.match(roundPage, /const completedHistoryMaster = completed2024 \|\| completed2025/);
+  assert.match(roundPage, /completedHistoryCompact=\{completedHistoryMaster\}/);
   assert.match(matchCard, /if \(completedHistoryCompact\)/);
   assert.match(roundPage, /useSupabase2026 \? <HistoricalMatchRow/);
   assert.doesNotMatch(roundPage, /year\s*>=\s*2017|\[2017,\s*2018/);
@@ -147,8 +149,8 @@ test("round scorecard availability remains gated by accepted complete-match cove
   assert.match(roundPage, /completeLegacyMatchIds\.has\(match\.id\)/);
   assert.match(roundPage, /displayScorecardsForMatch\(match\.id\)/);
   const completedStatistics = roundPage.slice(
-    roundPage.indexOf("{completed2025 ? (applicableRoundStatisticItems.length"),
-    roundPage.indexOf(": <section className={styles.section}>", roundPage.indexOf("{completed2025 ? (applicableRoundStatisticItems.length"))
+    roundPage.indexOf("{completedHistoryMaster ? (applicableRoundStatisticItems.length"),
+    roundPage.indexOf(": <section className={styles.section}>", roundPage.indexOf("{completedHistoryMaster ? (applicableRoundStatisticItems.length"))
   );
   assert.doesNotMatch(completedStatistics, /Historical Scorecards|Scorecard detail available/);
 });

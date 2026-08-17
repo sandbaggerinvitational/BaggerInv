@@ -143,7 +143,8 @@ test("canonical blank strokes become zero while a genuinely missing stroke colum
 });
 
 test("the identity repair is unambiguous, 2025-only, and contains no pairing-specific hardcode", () => {
-  assert.match(scramblePresentationSource, /Number\(scorecard\?\.year\) !== TARGET_YEAR/);
+  assert.match(scramblePresentationSource, /canonicalize2025ScrambleScorecardPresentation[\s\S]*year: TARGET_YEAR/);
+  assert.match(scramblePresentationSource, /Number\(scorecard\?\.year\) !== targetYear/);
   assert.match(scramblePresentationSource, /const \{ resolved: resolvedSides \} = resolveTeamCardSides/);
   assert.match(scramblePresentationSource, /resolvedSides\.get\(scorecard\)/);
   assert.match(scramblePresentationSource, /officialStrokeValue\(canonicalMatch, resolvedSide\)/);
@@ -228,8 +229,8 @@ test("ineligible 2025 matches retain Details without a fake Scorecard placeholde
 test("all 24 completed 2025 matchups use the no-stroke identity contract", () => {
   const matches = historicalData.matches.filter((match) => Number(match.Year) === 2025);
   assert.equal(matches.length, 24);
-  assert.match(matchCard, /completed2025MatchupCleanup = completedHistoryCompact && historyYear === 2025/);
-  assert.equal([...matchCard.matchAll(/showStroke=\{!completed2025MatchupCleanup\}/g)].length, 3);
+  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2024, 2025\]\.includes\(historyYear\)/);
+  assert.equal([...matchCard.matchAll(/showStroke=\{!completedHistoryMatchupCleanup\}/g)].length, 3);
   assert.match(matchCard, /showStroke && playerStrokeLabel/);
   assert.match(matchCard, /showStroke && teamStrokeLabel/);
   assert.match(matchCard, /showStroke \? <>[\s\S]*CompactHistoricalStrokeLine/);
@@ -279,11 +280,12 @@ test("Best Ball, Singles, Hole Winner, Final Result, and Match Progression stay 
   assert.match(roundPage, /<ScoringStatGrid/);
 });
 
-test("2023, 2024, and 2026 remain outside the completed-2025 action and matchup guards", () => {
-  assert.match(matchCard, /completed2025MatchupCleanup = completedHistoryCompact && historyYear === 2025/);
-  assert.match(roundPage, /completedHistoryCompact=\{completed2025\}/);
+test("the frozen 2025 guard remains intact while 2024 is deliberately migrated", () => {
+  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2024, 2025\]\.includes\(historyYear\)/);
+  assert.match(roundPage, /const completedHistoryMaster = completed2024 \|\| completed2025/);
+  assert.match(roundPage, /completedHistoryCompact=\{completedHistoryMaster\}/);
   assert.match(roundPage, /useSupabase2026 \? <HistoricalMatchRow/);
-  assert.doesNotMatch(roundPage, /2023.*completedHistoryCompact|2024.*completedHistoryCompact/);
+  assert.doesNotMatch(roundPage, /Number\(archive\.year\) === 2023/);
 });
 
 test("the 2025 action and summary system remains responsive and accessible", () => {

@@ -79,13 +79,13 @@ test("Singles retain the existing compact side without pairing-only blank stroke
 
 test("2025 remains on its accepted Birdie Leader source while 2026 removes the duplicate category", () => {
   assert.match(roundPage, /\.\.\.\(!completed2025 && !useSupabase2026 \? \[\{ label: "Most Birdies"/);
-  assert.match(roundPage, /const roundBirdieLeader = \(completed2025 \|\| useSupabase2026\) && archive\.format === "SC"[\s\S]*roundStatistics\.mostBirdies[\s\S]*roundStatistics\.birdieLeader/);
-  assert.match(roundPage, /const birdieLeaderHolders = completed2025 && archive\.format === "SC"[\s\S]*scrambleStatisticHolders\?\.mostBirdies/);
+  assert.match(roundPage, /const roundBirdieLeader = \(completedHistoryMaster \|\| useSupabase2026\) && archive\.format === "SC"[\s\S]*roundStatistics\.mostBirdies[\s\S]*roundStatistics\.birdieLeader/);
+  assert.match(roundPage, /const birdieLeaderHolders = completedHistoryMaster && archive\.format === "SC"[\s\S]*scrambleStatisticHolders\?\.mostBirdies/);
   assert.match(roundPage, /label: "Birdie Leader"[\s\S]*holders: birdieLeaderHolders/);
 });
 
 test("2025 year navigation appears once immediately below the hero with bounded destinations", () => {
-  const heroIndex = overview.indexOf("data-completed-prototype={useCompleted2025 ? \"2025\" : undefined}");
+  const heroIndex = overview.indexOf("data-completed-prototype={useCompletedMaster ? String(tournament.year) : undefined}");
   const yearNavigationIndex = overview.indexOf('surface="year"');
   const contentIndex = overview.indexOf("<section className={styles.content}>");
   assert.ok(heroIndex >= 0 && heroIndex < yearNavigationIndex);

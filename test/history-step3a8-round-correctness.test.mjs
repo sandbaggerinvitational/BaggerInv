@@ -126,7 +126,7 @@ test("Scramble holders resolve every accepted value to canonical two-golfer iden
 
 test("2026 Round Statistics are format-aware and expose Birdie Leader only once", () => {
   assert.match(roundPage, /!completed2025 && !useSupabase2026[\s\S]*label: "Most Birdies"/);
-  assert.match(roundPage, /showLowestRound = !\(useSupabase2026 && archive\.format === "SC"\)/);
+  assert.match(roundPage, /showLowestRound = !\(\(completedHistoryMaster \|\| useSupabase2026\) && archive\.format === "SC"\)/);
   assert.match(roundPage, /showLowestTeamRound = !useSupabase2026 \|\| archive\.format === "SC"/);
   assert.match(roundPage, /archive\.format === "BB" && bestBallLowestTeamRound\?\.sampleSize > 0/);
   assert.match(roundPage, /useSupabase2026 \? applicableRoundStatisticItems/);

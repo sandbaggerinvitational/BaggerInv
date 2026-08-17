@@ -15,11 +15,13 @@ const completedOverview = page.slice(
   page.indexOf("function CurrentHistoryOverview")
 );
 
-test("Step 3A intentionally gates the completed-year prototype to 2025", () => {
+test("the frozen completed-year prototype remains explicit for 2025 while 2024 opts into the same master", () => {
+  assert.match(page, /const useCompleted2024 = !useSupabase2026 && Number\(tournament\.year\) === 2024/);
   assert.match(page, /const useCompleted2025 = !useSupabase2026 && Number\(tournament\.year\) === 2025/);
-  assert.match(page, /useCompleted2025 \? <CompletedYearOverview/);
+  assert.match(page, /const useCompletedMaster = useCompleted2024 \|\| useCompleted2025/);
+  assert.match(page, /useCompletedMaster \? <CompletedYearOverview/);
   assert.match(page, /useSupabase2026 \? <CurrentHistoryOverview/);
-  assert.match(page, /useCompleted2025 \? null : <div className=\{styles\.finalScoreCard\}>/);
+  assert.match(page, /useCompletedMaster \? null : <div className=\{styles\.finalScoreCard\}>/);
   assert.doesNotMatch(page, /\[2017,\s*2018|year\s*>=\s*2017|year\s*<=\s*2025/);
 });
 
@@ -38,8 +40,8 @@ test("the collapsed 2025 final state follows the shared History hierarchy", () =
 });
 
 test("2025 uses the 2026 History visual contracts without changing the 2026 branch", () => {
-  assert.match(page, /useSupabase2026 \|\| useCompleted2025 \? pwaStyles\.currentTournamentHero/);
-  assert.match(page, /useSupabase2026 \|\| useCompleted2025 \? pwaStyles\.currentTournamentHeroContent/);
+  assert.match(page, /useSupabase2026 \|\| useCompletedMaster \? pwaStyles\.currentTournamentHero/);
+  assert.match(page, /useSupabase2026 \|\| useCompletedMaster \? pwaStyles\.currentTournamentHeroContent/);
   assert.match(page, /className=\{pwaStyles\.overviewSection\}/);
   assert.match(page, /className=\{pwaStyles\.overviewRoundList\}/);
   assert.match(page, /className=\{pwaStyles\.overviewTeamList\}/);

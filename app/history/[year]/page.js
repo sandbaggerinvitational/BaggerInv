@@ -149,6 +149,7 @@ function CompletedYearOverview({
   pointsTracked,
   scorecards,
   matches,
+  records = null,
 }) {
   const standings = historyStandingsSummary(leaderboard, 5);
   const scoreParts = String(tournament["Final Score"] ?? "")
@@ -156,7 +157,7 @@ function CompletedYearOverview({
     .map(completedScore);
   const championScore = scoreParts[0] || "—";
   const runnerUpScore = scoreParts[1] || "—";
-  const allRecords = build2025TournamentRecords({
+  const allRecords = records || build2025TournamentRecords({
     scorecards,
     matches,
     teams: tournament.teams,
@@ -447,12 +448,23 @@ export default async function TournamentYearPage({ params }) {
   });
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
+  const completed2024Records = Number(tournament?.year) === 2024
+    ? scoringItems(scoringStatistics, participant, tournament.courses)
+      .filter((item) => item.label !== "Scorecard Coverage" && item.value !== "—")
+      .map((item) => ({
+        ...item,
+        key: `2024-${item.label}`,
+        accessibleLabel: [item.label, item.value, item.detail, item.sample].filter(Boolean).join(", "),
+      }))
+    : null;
+  const useCompleted2024 = !useSupabase2026 && Number(tournament.year) === 2024;
   const useCompleted2025 = !useSupabase2026 && Number(tournament.year) === 2025;
+  const useCompletedMaster = useCompleted2024 || useCompleted2025;
   return (
     <main>
       <Header />
 
-      <section className={`${styles.tournamentHero} ${useSupabase2026 || useCompleted2025 ? pwaStyles.currentTournamentHero : ""} ${useCompleted2025 ? completedStyles.hero : ""}`} data-completed-prototype={useCompleted2025 ? "2025" : undefined}>
+      <section className={`${styles.tournamentHero} ${useSupabase2026 || useCompletedMaster ? pwaStyles.currentTournamentHero : ""} ${useCompletedMaster ? completedStyles.hero : ""}`} data-completed-prototype={useCompletedMaster ? String(tournament.year) : undefined}>
         <AssetImage
           src={historyHeroPath(tournament)}
           alt={`${tournament.year} ${tournament.Destination}`}
@@ -468,7 +480,7 @@ export default async function TournamentYearPage({ params }) {
         />
         <div className={styles.tournamentHeroOverlay} />
 
-        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 || useCompleted2025 ? pwaStyles.currentTournamentHeroContent : ""} ${useCompleted2025 ? completedStyles.heroContent : ""}`}>
+        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 || useCompletedMaster ? pwaStyles.currentTournamentHeroContent : ""} ${useCompletedMaster ? completedStyles.heroContent : ""}`}>
           {tournament.logoFileName ? (
             <AssetImage
               src={tournamentLogo(tournament.logoFileName)}
@@ -483,7 +495,7 @@ export default async function TournamentYearPage({ params }) {
               decoding="async"
             />
           ) : null}
-          <p>{useCompleted2025 ? historyEditionLabel(tournament.year) : tournament.editionTitle}</p>
+          <p>{useCompletedMaster ? historyEditionLabel(tournament.year) : tournament.editionTitle}</p>
           <h1>{tournament.year}</h1>
           <h2>{tournament.Destination}</h2>
           <span>{tournament.Dates}</span>
@@ -528,7 +540,7 @@ export default async function TournamentYearPage({ params }) {
             <strong>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `${tournament.championTeam.name} champions` : "Tournament complete") : "2026 tournament record"}</strong>
             <p>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `Official final: ${tournament["Final Score"]}` : "The official champion is pending canonical tournament resolution.") : "Final results and scorecards appear here as matches become official."}</p>
           </div>
-        </div> : useCompleted2025 ? null : <div className={styles.finalScoreCard}>
+        </div> : useCompletedMaster ? null : <div className={styles.finalScoreCard}>
           <div>
             <span>Champions</span>
             <strong>
@@ -547,12 +559,13 @@ export default async function TournamentYearPage({ params }) {
           </div>
         </div>}
 
-        {useCompleted2025 ? <CompletedYearOverview
+        {useCompletedMaster ? <CompletedYearOverview
           tournament={tournament}
           leaderboard={leaderboard}
           pointsTracked={pointsTracked}
           scorecards={tournamentScorecards}
           matches={tournamentMatches}
+          records={completed2024Records}
         /> : useSupabase2026 ? <CurrentHistoryOverview
           tournament={tournament}
           roundPoints={roundPoints}

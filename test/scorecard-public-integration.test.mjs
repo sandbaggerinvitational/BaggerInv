@@ -82,7 +82,7 @@ test("scorecard histories reuse tournament data and fail fast when optional shee
   assert.match(scorecardSheets, /Round Scorecards/);
   assert.match(scorecardSheets, /Course Holes/);
   assert.doesNotMatch(scorecardSheets, /Matches|Courses|Team Names|Players/);
-  assert.match(source, /loadHistoricalData\(\)/);
+  assert.match(source, /loadScorecardSheetsWithHistoricalContext\(loadHistoricalData\)/);
   assert.match(source, /timeoutMs:\s*10_000/);
   assert.match(source, /SCORECARD_CACHE_SECONDS\s*=\s*300/);
   assert.match(source, /HISTORICAL_CACHE_SECONDS\s*=\s*300/);

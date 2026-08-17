@@ -1,5 +1,8 @@
 export const dynamic = "force-dynamic";
-import { refreshHistoricalData } from "../../../../../lib/stats";
+import {
+  refreshCanonical2024HistoricalData,
+  refreshHistoricalData,
+} from "../../../../../lib/stats";
 import { notFound } from "next/navigation";
 import { Header } from "../../../../components";
 import AssetImage from "../../../../AssetImage";
@@ -18,7 +21,10 @@ import {
 import styles from "../../../../historical.module.css";
 import { formatTeamPoints } from "../../../../../lib/formatters";
 import { pageMetadata } from "../../../../../lib/seo";
-import { loadLegacyHistoryAnalytics } from "../../../../../lib/legacy-history-analytics";
+import {
+  loadCanonical2024HistoryAnalytics,
+  loadLegacyHistoryAnalytics,
+} from "../../../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../../../lib/scorecard-analytics";
 import { buildLegacyHistoryScorecardCoverage } from "../../../../../lib/legacy-history-scorecard-coverage";
 import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
@@ -33,6 +39,8 @@ import pwaStyles from "../../../history-participant.module.css";
 import completedRoundStyles from "./completed-round-2025.module.css";
 import HistoryBackToTop from "../../../HistoryBackToTop";
 import {
+  buildHistoricalScrambleRoundStatisticHolders,
+  canonicalizeHistoricalScrambleScorecardPresentation,
   build2025ScrambleRoundStatisticHolders,
   canonicalize2025ScrambleScorecardPresentation,
 } from "../../../../../lib/history-2025-tournament-records";
@@ -59,7 +67,9 @@ export async function generateMetadata({ params }) {
       archive = null;
     }
   } else {
-    await refreshHistoricalData();
+    await (Number(year) === 2024
+      ? refreshCanonical2024HistoricalData()
+      : refreshHistoricalData());
     archive = getHistoricalRound(year, round);
   }
 
@@ -101,15 +111,22 @@ export default async function HistoricalRoundPage({ params }) {
       );
     }
   } else {
-    const scorecardAnalyticsPromise = loadLegacyHistoryAnalytics();
-    await refreshHistoricalData();
+    const canonical2024 = Number(year) === 2024;
+    const scorecardAnalyticsPromise = canonical2024
+      ? loadCanonical2024HistoryAnalytics()
+      : loadLegacyHistoryAnalytics();
+    await (canonical2024
+      ? refreshCanonical2024HistoricalData()
+      : refreshHistoricalData());
     archive = getHistoricalRound(year, round);
     scorecardAnalytics = await scorecardAnalyticsPromise;
   }
 
   if (!archive) notFound();
+  const completed2024 = !useSupabase2026 && Number(archive.year) === 2024;
   const completed2025 = !useSupabase2026 && Number(archive.year) === 2025;
-  const canonicalFormat = completed2025 && archive.format === "BB"
+  const completedHistoryMaster = completed2024 || completed2025;
+  const canonicalFormat = completedHistoryMaster && archive.format === "BB"
     ? "Best Ball"
     : getFormatName(archive.format);
   const roundScorecards = filterScorecards(scorecardAnalytics.usableScorecards, {
@@ -130,28 +147,53 @@ export default async function HistoricalRoundPage({ params }) {
     teamIds: [archive.teamOne.id, archive.teamTwo.id],
   });
   const completeLegacyMatchIds = new Set(legacyScorecardCoverage?.completeMatchIds || []);
+  const legacyRoundMatches = useSupabase2026
+    ? []
+    : getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round));
   const displayScorecardsForMatch = (matchId) => {
     const cards = filterScorecards(scorecardAnalytics.scorecards, { matchId });
-    return completed2025 && Number(archive.round) === 2
-      ? canonicalize2025ScrambleScorecardPresentation({
-        scorecards: cards,
-        matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
-        teams: archive.tournament.teams,
-      })
+    return Number(archive.round) === 2 && (completed2024 || completed2025)
+      ? completed2025
+        ? canonicalize2025ScrambleScorecardPresentation({
+          scorecards: cards,
+          matches: legacyRoundMatches,
+          teams: archive.tournament.teams,
+        })
+        : canonicalizeHistoricalScrambleScorecardPresentation({
+          year: archive.year,
+          round: archive.round,
+          scorecards: cards,
+          matches: legacyRoundMatches,
+          teams: archive.tournament.teams,
+        })
       : cards;
   };
-  const scrambleStatisticHolders = completed2025 && Number(archive.round) === 2
-    ? build2025ScrambleRoundStatisticHolders({
-      scorecards: roundScorecards,
-      matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
-      teams: archive.tournament.teams,
-      acceptedValues: {
-        mostBirdies: roundStatistics.mostBirdies.value,
-        lowestFrontNine: roundStatistics.lowestFrontNine.value,
-        lowestBackNine: roundStatistics.lowestBackNine.value,
-        lowestTeamRound: roundStatistics.lowestTeamRound.value,
-      },
-    })
+  const scrambleStatisticHolders = completedHistoryMaster && Number(archive.round) === 2
+    ? completed2025
+      ? build2025ScrambleRoundStatisticHolders({
+        scorecards: roundScorecards,
+        matches: legacyRoundMatches,
+        teams: archive.tournament.teams,
+        acceptedValues: {
+          mostBirdies: roundStatistics.mostBirdies.value,
+          lowestFrontNine: roundStatistics.lowestFrontNine.value,
+          lowestBackNine: roundStatistics.lowestBackNine.value,
+          lowestTeamRound: roundStatistics.lowestTeamRound.value,
+        },
+      })
+      : buildHistoricalScrambleRoundStatisticHolders({
+        year: archive.year,
+        round: archive.round,
+        scorecards: roundScorecards,
+        matches: legacyRoundMatches,
+        teams: archive.tournament.teams,
+        acceptedValues: {
+          mostBirdies: roundStatistics.mostBirdies.value,
+          lowestFrontNine: roundStatistics.lowestFrontNine.value,
+          lowestBackNine: roundStatistics.lowestBackNine.value,
+          lowestTeamRound: roundStatistics.lowestTeamRound.value,
+        },
+      })
     : useSupabase2026 && archive.format === "SC"
       ? build2026ScrambleRoundStatisticHolders({
         scorecards: roundScorecards,
@@ -176,17 +218,17 @@ export default async function HistoricalRoundPage({ params }) {
   const holeLabel = (hole) => hole
     ? `Hole ${hole.holeNumber}${hole.tee ? ` · ${hole.tee}` : ""}`
     : "";
-  const roundBirdieLeader = (completed2025 || useSupabase2026) && archive.format === "SC"
+  const roundBirdieLeader = (completedHistoryMaster || useSupabase2026) && archive.format === "SC"
     ? roundStatistics.mostBirdies
     : roundStatistics.birdieLeader;
-  const birdieLeaderHolders = completed2025 && archive.format === "SC"
+  const birdieLeaderHolders = completedHistoryMaster && archive.format === "SC"
     ? scrambleStatisticHolders?.mostBirdies
     : useSupabase2026 && archive.format === "SC"
       ? scrambleStatisticHolders?.birdieLeader
       : undefined;
   const lowestTeamRound = bestBallLowestTeamRound || roundStatistics.lowestTeamRound;
   const lowestTeamRoundHolders = bestBallLowestTeamRound?.holders || scrambleStatisticHolders?.lowestTeamRound;
-  const showLowestRound = !(useSupabase2026 && archive.format === "SC");
+  const showLowestRound = !((completedHistoryMaster || useSupabase2026) && archive.format === "SC");
   const showLowestTeamRound = !useSupabase2026 || archive.format === "SC" ||
     (archive.format === "BB" && bestBallLowestTeamRound?.sampleSize > 0);
   const lowestRoundStatisticItem = { label: "Lowest Round", value: formatScoringNumber(roundStatistics.lowestRound.value), detail: participant(roundStatistics.lowestRound), sample: roundStatistics.lowestRound.label };
@@ -208,6 +250,16 @@ export default async function HistoricalRoundPage({ params }) {
     birdieLeaderStatisticItem,
     ...(showLowestTeamRound ? [lowestTeamRoundStatisticItem] : []),
   ];
+  const completed2024RoundStatisticItems = [
+    ...(showLowestRound ? [lowestRoundStatisticItem] : []),
+    lowestFrontNineStatisticItem,
+    lowestBackNineStatisticItem,
+    averageScoreStatisticItem,
+    birdieLeaderStatisticItem,
+    ...(showLowestTeamRound ? [lowestTeamRoundStatisticItem] : []),
+    hardestHoleStatisticItem,
+    easiestHoleStatisticItem,
+  ];
   const roundStatisticItems = useSupabase2026 ? [
     ...(showLowestRound ? [lowestRoundStatisticItem] : []),
     lowestFrontNineStatisticItem,
@@ -217,7 +269,7 @@ export default async function HistoricalRoundPage({ params }) {
     ...(showLowestTeamRound ? [lowestTeamRoundStatisticItem] : []),
     hardestHoleStatisticItem,
     easiestHoleStatisticItem,
-  ] : completedHistoryRoundStatisticItems;
+  ] : completed2024 ? completed2024RoundStatisticItems : completedHistoryRoundStatisticItems;
   const applicableRoundStatisticItems = roundStatisticItems.filter((item) =>
     item.value !== "—" && !/^Based on 0 recorded/i.test(String(item.sample || ""))
   );
@@ -313,7 +365,7 @@ export default async function HistoricalRoundPage({ params }) {
           </div>
 
           <div className={`${styles.roundArchiveWinner} ${useSupabase2026 ? pwaStyles.roundScoreWinner : ""}`}>
-            <span>{archive.roundWinner === "In Progress" ? "Round Status" : completed2025 && archive.roundWinner === "Halved" ? "Round Result" : "Round Winner"}</span>
+            <span>{archive.roundWinner === "In Progress" ? "Round Status" : completedHistoryMaster && archive.roundWinner === "Halved" ? "Round Result" : "Round Winner"}</span>
             <strong>{archive.roundWinner}</strong>
           </div>
 
@@ -333,14 +385,14 @@ export default async function HistoricalRoundPage({ params }) {
             No matchups have been recorded for this round.
           </div>
         ) : (
-          <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""} ${completed2025 ? completedRoundStyles.matchList : ""}`}>
+          <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""} ${completedHistoryMaster ? completedRoundStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
-              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} /> : <PublicMatchCard key={match.id} match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }} round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }} tournament={archive} variant="historical" scorecards={completeLegacyMatchIds.has(match.id) ? displayScorecardsForMatch(match.id) : []} historyDensity completedHistoryCompact={completed2025} />
+              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} /> : <PublicMatchCard key={match.id} match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }} round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }} tournament={archive} variant="historical" scorecards={completeLegacyMatchIds.has(match.id) ? displayScorecardsForMatch(match.id) : []} historyDensity completedHistoryCompact={completedHistoryMaster} />
             ))}
           </div>
         )}
 
-        {completed2025 ? (applicableRoundStatisticItems.length ? <section className={styles.section}>
+        {completedHistoryMaster ? (applicableRoundStatisticItems.length ? <section className={styles.section}>
           <span className={styles.sectionLabel}>Round Insights</span>
           <h2>Round Statistics</h2>
           <details className={completedRoundStyles.statistics}>
