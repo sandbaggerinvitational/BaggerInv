@@ -131,7 +131,12 @@ function NetParticipant({ netRow, scorecards, stackPairingIdentities }) {
   </div>;
 }
 
-function ScoreGrid({ scorecards, segment = "full", stackPairingIdentities = false }) {
+function ScoreGrid({
+  scorecards,
+  segment = "full",
+  stackPairingIdentities = false,
+  hideHoleWinnerSummary = false,
+}) {
   const start = segment === "back" ? 10 : 1;
   const end = segment === "front" ? 9 : 18;
   const holeNumbers = holesFor(scorecards, start, end);
@@ -210,9 +215,9 @@ function ScoreGrid({ scorecards, segment = "full", stackPairingIdentities = fals
             <tr className={styles.winnerRow}>
               <th>
                 <strong>Hole Winner</strong>
-                <small>
+                {!hideHoleWinnerSummary ? <small>
                   {matchNet.summary.sideAWins}–{matchNet.summary.sideBWins} · {matchNet.summary.halved} halved
-                </small>
+                </small> : null}
               </th>
               {holeNumbers.map((holeNumber) => {
                 const winner = winnerForHole(holeNumber);
@@ -323,17 +328,17 @@ export default function ScorecardTable({
           {showSummary ? <ScorecardSummary scorecards={available} stackPairingIdentities={stackPairingIdentities} /> : null}
 
           <div className={styles.desktopGrid}>
-            <ScoreGrid scorecards={available} stackPairingIdentities={stackPairingIdentities} />
+            <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} stackPairingIdentities={stackPairingIdentities} />
           </div>
 
           <div className={`${styles.mobileGrid} ${historyDensity ? density.mobileGrid : ""}`}>
             {hasFront ? <section>
               <header><strong>Front 9</strong><span>Holes 1–9</span></header>
-              <ScoreGrid scorecards={available} segment="front" stackPairingIdentities={stackPairingIdentities} />
+              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="front" stackPairingIdentities={stackPairingIdentities} />
             </section> : null}
             {hasBack ? <section>
               <header><strong>Back 9</strong><span>Holes 10–18</span></header>
-              <ScoreGrid scorecards={available} segment="back" stackPairingIdentities={stackPairingIdentities} />
+              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="back" stackPairingIdentities={stackPairingIdentities} />
             </section> : null}
           </div>
 
