@@ -1,0 +1,19 @@
+.resultLayout.resultLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: initial;
+  justify-content: initial;
+  gap: 8px;
+}
+
+.resultLayout.resultLayout strong {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  line-height: 1.22;
+}
+
+.resultLayout.resultLayout small {
+  max-width: 100%;
+  line-height: 1.4;
+  text-align: left;
+}

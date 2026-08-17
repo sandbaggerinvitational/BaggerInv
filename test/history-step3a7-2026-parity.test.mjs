@@ -59,7 +59,7 @@ test("canonical 2026 History supports all three lifecycle-aware Round models", (
 });
 
 test("Round route fixes the null legacy-coverage render boundary without hiding genuine failures", () => {
-  assert.match(roundPage, /const legacyRoundStatisticItems = useSupabase2026 \? roundStatisticItems : \[/);
+  assert.match(roundPage, /const legacyRoundStatisticItems = useSupabase2026 \? applicableRoundStatisticItems : \[/);
   assert.match(roundPage, /legacyScorecardCoverage\?\.completeMatchScorecards/);
   assert.match(roundPage, /loadHistory2026View\(\{ year: Number\(year\) \}\)/);
   assert.match(roundPage, /history2026RoundPageModel/);

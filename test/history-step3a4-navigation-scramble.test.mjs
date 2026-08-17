@@ -153,10 +153,12 @@ test("Scramble holder presentation never exposes raw team identities", () => {
   const output = JSON.stringify(holders);
   for (const raw of ["CRISPYBOYS", "CRIPSYBOYS", "BANDONBROTHERS", "SOURCE-TYPO"])
     assert.doesNotMatch(output, new RegExp(raw));
-  assert.match(roundPage, /holders: completed2025 && archive\.format === "SC" \? scrambleStatisticHolders\?\.mostBirdies/);
+  assert.match(roundPage, /const birdieLeaderHolders = completed2025 && archive\.format === "SC"[\s\S]*scrambleStatisticHolders\?\.mostBirdies/);
+  assert.match(roundPage, /holders: birdieLeaderHolders/);
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestFrontNine/);
   assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestBackNine/);
-  assert.match(roundPage, /holders: scrambleStatisticHolders\?\.lowestTeamRound/);
+  assert.match(roundPage, /const lowestTeamRoundHolders = bestBallLowestTeamRound\?\.holders \|\| scrambleStatisticHolders\?\.lowestTeamRound/);
+  assert.match(roundPage, /holders: lowestTeamRoundHolders/);
 });
 
 test("Round 2 scorecard disclosures replace raw team labels without changing scoring evidence", () => {

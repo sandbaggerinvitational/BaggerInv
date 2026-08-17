@@ -202,7 +202,7 @@ test("2026 now opts into the shared navigation without changing completed-year c
 test("Step 3A.5 player-slot and Birdie Leader corrections remain frozen", () => {
   assert.match(matchCard, /historicalPairingPlayerRows\(teamOnePlayers, teamTwoPlayers\)/);
   assert.match(matchCard, /data-empty=\{empty \? "true" : undefined\}/);
-  assert.match(roundSource, /\.\.\.\(!completed2025 \? \[\{ label: "Most Birdies"/);
+  assert.match(roundSource, /\.\.\.\(!completed2025 && !useSupabase2026 \? \[\{ label: "Most Birdies"/);
   assert.match(roundSource, /\{ label: "Birdie Leader"/);
 });
 

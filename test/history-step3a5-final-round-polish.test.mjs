@@ -77,10 +77,11 @@ test("Singles retain the existing compact side without pairing-only blank stroke
   assert.match(compact, /: <CompactHistoricalPairing/);
 });
 
-test("2025 rounds expose exactly one Birdie Leader while other years keep their existing categories", () => {
-  assert.match(roundPage, /\.\.\.\(!completed2025 \? \[\{ label: "Most Birdies"/);
-  assert.match(roundPage, /const roundBirdieLeader = completed2025 && archive\.format === "SC"[\s\S]*roundStatistics\.mostBirdies[\s\S]*roundStatistics\.birdieLeader/);
-  assert.match(roundPage, /label: "Birdie Leader"[\s\S]*holders: completed2025 && archive\.format === "SC" \? scrambleStatisticHolders\?\.mostBirdies/);
+test("2025 remains on its accepted Birdie Leader source while 2026 removes the duplicate category", () => {
+  assert.match(roundPage, /\.\.\.\(!completed2025 && !useSupabase2026 \? \[\{ label: "Most Birdies"/);
+  assert.match(roundPage, /const roundBirdieLeader = \(completed2025 \|\| useSupabase2026\) && archive\.format === "SC"[\s\S]*roundStatistics\.mostBirdies[\s\S]*roundStatistics\.birdieLeader/);
+  assert.match(roundPage, /const birdieLeaderHolders = completed2025 && archive\.format === "SC"[\s\S]*scrambleStatisticHolders\?\.mostBirdies/);
+  assert.match(roundPage, /label: "Birdie Leader"[\s\S]*holders: birdieLeaderHolders/);
 });
 
 test("2025 year navigation appears once immediately below the hero with bounded destinations", () => {

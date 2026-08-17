@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useId, useState } from "react";
 import styles from "./scorecard.module.css";
+import pairingStyles from "./scorecard-pairing.module.css";
 import summaryStyles from "./scorecard-summary.module.css";
 import density from "./history/history-density.module.css";
 
@@ -27,14 +28,26 @@ function PlayerLink({ name, slug }) {
   return slug ? <Link href={`/players/${slug}`}>{name}</Link> : <>{name}</>;
 }
 
-function Participant({ scorecard }) {
+function Participant({ scorecard, stackPairingIdentities = false }) {
   if (scorecard.scoreType === "TEAM") {
+    const participantNames = scorecard.participantNames || [];
+    const accessibleName = [participantNames.join(" and "), scorecard.teamName, "Net Scramble"]
+      .filter(Boolean)
+      .join(". ");
     return (
-      <div className={styles.teamParticipant}>
-        <strong>{scorecard.teamName || "Team"}</strong>
-        {scorecard.participantNames?.length ? (
+      <div className={`${styles.teamParticipant} ${stackPairingIdentities ? pairingStyles.stackedPairing : ""}`} aria-label={stackPairingIdentities ? accessibleName : undefined}>
+        {stackPairingIdentities && participantNames.length ? (
+          <div className={pairingStyles.pairingNames}>
+            {participantNames.map((name, index) => (
+              <strong key={`${scorecard.matchId}-${scorecard.teamId}-${index}`}>
+                <PlayerLink name={name} slug={scorecard.participantSlugs?.[index]} />
+              </strong>
+            ))}
+          </div>
+        ) : <strong>{scorecard.teamName || "Team"}</strong>}
+        {stackPairingIdentities ? <small>{scorecard.teamName || "Team"}<i>Net Scramble</i></small> : participantNames.length ? (
           <small>
-            {scorecard.participantNames.map((name, index) => (
+            {participantNames.map((name, index) => (
               <span key={`${scorecard.matchId}-${scorecard.teamId}-${index}`}>
                 {index ? " + " : ""}
                 <PlayerLink name={name} slug={scorecard.participantSlugs?.[index]} />
@@ -86,7 +99,26 @@ function holesFor(scorecards, start, end) {
     ));
 }
 
-function ScoreGrid({ scorecards, segment = "full" }) {
+function NetParticipant({ netRow, scorecards, stackPairingIdentities }) {
+  const pairingCards = scorecards.filter((scorecard) => Number(scorecard.side) === Number(netRow.side));
+  const players = pairingCards
+    .map((scorecard) => ({ name: scorecard.playerName, slug: scorecard.playerSlug }))
+    .filter((player) => player.name);
+  if (!stackPairingIdentities || players.length !== 2) {
+    return <><strong>{netRow.name}</strong><small>{netRow.label}</small></>;
+  }
+  return <div
+    aria-label={`${players.map((player) => player.name).join(" and ")}. ${netRow.name}. ${netRow.label}`}
+    className={`${styles.teamParticipant} ${pairingStyles.stackedPairing}`}
+  >
+    <div className={pairingStyles.pairingNames}>
+      {players.map((player) => <strong key={player.name}><PlayerLink name={player.name} slug={player.slug} /></strong>)}
+    </div>
+    <small>{netRow.name}<i>{netRow.label}</i></small>
+  </div>;
+}
+
+function ScoreGrid({ scorecards, segment = "full", stackPairingIdentities = false }) {
   const start = segment === "back" ? 10 : 1;
   const end = segment === "front" ? 9 : 18;
   const holeNumbers = holesFor(scorecards, start, end);
@@ -106,7 +138,7 @@ function ScoreGrid({ scorecards, segment = "full" }) {
   for (const scorecard of ordered) {
     rows.push(
       <tr key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
-        <th><Participant scorecard={scorecard} /></th>
+        <th><Participant scorecard={scorecard} stackPairingIdentities={stackPairingIdentities} /></th>
         {holeNumbers.map((holeNumber) => (
           <ScoreCell
             hole={scorecard.holes.find((hole) => hole.holeNumber === holeNumber)}
@@ -131,8 +163,7 @@ function ScoreGrid({ scorecards, segment = "full" }) {
     rows.push(
       <tr className={styles.netRow} key={`${scorecard.matchId}-net-${scorecard.side}`}>
         <th>
-          <strong>{netRow.name}</strong>
-          <small>{netRow.label}</small>
+          <NetParticipant netRow={netRow} scorecards={ordered} stackPairingIdentities={stackPairingIdentities} />
         </th>
         {holeNumbers.map((holeNumber) => (
           <NetCell hole={netRow.holes.find((hole) => hole.holeNumber === holeNumber)} key={holeNumber} />
@@ -196,11 +227,11 @@ function ScoreGrid({ scorecards, segment = "full" }) {
   );
 }
 
-function ScorecardSummary({ scorecards }) {
+function ScorecardSummary({ scorecards, stackPairingIdentities }) {
   return <div className={summaryStyles.summary} aria-label="Scorecard totals">
     {scorecards.map((scorecard) => (
       <div className={`${summaryStyles.row} ${density.summaryRow}`} key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
-        <span><Participant scorecard={scorecard} /></span>
+        <span><Participant scorecard={scorecard} stackPairingIdentities={stackPairingIdentities} /></span>
         <dl>
           <div><dt>Gross</dt><dd>{scorecard.total ?? "—"}</dd></div>
           <div><dt>Strokes</dt><dd>{scorecard.strokesReceived ?? "—"}</dd></div>
@@ -217,6 +248,7 @@ export default function ScorecardTable({
   compact = false,
   historyDensity = false,
   showSummary = false,
+  stackPairingIdentities = false,
 }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
@@ -275,20 +307,20 @@ export default function ScorecardTable({
             </div>
           ) : null}
 
-          {showSummary ? <ScorecardSummary scorecards={available} /> : null}
+          {showSummary ? <ScorecardSummary scorecards={available} stackPairingIdentities={stackPairingIdentities} /> : null}
 
           <div className={styles.desktopGrid}>
-            <ScoreGrid scorecards={available} />
+            <ScoreGrid scorecards={available} stackPairingIdentities={stackPairingIdentities} />
           </div>
 
           <div className={`${styles.mobileGrid} ${historyDensity ? density.mobileGrid : ""}`}>
             {hasFront ? <section>
               <header><strong>Front 9</strong><span>Holes 1–9</span></header>
-              <ScoreGrid scorecards={available} segment="front" />
+              <ScoreGrid scorecards={available} segment="front" stackPairingIdentities={stackPairingIdentities} />
             </section> : null}
             {hasBack ? <section>
               <header><strong>Back 9</strong><span>Holes 10–18</span></header>
-              <ScoreGrid scorecards={available} segment="back" />
+              <ScoreGrid scorecards={available} segment="back" stackPairingIdentities={stackPairingIdentities} />
             </section> : null}
           </div>
 
