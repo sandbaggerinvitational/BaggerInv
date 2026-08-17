@@ -109,26 +109,13 @@ function NetParticipant({ netRow, scorecards, stackPairingIdentities }) {
         slug: scorecard.participantSlugs?.[index],
       })))
     .filter((player) => player.name);
-  if (!stackPairingIdentities || players.length !== 2) {
-    return <><strong>{netRow.name}</strong><small>{netRow.label}</small></>;
-  }
-  if (String(netRow.label).trim().toLowerCase() === "net scramble") {
-    return <div
-      aria-label={`${players.map((player) => player.name).join(" and ")}. ${netRow.label}`}
-      className={`${styles.teamParticipant} ${pairingStyles.stackedPairing}`}
-    >
-      <strong className={pairingStyles.netOnlyLabel}>{netRow.label}</strong>
-    </div>;
-  }
-  return <div
-    aria-label={`${players.map((player) => player.name).join(" and ")}. ${netRow.label}`}
-    className={`${styles.teamParticipant} ${pairingStyles.stackedPairing}`}
-  >
-    <div className={pairingStyles.pairingNames}>
-      {players.map((player) => <strong key={player.name}><PlayerLink name={player.name} slug={player.slug} /></strong>)}
-    </div>
-    <small><i>{netRow.label}</i></small>
-  </div>;
+  if (!stackPairingIdentities) return <><strong>{netRow.name}</strong><small>{netRow.label}</small></>;
+
+  const participantIdentity = players.map((player) => player.name).join(" and ") || netRow.name;
+  return <span className={pairingStyles.derivedRowIdentity}>
+    <span aria-hidden="true" className={pairingStyles.derivedRowLabel}>{netRow.label}</span>
+    <span className={pairingStyles.visuallyHidden}>{participantIdentity}. {netRow.label}</span>
+  </span>;
 }
 
 function ScoreGrid({

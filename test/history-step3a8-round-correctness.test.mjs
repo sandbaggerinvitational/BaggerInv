@@ -88,12 +88,12 @@ test("result hierarchy gives the primary result full width and team points a sec
 
 test("2026 Best Ball and Scramble opt into stacked pairing identities while Singles data remains individual", () => {
   assert.match(matchRow, /stackPairingIdentities=\{use2026Presentation\}/);
-  assert.match(scorecardTable, /participantNames\.map[\s\S]*pairingStyles\.pairingNames/);
-  assert.match(scorecardTable, /players\.map[\s\S]*NetParticipant/);
+  assert.match(scorecardTable, /pairingStyles\.pairingNames[\s\S]*participantNames\.map/);
+  assert.match(scorecardTable, /participantIdentity = players\.map/);
   assert.match(scorecardTable, /scorecard\.scoreType === "TEAM"/);
   assert.match(scorecardTable, /return \([\s\S]*<strong>[\s\S]*scorecard\.playerName/);
   assert.match(pairingCss, /\.pairingNames\s*\{[\s\S]*display:\s*grid/);
-  assert.match(scorecardTable, /aria-label=.*players\.map/);
+  assert.match(scorecardTable, /pairingStyles\.visuallyHidden[\s\S]*participantIdentity/);
 });
 
 test("Best Ball Lowest Team Round reuses complete canonical net-best-ball rows", () => {

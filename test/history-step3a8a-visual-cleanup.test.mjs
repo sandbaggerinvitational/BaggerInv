@@ -44,30 +44,26 @@ test("2026 Scramble identity is stacked golfer names without a repeated team or 
   assert.doesNotMatch(participant, /\[participantNames\.join\(" and "\), scorecard\.teamName/);
 });
 
-test("Net Scramble is rendered once as the actual net-row label", () => {
+test("Net Scramble uses the shared derived-row label without repeated identity", () => {
   const netParticipant = block(scorecardTable, "function NetParticipant", "function ScoreGrid");
-  const scrambleBranchStart = netParticipant.indexOf('if (String(netRow.label).trim().toLowerCase() === "net scramble")');
-  const scrambleBranchEnd = netParticipant.indexOf("\n  return <div", scrambleBranchStart);
-  const scrambleBranch = netParticipant.slice(scrambleBranchStart, scrambleBranchEnd);
-  assert.match(netParticipant, /toLowerCase\(\) === "net scramble"/);
-  assert.match(netParticipant, /className=\{pairingStyles\.netOnlyLabel\}>\{netRow\.label\}<\/strong>/);
-  assert.doesNotMatch(scrambleBranch, /netRow\.name/);
-  assert.match(pairingCss, /\.netOnlyLabel\s*\{[\s\S]*text-transform:\s*uppercase/);
+  assert.match(netParticipant, /className=\{pairingStyles\.derivedRowLabel\}>\{netRow\.label\}<\/span>/);
+  assert.doesNotMatch(netParticipant, /toLowerCase\(\) === "net scramble"/);
+  assert.match(pairingCss, /\.derivedRowLabel\s*\{[\s\S]*text-transform:\s*uppercase/);
 });
 
-test("Best Ball net identity remains two stacked golfers plus Net Best Ball context", () => {
+test("Best Ball derived rows retain identity accessibly without repeating visible golfer names", () => {
   const netParticipant = block(scorecardTable, "function NetParticipant", "function ScoreGrid");
   assert.match(netParticipant, /pairingCards[\s\S]*scorecard\.playerName/);
-  assert.match(netParticipant, /players\.map[\s\S]*pairingStyles\.pairingNames/);
-  assert.match(netParticipant, /<small><i>\{netRow\.label\}<\/i><\/small>/);
-  assert.doesNotMatch(netParticipant, /<small>\{netRow\.name\}<i>/);
-  assert.match(pairingCss, /\.pairingNames\s*\{[\s\S]*display:\s*grid/);
+  assert.match(netParticipant, /participantIdentity = players\.map[\s\S]*\.join\(" and "\) \|\| netRow\.name/);
+  assert.match(netParticipant, /pairingStyles\.visuallyHidden[\s\S]*\{participantIdentity\}\. \{netRow\.label\}/);
+  assert.doesNotMatch(netParticipant, /players\.map\(\(player\) => <strong/);
 });
 
 test("Scramble net rows retain both canonical golfer names in their accessible identity", () => {
   const netParticipant = block(scorecardTable, "function NetParticipant", "function ScoreGrid");
   assert.match(netParticipant, /scorecard\.participantNames \|\| \[\]/);
-  assert.match(netParticipant, /aria-label=\{`\$\{players\.map\(\(player\) => player\.name\)\.join\(" and "\)\}\. \$\{netRow\.label\}`\}/);
+  assert.match(netParticipant, /players\.map\(\(player\) => player\.name\)\.join\(" and "\)/);
+  assert.match(netParticipant, /pairingStyles\.visuallyHidden/);
 });
 
 test("Singles scorecard rendering remains on the unchanged individual identity path", () => {
