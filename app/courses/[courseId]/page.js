@@ -64,8 +64,8 @@ export default async function CoursePage({ params, searchParams }) {
   if (!model) notFound();
   const { course } = model;
   const website = model.website;
-  const historyReturn = archive ? historyCourseReturn(resolvedSearchParams) : null;
-  const tournamentReturn = archive ? historyCourseTournamentReturn(resolvedSearchParams) : null;
+  const historyReturn = historyCourseReturn(resolvedSearchParams);
+  const tournamentReturn = historyCourseTournamentReturn(resolvedSearchParams);
   const returnLink = historyReturn || {
     href: archive ? "/courses?view=archive" : "/courses",
     label: "Courses",

@@ -92,11 +92,11 @@ test("first and middle year destinations are canonical and 2017 has no fabricate
 });
 
 test("completed Round History adapts Previous, Tournament, and Next without empty controls", () => {
-  assert.match(roundPage, /!useSupabase2026 \? <HistoricalDetailNavigation/);
+  assert.match(roundPage, /<HistoricalDetailNavigation/);
   assert.match(roundPage, /backLabel="Tournament"/);
   assert.match(roundPage, /backDetail=\{String\(archive\.year\)\}/);
   assert.match(roundPage, /backAriaLabel=\{`\$\{archive\.year\} Tournament`\}/);
-  assert.match(roundPage, /completedYear=\{Number\(archive\.year\) >= 2017 && Number\(archive\.year\) <= 2025\}/);
+  assert.match(roundPage, /completedYear=\{Number\(archive\.year\) >= 2017 && Number\(archive\.year\) <= 2026\}/);
   assert.match(roundNavigation, /const tournamentDestination = \{[\s\S]*label: backLabel,[\s\S]*detail: backDetail,[\s\S]*ariaLabel: backAriaLabel \|\| backLabel/);
   assert.match(roundNavigation, /const previousDestination = previousHref && previousLabel \? \{/);
   assert.match(roundNavigation, /const nextDestination = nextHref && nextLabel \? \{/);
@@ -115,7 +115,7 @@ test("completed Round History distributes first, middle, and final destinations 
 });
 
 test("completed Team History uses one shared parent destination without sibling controls", () => {
-  assert.match(teamPage, /!useSupabase2026 \? <HistoryNavigation/);
+  assert.match(teamPage, /<HistoryNavigation/);
   assert.match(teamPage, /href: `\/history\/\$\{team\.year\}`/);
   assert.match(teamPage, /label: "Tournament"/);
   assert.match(teamPage, /detail: String\(team\.year\)/);
@@ -123,8 +123,8 @@ test("completed Team History uses one shared parent destination without sibling 
   assert.match(teamPage, /direction: "left"/);
   assert.match(teamPage, /surface="team"/);
   const hero = teamPage.indexOf("<section className={`${styles.pageHero}");
-  const navigation = teamPage.indexOf("!useSupabase2026 ? <HistoryNavigation");
-  const content = teamPage.indexOf("{useSupabase2026 ? <HistoryArchiveNav", navigation);
+  const navigation = teamPage.indexOf("<HistoryNavigation");
+  const content = teamPage.indexOf("<section className={`${styles.content}", navigation);
   assert.ok(hero >= 0 && hero < navigation && navigation < content);
   const completedNavigation = teamPage.slice(navigation, content);
   assert.doesNotMatch(completedNavigation, /right=|center=|Previous Team|Next Team/);
@@ -184,16 +184,19 @@ test("all HistoryNavigation destination values keep the approved dark-green toke
   assert.doesNotMatch(navigationCss, /\.destination:(?:visited|hover|active|focus-visible)[\s\S]{0,160}color:\s*var\(--tsi-gold/);
 });
 
-test("2026 stays on its existing archive navigation and receives no completed-year Course rail", () => {
-  assert.match(yearPage, /useSupabase2026 \? <HistoryArchiveNav/);
-  assert.match(roundPage, /useSupabase2026 \? <HistoryArchiveNav/);
-  assert.match(teamPage, /useSupabase2026 \? <HistoryArchiveNav/);
-  assert.equal(historyCourseTournamentReturn({ source: "history", year: "2026", round: "1" }), null);
+test("2026 now opts into the shared navigation without changing completed-year capability rules", () => {
+  for (const page of [yearPage, roundPage, teamPage]) assert.doesNotMatch(page, /<HistoryArchiveNav/);
+  assert.deepEqual(historyCourseTournamentReturn({ source: "history", year: "2026", round: "1" }), {
+    href: "/history/2026",
+    label: "2026 Tournament",
+  });
   assert.deepEqual(historyCourseReturn({ source: "history", year: "2026", round: "1" }), {
     href: "/history/2026/round/1",
     label: "Back to 2026 Round 1",
   });
-  assert.match(coursePage, /historyReturn && !tournamentReturn \? <nav className=\{styles\.historyNavigation\}/);
+  assert.equal(historyCourseProfileHref({ courseId: "TPGC01", year: "2026", round: "1" }),
+    "/courses/TPGC01?source=history&year=2026&round=1");
+  assert.match(coursePage, /tournamentReturn \? <HistoryNavigation/);
 });
 
 test("Step 3A.5 player-slot and Birdie Leader corrections remain frozen", () => {

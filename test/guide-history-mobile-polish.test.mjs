@@ -33,18 +33,16 @@ test("Guide and nested course references remain inside the participant shell wit
   assert.doesNotMatch(destination, /Tournament Guide/);
 });
 
-test("2026 History uses route-backed archive navigation and keeps older-year presentation isolated", async () => {
+test("2026 History uses the shared route-backed navigation and keeps older-year presentation isolated", async () => {
   const [nav, year, round, team] = await Promise.all([
-    source("app/history/HistoryArchiveNav.js"),
+    source("app/history/HistoryNavigation.js"),
     source("app/history/[year]/page.js"),
     source("app/history/[year]/round/[round]/page.js"),
     source("app/history/[year]/team/[side]/page.js"),
   ]);
-  assert.ok(nav.includes('href="/history"'));
-  assert.ok(nav.includes('href={`/history/${year}`}'));
-  assert.ok(nav.includes('href={`/history/${year}/round/${round.number}`}'));
-  assert.ok(nav.includes('href={`/history/${year}/team/${encodeURIComponent(side)}`}'));
-  assert.match(nav, /aria-current/);
+  assert.match(nav, /<nav[\s\S]*aria-label=\{ariaLabel\}/);
+  assert.match(nav, /data-count=\{destinations\.length\}/);
+  for (const page of [year, round, team]) assert.doesNotMatch(page, /<HistoryArchiveNav/);
   assert.match(year, /2026 tournament record/);
   assert.doesNotMatch(year, /Final Recap/);
   assert.match(round, /useSupabase2026[\s\S]*HistoricalMatchRow[\s\S]*PublicMatchCard/);

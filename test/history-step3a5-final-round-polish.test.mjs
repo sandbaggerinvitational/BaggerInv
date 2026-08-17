@@ -113,7 +113,10 @@ test("2025 History-context Course Profiles expose explicit round and tournament 
     href: "/history/2025",
     label: "2025 Tournament",
   });
-  assert.equal(historyCourseTournamentReturn({ source: "history", year: "2026", round: "2" }), null);
+  assert.deepEqual(historyCourseTournamentReturn({ source: "history", year: "2026", round: "2" }), {
+    href: "/history/2026",
+    label: "2026 Tournament",
+  });
   assert.equal(historyCourseTournamentReturn({ view: "archive" }), null);
   assert.match(coursePage, /tournamentReturn \? <HistoryNavigation/);
   assert.match(coursePage, /href: tournamentReturn\.href[\s\S]*direction: "left"/);

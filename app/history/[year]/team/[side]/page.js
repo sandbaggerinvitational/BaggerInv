@@ -20,7 +20,6 @@ import {
 } from "../../../../../lib/history-2026-service";
 import { formatHistoryTournamentHandicap } from "../../../../../lib/history-team-metadata";
 import HistoryUnavailablePage from "../../../HistoryUnavailable";
-import HistoryArchiveNav from "../../../HistoryArchiveNav";
 import pwaStyles from "../../../history-participant.module.css";
 import HistoryBackToTop from "../../../HistoryBackToTop";
 import HistoryNavigation from "../../../HistoryNavigation";
@@ -119,7 +118,7 @@ export default async function TeamSeasonPage({ params }) {
         </div>
       </section>
 
-      {!useSupabase2026 ? <HistoryNavigation
+      <HistoryNavigation
         ariaLabel={`${team.year} team history navigation`}
         left={{
           href: `/history/${team.year}`,
@@ -129,9 +128,7 @@ export default async function TeamSeasonPage({ params }) {
           ariaLabel: `${team.year} Tournament`,
         }}
         surface="team"
-      /> : null}
-
-      {useSupabase2026 ? <HistoryArchiveNav year={team.year} rounds={team.roundGroups} teams={team.tournament.teams} activeSide={decodedSide} /> : null}
+      />
 
       <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.teamContent : ""}`}>
         {useSupabase2026 && team.roundGroups?.length ? (

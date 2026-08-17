@@ -155,7 +155,8 @@ test("the dead 2025 scorecard summary is removed while Honors remains model-back
 });
 
 test("2025 owns one compact top year navigator while preserving canonical destinations", () => {
-  assert.match(page, /useSupabase2026 \? <HistoryArchiveNav[\s\S]*: <HistoryNavigation/);
+  assert.match(page, /<HistoryNavigation/);
+  assert.doesNotMatch(page, /<HistoryArchiveNav/);
   assert.equal((page.match(/surface="year"/g) || []).length, 1);
   assert.doesNotMatch(page, /tournamentYearNavigationBottom/);
   assert.match(page, /href: `\/history\/\$\{previousYear\}`/);

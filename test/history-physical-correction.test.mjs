@@ -89,8 +89,10 @@ test("older History route analytics failure is isolated from the legacy archive 
 test("2026 overview uses summaries and preserves deep destinations without new reads", async () => {
   const page = await source("app/history/[year]/page.js");
   assert.match(page, /historyStandingsSummary\(leaderboard, 5\)/);
-  assert.match(page, /View Full Leaderboard/);
-  assert.match(page, /\/live\?view=leaderboards&tab=players/);
+  assert.match(page, /View Full Standings/);
+  assert.match(page, /Show Top 5/);
+  assert.match(page, /data-current-standings-disclosure/);
+  assert.doesNotMatch(page, /\/live\?view=leaderboards&tab=players/);
   assert.match(page, /View All Statistics/);
   assert.match(page, /Lowest Front/);
   assert.match(page, /Lowest Back/);

@@ -28,7 +28,6 @@ import {
   loadHistory2026View,
 } from "../../../../../lib/history-2026-service";
 import HistoryUnavailablePage from "../../../HistoryUnavailable";
-import HistoryArchiveNav from "../../../HistoryArchiveNav";
 import HistoricalMatchRow from "../../../HistoricalMatchRow";
 import pwaStyles from "../../../history-participant.module.css";
 import completedRoundStyles from "./completed-round-2025.module.css";
@@ -176,9 +175,8 @@ export default async function HistoricalRoundPage({ params }) {
   const applicableRoundStatisticItems = roundStatisticItems.filter((item) =>
     item.value !== "—" && !/^Based on 0 recorded/i.test(String(item.sample || ""))
   );
-  const legacyRoundStatisticItems = [
-    ...roundStatisticItems,
-    {
+  const legacyRoundStatisticItems = useSupabase2026 ? roundStatisticItems : [
+    ...roundStatisticItems, {
       label: "Historical Scorecards",
       value: legacyScorecardCoverage?.completeMatchScorecards === legacyScorecardCoverage?.canonicalMatches
         ? `All ${legacyScorecardCoverage.canonicalMatches} matches`
@@ -235,15 +233,13 @@ export default async function HistoricalRoundPage({ params }) {
         </div>
       </section>
 
-      {useSupabase2026 ? <HistoryArchiveNav year={archive.year} rounds={archive.availableRounds} teams={archive.tournament.teams} activeRound={archive.round} /> : null}
-
       <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.roundContent : ""}`}>
-        {!useSupabase2026 ? <HistoricalDetailNavigation
+        <HistoricalDetailNavigation
           backHref={`/history/${archive.year}`}
           backLabel="Tournament"
           backDetail={String(archive.year)}
           backAriaLabel={`${archive.year} Tournament`}
-          completedYear={Number(archive.year) >= 2017 && Number(archive.year) <= 2025}
+          completedYear={Number(archive.year) >= 2017 && Number(archive.year) <= 2026}
           previousHref={
             archive.previousRound
               ? `/history/${archive.year}/round/${archive.previousRound.number}`
@@ -257,7 +253,7 @@ export default async function HistoricalRoundPage({ params }) {
           }
           nextLabel={archive.nextRound?.label}
           position="top"
-        /> : null}
+        />
 
         <div className={`${styles.roundArchiveScoreboard} ${useSupabase2026 ? pwaStyles.roundScoreboard : ""}`}>
           <div className={`${styles.roundArchiveTeam} ${useSupabase2026 ? pwaStyles.roundScoreTeam : ""}`}>

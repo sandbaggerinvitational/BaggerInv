@@ -38,7 +38,6 @@ import {
   loadHistory2026View,
 } from "../../../lib/history-2026-service";
 import HistoryUnavailablePage from "../HistoryUnavailable";
-import HistoryArchiveNav from "../HistoryArchiveNav";
 import HistoryNavigation from "../HistoryNavigation";
 import pwaStyles from "../history-participant.module.css";
 import completedStyles from "./completed-year-2025.module.css";
@@ -296,6 +295,14 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
   const primaryLabels = new Set(["Best Individual Round", "Best Team Round", "Average Score", "Birdie Leader", "Scorecard Coverage"]);
   const primaryStatistics = allStatistics.filter((item) => primaryLabels.has(item.label));
   const secondaryStatistics = allStatistics.filter((item) => !primaryLabels.has(item.label));
+  const renderStanding = (row, keyPrefix) => {
+    const player = leaderboardPlayer(row);
+    return <div className={pwaStyles.standingsRow} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(row.tournamentRank || row.rank)}, ${player.name}, ${formatPlayerPoints(row.points)} points`}>
+      <strong>{row.tournamentRank || row.rank}</strong>
+      {player.slug ? <Link href={`/players/${player.slug}`} prefetch={keyPrefix === "full" ? false : undefined}>{player.name}</Link> : <span>{player.name}</span>}
+      <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
+    </div>;
+  };
 
   return <div className={pwaStyles.overviewSections}>
     <section className={pwaStyles.overviewSection} aria-labelledby="history-rounds-heading">
@@ -309,9 +316,9 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
             <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`}>
               <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
               <span><b>{course.Round}</b><strong>{course.Course}</strong><small>{getFormatName(course.Format)}{availablePoints !== null ? ` · ${availablePoints} points` : ""}</small></span>
-              <em>View Results <i aria-hidden="true">→</i></em>
+              <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={`/courses/${course["Course ID"]}`}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -332,16 +339,16 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
       <span className={styles.sectionLabel}>Player Standings</span>
       <h2 id="history-standings-heading">Leaders</h2>
       <div className={pwaStyles.standingsSummary} role="list" aria-label="Top player standings">
-        {standings.length ? standings.map((row) => {
-          const player = leaderboardPlayer(row);
-          return <div className={pwaStyles.standingsRow} role="listitem" key={row.id || player.name} aria-label={`${rankAccessibleLabel(row.tournamentRank || row.rank)}, ${player.name}, ${formatPlayerPoints(row.points)} points`}>
-            <strong>{row.tournamentRank || row.rank}</strong>
-            {player.slug ? <Link href={`/players/${player.slug}`}>{player.name}</Link> : <span>{player.name}</span>}
-            <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
-          </div>;
-        }) : <p>No completed matches have been recorded for this tournament yet.</p>}
+        {standings.length ? standings.map((row) => renderStanding(row, "summary")) : <p>No completed matches have been recorded for this tournament yet.</p>}
       </div>
-      <Link className={pwaStyles.overviewAction} href="/live?view=leaderboards&tab=players">View Full Leaderboard <span aria-hidden="true">→</span></Link>
+      {leaderboard.length > standings.length ? <details className={`${pwaStyles.recordsDetails} ${completedStyles.disclosure}`} data-current-standings-disclosure>
+        <summary><span className={completedStyles.closedLabel}>View Full Standings</span><span className={completedStyles.openLabel}>Show Top 5</span></summary>
+        <div className={completedStyles.disclosureBody}>
+          <div className={`${pwaStyles.standingsSummary} ${completedStyles.fullStandings}`} role="list" aria-label="Full current player standings">
+            {leaderboard.map((row) => renderStanding(row, "full"))}
+          </div>
+        </div>
+      </details> : null}
     </section>
 
     <section className={pwaStyles.overviewSection} aria-labelledby="history-records-heading">
@@ -483,7 +490,7 @@ export default async function TournamentYearPage({ params }) {
         </div>
       </section>
 
-      {useSupabase2026 ? <HistoryArchiveNav year={tournament.year} rounds={tournament.courses} teams={tournament.teams} /> : <HistoryNavigation
+      <HistoryNavigation
         ariaLabel={`${tournament.year} tournament year navigation`}
         center={{
           href: "/history",
@@ -505,7 +512,7 @@ export default async function TournamentYearPage({ params }) {
           ariaLabel: `Next Year, ${nextYear}`,
         } : null}
         surface="year"
-      />}
+      />
 
       <section className={styles.content}>
         {draft ? (
