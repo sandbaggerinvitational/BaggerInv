@@ -31,7 +31,7 @@ function PlayerLink({ name, slug }) {
 function Participant({ scorecard, stackPairingIdentities = false }) {
   if (scorecard.scoreType === "TEAM") {
     const participantNames = scorecard.participantNames || [];
-    const accessibleName = [participantNames.join(" and "), scorecard.teamName, "Net Scramble"]
+    const accessibleName = [participantNames.join(" and "), "Scramble scoring side"]
       .filter(Boolean)
       .join(". ");
     return (
@@ -45,7 +45,7 @@ function Participant({ scorecard, stackPairingIdentities = false }) {
             ))}
           </div>
         ) : <strong>{scorecard.teamName || "Team"}</strong>}
-        {stackPairingIdentities ? <small>{scorecard.teamName || "Team"}<i>Net Scramble</i></small> : participantNames.length ? (
+        {!stackPairingIdentities && participantNames.length ? (
           <small>
             {participantNames.map((name, index) => (
               <span key={`${scorecard.matchId}-${scorecard.teamId}-${index}`}>
@@ -102,19 +102,32 @@ function holesFor(scorecards, start, end) {
 function NetParticipant({ netRow, scorecards, stackPairingIdentities }) {
   const pairingCards = scorecards.filter((scorecard) => Number(scorecard.side) === Number(netRow.side));
   const players = pairingCards
-    .map((scorecard) => ({ name: scorecard.playerName, slug: scorecard.playerSlug }))
+    .flatMap((scorecard) => scorecard.playerName
+      ? [{ name: scorecard.playerName, slug: scorecard.playerSlug }]
+      : (scorecard.participantNames || []).map((name, index) => ({
+        name,
+        slug: scorecard.participantSlugs?.[index],
+      })))
     .filter((player) => player.name);
   if (!stackPairingIdentities || players.length !== 2) {
     return <><strong>{netRow.name}</strong><small>{netRow.label}</small></>;
   }
+  if (String(netRow.label).trim().toLowerCase() === "net scramble") {
+    return <div
+      aria-label={`${players.map((player) => player.name).join(" and ")}. ${netRow.label}`}
+      className={`${styles.teamParticipant} ${pairingStyles.stackedPairing}`}
+    >
+      <strong className={pairingStyles.netOnlyLabel}>{netRow.label}</strong>
+    </div>;
+  }
   return <div
-    aria-label={`${players.map((player) => player.name).join(" and ")}. ${netRow.name}. ${netRow.label}`}
+    aria-label={`${players.map((player) => player.name).join(" and ")}. ${netRow.label}`}
     className={`${styles.teamParticipant} ${pairingStyles.stackedPairing}`}
   >
     <div className={pairingStyles.pairingNames}>
       {players.map((player) => <strong key={player.name}><PlayerLink name={player.name} slug={player.slug} /></strong>)}
     </div>
-    <small>{netRow.name}<i>{netRow.label}</i></small>
+    <small><i>{netRow.label}</i></small>
   </div>;
 }
 

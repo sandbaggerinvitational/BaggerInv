@@ -68,7 +68,10 @@ export default function HistoricalMatchRow({ match, round, tournament, scorecard
       <Side team={tournament.teamTwo} players={match.team2Players} />
     </div>
 
-    <div className={`${styles.result} ${resultStyles.resultLayout} ${density.result}`}>
+    <div
+      className={`${styles.result} ${resultStyles.resultLayout} ${density.result}`}
+      data-official-result={state === "final" ? "true" : undefined}
+    >
       <div><span>{state === "final" ? "Official result" : state === "live" ? "Current match" : "Match status"}</span><strong>{result}</strong></div>
       {(hasValue(match.team1Points) || hasValue(match.team2Points)) ? <small>{tournament.teamOne.name} {formatTeamPoints(match.team1Points)} · {tournament.teamTwo.name} {formatTeamPoints(match.team2Points)}</small> : null}
     </div>
