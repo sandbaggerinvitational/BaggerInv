@@ -29,7 +29,17 @@ import { getDraftByYear } from "../../../lib/draft";
 import { loadLegacyHistoryAnalytics } from "../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
 import { buildLegacyHistoryScorecardCoverage } from "../../../lib/legacy-history-scorecard-coverage";
-import { build2025TournamentRecords } from "../../../lib/history-2025-tournament-records";
+import {
+  buildHistoricalScrambleRoundStatisticHolders,
+  build2025TournamentRecords,
+} from "../../../lib/history-2025-tournament-records";
+import {
+  buildHistoricalIndividualStatisticHolders,
+  combineHistoricalHolders,
+  historicalHolderContext,
+  historicalHolderText,
+  omitMeaninglessHistoricalBirdieLeader,
+} from "../../../lib/history-2024-net-projection";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import {
   history2026TournamentCard,
@@ -448,14 +458,58 @@ export default async function TournamentYearPage({ params }) {
   });
   const participant = (record) =>
     record?.scorecard?.playerName || record?.scorecard?.teamName || record?.scorecard?.playerId || record?.scorecard?.teamId || "";
+  const completed2024IndividualHolders = Number(tournament?.year) === 2024
+    ? buildHistoricalIndividualStatisticHolders({
+      year: 2024,
+      scorecards: tournamentScorecards,
+      acceptedValues: {
+        lowestRound: scoringStatistics.lowestRound.value,
+        lowestFrontNine: scoringStatistics.lowestFrontNine.value,
+        lowestBackNine: scoringStatistics.lowestBackNine.value,
+      },
+    })
+    : null;
+  const completed2024ScrambleHolders = Number(tournament?.year) === 2024
+    ? buildHistoricalScrambleRoundStatisticHolders({
+      year: 2024,
+      round: 2,
+      scorecards: tournamentScorecards,
+      matches: tournamentMatches,
+      teams: tournament.teams,
+      acceptedValues: {
+        lowestTeamRound: scoringStatistics.lowestTeamRound.value,
+        lowestFrontNine: scoringStatistics.lowestFrontNine.value,
+        lowestBackNine: scoringStatistics.lowestBackNine.value,
+      },
+    })
+    : null;
   const completed2024Records = Number(tournament?.year) === 2024
     ? scoringItems(scoringStatistics, participant, tournament.courses)
-      .filter((item) => item.label !== "Scorecard Coverage" && item.value !== "—")
-      .map((item) => ({
-        ...item,
-        key: `2024-${item.label}`,
-        accessibleLabel: [item.label, item.value, item.detail, item.sample].filter(Boolean).join(", "),
-      }))
+      .filter((item) =>
+        item.label !== "Scorecard Coverage" &&
+        item.value !== "—" &&
+        !(item.label === "Birdie Leader" && omitMeaninglessHistoricalBirdieLeader({ year: 2024, value: scoringStatistics.birdieLeader.value }))
+      )
+      .map((item) => {
+        const holders = item.label === "Best Individual Round"
+          ? completed2024IndividualHolders.lowestRound
+          : item.label === "Best Team Round"
+            ? completed2024ScrambleHolders.lowestTeamRound
+            : item.label === "Lowest Front"
+              ? combineHistoricalHolders(completed2024IndividualHolders.lowestFrontNine, completed2024ScrambleHolders.lowestFrontNine)
+              : item.label === "Lowest Back"
+                ? combineHistoricalHolders(completed2024IndividualHolders.lowestBackNine, completed2024ScrambleHolders.lowestBackNine)
+                : [];
+        const detail = holders.length ? historicalHolderText(holders) : item.detail;
+        const context = holders.length ? historicalHolderContext(holders) : item.context;
+        return {
+          ...item,
+          detail,
+          context,
+          key: `2024-${item.label}`,
+          accessibleLabel: [item.label, item.value, detail, context, item.sample].filter(Boolean).join(", "),
+        };
+      })
     : null;
   const useCompleted2024 = !useSupabase2026 && Number(tournament.year) === 2024;
   const useCompleted2025 = !useSupabase2026 && Number(tournament.year) === 2025;

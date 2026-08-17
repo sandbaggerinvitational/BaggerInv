@@ -243,7 +243,10 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       ? (match.team1Players || [])
       : winningSide === 2 ? (match.team2Players || []) : [];
     const fallbackWinner = winningPlayers.map((player) => player?.name).filter(Boolean).join(" & ");
-    const finalResult = reconstructedResult(scorecards, historyYear === 2024) || (halved
+    const useReconstructedFinalResult = historyYear !== 2024 || match.format === "SC";
+    const finalResult = (useReconstructedFinalResult
+      ? reconstructedResult(scorecards, historyYear === 2024)
+      : "") || (halved
       ? "Match Halved"
       : fallbackWinner
         ? `${fallbackWinner} ${winningPlayers.length === 1 ? "wins" : "win"}`
