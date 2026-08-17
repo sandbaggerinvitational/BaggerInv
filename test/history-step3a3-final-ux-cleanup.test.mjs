@@ -122,7 +122,7 @@ test("finalized 2025 match rows expose lifecycle, canonical format, participants
   assert.doesNotMatch(matchCard.slice(matchCard.indexOf("if (completedHistoryCompact)"), matchCard.indexOf("return <article className={styles.matchCard}", matchCard.indexOf("if (completedHistoryCompact)") + 1)), /Format TBA|UPCOMING|Upcoming/);
 });
 
-test("Match Details holds progression and segment results while scorecard stays directly discoverable", () => {
+test("Match Details holds progression and segment results after the primary scorecard disclosure", () => {
   const compact = matchCard.slice(matchCard.indexOf("if (completedHistoryCompact)"), matchCard.indexOf("return <article className={styles.matchCard}", matchCard.indexOf("if (completedHistoryCompact)") + 1));
   assert.match(compact, /<summary>View Match Details/);
   assert.match(compact, /<MatchProgressionSummary scorecards=\{scorecards\}/);
@@ -130,7 +130,7 @@ test("Match Details holds progression and segment results while scorecard stays 
   assert.match(compact, /<Segment label="Back 9"/);
   assert.match(compact, /<Segment label="Overall"/);
   assert.match(compact, /<ScorecardTable[\s\S]*?scorecards=\{scorecards\}[\s\S]*?historyDensity=\{historyDensity\}[\s\S]*?showSummary=\{historyScorecardParity\}/);
-  assert.ok(compact.indexOf("<ScorecardTable") > compact.indexOf("</details>"));
+  assert.ok(compact.indexOf("<ScorecardTable") < compact.indexOf("<details className={styles.historicalMatchDetails}"));
 });
 
 test("Round Statistics are secondary and empty zero-sample categories are filtered without recalculation", () => {

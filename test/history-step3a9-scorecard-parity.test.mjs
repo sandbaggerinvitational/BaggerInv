@@ -88,7 +88,7 @@ test("visual parity is limited to already-eligible 2023–2025 historical scorec
 
 test("eligible completed matches omit stroke copy without retaining empty stroke rows", () => {
   assert.match(matchCard, /showStrokeCopy=\{!historyScorecardParity\}/);
-  assert.match(matchCard, /showStroke=\{!historyScorecardParity\}/);
+  assert.match(matchCard, /showStroke=\{!completed2025MatchupCleanup\}/);
   assert.match(matchCard, /reserveStrokeRow=\{showStrokeCopy\}/);
   assert.match(matchCard, /reserveStrokeRow \? <span className=\{styles\.playerStrokeSlot\}/);
   assert.match(matchCard, /showStroke \? <>[\s\S]*CompactHistoricalStrokeLine/);
