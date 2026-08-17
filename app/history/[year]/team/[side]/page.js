@@ -123,7 +123,8 @@ export default async function TeamSeasonPage({ params }) {
         ariaLabel={`${team.year} team history navigation`}
         left={{
           href: `/history/${team.year}`,
-          label: `${team.year} Tournament`,
+          label: "Tournament",
+          detail: String(team.year),
           direction: "left",
           ariaLabel: `${team.year} Tournament`,
         }}

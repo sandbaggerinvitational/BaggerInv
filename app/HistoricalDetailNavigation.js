@@ -3,6 +3,8 @@ import HistoryNavigation from "./history/HistoryNavigation";
 export default function HistoricalDetailNavigation({
   backHref,
   backLabel,
+  backDetail,
+  backAriaLabel,
   previousHref,
   previousLabel,
   nextHref,
@@ -12,7 +14,12 @@ export default function HistoricalDetailNavigation({
   return (
     <HistoryNavigation
       ariaLabel="Historical round navigation"
-      center={{ href: backHref, label: backLabel, ariaLabel: backLabel }}
+      center={{
+        href: backHref,
+        label: backLabel,
+        detail: backDetail,
+        ariaLabel: backAriaLabel || backLabel,
+      }}
       left={previousHref && previousLabel ? {
         href: previousHref,
         label: "Previous Round",

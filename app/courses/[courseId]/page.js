@@ -90,13 +90,15 @@ export default async function CoursePage({ params, searchParams }) {
       ariaLabel={`${tournamentReturn.label} course history navigation`}
       left={{
         href: tournamentReturn.href,
-        label: tournamentReturn.label,
+        label: "Tournament",
+        detail: String(resolvedSearchParams.year),
         direction: "left",
         ariaLabel: tournamentReturn.label,
       }}
       right={historyReturn && Number.isInteger(Number(resolvedSearchParams?.round)) ? {
         href: historyReturn.href,
-        label: `Round ${Number(resolvedSearchParams.round)}`,
+        label: "Round",
+        detail: `Round ${Number(resolvedSearchParams.round)}`,
         direction: "right",
         ariaLabel: `Round ${Number(resolvedSearchParams.round)}`,
       } : null}

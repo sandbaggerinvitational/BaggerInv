@@ -93,8 +93,10 @@ test("first and middle year destinations are canonical and 2017 has no fabricate
 
 test("completed Round History adapts Previous, Tournament, and Next without empty controls", () => {
   assert.match(roundPage, /!useSupabase2026 \? <HistoricalDetailNavigation/);
-  assert.match(roundPage, /backLabel=\{`\$\{archive\.year\} Tournament`\}/);
-  assert.match(roundNavigation, /center=\{\{ href: backHref, label: backLabel/);
+  assert.match(roundPage, /backLabel="Tournament"/);
+  assert.match(roundPage, /backDetail=\{String\(archive\.year\)\}/);
+  assert.match(roundPage, /backAriaLabel=\{`\$\{archive\.year\} Tournament`\}/);
+  assert.match(roundNavigation, /label: backLabel,[\s\S]*detail: backDetail,[\s\S]*ariaLabel: backAriaLabel \|\| backLabel/);
   assert.match(roundNavigation, /left=\{previousHref && previousLabel \? \{/);
   assert.match(roundNavigation, /right=\{nextHref && nextLabel \? \{/);
   assert.doesNotMatch(roundNavigation, /return <span|aria-disabled|disabled/);
@@ -104,7 +106,9 @@ test("completed Round History adapts Previous, Tournament, and Next without empt
 test("completed Team History uses one shared parent destination without sibling controls", () => {
   assert.match(teamPage, /!useSupabase2026 \? <HistoryNavigation/);
   assert.match(teamPage, /href: `\/history\/\$\{team\.year\}`/);
-  assert.match(teamPage, /label: `\$\{team\.year\} Tournament`/);
+  assert.match(teamPage, /label: "Tournament"/);
+  assert.match(teamPage, /detail: String\(team\.year\)/);
+  assert.match(teamPage, /ariaLabel: `\$\{team\.year\} Tournament`/);
   assert.match(teamPage, /direction: "left"/);
   assert.match(teamPage, /surface="team"/);
   const hero = teamPage.indexOf("<section className={`${styles.pageHero}");
@@ -142,10 +146,19 @@ test("History-context Course navigation orders Tournament left and source Round 
   const round = context.indexOf("href: historyReturn.href");
   assert.ok(hero >= 0 && hero < start && start < content);
   assert.ok(tournament >= 0 && tournament < round);
-  assert.match(context, /href: tournamentReturn\.href[\s\S]*direction: "left"/);
-  assert.match(context, /href: historyReturn\.href[\s\S]*direction: "right"/);
+  assert.match(context, /href: tournamentReturn\.href[\s\S]*label: "Tournament"[\s\S]*detail: String\(resolvedSearchParams\.year\)[\s\S]*direction: "left"/);
+  assert.match(context, /href: historyReturn\.href[\s\S]*label: "Round"[\s\S]*detail: `Round \$\{Number\(resolvedSearchParams\.round\)\}`[\s\S]*direction: "right"/);
   assert.match(coursePage, /!historyReturn \? <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
+});
+
+test("all completed navigation variants use the Year rail descriptor and serif destination grammar", () => {
+  assert.match(navigation, /destination\.detail \? \([\s\S]*<span>[\s\S]*\{destination\.label\}[\s\S]*<strong>\{destination\.detail\}<\/strong>/);
+  assert.match(navigationCss, /\.destination span[\s\S]*font-family:\s*var\(--history-nav-sans\)/);
+  assert.match(navigationCss, /\.destination strong \{[^}]*font-family:\s*var\(--history-nav-display\)/);
+  assert.match(roundPage, /backLabel="Tournament"[\s\S]*backDetail=\{String\(archive\.year\)\}/);
+  assert.match(teamPage, /label: "Tournament",[\s\S]*detail: String\(team\.year\)/);
+  assert.match(coursePage, /label: "Tournament",[\s\S]*detail: String\(resolvedSearchParams\.year\)[\s\S]*label: "Round",[\s\S]*detail: `Round \$\{Number\(resolvedSearchParams\.round\)\}`/);
 });
 
 test("2026 stays on its existing archive navigation and receives no completed-year Course rail", () => {
