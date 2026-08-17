@@ -96,11 +96,22 @@ test("completed Round History adapts Previous, Tournament, and Next without empt
   assert.match(roundPage, /backLabel="Tournament"/);
   assert.match(roundPage, /backDetail=\{String\(archive\.year\)\}/);
   assert.match(roundPage, /backAriaLabel=\{`\$\{archive\.year\} Tournament`\}/);
-  assert.match(roundNavigation, /label: backLabel,[\s\S]*detail: backDetail,[\s\S]*ariaLabel: backAriaLabel \|\| backLabel/);
-  assert.match(roundNavigation, /left=\{previousHref && previousLabel \? \{/);
-  assert.match(roundNavigation, /right=\{nextHref && nextLabel \? \{/);
+  assert.match(roundPage, /completedYear=\{Number\(archive\.year\) >= 2017 && Number\(archive\.year\) <= 2025\}/);
+  assert.match(roundNavigation, /const tournamentDestination = \{[\s\S]*label: backLabel,[\s\S]*detail: backDetail,[\s\S]*ariaLabel: backAriaLabel \|\| backLabel/);
+  assert.match(roundNavigation, /const previousDestination = previousHref && previousLabel \? \{/);
+  assert.match(roundNavigation, /const nextDestination = nextHref && nextLabel \? \{/);
   assert.doesNotMatch(roundNavigation, /return <span|aria-disabled|disabled/);
   assert.match(roundNavigation, /surface="round"/);
+});
+
+test("completed Round History distributes first, middle, and final destinations without empty tracks", () => {
+  assert.match(roundNavigation, /completedYear = false/);
+  assert.match(roundNavigation, /const firstRound = completedYear && !previousDestination && nextDestination/);
+  assert.match(roundNavigation, /const finalRound = completedYear && previousDestination && !nextDestination/);
+  assert.match(roundNavigation, /center=\{!completedYear \|\| \(!firstRound && !finalRound\)[\s\S]*\? tournamentDestination[\s\S]*: null\}/);
+  assert.match(roundNavigation, /left=\{firstRound[\s\S]*\{ \.\.\.tournamentDestination, direction: "left" \}[\s\S]*: previousDestination\}/);
+  assert.match(roundNavigation, /right=\{finalRound[\s\S]*\{ \.\.\.tournamentDestination, direction: "none" \}[\s\S]*: nextDestination\}/);
+  assert.match(navigationCss, /\.navigation\[data-count="2"\] \{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
 });
 
 test("completed Team History uses one shared parent destination without sibling controls", () => {

@@ -243,6 +243,7 @@ export default async function HistoricalRoundPage({ params }) {
           backLabel="Tournament"
           backDetail={String(archive.year)}
           backAriaLabel={`${archive.year} Tournament`}
+          completedYear={Number(archive.year) >= 2017 && Number(archive.year) <= 2025}
           previousHref={
             archive.previousRound
               ? `/history/${archive.year}/round/${archive.previousRound.number}`
