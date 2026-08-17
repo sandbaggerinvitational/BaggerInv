@@ -234,16 +234,22 @@ function ScoreGrid({
 
 function ScorecardSummary({ scorecards, stackPairingIdentities }) {
   return <div className={summaryStyles.summary} aria-label="Scorecard totals">
-    {scorecards.map((scorecard) => (
-      <div className={`${summaryStyles.row} ${density.summaryRow}`} key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
+    {scorecards.map((scorecard) => {
+      const strokes = scorecard.historySummary
+        ? scorecard.historySummary.strokesReceived
+        : scorecard.strokesReceived;
+      const net = scorecard.historySummary
+        ? scorecard.historySummary.netTotal
+        : scorecard.netTotals?.total;
+      return <div className={`${summaryStyles.row} ${density.summaryRow}`} key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
         <span><Participant scorecard={scorecard} stackPairingIdentities={stackPairingIdentities} /></span>
         <dl>
           <div><dt>Gross</dt><dd>{scorecard.total ?? "—"}</dd></div>
-          <div><dt>Strokes</dt><dd>{scorecard.strokesReceived ?? "—"}</dd></div>
-          <div><dt>Net</dt><dd>{scorecard.netTotals?.total ?? "—"}</dd></div>
+          <div><dt>Strokes</dt><dd>{strokes ?? "—"}</dd></div>
+          <div><dt>Net</dt><dd>{net ?? "—"}</dd></div>
         </dl>
-      </div>
-    ))}
+      </div>;
+    })}
   </div>;
 }
 

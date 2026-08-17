@@ -100,8 +100,10 @@ test("completed scorecards reuse the approved grouped Gross, Strokes, and Net su
   assert.equal([...matchCard.matchAll(/showSummary=\{historyScorecardParity\}/g)].length, 2);
   assert.match(scorecard, /function ScorecardSummary/);
   assert.match(scorecard, /<dt>Gross<\/dt><dd>\{scorecard\.total \?\? "—"\}<\/dd>/);
-  assert.match(scorecard, /<dt>Strokes<\/dt><dd>\{scorecard\.strokesReceived \?\? "—"\}<\/dd>/);
-  assert.match(scorecard, /<dt>Net<\/dt><dd>\{scorecard\.netTotals\?\.total \?\? "—"\}<\/dd>/);
+  assert.match(scorecard, /<dt>Strokes<\/dt><dd>\{strokes \?\? "—"\}<\/dd>/);
+  assert.match(scorecard, /<dt>Net<\/dt><dd>\{net \?\? "—"\}<\/dd>/);
+  assert.match(scorecard, /: scorecard\.strokesReceived/);
+  assert.match(scorecard, /: scorecard\.netTotals\?\.total/);
   assert.match(summaryCss, /\.summary\{[^}]*border-radius:13px[^}]*background:#fffdf8/);
 });
 

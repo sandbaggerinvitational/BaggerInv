@@ -2,15 +2,17 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { buildScorecardAnalytics } from "../lib/scorecard-analytics.js";
+import { canonicalize2025ScrambleScorecardPresentation } from "../lib/history-2025-tournament-records.js";
 import { buildLegacyHistoryScorecardCoverage } from "../lib/legacy-history-scorecard-coverage.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [matchCard, scorecard, matchCss, summaryCss, analyticsSource, roundPage, packageJson, historicalData] = await Promise.all([
+const [matchCard, scorecard, matchCss, summaryCss, analyticsSource, scramblePresentationSource, roundPage, packageJson, historicalData] = await Promise.all([
   source("app/PublicMatchCard.js"),
   source("app/ScorecardTable.js"),
   source("app/live/live.module.css"),
   source("app/scorecard-summary.module.css"),
   source("lib/scorecard-analytics.js"),
+  source("lib/history-2025-tournament-records.js"),
   source("app/history/[year]/round/[round]/page.js"),
   source("package.json").then(JSON.parse),
   source("lib/historical-data.json").then(JSON.parse),
@@ -99,41 +101,73 @@ function scrambleFixture(year = 2025, { omitSecondStroke = false } = {}) {
   };
 }
 
+function projectedScrambleCards(fixture) {
+  const analytics = buildScorecardAnalytics(fixture);
+  return fixture.matches.flatMap((match) => canonicalize2025ScrambleScorecardPresentation({
+    scorecards: analytics.teamScorecards.filter((scorecard) => scorecard.matchId === match["Match ID"]),
+    matches: fixture.matches,
+    teams: fixture.teamNames,
+  })).sort((a, b) => a.matchNumber - b.matchNumber || a.side - b.side);
+}
+
 test("all twelve 2025 Scramble identities retain canonical Gross, Strokes, and Net evidence", () => {
-  const analytics = buildScorecardAnalytics(scrambleFixture());
-  const cards = analytics.teamScorecards
-    .slice()
-    .sort((a, b) => a.matchNumber - b.matchNumber || a.side - b.side);
+  const cards = projectedScrambleCards(scrambleFixture());
   assert.equal(cards.length, 12);
   const expected = scrambleEvidence.flatMap((evidence) => [
     [evidence.gross[0], Number(evidence.strokes[0] || 0), evidence.gross[0] - Number(evidence.strokes[0] || 0)],
     [evidence.gross[1], Number(evidence.strokes[1] || 0), evidence.gross[1] - Number(evidence.strokes[1] || 0)],
   ]);
-  assert.deepEqual(cards.map((card) => [card.total, card.strokesReceived, card.netTotals?.total]), expected);
+  assert.deepEqual(cards.map((card) => [
+    card.total,
+    card.historySummary?.strokesReceived,
+    card.historySummary?.netTotal,
+  ]), expected);
   assert.deepEqual(cards.map((card) => card.side), [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]);
   assert.ok(cards.every((card) => card.participantPlayerIds.length === 2));
 });
 
 test("canonical blank strokes become zero while a genuinely missing stroke column stays unresolved", () => {
-  const canonical = buildScorecardAnalytics(scrambleFixture()).teamScorecards;
-  const zeroCards = canonical.filter((card) => card.strokesReceived === 0);
+  const canonical = projectedScrambleCards(scrambleFixture());
+  const zeroCards = canonical.filter((card) => card.historySummary?.strokesReceived === 0);
   assert.equal(zeroCards.length, 6);
-  assert.ok(zeroCards.every((card) => card.netTotals?.total === card.total));
+  assert.ok(zeroCards.every((card) => card.historySummary?.netTotal === card.total));
 
-  const missing = buildScorecardAnalytics(scrambleFixture(2025, { omitSecondStroke: true })).teamScorecards;
+  const missing = projectedScrambleCards(scrambleFixture(2025, { omitSecondStroke: true }));
   const unresolvedSecondSides = missing.filter((card) => card.side === 2);
   assert.equal(unresolvedSecondSides.length, 6);
-  assert.ok(unresolvedSecondSides.every((card) => card.strokesReceived === null && card.netTotals === null));
+  assert.ok(unresolvedSecondSides.every((card) =>
+    card.historySummary?.strokesReceived === null && card.historySummary?.netTotal === null
+  ));
 });
 
 test("the identity repair is unambiguous, 2025-only, and contains no pairing-specific hardcode", () => {
-  assert.match(analyticsSource, /identity\.year !== 2025 \|\| identity\.round !== 2 \|\| identity\.format !== "SC"/);
-  assert.match(analyticsSource, /unresolvedRows\.length === 1 && availableSides\.length === 1/);
-  assert.doesNotMatch(analyticsSource, /Connor O'Reilly|Alex Monteleone|David Tatum|Chris Seekely|Jack Samis|Sonny Stepp|Jupjee Kochar|Brenan Cavanaugh/);
+  assert.match(scramblePresentationSource, /Number\(scorecard\?\.year\) !== TARGET_YEAR/);
+  assert.match(scramblePresentationSource, /const \{ resolved: resolvedSides \} = resolveTeamCardSides/);
+  assert.match(scramblePresentationSource, /resolvedSides\.get\(scorecard\)/);
+  assert.match(scramblePresentationSource, /officialStrokeValue\(canonicalMatch, resolvedSide\)/);
+  assert.doesNotMatch(scramblePresentationSource, /Connor O'Reilly|Alex Monteleone|David Tatum|Chris Seekely|Jack Samis|Sonny Stepp|Jupjee Kochar|Brenan Cavanaugh/);
   for (const year of [2023, 2024]) {
-    const cards = buildScorecardAnalytics(scrambleFixture(year)).teamScorecards;
-    assert.equal(cards.filter((card) => card.side === 2).length, 0);
-    assert.equal(cards.filter((card) => card.strokesReceived === null).length, 6);
+    const fixture = scrambleFixture(year);
+    const raw = buildScorecardAnalytics(fixture).teamScorecards;
+    const cards = canonicalize2025ScrambleScorecardPresentation({
+      scorecards: raw,
+      matches: fixture.matches,
+      teams: fixture.teamNames,
+    });
+    assert.deepEqual(cards, raw);
+  }
+});
+
+test("summary repair leaves every approved hole, net-row, and Hole Winner field unchanged", () => {
+  const fixture = scrambleFixture();
+  const raw = buildScorecardAnalytics(fixture).teamScorecards;
+  const projected = projectedScrambleCards(fixture);
+  for (const card of projected) {
+    const before = raw.find((candidate) => candidate.matchId === card.matchId && candidate.teamId === card.teamId);
+    assert.deepEqual(card.holes, before.holes);
+    assert.deepEqual(card.matchNetScoring, before.matchNetScoring);
+    assert.equal(card.strokesReceived, before.strokesReceived);
+    assert.deepEqual(card.netTotals, before.netTotals);
   }
 });
 
@@ -197,8 +231,10 @@ test("the established 2025 scorecard eligibility remains exactly 22", () => {
 
 test("Best Ball, Singles, Hole Winner, Final Result, and Match Progression stay on existing paths", () => {
   assert.match(scorecard, /scorecard\.total \?\? "—"/);
-  assert.match(scorecard, /scorecard\.strokesReceived \?\? "—"/);
-  assert.match(scorecard, /scorecard\.netTotals\?\.total \?\? "—"/);
+  assert.match(scorecard, /: scorecard\.strokesReceived/);
+  assert.match(scorecard, /: scorecard\.netTotals\?\.total/);
+  assert.match(scorecard, /scorecard\.historySummary[\s\S]*scorecard\.historySummary\.strokesReceived/);
+  assert.match(scorecard, /scorecard\.historySummary[\s\S]*scorecard\.historySummary\.netTotal/);
   assert.match(scorecard, /winnerForHole\(holeNumber\)/);
   assert.match(scorecard, /winner\?\.abbreviation \|\| "—"/);
   assert.match(matchCard, /<div className=\{styles\.historicalFinalResult\}>/);
@@ -224,7 +260,7 @@ test("the 2025 action and summary system remains responsive and accessible", () 
 });
 
 test("Step 3A.10 adds no request, endpoint, source, storage, or dependency", () => {
-  for (const value of [matchCard, scorecard, analyticsSource, roundPage]) {
+  for (const value of [matchCard, scorecard, analyticsSource, scramblePresentationSource, roundPage]) {
     assert.doesNotMatch(value, /fetch\(|axios|createClient|supabase\.from|\/api\/live|gviz|localStorage|sessionStorage/i);
   }
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
