@@ -49,8 +49,10 @@ import {
   build2026ScrambleRoundStatisticHolders,
 } from "../../../../../lib/history-2026-round-presentation";
 import {
+  buildHistoricalIndividualBirdieHolders,
   buildHistoricalIndividualStatisticHolders,
   omitMeaninglessHistoricalBirdieLeader,
+  selectCanonical2024IndividualStatisticScorecards,
   selectCanonical2024NetPresentationScorecards,
 } from "../../../../../lib/history-2024-net-projection";
 
@@ -145,6 +147,18 @@ export default async function HistoricalRoundPage({ params }) {
     roundScorecards,
     roundScorecards.length + missingRoundScorecards.length
   );
+  const canonical2024IndividualStatisticScorecards = completed2024
+    ? selectCanonical2024IndividualStatisticScorecards({
+      scorecards: scorecardAnalytics.scorecards,
+      projectedScorecards: scorecardAnalytics.history2024NetProjectionScorecards,
+    }).filter((scorecard) => Number(scorecard?.round) === Number(archive.round))
+    : [];
+  const canonical2024IndividualStatistics = canonical2024IndividualStatisticScorecards.length
+    ? buildScoringHighlights(
+      canonical2024IndividualStatisticScorecards,
+      canonical2024IndividualStatisticScorecards.length
+    )
+    : null;
   const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
     year: archive.year,
     matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
@@ -251,6 +265,16 @@ export default async function HistoricalRoundPage({ params }) {
     : useSupabase2026 && archive.format === "SC"
       ? scrambleStatisticHolders?.birdieLeader
       : undefined;
+  const completed2024RoundBirdieLeader = canonical2024IndividualStatistics?.birdieLeader || null;
+  const completed2024RoundBirdieHolders = completed2024RoundBirdieLeader
+    ? buildHistoricalIndividualBirdieHolders({
+      year: archive.year,
+      round: archive.round,
+      scorecards: canonical2024IndividualStatisticScorecards,
+      acceptedValue: completed2024RoundBirdieLeader.value,
+    })
+    : [];
+  const displayedBirdieLeader = completed2024RoundBirdieLeader || roundBirdieLeader;
   const lowestTeamRound = bestBallLowestTeamRound || roundStatistics.lowestTeamRound;
   const lowestTeamRoundHolders = bestBallLowestTeamRound?.holders || scrambleStatisticHolders?.lowestTeamRound;
   const showLowestRound = !((completedHistoryMaster || useSupabase2026) && archive.format === "SC");
@@ -276,10 +300,16 @@ export default async function HistoricalRoundPage({ params }) {
   const averageScoreStatisticItem = { label: "Average Score", value: formatScoringNumber(roundStatistics.averageScore.value), sample: roundStatistics.averageScore.label };
   const hardestHoleStatisticItem = { label: "Hardest Hole", value: roundStatistics.hardestHole ? `#${roundStatistics.hardestHole.holeNumber}` : "—", detail: holeLabel(roundStatistics.hardestHole), sample: roundStatistics.hardestHole?.averageToPar.label };
   const easiestHoleStatisticItem = { label: "Easiest Hole", value: roundStatistics.easiestHole ? `#${roundStatistics.easiestHole.holeNumber}` : "—", detail: holeLabel(roundStatistics.easiestHole), sample: roundStatistics.easiestHole?.averageToPar.label };
-  const birdieLeaderStatisticItem = { label: "Birdie Leader", value: formatScoringNumber(roundBirdieLeader.value), detail: participant(roundBirdieLeader), holders: birdieLeaderHolders, sample: roundBirdieLeader.label };
+  const birdieLeaderStatisticItem = { label: "Birdie Leader",
+    value: formatScoringNumber(displayedBirdieLeader.value),
+    detail: participant(displayedBirdieLeader),
+    holders: birdieLeaderHolders,
+    ...(completed2024RoundBirdieLeader ? { holders: completed2024RoundBirdieHolders } : {}),
+    sample: displayedBirdieLeader.label,
+  };
   const showBirdieLeader = !omitMeaninglessHistoricalBirdieLeader({
     year: archive.year,
-    value: roundBirdieLeader.value,
+    value: displayedBirdieLeader.value,
   });
   const lowestTeamRoundStatisticItem = { label: "Lowest Team Round", value: formatScoringNumber(lowestTeamRound.value), detail: bestBallLowestTeamRound ? "" : participant(roundStatistics.lowestTeamRound), holders: lowestTeamRoundHolders, sample: lowestTeamRound.label };
   const completedHistoryRoundStatisticItems = [

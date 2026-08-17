@@ -1,20 +1,23 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { buildScorecardAnalytics } from "../lib/scorecard-analytics.js";
+import { buildScorecardAnalytics, buildScoringHighlights } from "../lib/scorecard-analytics.js";
 import {
   buildCanonicalHistoryCourseHoleAliases,
+  buildHistoricalIndividualBirdieHolders,
   buildHistoricalIndividualStatisticHolders,
   omitMeaninglessHistoricalBirdieLeader,
+  selectCanonical2024IndividualStatisticScorecards,
   selectCanonical2024NetPresentationScorecards,
 } from "../lib/history-2024-net-projection.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [scorecardData, roundPage, overviewPage, matchCard, packageJson] = await Promise.all([
+const [scorecardData, roundPage, overviewPage, matchCard, migrationRequirement, packageJson] = await Promise.all([
   source("lib/scorecard-data.js"),
   source("app/history/[year]/round/[round]/page.js"),
   source("app/history/[year]/page.js"),
   source("app/PublicMatchCard.js"),
+  source("docs/history-2023-migration-requirements.md"),
   source("package.json").then(JSON.parse),
 ]);
 
@@ -144,6 +147,101 @@ test("all 24 R1 and all 24 R3 canonical golfer projections pass the complete-evi
   }
 });
 
+function canonicalStatisticFixture() {
+  const birdies = (round, player) => {
+    if (round === 1 && player === "Robert Murphy") return 4;
+    if (round === 3 && player === "Robert Murphy") return 3;
+    if (round === 3 && player === "Michael Hunnicutt") return 4;
+    return 0;
+  };
+  const projected = evidenceMatrix.map(([round, match, player, gross, strokes, net]) => {
+    const birdieCount = birdies(round, player);
+    const holes = Array.from({ length: 18 }, (_, index) => ({
+      holeNumber: index + 1,
+      score: index < birdieCount ? 3 : 4,
+      par: 4,
+      toPar: index < birdieCount ? -1 : 0,
+      netScore: index < strokes ? 3 : 4,
+    }));
+    return {
+      year: 2024,
+      round,
+      format: round === 1 ? "BB" : "SI",
+      matchId: `2024-R${round}-${match}`,
+      scoreType: "INDIVIDUAL",
+      playerId: player,
+      playerName: player,
+      status: "COMPLETE",
+      completedHoleCount: 18,
+      total: gross,
+      strokesReceived: strokes,
+      netAvailable: true,
+      netTotals: { total: net },
+      holes,
+      metrics: { birdies: { value: birdieCount } },
+      matchNetScoring: { available: true },
+    };
+  });
+  return {
+    projected,
+    base: projected.map((scorecard) => ({
+      ...scorecard,
+      netAvailable: false,
+      netTotals: null,
+      holes: scorecard.holes.map((hole) => ({ ...hole, netScore: null })),
+      matchNetScoring: { available: false },
+    })),
+  };
+}
+
+test("authorized 2024 Birdie Leaders and the tournament average use 48 complete individual gross rounds", () => {
+  const fixture = canonicalStatisticFixture();
+  const selected = selectCanonical2024IndividualStatisticScorecards({
+    scorecards: fixture.base,
+    projectedScorecards: fixture.projected,
+  });
+  assert.equal(selected.length, 48);
+  assert.equal(selected.filter((scorecard) => scorecard.round === 1).length, 24);
+  assert.equal(selected.filter((scorecard) => scorecard.round === 3).length, 24);
+
+  const tournament = buildScoringHighlights(selected, selected.length);
+  const roundOne = buildScoringHighlights(selected.filter((scorecard) => scorecard.round === 1), 24);
+  const roundThree = buildScoringHighlights(selected.filter((scorecard) => scorecard.round === 3), 24);
+  assert.equal(tournament.averageScore.sampleSize, 48);
+  assert.equal(tournament.averageScore.value, 3821 / 48);
+  assert.equal(tournament.averageScore.value.toFixed(1), "79.6");
+  assert.equal(tournament.birdieLeader.value, 7);
+  assert.equal(tournament.birdieLeader.scorecard.playerName, "Robert Murphy");
+  assert.equal(roundOne.birdieLeader.value, 4);
+  assert.equal(roundOne.birdieLeader.scorecard.playerName, "Robert Murphy");
+  assert.equal(roundThree.birdieLeader.value, 4);
+  assert.equal(roundThree.birdieLeader.scorecard.playerName, "Michael Hunnicutt");
+  assert.deepEqual(
+    buildHistoricalIndividualBirdieHolders({ year: 2024, scorecards: selected, acceptedValue: 7 }).map((holder) => holder.name),
+    ["Robert Murphy"]
+  );
+});
+
+test("the authorized statistics projection stays individual-only and leaves Scramble out of the tournament average", () => {
+  const fixture = canonicalStatisticFixture();
+  const scramble = {
+    ...fixture.projected[0],
+    round: 2,
+    format: "SC",
+    matchId: "2024-R2-1",
+    scoreType: "TEAM",
+    playerId: "",
+    teamId: "TEAM-1",
+    total: 63,
+  };
+  const selected = selectCanonical2024IndividualStatisticScorecards({
+    scorecards: [...fixture.base, scramble],
+    projectedScorecards: [...fixture.projected, scramble],
+  });
+  assert.equal(selected.length, 48);
+  assert.equal(selected.some((scorecard) => scorecard.round === 2 || scorecard.scoreType === "TEAM"), false);
+});
+
 test("a partial projection cannot replace the truthful gross-only base", () => {
   const base = [{ year: 2024, round: 1, matchId: "M1", scoreType: "INDIVIDUAL", playerId: "P1" }];
   const selected = selectCanonical2024NetPresentationScorecards({ year: 2024, round: 1, scorecards: base, projectedScorecards: [] });
@@ -168,6 +266,15 @@ test("zero Birdie Leaders are omitted only from the audited 2024 presentation", 
   assert.match(overviewPage, /item\.label === "Birdie Leader"[\s\S]*omitMeaninglessHistoricalBirdieLeader/);
 });
 
+test("future 2023 migration must audit Course ID and archive tee resolution without activating the 2024 repair", () => {
+  assert.match(migrationRequirement, /Course ID/);
+  assert.match(migrationRequirement, /archive display tee label/);
+  assert.match(migrationRequirement, /canonical Course Holes scoring-set tee label/);
+  assert.match(migrationRequirement, /must not be activated for 2023/);
+  assert.match(migrationRequirement, /20-scorecard eligibility contract/);
+  assert.doesNotMatch(scorecardData, /year: 2023|canonical2023/i);
+});
+
 test("runtime projection reuses the existing analytics and is isolated to 2024 R1/R3", () => {
   assert.match(scorecardData, /buildCanonicalHistoryCourseHoleAliases/);
   assert.match(scorecardData, /buildScorecardAnalytics\(\{[\s\S]*courseHoles: history2024NetProjection\.courseHoles/);
@@ -183,6 +290,7 @@ test("accepted Final Results remain frozen while R1/R3 Match Intelligence uses c
 
 test("Step 3B.1A adds no request, endpoint, dependency, or client scoring formula", () => {
   assert.doesNotMatch(roundPage + overviewPage, /fetch\(|axios|createClient|supabase\.from|\/api\/live/i);
+  assert.doesNotMatch(roundPage + overviewPage, /Robert Murphy|Michael Hunnicutt|79\.6/);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
     "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "next", "openai", "qrcode", "react", "react-dom", "web-push",
   ].sort());

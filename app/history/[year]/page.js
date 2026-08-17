@@ -26,7 +26,10 @@ import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 import StatusBadge from "../../StatusBadge";
 import { getDraftByYear } from "../../../lib/draft";
-import { loadLegacyHistoryAnalytics } from "../../../lib/legacy-history-analytics";
+import {
+  loadCanonical2024HistoryAnalytics,
+  loadLegacyHistoryAnalytics,
+} from "../../../lib/legacy-history-analytics";
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
 import { buildLegacyHistoryScorecardCoverage } from "../../../lib/legacy-history-scorecard-coverage";
 import {
@@ -34,11 +37,13 @@ import {
   build2025TournamentRecords,
 } from "../../../lib/history-2025-tournament-records";
 import {
+  buildHistoricalIndividualBirdieHolders,
   buildHistoricalIndividualStatisticHolders,
   combineHistoricalHolders,
   historicalHolderContext,
   historicalHolderText,
   omitMeaninglessHistoricalBirdieLeader,
+  selectCanonical2024IndividualStatisticScorecards,
 } from "../../../lib/history-2024-net-projection";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import {
@@ -422,7 +427,9 @@ export default async function TournamentYearPage({ params }) {
       );
     }
   } else {
-    const scorecardAnalyticsPromise = loadLegacyHistoryAnalytics();
+    const scorecardAnalyticsPromise = Number(year) === 2024
+      ? loadCanonical2024HistoryAnalytics()
+      : loadLegacyHistoryAnalytics();
     await refreshHistoricalData();
     tournament = getTournament(year);
     if (!tournament) notFound();
@@ -449,6 +456,25 @@ export default async function TournamentYearPage({ params }) {
     tournamentScorecards,
     tournamentScorecards.length + missingTournamentScorecards.length
   );
+  const completed2024IndividualStatisticScorecards = Number(tournament?.year) === 2024
+    ? selectCanonical2024IndividualStatisticScorecards({
+      scorecards: scorecardAnalytics.scorecards,
+      projectedScorecards: scorecardAnalytics.history2024NetProjectionScorecards,
+    })
+    : [];
+  const completed2024IndividualStatistics = completed2024IndividualStatisticScorecards.length
+    ? buildScoringHighlights(
+      completed2024IndividualStatisticScorecards,
+      completed2024IndividualStatisticScorecards.length
+    )
+    : null;
+  const completed2024RecordStatistics = completed2024IndividualStatistics
+    ? {
+      ...scoringStatistics,
+      averageScore: completed2024IndividualStatistics.averageScore,
+      birdieLeader: completed2024IndividualStatistics.birdieLeader,
+    }
+    : scoringStatistics;
   const tournamentMatches = useSupabase2026 ? [] : getTournamentMatches(year);
   const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
     year,
@@ -483,18 +509,27 @@ export default async function TournamentYearPage({ params }) {
       },
     })
     : null;
+  const completed2024BirdieHolders = completed2024IndividualStatistics
+    ? buildHistoricalIndividualBirdieHolders({
+      year: 2024,
+      scorecards: completed2024IndividualStatisticScorecards,
+      acceptedValue: completed2024IndividualStatistics.birdieLeader.value,
+    })
+    : [];
   const completed2024Records = Number(tournament?.year) === 2024
-    ? scoringItems(scoringStatistics, participant, tournament.courses)
+    ? scoringItems(completed2024RecordStatistics, participant, tournament.courses)
       .filter((item) =>
         item.label !== "Scorecard Coverage" &&
         item.value !== "—" &&
-        !(item.label === "Birdie Leader" && omitMeaninglessHistoricalBirdieLeader({ year: 2024, value: scoringStatistics.birdieLeader.value }))
+        !(item.label === "Birdie Leader" && omitMeaninglessHistoricalBirdieLeader({ year: 2024, value: completed2024RecordStatistics.birdieLeader.value }))
       )
       .map((item) => {
         const holders = item.label === "Best Individual Round"
           ? completed2024IndividualHolders.lowestRound
           : item.label === "Best Team Round"
             ? completed2024ScrambleHolders.lowestTeamRound
+            : item.label === "Birdie Leader"
+              ? completed2024BirdieHolders
             : item.label === "Lowest Front"
               ? combineHistoricalHolders(completed2024IndividualHolders.lowestFrontNine, completed2024ScrambleHolders.lowestFrontNine)
               : item.label === "Lowest Back"
@@ -502,12 +537,16 @@ export default async function TournamentYearPage({ params }) {
                 : [];
         const detail = holders.length ? historicalHolderText(holders) : item.detail;
         const context = holders.length ? historicalHolderContext(holders) : item.context;
+        const sample = item.label === "Average Score"
+          ? `${completed2024IndividualStatisticScorecards.length} individual rounds`
+          : item.sample;
         return {
           ...item,
           detail,
           context,
+          sample,
           key: `2024-${item.label}`,
-          accessibleLabel: [item.label, item.value, detail, context, item.sample].filter(Boolean).join(", "),
+          accessibleLabel: [item.label, item.value, detail, context, sample].filter(Boolean).join(", "),
         };
       })
     : null;
