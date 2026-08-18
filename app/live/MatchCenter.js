@@ -46,7 +46,7 @@ function ChampionshipBanner({ tournament }) {
     <h2>{winner.name}</h2>
     <strong>Final Score · <span className={scoreStyles.score}>{formatTeamPoints(tournament.teamOne.score)}<i className={scoreStyles.separator} aria-hidden="true">–</i>{formatTeamPoints(tournament.teamTwo.score)}</span></strong>
     <span>over {loser.name}</span>
-    <Link href={`/champions/${tournament.year}`}>View Final Results →</Link>
+    <Link href={`/history/${tournament.year}`}>View Final Results →</Link>
   </section>;
 }
 

@@ -57,7 +57,12 @@ test("normal Archive entry and explicit Player-origin History remain distinct", 
   assert.match(yearPage, /href: "\/history"[\s\S]*label: "All Tournament Years"/);
 });
 
-test("the existing Champions product remains available outside the Archive", () => {
+test("the public Champions product remains available outside the PWA", () => {
   assert.match(championsPage, /href=\{`\/champions\/\$\{tournament\.year\}`\}/);
-  assert.match(liveMatchCenter, /href=\{`\/champions\/\$\{tournament\.year\}`\}/);
+});
+
+test("the completed Match Center banner routes Final Results to canonical Tournament History", () => {
+  assert.match(liveMatchCenter, /const championshipMode = tournament\.state\.complete && tournament\.state\.championSide;/);
+  assert.match(liveMatchCenter, /href=\{`\/history\/\$\{tournament\.year\}`\}>View Final Results →<\/Link>/);
+  assert.doesNotMatch(liveMatchCenter, /href=\{`\/champions\/\$\{tournament\.year\}`\}/);
 });
