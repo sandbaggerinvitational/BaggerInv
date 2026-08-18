@@ -75,6 +75,7 @@ import {
   playerOriginReturnContext,
 } from "../../../../../lib/context-navigation";
 import PlayerProfileReturnNavigation from "../../../../PlayerProfileReturnNavigation";
+import HistoryMatchAnchorTarget from "../../../HistoryMatchAnchorTarget";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -506,6 +507,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
       </section>
 
       <PlayerProfileReturnNavigation context={playerReturnContext} />
+      <HistoryMatchAnchorTarget enabled={Boolean(playerReturnContext)} />
 
       <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.roundContent : ""}`}>
         <HistoricalDetailNavigation

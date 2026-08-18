@@ -16,6 +16,8 @@ const [
   shell,
   navigation,
   navigationCss,
+  matchTarget,
+  matchCss,
 ] = await Promise.all([
   source("app/players/[slug]/page.js"),
   source("app/players/[slug]/PlayerIntelligenceSections.js"),
@@ -28,6 +30,8 @@ const [
   source("lib/participant-shell.js"),
   source("app/history/HistoryNavigation.js"),
   source("app/history/history-navigation.module.css"),
+  source("app/history/HistoryMatchAnchorTarget.js"),
+  source("app/live/live.module.css"),
 ]);
 
 test("Career Profile is owned by the PWA shell without its website header or footer", () => {
@@ -83,6 +87,11 @@ test("all historical destinations share the same canonical, fail-closed Player r
   assert.match(playerReturn, /prefetch: false/);
   assert.match(playerReturn, /surface="player-return"/);
   assert.match(round, /<PublicMatchCard/);
+  assert.match(round, /<HistoryMatchAnchorTarget enabled=\{Boolean\(playerReturnContext\)\} \/>/);
+  assert.match(matchTarget, /\^match-\[A-Za-z0-9\._:-\]\+\$/);
+  assert.match(matchTarget, /scrollIntoView\(\{[\s\S]*behavior: "auto"[\s\S]*block: "start"/);
+  assert.match(matchTarget, /window\.requestAnimationFrame\(reveal\)/);
+  assert.match(matchCss, /scroll-margin-top: calc\(var\(--participant-header-height, 64px\) \+ 16px\)/);
 });
 
 test("Profile integration adds no browser-history authority, duplicate route, or client metadata fetch", () => {

@@ -208,6 +208,7 @@
 }
 
 .matchCard {
+  scroll-margin-top: calc(var(--participant-header-height, 64px) + 16px);
   overflow: hidden;
   border: 1px solid #ddd6c8;
   border-radius: 20px;
