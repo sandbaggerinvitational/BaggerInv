@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sbi-shell-v2";
+const CACHE_VERSION = "sbi-shell-v3";
 const STATIC_ASSETS = [
   "/offline.html",
   "/icon-192.png",
@@ -32,7 +32,6 @@ self.addEventListener("activate", (event) => {
 
 function isStaticAsset(url) {
   return (
-    url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/images/") ||
     /\.(?:avif|gif|ico|jpe?g|png|svg|webp|woff2?)$/i.test(url.pathname)
   );
@@ -60,6 +59,11 @@ self.addEventListener("fetch", (event) => {
   ) {
     return;
   }
+
+  // Next owns its deployment-scoped runtime/chunk cache. Caching framework
+  // assets in a deployment-independent PWA cache can mix an older hydrated
+  // client with a newer stable-Preview route payload during alias rollover.
+  if (url.pathname.startsWith("/_next/")) return;
 
   if (isStaticAsset(url)) {
     event.respondWith(

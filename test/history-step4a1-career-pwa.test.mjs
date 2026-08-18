@@ -21,6 +21,7 @@ const [
   scoringGrid,
   scoringCss,
   profileCss,
+  serviceWorker,
 ] = await Promise.all([
   source("app/players/[slug]/page.js"),
   source("app/players/[slug]/PlayerIntelligenceSections.js"),
@@ -38,6 +39,7 @@ const [
   source("app/ScoringStatGrid.js"),
   source("app/scoring-stats.module.css"),
   source("app/historical.module.css"),
+  source("public/sw.js"),
 ]);
 
 test("Career Profile is owned by the PWA shell without its website header or footer", () => {
@@ -122,4 +124,11 @@ test("Profile integration adds no browser-history authority, duplicate route, or
   }
   assert.doesNotMatch(formatHistory, /fetch\(|axios|useSWR|useQuery/);
   assert.doesNotMatch(playerReturn, /fetch\(|axios|useSWR|useQuery/);
+});
+
+test("the PWA leaves deployment-scoped Next assets to Next during client navigation", () => {
+  assert.match(serviceWorker, /CACHE_VERSION = "sbi-shell-v3"/);
+  assert.match(serviceWorker, /if \(url\.pathname\.startsWith\("\/_next\/"\)\) return/);
+  assert.doesNotMatch(serviceWorker, /url\.pathname\.startsWith\("\/_next\/static\/"\) \|\|/);
+  assert.doesNotMatch(serviceWorker, /window\.location|location\.reload/);
 });
