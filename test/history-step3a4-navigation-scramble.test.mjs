@@ -265,7 +265,7 @@ test("redundant app footers are scoped out of History while public event footer 
 });
 
 test("long pairing names wrap and no new dependency or participant request is introduced", () => {
-  assert.match(statCss, /holders b\{[^}]*overflow-wrap:anywhere/);
+  assert.match(statCss, /\.holders b \{[^}]*overflow-wrap: anywhere/);
   for (const file of [completedOverview, roundPage, teamPage, backToTop, coursePage])
     assert.doesNotMatch(file, /\/api\/live|gviz|localStorage|sessionStorage/i);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
