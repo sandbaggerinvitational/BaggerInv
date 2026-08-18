@@ -95,7 +95,7 @@ function TournamentHistoryRow({ playerName, season }) {
       className={styles.playerTournamentHistoryRow}
       data-finish={finishKey}
       href={`/history/${season.year}`}
-      prefetch={completedHistoryYear ? false : undefined}
+      prefetch={false}
       style={rowStyle}
     >
       {content}

@@ -156,7 +156,7 @@ test("Tournament History links completed years, preserves current 2026, and expo
   assert.match(intelligenceUi, /const currentTournamentYear = Number\(season\.year\) === 2026/);
   assert.match(intelligenceUi, /const linkedTournamentYear = completedHistoryYear \|\| currentTournamentYear/);
   assert.match(intelligenceUi, /href=\{`\/history\/\$\{season\.year\}`\}/);
-  assert.match(intelligenceUi, /prefetch=\{completedHistoryYear \? false : undefined\}/);
+  assert.match(intelligenceUi, /prefetch=\{false\}/);
   assert.match(intelligenceUi, /View \$\{playerName\}'s current \$\{season\.year\} Tournament/);
   assert.match(intelligenceUi, /!season\.pointsRecorded \? "—" : formatPlayerPoints\(season\.points\)/);
   assert.match(intelligenceUi, /aria-label=\{upcoming \|\| !season\.pointsRecorded \? "Points not recorded"/);
