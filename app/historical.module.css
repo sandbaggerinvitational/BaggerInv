@@ -494,6 +494,30 @@
   grid-template-columns: 70px minmax(160px, 1.5fr) .85fr .75fr;
 }
 
+.profilePartnersTable .tableRow {
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.profilePartnerResult {
+  min-width: 68px;
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.profilePartnerResult b {
+  color: var(--tsi-ink);
+  font-size: .82rem;
+}
+
+.profilePartnerResult small {
+  color: var(--tsi-muted);
+  font-size: .58rem;
+  font-weight: 700;
+}
+
 .seasonTable .tableRow {
   grid-template-columns: 70px minmax(180px, 1.5fr) .75fr .8fr .65fr .55fr;
 }
@@ -4826,29 +4850,21 @@
 }
 
 .playerRecordsHeld > article {
-  min-height: 112px;
-  padding: 15px;
+  min-height: 72px;
+  padding: 11px 13px;
   border: 1px solid var(--tsi-line);
   border-radius: var(--tsi-radius-sm);
   background: linear-gradient(145deg, rgba(247, 242, 232, .76), #fff);
   color: var(--tsi-ink);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.playerRecordsHeld span {
-  color: var(--tsi-gold-600);
-  font-size: .65rem;
-  font-weight: 800;
-  letter-spacing: .12em;
-  text-transform: uppercase;
+  justify-content: center;
 }
 
 .playerRecordsHeld strong {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.2rem;
+  font-size: 1.02rem;
+  line-height: 1.25;
 }
 
 @media (max-width: 700px) {
@@ -4915,8 +4931,100 @@
   }
 
   .playerFormatMetrics,
-  .playerRecordsHeld {
+  .playerFormatMetrics {
     grid-template-columns: 1fr;
+  }
+
+  .careerContent .playerIntelligence {
+    margin: 18px 0 30px;
+    gap: 8px;
+  }
+
+  .careerContent .playerIntelligenceSection > summary {
+    padding: 12px 14px;
+  }
+
+  .careerContent .playerIntelligenceSection > summary h2 {
+    font-size: 1.4rem;
+  }
+
+  .careerContent .playerIntelligenceBody {
+    padding: 1px 10px 12px;
+  }
+
+  .careerContent .playerIntelligenceBody > h3 {
+    margin: 13px 0 7px;
+  }
+
+  .careerContent .playerRankingList > div {
+    min-height: 34px;
+    gap: 10px;
+  }
+
+  .careerContent .playerRankingList strong {
+    font-size: 1.05rem;
+  }
+
+  .careerContent .playerRecordsHeld {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .careerContent .captainLegacySection {
+    margin-top: 44px;
+  }
+
+  .careerContent .captainLegacySection h2 {
+    font-size: 2rem;
+  }
+
+  .careerContent .captainLegacySummary {
+    margin-top: 16px;
+  }
+
+  .careerContent .captainLegacySummary > div {
+    padding: 14px 15px;
+  }
+
+  .careerContent .captainLegacySummary strong {
+    margin-top: 5px;
+    font-size: 1.4rem;
+  }
+
+  .careerContent .captainLegacyTimeline {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .careerContent .captainLegacySeason {
+    padding: 13px 14px;
+    gap: 10px;
+  }
+
+  .careerContent .rivalSpotlight {
+    margin-top: 38px;
+  }
+
+  .careerContent .rivalProfileCard {
+    margin-top: 15px;
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .careerContent .profilePartnersTable .tableRow {
+    min-width: 0;
+    padding: 10px 11px;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .careerContent .profilePartnersTable .tableHead {
+    min-height: 40px;
+    font-size: .57rem;
+  }
+
+  .careerContent .profilePartnerResult {
+    min-width: 62px;
   }
 }
 

@@ -172,13 +172,6 @@ export default async function PlayerPage({ params, searchParams }) {
 
   return (
     <main data-career-profile>
-      <HistoryNavigation
-        ariaLabel={`${player["Display Name"]} profile navigation`}
-        left={primaryNavigation}
-        right={browseNavigation}
-        surface="player"
-      />
-
       <section className={styles.pageHero}>
         <div className={styles.profileHeader}>
           <PlayerAvatar
@@ -211,7 +204,14 @@ export default async function PlayerPage({ params, searchParams }) {
         </div>
       </section>
 
-      <section className={styles.content}>
+      <HistoryNavigation
+        ariaLabel={`${player["Display Name"]} profile navigation`}
+        left={primaryNavigation}
+        right={browseNavigation}
+        surface="player"
+      />
+
+      <section className={`${styles.content} ${styles.careerContent}`}>
         <CareerHonors
           championships={stats.championships}
           soyYears={stats.sandbaggerOfYearYears}
@@ -348,12 +348,11 @@ export default async function PlayerPage({ params, searchParams }) {
           <span className={styles.sectionLabel}>Team Golf</span>
           <h2>Top Partners</h2>
 
-          <div className={`${styles.dataTable} ${styles.simpleTable}`}>
+          <div className={`${styles.dataTable} ${styles.profilePartnersTable}`}>
             <div className={`${styles.tableRow} ${styles.tableHead}`}>
               <span>#</span>
               <span>Partner</span>
               <span>Record</span>
-              <span>Points Won</span>
             </div>
 
             {addTournamentRanks(stats.partners.slice(0, 8), (row) => row.record.points).map((row) => (
@@ -366,12 +365,14 @@ export default async function PlayerPage({ params, searchParams }) {
                   slug={row.player.slug}
                   photo={row.player["Photo Filename"]}
                 />
-                <span>{formatRecord(row.record)}</span>
-                <strong>
-                  {row.record.recordedPointMatches > 0
-                    ? formatPlayerPoints(row.record.points)
-                    : <span aria-label="Points not recorded">—</span>}
-                </strong>
+                <span className={styles.profilePartnerResult}>
+                  <b>{formatRecord(row.record)}</b>
+                  <small>
+                    Points {row.record.recordedPointMatches > 0
+                      ? formatPlayerPoints(row.record.points)
+                      : <span aria-label="Points not recorded">—</span>}
+                  </small>
+                </span>
               </div>
             ))}
           </div>

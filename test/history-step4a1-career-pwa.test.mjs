@@ -18,6 +18,9 @@ const [
   navigationCss,
   matchTarget,
   matchCss,
+  scoringGrid,
+  scoringCss,
+  profileCss,
 ] = await Promise.all([
   source("app/players/[slug]/page.js"),
   source("app/players/[slug]/PlayerIntelligenceSections.js"),
@@ -32,6 +35,9 @@ const [
   source("app/history/history-navigation.module.css"),
   source("app/history/HistoryMatchAnchorTarget.js"),
   source("app/live/live.module.css"),
+  source("app/ScoringStatGrid.js"),
+  source("app/scoring-stats.module.css"),
+  source("app/historical.module.css"),
 ]);
 
 test("Career Profile is owned by the PWA shell without its website header or footer", () => {
@@ -50,6 +56,8 @@ test("History-origin Profile navigation reuses the approved contextual navigatio
   assert.match(profile, /left=\{primaryNavigation\}/);
   assert.match(profile, /right=\{browseNavigation\}/);
   assert.match(navigationCss, /min-height: 44px/);
+  assert.ok(profile.indexOf("<section className={styles.pageHero}") < profile.indexOf("<HistoryNavigation"));
+  assert.ok(profile.indexOf("<HistoryNavigation") < profile.indexOf("<CareerHonors"));
 });
 
 test("rankings, records, rival, draft history, and partners are genuinely display-only", () => {
@@ -57,11 +65,25 @@ test("rankings, records, rival, draft history, and partners are genuinely displa
   assert.match(intelligence, /"matchWins"/);
   assert.doesNotMatch(intelligence, /title="Current Rankings"/);
   assert.match(intelligence, /<article key=\{record\.slug\}>/);
+  assert.doesNotMatch(intelligence, /Record Holder/);
   assert.doesNotMatch(intelligence, /View Leaderboard|record\.href/);
   assert.doesNotMatch(profile, /Compare players|compareHref|\/compare/);
   assert.match(profile, /<LeaderboardPlayer[\s\S]*linked=\{false\}/);
   assert.match(profile, /className=\{styles\.profileDraftHistory\}[\s\S]*<article/);
   assert.doesNotMatch(profile, /Open Historical Draft Analytics|href=\{`\/draft\/\$\{draft\.year\}`\}/);
+});
+
+test("Career-only density and Top Partners mobile layout do not change frozen History cards", () => {
+  assert.match(scoringGrid, /career = false/);
+  assert.match(scoringGrid, /career \? styles\.career/);
+  assert.match(intelligence, /<ScoringStatGrid career dense/);
+  assert.match(scoringCss, /\.career \{/);
+  assert.match(scoringCss, /\.career \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(profile, /styles\.profilePartnersTable/);
+  assert.doesNotMatch(profile, /styles\.dataTable\} \$\{styles\.simpleTable/);
+  assert.match(profile, /className=\{styles\.profilePartnerResult\}/);
+  assert.match(profileCss, /\.profilePartnersTable \.tableRow \{[\s\S]*grid-template-columns: 46px minmax\(0, 1fr\) auto/);
+  assert.match(profileCss, /\.careerContent \.profilePartnersTable \.tableRow \{[\s\S]*min-width: 0/);
 });
 
 test("Tournament, Match, and Team remain canonical Player-origin drill-downs", () => {

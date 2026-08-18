@@ -132,7 +132,7 @@ export default function PlayerIntelligenceSections({
     <div className={styles.playerIntelligence}>
       <IntelligenceSection eyebrow="Complete Career View" title="Career Snapshot" open>
         <h3>Official Career</h3>
-        <ScoringStatGrid dense items={[
+        <ScoringStatGrid career dense items={[
           { label: "Overall Record", value: official.recordDisplay },
           { label: "Win Percentage", value: formatPercentage(official.winPercentage) },
           { label: "Career Points", value: formatPlayerPoints(official.careerPoints) },
@@ -141,7 +141,7 @@ export default function PlayerIntelligenceSections({
           { label: "Runner-Up Finishes", value: official.runnerUps },
         ]} />
         <h3>Hole-by-Hole</h3>
-        <ScoringStatGrid dense items={[
+        <ScoringStatGrid career dense items={[
           { label: "Hole Differential", value: formatScoringNumber(hole.holeDifferential, { signed: true, decimals: 0 }) },
           { label: "Birdies", value: hole.birdies },
           { label: "Eagles", value: hole.eagles },
@@ -154,25 +154,25 @@ export default function PlayerIntelligenceSections({
 
       <IntelligenceSection eyebrow="Recorded Scorecards" title="Scoring Profile">
         <h3>Gross</h3>
-        <ScoringStatGrid dense items={[
+        <ScoringStatGrid career dense items={[
           { label: "Average Gross", value: formatScoringNumber(hole.averageGrossScore) },
           { label: "Average Net", value: formatScoringNumber(hole.averageNetScore) },
         ]} />
         <h3>Par Performance</h3>
-        <ScoringStatGrid dense items={[
+        <ScoringStatGrid career dense items={[
           { label: "Par 3 Average", value: formatScoringNumber(hole.averagePar3Score) },
           { label: "Par 4 Average", value: formatScoringNumber(hole.averagePar4Score) },
           { label: "Par 5 Average", value: formatScoringNumber(hole.averagePar5Score) },
         ]} />
         <h3>Scoring Breakdown</h3>
-        <ScoringStatGrid dense items={[
+        <ScoringStatGrid career dense items={[
           { label: "Birdie %", value: formatScoringNumber(hole.birdieRate, { percentage: true }) },
           { label: "Par %", value: formatScoringNumber(hole.parRate, { percentage: true }) },
           { label: "Bogey %", value: formatScoringNumber(hole.bogeyRate, { percentage: true }) },
           { label: "Double Bogey+ %", value: formatScoringNumber(hole.doubleBogeyOrWorseRate, { percentage: true }) },
         ]} />
         <h3>Round Breakdown</h3>
-        <ScoringStatGrid dense items={[
+        <ScoringStatGrid career dense items={[
           { label: "Front Nine Average", value: formatScoringNumber(hole.averageFrontNineScore) },
           { label: "Back Nine Average", value: formatScoringNumber(hole.averageBackNineScore) },
         ]} />
@@ -182,7 +182,7 @@ export default function PlayerIntelligenceSections({
       </IntelligenceSection>
 
       <IntelligenceSection eyebrow="Reconstructed Match Play" title="Match Play Profile">
-        <ScoringStatGrid dense items={[
+        <ScoringStatGrid career dense items={[
           { label: "Holes Won", value: hole.holesWon },
           { label: "Holes Lost", value: hole.holesLost },
           { label: "Holes Halved", value: hole.holesHalved },
@@ -246,7 +246,6 @@ export default function PlayerIntelligenceSections({
           <div className={styles.playerRecordsHeld}>
             {intelligence.recordsHeld.map((record) => (
               <article key={record.slug}>
-                <span>Record Holder</span>
                 <strong>{record.title}</strong>
               </article>
             ))}

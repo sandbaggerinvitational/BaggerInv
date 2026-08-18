@@ -1,1 +1,154 @@
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:#fff;border:1px solid #ded8c9;border-radius:20px;padding:20px;min-height:190px;display:flex;flex-direction:column;box-shadow:0 14px 34px rgba(7,52,41,.05)}.card>span{color:#8d6b22;font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}.card>strong{color:#0a3d31;font-family:Georgia,serif;font-size:34px;line-height:1;margin:13px 0 7px}.card>b{color:#33413c;font-size:13px;margin-bottom:6px}.card>small{color:#747c79;font-size:11px;line-height:1.35}.holders{display:grid;gap:9px;margin-bottom:10px}.holders>div{display:grid;gap:2px;min-width:0}.holders b{color:#33413c;font-size:13px;overflow-wrap:anywhere}.holders em,.holders small{color:#747c79;font-size:11px;font-style:normal;line-height:1.35;overflow-wrap:anywhere}.leaderboardLink{margin-top:auto;padding-top:13px;border-top:1px solid #eee8dc;color:#0a3d31;font-size:11px;font-weight:800;text-decoration:none}.leaderboardLink:hover{text-decoration:underline}.dense{gap:9px}.dense .card{min-height:112px;padding:13px 15px;border-radius:15px}.dense .card>strong{margin:8px 0 3px}.dense .leaderboardLink{padding-top:8px}@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.grid{grid-template-columns:1fr}.card{min-height:165px}.dense .card{min-height:105px}}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.card {
+  min-height: 190px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ded8c9;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(7, 52, 41, .05);
+}
+
+.card > span {
+  color: #8d6b22;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.card > strong {
+  margin: 13px 0 7px;
+  color: #0a3d31;
+  font-family: Georgia, serif;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.card > b {
+  margin-bottom: 6px;
+  color: #33413c;
+  font-size: 13px;
+}
+
+.card > small {
+  color: #747c79;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.holders {
+  margin-bottom: 10px;
+  display: grid;
+  gap: 9px;
+}
+
+.holders > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.holders b {
+  color: #33413c;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.holders em,
+.holders small {
+  color: #747c79;
+  font-size: 11px;
+  font-style: normal;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.leaderboardLink {
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px solid #eee8dc;
+  color: #0a3d31;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.leaderboardLink:hover {
+  text-decoration: underline;
+}
+
+.dense {
+  gap: 9px;
+}
+
+.dense .card {
+  min-height: 112px;
+  padding: 13px 15px;
+  border-radius: 15px;
+}
+
+.dense .card > strong {
+  margin: 8px 0 3px;
+}
+
+.dense .leaderboardLink {
+  padding-top: 8px;
+}
+
+/* Career Profile density is intentionally scoped so frozen History cards keep
+   their approved layout. */
+.career {
+  gap: 8px;
+}
+
+.career .card {
+  min-height: 92px;
+  padding: 11px 13px;
+  border-radius: 14px;
+}
+
+.career .card > span {
+  font-size: 10px;
+  letter-spacing: .1em;
+  line-height: 1.3;
+}
+
+.career .card > strong {
+  margin: 7px 0 3px;
+  font-size: clamp(1.55rem, 5vw, 1.9rem);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: 165px;
+  }
+
+  .dense .card {
+    min-height: 105px;
+  }
+
+  .career {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .career .card {
+    min-height: 88px;
+  }
+}
