@@ -230,7 +230,8 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   const historyScorecardParity = variant === "historical" &&
     historyYear >= 2023 && historyYear <= 2025 &&
     scorecards.length > 0;
-  const completedHistoryMatchupCleanup = completedHistoryCompact && [2023, 2024, 2025].includes(historyYear);
+  const completedHistoryMatchupCleanup = completedHistoryCompact && [2023, 2024, 2025].includes(historyYear) ||
+    completedHistoryCompact && historyYear >= 2017 && historyYear <= 2022;
   const showCompletedHistoricalNineHoleSegments = match.format !== "SI" ||
     (historyYear === 2023 && match.id === "2023-R3-7");
   const completedHistoricalSegmentParticipant = (winner) => {
@@ -264,7 +265,10 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     const sideOneLabel = (match.team1Players || []).map((player) => player?.name).filter(Boolean).join(" and ");
     const sideTwoLabel = (match.team2Players || []).map((player) => player?.name).filter(Boolean).join(" and ");
     const participantLabel = `${sideOneLabel} versus ${sideTwoLabel}`;
-    const pointsLabel = `${tournament.teamOne.name} ${formatTeamPoints(match.team1Points)}, ${tournament.teamTwo.name} ${formatTeamPoints(match.team2Points)}`;
+    const hasCompletePointAllocation = hasValue(match.team1Points) && hasValue(match.team2Points);
+    const pointsLabel = hasCompletePointAllocation
+      ? `${tournament.teamOne.name} ${formatTeamPoints(match.team1Points)}, ${tournament.teamTwo.name} ${formatTeamPoints(match.team2Points)}`
+      : "Team points not recorded";
 
     return <article className={`${styles.matchCard} ${styles.historicalFinalCard}`} id={match.id ? `match-${match.id}` : undefined} style={cardStyle} data-match-state="final" aria-label={`Match ${match.match}, Final. ${participantLabel}. ${finalResult}. ${pointsLabel}.`}>
       <header className={styles.historicalFinalHeader}>
@@ -291,7 +295,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       <div className={styles.historicalFinalResult}>
         <span>Final result</span>
         <strong>{finalResult}</strong>
-        <small>{tournament.teamOne.name} {formatTeamPoints(match.team1Points)} <i aria-hidden="true">—</i> {formatTeamPoints(match.team2Points)} {tournament.teamTwo.name}</small>
+        {hasCompletePointAllocation ? <small>{tournament.teamOne.name} {formatTeamPoints(match.team1Points)} <i aria-hidden="true">—</i> {formatTeamPoints(match.team2Points)} {tournament.teamTwo.name}</small> : <small>Team points not recorded</small>}
       </div>
 
       <ScorecardTable

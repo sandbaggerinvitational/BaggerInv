@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { refreshHistoricalData } from "../../../../../lib/stats";
+import { refreshCanonical2017To2022HistoricalData, refreshHistoricalData } from "../../../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "../../../../components";
@@ -23,6 +23,7 @@ import HistoryUnavailablePage from "../../../HistoryUnavailable";
 import pwaStyles from "../../../history-participant.module.css";
 import HistoryBackToTop from "../../../HistoryBackToTop";
 import HistoryNavigation from "../../../HistoryNavigation";
+import { isStep3CCompletedHistoryYear } from "../../../../../lib/history-2017-2022-migration";
 
 function roundStatusLabel(value) {
   if (value === "FINAL") return "Final";
@@ -48,8 +49,14 @@ export async function generateMetadata({ params }) {
       team = null;
     }
   } else {
-    await refreshHistoricalData();
-    team = getTeamSeason(year, decodedSide);
+    try {
+      await (isStep3CCompletedHistoryYear(year)
+        ? refreshCanonical2017To2022HistoricalData()
+        : refreshHistoricalData());
+      team = getTeamSeason(year, decodedSide);
+    } catch {
+      team = null;
+    }
   }
 
   const title = team
@@ -92,7 +99,16 @@ export default async function TeamSeasonPage({ params }) {
       return <HistoryUnavailablePage year={year} section="Team History" />;
     }
   } else {
-    await refreshHistoricalData();
+    try {
+      await (isStep3CCompletedHistoryYear(year)
+        ? refreshCanonical2017To2022HistoricalData()
+        : refreshHistoricalData());
+    } catch {
+      if (isStep3CCompletedHistoryYear(year)) {
+        return <HistoryUnavailablePage year={year} section="Team History" />;
+      }
+      throw new Error(`Unable to load ${year} Team History.`);
+    }
     team = getTeamSeason(year, decodedSide);
   }
 

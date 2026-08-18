@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import {
+  refreshCanonical2017To2022HistoricalData,
   refreshCanonical2023HistoricalData,
   refreshCanonical2024HistoricalData,
   refreshHistoricalData,
@@ -23,6 +24,7 @@ import styles from "../../../../historical.module.css";
 import { formatTeamPoints } from "../../../../../lib/formatters";
 import { pageMetadata } from "../../../../../lib/seo";
 import {
+  loadCanonical2017To2022HistoryAnalytics,
   loadCanonical2023HistoryAnalytics,
   loadCanonical2024HistoryAnalytics,
   loadLegacyHistoryAnalytics,
@@ -66,6 +68,7 @@ import {
   selectCanonical2023IndividualStatisticScorecards,
   selectCanonical2023NetPresentationScorecards,
 } from "../../../../../lib/history-2023-projection";
+import { isStep3CCompletedHistoryYear } from "../../../../../lib/history-2017-2022-migration";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -85,12 +88,18 @@ export async function generateMetadata({ params }) {
       archive = null;
     }
   } else {
-    await (Number(year) === 2023
-      ? refreshCanonical2023HistoricalData()
-      : Number(year) === 2024
-        ? refreshCanonical2024HistoricalData()
-        : refreshHistoricalData());
-    archive = getHistoricalRound(year, round);
+    try {
+      await (isStep3CCompletedHistoryYear(year)
+        ? refreshCanonical2017To2022HistoricalData()
+        : Number(year) === 2023
+          ? refreshCanonical2023HistoricalData()
+          : Number(year) === 2024
+            ? refreshCanonical2024HistoricalData()
+            : refreshHistoricalData());
+      archive = getHistoricalRound(year, round);
+    } catch {
+      archive = null;
+    }
   }
 
   const title = archive
@@ -131,18 +140,30 @@ export default async function HistoricalRoundPage({ params }) {
       );
     }
   } else {
+    const canonical2017To2022 = isStep3CCompletedHistoryYear(year);
     const canonical2023 = Number(year) === 2023;
     const canonical2024 = Number(year) === 2024;
-    const scorecardAnalyticsPromise = canonical2023
-      ? loadCanonical2023HistoryAnalytics()
-      : canonical2024
-        ? loadCanonical2024HistoryAnalytics()
-        : loadLegacyHistoryAnalytics();
-    await (canonical2023
-      ? refreshCanonical2023HistoricalData()
-      : canonical2024
-        ? refreshCanonical2024HistoricalData()
-        : refreshHistoricalData());
+    const scorecardAnalyticsPromise = canonical2017To2022
+      ? loadCanonical2017To2022HistoryAnalytics()
+      : canonical2023
+        ? loadCanonical2023HistoryAnalytics()
+        : canonical2024
+          ? loadCanonical2024HistoryAnalytics()
+          : loadLegacyHistoryAnalytics();
+    try {
+      await (canonical2017To2022
+        ? refreshCanonical2017To2022HistoricalData()
+        : canonical2023
+          ? refreshCanonical2023HistoricalData()
+          : canonical2024
+            ? refreshCanonical2024HistoricalData()
+            : refreshHistoricalData());
+    } catch {
+      if (canonical2017To2022) {
+        return <HistoryUnavailablePage year={year} section={`Round ${round} History`} />;
+      }
+      throw new Error(`Unable to load ${year} Round ${round} History.`);
+    }
     archive = getHistoricalRound(year, round);
     scorecardAnalytics = await scorecardAnalyticsPromise;
   }
@@ -152,7 +173,9 @@ export default async function HistoricalRoundPage({ params }) {
   const completed2024 = !useSupabase2026 && Number(archive.year) === 2024;
   const completed2025 = !useSupabase2026 && Number(archive.year) === 2025;
   const completedHistoryMaster = completed2023 || completed2024 || completed2025;
-  const canonicalFormat = completedHistoryMaster && archive.format === "BB"
+  const completedStep3C = !useSupabase2026 && isStep3CCompletedHistoryYear(archive.year);
+  const completedHistoryPresentation = completedHistoryMaster || completedStep3C;
+  const canonicalFormat = completedHistoryPresentation && archive.format === "BB"
     ? "Best Ball"
     : getFormatName(archive.format);
   const canonical2023RoundScorecards = completed2023
@@ -400,6 +423,7 @@ export default async function HistoricalRoundPage({ params }) {
     hardestHole: hardestHoleStatisticItem,
     easiestHole: easiestHoleStatisticItem,
   });
+  const frozenCompletedHistoryRoundStatisticItems = completedHistoryMaster ? completedHistoryRoundStatisticItems : legacyHistoricalRoundStatisticItems;
   const roundStatisticItems = useSupabase2026 ? [
     ...(showLowestRound ? [lowestRoundStatisticItem] : []),
     lowestFrontNineStatisticItem,
@@ -409,7 +433,7 @@ export default async function HistoricalRoundPage({ params }) {
     ...(showLowestTeamRound ? [lowestTeamRoundStatisticItem] : []),
     hardestHoleStatisticItem,
     easiestHoleStatisticItem,
-  ] : completedHistoryMaster ? completedHistoryRoundStatisticItems : legacyHistoricalRoundStatisticItems;
+  ] : completedStep3C ? completedHistoryRoundStatisticItems : frozenCompletedHistoryRoundStatisticItems;
   const applicableRoundStatisticItems = roundStatisticItems.filter((item) =>
     item.value !== "—" && !/^Based on 0 recorded/i.test(String(item.sample || ""))
   );
@@ -505,7 +529,7 @@ export default async function HistoricalRoundPage({ params }) {
           </div>
 
           <div className={`${styles.roundArchiveWinner} ${useSupabase2026 ? pwaStyles.roundScoreWinner : ""}`}>
-            <span>{archive.roundWinner === "In Progress" ? "Round Status" : completedHistoryMaster && archive.roundWinner === "Halved" ? "Round Result" : "Round Winner"}</span>
+            <span>{archive.roundWinner === "In Progress" ? "Round Status" : completedHistoryPresentation && (archive.roundWinner === "Halved" || archive.roundWinner === "Not recorded") ? "Round Result" : "Round Winner"}</span>
             <strong>{archive.roundWinner}</strong>
           </div>
 
@@ -525,7 +549,7 @@ export default async function HistoricalRoundPage({ params }) {
             No matchups have been recorded for this round.
           </div>
         ) : (
-          <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""} ${completedHistoryMaster ? completedRoundStyles.matchList : ""}`}>
+          <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""} ${completedHistoryPresentation ? completedRoundStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
               useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} /> : completed2023 ? <PublicMatchCard
                 key={match.id}
@@ -536,7 +560,17 @@ export default async function HistoricalRoundPage({ params }) {
                 scorecards={scorecardCoverageForMatch(match.id)?.state !== "NONE" ? displayScorecardsForMatch(match.id) : []}
                 scorecardCoverage={scorecardCoverageForMatch(match.id)}
                 historyDensity
-                completedHistoryCompact={completedHistoryMaster}
+                completedHistoryCompact={completedHistoryPresentation}
+              /> : completedStep3C ? <PublicMatchCard
+                key={match.id}
+                match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
+                round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }}
+                tournament={archive}
+                variant="historical"
+                scorecards={scorecardCoverageForMatch(match.id)?.state !== "NONE" ? displayScorecardsForMatch(match.id) : []}
+                scorecardCoverage={scorecardCoverageForMatch(match.id)}
+                historyDensity
+                completedHistoryCompact={completedHistoryPresentation}
               /> : <PublicMatchCard
                 key={match.id}
                 match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
@@ -552,6 +586,13 @@ export default async function HistoricalRoundPage({ params }) {
         )}
 
         {completedHistoryMaster ? (applicableRoundStatisticItems.length ? <section className={styles.section}>
+          <span className={styles.sectionLabel}>Round Insights</span>
+          <h2>Round Statistics</h2>
+          <details className={completedRoundStyles.statistics}>
+            <summary>View Round Statistics <span aria-hidden="true">⌄</span></summary>
+            <div><ScoringStatGrid items={applicableRoundStatisticItems} /></div>
+          </details>
+        </section> : null) : completedStep3C ? (applicableRoundStatisticItems.length ? <section className={styles.section}>
           <span className={styles.sectionLabel}>Round Insights</span>
           <h2>Round Statistics</h2>
           <details className={completedRoundStyles.statistics}>

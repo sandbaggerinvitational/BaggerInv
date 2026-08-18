@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { refreshCanonical2023HistoricalData, refreshHistoricalData } from "../../../lib/stats";
+import { refreshCanonical2017To2022HistoricalData, refreshCanonical2023HistoricalData, refreshHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "../../components";
@@ -27,6 +27,7 @@ import TournamentLeaderboard from "../../TournamentLeaderboard";
 import StatusBadge from "../../StatusBadge";
 import { getDraftByYear } from "../../../lib/draft";
 import {
+  loadCanonical2017To2022HistoryAnalytics,
   loadCanonical2023HistoryAnalytics,
   loadCanonical2024HistoryAnalytics,
   loadLegacyHistoryAnalytics,
@@ -71,6 +72,10 @@ import {
   historyStandingsSummary,
   historyTournamentComplete,
 } from "../../../lib/history-presentation";
+import {
+  isStep3CCompletedHistoryYear,
+  projectStep3CTournamentFinal,
+} from "../../../lib/history-2017-2022-migration";
 
 export async function generateMetadata({ params }) {
   const { year } = await params;
@@ -85,8 +90,16 @@ export async function generateMetadata({ params }) {
       tournament = null;
     }
   } else {
-    await (Number(year) === 2023 ? refreshCanonical2023HistoricalData() : refreshHistoricalData());
-    tournament = getTournament(year);
+    try {
+      await (isStep3CCompletedHistoryYear(year)
+        ? refreshCanonical2017To2022HistoricalData()
+        : Number(year) === 2023
+          ? refreshCanonical2023HistoricalData()
+          : refreshHistoricalData());
+      tournament = getTournament(year);
+    } catch {
+      tournament = null;
+    }
   }
 
   return pageMetadata({
@@ -179,6 +192,7 @@ function CompletedYearOverview({
   scorecards,
   matches,
   records = null,
+  evidenceGatedSections = false,
 }) {
   const standings = historyStandingsSummary(leaderboard, 5);
   const scoreParts = String(tournament["Final Score"] ?? "")
@@ -204,6 +218,7 @@ function CompletedYearOverview({
     (item) => !defaultRecordLabels.includes(item.label)
   );
   const structuredCompletedHolders = [2023, 2024, 2025].includes(Number(tournament.year));
+  const linkHistoricalPlayers = !evidenceGatedSections;
   const renderRecord = (item, compact = false) => {
     const holderContexts = structuredCompletedHolders ? completedRecordHolderContexts(item) : [];
     const birdieRecord = item.label === "Birdie Leader";
@@ -240,7 +255,7 @@ function CompletedYearOverview({
     const rank = row.tournamentRank || row.rank;
     return <div className={`${pwaStyles.standingsRow} ${completedStyles.standingRow}`} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss", "losses")}, ${standingsCountLabel(row.halves, "tie")}, ${formatPlayerPoints(row.points)} points`}>
       <strong>{rank}</strong>
-      <span>{player.slug ? <Link href={`/players/${player.slug}`}>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></Link> : <>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></>}</span>
+      <span>{linkHistoricalPlayers && player.slug ? <Link href={`/players/${player.slug}`}>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></Link> : <>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></>}</span>
       <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
     </div>;
   };
@@ -319,7 +334,7 @@ function CompletedYearOverview({
       </details>
     </section>
 
-    <section className={pwaStyles.overviewSection} data-completed-records aria-labelledby="completed-records-heading">
+    {(!evidenceGatedSections || allRecords.length) ? <section className={pwaStyles.overviewSection} data-completed-records aria-labelledby="completed-records-heading">
       <span className={styles.sectionLabel}>Records</span>
       <h2 id="completed-records-heading">Tournament Records</h2>
       <div className={completedStyles.recordGrid}>{defaultRecords.map((item) => renderRecord(item))}</div>
@@ -327,9 +342,9 @@ function CompletedYearOverview({
         <summary><span className={completedStyles.closedLabel}>View All Tournament Records</span><span className={completedStyles.openLabel}>Hide Tournament Records</span></summary>
         <div className={completedStyles.recordList}>{remainingRecords.map((item) => renderRecord(item, true))}</div>
       </details> : null}
-    </section>
+    </section> : null}
 
-    <section className={pwaStyles.overviewSection} data-completed-honors aria-labelledby="completed-honors-heading">
+    {(!evidenceGatedSections || tournament.awards.length) ? <section className={pwaStyles.overviewSection} data-completed-honors aria-labelledby="completed-honors-heading">
       <span className={styles.sectionLabel}>Honors</span>
       <h2 id="completed-honors-heading">Tournament Honors</h2>
       <div className={completedStyles.honorList}>
@@ -338,7 +353,7 @@ function CompletedYearOverview({
           <strong>{award.winnerPlayer?.["Display Name"] || award.Winner}</strong>
         </article>) : <article><span>Sandbagger of the Year</span><strong>Not awarded</strong></article>}
       </div>
-    </section>
+    </section> : null}
   </div>;
 }
 
@@ -429,6 +444,7 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
 export default async function TournamentYearPage({ params }) {
   const { year } = await params;
   const useSupabase2026 = isSupabaseHistory2026(year);
+  const step3CCompletedYear = isStep3CCompletedHistoryYear(year);
   let tournament;
   let roundPoints;
   let leaderboardRows;
@@ -464,12 +480,25 @@ export default async function TournamentYearPage({ params }) {
       );
     }
   } else {
-    const scorecardAnalyticsPromise = Number(year) === 2023
-      ? loadCanonical2023HistoryAnalytics()
-      : Number(year) === 2024
-        ? loadCanonical2024HistoryAnalytics()
-        : loadLegacyHistoryAnalytics();
-    await (Number(year) === 2023 ? refreshCanonical2023HistoricalData() : refreshHistoricalData());
+    const scorecardAnalyticsPromise = step3CCompletedYear
+      ? loadCanonical2017To2022HistoryAnalytics()
+      : Number(year) === 2023
+        ? loadCanonical2023HistoryAnalytics()
+        : Number(year) === 2024
+          ? loadCanonical2024HistoryAnalytics()
+          : loadLegacyHistoryAnalytics();
+    try {
+      await (step3CCompletedYear
+        ? refreshCanonical2017To2022HistoricalData()
+        : Number(year) === 2023
+          ? refreshCanonical2023HistoricalData()
+          : refreshHistoricalData());
+    } catch {
+      if (step3CCompletedYear) {
+        return <HistoryUnavailablePage year={year} section="Tournament History" />;
+      }
+      throw new Error(`Unable to load ${year} History.`);
+    }
     tournament = getTournament(year);
     if (!tournament) notFound();
     roundPoints = getTournamentRoundPoints(year);
@@ -515,6 +544,17 @@ export default async function TournamentYearPage({ params }) {
     }
     : scoringStatistics;
   const tournamentMatches = useSupabase2026 ? [] : getTournamentMatches(year);
+  if (step3CCompletedYear) {
+    const pointProjection = projectStep3CTournamentFinal({
+      year: Number(year),
+      tournament,
+      matches: tournamentMatches,
+    });
+    if (pointProjection.applied) {
+      tournament = pointProjection.tournament;
+      status = tournamentStatus(tournament);
+    }
+  }
   if (Number(tournament?.year) === 2023) {
     const pointProjection = projectCanonical2023TournamentFinal({
       tournament,
@@ -628,11 +668,16 @@ export default async function TournamentYearPage({ params }) {
   const useCompleted2024 = !useSupabase2026 && Number(tournament.year) === 2024;
   const useCompleted2025 = !useSupabase2026 && Number(tournament.year) === 2025;
   const useCompletedMaster = useCompleted2023 || useCompleted2024 || useCompleted2025;
+  const useStep3CCompletedMaster = !useSupabase2026 && step3CCompletedYear;
+  const useFrozenCompletedPresentation = useCompletedMaster || useStep3CCompletedMaster;
   return (
     <main>
       <Header />
 
-      <section className={`${styles.tournamentHero} ${useSupabase2026 || useCompletedMaster ? pwaStyles.currentTournamentHero : ""} ${useCompletedMaster ? completedStyles.hero : ""}`} data-completed-prototype={useCompletedMaster ? String(tournament.year) : undefined}>
+      <section className={`${styles.tournamentHero} ${useSupabase2026 || useCompletedMaster ? pwaStyles.currentTournamentHero : useStep3CCompletedMaster ? pwaStyles.currentTournamentHero : ""} ${useFrozenCompletedPresentation ? completedStyles.hero : ""}`}
+        data-completed-prototype={useCompletedMaster ? String(tournament.year) : undefined}
+        data-step3c-completed-prototype={useStep3CCompletedMaster ? String(tournament.year) : undefined}
+      >
         <AssetImage
           src={historyHeroPath(tournament)}
           alt={`${tournament.year} ${tournament.Destination}`}
@@ -648,7 +693,7 @@ export default async function TournamentYearPage({ params }) {
         />
         <div className={styles.tournamentHeroOverlay} />
 
-        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 || useCompletedMaster ? pwaStyles.currentTournamentHeroContent : ""} ${useCompletedMaster ? completedStyles.heroContent : ""}`}>
+        <div className={`${styles.tournamentHeroContent} ${useSupabase2026 || useCompletedMaster ? pwaStyles.currentTournamentHeroContent : useStep3CCompletedMaster ? pwaStyles.currentTournamentHeroContent : ""} ${useFrozenCompletedPresentation ? completedStyles.heroContent : ""}`}>
           {tournament.logoFileName ? (
             <AssetImage
               src={tournamentLogo(tournament.logoFileName)}
@@ -663,7 +708,7 @@ export default async function TournamentYearPage({ params }) {
               decoding="async"
             />
           ) : null}
-          <p>{useCompletedMaster ? historyEditionLabel(tournament.year) : tournament.editionTitle}</p>
+          <p>{useFrozenCompletedPresentation ? historyEditionLabel(tournament.year) : tournament.editionTitle}</p>
           <h1>{tournament.year}</h1>
           <h2>{tournament.Destination}</h2>
           <span>{tournament.Dates}</span>
@@ -708,7 +753,7 @@ export default async function TournamentYearPage({ params }) {
             <strong>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `${tournament.championTeam.name} champions` : "Tournament complete") : "2026 tournament record"}</strong>
             <p>{historyTournamentComplete(tournament) ? (tournament.championTeam?.name ? `Official final: ${tournament["Final Score"]}` : "The official champion is pending canonical tournament resolution.") : "Final results and scorecards appear here as matches become official."}</p>
           </div>
-        </div> : useCompletedMaster ? null : <div className={styles.finalScoreCard}>
+        </div> : useStep3CCompletedMaster ? null : useCompletedMaster ? null : <div className={styles.finalScoreCard}>
           <div>
             <span>Champions</span>
             <strong>
@@ -734,6 +779,14 @@ export default async function TournamentYearPage({ params }) {
           scorecards={completed2023Scorecards.length ? completed2023Scorecards : tournamentScorecards}
           matches={tournamentMatches}
           records={completed2023Records || completed2024Records}
+        /> : useStep3CCompletedMaster ? <CompletedYearOverview
+          tournament={tournament}
+          leaderboard={leaderboard}
+          pointsTracked={pointsTracked}
+          scorecards={completed2023Scorecards.length ? completed2023Scorecards : tournamentScorecards}
+          matches={tournamentMatches}
+          records={[]}
+          evidenceGatedSections
         /> : useSupabase2026 ? <CurrentHistoryOverview
           tournament={tournament}
           roundPoints={roundPoints}
