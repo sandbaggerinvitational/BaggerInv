@@ -39,8 +39,8 @@ export function LeaderboardRank({ rank }) {
   </strong>;
 }
 
-export function LeaderboardPlayer({ name, slug, photo, compact = false }) {
-  const label = slug ? <Link href={`/players/${slug}`}>{name}</Link> : <strong>{name}</strong>;
+export function LeaderboardPlayer({ name, slug, photo, compact = false, linked = true }) {
+  const label = linked && slug ? <Link href={`/players/${slug}`}>{name}</Link> : <strong>{name}</strong>;
   return <span className={styles.player} data-compact={compact ? "true" : undefined}>
     <span className={styles.avatar}>
       <PlayerAvatar

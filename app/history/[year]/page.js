@@ -14,6 +14,7 @@ import {
   formatHandicap,
   getAdjacentTournamentYears,
   getFormatName,
+  getPlayerBySlug,
   getTournament,
   getTournamentMatches,
   getTournamentPlayerLeaderboard,
@@ -21,7 +22,11 @@ import {
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { formatPlayerPoints } from "../../../lib/formatters";
-import { historicalPlayerProfileHref } from "../../../lib/context-navigation";
+import {
+  historicalPlayerProfileHref,
+  isCompletedHistoryPlayerYear,
+  playerOriginReturnContext,
+} from "../../../lib/context-navigation";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
@@ -77,6 +82,7 @@ import {
   isStep3CCompletedHistoryYear,
   projectStep3CTournamentFinal,
 } from "../../../lib/history-2017-2022-migration";
+import PlayerProfileReturnNavigation from "../../PlayerProfileReturnNavigation";
 
 export async function generateMetadata({ params }) {
   const { year } = await params;
@@ -442,8 +448,9 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
   </div>;
 }
 
-export default async function TournamentYearPage({ params }) {
+export default async function TournamentYearPage({ params, searchParams }) {
   const { year } = await params;
+  const query = await searchParams;
   const useSupabase2026 = isSupabaseHistory2026(year);
   const step3CCompletedYear = isStep3CCompletedHistoryYear(year);
   let tournament;
@@ -671,6 +678,9 @@ export default async function TournamentYearPage({ params }) {
   const useCompletedMaster = useCompleted2023 || useCompleted2024 || useCompleted2025;
   const useStep3CCompletedMaster = !useSupabase2026 && step3CCompletedYear;
   const useFrozenCompletedPresentation = useCompletedMaster || useStep3CCompletedMaster;
+  const playerReturnContext = isCompletedHistoryPlayerYear(tournament.year)
+    ? playerOriginReturnContext(query, getPlayerBySlug)
+    : null;
   return (
     <main>
       <Header />
@@ -715,6 +725,8 @@ export default async function TournamentYearPage({ params }) {
           <span>{tournament.Dates}</span>
         </div>
       </section>
+
+      <PlayerProfileReturnNavigation context={playerReturnContext} />
 
       <HistoryNavigation
         ariaLabel={`${tournament.year} tournament year navigation`}

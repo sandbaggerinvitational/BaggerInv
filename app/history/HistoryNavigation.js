@@ -14,6 +14,7 @@ function Destination({ destination, position }) {
       className={styles.destination}
       data-position={position}
       href={destination.href}
+      prefetch={destination.prefetch}
     >
       {destination.detail ? (
         <>

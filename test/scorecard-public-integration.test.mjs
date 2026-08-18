@@ -31,7 +31,8 @@ test("Phase 2 public pages consume the shared scorecard analytics service", asyn
   assert.doesNotMatch(sources.course, /loadScorecardAnalytics/);
   assert.match(sources.hole, /Hole Statistics/);
   assert.match(sources.records, /Scoring Records/);
-  assert.match(sources.playerHistory, /ScorecardTable/);
+  assert.doesNotMatch(sources.playerHistory, /ScorecardTable/);
+  assert.match(sources.playerHistory, /View Match →/);
 });
 
 test("public scorecards are collapsed, mapped, responsive, and silent when missing", async () => {

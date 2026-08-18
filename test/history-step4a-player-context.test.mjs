@@ -6,6 +6,9 @@ import {
   historicalPlayerProfileHref,
   historicalPlayerReturnContext,
   isCompletedHistoryPlayerYear,
+  playerOriginReturnContext,
+  playerOriginSlug,
+  withPlayerOriginContext,
 } from "../lib/context-navigation.js";
 import {
   COMPLETED_CAREER_HISTORY_YEARS,
@@ -53,6 +56,34 @@ test("completed History player context is explicit, deterministic, and limited t
   assert.equal(historicalPlayerReturnContext({ from: "history", year: "2026" }), null);
   assert.equal(historicalPlayerReturnContext({ from: "history", year: "9999" }), null);
   assert.equal(historicalPlayerReturnContext({ from: "browse", year: "2023" }), null);
+});
+
+test("Player-origin context is canonical, query-safe, refresh-safe, and fail-closed", () => {
+  const player = {
+    "Player ID": "P-1",
+    "Display Name": "Clay Beltran",
+    slug: "clay-beltran",
+  };
+  const resolvePlayer = (slug) => slug === player.slug ? player : null;
+
+  assert.equal(playerOriginSlug({ from: "player", player: "Clay-Beltran" }), "clay-beltran");
+  assert.equal(playerOriginSlug({ from: "player", player: "<script>" }), "");
+  assert.equal(playerOriginSlug({ from: "history", player: "clay-beltran" }), "");
+  assert.equal(
+    withPlayerOriginContext("/history/2025/round/1?view=matches#match-2025-R1-1", player.slug),
+    "/history/2025/round/1?view=matches&from=player&player=clay-beltran#match-2025-R1-1"
+  );
+  assert.equal(withPlayerOriginContext("https://example.com/history/2025", player.slug), "https://example.com/history/2025");
+  assert.deepEqual(playerOriginReturnContext({ from: "player", player: player.slug }, resolvePlayer), {
+    slug: player.slug,
+    playerId: player["Player ID"],
+    name: player["Display Name"],
+    href: "/players/clay-beltran",
+    label: "Clay Beltran Profile",
+    accessibleLabel: "Back to Clay Beltran Profile",
+  });
+  assert.equal(playerOriginReturnContext({ from: "player", player: "unknown-player" }, resolvePlayer), null);
+  assert.equal(playerOriginReturnContext({ from: "player", player: "other-player" }, () => player), null);
 });
 
 test("Career authority replaces only frozen completed-year rows and preserves current 2026 identity", () => {
@@ -145,8 +176,11 @@ test("History-context navigation takes precedence without changing normal profil
   assert.match(profile, /refreshCanonicalCareerHistoricalData/);
   assert.match(profile, /loadCanonicalCareerScorecardAnalytics/);
   assert.match(profile, /const historyReturnContext = historicalPlayerReturnContext\(query\)/);
-  assert.match(profile, /href=\{historyReturnContext\?\.href \|\| \(participantIdentity \? "\/home" : playerDirectoryReturnHref\)\}/);
-  assert.match(profile, /label=\{historyReturnContext\?\.label \|\| \(participantIdentity \? "Back to My Tournament" : "Back to All Sandbaggers"\)\}/);
+  assert.match(profile, /const primaryNavigation = historyReturnContext/);
+  assert.match(profile, /<HistoryNavigation/);
+  assert.match(profile, /left=\{primaryNavigation\}/);
+  assert.match(profile, /right=\{browseNavigation\}/);
+  assert.doesNotMatch(profile, /<ContextBackLink/);
   assert.match(profile, /path: `\/players\/\$\{slug\}`/);
   assert.doesNotMatch(profile, /history\.back|router\.back|window\.history/);
 });
@@ -155,7 +189,8 @@ test("Tournament History links completed years, preserves current 2026, and expo
   assert.match(intelligenceUi, /isCompletedHistoryPlayerYear\(season\.year\)/);
   assert.match(intelligenceUi, /const currentTournamentYear = Number\(season\.year\) === 2026/);
   assert.match(intelligenceUi, /const linkedTournamentYear = completedHistoryYear \|\| currentTournamentYear/);
-  assert.match(intelligenceUi, /href=\{`\/history\/\$\{season\.year\}`\}/);
+  assert.match(intelligenceUi, /withPlayerOriginContext\(`\/history\/\$\{season\.year\}`, playerSlug\)/);
+  assert.match(intelligenceUi, /href=\{historyHref\}/);
   assert.match(intelligenceUi, /prefetch=\{false\}/);
   assert.match(intelligenceUi, /View \$\{playerName\}'s current \$\{season\.year\} Tournament/);
   assert.match(intelligenceUi, /!season\.pointsRecorded \? "—" : formatPlayerPoints\(season\.points\)/);

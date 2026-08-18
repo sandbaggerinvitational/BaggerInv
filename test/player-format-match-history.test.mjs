@@ -18,6 +18,9 @@ test("player format history uses accessible nested accordions and compact match 
   assert.match(source, /history\.latestYear/);
   assert.match(source, /Represented \{match\.team\.name\}/);
   assert.match(source, /View Match →/);
+  assert.match(source, /withPlayerOriginContext\(match\.href, playerSlug\)/);
+  assert.match(source, /prefetch=\{false\}/);
+  assert.doesNotMatch(source, /ScorecardTable|scorecardsByMatch|profileMatchScorecard/);
 });
 
 test("format history joins matches by stable player IDs and exposes reconciliation state", async () => {

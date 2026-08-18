@@ -8,6 +8,7 @@ import PublicMatchCard from "../../../../PublicMatchCard";
 import {
   formatHandicap,
   getFormatName,
+  getPlayerBySlug,
   getTeamSeason,
 } from "../../../../../lib/stats";
 import { formatTeamPoints } from "../../../../../lib/formatters";
@@ -24,6 +25,11 @@ import pwaStyles from "../../../history-participant.module.css";
 import HistoryBackToTop from "../../../HistoryBackToTop";
 import HistoryNavigation from "../../../HistoryNavigation";
 import { isStep3CCompletedHistoryYear } from "../../../../../lib/history-2017-2022-migration";
+import {
+  isCompletedHistoryPlayerYear,
+  playerOriginReturnContext,
+} from "../../../../../lib/context-navigation";
+import PlayerProfileReturnNavigation from "../../../../PlayerProfileReturnNavigation";
 
 function roundStatusLabel(value) {
   if (value === "FINAL") return "Final";
@@ -71,8 +77,9 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default async function TeamSeasonPage({ params }) {
+export default async function TeamSeasonPage({ params, searchParams }) {
   const { year, side } = await params;
+  const query = await searchParams;
   const decodedSide = decodeURIComponent(side);
   const useSupabase2026 = isSupabaseHistory2026(year);
   let team;
@@ -113,6 +120,9 @@ export default async function TeamSeasonPage({ params }) {
   }
 
   if (!team) notFound();
+  const playerReturnContext = isCompletedHistoryPlayerYear(team.year)
+    ? playerOriginReturnContext(query, getPlayerBySlug)
+    : null;
 
   return (
     <main>
@@ -133,6 +143,8 @@ export default async function TeamSeasonPage({ params }) {
         </p>
         </div>
       </section>
+
+      <PlayerProfileReturnNavigation context={playerReturnContext} />
 
       <HistoryNavigation
         ariaLabel={`${team.year} team history navigation`}

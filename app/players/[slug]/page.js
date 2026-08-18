@@ -2,8 +2,7 @@ export const dynamic = "force-dynamic";
 import { refreshCanonicalCareerHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header, Footer } from "../../components";
-import ContextBackLink from "../../ContextBackLink";
+import HistoryNavigation from "../../history/HistoryNavigation";
 import PlayerAvatar from "../../PlayerAvatar";
 import { CareerHonors } from "../../HonorBadges";
 import { playerPhoto } from "../../../lib/asset-paths";
@@ -22,13 +21,13 @@ import { formatPlayerCareerYears } from "../../../lib/player-career";
 import {
   historicalPlayerReturnContext,
   safePlayerDirectoryReturnHref,
+  withPlayerOriginContext,
 } from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
 import { getDrafts } from "../../../lib/draft";
 import { getPlayerDraftHistory } from "../../../lib/draft-analytics";
 import { loadCanonicalCareerScorecardAnalytics } from "../../../lib/scorecard-data";
-import { filterScorecards } from "../../../lib/scorecard-analytics";
 import { buildPlayerIntelligence } from "../../../lib/player-intelligence";
 import PlayerIntelligenceSections from "./PlayerIntelligenceSections";
 import { cookies } from "next/headers";
@@ -147,36 +146,38 @@ export default async function PlayerPage({ params, searchParams }) {
     scorecards: careerScorecards,
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
   });
-  const playerMatchIds = new Set(
-    Object.values(formatMatchHistory).flatMap((history) => history.matches.map((match) => match.id))
-  );
-  const scorecardsByMatch = Object.fromEntries(
-    [...playerMatchIds].map((matchId) => [
-      matchId,
-      filterScorecards(careerScorecards, { matchId }),
-    ])
-  );
-
-  const compareHref = rival
-    ? `/compare?player1=${encodeURIComponent(
-        player["Player ID"]
-      )}&player2=${encodeURIComponent(rival.player["Player ID"])}`
-    : "/compare";
+  const primaryNavigation = historyReturnContext
+    ? {
+        href: historyReturnContext.href,
+        label: historyReturnContext.label,
+        direction: "left",
+        ariaLabel: historyReturnContext.accessibleLabel,
+        prefetch: false,
+      }
+    : {
+        href: participantIdentity ? "/home" : playerDirectoryReturnHref,
+        label: participantIdentity ? "My Tournament" : "All Sandbaggers",
+        direction: "left",
+        ariaLabel: participantIdentity ? "Back to My Tournament" : "Back to All Sandbaggers",
+        prefetch: false,
+      };
+  const browseNavigation = historyReturnContext || participantIdentity
+    ? {
+        href: playerDirectoryReturnHref,
+        label: "Browse All Sandbaggers",
+        ariaLabel: "Browse All Sandbaggers",
+        prefetch: false,
+      }
+    : null;
 
   return (
-    <main>
-      <Header />
-      <ContextBackLink
-        accessibleLabel={historyReturnContext?.accessibleLabel}
-        href={historyReturnContext?.href || (participantIdentity ? "/home" : playerDirectoryReturnHref)}
-        label={historyReturnContext?.label || (participantIdentity ? "Back to My Tournament" : "Back to All Sandbaggers")}
-        prefetch={historyReturnContext ? false : undefined}
+    <main data-career-profile>
+      <HistoryNavigation
+        ariaLabel={`${player["Display Name"]} profile navigation`}
+        left={primaryNavigation}
+        right={browseNavigation}
+        surface="player"
       />
-      {historyReturnContext || participantIdentity ? <ContextBackLink
-        href={playerDirectoryReturnHref}
-        label="Browse All Sandbaggers"
-        prefetch={historyReturnContext ? false : undefined}
-      /> : null}
 
       <section className={styles.pageHero}>
         <div className={styles.profileHeader}>
@@ -227,7 +228,7 @@ export default async function PlayerPage({ params, searchParams }) {
           intelligence={playerIntelligence}
           formatMatchHistory={formatMatchHistory}
           playerName={player["Display Name"]}
-          scorecardsByMatch={scorecardsByMatch}
+          playerSlug={player.slug}
         />
 
         <section className={styles.captainLegacySection}>
@@ -254,15 +255,18 @@ export default async function PlayerPage({ params, searchParams }) {
               <div className={styles.captainLegacyTimeline}>
                 {captainLegacy.seasons.map((season) => (
                   <Link
+                    aria-label={`View ${player["Display Name"]}'s ${season.year} ${season.teamName} Team History`}
                     className={`${styles.captainLegacySeason} ${
                       season.result === "Champion"
                         ? styles.captainLegacyChampion
                         : ""
                     }`}
-                    href={`/history/${season.year}/team/${encodeURIComponent(
-                      season.teamSide
-                    )}`}
+                    href={withPlayerOriginContext(
+                      `/history/${season.year}/team/${encodeURIComponent(season.teamSide)}`,
+                      player.slug
+                    )}
                     key={season.year}
+                    prefetch={false}
                   >
                     <strong>{season.year}</strong>
                     <div>
@@ -307,9 +311,6 @@ export default async function PlayerPage({ params, searchParams }) {
                 <span>Head-to-Head</span>
                 <strong>{formatRecord(rival.record)}</strong>
               </div>
-              <Link className={styles.rivalCompareLink} href={compareHref}>
-                Compare players →
-              </Link>
             </div>
           ) : (
             <div className={styles.rivalEmpty}>
@@ -324,8 +325,7 @@ export default async function PlayerPage({ params, searchParams }) {
             <h2>Draft History</h2>
             <div className={styles.profileDraftHistory}>
               {playerDraftHistory.map((draft) => (
-                <Link
-                  href={`/draft/${draft.year}`}
+                <article
                   key={draft.year}
                   style={{ "--draft-history-team": draft.teamColor }}
                 >
@@ -337,11 +337,8 @@ export default async function PlayerPage({ params, searchParams }) {
                       ? `Finished #${draft.finish} · ${draft.dvs > 0 ? "+" : ""}${draft.dvs} DVS`
                       : "Tournament result pending"}
                   </small>
-                </Link>
+                </article>
               ))}
-              <Link className={styles.profileDraftAnalyticsLink} href="/draft/analytics">
-                Open Historical Draft Analytics →
-              </Link>
             </div>
           </section>
         ) : null}
@@ -364,6 +361,7 @@ export default async function PlayerPage({ params, searchParams }) {
                 <LeaderboardRank rank={row.tournamentRank} />
                 <LeaderboardPlayer
                   compact
+                  linked={false}
                   name={row.player["Display Name"]}
                   slug={row.player.slug}
                   photo={row.player["Photo Filename"]}
@@ -379,8 +377,6 @@ export default async function PlayerPage({ params, searchParams }) {
           </div>
         </section>
       </section>
-
-      <Footer />
     </main>
   );
 }

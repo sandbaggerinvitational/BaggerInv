@@ -18,6 +18,7 @@ import {
 import {
   getFormatName,
   getHistoricalRound,
+  getPlayerBySlug,
   getTournamentMatches,
 } from "../../../../../lib/stats";
 import styles from "../../../../historical.module.css";
@@ -69,6 +70,11 @@ import {
   selectCanonical2023NetPresentationScorecards,
 } from "../../../../../lib/history-2023-projection";
 import { isStep3CCompletedHistoryYear } from "../../../../../lib/history-2017-2022-migration";
+import {
+  isCompletedHistoryPlayerYear,
+  playerOriginReturnContext,
+} from "../../../../../lib/context-navigation";
+import PlayerProfileReturnNavigation from "../../../../PlayerProfileReturnNavigation";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -117,8 +123,9 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default async function HistoricalRoundPage({ params }) {
+export default async function HistoricalRoundPage({ params, searchParams }) {
   const { year, round } = await params;
+  const query = await searchParams;
   const useSupabase2026 = isSupabaseHistory2026(year);
   let archive;
   let scorecardAnalytics;
@@ -446,6 +453,9 @@ export default async function HistoricalRoundPage({ params }) {
       detail: "Scorecard detail available",
     },
   ];
+  const playerReturnContext = isCompletedHistoryPlayerYear(archive.year)
+    ? playerOriginReturnContext(query, getPlayerBySlug)
+    : null;
 
   return (
     <main>
@@ -494,6 +504,8 @@ export default async function HistoricalRoundPage({ params }) {
           </div>
         </div>
       </section>
+
+      <PlayerProfileReturnNavigation context={playerReturnContext} />
 
       <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.roundContent : ""}`}>
         <HistoricalDetailNavigation

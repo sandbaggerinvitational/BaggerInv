@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useId, useState } from "react";
 import styles from "../../historical.module.css";
-import ScorecardTable from "../../ScorecardTable";
+import { withPlayerOriginContext } from "../../../lib/context-navigation";
 
 const FORMAT_LABELS = {
   BB: "Best Ball",
@@ -32,9 +32,12 @@ function winnerColor(match, side) {
   return "#777d79";
 }
 
-function MatchRow({ match, scorecards }) {
+function MatchRow({ match, playerName, playerSlug }) {
   const opponents = match.opponents.map((player) => player.name).join(" + ");
   const partner = match.partner.map((player) => player.name).join(" + ");
+  const matchHref = match.href
+    ? withPlayerOriginContext(match.href, playerSlug)
+    : null;
 
   return (
     <article className={styles.profileMatchRow} id={`profile-match-${match.id}`}>
@@ -70,19 +73,21 @@ function MatchRow({ match, scorecards }) {
         </div>
       </div>
 
-      {match.href ? (
-        <Link className={styles.profileMatchLink} href={match.href}>
+      {matchHref ? (
+        <Link
+          aria-label={`View ${playerName}'s ${match.year} Round ${match.round} ${FORMAT_LABELS[match.format] || match.format} match`}
+          className={styles.profileMatchLink}
+          href={matchHref}
+          prefetch={false}
+        >
           View Match →
         </Link>
       ) : null}
-      <div className={styles.profileMatchScorecard}>
-        <ScorecardTable scorecards={scorecards} compact title={`${match.year} · Round ${match.round} Scorecard`} />
-      </div>
     </article>
   );
 }
 
-export default function PlayerFormatMatchHistory({ history, scorecardsByMatch = {} }) {
+export default function PlayerFormatMatchHistory({ history, playerName, playerSlug }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
   const [openYears, setOpenYears] = useState(() =>
@@ -153,7 +158,7 @@ export default function PlayerFormatMatchHistory({ history, scorecardsByMatch = 
                 </button>
                 <div id={yearId} hidden={!yearOpen}>
                   {group.matches.map((match) => (
-                    <MatchRow match={match} scorecards={scorecardsByMatch[match.id] || []} key={match.id} />
+                    <MatchRow match={match} playerName={playerName} playerSlug={playerSlug} key={match.id} />
                   ))}
                 </div>
               </section>

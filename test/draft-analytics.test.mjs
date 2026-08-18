@@ -38,11 +38,12 @@ test("AI redraft and historical awards reuse the shared Draft Value Score", asyn
   assert.match(analytics, /dvs: draftValueScore\(pick\.pickNumber, finish\)/);
 });
 
-test("player profiles expose draft history without duplicating analytics logic", async () => {
+test("player profiles preserve draft history as display-only career context", async () => {
   const profile = await readFile(
     new URL("../app/players/[slug]/page.js", import.meta.url),
     "utf8"
   );
   assert.match(profile, /getPlayerDraftHistory/);
-  assert.match(profile, /Open Historical Draft Analytics/);
+  assert.match(profile, /className=\{styles\.profileDraftHistory\}/);
+  assert.doesNotMatch(profile, /Open Historical Draft Analytics|href=\{`\/draft\/\$\{draft\.year\}`\}/);
 });

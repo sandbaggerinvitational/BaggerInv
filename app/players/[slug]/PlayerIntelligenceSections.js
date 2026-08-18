@@ -3,7 +3,10 @@ import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
 import { formatPercentage, formatRecord } from "../../../lib/stats";
 import { formatPlayerPoints } from "../../../lib/formatters";
-import { isCompletedHistoryPlayerYear } from "../../../lib/context-navigation";
+import {
+  isCompletedHistoryPlayerYear,
+  withPlayerOriginContext,
+} from "../../../lib/context-navigation";
 import TeamLogoPlate from "../../TeamLogoPlate";
 import styles from "../../historical.module.css";
 
@@ -30,17 +33,17 @@ function RankingList({ rows }) {
   return (
     <div className={styles.playerRankingList}>
       {rows.map((row) => (
-        <Link href={row.href} key={row.key}>
+        <div key={row.key}>
           <span>{row.label}</span>
           <i aria-hidden="true" />
           <strong>{rank(row.rank)}</strong>
-        </Link>
+        </div>
       ))}
     </div>
   );
 }
 
-function TournamentHistoryRow({ playerName, season }) {
+function TournamentHistoryRow({ playerName, playerSlug, season }) {
   const upcoming = season.finish === "Upcoming";
   const completedHistoryYear = isCompletedHistoryPlayerYear(season.year);
   // Preserve the existing current-tournament destination. It is deliberately
@@ -86,6 +89,9 @@ function TournamentHistoryRow({ playerName, season }) {
   const rowStyle = {
     "--history-team-color": season.teamColor || "var(--tsi-gold-600)",
   };
+  const historyHref = completedHistoryYear
+    ? withPlayerOriginContext(`/history/${season.year}`, playerSlug)
+    : `/history/${season.year}`;
 
   return linkedTournamentYear ? (
     <Link
@@ -94,7 +100,7 @@ function TournamentHistoryRow({ playerName, season }) {
         : `View ${playerName}'s current ${season.year} Tournament`}
       className={styles.playerTournamentHistoryRow}
       data-finish={finishKey}
-      href={`/history/${season.year}`}
+      href={historyHref}
       prefetch={false}
       style={rowStyle}
     >
@@ -115,11 +121,11 @@ export default function PlayerIntelligenceSections({
   intelligence,
   formatMatchHistory,
   playerName,
-  scorecardsByMatch,
+  playerSlug,
 }) {
   const { official, hole, progression } = intelligence;
   const careerRankingRows = intelligence.rankingRows.filter((row) =>
-    ["careerPoints", "winPercentage", "holeDifferential", "birdies", "averageGross"].includes(row.key)
+    ["careerPoints", "matchWins", "winPercentage", "holeDifferential", "birdies", "averageGross"].includes(row.key)
   );
 
   return (
@@ -201,7 +207,7 @@ export default function PlayerIntelligenceSections({
             <span>Avg Score</span>
           </div>
           {intelligence.tournamentHistory.map((season) => (
-            <TournamentHistoryRow playerName={playerName} season={season} key={season.year} />
+            <TournamentHistoryRow playerName={playerName} playerSlug={playerSlug} season={season} key={season.year} />
           ))}
         </div>
       </IntelligenceSection>
@@ -227,7 +233,8 @@ export default function PlayerIntelligenceSections({
               </div>
               <PlayerFormatMatchHistory
                 history={formatMatchHistory[format.code]}
-                scorecardsByMatch={scorecardsByMatch}
+                playerName={playerName}
+                playerSlug={playerSlug}
               />
             </article>
           ))}
@@ -238,19 +245,14 @@ export default function PlayerIntelligenceSections({
         <IntelligenceSection eyebrow="Current Record Book" title="Records Held">
           <div className={styles.playerRecordsHeld}>
             {intelligence.recordsHeld.map((record) => (
-              <Link href={record.href} key={record.slug}>
+              <article key={record.slug}>
                 <span>Record Holder</span>
                 <strong>{record.title}</strong>
-                <b>View Leaderboard →</b>
-              </Link>
+              </article>
             ))}
           </div>
         </IntelligenceSection>
       ) : null}
-
-      <IntelligenceSection eyebrow="Official Leaderboards" title="Current Rankings">
-        <RankingList rows={intelligence.rankingRows} />
-      </IntelligenceSection>
     </div>
   );
 }
