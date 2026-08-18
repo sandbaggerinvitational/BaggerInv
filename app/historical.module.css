@@ -595,7 +595,8 @@
     box-shadow .22s ease;
 }
 
-.historyPhotoCard:hover {
+.historyPhotoCard:hover,
+.historyPhotoCard:focus-within {
   transform: translateY(-4px);
   box-shadow: var(--tsi-shadow-md);
 }
@@ -604,14 +605,10 @@
   display: block;
 }
 
-.historyChampionLink {
-  margin: 0 21px 21px;
-  padding-top: 14px;
-  display: block;
-  border-top: 1px solid var(--tsi-line);
-  color: var(--tsi-green-900);
-  font-size: .78rem;
-  font-weight: 800;
+.historyCardPrimary:focus-visible {
+  outline: 3px solid var(--tsi-gold-500);
+  outline-offset: -3px;
+  border-radius: inherit;
 }
 
 .historyPhotoPlaceholder {

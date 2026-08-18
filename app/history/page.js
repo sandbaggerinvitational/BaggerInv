@@ -77,11 +77,14 @@ export default async function HistoryPage() {
         <div className={`${styles.historyCardGrid} ${pwaStyles.yearGrid}`}>
           {tournaments.map((tournament, index) => {
             const heroPath = historyHeroPath(tournament);
+            const completed = Boolean(tournament.championTeamId);
             return <article className={styles.historyPhotoCard} key={tournament.year}>
               <Link
                 className={styles.historyCardPrimary}
                 href={`/history/${tournament.year}`}
-                aria-label={`${tournament.year}, ${historyEditionLabel(tournament.year)}, ${tournament.Destination}, ${tournament.championTeam?.name ? `champion ${tournament.championTeam.name}` : historyTournamentCardResult(tournament)}`}
+                aria-label={completed
+                  ? `View ${tournament.year} Tournament History`
+                  : `${tournament.year}, ${historyEditionLabel(tournament.year)}, ${tournament.Destination}, ${historyTournamentCardResult(tournament)}`}
               >
                 <div className={styles.historyPhotoFrame}>
                   <AssetImage
@@ -108,15 +111,6 @@ export default async function HistoryPage() {
                   <strong>{historyTournamentCardResult(tournament)}</strong>
                 </div>
               </Link>
-
-              {tournament.championTeamId ? (
-                <Link
-                  className={styles.historyChampionLink}
-                  href={`/champions/${tournament.year}`}
-                >
-                  View {tournament.year} Champion →
-                </Link>
-              ) : null}
             </article>;
           })}
         </div>
