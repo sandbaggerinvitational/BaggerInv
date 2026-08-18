@@ -174,7 +174,7 @@ test("player intelligence UI uses dense cards, year-specific teams, finish treat
     readFile(new URL("../app/data-health/page.js", import.meta.url), "utf8"),
   ]);
 
-  assert.match(component, /<ScoringStatGrid dense/);
+  assert.match(component, /<ScoringStatGrid career dense/);
   assert.match(component, /playerTournamentHistoryHead/);
   assert.match(component, /data-label="Finish"/);
   assert.match(component, /TeamLogoPlate/);
@@ -185,7 +185,8 @@ test("player intelligence UI uses dense cards, year-specific teams, finish treat
   assert.match(profileCss, /\.playerTournamentHistory span[\s\S]*var\(--tsi-gold-600\)/);
   assert.match(profileCss, /--history-team-color/);
   assert.match(profileCss, /data-finish="champion"/);
-  assert.match(statsCss, /\.dense \.card\{min-height:112px;padding:13px 15px/);
+  assert.match(statsCss, /\.dense \.card \{[\s\S]*min-height: 112px;[\s\S]*padding: 13px 15px/);
+  assert.match(statsCss, /\.career \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(dataHealth, /unresolvedHistoricalRosterTeams/);
   assert.match(dataHealth, /Every historical roster assignment resolves to its year-specific team/);
 });

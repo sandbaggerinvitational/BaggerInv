@@ -29,7 +29,9 @@ test("service worker never intercepts writes or private scoring routes", async (
   assert.match(source, /url\.pathname\.startsWith\("\/score"\)/);
   assert.match(source, /url\.pathname\.startsWith\("\/admin"\)/);
   assert.match(source, /fetch\(request\)\.catch/);
-  assert.match(source, /const CACHE_VERSION = "sbi-shell-v2"/);
+  assert.match(source, /const CACHE_VERSION = "sbi-shell-v3"/);
+  assert.match(source, /if \(url\.pathname\.startsWith\("\/_next\/"\)\) return/);
+  assert.doesNotMatch(source, /url\.pathname\.startsWith\("\/_next\/static\/"\) \|\|/);
   const navigationBranch = source.match(
     /if \(request\.mode === "navigate"\) \{([\s\S]*?)\n  \}/
   )?.[1] || "";

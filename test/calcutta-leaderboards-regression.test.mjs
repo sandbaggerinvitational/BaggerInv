@@ -61,7 +61,8 @@ test("the installed PWA rechecks and activates the corrected navigation bundle",
   ]);
   assert.match(foundation, /updateViaCache: "none"/);
   assert.match(foundation, /registration\.update\(\)/);
-  assert.match(worker, /const CACHE_VERSION = "sbi-shell-v2"/);
+  assert.match(worker, /const CACHE_VERSION = "sbi-shell-v3"/);
+  assert.match(worker, /if \(url\.pathname\.startsWith\("\/_next\/"\)\) return/);
   assert.match(worker, /self\.skipWaiting\(\)/);
   assert.match(worker, /self\.clients\.claim\(\)/);
 });
