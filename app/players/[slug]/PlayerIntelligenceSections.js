@@ -43,6 +43,10 @@ function RankingList({ rows }) {
 function TournamentHistoryRow({ playerName, season }) {
   const upcoming = season.finish === "Upcoming";
   const completedHistoryYear = isCompletedHistoryPlayerYear(season.year);
+  // Preserve the existing current-tournament destination. It is deliberately
+  // separate from the completed-year History context contract above.
+  const currentTournamentYear = Number(season.year) === 2026;
+  const linkedTournamentYear = completedHistoryYear || currentTournamentYear;
   const finishKey = String(season.finish || "")
     .toLowerCase()
     .replace(/[^a-z]+/g, "-")
@@ -83,13 +87,15 @@ function TournamentHistoryRow({ playerName, season }) {
     "--history-team-color": season.teamColor || "var(--tsi-gold-600)",
   };
 
-  return completedHistoryYear ? (
+  return linkedTournamentYear ? (
     <Link
-      aria-label={`View ${playerName}'s ${season.year} Tournament History`}
+      aria-label={completedHistoryYear
+        ? `View ${playerName}'s ${season.year} Tournament History`
+        : `View ${playerName}'s current ${season.year} Tournament`}
       className={styles.playerTournamentHistoryRow}
       data-finish={finishKey}
       href={`/history/${season.year}`}
-      prefetch={false}
+      prefetch={completedHistoryYear ? false : undefined}
       style={rowStyle}
     >
       {content}
