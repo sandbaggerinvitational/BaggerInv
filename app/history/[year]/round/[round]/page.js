@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import {
+  refreshCanonical2023HistoricalData,
   refreshCanonical2024HistoricalData,
   refreshHistoricalData,
 } from "../../../../../lib/stats";
@@ -22,6 +23,7 @@ import styles from "../../../../historical.module.css";
 import { formatTeamPoints } from "../../../../../lib/formatters";
 import { pageMetadata } from "../../../../../lib/seo";
 import {
+  loadCanonical2023HistoryAnalytics,
   loadCanonical2024HistoryAnalytics,
   loadLegacyHistoryAnalytics,
 } from "../../../../../lib/legacy-history-analytics";
@@ -59,6 +61,11 @@ import {
   completedHistoryHoleStatisticItem,
   orderCompletedHistoryRoundStatistics,
 } from "../../../../../lib/completed-history-round-statistics";
+import {
+  reconcileCanonical2023ScorecardPresentation,
+  selectCanonical2023IndividualStatisticScorecards,
+  selectCanonical2023NetPresentationScorecards,
+} from "../../../../../lib/history-2023-projection";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -78,9 +85,11 @@ export async function generateMetadata({ params }) {
       archive = null;
     }
   } else {
-    await (Number(year) === 2024
-      ? refreshCanonical2024HistoricalData()
-      : refreshHistoricalData());
+    await (Number(year) === 2023
+      ? refreshCanonical2023HistoricalData()
+      : Number(year) === 2024
+        ? refreshCanonical2024HistoricalData()
+        : refreshHistoricalData());
     archive = getHistoricalRound(year, round);
   }
 
@@ -122,28 +131,47 @@ export default async function HistoricalRoundPage({ params }) {
       );
     }
   } else {
+    const canonical2023 = Number(year) === 2023;
     const canonical2024 = Number(year) === 2024;
-    const scorecardAnalyticsPromise = canonical2024
-      ? loadCanonical2024HistoryAnalytics()
-      : loadLegacyHistoryAnalytics();
-    await (canonical2024
-      ? refreshCanonical2024HistoricalData()
-      : refreshHistoricalData());
+    const scorecardAnalyticsPromise = canonical2023
+      ? loadCanonical2023HistoryAnalytics()
+      : canonical2024
+        ? loadCanonical2024HistoryAnalytics()
+        : loadLegacyHistoryAnalytics();
+    await (canonical2023
+      ? refreshCanonical2023HistoricalData()
+      : canonical2024
+        ? refreshCanonical2024HistoricalData()
+        : refreshHistoricalData());
     archive = getHistoricalRound(year, round);
     scorecardAnalytics = await scorecardAnalyticsPromise;
   }
 
   if (!archive) notFound();
+  const completed2023 = !useSupabase2026 && Number(archive.year) === 2023;
   const completed2024 = !useSupabase2026 && Number(archive.year) === 2024;
   const completed2025 = !useSupabase2026 && Number(archive.year) === 2025;
-  const completedHistoryMaster = completed2024 || completed2025;
+  const completedHistoryMaster = completed2023 || completed2024 || completed2025;
   const canonicalFormat = completedHistoryMaster && archive.format === "BB"
     ? "Best Ball"
     : getFormatName(archive.format);
-  const roundScorecards = filterScorecards(scorecardAnalytics.usableScorecards, {
-    year: archive.year,
-    round: archive.round,
-  });
+  const canonical2023RoundScorecards = completed2023
+    ? selectCanonical2023NetPresentationScorecards({
+      year: archive.year,
+      round: archive.round,
+      scorecards: scorecardAnalytics.scorecards,
+      projectedScorecards: scorecardAnalytics.history2023NetProjectionScorecards,
+    })
+    : [];
+  const roundScorecards = completed2023
+    ? canonical2023RoundScorecards.filter((scorecard) =>
+      ["COMPLETE", "VERIFIED"].includes(String(scorecard?.status || "").toUpperCase()) &&
+      Number(scorecard?.completedHoleCount) === 18
+    )
+    : filterScorecards(scorecardAnalytics.usableScorecards, {
+      year: archive.year,
+      round: archive.round,
+    });
   const missingRoundScorecards = scorecardAnalytics.missingScorecards.filter((scorecard) =>
     scorecard.year === Number(archive.year) && scorecard.round === Number(archive.round)
   );
@@ -163,6 +191,18 @@ export default async function HistoricalRoundPage({ params }) {
       canonical2024IndividualStatisticScorecards.length
     )
     : null;
+  const canonical2023IndividualStatisticScorecards = completed2023
+    ? selectCanonical2023IndividualStatisticScorecards({
+      scorecards: scorecardAnalytics.scorecards,
+      projectedScorecards: scorecardAnalytics.history2023NetProjectionScorecards,
+    }).filter((scorecard) => Number(scorecard?.round) === Number(archive.round))
+    : [];
+  const canonical2023IndividualStatistics = canonical2023IndividualStatisticScorecards.length
+    ? buildScoringHighlights(
+      canonical2023IndividualStatisticScorecards,
+      canonical2023IndividualStatisticScorecards.length
+    )
+    : null;
   const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
     year: archive.year,
     matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
@@ -174,16 +214,18 @@ export default async function HistoricalRoundPage({ params }) {
     ? []
     : getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round));
   const displayScorecardsForMatch = (matchId) => {
-    const presentationScorecards = completed2024 && [1, 3].includes(Number(archive.round))
-      ? selectCanonical2024NetPresentationScorecards({
-        year: archive.year,
-        round: archive.round,
-        scorecards: scorecardAnalytics.scorecards,
-        projectedScorecards: scorecardAnalytics.history2024NetProjectionScorecards,
-      })
-      : scorecardAnalytics.scorecards;
+    const presentationScorecards = completed2023
+      ? canonical2023RoundScorecards
+      : completed2024 && [1, 3].includes(Number(archive.round))
+        ? selectCanonical2024NetPresentationScorecards({
+          year: archive.year,
+          round: archive.round,
+          scorecards: scorecardAnalytics.scorecards,
+          projectedScorecards: scorecardAnalytics.history2024NetProjectionScorecards,
+        })
+        : scorecardAnalytics.scorecards;
     const cards = filterScorecards(presentationScorecards, { matchId });
-    return Number(archive.round) === 2 && (completed2024 || completed2025)
+    const formatAwareCards = Number(archive.round) === 2 && (completed2023 || completed2024 || completed2025)
       ? completed2025
         ? canonicalize2025ScrambleScorecardPresentation({
           scorecards: cards,
@@ -198,6 +240,12 @@ export default async function HistoricalRoundPage({ params }) {
           teams: archive.tournament.teams,
         })
       : cards;
+    return completed2023
+      ? reconcileCanonical2023ScorecardPresentation({
+        scorecards: formatAwareCards,
+        matches: legacyRoundMatches,
+      })
+      : formatAwareCards;
   };
   const scrambleStatisticHolders = completedHistoryMaster && Number(archive.round) === 2
     ? completed2025
@@ -266,6 +314,15 @@ export default async function HistoricalRoundPage({ params }) {
     : useSupabase2026 && archive.format === "SC"
       ? scrambleStatisticHolders?.birdieLeader
       : undefined;
+  const completed2023RoundBirdieLeader = canonical2023IndividualStatistics?.birdieLeader || null;
+  const completed2023RoundBirdieHolders = completed2023RoundBirdieLeader
+    ? buildHistoricalIndividualBirdieHolders({
+      year: archive.year,
+      round: archive.round,
+      scorecards: canonical2023IndividualStatisticScorecards,
+      acceptedValue: completed2023RoundBirdieLeader.value,
+    })
+    : [];
   const completed2024RoundBirdieLeader = canonical2024IndividualStatistics?.birdieLeader || null;
   const completed2024RoundBirdieHolders = completed2024RoundBirdieLeader
     ? buildHistoricalIndividualBirdieHolders({
@@ -275,7 +332,7 @@ export default async function HistoricalRoundPage({ params }) {
       acceptedValue: completed2024RoundBirdieLeader.value,
     })
     : [];
-  const displayedBirdieLeader = completed2024RoundBirdieLeader || roundBirdieLeader;
+  const displayedBirdieLeader = completed2023RoundBirdieLeader || completed2024RoundBirdieLeader || roundBirdieLeader;
   const lowestTeamRound = bestBallLowestTeamRound || roundStatistics.lowestTeamRound;
   const lowestTeamRoundHolders = bestBallLowestTeamRound?.holders || scrambleStatisticHolders?.lowestTeamRound;
   const showLowestRound = !((completedHistoryMaster || useSupabase2026) && archive.format === "SC");
@@ -299,7 +356,7 @@ export default async function HistoricalRoundPage({ params }) {
     sample: roundStatistics.lowestBackNine.label,
   };
   const averageScoreStatisticItem = { label: "Average Score", value: formatScoringNumber(roundStatistics.averageScore.value), sample: roundStatistics.averageScore.label };
-  const courseDifficultyStatistics = canonical2024IndividualStatistics || roundStatistics;
+  const courseDifficultyStatistics = canonical2023IndividualStatistics || canonical2024IndividualStatistics || roundStatistics;
   const hardestHoleStatisticItem = completedHistoryMaster
     ? completedHistoryHoleStatisticItem({ label: "Hardest Hole", hole: courseDifficultyStatistics.hardestHole })
     : { label: "Hardest Hole", value: roundStatistics.hardestHole ? `#${roundStatistics.hardestHole.holeNumber}` : "—", detail: roundStatistics.hardestHole ? `Hole ${roundStatistics.hardestHole.holeNumber}${roundStatistics.hardestHole.tee ? ` · ${roundStatistics.hardestHole.tee}` : ""}` : "", sample: roundStatistics.hardestHole?.averageToPar.label };
@@ -310,6 +367,7 @@ export default async function HistoricalRoundPage({ params }) {
     value: formatScoringNumber(displayedBirdieLeader.value),
     detail: participant(displayedBirdieLeader),
     holders: birdieLeaderHolders,
+    ...(completed2023RoundBirdieLeader ? { holders: completed2023RoundBirdieHolders } : {}),
     ...(completed2024RoundBirdieLeader ? { holders: completed2024RoundBirdieHolders } : {}),
     sample: displayedBirdieLeader.label,
   };

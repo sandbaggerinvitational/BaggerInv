@@ -15,10 +15,11 @@ const completedOverview = page.slice(
   page.indexOf("function CurrentHistoryOverview")
 );
 
-test("the frozen completed-year prototype remains explicit for 2025 while 2024 opts into the same master", () => {
+test("the frozen completed-year prototype remains explicit for 2025 while 2023 and 2024 opt into the same master", () => {
+  assert.match(page, /const useCompleted2023 = !useSupabase2026 && Number\(tournament\.year\) === 2023/);
   assert.match(page, /const useCompleted2024 = !useSupabase2026 && Number\(tournament\.year\) === 2024/);
   assert.match(page, /const useCompleted2025 = !useSupabase2026 && Number\(tournament\.year\) === 2025/);
-  assert.match(page, /const useCompletedMaster = useCompleted2024 \|\| useCompleted2025/);
+  assert.match(page, /const useCompletedMaster = useCompleted2023 \|\| useCompleted2024 \|\| useCompleted2025/);
   assert.match(page, /useCompletedMaster \? <CompletedYearOverview/);
   assert.match(page, /useSupabase2026 \? <CurrentHistoryOverview/);
   assert.match(page, /useCompletedMaster \? null : <div className=\{styles\.finalScoreCard\}>/);

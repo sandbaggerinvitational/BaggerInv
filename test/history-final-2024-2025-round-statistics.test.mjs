@@ -103,12 +103,11 @@ test("all six canonical hole populations retain hole, par, average, sample, and 
   }
 });
 
-test("2024 repaired individual evidence feeds difficulty while 2024 R2 and 2025 keep their established populations", () => {
-  assert.match(roundPage, /const courseDifficultyStatistics = canonical2024IndividualStatistics \|\| roundStatistics/);
+test("completed-year individual evidence feeds difficulty while 2024 R2 and 2025 keep their established populations", () => {
+  assert.match(roundPage, /const courseDifficultyStatistics = canonical2023IndividualStatistics \|\| canonical2024IndividualStatistics \|\| roundStatistics/);
   assert.match(roundPage, /completedHistoryMaster[\s\S]*completedHistoryHoleStatisticItem/);
   assert.match(roundPage, /completedHistoryMaster \? completedHistoryRoundStatisticItems : legacyHistoricalRoundStatisticItems/);
-  assert.match(roundPage, /const completedHistoryMaster = completed2024 \|\| completed2025/);
-  assert.doesNotMatch(roundPage, /Number\(archive\.year\) === 2023/);
+  assert.match(roundPage, /const completedHistoryMaster = completed2023 \|\| completed2024 \|\| completed2025/);
 });
 
 test("completed individual rounds preserve every canonical tied holder without changing accepted values", () => {

@@ -8,7 +8,9 @@ Before classifying any 2023 historical scorecard as Gross-only, audit the full s
 4. Verify that the existing historical stroke-allocation and Net helpers receive that scoring set.
 5. Treat ambiguous, incomplete, or multiply matching scoring sets as unsupported; do not infer or alias them.
 
-The 2024 repair must not be activated for 2023 during Step 3B.1A. Any future 2023 resolver must remain year-scoped, evidence-first, and must preserve 2023's canonical 20-scorecard eligibility contract.
+Step 3B.2 confirmed that the first two rounds resolve exactly, while Round 3 scorecard rows carry a stale course ID. The 2023 projection therefore reuses the existing fail-closed scoring-set contract and must fail closed: it accepts the archive round/format assignment only when there is one canonical course and one complete, unambiguous 18-hole scoring set. It does not alias tee names or mutate source rows. The repair remains year-scoped, evidence-first, and preserves the proven 20-scorecard eligibility contract.
+
+One Round 3 match reconstructs a result that conflicts with its authoritative halved result after the correct course context is restored. That match retains its canonical Gross/Strokes/Net summary, while Hole Winner and Match Progression stay suppressed. Official result and points remain authoritative.
 
 ## Completed-year Round Statistics target
 

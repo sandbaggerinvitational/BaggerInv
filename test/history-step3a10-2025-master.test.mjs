@@ -229,7 +229,7 @@ test("ineligible 2025 matches retain Details without a fake Scorecard placeholde
 test("all 24 completed 2025 matchups use the no-stroke identity contract", () => {
   const matches = historicalData.matches.filter((match) => Number(match.Year) === 2025);
   assert.equal(matches.length, 24);
-  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2024, 2025\]\.includes\(historyYear\)/);
+  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2023, 2024, 2025\]\.includes\(historyYear\)/);
   assert.equal([...matchCard.matchAll(/showStroke=\{!completedHistoryMatchupCleanup\}/g)].length, 3);
   assert.match(matchCard, /showStroke && playerStrokeLabel/);
   assert.match(matchCard, /showStroke && teamStrokeLabel/);
@@ -280,12 +280,11 @@ test("Best Ball, Singles, Hole Winner, Final Result, and Match Progression stay 
   assert.match(roundPage, /<ScoringStatGrid/);
 });
 
-test("the frozen 2025 guard remains intact while 2024 is deliberately migrated", () => {
-  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2024, 2025\]\.includes\(historyYear\)/);
-  assert.match(roundPage, /const completedHistoryMaster = completed2024 \|\| completed2025/);
+test("the frozen 2025 guard remains intact while 2023 and 2024 use the same completed-year contract", () => {
+  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2023, 2024, 2025\]\.includes\(historyYear\)/);
+  assert.match(roundPage, /const completedHistoryMaster = completed2023 \|\| completed2024 \|\| completed2025/);
   assert.match(roundPage, /completedHistoryCompact=\{completedHistoryMaster\}/);
   assert.match(roundPage, /useSupabase2026 \? <HistoricalMatchRow/);
-  assert.doesNotMatch(roundPage, /Number\(archive\.year\) === 2023/);
 });
 
 test("the 2025 action and summary system remains responsive and accessible", () => {

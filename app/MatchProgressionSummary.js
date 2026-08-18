@@ -7,6 +7,7 @@ import styles from "./live/live.module.css";
 const MILESTONES = [6, 9, 12, 15];
 
 export default function MatchProgressionSummary({ scorecards = [] }) {
+  if (scorecards.some((scorecard) => scorecard.historyProgressionSuppressed)) return null;
   const progressionScorecards = scorecards.map((scorecard) =>
     scorecard.historyProgressionMatchNetScoring
       ? {

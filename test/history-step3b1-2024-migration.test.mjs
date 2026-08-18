@@ -212,7 +212,7 @@ test("all 24 canonical 2024 matches contain completed-result evidence", () => {
 
 test("2024 uses the frozen completed-year overview without copying 2025 facts", () => {
   assert.match(overviewPage, /const useCompleted2024 = !useSupabase2026 && Number\(tournament\.year\) === 2024/);
-  assert.match(overviewPage, /const useCompletedMaster = useCompleted2024 \|\| useCompleted2025/);
+  assert.match(overviewPage, /const useCompletedMaster = useCompleted2023 \|\| useCompleted2024 \|\| useCompleted2025/);
   assert.match(overviewPage, /useCompletedMaster \? <CompletedYearOverview/);
   assert.doesNotMatch(overviewPage, /Bandon Dunes|Bandon Brothers|The Crispy Boys/);
 });
@@ -224,10 +224,10 @@ test("2024 Overview preserves the existing record populations and holders", () =
 });
 
 test("2024 match cards are FINAL, omit matchup strokes, and put Scorecard before Details", () => {
-  assert.match(roundPage, /const completedHistoryMaster = completed2024 \|\| completed2025/);
+  assert.match(roundPage, /const completedHistoryMaster = completed2023 \|\| completed2024 \|\| completed2025/);
   assert.match(roundPage, /completedHistoryCompact=\{completedHistoryMaster\}/);
   assert.match(matchCard, /const state = completedHistoryCompact \? "final"/);
-  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2024, 2025\]\.includes\(historyYear\)/);
+  assert.match(matchCard, /completedHistoryMatchupCleanup = completedHistoryCompact && \[2023, 2024, 2025\]\.includes\(historyYear\)/);
   const compact = matchCard.slice(matchCard.indexOf("if (completedHistoryCompact)"), matchCard.indexOf("return <article className={styles.matchCard}", matchCard.indexOf("if (completedHistoryCompact)")));
   assert.ok(compact.indexOf("styles.historicalFinalResult") < compact.indexOf("<ScorecardTable"));
   assert.ok(compact.indexOf("<ScorecardTable") < compact.indexOf("<details className={styles.historicalMatchDetails}"));
@@ -259,11 +259,11 @@ test("2024 statistics use performance-first order and omit zero-sample cards", (
   assert.match(roundPage, /!\/\^Based on 0 recorded\/i\.test/);
 });
 
-test("the frozen 2025 wrappers remain explicit and 2023/2026 stay on their prior routes", () => {
+test("the frozen 2025 wrappers remain explicit and 2026 stays on its prior route", () => {
   assert.match(recordsSource, /canonicalize2025ScrambleScorecardPresentation[\s\S]*year: TARGET_YEAR/);
   assert.match(roundPage, /completed2025\s+\? canonicalize2025ScrambleScorecardPresentation/);
   assert.match(roundPage, /useSupabase2026 \? <HistoricalMatchRow/);
-  assert.doesNotMatch(roundPage, /Number\(archive\.year\) === 2023/);
+  assert.match(roundPage, /Number\(archive\.year\) === 2023/);
 });
 
 test("Step 3B.1 adds no dependency, endpoint, client fetch, or storage", () => {

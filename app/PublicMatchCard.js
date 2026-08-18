@@ -163,6 +163,7 @@ function CompactHistoricalPairing({ teamOne, teamTwo, teamOnePlayers = [], teamT
 }
 
 function reconstructedResult(scorecards = [], useHistoricalProgression = false) {
+  if (scorecards.some((scorecard) => scorecard.historyProgressionSuppressed)) return "";
   const progression = reconstructMatchProgression(useHistoricalProgression
     ? scorecards.map((scorecard) => scorecard.historyProgressionMatchNetScoring
       ? { ...scorecard, matchNetScoring: scorecard.historyProgressionMatchNetScoring }
@@ -228,7 +229,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   const historyScorecardParity = variant === "historical" &&
     historyYear >= 2023 && historyYear <= 2025 &&
     scorecards.length > 0;
-  const completedHistoryMatchupCleanup = completedHistoryCompact && [2024, 2025].includes(historyYear);
+  const completedHistoryMatchupCleanup = completedHistoryCompact && [2023, 2024, 2025].includes(historyYear);
   const hasPairing = [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => player?.name);
   const hasSegments = Boolean(match.frontWinner || match.backWinner || overallWinner);
   const winnerName = halved ? "Match halved" : winningSide === 1 ? tournament.teamOne.name : winningSide === 2 ? tournament.teamTwo.name : "";

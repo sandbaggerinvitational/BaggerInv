@@ -266,13 +266,13 @@ test("zero Birdie Leaders are omitted only from the audited 2024 presentation", 
   assert.match(overviewPage, /item\.label === "Birdie Leader"[\s\S]*omitMeaninglessHistoricalBirdieLeader/);
 });
 
-test("future 2023 migration must audit Course ID and archive tee resolution without activating the 2024 repair", () => {
+test("the 2023 migration audits Course ID and archive tee resolution before applying its isolated projection", () => {
   assert.match(migrationRequirement, /Course ID/);
   assert.match(migrationRequirement, /archive display tee label/);
   assert.match(migrationRequirement, /canonical Course Holes scoring-set tee label/);
-  assert.match(migrationRequirement, /must not be activated for 2023/);
+  assert.match(migrationRequirement, /fail closed/i);
   assert.match(migrationRequirement, /20-scorecard eligibility contract/);
-  assert.doesNotMatch(scorecardData, /year: 2023|canonical2023/i);
+  assert.match(scorecardData, /canonical2023/i);
 });
 
 test("runtime projection reuses the existing analytics and is isolated to 2024 R1/R3", () => {

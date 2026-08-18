@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { refreshHistoricalData } from "../../../lib/stats";
+import { refreshCanonical2023HistoricalData, refreshHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "../../components";
@@ -27,6 +27,7 @@ import TournamentLeaderboard from "../../TournamentLeaderboard";
 import StatusBadge from "../../StatusBadge";
 import { getDraftByYear } from "../../../lib/draft";
 import {
+  loadCanonical2023HistoryAnalytics,
   loadCanonical2024HistoryAnalytics,
   loadLegacyHistoryAnalytics,
 } from "../../../lib/legacy-history-analytics";
@@ -34,8 +35,10 @@ import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard
 import { buildLegacyHistoryScorecardCoverage } from "../../../lib/legacy-history-scorecard-coverage";
 import {
   buildHistoricalScrambleRoundStatisticHolders,
+  buildHistoricalTournamentRecords,
   build2025TournamentRecords,
 } from "../../../lib/history-2025-tournament-records";
+import { selectCanonical2023NetPresentationScorecards } from "../../../lib/history-2023-projection";
 import {
   buildHistoricalIndividualBirdieHolders,
   buildHistoricalIndividualStatisticHolders,
@@ -78,7 +81,7 @@ export async function generateMetadata({ params }) {
       tournament = null;
     }
   } else {
-    await refreshHistoricalData();
+    await (Number(year) === 2023 ? refreshCanonical2023HistoricalData() : refreshHistoricalData());
     tournament = getTournament(year);
   }
 
@@ -427,10 +430,12 @@ export default async function TournamentYearPage({ params }) {
       );
     }
   } else {
-    const scorecardAnalyticsPromise = Number(year) === 2024
-      ? loadCanonical2024HistoryAnalytics()
-      : loadLegacyHistoryAnalytics();
-    await refreshHistoricalData();
+    const scorecardAnalyticsPromise = Number(year) === 2023
+      ? loadCanonical2023HistoryAnalytics()
+      : Number(year) === 2024
+        ? loadCanonical2024HistoryAnalytics()
+        : loadLegacyHistoryAnalytics();
+    await (Number(year) === 2023 ? refreshCanonical2023HistoricalData() : refreshHistoricalData());
     tournament = getTournament(year);
     if (!tournament) notFound();
     roundPoints = getTournamentRoundPoints(year);
@@ -550,9 +555,26 @@ export default async function TournamentYearPage({ params }) {
         };
       })
     : null;
+  const completed2023Scorecards = Number(tournament?.year) === 2023
+    ? [1, 2, 3].flatMap((round) => selectCanonical2023NetPresentationScorecards({
+      year: 2023,
+      round,
+      scorecards: scorecardAnalytics.scorecards,
+      projectedScorecards: scorecardAnalytics.history2023NetProjectionScorecards,
+    }))
+    : [];
+  const completed2023Records = Number(tournament?.year) === 2023
+    ? buildHistoricalTournamentRecords({
+      year: 2023,
+      scorecards: completed2023Scorecards,
+      matches: tournamentMatches,
+      teams: tournament.teams,
+    }).records
+    : null;
+  const useCompleted2023 = !useSupabase2026 && Number(tournament.year) === 2023;
   const useCompleted2024 = !useSupabase2026 && Number(tournament.year) === 2024;
   const useCompleted2025 = !useSupabase2026 && Number(tournament.year) === 2025;
-  const useCompletedMaster = useCompleted2024 || useCompleted2025;
+  const useCompletedMaster = useCompleted2023 || useCompleted2024 || useCompleted2025;
   return (
     <main>
       <Header />
@@ -656,9 +678,9 @@ export default async function TournamentYearPage({ params }) {
           tournament={tournament}
           leaderboard={leaderboard}
           pointsTracked={pointsTracked}
-          scorecards={tournamentScorecards}
+          scorecards={completed2023Scorecards.length ? completed2023Scorecards : tournamentScorecards}
           matches={tournamentMatches}
-          records={completed2024Records}
+          records={completed2023Records || completed2024Records}
         /> : useSupabase2026 ? <CurrentHistoryOverview
           tournament={tournament}
           roundPoints={roundPoints}
