@@ -189,9 +189,10 @@ function winnerClass(value) {
   return styles.halvedBadge;
 }
 
-function Segment({ label, winner, tournament }) {
+function Segment({ label, winner, tournament, participant = "" }) {
   return <div className={styles.segment}>
     <span>{label}</span>
+    {participant ? <b className={styles.segmentParticipant}>{participant}</b> : null}
     <strong className={`${styles.winnerBadge} ${winnerClass(winner)}`}>{winnerLabel(winner, tournament)}</strong>
   </div>;
 }
@@ -212,7 +213,7 @@ function TrophyIcon() {
   </svg>;
 }
 
-export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], historyDensity = false, completedHistoryCompact = false }) {
+export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], scorecardCoverage = null, historyDensity = false, completedHistoryCompact = false }) {
   const winningSide = winnerSide(match);
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
   const overallWinner = match.overallWinner || match.matchupWinner;
@@ -230,6 +231,14 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     historyYear >= 2023 && historyYear <= 2025 &&
     scorecards.length > 0;
   const completedHistoryMatchupCleanup = completedHistoryCompact && [2023, 2024, 2025].includes(historyYear);
+  const showCompletedHistoricalNineHoleSegments = match.format !== "SI" ||
+    (historyYear === 2023 && match.id === "2023-R3-7");
+  const completedHistoricalSegmentParticipant = (winner) => {
+    if (historyYear !== 2023 || match.id !== "2023-R3-7") return "";
+    if (winner === "Team 1") return match.team1Players?.[0]?.name || "";
+    if (winner === "Team 2") return match.team2Players?.[0]?.name || "";
+    return "";
+  };
   const hasPairing = [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => player?.name);
   const hasSegments = Boolean(match.frontWinner || match.backWinner || overallWinner);
   const winnerName = halved ? "Match halved" : winningSide === 1 ? tournament.teamOne.name : winningSide === 2 ? tournament.teamTwo.name : "";
@@ -287,6 +296,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
 
       <ScorecardTable
         scorecards={scorecards}
+        historicalCoverage={scorecardCoverage}
         compact
         historyDensity={historyDensity}
         showSummary={historyScorecardParity}
@@ -298,11 +308,11 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         <div className={styles.historicalMatchDetailsBody}>
           {scorecards.length ? <MatchProgressionSummary scorecards={scorecards} /> : null}
           {hasSegments ? <div className={`${styles.segmentGrid} ${match.format === "SI" ? styles.singleSegmentGrid : ""}`}>
-            {match.format !== "SI" ? <>
-              <Segment label="Front 9" winner={match.frontWinner} tournament={tournament} />
-              <Segment label="Back 9" winner={match.backWinner} tournament={tournament} />
+            {showCompletedHistoricalNineHoleSegments ? <>
+              <Segment label="Front 9" winner={match.frontWinner} tournament={tournament} participant={completedHistoricalSegmentParticipant(match.frontWinner)} />
+              <Segment label="Back 9" winner={match.backWinner} tournament={tournament} participant={completedHistoricalSegmentParticipant(match.backWinner)} />
             </> : null}
-            <Segment label="Overall" winner={overallWinner} tournament={tournament} />
+            <Segment label="Overall" winner={overallWinner} tournament={tournament} participant={completedHistoricalSegmentParticipant(overallWinner)} />
           </div> : null}
           {match.notes ? <p className={styles.matchNotes}>{match.notes}</p> : null}
         </div>
@@ -338,6 +348,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       <>
         <ScorecardTable
           scorecards={scorecards}
+          historicalCoverage={scorecardCoverage}
           compact
           historyDensity={historyDensity}
           showSummary={historyScorecardParity}

@@ -123,6 +123,7 @@ function ScoreGrid({
   segment = "full",
   stackPairingIdentities = false,
   hideHoleWinnerSummary = false,
+  suppressHoleWinners = false,
 }) {
   const start = segment === "back" ? 10 : 1;
   const end = segment === "front" ? 9 : 18;
@@ -198,7 +199,7 @@ function ScoreGrid({
         </thead>
         <tbody>
           {rows}
-          {showNet && matchNet?.holeWinners?.length ? (
+          {showNet && matchNet?.holeWinners?.length ? (!suppressHoleWinners ? (
             <tr className={styles.winnerRow}>
               <th>
                 <strong>Hole Winner</strong>
@@ -225,7 +226,7 @@ function ScoreGrid({
               {showTotal ? <td>{matchNet.summary.halved} H</td> : null}
               {showNet ? <td>—</td> : null}
             </tr>
-          ) : null}
+          ) : null) : null}
         </tbody>
       </table>
     </div>
@@ -260,6 +261,7 @@ export default function ScorecardTable({
   historyDensity = false,
   showSummary = false,
   stackPairingIdentities = false,
+  historicalCoverage = null,
 }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
@@ -271,22 +273,38 @@ export default function ScorecardTable({
 
   if (!available.length) return null;
 
-  const partial = available.some((scorecard) =>
+  const partialHoleCoverage = available.some((scorecard) =>
     scorecard.status === "PARTIAL" || scorecard.completedHoleCount < 18
   );
+  const expectedIdentities = Number(historicalCoverage?.expectedLogicalScorecards) || 0;
+  const recordedIdentities = Number(historicalCoverage?.recordedLogicalScorecards) || 0;
+  const partialIdentityCoverage = historicalCoverage?.state === "PARTIAL" &&
+    expectedIdentities > 0 && recordedIdentities > 0 && recordedIdentities < expectedIdentities;
+  const partial = partialHoleCoverage || partialIdentityCoverage;
   const recordedHoles = Math.min(...available.map((scorecard) => scorecard.completedHoleCount));
   const course = available.find((scorecard) => scorecard.courseName)?.courseName || "";
   const tee = teeLabel(available.find((scorecard) => scorecard.tee)?.tee);
   const courseTee = [course, tee].filter(Boolean).join(" · ");
   const hasFront = holesFor(available, 1, 9).length > 0;
   const hasBack = holesFor(available, 10, 18).length > 0;
-  const netAvailable = Boolean(available[0]?.matchNetScoring?.available);
+  const netAvailable = partialIdentityCoverage
+    ? available.every((scorecard) => scorecard.netAvailable === true && hasValue(scorecard.netTotals?.total))
+    : Boolean(available[0]?.matchNetScoring?.available);
+  const identityNoun = historicalCoverage?.format === "SC" ? "pairings" : "golfers";
+  const identityCoverageText = partialIdentityCoverage
+    ? `${recordedIdentities} of ${expectedIdentities} ${identityNoun} recorded`
+    : "";
+  const scoringCoverageText = netAvailable ? "Gross & Net" : "Gross only";
+  const partialAccessibleLabel = partialIdentityCoverage
+    ? `${title}, partial historical scorecard, ${identityCoverageText}. ${[courseTee, scoringCoverageText].filter(Boolean).join(", ")}`
+    : undefined;
 
   return (
     <section className={styles.scorecard} data-compact={compact ? "true" : "false"}>
       <button
         aria-controls={accordionId}
         aria-expanded={open}
+        aria-label={partialAccessibleLabel}
         className={`${styles.toggle} ${historyDensity ? density.scorecardToggle : ""}`}
         onClick={() => setOpen((current) => !current)}
         type="button"
@@ -295,10 +313,12 @@ export default function ScorecardTable({
           <strong>{title}</strong>
           {courseTee ? <small>{courseTee}</small> : null}
           <b>
-            {partial ? "Partial Scorecard · " : ""}{recordedHoles} holes recorded
-            {" · "}{historyDensity
-              ? (netAvailable ? "Gross & Net" : "Gross only")
-              : (netAvailable ? "Gross and net scoring available" : "Gross scoring available")}
+            {partialIdentityCoverage
+              ? `Partial historical scorecard · ${identityCoverageText} · ${scoringCoverageText}`
+              : <>{partialHoleCoverage ? "Partial Scorecard · " : ""}{recordedHoles} holes recorded
+                {" · "}{historyDensity
+                  ? scoringCoverageText
+                  : (netAvailable ? "Gross and net scoring available" : "Gross scoring available")}</>}
           </b>
         </span>
         <i aria-hidden="true">⌄</i>
@@ -314,24 +334,26 @@ export default function ScorecardTable({
         <div>
           {partial ? (
             <div className={styles.partial} role="status">
-              Partial Scorecard · Only recorded holes are shown. Full-round statistics exclude this scorecard.
+              {partialIdentityCoverage
+                ? `Partial historical scorecard · ${identityCoverageText}. Only canonical recorded scoring identities are shown.`
+                : "Partial Scorecard · Only recorded holes are shown. Full-round statistics exclude this scorecard."}
             </div>
           ) : null}
 
           {showSummary ? <ScorecardSummary scorecards={available} stackPairingIdentities={stackPairingIdentities} /> : null}
 
           <div className={styles.desktopGrid}>
-            <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} stackPairingIdentities={stackPairingIdentities} />
+            <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
           </div>
 
           <div className={`${styles.mobileGrid} ${historyDensity ? density.mobileGrid : ""}`}>
             {hasFront ? <section>
               <header><strong>Front 9</strong><span>Holes 1–9</span></header>
-              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="front" stackPairingIdentities={stackPairingIdentities} />
+              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="front" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
             </section> : null}
             {hasBack ? <section>
               <header><strong>Back 9</strong><span>Holes 10–18</span></header>
-              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="back" stackPairingIdentities={stackPairingIdentities} />
+              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="back" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
             </section> : null}
           </div>
 

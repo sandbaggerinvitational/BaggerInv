@@ -109,7 +109,7 @@ function scorecardCoverageFixture() {
   return { matches, base, projected };
 }
 
-test("the canonical 2023 tournament baseline preserves all authoritative team points and the 50–28 Final", () => {
+test("the bundled 2023 fallback remains read-only evidence of the former 50–28 snapshot", () => {
   const tournament = archive.tournaments.find((row) => Number(row.Year) === 2023);
   const matches = archive.matches.filter((row) => Number(row.Year) === 2023);
   assert.equal(tournament.Annual, "7th");
@@ -126,6 +126,9 @@ test("the canonical 2023 tournament baseline preserves all authoritative team po
   assert.deepEqual(roundPoints, [[7.5, 16.5], [4.5, 13.5], [16, 20]]);
   assert.deepEqual(roundPoints.reduce((sum, row) => [sum[0] + row[0], sum[1] + row[1]], [0, 0]), [28, 50]);
   assert.ok(matches.every((match) => ["Team 1", "Team 2", "Halved"].includes(match["Matchup Winner"])));
+  const matchSeven = matches.find((match) => match["Match ID"] === "2023-R3-7");
+  assert.equal(matchSeven["Matchup Winner"], "Halved");
+  assert.deepEqual([matchSeven["Team 1 Points"], matchSeven["Team 2 Points"]], [1.5, 1.5]);
 });
 
 test("the 2023 Course ID projection resolves only one complete round/format scoring set", () => {
@@ -164,12 +167,16 @@ test("ambiguous 2023 scoring context fails closed without a tee alias or source 
   assert.equal(result.projectedRoundScorecards[0]["Course ID"], "STALE");
 });
 
-test("the established 20-of-24 eligibility contract is proven from six missing scoring identities", () => {
+test("the established coverage contract distinguishes 20 complete, two partial, and two empty matches", () => {
   const fixture = scorecardCoverageFixture();
   const coverage = buildLegacyHistoryScorecardCoverage({ year: 2023, matches: fixture.matches, scorecards: fixture.projected, teamIds: ["T1", "T2"] });
   assert.equal(fixture.projected.length, 60);
   assert.equal(fixture.projected.filter((card) => card.status === "MISSING").length, 6);
   assert.equal(coverage.completeMatchScorecards, 20);
+  assert.equal(coverage.partialMatchScorecards, 2);
+  assert.equal(coverage.noScorecardMatches, 2);
+  assert.equal(coverage.recordedLogicalScorecards, 54);
+  assert.equal(coverage.expectedLogicalScorecards, 60);
   assert.deepEqual(coverage.rounds.map((round) => round.completeMatchScorecards), [5, 4, 11]);
   assert.deepEqual(coverage.rounds.map((round) => round.partialMatchScorecards), [1, 0, 1]);
   assert.deepEqual(coverage.rounds.map((round) => round.noScorecardMatches), [0, 2, 0]);

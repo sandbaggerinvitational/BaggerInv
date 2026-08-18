@@ -210,6 +210,8 @@ export default async function HistoricalRoundPage({ params }) {
     teamIds: [archive.teamOne.id, archive.teamTwo.id],
   });
   const completeLegacyMatchIds = new Set(legacyScorecardCoverage?.completeMatchIds || []);
+  const legacyMatchCoverageById = new Map((legacyScorecardCoverage?.matches || []).map((match) => [match.matchId, match]));
+  const scorecardCoverageForMatch = (matchId) => legacyMatchCoverageById.get(matchId) || null;
   const legacyRoundMatches = useSupabase2026
     ? []
     : getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round));
@@ -525,7 +527,26 @@ export default async function HistoricalRoundPage({ params }) {
         ) : (
           <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""} ${completedHistoryMaster ? completedRoundStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
-              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} /> : <PublicMatchCard key={match.id} match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }} round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }} tournament={archive} variant="historical" scorecards={completeLegacyMatchIds.has(match.id) ? displayScorecardsForMatch(match.id) : []} historyDensity completedHistoryCompact={completedHistoryMaster} />
+              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} /> : completed2023 ? <PublicMatchCard
+                key={match.id}
+                match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
+                round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }}
+                tournament={archive}
+                variant="historical"
+                scorecards={scorecardCoverageForMatch(match.id)?.state !== "NONE" ? displayScorecardsForMatch(match.id) : []}
+                scorecardCoverage={scorecardCoverageForMatch(match.id)}
+                historyDensity
+                completedHistoryCompact={completedHistoryMaster}
+              /> : <PublicMatchCard
+                key={match.id}
+                match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
+                round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }}
+                tournament={archive}
+                variant="historical"
+                scorecards={completeLegacyMatchIds.has(match.id) ? displayScorecardsForMatch(match.id) : []}
+                historyDensity
+                completedHistoryCompact={completedHistoryMaster}
+              />
             ))}
           </div>
         )}

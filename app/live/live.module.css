@@ -303,6 +303,17 @@
   font-size: .65rem;
 }
 
+.segmentParticipant {
+  margin-top: 10px;
+  color: #243a31;
+  font-size: .78rem;
+  line-height: 1.2;
+}
+
+.segmentParticipant + .winnerBadge {
+  margin-top: 4px;
+}
+
 .winnerBadge {
   display: inline-flex;
   align-items: center;

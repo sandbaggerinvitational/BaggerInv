@@ -38,7 +38,10 @@ import {
   buildHistoricalTournamentRecords,
   build2025TournamentRecords,
 } from "../../../lib/history-2025-tournament-records";
-import { selectCanonical2023NetPresentationScorecards } from "../../../lib/history-2023-projection";
+import {
+  projectCanonical2023TournamentFinal,
+  selectCanonical2023NetPresentationScorecards,
+} from "../../../lib/history-2023-projection";
 import {
   buildHistoricalIndividualBirdieHolders,
   buildHistoricalIndividualStatisticHolders,
@@ -161,6 +164,13 @@ function completedScore(value) {
     .replace(/\.0+$/, "");
 }
 
+function completedRecordHolderContexts(record) {
+  if (!Array.isArray(record?.winners)) return [];
+  return record.winners
+    .map((winner) => winner?.context || winner)
+    .filter((winner) => winner?.holder);
+}
+
 function CompletedYearOverview({
   tournament,
   leaderboard,
@@ -192,15 +202,38 @@ function CompletedYearOverview({
   const remainingRecords = allRecords.filter(
     (item) => !defaultRecordLabels.includes(item.label)
   );
-  const renderRecord = (item, compact = false) => (
-    <article className={compact ? completedStyles.recordRow : completedStyles.recordCard} key={item.key || item.label} aria-label={item.accessibleLabel}>
+  const structured2023Holders = Number(tournament.year) === 2023;
+  const renderRecord = (item, compact = false) => {
+    const holderContexts = structured2023Holders ? completedRecordHolderContexts(item) : [];
+    const birdieRecord = item.key === "birdie-leader";
+    return <article
+      className={compact ? completedStyles.recordRow : completedStyles.recordCard}
+      data-record-key={item.key || undefined}
+      key={item.key || item.label}
+      aria-label={item.accessibleLabel}
+    >
       <span>{item.label}</span>
       <strong>{item.value}</strong>
-      {item.detail ? <b>{item.detail}</b> : null}
-      {item.context ? <small className={completedStyles.recordContext}>{item.context}</small> : null}
+      {holderContexts.length ? <div
+        className={`${completedStyles.recordHolderList} ${birdieRecord ? completedStyles.birdieHolderList : ""}`}
+        data-record-holder-list
+      >
+        {holderContexts.map((holder, index) => {
+          const context = [holder.formatName, holder.course].filter(Boolean).join(" · ");
+          const holderLabel = [holder.holder, holder.classification === "TEAM" ? holder.team : "", birdieRecord ? "" : context].filter(Boolean).join(", ");
+          return <div className={completedStyles.recordHolderBlock} data-record-holder-block role="group" aria-label={holderLabel} key={`${item.key}-${holder.matchId || holder.playerId || holder.holder}-${index}`}>
+            <b>{holder.holder}</b>
+            {!birdieRecord && holder.classification === "TEAM" && holder.team ? <small className={completedStyles.recordHolderTeam}>{holder.team}</small> : null}
+            {!birdieRecord && context ? <small>{context}</small> : null}
+          </div>;
+        })}
+      </div> : <>
+        {item.detail ? <b>{item.detail}</b> : null}
+        {item.context ? <small className={completedStyles.recordContext}>{item.context}</small> : null}
+      </>}
       {item.sample ? <small>{item.sample}</small> : null}
-    </article>
-  );
+    </article>;
+  };
   const renderStanding = (row, keyPrefix) => {
     const player = leaderboardPlayer(row);
     const rank = row.tournamentRank || row.rank;
@@ -452,7 +485,7 @@ export default async function TournamentYearPage({ params }) {
       ? "points"
       : (row) => `${row.winPercentage.toFixed(6)}|${row.wins}|${row.losses}|${row.halves}`
   );
-  const status = tournamentStatus(tournament);
+  let status = tournamentStatus(tournament);
   const tournamentScorecards = filterScorecards(scorecardAnalytics.usableScorecards, { year });
   const missingTournamentScorecards = scorecardAnalytics.missingScorecards.filter(
     (scorecard) => scorecard.year === Number(year)
@@ -481,6 +514,16 @@ export default async function TournamentYearPage({ params }) {
     }
     : scoringStatistics;
   const tournamentMatches = useSupabase2026 ? [] : getTournamentMatches(year);
+  if (Number(tournament?.year) === 2023) {
+    const pointProjection = projectCanonical2023TournamentFinal({
+      tournament,
+      matches: tournamentMatches,
+    });
+    if (pointProjection.applied) {
+      tournament = pointProjection.tournament;
+      status = tournamentStatus(tournament);
+    }
+  }
   const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
     year,
     matches: tournamentMatches,
