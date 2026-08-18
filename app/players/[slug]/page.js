@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { refreshHistoricalData } from "../../../lib/stats";
+import { refreshCanonicalCareerHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
@@ -19,12 +19,15 @@ import { addTournamentRanks } from "../../../lib/rankings";
 import styles from "../../historical.module.css";
 import { formatPlayerPoints } from "../../../lib/formatters";
 import { formatPlayerCareerYears } from "../../../lib/player-career";
-import { safePlayerDirectoryReturnHref } from "../../../lib/context-navigation";
+import {
+  historicalPlayerReturnContext,
+  safePlayerDirectoryReturnHref,
+} from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
 import { getDrafts } from "../../../lib/draft";
 import { getPlayerDraftHistory } from "../../../lib/draft-analytics";
-import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
+import { loadCanonicalCareerScorecardAnalytics } from "../../../lib/scorecard-data";
 import { filterScorecards } from "../../../lib/scorecard-analytics";
 import { buildPlayerIntelligence } from "../../../lib/player-intelligence";
 import PlayerIntelligenceSections from "./PlayerIntelligenceSections";
@@ -35,7 +38,7 @@ import { participantIdentityAuthorityEnvironment } from "../../../lib/participan
 import { resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver";
 
 export async function generateMetadata({ params }) {
-  await refreshHistoricalData();
+  await refreshCanonicalCareerHistoricalData();
   const { slug } = await params;
   const player = getPlayerBySlug(slug);
 
@@ -92,13 +95,14 @@ function ChampionshipTimeline({ years, styles }) {
 
 
 export default async function PlayerPage({ params, searchParams }) {
-  const scorecardAnalyticsPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
+  const scorecardAnalyticsPromise = loadCanonicalCareerScorecardAnalytics();
+  await refreshCanonicalCareerHistoricalData();
   const { slug } = await params;
   const query = await searchParams;
   const playerDirectoryReturnHref = safePlayerDirectoryReturnHref(
     query?.returnTo
   );
+  const historyReturnContext = historicalPlayerReturnContext(query);
   const player = getPlayerBySlug(slug);
   if (!player) notFound();
   const cookieStore = await cookies();
@@ -133,13 +137,14 @@ export default async function PlayerPage({ params, searchParams }) {
     .map((season) => season.year);
   const careerYears = formatPlayerCareerYears(player, recordedAppearanceYears);
   const scorecardAnalytics = await scorecardAnalyticsPromise;
+  const careerScorecards = scorecardAnalytics.canonicalCareerScorecards;
   const officialRecords = getRecords();
   const playerIntelligence = buildPlayerIntelligence({
     playerId: player["Player ID"],
     stats,
     allPlayerStats: officialRecords.all,
     officialRecords,
-    scorecards: scorecardAnalytics.scorecards,
+    scorecards: careerScorecards,
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
   });
   const playerMatchIds = new Set(
@@ -148,7 +153,7 @@ export default async function PlayerPage({ params, searchParams }) {
   const scorecardsByMatch = Object.fromEntries(
     [...playerMatchIds].map((matchId) => [
       matchId,
-      filterScorecards(scorecardAnalytics.scorecards, { matchId }),
+      filterScorecards(careerScorecards, { matchId }),
     ])
   );
 
@@ -162,12 +167,15 @@ export default async function PlayerPage({ params, searchParams }) {
     <main>
       <Header />
       <ContextBackLink
-        href={participantIdentity ? "/home" : playerDirectoryReturnHref}
-        label={participantIdentity ? "Back to My Tournament" : "Back to All Sandbaggers"}
+        accessibleLabel={historyReturnContext?.accessibleLabel}
+        href={historyReturnContext?.href || (participantIdentity ? "/home" : playerDirectoryReturnHref)}
+        label={historyReturnContext?.label || (participantIdentity ? "Back to My Tournament" : "Back to All Sandbaggers")}
+        prefetch={historyReturnContext ? false : undefined}
       />
-      {participantIdentity ? <ContextBackLink
+      {historyReturnContext || participantIdentity ? <ContextBackLink
         href={playerDirectoryReturnHref}
         label="Browse All Sandbaggers"
+        prefetch={historyReturnContext ? false : undefined}
       /> : null}
 
       <section className={styles.pageHero}>
@@ -218,6 +226,7 @@ export default async function PlayerPage({ params, searchParams }) {
         <PlayerIntelligenceSections
           intelligence={playerIntelligence}
           formatMatchHistory={formatMatchHistory}
+          playerName={player["Display Name"]}
           scorecardsByMatch={scorecardsByMatch}
         />
 
@@ -288,7 +297,11 @@ export default async function PlayerPage({ params, searchParams }) {
               </div>
               <div>
                 <span>Points Won</span>
-                <strong>{rival.record.matches}</strong>
+                <strong>
+                  {rival.record.recordedPointMatches > 0
+                    ? formatPlayerPoints(rival.record.points)
+                    : <span aria-label="Points not recorded">—</span>}
+                </strong>
               </div>
               <div>
                 <span>Head-to-Head</span>
@@ -356,7 +369,11 @@ export default async function PlayerPage({ params, searchParams }) {
                   photo={row.player["Photo Filename"]}
                 />
                 <span>{formatRecord(row.record)}</span>
-                <strong>{formatPlayerPoints(row.record.points)}</strong>
+                <strong>
+                  {row.record.recordedPointMatches > 0
+                    ? formatPlayerPoints(row.record.points)
+                    : <span aria-label="Points not recorded">—</span>}
+                </strong>
               </div>
             ))}
           </div>

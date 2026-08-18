@@ -3975,6 +3975,13 @@
   }
 }
 
+@media (max-width: 350px) {
+  .profileChampionshipRow {
+    flex-wrap: wrap;
+    row-gap: 3px;
+  }
+}
+
 
 /* =========================================================
    V8.1 â€” CAREER TIMELINE & TOURNAMENT STATUS POLISH
@@ -4672,7 +4679,7 @@
 }
 
 .playerTournamentHistoryHead,
-.playerTournamentHistory > a {
+.playerTournamentHistoryRow {
   display: grid;
   grid-template-columns: .45fr minmax(150px, 1.35fr) .8fr .65fr .6fr .75fr;
   gap: 16px;
@@ -4689,7 +4696,7 @@
   text-transform: uppercase;
 }
 
-.playerTournamentHistory > a {
+.playerTournamentHistoryRow {
   min-height: 48px;
   padding: 9px 8px;
   border-left: 3px solid var(--history-team-color, var(--tsi-gold-600));
@@ -4697,8 +4704,13 @@
   color: var(--tsi-ink);
 }
 
-.playerTournamentHistory > a:hover {
+.playerTournamentHistoryRow[href]:hover {
   background: rgba(247, 242, 232, .55);
+}
+
+.playerTournamentHistoryRow[href]:focus-visible {
+  outline: 3px solid var(--tsi-gold-500);
+  outline-offset: 2px;
 }
 
 .playerTournamentHistory strong {
@@ -4741,8 +4753,8 @@
   font-style: normal;
 }
 
-.playerTournamentHistory > a[data-finish="champion"] .playerTournamentFinish,
-.playerTournamentHistory > a[data-finish="runner-up"] .playerTournamentFinish {
+.playerTournamentHistoryRow[data-finish="champion"] .playerTournamentFinish,
+.playerTournamentHistoryRow[data-finish="runner-up"] .playerTournamentFinish {
   padding: 4px 7px;
   border-radius: 999px;
   font-size: .65rem;
@@ -4751,13 +4763,13 @@
   text-transform: uppercase;
 }
 
-.playerTournamentHistory > a[data-finish="champion"] .playerTournamentFinish {
+.playerTournamentHistoryRow[data-finish="champion"] .playerTournamentFinish {
   border: 1px solid rgba(177, 137, 50, .5);
   background: rgba(177, 137, 50, .12);
   color: var(--tsi-gold-600);
 }
 
-.playerTournamentHistory > a[data-finish="runner-up"] .playerTournamentFinish {
+.playerTournamentHistoryRow[data-finish="runner-up"] .playerTournamentFinish {
   border: 1px solid rgba(116, 124, 121, .35);
   background: rgba(116, 124, 121, .09);
   color: var(--tsi-muted);
@@ -4881,7 +4893,7 @@
     display: none;
   }
 
-  .playerTournamentHistory > a {
+  .playerTournamentHistoryRow {
     margin-bottom: 8px;
     padding: 10px 11px;
     border: 1px solid var(--tsi-line);
@@ -4891,7 +4903,7 @@
     gap: 7px 16px;
   }
 
-  .playerTournamentHistory > a strong,
+  .playerTournamentHistoryRow strong,
   .playerTournamentTeam {
     grid-column: 1 / -1;
   }
@@ -4908,12 +4920,12 @@
     white-space: normal;
   }
 
-  .playerTournamentHistory > a span {
+  .playerTournamentHistoryRow span {
     display: grid;
     gap: 2px;
   }
 
-  .playerTournamentHistory > a span::before {
+  .playerTournamentHistoryRow span::before {
     content: attr(data-label);
     color: var(--tsi-muted);
     font-size: .59rem;
@@ -4922,7 +4934,7 @@
     text-transform: uppercase;
   }
 
-  .playerTournamentHistory > a span:nth-of-type(n + 2) {
+  .playerTournamentHistoryRow span:nth-of-type(n + 2) {
     font-size: .78rem;
   }
 

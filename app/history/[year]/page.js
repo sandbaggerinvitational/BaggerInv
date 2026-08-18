@@ -21,6 +21,7 @@ import {
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { formatPlayerPoints } from "../../../lib/formatters";
+import { historicalPlayerProfileHref } from "../../../lib/context-navigation";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
@@ -218,7 +219,6 @@ function CompletedYearOverview({
     (item) => !defaultRecordLabels.includes(item.label)
   );
   const structuredCompletedHolders = [2023, 2024, 2025].includes(Number(tournament.year));
-  const linkHistoricalPlayers = !evidenceGatedSections;
   const renderRecord = (item, compact = false) => {
     const holderContexts = structuredCompletedHolders ? completedRecordHolderContexts(item) : [];
     const birdieRecord = item.label === "Birdie Leader";
@@ -253,9 +253,10 @@ function CompletedYearOverview({
   const renderStanding = (row, keyPrefix) => {
     const player = leaderboardPlayer(row);
     const rank = row.tournamentRank || row.rank;
-    return <div className={`${pwaStyles.standingsRow} ${completedStyles.standingRow}`} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss", "losses")}, ${standingsCountLabel(row.halves, "tie")}, ${formatPlayerPoints(row.points)} points`}>
+    const playerProfileHref = historicalPlayerProfileHref(player.slug, tournament.year);
+    return <div className={`${pwaStyles.standingsRow} ${completedStyles.standingRow}`} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss", "losses")}, ${standingsCountLabel(row.halves, "tie")}, ${pointsTracked ? `${formatPlayerPoints(row.points)} points` : "points not recorded"}`}>
       <strong>{rank}</strong>
-      <span>{linkHistoricalPlayers && player.slug ? <Link href={`/players/${player.slug}`}>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></Link> : <>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></>}</span>
+      <span>{playerProfileHref ? <Link aria-label={`View ${player.name} career profile`} href={playerProfileHref} prefetch={false}>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></Link> : <>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></>}</span>
       <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
     </div>;
   };

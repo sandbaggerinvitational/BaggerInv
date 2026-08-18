@@ -3,6 +3,7 @@ import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
 import { formatPercentage, formatRecord } from "../../../lib/stats";
 import { formatPlayerPoints } from "../../../lib/formatters";
+import { isCompletedHistoryPlayerYear } from "../../../lib/context-navigation";
 import TeamLogoPlate from "../../TeamLogoPlate";
 import styles from "../../historical.module.css";
 
@@ -39,22 +40,15 @@ function RankingList({ rows }) {
   );
 }
 
-function TournamentHistoryRow({ season }) {
+function TournamentHistoryRow({ playerName, season }) {
   const upcoming = season.finish === "Upcoming";
+  const completedHistoryYear = isCompletedHistoryPlayerYear(season.year);
   const finishKey = String(season.finish || "")
     .toLowerCase()
     .replace(/[^a-z]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-  return (
-    <Link
-      href={`/history/${season.year}`}
-      data-finish={finishKey}
-      style={{
-        "--history-team-color":
-          season.teamColor || "var(--tsi-gold-600)",
-      }}
-    >
+  const content = <>
       <strong>{season.year}</strong>
       <div className={styles.playerTournamentTeam}>
         {season.teamLogo ? (
@@ -70,19 +64,51 @@ function TournamentHistoryRow({ season }) {
         <em className={styles.playerTournamentFinish}>{season.finish}</em>
       </span>
       <span data-label="Record">{upcoming ? "—" : season.recordDisplay}</span>
-      <span data-label="Points">{upcoming ? "—" : formatPlayerPoints(season.points)}</span>
-      <span data-label="Avg Score">
+      <span
+        aria-label={upcoming || !season.pointsRecorded ? "Points not recorded" : undefined}
+        data-label="Points"
+      >
+        {upcoming || !season.pointsRecorded ? "—" : formatPlayerPoints(season.points)}
+      </span>
+      <span
+        aria-label={upcoming || season.averageScore === null ? "Average score not recorded" : undefined}
+        data-label="Avg Score"
+      >
         {upcoming || season.averageScore === null
           ? "—"
           : formatScoringNumber(season.averageScore)}
       </span>
+    </>;
+  const rowStyle = {
+    "--history-team-color": season.teamColor || "var(--tsi-gold-600)",
+  };
+
+  return completedHistoryYear ? (
+    <Link
+      aria-label={`View ${playerName}'s ${season.year} Tournament History`}
+      className={styles.playerTournamentHistoryRow}
+      data-finish={finishKey}
+      href={`/history/${season.year}`}
+      prefetch={false}
+      style={rowStyle}
+    >
+      {content}
     </Link>
+  ) : (
+    <div
+      className={styles.playerTournamentHistoryRow}
+      data-finish={finishKey}
+      style={rowStyle}
+    >
+      {content}
+    </div>
   );
 }
 
 export default function PlayerIntelligenceSections({
   intelligence,
   formatMatchHistory,
+  playerName,
   scorecardsByMatch,
 }) {
   const { official, hole, progression } = intelligence;
@@ -169,7 +195,7 @@ export default function PlayerIntelligenceSections({
             <span>Avg Score</span>
           </div>
           {intelligence.tournamentHistory.map((season) => (
-            <TournamentHistoryRow season={season} key={season.year} />
+            <TournamentHistoryRow playerName={playerName} season={season} key={season.year} />
           ))}
         </div>
       </IntelligenceSection>
