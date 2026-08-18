@@ -160,12 +160,12 @@ test("Scramble record holders resolve to canonical pairings and team context thr
   assert.doesNotMatch(bestTeam.accessibleLabel, /SOURCE-TWO|T2-CANONICAL/);
 });
 
-test("Birdie Leader counts literal birdies across individual holes and excludes Scramble and eagles", () => {
+test("Birdie Leader counts literal birdies across the canonical individual population and excludes Scramble and eagles", () => {
   const model = build2025TournamentRecords({ scorecards: fixtureScorecards(), matches, teams });
   const birdie = byKey(model, "birdie-leader");
   assert.equal(birdie.value, "3");
   assert.equal(birdie.detail, "Alpha Golfer");
-  assert.equal(birdie.sample, "2 individual rounds · 36 holes");
+  assert.equal(birdie.sample, "6 individual rounds · 108 holes");
   assert.equal(birdie.sampleSize, 108);
 });
 

@@ -218,11 +218,11 @@ test("the 2023 record model derives Birdie provenance from all 46 individual rou
   assert.equal(records.proofs.birdieLeader.sample, "46 individual rounds · 828 holes");
 });
 
-test("2023-only record holder blocks and partial scorecard semantics are wired without changing frozen years", () => {
-  assert.match(overviewPage, /const structured2023Holders = Number\(tournament\.year\) === 2023/);
+test("completed-year record holder blocks and 2023 partial scorecard semantics are wired without changing older years", () => {
+  assert.match(overviewPage, /const structuredCompletedHolders = \[2023, 2024, 2025\]\.includes\(Number\(tournament\.year\)\)/);
   assert.match(overviewPage, /data-record-holder-block/);
   assert.match(overviewPage, /holder\.classification === "TEAM" && holder\.team/);
-  assert.match(overviewPage, /const birdieRecord = item\.key === "birdie-leader"/);
+  assert.match(overviewPage, /const birdieRecord = item\.label === "Birdie Leader"/);
   assert.match(roundPage, /scorecardCoverageForMatch\(match\.id\)\?\.state !== "NONE"/);
   assert.match(roundPage, /completed2023 \? <PublicMatchCard[\s\S]*scorecardCoverage=\{scorecardCoverageForMatch\(match\.id\)\}/);
   assert.match(scorecardTable, /Partial historical scorecard/);

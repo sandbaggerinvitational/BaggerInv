@@ -34,6 +34,7 @@ import {
 import { buildScoringHighlights, filterScorecards } from "../../../lib/scorecard-analytics";
 import { buildLegacyHistoryScorecardCoverage } from "../../../lib/legacy-history-scorecard-coverage";
 import {
+  buildHistoricalBirdiePopulationProvenance,
   buildHistoricalScrambleRoundStatisticHolders,
   buildHistoricalTournamentRecords,
   build2025TournamentRecords,
@@ -202,10 +203,10 @@ function CompletedYearOverview({
   const remainingRecords = allRecords.filter(
     (item) => !defaultRecordLabels.includes(item.label)
   );
-  const structured2023Holders = Number(tournament.year) === 2023;
+  const structuredCompletedHolders = [2023, 2024, 2025].includes(Number(tournament.year));
   const renderRecord = (item, compact = false) => {
-    const holderContexts = structured2023Holders ? completedRecordHolderContexts(item) : [];
-    const birdieRecord = item.key === "birdie-leader";
+    const holderContexts = structuredCompletedHolders ? completedRecordHolderContexts(item) : [];
+    const birdieRecord = item.label === "Birdie Leader";
     return <article
       className={compact ? completedStyles.recordRow : completedStyles.recordCard}
       data-record-key={item.key || undefined}
@@ -564,6 +565,9 @@ export default async function TournamentYearPage({ params }) {
       acceptedValue: completed2024IndividualStatistics.birdieLeader.value,
     })
     : [];
+  const completed2024BirdieProvenance = Number(tournament?.year) === 2024
+    ? buildHistoricalBirdiePopulationProvenance(completed2024IndividualStatisticScorecards)
+    : null;
   const completed2024Records = Number(tournament?.year) === 2024
     ? scoringItems(completed2024RecordStatistics, participant, tournament.courses)
       .filter((item) =>
@@ -587,12 +591,18 @@ export default async function TournamentYearPage({ params }) {
         const context = holders.length ? historicalHolderContext(holders) : item.context;
         const sample = item.label === "Average Score"
           ? `${completed2024IndividualStatisticScorecards.length} individual rounds`
-          : item.sample;
+          : item.label === "Birdie Leader"
+            ? completed2024BirdieProvenance.label
+            : item.sample;
         return {
           ...item,
           detail,
           context,
           sample,
+          winners: holders.map((holder) => ({
+            ...holder,
+            holder: holder.holder || holder.name,
+          })),
           key: `2024-${item.label}`,
           accessibleLabel: [item.label, item.value, detail, context, sample].filter(Boolean).join(", "),
         };
