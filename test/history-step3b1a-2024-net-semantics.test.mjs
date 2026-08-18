@@ -262,7 +262,7 @@ test("zero Birdie Leaders are omitted only from the audited 2024 presentation", 
   assert.equal(omitMeaninglessHistoricalBirdieLeader({ year: 2024, value: 0 }), true);
   assert.equal(omitMeaninglessHistoricalBirdieLeader({ year: 2024, value: 1 }), false);
   assert.equal(omitMeaninglessHistoricalBirdieLeader({ year: 2025, value: 0 }), false);
-  assert.match(roundPage, /showBirdieLeader[\s\S]*completed2024RoundStatisticItems/);
+  assert.match(roundPage, /showBirdieLeader[\s\S]*completedHistoryRoundStatisticItems/);
   assert.match(overviewPage, /item\.label === "Birdie Leader"[\s\S]*omitMeaninglessHistoricalBirdieLeader/);
 });
 

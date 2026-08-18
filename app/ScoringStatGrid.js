@@ -14,7 +14,7 @@ export default function ScoringStatGrid({ items = [], dense = false }) {
   return (
     <div className={`${styles.grid} ${dense ? styles.dense : ""}`}>
       {items.map((item) => (
-        <article className={styles.card} key={item.label}>
+        <article className={styles.card} key={item.label} aria-label={item.accessibleLabel || undefined}>
           <span>{item.label}</span>
           <strong>{item.value}</strong>
           {item.holders?.length ? (

@@ -248,13 +248,14 @@ test("Match Intelligence consumes the corrected shadow evidence with no new form
 });
 
 test("2024 statistics use performance-first order and omit zero-sample cards", () => {
-  const start = roundPage.indexOf("const completed2024RoundStatisticItems");
+  const start = roundPage.indexOf("const completedHistoryRoundStatisticItems");
   const end = roundPage.indexOf("const roundStatisticItems", start);
   const order = roundPage.slice(start, end);
-  for (const label of ["lowestFrontNineStatisticItem", "lowestBackNineStatisticItem", "averageScoreStatisticItem", "birdieLeaderStatisticItem", "hardestHoleStatisticItem", "easiestHoleStatisticItem"]) {
+  for (const label of ["lowestFrontNineStatisticItem", "lowestBackNineStatisticItem", "lowestRoundStatisticItem", "lowestTeamRoundStatisticItem", "birdieLeaderStatisticItem", "averageScoreStatisticItem", "hardestHoleStatisticItem", "easiestHoleStatisticItem"]) {
     assert.ok(order.includes(label));
   }
-  assert.ok(order.indexOf("birdieLeaderStatisticItem") < order.indexOf("hardestHoleStatisticItem"));
+  assert.ok(order.indexOf("birdieLeaderStatisticItem") < order.indexOf("averageScoreStatisticItem"));
+  assert.ok(order.indexOf("averageScoreStatisticItem") < order.indexOf("hardestHoleStatisticItem"));
   assert.match(roundPage, /!\/\^Based on 0 recorded\/i\.test/);
 });
 

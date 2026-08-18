@@ -82,10 +82,11 @@ test("2026 Round Statistics place Birdie Leader before course-difficulty statist
   assert.match(currentOrder, /lowestFrontNineStatisticItem[\s\S]*lowestBackNineStatisticItem[\s\S]*averageScoreStatisticItem[\s\S]*birdieLeaderStatisticItem/);
 });
 
-test("completed-year statistic rendering remains on its prior order", () => {
+test("completed-year statistic rendering uses the final format-aware order", () => {
   const completedOrder = block(roundPage, "const completedHistoryRoundStatisticItems", "const roundStatisticItems = useSupabase2026");
-  assert.ok(completedOrder.indexOf("hardestHoleStatisticItem") < completedOrder.indexOf("birdieLeaderStatisticItem"));
-  assert.match(roundPage, /const roundStatisticItems = useSupabase2026[\s\S]*: completedHistoryRoundStatisticItems/);
+  assert.match(completedOrder, /orderCompletedHistoryRoundStatistics/);
+  assert.match(completedOrder, /lowestFrontNine:[\s\S]*lowestBackNine:[\s\S]*lowestRound:[\s\S]*lowestTeamRound:[\s\S]*birdieLeader:[\s\S]*averageScore:[\s\S]*hardestHole:[\s\S]*easiestHole:/);
+  assert.match(roundPage, /completedHistoryMaster \? completedHistoryRoundStatisticItems : legacyHistoricalRoundStatisticItems/);
 });
 
 test("Most Birdies and inapplicable zero-sample statistics remain excluded from 2026", () => {
