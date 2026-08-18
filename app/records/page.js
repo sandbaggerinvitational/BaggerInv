@@ -14,10 +14,13 @@ import { pageMetadata } from "../../lib/seo";
 import { loadScorecardAnalytics } from "../../lib/scorecard-data";
 import ScoringStatGrid from "../ScoringStatGrid";
 import {
-  buildScorecardRecordLeaderboards,
   formatRecordValue,
 } from "../../lib/scorecard-record-leaderboards";
-import { buildMatchProgressionAnalytics } from "../../lib/match-progression";
+import {
+  getLeaderboardFromRecords,
+  getLeaderboardSlugs,
+} from "../../lib/leaderboards";
+import { buildCanonicalRecordHolderAuthority } from "../../lib/record-holder-authority";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -68,13 +71,16 @@ export default async function RecordsPage() {
   const playerNames = Object.fromEntries(
     records.points.map(({ player }) => [player["Player ID"], player["Display Name"]])
   );
-  const scorecardRecords = buildScorecardRecordLeaderboards(scorecardAnalytics.scorecards, {
+  const recordAuthority = buildCanonicalRecordHolderAuthority({
+    officialLeaderboards: getLeaderboardSlugs().map((slug) =>
+      getLeaderboardFromRecords(slug, records)
+    ),
+    scorecards: scorecardAnalytics.scorecards,
     playerNames,
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
   });
-  const matchProgression = buildMatchProgressionAnalytics(scorecardAnalytics.scorecards, {
-    ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
-  });
+  const scorecardRecords = recordAuthority.scorecardCatalog;
+  const matchProgression = recordAuthority.matchProgression;
   const scoreToPar = (value) => Number(value) === 0
     ? "Even"
     : `${Number(value) > 0 ? "+" : ""}${value}`;

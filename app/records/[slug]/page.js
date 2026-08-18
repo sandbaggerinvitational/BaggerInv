@@ -10,13 +10,12 @@ import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import {
-  buildScorecardRecordLeaderboards,
   scorecardLeaderboardRows,
 } from "../../../lib/scorecard-record-leaderboards";
 import {
-  buildMatchProgressionAnalytics,
   matchProgressionLeaderboardRows,
 } from "../../../lib/match-progression";
+import { buildCanonicalRecordHolderAuthority } from "../../../lib/record-holder-authority";
 
 export const dynamic = "force-dynamic";
 
@@ -27,13 +26,15 @@ async function resolveLeaderboard(slug) {
   const playerNames = Object.fromEntries(analytics.scorecards
     .filter((card) => card.playerId)
     .map((card) => [card.playerId, card.playerName || card.playerId]));
-  const record = buildScorecardRecordLeaderboards(analytics.scorecards, {
+  const authority = buildCanonicalRecordHolderAuthority({
+    scorecards: analytics.scorecards,
     playerNames,
     ghostMatchExclusions: analytics.ghostMatchExclusions,
-  }).bySlug[slug];
-  const progressionRecord = record ? null : buildMatchProgressionAnalytics(analytics.scorecards, {
-    ghostMatchExclusions: analytics.ghostMatchExclusions,
-  }).byRecordSlug[slug];
+  });
+  const record = authority.scorecardCatalog.bySlug[slug];
+  const progressionRecord = record
+    ? null
+    : authority.matchProgression.byRecordSlug[slug];
   const resolvedRecord = record || progressionRecord;
   if (!resolvedRecord) return null;
   const aggregateColumns = [
@@ -88,9 +89,7 @@ export default async function FullLeaderboardPage({ params }) {
   const defaultSort =
     leaderboard.columns.find((column) => column.numeric)?.key || "name";
 
-  const ascending = leaderboard.scorecard
-    ? leaderboard.direction === "lowest"
-    : slug === "average-handicap";
+  const ascending = leaderboard.direction === "lowest";
 
   return (
     <main>

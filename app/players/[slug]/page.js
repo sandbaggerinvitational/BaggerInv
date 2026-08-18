@@ -1,5 +1,8 @@
 export const dynamic = "force-dynamic";
-import { refreshCanonicalCareerHistoricalData } from "../../../lib/stats";
+import {
+  refreshCanonicalCareerHistoricalData,
+  refreshHistoricalData,
+} from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import HistoryNavigation from "../../history/HistoryNavigation";
@@ -27,8 +30,16 @@ import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard"
 import { pageMetadata } from "../../../lib/seo";
 import { getDrafts } from "../../../lib/draft";
 import { getPlayerDraftHistory } from "../../../lib/draft-analytics";
-import { loadCanonicalCareerScorecardAnalytics } from "../../../lib/scorecard-data";
+import {
+  loadCanonicalCareerScorecardAnalytics,
+  loadScorecardAnalytics,
+} from "../../../lib/scorecard-data";
 import { buildPlayerIntelligence } from "../../../lib/player-intelligence";
+import {
+  getLeaderboardFromRecords,
+  getLeaderboardSlugs,
+} from "../../../lib/leaderboards";
+import { buildCanonicalRecordHolderAuthority } from "../../../lib/record-holder-authority";
 import PlayerIntelligenceSections from "./PlayerIntelligenceSections";
 import { cookies } from "next/headers";
 import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport";
@@ -95,6 +106,24 @@ function ChampionshipTimeline({ years, styles }) {
 
 export default async function PlayerPage({ params, searchParams }) {
   const scorecardAnalyticsPromise = loadCanonicalCareerScorecardAnalytics();
+  const recordScorecardAnalyticsPromise = loadScorecardAnalytics();
+  await refreshHistoricalData();
+  const canonicalOfficialRecords = getRecords();
+  const recordScorecardAnalytics = await recordScorecardAnalyticsPromise;
+  const recordPlayerNames = Object.fromEntries(
+    canonicalOfficialRecords.all.map(({ player }) => [
+      player["Player ID"],
+      player["Display Name"],
+    ])
+  );
+  const recordAuthority = buildCanonicalRecordHolderAuthority({
+    officialLeaderboards: getLeaderboardSlugs().map((recordSlug) =>
+      getLeaderboardFromRecords(recordSlug, canonicalOfficialRecords)
+    ),
+    scorecards: recordScorecardAnalytics.scorecards,
+    playerNames: recordPlayerNames,
+    ghostMatchExclusions: recordScorecardAnalytics.ghostMatchExclusions,
+  });
   await refreshCanonicalCareerHistoricalData();
   const { slug } = await params;
   const query = await searchParams;
@@ -145,6 +174,7 @@ export default async function PlayerPage({ params, searchParams }) {
     officialRecords,
     scorecards: careerScorecards,
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
+    recordsHeld: recordAuthority.recordsHeldForPlayer(player["Player ID"]),
   });
   const primaryNavigation = historyReturnContext
     ? {

@@ -132,6 +132,7 @@ test("player intelligence combines official, scoring, progression, rankings, for
     allPlayerStats: all,
     officialRecords: records(all),
     scorecards: [scorecard("P1", 1), scorecard("P2", 2, 2)],
+    recordsHeld: [{ slug: "career-points", title: "Career Points" }],
   });
 
   assert.equal(intelligence.official.recordDisplay, "3-1-0");
