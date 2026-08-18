@@ -141,7 +141,7 @@ export default function PlayerIntelligenceSections({
           { label: "Runner-Up Finishes", value: official.runnerUps },
         ]} />
         <h3>Hole-by-Hole</h3>
-        <ScoringStatGrid career dense items={[
+        <ScoringStatGrid career dense layout="fiveBalanced" items={[
           { label: "Hole Differential", value: formatScoringNumber(hole.holeDifferential, { signed: true, decimals: 0 }) },
           { label: "Birdies", value: hole.birdies },
           { label: "Eagles", value: hole.eagles },
@@ -159,7 +159,7 @@ export default function PlayerIntelligenceSections({
           { label: "Average Net", value: formatScoringNumber(hole.averageNetScore) },
         ]} />
         <h3>Par Performance</h3>
-        <ScoringStatGrid career dense items={[
+        <ScoringStatGrid career dense layout="threeAcross" items={[
           { label: "Par 3 Average", value: formatScoringNumber(hole.averagePar3Score) },
           { label: "Par 4 Average", value: formatScoringNumber(hole.averagePar4Score) },
           { label: "Par 5 Average", value: formatScoringNumber(hole.averagePar5Score) },

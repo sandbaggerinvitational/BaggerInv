@@ -78,9 +78,17 @@ test("rankings, records, rival, draft history, and partners are genuinely displa
 test("Career-only density and Top Partners mobile layout do not change frozen History cards", () => {
   assert.match(scoringGrid, /career = false/);
   assert.match(scoringGrid, /career \? styles\.career/);
+  assert.match(scoringGrid, /layout = "default"/);
   assert.match(intelligence, /<ScoringStatGrid career dense/);
+  assert.match(intelligence, /layout="fiveBalanced"/);
+  assert.match(intelligence, /layout="threeAcross"/);
   assert.match(scoringCss, /\.career \{/);
   assert.match(scoringCss, /\.career \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(scoringCss, /\.career\.threeAcross \{[\s\S]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(scoringCss, /\.career\.fiveBalanced \.card:nth-child\(-n \+ 3\) \{[\s\S]*grid-column: span 2/);
+  assert.match(scoringCss, /\.career\.fiveBalanced \.card:nth-child\(n \+ 4\) \{[\s\S]*grid-column: span 3/);
+  assert.match(profileCss, /\.careerContent \{[\s\S]*padding-top: 30px/);
+  assert.match(profileCss, /\.careerContent > \.honorsSection \{[\s\S]*margin-top: 0/);
   assert.match(profile, /styles\.profilePartnersTable/);
   assert.doesNotMatch(profile, /styles\.dataTable\} \$\{styles\.simpleTable/);
   assert.match(profile, /className=\{styles\.profilePartnerResult\}/);

@@ -10,9 +10,15 @@ export function formatScoringNumber(value, { percentage = false, signed = false,
   return rendered;
 }
 
-export default function ScoringStatGrid({ items = [], dense = false, career = false }) {
+export default function ScoringStatGrid({ items = [], dense = false, career = false, layout = "default" }) {
+  const layoutClass = layout === "threeAcross"
+    ? styles.threeAcross
+    : layout === "fiveBalanced"
+      ? styles.fiveBalanced
+      : "";
+
   return (
-    <div className={`${styles.grid} ${dense ? styles.dense : ""} ${career ? styles.career : ""}`}>
+    <div className={`${styles.grid} ${dense ? styles.dense : ""} ${career ? styles.career : ""} ${layoutClass}`}>
       {items.map((item) => (
         <article className={styles.card} key={item.label} aria-label={item.accessibleLabel || undefined}>
           <span>{item.label}</span>

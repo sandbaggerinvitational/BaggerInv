@@ -125,9 +125,35 @@
   font-size: clamp(1.55rem, 5vw, 1.9rem);
 }
 
+/* Explicit odd-count Career groups keep their factual hierarchy without
+   inventing filler metrics or changing frozen History grids. */
+.career.threeAcross {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.career.fiveBalanced {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .career.threeAcross {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .career.fiveBalanced {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .career.fiveBalanced .card:nth-child(-n + 3) {
+    grid-column: span 2;
+  }
+
+  .career.fiveBalanced .card:nth-child(n + 4) {
+    grid-column: span 3;
   }
 }
 
@@ -150,5 +176,13 @@
 
   .career .card {
     min-height: 88px;
+  }
+
+  .career.threeAcross {
+    gap: 7px;
+  }
+
+  .career.threeAcross .card {
+    padding-inline: 9px;
   }
 }

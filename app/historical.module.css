@@ -4579,6 +4579,14 @@
 }
 /* ---------- Player intelligence ---------- */
 
+.careerContent {
+  padding-top: 30px;
+}
+
+.careerContent > .honorsSection {
+  margin-top: 0;
+}
+
 .playerIntelligence {
   margin: 26px 0 42px;
   display: grid;
@@ -4868,6 +4876,10 @@
 }
 
 @media (max-width: 700px) {
+  .careerContent {
+    padding-top: 20px;
+  }
+
   .playerIntelligenceSection > summary {
     padding: 14px 15px;
   }
