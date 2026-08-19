@@ -31,10 +31,11 @@ test("Local Guide normalizes source sections into the annual participant hierarc
   assert.equal(normalizeLocalGuideSection("Police"), "Medical & Emergency");
   assert.equal(normalizeLocalGuideSection("Future Recommendation"), "Other");
   assert.deepEqual(unknownLocalGuideSections([{ Section: "Future Recommendation" }, { Section: "Fuel" }]), ["Future Recommendation"]);
-  assert.equal(localGuideGroupDefaultOpen("Transportation"), true);
+  assert.equal(localGuideGroupDefaultOpen("Transportation"), false);
   assert.equal(localGuideGroupDefaultOpen("Airport & Hotel"), false);
   assert.equal(localGuideGroupDefaultOpen("Essentials"), false);
-  assert.equal(localGuideGroupDefaultOpen("Medical & Emergency"), true);
+  assert.equal(localGuideGroupDefaultOpen("Medical & Emergency"), false);
+  assert.equal(localGuideGroupDefaultOpen("Other"), false);
 });
 
 test("Local Guide creates native maps and telephone actions safely", () => {
