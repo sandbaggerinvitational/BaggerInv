@@ -57,7 +57,9 @@ test("Tournament Hub content routes retain shared headers and notification ancho
   const [guide, courses, history, profile] = await Promise.all([
     source("app/tournament-guide/page.js"), source("app/courses/page.js"), source("app/history/page.js"), source("app/me/ParticipantProfile.js"),
   ]);
-  for (const page of [guide, courses, history]) assert.match(page, /<Header \/>/);
+  for (const page of [guide, history]) assert.match(page, /<Header \/>/);
+  assert.doesNotMatch(courses, /<Header \/>|<Footer \/>/);
+  assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide<\/Link>/);
   assert.match(profile, /id="notification-preferences"/);
 });
 

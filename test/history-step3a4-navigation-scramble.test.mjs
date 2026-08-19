@@ -210,10 +210,11 @@ test("History-aware Course returns are explicit, refresh-safe routes", () => {
   });
 });
 
-test("all 2025 Course Profile actions carry bounded History context while direct archive fallback remains Courses", () => {
+test("all 2025 Course Profile actions carry bounded History context while Course origins stay explicit", () => {
   assert.match(completedOverview, /historyCourseProfileHref\(\{ courseId: course\["Course ID"\], year: tournament\.year, round \}\)/);
   assert.match(coursePage, /historyCourseReturn\(resolvedSearchParams\)/);
-  assert.match(coursePage, /href: archive \? "\/courses\?view=archive" : "\/courses"/);
+  assert.match(coursePage, /courseOriginReturn\(resolvedSearchParams\)/);
+  assert.match(coursePage, /!historyReturn && originReturn \? <Link/);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
 });
 

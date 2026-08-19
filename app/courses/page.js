@@ -1,11 +1,17 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
+import {
+  buildHistoricalCourseArchive,
+  courseRoundLabel,
+  currentTournamentCourses,
+} from "../../lib/course-archive";
+import { COURSE_ORIGINS, courseProfileHref } from "../../lib/course-navigation";
 import { resolveTournamentGuideContent } from "../tournament-guide/resolveGuideContent";
 import styles from "../historical.module.css";
 import guideStyles from "../tournament-guide/tournament-guide.module.css";
+import courseStyles from "./course-directory.module.css";
 import { pageMetadata } from "../../lib/seo";
 
 export const metadata = pageMetadata({
@@ -22,46 +28,72 @@ export default async function CoursesPage({ searchParams }) {
     ? await import("../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleTournamentGuideContent())
     : await resolveTournamentGuideContent({ surface: "course" });
   const { tournament } = content;
-  const courses = archive
-    ? content.courseArchive
-    : [...new Map(content.courses.map((course) => [course["Course ID"], course])).values()];
+  const courses = archive ? [] : currentTournamentCourses(content.courses);
+  const historicalArchive = archive ? buildHistoricalCourseArchive({
+    tournaments: content.courseArchiveTournaments,
+    courses: content.courseArchive,
+    currentYear: tournament?.year,
+  }) : null;
 
   return (
     <main>
-      <Header />
       <section className={`${styles.content} ${guideStyles.guideDetailShell}`}>
         <Link className={guideStyles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>
         <header className={guideStyles.detailHeading}>
           <p className={styles.eyebrow}>{archive ? "Course Archive" : `${tournament?.year || "Current"} Tournament`}</p>
           <h1>{archive ? "Every Tournament Course" : "Courses"}</h1>
-          <p>{archive ? "Every venue that has hosted a Sandbagger Invitational round." : "The courses being played during the active tournament."}</p>
+          <p>{archive ? "Every course played in Sandbagger Invitational history, organized by tournament year and round." : "The courses being played during the active tournament."}</p>
         </header>
-        <div className={styles.courseIndexGrid}>
-          {courses.map((course) => (
-            <Link
-              className={styles.courseIndexCard}
-              href={`/courses/${course["Course ID"]}${archive ? "?view=archive" : ""}`}
-              key={course["Course ID"]}
-            >
-              <AssetImage
-                src={courseLogo(course["Course Logo"])}
-                alt={`${course.Course} logo`}
-                className={styles.courseIndexLogo}
-                fallbackClassName={styles.courseLogoPlaceholder}
-                fallback="⛳"
-              />
-              <h2>{course.Course}</h2>
-              <p>
-                {course.City}, {course.State}
-              </p>
-              <span>{archive ? course.Designer : [course.Round, formatName(course.Format), course["Tee Played"] ? `${course["Tee Played"]} Tees` : ""].filter(Boolean).join(" • ")}</span>
-            </Link>
-          ))}
-        </div>
+        {archive ? <div className={courseStyles.archiveGroups}>
+          {historicalArchive.groups.map((group) => <section className={courseStyles.archiveYear} aria-labelledby={`course-year-${group.year}`} key={group.year}>
+            <header className={courseStyles.archiveYearHeader}>
+              <h2 id={`course-year-${group.year}`}>{group.year}</h2>
+              {group.destination ? <p>{group.destination}</p> : null}
+            </header>
+            <div className={courseStyles.archiveCourseGrid}>
+              {group.appearances.map((course) => <Link
+                aria-label={`View ${group.year} Round ${course.round} — ${course.Course}`}
+                className={`${styles.courseIndexCard} ${courseStyles.archiveCard}`}
+                href={courseProfileHref({ courseId: course["Course ID"], origin: COURSE_ORIGINS.ARCHIVE })}
+                key={`${group.year}-${course.round}-${course["Course ID"]}`}
+                prefetch={false}
+              >
+                <div className={courseStyles.archiveCardLead}>
+                  <AssetImage
+                    src={courseLogo(course["Course Logo"])}
+                    alt={`${course.Course} logo`}
+                    className={`${styles.courseIndexLogo} ${courseStyles.archiveLogo}`}
+                    fallbackClassName={styles.courseLogoPlaceholder}
+                    fallback="⛳"
+                  />
+                  <span className={courseStyles.roundLabel}>Round {course.round}</span>
+                </div>
+                <h3>{course.Course}</h3>
+                <p>{course.City}, {course.State}</p>
+                {course.Designer ? <small>Architect · {course.Designer}</small> : null}
+              </Link>)}
+            </div>
+          </section>)}
+        </div> : <div className={styles.courseIndexGrid}>
+          {courses.map((course) => <Link
+            className={styles.courseIndexCard}
+            href={courseProfileHref({ courseId: course["Course ID"], origin: COURSE_ORIGINS.CURRENT })}
+            key={course["Course ID"]}
+          >
+            <AssetImage
+              src={courseLogo(course["Course Logo"])}
+              alt={`${course.Course} logo`}
+              className={styles.courseIndexLogo}
+              fallbackClassName={styles.courseLogoPlaceholder}
+              fallback="⛳"
+            />
+            <h2>{course.Course}</h2>
+            <p>{course.City}, {course.State}</p>
+            <span>{[courseRoundLabel(course.Round), formatName(course.Format), course["Tee Played"] ? `${course["Tee Played"]} Tees` : ""].filter(Boolean).join(" • ")}</span>
+          </Link>)}
+        </div>}
         <Link className={guideStyles.secondaryAction} href={archive ? "/courses" : "/courses?view=archive"}>{archive ? "View Current Tournament" : "View Course Archive"} →</Link>
       </section>
-
-      <Footer />
     </main>
   );
 }

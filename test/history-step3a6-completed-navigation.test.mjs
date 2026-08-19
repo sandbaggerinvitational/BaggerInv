@@ -159,7 +159,9 @@ test("History-context Course navigation orders Tournament left and source Round 
   assert.ok(tournament >= 0 && tournament < round);
   assert.match(context, /href: tournamentReturn\.href[\s\S]*label: "Tournament"[\s\S]*detail: String\(resolvedSearchParams\.year\)[\s\S]*direction: "left"/);
   assert.match(context, /href: historyReturn\.href[\s\S]*label: "Round"[\s\S]*detail: `Round \$\{Number\(resolvedSearchParams\.round\)\}`[\s\S]*direction: "right"/);
-  assert.match(coursePage, /!historyReturn \? <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
+  assert.match(coursePage, /historyReturn && !tournamentReturn/);
+  assert.match(coursePage, /<Link href=\{historyReturn\.href\}>‹ \{historyReturn\.label\}<\/Link>/);
+  assert.match(coursePage, /!historyReturn && originReturn/);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
 });
 

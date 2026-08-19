@@ -122,7 +122,8 @@ test("2025 History-context Course Profiles expose explicit round and tournament 
   assert.match(coursePage, /tournamentReturn \? <HistoryNavigation/);
   assert.match(coursePage, /href: tournamentReturn\.href[\s\S]*direction: "left"/);
   assert.match(coursePage, /href: historyReturn\.href[\s\S]*direction: "right"/);
-  assert.match(coursePage, /!historyReturn \? <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
+  assert.match(coursePage, /historyReturn && !tournamentReturn \? <nav[\s\S]*href=\{historyReturn\.href\}/);
+  assert.match(coursePage, /!historyReturn && originReturn \? <Link[\s\S]*href=\{originReturn\.href\}/);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
 });
 

@@ -158,7 +158,8 @@ test("History-context Course navigation sits below the hero while direct and Gui
   assert.ok(hero >= 0 && hero < rail && rail < content);
   assert.match(coursePage, /left=\{\{[\s\S]*href: tournamentReturn\.href[\s\S]*direction: "left"/);
   assert.match(coursePage, /right=\{historyReturn[\s\S]*href: historyReturn\.href[\s\S]*direction: "right"/);
-  assert.match(coursePage, /!historyReturn \? <Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
+  assert.match(coursePage, /historyReturn && !tournamentReturn/);
+  assert.match(coursePage, /!historyReturn && originReturn/);
   assert.deepEqual(historyCourseReturn({}), null);
   assert.deepEqual(historyCourseTournamentReturn({}), null);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);

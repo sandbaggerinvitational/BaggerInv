@@ -22,7 +22,8 @@ function reportSchemaIssues(diagnostics) {
 
 async function loadGuideContent() {
   const [liveData] = await Promise.all([getTournamentData(), refreshHistoricalData()]);
-  const tournament = getTournaments().find((item) => Number(item.year) === Number(liveData?.tournament?.year)) || getTournaments()[0];
+  const tournaments = getTournaments();
+  const tournament = tournaments.find((item) => Number(item.year) === Number(liveData?.tournament?.year)) || tournaments[0];
   if (!tournament) throw new Error("Tournament Guide could not resolve the current tournament.");
   const guide = liveData.guide || {};
   const diagnostics = validateTournamentGuideHeaders(guide.headers);
@@ -36,7 +37,7 @@ async function loadGuideContent() {
   return {
     tournament, tournamentIdentity, liveTournament: liveData.tournament, liveRounds: liveData.rounds || [],
     timelineNow: liveData.timeline?.effectiveNow || new Date().toISOString(), overview: guide.sections || [],
-    schedule: guide.itinerary || [], courses: guide.courses || [], courseArchive: getCourses(),
+    schedule: guide.itinerary || [], courses: guide.courses || [], courseArchive: getCourses(), courseArchiveTournaments: tournaments,
     ruleBook: guide.ruleBook || [], tournamentRules: guide.tournamentRules || [], rounds: guide.rounds || [],
     dining: guide.dining || [], localGuide: guide.localGuide || [], importantContacts: guide.importantContacts || [],
     courseHoles: guide.courseHoles || [], diagnostics, projection: { source: "google" },

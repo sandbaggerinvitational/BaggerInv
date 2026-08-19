@@ -93,8 +93,9 @@ test("Course Detail remains inside The Bagger and has no map action", async () =
   ]);
   assert.match(page, /<Header homeHref="\/home"/);
   assert.match(page, /historyCourseReturn/);
-  assert.match(page, /href: archive \? "\/courses\?view=archive" : "\/courses"/);
-  assert.match(page, /<Link href=\{returnLink\.href\}>‹ \{returnLink\.label\}<\/Link>/);
+  assert.match(page, /courseOriginReturn/);
+  assert.match(page, /!historyReturn && originReturn/);
+  assert.match(page, /href=\{originReturn\.href\}>‹ \{originReturn\.label\}<\/Link>/);
   assert.doesNotMatch(page, /View Scorecard|href="#course-scorecard"/);
   assert.match(page, /Front Nine/);
   assert.match(page, /Back Nine/);

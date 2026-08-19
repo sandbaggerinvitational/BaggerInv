@@ -9,6 +9,7 @@ import AssetImage from "../../AssetImage";
 import ExternalLinkConfirm from "../../ExternalLinkConfirm";
 import { courseHero, courseLogo } from "../../../lib/asset-paths";
 import { courseDetailModel } from "../../../lib/course-detail";
+import { courseOriginReturn } from "../../../lib/course-navigation";
 import {
   historyCourseReturn,
   historyCourseTournamentReturn,
@@ -66,10 +67,7 @@ export default async function CoursePage({ params, searchParams }) {
   const website = model.website;
   const historyReturn = historyCourseReturn(resolvedSearchParams);
   const tournamentReturn = historyCourseTournamentReturn(resolvedSearchParams);
-  const returnLink = historyReturn || {
-    href: archive ? "/courses?view=archive" : "/courses",
-    label: "Courses",
-  };
+  const originReturn = courseOriginReturn(resolvedSearchParams);
   return <main className={styles.page}>
     <Header homeHref="/home" />
     <section className={styles.hero}>
@@ -77,8 +75,8 @@ export default async function CoursePage({ params, searchParams }) {
       <div className={styles.heroShade} />
       <div className={styles.heroContent}>
         {historyReturn && !tournamentReturn ? <nav className={styles.historyNavigation} aria-label="History course navigation">
-          <Link href={returnLink.href}>‹ {returnLink.label}</Link>
-        </nav> : !historyReturn ? <Link href={returnLink.href}>‹ {returnLink.label}</Link> : null}
+          <Link href={historyReturn.href}>‹ {historyReturn.label}</Link>
+        </nav> : !historyReturn && originReturn ? <Link aria-label={originReturn.accessibleLabel} href={originReturn.href}>‹ {originReturn.label}</Link> : null}
         <div className={styles.identity}>
           <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
           <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>
