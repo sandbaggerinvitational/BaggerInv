@@ -54,8 +54,8 @@ test("scorecard values, totals, and eligibility remain unchanged", () => {
 });
 
 test("all tournament History scorecards inherit the shared cleanup without year exceptions", () => {
-  assert.match(historicalMatchRow, /<ScorecardTable scorecards=\{scorecards\} compact historyDensity/);
-  assert.match(publicMatchCard, /<ScorecardTable[\s\S]*?scorecards=\{scorecards\}[\s\S]*?historyDensity=\{historyDensity\}/);
+  assert.match(historicalMatchRow, /<ScorecardTable scorecards=\{scorecardTableData\} compact deferClosedContent historyDensity/);
+  assert.match(publicMatchCard, /<ScorecardTable[\s\S]*?scorecards=\{scorecardTableData\}[\s\S]*?deferClosedContent=\{historyDensity\}[\s\S]*?historyDensity=\{historyDensity\}/);
   assert.match(roundPage, /variant="historical"[\s\S]*historyDensity/);
   assert.match(roundPage, /completeLegacyMatchIds\.has\(match\.id\) \? displayScorecardsForMatch\(match\.id\) : \[\]/);
   assert.doesNotMatch(scorecard, /2023|2024|2025|2026/);

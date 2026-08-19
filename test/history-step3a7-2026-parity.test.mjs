@@ -170,7 +170,7 @@ test("full current standings disclose inline from the existing 24-row History pa
   assert.match(yearPage, /View Full Standings/);
   assert.match(yearPage, /Show Top 5/);
   assert.match(yearPage, /leaderboard\.map\(\(row\) => renderStanding\(row, "full"\)\)/);
-  assert.match(yearPage, /prefetch=\{keyPrefix === "full" \? false : undefined\}/);
+  assert.match(yearPage, /<Link href=\{`\/players\/\$\{player\.slug\}`\} prefetch=\{false\}>/);
   assert.doesNotMatch(yearPage, /View Full Leaderboard|\/live\?view=leaderboards|router\.push|useState|fetch\(/);
 });
 

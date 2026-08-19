@@ -6,6 +6,7 @@ import { formatOfficialMatchResult } from "../../lib/match-result";
 import { matchState } from "../../lib/live-match-ux";
 import { formatTeamPoints } from "../../lib/formatters";
 import { build2026CanonicalFinalResult } from "../../lib/history-2026-round-presentation";
+import { scorecardPresentationData } from "../../lib/scorecard-presentation";
 import styles from "./historical-match-row.module.css";
 import resultStyles from "./historical-match-result.module.css";
 import density from "./history-density.module.css";
@@ -55,6 +56,7 @@ export default function HistoricalMatchRow({ match, round, tournament, scorecard
     ["Overall", match.overallWinner || match.matchupWinner],
   ].filter(([, value]) => value);
   const ghost = String(match.status || "").trim().toUpperCase() === "GHOST MATCH";
+  const scorecardTableData = scorecardPresentationData(scorecards);
 
   return <article className={styles.row} data-state={state} aria-label={`Match ${match.match}. ${result}.`}>
     <header className={`${styles.header} ${density.matchHeader}`}>
@@ -78,7 +80,7 @@ export default function HistoricalMatchRow({ match, round, tournament, scorecard
 
     {ghost ? <p className={styles.notice}><strong>Ghost match.</strong> Selected player results are excluded from official records.</p> : null}
 
-    {state === "final" ? <ScorecardTable scorecards={scorecards} compact historyDensity showSummary stackPairingIdentities={use2026Presentation} /> : null}
+    {state === "final" ? <ScorecardTable scorecards={scorecardTableData} compact deferClosedContent historyDensity showSummary stackPairingIdentities={use2026Presentation} /> : null}
 
     {state === "final" && segments.length ? <details className={styles.story}>
       <summary className={density.storySummary}>Match story <span aria-hidden="true">⌄</span></summary>

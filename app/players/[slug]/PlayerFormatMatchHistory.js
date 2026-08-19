@@ -90,6 +90,7 @@ function MatchRow({ match, playerName, playerSlug }) {
 export default function PlayerFormatMatchHistory({ history, playerName, playerSlug }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
+  const [hasRenderedContent, setHasRenderedContent] = useState(false);
   const [openYears, setOpenYears] = useState(() =>
     history.latestYear ? new Set([history.latestYear]) : new Set()
   );
@@ -119,7 +120,10 @@ export default function PlayerFormatMatchHistory({ history, playerName, playerSl
         className={styles.profileMatchToggle}
         aria-expanded={open}
         aria-controls={accordionId}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          if (!open) setHasRenderedContent(true);
+          setOpen((value) => !value);
+        }}
       >
         <span>
           <strong>View {formatLabel} Matches</strong>
@@ -134,37 +138,39 @@ export default function PlayerFormatMatchHistory({ history, playerName, playerSl
       </button>
 
       <div id={accordionId} hidden={!open}>
-        {!history.consistent ? (
-          <div className={styles.profileMatchWarning} role="status">
-            Data Health warning: this match history does not reconcile with the format summary.
-          </div>
-        ) : null}
+        {hasRenderedContent ? <>
+          {!history.consistent ? (
+            <div className={styles.profileMatchWarning} role="status">
+              Data Health warning: this match history does not reconcile with the format summary.
+            </div>
+          ) : null}
 
-        <div className={styles.profileMatchYears}>
-          {history.years.map((group) => {
-            const yearId = `${accordionId}-${group.year}`;
-            const yearOpen = openYears.has(group.year);
-            return (
-              <section className={styles.profileMatchYear} key={group.year}>
-                <button
-                  type="button"
-                  aria-expanded={yearOpen}
-                  aria-controls={yearId}
-                  onClick={() => toggleYear(group.year)}
-                >
-                  <strong>{group.year}</strong>
-                  <span>{group.matches.length} {group.matches.length === 1 ? "match" : "matches"}</span>
-                  <b aria-hidden="true">{yearOpen ? "−" : "+"}</b>
-                </button>
-                <div id={yearId} hidden={!yearOpen}>
-                  {group.matches.map((match) => (
-                    <MatchRow match={match} playerName={playerName} playerSlug={playerSlug} key={match.id} />
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+          <div className={styles.profileMatchYears}>
+            {history.years.map((group) => {
+              const yearId = `${accordionId}-${group.year}`;
+              const yearOpen = openYears.has(group.year);
+              return (
+                <section className={styles.profileMatchYear} key={group.year}>
+                  <button
+                    type="button"
+                    aria-expanded={yearOpen}
+                    aria-controls={yearId}
+                    onClick={() => toggleYear(group.year)}
+                  >
+                    <strong>{group.year}</strong>
+                    <span>{group.matches.length} {group.matches.length === 1 ? "match" : "matches"}</span>
+                    <b aria-hidden="true">{yearOpen ? "−" : "+"}</b>
+                  </button>
+                  <div id={yearId} hidden={!yearOpen}>
+                    {group.matches.map((match) => (
+                      <MatchRow match={match} playerName={playerName} playerSlug={playerSlug} key={match.id} />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        </> : null}
       </div>
     </div>
   );

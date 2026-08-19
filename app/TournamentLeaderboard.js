@@ -39,8 +39,8 @@ export function LeaderboardRank({ rank }) {
   </strong>;
 }
 
-export function LeaderboardPlayer({ name, slug, photo, compact = false, linked = true }) {
-  const label = linked && slug ? <Link href={`/players/${slug}`}>{name}</Link> : <strong>{name}</strong>;
+export function LeaderboardPlayer({ name, slug, photo, compact = false, linked = true, prefetch }) {
+  const label = linked && slug ? <Link href={`/players/${slug}`} prefetch={prefetch}>{name}</Link> : <strong>{name}</strong>;
   return <span className={styles.player} data-compact={compact ? "true" : undefined}>
     <span className={styles.avatar}>
       <PlayerAvatar
@@ -55,7 +55,7 @@ export function LeaderboardPlayer({ name, slug, photo, compact = false, linked =
   </span>;
 }
 
-export default function TournamentLeaderboard({ rows = [], pointsTracked = true, emptyMessage = "No completed matches have been recorded yet." }) {
+export default function TournamentLeaderboard({ rows = [], pointsTracked = true, prefetchPlayerLinks, emptyMessage = "No completed matches have been recorded yet." }) {
   const normalized = rows.map(normalizedRow);
   return <div className={styles.table} data-points={pointsTracked ? "true" : "false"}>
     <div className={`${styles.row} ${styles.head}`}>
@@ -65,7 +65,7 @@ export default function TournamentLeaderboard({ rows = [], pointsTracked = true,
       const { place } = podium(row.rank);
       return <div className={styles.row} data-place={place || undefined} key={row.id}>
         <LeaderboardRank rank={row.rank} />
-        <LeaderboardPlayer name={row.name} slug={row.slug} photo={row.photo} />
+        <LeaderboardPlayer name={row.name} slug={row.slug} photo={row.photo} prefetch={prefetchPlayerLinks} />
         <span className={styles.record}><b>{row.wins} W</b><i>•</i><b>{row.losses} L</b><i>•</i><b>{row.halves} T</b></span>
         {pointsTracked ? <strong className={styles.points}>{formatPlayerPoints(row.points)}</strong> : null}
       </div>;

@@ -1,7 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import ScoringStatGrid, { formatScoringNumber } from "../../ScoringStatGrid";
 import PlayerFormatMatchHistory from "./PlayerFormatMatchHistory";
-import { formatPercentage, formatRecord } from "../../../lib/stats";
 import { formatPlayerPoints } from "../../../lib/formatters";
 import {
   isCompletedHistoryPlayerYear,
@@ -10,9 +12,30 @@ import {
 import TeamLogoPlate from "../../TeamLogoPlate";
 import styles from "../../historical.module.css";
 
-function IntelligenceSection({ eyebrow, title, children, open = false }) {
+function formatRecord(record) {
+  return `${record.wins}-${record.losses}-${record.halves}`;
+}
+
+function formatPercentage(value) {
+  return `${value.toFixed(1)}%`;
+}
+
+function IntelligenceSection({ eyebrow, title, children, open = false, defer = false }) {
+  const [expanded, setExpanded] = useState(open);
+  const [hasRenderedContent, setHasRenderedContent] = useState(open || !defer);
+
   return (
-    <details className={styles.playerIntelligenceSection} open={open}>
+    <details
+      className={styles.playerIntelligenceSection}
+      data-career-detail={defer ? "deferred" : "eager"}
+      data-detail-mounted={hasRenderedContent ? "true" : "false"}
+      onToggle={(event) => {
+        const nextOpen = event.currentTarget.open;
+        setExpanded(nextOpen);
+        if (nextOpen) setHasRenderedContent(true);
+      }}
+      open={expanded}
+    >
       <summary>
         <div>
           <span className={styles.sectionLabel}>{eyebrow}</span>
@@ -20,7 +43,7 @@ function IntelligenceSection({ eyebrow, title, children, open = false }) {
         </div>
         <b aria-hidden="true">+</b>
       </summary>
-      <div className={styles.playerIntelligenceBody}>{children}</div>
+      {hasRenderedContent ? <div className={styles.playerIntelligenceBody}>{children}</div> : null}
     </details>
   );
 }
@@ -152,7 +175,7 @@ export default function PlayerIntelligenceSections({
         <RankingList rows={careerRankingRows} />
       </IntelligenceSection>
 
-      <IntelligenceSection eyebrow="Recorded Scorecards" title="Scoring Profile">
+      <IntelligenceSection defer eyebrow="Recorded Scorecards" title="Scoring Profile">
         <h3>Gross</h3>
         <ScoringStatGrid career dense items={[
           { label: "Average Gross", value: formatScoringNumber(hole.averageGrossScore) },
@@ -181,7 +204,7 @@ export default function PlayerIntelligenceSections({
         </p>
       </IntelligenceSection>
 
-      <IntelligenceSection eyebrow="Reconstructed Match Play" title="Match Play Profile">
+      <IntelligenceSection defer eyebrow="Reconstructed Match Play" title="Match Play Profile">
         <ScoringStatGrid career dense items={[
           { label: "Holes Won", value: hole.holesWon },
           { label: "Holes Lost", value: hole.holesLost },
@@ -196,7 +219,7 @@ export default function PlayerIntelligenceSections({
         ]} />
       </IntelligenceSection>
 
-      <IntelligenceSection eyebrow="Career Trends" title="Tournament History">
+      <IntelligenceSection defer eyebrow="Career Trends" title="Tournament History">
         <div className={styles.playerTournamentHistory}>
           <div className={styles.playerTournamentHistoryHead} aria-hidden="true">
             <span>Year</span>
@@ -212,7 +235,7 @@ export default function PlayerIntelligenceSections({
         </div>
       </IntelligenceSection>
 
-      <IntelligenceSection eyebrow="Best Format First" title="Format Performance">
+      <IntelligenceSection defer eyebrow="Best Format First" title="Format Performance">
         <div className={styles.playerFormatIntelligence}>
           {intelligence.formats.map((format, index) => (
             <article key={format.code}>

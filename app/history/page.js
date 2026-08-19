@@ -56,6 +56,7 @@ export default async function HistoryPage() {
     await refreshHistoricalData();
     tournaments = getTournaments();
   }
+  const newestCompletedYear = tournaments.find((tournament) => tournament.championTeamId)?.year;
 
   return (
     <main>
@@ -85,6 +86,7 @@ export default async function HistoryPage() {
                 aria-label={completed
                   ? `View ${tournament.year} Tournament History`
                   : `${tournament.year}, ${historyEditionLabel(tournament.year)}, ${tournament.Destination}, ${historyTournamentCardResult(tournament)}`}
+                prefetch={Number(tournament.year) === Number(newestCompletedYear) ? undefined : false}
               >
                 <div className={styles.historyPhotoFrame}>
                   <AssetImage

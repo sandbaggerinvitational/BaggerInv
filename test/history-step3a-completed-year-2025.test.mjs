@@ -98,7 +98,7 @@ test("Champion result is a single semantic, model-backed surface", () => {
 });
 
 test("all three round summaries keep canonical course facts and defer results to Round History", () => {
-  assert.match(page, /tournament\.courses\.map\(\(course\)/);
+  assert.match(page, /tournament\.courses\.map\(\(course, index\)/);
   assert.match(page, /completedFormatName\(course\.Format\)/);
   assert.match(page, /course\.Course/);
   assert.match(page, /href=\{`\/history\/\$\{tournament\.year\}\/round\/\$\{round\}`\}/);

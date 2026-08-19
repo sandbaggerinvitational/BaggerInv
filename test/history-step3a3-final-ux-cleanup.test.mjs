@@ -132,7 +132,7 @@ test("Match Details holds progression and segment results after the primary scor
   assert.match(compact, /<Segment label="Front 9"/);
   assert.match(compact, /<Segment label="Back 9"/);
   assert.match(compact, /<Segment label="Overall"/);
-  assert.match(compact, /<ScorecardTable[\s\S]*?scorecards=\{scorecards\}[\s\S]*?historyDensity=\{historyDensity\}[\s\S]*?showSummary=\{historyScorecardParity\}/);
+  assert.match(compact, /<ScorecardTable[\s\S]*?scorecards=\{scorecardTableData\}[\s\S]*?deferClosedContent=\{historyDensity\}[\s\S]*?historyDensity=\{historyDensity\}[\s\S]*?showSummary=\{historyScorecardParity\}/);
   assert.ok(compact.indexOf("<ScorecardTable") < compact.indexOf("<details className={styles.historicalMatchDetails}"));
 });
 

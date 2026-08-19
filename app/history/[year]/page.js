@@ -274,13 +274,13 @@ function CompletedYearOverview({
         <h2 id="completed-champion-heading">Tournament Final</h2>
       </div>
       <div className={completedStyles.result} role="group" aria-label={`${tournament.championTeam?.name}, ${tournament.year} Champions, ${championScore} points. ${tournament.runnerUpTeam?.name}, Runner-up, ${runnerUpScore} points.`}>
-        <Link className={completedStyles.resultTeam} href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.championTeam?.side || "Team 1")}`}>
+        <Link className={completedStyles.resultTeam} href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.championTeam?.side || "Team 1")}`} prefetch={false}>
           <AssetImage src={teamLogo(tournament.championTeam?.logo)} alt="" className={completedStyles.resultLogo} fallbackClassName={completedStyles.resultLogoFallback} fallback={tournament.championTeam?.name?.slice(0, 1) || "C"} inferFallback={false} />
           <span><small>Champions</small><strong>{tournament.championTeam?.name || "To Be Determined"}</strong></span>
           <b>{championScore}</b>
         </Link>
         <div className={completedStyles.finalDivider}><span>Final score</span><i aria-hidden="true" /></div>
-        <Link className={completedStyles.resultTeam} data-runner-up="true" href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.runnerUpTeam?.side || "Team 2")}`}>
+        <Link className={completedStyles.resultTeam} data-runner-up="true" href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.runnerUpTeam?.side || "Team 2")}`} prefetch={false}>
           <AssetImage src={teamLogo(tournament.runnerUpTeam?.logo)} alt="" className={completedStyles.resultLogo} fallbackClassName={completedStyles.resultLogoFallback} fallback={tournament.runnerUpTeam?.name?.slice(0, 1) || "R"} inferFallback={false} />
           <span><small>Runner-up</small><strong>{tournament.runnerUpTeam?.name || "To Be Determined"}</strong></span>
           <b>{runnerUpScore}</b>
@@ -292,10 +292,10 @@ function CompletedYearOverview({
       <span className={styles.sectionLabel}>Rounds</span>
       <h2 id="completed-rounds-heading">Tournament Rounds</h2>
       <div className={pwaStyles.overviewRoundList}>
-        {tournament.courses.map((course) => {
+        {tournament.courses.map((course, index) => {
           const round = roundNumber(course.Round);
           return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
-            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`}>
+            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`} prefetch={index === 0 ? undefined : false}>
               <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
               <span>
                 <b>{course.Round} · {completedFormatName(course.Format)}</b>
@@ -303,7 +303,7 @@ function CompletedYearOverview({
               </span>
               <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })} prefetch={false}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -374,7 +374,7 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
     const player = leaderboardPlayer(row);
     return <div className={pwaStyles.standingsRow} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(row.tournamentRank || row.rank)}, ${player.name}, ${formatPlayerPoints(row.points)} points`}>
       <strong>{row.tournamentRank || row.rank}</strong>
-      {player.slug ? <Link href={`/players/${player.slug}`} prefetch={keyPrefix === "full" ? false : undefined}>{player.name}</Link> : <span>{player.name}</span>}
+      {player.slug ? <Link href={`/players/${player.slug}`} prefetch={false}>{player.name}</Link> : <span>{player.name}</span>}
       <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
     </div>;
   };
@@ -384,16 +384,16 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
       <span className={styles.sectionLabel}>Rounds</span>
       <h2 id="history-rounds-heading">Tournament Rounds</h2>
       <div className={pwaStyles.overviewRoundList}>
-        {tournament.courses.map((course) => {
+        {tournament.courses.map((course, index) => {
           const round = roundNumber(course.Round);
           const availablePoints = pointsForRound(roundPoints, round);
           return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
-            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`}>
+            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`} prefetch={index === 0 ? undefined : false}>
               <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
               <span><b>{course.Round}</b><strong>{course.Course}</strong><small>{getFormatName(course.Format)}{availablePoints !== null ? ` · ${availablePoints} points` : ""}</small></span>
               <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })} prefetch={false}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -734,6 +734,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           href: "/history",
           label: "All Tournament Years",
           ariaLabel: "All Tournament Years",
+          prefetch: false,
         }}
         left={previousYear ? {
           href: `/history/${previousYear}`,
@@ -741,6 +742,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           detail: String(previousYear),
           direction: "left",
           ariaLabel: `Previous Year, ${previousYear}`,
+          prefetch: false,
         } : null}
         right={nextYear ? {
           href: `/history/${nextYear}`,
@@ -748,13 +750,14 @@ export default async function TournamentYearPage({ params, searchParams }) {
           detail: String(nextYear),
           direction: "right",
           ariaLabel: `Next Year, ${nextYear}`,
+          prefetch: false,
         } : null}
         surface="year"
       />
 
       <section className={styles.content}>
         {draft ? (
-          <Link className={styles.draftHistoryLink} href={`/draft/${year}`}>
+          <Link className={styles.draftHistoryLink} href={`/draft/${year}`} prefetch={false}>
             <span>Official Team Selection</span>
             <strong>View {year} Draft</strong>
             <b>View Draft →</b>
@@ -847,7 +850,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           <h2>Courses Played</h2>
 
           <div className={styles.courseCardGrid}>
-            {tournament.courses.map((course) => {
+            {tournament.courses.map((course, index) => {
               const round = roundNumber(course.Round);
               const availablePoints = pointsForRound(roundPoints, round);
 
@@ -859,6 +862,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
                   <Link
                     className={styles.courseRoundPrimary}
                     href={`/history/${tournament.year}/round/${round}`}
+                    prefetch={index === 0 ? undefined : false}
                   >
                     <AssetImage
                       src={courseLogo(course["Course Logo"])}
@@ -888,6 +892,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
                   <Link
                     className={styles.courseProfileLink}
                     href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}
+                    prefetch={false}
                   >
                     View Course Profile
                   </Link>
@@ -901,7 +906,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           <span className={styles.sectionLabel}>Player Standings</span>
           <h2>{tournament.year} Leaderboard</h2>
 
-          <TournamentLeaderboard rows={leaderboard} pointsTracked={pointsTracked} emptyMessage="No completed matches have been recorded for this tournament yet." />
+          <TournamentLeaderboard rows={leaderboard} pointsTracked={pointsTracked} prefetchPlayerLinks={false} emptyMessage="No completed matches have been recorded for this tournament yet." />
         </section>
 
         <section className={styles.section}>

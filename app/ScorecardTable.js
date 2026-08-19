@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import styles from "./scorecard.module.css";
 import pairingStyles from "./scorecard-pairing.module.css";
 import summaryStyles from "./scorecard-summary.module.css";
@@ -259,12 +259,24 @@ export default function ScorecardTable({
   title = "Hole-by-Hole Scorecard",
   compact = false,
   historyDensity = false,
+  deferClosedContent = false,
   showSummary = false,
   stackPairingIdentities = false,
   historicalCoverage = null,
 }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
+  const [hasRenderedContent, setHasRenderedContent] = useState(!deferClosedContent);
+  const [mobileHistoryLayout, setMobileHistoryLayout] = useState(false);
+
+  useEffect(() => {
+    if (!deferClosedContent) return undefined;
+    const media = window.matchMedia("(max-width: 700px)");
+    const update = () => setMobileHistoryLayout(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [deferClosedContent]);
   const available = scorecards.filter((scorecard) =>
     scorecard.status !== "MISSING" &&
     scorecard.completedHoleCount > 0 &&
@@ -306,7 +318,15 @@ export default function ScorecardTable({
         aria-expanded={open}
         aria-label={partialAccessibleLabel}
         className={`${styles.toggle} ${historyDensity ? density.scorecardToggle : ""}`}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => {
+          if (!open) {
+            if (deferClosedContent) {
+              setMobileHistoryLayout(window.matchMedia("(max-width: 700px)").matches);
+            }
+            setHasRenderedContent(true);
+          }
+          setOpen((current) => !current);
+        }}
         type="button"
       >
         <span>
@@ -329,9 +349,9 @@ export default function ScorecardTable({
         className={styles.content}
         data-open={open ? "true" : "false"}
         id={accordionId}
-        inert={open ? undefined : ""}
+        inert={open ? undefined : true}
       >
-        <div>
+        {hasRenderedContent ? <div>
           {partial ? (
             <div className={styles.partial} role="status">
               {partialIdentityCoverage
@@ -342,11 +362,11 @@ export default function ScorecardTable({
 
           {showSummary ? <ScorecardSummary scorecards={available} stackPairingIdentities={stackPairingIdentities} /> : null}
 
-          <div className={styles.desktopGrid}>
+          {(!deferClosedContent || !mobileHistoryLayout) ? <div className={styles.desktopGrid}>
             <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
-          </div>
+          </div> : null}
 
-          <div className={`${styles.mobileGrid} ${historyDensity ? density.mobileGrid : ""}`}>
+          {(!deferClosedContent || mobileHistoryLayout) ? <div className={`${styles.mobileGrid} ${historyDensity ? density.mobileGrid : ""}`}>
             {hasFront ? <section>
               <header><strong>Front 9</strong><span>Holes 1–9</span></header>
               <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="front" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
@@ -355,7 +375,7 @@ export default function ScorecardTable({
               <header><strong>Back 9</strong><span>Holes 10–18</span></header>
               <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="back" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
             </section> : null}
-          </div>
+          </div> : null}
 
           {historyDensity ? <details className={density.legendDetails}>
             <summary>How to read this scorecard</summary>
@@ -365,7 +385,7 @@ export default function ScorecardTable({
           </details> : <p className={styles.legend}>
             Large number: gross score · Small number: gross score to par · Gold dot: handicap stroke · Net row: score after handicap strokes
           </p>}
-        </div>
+        </div> : null}
       </div>
     </section>
   );

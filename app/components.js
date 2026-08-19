@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Menu from "./Menu";
 import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
+import { optimizedAssetUrl } from "../lib/asset-paths";
 
 export function Header({ activeNavigationHref = "", homeHref = "/" } = {}) {
   return (
     <header className="siteHeader">
       <Link href={homeHref} className="brand">
         <img
-          src="/images/sandbagger-logo.png"
+          src={optimizedAssetUrl("/images/sandbagger-logo.png", 128, 82)}
           alt="Sandbagger Invitational"
         />
 

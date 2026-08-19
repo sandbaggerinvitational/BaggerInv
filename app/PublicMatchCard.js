@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import AssetImage from "./AssetImage";
 import { teamLogo } from "../lib/asset-paths";
 import { formatHandicap, formatTeamPoints } from "../lib/formatters";
+import { scorecardPresentationData } from "../lib/scorecard-presentation";
 import styles from "./live/live.module.css";
 import scoreStyles from "./score-typography.module.css";
 import ScorecardTable from "./ScorecardTable";
@@ -214,6 +215,7 @@ function TrophyIcon() {
 }
 
 export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], scorecardCoverage = null, historyDensity = false, completedHistoryCompact = false }) {
+  const scorecardTableData = historyDensity ? scorecardPresentationData(scorecards) : scorecards;
   const winningSide = winnerSide(match);
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
   const overallWinner = match.overallWinner || match.matchupWinner;
@@ -299,9 +301,10 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       </div>
 
       <ScorecardTable
-        scorecards={scorecards}
+        scorecards={scorecardTableData}
         historicalCoverage={scorecardCoverage}
         compact
+        deferClosedContent={historyDensity}
         historyDensity={historyDensity}
         showSummary={historyScorecardParity}
         stackPairingIdentities={historyScorecardParity}
@@ -351,9 +354,10 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     {variant === "historical" ? (
       <>
         <ScorecardTable
-          scorecards={scorecards}
+          scorecards={scorecardTableData}
           historicalCoverage={scorecardCoverage}
           compact
+          deferClosedContent={historyDensity}
           historyDensity={historyDensity}
           showSummary={historyScorecardParity}
           stackPairingIdentities={historyScorecardParity}

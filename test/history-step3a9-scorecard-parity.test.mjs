@@ -155,7 +155,7 @@ test("Final Results, team points, Match Details, and Match Progression remain in
 
 test("2026 keeps its approved dedicated scorecard props and presentation path", () => {
   assert.match(currentMatchRow, /use2026Presentation = Number\(tournament\?\.year\) === 2026/);
-  assert.match(currentMatchRow, /<ScorecardTable scorecards=\{scorecards\} compact historyDensity showSummary stackPairingIdentities=\{use2026Presentation\} \/>/);
+  assert.match(currentMatchRow, /<ScorecardTable scorecards=\{scorecardTableData\} compact deferClosedContent historyDensity showSummary stackPairingIdentities=\{use2026Presentation\} \/>/);
   assert.match(roundPage, /useSupabase2026 \? <HistoricalMatchRow/);
 });
 
