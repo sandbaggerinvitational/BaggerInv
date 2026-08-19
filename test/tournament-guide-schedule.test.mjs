@@ -50,6 +50,19 @@ test("non-golf itinerary status uses tournament-local Start and End Time", () =>
   assert.equal(after.events.find((event) => event.id === "breakfast").status, "Completed");
 });
 
+test("Tournament Itinerary drink event types use the beer icon without changing editorial behavior", () => {
+  const model = itineraryViewModel({
+    records: [
+      { ...records[0], "Event ID": "happy-hour", "Event Type": "Happy Hour", Title: "Welcome Drinks" },
+      { ...records[3], "Event ID": "cocktails", "Event Type": "Cocktails", Title: "Cocktails" },
+    ],
+    tournament,
+    now: new Date("2026-09-24T12:00:00Z"),
+  });
+  assert.deepEqual(model.events.map((event) => event.icon), ["🍺", "🍺"]);
+  assert.ok(model.events.every((event) => event.roundNumber === null));
+});
+
 test("itinerary emphasis prioritizes a live event and otherwise the next future event", () => {
   const live = itineraryViewModel({ records, tournament, courses, now: new Date("2026-09-25T10:30:00Z") });
   assert.equal(live.focus.id, "breakfast");

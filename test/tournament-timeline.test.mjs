@@ -82,6 +82,10 @@ test("normalized golf events retain their authoritative round-derived state on H
 test("Timeline event types use one shared icon vocabulary", () => {
   assert.equal(timelineEventIcon("Golf"), "⛳");
   assert.equal(timelineEventIcon("Meal"), "🍽️");
+  for (const eventType of ["Drinks", "Bar", "Happy Hour", "Beer", "Cocktails"]) {
+    assert.equal(timelineEventIcon(eventType), "🍺");
+  }
+  assert.equal(timelineEventIcon("Cocktail Reception"), "🍺");
   assert.equal(timelineEventIcon("Check-In"), "📍");
   assert.equal(timelineEventIcon("Awards"), "🏆");
   assert.equal(timelineEventIcon("Meeting"), "👥");
