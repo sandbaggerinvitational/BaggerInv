@@ -73,6 +73,7 @@
 .rulesParityWarning span{font-size:.78rem;line-height:1.45}
 .diningSummary{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:12px;min-height:112px;padding:15px 16px}
 .diningCardStatic .eventState{align-self:center}
+.eventNoteBody{display:grid;gap:7px;min-width:0}.eventNoteBody p{white-space:pre-line;overflow-wrap:anywhere}
 .localGuideSections{gap:14px}
 .localGuideGroup{overflow:hidden;border:1px solid #ded7ca;border-radius:17px;background:#fff;box-shadow:0 7px 20px rgba(15,35,25,.04)}
 .localGuideGroup>summary{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;min-height:64px;padding:13px 16px;cursor:pointer;list-style:none}

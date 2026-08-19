@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { composeItineraryDetailSections, itineraryGroups, itineraryViewModel, structureItineraryDetails } from "../lib/tournament-guide-schedule.js";
+import { composeItineraryDetailSections, itineraryDetailParagraphs, itineraryGroups, itineraryViewModel, structureItineraryDetails } from "../lib/tournament-guide-schedule.js";
 
 const tournament = { status: "Live", timeZone: "America/New_York" };
 const courses = [
@@ -111,6 +111,42 @@ test("non-golf events remain editorial and do not acquire scoring context", () =
   assert.deepEqual(composeItineraryDetailSections(event), [{ label: "Additional Details", text: "Jackets requested." }]);
 });
 
+test("Schedule preserves Google Details line breaks and paragraph breaks as safe plain text", () => {
+  const details = [
+    "10th Annual Sandbagger of the Year",
+    "Presented by Caleb Lewis",
+    "",
+    "10th Annual Sandbagger Invitational Champions",
+    "Presented by past champion captain Chase Patterson",
+    "",
+    "Calcutta Results",
+    "Presented by Chase Patterson",
+  ].join("\r\n");
+  const model = itineraryViewModel({
+    records: [{ ...records[3], Title: "Awards at Large", Details: details }],
+    tournament,
+    now: new Date("2026-09-24T12:00:00Z"),
+  });
+  const [event] = model.events;
+  assert.equal(event.details, details);
+  assert.deepEqual(composeItineraryDetailSections(event), [{
+    label: "Additional Details",
+    text: details.replace(/\r\n/g, "\n"),
+  }]);
+  assert.deepEqual(itineraryDetailParagraphs(event.details), [
+    "10th Annual Sandbagger of the Year\nPresented by Caleb Lewis",
+    "10th Annual Sandbagger Invitational Champions\nPresented by past champion captain Chase Patterson",
+    "Calcutta Results\nPresented by Chase Patterson",
+  ]);
+});
+
+test("one-line and single-paragraph Schedule Details remain unchanged", () => {
+  assert.deepEqual(itineraryDetailParagraphs("Jackets requested."), ["Jackets requested."]);
+  assert.deepEqual(structureItineraryDetails("Jackets requested."), [{ label: "Additional Details", text: "Jackets requested." }]);
+  assert.equal(structureItineraryDetails("First line\nSecond line")[0].text, "First line\nSecond line");
+  assert.equal(structureItineraryDetails("First paragraph\n\nSecond paragraph")[0].text, "First paragraph\n\nSecond paragraph");
+});
+
 test("long workbook notes are structured into readable itinerary sections", () => {
   const sections = structureItineraryDetails("Green Tees. Nassau scoring: 1 point per segment. 90% handicap allocation. $25 net skins. Walking caddies are available.");
   assert.deepEqual(sections.map((section) => section.label), ["Tee Information", "Scoring", "Handicap", "Net Skins", "Caddies"]);
@@ -147,4 +183,17 @@ test("non-golf Additional Details use the golf-reference separation without chan
   assert.match(component, /event\.roundNumber \? styles\.eventExpanded : `\$\{styles\.eventExpanded\} \$\{styles\.eventExpandedNonGolf\}`/);
   assert.match(css, /\.eventExpandedNonGolf>\.eventNotes,\.eventExpandedNonGolf>\.eventNotesEmpty\{margin-top:15px\}/);
   assert.match(css, /\.scheduleContext\{margin:15px 0 0/);
+});
+
+test("Additional Details render preserved line structure as plain React text without requests or HTML interpretation", async () => {
+  const [component, css] = await Promise.all([
+    readFile(new URL("../app/tournament-guide/ScheduleItinerary.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/tournament-guide/tournament-guide.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(component, /itineraryDetailParagraphs\(value\)/);
+  assert.match(component, />\{paragraph\}<\/p>/);
+  assert.doesNotMatch(component, /dangerouslySetInnerHTML|innerHTML|Markdown|marked\(/i);
+  assert.doesNotMatch(component, /fetch\(|directorFetch\(/);
+  assert.match(css, /\.eventNoteBody\{display:grid;gap:7px;min-width:0\}/);
+  assert.match(css, /\.eventNoteBody p\{white-space:pre-line;overflow-wrap:anywhere\}/);
 });
