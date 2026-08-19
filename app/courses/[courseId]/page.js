@@ -67,7 +67,9 @@ export default async function CoursePage({ params, searchParams }) {
   const website = model.website;
   const historyReturn = historyCourseReturn(resolvedSearchParams);
   const tournamentReturn = historyCourseTournamentReturn(resolvedSearchParams);
-  const originReturn = courseOriginReturn(resolvedSearchParams);
+  const resolvedOriginReturn = courseOriginReturn(resolvedSearchParams);
+  const scheduleReturn = resolvedOriginReturn?.placement === "below-hero" ? resolvedOriginReturn : null;
+  const originReturn = scheduleReturn ? null : resolvedOriginReturn;
   return <main className={styles.page}>
     <Header homeHref="/home" />
     <section className={styles.hero}>
@@ -83,6 +85,17 @@ export default async function CoursePage({ params, searchParams }) {
         </div>
       </div>
     </section>
+
+    {scheduleReturn ? <HistoryNavigation
+      ariaLabel="Schedule course navigation"
+      left={{
+        href: scheduleReturn.href,
+        label: scheduleReturn.label,
+        direction: "left",
+        ariaLabel: scheduleReturn.accessibleLabel,
+      }}
+      surface="course"
+    /> : null}
 
     {tournamentReturn ? <HistoryNavigation
       ariaLabel={`${tournamentReturn.label} course history navigation`}

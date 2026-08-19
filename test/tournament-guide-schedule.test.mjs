@@ -62,7 +62,7 @@ test("Schedule preserves details behind disclosure and provides safe location ac
   const golf = model.events.find((event) => event.id === "round-1");
   assert.equal(golf.details, "Full scoring notes");
   assert.equal(golf.location, "Turtle Point");
-  assert.equal(golf.courseHref, "/courses/TP");
+  assert.equal(golf.courseHref, "/courses/TP?source=tournament-guide-schedule");
   assert.equal("mapHref" in golf, false);
 });
 
@@ -137,4 +137,14 @@ test("Schedule app presentation uses tappable disclosures and shared badges with
   assert.doesNotMatch(component, /Up Next|up-next-title|Tournament Complete/);
   assert.match(detail, /<ScheduleItinerary/);
   assert.doesNotMatch(detail, /className=\{styles\.timeline\}/);
+});
+
+test("non-golf Additional Details use the golf-reference separation without changing golf context spacing", async () => {
+  const [component, css] = await Promise.all([
+    readFile(new URL("../app/tournament-guide/ScheduleItinerary.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/tournament-guide/tournament-guide.module.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(component, /event\.roundNumber \? styles\.eventExpanded : `\$\{styles\.eventExpanded\} \$\{styles\.eventExpandedNonGolf\}`/);
+  assert.match(css, /\.eventExpandedNonGolf>\.eventNotes,\.eventExpandedNonGolf>\.eventNotesEmpty\{margin-top:15px\}/);
+  assert.match(css, /\.scheduleContext\{margin:15px 0 0/);
 });

@@ -46,7 +46,7 @@ function EventCard({ event }) {
         <span aria-hidden="true">⌄</span>
       </div>
     </summary>
-    <div className={styles.eventExpanded}>
+    <div className={event.roundNumber ? styles.eventExpanded : `${styles.eventExpanded} ${styles.eventExpandedNonGolf}`}>
       <SupportingDetails event={event} />
       <LocationActions event={event} />
     </div>

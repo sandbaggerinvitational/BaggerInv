@@ -77,9 +77,10 @@ test("Course Archive fails closed on conflicting Year/Round course evidence", ()
   assert.equal(model.audit.accidentalDuplicates.length, 1);
 });
 
-test("Course origin URLs preserve explicit Archive and current return precedence", () => {
+test("Course origin URLs preserve explicit Archive, current, and Schedule return precedence", () => {
   assert.equal(courseProfileHref({ courseId: "PDC01", origin: COURSE_ORIGINS.ARCHIVE }), "/courses/PDC01?view=archive&source=course-archive");
   assert.equal(courseProfileHref({ courseId: "TPGC01", origin: COURSE_ORIGINS.CURRENT }), "/courses/TPGC01?source=current-courses");
+  assert.equal(courseProfileHref({ courseId: "OCGC01", origin: COURSE_ORIGINS.SCHEDULE }), "/courses/OCGC01?source=tournament-guide-schedule");
   assert.deepEqual(courseOriginReturn({ view: "archive", source: "course-archive" }), {
     href: "/courses?view=archive",
     label: "Course Archive",
@@ -90,7 +91,13 @@ test("Course origin URLs preserve explicit Archive and current return precedence
     label: "Tournament Courses",
     accessibleLabel: "Back to Tournament Courses",
   });
-  for (const invalid of [{}, { view: "archive" }, { source: "course-archive" }, { source: "history", view: "archive" }, { source: "unknown" }]) {
+  assert.deepEqual(courseOriginReturn({ source: "tournament-guide-schedule" }), {
+    href: "/tournament-guide/schedule",
+    label: "Schedule",
+    accessibleLabel: "Back to Schedule",
+    placement: "below-hero",
+  });
+  for (const invalid of [{}, { view: "archive" }, { source: "course-archive" }, { source: "history", view: "archive" }, { source: "unknown" }, { source: "tournament-guide-schedule", view: "archive" }]) {
     assert.equal(courseOriginReturn(invalid), null);
   }
 });
@@ -113,6 +120,7 @@ test("Courses UI uses chronological groups, bounded prefetch, one AppShell, and 
   assert.doesNotMatch(page, /<Header|<Footer|fetch\(|\/api\//);
   assert.match(resolver, /courseArchiveTournaments: tournaments/);
   assert.match(detail, /courseOriginReturn/);
+  assert.match(detail, /scheduleReturn \? <HistoryNavigation/);
   assert.match(shell, /route === "\/courses"/);
   assert.match(css, /grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
   assert.match(css, /@media \(max-width: 650px\)/);
