@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../lib/stats";
 import Link from "next/link";
-import { Header, Footer } from "../components";
 import PlayerAvatar from "../PlayerAvatar";
 import { CompactHonors } from "../HonorBadges";
 import { playerDirectoryHref } from "../../lib/context-navigation";
@@ -27,8 +26,6 @@ export default async function PlayersPage({ searchParams }) {
 
   return (
     <main>
-      <Header />
-
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>The Competitors</p>
         <h1>Sandbaggers</h1>
@@ -117,7 +114,6 @@ export default async function PlayersPage({ searchParams }) {
         </div>
       </section>
 
-      <Footer />
     </main>
   );
 }

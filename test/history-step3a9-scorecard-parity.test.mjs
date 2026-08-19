@@ -162,7 +162,11 @@ test("2026 keeps its approved dedicated scorecard props and presentation path", 
 test("the summary and scorecard grids remain responsive at 320, 375, 390, and 430 pixels", () => {
   assert.match(scorecardCss, /@media\(max-width:700px\)[\s\S]*width:clamp\(120px,34vw,150px\)/);
   assert.match(scorecardCss, /\.scroller\{[^}]*overflow-x:auto/);
-  assert.match(summaryCss, /@media\(max-width:520px\)[\s\S]*grid-template-columns:1fr/);
+  assert.match(summaryCss, /@media\(max-width:360px\)[\s\S]*grid-template-columns:1fr/);
+  assert.match(summaryCss, /@media\(min-width:361px\) and \(max-width:520px\)[\s\S]*grid-template-columns:minmax\(0,1\.1fr\) minmax\(136px,\.9fr\)/);
+  assert.match(summaryCss, /\.row>span\{min-width:0/);
+  assert.match(summaryCss, /overflow-wrap:anywhere/);
+  assert.match(summaryCss, /grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
   for (const width of [320, 375, 390, 430]) {
     const identityWidth = Math.min(150, Math.max(120, width * 0.34));
     assert.ok(identityWidth >= 120 && identityWidth <= 150);

@@ -289,7 +289,8 @@ test("the frozen 2025 guard remains intact while 2023 and 2024 use the same comp
 
 test("the 2025 action and summary system remains responsive and accessible", () => {
   assert.match(matchCss, /@media\s*\(max-width:\s*700px\)/);
-  assert.match(summaryCss, /@media\(max-width:520px\)/);
+  assert.match(summaryCss, /@media\(max-width:360px\)/);
+  assert.match(summaryCss, /@media\(min-width:361px\) and \(max-width:520px\)/);
   assert.match(scorecard, /aria-controls=\{accordionId\}/);
   assert.match(scorecard, /aria-expanded=\{open\}/);
   assert.match(scorecard, /aria-label="Scorecard totals"/);
