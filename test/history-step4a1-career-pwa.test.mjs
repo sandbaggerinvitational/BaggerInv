@@ -96,6 +96,20 @@ test("Career-only density and Top Partners mobile layout do not change frozen Hi
   assert.match(profileCss, /\.careerContent \.profilePartnersTable \.tableRow \{[\s\S]*min-width: 0/);
 });
 
+test("Captain Legacy and Biggest Rival use compact Career-only mobile treatments", () => {
+  assert.match(profile, /<section className=\{styles\.captainLegacySection\}>[\s\S]*Captain Record[\s\S]*Championships as Captain[\s\S]*Tournaments as Captain/);
+  assert.match(profile, /Never served as Team Captain\./);
+  assert.match(profile, /<section className=\{styles\.rivalSpotlight\}>[\s\S]*Rival[\s\S]*Points Won[\s\S]*Head-to-Head/);
+  assert.match(profile, /Not enough recorded match history\./);
+  assert.match(profileCss, /\.careerContent \.captainLegacySummary \{[\s\S]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(profileCss, /\.careerContent \.captainLegacySeason \{[\s\S]*grid-template-columns: 50px minmax\(0, 1fr\) auto/);
+  assert.match(profileCss, /\.careerContent \.captainLegacySeason > b \{[\s\S]*grid-column: auto/);
+  assert.match(profileCss, /\.careerContent \.rivalProfileCard \{[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(profileCss, /\.careerContent \.rivalProfileCard > div:first-child \{[\s\S]*grid-column: 1 \/ -1/);
+  assert.match(profileCss, /\.careerContent \.captainLegacyEmpty,\s*\.careerContent \.rivalEmpty \{[\s\S]*min-height: 0;[\s\S]*padding: 10px 12px/);
+  assert.doesNotMatch(profile, /<details[^>]*className=\{styles\.(?:captainLegacySection|rivalSpotlight)\}/);
+});
+
 test("Tournament, Match, and Team remain canonical Player-origin drill-downs", () => {
   assert.match(intelligence, /withPlayerOriginContext\(`\/history\/\$\{season\.year\}`, playerSlug\)/);
   assert.match(formatHistory, /withPlayerOriginContext\(match\.href, playerSlug\)/);
