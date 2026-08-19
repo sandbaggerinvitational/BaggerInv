@@ -110,6 +110,68 @@
   color: #8e342a;
 }
 
+.validationDetails {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(142, 52, 42, .18);
+  color: #6f2d25;
+}
+
+.validationDetails > strong {
+  font-size: .72rem;
+  line-height: 1.4;
+}
+
+.validationDetails section {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.validationDetails h3 {
+  margin: 0;
+  color: #173c30;
+  font-size: .7rem;
+  letter-spacing: .04em;
+}
+
+.validationDetails ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.validationDetails li {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid rgba(142, 52, 42, .14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .58);
+  overflow-wrap: anywhere;
+}
+
+.validationDetails li > b {
+  color: #4d2721;
+  font-size: .68rem;
+}
+
+.validationDetails li > span,
+.validationDetails li > small {
+  font-size: .67rem;
+  line-height: 1.4;
+}
+
+.validationDetails li > small {
+  color: #6a514b;
+}
+
 @media (max-width: 520px) {
   .control {
     grid-template-columns: 1fr;

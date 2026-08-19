@@ -52,8 +52,26 @@ test("Mission Control Guide refresh reuses the protected route, reloads status, 
   assert.match(control, /requestInFlight\.current = true/);
   assert.match(control, /disabled=\{phase === "refreshing"\}/);
   assert.match(control, /loadStatus\(\)\.then\(\(\) => true\)/);
-  assert.match(control, /role=\{phase === "failure"/);
+  assert.match(control, /role=\{\(phase === "failure"/);
   assert.doesNotMatch(control, /router\.|window\.location|location\.href/);
+});
+
+test("Mission Control renders every protected validator detail as actionable source guidance", async () => {
+  const [control, css] = await Promise.all([
+    source("app/admin/director/DirectorGuideRefreshControl.js"),
+    source("app/admin/director/DirectorGuideRefreshControl.module.css"),
+  ]);
+  assert.match(control, /payload\.result\?\.validationIssues/);
+  assert.match(control, /setValidationIssues\(Array\.isArray\(error\?\.validationIssues\)/);
+  assert.match(control, /groupedValidationIssues\(validationIssues\)/);
+  assert.match(control, /Correct these source issues, then refresh again\./);
+  assert.match(control, /Participant Guide publication validation failures/);
+  assert.match(control, /Google value/);
+  assert.match(control, /Expected\/canonical value/);
+  assert.match(control, /issue\.reason/);
+  assert.doesNotMatch(control, /dangerouslySetInnerHTML|innerHTML/);
+  assert.match(css, /\.validationDetails/);
+  assert.match(css, /overflow-wrap: anywhere/);
 });
 
 test("Mission Control Guide refresh keeps Preview-only Director authorization and the canonical sync service", async () => {

@@ -257,11 +257,21 @@ test("projection rejects duplicate identities, malformed dates/times, missing he
   malformed["Tournament Itinerary"][0]["Event Date"] = "2026-02-31";
   malformed["Tournament Itinerary"][0]["Start Time"] = "25:90";
   malformed["Tournament Itinerary"][0]["Display Order"] = "later";
-  assert.throws(() => build({ sheets: malformed }), (error) =>
-    error.issues.some((issue) => /invalid approved-tournament date/.test(issue)) &&
-    error.issues.some((issue) => /invalid start time/.test(issue)) &&
-    error.issues.some((issue) => /invalid Display Order/.test(issue))
-  );
+  assert.throws(() => build({ sheets: malformed }), (error) => {
+    const dateIssue = error.validationIssues.find((issue) => issue.field === "Event Date" && Object.hasOwn(issue, "currentValue"));
+    const timeIssue = error.validationIssues.find((issue) => issue.field === "Start Time");
+    assert.deepEqual({
+      source: dateIssue.source, entity: dateIssue.entity, currentValue: dateIssue.currentValue, expectedValue: dateIssue.expectedValue,
+    }, {
+      source: "Tournament Itinerary", entity: "round-2", currentValue: "2026-02-31", expectedValue: "A valid 2026 tournament date",
+    });
+    assert.deepEqual({ currentValue: timeIssue.currentValue, expectedValue: timeIssue.expectedValue }, {
+      currentValue: "25:90", expectedValue: "A valid tournament time",
+    });
+    return error.issues.some((issue) => /invalid approved-tournament date/.test(issue)) &&
+      error.issues.some((issue) => /invalid start time/.test(issue)) &&
+      error.issues.some((issue) => /invalid Display Order/.test(issue));
+  });
 
   const missingHeader = officialSheets();
   missingHeader.Dining = missingHeader.Dining.map(({ Location: _removed, ...row }) => row);
@@ -292,15 +302,24 @@ test("projection rejects missing, duplicate, or scoring-inconsistent course assi
 
   const wrongTee = officialSheets();
   wrongTee.Courses[1]["Tee Played"] = "Blue";
-  assert.throws(() => build({ sheets: wrongTee }), (error) =>
-    error.issues.some((issue) => /Courses TPGC01:1 tee does not match canonical scoring configuration/.test(issue))
-  );
+  assert.throws(() => build({ sheets: wrongTee }), (error) => {
+    const detail = error.validationIssues.find((issue) => issue.field === "Tee Played");
+    assert.deepEqual({
+      source: detail.source, entity: detail.entity, currentValue: detail.currentValue, expectedValue: detail.expectedValue,
+    }, {
+      source: "Courses", entity: "TPGC01 · Round 1", currentValue: "Blue", expectedValue: "Gold",
+    });
+    return error.issues.some((issue) => /Courses TPGC01:1 tee does not match canonical scoring configuration/.test(issue));
+  });
 
   const wrongFormat = officialSheets();
   wrongFormat.Courses[1].Format = "SI";
-  assert.throws(() => build({ sheets: wrongFormat }), (error) =>
-    error.issues.some((issue) => /Courses TPGC01:1 format does not match canonical configuration/.test(issue))
-  );
+  assert.throws(() => build({ sheets: wrongFormat }), (error) => {
+    const detail = error.validationIssues.find((issue) => issue.field === "Format");
+    assert.equal(detail.currentValue, "SI");
+    assert.equal(detail.expectedValue, "BB");
+    return error.issues.some((issue) => /Courses TPGC01:1 format does not match canonical configuration/.test(issue));
+  });
 
   const presentationYardage = officialSheets();
   presentationYardage.Courses[1].Yardage = "9999";

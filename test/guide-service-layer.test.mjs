@@ -7,7 +7,7 @@ import {
   guideWorkerAuthorized,
   guideWorkerServerConfiguration,
 } from "../lib/guide-read-source.js";
-import { synchronizeGuideContent } from "../lib/guide-sync-service.js";
+import { guideValidationIssuesForDirector, synchronizeGuideContent } from "../lib/guide-sync-service.js";
 import { GuideProjectionValidationError } from "../lib/tournament-guide-projection.js";
 
 const workerSecret = "guide-worker-secret-32-characters-minimum";
@@ -128,6 +128,7 @@ test("canonical sync claims before Google, publishes one validated projection, a
 
 test("invalid Google content records a fixed safe failure and preserves last-known-good", async () => {
   let failure;
+  const message = "Courses TPGC01:1 tee does not match canonical scoring configuration";
   const result = await synchronizeGuideContent({
     triggerType: "MANUAL",
     requestedBy: "director",
@@ -136,7 +137,15 @@ test("invalid Google content records a fixed safe failure and preserves last-kno
       claimGuideSync: async () => rpc({ ok: true, claim_token: "claim" }),
       readGuideSourceContext: async () => canonicalContext,
       readGoogleSheets: async () => ({ result: {} }),
-      buildGuideProjection: () => { throw new GuideProjectionValidationError(["fixture is invalid"]); },
+      buildGuideProjection: () => { throw new GuideProjectionValidationError([message], [{
+        message,
+        source: "Courses",
+        entity: "TPGC01 · Round 1",
+        field: "Tee Played",
+        currentValue: "Blue",
+        expectedValue: "Gold",
+        valueSafe: true,
+      }]); },
       publishGuideProjection: async () => { throw new Error("not expected"); },
       failGuideSync: async (input) => { failure = input; return rpc({ ok: true }); },
     },
@@ -144,8 +153,38 @@ test("invalid Google content records a fixed safe failure and preserves last-kno
   assert.equal(result.ok, false);
   assert.equal(result.failureCategory, "VALIDATION");
   assert.equal(result.lastKnownGoodPreserved, true);
+  assert.deepEqual(result.validationIssues, [{
+    source: "Courses",
+    entity: "TPGC01 · Round 1",
+    field: "Tee Played",
+    reason: message,
+    currentValue: "Blue",
+    expectedValue: "Gold",
+  }]);
   assert.equal(failure.validationStatus, "INVALID");
   assert.equal(failure.failureSafe, "Google Guide content did not pass publication validation.");
+  assert.equal(failure.auditMetadata.validationIssueCount, 1);
+  assert.doesNotMatch(JSON.stringify(failure.auditMetadata), /Blue|Gold|TPGC01/);
+});
+
+test("Director validation diagnostics allowlist safe Guide values and never expose contact data or internal errors", () => {
+  const contactMessage = "Important Contacts row 1 is missing Email";
+  const error = new GuideProjectionValidationError([contactMessage], [{
+    message: contactMessage,
+    source: "Important Contacts",
+    entity: "Director contact",
+    field: "Email",
+    currentValue: "private@example.com",
+    expectedValue: "participant-safe email",
+    valueSafe: true,
+    stack: "database stack",
+  }]);
+  assert.deepEqual(guideValidationIssuesForDirector(error), [{
+    source: "Important Contacts",
+    entity: "Director contact",
+    field: "Email",
+    reason: contactMessage,
+  }]);
 });
 
 test("transient Google failures are classified safely and preserve last-known-good", async () => {
