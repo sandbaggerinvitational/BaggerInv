@@ -51,6 +51,19 @@ test("Local Guide creates native maps and telephone actions safely", () => {
   assert.equal(localGuideSectionIcon("Unknown"), "📍");
 });
 
+test("Local Guide treats whitespace-only descriptions as absent", () => {
+  const [resource] = localGuideViewModel([{
+    Year: 2027,
+    Section: "Transportation",
+    Title: "Future Shuttle",
+    Description: "  \n\t  ",
+    Phone: "843-555-0100",
+    "Sort Order": 1,
+  }]);
+  assert.equal(resource.description, "");
+  assert.equal(resource.phone, "843-555-0100");
+});
+
 test("Local Guide uses only approved workbook fields and data-backed actions", async () => {
   const [component, model, normalized, schema, css] = await Promise.all([
     readFile(new URL("../app/tournament-guide/LocalGuide.js", import.meta.url), "utf8"),
@@ -83,5 +96,7 @@ test("Local Guide uses only approved workbook fields and data-backed actions", a
   assert.match(normalized, /localGuideRows[\s\S]*recordMatchesTournament\(row, guideTournament\)/);
   assert.match(css, /@media\(max-width:700px\)\{\.localGuideGroup>div\{grid-template-columns:1fr\}\}/);
   assert.match(css, /width:36px;height:36px/);
-  assert.match(css, /\.localGuideActions>a\{[^}]*flex:0 0 100px/);
+  assert.match(css, /\.localGuideCard\{[^}]*gap:11px[^}]*align-content:start[^}]*padding:14px/);
+  assert.match(css, /\.localGuideActions>a\{[^}]*flex:0 0 auto[^}]*min-height:44px[^}]*padding:0 9px/);
+  assert.doesNotMatch(css, /\.localGuideActions>a\{[^}]*flex:0 0 100px/);
 });
