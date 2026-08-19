@@ -6,6 +6,7 @@ import { directorFetch } from "../../../lib/director-client-transaction";
 import { useCallback, useEffect, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
 import OddsAdmin from "../../odds-center/admin/OddsAdmin.js";
+import DirectorGuideRefreshControl from "./DirectorGuideRefreshControl.js";
 import { DirectorOperationsHub, OperationsSection } from "./DirectorOperationsConsole.js";
 import ParticipantIdentityFoundationPanel from "./ParticipantIdentityFoundationPanel.js";
 import styles from "./director.module.css";
@@ -297,6 +298,7 @@ export default function DirectorDashboard({ directorName }) {
         <article data-ready={data.championshipProjections.ready ? "true" : "attention"}><i aria-hidden="true">{data.championshipProjections.ready ? "🟢" : "🟡"}</i><strong>Publication {data.championshipProjections.ready ? "Ready" : "Pending"}</strong><span>{data.championshipProjections.nextLabel}</span></article>
         <article data-ready={data.operatingRound?.scoringLocked ? "attention" : "true"}><i aria-hidden="true">{data.operatingRound?.scoringLocked ? "🟡" : "🟢"}</i><strong>Scoring {data.operatingRound?.scoringLocked ? "Locked" : "Ready"}</strong><span>{data.operatingRound?.name || "Tournament complete"}</span></article>
       </div>
+      {data.qaTools ? <DirectorGuideRefreshControl onOperation={(operation) => recordOperation(operation.label, operation.status, operation.detail)} /> : null}
       <footer><p><small>Last Successful Publication</small><strong>{data.championshipProjections.publishedAt ? timestamp(data.championshipProjections.publishedAt) : "Not yet published"}</strong></p><p><small>Outstanding Actions</small><strong>{data.issueGroups.length}</strong></p><p><small>Pending Warnings</small><strong>{data.issueGroups.filter((item) => item.severity === "warning").length}</strong></p><p><small>Upcoming Required Action</small><strong>{data.primaryAction.label}</strong></p></footer>
     </section>
 
