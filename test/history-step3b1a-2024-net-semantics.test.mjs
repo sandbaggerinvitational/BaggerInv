@@ -277,7 +277,7 @@ test("the 2023 migration audits Course ID and archive tee resolution before appl
 
 test("runtime projection reuses the existing analytics and is isolated to 2024 R1/R3", () => {
   assert.match(scorecardData, /buildCanonicalHistoryCourseHoleAliases/);
-  assert.match(scorecardData, /buildScorecardAnalytics\(\{[\s\S]*courseHoles: history2024NetProjection\.courseHoles/);
+  assert.match(scorecardData, /reusableScorecardPass\(\{[\s\S]*courseHoles: history2024NetProjection\.courseHoles/);
   assert.match(roundPage, /completed2024 && \[1, 3\]\.includes\(Number\(archive\.round\)\)/);
   assert.match(roundPage, /selectCanonical2024NetPresentationScorecards/);
   assert.doesNotMatch(scorecardData, /calculateIndividualNetHoleScore|calculateBestBallNetHoleScore|getStrokesOnHole/);

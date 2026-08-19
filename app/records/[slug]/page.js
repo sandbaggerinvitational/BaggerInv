@@ -3,8 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
 import {
-  getLeaderboard,
+  getLeaderboardDefinition,
+  getLeaderboardFromRecords,
 } from "../../../lib/leaderboards";
+import { getRecords } from "../../../lib/stats";
+import { cache } from "react";
 import SortableLeaderboard from "../SortableLeaderboard";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
@@ -19,9 +22,14 @@ import { buildCanonicalRecordHolderAuthority } from "../../../lib/record-holder-
 
 export const dynamic = "force-dynamic";
 
-async function resolveLeaderboard(slug) {
-  const existing = getLeaderboard(slug);
-  if (existing) return { ...existing, scorecard: false };
+const resolveLeaderboard = cache(async (slug) => {
+  const officialDefinition = getLeaderboardDefinition(slug);
+  if (officialDefinition) {
+    return {
+      ...getLeaderboardFromRecords(slug, getRecords()),
+      scorecard: false,
+    };
+  }
   const analytics = await loadScorecardAnalytics();
   const playerNames = Object.fromEntries(analytics.scorecards
     .filter((card) => card.playerId)
@@ -61,7 +69,7 @@ async function resolveLeaderboard(slug) {
       : resolvedRecord.entityType === "COURSE_HOLE" ? "Course Hole" : progressionRecord ? "Player / Team / Match" : "Player",
     emptyState: resolvedRecord.emptyState,
   };
-}
+});
 
 export async function generateMetadata({ params }) {
   await refreshHistoricalData();

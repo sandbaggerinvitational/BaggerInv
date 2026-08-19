@@ -14,7 +14,6 @@ import {
   getCaptainLegacy,
   getPlayerBySlug,
   getPlayerFormatMatchHistory,
-  getPlayerStats,
   getRecords,
 } from "../../../lib/stats";
 import { addTournamentRanks } from "../../../lib/rankings";
@@ -149,7 +148,11 @@ export default async function PlayerPage({ params, searchParams }) {
     );
   }
 
-  const stats = getPlayerStats(player["Player ID"]);
+  const officialRecords = getRecords();
+  const stats = officialRecords.all.find(({ player: rowPlayer }) =>
+    rowPlayer["Player ID"] === player["Player ID"]
+  )?.stats;
+  if (!stats) notFound();
   const formatMatchHistory = getPlayerFormatMatchHistory(
     player["Player ID"],
     stats.records
@@ -166,7 +169,6 @@ export default async function PlayerPage({ params, searchParams }) {
   const careerYears = formatPlayerCareerYears(player, recordedAppearanceYears);
   const scorecardAnalytics = await scorecardAnalyticsPromise;
   const careerScorecards = scorecardAnalytics.canonicalCareerScorecards;
-  const officialRecords = getRecords();
   const playerIntelligence = buildPlayerIntelligence({
     playerId: player["Player ID"],
     stats,
