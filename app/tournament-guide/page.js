@@ -30,10 +30,10 @@ export default async function TournamentGuidePage({ searchParams }) {
     if (["schedule", "rules", "dining", "getting-around", "contacts"].includes(destination)) redirect(`/tournament-guide/${destination}`);
   }
 
-  const { tournamentIdentity } = await resolveTournamentGuideContent();
+  const { tournamentIdentity, courses } = await resolveTournamentGuideContent();
 
   return <main><Header />
-    <TournamentGuideHero tournament={tournamentIdentity} />
+    <TournamentGuideHero tournament={tournamentIdentity} courses={courses} />
     <div className={styles.shell}>
       <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{destinations.map((item) => <Link href={item.href} prefetch={false} key={item.href}><i><GuideDirectoryIcon name={item.icon} /></i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section>
     </div><Footer />

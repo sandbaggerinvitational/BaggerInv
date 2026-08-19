@@ -33,8 +33,22 @@ test("Dining icons derive dynamically from Cuisine with a neutral fallback", () 
 });
 
 test("Dining hides reservation status when the workbook value is blank", () => {
-  const [meal] = diningViewModel([{ Year: 2026, Day: "Friday", Meal: "Lunch", Cuisine: "Seafood", "Reservations Required": "" }]);
+  const [meal] = diningViewModel([{ Year: 2027, Day: "Thursday", Meal: "Lunch", Cuisine: "Seafood", "Start Time": "11:30 AM", "Reservations Required": "" }]);
   assert.equal(meal.reservationLabel, "");
+  assert.equal(meal.time, "11:30 AM");
+  assert.equal(meal.dressCode, "");
+  assert.equal(meal.notes, "");
+});
+
+test("Dining annual structure derives variable day and meal counts entirely from rows", () => {
+  const annual = diningViewModel([
+    { Year: 2027, Day: "Thursday", Meal: "Welcome", "Start Time": "6:00 PM", "Sort Order": 1 },
+    { Year: 2027, Day: "Saturday", Meal: "Awards", "Start Time": "8:00 PM", Notes: "Trophies follow dinner.", "Sort Order": 2 },
+  ]);
+  assert.equal(annual.length, 2);
+  assert.deepEqual([...diningGroups(annual).keys()], ["Thursday", "Saturday"]);
+  assert.equal(annual[0].reservationLabel, "");
+  assert.equal(annual[0].notes, "");
 });
 
 test("Dining uses only the approved workbook fields and renders Notes behind disclosure", async () => {
@@ -51,6 +65,8 @@ test("Dining uses only the approved workbook fields and renders Notes behind dis
     assert.match(schema, new RegExp(field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   assert.match(component, /<details/);
+  assert.match(component, /if \(!meal\.notes\) return <article/);
+  assert.match(component, /<DiningCardContent meal=\{meal\} disclosure=\{false\}/);
   assert.doesNotMatch(component, /<details[^>]* open/);
   assert.match(component, /Reservation Required/);
   assert.match(component, /meal\.reservationLabel \?/);

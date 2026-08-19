@@ -112,6 +112,22 @@ test("projection allowlists participant contact fields and strips unsafe optiona
   assert.equal(content.overview[1].Description, "Official rules");
 });
 
+test("projection carries annual tournament logo and responsive destination imagery without a Guide-only dataset", () => {
+  const sheets = officialSheets();
+  Object.assign(sheets.Tournaments[0], {
+    "Annual Image": "sandbagger-future",
+    "Hero Image": "future-destination",
+    "Mobile Hero Image": "future-destination-mobile",
+  });
+  const projection = build({ sheets }).content;
+  assert.equal(projection.tournamentIdentity.logoFileName, "sandbagger-future");
+  assert.equal(projection.tournamentIdentity.heroImageFileName, "future-destination");
+  assert.equal(projection.tournamentIdentity.mobileHeroImageFileName, "future-destination-mobile");
+  assert.equal(projection.tournament["Annual Image"], "sandbagger-future");
+  assert.equal(projection.tournament["Hero Image"], "future-destination");
+  assert.equal(projection.tournament["Mobile Hero Image"], "future-destination-mobile");
+});
+
 test("projection normalizes the official singular Dining reservation header", () => {
   const sheets = officialSheets();
   const value = sheets.Dining[0]["Reservations Required"];

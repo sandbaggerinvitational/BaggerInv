@@ -26,6 +26,26 @@ test("Important Contacts derives category icons and direct action URLs", () => {
   assert.equal(contactTextHref("(843) 555-0100"), "sms:8435550100");
   assert.equal(contactEmailHref("director@example.com"), "mailto:director@example.com");
   assert.equal(contactWebsiteHref("bagger.example.com"), "https://bagger.example.com");
+  assert.equal(contactCallHref("not a phone"), "");
+  assert.equal(contactTextHref("x"), "");
+  assert.equal(contactEmailHref("missing-at.example.com"), "");
+  assert.equal(contactWebsiteHref("javascript:alert(1)"), "");
+});
+
+test("Important Contacts annual rows retain contacts while exposing only usable action combinations", () => {
+  const contacts = contactsViewModel([
+    { Year: 2027, Category: "Tournament", Name: "Phone Only", Phone: "555-0100", "Text Enabled": "No", Email: "bad", Website: "" },
+    { Year: 2027, Category: "Resort", Name: "Email Only", Phone: "", Email: "frontdesk@example.com", Website: "javascript:bad" },
+    { Year: 2027, Category: "Transportation", Name: "Website Only", Website: "shuttle.example.com" },
+    { Year: 2027, Category: "Emergency", Name: "Text Contact", Phone: "911", "Text Enabled": "Yes" },
+  ]);
+  assert.equal(contacts.length, 4);
+  assert.deepEqual(contacts.map(({ phone, textEnabled, email, website }) => ({ phone: Boolean(phone), textEnabled, email: Boolean(email), website: Boolean(website) })), [
+    { phone: true, textEnabled: false, email: false, website: false },
+    { phone: false, textEnabled: false, email: true, website: false },
+    { phone: false, textEnabled: false, email: false, website: true },
+    { phone: true, textEnabled: true, email: false, website: false },
+  ]);
 });
 
 test("Important Contacts exposes only workbook-supported icon actions", async () => {

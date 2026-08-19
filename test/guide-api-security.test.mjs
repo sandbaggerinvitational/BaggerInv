@@ -67,7 +67,7 @@ test("Director Guide route authorizes signed Director sessions and shares the ca
 
 test("existing Director readiness surface exposes immediate Guide refresh and safe status", () => {
   const client = source("app/admin/director/game-center-readiness/GameCenterReadinessClient.js");
-  assert.match(client, /Refresh Guide Content/);
+  assert.match(client, /Refresh Participant Guide/);
   assert.match(client, /Guide Sync Status/);
   assert.match(client, /\/api\/director\/guide-content/);
   assert.match(client, /directorFetch/);

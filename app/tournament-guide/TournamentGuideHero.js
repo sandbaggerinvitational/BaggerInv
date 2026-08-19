@@ -1,47 +1,43 @@
 import AssetImage from "../AssetImage";
-import { tournamentLogo } from "../../lib/asset-paths";
-import { formatTournamentDates, formatTournamentEdition } from "../../lib/tournament-branding";
+import { optimizedAssetUrl } from "../../lib/asset-paths";
+import { annualGuideHeroModel } from "../../lib/tournament-guide-hero";
+import AnnualGuideHeroMedia from "./AnnualGuideHeroMedia";
 import styles from "./tournament-guide.module.css";
 
-function tournamentName(tournament) {
-  return tournament?.["Tournament Name"] || tournament?.Name || tournament?.name || "";
-}
+export default function TournamentGuideHero({ tournament, courses = [] }) {
+  const identity = annualGuideHeroModel({ tournament, courses });
+  const fallback = identity.year || identity.name.slice(0, 3).toUpperCase() || "SBI";
 
-function tournamentEdition(tournament) {
-  return formatTournamentEdition(tournament?.["Tournament Edition"] || tournament?.editionTitle || tournament?.Annual);
-}
-
-function tournamentDates(tournament) {
-  const dates = tournament?.["Tournament Dates"] || tournament?.Dates || tournament?.dates || tournament?.Date || "";
-  return formatTournamentDates(dates);
-}
-
-export default function TournamentGuideHero({ tournament }) {
-  const name = tournamentName(tournament);
-  const edition = tournamentEdition(tournament);
-  const dates = tournamentDates(tournament);
-  const logoFileName = tournament?.["Tournament Logo"] || tournament?.["Tournament Logo Filename"] || tournament?.logoFileName || tournament?.["Annual Image"] || tournament?.["Logo Filename"] || tournament?.logo;
-
-  return <section className={styles.tournamentIdentityHero} aria-label="Tournament identity">
+  return <section className={styles.tournamentIdentityHero} aria-labelledby="tournament-guide-title">
+    <AnnualGuideHeroMedia
+      image={identity.heroImage}
+      mobileImage={identity.mobileHeroImage}
+      alt={identity.heroAlt}
+      className={styles.tournamentIdentityMedia}
+      imageClassName={styles.tournamentIdentityImage}
+    />
+    <div className={styles.tournamentIdentityShade} aria-hidden="true" />
     <div className={styles.tournamentIdentityInner}>
       <div className={styles.tournamentIdentityLogoPlate}>
         <AssetImage
-          src={tournamentLogo(logoFileName)}
-          alt={name ? `${name} logo` : "Tournament logo"}
-          fallback={String(tournament?.year || "SBI")}
+          src={optimizedAssetUrl(identity.logoImage, 256, 82)}
+          alt={identity.name ? `${identity.name} logo` : "Tournament logo"}
+          fallback={fallback}
           className={styles.tournamentIdentityLogo}
           fallbackClassName={styles.tournamentIdentityLogoFallback}
-          width={108}
-          height={108}
-          sizes="(max-width: 560px) 64px, 108px"
+          width={128}
+          height={128}
+          sizes="(max-width: 560px) 76px, 128px"
+          loading="eager"
           decoding="async"
+          fetchPriority="high"
         />
       </div>
       <div className={styles.tournamentIdentityCopy}>
-        {edition ? <p>{edition}</p> : null}
-        {name ? <h1>{name}</h1> : null}
-        <strong>Tournament Guide</strong>
-        {dates ? <span>{dates}</span> : null}
+        {identity.edition || identity.name ? <p>{identity.edition || identity.name}</p> : null}
+        <h1 id="tournament-guide-title">Tournament Guide</h1>
+        {identity.dates ? <strong>{identity.dates}</strong> : null}
+        {identity.destination ? <span>{identity.destination}</span> : null}
       </div>
     </div>
   </section>;

@@ -50,25 +50,29 @@ test("Courses defaults to the active tournament and offers the historical archiv
   assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
 });
 
-test("Tournament Guide landing owns the published projection-driven identity hero while detail routes stay compact", async () => {
-  const [hero, guide, detail, courses, courseDetail, resolver] = await Promise.all([
+test("Tournament Guide landing owns the published projection-driven annual hero while detail routes stay compact", async () => {
+  const [hero, heroModel, guide, detail, courses, courseDetail, resolver] = await Promise.all([
     source("app/tournament-guide/TournamentGuideHero.js"),
+    source("lib/tournament-guide-hero.js"),
     source("app/tournament-guide/page.js"),
     source("app/tournament-guide/GuideDetailPage.js"),
     source("app/courses/page.js"),
     source("app/courses/[courseId]/page.js"),
     source("app/tournament-guide/resolveGuideContent.js"),
   ]);
-  for (const field of ["Tournament Name", "Tournament Edition", "Tournament Dates", "Tournament Logo"]) {
-    assert.match(hero, new RegExp(field));
+  for (const field of ["Tournament Name", "Tournament Edition", "Tournament Dates", "Tournament Logo", "Hero Image", "Mobile Hero Image"]) {
+    assert.match(heroModel, new RegExp(field));
   }
-  assert.match(hero, /tournamentLogo\(logoFileName\)/);
-  assert.match(hero, /Annual/);
+  assert.match(hero, /annualGuideHeroModel\(\{ tournament, courses \}\)/);
+  assert.match(hero, /<AnnualGuideHeroMedia/);
+  assert.match(hero, /<h1 id="tournament-guide-title">Tournament Guide<\/h1>/);
+  assert.match(heroModel, /tournamentLogo/);
+  assert.match(heroModel, /current-course/);
   assert.match(resolver, /tournamentIdentity/);
   assert.match(resolver, /data\.tournament\?\.name \|\| stored\.tournamentIdentity\?\.name/);
   assert.match(resolver, /stored\.tournamentIdentity\?\.dates/);
   assert.match(resolver, /stored\.tournamentIdentity\?\.location/);
-  assert.match(guide, /<TournamentGuideHero tournament=\{tournamentIdentity\} \/>/);
+  assert.match(guide, /<TournamentGuideHero tournament=\{tournamentIdentity\} courses=\{courses\} \/>/);
   assert.doesNotMatch(detail, /TournamentGuideHero/);
   assert.doesNotMatch(courses, /TournamentGuideHero/);
   assert.match(detail, /className=\{styles\.backToGuide\}/);
@@ -77,8 +81,9 @@ test("Tournament Guide landing owns the published projection-driven identity her
 });
 
 test("page titles remain in content and no longer repeat inside the shared hero", async () => {
-  const [hero, guide, detail, css] = await Promise.all([
+  const [hero, heroModel, guide, detail, css] = await Promise.all([
     source("app/tournament-guide/TournamentGuideHero.js"),
+    source("lib/tournament-guide-hero.js"),
     source("app/tournament-guide/page.js"),
     source("app/tournament-guide/GuideDetailPage.js"),
     source("app/tournament-guide/tournament-guide.module.css"),
@@ -89,8 +94,9 @@ test("page titles remain in content and no longer repeat inside the shared hero"
   for (const title of ["Schedule", "Rules & Formats", "Dining"]) assert.match(detail, new RegExp(`<h1>${title.replace("&", "&")}<\\/h1>`));
   assert.doesNotMatch(guide, /\[\["Edition"/);
   assert.doesNotMatch(guide, /\["Dates"/);
-  assert.match(hero, /formatTournamentDates\(dates\)/);
-  assert.doesNotMatch(css, /\.tournamentIdentityCopy p\{[^}]*text-transform:uppercase/);
+  assert.match(heroModel, /formatTournamentDates\(/);
+  assert.match(hero, /identity\.dates/);
+  assert.match(css, /\.tournamentIdentityCopy p\{[^}]*text-transform:uppercase/);
 });
 
 test("implemented Guide modules use approved sheets while unfinished content remains placeholder-only", async () => {
@@ -183,11 +189,16 @@ test("format summaries render only inside their expandable Round Format cards", 
 });
 
 test("format-specific rules are owned by Round Formats instead of repeated below", async () => {
-  const detail = await source("app/tournament-guide/GuideDetailPage.js");
-  assert.match(detail, /const remaining = ruleBook\.filter\(\(rule\) => !formatIds\.has\(rule\["Rule ID"\]\)\)/);
+  const [detail, ownership] = await Promise.all([
+    source("app/tournament-guide/GuideDetailPage.js"),
+    source("lib/tournament-guide-rules.js"),
+  ]);
+  assert.match(detail, /const presentation = rulesPresentationModel\(ruleBook\)/);
+  assert.match(detail, /const remaining = presentation\.remaining/);
   assert.doesNotMatch(detail, /governingCategory/);
-  assert.match(detail, /rules=\{forFormat\(formatCode\)\}/);
-  assert.match(detail, /formatIds = new Set\(Object\.keys\(formatTerms\).*forFormat\(format\)/);
+  assert.match(detail, /rules=\{presentation\.byFormat\[formatCode\] \|\| \[\]\}/);
+  assert.match(ownership, /formats\.length === 1/);
+  assert.match(ownership, /else remaining\.push\(rule\)/);
 });
 
 test("every non-format rule uses the same compact expandable card pattern", async () => {

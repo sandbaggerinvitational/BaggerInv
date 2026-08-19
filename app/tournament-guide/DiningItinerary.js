@@ -7,25 +7,32 @@ function DressCodeIcon() {
   return <svg className={styles.diningDressIcon} viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4 4 6l-2 4 3 1.5V20h14v-8.5l3-1.5-2-4-4-2c-.7 1.4-1.7 2-4 2s-3.3-.6-4-2Z" /></svg>;
 }
 
+function DiningCardContent({ meal, disclosure }) {
+  return <>
+    <div className={styles.eventIcon} aria-hidden="true">{meal.icon}</div>
+    <div className={styles.eventPrimary}>
+      {meal.time ? <span className={styles.eventTime}>{meal.time}</span> : null}
+      <h3>{meal.meal}</h3>
+      {meal.location ? <strong>{meal.location}</strong> : null}
+      {meal.dressCode ? <p className={styles.diningDress}><DressCodeIcon />{meal.dressCode}</p> : null}
+    </div>
+    <div className={styles.eventState}>
+      {meal.reservationLabel ? <span className={meal.reservationLabel === "Reservation Required" ? styles.reservationRequired : styles.openSeating}>{meal.reservationLabel}</span> : null}
+      {disclosure ? <span aria-hidden="true">⌄</span> : null}
+    </div>
+  </>;
+}
+
 function DiningCard({ meal }) {
+  if (!meal.notes) return <article className={`${styles.itineraryCard} ${styles.diningCard} ${styles.diningCardStatic}`}>
+    <div className={styles.diningSummary}><DiningCardContent meal={meal} disclosure={false} /></div>
+  </article>;
   return <details className={`${styles.itineraryCard} ${styles.diningCard}`} onClick={(interaction) => {
     if (interaction.target.closest("a, button, summary")) return;
     interaction.currentTarget.open = !interaction.currentTarget.open;
   }}>
-    <summary>
-      <div className={styles.eventIcon} aria-hidden="true">{meal.icon}</div>
-      <div className={styles.eventPrimary}>
-        {meal.time ? <span className={styles.eventTime}>{meal.time}</span> : null}
-        <h3>{meal.meal}</h3>
-        {meal.location ? <strong>{meal.location}</strong> : null}
-        {meal.dressCode ? <p className={styles.diningDress}><DressCodeIcon />{meal.dressCode}</p> : null}
-      </div>
-      <div className={styles.eventState}>
-        {meal.reservationLabel ? <span className={meal.reservationLabel === "Reservation Required" ? styles.reservationRequired : styles.openSeating}>{meal.reservationLabel}</span> : null}
-        <span aria-hidden="true">⌄</span>
-      </div>
-    </summary>
-    {meal.notes ? <div className={`${styles.eventExpanded} ${styles.diningNotes}`}><p>{meal.notes}</p></div> : null}
+    <summary><DiningCardContent meal={meal} disclosure /></summary>
+    <div className={`${styles.eventExpanded} ${styles.diningNotes}`}><p>{meal.notes}</p></div>
   </details>;
 }
 

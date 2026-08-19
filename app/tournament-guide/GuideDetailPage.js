@@ -8,9 +8,9 @@ import ScheduleItinerary from "./ScheduleItinerary";
 import DiningItinerary from "./DiningItinerary";
 import LocalGuide from "./LocalGuide";
 import ImportantContacts from "./ImportantContacts";
+import { GUIDE_FORMATS, guideFormatCode, rulesCurrentContextParity, rulesPresentationModel } from "../../lib/tournament-guide-rules";
 import styles from "./tournament-guide.module.css";
 
-const formatTerms = { BB: ["best ball", "four-ball", "four ball", "fourball"], SC: ["scramble"], SI: ["singles", "single match"] };
 const ruleSections = [
   { id: "tournament", icon: "🏆", title: "Competition Rules", matches: /tournament|handicap|scoring/i },
   { id: "local", icon: "📍", title: "Local Rules", matches: /local/i },
@@ -27,16 +27,15 @@ const categoryTitles = {
   practice: "Practice Rules",
   equipment: "Equipment",
 };
-const text = (record) => Object.values(record || {}).join(" ").toLowerCase();
-const code = (value) => String(value || "").trim().toUpperCase();
+const code = guideFormatCode;
 const categoryTitle = (value) => categoryTitles[String(value || "").trim().toLowerCase()] || value || "Competition Rules";
 
 function Text({ value }) { return paragraphs(value).map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>); }
 function Empty({ title }) { return <div className={styles.empty}><span>Tournament Guide</span><h2>{title}</h2><p>Published tournament information will appear here when available.</p></div>; }
 
-function Schedule({ tournament, records, description, rounds, courses, initialNow }) {
+function Schedule({ tournament, records, description, rounds, courses, tournamentRules, formatRules, initialNow }) {
   if (!records.length) return <Empty title="Schedule" />;
-  return <section className={`${styles.focusedContent} ${styles.scheduleExperience}`}><header><p className={styles.eyebrow}>Tournament Week</p><h1>Schedule</h1><Text value={description} /></header><ScheduleItinerary records={records} tournament={tournament} rounds={rounds} courses={courses} initialNow={initialNow} /></section>;
+  return <section className={`${styles.focusedContent} ${styles.scheduleExperience}`}><header><p className={styles.eyebrow}>Tournament Week</p><h1>Schedule</h1><Text value={description} /></header><ScheduleItinerary records={records} tournament={tournament} rounds={rounds} courses={courses} tournamentRules={tournamentRules} formatRules={formatRules} initialNow={initialNow} /></section>;
 }
 
 function Dining({ records }) {
@@ -64,10 +63,9 @@ function RuleSection({ id, icon, title, records }) {
   return <section className={styles.ruleCollection}><h2><span aria-hidden="true">{icon}</span>{title}</h2><div className={styles.ruleCards}>{records.map((rule) => <RuleCard rule={rule} key={rule["Rule ID"]} />)}</div></section>;
 }
 
-function Rules({ ruleBook, tournamentRules, rounds }) {
-  const forFormat = (format) => ruleBook.filter((rule) => formatTerms[format].some((term) => text(rule).includes(term)));
-  const formatIds = new Set(Object.keys(formatTerms).flatMap((format) => forFormat(format).map((rule) => rule["Rule ID"])));
-  const remaining = ruleBook.filter((rule) => !formatIds.has(rule["Rule ID"]));
+function Rules({ ruleBook, tournamentRules, rounds, liveRounds }) {
+  const presentation = rulesPresentationModel(ruleBook);
+  const remaining = presentation.remaining;
   const sectionRecords = Object.fromEntries(ruleSections.map((section) => [section.id, []]));
   remaining.forEach((rule) => {
     const searchable = [rule.Category, rule.Subcategory, rule.Title].filter(Boolean).join(" ");
@@ -76,8 +74,10 @@ function Rules({ ruleBook, tournamentRules, rounds }) {
       || ruleSections.at(-1);
     sectionRecords[section.id].push(rule);
   });
-  const formats = ["BB", "SC", "SI"].map((format) => rounds.find((row) => code(row["Format ID"] || row.Format) === format) || { "Format ID": format, Name: getFormatName(format) });
-  return <section className={`${styles.focusedContent} ${styles.rulesExperience}`}><header><p className={styles.eyebrow}>Official Competition</p><h1>Rules & Formats</h1><p>Official tournament rules and the format for every round, combined from the existing workbook.</p></header><section className={styles.formatCollection}><header><h2><span aria-hidden="true">⛳</span>Round Formats</h2><p>Best Ball, Scramble & Singles</p></header><div>{formats.map((format) => { const formatCode = code(format["Format ID"] || format.Format); return <FormatCard format={format} configuration={tournamentRules.find((rule) => code(rule.Format) === formatCode)} rules={forFormat(formatCode)} key={formatCode} />; })}</div></section>{ruleSections.map((section) => <RuleSection {...section} records={sectionRecords[section.id]} key={section.id} />)}</section>;
+  const formats = GUIDE_FORMATS.map((format) => rounds.find((row) => code(row["Format ID"] || row.Format) === format) || { "Format ID": format, Name: getFormatName(format) });
+  const parity = rulesCurrentContextParity({ liveRounds, tournamentRules, formats: rounds });
+  if (parity.issues.length) console.error("Tournament Guide rules/current scoring parity defect", parity.issues);
+  return <section className={`${styles.focusedContent} ${styles.rulesExperience}`}><header><p className={styles.eyebrow}>Official Competition</p><h1>Rules & Formats</h1><p>Official tournament rules and the format for every round, combined from the existing workbook.</p></header>{parity.issues.length ? <aside className={styles.rulesParityWarning} role="alert"><strong>Current format configuration needs review.</strong><span>The Guide has detected a mismatch between published Rules and the current playing configuration.</span></aside> : null}<section className={styles.formatCollection}><header><h2><span aria-hidden="true">⛳</span>Round Formats</h2><p>Best Ball, Scramble & Singles</p></header><div>{formats.map((format) => { const formatCode = code(format["Format ID"] || format.Format); return <FormatCard format={format} configuration={tournamentRules.find((rule) => code(rule.Format) === formatCode)} rules={presentation.byFormat[formatCode] || []} key={formatCode} />; })}</div></section>{ruleSections.map((section) => <RuleSection {...section} records={sectionRecords[section.id]} key={section.id} />)}</section>;
 }
 
 function Placeholder({ title, detail }) { return <section className={styles.placeholder}><span>Tournament Guide</span><h1>{title}</h1><p>{detail}</p></section>; }
@@ -86,5 +86,5 @@ export default async function GuideDetailPage({ section }) {
   const content = await resolveTournamentGuideContent();
   const { tournament, schedule: itinerary, ruleBook } = content;
   const descriptions = Object.fromEntries(content.overview.map((item) => [item["Section Slug"], item.Description]));
-  return <main className={styles.guideDetailPage}><Header /><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;
+  return <main className={styles.guideDetailPage}><Header /><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} tournamentRules={content.tournamentRules} formatRules={content.rounds} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} liveRounds={content.liveRounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;
 }

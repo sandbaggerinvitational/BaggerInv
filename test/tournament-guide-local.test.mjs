@@ -1,7 +1,18 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { localGuideDirections, localGuideGroups, localGuidePhone, localGuideRecordIcon, localGuideSectionIcon, localGuideViewModel, localGuideWebsite } from "../lib/tournament-guide-local.js";
+import {
+  localGuideDirections,
+  localGuideGroupDefaultOpen,
+  localGuideGroups,
+  localGuidePhone,
+  localGuideRecordIcon,
+  localGuideSectionIcon,
+  localGuideViewModel,
+  localGuideWebsite,
+  normalizeLocalGuideSection,
+  unknownLocalGuideSections,
+} from "../lib/tournament-guide-local.js";
 
 const records = [
   { Year: 2026, Section: "Medical", Title: "Urgent Care", Description: "Nearest walk-in clinic.", Address: "10 Main St", Phone: "(843) 555-1212", Website: "https://example.com/clinic", "Sort Order": 3 },
@@ -9,10 +20,21 @@ const records = [
   { Year: 2026, Section: "Transportation", Title: "Airport Transfer", Description: "Advance booking recommended.", Address: "Charleston International Airport", "Sort Order": 2 },
 ];
 
-test("Local Guide groups records by Section and preserves workbook Sort Order", () => {
+test("Local Guide normalizes source sections into the annual participant hierarchy without dropping rows", () => {
   const groups = localGuideGroups(localGuideViewModel(records));
-  assert.deepEqual([...groups.keys()], ["Transportation", "Medical"]);
+  assert.deepEqual([...groups.keys()], ["Transportation", "Medical & Emergency"]);
   assert.deepEqual(groups.get("Transportation").map((record) => record.title), ["Tournament Shuttle", "Airport Transfer"]);
+  assert.equal([...groups.values()].flat().length, records.length);
+  assert.equal(normalizeLocalGuideSection("Aiport"), "Airport & Hotel");
+  assert.equal(normalizeLocalGuideSection("Resort"), "Airport & Hotel");
+  assert.equal(normalizeLocalGuideSection("Pharmacy"), "Essentials");
+  assert.equal(normalizeLocalGuideSection("Police"), "Medical & Emergency");
+  assert.equal(normalizeLocalGuideSection("Future Recommendation"), "Other");
+  assert.deepEqual(unknownLocalGuideSections([{ Section: "Future Recommendation" }, { Section: "Fuel" }]), ["Future Recommendation"]);
+  assert.equal(localGuideGroupDefaultOpen("Transportation"), true);
+  assert.equal(localGuideGroupDefaultOpen("Airport & Hotel"), false);
+  assert.equal(localGuideGroupDefaultOpen("Essentials"), false);
+  assert.equal(localGuideGroupDefaultOpen("Medical & Emergency"), true);
 });
 
 test("Local Guide creates native maps and telephone actions safely", () => {
@@ -49,13 +71,17 @@ test("Local Guide uses only approved workbook fields and data-backed actions", a
   assert.match(component, /<h1>Local Guide<\/h1>/);
   assert.match(component, /localGuideSectionIcon\(section\)/);
   assert.match(component, /localGuideRecordIcon\(record\.title\)/);
+  assert.match(component, /<details className=\{styles\.localGuideGroup\}/);
+  assert.match(component, /open=\{localGuideGroupDefaultOpen\(section\)\}/);
+  assert.match(component, /<summary><h2>/);
+  assert.match(component, /visuallyHidden/);
   assert.match(component, /Local information is being prepared\./);
   assert.match(component, /<ExternalLinkConfirm href=\{localGuideWebsite\(record\.website\)\}/);
   assert.match(component, /localGuideDirections\(record\.address\)/);
   assert.match(component, /localGuidePhone\(record\.phone\)/);
   assert.match(normalized, /fetchOptionalSheet\("Local Guide"\)/);
   assert.match(normalized, /localGuideRows[\s\S]*recordMatchesTournament\(row, guideTournament\)/);
-  assert.match(css, /@media\(max-width:700px\)\{\.localGuideSections>section>div\{grid-template-columns:1fr\}\}/);
+  assert.match(css, /@media\(max-width:700px\)\{\.localGuideGroup>div\{grid-template-columns:1fr\}\}/);
   assert.match(css, /width:36px;height:36px/);
   assert.match(css, /\.localGuideActions>a\{[^}]*flex:0 0 100px/);
 });

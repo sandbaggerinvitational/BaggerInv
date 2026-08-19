@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import StatusBadge from "../StatusBadge";
-import { itineraryGroups, itineraryViewModel, structureItineraryDetails } from "../../lib/tournament-guide-schedule";
+import { composeItineraryDetailSections, itineraryGroups, itineraryViewModel } from "../../lib/tournament-guide-schedule";
 import styles from "./tournament-guide.module.css";
 
 function SupportingDetails({ event }) {
-  const context = [event.roundNumber ? `Round ${event.roundNumber}` : "", event.format, event.tee ? `${event.tee} Tees` : ""].filter(Boolean);
-  const sections = structureItineraryDetails(event.details);
+  const context = [event.roundNumber ? `Round ${event.roundNumber}` : "", event.formatLabel || event.format, event.tee ? `${event.tee} Tees` : ""].filter(Boolean);
+  const sections = composeItineraryDetailSections(event);
   return <>
     {context.length ? <p className={styles.scheduleContext}>{context.join(" • ")}</p> : null}
     {sections.length ? <div className={styles.eventNotes}>{sections.map((section) => <section key={section.label}><h4>{section.label}</h4><p>{section.text}</p></section>)}</div> : <p className={styles.eventNotesEmpty}>No additional details published.</p>}
@@ -53,7 +53,7 @@ function EventCard({ event }) {
   </details>;
 }
 
-export default function ScheduleItinerary({ records, tournament, rounds, courses, initialNow = "" }) {
+export default function ScheduleItinerary({ records, tournament, rounds, courses, tournamentRules, formatRules, initialNow = "" }) {
   const [initialTime] = useState(() => initialNow ? new Date(initialNow).getTime() : Date.now());
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function ScheduleItinerary({ records, tournament, rounds, courses
     const timer = window.setInterval(() => setElapsed(Date.now() - started), 60_000);
     return () => window.clearInterval(timer);
   }, []);
-  const model = useMemo(() => itineraryViewModel({ records, tournament, rounds, courses, now: new Date(initialTime + elapsed) }), [records, tournament, rounds, courses, initialTime, elapsed]);
+  const model = useMemo(() => itineraryViewModel({ records, tournament, rounds, courses, tournamentRules, formatRules, now: new Date(initialTime + elapsed) }), [records, tournament, rounds, courses, tournamentRules, formatRules, initialTime, elapsed]);
   const groups = itineraryGroups(model.events);
   return <>
     <div className={styles.itineraryDays}>

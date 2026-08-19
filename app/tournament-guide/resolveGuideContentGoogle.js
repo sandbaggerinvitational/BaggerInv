@@ -32,7 +32,9 @@ async function loadGuideContent() {
     ...tournament,
     name: tournament["Tournament Name"] || tournament.Name || liveData.tournament?.name || "",
     dates: tournament["Tournament Dates"] || tournament.Dates || liveData.tournament?.dates || "",
-    logoFileName: tournament["Tournament Logo"] || tournament["Tournament Logo Filename"] || tournament.logoFileName || liveData.tournament?.logo || (tournament.year ? `sandbagger-${tournament.year}` : ""),
+    logoFileName: tournament["Annual Image"] || tournament["Tournament Logo"] || tournament["Tournament Logo Filename"] || tournament.logoFileName || liveData.tournament?.logo || (tournament.year ? `sandbagger-${tournament.year}` : ""),
+    heroImageFileName: tournament["Hero Image"] || tournament["Hero Image Filename"] || tournament["Homepage Image"] || "",
+    mobileHeroImageFileName: tournament["Mobile Hero Image"] || tournament["Mobile Hero Image Filename"] || tournament["Homepage Mobile Hero Image"] || "",
   };
   return {
     tournament, tournamentIdentity, liveTournament: liveData.tournament, liveRounds: liveData.rounds || [],

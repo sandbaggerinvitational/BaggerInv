@@ -6,9 +6,9 @@ import { directorFetch } from "../../../lib/director-client-transaction";
 
 const TYPES = [
   ["sections", "Sections", "Section ID"],
-  ["itinerary", "Itinerary", "Event ID"],
+  ["itinerary", "Itinerary (Alternate)", "Event ID"],
   ["rules", "Rules", "Rule ID"],
-  ["information", "Information", "Item ID"],
+  ["information", "Information (Legacy)", "Item ID"],
 ];
 
 const FIELDS = {
@@ -65,7 +65,7 @@ export default function GuideEditor({ tournaments, embedded = false, sharedSecre
       const payload = await request("POST", { type: active, record: { ...nextRecord, "Tournament ID": tournamentId }, updatedBy: sharedUpdatedBy || "Guide Admin" });
       setData((current) => ({ ...current, [active]: [...(current[active] || []).filter((item) => item[idField] !== payload.record[idField]), payload.record] }));
       setRecord(payload.record);
-      setStatus("Saved successfully.");
+      setStatus("Saved to Google. Refresh Participant Guide to update Preview.");
     } catch (error) { setStatus(error.message); }
   }
 
@@ -81,13 +81,14 @@ export default function GuideEditor({ tournaments, embedded = false, sharedSecre
   function change(field, value) { setRecord((current) => ({ ...current, [field]: value })); }
 
   return <section className={`${styles.editor} ${embedded ? styles.embedded : ""}`}>
-    {!embedded ? <header><p>SBI Administration</p><h1>Tournament Guide Editor</h1><span>Create, preview, and publish tournament-week information without changing website code.</span></header> : null}
-    {!data ? <div className={styles.login}><label>Admin publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label><button type="button" disabled={!secret} onClick={load}>Open Guide Editor</button>{status ? <p>{status}</p> : null}</div> : <>
+    {!embedded ? <header><p>SBI Administration</p><h1>Tournament Guide Editor</h1><span>Edit Google-authored tournament-week information, then refresh the participant Preview projection.</span></header> : null}
+    {!data ? <div className={styles.login}><label>Admin editing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label><button type="button" disabled={!secret} onClick={load}>Open Guide Editor</button>{status ? <p>{status}</p> : null}</div> : <>
       {!embedded ? <div className={styles.toolbar}><label>Tournament<select value={tournamentId} onChange={(event) => changeTournament(event.target.value)}>{tournaments.map((item) => <option key={item.id} value={item.id}>{item.year} — {item.label}</option>)}</select></label><a href="/tournament-guide" target="_blank" rel="noreferrer">Open public preview ↗</a></div> : null}
+      <div className={styles.maintenanceNote}><strong>Participant Preview workflow</strong><span>Edit and save Google content, then use Director readiness to refresh the participant projection.</span><a href="/admin/director/game-center-readiness">Open Refresh Participant Guide →</a></div>
       <nav className={styles.tabs}>{TYPES.map(([type, label]) => <button className={active === type ? styles.active : ""} key={type} onClick={() => switchType(type)}>{label}</button>)}<button className={active === "preview" ? styles.active : ""} onClick={() => setActive("preview")}>Preview</button></nav>
       {active === "preview" ? <div className={styles.preview}><iframe title="Tournament Guide preview" src="/tournament-guide" /></div> : <div className={styles.workspace}>
-        <aside><div><h2>{TYPES.find(([type]) => type === active)?.[1]}</h2><button onClick={() => setRecord(blank(tournamentId))}>+ New</button></div>{records.length ? records.map((item) => <button className={record[idField] === item[idField] ? styles.selected : ""} key={item[idField]} onClick={() => setRecord(item)}><strong>{item[TITLES[active]] || "Untitled"}</strong><span>{item.Status || "Draft"} · Order {item["Display Order"] || 0}</span></button>) : <p>No records for this tournament.</p>}</aside>
-        <form onSubmit={(event) => { event.preventDefault(); save(); }}><h2>{record[idField] ? "Edit content" : "Create content"}</h2><div className={styles.formGrid}>{FIELDS[active].map(([field, type]) => <Field field={field} type={type} value={record[field]} onChange={change} key={field} />)}</div><div className={styles.actions}><button type="submit">Save</button>{record[idField] ? <><button type="button" className={styles.secondary} onClick={() => save({ ...record, Status: record.Status === "Published" ? "Draft" : "Published" })}>{record.Status === "Published" ? "Unpublish" : "Publish"}</button><button type="button" className={styles.danger} onClick={() => remove(record)}>Delete</button></> : null}</div>{status ? <p className={styles.status}>{status}</p> : null}</form>
+        <aside><div><h2>{TYPES.find(([type]) => type === active)?.[1]}</h2><button onClick={() => setRecord(blank(tournamentId))}>+ New</button></div>{active === "itinerary" ? <p className={styles.sourceNote}>Recommended primary Schedule editor: Admin Center → Schedule. This alternate view edits the same Tournament Itinerary authority.</p> : null}{active === "information" ? <p className={styles.sourceNote}>Legacy editor: these rows are not used by the current participant Tournament Guide.</p> : null}{records.length ? records.map((item) => <button className={record[idField] === item[idField] ? styles.selected : ""} key={item[idField]} onClick={() => setRecord(item)}><strong>{item[TITLES[active]] || "Untitled"}</strong><span>{item.Status || "Draft"} · Order {item["Display Order"] || 0}</span></button>) : <p>No records for this tournament.</p>}</aside>
+        <form onSubmit={(event) => { event.preventDefault(); save(); }}><h2>{record[idField] ? "Edit content" : "Create content"}</h2><div className={styles.formGrid}>{FIELDS[active].map(([field, type]) => <Field field={field} type={type} value={record[field]} onChange={change} key={field} />)}</div><div className={styles.actions}><button type="submit">Save</button>{record[idField] ? <><button type="button" className={styles.secondary} onClick={() => save({ ...record, Status: record.Status === "Published" ? "Draft" : "Published" })}>{record.Status === "Published" ? "Mark Draft" : "Mark Published"}</button><button type="button" className={styles.danger} onClick={() => remove(record)}>Delete</button></> : null}</div>{status ? <p className={styles.status}>{status}</p> : null}</form>
       </div>}
     </>}
   </section>;

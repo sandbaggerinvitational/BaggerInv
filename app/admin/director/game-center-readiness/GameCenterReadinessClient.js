@@ -78,7 +78,7 @@ export default function GameCenterReadinessClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run("intelligence-derived-readiness")}>Verify Tournament Intelligence</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("match-authorization-parity")}>Verify Match Authorization Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={inspectShadow}>Inspect Auth Shadow</button>
-      <button type="button" disabled={Boolean(busy)} onClick={() => guideOperation("refresh-guide-content")}>Refresh Guide Content</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => guideOperation("refresh-guide-content")}>Refresh Participant Guide</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => guideOperation("guide-sync-status")}>Guide Sync Status</button>
     </div>
     {busy ? <p role="status">Running {busy}…</p> : null}

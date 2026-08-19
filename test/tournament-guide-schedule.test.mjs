@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { itineraryGroups, itineraryViewModel, structureItineraryDetails } from "../lib/tournament-guide-schedule.js";
+import { composeItineraryDetailSections, itineraryGroups, itineraryViewModel, structureItineraryDetails } from "../lib/tournament-guide-schedule.js";
 
 const tournament = { status: "Live", timeZone: "America/New_York" };
 const courses = [
@@ -64,6 +64,51 @@ test("Schedule preserves details behind disclosure and provides safe location ac
   assert.equal(golf.location, "Turtle Point");
   assert.equal(golf.courseHref, "/courses/TP");
   assert.equal("mapHref" in golf, false);
+});
+
+test("golf events compose canonical current Round, Course, Format, and Tee while preserving editorial timing and notes", () => {
+  const model = itineraryViewModel({
+    records: [{ ...records[1], Subtitle: "Stale format", Details: "Green Tees. Old scoring. 80% handicap allocation. $25 net skins. Pay caddies in cash." }],
+    tournament,
+    courses,
+    rounds: [{ number: 1, status: "Upcoming", format: "BB" }],
+    tournamentRules: [{ Round: "1", Format: "BB", "Scoring Format": "Nassau — front, back, overall", "Handicap Allocation": "100% allowance" }],
+    formatRules: [{ "Format ID": "BB", Name: "Best Ball" }],
+    now: new Date("2026-09-24T12:00:00Z"),
+  });
+  const [golf] = model.events;
+  assert.equal(golf.title, "Round 1");
+  assert.equal(golf.startTime, "7:20 AM");
+  assert.equal(golf.location, "Turtle Point");
+  assert.equal(golf.subtitle, "Best Ball");
+  assert.equal(golf.editorialSubtitle, "Stale format");
+  assert.equal(golf.format, "BB");
+  assert.equal(golf.tee, "Gold");
+  assert.deepEqual(composeItineraryDetailSections(golf), [
+    { label: "Scoring", text: "Nassau — front, back, overall" },
+    { label: "Handicap", text: "100% allowance" },
+    { label: "Net Skins", text: "$25 net skins." },
+    { label: "Caddies", text: "Pay caddies in cash." },
+  ]);
+});
+
+test("non-golf events remain editorial and do not acquire scoring context", () => {
+  const model = itineraryViewModel({
+    records: [{ ...records[3], Subtitle: "Clubhouse ceremony", Location: "Ballroom", Details: "Jackets requested." }],
+    tournament,
+    courses,
+    rounds: [{ number: 3, status: "Upcoming", format: "SI" }],
+    tournamentRules: [{ Round: "3", Format: "SI", "Scoring Format": "Singles" }],
+    formatRules: [{ "Format ID": "SI", Name: "Singles" }],
+    now: new Date("2026-09-24T12:00:00Z"),
+  });
+  const [event] = model.events;
+  assert.equal(event.subtitle, "Clubhouse ceremony");
+  assert.equal(event.location, "Ballroom");
+  assert.equal(event.roundNumber, null);
+  assert.equal(event.format, "");
+  assert.equal(event.tee, "");
+  assert.deepEqual(composeItineraryDetailSections(event), [{ label: "Additional Details", text: "Jackets requested." }]);
 });
 
 test("long workbook notes are structured into readable itinerary sections", () => {
