@@ -220,6 +220,12 @@ test("every non-format rule uses the same compact expandable card pattern", asyn
   assert.doesNotMatch(css, /\.ruleCard>summary>span/);
 });
 
+test("adjacent Competition Rules categories have restrained additional separation", async () => {
+  const css = await source("app/tournament-guide/tournament-guide.module.css");
+  assert.match(css, /\.ruleCollection\+\.ruleCollection\{margin-top:10px\}/);
+  assert.doesNotMatch(css, /\.formatCollection\+\.ruleCollection\{margin-top:/);
+});
+
 test("Shotgun Mulligans uses the tournament-tradition beer mug icon", async () => {
   const detail = await source("app/tournament-guide/GuideDetailPage.js");
   assert.match(detail, /id: "shotgun", icon: "🍺", title: "Shotgun Mulligans"/);
