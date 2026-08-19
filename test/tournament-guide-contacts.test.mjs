@@ -70,18 +70,21 @@ test("Important Contacts exposes only workbook-supported icon actions", async ()
   assert.match(component, /className=\{styles\.visuallyHidden\}/);
   assert.match(normalized, /fetchOptionalSheet\("Important Contacts"\)/);
   assert.match(normalized, /importantContactRows[\s\S]*recordMatchesTournament\(row, guideTournament\)/);
-  assert.match(css, /\.contactActions>a\{[^}]*width:46px;height:46px;flex:0 0 46px/);
+  assert.match(css, /\.contactActions>a\{[^}]*width:44px;height:44px;flex:0 0 44px/);
   assert.match(css, /@media\(max-width:700px\)\{\.contactSections>section>div\{grid-template-columns:1fr\}\}/);
 });
 
-test("Important Contacts final polish emphasizes actions and priority contacts without changing visibility", async () => {
+test("Important Contacts density keeps compact accessible actions and priority treatment without changing visibility", async () => {
   const [component, css] = await Promise.all([
     readFile(new URL("../app/tournament-guide/ImportantContacts.js", import.meta.url), "utf8"),
     readFile(new URL("../app/tournament-guide/tournament-guide.module.css", import.meta.url), "utf8"),
   ]);
   assert.match(component, /className=\{styles\.contactActionGlyph\}/);
-  assert.match(css, /\.contactActionGlyph\{font-size:1\.18rem;line-height:1\}/);
-  assert.match(css, /\.contactCard\{[^}]*grid-template-rows:1fr auto;[^}]*align-items:center/);
+  assert.match(css, /\.contactActionGlyph\{font-size:1\.08rem;line-height:1\}/);
+  assert.match(css, /\.contactCard\{[^}]*grid-template-rows:1fr auto;gap:12px;align-items:center;padding:16px/);
+  assert.match(css, /\.contactCard>div:first-child\{[^}]*gap:3px;[^}]*text-align:center/);
+  assert.match(css, /\.contactActions\{[^}]*justify-content:center;gap:8px\}/);
+  assert.match(css, /@media\(max-width:560px\)[\s\S]*\.contactCard\{padding:14px\}\}/);
   assert.match(component, /isTournamentDirector[\s\S]*styles\.primaryContactCard/);
   assert.match(css, /\.primaryContactCard p\{color:#9a7627;font-weight:800\}/);
   assert.match(component, /category === "Emergency" \? styles\.emergencyContactHeading/);
