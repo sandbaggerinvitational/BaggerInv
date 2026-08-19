@@ -40,6 +40,11 @@ test("Dining hides reservation status when the workbook value is blank", () => {
   assert.equal(meal.notes, "");
 });
 
+test("Dining treats whitespace-only Notes as empty disclosure content", () => {
+  const [meal] = diningViewModel([{ Year: 2027, Day: "Thursday", Meal: "Lunch", Notes: "  \n\t  " }]);
+  assert.equal(meal.notes, "");
+});
+
 test("Dining annual structure derives variable day and meal counts entirely from rows", () => {
   const annual = diningViewModel([
     { Year: 2027, Day: "Thursday", Meal: "Welcome", "Start Time": "6:00 PM", "Sort Order": 1 },
@@ -67,9 +72,13 @@ test("Dining uses only the approved workbook fields and renders Notes behind dis
   assert.match(component, /<details/);
   assert.match(component, /if \(!meal\.notes\) return <article/);
   assert.match(component, /<DiningCardContent meal=\{meal\} disclosure=\{false\}/);
+  assert.match(component, /const openSeating = meal\.reservationLabel === "Open Seating"/);
+  assert.match(component, /const reservationRequired = meal\.reservationLabel === "Reservation Required"/);
+  assert.match(component, /const showState = reservationRequired \|\| disclosure/);
+  assert.match(component, /styles\.diningMeta/);
   assert.doesNotMatch(component, /<details[^>]* open/);
+  assert.doesNotMatch(component, /fetch\(/);
   assert.match(component, /Reservation Required/);
-  assert.match(component, /meal\.reservationLabel \?/);
   assert.match(component, /meal\.icon/);
   assert.ok(component.indexOf("meal.time") < component.indexOf("<h3>{meal.meal}</h3>"));
   assert.match(component, /function DressCodeIcon/);
@@ -83,4 +92,9 @@ test("Dining uses only the approved workbook fields and renders Notes behind dis
   assert.match(css, /white-space:pre-line/);
   assert.match(css, /\.diningDressIcon\{[^}]*color:#0b4938/);
   assert.match(css, /\.diningDressIcon path\{[^}]*fill:#f4ecd9/);
+  assert.match(css, /\.openSeating\{color:#68716d;font-size:\.72rem;font-weight:700/);
+  assert.doesNotMatch(css, /\.reservationRequired,\.openSeating/);
+  assert.match(css, /\.reservationRequired\{[^}]*border-radius:999px/);
+  assert.match(css, /\.diningNotes\{padding-top:16px\}/);
+  assert.match(css, /\.diningNotes p\{margin:0;/);
 });

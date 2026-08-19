@@ -8,18 +8,24 @@ function DressCodeIcon() {
 }
 
 function DiningCardContent({ meal, disclosure }) {
+  const openSeating = meal.reservationLabel === "Open Seating";
+  const reservationRequired = meal.reservationLabel === "Reservation Required";
+  const showState = reservationRequired || disclosure;
   return <>
     <div className={styles.eventIcon} aria-hidden="true">{meal.icon}</div>
     <div className={styles.eventPrimary}>
       {meal.time ? <span className={styles.eventTime}>{meal.time}</span> : null}
       <h3>{meal.meal}</h3>
       {meal.location ? <strong>{meal.location}</strong> : null}
-      {meal.dressCode ? <p className={styles.diningDress}><DressCodeIcon />{meal.dressCode}</p> : null}
+      {meal.dressCode || openSeating ? <div className={styles.diningMeta}>
+        {meal.dressCode ? <p className={styles.diningDress}><DressCodeIcon />{meal.dressCode}</p> : null}
+        {openSeating ? <span className={styles.openSeating}>{meal.reservationLabel}</span> : null}
+      </div> : null}
     </div>
-    <div className={styles.eventState}>
-      {meal.reservationLabel ? <span className={meal.reservationLabel === "Reservation Required" ? styles.reservationRequired : styles.openSeating}>{meal.reservationLabel}</span> : null}
+    {showState ? <div className={styles.eventState}>
+      {reservationRequired ? <span className={styles.reservationRequired}>{meal.reservationLabel}</span> : null}
       {disclosure ? <span aria-hidden="true">⌄</span> : null}
-    </div>
+    </div> : null}
   </>;
 }
 
