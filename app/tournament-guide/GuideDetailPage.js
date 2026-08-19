@@ -19,16 +19,7 @@ const ruleSections = [
   { id: "shotgun", icon: "🍺", title: "Shotgun Mulligans", matches: /shotgun|mulligan/i },
   { id: "general", icon: "📋", title: "General Rules", matches: /general|competition/i },
 ];
-const categoryTitles = {
-  general: "General Rules",
-  handicaps: "Handicaps",
-  handicap: "Handicaps",
-  scoring: "Scoring",
-  practice: "Practice Rules",
-  equipment: "Equipment",
-};
 const code = guideFormatCode;
-const categoryTitle = (value) => categoryTitles[String(value || "").trim().toLowerCase()] || value || "Competition Rules";
 
 function Text({ value }) { return paragraphs(value).map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>); }
 function Empty({ title }) { return <div className={styles.empty}><span>Tournament Guide</span><h2>{title}</h2><p>Published tournament information will appear here when available.</p></div>; }
@@ -44,9 +35,9 @@ function Dining({ records }) {
 }
 
 function RuleCard({ rule }) {
-  const category = categoryTitle(rule.Category);
-  const label = rule.Subcategory && rule.Subcategory !== rule.Title ? rule.Subcategory : category;
-  return <details className={`${styles.formatCard} ${styles.ruleCard} ${isTruthy(rule.Important) ? styles.ruleCardImportant : ""}`}><summary><span>{category}</span><div><h3>{rule.Title || label}</h3>{label && label !== rule.Title ? <p>{label}</p> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}><Text value={rule.Body} />{rule["Effective Year"] ? <small>Effective {rule["Effective Year"]}</small> : null}</div></details>;
+  const subtitle = rule.Subcategory && rule.Subcategory !== rule.Title ? rule.Subcategory : "";
+  const title = rule.Title || subtitle || "Rule";
+  return <details className={`${styles.formatCard} ${styles.ruleCard} ${isTruthy(rule.Important) ? styles.ruleCardImportant : ""}`}><summary><div><h3>{title}</h3>{subtitle && subtitle !== title ? <p>{subtitle}</p> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}><Text value={rule.Body} />{rule["Effective Year"] ? <small>Effective {rule["Effective Year"]}</small> : null}</div></details>;
 }
 function FormatCard({ format, configuration, rules }) {
   const formatCode = code(format["Format ID"] || format.Format);

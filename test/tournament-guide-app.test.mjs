@@ -172,12 +172,16 @@ test("Round Formats are expandable and summarize official workbook values", asyn
   assert.match(css, /@media\(max-width:560px\).*\.formatCard>summary/);
 });
 
-test("Rule accordion titles use golfer-friendly terminology", async () => {
+test("Rule cards keep title and subtitle while Category remains grouping-only", async () => {
   const detail = await source("app/tournament-guide/GuideDetailPage.js");
-  for (const title of ["General Rules", "Handicaps", "Scoring", "Practice Rules", "Equipment"]) {
-    assert.match(detail, new RegExp(title.replace("&", "&")));
-  }
-  assert.match(detail, /categoryTitle\(rule\.Category\)/);
+  const ruleCard = detail.slice(detail.indexOf("function RuleCard"), detail.indexOf("function FormatCard"));
+  assert.match(ruleCard, /rule\.Subcategory/);
+  assert.match(ruleCard, /rule\.Title/);
+  assert.match(ruleCard, /rule\.Body/);
+  assert.match(ruleCard, /rule\["Effective Year"\]/);
+  assert.match(ruleCard, /rule\.Important/);
+  assert.doesNotMatch(ruleCard, /rule\.Category|categoryTitle|<summary><span>/);
+  assert.match(detail, /const searchable = \[rule\.Category, rule\.Subcategory, rule\.Title\]/);
 });
 
 test("format summaries render only inside their expandable Round Format cards", async () => {
@@ -212,7 +216,8 @@ test("every non-format rule uses the same compact expandable card pattern", asyn
   assert.doesNotMatch(detail, /function RuleList|groupBy\(records/);
   assert.doesNotMatch(detail, /open=\{isTruthy\(rule\.Important\)\}/);
   assert.match(css, /\.ruleCards\{display:grid;gap:10px\}/);
-  assert.match(css, /\.ruleCard>summary\{min-height:88px/);
+  assert.match(css, /\.ruleCard>summary\{grid-template-columns:minmax\(0,1fr\) auto;min-height:88px/);
+  assert.doesNotMatch(css, /\.ruleCard>summary>span/);
 });
 
 test("Shotgun Mulligans uses the tournament-tradition beer mug icon", async () => {
