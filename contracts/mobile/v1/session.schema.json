@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:session",
+  "title": "Bagger Mobile API v1 session response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player", "tournament"],
+      "properties": {
+        "player": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["playerId", "displayName", "team"],
+          "properties": {
+            "playerId": { "type": "string", "minLength": 1 },
+            "displayName": { "type": "string", "minLength": 1 },
+            "team": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["teamId", "name"],
+                  "properties": {
+                    "teamId": { "type": "string", "minLength": 1 },
+                    "name": { "type": "string", "minLength": 1 }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "tournament": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tournamentId", "name", "year"],
+          "properties": {
+            "tournamentId": { "type": "string", "minLength": 1 },
+            "name": { "type": "string", "minLength": 1 },
+            "year": { "type": ["integer", "null"] }
+          }
+        }
+      }
+    }
+  }
+}

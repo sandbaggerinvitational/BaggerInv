@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:health",
+  "title": "Bagger Mobile API v1 health response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "service", "environment"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "service": { "const": "bagger-mobile-api" },
+    "environment": { "const": "preview" }
+  }
+}
