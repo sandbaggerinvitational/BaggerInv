@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { guideParticipantProjection } from "../../../../lib/guide-participant-adapter.js";
 import { readGuideProjection } from "../../../../lib/guide-supabase.js";
-import { guideContentWithCanonicalCourses } from "../../../../lib/tournament-guide-projection.js";
 
 export const dynamic = "force-dynamic";
 
@@ -27,9 +27,7 @@ const SECTION_READERS = {
 };
 
 function participantContent(data = {}) {
-  const stored = data.content && typeof data.content === "object" ? data.content : {};
-  const content = stored.content && typeof stored.content === "object" ? stored.content : stored;
-  return guideContentWithCanonicalCourses(content, Array.isArray(data.course_context) ? data.course_context : []);
+  return guideParticipantProjection({ payload: { data } }).content;
 }
 
 function requestHasEtag(request, fingerprint) {

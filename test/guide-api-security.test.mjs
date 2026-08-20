@@ -14,6 +14,7 @@ test("published Guide endpoint is a participant-safe Supabase read with revision
   assert.match(route, /stale-while-revalidate=300/);
   assert.match(route, /SECTION_READERS/);
   assert.match(route, /guideSections:\s*content\.overview/);
+  assert.match(route, /guideParticipantProjection/);
   assert.doesNotMatch(route, /readWorkbookSheetsByName|getTournamentData|resolveGuideContentGoogle|GOOGLE_SHEETS_ID/);
   assert.doesNotMatch(route, /export async function (?:POST|PUT|PATCH|DELETE)/);
 });
@@ -101,6 +102,7 @@ test("legacy Google Guide transport remains outside the normal participant path"
   const courseDetail = source("app/courses/[courseId]/page.js");
   assert.match(resolver, /if \(source\.source\.resolved === "google"\) return resolveGoogleGuideContent\(\)/);
   assert.match(resolver, /readGuideProjection\(\{ surface \}\)/);
+  assert.match(resolver, /readTournamentLiveView\(source\.tournamentId\)/);
   assert.doesNotMatch(resolver, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
   assert.match(legacy, /getTournamentData|refreshHistoricalData/);
   assert.match(courses, /archive\s*\?\s*await import\("\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);

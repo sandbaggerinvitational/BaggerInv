@@ -1,6 +1,8 @@
 import { requireGuideReadSource } from "../../lib/guide-read-source.js";
 import { readGuideProjection } from "../../lib/guide-supabase.js";
-import { guideContentWithCanonicalCourses, timelineFromGuideProjection } from "../../lib/tournament-guide-projection.js";
+import { guideParticipantProjection } from "../../lib/guide-participant-adapter.js";
+import { readTournamentLiveView, tournamentLiveDataFromSupabaseView } from "../../lib/tournament-live-supabase.js";
+import { timelineFromGuideProjection } from "../../lib/tournament-guide-projection.js";
 
 let legacyResolver;
 
@@ -31,20 +33,22 @@ function tournamentStatus(rounds = []) {
   return "Upcoming";
 }
 
-function contentFromSupabase(payload = {}) {
+export function contentFromSupabase(payload = {}, liveView = null) {
   const data = payload.data || {};
-  const projection = data.content || {};
-  const stored = guideContentWithCanonicalCourses(projection.content || projection, data.course_context || []);
-  const rounds = liveRounds(data.course_context || []);
-  const liveTournament = {
+  const stored = guideParticipantProjection({ payload }).content;
+  const fallbackRounds = liveRounds(data.course_context || []);
+  const fallbackTournament = {
     id: data.tournament?.tournament_id || stored.tournamentIdentity?.id || "2026",
     year: number(data.tournament?.tournament_year || stored.tournamentIdentity?.year, 2026),
     name: data.tournament?.name || stored.tournamentIdentity?.name || "",
     dates: stored.tournamentIdentity?.dates || "",
     location: stored.tournamentIdentity?.location || "",
     timeZone: stored.tournamentIdentity?.timeZone || "America/Chicago",
-    status: tournamentStatus(rounds),
+    status: tournamentStatus(fallbackRounds),
   };
+  const canonicalLive = liveView ? tournamentLiveDataFromSupabaseView(liveView.data || liveView) : null;
+  const rounds = canonicalLive?.rounds || fallbackRounds;
+  const liveTournament = canonicalLive?.tournament || fallbackTournament;
   const timeline = timelineFromGuideProjection(stored, {
     tournament: liveTournament,
     rounds,
@@ -83,11 +87,19 @@ function contentFromSupabase(payload = {}) {
 export async function resolveTournamentGuideContent({ surface = "guide" } = {}) {
   const source = requireGuideReadSource(process.env, surface === "course" ? "course" : "guide");
   if (source.source.resolved === "google") return resolveGoogleGuideContent();
-  const read = await readGuideProjection({ surface });
+  const [read, liveRead] = await Promise.all([
+    readGuideProjection({ surface }),
+    surface === "guide" ? readTournamentLiveView(source.tournamentId) : Promise.resolve(null),
+  ]);
   if (!read.payload?.ok) {
     const error = new Error("Tournament Guide is temporarily unavailable.");
     error.code = read.payload?.code || "GUIDE_PROJECTION_UNAVAILABLE";
     throw error;
   }
-  return contentFromSupabase(read.payload);
+  if (surface === "guide" && !liveRead?.payload?.ok) {
+    const error = new Error("Tournament Guide is temporarily unavailable.");
+    error.code = liveRead?.payload?.code || "TOURNAMENT_PROJECTION_UNAVAILABLE";
+    throw error;
+  }
+  return contentFromSupabase(read.payload, liveRead?.payload?.data || null);
 }

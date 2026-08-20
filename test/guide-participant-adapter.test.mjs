@@ -64,6 +64,17 @@ test("participant adapter unwraps the published revision and preserves safe meta
   assert.equal(projected.content.courseHoles.length, 18);
 });
 
+test("participant adapter preserves the Google presentation contract for optional Dining reservations", () => {
+  const read = structuredClone(guideRead);
+  read.payload.data.content.content.dining = [
+    { Meal: "Breakfast", "Reservations Required": "FALSE" },
+    { Meal: "Dinner", "Reservations Required": "TRUE" },
+  ];
+  const projected = guideParticipantProjection(read);
+  assert.equal(projected.content.dining[0]["Reservations Required"], "");
+  assert.equal(projected.content.dining[1]["Reservations Required"], "TRUE");
+});
+
 test("fresh canonical course context changes delivery without rewriting the immutable Guide revision", () => {
   const first = guideParticipantProjection(guideRead);
   const refreshed = structuredClone(guideRead);

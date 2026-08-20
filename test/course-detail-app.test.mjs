@@ -80,9 +80,10 @@ test("current Course Detail uses the Supabase Guide resolver while archive trans
   assert.match(page, /resolveGoogleArchivedCourseContent/);
   assert.match(page, /courseDetailModel/);
   assert.doesNotMatch(page, /refreshHistoricalData|loadScorecardAnalytics|getCourse\(/);
-  assert.match(loader, /guideContentWithCanonicalCourses\(projection\.content \|\| projection, data\.course_context \|\| \[\]\)/);
+  assert.match(loader, /guideParticipantProjection\(\{ payload \}\)\.content/);
   assert.match(loader, /courseHoles: stored\.courseHoles \|\| \[\]/);
   assert.match(loader, /readGuideProjection\(\{ surface \}\)/);
+  assert.match(loader, /surface === "guide" \? readTournamentLiveView\(source\.tournamentId\) : Promise\.resolve\(null\)/);
   assert.doesNotMatch(loader, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
 });
 
