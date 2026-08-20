@@ -5,6 +5,7 @@ import { buildCanonicalScoringAuthorityImport, reconcileCanonicalScoringAuthorit
 import { scoringAuthority, scoringAuthorityEnvironment } from "../lib/scoring-authority.js";
 import { googleOutboxDeliveryInput, processNextGoogleOutboxEvent } from "../lib/scoring-google-outbox.js";
 import { createScoringSession, verifyScoringSession } from "../lib/scoring-access.js";
+import { calculateMatchPoints } from "../lib/live-hole-scoring.js";
 
 const secret = "phase-2-scoring-session-secret-long-enough";
 const sheet = (rows) => ({ records: rows.map((record, index) => ({ record, rowNumber: index + 2 })), headers: Object.keys(rows[0] || {}) });
@@ -15,7 +16,7 @@ const finalizedSummary = { "Match ID": "M1", Year: 2026, Round: 1, Match: 1, For
 const reopenedSummary = { ...finalizedSummary, "Match Status": "Reopened", "Final Result": "", Winner: "", "Matchup Winner": "",
   "Completed At": "", "Finalized At": "", "Finalized By": "" };
 
-function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" } } = {}) {
+function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" }, liveMatch = {}, archivedMatches = [] } = {}) {
   const players = [
     { "Player ID": "P1", "Display Name": "Player One" }, { "Player ID": "P2", "Display Name": "Player Two" },
     { "Player ID": "P3", "Display Name": "Player Three" }, { "Player ID": "P4", "Display Name": "Player Four" },
@@ -33,7 +34,8 @@ function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" } } = {}) {
     "Updated At": "2026-08-10T12:00:00.000Z", "Team 1 Player 1": "P1", "Team 1 Player 2": "P2",
     "Team 2 Player 1": "P3", "Team 2 Player 2": "P4", "Team 1 Player 1 Playing HCP": 0,
     "Team 1 Player 2 Playing HCP": 10, "Team 2 Player 1 Playing HCP": 2, "Team 2 Player 2 Playing HCP": 4,
-    "Team 1 Player 1 Stroke": 0, "Team 1 Player 2 Stroke": 10, "Team 2 Player 1 Stroke": 2, "Team 2 Player 2 Stroke": 4 };
+    "Team 1 Player 1 Stroke": 0, "Team 1 Player 2 Stroke": 10, "Team 2 Player 1 Stroke": 2, "Team 2 Player 2 Stroke": 4,
+    ...liveMatch };
   const courseHoles = Array.from({ length: 18 }, (_, index) => ({ "Course ID": "C1", Tee: "Gold", "Hole Number": index + 1, "Stroke Index": index + 1, Par: index % 3 === 0 ? 5 : 4, Yardage: 400 }));
   const scores = Array.from({ length: holes }, (_, index) => ({ "Hole Score ID": `M1-H${index + 1}`, "Match ID": "M1", "Hole Number": index + 1,
     "Stroke Index": index + 1, Format: "BB", "Team 1 Gross Scores": [5, 5], "Team 2 Gross Scores": [6, 6],
@@ -48,7 +50,7 @@ function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" } } = {}) {
     ]),
     Rounds: sheet([{ Year: 2026, Round: 1, Format: "BB", "Handicap Allowance": 0.9 }, { Year: 2026, Round: 2, Format: "SC" }, { Year: 2026, Round: 3, Format: "SI" }]),
     Courses: sheet([{ Year: 2026, Format: "BB", "Course ID": "C1", "Tee Played": "Gold", Rating: 71.9, Slope: 136, Par: 72 }]),
-    "Course Holes": sheet(courseHoles), "Live Matches": sheet([match]), Matches: sheet([]), "Live Hole Scores": sheet(scores),
+    "Course Holes": sheet(courseHoles), "Live Matches": sheet([match]), Matches: sheet(archivedMatches), "Live Hole Scores": sheet(scores),
   };
 }
 
@@ -102,6 +104,53 @@ test("zero-hole authoritative matches import without manufactured scores", () =>
   assert.equal(result.payload.match_holes.length, 18);
   assert.equal(result.payload.hole_scores.length, 0);
   assert.equal(result.payload.matches[0].scored_holes, 0);
+});
+
+test("permanent Google finals reconcile two regressed Live rows and restore the full six Pickles points", () => {
+  const source = workbook({
+    holes: 18,
+    liveMatch: { Revision: 41, "Access Version": 4, "Scoring Locked": false, "Access Active": true },
+    archivedMatches: [finalizedSummary],
+  });
+  const first = source["Live Matches"].records[0].record;
+  const second = { ...first, "Match ID": "M2", Match: 2, Revision: 42 };
+  source["Live Matches"] = sheet([first, second]);
+  source.Matches = sheet([finalizedSummary, { ...finalizedSummary, "Match ID": "M2", Match: 2 }]);
+  source["Live Hole Scores"] = sheet(source["Live Hole Scores"].records.flatMap(({ record }) => [
+    { ...record, "Team 1 Gross Scores": [4, 4], "Team 2 Gross Scores": [6, 6], "Team 1 Net Score": 4, "Team 2 Net Score": 6, "Hole Winner": "Team 1" },
+    { ...record, "Hole Score ID": `M2-H${record["Hole Number"]}`, "Match ID": "M2", "Team 1 Gross Scores": [4, 4],
+      "Team 2 Gross Scores": [6, 6], "Team 1 Net Score": 4, "Team 2 Net Score": 6, "Hole Winner": "Team 1" },
+  ]));
+
+  const imported = buildCanonicalScoringAuthorityImport({ sheets: source, sourceWorkbookId: "preview-sheet" });
+  assert.deepEqual(imported.payload.matches.map((match) => match.status), ["FINAL", "FINAL"]);
+  assert.deepEqual(imported.payload.matches.map((match) => match.scoring_locked), [true, true]);
+  assert.deepEqual(imported.payload.matches.map((match) => match.match_revision), [41, 42],
+    "the mutable Live Matches row retains ownership of the match revision domain");
+  assert.ok(imported.payload.permissions.every((permission) => permission.can_score === false));
+  const awarded = imported.payload.matches.map((match) => calculateMatchPoints(match.format,
+    imported.payload.hole_scores.filter((hole) => hole.match_id === match.match_id)
+      .map((hole) => ({ holeNumber: hole.hole_number, winner: hole.hole_winner }))));
+  assert.deepEqual(awarded, [
+    { frontWinner: "Team 1", backWinner: "Team 1", overallWinner: "Team 1", team1Points: 3, team2Points: 0 },
+    { frontWinner: "Team 1", backWinner: "Team 1", overallWinner: "Team 1", team1Points: 3, team2Points: 0 },
+  ]);
+  assert.equal(awarded.reduce((sum, result) => sum + result.team1Points, 0), 6);
+  const stale = {
+    matches: imported.payload.matches.map((match) => ({ ...match, status: "LIVE", scoring_locked: false })),
+    holes: imported.payload.hole_scores,
+    players: imported.payload.tournament_players,
+    snapshots: imported.payload.snapshots,
+    permissions: imported.payload.permissions,
+  };
+  const staleParity = reconcileCanonicalScoringAuthority(imported, stale);
+  assert.deepEqual(staleParity.matchStateDivergence, ["M1", "M2"]);
+  assert.deepEqual(staleParity.scoreDivergence, []);
+  assert.deepEqual(staleParity.revisionDivergence, []);
+  assert.equal(reconcileCanonicalScoringAuthority(imported, {
+    ...stale,
+    matches: imported.payload.matches,
+  }).pass, true);
 });
 
 test("canonical reconciliation detects parity and genuine score drift", () => {
