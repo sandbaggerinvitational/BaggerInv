@@ -1392,7 +1392,7 @@ async function normalizeLegacyReopen(actorId, input = {}) {
   }
 }
 
-async function scoringMirrorOperations(actorId) {
+async function scoringMirrorOperations(actorId, { includeMatchIds = [] } = {}) {
   const authority = scoringAuthorityEnvironment();
   const inspected = await inspectScoringMirrorOperations({ tournament_id: "2026" });
   const operations = inspected.payload || {};
@@ -1401,17 +1401,18 @@ async function scoringMirrorOperations(actorId) {
   }
   const events = operations.events || [];
   const matchIds = new Set(events.map((event) => clean(event.match_id)).filter(Boolean));
+  includeMatchIds.map(clean).filter(Boolean).forEach((matchId) => matchIds.add(matchId));
   const sheets = matchIds.size
     ? await readWorkbookSheetsByName(["Live Matches", "Matches", "Live Hole Scores"], { fresh: true })
     : {};
   const rows = (tab) => (sheets[tab]?.records || []).map(({ record }) => record);
-  const google = events.map((event) => {
-    const matchId = clean(event.match_id);
+  const google = [...matchIds].map((matchId) => {
+    const event = events.find((item) => clean(item.match_id) === matchId);
     const live = rows("Live Matches").find((row) => clean(row["Match ID"]) === matchId) || {};
     const archive = rows("Matches").find((row) => clean(row["Match ID"]) === matchId) || {};
     const holes = rows("Live Hole Scores").filter((row) => clean(row["Match ID"]) === matchId);
     return {
-      eventId: event.id,
+      eventId: event?.id || "",
       matchId,
       live: {
         status: clean(live["Match Status"]),
@@ -1487,8 +1488,15 @@ async function deliverScoringMirrorEvent(actorId, input = {}) {
       shadowDiagnostics: { details: JSON.stringify(delivery) },
     });
   }
-  const after = await scoringMirrorOperations(actorId);
-  return { before, delivery, after };
+  const [after, canonicalAfter, liveViewAfter] = await Promise.all([
+    scoringMirrorOperations(actorId, { includeMatchIds: [expectedMatchId] }),
+    readCanonicalScoringAuthority({ match_id: expectedMatchId, mode: "MATCH" }),
+    readTournamentLiveView("2026"),
+  ]);
+  if (!canonicalAfter.payload?.ok || !liveViewAfter.payload?.ok) {
+    throw Object.assign(new Error("Post-delivery canonical verification failed."), { code: "MIRROR_POSTCONDITION_READ_FAILED" });
+  }
+  return { before, delivery, after, canonicalAfter: canonicalAfter.payload.data, tournamentLiveViewAfter: liveViewAfter.payload };
 }
 
 async function repairFinalizationParity(actorId, matchIdValue) {

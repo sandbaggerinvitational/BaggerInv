@@ -475,6 +475,9 @@ test("Director mirror reconciliation inspects and delivers exactly one confirmed
   assert.match(route, /confirmDelivery !== true/);
   assert.match(route, /healthyCommittedSupabaseEpoch/);
   assert.match(route, /expectedEventId: eventId/);
+  assert.match(route, /includeMatchIds: \[expectedMatchId\]/);
+  assert.match(route, /canonicalAfter: canonicalAfter\.payload\.data/);
+  assert.match(route, /tournamentLiveViewAfter: liveViewAfter\.payload/);
   assert.match(dashboard, /Inspect Mirror Outbox/);
   assert.match(dashboard, /Deliver Selected Mirror Event/);
   assert.match(worker, /LEGACY_REOPEN_CONFLICT/);
