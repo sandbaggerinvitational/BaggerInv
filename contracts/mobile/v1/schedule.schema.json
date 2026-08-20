@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "urn:bagger:mobile:v1:schedule",
+  "type": "object", "additionalProperties": false, "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": { "ok": { "const": true }, "apiVersion": { "const": "v1" }, "data": { "type": "object", "additionalProperties": false, "required": ["tournamentId", "timeZone", "events"], "properties": { "tournamentId": { "type": "string" }, "timeZone": { "type": "string" }, "events": { "type": "array", "items": { "$ref": "shared.schema.json#/$defs/event" } } } }, "meta": { "$ref": "shared.schema.json#/$defs/meta" } }
+}

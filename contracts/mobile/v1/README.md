@@ -10,7 +10,7 @@ Mobile v1 is enabled only in an isolated Vercel Preview runtime where the existi
 
 ## Authentication
 
-`GET /session` requires a Supabase access token:
+Every route except `GET /health` requires a Supabase access token:
 
 ```http
 Authorization: Bearer <supabase-access-token>
@@ -65,6 +65,35 @@ Success (`200`):
 
 `team` may be `null` and `tournament.year` may be `null` if those values are absent from the canonical context. No email, phone, raw Auth metadata, identity-link records, Director entitlements, match permissions, or scoring data are part of this contract. Handicap is not included because the existing participant identity-context product does not currently expose it.
 
+## Tournament read routes
+
+All read responses use `{ "ok": true, "apiVersion": "v1", "data": ..., "meta": ... }` and are private to the verified Bearer identity. `meta.generatedAt` is an ISO-8601 UTC response timestamp. `meta.revision` is the existing canonical product fingerprint: participant Home for `/today`, Tournament Live for `/matches`, Leaderboards Core for `/leaders`, and the published Guide delivery fingerprint (falling back to its existing projection revision) for `/schedule`. The same value is a strong `ETag`; matching `If-None-Match` requests receive `304`. No revision store was introduced.
+
+### `GET /today`
+
+Returns bounded tournament and Player context, at most one current match, and at most three published immediate events. Match preference is in-progress, then scheduled, then most recent completed; it is `null` when no canonical match involves the authenticated Player. Standings, storylines, Net Skins, scoring permissions, and full Guide content are excluded.
+
+### `GET /matches`
+
+Returns participant-visible Tournament Live matches ordered by round and canonical match ID. Status is `scheduled`, `inProgress`, or `completed`. Relationships are derived only from the server-resolved Player ID. Scoring permissions/capabilities, hole inputs, internal revisions, and Director controls are excluded.
+
+### `GET /leaders`
+
+Returns overall team and Player standings from Leaderboards Core and its established ranking helpers. Ties retain canonical display ranks. Round scorecards and secondary leaderboard modules are excluded.
+
+### `GET /schedule`
+
+Returns only the published participant itinerary from the current Guide projection. Editorial metadata, raw source rows, contacts, unpublished content, Details copy, and administration fields are excluded.
+
+## Date and time
+
+- Calendar dates are `YYYY-MM-DD`.
+- Absolute timestamps are ISO-8601 UTC strings.
+- The tournament IANA timezone is explicit as `timeZone`; the safe fallback is `America/Chicago` only when canonical data omits or invalidates it.
+- Schedule events include normalized `HH:mm:ss` tournament-local clocks plus UTC instants.
+- Match tee times currently lack a canonical calendar date, so they contain `localTime`, `timeZone`, and a presentation `label`; clients must not infer an absolute date.
+- Human-readable labels are never the sole machine-readable schedule time.
+
 ## Error contract
 
 ```json
@@ -86,6 +115,6 @@ Success (`200`):
 | `MOBILE_API_UNAVAILABLE` | 503 | Mobile v1 is not enabled in this environment or its required authority is unavailable. |
 | `INTERNAL_ERROR` | 500 | The request failed without a participant-safe classified error. |
 
-Responses use `Cache-Control: no-store`; session responses are private and vary on `Authorization`.
+Health uses `Cache-Control: no-store`; session uses `private, no-store`. Tournament reads use `private, no-cache`, vary on `Authorization`, and support ETag revalidation.
 
-Machine-readable schemas live beside this document.
+Machine-readable schemas and synthetic decoding fixtures live beside this document. Fixtures contain no Production personal data.

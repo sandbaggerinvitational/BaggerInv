@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "urn:bagger:mobile:v1:matches",
+  "type": "object", "additionalProperties": false, "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": { "ok": { "const": true }, "apiVersion": { "const": "v1" }, "data": { "type": "object", "additionalProperties": false, "required": ["tournament", "matches"], "properties": { "tournament": { "$ref": "shared.schema.json#/$defs/tournament" }, "matches": { "type": "array", "items": { "$ref": "shared.schema.json#/$defs/match" } } } }, "meta": { "$ref": "shared.schema.json#/$defs/meta" } }
+}

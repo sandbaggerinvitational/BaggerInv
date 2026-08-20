@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "today": [{ "case": "upcoming-match", "status": "scheduled" }, { "case": "completed-match", "status": "completed" }, { "case": "no-immediate-match", "status": null }],
+  "matches": [{ "matchId": "FIXTURE-SCHEDULED", "status": "scheduled" }, { "matchId": "FIXTURE-ACTIVE", "status": "inProgress" }, { "matchId": "FIXTURE-COMPLETED", "status": "completed" }],
+  "leaders": { "teamStandings": [{ "rank": 1, "teamId": "FIXTURE-T1", "points": 4 }], "playerStandings": [{ "rank": 1, "playerId": "FIXTURE-P1", "points": 2 }] },
+  "schedule": [{ "eventId": "FIXTURE-EVENT", "date": "2026-09-24", "startAt": "2026-09-24T23:00:00.000Z", "endAt": null, "location": null }]
+}
