@@ -165,6 +165,6 @@ test("the micro pass adds no request, dependency, or scoring calculation", () =>
   assert.doesNotMatch(overview, /historicalPairingPlayerRows|roundBirdieLeader|history\.back|router\.back/);
   assert.doesNotMatch(roundPage, /build2025TournamentRecords|reduce\(|filter\(.*bird/i);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "next", "openai", "qrcode", "react", "react-dom", "web-push",
+    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "web-push",
   ]);
 });

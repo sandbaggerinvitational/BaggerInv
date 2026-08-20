@@ -9,6 +9,8 @@ import {
   inspectParticipantIdentityTournamentResolution,
   inspectParticipantIdentitySecurity,
   linkAuthUserToPlayer,
+  manageParticipantAuthPhone,
+  readParticipantAuthPhoneAdmin,
   readParticipantIdentityAdmin,
   readSingleParticipantAuthRequestAudit,
   readSingleParticipantAuthRehearsalPreflight,
@@ -16,6 +18,11 @@ import {
   setSingleParticipantAuthRehearsalStatus,
 } from "../../../../lib/participant-identity-supabase.js";
 import { assertSingleParticipantAuthPreflight, safeParticipantAuthCandidate } from "../../../../lib/participant-auth-rehearsal.js";
+import {
+  maskParticipantAuthPhone,
+  normalizeParticipantAuthPhone,
+  participantAuthPhoneErrorMessage,
+} from "../../../../lib/participant-auth-phone.js";
 import {
   assertApprovedParticipantAuthUser,
   createParticipantAuthAdminClient,
@@ -32,6 +39,16 @@ export const dynamic = "force-dynamic";
 
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404 });
 const clean = (value) => String(value ?? "").trim();
+const PHONE_ACTIONS = new Set(["add-mobile", "change-mobile", "revoke-mobile"]);
+
+function sameOriginMutation(request) {
+  const origin = clean(request.headers.get("origin"));
+  const fetchSite = clean(request.headers.get("sec-fetch-site")).toLowerCase();
+  let expectedOrigin = "";
+  try { expectedOrigin = new URL(request.url).origin; }
+  catch { return false; }
+  return origin === expectedOrigin && (!fetchSite || fetchSite === "same-origin");
+}
 
 async function authorize(request) {
   if (process.env.VERCEL_ENV !== "preview") return { response: unavailable() };
@@ -128,14 +145,39 @@ async function loadAuthRehearsal(tournamentId) {
   };
 }
 
+async function loadPhoneOwnership(tournamentId, identity) {
+  const actorAuthUserId = clean(identity?.authUserId);
+  if (!actorAuthUserId) return {
+    available: false,
+    code: "PHONE_ADMIN_AUTH_ACCOUNT_REQUIRED",
+    counts: {},
+    players: [],
+  };
+  const result = await readParticipantAuthPhoneAdmin({ tournamentId, actorAuthUserId });
+  if (result.payload?.ok !== true) {
+    const error = new Error(participantAuthPhoneErrorMessage(result.payload?.code));
+    error.status = result.payload?.code === "PHONE_ADMIN_DIRECTOR_REQUIRED" ? 403 : 409;
+    throw error;
+  }
+  return {
+    available: true,
+    ...result.payload,
+    players: (result.payload.players || []).map((player) => {
+      const { lastFour, ...mobile } = player.mobile || {};
+      return { ...player, mobile: { ...mobile, masked: lastFour ? maskParticipantAuthPhone(lastFour) : null } };
+    }),
+  };
+}
+
 export async function GET(request) {
   const authorization = await authorize(request);
   if (authorization.response) return authorization.response;
   try {
     const review = await loadReview();
-    const [security, authRehearsal] = await Promise.all([
+    const [security, authRehearsal, phoneOwnership] = await Promise.all([
       inspectParticipantIdentitySecurity(),
       loadAuthRehearsal(review.tournamentId),
+      loadPhoneOwnership(review.tournamentId, authorization.identity),
     ]);
     return NextResponse.json({
       ok: true,
@@ -143,6 +185,7 @@ export async function GET(request) {
       review: { ...review, contacts: undefined },
       security: security.payload,
       authRehearsal,
+      phoneOwnership,
     }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     console.error("Participant identity review failed", { message: error?.message, code: error?.identityDiagnostics?.code || "" });
@@ -157,6 +200,56 @@ export async function POST(request) {
   const action = clean(input.action);
   const director = authorization.identity?.actor?.name || "Tournament Director";
   try {
+    if (PHONE_ACTIONS.has(action)) {
+      if (!sameOriginMutation(request)) {
+        return NextResponse.json({ error: "A same-origin Director request is required." }, { status: 403 });
+      }
+      const actorAuthUserId = clean(authorization.identity?.authUserId);
+      if (!actorAuthUserId) {
+        return NextResponse.json({ error: "A verified Director Auth account is required." }, { status: 403 });
+      }
+      const playerId = clean(input.playerId);
+      let phoneE164 = "";
+      if (action !== "revoke-mobile") {
+        try { phoneE164 = normalizeParticipantAuthPhone(input.phone).e164; }
+        catch (error) {
+          return NextResponse.json({ error: participantAuthPhoneErrorMessage(error?.code || "PHONE_INVALID") }, { status: 400 });
+        }
+      }
+      const review = await loadReview();
+      if (!review.review.some((player) => player.playerId === playerId)) {
+        return NextResponse.json({ error: participantAuthPhoneErrorMessage("PHONE_PLAYER_NOT_FOUND") }, { status: 404 });
+      }
+      const operation = action === "add-mobile" ? "ADD_PHONE"
+        : action === "change-mobile" ? "CHANGE_PHONE"
+        : "REVOKE_PHONE";
+      const result = await manageParticipantAuthPhone({
+        action: operation,
+        tournament_id: review.tournamentId,
+        player_id: playerId,
+        phone_e164: phoneE164,
+        actor_auth_user_id: actorAuthUserId,
+      });
+      const payload = result.payload || {};
+      if (payload.ok !== true) {
+        const status = payload.code === "PHONE_ADMIN_DIRECTOR_REQUIRED" ? 403
+          : payload.code === "PHONE_PLAYER_NOT_FOUND" ? 404
+          : payload.code === "PHONE_INVALID" ? 400
+          : 409;
+        return NextResponse.json({ error: participantAuthPhoneErrorMessage(payload.code), code: payload.code }, { status });
+      }
+      return NextResponse.json({
+        ok: true,
+        action,
+        result: {
+          changed: payload.changed === true,
+          identifierId: payload.identifierId || null,
+          status: payload.status,
+          maskedPhone: payload.lastFour ? maskParticipantAuthPhone(payload.lastFour) : null,
+          verified: payload.verified === true,
+        },
+      });
+    }
     if (action === "initialize-source") {
       const tournamentId = await readPreviewParticipantIdentityTournamentId();
       const admin = await readParticipantIdentityAdmin(tournamentId);
@@ -298,7 +391,18 @@ export async function POST(request) {
     }
     return NextResponse.json({ error: "Unsupported identity operation." }, { status: 400 });
   } catch (error) {
-    console.error("Participant identity operation failed", { action, message: error?.message, code: error?.identityDiagnostics?.code || "" });
+    const diagnosticsCode = error?.identityDiagnostics?.code || "";
+    console.error("Participant identity operation failed", {
+      action,
+      message: PHONE_ACTIONS.has(action) ? "Mobile eligibility operation failed." : error?.message,
+      code: diagnosticsCode,
+    });
+    if (PHONE_ACTIONS.has(action)) {
+      return NextResponse.json({
+        error: participantAuthPhoneErrorMessage(diagnosticsCode),
+        code: diagnosticsCode || "PHONE_OPERATION_FAILED",
+      }, { status: Number(error?.status) || 409 });
+    }
     return NextResponse.json({ error: error?.identityDiagnostics?.message || error?.message || "Participant identity operation failed." }, { status: Number(error?.status) || 400 });
   }
 }

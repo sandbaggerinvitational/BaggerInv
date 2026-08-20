@@ -270,6 +270,6 @@ test("long pairing names wrap and no new dependency or participant request is in
   for (const file of [completedOverview, roundPage, teamPage, backToTop, coursePage])
     assert.doesNotMatch(file, /\/api\/live|gviz|localStorage|sessionStorage/i);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "next", "openai", "qrcode", "react", "react-dom", "web-push",
+    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "web-push",
   ]);
 });

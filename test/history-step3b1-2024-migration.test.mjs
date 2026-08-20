@@ -274,6 +274,7 @@ test("Step 3B.1 adds no dependency, endpoint, client fetch, or storage", () => {
     "@supabase/ssr",
     "@supabase/supabase-js",
     "@vercel/analytics",
+    "libphonenumber-js",
     "next",
     "openai",
     "qrcode",

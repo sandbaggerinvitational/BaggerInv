@@ -292,6 +292,6 @@ test("Step 3B.1A adds no request, endpoint, dependency, or client scoring formul
   assert.doesNotMatch(roundPage + overviewPage, /fetch\(|axios|createClient|supabase\.from|\/api\/live/i);
   assert.doesNotMatch(roundPage + overviewPage, /Robert Murphy|Michael Hunnicutt|79\.6/);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "next", "openai", "qrcode", "react", "react-dom", "web-push",
+    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "web-push",
   ].sort());
 });

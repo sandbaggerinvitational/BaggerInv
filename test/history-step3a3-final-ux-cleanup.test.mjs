@@ -167,7 +167,7 @@ test("compact result rows retain accessible labels, long-name wrapping, touch ta
 test("Step 3A.3 adds no request, endpoint, client persistence, or dependency", () => {
   for (const value of [completedOverview, roundPage, matchCard]) assert.doesNotMatch(value, /fetch\(|\/api\/live|gviz|createClient|supabase\.from|localStorage|sessionStorage/i);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "next", "openai", "qrcode", "react", "react-dom", "web-push",
+    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "web-push",
   ]);
 });
 

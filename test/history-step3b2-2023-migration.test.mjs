@@ -323,7 +323,7 @@ test("2023 course/scoring loaders preserve the existing bounded request topology
     assert.doesNotMatch(file, /axios|createClient|supabase\.from|\/api\/live|localStorage|sessionStorage/i);
   }
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "next", "openai", "qrcode", "react", "react-dom", "web-push",
+    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "web-push",
   ]);
 });
 
