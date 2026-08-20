@@ -25,20 +25,25 @@ function ordinal(value) {
   return `${number}${suffix}`;
 }
 
-function RoundPerformance({ rounds }) {
+function RoundPerformance({ rounds, summary, year }) {
   if (!rounds?.length) return null;
   return <section className={`${styles.card} ${styles.performance}`} aria-labelledby="round-performance-title">
-    <div className={styles.sectionHeading}><span>Your Tournament</span><h2 id="round-performance-title">Round Performance</h2></div>
+    <div className={styles.sectionHeading}><span>{year ? `${year} Tournament` : "Current Tournament"}</span><h2 id="round-performance-title">Performance by Round</h2></div>
+    {summary ? <div className={styles.tournamentSummary} aria-label="Current tournament summary">
+      <span><b>{formatPlayerPoints(summary.points)}</b><small>Tournament Points</small></span>
+      {summary.individualRankLabel ? <span><b>{summary.individualRankLabel}</b><small>Individual Rank</small></span> : null}
+      {summary.teamStandingLabel ? <span><b>{summary.teamStandingLabel}</b><small>Team Standing</small></span> : null}
+    </div> : null}
     <div className={styles.performanceList}>{rounds.map((round) => {
-      const available = round.gross !== null || round.grossRankLabel || round.outcomes?.length || round.points !== null;
+      const available = round.gross !== null || round.net !== null || round.roundRankLabel || round.points !== null;
       return <article key={round.round} data-upcoming={available ? undefined : "true"}>
-        <header><strong>Round {round.round}{round.format ? ` • ${round.format}` : ""}</strong>{!available ? <span>Upcoming</span> : null}</header>
+        <header><strong>Round {round.round}{round.format ? ` • ${round.format}` : ""}</strong><span>{round.status === "Live" && round.holes ? `Live · Thru ${round.holes}` : round.status}</span></header>
         {available ? <div className={styles.performanceMetrics}>
-          {round.gross !== null ? <div><b>{round.gross}</b><small>Gross Score</small></div> : null}
-          {round.grossRankLabel ? <div><b>{round.grossRankLabel}</b><small>Gross Rank</small></div> : null}
-          {round.outcomes?.length ? <div><b>{round.outcomes.join(" • ")}</b><small>Result</small></div> : null}
-          {round.points !== null ? <div><b>{formatPlayerPoints(round.points)}</b><small>Points Earned</small></div> : null}
-        </div> : <p>Your round performance will appear after play.</p>}
+          {round.gross !== null ? <div><b>{round.gross}</b><small>{round.grossLabel}</small></div> : null}
+          {round.net !== null ? <div><b>{round.net}</b><small>{round.netLabel}</small></div> : null}
+          {round.roundRankLabel ? <div><b>{round.roundRankLabel}</b><small>Round Rank</small></div> : null}
+          {round.points !== null ? <div><b>{formatPlayerPoints(round.points)}</b><small>Round Points</small></div> : null}
+        </div> : <p>{round.status === "Not played" ? "No score was recorded for this round." : "Performance will appear when play begins."}</p>}
       </article>;
     })}</div>
   </section>;
@@ -159,7 +164,7 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
       </div> : null}
     </header>
 
-    <RoundPerformance rounds={tournamentData?.roundPerformance} />
+    <RoundPerformance rounds={tournamentData?.roundPerformance} summary={tournamentData?.tournamentSummary} year={tournament?.year} />
 
     <section className={styles.card}>
       <div className={styles.sectionHeading}><span>Career</span><h2>Profile &amp; Matches</h2></div>

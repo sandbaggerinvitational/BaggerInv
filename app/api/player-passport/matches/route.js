@@ -5,13 +5,13 @@ import { MATCH_ACCESS_ACTIONS, authorizeMatchAccess } from "../../../../lib/matc
 import { requireMatchAuthorizationSource } from "../../../../lib/match-authorization-source.js";
 import { createScoringSession, scoringSessionCookie } from "../../../../lib/scoring-access.js";
 import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
-import { playerPerformanceRows, rankPlayerRows } from "../../../../lib/mobile-leaderboards.js";
-import { playerRoundPerformance } from "../../../../lib/player-round-performance.js";
+import { playerTournamentPerformance } from "../../../../lib/player-round-performance.js";
 import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
 import { withNormalizedReadDiagnostics } from "../../../../lib/google-sheets-server-read.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { myMatchDataFromSupabaseView, readMyMatchView } from "../../../../lib/my-match-supabase.js";
+import { leaderboardsCoreDataFromSupabaseView, readLeaderboardsCoreView } from "../../../../lib/leaderboards-core-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -44,11 +44,32 @@ export async function GET(request) {
   }
   try {
     if (identity.authority.resolved === "supabase") {
-      const read = await readMyMatchView({ tournamentId: identity.tournamentId, playerId: identity.playerId });
+      const [read, leaderboardsRead] = await Promise.all([
+        readMyMatchView({ tournamentId: identity.tournamentId, playerId: identity.playerId }),
+        readLeaderboardsCoreView(identity.tournamentId).catch((error) => ({ error })),
+      ]);
       if (!read.payload?.ok) throw Object.assign(new Error("Participant match context is unavailable."), { code: read.payload?.code });
       const data = myMatchDataFromSupabaseView(read.payload.data);
+      let playerPerformanceSource = "unavailable";
+      try {
+        if (!leaderboardsRead.payload?.ok) throw leaderboardsRead.error || new Error("Leaderboards core state is unavailable.");
+        const tournamentData = leaderboardsCoreDataFromSupabaseView(leaderboardsRead.payload.data);
+        if (!tournamentData.slotVerification.pass) throw new Error("Canonical player-slot attribution did not validate.");
+        const performance = playerTournamentPerformance(tournamentData, data);
+        data.snapshot = performance.snapshot;
+        data.tournamentSummary = performance.summary;
+        data.roundPerformance = performance.rounds;
+        playerPerformanceSource = "supabase-leaderboards-core";
+      } catch (error) {
+        console.warn("Player tournament performance temporarily unavailable", {
+          route: "GET /api/player-passport/matches",
+          source: "supabase-leaderboards-core",
+          reason: error?.message || String(error),
+        });
+      }
       return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store",
-        "X-Participant-Identity-Authority": "supabase", "X-Participant-Identity-Google-Requests": "0" } });
+        "X-Participant-Identity-Authority": "supabase", "X-Participant-Identity-Google-Requests": "0",
+        "X-Player-Performance-Source": playerPerformanceSource } });
     }
     const measured = await withWorkbookWriteDiagnostics("participant-match-initialization", () =>
       withNormalizedReadDiagnostics("GET /api/player-passport/matches", () => initializeParticipantTournament(identity.session))
@@ -61,13 +82,10 @@ export async function GET(request) {
     const data = initialized.personalized;
     try {
       const tournamentData = initialized.tournamentData;
-      const standings = rankPlayerRows(
-        playerPerformanceRows(tournamentData.leaderboard || [], tournamentData.scoreLeaderboard || [], tournamentData.rounds || []),
-        "points"
-      );
-      const standing = standings.find((row) => String(row.id) === String(data.player.id));
-      if (standing && data.snapshot) data.snapshot.standing = standing.displayRank;
-      data.roundPerformance = playerRoundPerformance(tournamentData, data);
+      const performance = playerTournamentPerformance(tournamentData, data);
+      if (performance.snapshot) data.snapshot = { ...(data.snapshot || {}), ...performance.snapshot };
+      data.tournamentSummary = performance.summary;
+      data.roundPerformance = performance.rounds;
     } catch {
       // Identity and match data remain useful when optional standings are unavailable.
     }

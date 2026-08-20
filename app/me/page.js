@@ -9,7 +9,7 @@ export const metadata = privatePageMetadata("Me | Sandbagger Invitational");
 export default function MePage() {
   const participantIdentityAuthority = requireParticipantIdentityAuthority().resolved;
   return <main>
-    <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
+    <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} compact />
     <ParticipantProfile participantIdentityAuthority={participantIdentityAuthority} />
   </main>;
 }
