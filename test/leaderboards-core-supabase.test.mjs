@@ -211,7 +211,7 @@ test("versioned match presentation preserves legacy full-handicap player stats w
   assert.equal(player.gross, 72);
   assert.equal(player.net, 66);
   assert.equal(match.currentHole, 0);
-  assert.equal(match.archiveFinal, false);
+  assert.equal(match.archiveFinal, true);
   assert.equal(data.slotVerification.pass, true, JSON.stringify(data.slotVerification.issues));
   assert.ok(data.slotVerification.matchAppliedStrokeCells > 0);
   assert.ok(data.slotVerification.leaderboardStrokeCells > 0);
@@ -225,13 +225,78 @@ test("Player lifecycle projection stays canonical when imported match presentati
   const data = leaderboardsCoreDataFromSupabaseView(view, { includeCurrentMatchLifecycle: true });
   const displayed = data.rounds.flatMap((round) => round.matches).find((match) => match.id === "2026-R2-1");
   const current = data.currentMatchLifecycle.flatMap((round) => round.matches).find((match) => match.id === "2026-R2-1");
-  assert.equal(displayed.archiveFinal, true);
+  const roundRows = leaderboardsCoreParityProjection(data).roundPlayers.find((round) => round.round === 2).rows;
+  assert.equal(displayed.archiveFinal, false);
   assert.equal(displayed.currentHole, 18);
   assert.equal(current.status, "Live");
   assert.equal(current.scoringEnabled, true);
   assert.equal(current.scoringLocked, false);
   assert.equal(current.currentHole, 7);
   assert.deepEqual(current.playerIds, ["P5", "P6", "P7", "P8"]);
+  assert.equal(roundRows.length, 2);
+  assert.ok(roundRows.every((row) => row.officialFinal === false));
+  assert.ok(roundRows.every((row) => row.points === null));
+});
+
+test("leaderboard presentation follows canonical Final to Reopen to Re-Finalize lifecycle", () => {
+  const view = fixture();
+  const entryValue = view.matches.find((candidate) => candidate.match.match_id === "2026-R2-1");
+  const canonical = entryValue.match;
+  entryValue.scores = scores("2026-R2-1", "SC", 18);
+  Object.assign(canonical, { scored_holes: 18, current_hole: 18, holes_remaining: 0, scorecard_complete: true });
+  view.tournament_presentation.presentation.tournamentMatchDisplay = {
+    "2026-R2-1": { currentHole: 18, archiveFinal: false },
+  };
+
+  const readStage = () => {
+    const data = leaderboardsCoreDataFromSupabaseView(view);
+    const match = data.rounds.flatMap((round) => round.matches).find((row) => row.id === "2026-R2-1");
+    const rows = leaderboardsCoreParityProjection(data).roundPlayers.find((round) => round.round === 2).rows;
+    return { data, match, rows };
+  };
+
+  Object.assign(canonical, {
+    status: "FINAL", scoring_locked: true, result_winner: "Team 1",
+    finalized_at: "2026-08-12T12:00:00Z",
+  });
+  const finalized = readStage();
+  assert.equal(finalized.match.archiveFinal, true);
+  assert.ok(finalized.rows.every((row) => row.officialFinal === true));
+  assert.ok(finalized.rows.every((row) => row.points !== null));
+
+  Object.assign(canonical, {
+    status: "LIVE", scoring_locked: false, result_winner: "",
+    finalized_at: null,
+  });
+  view.tournament_presentation.presentation.tournamentMatchDisplay["2026-R2-1"].archiveFinal = true;
+  const reopened = readStage();
+  assert.equal(reopened.match.archiveFinal, false);
+  assert.ok(reopened.rows.every((row) => row.officialFinal === false));
+  assert.ok(reopened.rows.every((row) => row.points === null));
+  assert.ok(reopened.data.tournament.teamOne.score < finalized.data.tournament.teamOne.score);
+
+  Object.assign(canonical, {
+    status: "FINAL", scoring_locked: true, result_winner: "Team 1",
+    finalized_at: "2026-08-12T13:00:00Z",
+  });
+  view.tournament_presentation.presentation.tournamentMatchDisplay["2026-R2-1"].archiveFinal = false;
+  const refinalized = readStage();
+  assert.equal(refinalized.match.archiveFinal, true);
+  assert.ok(refinalized.rows.every((row) => row.officialFinal === true));
+  assert.ok(refinalized.rows.every((row) => row.points !== null));
+  assert.equal(refinalized.data.tournament.teamOne.score, finalized.data.tournament.teamOne.score);
+  assert.deepEqual(refinalized.data.leaderboard, finalized.data.leaderboard);
+});
+
+test("leaderboard parity compares lifecycle and points by current official state", () => {
+  const expected = leaderboardsCoreDataFromSupabaseView(fixture());
+  const actual = structuredClone(expected);
+  const match = actual.rounds.flatMap((round) => round.matches).find((row) => row.id === "2026-R2-1");
+  match.status = "Reopened";
+  match.archiveFinal = "";
+  match.team1Points = 0;
+  match.team2Points = 0;
+  assert.equal(compareLeaderboardsCoreParity(expected, actual).pass, true);
 });
 
 test("Preview page and API use Supabase core with no Google fallback or Passport-named identity request", async () => {
