@@ -5,6 +5,7 @@ import {
   disableLiveMatchAccess,
   finalizeLiveMatch,
   generateLiveMatchAccess,
+  markLiveMatch,
   readLiveMatchAdminData,
   reopenLiveMatch,
   updateLiveMatch,
@@ -62,6 +63,7 @@ export async function POST(request) {
     const measured = await withWorkbookWriteDiagnostics(`live-matches:${action}`, async () => {
       let match;
       if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
+      else if (action === "mark-live") match = await markLiveMatch(matchId, updatedBy);
       else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
       else if (action === "finalize") {
         const lifecycle = await persistDirectorMatchLifecycle({ action: "finalize", matchId, updatedBy });

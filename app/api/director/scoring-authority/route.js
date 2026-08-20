@@ -6,11 +6,14 @@ import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.j
 import {
   abortAuthorityEpoch,
   backfillCanonicalFinalMatchLocks,
+  beginScoringIngress,
   buildCanonicalScoringAuthorityImport,
   canonicalAuthorityFingerprint,
   commitAuthorityEpoch,
   completeCanonicalFinalizationParityRepair,
+  completeScoringIngress,
   inspectCanonicalAuthoritySecurity,
+  normalizeCanonicalLegacyReopen,
   prepareAuthorityEpoch,
   readCanonicalScoringAuthority,
   reconcileCanonicalScoringAuthority,
@@ -20,7 +23,7 @@ import {
 } from "../../../../lib/scoring-authority-supabase.js";
 import { benchmarkSummary, canonicalJson } from "../../../../lib/scoring-shadow.js";
 import { drainGoogleOutbox, inspectGoogleMatchState, processNextGoogleOutboxEvent } from "../../../../lib/scoring-google-outbox.js";
-import { inspectPreviewLiveMatchScoringLockMigration, migratePreviewLiveMatchScoringLock, readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
+import { inspectPreviewLiveMatchScoringLockMigration, migratePreviewLiveMatchScoringLock, normalizeLegacyReopenedMatch, readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { grossScoresFromCell } from "../../../../lib/live-score-values.js";
 import {
   buildGameCenterPresentationImport,
@@ -109,6 +112,8 @@ import {
   expectedMatchAuthorizationMatrix,
   readMatchAuthorizationMatrix,
 } from "../../../../lib/match-authorization-supabase.js";
+import { classifyScoringLifecycleConflict } from "../../../../lib/scoring-lifecycle-contract.js";
+import { drainScorecardArchiveJobs } from "../../../../lib/scorecard-archive-worker.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -118,7 +123,7 @@ const upper = (value) => clean(value).toUpperCase();
 const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const truthy = (value) => /^(true|yes|1|locked)$/i.test(clean(value));
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404 });
-const WORKBOOK_TABS = ["Tournaments", "Players", "Handicaps", "Team Names", "Rounds", "Courses", "Course Holes", "Live Matches", "Matches", "Live Hole Scores"];
+const WORKBOOK_TABS = ["Tournaments", "Players", "Handicaps", "Team Names", "Rounds", "Courses", "Course Holes", "Live Matches", "Matches", "Live Hole Scores", "Match Update Log", "Admin Audit Log"];
 const NET_SKINS_WORKBOOK_TABS = ["Net Skins", "Net Skins Result", "Live Matches"];
 
 async function authorize(request) {
@@ -1263,6 +1268,129 @@ async function commitMainRollback(actorId, epochId) {
   return { drained, reconciliation: snapshot.report, committed: committed.payload, security: snapshot.security };
 }
 
+const LEGACY_REOPEN_ARCHIVE_RESULT_FIELDS = [
+  "Final Result", "Winner", "Matchup Winner", "Front 9 Winner", "Back 9 Winner",
+  "18-Hole Winner", "Team 1 Points", "Team 2 Points",
+];
+
+const archiveResultIsInactive = (row = {}) => LEGACY_REOPEN_ARCHIVE_RESULT_FIELDS
+  .every((field) => !clean(row[field]));
+
+async function normalizeLegacyReopen(actorId, input = {}) {
+  const matchId = clean(input.matchId);
+  if (!matchId || input.confirmIntent !== true) {
+    throw Object.assign(new Error("A match and explicit Director confirmation are required."), { code: "DIRECTOR_INTENT_REQUIRED" });
+  }
+  const authority = scoringAuthorityEnvironment();
+  if (authority.resolved !== "google") {
+    throw Object.assign(new Error("Google must remain the active Preview scoring authority for legacy normalization."), { code: "GOOGLE_NOT_AUTHORITY" });
+  }
+  const [canonicalBefore, googleBefore] = await Promise.all([
+    readCanonicalScoringAuthority({ match_id: matchId, mode: "MATCH" }),
+    readWorkbookSheetsByName(["Live Matches", "Matches", "Live Hole Scores", "Match Update Log", "Admin Audit Log"], { fresh: true }),
+  ]);
+  const canonicalMatch = canonicalBefore.payload?.data;
+  if (!canonicalBefore.payload?.ok || !canonicalMatch) throw Object.assign(new Error("The canonical match was not found."), { code: "MATCH_NOT_FOUND" });
+  const diagnosticsBefore = await readCanonicalScoringAuthority({ tournament_id: canonicalMatch.tournament_id, mode: "DIAGNOSTICS" });
+  const ingress = diagnosticsBefore.payload?.data?.ingress || {};
+  if (upper(ingress.authority) !== "GOOGLE" || upper(ingress.state) !== "OPEN"
+      || number(diagnosticsBefore.payload?.data?.pending_outbox) !== 0 || ingress.active_epoch_id) {
+    throw Object.assign(new Error("Preview scoring ingress, authority, epoch, or outbox state is not clean."), { code: "NORMALIZATION_PREFLIGHT_FAILED" });
+  }
+  const rows = (tab) => (googleBefore[tab]?.records || []).map(({ record }) => record);
+  const googleLive = rows("Live Matches").find((row) => clean(row["Match ID"]) === matchId);
+  const googleArchive = rows("Matches").find((row) => clean(row["Match ID"]) === matchId);
+  if (!googleLive || !googleArchive) throw Object.assign(new Error("The Google lifecycle rows were not found."), { code: "GOOGLE_MATCH_NOT_FOUND" });
+  const conflict = classifyScoringLifecycleConflict({ current: googleLive, archived: googleArchive,
+    matchUpdateLog: rows("Match Update Log"), adminAuditLog: rows("Admin Audit Log") });
+  const unresolvedLegacyConflict = /^(Live|Reopened)$/i.test(clean(googleLive["Match Status"]))
+    && /^(Final|Finalized)$/i.test(clean(googleArchive["Match Status"]));
+  const partiallyNormalizedGoogleReopen = /^Reopened$/i.test(clean(googleLive["Match Status"]))
+    && /^Reopened$/i.test(clean(googleArchive["Match Status"]));
+  const googleAlreadyNormalized = /^Reopened$/i.test(clean(googleLive["Match Status"]))
+    && /^Reopened$/i.test(clean(googleArchive["Match Status"]))
+    && !clean(googleArchive["Finalized At"]) && !clean(googleArchive["Completed At"])
+    && archiveResultIsInactive(googleArchive)
+    && !truthy(googleLive["Scoring Locked"]) && truthy(googleLive["Access Active"]);
+  if (!unresolvedLegacyConflict && !partiallyNormalizedGoogleReopen) {
+    throw Object.assign(new Error("The selected match is not a legacy mutable-reopen / active-Final conflict."), {
+      code: "LEGACY_REOPEN_CONFLICT_REQUIRED", shadowDiagnostics: { details: JSON.stringify(conflict) },
+    });
+  }
+  const nextPermissionRevision = googleAlreadyNormalized ? number(googleLive["Access Version"]) : Math.max(
+    2,
+    number(canonicalMatch.permission_revision) + 1,
+    number(googleLive["Access Version"]) + 1,
+  );
+  const lease = await beginScoringIngress({ tournament_id: canonicalMatch.tournament_id, match_id: matchId,
+    expected_authority: "GOOGLE", actor_id: actorId, lease_seconds: 300 });
+  if (!lease.payload?.ok) throw Object.assign(new Error(`Normalization ingress failed (${lease.payload?.code || "unknown"}).`), { code: lease.payload?.code });
+  const leaseId = clean(lease.payload.lease_id);
+  let leaseCompleted = false;
+  try {
+    const google = await withWorkbookWriteDiagnostics("legacy-reopen-normalization", () => normalizeLegacyReopenedMatch(
+      matchId,
+      { confirmIntent: true, expectedLiveUpdatedAt: clean(googleLive["Updated At"]),
+        expectedArchiveFinalizedAt: clean(googleArchive["Finalized At"]), permissionRevision: nextPermissionRevision },
+      `Legacy reopen normalization · ${actorId}`,
+    ));
+    const verified = google.result;
+    const verifiedMatch = verified.match || {};
+    const verifiedArchive = verified.archive || {};
+    const googleAfter = await readWorkbookSheetsByName(["Live Matches", "Matches", "Live Hole Scores", "Match Update Log", "Admin Audit Log"], { fresh: true });
+    const afterRows = (tab) => (googleAfter[tab]?.records || []).map(({ record }) => record);
+    const holes = afterRows("Live Hole Scores").filter((row) => clean(row["Match ID"]) === matchId);
+    const googleHoleRevisions = Object.fromEntries(holes.map((row) => [String(number(row["Hole Number"])), number(row.Revision)]));
+    const archiveResultInactive = !clean(verifiedArchive["Finalized At"])
+      && !clean(verifiedArchive["Completed At"])
+      && archiveResultIsInactive(verifiedArchive);
+    const verifiedFingerprint = canonicalAuthorityFingerprint({ matchId, status: verifiedMatch["Match Status"],
+      archiveStatus: verifiedArchive["Match Status"], archiveResultInactive,
+      accessActive: truthy(verifiedMatch["Access Active"]), scoringLocked: truthy(verifiedMatch["Scoring Locked"]),
+      permissionRevision: number(verifiedMatch["Access Version"]), updatedAt: clean(verifiedMatch["Updated At"]),
+      holeFingerprint: canonicalAuthorityFingerprint(holes), holeCount: holes.length });
+    const mutationKey = `legacy-reopen-normalization:${matchId}:P${number(verifiedMatch["Access Version"])}`;
+    const normalized = await normalizeCanonicalLegacyReopen({
+      environment: "PREVIEW", director_authorized: true, operator_intent_confirmed: true,
+      tournament_id: canonicalMatch.tournament_id, match_id: matchId, actor_id: actorId,
+      mutation_key: mutationKey, lease_id: leaseId,
+      expected_match_revision: number(canonicalMatch.match_revision),
+      expected_permission_revision: number(canonicalMatch.permission_revision),
+      google_match_revision: number(verifiedMatch.Revision),
+      google_permission_revision: number(verifiedMatch["Access Version"]),
+      google_match_updated_at: clean(verifiedMatch["Updated At"]),
+      google_live_status: clean(verifiedMatch["Match Status"]),
+      google_archive_status: clean(verifiedArchive["Match Status"]),
+      google_archive_result_inactive: archiveResultInactive,
+      google_holes_unchanged: verified.holeScoresPreserved === true,
+      google_hole_revisions: googleHoleRevisions,
+      verified_fingerprint: verifiedFingerprint,
+    });
+    if (!normalized.payload?.ok) throw Object.assign(new Error(`Canonical legacy reopen normalization failed (${normalized.payload?.code || "unknown"}).`), { code: normalized.payload?.code });
+    const archiveJobs = await drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: true });
+    if (!archiveJobs.ok) {
+      throw Object.assign(new Error("The finalized-scorecard archive invalidation did not verify."), { code: "ARCHIVE_INVALIDATION_FAILED" });
+    }
+    const ingressCompletion = await completeScoringIngress({ lease_id: leaseId });
+    if (!ingressCompletion.payload?.ok) {
+      throw Object.assign(new Error(`Normalization ingress completion failed (${ingressCompletion.payload?.code || "unknown"}).`), { code: ingressCompletion.payload?.code });
+    }
+    leaseCompleted = true;
+    const [liveView, diagnosticsAfter] = await Promise.all([
+      readTournamentLiveView(canonicalMatch.tournament_id),
+      readCanonicalScoringAuthority({ tournament_id: canonicalMatch.tournament_id, mode: "DIAGNOSTICS" }),
+    ]);
+    return { matchId, conflictBefore: conflict, google: verified, googleDiagnostics: google.diagnostics,
+      canonical: normalized.payload, archiveJobs, ingressCompletion: ingressCompletion.payload,
+      tournamentLiveView: liveView.payload,
+      diagnosticsBefore: diagnosticsBefore.payload?.data, diagnosticsAfter: diagnosticsAfter.payload?.data };
+  } finally {
+    if (leaseId && !leaseCompleted) await completeScoringIngress({ lease_id: leaseId }).catch((error) => {
+      console.error("Legacy reopen ingress lease completion failed", { matchId, code: error?.code || "unknown" });
+    });
+  }
+}
+
 async function repairFinalizationParity(actorId, matchIdValue) {
   const matchId = clean(matchIdValue);
   if (!matchId) throw Object.assign(new Error("A finalized match is required."), { code: "MATCH_REQUIRED" });
@@ -1617,6 +1745,8 @@ export async function POST(request) {
       const reconciled = await currentAndReconcile(source.imported);
       result = { counts: source.imported.counts, googleReadMs: source.googleReadMs, normalizationMs: source.normalizationMs,
         supabaseReadMs: reconciled.readMs, reconciliation: reconciled.report };
+    } else if (action === "normalize-legacy-reopen") {
+      result = await normalizeLegacyReopen(actorId, input);
     } else if (action === "repair-finalization-parity") {
       result = await repairFinalizationParity(actorId, input.matchId);
     } else if (action === "migrate-preview-scoring-lock-schema") {

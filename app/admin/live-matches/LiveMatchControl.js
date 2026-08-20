@@ -10,7 +10,7 @@ import { finalizationReview, hasUnsavedMatchChanges } from "../../../lib/live-ad
 import { formatStatusLabel, formatTeamPoints } from "../../../lib/formatters";
 import { directorFetch, runDirectorTransaction } from "../../../lib/director-client-transaction";
 
-const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Match Status", "Notes"];
+const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Notes"];
 const PAIRING_FIELDS = ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"];
 const WINNERS = ["", "Team 1", "Team 2", "Halved"];
 
@@ -112,12 +112,13 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyCh
       <WinnerField label="Matchup Winner" field="Matchup Winner" value={draft["Matchup Winner"]} onChange={change} />
       <label><span>{sideOne} Points</span><input type="number" min="0" max="3" step="0.25" value={draft["Team 1 Points"]} onChange={(event) => change("Team 1 Points", event.target.value)} /></label>
       <label><span>{sideTwo} Points</span><input type="number" min="0" max="3" step="0.25" value={draft["Team 2 Points"]} onChange={(event) => change("Team 2 Points", event.target.value)} /></label>
-      <label><span>Match Status</span><select value={draft["Match Status"] || "Scheduled"} disabled={isFinal} onChange={(event) => change("Match Status", event.target.value)}><option>Scheduled</option><option>Live</option><option>Reopened</option>{isFinal ? <option>Final</option> : null}</select></label>
+      <label><span>Match Status</span><input value={match["Match Status"] || "Scheduled"} readOnly aria-describedby={`lifecycle-${match["Match ID"]}`} /><small id={`lifecycle-${match["Match ID"]}`}>Use the lifecycle actions below.</small></label>
       <label className={styles.notes}><span>Notes</span><textarea rows="3" value={draft.Notes} onChange={(event) => change("Notes", event.target.value)} /></label>
     </div>
     <div className={styles.actions}>
       {!isFinal ? <>
         <button type="button" disabled={busy || !dirty} onClick={() => run("update")}>{busy ? "Saving…" : "Save Changes"}</button>
+        {/^(Scheduled|Upcoming)$/i.test(match["Match Status"] || "") ? <button type="button" disabled={busy} onClick={() => run("mark-live", {})}>{busy ? "Starting…" : "Mark Live"}</button> : null}
         <button className={styles.finalize} type="button" disabled={busy} onClick={() => setReviewOpen(true)}>Review &amp; Finalize</button>
       </> : <button className={styles.reopen} type="button" disabled={busy} onClick={() => run("reopen")}>{busy ? "Reopening…" : "Reopen for correction"}</button>}
     </div>

@@ -5,7 +5,7 @@ import { buildCanonicalScoringAuthorityImport, reconcileCanonicalScoringAuthorit
 import { scoringAuthority, scoringAuthorityEnvironment } from "../lib/scoring-authority.js";
 import { googleOutboxDeliveryInput, processNextGoogleOutboxEvent } from "../lib/scoring-google-outbox.js";
 import { createScoringSession, verifyScoringSession } from "../lib/scoring-access.js";
-import { calculateMatchPoints } from "../lib/live-hole-scoring.js";
+import { classifyScoringLifecycleConflict, SCORING_LIFECYCLE_CLASSIFICATIONS } from "../lib/scoring-lifecycle-contract.js";
 
 const secret = "phase-2-scoring-session-secret-long-enough";
 const sheet = (rows) => ({ records: rows.map((record, index) => ({ record, rowNumber: index + 2 })), headers: Object.keys(rows[0] || {}) });
@@ -16,7 +16,7 @@ const finalizedSummary = { "Match ID": "M1", Year: 2026, Round: 1, Match: 1, For
 const reopenedSummary = { ...finalizedSummary, "Match Status": "Reopened", "Final Result": "", Winner: "", "Matchup Winner": "",
   "Completed At": "", "Finalized At": "", "Finalized By": "" };
 
-function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" }, liveMatch = {}, archivedMatches = [] } = {}) {
+function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" }, liveMatch = {}, archivedMatches = [], matchUpdateLog = [], adminAuditLog = [] } = {}) {
   const players = [
     { "Player ID": "P1", "Display Name": "Player One" }, { "Player ID": "P2", "Display Name": "Player Two" },
     { "Player ID": "P3", "Display Name": "Player Three" }, { "Player ID": "P4", "Display Name": "Player Four" },
@@ -51,6 +51,7 @@ function workbook({ holes = 1, captains = { 1: "P1", 2: "P3" }, liveMatch = {}, 
     Rounds: sheet([{ Year: 2026, Round: 1, Format: "BB", "Handicap Allowance": 0.9 }, { Year: 2026, Round: 2, Format: "SC" }, { Year: 2026, Round: 3, Format: "SI" }]),
     Courses: sheet([{ Year: 2026, Format: "BB", "Course ID": "C1", "Tee Played": "Gold", Rating: 71.9, Slope: 136, Par: 72 }]),
     "Course Holes": sheet(courseHoles), "Live Matches": sheet([match]), Matches: sheet(archivedMatches), "Live Hole Scores": sheet(scores),
+    "Match Update Log": sheet(matchUpdateLog), "Admin Audit Log": sheet(adminAuditLog),
   };
 }
 
@@ -106,16 +107,23 @@ test("zero-hole authoritative matches import without manufactured scores", () =>
   assert.equal(result.payload.matches[0].scored_holes, 0);
 });
 
-test("permanent Google finals reconcile two regressed Live rows and restore the full six Pickles points", () => {
+test("a prior Final archive cannot overwrite an intentionally reopened mutable lifecycle", () => {
   const source = workbook({
     holes: 18,
-    liveMatch: { Revision: 41, "Access Version": 4, "Scoring Locked": false, "Access Active": true },
+    liveMatch: { Revision: 41, "Access Version": 4, "Scoring Locked": false, "Access Active": true,
+      "Updated At": "2026-08-12T12:00:00.000Z" },
     archivedMatches: [finalizedSummary],
+    matchUpdateLog: [{ "Match ID": "M1", Action: "Reopened", "Updated At": "2026-08-12T12:00:00.000Z",
+      "New Value": JSON.stringify({ "Match Status": "Reopened" }) }],
   });
   const first = source["Live Matches"].records[0].record;
   const second = { ...first, "Match ID": "M2", Match: 2, Revision: 42 };
   source["Live Matches"] = sheet([first, second]);
   source.Matches = sheet([finalizedSummary, { ...finalizedSummary, "Match ID": "M2", Match: 2 }]);
+  source["Match Update Log"] = sheet([
+    { "Match ID": "M1", Action: "Reopened", "Updated At": "2026-08-12T12:00:00.000Z", "New Value": JSON.stringify({ "Match Status": "Reopened" }) },
+    { "Match ID": "M2", Action: "Legacy Reopen Normalized", "Updated At": "2026-08-12T12:01:00.000Z", "New Value": JSON.stringify({ live: { "Match Status": "Reopened" } }) },
+  ]);
   source["Live Hole Scores"] = sheet(source["Live Hole Scores"].records.flatMap(({ record }) => [
     { ...record, "Team 1 Gross Scores": [4, 4], "Team 2 Gross Scores": [6, 6], "Team 1 Net Score": 4, "Team 2 Net Score": 6, "Hole Winner": "Team 1" },
     { ...record, "Hole Score ID": `M2-H${record["Hole Number"]}`, "Match ID": "M2", "Team 1 Gross Scores": [4, 4],
@@ -123,34 +131,52 @@ test("permanent Google finals reconcile two regressed Live rows and restore the 
   ]));
 
   const imported = buildCanonicalScoringAuthorityImport({ sheets: source, sourceWorkbookId: "preview-sheet" });
-  assert.deepEqual(imported.payload.matches.map((match) => match.status), ["FINAL", "FINAL"]);
-  assert.deepEqual(imported.payload.matches.map((match) => match.scoring_locked), [true, true]);
+  assert.deepEqual(imported.payload.matches.map((match) => match.status), ["LIVE", "LIVE"]);
+  assert.deepEqual(imported.payload.matches.map((match) => match.scoring_locked), [false, false]);
   assert.deepEqual(imported.payload.matches.map((match) => match.match_revision), [41, 42],
     "the mutable Live Matches row retains ownership of the match revision domain");
-  assert.ok(imported.payload.permissions.every((permission) => permission.can_score === false));
-  const awarded = imported.payload.matches.map((match) => calculateMatchPoints(match.format,
-    imported.payload.hole_scores.filter((hole) => hole.match_id === match.match_id)
-      .map((hole) => ({ holeNumber: hole.hole_number, winner: hole.hole_winner }))));
-  assert.deepEqual(awarded, [
-    { frontWinner: "Team 1", backWinner: "Team 1", overallWinner: "Team 1", team1Points: 3, team2Points: 0 },
-    { frontWinner: "Team 1", backWinner: "Team 1", overallWinner: "Team 1", team1Points: 3, team2Points: 0 },
-  ]);
-  assert.equal(awarded.reduce((sum, result) => sum + result.team1Points, 0), 6);
-  const stale = {
-    matches: imported.payload.matches.map((match) => ({ ...match, status: "LIVE", scoring_locked: false })),
+  assert.ok(imported.payload.permissions.every((permission) => permission.can_score === true));
+  assert.deepEqual(imported.lifecycle.map((item) => item.classification), ["PROVEN_REOPEN", "PROVEN_REOPEN"]);
+  const reopened = {
+    matches: imported.payload.matches,
     holes: imported.payload.hole_scores,
     players: imported.payload.tournament_players,
     snapshots: imported.payload.snapshots,
     permissions: imported.payload.permissions,
   };
-  const staleParity = reconcileCanonicalScoringAuthority(imported, stale);
-  assert.deepEqual(staleParity.matchStateDivergence, ["M1", "M2"]);
-  assert.deepEqual(staleParity.scoreDivergence, []);
-  assert.deepEqual(staleParity.revisionDivergence, []);
-  assert.equal(reconcileCanonicalScoringAuthority(imported, {
-    ...stale,
-    matches: imported.payload.matches,
-  }).pass, true);
+  assert.equal(reconcileCanonicalScoringAuthority(imported, reopened).pass, true);
+});
+
+test("lifecycle classifier covers consistent, proven, stale, and ambiguous states", () => {
+  const current = { "Match ID": "M1", "Match Status": "Live", "Updated At": "2026-08-12T12:00:00.000Z" };
+  assert.equal(classifyScoringLifecycleConflict({ current }).classification, SCORING_LIFECYCLE_CLASSIFICATIONS.CONSISTENT_LIVE);
+  assert.equal(classifyScoringLifecycleConflict({ current: { ...current, "Match Status": "Final" }, archived: finalizedSummary }).classification,
+    SCORING_LIFECYCLE_CLASSIFICATIONS.CONSISTENT_FINAL);
+  assert.equal(classifyScoringLifecycleConflict({ current: { ...current, "Updated At": "2026-08-10T12:00:00.000Z" }, archived: finalizedSummary }).classification,
+    SCORING_LIFECYCLE_CLASSIFICATIONS.STALE_MUTABLE);
+  assert.equal(classifyScoringLifecycleConflict({ current, archived: finalizedSummary }).classification,
+    SCORING_LIFECYCLE_CLASSIFICATIONS.AMBIGUOUS_CONFLICT);
+  assert.equal(classifyScoringLifecycleConflict({ current, archived: finalizedSummary,
+    matchUpdateLog: [{ "Match ID": "M1", Action: "Reopened", "Updated At": "2026-08-12T11:00:00.000Z" }] }).classification,
+    SCORING_LIFECYCLE_CLASSIFICATIONS.PROVEN_REOPEN);
+});
+
+test("canonical import fails closed on an ambiguous mutable Live / Final archive conflict", () => {
+  assert.throws(() => buildCanonicalScoringAuthorityImport({
+    sheets: workbook({ liveMatch: { "Updated At": "2026-08-12T12:00:00.000Z" }, archivedMatches: [finalizedSummary] }),
+    sourceWorkbookId: "preview-sheet",
+  }), (error) => error.code === "AMBIGUOUS_LIFECYCLE_CONFLICT" && /lifecycle conflict/.test(error.message));
+});
+
+test("canonical import keeps a stale mutable row Final when archive ordering proves later Finalization", () => {
+  const imported = buildCanonicalScoringAuthorityImport({
+    sheets: workbook({ liveMatch: { "Updated At": "2026-08-10T12:00:00.000Z", "Scoring Locked": false, "Access Active": true }, archivedMatches: [finalizedSummary] }),
+    sourceWorkbookId: "preview-sheet",
+  });
+  assert.equal(imported.lifecycle[0].classification, "STALE_MUTABLE");
+  assert.equal(imported.payload.matches[0].status, "FINAL");
+  assert.equal(imported.payload.matches[0].scoring_locked, true);
+  assert.ok(imported.payload.permissions.every((permission) => permission.can_score === false));
 });
 
 test("canonical reconciliation detects parity and genuine score drift", () => {
@@ -315,6 +341,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const diagnostics = await readFile(new URL("../supabase/migrations/202608120008_preview_scoring_client_diagnostics.sql", import.meta.url), "utf8");
   const finalizationPermissions = await readFile(new URL("../supabase/migrations/202608120010_preview_scoring_authority_finalization_permissions.sql", import.meta.url), "utf8");
   const scoringLockedBackfill = await readFile(new URL("../supabase/migrations/202608120011_preview_live_matches_scoring_locked_backfill.sql", import.meta.url), "utf8");
+  const legacyReopen = await readFile(new URL("../supabase/migrations/202608200001_preview_legacy_reopen_normalization.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -368,6 +395,17 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.doesNotMatch(scoringLockedBackfill, /update scoring_authority\.hole_scores/i);
   assert.match(scoringLockedBackfill, /revoke all on function public\.backfill_preview_final_match_locks\(jsonb\) from public, anon, authenticated/i);
   assert.match(scoringLockedBackfill, /grant execute on function public\.backfill_preview_final_match_locks\(jsonb\) to service_role/i);
+  assert.match(legacyReopen, /create or replace function public\.normalize_preview_legacy_reopen\(input jsonb\)/i);
+  assert.match(legacyReopen, /operator_intent_confirmed/i);
+  assert.match(legacyReopen, /gate_row\.authority <> 'GOOGLE'/i);
+  assert.match(legacyReopen, /ACTIVE_INGRESS_LEASE_REQUIRED/i);
+  assert.match(legacyReopen, /GOOGLE_OUTBOX_NOT_DRAINED/i);
+  assert.match(legacyReopen, /status = 'LIVE', scoring_locked = false/i);
+  assert.match(legacyReopen, /can_score = true[\s\S]+revoked_at = null/i);
+  assert.match(legacyReopen, /LEGACY_REOPEN_NORMALIZED/i);
+  assert.match(legacyReopen, /invalidate_finalized_scorecard_snapshot/i);
+  assert.doesNotMatch(legacyReopen, /insert into scoring_authority\.google_outbox_events/i);
+  assert.match(legacyReopen, /revoke all on function public\.normalize_preview_legacy_reopen\(jsonb\) from public, anon, authenticated/i);
 });
 
 test("Preview Live Matches migration inserts exactly one canonical column and verifies preservation", async () => {

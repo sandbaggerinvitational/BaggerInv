@@ -173,12 +173,13 @@ test("Match Management exposes contextual lifecycle controls through the verifie
 
   assert.match(route, /match-unlock-scoring[\s\S]*enableLiveMatchAccess/);
   assert.match(route, /match-lock-scoring[\s\S]*disableLiveMatchAccess/);
-  assert.match(route, /match-mark-live[\s\S]*updateLiveMatch\(input\.matchId, \{ "Match Status": "Live" \}/);
+  assert.match(route, /match-mark-live[\s\S]*markLiveMatch\(input\.matchId, updatedBy\)/);
   assert.match(route, /match-finalize[\s\S]*finalizeLiveMatch\(input\.matchId, \{\}, updatedBy\)/);
   assert.match(route, /match-reopen[\s\S]*reopenLiveMatch\(input\.matchId, updatedBy\)/);
   assert.match(route, /verifyDirectorReadBack/);
   assert.match(route, /operationsAction = \[[^\]]*"match-finalize"[^\]]*"match-reopen"/);
   assert.match(writes, /scoringUnlocked: truthy\(record\["Access Active"\]\) && !accessExpired\(record\) && !\/\^Final\$\/i\.test/);
+  assert.match(writes, /Only a Scheduled match can be marked Live\. Use Reopen Match for a Final result\./);
 });
 
 test("match status and scoring access remain separate authoritative capabilities", () => {

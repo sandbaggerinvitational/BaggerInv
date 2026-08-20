@@ -3,7 +3,7 @@ import { after, NextResponse } from "next/server";
 import { getTournamentData, invalidateTournamentDataCache, tournamentLoaderDiagnostics } from "../../live/sheetData.js";
 import { authorizePreviewDirector } from "../../../lib/preview-director-authorization.js";
 import { directorAutomationDue, tournamentDirectorModel } from "../../../lib/tournament-director.js";
-import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorCourseTees, updateDirectorMatchManagement, updateDirectorNetSkins, updateDirectorRoundPairings, updateLiveMatch, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
+import { currentPushDevice, disableLiveMatchAccess, enableLiveMatchAccess, finalizeLiveMatch, markLiveMatch, readDirectorOperationsData, readNotificationLog, readOddsSnapshots, readTournamentReadiness, reopenLiveMatch, updateDirectorCalcutta, updateDirectorCourseTees, updateDirectorMatchManagement, updateDirectorNetSkins, updateDirectorRoundPairings, updateTournamentAdminData, withWorkbookWriteDiagnostics } from "../../../lib/google-sheets-write.js";
 import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server-read.js";
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../lib/google-sheets-data.js";
 import { previewPushConfiguration } from "../../../lib/web-push-notifications.js";
@@ -137,7 +137,7 @@ function refresh() {
 
 async function setMatchesLiveAndOpenScoring(matches, updatedBy) {
   await Promise.all(matches.filter((match) => match.status !== "Final").map(async (match) => {
-    await updateLiveMatch(match.id, { "Match Status": "Live" }, updatedBy);
+    if (!/^(Live|Reopened)$/i.test(match.status)) await markLiveMatch(match.id, updatedBy);
     await enableLiveMatchAccess(match.id, updatedBy);
   }));
 }
@@ -251,7 +251,7 @@ export async function POST(request) {
       await disableLiveMatchAccess(input.matchId, updatedBy);
     } else if (input.action === "match-mark-live") {
       if (!selectedMatch || selectedMatch.status === "Final") throw new Error("Reopen this Final match before marking it Live.");
-      await updateLiveMatch(input.matchId, { "Match Status": "Live" }, updatedBy);
+      await markLiveMatch(input.matchId, updatedBy);
     } else if (input.action === "match-finalize") {
       if (!selectedMatch) throw new Error("The selected match could not be found.");
       if (selectedMatch.status === "Final") throw new Error("This match is already Final.");

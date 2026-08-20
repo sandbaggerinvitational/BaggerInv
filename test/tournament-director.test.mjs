@@ -174,7 +174,7 @@ test("Director API requires canonical account Director authorization and uses au
   assert.match(route, /authorization\.status !== "active"/);
   assert.match(route, /status: 403/);
   assert.match(route, /status: 503/);
-  assert.match(route, /updateLiveMatch/);
+  assert.match(route, /markLiveMatch/);
   assert.match(route, /reopenLiveMatch/);
   assert.match(route, /updateTournamentAdminData/);
   assert.match(route, /directorAutomationDue/);
