@@ -33,6 +33,32 @@ function tournamentStatus(rounds = []) {
   return "Upcoming";
 }
 
+function guideLifecycle(liveView = {}, canonicalLive = null, fallbackRounds = []) {
+  const presentation = liveView?.tournament_presentation?.presentation || {};
+  const tournamentPresentation = presentation.tournament || {};
+  const status = String(tournamentPresentation.status || canonicalLive?.tournament?.status || "Upcoming").trim();
+  const currentRound = number(tournamentPresentation.currentRound || canonicalLive?.tournament?.currentRound, 0);
+  const final = /^(?:final|complete|completed)$/i.test(status);
+  const live = /^(?:live|active|in progress|in-progress)$/i.test(status);
+  const rounds = (canonicalLive?.rounds || fallbackRounds).map((round) => ({
+    ...round,
+    status: final ? "Complete"
+      : live && currentRound && number(round.number) < currentRound ? "Complete"
+      : live && number(round.number) === currentRound ? "Live"
+      : "Upcoming",
+  }));
+  const timeline = presentation.timeline || {};
+  return {
+    rounds,
+    tournament: canonicalLive?.tournament ? {
+      ...canonicalLive.tournament,
+      status,
+      ...(currentRound ? { currentRound } : {}),
+    } : null,
+    previewNow: timeline.previewDateActive === true ? timeline.effectiveNow || "" : "",
+  };
+}
+
 export function contentFromSupabase(payload = {}, liveView = null) {
   const data = payload.data || {};
   const stored = guideParticipantProjection({ payload }).content;
@@ -47,8 +73,9 @@ export function contentFromSupabase(payload = {}, liveView = null) {
     status: tournamentStatus(fallbackRounds),
   };
   const canonicalLive = liveView ? tournamentLiveDataFromSupabaseView(liveView.data || liveView) : null;
-  const rounds = canonicalLive?.rounds || fallbackRounds;
-  const liveTournament = canonicalLive?.tournament || fallbackTournament;
+  const lifecycle = guideLifecycle(liveView?.data || liveView || {}, canonicalLive, fallbackRounds);
+  const rounds = lifecycle.rounds;
+  const liveTournament = lifecycle.tournament || fallbackTournament;
   const timeline = timelineFromGuideProjection(stored, {
     tournament: liveTournament,
     rounds,
@@ -60,7 +87,7 @@ export function contentFromSupabase(payload = {}, liveView = null) {
     tournamentIdentity: stored.tournamentIdentity || liveTournament,
     liveTournament,
     liveRounds: rounds,
-    timelineNow: timeline.effectiveNow || new Date().toISOString(),
+    timelineNow: lifecycle.previewNow || timeline.effectiveNow || new Date().toISOString(),
     overview: stored.overview || [],
     schedule: stored.schedule || [],
     courses: stored.courses || [],

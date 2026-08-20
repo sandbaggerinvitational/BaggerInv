@@ -31,10 +31,13 @@ const liveView = {
   })),
   tournament_presentation: {
     source_fingerprint: "a".repeat(64),
-    presentation: { tournament: { status: "Live", statusMode: "Automatic", currentRound: 3, timeZone: "America/New_York" } },
+    presentation: {
+      tournament: { status: "LIVE", statusMode: "Automatic", currentRound: 3, timeZone: "America/New_York" },
+      timeline: { previewDateActive: true, effectiveNow: "2026-09-26T16:00:00.000Z" },
+    },
   },
   live_revision: { totalMatchRevisions: 3 },
-  matches: [liveEntry(1, "FINAL"), liveEntry(2, "FINAL"), liveEntry(3, "LIVE")],
+  matches: [liveEntry(1, "LIVE"), liveEntry(2, "LIVE"), liveEntry(3, "LIVE")],
 };
 
 const guidePayload = {
@@ -61,6 +64,7 @@ test("website Guide combines the immutable Guide revision with canonical live ro
   const content = contentFromSupabase(guidePayload, liveView);
   assert.deepEqual(content.liveRounds.map((round) => round.status), ["Complete", "Complete", "Live"]);
   assert.equal(content.liveTournament.status, "LIVE");
+  assert.equal(content.timelineNow, "2026-09-26T16:00:00.000Z");
   assert.equal(content.projection.revision, 14);
   assert.equal(content.projection.googleRequests, 0);
 });
