@@ -29,15 +29,13 @@ function RoundPerformance({ rounds, summary, year }) {
   if (!rounds?.length) return null;
   return <section className={`${styles.card} ${styles.performance}`} aria-labelledby="round-performance-title">
     <div className={styles.sectionHeading}><span>{year ? `${year} Tournament` : "Current Tournament"}</span><h2 id="round-performance-title">Performance by Round</h2></div>
-    {summary ? <div className={styles.tournamentSummary} aria-label="Current tournament summary">
-      <span><b>{formatPlayerPoints(summary.points)}</b><small>Tournament Points</small></span>
-      {summary.individualRankLabel ? <span><b>{summary.individualRankLabel}</b><small>Individual Rank</small></span> : null}
-      {summary.teamStandingLabel ? <span><b>{summary.teamStandingLabel}</b><small>Team Standing</small></span> : null}
+    {summary?.teamStandingLabel ? <div className={styles.tournamentSummary} aria-label="Current tournament team standing">
+      <small>Team Standing</small><b>{summary.teamStandingLabel}</b>
     </div> : null}
     <div className={styles.performanceList}>{rounds.map((round) => {
       const available = round.gross !== null || round.net !== null || round.roundRankLabel || round.points !== null;
       return <article key={round.round} data-upcoming={available ? undefined : "true"}>
-        <header><strong>Round {round.round}{round.format ? ` • ${round.format}` : ""}</strong><span>{round.status === "Live" && round.holes ? `Live · Thru ${round.holes}` : round.status}</span></header>
+        <header><strong>Round {round.round}{round.format ? ` • ${round.format}` : ""}</strong><span>{round.status === "Live" && round.thru ? `Live · Thru ${round.thru}` : round.status}</span></header>
         {available ? <div className={styles.performanceMetrics}>
           {round.gross !== null ? <div><b>{round.gross}</b><small>{round.grossLabel}</small></div> : null}
           {round.net !== null ? <div><b>{round.net}</b><small>{round.netLabel}</small></div> : null}

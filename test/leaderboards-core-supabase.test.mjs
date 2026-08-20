@@ -217,6 +217,23 @@ test("versioned match presentation preserves legacy full-handicap player stats w
   assert.ok(data.slotVerification.leaderboardStrokeCells > 0);
 });
 
+test("Player lifecycle projection stays canonical when imported match presentation is stale", () => {
+  const view = fixture();
+  view.tournament_presentation.presentation.tournamentMatchDisplay = {
+    "2026-R2-1": { currentHole: 18, archiveFinal: true },
+  };
+  const data = leaderboardsCoreDataFromSupabaseView(view, { includeCurrentMatchLifecycle: true });
+  const displayed = data.rounds.flatMap((round) => round.matches).find((match) => match.id === "2026-R2-1");
+  const current = data.currentMatchLifecycle.flatMap((round) => round.matches).find((match) => match.id === "2026-R2-1");
+  assert.equal(displayed.archiveFinal, true);
+  assert.equal(displayed.currentHole, 18);
+  assert.equal(current.status, "Live");
+  assert.equal(current.scoringEnabled, true);
+  assert.equal(current.scoringLocked, false);
+  assert.equal(current.currentHole, 7);
+  assert.deepEqual(current.playerIds, ["P5", "P6", "P7", "P8"]);
+});
+
 test("Preview page and API use Supabase core with no Google fallback or Passport-named identity request", async () => {
   const [page, route, dashboard, loader, director] = await Promise.all([
     source("app/live/page.js"), source("app/api/leaderboards/core/route.js"),

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { competitionRankLabel, playerRoundPerformance, playerTournamentPerformance } from "../lib/player-round-performance.js";
+import { mergeCanonicalPlayerPresentation } from "../lib/player-presentation.js";
 import { roundCompetitionRows } from "../lib/mobile-leaderboards.js";
 
 const source = async (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -24,6 +25,8 @@ test("Me leads with the authenticated golfer and canonical current-tournament pe
   assert.match(profile, /Current tournament performance/);
   assert.match(route, /readLeaderboardsCoreView/);
   assert.match(route, /leaderboardsCoreDataFromSupabaseView/);
+  assert.match(route, /includeCurrentMatchLifecycle: true/);
+  assert.match(route, /mergeCanonicalPlayerPresentation/);
   assert.match(route, /playerTournamentPerformance/);
   assert.match(route, /Promise\.all/);
   assert.match(route, /X-Player-Performance-Source/);
@@ -33,6 +36,9 @@ test("Me leads with the authenticated golfer and canonical current-tournament pe
   assert.match(profile, /\$\{year\} Tournament/);
   assert.doesNotMatch(profile, /2026 Tournament/);
   assert.match(profile, /<small>Position<\/small>/);
+  assert.doesNotMatch(profile, /Tournament Points/);
+  assert.doesNotMatch(profile, /Individual Rank/);
+  assert.match(profile, /Team Standing/);
 });
 
 test("Me omits unavailable scores and renders an honest pending or not-played state", async () => {
@@ -143,9 +149,41 @@ test("tournament summary reuses canonical overall and team standings with ties",
       { round: 2, status: "Final", result: { winner: "Halved" }, team: { name: "Pickles" } }],
   });
   assert.deepEqual(performance.snapshot, { record: { wins: 1, losses: 0, halves: 1 }, points: 2.25, standing: 1 });
-  assert.equal(performance.summary.individualRankLabel, "T-1");
+  assert.equal(Object.hasOwn(performance.summary, "points"), false);
+  assert.equal(Object.hasOwn(performance.summary, "individualRank"), false);
+  assert.equal(Object.hasOwn(performance.summary, "individualRankLabel"), false);
   assert.equal(performance.summary.teamStandingLabel, "1st");
   assert.equal(competitionRankLabel(4, true), "T-4");
+});
+
+test("round status and Thru use canonical current match lifecycle instead of stale final presentation", () => {
+  const tournamentData = tournamentFixture();
+  tournamentData.currentMatchLifecycle = [
+    { round: 1, matches: [{ id: "R1-M1", status: "Scheduled", scoringEnabled: true,
+      scoringLocked: false, currentHole: 18, playerIds: ["p1", "p2", "p3", "p4"] }] },
+    { round: 2, matches: [{ id: "R2-M1", status: "Live", scoringEnabled: true,
+      scoringLocked: false, currentHole: 7, playerIds: ["p1", "p2", "p3", "p4"] }] },
+    { round: 3, matches: [{ id: "R3-M1", status: "Upcoming", scoringEnabled: false,
+      scoringLocked: false, currentHole: 0, playerIds: ["p1", "p2"] }] },
+  ];
+  const rows = playerRoundPerformance(tournamentData, { player: { id: "p1" } });
+  assert.equal(rows[0].status, "Open");
+  assert.equal(rows[0].points, null);
+  assert.equal(rows[1].status, "Live");
+  assert.equal(rows[1].thru, 7);
+  assert.equal(rows[1].points, null);
+  assert.equal(rows[2].status, "Pending");
+});
+
+test("Player hero merges the canonical shared player-photo presentation and preserves initials fallback", () => {
+  const canonical = [
+    { id: "clay", slug: "clay-beltran", photo: "clay-beltran-pic" },
+    { id: "other", slug: "other-player", photo: "other-player-pic" },
+    { id: "fallback", slug: "fallback-player", photo: "" },
+  ];
+  assert.equal(mergeCanonicalPlayerPresentation({ id: "clay", name: "Clay Beltran" }, canonical).photo, "clay-beltran-pic");
+  assert.equal(mergeCanonicalPlayerPresentation({ id: "other", name: "Other Player" }, canonical).photo, "other-player-pic");
+  assert.equal(mergeCanonicalPlayerPresentation({ id: "fallback", name: "Fallback Player" }, canonical).photo, "");
 });
 
 test("no-play and partial-play rows never manufacture zero scores", () => {
@@ -161,11 +199,13 @@ test("no-play and partial-play rows never manufacture zero scores", () => {
   const partial = tournamentFixture();
   partial.rounds.find((round) => round.number === 2).status = "Live";
   partial.rounds.find((round) => round.number === 2).matches[0].status = "Live";
+  partial.rounds.find((round) => round.number === 2).matches[0].currentHole = 7;
   partial.rounds.find((round) => round.number === 2).matches[0].archiveFinal = false;
   partial.scoreLeaderboard.find((row) => row.id === "pair").holes = 7;
   const live = playerRoundPerformance(partial, { player: { id: "p1" }, matches: [{ round: 2, status: "Live" }] });
   assert.equal(live[1].status, "Live");
   assert.equal(live[1].holes, 7);
+  assert.equal(live[1].thru, 7);
   assert.equal(live[1].points, null);
 });
 

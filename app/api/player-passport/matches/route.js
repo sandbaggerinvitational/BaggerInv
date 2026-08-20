@@ -12,6 +12,7 @@ import { requireParticipantIdentityAuthority } from "../../../../lib/participant
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { myMatchDataFromSupabaseView, readMyMatchView } from "../../../../lib/my-match-supabase.js";
 import { leaderboardsCoreDataFromSupabaseView, readLeaderboardsCoreView } from "../../../../lib/leaderboards-core-supabase.js";
+import { mergeCanonicalPlayerPresentation } from "../../../../lib/player-presentation.js";
 
 export const dynamic = "force-dynamic";
 
@@ -53,8 +54,11 @@ export async function GET(request) {
       let playerPerformanceSource = "unavailable";
       try {
         if (!leaderboardsRead.payload?.ok) throw leaderboardsRead.error || new Error("Leaderboards core state is unavailable.");
-        const tournamentData = leaderboardsCoreDataFromSupabaseView(leaderboardsRead.payload.data);
+        const tournamentData = leaderboardsCoreDataFromSupabaseView(leaderboardsRead.payload.data, {
+          includeCurrentMatchLifecycle: true,
+        });
         if (!tournamentData.slotVerification.pass) throw new Error("Canonical player-slot attribution did not validate.");
+        data.player = mergeCanonicalPlayerPresentation(data.player, tournamentData.players);
         const performance = playerTournamentPerformance(tournamentData, data);
         data.snapshot = performance.snapshot;
         data.tournamentSummary = performance.summary;
