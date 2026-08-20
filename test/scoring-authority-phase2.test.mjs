@@ -330,6 +330,57 @@ test("Reopen outbox restores versioned Google access and verifies the inverse li
   assert.deepEqual(reopenCall.updates, { "Scoring Locked": false, "Access Active": true, "Access Version": 3 });
 });
 
+test("Reopen outbox normalizes a legacy mutable-Live plus active-Final Google mirror", async () => {
+  let reads = 0;
+  let normalization;
+  const event = { id: "00000000-0000-0000-0000-000000000007", event_type: "MATCH_REOPENED", match_id: "M1",
+    match_revision: 21, mutation_key: "legacy-reopen-M1", attempts: 2, payload: { permission_revision: 3 } };
+  const reopenedLive = { "Match ID": "M1", "Match Status": "Reopened", "Scoring Locked": false,
+    "Access Active": true, "Access Version": 3, "Updated At": "2026-08-11T12:02:00.000Z" };
+  const result = await processNextGoogleOutboxEvent({ dependencies: {
+    claimGoogleOutbox: async () => ({ payload: { event, checkpoint: { last_supabase_match_revision: 20 } } }),
+    reopenLiveMatch: async () => { throw new Error("Only a finalized match can be reopened."); },
+    normalizeLegacyReopenedMatch: async (matchId, input, actor) => {
+      normalization = { matchId, input, actor };
+      return { match: reopenedLive, archive: reopenedSummary, holeScoresPreserved: true };
+    },
+    readWorkbookSheetsByName: async () => {
+      reads += 1;
+      return reads === 1
+        ? { "Live Matches": sheet([{ ...reopenedLive, "Match Status": "Live", "Access Version": 2,
+          "Updated At": "2026-08-11T12:01:00.000Z" }]), Matches: sheet([finalizedSummary]) }
+        : { "Live Matches": sheet([reopenedLive]), Matches: sheet([reopenedSummary]) };
+    },
+    measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
+    completeGoogleOutbox: async () => ({ payload: { ok: true, checkpoint: { last_supabase_match_revision: 21 } } }),
+    failGoogleOutbox: async () => { throw new Error("should not fail"); },
+  } });
+  assert.equal(result.ok, true);
+  assert.equal(normalization.matchId, "M1");
+  assert.equal(normalization.input.confirmIntent, true);
+  assert.equal(normalization.input.permissionRevision, 3);
+  assert.equal(normalization.input.expectedArchiveFinalizedAt, finalizedSummary["Finalized At"]);
+});
+
+test("Reopen outbox is idempotent after Google succeeded but checkpoint completion did not", async () => {
+  let completed = 0;
+  const event = { id: "00000000-0000-0000-0000-000000000008", event_type: "MATCH_REOPENED", match_id: "M1",
+    match_revision: 21, mutation_key: "retry-reopen-M1", attempts: 3, payload: { permission_revision: 3 } };
+  const result = await processNextGoogleOutboxEvent({ dependencies: {
+    claimGoogleOutbox: async () => ({ payload: { event, checkpoint: { last_supabase_match_revision: 20 } } }),
+    reopenLiveMatch: async () => { throw new Error("Only a finalized match can be reopened."); },
+    normalizeLegacyReopenedMatch: async () => { throw new Error("already-delivered retry must not write Google"); },
+    readWorkbookSheetsByName: async () => ({ "Live Matches": sheet([{ "Match ID": "M1", "Match Status": "Reopened",
+      "Scoring Locked": false, "Access Active": true, "Access Version": 3, "Updated At": "2026-08-11T12:01:00.000Z" }]),
+      Matches: sheet([reopenedSummary]) }),
+    measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
+    completeGoogleOutbox: async () => { completed += 1; return { payload: { ok: true, checkpoint: { last_supabase_match_revision: 21 } } }; },
+    failGoogleOutbox: async () => { throw new Error("should not fail"); },
+  } });
+  assert.equal(result.ok, true);
+  assert.equal(completed, 1);
+});
+
 test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cutover, and rollback guards", async () => {
   const schema = await readFile(new URL("../supabase/migrations/202608120001_preview_scoring_authority_schema.sql", import.meta.url), "utf8");
   const transactions = await readFile(new URL("../supabase/migrations/202608120002_preview_scoring_authority_transactions.sql", import.meta.url), "utf8");
@@ -342,6 +393,7 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   const finalizationPermissions = await readFile(new URL("../supabase/migrations/202608120010_preview_scoring_authority_finalization_permissions.sql", import.meta.url), "utf8");
   const scoringLockedBackfill = await readFile(new URL("../supabase/migrations/202608120011_preview_live_matches_scoring_locked_backfill.sql", import.meta.url), "utf8");
   const legacyReopen = await readFile(new URL("../supabase/migrations/202608200001_preview_legacy_reopen_normalization.sql", import.meta.url), "utf8");
+  const mirrorOperations = await readFile(new URL("../supabase/migrations/202608200002_preview_scoring_mirror_operations.sql", import.meta.url), "utf8");
   for (const table of ["tournaments", "tournament_players", "scoring_snapshots", "matches", "match_participants", "scoring_permissions", "match_holes", "hole_scores", "score_mutations", "score_revision_history", "audit_events", "google_outbox_events", "google_match_checkpoints", "authority_epochs", "ingress_gates"]) {
     assert.match(schema, new RegExp(`create table scoring_authority\\.${table}`));
   }
@@ -406,6 +458,28 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.match(legacyReopen, /invalidate_finalized_scorecard_snapshot/i);
   assert.doesNotMatch(legacyReopen, /insert into scoring_authority\.google_outbox_events/i);
   assert.match(legacyReopen, /revoke all on function public\.normalize_preview_legacy_reopen\(jsonb\) from public, anon, authenticated/i);
+  assert.match(mirrorOperations, /inspect_preview_scoring_mirror_operations/i);
+  assert.match(mirrorOperations, /claim_preview_google_outbox_event/i);
+  assert.match(mirrorOperations, /last_attempt_at/i);
+  assert.match(mirrorOperations, /event_row\.match_revision <> checkpoint_row\.last_supabase_match_revision \+ 1/i);
+  assert.match(mirrorOperations, /DIRECTOR_PREVIEW_REQUIRED/i);
+  assert.match(mirrorOperations, /revoke all on function %s from public, anon, authenticated/i);
+});
+
+test("Director mirror reconciliation inspects and delivers exactly one confirmed reopen event", async () => {
+  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
+  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
+  const worker = await readFile(new URL("../lib/scoring-google-outbox.js", import.meta.url), "utf8");
+  assert.match(route, /action === "mirror-diagnostics"/);
+  assert.match(route, /action === "deliver-mirror-event"/);
+  assert.match(route, /confirmDelivery !== true/);
+  assert.match(route, /healthyCommittedSupabaseEpoch/);
+  assert.match(route, /expectedEventId: eventId/);
+  assert.match(dashboard, /Inspect Mirror Outbox/);
+  assert.match(dashboard, /Deliver Selected Mirror Event/);
+  assert.match(worker, /LEGACY_REOPEN_CONFLICT/);
+  assert.match(worker, /ALREADY_DELIVERED/);
+  assert.match(worker, /normalizeLegacyReopenedMatch/);
 });
 
 test("Preview Live Matches migration inserts exactly one canonical column and verifies preservation", async () => {

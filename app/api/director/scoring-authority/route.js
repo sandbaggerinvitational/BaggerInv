@@ -13,6 +13,7 @@ import {
   completeCanonicalFinalizationParityRepair,
   completeScoringIngress,
   inspectCanonicalAuthoritySecurity,
+  inspectScoringMirrorOperations,
   normalizeCanonicalLegacyReopen,
   prepareAuthorityEpoch,
   readCanonicalScoringAuthority,
@@ -1391,6 +1392,105 @@ async function normalizeLegacyReopen(actorId, input = {}) {
   }
 }
 
+async function scoringMirrorOperations(actorId) {
+  const authority = scoringAuthorityEnvironment();
+  const inspected = await inspectScoringMirrorOperations({ tournament_id: "2026" });
+  const operations = inspected.payload || {};
+  if (!operations.ok) {
+    throw Object.assign(new Error(`Scoring mirror diagnostics failed (${operations.code || "unknown"}).`), { code: operations.code });
+  }
+  const events = operations.events || [];
+  const matchIds = new Set(events.map((event) => clean(event.match_id)).filter(Boolean));
+  const sheets = matchIds.size
+    ? await readWorkbookSheetsByName(["Live Matches", "Matches", "Live Hole Scores"], { fresh: true })
+    : {};
+  const rows = (tab) => (sheets[tab]?.records || []).map(({ record }) => record);
+  const google = events.map((event) => {
+    const matchId = clean(event.match_id);
+    const live = rows("Live Matches").find((row) => clean(row["Match ID"]) === matchId) || {};
+    const archive = rows("Matches").find((row) => clean(row["Match ID"]) === matchId) || {};
+    const holes = rows("Live Hole Scores").filter((row) => clean(row["Match ID"]) === matchId);
+    return {
+      eventId: event.id,
+      matchId,
+      live: {
+        status: clean(live["Match Status"]),
+        scoringLocked: truthy(live["Scoring Locked"]),
+        accessActive: truthy(live["Access Active"]),
+        accessVersion: number(live["Access Version"]),
+        updatedAt: clean(live["Updated At"]),
+        finalizedAt: clean(live["Finalized At"]),
+      },
+      archive: {
+        status: clean(archive["Match Status"]),
+        completedAt: clean(archive["Completed At"]),
+        finalizedAt: clean(archive["Finalized At"]),
+        finalizedBy: clean(archive["Finalized By"]),
+        officialResultActive: !archiveResultIsInactive(archive),
+      },
+      holes: {
+        count: holes.length,
+        fingerprint: canonicalAuthorityFingerprint(holes),
+      },
+    };
+  });
+  const epoch = operations.active_epoch || {};
+  const ingress = operations.ingress || {};
+  return {
+    actorId,
+    runtime: {
+      configuredAuthority: authority.requested,
+      resolvedAuthority: authority.resolved,
+      tournamentReadSource: clean(process.env.TOURNAMENT_READ_SOURCE || "google").toLowerCase(),
+      tournamentFoundationReadSource: clean(process.env.TOURNAMENT_FOUNDATION_READ_SOURCE || "google").toLowerCase(),
+      vercelEnvironment: clean(process.env.VERCEL_ENV),
+      deploymentCommit: clean(process.env.VERCEL_GIT_COMMIT_SHA),
+    },
+    operations,
+    google,
+    healthyCommittedSupabaseEpoch: upper(epoch.status) === "COMMITTED"
+      && upper(epoch.authority_after) === "SUPABASE"
+      && upper(ingress.authority) === "SUPABASE"
+      && upper(ingress.state) === "OPEN"
+      && clean(ingress.active_epoch_id) === clean(epoch.epoch_id)
+      && number(ingress.unresolved_client_queues) === 0,
+  };
+}
+
+async function deliverScoringMirrorEvent(actorId, input = {}) {
+  const eventId = clean(input.eventId);
+  const expectedMatchId = clean(input.matchId);
+  if (!eventId || !expectedMatchId || input.confirmDelivery !== true) {
+    throw Object.assign(new Error("An inspected event, expected match, and explicit Director confirmation are required."), { code: "MIRROR_DELIVERY_CONFIRMATION_REQUIRED" });
+  }
+  const before = await scoringMirrorOperations(actorId);
+  const event = (before.operations.events || []).find((item) => clean(item.id) === eventId);
+  if (!event || clean(event.match_id) !== expectedMatchId) {
+    throw Object.assign(new Error("The selected mirror event no longer matches the inspected event."), { code: "MIRROR_EVENT_CHANGED" });
+  }
+  if (before.runtime.resolvedAuthority !== "supabase" || !before.healthyCommittedSupabaseEpoch) {
+    throw Object.assign(new Error("A healthy committed Supabase authority epoch is required for mirror delivery."), { code: "SUPABASE_EPOCH_NOT_HEALTHY" });
+  }
+  if (upper(event.event_type) !== "MATCH_REOPENED") {
+    throw Object.assign(new Error("This controlled operation only delivers an inspected match-reopened event."), { code: "REOPEN_MIRROR_EVENT_REQUIRED" });
+  }
+  if (event.claimable !== true) {
+    throw Object.assign(new Error("The selected event is not currently claimable in checkpoint order."), { code: "MIRROR_EVENT_NOT_CLAIMABLE" });
+  }
+  const delivery = await processNextGoogleOutboxEvent({
+    expectedEventId: eventId,
+    actor: `Supabase reopen mirror reconciliation · ${actorId}`,
+  });
+  if (!delivery.ok || clean(delivery.eventId) !== eventId || clean(delivery.matchId) !== expectedMatchId) {
+    throw Object.assign(new Error(`Google mirror delivery failed at ${delivery.errorStage || "unknown"} (${delivery.errorCode || "unknown"}).`), {
+      code: delivery.errorCode || "MIRROR_DELIVERY_FAILED",
+      shadowDiagnostics: { details: JSON.stringify(delivery) },
+    });
+  }
+  const after = await scoringMirrorOperations(actorId);
+  return { before, delivery, after };
+}
+
 async function repairFinalizationParity(actorId, matchIdValue) {
   const matchId = clean(matchIdValue);
   if (!matchId) throw Object.assign(new Error("A finalized match is required."), { code: "MATCH_REQUIRED" });
@@ -1747,6 +1847,10 @@ export async function POST(request) {
         supabaseReadMs: reconciled.readMs, reconciliation: reconciled.report };
     } else if (action === "normalize-legacy-reopen") {
       result = await normalizeLegacyReopen(actorId, input);
+    } else if (action === "mirror-diagnostics") {
+      result = await scoringMirrorOperations(actorId);
+    } else if (action === "deliver-mirror-event") {
+      result = await deliverScoringMirrorEvent(actorId, input);
     } else if (action === "repair-finalization-parity") {
       result = await repairFinalizationParity(actorId, input.matchId);
     } else if (action === "migrate-preview-scoring-lock-schema") {
