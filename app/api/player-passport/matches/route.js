@@ -5,14 +5,14 @@ import { MATCH_ACCESS_ACTIONS, authorizeMatchAccess } from "../../../../lib/matc
 import { requireMatchAuthorizationSource } from "../../../../lib/match-authorization-source.js";
 import { createScoringSession, scoringSessionCookie } from "../../../../lib/scoring-access.js";
 import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
-import { playerTournamentPerformance } from "../../../../lib/player-round-performance.js";
+import { playerRoundPerformance, playerTournamentPerformance, playerTournamentSummary } from "../../../../lib/player-round-performance.js";
 import { initializeParticipantTournament } from "../../../../lib/participant-initialization.js";
 import { withNormalizedReadDiagnostics } from "../../../../lib/google-sheets-server-read.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { myMatchDataFromSupabaseView, readMyMatchView } from "../../../../lib/my-match-supabase.js";
 import { leaderboardsCoreDataFromSupabaseView, readLeaderboardsCoreView } from "../../../../lib/leaderboards-core-supabase.js";
-import { mergeCanonicalPlayerPresentation } from "../../../../lib/player-presentation.js";
+import { playerProfileFromLeaderboardsCore } from "../../../../lib/player-presentation.js";
 
 export const dynamic = "force-dynamic";
 
@@ -32,8 +32,39 @@ async function participant(request) {
     scorerName: "", previewMode: false };
 }
 
+const duration = (value) => Number.isFinite(Number(value)) ? Number(value) : 0;
+
+function participantReadHeaders(identity, timings = {}, extra = {}) {
+  const sessionMs = duration(identity?.resolved?.timings?.sessionVerificationMs);
+  const contextMs = duration(identity?.resolved?.timings?.participantContextMs || identity?.resolved?.timings?.impersonationLeaseMs);
+  const values = [
+    ["session", sessionMs],
+    ["identity-context", contextMs],
+    ["identity", timings.identityMs],
+    ["my-match", timings.myMatchMs],
+    ["leaderboards-core", timings.leaderboardsCoreMs],
+    ["postgres", timings.postgresMs],
+    ["core-adaptation", timings.coreAdaptationMs],
+    ["portrait-profile", timings.portraitMs],
+    ["tournament-summary", timings.summaryMs],
+    ["round-performance", timings.roundPerformanceMs],
+    ["total", timings.totalMs],
+  ].filter(([, value]) => duration(value) > 0);
+  return {
+    "Cache-Control": "private, no-store",
+    Vary: "Cookie",
+    "X-Participant-Identity-Authority": identity?.authority?.resolved || "passport",
+    "X-Participant-Identity-Google-Requests": identity?.authority?.resolved === "supabase" ? "0" : "",
+    "Server-Timing": values.map(([name, value]) => `${name};dur=${duration(value).toFixed(1)}`).join(", "),
+    ...extra,
+  };
+}
+
 export async function GET(request) {
+  const startedAt = performance.now();
+  const profileView = new URL(request.url).searchParams.get("view") === "player";
   let identity;
+  const identityStartedAt = performance.now();
   try {
     identity = await participant(request);
   } catch (error) {
@@ -43,37 +74,78 @@ export async function GET(request) {
     }
     return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });
   }
+  const identityMs = performance.now() - identityStartedAt;
   try {
     if (identity.authority.resolved === "supabase") {
-      const [read, leaderboardsRead] = await Promise.all([
-        readMyMatchView({ tournamentId: identity.tournamentId, playerId: identity.playerId }),
-        readLeaderboardsCoreView(identity.tournamentId).catch((error) => ({ error })),
-      ]);
-      if (!read.payload?.ok) throw Object.assign(new Error("Participant match context is unavailable."), { code: read.payload?.code });
-      const data = myMatchDataFromSupabaseView(read.payload.data);
-      let playerPerformanceSource = "unavailable";
-      try {
-        if (!leaderboardsRead.payload?.ok) throw leaderboardsRead.error || new Error("Leaderboards core state is unavailable.");
-        const tournamentData = leaderboardsCoreDataFromSupabaseView(leaderboardsRead.payload.data, {
-          includeCurrentMatchLifecycle: true,
-        });
-        if (!tournamentData.slotVerification.pass) throw new Error("Canonical player-slot attribution did not validate.");
-        data.player = mergeCanonicalPlayerPresentation(data.player, tournamentData.players);
-        const performance = playerTournamentPerformance(tournamentData, data);
-        data.snapshot = performance.snapshot;
-        data.tournamentSummary = performance.summary;
-        data.roundPerformance = performance.rounds;
-        playerPerformanceSource = "supabase-leaderboards-core";
-      } catch (error) {
-        console.warn("Player tournament performance temporarily unavailable", {
-          route: "GET /api/player-passport/matches",
-          source: "supabase-leaderboards-core",
-          reason: error?.message || String(error),
+      if (!profileView) {
+        const myMatchStartedAt = performance.now();
+        const read = await readMyMatchView({ tournamentId: identity.tournamentId, playerId: identity.playerId });
+        const myMatchMs = performance.now() - myMatchStartedAt;
+        if (!read.payload?.ok) throw Object.assign(new Error("Participant match context is unavailable."), { code: read.payload?.code });
+        const data = myMatchDataFromSupabaseView(read.payload.data);
+        const totalMs = performance.now() - startedAt;
+        return NextResponse.json({ data }, { headers: participantReadHeaders(identity, {
+          identityMs, myMatchMs, postgresMs: data.queryMs, totalMs,
+        }, { "X-Player-Performance-Source": "not-requested" }) });
+      }
+
+      const coreStartedAt = performance.now();
+      const leaderboardsRead = await readLeaderboardsCoreView(identity.tournamentId);
+      const leaderboardsCoreMs = performance.now() - coreStartedAt;
+      if (!leaderboardsRead.payload?.ok) {
+        throw Object.assign(new Error("Leaderboards core state is unavailable."), { code: leaderboardsRead.payload?.code });
+      }
+      const adaptationStartedAt = performance.now();
+      const tournamentData = leaderboardsCoreDataFromSupabaseView(leaderboardsRead.payload.data, {
+        includeCurrentMatchLifecycle: true,
+      });
+      const coreAdaptationMs = performance.now() - adaptationStartedAt;
+      if (!tournamentData.slotVerification.pass) {
+        throw Object.assign(new Error("Canonical player-slot attribution did not validate."), {
+          code: "LEADERBOARDS_PLAYER_SLOT_DIVERGENCE",
         });
       }
-      return NextResponse.json({ data }, { headers: { "Cache-Control": "private, no-store",
-        "X-Participant-Identity-Authority": "supabase", "X-Participant-Identity-Google-Requests": "0",
-        "X-Player-Performance-Source": playerPerformanceSource } });
+      const portraitStartedAt = performance.now();
+      const data = playerProfileFromLeaderboardsCore(tournamentData, identity);
+      const portraitMs = performance.now() - portraitStartedAt;
+      const summaryStartedAt = performance.now();
+      const summary = playerTournamentSummary(tournamentData, data);
+      const summaryMs = performance.now() - summaryStartedAt;
+      const roundsStartedAt = performance.now();
+      const rounds = playerRoundPerformance(tournamentData, data);
+      const roundPerformanceMs = performance.now() - roundsStartedAt;
+      data.snapshot = summary.snapshot;
+      data.tournamentSummary = summary.summary;
+      data.roundPerformance = rounds;
+      const totalMs = performance.now() - startedAt;
+      const timings = {
+        identityMs,
+        leaderboardsCoreMs,
+        postgresMs: tournamentData.queryMs,
+        coreAdaptationMs,
+        portraitMs,
+        summaryMs,
+        roundPerformanceMs,
+        totalMs,
+      };
+      console.info("Player profile performance", {
+        source: "supabase-leaderboards-core",
+        playerId: identity.playerId,
+        ...timings,
+        supabaseServiceMs: duration(leaderboardsRead.durationMs),
+        standingsCalculationMs: duration(tournamentData.calculationMs),
+        clientRequests: 1,
+        googleRequests: 0,
+      });
+      return NextResponse.json({
+        active: true,
+        identityAuthority: "supabase",
+        previewMode: identity.previewMode,
+        data,
+      }, { headers: participantReadHeaders(identity, timings, {
+        "X-Player-Performance-Source": "supabase-leaderboards-core",
+        "X-Player-Profile-Read-Topology": "identity+leaderboards-core",
+      }) });
     }
     const measured = await withWorkbookWriteDiagnostics("participant-match-initialization", () =>
       withNormalizedReadDiagnostics("GET /api/player-passport/matches", () => initializeParticipantTournament(identity.session))
@@ -93,7 +165,7 @@ export async function GET(request) {
     } catch {
       // Identity and match data remain useful when optional standings are unavailable.
     }
-    return NextResponse.json({ data });
+    return NextResponse.json({ active: true, previewMode: identity.previewMode, data });
   } catch (error) {
     if (/no longer active|not active in this tournament/i.test(String(error?.message || ""))) {
       return NextResponse.json({ error: "Player Passport is not active." }, { status: 401 });

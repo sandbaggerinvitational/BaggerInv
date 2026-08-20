@@ -62,6 +62,7 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
 
   useEffect(() => {
     let current = true;
+    const controller = new AbortController();
     try {
       const saved = JSON.parse(window.localStorage.getItem(preferenceKey) || "null");
       if (saved) setPreferences((current) => ({ ...current, ...saved }));
@@ -71,16 +72,15 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
       if (remembered?.id && remembered?.name) setPlayer(remembered);
     } catch {}
     setLoading(true);
-    fetch("/api/player-passport/session", { cache: "no-store" })
+    fetch("/api/player-passport/matches?view=player", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         if (!current) return;
         if (response.ok) {
-          const identity = await response.json();
-          setPlayer(identity.player);
-          setPreviewMode(Boolean(identity.impersonation?.active));
+          const payload = await response.json();
+          setTournamentData(payload.data);
+          setPlayer(payload.data?.player || null);
+          setPreviewMode(Boolean(payload.previewMode));
           setIdentityState("active");
-          const tournamentResponse = await fetch("/api/player-passport/matches", { cache: "no-store" });
-          if (current && tournamentResponse.ok) setTournamentData((await tournamentResponse.json()).data);
         } else if (response.status === 401) {
           setPlayer(null);
           setIdentityState("inactive");
@@ -88,9 +88,9 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
           setIdentityState("unavailable");
         }
       })
-      .catch(() => { if (current) setIdentityState("unavailable"); })
+      .catch((error) => { if (current && error?.name !== "AbortError") setIdentityState("unavailable"); })
       .finally(() => { if (current) setLoading(false); });
-    return () => { current = false; };
+    return () => { current = false; controller.abort(); };
   }, [attempt]);
 
   const toggle = (id) => {

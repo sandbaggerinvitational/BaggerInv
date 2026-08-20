@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { competitionRankLabel, playerRoundPerformance, playerTournamentPerformance } from "../lib/player-round-performance.js";
-import { mergeCanonicalPlayerPresentation } from "../lib/player-presentation.js";
+import { mergeCanonicalPlayerPresentation, playerProfileFromLeaderboardsCore } from "../lib/player-presentation.js";
 import { roundCompetitionRows } from "../lib/mobile-leaderboards.js";
 
 const source = async (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -26,9 +26,8 @@ test("Me leads with the authenticated golfer and canonical current-tournament pe
   assert.match(route, /readLeaderboardsCoreView/);
   assert.match(route, /leaderboardsCoreDataFromSupabaseView/);
   assert.match(route, /includeCurrentMatchLifecycle: true/);
-  assert.match(route, /mergeCanonicalPlayerPresentation/);
+  assert.match(route, /playerProfileFromLeaderboardsCore/);
   assert.match(route, /playerTournamentPerformance/);
-  assert.match(route, /Promise\.all/);
   assert.match(route, /X-Player-Performance-Source/);
   assert.doesNotMatch(profile, /\/api\/leaderboards\/core/);
   assert.match(write, /tournamentHandicap: playerHandicap/);
@@ -39,6 +38,23 @@ test("Me leads with the authenticated golfer and canonical current-tournament pe
   assert.doesNotMatch(profile, /Tournament Points/);
   assert.doesNotMatch(profile, /Individual Rank/);
   assert.match(profile, /Team Standing/);
+});
+
+test("Player profile removes the session waterfall and requests one purpose-built canonical view", async () => {
+  const [profile, route] = await Promise.all([
+    source("app/me/ParticipantProfile.js"),
+    source("app/api/player-passport/matches/route.js"),
+  ]);
+  assert.match(profile, /fetch\("\/api\/player-passport\/matches\?view=player"/);
+  assert.doesNotMatch(profile, /fetch\("\/api\/player-passport\/session", \{ cache: "no-store"/);
+  assert.match(profile, /new AbortController\(\)/);
+  assert.match(profile, /controller\.abort\(\)/);
+  assert.match(route, /profileView/);
+  assert.match(route, /if \(!profileView\)/);
+  assert.match(route, /X-Player-Profile-Read-Topology/);
+  assert.match(route, /identity\+leaderboards-core/);
+  assert.match(route, /Server-Timing/);
+  assert.match(route, /Player profile performance/);
 });
 
 test("Me omits unavailable scores and renders an honest pending or not-played state", async () => {
@@ -184,6 +200,24 @@ test("Player hero merges the canonical shared player-photo presentation and pres
   assert.equal(mergeCanonicalPlayerPresentation({ id: "clay", name: "Clay Beltran" }, canonical).photo, "clay-beltran-pic");
   assert.equal(mergeCanonicalPlayerPresentation({ id: "other", name: "Other Player" }, canonical).photo, "other-player-pic");
   assert.equal(mergeCanonicalPlayerPresentation({ id: "fallback", name: "Fallback Player" }, canonical).photo, "");
+});
+
+test("Player profile adapts identity, portrait, team, and handicap from the shared Leaderboards core", () => {
+  const profile = playerProfileFromLeaderboardsCore({
+    tournament: {
+      id: "SBI-2026", year: 2026, teamOne: { name: "Pickles", logo: "pickles-logo" },
+      teamTwo: { name: "Rippers", logo: "rippers-logo" },
+    },
+    players: [{
+      id: "clay", name: "Clay Beltran", slug: "clay-beltran", photo: "clay-beltran-pic",
+      teamSide: 1, tournamentHandicap: 8.4,
+    }],
+  }, { playerId: "clay", scorerName: "Clay Beltran" });
+  assert.deepEqual(profile.player, {
+    id: "clay", name: "Clay Beltran", slug: "clay-beltran", photo: "clay-beltran-pic",
+    teamName: "Pickles", teamLogo: "pickles-logo", tournamentHandicap: 8.4,
+  });
+  assert.equal(profile.tournament.id, "SBI-2026");
 });
 
 test("no-play and partial-play rows never manufacture zero scores", () => {
