@@ -13,6 +13,7 @@ import { mobileTournamentDashboardEnabled } from "../lib/spreadsheet-environment
 import MobileTournamentHome from "./MobileTournamentHome";
 import StatusBadge from "./StatusBadge";
 import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
+import { applyTournamentFoundationToLiveData, readTournamentFoundation } from "../lib/tournament-foundation";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -43,27 +44,35 @@ export default async function Home() {
     console.error("Homepage live tournament details could not be loaded.", error);
   }
 
-  const liveTournament = liveData?.tournament || {};
-  const year = Number(liveTournament.year) || currentTournament.year;
+  const foundationRead = await readTournamentFoundation({
+    googleData: liveData,
+    googleLoadAttempted: true,
+    googleFallbackTournament: currentTournament,
+  });
+  const foundation = foundationRead.data;
+  const presentationLiveData = applyTournamentFoundationToLiveData(liveData, foundation);
+  const liveTournament = presentationLiveData?.tournament || foundation.tournament || {};
+  const year = Number(foundation.tournament?.year || liveTournament.year) || currentTournament.year;
   const destination =
-    clean(liveTournament.location || currentTournament.Destination) ||
+    clean(foundation.tournament?.location || liveTournament.location || currentTournament.Destination) ||
     "Tournament destination";
   const firstCourse = currentTournament.courses?.[0] || {};
   const state = clean(firstCourse.State);
   const location = state ? `${destination}, ${state}` : destination;
-  const dates = clean(liveTournament.dates || currentTournament.Dates);
-  const roundCount = currentTournament.courses?.length || 0;
+  const dates = clean(foundation.tournament?.dates || liveTournament.dates || currentTournament.Dates);
+  const roundCount = foundation.rounds?.length || currentTournament.courses?.length || 0;
+  const foundationTeamOne = foundation.teams?.find((team) => Number(team.side) === 1) || {};
+  const foundationTeamTwo = foundation.teams?.find((team) => Number(team.side) === 2) || {};
   const teamOneName =
-    clean(liveTournament.teamOne?.name || currentTournament.team1?.name) ||
+    clean(foundationTeamOne.name || liveTournament.teamOne?.name || currentTournament.team1?.name) ||
     "Team One";
   const teamTwoName =
-    clean(liveTournament.teamTwo?.name || currentTournament.team2?.name) ||
+    clean(foundationTeamTwo.name || liveTournament.teamTwo?.name || currentTournament.team2?.name) ||
     "Team Two";
-  const captainOne = playerName(currentTournament.team1?.captain);
-  const captainTwo = playerName(currentTournament.team2?.captain);
-  const rosterCount =
-    (currentTournament.team1?.roster?.length || 0) +
-    (currentTournament.team2?.roster?.length || 0);
+  const captainOne = playerName(foundationTeamOne.captain || currentTournament.team1?.captain);
+  const captainTwo = playerName(foundationTeamTwo.captain || currentTournament.team2?.captain);
+  const rosterCount = foundation.roster?.length ||
+    (currentTournament.team1?.roster?.length || 0) + (currentTournament.team2?.roster?.length || 0);
   const listedTeamSize = Number(currentTournament["Team Size"]);
   const playerCount = rosterCount ||
     (Number.isFinite(listedTeamSize) ? listedTeamSize * 2 : 0);
@@ -74,7 +83,7 @@ export default async function Home() {
     (round) => round.matches?.length
   );
   const edition =
-    clean(currentTournament.editionTitle) || `${year} Sandbagger Invitational`;
+    clean(foundation.tournament?.edition || currentTournament.editionTitle) || `${year} Sandbagger Invitational`;
   const mobileHeroImage = imagePath(
     currentTournament["Mobile Hero Image"] ||
       currentTournament["Homepage Mobile Hero Image"]
@@ -91,11 +100,11 @@ export default async function Home() {
     liveData?.rounds?.find((round) => Number(round.number) === 1)?.matches?.[0]?.teeTime
   );
   const startAt = tournamentStartTimestamp({
-    startDate: liveTournament.startDate || currentTournament["Start Date"],
+    startDate: foundation.tournament?.startDate || liveTournament.startDate || currentTournament["Start Date"],
     startTime: openingTeeTime,
     dates,
     year,
-    timeZone: liveTournament.timeZone || currentTournament["Time Zone"] || "America/Chicago",
+    timeZone: foundation.tournament?.timeZone || liveTournament.timeZone || currentTournament["Time Zone"] || "America/Chicago",
   });
   const statusHeroTournament = {
     year,
@@ -120,14 +129,14 @@ export default async function Home() {
 
   if (mobileTournamentDashboardEnabled(liveData?.tournament)) {
     return <>
-      <PwaSplashIdentityBridge tournament={liveData?.tournament || null} />
-      <MobileTournamentHome liveData={liveData} />
+      <PwaSplashIdentityBridge tournament={presentationLiveData?.tournament || null} />
+      <MobileTournamentHome liveData={presentationLiveData} />
     </>;
   }
 
   return (
     <>
-      <PwaSplashIdentityBridge tournament={liveData?.tournament || null} />
+      <PwaSplashIdentityBridge tournament={presentationLiveData?.tournament || null} />
       <main>
       <Header />
 
