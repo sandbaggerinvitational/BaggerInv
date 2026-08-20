@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:scoring-finalize-request",
+  "title": "Bagger Mobile API v1 participant finalization intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["matchId", "mutationId", "expectedMatchRevision"],
+  "properties": {
+    "matchId": { "$ref": "scoring-shared.schema.json#/$defs/identifier" },
+    "mutationId": { "$ref": "scoring-shared.schema.json#/$defs/identifier" },
+    "expectedMatchRevision": { "$ref": "scoring-shared.schema.json#/$defs/revision" }
+  }
+}

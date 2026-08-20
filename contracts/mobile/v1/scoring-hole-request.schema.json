@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:scoring-hole-request",
+  "title": "Bagger Mobile API v1 hole scoring intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["matchId", "holeNumber", "teamOneGrossScores", "teamTwoGrossScores", "mutationId", "expectedMatchRevision", "expectedHoleRevision"],
+  "properties": {
+    "matchId": { "$ref": "scoring-shared.schema.json#/$defs/identifier" },
+    "holeNumber": { "type": "integer", "minimum": 1, "maximum": 18 },
+    "teamOneGrossScores": { "$ref": "scoring-shared.schema.json#/$defs/grossScores" },
+    "teamTwoGrossScores": { "$ref": "scoring-shared.schema.json#/$defs/grossScores" },
+    "mutationId": { "$ref": "scoring-shared.schema.json#/$defs/identifier" },
+    "expectedMatchRevision": { "$ref": "scoring-shared.schema.json#/$defs/revision" },
+    "expectedHoleRevision": { "$ref": "scoring-shared.schema.json#/$defs/revision" }
+  }
+}

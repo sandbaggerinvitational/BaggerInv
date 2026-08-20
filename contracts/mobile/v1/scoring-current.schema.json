@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:scoring-current",
+  "title": "Bagger Mobile API v1 current scoring response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scoring"],
+      "properties": {
+        "scoring": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["match", "player", "sides", "course", "scores", "progress", "permission", "snapshot"],
+              "properties": {
+                "match": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["matchId", "roundNumber", "format", "status", "matchRevision", "permissionRevision", "result"],
+                  "properties": {
+                    "matchId": { "$ref": "scoring-shared.schema.json#/$defs/identifier" },
+                    "roundNumber": { "type": ["integer", "null"] },
+                    "format": { "enum": ["BB", "SC", "SI"] },
+                    "status": { "enum": ["scheduled", "inProgress", "completed"] },
+                    "matchRevision": { "$ref": "scoring-shared.schema.json#/$defs/revision" },
+                    "permissionRevision": { "$ref": "scoring-shared.schema.json#/$defs/revision" },
+                    "result": { "$ref": "scoring-shared.schema.json#/$defs/winner" }
+                  }
+                },
+                "player": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["playerId", "displayName", "teamSide"],
+                  "properties": {
+                    "playerId": { "type": "string", "minLength": 1 },
+                    "displayName": { "type": "string", "minLength": 1 },
+                    "teamSide": { "type": ["integer", "null"], "enum": [1, 2, null] }
+                  }
+                },
+                "sides": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["side", "teamId", "name", "participants"],
+                    "properties": {
+                      "side": { "type": "integer", "enum": [1, 2] },
+                      "teamId": { "type": ["string", "null"] },
+                      "name": { "type": "string" },
+                      "participants": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 2,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["playerId", "displayName", "slot", "isAuthenticatedPlayer", "handicapIndex", "courseHandicap", "playingHandicap", "strokes"],
+                          "properties": {
+                            "playerId": { "type": "string", "minLength": 1 },
+                            "displayName": { "type": "string", "minLength": 1 },
+                            "slot": { "type": "integer", "enum": [1, 2] },
+                            "isAuthenticatedPlayer": { "type": "boolean" },
+                            "handicapIndex": { "type": ["number", "null"] },
+                            "courseHandicap": { "type": ["number", "null"] },
+                            "playingHandicap": { "type": ["number", "null"] },
+                            "strokes": { "type": ["number", "null"] }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "course": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["courseId", "name", "tee", "rating", "slope", "par", "holes"],
+                  "properties": {
+                    "courseId": { "type": ["string", "null"] },
+                    "name": { "type": ["string", "null"] },
+                    "tee": { "type": ["string", "null"] },
+                    "rating": { "type": ["number", "null"] },
+                    "slope": { "type": ["number", "null"] },
+                    "par": { "type": ["number", "null"] },
+                    "holes": {
+                      "type": "array",
+                      "maxItems": 18,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["holeNumber", "par", "strokeIndex", "yardage"],
+                        "properties": {
+                          "holeNumber": { "type": "integer", "minimum": 1, "maximum": 18 },
+                          "par": { "type": ["number", "null"] },
+                          "strokeIndex": { "type": ["number", "null"] },
+                          "yardage": { "type": ["number", "null"] }
+                        }
+                      }
+                    }
+                  }
+                },
+                "scores": { "type": "array", "maxItems": 18, "items": { "$ref": "scoring-shared.schema.json#/$defs/hole" } },
+                "progress": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["currentHole", "holesRemaining", "scorecardComplete", "statusText"],
+                  "properties": {
+                    "currentHole": { "type": "integer", "minimum": 0, "maximum": 18 },
+                    "holesRemaining": { "type": "integer", "minimum": 0, "maximum": 18 },
+                    "scorecardComplete": { "type": "boolean" },
+                    "statusText": { "type": ["string", "null"] }
+                  }
+                },
+                "permission": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["canScore", "readOnly", "canFinalize", "reason"],
+                  "properties": {
+                    "canScore": { "type": "boolean" },
+                    "readOnly": { "type": "boolean" },
+                    "canFinalize": { "type": "boolean" },
+                    "reason": { "type": ["string", "null"], "enum": ["matchFinalized", "matchLocked", "matchNotActive", "permissionRevoked", "permissionChanged", "notAuthorized", null] }
+                  }
+                },
+                "snapshot": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["snapshotId", "revision"],
+                  "properties": {
+                    "snapshotId": { "type": ["string", "null"] },
+                    "revision": { "$ref": "scoring-shared.schema.json#/$defs/revision" }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "meta": { "$ref": "scoring-shared.schema.json#/$defs/meta" }
+  }
+}

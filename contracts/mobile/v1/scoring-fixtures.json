@@ -1,0 +1,183 @@
+{
+  "synthetic": true,
+  "current": {
+    "authorizedActive": {
+      "ok": true,
+      "apiVersion": "v1",
+      "data": {
+        "scoring": {
+          "match": {
+            "matchId": "FIXTURE-M1",
+            "roundNumber": 2,
+            "format": "BB",
+            "status": "inProgress",
+            "matchRevision": 12,
+            "permissionRevision": 4,
+            "result": null
+          },
+          "player": { "playerId": "FIXTURE-P1", "displayName": "Fixture Player One", "teamSide": 1 },
+          "sides": [
+            {
+              "side": 1,
+              "teamId": "FIXTURE-T1",
+              "name": "Fixture Team One",
+              "participants": [
+                { "playerId": "FIXTURE-P1", "displayName": "Fixture Player One", "slot": 1, "isAuthenticatedPlayer": true, "handicapIndex": 8.2, "courseHandicap": 9, "playingHandicap": 8, "strokes": 2 },
+                { "playerId": "FIXTURE-P2", "displayName": "Fixture Player Two", "slot": 2, "isAuthenticatedPlayer": false, "handicapIndex": 10.1, "courseHandicap": 11, "playingHandicap": 10, "strokes": 4 }
+              ]
+            },
+            {
+              "side": 2,
+              "teamId": "FIXTURE-T2",
+              "name": "Fixture Team Two",
+              "participants": [
+                { "playerId": "FIXTURE-P3", "displayName": "Fixture Player Three", "slot": 1, "isAuthenticatedPlayer": false, "handicapIndex": 6, "courseHandicap": 7, "playingHandicap": 6, "strokes": 0 },
+                { "playerId": "FIXTURE-P4", "displayName": "Fixture Player Four", "slot": 2, "isAuthenticatedPlayer": false, "handicapIndex": 12, "courseHandicap": 13, "playingHandicap": 12, "strokes": 6 }
+              ]
+            }
+          ],
+          "course": {
+            "courseId": "FIXTURE-C1",
+            "name": "Fixture Course",
+            "tee": "Blue",
+            "rating": 72.4,
+            "slope": 131,
+            "par": 72,
+            "holes": [{ "holeNumber": 1, "par": 4, "strokeIndex": 3, "yardage": 412 }]
+          },
+          "scores": [
+            {
+              "holeNumber": 1,
+              "revision": 2,
+              "gross": { "teamOne": [4, 5], "teamTwo": [5, 5] },
+              "strokes": { "teamOne": [1, 0], "teamTwo": [0, 1] },
+              "net": { "teamOne": 3, "teamTwo": 4 },
+              "winner": "teamOne",
+              "updatedAt": "2026-09-25T14:29:00.000Z"
+            }
+          ],
+          "progress": { "currentHole": 1, "holesRemaining": 17, "scorecardComplete": false, "statusText": "Team 1 1 UP through 1" },
+          "permission": { "canScore": true, "readOnly": false, "canFinalize": false, "reason": null },
+          "snapshot": { "snapshotId": "FIXTURE-M1:S1", "revision": 1 }
+        }
+      },
+      "meta": { "generatedAt": "2026-09-25T14:30:00.000Z" }
+    },
+    "readOnly": {
+      "ok": true,
+      "apiVersion": "v1",
+      "data": {
+        "scoring": {
+          "match": { "matchId": "FIXTURE-M2", "roundNumber": 3, "format": "SI", "status": "inProgress", "matchRevision": 8, "permissionRevision": 3, "result": null },
+          "player": { "playerId": "FIXTURE-P5", "displayName": "Fixture Player Five", "teamSide": 1 },
+          "sides": [
+            { "side": 1, "teamId": "FIXTURE-T1", "name": "Fixture Team One", "participants": [{ "playerId": "FIXTURE-P5", "displayName": "Fixture Player Five", "slot": 1, "isAuthenticatedPlayer": true, "handicapIndex": 5, "courseHandicap": 5, "playingHandicap": 5, "strokes": 0 }] },
+            { "side": 2, "teamId": "FIXTURE-T2", "name": "Fixture Team Two", "participants": [{ "playerId": "FIXTURE-P6", "displayName": "Fixture Player Six", "slot": 1, "isAuthenticatedPlayer": false, "handicapIndex": 9, "courseHandicap": 10, "playingHandicap": 10, "strokes": 5 }] }
+          ],
+          "course": { "courseId": "FIXTURE-C2", "name": "Fixture Course Two", "tee": "White", "rating": 70, "slope": 125, "par": 72, "holes": [] },
+          "scores": [],
+          "progress": { "currentHole": 0, "holesRemaining": 18, "scorecardComplete": false, "statusText": "Scheduled" },
+          "permission": { "canScore": false, "readOnly": true, "canFinalize": false, "reason": "permissionRevoked" },
+          "snapshot": { "snapshotId": "FIXTURE-M2:S1", "revision": 1 }
+        }
+      },
+      "meta": { "generatedAt": "2026-09-25T14:30:00.000Z" }
+    },
+    "noAuthorizedMatch": {
+      "ok": true,
+      "apiVersion": "v1",
+      "data": { "scoring": null },
+      "meta": { "generatedAt": "2026-09-25T14:30:00.000Z" }
+    },
+    "finalized": {
+      "ok": true,
+      "apiVersion": "v1",
+      "data": {
+        "scoring": {
+          "match": { "matchId": "FIXTURE-M3", "roundNumber": 1, "format": "SC", "status": "completed", "matchRevision": 20, "permissionRevision": 6, "result": "teamTwo" },
+          "player": { "playerId": "FIXTURE-P7", "displayName": "Fixture Player Seven", "teamSide": 2 },
+          "sides": [
+            { "side": 1, "teamId": "FIXTURE-T1", "name": "Fixture Team One", "participants": [{ "playerId": "FIXTURE-P8", "displayName": "Fixture Player Eight", "slot": 1, "isAuthenticatedPlayer": false, "handicapIndex": null, "courseHandicap": null, "playingHandicap": 4, "strokes": 0 }] },
+            { "side": 2, "teamId": "FIXTURE-T2", "name": "Fixture Team Two", "participants": [{ "playerId": "FIXTURE-P7", "displayName": "Fixture Player Seven", "slot": 1, "isAuthenticatedPlayer": true, "handicapIndex": null, "courseHandicap": null, "playingHandicap": 8, "strokes": 4 }] }
+          ],
+          "course": { "courseId": "FIXTURE-C3", "name": "Fixture Course Three", "tee": "Gold", "rating": 71, "slope": 128, "par": 72, "holes": [] },
+          "scores": [],
+          "progress": { "currentHole": 18, "holesRemaining": 0, "scorecardComplete": true, "statusText": "Team 2 wins" },
+          "permission": { "canScore": false, "readOnly": true, "canFinalize": false, "reason": "matchFinalized" },
+          "snapshot": { "snapshotId": "FIXTURE-M3:S1", "revision": 1 }
+        }
+      },
+      "meta": { "generatedAt": "2026-09-25T14:30:00.000Z" }
+    }
+  },
+  "holeMutation": {
+    "request": {
+      "matchId": "FIXTURE-M1",
+      "holeNumber": 2,
+      "teamOneGrossScores": [4, 5],
+      "teamTwoGrossScores": [5, 6],
+      "mutationId": "11111111-1111-4111-8111-111111111111",
+      "expectedMatchRevision": 12,
+      "expectedHoleRevision": 0
+    },
+    "accepted": {
+      "ok": true,
+      "apiVersion": "v1",
+      "data": {
+        "mutationId": "11111111-1111-4111-8111-111111111111",
+        "accepted": true,
+        "idempotent": false,
+        "semanticNoop": false,
+        "matchId": "FIXTURE-M1",
+        "hole": {
+          "holeNumber": 2,
+          "revision": 1,
+          "gross": { "teamOne": [4, 5], "teamTwo": [5, 6] },
+          "strokes": { "teamOne": [1, 0], "teamTwo": [0, 1] },
+          "net": { "teamOne": 3, "teamTwo": 4 },
+          "winner": "teamOne",
+          "updatedAt": "2026-09-25T14:30:00.000Z"
+        },
+        "match": { "revision": 13, "status": "inProgress", "currentHole": 2, "holesRemaining": 16, "scorecardComplete": false, "statusText": "Team 1 2 UP through 2" },
+        "refreshRequired": false
+      },
+      "meta": { "generatedAt": "2026-09-25T14:30:00.000Z" }
+    },
+    "idempotentRetry": {
+      "case": "same mutation ID and identical intent",
+      "outcome": "the accepted response is returned with data.idempotent=true and no second scoring effect"
+    },
+    "staleRevision": {
+      "ok": false,
+      "apiVersion": "v1",
+      "error": { "code": "REVISION_CONFLICT", "message": "Official scoring state has changed." },
+      "data": { "matchId": "FIXTURE-M1", "currentMatchRevision": 13, "currentHoleRevision": 1, "refreshRequired": true }
+    },
+    "invalidGrossScore": { "errorCode": "INVALID_SCORE_INPUT", "httpStatus": 400 },
+    "unauthorizedMatch": { "errorCode": "SCORING_NOT_AUTHORIZED", "httpStatus": 403 },
+    "permissionRevoked": { "errorCode": "SCORING_NOT_AUTHORIZED", "httpStatus": 403, "refreshRequired": true }
+  },
+  "crossDevice": {
+    "sameMutationReplay": ["accepted revision 13", "response lost", "same mutation replay", "idempotent acknowledgement revision 13"],
+    "staleSecondDevice": ["both devices read revision 12", "device A commits revision 13", "device B submits a different mutation expecting 12", "REVISION_CONFLICT", "authoritative refresh required"],
+    "authoritativeRefresh": "GET /scoring/current?matchId=FIXTURE-M1"
+  },
+  "finalization": {
+    "request": { "matchId": "FIXTURE-M1", "mutationId": "finalize:FIXTURE-M1:30", "expectedMatchRevision": 30 },
+    "accepted": {
+      "ok": true,
+      "apiVersion": "v1",
+      "data": {
+        "mutationId": "finalize:FIXTURE-M1:30",
+        "accepted": true,
+        "idempotent": false,
+        "match": { "matchId": "FIXTURE-M1", "revision": 31, "permissionRevision": 5, "status": "completed", "scoringLocked": true, "result": "teamOne", "finalizedAt": "2026-09-25T18:00:00.000Z" },
+        "refreshRequired": true
+      },
+      "meta": { "generatedAt": "2026-09-25T18:00:00.000Z" }
+    },
+    "incomplete": { "errorCode": "FINALIZATION_NOT_READY", "httpStatus": 409, "scoredHoles": 17 },
+    "alreadyFinalized": { "errorCode": "MATCH_ALREADY_FINALIZED", "httpStatus": 409 },
+    "staleRevision": { "errorCode": "REVISION_CONFLICT", "httpStatus": 409, "refreshRequired": true }
+  }
+}

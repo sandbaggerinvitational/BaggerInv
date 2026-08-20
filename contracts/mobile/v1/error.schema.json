@@ -19,10 +19,32 @@
             "INVALID_TOKEN",
             "PARTICIPANT_NOT_FOUND",
             "MOBILE_API_UNAVAILABLE",
+            "SCORING_UNAVAILABLE",
+            "MATCH_NOT_FOUND",
+            "SCORING_NOT_AUTHORIZED",
+            "SCORING_READ_ONLY",
+            "INVALID_SCORE_INPUT",
+            "REVISION_CONFLICT",
+            "IDEMPOTENCY_CONFLICT",
+            "FINALIZATION_NOT_READY",
+            "MATCH_ALREADY_FINALIZED",
             "INTERNAL_ERROR"
           ]
         },
         "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matchId", "refreshRequired"],
+      "properties": {
+        "matchId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "currentMatchRevision": { "type": "integer", "minimum": 0 },
+        "currentHoleRevision": { "type": "integer", "minimum": 0 },
+        "currentPermissionRevision": { "type": "integer", "minimum": 0 },
+        "scoredHoles": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "refreshRequired": { "const": true }
       }
     }
   }

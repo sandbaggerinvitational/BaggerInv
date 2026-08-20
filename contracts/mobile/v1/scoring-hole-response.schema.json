@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:scoring-hole-response",
+  "title": "Bagger Mobile API v1 authoritative hole acknowledgement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mutationId", "accepted", "idempotent", "semanticNoop", "matchId", "hole", "match", "refreshRequired"],
+      "properties": {
+        "mutationId": { "$ref": "scoring-shared.schema.json#/$defs/identifier" },
+        "accepted": { "const": true },
+        "idempotent": { "type": "boolean" },
+        "semanticNoop": { "type": "boolean" },
+        "matchId": { "$ref": "scoring-shared.schema.json#/$defs/identifier" },
+        "hole": { "$ref": "scoring-shared.schema.json#/$defs/hole" },
+        "match": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["revision", "status", "currentHole", "holesRemaining", "scorecardComplete", "statusText"],
+          "properties": {
+            "revision": { "$ref": "scoring-shared.schema.json#/$defs/revision" },
+            "status": { "enum": ["inProgress", "readyToFinalize"] },
+            "currentHole": { "type": "integer", "minimum": 0, "maximum": 18 },
+            "holesRemaining": { "type": "integer", "minimum": 0, "maximum": 18 },
+            "scorecardComplete": { "type": "boolean" },
+            "statusText": { "type": ["string", "null"] }
+          }
+        },
+        "refreshRequired": { "const": false }
+      }
+    },
+    "meta": { "$ref": "scoring-shared.schema.json#/$defs/meta" }
+  }
+}
