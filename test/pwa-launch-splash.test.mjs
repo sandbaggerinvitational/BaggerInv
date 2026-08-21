@@ -31,7 +31,8 @@ test("splash consumes Home's completed initialization without starting a second 
   assert.match(bridge, /window\.__sbiTournamentIdentity = tournament/);
   assert.match(bridge, /new CustomEvent\("sbi:tournament-ready"/);
   assert.match(rootHome, /<PwaSplashIdentityBridge tournament=\{presentationLiveData\?\.tournament \|\| null\} \/>/);
-  assert.match(rootHome, /readTournamentFoundation\(\{[\s\S]*googleData: liveData/);
+  assert.match(rootHome, /readHomepageCurrentTournament/);
+  assert.doesNotMatch(rootHome, /getTournamentData|sheetData/);
   assert.match(mobileHome, /<PwaSplashIdentityBridge tournament=\{liveData\.tournament\} \/>/);
   assert.match(mobileHome, /<PwaSplashIdentityBridge tournament=\{null\} \/>/);
   for (const field of ["name", "edition", "dates", "location", "logo", "year"]) assert.match(splash, new RegExp(`${field}:`));

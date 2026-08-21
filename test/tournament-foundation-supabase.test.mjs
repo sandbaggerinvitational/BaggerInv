@@ -163,15 +163,17 @@ test("Selected Supabase foundation fails closed without invoking the Google read
   assert.equal(googleReads, 0);
 });
 
-test("Homepage and public API use the shared foundation boundary while history and scoring gates remain isolated", async () => {
-  const [page, route, livePage] = await Promise.all([
-    source("app/page.js"), source("app/api/tournament/foundation/route.js"), source("app/live/page.js"),
+test("Homepage composition and public API use the shared foundation boundary while history and scoring gates remain isolated", async () => {
+  const [page, homepageService, route, livePage] = await Promise.all([
+    source("app/page.js"), source("lib/homepage-current-tournament.js"),
+    source("app/api/tournament/foundation/route.js"), source("app/live/page.js"),
   ]);
-  assert.match(page, /readTournamentFoundation/);
-  assert.match(page, /applyTournamentFoundationToLiveData/);
+  assert.match(page, /readHomepageCurrentTournament/);
+  assert.match(homepageService, /tournamentFoundationFromSupabaseView/);
+  assert.match(homepageService, /applyTournamentFoundationToLiveData/);
   assert.match(page, /refreshHistoricalData/);
   assert.match(page, /getTournaments/);
-  assert.match(page, /getTournamentData/);
+  assert.doesNotMatch(page, /getTournamentData|sheetData/);
   assert.match(route, /X-Tournament-Foundation-Read-Source/);
   assert.match(route, /X-Tournament-Foundation-Google-Requests/);
   assert.doesNotMatch(route, /getTournamentData|sheetData|google-sheets|GViz/i);

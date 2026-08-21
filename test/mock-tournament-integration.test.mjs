@@ -54,8 +54,9 @@ test("Preview mobile tournament payload uses authenticated normalized tabs", () 
   assert.doesNotMatch(sheetData, /Website Feed/);
 });
 
-test("Home, Tournament, and Leaderboards share the normalized tournament payload", () => {
-  assert.match(homePage, /getTournamentData/);
+test("Home, Tournament, and Leaderboards share the selected tournament contract", () => {
+  assert.match(homePage, /readHomepageCurrentTournament/);
+  assert.doesNotMatch(homePage, /getTournamentData|sheetData/);
   assert.match(homePage, /mobileTournamentDashboardEnabled\(liveData\?\.tournament\)/);
   assert.match(livePage, /getTournamentData/);
   assert.match(matchCenter, /view"\) === "leaderboards"/);

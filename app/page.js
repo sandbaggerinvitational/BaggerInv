@@ -3,7 +3,6 @@ import { refreshHistoricalData } from "../lib/stats";
 import Link from "next/link";
 import { Header, Footer } from "./components";
 import { getTournaments } from "../lib/stats";
-import { getTournamentData } from "./live/sheetData";
 import { homePageHero, tournamentLogo } from "../lib/asset-paths";
 import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
 import { tournamentStartTimestamp } from "../lib/tournament-countdown";
@@ -13,7 +12,8 @@ import { mobileTournamentDashboardEnabled } from "../lib/spreadsheet-environment
 import MobileTournamentHome from "./MobileTournamentHome";
 import StatusBadge from "./StatusBadge";
 import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
-import { applyTournamentFoundationToLiveData, readTournamentFoundation } from "../lib/tournament-foundation";
+import { readHomepageCurrentTournament } from "../lib/homepage-current-tournament";
+import { requireHomepageCurrentReadSource } from "../lib/tournament-read-source";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -31,26 +31,27 @@ function playerName(player) {
 }
 
 export default async function Home() {
-  await refreshHistoricalData();
+  const homepageSource = requireHomepageCurrentReadSource();
+  let currentRead = null;
+  if (homepageSource.resolved === "supabase") {
+    [currentRead] = await Promise.all([
+      readHomepageCurrentTournament({ source: homepageSource }),
+      refreshHistoricalData(),
+    ]);
+  } else {
+    await refreshHistoricalData();
+  }
   const tournaments = [...getTournaments()].sort(
     (a, b) => a.year - b.year
   );
   const currentTournament = tournaments[tournaments.length - 1] || {};
-  let liveData = null;
-
-  try {
-    liveData = await getTournamentData();
-  } catch (error) {
-    console.error("Homepage live tournament details could not be loaded.", error);
-  }
-
-  const foundationRead = await readTournamentFoundation({
-    googleData: liveData,
-    googleLoadAttempted: true,
+  currentRead ||= await readHomepageCurrentTournament({
+    source: homepageSource,
     googleFallbackTournament: currentTournament,
   });
-  const foundation = foundationRead.data;
-  const presentationLiveData = applyTournamentFoundationToLiveData(liveData, foundation);
+  const liveData = currentRead.liveData;
+  const foundation = currentRead.foundation;
+  const presentationLiveData = liveData;
   const liveTournament = presentationLiveData?.tournament || foundation.tournament || {};
   const year = Number(foundation.tournament?.year || liveTournament.year) || currentTournament.year;
   const destination =
