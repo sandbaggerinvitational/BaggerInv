@@ -220,8 +220,11 @@ export default async function PlayerPage({ params, searchParams }) {
     : null;
 
   return (
-    <main data-career-profile data-secondary-history-source={useSupabase ? "supabase" : "google"}>
-      <section className={styles.pageHero}>
+    <main data-career-profile>
+      <section
+        className={styles.pageHero}
+        data-secondary-history-source={useSupabase ? "supabase" : "google"}
+      >
         <div className={styles.profileHeader}>
           <PlayerAvatar
             player={player}
