@@ -12,6 +12,8 @@ import {
 } from "../../lib/stats";
 import styles from "../historical.module.css";
 import { pageMetadata } from "../../lib/seo";
+import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
 
 export const metadata = pageMetadata({
   title: "Sandbaggers | The Sandbagger Invitational",
@@ -20,12 +22,16 @@ export const metadata = pageMetadata({
 });
 
 export default async function PlayersPage({ searchParams }) {
-  await refreshHistoricalData();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  if (!useSupabase) await refreshHistoricalData();
   const directoryHref = playerDirectoryHref(await searchParams);
-  const players = getAllPlayerStats();
+  const players = useSupabase
+    ? secondaryHistory.calculations.getAllPlayerStats()
+    : getAllPlayerStats();
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>The Competitors</p>
         <h1>Sandbaggers</h1>

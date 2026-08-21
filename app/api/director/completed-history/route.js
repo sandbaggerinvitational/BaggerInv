@@ -16,6 +16,12 @@ import {
   compareCompletedHistoryDerivedShadows,
   completedHistoryYearReadToShadowPayload,
 } from "../../../../lib/completed-history-shadow.js";
+import {
+  comparePlayerPublicProfileProjection,
+  preparePreviewPlayerPublicProfileProjection,
+  readPreviewSecondaryHistoryPlayers,
+  syncPreviewPlayerPublicProfiles,
+} from "../../../../lib/player-public-profile-projection.js";
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 
 export const dynamic = "force-dynamic";
@@ -76,16 +82,22 @@ export async function GET(request) {
   if (access.response) return access.response;
   try {
     const year = Number(new URL(request.url).searchParams.get("year")) || undefined;
-    const [diagnostics, security] = await Promise.all([
+    const [diagnostics, security, playerProjection] = await Promise.all([
       inspectCompletedHistory({ year }),
       inspectCompletedHistorySecurity(),
+      readPreviewSecondaryHistoryPlayers(),
     ]);
     return NextResponse.json({
-      ok: diagnostics.payload?.ok === true && security.payload?.ok === true,
+      ok: diagnostics.payload?.ok === true && security.payload?.ok === true && playerProjection.payload?.ok === true,
       actor: actorId(access.identity),
       diagnostics: diagnostics.payload,
       security: security.payload,
-      durations: { diagnosticsMs: diagnostics.durationMs, securityMs: security.durationMs },
+      playerProjection: playerProjection.payload,
+      durations: {
+        diagnosticsMs: diagnostics.durationMs,
+        securityMs: security.durationMs,
+        playerProjectionMs: playerProjection.durationMs,
+      },
     }, { headers });
   } catch (error) {
     return NextResponse.json(safeError(error), { status: 503, headers });
@@ -140,6 +152,43 @@ export async function POST(request) {
         source: { fingerprint: sourceShadow.fingerprint, totals: sourceShadow.totals, recordHolders: sourceShadow.recordHolders },
         supabase: { fingerprint: storedShadow.fingerprint, totals: storedShadow.totals, recordHolders: storedShadow.recordHolders },
       }, { status: parity.pass ? 200 : 409, headers });
+    }
+    if (action === "sync-player-profiles") {
+      const result = await syncPreviewPlayerPublicProfiles({
+        authorization: {
+          authorized: true,
+          scope: "SECONDARY_HISTORY_PLAYER_PROFILE_SYNC",
+          actor_id: requestedBy,
+          authorization_id: randomUUID(),
+          authorized_at: new Date().toISOString(),
+        },
+      });
+      const payload = result.rpc.payload || {};
+      return NextResponse.json({
+        ok: payload.ok === true,
+        action,
+        result: payload,
+        source: {
+          playerCount: result.projection.players.length,
+          sourceFingerprint: result.projection.source_fingerprint,
+          sourceWorkbookId: result.projection.source_workbook_id,
+        },
+        durationMs: result.rpc.durationMs,
+      }, { status: payload.ok === true ? 200 : 422, headers });
+    }
+    if (action === "player-profile-parity") {
+      const [source, storedRead] = await Promise.all([
+        preparePreviewPlayerPublicProfileProjection(),
+        readPreviewSecondaryHistoryPlayers(),
+      ]);
+      if (storedRead.payload?.ok !== true) {
+        return NextResponse.json({ ok: false, action, result: storedRead.payload }, { status: 503, headers });
+      }
+      const parity = comparePlayerPublicProfileProjection(source, storedRead.payload.data);
+      return NextResponse.json({ ok: parity.pass, action, parity }, {
+        status: parity.pass ? 200 : 409,
+        headers,
+      });
     }
     if (action === "import") {
       const correction = body.correction && typeof body.correction === "object"
