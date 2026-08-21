@@ -69,17 +69,22 @@ test("Course Detail returns null only when neither normalized nor archived cours
   assert.equal(courseDetailModel("missing", content), null);
 });
 
-test("current Course Detail uses the Supabase Guide resolver while archive transport remains an explicit legacy boundary", async () => {
-  const [page, loader] = await Promise.all([
+test("current Course Detail uses the Guide resolver while archive transport uses the explicit historical-course boundary", async () => {
+  const [page, loader, courseService] = await Promise.all([
     readFile(new URL("../app/courses/[courseId]/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/tournament-guide/resolveGuideContent.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/historical-course-service.js", import.meta.url), "utf8"),
   ]);
   assert.match(page, /resolveTournamentGuideContent/);
   assert.match(page, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
-  assert.match(page, /archive\s*\?\s*await import\("\.\.\/\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
+  assert.match(page, /loadHistoricalCourseProfile/);
+  assert.match(page, /source\.resolved === "supabase"/);
   assert.match(page, /resolveGoogleArchivedCourseContent/);
   assert.match(page, /courseDetailModel/);
   assert.doesNotMatch(page, /refreshHistoricalData|loadScorecardAnalytics|getCourse\(/);
+  assert.match(courseService, /loadCompletedHistoryYears/);
+  assert.match(courseService, /loadHistory2026View/);
+  assert.doesNotMatch(courseService, /refreshHistoricalData|loadScorecardAnalytics|historical-data\.json/);
   assert.match(loader, /guideParticipantProjection\(\{ payload \}\)\.content/);
   assert.match(loader, /courseHoles: stored\.courseHoles \|\| \[\]/);
   assert.match(loader, /readGuideProjection\(\{ surface \}\)/);

@@ -43,7 +43,10 @@ test("Guide destinations are focused same-origin Supabase views with a flag-gate
 test("Courses defaults to the active tournament and offers the historical archive", async () => {
   const [courses, resolver] = await Promise.all([source("app/courses/page.js"), source("app/tournament-guide/resolveGuideContent.js")]);
   assert.match(courses, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
-  assert.match(courses, /archive\s*\?\s*await import\("\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
+  assert.match(courses, /requireHistoricalCourseReadSource\(process\.env\)/);
+  assert.match(courses, /archiveSource\.resolved === "supabase"/);
+  assert.match(courses, /import\("\.\.\/\.\.\/lib\/historical-course-service"\)/);
+  assert.match(courses, /import\("\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
   assert.doesNotMatch(courses, /getTournamentData|refreshHistoricalData|loadTournamentGuideSheets/);
   assert.match(resolver, /courses: stored\.courses \|\| \[\]/);
   assert.match(courses, /View Course Archive/);

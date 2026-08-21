@@ -79,6 +79,7 @@ test("Course Archive fails closed on conflicting Year/Round course evidence", ()
 
 test("Course origin URLs preserve explicit Archive, current, and Schedule return precedence", () => {
   assert.equal(courseProfileHref({ courseId: "PDC01", origin: COURSE_ORIGINS.ARCHIVE }), "/courses/PDC01?view=archive&source=course-archive");
+  assert.equal(courseProfileHref({ courseId: "PDC01", origin: COURSE_ORIGINS.ARCHIVE, year: 2023, round: 2 }), "/courses/PDC01?view=archive&source=course-archive&year=2023&round=2");
   assert.equal(courseProfileHref({ courseId: "TPGC01", origin: COURSE_ORIGINS.CURRENT }), "/courses/TPGC01?source=current-courses");
   assert.equal(courseProfileHref({ courseId: "OCGC01", origin: COURSE_ORIGINS.SCHEDULE }), "/courses/OCGC01?source=tournament-guide-schedule");
   assert.deepEqual(courseOriginReturn({ view: "archive", source: "course-archive" }), {

@@ -16,19 +16,33 @@ import {
 } from "../../../lib/history-course-navigation";
 import { pageMetadata } from "../../../lib/seo";
 import { resolveTournamentGuideContent } from "../../tournament-guide/resolveGuideContent";
+import { requireHistoricalCourseReadSource } from "../../../lib/historical-course-read-source";
 import styles from "./course-detail.module.css";
 
-const resolveCourse = cache(async (courseId, archive = false) => {
-  const content = archive
-    ? await import("../../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleArchivedCourseContent())
-    : await resolveTournamentGuideContent({ surface: "course" });
-  return courseDetailModel(courseId, content);
+const resolveCourse = cache(async (courseId, archive = false, year = null, round = null) => {
+  if (!archive) {
+    const content = await resolveTournamentGuideContent({ surface: "course" });
+    return { model: courseDetailModel(courseId, content), source: "current-guide" };
+  }
+  const source = requireHistoricalCourseReadSource(process.env);
+  if (source.resolved === "supabase") {
+    const profile = await import("../../../lib/historical-course-service").then((module) =>
+      module.loadHistoricalCourseProfile({ courseId })
+    );
+    return {
+      model: profile ? courseDetailModel(profile.canonicalCourseId, profile.content, { year, round }) : null,
+      source: "supabase",
+    };
+  }
+  const content = await import("../../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleArchivedCourseContent());
+  return { model: courseDetailModel(courseId, content, { year, round }), source: "google" };
 });
 
 export async function generateMetadata({ params, searchParams }) {
   const { courseId } = await params;
-  const archive = String((await searchParams)?.view || "") === "archive";
-  const model = await resolveCourse(courseId, archive);
+  const query = await searchParams;
+  const archive = String(query?.view || "") === "archive";
+  const { model } = await resolveCourse(courseId, archive, query?.year, query?.round);
   return pageMetadata({
     title: model ? `${model.course.Course} | The Sandbagger Invitational` : "Course | The Sandbagger Invitational",
     description: model ? `${model.course.Course} tournament course details.` : "Sandbagger Invitational course details.",
@@ -61,7 +75,8 @@ export default async function CoursePage({ params, searchParams }) {
   const { courseId } = await params;
   const resolvedSearchParams = await searchParams;
   const archive = String(resolvedSearchParams?.view || "") === "archive";
-  const model = await resolveCourse(courseId, archive);
+  const resolved = await resolveCourse(courseId, archive, resolvedSearchParams?.year, resolvedSearchParams?.round);
+  const { model } = resolved;
   if (!model) notFound();
   const { course } = model;
   const website = model.website;
@@ -70,7 +85,7 @@ export default async function CoursePage({ params, searchParams }) {
   const resolvedOriginReturn = courseOriginReturn(resolvedSearchParams);
   const scheduleReturn = resolvedOriginReturn?.placement === "below-hero" ? resolvedOriginReturn : null;
   const originReturn = scheduleReturn ? null : resolvedOriginReturn;
-  return <main className={styles.page}>
+  return <main className={styles.page} data-historical-course-source={resolved.source}>
     <Header homeHref="/home" />
     <section className={styles.hero}>
       {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
