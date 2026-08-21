@@ -116,6 +116,8 @@ test("canonical current lifecycle excludes reopened/live 2026 matches from offic
     { "Player ID": "P2", "Display Name": "Player Two", Slug: "player-two", Active: true },
   ], { sourceWorkbookId: "preview-workbook" });
   const result = buildSecondaryHistoryHistoricalData({ completedViews, currentView, playerProjection: profiles });
+  assert.equal(result.data.tournaments[0]["Winning Team"], "Team 1");
+  assert.equal(result.data.tournaments[0]["Runner-Up Team"], "Team 2");
   assert.equal(result.data.matches.some((row) => row["Match ID"] === "2026-R1-1"), true);
   assert.equal(result.data.matches.some((row) => row["Match ID"] === "2026-R1-4"), false);
   assert.equal(result.data.tournaments.at(-1)["Final Score"], "");
