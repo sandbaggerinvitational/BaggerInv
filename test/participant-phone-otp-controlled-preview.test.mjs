@@ -5,9 +5,11 @@ import test from "node:test";
 import {
   assertParticipantPhoneEnrollmentAuthUser,
   canonicalParticipantAuthPhone,
+  classifyParticipantPhoneOtpProviderFailure,
   inspectParticipantAuthUserPhone,
   normalizeParticipantPhoneOtpToken,
   participantPhoneOtpClientFingerprint,
+  participantPhoneOtpErrorMessage,
   participantPhoneOtpProviderFailureCode,
   requestExistingParticipantPhoneEnrollment,
   requestExistingParticipantPhoneLogin,
@@ -170,6 +172,38 @@ test("OTP input and provider errors stay in bounded safe categories", () => {
   for (const token of ["", "12345", "1234567", "12a456"]) assert.throws(() => normalizeParticipantPhoneOtpToken(token));
   assert.equal(participantPhoneOtpProviderFailureCode({ status: 429 }, "send"), "PHONE_OTP_RATE_LIMITED");
   assert.equal(participantPhoneOtpProviderFailureCode({ status: 400 }, "verify"), "PHONE_OTP_INVALID_OR_EXPIRED");
+});
+
+test("Twilio trial recipient rejection is classified without exposing provider details", () => {
+  const failure = classifyParticipantPhoneOtpProviderFailure({
+    status: 422,
+    code: "sms_send_failed",
+    message: "Error sending phone_change OTP to provider: trial account recipient unverified (21608)",
+  }, "send");
+  assert.deepEqual(failure, {
+    code: "PHONE_OTP_TRIAL_RECIPIENT_UNVERIFIED",
+    authErrorCode: "sms_send_failed",
+    authStatus: 422,
+    providerErrorClass: "TWILIO_21608_TRIAL_RECIPIENT_UNVERIFIED",
+    providerCalled: true,
+  });
+  assert.equal(participantPhoneOtpProviderFailureCode({
+    status: 422, code: "sms_send_failed", message: "Trial accounts cannot send to an unverified number. 21608",
+  }), "PHONE_OTP_TRIAL_RECIPIENT_UNVERIFIED");
+  const safeMessage = participantPhoneOtpErrorMessage(failure.code);
+  assert.doesNotMatch(safeMessage, /twilio|trial|21608|credential|sid|token/i);
+  assert.equal(classifyParticipantPhoneOtpProviderFailure({
+    status: 503, code: "unsafe code with details",
+  }).authErrorCode, "UNKNOWN");
+});
+
+test("enrollment route records a rejected Twilio request as provider-called using safe metadata only", async () => {
+  const route = await source("app/api/participant/auth/phone-enrollment/route.js");
+  assert.match(route, /providerCalled = providerAccepted \|\| \(!localSafetyError && failure\.providerCalled === true\)/);
+  assert.match(route, /authErrorCode: failure\.authErrorCode/);
+  assert.match(route, /authStatus: failure\.authStatus/);
+  assert.match(route, /providerErrorClass: failure\.providerErrorClass/);
+  assert.doesNotMatch(route, /message:\s*error\?\.message|console\.(?:warn|error)\([^\n]+error\?\.message/);
 });
 
 test("migration binds enrollment to actor A, active link, email, phone revision, and phone_change", async () => {
