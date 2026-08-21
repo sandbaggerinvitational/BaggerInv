@@ -60,8 +60,31 @@ also requires explicit publication.
 
 After a verified Supabase publication, a Google reporting mirror is attempted
 separately. A Google 429/503/readback failure leaves the Supabase publication
-valid and the mirror job retryable. Existing Google history is never rewritten
-by migration or rollback.
+valid and the mirror job retryable. Mirror delivery is claimed before the
+four-tab write, checkpointed only after exact readback verification, and may be
+reclaimed after an interrupted worker lease. Repeated publication and mirror
+requests resolve idempotently without another snapshot, reporting row set, or
+revision. When a newer publication becomes official, any unfinished older
+mirror job is superseded and cannot move Google back to the prior milestone.
+Existing Google history is never rewritten by migration or rollback.
+
+## Non-destructive publication certification
+
+`POST /api/odds/publication-operations` with the Director-only `rehearse`
+action runs only on an isolated Preview deployment. It loads the current
+Supabase input bundle, executes the unchanged deterministic Odds engine, builds
+the same native publication payload and the same four-tab Google reporting
+record sets, and invokes the real publication RPC in rehearsal mode.
+
+The database rehearsal performs the actual append/current-pointer, mirror-job,
+injected failure, retry, verified completion, duplicate publication, and
+duplicate delivery operations inside one PostgreSQL subtransaction. It then
+raises and catches a dedicated rollback signal. The response is successful only
+when the official snapshots and mirror jobs are byte/value unchanged afterward.
+No Google write is issued during rehearsal. A separate Director-only
+`retry-google-mirror` action is hard-gated to an isolated Preview where Supabase
+is already the resolved publication authority; it cannot be used while Google
+remains the selected publication authority.
 
 Preview server flags are `ODDS_CALCULATION_INPUT_SOURCE` and
 `ODDS_PUBLICATION_AUTHORITY`. Both fail closed to Google outside an isolated

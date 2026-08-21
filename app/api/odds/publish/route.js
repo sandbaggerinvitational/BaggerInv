@@ -13,9 +13,9 @@ import { authorizePreviewDirector } from "../../../../lib/preview-director-autho
 import { formatChampionshipOdds } from "../../../../lib/championship-odds-format";
 import { oddsPersistenceDiagnostics } from "../../../../lib/odds-workbook-persistence";
 import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, publishedOddsSnapshotsFromView, readPublishedOddsView, replacePublishedOddsSnapshots } from "../../../../lib/published-odds-supabase.js";
-import { buildSupabaseOddsPublication, completeSupabaseOddsGoogleMirror, loadSupabaseOddsInputs, publishSupabaseOddsSnapshot } from "../../../../lib/championship-odds-supabase.js";
+import { buildSupabaseOddsPublication, loadSupabaseOddsInputs, publishSupabaseOddsSnapshot } from "../../../../lib/championship-odds-supabase.js";
+import { deliverSupabaseOddsGoogleMirror } from "../../../../lib/championship-odds-google-mirror.js";
 import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
-import { scoringShadowPayloadHash } from "../../../../lib/scoring-shadow.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 
 export const dynamic = "force-dynamic";
@@ -114,15 +114,17 @@ async function publishProjection(request) {
       pass("Supabase publication", { function: "publishSupabaseOddsSnapshot", publication: nativePublication.payload });
       try {
         start("Google reporting mirror", { workbookOperation: "Atomic reporting mirror", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
-        snapshot = await publishOddsSnapshot(preview);
-        verification = await verifyPublishedOddsSnapshot(snapshot);
-        await completeSupabaseOddsGoogleMirror({ environment: "PREVIEW", snapshot_id: nativePublication.payload?.snapshot_id,
-          status: "SUCCEEDED", google_publication_fingerprint: scoringShadowPayloadHash({ verification, snapshot }),
-          google_publication_reference: { sheets: PUBLISHED_ODDS_WORKBOOK_TABS, verification } });
-        pass("Google reporting mirror", { function: "verifyPublishedOddsSnapshot", verification });
+        const mirror = await deliverSupabaseOddsGoogleMirror({ snapshotId: nativePublication.payload?.snapshot_id,
+          actorId: director?.identity?.player?.id || "Director publication" });
+        if (!mirror.ok) throw Object.assign(new Error("Google reporting mirror is delayed."), { code: mirror.code || "ODDS_GOOGLE_MIRROR_FAILED" });
+        if (mirror.delivered) {
+          snapshot = mirror.snapshot;
+          verification = mirror.verification;
+          pass("Google reporting mirror", { function: "verifyPublishedOddsSnapshot", verification, attemptCount: mirror.completion?.attempt_count });
+        } else {
+          pass("Google reporting mirror already verified", { function: "deliverSupabaseOddsGoogleMirror", duplicate: mirror.duplicate === true });
+        }
       } catch (mirrorError) {
-        await completeSupabaseOddsGoogleMirror({ environment: "PREVIEW", snapshot_id: nativePublication.payload?.snapshot_id,
-          status: "FAILED", error_safe: "Google reporting mirror is delayed." }).catch(() => null);
         console.error("Championship Odds Google reporting mirror delayed", { code: mirrorError?.code || "ODDS_GOOGLE_MIRROR_FAILED", message: mirrorError?.message || String(mirrorError), snapshotId: nativePublication.payload?.snapshot_id });
         pass("Google reporting mirror delayed", { function: "publishOddsSnapshot", snapshotId: nativePublication.payload?.snapshot_id, participantPublicationRetained: true });
       }
@@ -135,7 +137,7 @@ async function publishProjection(request) {
       pass("Workbook verification", { worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot", verification });
     }
 
-    if (process.env.VERCEL_ENV === "preview" && verification) {
+    if (process.env.VERCEL_ENV === "preview" && verification && source.publicationAuthority === "google") {
       start("Supabase publication projection", { workbookOperation: "Project verified published values without recalculation", worksheet: PUBLISHED_ODDS_WORKBOOK_TABS.join(", "), function: "replacePublishedOddsSnapshots" });
       const scope = await readPublishedOddsView({ sourceWorkbookId: process.env.GOOGLE_SHEETS_ID });
       if (!scope.payload?.ok) throw Object.assign(new Error("Published Odds tournament scope is unavailable."), { code: scope.payload?.code });

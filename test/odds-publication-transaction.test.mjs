@@ -6,7 +6,7 @@ const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("official projection reporting views publish in one field-scoped Sheets mutation", async () => {
   const source = await read("lib/google-sheets-write.js");
-  const start = source.indexOf("export async function publishOddsSnapshot");
+  const start = source.indexOf("export function buildOddsWorkbookPublicationRecords");
   const end = source.indexOf("const AUDIT_HEADERS", start);
   const publication = source.slice(start, end);
   assert.match(publication, /replaceRuntimeRecordSets\(\[/);
