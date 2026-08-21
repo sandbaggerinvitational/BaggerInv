@@ -13,11 +13,30 @@ export default function ParticipantAuthRehearsal() {
   const [requestId, setRequestId] = useState("");
   const [phoneToken, setPhoneToken] = useState("");
   const [phoneEnrollment, setPhoneEnrollment] = useState(null);
+  const [phoneLoginToken, setPhoneLoginToken] = useState("");
+  const [phoneLogin, setPhoneLogin] = useState(null);
   const [maskedMobile, setMaskedMobile] = useState("");
   const [resendSeconds, setResendSeconds] = useState(0);
+  const [phoneLoginResendSeconds, setPhoneLoginResendSeconds] = useState(0);
   const [session, setSession] = useState(null);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
+  const restorePhoneEnrollmentState = async () => {
+    const response = await fetch("/api/participant/auth/phone-enrollment", { cache: "no-store", credentials: "same-origin" });
+    const phoneState = await response.json();
+    if (phoneState.status === "VERIFIED") {
+      setPhoneEnrollment({ attemptId: "", status: "VERIFIED" });
+      return;
+    }
+    if (phoneState.status === "VERIFICATION_PENDING" && phoneState.attemptId) {
+      setPhoneEnrollment({ attemptId: phoneState.attemptId, status: phoneState.status });
+      setMaskedMobile(phoneState.maskedMobile || "Approved mobile");
+      setResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
+      setMessage("Verification code sent.");
+      return;
+    }
+    setPhoneEnrollment({ attemptId: "", status: "NONE" });
+  };
   useEffect(() => {
     enableParticipantAuthDiagnostics();
     recordParticipantAuthDiagnostic("AUTH_PAGE_LOADED", { routeTo: location.pathname });
@@ -29,13 +48,14 @@ export default function ParticipantAuthRehearsal() {
         setSession({ ...payload, localSessionCheckMs: duration });
         if (payload.session === "active") {
           flushParticipantAuthDiagnostics().catch(() => null);
-          fetch("/api/participant/auth/phone-enrollment", { cache: "no-store", credentials: "same-origin" })
+          restorePhoneEnrollmentState().catch(() => null);
+        } else {
+          fetch("/api/participant/auth/phone-login-proof", { cache: "no-store", credentials: "same-origin" })
             .then((response) => response.json()).then((phoneState) => {
-              if (phoneState.status === "VERIFICATION_PENDING" && phoneState.attemptId) {
-                setPhoneEnrollment({ attemptId: phoneState.attemptId, status: phoneState.status });
-                setMaskedMobile(phoneState.maskedMobile || "Approved mobile");
-                setResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
-                setMessage("Verification code sent.");
+              if (phoneState.armed === true) {
+                setPhoneLogin({ attemptId: phoneState.attemptId || "", status: phoneState.status || "READY", maskedMobile: phoneState.maskedMobile });
+                setPhoneLoginResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
+                if (phoneState.status === "VERIFICATION_PENDING") setMessage("Sign-in code sent to the approved mobile.");
               }
             }).catch(() => null);
         }
@@ -47,6 +67,11 @@ export default function ParticipantAuthRehearsal() {
     const timer = window.setTimeout(() => setResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
     return () => window.clearTimeout(timer);
   }, [resendSeconds]);
+  useEffect(() => {
+    if (phoneLoginResendSeconds <= 0) return undefined;
+    const timer = window.setTimeout(() => setPhoneLoginResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [phoneLoginResendSeconds]);
   const requestCode = async (event) => {
     event.preventDefault(); setBusy("request"); setMessage("");
     try {
@@ -71,6 +96,7 @@ export default function ParticipantAuthRehearsal() {
       const duration = Math.round(performance.now() - started);
       recordParticipantAuthDiagnostic("OTP_VERIFICATION", { durationMs: duration, routeTo: location.pathname });
       setSession({ session: "active", linkedPlayerId: payload.linkedPlayerId, otpVerificationMs: duration });
+      restorePhoneEnrollmentState().catch(() => null);
       flushParticipantAuthDiagnostics().catch(() => null);
       setMessage("Participant session established.");
       const requestedNext = String(searchParams.get("next") || "");
@@ -112,6 +138,59 @@ export default function ParticipantAuthRehearsal() {
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
+  const preparePhoneLoginProof = async () => {
+    if (!window.confirm("Prepare the controlled signed-out phone login proof? This signs out only this Preview participant browser session. No SMS is sent.")) return;
+    setBusy("phone-login-arm"); setMessage("");
+    try {
+      const response = await fetch("/api/participant/auth/phone-login-proof", { method: "POST", credentials: "same-origin",
+        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "arm" }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "The controlled phone login proof could not be prepared.");
+      clearParticipantAuthClientState();
+      const sessionResponse = await fetch("/api/participant/auth/session", { cache: "no-store", credentials: "same-origin" });
+      const sessionPayload = await sessionResponse.json();
+      if (sessionPayload.session !== "inactive") throw new Error("The Preview participant session could not be cleared safely.");
+      setSession({ session: "inactive" });
+      setPhoneLogin({ attemptId: "", status: "READY", maskedMobile: payload.maskedMobile });
+      setToken(""); setRequestId(""); setPhoneLoginToken("");
+      setMessage(payload.message || "Controlled signed-out phone login is ready. No SMS has been sent.");
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(""); }
+  };
+  const requestPhoneLoginCode = async () => {
+    if (!window.confirm("Send one real sign-in SMS to the already verified approved mobile? There is no automatic resend.")) return;
+    setBusy("phone-login-request"); setMessage("");
+    try {
+      const response = await fetch("/api/participant/auth/phone-login-proof", { method: "POST", credentials: "same-origin",
+        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "request" }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "The phone sign-in code could not be sent.");
+      setPhoneLogin({ attemptId: payload.attemptId, status: payload.status, maskedMobile: payload.maskedMobile });
+      setPhoneLoginResendSeconds(Number(payload.resendCooldownSeconds || 0));
+      setMessage(payload.message || "Sign-in code sent to the approved mobile.");
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(""); }
+  };
+  const verifyPhoneLoginCode = async (event) => {
+    event.preventDefault(); setBusy("phone-login-verify"); setMessage("");
+    try {
+      const response = await fetch("/api/participant/auth/phone-login-proof", { method: "POST", credentials: "same-origin",
+        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "verify", attemptId: phoneLogin?.attemptId, token: phoneLoginToken }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "That phone sign-in code is invalid or expired.");
+      const sessionResponse = await fetch("/api/participant/auth/session", { cache: "no-store", credentials: "same-origin" });
+      const sessionPayload = await sessionResponse.json();
+      if (sessionPayload.session !== "active" || sessionPayload.linkedPlayerId !== payload.linkedPlayerId) {
+        throw new Error("The phone was verified, but the participant session could not be restored safely.");
+      }
+      setSession(sessionPayload); setPhoneLoginToken("");
+      setPhoneLogin({ attemptId: "", status: "VERIFIED", maskedMobile: phoneLogin?.maskedMobile });
+      setPhoneEnrollment({ attemptId: "", status: "VERIFIED" });
+      flushParticipantAuthDiagnostics().catch(() => null);
+      setMessage(payload.message || "Phone sign-in verified on the existing Auth user.");
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(""); }
+  };
   return <main className={styles.page}>
     <section className={styles.card}>
       <span className={styles.eyebrow}>Preview only · Secure participant access</span>
@@ -123,7 +202,8 @@ export default function ParticipantAuthRehearsal() {
           <span className={styles.eyebrow}>Operation A · First-time enrollment</span>
           <h2 id="phone-enrollment-title">Add the approved mobile to this Auth user</h2>
           <p>This uses Supabase’s authenticated phone-change verification. The email Auth UUID and Player Passport stay unchanged. Nothing is sent until you confirm the button.</p>
-          {phoneEnrollment?.status === "VERIFIED" ? <strong>Mobile verified on this Auth user.</strong>
+          {phoneEnrollment === null ? <strong>Checking verified mobile state…</strong>
+            : phoneEnrollment?.status === "VERIFIED" ? <strong>Mobile verified on this Auth user.</strong>
             : phoneEnrollment?.status !== "VERIFICATION_PENDING" ? <button type="button" onClick={startPhoneEnrollment} disabled={Boolean(busy)}>{busy === "phone-start" ? "Starting…" : "Begin phone enrollment"}</button>
               : <form onSubmit={verifyPhoneEnrollment}>
                 <strong>Verification code sent</strong>
@@ -134,10 +214,38 @@ export default function ParticipantAuthRehearsal() {
                 <small>{resendSeconds > 0 ? `Resend available in ${resendSeconds}s.` : "The resend countdown has ended. Start over only if this code expires."}</small>
                 <small>Enter the code here—never paste it into chat.</small>
               </form>}
-          <div className={styles.operationBoundary}><strong>Operation B is separate</strong><span>Signed-out phone login remains disabled until enrollment succeeds and a later physical login test proves it returns this same Auth UUID.</span></div>
+          <div className={styles.operationBoundary}><strong>Operation B remains separate</strong><span>Enrollment is complete. The controlled signed-out phone-login proof below authenticates the verified phone without changing ownership.</span></div>
+        </section>
+        <section className={styles.phoneEnrollment} aria-labelledby="phone-login-proof-title">
+          <span className={styles.eyebrow}>Operation B · Controlled Preview proof</span>
+          <h2 id="phone-login-proof-title">Test signed-out login on the verified mobile</h2>
+          <p>This prepares a short-lived proof for only the verified CB01 mobile, signs out this participant browser session, and sends no SMS. Public participant SMS login remains off.</p>
+          <button type="button" onClick={preparePhoneLoginProof} disabled={Boolean(busy) || phoneEnrollment?.status !== "VERIFIED"}>
+            {busy === "phone-login-arm" ? "Preparing…" : "Prepare and sign out for phone-login proof"}
+          </button>
+          <small>Any existing Director entitlement is snapshotted before sign-out and must remain exactly unchanged after phone login.</small>
         </section>
       </>
         : <>
+          {phoneLogin ? <section className={styles.phoneEnrollment} aria-labelledby="signed-out-phone-login-title">
+            <span className={styles.eyebrow}>Operation B · Owner-controlled signed-out test</span>
+            <h2 id="signed-out-phone-login-title">Sign in with the verified approved mobile</h2>
+            <p>Preview participant session: signed out. Only the already verified rehearsal mobile is available; no phone number is accepted from this page.</p>
+            {phoneLogin.status === "READY" ? <>
+              <span className={styles.maskedMobile}>{phoneLogin.maskedMobile || "Approved mobile"}</span>
+              <button type="button" onClick={requestPhoneLoginCode} disabled={Boolean(busy)}>{busy === "phone-login-request" ? "Requesting…" : "Text the approved mobile a code"}</button>
+              <small>One owner-initiated SMS. No automatic resend.</small>
+            </> : phoneLogin.status === "VERIFICATION_PENDING" ? <form onSubmit={verifyPhoneLoginCode}>
+              <strong>Sign-in code sent</strong>
+              <span className={styles.maskedMobile}>{phoneLogin.maskedMobile || "Approved mobile"}</span>
+              <label>Six-digit phone sign-in code<input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={phoneLoginToken}
+                onChange={(event) => setPhoneLoginToken(event.target.value.replace(/\D/g, "").slice(0, 6))} autoComplete="one-time-code" required /></label>
+              <button disabled={Boolean(busy) || phoneLoginToken.length !== 6}>{busy === "phone-login-verify" ? "Verifying…" : "Verify phone sign-in"}</button>
+              <small>{phoneLoginResendSeconds > 0 ? `Resend locked for ${phoneLoginResendSeconds}s.` : "No automatic resend. Sign in by email to prepare a fresh proof if this code expires."}</small>
+              <small>Enter the code here—never include it in a screenshot or chat.</small>
+            </form> : <strong>Controlled phone sign-in completed.</strong>}
+            <div className={styles.operationBoundary}><strong>Email fallback remains available below</strong><span>CAPTCHA and the ordinary public SMS login UI remain deferred to Step 8B.3.</span></div>
+          </section> : null}
           <form onSubmit={requestCode}><label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required /></label>
             <button disabled={Boolean(busy)}>{busy === "request" ? "Requesting…" : "Send 6-digit code"}</button></form>
           {requestId ? <form onSubmit={verifyCode}><label>6-digit code<input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={token} onChange={(event) => setToken(event.target.value.replace(/\D/g, ""))} autoComplete="one-time-code" required /></label>
