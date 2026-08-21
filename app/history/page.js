@@ -20,6 +20,10 @@ import {
   loadHistory2026View,
 } from "../../lib/history-2026-service";
 import { HistoryUnavailableNotice } from "./HistoryUnavailable";
+import {
+  isSupabaseCompletedHistoryYear,
+  loadCompletedHistoryYears,
+} from "../../lib/completed-history-service";
 
 export const metadata = pageMetadata({
   title: "History | The Sandbagger Invitational",
@@ -29,28 +33,35 @@ export const metadata = pageMetadata({
 
 export default async function HistoryPage() {
   const useSupabase2026 = isSupabaseHistory2026("2026");
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear("2017");
   let tournaments;
   let currentHistoryUnavailable = false;
+  let completedHistoryUnavailable = false;
 
-  if (useSupabase2026) {
-    // Older years retain their existing legacy authority, but a private GViz
-    // refresh must not sit in front of the explicit Supabase 2026 entry. Render
-    // the already-available immutable legacy archive immediately and refresh
-    // its process cache only after this participant response has completed.
-    const legacyTournaments = getTournaments().filter(
-      (tournament) => Number(tournament.year) !== 2026
-    );
-    after(async () => {
-      await refreshHistoricalData();
-    });
-
+  if (useSupabaseCompleted) {
+    const [completedResult, currentResult] = await Promise.all([
+      loadCompletedHistoryYears()
+        .then((result) => ({ tournaments: result.tournaments }))
+        .catch(() => ({ tournaments: null })),
+      useSupabase2026
+        ? loadHistory2026View({ year: 2026 })
+          .then(history2026TournamentCard)
+          .catch(() => null)
+        : Promise.resolve(null),
+    ]);
+    completedHistoryUnavailable = !completedResult.tournaments;
+    currentHistoryUnavailable = useSupabase2026 && !currentResult;
+    tournaments = [currentResult, ...(completedResult.tournaments || [])]
+      .filter(Boolean)
+      .sort((a, b) => Number(b.year) - Number(a.year));
+  } else if (useSupabase2026) {
+    const legacyTournaments = getTournaments().filter((tournament) => Number(tournament.year) !== 2026);
+    after(async () => { await refreshHistoricalData(); });
     const currentTournament = await loadHistory2026View({ year: 2026 })
       .then(history2026TournamentCard)
       .catch(() => null);
     currentHistoryUnavailable = !currentTournament;
-
-    tournaments = [currentTournament, ...legacyTournaments]
-      .filter(Boolean)
+    tournaments = [currentTournament, ...legacyTournaments].filter(Boolean)
       .sort((a, b) => Number(b.year) - Number(a.year));
   } else {
     await refreshHistoricalData();
@@ -74,6 +85,9 @@ export default async function HistoryPage() {
       <section className={`${styles.content} ${pwaStyles.archiveContent}`} id="champions">
         {currentHistoryUnavailable ? (
           <HistoryUnavailableNotice year="2026" />
+        ) : null}
+        {completedHistoryUnavailable ? (
+          <HistoryUnavailableNotice year="2017–2025" />
         ) : null}
         <div className={`${styles.historyCardGrid} ${pwaStyles.yearGrid}`}>
           {tournaments.map((tournament, index) => {

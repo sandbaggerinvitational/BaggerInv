@@ -18,6 +18,12 @@ import styles from "../../historical.module.css";
 import { formatPlayerPoints, formatTeamPoints } from "../../../lib/formatters";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
+import {
+  completedHistoryTournamentPageModel,
+  isSupabaseCompletedHistoryYear,
+  loadCompletedHistoryView,
+} from "../../../lib/completed-history-service";
+import HistoryUnavailablePage from "../../history/HistoryUnavailable";
 
 function roundNumber(value) {
   return Number(String(value ?? "").replace(/\D/g, ""));
@@ -37,9 +43,26 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ChampionshipDetailPage({ params }) {
-  await refreshHistoricalData();
   const { year } = await params;
-  const tournament = getTournament(year);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
+  let tournament;
+  let leaderboardRows;
+  let completedRounds = null;
+  if (useSupabaseCompleted) {
+    try {
+      const view = await loadCompletedHistoryView({ year: Number(year) });
+      const model = completedHistoryTournamentPageModel(view);
+      tournament = model.tournament;
+      leaderboardRows = model.leaderboardRows;
+      completedRounds = view.rounds;
+    } catch {
+      return <HistoryUnavailablePage year={year} section="Championship History" />;
+    }
+  } else {
+    await refreshHistoricalData();
+    tournament = getTournament(year);
+    leaderboardRows = getTournamentPlayerLeaderboard(year);
+  }
 
   if (!tournament?.championTeam) notFound();
 
@@ -47,7 +70,6 @@ export default async function ChampionshipDetailPage({ params }) {
   const opponent = tournament.runnerUpTeam || tournament.teams.find(
     (team) => team.id !== champion.id
   );
-  const leaderboardRows = getTournamentPlayerLeaderboard(year);
   const pointsTracked = leaderboardRows.some((row) => row.pointsTracked);
   const leaderboard = addTournamentRanks(
     leaderboardRows,
@@ -58,7 +80,7 @@ export default async function ChampionshipDetailPage({ params }) {
   const standingsByPlayer = new Map(
     leaderboardRows.map((row) => [row.id, row])
   );
-  const rounds = tournament.courses
+  const rounds = completedRounds || tournament.courses
     .map((course) => {
       const number = roundNumber(course.Round);
       const archive = getHistoricalRound(year, number);
@@ -68,6 +90,15 @@ export default async function ChampionshipDetailPage({ params }) {
       return { number, course, archive, winningSide, opposingSide };
     })
     .filter(Boolean);
+  const championshipRounds = completedRounds
+    ? completedRounds.map((archive) => ({
+      number: archive.round,
+      course: archive.course,
+      archive,
+      winningSide: champion.side === "Team 1" ? archive.teamOne : archive.teamTwo,
+      opposingSide: champion.side === "Team 1" ? archive.teamTwo : archive.teamOne,
+    }))
+    : rounds;
 
   return (
     <main>
@@ -133,7 +164,7 @@ export default async function ChampionshipDetailPage({ params }) {
           <span className={styles.sectionLabel}>The Path to the Cup</span>
           <h2>Round-by-Round Points</h2>
           <div className={styles.championRounds}>
-            {rounds.map(({ number, course, archive, winningSide, opposingSide }) => (
+            {championshipRounds.map(({ number, course, archive, winningSide, opposingSide }) => (
               <Link href={`/history/${year}/round/${number}`} key={number}>
                 <div>
                   <span>Round {number} · {getFormatName(course.Format)}</span>
