@@ -222,9 +222,11 @@ test("Preview source boundary is reversible, Production-hard-blocked, and never 
 });
 
 test("projection migration reuses Odds configuration revisions and the route reads one Google tab", async () => {
-  const [migration, route, sourceGate, warRoom, optimizer, intelligence, oddsEngine] = await Promise.all([
+  const [migration, sharedRpcMigration, route, projectionService, sourceGate, warRoom, optimizer, intelligence, oddsEngine] = await Promise.all([
     readFile(new URL("../supabase/migrations/202608210011_preview_prediction_settings_projection.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608210012_preview_prediction_settings_shared_odds_rpc.sql", import.meta.url), "utf8"),
     readFile(new URL("../app/api/odds/prediction-settings/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/prediction-settings-supabase.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/prediction-settings-source.js", import.meta.url), "utf8"),
     readFile(new URL("../app/war-room/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/war-room/lineup-optimizer/page.js", import.meta.url), "utf8"),
@@ -241,6 +243,17 @@ test("projection migration reuses Odds configuration revisions and the route rea
   assert.match(migration, /PREDICTION_SETTINGS_VERSIONED/);
   assert.match(migration, /PREVIEW_ENVIRONMENT_REQUIRED/);
   assert.match(migration, /grant execute on function public\.read_preview_prediction_settings\(text\) to service_role/);
+  assert.match(sharedRpcMigration, /create or replace function public\.import_preview_championship_odds_inputs/);
+  assert.match(sharedRpcMigration, /function scoring_authority\.jsonb_object_length/);
+  assert.match(sharedRpcMigration, /revoke all on function scoring_authority\.jsonb_object_length\(jsonb\) from public,anon,authenticated/);
+  assert.match(sharedRpcMigration, /typed_prediction_settings boolean/);
+  assert.match(sharedRpcMigration, /current_config\.historical_ratings/);
+  assert.match(sharedRpcMigration, /PREDICTION_SETTINGS_VERSIONED/);
+  assert.match(sharedRpcMigration, /COMPLETE_VALID_PREDICTION_SETTINGS_REQUIRED/);
+  assert.match(projectionService, /import_preview_championship_odds_inputs/);
+  assert.match(projectionService, /readOddsInputBundle/);
+  assert.doesNotMatch(projectionService, /read_preview_prediction_settings/);
+  assert.match(route, /error\?\.shadowDiagnostics/);
   assert.match(route, /readWorkbookSheetsByName\(\[PREDICTION_SETTINGS_SOURCE_TAB\]\)/);
   assert.doesNotMatch(route, /loadPredictionSheets/);
   assert.doesNotMatch(route, /simulateTournamentOdds/);

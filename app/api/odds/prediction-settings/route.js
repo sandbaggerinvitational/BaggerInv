@@ -25,10 +25,21 @@ async function directorFor(request) {
 }
 
 function safeError(error) {
+  const shadow = error?.shadowDiagnostics && typeof error.shadowDiagnostics === "object"
+    ? {
+      status: Number(error?.status || 0),
+      path: clean(error.shadowDiagnostics.path),
+      code: clean(error.shadowDiagnostics.code),
+      message: clean(error.shadowDiagnostics.message),
+      details: clean(error.shadowDiagnostics.details),
+      hint: clean(error.shadowDiagnostics.hint),
+      durationMs: Number(error.shadowDiagnostics.durationMs || 0),
+    }
+    : null;
   return {
-    code: clean(error?.code || "PREDICTION_SETTINGS_OPERATION_FAILED"),
+    code: clean(error?.code || shadow?.code || "PREDICTION_SETTINGS_OPERATION_FAILED"),
     message: clean(error?.message || "Prediction Settings operation failed."),
-    ...(error?.diagnostics ? { diagnostics: error.diagnostics } : {}),
+    ...(error?.diagnostics ? { diagnostics: error.diagnostics } : shadow ? { diagnostics: shadow } : {}),
   };
 }
 
