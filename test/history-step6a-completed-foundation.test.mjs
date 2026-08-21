@@ -277,13 +277,22 @@ test("Step 6A source loader is fail-closed to one production workbook and no bun
 
 test("Step 6A route remains protected and does not alter public History source gates", async () => {
   const route = await readFile(new URL("../app/api/director/completed-history/route.js", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/admin/director/completed-history/page.js", import.meta.url), "utf8");
+  const client = await readFile(new URL("../app/admin/director/completed-history/CompletedHistoryClient.js", import.meta.url), "utf8");
   assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /process\.env\.VERCEL_ENV\s*!==\s*"preview"/);
   assert.match(route, /allowBootstrap:\s*false/);
+  assert.match(route, /sameOriginMutation\(request\)/);
+  assert.match(route, /A same-origin Director request is required/);
   assert.match(route, /expected_source_fingerprint/);
   assert.match(route, /HISTORICAL_RECONCILIATION_REQUIRED/);
   assert.match(route, /action === "shadow"/);
   assert.doesNotMatch(route, /HISTORY_.*READ_SOURCE|TOURNAMENT_READ_SOURCE|PUBLISHED_ODDS_READ_SOURCE/);
+  assert.match(page, /allowBootstrap: false/);
+  assert.match(page, /process\.env\.VERCEL_ENV\s*!==\s*"preview"/);
+  assert.match(page, /notFound\(\)/);
+  assert.match(client, /directorFetch\("\/api\/director\/completed-history"/);
+  assert.match(client, /idempotent re-import did not report an unchanged duplicate/);
 
   const files = await readdir(new URL("../supabase/migrations/", import.meta.url));
   assert.ok(files.some((name) => name === "202608210005_preview_completed_history_foundation.sql"));

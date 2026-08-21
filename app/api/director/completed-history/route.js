@@ -25,6 +25,15 @@ const clean = (value) => String(value ?? "").trim();
 const headers = { "Cache-Control": "private, no-store" };
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404, headers });
 
+function sameOriginMutation(request) {
+  const origin = clean(request.headers.get("origin"));
+  const fetchSite = clean(request.headers.get("sec-fetch-site")).toLowerCase();
+  let expectedOrigin = "";
+  try { expectedOrigin = new URL(request.url).origin; }
+  catch { return false; }
+  return origin === expectedOrigin && (!fetchSite || fetchSite === "same-origin");
+}
+
 async function authorize(request) {
   if (process.env.VERCEL_ENV !== "preview") return { response: unavailable() };
   const authorization = await authorizePreviewDirector({ request, allowBootstrap: false });
@@ -75,6 +84,9 @@ export async function GET(request) {
 export async function POST(request) {
   const access = await authorize(request);
   if (access.response) return access.response;
+  if (!sameOriginMutation(request)) {
+    return NextResponse.json({ error: "A same-origin Director request is required." }, { status: 403, headers });
+  }
   const body = await request.json().catch(() => ({}));
   const action = clean(body.action).toLowerCase();
   const year = Number(body.year);
