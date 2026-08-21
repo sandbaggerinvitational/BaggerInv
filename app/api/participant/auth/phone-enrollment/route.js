@@ -11,6 +11,7 @@ import {
 } from "../../../../../lib/participant-identity-supabase.js";
 import {
   assertParticipantPhoneEnrollmentAuthUser,
+  classifyParticipantPhoneOtpProviderFailure,
   normalizeParticipantPhoneOtpToken,
   participantPhoneOtpClientFingerprint,
   participantPhoneOtpErrorMessage,
@@ -158,18 +159,31 @@ export async function POST(request) {
           expiresAt: recorded.payload.expiresAt || attempt.expiresAt,
         }, { headers });
       } catch (error) {
-        const code = error?.code === "PHONE_OTP_AUTH_MISMATCH" || error?.code === "PHONE_OTP_REPAIR_REQUIRED"
+        const localSafetyError = error?.code === "PHONE_OTP_AUTH_MISMATCH" || error?.code === "PHONE_OTP_REPAIR_REQUIRED";
+        const failure = classifyParticipantPhoneOtpProviderFailure(error, "send");
+        const code = localSafetyError
           ? error.code
-          : participantPhoneOtpProviderFailureCode(error, "send");
+          : failure.code;
+        const providerCalled = providerAccepted || (!localSafetyError && failure.providerCalled === true);
         await recordParticipantPhoneEnrollmentSend({
           attempt_id: attempt.attemptId,
           actor_auth_user_id: expected.authUserId,
           succeeded: false,
-          provider_called: providerAccepted,
+          provider_called: providerCalled,
           safe_reason: code,
           duration_ms: Math.round(performance.now() - started),
         }).catch(() => null);
-        return errorResponse(code, code === "PHONE_OTP_RATE_LIMITED" ? 429 : code === "PHONE_OTP_PROVIDER_UNAVAILABLE" ? 503 : 409);
+        if (!localSafetyError) {
+          console.warn("Participant phone enrollment provider rejected", {
+            code,
+            authErrorCode: failure.authErrorCode,
+            authStatus: failure.authStatus,
+            providerErrorClass: failure.providerErrorClass,
+            providerCalled,
+          });
+        }
+        return errorResponse(code, code === "PHONE_OTP_RATE_LIMITED" ? 429
+          : ["PHONE_OTP_PROVIDER_UNAVAILABLE", "PHONE_OTP_TRIAL_RECIPIENT_UNVERIFIED"].includes(code) ? 503 : 409);
       }
     }
 
