@@ -131,7 +131,7 @@ test("Director API uses existing authorization, validates same-origin mutations,
   assert.doesNotMatch(route, /console\.(?:log|error)\([^\n]*phone/i);
 });
 
-test("Director UI manages masked eligibility while participant login remains email-only", async () => {
+test("Director UI manages masked eligibility while signed-out participant login remains email-only", async () => {
   const panel = await source("app/admin/director/ParticipantIdentityFoundationPanel.js");
   const login = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   const request = await source("app/api/participant/auth/otp/request/route.js");
@@ -143,8 +143,10 @@ test("Director UI manages masked eligibility while participant login remains ema
   assert.match(panel, /type="tel"/);
   assert.match(panel, /Email sign-in remains available/);
   assert.doesNotMatch(login, /Text Me a Code|Mobile Number|type="tel"/);
+  assert.match(login, /Operation A · First-time enrollment/);
+  assert.match(login, /authenticated phone-change verification/);
   assert.match(request, /shouldCreateUser: false/);
-  assert.doesNotMatch(`${login}\n${request}`, /phone|sms|twilio/i);
+  assert.doesNotMatch(request, /phone|sms|twilio/i);
 });
 
 test("new dependency is server/domain-only and no Twilio runtime is added", async () => {
