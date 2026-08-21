@@ -29,6 +29,14 @@ test("published player history preserves milestones and existing values", () => 
   assert.equal(history.at(-1).current, true);
 });
 
+test("published player history uses explicit future rank with legacy array-position fallback", () => {
+  const history = publishedPlayerHistory([
+    snapshot("Pre-Tournament", [player("a", "Clay Beltran", 9, "+1200")]),
+    snapshot("Round 3 Pairings Announced", [{ ...player("a", "Clay Beltran", 18, "+450"), rawProbability: 18.04, rank: 4 }]),
+  ], "a");
+  assert.deepEqual(history.map((entry) => entry.rank), [1, 4]);
+});
+
 test("projection history highlights published extrema and adjacent movement", () => {
   const history = projectionHistoryHighlights([
     { phase: "Pre-Tournament", probability: 9, rank: 8 },

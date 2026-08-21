@@ -21,6 +21,17 @@ test("published odds insights preserves supplied player order and ranking", () =
   assert.equal(result.movers, null);
 });
 
+test("published odds insights prefers explicit prospective ranks and falls back to immutable legacy order", () => {
+  const legacy = { phase: "After Round 2", phaseOrder: 2, players: [player("legacy", "Legacy Player", .4, "+24900")] };
+  const current = { phase: "Round 3 Pairings Announced", phaseOrder: 3, players: [
+    { ...player("higher", "Higher Raw Player", .4, "+19900"), rawProbability: .5, rank: 7 },
+    { ...player("legacy", "Legacy Player", .4, "+24900"), rawProbability: .4, rank: 8 },
+  ] };
+  const result = publishedOddsInsights([legacy, current]);
+  assert.deepEqual(result.players.map((entry) => entry.rank), [7, 8]);
+  assert.equal(result.players[1].previous.rank, undefined);
+});
+
 test("biggest movers compare only consecutive published snapshots", () => {
   const previous = { phase: "Round 1 Pairings", phaseOrder: 1, players: [
     player("clay", "Clay Beltran", 12, "+700"),

@@ -37,13 +37,18 @@ function sheets() {
 }
 
 test("published Odds import preserves exact Google payloads and milestone selection", () => {
-  const imported = buildPublishedOddsImport({ sheets: sheets(), tournamentId: "2026", tournamentYear: 2026,
+  const source = sheets();
+  const historicalJson = source["Odds Snapshots"].records.map(({ record }) => record["Snapshot JSON"]);
+  const imported = buildPublishedOddsImport({ sheets: source, tournamentId: "2026", tournamentYear: 2026,
     sourceWorkbookId: "preview", requestedBy: "Director" });
   assert.equal(imported.current_official_milestone, "After Round 1");
   assert.equal(imported.snapshots.length, 2);
   assert.deepEqual(imported.snapshots.map((item) => item.published_payload.phase), ["Pre-Tournament", "After Round 1"]);
   assert.match(imported.import_fingerprint, /^[0-9a-f]{64}$/);
   assert.equal(imported.snapshots[1].published_payload.players[0].probability, 20);
+  assert.deepEqual(imported.snapshots.map((item) => JSON.stringify(item.published_payload)), historicalJson);
+  assert.equal(imported.snapshots[0].published_payload.players[0].rank, undefined);
+  assert.equal(imported.snapshots[0].published_payload.players[0].rawProbability, undefined);
 });
 
 test("published Odds import is deterministic and rejects reporting divergence", () => {

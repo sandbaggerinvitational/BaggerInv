@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { PUBLICATION_STAGES, createPublicationTrace, validateProjectionSnapshot } from "../lib/projection-publication-diagnostics.js";
+import { americanOdds, ODDS_ENGINE_VERSION, ODDS_PUBLICATION_CONTRACT_VERSION } from "../lib/tournament-odds.js";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -27,6 +28,20 @@ test("snapshot validation rejects missing team or player projection output", () 
   const base = { year: 2026, phase: "Pre-Tournament", publishedAt: new Date().toISOString(), iterations: 10_000, totalPointsAvailable: 72 };
   assert.throws(() => validateProjectionSnapshot({ ...base, teams: [], players: [] }), /no team projections/i);
   assert.throws(() => validateProjectionSnapshot({ ...base, teams: [{ name: "Pickles", probability: 50 }], players: [] }), /no player projections/i);
+});
+
+test("snapshot validation enforces the prospective full-precision rank contract without imposing it on legacy publications", () => {
+  const base = { year: 2026, phase: "Round 3 Pairings Announced", publishedAt: new Date().toISOString(), iterations: 10_000, totalPointsAvailable: 72 };
+  const legacy = { ...base, teams: [{ name: "Pickles", probability: 50 }], players: [{ id: "p", name: "Player", probability: .4 }] };
+  assert.equal(validateProjectionSnapshot(legacy), legacy);
+  const current = { ...base, engineVersion: ODDS_ENGINE_VERSION, publicationContractVersion: ODDS_PUBLICATION_CONTRACT_VERSION,
+    teams: [{ name: "Pickles", rawProbability: 50, probability: 50, americanOdds: americanOdds(50) }],
+    players: [
+      { id: "higher", name: "Higher", rawProbability: .44, probability: .4, americanOdds: americanOdds(.44), rank: 1 },
+      { id: "lower", name: "Lower", rawProbability: .36, probability: .4, americanOdds: americanOdds(.36), rank: 2 },
+    ] };
+  assert.equal(validateProjectionSnapshot(current), current);
+  assert.throws(() => validateProjectionSnapshot({ ...current, players: current.players.slice().reverse() }), /full-precision contract|ordered by full-precision/i);
 });
 
 test("Preview Director UI renders trace timing and exact failure metadata", async () => {

@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { buildOddsInputProjection, buildSupabaseOddsPublication, compareOddsDeterministicParity, oddsEngineInputsFromBundle } from "../lib/championship-odds-supabase.js";
 import { oddsCalculationEnvironment } from "../lib/odds-calculation-source.js";
-import { simulateTournamentOdds } from "../lib/tournament-odds.js";
+import { ODDS_ENGINE_VERSION, ODDS_PUBLICATION_CONTRACT_VERSION, simulateTournamentOdds } from "../lib/tournament-odds.js";
 
 const core = {
   tournament: { tournament_id: "2026", tournament_year: 2026 },
@@ -39,12 +39,30 @@ test("canonical adapter reproduces unchanged tournament-odds.js deterministicall
   assert.equal(inputs.metadata.settingsFingerprint, projection.settings_fingerprint);
 });
 
-test("native publication carries reproducibility metadata without changing engine output", () => {
+test("cross-contract parity ignores only prospective metadata and intended raw-probability ordering", () => {
+  const shared = (id, probability, americanOdds) => ({ id, name: id, teamSide: 1, probability, americanOdds, expectedPoints: 1, expectedRecord: "1.0-0.0-0.0", averageFinish: 1 });
+  const legacy = { year: 2026, phase: "Round 3 Pairings Announced", phaseOrder: 3, publishedAt: "old", iterations: 10_000, totalPointsAvailable: 72,
+    teams: [{ side: 1, name: "Team", probability: 100, americanOdds: "-∞", expectedPoints: 72 }],
+    players: [shared("lower", .4, "+24900"), shared("higher", .4, "+19900")] };
+  const prospective = { ...legacy, publishedAt: "new", engineVersion: ODDS_ENGINE_VERSION, publicationContractVersion: ODDS_PUBLICATION_CONTRACT_VERSION,
+    deterministicSeed: "2026|Round 3 Pairings Announced|odds-v2-nassau",
+    teams: legacy.teams.map((team) => ({ ...team, rawProbability: 100 })),
+    players: [{ ...shared("higher", .4, "+19900"), rawProbability: .5, rank: 1 }, { ...shared("lower", .4, "+24900"), rawProbability: .4, rank: 2 }] };
+  const parity = compareOddsDeterministicParity(legacy, prospective);
+  assert.equal(parity.pass, true);
+  assert.equal(parity.exact, false);
+  assert.equal(parity.valueParity, true);
+  assert.equal(parity.rankingContractChanged, true);
+});
+
+test("native publication carries the prospective ranking contract while retaining the v2 deterministic seed", () => {
   const projection = buildOddsInputProjection({ tournamentId: "2026", tournamentYear: 2026, sourceWorkbookId: "preview", settings: [], historical });
   const inputs = oddsEngineInputsFromBundle({ current_state: core, input_configuration: { ...projection, configuration_revision: 1 } });
   const snapshot = simulateTournamentOdds({ ...inputs, phase: "Round 3 Pairings Announced", iterations: 10_000 });
   const publication = buildSupabaseOddsPublication({ snapshot, tournamentId: "2026", actorId: "DIRECTOR", metadata: inputs.metadata });
   assert.equal(publication.deterministic_seed, "2026|Round 3 Pairings Announced|odds-v2-nassau");
+  assert.equal(publication.engine_version, ODDS_ENGINE_VERSION);
+  assert.equal(publication.simulation_metadata.publicationContractVersion, ODDS_PUBLICATION_CONTRACT_VERSION);
   assert.deepEqual(publication.source_revision, core.source_revision);
   assert.equal(publication.simulation_metadata.iterations, 10_000);
   assert.deepEqual(publication.published_payload, snapshot);
@@ -57,7 +75,7 @@ test("Preview flags fail closed in Production", () => {
   assert.deepEqual([oddsCalculationEnvironment({ ...env, VERCEL_ENV: "production" }).inputSource, oddsCalculationEnvironment({ ...env, VERCEL_ENV: "production" }).publicationAuthority], ["google", "google"]);
 });
 
-test("migration and route are service/Director-only, idempotent, isolated, and keep the engine unchanged", async () => {
+test("migration and route are service/Director-only, idempotent, isolated, and retain v2 simulation seeds", async () => {
   const [migration, guards, route, inputRoute, engine] = await Promise.all([
     readFile(new URL("../supabase/migrations/202608120038_preview_championship_odds_inputs_publication.sql", import.meta.url), "utf8"),
     readFile(new URL("../supabase/migrations/202608120040_preview_championship_odds_runtime_guards.sql", import.meta.url), "utf8"),
@@ -77,6 +95,7 @@ test("migration and route are service/Director-only, idempotent, isolated, and k
   assert.match(inputRoute, /readWorkbookSheetsByName\(\["Prediction Settings"\]\)/);
   assert.match(inputRoute, /Number\(retained\.iterations\)/);
   assert.match(inputRoute, /Tournament Director access is required/);
-  assert.match(engine, /odds-v2-nassau/);
+  assert.match(engine, /ODDS_SIMULATION_SEED_VERSION = "odds-v2-nassau"/);
+  assert.match(engine, /odds-v3-nassau-full-precision-rank/);
   assert.match(engine, /iterations = 10_000/);
 });
