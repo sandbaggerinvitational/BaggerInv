@@ -23,6 +23,7 @@ import {
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const migrationPath = "supabase/migrations/202608210004_preview_phone_same_user_enrollment.sql";
 const repairPath = "supabase/preview_repairs/20260821_step_8b_2a_remove_failed_admin_phone_attachment.sql";
+const residualRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_2_clear_residual_unconfirmed_phone.sql";
 const authId = "11111111-1111-4111-8111-111111111111";
 const authB = "22222222-2222-4222-8222-222222222222";
 const phone = "+12025550123";
@@ -152,6 +153,18 @@ test("Auth state phases require empty phone, staged phone_change, then confirmed
   ), /did not match/i);
 });
 
+test("residual unconfirmed Auth phone blocks before provider use and repaired empty state is ready", () => {
+  const base = { id: authId, email: "golfer@example.net", phone_change: "", phone_confirmed_at: null };
+  assert.throws(() => assertParticipantPhoneEnrollmentAuthUser(
+    { ...base, phone: "12025550123" },
+    { expectedAuthUserId: authId, expectedEmail: base.email, targetPhone: phone, phase: "before" },
+  ), (error) => error.code === "PHONE_OTP_REPAIR_REQUIRED");
+  assert.doesNotThrow(() => assertParticipantPhoneEnrollmentAuthUser(
+    { ...base, phone: "" },
+    { expectedAuthUserId: authId, expectedEmail: base.email, targetPhone: phone, phase: "before" },
+  ));
+});
+
 test("OTP input and provider errors stay in bounded safe categories", () => {
   assert.equal(normalizeParticipantPhoneOtpToken("123 456"), "123456");
   for (const token of ["", "12345", "1234567", "12a456"]) assert.throws(() => normalizeParticipantPhoneOtpToken(token));
@@ -205,6 +218,30 @@ test("Preview repair is one-attempt guarded, preserves A/email/link, and never d
   assert.doesNotMatch(repair, /delete\s+from\s+auth\.users/i);
   assert.match(repair, /emailPreserved', true/);
   assert.match(repair, /playerLinkPreserved', true/);
+});
+
+test("residual Preview repair is PII-safe, exact-attempt scoped, and leaves enrollment ready", async () => {
+  const repair = await source(residualRepairPath);
+  assert.match(repair, /order by attempt\.requested_at desc[\s\S]*limit 1/);
+  assert.match(repair, /target_attempt\.status <> 'SEND_FAILED'/);
+  assert.match(repair, /target_attempt\.safe_reason <> 'PHONE_OTP_AUTH_MISMATCH'/);
+  assert.match(repair, /target_attempt\.provider_called/);
+  assert.match(repair, /target_attempt\.expires_at > now\(\)/);
+  assert.match(repair, /phone_confirmed_at is not null/);
+  assert.match(repair, /phone_change_sent_at is not null/);
+  assert.match(repair, /phone_change_token/);
+  assert.match(repair, /created_at between target_attempt\.requested_at/);
+  assert.match(repair, /delete from auth\.identities/);
+  assert.match(repair, /update auth\.users[\s\S]*set phone = null/);
+  assert.match(repair, /status = 'CANCELLED'/);
+  assert.match(repair, /safe_reason = 'PREVIEW_AUTH_PHONE_RESIDUE_REPAIRED'/);
+  assert.match(repair, /'PHONE_RESIDUAL_UNCONFIRMED_STATE_REPAIRED'/);
+  assert.match(repair, /'phoneIdentifierStatus', 'ELIGIBLE'/);
+  assert.match(repair, /'smsSent', false/);
+  assert.doesNotMatch(repair, /delete\s+from\s+auth\.users/i);
+  assert.doesNotMatch(repair, /(?:insert|update|delete)\s+(?:into\s+)?participant_identity\.user_player_links/i);
+  assert.doesNotMatch(repair, /status\s*=\s*'VERIFIED'/i);
+  assert.doesNotMatch(repair, /twilio|signInWithOtp|verifyOtp|updateUser\(\{\s*phone/i);
 });
 
 test("Director cannot send enrollment SMS; participant email session owns Operation A", async () => {
