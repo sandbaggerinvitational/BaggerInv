@@ -6,6 +6,11 @@ import TeamLogoPlate from "../TeamLogoPlate";
 import { getTournaments, refreshHistoricalData } from "../../lib/stats";
 import styles from "../historical.module.css";
 import { pageMetadata } from "../../lib/seo";
+import {
+  isSupabaseCompletedHistoryYear,
+  loadCompletedHistoryYears,
+} from "../../lib/completed-history-service";
+import { HistoryUnavailableNotice } from "../history/HistoryUnavailable";
 
 export const metadata = pageMetadata({
   title: "Champions | The Sandbagger Invitational",
@@ -25,10 +30,20 @@ function editionRibbon(value) {
 }
 
 export default async function ChampionsPage() {
-  await refreshHistoricalData();
-  const champions = getTournaments().filter(
-    (tournament) => tournament.championTeam
-  );
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(2017);
+  let unavailable = false;
+  let champions;
+  if (useSupabaseCompleted) {
+    champions = await loadCompletedHistoryYears()
+      .then((result) => result.tournaments.filter((tournament) => tournament.championTeam))
+      .catch(() => {
+        unavailable = true;
+        return [];
+      });
+  } else {
+    await refreshHistoricalData();
+    champions = getTournaments().filter((tournament) => tournament.championTeam);
+  }
 
   return (
     <main>
@@ -44,6 +59,7 @@ export default async function ChampionsPage() {
       </section>
 
       <section className={styles.content}>
+        {unavailable ? <HistoryUnavailableNotice year="2017–2025" /> : null}
         <div className={styles.championGrid}>
           {champions.map((tournament) => (
             <article className={styles.championCard} key={tournament.id}>

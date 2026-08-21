@@ -83,6 +83,12 @@ import {
   projectStep3CTournamentFinal,
 } from "../../../lib/history-2017-2022-migration";
 import PlayerProfileReturnNavigation from "../../PlayerProfileReturnNavigation";
+import {
+  completedHistoryResolvePlayer,
+  completedHistoryTournamentPageModel,
+  isSupabaseCompletedHistoryYear,
+  loadCompletedHistoryView,
+} from "../../../lib/completed-history-service";
 
 export async function generateMetadata({ params }) {
   const { year } = await params;
@@ -93,6 +99,14 @@ export async function generateMetadata({ params }) {
       tournament = history2026TournamentCard(
         await loadHistory2026View({ year: Number(year) })
       );
+    } catch {
+      tournament = null;
+    }
+  } else if (isSupabaseCompletedHistoryYear(year)) {
+    try {
+      tournament = completedHistoryTournamentPageModel(
+        await loadCompletedHistoryView({ year: Number(year) })
+      ).tournament;
     } catch {
       tournament = null;
     }
@@ -452,6 +466,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
   const { year } = await params;
   const query = await searchParams;
   const useSupabase2026 = isSupabaseHistory2026(year);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
   const step3CCompletedYear = isStep3CCompletedHistoryYear(year);
   let tournament;
   let roundPoints;
@@ -460,6 +475,8 @@ export default async function TournamentYearPage({ params, searchParams }) {
   let nextYear;
   let draft = null;
   let scorecardAnalytics;
+  let completedTournamentMatches = null;
+  let resolveHistoryPlayer = getPlayerBySlug;
 
   if (useSupabase2026) {
     try {
@@ -486,6 +503,32 @@ export default async function TournamentYearPage({ params, searchParams }) {
       return (
         <HistoryUnavailablePage year={year} section="Tournament History" />
       );
+    }
+  } else if (useSupabaseCompleted) {
+    try {
+      const view = await loadCompletedHistoryView({ year: Number(year) });
+      const model = completedHistoryTournamentPageModel(view);
+      if (
+        !model?.tournament ||
+        !Array.isArray(model.roundPoints) ||
+        !Array.isArray(model.leaderboardRows) ||
+        !Array.isArray(model.tournamentMatches) ||
+        !model.scorecardAnalytics
+      ) {
+        throw new Error("The completed historical view is incomplete.");
+      }
+      ({
+        tournament,
+        roundPoints,
+        leaderboardRows,
+        previousYear,
+        nextYear,
+        scorecardAnalytics,
+        tournamentMatches: completedTournamentMatches,
+      } = model);
+      resolveHistoryPlayer = (slug) => completedHistoryResolvePlayer(view, slug);
+    } catch {
+      return <HistoryUnavailablePage year={year} section="Tournament History" />;
     }
   } else {
     const scorecardAnalyticsPromise = step3CCompletedYear
@@ -551,8 +594,10 @@ export default async function TournamentYearPage({ params, searchParams }) {
       birdieLeader: completed2024IndividualStatistics.birdieLeader,
     }
     : scoringStatistics;
-  const tournamentMatches = useSupabase2026 ? [] : getTournamentMatches(year);
-  if (step3CCompletedYear) {
+  const tournamentMatches = useSupabase2026
+    ? []
+    : useSupabaseCompleted ? completedTournamentMatches : getTournamentMatches(year);
+  if (step3CCompletedYear && !useSupabaseCompleted) {
     const pointProjection = projectStep3CTournamentFinal({
       year: Number(year),
       tournament,
@@ -563,7 +608,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
       status = tournamentStatus(tournament);
     }
   }
-  if (Number(tournament?.year) === 2023) {
+  if (Number(tournament?.year) === 2023 && !useSupabaseCompleted) {
     const pointProjection = projectCanonical2023TournamentFinal({
       tournament,
       matches: tournamentMatches,
@@ -679,7 +724,9 @@ export default async function TournamentYearPage({ params, searchParams }) {
   const useStep3CCompletedMaster = !useSupabase2026 && step3CCompletedYear;
   const useFrozenCompletedPresentation = useCompletedMaster || useStep3CCompletedMaster;
   const playerReturnContext = isCompletedHistoryPlayerYear(tournament.year)
-    ? playerOriginReturnContext(query, getPlayerBySlug)
+    ? useSupabaseCompleted
+      ? playerOriginReturnContext(query, resolveHistoryPlayer)
+      : playerOriginReturnContext(query, getPlayerBySlug)
     : null;
   return (
     <main>

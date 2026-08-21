@@ -30,6 +30,12 @@ import {
   playerOriginReturnContext,
 } from "../../../../../lib/context-navigation";
 import PlayerProfileReturnNavigation from "../../../../PlayerProfileReturnNavigation";
+import {
+  completedHistoryResolvePlayer,
+  completedHistoryTeamPageModel,
+  isSupabaseCompletedHistoryYear,
+  loadCompletedHistoryView,
+} from "../../../../../lib/completed-history-service";
 
 function roundStatusLabel(value) {
   if (value === "FINAL") return "Final";
@@ -51,6 +57,15 @@ export async function generateMetadata({ params }) {
       if (team && !Array.isArray(team.roster)) {
         throw new Error("The 2026 historical team view is incomplete.");
       }
+    } catch {
+      team = null;
+    }
+  } else if (isSupabaseCompletedHistoryYear(year)) {
+    try {
+      team = completedHistoryTeamPageModel(
+        await loadCompletedHistoryView({ year: Number(year) }),
+        decodedSide
+      );
     } catch {
       team = null;
     }
@@ -82,7 +97,9 @@ export default async function TeamSeasonPage({ params, searchParams }) {
   const query = await searchParams;
   const decodedSide = decodeURIComponent(side);
   const useSupabase2026 = isSupabaseHistory2026(year);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
   let team;
+  let resolveHistoryPlayer = getPlayerBySlug;
 
   if (useSupabase2026) {
     try {
@@ -105,6 +122,23 @@ export default async function TeamSeasonPage({ params, searchParams }) {
     } catch {
       return <HistoryUnavailablePage year={year} section="Team History" />;
     }
+  } else if (useSupabaseCompleted) {
+    try {
+      const view = await loadCompletedHistoryView({ year: Number(year) });
+      team = completedHistoryTeamPageModel(view, decodedSide);
+      if (
+        team && (
+          !Array.isArray(team.roster) ||
+          !Array.isArray(team.roundGroups) ||
+          !team.tournament
+        )
+      ) {
+        throw new Error("The completed historical team view is incomplete.");
+      }
+      resolveHistoryPlayer = (slug) => completedHistoryResolvePlayer(view, slug);
+    } catch {
+      return <HistoryUnavailablePage year={year} section="Team History" />;
+    }
   } else {
     try {
       await (isStep3CCompletedHistoryYear(year)
@@ -121,7 +155,9 @@ export default async function TeamSeasonPage({ params, searchParams }) {
 
   if (!team) notFound();
   const playerReturnContext = isCompletedHistoryPlayerYear(team.year)
-    ? playerOriginReturnContext(query, getPlayerBySlug)
+    ? useSupabaseCompleted
+      ? playerOriginReturnContext(query, resolveHistoryPlayer)
+      : playerOriginReturnContext(query, getPlayerBySlug)
     : null;
 
   return (

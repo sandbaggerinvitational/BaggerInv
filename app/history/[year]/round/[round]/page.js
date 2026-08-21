@@ -76,6 +76,12 @@ import {
 } from "../../../../../lib/context-navigation";
 import PlayerProfileReturnNavigation from "../../../../PlayerProfileReturnNavigation";
 import HistoryMatchAnchorTarget from "../../../HistoryMatchAnchorTarget";
+import {
+  completedHistoryResolvePlayer,
+  completedHistoryRoundPageModel,
+  isSupabaseCompletedHistoryYear,
+  loadCompletedHistoryView,
+} from "../../../../../lib/completed-history-service";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
@@ -89,6 +95,15 @@ export async function generateMetadata({ params }) {
     try {
       archive = history2026RoundPageModel(
         await loadHistory2026View({ year: Number(year) }),
+        round
+      )?.archive;
+    } catch {
+      archive = null;
+    }
+  } else if (isSupabaseCompletedHistoryYear(year)) {
+    try {
+      archive = completedHistoryRoundPageModel(
+        await loadCompletedHistoryView({ year: Number(year) }),
         round
       )?.archive;
     } catch {
@@ -128,8 +143,11 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
   const { year, round } = await params;
   const query = await searchParams;
   const useSupabase2026 = isSupabaseHistory2026(year);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
   let archive;
   let scorecardAnalytics;
+  let roundTournamentMatches = null;
+  let resolveHistoryPlayer = getPlayerBySlug;
 
   if (useSupabase2026) {
     try {
@@ -146,6 +164,24 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
       return (
         <HistoryUnavailablePage year={year} section={`Round ${round} History`} />
       );
+    }
+  } else if (useSupabaseCompleted) {
+    try {
+      const view = await loadCompletedHistoryView({ year: Number(year) });
+      const model = completedHistoryRoundPageModel(view, round);
+      if (
+        !model?.archive ||
+        !model.scorecardAnalytics ||
+        !Array.isArray(model.tournamentMatches)
+      ) {
+        throw new Error("The completed historical round view is incomplete.");
+      }
+      archive = model.archive;
+      scorecardAnalytics = model.scorecardAnalytics;
+      roundTournamentMatches = model.tournamentMatches;
+      resolveHistoryPlayer = (slug) => completedHistoryResolvePlayer(view, slug);
+    } catch {
+      return <HistoryUnavailablePage year={year} section={`Round ${round} History`} />;
     }
   } else {
     const canonical2017To2022 = isStep3CCompletedHistoryYear(year);
@@ -236,7 +272,9 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
     : null;
   const legacyScorecardCoverage = useSupabase2026 ? null : buildLegacyHistoryScorecardCoverage({
     year: archive.year,
-    matches: getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
+    matches: useSupabaseCompleted
+      ? roundTournamentMatches
+      : getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round)),
     scorecards: scorecardAnalytics.scorecards,
     teamIds: [archive.teamOne.id, archive.teamTwo.id],
   });
@@ -245,7 +283,9 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
   const scorecardCoverageForMatch = (matchId) => legacyMatchCoverageById.get(matchId) || null;
   const legacyRoundMatches = useSupabase2026
     ? []
-    : getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round));
+    : useSupabaseCompleted
+      ? roundTournamentMatches
+      : getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round));
   const displayScorecardsForMatch = (matchId) => {
     const presentationScorecards = completed2023
       ? canonical2023RoundScorecards
@@ -455,7 +495,9 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
     },
   ];
   const playerReturnContext = isCompletedHistoryPlayerYear(archive.year)
-    ? playerOriginReturnContext(query, getPlayerBySlug)
+    ? useSupabaseCompleted
+      ? playerOriginReturnContext(query, resolveHistoryPlayer)
+      : playerOriginReturnContext(query, getPlayerBySlug)
     : null;
 
   return (
