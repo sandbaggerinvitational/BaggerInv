@@ -128,7 +128,7 @@ test("Players and Profiles use the shared service branch without page-level Supa
     source("app/players/page.js"),
     source("app/players/[slug]/page.js"),
     source("lib/secondary-history-service.js"),
-    source("supabase/migrations/202608210008_preview_secondary_history_player_projection.sql"),
+    source("supabase/migrations/202608210009_preview_secondary_history_player_projection.sql"),
     source(".env.example"),
   ]);
   for (const route of [directory, profile]) {
