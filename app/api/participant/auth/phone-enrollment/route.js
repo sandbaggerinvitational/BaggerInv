@@ -164,6 +164,9 @@ export async function POST(request) {
         const code = localSafetyError
           ? error.code
           : failure.code;
+        const responseCode = localSafetyError
+          ? "PHONE_OTP_ENROLLMENT_START_FAILED"
+          : code;
         const providerCalled = providerAccepted || (!localSafetyError && failure.providerCalled === true);
         await recordParticipantPhoneEnrollmentSend({
           attempt_id: attempt.attemptId,
@@ -182,8 +185,8 @@ export async function POST(request) {
             providerCalled,
           });
         }
-        return errorResponse(code, code === "PHONE_OTP_RATE_LIMITED" ? 429
-          : ["PHONE_OTP_PROVIDER_UNAVAILABLE", "PHONE_OTP_TRIAL_RECIPIENT_UNVERIFIED"].includes(code) ? 503 : 409);
+        return errorResponse(responseCode, responseCode === "PHONE_OTP_RATE_LIMITED" ? 429
+          : ["PHONE_OTP_PROVIDER_UNAVAILABLE", "PHONE_OTP_TRIAL_RECIPIENT_UNVERIFIED"].includes(responseCode) ? 503 : 409);
       }
     }
 
@@ -263,7 +266,10 @@ export async function POST(request) {
     }, { headers });
   } catch (error) {
     const code = error?.code || error?.identityDiagnostics?.code || "PHONE_OTP_PROVIDER_UNAVAILABLE";
+    const responseCode = action === "start" && code === "PHONE_OTP_AUTH_MISMATCH"
+      ? "PHONE_OTP_ENROLLMENT_START_FAILED"
+      : code;
     console.error("Participant phone enrollment failed", { code, message: "Participant phone enrollment failed." });
-    return errorResponse(code, Number(error?.status) || 409);
+    return errorResponse(responseCode, Number(error?.status) || 409);
   }
 }

@@ -26,6 +26,7 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 const migrationPath = "supabase/migrations/202608210004_preview_phone_same_user_enrollment.sql";
 const repairPath = "supabase/preview_repairs/20260821_step_8b_2a_remove_failed_admin_phone_attachment.sql";
 const residualRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_2_clear_residual_unconfirmed_phone.sql";
+const compromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_4_cancel_compromised_phone_change.sql";
 const authId = "11111111-1111-4111-8111-111111111111";
 const authB = "22222222-2222-4222-8222-222222222222";
 const phone = "+12025550123";
@@ -155,6 +156,29 @@ test("Auth state phases require empty phone, staged phone_change, then confirmed
   ), /did not match/i);
 });
 
+test("hosted Supabase User new_phone shape preserves A and ignores phone identity ids", () => {
+  const hostedPendingUser = {
+    id: authId,
+    email: "golfer@example.net",
+    phone: "",
+    new_phone: "12025550123",
+    phone_confirmed_at: null,
+    identities: [{
+      id: authB,
+      identity_id: authB,
+      user_id: authId,
+      provider: "email",
+    }],
+  };
+  assert.deepEqual(inspectParticipantAuthUserPhone(hostedPendingUser, phone), {
+    phoneState: "EMPTY", phoneChangeState: "EXPECTED", phoneConfirmed: false,
+  });
+  assert.doesNotThrow(() => assertParticipantPhoneEnrollmentAuthUser(
+    hostedPendingUser,
+    { expectedAuthUserId: authId, expectedEmail: hostedPendingUser.email, targetPhone: phone, phase: "pending" },
+  ));
+});
+
 test("residual unconfirmed Auth phone blocks before provider use and repaired empty state is ready", () => {
   const base = { id: authId, email: "golfer@example.net", phone_change: "", phone_confirmed_at: null };
   assert.throws(() => assertParticipantPhoneEnrollmentAuthUser(
@@ -204,6 +228,16 @@ test("enrollment route records a rejected Twilio request as provider-called usin
   assert.match(route, /authStatus: failure\.authStatus/);
   assert.match(route, /providerErrorClass: failure\.providerErrorClass/);
   assert.doesNotMatch(route, /message:\s*error\?\.message|console\.(?:warn|error)\([^\n]+error\?\.message/);
+});
+
+test("send-stage safety failures do not claim that OTP verification occurred", async () => {
+  const route = await source("app/api/participant/auth/phone-enrollment/route.js");
+  assert.equal(participantPhoneOtpErrorMessage("PHONE_OTP_ENROLLMENT_START_FAILED"),
+    "Phone enrollment could not be started safely.");
+  assert.match(route, /localSafetyError[\s\S]*PHONE_OTP_ENROLLMENT_START_FAILED/);
+  assert.match(route, /action === "start" && code === "PHONE_OTP_AUTH_MISMATCH"/);
+  assert.equal(participantPhoneOtpErrorMessage("PHONE_OTP_AUTH_MISMATCH"),
+    "The verified Auth identity did not match the approved participant.");
 });
 
 test("migration binds enrollment to actor A, active link, email, phone revision, and phone_change", async () => {
@@ -276,6 +310,28 @@ test("residual Preview repair is PII-safe, exact-attempt scoped, and leaves enro
   assert.doesNotMatch(repair, /(?:insert|update|delete)\s+(?:into\s+)?participant_identity\.user_player_links/i);
   assert.doesNotMatch(repair, /status\s*=\s*'VERIFIED'/i);
   assert.doesNotMatch(repair, /twilio|signInWithOtp|verifyOtp|updateUser\(\{\s*phone/i);
+});
+
+test("compromised real send is cancellable without accepting its OTP or changing ownership", async () => {
+  const repair = await source(compromisedRepairPath);
+  const executableRepair = repair.replace(/--.*$/gm, "");
+  assert.match(repair, /target_attempt\.status <> 'SEND_FAILED'/);
+  assert.match(repair, /target_attempt\.safe_reason <> 'PHONE_OTP_AUTH_MISMATCH'/);
+  assert.match(repair, /not target_attempt\.provider_called/);
+  assert.match(repair, /target_attempt\.verify_failure_count <> 0/);
+  assert.match(repair, /phone_change_sent_at is null/);
+  assert.match(repair, /phone_change_token/);
+  assert.match(repair, /update auth\.users[\s\S]*set phone_change = ''/);
+  assert.match(repair, /status = 'CANCELLED'/);
+  assert.match(repair, /safe_reason = 'COMPROMISED_OTP_SCREENSHOT'/);
+  assert.match(repair, /'PHONE_COMPROMISED_ENROLLMENT_CANCELLED'/);
+  assert.match(repair, /'failureStage', 'AFTER_UPDATE_USER_BEFORE_VERIFY_OTP'/);
+  assert.match(repair, /'phoneIdentifierStatus', 'ELIGIBLE'/);
+  assert.match(repair, /'smsSentByRepair', false/);
+  assert.doesNotMatch(repair, /delete\s+from\s+auth\.(?:users|identities)/i);
+  assert.doesNotMatch(repair, /(?:insert|update|delete)\s+(?:into\s+)?participant_identity\.user_player_links/i);
+  assert.doesNotMatch(repair, /status\s*=\s*'VERIFIED'/i);
+  assert.doesNotMatch(executableRepair, /signInWithOtp|verifyOtp|updateUser\(\{\s*phone/i);
 });
 
 test("Director cannot send enrollment SMS; participant email session owns Operation A", async () => {
