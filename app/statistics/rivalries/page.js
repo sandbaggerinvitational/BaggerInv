@@ -12,6 +12,8 @@ import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
+import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 
 export const metadata = pageMetadata({
   title: "Rivalry Analytics | The Sandbagger Invitational",
@@ -52,11 +54,15 @@ function RivalryTable({ title, description, rows, valueLabel, value }) {
 }
 
 export default async function RivalriesPage() {
-  await refreshHistoricalData();
-  const rivalries = getRivalryStats();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  if (!useSupabase) await refreshHistoricalData();
+  const rivalries = useSupabase
+    ? secondaryHistory.calculations.getRivalryStats()
+    : getRivalryStats();
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <Header />
 
       <section className={styles.pageHero}>

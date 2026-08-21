@@ -21,6 +21,8 @@ import {
   getLeaderboardSlugs,
 } from "../../lib/leaderboards";
 import { buildCanonicalRecordHolderAuthority } from "../../lib/record-holder-authority";
+import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -64,9 +66,15 @@ export const metadata = pageMetadata({
 });
 
 export default async function RecordsPage() {
-  const scorecardAnalyticsPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
-  const records = getRecords();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const scorecardAnalyticsPromise = useSupabase
+    ? Promise.resolve(secondaryHistory.scorecardAnalytics)
+    : loadScorecardAnalytics();
+  if (!useSupabase) await refreshHistoricalData();
+  const records = useSupabase
+    ? secondaryHistory.calculations.getRecords()
+    : getRecords();
   const scorecardAnalytics = await scorecardAnalyticsPromise;
   const playerNames = Object.fromEntries(
     records.points.map(({ player }) => [player["Player ID"], player["Display Name"]])
@@ -114,7 +122,7 @@ export default async function RecordsPage() {
   });
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <Header />
 
       <section className={styles.pageHero}>

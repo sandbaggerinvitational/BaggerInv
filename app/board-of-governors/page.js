@@ -13,6 +13,8 @@ import {
 } from "../../lib/stats";
 import styles from "../historical.module.css";
 import { pageMetadata } from "../../lib/seo";
+import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
 
 export const metadata = pageMetadata({
   title: "Board of Governors | Sandbagger Invitational",
@@ -21,13 +23,17 @@ export const metadata = pageMetadata({
 });
 
 export default async function BoardOfGovernorsPage() {
-  await refreshHistoricalData();
-  const governors = getAllPlayerStats().filter(({ player }) => player.boardOfGovernors);
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  if (!useSupabase) await refreshHistoricalData();
+  const governors = (useSupabase
+    ? secondaryHistory.calculations.getAllPlayerStats()
+    : getAllPlayerStats()).filter(({ player }) => player.boardOfGovernors);
   const combinedTitles = governors.reduce((sum, { stats }) => sum + (stats.championships?.length || 0), 0);
   const combinedAppearances = governors.reduce((sum, { stats }) => sum + (stats.appearances?.length || 0), 0);
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <Header />
 
       <section className={styles.pageHero}>
