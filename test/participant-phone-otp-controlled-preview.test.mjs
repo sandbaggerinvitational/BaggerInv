@@ -7,6 +7,8 @@ import {
   canonicalParticipantAuthPhone,
   classifyParticipantPhoneOtpProviderFailure,
   inspectParticipantAuthUserPhone,
+  maskParticipantAuthPhone,
+  normalizeParticipantPhoneEnrollmentStageB,
   normalizeParticipantPhoneOtpToken,
   participantPhoneOtpClientFingerprint,
   participantPhoneOtpErrorMessage,
@@ -27,6 +29,8 @@ const migrationPath = "supabase/migrations/202608210004_preview_phone_same_user_
 const repairPath = "supabase/preview_repairs/20260821_step_8b_2a_remove_failed_admin_phone_attachment.sql";
 const residualRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_2_clear_residual_unconfirmed_phone.sql";
 const compromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_4_cancel_compromised_phone_change.sql";
+const pendingTransitionMigrationPath = "supabase/migrations/202608210008_preview_phone_enrollment_pending_transition.sql";
+const latestCompromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_5_cancel_compromised_pending_transition.sql";
 const authId = "11111111-1111-4111-8111-111111111111";
 const authB = "22222222-2222-4222-8222-222222222222";
 const phone = "+12025550123";
@@ -153,7 +157,7 @@ test("Auth state phases require empty phone, staged phone_change, then confirmed
   assert.throws(() => assertParticipantPhoneEnrollmentAuthUser(
     { ...base, phone: "", phone_change: "12025550124", phone_confirmed_at: null },
     { expectedAuthUserId: authId, expectedEmail: base.email, targetPhone: phone, phase: "pending" },
-  ), /did not match/i);
+  ), (error) => error.code === "PHONE_OTP_PENDING_STATE_MISMATCH");
 });
 
 test("hosted Supabase User new_phone shape preserves A and ignores phone identity ids", () => {
@@ -177,6 +181,49 @@ test("hosted Supabase User new_phone shape preserves A and ignores phone identit
     hostedPendingUser,
     { expectedAuthUserId: authId, expectedEmail: hostedPendingUser.email, targetPhone: phone, phase: "pending" },
   ));
+});
+
+test("real hosted updateUser new_phone fixture advances Stage B before phone_change persistence catches up", () => {
+  const updateUser = {
+    id: authId,
+    email: "golfer@example.net",
+    phone: "",
+    new_phone: "12025550123",
+    phone_confirmed_at: null,
+    identities: [{ id: authB, identity_id: authB, user_id: authId, provider: "email" }],
+  };
+  const persistedUserAtRecordBoundary = {
+    id: authId,
+    email: updateUser.email,
+    phone: "",
+    phone_change: "",
+    phone_confirmed_at: null,
+  };
+  assert.deepEqual(normalizeParticipantPhoneEnrollmentStageB({
+    updateUser,
+    persistedUser: persistedUserAtRecordBoundary,
+    expectedAuthUserId: authId,
+    expectedEmail: updateUser.email,
+    targetPhone: phone,
+  }), {
+    authUserId: authId,
+    pendingPhoneMatches: true,
+    pendingPhoneSource: "UPDATE_USER_NEW_PHONE",
+    phoneRepresentationNormalized: true,
+  });
+  assert.equal(maskParticipantAuthPhone(phone), "••• ••• 0123");
+});
+
+test("Stage B reserves Auth mismatch for an Auth user UUID mismatch", () => {
+  const base = { email: "golfer@example.net", phone: "", new_phone: "12025550123", phone_confirmed_at: null };
+  assert.throws(() => normalizeParticipantPhoneEnrollmentStageB({
+    updateUser: { ...base, id: authB }, persistedUser: { ...base, id: authId },
+    expectedAuthUserId: authId, expectedEmail: base.email, targetPhone: phone,
+  }), (error) => error.code === "PHONE_OTP_AUTH_MISMATCH");
+  assert.throws(() => normalizeParticipantPhoneEnrollmentStageB({
+    updateUser: { ...base, id: authId, new_phone: "" }, persistedUser: { ...base, id: authId, new_phone: "" },
+    expectedAuthUserId: authId, expectedEmail: base.email, targetPhone: phone,
+  }), (error) => error.code === "PHONE_OTP_PENDING_STATE_MISMATCH");
 });
 
 test("residual unconfirmed Auth phone blocks before provider use and repaired empty state is ready", () => {
@@ -238,6 +285,21 @@ test("send-stage safety failures do not claim that OTP verification occurred", a
   assert.match(route, /action === "start" && code === "PHONE_OTP_AUTH_MISMATCH"/);
   assert.equal(participantPhoneOtpErrorMessage("PHONE_OTP_AUTH_MISMATCH"),
     "The verified Auth identity did not match the approved participant.");
+  assert.doesNotMatch(participantPhoneOtpErrorMessage("PHONE_OTP_PENDING_STATE_MISMATCH"), /verified Auth identity/i);
+  assert.doesNotMatch(participantPhoneOtpErrorMessage("PHONE_OTP_SEND_FAILED"), /verified Auth identity/i);
+  assert.doesNotMatch(participantPhoneOtpErrorMessage("PHONE_OTP_ENROLLMENT_START_FAILED"), /verified Auth identity/i);
+});
+
+test("Stage B record accepts normalized updateUser evidence without weakening UUID or collision gates", async () => {
+  const migration = await source(pendingTransitionMigrationPath);
+  assert.match(migration, /returned_auth_user is distinct from attempt\.auth_user_id[\s\S]*PHONE_OTP_AUTH_MISMATCH/);
+  assert.match(migration, /pending_phone_matches[\s\S]*PHONE_OTP_PENDING_STATE_MISMATCH/);
+  assert.match(migration, /pending_phone_source[\s\S]*UPDATE_USER_NEW_PHONE/);
+  assert.match(migration, /status', 'VERIFICATION_PENDING'/);
+  assert.match(migration, /status = case when succeeded then 'VERIFICATION_PENDING' else 'ELIGIBLE'/);
+  assert.match(migration, /PHONE_OTP_AUTH_COLLISION/);
+  assert.match(migration, /read_participant_phone_enrollment_state/);
+  assert.doesNotMatch(migration, /insert\s+into\s+auth\.users|update\s+participant_identity\.user_player_links/i);
 });
 
 test("migration binds enrollment to actor A, active link, email, phone revision, and phone_change", async () => {
@@ -334,6 +396,23 @@ test("compromised real send is cancellable without accepting its OTP or changing
   assert.doesNotMatch(executableRepair, /signInWithOtp|verifyOtp|updateUser\(\{\s*phone/i);
 });
 
+test("latest compromised Stage B attempt repair is exact, PII-safe, and sends no SMS", async () => {
+  const repair = await source(latestCompromisedRepairPath);
+  const executable = repair.replace(/--.*$/gm, "");
+  assert.match(repair, /status <> 'SEND_FAILED'/);
+  assert.match(repair, /safe_reason <> 'PHONE_OTP_AUTH_MISMATCH'/);
+  assert.match(repair, /sent_at is not null/);
+  assert.match(repair, /update auth\.users[\s\S]*phone_change = ''/);
+  assert.match(repair, /safe_reason = 'COMPROMISED_OTP_SCREENSHOT'/);
+  assert.match(repair, /IMMEDIATE_AUTH_USERS_PHONE_CHANGE_NOT_YET_VISIBLE/);
+  assert.match(repair, /'phoneIdentifierStatus', 'ELIGIBLE'/);
+  assert.match(repair, /'smsSentByRepair', false/);
+  assert.doesNotMatch(repair, /delete\s+from\s+auth\.(?:users|identities)/i);
+  assert.doesNotMatch(repair, /(?:insert|update|delete)\s+(?:into\s+)?participant_identity\.user_player_links/i);
+  assert.doesNotMatch(repair, /status\s*=\s*'VERIFIED'/i);
+  assert.doesNotMatch(executable, /signInWithOtp|verifyOtp|updateUser\(\{\s*phone/i);
+});
+
 test("Director cannot send enrollment SMS; participant email session owns Operation A", async () => {
   const [directorRoute, participantRoute, panel, participantUi] = await Promise.all([
     source("app/api/director/participant-identity/route.js"),
@@ -347,11 +426,27 @@ test("Director cannot send enrollment SMS; participant email session owns Operat
   assert.match(participantRoute, /verifyParticipantAuthClaims/);
   assert.match(participantRoute, /requestExistingParticipantPhoneEnrollment/);
   assert.match(participantRoute, /verifyExistingParticipantPhoneEnrollment/);
+  assert.match(participantRoute, /normalizeParticipantPhoneEnrollmentStageB/);
+  assert.match(participantRoute, /readParticipantPhoneEnrollmentState/);
   assert.match(participantRoute, /signOut\(\{ scope: "local" \}\)/);
   assert.match(participantUi, /window\.confirm/);
   assert.match(participantUi, /Begin phone enrollment/);
+  assert.match(participantUi, /Verification code sent/);
+  assert.match(participantUi, /Six-digit phone enrollment code/);
+  assert.match(participantUi, /resendSeconds/);
   assert.match(participantUi, /Operation B is separate/);
-  assert.doesNotMatch(participantUi, /useEffect\([\s\S]{0,300}phone-enrollment/);
+  assert.doesNotMatch(participantUi, /useEffect\([\s\S]{0,300}(?:action:\s*["']start|action:\s*["']verify)/);
+});
+
+test("verification UI is wired only to verifyOtp phone_change after Stage B", async () => {
+  const [route, ui] = await Promise.all([
+    source("app/api/participant/auth/phone-enrollment/route.js"),
+    source("app/participant-auth/ParticipantAuthRehearsal.js"),
+  ]);
+  assert.match(ui, /action: "verify", attemptId: phoneEnrollment\?\.attemptId, token: phoneToken/);
+  assert.match(ui, /phoneEnrollment\?\.status !== "VERIFICATION_PENDING"/);
+  assert.match(route, /verifyExistingParticipantPhoneEnrollment/);
+  assert.match(await source("lib/participant-phone-otp.js"), /verifyOtp\(\{ phone, token, type: "phone_change" \}\)/);
 });
 
 test("email sign-in remains enabled while public phone login remains absent", async () => {

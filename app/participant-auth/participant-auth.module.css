@@ -16,6 +16,7 @@
 .phoneEnrollment p { margin: 0; }
 .phoneEnrollment form { margin-top: 0; }
 .phoneEnrollment small { margin-top: 0; }
+.maskedMobile { color: #56625c; font-size: .9rem; font-weight: 800; letter-spacing: .08em; }
 .operationBoundary { display: grid; gap: 4px; padding-top: 12px; border-top: 1px solid #e1d5b4; }
 .operationBoundary strong { color: #0b4435; }
 .operationBoundary span { color: #56625c; font-size: .82rem; line-height: 1.45; }

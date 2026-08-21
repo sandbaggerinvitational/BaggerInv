@@ -6,12 +6,15 @@ import {
   beginParticipantPhoneEnrollment,
   completeParticipantPhoneEnrollment,
   readParticipantIdentityContextForAuth,
+  readParticipantPhoneEnrollmentState,
   recordParticipantPhoneEnrollmentFailure,
   recordParticipantPhoneEnrollmentSend,
 } from "../../../../../lib/participant-identity-supabase.js";
 import {
   assertParticipantPhoneEnrollmentAuthUser,
   classifyParticipantPhoneOtpProviderFailure,
+  maskParticipantAuthPhone,
+  normalizeParticipantPhoneEnrollmentStageB,
   normalizeParticipantPhoneOtpToken,
   participantPhoneOtpClientFingerprint,
   participantPhoneOtpErrorMessage,
@@ -41,13 +44,13 @@ function errorResponse(code, status) {
   return NextResponse.json({ error: participantPhoneOtpErrorMessage(code), code }, { status, headers });
 }
 
-async function authorizeParticipant(request) {
+async function authorizeParticipant(request, { mutation = true } = {}) {
   const authority = participantIdentityAuthorityEnvironment();
   if (process.env.VERCEL_ENV !== "preview" || !authority.participantAuthEnabled ||
       authority.resolved !== "supabase" || !participantSmsProviderTestConfigured()) {
     return { response: NextResponse.json({ error: "Not found." }, { status: 404, headers }) };
   }
-  if (!sameOriginMutation(request)) return { response: errorResponse("PHONE_OTP_SESSION_REQUIRED", 403) };
+  if (mutation && !sameOriginMutation(request)) return { response: errorResponse("PHONE_OTP_SESSION_REQUIRED", 403) };
   const cookieStore = await cookies();
   const verified = await verifyParticipantAuthClaims(cookieStore);
   if (verified.status !== "active" || !verified.claims?.sub) {
@@ -59,6 +62,19 @@ async function authorizeParticipant(request) {
     return { response: errorResponse("PHONE_OTP_NOT_ELIGIBLE", 403) };
   }
   return { authUserId: verified.claims.sub, context, cookieStore };
+}
+
+export async function GET(request) {
+  const authorization = await authorizeParticipant(request, { mutation: false });
+  if (authorization.response) return authorization.response;
+  const stateRead = await readParticipantPhoneEnrollmentState({
+    tournament_id: authorization.context.tournament.id,
+    player_id: authorization.context.playerId,
+    actor_auth_user_id: authorization.authUserId,
+  });
+  const state = stateRead.payload || {};
+  if (state.ok !== true) return errorResponse(state.code || "PHONE_OTP_ENROLLMENT_START_FAILED", 409);
+  return NextResponse.json(state, { headers });
 }
 
 async function readExpectedAuthUser(adminClient, expected) {
@@ -92,7 +108,8 @@ export async function POST(request) {
       });
       const attempt = attemptRead.payload || {};
       if (attempt.allowed !== true) {
-        const code = attempt.code || "PHONE_OTP_NOT_ELIGIBLE";
+        const attemptCode = attempt.code || "PHONE_OTP_NOT_ELIGIBLE";
+        const code = attemptCode === "PHONE_OTP_AUTH_MISMATCH" ? "PHONE_OTP_ENROLLMENT_START_FAILED" : attemptCode;
         const status = ["PHONE_OTP_COOLDOWN", "PHONE_OTP_RATE_LIMITED"].includes(code) ? 429 : 409;
         return errorResponse(code, status);
       }
@@ -106,7 +123,7 @@ export async function POST(request) {
           safe_reason: "PHONE_OTP_AUTH_MISMATCH",
           duration_ms: 0,
         });
-        return errorResponse("PHONE_OTP_AUTH_MISMATCH", 409);
+        return errorResponse("PHONE_OTP_ENROLLMENT_START_FAILED", 409);
       }
 
       const adminClient = createParticipantAuthAdminClient();
@@ -130,11 +147,13 @@ export async function POST(request) {
         });
         providerAccepted = requested.providerAccepted === true;
         const pendingUser = await readExpectedAuthUser(adminClient, expected);
-        assertParticipantPhoneEnrollmentAuthUser(pendingUser, {
+        const stageB = normalizeParticipantPhoneEnrollmentStageB({
+          updateUser: requested.user,
+          persistedUser: pendingUser,
           expectedAuthUserId: expected.authUserId,
           expectedEmail: attempt.emailNormalized,
           targetPhone: attempt.phoneE164,
-          phase: "pending",
+          requireUpdateUser: requested.method === "AUTHENTICATED_UPDATE_USER_PHONE",
         });
         const recorded = await recordParticipantPhoneEnrollmentSend({
           attempt_id: attempt.attemptId,
@@ -142,10 +161,14 @@ export async function POST(request) {
           succeeded: true,
           provider_called: true,
           safe_reason: "PHONE_CHANGE_PROVIDER_ACCEPTED",
+          returned_auth_user_id: requested.userId,
+          pending_phone_matches: stageB.pendingPhoneMatches,
+          pending_phone_source: stageB.pendingPhoneSource,
           duration_ms: Math.round(performance.now() - started),
         });
         if (recorded.payload?.ok !== true) {
-          return errorResponse(recorded.payload?.code || "PHONE_OTP_AUTH_MISMATCH", 409);
+          const code = recorded.payload?.code || "PHONE_OTP_ENROLLMENT_START_FAILED";
+          return errorResponse(code === "PHONE_OTP_AUTH_MISMATCH" ? "PHONE_OTP_ENROLLMENT_START_FAILED" : code, 409);
         }
         return NextResponse.json({
           ok: true,
@@ -153,18 +176,21 @@ export async function POST(request) {
           attemptId: attempt.attemptId,
           status: "VERIFICATION_PENDING",
           sameAuthUser: requested.sameAuthUser === true,
+          phoneRepresentationNormalized: stageB.phoneRepresentationNormalized,
           enrollmentMethod: "AUTHENTICATED_PHONE_CHANGE",
-          message: "Phone enrollment code requested for the existing signed-in Auth user.",
+          maskedMobile: maskParticipantAuthPhone(attempt.phoneE164),
+          message: "Verification code sent.",
           resendCooldownSeconds: 60,
           expiresAt: recorded.payload.expiresAt || attempt.expiresAt,
         }, { headers });
       } catch (error) {
-        const localSafetyError = error?.code === "PHONE_OTP_AUTH_MISMATCH" || error?.code === "PHONE_OTP_REPAIR_REQUIRED";
+        const localSafetyError = ["PHONE_OTP_AUTH_MISMATCH", "PHONE_OTP_REPAIR_REQUIRED",
+          "PHONE_OTP_PENDING_STATE_MISMATCH", "PHONE_OTP_ENROLLMENT_START_FAILED"].includes(error?.code);
         const failure = classifyParticipantPhoneOtpProviderFailure(error, "send");
         const code = localSafetyError
           ? error.code
           : failure.code;
-        const responseCode = localSafetyError
+        const responseCode = code === "PHONE_OTP_AUTH_MISMATCH"
           ? "PHONE_OTP_ENROLLMENT_START_FAILED"
           : code;
         const providerCalled = providerAccepted || (!localSafetyError && failure.providerCalled === true);
@@ -200,7 +226,8 @@ export async function POST(request) {
     });
     const allowed = allowedRead.payload || {};
     if (allowed.allowed !== true) {
-      const code = allowed.code || "PHONE_OTP_INVALID_OR_EXPIRED";
+      const allowedCode = allowed.code || "PHONE_OTP_INVALID_OR_EXPIRED";
+      const code = allowedCode === "PHONE_OTP_AUTH_MISMATCH" ? "PHONE_OTP_PENDING_STATE_MISMATCH" : allowedCode;
       return errorResponse(code, code === "PHONE_OTP_REPLAY" ? 409 : 400);
     }
     if (allowed.authUserId !== expected.authUserId || allowed.playerId !== expected.playerId ||
@@ -253,7 +280,8 @@ export async function POST(request) {
       duration_ms: Math.round(performance.now() - started),
     });
     if (completion.payload?.ok !== true) {
-      return errorResponse(completion.payload?.code || "PHONE_OTP_AUTH_MISMATCH", 409);
+      const completionCode = completion.payload?.code || "PHONE_OTP_VERIFY_FAILED";
+      return errorResponse(completionCode === "PHONE_OTP_AUTH_MISMATCH" ? "PHONE_OTP_VERIFY_FAILED" : completionCode, 409);
     }
     return NextResponse.json({
       ok: true,
