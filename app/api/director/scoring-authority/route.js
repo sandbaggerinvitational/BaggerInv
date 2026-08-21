@@ -22,9 +22,9 @@ import {
   replaceCanonicalScoringAuthorityImport,
   submitCanonicalHoleScore,
 } from "../../../../lib/scoring-authority-supabase.js";
-import { benchmarkSummary, canonicalJson } from "../../../../lib/scoring-shadow.js";
+import { benchmarkSummary, canonicalJson, scoringShadowPayloadHash } from "../../../../lib/scoring-shadow.js";
 import { drainGoogleOutbox, inspectGoogleMatchState, processNextGoogleOutboxEvent } from "../../../../lib/scoring-google-outbox.js";
-import { inspectPreviewLiveMatchScoringLockMigration, migratePreviewLiveMatchScoringLock, normalizeLegacyReopenedMatch, readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
+import { inspectPreviewLiveMatchScoringLockMigration, migratePreviewLiveMatchScoringLock, normalizeLegacyReopenedMatch, readOddsSnapshots, readWorkbookSheetsByName, repairFinalizedLiveMatchParity, saveLiveHoleScore, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
 import { grossScoresFromCell } from "../../../../lib/live-score-values.js";
 import {
   buildGameCenterPresentationImport,
@@ -100,10 +100,19 @@ import {
   buildPublishedOddsImport,
   comparePublishedOddsParity,
   PUBLISHED_ODDS_WORKBOOK_TABS,
+  publishedOddsFreshness,
+  publishedOddsLegacyPublication,
   publishedOddsSnapshotsFromView,
   readPublishedOddsView,
   replacePublishedOddsSnapshots,
 } from "../../../../lib/published-odds-supabase.js";
+import { publishedOddsReadEnvironment } from "../../../../lib/published-odds-read-source.js";
+import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
+import { loadOddsInputs } from "../../../../lib/odds-data.js";
+import { PREDICTION_SHEETS } from "../../../../lib/prediction-data.js";
+import { currentTournamentYear } from "../../../../lib/tournament-context.js";
+import { validateOpeningMatchups } from "../../../../lib/tournament-odds.js";
+import { publishedOddsInsights } from "../../../../lib/championship-odds-insights.js";
 import { getTournamentData, invalidateTournamentDataCache } from "../../../live/sheetData.js";
 import {
   MATCH_ACCESS_ACTIONS,
@@ -1016,7 +1025,46 @@ async function intelligenceDerivedReadiness(actorId, { refresh = false } = {}) {
     pass: Boolean(current.tournamentIntelligence && current.projectionEditorial && !current.finalRecap) };
 }
 
+async function publishedOddsGooglePublicReadSample() {
+  const startedAt = performance.now();
+  const measured = await withWorkbookWriteDiagnostics("published-odds-google-public-read", async () => {
+    const inputs = await loadOddsInputs();
+    const tournamentYear = currentTournamentYear(inputs.sheets);
+    const openingMatchups = validateOpeningMatchups(inputs.sheets, tournamentYear);
+    const snapshots = openingMatchups.ready
+      ? (await readOddsSnapshots()).filter((snapshot) => Number(snapshot.year) === tournamentYear)
+        .sort((left, right) => Number(left.phaseOrder || 0) - Number(right.phaseOrder || 0))
+      : [];
+    return { tournamentYear, openingMatchupsReady: openingMatchups.ready, snapshots,
+      publication: publishedOddsLegacyPublication(snapshots) };
+  });
+  return { durationMs: performance.now() - startedAt, diagnostics: measured.diagnostics,
+    tournamentYear: measured.result.tournamentYear, openingMatchupsReady: measured.result.openingMatchupsReady,
+    snapshots: measured.result.snapshots, publication: measured.result.publication };
+}
+
+function publishedOddsDerivedParityProjection(snapshots = []) {
+  const insights = publishedOddsInsights(snapshots);
+  return {
+    currentMilestone: insights.current?.phase || null,
+    previousMilestone: insights.previous?.phase || null,
+    favoritePlayerId: insights.favorite?.id || null,
+    mover: {
+      riserPlayerId: insights.movers?.riser?.id || null,
+      riserChange: insights.movers?.riser?.change ?? null,
+      fallerPlayerId: insights.movers?.faller?.id || null,
+      fallerChange: insights.movers?.faller?.change ?? null,
+    },
+    players: insights.players.map((player) => ({ id: player.id, rank: player.rank,
+      probability: player.probability, priorProbability: player.previous?.probability ?? null, change: player.change })),
+  };
+}
+
 async function publishedOddsReadiness(actorId, { refresh = false, samples = 25 } = {}) {
+  const readEnvironment = publishedOddsReadEnvironment();
+  const calculationEnvironment = oddsCalculationEnvironment();
+  const googlePublicCold = await publishedOddsGooglePublicReadSample();
+  const googlePublicWarm = await publishedOddsGooglePublicReadSample();
   const source = await authoritativeImport(actorId);
   const googleStartedAt = performance.now();
   const sheets = await readWorkbookSheetsByName(PUBLISHED_ODDS_WORKBOOK_TABS);
@@ -1039,9 +1087,20 @@ async function publishedOddsReadiness(actorId, { refresh = false, samples = 25 }
   const expected = imported.snapshots.map((item) => item.published_payload);
   const actual = publishedOddsSnapshotsFromView(read.payload.data);
   const parity = comparePublishedOddsParity(expected, actual);
+  const expectedDerived = publishedOddsDerivedParityProjection(expected);
+  const actualDerived = publishedOddsDerivedParityProjection(actual);
+  const derivedParity = scoringShadowPayloadHash(expectedDerived) === scoringShadowPayloadHash(actualDerived);
   const rows = read.payload.data.snapshots || [];
   const current = rows.find((item) => item.is_current_official);
+  const freshness = publishedOddsFreshness(read.payload.data);
   return {
+    authorities: {
+      publicRead: { configured: readEnvironment.requested, resolved: readEnvironment.resolved, reason: readEnvironment.reason,
+        previewDeployment: readEnvironment.previewDeployment, previewWorkbook: readEnvironment.previewWorkbook,
+        credentialsConfigured: readEnvironment.credentialsConfigured },
+      publication: { configured: calculationEnvironment.requestedPublication, resolved: calculationEnvironment.publicationAuthority },
+      calculationInputs: { configured: calculationEnvironment.requestedInputs, resolved: calculationEnvironment.inputSource },
+    },
     import: write?.payload || null,
     importFingerprint: imported.import_fingerprint,
     currentSelection: { tournamentId: tournament.tournament_id, tournamentYear: tournament.tournament_year,
@@ -1052,20 +1111,46 @@ async function publishedOddsReadiness(actorId, { refresh = false, samples = 25 }
       teamRows: item.payload?.teams?.length || 0, playerRows: item.payload?.players?.length || 0,
       complete: item.publication_verified === true, payloadHash: item.payload_hash,
       current: item.is_current_official === true })),
+    currentSnapshot: current ? {
+      tournamentYear: tournament.tournament_year,
+      milestone: current.milestone,
+      phaseOrder: current.phase_order,
+      publicationRevision: current.publication_revision,
+      publishedAt: current.published_at,
+      payloadFingerprint: freshness.payloadFingerprint,
+      sourceFingerprint: freshness.sourceFingerprint,
+      configurationFingerprint: freshness.configurationFingerprint,
+      configurationVersion: freshness.configurationVersion,
+      engineVersion: freshness.engineVersion,
+      contractVersion: freshness.contractVersion,
+      googleMirror: freshness.googleMirror,
+    } : null,
+    freshness,
     parity: { ...parity, milestonesCompared: expected.length, teamRows: expected.reduce((sum, item) => sum + item.teams.length, 0),
       playerRows: expected.reduce((sum, item) => sum + item.players.length, 0), teamDivergences: parity.pass ? 0 : null,
-      playerDivergences: parity.pass ? 0 : null, movementHistoryPreserved: actual.length > 1 },
+      playerDivergences: parity.pass ? 0 : null, movementHistoryPreserved: actual.length > 1,
+      derived: { pass: derivedParity, expected: expectedDerived, actual: actualDerived } },
     metadata: { sourceFingerprintAvailable: expected.every((item) => Boolean(clean(item.sourceFingerprint))),
       engineVersionAvailable: expected.every((item) => Boolean(clean(item.engineVersion))),
       configurationVersionAvailable: expected.every((item) => Boolean(clean(item.configurationVersion))),
       iterationsPreserved: expected.map((item) => ({ milestone: item.phase, iterations: item.iterations })),
       valuesRecalculated: false },
     google: { publicationSource: true, participantDependency: false, participantRequests: 0,
-      explicitImportReadMs: googlePublicationReadMs, sheets: PUBLISHED_ODDS_WORKBOOK_TABS },
+      explicitImportReadMs: googlePublicationReadMs, sheets: PUBLISHED_ODDS_WORKBOOK_TABS,
+      publicRead: {
+        cold: { durationMs: googlePublicCold.durationMs, diagnostics: googlePublicCold.diagnostics,
+          tournamentYear: googlePublicCold.tournamentYear, openingMatchupsReady: googlePublicCold.openingMatchupsReady,
+          historyCount: googlePublicCold.snapshots.length, publication: googlePublicCold.publication },
+        warm: { durationMs: googlePublicWarm.durationMs, diagnostics: googlePublicWarm.diagnostics,
+          tournamentYear: googlePublicWarm.tournamentYear, openingMatchupsReady: googlePublicWarm.openingMatchupsReady,
+          historyCount: googlePublicWarm.snapshots.length, publication: googlePublicWarm.publication },
+        predictionRangesPossible: Object.keys(PREDICTION_SHEETS).length,
+        historicalGvizCollectionsPossible: 10,
+      } },
     performance: { samples: serviceSamples.length, postgres: benchmarkSummary(postgresSamples), supabaseService: benchmarkSummary(serviceSamples) },
     failureIsolation: { coreLeaderboards: true, netSkins: true, homeTournament: true, scoring: true,
       lastVerifiedSnapshotRetained: true, noHiddenGoogleFallback: true },
-    pass: parity.pass && rows.length === expected.length && Boolean(current),
+    pass: parity.pass && derivedParity && rows.length === expected.length && freshness.current,
   };
 }
 

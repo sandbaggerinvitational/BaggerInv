@@ -4,9 +4,11 @@ import test from "node:test";
 import {
   buildPublishedOddsImport,
   comparePublishedOddsParity,
+  publishedOddsFreshness,
+  publishedOddsLegacyPublication,
   publishedOddsSnapshotsFromView,
 } from "../lib/published-odds-supabase.js";
-import { publishedOddsReadEnvironment } from "../lib/published-odds-read-source.js";
+import { publishedOddsReadEnvironment, requirePublishedOddsReadSource } from "../lib/published-odds-read-source.js";
 
 const sheet = (rows) => ({ records: rows.map((record) => ({ record })) });
 const snapshot = (phase, phaseOrder, publishedAt, clayProbability = 20) => ({
@@ -34,6 +36,18 @@ function sheets() {
       "Player ID": row.id, Player: row.name, "Top Player Probability": row.probability, "American Odds": Number(row.americanOdds),
       "Expected Points": row.expectedPoints, "Expected Record": row.expectedRecord, "Average Finish": row.averageFinish })))),
   };
+}
+
+function publishedView() {
+  const imported = buildPublishedOddsImport({ sheets: sheets(), tournamentId: "2026", tournamentYear: 2026,
+    sourceWorkbookId: "preview", requestedBy: "Director" });
+  return { history_count: imported.snapshots.length, snapshots: imported.snapshots.map((item, index) => ({
+    ...item,
+    payload: item.published_payload,
+    publication_revision: 1,
+    is_current_official: index === imported.snapshots.length - 1,
+    publication_verified: true,
+  })) };
 }
 
 test("published Odds import preserves exact Google payloads and milestone selection", () => {
@@ -117,6 +131,90 @@ test("published Odds source is Preview-only and Production fail-closed", () => {
   assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "preview" }).resolved, "supabase");
   assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "production" }).resolved, "google");
   assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "production" }).reason, "production-hard-block");
+  assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "preview", PUBLISHED_ODDS_READ_SOURCE: "google" }).resolved, "google");
+  const blocked = { ...base, VERCEL_ENV: "preview", SUPABASE_SCORING_MIRROR_SECRET_KEY: "" };
+  assert.equal(publishedOddsReadEnvironment(blocked).blocked, true);
+  assert.throws(() => requirePublishedOddsReadSource(blocked), (error) => error.code === "PUBLISHED_ODDS_SUPABASE_CONFIGURATION_REQUIRED");
+  const rollback = ["google", "supabase", "google", "supabase"].map((value) =>
+    requirePublishedOddsReadSource({ ...base, VERCEL_ENV: "preview", PUBLISHED_ODDS_READ_SOURCE: value }).resolved);
+  assert.deepEqual(rollback, ["google", "supabase", "google", "supabase"]);
+});
+
+test("Published Odds freshness follows the verified current-official publication, not wall-clock age", () => {
+  const view = publishedView();
+  const state = publishedOddsFreshness(view);
+  assert.equal(state.status, "CURRENT_OFFICIAL");
+  assert.equal(state.current, true);
+  assert.equal(state.official, true);
+  assert.equal(state.stale, false);
+  assert.equal(state.currentMilestone, "After Round 1");
+  assert.equal(state.publicationRevision, 1);
+  assert.equal(state.historyCount, 2);
+  assert.equal(state.contractVersion, "odds-v2-nassau");
+  assert.equal(state.googleMirror.status, "VERIFIED");
+  assert.deepEqual(state.reasons, []);
+  assert.equal(state.semantics.scoringRevisionAffectsFreshness, false);
+  assert.equal(state.semantics.calculationInputRevisionAffectsFreshness, false);
+  assert.equal(state.semantics.publicationTimestampAloneIsSufficient, false);
+});
+
+test("Published Odds freshness fails closed for missing, conflicting, or invalid current pointers", () => {
+  const missing = publishedView();
+  for (const row of missing.snapshots) row.is_current_official = false;
+  assert.deepEqual(publishedOddsFreshness(missing).reasons, ["CURRENT_OFFICIAL_SNAPSHOT_MISSING"]);
+  assert.equal(publishedOddsFreshness(missing).status, "UNAVAILABLE");
+
+  const conflicting = publishedView();
+  for (const row of conflicting.snapshots) row.is_current_official = true;
+  assert.equal(publishedOddsFreshness(conflicting).status, "UNAVAILABLE");
+  assert.deepEqual(publishedOddsFreshness(conflicting).reasons, ["MULTIPLE_CURRENT_OFFICIAL_SNAPSHOTS"]);
+
+  const invalid = publishedView();
+  const current = invalid.snapshots.at(-1);
+  current.payload = { ...current.payload, phase: "After Round 2", sourceFingerprint: "b".repeat(64) };
+  current.source_fingerprint = "a".repeat(64);
+  const invalidState = publishedOddsFreshness(invalid);
+  assert.equal(invalidState.status, "STALE");
+  assert.deepEqual(invalidState.reasons, ["CURRENT_MILESTONE_IDENTITY_MISMATCH", "CURRENT_SOURCE_FINGERPRINT_MISMATCH"]);
+});
+
+test("legacy Google snapshots retain immutable ordering while exposing the shared publication contract", () => {
+  const source = sheets();
+  const snapshots = source["Odds Snapshots"].records.map(({ record }) => JSON.parse(record["Snapshot JSON"]));
+  const publication = publishedOddsLegacyPublication(snapshots.reverse());
+  assert.equal(publication.status, "CURRENT_OFFICIAL");
+  assert.equal(publication.currentMilestone, "After Round 1");
+  assert.equal(publication.historyCount, 2);
+  assert.equal(publication.contractVersion, "odds-v2-nassau");
+  assert.match(publication.payloadFingerprint, /^[0-9a-f]{64}$/);
+  assert.equal(publication.stale, false);
+});
+
+test("Odds Center and Insights expose the shared freshness contract without a Supabase-to-Google fallback", async () => {
+  const [page, route, director] = await Promise.all([
+    readFile(new URL("../app/odds-center/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/leaderboards/insights/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8"),
+  ]);
+  const supabasePageBranch = page.slice(page.indexOf('source.resolved==="supabase"'), page.indexOf("}else{const inputs"));
+  assert.match(supabasePageBranch, /publishedOddsFreshness/);
+  assert.match(supabasePageBranch, /readPublishedOddsView/);
+  assert.doesNotMatch(supabasePageBranch, /loadOddsInputs|readOddsSnapshots|readWorkbookSheetsByName|refreshHistoricalData/);
+  assert.match(route, /publishedOddsLegacyPublication/);
+  assert.match(route, /publishedOddsFreshness/);
+  assert.match(route, /PUBLISHED_ODDS_CURRENT_OFFICIAL_STALE/);
+  assert.match(route, /X-Published-Odds-Freshness/);
+  assert.match(route, /X-Published-Odds-Google-Requests", "0"/);
+  const supabaseApiBranch = route.slice(route.indexOf("const startedAt = performance.now();"));
+  assert.doesNotMatch(supabaseApiBranch, /readOddsSnapshots|loadOddsInputs|readWorkbookSheetsByName|refreshHistoricalData/);
+  assert.match(director, /publicRead: \{ configured:/);
+  assert.match(director, /publication: \{ configured:/);
+  assert.match(director, /calculationInputs: \{ configured:/);
+  assert.match(director, /publishedOddsGooglePublicReadSample/);
+  assert.match(director, /withWorkbookWriteDiagnostics\("published-odds-google-public-read"/);
+  assert.match(director, /publishedOddsDerivedParityProjection/);
+  assert.match(director, /derivedParity/);
+  assert.match(director, /predictionRangesPossible: Object\.keys\(PREDICTION_SHEETS\)\.length/);
 });
 
 test("published Odds migration and participant adapter are service-only and calculation-free", async () => {
