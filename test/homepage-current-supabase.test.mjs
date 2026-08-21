@@ -20,7 +20,7 @@ const preview = {
   STORYLINES_READ_SOURCE: "supabase",
   NET_SKINS_READ_SOURCE: "supabase",
   GUIDE_SYNC_TOURNAMENT_ID: "2026",
-  PREVIEW_TIMELINE_DATE: "2026-08-13",
+  PREVIEW_TIMELINE_DATE: "",
 };
 
 const teams = [
@@ -148,9 +148,13 @@ test("Homepage current source inherits the certified Tournament flag, supports a
   assert.equal(homepageCurrentReadEnvironment({ ...preview, HOMEPAGE_CURRENT_READ_SOURCE: "automatic" }).blocked, true);
 });
 
-test("Homepage composes canonical live, Guide, storylines, Net Skins, and foundation contracts with zero Google live reads", async () => {
+test("Homepage composes canonical live, current Guide content, the published Preview clock, storylines, Net Skins, and foundation contracts with zero Google live reads", async () => {
   const counters = {};
-  const read = await readHomepageCurrentTournament({ env: preview, dependencies: dependencies(counters) });
+  const read = await readHomepageCurrentTournament({
+    env: preview,
+    now: new Date("2026-08-20T15:00:00.000Z"),
+    dependencies: dependencies(counters),
+  });
   assert.equal(read.diagnostics.source, "supabase");
   assert.equal(read.diagnostics.googleLiveModelReads, 0);
   assert.equal(read.diagnostics.googleLiveWorkbookRanges, 0);
@@ -167,10 +171,10 @@ test("Homepage composes canonical live, Guide, storylines, Net Skins, and founda
     assert.equal(reopened.holeResults.length, 18);
     assert.equal(reopened.archiveFinal, false);
   }
-  assert.deepEqual(read.liveData.schedule.map((row) => row.title), ["Breakfast", "Round 2"]);
+  assert.deepEqual(read.liveData.schedule.map((row) => row.title), ["Breakfast"]);
   assert.equal(read.liveData.timeline.previewDateActive, true);
-  assert.equal(read.liveData.timeline.effectiveNow, "2026-08-13T16:00:00.000Z");
-  assert.equal(read.liveData.schedule[1].status, "Live");
+  assert.equal(read.liveData.timeline.effectiveDate, "2026-08-13");
+  assert.equal(read.liveData.schedule[0].status, "Completed");
   assert.deepEqual(read.liveData.preparedStorylines, [{ id: "closest", headline: "Closest Match" }]);
   assert.equal(read.liveData.storylinesSource, "supabase");
   assert.equal(read.liveData.netSkins.rounds.length, 1);
