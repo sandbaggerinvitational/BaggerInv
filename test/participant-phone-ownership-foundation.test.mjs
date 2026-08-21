@@ -8,7 +8,7 @@ import {
   participantAuthPhoneErrorMessage,
   participantAuthPhoneStatusLabel,
 } from "../lib/participant-auth-phone.js";
-import { participantSmsAuthFeatureConfigured } from "../lib/participant-sms-auth-feature.js";
+import { participantSmsAuthFeatureConfigured, participantSmsProviderTestConfigured } from "../lib/participant-sms-auth-feature.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const migrationPath = "supabase/migrations/202608190001_preview_participant_auth_identifiers.sql";
@@ -42,6 +42,8 @@ test("SMS feature flag is Preview-only and is not enabled by Step 8B.1 defaults"
   assert.equal(participantSmsAuthFeatureConfigured({ VERCEL_ENV: "preview", PARTICIPANT_SMS_AUTH_ENABLED: "false" }), false);
   assert.equal(participantSmsAuthFeatureConfigured({ VERCEL_ENV: "production", PARTICIPANT_SMS_AUTH_ENABLED: "true" }), false);
   assert.equal(participantSmsAuthFeatureConfigured({ VERCEL_ENV: "preview", PARTICIPANT_SMS_AUTH_ENABLED: "true" }), true);
+  assert.equal(participantSmsProviderTestConfigured({ VERCEL_ENV: "preview", PARTICIPANT_SMS_PROVIDER_TEST_ENABLED: "true", PARTICIPANT_SMS_AUTH_ENABLED: "false" }), true);
+  assert.equal(participantSmsProviderTestConfigured({ VERCEL_ENV: "production", PARTICIPANT_SMS_PROVIDER_TEST_ENABLED: "true", PARTICIPANT_SMS_AUTH_ENABLED: "false" }), false);
 });
 
 test("forward migration creates one protected method-neutral EMAIL/PHONE authority", async () => {
