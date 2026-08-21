@@ -312,6 +312,9 @@ test("Preview page and API use Supabase core with no Google fallback or Passport
   assert.match(route, /X-Leaderboards-Core-Google-Requests/);
   assert.doesNotMatch(route, /getTournamentData|google-sheets|\/api\/live/);
   assert.match(loader, /\/api\/leaderboards\/core/);
+  assert.match(loader, /const \[payload, setPayload\] = useState\(null\)/);
+  assert.match(loader, /const cached = readLeaderboardsCoreCache\(\)/);
+  assert.doesNotMatch(loader, /useMemo\(\(\) => readLeaderboardsCoreCache\(\)/);
   assert.match(dashboard, /coreReadSource/);
   assert.match(dashboard, /secondaryReadUrl/);
   assert.match(dashboard, /tab === "skins"/);

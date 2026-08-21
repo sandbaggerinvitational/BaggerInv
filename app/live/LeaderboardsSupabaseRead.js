@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../../lib/participant-auth-client-diagnostics.js";
 import { readLeaderboardsCoreCache, writeLeaderboardsCoreCache } from "../../lib/leaderboards-core-cache.js";
@@ -17,9 +17,9 @@ function parseTiming(value = "") {
 
 export default function LeaderboardsSupabaseRead({ previewMode = false, netSkinsReadSource = "google" }) {
   const router = useRouter();
-  const initial = useMemo(() => readLeaderboardsCoreCache(), []);
-  const [payload, setPayload] = useState(initial);
-  const [state, setState] = useState(initial ? "ready" : "loading");
+  const [payload, setPayload] = useState(null);
+  const [state, setState] = useState("loading");
+  const restoredCache = useRef(false);
   const requestSequence = useRef(0);
   const controllerRef = useRef(null);
 
@@ -48,7 +48,7 @@ export default function LeaderboardsSupabaseRead({ previewMode = false, netSkins
       const timings = parseTiming(response.headers.get("server-timing") || "");
       recordParticipantAuthDiagnostic("LEADERBOARDS_CORE_USABLE", { routeTo: "/live?view=leaderboards", durationMs: clientTotal });
       console.info("Leaderboards core Supabase timing", { ...timings, clientTotal: Math.round(clientTotal),
-        cachedPresentation: Boolean(initial), googleRequests: Number(response.headers.get("x-leaderboards-core-google-requests") || 0),
+        cachedPresentation: restoredCache.current, googleRequests: Number(response.headers.get("x-leaderboards-core-google-requests") || 0),
         sourceFingerprint: response.headers.get("x-leaderboards-core-fingerprint") || "" });
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 450));
       schedule(() => {
@@ -61,10 +61,15 @@ export default function LeaderboardsSupabaseRead({ previewMode = false, netSkins
       if (error?.name === "AbortError" || sequence !== requestSequence.current) return;
       setState((current) => current === "ready" ? "ready" : "error");
     }
-  }, [acceptData, initial, router]);
+  }, [acceptData, router]);
 
   useEffect(() => {
-    if (initial) recordParticipantAuthDiagnostic("LEADERBOARDS_CACHED_CORE", { routeTo: "/live?view=leaderboards", durationMs: 0 });
+    const cached = readLeaderboardsCoreCache();
+    if (cached) {
+      restoredCache.current = true;
+      acceptData(cached);
+      recordParticipantAuthDiagnostic("LEADERBOARDS_CACHED_CORE", { routeTo: "/live?view=leaderboards", durationMs: 0 });
+    }
     refresh();
     const navigating = () => { requestSequence.current += 1; controllerRef.current?.abort(); };
     window.addEventListener("participant-navigation-start", navigating);
