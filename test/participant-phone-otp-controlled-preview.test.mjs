@@ -6,6 +6,7 @@ import {
   assertParticipantPhoneEnrollmentAuthUser,
   canonicalParticipantAuthPhone,
   classifyParticipantPhoneOtpProviderFailure,
+  createParticipantPhoneLoginProof,
   inspectParticipantAuthUserPhone,
   maskParticipantAuthPhone,
   normalizeParticipantPhoneEnrollmentStageB,
@@ -15,6 +16,8 @@ import {
   participantPhoneOtpProviderFailureCode,
   requestExistingParticipantPhoneEnrollment,
   requestExistingParticipantPhoneLogin,
+  participantPhoneLoginProofCookie,
+  verifyParticipantPhoneLoginProof,
   verifyExistingParticipantPhoneEnrollment,
   verifyExistingParticipantPhoneLogin,
 } from "../lib/participant-phone-otp.js";
@@ -31,6 +34,7 @@ const residualRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_2_clear
 const compromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_4_cancel_compromised_phone_change.sql";
 const pendingTransitionMigrationPath = "supabase/migrations/202608210008_preview_phone_enrollment_pending_transition.sql";
 const latestCompromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_5_cancel_compromised_pending_transition.sql";
+const controlledLoginMigrationPath = "supabase/migrations/202608210009_preview_controlled_phone_login_proof.sql";
 const authId = "11111111-1111-4111-8111-111111111111";
 const authB = "22222222-2222-4222-8222-222222222222";
 const phone = "+12025550123";
@@ -54,7 +58,7 @@ function authClientFor({ updateUserId = authId, verifyUserId = authId } = {}) {
       },
       async verifyOtp(input) {
         calls.push(["verifyOtp", input]);
-        return { data: { user: { id: verifyUserId }, session: { access_token: "not-inspected" } }, error: null };
+        return { data: { user: { id: verifyUserId }, session: { access_token: "not-inspected", refresh_token: "not-inspected" } }, error: null };
       },
     } },
   };
@@ -134,10 +138,141 @@ test("subsequent phone login is a separate shouldCreateUser:false sms flow resol
   });
   assert.equal(request.method, "SIGNED_OUT_PHONE_LOGIN");
   assert.equal(verify.ok, true);
+  assert.equal(verify.sessionCreated, true);
+  assert.equal(verify.refreshSessionAvailable, true);
   assert.deepEqual(mock.calls, [
     ["signInWithOtp", { phone, options: { shouldCreateUser: false, channel: "sms" } }],
     ["verifyOtp", { phone, token: "123456", type: "sms" }],
   ]);
+});
+
+test("controlled phone-login proof is signed, short-lived, HttpOnly, and tamper-evident", () => {
+  const secret = "controlled-preview-phone-proof-secret-value";
+  const now = Date.UTC(2026, 7, 21, 18, 0, 0);
+  const proof = createParticipantPhoneLoginProof({
+    proofId: "33333333-3333-4333-8333-333333333333",
+    authUserId: authId,
+    playerId: "CB01",
+    tournamentId: "2026",
+    identifierId: "44444444-4444-4444-8444-444444444444",
+    identifierRevision: 2,
+  }, secret, { now });
+  const verified = verifyParticipantPhoneLoginProof(proof, secret, { now: now + 30_000 });
+  assert.equal(verified.authUserId, authId);
+  assert.equal(verified.playerId, "CB01");
+  assert.equal(verified.expiresAt - verified.issuedAt, 600);
+  assert.throws(() => verifyParticipantPhoneLoginProof(`${proof}x`, secret, { now }));
+  assert.throws(() => verifyParticipantPhoneLoginProof(proof, secret, { now: now + 601_000 }));
+  const cookie = participantPhoneLoginProofCookie(proof);
+  assert.equal(cookie.httpOnly, true);
+  assert.equal(cookie.secure, true);
+  assert.equal(cookie.sameSite, "strict");
+});
+
+test("Operation B route is signed-out, one-proof scoped, and never accepts a client phone or ownership id", async () => {
+  const route = await source("app/api/participant/auth/phone-login-proof/route.js");
+  assert.match(route, /participantSmsProviderTestConfigured/);
+  assert.match(route, /action === "arm"/);
+  assert.match(route, /signOut\(\{ scope: "local" \}\)/);
+  assert.match(route, /requireSignedOut/);
+  assert.match(route, /beginParticipantPhoneLogin/);
+  assert.match(route, /phone: attempt\.phoneE164/);
+  assert.match(route, /phone: allowed\.phoneE164/);
+  assert.doesNotMatch(route, /input\.(?:phone|phoneE164|playerId|authUserId|tournamentId|identifierId)/);
+  assert.doesNotMatch(route, /auth\.admin\.(?:createUser|updateUserById)/);
+  assert.match(route, /readParticipantIdentityContextForAuth\(\{ authUserId: verified\.userId \}\)/);
+  assert.match(route, /authClient\.auth\.getUser\(\)/);
+});
+
+test("controlled phone-login migration hard-gates VERIFIED A, one user, link, membership, collision, and Director denial", async () => {
+  const migration = await source(controlledLoginMigrationPath);
+  assert.match(migration, /select count\(\*\) from auth\.users\) <> 1/);
+  assert.match(migration, /phone_identifier\.status <> 'VERIFIED'/);
+  assert.match(migration, /SUPABASE_AUTH_TWILIO_VERIFY/);
+  assert.match(migration, /phone_confirmed_at is null/);
+  assert.match(migration, /auth_user\.phone_change/);
+  assert.match(migration, /user_player_links/);
+  assert.match(migration, /participation_status = 'ACTIVE'/);
+  assert.match(migration, /provider = 'phone'/);
+  assert.match(migration, /provider = 'email'/);
+  assert.match(migration, /PHONE_OTP_AUTH_COLLISION/);
+  assert.match(migration, /preview_director_entitlements[\s\S]*PHONE_LOGIN_DIRECTOR_ENTITLEMENT_PRESENT/);
+  assert.match(migration, /directorAccessDenied', true/);
+});
+
+test("unknown, unverified, revoked, duplicate, and stale phone ownership cannot reach provider send", async () => {
+  const migration = await source(controlledLoginMigrationPath);
+  const route = await source("app/api/participant/auth/phone-login-proof/route.js");
+  const authorize = migration.slice(migration.indexOf("authorize_participant_phone_login_proof"), migration.indexOf("begin_participant_phone_login"));
+  const begin = migration.slice(migration.indexOf("begin_participant_phone_login"), migration.indexOf("record_participant_phone_login_send"));
+  assert.match(authorize, /identifier_type = 'PHONE'/);
+  assert.match(authorize, /status <> 'VERIFIED'/);
+  assert.match(authorize, /expected_revision[\s\S]*PHONE_OTP_NOT_ELIGIBLE/);
+  assert.match(authorize, /auth_phone_user_count <> 1/);
+  assert.match(begin, /PHONE_LOGIN_PROOF_USED/);
+  assert.match(begin, /PHONE_OTP_COOLDOWN/);
+  assert.match(begin, /PHONE_OTP_RATE_LIMITED/);
+  assert.ok(route.indexOf("beginParticipantPhoneLogin") < route.indexOf("requestExistingParticipantPhoneLogin"));
+});
+
+test("one owner request uses shouldCreateUser false and one sms verification uses type sms", async () => {
+  const helper = await source("lib/participant-phone-otp.js");
+  const route = await source("app/api/participant/auth/phone-login-proof/route.js");
+  assert.match(helper, /signInWithOtp\(\{[\s\S]*shouldCreateUser: false[\s\S]*channel: "sms"/);
+  assert.match(helper, /verifyOtp\(\{ phone, token, type: "sms" \}\)/);
+  assert.match(route, /provider_called: true/);
+  assert.doesNotMatch(route, /setInterval|automatic resend|auth\.resend/i);
+});
+
+test("wrong returned UUID is locally terminated and cannot complete Passport or scoring authorization", async () => {
+  const route = await source("app/api/participant/auth/phone-login-proof/route.js");
+  const migration = await source(controlledLoginMigrationPath);
+  assert.match(route, /!verified\.ok[\s\S]*signOut\(\{ scope: "local" \}\)/);
+  assert.match(route, /PHONE_OTP_AUTH_MISMATCH/);
+  assert.match(migration, /returned_auth_user <> expected_auth_user[\s\S]*status = 'UUID_MISMATCH'/);
+  assert.ok(route.lastIndexOf("completeParticipantPhoneLogin") > route.lastIndexOf("readParticipantIdentityContextForAuth"));
+});
+
+test("successful login preserves ownership/scoring and establishes a refreshable CB01 session", async () => {
+  const route = await source("app/api/participant/auth/phone-login-proof/route.js");
+  const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
+  const migration = await source(controlledLoginMigrationPath);
+  assert.match(ui, /sessionPayload\.session !== "active"/);
+  assert.match(route, /participantSessionEstablished/);
+  assert.match(route, /refreshSessionAvailable/);
+  assert.match(route, /playerPassportResolved: true/);
+  assert.match(migration, /SAME_AUTH_USER_PHONE_LOGIN_VERIFIED/);
+  assert.match(migration, /phoneIdentifierUnchanged', true/);
+  assert.match(migration, /scoringAuthorizationUnchanged', true/);
+  assert.doesNotMatch(migration, /update\s+participant_identity\.user_player_links/i);
+  assert.doesNotMatch(migration, /update\s+participant_identity\.participant_auth_identifiers/i);
+  assert.doesNotMatch(migration, /update\s+scoring_authority\.scoring_permissions/i);
+  assert.doesNotMatch(migration, /insert\s+into\s+auth\.users|update\s+auth\.users|delete\s+from\s+auth\.users/i);
+});
+
+test("controlled UI has no arbitrary phone input, restores pending proof, and retains email fallback", async () => {
+  const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
+  assert.match(ui, /Operation B · Controlled Preview proof/);
+  assert.match(ui, /Text the approved mobile a code/);
+  assert.match(ui, /autoComplete="one-time-code"/);
+  assert.match(ui, /phone-login-proof/);
+  assert.match(ui, /sessionPayload\.session !== "inactive"/);
+  assert.match(ui, /Email fallback remains available below/);
+  assert.match(ui, /CAPTCHA and the ordinary public SMS login UI remain deferred to Step 8B\.3/);
+  assert.doesNotMatch(ui, /type="tel"|name="phone"|placeholder="\+1/);
+});
+
+test("Operation B functions are service-role only and automated coverage contains no provider credentials or OTP storage", async () => {
+  const migration = await source(controlledLoginMigrationPath);
+  for (const name of ["authorize_participant_phone_login_proof", "begin_participant_phone_login",
+    "record_participant_phone_login_send", "read_participant_phone_login_state",
+    "authorize_participant_phone_login_verification", "record_participant_phone_login_failure",
+    "complete_participant_phone_login"]) {
+    assert.match(migration, new RegExp(`public\\.${name}`));
+  }
+  assert.match(migration, /revoke all on function %s from public, anon, authenticated/);
+  assert.match(migration, /grant execute on function %s to service_role/);
+  assert.doesNotMatch(migration, /auth token|account sid|verify service sid|otp\s+(?:text|varchar)|token\s+(?:text|varchar)/i);
 });
 
 test("Auth state phases require empty phone, staged phone_change, then confirmed phone on A", () => {
@@ -434,7 +569,7 @@ test("Director cannot send enrollment SMS; participant email session owns Operat
   assert.match(participantUi, /Verification code sent/);
   assert.match(participantUi, /Six-digit phone enrollment code/);
   assert.match(participantUi, /resendSeconds/);
-  assert.match(participantUi, /Operation B is separate/);
+  assert.match(participantUi, /Operation B remains separate/);
   assert.doesNotMatch(participantUi, /useEffect\([\s\S]{0,300}(?:action:\s*["']start|action:\s*["']verify)/);
 });
 
@@ -449,15 +584,18 @@ test("verification UI is wired only to verifyOtp phone_change after Stage B", as
   assert.match(await source("lib/participant-phone-otp.js"), /verifyOtp\(\{ phone, token, type: "phone_change" \}\)/);
 });
 
-test("email sign-in remains enabled while public phone login remains absent", async () => {
-  const [emailRequest, participantUi] = await Promise.all([
+test("email sign-in remains enabled while ordinary public phone login remains absent", async () => {
+  const [emailRequest, participantUi, controlledRoute] = await Promise.all([
     source("app/api/participant/auth/otp/request/route.js"),
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
+    source("app/api/participant/auth/phone-login-proof/route.js"),
   ]);
   assert.match(emailRequest, /signInWithOtp\(\{ email/);
   assert.match(emailRequest, /shouldCreateUser: false/);
   assert.match(participantUi, /type="email"/);
-  assert.doesNotMatch(participantUi, /signInWithOtp\(\{\s*phone|Text Me a Code/);
+  assert.doesNotMatch(participantUi, /type="tel"|name="phone"/);
+  assert.match(participantUi, /Public participant SMS login remains off/);
+  assert.doesNotMatch(controlledRoute, /input\.(?:phone|phoneE164)/);
 });
 
 test("unlinked Auth UUID B receives no participant or scoring identity", async () => {
