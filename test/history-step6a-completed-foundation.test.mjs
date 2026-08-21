@@ -284,6 +284,8 @@ test("Step 6A route remains protected and does not alter public History source g
   assert.match(route, /allowBootstrap:\s*false/);
   assert.match(route, /sameOriginMutation\(request\)/);
   assert.match(route, /A same-origin Director request is required/);
+  assert.match(route, /error\?\.shadowDiagnostics/);
+  assert.match(route, /durationMs: Number\(error\.shadowDiagnostics\.durationMs/);
   assert.match(route, /expected_source_fingerprint/);
   assert.match(route, /HISTORICAL_RECONCILIATION_REQUIRED/);
   assert.match(route, /action === "shadow"/);

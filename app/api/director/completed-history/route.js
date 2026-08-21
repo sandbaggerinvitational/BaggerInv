@@ -54,9 +54,20 @@ function actorId(identity = {}) {
 }
 
 function safeError(error) {
+  const diagnostics = error?.shadowDiagnostics && typeof error.shadowDiagnostics === "object"
+    ? {
+      status: Number(error.status || 0) || null,
+      code: clean(error.shadowDiagnostics.code),
+      message: clean(error.shadowDiagnostics.message),
+      details: clean(error.shadowDiagnostics.details),
+      hint: clean(error.shadowDiagnostics.hint),
+      durationMs: Number(error.shadowDiagnostics.durationMs || 0) || null,
+    }
+    : null;
   return {
     error: "Completed History operation did not complete.",
-    code: clean(error?.code || "COMPLETED_HISTORY_OPERATION_FAILED"),
+    code: clean(error?.code || diagnostics?.code || "COMPLETED_HISTORY_OPERATION_FAILED"),
+    ...(diagnostics ? { diagnostics } : {}),
   };
 }
 
