@@ -298,6 +298,18 @@ test("Step 6A route remains protected and does not alter public History source g
 
   const files = await readdir(new URL("../supabase/migrations/", import.meta.url));
   assert.ok(files.some((name) => name === "202608210005_preview_completed_history_foundation.sql"));
+  assert.ok(files.some((name) => name === "202608210006_preview_completed_history_round_name_precedence.sql"));
+});
+
+test("completed History importer round-name fallback is patched deterministically", async () => {
+  const sql = await readFile(new URL(
+    "../supabase/migrations/202608210006_preview_completed_history_round_name_precedence.sql",
+    import.meta.url
+  ), "utf8");
+  assert.match(sql, /pg_get_functiondef\(function_signature\)/);
+  assert.match(sql, /unsafe_occurrences <> 2/);
+  assert.match(sql, /'Round '' \|\| \(item->>''round_number''\)'/);
+  assert.match(sql, /COMPLETED_HISTORY_ROUND_NAME_PATCH_VERIFICATION_FAILED/);
 });
 
 test("completed History SQL is append-only, sequential, scoped, and service-role-only", async () => {
