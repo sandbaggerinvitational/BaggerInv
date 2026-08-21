@@ -299,6 +299,7 @@ test("Step 6A route remains protected and does not alter public History source g
   const files = await readdir(new URL("../supabase/migrations/", import.meta.url));
   assert.ok(files.some((name) => name === "202608210005_preview_completed_history_foundation.sql"));
   assert.ok(files.some((name) => name === "202608210006_preview_completed_history_round_name_precedence.sql"));
+  assert.ok(files.some((name) => name === "202608210007_preview_completed_history_roster_provenance.sql"));
 });
 
 test("completed History importer round-name fallback is patched deterministically", async () => {
@@ -310,6 +311,19 @@ test("completed History importer round-name fallback is patched deterministicall
   assert.match(sql, /unsafe_occurrences <> 2/);
   assert.match(sql, /'Round '' \|\| \(item->>''round_number''\)'/);
   assert.match(sql, /COMPLETED_HISTORY_ROUND_NAME_PATCH_VERIFICATION_FAILED/);
+});
+
+test("completed History revision roster preserves its canonical source key", async () => {
+  const sql = await readFile(new URL(
+    "../supabase/migrations/202608210007_preview_completed_history_roster_provenance.sql",
+    import.meta.url
+  ), "utf8");
+  assert.match(sql, /add column source_roster_key text/);
+  assert.match(sql, /roster\.tournament_id = fact\.tournament_id/);
+  assert.match(sql, /roster\.player_id = fact\.player_id/);
+  assert.match(sql, /alter column source_roster_key set not null/);
+  assert.match(sql, /item->>''source_roster_key''/);
+  assert.match(sql, /COMPLETED_HISTORY_ROSTER_PROVENANCE_PATCH_VERIFICATION_FAILED/);
 });
 
 test("completed History SQL is append-only, sequential, scoped, and service-role-only", async () => {
