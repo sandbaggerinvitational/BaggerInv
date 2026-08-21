@@ -4,6 +4,9 @@ import { assertParticipantIdentityAdministrativeEnvironment, participantIdentity
 import { validateParticipantIdentityConfiguration } from "../../../../lib/participant-identity.js";
 import {
   approveParticipantIdentityConfiguration,
+  authorizeParticipantPhoneOtpVerification,
+  beginParticipantPhoneOtpAttempt,
+  completeParticipantPhoneOtpVerification,
   configureSingleParticipantAuthRehearsal,
   importParticipantIdentityConfiguration,
   inspectParticipantIdentityTournamentResolution,
@@ -11,10 +14,13 @@ import {
   linkAuthUserToPlayer,
   manageParticipantAuthPhone,
   readParticipantAuthPhoneAdmin,
+  readParticipantPhoneOtpDirectorState,
   readParticipantIdentityAdmin,
   readSingleParticipantAuthRequestAudit,
   readSingleParticipantAuthRehearsalPreflight,
   recordSingleParticipantAuthEmailConfirmation,
+  recordParticipantPhoneOtpSend,
+  recordParticipantPhoneOtpVerificationFailure,
   setSingleParticipantAuthRehearsalStatus,
 } from "../../../../lib/participant-identity-supabase.js";
 import { assertSingleParticipantAuthPreflight, safeParticipantAuthCandidate } from "../../../../lib/participant-auth-rehearsal.js";
@@ -24,8 +30,22 @@ import {
   participantAuthPhoneErrorMessage,
 } from "../../../../lib/participant-auth-phone.js";
 import {
+  attachPhoneToExistingParticipantAuthUser,
+  normalizeParticipantPhoneOtpToken,
+  participantPhoneOtpClientFingerprint,
+  participantPhoneOtpErrorMessage,
+  participantPhoneOtpProviderFailureCode,
+  requestExistingParticipantPhoneOtp,
+  verifyExistingParticipantPhoneOtp,
+} from "../../../../lib/participant-phone-otp.js";
+import {
+  participantSmsAuthFeatureConfigured,
+  participantSmsProviderTestConfigured,
+} from "../../../../lib/participant-sms-auth-feature.js";
+import {
   assertApprovedParticipantAuthUser,
   createParticipantAuthAdminClient,
+  createParticipantAuthOtpClient,
   provisionApprovedAuthUser,
   safeParticipantAuthUserState,
 } from "../../../../lib/supabase-auth-admin.js";
@@ -40,6 +60,7 @@ export const dynamic = "force-dynamic";
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404 });
 const clean = (value) => String(value ?? "").trim();
 const PHONE_ACTIONS = new Set(["add-mobile", "change-mobile", "revoke-mobile"]);
+const PHONE_OTP_ACTIONS = new Set(["send-test-phone-otp", "verify-test-phone-otp"]);
 
 function sameOriginMutation(request) {
   const origin = clean(request.headers.get("origin"));
@@ -169,15 +190,42 @@ async function loadPhoneOwnership(tournamentId, identity) {
   };
 }
 
+async function loadPhoneOtpState(tournamentId, identity) {
+  const enabled = participantSmsProviderTestConfigured();
+  const publicSmsLoginEnabled = participantSmsAuthFeatureConfigured();
+  const actorAuthUserId = clean(identity?.authUserId);
+  if (!enabled || !actorAuthUserId) return {
+    enabled: false,
+    publicSmsLoginEnabled,
+    counts: {},
+    players: [],
+  };
+  const result = await readParticipantPhoneOtpDirectorState({ tournamentId, actorAuthUserId });
+  if (result.payload?.ok !== true) return {
+    enabled: false,
+    publicSmsLoginEnabled,
+    counts: {},
+    players: [],
+  };
+  return {
+    enabled: true,
+    publicSmsLoginEnabled,
+    provider: "Supabase Auth · Twilio Verify",
+    resendCooldownSeconds: 60,
+    ...result.payload,
+  };
+}
+
 export async function GET(request) {
   const authorization = await authorize(request);
   if (authorization.response) return authorization.response;
   try {
     const review = await loadReview();
-    const [security, authRehearsal, phoneOwnership] = await Promise.all([
+    const [security, authRehearsal, phoneOwnership, phoneOtp] = await Promise.all([
       inspectParticipantIdentitySecurity(),
       loadAuthRehearsal(review.tournamentId),
       loadPhoneOwnership(review.tournamentId, authorization.identity),
+      loadPhoneOtpState(review.tournamentId, authorization.identity),
     ]);
     return NextResponse.json({
       ok: true,
@@ -186,6 +234,7 @@ export async function GET(request) {
       security: security.payload,
       authRehearsal,
       phoneOwnership,
+      phoneOtp,
     }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     console.error("Participant identity review failed", { message: error?.message, code: error?.identityDiagnostics?.code || "" });
@@ -200,6 +249,199 @@ export async function POST(request) {
   const action = clean(input.action);
   const director = authorization.identity?.actor?.name || "Tournament Director";
   try {
+    if (PHONE_OTP_ACTIONS.has(action)) {
+      if (!sameOriginMutation(request)) {
+        return NextResponse.json({ error: "A same-origin Director request is required." }, { status: 403 });
+      }
+      if (!participantSmsProviderTestConfigured()) {
+        return NextResponse.json({ error: "Not found." }, { status: 404 });
+      }
+      const actorAuthUserId = clean(authorization.identity?.authUserId);
+      if (!actorAuthUserId) {
+        return NextResponse.json({ error: "A verified Director Auth account is required." }, { status: 403 });
+      }
+      const review = await loadReview();
+      const rehearsalRead = await readSingleParticipantAuthRehearsalPreflight(review.tournamentId);
+      const rehearsalPreflight = rehearsalRead.payload || {};
+      const candidate = assertSingleParticipantAuthPreflight(rehearsalPreflight);
+      const rehearsal = rehearsalPreflight.rehearsal;
+      if (rehearsalPreflight.participantAuthUsers !== 1 || rehearsalPreflight.participantLinks !== 1 ||
+          rehearsalPreflight.dummyAuthUsers !== 0 || rehearsalPreflight.dummyLinks !== 0 ||
+          rehearsal?.status !== "PREPARED" || rehearsal?.playerId !== candidate.playerId || !rehearsal?.authUserId) {
+        return NextResponse.json({ error: participantPhoneOtpErrorMessage("PHONE_OTP_NOT_ELIGIBLE") }, { status: 409 });
+      }
+      const playerId = clean(input.playerId);
+      if (playerId !== candidate.playerId) {
+        return NextResponse.json({ error: participantPhoneOtpErrorMessage("PHONE_OTP_NOT_ELIGIBLE") }, { status: 409 });
+      }
+
+      if (action === "send-test-phone-otp") {
+        const fingerprint = participantPhoneOtpClientFingerprint(
+          request,
+          process.env.PARTICIPANT_PHONE_OTP_RATE_LIMIT_SECRET,
+        );
+        const attemptRead = await beginParticipantPhoneOtpAttempt({
+          tournament_id: review.tournamentId,
+          player_id: playerId,
+          actor_auth_user_id: actorAuthUserId,
+          client_fingerprint: fingerprint,
+        });
+        const attempt = attemptRead.payload || {};
+        if (attempt.allowed !== true) {
+          const code = attempt.code || "PHONE_OTP_NOT_ELIGIBLE";
+          return NextResponse.json({
+            error: participantPhoneOtpErrorMessage(code),
+            code,
+            retryAfterSeconds: Number(attempt.retryAfterSeconds || 0),
+          }, { status: code === "PHONE_OTP_COOLDOWN" || code === "PHONE_OTP_RATE_LIMITED" ? 429 : 409 });
+        }
+        if (attempt.playerId !== candidate.playerId || attempt.authUserId !== rehearsal.authUserId ||
+            clean(attempt.emailNormalized).toLowerCase() !== candidate.emailNormalized) {
+          await recordParticipantPhoneOtpSend({
+            attempt_id: attempt.attemptId,
+            actor_auth_user_id: actorAuthUserId,
+            succeeded: false,
+            provider_called: false,
+            safe_reason: "PHONE_OTP_AUTH_MISMATCH",
+            duration_ms: 0,
+          });
+          return NextResponse.json({ error: participantPhoneOtpErrorMessage("PHONE_OTP_AUTH_MISMATCH") }, { status: 409 });
+        }
+
+        const adminClient = createParticipantAuthAdminClient();
+        const otpClient = createParticipantAuthOtpClient();
+        const authLookup = await adminClient.auth.admin.getUserById(attempt.authUserId);
+        if (authLookup.error) throw authLookup.error;
+        assertApprovedParticipantAuthUser({ user: authLookup.data?.user, candidate, tournamentId: review.tournamentId });
+        const started = performance.now();
+        let attachment;
+        try {
+          attachment = await attachPhoneToExistingParticipantAuthUser({
+            adminClient,
+            expectedAuthUserId: attempt.authUserId,
+            expectedEmail: candidate.emailNormalized,
+            targetPhone: attempt.phoneE164,
+          });
+          await requestExistingParticipantPhoneOtp({ otpClient, phone: attempt.phoneE164 });
+        } catch (error) {
+          const providerCalled = Boolean(attachment);
+          const code = error?.code === "PHONE_OTP_AUTH_MISMATCH"
+            ? "PHONE_OTP_AUTH_MISMATCH"
+            : participantPhoneOtpProviderFailureCode(error, "send");
+          await recordParticipantPhoneOtpSend({
+            attempt_id: attempt.attemptId,
+            actor_auth_user_id: actorAuthUserId,
+            succeeded: false,
+            provider_called: providerCalled,
+            auth_phone_attached: attachment?.attached === true,
+            safe_reason: code,
+            duration_ms: Math.round(performance.now() - started),
+          });
+          return NextResponse.json({ error: participantPhoneOtpErrorMessage(code), code },
+            { status: code === "PHONE_OTP_RATE_LIMITED" ? 429 : code === "PHONE_OTP_AUTH_MISMATCH" ? 409 : 503 });
+        }
+        const delivery = await recordParticipantPhoneOtpSend({
+          attempt_id: attempt.attemptId,
+          actor_auth_user_id: actorAuthUserId,
+          succeeded: true,
+          provider_called: true,
+          auth_phone_attached: attachment.attached,
+          safe_reason: "PROVIDER_ACCEPTED",
+          duration_ms: Math.round(performance.now() - started),
+        });
+        if (delivery.payload?.ok !== true) {
+          return NextResponse.json({ error: participantPhoneOtpErrorMessage(delivery.payload?.code || "PHONE_OTP_STALE") }, { status: 409 });
+        }
+        return NextResponse.json({
+          ok: true,
+          action,
+          attemptId: attempt.attemptId,
+          status: "VERIFICATION_PENDING",
+          message: "Verification code requested. Enter the six-digit code from the approved phone.",
+          resendCooldownSeconds: 60,
+          expiresAt: delivery.payload.expiresAt || attempt.expiresAt,
+          sameAuthUser: attachment.sameAuthUser,
+          emailPreserved: attachment.emailPreserved,
+        });
+      }
+
+      const token = normalizeParticipantPhoneOtpToken(input.token);
+      const attemptId = clean(input.attemptId);
+      if (!/^[0-9a-f-]{36}$/i.test(attemptId)) {
+        return NextResponse.json({ error: participantPhoneOtpErrorMessage("PHONE_OTP_INVALID") }, { status: 400 });
+      }
+      const allowedRead = await authorizeParticipantPhoneOtpVerification({
+        attempt_id: attemptId,
+        actor_auth_user_id: actorAuthUserId,
+      });
+      const allowed = allowedRead.payload || {};
+      if (allowed.allowed !== true) {
+        const code = allowed.code || "PHONE_OTP_INVALID_OR_EXPIRED";
+        return NextResponse.json({ error: participantPhoneOtpErrorMessage(code), code }, { status: code === "PHONE_OTP_REPLAY" ? 409 : 400 });
+      }
+      if (allowed.playerId !== candidate.playerId || allowed.authUserId !== rehearsal.authUserId ||
+          clean(allowed.emailNormalized).toLowerCase() !== candidate.emailNormalized) {
+        await recordParticipantPhoneOtpVerificationFailure({
+          attempt_id: attemptId,
+          actor_auth_user_id: actorAuthUserId,
+          safe_reason: "PHONE_OTP_AUTH_MISMATCH",
+          duration_ms: 0,
+        });
+        return NextResponse.json({ error: participantPhoneOtpErrorMessage("PHONE_OTP_AUTH_MISMATCH") }, { status: 409 });
+      }
+
+      const otpClient = createParticipantAuthOtpClient();
+      const started = performance.now();
+      const verified = await verifyExistingParticipantPhoneOtp({
+        otpClient,
+        phone: allowed.phoneE164,
+        token,
+        expectedAuthUserId: allowed.authUserId,
+      });
+      if (!verified.ok) {
+        const code = verified.error
+          ? participantPhoneOtpProviderFailureCode(verified.error, "verify")
+          : "PHONE_OTP_AUTH_MISMATCH";
+        await recordParticipantPhoneOtpVerificationFailure({
+          attempt_id: attemptId,
+          actor_auth_user_id: actorAuthUserId,
+          safe_reason: code,
+          duration_ms: Math.round(performance.now() - started),
+        });
+        if (verified.sessionCreated) await otpClient.auth.signOut({ scope: "local" }).catch(() => null);
+        return NextResponse.json({ error: participantPhoneOtpErrorMessage(code), code },
+          { status: code === "PHONE_OTP_AUTH_MISMATCH" ? 409 : code === "PHONE_OTP_PROVIDER_UNAVAILABLE" ? 503 : 400 });
+      }
+
+      try {
+        const adminClient = createParticipantAuthAdminClient();
+        const authLookup = await adminClient.auth.admin.getUserById(allowed.authUserId);
+        if (authLookup.error) throw authLookup.error;
+        assertApprovedParticipantAuthUser({ user: authLookup.data?.user, candidate, tournamentId: review.tournamentId });
+        const completion = await completeParticipantPhoneOtpVerification({
+          attempt_id: attemptId,
+          actor_auth_user_id: actorAuthUserId,
+          returned_auth_user_id: verified.userId,
+          duration_ms: Math.round(performance.now() - started),
+        });
+        if (completion.payload?.ok !== true) {
+          return NextResponse.json({
+            error: participantPhoneOtpErrorMessage(completion.payload?.code || "PHONE_OTP_AUTH_MISMATCH"),
+          }, { status: 409 });
+        }
+        return NextResponse.json({
+          ok: true,
+          action,
+          status: "VERIFIED",
+          sameAuthUser: completion.payload.sameAuthUser === true,
+          playerIdUnchanged: completion.payload.playerId === candidate.playerId,
+          emailPreserved: completion.payload.emailPreserved === true,
+          message: "Mobile verified for the existing Player Passport Auth user.",
+        });
+      } finally {
+        await otpClient.auth.signOut({ scope: "local" }).catch(() => null);
+      }
+    }
     if (PHONE_ACTIONS.has(action)) {
       if (!sameOriginMutation(request)) {
         return NextResponse.json({ error: "A same-origin Director request is required." }, { status: 403 });
@@ -392,11 +634,16 @@ export async function POST(request) {
     return NextResponse.json({ error: "Unsupported identity operation." }, { status: 400 });
   } catch (error) {
     const diagnosticsCode = error?.identityDiagnostics?.code || "";
+    const phoneSensitive = PHONE_ACTIONS.has(action) || PHONE_OTP_ACTIONS.has(action);
     console.error("Participant identity operation failed", {
       action,
-      message: PHONE_ACTIONS.has(action) ? "Mobile eligibility operation failed." : error?.message,
+      message: phoneSensitive ? "Participant phone operation failed." : error?.message,
       code: diagnosticsCode,
     });
+    if (PHONE_OTP_ACTIONS.has(action)) {
+      const code = error?.code || diagnosticsCode || "PHONE_OTP_PROVIDER_UNAVAILABLE";
+      return NextResponse.json({ error: participantPhoneOtpErrorMessage(code), code }, { status: Number(error?.status) || 409 });
+    }
     if (PHONE_ACTIONS.has(action)) {
       return NextResponse.json({
         error: participantAuthPhoneErrorMessage(diagnosticsCode),

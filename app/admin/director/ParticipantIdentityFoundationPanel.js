@@ -38,13 +38,21 @@ export default function ParticipantIdentityFoundationPanel() {
   const [mobileEdit, setMobileEdit] = useState(null);
   const [mobileValue, setMobileValue] = useState("");
   const [mobileFilter, setMobileFilter] = useState("ALL");
+  const [otpValues, setOtpValues] = useState({});
+  const [loadedAt, setLoadedAt] = useState(() => Date.now());
+  const [, setClock] = useState(0);
   const load = useCallback(async () => {
     const response = await fetch("/api/director/participant-identity", { cache: "no-store", credentials: "same-origin" });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Identity foundation is unavailable.");
-    setData(payload);
+    setData(payload); setLoadedAt(Date.now());
   }, []);
   useEffect(() => { load().catch((error) => setMessage(error.message)); }, [load]);
+  useEffect(() => {
+    if (!data?.phoneOtp?.enabled) return undefined;
+    const timer = window.setInterval(() => setClock((value) => value + 1), 1000);
+    return () => window.clearInterval(timer);
+  }, [data?.phoneOtp?.enabled]);
   const act = async (action) => {
     setBusy(action); setMessage("");
     try {
@@ -82,13 +90,32 @@ export default function ParticipantIdentityFoundationPanel() {
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
+  const runPhoneOtp = async ({ action, playerId, attemptId }) => {
+    setBusy(`${action}:${playerId}`); setMessage("");
+    try {
+      const response = await directorFetch("/api/director/participant-identity", {
+        method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action, playerId, attemptId, token: action === "verify-test-phone-otp" ? otpValues[playerId] : undefined }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Controlled phone verification failed.");
+      if (action === "verify-test-phone-otp") setOtpValues((values) => ({ ...values, [playerId]: "" }));
+      await load();
+      setMessage(payload.message || (action === "send-test-phone-otp"
+        ? "Verification code requested. Do not request another code until the countdown ends."
+        : "Mobile verified for the existing Player Passport Auth user."));
+    } catch (error) { setMessage(error.message); }
+    finally { setBusy(""); }
+  };
   if (!data) return <section className={styles.identityFoundation}><p>{message || "Loading identity foundation…"}</p></section>;
   const review = data.review;
   const clean = review.quality?.pass === true;
   const latestApproved = review.latestRun?.status === "APPROVED" && review.latestRun?.fingerprint === review.fingerprint;
   const rehearsal = data.authRehearsal;
   const phoneOwnership = data.phoneOwnership || { counts: {}, players: [] };
+  const phoneOtp = data.phoneOtp || { enabled: false, counts: {}, players: [] };
   const phoneByPlayer = new Map((phoneOwnership.players || []).map((player) => [player.playerId, player]));
+  const phoneOtpByPlayer = new Map((phoneOtp.players || []).map((player) => [player.playerId, player]));
   const identityPlayers = review.review.map((player) => ({ ...player, ...(phoneByPlayer.get(player.playerId) || {}),
     mobile: phoneByPlayer.get(player.playerId)?.mobile || { status: "AUTH_SETUP_REQUIRED" } }));
   const filteredPlayers = identityPlayers.filter((player) => filterMobile(player, mobileFilter));
@@ -101,7 +128,7 @@ export default function ParticipantIdentityFoundationPanel() {
     </div>
     <div className={styles.identityQuality}>{QUALITY.map(([key, label]) => <article key={key}><small>{label}</small><strong>{review.quality?.[key] ?? 0}</strong></article>)}</div>
     <div className={styles.identityMobileSummary} aria-label="Mobile authentication readiness">
-      <div><strong>Authentication methods</strong><span>Protected Supabase ownership · phone provider off</span></div>
+      <div><strong>Authentication methods</strong><span>{phoneOtp.enabled ? "Director provider test enabled · participant SMS login off" : "Protected Supabase ownership · provider test off"}</span></div>
       <div className={styles.identityQuality}>{MOBILE_QUALITY.map(([key, label]) => <article key={key}><small>{label}</small><strong>{phoneOwnership.counts?.[key] ?? 0}</strong></article>)}</div>
     </div>
     <div className={styles.identityActions}>
@@ -129,6 +156,13 @@ export default function ParticipantIdentityFoundationPanel() {
         const hasCurrentMobile = Boolean(player.mobile?.identifierId);
         const canManage = player.authLinkStatus === "ACTIVE";
         const editMode = mobileEdit?.playerId === player.playerId ? mobileEdit.mode : "";
+        const otpState = phoneOtpByPlayer.get(player.playerId);
+        const attempt = otpState?.attempt;
+        const elapsed = Math.floor((Date.now() - loadedAt) / 1000);
+        const retryAfter = Math.max(0, Number(attempt?.retryAfterSeconds || 0) - elapsed);
+        const awaitingCode = attempt?.status === "SENT" && Boolean(attempt?.attemptId);
+        const phoneVerified = mobileStatus === "VERIFIED" || otpState?.preflightStatus === "VERIFIED";
+        const canSendTest = phoneOtp.enabled && otpState?.preflightReady === true && hasCurrentMobile && !phoneVerified;
         return <article className={styles.identityPlayerCard} key={player.playerId} data-state={player.validationState} data-mobile-state={mobileStatus}>
           <div className={styles.identityPlayerHeading}><strong>{player.displayName}</strong><span>{player.playerId} · {player.teamId || "Team unassigned"}</span></div>
           <div className={styles.identityAuthMethods}>
@@ -147,6 +181,42 @@ export default function ParticipantIdentityFoundationPanel() {
             <p>{editMode === "change" ? "The prior mobile will be revoked. " : ""}Saving creates eligible, unverified ownership only. No SMS is sent.</p>
             <div><button type="button" disabled={Boolean(busy)} onClick={() => { setMobileEdit(null); setMobileValue(""); }}>Cancel</button><button type="submit" disabled={Boolean(busy) || !mobileValue.trim()}>{busy ? "Saving…" : editMode === "change" ? "Review Change" : "Add Mobile"}</button></div>
           </form> : null}
+          {phoneOtp.enabled && otpState ? <section className={styles.identityPhoneOtp} aria-labelledby={`phone-otp-${player.playerId}`}>
+            <div className={styles.identityPhoneOtpHeading}>
+              <div><small>Preview provider proof</small><strong id={`phone-otp-${player.playerId}`}>{phoneVerified ? "Mobile verified" : awaitingCode ? "Verification pending" : "Controlled SMS test"}</strong></div>
+              <span data-ready={otpState.preflightReady || phoneVerified ? "true" : "false"}>{phoneVerified ? "Verified" : otpState.preflightReady ? "Preflight ready" : otpState.preflightStatus?.replaceAll("_", " ") || "Not ready"}</span>
+            </div>
+            <p>{phoneVerified
+              ? "Supabase Auth and Participant Identity agree on the existing Auth user. Email sign-in remains available."
+              : "Director-only Preview test. This sends one real Twilio Verify code only when you press the button; participant SMS login remains off."}</p>
+            {!phoneVerified ? <div className={styles.identityPhoneOtpFacts} aria-label="Phone verification preflight">
+              <span>Auth phone: {otpState.authPhoneState || "UNKNOWN"}</span>
+              <span>phone_change: {otpState.authPhoneChangeState || "UNKNOWN"}</span>
+              <span>Other-user collision: {otpState.otherAuthUserCollision ? "BLOCKED" : "NONE"}</span>
+            </div> : null}
+            {!phoneVerified && !awaitingCode ? <button type="button" className={styles.identityPhoneOtpSend}
+              disabled={Boolean(busy) || !canSendTest || retryAfter > 0}
+              onClick={() => runPhoneOtp({ action: "send-test-phone-otp", playerId: player.playerId })}>
+              {retryAfter > 0 ? `Send again in ${retryAfter}s` : "Send Test Verification Code"}
+            </button> : null}
+            {awaitingCode ? <form className={styles.identityPhoneOtpForm} onSubmit={(event) => {
+              event.preventDefault();
+              runPhoneOtp({ action: "verify-test-phone-otp", playerId: player.playerId, attemptId: attempt.attemptId });
+            }}>
+              <label htmlFor={`phone-otp-code-${player.playerId}`}>Six-digit verification code</label>
+              <input id={`phone-otp-code-${player.playerId}`} name="one-time-code" type="text" inputMode="numeric"
+                autoComplete="one-time-code" pattern="[0-9]*" maxLength={6} required
+                value={otpValues[player.playerId] || ""}
+                onChange={(event) => setOtpValues((values) => ({ ...values, [player.playerId]: event.target.value.replace(/\D/g, "").slice(0, 6) }))}
+                aria-describedby={`phone-otp-help-${player.playerId}`} />
+              <button type="submit" disabled={Boolean(busy) || !/^\d{6}$/.test(otpValues[player.playerId] || "")}>{busy ? "Verifying…" : "Verify"}</button>
+              <p id={`phone-otp-help-${player.playerId}`}>Enter the code here—never paste it into chat. {retryAfter > 0 ? `A new code can be requested in ${retryAfter}s.` : "You may request a new code if this one did not arrive."}</p>
+              <button type="button" className={styles.identityPhoneOtpResend} disabled={Boolean(busy) || retryAfter > 0}
+                onClick={() => runPhoneOtp({ action: "send-test-phone-otp", playerId: player.playerId })}>
+                {retryAfter > 0 ? `Resend in ${retryAfter}s` : "Send a new code"}
+              </button>
+            </form> : null}
+          </section> : null}
         </article>;
       })}
     </div>
