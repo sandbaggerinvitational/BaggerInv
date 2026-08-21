@@ -80,7 +80,10 @@ test("mirror delivery is claimed, retryable, checkpointed, and idempotent", asyn
 });
 
 test("Director rehearsal route is Preview-only, read-only for Google, and protects real retry behind Supabase authority", async () => {
-  const route = await readFile(new URL("../app/api/odds/publication-operations/route.js", import.meta.url), "utf8");
+  const [route, readiness] = await Promise.all([
+    readFile(new URL("../app/api/odds/publication-operations/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/admin/director/game-center-readiness/GameCenterReadinessClient.js", import.meta.url), "utf8"),
+  ]);
   assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
   assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /rehearseSupabaseOddsSnapshot/);
@@ -89,6 +92,9 @@ test("Director rehearsal route is Preview-only, read-only for Google, and protec
   assert.doesNotMatch(route, /publishOddsSnapshot/);
   assert.match(route, /sources\.publicationAuthority !== "supabase"/);
   assert.match(route, /retry-google-mirror/);
+  assert.match(readiness, /Certify Odds Publication Lifecycle/);
+  assert.match(readiness, /\/api\/odds\/publication-operations/);
+  assert.match(readiness, /action: "rehearse"/);
 });
 
 test("migration keeps all Odds publication operations service-only", async () => {

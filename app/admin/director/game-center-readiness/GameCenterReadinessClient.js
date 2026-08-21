@@ -54,6 +54,24 @@ export default function GameCenterReadinessClient() {
     finally { setBusy(""); }
   }
 
+  async function oddsPublicationOperation() {
+    const action = "rehearse-odds-publication";
+    setBusy(action); setResult(null); setError("");
+    const startedAt = performance.now();
+    try {
+      const response = await directorFetch("/api/odds/publication-operations", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "rehearse" }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || `Request failed (${response.status}).`);
+      setResult({ action, requestMs: Math.round(performance.now() - startedAt), result: payload.result });
+    } catch (caught) { setError(caught?.message || "Odds publication rehearsal failed."); }
+    finally { setBusy(""); }
+  }
+
   return <section style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem", display: "grid", gap: "1rem" }}>
     <div><p>Preview only · Director authorized</p><h1>Live Read Readiness</h1><p>This surface is isolated from the Google-backed Director dashboard. Refresh imports presentation or competition configuration explicitly; parity verifies canonical participant views without changing scoring.</p></div>
     <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap" }}>
@@ -72,6 +90,7 @@ export default function GameCenterReadinessClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run("calcutta-parity", { samples: 25 })}>Verify Calcutta Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-published-odds-snapshots", { samples: 25 })}>Refresh Published Odds Snapshots</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("published-odds-parity", { samples: 25 })}>Verify Published Odds Parity</button>
+      <button type="button" disabled={Boolean(busy)} onClick={oddsPublicationOperation}>Certify Odds Publication Lifecycle</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-competition-derived-state", { samples: 25 })}>Refresh Momentum + Storylines</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("competition-derived-parity", { samples: 25 })}>Verify Momentum + Storylines Parity</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh-intelligence-derived-state")}>Refresh Tournament Intelligence</button>
