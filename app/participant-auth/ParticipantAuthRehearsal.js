@@ -13,6 +13,8 @@ export default function ParticipantAuthRehearsal() {
   const [requestId, setRequestId] = useState("");
   const [phoneToken, setPhoneToken] = useState("");
   const [phoneEnrollment, setPhoneEnrollment] = useState(null);
+  const [maskedMobile, setMaskedMobile] = useState("");
+  const [resendSeconds, setResendSeconds] = useState(0);
   const [session, setSession] = useState(null);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
@@ -25,10 +27,26 @@ export default function ParticipantAuthRehearsal() {
         const duration = Math.round(performance.now() - started);
         recordParticipantAuthDiagnostic("SESSION_CHECK", { routeTo: location.pathname, durationMs: duration });
         setSession({ ...payload, localSessionCheckMs: duration });
-        if (payload.session === "active") flushParticipantAuthDiagnostics().catch(() => null);
+        if (payload.session === "active") {
+          flushParticipantAuthDiagnostics().catch(() => null);
+          fetch("/api/participant/auth/phone-enrollment", { cache: "no-store", credentials: "same-origin" })
+            .then((response) => response.json()).then((phoneState) => {
+              if (phoneState.status === "VERIFICATION_PENDING" && phoneState.attemptId) {
+                setPhoneEnrollment({ attemptId: phoneState.attemptId, status: phoneState.status });
+                setMaskedMobile(phoneState.maskedMobile || "Approved mobile");
+                setResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
+                setMessage("Verification code sent.");
+              }
+            }).catch(() => null);
+        }
       })
       .catch(() => setSession({ session: "unavailable" }));
   }, []);
+  useEffect(() => {
+    if (resendSeconds <= 0) return undefined;
+    const timer = window.setTimeout(() => setResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resendSeconds]);
   const requestCode = async (event) => {
     event.preventDefault(); setBusy("request"); setMessage("");
     try {
@@ -76,7 +94,9 @@ export default function ParticipantAuthRehearsal() {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Phone enrollment could not be started.");
       setPhoneEnrollment({ attemptId: payload.attemptId, status: payload.status });
-      setMessage(payload.message || "Enter the six-digit phone enrollment code.");
+      setMaskedMobile(payload.maskedMobile || "Approved mobile");
+      setResendSeconds(Number(payload.resendCooldownSeconds || 0));
+      setMessage(payload.message || "Verification code sent.");
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
@@ -106,9 +126,12 @@ export default function ParticipantAuthRehearsal() {
           {phoneEnrollment?.status === "VERIFIED" ? <strong>Mobile verified on this Auth user.</strong>
             : phoneEnrollment?.status !== "VERIFICATION_PENDING" ? <button type="button" onClick={startPhoneEnrollment} disabled={Boolean(busy)}>{busy === "phone-start" ? "Starting…" : "Begin phone enrollment"}</button>
               : <form onSubmit={verifyPhoneEnrollment}>
+                <strong>Verification code sent</strong>
+                <span className={styles.maskedMobile}>{maskedMobile || "Approved mobile"}</span>
                 <label>Six-digit phone enrollment code<input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={phoneToken}
                   onChange={(event) => setPhoneToken(event.target.value.replace(/\D/g, "").slice(0, 6))} autoComplete="one-time-code" required /></label>
-                <button disabled={Boolean(busy) || phoneToken.length !== 6}>{busy === "phone-verify" ? "Verifying…" : "Verify phone on this Auth user"}</button>
+                <button disabled={Boolean(busy) || phoneToken.length !== 6}>{busy === "phone-verify" ? "Verifying…" : "Verify"}</button>
+                <small>{resendSeconds > 0 ? `Resend available in ${resendSeconds}s.` : "The resend countdown has ended. Start over only if this code expires."}</small>
                 <small>Enter the code here—never paste it into chat.</small>
               </form>}
           <div className={styles.operationBoundary}><strong>Operation B is separate</strong><span>Signed-out phone login remains disabled until enrollment succeeds and a later physical login test proves it returns this same Auth UUID.</span></div>
