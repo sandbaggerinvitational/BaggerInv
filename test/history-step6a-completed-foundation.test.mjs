@@ -319,11 +319,13 @@ test("completed History revision roster preserves its canonical source key", asy
     import.meta.url
   ), "utf8");
   assert.match(sql, /add column source_roster_key text/);
-  assert.match(sql, /roster\.tournament_id = fact\.tournament_id/);
-  assert.match(sql, /roster\.player_id = fact\.player_id/);
-  assert.match(sql, /alter column source_roster_key set not null/);
+  assert.doesNotMatch(sql, /update scoring_authority\.completed_history_roster_facts/);
+  assert.match(sql, /completed_history_roster_source_key_nonempty[\s\S]*?not valid/);
   assert.match(sql, /item->>''source_roster_key''/);
   assert.match(sql, /COMPLETED_HISTORY_ROSTER_PROVENANCE_PATCH_VERIFICATION_FAILED/);
+  assert.match(sql, /canonical_roster\.tournament_id = roster\.tournament_id/);
+  assert.match(sql, /canonical_roster\.player_id = roster\.player_id/);
+  assert.match(sql, /COMPLETED_HISTORY_ROSTER_READ_PATCH_VERIFICATION_FAILED/);
 });
 
 test("completed History SQL is append-only, sequential, scoped, and service-role-only", async () => {

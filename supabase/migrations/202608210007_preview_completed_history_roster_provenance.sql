@@ -1,36 +1,14 @@
 -- Preserve the canonical roster source key on each immutable History revision.
--- Existing values are copied from the same tournament-scoped canonical roster;
--- no historical fact is inferred or rewritten.
+-- The already-certified 2017 revision stays immutable. Its read projection
+-- obtains the same key from the tournament-scoped canonical roster. Future
+-- revisions store the key directly.
 alter table scoring_authority.completed_history_roster_facts
   add column source_roster_key text;
 
-select set_config('scoring_authority.completed_history_import', 'on', true);
-
-update scoring_authority.completed_history_roster_facts fact
-set source_roster_key = roster.source_roster_key
-from scoring_authority.tournament_players roster
-where roster.tournament_id = fact.tournament_id
-  and roster.player_id = fact.player_id
-  and fact.source_roster_key is null;
-
-do $backfill$
-begin
-  if exists (
-    select 1
-    from scoring_authority.completed_history_roster_facts
-    where btrim(coalesce(source_roster_key, '')) = ''
-  ) then
-    raise exception using
-      errcode = 'P0001',
-      message = 'COMPLETED_HISTORY_ROSTER_PROVENANCE_BACKFILL_FAILED';
-  end if;
-end;
-$backfill$;
-
 alter table scoring_authority.completed_history_roster_facts
-  alter column source_roster_key set not null,
   add constraint completed_history_roster_source_key_nonempty
-    check (length(btrim(source_roster_key)) > 0);
+    check (source_roster_key is not null and length(btrim(source_roster_key)) > 0)
+    not valid;
 
 -- Add the field to future immutable revision inserts. Fail closed if the
 -- deployed function is not the exact contract established by 210005/210006.
@@ -86,5 +64,56 @@ begin
   end if;
 end;
 $migration$;
+
+-- Compatibility for the one immutable revision created before this column
+-- existed. The current read contract remains deterministic and tournament-
+-- scoped; it never uses a free-text player join.
+do $read_contract$
+declare
+  function_signature regprocedure :=
+    'public.read_preview_completed_history(jsonb)'::regprocedure;
+  current_definition text;
+  patched_definition text;
+  unsafe_fragment constant text :=
+    'select jsonb_agg(to_jsonb(roster) order by roster.team_side, roster.display_name, roster.player_id)
+        from scoring_authority.completed_history_roster_facts roster
+        where roster.revision_id = revision_value';
+  safe_fragment constant text :=
+    'select jsonb_agg(
+          to_jsonb(roster) || jsonb_build_object(
+            ''source_roster_key'',
+            coalesce(roster.source_roster_key, canonical_roster.source_roster_key)
+          )
+          order by roster.team_side, roster.display_name, roster.player_id
+        )
+        from scoring_authority.completed_history_roster_facts roster
+        left join scoring_authority.tournament_players canonical_roster
+          on canonical_roster.tournament_id = roster.tournament_id
+         and canonical_roster.player_id = roster.player_id
+        where roster.revision_id = revision_value';
+  unsafe_occurrences integer;
+begin
+  select pg_get_functiondef(function_signature) into current_definition;
+  unsafe_occurrences := (
+    length(current_definition) - length(replace(current_definition, unsafe_fragment, ''))
+  ) / length(unsafe_fragment);
+  if unsafe_occurrences <> 1 then
+    raise exception using
+      errcode = 'P0001',
+      message = 'COMPLETED_HISTORY_ROSTER_READ_PATCH_PRECONDITION_FAILED',
+      detail = format('Expected 1 read fragment, found %s.', unsafe_occurrences);
+  end if;
+
+  patched_definition := replace(current_definition, unsafe_fragment, safe_fragment);
+  execute patched_definition;
+
+  select pg_get_functiondef(function_signature) into current_definition;
+  if position(safe_fragment in current_definition) = 0 then
+    raise exception using
+      errcode = 'P0001',
+      message = 'COMPLETED_HISTORY_ROSTER_READ_PATCH_VERIFICATION_FAILED';
+  end if;
+end;
+$read_contract$;
 
 notify pgrst, 'reload schema';
