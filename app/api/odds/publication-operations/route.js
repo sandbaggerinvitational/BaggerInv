@@ -39,6 +39,12 @@ async function directorFor(request) {
   return result?.status === "active" ? result : null;
 }
 
+function rehearsalFormResponse() {
+  return new NextResponse(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Preview Odds Publication Certification</title></head><body><main><h1>Preview Odds Publication Certification</h1><p>Director authorization required. This rehearsal rolls back all database changes and performs zero Google writes.</p><form method="post" action="/api/odds/publication-operations"><input type="hidden" name="action" value="rehearse"><button type="submit">Run non-destructive rehearsal</button></form></main></body></html>`, {
+    headers: { "cache-control": "no-store", "content-type": "text/html; charset=utf-8" },
+  });
+}
+
 function workbookValues(sheets = {}) {
   return Object.fromEntries(PUBLISHED_ODDS_WORKBOOK_TABS.map((tab) => [tab,
     (sheets[tab]?.records || []).map(({ record }) => record)]));
@@ -171,6 +177,7 @@ export async function GET(request) {
   const director = await directorFor(request);
   if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
   try {
+    if (new URL(request.url).searchParams.get("ui") === "1") return rehearsalFormResponse();
     const tournamentId = clean(director.identity?.tournamentId || "2026");
     return NextResponse.json({ ok: true, sources: oddsCalculationEnvironment(), diagnostics: await diagnostics(tournamentId) });
   } catch (error) {
@@ -183,7 +190,9 @@ export async function POST(request) {
   const director = await directorFor(request);
   if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
   try {
-    const input = await request.json();
+    const input = clean(request.headers.get("content-type")).includes("application/json")
+      ? await request.json()
+      : Object.fromEntries((await request.formData()).entries());
     const action = clean(input.action || "rehearse");
     const actorId = clean(director.identity?.player?.id || "Director");
     const tournamentId = clean(director.identity?.tournamentId || "2026");

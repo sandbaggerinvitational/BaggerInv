@@ -86,6 +86,9 @@ test("Director rehearsal route is Preview-only, read-only for Google, and protec
   ]);
   assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
   assert.match(route, /authorizePreviewDirector/);
+  assert.match(route, /Run non-destructive rehearsal/);
+  assert.match(route, /searchParams\.get\("ui"\) === "1"/);
+  assert.match(route, /request\.formData\(\)/);
   assert.match(route, /rehearseSupabaseOddsSnapshot/);
   assert.match(route, /buildOddsWorkbookPublicationRecords/);
   assert.match(route, /googleWrites: 0/);
