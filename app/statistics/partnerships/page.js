@@ -16,6 +16,8 @@ import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
+import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 
 export const metadata = pageMetadata({
   title: "Partnership Analytics | The Sandbagger Invitational",
@@ -58,11 +60,15 @@ function PartnershipTable({ title, description, rows, valueLabel, value }) {
 }
 
 export default async function PartnershipsPage() {
-  await refreshHistoricalData();
-  const partnerships = getPartnershipStats();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  if (!useSupabase) await refreshHistoricalData();
+  const partnerships = useSupabase
+    ? secondaryHistory.calculations.getPartnershipStats()
+    : getPartnershipStats();
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <Header />
 
       <section className={styles.pageHero}>

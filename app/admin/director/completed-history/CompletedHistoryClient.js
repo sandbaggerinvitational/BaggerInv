@@ -82,6 +82,8 @@ export default function CompletedHistoryClient() {
       <button type="button" disabled={Boolean(busy)} onClick={() => run(`validate-${year}`, () => post("validate"))}>Validate {year}</button>
       <button type="button" disabled={Boolean(busy)} onClick={certifyYear}>Certify {year}</button>
       <button type="button" disabled={Boolean(busy)} onClick={() => run("shadow", () => post("shadow"))}>Compare derived shadow</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("sync-player-profiles", () => post("sync-player-profiles"))}>Sync player presentation</button>
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("player-profile-parity", () => post("player-profile-parity"))}>Compare player presentation</button>
     </div>
     {busy ? <p role="status">Running {busy}…</p> : null}
     {error ? <div role="alert"><strong>{error.message}</strong><pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{JSON.stringify(error.payload, null, 2)}</pre></div> : null}

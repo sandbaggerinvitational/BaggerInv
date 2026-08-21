@@ -45,11 +45,17 @@ import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport";
 import { resolvePlayerPassportToken } from "../../../lib/player-passport-server";
 import { participantIdentityAuthorityEnvironment } from "../../../lib/participant-identity-authority";
 import { resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver";
+import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 
 export async function generateMetadata({ params }) {
-  await refreshCanonicalCareerHistoricalData();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  if (!useSupabase) await refreshCanonicalCareerHistoricalData();
   const { slug } = await params;
-  const player = getPlayerBySlug(slug);
+  const player = useSupabase
+    ? secondaryHistory.calculations.getPlayerBySlug(slug)
+    : getPlayerBySlug(slug);
 
   const title = player
     ? `${player["Display Name"]} | The Sandbagger Invitational`
@@ -104,10 +110,18 @@ function ChampionshipTimeline({ years, styles }) {
 
 
 export default async function PlayerPage({ params, searchParams }) {
-  const scorecardAnalyticsPromise = loadCanonicalCareerScorecardAnalytics();
-  const recordScorecardAnalyticsPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
-  const canonicalOfficialRecords = getRecords();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const calculations = secondaryHistory?.calculations || null;
+  const readSupabaseRecords = calculations?.getRecords;
+  const scorecardAnalyticsPromise = useSupabase
+    ? Promise.resolve(secondaryHistory.scorecardAnalytics)
+    : loadCanonicalCareerScorecardAnalytics();
+  const recordScorecardAnalyticsPromise = useSupabase
+    ? Promise.resolve(secondaryHistory.scorecardAnalytics)
+    : loadScorecardAnalytics();
+  if (!useSupabase) await refreshHistoricalData();
+  const canonicalOfficialRecords = useSupabase ? readSupabaseRecords() : getRecords();
   const recordScorecardAnalytics = await recordScorecardAnalyticsPromise;
   const recordPlayerNames = Object.fromEntries(
     canonicalOfficialRecords.all.map(({ player }) => [
@@ -123,14 +137,14 @@ export default async function PlayerPage({ params, searchParams }) {
     playerNames: recordPlayerNames,
     ghostMatchExclusions: recordScorecardAnalytics.ghostMatchExclusions,
   });
-  await refreshCanonicalCareerHistoricalData();
+  if (!useSupabase) await refreshCanonicalCareerHistoricalData();
   const { slug } = await params;
   const query = await searchParams;
   const playerDirectoryReturnHref = safePlayerDirectoryReturnHref(
     query?.returnTo
   );
   const historyReturnContext = historicalPlayerReturnContext(query);
-  const player = getPlayerBySlug(slug);
+  const player = useSupabase ? calculations.getPlayerBySlug(slug) : getPlayerBySlug(slug);
   if (!player) notFound();
   const cookieStore = await cookies();
   const participantIdentityAuthority = participantIdentityAuthorityEnvironment();
@@ -148,20 +162,23 @@ export default async function PlayerPage({ params, searchParams }) {
     );
   }
 
-  const officialRecords = getRecords();
+  const officialRecords = useSupabase ? readSupabaseRecords() : getRecords();
   const stats = officialRecords.all.find(({ player: rowPlayer }) =>
     rowPlayer["Player ID"] === player["Player ID"]
   )?.stats;
   if (!stats) notFound();
-  const formatMatchHistory = getPlayerFormatMatchHistory(
+  const formatMatchHistory = (useSupabase
+    ? calculations.getPlayerFormatMatchHistory
+    : getPlayerFormatMatchHistory)(
     player["Player ID"],
     stats.records
   );
   const playerDraftHistory = getPlayerDraftHistory(
-    await getDrafts(),
-    player["Player ID"]
+    await getDrafts(useSupabase ? { history: calculations } : undefined),
+    player["Player ID"],
+    useSupabase ? { history: calculations } : undefined
   );
-  const captainLegacy = getCaptainLegacy(player["Player ID"]);
+  const captainLegacy = (useSupabase ? calculations.getCaptainLegacy : getCaptainLegacy)(player["Player ID"]);
   const rival = stats.biggestRival;
   const recordedAppearanceYears = stats.seasons
     .filter((season) => season.overall.matches > 0)
@@ -204,7 +221,10 @@ export default async function PlayerPage({ params, searchParams }) {
 
   return (
     <main data-career-profile>
-      <section className={styles.pageHero}>
+      <section
+        className={styles.pageHero}
+        data-secondary-history-source={useSupabase ? "supabase" : "google"}
+      >
         <div className={styles.profileHeader}>
           <PlayerAvatar
             player={player}

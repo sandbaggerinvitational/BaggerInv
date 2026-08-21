@@ -19,18 +19,27 @@ import {
   matchProgressionLeaderboardRows,
 } from "../../../lib/match-progression";
 import { buildCanonicalRecordHolderAuthority } from "../../../lib/record-holder-authority";
+import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 
 export const dynamic = "force-dynamic";
 
-const resolveLeaderboard = cache(async (slug) => {
+const resolveLeaderboard = cache(async (slug, useSupabase) => {
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  if (!useSupabase) await refreshHistoricalData();
   const officialDefinition = getLeaderboardDefinition(slug);
   if (officialDefinition) {
+    const records = useSupabase
+      ? secondaryHistory.calculations.getRecords()
+      : getRecords();
     return {
-      ...getLeaderboardFromRecords(slug, getRecords()),
+      ...getLeaderboardFromRecords(slug, records),
       scorecard: false,
     };
   }
-  const analytics = await loadScorecardAnalytics();
+  const analytics = useSupabase
+    ? secondaryHistory.scorecardAnalytics
+    : await loadScorecardAnalytics();
   const playerNames = Object.fromEntries(analytics.scorecards
     .filter((card) => card.playerId)
     .map((card) => [card.playerId, card.playerName || card.playerId]));
@@ -72,9 +81,9 @@ const resolveLeaderboard = cache(async (slug) => {
 });
 
 export async function generateMetadata({ params }) {
-  await refreshHistoricalData();
+  const useSupabase = isSupabaseSecondaryHistory();
   const { slug } = await params;
-  const leaderboard = await resolveLeaderboard(slug);
+  const leaderboard = await resolveLeaderboard(slug, useSupabase);
 
   const title = leaderboard
     ? `${leaderboard.title} | The Sandbagger Invitational`
@@ -89,9 +98,9 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function FullLeaderboardPage({ params }) {
-  await refreshHistoricalData();
+  const useSupabase = isSupabaseSecondaryHistory();
   const { slug } = await params;
-  const leaderboard = await resolveLeaderboard(slug);
+  const leaderboard = await resolveLeaderboard(slug, useSupabase);
   if (!leaderboard) notFound();
 
   const defaultSort =
@@ -100,7 +109,7 @@ export default async function FullLeaderboardPage({ params }) {
   const ascending = leaderboard.direction === "lowest";
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <Header />
 
       <section className={styles.pageHero}>

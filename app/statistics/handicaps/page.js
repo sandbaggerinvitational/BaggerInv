@@ -11,6 +11,8 @@ import styles from "../../historical.module.css";
 import { addTournamentRanks } from "../../../lib/rankings";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
+import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 
 export const metadata = pageMetadata({
   title: "Handicap Analytics | The Sandbagger Invitational",
@@ -51,12 +53,16 @@ function HandicapTable({ title, description, rows, high = false }) {
 }
 
 export default async function HandicapsPage() {
-  await refreshHistoricalData();
-  const handicaps = getHandicapStats();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  if (!useSupabase) await refreshHistoricalData();
+  const handicaps = useSupabase
+    ? secondaryHistory.calculations.getHandicapStats()
+    : getHandicapStats();
   const improvedRanks = addTournamentRanks(handicaps.mostImproved, "improvement");
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <Header />
 
       <section className={styles.pageHero}>

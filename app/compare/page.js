@@ -12,6 +12,8 @@ import {
   buildHeadToHeadComparison,
   buildPlayerComparisonProfiles,
 } from "../../lib/player-comparison";
+import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
+import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
 
 export const metadata = pageMetadata({
   title: "Compare Sandbaggers | Sandbagger Invitational",
@@ -20,10 +22,16 @@ export const metadata = pageMetadata({
 });
 
 export default async function ComparePage({ searchParams }) {
-  const scorecardPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
+  const useSupabase = isSupabaseSecondaryHistory();
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const scorecardPromise = useSupabase
+    ? Promise.resolve(secondaryHistory.scorecardAnalytics)
+    : loadScorecardAnalytics();
+  if (!useSupabase) await refreshHistoricalData();
   const params = await searchParams;
-  const officialRecords = getRecords();
+  const officialRecords = useSupabase
+    ? secondaryHistory.calculations.getRecords()
+    : getRecords();
   const scorecardAnalytics = await scorecardPromise;
   const comparison = buildPlayerComparisonProfiles({
     allPlayerStats: officialRecords.all,
@@ -40,7 +48,9 @@ export default async function ComparePage({ searchParams }) {
       headToHead[`${one.id}|${two.id}`] = buildHeadToHeadComparison({
         playerAId: one.id,
         playerBId: two.id,
-        official: getHeadToHead(one.id, two.id),
+        official: useSupabase
+          ? secondaryHistory.calculations.getHeadToHead(one.id, two.id)
+          : getHeadToHead(one.id, two.id),
         scorecards: comparison.scorecards,
         progressionMatches: comparison.progressionMatches,
       });
@@ -48,7 +58,7 @@ export default async function ComparePage({ searchParams }) {
   }
 
   return (
-    <main>
+    <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
       <Header />
 
       <CompareTool
