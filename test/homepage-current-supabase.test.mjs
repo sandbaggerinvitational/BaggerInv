@@ -70,6 +70,18 @@ const supabaseView = {
       tournament: { edition: "2026 Tournament", dates: "August 12–15, 2026", location: "Kiawah Island",
         timeZone: "America/New_York", configuredStatus: "Live", status: "Live", statusMode: "Automatic",
         currentRound: 2, logo: "sandbagger-2026.png" },
+      timeline: {
+        available: true,
+        effectiveNow: "2026-08-13T16:00:00.000Z",
+        previewDateActive: true,
+        events: [
+          { id: "breakfast", date: "2026-08-13", startTime: "08:00", endTime: "09:00",
+            type: "Breakfast", title: "Breakfast", displayOnHome: true, status: "Completed" },
+          { id: "round-2", date: "2026-08-13", startTime: "10:00", endTime: "15:00",
+            type: "Golf · Round 2", title: "Round 2", displayOnHome: true,
+            roundStatusDerived: true, status: "Completed" },
+        ],
+      },
       leaderboardsPlayers: Object.fromEntries(["CL01", "CB01", "JS01", "PN01", "MS02", "RM01"]
         .map((id) => [id, { slug: id.toLowerCase(), photo: `${id}.jpg` }])),
       tournamentMatchDisplay: {
@@ -155,7 +167,10 @@ test("Homepage composes canonical live, Guide, storylines, Net Skins, and founda
     assert.equal(reopened.holeResults.length, 18);
     assert.equal(reopened.archiveFinal, false);
   }
-  assert.deepEqual(read.liveData.schedule.map((row) => row.title), ["Breakfast"]);
+  assert.deepEqual(read.liveData.schedule.map((row) => row.title), ["Breakfast", "Round 2"]);
+  assert.equal(read.liveData.timeline.previewDateActive, true);
+  assert.equal(read.liveData.timeline.effectiveNow, "2026-08-13T16:00:00.000Z");
+  assert.equal(read.liveData.schedule[1].status, "Live");
   assert.deepEqual(read.liveData.preparedStorylines, [{ id: "closest", headline: "Closest Match" }]);
   assert.equal(read.liveData.storylinesSource, "supabase");
   assert.equal(read.liveData.netSkins.rounds.length, 1);
