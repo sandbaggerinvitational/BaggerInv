@@ -10,6 +10,8 @@ import ScorecardCalibration from "./ScorecardCalibration";
 import CmsManager, { AuditLogPanel, DashboardPanel, StandingsPanel } from "./CmsManager";
 import styles from "./admin-center.module.css";
 import { resolveTournamentSelection } from "../../lib/tournament-identifiers";
+import PreviewModeBadge from "../PreviewModeBadge";
+import PlayerPassportAdmin from "./PlayerPassportAdmin";
 
 const TABS = [
   ["dashboard", "Dashboard"], ["tournament", "Tournament"], ["players", "Players"], ["teams", "Teams"],
@@ -18,7 +20,7 @@ const TABS = [
   ["history", "History"], ["calibration", "Calibration"], ["data-health", "Data Health"], ["settings", "Settings"], ["audit-log", "Audit Log"],
 ];
 
-export default function AdminCenter({ tournaments }) {
+export default function AdminCenter({ tournaments, previewMode = false, liveTournamentV2 = false }) {
   const search = useSearchParams();
   const router = useRouter();
   const requestedTab = search.get("tab");
@@ -47,8 +49,17 @@ export default function AdminCenter({ tournaments }) {
   function updateUrl(nextTab = active, nextTournament = tournamentId) {
     router.replace(`/admin?tab=${encodeURIComponent(nextTab)}&tournament=${encodeURIComponent(nextTournament)}`, { scroll: false });
   }
-  function selectTab(tab) { setActive(tab); updateUrl(tab, tournamentId); }
+  function canLeaveCurrentPanel() {
+    return active !== "live-scoring"
+      || !document.querySelector('[data-live-match-dirty="true"]')
+      || window.confirm("You have unsaved live-match changes. Leave them behind?");
+  }
+  function selectTab(tab) {
+    if (!canLeaveCurrentPanel()) return;
+    setActive(tab); updateUrl(tab, tournamentId);
+  }
   function selectTournament(id) {
+    if (!canLeaveCurrentPanel()) return;
     if (!validTournamentIds.has(String(id)) || String(id) === "0") {
       setStatus("Unable to resolve the selected tournament.");
       return;
@@ -68,6 +79,7 @@ export default function AdminCenter({ tournaments }) {
 
   const shared = { secret, tournamentId, year: tournament?.year, updatedBy };
   return <section className={styles.shell}>
+    {active === "live-scoring" ? <PreviewModeBadge visible={previewMode} /> : null}
     <header className={styles.hero}><p>SBI Administration</p><h1>Admin Center</h1><span>The operating system for tournament content, teams, competition, live scoring, analytics, and history.</span></header>
     {!tournament ? <div className={styles.login}><p>Unable to resolve the selected tournament.</p></div> : !authorized ? <div className={styles.login}><label>Admin password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && secret) login(); }} /></label><button type="button" disabled={!secret || busy} onClick={login}>{busy ? "Checking…" : "Open Admin Center"}</button>{status ? <p>{status}</p> : null}</div> : <>
       <div className={styles.controlBar}><label>Tournament<select value={tournamentId} onChange={(event) => selectTournament(event.target.value)}>{tournaments.map((item) => <option value={item.id} key={item.id}>{item.year} — {item.label}</option>)}</select></label><label>Updated by<input value={updatedBy} onChange={(event) => setUpdatedBy(event.target.value)} placeholder="Your name for the audit log" /></label><a href="/" target="_blank" rel="noreferrer">Open public site ↗</a></div>
@@ -75,13 +87,16 @@ export default function AdminCenter({ tournaments }) {
       <div className={styles.panel}>
         {active === "dashboard" ? <DashboardPanel {...shared} onNavigate={selectTab} /> : null}
         {active === "tournament" ? <TournamentEditor tournamentId={tournamentId} secret={secret} sharedUpdatedBy={updatedBy} /> : null}
-        {active === "players" ? <CmsManager resource="players" {...shared} description="Manage player profiles, status, leadership roles, handicapping details, biography, and public presentation." /> : null}
+        {active === "players" ? <div className={styles.stack}><PlayerPassportAdmin secret={secret} updatedBy={updatedBy} /><CmsManager resource="players" {...shared} description="Manage player profiles, status, leadership roles, handicapping details, biography, and public presentation." /></div> : null}
         {active === "teams" ? <div className={styles.stack}><CmsManager resource="teams" {...shared} description="Manage the selected tournament's team identity, captain, colors, logo, motto, and description." /><CmsManager resource="rosters" {...shared} title="Roster Assignments" description="Assign players to Team 1 or Team 2 and maintain the tournament handicap used across the public site." /></div> : null}
         {active === "draft" ? <div className={styles.stack}><CmsManager resource="draft-settings" {...shared} description="Schedule the draft, assign its teams and captains, set the pick count, and control the public draft presentation." /><CmsManager resource="draft-picks" {...shared} description="Build the official draft board. Player selections write directly to the Draft Picks sheet." /></div> : null}
         {active === "schedule" ? <CmsManager resource="schedule" {...shared} description="Build the tournament-week itinerary, connect rounds and courses, publish events, and reorder the schedule." /> : null}
         {active === "courses" ? <CmsManager resource="courses" {...shared} description="Manage the selected year's course assignments, tees, ratings, yardage, imagery, and GPS links." /> : null}
         {active === "matches" ? <CmsManager resource="matches" {...shared} description="Create and edit official pairings, formats, tee times, starting holes, and match status." /> : null}
-        {active === "live-scoring" ? <LiveMatchControl embedded sharedSecret={secret} sharedUpdatedBy={updatedBy} selectedYear={tournament?.year} /> : null}
+        {active === "live-scoring" ? liveTournamentV2
+          ? <LiveMatchControl embedded sharedSecret={secret} sharedUpdatedBy={updatedBy} selectedYear={tournament?.year} />
+          : <div className={styles.readOnly}><h2>Live Scoring Preview Disabled</h2><p>The Phase 8 preview feature flag is not enabled in this environment.</p></div>
+        : null}
         {active === "standings" ? <StandingsPanel secret={secret} year={tournament?.year} /> : null}
         {active === "guide" ? <GuideEditor tournaments={tournaments} embedded sharedSecret={secret} sharedUpdatedBy={updatedBy} selectedTournamentId={tournamentId} onTournamentChange={selectTournament} /> : null}
         {active === "odds" ? <OddsAdmin embedded sharedSecret={secret} /> : null}

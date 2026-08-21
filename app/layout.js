@@ -7,6 +7,9 @@ import {
   absoluteUrl,
   pageMetadata,
 } from "../lib/seo";
+import PwaFoundation from "./PwaFoundation";
+import ParticipantIdentity from "./ParticipantIdentity";
+import { Suspense } from "react";
 
 const homeMetadata = pageMetadata({
   title: SITE_NAME,
@@ -63,6 +66,11 @@ export const metadata = {
     },
   },
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SBI",
+  },
   robots: {
     index: true,
     follow: true,
@@ -82,6 +90,10 @@ export default function RootLayout({ children }) {
       <body>
         {children}
         <Analytics />
+        <PwaFoundation />
+        <Suspense fallback={null}>
+          <ParticipantIdentity />
+        </Suspense>
       </body>
     </html>
   );
