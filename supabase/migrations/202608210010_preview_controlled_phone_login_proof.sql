@@ -27,6 +27,22 @@ declare auth_phone_user_count integer := 0;
 declare scoring_permission_count integer := 0;
 declare active_scoring_permission_count integer := 0;
 declare scoring_revision_mismatch_count integer := 0;
+declare director_entitlement participant_identity.preview_director_entitlements%rowtype;
+declare director_entitlement_count integer := 0;
+declare director_entitlement_found boolean := false;
+declare director_entitlement_state text := 'NONE';
+declare director_role text := 'NONE';
+declare director_scope text := 'NONE';
+declare director_entitlement_revision bigint := 0;
+declare director_entitlement_source text := 'NONE';
+declare director_entitlement_fingerprint text;
+declare expected_director_fingerprint text := lower(btrim(coalesce(input->>'director_entitlement_fingerprint', '')));
+declare expected_director_state text := upper(btrim(coalesce(input->>'director_entitlement_state', '')));
+declare expected_director_role text := upper(btrim(coalesce(input->>'director_role', '')));
+declare expected_director_scope text := upper(btrim(coalesce(input->>'director_scope', '')));
+declare expected_director_revision text := btrim(coalesce(input->>'director_entitlement_revision', ''));
+declare expected_director_source text := upper(btrim(coalesce(input->>'director_entitlement_source', '')));
+declare expected_director_count text := btrim(coalesce(input->>'director_entitlement_count', ''));
 begin
   if target_tournament = '' or requested_player = '' or expected_auth_user is null then
     return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_OTP_CONTEXT_INVALID');
@@ -104,12 +120,43 @@ begin
      ) then
     return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_OTP_AUTH_COLLISION');
   end if;
-  if exists (
-    select 1 from participant_identity.preview_director_entitlements entitlement
-    where entitlement.auth_user_id = expected_auth_user
-      and entitlement.tournament_id = target_tournament and entitlement.status = 'ACTIVE'
-  ) then
-    return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_LOGIN_DIRECTOR_ENTITLEMENT_PRESENT');
+  select count(*) into director_entitlement_count
+  from participant_identity.preview_director_entitlements entitlement
+  where entitlement.auth_user_id = expected_auth_user;
+  select * into director_entitlement
+  from participant_identity.preview_director_entitlements entitlement
+  where entitlement.auth_user_id = expected_auth_user
+    and entitlement.tournament_id = target_tournament;
+  director_entitlement_found := found;
+  if director_entitlement_found then
+    director_entitlement_state := director_entitlement.status;
+    director_role := case when director_entitlement.status = 'ACTIVE' then 'DIRECTOR' else 'NONE' end;
+    director_scope := 'TOURNAMENT:' || upper(director_entitlement.tournament_id)
+      || ':PLAYER:' || upper(director_entitlement.director_player_id);
+    director_entitlement_revision := director_entitlement.entitlement_revision;
+    director_entitlement_source := director_entitlement.bootstrap_source;
+  end if;
+  director_entitlement_fingerprint := md5(concat_ws('|', expected_auth_user::text,
+    director_entitlement_count::text, director_entitlement_state, director_role,
+    director_scope, director_entitlement_revision::text, director_entitlement_source));
+
+  -- The arm call has no proof timestamp and captures this immutable baseline.
+  -- Every signed-out operation includes the signed snapshot and must match it.
+  if input ? 'proof_issued_at' then
+    if expected_director_fingerprint !~ '^[0-9a-f]{32}$'
+       or expected_director_revision !~ '^[0-9]+$'
+       or expected_director_count !~ '^[0-9]+$' then
+      return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_LOGIN_PROOF_REQUIRED');
+    end if;
+    if expected_director_fingerprint <> director_entitlement_fingerprint
+       or expected_director_state <> director_entitlement_state
+       or expected_director_role <> director_role
+       or expected_director_scope <> director_scope
+       or expected_director_revision::bigint <> director_entitlement_revision
+       or expected_director_source <> director_entitlement_source
+       or expected_director_count::integer <> director_entitlement_count then
+      return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_LOGIN_DIRECTOR_PARITY_MISMATCH');
+    end if;
   end if;
 
   select count(*), count(*) filter (where permission.can_score and permission.revoked_at is null)
@@ -130,7 +177,16 @@ begin
     'phoneE164', phone_identifier.normalized_value_private,
     'maskedMobile', '••• ••• ' || right(participant_identity.canonical_auth_phone(phone_identifier.normalized_value_private), 4),
     'emailPreserved', true, 'phoneConfirmed', true, 'phoneIdentitySameUser', true,
-    'activeLink', true, 'membershipActive', true, 'directorAccessDenied', true,
+    'activeLink', true, 'membershipActive', true,
+    'directorEntitlementState', director_entitlement_state,
+    'directorRole', director_role, 'directorScope', director_scope,
+    'directorEntitlementRevision', director_entitlement_revision,
+    'directorEntitlementSource', director_entitlement_source,
+    'directorEntitlementCount', director_entitlement_count,
+    'directorEntitlementFingerprint', director_entitlement_fingerprint,
+    'directorEntitlementPreserved', true,
+    'directorPrivilegeEscalation', false,
+    'authMethodChangesDirectorAuthorization', false,
     'authUserCount', 1, 'phoneIdentifierStatus', phone_identifier.status,
     'phoneVerificationSource', phone_identifier.verification_source,
     'scoringPermissionRows', scoring_permission_count,
@@ -227,7 +283,14 @@ begin
     'PHONE_LOGIN_REQUESTED', proof->>'tournamentId', auth_user_key, proof->>'playerId',
     proof->>'playerId', 'Controlled signed-out participant', new_attempt::text,
     jsonb_build_object('method', 'SIGNED_OUT_PHONE_LOGIN', 'shouldCreateUser', false,
-      'phoneStatus', 'VERIFIED', 'directorAccessDenied', true,
+      'phoneStatus', 'VERIFIED',
+      'directorEntitlementStateBefore', proof->>'directorEntitlementState',
+      'directorRoleBefore', proof->>'directorRole',
+      'directorScopeBefore', proof->>'directorScope',
+      'directorEntitlementRevisionBefore', (proof->>'directorEntitlementRevision')::bigint,
+      'directorEntitlementSourceBefore', proof->>'directorEntitlementSource',
+      'directorEntitlementCountBefore', (proof->>'directorEntitlementCount')::integer,
+      'directorEntitlementParityRequired', true,
       'rawPhoneLogged', false, 'otpLogged', false)
   );
   return proof || jsonb_build_object('ok', true, 'allowed', true,
@@ -460,12 +523,36 @@ begin
       'returnedAuthUserMatch', true, 'sessionEstablished', true,
       'refreshSessionAvailable', true, 'playerIdUnchanged', true,
       'phoneIdentifierUnchanged', true, 'scoringAuthorizationUnchanged', true,
-      'directorAccessDenied', true, 'rawPhoneLogged', false, 'otpLogged', false)
+      'directorEntitlementPreserved', true,
+      'directorEntitlementState', proof->>'directorEntitlementState',
+      'directorRole', proof->>'directorRole',
+      'directorScope', proof->>'directorScope',
+      'directorEntitlementRevision', (proof->>'directorEntitlementRevision')::bigint,
+      'directorEntitlementSource', proof->>'directorEntitlementSource',
+      'newDirectorEntitlements', 0, 'directorPrivilegeEscalation', false,
+      'authMethodChangesDirectorAuthorization', false,
+      'rawPhoneLogged', false, 'otpLogged', false)
   );
   return proof || jsonb_build_object('ok', true, 'status', 'VERIFIED',
     'sameAuthUser', true, 'sessionEstablished', true, 'refreshSessionAvailable', true,
     'playerIdUnchanged', true, 'phoneIdentifierUnchanged', true,
-    'scoringAuthorizationUnchanged', true, 'directorAccessDenied', true);
+    'scoringAuthorizationUnchanged', true, 'directorEntitlementPreserved', true,
+    'directorEntitlementBefore', jsonb_build_object(
+      'state', input->>'director_entitlement_state',
+      'role', input->>'director_role',
+      'scope', input->>'director_scope',
+      'revision', (input->>'director_entitlement_revision')::bigint,
+      'source', input->>'director_entitlement_source',
+      'count', (input->>'director_entitlement_count')::integer),
+    'directorEntitlementAfter', jsonb_build_object(
+      'state', proof->>'directorEntitlementState',
+      'role', proof->>'directorRole',
+      'scope', proof->>'directorScope',
+      'revision', (proof->>'directorEntitlementRevision')::bigint,
+      'source', proof->>'directorEntitlementSource',
+      'count', (proof->>'directorEntitlementCount')::integer),
+    'newDirectorEntitlements', 0, 'directorPrivilegeEscalation', false,
+    'authMethodChangesDirectorAuthorization', false);
 end;
 $$;
 

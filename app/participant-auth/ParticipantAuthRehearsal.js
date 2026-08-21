@@ -223,7 +223,7 @@ export default function ParticipantAuthRehearsal() {
           <button type="button" onClick={preparePhoneLoginProof} disabled={Boolean(busy) || phoneEnrollment?.status !== "VERIFIED"}>
             {busy === "phone-login-arm" ? "Preparing…" : "Prepare and sign out for phone-login proof"}
           </button>
-          <small>Director access must be separate before this participant-only proof can begin.</small>
+          <small>Any existing Director entitlement is snapshotted before sign-out and must remain exactly unchanged after phone login.</small>
         </section>
       </>
         : <>

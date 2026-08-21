@@ -14,6 +14,7 @@ import {
   participantPhoneOtpClientFingerprint,
   participantPhoneOtpErrorMessage,
   participantPhoneOtpProviderFailureCode,
+  participantDirectorEntitlementParity,
   requestExistingParticipantPhoneEnrollment,
   requestExistingParticipantPhoneLogin,
   participantPhoneLoginProofCookie,
@@ -156,10 +157,19 @@ test("controlled phone-login proof is signed, short-lived, HttpOnly, and tamper-
     tournamentId: "2026",
     identifierId: "44444444-4444-4444-8444-444444444444",
     identifierRevision: 2,
+    directorEntitlementState: "ACTIVE",
+    directorRole: "DIRECTOR",
+    directorScope: "TOURNAMENT:2026:PLAYER:CB01",
+    directorEntitlementRevision: 1,
+    directorEntitlementSource: "DIRECTOR_PASSPORT",
+    directorEntitlementCount: 1,
+    directorEntitlementFingerprint: "a".repeat(32),
   }, secret, { now });
   const verified = verifyParticipantPhoneLoginProof(proof, secret, { now: now + 30_000 });
   assert.equal(verified.authUserId, authId);
   assert.equal(verified.playerId, "CB01");
+  assert.equal(verified.directorRole, "DIRECTOR");
+  assert.equal(verified.directorEntitlementSource, "DIRECTOR_PASSPORT");
   assert.equal(verified.expiresAt - verified.issuedAt, 600);
   assert.throws(() => verifyParticipantPhoneLoginProof(`${proof}x`, secret, { now }));
   assert.throws(() => verifyParticipantPhoneLoginProof(proof, secret, { now: now + 601_000 }));
@@ -182,9 +192,11 @@ test("Operation B route is signed-out, one-proof scoped, and never accepts a cli
   assert.doesNotMatch(route, /auth\.admin\.(?:createUser|updateUserById)/);
   assert.match(route, /readParticipantIdentityContextForAuth\(\{ authUserId: verified\.userId \}\)/);
   assert.match(route, /authClient\.auth\.getUser\(\)/);
+  assert.match(route, /director_entitlement_fingerprint: proof\.directorEntitlementFingerprint/);
+  assert.match(route, /directorEntitlementFingerprint: authorization\.directorEntitlementFingerprint/);
 });
 
-test("controlled phone-login migration hard-gates VERIFIED A, one user, link, membership, collision, and Director denial", async () => {
+test("controlled phone-login migration snapshots VERIFIED A ownership and exact Director entitlement parity", async () => {
   const migration = await source(controlledLoginMigrationPath);
   assert.match(migration, /select count\(\*\) from auth\.users\) <> 1/);
   assert.match(migration, /phone_identifier\.status <> 'VERIFIED'/);
@@ -196,8 +208,57 @@ test("controlled phone-login migration hard-gates VERIFIED A, one user, link, me
   assert.match(migration, /provider = 'phone'/);
   assert.match(migration, /provider = 'email'/);
   assert.match(migration, /PHONE_OTP_AUTH_COLLISION/);
-  assert.match(migration, /preview_director_entitlements[\s\S]*PHONE_LOGIN_DIRECTOR_ENTITLEMENT_PRESENT/);
-  assert.match(migration, /directorAccessDenied', true/);
+  assert.match(migration, /preview_director_entitlements/);
+  assert.match(migration, /director_entitlement_fingerprint := md5/);
+  assert.match(migration, /expected_director_fingerprint <> director_entitlement_fingerprint/);
+  assert.match(migration, /PHONE_LOGIN_DIRECTOR_PARITY_MISMATCH/);
+  assert.match(migration, /directorEntitlementPreserved', true/);
+  assert.doesNotMatch(migration, /PHONE_LOGIN_DIRECTOR_ENTITLEMENT_PRESENT|directorAccessDenied/);
+});
+
+test("pre-existing Director phone login retains the same role, scope, source, revision, and count", () => {
+  const before = {
+    directorEntitlementState: "ACTIVE",
+    directorRole: "DIRECTOR",
+    directorScope: "TOURNAMENT:2026:PLAYER:CB01",
+    directorEntitlementRevision: 1,
+    directorEntitlementSource: "DIRECTOR_PASSPORT",
+    directorEntitlementCount: 1,
+    directorEntitlementFingerprint: "a".repeat(32),
+    authMethod: "email",
+  };
+  assert.equal(participantDirectorEntitlementParity(before, { ...before, authMethod: "phone" }), true);
+  assert.equal(participantDirectorEntitlementParity(before, {
+    ...before, authMethod: "phone", directorEntitlementRevision: 2,
+  }), false);
+  assert.equal(participantDirectorEntitlementParity(before, {
+    ...before, authMethod: "phone", directorEntitlementCount: 2,
+  }), false);
+});
+
+test("ordinary non-Director fixture remains non-Director after phone login", () => {
+  const before = {
+    directorEntitlementState: "NONE",
+    directorRole: "NONE",
+    directorScope: "NONE",
+    directorEntitlementRevision: 0,
+    directorEntitlementSource: "NONE",
+    directorEntitlementCount: 0,
+    directorEntitlementFingerprint: "b".repeat(32),
+    authMethod: "email",
+  };
+  assert.equal(participantDirectorEntitlementParity(before, { ...before, authMethod: "phone" }), true);
+  assert.equal(participantDirectorEntitlementParity(before, {
+    ...before,
+    authMethod: "phone",
+    directorEntitlementState: "ACTIVE",
+    directorRole: "DIRECTOR",
+    directorScope: "TOURNAMENT:2026:PLAYER:N",
+    directorEntitlementRevision: 1,
+    directorEntitlementSource: "DIRECTOR_PASSPORT",
+    directorEntitlementCount: 1,
+    directorEntitlementFingerprint: "c".repeat(32),
+  }), false);
 });
 
 test("unknown, unverified, revoked, duplicate, and stale phone ownership cannot reach provider send", async () => {
@@ -244,9 +305,13 @@ test("successful login preserves ownership/scoring and establishes a refreshable
   assert.match(migration, /SAME_AUTH_USER_PHONE_LOGIN_VERIFIED/);
   assert.match(migration, /phoneIdentifierUnchanged', true/);
   assert.match(migration, /scoringAuthorizationUnchanged', true/);
+  assert.match(migration, /newDirectorEntitlements', 0/);
+  assert.match(migration, /directorPrivilegeEscalation', false/);
+  assert.match(migration, /authMethodChangesDirectorAuthorization', false/);
   assert.doesNotMatch(migration, /update\s+participant_identity\.user_player_links/i);
   assert.doesNotMatch(migration, /update\s+participant_identity\.participant_auth_identifiers/i);
   assert.doesNotMatch(migration, /update\s+scoring_authority\.scoring_permissions/i);
+  assert.doesNotMatch(migration, /(?:insert\s+into|update|delete\s+from)\s+participant_identity\.preview_director_entitlements/i);
   assert.doesNotMatch(migration, /insert\s+into\s+auth\.users|update\s+auth\.users|delete\s+from\s+auth\.users/i);
 });
 

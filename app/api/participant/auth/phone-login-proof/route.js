@@ -68,6 +68,13 @@ function proofRpcInput(proof, additions = {}) {
     auth_user_id: proof.authUserId,
     identifier_id: proof.identifierId,
     identifier_revision: proof.identifierRevision,
+    director_entitlement_state: proof.directorEntitlementState,
+    director_role: proof.directorRole,
+    director_scope: proof.directorScope,
+    director_entitlement_revision: proof.directorEntitlementRevision,
+    director_entitlement_source: proof.directorEntitlementSource,
+    director_entitlement_count: proof.directorEntitlementCount,
+    director_entitlement_fingerprint: proof.directorEntitlementFingerprint,
     proof_issued_at: new Date(proof.issuedAt * 1000).toISOString(),
     ...additions,
   };
@@ -139,6 +146,13 @@ export async function POST(request) {
         tournamentId: authorization.tournamentId,
         identifierId: authorization.identifierId,
         identifierRevision: authorization.identifierRevision,
+        directorEntitlementState: authorization.directorEntitlementState,
+        directorRole: authorization.directorRole,
+        directorScope: authorization.directorScope,
+        directorEntitlementRevision: authorization.directorEntitlementRevision,
+        directorEntitlementSource: authorization.directorEntitlementSource,
+        directorEntitlementCount: authorization.directorEntitlementCount,
+        directorEntitlementFingerprint: authorization.directorEntitlementFingerprint,
       }, proofSecret());
       const authClient = createParticipantAuthServerClient(cookieStore);
       const signedOut = await authClient.auth.signOut({ scope: "local" });
@@ -150,6 +164,13 @@ export async function POST(request) {
         status: "READY",
         maskedMobile: authorization.maskedMobile || "Approved mobile",
         linkedPlayerId: authorization.playerId,
+        directorEntitlementBefore: {
+          state: authorization.directorEntitlementState,
+          role: authorization.directorRole,
+          scope: authorization.directorScope,
+          revision: authorization.directorEntitlementRevision,
+          source: authorization.directorEntitlementSource,
+        },
         message: "Preview participant session cleared. The controlled phone login proof is ready; no SMS has been sent.",
       }, { headers: responseHeaders });
       response.cookies.set(participantPhoneLoginProofCookie(proofToken));
@@ -282,7 +303,12 @@ export async function POST(request) {
       playerPassportResolved: true,
       scoringAuthorizationUnchanged: completion.scoringAuthorizationUnchanged === true,
       phoneIdentifierUnchanged: completion.phoneIdentifierUnchanged === true,
-      directorAccessDenied: completion.directorAccessDenied === true,
+      directorEntitlementPreserved: completion.directorEntitlementPreserved === true,
+      directorEntitlementBefore: completion.directorEntitlementBefore,
+      directorEntitlementAfter: completion.directorEntitlementAfter,
+      newDirectorEntitlements: Number(completion.newDirectorEntitlements || 0),
+      directorPrivilegeEscalation: completion.directorPrivilegeEscalation === true,
+      authMethodChangesDirectorAuthorization: completion.authMethodChangesDirectorAuthorization === true,
       message: "Phone sign-in verified on the existing Auth user. Player Passport CB01 is active.",
     }, { headers: responseHeaders }));
   } catch (error) {
