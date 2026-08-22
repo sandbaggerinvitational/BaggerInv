@@ -8,6 +8,8 @@ export const maxDuration = 300;
 
 const clean = (value) => String(value ?? "").trim();
 const OPERATIONS = new Set(["capture", "championship", "matchup", "simulation", "optimizer", "team-intelligence", "calibration"]);
+const FORMAT_SLICED_OPERATIONS = new Set(["matchup", "simulation", "optimizer"]);
+const FORMATS = new Set(["BB", "SC", "SI"]);
 
 function safeInteger(value, fallback, minimum, maximum) {
   const parsed = Number(value);
@@ -32,6 +34,10 @@ export async function GET(request) {
   if (!OPERATIONS.has(operation)) return NextResponse.json({ error: "Unsupported calculation parity operation." }, { status: 400 });
   const iterations = safeInteger(url.searchParams.get("iterations"), 10_000, 10_000, 100_000);
   const repeat = safeInteger(url.searchParams.get("repeat"), 2, 2, 3);
+  const format = clean(url.searchParams.get("format")).toUpperCase();
+  if (format && (!FORMAT_SLICED_OPERATIONS.has(operation) || !FORMATS.has(format))) {
+    return NextResponse.json({ error: "Unsupported calculation parity format slice." }, { status: 400 });
+  }
   const expectedSnapshotToken = clean(url.searchParams.get("snapshot"));
   const reportMode = /^(1|true|yes)$/i.test(clean(url.searchParams.get("report")));
   try {
@@ -41,6 +47,7 @@ export async function GET(request) {
       expectedSnapshotToken,
       iterations,
       repeat,
+      format,
       timeoutMs: 60_000,
     });
     return NextResponse.json(result, {

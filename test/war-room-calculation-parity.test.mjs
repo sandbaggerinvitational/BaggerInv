@@ -200,6 +200,18 @@ test("exhaustive matchup parity attributes a certified statistics change", () =>
   assert.ok(compared.attributionCounts.PLAYER_STATS > 0);
 });
 
+test("matchup parity can be certified in deterministic format slices", () => {
+  const googlePrepared = fixturePrepared("google");
+  const supabasePrepared = fixturePrepared("supabase");
+  const google = runMatchupParitySource(googlePrepared, { repeat: 2, formats: ["BB"] });
+  const supabase = runMatchupParitySource(supabasePrepared, { repeat: 2, formats: ["BB"] });
+  const compared = compareMatchupParity(google, supabase);
+  assert.deepEqual(google.selectedFormats, ["BB"]);
+  assert.deepEqual(google.counts, { BB: 1 });
+  assert.equal(compared.comparisonsExecuted, 1);
+  assert.equal(compared.pass, true);
+});
+
 test("match simulations are deterministic and differences inherit causal inputs", () => {
   const googlePrepared = fixturePrepared("google");
   const supabasePrepared = fixturePrepared("supabase");
@@ -220,6 +232,16 @@ test("lineup rankings compare completely without changing optimizer logic", () =
   assert.equal(compared.formats.BB.matchupCount.google, 1);
   assert.equal(compared.formats.SI.matchupCount.google, 4);
   assert.equal(compared.formats.BB.firstRankingDivergence, null);
+});
+
+test("optimizer parity can be certified in deterministic format slices", () => {
+  const google = runLineupParitySource(fixturePrepared("google"), { repeat: 2, formats: ["SI"] });
+  const supabase = runLineupParitySource(fixturePrepared("supabase"), { repeat: 2, formats: ["SI"] });
+  const compared = compareLineupParity(google, supabase);
+  assert.deepEqual(google.selectedFormats, ["SI"]);
+  assert.deepEqual(Object.keys(google.formats), ["SI"]);
+  assert.equal(compared.formats.SI.matchupCount.google, 4);
+  assert.equal(compared.pass, true);
 });
 
 test("Team Intelligence separates factual and editorial deterministic output", () => {
@@ -248,6 +270,8 @@ test("protected Step 7E route remains Preview-only and does not change War Room 
   assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
   assert.match(service, /selected\.resolved !== "google"/);
   assert.match(service, /zeroGoogleSupabaseShadow/);
+  assert.match(route, /FORMAT_SLICED_OPERATIONS/);
+  assert.match(route, /url\.searchParams\.get\("format"\)/);
   assert.doesNotMatch(`${route}\n${service}`, /WAR_ROOM_INPUT_SOURCE\s*=/);
   assert.doesNotMatch(`${route}\n${service}`, /Math\.random/);
   assert.doesNotMatch(service, /catch\s*\([^)]*\)\s*\{[^}]*prepareWarRoomInput/s);
