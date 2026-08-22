@@ -347,18 +347,18 @@ test("successful login preserves ownership/scoring and establishes a refreshable
 test("successful email and phone verification navigate immediately to Home without duplicate auth reads", async () => {
   const [ui, route, diagnostics, home, emailVerify] = await Promise.all([
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
-    source("app/api/participant/auth/phone-login-proof/route.js"),
+    source("app/api/participant/auth/phone/route.js"),
     source("app/ParticipantAuthDiagnostics.js"),
     source("app/ParticipantSupabaseHome.js"),
     source("app/api/participant/auth/otp/verify/route.js"),
   ]);
-  const phoneVerifyUi = ui.slice(ui.indexOf("const verifyPhoneLoginCode"), ui.indexOf("return <main"));
+  const phoneVerifyUi = ui.slice(ui.indexOf("const verifyCode"), ui.indexOf("const resendCode"));
   const phoneVerifyRoute = route.slice(route.indexOf('if (action !== "verify")'));
   assert.match(ui, /return [^;]*\? requestedNext : "\/home"/);
   assert.match(ui, /router\.replace\(next\)/);
-  assert.match(ui, /rememberParticipantAuthNavigation\(location\.pathname, next, "EMAIL_OTP"\)/);
-  assert.match(phoneVerifyUi, /rememberParticipantAuthNavigation\(location\.pathname, next, "PHONE_OTP"\)/);
-  assert.match(phoneVerifyUi, /setAuthTransition\(\{ method: "phone"/);
+  assert.match(ui, /rememberParticipantAuthNavigation\(location\.pathname, next, navigationType\)/);
+  assert.match(phoneVerifyUi, /beginNavigation\(method, payload, duration\)/);
+  assert.match(ui, /setAuthTransition\(true\)/);
   assert.doesNotMatch(phoneVerifyUi, /fetch\("\/api\/participant\/auth\/session"/);
   assert.doesNotMatch(phoneVerifyRoute, /auth\.getUser\(|readParticipantIdentityContextForAuth/);
   assert.match(phoneVerifyRoute, /completeParticipantPhoneLogin/);
@@ -385,20 +385,17 @@ test("performance diagnostics retain bounded login-to-Home stages without PII", 
   assert.doesNotMatch(migration, /normalized_value|sample->>'(?:phone|email|token)'|access_token|refresh_token/i);
 });
 
-test("controlled UI has no arbitrary phone input, restores pending proof, and retains email fallback", async () => {
+test("final UI is SMS-first, restores pending login, retains email fallback, and removes proof jargon", async () => {
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
-  assert.match(ui, /Operation B · Controlled Preview proof/);
-  assert.match(ui, /Controlled Preview test/);
-  assert.match(ui, /Sign in with verified mobile/);
-  assert.match(ui, /Text me a code/);
-  assert.match(ui, /controlledPhoneLoginAvailable === true/);
-  assert.match(ui, /setPhoneLogin\(\{ attemptId: "", status: "READY" \}\)/);
+  assert.match(ui, /Welcome to The Bagger/);
+  assert.match(ui, /Mobile Number/);
+  assert.match(ui, /Text Me a Code/);
+  assert.match(ui, /Use Email Instead/);
+  assert.match(ui, /phoneState\?\.status === "VERIFICATION_PENDING"/);
   assert.match(ui, /autoComplete="one-time-code"/);
-  assert.match(ui, /phone-login-proof/);
-  assert.match(ui, /Email fallback remains available below/);
-  assert.match(ui, /CAPTCHA and the ordinary public SMS login UI remain deferred to Step 8B\.3/);
-  assert.doesNotMatch(ui, /type="tel"|name="phone"|placeholder="\+1/);
-  assert.doesNotMatch(ui, /preparePhoneLoginProof|phone-login-arm/);
+  assert.match(ui, /\/api\/participant\/auth\/phone/);
+  assert.match(ui, /type="tel"/);
+  assert.doesNotMatch(ui, /Operation A|Operation B|Controlled Preview|Supabase email session|Player Passport|Auth UUID|phone_change/);
 });
 
 test("Operation B functions are service-role only and automated coverage contains no provider credentials or OTP storage", async () => {
@@ -703,37 +700,34 @@ test("Director cannot send enrollment SMS; participant email session owns Operat
   assert.match(participantRoute, /normalizeParticipantPhoneEnrollmentStageB/);
   assert.match(participantRoute, /readParticipantPhoneEnrollmentState/);
   assert.match(participantRoute, /signOut\(\{ scope: "local" \}\)/);
-  assert.match(participantUi, /window\.confirm/);
-  assert.match(participantUi, /Begin phone enrollment/);
-  assert.match(participantUi, /Verification code sent/);
-  assert.match(participantUi, /Six-digit phone enrollment code/);
+  assert.doesNotMatch(participantUi, /window\.confirm/);
+  assert.doesNotMatch(participantUi, /Begin phone enrollment/);
+  assert.doesNotMatch(participantUi, /Six-digit phone enrollment code/);
   assert.match(participantUi, /resendSeconds/);
-  assert.match(participantUi, /Operation B remains separate/);
+  assert.doesNotMatch(participantUi, /Operation B remains separate/);
   assert.doesNotMatch(participantUi, /useEffect\([\s\S]{0,300}(?:action:\s*["']start|action:\s*["']verify)/);
 });
 
-test("verification UI is wired only to verifyOtp phone_change after Stage B", async () => {
-  const [route, ui] = await Promise.all([
-    source("app/api/participant/auth/phone-enrollment/route.js"),
-    source("app/participant-auth/ParticipantAuthRehearsal.js"),
-  ]);
-  assert.match(ui, /action: "verify", attemptId: phoneEnrollment\?\.attemptId, token: phoneToken/);
-  assert.match(ui, /phoneEnrollment\?\.status !== "VERIFICATION_PENDING"/);
+test("Operation A phone-change verification remains backend regression infrastructure", async () => {
+  const route = await source("app/api/participant/auth/phone-enrollment/route.js");
   assert.match(route, /verifyExistingParticipantPhoneEnrollment/);
   assert.match(await source("lib/participant-phone-otp.js"), /verifyOtp\(\{ phone, token, type: "phone_change" \}\)/);
 });
 
-test("email sign-in remains enabled while ordinary public phone login remains absent", async () => {
-  const [emailRequest, participantUi, controlledRoute] = await Promise.all([
+test("email sign-in remains enabled alongside CAPTCHA-gated public phone login", async () => {
+  const [emailRequest, participantUi, publicRoute, controlledRoute] = await Promise.all([
     source("app/api/participant/auth/otp/request/route.js"),
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
+    source("app/api/participant/auth/phone/route.js"),
     source("app/api/participant/auth/phone-login-proof/route.js"),
   ]);
-  assert.match(emailRequest, /signInWithOtp\(\{ email/);
+  assert.match(emailRequest, /signInWithOtp\(\{[\s\S]*email: decision\.email/);
   assert.match(emailRequest, /shouldCreateUser: false/);
   assert.match(participantUi, /type="email"/);
-  assert.doesNotMatch(participantUi, /type="tel"|name="phone"/);
-  assert.match(participantUi, /Public participant SMS login remains off/);
+  assert.match(participantUi, /type="tel"/);
+  assert.match(participantUi, /Use Email Instead/);
+  assert.match(publicRoute, /normalizeParticipantAuthCaptchaToken/);
+  assert.match(publicRoute, /rollout_mode: feature\.rollout/);
   assert.doesNotMatch(controlledRoute, /input\.(?:phone|phoneE164)/);
 });
 

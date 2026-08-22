@@ -1,264 +1,402 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import ParticipantAuthTurnstile from "./ParticipantAuthTurnstile.js";
 import styles from "./participant-auth.module.css";
-import { clearParticipantAuthClientState, enableParticipantAuthDiagnostics, flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic, rememberParticipantAuthNavigation } from "../../lib/participant-auth-client-diagnostics.js";
+import {
+  enableParticipantAuthDiagnostics,
+  flushParticipantAuthDiagnostics,
+  recordParticipantAuthDiagnostic,
+  rememberParticipantAuthNavigation,
+} from "../../lib/participant-auth-client-diagnostics.js";
 
 function participantDestination(searchParams) {
   const requestedNext = String(searchParams.get("next") || "");
   return /^\/(?:home|my-match|score|live|me)(?:[/?#]|$)/.test(requestedNext) ? requestedNext : "/home";
 }
 
-export default function ParticipantAuthRehearsal() {
+function formatUsMobile(value) {
+  let digits = String(value || "").replace(/\D/g, "");
+  if (digits.length > 10 && digits.startsWith("1")) digits = digits.slice(1);
+  digits = digits.slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+function maskEnteredEmail(value) {
+  const [local = "", domain = ""] = String(value || "").trim().toLowerCase().split("@");
+  if (!local || !domain) return "your email";
+  return `${local.slice(0, 1)}${"•".repeat(Math.max(4, Math.min(8, local.length - 1)))}@${domain}`;
+}
+
+function networkMessage(error) {
+  return error instanceof TypeError ? "Connection lost. Try again." : cleanMessage(error?.message);
+}
+
+function cleanMessage(value) {
+  const message = String(value || "").trim();
+  return message || "We couldn't complete that request. Try again.";
+}
+
+export default function ParticipantAuthRehearsal({ experience }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const next = participantDestination(searchParams);
+  const [sessionState, setSessionState] = useState("checking");
+  const [method, setMethod] = useState(experience.defaultMethod);
+  const [step, setStep] = useState("entry");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [requestId, setRequestId] = useState("");
-  const [phoneToken, setPhoneToken] = useState("");
-  const [phoneEnrollment, setPhoneEnrollment] = useState(null);
-  const [phoneLoginToken, setPhoneLoginToken] = useState("");
-  const [phoneLogin, setPhoneLogin] = useState(null);
-  const [maskedMobile, setMaskedMobile] = useState("");
+  const [maskedDestination, setMaskedDestination] = useState("");
   const [resendSeconds, setResendSeconds] = useState(0);
-  const [phoneLoginResendSeconds, setPhoneLoginResendSeconds] = useState(0);
-  const [session, setSession] = useState(null);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
-  const [authTransition, setAuthTransition] = useState(null);
-  const restorePhoneEnrollmentState = async () => {
-    const response = await fetch("/api/participant/auth/phone-enrollment", { cache: "no-store", credentials: "same-origin" });
-    const phoneState = await response.json();
-    if (phoneState.status === "VERIFIED") {
-      setPhoneEnrollment({ attemptId: "", status: "VERIFIED" });
-      return;
+  const [error, setError] = useState("");
+  const [authTransition, setAuthTransition] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const phoneRef = useRef(null);
+  const emailRef = useRef(null);
+  const otpRef = useRef(null);
+
+  const resetCaptcha = useCallback(() => {
+    setCaptchaToken("");
+    setCaptchaResetKey((value) => value + 1);
+  }, []);
+
+  const beginNavigation = useCallback((authMethod, payload, durationMs) => {
+    if (payload.session !== "active" || !payload.linkedPlayerId) {
+      throw new Error("We couldn't connect this sign-in to your tournament profile. Please use email or contact the Tournament Director.");
     }
-    if (phoneState.status === "VERIFICATION_PENDING" && phoneState.attemptId) {
-      setPhoneEnrollment({ attemptId: phoneState.attemptId, status: phoneState.status });
-      setMaskedMobile(phoneState.maskedMobile || "Approved mobile");
-      setResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
-      setMessage("Verification code sent.");
-      return;
+    if (authMethod === "phone" && (
+      payload.sameAuthUser !== true || payload.participantSessionEstablished !== true ||
+      payload.refreshSessionAvailable !== true || payload.playerPassportResolved !== true ||
+      payload.scoringAuthorizationUnchanged !== true || payload.phoneIdentifierUnchanged !== true ||
+      payload.directorEntitlementPreserved !== true || Number(payload.newDirectorEntitlements || 0) !== 0 ||
+      payload.directorPrivilegeEscalation === true || payload.authMethodChangesDirectorAuthorization === true
+    )) {
+      throw new Error("We couldn't sign you in. Please use email or contact the Tournament Director.");
     }
-    setPhoneEnrollment({ attemptId: "", status: "NONE" });
-  };
+    const navigationType = authMethod === "phone" ? "PHONE_OTP" : "EMAIL_OTP";
+    recordParticipantAuthDiagnostic("AUTH_SESSION_ESTABLISHED", { durationMs, routeTo: location.pathname, navigationType });
+    setAuthTransition(true);
+    setMessage("Opening The Bagger…");
+    rememberParticipantAuthNavigation(location.pathname, next, navigationType);
+    recordParticipantAuthDiagnostic("LOGIN_REDIRECT_INITIATED", {
+      durationMs,
+      routeFrom: location.pathname,
+      routeTo: next,
+      navigationType,
+    });
+    router.replace(next);
+  }, [next, router]);
+
   useEffect(() => {
     enableParticipantAuthDiagnostics();
-    router.prefetch("/home");
+    router.prefetch(next);
     recordParticipantAuthDiagnostic("AUTH_PAGE_LOADED", { routeTo: location.pathname });
     const started = performance.now();
     fetch("/api/participant/auth/session", { cache: "no-store", credentials: "same-origin" })
-      .then((response) => response.json()).then((payload) => {
+      .then(async (response) => ({ response, payload: await response.json() }))
+      .then(async ({ response, payload }) => {
         const duration = Math.round(performance.now() - started);
         recordParticipantAuthDiagnostic("SESSION_CHECK", { routeTo: location.pathname, durationMs: duration });
-        setSession({ ...payload, localSessionCheckMs: duration });
-        if (payload.session === "active") {
+        if (response.ok && payload.session === "active" && payload.linkedPlayerId) {
           flushParticipantAuthDiagnostics().catch(() => null);
-          restorePhoneEnrollmentState().catch(() => null);
-        } else {
-          fetch("/api/participant/auth/phone-login-proof", { cache: "no-store", credentials: "same-origin" })
-            .then((response) => response.json()).then((phoneState) => {
-              if (phoneState.armed === true || phoneState.controlledPhoneLoginAvailable === true) {
-                setPhoneLogin({ attemptId: phoneState.attemptId || "", status: phoneState.status || "READY", maskedMobile: phoneState.maskedMobile });
-                setPhoneLoginResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
-                if (phoneState.status === "VERIFICATION_PENDING") setMessage("Sign-in code sent to the approved mobile.");
-              }
-            }).catch(() => null);
+          setAuthTransition(true);
+          setMessage("Opening The Bagger…");
+          rememberParticipantAuthNavigation(location.pathname, next, "SESSION_RESTORE");
+          router.replace(next);
+          return;
+        }
+        setSessionState("signed-out");
+        if (!experience.smsEnabled) return;
+        const phoneState = await fetch("/api/participant/auth/phone", { cache: "no-store", credentials: "same-origin" })
+          .then((result) => result.ok ? result.json() : null)
+          .catch(() => null);
+        if (phoneState?.status === "VERIFICATION_PENDING" && phoneState.attemptId) {
+          setMethod("phone");
+          setStep("code");
+          setRequestId(phoneState.attemptId);
+          setMaskedDestination(phoneState.maskedMobile || "your mobile");
+          setResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
+          setMessage("Enter the code from your text message.");
         }
       })
-      .catch(() => setSession({ session: "unavailable" }));
-  }, [router]);
+      .catch(() => {
+        setSessionState("signed-out");
+        setError("Connection lost. Try again.");
+      });
+  }, [experience.smsEnabled, next, router]);
+
   useEffect(() => {
     if (resendSeconds <= 0) return undefined;
     const timer = window.setTimeout(() => setResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
     return () => window.clearTimeout(timer);
   }, [resendSeconds]);
+
   useEffect(() => {
-    if (phoneLoginResendSeconds <= 0) return undefined;
-    const timer = window.setTimeout(() => setPhoneLoginResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
-    return () => window.clearTimeout(timer);
-  }, [phoneLoginResendSeconds]);
-  const requestCode = async (event) => {
-    event.preventDefault(); setBusy("request"); setMessage("");
-    try {
-      const started = performance.now();
-      const response = await fetch("/api/participant/auth/otp/request", { method: "POST", credentials: "same-origin",
-        headers: { "content-type": "application/json" }, body: JSON.stringify({ email }) });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || payload.message || "Sign-in code is temporarily unavailable.");
-      recordParticipantAuthDiagnostic("OTP_REQUEST", { durationMs: performance.now() - started, routeTo: location.pathname });
-      setRequestId(payload.requestId || ""); setMessage(payload.message || "Check your email for a 6-digit code.");
-    } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
+    if (sessionState !== "signed-out") return;
+    const target = step === "code" ? otpRef.current : method === "phone" ? phoneRef.current : emailRef.current;
+    window.setTimeout(() => target?.focus({ preventScroll: true }), 60);
+  }, [method, sessionState, step]);
+
+  const clearFeedback = () => { setError(""); setMessage(""); };
+
+  const cancelPhoneAttempt = useCallback(async () => {
+    if (method !== "phone" || step !== "code" || !requestId) return;
+    await fetch("/api/participant/auth/phone", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "cancel", attemptId: requestId }),
+    }).catch(() => null);
+  }, [method, requestId, step]);
+
+  const switchMethod = async (nextMethod) => {
+    if (busy || nextMethod === method) return;
+    await cancelPhoneAttempt();
+    setMethod(nextMethod);
+    setStep("entry");
+    setToken("");
+    setRequestId("");
+    setMaskedDestination("");
+    setResendSeconds(0);
+    clearFeedback();
+    resetCaptcha();
   };
+
+  const requestPhoneCode = async (event) => {
+    event?.preventDefault();
+    if (busy) return;
+    if (experience.captchaRequired && !captchaToken) {
+      setError("Complete the request check, then try again.");
+      return;
+    }
+    setBusy("phone-request");
+    clearFeedback();
+    const started = performance.now();
+    try {
+      const response = await fetch("/api/participant/auth/phone", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "request", phone, captchaToken }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Text sign-in is temporarily unavailable. Use email instead.");
+      setRequestId(payload.attemptId || "");
+      setMaskedDestination(payload.maskedMobile || "your mobile");
+      setResendSeconds(Number(payload.resendCooldownSeconds || 60));
+      setStep("code");
+      setMessage(payload.message || "If that mobile number is approved, a code will arrive shortly.");
+      recordParticipantAuthDiagnostic("PHONE_OTP_REQUEST", { durationMs: Math.round(performance.now() - started), routeTo: location.pathname });
+      resetCaptcha();
+    } catch (requestError) {
+      setError(networkMessage(requestError));
+      resetCaptcha();
+    } finally { setBusy(""); }
+  };
+
+  const requestEmailCode = async (event) => {
+    event?.preventDefault();
+    if (busy) return;
+    if (experience.captchaRequired && !captchaToken) {
+      setError("Complete the request check, then try again.");
+      return;
+    }
+    setBusy("email-request");
+    clearFeedback();
+    const started = performance.now();
+    try {
+      const response = await fetch("/api/participant/auth/otp/request", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, captchaToken }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || payload.message || "Email sign-in is temporarily unavailable.");
+      setRequestId(payload.requestId || "");
+      setMaskedDestination(maskEnteredEmail(email));
+      setResendSeconds(60);
+      setStep("code");
+      setMessage(payload.message || "If that email is approved, a code will arrive shortly.");
+      recordParticipantAuthDiagnostic("OTP_REQUEST", { durationMs: Math.round(performance.now() - started), routeTo: location.pathname });
+      resetCaptcha();
+    } catch (requestError) {
+      setError(networkMessage(requestError));
+      resetCaptcha();
+    } finally { setBusy(""); }
+  };
+
   const verifyCode = async (event) => {
-    event.preventDefault(); setBusy("verify"); setMessage("");
-    let navigating = false;
+    event.preventDefault();
+    if (busy || token.length !== 6) return;
+    setBusy("verify");
+    clearFeedback();
+    const started = performance.now();
     try {
-      const started = performance.now();
-      const response = await fetch("/api/participant/auth/otp/verify", { method: "POST", credentials: "same-origin",
-        headers: { "content-type": "application/json" }, body: JSON.stringify({ email, token, requestId }) });
+      const endpoint = method === "phone" ? "/api/participant/auth/phone" : "/api/participant/auth/otp/verify";
+      const body = method === "phone"
+        ? { action: "verify", attemptId: requestId, token }
+        : { email, requestId, token };
+      const response = await fetch(endpoint, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "That code is invalid or expired.");
+      if (!response.ok) throw new Error(payload.error || "That code is invalid or expired. Try again or request a new code.");
       const duration = Math.round(performance.now() - started);
-      recordParticipantAuthDiagnostic("OTP_VERIFICATION", { durationMs: duration, routeTo: location.pathname });
-      recordParticipantAuthDiagnostic("EMAIL_OTP_VERIFY_RESPONSE", { durationMs: duration, routeTo: location.pathname, navigationType: "EMAIL_OTP" });
-      if (payload.session !== "active" || !payload.linkedPlayerId) throw new Error("The participant session could not be established safely.");
-      setSession({ session: "active", linkedPlayerId: payload.linkedPlayerId, otpVerificationMs: duration });
-      recordParticipantAuthDiagnostic("AUTH_SESSION_ESTABLISHED", { durationMs: duration, routeTo: location.pathname, navigationType: "EMAIL_OTP" });
-      const next = participantDestination(searchParams);
-      setAuthTransition({ method: "email", linkedPlayerId: payload.linkedPlayerId });
-      setMessage("Signed in. Opening Home…");
-      rememberParticipantAuthNavigation(location.pathname, next, "EMAIL_OTP");
-      recordParticipantAuthDiagnostic("LOGIN_REDIRECT_INITIATED", { durationMs: performance.now() - started, routeFrom: location.pathname, routeTo: next, navigationType: "EMAIL_OTP" });
-      navigating = true;
-      router.replace(next);
-    } catch (error) { setMessage(error.message); }
-    finally { if (!navigating) setBusy(""); }
+      recordParticipantAuthDiagnostic(method === "phone" ? "PHONE_OTP_VERIFY_RESPONSE" : "EMAIL_OTP_VERIFY_RESPONSE", {
+        durationMs: duration,
+        routeTo: location.pathname,
+        navigationType: method === "phone" ? "PHONE_OTP" : "EMAIL_OTP",
+      });
+      beginNavigation(method, payload, duration);
+    } catch (verifyError) {
+      setError(networkMessage(verifyError));
+      setToken("");
+      otpRef.current?.focus();
+      setBusy("");
+    }
   };
-  const logout = async () => {
-    setBusy("logout");
-    await fetch("/api/participant/auth/session", { method: "DELETE", credentials: "same-origin" });
-    clearParticipantAuthClientState();
-    setSession({ session: "inactive" }); setToken(""); setPhoneToken(""); setPhoneEnrollment(null); setPhoneLogin({ attemptId: "", status: "READY" }); setRequestId(""); setMessage("Preview Auth session cleared. Player Passport is unchanged."); setBusy("");
-  };
-  const startPhoneEnrollment = async () => {
-    if (!window.confirm("Begin phone enrollment for this signed-in email account? This sends one real verification SMS.")) return;
-    setBusy("phone-start"); setMessage("");
+
+  const resendCode = async () => {
+    if (busy || resendSeconds > 0) return;
+    if (experience.captchaRequired && !captchaToken) {
+      setError("Complete the request check, then try again.");
+      return;
+    }
+    if (method === "email") return requestEmailCode();
+    setBusy("phone-resend");
+    clearFeedback();
     try {
-      const response = await fetch("/api/participant/auth/phone-enrollment", { method: "POST", credentials: "same-origin",
-        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "start" }) });
+      const response = await fetch("/api/participant/auth/phone", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "resend", attemptId: requestId, phone, captchaToken }),
+      });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Phone enrollment could not be started.");
-      setPhoneEnrollment({ attemptId: payload.attemptId, status: payload.status });
-      setMaskedMobile(payload.maskedMobile || "Approved mobile");
-      setResendSeconds(Number(payload.resendCooldownSeconds || 0));
-      setMessage(payload.message || "Verification code sent.");
-    } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
+      if (!response.ok) throw new Error(payload.error || "Text sign-in is temporarily unavailable. Use email instead.");
+      setRequestId(payload.attemptId || "");
+      setMaskedDestination(payload.maskedMobile || maskedDestination);
+      setResendSeconds(Number(payload.resendCooldownSeconds || 60));
+      setToken("");
+      setMessage(payload.message || "A new code is on its way.");
+      resetCaptcha();
+    } catch (resendError) {
+      setError(networkMessage(resendError));
+      resetCaptcha();
+    } finally { setBusy(""); }
   };
-  const verifyPhoneEnrollment = async (event) => {
-    event.preventDefault(); setBusy("phone-verify"); setMessage("");
-    try {
-      const response = await fetch("/api/participant/auth/phone-enrollment", { method: "POST", credentials: "same-origin",
-        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "verify", attemptId: phoneEnrollment?.attemptId, token: phoneToken }) });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "That phone enrollment code is invalid or expired.");
-      setPhoneToken(""); setPhoneEnrollment({ attemptId: "", status: "VERIFIED" });
-      setMessage(payload.message || "Mobile verified on the existing Auth user.");
-    } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
+
+  const changeIdentifier = async () => {
+    if (busy) return;
+    await cancelPhoneAttempt();
+    setStep("entry");
+    setToken("");
+    setRequestId("");
+    setMaskedDestination("");
+    setResendSeconds(0);
+    clearFeedback();
+    resetCaptcha();
   };
-  const requestPhoneLoginCode = async () => {
-    if (!window.confirm("Send one real sign-in SMS to the already verified approved mobile? There is no automatic resend.")) return;
-    setBusy("phone-login-request"); setMessage("");
-    try {
-      const response = await fetch("/api/participant/auth/phone-login-proof", { method: "POST", credentials: "same-origin",
-        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "request" }) });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "The phone sign-in code could not be sent.");
-      setPhoneLogin({ attemptId: payload.attemptId, status: payload.status, maskedMobile: payload.maskedMobile });
-      setPhoneLoginResendSeconds(Number(payload.resendCooldownSeconds || 0));
-      setMessage(payload.message || "Sign-in code sent to the approved mobile.");
-    } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
-  };
-  const verifyPhoneLoginCode = async (event) => {
-    event.preventDefault(); setBusy("phone-login-verify"); setMessage("");
-    let navigating = false;
-    try {
-      const started = performance.now();
-      const response = await fetch("/api/participant/auth/phone-login-proof", { method: "POST", credentials: "same-origin",
-        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "verify", attemptId: phoneLogin?.attemptId, token: phoneLoginToken }) });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "That phone sign-in code is invalid or expired.");
-      const duration = Math.round(performance.now() - started);
-      recordParticipantAuthDiagnostic("PHONE_OTP_VERIFY_RESPONSE", { durationMs: duration, routeTo: location.pathname, navigationType: "PHONE_OTP" });
-      if (payload.session !== "active" || payload.sameAuthUser !== true || payload.participantSessionEstablished !== true ||
-          payload.refreshSessionAvailable !== true || payload.playerPassportResolved !== true || !payload.linkedPlayerId ||
-          payload.scoringAuthorizationUnchanged !== true || payload.phoneIdentifierUnchanged !== true ||
-          payload.directorEntitlementPreserved !== true || Number(payload.newDirectorEntitlements || 0) !== 0 ||
-          payload.directorPrivilegeEscalation === true || payload.authMethodChangesDirectorAuthorization === true) {
-        throw new Error("The phone was verified, but the participant session could not be restored safely.");
-      }
-      recordParticipantAuthDiagnostic("AUTH_SESSION_ESTABLISHED", { durationMs: duration, routeTo: location.pathname, navigationType: "PHONE_OTP" });
-      setSession({ session: "active", linkedPlayerId: payload.linkedPlayerId }); setPhoneLoginToken("");
-      setPhoneLogin({ attemptId: "", status: "VERIFIED", maskedMobile: phoneLogin?.maskedMobile });
-      setPhoneEnrollment({ attemptId: "", status: "VERIFIED" });
-      const next = participantDestination(searchParams);
-      setAuthTransition({ method: "phone", linkedPlayerId: payload.linkedPlayerId });
-      setMessage("Signed in with the verified mobile. Opening Home…");
-      rememberParticipantAuthNavigation(location.pathname, next, "PHONE_OTP");
-      recordParticipantAuthDiagnostic("LOGIN_REDIRECT_INITIATED", { durationMs: performance.now() - started, routeFrom: location.pathname, routeTo: next, navigationType: "PHONE_OTP" });
-      navigating = true;
-      router.replace(next);
-    } catch (error) { setMessage(error.message); }
-    finally { if (!navigating) setBusy(""); }
-  };
+
+  const captcha = experience.captchaRequired && (step === "entry" || resendSeconds === 0)
+    ? <ParticipantAuthTurnstile
+        siteKey={experience.captchaSiteKey}
+        action={method === "phone" ? "participant_sms_login" : "participant_email_login"}
+        onTokenChange={setCaptchaToken}
+        resetKey={captchaResetKey}
+      />
+    : null;
+
+  if (sessionState === "checking" || authTransition) {
+    return <main className={styles.page}>
+      <section className={`${styles.card} ${styles.startup}`} aria-live="polite" aria-busy="true">
+        <Image className={styles.logo} src="/icon-192.png" alt="" width={64} height={64} priority />
+        <strong>The Bagger</strong>
+        <span>{authTransition ? "Opening The Bagger…" : "Getting things ready…"}</span>
+        <i aria-hidden="true" />
+      </section>
+    </main>;
+  }
+
   return <main className={styles.page}>
-    <section className={styles.card}>
-      <span className={styles.eyebrow}>Preview only · Secure participant access</span>
-      <h1>Participant sign-in</h1>
-      <p>Use your approved tournament email to request a secure sign-in code. Scoring authorization remains match-specific and server enforced.</p>
-      {authTransition ? <div className={styles.authTransition} role="status" aria-live="polite">
-        <span className={styles.eyebrow}>Session established</span>
-        <strong>Signed in</strong>
-        <span>Opening Home for Player {authTransition.linkedPlayerId}…</span>
-      </div> : session?.session === "active" ? <>
-        <div className={styles.session}><strong>Supabase email session active</strong><span>Linked Player ID: {session.linkedPlayerId}</span><button onClick={logout} disabled={Boolean(busy)}>Log out of Preview Auth</button></div>
-        <section className={styles.phoneEnrollment} aria-labelledby="phone-enrollment-title">
-          <span className={styles.eyebrow}>Operation A · First-time enrollment</span>
-          <h2 id="phone-enrollment-title">Add the approved mobile to this Auth user</h2>
-          <p>This uses Supabase’s authenticated phone-change verification. The email Auth UUID and Player Passport stay unchanged. Nothing is sent until you confirm the button.</p>
-          {phoneEnrollment === null ? <strong>Checking verified mobile state…</strong>
-            : phoneEnrollment?.status === "VERIFIED" ? <strong>Mobile verified on this Auth user.</strong>
-            : phoneEnrollment?.status !== "VERIFICATION_PENDING" ? <button type="button" onClick={startPhoneEnrollment} disabled={Boolean(busy)}>{busy === "phone-start" ? "Starting…" : "Begin phone enrollment"}</button>
-              : <form onSubmit={verifyPhoneEnrollment}>
-                <strong>Verification code sent</strong>
-                <span className={styles.maskedMobile}>{maskedMobile || "Approved mobile"}</span>
-                <label>Six-digit phone enrollment code<input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={phoneToken}
-                  onChange={(event) => setPhoneToken(event.target.value.replace(/\D/g, "").slice(0, 6))} autoComplete="one-time-code" required /></label>
-                <button disabled={Boolean(busy) || phoneToken.length !== 6}>{busy === "phone-verify" ? "Verifying…" : "Verify"}</button>
-                <small>{resendSeconds > 0 ? `Resend available in ${resendSeconds}s.` : "The resend countdown has ended. Start over only if this code expires."}</small>
-                <small>Enter the code here—never paste it into chat.</small>
-              </form>}
-          <div className={styles.operationBoundary}><strong>Operation B remains separate</strong><span>Enrollment is complete. The controlled signed-out phone-login proof below authenticates the verified phone without changing ownership.</span></div>
-        </section>
-        <section className={styles.phoneEnrollment} aria-labelledby="phone-login-proof-title">
-          <span className={styles.eyebrow}>Operation B · Controlled Preview proof</span>
-          <h2 id="phone-login-proof-title">Test signed-out login on the verified mobile</h2>
-          <p>Log out above, then use the signed-out controlled test. It resolves only the designated verified rehearsal mobile on the server. Public participant SMS login remains off.</p>
-          <small>Any existing Director entitlement is snapshotted before sign-out and must remain exactly unchanged after phone login.</small>
-        </section>
-      </>
-        : <>
-          {phoneLogin ? <section className={styles.phoneEnrollment} aria-labelledby="signed-out-phone-login-title">
-            <span className={styles.eyebrow}>Controlled Preview test</span>
-            <h2 id="signed-out-phone-login-title">Sign in with the verified approved mobile</h2>
-            <p>Preview participant session: signed out. The server resolves only the already verified rehearsal mobile; this page accepts no phone number, Auth UUID, or Player ID.</p>
-            {phoneLogin.status === "READY" ? <>
-              <strong>Sign in with verified mobile</strong>
-              <button type="button" onClick={requestPhoneLoginCode} disabled={Boolean(busy)}>{busy === "phone-login-request" ? "Requesting…" : "Text me a code"}</button>
-              <small>One owner-initiated SMS. No automatic resend.</small>
-            </> : phoneLogin.status === "VERIFICATION_PENDING" ? <form onSubmit={verifyPhoneLoginCode}>
-              <strong>Sign-in code sent</strong>
-              <span className={styles.maskedMobile}>{phoneLogin.maskedMobile || "Approved mobile"}</span>
-              <label>Six-digit phone sign-in code<input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={phoneLoginToken}
-                onChange={(event) => setPhoneLoginToken(event.target.value.replace(/\D/g, "").slice(0, 6))} autoComplete="one-time-code" required /></label>
-              <button disabled={Boolean(busy) || phoneLoginToken.length !== 6}>{busy === "phone-login-verify" ? "Verifying…" : "Verify phone sign-in"}</button>
-              <small>{phoneLoginResendSeconds > 0 ? `Resend locked for ${phoneLoginResendSeconds}s.` : "No automatic resend. Reload the controlled Preview test if this code expires."}</small>
-              <small>Enter the code here—never include it in a screenshot or chat.</small>
-            </form> : <strong>Controlled phone sign-in completed.</strong>}
-            <div className={styles.operationBoundary}><strong>Email fallback remains available below</strong><span>CAPTCHA and the ordinary public SMS login UI remain deferred to Step 8B.3.</span></div>
-          </section> : null}
-          <form onSubmit={requestCode}><label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required /></label>
-            <button disabled={Boolean(busy)}>{busy === "request" ? "Requesting…" : "Send 6-digit code"}</button></form>
-          {requestId ? <form onSubmit={verifyCode}><label>6-digit code<input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={token} onChange={(event) => setToken(event.target.value.replace(/\D/g, ""))} autoComplete="one-time-code" required /></label>
-            <button disabled={Boolean(busy) || token.length !== 6}>{busy === "verify" ? "Verifying…" : "Verify code"}</button></form> : null}
-        </>}
-      {message ? <p className={styles.message} role="status">{message}</p> : null}
-      <small>Identity authority: Supabase · Scoring authority: Supabase server transaction</small>
+    <section className={styles.card} aria-labelledby="participant-auth-title">
+      <header className={styles.header}>
+        {experience.preview ? <span className={styles.preview}>Preview</span> : null}
+        <div className={styles.brand}>
+          <Image className={styles.logo} src="/icon-192.png" alt="" width={58} height={58} priority />
+          <span>The Bagger</span>
+        </div>
+        <h1 id="participant-auth-title">{step === "code" ? "Enter your code" : "Welcome to The Bagger"}</h1>
+        <p>{step === "code"
+          ? method === "phone"
+            ? <>If this mobile number is approved, a 6-digit code will arrive at <strong>{maskedDestination}</strong>.</>
+            : <>If this email is approved, a 6-digit code will arrive at <strong>{maskedDestination}</strong>.</>
+          : "Sign in to access your tournament."}</p>
+      </header>
+
+      {step === "entry" ? method === "phone" ? <form className={styles.form} onSubmit={requestPhoneCode} noValidate>
+        <label htmlFor="participant-mobile">Mobile Number</label>
+        <input ref={phoneRef} id="participant-mobile" name="mobile" type="tel" inputMode="tel" autoComplete="tel"
+          placeholder="(###) ###-####" value={phone} onChange={(event) => { setPhone(formatUsMobile(event.target.value)); setError(""); }}
+          aria-invalid={error ? "true" : undefined} aria-describedby={error ? "auth-error" : undefined} required />
+        {captcha}
+        <button className={styles.primary} disabled={Boolean(busy) || phone.replace(/\D/g, "").length !== 10}>
+          {busy === "phone-request" ? "Sending code…" : "Text Me a Code"}
+        </button>
+        <div className={styles.switcher}><span>Prefer email?</span><button type="button" onClick={() => switchMethod("email")}>Use Email Instead</button></div>
+      </form> : <form className={styles.form} onSubmit={requestEmailCode} noValidate>
+        <label htmlFor="participant-email">Email</label>
+        <input ref={emailRef} id="participant-email" name="email" type="email" inputMode="email" autoComplete="email"
+          placeholder="you@example.com" value={email} onChange={(event) => { setEmail(event.target.value); setError(""); }}
+          aria-invalid={error ? "true" : undefined} aria-describedby={error ? "auth-error" : undefined} required />
+        {captcha}
+        <button className={styles.primary} disabled={Boolean(busy) || !email.trim()}>
+          {busy === "email-request" ? "Sending code…" : "Send Me a Code"}
+        </button>
+        {experience.smsEnabled
+          ? <div className={styles.switcher}><span>Prefer text?</span><button type="button" onClick={() => switchMethod("phone")}>Use Mobile Instead</button></div>
+          : null}
+      </form> : <form className={styles.form} onSubmit={verifyCode}>
+        <label htmlFor="participant-code">6-digit code</label>
+        <input ref={otpRef} className={styles.otp} id="participant-code" name="code" inputMode="numeric" autoComplete="one-time-code"
+          pattern="[0-9]{6}" maxLength={6} value={token}
+          onChange={(event) => { setToken(event.target.value.replace(/\D/g, "").slice(0, 6)); setError(""); }}
+          aria-invalid={error ? "true" : undefined} aria-describedby={error ? "auth-error" : undefined} required />
+        <button className={styles.primary} disabled={Boolean(busy) || token.length !== 6}>
+          {busy === "verify" ? "Verifying…" : "Verify"}
+        </button>
+        <div className={styles.resend}>
+          <span>Didn't get it?</span>
+          {resendSeconds > 0
+            ? <span aria-label={`Resend available in ${resendSeconds} seconds`}>Resend code in 0:{String(resendSeconds).padStart(2, "0")}</span>
+            : <>{captcha}<button type="button" onClick={resendCode} disabled={Boolean(busy)}>{busy.includes("resend") ? "Sending code…" : "Resend code"}</button></>}
+        </div>
+        <button className={styles.secondary} type="button" onClick={changeIdentifier} disabled={Boolean(busy)}>
+          {method === "phone" ? "Use a different number" : "Use a different email"}
+        </button>
+        <button className={styles.linkButton} type="button" onClick={() => switchMethod(method === "phone" ? "email" : "phone")} disabled={Boolean(busy) || (method === "email" && !experience.smsEnabled)}>
+          {method === "phone" ? "Use Email Instead" : "Use Mobile Instead"}
+        </button>
+      </form>}
+
+      {!experience.smsEnabled && experience.smsRequested
+        ? <p className={styles.notice}>Text sign-in is temporarily unavailable. Use email instead.</p>
+        : null}
+      {message ? <p className={styles.status} role="status" aria-live="polite">{message}</p> : null}
+      {error ? <p className={styles.error} id="auth-error" role="alert">{error}</p> : null}
     </section>
   </main>;
 }
