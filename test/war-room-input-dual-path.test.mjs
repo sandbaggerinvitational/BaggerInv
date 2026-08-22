@@ -163,9 +163,22 @@ test("normalized bundle projects the unchanged War Room consumer contract", () =
   const compatibleSheets = legacyPredictionSheetsFromBundle(bundle);
   assert.equal(compatibleSheets.settings.length, 30);
   assert.deepEqual([...new Set(compatibleSheets.handicaps.map((row) => row.Year))], [2025, 2026]);
+  assert.equal(compatibleSheets.handicaps.filter((row) => row.Year === 2026).length, 4);
+  assert.equal(new Set(compatibleSheets.handicaps.filter((row) => row.Year === 2026).map((row) => row["Player ID"])).size, 4);
   assert.equal(compatibleSheets.teamNames.find((row) => row.Year === 2025 && row["Team Side"] === "Team 1")["Team ID"], "2025-T1");
   assert.equal(compatibleSheets.handicaps.find((row) => row.Year === 2025 && row["Player ID"] === "P2")["Roster Order"], 2);
   assert.equal(predictionBundleParityProjection(bundle).metadata.source, undefined);
+});
+
+test("legacy compatibility sheets never duplicate the active roster from current-year handicap provenance", () => {
+  const input = fixture();
+  const bundle = structuredClone(buildGooglePredictionInputBundle({ ...input, workbookId: "preview-workbook" }));
+  bundle.handicaps.historical.push({ year: 2026, playerId: "P1", teamSide: 1, tournamentHandicap: 99 });
+  const compatibleSheets = legacyPredictionSheetsFromBundle(bundle);
+  const current = compatibleSheets.handicaps.filter((row) => row.Year === 2026);
+  assert.equal(current.length, 4);
+  assert.equal(current.filter((row) => row["Player ID"] === "P1").length, 1);
+  assert.equal(current.find((row) => row["Player ID"] === "P1")["Tournament Handicap"], 8);
 });
 
 test("deployed parity classification is fail-closed and explains only certified domains", () => {
