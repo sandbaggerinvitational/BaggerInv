@@ -172,6 +172,8 @@ test("Supabase adapter has zero Google imports and the boundary never implements
   const diagnosticRoute = source("app/api/admin/war-room-input-parity/route.js");
   assert.match(diagnosticRoute, /authorizePreviewDirector/);
   assert.match(diagnosticRoute, /compactParityResult/);
+  assert.match(diagnosticRoute, /reportMode/);
+  assert.match(diagnosticRoute, /result\.parity\.pass \|\| reportMode \? 200 : 409/);
   assert.match(diagnosticRoute, /cache-control.*no-store/);
 });
 
