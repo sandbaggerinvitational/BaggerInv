@@ -90,10 +90,11 @@ test("scorecard histories reuse tournament data and fail fast when optional shee
 });
 
 test("scorecard analytics are reused and the War Room avoids a duplicate archive load", async () => {
-  const [scorecardData, reuse, warRoomPage] = await Promise.all([
+  const [scorecardData, reuse, warRoomPage, warRoomGoogleAdapter] = await Promise.all([
     readFile(new URL("../lib/scorecard-data.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/historical-analytics-reuse.js", import.meta.url), "utf8"),
     readFile(new URL("../app/war-room/page.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/war-room-input-google.js", import.meta.url), "utf8"),
   ]);
 
   assert.match(scorecardData, /unstable_cache/);
@@ -104,6 +105,8 @@ test("scorecard analytics are reused and the War Room avoids a duplicate archive
   assert.match(reuse, /gzipSync/);
   assert.match(reuse, /HISTORICAL_ANALYTICS_VERSION/);
   assert.doesNotMatch(warRoomPage, /loadScorecardAnalytics/);
-  assert.match(warRoomPage, /buildScorecardAnalytics/);
-  assert.match(warRoomPage, /relevantScorecards\.map\(compactWarRoomScorecard\)/);
+  assert.doesNotMatch(warRoomPage, /buildScorecardAnalytics/);
+  assert.match(warRoomPage, /prepareWarRoomInput/);
+  assert.match(warRoomGoogleAdapter, /buildScorecardAnalytics/);
+  assert.match(warRoomGoogleAdapter, /needsCanonicalCareerScorecards\s*\?\s*loadScorecardAnalytics/);
 });

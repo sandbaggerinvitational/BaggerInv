@@ -1,13 +1,6 @@
 import { NextResponse } from "next/server";
-import { loadPredictionSheets } from "../../../../lib/prediction-data";
-import { buildScorecardAnalytics } from "../../../../lib/scorecard-analytics";
 import { buildScorecardCalibrationReport } from "../../../../lib/scorecard-calibration-report";
-import {
-  getAllPlayerStats,
-  getHeadToHead,
-  getPartnershipStats,
-  refreshHistoricalData,
-} from "../../../../lib/stats";
+import { prepareWarRoomInput } from "../../../../lib/war-room-input-service";
 
 export const dynamic = "force-dynamic";
 
@@ -28,36 +21,12 @@ export async function GET(request) {
   }
   const tournamentId = new URL(request.url).searchParams.get("tournament") || "";
   try {
-    const sheets = await loadPredictionSheets();
-    const analytics = buildScorecardAnalytics({
-      roundScorecards: sheets.roundScorecards,
-      matches: sheets.matches,
-      courseHoles: sheets.holes,
-      courses: sheets.courses,
-      teamNames: sheets.teamNames,
-      players: sheets.players,
-    });
-    await refreshHistoricalData();
-    const historical = Object.fromEntries(
-      getAllPlayerStats().map(({ player, stats }) => [player["Player ID"], stats])
-    );
-    const partnerships = Object.fromEntries(
-      getPartnershipStats().byMatches.map((row) => [
-        row.key,
-        { record: row.record, byFormat: row.byFormat, percentage: row.percentage },
-      ])
-    );
-    const playerIds = Object.keys(historical);
-    const headToHead = {};
-    for (let first = 0; first < playerIds.length; first += 1) {
-      for (let second = first + 1; second < playerIds.length; second += 1) {
-        headToHead[`${playerIds[first]}|${playerIds[second]}`] = getHeadToHead(playerIds[first], playerIds[second]);
-      }
-    }
+    const input = await prepareWarRoomInput({ scope: "scorecard-calibration" });
+    const { sheets, historical, partnerships, headToHead, scorecardAnalytics } = input.consumerData;
     return NextResponse.json({
       data: buildScorecardCalibrationReport({
         sheets,
-        scorecards: analytics.usableScorecards,
+        scorecards: scorecardAnalytics.scorecards,
         historical,
         partnerships,
         headToHead,
