@@ -120,6 +120,27 @@ test("Google adapter normalizes current, historical, settings, handicap, course,
   assert.equal(validation.pass, true, JSON.stringify(validation.errors));
 });
 
+test("Google adapter derives the current tournament window from live match facts when the control row is stale", () => {
+  const input = fixture();
+  input.sheets.liveTournaments[0]["Tournament Status"] = "UPCOMING";
+  input.sheets.liveTournaments[0]["Current Round"] = 1;
+  input.sheets.liveMatches[0].Round = 3;
+  input.sheets.liveMatches[0]["Match Status"] = "LIVE";
+  const bundle = buildGooglePredictionInputBundle({ ...input, workbookId: "preview-workbook" });
+  assert.equal(bundle.tournament.lifecycle, "LIVE");
+  assert.equal(bundle.tournament.currentRound, 3);
+});
+
+test("Google adapter preserves reopened lifecycle over stale finalized tournament metadata", () => {
+  const input = fixture();
+  input.sheets.liveTournaments[0]["Tournament Status"] = "FINAL";
+  input.sheets.liveTournaments[0]["Current Round"] = 3;
+  input.sheets.liveMatches[0]["Match Status"] = "REOPENED";
+  const bundle = buildGooglePredictionInputBundle({ ...input, workbookId: "preview-workbook" });
+  assert.equal(bundle.tournament.lifecycle, "LIVE");
+  assert.equal(bundle.tournament.currentRound, 3);
+});
+
 test("an unavailable current handicap remains explicit and ineligible without invalidating the shared bundle", () => {
   const input = fixture();
   input.sheets.handicaps.find((row) => row.Year === 2026 && row["Player ID"] === "P1")["Tournament Handicap"] = "";
