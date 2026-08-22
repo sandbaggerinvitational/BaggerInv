@@ -36,6 +36,7 @@ const compromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_4_ca
 const pendingTransitionMigrationPath = "supabase/migrations/202608210008_preview_phone_enrollment_pending_transition.sql";
 const latestCompromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_5_cancel_compromised_pending_transition.sql";
 const controlledLoginMigrationPath = "supabase/migrations/202608210010_preview_controlled_phone_login_proof.sql";
+const signedOutSurfaceMigrationPath = "supabase/migrations/202608210011_preview_signed_out_phone_login_surface.sql";
 const authId = "11111111-1111-4111-8111-111111111111";
 const authB = "22222222-2222-4222-8222-222222222222";
 const phone = "+12025550123";
@@ -194,6 +195,30 @@ test("Operation B route is signed-out, one-proof scoped, and never accepts a cli
   assert.match(route, /authClient\.auth\.getUser\(\)/);
   assert.match(route, /director_entitlement_fingerprint: proof\.directorEntitlementFingerprint/);
   assert.match(route, /directorEntitlementFingerprint: authorization\.directorEntitlementFingerprint/);
+  assert.match(route, /authorizeControlledParticipantPhoneLoginSurface\(\)/);
+  assert.match(route, /action !== "request"/);
+  assert.match(route, /controlledPhoneLoginAvailable: true/);
+});
+
+test("fully signed-out controlled surface resolves exactly one VERIFIED rehearsal identity server-side", async () => {
+  const [migration, route, client] = await Promise.all([
+    source(signedOutSurfaceMigrationPath),
+    source("app/api/participant/auth/phone-login-proof/route.js"),
+    source("lib/participant-identity-supabase.js"),
+  ]);
+  assert.match(client, /authorize_controlled_participant_phone_login_surface/);
+  assert.match(migration, /authorize_controlled_participant_phone_login_surface\(\)/);
+  assert.match(migration, /designated_count <> 1/);
+  assert.match(migration, /identifier\.identifier_type = 'PHONE'/);
+  assert.match(migration, /identifier\.status = 'VERIFIED'/);
+  assert.match(migration, /SUPABASE_AUTH_TWILIO_VERIFY/);
+  assert.match(migration, /rehearsal\.status = 'PREPARED'/);
+  assert.match(migration, /rehearsal\.shadow_enabled/);
+  assert.match(migration, /authorize_participant_phone_login_proof\(jsonb_build_object/);
+  assert.match(migration, /revoke all on function public\.authorize_controlled_participant_phone_login_surface\(\) from public, anon, authenticated/);
+  assert.match(migration, /grant execute on function public\.authorize_controlled_participant_phone_login_surface\(\) to service_role/);
+  assert.doesNotMatch(route, /input\.(?:phone|phoneE164|playerId|authUserId|tournamentId|identifierId)/);
+  assert.ok(route.indexOf("authorizeControlledParticipantPhoneLoginSurface") < route.indexOf("requestExistingParticipantPhoneLogin"));
 });
 
 test("controlled phone-login migration snapshots VERIFIED A ownership and exact Director entitlement parity", async () => {
@@ -318,13 +343,17 @@ test("successful login preserves ownership/scoring and establishes a refreshable
 test("controlled UI has no arbitrary phone input, restores pending proof, and retains email fallback", async () => {
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   assert.match(ui, /Operation B · Controlled Preview proof/);
-  assert.match(ui, /Text the approved mobile a code/);
+  assert.match(ui, /Controlled Preview test/);
+  assert.match(ui, /Sign in with verified mobile/);
+  assert.match(ui, /Text me a code/);
+  assert.match(ui, /controlledPhoneLoginAvailable === true/);
+  assert.match(ui, /setPhoneLogin\(\{ attemptId: "", status: "READY" \}\)/);
   assert.match(ui, /autoComplete="one-time-code"/);
   assert.match(ui, /phone-login-proof/);
-  assert.match(ui, /sessionPayload\.session !== "inactive"/);
   assert.match(ui, /Email fallback remains available below/);
   assert.match(ui, /CAPTCHA and the ordinary public SMS login UI remain deferred to Step 8B\.3/);
   assert.doesNotMatch(ui, /type="tel"|name="phone"|placeholder="\+1/);
+  assert.doesNotMatch(ui, /preparePhoneLoginProof|phone-login-arm/);
 });
 
 test("Operation B functions are service-role only and automated coverage contains no provider credentials or OTP storage", async () => {

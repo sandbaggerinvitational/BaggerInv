@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { participantIdentityAuthorityEnvironment } from "../../../../../lib/participant-identity-authority.js";
 import {
+  authorizeControlledParticipantPhoneLoginSurface,
   authorizeParticipantPhoneLoginProof,
   authorizeParticipantPhoneLoginVerification,
   beginParticipantPhoneLogin,
@@ -80,6 +81,23 @@ function proofRpcInput(proof, additions = {}) {
   };
 }
 
+function proofTokenForAuthorization(authorization) {
+  return createParticipantPhoneLoginProof({
+    authUserId: authorization.authUserId,
+    playerId: authorization.playerId,
+    tournamentId: authorization.tournamentId,
+    identifierId: authorization.identifierId,
+    identifierRevision: authorization.identifierRevision,
+    directorEntitlementState: authorization.directorEntitlementState,
+    directorRole: authorization.directorRole,
+    directorScope: authorization.directorScope,
+    directorEntitlementRevision: authorization.directorEntitlementRevision,
+    directorEntitlementSource: authorization.directorEntitlementSource,
+    directorEntitlementCount: authorization.directorEntitlementCount,
+    directorEntitlementFingerprint: authorization.directorEntitlementFingerprint,
+  }, proofSecret());
+}
+
 function readProof(cookieStore) {
   const token = clean(cookieStore.get(PARTICIPANT_PHONE_LOGIN_PROOF_COOKIE)?.value);
   return verifyParticipantPhoneLoginProof(token, proofSecret());
@@ -101,7 +119,13 @@ export async function GET() {
   let proof;
   try { proof = readProof(cookieStore); }
   catch {
-    return NextResponse.json({ ok: true, armed: false, status: "NONE" }, { headers: responseHeaders });
+    return NextResponse.json({
+      ok: true,
+      armed: false,
+      status: "READY",
+      controlledPhoneLoginAvailable: true,
+      publicSmsLoginEnabled: false,
+    }, { headers: responseHeaders });
   }
   const stateRead = await readParticipantPhoneLoginState(proofRpcInput(proof));
   const state = stateRead.payload || {};
@@ -140,20 +164,7 @@ export async function POST(request) {
       });
       const authorization = authorizationRead.payload || {};
       if (authorization.allowed !== true) return errorResponse(authorization.code || "PHONE_OTP_NOT_ELIGIBLE");
-      const proofToken = createParticipantPhoneLoginProof({
-        authUserId: authorization.authUserId,
-        playerId: authorization.playerId,
-        tournamentId: authorization.tournamentId,
-        identifierId: authorization.identifierId,
-        identifierRevision: authorization.identifierRevision,
-        directorEntitlementState: authorization.directorEntitlementState,
-        directorRole: authorization.directorRole,
-        directorScope: authorization.directorScope,
-        directorEntitlementRevision: authorization.directorEntitlementRevision,
-        directorEntitlementSource: authorization.directorEntitlementSource,
-        directorEntitlementCount: authorization.directorEntitlementCount,
-        directorEntitlementFingerprint: authorization.directorEntitlementFingerprint,
-      }, proofSecret());
+      const proofToken = proofTokenForAuthorization(authorization);
       const authClient = createParticipantAuthServerClient(cookieStore);
       const signedOut = await authClient.auth.signOut({ scope: "local" });
       if (signedOut.error) return errorResponse("PHONE_LOGIN_PROOF_REQUIRED", 503);
@@ -178,8 +189,17 @@ export async function POST(request) {
     }
 
     let proof;
+    let signedOutProofToken = "";
     try { proof = readProof(cookieStore); }
-    catch (error) { return errorResponse(error?.code || "PHONE_LOGIN_PROOF_REQUIRED"); }
+    catch (error) {
+      if (action !== "request") return errorResponse(error?.code || "PHONE_LOGIN_PROOF_REQUIRED");
+      if (!(await requireSignedOut(cookieStore))) return errorResponse("PHONE_LOGIN_PROOF_REQUIRED", 409);
+      const authorizationRead = await authorizeControlledParticipantPhoneLoginSurface();
+      const authorization = authorizationRead.payload || {};
+      if (authorization.allowed !== true) return errorResponse(authorization.code || "PHONE_OTP_NOT_ELIGIBLE");
+      signedOutProofToken = proofTokenForAuthorization(authorization);
+      proof = verifyParticipantPhoneLoginProof(signedOutProofToken, proofSecret());
+    }
     if (!(await requireSignedOut(cookieStore))) return errorResponse("PHONE_LOGIN_PROOF_REQUIRED", 409);
 
     if (action === "request") {
@@ -201,7 +221,7 @@ export async function POST(request) {
           duration_ms: Math.round(performance.now() - started),
         }));
         if (recorded.payload?.ok !== true) return errorResponse(recorded.payload?.code || "PHONE_LOGIN_SEND_FAILED");
-        return NextResponse.json({
+        const response = NextResponse.json({
           ok: true,
           status: "VERIFICATION_PENDING",
           attemptId: attempt.attemptId,
@@ -211,6 +231,8 @@ export async function POST(request) {
           shouldCreateUser: false,
           message: "Sign-in code sent to the approved mobile.",
         }, { headers: responseHeaders });
+        if (signedOutProofToken) response.cookies.set(participantPhoneLoginProofCookie(signedOutProofToken));
+        return response;
       } catch (error) {
         const failure = classifyParticipantPhoneOtpProviderFailure(error, "send");
         const code = failure.code === "PHONE_OTP_PROVIDER_UNAVAILABLE" ? "PHONE_LOGIN_SEND_FAILED" : failure.code;

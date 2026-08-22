@@ -52,7 +52,7 @@ export default function ParticipantAuthRehearsal() {
         } else {
           fetch("/api/participant/auth/phone-login-proof", { cache: "no-store", credentials: "same-origin" })
             .then((response) => response.json()).then((phoneState) => {
-              if (phoneState.armed === true) {
+              if (phoneState.armed === true || phoneState.controlledPhoneLoginAvailable === true) {
                 setPhoneLogin({ attemptId: phoneState.attemptId || "", status: phoneState.status || "READY", maskedMobile: phoneState.maskedMobile });
                 setPhoneLoginResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
                 if (phoneState.status === "VERIFICATION_PENDING") setMessage("Sign-in code sent to the approved mobile.");
@@ -109,7 +109,7 @@ export default function ParticipantAuthRehearsal() {
     setBusy("logout");
     await fetch("/api/participant/auth/session", { method: "DELETE", credentials: "same-origin" });
     clearParticipantAuthClientState();
-    setSession({ session: "inactive" }); setToken(""); setPhoneToken(""); setPhoneEnrollment(null); setRequestId(""); setMessage("Preview Auth session cleared. Player Passport is unchanged."); setBusy("");
+    setSession({ session: "inactive" }); setToken(""); setPhoneToken(""); setPhoneEnrollment(null); setPhoneLogin({ attemptId: "", status: "READY" }); setRequestId(""); setMessage("Preview Auth session cleared. Player Passport is unchanged."); setBusy("");
   };
   const startPhoneEnrollment = async () => {
     if (!window.confirm("Begin phone enrollment for this signed-in email account? This sends one real verification SMS.")) return;
@@ -135,25 +135,6 @@ export default function ParticipantAuthRehearsal() {
       if (!response.ok) throw new Error(payload.error || "That phone enrollment code is invalid or expired.");
       setPhoneToken(""); setPhoneEnrollment({ attemptId: "", status: "VERIFIED" });
       setMessage(payload.message || "Mobile verified on the existing Auth user.");
-    } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
-  };
-  const preparePhoneLoginProof = async () => {
-    if (!window.confirm("Prepare the controlled signed-out phone login proof? This signs out only this Preview participant browser session. No SMS is sent.")) return;
-    setBusy("phone-login-arm"); setMessage("");
-    try {
-      const response = await fetch("/api/participant/auth/phone-login-proof", { method: "POST", credentials: "same-origin",
-        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "arm" }) });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "The controlled phone login proof could not be prepared.");
-      clearParticipantAuthClientState();
-      const sessionResponse = await fetch("/api/participant/auth/session", { cache: "no-store", credentials: "same-origin" });
-      const sessionPayload = await sessionResponse.json();
-      if (sessionPayload.session !== "inactive") throw new Error("The Preview participant session could not be cleared safely.");
-      setSession({ session: "inactive" });
-      setPhoneLogin({ attemptId: "", status: "READY", maskedMobile: payload.maskedMobile });
-      setToken(""); setRequestId(""); setPhoneLoginToken("");
-      setMessage(payload.message || "Controlled signed-out phone login is ready. No SMS has been sent.");
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
@@ -219,21 +200,18 @@ export default function ParticipantAuthRehearsal() {
         <section className={styles.phoneEnrollment} aria-labelledby="phone-login-proof-title">
           <span className={styles.eyebrow}>Operation B · Controlled Preview proof</span>
           <h2 id="phone-login-proof-title">Test signed-out login on the verified mobile</h2>
-          <p>This prepares a short-lived proof for only the verified CB01 mobile, signs out this participant browser session, and sends no SMS. Public participant SMS login remains off.</p>
-          <button type="button" onClick={preparePhoneLoginProof} disabled={Boolean(busy) || phoneEnrollment?.status !== "VERIFIED"}>
-            {busy === "phone-login-arm" ? "Preparing…" : "Prepare and sign out for phone-login proof"}
-          </button>
+          <p>Log out above, then use the signed-out controlled test. It resolves only the designated verified rehearsal mobile on the server. Public participant SMS login remains off.</p>
           <small>Any existing Director entitlement is snapshotted before sign-out and must remain exactly unchanged after phone login.</small>
         </section>
       </>
         : <>
           {phoneLogin ? <section className={styles.phoneEnrollment} aria-labelledby="signed-out-phone-login-title">
-            <span className={styles.eyebrow}>Operation B · Owner-controlled signed-out test</span>
+            <span className={styles.eyebrow}>Controlled Preview test</span>
             <h2 id="signed-out-phone-login-title">Sign in with the verified approved mobile</h2>
-            <p>Preview participant session: signed out. Only the already verified rehearsal mobile is available; no phone number is accepted from this page.</p>
+            <p>Preview participant session: signed out. The server resolves only the already verified rehearsal mobile; this page accepts no phone number, Auth UUID, or Player ID.</p>
             {phoneLogin.status === "READY" ? <>
-              <span className={styles.maskedMobile}>{phoneLogin.maskedMobile || "Approved mobile"}</span>
-              <button type="button" onClick={requestPhoneLoginCode} disabled={Boolean(busy)}>{busy === "phone-login-request" ? "Requesting…" : "Text the approved mobile a code"}</button>
+              <strong>Sign in with verified mobile</strong>
+              <button type="button" onClick={requestPhoneLoginCode} disabled={Boolean(busy)}>{busy === "phone-login-request" ? "Requesting…" : "Text me a code"}</button>
               <small>One owner-initiated SMS. No automatic resend.</small>
             </> : phoneLogin.status === "VERIFICATION_PENDING" ? <form onSubmit={verifyPhoneLoginCode}>
               <strong>Sign-in code sent</strong>
@@ -241,7 +219,7 @@ export default function ParticipantAuthRehearsal() {
               <label>Six-digit phone sign-in code<input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={phoneLoginToken}
                 onChange={(event) => setPhoneLoginToken(event.target.value.replace(/\D/g, "").slice(0, 6))} autoComplete="one-time-code" required /></label>
               <button disabled={Boolean(busy) || phoneLoginToken.length !== 6}>{busy === "phone-login-verify" ? "Verifying…" : "Verify phone sign-in"}</button>
-              <small>{phoneLoginResendSeconds > 0 ? `Resend locked for ${phoneLoginResendSeconds}s.` : "No automatic resend. Sign in by email to prepare a fresh proof if this code expires."}</small>
+              <small>{phoneLoginResendSeconds > 0 ? `Resend locked for ${phoneLoginResendSeconds}s.` : "No automatic resend. Reload the controlled Preview test if this code expires."}</small>
               <small>Enter the code here—never include it in a screenshot or chat.</small>
             </form> : <strong>Controlled phone sign-in completed.</strong>}
             <div className={styles.operationBoundary}><strong>Email fallback remains available below</strong><span>CAPTCHA and the ordinary public SMS login UI remain deferred to Step 8B.3.</span></div>
