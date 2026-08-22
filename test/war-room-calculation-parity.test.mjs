@@ -103,7 +103,35 @@ function fixturePrepared(sourceName = "google") {
     settings,
   };
   const bundle = {
-    tournament: { id: "2026", year: 2026, lifecycle: "LIVE", currentRound: 3 },
+    tournament: { id: "2026", year: 2026, name: "Bagger Invitational", lifecycle: "LIVE", currentRound: 3 },
+    teams: [
+      { id: "2026-T1", side: 1, name: "Pickles" },
+      { id: "2026-T2", side: 2, name: "Lipp" },
+    ],
+    players: ids.map((id, index) => ({
+      id,
+      displayName: `Player ${index + 1}`,
+      teamSide: index < 2 ? 1 : 2,
+      tournamentHandicap: 7 + index,
+    })),
+    rules: courseRows.map((row, index) => ({ round: index + 1, format: row.format, pointsPerMatch: 3 })),
+    matches: matches.map((row, index) => ({
+      id: row["Match ID"],
+      round: row.Round,
+      format: row.Format,
+      lifecycle: row.Round < 3 ? "FINAL" : "LIVE",
+      points: {
+        current: { teamOne: row["Team 1 Points"], teamTwo: row["Team 2 Points"] },
+        official: row.Round < 3
+          ? { teamOne: row["Team 1 Points"], teamTwo: row["Team 2 Points"] }
+          : { teamOne: null, teamTwo: null },
+      },
+      participants: [1, 2].flatMap((side) => [1, 2].map((slot) => ({
+        playerId: row[`Team ${side} Player ${slot}`], teamSide: side, slot,
+      })).filter((participant) => participant.playerId)),
+      pairingOrder: index,
+    })),
+    playerStatistics: { byPlayer: historical },
     fingerprints: { bundle: `${sourceName}-bundle`, sections: { ordering: "order", pairings: "pairings", statistics: `${sourceName}-stats`, scorecards: `${sourceName}-cards`, courses: "courses" } },
     predictionSettings: { contractVersion: "prediction-settings-v1", effectiveFingerprint: "settings", freshness: "CURRENT", revision: sourceName === "supabase" ? 2 : null },
     ordering: { keys: { roster: ids, pairings: matches.map((row) => row["Match ID"]) } },
@@ -144,6 +172,18 @@ test("championship output is deterministic and exact for equivalent adapters", (
   assert.equal(google.repeatability.pass, true);
   assert.equal(supabase.repeatability.pass, true);
   assert.equal(compareChampionshipParity(google, supabase).pass, true);
+});
+
+test("championship adapter retains reopened pairings without re-awarding their prior points", () => {
+  const googlePrepared = fixturePrepared("google");
+  const reopened = googlePrepared.bundle.matches.find((row) => row.round === 2);
+  reopened.lifecycle = "LIVE";
+  reopened.points.current = { teamOne: 3, teamTwo: 0 };
+  reopened.points.official = { teamOne: null, teamTwo: null };
+  const result = runChampionshipParitySource(googlePrepared, { iterations: 200, repeat: 2 });
+  assert.equal(result.repeatability.pass, true);
+  assert.equal(result.output.totalPointsAvailable, 12);
+  assert.equal(result.output.teams.reduce((sum, row) => sum + row.expectedPoints, 0), 12);
 });
 
 test("exhaustive matchup parity attributes a certified statistics change", () => {

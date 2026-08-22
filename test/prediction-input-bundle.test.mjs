@@ -371,6 +371,19 @@ test("championship compatibility derives the unchanged deterministic engine cont
   assert.equal(compareOddsDeterministicParity(legacyResult, futureResult).pass, true);
 });
 
+test("championship compatibility exposes only canonical Final points", () => {
+  const bundle = build();
+  const input = championshipOddsInputFromPredictionBundle(bundle);
+  const finalized = input.sheets.matches.find((row) => row["Match ID"] === "M1");
+  const reopened = input.sheets.matches.find((row) => row["Match ID"] === "M2");
+  assert.deepEqual([finalized["Team 1 Points"], finalized["Team 2 Points"]], [3, 0]);
+  assert.deepEqual([reopened["Team 1 Points"], reopened["Team 2 Points"]], [null, null]);
+  assert.equal(reopened["Match Status"], "LIVE");
+  const simulated = simulateTournamentOdds({ ...input, phase: "Round 3 Pairings Announced", iterations: 1_000 });
+  assert.equal(simulated.totalPointsAvailable, 12);
+  assert.equal(Number((simulated.teams[0].expectedPoints + simulated.teams[1].expectedPoints).toFixed(2)), 12);
+});
+
 test("War Room, optimizer, intelligence, calibration, and championship requirements are complete", () => {
   const report = predictionInputCompatibilityReport(build());
   assert.equal(report.pass, true);
