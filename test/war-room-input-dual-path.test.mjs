@@ -14,7 +14,7 @@ import {
   predictionBundleParityProjection,
   WAR_ROOM_INPUT_CONTRACT_VERSION,
 } from "../lib/war-room-input-contract.js";
-import { resolveWarRoomInputSource } from "../lib/war-room-input-source.js";
+import { requireWarRoomSettingsVerification, resolveWarRoomInputSource } from "../lib/war-room-input-source.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = (file) => fs.readFileSync(path.join(root, file), "utf8");
@@ -103,6 +103,21 @@ test("one source boundary defaults Preview to Google and hard-resolves Productio
   assert.equal(production.productionHardResolvedToGoogle, true);
   assert.equal(production.fallbackUsed, false);
   assert.throws(() => resolveWarRoomInputSource({ VERCEL_ENV: "preview", WAR_ROOM_INPUT_SOURCE: "automatic" }), /Unsupported/);
+});
+
+test("Supabase cutover pins the independently certified source and effective settings fingerprints", () => {
+  const sourceFingerprint = "a".repeat(64);
+  const effectiveSettingsFingerprint = "b".repeat(64);
+  assert.deepEqual(requireWarRoomSettingsVerification({
+    WAR_ROOM_PREDICTION_SETTINGS_SOURCE_FINGERPRINT: sourceFingerprint,
+    WAR_ROOM_PREDICTION_SETTINGS_EFFECTIVE_FINGERPRINT: effectiveSettingsFingerprint,
+  }), { sourceFingerprint, effectiveSettingsFingerprint });
+  assert.throws(() => requireWarRoomSettingsVerification({}), (error) =>
+    error.code === "WAR_ROOM_PREDICTION_SETTINGS_VERIFICATION_REQUIRED" && error.status === 503);
+  assert.throws(() => requireWarRoomSettingsVerification({
+    WAR_ROOM_PREDICTION_SETTINGS_SOURCE_FINGERPRINT: "not-a-fingerprint",
+    WAR_ROOM_PREDICTION_SETTINGS_EFFECTIVE_FINGERPRINT: effectiveSettingsFingerprint,
+  }), (error) => error.code === "WAR_ROOM_PREDICTION_SETTINGS_VERIFICATION_INVALID");
 });
 
 test("Google adapter normalizes current, historical, settings, handicap, course, scorecard, and ordering facts", () => {
@@ -216,6 +231,7 @@ test("Supabase adapter has zero Google imports and the boundary never implements
   assert.doesNotMatch(boundary, /catch[\s\S]{0,200}prepareGoogleWarRoomInput/);
   const diagnosticRoute = source("app/api/admin/war-room-input-parity/route.js");
   assert.match(diagnosticRoute, /authorizePreviewDirector/);
+  assert.match(diagnosticRoute, /operation === "runtime"/);
   assert.match(diagnosticRoute, /compactParityResult/);
   assert.match(diagnosticRoute, /reportMode/);
   assert.match(diagnosticRoute, /result\.parity\.pass \|\| reportMode \? 200 : 409/);

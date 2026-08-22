@@ -91,7 +91,26 @@ export async function GET(request) {
         headers: { "cache-control": "no-store" },
       });
     }
-    if (operation !== "google") return NextResponse.json({ error: "Use operation=compare or operation=google." }, { status: 400 });
+    if (operation === "runtime") {
+      const prepared = await prepareWarRoomInput({ scope, env: process.env });
+      return NextResponse.json({
+        ok: true,
+        source: prepared.source,
+        selection: prepared.selection,
+        diagnostics: prepared.diagnostics,
+        settings: {
+          revision: prepared.bundle.predictionSettings.revision,
+          contractVersion: prepared.bundle.predictionSettings.contractVersion,
+          effectiveFingerprint: prepared.bundle.predictionSettings.effectiveFingerprint,
+          freshness: prepared.bundle.predictionSettings.freshness,
+        },
+        snapshot: {
+          bundleFingerprint: prepared.bundle.fingerprints.bundle,
+          orderingFingerprint: prepared.bundle.fingerprints.sections.ordering,
+        },
+      }, { headers: { "cache-control": "no-store" } });
+    }
+    if (operation !== "google") return NextResponse.json({ error: "Use operation=compare, operation=runtime, or operation=google." }, { status: 400 });
     const prepared = await prepareWarRoomInput({ scope, requestedSource: "google", env: process.env });
     return NextResponse.json({
       ok: true,
