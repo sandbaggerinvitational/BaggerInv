@@ -415,16 +415,22 @@ test("local shadow preparation reports transformation time and serialized diagno
   assert.ok(diagnostics.serializedBytes > 0);
 });
 
-test("structural validation fails closed on orphan identity, missing handicap, and non-final official points", () => {
+test("structural validation preserves explicit missing-handicap evidence while failing on malformed canonical facts", () => {
   const bundle = structuredClone(build());
   bundle.players[0].tournamentHandicap = null;
+  bundle.evidence.currentHandicaps.availablePlayerIds = bundle.evidence.currentHandicaps.availablePlayerIds.filter((id) => id !== bundle.players[0].id);
+  bundle.evidence.currentHandicaps.unavailablePlayerIds.push(bundle.players[0].id);
   bundle.matches[1].participants[0].playerId = "ORPHAN";
   bundle.matches[1].points.official.teamOne = 3;
   const result = validatePredictionInputBundle(bundle);
   assert.equal(result.pass, false);
   assert.deepEqual(new Set(result.errors.map((row) => row.code)), new Set([
-    "CURRENT_HANDICAP_UNAVAILABLE", "ORPHAN_MATCH_PARTICIPANT", "NON_FINAL_OFFICIAL_POINTS",
+    "ORPHAN_MATCH_PARTICIPANT", "NON_FINAL_OFFICIAL_POINTS",
   ]));
+  assert.equal(result.warnings.some((row) => row.code === "CURRENT_HANDICAP_UNAVAILABLE"), true);
+  const ambiguous = structuredClone(bundle);
+  ambiguous.evidence.currentHandicaps.unavailablePlayerIds = [];
+  assert.equal(validatePredictionInputBundle(ambiguous).errors.some((row) => row.code === "CURRENT_HANDICAP_EVIDENCE_MISSING"), true);
 });
 
 test("Prediction Settings must be valid; UNKNOWN is read-only and CURRENT is cutover eligible", () => {

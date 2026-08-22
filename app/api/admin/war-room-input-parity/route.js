@@ -8,6 +8,57 @@ export const maxDuration = 120;
 
 const clean = (value) => String(value ?? "").trim();
 
+function compactValue(value) {
+  if (value === null || value === undefined || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.length <= 12 ? value : { type: "array", length: value.length };
+  return { type: "object", keys: Object.keys(value).sort().slice(0, 20), keyCount: Object.keys(value).length };
+}
+
+function compactParityResult(result, limit = 100) {
+  const differences = (result?.parity?.differences || []).slice(0, limit).map((row) => ({
+    classification: row.classification,
+    disposition: row.disposition,
+    reason: row.reason,
+    path: row.path,
+    expected: compactValue(row.expected),
+    actual: compactValue(row.actual),
+  }));
+  return {
+    contract: result.contract,
+    capturedAt: result.capturedAt,
+    selectedRuntimeSource: result.selectedRuntimeSource,
+    calculationConsumersChanged: result.calculationConsumersChanged,
+    snapshots: result.snapshots,
+    parity: {
+      pass: result.parity.pass,
+      totalDifferences: result.parity.totalDifferences,
+      unexplainedDifferences: result.parity.unexplainedDifferences,
+      intentionalDifferences: result.parity.intentionalDifferences,
+      counts: result.parity.counts,
+      unexplainedCounts: result.parity.unexplainedCounts,
+      returnedDifferences: differences.length,
+      differences,
+    },
+    settings: {
+      pass: result.settings.pass,
+      google: {
+        revision: result.settings.google?.revision,
+        contractVersion: result.settings.google?.contractVersion,
+        effectiveFingerprint: result.settings.google?.effectiveFingerprint,
+        freshness: result.settings.google?.freshness,
+      },
+      supabase: {
+        revision: result.settings.supabase?.revision,
+        contractVersion: result.settings.supabase?.contractVersion,
+        effectiveFingerprint: result.settings.supabase?.effectiveFingerprint,
+        freshness: result.settings.supabase?.freshness,
+      },
+    },
+    zeroGoogleSupabaseShadow: result.zeroGoogleSupabaseShadow,
+    performance: result.performance,
+  };
+}
+
 function safeError(error) {
   return {
     code: clean(error?.code || "WAR_ROOM_INPUT_DIAGNOSTIC_FAILED"),
@@ -26,7 +77,11 @@ export async function GET(request) {
   try {
     if (operation === "compare") {
       const result = await captureWarRoomInputParity({ scope, env: process.env, timeoutMs: 40_000 });
-      return NextResponse.json({ ok: result.parity.pass, result }, {
+      const compact = /^(1|true|yes)$/i.test(clean(url.searchParams.get("compact")));
+      const limitValue = clean(url.searchParams.get("limit"));
+      const requestedLimit = limitValue ? Number(limitValue) : Number.NaN;
+      const limit = Number.isInteger(requestedLimit) ? Math.min(250, Math.max(0, requestedLimit)) : 100;
+      return NextResponse.json({ ok: result.parity.pass, result: compact ? compactParityResult(result, limit) : result }, {
         status: result.parity.pass ? 200 : 409,
         headers: { "cache-control": "no-store" },
       });

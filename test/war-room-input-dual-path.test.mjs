@@ -119,6 +119,17 @@ test("Google adapter normalizes current, historical, settings, handicap, course,
   assert.equal(validation.pass, true, JSON.stringify(validation.errors));
 });
 
+test("an unavailable current handicap remains explicit and ineligible without invalidating the shared bundle", () => {
+  const input = fixture();
+  input.sheets.handicaps.find((row) => row.Year === 2026 && row["Player ID"] === "P1")["Tournament Handicap"] = "";
+  const bundle = buildGooglePredictionInputBundle({ ...input, workbookId: "preview-workbook" });
+  const validation = validatePredictionInputBundle(bundle, { allowUnknownSettingsFreshness: false });
+  assert.equal(validation.pass, true, JSON.stringify(validation.errors));
+  assert.deepEqual(bundle.evidence.currentHandicaps.unavailablePlayerIds, ["P1"]);
+  assert.equal(validation.warnings.some((row) => row.code === "CURRENT_HANDICAP_UNAVAILABLE"), true);
+  assert.equal(bundle.players.find((row) => row.id === "P1").tournamentHandicap, null);
+});
+
 test("normalized bundle projects the unchanged War Room consumer contract", () => {
   const input = fixture();
   const bundle = buildGooglePredictionInputBundle({ ...input, workbookId: "preview-workbook" });
@@ -158,7 +169,10 @@ test("Supabase adapter has zero Google imports and the boundary never implements
   assert.match(supabase, /fallbackUsed: false/);
   const boundary = source("lib/war-room-input-service.js");
   assert.doesNotMatch(boundary, /catch[\s\S]{0,200}prepareGoogleWarRoomInput/);
-  assert.match(source("app/api/admin/war-room-input-parity/route.js"), /authorizePreviewDirector/);
+  const diagnosticRoute = source("app/api/admin/war-room-input-parity/route.js");
+  assert.match(diagnosticRoute, /authorizePreviewDirector/);
+  assert.match(diagnosticRoute, /compactParityResult/);
+  assert.match(diagnosticRoute, /cache-control.*no-store/);
 });
 
 test("Step 7D does not alter engine formulas, UI styling, publication, or consumer source configuration", () => {
