@@ -92,7 +92,10 @@ test("Turnstile is auth-route-only and sends one-time tokens to Supabase Auth", 
     source(".env.example"),
   ]);
   assert.match(widget, /challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/);
-  assert.match(widget, /appearance: "interaction-only"/);
+  assert.match(widget, /appearance: "always"/);
+  assert.match(widget, /onReady=/);
+  assert.match(widget, /onError=/);
+  assert.match(widget, /Request verification could not load/);
   assert.match(widget, /expired-callback/);
   assert.match(phoneRoute, /normalizeParticipantAuthCaptchaToken/);
   assert.match(emailRoute, /normalizeParticipantAuthCaptchaToken/);
@@ -100,6 +103,14 @@ test("Turnstile is auth-route-only and sends one-time tokens to Supabase Auth", 
   assert.match(emailRoute, /captchaToken \? \{ captchaToken \}/);
   assert.match(env, /NEXT_PUBLIC_PARTICIPANT_SMS_TURNSTILE_SITE_KEY=/);
   assert.doesNotMatch(env, /TURNSTILE_SECRET|CLOUDFLARE_SECRET/);
+});
+
+test("OTP sends stay disabled until the visible Turnstile control yields a token", async () => {
+  const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
+  assert.match(ui, /const captchaPending = experience\.captchaRequired && !captchaToken/);
+  assert.match(ui, /disabled=\{Boolean\(busy\) \|\| captchaPending \|\| phone\.replace/);
+  assert.match(ui, /disabled=\{Boolean\(busy\) \|\| captchaPending \|\| !email\.trim\(\)\}/);
+  assert.match(ui, /onClick=\{resendCode\} disabled=\{Boolean\(busy\) \|\| captchaPending\}/);
 });
 
 test("successful Turnstile callback forwards one token exactly once to the Supabase phone Auth boundary", async () => {

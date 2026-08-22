@@ -366,6 +366,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
         resetKey={captchaResetKey}
       />
     : null;
+  const captchaPending = experience.captchaRequired && !captchaToken;
   const phoneErrorAttributes = participantAuthFieldAttributes("phone", fieldError);
   const emailErrorAttributes = participantAuthFieldAttributes("email", fieldError);
   const codeErrorAttributes = participantAuthFieldAttributes("code", fieldError);
@@ -403,7 +404,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
           placeholder="(###) ###-####" value={phone} onChange={(event) => { setPhone(formatUsMobile(event.target.value)); setError(""); setFieldError(""); }}
           {...phoneErrorAttributes} required />
         {captcha}
-        <button className={styles.primary} disabled={Boolean(busy) || phone.replace(/\D/g, "").length !== 10}>
+        <button className={styles.primary} disabled={Boolean(busy) || captchaPending || phone.replace(/\D/g, "").length !== 10}>
           {busy === "phone-request" ? "Sending code…" : "Text Me a Code"}
         </button>
         <div className={styles.switcher}><span>Prefer email?</span><button type="button" onClick={() => switchMethod("email")}>Use Email Instead</button></div>
@@ -413,7 +414,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
           placeholder="you@example.com" value={email} onChange={(event) => { setEmail(event.target.value); setError(""); setFieldError(""); }}
           {...emailErrorAttributes} required />
         {captcha}
-        <button className={styles.primary} disabled={Boolean(busy) || !email.trim()}>
+        <button className={styles.primary} disabled={Boolean(busy) || captchaPending || !email.trim()}>
           {busy === "email-request" ? "Sending code…" : "Send Me a Code"}
         </button>
         {experience.smsEnabled
@@ -432,7 +433,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
           <span>Didn't get it?</span>
           {resendSeconds > 0
             ? <span aria-label={`Resend available in ${resendSeconds} seconds`}>Resend code in 0:{String(resendSeconds).padStart(2, "0")}</span>
-            : <>{captcha}<button type="button" onClick={resendCode} disabled={Boolean(busy)}>{busy.includes("resend") ? "Sending code…" : "Resend code"}</button></>}
+            : <>{captcha}<button type="button" onClick={resendCode} disabled={Boolean(busy) || captchaPending}>{busy.includes("resend") ? "Sending code…" : "Resend code"}</button></>}
         </div>
         <button className={styles.secondary} type="button" onClick={changeIdentifier} disabled={Boolean(busy)}>
           {method === "phone" ? "Use a different number" : "Use a different email"}

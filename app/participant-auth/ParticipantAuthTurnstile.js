@@ -9,6 +9,7 @@ export default function ParticipantAuthTurnstile({ siteKey, action, onTokenChang
   const containerRef = useRef(null);
   const widgetRef = useRef(null);
   const [scriptReady, setScriptReady] = useState(false);
+  const [widgetStatus, setWidgetStatus] = useState("loading");
 
   const removeWidget = useCallback(() => {
     if (widgetRef.current !== null && window.turnstile) {
@@ -19,17 +20,23 @@ export default function ParticipantAuthTurnstile({ siteKey, action, onTokenChang
 
   const renderWidget = useCallback(() => {
     if (!siteKey || !containerRef.current || !window.turnstile || widgetRef.current !== null) return;
-    widgetRef.current = window.turnstile.render(containerRef.current, {
-      sitekey: siteKey,
-      action,
-      theme: "light",
-      size: "flexible",
-      appearance: "interaction-only",
-      callback: (token) => onTokenChange(token),
-      "expired-callback": () => onTokenChange(""),
-      "timeout-callback": () => onTokenChange(""),
-      "error-callback": () => { onTokenChange(""); return true; },
-    });
+    setWidgetStatus("loading");
+    try {
+      widgetRef.current = window.turnstile.render(containerRef.current, {
+        sitekey: siteKey,
+        action,
+        theme: "light",
+        size: "flexible",
+        appearance: "always",
+        callback: (token) => { setWidgetStatus("verified"); onTokenChange(token); },
+        "expired-callback": () => { setWidgetStatus("loading"); onTokenChange(""); },
+        "timeout-callback": () => { setWidgetStatus("error"); onTokenChange(""); },
+        "error-callback": () => { setWidgetStatus("error"); onTokenChange(""); return true; },
+      });
+    } catch {
+      setWidgetStatus("error");
+      onTokenChange("");
+    }
   }, [action, onTokenChange, siteKey]);
 
   useEffect(() => {
@@ -46,13 +53,22 @@ export default function ParticipantAuthTurnstile({ siteKey, action, onTokenChang
   useEffect(() => {
     if (widgetRef.current !== null && window.turnstile) {
       try { window.turnstile.reset(widgetRef.current); } catch { /* A rerender will restore it. */ }
+      setWidgetStatus("loading");
       onTokenChange("");
     }
   }, [onTokenChange, resetKey]);
 
   if (!siteKey) return null;
-  return <div aria-label="Request verification" role="group">
-    <Script src={TURNSTILE_SCRIPT} strategy="afterInteractive" onLoad={() => setScriptReady(true)} />
+  return <div aria-label="Request verification" role="group" aria-busy={widgetStatus === "loading" ? "true" : undefined}>
+    <Script
+      src={TURNSTILE_SCRIPT}
+      strategy="afterInteractive"
+      onReady={() => { setWidgetStatus("loading"); setScriptReady(true); }}
+      onError={() => { setWidgetStatus("error"); onTokenChange(""); }}
+    />
     <div ref={containerRef} />
+    {widgetStatus === "error"
+      ? <p role="alert">Request verification could not load. Turn off content blockers for this site, then reload.</p>
+      : null}
   </div>;
 }
