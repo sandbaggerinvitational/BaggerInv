@@ -11,6 +11,11 @@ import {
   recordParticipantAuthDiagnostic,
   rememberParticipantAuthNavigation,
 } from "../../lib/participant-auth-client-diagnostics.js";
+import {
+  participantAuthEntryValidation,
+  participantAuthErrorPresentation,
+  participantAuthFieldAttributes,
+} from "../../lib/participant-auth-error-presentation.js";
 
 function participantDestination(searchParams) {
   const requestedNext = String(searchParams.get("next") || "");
@@ -45,10 +50,6 @@ function participantAuthRequestError(payload, fallback) {
   return Object.assign(new Error(payload?.error || payload?.message || fallback), {
     category: String(payload?.category || ""),
   });
-}
-
-function validEmailFormat(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
 export default function ParticipantAuthRehearsal({ experience }) {
@@ -185,9 +186,10 @@ export default function ParticipantAuthRehearsal({ experience }) {
   const requestPhoneCode = async (event) => {
     event?.preventDefault();
     if (busy) return;
-    if (phone.replace(/\D/g, "").length !== 10) {
-      setFieldError("phone");
-      setError("Enter a valid mobile number.");
+    const validation = participantAuthEntryValidation("phone", phone);
+    if (validation) {
+      setFieldError(validation.field);
+      setError(validation.message);
       return;
     }
     if (experience.captchaRequired && !captchaToken) {
@@ -215,8 +217,13 @@ export default function ParticipantAuthRehearsal({ experience }) {
       recordParticipantAuthDiagnostic("PHONE_OTP_REQUEST", { durationMs: Math.round(performance.now() - started), routeTo: location.pathname });
       resetCaptcha();
     } catch (requestError) {
-      setFieldError("");
-      setError(networkMessage(requestError));
+      const presentation = participantAuthErrorPresentation({
+        method: "phone",
+        category: requestError?.category,
+        message: networkMessage(requestError),
+      });
+      setFieldError(presentation.field);
+      setError(presentation.message);
       resetCaptcha();
     } finally { setBusy(""); }
   };
@@ -224,9 +231,10 @@ export default function ParticipantAuthRehearsal({ experience }) {
   const requestEmailCode = async (event) => {
     event?.preventDefault();
     if (busy) return;
-    if (!validEmailFormat(email)) {
-      setFieldError("email");
-      setError("Enter a valid email address.");
+    const validation = participantAuthEntryValidation("email", email);
+    if (validation) {
+      setFieldError(validation.field);
+      setError(validation.message);
       return;
     }
     if (experience.captchaRequired && !captchaToken) {
@@ -254,8 +262,13 @@ export default function ParticipantAuthRehearsal({ experience }) {
       recordParticipantAuthDiagnostic("OTP_REQUEST", { durationMs: Math.round(performance.now() - started), routeTo: location.pathname });
       resetCaptcha();
     } catch (requestError) {
-      setFieldError("");
-      setError(networkMessage(requestError));
+      const presentation = participantAuthErrorPresentation({
+        method: "email",
+        category: requestError?.category,
+        message: networkMessage(requestError),
+      });
+      setFieldError(presentation.field);
+      setError(presentation.message);
       resetCaptcha();
     } finally { setBusy(""); }
   };
@@ -287,8 +300,14 @@ export default function ParticipantAuthRehearsal({ experience }) {
       });
       beginNavigation(method, payload, duration);
     } catch (verifyError) {
-      setFieldError(verifyError?.category === "INVALID_OR_EXPIRED" ? "code" : "");
-      setError(networkMessage(verifyError));
+      const presentation = participantAuthErrorPresentation({
+        method,
+        step: "code",
+        category: verifyError?.category,
+        message: networkMessage(verifyError),
+      });
+      setFieldError(presentation.field);
+      setError(presentation.message);
       setToken("");
       otpRef.current?.focus();
       setBusy("");
@@ -347,6 +366,9 @@ export default function ParticipantAuthRehearsal({ experience }) {
         resetKey={captchaResetKey}
       />
     : null;
+  const phoneErrorAttributes = participantAuthFieldAttributes("phone", fieldError);
+  const emailErrorAttributes = participantAuthFieldAttributes("email", fieldError);
+  const codeErrorAttributes = participantAuthFieldAttributes("code", fieldError);
 
   if (sessionState === "checking" || authTransition) {
     return <main className={styles.page}>
@@ -379,7 +401,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
         <label htmlFor="participant-mobile">Mobile Number</label>
         <input ref={phoneRef} id="participant-mobile" name="mobile" type="tel" inputMode="tel" autoComplete="tel"
           placeholder="(###) ###-####" value={phone} onChange={(event) => { setPhone(formatUsMobile(event.target.value)); setError(""); setFieldError(""); }}
-          aria-invalid={fieldError === "phone" ? "true" : undefined} aria-describedby={fieldError === "phone" ? "auth-error" : undefined} required />
+          {...phoneErrorAttributes} required />
         {captcha}
         <button className={styles.primary} disabled={Boolean(busy) || phone.replace(/\D/g, "").length !== 10}>
           {busy === "phone-request" ? "Sending code…" : "Text Me a Code"}
@@ -389,7 +411,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
         <label htmlFor="participant-email">Email</label>
         <input ref={emailRef} id="participant-email" name="email" type="email" inputMode="email" autoComplete="email"
           placeholder="you@example.com" value={email} onChange={(event) => { setEmail(event.target.value); setError(""); setFieldError(""); }}
-          aria-invalid={fieldError === "email" ? "true" : undefined} aria-describedby={fieldError === "email" ? "auth-error" : undefined} required />
+          {...emailErrorAttributes} required />
         {captcha}
         <button className={styles.primary} disabled={Boolean(busy) || !email.trim()}>
           {busy === "email-request" ? "Sending code…" : "Send Me a Code"}
@@ -402,7 +424,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
         <input ref={otpRef} className={styles.otp} id="participant-code" name="code" inputMode="numeric" autoComplete="one-time-code"
           pattern="[0-9]{6}" maxLength={6} value={token}
           onChange={(event) => { setToken(event.target.value.replace(/\D/g, "").slice(0, 6)); setError(""); setFieldError(""); }}
-          aria-invalid={fieldError === "code" ? "true" : undefined} aria-describedby={fieldError === "code" ? "auth-error" : undefined} required />
+          {...codeErrorAttributes} required />
         <button className={styles.primary} disabled={Boolean(busy) || token.length !== 6}>
           {busy === "verify" ? "Verifying…" : "Verify"}
         </button>

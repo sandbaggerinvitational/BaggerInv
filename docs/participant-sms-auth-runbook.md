@@ -18,6 +18,23 @@ Step 8B.3. It does not authorize a Production rollout.
 The legacy `/activate` route remains an email/Passport rollback path. Do not
 remove it as part of SMS rollout.
 
+## Preview physical certification
+
+The owner completed the final protected participant flow on physical iPhone:
+
+- The polished SMS-first screen and email fallback rendered without operator
+  jargon.
+- Cloudflare Turnstile passed through Supabase's supported CAPTCHA boundary.
+- Twilio Verify delivered one branded Bagger message.
+- iOS offered the **From Messages** one-time-code suggestion.
+- The code UI and phone OTP verification passed.
+- The existing Auth user, Player Passport, and canonical Player remained the
+  previously certified identity.
+- The post-verification transition to Home was fast and passed.
+
+This is a Preview auth-product certification. It does not enable Production SMS
+or make unreviewed participant phone data ready for rollout.
+
 ## Preview feature controls
 
 All four controls must be ready before SMS appears:
@@ -80,25 +97,26 @@ Official reference: <https://supabase.com/docs/guides/auth/auth-captcha>
 Supabase Phone Auth invokes the configured Twilio Verify Service. The app never
 stores Twilio credentials or calls Twilio directly.
 
-For the current Preview trial account:
+Current Preview provider readiness is physically certified:
 
-1. Keep the proven rehearsal recipient as the only physical test recipient.
-2. Upgrade the Twilio account before expecting delivery to arbitrary golfers;
-   trial accounts can send only to verified recipients.
-3. In **Twilio Console → Verify → Services → Preview service → SMS**, retain
-   Fraud Guard. Standard is the normal default protection level.
-4. Review Verify logs, geographic permissions, and account usage alerts before
-   expanding the Preview cohort.
-5. If Twilio/Trust Hub displays a Primary Compliance Profile requirement for
-   this account or destination, complete the exact account-directed workflow.
-   Do not treat a generic messaging registration requirement as proven for
-   Verify without that account-specific notice.
+1. The Twilio account is upgraded; the former trial-recipient restriction is
+   no longer the rollout blocker.
+2. The account's Primary Compliance Profile is approved.
+3. The Preview Verify Service delivered the branded message beginning
+   `Your Bagger verification code is:` through the protected final UI.
+4. iOS recognized the message and offered the **From Messages** one-time-code
+   suggestion.
+5. Retain Fraud Guard, geographic permissions, Verify logs, and usage alerts
+   while expanding the reviewed Preview cohort.
+
+This certifies provider/account readiness for staged Preview Verify delivery.
+Broad Preview availability still depends on reviewed VERIFIED phone ownership;
+Production requires its own separately configured provider and rollout approval.
 
 Official references:
 
 - <https://www.twilio.com/docs/verify/api/verification>
 - <https://www.twilio.com/docs/verify/preventing-toll-fraud/sms-fraud-guard>
-- <https://help.twilio.com/hc/en-us/articles/360036052753-Twilio-Free-Trial-Limitations>
 
 ## Eligibility and failure diagnosis
 

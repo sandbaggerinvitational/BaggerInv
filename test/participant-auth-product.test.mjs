@@ -13,6 +13,11 @@ import {
   participantPhoneOtpIdentifierFingerprint,
   requestExistingParticipantPhoneLogin,
 } from "../lib/participant-phone-otp.js";
+import {
+  participantAuthEntryValidation,
+  participantAuthErrorPresentation,
+  participantAuthFieldAttributes,
+} from "../lib/participant-auth-error-presentation.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const readyPreview = {
@@ -133,13 +138,62 @@ test("the hosted captcha_failed response is classified before provider work", ()
   });
 });
 
-test("request-level failures do not mark valid phone or email fields invalid and consumed CAPTCHA tokens reset", async () => {
-  const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
-  assert.match(ui, /aria-invalid=\{fieldError === "phone"/);
-  assert.match(ui, /aria-invalid=\{fieldError === "email"/);
-  assert.match(ui, /aria-invalid=\{fieldError === "code"/);
-  assert.doesNotMatch(ui, /aria-invalid=\{error \?/);
-  assert.match(ui, /catch \(requestError\) \{\s*setFieldError\(""\);[\s\S]*?resetCaptcha\(\)/);
+test("valid phone request failures show an error card without invalidating the field", () => {
+  assert.equal(participantAuthEntryValidation("phone", "(202) 555-0123"), null);
+  for (const [category, message] of [
+    ["RATE_LIMITED", "Too many attempts. Wait a few minutes or use email instead."],
+    ["REQUEST_CHECK_FAILED", "We couldn't verify this request. Try again."],
+    ["TEXT_UNAVAILABLE", "Text sign-in is temporarily unavailable. Use email instead."],
+    ["", "Connection lost. Try again."],
+    ["ELIGIBILITY_SAFE", "If that mobile number is approved, a code will arrive shortly."],
+    ["SIGN_IN_FAILED", "We couldn't complete that request. Try again."],
+  ]) {
+    const presentation = participantAuthErrorPresentation({ method: "phone", category, message });
+    assert.equal(presentation.field, "");
+    assert.equal(presentation.showErrorCard, true);
+    assert.deepEqual(participantAuthFieldAttributes("phone", presentation.field), {
+      "aria-invalid": undefined,
+      "aria-describedby": undefined,
+    });
+  }
+});
+
+test("phone and email field validation alone controls red styling and aria-invalid", () => {
+  const invalidPhone = participantAuthEntryValidation("phone", "202-55");
+  assert.deepEqual(invalidPhone, { field: "phone", message: "Enter a valid mobile number." });
+  assert.deepEqual(participantAuthFieldAttributes("phone", invalidPhone.field), {
+    "aria-invalid": "true",
+    "aria-describedby": "auth-error",
+  });
+  const serverInvalidPhone = participantAuthErrorPresentation({
+    method: "phone", category: "INVALID_PHONE", message: "Enter a valid mobile number.",
+  });
+  assert.equal(serverInvalidPhone.field, "phone");
+
+  assert.equal(participantAuthEntryValidation("email", "golfer@example.com"), null);
+  const emailRequestFailure = participantAuthErrorPresentation({
+    method: "email", category: "REQUEST_CHECK_FAILED", message: "We couldn't verify this request. Try again.",
+  });
+  assert.equal(emailRequestFailure.field, "");
+  assert.equal(emailRequestFailure.showErrorCard, true);
+  assert.equal(participantAuthFieldAttributes("email", emailRequestFailure.field)["aria-invalid"], undefined);
+  const invalidEmail = participantAuthEntryValidation("email", "golfer-at-example");
+  assert.deepEqual(invalidEmail, { field: "email", message: "Enter a valid email address." });
+  assert.equal(participantAuthFieldAttributes("email", invalidEmail.field)["aria-invalid"], "true");
+});
+
+test("the final UI binds field attributes to validation scope and resets consumed CAPTCHA tokens", async () => {
+  const [ui, css] = await Promise.all([
+    source("app/participant-auth/ParticipantAuthRehearsal.js"),
+    source("app/participant-auth/participant-auth.module.css"),
+  ]);
+  assert.match(ui, /participantAuthFieldAttributes\("phone", fieldError\)/);
+  assert.match(ui, /participantAuthFieldAttributes\("email", fieldError\)/);
+  assert.match(ui, /participantAuthFieldAttributes\("code", fieldError\)/);
+  assert.match(ui, /role="alert"/);
+  assert.match(css, /input\[aria-invalid="true"\]/);
+  assert.doesNotMatch(css, /input:invalid/);
+  assert.match(ui, /catch \(requestError\) \{[\s\S]*?participantAuthErrorPresentation\([\s\S]*?setFieldError\(presentation\.field\)/);
   assert.match(ui, /catch \(resendError\) \{\s*setFieldError\(""\);[\s\S]*?resetCaptcha\(\)/);
   assert.match(ui, /const switchMethod = async[\s\S]*?clearFeedback\(\);\s*resetCaptcha\(\)/);
 });
@@ -256,10 +310,10 @@ test("email request and verify retain same-origin, no-store, no-create, and CAPT
   assert.match(verifyRoute, /data\?\.user\?\.id === allowed\.payload\.authUserId/);
 });
 
-test("operator runbook documents Preview enable, email-only rollback, trial limits, and separate Production readiness", async () => {
+test("operator runbook documents certified Preview auth, email-only rollback, and separate Production readiness", async () => {
   const runbook = await source("docs/participant-sms-auth-runbook.md");
   for (const requirement of ["PARTICIPANT_SMS_AUTH_ENABLED=true", "DESIGNATED", "Cloudflare Turnstile",
-    "PARTICIPANT_SMS_AUTH_ENABLED=false", "trial accounts can send only to verified recipients",
+    "PARTICIPANT_SMS_AUTH_ENABLED=false", "Twilio account is upgraded", "Primary Compliance Profile is approved",
     "Future Production checklist", "legacy `/activate`"]) assert.match(runbook, new RegExp(requirement.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
   assert.match(runbook, /Authentication → Bot and Abuse\s+Protection/i);
   assert.doesNotMatch(runbook, /sk_live|service_role\s*=|auth token\s*=|secret key:\s*\S+/i);
