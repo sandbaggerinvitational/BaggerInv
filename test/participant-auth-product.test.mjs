@@ -8,8 +8,10 @@ import {
   participantSmsAuthFeatureConfigured,
 } from "../lib/participant-sms-auth-feature.js";
 import {
+  classifyParticipantPhoneOtpProviderFailure,
   normalizeParticipantAuthCaptchaToken,
   participantPhoneOtpIdentifierFingerprint,
+  requestExistingParticipantPhoneLogin,
 } from "../lib/participant-phone-otp.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -93,6 +95,53 @@ test("Turnstile is auth-route-only and sends one-time tokens to Supabase Auth", 
   assert.match(emailRoute, /captchaToken \? \{ captchaToken \}/);
   assert.match(env, /NEXT_PUBLIC_PARTICIPANT_SMS_TURNSTILE_SITE_KEY=/);
   assert.doesNotMatch(env, /TURNSTILE_SECRET|CLOUDFLARE_SECRET/);
+});
+
+test("successful Turnstile callback forwards one token exactly once to the Supabase phone Auth boundary", async () => {
+  const calls = [];
+  const captchaToken = "mock-turnstile-token-that-is-never-routable";
+  const authClient = { auth: { signInWithOtp: async (input) => {
+    calls.push(input);
+    return { data: {}, error: null };
+  } } };
+
+  const result = await requestExistingParticipantPhoneLogin({
+    authClient,
+    phone: "+12025550123",
+    captchaToken,
+  });
+
+  assert.equal(result.providerAccepted, true);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0], {
+    phone: "+12025550123",
+    options: { shouldCreateUser: false, channel: "sms", captchaToken },
+  });
+});
+
+test("the hosted captcha_failed response is classified before provider work", () => {
+  assert.deepEqual(classifyParticipantPhoneOtpProviderFailure({
+    code: "captcha_failed",
+    status: 400,
+    message: "captcha protection: request disallowed",
+  }, "send"), {
+    code: "PHONE_OTP_CAPTCHA_FAILED",
+    authErrorCode: "captcha_failed",
+    authStatus: 400,
+    providerErrorClass: "CAPTCHA_REJECTED",
+    providerCalled: false,
+  });
+});
+
+test("request-level failures do not mark valid phone or email fields invalid and consumed CAPTCHA tokens reset", async () => {
+  const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
+  assert.match(ui, /aria-invalid=\{fieldError === "phone"/);
+  assert.match(ui, /aria-invalid=\{fieldError === "email"/);
+  assert.match(ui, /aria-invalid=\{fieldError === "code"/);
+  assert.doesNotMatch(ui, /aria-invalid=\{error \?/);
+  assert.match(ui, /catch \(requestError\) \{\s*setFieldError\(""\);[\s\S]*?resetCaptcha\(\)/);
+  assert.match(ui, /catch \(resendError\) \{\s*setFieldError\(""\);[\s\S]*?resetCaptcha\(\)/);
+  assert.match(ui, /const switchMethod = async[\s\S]*?clearFeedback\(\);\s*resetCaptcha\(\)/);
 });
 
 test("CAPTCHA tokens and identifier fingerprints are bounded without exposing raw values", () => {

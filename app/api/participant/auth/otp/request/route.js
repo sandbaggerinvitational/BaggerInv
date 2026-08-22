@@ -24,13 +24,13 @@ function sameOriginMutation(request) {
 export async function POST(request) {
   const authority = participantIdentityAuthorityEnvironment();
   if (!authority.participantAuthEnabled) return json({ error: "Not found." }, 404);
-  if (!sameOriginMutation(request)) return json({ error: "We couldn't verify this request. Try again." }, 403);
+  if (!sameOriginMutation(request)) return json({ error: "We couldn't verify this request. Try again.", category: "REQUEST_CHECK_FAILED" }, 403);
   const input = await request.json().catch(() => ({}));
   const email = String(input.email || "").trim().toLowerCase();
   const experience = participantAuthExperienceConfiguration();
   let captchaToken = "";
   try { captchaToken = normalizeParticipantAuthCaptchaToken(input.captchaToken, { required: experience.captchaRequired }); }
-  catch { return json({ error: "We couldn't verify this request. Try again." }, 400); }
+  catch { return json({ error: "We couldn't verify this request. Try again.", category: "REQUEST_CHECK_FAILED" }, 400); }
   const clientIdentity = `${request.headers.get("x-forwarded-for") || ""}|${request.headers.get("user-agent") || ""}|${process.env.SUPABASE_SCORING_MIRROR_SECRET_KEY || ""}`;
   const authorization = await authorizeSingleParticipantOtpRequest({ email, client_request_hash: participantAuthClientRequestHash(clientIdentity) });
   const decision = authorization.payload || {};
@@ -47,7 +47,11 @@ export async function POST(request) {
     safe_reason: error ? "AUTH_EMAIL_PROVIDER_REJECTED" : "DELIVERY_ACCEPTED", duration_ms: Math.round(performance.now() - started) });
   if (error) {
     const captchaRejected = String(error.code || "").toLowerCase().includes("captcha") || String(error.message || "").toLowerCase().includes("captcha");
-    return json({ message: captchaRejected ? "We couldn't verify this request. Try again." : "Email sign-in is temporarily unavailable. Try again shortly.", step: "email" }, captchaRejected ? 400 : 503);
+    return json({
+      message: captchaRejected ? "We couldn't verify this request. Try again." : "Email sign-in is temporarily unavailable. Try again shortly.",
+      category: captchaRejected ? "REQUEST_CHECK_FAILED" : "EMAIL_UNAVAILABLE",
+      step: "email",
+    }, captchaRejected ? 400 : 503);
   }
   return json({ message: participantAuthGenericMessage(), step: "code", requestId: decision.requestId });
 }

@@ -119,6 +119,14 @@ Operator-safe classifications distinguish:
 - `PHONE_LOGIN_PASSPORT_MISSING`: canonical ownership no longer resolves.
 - `PHONE_LOGIN_DIRECTOR_PARITY_MISMATCH`: entitlement changed during login.
 
+If Supabase Auth logs a CAPTCHA rejection with Cloudflare's
+`invalid-input-secret`, the browser token reached the supported Supabase Auth
+boundary but the Turnstile secret configured in Supabase is invalid. Confirm
+that the Vercel public site key and the Supabase CAPTCHA secret are the matching
+site-key/secret pair from the same Cloudflare widget. Replace the secret only in
+**Preview Supabase → Authentication → Bot and Abuse Protection → CAPTCHA
+protection**, then save. Do not put the secret in Vercel, source, logs, or chat.
+
 Never log raw phone, email, OTP, CAPTCHA token, access/refresh token, or service
 credentials. Use attempt ID and safe classifications only.
 

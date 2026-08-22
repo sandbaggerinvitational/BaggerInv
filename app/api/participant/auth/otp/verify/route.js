@@ -29,9 +29,9 @@ export async function POST(request) {
   const email = String(input.email || "").trim().toLowerCase();
   const token = String(input.token || "").replace(/\s/g, "");
   const requestId = String(input.requestId || "").trim();
-  if (!/^\d{6}$/.test(token) || !/^[0-9a-f-]{36}$/i.test(requestId)) return json({ error: "That code is invalid or expired." }, 400);
+  if (!/^\d{6}$/.test(token) || !/^[0-9a-f-]{36}$/i.test(requestId)) return json({ error: "That code is invalid or expired.", category: "INVALID_OR_EXPIRED" }, 400);
   const allowed = await authorizeSingleParticipantOtpVerification({ request_id: requestId, email_identity_hash: participantAuthEmailHash(email) });
-  if (allowed.payload?.allowed !== true) return json({ error: "That code is invalid or expired." }, 400);
+  if (allowed.payload?.allowed !== true) return json({ error: "That code is invalid or expired.", category: "INVALID_OR_EXPIRED" }, 400);
   const config = participantAuthServerConfiguration();
   const pendingCookies = [];
   const client = createServerClient(config.url, config.publishableKey, {
@@ -49,7 +49,7 @@ export async function POST(request) {
     succeeded: matches, duration_ms: verifyOtpMs });
   if (!matches) {
     if (data?.session) await client.auth.signOut({ scope: "local" });
-    return json({ error: "That code is invalid or expired." }, 400);
+    return json({ error: "That code is invalid or expired.", category: "INVALID_OR_EXPIRED" }, 400);
   }
   const totalMs = Math.round(performance.now() - started);
   const response = NextResponse.json({ ok: true, session: "active", linkedPlayerId: allowed.payload.playerId,
