@@ -15,8 +15,12 @@ Step 8B.3. It does not authorize a Production rollout.
 - Director Mission Control owns Add Mobile, Change Mobile, and Revoke Mobile.
   The participant login page never enrolls or changes a phone.
 
-The legacy `/activate` route remains an email/Passport rollback path. Do not
-remove it as part of SMS rollout.
+The legacy `/activate` route remains a hidden, direct-entry rollback path. No
+ordinary participant card, navigation item, redirect, or protected-route
+fallback links to it in Preview Supabase mode. Operators may reach it only by
+entering the route intentionally during an explicitly approved rollback. Do not
+remove the implementation until Production migration and rollback retirement
+receive separate approval.
 
 ## Preview physical certification
 

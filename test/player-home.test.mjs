@@ -132,7 +132,7 @@ test("personalized home keeps Passport authorization server-side", async () => {
   assert.match(sheetsWrite, /tee: String\(match\["Tee Played"\]/);
 });
 
-test("the Tournament Command Center keeps legacy activation only outside Supabase participant delivery", async () => {
+test("the Tournament Command Center signs Preview Supabase participants in and preserves Production rollback", async () => {
   const [component, styles] = await Promise.all([
     readFile(new URL("../app/PersonalizedPlayerHome.js", import.meta.url), "utf8"),
     readFile(new URL("../app/personalized-player-home.module.css", import.meta.url), "utf8"),
@@ -140,6 +140,7 @@ test("the Tournament Command Center keeps legacy activation only outside Supabas
   assert.match(component, /Activate Player Passport/);
   assert.match(component, /participantIdentityAuthority === "supabase"/);
   assert.match(component, /"\/participant-auth\?next=\/home" : "\/activate"/);
+  assert.match(component, /"Sign In" : "Activate Player Passport"/);
   assert.match(styles, /\.empty a\.primaryAction\s*\{\s*color:\s*#fff/);
 });
 

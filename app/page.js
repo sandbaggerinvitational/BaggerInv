@@ -14,6 +14,7 @@ import StatusBadge from "./StatusBadge";
 import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
 import { readHomepageCurrentTournament } from "../lib/homepage-current-tournament";
 import { requireHomepageCurrentReadSource } from "../lib/tournament-read-source";
+import { participantIdentityAuthorityEnvironment } from "../lib/participant-identity-authority";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -32,6 +33,7 @@ function playerName(player) {
 
 export default async function Home() {
   const homepageSource = requireHomepageCurrentReadSource();
+  const participantIdentityAuthority = participantIdentityAuthorityEnvironment().resolved;
   let currentRead = null;
   if (homepageSource.resolved === "supabase") {
     [currentRead] = await Promise.all([
@@ -131,7 +133,7 @@ export default async function Home() {
   if (mobileTournamentDashboardEnabled(liveData?.tournament)) {
     return <>
       <PwaSplashIdentityBridge tournament={presentationLiveData?.tournament || null} />
-      <MobileTournamentHome liveData={presentationLiveData} />
+      <MobileTournamentHome liveData={presentationLiveData} participantIdentityAuthority={participantIdentityAuthority} />
     </>;
   }
 

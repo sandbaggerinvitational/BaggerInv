@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AssetImage from "../AssetImage";
 import PlayerAvatar from "../PlayerAvatar";
@@ -48,6 +49,7 @@ function RoundPerformance({ rounds, summary, year }) {
 }
 
 export default function ParticipantProfile({ participantIdentityAuthority = "passport" }) {
+  const router = useRouter();
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [identityState, setIdentityState] = useState("loading");
@@ -62,6 +64,7 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
 
   useEffect(() => {
     let current = true;
+    let authRedirect = false;
     const controller = new AbortController();
     try {
       const saved = JSON.parse(window.localStorage.getItem(preferenceKey) || "null");
@@ -83,15 +86,18 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
           setIdentityState("active");
         } else if (response.status === 401) {
           setPlayer(null);
-          setIdentityState("inactive");
+          if (participantIdentityAuthority === "supabase") {
+            authRedirect = true;
+            router.replace("/participant-auth?next=/me");
+          } else setIdentityState("inactive");
         } else {
           setIdentityState("unavailable");
         }
       })
       .catch((error) => { if (current && error?.name !== "AbortError") setIdentityState("unavailable"); })
-      .finally(() => { if (current) setLoading(false); });
+      .finally(() => { if (current && !authRedirect) setLoading(false); });
     return () => { current = false; controller.abort(); };
-  }, [attempt]);
+  }, [attempt, participantIdentityAuthority, router]);
 
   const toggle = (id) => {
     setPreferences((current) => {
@@ -132,7 +138,7 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
   if (loading && !player) return <ScreenSkeleton label="Opening Player" cards={2} />;
   if (identityState === "unavailable" && !player) return <ErrorState title="Player information is temporarily unavailable." message="Check your connection and try again." onRetry={() => setAttempt((value) => value + 1)} />;
   if (!player) return participantIdentityAuthority === "supabase"
-    ? <section className={styles.state}><h1>Participant sign-in required</h1><Link href="/participant-auth?next=/me">Sign in</Link></section>
+    ? <section className={styles.state}><h1>Sign in to The Bagger</h1><Link href="/participant-auth?next=/me">Sign In</Link></section>
     : <section className={styles.state}><h1>Player Passport required</h1><Link href="/activate">Activate Player Passport</Link></section>;
 
   const profile = tournamentData?.player || player;

@@ -246,6 +246,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   useEffect(() => {
     let current = true;
     const controller = new AbortController();
+    let authRedirect = false;
     const cancelForNavigation = () => { current = false; controller.abort(); };
     window.addEventListener("participant-navigation-start", cancelForNavigation);
     const restore = async () => {
@@ -274,7 +275,10 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
           writeParticipantInitializationCache(identity);
         } else if (passport.status === 401) {
           clearParticipantInitializationCache();
-          setPassportState("inactive");
+          if (supabaseParticipantIdentity) {
+            authRedirect = true;
+            router.replace(`/participant-auth?next=${dashboardOnly ? "/my-match" : "/score"}`);
+          } else setPassportState("inactive");
         } else if (cached) {
           // The signed identity and recently verified snapshot remain usable.
           // Treat this as silent freshness degradation, not Passport failure.
@@ -294,12 +298,12 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       } catch {
         if (current) setPassportState(cached ? "freshness-degraded" : "unavailable");
       } finally {
-        if (current) setRestoring(false);
+        if (current && !authRedirect) setRestoring(false);
       }
     };
     restore();
     return () => { current = false; controller.abort(); window.removeEventListener("participant-navigation-start", cancelForNavigation); };
-  }, [dashboardOnly, restoreAttempt, supabaseParticipantIdentity]);
+  }, [dashboardOnly, restoreAttempt, router, supabaseParticipantIdentity]);
 
   const login = async () => {
     setBusy(true); setStatus("Opening scoring…");
@@ -976,8 +980,8 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   </section>;
 
   if (!authorized && supabaseParticipantIdentity) return <section className={styles.login}>
-    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Sign in with your approved tournament email to open your assigned scorecard.</p></div>
-    <Link className={styles.primary} href={`/participant-auth?next=${dashboardOnly ? "/my-match" : "/score"}`}>Participant sign-in</Link>
+    <div className={styles.brand}><span>SBI LIVE</span><h1>My Match</h1><p>Sign in to open your assigned scorecard.</p></div>
+    <Link className={styles.primary} href={`/participant-auth?next=${dashboardOnly ? "/my-match" : "/score"}`}>Sign In</Link>
     {status && <p className={styles.status}>{status}</p>}
   </section>;
 

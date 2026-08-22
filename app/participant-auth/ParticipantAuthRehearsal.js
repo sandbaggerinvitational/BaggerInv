@@ -19,7 +19,7 @@ import {
 
 function participantDestination(searchParams) {
   const requestedNext = String(searchParams.get("next") || "");
-  return /^\/(?:home|my-match|score|live|me)(?:[/?#]|$)/.test(requestedNext) ? requestedNext : "/home";
+  return /^\/(?:home|my-match|score|game-center|live|me)(?:[/?#]|$)/.test(requestedNext) ? requestedNext : "/home";
 }
 
 function formatUsMobile(value) {

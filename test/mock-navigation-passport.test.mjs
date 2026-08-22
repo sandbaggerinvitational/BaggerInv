@@ -42,7 +42,7 @@ test("Home and Tournament page trees are isolated by pathname in the shared PWA 
   assert.match(frame, /usePathname\(\)/);
   assert.match(frame, /key=\{pathname\}/);
   assert.match(frame, /data-participant-route=\{pathname\}/);
-  assert.match(home, /<MobileTournamentHome liveData=\{liveData\}/);
+  assert.match(home, /<MobileTournamentHome liveData=\{liveData\} participantIdentityAuthority=\{participantIdentityAuthority\}/);
   assert.doesNotMatch(home, /TournamentDashboard|MatchCenter/);
   assert.match(tournament, /<MatchCenter initialData=\{data\}/);
   assert.doesNotMatch(tournament, /MobileTournamentHome|TournamentCommandCenter/);

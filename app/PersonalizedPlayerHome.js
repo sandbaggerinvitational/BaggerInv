@@ -309,7 +309,7 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
       <p>Your Match</p>
       <h2 id="player-home-title">Find your tournament match</h2>
       <span>{participantIdentityAuthority === "supabase" ? "Sign in to see your partner, opponents, course, and tee time." : "Activate Player Passport to see your partner, opponents, course, and tee time."}</span>
-      <Link className={styles.primaryAction} href={participantIdentityAuthority === "supabase" ? "/participant-auth?next=/home" : "/activate"}>{participantIdentityAuthority === "supabase" ? "Participant sign-in" : "Activate Player Passport"}</Link>
+      <Link className={styles.primaryAction} href={participantIdentityAuthority === "supabase" ? "/participant-auth?next=/home" : "/activate"}>{participantIdentityAuthority === "supabase" ? "Sign In" : "Activate Player Passport"}</Link>
     </section>
   </>;
   if (state === "error") return <>

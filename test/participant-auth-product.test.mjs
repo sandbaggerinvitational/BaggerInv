@@ -78,7 +78,7 @@ test("trusted session stays behind a startup state and redirects without showing
 
 test("safe next destinations are internal participant routes only", async () => {
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
-  assert.match(ui, /\^\\\/(?:\(\?:)?home\|my-match\|score\|live\|me/);
+  assert.match(ui, /\^\\\/(?:\(\?:)?home\|my-match\|score\|game-center\|live\|me/);
   assert.match(ui, /\? requestedNext : "\/home"/);
   assert.doesNotMatch(ui, /window\.location\s*=|location\.href\s*=/);
 });
