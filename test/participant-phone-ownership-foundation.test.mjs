@@ -41,7 +41,13 @@ test("SMS feature flag is Preview-only and is not enabled by Step 8B.1 defaults"
   assert.equal(participantSmsAuthFeatureConfigured({}), false);
   assert.equal(participantSmsAuthFeatureConfigured({ VERCEL_ENV: "preview", PARTICIPANT_SMS_AUTH_ENABLED: "false" }), false);
   assert.equal(participantSmsAuthFeatureConfigured({ VERCEL_ENV: "production", PARTICIPANT_SMS_AUTH_ENABLED: "true" }), false);
-  assert.equal(participantSmsAuthFeatureConfigured({ VERCEL_ENV: "preview", PARTICIPANT_SMS_AUTH_ENABLED: "true" }), true);
+  assert.equal(participantSmsAuthFeatureConfigured({ VERCEL_ENV: "preview", PARTICIPANT_SMS_AUTH_ENABLED: "true" }), false);
+  assert.equal(participantSmsAuthFeatureConfigured({
+    VERCEL_ENV: "preview", PARTICIPANT_SMS_AUTH_ENABLED: "true",
+    PARTICIPANT_SMS_CAPTCHA_REQUIRED: "true", PARTICIPANT_SMS_CAPTCHA_CONFIGURED: "true",
+    NEXT_PUBLIC_PARTICIPANT_SMS_TURNSTILE_SITE_KEY: "preview-site-key",
+    PARTICIPANT_PHONE_OTP_RATE_LIMIT_SECRET: "preview-rate-limit-secret-at-least-32-characters",
+  }), true);
   assert.equal(participantSmsProviderTestConfigured({ VERCEL_ENV: "preview", PARTICIPANT_SMS_PROVIDER_TEST_ENABLED: "true", PARTICIPANT_SMS_AUTH_ENABLED: "false" }), true);
   assert.equal(participantSmsProviderTestConfigured({ VERCEL_ENV: "production", PARTICIPANT_SMS_PROVIDER_TEST_ENABLED: "true", PARTICIPANT_SMS_AUTH_ENABLED: "false" }), false);
 });
@@ -131,7 +137,7 @@ test("Director API uses existing authorization, validates same-origin mutations,
   assert.doesNotMatch(route, /console\.(?:log|error)\([^\n]*phone/i);
 });
 
-test("Director UI manages masked eligibility while signed-out participant login remains email-only", async () => {
+test("Director UI retains ownership management while final participant login is SMS-first with email fallback", async () => {
   const panel = await source("app/admin/director/ParticipantIdentityFoundationPanel.js");
   const login = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   const request = await source("app/api/participant/auth/otp/request/route.js");
@@ -142,11 +148,13 @@ test("Director UI manages masked eligibility while signed-out participant login 
   assert.match(panel, /No SMS is sent/);
   assert.match(panel, /type="tel"/);
   assert.match(panel, /Email sign-in remains available/);
-  assert.doesNotMatch(login, /Text Me a Code|Mobile Number|type="tel"/);
-  assert.match(login, /Operation A · First-time enrollment/);
-  assert.match(login, /authenticated phone-change verification/);
+  assert.match(login, /Text Me a Code/);
+  assert.match(login, /Mobile Number/);
+  assert.match(login, /type="tel"/);
+  assert.match(login, /Use Email Instead/);
+  assert.doesNotMatch(login, /Operation A|Operation B|phone-change verification/);
   assert.match(request, /shouldCreateUser: false/);
-  assert.doesNotMatch(request, /phone|sms|twilio/i);
+  assert.doesNotMatch(request, /signInWithOtp\(\{[\s\S]{0,120}phone:|channel:\s*["']sms["']/i);
 });
 
 test("new dependency is server/domain-only and no Twilio runtime is added", async () => {

@@ -32,7 +32,9 @@ export default function PwaFoundation() {
     window.addEventListener("online", syncOnlineState);
     window.addEventListener("offline", syncOnlineState);
     setDismissed(window.localStorage.getItem("sbi-pwa-prompt-dismissed") === "true");
-    setShowGlobalInstall(window.location.pathname !== "/home");
+    // Authentication stays focused on sign-in; install guidance resumes on
+    // ordinary PWA routes where it cannot cover the primary auth action.
+    setShowGlobalInstall(!["/home", "/participant-auth"].includes(window.location.pathname));
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;

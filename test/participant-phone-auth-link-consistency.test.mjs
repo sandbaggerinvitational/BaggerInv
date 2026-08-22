@@ -65,6 +65,5 @@ test("8B.1B performs no Auth phone mutation, SMS, or provider integration", asyn
   const migration = await source(repairMigration);
   assert.doesNotMatch(migration, /^\s*(?:update\s+auth\.users|insert\s+into\s+auth\.users|delete\s+from\s+auth\.users)/im);
   assert.doesNotMatch(migration, /twilio|signInWithOtp|verifyOtp|sendSms|phone provider/i);
-  const login = await source("app/participant-auth/ParticipantAuthRehearsal.js");
-  assert.doesNotMatch(login, /Text Me a Code|Mobile Number|type="tel"/);
+  assert.doesNotMatch(migration, /Text Me a Code|Mobile Number|type="tel"/);
 });
