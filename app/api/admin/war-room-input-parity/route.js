@@ -36,6 +36,7 @@ function compactParityResult(result, limit = 100) {
       intentionalDifferences: result.parity.intentionalDifferences,
       counts: result.parity.counts,
       unexplainedCounts: result.parity.unexplainedCounts,
+      intentionalReasonCounts: result.parity.intentionalReasonCounts,
       returnedDifferences: differences.length,
       differences,
     },
