@@ -36,6 +36,7 @@ function compactParityResult(result, limit = 100) {
       intentionalDifferences: result.parity.intentionalDifferences,
       counts: result.parity.counts,
       unexplainedCounts: result.parity.unexplainedCounts,
+      intentionalReasonCounts: result.parity.intentionalReasonCounts,
       returnedDifferences: differences.length,
       differences,
     },
@@ -81,8 +82,12 @@ export async function GET(request) {
       const limitValue = clean(url.searchParams.get("limit"));
       const requestedLimit = limitValue ? Number(limitValue) : Number.NaN;
       const limit = Number.isInteger(requestedLimit) ? Math.min(250, Math.max(0, requestedLimit)) : 100;
+      const reportMode = compact && /^(1|true|yes)$/i.test(clean(url.searchParams.get("report")));
       return NextResponse.json({ ok: result.parity.pass, result: compact ? compactParityResult(result, limit) : result }, {
-        status: result.parity.pass ? 200 : 409,
+        // Compact report mode is a protected, read-only browser transport. Keep
+        // the parity result in `ok`/`result.parity.pass`, while allowing the
+        // report body to remain inspectable when the comparison finds diffs.
+        status: result.parity.pass || reportMode ? 200 : 409,
         headers: { "cache-control": "no-store" },
       });
     }

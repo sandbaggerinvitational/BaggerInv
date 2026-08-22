@@ -9,6 +9,7 @@ import { PREDICTION_SETTING_SPECS } from "../lib/prediction-settings-contract.js
 import {
   buildGooglePredictionInputBundle,
   buildWarRoomConsumerData,
+  classifyWarRoomInputDifference,
   legacyPredictionSheetsFromBundle,
   predictionBundleParityProjection,
   WAR_ROOM_INPUT_CONTRACT_VERSION,
@@ -146,6 +147,16 @@ test("normalized bundle projects the unchanged War Room consumer contract", () =
   assert.equal(predictionBundleParityProjection(bundle).metadata.source, undefined);
 });
 
+test("deployed parity classification is fail-closed and explains only certified domains", () => {
+  const sourceOnly = classifyWarRoomInputDifference({ classification: "VALUE", path: "bundle.courses[19].stableCourseId" });
+  assert.equal(sourceOnly.disposition, "INTENTIONAL_CANONICAL_DIFFERENCE");
+  assert.equal(sourceOnly.reason, "CERTIFIED_2023_COURSE_ALIAS");
+  const scorecard = classifyWarRoomInputDifference({ classification: "EVIDENCE", path: "bundle.scorecards[10].holes[2].gross" });
+  assert.equal(scorecard.reason, "CERTIFIED_SCORECARD_EVIDENCE_AND_CURRENT_YEAR_COVERAGE");
+  const unknown = classifyWarRoomInputDifference({ classification: "VALUE", path: "bundle.matches[0].lifecycle" });
+  assert.equal(unknown.disposition, "UNEXPLAINED");
+});
+
 test("all War Room routes use the shared boundary and no page calls the broad loader directly", () => {
   for (const file of [
     "app/war-room/page.js",
@@ -172,6 +183,8 @@ test("Supabase adapter has zero Google imports and the boundary never implements
   const diagnosticRoute = source("app/api/admin/war-room-input-parity/route.js");
   assert.match(diagnosticRoute, /authorizePreviewDirector/);
   assert.match(diagnosticRoute, /compactParityResult/);
+  assert.match(diagnosticRoute, /reportMode/);
+  assert.match(diagnosticRoute, /result\.parity\.pass \|\| reportMode \? 200 : 409/);
   assert.match(diagnosticRoute, /cache-control.*no-store/);
 });
 
