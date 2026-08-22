@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   assertSingleParticipantAuthPreflight,
+  classifyParticipantEmailOtpAuthError,
   isDummyParticipantIdentityEmail,
   participantAuthEmailHash,
   safeParticipantAuthCandidate,
@@ -42,6 +43,33 @@ test("single-player preflight rejects any dummy provisioning or ambiguous real i
     realIdentityCount: 2, dummyIdentityCount: 22, dummyAuthUsers: 0, dummyLinks: 0, candidate: { playerId: "P1", emailNormalized: "one@real.tld" } }), /Exactly one real/);
   assert.throws(() => assertSingleParticipantAuthPreflight({ approved: true, ready: true, activePlayers: 24,
     realIdentityCount: 1, dummyIdentityCount: 23, dummyAuthUsers: 1, dummyLinks: 0, candidate: { playerId: "P1", emailNormalized: "one@real.tld" } }), /Dummy identities/);
+});
+
+test("email OTP CAPTCHA failures have a distinct safe audit classification", async () => {
+  assert.deepEqual(classifyParticipantEmailOtpAuthError({
+    code: "captcha_failed",
+    status: 400,
+    message: "captcha protection: request disallowed (no captcha_token found)",
+  }), {
+    captchaRejected: true,
+    safeReason: "AUTH_CAPTCHA_REJECTED",
+    responseCategory: "REQUEST_CHECK_FAILED",
+    responseStatus: 400,
+  });
+  assert.deepEqual(classifyParticipantEmailOtpAuthError({
+    code: "unexpected_failure",
+    status: 500,
+    message: "SMTP provider rejected the request",
+  }), {
+    captchaRejected: false,
+    safeReason: "AUTH_EMAIL_PROVIDER_REJECTED",
+    responseCategory: "EMAIL_UNAVAILABLE",
+    responseStatus: 503,
+  });
+
+  const route = await source("app/api/participant/auth/otp/request/route.js");
+  assert.match(route, /safe_reason: authFailure\?\.safeReason \|\| "DELIVERY_ACCEPTED"/);
+  assert.doesNotMatch(route, /safe_reason: error \? "AUTH_EMAIL_PROVIDER_REJECTED"/);
 });
 
 test("Auth rehearsal requires Preview, isolated workbook, Passport authority, and complete config", () => {
