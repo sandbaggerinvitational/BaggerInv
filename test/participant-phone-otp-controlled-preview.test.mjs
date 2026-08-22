@@ -37,6 +37,7 @@ const pendingTransitionMigrationPath = "supabase/migrations/202608210008_preview
 const latestCompromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_5_cancel_compromised_pending_transition.sql";
 const controlledLoginMigrationPath = "supabase/migrations/202608210010_preview_controlled_phone_login_proof.sql";
 const signedOutSurfaceMigrationPath = "supabase/migrations/202608210011_preview_signed_out_phone_login_surface.sql";
+const performanceDiagnosticsMigrationPath = "supabase/migrations/202608210013_preview_phone_login_performance_diagnostics.sql";
 const authId = "11111111-1111-4111-8111-111111111111";
 const authB = "22222222-2222-4222-8222-222222222222";
 const phone = "+12025550123";
@@ -191,8 +192,8 @@ test("Operation B route is signed-out, one-proof scoped, and never accepts a cli
   assert.match(route, /phone: allowed\.phoneE164/);
   assert.doesNotMatch(route, /input\.(?:phone|phoneE164|playerId|authUserId|tournamentId|identifierId)/);
   assert.doesNotMatch(route, /auth\.admin\.(?:createUser|updateUserById)/);
-  assert.match(route, /readParticipantIdentityContextForAuth\(\{ authUserId: verified\.userId \}\)/);
-  assert.match(route, /authClient\.auth\.getUser\(\)/);
+  assert.doesNotMatch(route, /authClient\.auth\.getUser\(\)/);
+  assert.doesNotMatch(route, /readParticipantIdentityContextForAuth\(\{ authUserId: verified\.userId \}\)/);
   assert.match(route, /director_entitlement_fingerprint: proof\.directorEntitlementFingerprint/);
   assert.match(route, /directorEntitlementFingerprint: authorization\.directorEntitlementFingerprint/);
   assert.match(route, /authorizeControlledParticipantPhoneLoginSurface\(\)/);
@@ -316,14 +317,17 @@ test("wrong returned UUID is locally terminated and cannot complete Passport or 
   assert.match(route, /!verified\.ok[\s\S]*signOut\(\{ scope: "local" \}\)/);
   assert.match(route, /PHONE_OTP_AUTH_MISMATCH/);
   assert.match(migration, /returned_auth_user <> expected_auth_user[\s\S]*status = 'UUID_MISMATCH'/);
-  assert.ok(route.lastIndexOf("completeParticipantPhoneLogin") > route.lastIndexOf("readParticipantIdentityContextForAuth"));
+  assert.ok(route.lastIndexOf("completeParticipantPhoneLogin") > route.lastIndexOf("verifyExistingParticipantPhoneLogin"));
 });
 
 test("successful login preserves ownership/scoring and establishes a refreshable CB01 session", async () => {
   const route = await source("app/api/participant/auth/phone-login-proof/route.js");
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   const migration = await source(controlledLoginMigrationPath);
-  assert.match(ui, /sessionPayload\.session !== "active"/);
+  assert.doesNotMatch(ui, /sessionResponse|sessionPayload/);
+  assert.match(ui, /payload\.session !== "active"/);
+  assert.match(ui, /payload\.sameAuthUser !== true/);
+  assert.match(ui, /payload\.playerPassportResolved !== true/);
   assert.match(route, /participantSessionEstablished/);
   assert.match(route, /refreshSessionAvailable/);
   assert.match(route, /playerPassportResolved: true/);
@@ -338,6 +342,47 @@ test("successful login preserves ownership/scoring and establishes a refreshable
   assert.doesNotMatch(migration, /update\s+scoring_authority\.scoring_permissions/i);
   assert.doesNotMatch(migration, /(?:insert\s+into|update|delete\s+from)\s+participant_identity\.preview_director_entitlements/i);
   assert.doesNotMatch(migration, /insert\s+into\s+auth\.users|update\s+auth\.users|delete\s+from\s+auth\.users/i);
+});
+
+test("successful email and phone verification navigate immediately to Home without duplicate auth reads", async () => {
+  const [ui, route, diagnostics, home, emailVerify] = await Promise.all([
+    source("app/participant-auth/ParticipantAuthRehearsal.js"),
+    source("app/api/participant/auth/phone-login-proof/route.js"),
+    source("app/ParticipantAuthDiagnostics.js"),
+    source("app/ParticipantSupabaseHome.js"),
+    source("app/api/participant/auth/otp/verify/route.js"),
+  ]);
+  const phoneVerifyUi = ui.slice(ui.indexOf("const verifyPhoneLoginCode"), ui.indexOf("return <main"));
+  const phoneVerifyRoute = route.slice(route.indexOf('if (action !== "verify")'));
+  assert.match(ui, /return [^;]*\? requestedNext : "\/home"/);
+  assert.match(ui, /router\.replace\(next\)/);
+  assert.match(ui, /rememberParticipantAuthNavigation\(location\.pathname, next, "EMAIL_OTP"\)/);
+  assert.match(phoneVerifyUi, /rememberParticipantAuthNavigation\(location\.pathname, next, "PHONE_OTP"\)/);
+  assert.match(phoneVerifyUi, /setAuthTransition\(\{ method: "phone"/);
+  assert.doesNotMatch(phoneVerifyUi, /fetch\("\/api\/participant\/auth\/session"/);
+  assert.doesNotMatch(phoneVerifyRoute, /auth\.getUser\(|readParticipantIdentityContextForAuth/);
+  assert.match(phoneVerifyRoute, /completeParticipantPhoneLogin/);
+  assert.match(phoneVerifyRoute, /completion\.playerId !== proof\.playerId/);
+  assert.match(phoneVerifyRoute, /completion\.directorEntitlementPreserved !== true/);
+  assert.match(phoneVerifyRoute, /completion\.scoringAuthorizationUnchanged !== true/);
+  assert.match(phoneVerifyRoute, /Server-Timing/);
+  assert.match(emailVerify, /Server-Timing/);
+  assert.doesNotMatch(diagnostics, /fetch\("\/api\/participant\/auth\/session"/);
+  assert.match(home, /HOME_SHELL_RENDER/);
+});
+
+test("performance diagnostics retain bounded login-to-Home stages without PII", async () => {
+  const [migration, client] = await Promise.all([
+    source(performanceDiagnosticsMigrationPath),
+    source("lib/participant-auth-client-diagnostics.js"),
+  ]);
+  for (const event of ["EMAIL_OTP_VERIFY_RESPONSE", "PHONE_OTP_VERIFY_RESPONSE", "AUTH_SESSION_ESTABLISHED",
+    "LOGIN_REDIRECT_INITIATED", "ROUTE_NAVIGATION", "HOME_SHELL_RENDER", "HOME_PRIMARY_USABLE",
+    "HOME_SECONDARY_COMPLETE"]) assert.match(migration, new RegExp(`'${event}'`));
+  assert.match(client, /navigationType/);
+  assert.match(client, /pending\.navigationType/);
+  assert.match(migration, /revoke all on function public\.record_single_participant_auth_client_diagnostics/);
+  assert.doesNotMatch(migration, /normalized_value|sample->>'(?:phone|email|token)'|access_token|refresh_token/i);
 });
 
 test("controlled UI has no arbitrary phone input, restores pending proof, and retains email fallback", async () => {

@@ -21,4 +21,7 @@
 .operationBoundary strong { color: #0b4435; }
 .operationBoundary span { color: #56625c; font-size: .82rem; line-height: 1.45; }
 .message { padding: 12px 14px; border-radius: 12px; background: #f5f0e6; color: #172019 !important; font-weight: 700; }
+.authTransition { display: grid; gap: 8px; margin: 22px 0; padding: 22px; border: 1px solid #c8ddcf; border-radius: 16px; background: #eff8f1; color: #0b4435; }
+.authTransition strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.4rem; }
+.authTransition span:last-child { color: #56625c; }
 .card small { display: block; margin-top: 18px; color: #7b827e; }

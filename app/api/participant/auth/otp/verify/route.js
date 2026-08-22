@@ -28,16 +28,18 @@ export async function POST(request) {
   });
   const started = performance.now();
   const { data, error } = await client.auth.verifyOtp({ email, token, type: "email" });
+  const verifyOtpMs = Math.round(performance.now() - started);
   const matches = !error && data?.user?.id === allowed.payload.authUserId;
   await recordSingleParticipantOtpVerification({ request_id: requestId, auth_user_id: data?.user?.id || null,
-    succeeded: matches, duration_ms: Math.round(performance.now() - started) });
+    succeeded: matches, duration_ms: verifyOtpMs });
   if (!matches) {
     if (data?.session) await client.auth.signOut({ scope: "local" });
     return NextResponse.json({ error: "That code is invalid or expired." }, { status: 400, headers: { "Cache-Control": "private, no-store" } });
   }
+  const totalMs = Math.round(performance.now() - started);
   const response = NextResponse.json({ ok: true, session: "active", linkedPlayerId: allowed.payload.playerId,
-    sessionEstablishedAt: new Date().toISOString() },
-    { headers: { "Cache-Control": "private, no-store" } });
+    sessionEstablishedAt: new Date().toISOString(), timings: { verifyOtpMs, totalMs } },
+    { headers: { "Cache-Control": "private, no-store", "Server-Timing": `verifyOtp;dur=${verifyOtpMs}, total;dur=${totalMs}` } });
   pendingCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
   return response;
 }

@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./participant-auth.module.css";
-import { clearParticipantAuthClientState, enableParticipantAuthDiagnostics, flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../../lib/participant-auth-client-diagnostics.js";
+import { clearParticipantAuthClientState, enableParticipantAuthDiagnostics, flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic, rememberParticipantAuthNavigation } from "../../lib/participant-auth-client-diagnostics.js";
+
+function participantDestination(searchParams) {
+  const requestedNext = String(searchParams.get("next") || "");
+  return /^\/(?:home|my-match|score|live|me)(?:[/?#]|$)/.test(requestedNext) ? requestedNext : "/home";
+}
 
 export default function ParticipantAuthRehearsal() {
   const router = useRouter();
@@ -21,6 +26,7 @@ export default function ParticipantAuthRehearsal() {
   const [session, setSession] = useState(null);
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
+  const [authTransition, setAuthTransition] = useState(null);
   const restorePhoneEnrollmentState = async () => {
     const response = await fetch("/api/participant/auth/phone-enrollment", { cache: "no-store", credentials: "same-origin" });
     const phoneState = await response.json();
@@ -39,6 +45,7 @@ export default function ParticipantAuthRehearsal() {
   };
   useEffect(() => {
     enableParticipantAuthDiagnostics();
+    router.prefetch("/home");
     recordParticipantAuthDiagnostic("AUTH_PAGE_LOADED", { routeTo: location.pathname });
     const started = performance.now();
     fetch("/api/participant/auth/session", { cache: "no-store", credentials: "same-origin" })
@@ -61,7 +68,7 @@ export default function ParticipantAuthRehearsal() {
         }
       })
       .catch(() => setSession({ session: "unavailable" }));
-  }, []);
+  }, [router]);
   useEffect(() => {
     if (resendSeconds <= 0) return undefined;
     const timer = window.setTimeout(() => setResendSeconds((seconds) => Math.max(0, seconds - 1)), 1000);
@@ -87,6 +94,7 @@ export default function ParticipantAuthRehearsal() {
   };
   const verifyCode = async (event) => {
     event.preventDefault(); setBusy("verify"); setMessage("");
+    let navigating = false;
     try {
       const started = performance.now();
       const response = await fetch("/api/participant/auth/otp/verify", { method: "POST", credentials: "same-origin",
@@ -95,15 +103,19 @@ export default function ParticipantAuthRehearsal() {
       if (!response.ok) throw new Error(payload.error || "That code is invalid or expired.");
       const duration = Math.round(performance.now() - started);
       recordParticipantAuthDiagnostic("OTP_VERIFICATION", { durationMs: duration, routeTo: location.pathname });
+      recordParticipantAuthDiagnostic("EMAIL_OTP_VERIFY_RESPONSE", { durationMs: duration, routeTo: location.pathname, navigationType: "EMAIL_OTP" });
+      if (payload.session !== "active" || !payload.linkedPlayerId) throw new Error("The participant session could not be established safely.");
       setSession({ session: "active", linkedPlayerId: payload.linkedPlayerId, otpVerificationMs: duration });
-      restorePhoneEnrollmentState().catch(() => null);
-      flushParticipantAuthDiagnostics().catch(() => null);
-      setMessage("Participant session established.");
-      const requestedNext = String(searchParams.get("next") || "");
-      const next = /^\/(?:home|my-match|score|live|me)(?:[/?#]|$)/.test(requestedNext) ? requestedNext : "";
-      if (next) router.replace(next);
+      recordParticipantAuthDiagnostic("AUTH_SESSION_ESTABLISHED", { durationMs: duration, routeTo: location.pathname, navigationType: "EMAIL_OTP" });
+      const next = participantDestination(searchParams);
+      setAuthTransition({ method: "email", linkedPlayerId: payload.linkedPlayerId });
+      setMessage("Signed in. Opening Home…");
+      rememberParticipantAuthNavigation(location.pathname, next, "EMAIL_OTP");
+      recordParticipantAuthDiagnostic("LOGIN_REDIRECT_INITIATED", { durationMs: performance.now() - started, routeFrom: location.pathname, routeTo: next, navigationType: "EMAIL_OTP" });
+      navigating = true;
+      router.replace(next);
     } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
+    finally { if (!navigating) setBusy(""); }
   };
   const logout = async () => {
     setBusy("logout");
@@ -154,30 +166,46 @@ export default function ParticipantAuthRehearsal() {
   };
   const verifyPhoneLoginCode = async (event) => {
     event.preventDefault(); setBusy("phone-login-verify"); setMessage("");
+    let navigating = false;
     try {
+      const started = performance.now();
       const response = await fetch("/api/participant/auth/phone-login-proof", { method: "POST", credentials: "same-origin",
         headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "verify", attemptId: phoneLogin?.attemptId, token: phoneLoginToken }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "That phone sign-in code is invalid or expired.");
-      const sessionResponse = await fetch("/api/participant/auth/session", { cache: "no-store", credentials: "same-origin" });
-      const sessionPayload = await sessionResponse.json();
-      if (sessionPayload.session !== "active" || sessionPayload.linkedPlayerId !== payload.linkedPlayerId) {
+      const duration = Math.round(performance.now() - started);
+      recordParticipantAuthDiagnostic("PHONE_OTP_VERIFY_RESPONSE", { durationMs: duration, routeTo: location.pathname, navigationType: "PHONE_OTP" });
+      if (payload.session !== "active" || payload.sameAuthUser !== true || payload.participantSessionEstablished !== true ||
+          payload.refreshSessionAvailable !== true || payload.playerPassportResolved !== true || !payload.linkedPlayerId ||
+          payload.scoringAuthorizationUnchanged !== true || payload.phoneIdentifierUnchanged !== true ||
+          payload.directorEntitlementPreserved !== true || Number(payload.newDirectorEntitlements || 0) !== 0 ||
+          payload.directorPrivilegeEscalation === true || payload.authMethodChangesDirectorAuthorization === true) {
         throw new Error("The phone was verified, but the participant session could not be restored safely.");
       }
-      setSession(sessionPayload); setPhoneLoginToken("");
+      recordParticipantAuthDiagnostic("AUTH_SESSION_ESTABLISHED", { durationMs: duration, routeTo: location.pathname, navigationType: "PHONE_OTP" });
+      setSession({ session: "active", linkedPlayerId: payload.linkedPlayerId }); setPhoneLoginToken("");
       setPhoneLogin({ attemptId: "", status: "VERIFIED", maskedMobile: phoneLogin?.maskedMobile });
       setPhoneEnrollment({ attemptId: "", status: "VERIFIED" });
-      flushParticipantAuthDiagnostics().catch(() => null);
-      setMessage(payload.message || "Phone sign-in verified on the existing Auth user.");
+      const next = participantDestination(searchParams);
+      setAuthTransition({ method: "phone", linkedPlayerId: payload.linkedPlayerId });
+      setMessage("Signed in with the verified mobile. Opening Home…");
+      rememberParticipantAuthNavigation(location.pathname, next, "PHONE_OTP");
+      recordParticipantAuthDiagnostic("LOGIN_REDIRECT_INITIATED", { durationMs: performance.now() - started, routeFrom: location.pathname, routeTo: next, navigationType: "PHONE_OTP" });
+      navigating = true;
+      router.replace(next);
     } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
+    finally { if (!navigating) setBusy(""); }
   };
   return <main className={styles.page}>
     <section className={styles.card}>
       <span className={styles.eyebrow}>Preview only · Secure participant access</span>
       <h1>Participant sign-in</h1>
       <p>Use your approved tournament email to request a secure sign-in code. Scoring authorization remains match-specific and server enforced.</p>
-      {session?.session === "active" ? <>
+      {authTransition ? <div className={styles.authTransition} role="status" aria-live="polite">
+        <span className={styles.eyebrow}>Session established</span>
+        <strong>Signed in</strong>
+        <span>Opening Home for Player {authTransition.linkedPlayerId}…</span>
+      </div> : session?.session === "active" ? <>
         <div className={styles.session}><strong>Supabase email session active</strong><span>Linked Player ID: {session.linkedPlayerId}</span><button onClick={logout} disabled={Boolean(busy)}>Log out of Preview Auth</button></div>
         <section className={styles.phoneEnrollment} aria-labelledby="phone-enrollment-title">
           <span className={styles.eyebrow}>Operation A · First-time enrollment</span>

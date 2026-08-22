@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { participantDestination, participantIdlePrefetchRoutes, participantNavigationRoute } from "../lib/participant-shell";
 import { isRecoverablePreviewImpersonationCode } from "../lib/participant-impersonation-recovery.js";
+import { readFreshPlayerPassportSession } from "../lib/participant-session-client.js";
 import styles from "./participant-navigation.module.css";
 
 const PARTICIPANT_SHELL_KEY = "sbi-participant-shell";
@@ -46,11 +47,11 @@ export default function ParticipantIdentity() {
 
   const refresh = useCallback(() => {
     const sequence = ++requestSequence.current;
-    fetch("/api/player-passport/session", { cache: "no-store" })
-      .then(async (response) => {
+    readFreshPlayerPassportSession()
+      .then((response) => {
         if (sequence !== requestSequence.current) return;
         if (response.ok) {
-          const payload = await response.json();
+          const payload = response.payload;
           const nextPlayer = payload.player;
           if (sequence !== requestSequence.current) return;
           setPlayer(nextPlayer);
@@ -60,7 +61,7 @@ export default function ParticipantIdentity() {
           else window.localStorage.removeItem(PREVIEW_SESSION_KEY);
           return;
         }
-        const failure = await response.json().catch(() => ({}));
+        const failure = response.payload || {};
         if ([401, 403].includes(response.status) && sequence === requestSequence.current) {
           setPlayer(null);
           setImpersonation(null);

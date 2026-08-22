@@ -103,6 +103,7 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
   }, [hydrateNetSkins, initial, router]);
 
   useEffect(() => {
+    recordParticipantAuthDiagnostic("HOME_SHELL_RENDER", { routeTo: "/home", durationMs: 0 });
     if (initial) {
       recordParticipantAuthDiagnostic("HOME_CACHED_SHELL", { routeTo: "/home", durationMs: 0 });
       recordParticipantAuthDiagnostic("HOME_IDENTITY_VISIBLE", { routeTo: "/home", durationMs: 0 });

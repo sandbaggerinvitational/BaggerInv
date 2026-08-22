@@ -95,13 +95,14 @@ test("My Match remains the assignment summary and Game Center remains one-match 
 });
 
 test("navigation polish is request-neutral and does not reopen authoritative systems", async () => {
-  const [menu, tournament, leaderboards, profile, migrations] = await Promise.all([
+  const [menu, tournament, leaderboards, profile, migrations, participantSession] = await Promise.all([
     source("app/Menu.js"), source("app/live/TournamentDashboard.js"),
     source("app/live/LeaderboardsDashboard.js"), source("app/me/ParticipantProfile.js"),
-    source("package.json"),
+    source("package.json"), source("lib/participant-session-client.js"),
   ]);
   assert.equal((menu.match(/fetch\("\/api\/director\/access"/g) || []).length, 1);
-  assert.equal((menu.match(/fetch\("\/api\/player-passport\/session"/g) || []).length, 1);
+  assert.equal((menu.match(/readFreshPlayerPassportSession\(\)/g) || []).length, 1);
+  assert.equal((participantSession.match(/fetch\("\/api\/player-passport\/session"/g) || []).length, 1);
   assert.match(tournament, /fetch\(secondaryReadUrl \+ "\?module=calcutta"/);
   assert.doesNotMatch(leaderboards, /leaderboards\/calcutta|calcuttaReadUrl/);
   assert.doesNotMatch([menu, tournament, leaderboards, profile].join("\n"), /googleapis|Google Sheets|script\.google/);
