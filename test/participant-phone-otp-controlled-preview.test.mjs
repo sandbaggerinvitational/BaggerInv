@@ -36,6 +36,8 @@ const compromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_4_ca
 const pendingTransitionMigrationPath = "supabase/migrations/202608210008_preview_phone_enrollment_pending_transition.sql";
 const latestCompromisedRepairPath = "supabase/preview_repairs/20260821_step_8b_2a_5_cancel_compromised_pending_transition.sql";
 const controlledLoginMigrationPath = "supabase/migrations/202608210010_preview_controlled_phone_login_proof.sql";
+const signedOutSurfaceMigrationPath = "supabase/migrations/202608210011_preview_signed_out_phone_login_surface.sql";
+const performanceDiagnosticsMigrationPath = "supabase/migrations/202608210013_preview_phone_login_performance_diagnostics.sql";
 const authId = "11111111-1111-4111-8111-111111111111";
 const authB = "22222222-2222-4222-8222-222222222222";
 const phone = "+12025550123";
@@ -190,10 +192,34 @@ test("Operation B route is signed-out, one-proof scoped, and never accepts a cli
   assert.match(route, /phone: allowed\.phoneE164/);
   assert.doesNotMatch(route, /input\.(?:phone|phoneE164|playerId|authUserId|tournamentId|identifierId)/);
   assert.doesNotMatch(route, /auth\.admin\.(?:createUser|updateUserById)/);
-  assert.match(route, /readParticipantIdentityContextForAuth\(\{ authUserId: verified\.userId \}\)/);
-  assert.match(route, /authClient\.auth\.getUser\(\)/);
+  assert.doesNotMatch(route, /authClient\.auth\.getUser\(\)/);
+  assert.doesNotMatch(route, /readParticipantIdentityContextForAuth\(\{ authUserId: verified\.userId \}\)/);
   assert.match(route, /director_entitlement_fingerprint: proof\.directorEntitlementFingerprint/);
   assert.match(route, /directorEntitlementFingerprint: authorization\.directorEntitlementFingerprint/);
+  assert.match(route, /authorizeControlledParticipantPhoneLoginSurface\(\)/);
+  assert.match(route, /action !== "request"/);
+  assert.match(route, /controlledPhoneLoginAvailable: true/);
+});
+
+test("fully signed-out controlled surface resolves exactly one VERIFIED rehearsal identity server-side", async () => {
+  const [migration, route, client] = await Promise.all([
+    source(signedOutSurfaceMigrationPath),
+    source("app/api/participant/auth/phone-login-proof/route.js"),
+    source("lib/participant-identity-supabase.js"),
+  ]);
+  assert.match(client, /authorize_controlled_participant_phone_login_surface/);
+  assert.match(migration, /authorize_controlled_participant_phone_login_surface\(\)/);
+  assert.match(migration, /designated_count <> 1/);
+  assert.match(migration, /identifier\.identifier_type = 'PHONE'/);
+  assert.match(migration, /identifier\.status = 'VERIFIED'/);
+  assert.match(migration, /SUPABASE_AUTH_TWILIO_VERIFY/);
+  assert.match(migration, /rehearsal\.status = 'PREPARED'/);
+  assert.match(migration, /rehearsal\.shadow_enabled/);
+  assert.match(migration, /authorize_participant_phone_login_proof\(jsonb_build_object/);
+  assert.match(migration, /revoke all on function public\.authorize_controlled_participant_phone_login_surface\(\) from public, anon, authenticated/);
+  assert.match(migration, /grant execute on function public\.authorize_controlled_participant_phone_login_surface\(\) to service_role/);
+  assert.doesNotMatch(route, /input\.(?:phone|phoneE164|playerId|authUserId|tournamentId|identifierId)/);
+  assert.ok(route.indexOf("authorizeControlledParticipantPhoneLoginSurface") < route.indexOf("requestExistingParticipantPhoneLogin"));
 });
 
 test("controlled phone-login migration snapshots VERIFIED A ownership and exact Director entitlement parity", async () => {
@@ -291,14 +317,17 @@ test("wrong returned UUID is locally terminated and cannot complete Passport or 
   assert.match(route, /!verified\.ok[\s\S]*signOut\(\{ scope: "local" \}\)/);
   assert.match(route, /PHONE_OTP_AUTH_MISMATCH/);
   assert.match(migration, /returned_auth_user <> expected_auth_user[\s\S]*status = 'UUID_MISMATCH'/);
-  assert.ok(route.lastIndexOf("completeParticipantPhoneLogin") > route.lastIndexOf("readParticipantIdentityContextForAuth"));
+  assert.ok(route.lastIndexOf("completeParticipantPhoneLogin") > route.lastIndexOf("verifyExistingParticipantPhoneLogin"));
 });
 
 test("successful login preserves ownership/scoring and establishes a refreshable CB01 session", async () => {
   const route = await source("app/api/participant/auth/phone-login-proof/route.js");
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   const migration = await source(controlledLoginMigrationPath);
-  assert.match(ui, /sessionPayload\.session !== "active"/);
+  assert.doesNotMatch(ui, /sessionResponse|sessionPayload/);
+  assert.match(ui, /payload\.session !== "active"/);
+  assert.match(ui, /payload\.sameAuthUser !== true/);
+  assert.match(ui, /payload\.playerPassportResolved !== true/);
   assert.match(route, /participantSessionEstablished/);
   assert.match(route, /refreshSessionAvailable/);
   assert.match(route, /playerPassportResolved: true/);
@@ -315,16 +344,61 @@ test("successful login preserves ownership/scoring and establishes a refreshable
   assert.doesNotMatch(migration, /insert\s+into\s+auth\.users|update\s+auth\.users|delete\s+from\s+auth\.users/i);
 });
 
+test("successful email and phone verification navigate immediately to Home without duplicate auth reads", async () => {
+  const [ui, route, diagnostics, home, emailVerify] = await Promise.all([
+    source("app/participant-auth/ParticipantAuthRehearsal.js"),
+    source("app/api/participant/auth/phone-login-proof/route.js"),
+    source("app/ParticipantAuthDiagnostics.js"),
+    source("app/ParticipantSupabaseHome.js"),
+    source("app/api/participant/auth/otp/verify/route.js"),
+  ]);
+  const phoneVerifyUi = ui.slice(ui.indexOf("const verifyPhoneLoginCode"), ui.indexOf("return <main"));
+  const phoneVerifyRoute = route.slice(route.indexOf('if (action !== "verify")'));
+  assert.match(ui, /return [^;]*\? requestedNext : "\/home"/);
+  assert.match(ui, /router\.replace\(next\)/);
+  assert.match(ui, /rememberParticipantAuthNavigation\(location\.pathname, next, "EMAIL_OTP"\)/);
+  assert.match(phoneVerifyUi, /rememberParticipantAuthNavigation\(location\.pathname, next, "PHONE_OTP"\)/);
+  assert.match(phoneVerifyUi, /setAuthTransition\(\{ method: "phone"/);
+  assert.doesNotMatch(phoneVerifyUi, /fetch\("\/api\/participant\/auth\/session"/);
+  assert.doesNotMatch(phoneVerifyRoute, /auth\.getUser\(|readParticipantIdentityContextForAuth/);
+  assert.match(phoneVerifyRoute, /completeParticipantPhoneLogin/);
+  assert.match(phoneVerifyRoute, /completion\.playerId !== proof\.playerId/);
+  assert.match(phoneVerifyRoute, /completion\.directorEntitlementPreserved !== true/);
+  assert.match(phoneVerifyRoute, /completion\.scoringAuthorizationUnchanged !== true/);
+  assert.match(phoneVerifyRoute, /Server-Timing/);
+  assert.match(emailVerify, /Server-Timing/);
+  assert.doesNotMatch(diagnostics, /fetch\("\/api\/participant\/auth\/session"/);
+  assert.match(home, /HOME_SHELL_RENDER/);
+});
+
+test("performance diagnostics retain bounded login-to-Home stages without PII", async () => {
+  const [migration, client] = await Promise.all([
+    source(performanceDiagnosticsMigrationPath),
+    source("lib/participant-auth-client-diagnostics.js"),
+  ]);
+  for (const event of ["EMAIL_OTP_VERIFY_RESPONSE", "PHONE_OTP_VERIFY_RESPONSE", "AUTH_SESSION_ESTABLISHED",
+    "LOGIN_REDIRECT_INITIATED", "ROUTE_NAVIGATION", "HOME_SHELL_RENDER", "HOME_PRIMARY_USABLE",
+    "HOME_SECONDARY_COMPLETE"]) assert.match(migration, new RegExp(`'${event}'`));
+  assert.match(client, /navigationType/);
+  assert.match(client, /pending\.navigationType/);
+  assert.match(migration, /revoke all on function public\.record_single_participant_auth_client_diagnostics/);
+  assert.doesNotMatch(migration, /normalized_value|sample->>'(?:phone|email|token)'|access_token|refresh_token/i);
+});
+
 test("controlled UI has no arbitrary phone input, restores pending proof, and retains email fallback", async () => {
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   assert.match(ui, /Operation B · Controlled Preview proof/);
-  assert.match(ui, /Text the approved mobile a code/);
+  assert.match(ui, /Controlled Preview test/);
+  assert.match(ui, /Sign in with verified mobile/);
+  assert.match(ui, /Text me a code/);
+  assert.match(ui, /controlledPhoneLoginAvailable === true/);
+  assert.match(ui, /setPhoneLogin\(\{ attemptId: "", status: "READY" \}\)/);
   assert.match(ui, /autoComplete="one-time-code"/);
   assert.match(ui, /phone-login-proof/);
-  assert.match(ui, /sessionPayload\.session !== "inactive"/);
   assert.match(ui, /Email fallback remains available below/);
   assert.match(ui, /CAPTCHA and the ordinary public SMS login UI remain deferred to Step 8B\.3/);
   assert.doesNotMatch(ui, /type="tel"|name="phone"|placeholder="\+1/);
+  assert.doesNotMatch(ui, /preparePhoneLoginProof|phone-login-arm/);
 });
 
 test("Operation B functions are service-role only and automated coverage contains no provider credentials or OTP storage", async () => {

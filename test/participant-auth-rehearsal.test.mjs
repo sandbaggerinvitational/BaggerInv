@@ -151,7 +151,8 @@ test("SSR session, logout, shadow comparison, and participant context stay Passp
   assert.match(shadow, /recordParticipantIdentityShadowObservation/);
   assert.match(shadow, /passport_context_revision/);
   assert.match(shadow, /linked_context_revision/);
-  assert.match(diagnostics, /fetch\("\/api\/participant\/auth\/session"/);
+  assert.doesNotMatch(diagnostics, /fetch\("\/api\/participant\/auth\/session"/);
+  assert.match(page, /fetch\("\/api\/participant\/auth\/session"/);
   assert.match(context, /identityAuthority: "passport"/);
   assert.match(context, /Participant Auth shadow comparison unavailable/);
   assert.match(page, /clearParticipantAuthClientState/);

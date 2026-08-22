@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { readFreshPlayerPassportSession } from "../lib/participant-session-client.js";
 import { formatTournamentEdition } from "../lib/tournament-branding";
 import Sheet from "./ui/Sheet";
 
@@ -86,8 +87,8 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
     const active = window.__sbiTournamentIdentity;
     if (active) applyTournament(active);
     Promise.all([
-      fetch("/api/player-passport/session", { cache: "no-store" })
-        .then(async (response) => response.ok ? await response.json() : null)
+      readFreshPlayerPassportSession()
+        .then((response) => response.ok ? response.payload : null)
         .catch(() => null),
       readDirectorAccess(),
     ]).then(([session, directorAccess]) => {
