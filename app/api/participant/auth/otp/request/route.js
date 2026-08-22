@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../../../lib/participant-identity-authority.js";
-import { participantAuthClientRequestHash, participantAuthGenericMessage } from "../../../../../../lib/participant-auth-rehearsal.js";
+import { classifyParticipantEmailOtpAuthError, participantAuthClientRequestHash, participantAuthGenericMessage } from "../../../../../../lib/participant-auth-rehearsal.js";
 import { authorizeSingleParticipantOtpRequest, recordSingleParticipantOtpDelivery } from "../../../../../../lib/participant-identity-supabase.js";
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
 import { normalizeParticipantAuthCaptchaToken } from "../../../../../../lib/participant-phone-otp.js";
@@ -43,15 +43,15 @@ export async function POST(request) {
     email: decision.email,
     options: { shouldCreateUser: false, ...(captchaToken ? { captchaToken } : {}) },
   });
+  const authFailure = error ? classifyParticipantEmailOtpAuthError(error) : null;
   await recordSingleParticipantOtpDelivery({ request_id: decision.requestId, succeeded: !error,
-    safe_reason: error ? "AUTH_EMAIL_PROVIDER_REJECTED" : "DELIVERY_ACCEPTED", duration_ms: Math.round(performance.now() - started) });
+    safe_reason: authFailure?.safeReason || "DELIVERY_ACCEPTED", duration_ms: Math.round(performance.now() - started) });
   if (error) {
-    const captchaRejected = String(error.code || "").toLowerCase().includes("captcha") || String(error.message || "").toLowerCase().includes("captcha");
     return json({
-      message: captchaRejected ? "We couldn't verify this request. Try again." : "Email sign-in is temporarily unavailable. Try again shortly.",
-      category: captchaRejected ? "REQUEST_CHECK_FAILED" : "EMAIL_UNAVAILABLE",
+      message: authFailure.captchaRejected ? "We couldn't verify this request. Try again." : "Email sign-in is temporarily unavailable. Try again shortly.",
+      category: authFailure.responseCategory,
       step: "email",
-    }, captchaRejected ? 400 : 503);
+    }, authFailure.responseStatus);
   }
   return json({ message: participantAuthGenericMessage(), step: "code", requestId: decision.requestId });
 }
