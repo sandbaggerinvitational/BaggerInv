@@ -105,6 +105,12 @@ test("legacy Google Guide transport remains outside the normal participant path"
   assert.match(resolver, /readTournamentLiveView\(source\.tournamentId\)/);
   assert.doesNotMatch(resolver, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
   assert.match(legacy, /getTournamentData|refreshHistoricalData/);
-  assert.match(courses, /archive\s*\?\s*await import\("\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
-  assert.match(courseDetail, /archive\s*\?\s*await import\("\.\.\/\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
+  assert.match(courses, /requireHistoricalCourseReadSource\(process\.env\)/);
+  assert.match(courses, /archiveSource\.resolved === "supabase"/);
+  assert.match(courses, /import\("\.\.\/\.\.\/lib\/historical-course-service"\)/);
+  assert.match(courses, /import\("\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
+  assert.match(courseDetail, /requireHistoricalCourseReadSource\(process\.env\)/);
+  assert.match(courseDetail, /source\.resolved === "supabase"/);
+  assert.match(courseDetail, /import\("\.\.\/\.\.\/\.\.\/lib\/historical-course-service"\)/);
+  assert.match(courseDetail, /import\("\.\.\/\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);
 });

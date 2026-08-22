@@ -13,6 +13,7 @@ import styles from "../historical.module.css";
 import guideStyles from "../tournament-guide/tournament-guide.module.css";
 import courseStyles from "./course-directory.module.css";
 import { pageMetadata } from "../../lib/seo";
+import { requireHistoricalCourseReadSource } from "../../lib/historical-course-read-source";
 
 export const metadata = pageMetadata({
   title: "Courses | The Sandbagger Invitational",
@@ -24,9 +25,12 @@ const formatName = (value) => ({ BB: "2v2 Best Ball", SC: "Scramble", SI: "Singl
 
 export default async function CoursesPage({ searchParams }) {
   const archive = String((await searchParams)?.view || "") === "archive";
-  const content = archive
-    ? await import("../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleTournamentGuideContent())
-    : await resolveTournamentGuideContent({ surface: "course" });
+  const archiveSource = archive ? requireHistoricalCourseReadSource(process.env) : null;
+  const content = !archive
+    ? await resolveTournamentGuideContent({ surface: "course" })
+    : archiveSource.resolved === "supabase"
+      ? await import("../../lib/historical-course-service").then((module) => module.loadHistoricalCourseArchive())
+      : await import("../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleTournamentGuideContent());
   const { tournament } = content;
   const courses = archive ? [] : currentTournamentCourses(content.courses);
   const historicalArchive = archive ? buildHistoricalCourseArchive({
@@ -36,7 +40,7 @@ export default async function CoursesPage({ searchParams }) {
   }) : null;
 
   return (
-    <main>
+    <main data-historical-course-source={archive ? archiveSource.resolved : "current-guide"}>
       <section className={`${styles.content} ${guideStyles.guideDetailShell}`}>
         <Link className={guideStyles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>
         <header className={guideStyles.detailHeading}>
@@ -54,7 +58,12 @@ export default async function CoursesPage({ searchParams }) {
               {group.appearances.map((course) => <Link
                 aria-label={`View ${group.year} Round ${course.round} — ${course.Course}`}
                 className={`${styles.courseIndexCard} ${courseStyles.archiveCard}`}
-                href={courseProfileHref({ courseId: course["Course ID"], origin: COURSE_ORIGINS.ARCHIVE })}
+                href={courseProfileHref({
+                  courseId: course["Course ID"],
+                  origin: COURSE_ORIGINS.ARCHIVE,
+                  year: group.year,
+                  round: course.round,
+                })}
                 key={`${group.year}-${course.round}-${course["Course ID"]}`}
                 prefetch={false}
               >

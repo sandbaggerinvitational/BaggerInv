@@ -4,15 +4,22 @@ import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
 import ContextBackLink from "../../../../ContextBackLink";
 import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
-import { loadScorecardAnalytics } from "../../../../../lib/scorecard-data";
-import { getCourse, refreshHistoricalData } from "../../../../../lib/stats";
+import { loadHistoricalCourseHole } from "../../../../../lib/historical-course-service";
+import { requireHistoricalCourseReadSource } from "../../../../../lib/historical-course-read-source";
 import { pageMetadata } from "../../../../../lib/seo";
 import styles from "../../../../historical.module.css";
 
 export async function generateMetadata({ params }) {
-  await refreshHistoricalData();
   const { courseId, holeNumber } = await params;
-  const course = getCourse(courseId);
+  const source = requireHistoricalCourseReadSource(process.env);
+  let course;
+  if (source.resolved === "supabase") {
+    course = (await loadHistoricalCourseHole({ courseId, holeNumber }))?.course || null;
+  } else {
+    const { getCourse, refreshHistoricalData } = await import("../../../../../lib/stats");
+    await refreshHistoricalData();
+    course = getCourse(courseId);
+  }
   return pageMetadata({
     title: course
       ? `${course.Course} Hole ${holeNumber} | The Sandbagger Invitational`
@@ -25,26 +32,38 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CourseHolePage({ params, searchParams }) {
-  const scorecardAnalyticsPromise = loadScorecardAnalytics();
-  await refreshHistoricalData();
   const { courseId, holeNumber } = await params;
   const query = await searchParams;
-  const course = getCourse(courseId);
   const number = Number(holeNumber);
+  const source = requireHistoricalCourseReadSource(process.env);
+  let course;
+  let hole;
+  if (source.resolved === "supabase") {
+    const result = await loadHistoricalCourseHole({ courseId, holeNumber: number, tee: query?.tee });
+    course = result?.course || null;
+    hole = result?.hole || null;
+  } else {
+    const [{ loadScorecardAnalytics }, { getCourse, refreshHistoricalData }] = await Promise.all([
+      import("../../../../../lib/scorecard-data"),
+      import("../../../../../lib/stats"),
+    ]);
+    const scorecardAnalyticsPromise = loadScorecardAnalytics();
+    await refreshHistoricalData();
+    course = getCourse(courseId);
+    const analytics = await scorecardAnalyticsPromise;
+    const candidates = analytics.courseHoleSummaries.filter((candidate) =>
+      String(candidate.courseId).toUpperCase() === String(courseId).toUpperCase() &&
+      candidate.holeNumber === number
+    );
+    const requestedTee = String(query?.tee || "").trim();
+    hole = candidates.find((item) =>
+      requestedTee && String(item.tee).toLowerCase() === requestedTee.toLowerCase()
+    ) || candidates[0] || null;
+  }
   if (!course || !Number.isInteger(number) || number < 1 || number > 18) notFound();
 
-  const analytics = await scorecardAnalyticsPromise;
-  const candidates = analytics.courseHoleSummaries.filter((hole) =>
-    String(hole.courseId).toUpperCase() === String(courseId).toUpperCase() &&
-    hole.holeNumber === number
-  );
-  const requestedTee = String(query?.tee || "").trim();
-  const hole = candidates.find((item) =>
-    requestedTee && String(item.tee).toLowerCase() === requestedTee.toLowerCase()
-  ) || candidates[0] || null;
-
   return (
-    <main>
+    <main data-historical-course-source={source.resolved}>
       <Header />
       <ContextBackLink href={`/courses/${encodeURIComponent(courseId)}`} label={`Back to ${course.Course}`} />
 
