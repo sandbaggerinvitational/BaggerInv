@@ -141,7 +141,7 @@ export async function GET(request) {
       injectSupabaseOutage: outage === "supabase",
     }, async () => {
       const result = await certificationRead(surface, authorization.identity);
-      setDataAuthorityResolvedSource(result?.source || "unknown");
+      setDataAuthorityResolvedSource(result?.source || result?.diagnostics?.resolvedSource || "unknown");
       return result;
     });
     const headers = { "Cache-Control": "private, no-store", ...dataAuthorityResponseHeaders(measured.diagnostics) };

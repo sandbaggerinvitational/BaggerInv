@@ -53,7 +53,7 @@ test("Director authorization and request validation occur before outage scope en
   assert.match(route, /injectGoogleOutage: outage === "google"/);
   assert.match(route, /injectSupabaseOutage: outage === "supabase"/);
   assert.match(route, /const result = await certificationRead\(surface, authorization\.identity\)/);
-  assert.match(route, /setDataAuthorityResolvedSource\(result\?\.source \|\| "unknown"\)/);
+  assert.match(route, /setDataAuthorityResolvedSource\(result\?\.source \|\| result\?\.diagnostics\?\.resolvedSource \|\| "unknown"\)/);
 });
 
 test("request-local outage injection is Preview-only, exclusive, and reports transport counters", async () => {
