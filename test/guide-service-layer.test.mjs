@@ -63,12 +63,13 @@ test("Guide and course reads are Preview-only, workbook-isolated, and project-sc
 
   const missingCredentials = guideReadEnvironment({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" });
   assert.equal(missingCredentials.guide.blocked, true);
-  assert.equal(missingCredentials.guide.resolved, "google");
+  assert.equal(missingCredentials.guide.resolved, "unavailable");
   assert.equal(missingCredentials.guide.reason, "credentials-missing");
 
   const independentlyBlockedCourse = guideReadEnvironment({ ...previewEnv, COURSE_PRESENTATION_READ_SOURCE: "invalid" });
   assert.equal(independentlyBlockedCourse.guide.resolved, "supabase");
   assert.equal(independentlyBlockedCourse.course.blocked, true);
+  assert.equal(independentlyBlockedCourse.course.resolved, "unavailable");
 });
 
 test("automatic sync is separately gated while manual sync remains eligible in isolated Preview", () => {

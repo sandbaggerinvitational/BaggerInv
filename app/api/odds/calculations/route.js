@@ -8,7 +8,7 @@ import {
   readPublishableOddsCalculation,
   requestCanonicalOddsCalculation,
 } from "../../../../lib/championship-odds-resilience.js";
-import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
+import { requireOddsCalculationInputSource } from "../../../../lib/odds-calculation-source.js";
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import { ODDS_PHASES, ODDS_SUPPORTED_ITERATION_COUNTS } from "../../../../lib/tournament-odds.js";
 
@@ -23,7 +23,7 @@ async function directorFor(request) {
 }
 
 function previewGate() {
-  const source = oddsCalculationEnvironment();
+  const source = requireOddsCalculationInputSource();
   return process.env.VERCEL_ENV === "preview" && source.inputSource === "supabase" ? source : null;
 }
 

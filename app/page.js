@@ -14,7 +14,9 @@ import StatusBadge from "./StatusBadge";
 import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
 import { readHomepageCurrentTournament } from "../lib/homepage-current-tournament";
 import { requireHomepageCurrentReadSource } from "../lib/tournament-read-source";
-import { participantIdentityAuthorityEnvironment } from "../lib/participant-identity-authority";
+import { requireParticipantIdentityAuthority } from "../lib/participant-identity-authority";
+import { loadCompletedHistoryYears } from "../lib/completed-history-service";
+import { loadHistory2026View } from "../lib/history-2026-service";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -33,20 +35,24 @@ function playerName(player) {
 
 export default async function Home() {
   const homepageSource = requireHomepageCurrentReadSource();
-  const participantIdentityAuthority = participantIdentityAuthorityEnvironment().resolved;
+  const participantIdentityAuthority = requireParticipantIdentityAuthority().resolved;
   let currentRead = null;
+  let tournaments = [];
+  let currentTournament = {};
   if (homepageSource.resolved === "supabase") {
-    [currentRead] = await Promise.all([
+    const [homepage, completed, currentHistory] = await Promise.all([
       readHomepageCurrentTournament({ source: homepageSource }),
-      refreshHistoricalData(),
+      loadCompletedHistoryYears(),
+      loadHistory2026View(),
     ]);
+    currentRead = homepage;
+    currentTournament = currentHistory.tournament || {};
+    tournaments = [...completed.tournaments, currentTournament].sort((a, b) => Number(a.year) - Number(b.year));
   } else {
     await refreshHistoricalData();
+    tournaments = [...getTournaments()].sort((a, b) => a.year - b.year);
+    currentTournament = tournaments[tournaments.length - 1] || {};
   }
-  const tournaments = [...getTournaments()].sort(
-    (a, b) => a.year - b.year
-  );
-  const currentTournament = tournaments[tournaments.length - 1] || {};
   currentRead ||= await readHomepageCurrentTournament({
     source: homepageSource,
     googleFallbackTournament: currentTournament,

@@ -4,6 +4,7 @@ import { authenticateParticipantMatch } from "../../../../lib/google-sheets-writ
 import { createScoringSession, scoringSessionCookie, scoringTokenFromRequest, verifyScoringSession, SCORING_SESSION_COOKIE } from "../../../../lib/scoring-access.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
+import { requireScoringAuthority } from "../../../../lib/scoring-authority.js";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,13 @@ export async function DELETE() {
 
 export async function POST(request) {
   try {
+    const authority = requireScoringAuthority();
+    if (authority.resolved === "supabase") {
+      return NextResponse.json({
+        error: "Legacy match-code and admin-secret scoring sessions are unavailable under Supabase authority.",
+        code: "LEGACY_SCORING_SESSION_DISABLED_UNDER_SUPABASE_AUTHORITY",
+      }, { status: 409 });
+    }
     const { selector, accessCode, adminSecret, scorerName } = await request.json();
     if (!String(scorerName || "").trim()) throw new Error("Enter your name.");
     const allowedAdmins = [
@@ -55,6 +63,9 @@ export async function POST(request) {
     response.cookies.set(scoringSessionCookie(token));
     return response;
   } catch (error) {
+    if (error?.code === "SCORING_AUTHORITY_UNAVAILABLE") {
+      return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) });
+    }
     return NextResponse.json({ error: "Unable to authorize this match." }, { status: 401 });
   }
 }

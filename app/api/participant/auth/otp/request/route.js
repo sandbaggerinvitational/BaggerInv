@@ -7,6 +7,7 @@ import { authorizeSingleParticipantOtpRequest, recordSingleParticipantOtpDeliver
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
 import { normalizeParticipantAuthCaptchaToken } from "../../../../../../lib/participant-phone-otp.js";
 import { participantAuthExperienceConfiguration } from "../../../../../../lib/participant-sms-auth-feature.js";
+import { dataAuthorityFetch } from "../../../../../../lib/data-authority-request.js";
 
 export const dynamic = "force-dynamic";
 const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -38,7 +39,10 @@ export async function POST(request) {
   if (decision.allowed !== true) return json({ message: participantAuthGenericMessage(), step: "code", requestId: decision.requestId || randomUUID() });
   const started = performance.now();
   const config = participantAuthServerConfiguration();
-  const client = createClient(config.url, config.publishableKey, { auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false } });
+  const client = createClient(config.url, config.publishableKey, {
+    auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+    global: { fetch: dataAuthorityFetch("supabase", { adapter: "participant-email-otp-request" }) },
+  });
   const { error } = await client.auth.signInWithOtp({
     email: decision.email,
     options: { shouldCreateUser: false, ...(captchaToken ? { captchaToken } : {}) },

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { participantIdentityAuthorityEnvironment } from "../../../../lib/participant-identity-authority.js";
+import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { inspectPlayerPassportToken } from "../../../../lib/player-passport-server.js";
 import { readParticipantIdentityContext } from "../../../../lib/participant-identity-supabase.js";
@@ -42,8 +42,8 @@ async function passportShadowDiagnostics({ authority, passportContext, tournamen
 }
 export async function GET(request) {
   if (process.env.VERCEL_ENV !== "preview") return response({ error: "Not found." }, 404);
-  const authority = participantIdentityAuthorityEnvironment();
   try {
+    const authority = requireParticipantIdentityAuthority();
     if (authority.resolved === "supabase") {
       const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
       const result = NextResponse.json({
@@ -79,6 +79,7 @@ export async function GET(request) {
       supabaseAuth: shadow.supabaseAuth, shadowComparison: shadow.shadowComparison,
       identityTimings: { passportVerificationMs, passportContextMs, ...shadow.timings } });
   } catch (error) {
+    const authority = error?.authority || { resolved: "unavailable" };
     console.error("Participant context foundation failed", { authority: authority.resolved, message: error?.message || String(error) });
     const safe = authority.resolved === "supabase" ? participantIdentityPublicError(error) : null;
     return response({ identityAuthority: authority.resolved, session: { status: safe?.status === 401 ? "inactive" : "unavailable" },

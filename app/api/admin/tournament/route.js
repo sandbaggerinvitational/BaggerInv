@@ -4,6 +4,7 @@ import { readTournamentAdminData, updateTournamentAdminData } from "../../../../
 import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
+import { assertDirectorMutationAuthority } from "../../../../lib/director-mutation-authority.js";
 
 export const dynamic = "force-dynamic";
 function authorized(request) {
@@ -25,6 +26,7 @@ export async function GET(request) {
 export async function POST(request) {
   if (!authorized(request)) return deny();
   try {
+    assertDirectorMutationAuthority({ surface: "director", action: "tournament-admin-update" });
     const { tournament, updates, updatedBy } = await request.json();
     const result = await updateTournamentAdminData(tournament, updates, updatedBy);
     revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
@@ -33,6 +35,8 @@ export async function POST(request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Tournament admin save failed", { sheet: "Tournaments", reason: error?.message || String(error), stack: error?.stack });
-    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
+    const authorityFailure = error?.code === "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY" || error?.code === "SCORING_AUTHORITY_UNAVAILABLE";
+    return NextResponse.json({ error: authorityFailure ? error.message : directorTransactionError(error),
+      ...(error?.code ? { code: error.code } : {}) }, { status: Number(error?.status || 400) });
   }
 }

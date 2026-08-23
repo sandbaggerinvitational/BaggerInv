@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../../lib/participant-auth-client-diagnostics.js";
 import { readTournamentLiveCache, writeTournamentLiveCache } from "../../lib/tournament-live-cache.js";
@@ -23,9 +23,9 @@ function likelyGameCenter(data) {
 
 export default function TournamentSupabaseRead({ initialView = "" }) {
   const router = useRouter();
-  const initial = useMemo(() => readTournamentLiveCache(), []);
-  const [payload, setPayload] = useState(initial);
-  const [state, setState] = useState(initial ? "ready" : "loading");
+  const [payload, setPayload] = useState(null);
+  const [state, setState] = useState("loading");
+  const restoredCache = useRef(false);
   const requestSequence = useRef(0);
   const controllerRef = useRef(null);
 
@@ -53,7 +53,7 @@ export default function TournamentSupabaseRead({ initialView = "" }) {
       recordParticipantAuthDiagnostic("TOURNAMENT_HEADER_USABLE", { routeTo: "/live", durationMs: clientTotal });
       recordParticipantAuthDiagnostic("TOURNAMENT_LIVE_STATE_USABLE", { routeTo: "/live", durationMs: clientTotal });
       console.info("Tournament Supabase load timing", { ...timings, clientTotal: Math.round(clientTotal),
-        cachedPresentation: Boolean(initial), googleRequests: Number(response.headers.get("x-tournament-google-requests") || 0) });
+        cachedPresentation: restoredCache.current, googleRequests: Number(response.headers.get("x-tournament-google-requests") || 0) });
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 450));
       schedule(() => {
         router.prefetch("/my-match");
@@ -67,10 +67,13 @@ export default function TournamentSupabaseRead({ initialView = "" }) {
       if (error?.name === "AbortError" || sequence !== requestSequence.current) return;
       setState((current) => current === "ready" ? "ready" : "error");
     }
-  }, [acceptData, initial, router]);
+  }, [acceptData, router]);
 
   useEffect(() => {
-    if (initial) {
+    const cached = readTournamentLiveCache();
+    if (cached) {
+      restoredCache.current = true;
+      acceptData(cached);
       recordParticipantAuthDiagnostic("TOURNAMENT_CACHED_SHELL", { routeTo: "/live", durationMs: 0 });
       recordParticipantAuthDiagnostic("TOURNAMENT_HEADER_USABLE", { routeTo: "/live", durationMs: 0 });
     }

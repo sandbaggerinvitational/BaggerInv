@@ -12,7 +12,7 @@ import {
   readOddsSnapshots,
   readWorkbookSheetsByName,
 } from "../../../../lib/google-sheets-write.js";
-import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
+import { oddsCalculationEnvironment, requireOddsCalculationInputSource, requireOddsPublicationAuthority } from "../../../../lib/odds-calculation-source.js";
 import { validateProjectionSnapshot } from "../../../../lib/projection-publication-diagnostics.js";
 import {
   buildPublishedOddsImport,
@@ -73,7 +73,7 @@ async function diagnostics(tournamentId) {
 }
 
 async function rehearsePublication({ actorId, tournamentId }) {
-  const sources = oddsCalculationEnvironment();
+  const sources = requireOddsCalculationInputSource();
   if (sources.inputSource !== "supabase") throw Object.assign(new Error("Supabase Odds inputs are required for native publication rehearsal."), {
     code: "ODDS_REHEARSAL_SUPABASE_INPUTS_REQUIRED",
   });
@@ -201,7 +201,7 @@ export async function POST(request) {
       return NextResponse.json({ ok: result.pass, action, result }, { status: result.pass ? 200 : 409 });
     }
     if (action === "retry-google-mirror") {
-      const sources = oddsCalculationEnvironment();
+      const sources = requireOddsPublicationAuthority();
       if (sources.publicationAuthority !== "supabase") return NextResponse.json({ error: "Supabase is not the selected Preview publication authority." }, { status: 409 });
       const result = await deliverSupabaseOddsGoogleMirror({ snapshotId: clean(input.snapshotId), actorId });
       return NextResponse.json({ ok: result.ok, action, result }, { status: result.ok ? 200 : 503 });

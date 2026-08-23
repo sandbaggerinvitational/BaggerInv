@@ -43,7 +43,7 @@ import PlayerIntelligenceSections from "./PlayerIntelligenceSections";
 import { cookies } from "next/headers";
 import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport";
 import { resolvePlayerPassportToken } from "../../../lib/player-passport-server";
-import { participantIdentityAuthorityEnvironment } from "../../../lib/participant-identity-authority";
+import { requireParticipantIdentityAuthority } from "../../../lib/participant-identity-authority";
 import { resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver";
 import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
@@ -147,7 +147,7 @@ export default async function PlayerPage({ params, searchParams }) {
   const player = useSupabase ? calculations.getPlayerBySlug(slug) : getPlayerBySlug(slug);
   if (!player) notFound();
   const cookieStore = await cookies();
-  const participantIdentityAuthority = participantIdentityAuthorityEnvironment();
+  const participantIdentityAuthority = requireParticipantIdentityAuthority();
   let participantIdentity = null;
   if (participantIdentityAuthority.resolved === "supabase") {
     try {

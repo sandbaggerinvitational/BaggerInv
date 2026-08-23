@@ -16,7 +16,7 @@ import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, publishedOddsSn
 import { buildSupabaseOddsPublication, loadSupabaseOddsInputs, publishSupabaseOddsSnapshot } from "../../../../lib/championship-odds-supabase.js";
 import { markOddsCalculationPublished, readPublishableOddsCalculation } from "../../../../lib/championship-odds-resilience.js";
 import { deliverSupabaseOddsGoogleMirror } from "../../../../lib/championship-odds-google-mirror.js";
-import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
+import { requireOddsCalculationInputSource, requireOddsPublicationAuthority } from "../../../../lib/odds-calculation-source.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +36,8 @@ async function publishProjection(request) {
     let { phase, iterations: requestedIterations = 10_000 } = requestInput;
     const calculationJobId = String(requestInput.jobId || "").trim();
     diagnostic.simulationPhase = phase;
-    const source = oddsCalculationEnvironment();
+    const source = requireOddsCalculationInputSource();
+    requireOddsPublicationAuthority();
     let inputs;
     let preparedCalculation = null;
     if (process.env.VERCEL_ENV === "preview" && source.inputSource === "supabase") {
@@ -222,7 +223,7 @@ async function publishProjection(request) {
     return NextResponse.json({
       error: directorTransactionError(error, "Championship projections could not be published. Please try again.", true),
       ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: details } : {}),
-    }, { status: 500 });
+    }, { status: Number(error?.status || 500) });
   }
 }
 

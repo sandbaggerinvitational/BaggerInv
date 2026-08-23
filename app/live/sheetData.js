@@ -32,6 +32,7 @@ import { initializeTournamentWorkbook } from "../../lib/tournament-workbook-init
 import { normalizeTournamentTimeline } from "../../lib/tournament-timeline";
 import { publicGuideRecords, recordMatchesTournament } from "../../lib/tournament-guide";
 import { buildCalcuttaModel } from "../../lib/calcutta";
+import { recordDataAuthorityTransport } from "../../lib/data-authority-request";
 
 const SPREADSHEET_ID = resolveSpreadsheetId();
 
@@ -85,6 +86,7 @@ async function fetchSheet(sheetName) {
   if (authenticatedPreviewReadsEnabled()) {
     return table(await readNormalizedSheetValues(sheetName));
   }
+  recordDataAuthorityTransport("google", { adapter: "live-sheet-data", transport: "gviz" });
   const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
   if (!response.ok) throw new Error(`${sheetName} returned ${response.status}.`);
   const text = await response.text();
@@ -102,6 +104,7 @@ async function fetchOptionalSheet(sheetName) {
 
 async function fetchOptionalSheetValues(sheetName) {
   try {
+    recordDataAuthorityTransport("google", { adapter: "live-sheet-data", transport: "gviz" });
     const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
     if (!response.ok) return [];
     const text = await response.text();

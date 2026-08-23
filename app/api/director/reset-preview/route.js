@@ -6,6 +6,7 @@ import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data.js";
 import { resetPreviewTournament } from "../../../../lib/google-sheets-write.js";
 import { initializeParticipantTournament, invalidateParticipantInitialization } from "../../../../lib/participant-initialization.js";
 import { directorTransactionError } from "../../../../lib/director-transaction-error.js";
+import { assertDirectorMutationAuthority } from "../../../../lib/director-mutation-authority.js";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Tournament Director access is required." }, { status: 403 });
   }
   try {
+    assertDirectorMutationAuthority({ surface: "director", action: "reset-preview" });
     const data = await getTournamentData();
     const result = await resetPreviewTournament(data.tournament.id, authorization.identity.actor.name);
     revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
@@ -36,6 +38,11 @@ export async function POST(request) {
       result,
     });
   } catch (error) {
-    return NextResponse.json({ error: directorTransactionError(error, "Preview tournament reset could not be completed. Please try again.") }, { status: 400 });
+    const authorityFailure = error?.code === "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY" || error?.code === "SCORING_AUTHORITY_UNAVAILABLE";
+    return NextResponse.json({
+      error: authorityFailure ? error.message : directorTransactionError(error, "Preview tournament reset could not be completed. Please try again."),
+      ...(error?.code ? { code: error.code } : {}),
+      ...(error?.authorityDiagnostics ? { authority: error.authorityDiagnostics } : {}),
+    }, { status: Number(error?.status || 400) });
   }
 }

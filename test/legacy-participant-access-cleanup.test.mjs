@@ -48,7 +48,7 @@ test("every Preview Home presentation path carries the canonical Supabase identi
     source("app/me/ParticipantProfile.js"),
   ]);
   for (const home of [rootHome, homePage]) {
-    assert.match(home, /participantIdentityAuthorityEnvironment\(\)\.resolved/);
+    assert.match(home, /requireParticipantIdentityAuthority\(\)\.resolved/);
     assert.match(home, /participantIdentityAuthority=\{participantIdentityAuthority\}/);
   }
   assert.match(supabaseHome, /participantIdentityAuthority="supabase"/);

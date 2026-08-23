@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "./components";
 import MobileTournamentHome from "./MobileTournamentHome";
@@ -21,9 +21,9 @@ function parseTiming(value = "") {
 
 export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" }) {
   const router = useRouter();
-  const initial = useMemo(() => readParticipantHomeCache(), []);
-  const [payload, setPayload] = useState(initial);
-  const [state, setState] = useState(initial ? "ready" : "loading");
+  const [payload, setPayload] = useState(null);
+  const [state, setState] = useState("loading");
+  const restoredCache = useRef(false);
   const requestSequence = useRef(0);
   const controllerRef = useRef(null);
   const secondaryControllerRef = useRef(null);
@@ -85,7 +85,7 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
       recordParticipantAuthDiagnostic("HOME_FRESH_PAYLOAD", { routeTo: "/home", durationMs: clientTotal });
       recordParticipantAuthDiagnostic("HOME_PRIMARY_USABLE", { routeTo: "/home", durationMs: clientTotal });
       console.info("Participant Home load timing", { ...timings, clientTotal: Math.round(clientTotal),
-        cachedPresentation: Boolean(initial), googleRequests: Number(response.headers.get("x-home-google-requests") || 0) });
+        cachedPresentation: restoredCache.current, googleRequests: Number(response.headers.get("x-home-google-requests") || 0) });
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 450));
       schedule(() => {
         hydrateNetSkins();
@@ -100,11 +100,15 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
       if (error?.name === "AbortError" || sequence !== requestSequence.current) return;
       setState((current) => current === "ready" ? "ready" : "error");
     }
-  }, [hydrateNetSkins, initial, router]);
+  }, [hydrateNetSkins, router]);
 
   useEffect(() => {
     recordParticipantAuthDiagnostic("HOME_SHELL_RENDER", { routeTo: "/home", durationMs: 0 });
-    if (initial) {
+    const cached = readParticipantHomeCache();
+    if (cached) {
+      restoredCache.current = true;
+      setPayload(cached);
+      setState("ready");
       recordParticipantAuthDiagnostic("HOME_CACHED_SHELL", { routeTo: "/home", durationMs: 0 });
       recordParticipantAuthDiagnostic("HOME_IDENTITY_VISIBLE", { routeTo: "/home", durationMs: 0 });
     }

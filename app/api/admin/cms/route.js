@@ -19,6 +19,7 @@ import {
   shouldSynchronizeDraftAfterWrite,
   synchronizeDraftProjection,
 } from "../../../../lib/draft-synchronization";
+import { assertDirectorMutationAuthority } from "../../../../lib/director-mutation-authority.js";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +59,7 @@ export async function POST(request) {
   try {
     body = await request.json();
     const { resource, action = "save", key, record, tournament, year, updatedBy, direction } = body;
+    assertDirectorMutationAuthority({ surface: "admin-cms", action: resource });
     const transactionId = String(request.headers.get("x-save-transaction-id") || body.transactionId || "").trim();
     const filters = { tournament: String(tournament || ""), year: String(year || "") };
     if (filters.tournament) assertValidTournamentId(filters.tournament);
@@ -124,6 +126,15 @@ export async function POST(request) {
       reason: error?.message || String(error),
       stack: error?.stack,
     });
-    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
+    const authorityFailure = [
+      "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "SCORING_AUTHORITY_UNAVAILABLE",
+      "DIRECTOR_MUTATION_NOT_RECOGNIZED",
+    ].includes(error?.code);
+    return NextResponse.json({
+      error: authorityFailure ? error.message : directorTransactionError(error),
+      ...(error?.code ? { code: error.code } : {}),
+      ...(error?.authorityDiagnostics ? { authority: error.authorityDiagnostics } : {}),
+    }, { status: Number(error?.status || 400) });
   }
 }

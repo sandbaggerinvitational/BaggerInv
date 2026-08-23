@@ -21,13 +21,22 @@ import { recalculateCompetitionDerivedTournament } from "../../../lib/competitio
 import { recalculateIntelligenceDerivedTournament } from "../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
 import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
+import { authorizePreviewDirector } from "../../../lib/preview-director-authorization.js";
+import { requireScoringAuthority } from "../../../lib/scoring-authority.js";
+import { assertDirectorMutationAuthority } from "../../../lib/director-mutation-authority.js";
 
 export const dynamic = "force-dynamic";
 
-function authorized(request) {
+function authorizedGoogleRollback(request) {
   const secret = request.headers.get("x-live-admin-secret");
-  const allowed = [process.env.ADMIN_SECRET, process.env.LIVE_ADMIN_SECRET, process.env.GUIDE_ADMIN_SECRET, process.env.ODDS_ADMIN_SECRET].filter(Boolean);
+  const allowed = [process.env.ADMIN_SECRET, process.env.LIVE_ADMIN_SECRET].filter(Boolean);
   return Boolean(secret) && allowed.includes(secret);
+}
+
+async function authorized(request, authority) {
+  if (authority.resolved === "google") return authorizedGoogleRollback(request);
+  const result = await authorizePreviewDirector({ request, allowBootstrap: true });
+  return result?.status === "active";
 }
 
 function deny() {
@@ -41,7 +50,10 @@ function refreshMatchData() {
 }
 
 export async function GET(request) {
-  if (!authorized(request)) return deny();
+  let authority;
+  try { authority = requireScoringAuthority(); }
+  catch (error) { return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
+  if (!(await authorized(request, authority))) return deny();
   try {
     const data = await readLiveMatchAdminData();
     return NextResponse.json({ data: {
@@ -57,9 +69,13 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  if (!authorized(request)) return deny();
+  let authority;
+  try { authority = requireScoringAuthority(); }
+  catch (error) { return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
+  if (!(await authorized(request, authority))) return deny();
   try {
     const { action, matchId, updates, updatedBy } = await request.json();
+    assertDirectorMutationAuthority({ surface: "live-matches", action, authority: authority.resolved });
     const measured = await withWorkbookWriteDiagnostics(`live-matches:${action}`, async () => {
       let match;
       if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
@@ -117,6 +133,11 @@ export async function POST(request) {
     return NextResponse.json({ match: safeMatch, ...(process.env.VERCEL_ENV === "preview" && calcuttaPublication ? { calcuttaPublication } : {}) });
   } catch (error) {
     console.error("Live Match Control action failed", { sheet: "Live Matches / Matches / Match Update Log", reason: error?.message || String(error), stack: error?.stack });
-    return NextResponse.json({ error: directorTransactionError(error, "The match update could not be completed. Please try again.") }, { status: 400 });
+    const authorityFailure = error?.code === "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY" || error?.code === "SCORING_AUTHORITY_UNAVAILABLE";
+    return NextResponse.json({
+      error: authorityFailure ? error.message : directorTransactionError(error, "The match update could not be completed. Please try again."),
+      ...(error?.code ? { code: error.code } : {}),
+      ...(error?.authorityDiagnostics ? { authority: error.authorityDiagnostics } : {}),
+    }, { status: Number(error?.status || 400) });
   }
 }

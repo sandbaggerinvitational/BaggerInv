@@ -4,6 +4,7 @@ import { participantIdentityAuthorityEnvironment } from "../../../../../../lib/p
 import { participantAuthEmailHash } from "../../../../../../lib/participant-auth-rehearsal.js";
 import { authorizeSingleParticipantOtpVerification, recordSingleParticipantOtpVerification } from "../../../../../../lib/participant-identity-supabase.js";
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
+import { dataAuthorityFetch } from "../../../../../../lib/data-authority-request.js";
 
 export const dynamic = "force-dynamic";
 const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -35,6 +36,7 @@ export async function POST(request) {
   const config = participantAuthServerConfiguration();
   const pendingCookies = [];
   const client = createServerClient(config.url, config.publishableKey, {
+    global: { fetch: dataAuthorityFetch("supabase", { adapter: "participant-email-otp-verify" }) },
     auth: { flowType: "pkce", persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
     cookies: {
       getAll: () => request.cookies.getAll(),

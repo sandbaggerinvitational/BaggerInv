@@ -20,6 +20,7 @@ import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox.js";
 import { recalculateCompetitionDerivedTournament } from "../../../lib/competition-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
 import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
+import { assertDirectorMutationAuthority } from "../../../lib/director-mutation-authority.js";
 
 export const dynamic = "force-dynamic";
 
@@ -211,7 +212,61 @@ export async function POST(request) {
   const identity = authorization.identity;
   try {
     const input = await request.json();
+    const mutationAuthority = assertDirectorMutationAuthority({ surface: "director", action: input.action });
     trace.stage("Action authorization", "PASS", String(input.action || "unknown"));
+    trace.stage("Canonical authority", "PASS", JSON.stringify(mutationAuthority));
+    if (mutationAuthority.resolvedAuthority === "supabase") {
+      if (!input.matchId || !mutationAuthority.canonicalLifecycleAction) {
+        const error = new Error("A canonical match lifecycle action and Match ID are required.");
+        error.code = "DIRECTOR_CANONICAL_LIFECYCLE_INPUT_REQUIRED";
+        error.status = 400;
+        throw error;
+      }
+      const updatedBy = identity.actor.name;
+      const lifecycle = await persistDirectorMatchLifecycle({
+        action: mutationAuthority.canonicalLifecycleAction,
+        matchId: input.matchId,
+        updatedBy,
+      });
+      if (!lifecycle.delegated) {
+        const error = new Error("The canonical Supabase lifecycle transaction was not selected.");
+        error.code = "SUPABASE_CANONICAL_LIFECYCLE_REQUIRED";
+        error.status = 503;
+        throw error;
+      }
+      const mirror = await drainGoogleOutbox({ maximum: 4, actor: updatedBy });
+      if (!mirror.ok) {
+        const error = new Error("The canonical mutation committed, but Google mirror delivery remains pending.");
+        error.code = "GOOGLE_MIRROR_DELIVERY_PENDING";
+        error.status = 503;
+        throw error;
+      }
+      trace.stage("Canonical lifecycle transaction", "PASS", JSON.stringify({
+        action: mutationAuthority.canonicalLifecycleAction,
+        matchId: input.matchId,
+        authority: "supabase",
+      }));
+      trace.stage("Google mirror", "PASS", JSON.stringify({
+        delivered: Number(mirror.delivered || 0),
+        failed: Number(mirror.failed || 0),
+      }));
+      refresh();
+      after(async () => {
+        try {
+          await Promise.all([
+            drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false }),
+            recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
+            recalculateCalcuttaTournament("", { calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}` }),
+          ]);
+        } catch (error) {
+          console.error("Competition derived-state Director lifecycle recalculation remains pending", {
+            action: input.action, code: error?.code || "DERIVED_STATE_RECALCULATION_FAILED",
+          });
+        }
+      });
+      console.info("Director action transaction", trace.report({ matchId: input.matchId, updatedBy, authority: "supabase" }));
+      return NextResponse.json({ ok: true, changed: false, authority: "supabase", mirror: { delivered: mirror.delivered, failed: mirror.failed } });
+    }
     const data = await getTournamentData();
     trace.stage("Workbook verification", "PASS");
     const round = Number(input.round || data.tournament.currentRound);
@@ -340,6 +395,11 @@ export async function POST(request) {
   } catch (error) {
     trace.stage("Failure", "FAIL", error instanceof Error ? error.message : String(error));
     console.error("Director action transaction", trace.report());
-    return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
+    const authorityFailure = error?.code === "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY" || error?.code === "SCORING_AUTHORITY_UNAVAILABLE";
+    return NextResponse.json({
+      error: authorityFailure ? error.message : directorTransactionError(error),
+      ...(error?.code ? { code: error.code } : {}),
+      ...(error?.authorityDiagnostics ? { authority: error.authorityDiagnostics } : {}),
+    }, { status: Number(error?.status || 400) });
   }
 }
