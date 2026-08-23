@@ -35,7 +35,7 @@ function escapeHtml(value) {
 }
 
 function uiResponse(payload) {
-  return new NextResponse(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Preview Draft Projection</title></head><body><main><h1>Preview Draft Projection</h1><p>Google remains the Tournament Director authoring authority. Synchronization reads only Draft Settings and Draft Picks.</p><form method="post"><input type="hidden" name="action" value="synchronize"><button type="submit">Synchronize Draft Projection</button></form><h2>Diagnostics</h2><pre>${escapeHtml(JSON.stringify(payload, null, 2))}</pre></main></body></html>`, {
+  return new NextResponse(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Preview Draft Projection</title></head><body><main><h1>Preview Draft Projection</h1><p>Google remains the Tournament Director authoring authority. Synchronization reads only Draft Settings and Draft Picks.</p><form action="/api/admin/draft-projection" method="post"><input type="hidden" name="action" value="synchronize"><label for="correctionReason">Historical correction reason (required only when correcting a completed Draft)</label><br><input id="correctionReason" name="correctionReason" type="text" minlength="10" autocomplete="off"><br><button type="submit">Synchronize Draft Projection</button></form><h2>Diagnostics</h2><pre>${escapeHtml(JSON.stringify(payload, null, 2))}</pre></main></body></html>`, {
     headers: { "cache-control": "no-store", "content-type": "text/html; charset=utf-8" },
   });
 }
