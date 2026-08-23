@@ -64,6 +64,6 @@ test("all tournament History scorecards inherit the shared cleanup without year 
 test("the presentation cleanup adds no request or dependency", () => {
   assert.doesNotMatch(scorecard, /fetch\(|axios|createClient|supabase\.from|\/api\//i);
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "web-push",
+    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "server-only", "web-push",
   ]);
 });

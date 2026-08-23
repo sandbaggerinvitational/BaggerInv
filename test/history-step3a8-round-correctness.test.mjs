@@ -177,6 +177,6 @@ test("Step 3A.8 adds no request, endpoint, source, cache, or dependency", () => 
     assert.doesNotMatch(value, /fetch\(|axios|\/api\/live|gviz|createClient|supabase\.from|localStorage|sessionStorage/i);
   }
   assert.deepEqual(Object.keys(packageJson.dependencies).sort(), [
-    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "web-push",
+    "@supabase/ssr", "@supabase/supabase-js", "@vercel/analytics", "libphonenumber-js", "next", "openai", "qrcode", "react", "react-dom", "server-only", "web-push",
   ]);
 });

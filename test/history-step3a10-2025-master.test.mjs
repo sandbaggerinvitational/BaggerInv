@@ -312,6 +312,7 @@ test("Step 3A.10 adds no request, endpoint, source, storage, or dependency", () 
     "qrcode",
     "react",
     "react-dom",
+    "server-only",
     "web-push",
   ]);
 });

@@ -280,6 +280,7 @@ test("Step 3B.1 adds no dependency, endpoint, client fetch, or storage", () => {
     "qrcode",
     "react",
     "react-dom",
+    "server-only",
     "web-push",
   ]);
 });

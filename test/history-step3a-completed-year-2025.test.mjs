@@ -179,6 +179,7 @@ test("the 2025 presentation introduces no request, endpoint, data source, or dep
     "qrcode",
     "react",
     "react-dom",
+    "server-only",
     "web-push",
   ]);
 });
