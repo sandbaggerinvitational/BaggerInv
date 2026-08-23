@@ -179,8 +179,9 @@ test("freshness distinguishes current, stale, unknown, and unavailable projectio
 });
 
 test("schema, synchronization, services, routes, analytics, and profiles share one protected contract", async () => {
-  const [sql, sync, service, source, route, draft, runtime, draftPage, yearPage, analyticsPage, profile, cms, analysis] = await Promise.all([
+  const [sql, orderCorrectionSql, sync, service, source, route, draft, runtime, draftPage, yearPage, analyticsPage, profile, cms, analysis] = await Promise.all([
     readFile(new URL("../supabase/migrations/202608220003_preview_versioned_draft_projection.sql", import.meta.url), "utf8"),
+    readFile(new URL("../supabase/migrations/202608220005_preview_draft_authoritative_pick_order.sql", import.meta.url), "utf8"),
     readFile(new URL("../lib/draft-synchronization.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/draft-service.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/draft-read-source.js", import.meta.url), "utf8"),
@@ -204,6 +205,10 @@ test("schema, synchronization, services, routes, analytics, and profiles share o
   assert.match(sql, /read_preview_draft_view/);
   assert.match(sql, /revoke all .*anon,authenticated/s);
   assert.match(sql, /grant execute .*service_role/s);
+  assert.match(orderCorrectionSql, /Draft Picks\.Team ID is the authoritative historical selecting-team fact/);
+  assert.doesNotMatch(orderCorrectionSql, /DRAFT_PICK_ORDER_INVALID/);
+  assert.match(orderCorrectionSql, /DRAFT_PICK_NUMBER_SEQUENCE_INVALID/);
+  assert.match(orderCorrectionSql, /DRAFT_PICK_ROSTER_TEAM_MISMATCH/);
   assert.match(sync, /readWorkbookSheetsByName/);
   assert.match(sync, /DRAFT_SOURCE_TABS/);
   assert.doesNotMatch(sync, /loadDraftSheets|loadPredictionSheets|refreshHistoricalData/);
