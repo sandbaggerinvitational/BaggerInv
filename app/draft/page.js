@@ -3,9 +3,9 @@ export const dynamic = "force-dynamic";
 import { Header, Footer } from "../components";
 import DraftExperience from "./DraftExperience";
 import { getCurrentDraft, getDrafts } from "../../lib/draft";
-import { refreshHistoricalData } from "../../lib/stats";
 import { pageMetadata } from "../../lib/seo";
 import { getDraftAnalysis } from "../../lib/draft-analysis";
+import { loadDraftRuntime } from "../../lib/draft-runtime";
 
 export const metadata = pageMetadata({
   title: "Sandbagger Draft",
@@ -15,10 +15,12 @@ export const metadata = pageMetadata({
 });
 
 export default async function DraftPage() {
-  await refreshHistoricalData();
-  const draft = await getCurrentDraft();
-  const drafts = await getDrafts();
-  const analysis = draft ? await getDraftAnalysis(draft) : null;
+  const runtime = await loadDraftRuntime();
+  const [draft, drafts] = await Promise.all([
+    getCurrentDraft(runtime.draftOptions),
+    getDrafts(runtime.draftOptions),
+  ]);
+  const analysis = draft ? await getDraftAnalysis(draft, runtime.analysisOptions) : null;
 
   if (!draft) {
     return (
@@ -40,6 +42,7 @@ export default async function DraftPage() {
         draft={draft}
         analysis={analysis}
         previousDrafts={drafts.filter((item) => item.year < draft.year)}
+        readSource={runtime.source.resolved}
       />
       <Footer />
     </main>

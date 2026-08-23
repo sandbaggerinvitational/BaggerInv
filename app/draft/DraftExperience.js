@@ -280,10 +280,10 @@ function DraftAnalysis({ analysis }) {
   );
 }
 
-export default function DraftExperience({ draft, previousDrafts = [], analysis = null }) {
+export default function DraftExperience({ draft, previousDrafts = [], analysis = null, readSource = "google" }) {
   return (
     <>
-      <section className={styles.hero}>
+      <section className={styles.hero} data-draft-read-source={readSource}>
         <p>Sandbagger Invitational</p>
         <h1>{draft.name}</h1>
         <span>

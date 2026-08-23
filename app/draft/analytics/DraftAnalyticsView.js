@@ -177,7 +177,7 @@ function Redraft({ redrafts }) {
   </Section>;
 }
 
-export default function DraftAnalyticsView({ analytics }) {
+export default function DraftAnalyticsView({ analytics, readSource = "google" }) {
   const s = analytics.summary;
   const [selectedPlayer, setSelectedPlayer] = useState("");
   const openHistory = (id) => {
@@ -194,7 +194,7 @@ export default function DraftAnalyticsView({ analytics }) {
   ];
 
   return <>
-    <section className={styles.hero}><p>SBI Draft History</p><h1>Historical Draft Analytics</h1><span>Every selection, captain, draft class, and value swing across Sandbagger Invitational history.</span></section>
+    <section className={styles.hero} data-draft-read-source={readSource}><p>SBI Draft History</p><h1>Historical Draft Analytics</h1><span>Every selection, captain, draft class, and value swing across Sandbagger Invitational history.</span></section>
     <div className={styles.shell}>
       <div className={styles.summaryGrid}>{[
         ["Drafts Recorded", s.draftsRecorded], ["Players Drafted", s.playersDrafted], ["Unique Golfers", s.uniqueGolfers], ["Captains", s.captains], ["Average Draft Size", `${s.averageDraftSize} Picks`],

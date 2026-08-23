@@ -27,7 +27,7 @@ import {
 } from "../../../lib/context-navigation";
 import { LeaderboardPlayer, LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
-import { getDrafts } from "../../../lib/draft";
+import { getPlayerDrafts } from "../../../lib/draft";
 import { getPlayerDraftHistory } from "../../../lib/draft-analytics";
 import {
   loadCanonicalCareerScorecardAnalytics,
@@ -174,7 +174,7 @@ export default async function PlayerPage({ params, searchParams }) {
     stats.records
   );
   const playerDraftHistory = getPlayerDraftHistory(
-    await getDrafts(useSupabase ? { history: calculations } : undefined),
+    await getPlayerDrafts(player["Player ID"], useSupabase ? { history: calculations } : undefined),
     player["Player ID"],
     useSupabase ? { history: calculations } : undefined
   );

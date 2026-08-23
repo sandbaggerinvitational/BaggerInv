@@ -15,6 +15,10 @@ import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
 import { assertValidTournamentId } from "../../../../lib/tournament-identifiers";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
+import {
+  shouldSynchronizeDraftAfterWrite,
+  synchronizeDraftProjection,
+} from "../../../../lib/draft-synchronization";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +32,7 @@ const deny = () => NextResponse.json({ error: "Invalid admin password." }, { sta
 const filtersFrom = (source) => ({ tournament: source.get("tournament") || "", year: source.get("year") || "" });
 const saveTransactions = globalThis.__sbiCmsSaveTransactions || new Map();
 globalThis.__sbiCmsSaveTransactions = saveTransactions;
-const REVALIDATED_PATHS = ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/tournament-guide"];
+const REVALIDATED_PATHS = ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/draft", "/tournament-guide"];
 const MATCH_REVALIDATED_PATHS = ["/home", "/admin", "/players", "/live"];
 
 export async function GET(request) {
@@ -65,12 +69,26 @@ export async function POST(request) {
         if (action === "reorder") return reorderCmsRecord(resource, key, direction, filters, updatedBy);
         throw new Error("Unknown Admin Center action.");
       });
+      const draftProjection = ["draft-settings", "draft-picks"].includes(resource)
+        && shouldSynchronizeDraftAfterWrite()
+        ? await synchronizeDraftProjection({
+            actorId: String(updatedBy || "Tournament Director"),
+            correctionReason: String(body.correctionReason || ""),
+          })
+        : null;
       const revalidatedPaths = resource === "matches" ? MATCH_REVALIDATED_PATHS : REVALIDATED_PATHS;
       revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
       invalidateScorecardAnalyticsCache();
       for (const path of revalidatedPaths) revalidatePath(path);
       return {
         data: measured.result,
+        ...(draftProjection ? { draftProjection: {
+          changed: draftProjection.changed,
+          changedCount: draftProjection.changedCount,
+          duplicateCount: draftProjection.duplicateCount,
+          revisions: draftProjection.results,
+          freshness: draftProjection.freshness,
+        } } : {}),
         diagnostics: {
           transactionId,
           incomingHttpRequests: 1,

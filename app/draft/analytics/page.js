@@ -3,9 +3,9 @@ export const dynamic = "force-dynamic";
 import { Header, Footer } from "../../components";
 import { getDrafts } from "../../../lib/draft";
 import { getHistoricalDraftAnalytics } from "../../../lib/draft-analytics";
-import { refreshHistoricalData } from "../../../lib/stats";
 import { pageMetadata } from "../../../lib/seo";
 import DraftAnalyticsView from "./DraftAnalyticsView";
+import { loadDraftRuntime } from "../../../lib/draft-runtime";
 
 export const metadata = pageMetadata({
   title: "Historical Draft Analytics",
@@ -14,11 +14,14 @@ export const metadata = pageMetadata({
 });
 
 export default async function HistoricalDraftAnalyticsPage() {
-  await refreshHistoricalData();
-  const analytics = await getHistoricalDraftAnalytics(await getDrafts());
+  const runtime = await loadDraftRuntime();
+  const analytics = await getHistoricalDraftAnalytics(
+    await getDrafts(runtime.draftOptions),
+    runtime.analysisOptions
+  );
   return <main>
     <Header />
-    <DraftAnalyticsView analytics={analytics} />
+    <DraftAnalyticsView analytics={analytics} readSource={runtime.source.resolved} />
     <Footer />
   </main>;
 }
