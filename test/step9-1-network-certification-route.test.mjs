@@ -23,13 +23,21 @@ test("Step 9.1 network certification is a protected Preview-only read allowlist"
   assert.doesNotMatch(route, /\bfetch\s*\(/);
 });
 
-test("normal-route diagnostics alias reuses the protected certification handler", async () => {
-  const route = await source("app/admin/source-audit/route.js");
+test("normal-route diagnostics page calls only the protected read-only handler", async () => {
+  const [page, client] = await Promise.all([
+    source("app/admin/source-audit/page.js"),
+    source("app/admin/source-audit/SourceAuditClient.js"),
+  ]);
 
-  assert.match(route, /GET as certificationGet/);
-  assert.match(route, /api\/admin\/data-authority-certification\/route\.js/);
-  assert.match(route, /export const GET = certificationGet/);
-  assert.doesNotMatch(route, /export async function (?:POST|PUT|PATCH|DELETE)\b/);
+  assert.match(page, /process\.env\.VERCEL_ENV !== "preview"/);
+  assert.match(page, /notFound\(\)/);
+  assert.match(page, /robots: \{ index: false, follow: false \}/);
+  assert.match(page, /SourceAuditClient/);
+  assert.match(client, /api\/admin\/data-authority-certification/);
+  assert.match(client, /credentials: "same-origin"/);
+  assert.match(client, /cache: "no-store"/);
+  assert.match(client, /Promise\.all\(targets\.map/);
+  assert.doesNotMatch(client, /method:\s*["'](?:POST|PUT|PATCH|DELETE)/);
 });
 
 test("Director authorization and request validation occur before outage scope entry", async () => {
