@@ -15,6 +15,7 @@ import {
   scoringAuthority,
   scoringAuthorityEnvironment,
 } from "../lib/scoring-authority.js";
+import { PRODUCTION_SPREADSHEET_ID } from "../lib/spreadsheet-environment.js";
 
 const eligiblePreview = {
   VERCEL_ENV: "preview",
@@ -81,6 +82,29 @@ test("eligible Preview selectors resolve Supabase without blocking", () => {
   assert.deepEqual({ requested: identity.requested, resolved: identity.resolved, eligible: identity.eligible, blocked: identity.blocked },
     { requested: "supabase", resolved: "supabase", eligible: true, blocked: false });
   assert.equal(identity.participantAuthEnabled, true);
+});
+
+test("Scoring accepts an isolated Preview workbook when the optional exact workbook selector is absent", () => {
+  const isolated = {
+    ...eligiblePreview,
+    PREVIEW_SCORING_SHEET_ID: "",
+    SCORING_AUTHORITY: "supabase",
+  };
+  assert.deepEqual(((state) => ({ resolved: state.resolved, eligible: state.eligible,
+    blocked: state.blocked, previewWorkbook: state.previewWorkbook, productionIsolated: state.productionIsolated }))(
+    scoringAuthorityEnvironment(isolated)),
+  { resolved: "supabase", eligible: true, blocked: false, previewWorkbook: true, productionIsolated: true });
+
+  const productionWorkbook = {
+    ...isolated,
+    GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID,
+    GOOGLE_SHEETS_SPREADSHEET_ID: PRODUCTION_SPREADSHEET_ID,
+  };
+  assert.deepEqual(((state) => ({ resolved: state.resolved, eligible: state.eligible,
+    blocked: state.blocked, reason: state.reason, productionIsolated: state.productionIsolated }))(
+    scoringAuthorityEnvironment(productionWorkbook)),
+  { resolved: "unavailable", eligible: false, blocked: true,
+    reason: "preview-workbook-required", productionIsolated: false });
 });
 
 test("invalid Preview authority tokens fail closed instead of selecting a legacy authority", () => {
