@@ -23,6 +23,15 @@ test("Step 9.1 network certification is a protected Preview-only read allowlist"
   assert.doesNotMatch(route, /\bfetch\s*\(/);
 });
 
+test("normal-route diagnostics alias reuses the protected certification handler", async () => {
+  const route = await source("app/admin/source-audit/route.js");
+
+  assert.match(route, /GET as certificationGet/);
+  assert.match(route, /api\/admin\/data-authority-certification\/route\.js/);
+  assert.match(route, /export const GET = certificationGet/);
+  assert.doesNotMatch(route, /export async function (?:POST|PUT|PATCH|DELETE)\b/);
+});
+
 test("Director authorization and request validation occur before outage scope entry", async () => {
   const route = await source("app/api/admin/data-authority-certification/route.js");
   const authorizeAt = route.indexOf("await authorizePreviewDirector");
