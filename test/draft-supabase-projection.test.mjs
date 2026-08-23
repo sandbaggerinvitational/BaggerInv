@@ -123,8 +123,16 @@ test("presentation hydration preserves existing Draft UI semantics without time 
   assert.equal(source.payload_fingerprint, draftFingerprint({ configuration: source.configuration, picks: source.picks, presentationSeed: source.presentation_seed }));
 });
 
-test("invalid ordering, duplicate players, missing identity, and orphan years fail closed", () => {
-  assert.throws(() => buildDraftProjection({ settingsRows: settingsRows.map((row) => row.Year === 2026 ? { ...row, "First Pick Team ID": "LIPPIT" } : row), pickRows, history, sourceWorkbookId: previewWorkbook }), (error) => error.code === "DRAFT_PICK_ORDER_INVALID");
+test("source order overrides are retained while invalid identity and orphan facts fail closed", () => {
+  const sourceOrderOverride = buildDraftProjection({
+    settingsRows: settingsRows.map((row) => row.Year === 2026 ? { ...row, "First Pick Team ID": "LIPPIT" } : row),
+    pickRows,
+    history,
+    sourceWorkbookId: previewWorkbook,
+  });
+  const overriddenDraft = sourceOrderOverride.drafts.find((draft) => draft.tournament_year === 2026);
+  assert.equal(overriddenDraft.picks[0].team_id, "PICKLES");
+  assert.ok(overriddenDraft.validation_diagnostics.corrections.some((entry) => entry.category === "SOURCE_TEAM_ORDER_OVERRIDE" && entry.year === 2026 && entry.pickNumber === 1));
   assert.throws(() => buildDraftProjection({ settingsRows, pickRows: pickRows.map((row) => row.Year === 2026 && row["Pick Number"] === 2 ? { ...row, "Team ID": "PICKLES" } : row), history, sourceWorkbookId: previewWorkbook }), (error) => error.code === "DRAFT_PICK_ROSTER_TEAM_MISMATCH");
   assert.throws(() => buildDraftProjection({ settingsRows, pickRows: pickRows.map((row) => row.Year === 2026 && row["Pick Number"] === 2 ? { ...row, "Player ID": "P1" } : row), history, sourceWorkbookId: previewWorkbook }), (error) => error.code === "DRAFT_PLAYER_DUPLICATE");
   assert.throws(() => buildDraftProjection({ settingsRows, pickRows: pickRows.map((row) => row.Year === 2026 && row["Pick Number"] === 2 ? { ...row, "Player ID": "UNKNOWN" } : row), history, sourceWorkbookId: previewWorkbook }), (error) => error.code === "DRAFT_PLAYER_ID_UNRESOLVED");

@@ -38,7 +38,10 @@ Projection adds deterministic `round_number`, `pick_within_round`, and an
 explicit `PENDING` or `SELECTED` evidence state. Pick numbers must be unique,
 contiguous, and in range. Selected players use stable Player IDs, must belong
 to the canonical tournament roster/team, and may appear only once per Draft.
-Snake ordering is validated without reordering the source.
+Pick numbers are validated for uniqueness, range, and deterministic source
+ordering. `Draft Picks.Team ID` remains authoritative for the actual selecting
+team; a Director-approved trade or order override is retained and diagnosed
+rather than rewritten from the default `Snake` configuration.
 
 ## Recorded historical coverage
 
