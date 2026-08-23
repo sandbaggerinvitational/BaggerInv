@@ -221,6 +221,7 @@ test("schema, synchronization, services, routes, analytics, and profiles share o
   assert.match(draft, /scope: "CURRENT"/);
   assert.match(draft, /scope: "PLAYER"/);
   assert.match(runtime, /readPublishedOddsView/);
+  assert.match(runtime, /sourceWorkbookId: env\.GOOGLE_SHEETS_ID/);
   assert.doesNotMatch(runtime, /loadDraftSheets/);
   for (const page of [draftPage, yearPage, analyticsPage]) {
     assert.match(page, /loadDraftRuntime/);
