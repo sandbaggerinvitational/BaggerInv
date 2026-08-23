@@ -6,7 +6,7 @@ import TournamentInitializationRecovery from "../TournamentInitializationRecover
 import { getTournamentData } from "../live/sheetData";
 import ParticipantSupabaseHome from "../ParticipantSupabaseHome";
 import { requireHomeReadSource } from "../../lib/home-read-source";
-import { netSkinsReadEnvironment } from "../../lib/net-skins-read-source";
+import { requireNetSkinsReadSource } from "../../lib/net-skins-read-source";
 import { participantIdentityAuthorityEnvironment } from "../../lib/participant-identity-authority";
 
 export const dynamic = "force-dynamic";
@@ -21,8 +21,8 @@ export const metadata = {
 export default async function MobileHomePage() {
   const source = requireHomeReadSource();
   const participantIdentityAuthority = participantIdentityAuthorityEnvironment().resolved;
-  const netSkinsSource = netSkinsReadEnvironment();
-  const netSkinsReadSource = netSkinsSource.previewDeployment && netSkinsSource.requested === "supabase" ? "supabase" : netSkinsSource.resolved;
+  const netSkinsSource = requireNetSkinsReadSource();
+  const netSkinsReadSource = netSkinsSource.resolved;
   if (source.resolved === "supabase") return <ParticipantSupabaseHome netSkinsReadSource={netSkinsReadSource} />;
 
   let liveData;

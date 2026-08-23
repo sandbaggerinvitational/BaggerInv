@@ -10,7 +10,7 @@ import styles from "./tournament-dashboard.module.css";
 import { workbookInitializationMessage } from "../../lib/tournament-workbook-initialization";
 import { requireTournamentReadSource } from "../../lib/tournament-read-source";
 import { requireLeaderboardsCoreReadSource } from "../../lib/leaderboards-core-read-source";
-import { netSkinsReadEnvironment } from "../../lib/net-skins-read-source";
+import { requireNetSkinsReadSource } from "../../lib/net-skins-read-source";
 import { redirect } from "next/navigation";
 import { isLegacyCalcuttaModule } from "../../lib/leaderboards-navigation";
 
@@ -29,9 +29,11 @@ export default async function LivePage({ searchParams }) {
   const requestedLeaderboardModule = leaderboardTab || leaderboardModule;
   if (view === "leaderboards" && requestedLeaderboardModule === "net-skins") redirect("/live?view=leaderboards&tab=skins");
   const source = requireTournamentReadSource();
+  if (source.resolved === "supabase" && ["points", "scores"].includes(view)) redirect("/live?view=leaderboards");
+  if (source.resolved === "supabase" && view && !["leaderboards", "calcutta"].includes(view)) redirect("/live");
   const leaderboardsSource = requireLeaderboardsCoreReadSource();
-  const netSkinsSource = netSkinsReadEnvironment();
-  const netSkinsReadSource = netSkinsSource.previewDeployment && netSkinsSource.requested === "supabase" ? "supabase" : netSkinsSource.resolved;
+  const netSkinsSource = requireNetSkinsReadSource();
+  const netSkinsReadSource = netSkinsSource.resolved;
   const supabaseLeaderboards = leaderboardsSource.resolved === "supabase" && view === "leaderboards";
   const supabaseTournament = source.resolved === "supabase" && (!view || view === "calcutta");
   let data;

@@ -3,12 +3,41 @@ import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheet
 import { workbookInitializationMessage } from "../../../lib/tournament-workbook-initialization";
 import { attachRuntimeTiming, createRuntimeProfile } from "../../../lib/runtime-performance";
 import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server-read";
+import { tournamentReadEnvironment } from "../../../lib/tournament-read-source";
+import { leaderboardsCoreReadEnvironment } from "../../../lib/leaderboards-core-read-source";
+import { netSkinsReadEnvironment } from "../../../lib/net-skins-read-source";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const profile = createRuntimeProfile("GET /api/live");
   try {
+    const tournamentSource = tournamentReadEnvironment();
+    const leaderboardsSource = leaderboardsCoreReadEnvironment();
+    const netSkinsSource = netSkinsReadEnvironment();
+    const selectedGoogleConsumers = [
+      ["tournament", tournamentSource],
+      ["leaderboards-core", leaderboardsSource],
+      ["net-skins", netSkinsSource],
+    ].filter(([, source]) => source.resolved === "google" && (
+      !source.previewDeployment || source.requested === "google"
+    )).map(([consumer]) => consumer);
+    if (!selectedGoogleConsumers.length) {
+      profile.finish({ blocked: true, source: "supabase" });
+      return NextResponse.json({
+        error: "The legacy Google live endpoint is not selected in this environment.",
+        code: "LEGACY_GOOGLE_LIVE_READ_NOT_SELECTED",
+        replacement: "/api/tournament/live",
+      }, {
+        status: 409,
+        headers: {
+          "X-Tournament-Read-Source": tournamentSource.resolved,
+          "X-Leaderboards-Core-Read-Source": leaderboardsSource.resolved,
+          "X-Net-Skins-Read-Source": netSkinsSource.resolved,
+          "X-Google-Fallback-Used": "false",
+        },
+      });
+    }
     const measured = await profile.measure("tournamentModel", () => withNormalizedReadDiagnostics("GET /api/live", getTournamentData));
     const data = measured.result;
     const diagnostics = tournamentLoaderDiagnostics();
