@@ -21,7 +21,9 @@ test("every presentation milestone submits its unchanged internal phase identifi
 test("all milestones share one publication handler and payload contract", async () => {
   const source = await readFile(new URL("../app/odds-center/admin/OddsAdmin.js", import.meta.url), "utf8");
   assert.match(source, /const endpoint = previewMode \? "\/api\/odds\/publish-preview" : "\/api\/odds\/publish"/);
-  assert.match(source, /const requestPayload = \{ phase, iterations \}/);
+  assert.match(source, /const requestPayload = \{ phase, iterations, \.\.\.\(previewMode \? \{ jobId: calculationJob\?\.job_id \} : \{\}\) \}/);
+  assert.match(source, /"\/api\/odds\/calculations"/);
+  assert.match(source, /ready for Director publication/);
   assert.match(source, /body: requestBody/);
   assert.match(source, /credentials: "same-origin"/);
   assert.match(source, /ODDS_PHASES\.includes\(phase\)/);

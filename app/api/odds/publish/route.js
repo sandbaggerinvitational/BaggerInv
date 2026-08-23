@@ -14,6 +14,7 @@ import { formatChampionshipOdds } from "../../../../lib/championship-odds-format
 import { oddsPersistenceDiagnostics } from "../../../../lib/odds-workbook-persistence";
 import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, publishedOddsSnapshotsFromView, readPublishedOddsView, replacePublishedOddsSnapshots } from "../../../../lib/published-odds-supabase.js";
 import { buildSupabaseOddsPublication, loadSupabaseOddsInputs, publishSupabaseOddsSnapshot } from "../../../../lib/championship-odds-supabase.js";
+import { markOddsCalculationPublished, readPublishableOddsCalculation } from "../../../../lib/championship-odds-resilience.js";
 import { deliverSupabaseOddsGoogleMirror } from "../../../../lib/championship-odds-google-mirror.js";
 import { oddsCalculationEnvironment } from "../../../../lib/odds-calculation-source.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
@@ -31,15 +32,25 @@ async function publishProjection(request) {
     const allowed = [process.env.ADMIN_SECRET, process.env.ODDS_ADMIN_SECRET, process.env.GUIDE_ADMIN_SECRET, process.env.LIVE_ADMIN_SECRET].filter(Boolean);
     const director = !secret || !allowed.includes(secret) ? await authorizePreviewDirector({ request, allowBootstrap: true }) : null;
     if ((!secret || !allowed.includes(secret)) && director?.status !== "active") return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
-    const { phase, iterations: requestedIterations = 10_000 } = await request.json();
+    const requestInput = await request.json();
+    let { phase, iterations: requestedIterations = 10_000 } = requestInput;
+    const calculationJobId = String(requestInput.jobId || "").trim();
     diagnostic.simulationPhase = phase;
-    if (!ODDS_PHASES.includes(phase)) return NextResponse.json({ error: "Invalid official phase." }, { status: 400 });
-    const iterations = Number(requestedIterations);
-    if (![10_000, 25_000, 50_000, 100_000].includes(iterations)) return NextResponse.json({ error: "Invalid simulation count." }, { status: 400 });
-
     const source = oddsCalculationEnvironment();
     let inputs;
-    if (source.inputSource === "supabase") {
+    let preparedCalculation = null;
+    if (process.env.VERCEL_ENV === "preview" && source.inputSource === "supabase") {
+      if (!/^[0-9a-f]{64}$/.test(calculationJobId)) return NextResponse.json({ error: "A completed resilient calculation is required before publication.", code: "ODDS_CALCULATION_JOB_REQUIRED" }, { status: 409 });
+      start("Calculation result verification", { workbookOperation: "None", worksheet: "odds_calculation_jobs", function: "readPublishableOddsCalculation" });
+      preparedCalculation = await readPublishableOddsCalculation({ tournamentId: director?.identity?.tournamentId || "2026", jobId: calculationJobId });
+      phase = preparedCalculation.job.phase;
+      requestedIterations = preparedCalculation.job.total_iterations;
+      diagnostic.simulationPhase = phase;
+      inputs = preparedCalculation.currentInputs;
+      pass("Calculation result verification", { function: "readPublishableOddsCalculation", jobId: calculationJobId,
+        resultFingerprint: preparedCalculation.job.result_fingerprint, checkpointCount: preparedCalculation.job.checkpoint_count,
+        attemptCount: preparedCalculation.job.attempt_count });
+    } else if (source.inputSource === "supabase") {
       start("Input loading", { workbookOperation: "None", worksheet: "Supabase scoring authority + versioned Odds inputs", function: "loadSupabaseOddsInputs" });
       inputs = await loadSupabaseOddsInputs(director?.identity?.tournamentId || "2026");
       pass("Input loading", { worksheet: inputs.sheets.projectionMatchSource, function: "loadSupabaseOddsInputs", diagnostics: inputs.diagnostics, metadata: inputs.metadata });
@@ -57,6 +68,9 @@ async function publishProjection(request) {
       inputs = await loadOddsInputs();
       pass("Input loading", { worksheet: inputs.sheets.projectionMatchSource || "Matches", function: "loadOddsInputs" });
     }
+    if (!ODDS_PHASES.includes(phase)) return NextResponse.json({ error: "Invalid official phase." }, { status: 400 });
+    const iterations = Number(requestedIterations);
+    if (![10_000, 25_000, 50_000, 100_000].includes(iterations)) return NextResponse.json({ error: "Invalid simulation count." }, { status: 400 });
 
     start("Pairing validation", { workbookOperation: "Validate official Round 1 and Round 2 pairings", worksheet: inputs.sheets.projectionMatchSource || "Matches", function: "validateOpeningMatchups" });
     const matchupStatus = validateOpeningMatchups(inputs.sheets);
@@ -76,10 +90,11 @@ async function publishProjection(request) {
     }
     pass("Pairing validation", { worksheet: inputs.sheets.projectionMatchSource || "Matches", function: "validateOpeningMatchups", roundReports: matchupStatus.roundReports });
 
-    trace.complete("Simulation start", { function: "simulateTournamentOdds", iterations, phase });
-    start("Simulation complete", { workbookOperation: "None", worksheet: "None", function: "simulateTournamentOdds", iterations, phase });
-    const preview = simulateTournamentOdds({ ...inputs, phase, iterations });
-    pass("Simulation complete", { function: "simulateTournamentOdds", iterations, phase });
+    trace.complete("Simulation start", { function: preparedCalculation ? "durable calculation result" : "simulateTournamentOdds", iterations, phase });
+    start("Simulation complete", { workbookOperation: "None", worksheet: "None", function: preparedCalculation ? "readPublishableOddsCalculation" : "simulateTournamentOdds", iterations, phase });
+    const preview = preparedCalculation?.snapshot || simulateTournamentOdds({ ...inputs, phase, iterations });
+    pass("Simulation complete", { function: preparedCalculation ? "readPublishableOddsCalculation" : "simulateTournamentOdds", iterations, phase,
+      ...(preparedCalculation ? { calculationJobId, resultFingerprint: preparedCalculation.job.result_fingerprint } : {}) });
 
     start("Snapshot generation", { workbookOperation: "Build normalized published projection snapshot", worksheet: "None", function: "simulateTournamentOdds" });
     if (!preview || typeof preview !== "object") throw new Error("Simulation did not return a projection snapshot.");
@@ -149,6 +164,19 @@ async function publishProjection(request) {
       if (!projected.payload?.ok) throw Object.assign(new Error("Published Odds Supabase projection failed after verified Google publication."), { code: projected.payload?.code });
       pass("Supabase publication projection", { function: "replacePublishedOddsSnapshots", snapshots: projected.payload.snapshots,
         importFingerprint: projected.payload.import_fingerprint, valuesRecalculated: false });
+    }
+
+    if (preparedCalculation) {
+      start("Calculation publication checkpoint", { workbookOperation: "None", worksheet: "odds_calculation_jobs", function: "markOddsCalculationPublished" });
+      const marked = await markOddsCalculationPublished(calculationJobId, {
+        phase: snapshot.phase,
+        publishedAt: snapshot.publishedAt,
+        publicationAuthority: source.publicationAuthority,
+        snapshotId: nativePublication?.payload?.snapshot_id || null,
+        verificationFingerprint: verification?.fingerprint || verification?.payloadFingerprint || null,
+      });
+      if (!marked.payload?.ok) throw Object.assign(new Error("The completed calculation publication checkpoint failed."), { code: marked.payload?.code || "ODDS_CALCULATION_PUBLICATION_CHECKPOINT_FAILED" });
+      pass("Calculation publication checkpoint", { function: "markOddsCalculationPublished", duplicate: marked.payload.duplicate === true });
     }
 
     start("Cache invalidation", { workbookOperation: "Invalidate shared projection API cache", worksheet: "None", function: "revalidatePath" });
