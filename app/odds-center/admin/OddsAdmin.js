@@ -41,13 +41,14 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
   const [status, setStatus] = useState("");
   const [preview, setPreview] = useState(null);
   const [calculationJob, setCalculationJob] = useState(null);
+  const [rehearsalFailure, setRehearsalFailure] = useState("MID_CALCULATION");
   const [diagnostics, setDiagnostics] = useState(null);
   const [busy, setBusy] = useState(false);
   useEffect(() => { if (ODDS_PHASES.includes(initialPhase)) setPhase(initialPhase); }, [initialPhase]);
   const selectablePhases = ODDS_PHASES.filter((item) => item === initialPhase || regenerationPhases.includes(item));
   const regeneration = regenerationPhases.includes(phase);
 
-  async function waitForCalculation(jobId) {
+  async function waitForCalculation(jobId, { retainForPublication = true } = {}) {
     const deadline = Date.now() + 15 * 60_000;
     while (Date.now() < deadline) {
       const response = await directorFetch(`/api/odds/calculations?job=${encodeURIComponent(jobId)}`, { credentials: "same-origin" });
@@ -58,7 +59,13 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
       const completed = Number(job.completed_iterations || 0).toLocaleString();
       const total = Number(job.total_iterations || 0).toLocaleString();
       setStatus(`${job.status === "RETRYABLE" ? "Resuming" : "Calculating"} ${completed} of ${total} iterations · ${Number(job.checkpoint_count || 0)} verified checkpoints. You may close this page.`);
-      if (job.status === "SUCCEEDED") { setCalculationJob(job); setStatus(`${total} deterministic iterations complete · ready for Director publication.`); return job; }
+      if (job.status === "SUCCEEDED") {
+        if (retainForPublication) setCalculationJob(job);
+        setStatus(retainForPublication
+          ? `${total} deterministic iterations complete · ready for Director publication.`
+          : `${total} deterministic iterations complete · recovery rehearsal passed without publication.`);
+        return job;
+      }
       if (["FAILED", "SUPERSEDED"].includes(job.status)) throw new Error(job.last_error_safe || `Calculation ${job.status.toLowerCase()}.`);
       await new Promise((resolve) => setTimeout(resolve, 2_000));
     }
@@ -74,6 +81,20 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Calculation could not be requested.");
       await waitForCalculation(data.jobId);
+    } catch (error) { setStatus(error.message); }
+    finally { setBusy(false); }
+  }
+
+  async function prepareRecoveryRehearsal() {
+    setBusy(true); setPreview(null); setDiagnostics(null); setCalculationJob(null);
+    setStatus(`Requesting a non-publishing ${rehearsalFailure.toLowerCase().replaceAll("_", " ")} recovery rehearsal…`);
+    try {
+      const response = await directorFetch("/api/odds/calculations", { method: "POST", credentials: "same-origin",
+        headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "request", phase, iterations, rehearsal: true, failureAt: rehearsalFailure }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Recovery rehearsal could not be requested.");
+      const job = await waitForCalculation(data.jobId, { retainForPublication: false });
+      setStatus(`${Number(job.total_iterations || iterations).toLocaleString()} deterministic iterations complete · recovery rehearsal passed in ${Number(job.attempt_count || 0)} attempts and ${Number(job.checkpoint_count || 0)} checkpoints · no publication created.`);
     } catch (error) { setStatus(error.message); }
     finally { setBusy(false); }
   }
@@ -137,5 +158,5 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
   const actionLabel = busy ? (previewMode ? "Calculation continues safely in the background…" : "Generating official projection…")
     : calculationJob ? (regeneration ? "Publish Completed Regeneration" : "Publish Completed Official Projection")
       : previewMode ? "Prepare Official Projection" : regeneration ? "Regenerate Official Projection" : "Generate & Publish Official Projection";
-  return <section className={styles.admin}><p>Official Tournament Intelligence</p><h1>Championship Projections</h1>{previewMode ? <button type="button" disabled={busy} onClick={refreshSupabaseInputs}>Verify Supabase Odds Inputs</button> : null}{regenerationPhases.length ? <div><strong>Preview Regeneration</strong><br /><span>Choose a published milestone to replace it using the current engine.</span></div> : null}<label>Official milestone{directorAuthorized && selectablePhases.length <= 1 ? <strong>{projectionPresentationLabel(phase)}</strong> : <select value={phase} onChange={(event) => { setPhase(event.target.value); resetCalculation(); }}>{(directorAuthorized ? selectablePhases : ODDS_PHASES).map((item) => <option value={item} key={item}>{projectionPresentationLabel(item)}{regenerationPhases.includes(item) ? " · Regenerate" : ""}</option>)}</select>}</label><label>Simulation count<select value={iterations} onChange={(event) => { setIterations(Number(event.target.value)); resetCalculation(); }}>{COUNTS.map((count) => <option value={count} key={count}>{count.toLocaleString()}</option>)}</select></label>{!embedded ? <label>Publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label> : null}<button disabled={(!publicationReady && !regeneration) || (!secret && !directorAuthorized) || busy} onClick={action}>{actionLabel}</button>{status ? <div>{status}</div> : null}<DiagnosticsPanel diagnostics={diagnostics} />{preview ? <div><span>Published Official Snapshot</span><strong>{projectionPresentationLabel(preview.phase)}</strong><br /><strong>{preview.teams?.[0]?.name}: {preview.teams?.[0]?.probability}%</strong><br /><strong>{preview.teams?.[1]?.name}: {preview.teams?.[1]?.probability}%</strong><br /><span>{preview.totalPointsAvailable} total tournament points modeled</span></div> : null}<small>Long calculations continue on a durable server job after this page closes. A completed result remains separate from publication until the Director explicitly publishes it.</small></section>;
+  return <section className={styles.admin}><p>Official Tournament Intelligence</p><h1>Championship Projections</h1>{previewMode ? <button type="button" disabled={busy} onClick={refreshSupabaseInputs}>Verify Supabase Odds Inputs</button> : null}{regenerationPhases.length ? <div><strong>Preview Regeneration</strong><br /><span>Choose a published milestone to replace it using the current engine.</span></div> : null}<label>Official milestone{directorAuthorized && selectablePhases.length <= 1 ? <strong>{projectionPresentationLabel(phase)}</strong> : <select value={phase} onChange={(event) => { setPhase(event.target.value); resetCalculation(); }}>{(directorAuthorized ? selectablePhases : ODDS_PHASES).map((item) => <option value={item} key={item}>{projectionPresentationLabel(item)}{regenerationPhases.includes(item) ? " · Regenerate" : ""}</option>)}</select>}</label><label>Simulation count<select value={iterations} onChange={(event) => { setIterations(Number(event.target.value)); resetCalculation(); }}>{COUNTS.map((count) => <option value={count} key={count}>{count.toLocaleString()}</option>)}</select></label>{!embedded ? <label>Publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label> : null}<button disabled={(!publicationReady && !regeneration) || (!secret && !directorAuthorized) || busy} onClick={action}>{actionLabel}</button>{previewMode ? <details><summary>Preview recovery rehearsal</summary><label>Safe interruption boundary<select value={rehearsalFailure} onChange={(event) => setRehearsalFailure(event.target.value)}><option value="BEFORE_FIRST_CHUNK">Before first chunk</option><option value="AFTER_CHECKPOINT">After checkpoint</option><option value="MID_CALCULATION">Mid-calculation</option><option value="AFTER_FINAL_CHECKPOINT">After final checkpoint</option><option value="AFTER_RESULT_COMMIT">After result commit</option></select></label><button type="button" disabled={busy} onClick={prepareRecoveryRehearsal}>Run non-publishing recovery rehearsal</button><small>This Preview-only rehearsal can retry a durable calculation, but it cannot publish Odds or create a Google mirror job.</small></details> : null}{status ? <div>{status}</div> : null}<DiagnosticsPanel diagnostics={diagnostics} />{preview ? <div><span>Published Official Snapshot</span><strong>{projectionPresentationLabel(preview.phase)}</strong><br /><strong>{preview.teams?.[0]?.name}: {preview.teams?.[0]?.probability}%</strong><br /><strong>{preview.teams?.[1]?.name}: {preview.teams?.[1]?.probability}%</strong><br /><span>{preview.totalPointsAvailable} total tournament points modeled</span></div> : null}<small>Long calculations continue on a durable server job after this page closes. A completed result remains separate from publication until the Director explicitly publishes it.</small></section>;
 }

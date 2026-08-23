@@ -249,6 +249,7 @@ test("the Preview worker is asynchronous, protected, zero-fallback, and does not
   assert.match(route, /process\.env\.VERCEL_ENV === "preview"/);
   assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /action === "certify"/);
+  assert.match(route, /searchParams\.get\("operation"\).*=== "certify"/s);
   assert.match(route, /publicationCreated: false/);
   assert.doesNotMatch(service, /loadOddsInputs|loadPredictionSheets|historical-data\.json|google-sheets/);
   assert.doesNotMatch(service, /publishSupabaseOddsSnapshot|publishOddsSnapshot|GoogleMirror/);
@@ -259,4 +260,6 @@ test("the Preview worker is asynchronous, protected, zero-fallback, and does not
   assert.doesNotMatch(warRoomSource, /odds_calculation_jobs|championship-odds-resilience/);
   assert.match(client, /You may close this page/);
   assert.match(client, /Publish Completed Official Projection/);
+  assert.match(client, /Run non-publishing recovery rehearsal/);
+  assert.match(client, /retainForPublication: false/);
 });

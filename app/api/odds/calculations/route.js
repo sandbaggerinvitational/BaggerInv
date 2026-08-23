@@ -56,6 +56,11 @@ export async function GET(request) {
   const jobId = clean(url.searchParams.get("job"));
   const tournamentId = clean(url.searchParams.get("tournament")) || clean(director.identity?.tournamentId) || "2026";
   try {
+    if (clean(url.searchParams.get("operation")).toLowerCase() === "certify") {
+      if (!/^[0-9a-f]{64}$/.test(jobId)) return NextResponse.json({ error: "A valid calculation job is required." }, { status: 400 });
+      const certification = await certifyOddsCalculationReference({ tournamentId, jobId });
+      return NextResponse.json({ ...certification, source: { requested: source.requestedInputs, resolved: source.inputSource }, publicationCreated: false });
+    }
     const state = await readOddsCalculationJobs(tournamentId, jobId || null);
     if (!state.payload?.ok) throw Object.assign(new Error("Calculation state is unavailable."), { code: state.payload?.code });
     let jobs = state.payload.jobs || [];
