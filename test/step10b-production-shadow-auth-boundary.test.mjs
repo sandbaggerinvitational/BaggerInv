@@ -420,6 +420,26 @@ test("Auth request hashing uses an Auth-only HMAC and provider failures are clas
     responseCategory: "RATE_LIMITED",
     responseStatus: 429,
   });
+  assert.deepEqual(classifyParticipantEmailOtpAuthError({
+    code: "unexpected_failure",
+    status: 429,
+    message: "Error sending confirmation email: Resend provider rate limit exceeded",
+  }), {
+    captchaRejected: false,
+    safeReason: "AUTH_SMTP_PROVIDER_RATE_LIMITED",
+    providerErrorClass: "SMTP_PROVIDER_RATE_LIMIT",
+    providerCalled: true,
+    responseCategory: "RATE_LIMITED",
+    responseStatus: 429,
+  });
+  assert.deepEqual(classifyParticipantEmailOtpAuthError({ status: 429, message: "Too many requests" }), {
+    captchaRejected: false,
+    safeReason: "AUTH_EMAIL_RATE_LIMITED_UNKNOWN_SOURCE",
+    providerErrorClass: "RATE_LIMIT_UNKNOWN_SOURCE",
+    providerCalled: false,
+    responseCategory: "RATE_LIMITED",
+    responseStatus: 429,
+  });
   assert.equal(classifyParticipantEmailOtpAuthError({ code: "captcha_failed", status: 400 }).providerErrorClass, "CAPTCHA_REJECTED");
   assert.equal(classifyParticipantEmailOtpAuthError({ message: "SMTP provider rejected the request", status: 500 }).providerErrorClass, "SMTP_PROVIDER_REJECTION");
   assert.equal(classifyParticipantEmailOtpAuthError({ message: "network unavailable", status: 503 }).providerErrorClass, "SERVICE_UNAVAILABLE");

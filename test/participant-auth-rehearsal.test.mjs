@@ -82,6 +82,30 @@ test("email OTP CAPTCHA failures have a distinct safe audit classification", asy
     responseCategory: "EMAIL_UNAVAILABLE",
     responseStatus: 503,
   });
+  assert.deepEqual(classifyParticipantEmailOtpAuthError({
+    code: "unexpected_failure",
+    status: 429,
+    message: "Error sending confirmation email: provider rate limit exceeded",
+  }), {
+    captchaRejected: false,
+    safeReason: "AUTH_SMTP_PROVIDER_RATE_LIMITED",
+    providerErrorClass: "SMTP_PROVIDER_RATE_LIMIT",
+    providerCalled: true,
+    responseCategory: "RATE_LIMITED",
+    responseStatus: 429,
+  });
+  assert.deepEqual(classifyParticipantEmailOtpAuthError({
+    code: "too_many_requests",
+    status: 429,
+    message: "Too many requests",
+  }), {
+    captchaRejected: false,
+    safeReason: "AUTH_EMAIL_RATE_LIMITED_UNKNOWN_SOURCE",
+    providerErrorClass: "RATE_LIMIT_UNKNOWN_SOURCE",
+    providerCalled: false,
+    responseCategory: "RATE_LIMITED",
+    responseStatus: 429,
+  });
 
   const route = await source("app/api/participant/auth/otp/request/route.js");
   assert.match(route, /safe_reason: authFailure\?\.safeReason \|\| "DELIVERY_ACCEPTED"/);
