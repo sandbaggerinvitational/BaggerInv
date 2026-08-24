@@ -27,6 +27,7 @@ test("Production foundation resolves every completed-history year without weaken
     "COMPLETED_HISTORY_READBACK",
     "CURRENT_TOURNAMENT_SHADOW_IMPORT",
     "CURRENT_SCORING_SHADOW_IMPORT",
+    "PRODUCTION_PRESENTATION_SHADOW_IMPORT",
     "CURRENT_SHADOW_READBACK",
   ]);
   for (let year = 2017; year <= 2025; year += 1) {
