@@ -179,9 +179,10 @@ test("candidate requests are bound to the stable alias and same origin", () => {
 });
 
 test("Production-shadow Auth page and optional diagnostics stay on the exact candidate boundary", async () => {
-  const [page, diagnosticsRoute] = await Promise.all([
+  const [page, diagnosticsRoute, previewEnvironmentRoute] = await Promise.all([
     readFile(new URL("../app/participant-auth/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/participant/auth/diagnostics/route.js", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/preview-environment/route.js", import.meta.url), "utf8"),
   ]);
   assert.match(page, /await applicationPageEnvironment\(\)/);
   assert.match(page, /PRODUCTION_SHADOW_CANDIDATE_REQUEST_UNAVAILABLE/);
@@ -198,6 +199,10 @@ test("Production-shadow Auth page and optional diagnostics stay on the exact can
     diagnosticsRoute.indexOf("verified.status !== \"active\"") < diagnosticsRoute.indexOf("inserted: 0, suppressed: true"),
     "candidate diagnostics no-op must still require an authenticated session",
   );
+  assert.match(previewEnvironmentRoute, /productionShadowCandidateEnvironment\(process\.env\)/);
+  assert.match(previewEnvironmentRoute, /commitApproved: candidate\.commitApproved/);
+  assert.match(previewEnvironmentRoute, /captchaSiteKeyConfigured: candidate\.captchaSiteKeyConfigured/);
+  assert.doesNotMatch(previewEnvironmentRoute, /secretKey|publishableKey|rateLimitSecret/);
 });
 
 test("Production-shadow candidate cannot initialize or call the legacy Google Admin CMS path", async () => {
