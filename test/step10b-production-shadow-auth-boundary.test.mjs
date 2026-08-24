@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -197,6 +198,105 @@ test("Production-shadow Auth page and optional diagnostics stay on the exact can
     diagnosticsRoute.indexOf("verified.status !== \"active\"") < diagnosticsRoute.indexOf("inserted: 0, suppressed: true"),
     "candidate diagnostics no-op must still require an authenticated session",
   );
+});
+
+test("Production-shadow candidate cannot initialize or call the legacy Google Admin CMS path", async () => {
+  const route = await readFile(new URL("../app/api/admin/cms/route.js", import.meta.url), "utf8");
+  assert.match(route, /PRODUCTION_SHADOW_CANDIDATE_GOOGLE_ADMIN_UNAVAILABLE/);
+  assert.match(route, /productionShadowCandidateEnvironment\(process\.env\)/);
+  assert.doesNotMatch(route, /^import[\s\S]{0,240}from "\.\.\/\.\.\/\.\.\/\.\.\/lib\/google-sheets-(?:write|data)/m);
+  assert.match(route, /async function loadGoogleCmsRuntime\(\)/);
+  const getHandler = route.slice(route.indexOf("export async function GET"), route.indexOf("export async function POST"));
+  const postHandler = route.slice(route.indexOf("export async function POST"));
+  for (const handler of [getHandler, postHandler]) {
+    assert.ok(handler.indexOf("blockedProductionShadowCms()") >= 0);
+    assert.ok(handler.indexOf("blockedProductionShadowCms()") < handler.indexOf("loadGoogleCmsRuntime();"));
+  }
+});
+
+test("Google modules import without side effects but default operations retain the Preview workbook guard", () => {
+  const dataModule = new URL("../lib/google-sheets-data.js", import.meta.url).href;
+  const writeModule = new URL("../lib/google-sheets-write.js", import.meta.url).href;
+  const script = `
+    let fetchCalls = 0;
+    globalThis.fetch = async () => { fetchCalls += 1; throw new Error("network-called"); };
+    const data = await import(${JSON.stringify(dataModule)});
+    const write = await import(${JSON.stringify(writeModule)});
+    const result = { imported: true, fetchCalls: 0, dataError: "", writeError: "" };
+    try { await data.loadHistoricalData(); } catch (error) { result.dataError = error?.message || String(error); }
+    try { await write.readWorkbookSheetTitles(); } catch (error) { result.writeError = error?.message || String(error); }
+    result.fetchCalls = fetchCalls;
+    process.stdout.write(JSON.stringify(result));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: new URL("..", import.meta.url),
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      VERCEL_ENV: "preview",
+      GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID,
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "must-not-be-used@example.invalid",
+      GOOGLE_PRIVATE_KEY: "must-not-be-used",
+    },
+  });
+  assert.equal(child.status, 0, child.stderr);
+  const result = JSON.parse(child.stdout);
+  assert.equal(result.imported, true);
+  assert.equal(result.dataError, "Preview data access is blocked from the production spreadsheet.");
+  assert.equal(result.writeError, "Preview data access is blocked from the production spreadsheet.");
+  assert.equal(result.fetchCalls, 0);
+});
+
+test("Production-shadow candidate blocks explicit Production archive reads before transport or fallback", () => {
+  const dataModule = new URL("../lib/google-sheets-data.js", import.meta.url).href;
+  const script = `
+    let fetchCalls = 0;
+    globalThis.fetch = async () => { fetchCalls += 1; throw new Error("network-called"); };
+    const data = await import(${JSON.stringify(dataModule)});
+    const result = { fetchCalls: 0, error: "", code: "" };
+    try { await data.loadScorecardSheets(); } catch (error) {
+      result.error = error?.message || String(error);
+      result.code = error?.code || "";
+    }
+    result.fetchCalls = fetchCalls;
+    process.stdout.write(JSON.stringify(result));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: new URL("..", import.meta.url),
+    encoding: "utf8",
+    env: { ...process.env, ...candidateEnv },
+  });
+  assert.equal(child.status, 0, child.stderr);
+  const result = JSON.parse(child.stdout);
+  assert.equal(result.code, "PRODUCTION_SHADOW_CANDIDATE_GOOGLE_READ_FORBIDDEN");
+  assert.equal(result.error, "Google data access is unavailable on the Production-shadow candidate.");
+  assert.equal(result.fetchCalls, 0);
+});
+
+test("malformed requested Production-shadow candidate also blocks explicit Google reads", () => {
+  const dataModule = new URL("../lib/google-sheets-data.js", import.meta.url).href;
+  const script = `
+    let fetchCalls = 0;
+    globalThis.fetch = async () => { fetchCalls += 1; throw new Error("network-called"); };
+    const data = await import(${JSON.stringify(dataModule)});
+    const result = { fetchCalls: 0, code: "" };
+    try { await data.loadScorecardSheets(); } catch (error) { result.code = error?.code || ""; }
+    result.fetchCalls = fetchCalls;
+    process.stdout.write(JSON.stringify(result));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: new URL("..", import.meta.url),
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      ...candidateEnv,
+      PRODUCTION_SHADOW_CANDIDATE_EXPECTED_COMMIT_SHA: "b".repeat(40),
+    },
+  });
+  assert.equal(child.status, 0, child.stderr);
+  const result = JSON.parse(child.stdout);
+  assert.equal(result.code, "PRODUCTION_SHADOW_CANDIDATE_GOOGLE_READ_FORBIDDEN");
+  assert.equal(result.fetchCalls, 0);
 });
 
 test("live Production always remains Passport even when candidate variables are injected", () => {

@@ -34,10 +34,9 @@ import { publicGuideRecords, recordMatchesTournament } from "../../lib/tournamen
 import { buildCalcuttaModel } from "../../lib/calcutta";
 import { recordDataAuthorityTransport } from "../../lib/data-authority-request";
 
-const SPREADSHEET_ID = resolveSpreadsheetId();
-
 function csvUrl(sheetName) {
-  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+  const spreadsheetId = resolveSpreadsheetId();
+  return `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
 }
 
 function parseCsv(csvText) {
@@ -86,8 +85,9 @@ async function fetchSheet(sheetName) {
   if (authenticatedPreviewReadsEnabled()) {
     return table(await readNormalizedSheetValues(sheetName));
   }
+  const url = csvUrl(sheetName);
   recordDataAuthorityTransport("google", { adapter: "live-sheet-data", transport: "gviz" });
-  const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
+  const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) throw new Error(`${sheetName} returned ${response.status}.`);
   const text = await response.text();
   if (!text.trim() || text.trim().startsWith("<")) throw new Error(`${sheetName} did not return public CSV data.`);
@@ -104,8 +104,9 @@ async function fetchOptionalSheet(sheetName) {
 
 async function fetchOptionalSheetValues(sheetName) {
   try {
+    const url = csvUrl(sheetName);
     recordDataAuthorityTransport("google", { adapter: "live-sheet-data", transport: "gviz" });
-    const response = await fetch(csvUrl(sheetName), { cache: "no-store" });
+    const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) return [];
     const text = await response.text();
     if (!text.trim() || text.trim().startsWith("<")) return [];

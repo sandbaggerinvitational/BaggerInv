@@ -1,25 +1,9 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import {
-  archiveCmsRecord,
-  deleteCmsRecord,
-  readAdminAuditLog,
-  readAdminDashboard,
-  readAdminStandings,
-  readCmsResource,
-  reorderCmsRecord,
-  saveCmsRecord,
-  withWorkbookWriteDiagnostics,
-} from "../../../../lib/google-sheets-write";
-import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
-import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
 import { assertValidTournamentId } from "../../../../lib/tournament-identifiers";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
-import {
-  shouldSynchronizeDraftAfterWrite,
-  synchronizeDraftProjection,
-} from "../../../../lib/draft-synchronization";
 import { assertDirectorMutationAuthority } from "../../../../lib/director-mutation-authority.js";
+import { productionShadowCandidateEnvironment } from "../../../../lib/production-shadow-candidate.js";
 
 export const dynamic = "force-dynamic";
 
@@ -36,12 +20,45 @@ globalThis.__sbiCmsSaveTransactions = saveTransactions;
 const REVALIDATED_PATHS = ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/draft", "/tournament-guide"];
 const MATCH_REVALIDATED_PATHS = ["/home", "/admin", "/players", "/live"];
 
+function blockedProductionShadowCms() {
+  const candidate = productionShadowCandidateEnvironment(process.env);
+  if (!candidate.requested) return null;
+  return NextResponse.json({
+    error: "Google-backed Admin CMS is unavailable on the Production-shadow candidate.",
+    code: "PRODUCTION_SHADOW_CANDIDATE_GOOGLE_ADMIN_UNAVAILABLE",
+  }, { status: candidate.allowed ? 409 : 404 });
+}
+
+async function loadGoogleCmsRuntime() {
+  const [write, data, scorecards, draft] = await Promise.all([
+    import("../../../../lib/google-sheets-write.js"),
+    import("../../../../lib/google-sheets-data.js"),
+    import("../../../../lib/scorecard-data.js"),
+    import("../../../../lib/draft-synchronization.js"),
+  ]);
+  return {
+    ...write,
+    GOOGLE_SHEETS_CACHE_TAG: data.GOOGLE_SHEETS_CACHE_TAG,
+    invalidateScorecardAnalyticsCache: scorecards.invalidateScorecardAnalyticsCache,
+    shouldSynchronizeDraftAfterWrite: draft.shouldSynchronizeDraftAfterWrite,
+    synchronizeDraftProjection: draft.synchronizeDraftProjection,
+  };
+}
+
 export async function GET(request) {
   if (!authorized(request)) return deny();
+  const candidateBlock = blockedProductionShadowCms();
+  if (candidateBlock) return candidateBlock;
   const query = new URL(request.url).searchParams;
   const resource = query.get("resource");
   const filters = filtersFrom(query);
   try {
+    const {
+      readAdminAuditLog,
+      readAdminDashboard,
+      readAdminStandings,
+      readCmsResource,
+    } = await loadGoogleCmsRuntime();
     if (filters.tournament) assertValidTournamentId(filters.tournament);
     if (resource === "dashboard") return NextResponse.json({ data: await readAdminDashboard(filters) });
     if (resource === "standings") return NextResponse.json({ data: await readAdminStandings(filters) });
@@ -55,6 +72,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   if (!authorized(request)) return deny();
+  const candidateBlock = blockedProductionShadowCms();
+  if (candidateBlock) return candidateBlock;
   let body = {};
   try {
     body = await request.json();
@@ -63,6 +82,17 @@ export async function POST(request) {
     const transactionId = String(request.headers.get("x-save-transaction-id") || body.transactionId || "").trim();
     const filters = { tournament: String(tournament || ""), year: String(year || "") };
     if (filters.tournament) assertValidTournamentId(filters.tournament);
+    const {
+      archiveCmsRecord,
+      deleteCmsRecord,
+      GOOGLE_SHEETS_CACHE_TAG,
+      invalidateScorecardAnalyticsCache,
+      reorderCmsRecord,
+      saveCmsRecord,
+      shouldSynchronizeDraftAfterWrite,
+      synchronizeDraftProjection,
+      withWorkbookWriteDiagnostics,
+    } = await loadGoogleCmsRuntime();
     const execute = async () => {
       const measured = await withWorkbookWriteDiagnostics(`cms:${resource}:${action}`, async () => {
         if (action === "save") return saveCmsRecord(resource, record, { key, ...filters, updatedBy });
