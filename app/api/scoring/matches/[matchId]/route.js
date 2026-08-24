@@ -14,6 +14,7 @@ import { recalculateIntelligenceDerivedTournament } from "../../../../../lib/int
 import { recalculateCalcuttaTournament } from "../../../../../lib/calcutta-supabase.js";
 import { drainScorecardArchiveJobs } from "../../../../../lib/scorecard-archive-worker.js";
 import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../../../../lib/scoring-read-service.js";
+import { productionShadowScoringMutationResponse } from "../../../../../lib/production-shadow-scoring-safety.js";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,8 @@ export async function GET(request, { params }) {
 }
 
 export async function POST(request, { params }) {
+  const candidateReadOnly = productionShadowScoringMutationResponse(request);
+  if (candidateReadOnly) return candidateReadOnly;
   try {
     const authorizationStartedAt = Date.now();
     const current = session(request);

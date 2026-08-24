@@ -10,6 +10,7 @@ import LocalGuide from "./LocalGuide";
 import ImportantContacts from "./ImportantContacts";
 import { GUIDE_FORMATS, guideFormatCode, rulesCurrentContextParity, rulesPresentationModel } from "../../lib/tournament-guide-rules";
 import styles from "./tournament-guide.module.css";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 const ruleSections = [
   { id: "tournament", icon: "🏆", title: "Competition Rules", matches: /tournament|handicap|scoring/i },
@@ -74,7 +75,8 @@ function Rules({ ruleBook, tournamentRules, rounds, liveRounds }) {
 function Placeholder({ title, detail }) { return <section className={styles.placeholder}><span>Tournament Guide</span><h1>{title}</h1><p>{detail}</p></section>; }
 
 export default async function GuideDetailPage({ section }) {
-  const content = await resolveTournamentGuideContent();
+  const env = await applicationPageEnvironment();
+  const content = await resolveTournamentGuideContent({ env });
   const { tournament, schedule: itinerary, ruleBook } = content;
   const descriptions = Object.fromEntries(content.overview.map((item) => [item["Section Slug"], item.Description]));
   return <main className={styles.guideDetailPage}><Header /><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} tournamentRules={content.tournamentRules} formatRules={content.rounds} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} liveRounds={content.liveRounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;

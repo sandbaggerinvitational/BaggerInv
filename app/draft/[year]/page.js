@@ -7,6 +7,7 @@ import { getDraftByYear, getDrafts } from "../../../lib/draft";
 import { pageMetadata } from "../../../lib/seo";
 import { getDraftAnalysis } from "../../../lib/draft-analysis";
 import { loadDraftRuntime } from "../../../lib/draft-runtime";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export async function generateMetadata({ params }) {
   const { year } = await params;
@@ -18,7 +19,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function HistoricalDraftPage({ params }) {
-  const runtime = await loadDraftRuntime();
+  const env = await applicationPageEnvironment();
+  const runtime = await loadDraftRuntime({ env });
   const { year } = await params;
   const [draft, drafts] = await Promise.all([
     getDraftByYear(year, runtime.draftOptions),

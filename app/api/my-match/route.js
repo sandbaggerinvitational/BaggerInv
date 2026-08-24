@@ -16,6 +16,7 @@ import { verifyParticipantAuthClaims } from "../../../lib/supabase-auth-server.j
 import { guideReadEnvironment } from "../../../lib/guide-read-source.js";
 import { readGuideProjection } from "../../../lib/guide-supabase.js";
 import { applyGuideCoursesToMyMatch, guideParticipantProjection } from "../../../lib/guide-participant-adapter.js";
+import { applicationRequestEnvironment } from "../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -34,10 +35,12 @@ export async function GET(request) {
   let session;
   let resolvedIdentity;
   let identity;
+  let env;
   try {
-    identity = requireParticipantIdentityAuthority();
+    env = applicationRequestEnvironment(request);
+    identity = requireParticipantIdentityAuthority(env);
     if (identity.resolved === "supabase") {
-      resolvedIdentity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+      resolvedIdentity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     } else {
       session = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));
     }
@@ -50,8 +53,8 @@ export async function GET(request) {
     return safeError(401);
   }
   const sessionValidationMs = performance.now() - requestStartedAt;
-  const source = requireMyMatchReadSource();
-  const guideSource = guideReadEnvironment().course;
+  const source = requireMyMatchReadSource(env);
+  const guideSource = guideReadEnvironment(env).course;
 
   try {
     if (source.resolved === "google") {
@@ -70,9 +73,9 @@ export async function GET(request) {
     const playerId = identity.resolved === "supabase" ? resolvedIdentity.playerId : playerPassportEffectivePlayerId(session);
     const tournamentId = identity.resolved === "supabase" ? resolvedIdentity.tournamentId : session.tournamentId;
     const [read, guideRead] = await Promise.all([
-      readMyMatchView({ tournamentId, playerId }),
+      readMyMatchView({ tournamentId, playerId }, { env }),
       guideSource.resolved === "supabase"
-        ? readGuideProjection({ tournamentId, surface: "course" }).catch((error) => ({
+        ? readGuideProjection({ tournamentId, surface: "course", env }).catch((error) => ({
           payload: { ok: false, code: error?.code || "GUIDE_PROJECTION_UNAVAILABLE" }, durationMs: 0,
         }))
         : Promise.resolve(null),

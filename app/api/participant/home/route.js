@@ -11,6 +11,7 @@ import { readGuideProjection } from "../../../../lib/guide-supabase.js";
 import { applyGuideProjectionToHome } from "../../../../lib/guide-participant-adapter.js";
 import { isRecoverablePreviewImpersonationCode } from "../../../../lib/participant-impersonation-recovery.js";
 import { PLAYER_PASSPORT_COOKIE, playerPassportCookie } from "../../../../lib/player-passport.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -19,26 +20,27 @@ const headers = { "Cache-Control": "private, no-store", "Vary": "Cookie" };
 export async function GET(request) {
   const startedAt = performance.now();
   try {
-    const source = requireHomeReadSource();
-    const storylinesSource = requireStorylinesReadSource();
-    const guideSource = guideReadEnvironment().guide;
-    const authority = requireParticipantIdentityAuthority();
+    const env = applicationRequestEnvironment(request);
+    const source = requireHomeReadSource(env);
+    const storylinesSource = requireStorylinesReadSource(env);
+    const guideSource = guideReadEnvironment(env).guide;
+    const authority = requireParticipantIdentityAuthority(env);
     if (source.resolved !== "supabase" || authority.resolved !== "supabase") {
       return NextResponse.json({ error: "Participant Home Supabase read is not active." }, { status: 404, headers });
     }
     const identityStarted = performance.now();
-    const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+    const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStarted;
     const serviceStarted = performance.now();
     const [read, prepared, guideRead] = await Promise.all([
-      readParticipantHomeView({ tournamentId: resolved.tournamentId, playerId: resolved.playerId }),
+      readParticipantHomeView({ tournamentId: resolved.tournamentId, playerId: resolved.playerId }, { env }),
       storylinesSource.resolved === "supabase"
-        ? currentCompetitionDerivedState(resolved.tournamentId, { engineKeys: ["TOURNAMENT_STORYLINES"] }).catch((error) => ({
+        ? currentCompetitionDerivedState(resolved.tournamentId, { engineKeys: ["TOURNAMENT_STORYLINES"], env }).catch((error) => ({
           storylines: [], moments: [], metadata: { storylines: { stale: true, unavailable: true, code: error?.code || "STORYLINES_UNAVAILABLE" } }, serviceMs: 0,
         }))
         : Promise.resolve(null),
       guideSource.resolved === "supabase"
-        ? readGuideProjection({ tournamentId: resolved.tournamentId, surface: "guide" }).catch((error) => ({
+        ? readGuideProjection({ tournamentId: resolved.tournamentId, surface: "guide", env }).catch((error) => ({
           payload: { ok: false, code: error?.code || "GUIDE_PROJECTION_UNAVAILABLE" }, durationMs: 0,
         }))
         : Promise.resolve(null),
@@ -48,8 +50,8 @@ export async function GET(request) {
     let data = participantHomeDataFromSupabaseView(read.payload.data);
     if (guideRead?.payload?.ok) {
       data = applyGuideProjectionToHome(data, guideRead, {
-        previewDate: process.env.PREVIEW_TIMELINE_DATE,
-        previewEnabled: process.env.VERCEL_ENV === "preview",
+        previewDate: env.PREVIEW_TIMELINE_DATE,
+        previewEnabled: env.VERCEL_ENV === "preview",
       });
     }
     if (storylinesSource.resolved === "supabase") {

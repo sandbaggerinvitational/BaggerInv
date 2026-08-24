@@ -14,6 +14,7 @@ import guideStyles from "../tournament-guide/tournament-guide.module.css";
 import courseStyles from "./course-directory.module.css";
 import { pageMetadata } from "../../lib/seo";
 import { requireHistoricalCourseReadSource } from "../../lib/historical-course-read-source";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Courses | The Sandbagger Invitational",
@@ -24,12 +25,13 @@ export const metadata = pageMetadata({
 const formatName = (value) => ({ BB: "2v2 Best Ball", SC: "Scramble", SI: "Singles" })[String(value || "").trim().toUpperCase()] || value || "";
 
 export default async function CoursesPage({ searchParams }) {
+  const env = await applicationPageEnvironment();
   const archive = String((await searchParams)?.view || "") === "archive";
-  const archiveSource = archive ? requireHistoricalCourseReadSource(process.env) : null;
+  const archiveSource = archive ? requireHistoricalCourseReadSource(env) : null;
   const content = !archive
-    ? await resolveTournamentGuideContent({ surface: "course" })
+    ? await resolveTournamentGuideContent({ surface: "course", env })
     : archiveSource.resolved === "supabase"
-      ? await import("../../lib/historical-course-service").then((module) => module.loadHistoricalCourseArchive())
+      ? await import("../../lib/historical-course-service").then((module) => module.loadHistoricalCourseArchive({ env }))
       : await import("../tournament-guide/resolveGuideContentGoogle.js").then((module) => module.resolveGoogleTournamentGuideContent());
   const { tournament } = content;
   const courses = archive ? [] : currentTournamentCourses(content.courses);

@@ -13,6 +13,7 @@ import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } fr
 import { myMatchDataFromSupabaseView, readMyMatchView } from "../../../../lib/my-match-supabase.js";
 import { leaderboardsCoreDataFromSupabaseView, readLeaderboardsCoreView } from "../../../../lib/leaderboards-core-supabase.js";
 import { playerProfileFromLeaderboardsCore } from "../../../../lib/player-presentation.js";
+import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
 
 export const dynamic = "force-dynamic";
 
@@ -184,6 +185,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const candidateReadOnly = productionShadowScoringMutationResponse(request);
+  if (candidateReadOnly) return candidateReadOnly;
   const startedAt = performance.now();
   let identity;
   try {

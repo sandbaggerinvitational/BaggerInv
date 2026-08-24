@@ -6,6 +6,7 @@ import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } fr
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -14,17 +15,19 @@ const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" }
 export async function GET(request) {
   const startedAt = performance.now();
   try {
-    const source = requireNetSkinsReadSource();
-    const authority = requireParticipantIdentityAuthority();
+    const env = applicationRequestEnvironment(request);
+    const source = requireNetSkinsReadSource(env);
+    const authority = requireParticipantIdentityAuthority(env);
     if (source.resolved !== "supabase" || authority.resolved !== "supabase") {
       return NextResponse.json({ error: "Net Skins Supabase read is not active." }, { status: 404, headers: responseHeaders });
     }
     const identityStarted = performance.now();
-    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStarted;
     const operational = await currentNetSkinsOperationalResult(identity.tournamentId, {
-      recalculatePending: true,
+      recalculatePending: !source.productionShadowCandidate,
       calculatedBy: `participant-read:${identity.playerId}`,
+      env,
     });
     const totalMs = performance.now() - startedAt;
     if (operational.recalculation) after(async () => {

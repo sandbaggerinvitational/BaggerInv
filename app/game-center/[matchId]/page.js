@@ -11,6 +11,7 @@ import { guideReadEnvironment } from "../../../lib/guide-read-source";
 import { readGuideProjection } from "../../../lib/guide-supabase";
 import { applyGuideCourseToGameCenter } from "../../../lib/guide-participant-adapter";
 import styles from "../game-center.module.css";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export const dynamic = "force-dynamic";
 export const metadata = privatePageMetadata("Game Center | Sandbagger Invitational");
@@ -23,21 +24,22 @@ function safeReturnContext(value) {
 }
 
 export default async function GameCenterPage({ params, searchParams }) {
+  const env = await applicationPageEnvironment();
   const { matchId } = await params;
   const query = await searchParams;
   const cookieStore = await cookies();
   let currentPlayerId = "";
-  const authority = requireParticipantIdentityAuthority();
+  const authority = requireParticipantIdentityAuthority(env);
   try {
     currentPlayerId = authority.resolved === "supabase"
-      ? (await resolveSupabaseParticipantIdentity({ cookieStore })).playerId
+      ? (await resolveSupabaseParticipantIdentity({ cookieStore, env })).playerId
       : playerPassportEffectivePlayerId(verifyPlayerPassportSession(cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""));
   } catch {}
-  const guideSource = guideReadEnvironment().course;
+  const guideSource = guideReadEnvironment(env).course;
   const [assembled, guideRead] = await Promise.all([
-    getGameCenterData(matchId, currentPlayerId),
+    getGameCenterData(matchId, currentPlayerId, { env }),
     guideSource.resolved === "supabase"
-      ? readGuideProjection({ surface: "course" }).catch(() => null)
+      ? readGuideProjection({ surface: "course", env }).catch(() => null)
       : Promise.resolve(null),
   ]);
   const initialData = guideRead?.payload?.ok ? applyGuideCourseToGameCenter(assembled, guideRead) : assembled;

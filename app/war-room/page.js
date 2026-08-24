@@ -3,6 +3,7 @@ import { Header, Footer } from "../components";
 import { prepareWarRoomInput } from "../../lib/war-room-input-service";
 import WarRoom from "./WarRoom";
 import { pageMetadata } from "../../lib/seo";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Match Intelligence | Sandbagger Invitational",
@@ -11,6 +12,7 @@ export const metadata = pageMetadata({
 });
 
 export default async function WarRoomPage({ searchParams }) {
+  const env = await applicationPageEnvironment();
   const query = await searchParams;
   const legacyPlayers = String(query?.players || "").split(",").filter(Boolean);
   const initialSelection = {
@@ -23,7 +25,7 @@ export default async function WarRoomPage({ searchParams }) {
   if (!initialSelection.players.length) initialSelection.players = legacyPlayers;
   let data=null, error="";
   try {
-    data = (await prepareWarRoomInput({ scope: "war-room" })).consumerData;
+    data = (await prepareWarRoomInput({ scope: "war-room", env })).consumerData;
   } catch(e){ error=e.message || "Unable to load prediction data."; }
   return <main><Header/><WarRoom initialData={data} loadError={error} initialSelection={initialSelection}/><Footer/></main>;
 }

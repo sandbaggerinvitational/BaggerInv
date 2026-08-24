@@ -23,6 +23,7 @@ import {
 import { buildCanonicalRecordHolderAuthority } from "../../lib/record-holder-authority";
 import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 function LeaderSection({ title, slug, rows, value }) {
   const rankedRows = addTournamentRanks(rows, ({ stats }) => value(stats));
@@ -66,8 +67,9 @@ export const metadata = pageMetadata({
 });
 
 export default async function RecordsPage() {
-  const useSupabase = isSupabaseSecondaryHistory();
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   const scorecardAnalyticsPromise = useSupabase
     ? Promise.resolve(secondaryHistory.scorecardAnalytics)
     : loadScorecardAnalytics();

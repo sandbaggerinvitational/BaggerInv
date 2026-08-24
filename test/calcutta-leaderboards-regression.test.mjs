@@ -38,7 +38,7 @@ test("legacy Calcutta query intent redirects before Leaderboards data loads", as
   const page = await source("app/live/page.js");
   const redirectCheck = page.indexOf("isLegacyCalcuttaModule(leaderboardTab)");
   assert.ok(redirectCheck > -1);
-  assert.ok(redirectCheck < page.indexOf("requireTournamentReadSource()"));
+  assert.ok(redirectCheck < page.indexOf("requireTournamentReadSource(env)"));
   assert.match(page, /isLegacyCalcuttaModule\(leaderboardModule\)/);
   assert.match(page, /redirect\("\/live\?view=calcutta"\)/);
 });
@@ -61,7 +61,7 @@ test("the installed PWA rechecks and activates the corrected navigation bundle",
   ]);
   assert.match(foundation, /updateViaCache: "none"/);
   assert.match(foundation, /registration\.update\(\)/);
-  assert.match(worker, /const CACHE_VERSION = "sbi-shell-v3"/);
+  assert.match(worker, /const CACHE_VERSION = "sbi-shell-v4"/);
   assert.match(worker, /if \(url\.pathname\.startsWith\("\/_next\/"\)\) return/);
   assert.match(worker, /self\.skipWaiting\(\)/);
   assert.match(worker, /self\.clients\.claim\(\)/);

@@ -110,7 +110,10 @@ function CompactMatchup({ match }) {
   </div>;
 }
 
-function MatchActions({ match, status, busy, onOpen, detailsHref }) {
+function MatchActions({ match, status, busy, onOpen, detailsHref, readOnly }) {
+  if (readOnly) return <div className={styles.actions}>
+    <Link className={styles.primaryAction} href={detailsHref}>View Match <i aria-hidden="true">→</i></Link>
+  </div>;
   const scorecardAction = status === "Live"
     ? scorecardReadyForReview(match) ? "Review & Finalize" : match.holesRecorded ? "Continue Scoring" : "Start Scoring"
     : status === "Final" ? "Final Scorecard" : "";
@@ -123,7 +126,7 @@ function MatchActions({ match, status, busy, onOpen, detailsHref }) {
   </div>;
 }
 
-function MatchCard({ match, tier = "compact", availableChoice = false, busy, onOpen, tournamentLogoFilename }) {
+function MatchCard({ match, tier = "compact", availableChoice = false, busy, onOpen, tournamentLogoFilename, readOnly }) {
   const status = appMatchStatus(match);
   const result = formatMatchResult(match, match.team?.side);
   const primary = tier === "primary";
@@ -166,12 +169,12 @@ function MatchCard({ match, tier = "compact", availableChoice = false, busy, onO
         {status === "Locked" ? <i aria-hidden="true">🔒</i> : null}
         {support}
       </span>
-      <MatchActions match={match} status={status} busy={busy} onOpen={onOpen} detailsHref={detailsHref} />
+      <MatchActions match={match} status={status} busy={busy} onOpen={onOpen} detailsHref={detailsHref} readOnly={readOnly} />
     </div>
   </article>;
 }
 
-export default function MyMatchDashboard({ player, tournament, matches, busy, onOpen, message }) {
+export default function MyMatchDashboard({ player, tournament, matches, busy, onOpen, message, readOnly = false }) {
   const ordered = orderPlayerMatches(matches, tournament?.currentRound);
   const selection = selectRelevantPlayerMatches(matches, tournament?.currentRound);
   const actionable = ordered.filter((match) => ["LIVE", "OPEN"].includes(normalizedMatchStatus(match)));
@@ -205,6 +208,7 @@ export default function MyMatchDashboard({ player, tournament, matches, busy, on
         <p>{player?.name ? `${player.name} · ` : ""}{tournament?.name || "Sandbagger Invitational"}</p>
       </div>
     </header>
+    {readOnly ? <p className={styles.message} role="status">Production shadow certification is read-only. Scoring changes are disabled.</p> : null}
     {message ? <p className={styles.message} role="status">{message}</p> : null}
     {ordered.length ? <div className={styles.matchGroups} aria-label="Your tournament matches">
       {groups.map((group) => <section className={styles.matchGroup} data-tier={group.tier} key={group.label}>
@@ -217,6 +221,7 @@ export default function MyMatchDashboard({ player, tournament, matches, busy, on
         busy={busy}
         onOpen={onOpen}
         tournamentLogoFilename={tournament?.logo}
+        readOnly={readOnly}
         />)}</div>
       </section>)}
     </div> : <div className={styles.empty}>

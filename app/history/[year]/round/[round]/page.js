@@ -82,28 +82,30 @@ import {
   isSupabaseCompletedHistoryYear,
   loadCompletedHistoryView,
 } from "../../../../../lib/completed-history-service";
+import { applicationPageEnvironment } from "../../../../../lib/production-shadow-request-environment";
 
 function displayPoints(value) {
   return formatTeamPoints(value);
 }
 
 export async function generateMetadata({ params }) {
+  const env = await applicationPageEnvironment();
   const { year, round } = await params;
   let archive;
 
-  if (isSupabaseHistory2026(year)) {
+  if (isSupabaseHistory2026(year, env)) {
     try {
       archive = history2026RoundPageModel(
-        await loadHistory2026View({ year: Number(year) }),
+        await loadHistory2026View({ year: Number(year), env }),
         round
       )?.archive;
     } catch {
       archive = null;
     }
-  } else if (isSupabaseCompletedHistoryYear(year)) {
+  } else if (isSupabaseCompletedHistoryYear(year, env)) {
     try {
       archive = completedHistoryRoundPageModel(
-        await loadCompletedHistoryView({ year: Number(year) }),
+        await loadCompletedHistoryView({ year: Number(year), env }),
         round
       )?.archive;
     } catch {
@@ -140,10 +142,11 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function HistoricalRoundPage({ params, searchParams }) {
+  const env = await applicationPageEnvironment();
   const { year, round } = await params;
   const query = await searchParams;
-  const useSupabase2026 = isSupabaseHistory2026(year);
-  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
+  const useSupabase2026 = isSupabaseHistory2026(year, env);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year, env);
   let archive;
   let scorecardAnalytics;
   let roundTournamentMatches = null;
@@ -152,7 +155,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
   if (useSupabase2026) {
     try {
       const model = history2026RoundPageModel(
-        await loadHistory2026View({ year: Number(year) }),
+        await loadHistory2026View({ year: Number(year), env }),
         round
       );
       if (model?.archive && !model.scorecardAnalytics) {
@@ -167,7 +170,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
     }
   } else if (useSupabaseCompleted) {
     try {
-      const view = await loadCompletedHistoryView({ year: Number(year) });
+      const view = await loadCompletedHistoryView({ year: Number(year), env });
       const model = completedHistoryRoundPageModel(view, round);
       if (
         !model?.archive ||

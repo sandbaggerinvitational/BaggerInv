@@ -114,7 +114,12 @@ function ScorecardCell({ readOnly, disabled, onEdit, children, label }) {
   return <button type="button" disabled={disabled} onClick={onEdit} aria-label={label}>{children}</button>;
 }
 
-export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = false, participantIdentityAuthority = "passport" }) {
+export default function ScoreEntry({
+  dashboardOnly = false,
+  localFirstEnabled = false,
+  participantIdentityAuthority = "passport",
+  scoringReadOnly = false,
+}) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [credential, setCredential] = useState("");
@@ -225,7 +230,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Unable to load the match.");
     setData(payload.data);
-    setShowReview(payload.data.match["Match Status"] === "Final" || Boolean(payload.data.canConfirm));
+    setShowReview(scoringReadOnly || payload.data.match["Match Status"] === "Final" || Boolean(payload.data.canConfirm));
     setConfirming(false);
     const scored = payload.data.holeScores.map((item) => Number(item["Hole Number"]));
     const targetHole = payload.data.match["Match Status"] === "Final"
@@ -306,6 +311,10 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   }, [dashboardOnly, restoreAttempt, router, supabaseParticipantIdentity]);
 
   const login = async () => {
+    if (scoringReadOnly) {
+      setStatus("Scoring changes are disabled in the Production shadow candidate.");
+      return;
+    }
     setBusy(true); setStatus("Opening scoring…");
     try {
       const payload = await request("/api/scoring/session", {
@@ -324,6 +333,10 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   };
 
   const openPassportMatch = async (passportMatch) => {
+    if (scoringReadOnly) {
+      setStatus("This Production shadow is read-only. Use Game Center to inspect the match.");
+      return;
+    }
     matchOpenController.current?.abort();
     const controller = new AbortController();
     matchOpenController.current = controller;
@@ -552,6 +565,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const teamNames = display.teamNames || {};
   const playerNames = display.playerNames || {};
   const isFinal = match["Match Status"] === "Final";
+  const readOnlyScorecard = isFinal || scoringReadOnly;
   const finalResult = isFinal
     ? finalizedMatchResult(match, data?.holeScores || [], teamNames)
     : "";
@@ -620,7 +634,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     team2GrossScores: gross.team2,
   }, savedHole));
 
-  const activeScoringFocus = Boolean(authorized && data && !isFinal && !showReview);
+  const activeScoringFocus = Boolean(authorized && data && !readOnlyScorecard && !showReview);
   useEffect(() => {
     document.body.classList.toggle("participant-scoring-focus-active", activeScoringFocus);
     return () => document.body.classList.remove("participant-scoring-focus-active");
@@ -820,7 +834,9 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
     }
   };
 
-  const save = localFirstEnabled ? saveLocally : saveAuthoritatively;
+  const save = scoringReadOnly
+    ? () => setStatus("Scoring changes are disabled in the Production shadow candidate.")
+    : localFirstEnabled ? saveLocally : saveAuthoritatively;
 
   const requestSave = () => {
     if (savedHole && draftDirty) {
@@ -831,6 +847,11 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   };
 
   const confirmScorecard = async () => {
+    if (scoringReadOnly) {
+      setStatus("Finalization is disabled in the Production shadow candidate.");
+      setConfirming(false);
+      return;
+    }
     if (localFirstEnabled && syncEntries.length) {
       setStatus("Syncing remaining scores before final submission…");
       await syncQueue.current?.retry();
@@ -951,7 +972,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   const frontComplete = [...completed].filter((number) => number <= 9).length;
   const backComplete = [...completed].filter((number) => number > 9).length;
   const missingScores = scoringSlots.filter((slot) => gross[slot.sideKey]?.[slot.index] === "" || gross[slot.sideKey]?.[slot.index] == null).length;
-  const saveDisabled = busy || !scoresComplete || unchangedSavedScore || (localFirstEnabled && (!syncReady || unsafeSyncBlock));
+  const saveDisabled = scoringReadOnly || busy || !scoresComplete || unchangedSavedScore || (localFirstEnabled && (!syncReady || unsafeSyncBlock));
   const saveLabel = busy
     ? `Saving Hole ${holeNumber}…`
     : saveFailed ? "Try Again"
@@ -972,6 +993,7 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
       busy={busy}
       onOpen={openPassportMatch}
       message={status}
+      readOnly={scoringReadOnly}
     />;
 
   if (!authorized && passportState === "unavailable") return <section className={styles.login}>
@@ -1003,10 +1025,15 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
   </section>;
   if (!data) return <section className={styles.login}><div className={styles.brand}><span>SBI LIVE</span><h1>Unable to open match</h1></div><button className={styles.primary} onClick={clearAccess}>Clear match access</button>{status && <p className={styles.status}>{status}</p>}</section>;
 
-  if (showReview) return <section className={`${styles.shell} ${styles.reviewShell}`} data-scorecard-state={isFinal ? "final" : "review"}>
+  if (showReview || (scoringReadOnly && data)) return <section className={`${styles.shell} ${styles.reviewShell}`} data-scorecard-state={isFinal ? "final" : scoringReadOnly ? "production-shadow-read-only" : "review"}>
     {tournamentIdentity}
-    <header className={styles.scorecardHeading}><div><span>{display.formatName || format}</span><h1>{isFinal ? "Official Tournament Scorecard" : "Review Scorecard"}</h1></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
-    {!isFinal ? <div className={styles.reviewStatus}>
+    <header className={styles.scorecardHeading}><div><span>{display.formatName || format}</span><h1>{isFinal ? "Official Tournament Scorecard" : scoringReadOnly ? "Read-only Scorecard" : "Review Scorecard"}</h1></div><b aria-label={`${completed.size} of 18 holes recorded`}>{completed.size}/18</b></header>
+    {scoringReadOnly && !isFinal ? <div className={styles.reviewStatus}>
+      <div className={styles.reviewBadge}><StatusBadge status="Read Only" /></div>
+      <span>PRODUCTION SHADOW CERTIFICATION</span>
+      <strong>Scoring, local drafts, and finalization are disabled.</strong>
+      <small>Use this view only to inspect the Production shadow match state.</small>
+    </div> : !isFinal ? <div className={styles.reviewStatus}>
       <div className={styles.reviewBadge}><StatusBadge status="Current Match" /></div>
       <span>REVIEW BEFORE SUBMITTING</span>
       <strong>{completed.size ? formatLiveMatchResult(data?.holeScores, teamNames) : lastSaved || "Check every hole before confirmation."}</strong>
@@ -1042,29 +1069,35 @@ export default function ScoreEntry({ dashboardOnly = false, localFirstEnabled = 
             const total = format === "SC" ? match[`Team ${side} Stroke`] : match[`Team ${side} Player ${index + 1} Stroke`];
             const dots = strokeDots(getStrokesOnHole(total, metadata?.["Stroke Index"]));
             const player = format === "SC" ? teamNames[side] || `Team ${side}` : playerNames[ids[index]] || ids[index];
-            return <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${player}, gross ${grossAt(score, side, index) || "not recorded"}`} key={number}><i>{dots}</i>{grossAt(score, side, index) || "—"}</ScorecardCell>;
+            return <ScorecardCell readOnly={readOnlyScorecard} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${player}, gross ${grossAt(score, side, index) || "not recorded"}`} key={number}><i>{dots}</i>{grossAt(score, side, index) || "—"}</ScorecardCell>;
           })}
         </div>);
       })}
       {[1, 2].map((side) => <div className={styles.scorecardRow} data-team="true" role="row" key={`net-${side}`}>
         <strong role="rowheader">{teamNames[side] || `Team ${side}`}<small>NET {format === "BB" ? "BEST BALL" : format === "SC" ? "SCRAMBLE" : "SCORE"}</small></strong>
-        {nine.map(({ number, score }) => <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${teamNames[side] || `Team ${side}`} net ${score?.[`Team ${side} Net Score`] || "not recorded"}`} key={number}>{score?.[`Team ${side} Net Score`] || "—"}</ScorecardCell>)}
+        {nine.map(({ number, score }) => <ScorecardCell readOnly={readOnlyScorecard} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${teamNames[side] || `Team ${side}`} net ${score?.[`Team ${side} Net Score`] || "not recorded"}`} key={number}>{score?.[`Team ${side} Net Score`] || "—"}</ScorecardCell>)}
       </div>)}
-      <div className={styles.scorecardRow} data-winner="true" role="row"><strong role="rowheader">Hole winner</strong>{nine.map(({ number, score }) => <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${holeWinnerMark(score, teamNames) || "not recorded"}`} key={number}>{compactHoleWinnerMark(score, teamNames)}</ScorecardCell>)}</div>
+      <div className={styles.scorecardRow} data-winner="true" role="row"><strong role="rowheader">Hole winner</strong>{nine.map(({ number, score }) => <ScorecardCell readOnly={readOnlyScorecard} disabled={!score} onEdit={() => editHole(number)} label={`Hole ${number}, ${holeWinnerMark(score, teamNames) || "not recorded"}`} key={number}>{compactHoleWinnerMark(score, teamNames)}</ScorecardCell>)}</div>
       <div className={styles.scorecardRow} data-running="true" role="row"><strong role="rowheader">Match status</strong>{nine.map(({ number, score }) => {
         const running = runningMatchStatusAtHole(data?.holeScores, number, teamNames);
         const compact = running.replace(`${teamNames[1]} `, "").replace(`${teamNames[2]} `, "");
-        return <ScorecardCell readOnly={isFinal} disabled={!score} onEdit={() => editHole(number)} label={`After hole ${number}, ${running || "not recorded"}`} key={number}>{score ? compact : "—"}</ScorecardCell>;
+        return <ScorecardCell readOnly={readOnlyScorecard} disabled={!score} onEdit={() => editHole(number)} label={`After hole ${number}, ${running || "not recorded"}`} key={number}>{score ? compact : "—"}</ScorecardCell>;
       })}</div>
     </div></div>)}
-    {!isFinal && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
+    {!readOnlyScorecard && <p className={styles.editHint}>Tap any scored hole to edit it before final confirmation.</p>}
     {localFirstEnabled && !isFinal ? syncBanner : null}
     {!isFinal && completed.size === 18 && finalizationReview.count ? <section className={styles.finalSyncBlock} aria-live="polite">
       <strong>{finalizationReview.reviewText}</strong>
       <span>Review and resolve every listed hole. Final submission becomes available after all scores are authoritatively synced.</span>
       <button type="button" onClick={reviewFirstSyncIssue}>Review first issue</button>
     </section> : null}
-    {isFinal ? <>
+    {scoringReadOnly && !isFinal ? <>
+      <p className={styles.finalConfirmation}>Production shadow scorecard • Read-only • No score writes permitted.</p>
+      <nav className={styles.finalActions} aria-label="Read-only scorecard actions">
+        <Link className={styles.primary} href="/my-match">Return to My Match</Link>
+        <Link className={styles.finalResultLink} href={`/game-center/${encodeURIComponent(match["Match ID"])}?from=my-match`}>View Game Center →</Link>
+      </nav>
+    </> : isFinal ? <>
       <p className={styles.finalConfirmation}>Scorecard confirmed • Only an administrator can reopen this official record.</p>
       <nav className={styles.finalActions} aria-label="Finalized scorecard actions">
         <Link className={styles.primary} href="/my-match">Return to My Match</Link>

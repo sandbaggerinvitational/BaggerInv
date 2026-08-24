@@ -6,15 +6,17 @@ import { withNormalizedReadDiagnostics } from "../../../lib/google-sheets-server
 import { tournamentReadEnvironment } from "../../../lib/tournament-read-source";
 import { leaderboardsCoreReadEnvironment } from "../../../lib/leaderboards-core-read-source";
 import { netSkinsReadEnvironment } from "../../../lib/net-skins-read-source";
+import { applicationRequestEnvironment } from "../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request) {
   const profile = createRuntimeProfile("GET /api/live");
   try {
-    const tournamentSource = tournamentReadEnvironment();
-    const leaderboardsSource = leaderboardsCoreReadEnvironment();
-    const netSkinsSource = netSkinsReadEnvironment();
+    const env = applicationRequestEnvironment(request);
+    const tournamentSource = tournamentReadEnvironment(env);
+    const leaderboardsSource = leaderboardsCoreReadEnvironment(env);
+    const netSkinsSource = netSkinsReadEnvironment(env);
     const selectedGoogleConsumers = [
       ["tournament", tournamentSource],
       ["leaderboards-core", leaderboardsSource],

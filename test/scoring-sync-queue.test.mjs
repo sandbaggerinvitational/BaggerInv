@@ -573,15 +573,17 @@ test("multiple conflicts clear oldest-first and expose the next affected hole", 
   queue.stop();
 });
 
-test("Preview alone enables local-first scoring while Production keeps verified save-before-advance", async () => {
+test("ordinary Preview enables local-first scoring while the Production shadow candidate stays read-only", async () => {
   const { readFile } = await import("node:fs/promises");
   const [scorePage, myMatchPage, component] = await Promise.all([
     readFile(new URL("../app/score/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/my-match/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8"),
   ]);
-  assert.match(scorePage, /localFirstEnabled=\{previewMode\}/);
-  assert.match(myMatchPage, /localFirstEnabled=\{previewMode\}/);
+  assert.match(scorePage, /localFirstEnabled=\{previewMode && !productionShadowReadOnly\}/);
+  assert.match(myMatchPage, /localFirstEnabled=\{previewMode && !productionShadowReadOnly\}/);
+  assert.match(scorePage, /scoringReadOnly=\{productionShadowReadOnly\}/);
+  assert.match(myMatchPage, /scoringReadOnly=\{productionShadowReadOnly\}/);
   assert.match(component, /createIndexedDbScoringStore/);
   assert.match(component, /syncQueue\.current\.enqueue/);
   assert.match(component, /Syncing remaining scores before final submission/);
@@ -602,5 +604,5 @@ test("Preview alone enables local-first scoring while Production keeps verified 
   assert.match(component, /canResolveScoreConflict \? <div className=\{styles\.syncResolution\}>/);
   assert.doesNotMatch(component, /activeSyncIssue\?\.failureKind === "conflict"/);
   assert.match(component, /finalizationReview\.buttonText/);
-  assert.match(component, /save = localFirstEnabled \? saveLocally : saveAuthoritatively/);
+  assert.match(component, /save = scoringReadOnly[\s\S]{0,180}localFirstEnabled \? saveLocally : saveAuthoritatively/);
 });

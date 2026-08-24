@@ -2,12 +2,13 @@ import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../../../lib/participant-identity-authority.js";
-import { classifyParticipantEmailOtpAuthError, participantAuthClientRequestHash, participantAuthGenericMessage } from "../../../../../../lib/participant-auth-rehearsal.js";
+import { classifyParticipantEmailOtpAuthError, participantAuthClientRequestHash, participantAuthGenericMessage, participantAuthRateLimitSecret } from "../../../../../../lib/participant-auth-rehearsal.js";
 import { authorizeSingleParticipantOtpRequest, recordSingleParticipantOtpDelivery } from "../../../../../../lib/participant-identity-supabase.js";
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
 import { normalizeParticipantAuthCaptchaToken } from "../../../../../../lib/participant-phone-otp.js";
 import { participantAuthExperienceConfiguration } from "../../../../../../lib/participant-sms-auth-feature.js";
 import { dataAuthorityFetch } from "../../../../../../lib/data-authority-request.js";
+import { assertProductionShadowCandidateRequest } from "../../../../../../lib/production-shadow-candidate.js";
 
 export const dynamic = "force-dynamic";
 const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -25,6 +26,10 @@ function sameOriginMutation(request) {
 export async function POST(request) {
   const authority = participantIdentityAuthorityEnvironment();
   if (!authority.participantAuthEnabled) return json({ error: "Not found." }, 404);
+  if (authority.productionShadowCandidate) {
+    try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true }); }
+    catch { return json({ error: "Not found." }, 404); }
+  }
   if (!sameOriginMutation(request)) return json({ error: "We couldn't verify this request. Try again.", category: "REQUEST_CHECK_FAILED" }, 403);
   const input = await request.json().catch(() => ({}));
   const email = String(input.email || "").trim().toLowerCase();
@@ -32,8 +37,15 @@ export async function POST(request) {
   let captchaToken = "";
   try { captchaToken = normalizeParticipantAuthCaptchaToken(input.captchaToken, { required: experience.captchaRequired }); }
   catch { return json({ error: "We couldn't verify this request. Try again.", category: "REQUEST_CHECK_FAILED" }, 400); }
-  const clientIdentity = `${request.headers.get("x-forwarded-for") || ""}|${request.headers.get("user-agent") || ""}|${process.env.SUPABASE_SCORING_MIRROR_SECRET_KEY || ""}`;
-  const authorization = await authorizeSingleParticipantOtpRequest({ email, client_request_hash: participantAuthClientRequestHash(clientIdentity) });
+  const clientIdentity = `${request.headers.get("x-forwarded-for") || ""}|${request.headers.get("user-agent") || ""}`;
+  let clientRequestHash = "";
+  try {
+    clientRequestHash = participantAuthClientRequestHash(clientIdentity, { secret: participantAuthRateLimitSecret() });
+  } catch (error) {
+    console.error("Participant email Auth configuration unavailable", { code: error?.code || "AUTH_CONFIGURATION_FAILURE" });
+    return json({ message: "Email sign-in is temporarily unavailable. Try again shortly.", category: "EMAIL_UNAVAILABLE" }, 503);
+  }
+  const authorization = await authorizeSingleParticipantOtpRequest({ email, client_request_hash: clientRequestHash });
   const decision = authorization.payload || {};
   if (!decision.requestId) return json({ message: participantAuthGenericMessage(), step: "code", requestId: randomUUID() });
   if (decision.allowed !== true) return json({ message: participantAuthGenericMessage(), step: "code", requestId: decision.requestId || randomUUID() });

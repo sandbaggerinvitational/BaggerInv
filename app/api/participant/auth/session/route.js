@@ -1,17 +1,25 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../../lib/participant-identity-authority.js";
-import { readParticipantIdentityContextForAuth, recordSingleParticipantAuthLogout } from "../../../../../lib/participant-identity-supabase.js";
+import {
+  readParticipantIdentityContextForAuth,
+  recordSingleParticipantAuthLogout,
+} from "../../../../../lib/participant-identity-supabase.js";
 import { createParticipantAuthServerClient, verifyParticipantAuthClaims } from "../../../../../lib/supabase-auth-server.js";
 import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../../lib/player-passport.js";
 import { observeParticipantIdentityShadow } from "../../../../../lib/participant-identity-shadow.js";
 import { SCORING_SESSION_COOKIE, scoringSessionCookie } from "../../../../../lib/scoring-access.js";
+import { assertProductionShadowCandidateRequest } from "../../../../../lib/production-shadow-candidate.js";
 
 export const dynamic = "force-dynamic";
 const headers = { "Cache-Control": "private, no-store" };
 export async function GET(request) {
   const authority = participantIdentityAuthorityEnvironment();
   if (!authority.participantAuthEnabled) return NextResponse.json({ error: "Not found." }, { status: 404 });
+  if (authority.productionShadowCandidate) {
+    try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: false }); }
+    catch { return NextResponse.json({ error: "Not found." }, { status: 404 }); }
+  }
   const started = performance.now();
   const verified = await verifyParticipantAuthClaims(await cookies());
   if (verified.status !== "active") return NextResponse.json({ session: "inactive", identityAuthority: authority.resolved }, { headers });
@@ -38,9 +46,13 @@ export async function GET(request) {
     displayName: context.payload.data.displayName, shadowComparison: { status: shadow.status, recorded: shadow.recorded },
     verificationMs: Math.round(performance.now() - started) }, { headers });
 }
-export async function DELETE() {
+export async function DELETE(request) {
   const authority = participantIdentityAuthorityEnvironment();
   if (!authority.participantAuthEnabled) return NextResponse.json({ error: "Not found." }, { status: 404 });
+  if (authority.productionShadowCandidate) {
+    try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true }); }
+    catch { return NextResponse.json({ error: "Not found." }, { status: 404 }); }
+  }
   const cookieStore = await cookies();
   const verified = await verifyParticipantAuthClaims(cookieStore);
   const client = createParticipantAuthServerClient(cookieStore);

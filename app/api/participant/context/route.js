@@ -7,6 +7,7 @@ import { readParticipantIdentityContext } from "../../../../lib/participant-iden
 import { observeParticipantIdentityShadow } from "../../../../lib/participant-identity-shadow.js";
 import { verifyParticipantAuthClaims } from "../../../../lib/supabase-auth-server.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -43,9 +44,10 @@ async function passportShadowDiagnostics({ authority, passportContext, tournamen
 export async function GET(request) {
   if (process.env.VERCEL_ENV !== "preview") return response({ error: "Not found." }, 404);
   try {
-    const authority = requireParticipantIdentityAuthority();
+    const env = applicationRequestEnvironment(request);
+    const authority = requireParticipantIdentityAuthority(env);
     if (authority.resolved === "supabase") {
-      const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+      const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
       const result = NextResponse.json({
         identityAuthority: "supabase",
         session: { status: resolved.sessionStatus },

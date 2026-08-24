@@ -5,6 +5,7 @@ import { createScoringSession, scoringSessionCookie, scoringTokenFromRequest, ve
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
 import { requireScoringAuthority } from "../../../../lib/scoring-authority.js";
+import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,8 @@ export async function DELETE() {
 }
 
 export async function POST(request) {
+  const candidateReadOnly = productionShadowScoringMutationResponse(request);
+  if (candidateReadOnly) return candidateReadOnly;
   try {
     const authority = requireScoringAuthority();
     if (authority.resolved === "supabase") {

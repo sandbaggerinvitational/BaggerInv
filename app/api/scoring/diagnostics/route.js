@@ -4,6 +4,7 @@ import { scoringTokenFromRequest, verifyScoringSession } from "../../../../lib/s
 import { scoringAuthorityEnvironment } from "../../../../lib/scoring-authority.js";
 import { recordPreviewScoringClientDiagnostic } from "../../../../lib/scoring-authority-supabase.js";
 import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
+import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,8 @@ function safeMetrics(input = {}) {
 }
 
 export async function POST(request) {
+  const candidateReadOnly = productionShadowScoringMutationResponse(request);
+  if (candidateReadOnly) return candidateReadOnly;
   const authority = scoringAuthorityEnvironment();
   if (!authority.previewDeployment || !authority.previewWorkbook || authority.resolved !== "supabase") return unavailable();
   try {

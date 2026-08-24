@@ -7,19 +7,21 @@ import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } fr
 import { isRecoverablePreviewImpersonationCode } from "../../../../lib/participant-impersonation-recovery.js";
 import { createParticipantAuthServerClient } from "../../../../lib/supabase-auth-server.js";
 import { SCORING_SESSION_COOKIE, scoringSessionCookie } from "../../../../lib/scoring-access.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
+  const env = applicationRequestEnvironment(request);
   let authority;
-  try { authority = requireParticipantIdentityAuthority(); }
+  try { authority = requireParticipantIdentityAuthority(env); }
   catch (error) {
     const safe = participantIdentityPublicError(error);
     return NextResponse.json({ active: null, error: safe.message, code: safe.code }, { status: safe.status });
   }
   if (authority.resolved === "supabase") {
     try {
-      const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+      const resolved = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
       const response = NextResponse.json({
         active: true,
         identityAuthority: "supabase",
@@ -69,11 +71,12 @@ export async function GET(request) {
   return NextResponse.json({ active: false }, { status: 401 });
 }
 
-export async function DELETE() {
-  const authority = requireParticipantIdentityAuthority();
+export async function DELETE(request) {
+  const env = applicationRequestEnvironment(request);
+  const authority = requireParticipantIdentityAuthority(env);
   if (authority.resolved === "supabase") {
     const cookieStore = await cookies();
-    const client = createParticipantAuthServerClient(cookieStore);
+    const client = createParticipantAuthServerClient(cookieStore, env);
     await client.auth.signOut({ scope: "global" });
     const response = NextResponse.json({ cleared: true, identityAuthority: "supabase" },
       { headers: { "Cache-Control": "private, no-store" } });

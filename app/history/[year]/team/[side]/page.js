@@ -36,6 +36,7 @@ import {
   isSupabaseCompletedHistoryYear,
   loadCompletedHistoryView,
 } from "../../../../../lib/completed-history-service";
+import { applicationPageEnvironment } from "../../../../../lib/production-shadow-request-environment";
 
 function roundStatusLabel(value) {
   if (value === "FINAL") return "Final";
@@ -44,14 +45,15 @@ function roundStatusLabel(value) {
 }
 
 export async function generateMetadata({ params }) {
+  const env = await applicationPageEnvironment();
   const { year, side } = await params;
   const decodedSide = decodeURIComponent(side);
   let team;
 
-  if (isSupabaseHistory2026(year)) {
+  if (isSupabaseHistory2026(year, env)) {
     try {
       team = history2026TeamPageModel(
-        await loadHistory2026View({ year: Number(year) }),
+        await loadHistory2026View({ year: Number(year), env }),
         decodedSide
       );
       if (team && !Array.isArray(team.roster)) {
@@ -60,10 +62,10 @@ export async function generateMetadata({ params }) {
     } catch {
       team = null;
     }
-  } else if (isSupabaseCompletedHistoryYear(year)) {
+  } else if (isSupabaseCompletedHistoryYear(year, env)) {
     try {
       team = completedHistoryTeamPageModel(
-        await loadCompletedHistoryView({ year: Number(year) }),
+        await loadCompletedHistoryView({ year: Number(year), env }),
         decodedSide
       );
     } catch {
@@ -93,11 +95,12 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function TeamSeasonPage({ params, searchParams }) {
+  const env = await applicationPageEnvironment();
   const { year, side } = await params;
   const query = await searchParams;
   const decodedSide = decodeURIComponent(side);
-  const useSupabase2026 = isSupabaseHistory2026(year);
-  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
+  const useSupabase2026 = isSupabaseHistory2026(year, env);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year, env);
   let team;
   let resolveHistoryPlayer = getPlayerBySlug;
 
@@ -106,6 +109,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
       team = history2026TeamPageModel(
         await loadHistory2026View({
           year: Number(year),
+          env,
           includeTournamentPlayerMetadata: true,
         }),
         decodedSide
@@ -124,7 +128,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
     }
   } else if (useSupabaseCompleted) {
     try {
-      const view = await loadCompletedHistoryView({ year: Number(year) });
+      const view = await loadCompletedHistoryView({ year: Number(year), env });
       team = completedHistoryTeamPageModel(view, decodedSide);
       if (
         team && (

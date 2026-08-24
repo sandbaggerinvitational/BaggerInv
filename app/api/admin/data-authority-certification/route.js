@@ -25,6 +25,8 @@ import { readMyMatchView } from "../../../../lib/my-match-supabase.js";
 import { readGameCenterView } from "../../../../lib/game-center-supabase.js";
 import { readLeaderboardsCoreView } from "../../../../lib/leaderboards-core-supabase.js";
 import { readGuideProjection } from "../../../../lib/guide-supabase.js";
+import { productionShadowCandidateEnvironment } from "../../../../lib/production-shadow-candidate.js";
+import { productionShadowCandidateDataEnvironment } from "../../../../lib/production-shadow-candidate-server.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -43,8 +45,7 @@ function payloadSummary(read) {
   };
 }
 
-async function certificationRead(surface, identity) {
-  const env = process.env;
+async function certificationRead(surface, identity, env = process.env) {
   const playerId = clean(identity?.player?.id || identity?.actor?.id);
   if (surface === "root") {
     const [read, completedHistory, currentHistory] = await Promise.all([
@@ -120,9 +121,18 @@ const SURFACES = new Set([
 
 export async function GET(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
+  const candidate = productionShadowCandidateEnvironment(process.env);
+  let env = process.env;
+  if (candidate.requested) {
+    try {
+      env = productionShadowCandidateDataEnvironment(process.env, { request, requireOrigin: false });
+    } catch {
+      return NextResponse.json({ error: "Not found." }, { status: 404 });
+    }
+  }
   // Certification is deliberately read-only. A Director entitlement must
   // already exist; this probe must never bootstrap or mutate identity state.
-  const authorization = await authorizePreviewDirector({ request, allowBootstrap: false });
+  const authorization = await authorizePreviewDirector({ request, env, allowBootstrap: false });
   if (authorization?.status !== "active") return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
   const url = new URL(request.url);
   const surface = clean(url.searchParams.get("surface") || "authorities").toLowerCase();
@@ -132,7 +142,7 @@ export async function GET(request) {
   }
   try {
     const measured = await withDataAuthorityRequestScope({
-      env: process.env,
+      env,
       label: `step9.1:${surface}`,
       // Every application probe below explicitly selects the certified
       // Supabase adapter; authorities is a metadata-only diagnostic.
@@ -140,7 +150,7 @@ export async function GET(request) {
       injectGoogleOutage: outage === "google",
       injectSupabaseOutage: outage === "supabase",
     }, async () => {
-      const result = await certificationRead(surface, authorization.identity);
+      const result = await certificationRead(surface, authorization.identity, env);
       setDataAuthorityResolvedSource(result?.source || result?.diagnostics?.resolvedSource || "unknown");
       return result;
     });

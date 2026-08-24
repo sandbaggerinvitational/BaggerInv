@@ -6,6 +6,7 @@ import { getCurrentDraft, getDrafts } from "../../lib/draft";
 import { pageMetadata } from "../../lib/seo";
 import { getDraftAnalysis } from "../../lib/draft-analysis";
 import { loadDraftRuntime } from "../../lib/draft-runtime";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Sandbagger Draft",
@@ -15,7 +16,8 @@ export const metadata = pageMetadata({
 });
 
 export default async function DraftPage() {
-  const runtime = await loadDraftRuntime();
+  const env = await applicationPageEnvironment();
+  const runtime = await loadDraftRuntime({ env });
   const [draft, drafts] = await Promise.all([
     getCurrentDraft(runtime.draftOptions),
     getDrafts(runtime.draftOptions),

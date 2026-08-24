@@ -465,7 +465,7 @@ test("participant scoring client remains database-inactive while server authorit
     assert.match(scoringRoute, /hole: participantResult\.hole/);
     assert.doesNotMatch(scoringRoute, /_shadow\?\.hole/);
   }
-  assert.match(scorePage, /requireParticipantIdentityAuthority\(\)\.resolved/);
+  assert.match(scorePage, /requireParticipantIdentityAuthority\(env\)\.resolved/);
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /hole_score_mirror|live_match_mirror/i);
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /realtime|createClient\(/i);
   assert.match(migration, /enable row level security/g);

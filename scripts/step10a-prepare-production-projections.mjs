@@ -15,6 +15,7 @@ import { pathToFileURL } from "node:url";
 import path from "node:path";
 
 import {
+  GUIDE_PARTICIPANT_CONTENT_POLICIES,
   GUIDE_PROJECTION_SCHEMA_VERSION,
   GUIDE_PROJECTION_SHEETS,
   buildGuideProjection,
@@ -123,6 +124,74 @@ export function productionProjectionCanonicalJson(value) {
 
 function sheetRecords(sheet) {
   return (sheet?.records || []).map((item) => item?.record || item || {});
+}
+
+function structuredGuideSheet(sheet = {}) {
+  return {
+    headers: Array.isArray(sheet?.headers) ? sheet.headers.map(clean) : [],
+    records: sheetRecords(sheet),
+  };
+}
+
+/**
+ * Production's legacy Prediction Settings sheet has a mixed-type Value
+ * column.  GViz may infer the first data row as a second header row and return
+ * labels such as `Setting Prediction Model` / `Value SBI v1.0`, dropping that
+ * row from the record set.  Recover only this exact, independently verifiable
+ * shape.  Every other non-canonical shape fails closed instead of guessing.
+ */
+export function normalizeProductionPredictionSettingsSheet(sheet = {}) {
+  const headers = Array.isArray(sheet?.headers) ? sheet.headers.map(clean) : [];
+  const records = Array.isArray(sheet?.records) ? sheet.records : [];
+  const canonical = headers[0] === "Setting" && headers[1] === "Value";
+  if (canonical) {
+    return {
+      records: sheetRecords(sheet),
+      provenance: {
+        contract: "production-prediction-settings-gviz-header-v1",
+        recovery_applied: false,
+        transport_fingerprint: productionProjectionFingerprint({ headers, records }),
+      },
+    };
+  }
+
+  const settingPrefix = "Setting ";
+  const valuePrefix = "Value ";
+  const recoverable = headers[0]?.startsWith(settingPrefix)
+    && headers[1]?.startsWith(valuePrefix)
+    && clean(headers[0].slice(settingPrefix.length))
+    && clean(headers[1].slice(valuePrefix.length));
+  if (!recoverable) {
+    throw productionScopeError(
+      "PRODUCTION_PREDICTION_SETTINGS_HEADER_AMBIGUOUS",
+      "Production Prediction Settings must expose Setting/Value headers or the certified GViz two-row header shape.",
+      { headers, values_exposed: false },
+    );
+  }
+
+  const canonicalHeaders = ["Setting", "Value", ...headers.slice(2)];
+  const remap = (record = {}) => Object.fromEntries(canonicalHeaders.map((header, index) => [
+    header,
+    record?.[headers[index]] ?? null,
+  ]));
+  const recoveredFirstRow = Object.fromEntries(canonicalHeaders.map((header, index) => [
+    header,
+    index === 0
+      ? clean(headers[0].slice(settingPrefix.length))
+      : index === 1
+        ? clean(headers[1].slice(valuePrefix.length))
+        : null,
+  ]));
+  return {
+    records: [recoveredFirstRow, ...records.map((item) => remap(item?.record || item || {}))],
+    provenance: {
+      contract: "production-prediction-settings-gviz-header-v1",
+      recovery_applied: true,
+      recovered_setting: recoveredFirstRow.Setting,
+      transport_fingerprint: productionProjectionFingerprint({ headers, records }),
+      canonical_headers_fingerprint: productionProjectionFingerprint(canonicalHeaders),
+    },
+  };
 }
 
 function sourceRowsForYear(sheets, tab, year = PRODUCTION_PROJECTION_RESOURCE.tournamentYear) {
@@ -235,28 +304,185 @@ function notConfiguredEnvelope(domain, { actor, sourcePayload, payload, reason }
   });
 }
 
+function unwrapProductionImportPayload(value = {}) {
+  const candidate = value?.input_template?.payload ?? value?.input?.payload ?? value?.payload ?? value;
+  return candidate?.tournament && Array.isArray(candidate?.teams) ? candidate : null;
+}
+
+function canonicalRosterRows(payload = {}) {
+  const rows = Array.isArray(payload?.roster)
+    ? payload.roster
+    : Array.isArray(payload?.tournament_players)
+      ? payload.tournament_players
+      : [];
+  return rows.map((row) => ({
+    ...row,
+    tournament_handicap: row?.tournament_handicap
+      ?? row?.handicap
+      ?? row?.source_payload?.["Tournament Handicap"]
+      ?? null,
+  }));
+}
+
+function currentShadowPayload(value = {}) {
+  return unwrapProductionImportPayload(value?.current_tournament)
+    || unwrapProductionImportPayload(value);
+}
+
+/**
+ * Derive Guide course context from the already prepared Production scoring
+ * snapshot, avoiding a separately hand-authored context file.
+ */
+export function buildCanonicalCourseContextFromProductionShadow(value = {}) {
+  const payload = currentShadowPayload(value);
+  const snapshots = Array.isArray(payload?.snapshots) ? payload.snapshots : [];
+  const matches = new Map((payload?.matches || []).map((match) => [clean(match?.match_id), match]));
+  const grouped = new Map();
+  for (const snapshot of snapshots) {
+    const courseId = clean(snapshot?.course_id ?? snapshot?.courseId);
+    const tee = clean(snapshot?.tee);
+    const holes = Array.isArray(snapshot?.hole_definitions) ? snapshot.hole_definitions : [];
+    if (!courseId || !tee || holes.length !== 18) continue;
+    const key = `${courseId.toUpperCase()}:${tee.toUpperCase()}`;
+    const match = matches.get(clean(snapshot?.match_id)) || {};
+    const roundNumber = Number(match?.round_number);
+    const format = clean(snapshot?.format ?? match?.format).toUpperCase();
+    const normalizedHoles = holes.map((hole) => ({
+      holeNumber: Number(hole?.hole_number),
+      yardage: Number(hole?.yardage),
+      par: Number(hole?.par),
+      strokeIndex: Number(hole?.stroke_index),
+    })).sort((left, right) => left.holeNumber - right.holeNumber);
+    const scoringConfiguration = productionProjectionCanonicalJson({
+      slope: Number(snapshot?.slope),
+      rating: Number(snapshot?.rating),
+      par: Number(snapshot?.par),
+      holes: normalizedHoles,
+    });
+    const existing = grouped.get(key);
+    if (!existing) {
+      grouped.set(key, {
+        courseId,
+        tee,
+        slope: Number(snapshot?.slope),
+        rating: Number(snapshot?.rating),
+        par: Number(snapshot?.par),
+        yardage: normalizedHoles.reduce((sum, hole) => sum + hole.yardage, 0),
+        holes: normalizedHoles,
+        rounds: [],
+        configuration_consistent: true,
+        _configuration: scoringConfiguration,
+      });
+    } else if (existing._configuration !== scoringConfiguration) {
+      existing.configuration_consistent = false;
+    }
+    const context = grouped.get(key);
+    if (Number.isInteger(roundNumber) && roundNumber > 0 && format
+        && !context.rounds.some((round) => round.round_number === roundNumber)) {
+      context.rounds.push({ round_number: roundNumber, format });
+    }
+  }
+  return [...grouped.values()].map(({ _configuration, ...context }) => ({
+    ...context,
+    rounds: context.rounds.sort((left, right) => left.round_number - right.round_number),
+  })).sort((left, right) => left.courseId.localeCompare(right.courseId) || left.tee.localeCompare(right.tee));
+}
+
+function draftPlayerFromCanonical(player = {}) {
+  const playerId = clean(player?.player_id ?? player?.["Player ID"] ?? player?.id);
+  const displayName = clean(player?.display_name ?? player?.["Display Name"] ?? player?.name);
+  return {
+    ...player,
+    "Player ID": playerId,
+    "Display Name": displayName,
+    First: clean(player?.first_name ?? player?.First ?? player?.source_payload?.first_name),
+    Last: clean(player?.last_name ?? player?.Last ?? player?.source_payload?.last_name),
+    "Photo Filename": clean(player?.["Photo Filename"] ?? player?.photo_filename ?? player?.source_payload?.photo_filename),
+  };
+}
+
+function draftTournamentFromProductionPayload(payload = {}, playerMap = {}) {
+  const year = Number(payload?.tournament?.tournament_year ?? payload?.tournament?.year ?? payload?.tournament_year);
+  if (!Number.isInteger(year)) return null;
+  const roster = canonicalRosterRows(payload);
+  const teams = (payload?.teams || []).map((team) => {
+    const teamId = clean(team?.team_id ?? team?.id);
+    const side = clean(team?.team_side ?? team?.side);
+    const teamRoster = roster.filter((row) => clean(row?.team_id) === teamId || clean(row?.team_side) === side)
+      .map((row) => ({
+        ...row,
+        player: playerMap[clean(row?.player_id)] || null,
+      }));
+    return {
+      ...team,
+      id: teamId,
+      side,
+      name: clean(team?.name),
+      logo: clean(team?.logo ?? team?.logo_key),
+      primaryColor: clean(team?.primaryColor ?? team?.primary_color ?? team?.presentation_identity?.primary_color),
+      secondaryColor: clean(team?.secondaryColor ?? team?.secondary_color ?? team?.presentation_identity?.secondary_color),
+      captainId: clean(team?.captainId ?? team?.captain_player_id ?? team?.source_payload?.Captain),
+      roster: teamRoster,
+    };
+  });
+  return {
+    id: clean(payload?.tournament?.tournament_id) || String(year),
+    year,
+    teams,
+    team1: teams.find((team) => clean(team.side) === "1") || teams[0] || null,
+    team2: teams.find((team) => clean(team.side) === "2") || teams[1] || null,
+  };
+}
+
 export function buildDraftHistoryAdapter(context = {}) {
   if (context?.getTournament && context?.getPlayerMap && context?.getTournamentHandicap) return context;
-  const tournaments = Array.isArray(context?.tournaments) ? context.tournaments : [];
-  const playerRows = Array.isArray(context?.players) ? context.players : [];
+  const completed = Array.isArray(context?.completed_history) ? context.completed_history
+    : Array.isArray(context?.history_years) ? context.history_years
+      : [];
+  const current = context?.current_tournament ? [context.current_tournament] : [];
+  const productionPayloads = [...completed, ...current].map(unwrapProductionImportPayload).filter(Boolean);
+  const playerRows = [
+    ...(Array.isArray(context?.players) ? context.players : []),
+    ...productionPayloads.flatMap((payload) => payload.players || []),
+  ];
   const playerMap = context?.player_map && typeof context.player_map === "object"
     ? context.player_map
     : Object.fromEntries(playerRows.flatMap((player) => {
-      const id = clean(player?.["Player ID"] || player?.player_id || player?.id);
-      return id ? [[id, player]] : [];
+      const normalized = draftPlayerFromCanonical(player);
+      const id = clean(normalized["Player ID"]);
+      return id ? [[id, normalized]] : [];
     }));
-  const handicaps = Array.isArray(context?.tournament_handicaps) ? context.tournament_handicaps : [];
+  const importedTournaments = productionPayloads.map((payload) => draftTournamentFromProductionPayload(payload, playerMap)).filter(Boolean);
+  const tournaments = [
+    ...(Array.isArray(context?.tournaments) ? context.tournaments : []),
+    ...importedTournaments,
+  ];
+  const handicaps = [
+    ...(Array.isArray(context?.tournament_handicaps) ? context.tournament_handicaps : []),
+    ...productionPayloads.flatMap((payload) => {
+      const year = Number(payload?.tournament?.tournament_year ?? payload?.tournament?.year ?? payload?.tournament_year);
+      return canonicalRosterRows(payload).map((row) => ({
+        tournament_year: year,
+        player_id: clean(row?.player_id),
+        handicap: row?.tournament_handicap ?? row?.handicap ?? null,
+      }));
+    }),
+  ];
   if (!tournaments.length || !Object.keys(playerMap).length) return null;
+  const tournamentByYear = new Map(tournaments.map((item) => [Number(item?.year ?? item?.Year), item]));
+  const handicapByIdentity = new Map(handicaps.map((item) => [
+    `${Number(item?.tournament_year ?? item?.year ?? item?.Year)}:${clean(item?.player_id ?? item?.["Player ID"])}`,
+    item,
+  ]));
   return {
     getTournament(year) {
-      return tournaments.find((item) => Number(item?.year ?? item?.Year) === Number(year)) || null;
+      return tournamentByYear.get(Number(year)) || null;
     },
     getPlayerMap() {
       return playerMap;
     },
     getTournamentHandicap(playerId, year) {
-      const row = handicaps.find((item) => clean(item?.player_id ?? item?.["Player ID"]) === clean(playerId)
-        && Number(item?.tournament_year ?? item?.year ?? item?.Year) === Number(year));
+      const row = handicapByIdentity.get(`${Number(year)}:${clean(playerId)}`);
       return row?.handicap ?? row?.tournament_handicap ?? row?.value ?? null;
     },
   };
@@ -318,12 +544,13 @@ export function prepareProductionProjectionPayloads({
         "Guide preparation requires the separately certified Production course/hole context.",
       );
     }
-    const guideSheets = Object.fromEntries(GUIDE_PROJECTION_SHEETS.map((tab) => [tab, sheetRecords(sheets[tab])]));
+    const guideSheets = Object.fromEntries(GUIDE_PROJECTION_SHEETS.map((tab) => [tab, structuredGuideSheet(sheets[tab])]));
     const projection = parser.guide({
       sheets: guideSheets,
       tournament: { id: "2026", year: 2026 },
       approvedTournamentId: "2026",
       canonicalCourseContext,
+      participantContentPolicy: GUIDE_PARTICIPANT_CONTENT_POLICIES.ALLOW_VALID_EMPTY_PRE_TOURNAMENT,
     });
     const payload = { schemaVersion: projection.schemaVersion, content: projection.content };
     return baseEnvelope("GUIDE", {
@@ -338,7 +565,12 @@ export function prepareProductionProjectionPayloads({
         content_canonical_json: projection.contentCanonicalJson,
         payload_canonical_json: projection.payloadCanonicalJson,
         content_fingerprint: projection.contentFingerprint,
-        source_metadata: { google_read_only: true, canonical_course_context_supplied: true },
+        source_metadata: {
+          google_read_only: true,
+          canonical_course_context_supplied: true,
+          participant_content_state: projection.validation.participantContentState,
+          valid_empty_production_content: projection.validation.emptyParticipantContentAccepted === true,
+        },
       },
     });
   });
@@ -388,11 +620,12 @@ export function prepareProductionProjectionPayloads({
   });
 
   run("PREDICTION_SETTINGS", () => {
+    const normalizedSheet = normalizeProductionPredictionSettingsSheet(sheets[PREDICTION_SETTINGS_SOURCE_TAB]);
     const projection = parser.predictionSettings({
       tournamentId: "2026",
       tournamentYear: 2026,
       sourceWorkbookId: PRODUCTION_PROJECTION_RESOURCE.workbookId,
-      rows: sheetRecords(sheets[PREDICTION_SETTINGS_SOURCE_TAB]),
+      rows: normalizedSheet.records,
       requestedBy: actor,
     });
     const payload = {
@@ -418,6 +651,10 @@ export function prepareProductionProjectionPayloads({
       extra: {
         settings_canonical_json: productionProjectionCanonicalJson(payload.settings),
         effective_settings_canonical_json: productionProjectionCanonicalJson(payload.effective_settings),
+        source_metadata: {
+          google_read_only: true,
+          header_normalization: normalizedSheet.provenance,
+        },
       },
     });
   });
@@ -694,10 +931,15 @@ async function main(argv = process.argv.slice(2)) {
   }
   const canonicalCourseContextValue = await optionalJson(args["canonical-course-context"], "canonical course context");
   const draftContextValue = await optionalJson(args["draft-context"], "Draft canonical context");
+  const canonicalCourseContext = Array.isArray(canonicalCourseContextValue)
+    ? canonicalCourseContextValue
+    : canonicalCourseContextValue?.canonical_course_context
+      || canonicalCourseContextValue?.courses
+      || buildCanonicalCourseContextFromProductionShadow(canonicalCourseContextValue);
   const prepared = prepareProductionProjectionPayloads({
     sheets: googleRead.result,
     actor: args.actor || "Step 10A Production shadow preparation",
-    canonicalCourseContext: canonicalCourseContextValue?.canonical_course_context || canonicalCourseContextValue?.courses || canonicalCourseContextValue,
+    canonicalCourseContext,
     draftHistory: draftContextValue,
   });
   const written = await writeProductionProjectionArtifacts(args["output-dir"], prepared, {

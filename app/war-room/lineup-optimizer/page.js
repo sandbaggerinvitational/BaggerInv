@@ -3,6 +3,7 @@ import { Header, Footer } from "../../components";
 import { prepareWarRoomInput } from "../../../lib/war-room-input-service";
 import LineupOptimizer from "./LineupOptimizer";
 import { pageMetadata } from "../../../lib/seo";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Lineup Optimizer | Sandbagger Invitational",
@@ -11,10 +12,11 @@ export const metadata = pageMetadata({
 });
 
 export default async function LineupOptimizerPage() {
+  const env = await applicationPageEnvironment();
   let data = null;
   let error = "";
   try {
-    data = (await prepareWarRoomInput({ scope: "lineup" })).consumerData;
+    data = (await prepareWarRoomInput({ scope: "lineup", env })).consumerData;
   } catch (e) {
     error = e.message || "Unable to load lineup data.";
   }

@@ -13,7 +13,16 @@ export default function PwaFoundation() {
   const [showGlobalInstall, setShowGlobalInstall] = useState(false);
 
   useEffect(() => {
+    let controllerChangeHandler = null;
     if ("serviceWorker" in navigator) {
+      const controlledAtStart = Boolean(navigator.serviceWorker.controller);
+      let controllerReloadStarted = false;
+      controllerChangeHandler = () => {
+        if (!controlledAtStart || controllerReloadStarted) return;
+        controllerReloadStarted = true;
+        window.location.reload();
+      };
+      navigator.serviceWorker.addEventListener("controllerchange", controllerChangeHandler);
       navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((registration) => {
         if (registration.waiting && navigator.serviceWorker.controller) setUpdateReady(true);
         registration.addEventListener("updatefound", () => {
@@ -58,6 +67,7 @@ export default function PwaFoundation() {
       window.removeEventListener("appinstalled", installed);
       window.removeEventListener("online", syncOnlineState);
       window.removeEventListener("offline", syncOnlineState);
+      if (controllerChangeHandler) navigator.serviceWorker.removeEventListener("controllerchange", controllerChangeHandler);
     };
   }, []);
 

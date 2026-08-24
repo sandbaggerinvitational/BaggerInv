@@ -6,6 +6,7 @@ import { getHistoricalDraftAnalytics } from "../../../lib/draft-analytics";
 import { pageMetadata } from "../../../lib/seo";
 import DraftAnalyticsView from "./DraftAnalyticsView";
 import { loadDraftRuntime } from "../../../lib/draft-runtime";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Historical Draft Analytics",
@@ -14,7 +15,8 @@ export const metadata = pageMetadata({
 });
 
 export default async function HistoricalDraftAnalyticsPage() {
-  const runtime = await loadDraftRuntime();
+  const env = await applicationPageEnvironment();
+  const runtime = await loadDraftRuntime({ env });
   const analytics = await getHistoricalDraftAnalytics(
     await getDrafts(runtime.draftOptions),
     runtime.analysisOptions

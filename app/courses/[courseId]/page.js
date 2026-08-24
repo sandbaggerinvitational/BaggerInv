@@ -17,17 +17,18 @@ import {
 import { pageMetadata } from "../../../lib/seo";
 import { resolveTournamentGuideContent } from "../../tournament-guide/resolveGuideContent";
 import { requireHistoricalCourseReadSource } from "../../../lib/historical-course-read-source";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 import styles from "./course-detail.module.css";
 
-const resolveCourse = cache(async (courseId, archive = false, year = null, round = null) => {
+const resolveCourse = cache(async (courseId, archive = false, year = null, round = null, env = process.env) => {
   if (!archive) {
-    const content = await resolveTournamentGuideContent({ surface: "course" });
+    const content = await resolveTournamentGuideContent({ surface: "course", env });
     return { model: courseDetailModel(courseId, content), source: "current-guide" };
   }
-  const source = requireHistoricalCourseReadSource(process.env);
+  const source = requireHistoricalCourseReadSource(env);
   if (source.resolved === "supabase") {
     const profile = await import("../../../lib/historical-course-service").then((module) =>
-      module.loadHistoricalCourseProfile({ courseId })
+      module.loadHistoricalCourseProfile({ courseId }, { env })
     );
     return {
       model: profile ? courseDetailModel(profile.canonicalCourseId, profile.content, { year, round }) : null,
@@ -39,10 +40,11 @@ const resolveCourse = cache(async (courseId, archive = false, year = null, round
 });
 
 export async function generateMetadata({ params, searchParams }) {
+  const env = await applicationPageEnvironment();
   const { courseId } = await params;
   const query = await searchParams;
   const archive = String(query?.view || "") === "archive";
-  const { model } = await resolveCourse(courseId, archive, query?.year, query?.round);
+  const { model } = await resolveCourse(courseId, archive, query?.year, query?.round, env);
   return pageMetadata({
     title: model ? `${model.course.Course} | The Sandbagger Invitational` : "Course | The Sandbagger Invitational",
     description: model ? `${model.course.Course} tournament course details.` : "Sandbagger Invitational course details.",
@@ -72,10 +74,11 @@ function NineScorecard({ holes, label }) {
 }
 
 export default async function CoursePage({ params, searchParams }) {
+  const env = await applicationPageEnvironment();
   const { courseId } = await params;
   const resolvedSearchParams = await searchParams;
   const archive = String(resolvedSearchParams?.view || "") === "archive";
-  const resolved = await resolveCourse(courseId, archive, resolvedSearchParams?.year, resolvedSearchParams?.round);
+  const resolved = await resolveCourse(courseId, archive, resolvedSearchParams?.year, resolvedSearchParams?.round, env);
   const { model } = resolved;
   if (!model) notFound();
   const { course } = model;

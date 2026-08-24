@@ -24,7 +24,7 @@ test("Supabase score and My Match pages pass a server-controlled identity source
     source("app/score/ScoreEntry.js"),
   ]);
   for (const page of [scorePage, myMatchPage]) {
-    assert.match(page, /requireParticipantIdentityAuthority\(\)\.resolved/);
+    assert.match(page, /requireParticipantIdentityAuthority\(env\)\.resolved/);
     assert.match(page, /participantIdentityAuthority=\{participantIdentityAuthority\}/);
   }
   assert.match(scoreEntry, /passport\.status === 401 && !dashboardOnly && !supabaseParticipantIdentity/);
@@ -48,7 +48,7 @@ test("every Preview Home presentation path carries the canonical Supabase identi
     source("app/me/ParticipantProfile.js"),
   ]);
   for (const home of [rootHome, homePage]) {
-    assert.match(home, /requireParticipantIdentityAuthority\(\)\.resolved/);
+    assert.match(home, /requireParticipantIdentityAuthority\(env\)\.resolved/);
     assert.match(home, /participantIdentityAuthority=\{participantIdentityAuthority\}/);
   }
   assert.match(supabaseHome, /participantIdentityAuthority="supabase"/);
@@ -57,7 +57,7 @@ test("every Preview Home presentation path carries the canonical Supabase identi
   assert.match(personalizedHome, /Sign in to see your partner, opponents, course, and tee time\./);
   assert.match(personalizedHome, /"Sign In" : "Activate Player Passport"/);
   assert.match(personalizedHome, /"\/participant-auth\?next=\/home" : "\/activate"/);
-  assert.match(mePage, /requireParticipantIdentityAuthority\(\)\.resolved/);
+  assert.match(mePage, /requireParticipantIdentityAuthority\(env\)\.resolved/);
   assert.match(profile, /"\/participant-auth\?next=\/me"/);
   assert.match(profile, /: <section[\s\S]*href="\/activate">Activate Player Passport/);
 });
@@ -100,7 +100,7 @@ test("Supabase Home does not register the legacy Trusted Devices install callbac
 test("public player profile decorates navigation through Supabase identity in Preview", async () => {
   const profile = await source("app/players/[slug]/page.js");
   assert.match(profile, /participantIdentityAuthority\.resolved === "supabase"/);
-  assert.match(profile, /resolveSupabaseParticipantIdentity\(\{ cookieStore \}\)/);
+  assert.match(profile, /resolveSupabaseParticipantIdentity\(\{ cookieStore, env \}\)/);
   assert.match(profile, /else \{[\s\S]*resolvePlayerPassportToken/);
 });
 

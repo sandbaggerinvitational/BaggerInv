@@ -10,7 +10,7 @@ test("Step 9.1 network certification is a protected Preview-only read allowlist"
   assert.match(route, /export async function GET\(request\)/);
   assert.doesNotMatch(route, /export async function (?:POST|PUT|PATCH|DELETE)\b/);
   assert.match(route, /process\.env\.VERCEL_ENV !== "preview"[\s\S]*status: 404/);
-  assert.match(route, /authorizePreviewDirector\(\{ request, allowBootstrap: false \}\)/);
+  assert.match(route, /authorizePreviewDirector\(\{ request, env, allowBootstrap: false \}\)/);
   assert.match(route, /authorization\?\.status !== "active"[\s\S]*status: 401/);
   assert.match(route, /const SURFACES = new Set\(\[/);
   for (const surface of [
@@ -52,7 +52,7 @@ test("Director authorization and request validation occur before outage scope en
   assert.match(route, /!\["none", "google", "supabase"\]\.includes\(outage\)/);
   assert.match(route, /injectGoogleOutage: outage === "google"/);
   assert.match(route, /injectSupabaseOutage: outage === "supabase"/);
-  assert.match(route, /const result = await certificationRead\(surface, authorization\.identity\)/);
+  assert.match(route, /const result = await certificationRead\(surface, authorization\.identity, env\)/);
   assert.match(route, /setDataAuthorityResolvedSource\(result\?\.source \|\| result\?\.diagnostics\?\.resolvedSource \|\| "unknown"\)/);
 });
 
@@ -96,8 +96,8 @@ test("Supabase homepage composes completed and 2026 History without a Google his
 
   assert.match(supabaseBranch, /Promise\.all\(\[/);
   assert.match(supabaseBranch, /readHomepageCurrentTournament/);
-  assert.match(supabaseBranch, /loadCompletedHistoryYears\(\)/);
-  assert.match(supabaseBranch, /loadHistory2026View\(\)/);
+  assert.match(supabaseBranch, /loadCompletedHistoryYears\(\{\s*env\s*\}\)/);
+  assert.match(supabaseBranch, /loadHistory2026View\(\{\s*env\s*\}\)/);
   assert.match(supabaseBranch, /completed\.tournaments/);
   assert.match(supabaseBranch, /currentHistory\.tournament/);
   assert.doesNotMatch(supabaseBranch, /refreshHistoricalData|getTournaments\(/);

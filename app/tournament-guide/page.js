@@ -6,6 +6,7 @@ import TournamentGuideHero from "./TournamentGuideHero";
 import GuideDirectoryIcon from "./GuideDirectoryIcon";
 import styles from "./tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
@@ -24,13 +25,14 @@ const destinations = [
 ];
 
 export default async function TournamentGuidePage({ searchParams }) {
+  const env = await applicationPageEnvironment();
   const legacySection = String((await searchParams)?.section || "");
   if (legacySection) {
     const destination = legacySection === "match-formats" ? "rules" : legacySection === "travel" ? "getting-around" : legacySection;
     if (["schedule", "rules", "dining", "getting-around", "contacts"].includes(destination)) redirect(`/tournament-guide/${destination}`);
   }
 
-  const { tournamentIdentity, courses } = await resolveTournamentGuideContent();
+  const { tournamentIdentity, courses } = await resolveTournamentGuideContent({ env });
 
   return <main><Header />
     <TournamentGuideHero tournament={tournamentIdentity} courses={courses} />

@@ -61,7 +61,7 @@ test("Game Center remains request-neutral and preserves polling, scorecard, and 
   assert.match(source, /setInterval\(refresh, 45_000\)/);
   assert.match(source, /fetch\(`\/api\/game-center\//);
   assert.match(source, /fetch\("\/api\/player-passport\/matches"/);
-  assert.match(page, /getGameCenterData\(matchId, currentPlayerId\)/);
+  assert.match(page, /getGameCenterData\(matchId, currentPlayerId, \{ env \}\)/);
   assert.match(supabase, /read_game_center_view/);
   assert.doesNotMatch(source + page, /google/i);
 });

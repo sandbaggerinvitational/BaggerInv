@@ -242,7 +242,7 @@ test("course routes use the shared service with an isolated current Guide path a
   assert.match(index, /round: course\.round/);
   assert.match(profile, /historical-course-service[\s\S]*loadHistoricalCourseProfile/);
   assert.match(hole, /loadHistoricalCourseHole/);
-  assert.match(profile, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
+  assert.match(profile, /resolveTournamentGuideContent\(\{ surface: "course", env \}\)/);
   assert.match(profile, /source\.resolved === "supabase"/);
   assert.match(hole, /source\.resolved === "supabase"/);
   assert.doesNotMatch(service, /refreshHistoricalData|loadScorecardAnalytics|historical-data\.json|readWorkbookSheetsByName|getTournamentData/);

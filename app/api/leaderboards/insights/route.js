@@ -12,6 +12,7 @@ import {
 import { requirePublishedOddsReadSource } from "../../../../lib/published-odds-read-source.js";
 import { currentIntelligenceDerivedState } from "../../../../lib/intelligence-derived-supabase.js";
 import { requireIntelligenceDerivedReadSources } from "../../../../lib/intelligence-derived-read-source.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +23,17 @@ export async function GET(request) {
     return NextResponse.json({ error: "A valid tournament year is required." }, { status: 400 });
   }
   let source;
+  let env;
   try {
-    source = requirePublishedOddsReadSource();
+    env = applicationRequestEnvironment(request);
+    source = requirePublishedOddsReadSource(env);
   } catch (error) {
     return NextResponse.json({ error: "Published Championship Odds are temporarily unavailable.",
       code: error?.code || "PUBLISHED_ODDS_READ_SOURCE_UNAVAILABLE" }, { status: 503,
       headers: { "Cache-Control": "private, no-store", Vary: "Cookie", "X-Published-Odds-Read-Source": "supabase",
         "X-Published-Odds-Google-Requests": "0" } });
   }
-  const intelligenceSources = requireIntelligenceDerivedReadSources();
+  const intelligenceSources = requireIntelligenceDerivedReadSources(env);
   if (source.resolved === "google") {
     const measured = await profile.measure("googleSheetsRead", () => withWorkbookWriteDiagnostics("GET /api/leaderboards/insights", readOddsSnapshots));
     const loadedSnapshots = measured.result;
@@ -47,11 +50,11 @@ export async function GET(request) {
   }
   const startedAt = performance.now();
   try {
-    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const [read, derived] = await Promise.all([
-      readPublishedOddsView({ tournamentId: identity.tournamentId }),
+      readPublishedOddsView({ tournamentId: identity.tournamentId }, { env }),
       Object.values(intelligenceSources).some((state) => state.resolved === "supabase")
-        ? currentIntelligenceDerivedState(identity.tournamentId).catch((error) => ({ unavailable: true, code: error?.code || "INTELLIGENCE_DERIVED_UNAVAILABLE" }))
+        ? currentIntelligenceDerivedState(identity.tournamentId, { env }).catch((error) => ({ unavailable: true, code: error?.code || "INTELLIGENCE_DERIVED_UNAVAILABLE" }))
         : Promise.resolve(null),
     ]);
     if (!read.payload?.ok) throw Object.assign(new Error("Published Odds state is unavailable."), { code: read.payload?.code });

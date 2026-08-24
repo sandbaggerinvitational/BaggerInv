@@ -4,6 +4,7 @@ import { leaderboardsCoreDataFromSupabaseView, readLeaderboardsCoreView } from "
 import { requireLeaderboardsCoreReadSource } from "../../../../lib/leaderboards-core-read-source.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -12,16 +13,17 @@ const headers = { "Cache-Control": "private, no-store", "Vary": "Cookie" };
 export async function GET(request) {
   const startedAt = performance.now();
   try {
-    const source = requireLeaderboardsCoreReadSource();
-    const identityAuthority = requireParticipantIdentityAuthority();
+    const env = applicationRequestEnvironment(request);
+    const source = requireLeaderboardsCoreReadSource(env);
+    const identityAuthority = requireParticipantIdentityAuthority(env);
     if (source.resolved !== "supabase" || identityAuthority.resolved !== "supabase") {
       return NextResponse.json({ error: "Leaderboards core Supabase read is not active." }, { status: 404, headers });
     }
     const identityStarted = performance.now();
-    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStarted;
     const serviceStarted = performance.now();
-    const read = await readLeaderboardsCoreView(identity.tournamentId);
+    const read = await readLeaderboardsCoreView(identity.tournamentId, { env });
     const serviceMs = performance.now() - serviceStarted;
     if (!read.payload?.ok) throw Object.assign(new Error("Leaderboards core state is unavailable."), { code: read.payload?.code });
     const data = leaderboardsCoreDataFromSupabaseView(read.payload.data);

@@ -24,6 +24,7 @@ import {
   loadCompletedHistoryView,
 } from "../../../lib/completed-history-service";
 import HistoryUnavailablePage from "../../history/HistoryUnavailable";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 function roundNumber(value) {
   return Number(String(value ?? "").replace(/\D/g, ""));
@@ -43,14 +44,15 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ChampionshipDetailPage({ params }) {
+  const env = await applicationPageEnvironment();
   const { year } = await params;
-  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year, env);
   let tournament;
   let leaderboardRows;
   let completedRounds = null;
   if (useSupabaseCompleted) {
     try {
-      const view = await loadCompletedHistoryView({ year: Number(year) });
+      const view = await loadCompletedHistoryView({ year: Number(year), env });
       const model = completedHistoryTournamentPageModel(view);
       tournament = model.tournament;
       leaderboardRows = model.leaderboardRows;

@@ -8,6 +8,7 @@ import ParticipantSupabaseHome from "../ParticipantSupabaseHome";
 import { requireHomeReadSource } from "../../lib/home-read-source";
 import { requireNetSkinsReadSource } from "../../lib/net-skins-read-source";
 import { requireParticipantIdentityAuthority } from "../../lib/participant-identity-authority";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -19,9 +20,10 @@ export const metadata = {
 };
 
 export default async function MobileHomePage() {
-  const source = requireHomeReadSource();
-  const participantIdentityAuthority = requireParticipantIdentityAuthority().resolved;
-  const netSkinsSource = requireNetSkinsReadSource();
+  const env = await applicationPageEnvironment();
+  const source = requireHomeReadSource(env);
+  const participantIdentityAuthority = requireParticipantIdentityAuthority(env).resolved;
+  const netSkinsSource = requireNetSkinsReadSource(env);
   const netSkinsReadSource = netSkinsSource.resolved;
   if (source.resolved === "supabase") return <ParticipantSupabaseHome netSkinsReadSource={netSkinsReadSource} />;
 

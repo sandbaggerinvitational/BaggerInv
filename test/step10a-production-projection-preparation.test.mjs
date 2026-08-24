@@ -9,7 +9,9 @@ import {
   PRODUCTION_PROJECTION_RESOURCE,
   PRODUCTION_PROJECTION_SPECS,
   assertProductionProjectionResource,
+  buildCanonicalCourseContextFromProductionShadow,
   buildDraftHistoryAdapter,
+  normalizeProductionPredictionSettingsSheet,
   productionProjectionCanonicalJson,
   prepareProductionProjectionPayloads,
   productionProjectionFingerprint,
@@ -20,6 +22,10 @@ import { PRODUCTION_PROJECTION_SHADOW_SHEETS } from "../lib/google-sheets-data.j
 const hash = (value, options) => productionProjectionFingerprint(value, options);
 const recordSheet = (records = []) => ({
   headers: Object.keys(records[0] || {}),
+  records: records.map((record, index) => ({ rowNumber: index + 2, record })),
+});
+const structuredSheet = (headers, records = []) => ({
+  headers,
   records: records.map((record, index) => ({ rowNumber: index + 2, record })),
 });
 
@@ -130,6 +136,70 @@ function configuredSheets() {
     "Odds Team Results": recordSheet([]),
     "Odds Player Results": recordSheet([]),
   };
+}
+
+function productionEmptyGuideSheets() {
+  const sheets = configuredSheets();
+  return {
+    ...sheets,
+    Tournaments: structuredSheet(["Year", "Tournament Name", "Destination", "Time Zone"], [{
+      Year: 2026,
+      "Tournament Name": "Sandbagger Invitational",
+      Destination: "Production Destination",
+      "Time Zone": "America/Chicago",
+    }]),
+    "Guide Sections": structuredSheet([
+      "Section ID", "Tournament ID", "Section Name", "Section Slug", "Description", "Display Order", "Status", "Updated At",
+    ], [{
+      "Section ID": "overview", "Tournament ID": "2026", "Section Name": "Overview",
+      "Section Slug": "overview", Description: "Production Draft — do not publish", "Display Order": 1, Status: "Draft",
+    }]),
+    "Tournament Itinerary": structuredSheet([
+      "Event ID", "Tournament ID", "Event Date", "Day Label", "Start Time", "End Time", "Event Type", "Title",
+      "Subtitle", "Location", "Details", "Round ID", "Course ID", "Display Order", "Status", "Featured", "Updated At",
+    ], [{
+      "Event ID": "draft-event", "Tournament ID": "2026", "Event Date": "2026-09-25", "Day Label": "Friday",
+      "Start Time": "8:00 AM", "Event Type": "Golf", Title: "Production Draft", "Display Order": 1, Status: "Draft",
+    }]),
+    "Tournament Timeline": structuredSheet([
+      "Year", "Tournament Day", "Event Date", "Start Time", "End Time", "Event Type", "Title", "Subtitle", "Location",
+      "Display on Home", "Notification Minutes", "Sort Order", "Status Override",
+    ]),
+    "Rule Book": structuredSheet([
+      "Rule ID", "Tournament ID", "Category", "Subcategory", "Title", "Body", "Display Order", "Status", "Effective Year", "Updated At", "Important",
+    ], [{
+      "Rule ID": "draft-rule", "Tournament ID": "2026", Category: "Tournament", Title: "Production Draft",
+      Body: "Do not publish", "Display Order": 1, Status: "Draft",
+    }]),
+    "Tournament Rules": structuredSheet([
+      "Year", "Round", "Format", "Team Size", "Points Available", "Front 9 Used", "Back 9 Used", "Overall Used",
+      "Front 9 Points", "Back 9 Points", "Overall Points",
+    ], [{ Year: 2026, Round: 1, Format: "BB", "Team Size": 2, "Points Available": 3 }]),
+    Rounds: structuredSheet(["Format ID", "Name", "Team Size"], [{ "Format ID": "BB", Name: "Best Ball", "Team Size": 2 }]),
+    Dining: structuredSheet([
+      "Year", "Day", "Meal", "Cuisine", "Start Time", "End Time", "Location", "Dress Code", "Reservation Required", "Notes", "Sort Order",
+    ]),
+    "Local Guide": structuredSheet(["Year", "Section", "Title", "Description", "Address", "Phone", "Website", "Sort Order"]),
+    "Important Contacts": structuredSheet(["Year", "Category", "Name", "Role", "Phone", "Text Enabled", "Email", "Website", "Sort Order"]),
+    Courses: structuredSheet([
+      "Course ID", "Year", "Round", "Format", "Course", "City", "State", "Tee Played", "Slope", "Rating", "Yardage", "Par",
+    ], [{
+      "Course ID": "C1", Year: 2026, Round: 1, Format: "BB", Course: "Production Course", City: "City", State: "TX",
+      "Tee Played": "Gold", Slope: 130, Rating: 72, Yardage: 7200, Par: 72,
+    }]),
+  };
+}
+
+function productionCourseContext() {
+  return [{
+    courseId: "C1", round: 1, format: "BB", tee: "Gold", slope: 130, rating: 72, yardage: 7200, par: 72,
+    holes: Array.from({ length: 18 }, (_, index) => ({
+      holeNumber: index + 1,
+      yardage: 400,
+      par: 4,
+      strokeIndex: index + 1,
+    })),
+  }];
 }
 
 const draftContext = {
@@ -250,6 +320,48 @@ test("unconfigured Net Skins and Calcutta are explicit and never invoke configur
   assert.deepEqual(prepared.envelopes.CALCUTTA_CONFIGURATION.payload.purchases, []);
 });
 
+test("Production preparation certifies a header-valid Draft-only Guide as VALID_EMPTY without publishing Draft rows", () => {
+  const localBuilders = builders();
+  delete localBuilders.guide;
+  const prepared = prepareProductionProjectionPayloads({
+    sheets: productionEmptyGuideSheets(),
+    actor: "Director P1",
+    canonicalCourseContext: productionCourseContext(),
+    draftHistory: draftContext,
+    builders: localBuilders,
+  });
+  const guide = prepared.envelopes.GUIDE;
+  assert.ok(guide);
+  assert.equal(guide.validation_status, "VALID");
+  assert.equal(guide.validation_diagnostics.participantContentState, "VALID_EMPTY");
+  assert.equal(guide.validation_diagnostics.emptyParticipantContentAccepted, true);
+  assert.equal(guide.source_metadata.participant_content_state, "VALID_EMPTY");
+  assert.equal(guide.source_metadata.valid_empty_production_content, true);
+  for (const field of ["overview", "schedule", "timelineRows", "ruleBook", "dining", "localGuide", "importantContacts"]) {
+    assert.deepEqual(guide.payload.content[field], []);
+  }
+  assert.equal(guide.payload.content.courses.length, 1);
+  assert.doesNotMatch(guide.payload_canonical_json, /Production Draft|Do not publish/);
+});
+
+test("Production empty-Guide preparation rejects missing or corrupt header-only structure", () => {
+  const localBuilders = builders();
+  delete localBuilders.guide;
+  const sheets = productionEmptyGuideSheets();
+  sheets.Dining.headers = sheets.Dining.headers.filter((header) => header !== "Location");
+  const prepared = prepareProductionProjectionPayloads({
+    sheets,
+    actor: "Director P1",
+    canonicalCourseContext: productionCourseContext(),
+    draftHistory: draftContext,
+    builders: localBuilders,
+  });
+  assert.equal(prepared.envelopes.GUIDE, undefined);
+  const blocker = prepared.blockers.find((item) => item.domain === "GUIDE");
+  assert.equal(blocker.code, "GUIDE_PROJECTION_INVALID");
+  assert(blocker.diagnostics.issues.some((issue) => /Dining headers are missing Location/.test(issue)));
+});
+
 test("missing certified context is reported per domain without guessing or fallback", () => {
   const localBuilders = builders();
   localBuilders.predictionSettings = () => {
@@ -321,6 +433,123 @@ test("JSON Draft context is adapted only to the three certified calculation meth
   assert.equal(adapter.getPlayerMap().P1["Display Name"], "Player One");
   assert.equal(adapter.getTournamentHandicap("P1", 2025), 7.2);
   assert.equal(buildDraftHistoryAdapter({ tournaments: [], players: [] }), null);
+});
+
+test("Production Prediction Settings recovers only the certified GViz mixed-type header shape", () => {
+  const sheet = {
+    headers: ["Setting Prediction Model", "Value SBI v1.0", "Description", "Updated At", "Updated By"],
+    records: [{
+      rowNumber: 2,
+      record: {
+        "Setting Prediction Model": "Handicap Category Weight",
+        "Value SBI v1.0": 15,
+        Description: null,
+        "Updated At": null,
+        "Updated By": null,
+      },
+    }],
+  };
+  const normalized = normalizeProductionPredictionSettingsSheet(sheet);
+  assert.equal(normalized.provenance.recovery_applied, true);
+  assert.equal(normalized.provenance.recovered_setting, "Prediction Model");
+  assert.deepEqual(normalized.records, [
+    { Setting: "Prediction Model", Value: "SBI v1.0", Description: null, "Updated At": null, "Updated By": null },
+    { Setting: "Handicap Category Weight", Value: 15, Description: null, "Updated At": null, "Updated By": null },
+  ]);
+  assert.match(normalized.provenance.transport_fingerprint, /^[0-9a-f]{64}$/);
+  assert.throws(() => normalizeProductionPredictionSettingsSheet({
+    headers: ["Setting Prediction Model", "Value", "Description"],
+    records: [],
+  }), { code: "PRODUCTION_PREDICTION_SETTINGS_HEADER_AMBIGUOUS" });
+});
+
+test("Draft context composes completed History with narrow current Production roster facts", () => {
+  const completed = {
+    input_template: {
+      payload: {
+        tournament: { tournament_id: "2025", tournament_year: 2025 },
+        players: [{ player_id: "P1", display_name: "History Player", source_payload: { first_name: "History", last_name: "Player" } }],
+        teams: [
+          { team_id: "H1", team_side: "1", name: "History One", captain_player_id: "P1" },
+          { team_id: "H2", team_side: "2", name: "History Two" },
+        ],
+        roster: [{ player_id: "P1", team_id: "H1", team_side: "1", tournament_handicap: 7.2 }],
+      },
+    },
+  };
+  const current = {
+    input_template: {
+      payload: {
+        tournament: { tournament_id: "2026", tournament_year: 2026 },
+        players: [{ player_id: "CM01", display_name: "Current Player", source_payload: { first_name: "Current", last_name: "Player" } }],
+        teams: [
+          { team_id: "C1", team_side: "1", name: "Current One", captain_player_id: "CM01" },
+          { team_id: "C2", team_side: "2", name: "Current Two" },
+        ],
+        roster: [{ player_id: "CM01", team_id: "C1", team_side: "1", tournament_handicap: 11.4 }],
+      },
+    },
+  };
+  const adapter = buildDraftHistoryAdapter({ completed_history: [completed], current_tournament: current });
+  assert.equal(adapter.getTournament(2025).teams[0].roster[0].player["Player ID"], "P1");
+  assert.equal(adapter.getTournament(2026).teams[0].roster[0].player["Player ID"], "CM01");
+  assert.equal(adapter.getPlayerMap().CM01["Display Name"], "Current Player");
+  assert.equal(adapter.getTournamentHandicap("P1", 2025), 7.2);
+  assert.equal(adapter.getTournamentHandicap("CM01", 2026), 11.4);
+});
+
+test("Production V2 shadow context supplies immutable Guide courses and current Draft roster facts", () => {
+  const holes = Array.from({ length: 18 }, (_, index) => ({
+    hole_number: index + 1,
+    yardage: 350 + index,
+    par: index % 3 === 0 ? 3 : 4,
+    stroke_index: index + 1,
+  }));
+  const context = {
+    completed_history: [],
+    current_tournament: {
+      input_template: {
+        payload: {
+          tournament: { tournament_id: "2026", tournament_year: 2026 },
+          players: [{ player_id: "CM01", display_name: "Current Player" }],
+          teams: [{
+            team_id: "PICKLES",
+            team_side: 1,
+            name: "The Pickles",
+            source_payload: { Captain: "CM01" },
+          }],
+          tournament_players: [{
+            player_id: "CM01",
+            team_id: "PICKLES",
+            team_side: 1,
+            source_payload: { "Tournament Handicap": 11.4 },
+          }],
+          matches: [
+            { match_id: "2026-R1-1", round_number: 1, format: "BB" },
+            { match_id: "2026-R2-1", round_number: 2, format: "SC" },
+          ],
+          snapshots: [
+            { match_id: "2026-R1-1", course_id: "TPGC01", tee: "Gold", slope: 136, rating: 71.9, par: 70, format: "BB", hole_definitions: holes },
+            { match_id: "2026-R2-1", course_id: "TPGC01", tee: "Gold", slope: 136, rating: 71.9, par: 70, format: "SC", hole_definitions: holes },
+          ],
+        },
+      },
+    },
+  };
+  const courses = buildCanonicalCourseContextFromProductionShadow(context);
+  assert.equal(courses.length, 1);
+  assert.equal(courses[0].courseId, "TPGC01");
+  assert.equal(courses[0].holes.length, 18);
+  assert.deepEqual(courses[0].rounds, [
+    { round_number: 1, format: "BB" },
+    { round_number: 2, format: "SC" },
+  ]);
+  assert.equal(courses[0].configuration_consistent, true);
+
+  const draft = buildDraftHistoryAdapter(context);
+  assert.equal(draft.getTournament(2026).teams[0].captainId, "CM01");
+  assert.equal(draft.getTournament(2026).teams[0].roster[0].player["Player ID"], "CM01");
+  assert.equal(draft.getTournamentHandicap("CM01", 2026), 11.4);
 });
 
 test("artifact writer creates owner-only sanitized files and a non-authoritative manifest", async () => {

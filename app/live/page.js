@@ -13,6 +13,7 @@ import { requireLeaderboardsCoreReadSource } from "../../lib/leaderboards-core-r
 import { requireNetSkinsReadSource } from "../../lib/net-skins-read-source";
 import { redirect } from "next/navigation";
 import { isLegacyCalcuttaModule } from "../../lib/leaderboards-navigation";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Match Center | Sandbagger Invitational",
@@ -21,6 +22,7 @@ export const metadata = pageMetadata({
 });
 
 export default async function LivePage({ searchParams }) {
+  const env = await applicationPageEnvironment();
   const query = await searchParams;
   const view = String(query?.view || "").trim();
   const leaderboardTab = String(query?.tab || "").trim();
@@ -28,11 +30,11 @@ export default async function LivePage({ searchParams }) {
   if (view === "leaderboards" && (isLegacyCalcuttaModule(leaderboardTab) || isLegacyCalcuttaModule(leaderboardModule))) redirect("/live?view=calcutta");
   const requestedLeaderboardModule = leaderboardTab || leaderboardModule;
   if (view === "leaderboards" && requestedLeaderboardModule === "net-skins") redirect("/live?view=leaderboards&tab=skins");
-  const source = requireTournamentReadSource();
+  const source = requireTournamentReadSource(env);
   if (source.resolved === "supabase" && ["points", "scores"].includes(view)) redirect("/live?view=leaderboards");
   if (source.resolved === "supabase" && view && !["leaderboards", "calcutta"].includes(view)) redirect("/live");
-  const leaderboardsSource = requireLeaderboardsCoreReadSource();
-  const netSkinsSource = requireNetSkinsReadSource();
+  const leaderboardsSource = requireLeaderboardsCoreReadSource(env);
+  const netSkinsSource = requireNetSkinsReadSource(env);
   const netSkinsReadSource = netSkinsSource.resolved;
   const supabaseLeaderboards = leaderboardsSource.resolved === "supabase" && view === "leaderboards";
   const supabaseTournament = source.resolved === "supabase" && (!view || view === "calcutta");

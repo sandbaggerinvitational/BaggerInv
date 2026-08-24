@@ -4,6 +4,7 @@ import { currentCalcuttaOperationalResult } from "../../../../lib/calcutta-supab
 import { requireCalcuttaReadSource } from "../../../../lib/calcutta-read-source.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -12,16 +13,19 @@ const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 export async function GET(request) {
   const startedAt = performance.now();
   try {
-    const source = requireCalcuttaReadSource();
-    const authority = requireParticipantIdentityAuthority();
+    const env = applicationRequestEnvironment(request);
+    const source = requireCalcuttaReadSource(env);
+    const authority = requireParticipantIdentityAuthority(env);
     if (source.resolved !== "supabase" || authority.resolved !== "supabase") {
       return NextResponse.json({ error: "Calcutta Supabase read is not active." }, { status: 404, headers });
     }
     const identityStartedAt = performance.now();
-    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() });
+    const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStartedAt;
     const operational = await currentCalcuttaOperationalResult(identity.tournamentId, {
-      recalculatePending: true, calculatedBy: `participant-read:${identity.playerId}`,
+      recalculatePending: !source.productionShadowCandidate,
+      calculatedBy: `participant-read:${identity.playerId}`,
+      env,
     });
     if (!operational.calcutta) throw Object.assign(new Error("Calcutta result is unavailable."), { code: "CALCUTTA_RESULT_REQUIRED" });
     const totalMs = performance.now() - startedAt;

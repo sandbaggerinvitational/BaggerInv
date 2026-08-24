@@ -8,27 +8,29 @@ import { resolveSupabaseParticipantIdentity } from "../../../../lib/participant-
 import { guideReadEnvironment } from "../../../../lib/guide-read-source.js";
 import { readGuideProjection } from "../../../../lib/guide-supabase.js";
 import { applyGuideCourseToGameCenter, guideParticipantProjection } from "../../../../lib/guide-participant-adapter.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request, { params }) {
   const profile = createRuntimeProfile("GET /api/game-center/[matchId]");
   try {
+    const env = applicationRequestEnvironment(request);
     const { matchId } = await params;
     let currentPlayerId = "";
-    const authority = requireParticipantIdentityAuthority();
-    const guideSource = guideReadEnvironment().course;
+    const authority = requireParticipantIdentityAuthority(env);
+    const guideSource = guideReadEnvironment(env).course;
     await profile.measure("participantIdentity", async () => {
       try {
         currentPlayerId = authority.resolved === "supabase"
-          ? (await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies() })).playerId
+          ? (await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env })).playerId
           : playerPassportEffectivePlayerId(verifyPlayerPassportSession(playerPassportTokenFromRequest(request)));
       } catch { currentPlayerId = ""; }
     });
     const [assembled, guideRead] = await Promise.all([
-      profile.measure("gameCenterAssembly", () => getGameCenterData(matchId, currentPlayerId)),
+      profile.measure("gameCenterAssembly", () => getGameCenterData(matchId, currentPlayerId, { env })),
       guideSource.resolved === "supabase"
-        ? readGuideProjection({ surface: "course" }).catch((error) => ({
+        ? readGuideProjection({ surface: "course", env }).catch((error) => ({
           payload: { ok: false, code: error?.code || "GUIDE_PROJECTION_UNAVAILABLE" }, durationMs: 0,
         }))
         : Promise.resolve(null),

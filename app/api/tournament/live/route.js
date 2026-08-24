@@ -6,25 +6,27 @@ import { requireMomentumReadSource } from "../../../../lib/competition-derived-r
 import { guideReadEnvironment } from "../../../../lib/guide-read-source.js";
 import { readGuideProjection } from "../../../../lib/guide-supabase.js";
 import { applyGuideCoursesToTournament, guideParticipantProjection } from "../../../../lib/guide-participant-adapter.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
 const headers = { "Cache-Control": "public, max-age=0, s-maxage=5, stale-while-revalidate=15" };
 
-export async function GET() {
+export async function GET(request) {
   const startedAt = performance.now();
   try {
-    const source = requireTournamentReadSource();
-    const momentumSource = requireMomentumReadSource();
-    const guideSource = guideReadEnvironment().course;
+    const env = applicationRequestEnvironment(request);
+    const source = requireTournamentReadSource(env);
+    const momentumSource = requireMomentumReadSource(env);
+    const guideSource = guideReadEnvironment(env).course;
     if (source.resolved !== "supabase") {
       return NextResponse.json({ error: "Tournament Supabase read is not active." }, { status: 404, headers });
     }
     const serviceStarted = performance.now();
     const [read, guideRead] = await Promise.all([
-      readTournamentLiveView(),
+      readTournamentLiveView("", { env }),
       guideSource.resolved === "supabase"
-        ? readGuideProjection({ surface: "course" }).catch((error) => ({
+        ? readGuideProjection({ surface: "course", env }).catch((error) => ({
           payload: { ok: false, code: error?.code || "GUIDE_PROJECTION_UNAVAILABLE" }, durationMs: 0,
         }))
         : Promise.resolve(null),
@@ -35,7 +37,7 @@ export async function GET() {
     if (guideRead?.payload?.ok) data = applyGuideCoursesToTournament(data, guideRead);
     let prepared = null;
     if (momentumSource.resolved === "supabase") {
-      prepared = await currentCompetitionDerivedState(data.tournament.id, { engineKeys: ["TEAM_MOMENTUM"] }).catch((error) => ({
+      prepared = await currentCompetitionDerivedState(data.tournament.id, { engineKeys: ["TEAM_MOMENTUM"], env }).catch((error) => ({
         momentum: null, metadata: { momentum: { stale: true, unavailable: true, code: error?.code || "MOMENTUM_UNAVAILABLE" } }, serviceMs: 0,
       }));
       data.momentum = prepared.momentum;

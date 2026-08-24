@@ -11,6 +11,7 @@ import {
   loadCompletedHistoryYears,
 } from "../../lib/completed-history-service";
 import { HistoryUnavailableNotice } from "../history/HistoryUnavailable";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Champions | The Sandbagger Invitational",
@@ -30,11 +31,12 @@ function editionRibbon(value) {
 }
 
 export default async function ChampionsPage() {
-  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(2017);
+  const env = await applicationPageEnvironment();
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(2017, env);
   let unavailable = false;
   let champions;
   if (useSupabaseCompleted) {
-    champions = await loadCompletedHistoryYears()
+    champions = await loadCompletedHistoryYears({ env })
       .then((result) => result.tournaments.filter((tournament) => tournament.championTeam))
       .catch(() => {
         unavailable = true;

@@ -24,6 +24,7 @@ import {
   isSupabaseCompletedHistoryYear,
   loadCompletedHistoryYears,
 } from "../../lib/completed-history-service";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "History | The Sandbagger Invitational",
@@ -32,19 +33,20 @@ export const metadata = pageMetadata({
 });
 
 export default async function HistoryPage() {
-  const useSupabase2026 = isSupabaseHistory2026("2026");
-  const useSupabaseCompleted = isSupabaseCompletedHistoryYear("2017");
+  const env = await applicationPageEnvironment();
+  const useSupabase2026 = isSupabaseHistory2026("2026", env);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear("2017", env);
   let tournaments;
   let currentHistoryUnavailable = false;
   let completedHistoryUnavailable = false;
 
   if (useSupabaseCompleted) {
     const [completedResult, currentResult] = await Promise.all([
-      loadCompletedHistoryYears()
+      loadCompletedHistoryYears({ env })
         .then((result) => ({ tournaments: result.tournaments }))
         .catch(() => ({ tournaments: null })),
       useSupabase2026
-        ? loadHistory2026View({ year: 2026 })
+        ? loadHistory2026View({ year: 2026, env })
           .then(history2026TournamentCard)
           .catch(() => null)
         : Promise.resolve(null),
@@ -57,7 +59,7 @@ export default async function HistoryPage() {
   } else if (useSupabase2026) {
     const legacyTournaments = getTournaments().filter((tournament) => Number(tournament.year) !== 2026);
     after(async () => { await refreshHistoricalData(); });
-    const currentTournament = await loadHistory2026View({ year: 2026 })
+    const currentTournament = await loadHistory2026View({ year: 2026, env })
       .then(history2026TournamentCard)
       .catch(() => null);
     currentHistoryUnavailable = !currentTournament;

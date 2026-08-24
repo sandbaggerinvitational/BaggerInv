@@ -76,7 +76,7 @@ test("current Course Detail uses the Guide resolver while archive transport uses
     readFile(new URL("../lib/historical-course-service.js", import.meta.url), "utf8"),
   ]);
   assert.match(page, /resolveTournamentGuideContent/);
-  assert.match(page, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
+  assert.match(page, /resolveTournamentGuideContent\(\{ surface: "course", env \}\)/);
   assert.match(page, /loadHistoricalCourseProfile/);
   assert.match(page, /source\.resolved === "supabase"/);
   assert.match(page, /resolveGoogleArchivedCourseContent/);
@@ -87,8 +87,8 @@ test("current Course Detail uses the Guide resolver while archive transport uses
   assert.doesNotMatch(courseService, /refreshHistoricalData|loadScorecardAnalytics|historical-data\.json/);
   assert.match(loader, /guideParticipantProjection\(\{ payload \}\)\.content/);
   assert.match(loader, /courseHoles: stored\.courseHoles \|\| \[\]/);
-  assert.match(loader, /readGuideProjection\(\{ surface \}\)/);
-  assert.match(loader, /surface === "guide" \? readTournamentLiveView\(source\.tournamentId\) : Promise\.resolve\(null\)/);
+  assert.match(loader, /readGuideProjection\(\{ surface, env \}\)/);
+  assert.match(loader, /surface === "guide" \? readTournamentLiveView\(source\.tournamentId, \{ env \}\) : Promise\.resolve\(null\)/);
   assert.doesNotMatch(loader, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
 });
 

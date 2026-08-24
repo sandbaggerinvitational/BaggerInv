@@ -11,6 +11,7 @@ import styles from "../historical.module.css";
 import { pageMetadata } from "../../lib/seo";
 import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Statistics | The Sandbagger Invitational",
@@ -19,8 +20,9 @@ export const metadata = pageMetadata({
 });
 
 export default async function StatisticsPage() {
-  const useSupabase = isSupabaseSecondaryHistory();
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   if (!useSupabase) await refreshHistoricalData();
   const records = useSupabase
     ? secondaryHistory.calculations.getRecords()

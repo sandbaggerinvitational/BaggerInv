@@ -53,6 +53,8 @@ test("email OTP CAPTCHA failures have a distinct safe audit classification", asy
   }), {
     captchaRejected: true,
     safeReason: "AUTH_CAPTCHA_REJECTED",
+    providerErrorClass: "CAPTCHA_REJECTED",
+    providerCalled: false,
     responseCategory: "REQUEST_CHECK_FAILED",
     responseStatus: 400,
   });
@@ -62,7 +64,9 @@ test("email OTP CAPTCHA failures have a distinct safe audit classification", asy
     message: "SMTP provider rejected the request",
   }), {
     captchaRejected: false,
-    safeReason: "AUTH_EMAIL_PROVIDER_REJECTED",
+    safeReason: "AUTH_SMTP_PROVIDER_REJECTED",
+    providerErrorClass: "SMTP_PROVIDER_REJECTION",
+    providerCalled: true,
     responseCategory: "EMAIL_UNAVAILABLE",
     responseStatus: 503,
   });

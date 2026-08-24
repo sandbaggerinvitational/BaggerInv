@@ -47,7 +47,7 @@ test("active scoring keeps hole, match status, progress, and next action visible
 
 test("final scorecard is a read-only official record with running match status", async () => {
   const source = await readFile(new URL("../app/score/ScoreEntry.js", import.meta.url), "utf8");
-  assert.match(source, /data-scorecard-state=\{isFinal \? "final" : "review"\}/);
+  assert.match(source, /data-scorecard-state=\{isFinal \? "final" : scoringReadOnly \? "production-shadow-read-only" : "review"\}/);
   assert.match(source, /Official Tournament Scorecard/);
   assert.doesNotMatch(source, /Official Match Scorecard/);
   assert.match(source, /OFFICIAL TOURNAMENT RECORD/);

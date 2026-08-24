@@ -126,7 +126,7 @@ test("migration keeps Game Center RPC and projection service-only with RLS and n
 test("active Supabase Game Center branch has no Google or tournament-model read on its critical path", async () => {
   const data = await source("app/game-center/gameCenterData.js");
   const branch = data.slice(data.indexOf('if (source.resolved === "supabase")'), data.indexOf("const [tournamentData, scoring]"));
-  assert.match(branch, /readGameCenterView\(id\)/);
+  assert.match(branch, /readGameCenterView\(id, \{ env: options\.env \}\)/);
   assert.match(branch, /googleRequests: 0/);
   assert.doesNotMatch(branch, /readLiveScoringMatch|getTournamentData/);
   const page = await source("app/game-center/[matchId]/page.js");

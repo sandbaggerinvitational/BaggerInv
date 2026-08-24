@@ -47,10 +47,12 @@ import { requireParticipantIdentityAuthority } from "../../../lib/participant-id
 import { resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver";
 import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export async function generateMetadata({ params }) {
-  const useSupabase = isSupabaseSecondaryHistory();
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   if (!useSupabase) await refreshCanonicalCareerHistoricalData();
   const { slug } = await params;
   const player = useSupabase
@@ -110,8 +112,9 @@ function ChampionshipTimeline({ years, styles }) {
 
 
 export default async function PlayerPage({ params, searchParams }) {
-  const useSupabase = isSupabaseSecondaryHistory();
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   const calculations = secondaryHistory?.calculations || null;
   const readSupabaseRecords = calculations?.getRecords;
   const scorecardAnalyticsPromise = useSupabase
@@ -147,11 +150,11 @@ export default async function PlayerPage({ params, searchParams }) {
   const player = useSupabase ? calculations.getPlayerBySlug(slug) : getPlayerBySlug(slug);
   if (!player) notFound();
   const cookieStore = await cookies();
-  const participantIdentityAuthority = requireParticipantIdentityAuthority();
+  const participantIdentityAuthority = requireParticipantIdentityAuthority(env);
   let participantIdentity = null;
   if (participantIdentityAuthority.resolved === "supabase") {
     try {
-      participantIdentity = await resolveSupabaseParticipantIdentity({ cookieStore });
+      participantIdentity = await resolveSupabaseParticipantIdentity({ cookieStore, env });
     } catch {
       // Player profiles are public. Missing participant identity only changes
       // the contextual back-link and must not make the profile unavailable.
@@ -174,7 +177,7 @@ export default async function PlayerPage({ params, searchParams }) {
     stats.records
   );
   const playerDraftHistory = getPlayerDraftHistory(
-    await getPlayerDrafts(player["Player ID"], useSupabase ? { history: calculations } : undefined),
+    await getPlayerDrafts(player["Player ID"], useSupabase ? { history: calculations, env } : { env }),
     player["Player ID"],
     useSupabase ? { history: calculations } : undefined
   );

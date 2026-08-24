@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  GUIDE_PARTICIPANT_CONTENT_POLICIES,
   GUIDE_PROJECTION_SCHEMA_VERSION,
   GuideProjectionValidationError,
   buildGuideProjection,
@@ -149,6 +150,61 @@ test("projection preserves current CMS source order when optional ordering, stat
   assert.equal(content.dining.find((row) => row.Meal === "Arrival Hospitality")["Start Time"], "");
   assert.deepEqual(content.localGuide.map((row) => row["Sort Order"]), ["1", "2"]);
   assert.equal(content.timelineRows[0]["Status Override"], "");
+});
+
+test("Production pre-tournament projection accepts only an entirely empty participant Guide with valid structure", () => {
+  const source = officialSheets();
+  const headers = Object.fromEntries(Object.entries(source).map(([name, rows]) => [name, Object.keys(rows[0] || {})]));
+  for (const row of source["Guide Sections"]) row.Status = "Draft";
+  for (const row of source["Tournament Itinerary"]) row.Status = "Draft";
+  for (const row of source["Rule Book"]) row.Status = "Draft";
+  for (const name of ["Tournament Timeline", "Dining", "Local Guide", "Important Contacts"]) source[name] = [];
+  const structured = Object.fromEntries(Object.entries(source).map(([name, rows]) => [name, { headers: headers[name], records: rows }]));
+
+  assert.throws(() => build({ sheets: structured }), (error) =>
+    error.issues.some((issue) => /Guide Sections has no published participant content/.test(issue))
+  );
+
+  const projection = build({
+    sheets: structured,
+    participantContentPolicy: GUIDE_PARTICIPANT_CONTENT_POLICIES.ALLOW_VALID_EMPTY_PRE_TOURNAMENT,
+  });
+  assert.equal(projection.validation.valid, true);
+  assert.equal(projection.validation.participantContentState, "VALID_EMPTY");
+  assert.equal(projection.validation.emptyParticipantContentAccepted, true);
+  assert.equal(projection.validation.activeAuthoringCounts["Guide Sections"], 3);
+  for (const field of ["overview", "schedule", "timelineRows", "ruleBook", "dining", "localGuide", "importantContacts"]) {
+    assert.deepEqual(projection.content[field], []);
+  }
+  assert.equal(projection.content.courses.length, 2);
+  assert.equal(projection.content.tournamentRules.length, 2);
+  assert.equal(projection.content.rounds.length, 2);
+  assert.doesNotMatch(projection.payloadCanonicalJson, /Hidden|Official rules|Afternoon golf|Three points are available/);
+});
+
+test("valid-empty Guide policy still fails closed for corrupt structure or partially published content", () => {
+  const makeSource = () => {
+    const source = officialSheets();
+    const headers = Object.fromEntries(Object.entries(source).map(([name, rows]) => [name, Object.keys(rows[0] || {})]));
+    for (const row of source["Guide Sections"]) row.Status = "Draft";
+    for (const row of source["Tournament Itinerary"]) row.Status = "Draft";
+    for (const row of source["Rule Book"]) row.Status = "Draft";
+    for (const name of ["Tournament Timeline", "Dining", "Local Guide", "Important Contacts"]) source[name] = [];
+    return Object.fromEntries(Object.entries(source).map(([name, rows]) => [name, { headers: headers[name], records: rows }]));
+  };
+  const corrupt = makeSource();
+  corrupt.Dining.headers = corrupt.Dining.headers.filter((header) => header !== "Location");
+  assert.throws(() => build({
+    sheets: corrupt,
+    participantContentPolicy: GUIDE_PARTICIPANT_CONTENT_POLICIES.ALLOW_VALID_EMPTY_PRE_TOURNAMENT,
+  }), (error) => error.issues.some((issue) => /Dining headers are missing Location/.test(issue)));
+
+  const partial = makeSource();
+  partial["Guide Sections"].records[0].Status = "Published";
+  assert.throws(() => build({
+    sheets: partial,
+    participantContentPolicy: GUIDE_PARTICIPANT_CONTENT_POLICIES.ALLOW_VALID_EMPTY_PRE_TOURNAMENT,
+  }), (error) => error.issues.some((issue) => /Tournament Itinerary has no published participant content/.test(issue)));
 });
 
 test("rules projection preserves every participant presentation field without becoming course scoring authority", () => {

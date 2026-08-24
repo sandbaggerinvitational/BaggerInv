@@ -89,23 +89,25 @@ import {
   isSupabaseCompletedHistoryYear,
   loadCompletedHistoryView,
 } from "../../../lib/completed-history-service";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export async function generateMetadata({ params }) {
+  const env = await applicationPageEnvironment();
   const { year } = await params;
   let tournament;
 
-  if (isSupabaseHistory2026(year)) {
+  if (isSupabaseHistory2026(year, env)) {
     try {
       tournament = history2026TournamentCard(
-        await loadHistory2026View({ year: Number(year) })
+        await loadHistory2026View({ year: Number(year), env })
       );
     } catch {
       tournament = null;
     }
-  } else if (isSupabaseCompletedHistoryYear(year)) {
+  } else if (isSupabaseCompletedHistoryYear(year, env)) {
     try {
       tournament = completedHistoryTournamentPageModel(
-        await loadCompletedHistoryView({ year: Number(year) })
+        await loadCompletedHistoryView({ year: Number(year), env })
       ).tournament;
     } catch {
       tournament = null;
@@ -463,10 +465,11 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
 }
 
 export default async function TournamentYearPage({ params, searchParams }) {
+  const env = await applicationPageEnvironment();
   const { year } = await params;
   const query = await searchParams;
-  const useSupabase2026 = isSupabaseHistory2026(year);
-  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year);
+  const useSupabase2026 = isSupabaseHistory2026(year, env);
+  const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year, env);
   const step3CCompletedYear = isStep3CCompletedHistoryYear(year);
   let tournament;
   let roundPoints;
@@ -481,7 +484,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
   if (useSupabase2026) {
     try {
       const model = history2026TournamentPageModel(
-        await loadHistory2026View({ year: Number(year) })
+        await loadHistory2026View({ year: Number(year), env })
       );
       if (
         !model?.tournament ||
@@ -506,7 +509,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
     }
   } else if (useSupabaseCompleted) {
     try {
-      const view = await loadCompletedHistoryView({ year: Number(year) });
+      const view = await loadCompletedHistoryView({ year: Number(year), env });
       const model = completedHistoryTournamentPageModel(view);
       if (
         !model?.tournament ||

@@ -8,13 +8,15 @@ import { loadHistoricalCourseHole } from "../../../../../lib/historical-course-s
 import { requireHistoricalCourseReadSource } from "../../../../../lib/historical-course-read-source";
 import { pageMetadata } from "../../../../../lib/seo";
 import styles from "../../../../historical.module.css";
+import { applicationPageEnvironment } from "../../../../../lib/production-shadow-request-environment";
 
 export async function generateMetadata({ params }) {
+  const env = await applicationPageEnvironment();
   const { courseId, holeNumber } = await params;
-  const source = requireHistoricalCourseReadSource(process.env);
+  const source = requireHistoricalCourseReadSource(env);
   let course;
   if (source.resolved === "supabase") {
-    course = (await loadHistoricalCourseHole({ courseId, holeNumber }))?.course || null;
+    course = (await loadHistoricalCourseHole({ courseId, holeNumber }, { env }))?.course || null;
   } else {
     const { getCourse, refreshHistoricalData } = await import("../../../../../lib/stats");
     await refreshHistoricalData();
@@ -32,14 +34,15 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CourseHolePage({ params, searchParams }) {
+  const env = await applicationPageEnvironment();
   const { courseId, holeNumber } = await params;
   const query = await searchParams;
   const number = Number(holeNumber);
-  const source = requireHistoricalCourseReadSource(process.env);
+  const source = requireHistoricalCourseReadSource(env);
   let course;
   let hole;
   if (source.resolved === "supabase") {
-    const result = await loadHistoricalCourseHole({ courseId, holeNumber: number, tee: query?.tee });
+    const result = await loadHistoricalCourseHole({ courseId, holeNumber: number, tee: query?.tee }, { env });
     course = result?.course || null;
     hole = result?.hole || null;
   } else {

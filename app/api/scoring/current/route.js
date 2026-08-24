@@ -14,6 +14,7 @@ import { readScoringMatchView } from "../../../../lib/scoring-read-supabase.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../../lib/calcutta-supabase.js";
+import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +51,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const candidateReadOnly = productionShadowScoringMutationResponse(request);
+  if (candidateReadOnly) return candidateReadOnly;
   try {
     const authorizationStartedAt = Date.now();
     const current = session(request);

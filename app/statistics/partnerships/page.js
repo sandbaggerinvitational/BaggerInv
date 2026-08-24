@@ -18,6 +18,7 @@ import { LeaderboardRank } from "../../TournamentLeaderboard";
 import { pageMetadata } from "../../../lib/seo";
 import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Partnership Analytics | The Sandbagger Invitational",
@@ -60,8 +61,9 @@ function PartnershipTable({ title, description, rows, valueLabel, value }) {
 }
 
 export default async function PartnershipsPage() {
-  const useSupabase = isSupabaseSecondaryHistory();
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   if (!useSupabase) await refreshHistoricalData();
   const partnerships = useSupabase
     ? secondaryHistory.calculations.getPartnershipStats()

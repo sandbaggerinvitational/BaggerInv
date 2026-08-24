@@ -17,6 +17,7 @@ import { requireHomepageCurrentReadSource } from "../lib/tournament-read-source"
 import { requireParticipantIdentityAuthority } from "../lib/participant-identity-authority";
 import { loadCompletedHistoryYears } from "../lib/completed-history-service";
 import { loadHistory2026View } from "../lib/history-2026-service";
+import { applicationPageEnvironment } from "../lib/production-shadow-request-environment";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -34,16 +35,17 @@ function playerName(player) {
 }
 
 export default async function Home() {
-  const homepageSource = requireHomepageCurrentReadSource();
-  const participantIdentityAuthority = requireParticipantIdentityAuthority().resolved;
+  const env = await applicationPageEnvironment();
+  const homepageSource = requireHomepageCurrentReadSource(env);
+  const participantIdentityAuthority = requireParticipantIdentityAuthority(env).resolved;
   let currentRead = null;
   let tournaments = [];
   let currentTournament = {};
   if (homepageSource.resolved === "supabase") {
     const [homepage, completed, currentHistory] = await Promise.all([
-      readHomepageCurrentTournament({ source: homepageSource }),
-      loadCompletedHistoryYears(),
-      loadHistory2026View(),
+      readHomepageCurrentTournament({ source: homepageSource, env }),
+      loadCompletedHistoryYears({ env }),
+      loadHistory2026View({ env }),
     ]);
     currentRead = homepage;
     currentTournament = currentHistory.tournament || {};
@@ -55,6 +57,7 @@ export default async function Home() {
   }
   currentRead ||= await readHomepageCurrentTournament({
     source: homepageSource,
+    env,
     googleFallbackTournament: currentTournament,
   });
   const liveData = currentRead.liveData;

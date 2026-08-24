@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { readTournamentFoundation } from "../../../../lib/tournament-foundation.js";
 import { tournamentFoundationReadEnvironment } from "../../../../lib/tournament-read-source.js";
+import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +16,14 @@ function responseHeaders(source, googleRequests) {
   };
 }
 
-export async function GET() {
+export async function GET(request) {
   const startedAt = performance.now();
-  const selected = tournamentFoundationReadEnvironment();
+  let env;
+  let selected;
   try {
-    const read = await readTournamentFoundation();
+    env = applicationRequestEnvironment(request);
+    selected = tournamentFoundationReadEnvironment(env);
+    const read = await readTournamentFoundation({ env });
     const response = NextResponse.json({ data: read.data, readDiagnostics: read.diagnostics }, {
       headers: responseHeaders(read.diagnostics.source, read.diagnostics.googleRequests),
     });
@@ -29,7 +33,7 @@ export async function GET() {
     return NextResponse.json({ error: "Current tournament foundation is temporarily unavailable.",
       code: error?.code || "TOURNAMENT_FOUNDATION_UNAVAILABLE" }, {
       status: Number(error?.status || 503),
-      headers: responseHeaders(selected.requested === "supabase" ? "supabase" : selected.resolved, 0),
+      headers: responseHeaders(selected?.requested === "supabase" ? "supabase" : selected?.resolved || "unavailable", 0),
     });
   }
 }

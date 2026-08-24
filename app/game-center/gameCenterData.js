@@ -17,14 +17,14 @@ import {
 
 const clean = (value) => String(value ?? "").trim();
 
-export async function getGameCenterData(matchId, currentPlayerId = "") {
+export async function getGameCenterData(matchId, currentPlayerId = "", options = {}) {
   const id = clean(matchId);
   if (!id) notFound();
 
-  const source = requireGameCenterReadSource();
+  const source = requireGameCenterReadSource(options.env || process.env);
   if (source.resolved === "supabase") {
     const startedAt = performance.now();
-    const read = await readGameCenterView(id);
+    const read = await readGameCenterView(id, { env: options.env });
     if (!read.payload?.ok) {
       if (read.payload?.code === "MATCH_NOT_FOUND") notFound();
       const error = new Error("Game Center Supabase read failed.");

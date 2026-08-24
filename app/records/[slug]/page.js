@@ -21,11 +21,12 @@ import {
 import { buildCanonicalRecordHolderAuthority } from "../../../lib/record-holder-authority";
 import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
+import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export const dynamic = "force-dynamic";
 
-const resolveLeaderboard = cache(async (slug, useSupabase) => {
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+const resolveLeaderboard = cache(async (slug, useSupabase, env) => {
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   if (!useSupabase) await refreshHistoricalData();
   const officialDefinition = getLeaderboardDefinition(slug);
   if (officialDefinition) {
@@ -81,9 +82,10 @@ const resolveLeaderboard = cache(async (slug, useSupabase) => {
 });
 
 export async function generateMetadata({ params }) {
-  const useSupabase = isSupabaseSecondaryHistory();
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
   const { slug } = await params;
-  const leaderboard = await resolveLeaderboard(slug, useSupabase);
+  const leaderboard = await resolveLeaderboard(slug, useSupabase, env);
 
   const title = leaderboard
     ? `${leaderboard.title} | The Sandbagger Invitational`
@@ -98,9 +100,10 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function FullLeaderboardPage({ params }) {
-  const useSupabase = isSupabaseSecondaryHistory();
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
   const { slug } = await params;
-  const leaderboard = await resolveLeaderboard(slug, useSupabase);
+  const leaderboard = await resolveLeaderboard(slug, useSupabase, env);
   if (!leaderboard) notFound();
 
   const defaultSort =

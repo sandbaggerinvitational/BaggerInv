@@ -75,6 +75,47 @@ test("published Odds import is deterministic and rejects reporting divergence", 
     (error) => error.code === "PUBLISHED_ODDS_REPORTING_DIVERGENCE");
 });
 
+test("published Odds treats an explicit positive sign as display-only while preserving non-finite blanks", () => {
+  const signedPositive = sheets();
+  for (const { record } of signedPositive["Odds Team Results"].records) {
+    if (Number(record["American Odds"]) > 0) record["American Odds"] = `+${record["American Odds"]}`;
+  }
+  for (const { record } of signedPositive["Odds Player Results"].records) {
+    if (Number(record["American Odds"]) > 0) record["American Odds"] = `+${record["American Odds"]}`;
+  }
+  assert.doesNotThrow(() => buildPublishedOddsImport({
+    sheets: signedPositive,
+    tournamentId: "2026",
+    tournamentYear: 2026,
+    sourceWorkbookId: "production",
+    requestedBy: "Director",
+  }));
+
+  const boundary = sheets();
+  const payload = JSON.parse(boundary["Odds Snapshots"].records[0].record["Snapshot JSON"]);
+  payload.players[0].probability = 0;
+  payload.players[0].americanOdds = "+∞";
+  boundary["Odds Snapshots"].records[0].record["Snapshot JSON"] = JSON.stringify(payload);
+  const row = boundary["Odds Player Results"].records.find(({ record }) => record.Phase === payload.phase && record["Player ID"] === payload.players[0].id).record;
+  row["Top Player Probability"] = 0;
+  row["American Odds"] = "";
+  assert.doesNotThrow(() => buildPublishedOddsImport({
+    sheets: boundary,
+    tournamentId: "2026",
+    tournamentYear: 2026,
+    sourceWorkbookId: "production",
+    requestedBy: "Director",
+  }));
+  row["American Odds"] = "+∞";
+  assert.throws(() => buildPublishedOddsImport({
+    sheets: boundary,
+    tournamentId: "2026",
+    tournamentYear: 2026,
+    sourceWorkbookId: "production",
+    requestedBy: "Director",
+  }), { code: "PUBLISHED_ODDS_REPORTING_DIVERGENCE" });
+});
+
 test("published Odds import rejects an incomplete or unsupported current milestone", () => {
   const missing = sheets();
   missing["Odds Control"].records[0].record["Current Official Phase"] = "After Round 2";

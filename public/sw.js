@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sbi-shell-v3";
+const CACHE_VERSION = "sbi-shell-v4";
 const STATIC_ASSETS = [
   "/offline.html",
   "/icon-192.png",
@@ -40,6 +40,7 @@ function isStaticAsset(url) {
 function isPrivateOrLiveRoute(url) {
   return (
     url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/participant-auth") ||
     url.pathname.startsWith("/score") ||
     url.pathname.startsWith("/admin") ||
     url.pathname.startsWith("/activate") ||

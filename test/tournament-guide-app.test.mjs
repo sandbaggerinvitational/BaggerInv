@@ -26,11 +26,11 @@ test("Guide destinations are focused same-origin Supabase views with a flag-gate
     assert.match(page, new RegExp(`/tournament-guide/${destination}`));
     assert.match(route, new RegExp(`"${destination}"`));
   }
-  assert.match(detail, /resolveTournamentGuideContent\(\)/);
+  assert.match(detail, /resolveTournamentGuideContent\(\{ env \}\)/);
   assert.match(resolver, /requireGuideReadSource/);
-  assert.match(resolver, /readGuideProjection\(\{ surface \}\)/);
+  assert.match(resolver, /readGuideProjection\(\{ surface, env \}\)/);
   assert.match(resolver, /guideParticipantProjection/);
-  assert.match(resolver, /readTournamentLiveView\(source\.tournamentId\)/);
+  assert.match(resolver, /readTournamentLiveView\(source\.tournamentId, \{ env \}\)/);
   assert.match(resolver, /source\.source\.resolved === "google"/);
   assert.doesNotMatch(resolver, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName|validateTournamentGuideHeaders|lastGood/);
   assert.match(normalized, /publicGuideRecords\(itineraryRows, guideTournament\)/);
@@ -42,8 +42,8 @@ test("Guide destinations are focused same-origin Supabase views with a flag-gate
 
 test("Courses defaults to the active tournament and offers the historical archive", async () => {
   const [courses, resolver] = await Promise.all([source("app/courses/page.js"), source("app/tournament-guide/resolveGuideContent.js")]);
-  assert.match(courses, /resolveTournamentGuideContent\(\{ surface: "course" \}\)/);
-  assert.match(courses, /requireHistoricalCourseReadSource\(process\.env\)/);
+  assert.match(courses, /resolveTournamentGuideContent\(\{ surface: "course", env \}\)/);
+  assert.match(courses, /requireHistoricalCourseReadSource\(env\)/);
   assert.match(courses, /archiveSource\.resolved === "supabase"/);
   assert.match(courses, /import\("\.\.\/\.\.\/lib\/historical-course-service"\)/);
   assert.match(courses, /import\("\.\.\/tournament-guide\/resolveGuideContentGoogle\.js"\)/);

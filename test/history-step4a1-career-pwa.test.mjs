@@ -149,7 +149,7 @@ test("Profile integration adds no browser-history authority, duplicate route, or
 });
 
 test("the PWA leaves deployment-scoped Next assets to Next during client navigation", () => {
-  assert.match(serviceWorker, /CACHE_VERSION = "sbi-shell-v3"/);
+  assert.match(serviceWorker, /CACHE_VERSION = "sbi-shell-v4"/);
   assert.match(serviceWorker, /if \(url\.pathname\.startsWith\("\/_next\/"\)\) return/);
   assert.doesNotMatch(serviceWorker, /url\.pathname\.startsWith\("\/_next\/static\/"\) \|\|/);
   assert.doesNotMatch(serviceWorker, /window\.location|location\.reload/);

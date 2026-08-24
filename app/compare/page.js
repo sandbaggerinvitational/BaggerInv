@@ -14,6 +14,7 @@ import {
 } from "../../lib/player-comparison";
 import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Compare Sandbaggers | Sandbagger Invitational",
@@ -22,8 +23,9 @@ export const metadata = pageMetadata({
 });
 
 export default async function ComparePage({ searchParams }) {
-  const useSupabase = isSupabaseSecondaryHistory();
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   const scorecardPromise = useSupabase
     ? Promise.resolve(secondaryHistory.scorecardAnalytics)
     : loadScorecardAnalytics();

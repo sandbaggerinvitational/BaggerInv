@@ -31,7 +31,7 @@ test("Tournament canonically owns the existing lazy Calcutta experience", async 
     source("app/live/TournamentDashboard.js"), source("app/live/LeaderboardsDashboard.js"),
   ]);
   assert.match(page, /view === "leaderboards" && \(isLegacyCalcuttaModule\(leaderboardTab\) \|\| isLegacyCalcuttaModule\(leaderboardModule\)\)\) redirect\("\/live\?view=calcutta"\)/);
-  assert.ok(page.indexOf("isLegacyCalcuttaModule(leaderboardTab)") < page.indexOf("requireTournamentReadSource()"));
+  assert.ok(page.indexOf("isLegacyCalcuttaModule(leaderboardTab)") < page.indexOf("requireTournamentReadSource(env)"));
   assert.match(page, /\(!view \|\| view === "calcutta"\)/);
   assert.match(page, /<TournamentSupabaseRead initialView=\{view\}/);
   assert.match(wrapper, /<TournamentDashboard[\s\S]*initialView=\{initialView\}/);

@@ -66,7 +66,7 @@ test("Hole Tracker and the approved lower Game Center remain frozen and request-
   assert.match(source, /<HoleTracker[\s\S]*<HoleDetails[\s\S]*<ResultSegments[\s\S]*<GameCenterScorecard[\s\S]*<MatchStats[\s\S]*<CourseInformation/);
   assert.equal((source.match(/fetch\(/g) || []).length, 2);
   assert.match(source, /setInterval\(refresh, 45_000\)/);
-  assert.match(page, /getGameCenterData\(matchId, currentPlayerId\)/);
+  assert.match(page, /getGameCenterData\(matchId, currentPlayerId, \{ env \}\)/);
   assert.doesNotMatch(source + page, /google/i);
   assert.match(myMatch, /18 holes scored · Ready to review/);
   assert.match(myMatch, /Review & Finalize/);

@@ -15,6 +15,7 @@ import styles from "../historical.module.css";
 import { pageMetadata } from "../../lib/seo";
 import { isSupabaseSecondaryHistory } from "../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../lib/secondary-history-service";
+import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 
 export const metadata = pageMetadata({
   title: "Board of Governors | Sandbagger Invitational",
@@ -23,8 +24,9 @@ export const metadata = pageMetadata({
 });
 
 export default async function BoardOfGovernorsPage() {
-  const useSupabase = isSupabaseSecondaryHistory();
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel() : null;
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
+  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   if (!useSupabase) await refreshHistoricalData();
   const governors = (useSupabase
     ? secondaryHistory.calculations.getAllPlayerStats()
