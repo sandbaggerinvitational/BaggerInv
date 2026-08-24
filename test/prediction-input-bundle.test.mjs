@@ -405,6 +405,40 @@ test("structural shadow validation resolves identities and warns only for read-o
   assert.equal(result.counts.scorecards > 0, true);
 });
 
+test("pending pairings in the same round do not collide as duplicate official pairings", () => {
+  const bundle = structuredClone(build());
+  bundle.matches[2].participants = [];
+  bundle.matches[3].participants = [];
+  bundle.pairings[2].teamOnePlayerIds = [];
+  bundle.pairings[2].teamTwoPlayerIds = [];
+  bundle.pairings[3].teamOnePlayerIds = [];
+  bundle.pairings[3].teamTwoPlayerIds = [];
+  const result = validatePredictionInputBundle(bundle);
+  assert.equal(result.errors.some((row) => row.code === "DUPLICATE_PAIRING"), false);
+});
+
+test("partial pairings in the same round do not collide as duplicate official pairings", () => {
+  const bundle = structuredClone(build());
+  const partial = [bundle.matches[2].participants[0]];
+  bundle.matches[2].participants = structuredClone(partial);
+  bundle.matches[3].participants = structuredClone(partial);
+  bundle.pairings[2].teamOnePlayerIds = [partial[0].playerId];
+  bundle.pairings[2].teamTwoPlayerIds = [];
+  bundle.pairings[3].teamOnePlayerIds = [partial[0].playerId];
+  bundle.pairings[3].teamTwoPlayerIds = [];
+  const result = validatePredictionInputBundle(bundle);
+  assert.equal(result.errors.some((row) => row.code === "DUPLICATE_PAIRING"), false);
+});
+
+test("complete pairings in the same round still reject duplicate participants", () => {
+  const bundle = structuredClone(build());
+  bundle.matches[3].participants = structuredClone(bundle.matches[2].participants);
+  bundle.pairings[3].teamOnePlayerIds = structuredClone(bundle.pairings[2].teamOnePlayerIds);
+  bundle.pairings[3].teamTwoPlayerIds = structuredClone(bundle.pairings[2].teamTwoPlayerIds);
+  const result = validatePredictionInputBundle(bundle);
+  assert.equal(result.errors.some((row) => row.code === "DUPLICATE_PAIRING"), true);
+});
+
 test("local shadow preparation reports transformation time and serialized diagnostic size separately from engine execution", (context) => {
   const samples = [];
   let bundle;
