@@ -85,10 +85,11 @@ test("safe next destinations are internal participant routes only", async () => 
 });
 
 test("Turnstile is auth-route-only and sends one-time tokens to Supabase Auth", async () => {
-  const [widget, phoneRoute, emailRoute, helper, env] = await Promise.all([
+  const [widget, phoneRoute, emailRoute, emailMode, helper, env] = await Promise.all([
     source("app/participant-auth/ParticipantAuthTurnstile.js"),
     source("app/api/participant/auth/phone/route.js"),
     source("app/api/participant/auth/otp/request/route.js"),
+    source("lib/participant-email-otp-mode.js"),
     source("lib/participant-phone-otp.js"),
     source(".env.example"),
   ]);
@@ -101,7 +102,7 @@ test("Turnstile is auth-route-only and sends one-time tokens to Supabase Auth", 
   assert.match(phoneRoute, /normalizeParticipantAuthCaptchaToken/);
   assert.match(emailRoute, /normalizeParticipantAuthCaptchaToken/);
   assert.match(helper, /shouldCreateUser: false, channel: "sms", \.\.\.\(captchaToken \? \{ captchaToken \}/);
-  assert.match(emailRoute, /captchaToken \? \{ captchaToken \}/);
+  assert.match(emailMode, /captchaToken \? \{ captchaToken \}/);
   assert.match(env, /NEXT_PUBLIC_PARTICIPANT_SMS_TURNSTILE_SITE_KEY=/);
   assert.doesNotMatch(env, /TURNSTILE_SECRET|CLOUDFLARE_SECRET/);
 });
@@ -309,15 +310,16 @@ test("participant auth source and serialized configuration contain no phone dire
 });
 
 test("email request and verify retain same-origin, no-store, no-create, and CAPTCHA protections", async () => {
-  const [requestRoute, verifyRoute] = await Promise.all([
+  const [requestRoute, verifyRoute, emailMode] = await Promise.all([
     source("app/api/participant/auth/otp/request/route.js"),
     source("app/api/participant/auth/otp/verify/route.js"),
+    source("lib/participant-email-otp-mode.js"),
   ]);
   for (const route of [requestRoute, verifyRoute]) {
     assert.match(route, /sameOriginMutation\(request\)/);
     assert.match(route, /private, no-store/);
   }
-  assert.match(requestRoute, /shouldCreateUser: false/);
+  assert.match(emailMode, /shouldCreateUser: false/);
   assert.match(requestRoute, /captchaToken/);
   assert.match(verifyRoute, /data\?\.user\?\.id === allowed\.payload\.authUserId/);
 });

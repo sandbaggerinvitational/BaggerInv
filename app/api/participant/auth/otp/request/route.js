@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../../../lib/participant-identity-authority.js";
 import { classifyParticipantEmailOtpAuthError, participantAuthClientRequestHash, participantAuthGenericMessage, participantAuthRateLimitSecret } from "../../../../../../lib/participant-auth-rehearsal.js";
 import { authorizeParticipantEmailOtpEligibility } from "../../../../../../lib/participant-email-otp-authorization.js";
+import { requestParticipantEmailOtp, resolveParticipantEmailOtpVerificationType } from "../../../../../../lib/participant-email-otp-mode.js";
 import { recordSingleParticipantOtpDelivery } from "../../../../../../lib/participant-identity-supabase.js";
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
 import { normalizeParticipantAuthCaptchaToken } from "../../../../../../lib/participant-phone-otp.js";
@@ -14,6 +15,13 @@ import { assertProductionShadowCandidateRequest } from "../../../../../../lib/pr
 export const dynamic = "force-dynamic";
 const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 const json = (payload, status = 200) => NextResponse.json(payload, { status, headers: responseHeaders });
+const publicRequestMinimumDurationMs = 750;
+
+async function enumerationSafeRequestResponse(startedAt, requestId) {
+  const remaining = publicRequestMinimumDurationMs - Math.round(performance.now() - startedAt);
+  if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
+  return json({ message: participantAuthGenericMessage(), step: "code", requestId: requestId || randomUUID() });
+}
 
 function sameOriginMutation(request) {
   const origin = String(request.headers.get("origin") || "").trim();
@@ -38,6 +46,7 @@ export async function POST(request) {
   let captchaToken = "";
   try { captchaToken = normalizeParticipantAuthCaptchaToken(input.captchaToken, { required: experience.captchaRequired }); }
   catch { return json({ error: "We couldn't verify this request. Try again.", category: "REQUEST_CHECK_FAILED" }, 400); }
+  const publicRequestStartedAt = performance.now();
   const clientIdentity = `${request.headers.get("x-forwarded-for") || ""}|${request.headers.get("user-agent") || ""}`;
   let clientRequestHash = "";
   try {
@@ -57,27 +66,45 @@ export async function POST(request) {
   }
   const authorization = eligibility.authorization;
   const decision = authorization.payload || {};
-  if (!decision.requestId) return json({ message: participantAuthGenericMessage(), step: "code", requestId: randomUUID() });
-  if (decision.allowed !== true) return json({ message: participantAuthGenericMessage(), step: "code", requestId: decision.requestId || randomUUID() });
-  const started = performance.now();
-  const config = participantAuthServerConfiguration();
-  const client = createClient(config.url, config.publishableKey, {
-    auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
-    global: { fetch: dataAuthorityFetch("supabase", { adapter: "participant-email-otp-request" }) },
-  });
-  const { error } = await client.auth.signInWithOtp({
-    email: decision.email,
-    options: { shouldCreateUser: false, ...(captchaToken ? { captchaToken } : {}) },
-  });
-  const authFailure = error ? classifyParticipantEmailOtpAuthError(error) : null;
-  await recordSingleParticipantOtpDelivery({ request_id: decision.requestId, succeeded: !error,
-    safe_reason: authFailure?.safeReason || "DELIVERY_ACCEPTED", duration_ms: Math.round(performance.now() - started) });
-  if (error) {
-    return json({
-      message: authFailure.captchaRejected ? "We couldn't verify this request. Try again." : "Email sign-in is temporarily unavailable. Try again shortly.",
-      category: authFailure.responseCategory,
-      step: "email",
-    }, authFailure.responseStatus);
+  if (!decision.requestId) return enumerationSafeRequestResponse(publicRequestStartedAt, randomUUID());
+  if (decision.allowed !== true) return enumerationSafeRequestResponse(publicRequestStartedAt, decision.requestId);
+  let pipelineError = null;
+  try {
+    const started = performance.now();
+    const config = participantAuthServerConfiguration();
+    const client = createClient(config.url, config.publishableKey, {
+      auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
+      global: { fetch: dataAuthorityFetch("supabase", { adapter: "participant-email-otp-request" }) },
+    });
+    const verificationType = resolveParticipantEmailOtpVerificationType(decision.verificationType, {
+      required: authority.productionShadowCandidate,
+    });
+    let error = null;
+    ({ error } = await requestParticipantEmailOtp(client, {
+      email: decision.email,
+      captchaToken,
+      verificationType,
+    }));
+    const authFailure = error ? classifyParticipantEmailOtpAuthError(error) : null;
+    await recordSingleParticipantOtpDelivery({ request_id: decision.requestId, succeeded: !error,
+      safe_reason: authFailure?.safeReason || "DELIVERY_ACCEPTED", duration_ms: Math.round(performance.now() - started) });
+    if (error) {
+      console.error("Participant email delivery unavailable", {
+        safeReason: authFailure.safeReason,
+        providerErrorClass: authFailure.providerErrorClass,
+        requestId: decision.requestId,
+      });
+    }
+  } catch (error) {
+    pipelineError = error;
   }
-  return json({ message: participantAuthGenericMessage(), step: "code", requestId: decision.requestId });
+  if (pipelineError) {
+    console.error("Participant email delivery pipeline failed closed", {
+      code: String(pipelineError?.code || pipelineError?.identityDiagnostics?.code || "AUTH_EMAIL_DELIVERY_PIPELINE_FAILED").slice(0, 80),
+      requestId: decision.requestId,
+    });
+  }
+  // Once an identifier has been evaluated, every public outcome is identical.
+  // Exact CAPTCHA/provider/configuration failures remain in the private audit.
+  return enumerationSafeRequestResponse(publicRequestStartedAt, decision.requestId);
 }

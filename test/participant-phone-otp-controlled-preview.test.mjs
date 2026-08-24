@@ -715,14 +715,16 @@ test("Operation A phone-change verification remains backend regression infrastru
 });
 
 test("email sign-in remains enabled alongside CAPTCHA-gated public phone login", async () => {
-  const [emailRequest, participantUi, publicRoute, controlledRoute] = await Promise.all([
+  const [emailRequest, emailMode, participantUi, publicRoute, controlledRoute] = await Promise.all([
     source("app/api/participant/auth/otp/request/route.js"),
+    source("lib/participant-email-otp-mode.js"),
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
     source("app/api/participant/auth/phone/route.js"),
     source("app/api/participant/auth/phone-login-proof/route.js"),
   ]);
-  assert.match(emailRequest, /signInWithOtp\(\{[\s\S]*email: decision\.email/);
-  assert.match(emailRequest, /shouldCreateUser: false/);
+  assert.match(emailRequest, /requestParticipantEmailOtp\(client, \{/);
+  assert.match(emailMode, /signInWithOtp\(\{[\s\S]*email/);
+  assert.match(emailMode, /shouldCreateUser: false/);
   assert.match(participantUi, /type="email"/);
   assert.match(participantUi, /type="tel"/);
   assert.match(participantUi, /Use Email Instead/);

@@ -70,10 +70,37 @@ test("email OTP CAPTCHA failures have a distinct safe audit classification", asy
     responseCategory: "EMAIL_UNAVAILABLE",
     responseStatus: 503,
   });
+  assert.deepEqual(classifyParticipantEmailOtpAuthError({
+    code: "signup_disabled",
+    status: 400,
+    message: "Signups not allowed for otp",
+  }), {
+    captchaRejected: false,
+    safeReason: "AUTH_EMAIL_CONFIGURATION_FAILED",
+    providerErrorClass: "CONFIGURATION_FAILURE",
+    providerCalled: false,
+    responseCategory: "EMAIL_UNAVAILABLE",
+    responseStatus: 503,
+  });
 
   const route = await source("app/api/participant/auth/otp/request/route.js");
   assert.match(route, /safe_reason: authFailure\?\.safeReason \|\| "DELIVERY_ACCEPTED"/);
+  assert.match(route, /every public outcome is identical/);
+  assert.match(route, /return enumerationSafeRequestResponse\(publicRequestStartedAt, decision\.requestId\)/);
+  assert.match(route, /Participant email delivery pipeline failed closed/);
+  assert.doesNotMatch(route, /message:\s*(?:error|authFailure)\??\.message/);
   assert.doesNotMatch(route, /safe_reason: error \? "AUTH_EMAIL_PROVIDER_REJECTED"/);
+});
+
+test("email OTP request outcomes are enumeration-safe after identifier evaluation", async () => {
+  const route = await source("app/api/participant/auth/otp/request/route.js");
+  assert.match(route, /publicRequestMinimumDurationMs = 750/);
+  assert.match(route, /enumerationSafeRequestResponse\(publicRequestStartedAt, decision\.requestId\)/);
+  assert.match(route, /if \(decision\.allowed !== true\) return enumerationSafeRequestResponse/);
+  assert.doesNotMatch(route, /if \(error\) \{[\s\S]*?return json\(/);
+  assert.match(route, /safeReason: authFailure\.safeReason/);
+  assert.match(route, /providerErrorClass: authFailure\.providerErrorClass/);
+  assert.match(route, /catch \(error\) \{[\s\S]*pipelineError = error;[\s\S]*return enumerationSafeRequestResponse/);
 });
 
 test("Auth rehearsal requires Preview, isolated workbook, Passport authority, and complete config", () => {
@@ -155,13 +182,15 @@ test("safe Auth request audit exposes only action and delivery metadata", async 
 test("OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior", async () => {
   const request = await source("app/api/participant/auth/otp/request/route.js");
   const verify = await source("app/api/participant/auth/otp/verify/route.js");
+  const mode = await source("lib/participant-email-otp-mode.js");
   assert.match(request, /participantAuthEnabled/);
-  assert.match(request, /shouldCreateUser: false/);
+  assert.match(mode, /shouldCreateUser: false/);
+  assert.match(mode, /resend\(\{ type: "signup", email, options \}\)/);
   assert.match(request, /participantAuthGenericMessage/);
   assert.match(request, /recordSingleParticipantOtpDelivery/);
   assert.match(verify, /\^\\d\{6\}\$/);
   assert.match(verify, /auth\.verifyOtp/);
-  assert.match(verify, /type: "email"/);
+  assert.match(verify, /type: verificationType/);
   assert.match(verify, /data\?\.user\?\.id === allowed\.payload\.authUserId/);
   assert.doesNotMatch(`${request}\n${verify}`, /console\.(?:log|error).*token|refresh_token|access_token/i);
 });

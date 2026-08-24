@@ -141,6 +141,7 @@ test("Director UI retains ownership management while final participant login is 
   const panel = await source("app/admin/director/ParticipantIdentityFoundationPanel.js");
   const login = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   const request = await source("app/api/participant/auth/otp/request/route.js");
+  const emailMode = await source("lib/participant-email-otp-mode.js");
   assert.match(panel, /Authentication methods/);
   assert.match(panel, /Add Mobile/);
   assert.match(panel, /Change Mobile/);
@@ -153,7 +154,7 @@ test("Director UI retains ownership management while final participant login is 
   assert.match(login, /type="tel"/);
   assert.match(login, /Use Email Instead/);
   assert.doesNotMatch(login, /Operation A|Operation B|phone-change verification/);
-  assert.match(request, /shouldCreateUser: false/);
+  assert.match(emailMode, /shouldCreateUser: false/);
   assert.doesNotMatch(request, /signInWithOtp\(\{[\s\S]{0,120}phone:|channel:\s*["']sms["']/i);
 });
 

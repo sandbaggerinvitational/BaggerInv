@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../../../lib/participant-identity-authority.js";
 import { participantAuthEmailHash } from "../../../../../../lib/participant-auth-rehearsal.js";
+import { resolveParticipantEmailOtpVerificationType } from "../../../../../../lib/participant-email-otp-mode.js";
 import { recordOtpVerificationWithRecovery } from "../../../../../../lib/participant-auth-certification-recovery.js";
 import { authorizeSingleParticipantOtpVerification, recordSingleParticipantOtpVerification } from "../../../../../../lib/participant-identity-supabase.js";
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
@@ -52,6 +53,14 @@ export async function POST(request) {
   if (!/^\d{6}$/.test(token) || !/^[0-9a-f-]{36}$/i.test(requestId)) return json({ error: "That code is invalid or expired.", category: "INVALID_OR_EXPIRED" }, 400);
   const allowed = await authorizeSingleParticipantOtpVerification({ request_id: requestId, email_identity_hash: participantAuthEmailHash(email) });
   if (allowed.payload?.allowed !== true) return json({ error: "That code is invalid or expired.", category: "INVALID_OR_EXPIRED" }, 400);
+  let verificationType = "";
+  try {
+    verificationType = resolveParticipantEmailOtpVerificationType(allowed.payload.verificationType, {
+      required: authority.productionShadowCandidate,
+    });
+  } catch {
+    return json({ error: "We couldn't verify that code. Try again.", category: "AUTH_SERVICE_UNAVAILABLE" }, 503);
+  }
   const config = participantAuthServerConfiguration();
   const pendingCookies = [];
   const client = createServerClient(config.url, config.publishableKey, {
@@ -63,7 +72,7 @@ export async function POST(request) {
     },
   });
   const started = performance.now();
-  const { data, error } = await client.auth.verifyOtp({ email, token, type: "email" });
+  const { data, error } = await client.auth.verifyOtp({ email, token, type: verificationType });
   const verifyOtpMs = Math.round(performance.now() - started);
   const matches = !error && data?.user?.id === allowed.payload.authUserId;
   try {
