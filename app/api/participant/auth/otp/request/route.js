@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../../../lib/participant-identity-authority.js";
 import { classifyParticipantEmailOtpAuthError, participantAuthClientRequestHash, participantAuthGenericMessage, participantAuthRateLimitSecret } from "../../../../../../lib/participant-auth-rehearsal.js";
-import { authorizeSingleParticipantOtpRequest, recordSingleParticipantOtpDelivery } from "../../../../../../lib/participant-identity-supabase.js";
+import { authorizeParticipantEmailOtpEligibility } from "../../../../../../lib/participant-email-otp-authorization.js";
+import { recordSingleParticipantOtpDelivery } from "../../../../../../lib/participant-identity-supabase.js";
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
 import { normalizeParticipantAuthCaptchaToken } from "../../../../../../lib/participant-phone-otp.js";
 import { participantAuthExperienceConfiguration } from "../../../../../../lib/participant-sms-auth-feature.js";
@@ -45,7 +46,16 @@ export async function POST(request) {
     console.error("Participant email Auth configuration unavailable", { code: error?.code || "AUTH_CONFIGURATION_FAILURE" });
     return json({ message: "Email sign-in is temporarily unavailable. Try again shortly.", category: "EMAIL_UNAVAILABLE" }, 503);
   }
-  const authorization = await authorizeSingleParticipantOtpRequest({ email, client_request_hash: clientRequestHash });
+  const eligibility = await authorizeParticipantEmailOtpEligibility({ email, client_request_hash: clientRequestHash });
+  if (!eligibility.ok) {
+    console.error("Participant email authorization unavailable", eligibility.diagnostics);
+    return json({
+      message: "Email sign-in is temporarily unavailable. Try again shortly.",
+      category: "EMAIL_UNAVAILABLE",
+      step: "email",
+    }, 503);
+  }
+  const authorization = eligibility.authorization;
   const decision = authorization.payload || {};
   if (!decision.requestId) return json({ message: participantAuthGenericMessage(), step: "code", requestId: randomUUID() });
   if (decision.allowed !== true) return json({ message: participantAuthGenericMessage(), step: "code", requestId: decision.requestId || randomUUID() });
