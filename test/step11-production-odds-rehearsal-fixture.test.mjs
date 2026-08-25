@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   PRODUCTION_ODDS_REHEARSAL_FIXTURE_CONTRACT,
   buildProductionOddsRehearsalInputs,
+  productionOddsPairingEvidenceFromCurrentState,
   productionOddsRehearsalFixtureEvidence,
 } from "../lib/production-odds-rehearsal-fixture.js";
 import {
@@ -67,6 +68,7 @@ function pendingProductionInputs() {
         Round: 1,
         Format: "BB",
         "Match ID": "2026-R1-1",
+        "Match Status": "SCHEDULED",
       }],
     },
     historical,
@@ -118,13 +120,107 @@ test("pending Production pairings become a pure deterministic calculation-only f
   assert.equal(result.players.length, 4);
 });
 
-test("partial Production pairings fail closed instead of being completed or overwritten", () => {
+function currentStateFromInputs(inputs) {
+  return {
+    matches: inputs.sheets.matches.map((row) => ({
+      match: {
+        match_id: row["Match ID"],
+        round_number: row.Round,
+        format: row.Format,
+        status: "SCHEDULED",
+        scoring_locked: false,
+        scored_holes: 0,
+        finalized_at: null,
+      },
+      snapshot: { course_id: "COURSE-1", tee: "TEE-1" },
+      participants: [1, 2].flatMap((side) => [1, 2].map((slot) => ({
+        player_id: row[`Team ${side} Player ${slot}`],
+        team_side: side,
+        player_slot: slot,
+      })).filter((participant) => participant.player_id)),
+      scores: [],
+    })),
+  };
+}
+
+test("partial Production pairings require certified source evidence", () => {
   const source = pendingProductionInputs();
   source.sheets.matches[0]["Team 1 Player 1"] = "A1";
   assert.throws(
     () => buildProductionOddsRehearsalInputs(source, { scope: scope() }),
-    { code: "PRODUCTION_ODDS_REHEARSAL_PARTIAL_PAIRINGS_UNSUPPORTED" },
+    { code: "PRODUCTION_ODDS_REHEARSAL_PAIRING_EVIDENCE_REQUIRED" },
   );
+});
+
+test("certified dormant partial pairings preserve fixed slots and fill only missing slots", () => {
+  const source = pendingProductionInputs();
+  source.sheets.matches[0]["Team 1 Player 1"] = "A1";
+  const evidence = productionOddsPairingEvidenceFromCurrentState(currentStateFromInputs(source));
+  source.configuration.pairing_fingerprint = evidence.sequenceFingerprint;
+  source.metadata.productionPairingEvidence = evidence;
+  const before = structuredClone(source);
+  const prepared = buildProductionOddsRehearsalInputs(source, { scope: scope() });
+
+  assert.deepEqual(source, before);
+  assert.equal(prepared.sheets.matches[0]["Team 1 Player 1"], "A1");
+  assert.equal(prepared.sheets.matches[0]["Team 1 Player 2"], "A2");
+  assert.equal(prepared.sheets.matches[0]["Team 2 Player 1"], "B1");
+  assert.equal(prepared.sheets.matches[0]["Team 2 Player 2"], "B2");
+  const fixture = prepared.metadata.productionRehearsalFixture;
+  assert.equal(fixture.pairingMode,
+    "SYNTHETIC_MISSING_PAIRINGS_WITH_FIXED_SOURCE_SLOTS");
+  assert.equal(fixture.fixedSourceSlots, 1);
+  assert.equal(fixture.syntheticSlots, 3);
+  assert.equal(fixture.partialRounds, 1);
+  assert.equal(fixture.canonicalPairingEvidenceFingerprint, evidence.sequenceFingerprint);
+  assert.equal(fixture.canonicalPairingActivityFingerprint, evidence.activityFingerprint);
+  assert.equal(fixture.databasePairingWrites, 0);
+  assert.equal(fixture.externalGoogleWrites, 0);
+  assert.equal(fixture.publicationEligible, false);
+  assert.equal(fixture.mirrorEligible, false);
+});
+
+test("partial pairing evidence drift, wrong-side players, and active state fail closed", () => {
+  const make = () => {
+    const source = pendingProductionInputs();
+    source.sheets.matches[0]["Team 1 Player 1"] = "A1";
+    const evidence = productionOddsPairingEvidenceFromCurrentState(currentStateFromInputs(source));
+    source.configuration.pairing_fingerprint = evidence.sequenceFingerprint;
+    source.metadata.productionPairingEvidence = evidence;
+    return source;
+  };
+
+  const drift = make();
+  drift.metadata.productionPairingEvidence.sequence[0].participants[0].player_id = "A2";
+  assert.throws(() => buildProductionOddsRehearsalInputs(drift, { scope: scope() }),
+    { code: "PRODUCTION_ODDS_REHEARSAL_PAIRING_EVIDENCE_MISMATCH" });
+
+  const wrongSide = make();
+  wrongSide.sheets.matches[0]["Team 1 Player 1"] = "B1";
+  const wrongEvidence = productionOddsPairingEvidenceFromCurrentState(currentStateFromInputs(wrongSide));
+  wrongSide.configuration.pairing_fingerprint = wrongEvidence.sequenceFingerprint;
+  wrongSide.metadata.productionPairingEvidence = wrongEvidence;
+  assert.throws(() => buildProductionOddsRehearsalInputs(wrongSide, { scope: scope() }),
+    { code: "PRODUCTION_ODDS_REHEARSAL_PARTIAL_PAIRINGS_INVALID" });
+
+  const active = make();
+  const activeState = currentStateFromInputs(active);
+  activeState.matches[0].match.scoring_locked = true;
+  active.metadata.productionPairingEvidence =
+    productionOddsPairingEvidenceFromCurrentState(activeState);
+  active.configuration.pairing_fingerprint =
+    active.metadata.productionPairingEvidence.sequenceFingerprint;
+  assert.throws(() => buildProductionOddsRehearsalInputs(active, { scope: scope() }),
+    { code: "PRODUCTION_ODDS_REHEARSAL_PARTIAL_PAIRINGS_ACTIVE" });
+});
+
+test("Singles evidence forbids second-player slots instead of hiding them", () => {
+  const source = pendingProductionInputs();
+  source.sheets.matches[0].Format = "SI";
+  source.sheets.matches[0]["Team 1 Player 1"] = "A1";
+  source.sheets.matches[0]["Team 1 Player 2"] = "A2";
+  assert.throws(() => buildProductionOddsRehearsalInputs(source, { scope: scope() }),
+    { code: "PRODUCTION_ODDS_REHEARSAL_PAIRING_SHAPE_UNSUPPORTED" });
 });
 
 test("fixture evidence is bound to the exact candidate SHA and hostname", () => {
