@@ -36,7 +36,7 @@ test("Production OTP eligibility fix preserves dormant scope, durable limits, an
 
 test("email OTP route fails closed with valid JSON before any Auth send when identity authorization is unavailable", async () => {
   const route = await readFile(routeUrl, "utf8");
-  const authorizationStart = route.indexOf("const eligibility = await authorizeParticipantEmailOtpEligibility");
+  const authorizationStart = route.indexOf("const eligibility = authority.productionCutoverIdentity");
   const authSend = route.indexOf("requestParticipantEmailOtp(client");
   assert.ok(authorizationStart >= 0 && authSend > authorizationStart);
   const authorizationBlock = route.slice(authorizationStart, authSend);

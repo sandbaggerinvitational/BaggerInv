@@ -10,6 +10,7 @@ import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verify
 import { observeParticipantIdentityShadow } from "../../../../../lib/participant-identity-shadow.js";
 import { SCORING_SESSION_COOKIE, scoringSessionCookie } from "../../../../../lib/scoring-access.js";
 import { assertProductionShadowCandidateRequest } from "../../../../../lib/production-shadow-candidate.js";
+import { assertProductionCutoverRequest } from "../../../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 const headers = { "Cache-Control": "private, no-store" };
@@ -18,6 +19,10 @@ export async function GET(request) {
   if (!authority.participantAuthEnabled) return NextResponse.json({ error: "Not found." }, { status: 404 });
   if (authority.productionShadowCandidate) {
     try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: false }); }
+    catch { return NextResponse.json({ error: "Not found." }, { status: 404 }); }
+  }
+  if (authority.productionCutoverIdentity) {
+    try { assertProductionCutoverRequest(request, process.env, { requireOrigin: false }); }
     catch { return NextResponse.json({ error: "Not found." }, { status: 404 }); }
   }
   const started = performance.now();
@@ -51,6 +56,10 @@ export async function DELETE(request) {
   if (!authority.participantAuthEnabled) return NextResponse.json({ error: "Not found." }, { status: 404 });
   if (authority.productionShadowCandidate) {
     try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true }); }
+    catch { return NextResponse.json({ error: "Not found." }, { status: 404 }); }
+  }
+  if (authority.productionCutoverIdentity) {
+    try { assertProductionCutoverRequest(request, process.env, { requireOrigin: true }); }
     catch { return NextResponse.json({ error: "Not found." }, { status: 404 }); }
   }
   const cookieStore = await cookies();

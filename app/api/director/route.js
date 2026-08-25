@@ -21,6 +21,11 @@ import { recalculateCompetitionDerivedTournament } from "../../../lib/competitio
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
 import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
 import { assertDirectorMutationAuthority } from "../../../lib/director-mutation-authority.js";
+import {
+  beginProductionGoogleAuthorityWrite,
+  completeProductionGoogleAuthorityWrite,
+} from "../../../lib/production-cutover-scoring-ingress.js";
+import { productionCutoverPhaseAtLeast } from "../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 
@@ -227,6 +232,8 @@ export async function POST(request) {
         action: mutationAuthority.canonicalLifecycleAction,
         matchId: input.matchId,
         updatedBy,
+        authUserId: identity.authUserId,
+        playerId: identity.actor.id,
       });
       if (!lifecycle.delegated) {
         const error = new Error("The canonical Supabase lifecycle transaction was not selected.");
@@ -234,7 +241,11 @@ export async function POST(request) {
         error.status = 503;
         throw error;
       }
-      const mirror = await drainGoogleOutbox({ maximum: 4, actor: updatedBy });
+      const productionWorkerPhase = process.env.VERCEL_ENV !== "production" ||
+        productionCutoverPhaseAtLeast(process.env, "WORKERS");
+      const mirror = productionWorkerPhase
+        ? await drainGoogleOutbox({ maximum: 4, actor: updatedBy })
+        : { ok: true, delivered: 0, failed: 0, pending: true };
       if (!mirror.ok) {
         const error = new Error("The canonical mutation committed, but Google mirror delivery remains pending.");
         error.code = "GOOGLE_MIRROR_DELIVERY_PENDING";
@@ -246,7 +257,7 @@ export async function POST(request) {
         matchId: input.matchId,
         authority: "supabase",
       }));
-      trace.stage("Google mirror", "PASS", JSON.stringify({
+      trace.stage("Google mirror", mirror.pending ? "PENDING" : "PASS", JSON.stringify({
         delivered: Number(mirror.delivered || 0),
         failed: Number(mirror.failed || 0),
       }));
@@ -254,7 +265,9 @@ export async function POST(request) {
       after(async () => {
         try {
           await Promise.all([
-            drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false }),
+            productionWorkerPhase
+              ? drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false })
+              : Promise.resolve({ ok: true, deliveries: [], pending: true }),
             recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
             recalculateCalcuttaTournament("", { calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}` }),
           ]);
@@ -265,7 +278,9 @@ export async function POST(request) {
         }
       });
       console.info("Director action transaction", trace.report({ matchId: input.matchId, updatedBy, authority: "supabase" }));
-      return NextResponse.json({ ok: true, changed: false, authority: "supabase", mirror: { delivered: mirror.delivered, failed: mirror.failed } });
+      return NextResponse.json({ ok: true, changed: false, authority: "supabase", mirror: {
+        delivered: mirror.delivered, failed: mirror.failed, pending: mirror.pending === true,
+      } });
     }
     const data = await getTournamentData();
     trace.stage("Workbook verification", "PASS");
@@ -274,7 +289,14 @@ export async function POST(request) {
     const selectedMatch = data.rounds.flatMap((item) => item.matches || []).find((match) => match.id === input.matchId);
     const updatedBy = identity.actor.name;
     const workbookWriteStartedAt = Date.now();
-    if (input.action === "automation-check") {
+    const productionIngressLease = await beginProductionGoogleAuthorityWrite({
+      tournamentId: data.tournament.id,
+      matchId: input.matchId || matches[0]?.id || `TOURNAMENT-${data.tournament.id}`,
+      actorId: identity.authUserId || identity.actor.id || updatedBy,
+      operation: `DIRECTOR:${String(input.action || "UNKNOWN")}`,
+    });
+    try {
+      if (input.action === "automation-check") {
       const dueRound = directorAutomationDue(tournamentDirectorModel(data));
       if (!dueRound) return NextResponse.json({ ok: true, changed: false });
       const dueMatches = data.rounds.find((item) => Number(item.number) === dueRound)?.matches || [];
@@ -332,9 +354,18 @@ export async function POST(request) {
       await updateDirectorCalcutta({ ...input, year: data.tournament.year }, updatedBy);
     } else if (input.action === "net-skins-eligibility") {
       await updateDirectorNetSkins({ ...input, year: data.tournament.year }, updatedBy);
-    } else if (input.action === "course-tees") {
-      await updateDirectorCourseTees({ ...input, year: data.tournament.year }, updatedBy);
-    } else throw new Error("Unknown Director action.");
+      } else if (input.action === "course-tees") {
+        await updateDirectorCourseTees({ ...input, year: data.tournament.year }, updatedBy);
+      } else throw new Error("Unknown Director action.");
+    } finally {
+      try { await completeProductionGoogleAuthorityWrite(productionIngressLease); }
+      catch (error) {
+        console.error("Production Director ingress lease completion remains pending", {
+          action: input.action,
+          code: error?.code || "PRODUCTION_GOOGLE_INGRESS_LEASE_COMPLETION_FAILED",
+        });
+      }
+    }
     const googleWriteCompletedAt = Date.now();
     trace.stage("Action execution", "PASS");
     trace.stage("Workbook write", "PASS", JSON.stringify({

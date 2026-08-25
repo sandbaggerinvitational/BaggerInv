@@ -102,7 +102,8 @@ test("legacy Google Guide transport remains outside the normal participant path"
   const courseDetail = source("app/courses/[courseId]/page.js");
   assert.match(resolver, /if \(source\.source\.resolved === "google"\) return resolveGoogleGuideContent\(\)/);
   assert.match(resolver, /readGuideProjection\(\{ surface, env \}\)/);
-  assert.match(resolver, /readTournamentLiveView\(source\.tournamentId, \{ env \}\)/);
+  assert.match(resolver, /readTournamentLiveView\(source\.tournamentId, \{/);
+  assert.match(resolver, /productionCutoverSurface: "GUIDE_COURSE_CONTEXT"/);
   assert.doesNotMatch(resolver, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
   assert.match(legacy, /getTournamentData|refreshHistoricalData/);
   assert.match(courses, /requireHistoricalCourseReadSource\(env\)/);

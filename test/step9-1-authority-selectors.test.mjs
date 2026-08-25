@@ -186,7 +186,7 @@ test("ineligible Preview Supabase requests fail closed with prerequisite diagnos
   assertUnavailable(() => requireParticipantIdentityAuthority(identityEnv), "IDENTITY_AUTHORITY_UNAVAILABLE");
 });
 
-test("Production hard-resolves authority requests to Google or Passport without throwing", () => {
+test("Production preserves legacy defaults but explicit Supabase authority fails closed until cutover is eligible", () => {
   const production = {
     ...eligiblePreview,
     VERCEL_ENV: "production",
@@ -202,13 +202,18 @@ test("Production hard-resolves authority requests to Google or Passport without 
   assert.equal(requireOddsCalculationInputSource(production).inputSource, "google");
   assert.equal(requireOddsPublicationAuthority(production).publicationAuthority, "google");
 
-  const scoring = requireScoringAuthority(production);
+  assertUnavailable(() => requireScoringAuthority(production), "SCORING_AUTHORITY_UNAVAILABLE");
+  const scoring = scoringAuthorityEnvironment(production);
   assert.deepEqual({ resolved: scoring.resolved, blocked: scoring.blocked, productionBlocked: scoring.productionBlocked, reason: scoring.reason },
-    { resolved: "google", blocked: false, productionBlocked: true, reason: "production-hard-block" });
+    { resolved: "unavailable", blocked: true, productionBlocked: true, reason: "production-cutover-scoring-gate-closed" });
 
-  const identity = requireParticipantIdentityAuthority(production);
+  assertUnavailable(() => requireParticipantIdentityAuthority(production), "IDENTITY_AUTHORITY_UNAVAILABLE");
+  const identity = participantIdentityAuthorityEnvironment(production);
   assert.deepEqual({ resolved: identity.resolved, blocked: identity.blocked, productionBlocked: identity.productionBlocked, reason: identity.reason },
-    { resolved: "passport", blocked: false, productionBlocked: true, reason: "production-hard-block" });
+    { resolved: "unavailable", blocked: true, productionBlocked: true, reason: "activation-disabled" });
+
+  assert.equal(requireScoringAuthority({ VERCEL_ENV: "production" }).resolved, "google");
+  assert.equal(requireParticipantIdentityAuthority({ VERCEL_ENV: "production" }).resolved, "passport");
 
   const invalidProduction = {
     ...production,

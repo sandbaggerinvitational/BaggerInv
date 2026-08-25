@@ -304,18 +304,20 @@ test("malformed requested Production-shadow candidate also blocks explicit Googl
   assert.equal(result.fetchCalls, 0);
 });
 
-test("live Production always remains Passport even when candidate variables are injected", () => {
+test("live Production fails closed when candidate variables explicitly request Supabase identity", () => {
   const live = participantIdentityAuthorityEnvironment({
     ...candidateEnv,
     VERCEL_ENV: "production",
     VERCEL_URL: "baggerinv.com",
     PRODUCTION_SHADOW_CANDIDATE_HOSTNAME: "baggerinv.com",
   });
-  assert.equal(live.resolved, "passport");
+  assert.equal(live.resolved, "unavailable");
+  assert.equal(live.blocked, true);
   assert.equal(live.participantAuthEnabled, false);
   assert.equal(live.productionShadowCandidate, false);
   assert.equal(live.productionBlocked, true);
-  assert.equal(live.reason, "production-hard-block");
+  assert.equal(live.reason, "activation-disabled");
+  assert.equal(participantIdentityAuthorityEnvironment({ VERCEL_ENV: "production" }).resolved, "passport");
 });
 
 test("Production-shadow identity RPCs are allowlisted and Preview administration remains separate", () => {

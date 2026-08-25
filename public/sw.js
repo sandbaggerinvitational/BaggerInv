@@ -1,4 +1,5 @@
-const CACHE_VERSION = "sbi-shell-v4";
+const CACHE_PREFIX = "sbi-shell-";
+const CACHE_VERSION = "sbi-shell-v5";
 const STATIC_ASSETS = [
   "/offline.html",
   "/icon-192.png",
@@ -22,7 +23,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key !== CACHE_VERSION)
+            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_VERSION)
             .map((key) => caches.delete(key)),
         ),
       ),

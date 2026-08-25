@@ -88,7 +88,7 @@ test("current Course Detail uses the Guide resolver while archive transport uses
   assert.match(loader, /guideParticipantProjection\(\{ payload \}\)\.content/);
   assert.match(loader, /courseHoles: stored\.courseHoles \|\| \[\]/);
   assert.match(loader, /readGuideProjection\(\{ surface, env \}\)/);
-  assert.match(loader, /surface === "guide" \? readTournamentLiveView\(source\.tournamentId, \{ env \}\) : Promise\.resolve\(null\)/);
+  assert.match(loader, /surface === "guide" \? readTournamentLiveView\(source\.tournamentId, \{[\s\S]*?env,[\s\S]*?productionCutoverSurface: "GUIDE_COURSE_CONTEXT",[\s\S]*?\}\) : Promise\.resolve\(null\)/);
   assert.doesNotMatch(loader, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
 });
 

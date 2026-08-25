@@ -15,6 +15,7 @@ import { recalculateCompetitionDerivedTournament } from "../../../../lib/competi
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../../lib/calcutta-supabase.js";
 import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
+import { productionCutoverPhaseAtLeast } from "../../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +57,8 @@ export async function POST(request) {
   try {
     const authorizationStartedAt = Date.now();
     const current = session(request);
-    await validateAuthoritativeParticipantSession(request, current, { requireWritable: true, cookieStore: await cookies() });
+    const verifiedAuthorization = await validateAuthoritativeParticipantSession(request, current,
+      { requireWritable: true, cookieStore: await cookies() });
     const authorizationMs = Date.now() - authorizationStartedAt;
     const rate = consumeRateLimit(`scoring-write:${clientAddress(request)}:${current.matchId}`, { limit: 30, windowMs: 60_000 });
     if (!rate.allowed) return NextResponse.json({ error: "Too many score updates. Wait a moment and try again." }, { status: 429 });
@@ -64,7 +66,8 @@ export async function POST(request) {
     const input = submitted.action === "confirm" ? submitted : normalizeLiveScoringRequest(submitted);
     const persistenceStartedAt = Date.now();
     const measured = await persistParticipantScore({ matchId: current.matchId, input, current,
-      updatedBy: current.scorerName || "Authorized participant" });
+      updatedBy: current.scorerName || "Authorized participant",
+      authorizationContext: verifiedAuthorization });
     const result = measured.result;
     const googleDiagnostics = measured.diagnostics;
     const googleAuthoritativeMs = measured.authority === "google" ? Date.now() - persistenceStartedAt : 0;
@@ -126,8 +129,12 @@ export async function POST(request) {
     }
     if (measured.authority === "supabase") {
       after(async () => {
-        const [drained, derived, calcutta] = await Promise.allSettled([
-          drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" }),
+        const productionWorkersAvailable = process.env.VERCEL_ENV !== "production" ||
+          productionCutoverPhaseAtLeast(process.env, "WORKERS");
+        const [drained, derived, intelligence, calcutta] = await Promise.allSettled([
+          productionWorkersAvailable
+            ? drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" })
+            : Promise.resolve({ ok: true, delivered: 0, failed: 0, pending: true }),
           recalculateCompetitionDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring derived-state worker · ${current.playerId || "participant"}`,
           }),
@@ -142,6 +149,9 @@ export async function POST(request) {
         if (!mirror.ok) console.error("Supabase Google outbox remains pending", { matchId: current.matchId, failed: mirror.failed });
         if (derived.status === "rejected") console.error("Competition derived-state recalculation remains pending", {
           matchId: current.matchId, code: derived.reason?.code || "DERIVED_STATE_RECALCULATION_FAILED",
+        });
+        if (intelligence.status === "rejected") console.error("Intelligence recalculation remains pending", {
+          matchId: current.matchId, code: intelligence.reason?.code || "INTELLIGENCE_RECALCULATION_FAILED",
         });
         if (calcutta.status === "rejected") console.error("Calcutta recalculation remains pending", {
           matchId: current.matchId, code: calcutta.reason?.code || "CALCUTTA_RECALCULATION_FAILED",

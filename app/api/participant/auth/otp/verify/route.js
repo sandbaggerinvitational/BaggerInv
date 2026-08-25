@@ -8,6 +8,7 @@ import { authorizeSingleParticipantOtpVerification, recordSingleParticipantOtpVe
 import { participantAuthServerConfiguration } from "../../../../../../lib/supabase-auth-server.js";
 import { dataAuthorityFetch } from "../../../../../../lib/data-authority-request.js";
 import { assertProductionShadowCandidateRequest } from "../../../../../../lib/production-shadow-candidate.js";
+import { assertProductionCutoverRequest } from "../../../../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -45,6 +46,10 @@ export async function POST(request) {
     try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true }); }
     catch { return json({ error: "Not found." }, 404); }
   }
+  if (authority.productionCutoverIdentity) {
+    try { assertProductionCutoverRequest(request, process.env, { requireOrigin: true }); }
+    catch { return json({ error: "Not found." }, 404); }
+  }
   if (!sameOriginMutation(request)) return json({ error: "We couldn't verify this request. Try again." }, 403);
   const input = await request.json().catch(() => ({}));
   const email = String(input.email || "").trim().toLowerCase();
@@ -56,7 +61,7 @@ export async function POST(request) {
   let verificationType = "";
   try {
     verificationType = resolveParticipantEmailOtpVerificationType(allowed.payload.verificationType, {
-      required: authority.productionShadowCandidate,
+      required: authority.productionShadowCandidate || authority.productionCutoverIdentity,
     });
   } catch {
     return json({ error: "We couldn't verify that code. Try again.", category: "AUTH_SERVICE_UNAVAILABLE" }, 503);

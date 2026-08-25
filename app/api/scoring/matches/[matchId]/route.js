@@ -15,6 +15,7 @@ import { recalculateCalcuttaTournament } from "../../../../../lib/calcutta-supab
 import { drainScorecardArchiveJobs } from "../../../../../lib/scorecard-archive-worker.js";
 import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../../../../lib/scoring-read-service.js";
 import { productionShadowScoringMutationResponse } from "../../../../../lib/production-shadow-scoring-safety.js";
+import { productionCutoverPhaseAtLeast } from "../../../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +55,8 @@ export async function POST(request, { params }) {
     const current = session(request);
     const { matchId } = await params;
     if (!canScoreMatch(current, matchId)) throw new Error("This code cannot update that match.");
-    await validateAuthoritativeParticipantSession(request, current, { requireWritable: true, cookieStore: await cookies() });
+    const verifiedAuthorization = await validateAuthoritativeParticipantSession(request, current,
+      { requireWritable: true, cookieStore: await cookies() });
     const authorizationMs = Date.now() - authorizationStartedAt;
     const rateLimit = consumeRateLimit(`scoring-write:${clientAddress(request)}:${matchId}`, {
       limit: 30,
@@ -73,7 +75,8 @@ export async function POST(request, { params }) {
     const input = submitted.action === "confirm" ? submitted : normalizeLiveScoringRequest(submitted);
     const persistenceStartedAt = Date.now();
     const measured = await persistParticipantScore({ matchId, input, current,
-      updatedBy: current.scorerName || "Authorized scorer" });
+      updatedBy: current.scorerName || "Authorized scorer",
+      authorizationContext: verifiedAuthorization });
     const result = measured.result;
     const googleDiagnostics = measured.diagnostics;
     const googleAuthoritativeMs = measured.authority === "google" ? Date.now() - persistenceStartedAt : 0;
@@ -111,9 +114,15 @@ export async function POST(request, { params }) {
     }
     if (measured.authority === "supabase") {
       after(async () => {
+        const productionWorkersAvailable = process.env.VERCEL_ENV !== "production" ||
+          productionCutoverPhaseAtLeast(process.env, "WORKERS");
         const [drained, archive, derived, intelligence, calcutta] = await Promise.allSettled([
-          drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" }),
-          drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false }),
+          productionWorkersAvailable
+            ? drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" })
+            : Promise.resolve({ ok: true, delivered: 0, failed: 0, pending: true }),
+          productionWorkersAvailable
+            ? drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false })
+            : Promise.resolve({ ok: true, deliveries: [], pending: true }),
           recalculateCompetitionDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring derived-state worker · ${current.playerId || "participant"}`,
           }),

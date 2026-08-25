@@ -21,9 +21,14 @@ import { recalculateCompetitionDerivedTournament } from "../../../lib/competitio
 import { recalculateIntelligenceDerivedTournament } from "../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
 import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
-import { authorizePreviewDirector } from "../../../lib/preview-director-authorization.js";
+import { authorizePreviewDirector, productionDirectorEntitlementEnvironment } from "../../../lib/preview-director-authorization.js";
 import { requireScoringAuthority } from "../../../lib/scoring-authority.js";
 import { assertDirectorMutationAuthority } from "../../../lib/director-mutation-authority.js";
+import {
+  beginProductionGoogleAuthorityWrite,
+  completeProductionGoogleAuthorityWrite,
+} from "../../../lib/production-cutover-scoring-ingress.js";
+import { productionCutoverPhaseAtLeast } from "../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 
@@ -34,9 +39,14 @@ function authorizedGoogleRollback(request) {
 }
 
 async function authorized(request, authority) {
-  if (authority.resolved === "google") return authorizedGoogleRollback(request);
-  const result = await authorizePreviewDirector({ request, allowBootstrap: true });
-  return result?.status === "active";
+  const productionDirector = productionDirectorEntitlementEnvironment(process.env);
+  if (productionDirector.enabled || productionDirector.failClosed) {
+    return authorizePreviewDirector({ request, allowBootstrap: false });
+  }
+  if (authority.resolved === "google") {
+    return authorizedGoogleRollback(request) ? { status: "active", identity: null } : { status: "denied" };
+  }
+  return authorizePreviewDirector({ request, allowBootstrap: true });
 }
 
 function deny() {
@@ -53,7 +63,8 @@ export async function GET(request) {
   let authority;
   try { authority = requireScoringAuthority(); }
   catch (error) { return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
-  if (!(await authorized(request, authority))) return deny();
+  const authorization = await authorized(request, authority);
+  if (authorization?.status !== "active") return deny();
   try {
     const data = await readLiveMatchAdminData();
     return NextResponse.json({ data: {
@@ -72,11 +83,78 @@ export async function POST(request) {
   let authority;
   try { authority = requireScoringAuthority(); }
   catch (error) { return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
-  if (!(await authorized(request, authority))) return deny();
+  const authorization = await authorized(request, authority);
+  if (authorization?.status !== "active") return deny();
   try {
     const { action, matchId, updates, updatedBy } = await request.json();
-    assertDirectorMutationAuthority({ surface: "live-matches", action, authority: authority.resolved });
-    const measured = await withWorkbookWriteDiagnostics(`live-matches:${action}`, async () => {
+    const mutationAuthority = assertDirectorMutationAuthority({ surface: "live-matches", action, authority: authority.resolved });
+    if (mutationAuthority.resolvedAuthority === "supabase") {
+      if (!matchId || !mutationAuthority.canonicalLifecycleAction) {
+        const error = new Error("A canonical match control action and Match ID are required.");
+        error.code = "DIRECTOR_CANONICAL_LIFECYCLE_INPUT_REQUIRED";
+        error.status = 400;
+        throw error;
+      }
+      const lifecycle = await persistDirectorMatchLifecycle({
+        action: mutationAuthority.canonicalLifecycleAction,
+        matchId,
+        updatedBy: authorization.identity?.actor?.name || updatedBy,
+        authUserId: authorization.identity?.authUserId,
+        playerId: authorization.identity?.actor?.id,
+      });
+      if (!lifecycle.delegated) throw Object.assign(
+        new Error("The canonical Supabase match-control transaction was not selected."),
+        { code: "SUPABASE_CANONICAL_LIFECYCLE_REQUIRED", status: 503 },
+      );
+      const productionWorkerPhase = process.env.VERCEL_ENV !== "production" ||
+        productionCutoverPhaseAtLeast(process.env, "WORKERS");
+      const mirror = productionWorkerPhase
+        ? await drainGoogleOutbox({ maximum: 4, actor: authorization.identity?.actor?.name || updatedBy })
+        : { ok: true, delivered: 0, failed: 0, pending: true };
+      if (!mirror.ok) throw Object.assign(
+        new Error("The canonical mutation committed, but Google mirror delivery remains pending."),
+        { code: "GOOGLE_MIRROR_DELIVERY_PENDING", status: 503 },
+      );
+      refreshMatchData();
+      if (["finalize", "reopen"].includes(mutationAuthority.canonicalLifecycleAction)) after(async () => {
+        const [archive, derived, intelligence, calcutta] = await Promise.allSettled([
+          productionWorkerPhase
+            ? drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false })
+            : Promise.resolve({ ok: true, deliveries: [], pending: true }),
+          recalculateCompetitionDerivedTournament("", {
+            calculatedBy: `Director lifecycle worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
+          }),
+          recalculateIntelligenceDerivedTournament("", {
+            calculatedBy: `Director lifecycle intelligence worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
+          }),
+          recalculateCalcuttaTournament("", {
+            calculatedBy: `Director lifecycle Calcutta worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
+          }),
+        ]);
+        for (const [domain, result] of [["archive", archive], ["competition", derived], ["intelligence", intelligence], ["calcutta", calcutta]]) {
+          if (result.status === "rejected") console.error("Director lifecycle follow-up remains pending", {
+            action, matchId, domain, code: result.reason?.code || "DIRECTOR_LIFECYCLE_FOLLOW_UP_FAILED",
+          });
+        }
+      });
+      return NextResponse.json({
+        data: { match: lifecycle.result },
+        transaction: { authority: "supabase", mirror: {
+          delivered: mirror.delivered, failed: mirror.failed, pending: mirror.pending === true,
+        } },
+      });
+    }
+    const productionIngressLease = authority.resolved === "google"
+      ? await beginProductionGoogleAuthorityWrite({
+          tournamentId: "2026",
+          matchId,
+          actorId: updatedBy || "Tournament Director",
+          operation: `LIVE_MATCHES:${String(action || "UNKNOWN")}`,
+        })
+      : { enabled: false };
+    let measured;
+    try {
+      measured = await withWorkbookWriteDiagnostics(`live-matches:${action}`, async () => {
       let match;
       if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
       else if (action === "mark-live") match = await markLiveMatch(matchId, updatedBy);
@@ -109,7 +187,16 @@ export async function POST(request) {
       else if (action === "access-disable") match = await disableLiveMatchAccess(matchId, updatedBy);
       else throw new Error("Unknown live-match action.");
       return { match };
-    });
+      });
+    } finally {
+      try { await completeProductionGoogleAuthorityWrite(productionIngressLease); }
+      catch (error) {
+        console.error("Production Live Matches ingress lease completion remains pending", {
+          action,
+          code: error?.code || "PRODUCTION_GOOGLE_INGRESS_LEASE_COMPLETION_FAILED",
+        });
+      }
+    }
     const { match, access } = measured.result;
     refreshMatchData();
     console.info("Live Match Control transaction", { action, matchId, ...measured.diagnostics });

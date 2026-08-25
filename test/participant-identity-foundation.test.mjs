@@ -99,8 +99,9 @@ test("identity authority defaults to Passport, shadow defaults off, and Producti
   };
   assert.equal(participantIdentityAuthorityEnvironment(preview).resolved, "supabase");
   assert.equal(participantIdentityAuthorityEnvironment(preview).shadowEnabled, true);
-  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "passport");
-  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).productionBlocked, true);
+  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "unavailable");
+  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).blocked, true);
+  assert.equal(participantIdentityAuthorityEnvironment({ VERCEL_ENV: "production" }).resolved, "passport");
   const ineligiblePreview = participantIdentityAuthorityEnvironment({ ...preview, GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID });
   assert.equal(ineligiblePreview.resolved, "unavailable");
   assert.equal(ineligiblePreview.blocked, true);

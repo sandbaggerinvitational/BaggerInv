@@ -199,14 +199,16 @@ test("snapshot parity ignores mutable Live Matches Updated At but detects scorin
   assert.deepEqual(reconcileCanonicalScoringAuthority(imported, changed).snapshotDivergence, ["M1"]);
 });
 
-test("authority feature flag defaults to Google and hard-blocks Production", () => {
+test("authority defaults Production to Google but explicit ineligible Supabase fails closed", () => {
   assert.equal(scoringAuthority({}), "google");
   const preview = { VERCEL_ENV: "preview", SCORING_AUTHORITY: "supabase", PREVIEW_SCORING_SHEET_ID: "preview", GOOGLE_SHEETS_SPREADSHEET_ID: "preview",
     GOOGLE_SHEETS_ID: "preview", SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret" };
   assert.equal(scoringAuthority(preview), "supabase");
   assert.equal(scoringAuthorityEnvironment(preview).resolved, "supabase");
-  assert.equal(scoringAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "google");
+  assert.equal(scoringAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "unavailable");
+  assert.equal(scoringAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).blocked, true);
   assert.equal(scoringAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).productionBlocked, true);
+  assert.equal(scoringAuthorityEnvironment({ VERCEL_ENV: "production" }).resolved, "google");
 });
 
 test("signed scoring session carries Player Passport identity and tournament scope without exposing it client-side", () => {

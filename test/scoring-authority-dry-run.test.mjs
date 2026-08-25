@@ -35,11 +35,19 @@ function match(format = "SI") {
   };
 }
 
-test("authority flag fails closed unless the server-only Preview isolation gate is complete", () => {
+test("authority flag fails closed unless the environment-specific isolation and activation gates are complete", () => {
   const safe = { VERCEL_ENV: "preview", SCORING_AUTHORITY: "supabase", PREVIEW_SCORING_SHEET_ID: "preview", GOOGLE_SHEETS_SPREADSHEET_ID: "preview",
     SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret" };
   assert.equal(scoringAuthority(safe), "supabase");
-  assert.equal(scoringAuthority({ ...safe, VERCEL_ENV: "production" }), "google");
+  assert.throws(
+    () => scoringAuthority({ ...safe, VERCEL_ENV: "production" }),
+    (error) => {
+      assert.equal(error.code, "SCORING_AUTHORITY_UNAVAILABLE");
+      assert.equal(error.authority?.resolved, "unavailable");
+      assert.equal(error.authority?.reason, "production-cutover-scoring-gate-closed");
+      return true;
+    },
+  );
   assert.throws(() => scoringAuthority({ ...safe, GOOGLE_SHEETS_SPREADSHEET_ID: "production" }), /unavailable/i);
   assert.equal(scoringAuthority({ ...safe, SCORING_AUTHORITY: "google" }), "google");
 });

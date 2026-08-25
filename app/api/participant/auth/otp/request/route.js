@@ -11,6 +11,7 @@ import { normalizeParticipantAuthCaptchaToken } from "../../../../../../lib/part
 import { participantAuthExperienceConfiguration } from "../../../../../../lib/participant-sms-auth-feature.js";
 import { dataAuthorityFetch } from "../../../../../../lib/data-authority-request.js";
 import { assertProductionShadowCandidateRequest } from "../../../../../../lib/production-shadow-candidate.js";
+import { assertProductionCutoverRequest } from "../../../../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -39,6 +40,10 @@ export async function POST(request) {
     try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true }); }
     catch { return json({ error: "Not found." }, 404); }
   }
+  if (authority.productionCutoverIdentity) {
+    try { assertProductionCutoverRequest(request, process.env, { requireOrigin: true }); }
+    catch { return json({ error: "Not found." }, 404); }
+  }
   if (!sameOriginMutation(request)) return json({ error: "We couldn't verify this request. Try again.", category: "REQUEST_CHECK_FAILED" }, 403);
   const input = await request.json().catch(() => ({}));
   const email = String(input.email || "").trim().toLowerCase();
@@ -55,7 +60,11 @@ export async function POST(request) {
     console.error("Participant email Auth configuration unavailable", { code: error?.code || "AUTH_CONFIGURATION_FAILURE" });
     return json({ message: "Email sign-in is temporarily unavailable. Try again shortly.", category: "EMAIL_UNAVAILABLE" }, 503);
   }
-  const eligibility = await authorizeParticipantEmailOtpEligibility({ email, client_request_hash: clientRequestHash });
+  const eligibility = authority.productionCutoverIdentity
+    ? await import("../../../../../../lib/production-participant-auth-enrollment.js")
+      .then(({ authorizeProductionParticipantEmailOtpEligibility }) =>
+        authorizeProductionParticipantEmailOtpEligibility({ email, client_request_hash: clientRequestHash }))
+    : await authorizeParticipantEmailOtpEligibility({ email, client_request_hash: clientRequestHash });
   if (!eligibility.ok) {
     console.error("Participant email authorization unavailable", eligibility.diagnostics);
     return json({
@@ -77,7 +86,7 @@ export async function POST(request) {
       global: { fetch: dataAuthorityFetch("supabase", { adapter: "participant-email-otp-request" }) },
     });
     const verificationType = resolveParticipantEmailOtpVerificationType(decision.verificationType, {
-      required: authority.productionShadowCandidate,
+      required: authority.productionShadowCandidate || authority.productionCutoverIdentity,
     });
     let error = null;
     ({ error } = await requestParticipantEmailOtp(client, {

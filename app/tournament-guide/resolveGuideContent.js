@@ -116,7 +116,10 @@ export async function resolveTournamentGuideContent({ surface = "guide", env = p
   if (source.source.resolved === "google") return resolveGoogleGuideContent();
   const [read, liveRead] = await Promise.all([
     readGuideProjection({ surface, env }),
-    surface === "guide" ? readTournamentLiveView(source.tournamentId, { env }) : Promise.resolve(null),
+    surface === "guide" ? readTournamentLiveView(source.tournamentId, {
+      env,
+      productionCutoverSurface: "GUIDE_COURSE_CONTEXT",
+    }) : Promise.resolve(null),
   ]);
   if (!read.payload?.ok) {
     const error = new Error("Tournament Guide is temporarily unavailable.");

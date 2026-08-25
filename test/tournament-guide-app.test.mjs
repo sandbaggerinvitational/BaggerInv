@@ -30,7 +30,8 @@ test("Guide destinations are focused same-origin Supabase views with a flag-gate
   assert.match(resolver, /requireGuideReadSource/);
   assert.match(resolver, /readGuideProjection\(\{ surface, env \}\)/);
   assert.match(resolver, /guideParticipantProjection/);
-  assert.match(resolver, /readTournamentLiveView\(source\.tournamentId, \{ env \}\)/);
+  assert.match(resolver, /readTournamentLiveView\(source\.tournamentId, \{/);
+  assert.match(resolver, /productionCutoverSurface: "GUIDE_COURSE_CONTEXT"/);
   assert.match(resolver, /source\.source\.resolved === "google"/);
   assert.doesNotMatch(resolver, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName|validateTournamentGuideHeaders|lastGood/);
   assert.match(normalized, /publicGuideRecords\(itineraryRows, guideTournament\)/);
