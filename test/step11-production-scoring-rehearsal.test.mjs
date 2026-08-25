@@ -90,6 +90,12 @@ function score(state, holeNumber, mutationKey = `score-${holeNumber}`) {
 
 test("Step 11 runtime gate requires exact isolated SHA/resources and forbids all live authority features", () => {
   const env = {
+    PRODUCTION_SHADOW_CANDIDATE_ENABLED: "true",
+    PRODUCTION_SHADOW_CANDIDATE_HOSTNAME: HOST,
+    PRODUCTION_SHADOW_CANDIDATE_EXPECTED_COMMIT_SHA: SHA,
+    PRODUCTION_SHADOW_CANDIDATE_EXPECTED_VERCEL_PROJECT_ID: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    PRODUCTION_SHADOW_CANDIDATE_AUTH_ENABLED: "true",
+    PRODUCTION_FOUNDATION_ENABLED: "true",
     PRODUCTION_STEP11_SCORING_REHEARSAL_ENABLED: "true",
     PRODUCTION_STEP11_SCORING_REHEARSAL_SHA: SHA,
     PRODUCTION_STEP11_SCORING_REHEARSAL_HOSTNAME: HOST,
@@ -99,18 +105,68 @@ test("Step 11 runtime gate requires exact isolated SHA/resources and forbids all
     PRODUCTION_SUPABASE_URL: "https://ymqhhtxaywtqllynrmxe.supabase.co",
     GOOGLE_SHEETS_ID: "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4",
     VERCEL_ENV: "preview",
+    VERCEL_URL: "bagger-inv-step11-deployment.vercel.app",
     VERCEL_GIT_COMMIT_SHA: SHA,
     VERCEL_BRANCH_URL: HOST,
+    VERCEL_PROJECT_ID: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    VERCEL_PROJECT_NAME: "bagger-inv",
+    PRODUCTION_SUPABASE_SECRET_KEY: "production-server-secret-never-serialized",
+    NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://ymqhhtxaywtqllynrmxe.supabase.co",
+    NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "production-browser-publishable-key",
+    PARTICIPANT_AUTH_CAPTCHA_REQUIRED: "true",
+    PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "true",
+    NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY: "production-turnstile-site-key",
+    PARTICIPANT_AUTH_RATE_LIMIT_SECRET: "production-auth-rate-limit-only-secret",
     SCORING_AUTHORITY: "google",
-    PARTICIPANT_IDENTITY_AUTHORITY: "passport",
+    PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
+    PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED: "false",
+    PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED: "false",
+    PRODUCTION_SUPABASE_PUBLIC_READS_ENABLED: "false",
+    PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "false",
+    PRODUCTION_SUPABASE_AUTH_USER_CREATION_ENABLED: "false",
+    PRODUCTION_SUPABASE_WORKERS_ENABLED: "false",
+    SUPABASE_SCORING_MIRROR_ENABLED: "false",
+    PRODUCTION_STEP11_EXTERNAL_GOOGLE_WRITES_ENABLED: "false",
   };
-  assert.equal(productionStep11ScoringRehearsalEnvironment(env).allowed, true);
+  const ready = productionStep11ScoringRehearsalEnvironment(env);
+  assert.equal(ready.allowed, true);
+  assert.equal(ready.scoringAuthorityPreserved, true);
+  assert.equal(ready.identityAuthority, "supabase");
+  assert.equal(ready.legacyIdentityPreserved, false);
+  assert.equal(ready.shadowCandidateIdentityApproved, true);
+  assert.equal(ready.authorityBoundaryApproved, true);
+  const legacyPassportReady = productionStep11ScoringRehearsalEnvironment({
+    ...env,
+    PARTICIPANT_IDENTITY_AUTHORITY: "passport",
+  });
+  assert.equal(legacyPassportReady.allowed, true);
+  assert.equal(legacyPassportReady.legacyIdentityPreserved, true);
+  assert.equal(legacyPassportReady.authorityBoundaryApproved, true);
   assert.equal(productionStep11ScoringRehearsalEnvironment({ ...env, VERCEL_ENV: "production" }).allowed, false);
+  assert.equal(productionStep11ScoringRehearsalEnvironment({
+    ...env, VERCEL_ENV: "production", PARTICIPANT_IDENTITY_AUTHORITY: "passport",
+  }).allowed, false);
   assert.equal(productionStep11ScoringRehearsalEnvironment({ ...env, SCORING_AUTHORITY: "supabase" }).allowed, false);
+  assert.equal(productionStep11ScoringRehearsalEnvironment({
+    ...env, PRODUCTION_SHADOW_CANDIDATE_ENABLED: "false",
+  }).allowed, false);
+  assert.equal(productionStep11ScoringRehearsalEnvironment({
+    ...env, VERCEL_PROJECT_ID: "prj_wrong",
+  }).allowed, false);
+  assert.equal(productionStep11ScoringRehearsalEnvironment({
+    ...env, PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "true",
+  }).allowed, false);
+  assert.equal(productionStep11ScoringRehearsalEnvironment({
+    ...env, PRODUCTION_SUPABASE_AUTH_USER_CREATION_ENABLED: "true",
+  }).allowed, false);
   assert.equal(productionStep11ScoringRehearsalEnvironment({ ...env, PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED: "true" }).allowed, false);
+  assert.equal(productionStep11ScoringRehearsalEnvironment({ ...env, PRODUCTION_SUPABASE_WORKERS_ENABLED: "true" }).allowed, false);
   assert.equal(productionStep11ScoringRehearsalEnvironment({ ...env, PRODUCTION_STEP11_EXTERNAL_GOOGLE_WRITES_ENABLED: "true" }).allowed, false);
   assert.equal(productionStep11ScoringRehearsalEnvironment({ ...env, PRODUCTION_STEP11_S3_FINGERPRINT: "" }).allowed, false);
   assert.equal(productionStep11ScoringRehearsalEnvironment({ ...env, GOOGLE_SHEETS_ID: "preview" }).allowed, false);
+  assert.equal(productionStep11ScoringRehearsalEnvironment({
+    ...env, PARTICIPANT_IDENTITY_AUTHORITY: "unknown",
+  }).allowed, false);
 });
 
 test("rehearsal fixtures can derive only from a completed historical Production match", () => {
