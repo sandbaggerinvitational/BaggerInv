@@ -337,6 +337,9 @@ test("Production credential facade is server-only and absent from Client Compone
   assert.match(contextSource, /AsyncLocalStorage/);
   assert.match(reader, /currentGoogleServiceAccountCredentials/);
   assert.match(writer, /currentGoogleServiceAccountCredentials/);
+  assert.match(writer, /credential\?\.credentialSource === "production-worker"/);
+  assert.match(writer, /credential\?\.resources\?\.googleWorkbookId/);
+  assert.match(writer, /dedicatedProductionWorkbook \|\| resolveSpreadsheetId\(\)/);
   assert.match(reader, /cachedAccessTokens = new Map/);
   assert.match(writer, /cachedGoogleTokens = new Map/);
 
