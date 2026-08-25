@@ -373,7 +373,16 @@ test("Step 11 metadata route is Director-only, exact-candidate, read-only, and s
   assert.doesNotMatch(route, /PRODUCTION_GOOGLE_PRIVATE_KEY|GOOGLE_PRIVATE_KEY|accessToken/);
   assert.doesNotMatch(route, /method:\s*["']POST|batchUpdate|values:batchUpdate/);
   assert.match(directorAuthorization, /["']\/api\/admin\/step11-production-google-metadata["']/);
+  assert.match(directorAuthorization, /["']\/api\/admin\/step11-production-google-certificate["']/);
   assert.match(writer, /readWorkbookNativeMetadataSnapshot/);
   assert.doesNotMatch(writer.match(/export async function readWorkbookNativeMetadataSnapshot\(\)[\s\S]*?\n}\n/)?.[0] || "",
     /editors|users|groups|domainUsersCanEdit|rowData|values/);
+});
+
+test("Step 11 browser certificate alias reuses the exact metadata handler", async () => {
+  const alias = await readFile(path.join(root,
+    "app/api/admin/step11-production-google-certificate/route.js"), "utf8");
+  assert.match(alias, /from "\.\.\/step11-production-google-metadata\/route\.js"/);
+  assert.match(alias, /\bGET\b/);
+  assert.doesNotMatch(alias, /(?:POST|PUT|PATCH|DELETE)/);
 });
