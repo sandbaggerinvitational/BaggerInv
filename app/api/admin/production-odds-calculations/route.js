@@ -4,14 +4,19 @@ import { after, NextResponse } from "next/server";
 import { publicOddsCalculationJob } from "../../../../lib/championship-odds-resilience.js";
 import {
   PRODUCTION_ODDS_CALCULATION_MODES,
+  PRODUCTION_STEP11_ODDS_SERVICE_AUTHORIZATION_HEADER,
   assertProductionOddsStoredJobScope,
   productionOddsCalculationEnvironment,
 } from "../../../../lib/production-odds-calculation-contract.js";
 import {
+  authorizeProductionStep11OddsServiceBridge,
   certifyProductionOddsCalculation,
+  inspectProductionStep11OddsControlState,
   processProductionOddsCalculationJob,
   readProductionOddsCalculationJobs,
   requestProductionOddsCalculation,
+  setProductionStep11OddsRuntime,
+  stageProductionStep11OddsRelease,
 } from "../../../../lib/production-odds-calculation-server.js";
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import { assertProductionCutoverRequest } from "../../../../lib/production-cutover-activation-contract.js";
@@ -28,6 +33,36 @@ function safeEqual(left, right) {
   const a = sha256(left);
   const b = sha256(right);
   return timingSafeEqual(a, b);
+}
+
+function serviceAuthorizationRequestFingerprint(request, state) {
+  let path = "";
+  try {
+    const url = new URL(request.url);
+    path = `${url.pathname}${url.search}`;
+  } catch {
+    path = "/api/admin/production-odds-calculations";
+  }
+  return createHash("sha256").update([
+    "production-step11-odds-service-authorization-v1",
+    clean(request.method).toUpperCase(),
+    path,
+    clean(state.deploymentCommit).toLowerCase(),
+    clean(state.candidateHostname).toLowerCase(),
+  ].join("\n")).digest("hex");
+}
+
+function serviceOperationRequestFingerprint(request, state, input = {}) {
+  return createHash("sha256").update([
+    serviceAuthorizationRequestFingerprint(request, state),
+    clean(input.action).toLowerCase(),
+    clean(input.expectedActivationRevision),
+    clean(input.expectedRuntimeRevision),
+    typeof input.expectedRuntimeEnabled === "boolean"
+      ? String(input.expectedRuntimeEnabled)
+      : "invalid-runtime-state",
+    clean(process.env.PRODUCTION_STEP11_S3_FINGERPRINT).toLowerCase(),
+  ].join("\n")).digest("hex");
 }
 
 function unavailable(state) {
@@ -51,6 +86,18 @@ async function authorizeRequest(request, state, { requireOrigin }) {
     }
   } catch {
     return null;
+  }
+  if (state.mode === PRODUCTION_ODDS_CALCULATION_MODES.REHEARSAL &&
+      clean(request.headers.get("x-step11-service-authorization")) ===
+        PRODUCTION_STEP11_ODDS_SERVICE_AUTHORIZATION_HEADER) {
+    try {
+      return await authorizeProductionStep11OddsServiceBridge({
+        requestFingerprint: serviceAuthorizationRequestFingerprint(request, state),
+        env: process.env,
+      });
+    } catch {
+      return null;
+    }
   }
   const director = await authorizePreviewDirector({
     request,
@@ -152,6 +199,43 @@ export async function POST(request) {
     const input = await request.json();
     const action = clean(input.action || "request").toLowerCase();
     const jobId = clean(input.jobId);
+    const serviceControlActions = new Set([
+      "inspect-rehearsal", "stage-rehearsal", "enable-rehearsal", "disable-rehearsal",
+    ]);
+    if (serviceControlActions.has(action)) {
+      if (state.mode !== PRODUCTION_ODDS_CALCULATION_MODES.REHEARSAL ||
+          director.source !== "production-step11-odds-service-bridge") {
+        return unavailable(state);
+      }
+      const requestFingerprint = serviceOperationRequestFingerprint(request, state, input);
+      if (action === "inspect-rehearsal") {
+        const inspected = await inspectProductionStep11OddsControlState({
+          requestFingerprint,
+          authorizationDiagnostics: director.diagnostics,
+        });
+        return NextResponse.json(inspected, {
+          headers: { "Cache-Control": "private, no-store" },
+        });
+      }
+      const expectedActivationRevision = input.expectedActivationRevision;
+      const expectedRuntimeRevision = input.expectedRuntimeRevision;
+      const expectedRuntimeEnabled = input.expectedRuntimeEnabled;
+      const result = action === "stage-rehearsal"
+        ? await stageProductionStep11OddsRelease({
+          expectedActivationRevision,
+          requestFingerprint,
+        })
+        : await setProductionStep11OddsRuntime({
+          enabled: action === "enable-rehearsal",
+          expectedActivationRevision,
+          expectedRuntimeRevision,
+          expectedRuntimeEnabled,
+          requestFingerprint,
+        });
+      return NextResponse.json(result, {
+        headers: { "Cache-Control": "private, no-store" },
+      });
+    }
     if (action === "certify") {
       if (!/^[0-9a-f]{64}$/.test(jobId)) {
         return NextResponse.json({ error: "A valid calculation job is required." }, { status: 400 });

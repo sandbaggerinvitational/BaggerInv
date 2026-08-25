@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { leaderboardsCoreReadEnvironment, requireLeaderboardsCoreReadSource } from "../lib/leaderboards-core-read-source.js";
+import { buildLeaderboard } from "../lib/leaderboards-core-engine.js";
 import {
   compareLeaderboardsCoreParity,
   leaderboardsCoreDataFromSupabaseView,
@@ -136,6 +137,41 @@ function fixture() {
   };
 }
 
+function preTournamentFixture() {
+  const view = fixture();
+  view.players = Array.from({ length: 24 }, (_, index) => ({
+    player_id: `P${index + 1}`,
+    display_name: `Player ${index + 1}`,
+    source_payload: { Slug: `player-${index + 1}` },
+    presentation: { photo: `player-${index + 1}-pic` },
+    team_id: index < 12 ? "T1" : "T2",
+    team_side: index < 12 ? 1 : 2,
+    participation_status: "ACTIVE",
+  }));
+  view.matches = view.matches.map((entryValue) => ({
+    ...entryValue,
+    match: {
+      ...entryValue.match,
+      status: "UPCOMING",
+      scoring_locked: true,
+      match_revision: 0,
+      scored_holes: 0,
+      current_hole: 0,
+      holes_remaining: 18,
+      team_1_holes_won: 0,
+      team_2_holes_won: 0,
+      running_result: "Scheduled",
+      result_winner: "",
+      clinched: false,
+      scorecard_complete: false,
+      finalized_at: null,
+    },
+    participants: [],
+    scores: [],
+  }));
+  return view;
+}
+
 test("Leaderboards core source is Preview-only and Production fails closed", () => {
   assert.equal(leaderboardsCoreReadEnvironment(preview).resolved, "supabase");
   assert.equal(leaderboardsCoreReadEnvironment({ ...preview, VERCEL_ENV: "production",
@@ -173,7 +209,73 @@ test("existing JavaScript engines preserve BB, Scramble pairing, Singles, Live, 
   assert.equal(leaderboardsCoreParityProjection(data).roundPlayers.length, 3);
 });
 
-test("source fingerprint is deterministic and changes for a hole revision", () => {
+test("overall Supabase standings seed all 24 active tournament players while pairings are pending", () => {
+  const data = leaderboardsCoreDataFromSupabaseView(preTournamentFixture());
+  assert.equal(data.leaderboard.length, 24);
+  assert.equal(new Set(data.leaderboard.map((row) => row.id)).size, 24);
+  assert.ok(data.leaderboard.every((row) => row.points === 0 && row.matchesPlayed === 0));
+  assert.ok(data.leaderboard.every((row) => row.wins === 0 && row.losses === 0 && row.halves === 0));
+  assert.equal(data.leaderboard.filter((row) => row.teamSide === 1).length, 12);
+  assert.equal(data.leaderboard.filter((row) => row.teamSide === 2).length, 12);
+  assert.ok(Object.values(data.roundLeaderboards).every((rows) => rows.length === 0));
+});
+
+test("partial pairings do not limit overall standings or fabricate round-specific players", () => {
+  const view = preTournamentFixture();
+  view.matches[0].participants = participants(view.matches[0].match.match_id, ["P1", "P2", "P13", "P14"], "BB");
+  const data = leaderboardsCoreDataFromSupabaseView(view);
+
+  assert.equal(data.leaderboard.length, 24);
+  assert.deepEqual(data.roundLeaderboards[1].map((row) => row.id).sort(), ["P1", "P13", "P14", "P2"]);
+  assert.equal(data.roundLeaderboards[2].length, 0);
+  assert.equal(data.roundLeaderboards[3].length, 0);
+
+  const teamOne = data.leaderboard.find((row) => row.id === "P1");
+  const teamTwo = data.leaderboard.find((row) => row.id === "P13");
+  assert.deepEqual({ teamSide: teamOne.teamSide, team: teamOne.team }, { teamSide: 1, team: "The Pickles" });
+  assert.deepEqual({ teamSide: teamTwo.teamSide, team: teamTwo.team }, { teamSide: 2, team: "Lipp it and Rip it" });
+});
+
+test("roster seeding leaves finalized-match scoring unchanged", () => {
+  const playerMap = Object.fromEntries(Array.from({ length: 6 }, (_, index) => [`P${index + 1}`, {
+    name: `Player ${index + 1}`,
+    slug: `player-${index + 1}`,
+    photo: `player-${index + 1}.png`,
+    teamSide: index < 3 ? 1 : 2,
+  }]));
+  const teams = {
+    1: { name: "The Pickles", logo: "pickles.png" },
+    2: { name: "Lipp it and Rip it", logo: "lipp.png" },
+  };
+  const matches = [{
+    status: "Final",
+    finalizedAt: "2026-08-12T12:00:00Z",
+    pointsAvailable: 3,
+    team1Points: 2,
+    team2Points: 1,
+    matchupWinner: "Team 1",
+    team1Players: [{ id: "P1" }, { id: "P2" }],
+    team2Players: [{ id: "P4" }, { id: "P5" }],
+  }];
+  const matchDerived = buildLeaderboard(matches, playerMap, teams);
+  const rosterSeeded = buildLeaderboard(matches, playerMap, teams, {
+    seedPlayers: Object.entries(playerMap).map(([id, player]) => ({ id, teamSide: player.teamSide })),
+  });
+
+  assert.deepEqual(
+    rosterSeeded.filter((row) => ["P1", "P2", "P4", "P5"].includes(row.id)),
+    matchDerived,
+  );
+  assert.deepEqual(
+    rosterSeeded.filter((row) => ["P3", "P6"].includes(row.id)).map(({ id, teamSide, points, matchesPlayed }) => ({ id, teamSide, points, matchesPlayed })),
+    [
+      { id: "P3", teamSide: 1, points: 0, matchesPlayed: 0 },
+      { id: "P6", teamSide: 2, points: 0, matchesPlayed: 0 },
+    ],
+  );
+});
+
+test("source fingerprint is deterministic and changes for scoring, presentation, or active-roster inputs", () => {
   const first = leaderboardsCoreDataFromSupabaseView(fixture());
   const second = leaderboardsCoreDataFromSupabaseView(structuredClone(fixture()));
   assert.equal(first.sourceFingerprint, second.sourceFingerprint);
@@ -183,6 +285,23 @@ test("source fingerprint is deterministic and changes for a hole revision", () =
   const presentationChanged = fixture();
   presentationChanged.source_revision.presentationFingerprint = "c".repeat(64);
   assert.notEqual(first.sourceFingerprint, leaderboardsCoreDataFromSupabaseView(presentationChanged).sourceFingerprint);
+
+  const playerIdChanged = fixture();
+  playerIdChanged.players[0].player_id = "P1-REPLACED";
+  assert.notEqual(first.sourceFingerprint, leaderboardsCoreDataFromSupabaseView(playerIdChanged).sourceFingerprint);
+
+  const teamChanged = fixture();
+  teamChanged.players[0].team_side = 2;
+  assert.notEqual(first.sourceFingerprint, leaderboardsCoreDataFromSupabaseView(teamChanged).sourceFingerprint);
+
+  const statusChanged = fixture();
+  statusChanged.players[0].participation_status = "INACTIVE";
+  assert.notEqual(first.sourceFingerprint, leaderboardsCoreDataFromSupabaseView(statusChanged).sourceFingerprint);
+
+  assert.deepEqual(first.sourceRevision.activeRoster.slice(0, 2), [
+    { playerId: "P1", participationStatus: "ACTIVE", teamSide: 1 },
+    { playerId: "P2", participationStatus: "ACTIVE", teamSide: 1 },
+  ]);
 });
 
 test("slot validation rejects array/participant mismatches instead of misattributing a score", () => {
