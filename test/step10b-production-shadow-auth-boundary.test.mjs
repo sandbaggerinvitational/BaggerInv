@@ -200,8 +200,11 @@ test("Production-shadow Auth page and optional diagnostics stay on the exact can
     "candidate diagnostics no-op must still require an authenticated session",
   );
   assert.match(previewEnvironmentRoute, /productionShadowCandidateEnvironment\(process\.env\)/);
+  assert.match(previewEnvironmentRoute, /productionStep11ScoringRehearsalEnvironment\(process\.env\)/);
   assert.match(previewEnvironmentRoute, /commitApproved: candidate\.commitApproved/);
   assert.match(previewEnvironmentRoute, /captchaSiteKeyConfigured: candidate\.captchaSiteKeyConfigured/);
+  assert.match(previewEnvironmentRoute, /runSecretConfigured: scoringRehearsal\.runSecretConfigured/);
+  assert.match(previewEnvironmentRoute, /externalWritesDisabled: scoringRehearsal\.externalWritesDisabled/);
   assert.doesNotMatch(previewEnvironmentRoute, /secretKey|publishableKey|rateLimitSecret/);
 });
 
