@@ -4,6 +4,7 @@ import { after, NextResponse } from "next/server";
 import { publicOddsCalculationJob } from "../../../../lib/championship-odds-resilience.js";
 import {
   PRODUCTION_ODDS_CALCULATION_MODES,
+  assertProductionOddsStoredJobScope,
   productionOddsCalculationEnvironment,
 } from "../../../../lib/production-odds-calculation-contract.js";
 import {
@@ -81,8 +82,31 @@ async function continueCalculation(jobId, { failureAt = "" } = {}) {
   return null;
 }
 
+function safeJob(job = {}) {
+  const safe = publicOddsCalculationJob(job);
+  const isolation = assertProductionOddsStoredJobScope(job, process.env);
+  const revision = job.source_revision || {};
+  safe.publicationEligible = isolation.publicationEligible;
+  safe.mirrorEligible = isolation.mirrorEligible;
+  if (revision.rehearsal_fixture_contract) {
+    safe.rehearsalIsolation = {
+      contract: clean(revision.rehearsal_fixture_contract),
+      namespace: clean(revision.rehearsal_namespace),
+      fixtureFingerprint: clean(revision.rehearsal_fixture_fingerprint),
+      canonicalPairingFingerprint: clean(revision.canonical_pairing_fingerprint),
+      rehearsalPairingFingerprint: clean(revision.rehearsal_pairing_fingerprint),
+      canonicalPairingsMutated: false,
+      databasePairingWrites: 0,
+      externalGoogleWrites: 0,
+      publicationEligible: isolation.publicationEligible,
+      mirrorEligible: isolation.mirrorEligible,
+    };
+  }
+  return safe;
+}
+
 function safeJobs(payload = {}) {
-  return (payload.jobs || []).map(publicOddsCalculationJob);
+  return (payload.jobs || []).map(safeJob);
 }
 
 export async function GET(request) {
@@ -144,6 +168,13 @@ export async function POST(request) {
       if (!/^[0-9a-f]{64}$/.test(jobId)) {
         return NextResponse.json({ error: "A valid calculation job is required." }, { status: 400 });
       }
+      const retained = await readProductionOddsCalculationJobs(jobId);
+      if (!retained.payload?.jobs?.length) {
+        return NextResponse.json({ error: "Calculation job not found in this rehearsal scope." }, {
+          status: 404,
+          headers: { "Cache-Control": "private, no-store" },
+        });
+      }
       after(() => continueCalculation(jobId).catch(() => null));
       return NextResponse.json({
         ok: true,
@@ -185,7 +216,7 @@ export async function POST(request) {
       accepted: true,
       duplicate: requested.requested.duplicate === true,
       jobId: requestedJobId,
-      job: publicOddsCalculationJob(requested.requested.job),
+      job: safeJob(requested.requested.job),
       operationMode: state.mode,
       failureBoundary: failureAt || null,
       calculationCompleted: false,

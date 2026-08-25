@@ -10,9 +10,11 @@ import { logicalOddsResult } from "../lib/championship-odds-supabase.js";
 import {
   PRODUCTION_ODDS_CALCULATION_MODES,
   assertProductionOddsCalculationEnvironment,
+  assertProductionOddsStoredJobScope,
   productionOddsCalculationDependencies,
   productionOddsCalculationEnvironment,
   productionOddsCalculationRequestInput,
+  productionOddsCalculationScope,
 } from "../lib/production-odds-calculation-contract.js";
 import {
   PRODUCTION_GOOGLE_WORKBOOK_ID,
@@ -20,6 +22,7 @@ import {
   PRODUCTION_SUPABASE_URL,
 } from "../lib/production-foundation-resource-contract.js";
 import { scoringShadowPayloadHash } from "../lib/scoring-shadow.js";
+import { buildProductionOddsRehearsalInputs } from "../lib/production-odds-rehearsal-fixture.js";
 import {
   ODDS_CALCULATION_CHECKPOINT_CONTRACT_VERSION,
   createTournamentOddsCheckpoint,
@@ -73,8 +76,36 @@ const candidateEnv = Object.freeze({
   PRODUCTION_STEP11_ODDS_REHEARSAL_SECRET: "production-step11-odds-rehearsal-secret-only",
 });
 
+const cutoverEnv = Object.freeze({
+  VERCEL_ENV: "production",
+  VERCEL_GIT_COMMIT_SHA: sha,
+  VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID,
+  VERCEL_PROJECT_NAME: "bagger-inv",
+  PRODUCTION_FOUNDATION_ENABLED: "true",
+  PRODUCTION_CUTOVER_ACTIVATION_ENABLED: "true",
+  PRODUCTION_CUTOVER_PHASE: "ODDS_WAR_ROOM",
+  PRODUCTION_CUTOVER_EXPECTED_COMMIT_SHA: sha,
+  PRODUCTION_CUTOVER_EXPECTED_VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID,
+  PRODUCTION_CANONICAL_DOMAIN: "https://baggerinv.com",
+  PRODUCTION_CUTOVER_TOURNAMENT_ID: "2026",
+  PRODUCTION_CUTOVER_TOURNAMENT_YEAR: "2026",
+  PRODUCTION_SUPABASE_PROJECT_REF,
+  PRODUCTION_SUPABASE_URL,
+  PRODUCTION_SUPABASE_SECRET_KEY: "sb_secret_" + "x".repeat(32),
+  GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID,
+  PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
+  PRODUCTION_SUPABASE_DIRECTOR_AUTH_ENABLED: "true",
+  PRODUCTION_SUPABASE_ADMIN_SESSION_REVALIDATION_ENABLED: "true",
+  SCORING_AUTHORITY: "supabase",
+  ODDS_PUBLICATION_AUTHORITY: "google",
+  PRODUCTION_SUPABASE_WORKERS_ENABLED: "true",
+  PRODUCTION_SUPABASE_ODDS_CALCULATION_ENABLED: "true",
+  PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "false",
+  PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "false",
+});
+
 function canonicalInputs() {
-  return {
+  const inputs = {
     ...championshipOddsResilienceFixture(),
     configuration: productionConfiguration(),
     metadata: {
@@ -85,6 +116,9 @@ function canonicalInputs() {
       configurationRevision: 4,
     },
   };
+  return buildProductionOddsRehearsalInputs(inputs, {
+    scope: productionOddsCalculationScope(candidateEnv),
+  });
 }
 
 function productionConfiguration() {
@@ -151,6 +185,16 @@ test("Production request identity binds exact resources, frozen inputs, CURRENT 
   assert.equal(scoringShadowPayloadHash(JSON.parse(input.input_snapshot_canonical_json)), input.input_fingerprint);
   assert.equal(scoringShadowPayloadHash(JSON.parse(input.checkpoint_canonical_json)), input.checkpoint_hash);
   assert.equal(scoringShadowPayloadHash(JSON.parse(input.invocation_canonical_json)), input.job_id);
+  const identity = JSON.parse(input.invocation_canonical_json);
+  assert.equal(identity.productionJobIdentityContract,
+    "production-odds-calculation-job-identity-v2");
+  assert.equal(identity.operationMode, "STEP11_REHEARSAL");
+  assert.equal(identity.deploymentCommit, sha);
+  assert.equal(identity.candidateHostname, candidateHostname);
+  assert.equal(identity.rehearsalNamespace, input.source_revision.rehearsal_namespace);
+  assert.equal(identity.rehearsalFixtureFingerprint,
+    input.source_revision.rehearsal_fixture_fingerprint);
+  assert.notEqual(input.job_id, invocation.job_id);
 
   assert.throws(
     () => productionOddsCalculationRequestInput({
@@ -162,8 +206,64 @@ test("Production request identity binds exact resources, frozen inputs, CURRENT 
   );
 });
 
+test("Step 11 fixture jobs and Step 12 cutover jobs have disjoint deterministic identities", () => {
+  const rawInputs = {
+    ...championshipOddsResilienceFixture(),
+    configuration: productionConfiguration(),
+    metadata: {
+      settingsFingerprint: h("1"), sourceRevision: { currentTournamentRevision: 3 },
+      sourceFingerprint: h("2"), pairingFingerprint: h("3"), configurationRevision: 4,
+    },
+  };
+  const rehearsalInputs = buildProductionOddsRehearsalInputs(rawInputs, {
+    scope: productionOddsCalculationScope(candidateEnv),
+  });
+  const rehearsalInvocation = buildOddsCalculationInvocation({
+    inputs: rehearsalInputs,
+    phase: RESILIENCE_PHASE,
+    iterations: 10_000,
+    requestedBy: "CB01",
+    outputTimestamp: RESILIENCE_PUBLISHED_AT,
+  });
+  const cutoverInvocation = buildOddsCalculationInvocation({
+    inputs: rawInputs,
+    phase: RESILIENCE_PHASE,
+    iterations: 10_000,
+    requestedBy: "CB01",
+    outputTimestamp: RESILIENCE_PUBLISHED_AT,
+  });
+  const rehearsal = productionOddsCalculationRequestInput({
+    invocation: rehearsalInvocation,
+    configuration: productionConfiguration(),
+    env: candidateEnv,
+  });
+  const cutover = productionOddsCalculationRequestInput({
+    invocation: cutoverInvocation,
+    configuration: productionConfiguration(),
+    env: cutoverEnv,
+  });
+
+  assert.notEqual(rehearsal.job_id, cutover.job_id);
+  assert.equal(JSON.parse(rehearsal.invocation_canonical_json).operationMode, "STEP11_REHEARSAL");
+  assert.equal(JSON.parse(cutover.invocation_canonical_json).operationMode, "PRODUCTION_CUTOVER");
+  assert.equal(cutover.source_revision.rehearsal_fixture_contract, undefined);
+  assert.equal(rehearsal.source_revision.production_job_identity_contract,
+    "production-odds-calculation-job-identity-v2");
+  assert.equal(cutover.source_revision.production_job_identity_contract,
+    "production-odds-calculation-job-identity-v2");
+  assert.throws(
+    () => productionOddsCalculationRequestInput({
+      invocation: rehearsalInvocation,
+      configuration: productionConfiguration(),
+      env: cutoverEnv,
+    }),
+    { code: "PRODUCTION_ODDS_REHEARSAL_FIXTURE_FORBIDDEN" },
+  );
+});
+
 function fakeProductionJob(totalIterations = 180) {
   const inputs = canonicalInputs();
+  const fixture = inputs.metadata.productionRehearsalFixture;
   const checkpoint = createTournamentOddsCheckpoint({
     ...inputs,
     phase: RESILIENCE_PHASE,
@@ -186,8 +286,72 @@ function fakeProductionJob(totalIterations = 180) {
     output_timestamp: RESILIENCE_PUBLISHED_AT,
     publication_status: "NOT_REQUESTED",
     publication_reference: {},
+    production_operation_mode: "STEP11_REHEARSAL",
+    production_deployment_commit: sha,
+    production_candidate_hostname: candidateHostname,
+    source_revision: {
+      production_job_identity_contract: "production-odds-calculation-job-identity-v2",
+      rehearsal_fixture_contract: fixture.contractVersion,
+      rehearsal_fixture_fingerprint: fixture.fixtureFingerprint,
+      rehearsal_namespace: fixture.namespace,
+    },
   };
 }
+
+test("retained Production jobs fail closed across mode, SHA, hostname, and publication boundary", () => {
+  const job = fakeProductionJob();
+  assert.deepEqual(assertProductionOddsStoredJobScope(job, candidateEnv), {
+    operationMode: "STEP11_REHEARSAL",
+    deploymentCommit: sha,
+    candidateHostname,
+    publicationEligible: false,
+    mirrorEligible: false,
+  });
+  assert.throws(
+    () => assertProductionOddsStoredJobScope({
+      ...job,
+      production_operation_mode: "PRODUCTION_CUTOVER",
+    }, candidateEnv),
+    { code: "PRODUCTION_ODDS_JOB_SCOPE_MISMATCH" },
+  );
+  assert.throws(
+    () => assertProductionOddsStoredJobScope({
+      ...job,
+      production_deployment_commit: "b".repeat(40),
+    }, candidateEnv),
+    { code: "PRODUCTION_ODDS_JOB_SCOPE_MISMATCH" },
+  );
+  assert.throws(
+    () => assertProductionOddsStoredJobScope({
+      ...job,
+      production_candidate_hostname: "other-candidate.vercel.app",
+    }, candidateEnv),
+    { code: "PRODUCTION_ODDS_JOB_SCOPE_MISMATCH" },
+  );
+  assert.throws(
+    () => assertProductionOddsStoredJobScope({
+      ...job,
+      status: "SUCCEEDED",
+      publication_status: "READY",
+    }, candidateEnv),
+    { code: "PRODUCTION_ODDS_REHEARSAL_JOB_NOT_ISOLATED" },
+  );
+  assert.equal(assertProductionOddsStoredJobScope({
+    ...job,
+    status: "SUCCEEDED",
+    publication_status: "REHEARSAL_ONLY",
+  }, candidateEnv).publicationEligible, false);
+  assert.equal(assertProductionOddsStoredJobScope({
+    ...job,
+    status: "SUCCEEDED",
+    publication_status: "READY",
+    production_operation_mode: "PRODUCTION_CUTOVER",
+    production_candidate_hostname: null,
+    source_revision: {
+      production_job_identity_contract: "production-odds-calculation-job-identity-v2",
+    },
+  }, cutoverEnv).publicationEligible, true);
+});
 
 function inMemoryProductionTransport(initialJob) {
   const state = {
@@ -229,7 +393,7 @@ function inMemoryProductionTransport(initialJob) {
       state.job.status = "SUCCEEDED";
       state.job.result_payload = structuredClone(input.result_payload);
       state.job.result_fingerprint = input.result_fingerprint;
-      state.job.publication_status = "READY";
+      state.job.publication_status = "REHEARSAL_ONLY";
       state.job.publication_reference = {};
       state.job.claim_token = null;
       return { payload: {
@@ -273,7 +437,7 @@ test("Production worker resumes from interruption, preserves PRNG state, and can
   assert.equal(completed.completed, true);
   assert.equal(memory.state.job.status, "SUCCEEDED");
   assert.equal(memory.state.job.attempt_count, 2);
-  assert.equal(memory.state.job.publication_status, "READY");
+  assert.equal(memory.state.job.publication_status, "REHEARSAL_ONLY");
   assert.deepEqual(memory.state.job.publication_reference, {});
   assert.equal(memory.state.publications, 0);
   assert.equal(memory.state.mirrors, 0);
@@ -287,10 +451,16 @@ test("Production worker resumes from interruption, preserves PRNG state, and can
 });
 
 test("Production SQL is exact-scope, service-only, idempotent, stale-aware, and inert on install", async () => {
-  const sql = await readFile(new URL(
-    "../supabase/production_migrations/202608240023_production_odds_calculation_orchestration.sql",
-    import.meta.url,
-  ), "utf8");
+  const [sql, isolation] = await Promise.all([
+    readFile(new URL(
+      "../supabase/production_migrations/202608240023_production_odds_calculation_orchestration.sql",
+      import.meta.url,
+    ), "utf8"),
+    readFile(new URL(
+      "../supabase/production_migrations/202608240026_production_odds_rehearsal_job_isolation.sql",
+      import.meta.url,
+    ), "utf8"),
+  ]);
   const server = await readFile(new URL(
     "../lib/production-odds-calculation-server.js",
     import.meta.url,
@@ -332,7 +502,40 @@ test("Production SQL is exact-scope, service-only, idempotent, stale-aware, and 
   assert.doesNotMatch(sql, /grant execute[\s\S]*to (?:public|anon|authenticated)/i);
   assert.match(server, /import "server-only"/);
   assert.match(server, /RPC_ALLOWLIST/);
+  assert.match(server, /assertProductionOddsStoredJobScope/);
+  assert.match(server, /for \(const job of result\?\.payload\?\.jobs \|\| \[\]\)/);
   assert.doesNotMatch(server, /publishSupabaseOddsSnapshot|markOddsCalculationPublished|GoogleMirror/);
+  assert.match(isolation, /production_odds_step11_rehearsal_fixture_check/);
+  assert.match(isolation, /PRODUCTION_ODDS_UNSCOPED_RETAINED_JOB_BLOCKS_ISOLATION/);
+  assert.match(isolation, /alter column production_operation_mode set not null/);
+  assert.match(isolation, /alter column production_deployment_commit set not null/);
+  assert.match(isolation, /production-odds-step11-rehearsal-fixture-v1/);
+  assert.match(isolation, /production-odds-calculation-job-identity-v2/);
+  assert.match(isolation, /REHEARSAL_ONLY/);
+  assert.match(isolation, /PRODUCTION_ODDS_REHEARSAL_PUBLICATION_FORBIDDEN/);
+  assert.match(isolation, /PRODUCTION_ODDS_JOB_SCOPE_MISMATCH/);
+  assert.match(isolation, /retained->>'tournament_id' is distinct from '2026'/);
+  assert.match(isolation, /retained_hostname is distinct from expected_hostname/);
+  assert.match(isolation, /identity->>'candidateHostname'/);
+  assert.match(isolation, /production_candidate_hostname is not distinct from\s+nullif\(input->>'candidate_hostname', ''\)/s);
+  assert.match(isolation, /job_value\.production_operation_mode = requested_mode/);
+  assert.match(isolation, /job_value\.production_deployment_commit = requested_commit/);
+  assert.match(isolation, /lower\(job_value\.production_candidate_hostname\)\s+is not distinct from requested_hostname/s);
+  assert.doesNotMatch(isolation, /legacy_(?:claim|checkpoint|fail|supersede)_production_odds/);
+  for (const rpc of ["request", "claim", "checkpoint", "complete", "fail", "supersede", "read"]) {
+    assert.match(isolation, new RegExp(
+      `create or replace function public\\.${rpc}_production_odds_calculation_job?s?\\(input jsonb\\)`,
+    ));
+  }
+  assert.ok((isolation.match(/assert_production_odds_retained_job_scope\(/g) || []).length >= 8);
+  assert.match(isolation, /canonicalPairingsMutated.*false/s);
+  assert.match(isolation, /databasePairingWrites.*0/s);
+  assert.match(isolation, /externalGoogleWrites.*0/s);
+  assert.match(isolation, /publicationEligible.*false/s);
+  assert.match(isolation, /mirrorEligible.*false/s);
+  assert.match(isolation, /production_operation_mode = 'PRODUCTION_CUTOVER'/);
+  assert.doesNotMatch(isolation, /idgigvjjqkfbqjeredpb|1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts/);
+  assert.doesNotMatch(isolation, /insert into scoring_authority\.odds_published_snapshots|insert into scoring_authority\.odds_google_mirror_jobs/i);
 });
 
 test("Production Odds GET is read-only while same-origin POST owns every calculation mutation", async () => {
@@ -367,6 +570,13 @@ test("Production Odds GET is read-only while same-origin POST owns every calcula
   assert.match(route, /export const maxDuration = 800/);
   assert.match(route, /publicationCreated:\s*false/);
   assert.match(route, /mirrorCreated:\s*false/);
+  assert.match(route, /rehearsalIsolation/);
+  assert.match(route, /canonicalPairingsMutated:\s*false/);
+  assert.match(route, /databasePairingWrites:\s*0/);
+  assert.match(route, /assertProductionOddsStoredJobScope/);
+  assert.match(route, /publicationEligible:\s*isolation\.publicationEligible/);
+  assert.match(route, /mirrorEligible:\s*isolation\.mirrorEligible/);
+  assert.match(route, /const retained = await readProductionOddsCalculationJobs\(jobId\)/);
   assert.match(authorization, /"\/api\/admin\/production-odds-calculations"/);
   assert.doesNotMatch(route, /publishSupabaseOddsSnapshot|markOddsCalculationPublished|deliverSupabaseOddsGoogleMirror/);
   assert.doesNotMatch(route, /google-sheets-write|sheets\.googleapis|docs\.google\.com/);
