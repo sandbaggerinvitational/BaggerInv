@@ -361,6 +361,8 @@ test("Step 11 metadata route is Director-only, exact-candidate, read-only, and s
   const route = await readFile(path.join(root,
     "app/api/admin/step11-production-google-metadata/route.js"), "utf8");
   const writer = await readFile(path.join(root, "lib/google-sheets-write.js"), "utf8");
+  const directorAuthorization = await readFile(path.join(root,
+    "lib/preview-director-authorization.js"), "utf8");
   assert.match(route, /assertProductionShadowCandidateRequest/);
   assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /allowBootstrap:\s*false/);
@@ -370,6 +372,7 @@ test("Step 11 metadata route is Director-only, exact-candidate, read-only, and s
   assert.match(route, /previewWorkbookSelectable:\s*false/);
   assert.doesNotMatch(route, /PRODUCTION_GOOGLE_PRIVATE_KEY|GOOGLE_PRIVATE_KEY|accessToken/);
   assert.doesNotMatch(route, /method:\s*["']POST|batchUpdate|values:batchUpdate/);
+  assert.match(directorAuthorization, /["']\/api\/admin\/step11-production-google-metadata["']/);
   assert.match(writer, /readWorkbookNativeMetadataSnapshot/);
   assert.doesNotMatch(writer.match(/export async function readWorkbookNativeMetadataSnapshot\(\)[\s\S]*?\n}\n/)?.[0] || "",
     /editors|users|groups|domainUsersCanEdit|rowData|values/);
