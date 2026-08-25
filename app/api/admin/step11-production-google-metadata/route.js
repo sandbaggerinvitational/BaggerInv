@@ -30,6 +30,21 @@ export const maxDuration = 60;
 const noStore = { "Cache-Control": "private, no-store" };
 const unavailable = () => NextResponse.json({ error: "Not found." }, { status: 404, headers: noStore });
 
+function safeFailureCode(error) {
+  const existing = String(error?.code || "").trim();
+  if (/^[A-Z][A-Z0-9_]{2,79}$/.test(existing)) return existing;
+  const status = Number(error?.status || error?.cause?.status || 0);
+  if (status === 401) return "PRODUCTION_GOOGLE_AUTHENTICATION_REJECTED";
+  if (status === 403) return "PRODUCTION_GOOGLE_WORKBOOK_ACCESS_DENIED";
+  if (status === 404) return "PRODUCTION_GOOGLE_WORKBOOK_NOT_FOUND";
+  const message = String(error?.message || "");
+  if (/Google authentication failed/i.test(message)) return "PRODUCTION_GOOGLE_AUTHENTICATION_FAILED";
+  if (/timeout|timed out/i.test(message) || error?.name === "TimeoutError") {
+    return "PRODUCTION_GOOGLE_REQUEST_TIMEOUT";
+  }
+  return "PRODUCTION_GOOGLE_METADATA_CERTIFICATION_FAILED";
+}
+
 function resources() {
   return {
     supabaseProjectRef: PRODUCTION_SUPABASE_PROJECT_REF,
@@ -94,13 +109,25 @@ export async function GET(request) {
       fallbackUsed: false,
     }, { headers: noStore });
   } catch (error) {
+    const code = safeFailureCode(error);
+    const diagnostics = error?.workbookDiagnostics || {};
     console.error("Step 11 Production Google metadata certification failed", {
-      code: String(error?.code || "PRODUCTION_GOOGLE_METADATA_CERTIFICATION_FAILED"),
+      code,
+      status: Number(error?.status || error?.cause?.status || 0),
+      category: String(error?.category || "unknown").slice(0, 40),
+      googleHttpRequests: Number(diagnostics.httpRequests || 0),
+      sheetsApiCalls: Number(diagnostics.sheetsApiCalls || 0),
+      writerOperations: Number(diagnostics.workbookWrites || 0),
     });
     return NextResponse.json({
       ok: false,
       error: "Production Google metadata certification failed.",
-      code: String(error?.code || "PRODUCTION_GOOGLE_METADATA_CERTIFICATION_FAILED"),
+      code,
+      googleRead: {
+        httpRequests: Number(diagnostics.httpRequests || 0),
+        sheetsApiCalls: Number(diagnostics.sheetsApiCalls || 0),
+        writerOperations: Number(diagnostics.workbookWrites || 0),
+      },
     }, { status: Number(error?.status || 503), headers: noStore });
   }
 }

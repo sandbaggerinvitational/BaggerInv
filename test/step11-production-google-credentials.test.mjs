@@ -369,6 +369,9 @@ test("Step 11 metadata route is Director-only, exact-candidate, read-only, and s
   assert.match(route, /PRODUCTION_WORKBOOK_METADATA_READ/);
   assert.match(route, /readWorkbookNativeMetadataSnapshot/);
   assert.match(route, /writerOperations/);
+  assert.match(route, /PRODUCTION_GOOGLE_WORKBOOK_ACCESS_DENIED/);
+  assert.match(route, /PRODUCTION_GOOGLE_AUTHENTICATION_FAILED/);
+  assert.match(route, /error\?\.workbookDiagnostics/);
   assert.match(route, /previewWorkbookSelectable:\s*false/);
   assert.doesNotMatch(route, /PRODUCTION_GOOGLE_PRIVATE_KEY|GOOGLE_PRIVATE_KEY|accessToken/);
   assert.doesNotMatch(route, /method:\s*["']POST|batchUpdate|values:batchUpdate/);
