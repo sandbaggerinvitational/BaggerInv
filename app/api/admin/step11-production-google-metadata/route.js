@@ -1,28 +1,28 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 
-import { authorizePreviewDirector } from "../../../../../lib/preview-director-authorization.js";
+import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import {
   PRODUCTION_CANONICAL_HOSTNAME,
   PRODUCTION_VERCEL_PROJECT_NAME,
   assertProductionShadowCandidateRequest,
-} from "../../../../../lib/production-shadow-candidate.js";
+} from "../../../../lib/production-shadow-candidate.js";
 import {
   PRODUCTION_GOOGLE_WORKBOOK_ID,
   PRODUCTION_SUPABASE_PROJECT_REF,
   PRODUCTION_SUPABASE_URL,
   PRODUCTION_TOURNAMENT_ID,
   PRODUCTION_TOURNAMENT_YEAR,
-} from "../../../../../lib/production-foundation-resource-contract.js";
+} from "../../../../lib/production-foundation-resource-contract.js";
 import {
   PRODUCTION_VERCEL_PROJECT_ID,
   withProductionGoogleServiceAccountCredentials,
-} from "../../../../../lib/production-google-service-account-server.js";
+} from "../../../../lib/production-google-service-account-server.js";
 import {
   readWorkbookNativeMetadataSnapshot,
   withWorkbookWriteDiagnostics,
-} from "../../../../../lib/google-sheets-write.js";
-import { canonicalJson } from "../../../../../lib/scoring-shadow.js";
+} from "../../../../lib/google-sheets-write.js";
+import { canonicalJson } from "../../../../lib/scoring-shadow.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
