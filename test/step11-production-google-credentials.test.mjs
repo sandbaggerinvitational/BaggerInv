@@ -60,6 +60,32 @@ const productionEnv = Object.freeze({
   ROUND_SCORECARDS_ARCHIVE_ENABLED: "false",
 });
 
+const candidateHostname = "bagger-production-shadow-metadata.vercel.app";
+const candidateEnv = Object.freeze({
+  ...productionEnv,
+  VERCEL_ENV: "preview",
+  VERCEL_URL: "bagger-production-shadow-deployment.vercel.app",
+  VERCEL_BRANCH_URL: candidateHostname,
+  VERCEL_GIT_COMMIT_SHA: "a".repeat(40),
+  PRODUCTION_SHADOW_CANDIDATE_ENABLED: "true",
+  PRODUCTION_SHADOW_CANDIDATE_HOSTNAME: candidateHostname,
+  PRODUCTION_SHADOW_CANDIDATE_EXPECTED_COMMIT_SHA: "a".repeat(40),
+  PRODUCTION_SHADOW_CANDIDATE_EXPECTED_VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID,
+  PRODUCTION_SHADOW_CANDIDATE_AUTH_ENABLED: "true",
+  PRODUCTION_SUPABASE_SECRET_KEY: "production-server-secret-never-serialized",
+  NEXT_PUBLIC_SUPABASE_AUTH_URL: PRODUCTION_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "production-browser-publishable-key",
+  PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
+  PARTICIPANT_AUTH_CAPTCHA_REQUIRED: "true",
+  PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "true",
+  NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY: "production-turnstile-site-key",
+  PARTICIPANT_AUTH_RATE_LIMIT_SECRET: "production-auth-rate-limit-only-secret",
+  PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED: "false",
+  PRODUCTION_SUPABASE_PUBLIC_READS_ENABLED: "false",
+  PRODUCTION_SUPABASE_AUTH_USER_CREATION_ENABLED: "false",
+  SUPABASE_SCORING_MIRROR_ENABLED: "false",
+});
+
 test("legacy application traffic remains on GOOGLE_* even when Production credentials exist", () => {
   const selected = currentGoogleServiceAccountCredentials(productionEnv);
   assert.equal(selected.source, "legacy");
@@ -100,6 +126,39 @@ test("an exact read-only Production worker context selects only the dedicated pa
   assert.equal(after.source, before.source);
   assert.equal(after.email, before.email);
   assert.equal(after.privateKey, before.privateKey);
+});
+
+test("the exact isolated candidate may certify metadata but cannot select synchronization or writer operations", () => {
+  const metadata = productionGoogleCredentialEnvironment({
+    env: candidateEnv,
+    operation: "PRODUCTION_WORKBOOK_METADATA_READ",
+    resources,
+  });
+  assert.equal(metadata.allowed, true);
+  assert.equal(metadata.candidateMetadataReadApproved, true);
+  assert.equal(metadata.policy.googleWrite, false);
+  for (const operation of ["GUIDE_SYNCHRONIZATION", "SCORING_GOOGLE_OUTBOX", "ODDS_GOOGLE_MIRROR"]) {
+    const state = productionGoogleCredentialEnvironment({ env: candidateEnv, operation, resources });
+    assert.equal(state.allowed, false, operation);
+    assert.equal(state.candidateMetadataReadApproved, false, operation);
+    assert.equal(state.reason, "production-environment-required", operation);
+  }
+});
+
+test("candidate metadata certification still rejects Preview or inexact workbook resources", () => {
+  const previewWorkbook = "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts";
+  assert.equal(productionGoogleCredentialEnvironment({
+    env: { ...candidateEnv, GOOGLE_SHEETS_ID: previewWorkbook },
+    operation: "PRODUCTION_WORKBOOK_METADATA_READ",
+    resources,
+  }).allowed, false);
+  const state = productionGoogleCredentialEnvironment({
+    env: candidateEnv,
+    operation: "PRODUCTION_WORKBOOK_METADATA_READ",
+    resources: { ...resources, googleWorkbookId: previewWorkbook },
+  });
+  assert.equal(state.allowed, false);
+  assert.equal(state.reason, "exact-production-resource-request-required");
 });
 
 test("Production worker selection never falls back to legacy credentials", () => {
@@ -296,4 +355,22 @@ test("Production credential facade is server-only and absent from Client Compone
     const source = await readFile(path.join(root, file), "utf8");
     assert.doesNotMatch(source, /production-google-service-account|google-service-account-credential-context|PRODUCTION_GOOGLE_PRIVATE_KEY/);
   }
+});
+
+test("Step 11 metadata route is Director-only, exact-candidate, read-only, and secret-safe", async () => {
+  const route = await readFile(path.join(root,
+    "app/api/admin/step11-production-google-metadata/route.js"), "utf8");
+  const writer = await readFile(path.join(root, "lib/google-sheets-write.js"), "utf8");
+  assert.match(route, /assertProductionShadowCandidateRequest/);
+  assert.match(route, /authorizePreviewDirector/);
+  assert.match(route, /allowBootstrap:\s*false/);
+  assert.match(route, /PRODUCTION_WORKBOOK_METADATA_READ/);
+  assert.match(route, /readWorkbookNativeMetadataSnapshot/);
+  assert.match(route, /writerOperations/);
+  assert.match(route, /previewWorkbookSelectable:\s*false/);
+  assert.doesNotMatch(route, /PRODUCTION_GOOGLE_PRIVATE_KEY|GOOGLE_PRIVATE_KEY|accessToken/);
+  assert.doesNotMatch(route, /method:\s*["']POST|batchUpdate|values:batchUpdate/);
+  assert.match(writer, /readWorkbookNativeMetadataSnapshot/);
+  assert.doesNotMatch(writer.match(/export async function readWorkbookNativeMetadataSnapshot\(\)[\s\S]*?\n}\n/)?.[0] || "",
+    /editors|users|groups|domainUsersCanEdit|rowData|values/);
 });
