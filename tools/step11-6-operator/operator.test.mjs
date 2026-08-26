@@ -479,7 +479,10 @@ test("retained origin inventory binding is the exact complete 1,140-record v2 ar
       frozenStep11: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
     },
     paginationComplete: true,
-    minimumLiveOriginInventoryCount: 1141,
+    reviewedPostCaptureDeploymentCount: 3,
+    reviewedPostCaptureDeploymentFingerprint:
+      "7f0f1e6c3267f92de77e49c341ee58ed4975361f91c8b2af2fa32e3928a3d8a5",
+    minimumLiveOriginInventoryCount: 1144,
     fixedAliasOriginCount: 4,
     candidateAliasOriginCount: 1,
     probeVectorCount: 9,

@@ -8,6 +8,9 @@ import { fileURLToPath } from "node:url";
 import { spawn, spawnSync } from "node:child_process";
 import test from "node:test";
 
+import { PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS } from
+  "../lib/production-google-writer-fence-quiesce.js";
+
 const repositoryRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
@@ -44,6 +47,8 @@ const originInventoryArtifact = JSON.parse(await readFile(path.join(
 const originInventory = Object.freeze(originInventoryArtifact.records);
 const originInventoryFingerprint =
   "533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6";
+const reviewedPostCapturePreviewDeployments =
+  PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS;
 const credentialConfinement = Object.freeze({
   credential_confinement_evidence_schema:
     "step11-6-production-google-credential-confinement-v1",
@@ -112,15 +117,43 @@ function candidateInventoryTuple(target) {
   ];
 }
 
-function liveOriginInventoryFor(target = "PREVIEW", additions = []) {
-  return [
-    ...originInventory,
-    ...additions,
-    candidateInventoryTuple(target),
-  ].sort((left, right) => compareCodepoint(
+function sortLiveOriginInventory(records) {
+  return [...records].sort((left, right) => compareCodepoint(
     `${left[0]}\n${left[2]}`,
     `${right[0]}\n${right[2]}`,
   ));
+}
+
+function liveOriginInventoryFor(target = "PREVIEW", additions = []) {
+  return sortLiveOriginInventory([
+    ...originInventory,
+    ...reviewedPostCapturePreviewDeployments,
+    ...additions,
+    candidateInventoryTuple(target),
+  ]);
+}
+
+function assertExactLiveOriginInventory(
+  cluster,
+  database,
+  liveInventory,
+  {
+    candidateDeploymentId = candidateIdentity.deploymentId,
+    candidateDeploymentCommit = candidateIdentity.commit,
+    candidateImmutableOrigin = candidateIdentity.immutableOrigin,
+    candidateDeploymentTarget = "PREVIEW",
+  } = {},
+) {
+  return psql(cluster, database, `
+    select production_control.assert_exact_vercel_live_inventory(
+      ${jsonSql(originInventory)},
+      ${jsonSql(liveInventory)},
+      ${sqlLiteral(candidateDeploymentId)},
+      ${sqlLiteral(candidateDeploymentCommit)},
+      ${sqlLiteral(candidateImmutableOrigin)},
+      ${sqlLiteral(candidateDeploymentTarget)}
+    );
+  `);
 }
 
 function providerAttestation(
@@ -530,7 +563,7 @@ async function installProductionMigrations(cluster, database) {
     .filter((name) => /^\d+_.*\.sql$/.test(name))
     .sort();
   const admissionMigration =
-    "202608260034_production_scoring_admission_fence_v2.sql";
+    "202608260035_production_reviewed_post_capture_preview_deployments.sql";
   const endIndex = migrationNames.indexOf(admissionMigration);
   assert.notEqual(endIndex, -1, `Missing ${admissionMigration}`);
   for (const migrationName of migrationNames.slice(0, endIndex + 1)) {
@@ -1642,6 +1675,312 @@ test(
       const baseline = stageAndArm(cluster, baselineDatabase);
 
       await t.test(
+        "migration 035 accepts exactly 1,140 retained, three reviewed, and one dynamic candidate tuple",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_exact_1144");
+          const liveInventory = liveOriginInventoryFor("PREVIEW");
+          assert.equal(liveInventory.length, 1144);
+          assert.equal(
+            assertExactLiveOriginInventory(cluster, database, liveInventory),
+            "",
+          );
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "inventory-035-exact-1144",
+          );
+          const binding = reserveProviderAttestation(
+            cluster,
+            database,
+            input,
+            "BEGIN",
+            "inventory-035-exact-1144-begin",
+          );
+          assert.match(
+            binding.attestation_id,
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects an inventory missing a reviewed deployment tuple",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_missing_reviewed");
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const liveInventory = liveOriginInventoryFor("PREVIEW").filter(
+            (record) => record[0] !== reviewed[0],
+          );
+          assert.equal(liveInventory.length, 1143);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects a tampered reviewed deployment tuple",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_tampered_reviewed");
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const liveInventory = sortLiveOriginInventory(
+            liveOriginInventoryFor("PREVIEW").map((record) =>
+              record[0] === reviewed[0]
+                ? [record[0], "a".repeat(40), ...record.slice(2)]
+                : record
+            ),
+          );
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects a duplicate reviewed tuple",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_duplicate_tuple");
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const liveInventory = sortLiveOriginInventory([
+            ...liveOriginInventoryFor("PREVIEW"),
+            [...reviewed],
+          ]);
+          assert.equal(liveInventory.length, 1145);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects a reviewed deployment ID reused by a new origin",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_duplicate_id");
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const liveInventory = liveOriginInventoryFor("PREVIEW", [[
+            reviewed[0],
+            candidateIdentity.commit,
+            "https://reviewed-id-new-origin-sandbagger-invitational.vercel.app",
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects a reviewed origin reused by a new deployment ID",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_duplicate_origin");
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const liveInventory = liveOriginInventoryFor("PREVIEW", [[
+            "dpl_ReviewedOriginReuse123",
+            candidateIdentity.commit,
+            reviewed[2],
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects a dynamic candidate colliding with a reviewed deployment ID",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_candidate_id_collision");
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const collidingCandidateOrigin =
+            "https://candidate-id-collision-sandbagger-invitational.vercel.app";
+          const liveInventory = sortLiveOriginInventory([
+            ...originInventory,
+            ...reviewedPostCapturePreviewDeployments,
+            [
+              reviewed[0],
+              candidateIdentity.commit,
+              collidingCandidateOrigin,
+              "FEATURE_PREVIEW",
+              "READY",
+              "GIT",
+            ],
+          ]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+              {
+                candidateDeploymentId: reviewed[0],
+                candidateImmutableOrigin: collidingCandidateOrigin,
+              },
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects a dynamic candidate colliding with a reviewed origin",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_candidate_origin_collision");
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const collidingCandidateId = "dpl_DynamicCandidateOrigin123";
+          const liveInventory = sortLiveOriginInventory([
+            ...originInventory,
+            ...reviewedPostCapturePreviewDeployments,
+            [
+              collidingCandidateId,
+              candidateIdentity.commit,
+              reviewed[2],
+              "FEATURE_PREVIEW",
+              "READY",
+              "GIT",
+            ],
+          ]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+              {
+                candidateDeploymentId: collidingCandidateId,
+                candidateImmutableOrigin: reviewed[2],
+              },
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects an exact reviewed tuple reused as the dynamic candidate",
+        () => {
+          const database = cloneDormantDatabase(
+            "inventory_035_exact_reviewed_candidate_collision",
+          );
+          const [reviewed] = reviewedPostCapturePreviewDeployments;
+          const liveInventory = sortLiveOriginInventory([
+            ...originInventory,
+            ...reviewedPostCapturePreviewDeployments,
+            [
+              "dpl_ReviewedCandidatePadding123",
+              reviewed[1],
+              "https://reviewed-candidate-padding-sandbagger-invitational.vercel.app",
+              "FEATURE_PREVIEW",
+              "READY",
+              "GIT",
+            ],
+          ]);
+          assert.equal(liveInventory.length, 1144);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+              {
+                candidateDeploymentId: reviewed[0],
+                candidateDeploymentCommit: reviewed[1],
+                candidateImmutableOrigin: reviewed[2],
+              },
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects an exact retained tuple reused as the dynamic candidate",
+        () => {
+          const database = cloneDormantDatabase(
+            "inventory_035_exact_retained_candidate_collision",
+          );
+          const retainedCandidate = originInventory.find((record) =>
+            record[3] === "FEATURE_PREVIEW" && record[4] === "READY" &&
+            record[5] === "GIT" && record[1] !== null,
+          );
+          assert.ok(retainedCandidate);
+          const liveInventory = sortLiveOriginInventory([
+            ...originInventory,
+            ...reviewedPostCapturePreviewDeployments,
+            [
+              "dpl_RetainedCandidatePadding123",
+              retainedCandidate[1],
+              "https://retained-candidate-padding-sandbagger-invitational.vercel.app",
+              "FEATURE_PREVIEW",
+              "READY",
+              "GIT",
+            ],
+          ]);
+          assert.equal(liveInventory.length, 1144);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+              {
+                candidateDeploymentId: retainedCandidate[0],
+                candidateDeploymentCommit: retainedCandidate[1],
+                candidateImmutableOrigin: retainedCandidate[2],
+              },
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 035 rejects an unreviewed post-capture deployment with a different SHA",
+        () => {
+          const database = cloneDormantDatabase("inventory_035_different_sha");
+          const liveInventory = liveOriginInventoryFor("PREVIEW", [[
+            "dpl_UnreviewedDifferentSha123",
+            "abcdef1234567890abcdef1234567890abcdef12",
+            "https://unreviewed-different-sha-sandbagger-invitational.vercel.app",
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveInventory,
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
         "database-issued provider challenges reserve once and recover a lost response",
         () => {
           const database = cloneDormantDatabase("attestation_challenge_recovery");
@@ -1937,6 +2276,60 @@ test(
                   routing_rule_fingerprint: fingerprint("drifted-rule"),
                 },
               },
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_FINALIZE_DRIFT/,
+          );
+        },
+      );
+
+      await t.test(
+        "FINALIZE rejects a valid same-SHA live inventory that drifted after BEGIN",
+        () => {
+          const database = cloneDormantDatabase("attestation_finalize_inventory_drift");
+          const beginInput = quiesceBeginInput(
+            "REHEARSAL",
+            "attestation-finalize-inventory-drift",
+          );
+          beginInput.provider_attestation = reserveProviderAttestation(
+            cluster,
+            database,
+            beginInput,
+            "BEGIN",
+            "attestation-finalize-inventory-drift-begin",
+          );
+          const draining = rpc(
+            cluster,
+            database,
+            "begin_production_vercel_writer_quiesce_evidence",
+            beginInput,
+          );
+          backdateQuiesceDrain(cluster, database, draining.evidence_id);
+          const driftedLiveInventory = liveOriginInventoryFor("PREVIEW", [[
+            "dpl_FinalizeInventoryDrift123",
+            candidateIdentity.commit,
+            "https://finalize-inventory-drift-sandbagger-invitational.vercel.app",
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assert.equal(driftedLiveInventory.length, 1145);
+          const finalizeInput = {
+            ...beginInput,
+            evidence_id: draining.evidence_id,
+            live_origin_inventory: driftedLiveInventory,
+            second_probe_records: quiesceProbeRecords(
+              new Date().toISOString(),
+              "PREVIEW",
+              driftedLiveInventory,
+            ),
+          };
+          assertCommandFailure(
+            () => reserveProviderAttestation(
+              cluster,
+              database,
+              finalizeInput,
+              "FINALIZE",
+              "attestation-finalize-inventory-drift-finalize",
             ),
             /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_FINALIZE_DRIFT/,
           );

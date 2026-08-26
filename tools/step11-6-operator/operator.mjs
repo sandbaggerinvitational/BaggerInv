@@ -41,11 +41,15 @@ export const FIXED = Object.freeze({
     "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
   requiredPriorLiveDeploymentId: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
   requiredFrozenStep11DeploymentId: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-  minimumLiveOriginInventoryCount: 1140 + 1,
+  reviewedPostCaptureDeploymentCount: 3,
+  reviewedPostCaptureDeploymentFingerprint:
+    "7f0f1e6c3267f92de77e49c341ee58ed4975361f91c8b2af2fa32e3928a3d8a5",
+  minimumLiveOriginInventoryCount: 1140 + 3 + 1,
   quiesceFixedAliasOriginCount: 4,
   quiesceCandidateAliasOriginCount: 1,
   quiesceProbeVectorCount: 9,
-  migrationName: "202608260034_production_scoring_admission_fence_v2.sql",
+  migrationName:
+    "202608260035_production_reviewed_post_capture_preview_deployments.sql",
   runbook: "docs/step12-production-cutover-runbook-v2.md",
 });
 
@@ -650,7 +654,12 @@ export function productionOriginInventoryBinding() {
     nullShaCount,
     requiredDeployments: Object.freeze({ ...requiredDeployments }),
     paginationComplete: true,
-    minimumLiveOriginInventoryCount: records.length + 1,
+    reviewedPostCaptureDeploymentCount:
+      FIXED.reviewedPostCaptureDeploymentCount,
+    reviewedPostCaptureDeploymentFingerprint:
+      FIXED.reviewedPostCaptureDeploymentFingerprint,
+    minimumLiveOriginInventoryCount: records.length +
+      FIXED.reviewedPostCaptureDeploymentCount + 1,
     fixedAliasOriginCount: FIXED.quiesceFixedAliasOriginCount,
     candidateAliasOriginCount: FIXED.quiesceCandidateAliasOriginCount,
     probeVectorCount: FIXED.quiesceProbeVectorCount,

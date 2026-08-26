@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
-import { generateKeyPairSync } from "node:crypto";
+import {
+  createHash,
+  generateKeyPairSync,
+  sign as signDetached,
+} from "node:crypto";
 import { EventEmitter } from "node:events";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
+  canonicalAttestationJson,
   collectVercelDeploymentScope,
   createVercelProviderAttestation,
   normalizeVercelEnvironmentScope,
@@ -16,6 +21,8 @@ import {
   VERCEL_PROVIDER_ATTESTATION_TEAM_ID_ENV,
 } from "../lib/vercel-provider-attestation.js";
 import { productionLegacyDeploymentInventory } from
+  "../lib/production-google-writer-fence-quiesce.js";
+import { PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS } from
   "../lib/production-google-writer-fence-quiesce.js";
 import {
   PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_EVIDENCE_FINGERPRINT,
@@ -130,6 +137,7 @@ function liveTuples(selectedRequest, { includePostFreeze = true } = {}) {
     ? "CUTOVER_PRODUCTION_CANDIDATE" : "FEATURE_PREVIEW";
   return [
     ...productionLegacyDeploymentInventory().recordTuples.map((tuple) => [...tuple]),
+    ...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.map((tuple) => [...tuple]),
     ...(includePostFreeze ? [[
       postFreezeId, postFreezeSha, postFreezeOrigin,
       "FEATURE_PREVIEW", "READY", "GIT",
@@ -195,13 +203,34 @@ function keys() {
   return generateKeyPairSync("ed25519");
 }
 
+function resignEnvelope(envelope, privateKey) {
+  const document = {
+    schemaVersion: envelope.schemaVersion,
+    algorithm: envelope.algorithm,
+    signerKeyVersion: envelope.signerKeyVersion,
+    signerKeyFingerprint: envelope.signerKeyFingerprint,
+    attestation: envelope.attestation,
+  };
+  const serialized = canonicalAttestationJson(document);
+  return {
+    ...document,
+    attestationFingerprint:
+      createHash("sha256").update(serialized).digest("hex"),
+    signature: signDetached(
+      null,
+      Buffer.from(serialized),
+      privateKey,
+    ).toString("base64url"),
+  };
+}
+
 test("local attester exhausts deployment pagination, accepts additive scope, and redacts values", async () => {
   const selectedRequest = request();
   const fixture = provider(selectedRequest);
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
   assert.equal(scope.retainedRecordCount, 1140);
-  assert.equal(scope.liveRecordCount, 1142);
-  assert.equal(scope.liveRecords.length, 1142);
+  assert.equal(scope.liveRecordCount, 1145);
+  assert.equal(scope.liveRecords.length, 1145);
   assert.equal(scope.paginationComplete, true);
   assert.equal(scope.pageCount, 12);
   assert.equal(scope.liveRecords.filter((tuple) => tuple[1] === null).length, 1,
@@ -222,6 +251,24 @@ test("local attester exhausts deployment pagination, accepts additive scope, and
       record[2] === "feature/mock-tournament-qa-integration"));
   assert.ok(fixture.secretValues.every((secret) =>
     !JSON.stringify(environment).includes(secret)));
+});
+
+test("exact retained plus reviewed plus candidate 1,144-origin scope is accepted", async () => {
+  const selectedRequest = request();
+  const fixture = provider(selectedRequest, { includePostFreeze: false });
+  const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
+  assert.equal(scope.retainedRecordCount, 1140);
+  assert.equal(scope.liveRecordCount, 1144);
+  assert.equal(scope.liveRecords.length, 1144);
+  assert.deepEqual(
+    scope.liveRecords.filter((tuple) =>
+      PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
+        (reviewed) => reviewed[0] === tuple[0] && reviewed[2] === tuple[2],
+      )),
+    [...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS],
+  );
+  assert.equal(scope.liveRecords.filter((tuple) =>
+    tuple[0] === candidateId && tuple[2] === candidateImmutable).length, 1);
 });
 
 test("signed BEGIN and independently signed FINALIZE attestations bind Preview scope", async () => {
@@ -249,7 +296,7 @@ test("signed BEGIN and independently signed FINALIZE attestations bind Preview s
   assert.equal(verifiedBegin.signatureVerified, true);
   assert.equal(verifiedBegin.stage, "BEGIN");
   assert.equal(verifiedBegin.candidateDeploymentTarget, "PREVIEW");
-  assert.equal(verifiedBegin.liveOriginInventoryCount, 1142);
+  assert.equal(verifiedBegin.liveOriginInventoryCount, 1145);
   assert.equal(verifiedBegin.routingRulePendingDraftChangeCount, 0);
   assert.equal(verifiedBegin.credentialConfinementEvidenceSchema,
     PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_SCHEMA);
@@ -292,6 +339,32 @@ test("signed BEGIN and independently signed FINALIZE attestations bind Preview s
     now,
     attestationId: beginRequest.challengeId,
   }), (error) => error.code === "STEP11_6_VERCEL_ATTESTATION_ID_INVALID");
+});
+
+test("a freshly re-signed but reordered live inventory is rejected by scope normalization", async () => {
+  const selectedRequest = request();
+  const keyPair = keys();
+  const envelope = structuredClone(await createVercelProviderAttestation({
+    request: selectedRequest,
+    privateKey: keyPair.privateKey,
+    readApi: provider(selectedRequest, { includePostFreeze: false }).readApi,
+    now,
+  }));
+  const records = envelope.attestation.liveOriginInventoryRecords;
+  [records[0], records[1]] = [records[1], records[0]];
+  envelope.attestation.liveOriginInventoryFingerprint =
+    createHash("sha256").update(JSON.stringify(records)).digest("hex");
+  const resigned = resignEnvelope(envelope, keyPair.privateKey);
+  assert.throws(() => verifyVercelProviderAttestation(resigned, {
+    env: {
+      [VERCEL_PROVIDER_ATTESTATION_PUBLIC_KEY_ENV]:
+        pinnedEd25519PublicKeyBase64(keyPair.publicKey),
+      [VERCEL_PROVIDER_ATTESTATION_TEAM_ID_ENV]: teamId,
+    },
+    request: selectedRequest,
+    expectedRoutingRuleRevision: "17",
+    now: now + 10_000,
+  }), (error) => error.code === "STEP11_6_VERCEL_DEPLOYMENT_SCOPE_DRIFT");
 });
 
 test("CUTOVER attestation binds a Production-target feature candidate without relabeling main", async () => {
@@ -507,6 +580,54 @@ test("post-capture additions are limited to the exact certified candidate SHA an
       for (const deployment of payload.deployments) {
         if (deployment.uid === postFreezeId) deployment.target = "production";
       }
+    }
+    return payload;
+  }, selectedRequest), (error) =>
+    error.code === "STEP11_6_VERCEL_DEPLOYMENT_SCOPE_DRIFT");
+});
+
+test("only exact reviewed post-capture Preview deployments extend the live scope", async () => {
+  const selectedRequest = request();
+  const fixture = provider(selectedRequest);
+  const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
+  assert.equal(scope.liveRecordCount, 1145);
+  assert.deepEqual(
+    scope.liveRecords.filter((tuple) =>
+      PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
+        (reviewed) => reviewed[0] === tuple[0],
+      )),
+    [...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS],
+  );
+
+  const mutations = [
+    (value) => ({ ...value, meta: { ...value.meta, githubCommitSha: "8".repeat(40) } }),
+    (value) => ({ ...value, target: "production" }),
+    (value) => ({ ...value, readyState: "ERROR" }),
+    (value) => ({ ...value, meta: { ...value.meta, githubCommitRef: "main" } }),
+    (value) => ({ ...value, url: "unreviewed-preview.vercel.app" }),
+  ];
+  for (const mutation of mutations) {
+    const driftFixture = provider(selectedRequest);
+    await assert.rejects(() => collectVercelDeploymentScope(
+      async (path) => {
+        const payload = await driftFixture.readApi(path);
+        if (path.startsWith("/v6/deployments?")) {
+          payload.deployments = payload.deployments.map((value) =>
+            value.uid === PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS[0][0]
+              ? mutation(value) : value);
+        }
+        return payload;
+      },
+      selectedRequest,
+    ), (error) => error.code === "STEP11_6_VERCEL_DEPLOYMENT_SCOPE_DRIFT");
+  }
+
+  const missingFixture = provider(selectedRequest);
+  await assert.rejects(() => collectVercelDeploymentScope(async (path) => {
+    const payload = await missingFixture.readApi(path);
+    if (path.startsWith("/v6/deployments?")) {
+      payload.deployments = payload.deployments.filter((value) =>
+        value.uid !== PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS[0][0]);
     }
     return payload;
   }, selectedRequest), (error) =>

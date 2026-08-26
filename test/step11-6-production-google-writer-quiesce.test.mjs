@@ -12,6 +12,7 @@ import {
   PRODUCTION_GOOGLE_WRITER_QUIESCE_VECTOR_COVERAGE_MASK,
   PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT,
   PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT,
+  PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS,
 } from "../lib/production-google-writer-fence-quiesce.js";
 import { PRODUCTION_VERCEL_PROJECT_ID } from
   "../lib/google-service-account-credential-context.js";
@@ -70,6 +71,7 @@ function providerAttestationFor(selectedEnvironment = environment(), additions =
     "FEATURE_PREVIEW", "READY", "GIT",
   ];
   const records = [...retained.recordTuples.map((tuple) => [...tuple]),
+    ...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.map((tuple) => [...tuple]),
     ...additions.map((tuple) => [...tuple]), candidateTuple]
     .sort((left, right) => `${left[0]}\n${left[2]}` < `${right[0]}\n${right[2]}` ? -1 : 1);
   return {
@@ -94,6 +96,24 @@ function normalize(selectedInput = input(), selectedEnvironment = environment(),
     selectedInput,
     selectedEnvironment,
     { providerAttestation: providerAttestationFor(selectedEnvironment, additions) },
+  );
+}
+
+function providerAttestationWithRecords(records) {
+  return {
+    ...providerAttestationFor(),
+    liveOriginInventoryCount: records.length,
+    liveOriginInventoryFingerprint:
+      createHash("sha256").update(JSON.stringify(records)).digest("hex"),
+    liveOriginInventoryRecords: records,
+  };
+}
+
+function normalizeWithProvider(providerAttestation, selectedEnvironment = environment()) {
+  return normalizeProductionWriterQuiesceEvidenceInput(
+    input(),
+    selectedEnvironment,
+    { providerAttestation },
   );
 }
 
@@ -168,6 +188,69 @@ test("normalization adds exact fixed and candidate origins without client invent
     (error) => error.code === "STEP11_6_WRITER_QUIESCE_CANDIDATE_INVENTORY_COLLISION");
 });
 
+test("signed live inventory uniqueness and reviewed-candidate collisions fail closed", () => {
+  const exact = providerAttestationFor();
+  assert.equal(exact.liveOriginInventoryCount, 1144);
+  assert.equal(normalizeWithProvider(exact).liveOriginInventoryCount, 1144,
+    "retained + three reviewed deployments + exact dynamic candidate is sufficient");
+
+  const duplicateTupleRecords = [
+    ...exact.liveOriginInventoryRecords.map((tuple) => [...tuple]),
+    [...exact.liveOriginInventoryRecords[0]],
+  ].sort((left, right) => {
+    const a = `${left[0]}\n${left[2]}`;
+    const b = `${right[0]}\n${right[2]}`;
+    return a < b ? -1 : a > b ? 1 : 0;
+  });
+  assert.throws(() => normalizeWithProvider(
+    providerAttestationWithRecords(duplicateTupleRecords),
+  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
+
+  const reviewed = PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS[0];
+  const duplicateIdRecords = [
+    ...exact.liveOriginInventoryRecords.map((tuple) => [...tuple]),
+    [
+      reviewed[0], candidateCommit,
+      "https://bagger-duplicate-id-new-origin-sandbagger-invitational.vercel.app",
+      "FEATURE_PREVIEW", "READY", "GIT",
+    ],
+  ].sort((left, right) => {
+    const a = `${left[0]}\n${left[2]}`;
+    const b = `${right[0]}\n${right[2]}`;
+    return a < b ? -1 : a > b ? 1 : 0;
+  });
+  assert.throws(() => normalizeWithProvider(
+    providerAttestationWithRecords(duplicateIdRecords),
+  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
+
+  const duplicateOriginRecords = [
+    ...exact.liveOriginInventoryRecords.map((tuple) => [...tuple]),
+    [
+      "dpl_DuplicateOriginNewId01", candidateCommit, reviewed[2],
+      "FEATURE_PREVIEW", "READY", "GIT",
+    ],
+  ].sort((left, right) => {
+    const a = `${left[0]}\n${left[2]}`;
+    const b = `${right[0]}\n${right[2]}`;
+    return a < b ? -1 : a > b ? 1 : 0;
+  });
+  assert.throws(() => normalizeWithProvider(
+    providerAttestationWithRecords(duplicateOriginRecords),
+  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
+
+  const idCollisionEnvironment = environment();
+  idCollisionEnvironment.resources.candidateDeploymentId = reviewed[0];
+  assert.throws(() => normalizeWithProvider(
+    providerAttestationFor(idCollisionEnvironment), idCollisionEnvironment,
+  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
+
+  const originCollisionEnvironment = environment();
+  originCollisionEnvironment.resources.deploymentHostname = new URL(reviewed[2]).hostname;
+  assert.throws(() => normalizeWithProvider(
+    providerAttestationFor(originCollisionEnvironment), originCollisionEnvironment,
+  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
+});
+
 test("signed post-freeze deployments expand the immutable probe scope without changing retained evidence", () => {
   const addition = [
     "dpl_PostFreezeRelevant01",
@@ -178,10 +261,10 @@ test("signed post-freeze deployments expand the immutable probe scope without ch
   const normalized = normalize(input(), environment(), [addition]);
   assert.equal(normalized.originInventoryCount, 1140,
     "the frozen retained artifact remains the receipt subset");
-  assert.equal(normalized.liveOriginInventoryCount, 1142,
-    "retained + signed post-freeze addition + current candidate are live");
-  assert.equal(normalized.probeOriginCount, 1147);
-  assert.equal(normalized.probeTargetCount, 1147 * 9);
+  assert.equal(normalized.liveOriginInventoryCount, 1145,
+    "retained + reviewed candidates + signed addition + current candidate are live");
+  assert.equal(normalized.probeOriginCount, 1150);
+  assert.equal(normalized.probeTargetCount, 1150 * 9);
   assert.ok(normalized.probeOrigins.includes(addition[2]));
   assert.ok(normalized.liveOriginInventoryTuples.some((tuple) =>
     tuple[0] === addition[0] && tuple[2] === addition[2]));
@@ -190,8 +273,10 @@ test("signed post-freeze deployments expand the immutable probe scope without ch
 test("full server probe requires exact Vercel deny markers and emits SQL-shaped evidence", async () => {
   const normalized = normalize();
   const probedVectors = new Set();
+  const probedTargets = new Set();
   const fetchImpl = async (url, request) => {
     probedVectors.add(`${request.method} ${new URL(url).pathname}`);
+    probedTargets.add(`${new URL(url).origin}\n${request.method}\n${new URL(url).pathname}`);
     return new Response("denied", {
       status: 403,
       headers: {
@@ -234,6 +319,27 @@ test("full server probe requires exact Vercel deny markers and emits SQL-shaped 
     "PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
     "PRODUCTION_WORKBOOK_SELECTOR",
   ]);
+  for (const reviewed of PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS) {
+    const record = proof.probeRecords.find((value) => value[0] === reviewed[2]);
+    assert.equal(record[3], reviewed[1]);
+    assert.equal(record[8], PRODUCTION_GOOGLE_WRITER_QUIESCE_VECTOR_COVERAGE_MASK);
+    assert.equal(record[9].length, PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS.length);
+    assert.equal(new Set(record[9]).size,
+      PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS.length,
+    "each reviewed origin has one distinct proof fingerprint per vector");
+    assert.ok(record[9].every((fingerprint) => /^[0-9a-f]{64}$/.test(fingerprint)));
+    for (const vector of PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS) {
+      assert.ok(probedTargets.has(
+        `${reviewed[2]}\n${vector.probeMethod}\n${vector.probePath}`,
+      ), `reviewed origin ${reviewed[0]} was probed for ${vector.probeMethod} ${
+        vector.probePath}`);
+    }
+    assert.deepEqual(record[7], [
+      "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
+      "POTENTIAL_DEDICATED_PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
+      "POTENTIAL_PRODUCTION_WORKBOOK_SELECTOR",
+    ]);
+  }
   const nullShaSource = productionLegacyDeploymentInventory().records.find((record) =>
     record.sha === null);
   const nullShaProof = proof.probeRecords.find((record) =>

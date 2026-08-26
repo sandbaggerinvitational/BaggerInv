@@ -180,9 +180,15 @@ Step 11 candidate, nine provider-resolved CLI SHAs, one provider-proven
 non-executable blocked deployment with a null SHA, scope/status semantics,
 and credential-capability sets. The operator revalidates only its repository
 binding and refuses caller-supplied origin matrices/fingerprints. The control
-route loads the artifact server-side, accepts only provider-signed relevant
-post-freeze deployments, then adds four fixed aliases and the current candidate
-alias. If the signed live inventory has `N` immutable origins, each snapshot
+route loads the artifact server-side and additionally requires the three exact
+reviewed post-capture Preview deployments pinned by migration
+`202608260035_production_reviewed_post_capture_preview_deployments.sql`. Their
+ordered tuple-set fingerprint is
+`7f0f1e6c3267f92de77e49c341ee58ed4975361f91c8b2af2fa32e3928a3d8a5`.
+Only provider-signed same-current-SHA deployments in the target-appropriate
+scope may extend that required set; all other additions fail closed. The route
+then adds four fixed aliases and the current candidate alias. If the signed
+live inventory has `N` immutable origins, each snapshot
 contains exactly `N + 5` origins and `9 × (N + 5)` edge requests. Every
 retained and signed post-freeze origin is probed, including `ERROR`
 and `BLOCKED` records. The vectors cover `POST` on all eight
@@ -190,9 +196,13 @@ historical/candidate writer routes plus `DELETE /api/tournament-guide`. It
 writes the immutable inventory and compact per-origin nine-vector proofs to the
 durable RPCs. The database validates the exact signed live origin set, coverage
 mask, ordered per-vector proof fingerprints, and dynamically derived logical
-origin×vector expansion. A normal Step 12 scope (retained baseline, Step 11.6
-Preview candidate, and current Production candidate) has at least 1,147 probe
-origins and 10,323 requests per snapshot; the receipt is authoritative.
+origin×vector expansion. The minimum Step 11.6 signed live inventory is 1,144
+immutable origins (1,140 retained + 3 reviewed + 1 exact dynamic candidate),
+which produces 1,149 probed origins and 10,341 requests per snapshot after the
+five fixed/candidate aliases. A normal Step 12 Preview-plus-Production candidate
+pair adds at least one more same-SHA immutable origin, producing at least 1,150
+probed origins and 10,350 requests. The provider-signed inventory and durable
+receipt remain authoritative when additional exact same-SHA redeploys exist.
 
 The five alias entries are fixed diagnostic canaries, not a claim that Vercel
 has only five aliases. Coverage of aliases that are not enumerated is derived
