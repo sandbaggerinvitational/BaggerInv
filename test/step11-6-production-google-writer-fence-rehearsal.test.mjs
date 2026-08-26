@@ -118,6 +118,7 @@ function provider({
   driftValuesAfterCanary = false,
   broadDriveEditor = false,
   drivePermissionStatus = 200,
+  drivePermissionReason = "accessNotConfigured",
   redactLegacyEditors = true,
   legacyProtectionVariant = "",
 } = {}) {
@@ -213,7 +214,10 @@ function provider({
     if (!identity) return Response.json({}, { status: 401 });
     if (String(url).includes("www.googleapis.com/drive/v3/files/")) {
       if (drivePermissionStatus !== 200) {
-        return Response.json({ error: { status: "PERMISSION_DENIED" } },
+        return Response.json({ error: {
+          status: "PERMISSION_DENIED",
+          errors: [{ reason: drivePermissionReason, message: "must not be exposed" }],
+        } },
           { status: drivePermissionStatus });
       }
       return Response.json({
@@ -618,20 +622,32 @@ test("canonical value drift fails certification and still restores every run-own
   assert.equal(google.installed(), false);
 });
 
-test("Drive ACL inventory fails closed on broad editors or unavailable permission metadata", async () => {
-  for (const google of [
-    provider({ broadDriveEditor: true }),
-    provider({ drivePermissionStatus: 403 }),
-  ]) {
-    await assert.rejects(() => executeProductionGoogleWriterFenceRehearsal(input("inspect"), {
-      env: environment(), fetchImpl: google.fetchImpl,
-    }), (error) => {
-      assert.match(error.code,
-        /^STEP11_6_GOOGLE_WRITER_FENCE_DRIVE_PERMISSION_(?:AUDIT_UNSAFE|AUDIT_REJECTED)$/);
-      return true;
-    });
-    assert.equal(google.installed(), false);
-  }
+test("Drive ACL inventory fails closed on a broad editor", async () => {
+  const google = provider({ broadDriveEditor: true });
+  await assert.rejects(() => executeProductionGoogleWriterFenceRehearsal(input("inspect"), {
+    env: environment(), fetchImpl: google.fetchImpl,
+  }), (error) => {
+    assert.equal(error.code, "STEP11_6_GOOGLE_WRITER_FENCE_DRIVE_PERMISSION_AUDIT_UNSAFE");
+    return true;
+  });
+  assert.equal(google.installed(), false);
+});
+
+test("Drive rejection exposes only canonical provider reason tokens", async () => {
+  const google = provider({ drivePermissionStatus: 403 });
+  await assert.rejects(() => executeProductionGoogleWriterFenceRehearsal(input("inspect"), {
+    env: environment(), fetchImpl: google.fetchImpl,
+  }), (error) => {
+    assert.equal(error.code,
+      "STEP11_6_GOOGLE_WRITER_FENCE_DRIVE_PERMISSION_AUDIT_REJECTED");
+    assert.equal(error.safeDiagnostics.providerStatus, 403);
+    assert.deepEqual(error.safeDiagnostics.providerReasons,
+      ["PERMISSION_DENIED", "accessNotConfigured"]);
+    assert.doesNotMatch(JSON.stringify(error.safeDiagnostics),
+      /message|email|private|token|workbook/i);
+    return true;
+  });
+  assert.equal(google.installed(), false);
 });
 
 test("Step 12 persistent fence stays installed until an authoritative removal receipt", async () => {
