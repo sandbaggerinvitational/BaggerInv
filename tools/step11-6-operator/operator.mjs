@@ -41,17 +41,17 @@ export const FIXED = Object.freeze({
     "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
   requiredPriorLiveDeploymentId: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
   requiredFrozenStep11DeploymentId: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-  reviewedPostCaptureDeploymentCount: 6,
+  reviewedPostCaptureDeploymentCount: 7,
   reviewedPostCaptureDeploymentFingerprint:
-    "2a0f75de0e4f2178c03cb98f8adb264b3f661b28025b51a70b29800aa30b5724",
-  minimumLiveOriginInventoryCount: 1140 + 6 + 1,
+    "91cdd7ab6fc077cb422c4b8921a0ac431ddf38f043167c457cc7ad4cc288a01a",
+  minimumLiveOriginInventoryCount: 1140 + 7 + 1,
   quiesceFixedAliasOriginCount: 4,
   quiesceCandidateAliasOriginCount: 1,
   quiesceProbeVectorCount: 9,
   migrationName:
-    "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+    "202608260038_production_provider_preview_target_inventory_v4.sql",
   migrationSha256:
-    "a81ea3d10d5da3c66b89f169d46bd1510ffc806a3bbaeb1dbfe810409d45c9b3",
+    "32cc5994570aaa77679b19e14a71a917dcc7fe297bc559ebe82dd320bff94c4c",
   runbook: "docs/step12-production-cutover-runbook-v2.md",
 });
 
@@ -86,7 +86,8 @@ const AUTHORITY_SENSITIVE_FIELDS = new Set([
   "deployment_scope_fingerprint", "google_credential_scope_fingerprint",
   "writer_coverage_fingerprint", "legacy_lease_set_fingerprint",
   "supabase_match_revisions", "google_checkpoints", "boundary_captured_at",
-  "captured_at", "stable_readback_count",
+  "captured_at", "stable_readback_count", "certification_fingerprint",
+  "environment_delta_fingerprint_v2",
 ]);
 
 const PROVIDER_ACTIONS = new Set([
@@ -112,11 +113,17 @@ const PROVIDER_READ_ONLY_ACTIONS = new Set([
 
 const OWNER_AUTHORIZATION_EXEMPT = new Set([
   "inspect",
+  "inspect-scoring-admission",
   "inspect-begin-provider-attestation-challenge",
   "inspect-finalize-provider-attestation-challenge",
   "inspect-provider-quiesce",
   "inspect-persistent-provider-fence",
   "capture-final-google-fingerprint",
+]);
+
+const SCOPE_ONLY_INSPECTIONS = new Set([
+  "inspect",
+  "inspect-scoring-admission",
 ]);
 
 const PERSISTENT_FENCE_REQUIRED_OPERATIONS = new Set([
@@ -196,6 +203,7 @@ const PROVIDER_ACTION_INPUT_KEYS = Object.freeze({
 
 const OPERATION_EXTRA_KEYS = Object.freeze({
   "inspect": [],
+  "inspect-scoring-admission": [],
   "stage-release": [
     "contract_version", "vercel_project", "vercel_project_id", "canonical_domain",
     "tournament_year", "source_fingerprint", "certification_fingerprint",
@@ -286,6 +294,10 @@ const OPERATION_EXTRA_KEYS = Object.freeze({
 
 export const OPERATIONS = Object.freeze({
   inspect: { kind: "rpc-read-only", rpc: "inspect_production_cutover_authority" },
+  "inspect-scoring-admission": {
+    kind: "rpc-read-only",
+    rpc: "inspect_production_scoring_admission",
+  },
   "issue-begin-provider-attestation-challenge": {
     kind: "provider-action-payload", rpc: null,
     endpoint: FIXED.providerControlEndpoint,
@@ -912,6 +924,39 @@ function validateStructuredProviderEvidence(manifest) {
   productionCredentialConfinementBinding();
 }
 
+function validateStagedProvenance(manifest) {
+  const state = manifest.state;
+  const fields = [
+    "stagedRequestFingerprint", "stagedPayloadHash",
+    "stagedCertificationFingerprint", "stagedEnvironmentDeltaFingerprintV2",
+  ];
+  const values = fields.map((field) => state[field]);
+  const allMissing = values.every((value) => value === null);
+  const allPresent = values.every((value) =>
+    typeof value === "string" && HEX64.test(value));
+  if (!allMissing && !allPresent) {
+    refuse(
+      "STAGED_PROVENANCE_INCOMPLETE",
+      "Protected STAGE_RELEASE provenance must be either entirely absent or entirely present.",
+    );
+  }
+  if (allPresent) {
+    requireEqual(
+      state.stagedCertificationFingerprint,
+      manifest.release.certificationFingerprint,
+      "STAGED_PROVENANCE_MISMATCH",
+      "state.stagedCertificationFingerprint",
+    );
+    requireEqual(
+      state.stagedEnvironmentDeltaFingerprintV2,
+      manifest.release.environmentDeltaFingerprintV2,
+      "STAGED_PROVENANCE_MISMATCH",
+      "state.stagedEnvironmentDeltaFingerprintV2",
+    );
+  }
+  return { present: allPresent };
+}
+
 export function validateManifest(manifest) {
   requireObject(manifest, "MANIFEST_REQUIRED", "manifest");
   requireEqual(manifest.schemaVersion, FIXED.schemaVersion, "SCHEMA_VERSION_MISMATCH", "schemaVersion");
@@ -942,11 +987,23 @@ export function validateManifest(manifest) {
   requireObject(manifest.evidence, "EVIDENCE_REQUIRED", "evidence");
   requireObject(manifest.stableRequestIds, "REQUEST_IDS_REQUIRED", "stableRequestIds");
   requireObject(manifest.operationInputs, "OPERATION_INPUTS_REQUIRED", "operationInputs");
+  const stagedProvenance = validateStagedProvenance(manifest);
+  if ((manifest.state.cutoverPhase !== "DORMANT" ||
+      manifest.state.activationState !== "DORMANT") &&
+      !stagedProvenance.present) {
+    refuse(
+      "STAGED_PROVENANCE_REQUIRED",
+      "Post-stage execution requires the protected authoritative STAGE_RELEASE provenance.",
+    );
+  }
   requireInteger(manifest.state.activationRevision, "STATE_INVALID", "state.activationRevision");
-  requireInteger(manifest.state.activeLegacyWriters, "STATE_INVALID", "state.activeLegacyWriters");
-  requireInteger(manifest.state.unresolvedLegacyWriters, "STATE_INVALID", "state.unresolvedLegacyWriters");
-  requireInteger(manifest.state.unresolvedOutbox, "STATE_INVALID", "state.unresolvedOutbox");
-  requireInteger(manifest.state.unresolvedArchive, "STATE_INVALID", "state.unresolvedArchive");
+  for (const field of [
+    "activeLegacyWriters", "unresolvedLegacyWriters", "ambiguousGoogleWrites",
+    "partialGoogleWrites", "legacyUnclassifiedWriters", "unresolvedOutbox",
+    "unresolvedArchive",
+  ]) {
+    requireInteger(manifest.state[field], "STATE_INVALID", `state.${field}`);
+  }
   requireBoolean(manifest.state.firstSupabaseCanonicalWritePossible, "STATE_INVALID", "state.firstSupabaseCanonicalWritePossible");
   requireBoolean(manifest.state.firstSupabaseCanonicalWriteObserved, "STATE_INVALID", "state.firstSupabaseCanonicalWriteObserved");
   if (!new Set(["OPEN", "CLOSING", "CLOSED"]).has(manifest.state.admissionState)) {
@@ -996,6 +1053,32 @@ export function evaluateReadiness(manifest) {
   }
   if (!unresolved(release.candidateSha) && !unresolved(release.frozenSha) && release.candidateSha !== release.frozenSha) {
     blockers.push("release.candidateSha does not equal release.frozenSha");
+  }
+  if (!unresolved(release.environmentDeltaFingerprintV2) &&
+      HEX64.test(String(release.environmentDeltaFingerprintV2).toLowerCase()) &&
+      release.environmentDeltaFingerprintV2 !==
+        computeEnvironmentDeltaFingerprintV2(manifest)) {
+    blockers.push(
+      "release.environmentDeltaFingerprintV2 does not match the computed environment delta material",
+    );
+  }
+  const dormantCertificationSnapshot = isDormantCertificationSnapshot(manifest);
+  if (dormantCertificationSnapshot &&
+      !unresolved(release.certificationFingerprint) &&
+      HEX64.test(String(release.certificationFingerprint).toLowerCase()) &&
+      release.certificationFingerprint !==
+        computeCertificationFingerprint(manifest)) {
+    blockers.push(
+      "release.certificationFingerprint does not match the computed certification material",
+    );
+  }
+  if (!unresolved(release.executionBundleFingerprintV2) &&
+      HEX64.test(String(release.executionBundleFingerprintV2).toLowerCase()) &&
+      release.executionBundleFingerprintV2 !==
+        computeExecutionBundleMaterialFingerprint(manifest)) {
+    blockers.push(
+      "release.executionBundleFingerprintV2 does not match the computed execution bundle material",
+    );
   }
   if (release.credentialConfinementSchema !== FIXED.credentialConfinementSchema ||
       release.credentialConfinementRecordCount !==
@@ -1083,6 +1166,27 @@ export function evaluateReadiness(manifest) {
   if (rehearsal.protectedRangeCountBefore !== rehearsal.protectedRangeCountAfter) {
     blockers.push("providerFenceRehearsal protected-range baseline was not restored");
   }
+  if (rehearsal.restoredFingerprint !== rehearsal.baselineFingerprint) {
+    blockers.push("providerFenceRehearsal restored fingerprint does not equal baseline");
+  }
+  if (manifest.providerQuiesceEvidence.status !== "VERIFIED") {
+    blockers.push("providerQuiesceEvidence is not VERIFIED historical evidence");
+  }
+  if (!new Set(["MISSING", "REMOVED"])
+    .has(manifest.persistentProviderFence.status) ||
+      manifest.persistentProviderFence.protectionCount !== 0) {
+    blockers.push("persistentProviderFence is not absent/restored with zero protections");
+  }
+  if (manifest.providerFenceProof.status !== "MISSING") {
+    blockers.push("providerFenceProof is not MISSING at DORMANT readiness");
+  }
+  if ([
+    state.stagedRequestFingerprint, state.stagedPayloadHash,
+    state.stagedCertificationFingerprint,
+    state.stagedEnvironmentDeltaFingerprintV2,
+  ].some((value) => value !== null)) {
+    blockers.push("protected staged provenance is not absent at DORMANT readiness");
+  }
 
   const expectedState = {
     cutoverPhase: "DORMANT", activationState: "DORMANT", scoringAuthority: "GOOGLE",
@@ -1149,6 +1253,50 @@ function assertFirstWrite(manifest, { possible, observed }) {
     "FIRST_WRITE_POSSIBLE_MISMATCH", "first Supabase canonical write possible");
   requireEqual(manifest.state.firstSupabaseCanonicalWriteObserved, observed,
     "FIRST_WRITE_OBSERVED_MISMATCH", "first Supabase canonical write observed");
+}
+
+function assertStep116DormantNonImpact(manifest) {
+  for (const field of [
+    "stagedRequestFingerprint", "stagedPayloadHash",
+    "stagedCertificationFingerprint", "stagedEnvironmentDeltaFingerprintV2",
+  ]) {
+    requireEqual(
+      manifest.state[field],
+      null,
+      "STEP11_6_STAGED_PROVENANCE_ALREADY_PRESENT",
+      `state.${field}`,
+    );
+  }
+  requireEqual(
+    manifest.providerFenceRehearsal.restoredFingerprint,
+    manifest.providerFenceRehearsal.baselineFingerprint,
+    "STEP11_6_REHEARSAL_BASELINE_NOT_RESTORED",
+    "providerFenceRehearsal.restoredFingerprint",
+  );
+  requireEqual(
+    manifest.providerQuiesceEvidence.status,
+    "VERIFIED",
+    "STEP11_6_PROVIDER_QUIESCE_NOT_VERIFIED",
+    "providerQuiesceEvidence.status",
+  );
+  requireEqual(
+    ["MISSING", "REMOVED"].includes(manifest.persistentProviderFence.status),
+    true,
+    "STEP11_6_PROVIDER_FENCE_NOT_RESTORED",
+    "persistentProviderFence.status",
+  );
+  requireEqual(
+    manifest.persistentProviderFence.protectionCount,
+    0,
+    "STEP11_6_PROVIDER_FENCE_NOT_RESTORED",
+    "persistentProviderFence.protectionCount",
+  );
+  requireEqual(
+    manifest.providerFenceProof.status,
+    "MISSING",
+    "STEP11_6_PROVIDER_PROOF_NOT_ABSENT",
+    "providerFenceProof.status",
+  );
 }
 
 function assertNoLegacyWriters(manifest) {
@@ -1459,8 +1607,9 @@ function assertInitialCutoverFenceWindowState(manifest) {
 function assertOperationGuard(manifest, operation) {
   const state = manifest.state;
   assertOwnerAuthorization(manifest, operation);
-  if (operation !== "inspect") assertFrozenRelease(manifest);
-  if (!["inspect", "stage-release", ...PROVIDER_ACTIONS].includes(operation)) {
+  if (!SCOPE_ONLY_INSPECTIONS.has(operation)) assertFrozenRelease(manifest);
+  if (![...SCOPE_ONLY_INSPECTIONS, "stage-release", ...PROVIDER_ACTIONS]
+    .includes(operation)) {
     assertOptimisticState(manifest);
   }
   if (PERSISTENT_FENCE_REQUIRED_OPERATIONS.has(operation)) {
@@ -1469,6 +1618,7 @@ function assertOperationGuard(manifest, operation) {
 
   switch (operation) {
     case "inspect": return;
+    case "inspect-scoring-admission": return;
     case "issue-begin-provider-attestation-challenge":
     case "inspect-begin-provider-attestation-challenge": {
       const quiesce = assertQuiesceRequestScope(manifest);
@@ -1656,6 +1806,7 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.participantIdentityAuthority, "PASSPORT", "IDENTITY_MISMATCH", "state.participantIdentityAuthority");
       requireEqual(state.admissionState, "OPEN", "ADMISSION_STATE_MISMATCH", "state.admissionState");
       requireEqual(state.gateExecutionState, "PAUSED", "GATE_STATE_MISMATCH", "state.gateExecutionState");
+      assertStep116DormantNonImpact(manifest);
       assertFirstWrite(manifest, { possible: false, observed: false });
       return;
     case "read-cutover":
@@ -1876,7 +2027,7 @@ function assertOperationGuard(manifest, operation) {
 function commonPayload(manifest, operation) {
   const state = manifest.state;
   const release = manifest.release;
-  if (operation === "inspect") {
+  if (SCOPE_ONLY_INSPECTIONS.has(operation)) {
     return {
       environment: FIXED.environment,
       project_ref: FIXED.projectRef,
@@ -2094,7 +2245,8 @@ function operationDefaults(manifest, operation) {
     evidence,
   } = manifest;
   switch (operation) {
-    case "inspect": return {};
+    case "inspect":
+    case "inspect-scoring-admission": return {};
     case "stage-release": return {
       contract_version: "production-cutover-activation-v1",
       vercel_project: FIXED.vercelProject,
@@ -2333,6 +2485,12 @@ function buildDiagnosticStateGuard(manifest) {
     activationState: manifest.state.activationState,
     activationRevision: manifest.state.activationRevision,
     authorityGeneration: manifest.state.authorityGeneration,
+    stagedRequestFingerprint: manifest.state.stagedRequestFingerprint,
+    stagedPayloadHash: manifest.state.stagedPayloadHash,
+    stagedCertificationFingerprint:
+      manifest.state.stagedCertificationFingerprint,
+    stagedEnvironmentDeltaFingerprintV2:
+      manifest.state.stagedEnvironmentDeltaFingerprintV2,
     scoringAuthority: manifest.state.scoringAuthority,
     scoringIngressEnabled: manifest.state.scoringIngressEnabled,
     gateExecutionState: manifest.state.gateExecutionState,
@@ -2344,6 +2502,9 @@ function buildDiagnosticStateGuard(manifest) {
     activeClosureStatus: manifest.state.activeClosureStatus,
     activeLegacyWriters: manifest.state.activeLegacyWriters,
     unresolvedLegacyWriters: manifest.state.unresolvedLegacyWriters,
+    ambiguousGoogleWrites: manifest.state.ambiguousGoogleWrites,
+    partialGoogleWrites: manifest.state.partialGoogleWrites,
+    legacyUnclassifiedWriters: manifest.state.legacyUnclassifiedWriters,
     unresolvedOutbox: manifest.state.unresolvedOutbox,
     unresolvedArchive: manifest.state.unresolvedArchive,
     firstSupabaseCanonicalWritePossible:
@@ -2370,6 +2531,11 @@ export function buildOperationEnvelope(manifest, operation) {
   const definition = OPERATIONS[operation];
   if (!definition) refuse("UNKNOWN_OPERATION", `Unknown operation: ${operation}`);
   assertOperationGuard(manifest, operation);
+  if (!SCOPE_ONLY_INSPECTIONS.has(operation)) {
+    assertExactFingerprintClaims(manifest, {
+      requireStep11CertificationMaterial: operation === "stage-release",
+    });
+  }
   const diagnosticStateGuard = buildDiagnosticStateGuard(manifest);
   if (PROVIDER_ACTIONS.has(operation)) {
     let payload = providerActionDefaults(manifest, operation);
@@ -2443,15 +2609,158 @@ export function buildOperationEnvelope(manifest, operation) {
   return envelope;
 }
 
+function environmentDeltaMaterial(manifest) {
+  const release = clone(manifest.release);
+  delete release.environmentDeltaFingerprintV2;
+  delete release.certificationFingerprint;
+  delete release.executionBundleFingerprintV2;
+  return {
+    domain: "BAGGER_STEP12_ENVIRONMENT_DELTA_V2",
+    newEnvironmentVariables: [],
+    resources: clone(manifest.resources),
+    release,
+    provider: {
+      controlEndpoint: FIXED.providerControlEndpoint,
+      fenceBranch: FIXED.providerFenceBranch,
+      directorPlayerId: FIXED.providerFenceDirector,
+      fenceDescription: FIXED.providerFenceDescription,
+      fenceRemoveConfirmation: FIXED.providerFenceRemoveConfirmation,
+      ownerFreezeConfirmation: FIXED.ownerFreezeConfirmation,
+      quiesceScope: FIXED.quiesceScope,
+      originInventoryArtifact: FIXED.originInventoryArtifact,
+      originInventorySchema: FIXED.originInventorySchema,
+      originInventoryCount: FIXED.originInventoryCount,
+      originInventoryFingerprint: FIXED.originInventoryFingerprint,
+      credentialConfinementArtifact: FIXED.credentialConfinementArtifact,
+      credentialConfinementSchema: FIXED.credentialConfinementSchema,
+      credentialConfinementRecordCount: FIXED.credentialConfinementRecordCount,
+      credentialConfinementRecordsFingerprint:
+        FIXED.credentialConfinementRecordsFingerprint,
+      credentialConfinementEvidenceFingerprint:
+        FIXED.credentialConfinementEvidenceFingerprint,
+      reviewedPostCaptureDeploymentCount:
+        FIXED.reviewedPostCaptureDeploymentCount,
+      reviewedPostCaptureDeploymentFingerprint:
+        FIXED.reviewedPostCaptureDeploymentFingerprint,
+      minimumLiveOriginInventoryCount: FIXED.minimumLiveOriginInventoryCount,
+      fixedAliasOriginCount: FIXED.quiesceFixedAliasOriginCount,
+      candidateAliasOriginCount: FIXED.quiesceCandidateAliasOriginCount,
+      probeVectorCount: FIXED.quiesceProbeVectorCount,
+    },
+    migration: {
+      name: manifest.release.migrationName,
+      sha256: manifest.release.migrationSha256,
+    },
+  };
+}
+
+export function computeEnvironmentDeltaFingerprintV2(manifest) {
+  validateManifest(manifest);
+  return sha256Hex(canonicalJson(environmentDeltaMaterial(manifest)));
+}
+
+export function computeCertificationFingerprint(manifest) {
+  validateManifest(manifest);
+  const release = clone(manifest.release);
+  delete release.certificationFingerprint;
+  delete release.executionBundleFingerprintV2;
+  release.environmentDeltaFingerprintV2 =
+    computeEnvironmentDeltaFingerprintV2(manifest);
+  return sha256Hex(canonicalJson({
+    domain: "BAGGER_STEP11_6_CERTIFICATION_V2",
+    certification: clone(manifest.certification),
+    providerFenceRehearsal: clone(manifest.providerFenceRehearsal),
+    providerQuiesceEvidence: clone(manifest.providerQuiesceEvidence),
+    state: clone(manifest.state),
+    resources: clone(manifest.resources),
+    release,
+  }));
+}
+
 export function computeExecutionBundleMaterialFingerprint(manifest) {
   validateManifest(manifest);
   const material = clone(manifest);
   delete material.executionReadiness;
+  if (material.execution) {
+    // Owner authorization is a mutable execution decision, not Step 11.6
+    // certification material. All inert execution controls remain bound.
+    delete material.execution.step12OwnerAuthorizationRecorded;
+  }
   if (material.release) delete material.release.executionBundleFingerprintV2;
   return sha256Hex(canonicalJson({
     domain: "BAGGER_STEP12_EXECUTION_BUNDLE_V2",
     manifest: material,
   }));
+}
+
+function isDormantCertificationSnapshot(manifest) {
+  return manifest.state.cutoverPhase === "DORMANT" &&
+    manifest.state.activationState === "DORMANT" &&
+    manifest.state.stagedRequestFingerprint === null &&
+    manifest.state.stagedPayloadHash === null &&
+    manifest.state.stagedCertificationFingerprint === null &&
+    manifest.state.stagedEnvironmentDeltaFingerprintV2 === null;
+}
+
+export function computeFingerprintSet(manifest) {
+  const environmentDeltaFingerprintV2 =
+    computeEnvironmentDeltaFingerprintV2(manifest);
+  const certificationFingerprint = isDormantCertificationSnapshot(manifest)
+    ? computeCertificationFingerprint(manifest)
+    : requireResolved(
+      manifest.release.certificationFingerprint,
+      HEX64,
+      "CERTIFICATION_FINGERPRINT_REQUIRED",
+      "release.certificationFingerprint",
+    );
+  const executionMaterial = clone(manifest);
+  executionMaterial.release.environmentDeltaFingerprintV2 =
+    environmentDeltaFingerprintV2;
+  executionMaterial.release.certificationFingerprint = certificationFingerprint;
+  const executionBundleFingerprintV2 =
+    computeExecutionBundleMaterialFingerprint(executionMaterial);
+  return {
+    environmentDeltaFingerprintV2,
+    certificationFingerprint,
+    executionBundleFingerprintV2,
+  };
+}
+
+function assertExactFingerprintClaims(manifest, {
+  requireStep11CertificationMaterial = false,
+} = {}) {
+  const computedEnvironmentDelta =
+    computeEnvironmentDeltaFingerprintV2(manifest);
+  requireEqual(
+    requireResolved(manifest.release.environmentDeltaFingerprintV2, HEX64,
+      "ENVIRONMENT_DELTA_FINGERPRINT_REQUIRED",
+      "release.environmentDeltaFingerprintV2"),
+    computedEnvironmentDelta,
+    "ENVIRONMENT_DELTA_FINGERPRINT_MISMATCH",
+    "release.environmentDeltaFingerprintV2",
+  );
+  const certificationClaim = requireResolved(
+    manifest.release.certificationFingerprint,
+    HEX64,
+    "CERTIFICATION_FINGERPRINT_REQUIRED",
+    "release.certificationFingerprint",
+  );
+  if (requireStep11CertificationMaterial) {
+    requireEqual(
+      certificationClaim,
+      computeCertificationFingerprint(manifest),
+      "CERTIFICATION_FINGERPRINT_MISMATCH",
+      "release.certificationFingerprint",
+    );
+  }
+  requireEqual(
+    requireResolved(manifest.release.executionBundleFingerprintV2, HEX64,
+      "EXECUTION_BUNDLE_FINGERPRINT_REQUIRED",
+      "release.executionBundleFingerprintV2"),
+    computeExecutionBundleMaterialFingerprint(manifest),
+    "EXECUTION_BUNDLE_FINGERPRINT_MISMATCH",
+    "release.executionBundleFingerprintV2",
+  );
 }
 
 function readJson(path) {
@@ -2504,7 +2813,7 @@ export function main() {
     return;
   }
   if (command === "fingerprint") {
-    print({ executionBundleMaterialFingerprintV2: computeExecutionBundleMaterialFingerprint(manifest) });
+    print(computeFingerprintSet(manifest));
     return;
   }
   if (command === "payload") {

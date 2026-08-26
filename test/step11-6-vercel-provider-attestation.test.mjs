@@ -122,7 +122,7 @@ function rawDeployment(tuple, { createdAt = "2026-08-20T00:00:00.000Z" } = {}) {
   return {
     uid,
     url: new URL(origin).hostname,
-    target: scope === "FEATURE_PREVIEW" ? "preview" : "production",
+    target: scope === "FEATURE_PREVIEW" ? null : "production",
     readyState: status === "BLOCKED" ? "CANCELED" : status,
     createdAt,
     meta: {
@@ -229,8 +229,8 @@ test("local attester exhausts deployment pagination, accepts additive scope, and
   const fixture = provider(selectedRequest);
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
   assert.equal(scope.retainedRecordCount, 1140);
-  assert.equal(scope.liveRecordCount, 1148);
-  assert.equal(scope.liveRecords.length, 1148);
+  assert.equal(scope.liveRecordCount, 1149);
+  assert.equal(scope.liveRecords.length, 1149);
   assert.equal(scope.paginationComplete, true);
   assert.equal(scope.pageCount, 12);
   assert.equal(scope.liveRecords.filter((tuple) => tuple[1] === null).length, 1,
@@ -253,13 +253,13 @@ test("local attester exhausts deployment pagination, accepts additive scope, and
     !JSON.stringify(environment).includes(secret)));
 });
 
-test("exact retained plus reviewed plus candidate 1,147-origin scope is accepted", async () => {
+test("exact retained plus reviewed plus candidate 1,148-origin scope is accepted", async () => {
   const selectedRequest = request();
   const fixture = provider(selectedRequest, { includePostFreeze: false });
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
   assert.equal(scope.retainedRecordCount, 1140);
-  assert.equal(scope.liveRecordCount, 1147);
-  assert.equal(scope.liveRecords.length, 1147);
+  assert.equal(scope.liveRecordCount, 1148);
+  assert.equal(scope.liveRecords.length, 1148);
   assert.deepEqual(
     scope.liveRecords.filter((tuple) =>
       PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
@@ -296,7 +296,7 @@ test("signed BEGIN and independently signed FINALIZE attestations bind Preview s
   assert.equal(verifiedBegin.signatureVerified, true);
   assert.equal(verifiedBegin.stage, "BEGIN");
   assert.equal(verifiedBegin.candidateDeploymentTarget, "PREVIEW");
-  assert.equal(verifiedBegin.liveOriginInventoryCount, 1148);
+  assert.equal(verifiedBegin.liveOriginInventoryCount, 1149);
   assert.equal(verifiedBegin.routingRulePendingDraftChangeCount, 0);
   assert.equal(verifiedBegin.credentialConfinementEvidenceSchema,
     PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_SCHEMA);
@@ -590,7 +590,7 @@ test("only exact reviewed post-capture Preview deployments extend the live scope
   const selectedRequest = request();
   const fixture = provider(selectedRequest);
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
-  assert.equal(scope.liveRecordCount, 1148);
+  assert.equal(scope.liveRecordCount, 1149);
   assert.deepEqual(
     scope.liveRecords.filter((tuple) =>
       PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
@@ -602,6 +602,12 @@ test("only exact reviewed post-capture Preview deployments extend the live scope
   const mutations = [
     (value) => ({ ...value, meta: { ...value.meta, githubCommitSha: "8".repeat(40) } }),
     (value) => ({ ...value, target: "production" }),
+    (value) => ({ ...value, target: "preview" }),
+    (value) => {
+      const changed = { ...value };
+      delete changed.target;
+      return changed;
+    },
     (value) => ({ ...value, readyState: "ERROR" }),
     (value) => ({ ...value, meta: { ...value.meta, githubCommitRef: "main" } }),
     (value) => ({ ...value, url: "unreviewed-preview.vercel.app" }),

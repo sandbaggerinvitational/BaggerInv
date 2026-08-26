@@ -49,6 +49,19 @@ const originInventoryFingerprint =
   "533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6";
 const reviewedPostCapturePreviewDeployments =
   PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS;
+const reviewed68c81deDeployment = Object.freeze([
+  "dpl_3wULxzmgsbsmUPLmK7B1Ld4FAjeT",
+  "68c81debe4c8f99662bb5615d5c82a34a10a011e",
+  "https://bagger-99mqqt7qn-sandbagger-invitational.vercel.app",
+  "FEATURE_PREVIEW",
+  "READY",
+  "GIT",
+]);
+const reviewedDeploymentsThrough037 = Object.freeze(
+  reviewedPostCapturePreviewDeployments.filter(
+    (tuple) => tuple[0] !== reviewed68c81deDeployment[0],
+  ),
+);
 const credentialConfinement = Object.freeze({
   credential_confinement_evidence_schema:
     "step11-6-production-google-credential-confinement-v1",
@@ -128,6 +141,15 @@ function liveOriginInventoryFor(target = "PREVIEW", additions = []) {
   return sortLiveOriginInventory([
     ...originInventory,
     ...reviewedPostCapturePreviewDeployments,
+    ...additions,
+    candidateInventoryTuple(target),
+  ]);
+}
+
+function liveOriginInventoryThrough037For(target = "PREVIEW", additions = []) {
+  return sortLiveOriginInventory([
+    ...originInventory,
+    ...reviewedDeploymentsThrough037,
     ...additions,
     candidateInventoryTuple(target),
   ]);
@@ -594,7 +616,7 @@ async function installProductionMigrations(
   cluster,
   database,
   admissionMigration =
-    "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+    "202608260038_production_provider_preview_target_inventory_v4.sql",
 ) {
   const migrationNames = (await readdir(migrationsDirectory))
     .filter((name) => /^\d+_.*\.sql$/.test(name))
@@ -734,6 +756,12 @@ function state(cluster, database) {
       'activation_revision', activation.activation_revision,
       'authority_generation_id', activation.authority_generation_id,
       'authority', activation.current_authority,
+      'staged_request_fingerprint', activation.staged_request_fingerprint,
+      'staged_payload_hash', activation.staged_payload_hash,
+      'staged_certification_fingerprint',
+        activation.staged_certification_fingerprint,
+      'staged_environment_delta_fingerprint_v2',
+        activation.staged_environment_delta_fingerprint_v2,
       'read_cutover_phase', activation.read_cutover_phase,
       'scoring_ingress_enabled', activation.scoring_ingress_enabled,
       'expected_source_fingerprint', activation.expected_source_fingerprint,
@@ -1537,6 +1565,13 @@ function refreshFenceEvidence(
 
 function stageToArmedGoogleGate(cluster, database, label = "initial") {
   const beforeStage = state(cluster, database);
+  const stageRequestFingerprint = fingerprint(`${label}-stage-release`);
+  const certificationFingerprint = fingerprint(
+    `${label}-step11-6-certification`,
+  );
+  const environmentDeltaFingerprint = fingerprint(
+    `${label}-environment-delta-v2`,
+  );
   const stage = rpc(cluster, database, "stage_production_cutover_release", {
     ...scope,
     actor_id: actor,
@@ -1547,10 +1582,19 @@ function stageToArmedGoogleGate(cluster, database, label = "initial") {
     vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
     deployment_commit: deploymentCommit,
     source_fingerprint: sourceFingerprint,
+    certification_fingerprint: certificationFingerprint,
+    environment_delta_fingerprint_v2: environmentDeltaFingerprint,
     expected_activation_revision: Number(beforeStage.activation_revision),
-    request_fingerprint: fingerprint(`${label}-stage-release`),
+    request_fingerprint: stageRequestFingerprint,
   });
   assert.equal(stage.code, "PRODUCTION_RELEASE_STAGED");
+  assert.equal(stage.stage_request_fingerprint, stageRequestFingerprint);
+  assert.match(stage.stage_payload_hash, /^[0-9a-f]{64}$/);
+  assert.equal(stage.certification_fingerprint, certificationFingerprint);
+  assert.equal(
+    stage.environment_delta_fingerprint_v2,
+    environmentDeltaFingerprint,
+  );
 
   psql(cluster, database, `
     update production_control.cutover_activation_state
@@ -1564,6 +1608,13 @@ function stageToArmedGoogleGate(cluster, database, label = "initial") {
     where scope_key = 'BAGGER_INV_PRODUCTION';
   `);
   const staged = state(cluster, database);
+  assert.equal(staged.staged_request_fingerprint, stageRequestFingerprint);
+  assert.equal(staged.staged_payload_hash, stage.stage_payload_hash);
+  assert.equal(staged.staged_certification_fingerprint, certificationFingerprint);
+  assert.equal(
+    staged.staged_environment_delta_fingerprint_v2,
+    environmentDeltaFingerprint,
+  );
 
   const arm = rpc(
     cluster,
@@ -1838,7 +1889,8 @@ test(
             ...originInventory,
             ...reviewedPostCapturePreviewDeployments.filter((tuple) =>
               tuple[1] !== "3fcbaa287fcb306fa3b47310f01ed6eb3901749c" &&
-              tuple[0] !== "dpl_idZKEn956pcuEXctKS5HPoWfEn4Y"
+              tuple[0] !== "dpl_idZKEn956pcuEXctKS5HPoWfEn4Y" &&
+              tuple[0] !== reviewed68c81deDeployment[0]
             ),
             candidateInventoryTuple("PREVIEW"),
           ]);
@@ -2052,9 +2104,9 @@ test(
               (tuple) => tuple[0] === "dpl_idZKEn956pcuEXctKS5HPoWfEn4Y",
             );
             assert.ok(reviewedB6);
-            const pre037LiveInventory = liveOriginInventoryFor("PREVIEW")
+            const pre037LiveInventory = liveOriginInventoryThrough037For("PREVIEW")
               .filter((tuple) => tuple[0] !== reviewedB6[0]);
-            const post037LiveInventory = liveOriginInventoryFor("PREVIEW");
+            const post037LiveInventory = liveOriginInventoryThrough037For("PREVIEW");
             assert.equal(pre037LiveInventory.length, 1146);
             assert.equal(post037LiveInventory.length, 1147);
 
@@ -2223,25 +2275,178 @@ test(
       );
 
       await t.test(
-        "migration 037 accepts exactly 1,140 retained, six reviewed, and one dynamic candidate tuple",
+        "migration 038 invalidates a persistent pre-038 inventory call and requires the exact 68c81de tuple",
+        async () => {
+          databaseCounter += 1;
+          const database =
+            `admission_034_${databaseCounter}_migration_038_cached_upgrade`;
+          let persistentSession;
+          try {
+            createDatabase(cluster, database);
+            installSupabaseCompatibility(cluster, database);
+            await installProductionMigrations(
+              cluster,
+              database,
+              "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+            );
+            installScoringFixture(cluster, database);
+
+            assert.deepEqual(
+              reviewedPostCapturePreviewDeployments.find(
+                (tuple) => tuple[0] === reviewed68c81deDeployment[0],
+              ),
+              reviewed68c81deDeployment,
+            );
+            const pre038LiveInventory = liveOriginInventoryThrough037For("PREVIEW");
+            const post038LiveInventory = liveOriginInventoryFor("PREVIEW");
+            assert.equal(pre038LiveInventory.length, 1147);
+            assert.equal(post038LiveInventory.length, 1148);
+
+            const productionAuthorityState = () => psql(cluster, database, `
+              select activation.state || '|' || activation.current_authority ||
+                '|' || resource.participant_identity_authority || '|' ||
+                gate.admission_state || '|' || gate.state
+              from production_control.cutover_activation_state activation
+              join production_control.resource_scope resource
+                on resource.scope_key = activation.scope_key
+              cross join scoring_authority.ingress_gates gate
+              where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+                and gate.tournament_id = '2026';
+            `);
+            assert.equal(
+              productionAuthorityState(),
+              "DORMANT|GOOGLE|PASSPORT|OPEN|PAUSED",
+            );
+
+            const cachedExecution = (liveInventory) => `
+              execute cached_live_inventory_038(
+                ${jsonSql(originInventory)},
+                ${jsonSql(liveInventory)},
+                ${sqlLiteral(candidateIdentity.deploymentId)},
+                ${sqlLiteral(candidateIdentity.commit)},
+                ${sqlLiteral(candidateIdentity.immutableOrigin)},
+                'PREVIEW'
+              );
+            `;
+            persistentSession = spawnInteractivePsql(cluster, database);
+            persistentSession.send(`
+              prepare cached_live_inventory_038(
+                jsonb, jsonb, text, text, text, text
+              ) as
+                select production_control.assert_exact_vercel_live_inventory(
+                  $1, $2, $3, $4, $5, $6
+                );
+              ${cachedExecution(pre038LiveInventory)}
+              select 'PRE038_CACHED_ASSERTION_READY';
+            `);
+            await persistentSession.waitFor("PRE038_CACHED_ASSERTION_READY");
+
+            psqlFile(
+              cluster,
+              database,
+              path.join(
+                migrationsDirectory,
+                "202608260038_production_provider_preview_target_inventory_v4.sql",
+              ),
+            );
+
+            persistentSession.send(`
+              \\set ON_ERROR_STOP off
+              ${cachedExecution(pre038LiveInventory)}
+              select 'POST038_MISSING_68C81DE_ATTEMPTED';
+            `);
+            await persistentSession.waitFor(
+              "POST038_MISSING_68C81DE_ATTEMPTED",
+            );
+            assert.match(
+              persistentSession.snapshot().stderr,
+              /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+              "a cached pre-038 call must resolve the replacement 68c81de assertion",
+            );
+
+            persistentSession.send(`
+              \\set ON_ERROR_STOP on
+              ${cachedExecution(post038LiveInventory)}
+              select 'POST038_EXACT_68C81DE_ACCEPTED';
+              \\q
+            `);
+            await persistentSession.waitFor("POST038_EXACT_68C81DE_ACCEPTED");
+            const sessionResult = await persistentSession.done;
+            assert.equal(sessionResult.status, 0);
+
+            assert.equal(
+              psql(cluster, database, `
+                select current_assertion.prosecdef::text || '|' ||
+                  current_assertion.provolatile::text || '|' ||
+                  (current_assertion.proconfig @>
+                    array['search_path=pg_catalog'])::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'anon', current_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'authenticated', current_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'service_role', current_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  prior_assertion.prosecdef::text || '|' ||
+                  prior_assertion.provolatile::text || '|' ||
+                  (prior_assertion.proconfig @>
+                    array['search_path=pg_catalog'])::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'anon', prior_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'authenticated', prior_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'service_role', prior_assertion.oid, 'EXECUTE'
+                  )::text
+                from pg_catalog.pg_proc current_assertion
+                join pg_catalog.pg_namespace current_namespace
+                  on current_namespace.oid = current_assertion.pronamespace
+                cross join pg_catalog.pg_proc prior_assertion
+                join pg_catalog.pg_namespace prior_namespace
+                  on prior_namespace.oid = prior_assertion.pronamespace
+                where current_namespace.nspname = 'production_control'
+                  and current_assertion.proname =
+                    'assert_exact_vercel_live_inventory'
+                  and prior_namespace.nspname = 'production_control'
+                  and prior_assertion.proname =
+                    'assert_exact_vercel_live_inventory_v3';
+              `),
+              "true|i|true|false|false|true|true|i|true|false|false|true",
+            );
+            assert.equal(
+              productionAuthorityState(),
+              "DORMANT|GOOGLE|PASSPORT|OPEN|PAUSED",
+            );
+          } finally {
+            await terminatePsqlSessions(persistentSession);
+          }
+        },
+      );
+
+      await t.test(
+        "migration 038 accepts exactly 1,140 retained, seven reviewed, and one dynamic candidate tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_037_exact_1147");
+          const database = cloneDormantDatabase("inventory_038_exact_1148");
           const liveInventory = liveOriginInventoryFor("PREVIEW");
-          assert.equal(liveInventory.length, 1147);
+          assert.equal(liveInventory.length, 1148);
           assert.equal(
             assertExactLiveOriginInventory(cluster, database, liveInventory),
             "",
           );
           const input = quiesceBeginInput(
             "REHEARSAL",
-            "inventory-037-exact-1147",
+            "inventory-038-exact-1148",
           );
           const binding = reserveProviderAttestation(
             cluster,
             database,
             input,
             "BEGIN",
-            "inventory-037-exact-1147-begin",
+            "inventory-038-exact-1148-begin",
           );
           assert.match(
             binding.attestation_id,
@@ -2251,7 +2456,420 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects missing, tampered, and colliding b6 reviewed tuples",
+        "migration 038 permits exact read-only admission inspection in DORMANT and rejects wrong resources",
+        () => {
+          const database = cloneDormantDatabase(
+            "migration_038_dormant_admission_inspection",
+          );
+          const productionAuthorityState = () => psql(cluster, database, `
+            select activation.state || '|' || activation.current_authority ||
+              '|' || resource.participant_identity_authority || '|' ||
+              gate.admission_state || '|' || gate.state || '|' ||
+              activation.scoring_ingress_enabled::text || '|' ||
+              resource.workers_enabled::text
+            from production_control.cutover_activation_state activation
+            join production_control.resource_scope resource
+              on resource.scope_key = activation.scope_key
+            cross join scoring_authority.ingress_gates gate
+            where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+              and gate.tournament_id = '2026';
+          `);
+          const operationalRowCounts = () => psql(cluster, database, `
+            select pg_catalog.jsonb_build_object(
+              'audit', (select pg_catalog.count(*) from
+                production_control.operation_audit_events),
+              'leases', (select pg_catalog.count(*) from
+                scoring_authority.scoring_ingress_leases),
+              'outbox', (select pg_catalog.count(*) from
+                scoring_authority.google_outbox_events),
+              'archive', (select pg_catalog.count(*) from
+                scoring_authority.scorecard_archive_jobs)
+            )::text;
+          `);
+          const before = productionAuthorityState();
+          const rowCountsBefore = operationalRowCounts();
+          assert.equal(
+            before,
+            "DORMANT|GOOGLE|PASSPORT|OPEN|PAUSED|false|false",
+          );
+
+          const inspected = rpc(
+            cluster,
+            database,
+            "inspect_production_scoring_admission",
+            scope,
+          );
+          assert.equal(inspected.ok, true);
+          assert.equal(inspected.activation_state, "DORMANT");
+          assert.equal(inspected.authority, "GOOGLE");
+          assert.equal(inspected.scoring_authority, "GOOGLE");
+          assert.equal(inspected.execution_gate, "PAUSED");
+          assert.equal(inspected.admission_state, "OPEN");
+          assert.equal(inspected.admission_protocol_enforced, false);
+          assert.equal(inspected.scoring_ingress_enabled, false);
+          assert.equal(inspected.active_closure_id, null);
+          assert.equal(inspected.active_closure_kind, null);
+          assert.equal(inspected.active_closure_status, null);
+          assert.equal(inspected.staged_request_fingerprint, null);
+          assert.equal(inspected.staged_payload_hash, null);
+          assert.equal(inspected.staged_certification_fingerprint, null);
+          assert.equal(
+            inspected.staged_environment_delta_fingerprint_v2,
+            null,
+          );
+          assert.equal(inspected.v2_unresolved, 0);
+          assert.equal(inspected.legacy_unclassified, 0);
+          for (const field of [
+            "active_legacy_writers",
+            "unresolved_legacy_writers",
+            "ambiguous_google_writes",
+            "partial_google_writes",
+            "unresolved_outbox",
+            "unresolved_archive",
+          ]) {
+            assert.equal(
+              inspected[field],
+              0,
+              `${field} must be the authoritative dormant integer zero`,
+            );
+            assert.equal(Number.isInteger(inspected[field]), true);
+          }
+          assert.equal(
+            inspected.first_supabase_canonical_write_possible,
+            false,
+          );
+          assert.equal(
+            inspected.first_supabase_canonical_write_observed,
+            false,
+          );
+          assert.equal(
+            inspected.external_google_writer_fence_centrally_enforced,
+            false,
+          );
+          assert.match(
+            inspected.admission_generation_id,
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+          );
+          assert.ok(Number.isSafeInteger(Number(inspected.admission_revision)));
+          assert.ok(Date.parse(inspected.captured_at));
+
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "inspect_production_scoring_admission",
+              { ...scope, project_ref: "idgigvjjqkfbqjeredpb" },
+            ),
+            /PRODUCTION_RESOURCE_ASSERTION_FAILED/,
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select pg_catalog.has_function_privilege(
+                'anon', function_value.oid, 'EXECUTE'
+              )::text || '|' ||
+                pg_catalog.has_function_privilege(
+                  'authenticated', function_value.oid, 'EXECUTE'
+                )::text || '|' ||
+                pg_catalog.has_function_privilege(
+                  'service_role', function_value.oid, 'EXECUTE'
+                )::text || '|' || function_value.prosecdef::text || '|' ||
+                (function_value.proconfig @>
+                  array['search_path=pg_catalog'])::text
+              from pg_catalog.pg_proc function_value
+              join pg_catalog.pg_namespace namespace_value
+                on namespace_value.oid = function_value.pronamespace
+              where namespace_value.nspname = 'public'
+                and function_value.proname =
+                  'inspect_production_scoring_admission';
+            `),
+            "false|false|true|true|true",
+          );
+          assert.equal(productionAuthorityState(), before);
+          assert.equal(operationalRowCounts(), rowCountsBefore);
+        },
+      );
+
+      await t.test(
+        "migration 038 atomically binds immutable staged provenance and permits exact replay",
+        () => {
+          const database = cloneDormantDatabase(
+            "migration_038_staged_provenance",
+          );
+          certifySuccessfulRehearsal(
+            cluster,
+            database,
+            "migration-038-staged-provenance-rehearsal",
+          );
+          const dormant = state(cluster, database);
+          const stageInput = {
+            ...scope,
+            actor_id: actor,
+            contract_version: "production-cutover-activation-v1",
+            vercel_project: "bagger-inv",
+            canonical_domain: "https://baggerinv.com",
+            tournament_year: 2026,
+            vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+            deployment_commit: deploymentCommit,
+            source_fingerprint: sourceFingerprint,
+            certification_fingerprint: fingerprint(
+              "migration-038-staged-provenance-certification",
+            ),
+            environment_delta_fingerprint_v2: fingerprint(
+              "migration-038-staged-provenance-environment",
+            ),
+            expected_activation_revision: Number(dormant.activation_revision),
+            request_fingerprint: fingerprint(
+              "migration-038-staged-provenance-request",
+            ),
+          };
+          const staged = rpc(
+            cluster,
+            database,
+            "stage_production_cutover_release",
+            stageInput,
+          );
+          assert.equal(staged.code, "PRODUCTION_RELEASE_STAGED");
+          assert.equal(
+            staged.stage_request_fingerprint,
+            stageInput.request_fingerprint,
+          );
+          assert.equal(
+            staged.certification_fingerprint,
+            stageInput.certification_fingerprint,
+          );
+          assert.equal(
+            staged.environment_delta_fingerprint_v2,
+            stageInput.environment_delta_fingerprint_v2,
+          );
+          assert.match(staged.stage_payload_hash, /^[0-9a-f]{64}$/);
+
+          const replay = rpc(
+            cluster,
+            database,
+            "stage_production_cutover_release",
+            stageInput,
+          );
+          assert.equal(replay.idempotent, true);
+          assert.equal(replay.stage_payload_hash, staged.stage_payload_hash);
+
+          const afterStage = state(cluster, database);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "stage_production_cutover_release",
+              {
+                ...stageInput,
+                expected_activation_revision:
+                  Number(afterStage.activation_revision),
+                certification_fingerprint: fingerprint(
+                  "migration-038-recertification-overwrite",
+                ),
+                request_fingerprint: fingerprint(
+                  "migration-038-restage-overwrite",
+                ),
+              },
+            ),
+            /PRODUCTION_STAGE_PROVENANCE_IMMUTABLE/,
+          );
+          const inspected = rpc(
+            cluster,
+            database,
+            "inspect_production_scoring_admission",
+            scope,
+          );
+          assert.equal(
+            inspected.staged_request_fingerprint,
+            stageInput.request_fingerprint,
+          );
+          assert.equal(
+            inspected.staged_payload_hash,
+            staged.stage_payload_hash,
+          );
+          assert.equal(
+            inspected.staged_certification_fingerprint,
+            stageInput.certification_fingerprint,
+          );
+          assert.equal(
+            inspected.staged_environment_delta_fingerprint_v2,
+            stageInput.environment_delta_fingerprint_v2,
+          );
+
+          psql(cluster, database, `
+            update production_control.cutover_activation_state
+            set state = 'ROLLED_BACK',
+                activation_revision = activation_revision + 1
+            where scope_key = 'BAGGER_INV_PRODUCTION';
+          `);
+          const rolledBack = state(cluster, database);
+          assert.equal(rolledBack.activation_state, "ROLLED_BACK");
+          assert.equal(
+            rolledBack.staged_certification_fingerprint,
+            stageInput.certification_fingerprint,
+          );
+          const replayAfterRollback = rpc(
+            cluster,
+            database,
+            "stage_production_cutover_release",
+            stageInput,
+          );
+          assert.equal(replayAfterRollback.idempotent, true);
+          assert.equal(
+            replayAfterRollback.stage_payload_hash,
+            staged.stage_payload_hash,
+          );
+          assert.equal(state(cluster, database).activation_state, "ROLLED_BACK");
+
+          const restageInput = {
+            ...stageInput,
+            expected_activation_revision:
+              Number(rolledBack.activation_revision),
+            certification_fingerprint: fingerprint(
+              "migration-038-restage-certification",
+            ),
+            environment_delta_fingerprint_v2: fingerprint(
+              "migration-038-restage-environment",
+            ),
+            request_fingerprint: fingerprint(
+              "migration-038-restage-request",
+            ),
+          };
+          const restaged = rpc(
+            cluster,
+            database,
+            "stage_production_cutover_release",
+            restageInput,
+          );
+          assert.equal(restaged.idempotent, false);
+          assert.equal(
+            restaged.certification_fingerprint,
+            restageInput.certification_fingerprint,
+          );
+          assert.notEqual(
+            restaged.stage_payload_hash,
+            staged.stage_payload_hash,
+          );
+
+          psql(cluster, database, `
+            update production_control.cutover_activation_state
+            set state = 'DORMANT',
+                activation_revision = activation_revision + 1,
+                expected_deployment_commit = null,
+                expected_vercel_project_id = null,
+                expected_source_fingerprint = null
+            where scope_key = 'BAGGER_INV_PRODUCTION';
+          `);
+          const reset = state(cluster, database);
+          assert.equal(reset.activation_state, "DORMANT");
+          assert.equal(reset.staged_request_fingerprint, null);
+          assert.equal(reset.staged_payload_hash, null);
+          assert.equal(reset.staged_certification_fingerprint, null);
+          assert.equal(
+            reset.staged_environment_delta_fingerprint_v2,
+            null,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 038 rejects missing, tampered, and colliding 68c81de reviewed tuples",
+        () => {
+          const database = cloneDormantDatabase(
+            "inventory_038_68c81de_negative_cases",
+          );
+          const reviewed68c81de = reviewedPostCapturePreviewDeployments.find(
+            (tuple) => tuple[0] === reviewed68c81deDeployment[0],
+          );
+          assert.deepEqual(reviewed68c81de, reviewed68c81deDeployment);
+          const expectedFailure =
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/;
+
+          const missing68c81de = liveOriginInventoryFor("PREVIEW").filter(
+            (tuple) => tuple[0] !== reviewed68c81de[0],
+          );
+          assert.equal(missing68c81de.length, 1147);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              missing68c81de,
+            ),
+            expectedFailure,
+          );
+
+          const tampered68c81de = sortLiveOriginInventory(
+            liveOriginInventoryFor("PREVIEW").map((tuple) =>
+              tuple[0] === reviewed68c81de[0]
+                ? [tuple[0], "f".repeat(40), ...tuple.slice(2)]
+                : tuple
+            ),
+          );
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              tampered68c81de,
+            ),
+            expectedFailure,
+          );
+
+          const colliding68c81deId = liveOriginInventoryFor("PREVIEW", [[
+            reviewed68c81de[0],
+            candidateIdentity.commit,
+            "https://reviewed-68c81de-id-collision.vercel.app",
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              colliding68c81deId,
+            ),
+            expectedFailure,
+          );
+
+          const colliding68c81deOrigin = liveOriginInventoryFor("PREVIEW", [[
+            "dpl_68c81deReviewedOriginCollision123",
+            candidateIdentity.commit,
+            reviewed68c81de[2],
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              colliding68c81deOrigin,
+            ),
+            expectedFailure,
+          );
+
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveOriginInventoryFor("PREVIEW"),
+              { candidateDeploymentId: reviewed68c81de[0] },
+            ),
+            expectedFailure,
+          );
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveOriginInventoryFor("PREVIEW"),
+              { candidateImmutableOrigin: reviewed68c81de[2] },
+            ),
+            expectedFailure,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 038 transitively rejects missing, tampered, and colliding b6 reviewed tuples",
         () => {
           const database = cloneDormantDatabase("inventory_037_b6_negative_cases");
           const reviewedB6 = reviewedPostCapturePreviewDeployments.find(
@@ -2270,7 +2888,7 @@ test(
           const missingB6 = liveOriginInventoryFor("PREVIEW").filter(
             (tuple) => tuple[0] !== reviewedB6[0],
           );
-          assert.equal(missingB6.length, 1146);
+          assert.equal(missingB6.length, 1147);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(cluster, database, missingB6),
             expectedFailure,
@@ -2327,14 +2945,14 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects an inventory missing a reviewed deployment tuple",
+        "migration 038 rejects an inventory missing a reviewed deployment tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_036_missing_reviewed");
+          const database = cloneDormantDatabase("inventory_038_missing_reviewed");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = liveOriginInventoryFor("PREVIEW").filter(
             (record) => record[0] !== reviewed[0],
           );
-          assert.equal(liveInventory.length, 1146);
+          assert.equal(liveInventory.length, 1147);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2347,9 +2965,9 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects a tampered reviewed deployment tuple",
+        "migration 038 rejects a tampered reviewed deployment tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_036_tampered_reviewed");
+          const database = cloneDormantDatabase("inventory_038_tampered_reviewed");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = sortLiveOriginInventory(
             liveOriginInventoryFor("PREVIEW").map((record) =>
@@ -2370,15 +2988,15 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects a duplicate reviewed tuple",
+        "migration 038 rejects a duplicate reviewed tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_036_duplicate_tuple");
+          const database = cloneDormantDatabase("inventory_038_duplicate_tuple");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = sortLiveOriginInventory([
             ...liveOriginInventoryFor("PREVIEW"),
             [...reviewed],
           ]);
-          assert.equal(liveInventory.length, 1148);
+          assert.equal(liveInventory.length, 1149);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2391,9 +3009,9 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects a reviewed deployment ID reused by a new origin",
+        "migration 038 rejects a reviewed deployment ID reused by a new origin",
         () => {
-          const database = cloneDormantDatabase("inventory_036_duplicate_id");
+          const database = cloneDormantDatabase("inventory_038_duplicate_id");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = liveOriginInventoryFor("PREVIEW", [[
             reviewed[0],
@@ -2415,9 +3033,9 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects a reviewed origin reused by a new deployment ID",
+        "migration 038 rejects a reviewed origin reused by a new deployment ID",
         () => {
-          const database = cloneDormantDatabase("inventory_036_duplicate_origin");
+          const database = cloneDormantDatabase("inventory_038_duplicate_origin");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = liveOriginInventoryFor("PREVIEW", [[
             "dpl_ReviewedOriginReuse123",
@@ -2439,9 +3057,9 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects a dynamic candidate colliding with a reviewed deployment ID",
+        "migration 038 rejects a dynamic candidate colliding with a reviewed deployment ID",
         () => {
-          const database = cloneDormantDatabase("inventory_036_candidate_id_collision");
+          const database = cloneDormantDatabase("inventory_038_candidate_id_collision");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const collidingCandidateOrigin =
             "https://candidate-id-collision-sandbagger-invitational.vercel.app";
@@ -2473,9 +3091,9 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects a dynamic candidate colliding with a reviewed origin",
+        "migration 038 rejects a dynamic candidate colliding with a reviewed origin",
         () => {
-          const database = cloneDormantDatabase("inventory_036_candidate_origin_collision");
+          const database = cloneDormantDatabase("inventory_038_candidate_origin_collision");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const collidingCandidateId = "dpl_DynamicCandidateOrigin123";
           const liveInventory = sortLiveOriginInventory([
@@ -2506,10 +3124,10 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects an exact reviewed tuple reused as the dynamic candidate",
+        "migration 038 rejects an exact reviewed tuple reused as the dynamic candidate",
         () => {
           const database = cloneDormantDatabase(
-            "inventory_036_exact_reviewed_candidate_collision",
+            "inventory_038_exact_reviewed_candidate_collision",
           );
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = sortLiveOriginInventory([
@@ -2524,7 +3142,7 @@ test(
               "GIT",
             ],
           ]);
-          assert.equal(liveInventory.length, 1147);
+          assert.equal(liveInventory.length, 1148);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2542,10 +3160,10 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects an exact retained tuple reused as the dynamic candidate",
+        "migration 038 rejects an exact retained tuple reused as the dynamic candidate",
         () => {
           const database = cloneDormantDatabase(
-            "inventory_036_exact_retained_candidate_collision",
+            "inventory_038_exact_retained_candidate_collision",
           );
           const retainedCandidate = originInventory.find((record) =>
             record[3] === "FEATURE_PREVIEW" && record[4] === "READY" &&
@@ -2564,7 +3182,7 @@ test(
               "GIT",
             ],
           ]);
-          assert.equal(liveInventory.length, 1147);
+          assert.equal(liveInventory.length, 1148);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2582,9 +3200,9 @@ test(
       );
 
       await t.test(
-        "migration 037 rejects an unreviewed post-capture deployment with a different SHA",
+        "migration 038 rejects an unreviewed post-capture deployment with a different SHA",
         () => {
-          const database = cloneDormantDatabase("inventory_036_different_sha");
+          const database = cloneDormantDatabase("inventory_038_different_sha");
           const liveInventory = liveOriginInventoryFor("PREVIEW", [[
             "dpl_UnreviewedDifferentSha123",
             "abcdef1234567890abcdef1234567890abcdef12",
@@ -3822,7 +4440,7 @@ test(
             "READY",
             "GIT",
           ]]);
-          assert.equal(driftedLiveInventory.length, 1148);
+          assert.equal(driftedLiveInventory.length, 1149);
           const finalizeInput = {
             ...beginInput,
             evidence_id: draining.evidence_id,
@@ -3913,6 +4531,12 @@ test(
                 vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
                 deployment_commit: deploymentCommit,
                 source_fingerprint: sourceFingerprint,
+                certification_fingerprint: fingerprint(
+                  "rehearsal-stage-blocked-certification",
+                ),
+                environment_delta_fingerprint_v2: fingerprint(
+                  "rehearsal-stage-blocked-environment",
+                ),
                 expected_activation_revision:
                   Number(dormant.activation_revision),
                 request_fingerprint: fingerprint("rehearsal-stage-blocked"),
@@ -4208,6 +4832,12 @@ test(
                 vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
                 deployment_commit: deploymentCommit,
                 source_fingerprint: sourceFingerprint,
+                certification_fingerprint: fingerprint(
+                  "restored-failed-stage-certification",
+                ),
+                environment_delta_fingerprint_v2: fingerprint(
+                  "restored-failed-stage-environment",
+                ),
                 expected_activation_revision:
                   Number(dormant.activation_revision),
                 request_fingerprint: fingerprint(

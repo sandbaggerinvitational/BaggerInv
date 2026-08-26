@@ -39,7 +39,7 @@
     "credentialConfinementRecordsFingerprint": "c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508",
     "credentialConfinementEvidenceFingerprint": "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
     "executionBundleFingerprintV2": "__STEP12_EXECUTION_BUNDLE_FINGERPRINT_V2__",
-    "migrationName": "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+    "migrationName": "202608260038_production_provider_preview_target_inventory_v4.sql",
     "migrationSha256": "__STEP11_6_MIGRATION_SHA256__",
     "runbook": "docs/step12-production-cutover-runbook-v2.md"
   },
@@ -215,6 +215,10 @@
     "activationState": "DORMANT",
     "activationRevision": 11,
     "authorityGeneration": "40af69bd-f6eb-4974-a2fe-2dcf91a261c3",
+    "stagedRequestFingerprint": null,
+    "stagedPayloadHash": null,
+    "stagedCertificationFingerprint": null,
+    "stagedEnvironmentDeltaFingerprintV2": null,
     "scoringAuthority": "GOOGLE",
     "participantIdentityAuthority": "PASSPORT",
     "admissionState": "OPEN",
@@ -301,6 +305,7 @@
     "odds-runtime": "__UUID__"
   },
   "operationInputs": {
+    "inspect-scoring-admission": {},
     "issue-begin-provider-attestation-challenge": {},
     "inspect-begin-provider-attestation-challenge": {},
     "issue-finalize-provider-attestation-challenge": {},

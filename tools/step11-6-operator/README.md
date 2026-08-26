@@ -33,7 +33,9 @@ secrets in that file.
 ```sh
 node tools/step11-6-operator/operator.mjs validate --manifest ./step12-v2.json
 node tools/step11-6-operator/operator.mjs readiness --manifest ./step12-v2.json
+node tools/step11-6-operator/operator.mjs fingerprint --manifest ./step12-v2.json
 node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect-scoring-admission
 node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation stage-release
 node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation read-cutover
 node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation identity
@@ -53,6 +55,53 @@ node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --
 node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation capture-final-google-fingerprint
 node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation finalize-legacy-closed
 ```
+
+`inspect-scoring-admission` is an owner-authorization-exempt, service-only,
+read-only diagnostic envelope for
+`inspect_production_scoring_admission`. It carries only the exact Production
+project URL/ref, workbook, tournament, and environment scope. It has no actor,
+stable mutation request ID, or optimistic write fields. Map its authoritative
+response into the sanitized manifest as follows; do not infer these values from
+an application deployment or browser session.
+
+| RPC response field | Manifest/diagnostic use |
+|---|---|
+| `ok`, `contract_version` | Require `ok=true`; retain the exact admission contract version as evidence |
+| `activation_state` | `state.activationState` |
+| `activation_revision` | `state.activationRevision` |
+| `authority_generation_id` | `state.authorityGeneration` |
+| `staged_request_fingerprint`, `staged_payload_hash` | `state.stagedRequestFingerprint`, `state.stagedPayloadHash` |
+| `staged_certification_fingerprint` | `state.stagedCertificationFingerprint` |
+| `staged_environment_delta_fingerprint_v2` | `state.stagedEnvironmentDeltaFingerprintV2` |
+| `scoring_authority` (`authority` is its compatibility alias) | `state.scoringAuthority` |
+| `scoring_ingress_enabled` | `state.scoringIngressEnabled` |
+| `execution_gate` | `state.gateExecutionState` |
+| `admission_state` | `state.admissionState` |
+| `admission_protocol_enforced` | `state.admissionProtocolEnforced` |
+| `admission_generation_id` | `state.admissionGeneration` |
+| `admission_revision` | `state.admissionRevision` |
+| `admission_deployment_id` (`deployment_id` is its compatibility alias) | `state.admissionDeploymentId` |
+| `active_closure_id`, `active_closure_kind` | `state.activeClosureId`, `state.activeClosureKind` |
+| `active_closure_status` | `state.activeClosureStatus` |
+| `external_fence_evidence_id` | `state.externalFenceEvidenceId` / exact external-fence receipt |
+| `active_legacy_writers` | `state.activeLegacyWriters` |
+| `unresolved_legacy_writers` | `state.unresolvedLegacyWriters` |
+| `ambiguous_google_writes` | `state.ambiguousGoogleWrites` |
+| `partial_google_writes` | `state.partialGoogleWrites` |
+| `legacy_unclassified` | `state.legacyUnclassifiedWriters` |
+| `v2_unresolved` | Aggregate v2 unresolved diagnostic; retain it as cross-check evidence and do not substitute it for any exact count above |
+| `unresolved_outbox`, `unresolved_archive` | `state.unresolvedOutbox`, `state.unresolvedArchive` |
+| `lease_set_fingerprint` | Current diagnostic lease-set evidence; it is not a substitute for the finalized closure boundary |
+| `first_supabase_canonical_write_possible` | `state.firstSupabaseCanonicalWritePossible` |
+| `first_supabase_canonical_write_observed` | `state.firstSupabaseCanonicalWriteObserved` |
+| `first_supabase_canonical_write_possible_at`, `first_supabase_canonical_write_observed_at` | Preserve as timestamp evidence; never infer the booleans from participant reports |
+| `active_closure_high_watermark` | Drain/high-watermark evidence for the exact active closure |
+| `external_google_writer_fence_centrally_enforced` | Diagnostic only; the durable provider-fence proof remains separately required |
+| `captured_at` | Authoritative snapshot timestamp |
+
+The database activation revision/generations and this protected diagnostic are
+the authority for current state. The manifest is a sanitized local projection,
+not a source of truth.
 
 The challenge response is the only attester request source. Do not create or
 edit a challenge nonce locally. Install the persistent signer once, store its
@@ -145,8 +194,14 @@ the zero-unresolved predicates.
 
 ## Step 12 environment delta v2
 
-The environment delta **did change** for the hardened contract. Six non-secret
-variables are now declared in `.env.example`, disabled/blank by default:
+The final Step 11.6 reproducibility/diagnostics patch adds **zero new
+environment variables**. Its deterministic environment-delta material records
+`newEnvironmentVariables: []` and binds the exact Production resources,
+release identity, provider-control constants, retained inventory and credential-
+confinement evidence, and migration name/SHA. The following six non-secret
+provider controls were already part of the hardened contract and remain
+disabled/blank by default in `.env.example`; they are existing bindings, not
+new additions in this final delta:
 
 - `PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_REHEARSAL_ENABLED`
 - `PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_EXPECTED_COMMIT_SHA`
@@ -157,12 +212,59 @@ variables are now declared in `.env.example`, disabled/blank by default:
 
 The first pair is candidate-only Step 11.6 evidence, the middle pair pins the
 local signer and Vercel team, and the final pair is the separate Step 12
-persistent-fence gate and exact-SHA binding. No credential or secret value was
-added; the Step 12 environment-delta fingerprint must be regenerated from this
-v2 declaration. The Ed25519 private key remains only in the authorized new
-Mac's exact macOS Keychain item. The resulting bundle binds the public signer
+persistent-fence gate and exact-SHA binding. No credential or secret value is
+fingerprinted. The Ed25519 private key remains only in the authorized new Mac's
+exact macOS Keychain item. The material instead binds the public signer
 fingerprint, exact Vercel team, signed redacted environment-scope fingerprint,
-and credential-confinement evidence fingerprint.
+credential-confinement evidence fingerprint, and additive migration
+`202608260038_production_provider_preview_target_inventory_v4.sql` with exact
+SHA-256
+`32cc5994570aaa77679b19e14a71a917dcc7fe297bc559ebe82dd320bff94c4c`.
+
+## Fingerprint dependency and lifecycle
+
+The `fingerprint` command returns these claims in dependency order:
+
+1. `environmentDeltaFingerprintV2`, computed independently of all fingerprint
+   claims;
+2. `certificationFingerprint`, computed for the final DORMANT Step 11.6
+   snapshot using the computed environment fingerprint and the exact
+   `certification`, restored rehearsal, quiesce, state, resources, and release
+   material, excluding its own claim and the execution claim; and
+3. `executionBundleFingerprintV2`, computed after injecting the first two
+   claims into the manifest material.
+
+At DORMANT readiness and `stage-release`, all three claims must exactly match
+their computed material. The mutable
+`execution.step12OwnerAuthorizationRecorded` flag is excluded from every
+fingerprint: recording the later explicit Step 12 authorization does not alter
+the certified bytes, although mutating payloads still refuse while the flag is
+false.
+
+After `stage-release`, preserve `environmentDeltaFingerprintV2` and
+`certificationFingerprint` byte-for-byte as the historical claims bound by the
+stage transaction. Final DORMANT readiness and the stage payload require the
+four protected `state.staged*` provenance fields to be null. The database
+atomically stores the stage request fingerprint, payload hash, certification
+fingerprint, and environment-delta fingerprint in protected activation state.
+After stage, hydrate `state.stagedRequestFingerprint`, `state.stagedPayloadHash`,
+`state.stagedCertificationFingerprint`, and
+`state.stagedEnvironmentDeltaFingerprintV2` directly from
+`inspect_production_scoring_admission`. The operator rejects every non-DORMANT
+manifest without all four fields and rejects any later certification or
+environment claim that differs from the protected database values.
+
+Update state/evidence only from protected diagnostics and durable receipts, then
+run `fingerprint` and replace only
+`executionBundleFingerprintV2`. In a non-DORMANT manifest the command carries
+the historical certification claim forward rather than recertifying mutable
+cutover state. Every non-diagnostic envelope verifies the exact environment
+claim and current execution material; `stage-release` additionally recomputes
+and verifies the DORMANT certification material. Operation inputs may neither
+override the stage claims nor carry them into later RPCs. If immutable release,
+resource, provider, migration, certification, or rehearsal material changes,
+stop and perform explicit recertification; do not call it a routine execution
+rebind.
 
 Migrations `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
 and `202608260037_production_provider_rpc_name_and_inventory_v3.sql` together
@@ -193,13 +295,17 @@ Step 11 candidate, nine provider-resolved CLI SHAs, one provider-proven
 non-executable blocked deployment with a null SHA, scope/status semantics,
 and credential-capability sets. The operator revalidates only its repository
 binding and refuses caller-supplied origin matrices/fingerprints. The control
-route loads the artifact server-side and additionally requires the six exact
+route loads the artifact server-side and additionally requires the seven exact
 reviewed post-capture Preview deployments pinned by additive migrations
 `202608260035_production_reviewed_post_capture_preview_deployments.sql` and
 `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
-plus `202608260037_production_provider_rpc_name_and_inventory_v3.sql`. Their
+plus `202608260037_production_provider_rpc_name_and_inventory_v3.sql` and
+`202608260038_production_provider_preview_target_inventory_v4.sql`. Their
 ordered tuple-set fingerprint is
-`2a0f75de0e4f2178c03cb98f8adb264b3f661b28025b51a70b29800aa30b5724`.
+`91cdd7ab6fc077cb422c4b8921a0ac431ddf38f043167c457cc7ad4cc288a01a`.
+The provider reader binds Vercel v6's exact Preview encoding: a Preview
+deployment has an explicit JSON `target: null`; a missing target or a non-null
+target is not silently classified as `FEATURE_PREVIEW`.
 Only provider-signed same-current-SHA deployments in the target-appropriate
 scope may extend that required set; all other additions fail closed. The route
 then adds four fixed aliases and the current candidate alias. If the signed
@@ -211,12 +317,12 @@ historical/candidate writer routes plus `DELETE /api/tournament-guide`. It
 writes the immutable inventory and compact per-origin nine-vector proofs to the
 durable RPCs. The database validates the exact signed live origin set, coverage
 mask, ordered per-vector proof fingerprints, and dynamically derived logical
-origin×vector expansion. The minimum Step 11.6 signed live inventory is 1,147
-immutable origins (1,140 retained + 6 reviewed + 1 exact dynamic candidate),
-which produces 1,152 probed origins and 10,368 requests per snapshot after the
+origin×vector expansion. The minimum Step 11.6 signed live inventory is 1,148
+immutable origins (1,140 retained + 7 reviewed + 1 exact dynamic candidate),
+which produces 1,153 probed origins and 10,377 requests per snapshot after the
 five fixed/candidate aliases. A normal Step 12 Preview-plus-Production candidate
-pair adds at least one more same-SHA immutable origin, producing at least 1,153
-probed origins and 10,377 requests. The provider-signed inventory and durable
+pair adds at least one more same-SHA immutable origin, producing at least 1,154
+probed origins and 10,386 requests. The provider-signed inventory and durable
 receipt remain authoritative when additional exact same-SHA redeploys exist.
 
 The five alias entries are fixed diagnostic canaries, not a claim that Vercel
@@ -308,6 +414,15 @@ Google fence/verification records. `providerFenceProof` is the DB-derived
 external evidence record that binds those three durable IDs. A restored DORMANT
 rehearsal must never be treated as an installed cutover fence.
 
+Final DORMANT readiness is deliberately stricter than forward Step 12 state.
+It requires `providerFenceRehearsal.restoredFingerprint` to equal the exact
+`baselineFingerprint`, retained `providerQuiesceEvidence.status=VERIFIED`,
+`persistentProviderFence.status=MISSING|REMOVED` with `protectionCount=0`, and
+`providerFenceProof.status=MISSING`. `stage-release` enforces the same
+non-impact predicates before it can render a payload. The active persistent
+fence and its DB proof are installed only after stage at the certified forward
+cutover checkpoint; they are never valid evidence for a Step 11.6 DORMANT PASS.
+
 Every mutating operation uses a stable, pre-recorded request UUID from
 `stableRequestIds`. The request fingerprint is deterministic over the complete
 payload. Save the generated envelope and retry it byte-for-byte after a lost
@@ -318,7 +433,9 @@ operation.
 computed project/workbook/deployment, revision/generation, closure/epoch,
 authority, evidence, or fingerprint bindings. Repeating one of those fields is
 accepted only when its canonical JSON value is exactly equal to the computed
-value; any differing value fails closed.
+value; any differing value fails closed. Only `stage-release` carries the
+historical certification/environment claims. Later operation inputs reject
+those fields entirely.
 
 ## Inertness and authorization
 
@@ -331,7 +448,9 @@ value; any differing value fails closed.
 - SQL envelopes are review artifacts, not executed commands.
 - Set `execution.step12OwnerAuthorizationRecorded=true` only after the new,
   explicit Step 12 owner authorization. Every mutating payload refuses without
-  it. Read-only inspect/capture payloads remain available for diagnosis.
+  it. The scope-only `inspect` and `inspect-scoring-admission` diagnostics, the
+  protected provider inspections, and read-only capture artifacts remain
+  available according to their own guards.
 
 The template intentionally evaluates not ready. Readiness remains false until
 all of the following are populated and mutually consistent:

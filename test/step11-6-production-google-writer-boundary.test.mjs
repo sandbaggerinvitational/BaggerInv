@@ -115,6 +115,55 @@ test("Production Google writer inventory classifies every callable workbook writ
   assert.deepEqual(findings, [], `Unclassified Google canonical writers: ${JSON.stringify(findings)}`);
 });
 
+test("server-only admission capabilities and generic low-level scopes have a closed import surface", async () => {
+  const files = [...await javascriptFiles("app"), ...await javascriptFiles("lib")];
+  const capabilityImporters = [];
+  const genericIntentImporters = [];
+  const prepareImporters = [];
+  const canonicalCredentialLiteralFiles = [];
+  const subordinateCanonicalWriterImporters = [];
+  for (const relative of files) {
+    if (relative === "lib/production-google-admission-capability.js") continue;
+    const source = await read(relative);
+    if (source.includes("production-google-admission-capability.js")) capabilityImporters.push(relative);
+    if (/import\s*\{[^}]*\bwithGoogleWorkbookMutationIntent\b[^}]*\}\s*from\s*["'][^"']*google-workbook-mutation-intent\.js["']/s.test(source)) {
+      genericIntentImporters.push(relative);
+    }
+    if (/import\s*\{[^}]*\bprepareGoogleWorkbookMutation\b[^}]*\}\s*from\s*["'][^"']*google-workbook-mutation-intent\.js["']/s.test(source)) {
+      prepareImporters.push(relative);
+    }
+    if (/["']CANONICAL_LEGACY_V2["']/.test(source)) canonicalCredentialLiteralFiles.push(relative);
+    if (/import\s*\{[^}]*(?:synchronizeNetSkinsResults|publishOfficialCalcutta)[^}]*\}\s*from\s*["'][^"']*google-sheets-write\.js["']/s.test(source)) {
+      subordinateCanonicalWriterImporters.push(relative);
+    }
+  }
+  assert.deepEqual(capabilityImporters.sort(), [
+    "lib/google-workbook-mutation-intent.js",
+    "lib/production-cutover-scoring-ingress.js",
+  ]);
+  const ingress = await read("lib/production-cutover-scoring-ingress.js");
+  const intent = await read("lib/google-workbook-mutation-intent.js");
+  assert.match(ingress, /import\s*\{[^}]*registerProductionGoogleAdmissionCapability[^}]*revokeProductionGoogleAdmissionCapability[^}]*\}\s*from\s*["']\.\/production-google-admission-capability\.js["']/s);
+  assert.doesNotMatch(ingress, /import\s*\(\s*["']\.\/production-google-admission-capability\.js["']\s*\)/);
+  assert.match(intent, /import\s*\(\s*["']\.\/production-google-admission-capability\.js["']\s*\)/);
+  assert.doesNotMatch(intent, /from\s*["']\.\/production-google-admission-capability\.js["']/);
+  for (const source of [ingress, intent]) {
+    assert.doesNotMatch(source, /export\s+(?:\*|\{[^}]*\})\s+from\s+["'][^"']*production-google-admission-capability\.js["']/s);
+  }
+  assert.deepEqual(genericIntentImporters.sort(), [
+    "lib/google-service-account-credential-context.js",
+    "lib/production-cutover-scoring-ingress.js",
+    "lib/production-google-authoring.js",
+  ]);
+  assert.deepEqual(prepareImporters, ["lib/google-sheets-write.js"]);
+  assert.deepEqual(canonicalCredentialLiteralFiles.sort(), [
+    "lib/google-service-account-credential-context.js",
+    "lib/google-sheets-write.js",
+    "lib/production-cutover-scoring-ingress.js",
+  ]);
+  assert.deepEqual(subordinateCanonicalWriterImporters, []);
+});
+
 test("inventory and route sources preserve distinct canonical, authoring, and mirror/archive intents", async () => {
   const [inventory, cms, guide, odds, passport, outbox, archive, oddsMirror] = await Promise.all([
     read("lib/production-google-writer-inventory.js"),
@@ -170,8 +219,11 @@ test("the sole low-level Sheets transport enforces intent before credentials or 
   assert.doesNotMatch(fenceRehearsal, /updateCells|values:batchUpdate|deleteSheet|updateSheetProperties/);
   const guardIndex = writer.indexOf("await prepareGoogleWorkbookMutation");
   const credentialIndex = writer.indexOf("token = await accessToken", guardIndex);
+  const dispatchGuardIndex = writer.indexOf("mutation?.assertDispatch?.()", credentialIndex);
   const fetchIndex = writer.indexOf("await fetch(`${target.apiBase}", guardIndex);
-  assert.ok(guardIndex >= 0 && credentialIndex > guardIndex && fetchIndex > credentialIndex);
+  assert.ok(guardIndex >= 0 && credentialIndex > guardIndex && dispatchGuardIndex > credentialIndex &&
+    fetchIndex > dispatchGuardIndex);
+  assert.match(writer, /assertProductionGoogleServiceAccountMutationBinding/);
   assert.match(intent, /PRODUCTION_GOOGLE_MUTATION_INTENT_REQUIRED/);
   assert.match(intent, /PRODUCTION_GOOGLE_MUTATION_SHEET_REQUIRED/);
   assert.match(intent, /PRODUCTION_GOOGLE_MUTATION_SHEET_NOT_ALLOWED/);
@@ -241,6 +293,7 @@ test("v2 admission fails closed and uses the separate Production credential", ()
     }) };
     const calls = [];
     let nonce = "";
+    let dispatchGuard;
     const fetchImpl = async (url, init) => {
       const functionName = url.split("/").at(-1);
       const input = JSON.parse(init.body).input;
@@ -263,13 +316,19 @@ test("v2 admission fails closed and uses the separate Production credential", ()
         authorityGeneration, admissionGeneration, activationRevision: 11, admissionRevision: 7,
         deploymentId: env.VERCEL_DEPLOYMENT_ID, deploymentCommit: commit }, request }, async () => {
         const credential = googleServiceAccountCredentialDiagnostics();
-        await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"], env });
+        const first = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"], env });
+        first.assertDispatch();
+        const second = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Matches"], env });
+        second.assertDispatch();
+        dispatchGuard = second.assertDispatch;
         confirmGoogleWorkbookMutation();
         certifyGoogleWorkbookMutationReadback({ proofType: "TEST_SCORE", before: { revision: 1 },
           expectedAfter: { revision: 2 }, providerReadback: { revision: 2 } });
         return { credentialSource: credential.credentialSource, operation: credential.operation };
       }, { env, fetchImpl });
-    process.stdout.write(JSON.stringify({ result, calls, nonce }));
+    let postWrapperDispatch;
+    try { dispatchGuard(); } catch (error) { postWrapperDispatch = error.code; }
+    process.stdout.write(JSON.stringify({ result, calls, nonce, postWrapperDispatch }));
   `;
   const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
     cwd: root,
@@ -288,6 +347,7 @@ test("v2 admission fails closed and uses the separate Production credential", ()
   assert.equal(evidence.calls[1].input.writer_intent, "CANONICAL_LEGACY");
   assert.equal(evidence.calls[2].input.lease_nonce, evidence.nonce);
   assert.equal(evidence.calls[3].input.outcome_state, "CONFIRMED_WRITE");
+  assert.equal(evidence.postWrapperDispatch, "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REVOKED");
   assert.match(evidence.calls[3].input.provider_before_fingerprint, /^[0-9a-f]{64}$/);
   assert.equal(evidence.calls[3].input.provider_after_fingerprint,
     evidence.calls[3].input.provider_readback_fingerprint);
@@ -547,6 +607,141 @@ test("low-level Production writes reject absent intent and canonical admission b
   ]);
 });
 
+test("canonical admission capability rejects clone, replay, drift, marker failure, and post-wrapper dispatch", () => {
+  const capabilityUrl = new URL("../lib/production-google-admission-capability.js", import.meta.url).href;
+  const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
+  const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
+  const script = `
+    import {
+      registerProductionGoogleAdmissionCapability,
+      revokeProductionGoogleAdmissionCapability,
+    } from ${JSON.stringify(capabilityUrl)};
+    import {
+      GOOGLE_WORKBOOK_MUTATION_INTENTS,
+      prepareGoogleWorkbookMutation,
+      withGoogleWorkbookMutationIntent,
+    } from ${JSON.stringify(intentUrl)};
+    import {
+      PRODUCTION_GOOGLE_WORKBOOK_ID,
+      PRODUCTION_SUPABASE_PROJECT_REF,
+      PRODUCTION_SUPABASE_URL,
+    } from ${JSON.stringify(foundationUrl)};
+    const uuid = (char) => char.repeat(8) + "-" + char.repeat(4) + "-4" + char.repeat(3) +
+      "-8" + char.repeat(3) + "-" + char.repeat(12);
+    function admission(operation = "PARTICIPANT:SCORE") {
+      const deploymentId = "dpl_12345678Test";
+      const commit = "a".repeat(40);
+      const authorityGeneration = uuid("1");
+      const admissionGeneration = uuid("2");
+      const leaseId = uuid("3");
+      const leaseNonce = uuid("4");
+      const operationRequestId = uuid("5");
+      const revisions = { activationRevision: 11, admissionRevision: 7 };
+      const state = { required: true, enabled: true, googleAuthorityRequested: true,
+        exactProductionWorkbook: true, expectedAuthorityGeneration: authorityGeneration,
+        expectedAdmissionGeneration: admissionGeneration, deploymentId, externalFenceEvidenceId: "",
+        activation: { allowed: true, resources: { projectRef: PRODUCTION_SUPABASE_PROJECT_REF,
+          workbookId: PRODUCTION_GOOGLE_WORKBOOK_ID, tournamentId: "2026", commitSha: commit,
+          vercelProjectId: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU" } } };
+      const bound = { environment: "PRODUCTION", project_ref: PRODUCTION_SUPABASE_PROJECT_REF,
+        project_url: PRODUCTION_SUPABASE_URL, source_workbook_id: PRODUCTION_GOOGLE_WORKBOOK_ID,
+        tournament_id: "2026", expected_authority: "GOOGLE", writer_intent: "CANONICAL_LEGACY",
+        expected_authority_generation: authorityGeneration, expected_admission_generation: admissionGeneration,
+        deployment_id: deploymentId, deployment_commit: commit, request_fingerprint: "b".repeat(64),
+        expected_activation_revision: revisions.activationRevision,
+        expected_admission_revision: revisions.admissionRevision, match_id: "2026-R1-1", operation,
+        actor_id: "CB01", lease_seconds: 180, operation_request_id: operationRequestId,
+        lease_nonce: leaseNonce };
+      return Object.freeze({ enabled: true, admissionId: leaseId, leaseId, leaseNonce,
+        providerMutationKey: "c".repeat(64), operationRequestId, state, revisions, bound });
+    }
+    const attempt = (item, operation = item.bound.operation) => withGoogleWorkbookMutationIntent({
+      intent: GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY, operation, admission: item,
+    }, () => prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+      method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Matches"] }));
+    const codes = {};
+    let markerCalls = 0;
+    const valid = admission();
+    registerProductionGoogleAdmissionCapability(valid, async () => { markerCalls += 1; return { ok: true }; });
+    await withGoogleWorkbookMutationIntent({ intent: GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY,
+      operation: valid.bound.operation, admission: valid }, async () => {
+      const first = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+        method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
+      first.assertDispatch();
+      const second = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+        method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
+      second.assertDispatch();
+    });
+    try { await attempt(valid); } catch (error) { codes.replay = error.code; }
+    revokeProductionGoogleAdmissionCapability(valid);
+    try { await attempt(valid); } catch (error) { codes.revoked = error.code; }
+    try { await attempt(admission()); } catch (error) { codes.clone = error.code; }
+
+    const operationMismatch = admission();
+    registerProductionGoogleAdmissionCapability(operationMismatch, async () => ({ ok: true }));
+    try { await attempt(operationMismatch, "PARTICIPANT:CONFIRM"); }
+    catch (error) { codes.operationMismatch = error.code; }
+    revokeProductionGoogleAdmissionCapability(operationMismatch);
+
+    const drift = admission();
+    registerProductionGoogleAdmissionCapability(drift, async () => ({ ok: true }));
+    drift.bound.deployment_commit = "d".repeat(40);
+    try { await attempt(drift); } catch (error) { codes.boundaryDrift = error.code; }
+    revokeProductionGoogleAdmissionCapability(drift);
+
+    const failedMarker = admission();
+    registerProductionGoogleAdmissionCapability(failedMarker, async () => {
+      throw Object.assign(new Error("marker failed"), { code: "TEST_MARKER_FAILED" });
+    });
+    try { await attempt(failedMarker); } catch (error) { codes.markerFailure = error.code; }
+    revokeProductionGoogleAdmissionCapability(failedMarker);
+
+    const rejectedMarker = admission();
+    registerProductionGoogleAdmissionCapability(rejectedMarker, async () => ({ ok: false }));
+    try { await attempt(rejectedMarker); } catch (error) { codes.markerRejected = error.code; }
+    revokeProductionGoogleAdmissionCapability(rejectedMarker);
+
+    const paused = admission();
+    registerProductionGoogleAdmissionCapability(paused, async () => ({ ok: true }));
+    let releaseToken;
+    const tokenPending = new Promise((resolve) => { releaseToken = resolve; });
+    let providerCalls = 0;
+    let detached;
+    await withGoogleWorkbookMutationIntent({ intent: GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY,
+      operation: paused.bound.operation, admission: paused }, async () => {
+      const prepared = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+        method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
+      detached = (async () => {
+        await tokenPending;
+        prepared.assertDispatch();
+        providerCalls += 1;
+      })();
+    });
+    revokeProductionGoogleAdmissionCapability(paused);
+    releaseToken();
+    try { await detached; } catch (error) { codes.pausedBeforeDispatch = error.code; }
+    process.stdout.write(JSON.stringify({ codes, markerCalls, providerCalls }));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: root, encoding: "utf8",
+  });
+  assert.equal(child.status, 0, child.stderr);
+  assert.deepEqual(JSON.parse(child.stdout), {
+    codes: {
+      replay: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REPLAYED",
+      revoked: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REVOKED",
+      clone: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REQUIRED",
+      operationMismatch: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_BOUNDARY_MISMATCH",
+      boundaryDrift: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_BOUNDARY_MISMATCH",
+      markerFailure: "TEST_MARKER_FAILED",
+      markerRejected: "PRODUCTION_CANONICAL_GOOGLE_WRITE_MARKER_REJECTED",
+      pausedBeforeDispatch: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REVOKED",
+    },
+    markerCalls: 1,
+    providerCalls: 0,
+  });
+});
+
 test("low-level Production transport binds each mutation intent and operation to approved sheets", () => {
   const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
   const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
@@ -630,7 +825,7 @@ test("low-level Production transport binds each mutation intent and operation to
     scoringMirror: "OK",
     archive: "OK",
     oddsMirror: "OK",
-    canonical: "OK",
+    canonical: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REQUIRED",
   });
 });
 
@@ -720,6 +915,87 @@ test("canonical, authoring, and mirror policies are distinct and never fall back
     authoring: { allowed: true, authoring: true, mirror: false },
     mirror: { allowed: true, mirror: true },
     fallback: { allowed: false, reason: "production-google-credentials-required", legacyFallback: false },
+  });
+});
+
+test("credential operations are identity-bound to canonical, authoring, and mirror mutation intents", () => {
+  const credentialUrl = new URL("../lib/google-service-account-credential-context.js", import.meta.url).href;
+  const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
+  const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
+  const activationUrl = new URL("../lib/production-cutover-activation-contract.js", import.meta.url).href;
+  const script = `
+    import {
+      assertProductionGoogleServiceAccountMutationBinding,
+      withProductionGoogleServiceAccountCredentials,
+    } from ${JSON.stringify(credentialUrl)};
+    import { GOOGLE_WORKBOOK_MUTATION_INTENTS } from ${JSON.stringify(intentUrl)};
+    import { PRODUCTION_GOOGLE_WORKBOOK_ID, PRODUCTION_SUPABASE_PROJECT_REF, PRODUCTION_SUPABASE_URL } from ${JSON.stringify(foundationUrl)};
+    import { PRODUCTION_VERCEL_PROJECT_ID } from ${JSON.stringify(activationUrl)};
+    const resources = { supabaseProjectRef: PRODUCTION_SUPABASE_PROJECT_REF,
+      supabaseProjectUrl: PRODUCTION_SUPABASE_URL, googleWorkbookId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+      tournamentId: "2026", tournamentYear: 2026, vercelProjectId: PRODUCTION_VERCEL_PROJECT_ID,
+      vercelProjectName: "bagger-inv", canonicalHostname: "baggerinv.com" };
+    const base = { VERCEL_ENV: "production", VERCEL_PROJECT_NAME: "bagger-inv",
+      VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID, PRODUCTION_FOUNDATION_ENABLED: "true",
+      PRODUCTION_SUPABASE_PROJECT_REF, PRODUCTION_SUPABASE_URL, GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID,
+      VERCEL_DEPLOYMENT_ID: "dpl_12345678Test", SCORING_AUTHORITY: "google",
+      PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
+      PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: "11111111-1111-4111-8111-111111111111",
+      PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: "22222222-2222-4222-8222-222222222222",
+      PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+      PRODUCTION_GOOGLE_PRIVATE_KEY: "dedicated-key", GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-v0@example.invalid",
+      GOOGLE_PRIVATE_KEY: "legacy-key" };
+    const C = GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY;
+    const A = GOOGLE_WORKBOOK_MUTATION_INTENTS.AUTHORING;
+    const M = GOOGLE_WORKBOOK_MUTATION_INTENTS.MIRROR_ARCHIVE;
+    const exactAdmission = Object.freeze({ admissionId: "exact" });
+    const clonedAdmission = Object.freeze({ admissionId: "exact" });
+    const attempt = (input) => {
+      try { assertProductionGoogleServiceAccountMutationBinding(input); return "OK"; }
+      catch (error) { return error.code; }
+    };
+    const results = {};
+    await withProductionGoogleServiceAccountCredentials({ env: base, operation: "CANONICAL_LEGACY_V2",
+      resources, canonicalAdmission: exactAdmission }, async () => {
+      results.canonicalExact = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: exactAdmission });
+      results.canonicalClone = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: clonedAdmission });
+      results.canonicalAsAuthoring = attempt({ intent: A, operation: "TOURNAMENT_GUIDE" });
+      results.canonicalAsMirror = attempt({ intent: M, operation: "SCORING_GOOGLE_OUTBOX" });
+    });
+    await withProductionGoogleServiceAccountCredentials({ env: base, operation: "GOOGLE_DIRECTOR_AUTHORING",
+      resources }, async () => {
+      results.authoringExact = attempt({ intent: A, operation: "TOURNAMENT_GUIDE" });
+      results.authoringAsCanonical = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: exactAdmission });
+      results.authoringAsMirror = attempt({ intent: M, operation: "SCORING_GOOGLE_OUTBOX" });
+    });
+    const mirrorEnv = { ...base, SCORING_AUTHORITY: "supabase",
+      SUPABASE_SCORING_MIRROR_URL: PRODUCTION_SUPABASE_URL,
+      PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED: "true" };
+    await withProductionGoogleServiceAccountCredentials({ env: mirrorEnv, operation: "SCORING_GOOGLE_OUTBOX",
+      resources }, async () => {
+      results.mirrorExact = attempt({ intent: M, operation: "SCORING_GOOGLE_OUTBOX" });
+      results.mirrorAsCanonical = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: exactAdmission });
+      results.mirrorAsAuthoring = attempt({ intent: A, operation: "TOURNAMENT_GUIDE" });
+      results.mirrorWrongOperation = attempt({ intent: M, operation: "ROUND_SCORECARDS_ARCHIVE" });
+    });
+    process.stdout.write(JSON.stringify(results));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: root, encoding: "utf8",
+  });
+  assert.equal(child.status, 0, child.stderr);
+  assert.deepEqual(JSON.parse(child.stdout), {
+    canonicalExact: "OK",
+    canonicalClone: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    canonicalAsAuthoring: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    canonicalAsMirror: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    authoringExact: "OK",
+    authoringAsCanonical: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    authoringAsMirror: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    mirrorExact: "OK",
+    mirrorAsCanonical: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    mirrorAsAuthoring: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    mirrorWrongOperation: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
   });
 });
 
