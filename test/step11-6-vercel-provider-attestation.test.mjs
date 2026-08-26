@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
 import { EventEmitter } from "node:events";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -29,6 +30,7 @@ import {
   installKeychainAttestationSigner,
   readKeychainAttestationPrivateKey,
   VERCEL_PROVIDER_ATTESTER_KEYCHAIN_ACCOUNT,
+  VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SECRET_PREFIX,
   VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE,
 } from
   "../tools/step11-6-operator/vercel-provider-attester.mjs";
@@ -514,11 +516,13 @@ test("post-capture additions are limited to the exact certified candidate SHA an
 test("persistent signer is read/installed only through the fixed macOS Keychain item", async () => {
   const pair = keys();
   const privatePem = pair.privateKey.export({ type: "pkcs8", format: "pem" });
+  const storedToken = `${VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SECRET_PREFIX}${
+    Buffer.from(privatePem.trim(), "utf8").toString("base64url")}`;
   const readCalls = [];
   const loaded = await readKeychainAttestationPrivateKey({
     execFileImpl: async (...args) => {
       readCalls.push(args);
-      return { stdout: privatePem };
+      return { stdout: storedToken };
     },
   });
   assert.equal(loaded, privatePem.trim());
@@ -528,22 +532,31 @@ test("persistent signer is read/installed only through the fixed macOS Keychain 
     "-s", VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE,
     "-w",
   ]);
+  assert.equal(readCalls[0][2].timeout, 15_000);
+  assert.equal(readCalls[0][2].killSignal, "SIGKILL");
   assert.ok(!JSON.stringify(readCalls).includes(privatePem));
 
   let installArgs;
-  let stdinSecret;
+  let interactiveStdin = "";
+  let installedToken = "";
+  let readbackCount = 0;
   const installed = await installKeychainAttestationSigner({
     execFileImpl: async () => {
-      const error = new Error("not found");
-      error.code = 44;
-      throw error;
+      readbackCount += 1;
+      if (readbackCount === 1) {
+        const error = new Error("not found");
+        error.code = 44;
+        throw error;
+      }
+      return { stdout: installedToken };
     },
     spawnImpl: (binary, args) => {
       installArgs = { binary, args };
       const child = new EventEmitter();
       child.stdin = {
         end(value) {
-          stdinSecret = value;
+          interactiveStdin = value;
+          installedToken = value.match(/ -w ([A-Za-z0-9_-]+)\nquit\n$/)?.[1] || "";
           queueMicrotask(() => child.emit("exit", 0));
         },
       };
@@ -551,16 +564,26 @@ test("persistent signer is read/installed only through the fixed macOS Keychain 
     },
   });
   assert.equal(installArgs.binary, "/usr/bin/security");
-  assert.equal(installArgs.args.at(-1), "-w");
+  assert.deepEqual(installArgs.args, ["-i"]);
   assert.ok(!JSON.stringify(installArgs).includes("BEGIN PRIVATE KEY"));
-  assert.match(stdinSecret, /BEGIN PRIVATE KEY/);
+  assert.ok(interactiveStdin.startsWith(
+    `add-generic-password -a ${VERCEL_PROVIDER_ATTESTER_KEYCHAIN_ACCOUNT} ` +
+    `-s ${VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE} ` +
+    "-l \"BaggerInv Step 11.6 Vercel provider attester Ed25519 key\" " +
+    "-T /usr/bin/security -w STEP11_6_ED25519_PKCS8_B64_V1_",
+  ));
+  assert.match(interactiveStdin,
+    /^add-generic-password [^\r\n]+ -w STEP11_6_ED25519_PKCS8_B64_V1_[A-Za-z0-9_-]+\nquit\n$/);
+  assert.doesNotMatch(interactiveStdin, /BEGIN PRIVATE KEY| -U(?: |\n)| -A(?: |\n)/);
+  assert.equal(installedToken.startsWith(VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SECRET_PREFIX), true);
+  assert.equal(readbackCount, 2);
   assert.match(installed.publicKeyBase64, /^[A-Za-z0-9+/=]+$/);
   assert.match(installed.signerKeyFingerprint, /^[0-9a-f]{64}$/);
   assert.equal(installed.recovered, false);
 
   let spawnCalled = false;
   const recovered = await installKeychainAttestationSigner({
-    execFileImpl: async () => ({ stdout: privatePem }),
+    execFileImpl: async () => ({ stdout: storedToken }),
     spawnImpl: () => {
       spawnCalled = true;
       throw new Error("must not overwrite");
@@ -571,4 +594,103 @@ test("persistent signer is read/installed only through the fixed macOS Keychain 
   assert.equal(recovered.publicKeyBase64,
     pinnedEd25519PublicKeyBase64(pair.publicKey));
   assert.match(recovered.signerKeyFingerprint, /^[0-9a-f]{64}$/);
+
+  const attesterSource = readFileSync(new URL(
+    "../tools/step11-6-operator/vercel-provider-attester.mjs",
+    import.meta.url,
+  ), "utf8");
+  assert.match(attesterSource, /const KEYCHAIN_READ_TIMEOUT_MS = 15_000/);
+  assert.match(attesterSource, /const KEYCHAIN_ADD_TIMEOUT_MS = 30_000/);
+  assert.match(attesterSource, /child\.kill\("SIGKILL"\)/);
+  assert.match(attesterSource, /timeoutId\.unref\?\.\(\)/);
+  assert.doesNotMatch(attesterSource, /add-generic-password[\s\S]{0,500}"-U"/);
+  assert.doesNotMatch(attesterSource, /add-generic-password[\s\S]{0,500}"-A"/);
+
+  await assert.rejects(() => readKeychainAttestationPrivateKey({
+    execFileImpl: async () => ({ stdout: privatePem }),
+  }), (error) =>
+    error.code === "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_INVALID");
+});
+
+test("Keychain signer install recovers a lost add response and rejects an invalid duplicate", async () => {
+  let storedToken = "";
+  let reads = 0;
+  const recovered = await installKeychainAttestationSigner({
+    execFileImpl: async () => {
+      reads += 1;
+      if (reads === 1) {
+        const error = new Error("not found");
+        error.code = 44;
+        throw error;
+      }
+      return { stdout: storedToken };
+    },
+    spawnImpl: (binary, args) => {
+      assert.equal(binary, "/usr/bin/security");
+      assert.deepEqual(args, ["-i"]);
+      const child = new EventEmitter();
+      child.stdin = {
+        end(value) {
+          storedToken = value.match(/ -w ([A-Za-z0-9_-]+)\nquit\n$/)?.[1] || "";
+          queueMicrotask(() => child.emit("error", new Error("response lost")));
+        },
+      };
+      return child;
+    },
+  });
+  assert.equal(recovered.recovered, false);
+  assert.match(recovered.signerKeyFingerprint, /^[0-9a-f]{64}$/);
+  assert.equal(reads, 2);
+
+  const concurrentPair = keys();
+  const concurrentPem = concurrentPair.privateKey.export({ type: "pkcs8", format: "pem" });
+  const concurrentToken = `${VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SECRET_PREFIX}${
+    Buffer.from(concurrentPem.trim(), "utf8").toString("base64url")}`;
+  let concurrentReads = 0;
+  const concurrent = await installKeychainAttestationSigner({
+    execFileImpl: async () => {
+      concurrentReads += 1;
+      if (concurrentReads === 1) {
+        const error = new Error("not found");
+        error.code = 44;
+        throw error;
+      }
+      return { stdout: concurrentToken };
+    },
+    spawnImpl: () => {
+      const child = new EventEmitter();
+      child.stdin = {
+        end() {
+          // The interactive shell reports success even though its inner add
+          // observed the concurrently-created exact item as a duplicate.
+          queueMicrotask(() => child.emit("exit", 0));
+        },
+      };
+      return child;
+    },
+  });
+  assert.equal(concurrent.recovered, true);
+  assert.equal(concurrent.publicKeyBase64,
+    pinnedEd25519PublicKeyBase64(concurrentPair.publicKey));
+
+  let invalidReads = 0;
+  await assert.rejects(() => installKeychainAttestationSigner({
+    execFileImpl: async () => {
+      invalidReads += 1;
+      if (invalidReads === 1) {
+        const error = new Error("not found");
+        error.code = 44;
+        throw error;
+      }
+      return { stdout: "invalid duplicate" };
+    },
+    spawnImpl: () => {
+      const child = new EventEmitter();
+      child.stdin = {
+        end() { queueMicrotask(() => child.emit("exit", 73)); },
+      };
+      return child;
+    },
+  }), (error) =>
+    error.code === "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_INVALID");
 });

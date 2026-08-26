@@ -73,8 +73,22 @@ The private Ed25519 key is generated in memory and stored only in macOS
 Keychain service `com.baggerinv.step11-6.vercel-provider-attester`, account
 `production-vercel-provider-attestation-ed25519-v1`. The installer first reads
 that exact item, derives its public key/fingerprint, and returns
-`recovered=true` without overwriting it when it already exists. There is no
-private-key file option. Output files are created once with mode `0600`; copy
+`recovered=true` without overwriting it when it already exists. Initial storage
+uses `/usr/bin/security -i`, with `-i` as its only argv value. An exact add-only
+interactive command is sent through stdin with a single versioned
+`STEP11_6_ED25519_PKCS8_B64_V1_<base64url>` secret token, the fixed item
+identity/label, and `-T /usr/bin/security`. It never uses `-U` or `-A`. The same
+trusted executable then reads the item back; the token is strictly decoded,
+canonicalized, and parsed as Ed25519 PKCS8 material. Readback is authoritative:
+a generated-key match is the new install, while a different valid exact signer
+is recovered as a concurrent/existing item regardless of the interactive
+shell's outer exit status. It is never overwritten.
+Both the read and add subprocesses have fixed fail-closed timeouts; a timed-out
+add is killed and resolved only by the same bounded, verified Keychain readback.
+The key is never placed in argv, logs, or a file. A duplicate or lost helper
+response is resolved by validating the exact existing item; an invalid duplicate
+fails closed. There is no private-key file option. Output files are created once
+with mode `0600`; copy
 each complete signed envelope into the matching sanitized manifest challenge
 record.
 

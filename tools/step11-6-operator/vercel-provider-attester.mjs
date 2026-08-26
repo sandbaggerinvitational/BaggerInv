@@ -21,7 +21,12 @@ export const VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE =
   "com.baggerinv.step11-6.vercel-provider-attester";
 export const VERCEL_PROVIDER_ATTESTER_KEYCHAIN_ACCOUNT =
   "production-vercel-provider-attestation-ed25519-v1";
+export const VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SECRET_PREFIX =
+  "STEP11_6_ED25519_PKCS8_B64_V1_";
 const SECURITY_BINARY = "/usr/bin/security";
+const KEYCHAIN_READ_TIMEOUT_MS = 15_000;
+const KEYCHAIN_ADD_TIMEOUT_MS = 30_000;
+const KEYCHAIN_LABEL = "BaggerInv Step 11.6 Vercel provider attester Ed25519 key";
 
 function fail(code, message) {
   const error = new Error(message);
@@ -39,18 +44,43 @@ export async function readKeychainAttestationPrivateKey({
       "-a", VERCEL_PROVIDER_ATTESTER_KEYCHAIN_ACCOUNT,
       "-s", VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE,
       "-w",
-    ], { encoding: "utf8", maxBuffer: 64 * 1024, windowsHide: true }));
+    ], {
+      encoding: "utf8",
+      maxBuffer: 64 * 1024,
+      windowsHide: true,
+      timeout: KEYCHAIN_READ_TIMEOUT_MS,
+      killSignal: "SIGKILL",
+    }));
   } catch {
     fail(
       "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_UNAVAILABLE",
       "The persistent Ed25519 signer was unavailable from the exact macOS Keychain item.",
     );
   }
-  const key = String(stdout || "").trim();
-  if (!key.includes("BEGIN PRIVATE KEY") || !key.includes("END PRIVATE KEY")) {
+  const stored = String(stdout || "").trim();
+  const match = stored.match(
+    /^STEP11_6_ED25519_PKCS8_B64_V1_([A-Za-z0-9_-]+)$/,
+  );
+  if (!match) {
     fail(
       "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_INVALID",
-      "The exact macOS Keychain item did not contain an Ed25519 PKCS8 key.",
+      "The exact macOS Keychain item did not contain a versioned signer token.",
+    );
+  }
+  let decoded;
+  try {
+    decoded = Buffer.from(match[1], "base64url");
+  } catch {
+    decoded = Buffer.alloc(0);
+  }
+  const key = decoded.toString("utf8");
+  if (decoded.length === 0 || decoded.toString("base64url") !== match[1] ||
+      !Buffer.from(key, "utf8").equals(decoded) || key !== key.trim() ||
+      key.includes("\0") || !key.startsWith("-----BEGIN PRIVATE KEY-----\n") ||
+      !key.endsWith("-----END PRIVATE KEY-----")) {
+    fail(
+      "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_INVALID",
+      "The exact macOS Keychain signer token was not canonical PKCS8 material.",
     );
   }
   return key;
@@ -60,12 +90,17 @@ export async function installKeychainAttestationSigner({
   spawnImpl = spawnCallback,
   execFileImpl = execFileAsync,
 } = {}) {
-  try {
-    const existingPem = await readKeychainAttestationPrivateKey({ execFileImpl });
-    const existingPrivateKey = createPrivateKey(existingPem);
-    if (existingPrivateKey.asymmetricKeyType !== "ed25519") throw new Error("not-ed25519");
+  function signerResult(privatePem, recovered) {
+    let privateKey;
+    try {
+      privateKey = createPrivateKey(privatePem);
+      if (privateKey.asymmetricKeyType !== "ed25519") throw new Error("not-ed25519");
+    } catch {
+      fail("STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_INVALID",
+        "The existing macOS Keychain signer could not be verified as Ed25519.");
+    }
     const publicKeyBase64 = pinnedEd25519PublicKeyBase64(
-      createPublicKey(existingPrivateKey),
+      createPublicKey(privateKey),
     );
     return Object.freeze({
       service: VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE,
@@ -73,8 +108,13 @@ export async function installKeychainAttestationSigner({
       publicKeyBase64,
       signerKeyFingerprint: createHash("sha256")
         .update(Buffer.from(publicKeyBase64, "base64")).digest("hex"),
-      recovered: true,
+      recovered,
     });
+  }
+
+  try {
+    const existingPem = await readKeychainAttestationPrivateKey({ execFileImpl });
+    return signerResult(existingPem, true);
   } catch (error) {
     if (error?.code !== "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_UNAVAILABLE") {
       fail("STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_INVALID",
@@ -84,31 +124,64 @@ export async function installKeychainAttestationSigner({
   const pair = generateKeyPairSync("ed25519");
   const privatePem = pair.privateKey.export({ type: "pkcs8", format: "pem" });
   const publicKeyBase64 = pinnedEd25519PublicKeyBase64(pair.publicKey);
-  await new Promise((resolve, reject) => {
-    const child = spawnImpl(SECURITY_BINARY, [
-      "add-generic-password",
-      "-a", VERCEL_PROVIDER_ATTESTER_KEYCHAIN_ACCOUNT,
-      "-s", VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE,
-      "-l", "BaggerInv Step 11.6 Vercel provider attester Ed25519 key",
-      // Per `security help add-generic-password`, -w last reads the password
-      // interactively. The key is sent over stdin, never argv/stdout/a file.
-      "-w",
-    ], { stdio: ["pipe", "ignore", "ignore"] });
-    child.once("error", reject);
-    child.once("exit", (code) => code === 0 ? resolve() : reject(new Error("keychain")));
-    child.stdin.end(`${privatePem}\n`);
-  }).catch(() => fail(
-    "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_INSTALL_FAILED",
-    "The one-time macOS Keychain signer installation did not complete.",
-  ));
-  return Object.freeze({
-    service: VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE,
-    account: VERCEL_PROVIDER_ATTESTER_KEYCHAIN_ACCOUNT,
-    publicKeyBase64,
-    signerKeyFingerprint: createHash("sha256")
-      .update(Buffer.from(publicKeyBase64, "base64")).digest("hex"),
-    recovered: false,
-  });
+  const encodedPrivateKey = `${VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SECRET_PREFIX}${
+    Buffer.from(privatePem.trim(), "utf8").toString("base64url")}`;
+  const interactiveAddCommand = [
+    "add-generic-password",
+    "-a", VERCEL_PROVIDER_ATTESTER_KEYCHAIN_ACCOUNT,
+    "-s", VERCEL_PROVIDER_ATTESTER_KEYCHAIN_SERVICE,
+    "-l", `"${KEYCHAIN_LABEL}"`,
+    "-T", SECURITY_BINARY,
+    "-w", encodedPrivateKey,
+  ].join(" ");
+  try {
+    await new Promise((resolve, reject) => {
+      let settled = false;
+      let timeoutId;
+      const settle = (error) => {
+        if (settled) return;
+        settled = true;
+        if (timeoutId) clearTimeout(timeoutId);
+        if (error) reject(error);
+        else resolve();
+      };
+      const child = spawnImpl(SECURITY_BINARY, ["-i"], {
+        stdio: ["pipe", "ignore", "ignore"],
+      });
+      child.once("error", (error) => settle(error));
+      child.once("exit", (code) => settle(code === 0 ? null : new Error("keychain")));
+      timeoutId = setTimeout(() => {
+        try { child.kill("SIGKILL"); } catch { /* already gone */ }
+        settle(new Error("keychain-timeout"));
+      }, KEYCHAIN_ADD_TIMEOUT_MS);
+      timeoutId.unref?.();
+      try {
+        child.stdin.end(`${interactiveAddCommand}\nquit\n`);
+      } catch (error) {
+        settle(error);
+      }
+    });
+  } catch {
+    // A duplicate or a lost process response is resolved only by reading and
+    // validating the exact add-only item below. No retry ever overwrites it.
+  }
+
+  let storedPem;
+  try {
+    storedPem = await readKeychainAttestationPrivateKey({ execFileImpl });
+  } catch (error) {
+    if (error?.code === "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_KEY_INVALID") throw error;
+    fail(
+      "STEP11_6_VERCEL_ATTESTER_KEYCHAIN_INSTALL_FAILED",
+      "The one-time macOS Keychain signer installation did not complete.",
+    );
+  }
+  const stored = signerResult(storedPem, false);
+  if (stored.publicKeyBase64 === publicKeyBase64) return stored;
+  // `security -i` can itself exit zero even when its inner add reports a
+  // duplicate. A different, strictly decoded Ed25519 readback is therefore an
+  // authoritative concurrent/existing signer, never a reason to overwrite it.
+  return Object.freeze({ ...stored, recovered: true });
 }
 
 export function createVercelCliReadApi({
