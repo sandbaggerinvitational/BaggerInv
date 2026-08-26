@@ -9,6 +9,8 @@ import { assertProductionShadowCandidateRequest } from "../../../../lib/producti
 import {
   normalizeProductionWriterQuiesceEvidenceInput,
   probeProductionWriterQuiesceOrigins,
+  PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT,
+  PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS,
   publicProductionWriterQuiesceError,
 } from "../../../../lib/production-google-writer-fence-quiesce.js";
 import {
@@ -43,6 +45,8 @@ const unavailable = () => NextResponse.json(
 const QUIESCE_ACTIONS = new Set([
   "issue-provider-attestation-challenge",
   "inspect-provider-attestation-challenge",
+  "inspect-retained-provider-attestation-challenge",
+  "abandon-provider-attestation-challenge",
   "begin-provider-quiesce",
   "finalize-provider-quiesce",
   "inspect-provider-quiesce",
@@ -65,6 +69,7 @@ const INPUT_KEYS = new Set([
   "providerAttestationStage", "providerChallengeId",
   "providerAttestationConsumeRequestId",
   "providerAttestation", "rehearsalRunId", "rehearsalRequestId", "routingRule",
+  "providerRetainedChallenge", "abandonRequestId",
 ]);
 
 async function authorize(request) {
@@ -244,6 +249,19 @@ function publicProviderAttestationChallenge(receipt = {}) {
     consumedProviderAttestation:
       receipt.consumed_provider_attestation || receipt.consumedProviderAttestation || null,
     consumeRequestId: clean(receipt.consume_request_id || receipt.consumeRequestId),
+    abandonedAt: receipt.abandoned_at || receipt.abandonedAt || null,
+    abandonRequestId: clean(
+      receipt.abandon_request_id || receipt.abandonRequestId,
+    ),
+    abandonRequestFingerprint: clean(
+      receipt.abandon_request_fingerprint || receipt.abandonRequestFingerprint,
+    ),
+    abandonEligible:
+      receipt.abandon_eligible === true || receipt.abandonEligible === true,
+    abandonmentCode: clean(
+      receipt.abandonment_code || receipt.abandonmentCode,
+    ).toUpperCase(),
+    serverObservedAt: receipt.server_observed_at || receipt.serverObservedAt || null,
     idempotent: receipt.idempotent === true,
   });
 }
@@ -277,7 +295,9 @@ function recoveredConsumedProviderAttestation(challenge) {
       clean(value.routing_rule_id) !== challenge.routingRuleId ||
       clean(value.routing_rule_config_version) !== challenge.routingRuleConfigVersion ||
       Number(value.routing_rule_pending_draft_change_count) !== 0 ||
-      !Array.isArray(records) || count !== records.length || count < 1_141 ||
+      !Array.isArray(records) || count !== records.length ||
+      count < PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT +
+        PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.length + 1 ||
       !/^[0-9a-f]{64}$/.test(fingerprint) ||
       sha256(JSON.stringify(records)) !== fingerprint ||
       !Number.isFinite(bindingExpiresAt) || bindingExpiresAt <= Date.now()) {
@@ -390,6 +410,17 @@ async function executeQuiesce(input, dependencies) {
     throw error;
   }
   const environment = candidateEnvironment(baseEnvironment);
+  if (input.action === "inspect-retained-provider-attestation-challenge" ||
+      input.action === "abandon-provider-attestation-challenge") {
+    const receipt = input.action === "inspect-retained-provider-attestation-challenge"
+      ? await dependencies.quiesce.inspectRetainedChallenge({ input })
+      : await dependencies.quiesce.abandonChallenge({ input });
+    return {
+      ok: true,
+      action: input.action,
+      challenge: publicProviderAttestationChallenge(receipt),
+    };
+  }
   if (input.action === "issue-provider-attestation-challenge" ||
       input.action === "inspect-provider-attestation-challenge") {
     const receipt = input.action === "issue-provider-attestation-challenge"

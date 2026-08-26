@@ -6,7 +6,10 @@ import { fileURLToPath } from "node:url";
 
 import {
   buildProviderQuiesceStagePayload,
+  buildRetainedProviderAttestationChallengePayload,
+  canAbandonRetainedProviderAttestationChallenge,
   canExecuteProviderQuiesceStage,
+  discardAbandonedProviderAttestationAttempt,
   ensureProviderAttestationStageState,
   validateLoadedProviderAttestationEnvelope,
   validateProviderAttestationChallenge,
@@ -46,6 +49,8 @@ function challenge(state, stage, status = "ISSUED") {
     consumedAttestationFingerprint: status === "CONSUMED" ? "c".repeat(64) : "",
     consumeRequestId: status === "CONSUMED"
       ? state[`${prefix}ConsumeRequestId`] : "",
+    issuedAt: "2026-08-26T19:00:00.000Z",
+    expiresAt: "2026-08-26T19:02:00.000Z",
   };
 }
 
@@ -183,11 +188,202 @@ test("only an exact durable CONSUMED reservation permits envelope-free lost-resp
   }, state, "BEGIN", "REHEARSAL"), /did not match this stage/i);
 });
 
+test("only an exact authoritative ABANDONED receipt clears retained BEGIN recovery", () => {
+  const initial = ensureProviderAttestationStageState({}, "BEGIN", nextId());
+  const issued = validateProviderAttestationChallenge(
+    challenge(initial, "BEGIN"), initial, "BEGIN", "REHEARSAL",
+  );
+  const retained = {
+    ...initial,
+    baseline: "a".repeat(64),
+    canonicalValues: "b".repeat(64),
+    routingRuleId: issued.routingRuleId,
+    routingRuleRevision: issued.routingRuleConfigVersion,
+    beginAbandonRequestId: ids[12],
+    beginProviderChallenge: issued,
+    beginProviderAttestationRequest: requestFor(issued),
+    beginSignedProviderAttestation: envelopeFor(issued),
+  };
+  const eligible = {
+    ...issued,
+    abandonEligible: true,
+    abandonmentCode: "ELIGIBLE",
+    serverObservedAt: "2026-08-26T19:02:31.000Z",
+  };
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained, eligible, "REHEARSAL",
+  ), true);
+  const retainedPayload = buildRetainedProviderAttestationChallengePayload(
+    retained, "REHEARSAL",
+  );
+  assert.deepEqual(retainedPayload, {
+    quiescePurpose: "REHEARSAL",
+    evidenceRequestId: retained.evidenceRequestId,
+    challengeRequestId: retained.beginChallengeRequestId,
+    providerAttestationStage: "BEGIN",
+    providerChallengeId: issued.challengeId,
+    providerRetainedChallenge: issued,
+  });
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained, eligible, "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+
+  const abandoned = {
+    ...issued,
+    status: "ABANDONED",
+    abandonEligible: false,
+    abandonmentCode: "ABANDONED",
+    abandonRequestId: retained.beginAbandonRequestId,
+    abandonRequestFingerprint: "f".repeat(64),
+    abandonedAt: "2026-08-26T19:03:00.000Z",
+    serverObservedAt: "2026-08-26T19:03:01.000Z",
+  };
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained, abandoned, "REHEARSAL",
+  ), true, "a lost abandonment response must remain retryable with the same ID");
+  const cleared = discardAbandonedProviderAttestationAttempt(
+    retained, abandoned, "REHEARSAL",
+  );
+  assert.deepEqual(cleared, {
+    baseline: "a".repeat(64),
+    canonicalValues: "b".repeat(64),
+  });
+  for (const key of [
+    "routingRuleId", "routingRuleRevision", "evidenceRequestId",
+    "beginOperationRequestId", "beginChallengeRequestId", "beginConsumeRequestId",
+    "beginAbandonRequestId", "beginProviderChallenge",
+    "beginProviderAttestationRequest", "beginSignedProviderAttestation",
+    "retainedProviderChallengeInspection",
+  ]) assert.equal(Object.hasOwn(cleared, key), false, `${key} must be cleared`);
+
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, abandonRequestId: ids[13] },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, abandonedAt: "" },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, abandonRequestFingerprint: "" },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, abandonRequestFingerprint: "not-a-fingerprint" },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, serverObservedAt: "" },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, serverObservedAt: "not-a-timestamp" },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, expiresAt: "" },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_CHALLENGE_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    { ...abandoned, routingRuleConfigVersion: "revision-mismatch" },
+    "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+});
+
+test("consumed, unexpired/ineligible, mismatched, and durable retained attempts reject abandonment", () => {
+  const initial = ensureProviderAttestationStageState({}, "BEGIN", nextId());
+  const issued = validateProviderAttestationChallenge(
+    challenge(initial, "BEGIN"), initial, "BEGIN", "REHEARSAL",
+  );
+  const retained = {
+    ...initial,
+    beginAbandonRequestId: ids[12],
+    beginProviderChallenge: issued,
+    beginProviderAttestationRequest: requestFor(issued),
+    beginSignedProviderAttestation: envelopeFor(issued),
+  };
+  const eligible = {
+    ...issued,
+    abandonEligible: true,
+    abandonmentCode: "ELIGIBLE",
+    serverObservedAt: "2026-08-26T19:02:31.000Z",
+  };
+  const unexpired = {
+    ...issued,
+    abandonEligible: false,
+    abandonmentCode: "NOT_EXPIRED",
+    serverObservedAt: "2026-08-26T19:01:59.000Z",
+  };
+  const consumed = {
+    ...challenge(initial, "BEGIN", "CONSUMED"),
+    abandonEligible: false,
+    abandonmentCode: "CONSUMED",
+    serverObservedAt: "2026-08-26T19:02:31.000Z",
+  };
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained, unexpired, "REHEARSAL",
+  ), false);
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained, consumed, "REHEARSAL",
+  ), false);
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained,
+    { ...eligible, challengeId: ids[14] },
+    "REHEARSAL",
+  ), false);
+
+  const durableStates = [
+    ["quiesceEvidenceId", ids[15]],
+    ["quiesceStatus", "DRAINING"],
+    ["drainStartedAt", "2026-08-26T19:03:00.000Z"],
+    ["quiesceExpiresAt", "2026-08-26T19:30:00.000Z"],
+    ["rehearsalRequestId", ids[15]],
+    ["rehearsalRunId", ids[15]],
+    ["restoreRequestId", ids[15]],
+    ["rehearsalCertified", true],
+    ["finalizeOperationRequestId", ids[15]],
+    ["fenceId", ids[15]],
+  ];
+  for (const [key, value] of durableStates) {
+    const unsafe = { ...retained, [key]: value };
+    assert.equal(canAbandonRetainedProviderAttestationChallenge(
+      unsafe, eligible, "REHEARSAL",
+    ), false);
+    assert.throws(() => discardAbandonedProviderAttestationAttempt(
+      unsafe,
+      {
+        ...issued,
+        status: "ABANDONED",
+        abandonmentCode: "ABANDONED",
+        abandonRequestId: ids[12],
+        abandonRequestFingerprint: "f".repeat(64),
+        abandonedAt: "2026-08-26T19:03:00.000Z",
+        serverObservedAt: "2026-08-26T19:03:01.000Z",
+      },
+      "REHEARSAL",
+    ), (error) => error.code === "PROVIDER_ATTESTATION_RETAINED_ATTEMPT_UNSAFE");
+  }
+});
+
 test("both browser clients gate quiesce execution on the attestation workflow", async () => {
-  const rehearsal = await readFile(path.join(root,
-    "app/admin/step11-6-production-google-writer-fence/WriterFenceClient.js"), "utf8");
-  const persistent = await readFile(path.join(root,
-    "app/admin/step12-production-google-writer-provider-fence/PersistentWriterFenceClient.js"), "utf8");
+  const [rehearsal, persistent, route, receiptAdapter] = await Promise.all([
+    readFile(path.join(root,
+      "app/admin/step11-6-production-google-writer-fence/WriterFenceClient.js"), "utf8"),
+    readFile(path.join(root,
+      "app/admin/step12-production-google-writer-provider-fence/PersistentWriterFenceClient.js"), "utf8"),
+    readFile(path.join(root,
+      "app/api/admin/step11-6-production-google-writer-fence/route.js"), "utf8"),
+    readFile(path.join(root,
+      "lib/production-google-writer-fence-receipt-server.js"), "utf8"),
+  ]);
   for (const source of [rehearsal, persistent]) {
     assert.match(source, /issue-provider-attestation-challenge/);
     assert.match(source, /Download BEGIN attester request/);
@@ -198,4 +394,59 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
   }
   assert.match(rehearsal, /Safe diagnostics/);
   assert.match(rehearsal, /JSON\.stringify\(error\.diagnostics, null, 2\)/);
+  assert.match(rehearsal, /inspect-retained-provider-attestation-challenge/);
+  assert.match(rehearsal, /abandon-provider-attestation-challenge/);
+  assert.match(rehearsal, /canAbandonRetainedProviderAttestationChallenge/);
+  assert.match(rehearsal, /discardAbandonedProviderAttestationAttempt/);
+  assert.doesNotMatch(rehearsal,
+    /canDiscardExpiredProviderAttestationAttempt|discardExpiredProviderAttestationAttempt/);
+  assert.ok(rehearsal.indexOf("inspect-retained-provider-attestation-challenge") <
+    rehearsal.indexOf("abandon-provider-attestation-challenge"));
+  assert.match(rehearsal, /setOwnerFreezeConfirmed\(false\)/);
+  assert.match(rehearsal, /setRoutingRuleId\(""\)/);
+  assert.match(rehearsal, /setRoutingRuleRevision\(""\)/);
+  assert.doesNotMatch(rehearsal,
+    /localStorage(?:\?\.|\.)(?:clear|removeItem)\s*\(/);
+  assert.doesNotMatch(rehearsal,
+    /inspect_production_vercel_provider_attestation_challenge_abandonment|abandon_production_vercel_provider_attestation_challenge/,
+  "the browser must use the same-origin server route, never the service-role RPC directly");
+  const abandonFunction = rehearsal.slice(
+    rehearsal.indexOf("async function abandonRetainedChallenge"),
+    rehearsal.indexOf("async function issueChallenge"),
+  );
+  assert.match(abandonFunction,
+    /const beginAbandonRequestId = recovery\.beginAbandonRequestId \|\| requestId\(\)/);
+  assert.ok(abandonFunction.indexOf("storeExact(stable)") <
+    abandonFunction.indexOf('"abandon-provider-attestation-challenge"'),
+  "the stable abandonment identity must be retained before the request");
+  assert.ok(abandonFunction.indexOf('"abandon-provider-attestation-challenge"') <
+    abandonFunction.indexOf("discardAbandonedProviderAttestationAttempt("),
+  "recovery can clear only after the authoritative abandonment response");
+
+  for (const action of [
+    "inspect-retained-provider-attestation-challenge",
+    "abandon-provider-attestation-challenge",
+  ]) assert.match(route, new RegExp(`"${action}"`));
+  assert.match(route, /dependencies\.quiesce\.inspectRetainedChallenge/);
+  assert.match(route, /dependencies\.quiesce\.abandonChallenge/);
+  assert.match(route, /providerRetainedChallenge/);
+  assert.match(route, /abandonRequestId/);
+  assert.match(route, /abandonRequestFingerprint/);
+  assert.match(route, /serverObservedAt/);
+  assert.match(receiptAdapter, /^import "server-only";/);
+  assert.match(receiptAdapter, /PRODUCTION_SUPABASE_SECRET_KEY/);
+  assert.match(receiptAdapter, /function retainedChallengeScope\(input\)/);
+  for (const retainedField of [
+    "challengeId", "challengeRequestId", "operationRequestId", "evidenceRequestId",
+    "candidateDeploymentId", "candidateDeploymentCommit",
+    "candidateDeploymentTarget", "candidateAliasOrigin", "candidateImmutableOrigin",
+    "routingRuleId", "routingRuleConfigVersion",
+  ]) assert.match(receiptAdapter, new RegExp(`challenge\\.${retainedField}`));
+  for (const rpc of [
+    "inspect_production_vercel_provider_attestation_challenge_abandonment",
+    "abandon_production_vercel_provider_attestation_challenge",
+  ]) assert.match(receiptAdapter, new RegExp(`"${rpc}"`));
+  assert.match(receiptAdapter, /inspectRetainedChallenge/);
+  assert.match(receiptAdapter, /abandonChallenge/);
+  assert.match(receiptAdapter, /EXPIRED_UNCONSUMED_BEGIN_SUPERSEDED/);
 });

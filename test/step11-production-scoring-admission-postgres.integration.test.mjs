@@ -558,12 +558,15 @@ async function destroyCluster(cluster) {
   await rm(cluster.clusterRoot, { recursive: true, force: true });
 }
 
-async function installProductionMigrations(cluster, database) {
+async function installProductionMigrations(
+  cluster,
+  database,
+  admissionMigration =
+    "202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+) {
   const migrationNames = (await readdir(migrationsDirectory))
     .filter((name) => /^\d+_.*\.sql$/.test(name))
     .sort();
-  const admissionMigration =
-    "202608260035_production_reviewed_post_capture_preview_deployments.sql";
   const endIndex = migrationNames.indexOf(admissionMigration);
   assert.notEqual(endIndex, -1, `Missing ${admissionMigration}`);
   for (const migrationName of migrationNames.slice(0, endIndex + 1)) {
@@ -582,9 +585,23 @@ function createDatabase(cluster, database, template) {
 
 function installSupabaseCompatibility(cluster, database) {
   psql(cluster, database, `
-    create role anon nologin;
-    create role authenticated nologin;
-    create role service_role nologin;
+    do $roles$
+    begin
+      if not exists (select 1 from pg_catalog.pg_roles where rolname = 'anon') then
+        create role anon nologin;
+      end if;
+      if not exists (
+        select 1 from pg_catalog.pg_roles where rolname = 'authenticated'
+      ) then
+        create role authenticated nologin;
+      end if;
+      if not exists (
+        select 1 from pg_catalog.pg_roles where rolname = 'service_role'
+      ) then
+        create role service_role nologin;
+      end if;
+    end
+    $roles$;
     create schema auth;
     create table auth.users (
       id uuid primary key,
@@ -785,6 +802,102 @@ function providerChallengeIssueInput(input, stage, label, {
     routing_rule_config_version: input.routing_rule_revision,
     routing_rule_scope: input.routing_rule_scope,
   };
+}
+
+function providerChallengeAbandonInput(issueInput, challenge, label, {
+  abandonRequestId = randomUUID(),
+  requestFingerprint = fingerprint(`${label}-challenge-abandon`),
+  ...overrides
+} = {}) {
+  return {
+    ...scope,
+    actor_id: issueInput.actor_id,
+    authenticated_actor_fingerprint:
+      issueInput.authenticated_actor_fingerprint,
+    abandon_request_id: abandonRequestId,
+    request_fingerprint: requestFingerprint,
+    challenge_id: challenge.challenge_id,
+    challenge_request_id: issueInput.challenge_request_id,
+    operation_request_id: issueInput.operation_request_id,
+    evidence_request_id: issueInput.evidence_request_id,
+    stage: "BEGIN",
+    purpose: issueInput.purpose,
+    vercel_project_id: issueInput.vercel_project_id,
+    vercel_team_id: issueInput.vercel_team_id,
+    candidate_deployment_id: issueInput.candidate_deployment_id,
+    candidate_deployment_commit: issueInput.candidate_deployment_commit,
+    candidate_deployment_target: issueInput.candidate_deployment_target,
+    candidate_alias_origin: issueInput.candidate_alias_origin,
+    candidate_immutable_origin: issueInput.candidate_immutable_origin,
+    routing_rule_id: issueInput.routing_rule_id,
+    routing_rule_config_version: issueInput.routing_rule_config_version,
+    routing_rule_scope: issueInput.routing_rule_scope,
+    abandonment_reason: "EXPIRED_UNCONSUMED_BEGIN_SUPERSEDED",
+    ...overrides,
+  };
+}
+
+function providerChallengeAbandonInspectionInput(issueInput, challenge) {
+  const {
+    abandon_request_id: _abandonRequestId,
+    request_fingerprint: _requestFingerprint,
+    abandonment_reason: _abandonmentReason,
+    ...inspectionInput
+  } = providerChallengeAbandonInput(
+    issueInput,
+    challenge,
+    "inspection-only",
+  );
+  return inspectionInput;
+}
+
+function providerChallengeConsumeInput(input, issueInput, challenge, label) {
+  const attestation = providerAttestation(
+    "BEGIN",
+    `${label}-attestation`,
+    {
+      purpose: issueInput.purpose,
+      target: issueInput.candidate_deployment_target,
+      liveInventory: input.live_origin_inventory,
+      challengeId: challenge.challenge_id,
+      challengeRequestFingerprint: challenge.challenge_request_fingerprint,
+      operationRequestId: issueInput.operation_request_id,
+      candidate_deployment_id: issueInput.candidate_deployment_id,
+      candidate_deployment_commit: issueInput.candidate_deployment_commit,
+      candidate_deployment_target: issueInput.candidate_deployment_target,
+      routing_rule_id: issueInput.routing_rule_id,
+      routing_rule_config_version: issueInput.routing_rule_config_version,
+    },
+  );
+  return {
+    ...scope,
+    actor_id: issueInput.actor_id,
+    authenticated_actor_fingerprint:
+      issueInput.authenticated_actor_fingerprint,
+    consume_request_id: randomUUID(),
+    request_fingerprint: fingerprint(`${label}-challenge-consume`),
+    challenge_id: challenge.challenge_id,
+    challenge_request_id: issueInput.challenge_request_id,
+    operation_request_id: issueInput.operation_request_id,
+    evidence_request_id: issueInput.evidence_request_id,
+    purpose: issueInput.purpose,
+    stage: "BEGIN",
+    candidate_deployment_id: issueInput.candidate_deployment_id,
+    candidate_deployment_commit: issueInput.candidate_deployment_commit,
+    candidate_deployment_target: issueInput.candidate_deployment_target,
+    origin_inventory: input.origin_inventory,
+    live_origin_inventory: input.live_origin_inventory,
+    provider_attestation: attestation,
+  };
+}
+
+function expireProviderChallenge(cluster, database, challengeId) {
+  psql(cluster, database, `
+    update production_control.vercel_provider_attestation_challenges
+    set issued_at = pg_catalog.now() - interval '180 seconds',
+        expires_at = pg_catalog.now() - interval '60 seconds'
+    where challenge_id = ${sqlLiteral(challengeId)}::uuid;
+  `);
 }
 
 function reserveProviderAttestation(
@@ -1675,25 +1788,236 @@ test(
       const baseline = stageAndArm(cluster, baselineDatabase);
 
       await t.test(
-        "migration 035 accepts exactly 1,140 retained, three reviewed, and one dynamic candidate tuple",
+        "migration 036 upgrades existing ISSUED and CONSUMED challenges without changing dormant Production authority",
+        async () => {
+          databaseCounter += 1;
+          const database =
+            `admission_034_${databaseCounter}_migration_036_upgrade`;
+          createDatabase(cluster, database);
+          installSupabaseCompatibility(cluster, database);
+          await installProductionMigrations(
+            cluster,
+            database,
+            "202608260035_production_reviewed_post_capture_preview_deployments.sql",
+          );
+          installScoringFixture(cluster, database);
+
+          const pre036LiveInventory = sortLiveOriginInventory([
+            ...originInventory,
+            ...reviewedPostCapturePreviewDeployments.filter((tuple) =>
+              tuple[1] !== "3fcbaa287fcb306fa3b47310f01ed6eb3901749c"
+            ),
+            candidateInventoryTuple("PREVIEW"),
+          ]);
+          assert.equal(pre036LiveInventory.length, 1144);
+
+          const expiredInput = quiesceBeginInput(
+            "REHEARSAL",
+            "migration-036-upgrade-expired",
+          );
+          const expiredIssueInput = providerChallengeIssueInput(
+            expiredInput,
+            "BEGIN",
+            "migration-036-upgrade-expired",
+          );
+          const expiredChallenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            expiredIssueInput,
+          );
+          expireProviderChallenge(
+            cluster,
+            database,
+            expiredChallenge.challenge_id,
+          );
+
+          const consumedInput = quiesceBeginInput(
+            "REHEARSAL",
+            "migration-036-upgrade-consumed",
+          );
+          consumedInput.live_origin_inventory = pre036LiveInventory;
+          consumedInput.first_probe_records = quiesceProbeRecords(
+            new Date().toISOString(),
+            "PREVIEW",
+            pre036LiveInventory,
+          );
+          const consumedIssueInput = providerChallengeIssueInput(
+            consumedInput,
+            "BEGIN",
+            "migration-036-upgrade-consumed",
+          );
+          const consumedChallenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            consumedIssueInput,
+          );
+          const reserved = rpc(
+            cluster,
+            database,
+            "consume_production_vercel_provider_attestation_challenge",
+            providerChallengeConsumeInput(
+              consumedInput,
+              consumedIssueInput,
+              consumedChallenge,
+              "migration-036-upgrade-consumed",
+            ),
+          );
+          assert.equal(reserved.status, "RESERVED");
+
+          const productionAuthorityState = () => psql(cluster, database, `
+            select activation.state || '|' || activation.current_authority ||
+              '|' || resource.participant_identity_authority || '|' ||
+              gate.admission_state
+            from production_control.cutover_activation_state activation
+            join production_control.resource_scope resource
+              on resource.scope_key = activation.scope_key
+            cross join scoring_authority.ingress_gates gate
+            where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+              and gate.tournament_id = '2026';
+          `);
+          assert.equal(
+            productionAuthorityState(),
+            "DORMANT|GOOGLE|PASSPORT|OPEN",
+          );
+
+          psqlFile(
+            cluster,
+            database,
+            path.join(
+              migrationsDirectory,
+              "202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+            ),
+          );
+
+          assert.equal(
+            psql(cluster, database, `
+              select status || '|' ||
+                (abandon_request_id is null)::text || '|' ||
+                (abandon_request_fingerprint is null)::text || '|' ||
+                (abandon_payload_hash is null)::text || '|' ||
+                (abandoned_at is null)::text
+              from production_control.vercel_provider_attestation_challenges
+              where challenge_id =
+                ${sqlLiteral(expiredChallenge.challenge_id)}::uuid;
+            `),
+            "ISSUED|true|true|true|true",
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select status || '|' ||
+                (abandon_request_id is null)::text || '|' ||
+                (abandon_request_fingerprint is null)::text || '|' ||
+                (abandon_payload_hash is null)::text || '|' ||
+                (abandoned_at is null)::text
+              from production_control.vercel_provider_attestation_challenges
+              where challenge_id =
+                ${sqlLiteral(consumedChallenge.challenge_id)}::uuid;
+            `),
+            "CONSUMED|true|true|true|true",
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select count(*) || '|' ||
+                count(*) filter (where constraint_value.convalidated)
+              from pg_catalog.pg_constraint constraint_value
+              where constraint_value.conrelid =
+                'production_control.vercel_provider_attestation_challenges'
+                  ::pg_catalog.regclass
+                and constraint_value.conname in (
+                  'vercel_provider_attestation_challenges_status_check',
+                  'vercel_provider_attestation_challenges_check2'
+                );
+            `),
+            "2|2",
+          );
+          assert.equal(
+            productionAuthorityState(),
+            "DORMANT|GOOGLE|PASSPORT|OPEN",
+          );
+
+          const expiredInspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(
+              expiredIssueInput,
+              expiredChallenge,
+            ),
+          );
+          assert.equal(expiredInspection.abandonment_code, "ELIGIBLE");
+          assert.equal(expiredInspection.abandon_eligible, true);
+          const consumedInspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(
+              consumedIssueInput,
+              consumedChallenge,
+            ),
+          );
+          assert.equal(consumedInspection.abandonment_code, "CONSUMED");
+          assert.equal(consumedInspection.abandon_eligible, false);
+
+          const abandoned = rpc(
+            cluster,
+            database,
+            "abandon_production_vercel_provider_attestation_challenge",
+            providerChallengeAbandonInput(
+              expiredIssueInput,
+              expiredChallenge,
+              "migration-036-upgrade-expired",
+            ),
+          );
+          assert.equal(abandoned.status, "ABANDONED");
+          assert.equal(
+            psql(cluster, database, `
+              select
+                (select status from
+                  production_control.vercel_provider_attestation_challenges
+                  where challenge_id =
+                    ${sqlLiteral(expiredChallenge.challenge_id)}::uuid)
+                || '|' ||
+                (select status from
+                  production_control.vercel_provider_attestation_challenges
+                  where challenge_id =
+                    ${sqlLiteral(consumedChallenge.challenge_id)}::uuid)
+                || '|' ||
+                (select count(*) from
+                  production_control.vercel_provider_attestations
+                  where challenge_id =
+                    ${sqlLiteral(consumedChallenge.challenge_id)}::uuid);
+            `),
+            "ABANDONED|CONSUMED|1",
+          );
+          assert.equal(
+            productionAuthorityState(),
+            "DORMANT|GOOGLE|PASSPORT|OPEN",
+          );
+        },
+      );
+
+      await t.test(
+        "migration 036 accepts exactly 1,140 retained, five reviewed, and one dynamic candidate tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_035_exact_1144");
+          const database = cloneDormantDatabase("inventory_036_exact_1146");
           const liveInventory = liveOriginInventoryFor("PREVIEW");
-          assert.equal(liveInventory.length, 1144);
+          assert.equal(liveInventory.length, 1146);
           assert.equal(
             assertExactLiveOriginInventory(cluster, database, liveInventory),
             "",
           );
           const input = quiesceBeginInput(
             "REHEARSAL",
-            "inventory-035-exact-1144",
+            "inventory-036-exact-1146",
           );
           const binding = reserveProviderAttestation(
             cluster,
             database,
             input,
             "BEGIN",
-            "inventory-035-exact-1144-begin",
+            "inventory-036-exact-1146-begin",
           );
           assert.match(
             binding.attestation_id,
@@ -1703,14 +2027,14 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects an inventory missing a reviewed deployment tuple",
+        "migration 036 rejects an inventory missing a reviewed deployment tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_035_missing_reviewed");
+          const database = cloneDormantDatabase("inventory_036_missing_reviewed");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = liveOriginInventoryFor("PREVIEW").filter(
             (record) => record[0] !== reviewed[0],
           );
-          assert.equal(liveInventory.length, 1143);
+          assert.equal(liveInventory.length, 1145);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -1723,9 +2047,9 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects a tampered reviewed deployment tuple",
+        "migration 036 rejects a tampered reviewed deployment tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_035_tampered_reviewed");
+          const database = cloneDormantDatabase("inventory_036_tampered_reviewed");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = sortLiveOriginInventory(
             liveOriginInventoryFor("PREVIEW").map((record) =>
@@ -1746,15 +2070,15 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects a duplicate reviewed tuple",
+        "migration 036 rejects a duplicate reviewed tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_035_duplicate_tuple");
+          const database = cloneDormantDatabase("inventory_036_duplicate_tuple");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = sortLiveOriginInventory([
             ...liveOriginInventoryFor("PREVIEW"),
             [...reviewed],
           ]);
-          assert.equal(liveInventory.length, 1145);
+          assert.equal(liveInventory.length, 1147);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -1767,9 +2091,9 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects a reviewed deployment ID reused by a new origin",
+        "migration 036 rejects a reviewed deployment ID reused by a new origin",
         () => {
-          const database = cloneDormantDatabase("inventory_035_duplicate_id");
+          const database = cloneDormantDatabase("inventory_036_duplicate_id");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = liveOriginInventoryFor("PREVIEW", [[
             reviewed[0],
@@ -1791,9 +2115,9 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects a reviewed origin reused by a new deployment ID",
+        "migration 036 rejects a reviewed origin reused by a new deployment ID",
         () => {
-          const database = cloneDormantDatabase("inventory_035_duplicate_origin");
+          const database = cloneDormantDatabase("inventory_036_duplicate_origin");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = liveOriginInventoryFor("PREVIEW", [[
             "dpl_ReviewedOriginReuse123",
@@ -1815,9 +2139,9 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects a dynamic candidate colliding with a reviewed deployment ID",
+        "migration 036 rejects a dynamic candidate colliding with a reviewed deployment ID",
         () => {
-          const database = cloneDormantDatabase("inventory_035_candidate_id_collision");
+          const database = cloneDormantDatabase("inventory_036_candidate_id_collision");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const collidingCandidateOrigin =
             "https://candidate-id-collision-sandbagger-invitational.vercel.app";
@@ -1849,9 +2173,9 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects a dynamic candidate colliding with a reviewed origin",
+        "migration 036 rejects a dynamic candidate colliding with a reviewed origin",
         () => {
-          const database = cloneDormantDatabase("inventory_035_candidate_origin_collision");
+          const database = cloneDormantDatabase("inventory_036_candidate_origin_collision");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const collidingCandidateId = "dpl_DynamicCandidateOrigin123";
           const liveInventory = sortLiveOriginInventory([
@@ -1882,10 +2206,10 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects an exact reviewed tuple reused as the dynamic candidate",
+        "migration 036 rejects an exact reviewed tuple reused as the dynamic candidate",
         () => {
           const database = cloneDormantDatabase(
-            "inventory_035_exact_reviewed_candidate_collision",
+            "inventory_036_exact_reviewed_candidate_collision",
           );
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = sortLiveOriginInventory([
@@ -1900,7 +2224,7 @@ test(
               "GIT",
             ],
           ]);
-          assert.equal(liveInventory.length, 1144);
+          assert.equal(liveInventory.length, 1146);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -1918,10 +2242,10 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects an exact retained tuple reused as the dynamic candidate",
+        "migration 036 rejects an exact retained tuple reused as the dynamic candidate",
         () => {
           const database = cloneDormantDatabase(
-            "inventory_035_exact_retained_candidate_collision",
+            "inventory_036_exact_retained_candidate_collision",
           );
           const retainedCandidate = originInventory.find((record) =>
             record[3] === "FEATURE_PREVIEW" && record[4] === "READY" &&
@@ -1940,7 +2264,7 @@ test(
               "GIT",
             ],
           ]);
-          assert.equal(liveInventory.length, 1144);
+          assert.equal(liveInventory.length, 1146);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -1958,9 +2282,9 @@ test(
       );
 
       await t.test(
-        "migration 035 rejects an unreviewed post-capture deployment with a different SHA",
+        "migration 036 rejects an unreviewed post-capture deployment with a different SHA",
         () => {
-          const database = cloneDormantDatabase("inventory_035_different_sha");
+          const database = cloneDormantDatabase("inventory_036_different_sha");
           const liveInventory = liveOriginInventoryFor("PREVIEW", [[
             "dpl_UnreviewedDifferentSha123",
             "abcdef1234567890abcdef1234567890abcdef12",
@@ -2180,6 +2504,861 @@ test(
       );
 
       await t.test(
+        "an exact expired BEGIN challenge is classified and immutably abandoned with lost-response recovery",
+        () => {
+          const database = cloneDormantDatabase("challenge_abandonment");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "challenge-abandonment",
+          );
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-abandonment",
+          );
+          issueInput.candidate_deployment_id =
+            "dpl_6m9FqCvd8pe1epaxyYMmkRhK7Pc6";
+          issueInput.candidate_deployment_commit =
+            "3fcbaa287fcb306fa3b47310f01ed6eb3901749c";
+          issueInput.candidate_alias_origin =
+            "https://old-candidate-alias-sandbagger-invitational.vercel.app";
+          issueInput.candidate_immutable_origin =
+            "https://bagger-phzmni50c-sandbagger-invitational.vercel.app";
+          issueInput.routing_rule_id = "retained-provider-rule";
+          issueInput.routing_rule_config_version = "retained-revision-1";
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+
+          const freshInspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(issueInput, challenge),
+          );
+          assert.equal(freshInspection.abandon_eligible, false);
+          assert.equal(freshInspection.abandonment_code, "NOT_EXPIRED");
+          assert.ok(Date.parse(freshInspection.server_observed_at));
+
+          expireProviderChallenge(cluster, database, challenge.challenge_id);
+          const eligibleInspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(issueInput, challenge),
+          );
+          assert.equal(eligibleInspection.abandon_eligible, true);
+          assert.equal(eligibleInspection.abandonment_code, "ELIGIBLE");
+
+          const abandonInput = providerChallengeAbandonInput(
+            issueInput,
+            challenge,
+            "challenge-abandonment",
+          );
+          const abandoned = rpc(
+            cluster,
+            database,
+            "abandon_production_vercel_provider_attestation_challenge",
+            abandonInput,
+          );
+          assert.equal(abandoned.status, "ABANDONED");
+          assert.equal(abandoned.abandon_eligible, false);
+          assert.equal(abandoned.abandonment_code, "ABANDONED");
+          assert.equal(abandoned.abandon_request_id,
+            abandonInput.abandon_request_id);
+          assert.equal(abandoned.abandon_request_fingerprint,
+            abandonInput.request_fingerprint);
+          assert.equal(abandoned.candidate_deployment_id,
+            issueInput.candidate_deployment_id);
+          assert.equal(abandoned.candidate_deployment_commit,
+            issueInput.candidate_deployment_commit);
+          assert.equal(abandoned.routing_rule_id, issueInput.routing_rule_id);
+          assert.equal(abandoned.routing_rule_config_version,
+            issueInput.routing_rule_config_version);
+          assert.ok(Date.parse(abandoned.abandoned_at));
+          assert.ok(Date.parse(abandoned.server_observed_at));
+
+          const recovered = rpc(
+            cluster,
+            database,
+            "abandon_production_vercel_provider_attestation_challenge",
+            abandonInput,
+          );
+          assert.equal(recovered.idempotent, true);
+          assert.equal(recovered.abandoned_at, abandoned.abandoned_at);
+          assert.equal(recovered.abandon_request_fingerprint,
+            abandonInput.request_fingerprint);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "abandon_production_vercel_provider_attestation_challenge",
+              {
+                ...abandonInput,
+                abandon_request_id: randomUUID(),
+                request_fingerprint: fingerprint(
+                  "challenge-abandonment-conflicting-retry",
+                ),
+              },
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDON_IDEMPOTENCY_CONFLICT/,
+          );
+
+          assert.equal(
+            psql(cluster, database, `
+              select status || '|' || stage || '|' ||
+                (abandoned_at >= expires_at)::text
+              from production_control.vercel_provider_attestation_challenges
+              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            "ABANDONED|BEGIN|true",
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select
+                (select count(*) from
+                  production_control.vercel_provider_attestations
+                  where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid)
+                || '|' ||
+                (select count(*) from
+                  production_control.vercel_writer_quiesce_evidence
+                  where evidence_request_id =
+                    ${sqlLiteral(issueInput.evidence_request_id)}::uuid)
+                || '|' ||
+                (select count(*) from
+                  production_control.vercel_provider_attestation_challenges
+                  where evidence_request_id =
+                    ${sqlLiteral(issueInput.evidence_request_id)}::uuid
+                    and stage = 'FINALIZE')
+                || '|' ||
+                (select count(*) from
+                  production_control.google_writer_fence_rehearsals)
+                || '|' ||
+                (select count(*) from
+                  production_control.google_writer_provider_fences);
+            `),
+            "0|0|0|0|0",
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select count(*) || '|' ||
+                (details->>'abandonment_reason')
+              from production_control.operation_audit_events
+              where event_type =
+                'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDONED'
+                and request_fingerprint =
+                  ${sqlLiteral(abandonInput.request_fingerprint)}
+              group by details->>'abandonment_reason';
+            `),
+            "1|EXPIRED_UNCONSUMED_BEGIN_SUPERSEDED",
+          );
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              update production_control.vercel_provider_attestation_challenges
+              set updated_at = pg_catalog.clock_timestamp()
+              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDONED_TERMINAL/,
+          );
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              delete from production_control.vercel_provider_attestation_challenges
+              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDONED_TERMINAL/,
+          );
+
+          const nextIssueInput = {
+            ...issueInput,
+            challenge_request_id: randomUUID(),
+            operation_request_id: randomUUID(),
+            evidence_request_id: randomUUID(),
+            request_fingerprint: fingerprint(
+              "challenge-abandonment-next-cycle-issue",
+            ),
+          };
+          const nextChallenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            nextIssueInput,
+          );
+          assert.equal(nextChallenge.status, "ISSUED");
+          assert.equal(nextChallenge.candidate_deployment_id,
+            issueInput.candidate_deployment_id);
+          assert.equal(nextChallenge.routing_rule_id, issueInput.routing_rule_id);
+          assert.equal(
+            psql(cluster, database, `
+              select pg_catalog.string_agg(status, ',' order by status)
+              from production_control.vercel_provider_attestation_challenges
+              where challenge_id in (
+                ${sqlLiteral(challenge.challenge_id)}::uuid,
+                ${sqlLiteral(nextChallenge.challenge_id)}::uuid
+              );
+            `),
+            "ABANDONED,ISSUED",
+          );
+        },
+      );
+
+      await t.test(
+        "abandonment requires the exact retained candidate, rule, actor, and Production resource binding",
+        () => {
+          const database = cloneDormantDatabase("challenge_abandonment_binding");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "challenge-abandonment-binding",
+          );
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-abandonment-binding",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          expireProviderChallenge(cluster, database, challenge.challenge_id);
+          for (const [label, overrides] of [
+            ["candidate", { candidate_deployment_commit: "f".repeat(40) }],
+            ["rule", { routing_rule_config_version: "retained-revision-drift" }],
+            ["actor", { actor_id: "different-authorized-operator" }],
+          ]) {
+            assertCommandFailure(
+              () => rpc(
+                cluster,
+                database,
+                "abandon_production_vercel_provider_attestation_challenge",
+                providerChallengeAbandonInput(
+                  issueInput,
+                  challenge,
+                  `challenge-abandonment-binding-${label}`,
+                  overrides,
+                ),
+              ),
+              /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDON_BINDING_MISMATCH/,
+            );
+          }
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "abandon_production_vercel_provider_attestation_challenge",
+              providerChallengeAbandonInput(
+                issueInput,
+                challenge,
+                "challenge-abandonment-binding-resource",
+                { source_workbook_id: "wrong-workbook" },
+              ),
+            ),
+            /PRODUCTION_RESOURCE_ASSERTION_FAILED/,
+          );
+          const abandoned = rpc(
+            cluster,
+            database,
+            "abandon_production_vercel_provider_attestation_challenge",
+            providerChallengeAbandonInput(
+              issueInput,
+              challenge,
+              "challenge-abandonment-binding-exact",
+            ),
+          );
+          assert.equal(abandoned.status, "ABANDONED");
+        },
+      );
+
+      await t.test(
+        "a progressed evidence identity is classified and rejected without mutation",
+        () => {
+          const database = cloneDormantDatabase(
+            "challenge_abandonment_progression",
+          );
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "challenge-abandonment-progression",
+          );
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-abandonment-progression",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          expireProviderChallenge(cluster, database, challenge.challenge_id);
+          psql(cluster, database, `
+            insert into production_control.vercel_provider_attestation_challenges (
+              challenge_id, challenge_request_id, operation_request_id,
+              evidence_request_id, stage, purpose, issue_request_fingerprint,
+              issue_payload_hash, challenge_request_fingerprint, status,
+              authenticated_actor_fingerprint, vercel_project_id,
+              vercel_team_id, candidate_deployment_id,
+              candidate_deployment_commit, candidate_deployment_target,
+              candidate_alias_origin, candidate_immutable_origin,
+              routing_rule_id, routing_rule_config_version,
+              routing_rule_scope, actor_id, issued_at, expires_at,
+              created_at, updated_at
+            )
+            select extensions.gen_random_uuid(), extensions.gen_random_uuid(),
+              extensions.gen_random_uuid(), evidence_request_id, 'FINALIZE',
+              purpose,
+              ${sqlLiteral(fingerprint("progressed-finalize-issue"))},
+              ${sqlLiteral(fingerprint("progressed-finalize-payload"))},
+              ${sqlLiteral(fingerprint("progressed-finalize-binding"))},
+              'ISSUED', authenticated_actor_fingerprint, vercel_project_id,
+              vercel_team_id, candidate_deployment_id,
+              candidate_deployment_commit, candidate_deployment_target,
+              candidate_alias_origin, candidate_immutable_origin,
+              routing_rule_id, routing_rule_config_version,
+              routing_rule_scope, actor_id, pg_catalog.now(),
+              pg_catalog.now() + interval '120 seconds',
+              pg_catalog.now(), pg_catalog.now()
+            from production_control.vercel_provider_attestation_challenges
+            where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+          `);
+          const inspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(issueInput, challenge),
+          );
+          assert.equal(inspection.abandon_eligible, false);
+          assert.equal(inspection.abandonment_code, "PROGRESSION_CONFLICT");
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "abandon_production_vercel_provider_attestation_challenge",
+              providerChallengeAbandonInput(
+                issueInput,
+                challenge,
+                "challenge-abandonment-progression",
+              ),
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDON_PROGRESSION_CONFLICT/,
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select status
+              from production_control.vercel_provider_attestation_challenges
+              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            "ISSUED",
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select count(*)
+              from production_control.operation_audit_events
+              where event_type =
+                'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDONED';
+            `),
+            "0",
+          );
+        },
+      );
+
+      await t.test(
+        "consume winning before abandonment is terminal and cannot be discarded",
+        () => {
+          const database = cloneDormantDatabase("challenge_consume_wins");
+          const input = quiesceBeginInput("REHEARSAL", "challenge-consume-wins");
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-consume-wins",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          const consumed = rpc(
+            cluster,
+            database,
+            "consume_production_vercel_provider_attestation_challenge",
+            providerChallengeConsumeInput(
+              input,
+              issueInput,
+              challenge,
+              "challenge-consume-wins",
+            ),
+          );
+          assert.equal(consumed.status, "RESERVED");
+          const inspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(issueInput, challenge),
+          );
+          assert.equal(inspection.abandonment_code, "CONSUMED");
+          assert.equal(inspection.abandon_eligible, false);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "abandon_production_vercel_provider_attestation_challenge",
+              providerChallengeAbandonInput(
+                issueInput,
+                challenge,
+                "challenge-consume-wins",
+              ),
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDON_TERMINAL_CONFLICT/,
+          );
+        },
+      );
+
+      await t.test(
+        "abandonment winning before consume remains terminal and creates no reservation",
+        () => {
+          const database = cloneDormantDatabase("challenge_abandon_wins");
+          const input = quiesceBeginInput("REHEARSAL", "challenge-abandon-wins");
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-abandon-wins",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          const consumeInput = providerChallengeConsumeInput(
+            input,
+            issueInput,
+            challenge,
+            "challenge-abandon-wins",
+          );
+          expireProviderChallenge(cluster, database, challenge.challenge_id);
+          const abandoned = rpc(
+            cluster,
+            database,
+            "abandon_production_vercel_provider_attestation_challenge",
+            providerChallengeAbandonInput(
+              issueInput,
+              challenge,
+              "challenge-abandon-wins",
+            ),
+          );
+          assert.equal(abandoned.status, "ABANDONED");
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "consume_production_vercel_provider_attestation_challenge",
+              consumeInput,
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_(EXPIRED|ABANDONED_TERMINAL)/,
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select count(*)
+              from production_control.vercel_provider_attestations
+              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            "0",
+          );
+          const inspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(issueInput, challenge),
+          );
+          assert.equal(inspection.abandonment_code, "ABANDONED");
+          assert.equal(inspection.abandon_eligible, false);
+        },
+      );
+
+      await t.test(
+        "concurrent consume and abandon serialize to one terminal abandoned outcome",
+        async () => {
+          const database = cloneDormantDatabase("challenge_abandon_consume_race");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "challenge-abandon-consume-race",
+          );
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-abandon-consume-race",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          expireProviderChallenge(cluster, database, challenge.challenge_id);
+          const abandonInput = providerChallengeAbandonInput(
+            issueInput,
+            challenge,
+            "challenge-abandon-consume-race",
+          );
+          const consumeInput = providerChallengeConsumeInput(
+            input,
+            issueInput,
+            challenge,
+            "challenge-abandon-consume-race",
+          );
+
+          const lockHolder = spawnPsql(cluster, database, `
+            begin;
+            select pg_catalog.pg_advisory_xact_lock(${advisoryLockKey});
+            select pg_catalog.pg_sleep(2.50);
+            commit;
+          `);
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: true,
+            minimum: 1,
+          });
+
+          const abandonSession = spawnPsql(
+            cluster,
+            database,
+            rpcSql(
+              "abandon_production_vercel_provider_attestation_challenge",
+              abandonInput,
+            ),
+          );
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: false,
+            minimum: 1,
+          });
+          const consumeSession = spawnPsql(
+            cluster,
+            database,
+            rpcSql(
+              "consume_production_vercel_provider_attestation_challenge",
+              consumeInput,
+            ),
+          );
+          const consumeDone = consumeSession.done.then(
+            (result) => ({ ok: true, result }),
+            (error) => ({ ok: false, error }),
+          );
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: false,
+            minimum: 2,
+          });
+
+          await lockHolder.done;
+          const abandoned = parseJsonOutput((await abandonSession.done).stdout);
+          assert.equal(abandoned.status, "ABANDONED");
+          const consumed = await consumeDone;
+          assert.equal(consumed.ok, false);
+          assert.match(
+            consumed.error.message,
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_(EXPIRED|ABANDONED_TERMINAL)/,
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select challenge.status || '|' ||
+                (select count(*) from
+                  production_control.vercel_provider_attestations attestation
+                  where attestation.challenge_id = challenge.challenge_id)
+                || '|' ||
+                (select count(*) from production_control.operation_audit_events event
+                  where event.event_type =
+                    'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDONED'
+                    and event.request_fingerprint =
+                      ${sqlLiteral(abandonInput.request_fingerprint)})
+                || '|' ||
+                (select count(*) from production_control.operation_audit_events event
+                  where event.event_type =
+                    'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_RESERVED'
+                    and event.details->>'challenge_id' = challenge.challenge_id::text)
+              from production_control.vercel_provider_attestation_challenges challenge
+              where challenge.challenge_id =
+                ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            "ABANDONED|0|1|0",
+          );
+        },
+      );
+
+      await t.test(
+        "concurrent consume queued first reserves once and rejects abandonment",
+        async () => {
+          const database = cloneDormantDatabase("challenge_consume_abandon_race");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "challenge-consume-abandon-race",
+          );
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-consume-abandon-race",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          const consumeInput = providerChallengeConsumeInput(
+            input,
+            issueInput,
+            challenge,
+            "challenge-consume-abandon-race",
+          );
+          const abandonInput = providerChallengeAbandonInput(
+            issueInput,
+            challenge,
+            "challenge-consume-abandon-race",
+          );
+
+          const lockHolder = spawnPsql(cluster, database, `
+            begin;
+            select pg_catalog.pg_advisory_xact_lock(${advisoryLockKey});
+            select pg_catalog.pg_sleep(2.50);
+            commit;
+          `);
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: true,
+            minimum: 1,
+          });
+
+          const consumeSession = spawnPsql(
+            cluster,
+            database,
+            rpcSql(
+              "consume_production_vercel_provider_attestation_challenge",
+              consumeInput,
+            ),
+          );
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: false,
+            minimum: 1,
+          });
+          const abandonSession = spawnPsql(
+            cluster,
+            database,
+            rpcSql(
+              "abandon_production_vercel_provider_attestation_challenge",
+              abandonInput,
+            ),
+          );
+          const abandonDone = abandonSession.done.then(
+            (result) => ({ ok: true, result }),
+            (error) => ({ ok: false, error }),
+          );
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: false,
+            minimum: 2,
+          });
+
+          await lockHolder.done;
+          const consumed = parseJsonOutput((await consumeSession.done).stdout);
+          assert.equal(consumed.status, "RESERVED");
+          const abandoned = await abandonDone;
+          assert.equal(abandoned.ok, false);
+          assert.match(
+            abandoned.error.message,
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDON_TERMINAL_CONFLICT/,
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select challenge.status || '|' ||
+                (select count(*) from
+                  production_control.vercel_provider_attestations attestation
+                  where attestation.challenge_id = challenge.challenge_id)
+                || '|' ||
+                (select count(*) from production_control.operation_audit_events event
+                  where event.event_type =
+                    'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_RESERVED'
+                    and event.details->>'challenge_id' = challenge.challenge_id::text)
+                || '|' ||
+                (select count(*) from production_control.operation_audit_events event
+                  where event.event_type =
+                    'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_ABANDONED'
+                    and event.request_fingerprint =
+                      ${sqlLiteral(abandonInput.request_fingerprint)})
+              from production_control.vercel_provider_attestation_challenges challenge
+              where challenge.challenge_id =
+                ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            "CONSUMED|1|1|0",
+          );
+        },
+      );
+
+      await t.test(
+        "a consume queued before expiry cannot commit after the database-clock boundary",
+        async () => {
+          const database = cloneDormantDatabase(
+            "challenge_consume_crosses_expiry",
+          );
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "challenge-consume-crosses-expiry",
+          );
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "challenge-consume-crosses-expiry",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          psql(cluster, database, `
+            update production_control.vercel_provider_attestation_challenges
+            set issued_at = pg_catalog.now() - interval '118 seconds',
+                expires_at = pg_catalog.now() + interval '2 seconds'
+            where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+          `);
+          const consumeInput = providerChallengeConsumeInput(
+            input,
+            issueInput,
+            challenge,
+            "challenge-consume-crosses-expiry",
+          );
+          const lockHolder = spawnPsql(cluster, database, `
+            begin;
+            select pg_catalog.pg_advisory_xact_lock(${advisoryLockKey});
+            select pg_catalog.pg_sleep(3.00);
+            commit;
+          `);
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: true,
+            minimum: 1,
+          });
+          const consumeSession = spawnPsql(
+            cluster,
+            database,
+            rpcSql(
+              "consume_production_vercel_provider_attestation_challenge",
+              consumeInput,
+            ),
+          );
+          const consumeDone = consumeSession.done.then(
+            (result) => ({ ok: true, result }),
+            (error) => ({ ok: false, error }),
+          );
+          await waitForAdvisoryLocks(cluster, database, {
+            mode: "ExclusiveLock",
+            granted: false,
+            minimum: 1,
+          });
+          assert.equal(
+            psql(cluster, database, `
+              select pg_catalog.clock_timestamp() < expires_at
+              from production_control.vercel_provider_attestation_challenges
+              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            "t",
+          );
+
+          await lockHolder.done;
+          const consumed = await consumeDone;
+          assert.equal(consumed.ok, false);
+          assert.match(
+            consumed.error.message,
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_EXPIRED/,
+          );
+          assert.equal(
+            psql(cluster, database, `
+              select challenge.status || '|' ||
+                (select count(*) from
+                  production_control.vercel_provider_attestations attestation
+                  where attestation.challenge_id = challenge.challenge_id)
+                || '|' ||
+                (select count(*) from production_control.operation_audit_events event
+                  where event.event_type =
+                    'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_RESERVED'
+                    and event.details->>'challenge_id' = challenge.challenge_id::text)
+              from production_control.vercel_provider_attestation_challenges challenge
+              where challenge.challenge_id =
+                ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `),
+            "ISSUED|0|0",
+          );
+          const inspection = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            providerChallengeAbandonInspectionInput(issueInput, challenge),
+          );
+          assert.equal(inspection.abandonment_code, "ELIGIBLE");
+          assert.equal(inspection.abandon_eligible, true);
+        },
+      );
+
+      await t.test(
+        "abandonment RPCs are service-role only, fixed-search-path, and cover every progression blocker",
+        () => {
+          const database = cloneDormantDatabase("challenge_abandonment_security");
+          for (const rpcName of [
+            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            "abandon_production_vercel_provider_attestation_challenge",
+          ]) {
+            assert.equal(
+              psql(cluster, database, `
+                select p.prosecdef::text || '|' ||
+                  (p.proconfig @> array['search_path=pg_catalog'])::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'anon', 'public.${rpcName}(jsonb)', 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'authenticated', 'public.${rpcName}(jsonb)', 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'service_role', 'public.${rpcName}(jsonb)', 'EXECUTE'
+                  )::text
+                from pg_catalog.pg_proc p
+                join pg_catalog.pg_namespace n on n.oid = p.pronamespace
+                where n.nspname = 'public' and p.proname = '${rpcName}';
+              `),
+              "true|true|false|false|true",
+            );
+          }
+          const abandonDefinition = psql(cluster, database, `
+            select pg_catalog.pg_get_functiondef(
+              'public.abandon_production_vercel_provider_attestation_challenge(jsonb)'
+                ::pg_catalog.regprocedure
+            );
+          `);
+          assert.match(abandonDefinition, /pg_advisory_xact_lock/);
+          assert.match(abandonDefinition, /for update/i);
+          assert.match(abandonDefinition, /clock_timestamp/);
+          assert.match(abandonDefinition,
+            /vercel_provider_challenge_has_abandonment_progression/);
+          const progressionDefinition = psql(cluster, database, `
+            select pg_catalog.pg_get_functiondef(
+              'production_control.vercel_provider_challenge_has_abandonment_progression(production_control.vercel_provider_attestation_challenges)'
+                ::pg_catalog.regprocedure
+            );
+          `);
+          for (const relation of [
+            "vercel_provider_attestations",
+            "vercel_writer_quiesce_evidence",
+            "vercel_provider_attestation_challenges",
+            "google_writer_fence_rehearsals",
+            "google_writer_provider_fences",
+          ]) assert.match(progressionDefinition, new RegExp(relation));
+        },
+      );
+
+      await t.test(
         "post-freeze inventory with a different SHA cannot be reserved",
         () => {
           const database = cloneDormantDatabase("dynamic_provider_scope_drift");
@@ -2312,7 +3491,7 @@ test(
             "READY",
             "GIT",
           ]]);
-          assert.equal(driftedLiveInventory.length, 1145);
+          assert.equal(driftedLiveInventory.length, 1147);
           const finalizeInput = {
             ...beginInput,
             evidence_id: draining.evidence_id,

@@ -71,11 +71,12 @@ safety wait or failed gate.
    evidence fingerprint
    `1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df`).
 2. The server verifies the provider-signed live inventory: the retained 1,140
-   records, the three exact reviewed post-capture Preview deployments pinned by
-   additive migration
-   `202608260035_production_reviewed_post_capture_preview_deployments.sql`, and
+   records, the five exact reviewed post-capture Preview deployments pinned by
+   additive migrations
+   `202608260035_production_reviewed_post_capture_preview_deployments.sql` and
+   `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`, and
    the exact dynamic candidate. The ordered reviewed tuple-set fingerprint is
-   `7f0f1e6c3267f92de77e49c341ee58ed4975361f91c8b2af2fa32e3928a3d8a5`.
+   `9262c1d4edc14259d442c29aa25d04f90b21961ed2124d422e6f77b4e3e49c00`.
    Only provider-signed same-current-SHA additions in the target-appropriate
    scope are permitted. The server then adds four fixed aliases and the dynamic
    candidate alias. For signed live count `N`, each
@@ -91,15 +92,23 @@ safety wait or failed gate.
    Each snapshot is persisted as one compact tuple per dynamically attested
    origin with the exact nine-vector coverage mask and nine ordered provider-
    proof fingerprints; the database derives and validates the complete logical
-   origin×vector set. The minimum Step 11.6 snapshot is 1,149 origins and
-   10,341 requests (1,144 signed immutable origins plus five aliases). A normal
-   Step 12 Preview-plus-Production candidate pair is at least 1,150 origins and
-   10,350 requests, but the signed inventory and receipt are authoritative.
+   origin×vector set. The minimum Step 11.6 snapshot is 1,151 origins and
+   10,359 requests (1,146 signed immutable origins plus five aliases). A normal
+   Step 12 Preview-plus-Production candidate pair is at least 1,152 origins and
+   10,368 requests, but the signed inventory and receipt are authoritative.
    The fixed/candidate aliases are diagnostic canaries, not an exhaustive alias
    inventory. All other aliases are covered by the provider-attested active
    project-wide firewall configuration. The attester rejects inactive/missing
    active config and all pending drafts, and binds the exact version/rule/
    conditions in each independently signed BEGIN/FINALIZE observation.
+   If a BEGIN challenge expires before it is consumed, inspect its exact durable
+   state through the protected operator route. Only an expired, unconsumed,
+   unprogressed BEGIN challenge with the exact original actor, resource,
+   candidate, rule, purpose, and request binding may transition to immutable
+   `ABANDONED`. Retain and retry the same abandonment request identity after a
+   lost response; clear browser recovery only after the exact authoritative
+   `ABANDONED` receipt, then issue all-new BEGIN identities. Never delete the
+   row or clear browser state as a substitute for database recovery.
 3. Wait at least 300 seconds inside the recorded owner-freeze window. Generate
    `finalize-provider-quiesce` and then `inspect-provider-quiesce`. Both durable
    snapshots must bind the exact project/rule/revision/scope and candidate,

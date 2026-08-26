@@ -7,7 +7,7 @@ import { PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS } from
   "../lib/production-google-writer-fence-quiesce.js";
 
 const migrationUrl = new URL(
-  "../supabase/production_migrations/202608260035_production_reviewed_post_capture_preview_deployments.sql",
+  "../supabase/production_migrations/202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
   import.meta.url,
 );
 const sql = await readFile(migrationUrl, "utf8");
@@ -18,13 +18,18 @@ const reviewedMatch = sql.match(
 test("additive migration pins the exact shared reviewed deployment set", () => {
   assert.ok(reviewedMatch, "the reviewed SQL inventory must be statically extractable");
   const reviewed = JSON.parse(reviewedMatch[1]);
-  assert.deepEqual(reviewed, [
+  const normalizedReviewed = [...reviewed].sort((left, right) => {
+    const leftKey = `${left[0]}\n${left[2]}`;
+    const rightKey = `${right[0]}\n${right[2]}`;
+    return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+  });
+  assert.deepEqual(normalizedReviewed, [
     ...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS,
   ]);
-  assert.equal(reviewed.length, 3);
+  assert.equal(normalizedReviewed.length, 5);
   assert.equal(
-    createHash("sha256").update(JSON.stringify(reviewed)).digest("hex"),
-    "7f0f1e6c3267f92de77e49c341ee58ed4975361f91c8b2af2fa32e3928a3d8a5",
+    createHash("sha256").update(JSON.stringify(normalizedReviewed)).digest("hex"),
+    "9262c1d4edc14259d442c29aa25d04f90b21961ed2124d422e6f77b4e3e49c00",
   );
 });
 

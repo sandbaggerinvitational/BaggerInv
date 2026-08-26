@@ -41,15 +41,15 @@ export const FIXED = Object.freeze({
     "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
   requiredPriorLiveDeploymentId: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
   requiredFrozenStep11DeploymentId: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-  reviewedPostCaptureDeploymentCount: 3,
+  reviewedPostCaptureDeploymentCount: 5,
   reviewedPostCaptureDeploymentFingerprint:
-    "7f0f1e6c3267f92de77e49c341ee58ed4975361f91c8b2af2fa32e3928a3d8a5",
-  minimumLiveOriginInventoryCount: 1140 + 3 + 1,
+    "9262c1d4edc14259d442c29aa25d04f90b21961ed2124d422e6f77b4e3e49c00",
+  minimumLiveOriginInventoryCount: 1140 + 5 + 1,
   quiesceFixedAliasOriginCount: 4,
   quiesceCandidateAliasOriginCount: 1,
   quiesceProbeVectorCount: 9,
   migrationName:
-    "202608260035_production_reviewed_post_capture_preview_deployments.sql",
+    "202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
   runbook: "docs/step12-production-cutover-runbook-v2.md",
 });
 

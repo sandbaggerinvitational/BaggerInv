@@ -190,9 +190,9 @@ test("normalization adds exact fixed and candidate origins without client invent
 
 test("signed live inventory uniqueness and reviewed-candidate collisions fail closed", () => {
   const exact = providerAttestationFor();
-  assert.equal(exact.liveOriginInventoryCount, 1144);
-  assert.equal(normalizeWithProvider(exact).liveOriginInventoryCount, 1144,
-    "retained + three reviewed deployments + exact dynamic candidate is sufficient");
+  assert.equal(exact.liveOriginInventoryCount, 1146);
+  assert.equal(normalizeWithProvider(exact).liveOriginInventoryCount, 1146,
+    "retained + five reviewed deployments + exact dynamic candidate is sufficient");
 
   const duplicateTupleRecords = [
     ...exact.liveOriginInventoryRecords.map((tuple) => [...tuple]),
@@ -261,10 +261,10 @@ test("signed post-freeze deployments expand the immutable probe scope without ch
   const normalized = normalize(input(), environment(), [addition]);
   assert.equal(normalized.originInventoryCount, 1140,
     "the frozen retained artifact remains the receipt subset");
-  assert.equal(normalized.liveOriginInventoryCount, 1145,
+  assert.equal(normalized.liveOriginInventoryCount, 1147,
     "retained + reviewed candidates + signed addition + current candidate are live");
-  assert.equal(normalized.probeOriginCount, 1150);
-  assert.equal(normalized.probeTargetCount, 1150 * 9);
+  assert.equal(normalized.probeOriginCount, 1152);
+  assert.equal(normalized.probeTargetCount, 1152 * 9);
   assert.ok(normalized.probeOrigins.includes(addition[2]));
   assert.ok(normalized.liveOriginInventoryTuples.some((tuple) =>
     tuple[0] === addition[0] && tuple[2] === addition[2]));
