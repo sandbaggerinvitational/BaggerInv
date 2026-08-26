@@ -10,6 +10,8 @@ import { fetchWithTransientRetry } from "../../lib/transient-fetch.js";
 import { grossScoresFromCell, normalizeLiveScoreInput } from "../../lib/live-score-values.js";
 import { clearParticipantInitializationCache, readParticipantInitializationCache, writeParticipantInitializationCache } from "../../lib/participant-initialization-cache.js";
 import { actionableScoringEntries, createIndexedDbScoringStore, createScoringSyncQueue, participantScoringSyncIssue, sameGrossScores, scoringFinalizationReview, scoringSyncIssueKind, scoringSyncSummary } from "../../lib/scoring-sync-queue.js";
+import { scoringMutationAuthorityContractFromData } from "../../lib/scoring-mutation-authority-contract.js";
+import { createClientMutationOperationIdentityRegistry } from "../../lib/client-mutation-operation-identity.js";
 import { createIndexedDbScoringDiagnosticsStore } from "../../lib/scoring-client-diagnostics.js";
 import { applyParticipantFinalizationResult } from "../../lib/scoring-finalization-state.js";
 import { buildScoringSlots, buildScoringTeamPresentation, nextScoringSlotIndex, scoreFromKeypad, scoringKeypadActionLabel } from "../../lib/scoring-keypad.js";
@@ -161,11 +163,19 @@ export default function ScoreEntry({
   const [scoringDiagnosticsEnabled] = useState(() => scoringDiagnosticsOptIn(localFirstEnabled));
   const [scoringTimingSamples, setScoringTimingSamples] = useState([]);
   const scoringDiagnosticsStore = useRef(null);
+  const mutationOperationIdentities = useRef(null);
   const supabaseParticipantIdentity = participantIdentityAuthority === "supabase";
 
   const durableScoringStore = () => {
     if (!scoringStore.current) scoringStore.current = createIndexedDbScoringStore();
     return scoringStore.current;
+  };
+
+  const mutationIdentityRegistry = () => {
+    if (!mutationOperationIdentities.current) {
+      mutationOperationIdentities.current = createClientMutationOperationIdentityRegistry();
+    }
+    return mutationOperationIdentities.current;
   };
 
   const restoreLocalEntries = async (matchId) => {
@@ -219,7 +229,12 @@ export default function ScoreEntry({
       },
     });
     const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || "The scoring request failed.");
+    if (!response.ok) {
+      const error = new Error(payload.error || "The scoring request failed.");
+      error.status = response.status;
+      error.code = payload.code || "";
+      throw error;
+    }
     return payload;
   };
 
@@ -433,6 +448,8 @@ export default function ScoreEntry({
             expectedMatchRevision: entry.expectedMatchRevision,
             expectedUpdatedAt: entry.expectedUpdatedAt,
             clientMutationId: entry.clientMutationId,
+            operationRequestId: entry.operationRequestId,
+            scoringAuthorityContract: entry.scoringAuthorityContract,
           }),
         });
         const payload = await response.json();
@@ -559,6 +576,7 @@ export default function ScoreEntry({
   }, [authorized, data?.match?.["Match ID"], localFirstEnabled]);
 
   const match = data?.match || {};
+  const scoringAuthorityContract = scoringMutationAuthorityContractFromData(data);
   const display = data?.display || {};
   const teeName = display.course?.tee || match.Tee || match["Tee Played"] || "";
   const teeTime = match["Tee Time"] || "";
@@ -690,7 +708,20 @@ export default function ScoreEntry({
     setSaveFailed(false);
     setSyncFeedback({ state: "saving", text: "Saving…" });
     setBusy(true); setStatus(`Saving hole ${holeNumber}…`);
+    const intent = {
+      action: "score",
+      matchId: String(match["Match ID"] || ""),
+      holeNumber,
+      team1GrossScores: gross.team1,
+      team2GrossScores: gross.team2,
+      expectedRevision: Number(savedHole?.Revision || 0),
+      expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
+      expectedUpdatedAt: match["Updated At"] || "",
+      scoringAuthorityContract,
+    };
     try {
+      const operationReceipt = mutationIdentityRegistry().acquire(intent);
+      const operationRequestId = operationReceipt.operationRequestId;
       const payload = await request("/api/scoring/current", {
         method: "POST",
         body: JSON.stringify({
@@ -700,8 +731,12 @@ export default function ScoreEntry({
           expectedRevision: Number(savedHole?.Revision || 0),
           expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
           expectedUpdatedAt: match["Updated At"] || "",
+          clientMutationId: operationRequestId,
+          operationRequestId,
+          scoringAuthorityContract,
         }),
       });
+      mutationIdentityRegistry().confirm(operationReceipt);
       const nextScores = (data?.holeScores || [])
         .filter((item) => Number(item["Hole Number"]) !== holeNumber)
         .concat(payload.result?.hole || []);
@@ -791,6 +826,7 @@ export default function ScoreEntry({
         expectedUpdatedAt: match["Updated At"] || "",
         optimisticHole,
         authoritativeHole: savedHole || null,
+        scoringAuthorityContract,
       });
       const commitFinishedAt = typeof performance === "undefined" ? Date.now() : performance.now();
       const effectiveOptimisticHole = queuedEntry.optimisticHole || savedHole || optimisticHole;
@@ -863,14 +899,24 @@ export default function ScoreEntry({
         const authoritative = await loadMatch();
         if (!authoritative?.canConfirm) throw new Error("All 18 holes must be confirmed before final submission.");
       }
+      const finalizeIntent = {
+        action: "finalize",
+        matchId: String(match["Match ID"] || ""),
+        expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
+        scoringAuthorityContract,
+      };
+      const operationReceipt = mutationIdentityRegistry().acquire(finalizeIntent);
       const finalized = await request("/api/scoring/current", {
         method: "POST",
         body: JSON.stringify({
           action: "confirm",
           expectedMatchRevision: Number(match.Revision || match.matchRevision || 0),
           clientMutationId: `finalize:${match["Match ID"]}:${Number(match.Revision || match.matchRevision || 0)}`,
+          operationRequestId: operationReceipt.operationRequestId,
+          scoringAuthorityContract,
         }),
       });
+      mutationIdentityRegistry().confirm(operationReceipt);
       if (finalized.authoritativeData?.match?.["Match Status"] === "Final") {
         setData(finalized.authoritativeData);
         const scored = finalized.authoritativeData.holeScores?.map((item) => Number(item["Hole Number"])) || [];
@@ -1199,7 +1245,8 @@ export default function ScoreEntry({
         <button type="button" onClick={() => syncQueue.current?.resolveConflict(activeSyncIssue.id, "server")}><strong>Use Server Score</strong><small>Keep the score already recorded on the server.</small></button>
       </div> : null}
       {activeSyncIssueKind === "retryable" ? <button type="button" onClick={() => syncQueue.current?.retryEntry(activeSyncIssue.id)}>Retry Sync</button> : null}
-      {activeSyncIssue.status === "action-required" ? <button type="button" onClick={() => syncQueue.current?.retryEntry(activeSyncIssue.id)}>Check Again</button> : null}
+      {activeSyncIssue.status === "action-required" && activeSyncIssue.failureKind !== "authority-transition" ? <button type="button" onClick={() => syncQueue.current?.retryEntry(activeSyncIssue.id)}>Check Again</button> : null}
+      {activeSyncIssue.failureKind === "authority-transition" ? <button type="button" onClick={() => window.location.reload()}>Refresh Match</button> : null}
     </section> : null}
     <div className={styles.scoringDock}>
       {localFirstEnabled ? syncBanner : null}

@@ -21,11 +21,10 @@ import { recalculateCompetitionDerivedTournament } from "../../../lib/competitio
 import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
 import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
 import { assertDirectorMutationAuthority } from "../../../lib/director-mutation-authority.js";
-import {
-  beginProductionGoogleAuthorityWrite,
-  completeProductionGoogleAuthorityWrite,
-} from "../../../lib/production-cutover-scoring-ingress.js";
+import { withProductionGoogleAuthorityWrite } from "../../../lib/production-cutover-scoring-ingress.js";
 import { productionCutoverPhaseAtLeast } from "../../../lib/production-cutover-activation-contract.js";
+import { certifyGoogleWorkbookMutationReadback, googleWorkbookMutationOutcome } from "../../../lib/google-workbook-mutation-intent.js";
+import { assertScoringMutationAuthorityContractBeforeDispatch, currentScoringMutationAuthorityContract } from "../../../lib/scoring-mutation-authority-server.js";
 
 export const dynamic = "force-dynamic";
 
@@ -166,6 +165,7 @@ export async function GET(request) {
     trace.stage("Workbook verification", "PASS");
     console.info("Director workbook access", { normalized: measured.result.diagnostics, authenticated: measured.diagnostics });
     const directorModel = tournamentDirectorModel({ ...tournamentData, readiness, diagnostics: tournamentLoaderDiagnostics() });
+    const scoringAuthorityContract = await currentScoringMutationAuthorityContract({ request });
     const projectionYear = projectionSheets ? currentTournamentYear(projectionSheets) : directorModel.tournament.year;
     const boundProjectionSheets = projectionSheets ? bindOfficialProjectionMatches(projectionSheets, projectionYear) : null;
     const championshipProjections = championshipProjectionMissionStatus({
@@ -183,6 +183,7 @@ export async function GET(request) {
     console.info("Director dashboard transaction", trace.report({ workbook: measured.result.diagnostics, authorization: measured.diagnostics }));
     return NextResponse.json({ data: {
       ...directorModel,
+      scoringAuthorityContract,
       operations,
       championshipProjections,
       notificationSandbox: preview.preview ? {
@@ -218,6 +219,7 @@ export async function POST(request) {
   try {
     const input = await request.json();
     const mutationAuthority = assertDirectorMutationAuthority({ surface: "director", action: input.action });
+    await assertScoringMutationAuthorityContractBeforeDispatch(input.scoringAuthorityContract, { request });
     trace.stage("Action authorization", "PASS", String(input.action || "unknown"));
     trace.stage("Canonical authority", "PASS", JSON.stringify(mutationAuthority));
     if (mutationAuthority.resolvedAuthority === "supabase") {
@@ -234,6 +236,7 @@ export async function POST(request) {
         updatedBy,
         authUserId: identity.authUserId,
         playerId: identity.actor.id,
+        operationRequestId: input.operationRequestId,
       });
       if (!lifecycle.delegated) {
         const error = new Error("The canonical Supabase lifecycle transaction was not selected.");
@@ -289,13 +292,15 @@ export async function POST(request) {
     const selectedMatch = data.rounds.flatMap((item) => item.matches || []).find((match) => match.id === input.matchId);
     const updatedBy = identity.actor.name;
     const workbookWriteStartedAt = Date.now();
-    const productionIngressLease = await beginProductionGoogleAuthorityWrite({
+    return await withProductionGoogleAuthorityWrite({
       tournamentId: data.tournament.id,
-      matchId: input.matchId || matches[0]?.id || `TOURNAMENT-${data.tournament.id}`,
+      matchId: input.matchId || matches[0]?.id || data.rounds.flatMap((item) => item.matches || [])[0]?.id || "",
       actorId: identity.authUserId || identity.actor.id || updatedBy,
       operation: `DIRECTOR:${String(input.action || "UNKNOWN")}`,
-    });
-    try {
+      operationRequestId: input.operationRequestId,
+      scoringAuthorityContract: input.scoringAuthorityContract,
+      request,
+    }, async () => {
       if (input.action === "automation-check") {
       const dueRound = directorAutomationDue(tournamentDirectorModel(data));
       if (!dueRound) return NextResponse.json({ ok: true, changed: false });
@@ -317,7 +322,7 @@ export async function POST(request) {
       await updateTournamentAdminData(data.tournament.id, { "Status Mode": "Manual Override", "Tournament Status": next ? "Live" : "Final", "Current Round": next ? String(next) : "Final" }, updatedBy);
     } else if (input.action === "reopen-match") {
       if (!input.matchId || !matches.some((match) => match.id === input.matchId && match.status === "Final")) throw new Error("Select a finalized match from the active round.");
-      const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId: input.matchId, updatedBy });
+      const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId: input.matchId, updatedBy, operationRequestId: input.operationRequestId });
       if (!lifecycle.delegated) await reopenLiveMatch(input.matchId, updatedBy);
       else if (!(await drainGoogleOutbox({ maximum: 4, actor: updatedBy })).ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
     } else if (input.action === "match-unlock-scoring") {
@@ -332,12 +337,12 @@ export async function POST(request) {
     } else if (input.action === "match-finalize") {
       if (!selectedMatch) throw new Error("The selected match could not be found.");
       if (selectedMatch.status === "Final") throw new Error("This match is already Final.");
-      const lifecycle = await persistDirectorMatchLifecycle({ action: "finalize", matchId: input.matchId, updatedBy });
+      const lifecycle = await persistDirectorMatchLifecycle({ action: "finalize", matchId: input.matchId, updatedBy, operationRequestId: input.operationRequestId });
       if (!lifecycle.delegated) await finalizeLiveMatch(input.matchId, {}, updatedBy);
       else if (!(await drainGoogleOutbox({ maximum: 4, actor: updatedBy })).ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
     } else if (input.action === "match-reopen") {
       if (!selectedMatch || selectedMatch.status !== "Final") throw new Error("Only a Final match can be reopened.");
-      const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId: input.matchId, updatedBy });
+      const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId: input.matchId, updatedBy, operationRequestId: input.operationRequestId });
       if (!lifecycle.delegated) await reopenLiveMatch(input.matchId, updatedBy);
       else if (!(await drainGoogleOutbox({ maximum: 4, actor: updatedBy })).ok) throw new Error("Google mirror delivery must verify before completing this Director action.");
     } else if (input.action === "automation") {
@@ -357,15 +362,6 @@ export async function POST(request) {
       } else if (input.action === "course-tees") {
         await updateDirectorCourseTees({ ...input, year: data.tournament.year }, updatedBy);
       } else throw new Error("Unknown Director action.");
-    } finally {
-      try { await completeProductionGoogleAuthorityWrite(productionIngressLease); }
-      catch (error) {
-        console.error("Production Director ingress lease completion remains pending", {
-          action: input.action,
-          code: error?.code || "PRODUCTION_GOOGLE_INGRESS_LEASE_COMPLETION_FAILED",
-        });
-      }
-    }
     const googleWriteCompletedAt = Date.now();
     trace.stage("Action execution", "PASS");
     trace.stage("Workbook write", "PASS", JSON.stringify({
@@ -420,9 +416,19 @@ export async function POST(request) {
       new Error("The workbook update could not be verified after it completed."),
       { verificationAttempts: verification.attempts },
     );
+    if (googleWorkbookMutationOutcome().confirmedWrites > 0) {
+      const providerValues = verificationValues(input.action, input, verification.data, round);
+      certifyGoogleWorkbookMutationReadback({
+        proofType: "DIRECTOR_OPERATION",
+        before: verificationValues(input.action, input, data, round),
+        expectedAfter: { action: input.action, verified: true, request: input, providerValues },
+        providerReadback: { action: input.action, verified: verifyActionReadBack(input.action, input, verification.data, round), request: input, providerValues },
+      });
+    }
     trace.stage("Success", "PASS");
     console.info("Director action transaction", trace.report({ round, updatedBy }));
     return NextResponse.json({ ok: true, changed: input.action === "automation-check" });
+    });
   } catch (error) {
     trace.stage("Failure", "FAIL", error instanceof Error ? error.message : String(error));
     console.error("Director action transaction", trace.report());

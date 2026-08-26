@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StatusBadge from "../../StatusBadge";
 import styles from "./live-match-control.module.css";
 import pairingStyles from "./pairing-editor.module.css";
@@ -9,6 +9,7 @@ import { getTournamentState } from "../../../lib/live-tournament";
 import { finalizationReview, hasUnsavedMatchChanges } from "../../../lib/live-admin-ux";
 import { formatStatusLabel, formatTeamPoints } from "../../../lib/formatters";
 import { directorFetch, runDirectorTransaction } from "../../../lib/director-client-transaction";
+import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity";
 
 const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Notes"];
 const PAIRING_FIELDS = ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"];
@@ -156,6 +157,13 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const [year, setYear] = useState("");
   const [round, setRound] = useState("");
   const [calcuttaTrace, setCalcuttaTrace] = useState(null);
+  const mutationOperationIdentities = useRef(null);
+  const mutationIdentityRegistry = () => {
+    if (!mutationOperationIdentities.current) {
+      mutationOperationIdentities.current = createClientMutationOperationIdentityRegistry();
+    }
+    return mutationOperationIdentities.current;
+  };
   const updateDirty = useCallback((matchId, dirty) => setDirtyMatches((current) => {
     const next = new Set(current);
     if (dirty) next.add(matchId); else next.delete(matchId);
@@ -203,8 +211,11 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
     if (!updatedBy.trim()) throw new Error("Enter your name before updating a match.");
     if (action === "reopen" && !window.confirm(`Reopen ${match["Match ID"]} for a documented correction?`)) return null;
     setBusyMatchId(match["Match ID"]);
+    const requestBody = { action, matchId: match["Match ID"], updates, updatedBy, scoringAuthorityContract: data?.scoringAuthorityContract };
+    const receipt = mutationIdentityRegistry().acquire({ endpoint: "/api/live-matches", ...requestBody });
     try {
-      const payload = await request({ action, matchId: match["Match ID"], updates, updatedBy });
+      const payload = await request({ ...requestBody, operationRequestId: receipt.operationRequestId });
+      mutationIdentityRegistry().confirm(receipt);
       if (action === "finalize") setCalcuttaTrace(payload.calcuttaPublication || null);
       if (payload.access) {
         setAccessByMatch((current) => ({ ...current, [match["Match ID"]]: payload.access }));

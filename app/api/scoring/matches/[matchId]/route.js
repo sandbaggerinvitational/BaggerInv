@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { canScoreMatch, scoringTokenFromRequest, verifyScoringSession } from "../../../../../lib/scoring-access.js";
 import { clientAddress, consumeRateLimit } from "../../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../../lib/live-score-values.js";
-import { logScoringFailure, participantScoringError } from "../../../../../lib/scoring-api-errors.js";
+import { logScoringFailure, participantScoringError, participantScoringHttpStatus, participantScoringPauseHeaders } from "../../../../../lib/scoring-api-errors.js";
 import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldScheduleScoringShadowObservation } from "../../../../../lib/scoring-shadow.js";
 import { scoringShadowEnvironment } from "../../../../../lib/scoring-shadow-gate.js";
 import { persistParticipantScore } from "../../../../../lib/scoring-persistence-adapter.js";
@@ -16,6 +16,7 @@ import { drainScorecardArchiveJobs } from "../../../../../lib/scorecard-archive-
 import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../../../../lib/scoring-read-service.js";
 import { productionShadowScoringMutationResponse } from "../../../../../lib/production-shadow-scoring-safety.js";
 import { productionCutoverPhaseAtLeast } from "../../../../../lib/production-cutover-activation-contract.js";
+import { attachScoringMutationAuthorityContract, currentScoringMutationAuthorityContract } from "../../../../../lib/scoring-mutation-authority-server.js";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,11 @@ export async function GET(request, { params }) {
       },
       canonicalData: authorization.canonical,
     });
-    return NextResponse.json({ data: { ...scoring.data, readDiagnostics: scoring.diagnostics } },
+    const mutationContract = await currentScoringMutationAuthorityContract({ request });
+    return NextResponse.json({ data: attachScoringMutationAuthorityContract(
+      { ...scoring.data, readDiagnostics: scoring.diagnostics },
+      mutationContract,
+    ) },
       { headers: scoringReadResponseHeaders(scoring.diagnostics) });
   } catch (error) {
     return NextResponse.json({ error: error?.message || "Unable to load scoring.", code: error?.code || "" },
@@ -76,7 +81,8 @@ export async function POST(request, { params }) {
     const persistenceStartedAt = Date.now();
     const measured = await persistParticipantScore({ matchId, input, current,
       updatedBy: current.scorerName || "Authorized scorer",
-      authorizationContext: verifiedAuthorization });
+      authorizationContext: verifiedAuthorization,
+      request });
     const result = measured.result;
     const googleDiagnostics = measured.diagnostics;
     const googleAuthoritativeMs = measured.authority === "google" ? Date.now() - persistenceStartedAt : 0;
@@ -156,8 +162,9 @@ export async function POST(request, { params }) {
     return NextResponse.json(
       {
         error: participantScoringError(error),
+        code: error?.code || "",
       },
-      { status: conflict ? 409 : Number(error?.status) === 403 ? 403 : 400 }
+      { status: conflict ? 409 : participantScoringHttpStatus(error), headers: participantScoringPauseHeaders(error) }
     );
   }
 }

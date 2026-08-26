@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { scoringTokenFromRequest, verifyScoringSession } from "../../../../lib/scoring-access.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../lib/live-score-values.js";
-import { logScoringFailure, participantScoringError } from "../../../../lib/scoring-api-errors.js";
+import { logScoringFailure, participantScoringError, participantScoringHttpStatus, participantScoringPauseHeaders } from "../../../../lib/scoring-api-errors.js";
 import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldScheduleScoringShadowObservation } from "../../../../lib/scoring-shadow.js";
 import { scoringShadowEnvironment } from "../../../../lib/scoring-shadow-gate.js";
 import { persistParticipantScore } from "../../../../lib/scoring-persistence-adapter.js";
@@ -16,6 +16,7 @@ import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intell
 import { recalculateCalcuttaTournament } from "../../../../lib/calcutta-supabase.js";
 import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
 import { productionCutoverPhaseAtLeast } from "../../../../lib/production-cutover-activation-contract.js";
+import { attachScoringMutationAuthorityContract, currentScoringMutationAuthorityContract } from "../../../../lib/scoring-mutation-authority-server.js";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,12 @@ export async function GET(request) {
       },
       canonicalData: authorization.canonical,
     });
+    const mutationContract = await currentScoringMutationAuthorityContract({ request });
     return NextResponse.json({
-      data: { ...scoring.data, readDiagnostics: scoring.diagnostics },
+      data: attachScoringMutationAuthorityContract(
+        { ...scoring.data, readDiagnostics: scoring.diagnostics },
+        mutationContract,
+      ),
     }, { headers: scoringReadResponseHeaders(scoring.diagnostics) });
   } catch (error) {
     const status = Number(error?.status) || (/temporarily unavailable/i.test(error?.message || "") ? 503 : 403);
@@ -67,7 +72,8 @@ export async function POST(request) {
     const persistenceStartedAt = Date.now();
     const measured = await persistParticipantScore({ matchId: current.matchId, input, current,
       updatedBy: current.scorerName || "Authorized participant",
-      authorizationContext: verifiedAuthorization });
+      authorizationContext: verifiedAuthorization,
+      request });
     const result = measured.result;
     const googleDiagnostics = measured.diagnostics;
     const googleAuthoritativeMs = measured.authority === "google" ? Date.now() - persistenceStartedAt : 0;
@@ -172,6 +178,6 @@ export async function POST(request) {
       error: participantScoringError(error),
       code: error?.code || diagnostics.code || "",
       currentMatchRevision: Number.isFinite(Number(diagnostics.current_match_revision)) ? Number(diagnostics.current_match_revision) : undefined,
-    }, { status: conflict ? 409 : Number(error?.status) === 403 ? 403 : 400 });
+    }, { status: conflict ? 409 : participantScoringHttpStatus(error), headers: participantScoringPauseHeaders(error) });
   }
 }

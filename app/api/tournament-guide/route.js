@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { deleteTournamentGuideRecord, readTournamentGuideAdminData, saveTournamentGuideRecord } from "../../../lib/google-sheets-write";
 import { directorTransactionError } from "../../../lib/director-transaction-error";
+import { withProductionGoogleAuthoringWrite } from "../../../lib/production-google-authoring.js";
+import { GOOGLE_AUTHORING_OPERATIONS } from "../../../lib/google-workbook-mutation-intent.js";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +30,11 @@ export async function POST(request) {
   if (!authorized(request)) return deny();
   try {
     const { type, record, updatedBy } = await request.json();
-    return NextResponse.json({ record: await saveTournamentGuideRecord(type, record, updatedBy) });
+    const saved = await withProductionGoogleAuthoringWrite({
+      request,
+      operation: GOOGLE_AUTHORING_OPERATIONS.TOURNAMENT_GUIDE,
+    }, () => saveTournamentGuideRecord(type, record, updatedBy));
+    return NextResponse.json({ record: saved });
   } catch (error) {
     console.error("Tournament Guide save failed", { sheet: "Guide tabs", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
@@ -39,7 +45,10 @@ export async function DELETE(request) {
   if (!authorized(request)) return deny();
   try {
     const { type, id, updatedBy } = await request.json();
-    return NextResponse.json(await deleteTournamentGuideRecord(type, id, updatedBy));
+    return NextResponse.json(await withProductionGoogleAuthoringWrite({
+      request,
+      operation: GOOGLE_AUTHORING_OPERATIONS.TOURNAMENT_GUIDE,
+    }, () => deleteTournamentGuideRecord(type, id, updatedBy)));
   } catch (error) {
     console.error("Tournament Guide delete failed", { sheet: "Guide tabs", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });

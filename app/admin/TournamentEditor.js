@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { directorFetch } from "../../lib/director-client-transaction";
+import { createClientMutationOperationIdentityRegistry } from "../../lib/client-mutation-operation-identity";
 import styles from "./admin-center.module.css";
 
 const LABELS = {
@@ -16,6 +17,11 @@ const LABELS = {
 
 export default function TournamentEditor({ tournamentId, secret, sharedUpdatedBy = "" }) {
   const [data, setData] = useState(null), [draft, setDraft] = useState({}), [updatedBy, setUpdatedBy] = useState(sharedUpdatedBy), [status, setStatus] = useState(""), [busy, setBusy] = useState(false), [dirty, setDirty] = useState(false);
+  const mutationOperationIdentities = useRef(null);
+  const mutationIdentityRegistry = () => {
+    if (!mutationOperationIdentities.current) mutationOperationIdentities.current = createClientMutationOperationIdentityRegistry();
+    return mutationOperationIdentities.current;
+  };
   const fields = useMemo(() => data?.editableFields || [], [data]);
   async function request(method, body) {
     const response = await directorFetch(`/api/admin/tournament?tournament=${encodeURIComponent(tournamentId)}`, { method, headers: { "content-type": "application/json", "x-admin-secret": secret }, body: body ? JSON.stringify(body) : undefined });
@@ -24,7 +30,7 @@ export default function TournamentEditor({ tournamentId, secret, sharedUpdatedBy
   async function load() { setBusy(true); setStatus("Loading tournament settings…"); try { const payload = await request("GET"); setData(payload); setDraft(payload.record); setDirty(Boolean(payload.recoveredIdentifier)); setStatus(payload.recoveredIdentifier ? `The tournament year was recovered as ${payload.record.Year}. Save Tournament to repair the blank Year cell.` : ""); } catch (error) { setStatus(error.message); } finally { setBusy(false); } }
   useEffect(() => { if (tournamentId && secret) load(); }, [tournamentId, secret]);
   useEffect(() => { if (sharedUpdatedBy) setUpdatedBy(sharedUpdatedBy); }, [sharedUpdatedBy]);
-  async function save(event) { event.preventDefault(); if (!updatedBy.trim()) { setStatus("Enter your name before saving."); return; } setBusy(true); setStatus("Saving…"); try { const payload = await request("POST", { tournament: tournamentId, updates: draft, updatedBy }); setDraft(payload.record); setDirty(false); setStatus("Saved successfully."); } catch (error) { setStatus(`Save failed: ${error.message}`); } finally { setBusy(false); } }
+  async function save(event) { event.preventDefault(); if (!updatedBy.trim()) { setStatus("Enter your name before saving."); return; } setBusy(true); setStatus("Saving…"); const requestBody = { tournament: tournamentId, updates: draft, updatedBy, scoringAuthorityContract: data?.scoringAuthorityContract }; const receipt = mutationIdentityRegistry().acquire({ endpoint: "/api/admin/tournament", ...requestBody }); try { const payload = await request("POST", { ...requestBody, operationRequestId: receipt.operationRequestId }); mutationIdentityRegistry().confirm(receipt); setDraft(payload.record); setDirty(false); setStatus("Saved successfully."); } catch (error) { setStatus(`Save failed: ${error.message}`); } finally { setBusy(false); } }
   const change = (name, value) => { setDraft((current) => ({ ...current, [name]: value })); setDirty(true); setStatus("Unsaved changes"); };
   const manualOverride = String(draft["Status Mode"] || "Automatic").toLowerCase().includes("manual");
   return <section className={styles.tournamentEditor}><div className={styles.editorHeading}><p>Google Sheets</p><h2>Tournament settings</h2><span>Control the tournament identity, dates, status, homepage presentation, captains, and final result from one record.</span></div>{!data ? <div className={styles.notice}>{status || "Loading…"}</div> : <form onSubmit={save}>{manualOverride ? <div className={styles.notice}>Manual override is active. Public tournament status will not advance automatically.</div> : null}<div className={styles.editorGrid}>{fields.map((field) => {

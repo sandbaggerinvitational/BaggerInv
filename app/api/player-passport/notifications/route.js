@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
 import { currentPushDevice, updatePlayerReadiness } from "../../../../lib/google-sheets-write.js";
 import { previewPushConfiguration } from "../../../../lib/web-push-notifications.js";
+import { withProductionGoogleAuthoringWrite } from "../../../../lib/production-google-authoring.js";
+import { GOOGLE_AUTHORING_OPERATIONS } from "../../../../lib/google-workbook-mutation-intent.js";
 
 export const dynamic = "force-dynamic";
 
@@ -31,10 +33,13 @@ export async function POST(request) {
   try {
     const session = sessionFor(request);
     const input = await request.json();
-    const readiness = await updatePlayerReadiness(session, {
+    const readiness = await withProductionGoogleAuthoringWrite({
+      request,
+      operation: GOOGLE_AUTHORING_OPERATIONS.PASSPORT_ROLLBACK,
+    }, () => updatePlayerReadiness(session, {
       notificationPermission: input?.permission,
       pushSubscription: input?.subscription ?? null,
-    });
+    }));
     return NextResponse.json({ readiness }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const message = String(error?.message || "");

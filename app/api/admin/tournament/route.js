@@ -5,6 +5,10 @@ import { GOOGLE_SHEETS_CACHE_TAG } from "../../../../lib/google-sheets-data";
 import { invalidateScorecardAnalyticsCache } from "../../../../lib/scorecard-data";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
 import { assertDirectorMutationAuthority } from "../../../../lib/director-mutation-authority.js";
+import { withProductionGoogleAuthorityWrite } from "../../../../lib/production-cutover-scoring-ingress.js";
+import { getTournamentData } from "../../../live/sheetData.js";
+import { certifyGoogleWorkbookMutationReadback } from "../../../../lib/google-workbook-mutation-intent.js";
+import { currentScoringMutationAuthorityContract } from "../../../../lib/scoring-mutation-authority-server.js";
 
 export const dynamic = "force-dynamic";
 function authorized(request) {
@@ -16,7 +20,10 @@ const deny = () => NextResponse.json({ error: "Invalid admin password." }, { sta
 
 export async function GET(request) {
   if (!authorized(request)) return deny();
-  try { return NextResponse.json(await readTournamentAdminData(new URL(request.url).searchParams.get("tournament"))); }
+  try { return NextResponse.json({
+    ...await readTournamentAdminData(new URL(request.url).searchParams.get("tournament")),
+    scoringAuthorityContract: await currentScoringMutationAuthorityContract({ request }),
+  }); }
   catch (error) {
     console.error("Tournament admin load failed", { sheet: "Tournaments", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: error?.message || "Unable to load tournament settings." }, { status: 400 });
@@ -27,8 +34,42 @@ export async function POST(request) {
   if (!authorized(request)) return deny();
   try {
     assertDirectorMutationAuthority({ surface: "director", action: "tournament-admin-update" });
-    const { tournament, updates, updatedBy } = await request.json();
-    const result = await updateTournamentAdminData(tournament, updates, updatedBy);
+    const { tournament, updates, updatedBy, operationRequestId, scoringAuthorityContract } = await request.json();
+    const data = await getTournamentData();
+    const representativeMatchId = data.rounds?.flatMap((round) => round.matches || [])[0]?.id || "";
+    const result = await withProductionGoogleAuthorityWrite({
+      tournamentId: data.tournament?.id,
+      matchId: representativeMatchId,
+      actorId: updatedBy || "Tournament Director",
+      operation: "ADMIN_TOURNAMENT:UPDATE",
+      operationRequestId,
+      scoringAuthorityContract,
+      request,
+    }, async () => {
+      const before = await readTournamentAdminData(tournament);
+      const updated = await updateTournamentAdminData(tournament, updates, updatedBy);
+      const verified = await readTournamentAdminData(tournament);
+      const fields = Object.keys(updates || {}).sort();
+      const projection = (record) => Object.fromEntries(fields.map((field) => [
+        field,
+        String(record?.[field] ?? "").trim(),
+      ]));
+      const expectedAfter = projection(updated.record);
+      const providerReadback = projection(verified.record);
+      if (JSON.stringify(expectedAfter) !== JSON.stringify(providerReadback)) {
+        const error = new Error("The Production tournament update did not verify from Google.");
+        error.code = "PRODUCTION_TOURNAMENT_GOOGLE_READBACK_MISMATCH";
+        error.status = 503;
+        throw error;
+      }
+      certifyGoogleWorkbookMutationReadback({
+        proofType: "CURRENT_TOURNAMENT_UPDATE",
+        before: projection(before.record),
+        expectedAfter,
+        providerReadback,
+      });
+      return updated;
+    });
     revalidateTag(GOOGLE_SHEETS_CACHE_TAG);
     invalidateScorecardAnalyticsCache();
     for (const path of ["/", "/admin", "/history", "/tournament-guide", "/live"]) revalidatePath(path);

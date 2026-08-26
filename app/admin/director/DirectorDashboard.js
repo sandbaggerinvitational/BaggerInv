@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { directorFetch } from "../../../lib/director-client-transaction";
-import { useCallback, useEffect, useState } from "react";
+import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity";
+import { useCallback, useEffect, useRef, useState } from "react";
 import StatusBadge from "../../StatusBadge.js";
 import OddsAdmin from "../../odds-center/admin/OddsAdmin.js";
 import DirectorGuideRefreshControl from "./DirectorGuideRefreshControl.js";
@@ -90,6 +91,13 @@ export default function DirectorDashboard({ directorName }) {
   const [operationLog, setOperationLog] = useState([]);
   const [toast, setToast] = useState("");
   const [loadStartedAt] = useState(() => typeof performance === "undefined" ? 0 : performance.now());
+  const mutationOperationIdentities = useRef(null);
+  const mutationIdentityRegistry = useCallback(() => {
+    if (!mutationOperationIdentities.current) {
+      mutationOperationIdentities.current = createClientMutationOperationIdentityRegistry();
+    }
+    return mutationOperationIdentities.current;
+  }, []);
   const recordOperation = useCallback((label, status = "success", detail = "") => {
     setOperationLog((current) => [{ id: `${Date.now()}-${label}`, label, status, detail, at: new Date().toISOString() }, ...current].slice(0, 8));
   }, []);
@@ -113,18 +121,43 @@ export default function DirectorDashboard({ directorName }) {
   useEffect(() => { load().catch((error) => { setMessage(error.message); setLoadFailed(true); }); }, [load]);
   useEffect(() => {
     if (!data?.automation?.enabled) return undefined;
-    const check = () => directorFetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "automation-check" }) }).then((response) => response.ok ? response.json() : null).then((result) => { if (result?.changed) load(); }).catch(() => {});
+    const check = async () => {
+      const requestBody = { action: "automation-check", scoringAuthorityContract: data.scoringAuthorityContract };
+      const receipt = mutationIdentityRegistry().acquire({ endpoint: "/api/director", ...requestBody });
+      try {
+        const response = await directorFetch("/api/director", {
+          method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ ...requestBody, operationRequestId: receipt.operationRequestId }),
+        });
+        if (!response.ok) return;
+        const result = await response.json();
+        mutationIdentityRegistry().confirm(receipt);
+        if (result?.changed) await load();
+      } catch {
+        // Preserve this exact logical operation ID for the next scheduled
+        // attempt when the response may have been lost.
+      }
+    };
     check();
     const timer = window.setInterval(check, 60_000);
     return () => window.clearInterval(timer);
-  }, [data?.automation?.enabled, load]);
-  const act = async (action, extra = {}) => {
+  }, [data?.automation?.enabled, data?.scoringAuthorityContract, load, mutationIdentityRegistry]);
+  const act = async (action, extra = {}, priorAttempt = null) => {
     const startedAt = Date.now();
     setBusy(action); setMessage(""); setRetryOperation(null);
+    const requestBody = priorAttempt?.requestBody || {
+      action, round: Number(selectedRound), scoringAuthorityContract: data?.scoringAuthorityContract, ...extra,
+    };
+    const receipt = priorAttempt?.receipt || mutationIdentityRegistry().acquire({ endpoint: "/api/director", ...requestBody });
+    const serializedBody = priorAttempt?.serializedBody || JSON.stringify({ ...requestBody, operationRequestId: receipt.operationRequestId });
+    const attempt = { requestBody, receipt, serializedBody };
+    let mutationConfirmed = false;
     try {
-      const response = await directorFetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, round: Number(selectedRound), ...extra }) });
+      const response = await directorFetch("/api/director", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: serializedBody });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Director action failed.");
+      mutationIdentityRegistry().confirm(receipt);
+      mutationConfirmed = true;
       await load();
       const elapsed = Date.now() - startedAt;
       const label = ACTION_LABELS[action] || "Tournament operation completed";
@@ -134,7 +167,7 @@ export default function DirectorDashboard({ directorName }) {
     } catch (error) {
       const detail = error instanceof Error ? error.message : "Director action failed.";
       recordOperation(ACTION_LABELS[action] || "Tournament operation", "failed", detail);
-      setRetryOperation(() => () => act(action, extra));
+      setRetryOperation(() => mutationConfirmed ? () => load() : () => act(action, extra, attempt));
       setMessage(detail);
       return false;
     }

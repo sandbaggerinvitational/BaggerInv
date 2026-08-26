@@ -24,11 +24,10 @@ import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker
 import { authorizePreviewDirector, productionDirectorEntitlementEnvironment } from "../../../lib/preview-director-authorization.js";
 import { requireScoringAuthority } from "../../../lib/scoring-authority.js";
 import { assertDirectorMutationAuthority } from "../../../lib/director-mutation-authority.js";
-import {
-  beginProductionGoogleAuthorityWrite,
-  completeProductionGoogleAuthorityWrite,
-} from "../../../lib/production-cutover-scoring-ingress.js";
+import { withProductionGoogleAuthorityWrite } from "../../../lib/production-cutover-scoring-ingress.js";
 import { productionCutoverPhaseAtLeast } from "../../../lib/production-cutover-activation-contract.js";
+import { certifyGoogleWorkbookMutationReadback, googleWorkbookMutationOutcome } from "../../../lib/google-workbook-mutation-intent.js";
+import { assertScoringMutationAuthorityContractBeforeDispatch, currentScoringMutationAuthorityContract } from "../../../lib/scoring-mutation-authority-server.js";
 
 export const dynamic = "force-dynamic";
 
@@ -67,8 +66,10 @@ export async function GET(request) {
   if (authorization?.status !== "active") return deny();
   try {
     const data = await readLiveMatchAdminData();
+    const scoringAuthorityContract = await currentScoringMutationAuthorityContract({ request });
     return NextResponse.json({ data: {
       ...data,
+      scoringAuthorityContract,
       matches: data.matches.map((match) => Object.fromEntries(
         Object.entries(match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key))
       )),
@@ -86,8 +87,9 @@ export async function POST(request) {
   const authorization = await authorized(request, authority);
   if (authorization?.status !== "active") return deny();
   try {
-    const { action, matchId, updates, updatedBy } = await request.json();
+    const { action, matchId, updates, updatedBy, operationRequestId, scoringAuthorityContract } = await request.json();
     const mutationAuthority = assertDirectorMutationAuthority({ surface: "live-matches", action, authority: authority.resolved });
+    await assertScoringMutationAuthorityContractBeforeDispatch(scoringAuthorityContract, { request });
     if (mutationAuthority.resolvedAuthority === "supabase") {
       if (!matchId || !mutationAuthority.canonicalLifecycleAction) {
         const error = new Error("A canonical match control action and Match ID are required.");
@@ -101,6 +103,7 @@ export async function POST(request) {
         updatedBy: authorization.identity?.actor?.name || updatedBy,
         authUserId: authorization.identity?.authUserId,
         playerId: authorization.identity?.actor?.id,
+        operationRequestId,
       });
       if (!lifecycle.delegated) throw Object.assign(
         new Error("The canonical Supabase match-control transaction was not selected."),
@@ -144,23 +147,24 @@ export async function POST(request) {
         } },
       });
     }
-    const productionIngressLease = authority.resolved === "google"
-      ? await beginProductionGoogleAuthorityWrite({
-          tournamentId: "2026",
-          matchId,
-          actorId: updatedBy || "Tournament Director",
-          operation: `LIVE_MATCHES:${String(action || "UNKNOWN")}`,
-        })
-      : { enabled: false };
-    let measured;
-    try {
-      measured = await withWorkbookWriteDiagnostics(`live-matches:${action}`, async () => {
+    const measured = await withProductionGoogleAuthorityWrite({
+      tournamentId: "2026",
+      matchId,
+      actorId: updatedBy || "Tournament Director",
+      operation: `LIVE_MATCHES:${String(action || "UNKNOWN")}`,
+      operationRequestId,
+      scoringAuthorityContract,
+      request,
+    }, () => withWorkbookWriteDiagnostics(`live-matches:${action}`, async () => {
+      const beforeData = await readLiveMatchAdminData();
+      const beforeMatch = beforeData.matches.find((item) => String(item["Match ID"] || "").trim() === String(matchId || "").trim()) || null;
       let match;
+      let access;
       if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
       else if (action === "mark-live") match = await markLiveMatch(matchId, updatedBy);
       else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
       else if (action === "finalize") {
-        const lifecycle = await persistDirectorMatchLifecycle({ action: "finalize", matchId, updatedBy });
+        const lifecycle = await persistDirectorMatchLifecycle({ action: "finalize", matchId, updatedBy, operationRequestId });
         if (!lifecycle.delegated) match = await finalizeLiveMatch(matchId, updates, updatedBy, { includeCalcuttaPublicationTrace: process.env.VERCEL_ENV === "preview" });
         else {
           const drained = await drainGoogleOutbox({ maximum: 4, actor: updatedBy });
@@ -169,7 +173,7 @@ export async function POST(request) {
         }
       }
       else if (action === "reopen") {
-        const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId, updatedBy });
+        const lifecycle = await persistDirectorMatchLifecycle({ action: "reopen", matchId, updatedBy, operationRequestId });
         if (!lifecycle.delegated) match = await reopenLiveMatch(matchId, updatedBy);
         else {
           const drained = await drainGoogleOutbox({ maximum: 4, actor: updatedBy });
@@ -178,25 +182,46 @@ export async function POST(request) {
         }
       }
       else if (action === "access-generate") {
-        const access = await generateLiveMatchAccess(matchId, updatedBy);
-        const accessUrl = `${new URL(request.url).origin}/score/access/${encodeURIComponent(access.token)}`;
+        const generated = await generateLiveMatchAccess(matchId, updatedBy);
+        const accessUrl = `${new URL(request.url).origin}/score/access/${encodeURIComponent(generated.token)}`;
         const qrDataUrl = await QRCode.toDataURL(accessUrl, { width: 420, margin: 2, color: { dark: "#0b4938", light: "#fffdf8" } });
-        match = Object.fromEntries(Object.entries(access.match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key)));
-        return { match, access: { code: access.code, accessUrl, qrDataUrl, expiresAt: access.expiresAt } };
+        match = Object.fromEntries(Object.entries(generated.match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key)));
+        access = { code: generated.code, accessUrl, qrDataUrl, expiresAt: generated.expiresAt };
       }
       else if (action === "access-disable") match = await disableLiveMatchAccess(matchId, updatedBy);
       else throw new Error("Unknown live-match action.");
-      return { match };
-      });
-    } finally {
-      try { await completeProductionGoogleAuthorityWrite(productionIngressLease); }
-      catch (error) {
-        console.error("Production Live Matches ingress lease completion remains pending", {
-          action,
-          code: error?.code || "PRODUCTION_GOOGLE_INGRESS_LEASE_COMPLETION_FAILED",
+      if (googleWorkbookMutationOutcome().confirmedWrites > 0) {
+        const verifiedData = await readLiveMatchAdminData();
+        const verifiedMatch = verifiedData.matches.find((item) => String(item["Match ID"] || "").trim() === String(matchId || "").trim());
+        const actionFields = {
+          "mark-live": ["Match Status", "Updated At"],
+          finalize: ["Match Status", "Scoring Locked", "Access Active", "Access Version", "Finalized At", "Team 1 Points", "Team 2 Points", "Matchup Winner"],
+          reopen: ["Match Status", "Scoring Locked", "Access Active", "Access Version", "Finalized At", "Team 1 Points", "Team 2 Points", "Matchup Winner"],
+          "access-generate": ["Access Active", "Access Version", "Access Expires At", "Updated At"],
+          "access-disable": ["Access Active", "Access Version", "Updated At"],
+        }[action] || [];
+        const fields = [...new Set(["Match ID", ...actionFields, ...Object.keys(updates || {})])].sort();
+        const projection = (record) => Object.fromEntries(fields.map((field) => [
+          field,
+          String(record?.[field] ?? "").trim(),
+        ]));
+        const expectedAfter = projection(match);
+        const providerReadback = projection(verifiedMatch);
+        if (!verifiedMatch || JSON.stringify(expectedAfter) !== JSON.stringify(providerReadback)) {
+          const error = new Error("The Production match-control update did not verify from Google.");
+          error.code = "PRODUCTION_LIVE_MATCH_GOOGLE_READBACK_MISMATCH";
+          error.status = 503;
+          throw error;
+        }
+        certifyGoogleWorkbookMutationReadback({
+          proofType: "LIVE_MATCH_CONTROL",
+          before: projection(beforeMatch),
+          expectedAfter,
+          providerReadback,
         });
       }
-    }
+      return { match, ...(access ? { access } : {}) };
+      }));
     const { match, access } = measured.result;
     refreshMatchData();
     console.info("Live Match Control transaction", { action, matchId, ...measured.diagnostics });

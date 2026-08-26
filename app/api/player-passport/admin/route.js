@@ -7,6 +7,8 @@ import {
   revokePlayerPassportDevices,
 } from "../../../../lib/google-sheets-write.js";
 import { directorTransactionError } from "../../../../lib/director-transaction-error.js";
+import { withProductionGoogleAuthoringWrite } from "../../../../lib/production-google-authoring.js";
+import { GOOGLE_AUTHORING_OPERATIONS } from "../../../../lib/google-workbook-mutation-intent.js";
 
 export const dynamic = "force-dynamic";
 
@@ -38,23 +40,28 @@ export async function POST(request) {
   try {
     const { action, playerId, deviceId, updatedBy } = await request.json();
     if (!String(updatedBy || "").trim()) throw new Error("Updated By is required.");
-    if (action === "generate") {
-      const credential = await generatePlayerPassport(playerId, updatedBy);
-      return NextResponse.json({ credential, data: await readPlayerPassportAdminData() });
-    }
-    if (action === "generate-missing") {
-      const credentials = await generateMissingPlayerPassports(updatedBy);
-      return NextResponse.json({ credentials, data: await readPlayerPassportAdminData() });
-    }
-    if (action === "revoke-devices") {
-      await revokePlayerPassportDevices(playerId, updatedBy, deviceId);
-      return NextResponse.json({ data: await readPlayerPassportAdminData() });
-    }
-    if (action === "disable") {
-      await disablePlayerPassportActivation(playerId, updatedBy);
-      return NextResponse.json({ data: await readPlayerPassportAdminData() });
-    }
-    throw new Error("Unknown Player Passport action.");
+    return await withProductionGoogleAuthoringWrite({
+      request,
+      operation: GOOGLE_AUTHORING_OPERATIONS.PASSPORT_ROLLBACK,
+    }, async () => {
+      if (action === "generate") {
+        const credential = await generatePlayerPassport(playerId, updatedBy);
+        return NextResponse.json({ credential, data: await readPlayerPassportAdminData() });
+      }
+      if (action === "generate-missing") {
+        const credentials = await generateMissingPlayerPassports(updatedBy);
+        return NextResponse.json({ credentials, data: await readPlayerPassportAdminData() });
+      }
+      if (action === "revoke-devices") {
+        await revokePlayerPassportDevices(playerId, updatedBy, deviceId);
+        return NextResponse.json({ data: await readPlayerPassportAdminData() });
+      }
+      if (action === "disable") {
+        await disablePlayerPassportActivation(playerId, updatedBy);
+        return NextResponse.json({ data: await readPlayerPassportAdminData() });
+      }
+      throw new Error("Unknown Player Passport action.");
+    });
   } catch (error) {
     return NextResponse.json({ error: directorTransactionError(error) }, { status: 400 });
   }

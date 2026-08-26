@@ -26,6 +26,28 @@ const mutation = (holeNumber, overrides = {}) => ({
   ...overrides,
 });
 
+const googleMutationContract = Object.freeze({
+  version: "scoring-mutation-authority-v1",
+  scoringAuthority: "google",
+  authorityGeneration: "11111111-1111-4111-8111-111111111111",
+  admissionGeneration: "22222222-2222-4222-8222-222222222222",
+  activationRevision: 41,
+  admissionRevision: 12,
+  deploymentId: "dpl_GoogleBoundary123",
+  deploymentCommit: "a".repeat(40),
+});
+
+const supabaseMutationContract = Object.freeze({
+  version: "scoring-mutation-authority-v1",
+  scoringAuthority: "supabase",
+  authorityGeneration: "33333333-3333-4333-8333-333333333333",
+  admissionGeneration: "22222222-2222-4222-8222-222222222222",
+  activationRevision: 42,
+  admissionRevision: 13,
+  deploymentId: "dpl_GoogleBoundary123",
+  deploymentCommit: "a".repeat(40),
+});
+
 const until = async (predicate, timeout = 1000) => {
   const started = Date.now();
   while (!(await predicate())) {
@@ -302,7 +324,139 @@ test("failure classification produces participant-safe retry, conflict, authoriz
   assert.equal(classifyScoringSyncFailure({ status: 400, message: "Scoring has been locked" }).kind, "locked");
   assert.equal(classifyScoringSyncFailure({ status: 400, message: "This match is Final. Reopen it." }).kind, "finalized");
   assert.equal(classifyScoringSyncFailure({ status: 401, message: "Player Passport expired" }).kind, "authorization");
+  assert.equal(classifyScoringSyncFailure({
+    status: 409,
+    code: "PRODUCTION_SCORING_ADMISSION_INSPECTION_MISMATCH",
+  }).kind, "authority-transition");
   assert.equal(participantScoringSyncIssue({ failureKind: "locked", participantMessage: "Scoring has been locked by the Tournament Director." }), "Scoring has been locked by the Tournament Director.");
+});
+
+test("a queued Google mutation stays terminal across CLOSED admission and the Supabase transition", async () => {
+  const store = createMemoryScoringStore();
+  const scheduled = [];
+  let phase = "CLOSED";
+  let currentContract = googleMutationContract;
+  let attempts = 0;
+  let googleWrites = 0;
+  let supabaseWrites = 0;
+  const queue = createScoringSyncQueue({
+    store,
+    schedule: (callback, delay) => {
+      scheduled.push({ callback, delay });
+      return scheduled.length;
+    },
+    send: async (entry) => {
+      attempts += 1;
+      if (phase === "CLOSED") {
+        throw Object.assign(new Error("Scoring admission is closed for the authority transition."), {
+          status: 409,
+          code: "PRODUCTION_SCORING_ADMISSION_INSPECTION_MISMATCH",
+        });
+      }
+      if (entry.scoringAuthorityContract?.scoringAuthority !== currentContract.scoringAuthority ||
+          entry.scoringAuthorityContract?.authorityGeneration !== currentContract.authorityGeneration) {
+        throw Object.assign(new Error("The scoring authority changed."), {
+          status: 409,
+          code: "SCORING_AUTHORITY_CONTRACT_STALE",
+        });
+      }
+      if (currentContract.scoringAuthority === "google") googleWrites += 1;
+      else supabaseWrites += 1;
+      return { hole: { "Hole Number": entry.holeNumber, Revision: 1 }, matchRevision: 1 };
+    },
+  });
+
+  await queue.enqueue(mutation(7, {
+    clientMutationId: "11111111-aaaa-4aaa-8aaa-111111111111",
+    operationRequestId: "11111111-aaaa-4aaa-8aaa-111111111111",
+    scoringAuthorityContract: googleMutationContract,
+  }));
+  await until(async () => (await store.list())[0]?.status === "action-required");
+  const stale = (await store.list())[0];
+  assert.equal(stale.failureKind, "authority-transition");
+  assert.equal(stale.nextRetryAt, null);
+  assert.match(stale.participantMessage, /refresh/i);
+  assert.deepEqual(stale.scoringAuthorityContract, googleMutationContract);
+  assert.equal(attempts, 1);
+  assert.equal(scheduled.length, 0);
+  assert.equal(googleWrites, 0);
+  assert.equal(supabaseWrites, 0);
+
+  phase = "OPEN";
+  currentContract = supabaseMutationContract;
+  await queue.retry();
+  await queue.retryEntry(stale.id);
+  assert.equal(await queue.resolveConflict(stale.id, "device"), false);
+  await queue.reconcile("2026-R3-2", [], {
+    Revision: 2,
+    matchRevision: 2,
+    "Match Status": "Live",
+    "Scoring Locked": false,
+    authority: {
+      source: "supabase",
+      writable: true,
+      authorizationVerified: true,
+      mutationContract: supabaseMutationContract,
+    },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+  const retained = (await store.list())[0];
+  assert.equal(retained.status, "action-required");
+  assert.equal(retained.failureKind, "authority-transition");
+  assert.deepEqual(retained.scoringAuthorityContract, googleMutationContract);
+  assert.equal(attempts, 1);
+  assert.equal(googleWrites, 0);
+  assert.equal(supabaseWrites, 0);
+  queue.stop();
+});
+
+test("a same-authority transient failure retries with the original contract and mutation identity", async () => {
+  const store = createMemoryScoringStore();
+  const scheduled = [];
+  const sent = [];
+  let clock = 1_000;
+  let attempts = 0;
+  let writes = 0;
+  const queue = createScoringSyncQueue({
+    store,
+    now: () => clock,
+    schedule: (callback, delay) => {
+      scheduled.push({ callback, delay });
+      return scheduled.length;
+    },
+    send: async (entry) => {
+      attempts += 1;
+      sent.push({
+        clientMutationId: entry.clientMutationId,
+        operationRequestId: entry.operationRequestId,
+        scoringAuthorityContract: entry.scoringAuthorityContract,
+      });
+      if (attempts === 1) {
+        throw Object.assign(new Error("Connection reset."), { status: 503, code: "ECONNRESET" });
+      }
+      writes += 1;
+      return { hole: { "Hole Number": entry.holeNumber, Revision: 1 }, matchRevision: 1 };
+    },
+  });
+  const operationRequestId = "22222222-aaaa-4aaa-8aaa-222222222222";
+  await queue.enqueue(mutation(8, {
+    clientMutationId: operationRequestId,
+    operationRequestId,
+    scoringAuthorityContract: googleMutationContract,
+  }));
+  await until(async () => (await store.list())[0]?.status === "retryable");
+  assert.equal(scheduled.length, 1);
+  const retry = scheduled.shift();
+  clock += retry.delay;
+  retry.callback();
+  await until(() => attempts === 2);
+  await until(async () => (await store.list()).length === 0);
+  assert.equal(writes, 1);
+  assert.deepEqual(sent, [
+    { clientMutationId: operationRequestId, operationRequestId, scoringAuthorityContract: googleMutationContract },
+    { clientMutationId: operationRequestId, operationRequestId, scoringAuthorityContract: googleMutationContract },
+  ]);
+  queue.stop();
 });
 
 test("legacy durable conflicts normalize from mismatch evidence instead of falling through to lifecycle UI", async () => {

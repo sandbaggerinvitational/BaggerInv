@@ -4,6 +4,8 @@ import { appendNotificationLog, currentPushDevice, invalidatePushDevice } from "
 import { previewPushConfiguration, sendPreviewPush } from "../../../../../lib/web-push-notifications.js";
 import { notificationPreviewContextForPlayer, previewNotificationTemplate } from "../../../../../lib/notification-templates.js";
 import { getTournamentData } from "../../../../live/sheetData.js";
+import { withProductionGoogleAuthoringWrite } from "../../../../../lib/production-google-authoring.js";
+import { GOOGLE_AUTHORING_OPERATIONS } from "../../../../../lib/google-workbook-mutation-intent.js";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,10 @@ export async function POST(request) {
   const input = await request.json().catch(() => ({}));
   const tournamentData = await getTournamentData();
   const template = previewNotificationTemplate(input?.templateId, notificationPreviewContextForPlayer(tournamentData, inspected.identity.player));
-  try {
+  return withProductionGoogleAuthoringWrite({
+    request,
+    operation: GOOGLE_AUTHORING_OPERATIONS.PASSPORT_ROLLBACK,
+  }, async () => { try {
     const device = await currentPushDevice(session);
     await sendPreviewPush(device.subscription, {
       title: template.title, body: template.body,
@@ -33,5 +38,5 @@ export async function POST(request) {
     const failure = [404, 410].includes(statusCode) ? "Subscription expired" : String(error?.code || "Delivery failed");
     await appendNotificationLog(session, { type: template.label, template: template.id, recipient: inspected.identity.player.name, status: "Failed", failure }).catch(() => {});
     return NextResponse.json({ error: error?.message || "Test notification could not be sent." }, { status: 503 });
-  }
+  } });
 }

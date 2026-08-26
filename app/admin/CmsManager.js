@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { formatPlayerPoints, formatTeamPoints } from "../../lib/formatters";
 import styles from "./cms-manager.module.css";
 import { directorFetch } from "../../lib/director-client-transaction";
+import { createClientMutationOperationIdentityRegistry } from "../../lib/client-mutation-operation-identity";
 
 const truthy = (value) => value === true || /^(true|yes|y|1|active)$/i.test(String(value ?? ""));
 const displayValue = (value) => value === "TRUE" ? "Yes" : value === "FALSE" ? "No" : String(value ?? "").trim() || "—";
@@ -43,6 +44,11 @@ export default function CmsManager({ resource, secret, tournamentId, year, updat
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const pendingSubmission = useRef(null);
+  const mutationOperationIdentities = useRef(null);
+  const mutationIdentityRegistry = () => {
+    if (!mutationOperationIdentities.current) mutationOperationIdentities.current = createClientMutationOperationIdentityRegistry();
+    return mutationOperationIdentities.current;
+  };
 
   async function load(message = "Loading…") {
     setBusy(true); setStatus(message);
@@ -74,14 +80,20 @@ export default function CmsManager({ resource, secret, tournamentId, year, updat
     if (!updatedBy.trim()) { setStatus("Enter your name in the Admin Center bar before making changes."); return; }
     if (action === "delete" && !window.confirm(`Permanently delete this ${data.singular.toLowerCase()}? The action will be recorded in the Audit Log.`)) return;
     if (action === "archive" && !window.confirm(`Archive this ${data.singular.toLowerCase()}?`)) return;
-    const transactionId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const requestBody = {
+      resource, action, key: row?.__key || editingKey, record: action === "save" ? draft : undefined,
+      tournament: tournamentId, year, updatedBy, scoringAuthorityContract: data?.scoringAuthorityContract, ...extras,
+    };
+    const receipt = mutationIdentityRegistry().acquire({ endpoint: "/api/admin/cms", ...requestBody });
+    const transactionId = receipt.operationRequestId;
     const operation = (async () => {
       setBusy(true); setStatus(`${action === "save" ? "Saving" : action === "reorder" ? "Reordering" : `${action[0].toUpperCase()}${action.slice(1)}ing`}…`);
       try {
       const saved = await adminRequest(secret, resource, {
         method: "POST", tournament: tournamentId, year,
-        body: { resource, action, key: row?.__key || editingKey, record: action === "save" ? draft : undefined, tournament: tournamentId, year, updatedBy, transactionId, ...extras },
+        body: { ...requestBody, transactionId, operationRequestId: transactionId },
       });
+      mutationIdentityRegistry().confirm(receipt);
       if (action === "save" && resource === "matches" && editingKey) {
         setData((current) => ({ ...current, rows: current.rows.map((item) => item.__key === editingKey ? saved : item) }));
         setDraft(null); setEditingKey(""); setStatus("Saved successfully.");

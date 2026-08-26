@@ -4,6 +4,8 @@ import { createPlayerPassportSession, playerPassportCookie, previewDirectorPassp
 import { inspectTournamentDirectorToken } from "../../../../lib/player-passport-server.js";
 import { initializeParticipantTournament, invalidateParticipantInitialization } from "../../../../lib/participant-initialization.js";
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
+import { withProductionGoogleAuthoringWrite } from "../../../../lib/production-google-authoring.js";
+import { GOOGLE_AUTHORING_OPERATIONS } from "../../../../lib/google-workbook-mutation-intent.js";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +26,10 @@ export async function POST(request) {
     const { activationCode, deviceLabel } = payload;
     const rate = consumeRateLimit(`passport-activation:${clientAddress(request)}:${String(reference || "").slice(0, 24)}`, { limit: 5, windowMs: 15 * 60_000 });
     if (!rate.allowed) return NextResponse.json({ error: "Too many attempts. Wait 15 minutes, then generate a new code and try again." }, { status: 429 });
-    const activated = await activatePlayerPassport({ reference, code: activationCode, deviceLabel });
+    const activated = await withProductionGoogleAuthoringWrite({
+      request,
+      operation: GOOGLE_AUTHORING_OPERATIONS.PASSPORT_ROLLBACK,
+    }, async () => await activatePlayerPassport({ reference, code: activationCode, deviceLabel }));
     const token = createPlayerPassportSession(activated);
     const session = verifyPlayerPassportSession(token);
     invalidateParticipantInitialization(session);

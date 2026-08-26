@@ -18,6 +18,8 @@ import { markOddsCalculationPublished, readPublishableOddsCalculation } from "..
 import { deliverSupabaseOddsGoogleMirror } from "../../../../lib/championship-odds-google-mirror.js";
 import { requireOddsCalculationInputSource, requireOddsPublicationAuthority } from "../../../../lib/odds-calculation-source.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
+import { withProductionGoogleAuthoringWrite } from "../../../../lib/production-google-authoring.js";
+import { GOOGLE_AUTHORING_OPERATIONS } from "../../../../lib/google-workbook-mutation-intent.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -146,7 +148,10 @@ async function publishProjection(request) {
       }
     } else {
       start("Batch workbook write", { workbookOperation: "Atomic field-scoped replacement of projection runtime records", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
-      snapshot = await publishOddsSnapshot(preview);
+      snapshot = await withProductionGoogleAuthoringWrite({
+        request,
+        operation: GOOGLE_AUTHORING_OPERATIONS.ODDS_PUBLICATION,
+      }, () => publishOddsSnapshot(preview));
       pass("Batch workbook write", { worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
       start("Workbook verification", { workbookOperation: "Read back and verify published projection rows", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "verifyPublishedOddsSnapshot" });
       verification = await verifyPublishedOddsSnapshot(snapshot);

@@ -2,8 +2,13 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { assertValidTournamentId } from "../../../../lib/tournament-identifiers";
 import { directorTransactionError } from "../../../../lib/director-transaction-error";
-import { assertDirectorMutationAuthority } from "../../../../lib/director-mutation-authority.js";
+import { assertDirectorMutationAuthority, directorMutationPolicy } from "../../../../lib/director-mutation-authority.js";
 import { productionShadowCandidateEnvironment } from "../../../../lib/production-shadow-candidate.js";
+import { withProductionGoogleAuthorityWrite } from "../../../../lib/production-cutover-scoring-ingress.js";
+import { withProductionGoogleAuthoringWrite } from "../../../../lib/production-google-authoring.js";
+import { certifyGoogleWorkbookMutationReadback, GOOGLE_AUTHORING_OPERATIONS, googleWorkbookMutationOutcome } from "../../../../lib/google-workbook-mutation-intent.js";
+import { getTournamentData } from "../../../live/sheetData.js";
+import { currentScoringMutationAuthorityContract } from "../../../../lib/scoring-mutation-authority-server.js";
 
 export const dynamic = "force-dynamic";
 
@@ -60,10 +65,15 @@ export async function GET(request) {
       readCmsResource,
     } = await loadGoogleCmsRuntime();
     if (filters.tournament) assertValidTournamentId(filters.tournament);
-    if (resource === "dashboard") return NextResponse.json({ data: await readAdminDashboard(filters) });
-    if (resource === "standings") return NextResponse.json({ data: await readAdminStandings(filters) });
-    if (resource === "audit") return NextResponse.json({ data: await readAdminAuditLog(query.get("limit")) });
-    return NextResponse.json({ data: await readCmsResource(resource, filters) });
+    const mutationPolicy = directorMutationPolicy("admin-cms", resource);
+    const scoringAuthorityContract = mutationPolicy && mutationPolicy.execution !== "GOOGLE_DIRECTOR_AUTHORING"
+      ? await currentScoringMutationAuthorityContract({ request })
+      : null;
+    const withContract = (data) => scoringAuthorityContract ? { ...data, scoringAuthorityContract } : data;
+    if (resource === "dashboard") return NextResponse.json({ data: withContract(await readAdminDashboard(filters)) });
+    if (resource === "standings") return NextResponse.json({ data: withContract(await readAdminStandings(filters)) });
+    if (resource === "audit") return NextResponse.json({ data: withContract(await readAdminAuditLog(query.get("limit"))) });
+    return NextResponse.json({ data: withContract(await readCmsResource(resource, filters)) });
   } catch (error) {
     console.error("Admin CMS load failed", { resource, filters, reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: error?.message || "Unable to load Admin Center data." }, { status: 400 });
@@ -78,7 +88,7 @@ export async function POST(request) {
   try {
     body = await request.json();
     const { resource, action = "save", key, record, tournament, year, updatedBy, direction } = body;
-    assertDirectorMutationAuthority({ surface: "admin-cms", action: resource });
+    const mutationAuthority = assertDirectorMutationAuthority({ surface: "admin-cms", action: resource });
     const transactionId = String(request.headers.get("x-save-transaction-id") || body.transactionId || "").trim();
     const filters = { tournament: String(tournament || ""), year: String(year || "") };
     if (filters.tournament) assertValidTournamentId(filters.tournament);
@@ -87,6 +97,7 @@ export async function POST(request) {
       deleteCmsRecord,
       GOOGLE_SHEETS_CACHE_TAG,
       invalidateScorecardAnalyticsCache,
+      readCmsResource,
       reorderCmsRecord,
       saveCmsRecord,
       shouldSynchronizeDraftAfterWrite,
@@ -94,6 +105,8 @@ export async function POST(request) {
       withWorkbookWriteDiagnostics,
     } = await loadGoogleCmsRuntime();
     const execute = async () => {
+      const canonicalLegacy = mutationAuthority.execution !== "GOOGLE_DIRECTOR_AUTHORING";
+      const before = canonicalLegacy ? await readCmsResource(resource, filters) : null;
       const measured = await withWorkbookWriteDiagnostics(`cms:${resource}:${action}`, async () => {
         if (action === "save") return saveCmsRecord(resource, record, { key, ...filters, updatedBy });
         if (action === "archive") return archiveCmsRecord(resource, key, updatedBy);
@@ -101,6 +114,47 @@ export async function POST(request) {
         if (action === "reorder") return reorderCmsRecord(resource, key, direction, filters, updatedBy);
         throw new Error("Unknown Admin Center action.");
       });
+      if (canonicalLegacy && googleWorkbookMutationOutcome().confirmedWrites > 0) {
+        const verified = await readCmsResource(resource, filters);
+        const rowProjection = (value, fields) => Object.fromEntries(fields.map((field) => [
+          field,
+          String(value?.[field] ?? "").trim(),
+        ]));
+        let beforeProof;
+        let expectedAfter;
+        let providerReadback;
+        if (action === "delete") {
+          beforeProof = { key, present: before.rows.some((item) => item.__key === key) };
+          expectedAfter = { key, present: false };
+          providerReadback = { key, present: verified.rows.some((item) => item.__key === key) };
+        } else if (action === "reorder") {
+          const order = (value) => value.rows.map((item) => item.__key);
+          beforeProof = { order: order(before) };
+          expectedAfter = { order: order(measured.result) };
+          providerReadback = { order: order(verified) };
+        } else {
+          const expectedRow = measured.result;
+          const expectedKey = String(expectedRow?.__key || key || "").trim();
+          const beforeRow = before.rows.find((item) => item.__key === expectedKey) || null;
+          const verifiedRow = verified.rows.find((item) => item.__key === expectedKey) || null;
+          const fields = Object.keys(expectedRow || {}).filter((field) => field !== "__key").sort();
+          beforeProof = { key: expectedKey, row: beforeRow ? rowProjection(beforeRow, fields) : null };
+          expectedAfter = { key: expectedKey, row: rowProjection(expectedRow, fields) };
+          providerReadback = { key: expectedKey, row: verifiedRow ? rowProjection(verifiedRow, fields) : null };
+        }
+        if (JSON.stringify(expectedAfter) !== JSON.stringify(providerReadback)) {
+          const error = new Error("The Production Admin CMS mutation did not verify from Google.");
+          error.code = "PRODUCTION_ADMIN_CMS_GOOGLE_READBACK_MISMATCH";
+          error.status = 503;
+          throw error;
+        }
+        certifyGoogleWorkbookMutationReadback({
+          proofType: "ADMIN_CMS_CANONICAL",
+          before: beforeProof,
+          expectedAfter,
+          providerReadback,
+        });
+      }
       const draftProjection = ["draft-settings", "draft-picks"].includes(resource)
         && shouldSynchronizeDraftAfterWrite()
         ? await synchronizeDraftProjection({
@@ -131,13 +185,38 @@ export async function POST(request) {
         },
       };
     };
+    const executeWithIntent = async () => {
+      if (mutationAuthority.execution === "GOOGLE_DIRECTOR_AUTHORING") {
+        const authoringOperation = ["draft-settings", "draft-picks"].includes(resource)
+          ? GOOGLE_AUTHORING_OPERATIONS.ADMIN_CMS_DRAFT
+          : resource === "schedule"
+            ? GOOGLE_AUTHORING_OPERATIONS.ADMIN_CMS_GUIDE
+            : resource === "prediction-settings"
+              ? GOOGLE_AUTHORING_OPERATIONS.ADMIN_CMS_PREDICTION_SETTINGS
+              : GOOGLE_AUTHORING_OPERATIONS.ADMIN_CMS_PRESENTATION;
+        return withProductionGoogleAuthoringWrite({ request, operation: authoringOperation }, execute);
+      }
+      const data = await getTournamentData();
+      const representativeMatchId = data.rounds?.flatMap((round) => round.matches || [])[0]?.id || "";
+      return withProductionGoogleAuthorityWrite({
+        tournamentId: tournament || data.tournament?.id,
+        matchId: resource === "matches"
+          ? (record?.["Match ID"] || key || representativeMatchId)
+          : representativeMatchId,
+        actorId: updatedBy || "Tournament Director",
+        operation: `ADMIN_CMS:${String(resource || "UNKNOWN").toUpperCase()}:${String(action).toUpperCase()}`,
+        operationRequestId: body.operationRequestId || transactionId,
+        scoringAuthorityContract: body.scoringAuthorityContract,
+        request,
+      }, execute);
+    };
     let result;
     const existing = transactionId ? saveTransactions.get(transactionId) : null;
     if (existing) {
       result = await existing;
       result = { ...result, diagnostics: { ...result.diagnostics, duplicateSubmissions: result.diagnostics.duplicateSubmissions + 1 } };
     } else {
-      const pending = execute();
+      const pending = executeWithIntent();
       if (transactionId) {
         saveTransactions.set(transactionId, pending);
         setTimeout(() => saveTransactions.delete(transactionId), 30_000).unref?.();
