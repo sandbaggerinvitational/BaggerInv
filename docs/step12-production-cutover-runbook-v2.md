@@ -2,6 +2,13 @@
 
 Status: certification artifact only. This document does not authorize Step 12.
 
+The environment delta includes the exact non-secret Ed25519 attester public-key
+pin and Vercel team-ID pin. The private key remains only in the authorized new
+Mac's macOS Keychain. Each begin/final provider proof requires a distinct
+database-issued one-time challenge and a fresh locally signed Vercel
+firewall/deployment/redacted-environment attestation; application runtime never
+receives a Vercel token or private signing key.
+
 ## Fixed production resources
 
 - Supabase project: `ymqhhtxaywtqllynrmxe`
@@ -32,8 +39,84 @@ is acceptable; ambiguous or dual authority is not.
 
 ## Required provider fence
 
-Before the close operation is eligible, the operator must prove that every
-Production-capable origin is controlled. The proof must bind:
+The Step 11.6 rehearsal is restored and is not an active Step 12 fence. Do not
+start the Step 12 quiesce in `DORMANT` and do not put a prolonged project-wide
+403 in front of V0. First stage the release, complete static/read/identity
+cutover, and arm the barrier-aware dedicated-credential candidate. The initial
+cutover quiesce is eligible only at `CURRENT_READS + GOOGLE_LEASE_ARMED`, with
+Google canonical, the candidate deployment bound to the open v2 admission
+protocol, the execution gate `OPEN`, Supabase scoring ingress disabled, and no
+unresolved writer or durable-queue work.
+
+Immediately before recording external fence evidence and closing admission:
+
+Allow roughly 15–25 minutes for this controlled provider-quiesce/fence window:
+two dynamically sized exhaustive edge snapshots, the mandatory
+300-second drain, durable receipt verification, and the 17-sheet provider
+fence install/readback. This estimate is informational and never shortens a
+safety wait or failed gate.
+
+1. Generate `begin-provider-quiesce` with a stable evidence request ID, the
+   exact reviewed Vercel routing rule, `quiescePurpose=CUTOVER`, explicit
+   owner-freeze confirmation, and the certified 1,800-second TTL. The client never
+   supplies acknowledgement/expiry timestamps or unresolved-write counts; the
+   server records time and the DB independently verifies the zero-write
+   predicates. The server loads the retained 1,140-record v2 Production-capable
+   origin inventory (458 main Production plus 682 feature-branch Preview
+   deployments) and revalidates its exact tuple digest
+   `533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6`;
+   the browser/operator must not send those records. It also binds the generated
+   1,140-origin credential-confinement evidence (records fingerprint
+   `c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508`,
+   evidence fingerprint
+   `1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df`).
+2. The server verifies the provider-signed live inventory (the retained 1,140
+   records plus every relevant post-freeze deployment), then adds four fixed
+   aliases and the dynamic candidate alias. For signed live count `N`, each
+   snapshot covers exactly `N + 5` origins and `9 × (N + 5)` requests. The
+   immutable candidate is already in `N` and is not double-counted. This
+   includes every retained/signed `READY`, `ERROR`, and `BLOCKED` origin. The
+   vectors are `POST` for
+   `/api/scoring/current`, `/api/scoring/matches/__step11_6_probe__`,
+   `/api/director`, `/api/live-matches`, `/api/admin/tournament`,
+   `/api/admin/cms`, `/api/odds/publish`, and `/api/tournament-guide`, plus
+   `DELETE /api/tournament-guide`. One probe URL cannot certify a project-wide
+   method/path rule.
+   Each snapshot is persisted as one compact tuple per dynamically attested
+   origin with the exact nine-vector coverage mask and nine ordered provider-
+   proof fingerprints; the database derives and validates the complete logical
+   origin×vector set. The normal Step 12 minimum is 1,147 origins and 10,323
+   requests per snapshot, but the signed inventory and receipt are authoritative.
+   The fixed/candidate aliases are diagnostic canaries, not an exhaustive alias
+   inventory. All other aliases are covered by the provider-attested active
+   project-wide firewall configuration. The attester rejects inactive/missing
+   active config and all pending drafts, and binds the exact version/rule/
+   conditions in each independently signed BEGIN/FINALIZE observation.
+3. Wait at least 300 seconds inside the recorded owner-freeze window. Generate
+   `finalize-provider-quiesce` and then `inspect-provider-quiesce`. Both durable
+   snapshots must bind the exact project/rule/revision/scope and candidate,
+   with zero unresolved request-log entries, Google writes, or probes.
+4. Generate `inspect-persistent-provider-fence` for the baseline, then
+   `install-persistent-provider-fence` with the verified quiesce evidence ID.
+   The begin/finish receipts must prove that exactly 17 run-owned whole-sheet
+   protections are installed, values/formulas and Drive ACL are unchanged, and
+   the dedicated writer retains the certified access.
+5. Remove only the exact temporary project-wide Vercel deny rule used by the
+   verified quiesce. Immediately verify the control page and ordinary
+   read/health requests are no longer edge-denied and that the barrier-aware v2
+   candidate can again acquire tracked Google-authority leases while admission
+   is still `OPEN`. Do not advance if the deny rule remains active or if any
+   retained legacy origin can reach Google: the installed 17-sheet provider
+   fence, not a prolonged HTTP 403, is now the durable old-host boundary.
+
+Hold a Vercel provider-admin change freeze and monitor the active firewall
+version/draft throughout this bounded sequence. Do not permit deployment,
+alias, environment, firewall, or draft-publication changes by another operator.
+If the active version changes, a draft appears, or monitoring becomes
+unavailable, keep the deny active and stop for a fresh signed attestation.
+
+Only then may the operator record the DB-derived external fence evidence and
+advance to close. The proof must bind:
 
 - Vercel project, deployment ID, Git SHA, environment, aliases, and immutable
   deployment hostnames;
@@ -49,15 +132,40 @@ itself is not provider enforcement. Old deployments must be cryptographically
 unable to write, or forced through a sole credential-owning barrier-aware
 service. The provider proof contains hashes and non-secret identifiers only.
 
-Provider-fence evidence is deliberately short lived. If it approaches expiry
+Provider-fence verification is deliberately short lived. If it approaches expiry
 while the gate is `PAUSED` and the active closure is `CLOSING` or `CLOSED`, call
-`refresh_production_scoring_external_fence_evidence` with a durable request ID,
-the prior evidence ID, active closure, exact optimistic revisions/generations,
-and fresh provider readback. The provider, deployment, credential, and writer
-coverage fingerprints must remain byte-for-byte identical to the evidence
-already bound to the closure. Only the reconciled legacy lease-set evidence and
-capture time may advance. Record the returned evidence ID and new revisions;
-never substitute a looser or operator-asserted scope.
+`begin-provider-quiesce` with the prior quiesce evidence ID, repeat finalize and
+inspect, and pass the new verified quiesce ID to
+`refresh-persistent-provider-fence`. Then call
+`refresh_production_scoring_external_fence_evidence` with the three exact
+durable IDs, prior external-evidence ID, active closure, exact optimistic
+revisions/generations, and fresh server-derived readback. The provider,
+deployment, credential, and writer coverage fingerprints must remain
+byte-for-byte identical to the evidence already bound to the closure. Record
+the returned evidence/verification IDs and new revisions; never substitute a
+looser or operator-asserted scope.
+
+The 17 protections remain installed through close, final Google capture,
+prepare, commit, and supported rollback. A lost install/refresh/remove response
+is retried with the same stable request ID; inspect the durable receipt rather
+than restoring or deleting protections speculatively. Removal is permitted only
+after the authoritative DB state is `DORMANT` or `ROLLED_BACK`, Google and
+Passport are canonical, admission is `OPEN` with the gate `PAUSED`, no prepared
+epoch/closure exists, and all writers/queues are drained. The control route
+must obtain `authorize_production_google_writer_provider_fence_removal` before
+deleting the exact 17 run-owned protections, then finalize the restoration
+receipt. An operator assertion alone never authorizes removal.
+
+Removal itself is another singular-writer window. Begin/finalize a fresh
+project-wide quiesce, refresh the persistent fence onto that exact quiesce ID,
+and keep the deny rule active while the authoritative rollback restores
+Google, Passport, the legacy deployment/domain, and the exact V0 environment.
+The WAF exception must keep this authenticated control route reachable until
+the removal receipt is finalized. Only after control-plane diagnostics prove
+the exact V0/Passport/Google state may the operator remove the temporary WAF
+rule; immediately re-probe normal edge/read health. Never remove the provider
+fence first and expose retained immutable legacy deployments before the WAF
+boundary is active.
 
 ## Forward phase sequence
 
@@ -67,6 +175,7 @@ advancing.
 
 1. `DORMANT -> STAGED`
    - Stage the exact frozen release.
+   - No persistent-fence IDs exist yet and none are supplied to stage.
    - Google scoring and Passport identity remain canonical.
    - Legacy admission remains `OPEN`.
 
@@ -80,11 +189,18 @@ advancing.
    - Follow the separately certified read and identity transitions.
    - Google remains canonical scoring authority.
    - Legacy admission may remain `OPEN`.
+   - Arm the barrier-aware legacy admission protocol for the exact candidate,
+     then execute the quiesce/install sequence above and record the external
+     fence evidence from its quiesce, fence, and verification IDs. Remove the
+     exact temporary WAF rule and pass the immediate post-removal edge/read
+     health checks before recording or closing; do not leave the project-wide
+     deny window open while performing unrelated phases.
 
 4. Close legacy admission atomically
    - Call `close_production_scoring_admission` with the current activation,
      authority, admission revisions/generations, provider-fence evidence ID,
-     exact resource tuple, deployment ID/SHA, and durable request identity.
+     exact quiesce/fence/verification IDs, exact resource tuple, deployment
+     ID/SHA, and durable request identity.
    - One transaction changes admission `OPEN -> CLOSING`, pauses execution,
      records a lease high-watermark, and prevents new v2 admissions.
    - The close boundary serializes with an admitted canonical transaction. If

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 import { constants as fsConstants } from "node:fs";
-import { access, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -37,9 +37,233 @@ const deploymentCommit = "1234567890abcdef1234567890abcdef12345678";
 const deploymentId = "dpl_PostgresAdmission034";
 const sourceFingerprint = fingerprint("staged-source-boundary");
 const advisoryLockKey = 731102026032n;
+const originInventoryArtifact = JSON.parse(await readFile(path.join(
+  repositoryRoot,
+  "docs/evidence/step11-6-production-origin-inventory.json",
+), "utf8"));
+const originInventory = Object.freeze(originInventoryArtifact.records);
+const originInventoryFingerprint =
+  "533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6";
+const credentialConfinement = Object.freeze({
+  credential_confinement_evidence_schema:
+    "step11-6-production-google-credential-confinement-v1",
+  credential_confinement_record_count: 1140,
+  credential_confinement_records_fingerprint:
+    "c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508",
+  credential_confinement_evidence_fingerprint:
+    "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
+});
+const candidateIdentity = Object.freeze({
+  deploymentId: deploymentId,
+  commit: deploymentCommit,
+  credentialGeneration: "DEDICATED_PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
+  mainBranchAliasOrigin:
+    "https://bagger-inv-git-main-sandbagger-invitational.vercel.app",
+  aliasOrigin:
+    "https://candidate-step11-6-sandbagger-invitational.vercel.app",
+  immutableOrigin:
+    "https://bagger-step11-6-immutable-sandbagger-invitational.vercel.app",
+});
+const probeVectors = Object.freeze([
+  { probeMethod: "DELETE", probePath: "/api/tournament-guide" },
+  { probeMethod: "POST", probePath: "/api/admin/cms" },
+  { probeMethod: "POST", probePath: "/api/admin/tournament" },
+  { probeMethod: "POST", probePath: "/api/director" },
+  { probeMethod: "POST", probePath: "/api/live-matches" },
+  { probeMethod: "POST", probePath: "/api/odds/publish" },
+  { probeMethod: "POST", probePath: "/api/scoring/current" },
+  {
+    probeMethod: "POST",
+    probePath: "/api/scoring/matches/__step11_6_probe__",
+  },
+  { probeMethod: "POST", probePath: "/api/tournament-guide" },
+]);
+const expectedFenceSheetIds = Object.freeze([
+  0, 28074660, 214637017, 270637829, 314908504, 388354025,
+  625223812, 804336907, 844307454, 1074655326, 1403525379,
+  1404770729, 1471947317, 1677468900, 1763222762, 1802214847,
+  1940053655,
+]);
+const providerProofByEvidenceId = new Map();
 
 function fingerprint(label) {
   return createHash("sha256").update(label).digest("hex");
+}
+
+assert.equal(originInventoryArtifact.recordCount, 1140);
+assert.equal(originInventory.length, 1140);
+assert.equal(originInventoryArtifact.recordsFingerprint, originInventoryFingerprint);
+assert.equal(fingerprint(JSON.stringify(originInventory)), originInventoryFingerprint);
+
+function compareCodepoint(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function candidateInventoryTuple(target) {
+  return [
+    candidateIdentity.deploymentId,
+    candidateIdentity.commit,
+    candidateIdentity.immutableOrigin,
+    target === "PRODUCTION"
+      ? "CUTOVER_PRODUCTION_CANDIDATE"
+      : "FEATURE_PREVIEW",
+    "READY",
+    "GIT",
+  ];
+}
+
+function liveOriginInventoryFor(target = "PREVIEW", additions = []) {
+  return [
+    ...originInventory,
+    ...additions,
+    candidateInventoryTuple(target),
+  ].sort((left, right) => compareCodepoint(
+    `${left[0]}\n${left[2]}`,
+    `${right[0]}\n${right[2]}`,
+  ));
+}
+
+function providerAttestation(
+  stage,
+  label,
+  { target = "PREVIEW",
+    purpose = target === "PRODUCTION" ? "CUTOVER" : "REHEARSAL",
+    liveInventory = liveOriginInventoryFor(target),
+    challengeId = randomUUID(),
+    challengeRequestFingerprint = fingerprint(`${label}-challenge-request`),
+    operationRequestId = randomUUID(),
+    ...overrides } = {},
+) {
+  return {
+    attestation_id: randomUUID(),
+    attestation_fingerprint: fingerprint(`${label}-signed-payload`),
+    signer_key_fingerprint: fingerprint("step11-6-vercel-attester-key-v1"),
+    signer_key_version: "STEP11_6_VERCEL_ATTESTER_V1",
+    stage,
+    purpose,
+    challenge_id: challengeId,
+    challenge_request_fingerprint: challengeRequestFingerprint,
+    operation_request_id: operationRequestId,
+    request_fingerprint: fingerprint(`${label}-signed-request-binding`),
+    signature_verified: true,
+    vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    vercel_team_id: "team_SandbaggerInvitations",
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    candidate_deployment_target: target,
+    routing_rule_id: "step11_6_pg17_writer_quiesce",
+    routing_rule_config_version: "revision-1",
+    routing_rule_etag: 'W/"revision-1"',
+    routing_rule_fingerprint: fingerprint("step11-6-writer-quiesce-rule"),
+    routing_rule_pending_draft_change_count: 0,
+    live_origin_inventory_count: liveInventory.length,
+    live_origin_inventory_fingerprint: fingerprint(
+      JSON.stringify(liveInventory),
+    ),
+    redacted_environment_scope_fingerprint: fingerprint(
+      "step11-6-redacted-environment-scope",
+    ),
+    ...credentialConfinement,
+    provider_observed_at: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+function quiesceOriginRecords(target = "PREVIEW", liveInventory =
+  liveOriginInventoryFor(target)) {
+  return [
+    ...liveInventory.map((record) => ({
+      origin: record[2],
+      originKind: record[3] === "MAIN_PRODUCTION"
+        ? "IMMUTABLE_MAIN_PRODUCTION"
+        : record[3] === "CUTOVER_PRODUCTION_CANDIDATE"
+        ? "IMMUTABLE_CUTOVER_PRODUCTION_CANDIDATE"
+        : "IMMUTABLE_FEATURE_PREVIEW",
+      deploymentId: record[0],
+      sha: record[1],
+      scopeClass: record[3],
+      deploymentStatus: record[4],
+      sourceProvenance: record[5],
+      credentialCapabilities: record[0] === candidateIdentity.deploymentId &&
+        record[2] === candidateIdentity.immutableOrigin
+        ? [
+          "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
+          "PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
+          "PRODUCTION_WORKBOOK_SELECTOR",
+        ]
+        : record[3] === "MAIN_PRODUCTION"
+        ? [
+          "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
+          "PRODUCTION_WORKBOOK_SELECTOR",
+        ]
+        : record[3] === "CUTOVER_PRODUCTION_CANDIDATE"
+        ? [
+          "PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
+          "PRODUCTION_WORKBOOK_SELECTOR",
+        ]
+        : [
+          "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
+          "POTENTIAL_DEDICATED_PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
+          "POTENTIAL_PRODUCTION_WORKBOOK_SELECTOR",
+        ],
+    })),
+    ...[
+      "https://baggerinv.com",
+      "https://www.baggerinv.com",
+      "https://bagger-inv.vercel.app",
+      candidateIdentity.mainBranchAliasOrigin,
+    ].map((origin) => ({
+      origin,
+      originKind: "FIXED_ALIAS",
+      deploymentId: null,
+      sha: null,
+      scopeClass: null,
+      deploymentStatus: null,
+      sourceProvenance: null,
+      credentialCapabilities: [],
+    })),
+    {
+      origin: candidateIdentity.aliasOrigin,
+      originKind: "CANDIDATE_ALIAS",
+      deploymentId: candidateIdentity.deploymentId,
+      sha: candidateIdentity.commit,
+      scopeClass: null,
+      deploymentStatus: null,
+      sourceProvenance: null,
+      credentialCapabilities: [
+        "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
+        "PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
+        "PRODUCTION_WORKBOOK_SELECTOR",
+      ],
+    },
+  ].sort((left, right) => compareCodepoint(left.origin, right.origin));
+}
+
+function quiesceProbeRecords(
+  observedAt = new Date().toISOString(),
+  target = "PREVIEW",
+  liveInventory = liveOriginInventoryFor(target),
+) {
+  const edgeRequestSetNonce = randomUUID();
+  return quiesceOriginRecords(target, liveInventory).map((origin) => [
+    origin.origin,
+    origin.originKind,
+    origin.deploymentId,
+    origin.sha,
+    origin.scopeClass,
+    origin.deploymentStatus,
+    origin.sourceProvenance,
+    origin.credentialCapabilities,
+    511,
+    probeVectors.map((vector) => fingerprint([
+      origin.origin,
+      vector.probeMethod,
+      vector.probePath,
+      "QUIESCED_NO_CANONICAL_WRITE",
+      edgeRequestSetNonce,
+    ].join("\n"))),
+    observedAt,
+  ]);
 }
 
 function sqlLiteral(value) {
@@ -428,6 +652,7 @@ function state(cluster, database) {
       'activation_revision', activation.activation_revision,
       'authority_generation_id', activation.authority_generation_id,
       'authority', activation.current_authority,
+      'read_cutover_phase', activation.read_cutover_phase,
       'scoring_ingress_enabled', activation.scoring_ingress_enabled,
       'expected_source_fingerprint', activation.expected_source_fingerprint,
       'admission_state', gate.admission_state,
@@ -436,7 +661,11 @@ function state(cluster, database) {
       'admission_deployment_id', gate.admission_deployment_id,
       'execution_gate', gate.state,
       'active_closure_id', gate.active_closure_id,
-      'external_fence_evidence_id', gate.external_fence_evidence_id
+      'external_fence_evidence_id', gate.external_fence_evidence_id,
+      'quiesce_evidence_id', activation.active_vercel_quiesce_evidence_id,
+      'provider_fence_id', activation.active_google_writer_provider_fence_id,
+      'provider_fence_verification_id',
+        activation.active_google_writer_provider_verification_id
     )
     from production_control.cutover_activation_state activation
     cross join scoring_authority.ingress_gates gate
@@ -459,9 +688,578 @@ function optimisticInput(current, label) {
   };
 }
 
+function quiesceBeginInput(purpose, label, priorEvidenceId = undefined) {
+  const requestFingerprint = fingerprint(`${label}-begin-request`);
+  const candidateTarget = purpose === "CUTOVER" ? "PRODUCTION" : "PREVIEW";
+  const liveInventory = liveOriginInventoryFor(candidateTarget);
+  return {
+    ...scope,
+    actor_id: actor,
+    purpose,
+    evidence_request_id: randomUUID(),
+    prior_evidence_id: priorEvidenceId,
+    request_fingerprint: requestFingerprint,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    candidate_deployment_target: candidateTarget,
+    candidate_credential_generation: candidateIdentity.credentialGeneration,
+    main_branch_alias_origin: candidateIdentity.mainBranchAliasOrigin,
+    candidate_alias_origin: candidateIdentity.aliasOrigin,
+    candidate_immutable_origin: candidateIdentity.immutableOrigin,
+    vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    routing_rule_id: "step11_6_pg17_writer_quiesce",
+    routing_rule_revision: "revision-1",
+    routing_rule_scope: "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
+    origin_inventory: originInventory,
+    live_origin_inventory: liveInventory,
+    first_probe_records: quiesceProbeRecords(
+      new Date().toISOString(),
+      candidateTarget,
+      liveInventory,
+    ),
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    owner_principal_fingerprint: fingerprint("production-workbook-owner"),
+    owner_override_operationally_frozen: true,
+    owner_freeze_ttl_seconds: 1800,
+    ...credentialConfinement,
+  };
+}
+
+function providerChallengeIssueInput(input, stage, label, {
+  operationRequestId = randomUUID(),
+  challengeRequestId = randomUUID(),
+} = {}) {
+  const purpose = input.purpose || (input.candidate_deployment_target === "PRODUCTION"
+    ? "CUTOVER" : "REHEARSAL");
+  return {
+    ...scope,
+    actor_id: actor,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    challenge_request_id: challengeRequestId,
+    operation_request_id: operationRequestId,
+    evidence_request_id: input.evidence_request_id,
+    request_fingerprint: fingerprint(`${label}-challenge-issue`),
+    purpose,
+    stage,
+    candidate_deployment_id: input.candidate_deployment_id,
+    candidate_deployment_commit: input.candidate_deployment_commit,
+    candidate_deployment_target: input.candidate_deployment_target,
+    candidate_alias_origin: candidateIdentity.aliasOrigin,
+    candidate_immutable_origin: candidateIdentity.immutableOrigin,
+    vercel_project_id: input.vercel_project_id,
+    vercel_team_id: "team_SandbaggerInvitations",
+    routing_rule_id: input.routing_rule_id,
+    routing_rule_config_version: input.routing_rule_revision,
+    routing_rule_scope: input.routing_rule_scope,
+  };
+}
+
+function reserveProviderAttestation(
+  cluster,
+  database,
+  input,
+  stage,
+  label,
+  { providerOverrides = {}, returnDetails = false } = {},
+) {
+  const issueInput = providerChallengeIssueInput(input, stage, label);
+  const purpose = issueInput.purpose;
+  const operationRequestId = issueInput.operation_request_id;
+  const challengeRequestId = issueInput.challenge_request_id;
+  const challenge = rpc(
+    cluster,
+    database,
+    "issue_production_vercel_provider_attestation_challenge",
+    issueInput,
+  );
+  const attestation = providerAttestation(stage, `${label}-attestation`, {
+    purpose,
+    target: input.candidate_deployment_target,
+    liveInventory: input.live_origin_inventory,
+    challengeId: challenge.challenge_id,
+    challengeRequestFingerprint: challenge.challenge_request_fingerprint,
+    operationRequestId,
+    ...providerOverrides,
+  });
+  const consumeInput = {
+    ...scope,
+    actor_id: actor,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    consume_request_id: randomUUID(),
+    request_fingerprint: fingerprint(`${label}-challenge-consume`),
+    challenge_id: challenge.challenge_id,
+    challenge_request_id: challengeRequestId,
+    operation_request_id: operationRequestId,
+    evidence_request_id: input.evidence_request_id,
+    purpose,
+    stage,
+    candidate_deployment_id: input.candidate_deployment_id,
+    candidate_deployment_commit: input.candidate_deployment_commit,
+    candidate_deployment_target: input.candidate_deployment_target,
+    origin_inventory: input.origin_inventory || originInventory,
+    live_origin_inventory: input.live_origin_inventory,
+    provider_attestation: attestation,
+  };
+  const reserved = rpc(
+    cluster,
+    database,
+    "consume_production_vercel_provider_attestation_challenge",
+    consumeInput,
+  );
+  assert.equal(reserved.status, "RESERVED");
+  const binding = {
+    attestation_id: reserved.attestation_id,
+    attestation_fingerprint: reserved.attestation_fingerprint,
+  };
+  return returnDetails
+    ? { binding, reserved, consumeInput, challenge }
+    : binding;
+}
+
+function certifyQuiesce(
+  cluster,
+  database,
+  purpose,
+  label,
+  priorEvidenceId = undefined,
+) {
+  const beginInput = quiesceBeginInput(
+    purpose,
+    label,
+    priorEvidenceId,
+  );
+  beginInput.provider_attestation = reserveProviderAttestation(
+    cluster, database, beginInput, "BEGIN", `${label}-begin`,
+  );
+  const draining = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_quiesce_evidence",
+    beginInput,
+  );
+  assert.equal(draining.status, "DRAINING");
+  assert.equal(Number(draining.probe_vector_count), 9);
+  assert.equal(
+    Number(draining.probe_origin_count),
+    beginInput.live_origin_inventory.length + 5,
+  );
+  assert.equal(
+    Number(draining.probe_record_count),
+    (beginInput.live_origin_inventory.length + 5) * 9,
+  );
+  psql(cluster, database, `
+    update production_control.vercel_writer_quiesce_evidence
+    set owner_acknowledged_at = now() - interval '301 seconds',
+        drain_started_at = now() - interval '301 seconds',
+        owner_freeze_expires_at = now() + interval '20 minutes'
+    where evidence_id = ${sqlLiteral(draining.evidence_id)}::uuid;
+  `);
+  const finalizeRequestFingerprint = fingerprint(
+    `${label}-finalize-request`,
+  );
+  const finalizeInput = {
+    ...scope,
+    actor_id: actor,
+    purpose,
+    evidence_id: draining.evidence_id,
+    evidence_request_id: beginInput.evidence_request_id,
+    request_fingerprint: finalizeRequestFingerprint,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    candidate_deployment_target: beginInput.candidate_deployment_target,
+    vercel_project_id: beginInput.vercel_project_id,
+    routing_rule_id: beginInput.routing_rule_id,
+    routing_rule_revision: beginInput.routing_rule_revision,
+    routing_rule_scope: beginInput.routing_rule_scope,
+    origin_inventory: beginInput.origin_inventory,
+    live_origin_inventory: beginInput.live_origin_inventory,
+    second_probe_records: quiesceProbeRecords(
+      new Date().toISOString(),
+      beginInput.candidate_deployment_target,
+      beginInput.live_origin_inventory,
+    ),
+    ...credentialConfinement,
+  };
+  finalizeInput.provider_attestation = reserveProviderAttestation(
+    cluster, database, finalizeInput, "FINALIZE", `${label}-finalize`,
+  );
+  const verified = rpc(
+    cluster,
+    database,
+    "finalize_production_vercel_writer_quiesce_evidence",
+    finalizeInput,
+  );
+  assert.equal(verified.status, "VERIFIED");
+  assert.notEqual(
+    verified.begin_provider_attestation_id,
+    verified.finalize_provider_attestation_id,
+  );
+  assert.notEqual(
+    verified.begin_provider_attestation_fingerprint,
+    verified.finalize_provider_attestation_fingerprint,
+  );
+  assert.equal(
+    Number(verified.probe_origin_count),
+    beginInput.live_origin_inventory.length + 5,
+  );
+  assert.equal(
+    Number(verified.probe_record_count),
+    (beginInput.live_origin_inventory.length + 5) * 9,
+  );
+  return verified;
+}
+
+function makeQuiesceFinalizeInput(
+  cluster,
+  database,
+  beginInput,
+  draining,
+  label,
+  secondProbeRecords,
+) {
+  const requestFingerprint = fingerprint(`${label}-finalize-request`);
+  const finalizeInput = {
+    ...scope,
+    actor_id: actor,
+    purpose: beginInput.purpose,
+    evidence_id: draining.evidence_id,
+    evidence_request_id: beginInput.evidence_request_id,
+    request_fingerprint: requestFingerprint,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    candidate_deployment_target: beginInput.candidate_deployment_target,
+    vercel_project_id: beginInput.vercel_project_id,
+    routing_rule_id: beginInput.routing_rule_id,
+    routing_rule_revision: beginInput.routing_rule_revision,
+    routing_rule_scope: beginInput.routing_rule_scope,
+    origin_inventory: beginInput.origin_inventory,
+    live_origin_inventory: beginInput.live_origin_inventory,
+    second_probe_records: secondProbeRecords,
+    ...credentialConfinement,
+  };
+  finalizeInput.provider_attestation = reserveProviderAttestation(
+    cluster, database, finalizeInput, "FINALIZE", `${label}-finalize`,
+  );
+  return finalizeInput;
+}
+
+function backdateQuiesceDrain(cluster, database, evidenceId) {
+  psql(cluster, database, `
+    update production_control.vercel_writer_quiesce_evidence
+    set owner_acknowledged_at = now() - interval '301 seconds',
+        drain_started_at = now() - interval '301 seconds',
+        owner_freeze_expires_at = now() + interval '20 minutes'
+    where evidence_id = ${sqlLiteral(evidenceId)}::uuid;
+  `);
+}
+
+function rehearsalBeginInput(
+  current,
+  quiesceEvidenceId,
+  label = "writer-fence-rehearsal-begin",
+) {
+  return {
+    ...scope,
+    actor_id: actor,
+    rehearsal_request_id: randomUUID(),
+    request_fingerprint: fingerprint(label),
+    quiesce_evidence_id: quiesceEvidenceId,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    dedicated_google_service_account:
+      "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+    expected_activation_revision: Number(current.activation_revision),
+    expected_authority_generation: current.authority_generation_id,
+    expected_admission_generation: current.admission_generation_id,
+    expected_admission_revision: Number(current.admission_revision),
+    baseline_provider_fingerprint: fingerprint(`${label}-provider-baseline`),
+    baseline_protected_ranges_fingerprint:
+      fingerprint(`${label}-protected-ranges-baseline`),
+    baseline_canonical_value_fingerprint:
+      fingerprint(`${label}-canonical-values-baseline`),
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+  };
+}
+
+function rehearsalFinishInput(
+  beginInput,
+  run,
+  outcome,
+  label,
+  restorationConfirmed = outcome === "RESTORED",
+) {
+  const restored = restorationConfirmed;
+  return {
+    ...scope,
+    actor_id: actor,
+    run_id: run.run_id,
+    rehearsal_request_id: beginInput.rehearsal_request_id,
+    candidate_deployment_id: beginInput.candidate_deployment_id,
+    candidate_deployment_commit: beginInput.candidate_deployment_commit,
+    protection_description_prefix: run.protection_description_prefix,
+    request_fingerprint: fingerprint(label),
+    outcome,
+    provider_evidence_fingerprint: restored
+      ? fingerprint(`${label}-provider-evidence`)
+      : undefined,
+    fenced_provider_fingerprint: restored
+      ? fingerprint(`${label}-fenced-provider`)
+      : undefined,
+    restored_provider_fingerprint: restored
+      ? beginInput.baseline_provider_fingerprint
+      : undefined,
+    restored_protected_ranges_fingerprint: restored
+      ? beginInput.baseline_protected_ranges_fingerprint
+      : undefined,
+    restored_canonical_value_fingerprint: restored
+      ? beginInput.baseline_canonical_value_fingerprint
+      : undefined,
+    restoration_evidence_fingerprint: restored
+      ? fingerprint(`${label}-restoration-evidence`)
+      : undefined,
+    run_owned_protection_ids: restored
+      ? Array.from({ length: 17 }, (_, index) => 341 + index)
+      : [341],
+    active_run_owned_protection_count: restored ? 0 : 1,
+    dedicated_identity_can_edit: restored ? true : undefined,
+    legacy_identity_denied: restored ? true : undefined,
+    google_value_writes_performed: restored ? false : undefined,
+    preview_resources_accessed: restored ? false : undefined,
+    restoration_confirmed: restored,
+    failure_code: outcome === "FAILED"
+      ? "FAULT_INJECTED_PROVIDER_FAILURE"
+      : undefined,
+  };
+}
+
+function certifySuccessfulRehearsal(cluster, database, label) {
+  const current = state(cluster, database);
+  const quiesce = certifyQuiesce(
+    cluster,
+    database,
+    "REHEARSAL",
+    `${label}-quiesce`,
+  );
+  const beginInput = rehearsalBeginInput(
+    current,
+    quiesce.evidence_id,
+    `${label}-begin`,
+  );
+  const running = rpc(
+    cluster,
+    database,
+    "begin_production_google_writer_fence_rehearsal",
+    beginInput,
+  );
+  const restored = rpc(
+    cluster,
+    database,
+    "finish_production_google_writer_fence_rehearsal",
+    rehearsalFinishInput(beginInput, running, "RESTORED", `${label}-restored`),
+  );
+  assert.equal(restored.status, "RESTORED");
+  assert.equal(restored.certification_passed, true);
+  return restored;
+}
+
+function canonicalSheetUnionFingerprint(cluster, database) {
+  return psql(cluster, database, `
+    select production_control.structured_evidence_fingerprint(
+      production_control.expected_google_writer_fence_sheet_ids()
+    );
+  `);
+}
+
+function providerProtectionRecords(prefix) {
+  return expectedFenceSheetIds.map((sheetId, index) => ({
+    sheetId,
+    protectedRangeId: 91_000 + index,
+    description: `${prefix}:${sheetId}`,
+    warningOnly: false,
+    dedicatedRequestingUserCanEdit: true,
+    legacyRequestingUserCanEdit: false,
+  }));
+}
+
+function inspectProviderFence(cluster, database, installRequestId, fenceId) {
+  return rpc(
+    cluster,
+    database,
+    "inspect_production_google_writer_provider_fence",
+    {
+      ...scope,
+      install_request_id: installRequestId,
+      fence_id: fenceId,
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+    },
+  );
+}
+
+function installProviderFence(cluster, database, quiesce, label) {
+  const installRequestId = randomUUID();
+  const baseline = {
+    provider: fingerprint(`${label}-baseline-provider`),
+    acl: fingerprint(`${label}-baseline-acl`),
+    canonical: fingerprint(`${label}-baseline-canonical`),
+    formula: fingerprint(`${label}-baseline-formula`),
+    combined: fingerprint(`${label}-baseline-combined`),
+  };
+  const begin = rpc(
+    cluster,
+    database,
+    "begin_production_google_writer_provider_fence_install",
+    {
+      ...scope,
+      actor_id: actor,
+      install_request_id: installRequestId,
+      request_fingerprint: fingerprint(`${label}-begin-request`),
+      quiesce_evidence_id: quiesce.evidence_id,
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      dedicated_principal_fingerprint: fingerprint("dedicated-google-principal"),
+      legacy_credential_generation_fingerprint:
+        fingerprint("legacy-google-credential-generation-v0"),
+      baseline_provider_fingerprint: baseline.provider,
+      baseline_acl_fingerprint: baseline.acl,
+      baseline_canonical_value_fingerprint: baseline.canonical,
+      baseline_formula_fingerprint: baseline.formula,
+      baseline_combined_value_fingerprint: baseline.combined,
+      writer_scope_fingerprint: fingerprint("canonical-google-writer-scope-v2"),
+      canonical_sheet_union_fingerprint:
+        canonicalSheetUnionFingerprint(cluster, database),
+    },
+  );
+  assert.equal(begin.status, "INSTALLING");
+  const protectionRecords = providerProtectionRecords(
+    begin.protection_description_prefix,
+  );
+  const provider = {
+    provider: fingerprint(`${label}-installed-provider`),
+    acl: baseline.acl,
+    canonical: baseline.canonical,
+    formula: baseline.formula,
+    combined: baseline.combined,
+    structural: fingerprint(`${label}-structural-canary`),
+    permissions: fingerprint(`${label}-permission-inventory`),
+  };
+  const installed = rpc(
+    cluster,
+    database,
+    "finish_production_google_writer_provider_fence_install",
+    {
+      ...scope,
+      actor_id: actor,
+      fence_id: begin.fence_id,
+      install_request_id: installRequestId,
+      quiesce_evidence_id: quiesce.evidence_id,
+      request_fingerprint: fingerprint(`${label}-finish-request`),
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      protection_description_prefix: begin.protection_description_prefix,
+      protection_records: protectionRecords,
+      provider_fingerprint: provider.provider,
+      acl_fingerprint: provider.acl,
+      canonical_value_fingerprint: provider.canonical,
+      formula_fingerprint: provider.formula,
+      combined_value_fingerprint: provider.combined,
+      structural_canary_fingerprint: provider.structural,
+      permission_inventory_fingerprint: provider.permissions,
+    },
+  );
+  assert.equal(installed.status, "INSTALLED");
+  const inspected = inspectProviderFence(
+    cluster,
+    database,
+    installRequestId,
+    begin.fence_id,
+  );
+  assert.equal(inspected.verification.protection_count, 17);
+  return {
+    fenceId: begin.fence_id,
+    installRequestId,
+    verificationId: inspected.verification.verification_id,
+    quiesceEvidenceId: quiesce.evidence_id,
+    protectionDescriptionPrefix: begin.protection_description_prefix,
+    protectionRecords,
+    provider,
+  };
+}
+
+function currentProviderProof(cluster, database) {
+  return parseJsonOutput(psql(cluster, database, `
+    select jsonb_build_object(
+      'fenceId', fence.fence_id,
+      'installRequestId', fence.install_request_id,
+      'verificationId', verification.verification_id,
+      'quiesceEvidenceId', verification.quiesce_evidence_id,
+      'protectionDescriptionPrefix', fence.protection_description_prefix,
+      'protectionRecords', verification.protection_records,
+      'provider', jsonb_build_object(
+        'provider', verification.provider_fingerprint,
+        'acl', verification.acl_fingerprint,
+        'canonical', verification.canonical_value_fingerprint,
+        'formula', verification.formula_fingerprint,
+        'combined', verification.combined_value_fingerprint,
+        'structural', verification.structural_canary_fingerprint,
+        'permissions', verification.permission_inventory_fingerprint
+      )
+    )
+    from production_control.cutover_activation_state activation
+    join production_control.google_writer_provider_fences fence
+      on fence.fence_id = activation.active_google_writer_provider_fence_id
+    join production_control.google_writer_provider_fence_verifications verification
+      on verification.verification_id =
+        activation.active_google_writer_provider_verification_id
+    where activation.scope_key = 'BAGGER_INV_PRODUCTION';
+  `));
+}
+
+function refreshProviderFence(cluster, database, prior, quiesce, label) {
+  rpc(
+    cluster,
+    database,
+    "refresh_production_google_writer_provider_fence",
+    {
+      ...scope,
+      actor_id: actor,
+      fence_id: prior.fenceId,
+      install_request_id: prior.installRequestId,
+      quiesce_evidence_id: quiesce.evidence_id,
+      provider_fence_verification_id: prior.verificationId,
+      request_fingerprint: fingerprint(`${label}-provider-refresh-request`),
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      protection_description_prefix: prior.protectionDescriptionPrefix,
+      protection_records: prior.protectionRecords,
+      provider_fingerprint: prior.provider.provider,
+      acl_fingerprint: prior.provider.acl,
+      canonical_value_fingerprint: prior.provider.canonical,
+      formula_fingerprint: prior.provider.formula,
+      combined_value_fingerprint: prior.provider.combined,
+      structural_canary_fingerprint: prior.provider.structural,
+      permission_inventory_fingerprint: prior.provider.permissions,
+    },
+  );
+  return currentProviderProof(cluster, database);
+}
+
+function exactProviderIds(evidenceId) {
+  const proof = providerProofByEvidenceId.get(evidenceId);
+  assert.ok(proof, `missing provider proof for external evidence ${evidenceId}`);
+  return {
+    quiesce_evidence_id: proof.quiesceEvidenceId,
+    provider_fence_id: proof.fenceId,
+    provider_fence_verification_id: proof.verificationId,
+  };
+}
+
 function closeInput(current, evidenceId, label) {
   return {
     ...optimisticInput(current, label),
+    ...exactProviderIds(evidenceId),
     expected_authority: current.authority,
     external_fence_evidence_id: evidenceId,
     start_source_fingerprint: current.expected_source_fingerprint,
@@ -489,20 +1287,14 @@ function beginInput(
 function closureInput(current, evidenceId, closureId, label) {
   return {
     ...optimisticInput(current, label),
+    ...exactProviderIds(evidenceId),
     closure_id: closureId,
     external_fence_evidence_id: evidenceId,
   };
 }
 
 function recordFenceEvidence(cluster, database, current, label) {
-  const legacy = parseJsonOutput(psql(cluster, database, `
-    select jsonb_build_object(
-      'fingerprint', production_control.scoring_admission_legacy_set_fingerprint(),
-      'count', count(*)::integer
-    )
-    from scoring_authority.scoring_ingress_leases
-    where tournament_id = '2026' and protocol_version = 'LEGACY_V1';
-  `));
+  const proof = currentProviderProof(cluster, database);
   const evidence = rpc(
     cluster,
     database,
@@ -510,22 +1302,16 @@ function recordFenceEvidence(cluster, database, current, label) {
     {
       ...optimisticInput(current, `${label}-request`),
       operation: "RECORD_PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE",
-      provider_evidence_fingerprint: fingerprint(`${label}-provider`),
-      deployment_scope_fingerprint: fingerprint(`${label}-deployment-scope`),
-      google_credential_scope_fingerprint: fingerprint(`${label}-credentials`),
-      writer_coverage_fingerprint: fingerprint(`${label}-writer-coverage`),
-      legacy_lease_set_fingerprint: legacy.fingerprint,
-      legacy_lease_count: Number(legacy.count),
-      legacy_deployments_fenced: true,
-      google_credentials_fenced: true,
-      manual_google_scoring_fenced: true,
-      captured_at: new Date().toISOString(),
+      quiesce_evidence_id: proof.quiesceEvidenceId,
+      provider_fence_id: proof.fenceId,
+      provider_fence_verification_id: proof.verificationId,
     },
   );
   assert.equal(
     evidence.code,
     "PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE_RECORDED",
   );
+  providerProofByEvidenceId.set(evidence.evidence_id, proof);
   return evidence;
 }
 
@@ -537,26 +1323,23 @@ function refreshFenceEvidence(
   priorEvidenceId,
   label,
 ) {
-  const proof = parseJsonOutput(psql(cluster, database, `
-    select jsonb_build_object(
-      'provider_evidence_fingerprint', evidence.provider_evidence_fingerprint,
-      'deployment_scope_fingerprint', evidence.deployment_scope_fingerprint,
-      'google_credential_scope_fingerprint',
-        evidence.google_credential_scope_fingerprint,
-      'writer_coverage_fingerprint', evidence.writer_coverage_fingerprint,
-      'legacy_lease_set_fingerprint',
-        production_control.scoring_admission_legacy_set_fingerprint(),
-      'legacy_lease_count', (
-        select count(*)::integer
-        from scoring_authority.scoring_ingress_leases lease
-        where lease.tournament_id = '2026'
-          and lease.protocol_version = 'LEGACY_V1'
-      )
-    )
-    from production_control.scoring_external_fence_evidence evidence
-    where evidence.evidence_id = ${sqlLiteral(priorEvidenceId)}::uuid;
-  `));
-  return rpc(
+  const prior = providerProofByEvidenceId.get(priorEvidenceId)
+    ?? currentProviderProof(cluster, database);
+  const quiesce = certifyQuiesce(
+    cluster,
+    database,
+    "CUTOVER",
+    `${label}-quiesce`,
+    prior.quiesceEvidenceId,
+  );
+  const proof = refreshProviderFence(
+    cluster,
+    database,
+    prior,
+    quiesce,
+    label,
+  );
+  const refreshed = rpc(
     cluster,
     database,
     "refresh_production_scoring_external_fence_evidence",
@@ -565,16 +1348,16 @@ function refreshFenceEvidence(
       operation: "REFRESH_PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE",
       prior_external_fence_evidence_id: priorEvidenceId,
       closure_id: closureId,
-      ...proof,
-      legacy_deployments_fenced: true,
-      google_credentials_fenced: true,
-      manual_google_scoring_fenced: true,
-      captured_at: new Date().toISOString(),
+      quiesce_evidence_id: proof.quiesceEvidenceId,
+      provider_fence_id: proof.fenceId,
+      provider_fence_verification_id: proof.verificationId,
     },
   );
+  providerProofByEvidenceId.set(refreshed.evidence_id, proof);
+  return refreshed;
 }
 
-function stageAndArm(cluster, database) {
+function stageToArmedGoogleGate(cluster, database, label = "initial") {
   const beforeStage = state(cluster, database);
   const stage = rpc(cluster, database, "stage_production_cutover_release", {
     ...scope,
@@ -587,17 +1370,22 @@ function stageAndArm(cluster, database) {
     deployment_commit: deploymentCommit,
     source_fingerprint: sourceFingerprint,
     expected_activation_revision: Number(beforeStage.activation_revision),
-    request_fingerprint: fingerprint("stage-release"),
+    request_fingerprint: fingerprint(`${label}-stage-release`),
   });
   assert.equal(stage.code, "PRODUCTION_RELEASE_STAGED");
 
+  psql(cluster, database, `
+    update production_control.cutover_activation_state
+    set read_cutover_phase = 'CURRENT_READS'
+    where scope_key = 'BAGGER_INV_PRODUCTION';
+    update production_control.resource_scope
+    set participant_identity_authority = 'SUPABASE',
+        current_tournament_read_authority = 'SUPABASE',
+        public_supabase_reads_enabled = true,
+        auth_user_creation_enabled = true
+    where scope_key = 'BAGGER_INV_PRODUCTION';
+  `);
   const staged = state(cluster, database);
-  const evidence = recordFenceEvidence(
-    cluster,
-    database,
-    staged,
-    "external-fence-evidence",
-  );
 
   const arm = rpc(
     cluster,
@@ -605,7 +1393,6 @@ function stageAndArm(cluster, database) {
     "arm_production_google_ingress_lease_gate",
     {
       ...optimisticInput(staged, "arm-google-admission"),
-      external_fence_evidence_id: evidence.evidence_id,
     },
   );
   assert.equal(arm.code, "PRODUCTION_GOOGLE_LEASE_GATE_V2_ARMED");
@@ -613,6 +1400,30 @@ function stageAndArm(cluster, database) {
   assert.equal(armed.activation_state, "GOOGLE_LEASE_ARMED");
   assert.equal(armed.admission_state, "OPEN");
   assert.equal(armed.execution_gate, "OPEN");
+  return armed;
+}
+
+function stageAndArm(cluster, database) {
+  const armed = stageToArmedGoogleGate(cluster, database);
+  const quiesce = certifyQuiesce(
+    cluster,
+    database,
+    "CUTOVER",
+    "initial-cutover-quiesce",
+  );
+  installProviderFence(
+    cluster,
+    database,
+    quiesce,
+    "initial-provider-fence",
+  );
+  const providerBound = state(cluster, database);
+  const evidence = recordFenceEvidence(
+    cluster,
+    database,
+    providerBound,
+    "external-fence-evidence",
+  );
   return { armed, evidenceId: evidence.evidence_id };
 }
 
@@ -795,10 +1606,17 @@ test(
     const cluster = await createCluster();
     let databaseCounter = 0;
     const baselineDatabase = "admission_034_baseline";
+    const dormantBaselineDatabase = "admission_034_dormant_baseline";
     const cloneDatabase = (label) => {
       databaseCounter += 1;
       const database = `admission_034_${databaseCounter}_${label}`;
       createDatabase(cluster, database, baselineDatabase);
+      return database;
+    };
+    const cloneDormantDatabase = (label) => {
+      databaseCounter += 1;
+      const database = `admission_034_${databaseCounter}_${label}`;
+      createDatabase(cluster, database, dormantBaselineDatabase);
       return database;
     };
 
@@ -806,8 +1624,766 @@ test(
       createDatabase(cluster, baselineDatabase);
       installSupabaseCompatibility(cluster, baselineDatabase);
       await installProductionMigrations(cluster, baselineDatabase);
+      assert.equal(
+        psql(cluster, baselineDatabase, `
+          select production_control.vercel_origin_inventory_fingerprint(
+            ${jsonSql(originInventory)}
+          );
+        `).trim(),
+        originInventoryFingerprint,
+      );
       installScoringFixture(cluster, baselineDatabase);
+      createDatabase(cluster, dormantBaselineDatabase, baselineDatabase);
+      certifySuccessfulRehearsal(
+        cluster,
+        baselineDatabase,
+        "baseline-certified-rehearsal",
+      );
       const baseline = stageAndArm(cluster, baselineDatabase);
+
+      await t.test(
+        "database-issued provider challenges reserve once and recover a lost response",
+        () => {
+          const database = cloneDormantDatabase("attestation_challenge_recovery");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "attestation-challenge-recovery",
+          );
+          const details = reserveProviderAttestation(
+            cluster,
+            database,
+            input,
+            "BEGIN",
+            "attestation-challenge-recovery",
+            { returnDetails: true },
+          );
+          assert.notEqual(
+            details.reserved.attestation_id,
+            details.challenge.challenge_id,
+          );
+          assert.equal(
+            details.reserved.operation_request_id,
+            details.challenge.operation_request_id,
+          );
+          assert.equal(
+            details.reserved.evidence_request_id,
+            input.evidence_request_id,
+          );
+          const recovered = rpc(
+            cluster,
+            database,
+            "consume_production_vercel_provider_attestation_challenge",
+            details.consumeInput,
+          );
+          assert.equal(recovered.attestation_id, details.reserved.attestation_id);
+          assert.equal(recovered.idempotent, true);
+          const inspected = rpc(
+            cluster,
+            database,
+            "inspect_production_vercel_provider_attestation_challenge",
+            {
+              ...scope,
+              actor_id: actor,
+              authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+              challenge_id: details.challenge.challenge_id,
+              operation_request_id: details.challenge.operation_request_id,
+              evidence_request_id: input.evidence_request_id,
+              stage: "BEGIN",
+              purpose: "REHEARSAL",
+              candidate_deployment_id: candidateIdentity.deploymentId,
+              candidate_deployment_commit: candidateIdentity.commit,
+              candidate_deployment_target: "PREVIEW",
+            },
+          );
+          assert.equal(inspected.status, "CONSUMED");
+          assert.equal(
+            inspected.consumed_attestation_id,
+            details.reserved.attestation_id,
+          );
+          assert.equal(
+            inspected.consumed_provider_attestation.status,
+            "RESERVED",
+          );
+          assert.deepEqual(
+            inspected.consumed_provider_attestation.live_origin_inventory,
+            input.live_origin_inventory,
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "consume_production_vercel_provider_attestation_challenge",
+              {
+                ...details.consumeInput,
+                consume_request_id: randomUUID(),
+              },
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CONSUME_IDEMPOTENCY_CONFLICT/,
+          );
+        },
+      );
+
+      await t.test(
+        "signed post-freeze inventory additions expand the exact probe scope",
+        () => {
+          const database = cloneDormantDatabase("dynamic_provider_scope");
+          const input = quiesceBeginInput("REHEARSAL", "dynamic-provider-scope");
+          input.live_origin_inventory = liveOriginInventoryFor("PREVIEW", [[
+            "dpl_PostFreezeAddition123",
+            candidateIdentity.commit,
+            "https://post-freeze-addition-sandbagger-invitational.vercel.app",
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          input.first_probe_records = quiesceProbeRecords(
+            new Date().toISOString(),
+            "PREVIEW",
+            input.live_origin_inventory,
+          );
+          input.provider_attestation = reserveProviderAttestation(
+            cluster,
+            database,
+            input,
+            "BEGIN",
+            "dynamic-provider-scope-begin",
+          );
+          const draining = rpc(
+            cluster,
+            database,
+            "begin_production_vercel_writer_quiesce_evidence",
+            input,
+          );
+          assert.equal(
+            Number(draining.live_origin_inventory_count),
+            input.live_origin_inventory.length,
+          );
+          assert.equal(
+            Number(draining.probe_origin_count),
+            input.live_origin_inventory.length + 5,
+          );
+          assert.equal(
+            Number(draining.probe_record_count),
+            (input.live_origin_inventory.length + 5) * 9,
+          );
+        },
+      );
+
+      await t.test(
+        "an unconsumed database challenge expires before provider reservation",
+        () => {
+          const database = cloneDormantDatabase("attestation_challenge_expiry");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "attestation-challenge-expiry",
+          );
+          const issueInput = providerChallengeIssueInput(
+            input,
+            "BEGIN",
+            "attestation-challenge-expiry",
+          );
+          const challenge = rpc(
+            cluster,
+            database,
+            "issue_production_vercel_provider_attestation_challenge",
+            issueInput,
+          );
+          psql(cluster, database, `
+            update production_control.vercel_provider_attestation_challenges
+            set issued_at = now() - interval '180 seconds',
+                expires_at = now() - interval '60 seconds'
+            where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+          `);
+          const attestation = providerAttestation(
+            "BEGIN",
+            "attestation-challenge-expiry",
+            {
+              purpose: "REHEARSAL",
+              target: "PREVIEW",
+              liveInventory: input.live_origin_inventory,
+              challengeId: challenge.challenge_id,
+              challengeRequestFingerprint:
+                challenge.challenge_request_fingerprint,
+              operationRequestId: issueInput.operation_request_id,
+            },
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "consume_production_vercel_provider_attestation_challenge",
+              {
+                ...scope,
+                actor_id: actor,
+                authenticated_actor_fingerprint:
+                  fingerprint("authenticated-operator"),
+                consume_request_id: randomUUID(),
+                request_fingerprint: fingerprint(
+                  "attestation-challenge-expiry-consume",
+                ),
+                challenge_id: challenge.challenge_id,
+                challenge_request_id: issueInput.challenge_request_id,
+                operation_request_id: issueInput.operation_request_id,
+                evidence_request_id: input.evidence_request_id,
+                purpose: "REHEARSAL",
+                stage: "BEGIN",
+                candidate_deployment_id: input.candidate_deployment_id,
+                candidate_deployment_commit: input.candidate_deployment_commit,
+                candidate_deployment_target: "PREVIEW",
+                origin_inventory: input.origin_inventory,
+                live_origin_inventory: input.live_origin_inventory,
+                provider_attestation: attestation,
+              },
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_EXPIRED/,
+          );
+        },
+      );
+
+      await t.test(
+        "post-freeze inventory with a different SHA cannot be reserved",
+        () => {
+          const database = cloneDormantDatabase("dynamic_provider_scope_drift");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "dynamic-provider-scope-drift",
+          );
+          input.live_origin_inventory = liveOriginInventoryFor("PREVIEW", [[
+            "dpl_PostFreezeDrift123",
+            "abcdef1234567890abcdef1234567890abcdef12",
+            "https://post-freeze-drift-sandbagger-invitational.vercel.app",
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assertCommandFailure(
+            () => reserveProviderAttestation(
+              cluster,
+              database,
+              input,
+              "BEGIN",
+              "dynamic-provider-scope-drift-begin",
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "provider reservations bind the frozen credential-confinement evidence",
+        () => {
+          const database = cloneDormantDatabase("credential_confinement_drift");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "credential-confinement-drift",
+          );
+          assertCommandFailure(
+            () => reserveProviderAttestation(
+              cluster,
+              database,
+              input,
+              "BEGIN",
+              "credential-confinement-drift-begin",
+              { providerOverrides: {
+                credential_confinement_evidence_fingerprint:
+                  fingerprint("untrusted-credential-confinement"),
+              } },
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CONSUME_INPUT_INVALID/,
+          );
+        },
+      );
+
+      await t.test(
+        "final provider attestation is distinct and rejects rule drift",
+        () => {
+          const database = cloneDormantDatabase("attestation_finalize_drift");
+          const beginInput = quiesceBeginInput(
+            "REHEARSAL",
+            "attestation-finalize-drift",
+          );
+          beginInput.provider_attestation = reserveProviderAttestation(
+            cluster,
+            database,
+            beginInput,
+            "BEGIN",
+            "attestation-finalize-drift-begin",
+          );
+          const draining = rpc(
+            cluster,
+            database,
+            "begin_production_vercel_writer_quiesce_evidence",
+            beginInput,
+          );
+          backdateQuiesceDrain(cluster, database, draining.evidence_id);
+          const finalizeInput = {
+            ...beginInput,
+            evidence_id: draining.evidence_id,
+            second_probe_records: quiesceProbeRecords(
+              new Date().toISOString(),
+              "PREVIEW",
+              beginInput.live_origin_inventory,
+            ),
+          };
+          assertCommandFailure(
+            () => reserveProviderAttestation(
+              cluster,
+              database,
+              finalizeInput,
+              "FINALIZE",
+              "attestation-finalize-drift-finalize",
+              {
+                providerOverrides: {
+                  routing_rule_fingerprint: fingerprint("drifted-rule"),
+                },
+              },
+            ),
+            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_FINALIZE_DRIFT/,
+          );
+        },
+      );
+
+      await t.test(
+        "a durable failed rehearsal blocks authority until exact safe restoration",
+        () => {
+          const database = cloneDormantDatabase("provider_rehearsal_receipt");
+          const dormant = state(cluster, database);
+          const quiesce = certifyQuiesce(
+            cluster,
+            database,
+            "REHEARSAL",
+            "provider-rehearsal-receipt-quiesce",
+          );
+          const beginInput = rehearsalBeginInput(
+            dormant,
+            quiesce.evidence_id,
+          );
+          const running = rpc(
+            cluster,
+            database,
+            "begin_production_google_writer_fence_rehearsal",
+            beginInput,
+          );
+          assert.equal(running.status, "RUNNING");
+          assert.match(
+            running.protection_description_prefix,
+            /^STEP11_6_WRITER_FENCE_REHEARSAL:[0-9a-f-]{36}$/,
+          );
+          const lostBeginRecovered = rpc(
+            cluster,
+            database,
+            "begin_production_google_writer_fence_rehearsal",
+            beginInput,
+          );
+          assert.equal(lostBeginRecovered.run_id, running.run_id);
+          assert.equal(lostBeginRecovered.idempotent, true);
+
+          const inspectInput = {
+            ...scope,
+            run_id: running.run_id,
+            rehearsal_request_id: beginInput.rehearsal_request_id,
+            candidate_deployment_id: beginInput.candidate_deployment_id,
+            candidate_deployment_commit:
+              beginInput.candidate_deployment_commit,
+          };
+          assert.equal(
+            rpc(
+              cluster,
+              database,
+              "inspect_production_google_writer_fence_rehearsal",
+              inspectInput,
+            ).status,
+            "RUNNING",
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "stage_production_cutover_release",
+              {
+                ...scope,
+                actor_id: actor,
+                contract_version: "production-cutover-activation-v1",
+                vercel_project: "bagger-inv",
+                canonical_domain: "https://baggerinv.com",
+                tournament_year: 2026,
+                vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+                deployment_commit: deploymentCommit,
+                source_fingerprint: sourceFingerprint,
+                expected_activation_revision:
+                  Number(dormant.activation_revision),
+                request_fingerprint: fingerprint("rehearsal-stage-blocked"),
+              },
+            ),
+            /PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_UNRESTORED/,
+          );
+          assertCommandFailure(
+            () => psql(
+              cluster,
+              database,
+              "update production_control.resource_scope set updated_at = now();",
+            ),
+            /PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_UNRESTORED/,
+          );
+
+          const failedInput = rehearsalFinishInput(
+            beginInput,
+            running,
+            "FAILED",
+            "writer-fence-rehearsal-failed",
+          );
+          const failed = rpc(
+            cluster,
+            database,
+            "finish_production_google_writer_fence_rehearsal",
+            failedInput,
+          );
+          assert.equal(failed.status, "FAILED");
+          assertCommandFailure(
+            () => psql(
+              cluster,
+              database,
+              "update production_control.resource_scope set updated_at = now();",
+            ),
+            /PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_UNRESTORED/,
+          );
+
+          const restoredInput = rehearsalFinishInput(
+            beginInput,
+            running,
+            "FAILED",
+            "writer-fence-rehearsal-restored",
+            true,
+          );
+          const restored = rpc(
+            cluster,
+            database,
+            "finish_production_google_writer_fence_rehearsal",
+            restoredInput,
+          );
+          assert.equal(restored.status, "FAILED");
+          assert.equal(restored.restoration_confirmed, true);
+          assert.equal(restored.certification_passed, false);
+          assert.equal(restored.active_run_owned_protection_count, 0);
+          const lostFinishRecovered = rpc(
+            cluster,
+            database,
+            "finish_production_google_writer_fence_rehearsal",
+            restoredInput,
+          );
+          assert.equal(lostFinishRecovered.idempotent, true);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "finish_production_google_writer_fence_rehearsal",
+              {
+                ...restoredInput,
+                request_fingerprint: fingerprint(
+                  "writer-fence-rehearsal-illegal-second-restore",
+                ),
+              },
+            ),
+            /PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_FAILED_RECOVERY_REQUIRED/,
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "begin_production_google_writer_fence_rehearsal",
+              {
+                ...beginInput,
+                rehearsal_request_id: randomUUID(),
+                request_fingerprint: fingerprint(
+                  "writer-fence-rehearsal-illegal-reapply",
+                ),
+              },
+            ),
+            /PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_CANDIDATE_ALREADY_USED/,
+          );
+          assert.equal(
+            psql(
+              cluster,
+              database,
+              `select count(*) from production_control.operation_audit_events
+               where event_type like 'PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_%';`,
+            ),
+            "3",
+          );
+          const ending = state(cluster, database);
+          assert.equal(ending.activation_state, "DORMANT");
+          assert.equal(ending.authority, "GOOGLE");
+          assert.equal(ending.execution_gate, "PAUSED");
+          assert.equal(ending.admission_state, "OPEN");
+        },
+      );
+
+      await t.test(
+        "compact quiesce proof vectors cannot be reused across the exact scope",
+        () => {
+          const database = cloneDormantDatabase("probe_proof_reuse");
+          const input = quiesceBeginInput(
+            "REHEARSAL",
+            "probe-proof-reuse",
+          );
+          input.first_probe_records[0][9][1] =
+            input.first_probe_records[0][9][0];
+          input.provider_attestation = reserveProviderAttestation(
+            cluster, database, input, "BEGIN", "probe-proof-reuse-begin",
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "begin_production_vercel_writer_quiesce_evidence",
+              input,
+            ),
+            /PRODUCTION_VERCEL_PROBE_RECORDS_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "the second probe is post-drain and cannot reuse first-probe proofs",
+        () => {
+          const staleDatabase = cloneDormantDatabase(
+            "second_probe_timestamp",
+          );
+          const staleBeginInput = quiesceBeginInput(
+            "REHEARSAL",
+            "second-probe-timestamp",
+          );
+          staleBeginInput.provider_attestation = reserveProviderAttestation(
+            cluster, staleDatabase, staleBeginInput, "BEGIN",
+            "second-probe-timestamp-begin",
+          );
+          const staleDraining = rpc(
+            cluster,
+            staleDatabase,
+            "begin_production_vercel_writer_quiesce_evidence",
+            staleBeginInput,
+          );
+          backdateQuiesceDrain(
+            cluster,
+            staleDatabase,
+            staleDraining.evidence_id,
+          );
+          const staleObservedAt = new Date(
+            Date.now() - 10 * 60 * 1000,
+          ).toISOString();
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              staleDatabase,
+              "finalize_production_vercel_writer_quiesce_evidence",
+              makeQuiesceFinalizeInput(
+                cluster,
+                staleDatabase,
+                staleBeginInput,
+                staleDraining,
+                "second-probe-timestamp",
+                quiesceProbeRecords(staleObservedAt),
+              ),
+            ),
+            /PRODUCTION_VERCEL_WRITER_QUIESCE_SECOND_PROBE_SCOPE_MISMATCH/,
+          );
+
+          const reuseDatabase = cloneDormantDatabase(
+            "second_probe_proof_reuse",
+          );
+          const reuseBeginInput = quiesceBeginInput(
+            "REHEARSAL",
+            "second-probe-proof-reuse",
+          );
+          reuseBeginInput.provider_attestation = reserveProviderAttestation(
+            cluster, reuseDatabase, reuseBeginInput, "BEGIN",
+            "second-probe-proof-reuse-begin",
+          );
+          const reuseDraining = rpc(
+            cluster,
+            reuseDatabase,
+            "begin_production_vercel_writer_quiesce_evidence",
+            reuseBeginInput,
+          );
+          backdateQuiesceDrain(
+            cluster,
+            reuseDatabase,
+            reuseDraining.evidence_id,
+          );
+          const reusedSecondRecords = reuseBeginInput.first_probe_records.map(
+            (record) => [...record.slice(0, 10), new Date().toISOString()],
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              reuseDatabase,
+              "finalize_production_vercel_writer_quiesce_evidence",
+              makeQuiesceFinalizeInput(
+                cluster,
+                reuseDatabase,
+                reuseBeginInput,
+                reuseDraining,
+                "second-probe-proof-reuse",
+                reusedSecondRecords,
+              ),
+            ),
+            /PRODUCTION_VERCEL_WRITER_QUIESCE_SECOND_PROBE_SCOPE_MISMATCH/,
+          );
+        },
+      );
+
+      await t.test(
+        "exact baseline restoration can safely terminate a failed certification",
+        () => {
+          const database = cloneDormantDatabase(
+            "provider_rehearsal_restored_failure",
+          );
+          const dormant = state(cluster, database);
+          const quiesce = certifyQuiesce(
+            cluster,
+            database,
+            "REHEARSAL",
+            "writer-fence-restored-failure-quiesce",
+          );
+          const beginInput = rehearsalBeginInput(
+            dormant,
+            quiesce.evidence_id,
+            "writer-fence-restored-failure-begin",
+          );
+          const running = rpc(
+            cluster,
+            database,
+            "begin_production_google_writer_fence_rehearsal",
+            beginInput,
+          );
+          const safelyFailedInput = {
+            ...rehearsalFinishInput(
+              beginInput,
+              running,
+              "RESTORED",
+              "writer-fence-restored-failure-finish",
+            ),
+            outcome: "FAILED",
+            legacy_identity_denied: false,
+            failure_code: "LEGACY_CANARY_UNEXPECTEDLY_ALLOWED",
+          };
+          const safelyFailed = rpc(
+            cluster,
+            database,
+            "finish_production_google_writer_fence_rehearsal",
+            safelyFailedInput,
+          );
+          assert.equal(safelyFailed.status, "FAILED");
+          assert.equal(safelyFailed.restoration_confirmed, true);
+          assert.equal(safelyFailed.certification_passed, false);
+
+          psql(
+            cluster,
+            database,
+            "update production_control.resource_scope set updated_at = '2030-01-02T03:04:05Z';",
+          );
+          assert.equal(
+            psql(
+              cluster,
+              database,
+              "select updated_at = '2030-01-02T03:04:05Z'::timestamptz from production_control.resource_scope;",
+            ),
+            "t",
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "stage_production_cutover_release",
+              {
+                ...scope,
+                actor_id: actor,
+                contract_version: "production-cutover-activation-v1",
+                vercel_project: "bagger-inv",
+                canonical_domain: "https://baggerinv.com",
+                tournament_year: 2026,
+                vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+                deployment_commit: deploymentCommit,
+                source_fingerprint: sourceFingerprint,
+                expected_activation_revision:
+                  Number(dormant.activation_revision),
+                request_fingerprint: fingerprint(
+                  "restored-failed-stage-rejected",
+                ),
+              },
+            ),
+            /PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_CERTIFICATION_REQUIRED/,
+          );
+          const ending = state(cluster, database);
+          assert.equal(ending.activation_state, "DORMANT");
+          assert.equal(ending.authority, "GOOGLE");
+          assert.equal(ending.execution_gate, "PAUSED");
+          assert.equal(ending.admission_state, "OPEN");
+        },
+      );
+
+      await t.test(
+        "an authority write waiting behind begin rechecks the row guard",
+        async () => {
+          const database = cloneDormantDatabase(
+            "provider_rehearsal_row_guard_race",
+          );
+          const dormant = state(cluster, database);
+          const quiesce = certifyQuiesce(
+            cluster,
+            database,
+            "REHEARSAL",
+            "writer-fence-row-guard-race-quiesce",
+          );
+          const beginInput = rehearsalBeginInput(
+            dormant,
+            quiesce.evidence_id,
+            "writer-fence-row-guard-race",
+          );
+          const beginSession = spawnPsql(cluster, database, `
+            begin;
+            select 1 from production_control.cutover_activation_state
+            where scope_key = 'BAGGER_INV_PRODUCTION' for update;
+            select 'ACTIVATION_ROW_LOCKED';
+            select pg_sleep(0.40);
+            ${rpcSql(
+              "begin_production_google_writer_fence_rehearsal",
+              beginInput,
+            )}
+            commit;
+          `);
+          await beginSession.waitFor("ACTIVATION_ROW_LOCKED");
+          const waitingUpdate = spawnPsql(
+            cluster,
+            database,
+            "update production_control.cutover_activation_state set updated_at = now() where scope_key = 'BAGGER_INV_PRODUCTION';",
+          );
+          const updateDone = waitingUpdate.done.then(
+            (result) => ({ ok: true, result }),
+            (error) => ({ ok: false, error }),
+          );
+          const running = parseJsonOutput((await beginSession.done).stdout);
+          assert.equal(running.status, "RUNNING");
+          const updateResult = await updateDone;
+          assert.equal(updateResult.ok, false);
+          assert.match(
+            updateResult.error.message,
+            /PRODUCTION_GOOGLE_WRITER_FENCE_REHEARSAL_UNRESTORED/,
+          );
+          const restored = rpc(
+            cluster,
+            database,
+            "finish_production_google_writer_fence_rehearsal",
+            rehearsalFinishInput(
+              beginInput,
+              running,
+              "RESTORED",
+              "writer-fence-row-guard-race-restored",
+            ),
+          );
+          assert.equal(restored.status, "RESTORED");
+        },
+      );
 
       await t.test("begin linearizes before a waiting close", async () => {
         const database = cloneDatabase("begin_before_close");
@@ -998,6 +2574,359 @@ test(
           );
           assert.equal(reopened.admission_state, "OPEN");
           assert.equal(reopened.execution_gate, "OPEN");
+        },
+      );
+
+      await t.test(
+        "a lost provider-install response is recovered exactly after authorization expiry",
+        () => {
+          const database = cloneDormantDatabase("provider_install_recovery");
+          certifySuccessfulRehearsal(
+            cluster,
+            database,
+            "provider-recovery-certified-rehearsal",
+          );
+          stageToArmedGoogleGate(cluster, database, "provider-recovery");
+          const quiesce = certifyQuiesce(
+            cluster,
+            database,
+            "CUTOVER",
+            "provider-recovery-quiesce",
+          );
+          const installRequestId = randomUUID();
+          const baseline = {
+            provider: fingerprint("provider-recovery-baseline-provider"),
+            acl: fingerprint("provider-recovery-baseline-acl"),
+            canonical: fingerprint("provider-recovery-baseline-canonical"),
+            formula: fingerprint("provider-recovery-baseline-formula"),
+            combined: fingerprint("provider-recovery-baseline-combined"),
+          };
+          const begin = rpc(
+            cluster,
+            database,
+            "begin_production_google_writer_provider_fence_install",
+            {
+              ...scope,
+              actor_id: actor,
+              install_request_id: installRequestId,
+              request_fingerprint:
+                fingerprint("provider-recovery-begin-request"),
+              quiesce_evidence_id: quiesce.evidence_id,
+              candidate_deployment_id: candidateIdentity.deploymentId,
+              candidate_deployment_commit: candidateIdentity.commit,
+              authenticated_actor_fingerprint:
+                fingerprint("authenticated-operator"),
+              dedicated_principal_fingerprint:
+                fingerprint("dedicated-google-principal"),
+              legacy_credential_generation_fingerprint:
+                fingerprint("legacy-google-credential-generation-v0"),
+              baseline_provider_fingerprint: baseline.provider,
+              baseline_acl_fingerprint: baseline.acl,
+              baseline_canonical_value_fingerprint: baseline.canonical,
+              baseline_formula_fingerprint: baseline.formula,
+              baseline_combined_value_fingerprint: baseline.combined,
+              writer_scope_fingerprint:
+                fingerprint("canonical-google-writer-scope-v2"),
+              canonical_sheet_union_fingerprint:
+                canonicalSheetUnionFingerprint(cluster, database),
+            },
+          );
+          assert.equal(begin.status, "INSTALLING");
+          const provider = {
+            provider: fingerprint("provider-recovery-installed-provider"),
+            acl: baseline.acl,
+            canonical: baseline.canonical,
+            formula: baseline.formula,
+            combined: baseline.combined,
+            structural: fingerprint("provider-recovery-structural"),
+            permissions: fingerprint("provider-recovery-permissions"),
+          };
+          const finishInput = {
+            ...scope,
+            actor_id: actor,
+            fence_id: begin.fence_id,
+            install_request_id: installRequestId,
+            quiesce_evidence_id: quiesce.evidence_id,
+            request_fingerprint:
+              fingerprint("provider-recovery-finish-request"),
+            candidate_deployment_id: candidateIdentity.deploymentId,
+            candidate_deployment_commit: candidateIdentity.commit,
+            protection_description_prefix: begin.protection_description_prefix,
+            protection_records: providerProtectionRecords(
+              begin.protection_description_prefix,
+            ),
+            provider_fingerprint: provider.provider,
+            acl_fingerprint: provider.acl,
+            canonical_value_fingerprint: provider.canonical,
+            formula_fingerprint: provider.formula,
+            combined_value_fingerprint: provider.combined,
+            structural_canary_fingerprint: provider.structural,
+            permission_inventory_fingerprint: provider.permissions,
+          };
+          psql(cluster, database, `
+            update production_control.vercel_writer_quiesce_evidence
+            set owner_acknowledged_at = now() - interval '25 minutes',
+                drain_started_at = now() - interval '25 minutes',
+                drain_completed_at = now() - interval '20 minutes',
+                verified_at = now() - interval '20 minutes',
+                expires_at = now() - interval '10 minutes',
+                owner_freeze_expires_at = now() - interval '1 minute'
+            where evidence_id = ${sqlLiteral(quiesce.evidence_id)}::uuid;
+          `);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "finish_production_google_writer_provider_fence_install",
+              { ...finishInput, quiesce_evidence_id: randomUUID() },
+            ),
+            /PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_OWNERSHIP_MISMATCH/,
+          );
+          const installed = rpc(
+            cluster,
+            database,
+            "finish_production_google_writer_provider_fence_install",
+            finishInput,
+          );
+          assert.equal(installed.status, "INSTALLED");
+          const recovered = inspectProviderFence(
+            cluster,
+            database,
+            installRequestId,
+            begin.fence_id,
+          );
+          assert.equal(recovered.verification.recovery_only, true);
+          assertCommandFailure(
+            () => recordFenceEvidence(
+              cluster,
+              database,
+              state(cluster, database),
+              "recovery-only-external-evidence",
+            ),
+            /PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_NOT_CURRENT/,
+          );
+          const refreshedQuiesce = certifyQuiesce(
+            cluster,
+            database,
+            "CUTOVER",
+            "provider-recovery-refresh-quiesce",
+            quiesce.evidence_id,
+          );
+          const refreshed = refreshProviderFence(
+            cluster,
+            database,
+            {
+              fenceId: begin.fence_id,
+              installRequestId,
+              verificationId: recovered.verification.verification_id,
+              quiesceEvidenceId: quiesce.evidence_id,
+              protectionDescriptionPrefix: begin.protection_description_prefix,
+              protectionRecords: finishInput.protection_records,
+              provider,
+            },
+            refreshedQuiesce,
+            "provider-recovery-refresh",
+          );
+          const refreshedInspection = inspectProviderFence(
+            cluster,
+            database,
+            installRequestId,
+            begin.fence_id,
+          );
+          assert.equal(refreshedInspection.verification.recovery_only, false);
+          const evidence = recordFenceEvidence(
+            cluster,
+            database,
+            state(cluster, database),
+            "provider-recovery-current-evidence",
+          );
+          assert.equal(evidence.code,
+            "PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE_RECORDED");
+          assert.equal(refreshed.verificationId,
+            refreshedInspection.verification.verification_id);
+        },
+      );
+
+      await t.test(
+        "rollback quiesce refresh gates removal and exact finish survives TTL expiry",
+        () => {
+          const database = cloneDatabase("rollback_provider_removal");
+          psql(cluster, database, `
+            update production_control.cutover_activation_state
+            set state = 'DORMANT', current_authority = 'GOOGLE',
+                scoring_ingress_enabled = false,
+                active_transition_epoch_id = null,
+                expected_deployment_commit = null,
+                expected_vercel_project_id = null,
+                expected_source_fingerprint = null,
+                read_cutover_phase = 'STATIC_BACKEND',
+                staged_by = null, staged_at = null
+            where scope_key = 'BAGGER_INV_PRODUCTION';
+            update production_control.resource_scope
+            set current_tournament_read_authority = 'GOOGLE',
+                scoring_authority = 'GOOGLE',
+                participant_identity_authority = 'PASSPORT',
+                public_supabase_reads_enabled = false,
+                auth_user_creation_enabled = false,
+                scoring_ingress_enabled = false,
+                workers_enabled = false
+            where scope_key = 'BAGGER_INV_PRODUCTION';
+            update scoring_authority.ingress_gates
+            set state = 'PAUSED', authority = 'GOOGLE',
+                admission_state = 'OPEN', admission_protocol_enforced = false,
+                admission_enforced_at = null,
+                admission_deployment_id = null,
+                active_epoch_id = null, active_closure_id = null,
+                external_fence_evidence_id = null,
+                unresolved_client_queues = 0
+            where tournament_id = '2026';
+          `);
+          const prior = currentProviderProof(cluster, database);
+          const quiesce = certifyQuiesce(
+            cluster,
+            database,
+            "CUTOVER",
+            "rollback-removal-quiesce",
+            prior.quiesceEvidenceId,
+          );
+          const refreshed = refreshProviderFence(
+            cluster,
+            database,
+            prior,
+            quiesce,
+            "rollback-removal-provider",
+          );
+          const current = state(cluster, database);
+          const removalRequestId = randomUUID();
+          const authorize = {
+            ...scope,
+            actor_id: actor,
+            authenticated_actor_fingerprint:
+              fingerprint("authenticated-operator"),
+            fence_id: refreshed.fenceId,
+            install_request_id: refreshed.installRequestId,
+            quiesce_evidence_id: refreshed.quiesceEvidenceId,
+            provider_fence_verification_id: refreshed.verificationId,
+            removal_request_id: removalRequestId,
+            request_fingerprint: fingerprint("rollback-removal-authorize"),
+            candidate_deployment_id: candidateIdentity.deploymentId,
+            candidate_deployment_commit: candidateIdentity.commit,
+            expected_activation_revision: Number(current.activation_revision),
+            expected_authority_generation: current.authority_generation_id,
+            expected_admission_generation: current.admission_generation_id,
+            expected_admission_revision: Number(current.admission_revision),
+            pre_remove_provider_fingerprint: refreshed.provider.provider,
+            expected_post_remove_provider_fingerprint:
+              fingerprint("rollback-removal-provider-without-fence"),
+            pre_remove_acl_fingerprint: refreshed.provider.acl,
+            pre_remove_canonical_value_fingerprint:
+              refreshed.provider.canonical,
+            pre_remove_combined_value_fingerprint:
+              refreshed.provider.combined,
+            pre_remove_formula_fingerprint: refreshed.provider.formula,
+          };
+          psql(cluster, database, `
+            update production_control.vercel_writer_quiesce_evidence
+            set expires_at = now() + interval '4 minutes'
+            where evidence_id = ${sqlLiteral(refreshed.quiesceEvidenceId)}::uuid;
+          `);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "authorize_production_google_writer_provider_fence_removal",
+              authorize,
+            ),
+            /PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_REMOVAL_NOT_SAFE/,
+          );
+          psql(cluster, database, `
+            update production_control.vercel_writer_quiesce_evidence
+            set expires_at = least(
+              now() + interval '9 minutes', owner_freeze_expires_at
+            )
+            where evidence_id = ${sqlLiteral(refreshed.quiesceEvidenceId)}::uuid;
+          `);
+          const authorized = rpc(
+            cluster,
+            database,
+            "authorize_production_google_writer_provider_fence_removal",
+            authorize,
+          );
+          assert.equal(authorized.status, "REMOVAL_AUTHORIZED");
+          const finish = {
+            ...scope,
+            actor_id: actor,
+            fence_id: refreshed.fenceId,
+            install_request_id: refreshed.installRequestId,
+            quiesce_evidence_id: refreshed.quiesceEvidenceId,
+            removal_request_id: removalRequestId,
+            request_fingerprint: fingerprint("rollback-removal-finish"),
+            candidate_deployment_id: candidateIdentity.deploymentId,
+            candidate_deployment_commit: candidateIdentity.commit,
+            removed_protected_range_ids: refreshed.protectionRecords.map(
+              (record) => record.protectedRangeId,
+            ).sort((left, right) => left - right),
+            active_run_owned_protection_count: 0,
+            restored_provider_fingerprint:
+              authorize.expected_post_remove_provider_fingerprint,
+            restored_acl_fingerprint: authorize.pre_remove_acl_fingerprint,
+            restored_canonical_value_fingerprint:
+              authorize.pre_remove_canonical_value_fingerprint,
+            restored_combined_value_fingerprint:
+              authorize.pre_remove_combined_value_fingerprint,
+            restored_formula_fingerprint:
+              authorize.pre_remove_formula_fingerprint,
+            restoration_evidence_fingerprint:
+              fingerprint("rollback-removal-restoration-evidence"),
+          };
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "finish_production_google_writer_provider_fence_removal",
+              { ...finish, quiesce_evidence_id: randomUUID() },
+            ),
+            /PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_REMOVAL_PROOF_MISMATCH/,
+          );
+          psql(cluster, database, `
+            update production_control.cutover_activation_state
+            set state = 'GOOGLE_LEASE_ARMED'
+            where scope_key = 'BAGGER_INV_PRODUCTION';
+          `);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "finish_production_google_writer_provider_fence_removal",
+              finish,
+            ),
+            /PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_REMOVAL_NOT_SAFE/,
+          );
+          psql(cluster, database, `
+            update production_control.cutover_activation_state
+            set state = 'DORMANT'
+            where scope_key = 'BAGGER_INV_PRODUCTION';
+            update production_control.vercel_writer_quiesce_evidence
+            set owner_acknowledged_at = now() - interval '40 minutes',
+                drain_started_at = now() - interval '35 minutes',
+                drain_completed_at = now() - interval '30 minutes',
+                verified_at = now() - interval '30 minutes',
+                expires_at = now() - interval '16 minutes',
+                owner_freeze_expires_at = now() - interval '15 minutes'
+            where evidence_id = ${sqlLiteral(refreshed.quiesceEvidenceId)}::uuid;
+            update production_control.google_writer_provider_fence_verifications
+            set captured_at = now() - interval '40 minutes',
+                expires_at = now() - interval '10 minutes'
+            where verification_id = ${sqlLiteral(refreshed.verificationId)}::uuid;
+          `);
+          const removed = rpc(
+            cluster,
+            database,
+            "finish_production_google_writer_provider_fence_removal",
+            finish,
+          );
+          assert.equal(removed.status, "REMOVED");
+          assert.equal(state(cluster, database).provider_fence_id, null);
         },
       );
 

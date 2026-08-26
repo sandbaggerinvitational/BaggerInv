@@ -68,6 +68,18 @@ const productionEntrypoints = new Map([
   ["lib/championship-odds-google-mirror.js", "withProductionGoogleServiceAccountCredentials"],
 ]);
 
+test("environment example keeps rehearsal and persistent-fence gates explicit and disabled", async () => {
+  const envExample = await read(".env.example");
+  assert.match(envExample,
+    /^PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_REHEARSAL_ENABLED=false$/m);
+  assert.match(envExample,
+    /^PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_EXPECTED_COMMIT_SHA=$/m);
+  assert.match(envExample,
+    /^PRODUCTION_STEP12_GOOGLE_WRITER_PROVIDER_FENCE_ENABLED=false$/m);
+  assert.match(envExample,
+    /^PRODUCTION_STEP12_GOOGLE_WRITER_PROVIDER_FENCE_EXPECTED_COMMIT_SHA=$/m);
+});
+
 const previewOnly = new Set([
   "app/api/director/reset-preview/route.js",
   "app/api/director/scoring-authority/route.js",
@@ -145,12 +157,17 @@ test("the sole low-level Sheets transport enforces intent before credentials or 
   assert.deepEqual(directTransportFiles, [
     "lib/google-sheets-server-read.js",
     "lib/google-sheets-write.js",
+    "lib/production-google-writer-fence-rehearsal.js",
   ]);
   const readTransport = await read("lib/google-sheets-server-read.js");
   assert.match(readTransport, /spreadsheets\.readonly/);
   const sheetsReadRequest = readTransport.slice(readTransport.indexOf("sheets.googleapis.com"));
   assert.doesNotMatch(sheetsReadRequest, /method\s*:\s*["'](?:POST|PUT|PATCH|DELETE)["']/);
   assert.doesNotMatch(readTransport, /prepareGoogleWorkbookMutation|confirmGoogleWorkbookMutation/);
+  const fenceRehearsal = await read("lib/production-google-writer-fence-rehearsal.js");
+  assert.match(fenceRehearsal, /PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_REHEARSAL_ENABLED/);
+  assert.match(fenceRehearsal, /requestingUserCanEdit/);
+  assert.doesNotMatch(fenceRehearsal, /updateCells|values:batchUpdate|deleteSheet|updateSheetProperties/);
   const guardIndex = writer.indexOf("await prepareGoogleWorkbookMutation");
   const credentialIndex = writer.indexOf("token = await accessToken", guardIndex);
   const fetchIndex = writer.indexOf("await fetch(`${target.apiBase}", guardIndex);
