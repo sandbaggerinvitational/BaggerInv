@@ -196,4 +196,6 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
     assert.match(source, /disabled=\{Boolean\(busy\)[\s\S]{0,120}!beginExecutable/);
     assert.match(source, /disabled=\{Boolean\(busy\)[\s\S]{0,160}!finalizeExecutable/);
   }
+  assert.match(rehearsal, /Safe diagnostics/);
+  assert.match(rehearsal, /JSON\.stringify\(error\.diagnostics, null, 2\)/);
 });

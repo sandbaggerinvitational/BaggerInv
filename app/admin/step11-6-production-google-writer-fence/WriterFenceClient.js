@@ -84,6 +84,7 @@ export default function WriterFenceClient({ environment }) {
     setError({
       code: error?.code || fallbackCode,
       error: error?.message || "The local provider-attestation contract failed closed.",
+      diagnostics: error?.diagnostics || null,
     });
   }
 
@@ -455,6 +456,11 @@ export default function WriterFenceClient({ environment }) {
         <p>{error.error || "The operation failed closed."}</p>
         {error.diagnostics?.restoreRequired === true
           ? <p>Recovery state: exact fence restoration is still required.</p> : null}
+        {error.diagnostics && Object.keys(error.diagnostics).length > 0
+          ? <details>
+            <summary>Safe diagnostics</summary>
+            <pre>{JSON.stringify(error.diagnostics, null, 2)}</pre>
+          </details> : null}
       </section> : null}
       {result ? <section className={styles.result} aria-live="polite">
         <h2>Sanitized authoritative result</h2>

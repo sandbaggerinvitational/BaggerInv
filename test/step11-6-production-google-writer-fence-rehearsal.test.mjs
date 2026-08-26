@@ -33,6 +33,17 @@ const persistentFenceId = "44444444-4444-4444-8444-444444444444";
 const persistentInstallId = "55555555-5555-4555-8555-555555555555";
 const persistentVerificationId = "66666666-6666-4666-8666-666666666666";
 const persistentQuiesceId = "77777777-7777-4777-8777-777777777777";
+const EXPECTED_METADATA_FIELDS = [
+  "spreadsheetId",
+  "properties(title,locale,timeZone)",
+  "namedRanges(namedRangeId,name,range)",
+  "sheets(properties(sheetId,title,index,hidden,rightToLeft,gridProperties)," +
+    "protectedRanges(protectedRangeId,description,warningOnly,range," +
+    "editors(users,groups,domainUsersCanEdit),requestingUserCanEdit)," +
+    "filterViews(filterViewId,title,range),basicFilter(range),merges)",
+].join(",");
+const EXPECTED_CANONICAL_VALUE_RANGES = PRODUCTION_CANONICAL_LEGACY_SHEET_NAMES
+  .map((title) => `'${title.replaceAll("'", "''")}'`);
 
 function privateKey() {
   return generateKeyPairSync("rsa", { modulusLength: 2048 }).privateKey.export({
@@ -107,6 +118,8 @@ function provider({
   driftValuesAfterCanary = false,
   broadDriveEditor = false,
   drivePermissionStatus = 200,
+  redactLegacyEditors = true,
+  legacyProtectionVariant = "",
 } = {}) {
   let installed = false;
   let addResponseLost = false;
@@ -143,6 +156,32 @@ function provider({
         requestingUserCanEdit,
       }] : [],
     }));
+    if (installed && identity === legacyEmail) {
+      for (const sheet of canonical) {
+        if (redactLegacyEditors) delete sheet.protectedRanges[0].editors;
+      }
+      const target = canonical[0].protectedRanges[0];
+      if (legacyProtectionVariant === "WRONG_ID") {
+        target.protectedRangeId += 1_000_000;
+      } else if (legacyProtectionVariant === "MISSING_ID") {
+        delete target.protectedRangeId;
+      } else if (legacyProtectionVariant === "WRONG_STRUCTURE") {
+        target.range = { ...target.range, startRowIndex: 0 };
+      } else if (legacyProtectionVariant === "EXTRA_TAGGED") {
+        canonical[0].protectedRanges.push({
+          ...target,
+          protectedRangeId: target.protectedRangeId + 1_000_000,
+        });
+      } else if (legacyProtectionVariant === "CAN_EDIT_TRUE") {
+        target.requestingUserCanEdit = true;
+      } else if (legacyProtectionVariant === "WRONG_EDITORS") {
+        target.editors = {
+          users: [legacyEmail],
+          groups: [],
+          domainUsersCanEdit: false,
+        };
+      }
+    }
     return {
       spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
       properties: { title: "Production", locale: "en_US", timeZone: "America/Chicago" },
@@ -208,6 +247,17 @@ function provider({
       });
     }
     if (String(url).includes("/values:batchGet")) {
+      const parsed = new URL(String(url));
+      assert.equal(request.method, "GET");
+      assert.equal(parsed.pathname,
+        `/v4/spreadsheets/${PRODUCTION_GOOGLE_WORKBOOK_ID}/values:batchGet`);
+      assert.deepEqual(parsed.searchParams.getAll("ranges"),
+        EXPECTED_CANONICAL_VALUE_RANGES);
+      assert.equal(parsed.searchParams.get("majorDimension"), "ROWS");
+      assert.ok(["FORMULA", "UNFORMATTED_VALUE"].includes(
+        parsed.searchParams.get("valueRenderOption"),
+      ));
+      assert.equal(parsed.searchParams.get("dateTimeRenderOption"), "SERIAL_NUMBER");
       return Response.json({
         valueRanges: PRODUCTION_CANONICAL_LEGACY_SHEET_NAMES.map((title, index) => ({
           range: `'${title}'!A1:ZZ1000`,
@@ -264,6 +314,16 @@ function provider({
       nextProtectionId += body.requests.length;
       return Response.json({ replies: [] });
     }
+    const parsed = new URL(String(url));
+    assert.equal(request.method, "GET");
+    assert.equal(parsed.pathname,
+      `/v4/spreadsheets/${PRODUCTION_GOOGLE_WORKBOOK_ID}`);
+    assert.deepEqual([...new Set(parsed.searchParams.keys())].sort(),
+      ["fields", "includeGridData"]);
+    assert.equal(parsed.searchParams.get("includeGridData"), "false");
+    assert.equal(parsed.searchParams.get("fields"), EXPECTED_METADATA_FIELDS);
+    assert.doesNotMatch(parsed.searchParams.get("fields"),
+      /spreadsheetIdproperties|\)namedRanges|\)sheets/);
     return Response.json(metadata(identity));
   }
 
@@ -369,7 +429,37 @@ test("environment requires exact candidate SHA/branch/workbook and separated pub
   })).allowed, false);
 });
 
-test("rehearsal applies 17 exact whole-sheet protections, proves identity editability, and restores", async () => {
+test("read-only Inspect uses exact metadata fields and ordered whole-sheet value reads", async () => {
+  const google = provider();
+  const result = await executeProductionGoogleWriterFenceRehearsal(input("inspect"), {
+    env: environment(),
+    fetchImpl: google.fetchImpl,
+  });
+  assert.equal(result.ok, true);
+  const providerCalls = google.calls.filter((call) =>
+    call.url !== "https://oauth2.googleapis.com/token");
+  assert.deepEqual(providerCalls.map((call) => {
+    const parsed = new URL(call.url);
+    if (parsed.hostname === "sheets.googleapis.com" &&
+        parsed.pathname.endsWith("/values:batchGet")) {
+      return `VALUES:${parsed.searchParams.get("valueRenderOption")}`;
+    }
+    if (parsed.hostname === "sheets.googleapis.com") return "METADATA";
+    if (parsed.hostname === "www.googleapis.com") return "DRIVE_PERMISSIONS";
+    return "UNEXPECTED";
+  }), [
+    "METADATA",
+    "VALUES:FORMULA",
+    "VALUES:UNFORMATTED_VALUE",
+    "DRIVE_PERMISSIONS",
+  ]);
+  assert.ok(providerCalls.every((call) => call.request.method === "GET"));
+  assert.equal(providerCalls.some((call) => call.url.endsWith(":batchUpdate")), false);
+  assert.equal(result.providerMutations, 0);
+  assert.equal(result.applicationDataWriteIssued, false);
+});
+
+test("rehearsal accepts provider-redacted legacy editors while preserving exact fence proof", async () => {
   const google = provider();
   const receipts = receipt();
   const inspected = await executeProductionGoogleWriterFenceRehearsal(input("inspect"), {
@@ -428,6 +518,36 @@ test("rehearsal applies 17 exact whole-sheet protections, proves identity editab
   ]) assert.match(receipts.finished[0][key], /^[0-9a-f]{64}$/);
   const sheetsWrites = google.calls.filter((call) => call.url.endsWith(":batchUpdate"));
   assert.equal(sheetsWrites.length, 3);
+});
+
+test("legacy redacted view rejects protection identity, structure, tag, editor, and editability drift", async (t) => {
+  for (const variant of [
+    "WRONG_ID",
+    "MISSING_ID",
+    "WRONG_STRUCTURE",
+    "EXTRA_TAGGED",
+    "WRONG_EDITORS",
+    "CAN_EDIT_TRUE",
+  ]) {
+    await t.test(variant, async () => {
+      const google = provider({ legacyProtectionVariant: variant });
+      const inspected = await executeProductionGoogleWriterFenceRehearsal(input("inspect"), {
+        env: environment(),
+        fetchImpl: google.fetchImpl,
+      });
+      await assert.rejects(() => executeProductionGoogleWriterFenceRehearsal(
+        input(
+          "rehearse",
+          inspected.inspection.baselineMetadataFingerprint,
+          inspected.inspection.canonicalValueFingerprint,
+        ),
+        { env: environment(), fetchImpl: google.fetchImpl, receipt: receipt() },
+      ), (error) =>
+        error.code === "STEP11_6_GOOGLE_WRITER_FENCE_IDENTITY_VIEW_MISMATCH");
+      assert.equal(google.installed(), false,
+        "the dedicated identity must restore the exact baseline after rejection");
+    });
+  }
 });
 
 test("recovery restore is idempotent when the exact baseline is already present", async () => {
