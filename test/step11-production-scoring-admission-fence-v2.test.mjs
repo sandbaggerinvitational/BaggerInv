@@ -163,7 +163,11 @@ test("authority transitions never make legacy Google admission OPEN under Supaba
   assert.match(reopen, /activation\.current_authority is distinct from 'GOOGLE'/);
   assert.match(reopen, /activation\.state not in \('GOOGLE_LEASE_ARMED', 'ROLLED_BACK'\)/);
   assert.match(runtime, /gate\.admission_state is distinct from 'CLOSED'/);
-  assert.match(runtime, /legacy_closure\.closure_kind is distinct from 'LEGACY_ADMISSION'/);
+  assert.match(runtime, /normal_supabase_runtime :=[\s\S]*gate\.state = 'OPEN'[\s\S]*active_closure\.closure_kind = 'LEGACY_ADMISSION'/);
+  assert.match(runtime, /rollback_worker_drain :=[\s\S]*required_worker_name in \([\s\S]*'SCORING_GOOGLE_OUTBOX', 'ROUND_SCORECARDS_ARCHIVE'[\s\S]*gate\.state = 'PAUSED'[\s\S]*active_closure\.closure_kind = 'SUPABASE_INGRESS'[\s\S]*active_closure\.status = 'CLOSING'/);
+  assert.match(runtime, /legacy_closure\.status = 'CONSUMED'[\s\S]*legacy_closure\.consumed_epoch_id = activation\.authority_generation_id/);
+  assert.match(runtime, /not \(normal_supabase_runtime or rollback_worker_drain\)/);
+  assert.match(runtime, /required_worker_name not in \([\s\S]*'SCORING_GOOGLE_OUTBOX', 'ROUND_SCORECARDS_ARCHIVE'/);
 });
 
 test("closure and epoch boundaries require exact fresh evidence and stable reconciliation", () => {

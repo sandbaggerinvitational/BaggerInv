@@ -58,6 +58,22 @@ changes the gate from `OPEN` to `PAUSED`. Drain and closure finalization happen
 while that gate remains `PAUSED`; only then may the rollback epoch be prepared
 and committed. The tool refuses to collapse these two state dimensions.
 
+If the short-lived external provider-fence evidence will expire while admission
+is `CLOSING` or `CLOSED`, generate `refresh-provider-fence`. It maps only to
+`refresh_production_scoring_external_fence_evidence` and requires the prior
+evidence ID, active closure, paused gate, optimistic revisions, and a byte-exact
+match between `providerFenceProof.boundImmutableScope` and the newly captured
+provider/deployment/credential/writer coverage. Only the legacy lease-set
+fingerprint/count and capture time may advance. Save the returned evidence ID
+and refreshed activation/admission revisions before generating another payload.
+
+The manifest and every rendered envelope expose `activeClosureKind`,
+`activeClosureStatus`, `unresolvedOutbox`, and `unresolvedArchive` in the
+diagnostic state guard. Closure finalization and authority prepare/commit refuse
+non-zero durable queue counts. An admitted canonical transaction may complete
+while close waits; any durable outbox/archive work it creates remains explicit
+work to drain and is never treated as completed merely because close returned.
+
 `validate` reports structural and exact-scope errors. `readiness` derives a
 truthful readiness decision; it never trusts a manifest's claimed `ready`
 value. `payload` checks the exact phase, authority, admission state,
@@ -69,6 +85,12 @@ Every mutating operation uses a stable, pre-recorded request UUID from
 payload. Save the generated envelope and retry it byte-for-byte after a lost
 response. Do not regenerate it from a newer state and assume it is the same
 operation.
+
+`operationInputs` may add only operation-allowlisted fields. It cannot replace
+computed project/workbook/deployment, revision/generation, closure/epoch,
+authority, evidence, or fingerprint bindings. Repeating one of those fields is
+accepted only when its canonical JSON value is exactly equal to the computed
+value; any differing value fails closed.
 
 ## Inertness and authorization
 

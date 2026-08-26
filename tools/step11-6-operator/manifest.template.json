@@ -64,6 +64,12 @@
     "writerCoverageFingerprint": "__SHA256__",
     "legacyLeaseSetFingerprint": "__SHA256__",
     "legacyLeaseCount": 0,
+    "boundImmutableScope": {
+      "providerEvidenceFingerprint": "__SHA256__",
+      "deploymentScopeFingerprint": "__SHA256__",
+      "googleCredentialScopeFingerprint": "__SHA256__",
+      "writerCoverageFingerprint": "__SHA256__"
+    },
     "originMatrix": []
   },
   "state": {
@@ -131,6 +137,7 @@
     "identity": "__UUID__",
     "arm-legacy-admission": "__UUID__",
     "record-provider-fence": "__UUID__",
+    "refresh-provider-fence": "__UUID__",
     "close-legacy-admission": "__UUID__",
     "drain-legacy-admission": "__UUID__",
     "finalize-legacy-closed": "__UUID__",
@@ -154,6 +161,7 @@
     "identity": {},
     "arm-legacy-admission": {},
     "record-provider-fence": {},
+    "refresh-provider-fence": {},
     "close-legacy-admission": {},
     "drain-legacy-admission": {},
     "finalize-legacy-closed": {},

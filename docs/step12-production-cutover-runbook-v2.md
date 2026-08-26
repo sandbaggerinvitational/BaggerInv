@@ -49,6 +49,16 @@ itself is not provider enforcement. Old deployments must be cryptographically
 unable to write, or forced through a sole credential-owning barrier-aware
 service. The provider proof contains hashes and non-secret identifiers only.
 
+Provider-fence evidence is deliberately short lived. If it approaches expiry
+while the gate is `PAUSED` and the active closure is `CLOSING` or `CLOSED`, call
+`refresh_production_scoring_external_fence_evidence` with a durable request ID,
+the prior evidence ID, active closure, exact optimistic revisions/generations,
+and fresh provider readback. The provider, deployment, credential, and writer
+coverage fingerprints must remain byte-for-byte identical to the evidence
+already bound to the closure. Only the reconciled legacy lease-set evidence and
+capture time may advance. Record the returned evidence ID and new revisions;
+never substitute a looser or operator-asserted scope.
+
 ## Forward phase sequence
 
 For every phase, recapture state, verify the prior receipt, record the new
@@ -77,6 +87,11 @@ advancing.
      exact resource tuple, deployment ID/SHA, and durable request identity.
    - One transaction changes admission `OPEN -> CLOSING`, pauses execution,
      records a lease high-watermark, and prevents new v2 admissions.
+   - The close boundary serializes with an admitted canonical transaction. If
+     admission won first, close waits for that canonical database transaction;
+     durable outbox/archive work created by the transaction remains visible and
+     still has to drain. A returned close receipt does not imply that durable
+     queue work is delivered or verified.
    - Lost responses are resolved by `inspect_production_scoring_admission`; do
      not infer failure and do not issue a reopen.
 
@@ -89,6 +104,8 @@ advancing.
      unresolved until Google readback/idempotency proves the outcome.
    - Require active/potential writers `0`, ambiguous writers `0`, partial
      writers `0`, and unresolved legacy writers `0`.
+   - Require unresolved Google outbox events `0` and unresolved scorecard
+     archive jobs `0` before closure finalization or authority prepare/commit.
 
 6. Seal the closed Google boundary
    - Capture fresh Google readback after admission is already `CLOSING` and the
@@ -99,7 +116,8 @@ advancing.
      fingerprint, exact match revision/checkpoint maps, queue state, provider
      evidence, and closure high-watermark.
    - Require admission `CLOSED`, zero possible writers, stable repeated
-     readback, and `FINAL_GOOGLE_AUTHORITY_SNAPSHOT_SAFE=true`.
+     readback, zero unresolved outbox/archive work, and
+     `FINAL_GOOGLE_AUTHORITY_SNAPSHOT_SAFE=true`.
 
 7. Prepare Supabase authority
    - Call `prepare_production_authority_epoch(CUTOVER)` only when

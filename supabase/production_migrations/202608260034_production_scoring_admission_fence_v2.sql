@@ -3461,10 +3461,13 @@ declare
   activation production_control.cutover_activation_state%rowtype;
   resource production_control.resource_scope%rowtype;
   gate scoring_authority.ingress_gates%rowtype;
+  active_closure production_control.scoring_admission_closures%rowtype;
   legacy_closure production_control.scoring_admission_closures%rowtype;
   required_worker_name text := pg_catalog.upper(
     coalesce(required_worker, '')
   );
+  normal_supabase_runtime boolean := false;
+  rollback_worker_drain boolean := false;
 begin
   -- The transaction-scoped shared lock remains held through the caller RPC.
   -- Close/prepare/commit/reopen use the exclusive counterpart, so no Supabase
@@ -3482,9 +3485,55 @@ begin
   select * into strict gate
   from scoring_authority.ingress_gates value
   where value.tournament_id = '2026';
-  select * into strict legacy_closure
+  select * into strict active_closure
   from production_control.scoring_admission_closures value
   where value.closure_id = gate.active_closure_id;
+
+  if active_closure.closure_kind = 'SUPABASE_INGRESS' then
+    select * into strict legacy_closure
+    from production_control.scoring_admission_closures value
+    where value.closure_id = active_closure.prior_legacy_closure_id;
+  else
+    legacy_closure := active_closure;
+  end if;
+
+  normal_supabase_runtime :=
+    gate.state = 'OPEN'
+    and active_closure.closure_kind = 'LEGACY_ADMISSION'
+    and active_closure.authority = 'GOOGLE'
+    and active_closure.status = 'CONSUMED'
+    and active_closure.consumed_epoch_id = activation.authority_generation_id
+    and active_closure.admission_generation_id = gate.admission_generation_id
+    and active_closure.deployment_id = gate.admission_deployment_id
+    and active_closure.external_fence_evidence_id = gate.external_fence_evidence_id;
+
+  -- A Supabase mutation that held the shared authority lock may have committed
+  -- immediately before rollback acquired the exclusive lock and paused new
+  -- ingress. Its durable Google mirror/archive work must remain drainable or
+  -- rollback finalization would deadlock on its own unresolved-queue checks.
+  -- This exception is intentionally worker-only: every participant/Director
+  -- canonical mutation calls this function without required_worker and stays
+  -- rejected while the execution gate is PAUSED.
+  rollback_worker_drain :=
+    required_worker_name in (
+      'SCORING_GOOGLE_OUTBOX', 'ROUND_SCORECARDS_ARCHIVE'
+    )
+    and gate.state = 'PAUSED'
+    and active_closure.closure_kind = 'SUPABASE_INGRESS'
+    and active_closure.authority = 'SUPABASE'
+    and active_closure.status = 'CLOSING'
+    and active_closure.authority_generation_id =
+      activation.authority_generation_id
+    and active_closure.admission_generation_id = gate.admission_generation_id
+    and active_closure.deployment_id = gate.admission_deployment_id
+    and active_closure.external_fence_evidence_id =
+      gate.external_fence_evidence_id
+    and active_closure.prior_legacy_closure_id = legacy_closure.closure_id
+    and legacy_closure.closure_kind = 'LEGACY_ADMISSION'
+    and legacy_closure.authority = 'GOOGLE'
+    and legacy_closure.status = 'CONSUMED'
+    and legacy_closure.consumed_epoch_id = activation.authority_generation_id
+    and activation.active_transition_epoch_id is null;
 
   if activation.state is distinct from 'SCORING_COMMITTED'
      or activation.current_authority is distinct from 'SUPABASE'
@@ -3493,17 +3542,14 @@ begin
        nullif(input->>'expected_epoch_id', '')::uuid
      or resource.scoring_authority is distinct from 'SUPABASE'
      or not resource.scoring_ingress_enabled
-     or gate.state is distinct from 'OPEN'
      or gate.admission_state is distinct from 'CLOSED'
      or not gate.admission_protocol_enforced
      or gate.active_closure_id is null
      or gate.external_fence_evidence_id is null
-     or legacy_closure.closure_kind is distinct from 'LEGACY_ADMISSION'
-     or legacy_closure.authority is distinct from 'GOOGLE'
-     or legacy_closure.status not in ('CLOSED', 'CONSUMED')
      or gate.authority is distinct from 'SUPABASE'
      or gate.active_epoch_id
        is distinct from activation.authority_generation_id
+     or not (normal_supabase_runtime or rollback_worker_drain)
      or not exists (
        select 1 from scoring_authority.tournaments value
        where value.tournament_id = '2026'

@@ -1581,6 +1581,96 @@ test(
           assert.equal(committed.admission_state, "CLOSED");
           assert.equal(committed.scoring_ingress_enabled, true);
 
+          const committedState = state(cluster, database);
+          const enabledOutboxWorker = rpc(
+            cluster,
+            database,
+            "set_production_cutover_worker_state",
+            {
+              ...scope,
+              actor_id: actor,
+              deployment_commit: deploymentCommit,
+              worker_name: "SCORING_GOOGLE_OUTBOX",
+              enabled: true,
+              expected_activation_revision: Number(
+                committedState.activation_revision,
+              ),
+              expected_epoch_id: committedState.authority_generation_id,
+              google_service_account_email:
+                "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+              request_fingerprint: fingerprint(
+                "enable-outbox-worker-before-rollback-drain",
+              ),
+            },
+          );
+          assert.equal(enabledOutboxWorker.enabled, true);
+          const afterOutboxEnable = state(cluster, database);
+          const enabledArchiveWorker = rpc(
+            cluster,
+            database,
+            "set_production_cutover_worker_state",
+            {
+              ...scope,
+              actor_id: actor,
+              deployment_commit: deploymentCommit,
+              worker_name: "ROUND_SCORECARDS_ARCHIVE",
+              enabled: true,
+              expected_activation_revision: Number(
+                afterOutboxEnable.activation_revision,
+              ),
+              expected_epoch_id: afterOutboxEnable.authority_generation_id,
+              google_service_account_email:
+                "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+              request_fingerprint: fingerprint(
+                "enable-archive-worker-before-rollback-drain",
+              ),
+            },
+          );
+          assert.equal(enabledArchiveWorker.enabled, true);
+
+          // Model a canonical Supabase transaction that committed immediately
+          // before rollback paused ingress. Its durable mirror and archive
+          // events must be drainable while new canonical RPCs remain rejected.
+          psql(cluster, database, `
+            update scoring_authority.matches
+            set match_revision = 1, updated_at = now()
+            where match_id = '2026-R1-1';
+            insert into scoring_authority.google_outbox_events (
+              tournament_id, match_id, match_revision, hole_number,
+              hole_revision, mutation_key, event_type, payload, payload_hash
+            ) values (
+              '2026', '2026-R1-1', 1, 1, 1,
+              'rollback-drain-event', 'HOLE_SCORE_UPSERTED',
+              '{"test":"rollback-worker-drain"}'::jsonb,
+              ${sqlLiteral(fingerprint("rollback-worker-drain-payload"))}
+            );
+            insert into scoring_authority.finalized_scorecard_snapshots (
+              snapshot_id, tournament_id, match_id, snapshot_revision,
+              match_revision, scoring_snapshot_id,
+              scoring_snapshot_revision, source_fingerprint, payload_hash,
+              payload, state, finalized_at, invalidated_at
+            ) values (
+              '00000000-0000-4000-8000-000000000116',
+              '2026', '2026-R1-1', 1, 0,
+              'snapshot-2026-r1-m1', 1,
+              ${sqlLiteral(fingerprint("rollback-archive-source"))},
+              ${sqlLiteral(fingerprint("rollback-archive-payload"))},
+              '{"test":"rollback-archive-drain"}'::jsonb,
+              'INVALIDATED', now(), now()
+            );
+            insert into scoring_authority.scorecard_archive_jobs (
+              tournament_id, match_id, snapshot_id, snapshot_revision,
+              match_revision, event_type, source_fingerprint,
+              archive_payload_hash
+            ) values (
+              '2026', '2026-R1-1',
+              '00000000-0000-4000-8000-000000000116', 1, 0,
+              'SCORECARD_ARCHIVE_INVALIDATE',
+              ${sqlLiteral(fingerprint("rollback-archive-source"))},
+              ${sqlLiteral(fingerprint("rollback-archive-payload"))}
+            );
+          `);
+
           const supabaseState = state(cluster, database);
           assertCommandFailure(
             () => rpc(
@@ -1638,6 +1728,126 @@ test(
           );
           assert.equal(rollbackClose.admission_state, "CLOSED");
           assert.equal(rollbackClose.execution_gate, "PAUSED");
+
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_production_scoring_runtime(
+                ${jsonSql(runtimeInput)}
+              );
+            `),
+            /PRODUCTION_SUPABASE_SCORING_ADMISSION_V2_REQUIRED/,
+          );
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_production_scoring_runtime(
+                ${jsonSql(runtimeInput)}, 'UNRECOGNIZED_WORKER'
+              );
+            `),
+            /PRODUCTION_SUPABASE_SCORING_ADMISSION_V2_REQUIRED/,
+          );
+
+          const blockedDrainState = state(cluster, database);
+          const blockedDrain = rpc(
+            cluster,
+            database,
+            "drain_production_scoring_admission",
+            closureInput(
+              blockedDrainState,
+              rollbackEvidence.evidence_id,
+              rollbackClose.closure_id,
+              "rollback-queues-still-pending-drain",
+            ),
+          );
+          assert.equal(blockedDrain.ready_to_finalize, true);
+          const blockedBoundary = finalBoundary(cluster, database);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "finalize_production_scoring_admission",
+              finalizationInput(
+                state(cluster, database),
+                rollbackEvidence.evidence_id,
+                rollbackClose.closure_id,
+                blockedDrain,
+                blockedBoundary,
+                "rollback-queues-still-pending-finalize",
+              ),
+            ),
+            /PRODUCTION_SCORING_ADMISSION_FINAL_BOUNDARY_CHANGED/,
+          );
+
+          const rollbackWorkerInput = {
+            ...scope,
+            deployment_commit: deploymentCommit,
+            expected_epoch_id: supabaseState.authority_generation_id,
+            worker_id: "rollback-drain-worker",
+          };
+          const claimedRollbackEvent = rpc(
+            cluster,
+            database,
+            "claim_production_google_outbox",
+            { ...rollbackWorkerInput, lease_seconds: 30 },
+          );
+          assert.equal(claimedRollbackEvent.ok, true);
+          assert.equal(
+            claimedRollbackEvent.event.mutation_key,
+            "rollback-drain-event",
+          );
+          const completedRollbackEvent = rpc(
+            cluster,
+            database,
+            "complete_production_google_outbox",
+            {
+              ...rollbackWorkerInput,
+              event_id: claimedRollbackEvent.event.id,
+              verified_fingerprint: fingerprint(
+                "rollback-drain-google-readback",
+              ),
+              google_match_revision: 1,
+              google_hole_revision: 1,
+            },
+          );
+          assert.equal(completedRollbackEvent.ok, true);
+
+          const claimedArchiveJob = rpc(
+            cluster,
+            database,
+            "claim_production_scorecard_archive_job",
+            {
+              ...rollbackWorkerInput,
+              worker_id: "rollback-archive-worker",
+              lease_seconds: 30,
+            },
+          );
+          assert.equal(claimedArchiveJob.ok, true);
+          assert.equal(
+            claimedArchiveJob.job.event_type,
+            "SCORECARD_ARCHIVE_INVALIDATE",
+          );
+          const completedArchiveJob = rpc(
+            cluster,
+            database,
+            "complete_production_scorecard_archive_job",
+            {
+              ...rollbackWorkerInput,
+              worker_id: "rollback-archive-worker",
+              job_id: claimedArchiveJob.job.id,
+              claim_token: claimedArchiveJob.job.claim_token,
+              source_fingerprint: fingerprint("rollback-archive-source"),
+              archive_payload_hash: fingerprint("rollback-archive-payload"),
+              snapshot_revision: 1,
+              finalized_match_revision: 0,
+              google_readback_hash: fingerprint(
+                "rollback-archive-google-readback",
+              ),
+              expected_logical_identities: [],
+              google_row_numbers: [],
+              verified_status: "INVALIDATED",
+            },
+          );
+          assert.equal(completedArchiveJob.ok, true);
+
           const rollbackClosed = drainFinalizeExistingClose(
             cluster,
             database,
@@ -1645,6 +1855,19 @@ test(
             rollbackClose,
             "rollback-boundary",
           );
+          for (const workerName of [
+            "SCORING_GOOGLE_OUTBOX",
+            "ROUND_SCORECARDS_ARCHIVE",
+          ]) {
+            assertCommandFailure(
+              () => psql(cluster, database, `
+                select production_control.assert_production_scoring_runtime(
+                  ${jsonSql(runtimeInput)}, ${sqlLiteral(workerName)}
+                );
+              `),
+              /PRODUCTION_SUPABASE_SCORING_ADMISSION_V2_REQUIRED/,
+            );
+          }
           const rollbackPrepared = rpc(
             cluster,
             database,

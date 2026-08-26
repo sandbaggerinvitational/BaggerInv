@@ -39,6 +39,20 @@ const COMMON_INPUT_KEYS = new Set([
   "request_fingerprint",
 ]);
 
+const AUTHORITY_SENSITIVE_FIELDS = new Set([
+  ...COMMON_INPUT_KEYS,
+  "expected_epoch_id", "expected_authority", "closure_id", "epoch_id",
+  "external_fence_evidence_id", "prior_external_fence_evidence_id",
+  "start_source_fingerprint", "source_fingerprint", "final_source_fingerprint",
+  "reconciliation_fingerprint", "closure_boundary_fingerprint",
+  "lease_set_fingerprint", "supabase_shadow_fingerprint",
+  "expected_prior_source_fingerprint", "provider_evidence_fingerprint",
+  "deployment_scope_fingerprint", "google_credential_scope_fingerprint",
+  "writer_coverage_fingerprint", "legacy_lease_set_fingerprint",
+  "supabase_match_revisions", "google_checkpoints", "boundary_captured_at",
+  "captured_at", "stable_readback_count",
+]);
+
 const OPERATION_EXTRA_KEYS = Object.freeze({
   "inspect": [],
   "stage-release": [
@@ -56,6 +70,14 @@ const OPERATION_EXTRA_KEYS = Object.freeze({
     "deployment_scope_fingerprint", "google_credential_scope_fingerprint",
     "writer_coverage_fingerprint", "legacy_lease_set_fingerprint",
     "legacy_lease_count", "legacy_deployments_fenced", "google_credentials_fenced",
+    "manual_google_scoring_fenced",
+  ],
+  "refresh-provider-fence": [
+    "operation", "prior_external_fence_evidence_id", "closure_id", "captured_at",
+    "provider_evidence_fingerprint", "deployment_scope_fingerprint",
+    "google_credential_scope_fingerprint", "writer_coverage_fingerprint",
+    "legacy_lease_set_fingerprint", "legacy_lease_count",
+    "legacy_deployments_fenced", "google_credentials_fenced",
     "manual_google_scoring_fenced",
   ],
   "close-legacy-admission": [
@@ -123,6 +145,7 @@ export const OPERATIONS = Object.freeze({
   identity: { kind: "rpc", rpc: "activate_production_participant_identity" },
   "arm-legacy-admission": { kind: "rpc", rpc: "arm_production_google_ingress_lease_gate" },
   "record-provider-fence": { kind: "rpc", rpc: "record_production_scoring_external_fence_evidence" },
+  "refresh-provider-fence": { kind: "rpc", rpc: "refresh_production_scoring_external_fence_evidence" },
   "close-legacy-admission": { kind: "rpc", rpc: "close_production_scoring_admission" },
   "drain-legacy-admission": { kind: "rpc", rpc: "drain_production_scoring_admission" },
   "capture-final-google-fingerprint": { kind: "evidence-payload", rpc: null },
@@ -305,6 +328,8 @@ export function validateManifest(manifest) {
   requireInteger(manifest.state.activationRevision, "STATE_INVALID", "state.activationRevision");
   requireInteger(manifest.state.activeLegacyWriters, "STATE_INVALID", "state.activeLegacyWriters");
   requireInteger(manifest.state.unresolvedLegacyWriters, "STATE_INVALID", "state.unresolvedLegacyWriters");
+  requireInteger(manifest.state.unresolvedOutbox, "STATE_INVALID", "state.unresolvedOutbox");
+  requireInteger(manifest.state.unresolvedArchive, "STATE_INVALID", "state.unresolvedArchive");
   requireBoolean(manifest.state.firstSupabaseCanonicalWritePossible, "STATE_INVALID", "state.firstSupabaseCanonicalWritePossible");
   requireBoolean(manifest.state.firstSupabaseCanonicalWriteObserved, "STATE_INVALID", "state.firstSupabaseCanonicalWriteObserved");
   if (!new Set(["OPEN", "CLOSING", "CLOSED"]).has(manifest.state.admissionState)) {
@@ -312,6 +337,12 @@ export function validateManifest(manifest) {
   }
   if (!new Set(["OPEN", "PAUSED"]).has(manifest.state.gateExecutionState)) {
     refuse("GATE_EXECUTION_STATE_INVALID", "state.gateExecutionState must be OPEN or PAUSED.");
+  }
+  if (![null, "LEGACY_ADMISSION", "SUPABASE_INGRESS"].includes(manifest.state.activeClosureKind)) {
+    refuse("CLOSURE_KIND_INVALID", "state.activeClosureKind is outside the certified closure kinds.");
+  }
+  if (![null, "CLOSING", "CLOSED", "CONSUMED", "REOPENED"].includes(manifest.state.activeClosureStatus)) {
+    refuse("CLOSURE_STATUS_INVALID", "state.activeClosureStatus is outside the certified closure statuses.");
   }
   assertNoSecrets(manifest.operationInputs, "operationInputs");
   assertNoPreview(manifest);
@@ -398,6 +429,7 @@ export function evaluateReadiness(manifest) {
     scoringIngressEnabled: false, workersEnabled: false,
     activeLegacyWriters: 0, unresolvedLegacyWriters: 0, ambiguousGoogleWrites: 0,
     partialGoogleWrites: 0, legacyUnclassifiedWriters: 0,
+    unresolvedOutbox: 0, unresolvedArchive: 0,
     firstSupabaseCanonicalWritePossible: false,
     firstSupabaseCanonicalWriteObserved: false,
   };
@@ -442,6 +474,31 @@ function assertNoLegacyWriters(manifest) {
     "activeLegacyWriters", "unresolvedLegacyWriters", "ambiguousGoogleWrites",
     "partialGoogleWrites", "legacyUnclassifiedWriters",
   ]) requireEqual(manifest.state[key], 0, "LEGACY_WRITERS_NOT_DRAINED", `state.${key}`);
+}
+
+function assertDurableQueuesDrained(manifest) {
+  requireEqual(manifest.state.unresolvedOutbox, 0,
+    "DURABLE_QUEUE_NOT_DRAINED", "state.unresolvedOutbox");
+  requireEqual(manifest.state.unresolvedArchive, 0,
+    "DURABLE_QUEUE_NOT_DRAINED", "state.unresolvedArchive");
+}
+
+function assertImmutableFenceRefreshScope(manifest) {
+  const proof = manifest.providerFenceProof;
+  const bound = requireObject(proof.boundImmutableScope,
+    "PROVIDER_FENCE_BOUND_SCOPE_REQUIRED", "providerFenceProof.boundImmutableScope");
+  const fields = [
+    "providerEvidenceFingerprint", "deploymentScopeFingerprint",
+    "googleCredentialScopeFingerprint", "writerCoverageFingerprint",
+  ];
+  for (const field of fields) {
+    const current = requireResolved(proof[field], HEX64,
+      "PROVIDER_FENCE_REQUIRED", `providerFenceProof.${field}`);
+    const prior = requireResolved(bound[field], HEX64,
+      "PROVIDER_FENCE_BOUND_SCOPE_REQUIRED", `providerFenceProof.boundImmutableScope.${field}`);
+    requireEqual(current, prior, "PROVIDER_FENCE_REFRESH_SCOPE_DRIFT",
+      `providerFenceProof.${field}`);
+  }
 }
 
 function assertRollbackEvidence(manifest) {
@@ -518,6 +575,23 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.admissionProtocolEnforced, true, "ADMISSION_PROTOCOL_REQUIRED", "state.admissionProtocolEnforced");
       assertProviderFence(manifest, { requireEvidenceId: false });
       return;
+    case "refresh-provider-fence":
+      requireEqual(state.gateExecutionState, "PAUSED", "GATE_STATE_MISMATCH", "state.gateExecutionState");
+      requireEqual(["CLOSING", "CLOSED"].includes(state.admissionState), true,
+        "ADMISSION_STATE_MISMATCH", "state.admissionState");
+      requireEqual(["CLOSING", "CLOSED"].includes(state.activeClosureStatus), true,
+        "CLOSURE_STATUS_MISMATCH", "state.activeClosureStatus");
+      requireEqual(["LEGACY_ADMISSION", "SUPABASE_INGRESS"].includes(state.activeClosureKind), true,
+        "CLOSURE_KIND_MISMATCH", "state.activeClosureKind");
+      requireEqual(state.admissionProtocolEnforced, true,
+        "ADMISSION_PROTOCOL_REQUIRED", "state.admissionProtocolEnforced");
+      requireEqual(state.externalFenceEvidenceId, manifest.providerFenceProof.evidenceId,
+        "PROVIDER_EVIDENCE_BINDING_MISMATCH", "state.externalFenceEvidenceId");
+      requireResolved(state.activeClosureId, UUID,
+        "CLOSURE_ID_REQUIRED", "state.activeClosureId");
+      assertProviderFence(manifest);
+      assertImmutableFenceRefreshScope(manifest);
+      return;
     case "close-legacy-admission":
       requireEqual(state.activationState, "GOOGLE_LEASE_ARMED", "PHASE_SKIP_FORBIDDEN", "state.activationState");
       requireEqual(state.scoringAuthority, "GOOGLE", "AUTHORITY_MISMATCH", "state.scoringAuthority");
@@ -542,6 +616,7 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.activeClosureStatus, "CLOSING", "CLOSURE_STATUS_MISMATCH", "state.activeClosureStatus");
       assertNoLegacyWriters(manifest);
       assertProviderFence(manifest);
+      assertDurableQueuesDrained(manifest);
       return;
     case "finalize-legacy-closed":
       requireEqual(state.scoringAuthority, "GOOGLE", "AUTHORITY_MISMATCH", "state.scoringAuthority");
@@ -549,6 +624,7 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.gateExecutionState, "PAUSED", "GATE_STATE_MISMATCH", "state.gateExecutionState");
       requireEqual(state.activeClosureStatus, "CLOSING", "CLOSURE_STATUS_MISMATCH", "state.activeClosureStatus");
       assertNoLegacyWriters(manifest);
+      assertDurableQueuesDrained(manifest);
       assertProviderFence(manifest);
       requireEqual(manifest.evidence.stableReadbackCount >= 2, true,
         "STABLE_GOOGLE_READBACK_REQUIRED", "evidence.stableReadbackCount >= 2");
@@ -565,6 +641,7 @@ function assertOperationGuard(manifest, operation) {
         "SUPABASE_PREPARE_UNSAFE", "state.supabaseAuthorityPrepareSafe");
       requireEqual(state.supabaseShadowParityExact, true, "SHADOW_PARITY_REQUIRED", "state.supabaseShadowParityExact");
       assertNoLegacyWriters(manifest);
+      assertDurableQueuesDrained(manifest);
       assertFirstWrite(manifest, { possible: false, observed: false });
       return;
     case "commit-authority":
@@ -579,6 +656,7 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.scoringIngressEnabled, false, "INGRESS_MUST_BE_PAUSED", "state.scoringIngressEnabled");
       requireEqual(state.workersEnabled, false, "WORKERS_MUST_BE_DISABLED", "state.workersEnabled");
       assertNoLegacyWriters(manifest);
+      assertDurableQueuesDrained(manifest);
       assertFirstWrite(manifest, { possible: false, observed: false });
       return;
     case "abort-authority":
@@ -645,6 +723,7 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.scoringIngressEnabled, true, "ACTIVATION_INGRESS_FLAG_MISMATCH", "state.scoringIngressEnabled");
       assertNoLegacyWriters(manifest);
       assertProviderFence(manifest);
+      assertDurableQueuesDrained(manifest);
       requireEqual(manifest.evidence.rollbackStableReadbackCount >= 2, true,
         "STABLE_ROLLBACK_READBACK_REQUIRED", "evidence.rollbackStableReadbackCount >= 2");
       return;
@@ -657,6 +736,7 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.activeClosureKind, "SUPABASE_INGRESS", "CLOSURE_KIND_MISMATCH", "state.activeClosureKind");
       requireEqual(state.activeClosureStatus, "CLOSED", "CLOSURE_STATUS_MISMATCH", "state.activeClosureStatus");
       assertNoLegacyWriters(manifest);
+      assertDurableQueuesDrained(manifest);
       assertRollbackEvidence(manifest);
       return;
     case "commit-rollback":
@@ -666,6 +746,7 @@ function assertOperationGuard(manifest, operation) {
       requireEqual(state.gateExecutionState, "PAUSED", "GATE_STATE_MISMATCH", "state.gateExecutionState");
       requireEqual(state.activeClosureKind, "SUPABASE_INGRESS", "CLOSURE_KIND_MISMATCH", "state.activeClosureKind");
       requireEqual(state.activeClosureStatus, "CLOSED", "CLOSURE_STATUS_MISMATCH", "state.activeClosureStatus");
+      assertDurableQueuesDrained(manifest);
       assertRollbackEvidence(manifest);
       return;
     case "workers":
@@ -744,6 +825,21 @@ function operationDefaults(manifest, operation) {
     case "arm-legacy-admission": return { expected_epoch_id: state.authorityGeneration };
     case "record-provider-fence": return {
       operation: "RECORD_PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE",
+      captured_at: proof.capturedAt,
+      provider_evidence_fingerprint: proof.providerEvidenceFingerprint,
+      deployment_scope_fingerprint: proof.deploymentScopeFingerprint,
+      google_credential_scope_fingerprint: proof.googleCredentialScopeFingerprint,
+      writer_coverage_fingerprint: proof.writerCoverageFingerprint,
+      legacy_lease_set_fingerprint: proof.legacyLeaseSetFingerprint,
+      legacy_lease_count: proof.legacyLeaseCount,
+      legacy_deployments_fenced: proof.legacyDeploymentsFenced,
+      google_credentials_fenced: proof.googleCredentialsFenced,
+      manual_google_scoring_fenced: proof.manualGoogleScoringFenced,
+    };
+    case "refresh-provider-fence": return {
+      operation: "REFRESH_PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE",
+      prior_external_fence_evidence_id: proof.evidenceId,
+      closure_id: state.activeClosureId,
       captured_at: proof.capturedAt,
       provider_evidence_fingerprint: proof.providerEvidenceFingerprint,
       deployment_scope_fingerprint: proof.deploymentScopeFingerprint,
@@ -861,8 +957,12 @@ function mergeOperationInput(manifest, operation, payload) {
   const allowed = new Set([...COMMON_INPUT_KEYS, ...(OPERATION_EXTRA_KEYS[operation] ?? [])]);
   for (const [key, value] of Object.entries(input)) {
     if (!allowed.has(key)) refuse("OPERATION_INPUT_FIELD_FORBIDDEN", `Unexpected field operationInputs.${operation}.${key}.`);
-    if (COMMON_INPUT_KEYS.has(key)) {
-      refuse("OPTIMISTIC_BINDING_OVERRIDE_FORBIDDEN", `operationInputs may not override ${key}.`);
+    if (AUTHORITY_SENSITIVE_FIELDS.has(key)) {
+      if (!(key in payload) || canonicalJson(value) !== canonicalJson(payload[key])) {
+        refuse("AUTHORITY_BINDING_OVERRIDE_FORBIDDEN",
+          `operationInputs.${operation}.${key} differs from the computed authoritative binding.`);
+      }
+      continue;
     }
     payload[key] = clone(value);
   }
@@ -899,10 +999,33 @@ export function buildOperationEnvelope(manifest, operation) {
   let payload = { ...base, ...operationDefaults(manifest, operation) };
   payload = mergeOperationInput(manifest, operation, payload);
   delete payload.request_fingerprint;
+  const diagnosticStateGuard = {
+    activationState: manifest.state.activationState,
+    activationRevision: manifest.state.activationRevision,
+    authorityGeneration: manifest.state.authorityGeneration,
+    scoringAuthority: manifest.state.scoringAuthority,
+    scoringIngressEnabled: manifest.state.scoringIngressEnabled,
+    gateExecutionState: manifest.state.gateExecutionState,
+    admissionState: manifest.state.admissionState,
+    admissionRevision: manifest.state.admissionRevision,
+    admissionGeneration: manifest.state.admissionGeneration,
+    activeClosureId: manifest.state.activeClosureId,
+    activeClosureKind: manifest.state.activeClosureKind,
+    activeClosureStatus: manifest.state.activeClosureStatus,
+    activeLegacyWriters: manifest.state.activeLegacyWriters,
+    unresolvedLegacyWriters: manifest.state.unresolvedLegacyWriters,
+    unresolvedOutbox: manifest.state.unresolvedOutbox,
+    unresolvedArchive: manifest.state.unresolvedArchive,
+    firstSupabaseCanonicalWritePossible:
+      manifest.state.firstSupabaseCanonicalWritePossible,
+    firstSupabaseCanonicalWriteObserved:
+      manifest.state.firstSupabaseCanonicalWriteObserved,
+  };
   payload.request_fingerprint = sha256Hex(canonicalJson({
     domain: "BAGGER_STEP11_6_OPERATOR_REQUEST_V2",
     operation,
     payload,
+    diagnosticStateGuard,
   }));
   validateRenderedPayload(operation, payload);
   const envelope = {
@@ -919,6 +1042,7 @@ export function buildOperationEnvelope(manifest, operation) {
     stableRequestId: payload.request_id ?? null,
     requestFingerprint: payload.request_fingerprint,
     payload,
+    diagnosticStateGuard,
     sqlEnvelope: definition.rpc ? sqlEnvelope(definition.rpc, payload) : null,
     runbook: FIXED.runbook,
     warning: "REVIEW ARTIFACT ONLY — THIS TOOL DOES NOT EXECUTE OR AUTHORIZE PRODUCTION CHANGES",

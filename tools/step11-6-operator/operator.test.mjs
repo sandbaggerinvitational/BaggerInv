@@ -67,6 +67,12 @@ function certifiedManifest() {
     writerCoverageFingerprint: "4".repeat(64),
     legacyLeaseSetFingerprint: "5".repeat(64),
     legacyLeaseCount: 0,
+    boundImmutableScope: {
+      providerEvidenceFingerprint: "1".repeat(64),
+      deploymentScopeFingerprint: "2".repeat(64),
+      googleCredentialScopeFingerprint: "3".repeat(64),
+      writerCoverageFingerprint: "4".repeat(64),
+    },
     originMatrix: [
       {
         origin: "https://baggerinv.com",
@@ -273,6 +279,20 @@ test("close requires barrier-aware state plus exact old-host provider fence", ()
   assert.match(envelope.sqlEnvelope, /close_production_scoring_admission/);
 });
 
+test("provider-fence refresh preserves immutable scope and advances only bound evidence", () => {
+  const manifest = closingManifest();
+  const envelope = buildOperationEnvelope(manifest, "refresh-provider-fence");
+  assert.equal(envelope.rpc, "refresh_production_scoring_external_fence_evidence");
+  assert.equal(envelope.payload.prior_external_fence_evidence_id, U.evidence);
+  assert.equal(envelope.payload.closure_id, U.closure);
+  assert.equal(envelope.payload.provider_evidence_fingerprint,
+    manifest.providerFenceProof.boundImmutableScope.providerEvidenceFingerprint);
+
+  manifest.providerFenceProof.boundImmutableScope.writerCoverageFingerprint = "f".repeat(64);
+  expectRefusal("PROVIDER_FENCE_REFRESH_SCOPE_DRIFT", () =>
+    buildOperationEnvelope(manifest, "refresh-provider-fence"));
+});
+
 test("drain can inspect blockers, but fingerprint/finalize refuse potential writers", () => {
   const manifest = closingManifest();
   manifest.state.activeLegacyWriters = 1;
@@ -411,6 +431,69 @@ test("rollback prepare and commit require a CLOSED SUPABASE_INGRESS closure with
   preparedInput.state.activeClosureKind = "LEGACY_ADMISSION";
   expectRefusal("CLOSURE_KIND_MISMATCH", () =>
     buildOperationEnvelope(preparedInput, "commit-rollback"));
+});
+
+test("rollback closure finalization, prepare, and commit fail fast on durable queue backlog", () => {
+  const finalizing = supabaseIngressPausedManifest();
+  finalizing.state.unresolvedOutbox = 1;
+  expectRefusal("DURABLE_QUEUE_NOT_DRAINED", () =>
+    buildOperationEnvelope(finalizing, "finalize-supabase-ingress-closed"));
+
+  const preparing = supabaseIngressClosedManifest();
+  preparing.state.unresolvedArchive = 1;
+  expectRefusal("DURABLE_QUEUE_NOT_DRAINED", () =>
+    buildOperationEnvelope(preparing, "prepare-rollback"));
+
+  const committing = supabaseIngressClosedManifest();
+  Object.assign(committing.state, {
+    activationState: "ROLLBACK_PREPARED",
+    preparedEpochId: U.epoch,
+    unresolvedOutbox: 1,
+  });
+  expectRefusal("DURABLE_QUEUE_NOT_DRAINED", () =>
+    buildOperationEnvelope(committing, "commit-rollback"));
+});
+
+test("queue diagnostics are typed and rendered with closure kind/status", () => {
+  const invalid = certifiedManifest();
+  invalid.state.unresolvedArchive = "0";
+  expectRefusal("STATE_INVALID", () => validateManifest(invalid));
+
+  const manifest = supabaseIngressPausedManifest();
+  const envelope = buildOperationEnvelope(manifest, "drain-supabase-ingress");
+  assert.deepEqual({
+    activeClosureKind: envelope.diagnosticStateGuard.activeClosureKind,
+    activeClosureStatus: envelope.diagnosticStateGuard.activeClosureStatus,
+    unresolvedOutbox: envelope.diagnosticStateGuard.unresolvedOutbox,
+    unresolvedArchive: envelope.diagnosticStateGuard.unresolvedArchive,
+  }, {
+    activeClosureKind: "SUPABASE_INGRESS",
+    activeClosureStatus: "CLOSING",
+    unresolvedOutbox: 0,
+    unresolvedArchive: 0,
+  });
+});
+
+test("operationInputs can repeat computed authority bindings only when exactly equal", () => {
+  const manifest = closedManifest();
+  Object.assign(manifest.operationInputs["prepare-authority"], {
+    closure_id: U.closure,
+    expected_activation_revision: manifest.state.activationRevision,
+    source_fingerprint: manifest.evidence.finalGoogleFingerprint,
+    external_fence_evidence_id: U.evidence,
+  });
+  const envelope = buildOperationEnvelope(manifest, "prepare-authority");
+  assert.equal(envelope.payload.closure_id, U.closure);
+
+  manifest.operationInputs["prepare-authority"].closure_id =
+    "66666666-6666-4666-8666-666666666666";
+  expectRefusal("AUTHORITY_BINDING_OVERRIDE_FORBIDDEN", () =>
+    buildOperationEnvelope(manifest, "prepare-authority"));
+
+  manifest.operationInputs["prepare-authority"].closure_id = U.closure;
+  manifest.operationInputs["prepare-authority"].expected_activation_revision += 1;
+  expectRefusal("AUTHORITY_BINDING_OVERRIDE_FORBIDDEN", () =>
+    buildOperationEnvelope(manifest, "prepare-authority"));
 });
 
 test("post-write rollback requires enumeration with zero lost, duplicate, and unresolved writes", () => {
