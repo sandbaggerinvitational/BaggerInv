@@ -81,7 +81,7 @@ function certifiedManifest() {
     credentialConfinementEvidenceFingerprint:
       FIXED.credentialConfinementEvidenceFingerprint,
     executionBundleFingerprintV2: "d".repeat(64),
-    migrationSha256: "e".repeat(64),
+    migrationSha256: FIXED.migrationSha256,
   });
   Object.assign(manifest.certification, {
     migrationInstalledDormant: true,
@@ -402,6 +402,17 @@ test("claimed readiness is ignored; exact evidence derives readiness", () => {
   assert.ok(result.blockers.includes("providerFenceRehearsal.exactOldHostProviderFence is not true"));
 });
 
+test("operator readiness binds the exact migration bytes", () => {
+  const manifest = certifiedManifest();
+  assert.deepEqual(evaluateReadiness(manifest), { ready: true, blockers: [] });
+  manifest.release.migrationSha256 = "e".repeat(64);
+  expectRefusal("MIGRATION_BINDING_DRIFT", () => validateManifest(manifest));
+  const result = evaluateReadiness(manifest);
+  assert.equal(result.ready, false);
+  assert.ok(result.blockers.some((value) =>
+    value.includes("release.migrationSha256")));
+});
+
 test("manifest rejects a caller-supplied origin subset or arbitrary matrix fingerprint", () => {
   const manifest = certifiedManifest();
   manifest.providerFenceRehearsal.originMatrix = [{
@@ -479,10 +490,10 @@ test("retained origin inventory binding is the exact complete 1,140-record v2 ar
       frozenStep11: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
     },
     paginationComplete: true,
-    reviewedPostCaptureDeploymentCount: 5,
+    reviewedPostCaptureDeploymentCount: 6,
     reviewedPostCaptureDeploymentFingerprint:
-      "9262c1d4edc14259d442c29aa25d04f90b21961ed2124d422e6f77b4e3e49c00",
-    minimumLiveOriginInventoryCount: 1146,
+      "2a0f75de0e4f2178c03cb98f8adb264b3f661b28025b51a70b29800aa30b5724",
+    minimumLiveOriginInventoryCount: 1147,
     fixedAliasOriginCount: 4,
     candidateAliasOriginCount: 1,
     probeVectorCount: 9,

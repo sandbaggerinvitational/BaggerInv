@@ -39,7 +39,7 @@
     "credentialConfinementRecordsFingerprint": "c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508",
     "credentialConfinementEvidenceFingerprint": "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
     "executionBundleFingerprintV2": "__STEP12_EXECUTION_BUNDLE_FINGERPRINT_V2__",
-    "migrationName": "202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+    "migrationName": "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
     "migrationSha256": "__STEP11_6_MIGRATION_SHA256__",
     "runbook": "docs/step12-production-cutover-runbook-v2.md"
   },

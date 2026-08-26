@@ -71,12 +71,13 @@ safety wait or failed gate.
    evidence fingerprint
    `1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df`).
 2. The server verifies the provider-signed live inventory: the retained 1,140
-   records, the five exact reviewed post-capture Preview deployments pinned by
+   records, the six exact reviewed post-capture Preview deployments pinned by
    additive migrations
    `202608260035_production_reviewed_post_capture_preview_deployments.sql` and
-   `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`, and
+   `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
+   plus `202608260037_production_provider_rpc_name_and_inventory_v3.sql`, and
    the exact dynamic candidate. The ordered reviewed tuple-set fingerprint is
-   `9262c1d4edc14259d442c29aa25d04f90b21961ed2124d422e6f77b4e3e49c00`.
+   `2a0f75de0e4f2178c03cb98f8adb264b3f661b28025b51a70b29800aa30b5724`.
    Only provider-signed same-current-SHA additions in the target-appropriate
    scope are permitted. The server then adds four fixed aliases and the dynamic
    candidate alias. For signed live count `N`, each
@@ -92,10 +93,10 @@ safety wait or failed gate.
    Each snapshot is persisted as one compact tuple per dynamically attested
    origin with the exact nine-vector coverage mask and nine ordered provider-
    proof fingerprints; the database derives and validates the complete logical
-   origin×vector set. The minimum Step 11.6 snapshot is 1,151 origins and
-   10,359 requests (1,146 signed immutable origins plus five aliases). A normal
-   Step 12 Preview-plus-Production candidate pair is at least 1,152 origins and
-   10,368 requests, but the signed inventory and receipt are authoritative.
+   origin×vector set. The minimum Step 11.6 snapshot is 1,152 origins and
+   10,368 requests (1,147 signed immutable origins plus five aliases). A normal
+   Step 12 Preview-plus-Production candidate pair is at least 1,153 origins and
+   10,377 requests, but the signed inventory and receipt are authoritative.
    The fixed/candidate aliases are diagnostic canaries, not an exhaustive alias
    inventory. All other aliases are covered by the provider-attested active
    project-wide firewall configuration. The attester rejects inactive/missing

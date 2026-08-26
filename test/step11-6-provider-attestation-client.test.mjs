@@ -408,7 +408,7 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
   assert.doesNotMatch(rehearsal,
     /localStorage(?:\?\.|\.)(?:clear|removeItem)\s*\(/);
   assert.doesNotMatch(rehearsal,
-    /inspect_production_vercel_provider_attestation_challenge_abandonment|abandon_production_vercel_provider_attestation_challenge/,
+    /inspect_production_vercel_provider_(?:attestation_challenge_abandonment|challenge_abandonment)|abandon_production_vercel_provider_attestation_challenge/,
   "the browser must use the same-origin server route, never the service-role RPC directly");
   const abandonFunction = rehearsal.slice(
     rehearsal.indexOf("async function abandonRetainedChallenge"),
@@ -442,10 +442,26 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
     "candidateDeploymentTarget", "candidateAliasOrigin", "candidateImmutableOrigin",
     "routingRuleId", "routingRuleConfigVersion",
   ]) assert.match(receiptAdapter, new RegExp(`challenge\\.${retainedField}`));
-  for (const rpc of [
-    "inspect_production_vercel_provider_attestation_challenge_abandonment",
-    "abandon_production_vercel_provider_attestation_challenge",
-  ]) assert.match(receiptAdapter, new RegExp(`"${rpc}"`));
+  const allowlist = receiptAdapter.match(
+    /const allowed = new Set\(\[([\s\S]*?)\]\);/,
+  );
+  assert.ok(allowlist, "the server RPC allowlist must be statically extractable");
+  const allowedRpcs = [...allowlist[1].matchAll(/"([a-z0-9_]+)"/g)]
+    .map((match) => match[1]);
+  assert.equal(allowedRpcs.length, 18);
+  assert.equal(new Set(allowedRpcs).size, allowedRpcs.length);
+  for (const rpc of allowedRpcs) {
+    assert.ok(rpc.length <= 63,
+      `PostgREST RPC ${rpc} must survive PostgreSQL identifier storage exactly`);
+    assert.match(receiptAdapter, new RegExp(`"${rpc}"`));
+  }
+  assert.ok(allowedRpcs.includes(
+    "inspect_production_vercel_provider_challenge_abandonment"));
+  assert.ok(allowedRpcs.includes(
+    "abandon_production_vercel_provider_attestation_challenge"));
+  assert.doesNotMatch(receiptAdapter,
+    /"inspect_production_vercel_provider_attestation_challenge_abandonment"/,
+    "the obsolete overlength PostgREST RPC name must not return");
   assert.match(receiptAdapter, /inspectRetainedChallenge/);
   assert.match(receiptAdapter, /abandonChallenge/);
   assert.match(receiptAdapter, /EXPIRED_UNCONSUMED_BEGIN_SUPERSEDED/);

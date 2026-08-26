@@ -41,15 +41,17 @@ export const FIXED = Object.freeze({
     "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
   requiredPriorLiveDeploymentId: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
   requiredFrozenStep11DeploymentId: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-  reviewedPostCaptureDeploymentCount: 5,
+  reviewedPostCaptureDeploymentCount: 6,
   reviewedPostCaptureDeploymentFingerprint:
-    "9262c1d4edc14259d442c29aa25d04f90b21961ed2124d422e6f77b4e3e49c00",
-  minimumLiveOriginInventoryCount: 1140 + 5 + 1,
+    "2a0f75de0e4f2178c03cb98f8adb264b3f661b28025b51a70b29800aa30b5724",
+  minimumLiveOriginInventoryCount: 1140 + 6 + 1,
   quiesceFixedAliasOriginCount: 4,
   quiesceCandidateAliasOriginCount: 1,
   quiesceProbeVectorCount: 9,
   migrationName:
-    "202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+    "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+  migrationSha256:
+    "a81ea3d10d5da3c66b89f169d46bd1510ffc806a3bbaeb1dbfe810409d45c9b3",
   runbook: "docs/step12-production-cutover-runbook-v2.md",
 });
 
@@ -920,6 +922,10 @@ export function validateManifest(manifest) {
   if (actorId.length > 160) refuse("OPERATOR_INVALID", "operator.actorId exceeds 160 characters.");
   requireObject(manifest.release, "RELEASE_REQUIRED", "release");
   requireEqual(manifest.release.migrationName, FIXED.migrationName, "MIGRATION_BINDING_DRIFT", "release.migrationName");
+  if (!unresolved(manifest.release.migrationSha256)) {
+    requireEqual(manifest.release.migrationSha256, FIXED.migrationSha256,
+      "MIGRATION_BINDING_DRIFT", "release.migrationSha256");
+  }
   requireEqual(manifest.release.runbook, FIXED.runbook, "RUNBOOK_BINDING_DRIFT", "release.runbook");
   requireObject(manifest.certification, "CERTIFICATION_REQUIRED", "certification");
   requireObject(manifest.providerFenceRehearsal,
@@ -983,6 +989,10 @@ export function evaluateReadiness(manifest) {
     if (unresolved(release[field]) || !pattern.test(String(release[field]).toLowerCase())) {
       blockers.push(`release.${field} is unresolved`);
     }
+  }
+  if (!unresolved(release.migrationSha256) &&
+      release.migrationSha256 !== FIXED.migrationSha256) {
+    blockers.push("release.migrationSha256 does not match the certified migration bytes");
   }
   if (!unresolved(release.candidateSha) && !unresolved(release.frozenSha) && release.candidateSha !== release.frozenSha) {
     blockers.push("release.candidateSha does not equal release.frozenSha");

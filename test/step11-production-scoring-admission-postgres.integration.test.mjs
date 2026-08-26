@@ -404,14 +404,23 @@ function assertCommandFailure(action, expected) {
   );
 }
 
-function spawnPsql(cluster, database, sql) {
+function spawnPsql(cluster, database, sql, { interactive = false } = {}) {
+  const argumentsValue = [
+    "-X",
+    "-qAt",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "-d",
+    database,
+  ];
+  if (!interactive) argumentsValue.push("-c", sql);
   const child = spawn(
     postgresBinaries.psql,
-    ["-X", "-qAt", "-v", "ON_ERROR_STOP=1", "-d", database, "-c", sql],
+    argumentsValue,
     {
       cwd: repositoryRoot,
       env: psqlEnvironment(cluster),
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: [interactive ? "pipe" : "ignore", "pipe", "pipe"],
     },
   );
   child.stdout.setEncoding("utf8");
@@ -448,9 +457,18 @@ function spawnPsql(cluster, database, sql) {
       }));
     });
   });
+  // Concurrent tests sometimes intentionally terminate a blocked psql process
+  // during cleanup. Attach a rejection observer immediately so assertion
+  // failures cannot turn a later child exit into an unhandled rejection.
+  void done.catch(() => {});
   return {
     child,
     done,
+    send(commands) {
+      assert.equal(interactive, true, "send() requires an interactive psql session");
+      assert.equal(child.stdin.destroyed, false, "interactive psql stdin is closed");
+      child.stdin.write(`${commands}\n`);
+    },
     snapshot() {
       return { stdout, stderr };
     },
@@ -474,6 +492,20 @@ function spawnPsql(cluster, database, sql) {
       });
     },
   };
+}
+
+function spawnInteractivePsql(cluster, database) {
+  return spawnPsql(cluster, database, undefined, { interactive: true });
+}
+
+async function terminatePsqlSessions(...sessions) {
+  const presentSessions = sessions.filter(Boolean);
+  for (const session of presentSessions) {
+    if (session.child.exitCode === null && session.child.signalCode === null) {
+      session.child.kill("SIGTERM");
+    }
+  }
+  await Promise.allSettled(presentSessions.map((session) => session.done));
 }
 
 function delay(milliseconds) {
@@ -562,7 +594,7 @@ async function installProductionMigrations(
   cluster,
   database,
   admissionMigration =
-    "202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+    "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
 ) {
   const migrationNames = (await readdir(migrationsDirectory))
     .filter((name) => /^\d+_.*\.sql$/.test(name))
@@ -1805,7 +1837,8 @@ test(
           const pre036LiveInventory = sortLiveOriginInventory([
             ...originInventory,
             ...reviewedPostCapturePreviewDeployments.filter((tuple) =>
-              tuple[1] !== "3fcbaa287fcb306fa3b47310f01ed6eb3901749c"
+              tuple[1] !== "3fcbaa287fcb306fa3b47310f01ed6eb3901749c" &&
+              tuple[0] !== "dpl_idZKEn956pcuEXctKS5HPoWfEn4Y"
             ),
             candidateInventoryTuple("PREVIEW"),
           ]);
@@ -1999,25 +2032,216 @@ test(
       );
 
       await t.test(
-        "migration 036 accepts exactly 1,140 retained, five reviewed, and one dynamic candidate tuple",
+        "migration 037 invalidates a persistent pre-037 inventory call and requires the exact b6 tuple",
+        async () => {
+          databaseCounter += 1;
+          const database =
+            `admission_034_${databaseCounter}_migration_037_cached_upgrade`;
+          let persistentSession;
+          try {
+            createDatabase(cluster, database);
+            installSupabaseCompatibility(cluster, database);
+            await installProductionMigrations(
+              cluster,
+              database,
+              "202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+            );
+            installScoringFixture(cluster, database);
+
+            const reviewedB6 = reviewedPostCapturePreviewDeployments.find(
+              (tuple) => tuple[0] === "dpl_idZKEn956pcuEXctKS5HPoWfEn4Y",
+            );
+            assert.ok(reviewedB6);
+            const pre037LiveInventory = liveOriginInventoryFor("PREVIEW")
+              .filter((tuple) => tuple[0] !== reviewedB6[0]);
+            const post037LiveInventory = liveOriginInventoryFor("PREVIEW");
+            assert.equal(pre037LiveInventory.length, 1146);
+            assert.equal(post037LiveInventory.length, 1147);
+
+            const productionAuthorityState = () => psql(cluster, database, `
+              select activation.state || '|' || activation.current_authority ||
+                '|' || resource.participant_identity_authority || '|' ||
+                gate.admission_state || '|' || gate.state
+              from production_control.cutover_activation_state activation
+              join production_control.resource_scope resource
+                on resource.scope_key = activation.scope_key
+              cross join scoring_authority.ingress_gates gate
+              where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+                and gate.tournament_id = '2026';
+            `);
+            assert.equal(
+              productionAuthorityState(),
+              "DORMANT|GOOGLE|PASSPORT|OPEN|PAUSED",
+            );
+
+            const cachedExecution = (liveInventory) => `
+              execute cached_live_inventory(
+                ${jsonSql(originInventory)},
+                ${jsonSql(liveInventory)},
+                ${sqlLiteral(candidateIdentity.deploymentId)},
+                ${sqlLiteral(candidateIdentity.commit)},
+                ${sqlLiteral(candidateIdentity.immutableOrigin)},
+                'PREVIEW'
+              );
+            `;
+            persistentSession = spawnInteractivePsql(cluster, database);
+            persistentSession.send(`
+              prepare cached_live_inventory(
+                jsonb, jsonb, text, text, text, text
+              ) as
+                select production_control.assert_exact_vercel_live_inventory(
+                  $1, $2, $3, $4, $5, $6
+                );
+              ${cachedExecution(pre037LiveInventory)}
+              select 'PRE037_CACHED_ASSERTION_READY';
+            `);
+            await persistentSession.waitFor(
+              "PRE037_CACHED_ASSERTION_READY",
+            );
+
+            psqlFile(
+              cluster,
+              database,
+              path.join(
+                migrationsDirectory,
+                "202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+              ),
+            );
+
+            persistentSession.send(`
+              \\set ON_ERROR_STOP off
+              ${cachedExecution(pre037LiveInventory)}
+              select 'POST037_MISSING_B6_ATTEMPTED';
+            `);
+            await persistentSession.waitFor(
+              "POST037_MISSING_B6_ATTEMPTED",
+            );
+            assert.match(
+              persistentSession.snapshot().stderr,
+              /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+              "a cached pre-037 call must resolve the replacement b6 assertion",
+            );
+
+            persistentSession.send(`
+              \\set ON_ERROR_STOP on
+              ${cachedExecution(post037LiveInventory)}
+              select 'POST037_EXACT_B6_ACCEPTED';
+              \\q
+            `);
+            await persistentSession.waitFor("POST037_EXACT_B6_ACCEPTED");
+            const sessionResult = await persistentSession.done;
+            assert.equal(sessionResult.status, 0);
+
+            assert.equal(
+              psql(cluster, database, `
+                select pg_catalog.length(alias.proname)::text || '|' ||
+                  pg_catalog.length(terminal.proname)::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'anon', alias.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'authenticated', alias.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'service_role', alias.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'anon', terminal.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'authenticated', terminal.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'service_role', terminal.oid, 'EXECUTE'
+                  )::text
+                from pg_catalog.pg_proc alias
+                join pg_catalog.pg_namespace alias_namespace
+                  on alias_namespace.oid = alias.pronamespace
+                cross join pg_catalog.pg_proc terminal
+                join pg_catalog.pg_namespace terminal_namespace
+                  on terminal_namespace.oid = terminal.pronamespace
+                where alias_namespace.nspname = 'public'
+                  and alias.proname =
+                    'inspect_production_vercel_provider_challenge_abandonment'
+                  and terminal_namespace.nspname = 'public'
+                  and terminal.proname =
+                    'inspect_production_vercel_provider_attestation_challenge_abando';
+              `),
+              "56|63|false|false|true|false|false|true",
+            );
+            assert.equal(
+              psql(cluster, database, `
+                select current_assertion.prosecdef::text || '|' ||
+                  current_assertion.provolatile::text || '|' ||
+                  (current_assertion.proconfig @>
+                    array['search_path=pg_catalog'])::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'anon', current_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'authenticated', current_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'service_role', current_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  prior_assertion.prosecdef::text || '|' ||
+                  prior_assertion.provolatile::text || '|' ||
+                  (prior_assertion.proconfig @>
+                    array['search_path=pg_catalog'])::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'anon', prior_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'authenticated', prior_assertion.oid, 'EXECUTE'
+                  )::text || '|' ||
+                  pg_catalog.has_function_privilege(
+                    'service_role', prior_assertion.oid, 'EXECUTE'
+                  )::text
+                from pg_catalog.pg_proc current_assertion
+                join pg_catalog.pg_namespace current_namespace
+                  on current_namespace.oid = current_assertion.pronamespace
+                cross join pg_catalog.pg_proc prior_assertion
+                join pg_catalog.pg_namespace prior_namespace
+                  on prior_namespace.oid = prior_assertion.pronamespace
+                where current_namespace.nspname = 'production_control'
+                  and current_assertion.proname =
+                    'assert_exact_vercel_live_inventory'
+                  and prior_namespace.nspname = 'production_control'
+                  and prior_assertion.proname =
+                    'assert_exact_vercel_live_inventory_v2';
+              `),
+              "true|i|true|false|false|true|true|i|true|false|false|true",
+            );
+            assert.equal(
+              productionAuthorityState(),
+              "DORMANT|GOOGLE|PASSPORT|OPEN|PAUSED",
+            );
+          } finally {
+            await terminatePsqlSessions(persistentSession);
+          }
+        },
+      );
+
+      await t.test(
+        "migration 037 accepts exactly 1,140 retained, six reviewed, and one dynamic candidate tuple",
         () => {
-          const database = cloneDormantDatabase("inventory_036_exact_1146");
+          const database = cloneDormantDatabase("inventory_037_exact_1147");
           const liveInventory = liveOriginInventoryFor("PREVIEW");
-          assert.equal(liveInventory.length, 1146);
+          assert.equal(liveInventory.length, 1147);
           assert.equal(
             assertExactLiveOriginInventory(cluster, database, liveInventory),
             "",
           );
           const input = quiesceBeginInput(
             "REHEARSAL",
-            "inventory-036-exact-1146",
+            "inventory-037-exact-1147",
           );
           const binding = reserveProviderAttestation(
             cluster,
             database,
             input,
             "BEGIN",
-            "inventory-036-exact-1146-begin",
+            "inventory-037-exact-1147-begin",
           );
           assert.match(
             binding.attestation_id,
@@ -2027,14 +2251,90 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects an inventory missing a reviewed deployment tuple",
+        "migration 037 rejects missing, tampered, and colliding b6 reviewed tuples",
+        () => {
+          const database = cloneDormantDatabase("inventory_037_b6_negative_cases");
+          const reviewedB6 = reviewedPostCapturePreviewDeployments.find(
+            (tuple) => tuple[0] === "dpl_idZKEn956pcuEXctKS5HPoWfEn4Y",
+          );
+          assert.deepEqual(reviewedB6, [
+            "dpl_idZKEn956pcuEXctKS5HPoWfEn4Y",
+            "b6f50d24d9a96c845305210b958ccf716bbf994d",
+            "https://bagger-aggbtffot-sandbagger-invitational.vercel.app",
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]);
+          const expectedFailure = /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/;
+
+          const missingB6 = liveOriginInventoryFor("PREVIEW").filter(
+            (tuple) => tuple[0] !== reviewedB6[0],
+          );
+          assert.equal(missingB6.length, 1146);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(cluster, database, missingB6),
+            expectedFailure,
+          );
+
+          const tamperedB6 = sortLiveOriginInventory(
+            liveOriginInventoryFor("PREVIEW").map((tuple) =>
+              tuple[0] === reviewedB6[0]
+                ? [tuple[0], "f".repeat(40), ...tuple.slice(2)]
+                : tuple
+            ),
+          );
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(cluster, database, tamperedB6),
+            expectedFailure,
+          );
+
+          const collidingB6Origin = liveOriginInventoryFor("PREVIEW", [[
+            "dpl_B6ReviewedOriginCollision123",
+            candidateIdentity.commit,
+            reviewedB6[2],
+            "FEATURE_PREVIEW",
+            "READY",
+            "GIT",
+          ]]);
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              collidingB6Origin,
+            ),
+            expectedFailure,
+          );
+
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveOriginInventoryFor("PREVIEW"),
+              { candidateDeploymentId: reviewedB6[0] },
+            ),
+            expectedFailure,
+          );
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              liveOriginInventoryFor("PREVIEW"),
+              { candidateImmutableOrigin: reviewedB6[2] },
+            ),
+            expectedFailure,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 037 rejects an inventory missing a reviewed deployment tuple",
         () => {
           const database = cloneDormantDatabase("inventory_036_missing_reviewed");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
           const liveInventory = liveOriginInventoryFor("PREVIEW").filter(
             (record) => record[0] !== reviewed[0],
           );
-          assert.equal(liveInventory.length, 1145);
+          assert.equal(liveInventory.length, 1146);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2047,7 +2347,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects a tampered reviewed deployment tuple",
+        "migration 037 rejects a tampered reviewed deployment tuple",
         () => {
           const database = cloneDormantDatabase("inventory_036_tampered_reviewed");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
@@ -2070,7 +2370,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects a duplicate reviewed tuple",
+        "migration 037 rejects a duplicate reviewed tuple",
         () => {
           const database = cloneDormantDatabase("inventory_036_duplicate_tuple");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
@@ -2078,7 +2378,7 @@ test(
             ...liveOriginInventoryFor("PREVIEW"),
             [...reviewed],
           ]);
-          assert.equal(liveInventory.length, 1147);
+          assert.equal(liveInventory.length, 1148);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2091,7 +2391,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects a reviewed deployment ID reused by a new origin",
+        "migration 037 rejects a reviewed deployment ID reused by a new origin",
         () => {
           const database = cloneDormantDatabase("inventory_036_duplicate_id");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
@@ -2115,7 +2415,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects a reviewed origin reused by a new deployment ID",
+        "migration 037 rejects a reviewed origin reused by a new deployment ID",
         () => {
           const database = cloneDormantDatabase("inventory_036_duplicate_origin");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
@@ -2139,7 +2439,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects a dynamic candidate colliding with a reviewed deployment ID",
+        "migration 037 rejects a dynamic candidate colliding with a reviewed deployment ID",
         () => {
           const database = cloneDormantDatabase("inventory_036_candidate_id_collision");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
@@ -2173,7 +2473,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects a dynamic candidate colliding with a reviewed origin",
+        "migration 037 rejects a dynamic candidate colliding with a reviewed origin",
         () => {
           const database = cloneDormantDatabase("inventory_036_candidate_origin_collision");
           const [reviewed] = reviewedPostCapturePreviewDeployments;
@@ -2206,7 +2506,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects an exact reviewed tuple reused as the dynamic candidate",
+        "migration 037 rejects an exact reviewed tuple reused as the dynamic candidate",
         () => {
           const database = cloneDormantDatabase(
             "inventory_036_exact_reviewed_candidate_collision",
@@ -2224,7 +2524,7 @@ test(
               "GIT",
             ],
           ]);
-          assert.equal(liveInventory.length, 1146);
+          assert.equal(liveInventory.length, 1147);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2242,7 +2542,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects an exact retained tuple reused as the dynamic candidate",
+        "migration 037 rejects an exact retained tuple reused as the dynamic candidate",
         () => {
           const database = cloneDormantDatabase(
             "inventory_036_exact_retained_candidate_collision",
@@ -2264,7 +2564,7 @@ test(
               "GIT",
             ],
           ]);
-          assert.equal(liveInventory.length, 1146);
+          assert.equal(liveInventory.length, 1147);
           assertCommandFailure(
             () => assertExactLiveOriginInventory(
               cluster,
@@ -2282,7 +2582,7 @@ test(
       );
 
       await t.test(
-        "migration 036 rejects an unreviewed post-capture deployment with a different SHA",
+        "migration 037 rejects an unreviewed post-capture deployment with a different SHA",
         () => {
           const database = cloneDormantDatabase("inventory_036_different_sha");
           const liveInventory = liveOriginInventoryFor("PREVIEW", [[
@@ -2536,7 +2836,7 @@ test(
           const freshInspection = rpc(
             cluster,
             database,
-            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            "inspect_production_vercel_provider_challenge_abandonment",
             providerChallengeAbandonInspectionInput(issueInput, challenge),
           );
           assert.equal(freshInspection.abandon_eligible, false);
@@ -2547,7 +2847,7 @@ test(
           const eligibleInspection = rpc(
             cluster,
             database,
-            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            "inspect_production_vercel_provider_challenge_abandonment",
             providerChallengeAbandonInspectionInput(issueInput, challenge),
           );
           assert.equal(eligibleInspection.abandon_eligible, true);
@@ -3219,87 +3519,116 @@ test(
             "issue_production_vercel_provider_attestation_challenge",
             issueInput,
           );
-          psql(cluster, database, `
-            update production_control.vercel_provider_attestation_challenges
-            set issued_at = pg_catalog.now() - interval '118 seconds',
-                expires_at = pg_catalog.now() + interval '2 seconds'
-            where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
-          `);
           const consumeInput = providerChallengeConsumeInput(
             input,
             issueInput,
             challenge,
             "challenge-consume-crosses-expiry",
           );
-          const lockHolder = spawnPsql(cluster, database, `
-            begin;
-            select pg_catalog.pg_advisory_xact_lock(${advisoryLockKey});
-            select pg_catalog.pg_sleep(3.00);
-            commit;
-          `);
-          await waitForAdvisoryLocks(cluster, database, {
-            mode: "ExclusiveLock",
-            granted: true,
-            minimum: 1,
-          });
-          const consumeSession = spawnPsql(
-            cluster,
-            database,
-            rpcSql(
-              "consume_production_vercel_provider_attestation_challenge",
-              consumeInput,
-            ),
-          );
-          const consumeDone = consumeSession.done.then(
-            (result) => ({ ok: true, result }),
-            (error) => ({ ok: false, error }),
-          );
-          await waitForAdvisoryLocks(cluster, database, {
-            mode: "ExclusiveLock",
-            granted: false,
-            minimum: 1,
-          });
-          assert.equal(
-            psql(cluster, database, `
-              select pg_catalog.clock_timestamp() < expires_at
-              from production_control.vercel_provider_attestation_challenges
-              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
-            `),
-            "t",
-          );
+          let lockHolder;
+          let consumeSession;
+          try {
+            lockHolder = spawnInteractivePsql(cluster, database);
+            lockHolder.send(`
+              begin;
+              select pg_catalog.pg_advisory_xact_lock(${advisoryLockKey});
+              select 'CROSS_EXPIRY_LOCK_HELD';
+            `);
+            await lockHolder.waitFor("CROSS_EXPIRY_LOCK_HELD");
+            await waitForAdvisoryLocks(cluster, database, {
+              mode: "ExclusiveLock",
+              granted: true,
+              minimum: 1,
+            });
 
-          await lockHolder.done;
-          const consumed = await consumeDone;
-          assert.equal(consumed.ok, false);
-          assert.match(
-            consumed.error.message,
-            /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_EXPIRED/,
-          );
-          assert.equal(
+            consumeSession = spawnPsql(
+              cluster,
+              database,
+              rpcSql(
+                "consume_production_vercel_provider_attestation_challenge",
+                consumeInput,
+              ),
+            );
+            const consumeDone = consumeSession.done.then(
+              (result) => ({ ok: true, result }),
+              (error) => ({ ok: false, error }),
+            );
+            await waitForAdvisoryLocks(cluster, database, {
+              mode: "ExclusiveLock",
+              granted: false,
+              minimum: 1,
+            });
+            assert.equal(
+              psql(cluster, database, `
+                select pg_catalog.clock_timestamp() < expires_at
+                from production_control.vercel_provider_attestation_challenges
+                where challenge_id =
+                  ${sqlLiteral(challenge.challenge_id)}::uuid;
+              `),
+              "t",
+            );
+
+            // The consumer has already entered its transaction and queued on
+            // the advisory lock. Move the challenge across the boundary without
+            // wall-clock sleeps, then release the consumer deterministically.
             psql(cluster, database, `
-              select challenge.status || '|' ||
-                (select count(*) from
-                  production_control.vercel_provider_attestations attestation
-                  where attestation.challenge_id = challenge.challenge_id)
-                || '|' ||
-                (select count(*) from production_control.operation_audit_events event
-                  where event.event_type =
-                    'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_RESERVED'
-                    and event.details->>'challenge_id' = challenge.challenge_id::text)
-              from production_control.vercel_provider_attestation_challenges challenge
-              where challenge.challenge_id =
-                ${sqlLiteral(challenge.challenge_id)}::uuid;
-            `),
-            "ISSUED|0|0",
-          );
-          const inspection = rpc(
-            cluster,
-            database,
-            "inspect_production_vercel_provider_attestation_challenge_abandonment",
-            providerChallengeAbandonInspectionInput(issueInput, challenge),
-          );
-          assert.equal(inspection.abandonment_code, "ELIGIBLE");
-          assert.equal(inspection.abandon_eligible, true);
+              update production_control.vercel_provider_attestation_challenges
+              set issued_at = pg_catalog.clock_timestamp() - interval '179 seconds',
+                  expires_at = pg_catalog.clock_timestamp() - interval '1 minute'
+              where challenge_id = ${sqlLiteral(challenge.challenge_id)}::uuid;
+            `);
+            assert.equal(
+              psql(cluster, database, `
+                select pg_catalog.clock_timestamp() > expires_at
+                from production_control.vercel_provider_attestation_challenges
+                where challenge_id =
+                  ${sqlLiteral(challenge.challenge_id)}::uuid;
+              `),
+              "t",
+            );
+
+            lockHolder.send(`
+              commit;
+              select 'CROSS_EXPIRY_LOCK_RELEASED';
+              \\q
+            `);
+            await lockHolder.waitFor("CROSS_EXPIRY_LOCK_RELEASED");
+            await lockHolder.done;
+
+            const consumed = await consumeDone;
+            assert.equal(consumed.ok, false);
+            assert.match(
+              consumed.error.message,
+              /PRODUCTION_VERCEL_PROVIDER_ATTESTATION_CHALLENGE_EXPIRED/,
+            );
+            assert.equal(
+              psql(cluster, database, `
+                select challenge.status || '|' ||
+                  (select count(*) from
+                    production_control.vercel_provider_attestations attestation
+                    where attestation.challenge_id = challenge.challenge_id)
+                  || '|' ||
+                  (select count(*) from production_control.operation_audit_events event
+                    where event.event_type =
+                      'PRODUCTION_VERCEL_PROVIDER_ATTESTATION_RESERVED'
+                      and event.details->>'challenge_id' = challenge.challenge_id::text)
+                from production_control.vercel_provider_attestation_challenges challenge
+                where challenge.challenge_id =
+                  ${sqlLiteral(challenge.challenge_id)}::uuid;
+              `),
+              "ISSUED|0|0",
+            );
+            const inspection = rpc(
+              cluster,
+              database,
+              "inspect_production_vercel_provider_challenge_abandonment",
+              providerChallengeAbandonInspectionInput(issueInput, challenge),
+            );
+            assert.equal(inspection.abandonment_code, "ELIGIBLE");
+            assert.equal(inspection.abandon_eligible, true);
+          } finally {
+            await terminatePsqlSessions(lockHolder, consumeSession);
+          }
         },
       );
 
@@ -3308,9 +3637,11 @@ test(
         () => {
           const database = cloneDormantDatabase("challenge_abandonment_security");
           for (const rpcName of [
-            "inspect_production_vercel_provider_attestation_challenge_abandonment",
+            "inspect_production_vercel_provider_challenge_abandonment",
             "abandon_production_vercel_provider_attestation_challenge",
           ]) {
+            assert.ok(rpcName.length <= 63,
+              `${rpcName} must survive PostgreSQL identifier storage exactly`);
             assert.equal(
               psql(cluster, database, `
                 select p.prosecdef::text || '|' ||
@@ -3491,7 +3822,7 @@ test(
             "READY",
             "GIT",
           ]]);
-          assert.equal(driftedLiveInventory.length, 1147);
+          assert.equal(driftedLiveInventory.length, 1148);
           const finalizeInput = {
             ...beginInput,
             evidence_id: draining.evidence_id,

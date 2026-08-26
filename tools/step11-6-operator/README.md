@@ -164,9 +164,10 @@ Mac's exact macOS Keychain item. The resulting bundle binds the public signer
 fingerprint, exact Vercel team, signed redacted environment-scope fingerprint,
 and credential-confinement evidence fingerprint.
 
-Migration `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
-also installs a narrow recovery contract for an expired, unconsumed BEGIN
-provider-attestation challenge. Inspection and abandonment are service-role
+Migrations `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
+and `202608260037_production_provider_rpc_name_and_inventory_v3.sql` together
+install the narrow recovery contract for an expired, unconsumed BEGIN
+provider-attestation challenge and its PostgREST-safe inspect RPC. Inspection and abandonment are service-role
 operations bound to the exact original Director, Production resources,
 candidate, rule, purpose, and request identities. Abandonment shares the same
 database transition lock as consumption, uses database time, rejects every
@@ -192,12 +193,13 @@ Step 11 candidate, nine provider-resolved CLI SHAs, one provider-proven
 non-executable blocked deployment with a null SHA, scope/status semantics,
 and credential-capability sets. The operator revalidates only its repository
 binding and refuses caller-supplied origin matrices/fingerprints. The control
-route loads the artifact server-side and additionally requires the five exact
+route loads the artifact server-side and additionally requires the six exact
 reviewed post-capture Preview deployments pinned by additive migrations
 `202608260035_production_reviewed_post_capture_preview_deployments.sql` and
-`202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`. Their
+`202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
+plus `202608260037_production_provider_rpc_name_and_inventory_v3.sql`. Their
 ordered tuple-set fingerprint is
-`9262c1d4edc14259d442c29aa25d04f90b21961ed2124d422e6f77b4e3e49c00`.
+`2a0f75de0e4f2178c03cb98f8adb264b3f661b28025b51a70b29800aa30b5724`.
 Only provider-signed same-current-SHA deployments in the target-appropriate
 scope may extend that required set; all other additions fail closed. The route
 then adds four fixed aliases and the current candidate alias. If the signed
@@ -209,12 +211,12 @@ historical/candidate writer routes plus `DELETE /api/tournament-guide`. It
 writes the immutable inventory and compact per-origin nine-vector proofs to the
 durable RPCs. The database validates the exact signed live origin set, coverage
 mask, ordered per-vector proof fingerprints, and dynamically derived logical
-origin×vector expansion. The minimum Step 11.6 signed live inventory is 1,146
-immutable origins (1,140 retained + 5 reviewed + 1 exact dynamic candidate),
-which produces 1,151 probed origins and 10,359 requests per snapshot after the
+origin×vector expansion. The minimum Step 11.6 signed live inventory is 1,147
+immutable origins (1,140 retained + 6 reviewed + 1 exact dynamic candidate),
+which produces 1,152 probed origins and 10,368 requests per snapshot after the
 five fixed/candidate aliases. A normal Step 12 Preview-plus-Production candidate
-pair adds at least one more same-SHA immutable origin, producing at least 1,152
-probed origins and 10,368 requests. The provider-signed inventory and durable
+pair adds at least one more same-SHA immutable origin, producing at least 1,153
+probed origins and 10,377 requests. The provider-signed inventory and durable
 receipt remain authoritative when additional exact same-SHA redeploys exist.
 
 The five alias entries are fixed diagnostic canaries, not a claim that Vercel

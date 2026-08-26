@@ -229,8 +229,8 @@ test("local attester exhausts deployment pagination, accepts additive scope, and
   const fixture = provider(selectedRequest);
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
   assert.equal(scope.retainedRecordCount, 1140);
-  assert.equal(scope.liveRecordCount, 1147);
-  assert.equal(scope.liveRecords.length, 1147);
+  assert.equal(scope.liveRecordCount, 1148);
+  assert.equal(scope.liveRecords.length, 1148);
   assert.equal(scope.paginationComplete, true);
   assert.equal(scope.pageCount, 12);
   assert.equal(scope.liveRecords.filter((tuple) => tuple[1] === null).length, 1,
@@ -253,13 +253,13 @@ test("local attester exhausts deployment pagination, accepts additive scope, and
     !JSON.stringify(environment).includes(secret)));
 });
 
-test("exact retained plus reviewed plus candidate 1,146-origin scope is accepted", async () => {
+test("exact retained plus reviewed plus candidate 1,147-origin scope is accepted", async () => {
   const selectedRequest = request();
   const fixture = provider(selectedRequest, { includePostFreeze: false });
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
   assert.equal(scope.retainedRecordCount, 1140);
-  assert.equal(scope.liveRecordCount, 1146);
-  assert.equal(scope.liveRecords.length, 1146);
+  assert.equal(scope.liveRecordCount, 1147);
+  assert.equal(scope.liveRecords.length, 1147);
   assert.deepEqual(
     scope.liveRecords.filter((tuple) =>
       PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
@@ -296,7 +296,7 @@ test("signed BEGIN and independently signed FINALIZE attestations bind Preview s
   assert.equal(verifiedBegin.signatureVerified, true);
   assert.equal(verifiedBegin.stage, "BEGIN");
   assert.equal(verifiedBegin.candidateDeploymentTarget, "PREVIEW");
-  assert.equal(verifiedBegin.liveOriginInventoryCount, 1147);
+  assert.equal(verifiedBegin.liveOriginInventoryCount, 1148);
   assert.equal(verifiedBegin.routingRulePendingDraftChangeCount, 0);
   assert.equal(verifiedBegin.credentialConfinementEvidenceSchema,
     PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_SCHEMA);
@@ -590,7 +590,7 @@ test("only exact reviewed post-capture Preview deployments extend the live scope
   const selectedRequest = request();
   const fixture = provider(selectedRequest);
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
-  assert.equal(scope.liveRecordCount, 1147);
+  assert.equal(scope.liveRecordCount, 1148);
   assert.deepEqual(
     scope.liveRecords.filter((tuple) =>
       PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
