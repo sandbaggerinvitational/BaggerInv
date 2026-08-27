@@ -422,6 +422,12 @@ test("environment requires exact candidate SHA/branch/workbook and separated pub
   assert.equal(ready.safety.automaticRestore, true);
   assert.equal(ready.safety.protectedIdentityScope, "LEGACY_SERVICE_ACCOUNT_ONLY");
   assert.equal(ready.safety.spreadsheetOwnerOverrideTested, false);
+  assert.equal(ready.safety.allMethodFenceRequiredHostCount, 8);
+  assert.equal(ready.safety.allMethodFenceRequiredHostsFingerprint,
+    "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d");
+  assert.equal(ready.safety.allMethodFenceRequiredPathCount, 1);
+  assert.equal(ready.safety.allMethodFenceRequiredPathsFingerprint,
+    "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa");
   assert.equal(productionGoogleWriterFenceRehearsalEnvironment(environment({
     VERCEL_GIT_COMMIT_REF: "main",
   })).allowed, false);
@@ -871,6 +877,12 @@ test("route and pages require mode-specific same-origin Director auth and exact 
   assert.match(route, /verifyVercelProviderAttestation/);
   assert.match(route, /reserveChallenge/);
   assert.doesNotMatch(route, /attestationId:\s*challenge\.challengeId/);
+  assert.match(route,
+    /current - providerObservedAt >[\s\S]{0,120}VERCEL_PROVIDER_ATTESTATION_INITIAL_MAX_AGE_SECONDS/);
+  assert.match(route,
+    /initialMaxAgeSeconds:\s*[\s\S]{0,120}VERCEL_PROVIDER_ATTESTATION_INITIAL_MAX_AGE_SECONDS/);
+  assert.doesNotMatch(route,
+    /initialMaxAgeSeconds:\s*challenge\.status === "CONSUMED"\s*\?\s*1_800/);
   assert.ok(route.indexOf("verifyVercelProviderAttestation(") <
     route.indexOf("dependencies.quiesce.reserveChallenge("));
   assert.ok(route.indexOf("dependencies.quiesce.reserveChallenge(") <
@@ -878,9 +890,21 @@ test("route and pages require mode-specific same-origin Director auth and exact 
   assert.match(receiptAdapter, /originInventoryTuples/);
   assert.match(receiptAdapter,
     /consume_production_vercel_provider_attestation_challenge/);
+  assert.match(receiptAdapter,
+    /finalize_production_vercel_writer_quiesce_evidence[\s\S]{0,900}?authenticated_actor_fingerprint/);
+  assert.match(receiptAdapter,
+    /productionWriterQuiesceRoutingRulePayload\(routingRule\)/);
+  assert.match(route, /routingRuleAllMethodFenceRequiredPathCount/);
+  assert.match(route, /routingRuleAllMethodFenceRequiredPathsFingerprint/);
   assert.match(page, /notFound\(\)/);
   assert.match(persistentPage, /production-director-entitlement/);
   for (const label of ["Inspect", "Apply Rehearsal Fence", "Restore"]) assert.match(client, new RegExp(label));
+  for (const browserClient of [client, persistentClient]) {
+    assert.match(browserClient, /allMethodFenceRequiredHostCount:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredHostCount/);
+    assert.match(browserClient, /allMethodFenceRequiredHostsFingerprint:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredHostsFingerprint/);
+    assert.match(browserClient, /allMethodFenceRequiredPathCount:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredPathCount/);
+    assert.match(browserClient, /allMethodFenceRequiredPathsFingerprint:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredPathsFingerprint/);
+  }
   assert.match(client, /credentials:\s*"same-origin"/);
   assert.match(persistentClient, /credentials:\s*"same-origin"/);
   assert.match(persistentClient, /quiesceEvidenceId:\s*state\.quiesceEvidenceId/);

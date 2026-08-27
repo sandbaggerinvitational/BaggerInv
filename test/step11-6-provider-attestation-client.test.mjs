@@ -24,7 +24,7 @@ const nextId = (values = ids) => {
   return () => values[index++];
 };
 
-function challenge(state, stage, status = "ISSUED") {
+function challenge(state, stage, status = "ISSUED", purpose = "REHEARSAL") {
   const prefix = stage === "BEGIN" ? "begin" : "finalize";
   return {
     found: true,
@@ -34,7 +34,7 @@ function challenge(state, stage, status = "ISSUED") {
     evidenceRequestId: state.evidenceRequestId,
     challengeRequestFingerprint: "a".repeat(64),
     stage,
-    purpose: "REHEARSAL",
+    purpose,
     status,
     vercelProjectId: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
     vercelTeamId: "team_12345678",
@@ -97,6 +97,20 @@ function envelopeFor(value) {
       routingRuleId: value.routingRuleId,
       routingRuleConfigVersion: value.routingRuleConfigVersion,
     },
+  };
+}
+
+function abandonedConsumedProviderAttestation(value, abandonedAt) {
+  return {
+    attestation_id: value.consumedAttestationId,
+    attestation_fingerprint: value.consumedAttestationFingerprint,
+    challenge_id: value.challengeId,
+    operation_request_id: value.operationRequestId,
+    evidence_request_id: value.evidenceRequestId,
+    stage: value.stage,
+    status: "ABANDONED",
+    binding_expires_at: "2026-08-26T19:03:30.000Z",
+    abandoned_at: abandonedAt,
   };
 }
 
@@ -188,7 +202,7 @@ test("only an exact durable CONSUMED reservation permits envelope-free lost-resp
   }, state, "BEGIN", "REHEARSAL"), /did not match this stage/i);
 });
 
-test("only an exact authoritative ABANDONED receipt clears retained BEGIN recovery", () => {
+test("migration 036 reasonless unconsumed BEGIN remains an exact read-only lost-response recovery", () => {
   const initial = ensureProviderAttestationStageState({}, "BEGIN", nextId());
   const issued = validateProviderAttestationChallenge(
     challenge(initial, "BEGIN"), initial, "BEGIN", "REHEARSAL",
@@ -247,9 +261,11 @@ test("only an exact authoritative ABANDONED receipt clears retained BEGIN recove
   assert.deepEqual(cleared, {
     baseline: "a".repeat(64),
     canonicalValues: "b".repeat(64),
+    routingRuleId: issued.routingRuleId,
+    routingRuleRevision: issued.routingRuleConfigVersion,
   });
   for (const key of [
-    "routingRuleId", "routingRuleRevision", "evidenceRequestId",
+    "evidenceRequestId",
     "beginOperationRequestId", "beginChallengeRequestId", "beginConsumeRequestId",
     "beginAbandonRequestId", "beginProviderChallenge",
     "beginProviderAttestationRequest", "beginSignedProviderAttestation",
@@ -295,6 +311,211 @@ test("only an exact authoritative ABANDONED receipt clears retained BEGIN recove
     retained,
     { ...abandoned, routingRuleConfigVersion: "revision-mismatch" },
     "REHEARSAL",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+
+  const finalizedState = ensureProviderAttestationStageState(
+    initial, "FINALIZE", nextId(ids.slice(4)),
+  );
+  const finalized = challenge(finalizedState, "FINALIZE");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    {
+      ...finalizedState,
+      quiesceEvidenceId: ids[15],
+      quiesceStatus: "DRAINING",
+      finalizeAbandonRequestId: ids[12],
+      finalizeProviderChallenge: finalized,
+    },
+    {
+      ...finalized,
+      status: "ABANDONED",
+      abandonEligible: false,
+      abandonmentCode: "ABANDONED",
+      abandonRequestId: ids[12],
+      abandonRequestFingerprint: "f".repeat(64),
+      abandonedAt: "2026-08-26T19:03:00.000Z",
+      serverObservedAt: "2026-08-26T19:03:01.000Z",
+    },
+    "REHEARSAL",
+    "FINALIZE",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID",
+  "reasonless compatibility must remain limited to migration 036 BEGIN rows");
+});
+
+test("stale CONSUMED unbound BEGIN can be abandoned without losing the installed routing rule", () => {
+  const initial = ensureProviderAttestationStageState({}, "BEGIN", nextId());
+  const consumed = validateProviderAttestationChallenge(
+    challenge(initial, "BEGIN", "CONSUMED"), initial, "BEGIN", "REHEARSAL",
+  );
+  const retained = {
+    ...initial,
+    routingRuleId: consumed.routingRuleId,
+    routingRuleRevision: consumed.routingRuleConfigVersion,
+    quiesceStatus: "PROBING",
+    beginAbandonRequestId: ids[12],
+    beginProviderChallenge: consumed,
+  };
+  const eligible = {
+    ...consumed,
+    abandonEligible: true,
+    abandonmentCode: "ELIGIBLE_CONSUMED_UNBOUND",
+    serverObservedAt: "2026-08-26T19:03:31.000Z",
+  };
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained, eligible, "REHEARSAL", "BEGIN",
+  ), true);
+  assert.equal(buildRetainedProviderAttestationChallengePayload(
+    retained, "REHEARSAL", "BEGIN",
+  ).providerRetainedChallenge.status, "CONSUMED");
+
+  const abandoned = {
+    ...consumed,
+    status: "ABANDONED",
+    abandonEligible: false,
+    abandonmentCode: "ABANDONED",
+    abandonmentReason:
+      "EXPIRED_CONSUMED_UNBOUND_PROVIDER_ATTESTATION_SUPERSEDED",
+    abandonRequestId: retained.beginAbandonRequestId,
+    abandonRequestFingerprint: "f".repeat(64),
+    abandonedAt: "2026-08-26T19:03:40.000Z",
+    serverObservedAt: "2026-08-26T19:03:41.000Z",
+    consumedAt: "2026-08-26T19:01:00.000Z",
+    consumedProviderAttestation: abandonedConsumedProviderAttestation(
+      consumed, "2026-08-26T19:03:40.000Z",
+    ),
+  };
+  const cleared = discardAbandonedProviderAttestationAttempt(
+    retained, abandoned, "REHEARSAL", "BEGIN",
+  );
+  assert.equal(cleared.routingRuleId, consumed.routingRuleId);
+  assert.equal(cleared.routingRuleRevision, consumed.routingRuleConfigVersion);
+  assert.equal("evidenceRequestId" in cleared, false);
+  assert.equal("beginProviderChallenge" in cleared, false);
+  assert.equal("quiesceStatus" in cleared, false);
+});
+
+test("stale CONSUMED unbound FINALIZE can be abandoned while its DRAINING evidence remains intact", () => {
+  const createId = nextId();
+  const begin = ensureProviderAttestationStageState({}, "BEGIN", createId);
+  const state = ensureProviderAttestationStageState(begin, "FINALIZE", createId);
+  const consumed = validateProviderAttestationChallenge(
+    challenge(state, "FINALIZE", "CONSUMED"),
+    state, "FINALIZE", "REHEARSAL",
+  );
+  const retained = {
+    ...state,
+    quiesceEvidenceId: ids[15],
+    quiesceStatus: "DRAINING",
+    finalizeAbandonRequestId: ids[12],
+    finalizeProviderChallenge: consumed,
+  };
+  const eligible = {
+    ...consumed,
+    abandonEligible: true,
+    abandonmentCode: "ELIGIBLE_CONSUMED_UNBOUND",
+    serverObservedAt: "2026-08-26T19:03:31.000Z",
+  };
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained, eligible, "REHEARSAL", "FINALIZE",
+  ), true);
+  const abandoned = {
+    ...consumed,
+    status: "ABANDONED",
+    abandonEligible: false,
+    abandonmentCode: "ABANDONED",
+    abandonmentReason:
+      "EXPIRED_CONSUMED_UNBOUND_PROVIDER_ATTESTATION_SUPERSEDED",
+    abandonRequestId: retained.finalizeAbandonRequestId,
+    abandonRequestFingerprint: "f".repeat(64),
+    abandonedAt: "2026-08-26T19:03:40.000Z",
+    serverObservedAt: "2026-08-26T19:03:41.000Z",
+    consumedAt: "2026-08-26T19:01:00.000Z",
+    consumedProviderAttestation: abandonedConsumedProviderAttestation(
+      consumed, "2026-08-26T19:03:40.000Z",
+    ),
+  };
+  const cleared = discardAbandonedProviderAttestationAttempt(
+    retained, abandoned, "REHEARSAL", "FINALIZE",
+  );
+  assert.equal(cleared.evidenceRequestId, retained.evidenceRequestId);
+  assert.equal(cleared.quiesceEvidenceId, ids[15]);
+  assert.equal(cleared.quiesceStatus, "DRAINING");
+  assert.equal(cleared.beginOperationRequestId, retained.beginOperationRequestId);
+  assert.equal("finalizeOperationRequestId" in cleared, false);
+  assert.equal("finalizeProviderChallenge" in cleared, false);
+});
+
+test("abandoning an unbound BEGIN refresh restores the exact prior VERIFIED evidence", () => {
+  const initial = ensureProviderAttestationStageState({}, "BEGIN", nextId());
+  const consumed = validateProviderAttestationChallenge(
+    challenge(initial, "BEGIN", "CONSUMED", "CUTOVER"),
+    initial, "BEGIN", "CUTOVER",
+  );
+  const retained = {
+    ...initial,
+    quiesceEvidenceId: ids[15],
+    priorEvidenceIdForCycle: ids[15],
+    quiesceRefreshPending: true,
+    quiesceStatus: "REFRESH_PENDING",
+    fenceId: ids[14],
+    beginAbandonRequestId: ids[12],
+    beginProviderChallenge: consumed,
+  };
+  const eligible = {
+    ...consumed,
+    abandonEligible: true,
+    abandonmentCode: "ELIGIBLE_CONSUMED_UNBOUND",
+    serverObservedAt: "2026-08-26T19:03:31.000Z",
+  };
+  assert.equal(canAbandonRetainedProviderAttestationChallenge(
+    retained, eligible, "CUTOVER", "BEGIN",
+  ), true);
+  const abandoned = {
+    ...consumed,
+    status: "ABANDONED",
+    abandonEligible: false,
+    abandonmentCode: "ABANDONED",
+    abandonmentReason:
+      "EXPIRED_CONSUMED_UNBOUND_PROVIDER_ATTESTATION_SUPERSEDED",
+    abandonRequestId: retained.beginAbandonRequestId,
+    abandonRequestFingerprint: "f".repeat(64),
+    abandonedAt: "2026-08-26T19:03:40.000Z",
+    serverObservedAt: "2026-08-26T19:03:41.000Z",
+    consumedAt: "2026-08-26T19:01:00.000Z",
+    consumedProviderAttestation: abandonedConsumedProviderAttestation(
+      consumed, "2026-08-26T19:03:40.000Z",
+    ),
+  };
+  const restored = discardAbandonedProviderAttestationAttempt(
+    retained, abandoned, "CUTOVER", "BEGIN",
+  );
+  assert.equal(restored.quiesceEvidenceId, ids[15]);
+  assert.equal(restored.quiesceStatus, "VERIFIED");
+  assert.equal(restored.quiesceRefreshPending, false);
+  assert.equal(restored.fenceId, ids[14]);
+  assert.equal("priorEvidenceIdForCycle" in restored, false);
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    {
+      ...abandoned,
+      consumedProviderAttestation: {
+        ...abandoned.consumedProviderAttestation,
+        status: "BOUND",
+      },
+    },
+    "CUTOVER",
+    "BEGIN",
+  ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
+  assert.throws(() => discardAbandonedProviderAttestationAttempt(
+    retained,
+    {
+      ...abandoned,
+      consumedProviderAttestation: {
+        ...abandoned.consumedProviderAttestation,
+        attestation_id: ids[13],
+      },
+    },
+    "CUTOVER",
+    "BEGIN",
   ), (error) => error.code === "PROVIDER_ATTESTATION_ABANDON_RECEIPT_INVALID");
 });
 
@@ -391,6 +612,15 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
     assert.match(source, /buildProviderQuiesceStagePayload/);
     assert.match(source, /disabled=\{Boolean\(busy\)[\s\S]{0,120}!beginExecutable/);
     assert.match(source, /disabled=\{Boolean\(busy\)[\s\S]{0,160}!finalizeExecutable/);
+    assert.match(source, /allMethodFenceRequiredHostCount:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredHostCount/);
+    assert.match(source, /allMethodFenceRequiredHostsFingerprint:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredHostsFingerprint/);
+    assert.match(source, /allMethodFenceRequiredPathCount:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredPathCount/);
+    assert.match(source, /allMethodFenceRequiredPathsFingerprint:\s*[\s\S]{0,100}environment\.safety\.allMethodFenceRequiredPathsFingerprint/);
+    assert.match(source,
+      /inspection\.status === "CONSUMED"[\s\S]{0,100}\[keys\.challengeKey\]: inspection/,
+      "authoritative inspection must promote a locally ISSUED challenge after a lost consume response");
+    assert.match(source, /Inspect retained FINALIZE challenge/);
+    assert.match(source, /Abandon stale unbound FINALIZE challenge/);
   }
   assert.match(rehearsal, /Safe diagnostics/);
   assert.match(rehearsal, /JSON\.stringify\(error\.diagnostics, null, 2\)/);
@@ -403,8 +633,9 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
   assert.ok(rehearsal.indexOf("inspect-retained-provider-attestation-challenge") <
     rehearsal.indexOf("abandon-provider-attestation-challenge"));
   assert.match(rehearsal, /setOwnerFreezeConfirmed\(false\)/);
-  assert.match(rehearsal, /setRoutingRuleId\(""\)/);
-  assert.match(rehearsal, /setRoutingRuleRevision\(""\)/);
+  assert.doesNotMatch(rehearsal, /setRoutingRuleId\(""\)/,
+    "a still-installed provider rule must remain retained for a fresh challenge");
+  assert.doesNotMatch(rehearsal, /setRoutingRuleRevision\(""\)/);
   assert.doesNotMatch(rehearsal,
     /localStorage(?:\?\.|\.)(?:clear|removeItem)\s*\(/);
   assert.doesNotMatch(rehearsal,
@@ -415,7 +646,7 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
     rehearsal.indexOf("async function issueChallenge"),
   );
   assert.match(abandonFunction,
-    /const beginAbandonRequestId = recovery\.beginAbandonRequestId \|\| requestId\(\)/);
+    /const abandonRequestId = recovery\[keys\.abandonRequestKey\] \|\| requestId\(\)/);
   assert.ok(abandonFunction.indexOf("storeExact(stable)") <
     abandonFunction.indexOf('"abandon-provider-attestation-challenge"'),
   "the stable abandonment identity must be retained before the request");
@@ -464,5 +695,24 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
     "the obsolete overlength PostgREST RPC name must not return");
   assert.match(receiptAdapter, /inspectRetainedChallenge/);
   assert.match(receiptAdapter, /abandonChallenge/);
+  const abandonAdapter = receiptAdapter.slice(
+    receiptAdapter.indexOf("abandonChallenge: async"),
+    receiptAdapter.indexOf("reserveChallenge: async"),
+  );
+  assert.match(abandonAdapter,
+    /if \(durableStatus === "ABANDONED"\)[\s\S]*return inspected;/,
+    "an already-terminal challenge must be returned from read-only inspection");
+  assert.ok(abandonAdapter.indexOf("return inspected;") <
+    abandonAdapter.indexOf('"abandon_production_vercel_provider_attestation_challenge"'),
+  "migration 036 lost-response recovery must not mutate the historical row");
+  assert.doesNotMatch(abandonAdapter,
+    /durableReason \|\|[\s\S]{0,100}EXPIRED_UNCONSUMED_BEGIN_SUPERSEDED/,
+  "the adapter must not fabricate a reason for an immutable migration 036 receipt");
+  assert.match(abandonAdapter, /abandon_request_id \|\| inspected\.abandonRequestId/);
+  assert.match(abandonAdapter,
+    /abandon_request_fingerprint[\s\S]{0,80}inspected\.abandonRequestFingerprint/);
   assert.match(receiptAdapter, /EXPIRED_UNCONSUMED_BEGIN_SUPERSEDED/);
+  assert.match(receiptAdapter, /EXPIRED_UNCONSUMED_FINALIZE_SUPERSEDED/);
+  assert.match(receiptAdapter,
+    /EXPIRED_CONSUMED_UNBOUND_PROVIDER_ATTESTATION_SUPERSEDED/);
 });

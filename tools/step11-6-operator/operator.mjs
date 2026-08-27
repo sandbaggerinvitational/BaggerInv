@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 export const FIXED = Object.freeze({
-  schemaVersion: "bagger-step11.6-operator-v2",
+  schemaVersion: "bagger-step11.6-operator-v3",
   environment: "PRODUCTION",
   projectRef: "ymqhhtxaywtqllynrmxe",
   projectUrl: "https://ymqhhtxaywtqllynrmxe.supabase.co",
@@ -27,31 +27,49 @@ export const FIXED = Object.freeze({
   ownerFreezeConfirmation: "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS CUTOVER",
   quiesceScope: "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
   originInventoryArtifact: "docs/evidence/step11-6-production-origin-inventory.json",
-  originInventorySchema: "step11-6-production-origin-inventory-v2",
-  originInventoryCount: 1140,
-  originInventoryFingerprint: "533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6",
+  originInventorySchema: "step11-6-production-origin-inventory-v3",
+  originInventoryCount: 1291,
+  originInventoryFingerprint: "d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6",
+  providerInventoryCount: 1291,
+  providerInventoryFingerprint:
+    "6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692",
   credentialConfinementArtifact:
     "docs/evidence/step11-6-production-google-credential-confinement.json",
   credentialConfinementSchema:
-    "step11-6-production-google-credential-confinement-v1",
-  credentialConfinementRecordCount: 1140,
+    "step11-6-production-google-credential-confinement-v2",
+  credentialConfinementRecordCount: 1291,
   credentialConfinementRecordsFingerprint:
-    "c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508",
+    "9ce65239f41086f56ea126e2491afe36ae90e85172a8536706f549912b27979b",
   credentialConfinementEvidenceFingerprint:
-    "1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df",
+    "071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133",
+  allMethodFenceRequiredHostCount: 8,
+  allMethodFenceRequiredHostsFingerprint:
+    "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+  historicalSafeMethodWriterArtifact:
+    "docs/evidence/step11-6-historical-safe-method-google-writer.json",
+  historicalSafeMethodWriterSchema:
+    "step11-6-historical-safe-method-google-writer-v1",
+  historicalSafeMethodWriterEvidenceFingerprint:
+    "6bf411a2e119e8552e6b3ac9ac51d8828e9fc853e5c43069dc40c31a6e794f28",
+  historicalSafeMethodWriterAffectedOriginCount: 236,
+  historicalSafeMethodWriterAffectedOriginsFingerprint:
+    "a8263e02ab7b65df938367fbf39769c70b501a614ebcdfa46800bda2e82de3a2",
+  allMethodFenceRequiredPathCount: 1,
+  allMethodFenceRequiredPathsFingerprint:
+    "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
   requiredPriorLiveDeploymentId: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
   requiredFrozenStep11DeploymentId: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-  reviewedPostCaptureDeploymentCount: 7,
-  reviewedPostCaptureDeploymentFingerprint:
-    "91cdd7ab6fc077cb422c4b8921a0ac431ddf38f043167c457cc7ad4cc288a01a",
-  minimumLiveOriginInventoryCount: 1140 + 7 + 1,
+  originInventoryCapturedAt: "2026-08-26T23:27:14.195Z",
+  originInventoryPageRecordsFingerprint:
+    "52d6db20fa7adf18aeb9678d0adc7b984855ae0315851e1fdf21e3c49e0d8b38",
+  minimumLiveOriginInventoryCount: 1291,
+  maximumLiveOriginInventoryCount: 1291 + 1,
   quiesceFixedAliasOriginCount: 4,
   quiesceCandidateAliasOriginCount: 1,
-  quiesceProbeVectorCount: 9,
+  quiesceProbeVectorCount: 11,
   migrationName:
-    "202608260038_production_provider_preview_target_inventory_v4.sql",
-  migrationSha256:
-    "32cc5994570aaa77679b19e14a71a917dcc7fe297bc559ebe82dd320bff94c4c",
+    "202608260039_production_all_project_provider_inventory_v3.sql",
+  migrationSha256: "14f1233ac8c61461ffdeae1df8b8be90a81c1236076d7493168a3542fddcda96",
   runbook: "docs/step12-production-cutover-runbook-v2.md",
 });
 
@@ -93,8 +111,12 @@ const AUTHORITY_SENSITIVE_FIELDS = new Set([
 const PROVIDER_ACTIONS = new Set([
   "issue-begin-provider-attestation-challenge",
   "inspect-begin-provider-attestation-challenge",
+  "inspect-begin-provider-attestation-abandonment",
+  "abandon-begin-provider-attestation-challenge",
   "issue-finalize-provider-attestation-challenge",
   "inspect-finalize-provider-attestation-challenge",
+  "inspect-finalize-provider-attestation-abandonment",
+  "abandon-finalize-provider-attestation-challenge",
   "begin-provider-quiesce",
   "finalize-provider-quiesce",
   "inspect-provider-quiesce",
@@ -106,7 +128,9 @@ const PROVIDER_ACTIONS = new Set([
 
 const PROVIDER_READ_ONLY_ACTIONS = new Set([
   "inspect-begin-provider-attestation-challenge",
+  "inspect-begin-provider-attestation-abandonment",
   "inspect-finalize-provider-attestation-challenge",
+  "inspect-finalize-provider-attestation-abandonment",
   "inspect-provider-quiesce",
   "inspect-persistent-provider-fence",
 ]);
@@ -115,7 +139,9 @@ const OWNER_AUTHORIZATION_EXEMPT = new Set([
   "inspect",
   "inspect-scoring-admission",
   "inspect-begin-provider-attestation-challenge",
+  "inspect-begin-provider-attestation-abandonment",
   "inspect-finalize-provider-attestation-challenge",
+  "inspect-finalize-provider-attestation-abandonment",
   "inspect-provider-quiesce",
   "inspect-persistent-provider-fence",
   "capture-final-google-fingerprint",
@@ -147,6 +173,18 @@ const PROVIDER_ACTION_INPUT_KEYS = Object.freeze({
     "providerChallengeId", "expectedCommitSha", "expectedWorkbookId",
     "expectedBranch", "expectedDirectorPlayerId", "quiescePurpose", "routingRule",
   ],
+  "inspect-begin-provider-attestation-abandonment": [
+    "action", "operationRequestId", "evidenceRequestId", "challengeRequestId",
+    "providerAttestationStage", "providerChallengeId", "providerRetainedChallenge",
+    "expectedCommitSha", "expectedWorkbookId", "expectedBranch",
+    "expectedDirectorPlayerId", "quiescePurpose",
+  ],
+  "abandon-begin-provider-attestation-challenge": [
+    "action", "operationRequestId", "evidenceRequestId", "challengeRequestId",
+    "providerAttestationStage", "providerChallengeId", "providerRetainedChallenge",
+    "abandonRequestId", "expectedCommitSha", "expectedWorkbookId",
+    "expectedBranch", "expectedDirectorPlayerId", "quiescePurpose",
+  ],
   "issue-finalize-provider-attestation-challenge": [
     "action", "operationRequestId", "challengeRequestId", "evidenceRequestId",
     "providerAttestationStage", "expectedCommitSha", "expectedWorkbookId",
@@ -156,6 +194,18 @@ const PROVIDER_ACTION_INPUT_KEYS = Object.freeze({
     "action", "operationRequestId", "evidenceRequestId", "providerAttestationStage",
     "providerChallengeId", "expectedCommitSha", "expectedWorkbookId",
     "expectedBranch", "expectedDirectorPlayerId", "quiescePurpose", "routingRule",
+  ],
+  "inspect-finalize-provider-attestation-abandonment": [
+    "action", "operationRequestId", "evidenceRequestId", "challengeRequestId",
+    "providerAttestationStage", "providerChallengeId", "providerRetainedChallenge",
+    "expectedCommitSha", "expectedWorkbookId", "expectedBranch",
+    "expectedDirectorPlayerId", "quiescePurpose",
+  ],
+  "abandon-finalize-provider-attestation-challenge": [
+    "action", "operationRequestId", "evidenceRequestId", "challengeRequestId",
+    "providerAttestationStage", "providerChallengeId", "providerRetainedChallenge",
+    "abandonRequestId", "expectedCommitSha", "expectedWorkbookId",
+    "expectedBranch", "expectedDirectorPlayerId", "quiescePurpose",
   ],
   "begin-provider-quiesce": [
     "action", "operationRequestId", "expectedCommitSha", "expectedWorkbookId",
@@ -308,6 +358,16 @@ export const OPERATIONS = Object.freeze({
     endpoint: FIXED.providerControlEndpoint,
     receiptRpcs: ["inspect_production_vercel_provider_attestation_challenge"],
   },
+  "inspect-begin-provider-attestation-abandonment": {
+    kind: "provider-read-only-payload", rpc: null,
+    endpoint: FIXED.providerControlEndpoint,
+    receiptRpcs: ["inspect_production_vercel_provider_challenge_abandonment"],
+  },
+  "abandon-begin-provider-attestation-challenge": {
+    kind: "provider-action-payload", rpc: null,
+    endpoint: FIXED.providerControlEndpoint,
+    receiptRpcs: ["abandon_production_vercel_provider_attestation_challenge"],
+  },
   "issue-finalize-provider-attestation-challenge": {
     kind: "provider-action-payload", rpc: null,
     endpoint: FIXED.providerControlEndpoint,
@@ -317,6 +377,16 @@ export const OPERATIONS = Object.freeze({
     kind: "provider-read-only-payload", rpc: null,
     endpoint: FIXED.providerControlEndpoint,
     receiptRpcs: ["inspect_production_vercel_provider_attestation_challenge"],
+  },
+  "inspect-finalize-provider-attestation-abandonment": {
+    kind: "provider-read-only-payload", rpc: null,
+    endpoint: FIXED.providerControlEndpoint,
+    receiptRpcs: ["inspect_production_vercel_provider_challenge_abandonment"],
+  },
+  "abandon-finalize-provider-attestation-challenge": {
+    kind: "provider-action-payload", rpc: null,
+    endpoint: FIXED.providerControlEndpoint,
+    receiptRpcs: ["abandon_production_vercel_provider_attestation_challenge"],
   },
   "begin-provider-quiesce": {
     kind: "provider-action-payload",
@@ -457,6 +527,13 @@ function requireResolved(value, pattern, code, label) {
   return requirePattern(value, pattern, code, label);
 }
 
+function requireExactResolved(value, pattern, code, label) {
+  const selected = requireString(value, code, label);
+  if (unresolved(selected)) refuse(code, `${label} is still an unresolved placeholder.`);
+  if (!pattern.test(selected)) refuse(code, `${label} has an invalid format.`);
+  return selected;
+}
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -503,12 +580,76 @@ function exactProductionOrigin(value) {
 
 let retainedOriginInventoryBinding;
 let retainedOriginInventoryOrigins;
+let retainedOriginInventoryDeploymentIds;
+let retainedOriginInventoryByOrigin;
+let retainedOriginInventoryByDeploymentId;
 let credentialConfinementBinding;
+let historicalSafeMethodWriterBinding;
+
+export function productionHistoricalSafeMethodWriterBinding() {
+  if (historicalSafeMethodWriterBinding) return historicalSafeMethodWriterBinding;
+  let artifact;
+  try {
+    artifact = JSON.parse(readFileSync(new URL(
+      "../../docs/evidence/step11-6-historical-safe-method-google-writer.json",
+      import.meta.url,
+    ), "utf8"));
+  } catch {
+    refuse("HISTORICAL_SAFE_METHOD_WRITER_ARTIFACT_UNAVAILABLE",
+      "The historical safe-method Google-writer artifact could not be loaded.");
+  }
+  const { evidenceFingerprint, ...base } = artifact;
+  const writer = artifact.historicalSafeMethodWriter;
+  const contract = artifact.providerFenceContract;
+  const paths = contract?.blockedRequestPaths;
+  const origins = writer?.affectedReadyOrigins;
+  if (artifact.schemaVersion !== FIXED.historicalSafeMethodWriterSchema ||
+      artifact.originInventorySchemaVersion !== FIXED.originInventorySchema ||
+      artifact.originInventoryProviderRecordCount !== FIXED.providerInventoryCount ||
+      artifact.originInventoryProviderRecordsFingerprint !==
+        FIXED.providerInventoryFingerprint ||
+      evidenceFingerprint !== FIXED.historicalSafeMethodWriterEvidenceFingerprint ||
+      sha256Hex(JSON.stringify(base)) !== evidenceFingerprint ||
+      writer?.operationClass !== "MIRROR_ARCHIVE" ||
+      writer?.writerIntent !== "MIRROR_ARCHIVE" ||
+      writer?.affectedReadyOriginCount !==
+        FIXED.historicalSafeMethodWriterAffectedOriginCount ||
+      !Array.isArray(origins) || origins.length !==
+        FIXED.historicalSafeMethodWriterAffectedOriginCount ||
+      sha256Hex(JSON.stringify(origins)) !==
+        FIXED.historicalSafeMethodWriterAffectedOriginsFingerprint ||
+      !Array.isArray(paths) || paths.length !==
+        FIXED.allMethodFenceRequiredPathCount ||
+      sha256Hex(JSON.stringify(paths)) !==
+        FIXED.allMethodFenceRequiredPathsFingerprint ||
+      contract?.blockedRequestPathsFingerprint !==
+        FIXED.allMethodFenceRequiredPathsFingerprint ||
+      contract?.conditionType !== "path" || contract?.conditionOperator !== "inc" ||
+      contract?.methodScope !== "ALL_METHODS" ||
+      contract?.conditionGroupRelation !== "OR" ||
+      contract?.sourceUnresolvedReadyOriginsRemainCoveredByExactHostAllMethodGroup !==
+        true) {
+    refuse("HISTORICAL_SAFE_METHOD_WRITER_ARTIFACT_INVALID",
+      "The historical safe-method Google-writer artifact was invalid.");
+  }
+  historicalSafeMethodWriterBinding = Object.freeze({
+    artifact: FIXED.historicalSafeMethodWriterArtifact,
+    schemaVersion: artifact.schemaVersion,
+    evidenceFingerprint,
+    affectedOriginCount: writer.affectedReadyOriginCount,
+    affectedOriginsFingerprint: writer.affectedReadyOriginsFingerprint,
+    allMethodFenceRequiredPathCount: contract.blockedRequestPathCount,
+    allMethodFenceRequiredPathsFingerprint:
+      contract.blockedRequestPathsFingerprint,
+  });
+  return historicalSafeMethodWriterBinding;
+}
 
 /**
- * Revalidate the repository-retained 1,140-record inventory without ever copying
- * the records into a browser/provider envelope. The application route repeats
- * this validation server-side and supplies the immutable inventory to the DB.
+ * Revalidate the repository-retained all-project provider census without ever
+ * accepting an operator-supplied origin list. The application route repeats
+ * this validation server-side, signs the exact live provider scope, and sends
+ * only the derived six-field projection to the database.
  */
 export function productionOriginInventoryBinding() {
   if (retainedOriginInventoryBinding) return retainedOriginInventoryBinding;
@@ -522,20 +663,23 @@ export function productionOriginInventoryBinding() {
     refuse("ORIGIN_INVENTORY_ARTIFACT_UNAVAILABLE",
       "The retained Production deployment inventory could not be loaded.");
   }
+  const providerRecordTuple = [
+    "deploymentId", "sha", "providerCommitSha", "origin", "deploymentTarget",
+    "gitBranch", "providerSource", "deploymentStatus", "createdAt", "shaResolution",
+  ];
   const recordTuple = [
     "deploymentId", "sha", "origin", "scopeClass", "deploymentStatus",
-    "sourceProvenance",
+    "providerMetadataFingerprint",
   ];
   const scopeClasses = {
-    MAIN_PRODUCTION: {
-      branch: "main", deploymentEnvironment: "PRODUCTION",
+    PRODUCTION_TARGET: {
+      deploymentTarget: "PRODUCTION", deploymentEnvironment: "PRODUCTION",
       credentialCapabilities: [
         "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0", "PRODUCTION_WORKBOOK_SELECTOR",
       ],
     },
-    FEATURE_PREVIEW: {
-      branch: "feature/mock-tournament-qa-integration",
-      deploymentEnvironment: "PREVIEW",
+    PROJECT_PREVIEW: {
+      deploymentTarget: "PREVIEW", deploymentEnvironment: "PREVIEW",
       credentialCapabilities: [
         "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
         "POTENTIAL_DEDICATED_PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
@@ -548,69 +692,111 @@ export function productionOriginInventoryBinding() {
     ERROR: { publiclyReachable: false, writerCapable: false },
     BLOCKED: { publiclyReachable: false, writerCapable: false },
   };
-  const paginationEvidence = {
-    productionTarget: {
-      recordCount: 458, complete: true, remainingLoadMore: false,
-    },
-    candidateBranchPreview: {
-      recordCount: 682, complete: true, remainingLoadMore: false,
-    },
-  };
   const requiredDeployments = {
     priorLive: FIXED.requiredPriorLiveDeploymentId,
     frozenStep11: FIXED.requiredFrozenStep11DeploymentId,
+    step11_6Candidate: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
   };
   if (!exactObjectKeys(artifact, [
-    "schemaVersion", "vercelProjectId", "capturedAt", "recordTuple",
-    "scopeClasses", "statusSemantics", "paginationEvidence", "recordCount",
-    "recordsFingerprint", "requiredDeployments", "records",
+    "schemaVersion", "vercelProjectId", "vercelTeamId", "capturedAt",
+    "providerRecordTuple", "recordTuple", "scopeClasses", "statusSemantics",
+    "paginationEvidence", "coverageSummary", "providerRecordCount", "recordCount",
+    "providerRecordsFingerprint", "recordsFingerprint", "requiredDeployments",
+    "providerRecords", "records",
   ]) || artifact.schemaVersion !== FIXED.originInventorySchema ||
       artifact.vercelProjectId !== FIXED.vercelProjectId ||
-      Number.isNaN(Date.parse(artifact.capturedAt)) ||
-      !/[zZ]|[+-]\d\d:\d\d$/.test(String(artifact.capturedAt || "")) ||
+      artifact.vercelTeamId !== "team_kPw5zaib8uaQJALAwj4fWI6R" ||
+      artifact.capturedAt !== FIXED.originInventoryCapturedAt ||
+      canonicalJson(artifact.providerRecordTuple) !== canonicalJson(providerRecordTuple) ||
       canonicalJson(artifact.recordTuple) !== canonicalJson(recordTuple) ||
       canonicalJson(artifact.scopeClasses) !== canonicalJson(scopeClasses) ||
       canonicalJson(artifact.statusSemantics) !== canonicalJson(statusSemantics) ||
-      canonicalJson(artifact.paginationEvidence) !== canonicalJson(paginationEvidence) ||
       canonicalJson(artifact.requiredDeployments) !== canonicalJson(requiredDeployments) ||
+      artifact.providerRecordCount !== FIXED.providerInventoryCount ||
       artifact.recordCount !== FIXED.originInventoryCount ||
+      artifact.providerRecordsFingerprint !== FIXED.providerInventoryFingerprint ||
       artifact.recordsFingerprint !== FIXED.originInventoryFingerprint ||
+      !Array.isArray(artifact.providerRecords) ||
+      artifact.providerRecords.length !== FIXED.providerInventoryCount ||
       !Array.isArray(artifact.records) ||
       artifact.records.length !== FIXED.originInventoryCount) {
     refuse("ORIGIN_INVENTORY_ARTIFACT_INVALID",
       "The retained Production deployment inventory header is invalid.");
   }
+  const providerSources = new Set(["CLI", "GIT", "IMPORT", "REDEPLOY", "UNAVAILABLE"]);
+  const shaResolutions = new Set([
+    "EXACT_PROVIDER", "LOCAL_GIT_ABBREVIATION", "UNAVAILABLE",
+  ]);
+  const providerRecords = artifact.providerRecords.map((record, index) => {
+    if (!Array.isArray(record) || record.length !== providerRecordTuple.length) {
+      refuse("ORIGIN_INVENTORY_ARTIFACT_INVALID",
+        `Provider inventory record ${index} is not an exact ten-field tuple.`);
+    }
+    const [rawDeploymentId, rawSha, rawProviderCommitSha, rawOrigin,
+      rawDeploymentTarget, rawGitBranch, rawProviderSource, rawDeploymentStatus,
+      rawCreatedAt, rawShaResolution] = record;
+    const deploymentId = String(rawDeploymentId || "");
+    const sha = rawSha === null ? null : String(rawSha).toLowerCase();
+    const providerCommitSha = rawProviderCommitSha === null
+      ? null : String(rawProviderCommitSha).toLowerCase();
+    const origin = exactProductionOrigin(rawOrigin);
+    const deploymentTarget = String(rawDeploymentTarget || "");
+    const gitBranch = rawGitBranch === null ? null : String(rawGitBranch);
+    const providerSource = String(rawProviderSource || "");
+    const deploymentStatus = String(rawDeploymentStatus || "");
+    const createdAt = String(rawCreatedAt || "");
+    const shaResolution = String(rawShaResolution || "");
+    const exactProviderSha = shaResolution === "EXACT_PROVIDER" &&
+      sha !== null && providerCommitSha === sha && HEX40.test(sha);
+    const locallyResolved = shaResolution === "LOCAL_GIT_ABBREVIATION" &&
+      sha !== null && HEX40.test(sha) && providerCommitSha !== null &&
+      /^[0-9a-f]{7,39}$/.test(providerCommitSha) && sha.startsWith(providerCommitSha);
+    const unavailable = shaResolution === "UNAVAILABLE" && sha === null &&
+      providerCommitSha === null && gitBranch === null && providerSource === "CLI";
+    if (!DEPLOYMENT_ID.test(deploymentId) || !origin ||
+        !new Set(["PRODUCTION", "PREVIEW"]).has(deploymentTarget) ||
+        (gitBranch !== null && (!gitBranch || gitBranch.length > 240)) ||
+        !providerSources.has(providerSource) ||
+        !statusSemantics[deploymentStatus] ||
+        Number.isNaN(Date.parse(createdAt)) ||
+        new Date(Date.parse(createdAt)).toISOString() !== createdAt ||
+        !shaResolutions.has(shaResolution) ||
+        !(exactProviderSha || locallyResolved || unavailable) ||
+        (deploymentTarget === "PRODUCTION" &&
+          (gitBranch !== "main" || sha === null))) {
+      refuse("ORIGIN_INVENTORY_ARTIFACT_INVALID",
+        `Provider inventory record ${index} is outside the exact provider contract.`);
+    }
+    return {
+      deploymentId, sha, providerCommitSha, origin, deploymentTarget, gitBranch,
+      providerSource, deploymentStatus, createdAt, shaResolution,
+    };
+  });
   const records = artifact.records.map((record, index) => {
     if (!Array.isArray(record) || record.length !== recordTuple.length) {
       refuse("ORIGIN_INVENTORY_ARTIFACT_INVALID",
         `Origin inventory record ${index} is not an exact six-field tuple.`);
     }
     const [rawDeploymentId, rawSha, rawOrigin, rawScopeClass,
-      rawDeploymentStatus, rawSourceProvenance] = record;
+      rawDeploymentStatus, rawProviderMetadataFingerprint] = record;
     const deploymentId = requireString(rawDeploymentId,
       "ORIGIN_INVENTORY_ARTIFACT_INVALID", `origin inventory record ${index}.deploymentId`);
     const sha = rawSha === null ? null : String(rawSha).toLowerCase();
     const origin = exactProductionOrigin(rawOrigin);
     const scopeClass = String(rawScopeClass || "");
     const deploymentStatus = String(rawDeploymentStatus || "");
-    const sourceProvenance = String(rawSourceProvenance || "");
+    const providerMetadataFingerprint = String(rawProviderMetadataFingerprint || "");
     const scope = scopeClasses[scopeClass];
     const status = statusSemantics[deploymentStatus];
-    const shaUnavailable = sourceProvenance === "VERCEL_CLI_SHA_UNAVAILABLE";
     if (!DEPLOYMENT_ID.test(deploymentId) ||
-        (sha === null ? !shaUnavailable : !HEX40.test(sha) || shaUnavailable) ||
-        !origin || !scope || !status ||
-        !new Set(["GIT", "REDEPLOY_INHERITED_GIT", "VERCEL_API_RESOLVED_GIT",
-          "VERCEL_CLI_SHA_UNAVAILABLE"])
-          .has(sourceProvenance) ||
-        (scopeClass === "MAIN_PRODUCTION" &&
-          (deploymentStatus !== "READY" || sourceProvenance !== "GIT"))) {
+        (sha !== null && !HEX40.test(sha)) || !origin || !scope || !status ||
+        !HEX64.test(providerMetadataFingerprint)) {
       refuse("ORIGIN_INVENTORY_ARTIFACT_INVALID",
         `Origin inventory record ${index} is outside the frozen Production scope.`);
     }
     return {
-      deploymentId, sha, origin, scopeClass, deploymentStatus, sourceProvenance,
-      branch: scope.branch,
+      deploymentId, sha, origin, scopeClass, deploymentStatus,
+      providerMetadataFingerprint,
       deploymentEnvironment: scope.deploymentEnvironment,
       credentialCapabilities: [...scope.credentialCapabilities],
       publiclyReachable: status.publiclyReachable,
@@ -621,36 +807,113 @@ export function productionOriginInventoryBinding() {
     codepointCompare(`${left.deploymentId}\n${left.origin}`,
       `${right.deploymentId}\n${right.origin}`));
   const keys = records.map((record) => `${record.deploymentId}\n${record.origin}`);
-  const nullShaCount = records.filter((record) => record.sha === null).length;
-  const mainProductionCount = records.filter((record) =>
-    record.scopeClass === "MAIN_PRODUCTION").length;
-  const featurePreviewCount = records.filter((record) =>
-    record.scopeClass === "FEATURE_PREVIEW").length;
+  const providerSorted = [...providerRecords].sort((left, right) =>
+    codepointCompare(`${left.deploymentId}\n${left.origin}`,
+      `${right.deploymentId}\n${right.origin}`));
+  const providerKeys = providerRecords.map((record) =>
+    `${record.deploymentId}\n${record.origin}`);
+  const nullShaCount = providerRecords.filter((record) => record.sha === null).length;
+  const productionTargetCount = records.filter((record) =>
+    record.scopeClass === "PRODUCTION_TARGET").length;
+  const projectPreviewCount = records.filter((record) =>
+    record.scopeClass === "PROJECT_PREVIEW").length;
+  const derivedRecords = providerRecords.map((record) => [
+    record.deploymentId,
+    record.sha,
+    record.origin,
+    record.deploymentTarget === "PRODUCTION" ? "PRODUCTION_TARGET" : "PROJECT_PREVIEW",
+    record.deploymentStatus,
+    sha256Hex(JSON.stringify([
+      record.providerCommitSha, record.deploymentTarget, record.gitBranch,
+      record.providerSource, record.createdAt, record.shaResolution,
+    ])),
+  ]);
+  const countBy = (values) => Object.fromEntries([...values.reduce((counts, value) =>
+    counts.set(value, (counts.get(value) || 0) + 1), new Map()).entries()]
+    .sort(([left], [right]) => codepointCompare(left, right)));
+  const branchCountMap = new Map();
+  for (const record of providerRecords) {
+    const branch = record.gitBranch ?? "__UNAVAILABLE__";
+    branchCountMap.set(branch, (branchCountMap.get(branch) || 0) + 1);
+  }
+  const expectedCoverageSummary = {
+    targetCounts: countBy(providerRecords.map((record) => record.deploymentTarget)),
+    statusCounts: countBy(providerRecords.map((record) => record.deploymentStatus)),
+    providerSourceCounts: countBy(providerRecords.map((record) => record.providerSource)),
+    shaResolutionCounts: countBy(providerRecords.map((record) => record.shaResolution)),
+    branchCounts: [...branchCountMap.entries()].sort(([left], [right]) =>
+      codepointCompare(left, right)),
+    nullShaRecordCount: nullShaCount,
+    nullShaReadyRecordCount: providerRecords.filter((record) =>
+      record.sha === null && record.deploymentStatus === "READY").length,
+    providerCommitShaUnavailableCount: providerRecords.filter((record) =>
+      record.providerCommitSha === null).length,
+    nullBranchRecordCount: providerRecords.filter((record) =>
+      record.gitBranch === null).length,
+  };
+  const pagination = artifact.paginationEvidence;
+  const exactPagination = exactObjectKeys(pagination, [
+    "queryScope", "pageLimit", "firstPass", "secondPass", "exactPassMatch",
+    "remainingCursor",
+  ]) && pagination.queryScope === "ALL_PROJECT_DEPLOYMENTS_NO_TARGET_OR_BRANCH_FILTER" &&
+    pagination.pageLimit === 100 && pagination.exactPassMatch === true &&
+    pagination.remainingCursor === null &&
+    exactObjectKeys(pagination.firstPass, [
+      "pageCount", "recordCount", "pageRecordsFingerprint",
+    ]) && exactObjectKeys(pagination.secondPass, [
+      "pageCount", "recordCount", "pageRecordsFingerprint",
+    ]) && pagination.firstPass.pageCount === 13 &&
+    pagination.secondPass.pageCount === 13 &&
+    pagination.firstPass.recordCount === records.length &&
+    pagination.secondPass.recordCount === records.length &&
+    pagination.firstPass.pageRecordsFingerprint ===
+      FIXED.originInventoryPageRecordsFingerprint &&
+    pagination.secondPass.pageRecordsFingerprint ===
+      FIXED.originInventoryPageRecordsFingerprint;
   const requiredTuples = [
     [
       "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
       "561a61946be3536c7e32b46be53e4683cbb45579",
       "https://bagger-drmix94o0-sandbagger-invitational.vercel.app",
-      "MAIN_PRODUCTION", "READY", "GIT",
+      "PRODUCTION_TARGET", "READY",
+      "0383e746abde16275626a8bcd41a38853eb9fe6e2cb036ef7658d21c23d9f5e8",
     ],
     [
       "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
       "be5531faca009e26617496e47831f365a1b4997b",
       "https://bagger-mribo6cqh-sandbagger-invitational.vercel.app",
-      "FEATURE_PREVIEW", "READY", "GIT",
+      "PROJECT_PREVIEW", "READY",
+      "0c8b213bcad5397731982762bf178cc961254b79a6be5a3b75e71e547ef9dc71",
+    ],
+    [
+      "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+      "a0b79cdef3a34d640e9411035792bd1e91989566",
+      "https://bagger-pmt7catuz-sandbagger-invitational.vercel.app",
+      "PROJECT_PREVIEW", "READY",
+      "acb7fa3de11c8e6e5704c41a22b1693b42428b7b70c1d9ed73763ea6330ddb8e",
     ],
   ];
   if (records.some((record, index) =>
         keys[index] !== `${sorted[index].deploymentId}\n${sorted[index].origin}`) ||
+      providerRecords.some((record, index) =>
+        providerKeys[index] !==
+          `${providerSorted[index].deploymentId}\n${providerSorted[index].origin}`) ||
       new Set(keys).size !== records.length ||
-      nullShaCount !== 1 || mainProductionCount !== 458 ||
-      featurePreviewCount !== 682 ||
+      new Set(providerKeys).size !== providerRecords.length ||
+      canonicalJson(keys) !== canonicalJson(providerKeys) ||
+      canonicalJson(derivedRecords) !== canonicalJson(artifact.records) ||
+      canonicalJson(expectedCoverageSummary) !==
+        canonicalJson(artifact.coverageSummary) || !exactPagination ||
+      nullShaCount !== 8 || productionTargetCount !== 458 ||
+      projectPreviewCount !== 833 ||
       !records.some((record) =>
         record.deploymentId === FIXED.requiredPriorLiveDeploymentId) ||
       !records.some((record) =>
         record.deploymentId === FIXED.requiredFrozenStep11DeploymentId) ||
       requiredTuples.some((required) => !artifact.records.some((tuple) =>
         canonicalJson(tuple) === canonicalJson(required))) ||
+      sha256Hex(JSON.stringify(artifact.providerRecords)) !==
+        FIXED.providerInventoryFingerprint ||
       sha256Hex(JSON.stringify(artifact.records)) !== FIXED.originInventoryFingerprint) {
     refuse("ORIGIN_INVENTORY_ARTIFACT_INVALID",
       "The retained Production deployment inventory does not match its immutable digest.");
@@ -661,30 +924,35 @@ export function productionOriginInventoryBinding() {
     vercelProjectId: artifact.vercelProjectId,
     capturedAt: requireTimestamp(artifact.capturedAt,
       "ORIGIN_INVENTORY_ARTIFACT_INVALID", "origin inventory capturedAt"),
+    providerRecordCount: providerRecords.length,
+    providerRecordsFingerprint: artifact.providerRecordsFingerprint,
     recordCount: records.length,
     recordsFingerprint: artifact.recordsFingerprint,
-    mainProductionCount,
-    featurePreviewCount,
+    productionTargetCount,
+    projectPreviewCount,
     nullShaCount,
     requiredDeployments: Object.freeze({ ...requiredDeployments }),
     paginationComplete: true,
-    reviewedPostCaptureDeploymentCount:
-      FIXED.reviewedPostCaptureDeploymentCount,
-    reviewedPostCaptureDeploymentFingerprint:
-      FIXED.reviewedPostCaptureDeploymentFingerprint,
-    minimumLiveOriginInventoryCount: records.length +
-      FIXED.reviewedPostCaptureDeploymentCount + 1,
+    minimumLiveOriginInventoryCount: records.length,
+    maximumLiveOriginInventoryCount: records.length + 1,
     fixedAliasOriginCount: FIXED.quiesceFixedAliasOriginCount,
     candidateAliasOriginCount: FIXED.quiesceCandidateAliasOriginCount,
     probeVectorCount: FIXED.quiesceProbeVectorCount,
   });
   retainedOriginInventoryOrigins = new Set(records.map((record) => record.origin));
+  retainedOriginInventoryDeploymentIds = new Set(records.map((record) =>
+    record.deploymentId));
+  retainedOriginInventoryByOrigin = new Map(records.map((record) =>
+    [record.origin, record]));
+  retainedOriginInventoryByDeploymentId = new Map(records.map((record) =>
+    [record.deploymentId, record]));
   return retainedOriginInventoryBinding;
 }
 
 export function productionCredentialConfinementBinding() {
   if (credentialConfinementBinding) return credentialConfinementBinding;
   const origin = productionOriginInventoryBinding();
+  productionHistoricalSafeMethodWriterBinding();
   let artifact;
   try {
     artifact = JSON.parse(readFileSync(new URL(
@@ -701,24 +969,51 @@ export function productionCredentialConfinementBinding() {
     ? Object.values(classifications).reduce((total, value) =>
       total + Number(value?.recordCount || 0), 0) : 0;
   if (!exactObjectKeys(artifact, [
-    "schemaVersion", "originInventorySchemaVersion", "originInventoryRecordCount",
-    "originInventoryFingerprint", "classificationRecordTuple",
+    "schemaVersion", "originInventorySchemaVersion", "originInventoryRecordTuple",
+    "originInventoryRecordCount", "originInventoryFingerprint",
+    "originInventoryProviderRecordTuple", "originInventoryProviderRecordCount",
+    "originInventoryProviderRecordsFingerprint", "classificationRecordTuple",
     "classificationRecordCount", "classificationRecordsFingerprint",
     "markerPatterns", "gitObjectAudit", "classifications",
     "markerBearingPreviewPathSummary", "canonicalMutationRouteAudit",
+    "allMethodFenceRequiredHosts", "providerInventoryContract",
     "environmentScopeContract", "dynamicCandidateContract", "evidenceFingerprint",
   ]) || artifact.schemaVersion !== FIXED.credentialConfinementSchema ||
+      artifact.originInventorySchemaVersion !== origin.schemaVersion ||
       artifact.originInventoryRecordCount !== origin.recordCount ||
       artifact.originInventoryFingerprint !== origin.recordsFingerprint ||
+      artifact.originInventoryProviderRecordCount !== origin.providerRecordCount ||
+      artifact.originInventoryProviderRecordsFingerprint !==
+        origin.providerRecordsFingerprint ||
       artifact.classificationRecordCount !== FIXED.credentialConfinementRecordCount ||
       artifact.classificationRecordsFingerprint !==
         FIXED.credentialConfinementRecordsFingerprint ||
       evidenceFingerprint !== FIXED.credentialConfinementEvidenceFingerprint ||
       sha256Hex(JSON.stringify(base)) !== evidenceFingerprint ||
       classificationTotal !== FIXED.credentialConfinementRecordCount ||
-      artifact.gitObjectAudit?.missingCommitCount !== 0 ||
+      artifact.gitObjectAudit?.missingCommitCount !== 3 ||
+      artifact.gitObjectAudit?.nullShaRecordCount !== 8 ||
+      artifact.gitObjectAudit?.nullShaWriterCapableRecordCount !== 5 ||
+      artifact.gitObjectAudit?.nullShaProviderBlockedRecordCount !== 3 ||
       artifact.canonicalMutationRouteAudit?.dedicatedWriterMarkerMatchCount !== 0 ||
-      artifact.dynamicCandidateContract?.arbitraryMainProductionAdditionAllowed !== false ||
+      artifact.allMethodFenceRequiredHosts?.count !==
+        FIXED.allMethodFenceRequiredHostCount ||
+      artifact.allMethodFenceRequiredHosts?.fingerprint !==
+        FIXED.allMethodFenceRequiredHostsFingerprint ||
+      !Array.isArray(artifact.allMethodFenceRequiredHosts?.origins) ||
+      artifact.allMethodFenceRequiredHosts.origins.length !==
+        FIXED.allMethodFenceRequiredHostCount ||
+      sha256Hex(JSON.stringify(artifact.allMethodFenceRequiredHosts.origins)) !==
+        FIXED.allMethodFenceRequiredHostsFingerprint ||
+      artifact.providerInventoryContract?.providerRecordCount !==
+        origin.providerRecordCount ||
+      artifact.providerInventoryContract?.providerRecordsFingerprint !==
+        origin.providerRecordsFingerprint ||
+      artifact.providerInventoryContract?.projectionRecordCount !== origin.recordCount ||
+      artifact.providerInventoryContract?.projectionRecordsFingerprint !==
+        origin.recordsFingerprint ||
+      artifact.providerInventoryContract?.oneToOneProjection !== true ||
+      artifact.dynamicCandidateContract?.arbitraryProductionTargetAdditionAllowed !== false ||
       artifact.dynamicCandidateContract?.differentShaAdditionAllowed !== false ||
       artifact.environmentScopeContract
         ?.duplicateUnscopedDedicatedPreviewRecordAllowed !== false) {
@@ -731,6 +1026,10 @@ export function productionCredentialConfinementBinding() {
     recordCount: artifact.classificationRecordCount,
     recordsFingerprint: artifact.classificationRecordsFingerprint,
     evidenceFingerprint,
+    allMethodFenceRequiredHostCount:
+      artifact.allMethodFenceRequiredHosts.count,
+    allMethodFenceRequiredHostsFingerprint:
+      artifact.allMethodFenceRequiredHosts.fingerprint,
   });
   return credentialConfinementBinding;
 }
@@ -804,6 +1103,10 @@ function assertRoutingRuleShape(rule, { resolved = false } = {}) {
   if (!exactObjectKeys(rule, [
     "projectId", "ruleId", "revision", "scope", "projectWide", "action",
     "requestPathOperator", "requestPath", "methodOperator", "methods",
+    "allMethodFenceRequiredHostCount",
+    "allMethodFenceRequiredHostsFingerprint",
+    "allMethodFenceRequiredPathCount",
+    "allMethodFenceRequiredPathsFingerprint",
   ])) {
     refuse("PROVIDER_QUIESCE_RULE_INVALID",
       "providerQuiesceEvidence.routingRule must have the exact reviewed field set.");
@@ -824,6 +1127,22 @@ function assertRoutingRuleShape(rule, { resolved = false } = {}) {
     "PROVIDER_QUIESCE_RULE_INVALID", "providerQuiesceEvidence.routingRule.methodOperator");
   requireEqual(canonicalJson(rule.methods), canonicalJson(["GET", "HEAD", "OPTIONS"]),
     "PROVIDER_QUIESCE_RULE_INVALID", "providerQuiesceEvidence.routingRule.methods");
+  requireEqual(rule.allMethodFenceRequiredHostCount,
+    FIXED.allMethodFenceRequiredHostCount,
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.allMethodFenceRequiredHostCount");
+  requireEqual(rule.allMethodFenceRequiredHostsFingerprint,
+    FIXED.allMethodFenceRequiredHostsFingerprint,
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.allMethodFenceRequiredHostsFingerprint");
+  requireEqual(rule.allMethodFenceRequiredPathCount,
+    FIXED.allMethodFenceRequiredPathCount,
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.allMethodFenceRequiredPathCount");
+  requireEqual(rule.allMethodFenceRequiredPathsFingerprint,
+    FIXED.allMethodFenceRequiredPathsFingerprint,
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.allMethodFenceRequiredPathsFingerprint");
   for (const field of ["ruleId", "revision"]) {
     const value = requireString(rule[field], "PROVIDER_QUIESCE_RULE_INVALID",
       `providerQuiesceEvidence.routingRule.${field}`);
@@ -860,6 +1179,15 @@ function validateStructuredProviderEvidence(manifest) {
     "ORIGIN_INVENTORY_BINDING_DRIFT", "providerQuiesceEvidence.originInventoryCount");
   requireEqual(quiesce.originInventoryFingerprint, FIXED.originInventoryFingerprint,
     "ORIGIN_INVENTORY_BINDING_DRIFT", "providerQuiesceEvidence.originInventoryFingerprint");
+  requireEqual(quiesce.providerInventorySchema, FIXED.originInventorySchema,
+    "PROVIDER_INVENTORY_BINDING_DRIFT",
+    "providerQuiesceEvidence.providerInventorySchema");
+  requireEqual(quiesce.retainedProviderInventoryCount, FIXED.providerInventoryCount,
+    "PROVIDER_INVENTORY_BINDING_DRIFT",
+    "providerQuiesceEvidence.retainedProviderInventoryCount");
+  requireEqual(quiesce.retainedProviderInventoryFingerprint,
+    FIXED.providerInventoryFingerprint, "PROVIDER_INVENTORY_BINDING_DRIFT",
+    "providerQuiesceEvidence.retainedProviderInventoryFingerprint");
   const credentialConfinement = productionCredentialConfinementBinding();
   requireEqual(quiesce.credentialConfinementArtifact,
     credentialConfinement.artifact, "CREDENTIAL_CONFINEMENT_BINDING_DRIFT",
@@ -877,16 +1205,22 @@ function validateStructuredProviderEvidence(manifest) {
     credentialConfinement.evidenceFingerprint, "CREDENTIAL_CONFINEMENT_BINDING_DRIFT",
     "providerQuiesceEvidence.credentialConfinementEvidenceFingerprint");
   for (const field of [
-    "liveOriginInventoryCount", "probeOriginCount", "probeVectorCount", "probeRecordCount",
+    "liveProviderInventoryCount", "liveOriginInventoryCount", "probeOriginCount",
+    "probeVectorCount", "probeRecordCount",
     "unresolvedRequestLogCount", "unresolvedGoogleWriteCount",
     "unresolvedProbeCount", "ownerFreezeTtlSeconds",
   ]) requireInteger(quiesce[field], "PROVIDER_QUIESCE_EVIDENCE_INVALID",
     `providerQuiesceEvidence.${field}`);
   if (["DRAINING", "VERIFIED"].includes(quiesce.status)) {
+    const expectedLiveInventoryCount = expectedQuiesceLiveInventoryCount(quiesce);
+    requireResolved(quiesce.liveProviderInventoryFingerprint, HEX64,
+      "PROVIDER_QUIESCE_LIVE_PROVIDER_INVENTORY_REQUIRED",
+      "providerQuiesceEvidence.liveProviderInventoryFingerprint");
     requireResolved(quiesce.liveOriginInventoryFingerprint, HEX64,
       "PROVIDER_QUIESCE_LIVE_INVENTORY_REQUIRED",
       "providerQuiesceEvidence.liveOriginInventoryFingerprint");
-    if (quiesce.liveOriginInventoryCount < FIXED.minimumLiveOriginInventoryCount ||
+    if (quiesce.liveProviderInventoryCount !== quiesce.liveOriginInventoryCount ||
+        quiesce.liveOriginInventoryCount !== expectedLiveInventoryCount ||
         quiesce.probeOriginCount !== quiesce.liveOriginInventoryCount +
           FIXED.quiesceFixedAliasOriginCount +
           FIXED.quiesceCandidateAliasOriginCount) {
@@ -1132,6 +1466,10 @@ export function evaluateReadiness(manifest) {
   if (rehearsal.originInventoryFingerprint !== FIXED.originInventoryFingerprint) {
     blockers.push("providerFenceRehearsal.originInventoryFingerprint is not exact");
   }
+  if (rehearsal.providerInventoryCount !== FIXED.providerInventoryCount ||
+      rehearsal.providerInventoryFingerprint !== FIXED.providerInventoryFingerprint) {
+    blockers.push("providerFenceRehearsal provider inventory binding is not exact");
+  }
   if (rehearsal.credentialConfinementSchema !== FIXED.credentialConfinementSchema ||
       rehearsal.credentialConfinementRecordCount !==
         FIXED.credentialConfinementRecordCount ||
@@ -1141,8 +1479,15 @@ export function evaluateReadiness(manifest) {
         FIXED.credentialConfinementEvidenceFingerprint) {
     blockers.push("providerFenceRehearsal credential-confinement binding is not exact");
   }
+  const expectedReadinessLiveInventoryCount =
+    manifest.providerQuiesceEvidence.status === "VERIFIED"
+      ? expectedQuiesceLiveInventoryCount(manifest.providerQuiesceEvidence)
+      : null;
   if (!Number.isSafeInteger(rehearsal.liveOriginInventoryCount) ||
-      rehearsal.liveOriginInventoryCount < FIXED.minimumLiveOriginInventoryCount ||
+      expectedReadinessLiveInventoryCount === null ||
+      rehearsal.liveOriginInventoryCount !== expectedReadinessLiveInventoryCount ||
+      rehearsal.liveOriginInventoryCount !==
+        manifest.providerQuiesceEvidence.liveOriginInventoryCount ||
       !HEX64.test(String(rehearsal.liveOriginInventoryFingerprint || "")) ||
       rehearsal.probeOriginCount !== rehearsal.liveOriginInventoryCount +
         FIXED.quiesceFixedAliasOriginCount +
@@ -1235,7 +1580,7 @@ function assertFrozenRelease(manifest) {
     FIXED.credentialConfinementEvidenceFingerprint,
     "CREDENTIAL_CONFINEMENT_BINDING_DRIFT",
     "release.credentialConfinementEvidenceFingerprint");
-  requireResolved(manifest.release.deploymentId, DEPLOYMENT_ID,
+  requireExactResolved(manifest.release.deploymentId, DEPLOYMENT_ID,
     "DEPLOYMENT_ID_REQUIRED", "release.deploymentId");
   return frozen;
 }
@@ -1398,6 +1743,51 @@ function assertCandidateEvidenceBinding(manifest, evidence, path) {
     "PROVIDER_CANDIDATE_BINDING_MISMATCH", `${path}.candidateDeploymentCommit`);
 }
 
+function expectedQuiesceLiveInventoryCount(quiesce) {
+  const artifact = productionOriginInventoryBinding();
+  // Vercel deployment ids are case-sensitive. `requireResolved` deliberately
+  // lower-cases hash-like operator inputs, so validate this identifier without
+  // changing its exact provider spelling before matching retained inventory.
+  const deploymentId = requireString(
+    quiesce.candidateDeploymentId,
+    "PROVIDER_QUIESCE_CANDIDATE_IDENTITY_INVALID",
+    "providerQuiesceEvidence.candidateDeploymentId",
+  );
+  if (unresolved(deploymentId) || !DEPLOYMENT_ID.test(deploymentId)) {
+    refuse("PROVIDER_QUIESCE_CANDIDATE_IDENTITY_INVALID",
+      "providerQuiesceEvidence.candidateDeploymentId has an invalid format.");
+  }
+  const commit = requireResolved(
+    String(quiesce.candidateDeploymentCommit || "").toLowerCase(),
+    HEX40,
+    "PROVIDER_QUIESCE_CANDIDATE_IDENTITY_INVALID",
+    "providerQuiesceEvidence.candidateDeploymentCommit",
+  );
+  const candidateAliasOrigin = exactProductionOrigin(quiesce.candidateAliasOrigin);
+  const candidateImmutableOrigin = exactProductionOrigin(
+    quiesce.candidateImmutableOrigin,
+  );
+  if (!candidateAliasOrigin || !candidateImmutableOrigin ||
+      candidateAliasOrigin === candidateImmutableOrigin ||
+      retainedOriginInventoryOrigins.has(candidateAliasOrigin)) {
+    refuse("PROVIDER_QUIESCE_CANDIDATE_ORIGIN_INVALID",
+      "The server-derived candidate origins are invalid or collide with retained inventory.");
+  }
+  const retainedByOrigin = retainedOriginInventoryByOrigin.get(candidateImmutableOrigin);
+  const retainedByDeploymentId = retainedOriginInventoryByDeploymentId.get(deploymentId);
+  if (retainedByOrigin || retainedByDeploymentId) {
+    if (!retainedByOrigin || !retainedByDeploymentId ||
+        retainedByOrigin.deploymentId !== deploymentId ||
+        retainedByDeploymentId.origin !== candidateImmutableOrigin ||
+        retainedByOrigin.sha !== commit || retainedByDeploymentId.sha !== commit) {
+      refuse("PROVIDER_QUIESCE_CANDIDATE_ORIGIN_INVALID",
+        "The candidate only partially matched a retained provider deployment tuple.");
+    }
+    return artifact.recordCount;
+  }
+  return artifact.recordCount + 1;
+}
+
 function assertQuiesceInventoryBinding(quiesce) {
   const artifact = productionOriginInventoryBinding();
   requireEqual(quiesce.originInventoryArtifact, artifact.artifact,
@@ -1406,27 +1796,33 @@ function assertQuiesceInventoryBinding(quiesce) {
     "ORIGIN_INVENTORY_BINDING_DRIFT", "providerQuiesceEvidence.originInventoryCount");
   requireEqual(quiesce.originInventoryFingerprint, artifact.recordsFingerprint,
     "ORIGIN_INVENTORY_BINDING_DRIFT", "providerQuiesceEvidence.originInventoryFingerprint");
-  const candidateAliasOrigin = exactProductionOrigin(quiesce.candidateAliasOrigin);
-  const candidateImmutableOrigin = exactProductionOrigin(
-    quiesce.candidateImmutableOrigin,
-  );
-  if (!candidateAliasOrigin || !candidateImmutableOrigin ||
-      candidateAliasOrigin === candidateImmutableOrigin ||
-      retainedOriginInventoryOrigins.has(candidateAliasOrigin) ||
-      retainedOriginInventoryOrigins.has(candidateImmutableOrigin)) {
-    refuse("PROVIDER_QUIESCE_CANDIDATE_ORIGIN_INVALID",
-      "The server-derived candidate origins are invalid or collide with retained inventory.");
-  }
+  requireEqual(quiesce.providerInventorySchema, artifact.schemaVersion,
+    "PROVIDER_INVENTORY_BINDING_DRIFT",
+    "providerQuiesceEvidence.providerInventorySchema");
+  requireEqual(quiesce.retainedProviderInventoryCount, artifact.providerRecordCount,
+    "PROVIDER_INVENTORY_BINDING_DRIFT",
+    "providerQuiesceEvidence.retainedProviderInventoryCount");
+  requireEqual(quiesce.retainedProviderInventoryFingerprint,
+    artifact.providerRecordsFingerprint, "PROVIDER_INVENTORY_BINDING_DRIFT",
+    "providerQuiesceEvidence.retainedProviderInventoryFingerprint");
+  const expectedLiveInventoryCount = expectedQuiesceLiveInventoryCount(quiesce);
   requireInteger(quiesce.liveOriginInventoryCount,
     "PROVIDER_QUIESCE_LIVE_INVENTORY_REQUIRED",
     "providerQuiesceEvidence.liveOriginInventoryCount");
-  if (quiesce.liveOriginInventoryCount < artifact.minimumLiveOriginInventoryCount) {
+  requireInteger(quiesce.liveProviderInventoryCount,
+    "PROVIDER_QUIESCE_LIVE_PROVIDER_INVENTORY_REQUIRED",
+    "providerQuiesceEvidence.liveProviderInventoryCount");
+  if (quiesce.liveOriginInventoryCount !== expectedLiveInventoryCount ||
+      quiesce.liveProviderInventoryCount !== quiesce.liveOriginInventoryCount) {
     refuse("PROVIDER_QUIESCE_LIVE_INVENTORY_REQUIRED",
       "The signed live inventory omitted the candidate or retained baseline.");
   }
   requireResolved(quiesce.liveOriginInventoryFingerprint, HEX64,
     "PROVIDER_QUIESCE_LIVE_INVENTORY_REQUIRED",
     "providerQuiesceEvidence.liveOriginInventoryFingerprint");
+  requireResolved(quiesce.liveProviderInventoryFingerprint, HEX64,
+    "PROVIDER_QUIESCE_LIVE_PROVIDER_INVENTORY_REQUIRED",
+    "providerQuiesceEvidence.liveProviderInventoryFingerprint");
   requireEqual(quiesce.probeOriginCount,
     quiesce.liveOriginInventoryCount + artifact.fixedAliasOriginCount +
       artifact.candidateAliasOriginCount,
@@ -1620,7 +2016,9 @@ function assertOperationGuard(manifest, operation) {
     case "inspect": return;
     case "inspect-scoring-admission": return;
     case "issue-begin-provider-attestation-challenge":
-    case "inspect-begin-provider-attestation-challenge": {
+    case "inspect-begin-provider-attestation-challenge":
+    case "inspect-begin-provider-attestation-abandonment":
+    case "abandon-begin-provider-attestation-challenge": {
       const quiesce = assertQuiesceRequestScope(manifest);
       requireEqual(quiesce.status, "MISSING",
         "PROVIDER_QUIESCE_BEGIN_STATE_INVALID", "providerQuiesceEvidence.status");
@@ -1628,7 +2026,9 @@ function assertOperationGuard(manifest, operation) {
       return;
     }
     case "issue-finalize-provider-attestation-challenge":
-    case "inspect-finalize-provider-attestation-challenge": {
+    case "inspect-finalize-provider-attestation-challenge":
+    case "inspect-finalize-provider-attestation-abandonment":
+    case "abandon-finalize-provider-attestation-challenge": {
       const quiesce = assertQuiesceRequestScope(manifest, { requireDrain: true });
       requireEqual(quiesce.status, "DRAINING",
         "PROVIDER_QUIESCE_FINALIZE_STATE_INVALID", "providerQuiesceEvidence.status");
@@ -2039,8 +2439,9 @@ function commonPayload(manifest, operation) {
   const requestId = requireResolved(manifest.stableRequestIds[operation], UUID,
     "STABLE_REQUEST_ID_REQUIRED", `stableRequestIds.${operation}`);
   const deploymentId = operation === "stage-release"
-    ? requireResolved(release.deploymentId, DEPLOYMENT_ID, "DEPLOYMENT_ID_REQUIRED", "release.deploymentId")
-    : requireResolved(state.admissionDeploymentId ?? release.deploymentId, DEPLOYMENT_ID,
+    ? requireExactResolved(release.deploymentId, DEPLOYMENT_ID,
+      "DEPLOYMENT_ID_REQUIRED", "release.deploymentId")
+    : requireExactResolved(state.admissionDeploymentId ?? release.deploymentId, DEPLOYMENT_ID,
       "DEPLOYMENT_ID_REQUIRED", "state.admissionDeploymentId/release.deploymentId");
   return {
     actor_id: manifest.operator.actorId,
@@ -2104,10 +2505,65 @@ function signedProviderAttestation(manifest, challenge, stage, requestOperation)
   return clone(envelope);
 }
 
+function retainedProviderAttestationChallenge(
+  manifest,
+  challenge,
+  stage,
+  requestOperation,
+) {
+  const retained = requireObject(
+    challenge.retainedChallenge,
+    "PROVIDER_ATTESTATION_RETAINED_CHALLENGE_REQUIRED",
+    `providerAttestationChallenges.${stage.toLowerCase()}.retainedChallenge`,
+  );
+  const quiesce = manifest.providerQuiesceEvidence;
+  const status = String(retained.status || "").toUpperCase();
+  const expectedTarget = "PRODUCTION";
+  const exact = [
+    [retained.challengeId, challenge.challengeId],
+    [retained.challengeRequestId, challenge.challengeRequestId],
+    [retained.operationRequestId, manifest.stableRequestIds[requestOperation]],
+    [retained.evidenceRequestId, quiesce.evidenceRequestId],
+    [retained.stage, stage],
+    [retained.purpose, "CUTOVER"],
+    [retained.vercelProjectId, FIXED.vercelProjectId],
+    [retained.vercelTeamId, manifest.resources.vercelTeamId],
+    [retained.candidateDeploymentId, manifest.release.deploymentId],
+    [retained.candidateDeploymentCommit, manifest.release.frozenSha],
+    [retained.candidateDeploymentTarget, expectedTarget],
+    [retained.candidateAliasOrigin, quiesce.candidateAliasOrigin],
+    [retained.candidateImmutableOrigin, quiesce.candidateImmutableOrigin],
+    [retained.routingRuleId, quiesce.routingRule.ruleId],
+    [retained.routingRuleConfigVersion, quiesce.routingRule.revision],
+  ];
+  if (!new Set(["ISSUED", "CONSUMED"]).has(status) ||
+      exact.some(([actual, expected]) => actual !== expected) ||
+      !HEX64.test(String(retained.challengeRequestFingerprint || "")) ||
+      !Number.isFinite(Date.parse(String(retained.issuedAt || ""))) ||
+      !Number.isFinite(Date.parse(String(retained.expiresAt || ""))) ||
+      Date.parse(retained.expiresAt) <= Date.parse(retained.issuedAt) ||
+      Date.parse(retained.expiresAt) > Date.parse(retained.issuedAt) + 120_000 ||
+      (status === "CONSUMED" && (
+        retained.consumeRequestId !== challenge.consumeRequestId ||
+        !UUID.test(String(retained.consumedAttestationId || "")) ||
+        retained.consumedAttestationId !==
+          challenge.signedAttestation?.attestation?.attestationId ||
+        retained.consumedAttestationFingerprint !==
+          challenge.signedAttestation?.attestationFingerprint ||
+        !HEX64.test(String(retained.consumedAttestationFingerprint || ""))
+      ))) {
+    refuse(
+      "PROVIDER_ATTESTATION_RETAINED_CHALLENGE_MISMATCH",
+      `The retained ${stage} provider challenge does not match the protected cutover binding.`,
+    );
+  }
+  return clone(retained);
+}
+
 function providerActionDefaults(manifest, operation) {
   const quiesce = manifest.providerQuiesceEvidence;
   const fence = manifest.persistentProviderFence;
-  const common = operation.includes("provider-attestation-challenge")
+  const common = operation.includes("provider-attestation")
     ? null : providerCommonPayload(manifest, operation);
   const beginChallenge = manifest.providerAttestationChallenges.begin;
   const finalizeChallenge = manifest.providerAttestationChallenges.finalize;
@@ -2136,6 +2592,37 @@ function providerActionDefaults(manifest, operation) {
       quiescePurpose: "CUTOVER",
       routingRule: clone(quiesce.routingRule),
     };
+    case "inspect-begin-provider-attestation-abandonment": return {
+      ...providerCommonPayload(manifest, operation, {
+        requestOperation: "begin-provider-quiesce",
+        routeAction: "inspect-retained-provider-attestation-challenge",
+      }),
+      evidenceRequestId: quiesce.evidenceRequestId,
+      challengeRequestId: beginChallenge.challengeRequestId,
+      providerAttestationStage: "BEGIN",
+      providerChallengeId: beginChallenge.challengeId,
+      providerRetainedChallenge: retainedProviderAttestationChallenge(
+        manifest, beginChallenge, "BEGIN", "begin-provider-quiesce",
+      ),
+      quiescePurpose: "CUTOVER",
+    };
+    case "abandon-begin-provider-attestation-challenge": return {
+      ...providerCommonPayload(manifest, operation, {
+        requestOperation: "begin-provider-quiesce",
+        routeAction: "abandon-provider-attestation-challenge",
+      }),
+      evidenceRequestId: quiesce.evidenceRequestId,
+      challengeRequestId: beginChallenge.challengeRequestId,
+      providerAttestationStage: "BEGIN",
+      providerChallengeId: beginChallenge.challengeId,
+      providerRetainedChallenge: retainedProviderAttestationChallenge(
+        manifest, beginChallenge, "BEGIN", "begin-provider-quiesce",
+      ),
+      abandonRequestId: requireResolved(beginChallenge.abandonRequestId, UUID,
+        "PROVIDER_ATTESTATION_ABANDON_REQUEST_REQUIRED",
+        "providerAttestationChallenges.begin.abandonRequestId"),
+      quiescePurpose: "CUTOVER",
+    };
     case "issue-finalize-provider-attestation-challenge": return {
       ...providerCommonPayload(manifest, operation, {
         requestOperation: "finalize-provider-quiesce",
@@ -2159,6 +2646,37 @@ function providerActionDefaults(manifest, operation) {
       providerChallengeId: finalizeChallenge.challengeId,
       quiescePurpose: "CUTOVER",
       routingRule: clone(quiesce.routingRule),
+    };
+    case "inspect-finalize-provider-attestation-abandonment": return {
+      ...providerCommonPayload(manifest, operation, {
+        requestOperation: "finalize-provider-quiesce",
+        routeAction: "inspect-retained-provider-attestation-challenge",
+      }),
+      evidenceRequestId: quiesce.evidenceRequestId,
+      challengeRequestId: finalizeChallenge.challengeRequestId,
+      providerAttestationStage: "FINALIZE",
+      providerChallengeId: finalizeChallenge.challengeId,
+      providerRetainedChallenge: retainedProviderAttestationChallenge(
+        manifest, finalizeChallenge, "FINALIZE", "finalize-provider-quiesce",
+      ),
+      quiescePurpose: "CUTOVER",
+    };
+    case "abandon-finalize-provider-attestation-challenge": return {
+      ...providerCommonPayload(manifest, operation, {
+        requestOperation: "finalize-provider-quiesce",
+        routeAction: "abandon-provider-attestation-challenge",
+      }),
+      evidenceRequestId: quiesce.evidenceRequestId,
+      challengeRequestId: finalizeChallenge.challengeRequestId,
+      providerAttestationStage: "FINALIZE",
+      providerChallengeId: finalizeChallenge.challengeId,
+      providerRetainedChallenge: retainedProviderAttestationChallenge(
+        manifest, finalizeChallenge, "FINALIZE", "finalize-provider-quiesce",
+      ),
+      abandonRequestId: requireResolved(finalizeChallenge.abandonRequestId, UUID,
+        "PROVIDER_ATTESTATION_ABANDON_REQUEST_REQUIRED",
+        "providerAttestationChallenges.finalize.abandonRequestId"),
+      quiescePurpose: "CUTOVER",
     };
     case "begin-provider-quiesce": return {
       ...common,
@@ -2631,6 +3149,8 @@ function environmentDeltaMaterial(manifest) {
       originInventorySchema: FIXED.originInventorySchema,
       originInventoryCount: FIXED.originInventoryCount,
       originInventoryFingerprint: FIXED.originInventoryFingerprint,
+      providerInventoryCount: FIXED.providerInventoryCount,
+      providerInventoryFingerprint: FIXED.providerInventoryFingerprint,
       credentialConfinementArtifact: FIXED.credentialConfinementArtifact,
       credentialConfinementSchema: FIXED.credentialConfinementSchema,
       credentialConfinementRecordCount: FIXED.credentialConfinementRecordCount,
@@ -2638,11 +3158,22 @@ function environmentDeltaMaterial(manifest) {
         FIXED.credentialConfinementRecordsFingerprint,
       credentialConfinementEvidenceFingerprint:
         FIXED.credentialConfinementEvidenceFingerprint,
-      reviewedPostCaptureDeploymentCount:
-        FIXED.reviewedPostCaptureDeploymentCount,
-      reviewedPostCaptureDeploymentFingerprint:
-        FIXED.reviewedPostCaptureDeploymentFingerprint,
+      historicalSafeMethodWriterArtifact:
+        FIXED.historicalSafeMethodWriterArtifact,
+      historicalSafeMethodWriterSchema:
+        FIXED.historicalSafeMethodWriterSchema,
+      historicalSafeMethodWriterEvidenceFingerprint:
+        FIXED.historicalSafeMethodWriterEvidenceFingerprint,
+      historicalSafeMethodWriterAffectedOriginCount:
+        FIXED.historicalSafeMethodWriterAffectedOriginCount,
+      historicalSafeMethodWriterAffectedOriginsFingerprint:
+        FIXED.historicalSafeMethodWriterAffectedOriginsFingerprint,
+      allMethodFenceRequiredPathCount:
+        FIXED.allMethodFenceRequiredPathCount,
+      allMethodFenceRequiredPathsFingerprint:
+        FIXED.allMethodFenceRequiredPathsFingerprint,
       minimumLiveOriginInventoryCount: FIXED.minimumLiveOriginInventoryCount,
+      maximumLiveOriginInventoryCount: FIXED.maximumLiveOriginInventoryCount,
       fixedAliasOriginCount: FIXED.quiesceFixedAliasOriginCount,
       candidateAliasOriginCount: FIXED.quiesceCandidateAliasOriginCount,
       probeVectorCount: FIXED.quiesceProbeVectorCount,

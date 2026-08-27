@@ -3,9 +3,6 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS } from
-  "../lib/production-google-writer-fence-quiesce.js";
-
 const migration036Url = new URL(
   "../supabase/production_migrations/202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
   import.meta.url,
@@ -47,9 +44,6 @@ test("additive migration pins the exact shared reviewed deployment set", () => {
     const rightKey = `${right[0]}\n${right[2]}`;
     return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
   });
-  assert.deepEqual(normalizedReviewed, [
-    ...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS,
-  ]);
   assert.equal(normalizedReviewed.length, 7);
   assert.equal(
     createHash("sha256").update(JSON.stringify(normalizedReviewed)).digest("hex"),

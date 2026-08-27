@@ -11,22 +11,29 @@ Use the authenticated candidate page:
 
 `/admin/step11-6-production-google-writer-fence`
 
-The page exposes six same-origin controls:
+The page exposes the following same-origin controls:
 
 1. **Inspect workbook** — reads sanitized metadata and establishes the exact baseline.
-2. **Begin controlled quiesce** — the server loads and hashes the retained
-   1,140-deployment v2 inventory and probes every signed immutable, fixed, and
-   candidate origin against the exact nine-method/path write vector. For signed
-   live inventory count `N`, a snapshot contains `9 × (N + 5)` probes.
+2. **Begin controlled quiesce** — the server loads and hashes the complete
+   1,291-deployment all-project v3 inventory, verifies its signed full-provider
+   and enforcement-projection tuples, and probes every signed immutable, fixed,
+   and candidate origin against the exact eleven-method/path write vector. For
+   signed live inventory count `N`, a snapshot contains `11 × (N + 5)` probes.
 3. **Finalize quiesce** — repeats the complete probe. The database requires at
    least 300 elapsed seconds and zero unresolved request logs/writes.
 4. **Inspect quiesce receipt** — discovers a lost response by retained request ID.
-5. **Apply Rehearsal Fence** — in one request, atomically adds 17 whole-sheet,
+5. **Inspect / abandon a retained BEGIN or FINALIZE challenge** — reads the
+   authoritative challenge/reservation state. An expired unconsumed challenge,
+   or a stale consumed attestation that remains `RESERVED` and never bound to
+   quiesce evidence, may be immutably abandoned with a separate stable request
+   identity. A `BOUND` reservation or any evidence progression cannot be
+   abandoned.
+6. **Apply Rehearsal Fence** — in one request, atomically adds 17 whole-sheet,
    non-warning protected ranges, proves the dedicated identity can edit them,
    proves the legacy service account cannot, attempts one same-description
    update against a run-owned protection and requires a provider `403`, then
    restores the exact baseline in `finally`.
-6. **Restore exact rehearsal fence** — recovery-only; deletes only exact tagged whole-sheet ranges
+7. **Restore exact rehearsal fence** — recovery-only; deletes only exact tagged whole-sheet ranges
    owned by the dedicated identity and requires exact baseline readback. A
    recovery-only restore records `FAILED / restoration_confirmed=true`; it
    clears the authority-mutation safety guard but does not certify the candidate.
@@ -78,21 +85,34 @@ explicit operational override and is **not** claimed to be machine-fenced.
 - dormant candidate flags: Google scoring, no Supabase scoring ingress, no
   workers, no publication, and no public read cutover.
 - exact server-configured Vercel project/rule/revision and the retained
-  `docs/evidence/step11-6-production-origin-inventory.json` artifact (1,140
-  exact tuples: 458 main Production and 682 feature-branch Preview, digest
-  `533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6`),
-  complete pagination evidence, and required prior-live/frozen-Step-11 IDs;
-- exact generated credential-confinement evidence for all 1,140 retained
-  origins (records fingerprint
-  `c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508`,
+  `docs/evidence/step11-6-production-origin-inventory.json` artifact, schema
+  `step11-6-production-origin-inventory-v3`: 1,291 all-project deployments,
+  comprising 458 Production-target and 833 project Preview records, with full
+  provider fingerprint
+  `6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692`
+  and one-to-one projection fingerprint
+  `d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6`;
+- exact generated credential-confinement evidence, schema
+  `step11-6-production-google-credential-confinement-v2`, for all 1,291
+  retained origins (classification fingerprint
+  `9ce65239f41086f56ea126e2491afe36ae90e85172a8536706f549912b27979b`,
   evidence fingerprint
-  `1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df`),
-  including nine provider-resolved SHAs and the sole non-executable BLOCKED
-  null-SHA tuple;
-- two complete dynamically sized live probe matrices (`18 × (N + 5)` total
-  edge requests) covering all 1,140 retained and all signed post-freeze origins
-  regardless `READY`/`ERROR`/`BLOCKED` status, four fixed aliases, and the
-  dynamic candidate alias, with exact `403`,
+  `071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133`),
+  including five READY null-SHA deployments and three READY deployments whose
+  exact Git objects are unavailable, all conservatively treated as potential
+  legacy writers;
+- exact historical safe-method Google-writer evidence at
+  `docs/evidence/step11-6-historical-safe-method-google-writer.json`, evidence
+  fingerprint
+  `6bf411a2e119e8552e6b3ac9ac51d8828e9fc853e5c43069dc40c31a6e794f28`,
+  proving 236 READY immutable origins can reach the historical
+  `GET`/implicit-`HEAD` Round Scorecards archive writer and binding the single
+  all-method path-set fingerprint
+  `fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa`;
+- two complete dynamically sized live probe matrices (`22 × (N + 5)` total
+  edge requests) covering the exact retained inventory or retained inventory
+  plus one exact current candidate, regardless `READY`/`ERROR`/`BLOCKED`
+  status, four fixed aliases, and the dynamic candidate alias, with exact `403`,
   `x-vercel-mitigated: deny`,
   `server: Vercel`, and `x-vercel-id` evidence;
 - an action-time owner-write freeze with the database-issued 30-minute
@@ -102,14 +122,36 @@ explicit operational override and is **not** claimed to be machine-fenced.
 
 The exhaustive two-pass edge proof plus the mandatory five-minute drain is
 budgeted as a roughly 15–25 minute controlled live window. Each snapshot uses
-`N + 5` compact per-origin tuples carrying a nine-bit coverage mask and nine
+`N + 5` compact per-origin tuples carrying an eleven-bit coverage mask and eleven
 ordered provider-proof fingerprints; the database validates and expands the
-logical `9 × (N + 5)` origin×vector set without relying on a multi-megabyte repeated
+logical `11 × (N + 5)` origin×vector set without relying on a multi-megabyte repeated
 JSON matrix.
+
+The signed provider attestation is consumed into a durable `RESERVED` row
+before the exhaustive edge probes begin. If probing or the network fails after
+that transaction, the challenge is not reusable forever and local storage must
+not be cleared as a workaround. Inspect the exact retained stage. Once the
+database reports `ELIGIBLE_CONSUMED_UNBOUND`, abandon it with the retained
+abandonment request ID. The database serializes abandonment against binding,
+requires the reservation still be unbound with no quiesce progression, marks
+both challenge and reservation `ABANDONED`, and preserves the consumed IDs and
+fingerprints in the audit chronology. A lost abandonment response is recovered
+by retrying that exact ID. Reissue BEGIN with a new evidence and all-new stage
+IDs; reissue FINALIZE with the same draining evidence ID and all-new FINALIZE
+IDs. Keep the provider deny rule installed while recovering.
 
 Only public-key hashes and sanitized metadata fingerprints are returned. OAuth
 tokens, private keys, service-account principals, protected-range principals,
 Drive principals/permission IDs, and cell values are never returned.
+
+The inventory artifact binds two ordered, one-to-one tuple forms. The full
+provider tuple is `deploymentId`, `sha`, `providerCommitSha`, `origin`,
+`deploymentTarget`, `gitBranch`, `providerSource`, `deploymentStatus`,
+`createdAt`, and `shaResolution`. The enforcement projection is
+`deploymentId`, `sha`, `origin`, `scopeClass`, `deploymentStatus`, and
+`providerMetadataFingerprint`. A signed live observation must be exactly the
+retained 1,291 tuple pairs, or those pairs plus one exact current-candidate pair.
+No mutable reviewed-deployment addendum is accepted.
 
 ## Fixed provider scope
 
@@ -176,17 +218,36 @@ hard execution precondition outside this candidate route.
 
 Before `Apply Rehearsal Fence`, install one temporary **project-level** Vercel
 WAF deny rule across every Production and Preview deployment/hostname in the
-`bagger-inv` project. The reviewed rule is:
+`bagger-inv` project. Its action is **Deny**, and it has exactly these three OR
+groups:
 
-- Request Path **Does not equal**
-  `/api/admin/step11-6-production-google-writer-fence`;
-- Method **Is not any of** `GET`, `HEAD`, `OPTIONS`;
-- Action: **Deny**.
+1. Request Path **Does not equal**
+   `/api/admin/step11-6-production-google-writer-fence` **and** Method **Is not
+   any of** `GET`, `HEAD`, `OPTIONS`.
+2. Host **Is any of** the exact eight source-unresolved READY immutable
+   hostnames, with no method exception:
+   `bagger-1w07if9d1-sandbagger-invitational.vercel.app`,
+   `bagger-60ah92b8c-sandbagger-invitational.vercel.app`,
+   `bagger-6nrmyunec-sandbagger-invitational.vercel.app`,
+   `bagger-b8ob0hjnu-sandbagger-invitational.vercel.app`,
+   `bagger-f64olgv1h-sandbagger-invitational.vercel.app`,
+   `bagger-h0eycprri-sandbagger-invitational.vercel.app`,
+   `bagger-kh2m1cy6h-sandbagger-invitational.vercel.app`, and
+   `bagger-kj3c0pkvm-sandbagger-invitational.vercel.app`.
+3. Request Path **Is any of** the exact single historical safe-method writer
+   path `/api/cron/round-scorecards-archive`, with no method exception.
 
-This keeps read-only traffic available, permits only the exact authenticated
-candidate rehearsal POST, and blocks every other mutating HTTP method without
-depending on a route inventory. Do not scope it to Vercel's Production
-environment: retained branch and immutable Preview deployments may still hold
+The exact sorted eight-origin fingerprint is
+`62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d`.
+The first group keeps ordinary read-only traffic available, permits only the
+exact authenticated candidate rehearsal POST, and blocks every other mutating
+HTTP method without depending on a route inventory. The second group closes
+all methods on source-unresolved READY code, so an unknown mutating `GET`,
+`HEAD`, or `OPTIONS` path cannot bypass the fence. The third group blocks the
+audited historical archive writer on all 236 affected immutable deployments,
+including explicit `GET` and framework-dispatched `HEAD`. Do not scope any
+group to
+Vercel's Production environment: immutable Preview deployments may still hold
 Production Google credentials.
 
 After saving the rule:

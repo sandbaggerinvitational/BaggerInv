@@ -53,14 +53,19 @@ export default function WriterFenceClient({ environment }) {
     recovery.quiesceEvidenceId;
   const beginExecutable = canExecuteProviderQuiesceStage(recovery, "BEGIN");
   const finalizeExecutable = canExecuteProviderQuiesceStage(recovery, "FINALIZE");
-  const retainedChallengeInspection =
-    recovery.retainedProviderChallengeInspection || null;
-  const retainedAttemptAbandonable =
-    canAbandonRetainedProviderAttestationChallenge(
-      recovery,
-      retainedChallengeInspection,
-      "REHEARSAL",
-    );
+  const beginAbandonable = canAbandonRetainedProviderAttestationChallenge(
+    recovery,
+    recovery.beginProviderChallengeAbandonmentInspection ||
+      recovery.retainedProviderChallengeInspection,
+    "REHEARSAL",
+    "BEGIN",
+  );
+  const finalizeAbandonable = canAbandonRetainedProviderAttestationChallenge(
+    recovery,
+    recovery.finalizeProviderChallengeAbandonmentInspection,
+    "REHEARSAL",
+    "FINALIZE",
+  );
 
   useEffect(() => {
     const retained = retainedState();
@@ -89,6 +94,14 @@ export default function WriterFenceClient({ environment }) {
       requestPath: API_PATH,
       methodOperator: "IS_NOT_ANY_OF",
       methods: ["GET", "HEAD", "OPTIONS"],
+      allMethodFenceRequiredHostCount:
+        environment.safety.allMethodFenceRequiredHostCount,
+      allMethodFenceRequiredHostsFingerprint:
+        environment.safety.allMethodFenceRequiredHostsFingerprint,
+      allMethodFenceRequiredPathCount:
+        environment.safety.allMethodFenceRequiredPathCount,
+      allMethodFenceRequiredPathsFingerprint:
+        environment.safety.allMethodFenceRequiredPathsFingerprint,
     };
   }
 
@@ -105,11 +118,12 @@ export default function WriterFenceClient({ environment }) {
     setRecovery(next);
   }
 
-  async function inspectRetainedChallenge() {
+  async function inspectRetainedChallenge(stage) {
+    const keys = providerAttestationStageKeys(stage);
     let payload;
     try {
       payload = buildRetainedProviderAttestationChallengePayload(
-        recovery, "REHEARSAL",
+        recovery, "REHEARSAL", keys.stage,
       );
     } catch (cause) {
       clientError(
@@ -121,14 +135,19 @@ export default function WriterFenceClient({ environment }) {
     const body = await post(
       "inspect-retained-provider-attestation-challenge",
       payload,
-      recovery.beginOperationRequestId,
+      recovery[keys.operationKey],
     );
     if (!body?.challenge) return;
     try {
       const inspection = validateRetainedProviderAttestationChallenge(
-        body.challenge, recovery, "REHEARSAL",
+        body.challenge, recovery, "REHEARSAL", keys.stage,
       );
-      retain({ retainedProviderChallengeInspection: inspection });
+      retain({
+        [keys.abandonmentInspectionKey]: inspection,
+        ...(inspection.status === "CONSUMED"
+          ? { [keys.challengeKey]: inspection }
+          : {}),
+      });
     } catch (cause) {
       clientError(
         cause,
@@ -137,19 +156,21 @@ export default function WriterFenceClient({ environment }) {
     }
   }
 
-  async function abandonRetainedChallenge() {
+  async function abandonRetainedChallenge(stage) {
+    const keys = providerAttestationStageKeys(stage);
+    const abandonable = keys.stage === "BEGIN" ? beginAbandonable : finalizeAbandonable;
     let stable;
     let payload;
     try {
-      if (!retainedAttemptAbandonable) {
+      if (!abandonable) {
         throw Object.assign(new Error(
-          "The retained BEGIN challenge is not authoritatively eligible for abandonment.",
+          `The retained ${keys.stage} challenge is not authoritatively eligible for abandonment.`,
         ), { code: "PROVIDER_ATTESTATION_ABANDON_NOT_ELIGIBLE" });
       }
-      const beginAbandonRequestId = recovery.beginAbandonRequestId || requestId();
-      stable = { ...recovery, beginAbandonRequestId };
+      const abandonRequestId = recovery[keys.abandonRequestKey] || requestId();
+      stable = { ...recovery, [keys.abandonRequestKey]: abandonRequestId };
       payload = buildRetainedProviderAttestationChallengePayload(
-        stable, "REHEARSAL",
+        stable, "REHEARSAL", keys.stage,
       );
       storeExact(stable);
     } catch (cause) {
@@ -161,8 +182,8 @@ export default function WriterFenceClient({ environment }) {
     }
     const body = await post(
       "abandon-provider-attestation-challenge",
-      { ...payload, abandonRequestId: stable.beginAbandonRequestId },
-      stable.beginOperationRequestId,
+      { ...payload, abandonRequestId: stable[keys.abandonRequestKey] },
+      stable[keys.operationKey],
     );
     if (!body?.challenge) return;
     try {
@@ -170,11 +191,12 @@ export default function WriterFenceClient({ environment }) {
         stable,
         body.challenge,
         "REHEARSAL",
+        keys.stage,
       );
       storeExact(next);
-      setRoutingRuleId("");
-      setRoutingRuleRevision("");
-      setOwnerFreezeConfirmed(false);
+      if (keys.stage === "BEGIN") {
+        setOwnerFreezeConfirmed(false);
+      }
       setError(null);
       setResult(body);
     } catch (cause) {
@@ -490,15 +512,15 @@ export default function WriterFenceClient({ environment }) {
         </button>
         <button type="button" disabled={Boolean(busy) ||
           !recovery.beginProviderChallenge || Boolean(verifiedQuiesce)}
-          onClick={inspectRetainedChallenge}>
+          onClick={() => inspectRetainedChallenge("BEGIN")}>
           {busy === "inspect-retained-provider-attestation-challenge"
             ? "Inspecting retained challenge…" : "Inspect retained BEGIN challenge"}
         </button>
-        <button type="button" disabled={Boolean(busy) || !retainedAttemptAbandonable}
-          onClick={abandonRetainedChallenge}>
+        <button type="button" disabled={Boolean(busy) || !beginAbandonable}
+          onClick={() => abandonRetainedChallenge("BEGIN")}>
           {busy === "abandon-provider-attestation-challenge"
             ? "Abandoning retained challenge…" :
-              "Abandon expired unconsumed BEGIN challenge"}
+              "Abandon stale unbound BEGIN challenge"}
         </button>
         <button type="button" disabled={Boolean(busy) ||
           !recovery.beginProviderAttestationRequest}
@@ -521,6 +543,18 @@ export default function WriterFenceClient({ environment }) {
           onClick={() => issueChallenge("FINALIZE")}>
           {busy === "issue-provider-attestation-challenge"
             ? "Issuing challenge…" : "Issue / recover FINALIZE challenge"}
+        </button>
+        <button type="button" disabled={Boolean(busy) ||
+          !recovery.finalizeProviderChallenge}
+          onClick={() => inspectRetainedChallenge("FINALIZE")}>
+          {busy === "inspect-retained-provider-attestation-challenge"
+            ? "Inspecting retained challenge…" : "Inspect retained FINALIZE challenge"}
+        </button>
+        <button type="button" disabled={Boolean(busy) || !finalizeAbandonable}
+          onClick={() => abandonRetainedChallenge("FINALIZE")}>
+          {busy === "abandon-provider-attestation-challenge"
+            ? "Abandoning retained challenge…" :
+              "Abandon stale unbound FINALIZE challenge"}
         </button>
         <button type="button" disabled={Boolean(busy) ||
           !recovery.finalizeProviderAttestationRequest}

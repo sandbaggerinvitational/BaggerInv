@@ -69,9 +69,10 @@ activation/admission revisions, generations, and durable receipts—not the
 local manifest—remain authoritative. The operator rejects post-stage state when
 the protected stage receipt is missing or any historical claim differs from it.
 
-The additive migration is
-`202608260038_production_provider_preview_target_inventory_v4.sql`, SHA-256
-`32cc5994570aaa77679b19e14a71a917dcc7fe297bc559ebe82dd320bff94c4c`.
+The additive all-project provider-inventory migration is
+`202608260039_production_all_project_provider_inventory_v3.sql`. Its exact
+SHA-256 is bound by the frozen Step 11.6 operator bundle; never transcribe it
+from an unfrozen worktree.
 
 ## Non-negotiable writer invariant
 
@@ -109,63 +110,102 @@ fence install/readback. This estimate is informational and never shortens a
 safety wait or failed gate.
 
 1. Generate `begin-provider-quiesce` with a stable evidence request ID, the
-   exact reviewed Vercel routing rule, `quiescePurpose=CUTOVER`, explicit
+   exact certified Vercel routing rule, `quiescePurpose=CUTOVER`, explicit
    owner-freeze confirmation, and the certified 1,800-second TTL. The client never
    supplies acknowledgement/expiry timestamps or unresolved-write counts; the
    server records time and the DB independently verifies the zero-write
-   predicates. The server loads the retained 1,140-record v2 Production-capable
-   origin inventory (458 main Production plus 682 feature-branch Preview
-   deployments) and revalidates its exact tuple digest
-   `533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6`;
-   the browser/operator must not send those records. It also binds the generated
-   1,140-origin credential-confinement evidence (records fingerprint
-   `c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508`,
-   evidence fingerprint
-   `1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df`).
-2. The server verifies the provider-signed live inventory: the retained 1,140
-   records, the seven exact reviewed post-capture Preview deployments pinned by
-   additive migrations
-   `202608260035_production_reviewed_post_capture_preview_deployments.sql` and
-   `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
-   plus `202608260037_production_provider_rpc_name_and_inventory_v3.sql` and
-   `202608260038_production_provider_preview_target_inventory_v4.sql`, and the
-   exact dynamic candidate. The ordered reviewed tuple-set fingerprint is
-   `91cdd7ab6fc077cb422c4b8921a0ac431ddf38f043167c457cc7ad4cc288a01a`.
-   The provider reader requires Vercel v6's exact Preview representation:
-   explicit JSON `target: null`. Missing or non-null target values cannot be
-   silently classified as `FEATURE_PREVIEW`.
-   Only provider-signed same-current-SHA additions in the target-appropriate
-   scope are permitted. The server then adds four fixed aliases and the dynamic
-   candidate alias. For signed live count `N`, each
-   snapshot covers exactly `N + 5` origins and `9 × (N + 5)` requests. The
+   predicates. The server loads the complete all-project inventory artifact,
+   schema `step11-6-production-origin-inventory-v3`, and revalidates its 1,291
+   records: 458 Production-target plus 833 project Preview deployments. It
+   binds the ordered full-provider tuple set—`deploymentId`, `sha`,
+   `providerCommitSha`, `origin`, `deploymentTarget`, `gitBranch`,
+   `providerSource`, `deploymentStatus`, `createdAt`, `shaResolution`—with
+   count 1,291 and fingerprint
+   `6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692`.
+   It also binds the exact one-to-one enforcement projection—`deploymentId`,
+   `sha`, `origin`, `scopeClass`, `deploymentStatus`,
+   `providerMetadataFingerprint`—with count 1,291 and fingerprint
+   `d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6`.
+   The browser/operator must not send either tuple set.
+
+   The same request binds credential-confinement schema
+   `step11-6-production-google-credential-confinement-v2`, count 1,291,
+   classification fingerprint
+   `9ce65239f41086f56ea126e2491afe36ae90e85172a8536706f549912b27979b`,
+   and evidence fingerprint
+   `071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133`.
+   It binds the exact eight source-unresolved READY hosts that need an
+   all-method fence by fingerprint
+   `62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d`.
+   The hostnames are `bagger-1w07if9d1-sandbagger-invitational.vercel.app`,
+   `bagger-60ah92b8c-sandbagger-invitational.vercel.app`,
+   `bagger-6nrmyunec-sandbagger-invitational.vercel.app`,
+   `bagger-b8ob0hjnu-sandbagger-invitational.vercel.app`,
+   `bagger-f64olgv1h-sandbagger-invitational.vercel.app`,
+   `bagger-h0eycprri-sandbagger-invitational.vercel.app`,
+   `bagger-kh2m1cy6h-sandbagger-invitational.vercel.app`, and
+   `bagger-kj3c0pkvm-sandbagger-invitational.vercel.app`.
+2. The server verifies the provider-signed live inventory is exactly the
+   retained 1,291 full-provider/projection tuple pairs, or those pairs plus one
+   exact current candidate. The optional candidate must bind the current
+   deployment ID, immutable origin, SHA, branch, target, status, and provider
+   metadata in both tuple forms. There is no mutable reviewed-deployment
+   addendum and no allowance for an arbitrary same-SHA redeploy. Missing,
+   extra, reordered, or mismatched provider/projection tuples fail closed and
+   require inventory recapture/recertification.
+
+   The temporary WAF action is `DENY` with exactly three OR groups: (a) request
+   path is not
+   `/api/admin/step11-6-production-google-writer-fence` **and** method is not
+   one of `GET`, `HEAD`, or `OPTIONS`; or (b) host is one of the exact eight
+   source-unresolved READY hostnames, with no method exception; or (c) path is
+   in the exact one-path all-method set
+   `/api/cron/round-scorecards-archive`. The first group
+   stops ordinary mutating routes while keeping read traffic and the control
+   POST available. The second group stops unknown code from hiding a mutation
+   behind `GET`, `HEAD`, or `OPTIONS`. The third group closes the independently
+   audited historical archive-writer route across 236 READY immutable origins;
+   its evidence fingerprint is
+   `6bf411a2e119e8552e6b3ac9ac51d8828e9fc853e5c43069dc40c31a6e794f28`
+   and its path-set fingerprint is
+   `fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa`.
+
+   The server then adds four fixed aliases and the dynamic candidate alias. For
+   signed live count `N`, each
+   snapshot covers exactly `N + 5` origins and `11 × (N + 5)` requests. The
    immutable candidate is already in `N` and is not double-counted. This
    includes every retained/signed `READY`, `ERROR`, and `BLOCKED` origin. The
    vectors are `POST` for
    `/api/scoring/current`, `/api/scoring/matches/__step11_6_probe__`,
    `/api/director`, `/api/live-matches`, `/api/admin/tournament`,
    `/api/admin/cms`, `/api/odds/publish`, and `/api/tournament-guide`, plus
-   `DELETE /api/tournament-guide`. One probe URL cannot certify a project-wide
+   `DELETE /api/tournament-guide`, plus `GET` and `HEAD` for
+   `/api/cron/round-scorecards-archive`. One probe URL cannot certify a project-wide
    method/path rule.
    Each snapshot is persisted as one compact tuple per dynamically attested
-   origin with the exact nine-vector coverage mask and nine ordered provider-
+   origin with the exact eleven-vector coverage mask and eleven ordered provider-
    proof fingerprints; the database derives and validates the complete logical
-   origin×vector set. The minimum Step 11.6 snapshot is 1,153 origins and
-   10,377 requests (1,148 signed immutable origins plus five aliases). A normal
-   Step 12 Preview-plus-Production candidate pair is at least 1,154 origins and
-   10,386 requests, but the signed inventory and receipt are authoritative.
+   origin×vector set. The retained-set snapshot is 1,296 origins and 14,256
+   requests. The retained-plus-one-candidate snapshot is 1,297 origins and
+   14,267 requests. The signed inventory and durable receipt are authoritative.
    The fixed/candidate aliases are diagnostic canaries, not an exhaustive alias
    inventory. All other aliases are covered by the provider-attested active
    project-wide firewall configuration. The attester rejects inactive/missing
    active config and all pending drafts, and binds the exact version/rule/
    conditions in each independently signed BEGIN/FINALIZE observation.
-   If a BEGIN challenge expires before it is consumed, inspect its exact durable
-   state through the protected operator route. Only an expired, unconsumed,
-   unprogressed BEGIN challenge with the exact original actor, resource,
-   candidate, rule, purpose, and request binding may transition to immutable
-   `ABANDONED`. Retain and retry the same abandonment request identity after a
-   lost response; clear browser recovery only after the exact authoritative
-   `ABANDONED` receipt, then issue all-new BEGIN identities. Never delete the
-   row or clear browser state as a substitute for database recovery.
+   If a BEGIN or FINALIZE challenge expires before consumption, or if a signed
+   attestation was consumed into a durable `RESERVED` row but probing/network
+   failed before it was `BOUND`, inspect its exact durable state through the
+   protected operator route. Only an authoritatively eligible unprogressed
+   challenge with the exact original actor, resource, candidate, rule, stage,
+   purpose, request, consume, and attestation binding may transition to
+   immutable `ABANDONED`. `BOUND`, fresh, mismatched, or progressed evidence
+   fails closed. Retain and retry the same abandonment request identity after a
+   lost response; clear only the affected browser stage after the exact
+   authoritative `ABANDONED` receipt. Then issue all-new stage identities:
+   BEGIN also uses a new evidence request ID; FINALIZE retains the same DRAINING
+   evidence request ID. Keep the deny rule active. Never delete an audit row,
+   reset local storage, or reuse a consumed attestation as recovery.
 3. Wait at least 300 seconds inside the recorded owner-freeze window. Generate
    `finalize-provider-quiesce` and then `inspect-provider-quiesce`. Both durable
    snapshots must bind the exact project/rule/revision/scope and candidate,

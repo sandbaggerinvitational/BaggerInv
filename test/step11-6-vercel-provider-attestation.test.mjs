@@ -20,9 +20,11 @@ import {
   VERCEL_PROVIDER_ATTESTATION_REQUEST_SCHEMA,
   VERCEL_PROVIDER_ATTESTATION_TEAM_ID_ENV,
 } from "../lib/vercel-provider-attestation.js";
-import { productionLegacyDeploymentInventory } from
-  "../lib/production-google-writer-fence-quiesce.js";
-import { PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS } from
+import {
+  productionGoogleWriterAllMethodFenceHosts,
+  productionGoogleWriterAllMethodFencePaths,
+  productionLegacyDeploymentInventory,
+} from
   "../lib/production-google-writer-fence-quiesce.js";
 import {
   PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_EVIDENCE_FINGERPRINT,
@@ -30,6 +32,11 @@ import {
   PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_RECORDS_FINGERPRINT,
   PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_SCHEMA,
 } from "../lib/production-google-credential-confinement.js";
+import {
+  productionWriterQuiesceRoutingRulePayload,
+  verifiedProviderAttestationPayload,
+} from
+  "../lib/production-google-writer-fence-provider-claim.js";
 import { PRODUCTION_VERCEL_PROJECT_ID } from
   "../lib/google-service-account-credential-context.js";
 import {
@@ -50,12 +57,8 @@ const candidateAlias =
   "https://bagger-inv-git-feature-step116-sandbagger-invitational.vercel.app";
 const candidateImmutable =
   "https://bagger-step116signed-sandbagger-invitational.vercel.app";
-const postFreezeId = "dpl_PostFreezeStep116Preview01";
-const postFreezeSha = candidateSha;
-const postFreezeOrigin =
-  "https://bagger-postfreezesigned-sandbagger-invitational.vercel.app";
-const capturedLater = "2026-08-26T16:10:00.000Z";
-const now = Date.parse("2026-08-26T16:20:00.000Z");
+const capturedLater = "2026-08-26T23:30:00.000Z";
+const now = Date.parse("2026-08-26T23:40:00.000Z");
 
 function request({
   stage = "BEGIN",
@@ -63,6 +66,10 @@ function request({
   target = purpose === "CUTOVER" ? "PRODUCTION" : "PREVIEW",
   requestId = "11111111-1111-4111-8111-111111111111",
   challengeId = "33333333-3333-4333-8333-333333333333",
+  selectedCandidateId = candidateId,
+  selectedCandidateSha = candidateSha,
+  selectedCandidateAlias = candidateAlias,
+  selectedCandidateImmutable = candidateImmutable,
 } = {}) {
   return {
     schemaVersion: VERCEL_PROVIDER_ATTESTATION_REQUEST_SCHEMA,
@@ -73,11 +80,11 @@ function request({
     purpose,
     projectId: PRODUCTION_VERCEL_PROJECT_ID,
     teamId,
-    candidateDeploymentId: candidateId,
-    candidateCommitSha: candidateSha,
+    candidateDeploymentId: selectedCandidateId,
+    candidateCommitSha: selectedCandidateSha,
     candidateDeploymentTarget: target,
-    candidateAliasOrigin: candidateAlias,
-    candidateImmutableOrigin: candidateImmutable,
+    candidateAliasOrigin: selectedCandidateAlias,
+    candidateImmutableOrigin: selectedCandidateImmutable,
     routingRuleId: ruleId,
     routingRuleConfigVersion: "17",
   };
@@ -108,6 +115,18 @@ function firewall({ active = true, action = "deny", version = "17" } = {}) {
             value: ["OPTIONS", "GET", "HEAD"],
           },
         ],
+      }, {
+        conditions: [{
+          type: "hostname",
+          op: "inc",
+          value: [...productionGoogleWriterAllMethodFenceHosts().hostnames],
+        }],
+      }, {
+        conditions: [{
+          type: "path",
+          op: "inc",
+          value: [...productionGoogleWriterAllMethodFencePaths().paths],
+        }],
       }],
       action: { mitigate: { action } },
     }],
@@ -115,47 +134,44 @@ function firewall({ active = true, action = "deny", version = "17" } = {}) {
   return { active: config, draft: null, versions: [config] };
 }
 
-function rawDeployment(tuple, { createdAt = "2026-08-20T00:00:00.000Z" } = {}) {
-  const [uid, sha, origin, scope, status] = tuple;
-  const feature = scope === "FEATURE_PREVIEW" ||
-    scope === "CUTOVER_PRODUCTION_CANDIDATE";
+function rawDeployment(tuple) {
+  const [uid, , providerSha, origin, target, branch, providerSource, status, createdAt] =
+    tuple;
   return {
     uid,
     url: new URL(origin).hostname,
-    target: scope === "FEATURE_PREVIEW" ? null : "production",
+    target: target === "PREVIEW" ? null : "production",
     readyState: status === "BLOCKED" ? "CANCELED" : status,
-    createdAt,
-    meta: {
-      ...(sha ? { githubCommitSha: sha } : {}),
-      githubCommitRef: feature ? "feature/mock-tournament-qa-integration" : "main",
+    createdAt: Date.parse(createdAt),
+    source: providerSource.toLowerCase(),
+    meta: providerSha === null ? {} : {
+      githubCommitSha: providerSha,
+      ...(branch ? { githubCommitRef: branch } : {}),
     },
   };
 }
 
-function liveTuples(selectedRequest, { includePostFreeze = true } = {}) {
-  const candidateScope = selectedRequest.candidateDeploymentTarget === "PRODUCTION"
-    ? "CUTOVER_PRODUCTION_CANDIDATE" : "FEATURE_PREVIEW";
+function liveProviderTuples(selectedRequest, { candidateRetained = false } = {}) {
+  const retained = productionLegacyDeploymentInventory().providerRecordTuples
+    .map((tuple) => [...tuple]);
+  if (candidateRetained) return retained;
   return [
-    ...productionLegacyDeploymentInventory().recordTuples.map((tuple) => [...tuple]),
-    ...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.map((tuple) => [...tuple]),
-    ...(includePostFreeze ? [[
-      postFreezeId, postFreezeSha, postFreezeOrigin,
-      "FEATURE_PREVIEW", "READY", "GIT",
-    ]] : []),
-    [candidateId, candidateSha, candidateImmutable, candidateScope, "READY", "GIT"],
+    ...retained,
+    [selectedRequest.candidateDeploymentId, selectedRequest.candidateCommitSha,
+      selectedRequest.candidateCommitSha, selectedRequest.candidateImmutableOrigin,
+      selectedRequest.candidateDeploymentTarget,
+      "feature/mock-tournament-qa-integration", "GIT", "READY", capturedLater,
+      "EXACT_PROVIDER"],
   ].sort((left, right) => {
-    const a = `${left[0]}\n${left[2]}`;
-    const b = `${right[0]}\n${right[2]}`;
+    const a = `${left[0]}\n${left[3]}`;
+    const b = `${right[0]}\n${right[3]}`;
     return a < b ? -1 : a > b ? 1 : 0;
   });
 }
 
 function provider(selectedRequest, options = {}) {
-  const tuples = liveTuples(selectedRequest, options);
-  const deployments = tuples.map((tuple) => rawDeployment(tuple, {
-    createdAt: tuple[0] === postFreezeId || tuple[0] === candidateId
-      ? capturedLater : "2026-08-20T00:00:00.000Z",
-  }));
+  const tuples = liveProviderTuples(selectedRequest, options);
+  const deployments = tuples.map(rawDeployment);
   const paths = [];
   const secretValues = ["never-return-this-private-key", "sb_secret_never-return-this"];
   const candidateTarget = selectedRequest.candidateDeploymentTarget === "PRODUCTION"
@@ -228,15 +244,16 @@ test("local attester exhausts deployment pagination, accepts additive scope, and
   const selectedRequest = request();
   const fixture = provider(selectedRequest);
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
-  assert.equal(scope.retainedRecordCount, 1140);
-  assert.equal(scope.liveRecordCount, 1149);
-  assert.equal(scope.liveRecords.length, 1149);
+  assert.equal(scope.retainedRecordCount, 1291);
+  assert.equal(scope.retainedProviderRecordCount, 1291);
+  assert.equal(scope.liveRecordCount, 1292);
+  assert.equal(scope.liveRecords.length, 1292);
+  assert.equal(scope.liveProviderRecords.length, 1292);
   assert.equal(scope.paginationComplete, true);
-  assert.equal(scope.pageCount, 12);
-  assert.equal(scope.liveRecords.filter((tuple) => tuple[1] === null).length, 1,
-    "only the provider-proven non-executable blocked deployment retains a null SHA");
-  assert.ok(fixture.paths.filter((path) => path.startsWith("/v6/deployments?")).length === 12);
-  assert.ok(fixture.paths.some((path) => path.includes("until=1100")));
+  assert.equal(scope.pageCount, 13);
+  assert.equal(scope.liveRecords.filter((tuple) => tuple[1] === null).length, 8);
+  assert.ok(fixture.paths.filter((path) => path.startsWith("/v6/deployments?")).length === 13);
+  assert.ok(fixture.paths.some((path) => path.includes("until=1200")));
 
   const environment = normalizeVercelEnvironmentScope(await fixture.readApi(
     `/v9/projects/${PRODUCTION_VERCEL_PROJECT_ID}/env?teamId=${teamId}`,
@@ -253,22 +270,74 @@ test("local attester exhausts deployment pagination, accepts additive scope, and
     !JSON.stringify(environment).includes(secret)));
 });
 
-test("exact retained plus reviewed plus candidate 1,148-origin scope is accepted", async () => {
+test("exact retained CLI deployments with unavailable SHA remain accepted but cannot drift", async () => {
   const selectedRequest = request();
-  const fixture = provider(selectedRequest, { includePostFreeze: false });
-  const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
-  assert.equal(scope.retainedRecordCount, 1140);
-  assert.equal(scope.liveRecordCount, 1148);
-  assert.equal(scope.liveRecords.length, 1148);
-  assert.deepEqual(
-    scope.liveRecords.filter((tuple) =>
-      PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
-        (reviewed) => reviewed[0] === tuple[0] && reviewed[2] === tuple[2],
-      )),
-    [...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS],
+  const retainedCli = productionLegacyDeploymentInventory().providerRecordTuples.find(
+    (tuple) => tuple[9] === "UNAVAILABLE",
   );
+  assert.equal(retainedCli[1], null);
+  assert.equal(retainedCli[2], null);
+  assert.equal(retainedCli[5], null);
+  assert.equal(retainedCli[6], "CLI");
+
+  const exactFixture = provider(selectedRequest);
+  const exactScope = await collectVercelDeploymentScope(
+    exactFixture.readApi,
+    selectedRequest,
+  );
+  assert.equal(exactScope.liveRecords.filter((tuple) =>
+    tuple[0] === retainedCli[0] && tuple[2] === retainedCli[3]).length, 1);
+
+  for (const mutate of [
+    (record) => { record.meta.githubCommitSha = "a".repeat(40); },
+    (record) => { record.meta.githubCommitRef =
+      "feature/mock-tournament-qa-integration"; },
+    (record) => { record.source = "git"; },
+    (record) => { record.target = "production"; },
+    (record) => { record.readyState = retainedCli[7] === "READY" ? "ERROR" : "READY"; },
+  ]) {
+    const driftFixture = provider(selectedRequest);
+    const originalReader = driftFixture.readApi;
+    await assert.rejects(() => collectVercelDeploymentScope(async (path) => {
+      const payload = await originalReader(path);
+      if (path.startsWith("/v6/deployments?")) {
+        const record = payload.deployments.find((item) => item.uid === retainedCli[0]);
+        if (record) mutate(record);
+      }
+      return payload;
+    }, selectedRequest), (error) =>
+      error.code === "STEP11_6_VERCEL_DEPLOYMENT_SCOPE_DRIFT");
+  }
+});
+
+test("exact complete retained census plus one dynamic candidate is accepted", async () => {
+  const selectedRequest = request();
+  const fixture = provider(selectedRequest);
+  const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
+  assert.equal(scope.retainedRecordCount, 1291);
+  assert.equal(scope.liveRecordCount, 1292);
+  assert.equal(scope.liveRecords.length, 1292);
   assert.equal(scope.liveRecords.filter((tuple) =>
     tuple[0] === candidateId && tuple[2] === candidateImmutable).length, 1);
+});
+
+test("an exact candidate already present in the retained census needs no additive tuple", async () => {
+  const retainedCandidate = productionLegacyDeploymentInventory().providerRecordTuples.find(
+    (tuple) => tuple[0] === "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+  );
+  const selectedRequest = request({
+    selectedCandidateId: retainedCandidate[0],
+    selectedCandidateSha: retainedCandidate[1],
+    selectedCandidateImmutable: retainedCandidate[3],
+    selectedCandidateAlias:
+      "https://bagger-retained-candidate-alias-sandbagger-invitational.vercel.app",
+  });
+  const fixture = provider(selectedRequest, { candidateRetained: true });
+  const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
+  assert.equal(scope.liveRecordCount, 1291);
+  assert.equal(scope.liveProviderRecordCount, 1291);
+  assert.equal(scope.liveRecords.filter((tuple) =>
+    tuple[0] === retainedCandidate[0] && tuple[2] === retainedCandidate[3]).length, 1);
 });
 
 test("signed BEGIN and independently signed FINALIZE attestations bind Preview scope", async () => {
@@ -295,8 +364,9 @@ test("signed BEGIN and independently signed FINALIZE attestations bind Preview s
   });
   assert.equal(verifiedBegin.signatureVerified, true);
   assert.equal(verifiedBegin.stage, "BEGIN");
+  assert.equal(verifiedBegin.purpose, "REHEARSAL");
   assert.equal(verifiedBegin.candidateDeploymentTarget, "PREVIEW");
-  assert.equal(verifiedBegin.liveOriginInventoryCount, 1149);
+  assert.equal(verifiedBegin.liveOriginInventoryCount, 1292);
   assert.equal(verifiedBegin.routingRulePendingDraftChangeCount, 0);
   assert.equal(verifiedBegin.credentialConfinementEvidenceSchema,
     PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_SCHEMA);
@@ -306,6 +376,31 @@ test("signed BEGIN and independently signed FINALIZE attestations bind Preview s
     PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_RECORDS_FINGERPRINT);
   assert.equal(verifiedBegin.credentialConfinementEvidenceFingerprint,
     PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_EVIDENCE_FINGERPRINT);
+  const receiptClaim = verifiedProviderAttestationPayload(verifiedBegin, "BEGIN");
+  assert.equal(receiptClaim.purpose, "REHEARSAL");
+  assert.equal(receiptClaim.routing_rule_all_method_fence_required_path_count, 1);
+  assert.equal(receiptClaim.routing_rule_all_method_fence_required_paths_fingerprint,
+    "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa");
+  const topLevelRule = productionWriterQuiesceRoutingRulePayload({
+    ruleId,
+    revision: "17",
+    scope: "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
+    allMethodFenceRequiredHostCount:
+      verifiedBegin.routingRuleAllMethodFenceRequiredHostCount,
+    allMethodFenceRequiredHostsFingerprint:
+      verifiedBegin.routingRuleAllMethodFenceRequiredHostsFingerprint,
+    allMethodFenceRequiredPathCount:
+      verifiedBegin.routingRuleAllMethodFenceRequiredPathCount,
+    allMethodFenceRequiredPathsFingerprint:
+      verifiedBegin.routingRuleAllMethodFenceRequiredPathsFingerprint,
+  });
+  assert.deepEqual(Object.keys(topLevelRule).sort(), [
+    "routing_rule_all_method_fence_required_host_count",
+    "routing_rule_all_method_fence_required_hosts_fingerprint",
+    "routing_rule_all_method_fence_required_path_count",
+    "routing_rule_all_method_fence_required_paths_fingerprint",
+    "routing_rule_id", "routing_rule_revision", "routing_rule_scope",
+  ].sort());
 
   const finalizeRequest = request({
     stage: "FINALIZE",
@@ -341,18 +436,42 @@ test("signed BEGIN and independently signed FINALIZE attestations bind Preview s
   }), (error) => error.code === "STEP11_6_VERCEL_ATTESTATION_ID_INVALID");
 });
 
+test("signed provider evidence requires two identical exhaustive deployment passes", async () => {
+  const selectedRequest = request();
+  const fixture = provider(selectedRequest);
+  let pass = 0;
+  await assert.rejects(() => createVercelProviderAttestation({
+    request: selectedRequest,
+    privateKey: keys().privateKey,
+    readApi: async (path) => {
+      const isDeploymentPage = path.startsWith("/v6/deployments?");
+      if (isDeploymentPage && !new URL(`https://local${path}`).searchParams.has("until")) {
+        pass += 1;
+      }
+      const payload = await fixture.readApi(path);
+      if (isDeploymentPage && pass === 2) {
+        const candidate = payload.deployments.find((item) => item.uid === candidateId);
+        if (candidate) candidate.createdAt += 1;
+      }
+      return payload;
+    },
+    now,
+  }), (error) => error.code === "STEP11_6_VERCEL_DEPLOYMENT_SCOPE_DRIFT");
+  assert.equal(pass, 2);
+});
+
 test("a freshly re-signed but reordered live inventory is rejected by scope normalization", async () => {
   const selectedRequest = request();
   const keyPair = keys();
   const envelope = structuredClone(await createVercelProviderAttestation({
     request: selectedRequest,
     privateKey: keyPair.privateKey,
-    readApi: provider(selectedRequest, { includePostFreeze: false }).readApi,
+    readApi: provider(selectedRequest).readApi,
     now,
   }));
-  const records = envelope.attestation.liveOriginInventoryRecords;
+  const records = envelope.attestation.liveProviderInventoryRecords;
   [records[0], records[1]] = [records[1], records[0]];
-  envelope.attestation.liveOriginInventoryFingerprint =
+  envelope.attestation.liveProviderInventoryFingerprint =
     createHash("sha256").update(JSON.stringify(records)).digest("hex");
   const resigned = resignEnvelope(envelope, keyPair.privateKey);
   assert.throws(() => verifyVercelProviderAttestation(resigned, {
@@ -446,9 +565,41 @@ test("tamper, stale proof, wrong purpose/target, firewall drift, and deployment 
 
   const emptyDraft = firewall();
   emptyDraft.draft = { changes: [] };
-  assert.equal(normalizeVercelFirewallConfiguration(
+  const normalizedFirewall = normalizeVercelFirewallConfiguration(
     emptyDraft, selectedRequest,
-  ).pendingDraftChangeCount, 0);
+  );
+  assert.equal(normalizedFirewall.pendingDraftChangeCount, 0);
+  assert.equal(normalizedFirewall.allMethodFenceRequiredHostCount, 8);
+  assert.equal(normalizedFirewall.allMethodFenceRequiredHostsFingerprint,
+    "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d");
+  assert.equal(normalizedFirewall.allMethodFenceRequiredPathCount, 1);
+  assert.equal(normalizedFirewall.allMethodFenceRequiredPathsFingerprint,
+    "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa");
+
+  const noAllMethodPathGroup = firewall();
+  noAllMethodPathGroup.active.rules[0].conditionGroup.pop();
+  assert.throws(() => normalizeVercelFirewallConfiguration(
+    noAllMethodPathGroup, selectedRequest,
+  ), (error) => error.code === "STEP11_6_VERCEL_FIREWALL_RULE_INVALID");
+
+  const noAllMethodHostGroup = firewall();
+  noAllMethodHostGroup.active.rules[0].conditionGroup.splice(1, 1);
+  assert.throws(() => normalizeVercelFirewallConfiguration(
+    noAllMethodHostGroup, selectedRequest,
+  ), (error) => error.code === "STEP11_6_VERCEL_FIREWALL_RULE_INVALID");
+
+  const incompleteAllMethodHosts = firewall();
+  incompleteAllMethodHosts.active.rules[0].conditionGroup[1].conditions[0].value.pop();
+  assert.throws(() => normalizeVercelFirewallConfiguration(
+    incompleteAllMethodHosts, selectedRequest,
+  ), (error) => error.code === "STEP11_6_VERCEL_FIREWALL_RULE_INVALID");
+
+  const wrongAllMethodPath = firewall();
+  wrongAllMethodPath.active.rules[0].conditionGroup[2].conditions[0].value =
+    ["/api/cron/not-the-archive-route"];
+  assert.throws(() => normalizeVercelFirewallConfiguration(
+    wrongAllMethodPath, selectedRequest,
+  ), (error) => error.code === "STEP11_6_VERCEL_FIREWALL_RULE_INVALID");
 
   const missingCandidate = provider(selectedRequest);
   const originalReader = missingCandidate.readApi;
@@ -535,7 +686,7 @@ test("deployment pagination loops/nontermination and unexpected branches fail cl
     const payload = await fixture.readApi(path);
     if (path.startsWith("/v6/deployments?")) {
       for (const deployment of payload.deployments) {
-        if (deployment.uid === postFreezeId) deployment.meta.githubCommitRef = "unreviewed-branch";
+        if (deployment.uid === candidateId) deployment.meta.githubCommitRef = "unreviewed-branch";
       }
     }
     return payload;
@@ -551,7 +702,7 @@ test("post-capture additions are limited to the exact certified candidate SHA an
     const payload = await wrongShaFixture.readApi(path);
     if (path.startsWith("/v6/deployments?")) {
       for (const deployment of payload.deployments) {
-        if (deployment.uid === postFreezeId) deployment.meta.githubCommitSha = wrongSha;
+        if (deployment.uid === candidateId) deployment.meta.githubCommitSha = wrongSha;
       }
     }
     return payload;
@@ -563,7 +714,7 @@ test("post-capture additions are limited to the exact certified candidate SHA an
     const payload = await mainAdditionFixture.readApi(path);
     if (path.startsWith("/v6/deployments?")) {
       for (const deployment of payload.deployments) {
-        if (deployment.uid === postFreezeId) {
+        if (deployment.uid === candidateId) {
           deployment.target = "production";
           deployment.meta.githubCommitRef = "main";
         }
@@ -578,7 +729,7 @@ test("post-capture additions are limited to the exact certified candidate SHA an
     const payload = await productionAdditionInRehearsal.readApi(path);
     if (path.startsWith("/v6/deployments?")) {
       for (const deployment of payload.deployments) {
-        if (deployment.uid === postFreezeId) deployment.target = "production";
+        if (deployment.uid === candidateId) deployment.target = "production";
       }
     }
     return payload;
@@ -586,18 +737,13 @@ test("post-capture additions are limited to the exact certified candidate SHA an
     error.code === "STEP11_6_VERCEL_DEPLOYMENT_SCOPE_DRIFT");
 });
 
-test("only exact reviewed post-capture Preview deployments extend the live scope", async () => {
+test("every retained provider record is exact and cannot be omitted or relabeled", async () => {
   const selectedRequest = request();
   const fixture = provider(selectedRequest);
   const scope = await collectVercelDeploymentScope(fixture.readApi, selectedRequest);
-  assert.equal(scope.liveRecordCount, 1149);
-  assert.deepEqual(
-    scope.liveRecords.filter((tuple) =>
-      PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.some(
-        (reviewed) => reviewed[0] === tuple[0],
-      )),
-    [...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS],
-  );
+  assert.equal(scope.liveRecordCount, 1292);
+  const retainedProvider = productionLegacyDeploymentInventory()
+    .providerRecordTuples.find((tuple) => tuple[1] !== null && tuple[5] !== null);
 
   const mutations = [
     (value) => ({ ...value, meta: { ...value.meta, githubCommitSha: "8".repeat(40) } }),
@@ -619,7 +765,7 @@ test("only exact reviewed post-capture Preview deployments extend the live scope
         const payload = await driftFixture.readApi(path);
         if (path.startsWith("/v6/deployments?")) {
           payload.deployments = payload.deployments.map((value) =>
-            value.uid === PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS[0][0]
+            value.uid === retainedProvider[0]
               ? mutation(value) : value);
         }
         return payload;
@@ -633,7 +779,7 @@ test("only exact reviewed post-capture Preview deployments extend the live scope
     const payload = await missingFixture.readApi(path);
     if (path.startsWith("/v6/deployments?")) {
       payload.deployments = payload.deployments.filter((value) =>
-        value.uid !== PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS[0][0]);
+        value.uid !== retainedProvider[0]);
     }
     return payload;
   }, selectedRequest), (error) =>

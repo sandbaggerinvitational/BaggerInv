@@ -1,4 +1,4 @@
-# Step 11.6 / Step 12 Operator Bundle v2
+# Step 11.6 / Step 12 Operator Bundle v3
 
 This is an inert, repository-local payload generator for the admission-hardened
 Step 12 runbook. It does **not** connect to GitHub, Vercel, Supabase, Google, or
@@ -31,29 +31,29 @@ placeholders only with values captured by the certified diagnostics. Never put
 secrets in that file.
 
 ```sh
-node tools/step11-6-operator/operator.mjs validate --manifest ./step12-v2.json
-node tools/step11-6-operator/operator.mjs readiness --manifest ./step12-v2.json
-node tools/step11-6-operator/operator.mjs fingerprint --manifest ./step12-v2.json
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect-scoring-admission
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation stage-release
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation read-cutover
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation identity
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation arm-legacy-admission
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation issue-begin-provider-attestation-challenge
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect-begin-provider-attestation-challenge
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation begin-provider-quiesce
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation issue-finalize-provider-attestation-challenge
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect-finalize-provider-attestation-challenge
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation finalize-provider-quiesce
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect-provider-quiesce
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation inspect-persistent-provider-fence
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation install-persistent-provider-fence
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation record-provider-fence
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation close-legacy-admission
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation drain-legacy-admission
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation capture-final-google-fingerprint
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation finalize-legacy-closed
+node tools/step11-6-operator/operator.mjs validate --manifest ./step12-v3.json
+node tools/step11-6-operator/operator.mjs readiness --manifest ./step12-v3.json
+node tools/step11-6-operator/operator.mjs fingerprint --manifest ./step12-v3.json
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect-scoring-admission
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation stage-release
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation read-cutover
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation identity
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation arm-legacy-admission
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation issue-begin-provider-attestation-challenge
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect-begin-provider-attestation-challenge
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation begin-provider-quiesce
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation issue-finalize-provider-attestation-challenge
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect-finalize-provider-attestation-challenge
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation finalize-provider-quiesce
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect-provider-quiesce
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect-persistent-provider-fence
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation install-persistent-provider-fence
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation record-provider-fence
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation close-legacy-admission
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation drain-legacy-admission
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation capture-final-google-fingerprint
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation finalize-legacy-closed
 ```
 
 `inspect-scoring-admission` is an owner-authorization-exempt, service-only,
@@ -172,18 +172,40 @@ window short and never applies it to the old V0 deployment path.
 Do not remove the temporary project-wide deny merely because sheet protections
 were installed. Before removal, the signed provider proof must bind
 `docs/evidence/step11-6-production-google-credential-confinement.json` exactly:
-1,140 classified origins, records fingerprint
-`c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508`,
+schema `step11-6-production-google-credential-confinement-v2`, 1,291 classified
+origins, classification fingerprint
+`9ce65239f41086f56ea126e2491afe36ae90e85172a8536706f549912b27979b`,
 and evidence fingerprint
-`1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df`.
-That proof establishes zero dedicated-writer markers in all 458 retained main
-Production SHAs; exact Preview environment denial/read-only confinement for the
-681 executable retained Preview records; one provider-BLOCKED deployment with
-zero builds, functions, and aliases; and exact-SHA/branch/target plus v2 database
-admission for every signed post-capture candidate. Redacted environment
-metadata is necessary but is not treated as sufficient by itself. If any
-artifact, provider scope, or candidate binding drifts, leave the deny in place,
-keep authority unchanged, and stop.
+`071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133`.
+That proof classifies all 458 Production-target deployments and all 833
+project Preview deployments. Five READY deployments have no resolvable SHA and
+three READY deployments name Git objects that cannot be independently loaded;
+all eight are conservatively treated as potential legacy writers and require
+an all-method host fence. Their sorted origin-set fingerprint is
+`62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d`.
+Redacted environment metadata is necessary but is not sufficient by itself. If
+any artifact, provider scope, candidate binding, or all-method host set drifts,
+leave the deny in place, keep authority unchanged, and stop.
+
+The active Vercel WAF rule has three OR groups:
+
+1. request path is not the exact control endpoint **and** method is not one of
+   `GET`, `HEAD`, or `OPTIONS`; or
+2. host is one of the exact eight source-unresolved READY immutable hostnames,
+   with no method exception; or
+3. path is in the exact one-path all-method set
+   `/api/cron/round-scorecards-archive`.
+
+The second group prevents unknown old code from using a mutating `GET`, `HEAD`,
+or `OPTIONS` route. The third blocks the audited historical Round Scorecards
+archive `GET`/implicit-`HEAD` writer across 236 READY immutable origins. Its
+evidence fingerprint is
+`6bf411a2e119e8552e6b3ac9ac51d8828e9fc853e5c43069dc40c31a6e794f28`
+and its exact path-set fingerprint is
+`fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa`.
+The complete eight-host set comes only from the immutable
+credential-confinement artifact; the operator never accepts it from a mutable
+manifest field.
 
 The browser payload uses `quiescePurpose=CUTOVER` and supplies only an explicit
 owner-freeze confirmation plus the exact certified
@@ -217,9 +239,8 @@ fingerprinted. The Ed25519 private key remains only in the authorized new Mac's
 exact macOS Keychain item. The material instead binds the public signer
 fingerprint, exact Vercel team, signed redacted environment-scope fingerprint,
 credential-confinement evidence fingerprint, and additive migration
-`202608260038_production_provider_preview_target_inventory_v4.sql` with exact
-SHA-256
-`32cc5994570aaa77679b19e14a71a917dcc7fe297bc559ebe82dd320bff94c4c`.
+`202608260039_production_all_project_provider_inventory_v3.sql` with the exact
+SHA-256 recorded by the frozen operator bundle.
 
 ## Fingerprint dependency and lifecycle
 
@@ -266,18 +287,36 @@ resource, provider, migration, certification, or rehearsal material changes,
 stop and perform explicit recertification; do not call it a routine execution
 rebind.
 
-Migrations `202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
-and `202608260037_production_provider_rpc_name_and_inventory_v3.sql` together
-install the narrow recovery contract for an expired, unconsumed BEGIN
-provider-attestation challenge and its PostgREST-safe inspect RPC. Inspection and abandonment are service-role
-operations bound to the exact original Director, Production resources,
-candidate, rule, purpose, and request identities. Abandonment shares the same
-database transition lock as consumption, uses database time, rejects every
-consumed or progressed challenge, preserves an immutable `ABANDONED` row and
-audit event, and is idempotent under a lost response. Browser recovery retains
-the request identity and may clear the old cycle only after the exact
-authoritative `ABANDONED` receipt. It never deletes a challenge or treats a
-local-storage reset as recovery.
+The additive provider-control migrations install a narrow recovery contract
+for both BEGIN and FINALIZE provider-attestation challenges. It covers an
+expired unconsumed challenge and the harder case where the one-time challenge
+was consumed into an attestation `RESERVED` row but exhaustive probes or their
+network response failed before the row was `BOUND` to quiesce evidence.
+Inspection and abandonment are service-role operations bound to the exact
+original Director, Production resources, candidate, rule, stage, purpose,
+request, consume, and attestation identities. Abandonment shares the database
+transition lock with consume/bind, uses database time, and rejects `BOUND`,
+fresh, mismatched, or progressed evidence. The immutable `ABANDONED` challenge,
+reservation, and audit event retain the original identities. A lost response
+is retried with the same abandonment request ID. Browser/operator recovery
+clears only the affected stage after the authoritative receipt; a fresh BEGIN
+uses a new evidence ID, while a fresh FINALIZE keeps the same DRAINING evidence
+ID. It never deletes audit state, drops the active provider deny rule, or treats
+a local-storage reset as recovery.
+
+The dry-run wrapper exposes four explicit recovery payloads in addition to the
+ordinary challenge inspection operations:
+
+```sh
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect-begin-provider-attestation-abandonment
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation abandon-begin-provider-attestation-challenge
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation inspect-finalize-provider-attestation-abandonment
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation abandon-finalize-provider-attestation-challenge
+```
+
+Populate each stage's `retainedChallenge` only from the sanitized authoritative
+challenge receipt and generate its `abandonRequestId` once. The wrapper refuses
+scope drift and emits no network or SQL execution capability.
 
 The install consumes `quiesceEvidenceId` and leaves exactly 17 whole-sheet
 protections installed. Those protections remain installed through external-
@@ -287,43 +326,45 @@ The close/prepare/commit artifacts bind the installed quiesce, fence, and
 verification IDs.
 
 The retained origin inventory is
-`docs/evidence/step11-6-production-origin-inventory.json`: 1,140 exact v2
-tuples (458 main Production plus 682 feature-branch Preview) with digest
-`533178a28a5458c5f2f727b77af3024de4cc0402c49e90dcd763b950d26fb4c6`.
-It binds complete pagination evidence, the prior live deployment, the frozen
-Step 11 candidate, nine provider-resolved CLI SHAs, one provider-proven
-non-executable blocked deployment with a null SHA, scope/status semantics,
-and credential-capability sets. The operator revalidates only its repository
-binding and refuses caller-supplied origin matrices/fingerprints. The control
-route loads the artifact server-side and additionally requires the seven exact
-reviewed post-capture Preview deployments pinned by additive migrations
-`202608260035_production_reviewed_post_capture_preview_deployments.sql` and
-`202608260036_production_reviewed_post_capture_preview_deployments_v2.sql`
-plus `202608260037_production_provider_rpc_name_and_inventory_v3.sql` and
-`202608260038_production_provider_preview_target_inventory_v4.sql`. Their
-ordered tuple-set fingerprint is
-`91cdd7ab6fc077cb422c4b8921a0ac431ddf38f043167c457cc7ad4cc288a01a`.
-The provider reader binds Vercel v6's exact Preview encoding: a Preview
-deployment has an explicit JSON `target: null`; a missing target or a non-null
-target is not silently classified as `FEATURE_PREVIEW`.
-Only provider-signed same-current-SHA deployments in the target-appropriate
-scope may extend that required set; all other additions fail closed. The route
-then adds four fixed aliases and the current candidate alias. If the signed
-live inventory has `N` immutable origins, each snapshot
-contains exactly `N + 5` origins and `9 × (N + 5)` edge requests. Every
-retained and signed post-freeze origin is probed, including `ERROR`
-and `BLOCKED` records. The vectors cover `POST` on all eight
-historical/candidate writer routes plus `DELETE /api/tournament-guide`. It
-writes the immutable inventory and compact per-origin nine-vector proofs to the
-durable RPCs. The database validates the exact signed live origin set, coverage
-mask, ordered per-vector proof fingerprints, and dynamically derived logical
-origin×vector expansion. The minimum Step 11.6 signed live inventory is 1,148
-immutable origins (1,140 retained + 7 reviewed + 1 exact dynamic candidate),
-which produces 1,153 probed origins and 10,377 requests per snapshot after the
-five fixed/candidate aliases. A normal Step 12 Preview-plus-Production candidate
-pair adds at least one more same-SHA immutable origin, producing at least 1,154
-probed origins and 10,386 requests. The provider-signed inventory and durable
-receipt remain authoritative when additional exact same-SHA redeploys exist.
+`docs/evidence/step11-6-production-origin-inventory.json`, schema
+`step11-6-production-origin-inventory-v3`. It is a complete, twice-read
+all-project census of 1,291 Vercel deployments: 458 Production-target and 833
+project Preview records. It binds both of these signed, one-to-one tuple sets:
+
+- full provider tuple: `deploymentId`, `sha`, `providerCommitSha`, `origin`,
+  `deploymentTarget`, `gitBranch`, `providerSource`, `deploymentStatus`,
+  `createdAt`, `shaResolution`; count 1,291; fingerprint
+  `6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692`;
+- enforcement projection: `deploymentId`, `sha`, `origin`, `scopeClass`,
+  `deploymentStatus`, `providerMetadataFingerprint`; count 1,291; fingerprint
+  `d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6`.
+
+The complete pagination proof, status/source/branch/SHA-resolution coverage,
+prior live deployment, frozen Step 11 deployment, and existing Step 11.6
+candidate are inside that immutable artifact. There is no mutable
+post-capture/reviewed deployment addendum. The operator revalidates the full
+provider tuple set, its exact projection, and their one-to-one mapping, and
+refuses caller-supplied origin matrices or fingerprints.
+
+At attestation time the signed live inventory must be exactly the retained
+1,291 tuples, or those tuples plus one exact current candidate represented in
+both full-provider and projection form. The extra tuple must bind the current
+candidate deployment ID, immutable origin, SHA, branch, target, status, and
+provider metadata. Missing retained tuples, extra redeploys, reordered tuples,
+or a provider/projection mismatch fail closed; recapture and recertify rather
+than attaching a mutable addendum.
+
+The route adds four fixed aliases and the current candidate alias to the edge
+probe set. If the signed live inventory has `N` immutable origins, each
+snapshot contains exactly `N + 5` origins and `11 × (N + 5)` edge requests. Thus
+the retained-set case is 1,296 origins and 14,256 requests; a retained-plus-one
+candidate case is 1,297 origins and 14,267 requests. Every signed `READY`,
+`ERROR`, and `BLOCKED` origin is represented. The vectors cover `POST` on all
+eight historical/candidate writer routes plus
+`DELETE /api/tournament-guide`, and `GET` plus `HEAD` on
+`/api/cron/round-scorecards-archive`. The database validates the exact signed full
+provider and projection sets, coverage mask, ordered per-vector proof
+fingerprints, and dynamically derived logical origin×vector expansion.
 
 The five alias entries are fixed diagnostic canaries, not a claim that Vercel
 has only five aliases. Coverage of aliases that are not enumerated is derived
@@ -349,7 +390,7 @@ authoritative rollback or abort has returned the system to `DORMANT` or
 operator generate:
 
 ```sh
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation remove-persistent-provider-fence
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation remove-persistent-provider-fence
 ```
 
 Removal additionally requires a fresh verified project-wide quiesce already
@@ -368,11 +409,11 @@ the verified restoration. No operator boolean can substitute for this check.
 For an authority rollback, use the exact Supabase-ingress closure sequence:
 
 ```sh
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation pause-supabase-ingress
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation drain-supabase-ingress
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation finalize-supabase-ingress-closed
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation prepare-rollback
-node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v2.json --operation commit-rollback
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation pause-supabase-ingress
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation drain-supabase-ingress
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation finalize-supabase-ingress-closed
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation prepare-rollback
+node tools/step11-6-operator/operator.mjs payload --manifest ./step12-v3.json --operation commit-rollback
 ```
 
 `state.scoringIngressEnabled` records the activation-level authority flag.

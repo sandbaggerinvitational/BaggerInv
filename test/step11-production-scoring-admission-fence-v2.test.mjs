@@ -2,11 +2,17 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const migrationUrl = new URL(
+const baseMigrationUrl = new URL(
   "../supabase/production_migrations/202608260034_production_scoring_admission_fence_v2.sql",
   import.meta.url,
 );
-const sql = await readFile(migrationUrl, "utf8");
+const inventoryV3MigrationUrl = new URL(
+  "../supabase/production_migrations/202608260039_production_all_project_provider_inventory_v3.sql",
+  import.meta.url,
+);
+const baseSql = await readFile(baseMigrationUrl, "utf8");
+const inventoryV3Sql = await readFile(inventoryV3MigrationUrl, "utf8");
+const sql = [baseSql, inventoryV3Sql].join("\n");
 const quiesceSource = await readFile(new URL(
   "../lib/production-google-writer-fence-quiesce.js",
   import.meta.url,
@@ -14,7 +20,10 @@ const quiesceSource = await readFile(new URL(
 
 function definition(qualifiedName) {
   const marker = `create or replace function ${qualifiedName}`;
-  const start = sql.indexOf(marker);
+  // Later additive migrations deliberately replace selected functions. Static
+  // assertions must inspect the effective latest definition, not the first
+  // historical definition retained in the migration ledger.
+  const start = sql.lastIndexOf(marker);
   assert.notEqual(start, -1, `Missing ${qualifiedName}`);
   const bodyStart = sql.indexOf("as $$", start);
   assert.notEqual(bodyStart, -1, `Missing body for ${qualifiedName}`);
@@ -320,12 +329,16 @@ test("structured quiesce and durable provider removal are exact and recoverable"
     "production_control.assert_exact_vercel_probe_records",
   );
   assert.match(probe, /expected_origin_count integer :=[\s\S]*jsonb_array_length\(target_origin_inventory\) \+ 5/);
-  assert.match(probe, /expected_logical_probe_count integer := expected_origin_count \* 9/);
+  assert.match(
+    probe,
+    /expected_logical_probe_count integer :=[\s\S]*expected_origin_count \* expected_probe_vector_count/,
+  );
+  assert.match(probe, /expected_probe_vector_count <> 11/);
   assert.match(probe, /CUTOVER_PRODUCTION_CANDIDATE/);
   assert.match(probe, /IMMUTABLE_CUTOVER_PRODUCTION_CANDIDATE/);
-  assert.match(probe, /pg_catalog\.jsonb_array_length\(value->9\) <> 9/);
+  assert.match(probe, /pg_catalog\.jsonb_array_length\(value->9\) <> 11/);
   assert.match(probe, /vectorProofFingerprints|value->9/);
-  assert.match(probe, /coalesce\(value->>8, ''\) <> '511'/);
+  assert.match(probe, /coalesce\(value->>8, ''\) <> '2047'/);
   assert.match(probe, /normalized_scope is distinct from expected_scope/);
   assert.match(probe, /pg_catalog\.count\(distinct proof #>> '\{\}'\)/);
   const finalizeQuiesce = definition(
@@ -379,6 +392,10 @@ test("signed Vercel attestations are fresh, anti-replay, and bind dynamic probe 
     "candidate_deployment_commit", "candidate_deployment_target",
     "routing_rule_id", "routing_rule_config_version", "routing_rule_etag",
     "routing_rule_fingerprint", "routing_rule_pending_draft_change_count",
+    "routing_rule_all_method_fence_required_host_count",
+    "routing_rule_all_method_fence_required_hosts_fingerprint",
+    "routing_rule_all_method_fence_required_path_count",
+    "routing_rule_all_method_fence_required_paths_fingerprint",
     "live_origin_inventory_count",
     "live_origin_inventory_fingerprint",
     "redacted_environment_scope_fingerprint",
@@ -397,17 +414,39 @@ test("signed Vercel attestations are fresh, anti-replay, and bind dynamic probe 
   const retainedInventory = definition(
     "production_control.assert_exact_vercel_origin_inventory",
   );
-  assert.match(retainedInventory, /VERCEL_API_RESOLVED_GIT/);
-  assert.match(retainedInventory, /where value->1 = 'null'::jsonb\) <> 1/);
+  assert.match(
+    inventoryV3Sql,
+    /provider_inventory_schema[\s\S]*step11-6-production-origin-inventory-v3/,
+  );
+  assert.match(
+    inventoryV3Sql,
+    /6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692/,
+  );
+  assert.match(retainedInventory, /record_count <> 1291/);
+  assert.match(
+    retainedInventory,
+    /value->1 <> 'null'::jsonb[\s\S]*'\^\[0-9a-f\]\{40\}\$'/,
+  );
   assert.match(liveInventory, /select value[\s\S]*normalized_retained[\s\S]*except[\s\S]*normalized_live/);
-  assert.match(liveInventory, /expected_candidate_record/);
+  assert.match(liveInventory, /retained_candidate_count not in \(0, 1\)/);
+  assert.match(liveInventory, /live_candidate_count <> 1/);
   assert.match(liveInventory, /CUTOVER_PRODUCTION_CANDIDATE/);
-  assert.match(liveInventory, /live\.record->>1 <> pg_catalog\.lower\(candidate_deployment_commit\)/);
-  assert.match(liveInventory, /live\.record->>3 not in \([\s\S]*'FEATURE_PREVIEW'[\s\S]*'CUTOVER_PRODUCTION_CANDIDATE'/);
+  assert.match(liveInventory, /live\.record->>1 = pg_catalog\.lower\(candidate_deployment_commit\)/);
+  assert.match(
+    liveInventory,
+    /candidate_deployment_target not in \('PREVIEW', 'PRODUCTION'\)/,
+  );
+  assert.match(
+    liveInventory,
+    /dynamic_candidate_scope := case candidate_deployment_target[\s\S]*'PROJECT_PREVIEW'[\s\S]*'CUTOVER_PRODUCTION_CANDIDATE'/,
+  );
   assert.match(liveInventory, /retained\.record = live\.record/);
   assert.match(liveInventory, /count\(distinct value->>0\)/);
   assert.match(liveInventory, /count\(distinct value->>2\)/);
-  assert.match(liveInventory, /live_count < pg_catalog\.jsonb_array_length\(normalized_retained\) \+ 1/);
+  assert.match(
+    liveInventory,
+    /expected_count := pg_catalog\.jsonb_array_length\(normalized_retained\)[\s\S]*case when retained_candidate_count = 1 then 0 else 1 end/,
+  );
 
   const issue = definition(
     "public.issue_production_vercel_provider_attestation_challenge",
@@ -430,8 +469,18 @@ test("signed Vercel attestations are fresh, anti-replay, and bind dynamic probe 
   assert.match(consume, /begin_attestation\.routing_rule_fingerprint/);
   assert.match(consume, /begin_attestation\.live_origin_inventory is distinct from/);
   assert.match(consume, /credential_confinement_evidence_schema/);
-  assert.match(consume, /c63962703a60745786ffce2e43e9fef5fa38e12746fce5627f33bfde92c8f508/);
-  assert.match(consume, /1d6f4203fc56226ba4f6881339e9b2dfcede0e413485a110785d28e066a569df/);
+  assert.match(consume, /assert_current_provider_inventory_v3/);
+  const providerInventory = definition(
+    "production_control.assert_current_provider_inventory_v3",
+  );
+  assert.match(
+    providerInventory,
+    /9ce65239f41086f56ea126e2491afe36ae90e85172a8536706f549912b27979b/,
+  );
+  assert.match(
+    providerInventory,
+    /071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133/,
+  );
   assert.match(consume, /status = 'CONSUMED'/);
   assert.match(consume, /'RESERVED'/);
 
@@ -562,10 +611,15 @@ test("all new callable RPCs are service-role only and all definitions use fixed 
   assert.match(sql, /enable row level security/g);
 });
 
-test("migration contains no schema-qualified conditional syntax and is one balanced transaction", () => {
-  assert.doesNotMatch(sql, /pg_catalog\.(?:coalesce|nullif|greatest|least)\s*\(/i);
-  assert.match(sql, /^--[\s\S]*\nbegin;\n/i);
-  assert.match(sql, /notify pgrst, 'reload schema';\ncommit;\n$/);
-  assert.equal((sql.match(/\bcommit;/gi) ?? []).length, 1);
-  assert.equal((sql.match(/\$\$/g) ?? []).length % 2, 0);
+test("each migration contains no schema-qualified conditional syntax and is one balanced transaction", () => {
+  for (const migration of [baseSql, inventoryV3Sql]) {
+    assert.doesNotMatch(
+      migration,
+      /pg_catalog\.(?:coalesce|nullif|greatest|least)\s*\(/i,
+    );
+    assert.match(migration, /^--[\s\S]*\nbegin;\n/i);
+    assert.match(migration, /notify pgrst, 'reload schema';\s*commit;\n$/);
+    assert.equal((migration.match(/\bcommit;/gi) ?? []).length, 1);
+    assert.equal((migration.match(/\$\$/g) ?? []).length % 2, 0);
+  }
 });

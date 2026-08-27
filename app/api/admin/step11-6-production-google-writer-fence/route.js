@@ -10,7 +10,10 @@ import {
   normalizeProductionWriterQuiesceEvidenceInput,
   probeProductionWriterQuiesceOrigins,
   PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT,
-  PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS,
+  PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT,
+  PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_SCHEMA,
+  PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_COUNT,
+  PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_FINGERPRINT,
   publicProductionWriterQuiesceError,
 } from "../../../../lib/production-google-writer-fence-quiesce.js";
 import {
@@ -28,6 +31,7 @@ import {
 } from "../../../../lib/production-google-writer-fence-receipt-server.js";
 import {
   verifyVercelProviderAttestation,
+  VERCEL_PROVIDER_ATTESTATION_INITIAL_MAX_AGE_SECONDS,
   VERCEL_PROVIDER_ATTESTATION_REQUEST_SCHEMA,
   VERCEL_PROVIDER_ATTESTATION_TEAM_ID_ENV,
 } from "../../../../lib/vercel-provider-attestation.js";
@@ -175,11 +179,43 @@ function publicQuiesceReceipt(receipt = {}) {
     ),
     originInventoryCount: Number(receipt.origin_inventory_count),
     originInventoryFingerprint: clean(receipt.origin_inventory_fingerprint),
+    providerInventorySchema: clean(
+      receipt.provider_inventory_schema || receipt.providerInventorySchema,
+    ),
+    retainedProviderInventoryCount: Number(
+      receipt.retained_provider_inventory_count || receipt.retainedProviderInventoryCount,
+    ),
+    retainedProviderInventoryFingerprint: clean(
+      receipt.retained_provider_inventory_fingerprint ||
+        receipt.retainedProviderInventoryFingerprint,
+    ),
+    liveProviderInventoryCount: Number(
+      receipt.live_provider_inventory_count || receipt.liveProviderInventoryCount,
+    ),
+    liveProviderInventoryFingerprint: clean(
+      receipt.live_provider_inventory_fingerprint || receipt.liveProviderInventoryFingerprint,
+    ),
     liveOriginInventoryCount: Number(
       receipt.live_origin_inventory_count || receipt.liveOriginInventoryCount,
     ),
     liveOriginInventoryFingerprint: clean(
       receipt.live_origin_inventory_fingerprint || receipt.liveOriginInventoryFingerprint,
+    ),
+    routingRuleAllMethodFenceRequiredHostCount: Number(
+      receipt.routing_rule_all_method_fence_required_host_count ||
+        receipt.routingRuleAllMethodFenceRequiredHostCount,
+    ),
+    routingRuleAllMethodFenceRequiredHostsFingerprint: clean(
+      receipt.routing_rule_all_method_fence_required_hosts_fingerprint ||
+        receipt.routingRuleAllMethodFenceRequiredHostsFingerprint,
+    ),
+    routingRuleAllMethodFenceRequiredPathCount: Number(
+      receipt.routing_rule_all_method_fence_required_path_count ||
+        receipt.routingRuleAllMethodFenceRequiredPathCount,
+    ),
+    routingRuleAllMethodFenceRequiredPathsFingerprint: clean(
+      receipt.routing_rule_all_method_fence_required_paths_fingerprint ||
+        receipt.routingRuleAllMethodFenceRequiredPathsFingerprint,
     ),
     probeOriginCount: Number(receipt.probe_origin_count),
     probeVectorCount: Number(receipt.probe_vector_count),
@@ -261,6 +297,9 @@ function publicProviderAttestationChallenge(receipt = {}) {
     abandonmentCode: clean(
       receipt.abandonment_code || receipt.abandonmentCode,
     ).toUpperCase(),
+    abandonmentReason: clean(
+      receipt.abandonment_reason || receipt.abandonmentReason,
+    ).toUpperCase(),
     serverObservedAt: receipt.server_observed_at || receipt.serverObservedAt || null,
     idempotent: receipt.idempotent === true,
   });
@@ -272,6 +311,8 @@ function recoveredConsumedProviderAttestation(challenge) {
   const count = Number(value?.live_origin_inventory_count);
   const fingerprint = clean(value?.live_origin_inventory_fingerprint).toLowerCase();
   const bindingExpiresAt = Date.parse(clean(value?.binding_expires_at));
+  const providerObservedAt = Date.parse(clean(value?.provider_observed_at));
+  const current = Date.now();
   if (!value || Array.isArray(value) || typeof value !== "object" ||
       clean(value.attestation_id).toLowerCase() !== challenge.consumedAttestationId ||
       clean(value.attestation_fingerprint).toLowerCase() !==
@@ -296,11 +337,28 @@ function recoveredConsumedProviderAttestation(challenge) {
       clean(value.routing_rule_config_version) !== challenge.routingRuleConfigVersion ||
       Number(value.routing_rule_pending_draft_change_count) !== 0 ||
       !Array.isArray(records) || count !== records.length ||
-      count < PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT +
-        PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.length + 1 ||
+      count < PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT ||
       !/^[0-9a-f]{64}$/.test(fingerprint) ||
       sha256(JSON.stringify(records)) !== fingerprint ||
-      !Number.isFinite(bindingExpiresAt) || bindingExpiresAt <= Date.now()) {
+      clean(value.provider_inventory_schema) !==
+        PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_SCHEMA ||
+      Number(value.retained_origin_inventory_count) !==
+        PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT ||
+      clean(value.retained_origin_inventory_fingerprint).toLowerCase() !==
+        PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT ||
+      Number(value.retained_provider_inventory_count) !==
+        PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_COUNT ||
+      clean(value.retained_provider_inventory_fingerprint).toLowerCase() !==
+        PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_FINGERPRINT ||
+      Number(value.live_provider_inventory_count) !== count ||
+      !/^[0-9a-f]{64}$/.test(
+        clean(value.live_provider_inventory_fingerprint).toLowerCase(),
+      ) ||
+      !Number.isFinite(providerObservedAt) ||
+      providerObservedAt > current + 30_000 ||
+      current - providerObservedAt >
+        VERCEL_PROVIDER_ATTESTATION_INITIAL_MAX_AGE_SECONDS * 1_000 ||
+      !Number.isFinite(bindingExpiresAt) || bindingExpiresAt <= current) {
     const error = new Error("The durable consumed provider reservation was invalid.");
     error.code = "STEP11_6_VERCEL_PROVIDER_ATTESTATION_RESERVATION_INVALID";
     error.status = 409;
@@ -329,6 +387,22 @@ function recoveredConsumedProviderAttestation(challenge) {
     routingRuleFingerprint: clean(value.routing_rule_fingerprint).toLowerCase(),
     routingRulePendingDraftChangeCount:
       Number(value.routing_rule_pending_draft_change_count),
+    routingRuleAllMethodFenceRequiredHostCount:
+      Number(value.routing_rule_all_method_fence_required_host_count),
+    routingRuleAllMethodFenceRequiredHostsFingerprint:
+      clean(value.routing_rule_all_method_fence_required_hosts_fingerprint).toLowerCase(),
+    routingRuleAllMethodFenceRequiredPathCount:
+      Number(value.routing_rule_all_method_fence_required_path_count),
+    routingRuleAllMethodFenceRequiredPathsFingerprint:
+      clean(value.routing_rule_all_method_fence_required_paths_fingerprint).toLowerCase(),
+    providerInventorySchema: clean(value.provider_inventory_schema),
+    retainedProviderInventoryCount:
+      Number(value.retained_provider_inventory_count),
+    retainedProviderInventoryFingerprint:
+      clean(value.retained_provider_inventory_fingerprint).toLowerCase(),
+    liveProviderInventoryCount: Number(value.live_provider_inventory_count),
+    liveProviderInventoryFingerprint:
+      clean(value.live_provider_inventory_fingerprint).toLowerCase(),
     liveOriginInventoryCount: count,
     liveOriginInventoryFingerprint: fingerprint,
     liveOriginInventoryRecords: records,
@@ -342,7 +416,7 @@ function recoveredConsumedProviderAttestation(challenge) {
       clean(value.credential_confinement_records_fingerprint).toLowerCase(),
     credentialConfinementEvidenceFingerprint:
       clean(value.credential_confinement_evidence_fingerprint).toLowerCase(),
-    providerObservedAt: value.provider_observed_at,
+    providerObservedAt: new Date(providerObservedAt).toISOString(),
   });
 }
 
@@ -508,7 +582,12 @@ async function executeQuiesce(input, dependencies) {
         env: process.env,
         request: attestationRequest,
         expectedRoutingRuleRevision: input.routingRule?.revision,
-        initialMaxAgeSeconds: challenge.status === "CONSUMED" ? 1_800 : 120,
+        // A consumed reservation preserves exact lost-response idempotency; it
+        // does not extend the provider/WAF observation window. BEGIN and
+        // FINALIZE must each remain bound to a provider snapshot no older than
+        // the normal two-minute admission policy.
+        initialMaxAgeSeconds:
+          VERCEL_PROVIDER_ATTESTATION_INITIAL_MAX_AGE_SECONDS,
       },
     );
   const normalized = normalizeProductionWriterQuiesceEvidenceInput(

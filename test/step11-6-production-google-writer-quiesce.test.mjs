@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
   normalizeProductionWriterQuiesceEvidenceInput,
   probeProductionWriterQuiesceOrigins,
+  productionGoogleWriterAllMethodFenceHosts,
+  productionGoogleWriterAllMethodFencePaths,
   productionLegacyDeploymentInventory,
   PRODUCTION_GOOGLE_WRITER_QUIESCE_CONTROL_PATH,
   PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS,
@@ -12,7 +15,8 @@ import {
   PRODUCTION_GOOGLE_WRITER_QUIESCE_VECTOR_COVERAGE_MASK,
   PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT,
   PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT,
-  PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS,
+  PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_COUNT,
+  PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_FINGERPRINT,
 } from "../lib/production-google-writer-fence-quiesce.js";
 import { PRODUCTION_VERCEL_PROJECT_ID } from
   "../lib/google-service-account-credential-context.js";
@@ -57,6 +61,12 @@ function input(overrides = {}) {
       requestPath: PRODUCTION_GOOGLE_WRITER_QUIESCE_CONTROL_PATH,
       methodOperator: "IS_NOT_ANY_OF",
       methods: ["OPTIONS", "GET", "HEAD"],
+      allMethodFenceRequiredHostCount: 8,
+      allMethodFenceRequiredHostsFingerprint:
+        "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+      allMethodFenceRequiredPathCount: 1,
+      allMethodFenceRequiredPathsFingerprint:
+        "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
     },
     ...overrides,
   };
@@ -68,14 +78,24 @@ function providerAttestationFor(selectedEnvironment = environment(), additions =
     selectedEnvironment.resources.candidateDeploymentId,
     selectedEnvironment.resources.commitSha,
     `https://${selectedEnvironment.resources.deploymentHostname}`,
-    "FEATURE_PREVIEW", "READY", "GIT",
+    "PROJECT_PREVIEW", "READY", "a".repeat(64),
   ];
   const records = [...retained.recordTuples.map((tuple) => [...tuple]),
-    ...PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS.map((tuple) => [...tuple]),
     ...additions.map((tuple) => [...tuple]), candidateTuple]
     .sort((left, right) => `${left[0]}\n${left[2]}` < `${right[0]}\n${right[2]}` ? -1 : 1);
   return {
     signatureVerified: true,
+    routingRuleAllMethodFenceRequiredHostCount: 8,
+    routingRuleAllMethodFenceRequiredHostsFingerprint:
+      "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+    routingRuleAllMethodFenceRequiredPathCount: 1,
+    routingRuleAllMethodFenceRequiredPathsFingerprint:
+      "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
+    providerInventorySchema: retained.schemaVersion,
+    retainedProviderInventoryCount: retained.providerRecordCount,
+    retainedProviderInventoryFingerprint: retained.providerRecordsFingerprint,
+    liveProviderInventoryCount: records.length,
+    liveProviderInventoryFingerprint: "b".repeat(64),
     credentialConfinementEvidenceSchema:
       PRODUCTION_GOOGLE_CREDENTIAL_CONFINEMENT_SCHEMA,
     credentialConfinementRecordCount:
@@ -117,29 +137,36 @@ function normalizeWithProvider(providerAttestation, selectedEnvironment = enviro
   );
 }
 
-test("retained complete 1,140-origin v2 inventory is expanded and re-hashed exactly", () => {
+test("retained complete 1,291-origin v3 provider inventory is projected and re-hashed exactly", () => {
   const retained = productionLegacyDeploymentInventory();
   assert.equal(retained.recordCount, PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT);
   assert.equal(retained.vercelProjectId, PRODUCTION_VERCEL_PROJECT_ID);
   assert.equal(retained.recordsFingerprint,
     PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT);
+  assert.equal(retained.providerRecordCount,
+    PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_COUNT);
+  assert.equal(retained.providerRecordsFingerprint,
+    PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_FINGERPRINT);
+  assert.equal(createHash("sha256").update(
+    JSON.stringify(retained.providerRecordTuples)).digest("hex"),
+  PRODUCTION_LEGACY_DEPLOYMENT_PROVIDER_INVENTORY_FINGERPRINT);
   assert.equal(createHash("sha256").update(JSON.stringify(retained.recordTuples)).digest("hex"),
     PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT);
   assert.deepEqual([...retained.records].map((record) => record.deploymentId),
     [...retained.records].map((record) => record.deploymentId).sort((a, b) =>
       a < b ? -1 : a > b ? 1 : 0));
-  assert.equal(retained.records.filter((record) => record.sha === null).length, 1);
+  assert.equal(retained.records.filter((record) => record.sha === null).length, 8);
   assert.equal(retained.records.filter((record) =>
-    record.sourceProvenance === "VERCEL_API_RESOLVED_GIT").length, 9);
+    record.shaResolution === "LOCAL_GIT_ABBREVIATION").length, 2);
   assert.equal(retained.records.filter((record) =>
-    record.scopeClass === "MAIN_PRODUCTION").length, 458);
+    record.scopeClass === "PRODUCTION_TARGET").length, 458);
   assert.equal(retained.records.filter((record) =>
-    record.scopeClass === "FEATURE_PREVIEW").length, 682);
-  assert.equal(retained.paginationEvidence.productionTarget.remainingLoadMore, false);
-  assert.equal(retained.paginationEvidence.candidateBranchPreview.remainingLoadMore, false);
+    record.scopeClass === "PROJECT_PREVIEW").length, 833);
+  assert.equal(retained.paginationEvidence.exactPassMatch, true);
+  assert.equal(retained.paginationEvidence.remainingCursor, null);
   assert.deepEqual(retained.recordTuple, [
     "deploymentId", "sha", "origin", "scopeClass", "deploymentStatus",
-    "sourceProvenance",
+    "providerMetadataFingerprint",
   ]);
   assert.deepEqual(retained.statusSemantics, {
     READY: { publiclyReachable: true, writerCapable: true },
@@ -159,7 +186,7 @@ test("retained complete 1,140-origin v2 inventory is expanded and re-hashed exac
 
 test("normalization adds exact fixed and candidate origins without client inventory", () => {
   const normalized = normalize();
-  assert.equal(normalized.originInventoryCount, 1140);
+  assert.equal(normalized.originInventoryCount, 1291);
   assert.equal(normalized.originInventoryFingerprint,
     PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT);
   assert.equal(normalized.purpose, "REHEARSAL");
@@ -175,8 +202,11 @@ test("normalization adds exact fixed and candidate origins without client invent
   const expectedTargetCount = expectedOriginCount * normalized.probeVectorCount;
   assert.equal(normalized.probeOrigins.length, expectedOriginCount);
   assert.equal(normalized.probeTargets.length, expectedTargetCount);
-  assert.equal(normalized.probeVectorCoverageMask, 511);
-  assert.deepEqual(normalized.probeTargets.slice(0, 9)
+  assert.equal(normalized.probeVectorCoverageMask,
+    PRODUCTION_GOOGLE_WRITER_QUIESCE_VECTOR_COVERAGE_MASK);
+  assert.equal(normalized.probeVectorCoverageMask, 2047);
+  assert.deepEqual(normalized.probeTargets.slice(
+    0, PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS.length)
     .map(({ probeMethod, probePath }) => ({ probeMethod, probePath })),
   PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS);
   assert.throws(() => normalize(input({
@@ -188,11 +218,57 @@ test("normalization adds exact fixed and candidate origins without client invent
     (error) => error.code === "STEP11_6_WRITER_QUIESCE_CANDIDATE_INVENTORY_COLLISION");
 });
 
-test("signed live inventory uniqueness and reviewed-candidate collisions fail closed", () => {
+test("normalization accepts an exact candidate already present in the complete retained census", async () => {
+  const retained = productionLegacyDeploymentInventory();
+  const candidate = retained.records.find((record) =>
+    record.deploymentId === "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox");
+  const selectedEnvironment = environment();
+  selectedEnvironment.resources.candidateDeploymentId = candidate.deploymentId;
+  selectedEnvironment.resources.commitSha = candidate.sha;
+  selectedEnvironment.resources.deploymentHostname = new URL(candidate.origin).hostname;
+  selectedEnvironment.resources.candidateHostname =
+    "bagger-retained-candidate-alias-sandbagger-invitational.vercel.app";
+  const projected = retained.recordTuples.map((tuple) => [...tuple]);
+  const attestation = {
+    ...providerAttestationFor(selectedEnvironment),
+    liveOriginInventoryCount: projected.length,
+    liveOriginInventoryFingerprint:
+      createHash("sha256").update(JSON.stringify(projected)).digest("hex"),
+    liveOriginInventoryRecords: projected,
+    liveProviderInventoryCount: projected.length,
+  };
+  const normalized = normalizeProductionWriterQuiesceEvidenceInput(
+    input(), selectedEnvironment, { providerAttestation: attestation },
+  );
+  assert.equal(normalized.liveOriginInventoryCount, 1291);
+  assert.equal(normalized.probeOrigins.filter((origin) => origin === candidate.origin).length, 1);
+  const proof = await probeProductionWriterQuiesceOrigins(normalized, {
+    concurrency: 64,
+    fetchImpl: async () => new Response("denied", {
+      status: 403,
+      headers: {
+        "x-vercel-mitigated": "deny",
+        server: "Vercel",
+        "x-vercel-id": "cle1::iad1::retained-candidate-proof",
+      },
+    }),
+  });
+  const candidateProof = proof.probeRecords.find((record) =>
+    record[0] === candidate.origin);
+  assert.equal(candidateProof[1], "IMMUTABLE_PROJECT_PREVIEW");
+  assert.equal(candidateProof[6], candidate.providerMetadataFingerprint);
+  assert.deepEqual(candidateProof[7], [
+    "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
+    "PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
+    "PRODUCTION_WORKBOOK_SELECTOR",
+  ], "candidate capabilities take precedence even for a retained +0 tuple");
+});
+
+test("signed live inventory uniqueness and retained-candidate collisions fail closed", () => {
   const exact = providerAttestationFor();
-  assert.equal(exact.liveOriginInventoryCount, 1148);
-  assert.equal(normalizeWithProvider(exact).liveOriginInventoryCount, 1148,
-    "retained + seven reviewed deployments + exact dynamic candidate is sufficient");
+  assert.equal(exact.liveOriginInventoryCount, 1292);
+  assert.equal(normalizeWithProvider(exact).liveOriginInventoryCount, 1292,
+    "retained complete project census plus exact dynamic candidate is sufficient");
 
   const duplicateTupleRecords = [
     ...exact.liveOriginInventoryRecords.map((tuple) => [...tuple]),
@@ -206,13 +282,13 @@ test("signed live inventory uniqueness and reviewed-candidate collisions fail cl
     providerAttestationWithRecords(duplicateTupleRecords),
   ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
 
-  const reviewed = PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS[0];
+  const reviewed = productionLegacyDeploymentInventory().recordTuples[0];
   const duplicateIdRecords = [
     ...exact.liveOriginInventoryRecords.map((tuple) => [...tuple]),
     [
       reviewed[0], candidateCommit,
       "https://bagger-duplicate-id-new-origin-sandbagger-invitational.vercel.app",
-      "FEATURE_PREVIEW", "READY", "GIT",
+      "PROJECT_PREVIEW", "READY", "c".repeat(64),
     ],
   ].sort((left, right) => {
     const a = `${left[0]}\n${left[2]}`;
@@ -227,7 +303,7 @@ test("signed live inventory uniqueness and reviewed-candidate collisions fail cl
     ...exact.liveOriginInventoryRecords.map((tuple) => [...tuple]),
     [
       "dpl_DuplicateOriginNewId01", candidateCommit, reviewed[2],
-      "FEATURE_PREVIEW", "READY", "GIT",
+      "PROJECT_PREVIEW", "READY", "c".repeat(64),
     ],
   ].sort((left, right) => {
     const a = `${left[0]}\n${left[2]}`;
@@ -242,32 +318,24 @@ test("signed live inventory uniqueness and reviewed-candidate collisions fail cl
   idCollisionEnvironment.resources.candidateDeploymentId = reviewed[0];
   assert.throws(() => normalizeWithProvider(
     providerAttestationFor(idCollisionEnvironment), idCollisionEnvironment,
-  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
+  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_CANDIDATE_INVENTORY_COLLISION");
 
   const originCollisionEnvironment = environment();
   originCollisionEnvironment.resources.deploymentHostname = new URL(reviewed[2]).hostname;
   assert.throws(() => normalizeWithProvider(
     providerAttestationFor(originCollisionEnvironment), originCollisionEnvironment,
-  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
+  ), (error) => error.code === "STEP11_6_WRITER_QUIESCE_CANDIDATE_INVENTORY_COLLISION");
 });
 
-test("signed post-freeze deployments expand the immutable probe scope without changing retained evidence", () => {
+test("a post-capture deployment other than the exact dynamic candidate fails closed", () => {
   const addition = [
     "dpl_PostFreezeRelevant01",
     candidateCommit,
     "https://bagger-postfreeze-relevant-sandbagger-invitational.vercel.app",
-    "FEATURE_PREVIEW", "READY", "GIT",
+    "PROJECT_PREVIEW", "READY", "d".repeat(64),
   ];
-  const normalized = normalize(input(), environment(), [addition]);
-  assert.equal(normalized.originInventoryCount, 1140,
-    "the frozen retained artifact remains the receipt subset");
-  assert.equal(normalized.liveOriginInventoryCount, 1149,
-    "retained + reviewed candidates + signed addition + current candidate are live");
-  assert.equal(normalized.probeOriginCount, 1154);
-  assert.equal(normalized.probeTargetCount, 1154 * 9);
-  assert.ok(normalized.probeOrigins.includes(addition[2]));
-  assert.ok(normalized.liveOriginInventoryTuples.some((tuple) =>
-    tuple[0] === addition[0] && tuple[2] === addition[2]));
+  assert.throws(() => normalize(input(), environment(), [addition]),
+    (error) => error.code === "STEP11_6_WRITER_QUIESCE_PROVIDER_ATTESTATION_INVALID");
 });
 
 test("full server probe requires exact Vercel deny markers and emits SQL-shaped evidence", async () => {
@@ -277,6 +345,10 @@ test("full server probe requires exact Vercel deny markers and emits SQL-shaped 
   const fetchImpl = async (url, request) => {
     probedVectors.add(`${request.method} ${new URL(url).pathname}`);
     probedTargets.add(`${new URL(url).origin}\n${request.method}\n${new URL(url).pathname}`);
+    if (new Set(["GET", "HEAD"]).has(request.method)) {
+      assert.equal(Object.prototype.hasOwnProperty.call(request, "body"), false,
+        `${request.method} edge probes must not carry a forbidden request body`);
+    }
     return new Response("denied", {
       status: 403,
       headers: {
@@ -299,7 +371,8 @@ test("full server probe requires exact Vercel deny markers and emits SQL-shaped 
   assert.equal(proof.probeRecords[0].length, 11);
   assert.equal(proof.probeRecords[0][8],
     PRODUCTION_GOOGLE_WRITER_QUIESCE_VECTOR_COVERAGE_MASK);
-  assert.equal(proof.probeRecords[0][9].length, 9);
+  assert.equal(proof.probeRecords[0][9].length,
+    PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS.length);
   assert.ok(proof.probeRecords[0][9].every((fingerprint) =>
     /^[0-9a-f]{64}$/.test(fingerprint)));
   assert.ok(Buffer.byteLength(JSON.stringify(proof.probeRecords), "utf8") < 2_000_000,
@@ -307,38 +380,48 @@ test("full server probe requires exact Vercel deny markers and emits SQL-shaped 
   assert.deepEqual([...probedVectors].sort(), PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS
     .map((record) => `${record.probeMethod} ${record.probePath}`).sort());
   assert.ok(proof.probeRecords.every((record) =>
-    record[8] === 511 && record[10] === "2026-08-26T15:00:00.000Z"));
+    record[8] === PRODUCTION_GOOGLE_WRITER_QUIESCE_VECTOR_COVERAGE_MASK &&
+    record[10] === "2026-08-26T15:00:00.000Z"));
+  assert.deepEqual(productionGoogleWriterAllMethodFencePaths(), {
+    paths: ["/api/cron/round-scorecards-archive"],
+    count: 1,
+    fingerprint: "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
+    policy:
+      "EXACT_HISTORICAL_SAFE_METHOD_GOOGLE_WRITER_PATH_REQUIRES_ALL_METHOD_PROJECT_WIDE_DENY",
+  });
   const fixed = proof.probeRecords.find((record) => record[0] === "https://baggerinv.com");
   assert.equal(fixed[1], "FIXED_ALIAS");
   assert.equal(fixed[2], null);
   assert.deepEqual(fixed[7], []);
   const candidate = proof.probeRecords.find((record) =>
-    record[1] === "CANDIDATE_IMMUTABLE");
+    record[0] === normalized.candidateImmutableOrigin);
+  assert.equal(candidate[1], "IMMUTABLE_PROJECT_PREVIEW");
+  assert.equal(candidate[6], "a".repeat(64));
   assert.deepEqual(candidate[7], [
     "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
     "PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
     "PRODUCTION_WORKBOOK_SELECTOR",
   ]);
-  for (const reviewed of PRODUCTION_REVIEWED_POST_CAPTURE_PREVIEW_DEPLOYMENTS) {
-    const record = proof.probeRecords.find((value) => value[0] === reviewed[2]);
-    assert.equal(record[3], reviewed[1]);
+  for (const origin of productionGoogleWriterAllMethodFenceHosts().origins) {
+    const source = productionLegacyDeploymentInventory().records.find((value) =>
+      value.origin === origin);
+    const record = proof.probeRecords.find((value) => value[0] === origin);
+    assert.equal(record[3], source.sha);
+    assert.equal(record[6], source.providerMetadataFingerprint,
+      "the runtime probe tuple must carry projection field 5 for SQL scope binding");
     assert.equal(record[8], PRODUCTION_GOOGLE_WRITER_QUIESCE_VECTOR_COVERAGE_MASK);
     assert.equal(record[9].length, PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS.length);
     assert.equal(new Set(record[9]).size,
       PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS.length,
-    "each reviewed origin has one distinct proof fingerprint per vector");
+    "each all-method-fenced origin has one distinct proof fingerprint per vector");
     assert.ok(record[9].every((fingerprint) => /^[0-9a-f]{64}$/.test(fingerprint)));
     for (const vector of PRODUCTION_GOOGLE_WRITER_QUIESCE_PROBE_VECTORS) {
       assert.ok(probedTargets.has(
-        `${reviewed[2]}\n${vector.probeMethod}\n${vector.probePath}`,
-      ), `reviewed origin ${reviewed[0]} was probed for ${vector.probeMethod} ${
+        `${origin}\n${vector.probeMethod}\n${vector.probePath}`,
+      ), `all-method origin ${source.deploymentId} was probed for ${vector.probeMethod} ${
         vector.probePath}`);
     }
-    assert.deepEqual(record[7], [
-      "LEGACY_GOOGLE_SERVICE_ACCOUNT_V0",
-      "POTENTIAL_DEDICATED_PRODUCTION_GOOGLE_SERVICE_ACCOUNT_V1",
-      "POTENTIAL_PRODUCTION_WORKBOOK_SELECTOR",
-    ]);
+    assert.ok(record[7].includes("LEGACY_GOOGLE_SERVICE_ACCOUNT_V0"));
   }
   const nullShaSource = productionLegacyDeploymentInventory().records.find((record) =>
     record.sha === null);
@@ -349,6 +432,14 @@ test("full server probe requires exact Vercel deny markers and emits SQL-shaped 
     record.deploymentStatus !== "READY");
   assert.ok(proof.probeRecords.some((record) => record[0] === nonReadySource.origin),
     "ERROR/BLOCKED origins remain in exhaustive edge-WAF coverage");
+
+  const migration = readFileSync(new URL(
+    "../supabase/production_migrations/202608260039_production_all_project_provider_inventory_v3.sql",
+    import.meta.url,
+  ), "utf8");
+  assert.match(migration,
+    /jsonb_build_array\(\s*item->2,[\s\S]{0,500}?item->3, item->4, item->5,/,
+    "SQL039 must bind probe tuple element 6 to providerMetadataFingerprint");
 });
 
 test("one non-denied origin fails the entire quiesce proof closed", async () => {
