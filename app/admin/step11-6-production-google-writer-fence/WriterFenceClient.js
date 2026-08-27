@@ -442,6 +442,27 @@ export default function WriterFenceClient({ environment }) {
     if (body?.wafEpoch) retainWafEpoch(body.wafEpoch);
   }
 
+  async function retireRejectedWafEpoch() {
+    const operationRequestId = recovery.wafRejectedRetirementRequestId || requestId();
+    retain({ wafRejectedRetirementRequestId: operationRequestId });
+    const body = await post(
+      "retire-rejected-vercel-waf-provider-epoch",
+      { criticalWafEpochId },
+      operationRequestId,
+    );
+    if (!body?.wafEpoch?.rejectedRetired) return;
+    retain({
+      rejectedWafEpoch: body.wafEpoch,
+      criticalWafEpoch: {},
+      criticalWafEpochId: "",
+      criticalWafStatus: "",
+      wafInstallRequestId: "",
+      wafRejectedRetirementRequestId: "",
+    });
+    setResult(body);
+    setError(null);
+  }
+
   function currentCriticalWafBinding() {
     if (!criticalWafEpochId || !criticalWafObservationId ||
         !new Set(["INSTALL", "RESTORE_REATTEST"]).has(
@@ -667,6 +688,12 @@ export default function WriterFenceClient({ environment }) {
           )}>
           {busy === "install-vercel-waf-provider-fence"
             ? "Installing temporary WAF…" : "Install temporary CRITICAL_WINDOW WAF"}
+        </button>
+        <button type="button" disabled={Boolean(busy) || !criticalWafEpochId ||
+          error?.code !== "STEP11_6_VERCEL_WAF_EXECUTOR_PROVIDER_REJECTED"}
+          onClick={retireRejectedWafEpoch}>
+          {busy === "retire-rejected-vercel-waf-provider-epoch"
+            ? "Verifying rejected epoch…" : "Retire rejected no-mutation WAF epoch"}
         </button>
         <button type="button" disabled={Boolean(busy) || !ownerFreezeConfirmed ||
           !routingRuleId.trim() || !routingRuleRevision.trim()}

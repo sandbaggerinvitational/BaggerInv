@@ -74,6 +74,7 @@ const REHEARSAL_WAF_EXECUTOR_ACTIONS = new Map([
   ["install-vercel-waf-provider-fence", "INSTALL"],
   ["reattest-vercel-waf-provider-fence", "REATTEST"],
   ["restore-vercel-waf-provider-baseline", "RESTORE"],
+  ["retire-rejected-vercel-waf-provider-epoch", "RETIRE_REJECTED"],
 ]);
 const INPUT_KEYS = new Set([
   "action", "confirmation", "currentVerificationId", "evidenceRequestId",

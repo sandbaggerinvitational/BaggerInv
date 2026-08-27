@@ -21,7 +21,8 @@ if (!childMode) {
     assert.deepEqual(JSON.parse(child.stdout), {
       candidateMismatchRejectedBeforeRpc: true,
       candidateTarget: "PREVIEW",
-      exactRpcCount: 9,
+      exactRpcCount: 10,
+      rejectedRetirementExactRpc: true,
       shortenedFinalizeRpc: true,
       signedDispatchProjectionCount: 56,
       signedWafProjectionCount: 49,
@@ -157,6 +158,21 @@ if (!childMode) {
     evidenceId: "10000000-0000-4000-8000-000000000003",
   });
   const baseline = baselineEnvelope.evidence;
+  const retirementRequestId = "15000000-0000-4000-8000-000000000001";
+  const retirementBaselineRequest = wafRequest({
+    stage: "BASELINE_CAPTURE",
+    evidenceRequestId: "15000000-0000-4000-8000-000000000002",
+    transitionRequestId: retirementRequestId,
+    expectedConfigurationVersion: "10",
+  });
+  const retirementBaselineEnvelope =
+    attestation.createVercelWafProviderEvidence({
+      request: retirementBaselineRequest,
+      firewallPayload: providerConfiguration(),
+      privateKey: keyPair.privateKey,
+      now: now + 500,
+      evidenceId: "15000000-0000-4000-8000-000000000003",
+    });
 
   const criticalRequest = wafRequest({
     stage: "CRITICAL_ACTIVE",
@@ -466,6 +482,26 @@ if (!childMode) {
   assert.deepEqual(calls.at(-1).input, operatorPayload(
     baseOperatorManifest(), "begin-critical-waf-epoch"));
 
+  await control.retireRejectedCriticalWafEpoch({
+    epochId: wafEpochId,
+    retirementRequestId,
+    freshBaselineObservationRequestId:
+      "15000000-0000-4000-8000-000000000004",
+    evidenceEnvelope: retirementBaselineEnvelope,
+    evidenceRequest: retirementBaselineRequest,
+    environment,
+  });
+  assert.equal(calls.at(-1).functionName,
+    "retire_production_vercel_writer_rejected_waf_epoch");
+  assert.equal(calls.at(-1).input.operation,
+    "RETIRE_PRODUCTION_VERCEL_WRITER_REJECTED_WAF_EPOCH");
+  assert.equal(calls.at(-1).input.epoch_id, wafEpochId);
+  assert.equal(calls.at(-1).input.retirement_request_id, retirementRequestId);
+  assert.equal(calls.at(-1).input.verified_waf_evidence.stage,
+    "BASELINE_CAPTURE");
+  assert.equal(calls.at(-1).input.candidate_deployment_id,
+    candidateDeploymentId);
+
   const beforeMismatch = calls.length;
   await assert.rejects(() => control.beginCriticalWafEpoch({
     evidenceEnvelope: baselineEnvelope,
@@ -616,13 +652,15 @@ if (!childMode) {
 
   const criticalRpcs = calls.filter(({ functionName }) =>
     functionName !== "inspect_production_scoring_admission");
-  assert.equal(criticalRpcs.length, 9);
+  assert.equal(criticalRpcs.length, 10);
   console.log(JSON.stringify({
     candidateMismatchRejectedBeforeRpc: true,
     candidateTarget: calls.find(({ functionName }) => functionName ===
       "begin_production_vercel_writer_critical_waf_epoch")
       .input.candidate_deployment_target,
     exactRpcCount: criticalRpcs.length,
+    rejectedRetirementExactRpc: criticalRpcs.some(({ functionName }) =>
+      functionName === "retire_production_vercel_writer_rejected_waf_epoch"),
     shortenedFinalizeRpc: calls.some(({ functionName }) =>
       functionName === "finalize_production_google_writer_fence_waf_restore"),
     signedDispatchProjectionCount:

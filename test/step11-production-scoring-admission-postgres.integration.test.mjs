@@ -1930,6 +1930,30 @@ function criticalWafDispatchResult(context, dispatch, label) {
   return Object.freeze(evidence);
 }
 
+function rejectedCriticalWafDispatchResult(context, dispatch, label) {
+  return Object.freeze({
+    ...criticalWafDispatchResult(context, dispatch, label),
+    outcomeStatus: "PROVIDER_REJECTED",
+    providerResponseStatus: 400,
+    providerReadbackFingerprint: null,
+    activeSemanticConfiguration: null,
+    activeSemanticConfigurationFingerprint: null,
+    activeCustomRuleCount: null,
+    activePendingDraftPresent: null,
+    draftSemanticConfiguration: null,
+    draftSemanticConfigurationFingerprint: null,
+    draftOrderedCustomRulesFingerprint: null,
+    draftConfigurationVersion: null,
+    draftConfigurationIdentityFingerprint: null,
+    draftCustomRuleCount: null,
+    pendingDraftChangeCount: null,
+    providerAssignedRuleId: null,
+    runOwnedProviderRuleDocumentFingerprint: null,
+    runOwnedRulePrecedence: null,
+    criticalWindowContractFingerprint: null,
+  });
+}
+
 function criticalWafDispatchInput(context, step, label, extras = {}) {
   return {
     ...scope,
@@ -2108,6 +2132,121 @@ function activateCriticalWafEpochV4(
   assert.equal(activated.status, "ACTIVE_UNBOUND");
   context.criticalActiveObservationId = activated.provider_result_observation_id;
   return context;
+}
+
+function rejectCriticalWafEpochV4(
+  cluster,
+  database,
+  label,
+  { purpose = "REHEARSAL", transitionMode = purpose } = {},
+) {
+  const runOwnedRuleNonce = randomUUID();
+  const epochId = randomUUID();
+  const context = {
+    epochId,
+    purpose,
+    transitionMode,
+    runOwnedRuleNonce,
+    runOwnedRuleName: `bagger-critical-window-${runOwnedRuleNonce}`,
+    runOwnedRuleFingerprint: fingerprint(`${label}-run-owned-rule`),
+    runOwnedInsertDocumentFingerprint:
+      fingerprint(`${label}-run-owned-insert-document`),
+    providerAssignedRuleId: `rule_${fingerprint(label).slice(0, 16)}`,
+    runOwnedProviderRuleDocumentFingerprint:
+      fingerprint(`${label}-provider-rule-document`),
+    criticalWindowContractFingerprint:
+      fingerprint(`${label}-critical-window-contract`),
+    baselineConfigurationVersion: "10",
+    criticalConfigurationVersion: "11",
+    providerConfigurationId: "config_bagger_production",
+    providerOwnerId: "team_SandbaggerInvitations",
+    baselineConfigurationIdentityFingerprint:
+      fingerprint(`${label}-baseline-identity`),
+    criticalConfigurationIdentityFingerprint:
+      fingerprint(`${label}-critical-identity`),
+    draftConfigurationIdentityFingerprint:
+      fingerprint(`${label}-draft-identity`),
+    baselineSourceVersionReadFingerprint:
+      fingerprint(`${label}-baseline-source-version-read`),
+    baselineSemanticFingerprint: fingerprint(`${label}-baseline-semantic`),
+    criticalSemanticFingerprint: fingerprint(`${label}-critical-semantic`),
+    baselineOrderedCustomRulesFingerprint:
+      fingerprint(`${label}-baseline-ordered-rules`),
+    criticalOrderedCustomRulesFingerprint:
+      fingerprint(`${label}-critical-ordered-rules`),
+  };
+  context.baselineSemanticConfiguration = wafSemanticConfiguration(
+    `${label}-baseline`,
+  );
+  context.criticalSemanticConfiguration = wafSemanticConfiguration(
+    `${label}-critical`,
+    [{ id: context.providerAssignedRuleId, name: context.runOwnedRuleName }],
+  );
+  const baselineTransitionRequestId = randomUUID();
+  const baselineEvidence = criticalWafEvidence(
+    context,
+    "BASELINE_CAPTURE",
+    baselineTransitionRequestId,
+    `${label}-baseline`,
+  );
+  context.baselineEvidenceId = baselineEvidence.evidenceId;
+  const epoch = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_critical_waf_epoch",
+    {
+      ...scope,
+      actor_id: actor,
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      operation: "BEGIN_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_EPOCH",
+      epoch_id: epochId,
+      epoch_request_id: randomUUID(),
+      baseline_observation_request_id: randomUUID(),
+      purpose,
+      transition_mode: transitionMode,
+      request_fingerprint: fingerprint(`${label}-epoch-begin`),
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      candidate_deployment_target: "PREVIEW",
+      candidate_alias_origin: candidateIdentity.aliasOrigin,
+      candidate_immutable_origin: candidateIdentity.immutableOrigin,
+      candidate_control_hosts_fingerprint:
+        providerInventoryBindingV4
+          .routing_rule_candidate_control_hosts_fingerprint,
+      baseline_waf_evidence: baselineEvidence,
+    },
+  );
+  assert.equal(epoch.status, "ACTIVATION_PENDING");
+
+  const insertInput = criticalWafDispatchInput(
+    context,
+    "CRITICAL_RULE_INSERT",
+    `${label}-rule-insert`,
+  );
+  const insertDispatch = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_critical_waf_dispatch",
+    insertInput,
+  );
+  markCriticalWafDispatch(cluster, database, insertDispatch);
+  const rejectedResult = rpc(
+    cluster,
+    database,
+    "record_production_vercel_writer_critical_waf_dispatch_result",
+    {
+      operation: "RECORD_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_DISPATCH_RESULT",
+      dispatch_id: insertDispatch.dispatch_id,
+      request_fingerprint: fingerprint(`${label}-rule-insert-rejected`),
+      verified_dispatch_result: rejectedCriticalWafDispatchResult(
+        context,
+        insertDispatch,
+        `${label}-rule-insert-rejected`,
+      ),
+    },
+  );
+  assert.equal(rejectedResult.outcome_status, "PROVIDER_REJECTED");
+  return { ...context, insertDispatch };
 }
 
 function reattestCriticalWafEpochV4(cluster, database, context, label) {
@@ -10631,6 +10770,182 @@ test(
           assert.equal(rolledBack.admission_state, "CLOSED");
           assert.equal(rolledBack.scoring_ingress_enabled, false);
           assert.equal(state(cluster, database).execution_gate, "PAUSED");
+        },
+      );
+
+      await t.test(
+        "migration 041 retires only a synchronously rejected no-mutation WAF epoch",
+        () => {
+          const database = cloneDormantDatabase(
+            "migration_041_rejected_waf_retirement",
+          );
+          for (const migration of [
+            "202608260039_production_all_project_provider_inventory_v3.sql",
+            "202608260040_production_provider_inventory_recertification_v4.sql",
+          ]) psqlFile(cluster, database,
+            path.join(migrationsDirectory, migration));
+
+          const rejected = rejectCriticalWafEpochV4(
+            cluster,
+            database,
+            "migration-041-rejected",
+          );
+          psqlFile(cluster, database, path.join(
+            migrationsDirectory,
+            "202608270041_production_rejected_waf_epoch_retirement.sql",
+          ));
+          assert.equal(psql(cluster, database, `
+            select status
+            from production_control.vercel_writer_critical_waf_epochs
+            where epoch_id = ${sqlLiteral(rejected.epochId)}::uuid;
+          `).trim(), "ACTIVATION_PENDING",
+          "installing migration 041 must not retire an epoch automatically");
+
+          const retirementRequestId = randomUUID();
+          const retirementEvidence = criticalWafEvidence(
+            rejected,
+            "BASELINE_CAPTURE",
+            retirementRequestId,
+            "migration-041-retirement-baseline",
+          );
+          const retirementInput = {
+            ...scope,
+            actor_id: actor,
+            authenticated_actor_fingerprint:
+              fingerprint("authenticated-operator"),
+            operation:
+              "RETIRE_PRODUCTION_VERCEL_WRITER_REJECTED_WAF_EPOCH",
+            epoch_id: rejected.epochId,
+            retirement_request_id: retirementRequestId,
+            fresh_baseline_observation_request_id: randomUUID(),
+            request_fingerprint: fingerprint("migration-041-retirement"),
+            candidate_deployment_id: candidateIdentity.deploymentId,
+            candidate_deployment_commit: candidateIdentity.commit,
+            verified_waf_evidence: retirementEvidence,
+          };
+          const retired = rpc(
+            cluster,
+            database,
+            "retire_production_vercel_writer_rejected_waf_epoch",
+            retirementInput,
+          );
+          assert.equal(retired.status, "REJECTED_RETIRED");
+          assert.equal(retired.provider_mutation_performed, false);
+          assert.equal(retired.idempotent, false);
+          assert.equal(retired.retirement_request_id, retirementRequestId);
+          assert.equal(
+            retired.retirement_evidence_fingerprint,
+            retirementEvidence.evidenceFingerprint,
+          );
+
+          const freshReplayEvidence = {
+            ...criticalWafEvidence(
+              rejected,
+              "BASELINE_CAPTURE",
+              retirementRequestId,
+              "migration-041-retirement-baseline-replay",
+            ),
+            evidenceId: retirementEvidence.evidenceId,
+            evidenceRequestId: retirementEvidence.evidenceRequestId,
+          };
+          const replay = rpc(
+            cluster,
+            database,
+            "retire_production_vercel_writer_rejected_waf_epoch",
+            {
+              ...retirementInput,
+              verified_waf_evidence: freshReplayEvidence,
+            },
+          );
+          assert.equal(replay.status, "REJECTED_RETIRED");
+          assert.equal(replay.provider_mutation_performed, false);
+          assert.equal(replay.idempotent, true);
+          assert.equal(replay.retirement_observation_id,
+            retired.retirement_observation_id);
+
+          assert.equal(psql(cluster, database, `
+            select pg_catalog.concat_ws('|',
+              activation.state,
+              activation.current_authority,
+              resource.participant_identity_authority,
+              gate.admission_state,
+              gate.state,
+              activation.scoring_ingress_enabled,
+              resource.workers_enabled,
+              activation.first_supabase_write_possible_at is not null,
+              activation.first_supabase_write_observed_at is not null,
+              (
+                select pg_catalog.count(*)
+                from production_control.operation_audit_events value
+                where value.event_type =
+                  'PRODUCTION_VERCEL_WRITER_REJECTED_WAF_EPOCH_RETIRED'
+                  and value.request_fingerprint =
+                    ${sqlLiteral(retirementInput.request_fingerprint)}
+              ),
+              pg_catalog.has_function_privilege(
+                'service_role',
+                'public.retire_production_vercel_writer_rejected_waf_epoch(jsonb)',
+                'EXECUTE'
+              ),
+              pg_catalog.has_function_privilege(
+                'authenticated',
+                'public.retire_production_vercel_writer_rejected_waf_epoch(jsonb)',
+                'EXECUTE'
+              )
+            )
+            from production_control.cutover_activation_state activation
+            cross join production_control.resource_scope resource
+            cross join scoring_authority.ingress_gates gate
+            where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+              and resource.scope_key = 'BAGGER_INV_PRODUCTION'
+              and gate.tournament_id = '2026';
+          `).trim(), "DORMANT|GOOGLE|PASSPORT|OPEN|PAUSED|f|f|f|f|1|t|f");
+
+          const nextRejected = rejectCriticalWafEpochV4(
+            cluster,
+            database,
+            "migration-041-next-epoch",
+          );
+          const driftRequestId = randomUUID();
+          const driftEvidence = {
+            ...criticalWafEvidence(
+              nextRejected,
+              "BASELINE_CAPTURE",
+              driftRequestId,
+              "migration-041-drift-baseline",
+            ),
+            semanticConfigurationFingerprint:
+              fingerprint("migration-041-unexpected-provider-drift"),
+          };
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "retire_production_vercel_writer_rejected_waf_epoch",
+              {
+                ...scope,
+                actor_id: actor,
+                authenticated_actor_fingerprint:
+                  fingerprint("authenticated-operator"),
+                operation:
+                  "RETIRE_PRODUCTION_VERCEL_WRITER_REJECTED_WAF_EPOCH",
+                epoch_id: nextRejected.epochId,
+                retirement_request_id: driftRequestId,
+                fresh_baseline_observation_request_id: randomUUID(),
+                request_fingerprint:
+                  fingerprint("migration-041-drift-retirement"),
+                candidate_deployment_id: candidateIdentity.deploymentId,
+                candidate_deployment_commit: candidateIdentity.commit,
+                verified_waf_evidence: driftEvidence,
+              },
+            ),
+            /PRODUCTION_VERCEL_WRITER_REJECTED_WAF_RETIREMENT_BASELINE_INVALID/,
+          );
+          assert.equal(psql(cluster, database, `
+            select status
+            from production_control.vercel_writer_critical_waf_epochs
+            where epoch_id = ${sqlLiteral(nextRejected.epochId)}::uuid;
+          `).trim(), "ACTIVATION_PENDING");
         },
       );
 

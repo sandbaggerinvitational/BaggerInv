@@ -25,6 +25,7 @@ if (!childMode) {
       exactReattestationReadback: true,
       exactRestorationReadback: true,
       providerRejectionDurableAndNonReplayable: true,
+      rejectedEpochRetiredAfterExactNoMutationReadback: true,
       routeAndClientBoundaryPinned: true,
       unsupportedPayloadRefused: true,
       wrongCandidateRefused: true,
@@ -118,6 +119,7 @@ if (!childMode) {
     let failedPostPatchRead = false;
     let finalized = 0;
     let reattestations = 0;
+    let retirements = 0;
     const dispatches = new Map();
     const signedResults = [];
     const requests = [];
@@ -184,7 +186,7 @@ if (!childMode) {
         });
       }
       if (init.method === "PATCH") {
-        assert.equal(url.pathname, "/v1/security/firewall/config/draft");
+        assert.equal(url.pathname, "/v1/security/firewall/config");
         assert.deepEqual(Object.keys(JSON.parse(init.body)).sort(),
           ["action", "id", "value"]);
         if (patchMode === "rejected" || patchMode === "rejected-non-json") {
@@ -343,6 +345,32 @@ if (!childMode) {
             epoch.latestCriticalReattestObservationId,
         };
       },
+      retireRejectedCriticalWafEpoch: async (details) => {
+        const signed = details.evidenceEnvelope.evidence;
+        assert.equal(epoch.status === "ACTIVATION_PENDING" ||
+          epoch.status === "REJECTED_RETIRED", true);
+        assert.equal(dispatches.get("CRITICAL_RULE_INSERT").status,
+          "PROVIDER_REJECTED");
+        assert.equal(signed.stage, "BASELINE_CAPTURE");
+        assert.equal(signed.wafEpochId, epochId);
+        assert.equal(signed.transitionRequestId, operationRequestId);
+        assert.equal(signed.configurationVersion,
+          epoch.baselineActiveConfigVersion);
+        assert.equal(signed.semanticConfigurationFingerprint,
+          epoch.baselineSemanticConfigurationFingerprint);
+        assert.equal(signed.orderedCustomRulesFingerprint,
+          epoch.baselineOrderedRulesFingerprint);
+        assert.equal(signed.customRuleCount, 0);
+        assert.equal(signed.pendingDraftChangeCount, 0);
+        assert.equal(details.retirementRequestId, operationRequestId);
+        if (epoch.status !== "REJECTED_RETIRED") retirements += 1;
+        epoch.status = "REJECTED_RETIRED";
+        epoch.rejectedRetired = true;
+        epoch.retirementId =
+          "90000000-0000-4000-8000-000000000001";
+        epoch.providerMutationPerformed = false;
+        return inspect();
+      },
       finalizeWafBaselineRestore: async (details) => {
         assert.equal(details.fenceId, fenceId);
         assert.equal(details.baselineRestoredObservationId,
@@ -365,6 +393,7 @@ if (!childMode) {
       now: () => now,
       providerResponse,
       reattestations: () => reattestations,
+      retirements: () => retirements,
       requests,
       signedResults,
     };
@@ -477,6 +506,22 @@ if (!childMode) {
     code: "STEP11_6_VERCEL_WAF_EXECUTOR_PROVIDER_REJECTED",
   });
   assert.equal(rejected.requests.filter((item) => item.method === "PATCH").length, 1);
+  const beforeRetireReads = rejected.requests.length;
+  const retired = await call(rejected, "RETIRE_REJECTED");
+  assert.equal(retired.providerReadbackVerified, true);
+  assert.equal(retired.providerMutationCoupled, false);
+  assert.equal(retired.providerMutationPerformed, false);
+  assert.equal(retired.wafEpoch.status, "REJECTED_RETIRED");
+  assert.equal(retired.wafEpoch.rejectedRetired, true);
+  assert.equal(retired.wafEpoch.providerMutationPerformed, false);
+  assert.equal(rejected.retirements(), 1);
+  assert.equal(rejected.requests.length, beforeRetireReads + 2);
+  assert.equal(rejected.requests.slice(beforeRetireReads).every((item) =>
+    item.method === "GET"), true);
+  const retiredRetry = await call(rejected, "RETIRE_REJECTED");
+  assert.equal(retiredRetry.wafEpoch.status, "REJECTED_RETIRED");
+  assert.equal(rejected.retirements(), 1);
+  assert.equal(rejected.requests.filter((item) => item.method === "PATCH").length, 1);
 
   const refused = harness();
   await assert.rejects(() => call(refused, "INSTALL", {
@@ -515,6 +560,7 @@ if (!childMode) {
   assert.match(routeSource, /install-vercel-waf-provider-fence/);
   assert.match(routeSource, /reattest-vercel-waf-provider-fence/);
   assert.match(routeSource, /restore-vercel-waf-provider-baseline/);
+  assert.match(routeSource, /retire-rejected-vercel-waf-provider-epoch/);
   assert.match(routeSource, /exactWafExecutorInput/);
   assert.match(routeSource, /criticalWafObservationId/);
   assert.match(routeSource, /criticalWafQuiesceStage/);
@@ -526,6 +572,7 @@ if (!childMode) {
     exactReattestationReadback: true,
     exactRestorationReadback: true,
     providerRejectionDurableAndNonReplayable: true,
+    rejectedEpochRetiredAfterExactNoMutationReadback: true,
     routeAndClientBoundaryPinned: true,
     unsupportedPayloadRefused: true,
     wrongCandidateRefused: true,

@@ -2217,7 +2217,7 @@ function validateWafCriticalEpochManifest(manifest) {
     "wafCriticalEpoch.authenticatedActorId");
   if (!new Set([
     "MISSING", "ACTIVATION_PENDING", "ACTIVE_UNBOUND", "FENCE_BOUND",
-    "RESTORE_PENDING", "BASELINE_RESTORED",
+    "RESTORE_PENDING", "BASELINE_RESTORED", "REJECTED_RETIRED",
   ]).has(epoch.status)) {
     refuse("WAF_CRITICAL_EPOCH_STATUS_INVALID",
       "The WAF epoch status was outside the certified state machine.");

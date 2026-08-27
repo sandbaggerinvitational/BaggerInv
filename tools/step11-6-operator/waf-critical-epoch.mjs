@@ -257,7 +257,7 @@ function assertEpochShape(manifest, epoch) {
   }
   requireOne(epoch.status, [
     "MISSING", "ACTIVATION_PENDING", "ACTIVE_UNBOUND", "FENCE_BOUND",
-    "RESTORE_PENDING", "BASELINE_RESTORED",
+    "RESTORE_PENDING", "BASELINE_RESTORED", "REJECTED_RETIRED",
   ], "wafCriticalEpoch.status");
   requireMatch(epoch.epochId, UUID, "wafCriticalEpoch.epochId");
   requireMatch(epoch.epochRequestId, UUID, "wafCriticalEpoch.epochRequestId");
