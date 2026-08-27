@@ -102,6 +102,17 @@ test("Vercel rules.insert generator uses a null ID and binds the run-owned name"
   assert.equal(generated.body.value.active, true);
   assert.deepEqual(generated.body.value.action, { mitigate: { action: "deny" } });
   assert.equal(generated.body.value.conditionGroup.length, 5);
+  assert.deepEqual(
+    generated.body.value.conditionGroup.flatMap((group) =>
+      group.conditions.filter((condition) => condition.type === "host")
+    ).length,
+    6,
+  );
+  assert.equal(
+    generated.body.value.conditionGroup.flatMap((group) => group.conditions)
+      .some((condition) => condition.type === "hostname"),
+    false,
+  );
   assert.match(generated.runOwnedRuleFingerprint, /^[0-9a-f]{64}$/);
   assert.match(generated.runOwnedInsertDocumentFingerprint, /^[0-9a-f]{64}$/);
   assert.throws(() => buildProductionGoogleWriterCriticalWindowVercelRuleInsert({
