@@ -314,78 +314,45 @@ if (!childMode) {
   };
   const recoveryDispatchId = "16000000-0000-4000-8000-000000000001";
   const recoveryResultId = "16000000-0000-4000-8000-000000000002";
-  const recoveryReads = [];
   const recoveryRpcCalls = [];
+  const recoveryRow = {
+    ok: true,
+    epoch_id: wafEpochId,
+    status: "ACTIVATION_PENDING",
+    purpose: "REHEARSAL",
+    transition_mode: "REHEARSAL",
+    vercel_project_id: PRODUCTION_VERCEL_PROJECT_ID,
+    vercel_team_id: teamId,
+    candidate_deployment_id: historicalDeploymentId,
+    candidate_deployment_commit: historicalCommitSha,
+    candidate_deployment_target: "PREVIEW",
+    candidate_alias_origin: candidateAliasOrigin,
+    candidate_immutable_origin: historicalImmutableOrigin,
+    candidate_control_hosts_fingerprint:
+      criticalWaf.productionGoogleWriterCriticalWindowProviderRuleContract({
+        candidateAliasOrigin,
+        candidateImmutableOrigin: historicalImmutableOrigin,
+        runOwnedRuleName,
+        runOwnedRuleNonce,
+      }).candidateControlHostsFingerprint,
+    run_owned_rule_name: runOwnedRuleName,
+    run_owned_rule_nonce: runOwnedRuleNonce,
+    run_owned_rule_fingerprint:
+      historicalInsertDocument.runOwnedRuleFingerprint,
+    run_owned_insert_document_fingerprint:
+      historicalInsertDocument.runOwnedInsertDocumentFingerprint,
+    retirement_request_id: null,
+    retirement_candidate_deployment_id: null,
+    retirement_candidate_deployment_commit: null,
+    retirement_reason: null,
+    retired_at: null,
+    rejected_dispatch_id: recoveryDispatchId,
+    rejected_dispatch_result_id: recoveryResultId,
+    provider_response_status: 400,
+  };
   const recoveryFetch = (mode = "one") => async (rawUrl, init = {}) => {
     const url = new URL(rawUrl);
-    if (init.method === "GET") {
-      recoveryReads.push({
-        pathname: url.pathname,
-        acceptProfile: init.headers["accept-profile"],
-        epochFilter: url.searchParams.get("epoch_id"),
-        statusFilter: url.searchParams.get("status"),
-      });
-      if (url.pathname.endsWith("/vercel_writer_critical_waf_epochs")) {
-        if (mode === "zero") return response([]);
-        const row = {
-          epoch_id: wafEpochId,
-          status: "ACTIVATION_PENDING",
-          purpose: "REHEARSAL",
-          transition_mode: "REHEARSAL",
-          vercel_project_id: PRODUCTION_VERCEL_PROJECT_ID,
-          vercel_team_id: teamId,
-          candidate_deployment_id: historicalDeploymentId,
-          candidate_deployment_commit: historicalCommitSha,
-          candidate_deployment_target: "PREVIEW",
-          candidate_alias_origin: candidateAliasOrigin,
-          candidate_immutable_origin: historicalImmutableOrigin,
-          candidate_control_hosts_fingerprint:
-            criticalWaf.productionGoogleWriterCriticalWindowProviderRuleContract({
-              candidateAliasOrigin,
-              candidateImmutableOrigin: historicalImmutableOrigin,
-              runOwnedRuleName,
-              runOwnedRuleNonce,
-            }).candidateControlHostsFingerprint,
-          run_owned_rule_name: runOwnedRuleName,
-          run_owned_rule_nonce: runOwnedRuleNonce,
-          run_owned_rule_fingerprint:
-            historicalInsertDocument.runOwnedRuleFingerprint,
-          run_owned_insert_document_fingerprint:
-            historicalInsertDocument.runOwnedInsertDocumentFingerprint,
-          retirement_request_id: null,
-          retirement_candidate_deployment_id: null,
-          retirement_candidate_deployment_commit: null,
-          retirement_reason: null,
-          retired_at: null,
-        };
-        return response(mode === "two" ? [row, { ...row }] : [row]);
-      }
-      if (url.pathname.endsWith("/vercel_writer_critical_waf_dispatches")) {
-        return response([{
-          dispatch_id: recoveryDispatchId,
-          epoch_id: wafEpochId,
-          dispatch_step: "CRITICAL_RULE_INSERT",
-          status: "PROVIDER_REJECTED",
-          provider_dispatch_started_at: new Date(now - 2_000).toISOString(),
-          provider_dispatch_result_id: recoveryResultId,
-          provider_result_observation_id: null,
-        }]);
-      }
-      assert.ok(url.pathname.endsWith(
-        "/vercel_writer_critical_waf_dispatch_results",
-      ));
-      return response([{
-        result_id: recoveryResultId,
-        dispatch_id: recoveryDispatchId,
-        epoch_id: wafEpochId,
-        dispatch_step: "CRITICAL_RULE_INSERT",
-        outcome_status: "PROVIDER_REJECTED",
-        provider_response_observed: true,
-        provider_response_status: 400,
-        provider_readback_fingerprint: null,
-        provider_assigned_rule_id: null,
-      }]);
-    }
+    assert.equal(init.method, "POST");
     const functionName = url.pathname.split("/").at(-1);
     const input = JSON.parse(init.body).input;
     recoveryRpcCalls.push({ functionName, input });
@@ -429,6 +396,27 @@ if (!childMode) {
     }
     assert.equal(functionName,
       "inspect_production_vercel_writer_critical_waf_epoch");
+    if (input.operation ===
+        "RECOVER_PRODUCTION_VERCEL_WRITER_REJECTED_WAF_EPOCH") {
+      assert.equal(input.vercel_project_id, PRODUCTION_VERCEL_PROJECT_ID);
+      assert.equal(input.expected_status,
+        input.expected_epoch_id && input.retirement_request_id
+        ? "ACTIVATION_PENDING_OR_REJECTED_RETIRED"
+        : "ACTIVATION_PENDING");
+      assert.equal(input.expected_purpose, "REHEARSAL");
+      assert.equal(input.expected_transition_mode, "REHEARSAL");
+      if (mode === "zero") {
+        return response({
+          message: "STEP11_6_VERCEL_WAF_RECOVERY_NOT_FOUND",
+        }, 409);
+      }
+      if (mode === "two") {
+        return response({
+          message: "STEP11_6_VERCEL_WAF_RECOVERY_CONFLICT",
+        }, 409);
+      }
+      return response(recoveryRow);
+    }
     assert.equal(input.candidate_deployment_id, historicalDeploymentId);
     assert.equal(input.candidate_deployment_commit, historicalCommitSha);
     return response({
@@ -629,8 +617,8 @@ if (!childMode) {
   assert.equal(recoveredEpoch.provider_mutation_performed, false);
   assert.equal(recoveredEpoch.candidate_deployment_id,
     historicalDeploymentId);
-  assert.equal(recoveryReads.filter((item) => item.acceptProfile ===
-    "production_control").length, 3);
+  assert.equal(recoveryRpcCalls.filter(({ input }) => input.operation ===
+    "RECOVER_PRODUCTION_VERCEL_WRITER_REJECTED_WAF_EPOCH").length, 1);
 
   const missingRecoveryControl = receiptServer
     .productionGoogleWriterProviderFenceControlDependencies({
