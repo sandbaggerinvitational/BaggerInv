@@ -71,6 +71,7 @@ const REHEARSAL_ACL_ACTIONS = new Map([
   ["restore-drive-acl-rehearsal", "abort-install"],
 ]);
 const REHEARSAL_WAF_EXECUTOR_ACTIONS = new Map([
+  ["recover-rejected-vercel-waf-provider-epoch", "RECOVER_REJECTED"],
   ["install-vercel-waf-provider-fence", "INSTALL"],
   ["reattest-vercel-waf-provider-fence", "REATTEST"],
   ["restore-vercel-waf-provider-baseline", "RESTORE"],

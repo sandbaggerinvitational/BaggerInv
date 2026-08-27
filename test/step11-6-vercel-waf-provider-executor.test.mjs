@@ -37,6 +37,9 @@ if (!childMode) {
   const executor = await import(
     "../lib/production-vercel-waf-provider-executor.js"
   );
+  const criticalWaf = await import(
+    "../lib/production-google-writer-critical-window-waf.js"
+  );
   const { PRODUCTION_VERCEL_PROJECT_ID } = await import(
     "../lib/google-service-account-credential-context.js"
   );
@@ -112,7 +115,7 @@ if (!childMode) {
   }
 
   function harness({ patchMode = "accepted", failPostPatchRead = false,
-    versionReadMismatch = false } = {}) {
+    versionReadMismatch = false, historicalRejectedEpoch = false } = {}) {
     let epoch = null;
     let phase = "BASELINE";
     let draftRule = null;
@@ -241,6 +244,8 @@ if (!childMode) {
           baselineOrderedRulesFingerprint: evidence.orderedCustomRulesFingerprint,
           baselineObservationId:
             "40000000-0000-4000-8000-000000000001",
+          candidateAliasOrigin: `https://${alias}`,
+          candidateImmutableOrigin: `https://${immutable}`,
           runOwnedRuleName: evidence.runOwnedRuleName,
           runOwnedRuleNonce: evidence.runOwnedRuleNonce,
           runOwnedRuleFingerprint: evidence.runOwnedRuleFingerprint,
@@ -298,6 +303,20 @@ if (!childMode) {
           dispatch.status = signed.outcomeStatus;
           if (signed.outcomeStatus === "TARGET_CONFIRMED") {
             epoch.providerAssignedRuleId = signed.providerAssignedRuleId;
+          } else if (signed.outcomeStatus === "PROVIDER_REJECTED" &&
+              historicalRejectedEpoch) {
+            epoch.candidateImmutableOrigin =
+              "https://bagger-historical-rejected-sandbagger-invitational.vercel.app";
+            const historical =
+              criticalWaf.buildProductionGoogleWriterCriticalWindowVercelRuleInsert({
+                candidateAliasOrigin: epoch.candidateAliasOrigin,
+                candidateImmutableOrigin: epoch.candidateImmutableOrigin,
+                runOwnedRuleName: epoch.runOwnedRuleName,
+                runOwnedRuleNonce: epoch.runOwnedRuleNonce,
+              });
+            epoch.runOwnedRuleFingerprint = historical.runOwnedRuleFingerprint;
+            epoch.runOwnedInsertDocumentFingerprint =
+              historical.runOwnedInsertDocumentFingerprint;
           }
           return { ...structuredClone(dispatch), outcomeStatus: dispatch.status };
         }
@@ -345,6 +364,18 @@ if (!childMode) {
             epoch.latestCriticalReattestObservationId,
         };
       },
+      recoverRejectedCriticalWafEpoch: async (details) => {
+        assert.equal(epoch.status === "ACTIVATION_PENDING" ||
+          epoch.status === "REJECTED_RETIRED", true);
+        assert.equal(dispatches.get("CRITICAL_RULE_INSERT").status,
+          "PROVIDER_REJECTED");
+        if (details.expectedEpochId) assert.equal(details.expectedEpochId, epochId);
+        return {
+          ...inspect(),
+          recoverableRejected: true,
+          providerMutationPerformed: false,
+        };
+      },
       retireRejectedCriticalWafEpoch: async (details) => {
         const signed = details.evidenceEnvelope.evidence;
         assert.equal(epoch.status === "ACTIVATION_PENDING" ||
@@ -362,6 +393,12 @@ if (!childMode) {
           epoch.baselineOrderedRulesFingerprint);
         assert.equal(signed.customRuleCount, 0);
         assert.equal(signed.pendingDraftChangeCount, 0);
+        assert.equal(signed.candidateImmutableOrigin,
+          epoch.candidateImmutableOrigin);
+        assert.equal(signed.runOwnedRuleFingerprint,
+          epoch.runOwnedRuleFingerprint);
+        assert.equal(signed.runOwnedInsertDocumentFingerprint,
+          epoch.runOwnedInsertDocumentFingerprint);
         assert.equal(details.retirementRequestId, operationRequestId);
         if (epoch.status !== "REJECTED_RETIRED") retirements += 1;
         epoch.status = "REJECTED_RETIRED";
@@ -492,7 +529,10 @@ if (!childMode) {
   assert.equal(recoveredInsert.providerResponseObserved, false);
   assert.equal(recoveredInsert.providerResponseFingerprint, null);
 
-  const rejected = harness({ patchMode: "rejected-non-json" });
+  const rejected = harness({
+    patchMode: "rejected-non-json",
+    historicalRejectedEpoch: true,
+  });
   await assert.rejects(() => call(rejected, "INSTALL"), {
     code: "STEP11_6_VERCEL_WAF_EXECUTOR_PROVIDER_REJECTED",
   });
@@ -506,6 +546,12 @@ if (!childMode) {
     code: "STEP11_6_VERCEL_WAF_EXECUTOR_PROVIDER_REJECTED",
   });
   assert.equal(rejected.requests.filter((item) => item.method === "PATCH").length, 1);
+  const recoveredRejected = await call(rejected, "RECOVER_REJECTED", {
+    criticalWafEpochId: undefined,
+  });
+  assert.equal(recoveredRejected.wafEpoch.epochId, epochId);
+  assert.equal(recoveredRejected.wafEpoch.recoverableRejected, true);
+  assert.equal(recoveredRejected.providerMutationPerformed, false);
   const beforeRetireReads = rejected.requests.length;
   const retired = await call(rejected, "RETIRE_REJECTED");
   assert.equal(retired.providerReadbackVerified, true);
@@ -556,14 +602,21 @@ if (!childMode) {
   const routeSource = readFileSync(
     "app/api/admin/step11-6-production-google-writer-fence/route.js", "utf8",
   );
+  const clientSource = readFileSync(
+    "app/admin/step11-6-production-google-writer-fence/WriterFenceClient.js",
+    "utf8",
+  );
   assert.match(moduleSource, /^import "server-only";/);
   assert.match(routeSource, /install-vercel-waf-provider-fence/);
   assert.match(routeSource, /reattest-vercel-waf-provider-fence/);
   assert.match(routeSource, /restore-vercel-waf-provider-baseline/);
+  assert.match(routeSource, /recover-rejected-vercel-waf-provider-epoch/);
   assert.match(routeSource, /retire-rejected-vercel-waf-provider-epoch/);
   assert.match(routeSource, /exactWafExecutorInput/);
   assert.match(routeSource, /criticalWafObservationId/);
   assert.match(routeSource, /criticalWafQuiesceStage/);
+  assert.match(clientSource, /recoverRejectedWafEpoch/);
+  assert.match(clientSource, /criticalWafEpoch\?\.recoverableRejected !== true/);
   assert.doesNotMatch(routeSource, /PRODUCTION_VERCEL_WAF_EXECUTOR_TOKEN/);
 
   console.log(JSON.stringify({

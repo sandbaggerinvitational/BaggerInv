@@ -19,9 +19,12 @@ if (!childMode) {
     });
     assert.equal(child.status, 0, child.stderr || child.stdout);
     assert.deepEqual(JSON.parse(child.stdout), {
+      activeRejectedEpochRecoveredWithoutBrowserState: true,
       candidateMismatchRejectedBeforeRpc: true,
       candidateTarget: "PREVIEW",
-      exactRpcCount: 10,
+      conflictingRecoveryRejected: true,
+      exactRpcCount: 9,
+      missingRecoveryRejected: true,
       rejectedRetirementExactRpc: true,
       shortenedFinalizeRpc: true,
       signedDispatchProjectionCount: 56,
@@ -64,6 +67,17 @@ if (!childMode) {
     criticalWaf.buildProductionGoogleWriterCriticalWindowVercelRuleInsert({
       candidateAliasOrigin,
       candidateImmutableOrigin,
+      runOwnedRuleName,
+      runOwnedRuleNonce,
+    });
+  const historicalDeploymentId = "dpl_HistoricalWafCandidate1";
+  const historicalCommitSha = "6".repeat(40);
+  const historicalImmutableOrigin =
+    "https://bagger-historicalwaf-sandbagger-invitational.vercel.app";
+  const historicalInsertDocument =
+    criticalWaf.buildProductionGoogleWriterCriticalWindowVercelRuleInsert({
+      candidateAliasOrigin,
+      candidateImmutableOrigin: historicalImmutableOrigin,
       runOwnedRuleName,
       runOwnedRuleNonce,
     });
@@ -110,6 +124,9 @@ if (!childMode) {
     baselineConfigurationVersion = null,
     baselineSourceVersionReadFingerprint = null,
     expectedConfigurationVersion,
+    ruleDocument = insertDocument,
+    requestAliasOrigin = candidateAliasOrigin,
+    requestImmutableOrigin = candidateImmutableOrigin,
     assignedRuleId = new Set(["CRITICAL_ACTIVE", "CRITICAL_REATTEST"])
       .has(stage) ? providerAssignedRuleId : null,
   }) {
@@ -123,16 +140,16 @@ if (!childMode) {
       transitionMode: "REHEARSAL",
       projectId: PRODUCTION_VERCEL_PROJECT_ID,
       teamId,
-      candidateAliasOrigin,
-      candidateImmutableOrigin,
+      candidateAliasOrigin: requestAliasOrigin,
+      candidateImmutableOrigin: requestImmutableOrigin,
       candidateDeploymentId,
       candidateCommitSha,
       candidateDeploymentTarget: "PREVIEW",
       runOwnedRuleName,
       runOwnedRuleNonce,
-      runOwnedRuleFingerprint: insertDocument.runOwnedRuleFingerprint,
+      runOwnedRuleFingerprint: ruleDocument.runOwnedRuleFingerprint,
       runOwnedInsertDocumentFingerprint:
-        insertDocument.runOwnedInsertDocumentFingerprint,
+        ruleDocument.runOwnedInsertDocumentFingerprint,
       providerAssignedRuleId: assignedRuleId,
       baselineEvidenceId,
       criticalEvidenceId,
@@ -164,6 +181,8 @@ if (!childMode) {
     evidenceRequestId: "15000000-0000-4000-8000-000000000002",
     transitionRequestId: retirementRequestId,
     expectedConfigurationVersion: "10",
+    ruleDocument: historicalInsertDocument,
+    requestImmutableOrigin: historicalImmutableOrigin,
   });
   const retirementBaselineEnvelope =
     attestation.createVercelWafProviderEvidence({
@@ -292,6 +311,141 @@ if (!childMode) {
       });
     }
     return response({ ok: true, ...input });
+  };
+  const recoveryDispatchId = "16000000-0000-4000-8000-000000000001";
+  const recoveryResultId = "16000000-0000-4000-8000-000000000002";
+  const recoveryReads = [];
+  const recoveryRpcCalls = [];
+  const recoveryFetch = (mode = "one") => async (rawUrl, init = {}) => {
+    const url = new URL(rawUrl);
+    if (init.method === "GET") {
+      recoveryReads.push({
+        pathname: url.pathname,
+        acceptProfile: init.headers["accept-profile"],
+        epochFilter: url.searchParams.get("epoch_id"),
+        statusFilter: url.searchParams.get("status"),
+      });
+      if (url.pathname.endsWith("/vercel_writer_critical_waf_epochs")) {
+        if (mode === "zero") return response([]);
+        const row = {
+          epoch_id: wafEpochId,
+          status: "ACTIVATION_PENDING",
+          purpose: "REHEARSAL",
+          transition_mode: "REHEARSAL",
+          vercel_project_id: PRODUCTION_VERCEL_PROJECT_ID,
+          vercel_team_id: teamId,
+          candidate_deployment_id: historicalDeploymentId,
+          candidate_deployment_commit: historicalCommitSha,
+          candidate_deployment_target: "PREVIEW",
+          candidate_alias_origin: candidateAliasOrigin,
+          candidate_immutable_origin: historicalImmutableOrigin,
+          candidate_control_hosts_fingerprint:
+            criticalWaf.productionGoogleWriterCriticalWindowProviderRuleContract({
+              candidateAliasOrigin,
+              candidateImmutableOrigin: historicalImmutableOrigin,
+              runOwnedRuleName,
+              runOwnedRuleNonce,
+            }).candidateControlHostsFingerprint,
+          run_owned_rule_name: runOwnedRuleName,
+          run_owned_rule_nonce: runOwnedRuleNonce,
+          run_owned_rule_fingerprint:
+            historicalInsertDocument.runOwnedRuleFingerprint,
+          run_owned_insert_document_fingerprint:
+            historicalInsertDocument.runOwnedInsertDocumentFingerprint,
+          retirement_request_id: null,
+          retirement_candidate_deployment_id: null,
+          retirement_candidate_deployment_commit: null,
+          retirement_reason: null,
+          retired_at: null,
+        };
+        return response(mode === "two" ? [row, { ...row }] : [row]);
+      }
+      if (url.pathname.endsWith("/vercel_writer_critical_waf_dispatches")) {
+        return response([{
+          dispatch_id: recoveryDispatchId,
+          epoch_id: wafEpochId,
+          dispatch_step: "CRITICAL_RULE_INSERT",
+          status: "PROVIDER_REJECTED",
+          provider_dispatch_started_at: new Date(now - 2_000).toISOString(),
+          provider_dispatch_result_id: recoveryResultId,
+          provider_result_observation_id: null,
+        }]);
+      }
+      assert.ok(url.pathname.endsWith(
+        "/vercel_writer_critical_waf_dispatch_results",
+      ));
+      return response([{
+        result_id: recoveryResultId,
+        dispatch_id: recoveryDispatchId,
+        epoch_id: wafEpochId,
+        dispatch_step: "CRITICAL_RULE_INSERT",
+        outcome_status: "PROVIDER_REJECTED",
+        provider_response_observed: true,
+        provider_response_status: 400,
+        provider_readback_fingerprint: null,
+        provider_assigned_rule_id: null,
+      }]);
+    }
+    const functionName = url.pathname.split("/").at(-1);
+    const input = JSON.parse(init.body).input;
+    recoveryRpcCalls.push({ functionName, input });
+    if (functionName === "inspect_production_scoring_admission") {
+      return response({
+        ok: true,
+        activation_state: "DORMANT",
+        authority: "GOOGLE",
+        scoring_authority: "GOOGLE",
+        scoring_ingress_enabled: false,
+        execution_gate: "PAUSED",
+        admission_state: "OPEN",
+        admission_protocol_enforced: false,
+        active_closure_id: null,
+        v2_unresolved: 0,
+        legacy_unclassified: 0,
+        first_supabase_canonical_write_possible: false,
+        first_supabase_canonical_write_observed: false,
+        activation_revision: 1,
+        authority_generation_id: "abababab-abab-4bab-8bab-abababababab",
+        admission_generation_id: "acacacac-acac-4cac-8cac-acacacacacac",
+        admission_revision: 4,
+      });
+    }
+    if (functionName ===
+        "retire_production_vercel_writer_rejected_waf_epoch") {
+      return response({
+        ok: true,
+        epoch_id: wafEpochId,
+        status: "REJECTED_RETIRED",
+        purpose: "REHEARSAL",
+        transition_mode: "REHEARSAL",
+        run_owned_rule_name: runOwnedRuleName,
+        run_owned_rule_nonce: runOwnedRuleNonce,
+        run_owned_rule_fingerprint:
+          historicalInsertDocument.runOwnedRuleFingerprint,
+        run_owned_insert_document_fingerprint:
+          historicalInsertDocument.runOwnedInsertDocumentFingerprint,
+        provider_mutation_performed: false,
+      });
+    }
+    assert.equal(functionName,
+      "inspect_production_vercel_writer_critical_waf_epoch");
+    assert.equal(input.candidate_deployment_id, historicalDeploymentId);
+    assert.equal(input.candidate_deployment_commit, historicalCommitSha);
+    return response({
+      ok: true,
+      found: true,
+      epoch_id: wafEpochId,
+      status: "ACTIVATION_PENDING",
+      purpose: "REHEARSAL",
+      transition_mode: "REHEARSAL",
+      baseline_active_config_version: "10",
+      run_owned_rule_name: runOwnedRuleName,
+      run_owned_rule_nonce: runOwnedRuleNonce,
+      run_owned_rule_fingerprint:
+        historicalInsertDocument.runOwnedRuleFingerprint,
+      run_owned_insert_document_fingerprint:
+        historicalInsertDocument.runOwnedInsertDocumentFingerprint,
+    });
   };
   const env = {
     NODE_TEST_CONTEXT: "child-v8",
@@ -458,6 +612,54 @@ if (!childMode) {
       fetchImpl,
     });
 
+  const recoveryControl = receiptServer
+    .productionGoogleWriterProviderFenceControlDependencies({
+      actor: {
+        actorId: "CB01",
+        authenticatedActorFingerprint: "3".repeat(64),
+      },
+      env,
+      fetchImpl: recoveryFetch("one"),
+    });
+  const recoveredEpoch = await recoveryControl
+    .recoverRejectedCriticalWafEpoch({ environment });
+  assert.equal(recoveredEpoch.epoch_id, wafEpochId);
+  assert.equal(recoveredEpoch.status, "ACTIVATION_PENDING");
+  assert.equal(recoveredEpoch.recoverable_rejected, true);
+  assert.equal(recoveredEpoch.provider_mutation_performed, false);
+  assert.equal(recoveredEpoch.candidate_deployment_id,
+    historicalDeploymentId);
+  assert.equal(recoveryReads.filter((item) => item.acceptProfile ===
+    "production_control").length, 3);
+
+  const missingRecoveryControl = receiptServer
+    .productionGoogleWriterProviderFenceControlDependencies({
+      actor: {
+        actorId: "CB01",
+        authenticatedActorFingerprint: "3".repeat(64),
+      },
+      env,
+      fetchImpl: recoveryFetch("zero"),
+    });
+  await assert.rejects(() => missingRecoveryControl
+    .recoverRejectedCriticalWafEpoch({ environment }), {
+    code: "STEP11_6_VERCEL_WAF_RECOVERY_NOT_FOUND",
+  });
+
+  const conflictingRecoveryControl = receiptServer
+    .productionGoogleWriterProviderFenceControlDependencies({
+      actor: {
+        actorId: "CB01",
+        authenticatedActorFingerprint: "3".repeat(64),
+      },
+      env,
+      fetchImpl: recoveryFetch("two"),
+    });
+  await assert.rejects(() => conflictingRecoveryControl
+    .recoverRejectedCriticalWafEpoch({ environment }), {
+    code: "STEP11_6_VERCEL_WAF_RECOVERY_CONFLICT",
+  });
+
   await control.inspectCriticalWafEpoch({
     epochId: wafEpochId,
     environment,
@@ -482,7 +684,7 @@ if (!childMode) {
   assert.deepEqual(calls.at(-1).input, operatorPayload(
     baseOperatorManifest(), "begin-critical-waf-epoch"));
 
-  await control.retireRejectedCriticalWafEpoch({
+  await recoveryControl.retireRejectedCriticalWafEpoch({
     epochId: wafEpochId,
     retirementRequestId,
     freshBaselineObservationRequestId:
@@ -491,15 +693,16 @@ if (!childMode) {
     evidenceRequest: retirementBaselineRequest,
     environment,
   });
-  assert.equal(calls.at(-1).functionName,
+  assert.equal(recoveryRpcCalls.at(-1).functionName,
     "retire_production_vercel_writer_rejected_waf_epoch");
-  assert.equal(calls.at(-1).input.operation,
+  assert.equal(recoveryRpcCalls.at(-1).input.operation,
     "RETIRE_PRODUCTION_VERCEL_WRITER_REJECTED_WAF_EPOCH");
-  assert.equal(calls.at(-1).input.epoch_id, wafEpochId);
-  assert.equal(calls.at(-1).input.retirement_request_id, retirementRequestId);
-  assert.equal(calls.at(-1).input.verified_waf_evidence.stage,
+  assert.equal(recoveryRpcCalls.at(-1).input.epoch_id, wafEpochId);
+  assert.equal(recoveryRpcCalls.at(-1).input.retirement_request_id,
+    retirementRequestId);
+  assert.equal(recoveryRpcCalls.at(-1).input.verified_waf_evidence.stage,
     "BASELINE_CAPTURE");
-  assert.equal(calls.at(-1).input.candidate_deployment_id,
+  assert.equal(recoveryRpcCalls.at(-1).input.candidate_deployment_id,
     candidateDeploymentId);
 
   const beforeMismatch = calls.length;
@@ -652,14 +855,17 @@ if (!childMode) {
 
   const criticalRpcs = calls.filter(({ functionName }) =>
     functionName !== "inspect_production_scoring_admission");
-  assert.equal(criticalRpcs.length, 10);
+  assert.equal(criticalRpcs.length, 9);
   console.log(JSON.stringify({
+    activeRejectedEpochRecoveredWithoutBrowserState: true,
     candidateMismatchRejectedBeforeRpc: true,
     candidateTarget: calls.find(({ functionName }) => functionName ===
       "begin_production_vercel_writer_critical_waf_epoch")
       .input.candidate_deployment_target,
+    conflictingRecoveryRejected: true,
     exactRpcCount: criticalRpcs.length,
-    rejectedRetirementExactRpc: criticalRpcs.some(({ functionName }) =>
+    missingRecoveryRejected: true,
+    rejectedRetirementExactRpc: recoveryRpcCalls.some(({ functionName }) =>
       functionName === "retire_production_vercel_writer_rejected_waf_epoch"),
     shortenedFinalizeRpc: calls.some(({ functionName }) =>
       functionName === "finalize_production_google_writer_fence_waf_restore"),
