@@ -11099,6 +11099,24 @@ function option2Begin(cluster, database, label) {
   );
 }
 
+function option2PreprepareAbortInput(current, label, overrides = {}) {
+  return option2Optimistic(current, `${label}-abort-preprepare`, overrides);
+}
+
+function option2AbortPreprepare(cluster, database, label, overrides = {}) {
+  const current = option2State(cluster, database);
+  const input = option2PreprepareAbortInput(current, label, overrides);
+  return {
+    input,
+    result: rpc(
+      cluster,
+      database,
+      "abort_production_scoring_maintenance_preprepare",
+      input,
+    ),
+  };
+}
+
 function option2Drain(cluster, database, closureId, label) {
   const current = option2State(cluster, database);
   return rpc(
@@ -11328,7 +11346,7 @@ test(
         "202608260039_production_all_project_provider_inventory_v3.sql",
       );
       const option2Index = option2MigrationNames.indexOf(
-        "202608270044_production_maintenance_window_cutover.sql",
+        "202608270045_production_maintenance_preprepare_abort.sql",
       );
       assert.notEqual(providerV3Index, -1);
       assert.notEqual(option2Index, -1);
@@ -11425,6 +11443,378 @@ test(
           ),
           /PRODUCTION_MAINTENANCE_NOT_ENTERABLE/,
         );
+      });
+
+      await t.test("CLOSING maintenance aborts pre-prepare to NORMAL and OPEN Google admission", () => {
+        const database = clone("preprepare_abort_closing");
+        option2StageAndArm(cluster, database, "abort-closing");
+        const begun = option2Begin(cluster, database, "abort-closing");
+        const beforeAbort = option2State(cluster, database);
+        assert.equal(beforeAbort.admission_state, "CLOSING");
+
+        const { input, result: aborted } = option2AbortPreprepare(
+          cluster,
+          database,
+          "abort-closing",
+        );
+        assert.equal(
+          aborted.code,
+          "PRODUCTION_SCORING_MAINTENANCE_PREPREPARE_ABORTED",
+        );
+        assert.equal(aborted.authority, "GOOGLE");
+        assert.equal(aborted.maintenance_state, "NORMAL");
+        assert.equal(aborted.execution_gate, "OPEN");
+        assert.equal(aborted.admission_state, "OPEN");
+        assert.equal(aborted.scoring_ingress_enabled, false);
+        assert.equal(aborted.workers_enabled, false);
+        assert.equal(aborted.first_supabase_canonical_write_possible, false);
+        assert.equal(aborted.first_supabase_canonical_write_observed, false);
+        assert.equal(aborted.idempotent, false);
+        assert.equal(
+          Number(aborted.activation_revision),
+          Number(beforeAbort.activation_revision) + 1,
+        );
+        assert.equal(
+          Number(aborted.admission_revision),
+          Number(beforeAbort.admission_revision) + 1,
+        );
+        assert.equal(
+          aborted.authority_generation_id,
+          beforeAbort.authority_generation_id,
+        );
+        assert.notEqual(
+          aborted.admission_generation_id,
+          beforeAbort.admission_generation_id,
+        );
+
+        const restored = option2State(cluster, database);
+        assert.deepEqual(
+          {
+            activation: restored.activation_state,
+            authority: restored.authority,
+            resourceAuthority: restored.resource_authority,
+            maintenance: restored.maintenance_state,
+            executionGate: restored.execution_gate,
+            admission: restored.admission_state,
+            ingress: restored.scoring_ingress_enabled,
+            resourceIngress: restored.resource_ingress_enabled,
+            workers: restored.resource_workers_enabled,
+            activeClosure: restored.active_closure_id,
+            activeEpoch: restored.active_epoch_id,
+            possible: restored.first_write_possible_at,
+            observed: restored.first_write_observed_at,
+          },
+          {
+            activation: "GOOGLE_LEASE_ARMED",
+            authority: "GOOGLE",
+            resourceAuthority: "GOOGLE",
+            maintenance: "NORMAL",
+            executionGate: "OPEN",
+            admission: "OPEN",
+            ingress: false,
+            resourceIngress: false,
+            workers: false,
+            activeClosure: null,
+            activeEpoch: null,
+            possible: null,
+            observed: null,
+          },
+        );
+        assert.equal(psql(cluster, database, `
+          select status
+          from production_control.scoring_admission_closures
+          where closure_id = ${sqlLiteral(begun.closure_id)}::uuid;
+        `).trim(), "REOPENED");
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.operation_audit_events
+          where event_type =
+              'PRODUCTION_SCORING_MAINTENANCE_PREPREPARE_ABORTED'
+            and request_fingerprint =
+              ${sqlLiteral(input.request_fingerprint)};
+        `).trim(), "1");
+      });
+
+      await t.test("CLOSED maintenance aborts pre-prepare to NORMAL and OPEN Google admission", () => {
+        const database = clone("preprepare_abort_closed");
+        option2StageAndArm(cluster, database, "abort-closed");
+        const begun = option2Begin(cluster, database, "abort-closed");
+        const drained = option2Drain(
+          cluster,
+          database,
+          begun.closure_id,
+          "abort-closed",
+        );
+        assert.equal(drained.ready_to_finalize, true);
+        option2Finalize(
+          cluster,
+          database,
+          begun.closure_id,
+          drained,
+          "abort-closed",
+        );
+        assert.equal(option2State(cluster, database).admission_state, "CLOSED");
+
+        const { result: aborted } = option2AbortPreprepare(
+          cluster,
+          database,
+          "abort-closed",
+        );
+        assert.equal(aborted.authority, "GOOGLE");
+        assert.equal(aborted.maintenance_state, "NORMAL");
+        assert.equal(aborted.execution_gate, "OPEN");
+        assert.equal(aborted.admission_state, "OPEN");
+        assert.equal(psql(cluster, database, `
+          select status
+          from production_control.scoring_admission_closures
+          where closure_id = ${sqlLiteral(begun.closure_id)}::uuid;
+        `).trim(), "REOPENED");
+      });
+
+      await t.test("lost-response pre-prepare abort retry is idempotent", () => {
+        const database = clone("preprepare_abort_retry");
+        option2StageAndArm(cluster, database, "abort-retry");
+        option2Begin(cluster, database, "abort-retry");
+        const beforeAbort = option2State(cluster, database);
+        const input = option2PreprepareAbortInput(
+          beforeAbort,
+          "abort-retry",
+        );
+        const first = rpc(
+          cluster,
+          database,
+          "abort_production_scoring_maintenance_preprepare",
+          input,
+        );
+        const replay = rpc(
+          cluster,
+          database,
+          "abort_production_scoring_maintenance_preprepare",
+          input,
+        );
+        assert.equal(first.idempotent, false);
+        assert.equal(replay.idempotent, true);
+        for (const key of [
+          "closure_id",
+          "activation_revision",
+          "authority_generation_id",
+          "admission_generation_id",
+          "admission_revision",
+        ]) assert.equal(replay[key], first[key], key);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.operation_audit_events
+          where event_type =
+              'PRODUCTION_SCORING_MAINTENANCE_PREPREPARE_ABORTED'
+            and request_fingerprint =
+              ${sqlLiteral(input.request_fingerprint)};
+        `).trim(), "1");
+      });
+
+      await t.test("active and ambiguous leases block pre-prepare abort", () => {
+        const database = clone("preprepare_abort_lease_blocker");
+        const armed = option2StageAndArm(
+          cluster,
+          database,
+          "abort-lease",
+        );
+        const lease = rpc(
+          cluster,
+          database,
+          "begin_production_scoring_ingress_v2",
+          beginInput(armed, "abort-preprepare-active-lease"),
+        );
+        const begun = option2Begin(cluster, database, "abort-lease");
+        assertCommandFailure(
+          () => option2AbortPreprepare(
+            cluster,
+            database,
+            "abort-active-lease",
+          ),
+          /PRODUCTION_MAINTENANCE_PREPREPARE_ABORT_NOT_SAFE/,
+        );
+
+        psql(cluster, database, `
+          update scoring_authority.scoring_ingress_leases
+          set expires_at = pg_catalog.now() - interval '1 second'
+          where lease_id = ${sqlLiteral(lease.lease_id)}::uuid;
+        `);
+        const drained = option2Drain(
+          cluster,
+          database,
+          begun.closure_id,
+          "abort-lease",
+        );
+        assert.equal(drained.ready_to_finalize, false);
+        assert.equal(drained.expired_became_ambiguous, 1);
+        assertCommandFailure(
+          () => option2AbortPreprepare(
+            cluster,
+            database,
+            "abort-ambiguous-lease",
+          ),
+          /PRODUCTION_MAINTENANCE_PREPREPARE_ABORT_NOT_SAFE/,
+        );
+      });
+
+      await t.test("prepared Supabase authority epoch blocks pre-prepare abort", () => {
+        const database = clone("preprepare_abort_prepared");
+        option2ReachPrepared(cluster, database, "abort-prepared");
+        assertCommandFailure(
+          () => option2AbortPreprepare(
+            cluster,
+            database,
+            "abort-prepared",
+          ),
+          /PRODUCTION_MAINTENANCE_PREPREPARE_ABORT_NOT_SAFE/,
+        );
+      });
+
+      await t.test("committed Supabase authority blocks pre-prepare abort", () => {
+        const database = clone("preprepare_abort_committed");
+        option2ReachCommittedPaused(cluster, database, "abort-committed");
+        assertCommandFailure(
+          () => option2AbortPreprepare(
+            cluster,
+            database,
+            "abort-committed",
+          ),
+          /PRODUCTION_MAINTENANCE_PREPREPARE_ABORT_NOT_SAFE/,
+        );
+      });
+
+      await t.test("first-write possible and observed states block pre-prepare abort", () => {
+        const database = clone("preprepare_abort_first_write");
+        const boundary = option2ReachCommittedPaused(
+          cluster,
+          database,
+          "abort-first-write",
+        );
+        option2ResumeSupabase(
+          cluster,
+          database,
+          boundary.prepared.epoch_id,
+          "abort-first-write",
+        );
+        assert.notEqual(
+          option2State(cluster, database).first_write_possible_at,
+          null,
+        );
+        assertCommandFailure(
+          () => option2AbortPreprepare(
+            cluster,
+            database,
+            "abort-write-possible",
+          ),
+          /PRODUCTION_MAINTENANCE_PREPREPARE_ABORT_NOT_SAFE/,
+        );
+
+        psql(cluster, database, `
+          update production_control.cutover_activation_state
+          set first_supabase_write_observed_at = pg_catalog.now(),
+              first_supabase_mutation_key = 'preprepare-abort-test-write',
+              first_supabase_match_id = '2026-R1-1',
+              first_supabase_match_revision = 1
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        assert.notEqual(
+          option2State(cluster, database).first_write_observed_at,
+          null,
+        );
+        assertCommandFailure(
+          () => option2AbortPreprepare(
+            cluster,
+            database,
+            "abort-write-observed",
+          ),
+          /PRODUCTION_MAINTENANCE_PREPREPARE_ABORT_NOT_SAFE/,
+        );
+      });
+
+      await t.test("stale pre-prepare abort revisions and generations fail closed", () => {
+        const database = clone("preprepare_abort_stale");
+        option2StageAndArm(cluster, database, "abort-stale");
+        option2Begin(cluster, database, "abort-stale");
+        const current = option2State(cluster, database);
+        for (const overrides of [
+          {
+            expected_activation_revision:
+              Number(current.activation_revision) + 1,
+          },
+          { expected_authority_generation: randomUUID() },
+          { expected_admission_generation: randomUUID() },
+          {
+            expected_admission_revision:
+              Number(current.admission_revision) + 1,
+          },
+        ]) {
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "abort_production_scoring_maintenance_preprepare",
+              option2PreprepareAbortInput(
+                current,
+                `abort-stale-${randomUUID()}`,
+                overrides,
+              ),
+            ),
+            /PRODUCTION_MAINTENANCE_PREPREPARE_ABORT_NOT_SAFE/,
+          );
+        }
+        const unchanged = option2State(cluster, database);
+        assert.equal(unchanged.maintenance_state, "SCORING_MAINTENANCE");
+        assert.equal(unchanged.admission_state, "CLOSING");
+      });
+
+      await t.test("pre-prepare abort is Production-resource isolated and service-role only", () => {
+        const database = clone("preprepare_abort_isolation");
+        option2StageAndArm(cluster, database, "abort-isolation");
+        option2Begin(cluster, database, "abort-isolation");
+        const current = option2State(cluster, database);
+        const cases = [
+          { environment: "PREVIEW" },
+          { project_ref: "idgigvjjqkfbqjeredpb" },
+          {
+            source_workbook_id:
+              "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts",
+          },
+          { tournament_id: "2025" },
+        ];
+        for (const overrides of cases) {
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "abort_production_scoring_maintenance_preprepare",
+              option2PreprepareAbortInput(
+                current,
+                `abort-isolation-${randomUUID()}`,
+                overrides,
+              ),
+            ),
+            /PRODUCTION_RESOURCE_ASSERTION_FAILED/,
+          );
+        }
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.concat_ws('|',
+            pg_catalog.has_function_privilege(
+              'service_role',
+              'public.abort_production_scoring_maintenance_preprepare(jsonb)',
+              'EXECUTE'
+            ),
+            pg_catalog.has_function_privilege(
+              'authenticated',
+              'public.abort_production_scoring_maintenance_preprepare(jsonb)',
+              'EXECUTE'
+            ),
+            pg_catalog.has_function_privilege(
+              'anon',
+              'public.abort_production_scoring_maintenance_preprepare(jsonb)',
+              'EXECUTE'
+            )
+          );
+        `).trim(), "t|f|f");
       });
 
       await t.test("maintenance wins admission, drains, binds stable parity, prepares, commits paused, and resumes explicitly", () => {
