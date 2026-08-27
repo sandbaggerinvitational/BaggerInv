@@ -10986,3 +10986,752 @@ test(
     }
   },
 );
+
+function option2State(cluster, database) {
+  return parseJsonOutput(psql(cluster, database, `
+    select pg_catalog.jsonb_build_object(
+      'activation_state', activation.state,
+      'activation_revision', activation.activation_revision,
+      'authority_generation_id', activation.authority_generation_id,
+      'authority', activation.current_authority,
+      'boundary_mode', activation.boundary_mode,
+      'maintenance_state', activation.maintenance_state,
+      'scoring_ingress_enabled', activation.scoring_ingress_enabled,
+      'expected_source_fingerprint', activation.expected_source_fingerprint,
+      'staged_environment_delta_fingerprint_v2',
+        activation.staged_environment_delta_fingerprint_v2,
+      'active_transition_epoch_id', activation.active_transition_epoch_id,
+      'first_write_possible_at',
+        activation.first_supabase_write_possible_at,
+      'first_write_observed_at',
+        activation.first_supabase_write_observed_at,
+      'resource_authority', resource.scoring_authority,
+      'resource_ingress_enabled', resource.scoring_ingress_enabled,
+      'resource_workers_enabled', resource.workers_enabled,
+      'admission_state', gate.admission_state,
+      'admission_revision', gate.admission_revision,
+      'admission_generation_id', gate.admission_generation_id,
+      'admission_deployment_id', gate.admission_deployment_id,
+      'admission_protocol_enforced', gate.admission_protocol_enforced,
+      'execution_gate', gate.state,
+      'active_closure_id', gate.active_closure_id,
+      'active_epoch_id', gate.active_epoch_id
+    )
+    from production_control.cutover_activation_state activation
+    cross join production_control.resource_scope resource
+    cross join scoring_authority.ingress_gates gate
+    where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+      and resource.scope_key = 'BAGGER_INV_PRODUCTION'
+      and gate.tournament_id = '2026';
+  `));
+}
+
+function option2Optimistic(current, label, overrides = {}) {
+  return {
+    ...scope,
+    boundary_mode: "MAINTENANCE_WINDOW_V1",
+    deployment_id: deploymentId,
+    deployment_commit: deploymentCommit,
+    expected_activation_revision: Number(current.activation_revision),
+    expected_authority_generation: current.authority_generation_id,
+    expected_admission_generation: current.admission_generation_id,
+    expected_admission_revision: Number(current.admission_revision),
+    actor_id: actor,
+    request_fingerprint: fingerprint(`option2-${label}`),
+    ...overrides,
+  };
+}
+
+function option2StageAndArm(cluster, database, label) {
+  const beforeStage = option2State(cluster, database);
+  const staged = rpc(cluster, database, "stage_production_cutover_release", {
+    ...scope,
+    actor_id: actor,
+    contract_version: "production-cutover-activation-v1",
+    boundary_mode: "MAINTENANCE_WINDOW_V1",
+    vercel_project: "bagger-inv",
+    canonical_domain: "https://baggerinv.com",
+    tournament_year: 2026,
+    vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    deployment_commit: deploymentCommit,
+    source_fingerprint: sourceFingerprint,
+    certification_fingerprint: fingerprint(`${label}-certification`),
+    environment_delta_fingerprint_v2: fingerprint(`${label}-environment`),
+    expected_activation_revision: Number(beforeStage.activation_revision),
+    request_fingerprint: fingerprint(`${label}-stage`),
+  });
+  assert.equal(staged.code, "PRODUCTION_RELEASE_STAGED");
+  assert.equal(staged.boundary_mode, "MAINTENANCE_WINDOW_V1");
+
+  // Earlier read/identity phases are independently certified. This focused
+  // test advances their state without exercising those unrelated contracts.
+  psql(cluster, database, `
+    update production_control.cutover_activation_state
+    set read_cutover_phase = 'CURRENT_READS'
+    where scope_key = 'BAGGER_INV_PRODUCTION';
+    update production_control.resource_scope
+    set participant_identity_authority = 'SUPABASE',
+        current_tournament_read_authority = 'SUPABASE',
+        public_supabase_reads_enabled = true,
+        auth_user_creation_enabled = true
+    where scope_key = 'BAGGER_INV_PRODUCTION';
+  `);
+  const beforeArm = option2State(cluster, database);
+  const arm = rpc(
+    cluster,
+    database,
+    "arm_production_google_ingress_lease_gate",
+    option2Optimistic(beforeArm, `${label}-arm`),
+  );
+  assert.equal(arm.code, "PRODUCTION_GOOGLE_LEASE_GATE_V2_ARMED");
+  return option2State(cluster, database);
+}
+
+function option2Begin(cluster, database, label) {
+  const current = option2State(cluster, database);
+  return rpc(
+    cluster,
+    database,
+    "begin_production_scoring_maintenance",
+    option2Optimistic(current, `${label}-begin`, {
+      start_source_fingerprint: current.expected_source_fingerprint,
+    }),
+  );
+}
+
+function option2Drain(cluster, database, closureId, label) {
+  const current = option2State(cluster, database);
+  return rpc(
+    cluster,
+    database,
+    "drain_production_scoring_maintenance",
+    option2Optimistic(current, `${label}-drain`, {
+      closure_id: closureId,
+    }),
+  );
+}
+
+function option2Finalize(cluster, database, closureId, drained, label) {
+  const current = option2State(cluster, database);
+  const boundary = finalBoundary(cluster, database);
+  const stableFingerprint = fingerprint(`${label}-stable-google-and-shadow`);
+  // Avoid a wall-clock sleep while still proving the required ordered stable
+  // readbacks. This modifies only the disposable PostgreSQL fixture.
+  psql(cluster, database, `
+    update production_control.scoring_admission_closures
+    set closing_at = closing_at - interval '2 seconds'
+    where closure_id = ${sqlLiteral(closureId)}::uuid;
+  `);
+  const firstCapturedAt = new Date(Date.now() - 1_000).toISOString();
+  const secondCapturedAt = new Date().toISOString();
+  const finalized = rpc(
+    cluster,
+    database,
+    "finalize_production_scoring_maintenance_snapshot",
+    option2Optimistic(current, `${label}-finalize`, {
+      closure_id: closureId,
+      first_google_source_fingerprint: stableFingerprint,
+      first_google_captured_at: firstCapturedAt,
+      second_google_source_fingerprint: stableFingerprint,
+      second_google_captured_at: secondCapturedAt,
+      final_source_fingerprint: stableFingerprint,
+      supabase_shadow_fingerprint: stableFingerprint,
+      unexplained_difference_count: 0,
+      reconciliation_fingerprint: fingerprint(`${label}-reconciliation`),
+      lease_set_fingerprint: drained.lease_set_fingerprint,
+      supabase_match_revisions: boundary.supabase_match_revisions,
+      google_checkpoints: boundary.google_checkpoints,
+    }),
+  );
+  return { finalized, boundary, stableFingerprint };
+}
+
+function option2ReachPrepared(cluster, database, label) {
+  option2StageAndArm(cluster, database, label);
+  const begun = option2Begin(cluster, database, label);
+  const drained = option2Drain(cluster, database, begun.closure_id, label);
+  assert.equal(drained.ready_to_finalize, true);
+  const snapshot = option2Finalize(
+    cluster,
+    database,
+    begun.closure_id,
+    drained,
+    label,
+  );
+  const beforePrepare = option2State(cluster, database);
+  const prepared = rpc(
+    cluster,
+    database,
+    "prepare_production_authority_epoch",
+    option2Optimistic(beforePrepare, `${label}-prepare`, {
+      closure_id: begun.closure_id,
+      epoch_type: "CUTOVER",
+      source_fingerprint: snapshot.stableFingerprint,
+      supabase_shadow_fingerprint: snapshot.stableFingerprint,
+      reconciliation_fingerprint: snapshot.finalized.reconciliation_fingerprint,
+      closure_boundary_fingerprint: snapshot.finalized.lease_set_fingerprint,
+      supabase_match_revisions: snapshot.boundary.supabase_match_revisions,
+      google_checkpoints: snapshot.boundary.google_checkpoints,
+      reason: "Option 2 focused PostgreSQL test",
+    }),
+  );
+  return { begun, drained, snapshot, prepared };
+}
+
+function option2ReachCommittedPaused(cluster, database, label) {
+  const boundary = option2ReachPrepared(cluster, database, label);
+  const beforeCommit = option2State(cluster, database);
+  const committed = rpc(
+    cluster,
+    database,
+    "commit_production_authority_epoch",
+    option2Optimistic(beforeCommit, `${label}-commit`, {
+      closure_id: boundary.begun.closure_id,
+      epoch_id: boundary.prepared.epoch_id,
+      reconciliation_fingerprint:
+        boundary.snapshot.finalized.reconciliation_fingerprint,
+      supabase_shadow_fingerprint: boundary.snapshot.stableFingerprint,
+      commit_google_source_fingerprint: boundary.snapshot.stableFingerprint,
+      commit_google_captured_at: new Date().toISOString(),
+    }),
+  );
+  return { ...boundary, committed };
+}
+
+function option2ResumeSupabase(cluster, database, epochId, label) {
+  const current = option2State(cluster, database);
+  return rpc(
+    cluster,
+    database,
+    "resume_production_supabase_scoring",
+    option2Optimistic(current, `${label}-resume-supabase`, {
+      epoch_id: epochId,
+      runtime_verification_fingerprint: fingerprint(`${label}-runtime-smoke`),
+      configuration_fingerprint:
+        current.staged_environment_delta_fingerprint_v2,
+    }),
+  );
+}
+
+function option2FinalizeRollback(
+  cluster,
+  database,
+  closureId,
+  sourceFingerprintValue,
+  label,
+  reconciliationComplete,
+) {
+  const current = option2State(cluster, database);
+  const boundary = finalBoundary(cluster, database);
+  const capturedAt = new Date().toISOString();
+  return rpc(
+    cluster,
+    database,
+    "finalize_production_maintenance_rollback_snapshot",
+    option2Optimistic(current, `${label}-finalize-rollback`, {
+      closure_id: closureId,
+      supabase_source_fingerprint: sourceFingerprintValue,
+      supabase_source_captured_at: capturedAt,
+      google_reconciled_fingerprint: sourceFingerprintValue,
+      google_reconciled_captured_at: capturedAt,
+      reconciliation_complete: reconciliationComplete,
+      reconciliation_fingerprint: fingerprint(`${label}-rollback-reconciled`),
+      lost_write_count: 0,
+      duplicate_write_count: 0,
+      unresolved_write_count: 0,
+      supabase_match_revisions: boundary.supabase_match_revisions,
+      google_checkpoints: boundary.google_checkpoints,
+    }),
+  );
+}
+
+function option2CommitRollback(
+  cluster,
+  database,
+  closureId,
+  reconciliationFingerprint,
+  label,
+  reconciliationComplete,
+) {
+  const current = option2State(cluster, database);
+  return rpc(
+    cluster,
+    database,
+    "rollback_production_maintenance_authority_epoch",
+    option2Optimistic(current, `${label}-commit-rollback`, {
+      closure_id: closureId,
+      reconciliation_complete: reconciliationComplete,
+      reconciliation_fingerprint: reconciliationFingerprint,
+      lost_write_count: 0,
+      duplicate_write_count: 0,
+      unresolved_write_count: 0,
+      reason: "Option 2 focused rollback",
+    }),
+  );
+}
+
+function option2ResumeGoogle(
+  cluster,
+  database,
+  sourceFingerprintValue,
+  label,
+  reconciliationComplete,
+) {
+  const current = option2State(cluster, database);
+  return rpc(
+    cluster,
+    database,
+    "resume_production_google_scoring_after_maintenance_rollback",
+    option2Optimistic(current, `${label}-resume-google`, {
+      google_source_fingerprint: sourceFingerprintValue,
+      google_source_captured_at: new Date().toISOString(),
+      reconciliation_complete: reconciliationComplete,
+      lost_write_count: 0,
+      duplicate_write_count: 0,
+      unresolved_write_count: 0,
+    }),
+  );
+}
+
+test(
+  "Option 2 maintenance cutover preserves singular authority in PostgreSQL 17",
+  { timeout: 120_000 },
+  async (t) => {
+    if (!(await allBinariesAvailable())) {
+      t.skip(`PostgreSQL 17 toolchain is unavailable at ${pgBin}`);
+      return;
+    }
+
+    const cluster = await createCluster();
+    const templateDatabase = "option2_maintenance_template";
+    let databaseCounter = 0;
+    const clone = (label) => {
+      databaseCounter += 1;
+      const database = `option2_${databaseCounter}_${label}`;
+      createDatabase(cluster, database, templateDatabase);
+      return database;
+    };
+
+    try {
+      createDatabase(cluster, templateDatabase);
+      installSupabaseCompatibility(cluster, templateDatabase);
+      await installProductionMigrations(
+        cluster,
+        templateDatabase,
+        "202608260038_production_provider_preview_target_inventory_v4.sql",
+      );
+      installScoringFixture(cluster, templateDatabase);
+      const option2MigrationNames = (await readdir(migrationsDirectory))
+        .filter((name) => /^\d+_.*\.sql$/.test(name))
+        .sort();
+      const providerV3Index = option2MigrationNames.indexOf(
+        "202608260039_production_all_project_provider_inventory_v3.sql",
+      );
+      const option2Index = option2MigrationNames.indexOf(
+        "202608270044_production_maintenance_window_cutover.sql",
+      );
+      assert.notEqual(providerV3Index, -1);
+      assert.notEqual(option2Index, -1);
+      for (
+        const migrationName of option2MigrationNames.slice(
+          providerV3Index,
+          option2Index + 1,
+        )
+      ) {
+        psqlFile(
+          cluster,
+          templateDatabase,
+          path.join(migrationsDirectory, migrationName),
+        );
+      }
+
+      await t.test("installation is inert and provider mode still fails through its certification gate", () => {
+        const inert = option2State(cluster, templateDatabase);
+        assert.deepEqual(
+          {
+            phase: inert.activation_state,
+            authority: inert.authority,
+            resourceAuthority: inert.resource_authority,
+            boundaryMode: inert.boundary_mode,
+            maintenance: inert.maintenance_state,
+            admission: inert.admission_state,
+            executionGate: inert.execution_gate,
+            ingress: inert.scoring_ingress_enabled,
+            resourceIngress: inert.resource_ingress_enabled,
+            workers: inert.resource_workers_enabled,
+            possible: inert.first_write_possible_at,
+            observed: inert.first_write_observed_at,
+          },
+          {
+            phase: "DORMANT",
+            authority: "GOOGLE",
+            resourceAuthority: "GOOGLE",
+            boundaryMode: "PROVIDER_FENCE_V2",
+            maintenance: "NORMAL",
+            admission: "OPEN",
+            executionGate: "PAUSED",
+            ingress: false,
+            resourceIngress: false,
+            workers: false,
+            possible: null,
+            observed: null,
+          },
+        );
+
+        assertCommandFailure(
+          () => rpc(cluster, templateDatabase, "stage_production_cutover_release", {
+            ...scope,
+            actor_id: actor,
+            contract_version: "production-cutover-activation-v1",
+            vercel_project: "bagger-inv",
+            canonical_domain: "https://baggerinv.com",
+            tournament_year: 2026,
+            vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+            deployment_commit: deploymentCommit,
+            source_fingerprint: sourceFingerprint,
+            certification_fingerprint: fingerprint("provider-certification"),
+            environment_delta_fingerprint_v2: fingerprint("provider-env"),
+            expected_activation_revision: Number(inert.activation_revision),
+            request_fingerprint: fingerprint("provider-stage"),
+          }),
+          /PRODUCTION_GOOGLE_WRITER_DRIVE_ACL_REHEARSAL_CERTIFICATION_REQUIRED/,
+        );
+      });
+
+      await t.test("wrong Production scope and stale revisions fail before maintenance", () => {
+        const database = clone("scope_and_revision");
+        const armed = option2StageAndArm(cluster, database, "scope-revision");
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "begin_production_scoring_maintenance",
+            option2Optimistic(armed, "preview-scope", {
+              project_ref: "idgigvjjqkfbqjeredpb",
+              start_source_fingerprint: armed.expected_source_fingerprint,
+            }),
+          ),
+          /PRODUCTION_RESOURCE_ASSERTION_FAILED/,
+        );
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "begin_production_scoring_maintenance",
+            option2Optimistic(armed, "stale-revision", {
+              expected_activation_revision: Number(armed.activation_revision) + 1,
+              start_source_fingerprint: armed.expected_source_fingerprint,
+            }),
+          ),
+          /PRODUCTION_MAINTENANCE_NOT_ENTERABLE/,
+        );
+      });
+
+      await t.test("maintenance wins admission, drains, binds stable parity, prepares, commits paused, and resumes explicitly", () => {
+        const database = clone("happy_path");
+        option2StageAndArm(cluster, database, "happy");
+        const begun = option2Begin(cluster, database, "happy");
+        assert.equal(begun.admission_state, "CLOSING");
+        assert.equal(begun.execution_gate, "PAUSED");
+        assert.equal(begun.first_supabase_canonical_write_possible, false);
+
+        const afterBegin = option2State(cluster, database);
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "begin_production_scoring_ingress_v2",
+            beginInput(afterBegin, "option2-close-wins"),
+          ),
+          /PRODUCTION_SCORING_ADMISSION_(?:NOT_OPEN|V2_BOUNDARY_MISMATCH)/,
+        );
+
+        const drained = option2Drain(
+          cluster,
+          database,
+          begun.closure_id,
+          "happy",
+        );
+        assert.equal(drained.ready_to_finalize, true);
+        assert.equal(drained.active_or_unresolved_leases, 0);
+        const snapshot = option2Finalize(
+          cluster,
+          database,
+          begun.closure_id,
+          drained,
+          "happy",
+        );
+        assert.equal(snapshot.finalized.maintenance_cutover_snapshot_safe, true);
+        assert.equal(option2State(cluster, database).admission_state, "CLOSED");
+
+        const beforePrepare = option2State(cluster, database);
+        const prepared = rpc(
+          cluster,
+          database,
+          "prepare_production_authority_epoch",
+          option2Optimistic(beforePrepare, "happy-prepare", {
+            closure_id: begun.closure_id,
+            epoch_type: "CUTOVER",
+            source_fingerprint: snapshot.stableFingerprint,
+            supabase_shadow_fingerprint: snapshot.stableFingerprint,
+            reconciliation_fingerprint:
+              snapshot.finalized.reconciliation_fingerprint,
+            closure_boundary_fingerprint:
+              snapshot.finalized.lease_set_fingerprint,
+            supabase_match_revisions: snapshot.boundary.supabase_match_revisions,
+            google_checkpoints: snapshot.boundary.google_checkpoints,
+            reason: "Option 2 focused PostgreSQL test",
+          }),
+        );
+        assert.equal(prepared.maintenance_cutover_prepare_safe, true);
+        assert.equal(prepared.first_supabase_canonical_write_possible, false);
+
+        const beforeCommit = option2State(cluster, database);
+        const committed = rpc(
+          cluster,
+          database,
+          "commit_production_authority_epoch",
+          option2Optimistic(beforeCommit, "happy-commit", {
+            closure_id: begun.closure_id,
+            epoch_id: prepared.epoch_id,
+            reconciliation_fingerprint:
+              snapshot.finalized.reconciliation_fingerprint,
+            supabase_shadow_fingerprint: snapshot.stableFingerprint,
+            commit_google_source_fingerprint: snapshot.stableFingerprint,
+            commit_google_captured_at: new Date().toISOString(),
+          }),
+        );
+        assert.equal(committed.authority, "SUPABASE");
+        assert.equal(committed.ingress, "PAUSED");
+        assert.equal(committed.first_supabase_canonical_write_possible, false);
+        assert.equal(committed.first_supabase_canonical_write_observed, false);
+        const paused = option2State(cluster, database);
+        assert.equal(paused.authority, "SUPABASE");
+        assert.equal(paused.execution_gate, "PAUSED");
+        assert.equal(paused.scoring_ingress_enabled, false);
+        assert.equal(paused.first_write_possible_at, null);
+
+        const resumed = rpc(
+          cluster,
+          database,
+          "resume_production_supabase_scoring",
+          option2Optimistic(paused, "happy-resume", {
+            epoch_id: prepared.epoch_id,
+            runtime_verification_fingerprint: fingerprint("runtime-smoke"),
+            configuration_fingerprint:
+              paused.staged_environment_delta_fingerprint_v2,
+          }),
+        );
+        assert.equal(resumed.authority, "SUPABASE");
+        assert.equal(resumed.ingress, "OPEN");
+        assert.equal(resumed.first_supabase_canonical_write_possible, true);
+        assert.equal(resumed.first_supabase_canonical_write_observed, false);
+        const open = option2State(cluster, database);
+        assert.equal(open.maintenance_state, "NORMAL");
+        assert.equal(open.scoring_ingress_enabled, true);
+        assert.notEqual(open.first_write_possible_at, null);
+      });
+
+      await t.test("an admitted writer remains visible and expiry becomes an ambiguity blocker", () => {
+        const database = clone("ambiguity");
+        const armed = option2StageAndArm(cluster, database, "ambiguity");
+        const lease = rpc(
+          cluster,
+          database,
+          "begin_production_scoring_ingress_v2",
+          beginInput(armed, "option2-admission-wins"),
+        );
+        assert.equal(lease.code, "PRODUCTION_SCORING_LEASE_V2_ADMITTED");
+        const begun = option2Begin(cluster, database, "ambiguity");
+        assert.ok(begun.active_or_unresolved_leases > 0);
+        psql(cluster, database, `
+          update scoring_authority.scoring_ingress_leases
+          set expires_at = pg_catalog.now() - interval '1 second'
+          where lease_id = ${sqlLiteral(lease.lease_id)}::uuid;
+        `);
+        const drained = option2Drain(
+          cluster,
+          database,
+          begun.closure_id,
+          "ambiguity",
+        );
+        assert.equal(drained.ready_to_finalize, false);
+        assert.equal(drained.expired_became_ambiguous, 1);
+        assert.ok(drained.active_or_unresolved_leases > 0);
+        assertCommandFailure(
+          () => option2Finalize(
+            cluster,
+            database,
+            begun.closure_id,
+            drained,
+            "ambiguity",
+          ),
+          /PRODUCTION_MAINTENANCE_SNAPSHOT_NOT_SAFE/,
+        );
+      });
+
+      await t.test("a prepared epoch aborts back to Google before any Supabase write is possible", () => {
+        const database = clone("precommit_abort");
+        const boundary = option2ReachPrepared(cluster, database, "abort");
+        const beforeAbort = option2State(cluster, database);
+        const aborted = rpc(
+          cluster,
+          database,
+          "abort_production_authority_epoch",
+          option2Optimistic(beforeAbort, "abort-precommit", {
+            epoch_id: boundary.prepared.epoch_id,
+            google_source_fingerprint: boundary.snapshot.stableFingerprint,
+            google_source_captured_at: new Date().toISOString(),
+            reason: "Option 2 focused abort",
+          }),
+        );
+        assert.equal(aborted.authority, "GOOGLE");
+        assert.equal(aborted.admission_state, "OPEN");
+        assert.equal(aborted.maintenance_state, "NORMAL");
+        assert.equal(aborted.first_supabase_canonical_write_possible, false);
+        const restored = option2State(cluster, database);
+        assert.equal(restored.authority, "GOOGLE");
+        assert.equal(restored.execution_gate, "OPEN");
+        assert.equal(restored.admission_state, "OPEN");
+        assert.equal(restored.first_write_possible_at, null);
+        assert.equal(restored.first_write_observed_at, null);
+      });
+
+      await t.test("committed/no-write rollback pauses Supabase, reconciles, rolls authority back, then reopens Google", () => {
+        const database = clone("no_write_rollback");
+        const boundary = option2ReachCommittedPaused(
+          cluster,
+          database,
+          "no-write",
+        );
+        const committedState = option2State(cluster, database);
+        const rollbackMaintenance = rpc(
+          cluster,
+          database,
+          "begin_production_supabase_rollback_maintenance",
+          option2Optimistic(committedState, "no-write-begin-rollback"),
+        );
+        assert.equal(rollbackMaintenance.authority, "SUPABASE");
+        assert.equal(rollbackMaintenance.ingress, "PAUSED");
+        assert.equal(
+          rollbackMaintenance.first_supabase_canonical_write_observed,
+          false,
+        );
+        const snapshot = option2FinalizeRollback(
+          cluster,
+          database,
+          rollbackMaintenance.closure_id,
+          boundary.snapshot.stableFingerprint,
+          "no-write",
+          false,
+        );
+        const rolledBack = option2CommitRollback(
+          cluster,
+          database,
+          rollbackMaintenance.closure_id,
+          snapshot.reconciliation_fingerprint,
+          "no-write",
+          false,
+        );
+        assert.equal(rolledBack.authority, "GOOGLE");
+        assert.equal(rolledBack.ingress, "PAUSED");
+        assert.equal(rolledBack.admission_state, "CLOSED");
+        const resumed = option2ResumeGoogle(
+          cluster,
+          database,
+          snapshot.source_fingerprint,
+          "no-write",
+          false,
+        );
+        assert.equal(resumed.authority, "GOOGLE");
+        assert.equal(resumed.ingress, "OPEN");
+        assert.equal(resumed.admission_state, "OPEN");
+      });
+
+      await t.test("post-write rollback cannot advance before explicit reconciliation", () => {
+        const database = clone("post_write_rollback");
+        const boundary = option2ReachCommittedPaused(
+          cluster,
+          database,
+          "post-write",
+        );
+        option2ResumeSupabase(
+          cluster,
+          database,
+          boundary.prepared.epoch_id,
+          "post-write",
+        );
+        psql(cluster, database, `
+          update production_control.cutover_activation_state
+          set first_supabase_write_observed_at = pg_catalog.now(),
+              first_supabase_mutation_key = 'isolated-postgres-test-write',
+              first_supabase_match_id = '2026-R1-1',
+              first_supabase_match_revision = 1
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        const beforeRollback = option2State(cluster, database);
+        const rollbackMaintenance = rpc(
+          cluster,
+          database,
+          "begin_production_supabase_rollback_maintenance",
+          option2Optimistic(beforeRollback, "post-write-begin-rollback"),
+        );
+        assert.equal(
+          rollbackMaintenance.first_supabase_canonical_write_observed,
+          true,
+        );
+        assertCommandFailure(
+          () => option2FinalizeRollback(
+            cluster,
+            database,
+            rollbackMaintenance.closure_id,
+            boundary.snapshot.stableFingerprint,
+            "post-write-unreconciled",
+            false,
+          ),
+          /PRODUCTION_MAINTENANCE_ROLLBACK_SNAPSHOT_NOT_SAFE/,
+        );
+        const snapshot = option2FinalizeRollback(
+          cluster,
+          database,
+          rollbackMaintenance.closure_id,
+          boundary.snapshot.stableFingerprint,
+          "post-write-reconciled",
+          true,
+        );
+        assertCommandFailure(
+          () => option2CommitRollback(
+            cluster,
+            database,
+            rollbackMaintenance.closure_id,
+            snapshot.reconciliation_fingerprint,
+            "post-write-missing-proof",
+            false,
+          ),
+          /PRODUCTION_MAINTENANCE_ROLLBACK_NOT_SAFE/,
+        );
+        const rolledBack = option2CommitRollback(
+          cluster,
+          database,
+          rollbackMaintenance.closure_id,
+          snapshot.reconciliation_fingerprint,
+          "post-write-reconciled",
+          true,
+        );
+        assert.equal(rolledBack.authority, "GOOGLE");
+        assert.equal(rolledBack.reconciliation_required, true);
+        const resumed = option2ResumeGoogle(
+          cluster,
+          database,
+          snapshot.source_fingerprint,
+          "post-write-reconciled",
+          true,
+        );
+        assert.equal(resumed.authority, "GOOGLE");
+        assert.equal(resumed.reconciliation_complete, true);
+      });
+    } finally {
+      await destroyCluster(cluster);
+    }
+  },
+);

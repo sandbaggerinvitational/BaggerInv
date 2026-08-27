@@ -1,60 +1,49 @@
-# Step 12 Production cutover runbook v2 — ACL writer boundary
+# Step 12 Production cutover runbook v2 — maintenance-window boundary
 
-This runbook is executable only after Step 11.6 passes and the owner separately
-authorizes Step 12. The Step 11.6 rehearsal authorization does not authorize any
-Step 12 phase, deployment promotion, identity transition, scoring authority
-commit, worker activation, or public read cutover.
+This runbook is executable only after the `MAINTENANCE_WINDOW_V1` release path
+is certified and the owner separately authorizes Step 12. Implementation,
+migration, candidate-deployment, or prior rehearsal authorization does not
+authorize a Production cutover, scoring-authority commit, participant-identity
+transition, public-read cutover, worker activation, or Odds publication.
+
+The maintenance path preserves the installed ADMISSION_V3 lease, authority
+epoch, Supabase ingress, revision, stale-client, authorization, audit,
+outbox/archive, rollback, resource-isolation, and parity controls. It does not
+require a new Vercel WAF or Google Drive ACL rehearsal and it does not alter the
+existing provider-fence path.
 
 ## Required certified inputs
 
-Bind every payload to the exact Step 11.6 frozen SHA, non-authoritative
-candidate deployment, Production Supabase project
-`ymqhhtxaywtqllynrmxe`, Production workbook
+Bind every payload to the exact frozen SHA, non-authoritative candidate,
+Production Supabase project `ymqhhtxaywtqllynrmxe`, Production workbook
 `1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4`, Vercel project
-`prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU`, `https://baggerinv.com`, activation
-revision, authority generation, admission revision/generation, final
-certification fingerprint, environment-delta fingerprint v2, and execution
-bundle fingerprint v2.
+`prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU`, canonical domain
+`https://baggerinv.com`, tournament, activation revision, authority generation,
+admission revision/generation, certification fingerprint, environment-delta
+fingerprint, and execution-bundle fingerprint.
 
-Step 12 GO/NO-GO additionally requires:
+Step 12 GO/NO-GO requires:
 
-- the historical writer-scope artifact preserved as historical evidence
-  with `acceptedAsPrimaryProof=false` and
-  `unexplainedConcurrencyWindowCount=1`;
-- the fixed immutable ACL-v2 artifact at
-  `docs/evidence/step11-6-production-google-drive-acl-v2-acceptance-v1.json`,
-  exactly matched by the manifest, with `acceptedAsPrimaryProof=true` and
-  `unexplainedConcurrencyWindowCount=0`;
-- rehearsal implementation SHA A recorded by that artifact, frozen
-  certification SHA B bound by the execution bundle, and an independently
-  verified A-to-B evidence-only diff with zero unexpected paths;
-- exact old-deployment and Production-capable-origin enforcement proof;
-- exact Drive identity/capability and WAF baseline/critical-window proofs;
-- the exact ACL-intent legacy-principal fingerprint equal to the ending
-  ADMISSION_V3 `provider_principal_fingerprint`;
-- no unresolved or `OUTCOME_UNKNOWN` ACL dispatch;
-- Step 11.6 ending snapshot `DORMANT / GOOGLE / PASSPORT / OPEN`;
-- all affected tests, Production build, provider authentication, and resource
-  isolation green.
+- the additive maintenance-window migration installed and backward-compatible;
+- the exact frozen release and authoritative GitHub tip;
+- a clean worktree, affected tests, final suite, Production build, provider
+  authentication, and Production/Preview isolation green;
+- live starting state `DORMANT / GOOGLE / PASSPORT / admission OPEN` with
+  Supabase ingress and workers disabled;
+- first Supabase canonical write possible/observed `false/false`;
+- current History, tournament, Guide, Draft, Prediction Settings, Published
+  Odds, War Room, Auth, PWA, rollback, and worker certifications current;
+- no active WAF rule, Drive ACL fence, provider restoration, or other
+  nonterminal physical-fence operation.
 
-Do not hydrate placeholders from browser memory. Read current revisions and
-fingerprints from protected diagnostics and durable receipts immediately before
-rendering each payload.
-
-Every `REHEARSAL`, `CUTOVER`, and `ROLLBACK` provider-control request executes
-from the one exact non-authoritative Project Preview candidate. Its signed
-scope is always `candidateDeploymentTarget=PREVIEW` plus the exact deployment
-ID, frozen commit, branch alias, immutable origin, Vercel project, Production
-Supabase project, and Production workbook. The purpose/transition mode names
-the lifecycle; it never relabels this control runtime as a Production-target
-deployment. The protected executor uses
-`productionWriterFenceCandidateCutoverEnvironment`, requires at least
-`CURRENT_READS` for Step 12 actions, and rejects a Production runtime so the
-critical WAF cannot accidentally expose a second control origin. Live domain
-promotion and live application phase changes remain separate sequential
-operations.
+Rejected, retired, restored, and otherwise terminal Step 11.6 epochs are
+historical evidence and do not block `MAINTENANCE_WINDOW_V1`. Do not delete,
+rewrite, or reuse them. Do not hydrate payload values from browser memory; read
+current values from protected diagnostics and durable receipts.
 
 ## Authority progression
+
+The phase progression remains sequential:
 
 ```text
 DORMANT
@@ -70,260 +59,267 @@ DORMANT
 -> OBSERVATION
 ```
 
-Canonical authority and mutation admission are independent facts. The only
-legal scoring progression is:
+The scoring boundary is:
 
 ```text
-GOOGLE canonical / legacy admission OPEN
--> GOOGLE canonical / legacy admission CLOSING
--> GOOGLE canonical / legacy admission CLOSED
--> GOOGLE canonical / Supabase prepared / Supabase ingress paused
--> SUPABASE canonical / legacy admission CLOSED
+GOOGLE canonical / current-app admission OPEN / maintenance NORMAL
+-> GOOGLE canonical / current-app admission CLOSING / SCORING_MAINTENANCE
+-> GOOGLE canonical / current-app admission CLOSED / SCORING_MAINTENANCE
+-> GOOGLE canonical / Supabase prepared / Supabase ingress PAUSED
+-> SUPABASE canonical / current-app Google admission CLOSED / ingress PAUSED
+-> SUPABASE canonical / Supabase ingress OPEN / maintenance NORMAL
 ```
 
-`GOOGLE admission OPEN + Supabase scoring ingress OPEN` is forbidden. A short,
-explicit participant-facing scoring pause is valid; ambiguous or dual authority
-is not.
+Authority and admission are independent. A short explicit scoring pause is
+valid. Ambiguous authority, automatic cross-authority retry, and
+`GOOGLE admission OPEN + Supabase ingress OPEN` are forbidden.
 
-## WAF lifecycle
+## Maintenance boundary
 
-Two WAF configurations must never be conflated:
+`boundary_mode=MAINTENANCE_WINDOW_V1` is persistent, audited, exact-resource
+scoped, and service-role controlled. The inspector reports
+`maintenance_state=NORMAL|SCORING_MAINTENANCE`. Use these supported operations:
 
-- `BASELINE`: exact legacy-compatible pre-cutover configuration;
-- `CRITICAL_WINDOW`: temporary five-group containment used while a Drive ACL
-  update, drain, fingerprint, prepare, commit, or rollback restoration can race
-  an old function.
+- `begin_production_scoring_maintenance` closes current-application admission
+  atomically from `OPEN` to `CLOSING` while Google remains canonical;
+- the existing ADMISSION_V3 drain accounts for all admitted operations until
+  they are definitively successful, definitively absent, or reconciled;
+- `finalize_production_scoring_maintenance_snapshot` binds the drained closure,
+  stable Google readbacks, final Google fingerprint, and exact Supabase parity;
+- `prepare_production_maintenance_authority_epoch` prepares the exact
+  maintenance-bound Supabase authority epoch;
+- `commit_production_maintenance_authority_epoch` makes Supabase canonical but
+  leaves its scoring ingress paused;
+- `resume_production_supabase_scoring` opens Supabase ingress and ends
+  maintenance only after the committed runtime passes smoke checks;
+- `abort_production_maintenance_authority_epoch` is the explicit precommit
+  abort path;
+- `begin_production_supabase_rollback_maintenance` atomically pauses Supabase
+  ingress before a committed rollback can enumerate or reconcile writes;
+- `finalize_production_maintenance_rollback_snapshot` binds the drained
+  Supabase write set and exact Google reconciliation result;
+- `rollback_production_maintenance_authority_epoch` returns canonical authority
+  to Google while Google admission remains CLOSED;
+- `resume_production_google_scoring_after_maintenance_rollback` is the only
+  committed-rollback reopen path and must satisfy
+  `assert_maintenance_google_reopen_safe`.
 
-`CRITICAL_WINDOW` consists of the exact signed-candidate control exception,
-noncanonical deny, canonical non-safe-method deny, canonical historical
-safe-method writer-route deny, and canonical safe-read allow groups. Record its
-database activation timestamp. The critical WAF is not the canonical writer
-fence; the Drive ACL is.
+Provider evidence may be absent only for this exact boundary mode. Existing
+provider-mode behavior remains unchanged.
 
-Each cutover or rollback window creates one fresh, immutable
-`CRITICAL_WINDOW_WAF_V1` epoch:
+While maintenance is active, participant and Director canonical scoring,
+lifecycle, pairing, course/tee, access, lock, Finalize, and Reopen mutations
+fail with an explicit temporary-maintenance response. Do not queue a rejected
+request for later submission or reinterpret it under another authority.
+Read-only pages and separately classified Google authoring such as Guide,
+Draft, and Prediction Settings may continue.
 
-```text
-ACTIVATION_PENDING
--> ACTIVE_UNBOUND
--> FENCE_BOUND
--> RESTORE_PENDING
--> BASELINE_RESTORED
-```
+## Safety predicates
 
-The same epoch carries distinct signed `BASELINE_CAPTURE`, `CRITICAL_ACTIVE`,
-fresh `CRITICAL_REATTEST`, and `BASELINE_RESTORED` evidence. Rule insertion is
-proven by its exact module-owned provider response and does not invent draft
-evidence. Each provider mutation uses a durable reserve → mark-started → result
-record. `OUTCOME_UNKNOWN` is terminal and inspect-only; never retry it after a
-TTL. The epoch binds atomically to one Drive ACL fence while
-`ACTIVE_UNBOUND`. `BASELINE_RESTORED` is terminal and cannot authorize another
-fence, close, or rollback.
+`assert_maintenance_cutover_snapshot_safe` may pass only when:
 
-After a successful Supabase scoring commit, keep the legacy Drive permission at
-`reader` but restore the exact `BASELINE` WAF so canonical Supabase scoring
-`POST`s can reach the application. Before any rollback ACL restoration, first
-reinstall and re-attest `CRITICAL_WINDOW`.
+- authority is GOOGLE and maintenance is `SCORING_MAINTENANCE`;
+- current-app admission is CLOSED with protocol enforcement active;
+- Supabase ingress and workers are disabled;
+- active, potential, unresolved, ambiguous, partial, and unclassified
+  canonical current-app mutations are all zero;
+- no canonical queue/backlog can later mutate Google;
+- exact project, workbook, tournament, activation and admission generations;
+- no conflicting prepared authority epoch;
+- two fresh, repeated Production Google readbacks captured after closure have
+  the same scoring/current-state fingerprint;
+- no mutation exists beyond the closure high-watermark;
+- Supabase shadow is synchronized to that exact fingerprint with zero
+  unexplained differences;
+- first Supabase canonical write possible/observed is `false/false`.
+
+`assert_maintenance_cutover_prepare_safe` additionally requires the final
+Google fingerprint durably bound to the maintenance closure, exact match
+revisions and checkpoints, unchanged admission/authority generations, exact
+Supabase parity, and ingress/workers still disabled.
+
+`assert_maintenance_cutover_commit_safe` additionally requires a valid prepared
+CUTOVER epoch bound to the same closure, maintenance still active, admission
+still CLOSED, a fresh Google readback still matching the bound fingerprint,
+Supabase parity still exact, the exact expected precommit deployment and
+configuration, unchanged activation/admission revisions, and first-write
+possible/observed still `false/false`.
+
+Authority commit must atomically make Supabase canonical while leaving
+Supabase ingress PAUSED. It must not make a canonical Supabase write possible.
+Only `resume_production_supabase_scoring` may open ingress and set
+first-write-possible true after live runtime verification.
 
 ## Sequential execution
 
 ### 1. New-Mac preflight and recovery snapshot
 
-Verify exact repository/branch/local SHA/GitHub tip, clean worktree, Node/npm,
-GitHub/Vercel/Supabase/Google authentication, Production resource isolation,
-critical tests, `git diff --check`, and Production build. Capture `STEP12-R0`
-for Vercel, Google, Supabase, Auth, Odds, and environment state. Stop on any
-provenance or resource mismatch.
+Verify repository identity, branch, local SHA, GitHub tip, clean worktree,
+Node/npm, GitHub/Vercel/Supabase/Google authentication, exact Production
+resources, tests, `git diff --check`, and Production build. Capture `STEP12-R0`
+for Vercel, Google, Supabase, Auth, Odds, environment, authority, admission,
+ingress, workers, and first-write state. Stop on any mismatch.
 
 ### 2. Freshness and final GO/NO-GO
 
-Revalidate History, current tournament, roster, rounds, matches, pairings,
-lifecycle, scores, Guide, editorial, Prediction Settings, Draft, Published
-Odds, and War Room. Synchronize legitimate Production content only through the
-certified path. Require zero unexplained differences and the exact ACL-v2
-acceptance binding.
+Revalidate completed History, current tournament, roster, rounds, matches,
+pairings, lifecycle, scores, Guide, editorial, Prediction Settings, Draft,
+Published Odds, and War Room. Synchronize legitimate Production content only
+through the certified path. Require zero unexplained differences. Confirm no
+actual provider fence/restoration is active.
 
 ### 3. Stage through CURRENT_READS
 
-Sequentially stage the exact release, enter `STATIC_BACKEND`, promote only
-after resource assertions, complete read-only source transitions, activate
-Supabase participant identity, and enter `CURRENT_READS`. At each phase capture
-the control-plane state and authority matrix. Google remains canonical scoring,
-legacy admission remains `OPEN`, and Supabase scoring ingress remains paused.
+Stage the exact SHA with `boundary_mode=MAINTENANCE_WINDOW_V1`. Sequentially
+enter `STATIC_BACKEND`, promote the barrier-aware candidate only after resource
+assertions, complete read-source transitions, activate Supabase participant
+identity, and enter `CURRENT_READS`. Verify each phase before advancing.
+Google remains canonical scoring, current-app admission remains OPEN, and
+Supabase scoring ingress remains paused.
 
 ### 4. PWA and Director precommit checkpoint
 
-Require current service worker, old caches evicted, no auth/scoring/admin API
-caching, Supabase Director `CB01`, healthy Auth/Turnstile/SMTP, correct Player
-ID/entitlement, stale Passport rejection, and server-side rejection of stale
-clients. Do not send an OTP without explicit approval if another physical email
-is required.
+Require the current service worker, old-cache eviction, no caching of
+Auth/scoring/admin APIs, Supabase Director `CB01`, healthy Auth/Turnstile/SMTP,
+correct Player ID and entitlement, stale Passport rejection, and server-side
+stale-client rejection. Do not send another physical OTP without explicit
+approval.
 
-### 5. Install the singular-writer boundary
+### 5. Enter scoring maintenance
 
-1. Reinspect exact `BASELINE` WAF and Drive permission state.
-2. Record the current owner/provider-admin freeze.
-3. Start a new `purpose=CUTOVER` critical-WAF epoch after the recorded Step 12
-   start. Require signed baseline evidence, reserve/start/resolve the one
-   run-owned rule insertion, reserve/start/resolve draft activation, and require
-   distinct signed `CRITICAL_ACTIVE` readback. Record its database activation
-   time, new evidence identities, new install/fence run identities, and an
-   unexpired owner freeze. Require `baselineWafRestored=false` and no restored
-   WAF fingerprint. The restored Step 11.6 rehearsal receipt and run identities
-   are historical and must not be reused.
-   The purpose-bound owner statement must be exactly
-   `I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS PRODUCTION CUTOVER`;
-   the rehearsal-only statement is rejected.
-4. Call the supported persistent-fence install with the same exact
-   `critical_waf_epoch_id`, which atomically consumes its single
-   `ACTIVE_UNBOUND` binding opportunity, plus
-   `lifecycle_mode=CUTOVER`, one stable request ID, exact candidate/resource
-   tuple, exact quiesce evidence, and exact baseline fingerprints.
-5. Require the Drive legacy permission dispatch result `TARGET_CONFIRMED` and
-   fresh readback showing `reader`, `canEdit=false`, `canShare=false`.
-6. After at least 190 database-clock seconds, record settlement readback 1.
-   After at least another 10 seconds, atomically record readback 2, finish the
-   provider fence, and transition legacy admission `OPEN -> CLOSING`.
+1. Announce the short scoring-maintenance window and freeze owner/Director
+   canonical current-state changes.
+2. Re-read exact authority, admission, ingress, worker, resource, revision,
+   generation, and first-write state.
+3. Call `begin_production_scoring_maintenance` once with a durable request ID
+   and exact optimistic revisions.
+4. Require GOOGLE canonical, maintenance `SCORING_MAINTENANCE`, current-app
+   admission CLOSING, Supabase ingress disabled, and workers disabled.
+5. Verify participant and Director canonical mutations return the explicit
+   maintenance response, with no queued or fallback write.
 
-If the Drive result is `OUTCOME_UNKNOWN`, stop. Keep the WAF, permission reservation,
-and admission state fail-closed. Never retry the ACL update, reopen, or proceed
-because 1,810 seconds elapsed.
+A lost response is recovered by inspecting the same durable request identity;
+never submit a differently identified close request speculatively.
 
-A lost response may be recovered only by inspecting and replaying the same
-durable request identity. Restoring `BASELINE` terminally consumes this
-critical-window epoch. A consumed receipt cannot install another fence or
-authorize a later rollback; that requires a new active provider-attested epoch.
+### 6. Drain, fingerprint, and reconcile
 
-### 6. Drain and close
+Drain all ADMISSION_V3 work. Do not treat timer expiry, process exit, or an
+ambiguous Google response as completion. Require every potential writer to be
+definitively resolved and require admission CLOSED.
 
-Call the protected drain operation using the exact closure and external-fence
-IDs. Require:
-
-- active/potential legacy writers `0`;
-- unresolved, ambiguous, partial, and unclassified Google writers `0`;
-- unresolved legacy outbox/archive work `0` where it affects rollback safety;
-- no ACL `OUTCOME_UNKNOWN`;
-- exact admission and authority generations unchanged.
-
-Only then capture two stable readbacks and the final Google-authoritative
-fingerprint. Atomically finalize admission `CLOSED`. Require:
-
-```text
-FINAL_GOOGLE_AUTHORITY_SNAPSHOT_SAFE = true
-```
-
-No old deployment, immutable URL, alias, stale tab, or installed PWA may create
-a Google canonical write after this point.
+Capture two fresh Google scoring/current-state readbacks after closure and
+require equal fingerprints. Import/reconcile that exact state into Production
+Supabase while Google remains canonical and Supabase ingress remains paused.
+Require zero unexplained differences, then call
+`finalize_production_scoring_maintenance_snapshot` and require
+`assert_maintenance_cutover_snapshot_safe` to pass.
 
 ### 7. Prepare Supabase authority
 
-Reconcile the final Google fingerprint to the Production Supabase shadow while
-Google remains canonical and legacy admission remains `CLOSED`. Require exact
-parity and:
-
-```text
-SUPABASE_AUTHORITY_PREPARE_SAFE = true
-```
-
-Call `prepare_production_authority_epoch(CUTOVER)`. Deploy the exact precommit
-configuration while Supabase ingress remains paused. Scoring must be visibly
-and explicitly unavailable during this pause; do not queue or reinterpret a
-legacy request.
+Require `assert_maintenance_cutover_prepare_safe` to pass, then call
+`prepare_production_maintenance_authority_epoch` with the exact maintenance
+closure and fingerprint. Deploy/bind the exact precommit Supabase configuration
+while ingress remains paused. Scoring remains explicitly unavailable.
 
 ### 8. Final pre-write check and commit
 
 Immediately before commit require:
 
-- exact frozen SHA/project/workbook/deployment/phase;
-- legacy Drive role `reader` and ACL dispatch `TARGET_CONFIRMED`;
-- legacy admission `CLOSED`;
-- active/potential/unresolved/ambiguous/partial writers all `0`;
-- final Google fingerprint stable and Supabase shadow exact;
-- prepared epoch valid;
+- exact frozen SHA, deployment, project, workbook, tournament, and phase;
+- maintenance `SCORING_MAINTENANCE` and current-app admission CLOSED;
+- every active/potential/unresolved/ambiguous writer zero;
+- fresh Google fingerprint equal to the bound final fingerprint;
+- Supabase shadow exact with zero unexplained differences;
+- prepared epoch, activation revision, and generations exact;
 - Supabase ingress paused and workers disabled;
 - participant identity, Director, current reads, and PWA healthy;
-- `FIRST_SUPABASE_CANONICAL_WRITE_POSSIBLE=false`;
-- `FIRST_SUPABASE_CANONICAL_WRITE_OBSERVED=false`;
-- `SUPABASE_AUTHORITY_COMMIT_SAFE=true`.
+- first-write possible/observed `false/false`;
+- `assert_maintenance_cutover_commit_safe` passes.
 
-Call `commit_production_authority_epoch` once with its durable request ID.
-After success, Supabase is the sole canonical scoring authority, legacy
-admission and the Drive permission remain closed/reader, ingress becomes
-available, and first-write possible becomes true. Authority commit is not an
-actual scoring mutation.
+Call `commit_production_maintenance_authority_epoch` once with its durable
+request ID. Require SUPABASE canonical, Google current-app admission CLOSED,
+Supabase ingress still PAUSED, maintenance still `SCORING_MAINTENANCE`, and
+first-write possible/observed still `false/false`. Authority commit is not a
+scoring mutation.
 
-### 9. Restore normal network routing
+### 9. Verify and resume Supabase scoring
 
-Once the Supabase authority commit is proven, Google canonical mutation is
-impossible, and `CRITICAL_WINDOW` has remained active for at least 1,810
-database-clock seconds from its signed provider activation time, record fresh
-`CRITICAL_REATTEST` evidence on the same `FENCE_BOUND` epoch. Reserve/start the
-single `BASELINE_VERSION_ACTIVATE` dispatch, then require signed
-`BASELINE_RESTORED` evidence whose full semantic configuration equals the
-captured baseline. Do not restore the legacy Drive permission. If the minimum
-hold has not elapsed, keep scoring explicitly paused and wait; do not shorten
-the horizon. Verify apex Supabase scoring routes work and all noncanonical/old
-routes still fail the application authority contract. Baseline restoration
-terminally consumes the epoch; no later operation may reuse it.
+Verify live SHA, exact Production Supabase, canonical domain, Supabase Auth,
+authority epoch, source diagnostics, stale-client denial, current reads,
+participant/match authorization, and no unexpected Google or Supabase write.
+Then call `resume_production_supabase_scoring` once.
+
+Require Supabase ingress OPEN, maintenance NORMAL, Google admission CLOSED,
+first-write-possible true with its timestamp, and first-write-observed false
+unless a legitimate tournament mutation has occurred. Never fabricate a score,
+Finalize, Reopen, pairing, or other tournament fact.
 
 ### 10. Workers, Odds, and observation
 
-Enable only certified scoring mirror and Round Scorecards archive workers with
-the dedicated Production Google account. Move War Room and Odds calculation
-inputs to Supabase. Keep Odds publication authority Google and create no new
-publication. Complete website/PWA/Auth/source/isolation/security smokes and
-immediate observation. Do not fabricate a score, Finalize, Reopen, pairing, or
-publication.
+Enable only the certified scoring mirror and Round Scorecards archive workers
+with the dedicated Production Google identity. Move War Room and Odds
+calculation inputs to Supabase. Keep Odds publication authority GOOGLE and
+create no publication. Complete website/PWA/Auth/source/isolation/security
+smokes and observation. Arm the first-score, first-Finalize, and first-Reopen
+checkpoints for legitimate events.
 
-## Lost response and idempotency
+## Historical-deployment residual risk
 
-Database operations use stable durable request identities and are rediscovered
-through read-only diagnostics after a lost response. Drive ACL dispatch is
-stricter: the same dispatch may be inspected, but a second provider update is
-forbidden. Only a provider-module-issued `TARGET_CONFIRMED` result plus exact
-readback may advance. Caller-supplied result JSON, cloned capabilities, and
-`OUTCOME_UNKNOWN` are never authoritative.
+The maintenance boundary stops current ADMISSION_V3 application mutations; it
+does not cryptographically revoke credentials from every pre-ADMISSION_V3
+immutable Vercel deployment. Such a deployment could theoretically mutate
+Google if a caller knows a retained immutable hostname and legacy request
+contract, has usable historical participant/Director authorization, and sends
+an eligible mutation. Those origins are not part of normal application
+navigation.
+
+Mitigate this consciously by using a short pre-tournament window, freezing
+owner/Director current-state changes, avoiding old deployment URLs, checking
+Google immediately before commit, and checking it again before maintenance is
+released. Repeated fingerprints detect changes completed before readback; they
+cannot prevent a delayed legacy mutation after the last read.
+
+Any Google current-state change after Supabase commit is a critical divergence:
+keep maintenance active, pause Supabase ingress if opened, preserve both write
+sets, classify the first-write boundary from control-plane evidence, and follow
+the applicable rollback/reconciliation path. Never restore Google admission by
+changing source variables first.
 
 ## Rollback matrix
 
-| State | Supabase canonical | Supabase write observed | Legacy ACL/admission | Safe rollback |
+| State | Supabase canonical | Supabase write observed | Maintenance/current-app admission | Safe rollback |
 |---|---:|---:|---|---|
-| Before close | No | No | writer / OPEN | Normal legacy operation |
-| CLOSING | No | No | reader / CLOSING | Drain or abort; hold critical WAF; confirmed ACL restore; reopen; baseline WAF |
-| CLOSED pre-prepare | No | No | reader / CLOSED | Confirm safe abort; confirmed ACL restore; reopen; baseline WAF |
-| Prepared | No | No | reader / CLOSED | Abort epoch; confirmed ACL restore; reopen; baseline WAF |
-| Committed/no write | Yes | No | reader / CLOSED | Install critical WAF; pause ingress; roll back authority; confirmed ACL restore; reopen; baseline WAF |
-| Committed/post-write | Yes | Yes | reader / CLOSED | Install critical WAF; pause/drain Supabase; enumerate and reconcile; roll back authority; confirmed ACL restore; reopen; baseline WAF |
+| Before maintenance | No | No | NORMAL / OPEN | Normal Google operation |
+| CLOSING | No | No | SCORING_MAINTENANCE / CLOSING | Drain or cancel safely; explicit maintenance abort/reopen |
+| CLOSED pre-prepare | No | No | SCORING_MAINTENANCE / CLOSED | Verify Google and closure; explicit reopen; return NORMAL |
+| Prepared | No | No | SCORING_MAINTENANCE / CLOSED | Abort epoch; verify Google; reopen; return NORMAL |
+| Committed/no write | Yes | No | SCORING_MAINTENANCE / CLOSED | Begin rollback maintenance; bind no-write snapshot; roll back authority paused; verify Google; explicitly resume Google; return NORMAL |
+| Committed/post-write | Yes | Yes | SCORING_MAINTENANCE / CLOSED | Begin rollback maintenance; drain/enumerate/reconcile; bind exact snapshot; roll back authority paused; explicitly resume Google |
 
-No rollback may reopen Google while Supabase remains canonical or any Supabase
-write is unreconciled. No rollback may restore the ACL while an ACL result is
-`OUTCOME_UNKNOWN`. A racing Supabase mutation must be resolved by the ingress
-pause/drain contract before authority rollback. A rollback that needs a new
-`CRITICAL_WINDOW` epoch must provider-attest that fresh epoch and hold it for at
-least 1,810 database-clock seconds before the legacy Drive permission is
-restored to `writer`; restoring `BASELINE` then consumes that epoch.
+No rollback may reopen Google while Supabase remains canonical, while a
+Supabase mutation can begin, or while any Supabase write is unreconciled.
+`assert_maintenance_google_reopen_safe` must pass before reopen. A racing
+Supabase mutation must be resolved through the ingress pause/drain contract
+before authority rollback.
 
-## Step 11.6 rehearsal versus Step 12
+## Lost response and idempotency
 
-Step 11.6 uses `lifecycle_mode=REHEARSAL`, returns the legacy ACL to `writer`
-with its exact baseline capabilities, and restores `BASELINE` while Production
-remains `DORMANT`. Its restored quiesce evidence is certification history, not
-an active Step 12 fence.
-
-Step 12 uses `lifecycle_mode=CUTOVER`, keeps the legacy ACL at `reader` through
-prepare, commit, workers, and observation, and restores only the normal WAF
-routing after commit. Google remains authoring/mirror/archive/Odds-publication
-and explicit rollback infrastructure; it is not a simultaneous canonical
-scoring writer.
+Every control-plane mutation uses one stable durable request identity. After a
+lost response, inspect authoritative state and replay only that same identity
+where the operation contract permits it. Never infer maintenance, authority,
+ingress, or first-write state from an HTTP response alone.
 
 ## Final no-go rules
 
-Stop for any wrong project/workbook/principal, Preview contamination, stale
-revision/generation, unexpected phase, active or ambiguous writer, ACL
-`OUTCOME_UNKNOWN`, WAF drift, Director/Auth failure, stale client accepted, fingerprint
-drift, direct Google canonical mutation, first-write marker mismatch, or client
-secret exposure. Choose the rollback procedure from database evidence, never
-from operator inference.
+Stop for any wrong project/workbook/tournament, Preview contamination, stale
+revision/generation, unexpected phase, active or ambiguous writer, unstable
+Google fingerprint, Supabase parity drift, active physical fence/restoration,
+Director/Auth failure, stale client accepted, hidden Google fallback, dual
+authority, first-write marker mismatch, rollback uncertainty, or client-secret
+exposure. Choose rollback from database/control-plane evidence, not operator
+inference.
 
-The installed PWA shares the same deployment and backend. It receives no
-separate datastore or authority cutover.
+The installed PWA shares the Production deployment and backend. It receives no
+separate authority cutover. Google remains explicitly retained for approved
+authoring, mirror/archive, Odds publication, and rollback; it is not a
+simultaneous canonical scoring writer.
