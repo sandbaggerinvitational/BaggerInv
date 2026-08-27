@@ -12125,3 +12125,266 @@ test(
     }
   },
 );
+
+test(
+  "migration 046 completes only an exact static-read staged abort in PostgreSQL 17",
+  { timeout: 120_000 },
+  async (t) => {
+    if (!(await allBinariesAvailable())) {
+      t.skip(`PostgreSQL 17 toolchain is unavailable at ${pgBin}`);
+      return;
+    }
+
+    const cluster = await createCluster();
+    const templateDatabase = "staged_abort_046_template";
+    let databaseCounter = 0;
+    const clone = (label) => {
+      databaseCounter += 1;
+      const database = `staged_abort_046_${databaseCounter}_${label}`;
+      createDatabase(cluster, database, templateDatabase);
+      return database;
+    };
+    const abortState = (database) => parseJsonOutput(psql(cluster, database, `
+      select pg_catalog.jsonb_build_object(
+        'activation_state', activation.state,
+        'activation_revision', activation.activation_revision,
+        'current_authority', activation.current_authority,
+        'maintenance_state', activation.maintenance_state,
+        'read_cutover_phase', activation.read_cutover_phase,
+        'read_source_fingerprint', activation.read_source_fingerprint,
+        'expected_source_fingerprint', activation.expected_source_fingerprint,
+        'public_reads_activated_at', activation.public_reads_activated_at,
+        'active_transition_epoch_id', activation.active_transition_epoch_id,
+        'first_write_possible_at', activation.first_supabase_write_possible_at,
+        'first_write_observed_at', activation.first_supabase_write_observed_at,
+        'resource_authority', resource.scoring_authority,
+        'identity_authority', resource.participant_identity_authority,
+        'current_read_authority', resource.current_tournament_read_authority,
+        'public_reads', resource.public_supabase_reads_enabled,
+        'resource_ingress', resource.scoring_ingress_enabled,
+        'resource_workers', resource.workers_enabled,
+        'admission_state', gate.admission_state,
+        'execution_gate', gate.state,
+        'gate_authority', gate.authority,
+        'active_epoch_id', gate.active_epoch_id,
+        'unresolved_client_queues', gate.unresolved_client_queues
+      )
+      from production_control.cutover_activation_state activation
+      cross join production_control.resource_scope resource
+      cross join scoring_authority.ingress_gates gate
+      where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+        and resource.scope_key = 'BAGGER_INV_PRODUCTION'
+        and gate.tournament_id = '2026';
+    `));
+    const stage = (database, label) => {
+      const current = abortState(database);
+      return rpc(cluster, database, "stage_production_cutover_release", {
+        ...scope,
+        actor_id: actor,
+        contract_version: "production-cutover-activation-v1",
+        boundary_mode: "MAINTENANCE_WINDOW_V1",
+        vercel_project: "bagger-inv",
+        canonical_domain: "https://baggerinv.com",
+        tournament_year: 2026,
+        vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+        deployment_commit: deploymentCommit,
+        source_fingerprint: sourceFingerprint,
+        certification_fingerprint: fingerprint(`${label}-certification`),
+        environment_delta_fingerprint_v2: fingerprint(`${label}-environment`),
+        expected_activation_revision: Number(current.activation_revision),
+        request_fingerprint: fingerprint(`${label}-stage`),
+      });
+    };
+    const setReadState = (database, label, mode, prior, target) => {
+      const current = abortState(database);
+      return rpc(cluster, database, "set_production_cutover_read_state", {
+        ...scope,
+        actor_id: actor,
+        deployment_commit: deploymentCommit,
+        mode,
+        expected_prior_phase: prior,
+        target_phase: target,
+        source_fingerprint: sourceFingerprint,
+        expected_activation_revision: Number(current.activation_revision),
+        request_fingerprint: fingerprint(`${label}-${mode}-${prior}-${target}`),
+      });
+    };
+    const abortInput = (database, label) => {
+      const current = abortState(database);
+      return {
+        ...scope,
+        actor_id: actor,
+        contract_version: "production-cutover-activation-v1",
+        operation: "ABORT_PRODUCTION_STAGED_RELEASE",
+        tournament_year: 2026,
+        vercel_project: "bagger-inv",
+        vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+        canonical_domain: "https://baggerinv.com",
+        deployment_commit: deploymentCommit,
+        source_fingerprint: sourceFingerprint,
+        expected_activation_revision: Number(current.activation_revision),
+        request_fingerprint: fingerprint(`${label}-abort`),
+      };
+    };
+    const stageAndRollbackReads = (database, label) => {
+      stage(database, label);
+      setReadState(
+        database,
+        label,
+        "ACTIVATE",
+        "STATIC_BACKEND",
+        "READ_CUTOVER",
+      );
+      setReadState(
+        database,
+        label,
+        "ROLLBACK",
+        "READ_CUTOVER",
+        "STATIC_BACKEND",
+      );
+      return abortState(database);
+    };
+
+    try {
+      createDatabase(cluster, templateDatabase);
+      installSupabaseCompatibility(cluster, templateDatabase);
+      await installProductionMigrations(
+        cluster,
+        templateDatabase,
+        "202608260038_production_provider_preview_target_inventory_v4.sql",
+      );
+      installScoringFixture(cluster, templateDatabase);
+      const migrationNames = (await readdir(migrationsDirectory))
+        .filter((name) => /^\d+_.*\.sql$/.test(name))
+        .sort();
+      const startIndex = migrationNames.indexOf(
+        "202608260039_production_all_project_provider_inventory_v3.sql",
+      );
+      const endIndex = migrationNames.indexOf(
+        "202608270046_production_staged_release_abort_static_fingerprint.sql",
+      );
+      assert.notEqual(startIndex, -1);
+      assert.notEqual(endIndex, -1);
+      for (const migrationName of migrationNames.slice(startIndex, endIndex + 1)) {
+        psqlFile(
+          cluster,
+          templateDatabase,
+          path.join(migrationsDirectory, migrationName),
+        );
+      }
+
+      await t.test("exact rolled-back fingerprint reaches DORMANT and retries safely", () => {
+        const database = clone("exact");
+        const rolledBack = stageAndRollbackReads(database, "exact");
+        assert.equal(rolledBack.activation_state, "STAGED");
+        assert.equal(rolledBack.read_cutover_phase, "STATIC_BACKEND");
+        assert.equal(rolledBack.read_source_fingerprint, sourceFingerprint);
+        assert.equal(rolledBack.expected_source_fingerprint, sourceFingerprint);
+        assert.equal(rolledBack.current_authority, "GOOGLE");
+        assert.equal(rolledBack.identity_authority, "PASSPORT");
+        assert.equal(rolledBack.current_read_authority, "GOOGLE");
+        assert.equal(rolledBack.public_reads, false);
+        assert.equal(rolledBack.resource_ingress, false);
+        assert.equal(rolledBack.resource_workers, false);
+        assert.equal(rolledBack.first_write_possible_at, null);
+        assert.equal(rolledBack.first_write_observed_at, null);
+
+        const input = abortInput(database, "exact");
+        const aborted = rpc(
+          cluster,
+          database,
+          "abort_production_staged_release",
+          input,
+        );
+        assert.equal(aborted.code, "PRODUCTION_STAGED_RELEASE_ABORTED");
+        assert.equal(aborted.state, "DORMANT");
+        assert.equal(aborted.authority, "GOOGLE");
+        assert.equal(aborted.participant_identity_authority, "PASSPORT");
+        assert.equal(aborted.first_supabase_canonical_write_possible, false);
+        assert.equal(aborted.first_supabase_canonical_write_observed, false);
+        assert.equal(aborted.idempotent, false);
+        assert.equal(
+          rpc(cluster, database, "abort_production_staged_release", input)
+            .idempotent,
+          true,
+        );
+        const dormant = abortState(database);
+        assert.equal(dormant.activation_state, "DORMANT");
+        assert.equal(dormant.read_source_fingerprint, null);
+        assert.equal(dormant.expected_source_fingerprint, null);
+      });
+
+      await t.test("never-activated NULL fingerprint remains abortable", () => {
+        const database = clone("null");
+        stage(database, "null");
+        assert.equal(abortState(database).read_source_fingerprint, null);
+        const aborted = rpc(
+          cluster,
+          database,
+          "abort_production_staged_release",
+          abortInput(database, "null"),
+        );
+        assert.equal(aborted.state, "DORMANT");
+      });
+
+      await t.test("unexplained fingerprint drift still fails closed", () => {
+        const database = clone("drift");
+        stageAndRollbackReads(database, "drift");
+        psql(cluster, database, `
+          update production_control.cutover_activation_state
+          set read_source_fingerprint = ${sqlLiteral(fingerprint("drift"))}
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "abort_production_staged_release",
+            abortInput(database, "drift"),
+          ),
+          /PRODUCTION_STAGED_RELEASE_ABORT_PRECUTOVER_STATE_REQUIRED/,
+        );
+      });
+
+      await t.test("restored fingerprint never bypasses identity or read authority guards", () => {
+        const identityDatabase = clone("identity");
+        stageAndRollbackReads(identityDatabase, "identity");
+        psql(cluster, identityDatabase, `
+          update production_control.resource_scope
+          set participant_identity_authority = 'SUPABASE',
+              auth_user_creation_enabled = true
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            identityDatabase,
+            "abort_production_staged_release",
+            abortInput(identityDatabase, "identity"),
+          ),
+          /PRODUCTION_STAGED_RELEASE_ABORT_DORMANT_AUTHORITY_REQUIRED/,
+        );
+
+        const readsDatabase = clone("reads");
+        stageAndRollbackReads(readsDatabase, "reads");
+        psql(cluster, readsDatabase, `
+          update production_control.resource_scope
+          set current_tournament_read_authority = 'SUPABASE',
+              public_supabase_reads_enabled = true
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            readsDatabase,
+            "abort_production_staged_release",
+            abortInput(readsDatabase, "reads"),
+          ),
+          /PRODUCTION_STAGED_RELEASE_ABORT_DORMANT_AUTHORITY_REQUIRED/,
+        );
+      });
+    } finally {
+      await destroyCluster(cluster);
+    }
+  },
+);

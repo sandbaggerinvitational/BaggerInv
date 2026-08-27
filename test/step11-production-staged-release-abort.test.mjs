@@ -3,6 +3,10 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const migrationUrl = new URL(
+  "../supabase/production_migrations/202608270046_production_staged_release_abort_static_fingerprint.sql",
+  import.meta.url,
+);
+const baseMigrationUrl = new URL(
   "../supabase/production_migrations/202608240031_production_staged_release_abort.sql",
   import.meta.url,
 );
@@ -10,14 +14,15 @@ const priorScopeUrl = new URL(
   "../supabase/production_migrations/202608240029_production_odds_observation_phase_rebind.sql",
   import.meta.url,
 );
-const [sql, priorScopeSql] = await Promise.all([
+const [sql, baseSql, priorScopeSql] = await Promise.all([
   readFile(migrationUrl, "utf8"),
+  readFile(baseMigrationUrl, "utf8"),
   readFile(priorScopeUrl, "utf8"),
 ]);
 const scopeStart = "create or replace function production_control.assert_production_odds_calculation_scope";
-const lockedScope = sql.slice(
-  sql.indexOf(scopeStart),
-  sql.indexOf("create or replace function public.abort_production_staged_release"),
+const lockedScope = baseSql.slice(
+  baseSql.indexOf(scopeStart),
+  baseSql.indexOf("create or replace function public.abort_production_staged_release"),
 );
 const priorScope = priorScopeSql.slice(
   priorScopeSql.indexOf(scopeStart),
@@ -27,6 +32,35 @@ const body = sql.slice(
   sql.indexOf("create or replace function public.abort_production_staged_release"),
   sql.indexOf("revoke all on function public.abort_production_staged_release"),
 );
+const baseBody = baseSql.slice(
+  baseSql.indexOf("create or replace function public.abort_production_staged_release"),
+  baseSql.indexOf("revoke all on function public.abort_production_staged_release"),
+);
+
+test("additive migration relaxes only the certified rolled-back fingerprint predicate", () => {
+  const normalize = (value) => value
+    .replace(/--.*$/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const expected = baseBody.replace(
+    "or activation.read_source_fingerprint is not null",
+    `or (
+       activation.read_source_fingerprint is not null
+       and activation.read_source_fingerprint
+         is distinct from activation.expected_source_fingerprint
+     )`,
+  );
+  assert.equal(normalize(body), normalize(expected));
+  assert.match(
+    body,
+    /activation\.expected_source_fingerprint[\s\S]*is distinct from source_fingerprint_value/i,
+  );
+  assert.match(
+    body,
+    /activation\.read_cutover_phase <> 'STATIC_BACKEND'[\s\S]*activation\.read_source_fingerprint is not null[\s\S]*is distinct from activation\.expected_source_fingerprint/i,
+  );
+  assert.doesNotMatch(body, /a4f79ec3711bf0f5912bf1663a5ca019c3cd6e1a048e985c4b74ac1981a21d80/i);
+});
 
 test("staged-release abort is installation-inert and service-role only", () => {
   const installation = sql.slice(0, sql.indexOf("create or replace function"));
