@@ -4305,7 +4305,7 @@ function operationDefaults(manifest, operation) {
       contract_version: "production-cutover-read-sources-v1", operation: "SET_READ_CUTOVER",
       phase: "READ_CUTOVER", read_state: "SUPABASE", source_matrix_fingerprint: evidence.reconciliationFingerprint,
     };
-    case "identity": return { contract_version: "production-participant-identity-cutover-v1", phase: "IDENTITY" };
+    case "identity": return { contract_version: "production-participant-identity-cutover-v2", phase: "IDENTITY" };
     case "arm-legacy-admission": return { expected_epoch_id: state.authorityGeneration };
     case "record-provider-fence": return {
       operation: "RECORD_PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE",
