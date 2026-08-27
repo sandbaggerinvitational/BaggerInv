@@ -72,6 +72,7 @@ const REHEARSAL_ACL_ACTIONS = new Map([
 ]);
 const REHEARSAL_WAF_EXECUTOR_ACTIONS = new Map([
   ["install-vercel-waf-provider-fence", "INSTALL"],
+  ["reattest-vercel-waf-provider-fence", "REATTEST"],
   ["restore-vercel-waf-provider-baseline", "RESTORE"],
 ]);
 const INPUT_KEYS = new Set([
@@ -88,6 +89,7 @@ const INPUT_KEYS = new Set([
   "providerAttestation", "rehearsalRunId", "rehearsalRequestId", "routingRule",
   "providerRetainedChallenge", "abandonRequestId",
   "criticalWafEpochId",
+  "criticalWafObservationId", "criticalWafQuiesceStage",
 ]);
 
 async function authorize(request) {
@@ -591,6 +593,16 @@ function exactExecutionInput(input, action) {
   return { ...input, action };
 }
 
+function exactWafExecutorInput(input, action) {
+  return {
+    action,
+    criticalWafEpochId: input.criticalWafEpochId,
+    fenceId: input.fenceId,
+    operationRequestId: input.operationRequestId,
+    quiescePurpose: "REHEARSAL",
+  };
+}
+
 async function inspectOwnerFingerprint(input, dependencies) {
   const inspectionInput = exactExecutionInput(input, "inspect");
   const result = await executeProductionGoogleWriterProviderFence(
@@ -850,8 +862,8 @@ export async function POST(request) {
         throw error;
       }
       result = await executeProductionVercelWafProviderAction(
-        exactExecutionInput(
-          { ...input, quiescePurpose: "REHEARSAL" },
+        exactWafExecutorInput(
+          input,
           REHEARSAL_WAF_EXECUTOR_ACTIONS.get(action),
         ),
         {

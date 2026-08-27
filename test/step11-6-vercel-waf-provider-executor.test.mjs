@@ -22,6 +22,7 @@ if (!childMode) {
     assert.deepEqual(JSON.parse(child.stdout), {
       ambiguousResponseRecoveredWithoutSecondPatch: true,
       exactProviderResponseRecorded: true,
+      exactReattestationReadback: true,
       exactRestorationReadback: true,
       providerRejectionDurableAndNonReplayable: true,
       routeAndClientBoundaryPinned: true,
@@ -112,6 +113,7 @@ if (!childMode) {
     let draftRule = null;
     let failedPostPatchRead = false;
     let finalized = 0;
+    let reattestations = 0;
     const dispatches = new Map();
     const signedResults = [];
     const requests = [];
@@ -225,6 +227,8 @@ if (!childMode) {
             evidence.runOwnedInsertDocumentFingerprint,
           providerAssignedRuleId: "",
           criticalSemanticConfigurationFingerprint: "",
+          criticalActiveObservationId: "",
+          latestCriticalReattestObservationId: "",
           baselineRestoredObservationId: "",
         };
         return inspect();
@@ -294,6 +298,32 @@ if (!childMode) {
           providerResultObservationId: observationId,
         };
       },
+      recordCriticalWafReattestation: async (details) => {
+        const signed = details.evidenceEnvelope.evidence;
+        assert.equal(signed.stage, "CRITICAL_REATTEST");
+        assert.equal(signed.wafEpochId, epochId);
+        assert.equal(signed.providerAssignedRuleId,
+          epoch.providerAssignedRuleId);
+        assert.equal(signed.baselineEvidenceId,
+          acceptedEvidenceId("baseline-evidence"));
+        assert.equal(signed.criticalEvidenceId,
+          acceptedEvidenceId("critical-active-evidence"));
+        assert.equal(signed.semanticConfigurationFingerprint,
+          epoch.criticalSemanticConfigurationFingerprint);
+        assert.equal(details.evidenceRequest.transitionRequestId,
+          operationRequestId);
+        assert.match(details.observationRequestId,
+          /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+        reattestations += 1;
+        signedResults.push(structuredClone(signed));
+        epoch.latestCriticalReattestObservationId =
+          "70000000-0000-4000-8000-000000000001";
+        return {
+          ...inspect(),
+          criticalReattestObservationId:
+            epoch.latestCriticalReattestObservationId,
+        };
+      },
       finalizeWafBaselineRestore: async (details) => {
         assert.equal(details.fenceId, fenceId);
         assert.equal(details.baselineRestoredObservationId,
@@ -303,6 +333,11 @@ if (!childMode) {
       },
     });
     return {
+      bindFence: () => {
+        assert.equal(epoch.status, "ACTIVE_UNBOUND");
+        epoch.status = "FENCE_BOUND";
+        epoch.boundFenceId = fenceId;
+      },
       control,
       dispatches,
       env: baseEnv,
@@ -310,6 +345,7 @@ if (!childMode) {
       finalized: () => finalized,
       now: () => now,
       providerResponse,
+      reattestations: () => reattestations,
       requests,
       signedResults,
     };
@@ -331,9 +367,21 @@ if (!childMode) {
       now: fixture.now,
     });
 
+  function acceptedEvidenceId(label) {
+    const chars = createHash("sha256")
+      .update(`BAGGER_VERCEL_WAF_EXECUTOR_V1\n${epochId}\n${label}`)
+      .digest("hex").slice(0, 32).split("");
+    chars[12] = "4";
+    chars[16] = ["8", "9", "a", "b"][Number.parseInt(chars[16], 16) % 4];
+    const id = chars.join("");
+    return `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-` +
+      `${id.slice(16, 20)}-${id.slice(20)}`;
+  }
+
   const accepted = harness();
   const installed = await call(accepted, "INSTALL");
   assert.equal(installed.wafEpoch.criticalWindowActive, true);
+  assert.equal(installed.wafEpoch.criticalActiveConfigurationVersion, "11");
   const insertTarget = accepted.signedResults.find((item) =>
     item.dispatchStep === "CRITICAL_RULE_INSERT" &&
       item.outcomeStatus === "TARGET_CONFIRMED");
@@ -345,6 +393,31 @@ if (!childMode) {
     createHash("sha256").update(
       attestation.canonicalAttestationJson(accepted.providerResponse),
     ).digest("hex"));
+  const beforeReattestRequests = accepted.requests.length;
+  await assert.rejects(() => call(accepted, "REATTEST"), {
+    code: "STEP11_6_VERCEL_WAF_EXECUTOR_REATTEST_STATE_INVALID",
+  });
+  assert.equal(accepted.requests.length, beforeReattestRequests);
+  accepted.bindFence();
+  const reattested = await call(accepted, "REATTEST");
+  assert.equal(reattested.providerReadbackVerified, true);
+  assert.equal(reattested.providerMutationCoupled, false);
+  assert.equal(reattested.idempotent, false);
+  assert.equal(reattested.wafEpoch.criticalActiveObservationId,
+    "50000000-0000-4000-8000-000000000001");
+  assert.equal(reattested.wafEpoch.criticalReattestObservationId,
+    "70000000-0000-4000-8000-000000000001");
+  assert.equal(reattested.wafEpoch.latestCriticalReattestObservationId,
+    "70000000-0000-4000-8000-000000000001");
+  assert.equal(accepted.reattestations(), 1);
+  assert.equal(accepted.requests.length, beforeReattestRequests + 1);
+  assert.equal(accepted.requests.at(-1).method, "GET");
+  const reattestRetry = await call(accepted, "REATTEST");
+  assert.equal(reattestRetry.idempotent, true);
+  assert.equal(reattestRetry.wafEpoch.criticalReattestObservationId,
+    reattested.wafEpoch.criticalReattestObservationId);
+  assert.equal(accepted.reattestations(), 1);
+  assert.equal(accepted.requests.length, beforeReattestRequests + 1);
   const restored = await call(accepted, "RESTORE", { fenceId });
   assert.equal(restored.wafEpoch.baselineRestored, true);
   assert.equal(accepted.finalized(), 1);
@@ -411,12 +484,17 @@ if (!childMode) {
   );
   assert.match(moduleSource, /^import "server-only";/);
   assert.match(routeSource, /install-vercel-waf-provider-fence/);
+  assert.match(routeSource, /reattest-vercel-waf-provider-fence/);
   assert.match(routeSource, /restore-vercel-waf-provider-baseline/);
+  assert.match(routeSource, /exactWafExecutorInput/);
+  assert.match(routeSource, /criticalWafObservationId/);
+  assert.match(routeSource, /criticalWafQuiesceStage/);
   assert.doesNotMatch(routeSource, /PRODUCTION_VERCEL_WAF_EXECUTOR_TOKEN/);
 
   console.log(JSON.stringify({
     ambiguousResponseRecoveredWithoutSecondPatch: true,
     exactProviderResponseRecorded: true,
+    exactReattestationReadback: true,
     exactRestorationReadback: true,
     providerRejectionDurableAndNonReplayable: true,
     routeAndClientBoundaryPinned: true,

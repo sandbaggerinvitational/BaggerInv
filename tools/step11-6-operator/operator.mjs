@@ -909,7 +909,7 @@ export function productionHistoricalWriterScopeBinding() {
   return historicalWriterScopeBinding;
 }
 
-const ACL_V2_ACCEPTANCE_KEYS = Object.freeze([
+export const ACL_V2_ACCEPTANCE_KEYS = Object.freeze([
   "artifactPath", "schemaVersion", "acceptanceFingerprint",
   "acceptedAsPrimaryProof",
   "unexplainedConcurrencyWindowCount", "historicalWriterScopeArtifact",
@@ -982,7 +982,7 @@ function loadAclV2AcceptanceArtifact() {
   }
 }
 
-function validateAclV2Acceptance(manifest) {
+export function validateAclV2Acceptance(manifest) {
   const acceptance = requireObject(manifest.aclV2Acceptance,
     "ACL_V2_ACCEPTANCE_REQUIRED", "aclV2Acceptance");
   if (!exactObjectKeys(acceptance, ACL_V2_ACCEPTANCE_KEYS)) {
