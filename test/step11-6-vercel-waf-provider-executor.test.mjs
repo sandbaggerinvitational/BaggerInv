@@ -88,7 +88,10 @@ if (!childMode) {
       ownerId: teamId,
       firewallEnabled: true,
       ips: [],
-      crs: [],
+      crs: {
+        gen: { active: true, action: "log" },
+        sqli: { active: true, action: "log" },
+      },
       changes: [{ action: "active.read" }],
       projectKey: "bagger-inv-active",
       updatedAt: new Date(now - 2_000).toISOString(),
