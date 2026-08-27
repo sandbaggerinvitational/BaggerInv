@@ -107,7 +107,8 @@ if (!childMode) {
     };
   }
 
-  function harness({ patchMode = "accepted", failPostPatchRead = false } = {}) {
+  function harness({ patchMode = "accepted", failPostPatchRead = false,
+    versionReadMismatch = false } = {}) {
     let epoch = null;
     let phase = "BASELINE";
     let draftRule = null;
@@ -156,13 +157,28 @@ if (!childMode) {
       assert.equal(url.searchParams.get("projectId"), PRODUCTION_VERCEL_PROJECT_ID);
       assert.equal(url.searchParams.get("teamId"), teamId);
       if (init.method === "GET") {
-        if (failPostPatchRead && phase === "DRAFT" && !failedPostPatchRead) {
+        if (failPostPatchRead && phase === "DRAFT" && !failedPostPatchRead &&
+            url.pathname === "/v1/security/firewall/config") {
           failedPostPatchRead = true;
           return new Response(JSON.stringify({ error: "temporary" }), {
             status: 503,
           });
         }
-        return new Response(JSON.stringify(readback()), { status: 200 });
+        const currentReadback = readback();
+        if (url.pathname === "/v1/security/firewall/config") {
+          return new Response(JSON.stringify(currentReadback), { status: 200 });
+        }
+        assert.equal(url.pathname,
+          `/v1/security/firewall/config/${currentReadback.active.version}`);
+        const versionReadback = versionReadMismatch
+          ? {
+            ...currentReadback.activeVersion,
+            ownerId: "team_WrongScope123456789",
+          }
+          : currentReadback.activeVersion;
+        return new Response(JSON.stringify(versionReadback), {
+          status: 200,
+        });
       }
       if (init.method === "PATCH") {
         assert.equal(url.pathname, "/v1/security/firewall/config/draft");
@@ -410,14 +426,17 @@ if (!childMode) {
   assert.equal(reattested.wafEpoch.latestCriticalReattestObservationId,
     "70000000-0000-4000-8000-000000000001");
   assert.equal(accepted.reattestations(), 1);
-  assert.equal(accepted.requests.length, beforeReattestRequests + 1);
-  assert.equal(accepted.requests.at(-1).method, "GET");
+  assert.equal(accepted.requests.length, beforeReattestRequests + 2);
+  assert.equal(accepted.requests.at(-2).pathname,
+    "/v1/security/firewall/config");
+  assert.equal(accepted.requests.at(-1).pathname,
+    "/v1/security/firewall/config/11");
   const reattestRetry = await call(accepted, "REATTEST");
   assert.equal(reattestRetry.idempotent, true);
   assert.equal(reattestRetry.wafEpoch.criticalReattestObservationId,
     reattested.wafEpoch.criticalReattestObservationId);
   assert.equal(accepted.reattestations(), 1);
-  assert.equal(accepted.requests.length, beforeReattestRequests + 1);
+  assert.equal(accepted.requests.length, beforeReattestRequests + 2);
   const restored = await call(accepted, "RESTORE", { fenceId });
   assert.equal(restored.wafEpoch.baselineRestored, true);
   assert.equal(accepted.finalized(), 1);
@@ -461,6 +480,13 @@ if (!childMode) {
     routingRule: { action: "block" },
   }), { code: "STEP11_6_VERCEL_WAF_EXECUTOR_INPUT_INVALID" });
   assert.equal(refused.requests.length, 0);
+
+  const mismatchedVersionRead = harness({ versionReadMismatch: true });
+  await assert.rejects(() => call(mismatchedVersionRead, "INSTALL"), {
+    code: "STEP11_6_VERCEL_WAF_EXECUTOR_READBACK_VERSION_MISMATCH",
+  });
+  assert.equal(mismatchedVersionRead.requests.some((item) =>
+    item.method === "PATCH"), false);
   await assert.rejects(() => executor.executeProductionVercelWafProviderAction({
     action: "INSTALL",
     criticalWafEpochId: epochId,
