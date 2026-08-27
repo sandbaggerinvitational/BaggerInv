@@ -141,7 +141,10 @@ function firewall({
     ownerId: teamId,
     firewallEnabled: true,
     ips: [],
-    crs: [],
+    crs: {
+      gen: { active: true, action: "log" },
+      sqli: { active: true, action: "log" },
+    },
     changes: [{ action: "active.read" }],
     projectKey: "bagger-inv-active",
     updatedAt: "2026-08-27T02:00:00.000Z",
@@ -234,7 +237,10 @@ function baselineFirewall({ version = "10" } = {}) {
     ownerId: teamId,
     firewallEnabled: true,
     ips: [],
-    crs: [],
+    crs: {
+      gen: { active: true, action: "log" },
+      sqli: { active: true, action: "log" },
+    },
     changes: [{ action: "active.read" }],
     projectKey: "bagger-inv-active",
     updatedAt: "2026-08-27T02:00:00.000Z",
