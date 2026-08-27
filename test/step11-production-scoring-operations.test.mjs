@@ -151,12 +151,14 @@ test("Production workers are lease-bound, inspectable, dormant, service-role-onl
   }
 });
 
-test("Google scoring/archive writers require the dedicated Production credential context", () => {
+test("Google scoring/archive workers stay dedicated while canonical legacy is fenceable", () => {
   assert.match(outboxWorker, /operation: "SCORING_GOOGLE_OUTBOX"/);
   assert.match(archiveWorker, /operation: "ROUND_SCORECARDS_ARCHIVE"/);
   assert.match(outboxWorker, /production-google-service-account-server/);
   assert.match(archiveWorker, /production-google-service-account-server/);
-  assert.match(googleWriter, /credentialSource === "production-worker"/);
+  assert.match(googleWriter, /\["production-worker", "legacy-canonical"\]\.includes/);
+  assert.match(googleWriter, /credential\.credentialSource === "legacy-canonical"/);
+  assert.match(googleWriter, /credential\.operation === "CANONICAL_LEGACY_V2"/);
   assert.match(googleWriter, /PRODUCTION_GOOGLE_WRITE_CONTEXT_FORBIDDEN/);
   assert.match(googleWriter, /mirrorCanonicalLiveMatchControl/);
   assert.doesNotMatch(outboxWorker, /GOOGLE_SERVICE_ACCOUNT_EMAIL|GOOGLE_PRIVATE_KEY/);

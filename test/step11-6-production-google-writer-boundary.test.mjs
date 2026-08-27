@@ -4,8 +4,13 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
+import { productionGoogleDrivePrincipalFingerprint } from
+  "../lib/google-service-account-credential-context.js";
+
 const root = path.resolve(new URL("..", import.meta.url).pathname);
 const read = (relative) => readFile(path.join(root, relative), "utf8");
+const legacyPrincipal = (email) =>
+  productionGoogleDrivePrincipalFingerprint(email);
 
 async function javascriptFiles(directory) {
   const absolute = path.join(root, directory);
@@ -137,16 +142,43 @@ test("server-only admission capabilities and generic low-level scopes have a clo
       subordinateCanonicalWriterImporters.push(relative);
     }
   }
-  assert.deepEqual(capabilityImporters.sort(), [
-    "lib/google-workbook-mutation-intent.js",
-    "lib/production-cutover-scoring-ingress.js",
-  ]);
+  assert.deepEqual(capabilityImporters, []);
   const ingress = await read("lib/production-cutover-scoring-ingress.js");
   const intent = await read("lib/google-workbook-mutation-intent.js");
-  assert.match(ingress, /import\s*\{[^}]*registerProductionGoogleAdmissionCapability[^}]*revokeProductionGoogleAdmissionCapability[^}]*\}\s*from\s*["']\.\/production-google-admission-capability\.js["']/s);
+  const capability = await read("lib/production-google-admission-capability.js");
+  assert.doesNotMatch(ingress, /from\s*["']\.\/production-google-admission-capability\.js["']/);
   assert.doesNotMatch(ingress, /import\s*\(\s*["']\.\/production-google-admission-capability\.js["']\s*\)/);
-  assert.match(intent, /import\s*\(\s*["']\.\/production-google-admission-capability\.js["']\s*\)/);
+  assert.match(intent, /import\s*\(\s*["']\.\/production-cutover-scoring-ingress\.js["']\s*\)/);
   assert.doesNotMatch(intent, /from\s*["']\.\/production-google-admission-capability\.js["']/);
+  assert.doesNotMatch(capability, /export\s/);
+  assert.doesNotMatch(capability, /registerProductionGoogleAdmissionCapability|canonicalAdmissionCapabilities/);
+  assert.match(ingress, /function captureProductionGoogleAdmissionBeginMonotonic\(/);
+  assert.match(ingress, /function registerProductionGoogleAdmissionCapability\(/);
+  assert.match(ingress, /function revokeProductionGoogleAdmissionCapability\(/);
+  assert.doesNotMatch(ingress, /export function (?:capture|register|revoke)ProductionGoogleAdmission/);
+  assert.doesNotMatch(ingress,
+    /export async function (?:begin|mark|report)ProductionGoogleAuthorityWrite/);
+  assert.doesNotMatch(intent, /export function currentGoogleWorkbookMutationIntent/);
+  assert.match(ingress,
+    /PRODUCTION_SCORING_OUTCOME_BEFORE_CAPABILITY_REVOCATION_FORBIDDEN/);
+  assert.match(ingress,
+    /!revokedCanonicalAdmissions\.has\(admission\)[\s\S]*canonicalAdmissionCapabilities\.has\(admission\)/);
+  assert.match(ingress, /performance\.now\(\)/);
+  assert.match(ingress, /beginDispatchDeadline/);
+  assert.match(ingress, /markDispatchDeadline/);
+  assert.match(ingress, /remaining_dispatch_ms/);
+  assert.doesNotMatch(ingress, /Date\.now\(\)/);
+  assert.match(ingress, /productionControlPlaneFetch = globalThis\.fetch\.bind\(globalThis\)/);
+  assert.match(ingress, /trustedControlPlaneDependencyBundles = new WeakSet\(\)/);
+  assert.match(ingress, /function normalizeTrustedControlPlaneDependencies\(/);
+  assert.match(ingress, /Object\.getOwnPropertyDescriptors\(candidate\)/);
+  assert.match(ingress, /trustedControlPlaneDependencyBundles\.has\(options\)/);
+  assert.match(ingress, /PRODUCTION_SCORING_CONTROL_PLANE_TEST_OVERRIDE_FORBIDDEN/);
+  assert.match(ingress, /NODE_TEST_CONTEXT\) === "child-v8"/);
+  assert.match(ingress, /suppliedEnv !== undefined && suppliedEnv !== process\.env/);
+  assert.doesNotMatch(ingress, /\.\.\.options|options\.(?:env|fetchImpl|timeoutMs)/);
+  assert.match(ingress, /captureProductionGoogleAdmissionBeginMonotonic\(\)[\s\S]*productionScoringIngressRpc\(V3_RPCS\.BEGIN/);
+  assert.doesNotMatch(ingress, /leaseExpiryFuture|clientNow\s*=\s*Date\.now/);
   for (const source of [ingress, intent]) {
     assert.doesNotMatch(source, /export\s+(?:\*|\{[^}]*\})\s+from\s+["'][^"']*production-google-admission-capability\.js["']/s);
   }
@@ -188,7 +220,7 @@ test("inventory and route sources preserve distinct canonical, authoring, and mi
   assert.match(archive, /ROUND_SCORECARDS_ARCHIVE/);
   assert.match(oddsMirror, /ODDS_GOOGLE_MIRROR/);
   for (const source of [cms, guide, odds, passport, outbox, archive, oddsMirror]) {
-    assert.doesNotMatch(source, /begin_production_scoring_ingress_v2|mark_production_scoring_ingress_write_started|report_production_scoring_ingress_outcome/);
+    assert.doesNotMatch(source, /begin_production_scoring_ingress_v3|mark_production_scoring_ingress_write_started|report_production_scoring_ingress_outcome/);
   }
 });
 
@@ -206,7 +238,6 @@ test("the sole low-level Sheets transport enforces intent before credentials or 
   assert.deepEqual(directTransportFiles, [
     "lib/google-sheets-server-read.js",
     "lib/google-sheets-write.js",
-    "lib/production-google-writer-fence-rehearsal.js",
   ]);
   const readTransport = await read("lib/google-sheets-server-read.js");
   assert.match(readTransport, /spreadsheets\.readonly/);
@@ -214,15 +245,20 @@ test("the sole low-level Sheets transport enforces intent before credentials or 
   assert.doesNotMatch(sheetsReadRequest, /method\s*:\s*["'](?:POST|PUT|PATCH|DELETE)["']/);
   assert.doesNotMatch(readTransport, /prepareGoogleWorkbookMutation|confirmGoogleWorkbookMutation/);
   const fenceRehearsal = await read("lib/production-google-writer-fence-rehearsal.js");
-  assert.match(fenceRehearsal, /PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_REHEARSAL_ENABLED/);
-  assert.match(fenceRehearsal, /requestingUserCanEdit/);
-  assert.doesNotMatch(fenceRehearsal, /updateCells|values:batchUpdate|deleteSheet|updateSheetProperties/);
+  assert.doesNotMatch(fenceRehearsal, /addProtectedRange|deleteProtectedRange/);
   const guardIndex = writer.indexOf("await prepareGoogleWorkbookMutation");
   const credentialIndex = writer.indexOf("token = await accessToken", guardIndex);
+  const writerStartIndex = writer.indexOf("await mutation?.prepareDispatch?.()", credentialIndex);
+  const credentialBindingIndex = writer.indexOf(
+    "assertProductionGoogleServiceAccountMutationBinding({",
+    writerStartIndex,
+  );
   const dispatchGuardIndex = writer.indexOf("mutation?.assertDispatch?.()", credentialIndex);
-  const fetchIndex = writer.indexOf("await fetch(`${target.apiBase}", guardIndex);
-  assert.ok(guardIndex >= 0 && credentialIndex > guardIndex && dispatchGuardIndex > credentialIndex &&
+  const fetchIndex = writer.indexOf("responsePromise = fetch(`${target.apiBase}", guardIndex);
+  assert.ok(guardIndex >= 0 && credentialIndex > guardIndex && writerStartIndex > credentialIndex &&
+    credentialBindingIndex > writerStartIndex && dispatchGuardIndex > credentialBindingIndex &&
     fetchIndex > dispatchGuardIndex);
+  assert.doesNotMatch(writer.slice(credentialBindingIndex, fetchIndex), /await/);
   assert.match(writer, /assertProductionGoogleServiceAccountMutationBinding/);
   assert.match(intent, /PRODUCTION_GOOGLE_MUTATION_INTENT_REQUIRED/);
   assert.match(intent, /PRODUCTION_GOOGLE_MUTATION_SHEET_REQUIRED/);
@@ -233,9 +269,191 @@ test("the sole low-level Sheets transport enforces intent before credentials or 
   assert.match(writer, /mutationSheets:\s*\["Round Scorecards"\]/);
   assert.match(credential, /CANONICAL_LEGACY_V2/);
   assert.match(credential, /credentialsSeparated/);
+  assert.match(credential, /google-drive-permission-principal-v1\\nuser\\n/);
+  assert.match(credential, /cacheKey:\s*\{ value: `\$\{source\}:\$\{principalFingerprint\}`/);
+  const ingress = await read("lib/production-cutover-scoring-ingress.js");
+  assert.match(ingress, /expected_provider_principal_fingerprint/);
+  assert.match(ingress, /provider_principal_fingerprint/);
+  assert.match(ingress, /providerPrincipalFingerprint === state\.providerPrincipalFingerprint/);
+  assert.match(ingress,
+    /returnedPrincipalFingerprint === admission\.providerPrincipalFingerprint/);
 });
 
-test("v2 canonical boundary has no v1 completion-success escape", async () => {
+test("the private Sheets transport dynamically marks WRITE_STARTED after OAuth and before every canonical provider write", () => {
+  const ingressUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
+  const writerUrl = new URL("../lib/google-sheets-write.js", import.meta.url).href;
+  const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
+  const activationUrl = new URL("../lib/production-cutover-activation-contract.js", import.meta.url).href;
+  const script = `
+    import { generateKeyPairSync } from "node:crypto";
+    import { withProductionGoogleAuthorityWrite } from ${JSON.stringify(ingressUrl)};
+    import { updateLiveMatch } from ${JSON.stringify(writerUrl)};
+    import { PRODUCTION_GOOGLE_WORKBOOK_ID, PRODUCTION_SUPABASE_PROJECT_REF, PRODUCTION_SUPABASE_URL } from ${JSON.stringify(foundationUrl)};
+    import { PRODUCTION_VERCEL_PROJECT_ID } from ${JSON.stringify(activationUrl)};
+
+    const { privateKey: legacyPrivateKey } = generateKeyPairSync("rsa", {
+      modulusLength: 2048,
+      privateKeyEncoding: { type: "pkcs8", format: "pem" },
+      publicKeyEncoding: { type: "spki", format: "pem" },
+    });
+    const { privateKey: productionPrivateKey } = generateKeyPairSync("rsa", {
+      modulusLength: 2048,
+      privateKeyEncoding: { type: "pkcs8", format: "pem" },
+      publicKeyEncoding: { type: "spki", format: "pem" },
+    });
+    const authorityGeneration = "11111111-1111-4111-8111-111111111111";
+    const admissionGeneration = "22222222-2222-4222-8222-222222222222";
+    const leaseId = "33333333-3333-4333-8333-333333333333";
+    const commit = "a".repeat(40);
+    const env = {
+      VERCEL_ENV: "production", VERCEL_PROJECT_NAME: "bagger-inv", VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID,
+      VERCEL_GIT_COMMIT_SHA: commit, VERCEL_DEPLOYMENT_ID: "dpl_12345678Test",
+      PRODUCTION_FOUNDATION_ENABLED: "true", PRODUCTION_CUTOVER_ACTIVATION_ENABLED: "true",
+      PRODUCTION_CUTOVER_PHASE: "STATIC_BACKEND", PRODUCTION_CUTOVER_EXPECTED_COMMIT_SHA: commit,
+      PRODUCTION_CUTOVER_EXPECTED_VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID,
+      PRODUCTION_CANONICAL_DOMAIN: "https://baggerinv.com", PRODUCTION_CUTOVER_TOURNAMENT_ID: "2026",
+      PRODUCTION_CUTOVER_TOURNAMENT_YEAR: "2026", PRODUCTION_SUPABASE_PROJECT_REF, PRODUCTION_SUPABASE_URL,
+      PRODUCTION_SUPABASE_SECRET_KEY: "sb_secret_" + "x".repeat(32), GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID,
+      SCORING_AUTHORITY: "google", PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
+      PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: authorityGeneration,
+      PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: admissionGeneration,
+      PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+      PRODUCTION_GOOGLE_PRIVATE_KEY: productionPrivateKey,
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid", GOOGLE_PRIVATE_KEY: legacyPrivateKey,
+    };
+    Object.assign(process.env, env);
+    const request = { method: "POST", url: "https://baggerinv.com/api/live-matches", headers: new Headers({
+      host: "baggerinv.com", origin: "https://baggerinv.com", "x-forwarded-host": "baggerinv.com", "x-forwarded-proto": "https",
+    }) };
+    const events = [];
+    const reports = [];
+    let expiresAt = "";
+    const controlFetch = async (url, init = {}) => {
+      const functionName = String(url).split("/").at(-1);
+      const input = JSON.parse(init.body).input;
+      events.push("rpc:" + functionName);
+      if (functionName === "inspect_production_scoring_admission") return Response.json({ ok: true,
+        activation_revision: 11, admission_revision: 7, authority_generation_id: authorityGeneration,
+        admission_generation_id: admissionGeneration, deployment_id: env.VERCEL_DEPLOYMENT_ID,
+        authority: "GOOGLE", admission_state: "OPEN", contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      if (functionName === "begin_production_scoring_ingress_v3") {
+        expiresAt = new Date(Date.now() + 180_000).toISOString();
+        return Response.json({ ok: true, lease_id: leaseId, lease_nonce: input.lease_nonce,
+          authority_generation_id: authorityGeneration, admission_generation_id: admissionGeneration,
+          writer_intent: "CANONICAL_LEGACY", operation_request_id: input.operation_request_id,
+          contract_version: "ADMISSION_V3", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+          provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+          provider_dispatch_must_begin_before_expires_at: true, expires_at: expiresAt,
+          remaining_dispatch_ms: 179_000, replay_usable: true });
+      }
+      if (functionName === "mark_production_scoring_ingress_write_started_v3") return Response.json({
+        ok: true, lease_id: leaseId, lease_nonce: input.lease_nonce,
+        operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+        provider_dispatch_must_begin_before_expires_at: true, expires_at: expiresAt,
+        remaining_dispatch_ms: 178_000,
+        write_started_at: new Date().toISOString(), resolution_state: "WRITE_STARTED",
+      });
+      if (functionName === "report_production_scoring_ingress_outcome") {
+        reports.push(input);
+        return Response.json({ ok: true, resolution_state: input.outcome_state,
+          lease_id: input.lease_id, lease_nonce: input.lease_nonce,
+          operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+          provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+          provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      }
+      return Response.json({ code: "FUNCTION_NOT_FOUND" }, { status: 404 });
+    };
+    const sheetHeaders = {
+      "Live Matches": ["Match ID", "Notes", "Updated At", "Updated By", "Finalized At", "Finalized By"],
+      "Match Update Log": ["Log ID", "Match ID", "Action", "Previous Value", "New Value", "Updated By", "Updated At"],
+      "Admin Audit Log": ["Audit ID", "Resource", "Record ID", "Action", "Summary", "Previous Value", "New Value", "Updated By", "Updated At"],
+    };
+    const originalFetch = globalThis.fetch;
+    let bearerBound = true;
+    let productionWorkbookBound = true;
+    globalThis.fetch = async (url, init = {}) => {
+      const target = String(url);
+      if (target === "https://oauth2.googleapis.com/token") {
+        events.push("oauth");
+        return Response.json({ access_token: "synthetic-legacy-token", expires_in: 3600 });
+      }
+      if (!target.startsWith("https://sheets.googleapis.com/v4/spreadsheets/")) {
+        throw new Error("Unexpected network target: " + target);
+      }
+      productionWorkbookBound &&= target.includes("/" + PRODUCTION_GOOGLE_WORKBOOK_ID);
+      bearerBound &&= init.headers?.authorization === "Bearer synthetic-legacy-token";
+      const method = String(init.method || "GET").toUpperCase();
+      if (method !== "GET") {
+        events.push("sheets:write");
+        return Response.json({ totalUpdatedCells: 1 });
+      }
+      events.push("sheets:read");
+      const decoded = decodeURIComponent(target);
+      if (target.includes("/values:batchGet?")) {
+        const ranges = new URL(target).searchParams.getAll("ranges");
+        return Response.json({ valueRanges: ranges.map((range) => ({ range, values: [["2026-R1-1"]] })) });
+      }
+      for (const [tab, headers] of Object.entries(sheetHeaders)) {
+        if (decoded.includes(tab + "!A:ZZ")) {
+          return Response.json({ values: tab === "Live Matches"
+            ? [headers, ["2026-R1-1", "before", "2026-08-26T00:00:00.000Z", "CB01", "", ""]]
+            : [headers] });
+        }
+      }
+      if (target.endsWith("/" + PRODUCTION_GOOGLE_WORKBOOK_ID)) {
+        return Response.json({ sheets: Object.keys(sheetHeaders).map((title, index) => ({
+          properties: { title, sheetId: index + 1, gridProperties: { rowCount: 10, columnCount: sheetHeaders[title].length } },
+        })) });
+      }
+      throw new Error("Unexpected Sheets read: " + target);
+    };
+    let failureCode = "";
+    try {
+      await withProductionGoogleAuthorityWrite({
+        tournamentId: "2026", matchId: "2026-R1-1", actorId: "CB01", request,
+        operation: "LIVE_MATCHES:UPDATE", operationRequestId: "44444444-4444-4444-8444-444444444444",
+        scoringAuthorityContract: { version: "scoring-mutation-authority-v1", scoringAuthority: "google",
+          authorityGeneration, admissionGeneration, activationRevision: 11, admissionRevision: 7,
+          deploymentId: env.VERCEL_DEPLOYMENT_ID, deploymentCommit: commit },
+      }, () => updateLiveMatch("2026-R1-1", { Notes: "chronology-test" }, "CB01"), { env, fetchImpl: controlFetch });
+    } catch (error) {
+      failureCode = error.code || error.message;
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+    process.stdout.write(JSON.stringify({ events, reports: reports.map((input) => input.outcome_state),
+      failureCode, bearerBound, productionWorkbookBound }));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: root, encoding: "utf8",
+  });
+  assert.equal(child.status, 0, child.stderr);
+  const evidence = JSON.parse(child.stdout);
+  const inspectIndex = evidence.events.indexOf("rpc:inspect_production_scoring_admission");
+  const beginIndex = evidence.events.indexOf("rpc:begin_production_scoring_ingress_v3");
+  const oauthIndex = evidence.events.indexOf("oauth");
+  const markerIndex = evidence.events.indexOf("rpc:mark_production_scoring_ingress_write_started_v3");
+  const firstWriteIndex = evidence.events.indexOf("sheets:write");
+  const reportIndex = evidence.events.indexOf("rpc:report_production_scoring_ingress_outcome");
+  assert.ok(inspectIndex >= 0 && beginIndex > inspectIndex && oauthIndex > beginIndex &&
+    markerIndex > oauthIndex && firstWriteIndex > markerIndex && reportIndex > firstWriteIndex,
+  JSON.stringify(evidence));
+  assert.equal(firstWriteIndex, markerIndex + 1, evidence.events.join(" -> "));
+  assert.equal(evidence.events.filter((event) => event === "rpc:mark_production_scoring_ingress_write_started_v3").length, 1);
+  assert.ok(evidence.events.filter((event) => event === "sheets:write").length >= 3,
+    JSON.stringify(evidence));
+  assert.equal(evidence.events.slice(0, markerIndex).includes("sheets:write"), false);
+  assert.equal(evidence.bearerBound, true);
+  assert.equal(evidence.productionWorkbookBound, true);
+  assert.deepEqual(evidence.reports, ["AMBIGUOUS"]);
+  assert.equal(evidence.failureCode, "PRODUCTION_SCORING_WRITE_AMBIGUOUS_RECONCILIATION_REQUIRED");
+});
+
+test("v3 canonical boundary has no v1 completion-success escape", async () => {
   const [ingress, director, liveMatches, persistence] = await Promise.all([
     read("lib/production-cutover-scoring-ingress.js"),
     read("app/api/director/route.js"),
@@ -244,8 +462,8 @@ test("v2 canonical boundary has no v1 completion-success escape", async () => {
   ]);
   for (const name of [
     "inspect_production_scoring_admission",
-    "begin_production_scoring_ingress_v2",
-    "mark_production_scoring_ingress_write_started",
+    "begin_production_scoring_ingress_v3",
+    "mark_production_scoring_ingress_write_started_v3",
     "report_production_scoring_ingress_outcome",
   ]) assert.match(ingress, new RegExp(name));
   assert.match(ingress, /writer_intent:\s*GOOGLE_WORKBOOK_MUTATION_INTENTS\.CANONICAL_LEGACY/);
@@ -257,7 +475,7 @@ test("v2 canonical boundary has no v1 completion-success escape", async () => {
   }
 });
 
-test("v2 admission fails closed and uses the separate Production credential", () => {
+test("v3 admission fails closed and uses the fenceable legacy credential identity", () => {
   const ingressUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
   const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
   const credentialUrl = new URL("../lib/google-service-account-credential-context.js", import.meta.url).href;
@@ -265,8 +483,10 @@ test("v2 admission fails closed and uses the separate Production credential", ()
   const activationUrl = new URL("../lib/production-cutover-activation-contract.js", import.meta.url).href;
   const script = `
     import { withProductionGoogleAuthorityWrite } from ${JSON.stringify(ingressUrl)};
+    import * as ingressSurface from ${JSON.stringify(ingressUrl)};
     import { certifyGoogleWorkbookMutationReadback, confirmGoogleWorkbookMutation, prepareGoogleWorkbookMutation } from ${JSON.stringify(intentUrl)};
-    import { googleServiceAccountCredentialDiagnostics } from ${JSON.stringify(credentialUrl)};
+    import * as intentSurface from ${JSON.stringify(intentUrl)};
+    import { currentGoogleServiceAccountCredentials, googleServiceAccountCredentialDiagnostics } from ${JSON.stringify(credentialUrl)};
     import { PRODUCTION_GOOGLE_WORKBOOK_ID, PRODUCTION_SUPABASE_PROJECT_REF, PRODUCTION_SUPABASE_URL } from ${JSON.stringify(foundationUrl)};
     import { PRODUCTION_VERCEL_PROJECT_ID } from ${JSON.stringify(activationUrl)};
     const authorityGeneration = "11111111-1111-4111-8111-111111111111";
@@ -287,13 +507,20 @@ test("v2 admission fails closed and uses the separate Production credential", ()
       PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: admissionGeneration,
       PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
       PRODUCTION_GOOGLE_PRIVATE_KEY: "separate-production-key",
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid", GOOGLE_PRIVATE_KEY: "legacy-writer-key",
     };
     const request = { method: "POST", url: "https://baggerinv.com/api/scoring/current", headers: new Headers({
       host: "baggerinv.com", origin: "https://baggerinv.com", "x-forwarded-host": "baggerinv.com", "x-forwarded-proto": "https",
     }) };
     const calls = [];
     let nonce = "";
+    let issuedExpiresAt = "";
     let dispatchGuard;
+    let beginVariant = "VALID";
+    let beginRemainingOverride = null;
+    let markRemainingOverride = null;
+    let callbackSettled = false;
+    const reportAfterCallbackSettlement = [];
     const fetchImpl = async (url, init) => {
       const functionName = url.split("/").at(-1);
       const input = JSON.parse(init.body).input;
@@ -301,34 +528,128 @@ test("v2 admission fails closed and uses the separate Production credential", ()
       if (functionName === "inspect_production_scoring_admission") return Response.json({ ok: true,
         activation_revision: 11, admission_revision: 7, authority_generation_id: authorityGeneration,
         admission_generation_id: admissionGeneration, deployment_id: env.VERCEL_DEPLOYMENT_ID,
-        authority: "GOOGLE", admission_state: "OPEN" });
-      if (functionName === "begin_production_scoring_ingress_v2") { nonce = input.lease_nonce; return Response.json({ ok: true,
-        lease_id: leaseId, authority_generation_id: authorityGeneration, admission_generation_id: admissionGeneration,
-        writer_intent: "CANONICAL_LEGACY", operation_request_id: input.operation_request_id, replay_usable: true }); }
-      if (functionName === "mark_production_scoring_ingress_write_started") return Response.json({ ok: true, resolution_state: "WRITE_STARTED" });
-      if (functionName === "report_production_scoring_ingress_outcome") return Response.json({ ok: true, resolution_state: input.outcome_state });
+        authority: "GOOGLE", admission_state: "OPEN", contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      if (functionName === "begin_production_scoring_ingress_v3") { nonce = input.lease_nonce;
+        issuedExpiresAt = beginVariant === "MISSING_EXPIRY" ? "" : beginVariant === "EXPIRED"
+          ? new Date(Date.now() - 1_000).toISOString()
+          : beginVariant === "UNBOUNDED_EXPIRY" ? new Date(Date.now() + 3_600_000).toISOString()
+            : new Date(Date.now() + 180_000).toISOString();
+        return Response.json({ ok: true,
+        lease_id: leaseId, lease_nonce: input.lease_nonce,
+        authority_generation_id: authorityGeneration, admission_generation_id: admissionGeneration,
+        contract_version: beginVariant === "CONTRACT_MISMATCH" ? "ADMISSION_V2" : "ADMISSION_V3",
+        provider_dispatch_must_begin_before_expires_at: beginVariant !== "DISPATCH_EXPIRY_UNBOUND",
+        writer_intent: "CANONICAL_LEGACY", provider_credential_class: beginVariant === "CLASS_MISMATCH"
+          ? "DEDICATED_PRODUCTION" : "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: beginVariant === "PRINCIPAL_MISMATCH"
+          ? ${JSON.stringify(legacyPrincipal("another-writer@example.invalid"))}
+          : ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+        operation_request_id: input.operation_request_id,
+        remaining_dispatch_ms: beginVariant === "EXPIRED" ? 0
+          : beginVariant === "UNBOUNDED_EXPIRY" ? 3_600_000
+            : beginRemainingOverride ?? 179_000,
+        ...(issuedExpiresAt ? { expires_at: issuedExpiresAt } : {}), replay_usable: true }); }
+      if (functionName === "mark_production_scoring_ingress_write_started_v3") return Response.json({
+        ok: true, lease_id: leaseId, lease_nonce: input.lease_nonce,
+        operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+        provider_dispatch_must_begin_before_expires_at: true,
+        expires_at: issuedExpiresAt,
+        remaining_dispatch_ms: markRemainingOverride ?? 178_000,
+        write_started_at: new Date().toISOString(),
+        resolution_state: "WRITE_STARTED",
+      });
+      if (functionName === "report_production_scoring_ingress_outcome") {
+        reportAfterCallbackSettlement.push(callbackSettled);
+        return Response.json({ ok: true, resolution_state: input.outcome_state,
+          lease_id: input.lease_id, lease_nonce: input.lease_nonce,
+          operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+          provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+          provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      }
       return Response.json({ code: "FUNCTION_NOT_FOUND" }, { status: 404 });
     };
-    const result = await withProductionGoogleAuthorityWrite({ tournamentId: "2026", matchId: "2026-R1-1",
+    const admissionInput = (operationRequestId) => ({ tournamentId: "2026", matchId: "2026-R1-1",
       actorId: "CB01", operation: "PARTICIPANT:SCORE",
-      operationRequestId: "44444444-4444-4444-8444-444444444444",
+      operationRequestId,
       scoringAuthorityContract: { version: "scoring-mutation-authority-v1", scoringAuthority: "google",
         authorityGeneration, admissionGeneration, activationRevision: 11, admissionRevision: 7,
-        deploymentId: env.VERCEL_DEPLOYMENT_ID, deploymentCommit: commit }, request }, async () => {
+        deploymentId: env.VERCEL_DEPLOYMENT_ID, deploymentCommit: commit }, request });
+    const result = await withProductionGoogleAuthorityWrite(
+      admissionInput("44444444-4444-4444-8444-444444444444"), async () => {
         const credential = googleServiceAccountCredentialDiagnostics();
-        const first = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"], env });
-        first.assertDispatch();
-        const second = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Matches"], env });
-        second.assertDispatch();
+        const selected = currentGoogleServiceAccountCredentials(env);
+        const originalDateNow = Date.now;
+        Date.now = () => originalDateNow() + 365 * 24 * 60 * 60 * 1000;
+        let first;
+        let second;
+        try {
+          first = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"], env });
+          await first.prepareDispatch();
+          first.assertDispatch();
+          second = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Matches"], env });
+          await second.prepareDispatch();
+          second.assertDispatch();
+        } finally {
+          Date.now = originalDateNow;
+        }
         dispatchGuard = second.assertDispatch;
         confirmGoogleWorkbookMutation();
         certifyGoogleWorkbookMutationReadback({ proofType: "TEST_SCORE", before: { revision: 1 },
           expectedAfter: { revision: 2 }, providerReadback: { revision: 2 } });
-        return { credentialSource: credential.credentialSource, operation: credential.operation };
+        callbackSettled = true;
+        return { credentialSource: credential.credentialSource, selectedSource: selected.source,
+          selectedLegacyIdentity: selected.email === env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+          selectedDedicatedIdentity: selected.email === env.PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL,
+          operation: credential.operation,
+          lifecycleExports: ["beginProductionGoogleAuthorityWrite", "markProductionGoogleAuthorityWriteStarted",
+            "reportProductionGoogleAuthorityWriteOutcome"].filter((name) => typeof ingressSurface[name] !== "undefined"),
+          mutableStoreAccessor: typeof intentSurface.currentGoogleWorkbookMutationIntent };
       }, { env, fetchImpl });
     let postWrapperDispatch;
     try { dispatchGuard(); } catch (error) { postWrapperDispatch = error.code; }
-    process.stdout.write(JSON.stringify({ result, calls, nonce, postWrapperDispatch }));
+    const primaryNonce = nonce;
+    const rejectedVariants = {};
+    let variantSequence = 0;
+    for (const variant of [
+      "MISSING_EXPIRY", "EXPIRED", "UNBOUNDED_EXPIRY", "CLASS_MISMATCH",
+      "CONTRACT_MISMATCH", "DISPATCH_EXPIRY_UNBOUND", "PRINCIPAL_MISMATCH",
+    ]) {
+      beginVariant = variant;
+      const suffix = String(++variantSequence).padStart(12, "0");
+      try { await withProductionGoogleAuthorityWrite(admissionInput(
+        "55555555-5555-4555-8555-" + suffix), async () => "must-not-run", { env, fetchImpl }); }
+      catch (error) { rejectedVariants[variant] = error.code; }
+    }
+    beginVariant = "VALID";
+    beginRemainingOverride = 80;
+    markRemainingOverride = 20;
+    const pauseCodes = {};
+    let pauseOutcome;
+    try {
+      await withProductionGoogleAuthorityWrite(
+        admissionInput("66666666-6666-4666-8666-666666666666"),
+        async () => {
+          const first = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+            method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"], env });
+          const second = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+            method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Matches"], env });
+          await first.prepareDispatch();
+          await second.prepareDispatch();
+          await new Promise((resolve) => setTimeout(resolve, 35));
+          try { first.assertDispatch(); } catch (error) { pauseCodes.first = error.code; }
+          try { second.assertDispatch(); } catch (error) { pauseCodes.second = error.code; }
+        },
+        { env, fetchImpl },
+      );
+    } catch (error) {
+      pauseOutcome = error.code;
+    }
+    process.stdout.write(JSON.stringify({ result, calls, nonce: primaryNonce, postWrapperDispatch,
+      rejectedVariants, pauseCodes, pauseOutcome, reportAfterCallbackSettlement }));
   `;
   const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
     cwd: root,
@@ -336,18 +657,41 @@ test("v2 admission fails closed and uses the separate Production credential", ()
   });
   assert.equal(child.status, 0, child.stderr);
   const evidence = JSON.parse(child.stdout);
-  assert.deepEqual(evidence.calls.map((item) => item.functionName), [
+  assert.deepEqual(evidence.calls.slice(0, 4).map((item) => item.functionName), [
     "inspect_production_scoring_admission",
-    "begin_production_scoring_ingress_v2",
-    "mark_production_scoring_ingress_write_started",
+    "begin_production_scoring_ingress_v3",
+    "mark_production_scoring_ingress_write_started_v3",
     "report_production_scoring_ingress_outcome",
   ]);
-  assert.equal(evidence.result.credentialSource, "production-worker");
+  assert.equal(evidence.result.credentialSource, "legacy-canonical");
+  assert.equal(evidence.result.selectedSource, "legacy-canonical");
+  assert.equal(evidence.result.selectedLegacyIdentity, true);
+  assert.equal(evidence.result.selectedDedicatedIdentity, false);
   assert.equal(evidence.result.operation, "CANONICAL_LEGACY_V2");
+  assert.deepEqual(evidence.result.lifecycleExports, []);
+  assert.equal(evidence.result.mutableStoreAccessor, "undefined");
   assert.equal(evidence.calls[1].input.writer_intent, "CANONICAL_LEGACY");
   assert.equal(evidence.calls[2].input.lease_nonce, evidence.nonce);
   assert.equal(evidence.calls[3].input.outcome_state, "CONFIRMED_WRITE");
+  assert.equal(evidence.reportAfterCallbackSettlement[0], true);
   assert.equal(evidence.postWrapperDispatch, "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REVOKED");
+  assert.deepEqual(evidence.rejectedVariants, {
+    MISSING_EXPIRY: "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+    EXPIRED: "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+    UNBOUNDED_EXPIRY: "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+    CLASS_MISMATCH: "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+    CONTRACT_MISMATCH: "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+    DISPATCH_EXPIRY_UNBOUND: "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+    PRINCIPAL_MISMATCH: "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+  });
+  assert.deepEqual(evidence.pauseCodes, {
+    first: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_EXPIRED",
+    second: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_EXPIRED",
+  });
+  assert.equal(
+    evidence.pauseOutcome,
+    "PRODUCTION_SCORING_WRITE_AMBIGUOUS_RECONCILIATION_REQUIRED",
+  );
   assert.match(evidence.calls[3].input.provider_before_fingerprint, /^[0-9a-f]{64}$/);
   assert.equal(evidence.calls[3].input.provider_after_fingerprint,
     evidence.calls[3].input.provider_readback_fingerprint);
@@ -377,7 +721,8 @@ test("lost BEGIN response replays the exact OPEN payload during CLOSING without 
       GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID, SCORING_AUTHORITY: "google", PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
       PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: authorityGeneration, PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: admissionGeneration,
       PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
-      PRODUCTION_GOOGLE_PRIVATE_KEY: "separate-production-key" };
+      PRODUCTION_GOOGLE_PRIVATE_KEY: "separate-production-key",
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid", GOOGLE_PRIVATE_KEY: "legacy-writer-key" };
     const request = { method: "POST", url: "https://baggerinv.com/api/director", headers: new Headers({ host: "baggerinv.com",
       origin: "https://baggerinv.com", "x-forwarded-host": "baggerinv.com", "x-forwarded-proto": "https" }) };
     const scoringAuthorityContract = { version: "scoring-mutation-authority-v1", scoringAuthority: "google",
@@ -392,24 +737,47 @@ test("lost BEGIN response replays the exact OPEN payload during CLOSING without 
     let replayBegin = null;
     let replayUsable = true;
     let conflict = false;
+    let issuedExpiresAt = "";
     const fetchImpl = async (url, init) => {
       const name = url.split("/").at(-1); const input = JSON.parse(init.body).input;
       if (name === "inspect_production_scoring_admission") return Response.json({ ok: true,
         activation_revision: phase === "OPEN" ? 11 : 12, admission_revision: phase === "OPEN" ? 7 : 8,
         authority_generation_id: authorityGeneration, admission_generation_id: admissionGeneration,
-        deployment_id: env.VERCEL_DEPLOYMENT_ID, authority: "GOOGLE", admission_state: phase });
-      if (name === "begin_production_scoring_ingress_v2") {
+        deployment_id: env.VERCEL_DEPLOYMENT_ID, authority: "GOOGLE", admission_state: phase,
+        contract_version: "ADMISSION_V3", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      if (name === "begin_production_scoring_ingress_v3") {
         beginAttempts += 1;
         if (conflict) return Response.json({ code: "PRODUCTION_SCORING_INGRESS_V2_IDEMPOTENCY_CONFLICT" }, { status: 409 });
         if (beginAttempts === 1) { firstBegin = input; throw new Error("BEGIN response lost after commit"); }
         replayBegin = input;
-        return Response.json({ ok: true, lease_id: leaseId, authority_generation_id: authorityGeneration,
+        issuedExpiresAt = new Date(Date.now() + 180_000).toISOString();
+        return Response.json({ ok: true, lease_id: leaseId, lease_nonce: input.lease_nonce,
+          authority_generation_id: authorityGeneration,
           admission_generation_id: admissionGeneration, writer_intent: "CANONICAL_LEGACY",
+          contract_version: "ADMISSION_V3",
+          provider_dispatch_must_begin_before_expires_at: true,
+          provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+          provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
           operation_request_id: operationRequestId, replay_usable: replayUsable, idempotent: true,
+          expires_at: issuedExpiresAt, remaining_dispatch_ms: replayUsable ? 179_000 : 0,
           lease_nonce_rotated: replayUsable });
       }
-      if (name === "mark_production_scoring_ingress_write_started") return Response.json({ ok: true });
-      if (name === "report_production_scoring_ingress_outcome") return Response.json({ ok: true, resolution_state: input.outcome_state });
+      if (name === "mark_production_scoring_ingress_write_started_v3") return Response.json({
+        ok: true, lease_id: leaseId, lease_nonce: input.lease_nonce,
+        operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+        provider_dispatch_must_begin_before_expires_at: true,
+        expires_at: issuedExpiresAt, remaining_dispatch_ms: 178_000,
+        write_started_at: new Date().toISOString(),
+        resolution_state: "WRITE_STARTED",
+      });
+      if (name === "report_production_scoring_ingress_outcome") return Response.json({ ok: true,
+        resolution_state: input.outcome_state, lease_id: input.lease_id, lease_nonce: input.lease_nonce,
+        operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
       return Response.json({}, { status: 404 });
     };
     const errors = [];
@@ -438,7 +806,7 @@ test("lost BEGIN response replays the exact OPEN payload during CLOSING without 
   assert.deepEqual(JSON.parse(child.stdout), {
     errors: [
       "PRODUCTION_SCORING_ADMISSION_CONTROL_PLANE_UNAVAILABLE",
-      "PRODUCTION_SCORING_ADMISSION_V2_REJECTED",
+      "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
       "PRODUCTION_SCORING_INGRESS_V2_IDEMPOTENCY_CONFLICT",
     ],
     recovered: "recovered",
@@ -449,6 +817,124 @@ test("lost BEGIN response replays the exact OPEN payload during CLOSING without 
     replayActivationRevision: 11,
     replayAdmissionRevision: 7,
     operationRequestId: "66666666-6666-4666-8666-666666666666",
+  });
+});
+
+test("settled callback revokes detached dispatch before outcome reporting can pause", () => {
+  const ingressUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
+  const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
+  const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
+  const activationUrl = new URL("../lib/production-cutover-activation-contract.js", import.meta.url).href;
+  const script = `
+    import { withProductionGoogleAuthorityWrite } from ${JSON.stringify(ingressUrl)};
+    import { certifyGoogleWorkbookMutationReadback, confirmGoogleWorkbookMutation,
+      prepareGoogleWorkbookMutation } from ${JSON.stringify(intentUrl)};
+    import { PRODUCTION_GOOGLE_WORKBOOK_ID, PRODUCTION_SUPABASE_PROJECT_REF,
+      PRODUCTION_SUPABASE_URL } from ${JSON.stringify(foundationUrl)};
+    import { PRODUCTION_VERCEL_PROJECT_ID } from ${JSON.stringify(activationUrl)};
+    const authorityGeneration = "11111111-1111-4111-8111-111111111111";
+    const admissionGeneration = "22222222-2222-4222-8222-222222222222";
+    const commit = "a".repeat(40);
+    const env = { VERCEL_ENV: "production", VERCEL_PROJECT_NAME: "bagger-inv",
+      VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID, VERCEL_GIT_COMMIT_SHA: commit,
+      VERCEL_DEPLOYMENT_ID: "dpl_12345678Test", PRODUCTION_FOUNDATION_ENABLED: "true",
+      PRODUCTION_CUTOVER_ACTIVATION_ENABLED: "true", PRODUCTION_CUTOVER_PHASE: "STATIC_BACKEND",
+      PRODUCTION_CUTOVER_EXPECTED_COMMIT_SHA: commit,
+      PRODUCTION_CUTOVER_EXPECTED_VERCEL_PROJECT_ID: PRODUCTION_VERCEL_PROJECT_ID,
+      PRODUCTION_CANONICAL_DOMAIN: "https://baggerinv.com", PRODUCTION_CUTOVER_TOURNAMENT_ID: "2026",
+      PRODUCTION_CUTOVER_TOURNAMENT_YEAR: "2026", PRODUCTION_SUPABASE_PROJECT_REF,
+      PRODUCTION_SUPABASE_URL, PRODUCTION_SUPABASE_SECRET_KEY: "sb_secret_" + "x".repeat(32),
+      GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID, SCORING_AUTHORITY: "google",
+      PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
+      PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: authorityGeneration,
+      PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: admissionGeneration,
+      PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL:
+        "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+      PRODUCTION_GOOGLE_PRIVATE_KEY: "dedicated-key",
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid",
+      GOOGLE_PRIVATE_KEY: "legacy-writer-key" };
+    const request = { method: "POST", url: "https://baggerinv.com/api/scoring/current",
+      headers: new Headers({ host: "baggerinv.com", origin: "https://baggerinv.com",
+        "x-forwarded-host": "baggerinv.com", "x-forwarded-proto": "https" }) };
+    let releaseReport;
+    const reportPending = new Promise((resolve) => { releaseReport = resolve; });
+    let reportStarted;
+    const reportStartedPromise = new Promise((resolve) => { reportStarted = resolve; });
+    const leaseId = "33333333-3333-4333-8333-333333333333";
+    let issuedExpiresAt = "";
+    const fetchImpl = async (url, init) => {
+      const name = url.split("/").at(-1); const input = JSON.parse(init.body).input;
+      if (name === "inspect_production_scoring_admission") return Response.json({ ok: true,
+        activation_revision: 11, admission_revision: 7, authority_generation_id: authorityGeneration,
+        admission_generation_id: admissionGeneration, deployment_id: env.VERCEL_DEPLOYMENT_ID,
+        authority: "GOOGLE", admission_state: "OPEN", contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      if (name === "begin_production_scoring_ingress_v3") { issuedExpiresAt = new Date(Date.now() + 180_000).toISOString(); return Response.json({ ok: true,
+        lease_id: leaseId, lease_nonce: input.lease_nonce,
+        authority_generation_id: authorityGeneration, admission_generation_id: admissionGeneration,
+        contract_version: "ADMISSION_V3",
+        provider_dispatch_must_begin_before_expires_at: true,
+        writer_intent: "CANONICAL_LEGACY", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+        operation_request_id: input.operation_request_id,
+        expires_at: issuedExpiresAt, remaining_dispatch_ms: 179_000, replay_usable: true }); }
+      if (name === "mark_production_scoring_ingress_write_started_v3") return Response.json({
+        ok: true, lease_id: leaseId, lease_nonce: input.lease_nonce,
+        operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+        provider_dispatch_must_begin_before_expires_at: true,
+        expires_at: issuedExpiresAt, remaining_dispatch_ms: 178_000,
+        write_started_at: new Date().toISOString(),
+        resolution_state: "WRITE_STARTED",
+      });
+      if (name === "report_production_scoring_ingress_outcome") {
+        reportStarted();
+        await reportPending;
+        return Response.json({ ok: true, resolution_state: input.outcome_state,
+          lease_id: input.lease_id, lease_nonce: input.lease_nonce,
+          operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+          provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+          provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      }
+      return Response.json({}, { status: 404 });
+    };
+    let releaseDetached;
+    const detachedPending = new Promise((resolve) => { releaseDetached = resolve; });
+    let detached;
+    let providerCalls = 0;
+    const wrapper = withProductionGoogleAuthorityWrite({ tournamentId: "2026", matchId: "2026-R1-1",
+      actorId: "CB01", operation: "PARTICIPANT:SCORE",
+      operationRequestId: "44444444-4444-4444-8444-444444444444",
+      scoringAuthorityContract: { version: "scoring-mutation-authority-v1", scoringAuthority: "google",
+        authorityGeneration, admissionGeneration, activationRevision: 11, admissionRevision: 7,
+        deploymentId: env.VERCEL_DEPLOYMENT_ID, deploymentCommit: commit }, request }, async () => {
+      const prepared = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+        method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"], env });
+      await prepared.prepareDispatch();
+      confirmGoogleWorkbookMutation();
+      certifyGoogleWorkbookMutationReadback({ proofType: "TEST_SCORE", before: { revision: 1 },
+        expectedAfter: { revision: 2 }, providerReadback: { revision: 2 } });
+      detached = (async () => { await detachedPending; prepared.assertDispatch(); providerCalls += 1; })();
+      return "complete";
+    }, { env, fetchImpl });
+    await reportStartedPromise;
+    releaseDetached();
+    let detachedCode = "";
+    try { await detached; } catch (error) { detachedCode = error.code; }
+    releaseReport();
+    const result = await wrapper;
+    process.stdout.write(JSON.stringify({ result, detachedCode, providerCalls }));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: root, encoding: "utf8",
+  });
+  assert.equal(child.status, 0, child.stderr);
+  assert.deepEqual(JSON.parse(child.stdout), {
+    result: "complete",
+    detachedCode: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REVOKED",
+    providerCalls: 0,
   });
 });
 
@@ -556,6 +1042,9 @@ test("control-plane loss prevents the callback and no legacy fallback executes",
       PRODUCTION_CANONICAL_DOMAIN: "https://baggerinv.com", PRODUCTION_CUTOVER_TOURNAMENT_ID: "2026", PRODUCTION_CUTOVER_TOURNAMENT_YEAR: "2026",
       PRODUCTION_SUPABASE_PROJECT_REF, PRODUCTION_SUPABASE_URL, PRODUCTION_SUPABASE_SECRET_KEY: "sb_secret_" + "x".repeat(32),
       GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID, SCORING_AUTHORITY: "google", PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid", GOOGLE_PRIVATE_KEY: "legacy-writer-key",
+      PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+      PRODUCTION_GOOGLE_PRIVATE_KEY: "dedicated-production-key",
       PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: "11111111-1111-4111-8111-111111111111",
       PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: "22222222-2222-4222-8222-222222222222" };
     const request = { method: "POST", url: "https://baggerinv.com/api/scoring/current", headers: new Headers({ host: "baggerinv.com",
@@ -577,6 +1066,92 @@ test("control-plane loss prevents the callback and no legacy fallback executes",
   assert.deepEqual(JSON.parse(child.stdout), {
     callbackCalled: false,
     code: "PRODUCTION_SCORING_ADMISSION_CONTROL_PLANE_UNAVAILABLE",
+  });
+});
+
+test("Production context rejects fake control-plane fetch and environment injection before minting", () => {
+  const ingressUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
+  const script = `
+    import { withProductionGoogleAuthorityWrite } from ${JSON.stringify(ingressUrl)};
+    delete process.env.NODE_TEST_CONTEXT;
+    let callbackCalled = false;
+    let fakeFetchCalls = 0;
+    let code = "";
+    try {
+      await withProductionGoogleAuthorityWrite(
+        {},
+        async () => { callbackCalled = true; },
+        {
+          env: { ...process.env },
+          fetchImpl: async () => {
+            fakeFetchCalls += 1;
+            return Response.json({
+              ok: true,
+              contract_version: "ADMISSION_V3",
+              remaining_dispatch_ms: 300_000,
+            });
+          },
+        },
+      );
+    } catch (error) {
+      code = error.code;
+    }
+    process.stdout.write(JSON.stringify({ code, callbackCalled, fakeFetchCalls }));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: root,
+    encoding: "utf8",
+  });
+  assert.equal(child.status, 0, child.stderr);
+  assert.deepEqual(JSON.parse(child.stdout), {
+    code: "PRODUCTION_SCORING_CONTROL_PLANE_TEST_OVERRIDE_FORBIDDEN",
+    callbackCalled: false,
+    fakeFetchCalls: 0,
+  });
+});
+
+test("Production context rejects accessor and Proxy dependency substitution without invoking it", () => {
+  const ingressUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
+  const script = `
+    import { withProductionGoogleAuthorityWrite } from ${JSON.stringify(ingressUrl)};
+    delete process.env.NODE_TEST_CONTEXT;
+    let callbackCalled = false;
+    let getterCalls = 0;
+    let fakeFetchCalls = 0;
+    const fakeFetch = async () => {
+      fakeFetchCalls += 1;
+      return Response.json({ ok: true, contract_version: "ADMISSION_V3", remaining_dispatch_ms: 300_000 });
+    };
+    const options = new Proxy({}, {
+      ownKeys: () => ["fetchImpl"],
+      getOwnPropertyDescriptor: (_target, key) => key === "fetchImpl" ? {
+        configurable: true,
+        enumerable: true,
+        get() { getterCalls += 1; return fakeFetch; },
+      } : undefined,
+      get: () => {
+        getterCalls += 1;
+        return fakeFetch;
+      },
+    });
+    let code = "";
+    try {
+      await withProductionGoogleAuthorityWrite({}, async () => { callbackCalled = true; }, options);
+    } catch (error) {
+      code = error.code;
+    }
+    process.stdout.write(JSON.stringify({ code, callbackCalled, getterCalls, fakeFetchCalls }));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: root,
+    encoding: "utf8",
+  });
+  assert.equal(child.status, 0, child.stderr);
+  assert.deepEqual(JSON.parse(child.stdout), {
+    code: "PRODUCTION_SCORING_CONTROL_PLANE_TEST_OVERRIDE_FORBIDDEN",
+    callbackCalled: false,
+    getterCalls: 0,
+    fakeFetchCalls: 0,
   });
 });
 
@@ -607,139 +1182,62 @@ test("low-level Production writes reject absent intent and canonical admission b
   ]);
 });
 
-test("canonical admission capability rejects clone, replay, drift, marker failure, and post-wrapper dispatch", () => {
-  const capabilityUrl = new URL("../lib/production-google-admission-capability.js", import.meta.url).href;
-  const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
-  const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
+test("canonical admission mint is private and fabricated JSON, spread, and structured clones cannot dispatch", () => {
+  const ingressUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
+  const retiredCapabilityUrl = new URL("../lib/production-google-admission-capability.js", import.meta.url).href;
   const script = `
     import {
-      registerProductionGoogleAdmissionCapability,
-      revokeProductionGoogleAdmissionCapability,
-    } from ${JSON.stringify(capabilityUrl)};
-    import {
-      GOOGLE_WORKBOOK_MUTATION_INTENTS,
-      prepareGoogleWorkbookMutation,
-      withGoogleWorkbookMutationIntent,
-    } from ${JSON.stringify(intentUrl)};
-    import {
-      PRODUCTION_GOOGLE_WORKBOOK_ID,
-      PRODUCTION_SUPABASE_PROJECT_REF,
-      PRODUCTION_SUPABASE_URL,
-    } from ${JSON.stringify(foundationUrl)};
-    const uuid = (char) => char.repeat(8) + "-" + char.repeat(4) + "-4" + char.repeat(3) +
-      "-8" + char.repeat(3) + "-" + char.repeat(12);
-    function admission(operation = "PARTICIPANT:SCORE") {
-      const deploymentId = "dpl_12345678Test";
-      const commit = "a".repeat(40);
-      const authorityGeneration = uuid("1");
-      const admissionGeneration = uuid("2");
-      const leaseId = uuid("3");
-      const leaseNonce = uuid("4");
-      const operationRequestId = uuid("5");
-      const revisions = { activationRevision: 11, admissionRevision: 7 };
-      const state = { required: true, enabled: true, googleAuthorityRequested: true,
-        exactProductionWorkbook: true, expectedAuthorityGeneration: authorityGeneration,
-        expectedAdmissionGeneration: admissionGeneration, deploymentId, externalFenceEvidenceId: "",
-        activation: { allowed: true, resources: { projectRef: PRODUCTION_SUPABASE_PROJECT_REF,
-          workbookId: PRODUCTION_GOOGLE_WORKBOOK_ID, tournamentId: "2026", commitSha: commit,
-          vercelProjectId: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU" } } };
-      const bound = { environment: "PRODUCTION", project_ref: PRODUCTION_SUPABASE_PROJECT_REF,
-        project_url: PRODUCTION_SUPABASE_URL, source_workbook_id: PRODUCTION_GOOGLE_WORKBOOK_ID,
-        tournament_id: "2026", expected_authority: "GOOGLE", writer_intent: "CANONICAL_LEGACY",
-        expected_authority_generation: authorityGeneration, expected_admission_generation: admissionGeneration,
-        deployment_id: deploymentId, deployment_commit: commit, request_fingerprint: "b".repeat(64),
-        expected_activation_revision: revisions.activationRevision,
-        expected_admission_revision: revisions.admissionRevision, match_id: "2026-R1-1", operation,
-        actor_id: "CB01", lease_seconds: 180, operation_request_id: operationRequestId,
-        lease_nonce: leaseNonce };
-      return Object.freeze({ enabled: true, admissionId: leaseId, leaseId, leaseNonce,
-        providerMutationKey: "c".repeat(64), operationRequestId, state, revisions, bound });
-    }
-    const attempt = (item, operation = item.bound.operation) => withGoogleWorkbookMutationIntent({
-      intent: GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY, operation, admission: item,
-    }, () => prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
-      method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Matches"] }));
+      consumeProductionGoogleAdmissionCapability,
+      assertProductionGoogleAdmissionCapabilityActive,
+    } from ${JSON.stringify(ingressUrl)};
+    import * as retiredCapability from ${JSON.stringify(retiredCapabilityUrl)};
+    const plain = {
+      enabled: true,
+      admissionId: "33333333-3333-4333-8333-333333333333",
+      leaseId: "33333333-3333-4333-8333-333333333333",
+      leaseNonce: "44444444-4444-4444-8444-444444444444",
+      operationRequestId: "55555555-5555-4555-8555-555555555555",
+      bound: { operation: "PARTICIPANT:SCORE" },
+    };
+    const variants = {
+      plain,
+      json: JSON.parse(JSON.stringify(plain)),
+      spread: { ...plain },
+      structured: structuredClone(plain),
+    };
     const codes = {};
-    let markerCalls = 0;
-    const valid = admission();
-    registerProductionGoogleAdmissionCapability(valid, async () => { markerCalls += 1; return { ok: true }; });
-    await withGoogleWorkbookMutationIntent({ intent: GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY,
-      operation: valid.bound.operation, admission: valid }, async () => {
-      const first = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
-        method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
-      first.assertDispatch();
-      const second = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
-        method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
-      second.assertDispatch();
-    });
-    try { await attempt(valid); } catch (error) { codes.replay = error.code; }
-    revokeProductionGoogleAdmissionCapability(valid);
-    try { await attempt(valid); } catch (error) { codes.revoked = error.code; }
-    try { await attempt(admission()); } catch (error) { codes.clone = error.code; }
-
-    const operationMismatch = admission();
-    registerProductionGoogleAdmissionCapability(operationMismatch, async () => ({ ok: true }));
-    try { await attempt(operationMismatch, "PARTICIPANT:CONFIRM"); }
-    catch (error) { codes.operationMismatch = error.code; }
-    revokeProductionGoogleAdmissionCapability(operationMismatch);
-
-    const drift = admission();
-    registerProductionGoogleAdmissionCapability(drift, async () => ({ ok: true }));
-    drift.bound.deployment_commit = "d".repeat(40);
-    try { await attempt(drift); } catch (error) { codes.boundaryDrift = error.code; }
-    revokeProductionGoogleAdmissionCapability(drift);
-
-    const failedMarker = admission();
-    registerProductionGoogleAdmissionCapability(failedMarker, async () => {
-      throw Object.assign(new Error("marker failed"), { code: "TEST_MARKER_FAILED" });
-    });
-    try { await attempt(failedMarker); } catch (error) { codes.markerFailure = error.code; }
-    revokeProductionGoogleAdmissionCapability(failedMarker);
-
-    const rejectedMarker = admission();
-    registerProductionGoogleAdmissionCapability(rejectedMarker, async () => ({ ok: false }));
-    try { await attempt(rejectedMarker); } catch (error) { codes.markerRejected = error.code; }
-    revokeProductionGoogleAdmissionCapability(rejectedMarker);
-
-    const paused = admission();
-    registerProductionGoogleAdmissionCapability(paused, async () => ({ ok: true }));
-    let releaseToken;
-    const tokenPending = new Promise((resolve) => { releaseToken = resolve; });
-    let providerCalls = 0;
-    let detached;
-    await withGoogleWorkbookMutationIntent({ intent: GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY,
-      operation: paused.bound.operation, admission: paused }, async () => {
-      const prepared = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
-        method: "POST", path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
-      detached = (async () => {
-        await tokenPending;
-        prepared.assertDispatch();
-        providerCalls += 1;
-      })();
-    });
-    revokeProductionGoogleAdmissionCapability(paused);
-    releaseToken();
-    try { await detached; } catch (error) { codes.pausedBeforeDispatch = error.code; }
-    process.stdout.write(JSON.stringify({ codes, markerCalls, providerCalls }));
+    for (const [name, admission] of Object.entries(variants)) {
+      try {
+        await consumeProductionGoogleAdmissionCapability(admission, {
+          scope: {}, operation: "PARTICIPANT:SCORE",
+        });
+      } catch (error) {
+        codes[name + "Consume"] = error.code;
+      }
+      try {
+        assertProductionGoogleAdmissionCapabilityActive(admission, {
+          scope: {}, operation: "PARTICIPANT:SCORE",
+        });
+      } catch (error) {
+        codes[name + "Assert"] = error.code;
+      }
+    }
+    process.stdout.write(JSON.stringify({
+      codes,
+      retiredExports: Object.keys(retiredCapability).sort(),
+    }));
   `;
   const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
-    cwd: root, encoding: "utf8",
+    cwd: root,
+    encoding: "utf8",
   });
   assert.equal(child.status, 0, child.stderr);
-  assert.deepEqual(JSON.parse(child.stdout), {
-    codes: {
-      replay: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REPLAYED",
-      revoked: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REVOKED",
-      clone: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REQUIRED",
-      operationMismatch: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_BOUNDARY_MISMATCH",
-      boundaryDrift: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_BOUNDARY_MISMATCH",
-      markerFailure: "TEST_MARKER_FAILED",
-      markerRejected: "PRODUCTION_CANONICAL_GOOGLE_WRITE_MARKER_REJECTED",
-      pausedBeforeDispatch: "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REVOKED",
-    },
-    markerCalls: 1,
-    providerCalls: 0,
-  });
+  const evidence = JSON.parse(child.stdout);
+  assert.deepEqual(evidence.retiredExports, []);
+  assert.deepEqual(new Set(Object.values(evidence.codes)), new Set([
+    "PRODUCTION_CANONICAL_GOOGLE_ADMISSION_CAPABILITY_REQUIRED",
+  ]));
+  assert.equal(Object.keys(evidence.codes).length, 8);
 });
 
 test("low-level Production transport binds each mutation intent and operation to approved sheets", () => {
@@ -760,12 +1258,16 @@ test("low-level Production transport binds each mutation intent and operation to
           intent,
           operation,
           ...(canonical ? { admission: validAdmission, beforeFirstWrite: async () => ({ ok: true }) } : {}),
-        }, () => prepareGoogleWorkbookMutation({
-          spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
-          method: "POST",
-          path: "/values:batchUpdate",
-          affectedSheets,
-        }));
+        }, async () => {
+          const prepared = await prepareGoogleWorkbookMutation({
+            spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+            method: "POST",
+            path: "/values:batchUpdate",
+            affectedSheets,
+          });
+          await prepared.prepareDispatch();
+          return prepared;
+        });
         return "OK";
       } catch (error) {
         return error.code;
@@ -875,7 +1377,7 @@ test("noncanonical and direct-deployment hosts fail before authoring selects a c
   });
 });
 
-test("canonical, authoring, and mirror policies are distinct and never fall back to legacy credentials", () => {
+test("canonical uses the fenceable legacy identity while authoring and mirror remain dedicated", () => {
   const credentialUrl = new URL("../lib/google-service-account-credential-context.js", import.meta.url).href;
   const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
   const activationUrl = new URL("../lib/production-cutover-activation-contract.js", import.meta.url).href;
@@ -901,9 +1403,11 @@ test("canonical, authoring, and mirror policies are distinct and never fall back
       operation: "SCORING_GOOGLE_OUTBOX", resources });
     const fallback = productionGoogleCredentialEnvironment({ env: { ...base, PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "",
       PRODUCTION_GOOGLE_PRIVATE_KEY: "" }, operation: "GOOGLE_DIRECTOR_AUTHORING", resources });
-    process.stdout.write(JSON.stringify({ canonical: { allowed: canonical.allowed, canonical: canonical.policy.canonicalLegacy,
+    process.stdout.write(JSON.stringify({ canonical: { allowed: canonical.allowed, source: canonical.credentialSource,
+      usesLegacy: canonical.safety.canonicalLegacyUsesLegacyIdentity, canonical: canonical.policy.canonicalLegacy,
       mirror: canonical.policy.mirrorArchive }, authoring: { allowed: authoring.allowed, authoring: authoring.policy.directorAuthoring,
-      mirror: authoring.policy.mirrorArchive }, mirror: { allowed: mirror.allowed, mirror: mirror.policy.mirrorArchive },
+      source: authoring.credentialSource, mirror: authoring.policy.mirrorArchive },
+      mirror: { allowed: mirror.allowed, source: mirror.credentialSource, mirror: mirror.policy.mirrorArchive },
       fallback: { allowed: fallback.allowed, reason: fallback.reason, legacyFallback: fallback.safety.legacyCredentialFallback } }));
   `;
   const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
@@ -911,9 +1415,9 @@ test("canonical, authoring, and mirror policies are distinct and never fall back
   });
   assert.equal(child.status, 0, child.stderr);
   assert.deepEqual(JSON.parse(child.stdout), {
-    canonical: { allowed: true, canonical: true, mirror: false },
-    authoring: { allowed: true, authoring: true, mirror: false },
-    mirror: { allowed: true, mirror: true },
+    canonical: { allowed: true, source: "legacy-canonical", usesLegacy: true, canonical: true, mirror: false },
+    authoring: { allowed: true, authoring: true, source: "production-worker", mirror: false },
+    mirror: { allowed: true, source: "production-worker", mirror: true },
     fallback: { allowed: false, reason: "production-google-credentials-required", legacyFallback: false },
   });
 });
@@ -926,6 +1430,7 @@ test("credential operations are identity-bound to canonical, authoring, and mirr
   const script = `
     import {
       assertProductionGoogleServiceAccountMutationBinding,
+      currentGoogleServiceAccountCredentials,
       withProductionGoogleServiceAccountCredentials,
     } from ${JSON.stringify(credentialUrl)};
     import { GOOGLE_WORKBOOK_MUTATION_INTENTS } from ${JSON.stringify(intentUrl)};
@@ -948,8 +1453,12 @@ test("credential operations are identity-bound to canonical, authoring, and mirr
     const C = GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY;
     const A = GOOGLE_WORKBOOK_MUTATION_INTENTS.AUTHORING;
     const M = GOOGLE_WORKBOOK_MUTATION_INTENTS.MIRROR_ARCHIVE;
-    const exactAdmission = Object.freeze({ admissionId: "exact" });
-    const clonedAdmission = Object.freeze({ admissionId: "exact" });
+    const exactAdmission = Object.freeze({ admissionId: "exact",
+      providerCredentialClass: "LEGACY_PROVIDER_FENCEABLE",
+      providerPrincipalFingerprint: ${JSON.stringify(legacyPrincipal("legacy-v0@example.invalid"))} });
+    const clonedAdmission = Object.freeze({ admissionId: "exact",
+      providerCredentialClass: "LEGACY_PROVIDER_FENCEABLE",
+      providerPrincipalFingerprint: ${JSON.stringify(legacyPrincipal("legacy-v0@example.invalid"))} });
     const attempt = (input) => {
       try { assertProductionGoogleServiceAccountMutationBinding(input); return "OK"; }
       catch (error) { return error.code; }
@@ -957,14 +1466,27 @@ test("credential operations are identity-bound to canonical, authoring, and mirr
     const results = {};
     await withProductionGoogleServiceAccountCredentials({ env: base, operation: "CANONICAL_LEGACY_V2",
       resources, canonicalAdmission: exactAdmission }, async () => {
+      results.canonicalSource = currentGoogleServiceAccountCredentials(base).source;
       results.canonicalExact = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: exactAdmission });
       results.canonicalClone = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: clonedAdmission });
       results.canonicalAsAuthoring = attempt({ intent: A, operation: "TOURNAMENT_GUIDE" });
       results.canonicalAsMirror = attempt({ intent: M, operation: "SCORING_GOOGLE_OUTBOX" });
     });
+    try {
+      await withProductionGoogleServiceAccountCredentials({ env: base, operation: "CANONICAL_LEGACY_V2",
+        resources, canonicalAdmission: { ...exactAdmission, providerCredentialClass: "DEDICATED_PRODUCTION" } },
+      async () => { results.classMismatchCallback = true; });
+    } catch (error) { results.canonicalClassMismatch = error.code; }
+    try {
+      await withProductionGoogleServiceAccountCredentials({ env: base, operation: "CANONICAL_LEGACY_V2",
+        resources, canonicalAdmission: { ...exactAdmission,
+          providerPrincipalFingerprint: ${JSON.stringify(legacyPrincipal("another-writer@example.invalid"))} } },
+      async () => { results.principalMismatchCallback = true; });
+    } catch (error) { results.canonicalPrincipalMismatch = error.code; }
     await withProductionGoogleServiceAccountCredentials({ env: base, operation: "GOOGLE_DIRECTOR_AUTHORING",
       resources }, async () => {
       results.authoringExact = attempt({ intent: A, operation: "TOURNAMENT_GUIDE" });
+      results.authoringSource = currentGoogleServiceAccountCredentials(base).source;
       results.authoringAsCanonical = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: exactAdmission });
       results.authoringAsMirror = attempt({ intent: M, operation: "SCORING_GOOGLE_OUTBOX" });
     });
@@ -974,6 +1496,7 @@ test("credential operations are identity-bound to canonical, authoring, and mirr
     await withProductionGoogleServiceAccountCredentials({ env: mirrorEnv, operation: "SCORING_GOOGLE_OUTBOX",
       resources }, async () => {
       results.mirrorExact = attempt({ intent: M, operation: "SCORING_GOOGLE_OUTBOX" });
+      results.mirrorSource = currentGoogleServiceAccountCredentials(mirrorEnv).source;
       results.mirrorAsCanonical = attempt({ intent: C, operation: "PARTICIPANT:SCORE", admission: exactAdmission });
       results.mirrorAsAuthoring = attempt({ intent: A, operation: "TOURNAMENT_GUIDE" });
       results.mirrorWrongOperation = attempt({ intent: M, operation: "ROUND_SCORECARDS_ARCHIVE" });
@@ -985,21 +1508,26 @@ test("credential operations are identity-bound to canonical, authoring, and mirr
   });
   assert.equal(child.status, 0, child.stderr);
   assert.deepEqual(JSON.parse(child.stdout), {
+    canonicalSource: "legacy-canonical",
     canonicalExact: "OK",
     canonicalClone: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
     canonicalAsAuthoring: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
     canonicalAsMirror: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
+    canonicalClassMismatch: "PRODUCTION_GOOGLE_CANONICAL_CREDENTIAL_CLASS_MISMATCH",
+    canonicalPrincipalMismatch: "PRODUCTION_GOOGLE_CANONICAL_PRINCIPAL_MISMATCH",
     authoringExact: "OK",
+    authoringSource: "production-worker",
     authoringAsCanonical: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
     authoringAsMirror: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
     mirrorExact: "OK",
+    mirrorSource: "production-worker",
     mirrorAsCanonical: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
     mirrorAsAuthoring: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
     mirrorWrongOperation: "PRODUCTION_GOOGLE_CREDENTIAL_INTENT_MISMATCH",
   });
 });
 
-test("v2 reports no-write, ambiguous, and partial outcomes without a finally-success path", () => {
+test("v3 reports no-write, ambiguous, and partial outcomes without a finally-success path", () => {
   const ingressUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
   const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
   const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
@@ -1021,13 +1549,16 @@ test("v2 reports no-write, ambiguous, and partial outcomes without a finally-suc
       GOOGLE_SHEETS_ID: PRODUCTION_GOOGLE_WORKBOOK_ID, SCORING_AUTHORITY: "google", PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
       PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: authorityGeneration, PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: admissionGeneration,
       PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
-      PRODUCTION_GOOGLE_PRIVATE_KEY: "separate-production-key" };
+      PRODUCTION_GOOGLE_PRIVATE_KEY: "separate-production-key",
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid", GOOGLE_PRIVATE_KEY: "legacy-writer-key" };
     const request = { method: "POST", url: "https://baggerinv.com/api/scoring/current", headers: new Headers({ host: "baggerinv.com",
       origin: "https://baggerinv.com", "x-forwarded-host": "baggerinv.com", "x-forwarded-proto": "https" }) };
     let sequence = 0;
     const reports = [];
     const rpcCounts = {};
     const modeByRequestId = new Map();
+    let currentLeaseId = "";
+    let currentExpiresAt = "";
     const fetchImpl = async (url, init) => {
       const name = url.split("/").at(-1); const input = JSON.parse(init.body).input;
       const mode = modeByRequestId.get(input.operation_request_id) || input.operation || "INSPECT";
@@ -1035,23 +1566,51 @@ test("v2 reports no-write, ambiguous, and partial outcomes without a finally-suc
       rpcCounts[countKey] = Number(rpcCounts[countKey] || 0) + 1;
       if (name === "inspect_production_scoring_admission") return Response.json({ ok: true, activation_revision: 11,
         admission_revision: 7, authority_generation_id: authorityGeneration, admission_generation_id: admissionGeneration,
-        deployment_id: env.VERCEL_DEPLOYMENT_ID, authority: "GOOGLE", admission_state: "OPEN" });
-      if (name === "begin_production_scoring_ingress_v2") return Response.json({ ok: true,
-        lease_id: "33333333-3333-4333-8333-" + String(++sequence).padStart(12, "0"), authority_generation_id: authorityGeneration,
+        deployment_id: env.VERCEL_DEPLOYMENT_ID, authority: "GOOGLE", admission_state: "OPEN",
+        contract_version: "ADMISSION_V3", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
+      if (name === "begin_production_scoring_ingress_v3") { currentLeaseId =
+        "33333333-3333-4333-8333-" + String(++sequence).padStart(12, "0");
+        currentExpiresAt = new Date(Date.now() + 180_000).toISOString();
+        return Response.json({ ok: true,
+        lease_id: currentLeaseId, lease_nonce: input.lease_nonce,
+        authority_generation_id: authorityGeneration,
         admission_generation_id: admissionGeneration, writer_intent: "CANONICAL_LEGACY",
-        operation_request_id: input.operation_request_id, replay_usable: true });
-      if (name === "mark_production_scoring_ingress_write_started") {
+        contract_version: "ADMISSION_V3",
+        provider_dispatch_must_begin_before_expires_at: true,
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+        operation_request_id: input.operation_request_id,
+        expires_at: currentExpiresAt, remaining_dispatch_ms: 179_000,
+        replay_usable: true }); }
+      if (name === "mark_production_scoring_ingress_write_started_v3") {
         if (mode === "TEST:MARK_LOST") throw new Error("response lost after server boundary");
-        if (mode === "TEST:EXPIRED") return Response.json({ ok: false, resolution_state: "AMBIGUOUS",
+        const boundary = { lease_id: currentLeaseId, lease_nonce: input.lease_nonce,
+          operation_request_id: input.operation_request_id,
+          contract_version: "ADMISSION_V3",
+          provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+          provider_principal_fingerprint: mode === "TEST:MARK_PRINCIPAL_MISMATCH"
+            ? ${JSON.stringify(legacyPrincipal("another-writer@example.invalid"))}
+            : ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))},
+          provider_dispatch_must_begin_before_expires_at: true,
+          expires_at: currentExpiresAt, remaining_dispatch_ms: 178_000 };
+        if (mode === "TEST:EXPIRED") return Response.json({ ...boundary, ok: false, resolution_state: "AMBIGUOUS",
           code: "PRODUCTION_SCORING_LEASE_EXPIRED_AMBIGUOUS" });
-        return Response.json({ ok: true, resolution_state: "WRITE_STARTED" });
+        return Response.json({ ...boundary, ok: true, resolution_state: "WRITE_STARTED",
+          write_started_at: new Date().toISOString() });
       }
       if (name === "report_production_scoring_ingress_outcome") {
         reports.push(input);
         if (["TEST:MARK_LOST", "TEST:EXPIRED"].includes(mode)) return Response.json({
           code: "PRODUCTION_SCORING_NO_WRITE_RECONCILIATION_REQUIRED",
         }, { status: 409 });
-        return Response.json({ ok: true, resolution_state: input.outcome_state });
+        return Response.json({ ok: true, resolution_state: input.outcome_state,
+          lease_id: input.lease_id, lease_nonce: input.lease_nonce,
+          operation_request_id: input.operation_request_id, contract_version: "ADMISSION_V3",
+          provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+          provider_principal_fingerprint: mode === "TEST:OUTCOME_PRINCIPAL_MISMATCH"
+            ? ${JSON.stringify(legacyPrincipal("another-writer@example.invalid"))}
+            : ${JSON.stringify(legacyPrincipal("legacy-writer@example.invalid"))} });
       }
       return Response.json({}, { status: 404 });
     };
@@ -1067,11 +1626,16 @@ test("v2 reports no-write, ambiguous, and partial outcomes without a finally-suc
     };
     const outcomes = [];
     outcomes.push(await withProductionGoogleAuthorityWrite(operationInput("TEST:NO_WRITE"), async () => "no-write", { env, fetchImpl }));
+    try {
+      await withProductionGoogleAuthorityWrite(operationInput("TEST:OUTCOME_PRINCIPAL_MISMATCH"),
+        async () => "no-write", { env, fetchImpl });
+    } catch (error) { outcomes.push(error.code); }
     for (const mode of ["NO_READBACK", "AMBIGUOUS", "PARTIAL"]) {
       try {
         await withProductionGoogleAuthorityWrite(operationInput("TEST:" + mode), async () => {
-          await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST",
+          const prepared = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST",
             path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
+          await prepared.prepareDispatch();
           if (mode === "AMBIGUOUS") markGoogleWorkbookMutationAmbiguous();
           else confirmGoogleWorkbookMutation();
           if (mode === "PARTIAL") throw Object.assign(new Error("after-write failure"), { code: "TEST_AFTER_WRITE_FAILURE" });
@@ -1079,11 +1643,12 @@ test("v2 reports no-write, ambiguous, and partial outcomes without a finally-suc
         }, { env, fetchImpl });
       } catch (error) { outcomes.push(error.code); }
     }
-    for (const mode of ["MARK_LOST", "EXPIRED"]) {
+    for (const mode of ["MARK_LOST", "EXPIRED", "MARK_PRINCIPAL_MISMATCH"]) {
       try {
         await withProductionGoogleAuthorityWrite(operationInput("TEST:" + mode), async () => {
-          await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST",
+          const prepared = await prepareGoogleWorkbookMutation({ spreadsheetId: PRODUCTION_GOOGLE_WORKBOOK_ID, method: "POST",
             path: "/values:batchUpdate", affectedSheets: ["Live Hole Scores"] });
+          await prepared.prepareDispatch();
           throw new Error("provider must remain unreachable");
         }, { env, fetchImpl });
       } catch (error) { outcomes.push(error.code); }
@@ -1099,17 +1664,22 @@ test("v2 reports no-write, ambiguous, and partial outcomes without a finally-suc
   const evidence = JSON.parse(child.stdout);
   assert.deepEqual(evidence.outcomes, [
     "no-write",
+    "PRODUCTION_SCORING_ADMISSION_OUTCOME_UNCONFIRMED",
     "PRODUCTION_SCORING_WRITE_AMBIGUOUS_RECONCILIATION_REQUIRED",
     "PRODUCTION_SCORING_WRITE_AMBIGUOUS_RECONCILIATION_REQUIRED",
     "PRODUCTION_SCORING_PARTIAL_WRITE_RECONCILIATION_REQUIRED",
     "PRODUCTION_SCORING_ADMISSION_OUTCOME_UNCONFIRMED",
     "PRODUCTION_SCORING_ADMISSION_OUTCOME_UNCONFIRMED",
+    "PRODUCTION_SCORING_WRITE_AMBIGUOUS_RECONCILIATION_REQUIRED",
   ]);
   assert.deepEqual(evidence.reports.map((item) => item.outcome), [
-    "PROVEN_NO_WRITE", "AMBIGUOUS", "AMBIGUOUS", "PARTIAL_WRITE", "PROVEN_NO_WRITE", "PROVEN_NO_WRITE",
+    "PROVEN_NO_WRITE", "PROVEN_NO_WRITE", "AMBIGUOUS", "AMBIGUOUS", "PARTIAL_WRITE", "AMBIGUOUS", "AMBIGUOUS",
+    "AMBIGUOUS",
   ]);
-  assert.equal(evidence.rpcCounts["TEST:MARK_LOST:mark_production_scoring_ingress_write_started"], 1);
-  assert.equal(evidence.rpcCounts["TEST:EXPIRED:mark_production_scoring_ingress_write_started"], 1);
+  assert.equal(evidence.rpcCounts["TEST:OUTCOME_PRINCIPAL_MISMATCH:report_production_scoring_ingress_outcome"], 1);
+  assert.equal(evidence.rpcCounts["TEST:MARK_LOST:mark_production_scoring_ingress_write_started_v3"], 1);
+  assert.equal(evidence.rpcCounts["TEST:EXPIRED:mark_production_scoring_ingress_write_started_v3"], 1);
+  assert.equal(evidence.rpcCounts["TEST:MARK_PRINCIPAL_MISMATCH:mark_production_scoring_ingress_write_started_v3"], 1);
   assert.ok(evidence.reports.every((item) => item.actor === "CB01"));
   for (const item of evidence.reports.slice(1)) {
     assert.equal(item.before, "");
@@ -1118,23 +1688,72 @@ test("v2 reports no-write, ambiguous, and partial outcomes without a finally-suc
   }
 });
 
-test("stale admission errors are rendered as a refresh-required scoring pause", () => {
-  const errorsUrl = new URL("../lib/scoring-api-errors.js", import.meta.url).href;
+test("one uncertain provider-dispatch error produces one ambiguity diagnostic", () => {
+  const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
   const script = `
-    import { participantScoringError, participantScoringHttpStatus, participantScoringPauseHeaders } from ${JSON.stringify(errorsUrl)};
-    const error = Object.assign(new Error("internal mismatch"), { code: "PRODUCTION_SCORING_ADMISSION_INSPECTION_MISMATCH" });
-    const headers = participantScoringPauseHeaders(error);
-    process.stdout.write(JSON.stringify({ status: participantScoringHttpStatus(error), message: participantScoringError(error),
-      retryAfter: headers["Retry-After"], admission: headers["X-Scoring-Admission"], action: headers["X-Scoring-Action"] }));
+    import {
+      GOOGLE_WORKBOOK_MUTATION_INTENTS,
+      googleWorkbookMutationOutcome,
+      markGoogleWorkbookMutationAmbiguous,
+      withGoogleWorkbookMutationIntent,
+    } from ${JSON.stringify(intentUrl)};
+    const outcome = await withGoogleWorkbookMutationIntent({
+      intent: GOOGLE_WORKBOOK_MUTATION_INTENTS.CANONICAL_LEGACY,
+      operation: "PARTICIPANT:SCORE",
+      admission: { enabled: true, admissionId: "11111111-1111-4111-8111-111111111111" },
+    }, async () => {
+      const error = Object.assign(new Error("provider-dispatch outcome unknown"), {
+        authorityDiagnostics: Object.freeze({ writeStartOutcomeUnknown: true }),
+      });
+      markGoogleWorkbookMutationAmbiguous(error);
+      markGoogleWorkbookMutationAmbiguous(error);
+      return googleWorkbookMutationOutcome();
+    });
+    process.stdout.write(JSON.stringify(outcome));
   `;
   const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
     cwd: root, encoding: "utf8",
   });
   assert.equal(child.status, 0, child.stderr);
-  assert.deepEqual(JSON.parse(child.stdout), {
+  assert.equal(JSON.parse(child.stdout).ambiguousWrites, 1);
+});
+
+test("v3 admission failures are rendered as a refresh-required scoring pause", () => {
+  const errorsUrl = new URL("../lib/scoring-api-errors.js", import.meta.url).href;
+  const script = `
+    import { participantScoringError, participantScoringHttpStatus, participantScoringPauseHeaders } from ${JSON.stringify(errorsUrl)};
+    const codes = [
+      "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+      "PRODUCTION_SCORING_ADMISSION_V3_UNAVAILABLE",
+      "PRODUCTION_SCORING_ADMISSION_V3_CONTRACT_UNAVAILABLE",
+    ];
+    process.stdout.write(JSON.stringify(Object.fromEntries(codes.map((code) => {
+      const error = Object.assign(new Error("internal admission failure"), { code });
+      const headers = participantScoringPauseHeaders(error);
+      return [code, { status: participantScoringHttpStatus(error), message: participantScoringError(error),
+        retryAfter: headers["Retry-After"], admission: headers["X-Scoring-Admission"], action: headers["X-Scoring-Action"] }];
+    }))));
+  `;
+  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
+    cwd: root, encoding: "utf8",
+  });
+  assert.equal(child.status, 0, child.stderr);
+  const evidence = JSON.parse(child.stdout);
+  assert.deepEqual(evidence.PRODUCTION_SCORING_ADMISSION_V3_REJECTED, {
     status: 409,
     message: "Scoring is temporarily paused for a verified authority transition. Refresh before trying again.",
     admission: "paused",
     action: "refresh-required",
   });
+  for (const code of [
+    "PRODUCTION_SCORING_ADMISSION_V3_UNAVAILABLE",
+    "PRODUCTION_SCORING_ADMISSION_V3_CONTRACT_UNAVAILABLE",
+  ]) {
+    assert.deepEqual(evidence[code], {
+      status: 503,
+      message: "Scoring is temporarily paused for a verified authority transition. Refresh before trying again.",
+      admission: "paused",
+      action: "refresh-required",
+    });
+  }
 });

@@ -8,6 +8,9 @@ import { fileURLToPath } from "node:url";
 import { spawn, spawnSync } from "node:child_process";
 import test from "node:test";
 
+import { productionGoogleWriterProviderAbortEvidenceHash } from
+  "../lib/production-google-writer-provider-abort-evidence.js";
+
 const repositoryRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
@@ -36,6 +39,9 @@ const actor = "postgres-admission-integration-test";
 const deploymentCommit = "1234567890abcdef1234567890abcdef12345678";
 const deploymentId = "dpl_PostgresAdmission034";
 const sourceFingerprint = fingerprint("staged-source-boundary");
+const legacyProviderPrincipalFingerprint = fingerprint(
+  "google-drive-permission-principal-v1\nuser\nlegacy-writer@example.invalid",
+);
 const advisoryLockKey = 731102026032n;
 const originInventoryArtifact = JSON.parse(await readFile(path.join(
   repositoryRoot,
@@ -53,6 +59,23 @@ const originInventoryV3Fingerprint =
   "d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6";
 const providerInventoryV3Fingerprint =
   "6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692";
+const originInventoryV4Artifact = JSON.parse(await readFile(path.join(
+  repositoryRoot,
+  "docs/evidence/step11-6-production-origin-inventory-v4.json",
+), "utf8"));
+const activeAliasCensusArtifact = JSON.parse(await readFile(path.join(
+  repositoryRoot,
+  "docs/evidence/step11-6-production-active-alias-census-v1.json",
+), "utf8"));
+const originInventoryV4 = Object.freeze(originInventoryV4Artifact.records);
+const originInventoryV4Fingerprint =
+  "9d25299c72424a2b5c3c613649b7f07760fda64c0b0bb4823edaf2cd91622774";
+const providerInventoryV4Fingerprint =
+  "abd27e4e2747c17053f6debf71ec0f523d39fea8e2383d4911f9dc4b87959cbe";
+const credentialConfinementV4Artifact = JSON.parse(await readFile(path.join(
+  repositoryRoot,
+  "docs/evidence/step11-6-production-google-credential-confinement-v4.json",
+), "utf8"));
 // Migrations 036-038 remain historical and are exercised against the exact
 // post-capture additions they originally certified.  Runtime code intentionally
 // no longer exports this partial-inventory compatibility list after v3.
@@ -117,6 +140,24 @@ const credentialConfinementV2 = Object.freeze({
   credential_confinement_evidence_fingerprint:
     "071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133",
 });
+const credentialConfinementV3 = Object.freeze({
+  credential_confinement_evidence_schema:
+    "step11-6-production-google-credential-confinement-v3",
+  credential_confinement_record_count: 1292,
+  credential_confinement_records_fingerprint:
+    "7549a25c6cbdcec38ea0f331c8aff344cfee837a916ac8871fb5a4956f67838e",
+  credential_confinement_evidence_fingerprint:
+    "0c392e1b369d43c5c117716e6b00d3050ab1c8a9fc79b22df43050d0a7c7fb11",
+});
+const credentialConfinementV4 = Object.freeze({
+  credential_confinement_evidence_schema:
+    "step11-6-production-google-credential-confinement-v4",
+  credential_confinement_record_count: 1292,
+  credential_confinement_records_fingerprint:
+    "7549a25c6cbdcec38ea0f331c8aff344cfee837a916ac8871fb5a4956f67838e",
+  credential_confinement_evidence_fingerprint:
+    "6f468334a508553cdb9230c14ad85969c89169df6a2ec88011fb2e7e30c9656a",
+});
 const providerInventoryBindingV3 = Object.freeze({
   provider_inventory_schema: "step11-6-production-origin-inventory-v3",
   retained_origin_inventory_count: 1291,
@@ -131,6 +172,34 @@ const providerInventoryBindingV3 = Object.freeze({
   routing_rule_all_method_fence_required_path_count: 1,
   routing_rule_all_method_fence_required_paths_fingerprint:
     "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
+});
+const providerInventoryBindingV4 = Object.freeze({
+  provider_inventory_schema: "step11-6-production-origin-inventory-v4",
+  retained_origin_inventory_count: 1292,
+  retained_origin_inventory_fingerprint: originInventoryV4Fingerprint,
+  retained_provider_inventory_count: 1292,
+  retained_provider_inventory_fingerprint: providerInventoryV4Fingerprint,
+  live_provider_inventory_count: 1292,
+  live_provider_inventory_fingerprint: providerInventoryV4Fingerprint,
+  routing_rule_all_method_fence_required_host_count: 9,
+  routing_rule_all_method_fence_required_hosts_fingerprint:
+    "0423e6a742d6527b10afc071856dbc6c5b1cca5e1ffb09a5d2523d0f04b31c0c",
+  routing_rule_all_method_fence_required_path_count: 1,
+  routing_rule_all_method_fence_required_paths_fingerprint:
+    "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
+  routing_rule_hostname_operator: "DOES_NOT_EQUAL",
+  routing_rule_canonical_hostname: "baggerinv.com",
+  routing_rule_earlier_active_bypass_rule_count: 0,
+  routing_rule_global_invocation_quiescence_proved: true,
+  routing_rule_candidate_control_host_count: 2,
+  routing_rule_candidate_control_hosts_fingerprint:
+    "8ae83902ac5826bac13cd5e673136be67c6a807f85ec7f1e8382d1f0c35ca778",
+  routing_rule_canonical_apex_safe_method_count: 3,
+  routing_rule_canonical_apex_safe_methods_fingerprint:
+    "798954f7a6aab53443a1fac2333ce7043f7c5c5bf5bdbffdfdd19f18433e96e7",
+  routing_rule_canonical_apex_safe_method_writer_route_count: 10,
+  routing_rule_canonical_apex_safe_method_writer_routes_fingerprint:
+    "8f3bcfaf2b8fd6825ce5fb56385b1a1aa2e23da7bfe96b42e7e9c3ec23f4bcd7",
 });
 const retainedV3CandidateIdentity = Object.freeze({
   deploymentId: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
@@ -154,6 +223,49 @@ const candidateIdentity = Object.freeze({
   immutableOrigin:
     "https://bagger-step11-6-immutable-sandbagger-invitational.vercel.app",
 });
+const providerAliasInventoryRecords = Object.freeze([
+  ...activeAliasCensusArtifact.records.filter((record) =>
+    record[0] !==
+      "bagger-inv-git-feature-mock-tour-b4f752-sandbagger-invitational.vercel.app"
+  ),
+  [
+    candidateIdentity.aliasOrigin.slice("https://".length),
+    candidateIdentity.deploymentId,
+    candidateIdentity.immutableOrigin.slice("https://".length),
+    null,
+    null,
+  ],
+].sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
+  .map(Object.freeze));
+function providerAliasBindingForPurpose(purpose) {
+  const candidateImmutableHostname =
+    candidateIdentity.immutableOrigin.slice("https://".length);
+  const candidateRecords = purpose === "CUTOVER"
+    ? providerAliasInventoryRecords.map((record) => {
+      if (!["baggerinv.com", "bagger-inv.vercel.app", "www.baggerinv.com"]
+        .includes(record[0])) return record;
+      return Object.freeze([
+        record[0],
+        candidateIdentity.deploymentId,
+        candidateImmutableHostname,
+        record[0] === "www.baggerinv.com" ? "baggerinv.com" : null,
+        record[0] === "www.baggerinv.com" ? 308 : null,
+      ]);
+    })
+    : providerAliasInventoryRecords;
+  const records = Object.freeze([...candidateRecords]
+    .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0));
+  return Object.freeze({
+    candidate_alias_origin: candidateIdentity.aliasOrigin,
+    candidate_immutable_origin: candidateIdentity.immutableOrigin,
+    alias_inventory_count: records.length,
+    alias_inventory_fingerprint: fingerprint(JSON.stringify(records)),
+    alias_inventory_records: records,
+    alias_pagination_page_count: 1,
+    alias_pagination_fingerprint:
+      fingerprint(`pg17-migration-040-alias-pagination-${purpose}`),
+  });
+}
 const probeVectors = Object.freeze([
   { probeMethod: "DELETE", probePath: "/api/tournament-guide" },
   { probeMethod: "POST", probePath: "/api/admin/cms" },
@@ -185,6 +297,220 @@ function fingerprint(label) {
   return createHash("sha256").update(label).digest("hex");
 }
 
+function aclScalar(value) {
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (Number.isSafeInteger(value)) return String(value);
+  return String(value ?? "").trim();
+}
+
+function aclTupleFingerprint(domain, values) {
+  return fingerprint([domain, ...values.map(aclScalar)].join("\n"));
+}
+
+function aclTransitionIntentFingerprint(value) {
+  return aclTupleFingerprint(
+    "production-google-drive-acl-transition-intent-v1",
+    [
+      value.schemaVersion,
+      value.workbookId,
+      value.fenceId,
+      value.installRequestId,
+      value.transitionPhase,
+      value.providerMutationClass,
+      value.sourceRole,
+      value.targetRole,
+      value.permissionManagementScope,
+      value.legacyPermissionFingerprint,
+      value.legacyPrincipalFingerprint,
+      value.dedicatedPermissionFingerprint,
+      value.dedicatedPrincipalFingerprint,
+      value.dedicatedDriveIdentityFingerprint,
+      value.priorPermissionInventoryFingerprint,
+      value.expectedTargetPermissionInventoryFingerprint,
+      value.permissionIdentityFingerprint,
+      value.sharingCapabilityFingerprint,
+      value.priorAclFingerprint,
+      value.priorLegacyCanEdit,
+      value.priorLegacyCanShare,
+      value.expectedTargetLegacyCanEdit,
+      value.expectedTargetLegacyCanShare,
+      value.priorLegacyEditCapabilityFingerprint,
+      value.expectedTargetLegacyEditCapabilityFingerprint,
+      value.legacyDriveIdentityFingerprint,
+      value.permissionCount,
+      value.priorNonOwnerEditorCount,
+      value.expectedTargetNonOwnerEditorCount,
+      value.priorEffectiveNonOwnerEditorFingerprint,
+      value.expectedTargetEffectiveNonOwnerEditorFingerprint,
+    ],
+  );
+}
+
+function aclTransitionProofFingerprint(value) {
+  return aclTupleFingerprint(
+    "production-google-drive-acl-transition-proof-v1",
+    [
+      value.schemaVersion,
+      value.workbookId,
+      value.fenceId,
+      value.installRequestId,
+      value.transitionPhase,
+      value.providerMutationClass,
+      value.permissionManagementScope,
+      value.transitionIntentFingerprint,
+      value.legacyPermissionFingerprint,
+      value.legacyPrincipalFingerprint,
+      value.priorRole,
+      value.currentRole,
+      value.priorPermissionInventoryFingerprint,
+      value.currentPermissionInventoryFingerprint,
+      value.permissionIdentityFingerprint,
+      value.sharingCapabilityFingerprint,
+      value.dedicatedDriveIdentityFingerprint,
+      value.legacyDriveIdentityFingerprint,
+      value.priorAclFingerprint,
+      value.currentAclFingerprint,
+      value.priorLegacyCanEdit,
+      value.currentLegacyCanEdit,
+      value.priorLegacyCanShare,
+      value.currentLegacyCanShare,
+      value.priorLegacyEditCapabilityFingerprint,
+      value.currentLegacyEditCapabilityFingerprint,
+      value.dedicatedCanShare,
+      value.writersCanShare,
+    ],
+  );
+}
+
+function aclV2TransitionVector(label, fenceId, installRequestId) {
+  const shared = Object.freeze({
+    legacyPermissionFingerprint: fingerprint(`${label}-legacy-permission`),
+    legacyPrincipalFingerprint: legacyProviderPrincipalFingerprint,
+    dedicatedPermissionFingerprint: fingerprint(`${label}-dedicated-permission`),
+    dedicatedPrincipalFingerprint: fingerprint(`${label}-dedicated-principal`),
+    dedicatedDriveIdentityFingerprint: fingerprint(`${label}-dedicated-identity`),
+    legacyDriveIdentityFingerprint: fingerprint(`${label}-legacy-identity`),
+    permissionIdentityFingerprint: fingerprint(`${label}-permission-identities`),
+    sharingCapabilityFingerprint: fingerprint(`${label}-sharing-capability`),
+    writerPermissionInventoryFingerprint: fingerprint(`${label}-writer-inventory`),
+    readerPermissionInventoryFingerprint: fingerprint(`${label}-reader-inventory`),
+    writerAclFingerprint: fingerprint(`${label}-writer-acl`),
+    readerAclFingerprint: fingerprint(`${label}-reader-acl`),
+    writerLegacyCapabilityFingerprint: fingerprint(`${label}-writer-capability`),
+    readerLegacyCapabilityFingerprint: fingerprint(`${label}-reader-capability`),
+    writerEditorFingerprint: fingerprint(`${label}-writer-editors`),
+    readerEditorFingerprint: fingerprint(`${label}-reader-editors`),
+  });
+  const intent = ({ targetRole }) => {
+    const installing = targetRole === "reader";
+    const core = {
+      schemaVersion: "step12-production-google-drive-acl-transition-intent-v1",
+      workbookId: scope.source_workbook_id,
+      fenceId,
+      installRequestId,
+      transitionPhase: installing ? "INSTALL" : "ABORT",
+      providerMutationClass: installing
+        ? "DRIVE_LEGACY_PERMISSION_WRITER_TO_READER_V1"
+        : "DRIVE_LEGACY_PERMISSION_READER_TO_WRITER_V1",
+      sourceRole: installing ? "writer" : "reader",
+      targetRole,
+      permissionManagementScope: "https://www.googleapis.com/auth/drive.file",
+      legacyPermissionFingerprint: shared.legacyPermissionFingerprint,
+      legacyPrincipalFingerprint: shared.legacyPrincipalFingerprint,
+      dedicatedPermissionFingerprint: shared.dedicatedPermissionFingerprint,
+      dedicatedPrincipalFingerprint: shared.dedicatedPrincipalFingerprint,
+      dedicatedDriveIdentityFingerprint: shared.dedicatedDriveIdentityFingerprint,
+      priorPermissionInventoryFingerprint: installing
+        ? shared.writerPermissionInventoryFingerprint
+        : shared.readerPermissionInventoryFingerprint,
+      expectedTargetPermissionInventoryFingerprint: installing
+        ? shared.readerPermissionInventoryFingerprint
+        : shared.writerPermissionInventoryFingerprint,
+      permissionIdentityFingerprint: shared.permissionIdentityFingerprint,
+      sharingCapabilityFingerprint: shared.sharingCapabilityFingerprint,
+      priorAclFingerprint: installing
+        ? shared.writerAclFingerprint
+        : shared.readerAclFingerprint,
+      priorLegacyCanEdit: installing,
+      priorLegacyCanShare: installing,
+      expectedTargetLegacyCanEdit: !installing,
+      expectedTargetLegacyCanShare: !installing,
+      priorLegacyEditCapabilityFingerprint: installing
+        ? shared.writerLegacyCapabilityFingerprint
+        : shared.readerLegacyCapabilityFingerprint,
+      expectedTargetLegacyEditCapabilityFingerprint: installing
+        ? shared.readerLegacyCapabilityFingerprint
+        : shared.writerLegacyCapabilityFingerprint,
+      legacyDriveIdentityFingerprint: shared.legacyDriveIdentityFingerprint,
+      permissionCount: 3,
+      priorNonOwnerEditorCount: installing ? 2 : 1,
+      expectedTargetNonOwnerEditorCount: installing ? 1 : 2,
+      priorEffectiveNonOwnerEditorFingerprint: installing
+        ? shared.writerEditorFingerprint
+        : shared.readerEditorFingerprint,
+      expectedTargetEffectiveNonOwnerEditorFingerprint: installing
+        ? shared.readerEditorFingerprint
+        : shared.writerEditorFingerprint,
+    };
+    return Object.freeze({
+      ...core,
+      transitionIntentFingerprint: aclTransitionIntentFingerprint(core),
+    });
+  };
+  const proof = (transitionIntent) => {
+    const installing = transitionIntent.targetRole === "reader";
+    const core = {
+      schemaVersion: "step12-production-google-drive-acl-transition-proof-v1",
+      workbookId: scope.source_workbook_id,
+      fenceId,
+      installRequestId,
+      transitionPhase: transitionIntent.transitionPhase,
+      providerMutationClass: transitionIntent.providerMutationClass,
+      permissionManagementScope: transitionIntent.permissionManagementScope,
+      transitionIntentFingerprint: transitionIntent.transitionIntentFingerprint,
+      legacyPermissionFingerprint: shared.legacyPermissionFingerprint,
+      legacyPrincipalFingerprint: shared.legacyPrincipalFingerprint,
+      priorRole: transitionIntent.sourceRole,
+      currentRole: transitionIntent.targetRole,
+      priorPermissionInventoryFingerprint:
+        transitionIntent.priorPermissionInventoryFingerprint,
+      currentPermissionInventoryFingerprint:
+        transitionIntent.expectedTargetPermissionInventoryFingerprint,
+      permissionIdentityFingerprint: shared.permissionIdentityFingerprint,
+      sharingCapabilityFingerprint: shared.sharingCapabilityFingerprint,
+      dedicatedDriveIdentityFingerprint: shared.dedicatedDriveIdentityFingerprint,
+      legacyDriveIdentityFingerprint: shared.legacyDriveIdentityFingerprint,
+      priorAclFingerprint: transitionIntent.priorAclFingerprint,
+      currentAclFingerprint: installing
+        ? shared.readerAclFingerprint
+        : shared.writerAclFingerprint,
+      priorLegacyCanEdit: transitionIntent.priorLegacyCanEdit,
+      currentLegacyCanEdit: transitionIntent.expectedTargetLegacyCanEdit,
+      priorLegacyCanShare: transitionIntent.priorLegacyCanShare,
+      currentLegacyCanShare: transitionIntent.expectedTargetLegacyCanShare,
+      priorLegacyEditCapabilityFingerprint:
+        transitionIntent.priorLegacyEditCapabilityFingerprint,
+      currentLegacyEditCapabilityFingerprint:
+        transitionIntent.expectedTargetLegacyEditCapabilityFingerprint,
+      dedicatedCanShare: true,
+      writersCanShare: true,
+    };
+    return Object.freeze({
+      ...core,
+      transitionFingerprint: aclTransitionProofFingerprint(core),
+    });
+  };
+  const installIntent = intent({ targetRole: "reader" });
+  const restoreIntent = intent({ targetRole: "writer" });
+  return Object.freeze({
+    shared,
+    installIntent,
+    installProof: proof(installIntent),
+    restoreIntent,
+    restoreProof: proof(restoreIntent),
+  });
+}
+
 assert.equal(originInventoryArtifact.recordCount, 1140);
 assert.equal(originInventory.length, 1140);
 assert.equal(originInventoryArtifact.recordsFingerprint, originInventoryFingerprint);
@@ -199,6 +525,28 @@ assert.equal(originInventoryV3Artifact.providerRecordsFingerprint,
   providerInventoryV3Fingerprint);
 assert.equal(fingerprint(JSON.stringify(originInventoryV3)),
   originInventoryV3Fingerprint);
+assert.equal(originInventoryV4Artifact.schemaVersion,
+  "step11-6-production-origin-inventory-v4");
+assert.equal(originInventoryV4Artifact.recordCount, 1292);
+assert.equal(originInventoryV4Artifact.providerRecordCount, 1292);
+assert.equal(originInventoryV4Artifact.recordsFingerprint,
+  originInventoryV4Fingerprint);
+assert.equal(originInventoryV4Artifact.providerRecordsFingerprint,
+  providerInventoryV4Fingerprint);
+assert.equal(fingerprint(JSON.stringify(originInventoryV4)),
+  originInventoryV4Fingerprint);
+assert.equal(activeAliasCensusArtifact.recordCount, 56);
+assert.equal(activeAliasCensusArtifact.recordsFingerprint,
+  fingerprint(JSON.stringify(activeAliasCensusArtifact.records)));
+assert.equal(providerAliasInventoryRecords.length, 56);
+assert.equal(credentialConfinementV4Artifact.schemaVersion,
+  credentialConfinementV4.credential_confinement_evidence_schema);
+assert.equal(credentialConfinementV4Artifact.classificationRecordCount,
+  credentialConfinementV4.credential_confinement_record_count);
+assert.equal(credentialConfinementV4Artifact.classificationRecordsFingerprint,
+  credentialConfinementV4.credential_confinement_records_fingerprint);
+assert.equal(credentialConfinementV4Artifact.evidenceFingerprint,
+  credentialConfinementV4.credential_confinement_evidence_fingerprint);
 
 function compareCodepoint(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
@@ -240,6 +588,31 @@ function liveOriginInventoryThrough037For(target = "PREVIEW", additions = []) {
     ...additions,
     candidateInventoryTuple(target),
   ]);
+}
+
+function liveOriginInventoryV4ForCutover(candidateTarget = "PREVIEW") {
+  assert.equal(candidateTarget, "PREVIEW",
+    "the current v4 control candidate is Preview-only");
+  return sortLiveOriginInventory([
+    ...originInventoryV4,
+    [
+      candidateIdentity.deploymentId,
+      candidateIdentity.commit,
+      candidateIdentity.immutableOrigin,
+      "PROJECT_PREVIEW",
+      "READY",
+      fingerprint("pg17-migration-040-candidate-provider-metadata"),
+    ],
+  ]);
+}
+
+function providerInventoryBindingV4ForLive(liveInventory) {
+  return {
+    ...providerInventoryBindingV4,
+    live_provider_inventory_count: liveInventory.length,
+    live_provider_inventory_fingerprint:
+      fingerprint("pg17-provider-v4:" + JSON.stringify(liveInventory)),
+  };
 }
 
 function assertExactLiveOriginInventory(
@@ -409,16 +782,20 @@ function quiesceProbeRecords(
   ]);
 }
 
-function quiesceProbeRecordsV3(
-  observedAt = new Date().toISOString(),
-  candidate = retainedV3CandidateIdentity,
+function quiesceProbeRecordsForProviderInventory(
+  inventory,
+  observedAt,
+  candidate,
+  { excludeCanonicalApex = false } = {},
 ) {
   const edgeRequestSetNonce = randomUUID();
   const origins = [
-    ...originInventoryV3.map((record) => ({
+    ...inventory.map((record) => ({
       origin: record[2],
       originKind: record[3] === "PRODUCTION_TARGET"
         ? "IMMUTABLE_PRODUCTION_TARGET"
+        : record[3] === "CUTOVER_PRODUCTION_CANDIDATE"
+        ? "IMMUTABLE_CUTOVER_PRODUCTION_CANDIDATE"
         : "IMMUTABLE_PROJECT_PREVIEW",
       deploymentId: record[0],
       sha: record[1],
@@ -444,7 +821,7 @@ function quiesceProbeRecordsV3(
         ],
     })),
     ...[
-      "https://baggerinv.com",
+      ...(excludeCanonicalApex ? [] : ["https://baggerinv.com"]),
       "https://www.baggerinv.com",
       "https://bagger-inv.vercel.app",
       candidate.mainBranchAliasOrigin,
@@ -492,6 +869,29 @@ function quiesceProbeRecordsV3(
     ].join("\n"))),
     observedAt,
   ]);
+}
+
+function quiesceProbeRecordsV3(
+  observedAt = new Date().toISOString(),
+  candidate = retainedV3CandidateIdentity,
+) {
+  return quiesceProbeRecordsForProviderInventory(
+    originInventoryV3,
+    observedAt,
+    candidate,
+  );
+}
+
+function quiesceProbeRecordsV4(
+  liveInventory,
+  observedAt = new Date().toISOString(),
+) {
+  return quiesceProbeRecordsForProviderInventory(
+    liveInventory,
+    observedAt,
+    candidateIdentity,
+    { excludeCanonicalApex: true },
+  );
 }
 
 function sqlLiteral(value) {
@@ -1003,6 +1403,9 @@ function quiesceBeginInput(purpose, label, priorEvidenceId = undefined) {
     authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
     owner_principal_fingerprint: fingerprint("production-workbook-owner"),
     owner_override_operationally_frozen: true,
+    // Migration 034's historical receipt contract is immutable at 30 minutes.
+    // Migration 040-specific helpers below use the certified 2100-second v4
+    // contract after the predecessor constraints have been recertified.
     owner_freeze_ttl_seconds: 1800,
     ...credentialConfinement,
   };
@@ -1034,6 +1437,24 @@ function providerChallengeIssueInput(input, stage, label, {
     routing_rule_id: input.routing_rule_id,
     routing_rule_config_version: input.routing_rule_revision,
     routing_rule_scope: input.routing_rule_scope,
+    routing_rule_hostname_operator: input.routing_rule_hostname_operator,
+    routing_rule_canonical_hostname: input.routing_rule_canonical_hostname,
+    routing_rule_earlier_active_bypass_rule_count:
+      input.routing_rule_earlier_active_bypass_rule_count,
+    routing_rule_global_invocation_quiescence_proved:
+      input.routing_rule_global_invocation_quiescence_proved,
+    routing_rule_candidate_control_host_count:
+      input.routing_rule_candidate_control_host_count,
+    routing_rule_candidate_control_hosts_fingerprint:
+      input.routing_rule_candidate_control_hosts_fingerprint,
+    routing_rule_canonical_apex_safe_method_count:
+      input.routing_rule_canonical_apex_safe_method_count,
+    routing_rule_canonical_apex_safe_methods_fingerprint:
+      input.routing_rule_canonical_apex_safe_methods_fingerprint,
+    routing_rule_canonical_apex_safe_method_writer_route_count:
+      input.routing_rule_canonical_apex_safe_method_writer_route_count,
+    routing_rule_canonical_apex_safe_method_writer_routes_fingerprint:
+      input.routing_rule_canonical_apex_safe_method_writer_routes_fingerprint,
   };
 }
 
@@ -1139,7 +1560,11 @@ function reserveProviderAttestation(
   input,
   stage,
   label,
-  { providerOverrides = {}, returnDetails = false } = {},
+  {
+    providerOverrides = {},
+    returnDetails = false,
+    assertRoutingAudit = false,
+  } = {},
 ) {
   const issueInput = providerChallengeIssueInput(input, stage, label);
   const purpose = issueInput.purpose;
@@ -1151,6 +1576,20 @@ function reserveProviderAttestation(
     "issue_production_vercel_provider_attestation_challenge",
     issueInput,
   );
+  if (issueInput.routing_rule_hostname_operator !== undefined) {
+    assert.equal(
+      challenge.routing_rule_hostname_operator,
+      "DOES_NOT_EQUAL",
+    );
+    assert.equal(
+      challenge.routing_rule_canonical_hostname,
+      "baggerinv.com",
+    );
+    assert.equal(
+      Number(challenge.routing_rule_earlier_active_bypass_rule_count),
+      0,
+    );
+  }
   const attestation = providerAttestation(stage, `${label}-attestation`, {
     purpose,
     target: input.candidate_deployment_target,
@@ -1179,6 +1618,25 @@ function reserveProviderAttestation(
     live_origin_inventory: input.live_origin_inventory,
     provider_attestation: attestation,
   };
+  if (assertRoutingAudit) {
+    assertCommandFailure(
+      () => rpc(
+        cluster,
+        database,
+        "consume_production_vercel_provider_attestation_challenge",
+        {
+          ...consumeInput,
+          consume_request_id: randomUUID(),
+          request_fingerprint: fingerprint(label + "-routing-audit-drift"),
+          provider_attestation: {
+            ...attestation,
+            routing_rule_earlier_active_bypass_rule_count: 1,
+          },
+        },
+      ),
+      /PRODUCTION_VERCEL_ROUTING_RULE_AUDIT_MISMATCH/,
+    );
+  }
   const reserved = rpc(
     cluster,
     database,
@@ -1186,6 +1644,20 @@ function reserveProviderAttestation(
     consumeInput,
   );
   assert.equal(reserved.status, "RESERVED");
+  if (attestation.routing_rule_hostname_operator !== undefined) {
+    assert.equal(
+      reserved.routing_rule_hostname_operator,
+      "DOES_NOT_EQUAL",
+    );
+    assert.equal(
+      reserved.routing_rule_canonical_hostname,
+      "baggerinv.com",
+    );
+    assert.equal(
+      Number(reserved.routing_rule_earlier_active_bypass_rule_count),
+      0,
+    );
+  }
   const binding = {
     attestation_id: reserved.attestation_id,
     attestation_fingerprint: reserved.attestation_fingerprint,
@@ -1288,6 +1760,678 @@ function certifyQuiesce(
   return verified;
 }
 
+function wafSemanticConfiguration(label, orderedCustomRules = []) {
+  return Object.freeze({
+    schemaVersion: "bagger-vercel-waf-semantic-configuration-v1",
+    securityConfigurationKeys: ["crs", "firewallEnabled", "ips", "rules"],
+    securityConfigurationKeysFingerprint:
+      fingerprint(`${label}-security-configuration-keys`),
+    firewallEnabled: true,
+    ips: [],
+    crs: { enabled: true },
+    orderedCustomRules,
+  });
+}
+
+function criticalWafEvidence(context, stage, transitionRequestId, label) {
+  const observedAt = new Date().toISOString();
+  const expiresAt = new Date(
+    Date.parse(observedAt) + 2_100_000,
+  ).toISOString();
+  const baseline = stage === "BASELINE_CAPTURE" ||
+    stage === "BASELINE_RESTORED";
+  const reattest = stage === "CRITICAL_REATTEST";
+  const critical = stage === "CRITICAL_ACTIVE" || reattest;
+  const semanticConfiguration = baseline
+    ? context.baselineSemanticConfiguration
+    : context.criticalSemanticConfiguration;
+  const semanticConfigurationFingerprint = baseline
+    ? context.baselineSemanticFingerprint
+    : context.criticalSemanticFingerprint;
+  const evidence = {
+    schemaVersion: "bagger-vercel-waf-provider-evidence-v1",
+    evidenceId: randomUUID(),
+    evidenceRequestId: randomUUID(),
+    wafEpochId: context.epochId,
+    transitionRequestId,
+    requestFingerprint: fingerprint(`${label}-signed-request`),
+    stage,
+    purpose: context.purpose,
+    transitionMode: context.transitionMode,
+    vercelProjectId: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    vercelTeamId: "team_SandbaggerInvitations",
+    candidateAliasOrigin: candidateIdentity.aliasOrigin,
+    candidateImmutableOrigin: candidateIdentity.immutableOrigin,
+    candidateDeploymentId: candidateIdentity.deploymentId,
+    candidateCommitSha: candidateIdentity.commit,
+    candidateDeploymentTarget: "PREVIEW",
+    runOwnedRuleName: context.runOwnedRuleName,
+    runOwnedRuleNonce: context.runOwnedRuleNonce,
+    runOwnedRuleFingerprint: context.runOwnedRuleFingerprint,
+    runOwnedInsertDocumentFingerprint:
+      context.runOwnedInsertDocumentFingerprint,
+    providerAssignedRuleId: critical ? context.providerAssignedRuleId : null,
+    baselineEvidenceId: stage === "BASELINE_CAPTURE"
+      ? null : context.baselineEvidenceId,
+    criticalEvidenceId: reattest || stage === "BASELINE_RESTORED"
+      ? context.criticalEvidenceId : null,
+    baselineConfigurationVersion: stage === "BASELINE_CAPTURE"
+      ? null : context.baselineConfigurationVersion,
+    baselineSourceVersionReadFingerprint: stage === "BASELINE_CAPTURE"
+      ? null : context.baselineSourceVersionReadFingerprint,
+    configurationMode: baseline ? "BASELINE" : "CRITICAL_WINDOW",
+    configurationVersion: baseline
+      ? context.baselineConfigurationVersion
+      : context.criticalConfigurationVersion,
+    configurationEtag: null,
+    providerConfigurationId: context.providerConfigurationId,
+    providerOwnerId: context.providerOwnerId,
+    configurationIdentityFingerprint: baseline
+      ? context.baselineConfigurationIdentityFingerprint
+      : context.criticalConfigurationIdentityFingerprint,
+    semanticConfiguration,
+    semanticConfigurationFingerprint,
+    orderedCustomRulesFingerprint: baseline
+      ? context.baselineOrderedCustomRulesFingerprint
+      : context.criticalOrderedCustomRulesFingerprint,
+    baselineSemanticFingerprint: context.baselineSemanticFingerprint,
+    criticalSemanticFingerprint: stage === "BASELINE_CAPTURE"
+      ? null : context.criticalSemanticFingerprint,
+    customRuleCount: baseline ? 0 : 1,
+    runOwnedProviderRuleDocumentFingerprint: critical
+      ? context.runOwnedProviderRuleDocumentFingerprint : null,
+    runOwnedRulePrecedence: critical ? 0 : null,
+    criticalWindowContractFingerprint: critical
+      ? context.criticalWindowContractFingerprint : null,
+    pendingDraftChangeCount: 0,
+    providerObservedAt: observedAt,
+    attestedAt: observedAt,
+    expiresAt,
+    sourceVersionReadFingerprint:
+      context.baselineSourceVersionReadFingerprint,
+    evidenceFingerprint: fingerprint(`${label}-signed-evidence`),
+    signerKeyFingerprint: fingerprint("step11-6-vercel-attester-key-v1"),
+    signerKeyVersion: "STEP11_6_VERCEL_ATTESTER_V1",
+    signatureVerified: true,
+  };
+  assert.equal(Object.keys(evidence).length, 49);
+  return Object.freeze(evidence);
+}
+
+function criticalWafDispatchResult(context, dispatch, label) {
+  const observedAt = new Date().toISOString();
+  const evidence = {
+    schemaVersion: "bagger-vercel-waf-rule-insert-dispatch-result-v3",
+    dispatchResultId: randomUUID(),
+    dispatchId: dispatch.dispatch_id,
+    dispatchRequestId: dispatch.dispatch_request_id,
+    dispatchStep: dispatch.dispatch_step,
+    wafEpochId: context.epochId,
+    transitionRequestId: dispatch.transition_request_id,
+    requestFingerprint: fingerprint(`${label}-signed-request`),
+    purpose: context.purpose,
+    transitionMode: context.transitionMode,
+    projectId: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    teamId: "team_SandbaggerInvitations",
+    candidateAliasOrigin: candidateIdentity.aliasOrigin,
+    candidateImmutableOrigin: candidateIdentity.immutableOrigin,
+    candidateDeploymentId: candidateIdentity.deploymentId,
+    candidateCommitSha: candidateIdentity.commit,
+    candidateDeploymentTarget: "PREVIEW",
+    baselineEvidenceId: context.baselineEvidenceId,
+    baselineConfigurationVersion: context.baselineConfigurationVersion,
+    baselineConfigurationEtag: null,
+    baselineConfigurationIdentityFingerprint:
+      context.baselineConfigurationIdentityFingerprint,
+    baselineSemanticFingerprint: context.baselineSemanticFingerprint,
+    baselineOrderedCustomRulesFingerprint:
+      context.baselineOrderedCustomRulesFingerprint,
+    baselineSourceVersionReadFingerprint:
+      context.baselineSourceVersionReadFingerprint,
+    providerIntentFingerprint: dispatch.provider_intent_fingerprint,
+    runOwnedRuleName: context.runOwnedRuleName,
+    runOwnedRuleNonce: context.runOwnedRuleNonce,
+    runOwnedRuleFingerprint: context.runOwnedRuleFingerprint,
+    runOwnedInsertDocumentFingerprint:
+      context.runOwnedInsertDocumentFingerprint,
+    outcomeStatus: "TARGET_CONFIRMED",
+    providerResponseObserved: true,
+    providerResponseStatus: null,
+    providerResponseFingerprint: fingerprint(`${label}-provider-response`),
+    providerReadbackFingerprint: fingerprint(`${label}-provider-readback`),
+    activeSemanticConfiguration: context.baselineSemanticConfiguration,
+    activeSemanticConfigurationFingerprint: context.baselineSemanticFingerprint,
+    activeCustomRuleCount: 0,
+    activePendingDraftPresent: false,
+    draftSemanticConfiguration: context.criticalSemanticConfiguration,
+    draftSemanticConfigurationFingerprint: context.criticalSemanticFingerprint,
+    draftOrderedCustomRulesFingerprint:
+      context.criticalOrderedCustomRulesFingerprint,
+    draftConfigurationVersion: "DRAFT",
+    draftConfigurationIdentityFingerprint:
+      context.draftConfigurationIdentityFingerprint,
+    draftCustomRuleCount: 1,
+    pendingDraftChangeCount: 1,
+    providerAssignedRuleId: context.providerAssignedRuleId,
+    runOwnedProviderRuleDocumentFingerprint:
+      context.runOwnedProviderRuleDocumentFingerprint,
+    runOwnedRulePrecedence: 0,
+    criticalWindowContractFingerprint:
+      context.criticalWindowContractFingerprint,
+    providerObservedAt: observedAt,
+    attestedAt: observedAt,
+    expiresAt: new Date(Date.parse(observedAt) + 2_100_000).toISOString(),
+    evidenceFingerprint: fingerprint(`${label}-signed-evidence`),
+    signerKeyFingerprint: fingerprint("step11-6-vercel-attester-key-v1"),
+    signerKeyVersion: "STEP11_6_VERCEL_ATTESTER_V1",
+    signatureVerified: true,
+  };
+  assert.equal(Object.keys(evidence).length, 56);
+  return Object.freeze(evidence);
+}
+
+function criticalWafDispatchInput(context, step, label, extras = {}) {
+  return {
+    ...scope,
+    actor_id: actor,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    operation: "BEGIN_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_DISPATCH",
+    epoch_id: context.epochId,
+    dispatch_request_id: randomUUID(),
+    transition_request_id: randomUUID(),
+    dispatch_step: step,
+    request_fingerprint: fingerprint(`${label}-dispatch-request`),
+    provider_intent_fingerprint: fingerprint(`${label}-provider-intent`),
+    ...extras,
+  };
+}
+
+function markCriticalWafDispatch(cluster, database, dispatch) {
+  return rpc(
+    cluster,
+    database,
+    "mark_production_vercel_writer_critical_waf_dispatch_started",
+    {
+      operation:
+        "MARK_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_DISPATCH_STARTED",
+      dispatch_id: dispatch.dispatch_id,
+      dispatch_request_id: dispatch.dispatch_request_id,
+      transition_request_id: dispatch.transition_request_id,
+      request_fingerprint: dispatch.request_fingerprint,
+    },
+  );
+}
+
+function activateCriticalWafEpochV4(
+  cluster,
+  database,
+  label,
+  { purpose = "CUTOVER", transitionMode = purpose } = {},
+) {
+  const runOwnedRuleNonce = randomUUID();
+  const epochId = randomUUID();
+  const context = {
+    epochId,
+    purpose,
+    transitionMode,
+    runOwnedRuleNonce,
+    runOwnedRuleName: `bagger-critical-window-${runOwnedRuleNonce}`,
+    runOwnedRuleFingerprint: fingerprint(`${label}-run-owned-rule`),
+    runOwnedInsertDocumentFingerprint:
+      fingerprint(`${label}-run-owned-insert-document`),
+    providerAssignedRuleId: `rule_${fingerprint(label).slice(0, 16)}`,
+    runOwnedProviderRuleDocumentFingerprint:
+      fingerprint(`${label}-provider-rule-document`),
+    criticalWindowContractFingerprint:
+      fingerprint(`${label}-critical-window-contract`),
+    baselineConfigurationVersion: "10",
+    criticalConfigurationVersion: "11",
+    providerConfigurationId: "config_bagger_production",
+    providerOwnerId: "team_SandbaggerInvitations",
+    baselineConfigurationIdentityFingerprint:
+      fingerprint(`${label}-baseline-identity`),
+    criticalConfigurationIdentityFingerprint:
+      fingerprint(`${label}-critical-identity`),
+    draftConfigurationIdentityFingerprint:
+      fingerprint(`${label}-draft-identity`),
+    baselineSourceVersionReadFingerprint:
+      fingerprint(`${label}-baseline-source-version-read`),
+    baselineSemanticFingerprint: fingerprint(`${label}-baseline-semantic`),
+    criticalSemanticFingerprint: fingerprint(`${label}-critical-semantic`),
+    baselineOrderedCustomRulesFingerprint:
+      fingerprint(`${label}-baseline-ordered-rules`),
+    criticalOrderedCustomRulesFingerprint:
+      fingerprint(`${label}-critical-ordered-rules`),
+  };
+  context.baselineSemanticConfiguration = wafSemanticConfiguration(
+    `${label}-baseline`,
+  );
+  context.criticalSemanticConfiguration = wafSemanticConfiguration(
+    `${label}-critical`,
+    [{ id: context.providerAssignedRuleId, name: context.runOwnedRuleName }],
+  );
+  const baselineTransitionRequestId = randomUUID();
+  const baselineEvidence = criticalWafEvidence(
+    context,
+    "BASELINE_CAPTURE",
+    baselineTransitionRequestId,
+    `${label}-baseline`,
+  );
+  context.baselineEvidenceId = baselineEvidence.evidenceId;
+  const epoch = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_critical_waf_epoch",
+    {
+      ...scope,
+      actor_id: actor,
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      operation: "BEGIN_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_EPOCH",
+      epoch_id: epochId,
+      epoch_request_id: randomUUID(),
+      baseline_observation_request_id: randomUUID(),
+      purpose,
+      transition_mode: transitionMode,
+      request_fingerprint: fingerprint(`${label}-epoch-begin`),
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      candidate_deployment_target: "PREVIEW",
+      candidate_alias_origin: candidateIdentity.aliasOrigin,
+      candidate_immutable_origin: candidateIdentity.immutableOrigin,
+      candidate_control_hosts_fingerprint:
+        providerInventoryBindingV4.routing_rule_candidate_control_hosts_fingerprint,
+      baseline_waf_evidence: baselineEvidence,
+    },
+  );
+  assert.equal(epoch.status, "ACTIVATION_PENDING");
+
+  const insertInput = criticalWafDispatchInput(
+    context,
+    "CRITICAL_RULE_INSERT",
+    `${label}-rule-insert`,
+  );
+  const insertDispatch = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_critical_waf_dispatch",
+    insertInput,
+  );
+  markCriticalWafDispatch(cluster, database, insertDispatch);
+  const insertResult = rpc(
+    cluster,
+    database,
+    "record_production_vercel_writer_critical_waf_dispatch_result",
+    {
+      operation: "RECORD_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_DISPATCH_RESULT",
+      dispatch_id: insertDispatch.dispatch_id,
+      request_fingerprint: fingerprint(`${label}-rule-insert-result`),
+      verified_dispatch_result: criticalWafDispatchResult(
+        context,
+        insertDispatch,
+        `${label}-rule-insert-result`,
+      ),
+    },
+  );
+  assert.equal(insertResult.outcome_status, "TARGET_CONFIRMED");
+
+  const activateInput = criticalWafDispatchInput(
+    context,
+    "CRITICAL_DRAFT_ACTIVATE",
+    `${label}-draft-activate`,
+  );
+  const activateDispatch = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_critical_waf_dispatch",
+    activateInput,
+  );
+  markCriticalWafDispatch(cluster, database, activateDispatch);
+  const criticalEvidence = criticalWafEvidence(
+    context,
+    "CRITICAL_ACTIVE",
+    activateDispatch.transition_request_id,
+    `${label}-critical-active`,
+  );
+  context.criticalEvidenceId = criticalEvidence.evidenceId;
+  const activated = rpc(
+    cluster,
+    database,
+    "record_production_vercel_writer_critical_waf_dispatch_result",
+    {
+      operation: "RECORD_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_DISPATCH_RESULT",
+      dispatch_id: activateDispatch.dispatch_id,
+      observation_request_id: randomUUID(),
+      request_fingerprint: fingerprint(`${label}-draft-activate-result`),
+      verified_waf_evidence: criticalEvidence,
+    },
+  );
+  assert.equal(activated.status, "ACTIVE_UNBOUND");
+  context.criticalActiveObservationId = activated.provider_result_observation_id;
+  return context;
+}
+
+function reattestCriticalWafEpochV4(cluster, database, context, label) {
+  const transitionRequestId = randomUUID();
+  const evidence = criticalWafEvidence(
+    context,
+    "CRITICAL_REATTEST",
+    transitionRequestId,
+    label,
+  );
+  const reattested = rpc(
+    cluster,
+    database,
+    "record_production_vercel_writer_critical_waf_reattestation",
+    {
+      operation:
+        "RECORD_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_REATTESTATION",
+      epoch_id: context.epochId,
+      observation_request_id: randomUUID(),
+      request_fingerprint: fingerprint(`${label}-record`),
+      verified_waf_evidence: evidence,
+    },
+  );
+  assert.equal(reattested.status, "FENCE_BOUND");
+  return {
+    ...context,
+    latestCriticalReattestObservationId:
+      reattested.critical_reattest_observation_id,
+  };
+}
+
+function restoreCriticalWafBaselineV4(
+  cluster,
+  database,
+  context,
+  fence,
+  label,
+) {
+  const restoreRequestId = randomUUID();
+  const restoreRequestFingerprint = fingerprint(`${label}-restore-request`);
+  const restoreDispatchInput = criticalWafDispatchInput(
+    context,
+    "BASELINE_VERSION_ACTIVATE",
+    `${label}-baseline-activate`,
+    {
+      restore_request_id: restoreRequestId,
+      restore_request_fingerprint: restoreRequestFingerprint,
+    },
+  );
+  const restoreDispatch = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_critical_waf_dispatch",
+    restoreDispatchInput,
+  );
+  assert.equal(restoreDispatch.status, "RESERVED");
+  markCriticalWafDispatch(cluster, database, restoreDispatch);
+  const restoredEvidence = criticalWafEvidence(
+    context,
+    "BASELINE_RESTORED",
+    restoreDispatch.transition_request_id,
+    `${label}-baseline-restored`,
+  );
+  const restoredEpoch = rpc(
+    cluster,
+    database,
+    "record_production_vercel_writer_critical_waf_dispatch_result",
+    {
+      operation:
+        "RECORD_PRODUCTION_VERCEL_WRITER_CRITICAL_WAF_DISPATCH_RESULT",
+      dispatch_id: restoreDispatch.dispatch_id,
+      observation_request_id: randomUUID(),
+      request_fingerprint: fingerprint(`${label}-baseline-result`),
+      verified_waf_evidence: restoredEvidence,
+    },
+  );
+  assert.equal(restoredEpoch.status, "BASELINE_RESTORED");
+  assert.equal(restoredEpoch.baseline_restored, true);
+  const finalized = rpc(
+    cluster,
+    database,
+    "finalize_production_google_writer_fence_waf_restore",
+    {
+      ...scope,
+      actor_id: actor,
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      operation:
+        "FINALIZE_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_WAF_BASELINE_RESTORE",
+      fence_id: fence.fence_id,
+      critical_waf_epoch_id: context.epochId,
+      baseline_restored_observation_id:
+        restoredEpoch.provider_result_observation_id,
+      request_fingerprint: fingerprint(`${label}-finalize`),
+    },
+  );
+  assert.equal(finalized.status, "REHEARSAL_RESTORED");
+  assert.equal(finalized.baseline_restored, true);
+  assert.equal(finalized.critical_window_active, false);
+  return { restoreDispatch, restoredEvidence, restoredEpoch, finalized };
+}
+
+function certifyQuiesceV4(
+  cluster,
+  database,
+  label,
+  {
+    purpose = "CUTOVER",
+    criticalWaf = undefined,
+    criticalWafQuiesceStage = "INSTALL",
+  } = {},
+) {
+  const candidateTarget = "PREVIEW";
+  const waf = criticalWaf ?? activateCriticalWafEpochV4(
+    cluster,
+    database,
+    `${label}-critical-waf`,
+    { purpose, transitionMode: purpose },
+  );
+  const liveInventory = liveOriginInventoryV4ForCutover(candidateTarget);
+  const providerBinding = providerInventoryBindingV4ForLive(liveInventory);
+  const providerAliasBinding = providerAliasBindingForPurpose(purpose);
+  const beginInput = {
+    ...scope,
+    actor_id: actor,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    purpose,
+    evidence_request_id: randomUUID(),
+    request_fingerprint: fingerprint(label + "-begin-request"),
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    candidate_deployment_target: candidateTarget,
+    candidate_credential_generation: candidateIdentity.credentialGeneration,
+    main_branch_alias_origin: candidateIdentity.mainBranchAliasOrigin,
+    candidate_alias_origin: candidateIdentity.aliasOrigin,
+    candidate_immutable_origin: candidateIdentity.immutableOrigin,
+    vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    routing_rule_id: "step11_6_pg17_writer_quiesce_v4",
+    routing_rule_revision: "revision-v4",
+    routing_rule_scope: "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
+    origin_inventory: originInventoryV4,
+    live_origin_inventory: liveInventory,
+    first_probe_records: quiesceProbeRecordsV4(liveInventory),
+    owner_principal_fingerprint: fingerprint("production-workbook-owner"),
+    owner_override_operationally_frozen: true,
+    owner_freeze_confirmation: purpose === "CUTOVER"
+      ? "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS PRODUCTION CUTOVER"
+      : "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS REHEARSAL",
+    owner_freeze_ttl_seconds: 2100,
+    critical_waf_epoch_id: waf.epochId,
+    critical_waf_observation_id: criticalWafQuiesceStage === "INSTALL"
+      ? waf.criticalActiveObservationId
+      : waf.latestCriticalReattestObservationId,
+    critical_waf_quiesce_stage: criticalWafQuiesceStage,
+    ...providerBinding,
+    ...credentialConfinementV4,
+  };
+  assertCommandFailure(
+    () => rpc(
+      cluster,
+      database,
+      "issue_production_vercel_provider_attestation_challenge",
+      {
+        ...providerChallengeIssueInput(
+          beginInput,
+          "BEGIN",
+          label + "-routing-audit-drift",
+        ),
+        routing_rule_hostname_operator: "EQUALS",
+      },
+    ),
+    /PRODUCTION_VERCEL_ROUTING_RULE_AUDIT_MISMATCH/,
+  );
+  beginInput.provider_attestation = reserveProviderAttestation(
+    cluster,
+    database,
+    beginInput,
+    "BEGIN",
+    label + "-begin",
+    { providerOverrides: {
+      ...providerBinding,
+      ...credentialConfinementV4,
+      ...providerAliasBinding,
+      routing_rule_id: beginInput.routing_rule_id,
+      routing_rule_config_version: beginInput.routing_rule_revision,
+    }, assertRoutingAudit: true },
+  );
+  assertCommandFailure(
+    () => rpc(
+      cluster,
+      database,
+      "begin_production_vercel_writer_quiesce_evidence",
+      {
+        ...beginInput,
+        request_fingerprint: fingerprint(label + "-begin-routing-drift"),
+        routing_rule_canonical_hostname: "www.baggerinv.com",
+      },
+    ),
+    /PRODUCTION_VERCEL_ROUTING_RULE_AUDIT_MISMATCH/,
+  );
+  const draining = rpc(
+    cluster,
+    database,
+    "begin_production_vercel_writer_quiesce_evidence",
+    beginInput,
+  );
+  assert.equal(draining.status, "DRAINING");
+  assert.equal(Number(draining.probe_vector_count), 11);
+  assert.equal(Number(draining.probe_origin_count), liveInventory.length + 4);
+  assert.equal(Number(draining.probe_record_count),
+    (liveInventory.length + 4) * 11);
+  assert.equal(draining.routing_rule_hostname_operator, "DOES_NOT_EQUAL");
+  assert.equal(draining.routing_rule_canonical_hostname, "baggerinv.com");
+  assert.equal(
+    Number(draining.routing_rule_earlier_active_bypass_rule_count),
+    0,
+  );
+  backdateQuiesceDrain(cluster, database, draining.evidence_id, 2100);
+
+  const finalizeInput = {
+    ...scope,
+    actor_id: actor,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    purpose,
+    evidence_id: draining.evidence_id,
+    evidence_request_id: beginInput.evidence_request_id,
+    request_fingerprint: fingerprint(label + "-finalize-request"),
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    candidate_deployment_target: candidateTarget,
+    candidate_credential_generation: candidateIdentity.credentialGeneration,
+    main_branch_alias_origin: candidateIdentity.mainBranchAliasOrigin,
+    candidate_alias_origin: candidateIdentity.aliasOrigin,
+    candidate_immutable_origin: candidateIdentity.immutableOrigin,
+    vercel_project_id: beginInput.vercel_project_id,
+    routing_rule_id: beginInput.routing_rule_id,
+    routing_rule_revision: beginInput.routing_rule_revision,
+    routing_rule_scope: beginInput.routing_rule_scope,
+    origin_inventory: originInventoryV4,
+    live_origin_inventory: liveInventory,
+    second_probe_records: quiesceProbeRecordsV4(liveInventory),
+    ...providerBinding,
+    ...credentialConfinementV4,
+  };
+  finalizeInput.provider_attestation = reserveProviderAttestation(
+    cluster,
+    database,
+    finalizeInput,
+    "FINALIZE",
+    label + "-finalize",
+    { providerOverrides: {
+      ...providerBinding,
+      ...credentialConfinementV4,
+      ...providerAliasBinding,
+      routing_rule_id: finalizeInput.routing_rule_id,
+      routing_rule_config_version: finalizeInput.routing_rule_revision,
+    } },
+  );
+  assertCommandFailure(
+    () => rpc(
+      cluster,
+      database,
+      "finalize_production_vercel_writer_quiesce_evidence",
+      {
+        ...finalizeInput,
+        request_fingerprint: fingerprint(label + "-finalize-routing-drift"),
+        routing_rule_earlier_active_bypass_rule_count: 2,
+      },
+    ),
+    /PRODUCTION_VERCEL_ROUTING_RULE_AUDIT_MISMATCH/,
+  );
+  const verified = rpc(
+    cluster,
+    database,
+    "finalize_production_vercel_writer_quiesce_evidence",
+    finalizeInput,
+  );
+  assert.equal(verified.status, "VERIFIED");
+  assert.equal(Number(verified.probe_vector_count), 11);
+  assert.equal(Number(verified.probe_origin_count), liveInventory.length + 4);
+  assert.equal(Number(verified.probe_record_count),
+    (liveInventory.length + 4) * 11);
+  assert.equal(verified.routing_rule_hostname_operator, "DOES_NOT_EQUAL");
+  assert.equal(verified.routing_rule_canonical_hostname, "baggerinv.com");
+  assert.equal(
+    Number(verified.routing_rule_earlier_active_bypass_rule_count),
+    0,
+  );
+  assert.equal(psql(cluster, database, `
+    select pg_catalog.concat_ws(
+      '|',
+      pg_catalog.count(*),
+      pg_catalog.count(*) filter (where
+        value.routing_rule_hostname_operator = 'DOES_NOT_EQUAL'
+        and value.routing_rule_canonical_hostname = 'baggerinv.com'
+        and value.routing_rule_earlier_active_bypass_rule_count = 0
+      )
+    )
+    from production_control.vercel_routing_rule_audit_bindings value
+    where value.quiesce_evidence_id =
+        ${sqlLiteral(draining.evidence_id)}::uuid
+      or value.attestation_id in (
+        select attestation.attestation_id
+        from production_control.vercel_provider_attestations attestation
+        where attestation.evidence_id =
+          ${sqlLiteral(draining.evidence_id)}::uuid
+      )
+      or value.challenge_id in (
+        select challenge.challenge_id
+        from production_control.vercel_provider_attestation_challenges challenge
+        where challenge.evidence_request_id =
+          ${sqlLiteral(beginInput.evidence_request_id)}::uuid
+      );
+  `).trim(), "5|5");
+  assertCommandFailure(
+    () => psql(cluster, database, `
+      update production_control.vercel_routing_rule_audit_bindings
+      set routing_rule_canonical_hostname = 'www.baggerinv.com'
+      where quiesce_evidence_id = ${sqlLiteral(draining.evidence_id)}::uuid;
+    `),
+    /PRODUCTION_VERCEL_ROUTING_RULE_AUDIT_IMMUTABLE/,
+  );
+  return { ...verified, criticalWaf: waf };
+}
+
 function makeQuiesceFinalizeInput(
   cluster,
   database,
@@ -1322,12 +2466,20 @@ function makeQuiesceFinalizeInput(
   return finalizeInput;
 }
 
-function backdateQuiesceDrain(cluster, database, evidenceId) {
+function backdateQuiesceDrain(
+  cluster,
+  database,
+  evidenceId,
+  ownerFreezeTtlSeconds = 1800,
+) {
+  assert.ok(Number.isSafeInteger(ownerFreezeTtlSeconds));
   psql(cluster, database, `
     update production_control.vercel_writer_quiesce_evidence
     set owner_acknowledged_at = now() - interval '301 seconds',
         drain_started_at = now() - interval '301 seconds',
-        owner_freeze_expires_at = now() + interval '20 minutes'
+        owner_freeze_expires_at =
+          now() - interval '301 seconds' +
+          ${ownerFreezeTtlSeconds} * interval '1 second'
     where evidence_id = ${sqlLiteral(evidenceId)}::uuid;
   `);
 }
@@ -1474,6 +2626,552 @@ function inspectProviderFence(cluster, database, installRequestId, fenceId) {
       candidate_deployment_commit: candidateIdentity.commit,
     },
   );
+}
+
+function beginProviderFenceReservation(cluster, database, quiesce, label) {
+  const installRequestId = randomUUID();
+  const before = state(cluster, database);
+  const baseline = {
+    provider: fingerprint(label + "-baseline-provider"),
+    acl: fingerprint(label + "-baseline-acl"),
+    canonical: fingerprint(label + "-baseline-canonical"),
+    formula: fingerprint(label + "-baseline-formula"),
+    combined: fingerprint(label + "-baseline-combined"),
+  };
+  const input = {
+    ...optimisticInput(before, `${label}-begin-request`),
+    operation: "BEGIN_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL",
+    lifecycle_mode: "CUTOVER",
+    install_request_id: installRequestId,
+    quiesce_evidence_id: quiesce.evidence_id,
+    critical_waf_epoch_id: quiesce.critical_waf_epoch_id,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    dedicated_principal_fingerprint: fingerprint("dedicated-google-principal"),
+    legacy_credential_generation_fingerprint:
+      fingerprint("legacy-google-credential-generation-v0"),
+    baseline_provider_fingerprint: baseline.provider,
+    baseline_acl_fingerprint: baseline.acl,
+    baseline_canonical_value_fingerprint: baseline.canonical,
+    baseline_formula_fingerprint: baseline.formula,
+    baseline_combined_value_fingerprint: baseline.combined,
+    writer_scope_fingerprint: fingerprint("canonical-google-writer-scope-v2"),
+    canonical_sheet_union_fingerprint:
+      emptyStructuredEvidenceFingerprint(cluster, database),
+  };
+  const begin = rpc(
+    cluster,
+    database,
+    "begin_production_google_writer_provider_fence_install",
+    input,
+  );
+  assert.equal(begin.status, "INSTALLING");
+  assert.equal(begin.lifecycle_mode, "CUTOVER");
+  assert.equal(begin.admission_reservation_active, true);
+  return { begin, input, baseline };
+}
+
+function emptyStructuredEvidenceFingerprint(cluster, database) {
+  return psql(cluster, database, `
+    select production_control.structured_evidence_fingerprint('[]'::jsonb);
+  `).trim();
+}
+
+function aclSettlementInput({
+  current,
+  fence,
+  installProof,
+  installIntent,
+  label,
+  observationRequestId = randomUUID(),
+  priorObservationId = undefined,
+  providerObservedAt = new Date().toISOString(),
+  snapshot,
+  stage,
+}) {
+  return {
+    ...optimisticInput(current, `${label}-${stage.toLowerCase()}`),
+    operation: "RECORD_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_SETTLEMENT",
+    stage,
+    fence_id: fence.fence_id,
+    install_request_id: fence.install_request_id,
+    quiesce_evidence_id: fence.quiesce_evidence_id,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    observation_request_id: observationRequestId,
+    prior_observation_id: priorObservationId,
+    provider_fingerprint: snapshot.provider,
+    acl_fingerprint: installProof.currentAclFingerprint,
+    canonical_value_fingerprint: snapshot.canonical,
+    combined_value_fingerprint: snapshot.combined,
+    formula_fingerprint: snapshot.formula,
+    structural_canary_fingerprint: snapshot.structural,
+    permission_inventory_fingerprint:
+      installProof.currentPermissionInventoryFingerprint,
+    legacy_role: "reader",
+    legacy_can_edit: false,
+    legacy_can_share: false,
+    legacy_edit_capability_fingerprint:
+      installProof.currentLegacyEditCapabilityFingerprint,
+    acl_transition_intent_fingerprint:
+      installIntent.transitionIntentFingerprint,
+    acl_transition_proof_fingerprint: installProof.transitionFingerprint,
+    acl_transition_proof: installProof,
+    provider_observed_at: providerObservedAt,
+  };
+}
+
+function certifyAclV2RehearsalV4(cluster, database, label) {
+  const forwardQuiesce = certifyQuiesceV4(
+    cluster,
+    database,
+    `${label}-forward`,
+    { purpose: "REHEARSAL" },
+  );
+  const before = state(cluster, database);
+  const installRequestId = randomUUID();
+  const snapshot = Object.freeze({
+    provider: fingerprint(`${label}-reader-provider`),
+    canonical: fingerprint(`${label}-canonical`),
+    combined: fingerprint(`${label}-combined`),
+    formula: fingerprint(`${label}-formula`),
+    structural: fingerprint(`${label}-structural-canary`),
+  });
+  const baselineProviderFingerprint = fingerprint(`${label}-writer-provider`);
+  const beginInput = {
+    ...optimisticInput(before, `${label}-begin`),
+    operation: "BEGIN_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL",
+    lifecycle_mode: "REHEARSAL",
+    install_request_id: installRequestId,
+    quiesce_evidence_id: forwardQuiesce.evidence_id,
+    critical_waf_epoch_id: forwardQuiesce.critical_waf_epoch_id,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    dedicated_principal_fingerprint: fingerprint(`${label}-dedicated-principal`),
+    legacy_credential_generation_fingerprint:
+      fingerprint(`${label}-legacy-credential-generation`),
+    baseline_provider_fingerprint: baselineProviderFingerprint,
+    baseline_acl_fingerprint: fingerprint(`${label}-writer-acl`),
+    baseline_canonical_value_fingerprint: snapshot.canonical,
+    baseline_formula_fingerprint: snapshot.formula,
+    baseline_combined_value_fingerprint: snapshot.combined,
+    writer_scope_fingerprint: fingerprint(`${label}-writer-scope`),
+    canonical_sheet_union_fingerprint:
+      emptyStructuredEvidenceFingerprint(cluster, database),
+  };
+  const fence = rpc(
+    cluster,
+    database,
+    "begin_production_google_writer_provider_fence_install",
+    beginInput,
+  );
+  assert.equal(fence.status, "INSTALLING");
+  assert.equal(fence.lifecycle_mode, "REHEARSAL");
+
+  // The same critical-window epoch is now bound to this fence. Capture a
+  // fresh provider readback and purpose-specific owner freeze while the
+  // DORMANT admission gate is still OPEN; the receipt remains linked to this
+  // exact epoch/fence throughout close and ACL restoration.
+  const restoreWaf = reattestCriticalWafEpochV4(
+    cluster,
+    database,
+    forwardQuiesce.criticalWaf,
+    `${label}-restore-waf-reattest`,
+  );
+  const restoreQuiesce = certifyQuiesceV4(
+    cluster,
+    database,
+    `${label}-restore`,
+    {
+      purpose: "REHEARSAL",
+      criticalWaf: restoreWaf,
+      criticalWafQuiesceStage: "RESTORE_REATTEST",
+    },
+  );
+  assert.equal(
+    restoreQuiesce.critical_waf_epoch_id,
+    forwardQuiesce.critical_waf_epoch_id,
+  );
+
+  const vector = aclV2TransitionVector(
+    label,
+    fence.fence_id,
+    installRequestId,
+  );
+  // This is the end-to-end JS-to-PostgreSQL vector check: both runtimes must
+  // hash the exact same fixed scalar tuple before a DB dispatch can exist.
+  assert.equal(psql(cluster, database, `
+    select production_control.google_drive_acl_transition_intent_fingerprint_v1(
+      ${jsonSql(vector.installIntent)} - 'transitionIntentFingerprint'
+    );
+  `).trim(), vector.installIntent.transitionIntentFingerprint);
+  assert.equal(psql(cluster, database, `
+    select production_control.google_drive_acl_transition_proof_fingerprint_v1(
+      ${jsonSql(vector.installProof)} - 'transitionFingerprint'
+    );
+  `).trim(), vector.installProof.transitionFingerprint);
+
+  let current = state(cluster, database);
+  const installDispatch = rpc(
+    cluster,
+    database,
+    "begin_production_google_writer_provider_fence_install_dispatch",
+    {
+      ...optimisticInput(current, `${label}-install-dispatch`),
+      operation:
+        "BEGIN_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL_DISPATCH",
+      fence_id: fence.fence_id,
+      install_request_id: installRequestId,
+      dispatch_request_id: randomUUID(),
+      quiesce_evidence_id: forwardQuiesce.evidence_id,
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      mutation_plan: "DRIVE_ACL_LEGACY_WRITER_TO_READER_V1",
+      provider_mutation_class:
+        "DRIVE_LEGACY_PERMISSION_WRITER_TO_READER_V1",
+      source_role: "writer",
+      target_role: "reader",
+      transition_intent: vector.installIntent,
+      transition_intent_fingerprint:
+        vector.installIntent.transitionIntentFingerprint,
+      provider_preflight_fingerprint:
+        fingerprint(`${label}-install-provider-preflight`),
+      provider_preflight_position: "SOURCE",
+    },
+  );
+  assert.equal(installDispatch.dispatch_usable, true);
+  const installProviderObservedAt = new Date().toISOString();
+  const installResult = rpc(
+    cluster,
+    database,
+    "record_production_google_writer_acl_dispatch_result",
+    {
+      ...optimisticInput(current, `${label}-install-result`),
+      operation:
+        "RECORD_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_ACL_DISPATCH_RESULT",
+      direction: "INSTALL",
+      outcome_status: "TARGET_CONFIRMED",
+      fence_id: fence.fence_id,
+      install_request_id: installRequestId,
+      dispatch_id: installDispatch.dispatch_id,
+      result_request_id: randomUUID(),
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      transition_proof: vector.installProof,
+      transition_proof_fingerprint: vector.installProof.transitionFingerprint,
+      provider_observed_at: installProviderObservedAt,
+    },
+  );
+  assert.equal(installResult.outcome_status, "TARGET_CONFIRMED");
+
+  const aclReader = rpc(
+    cluster,
+    database,
+    "record_production_google_writer_provider_fence_settlement",
+    aclSettlementInput({
+      current,
+      fence,
+      installProof: vector.installProof,
+      installIntent: vector.installIntent,
+      label,
+      snapshot,
+      stage: "ACL_READER_CONFIRMED",
+    }),
+  );
+  psql(cluster, database, `
+    update production_control.google_writer_provider_fence_settlement_observations
+    set recorded_at = now() - interval '202 seconds',
+        provider_observed_at = now() - interval '202 seconds'
+    where observation_id = ${sqlLiteral(aclReader.observation_id)}::uuid;
+  `);
+  const readback1 = rpc(
+    cluster,
+    database,
+    "record_production_google_writer_provider_fence_settlement",
+    aclSettlementInput({
+      current,
+      fence,
+      installProof: vector.installProof,
+      installIntent: vector.installIntent,
+      label,
+      priorObservationId: aclReader.observation_id,
+      snapshot,
+      stage: "SETTLEMENT_READBACK_1",
+    }),
+  );
+  psql(cluster, database, `
+    update production_control.google_writer_provider_fence_settlement_observations
+    set recorded_at = now() - interval '11 seconds',
+        provider_observed_at = now() - interval '11 seconds'
+    where observation_id = ${sqlLiteral(readback1.observation_id)}::uuid;
+  `);
+
+  const closeInputValue = {
+    ...optimisticInput(current, `${label}-finish-close`),
+    operation:
+      "FINISH_AND_CLOSE_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL",
+    expected_authority: "GOOGLE",
+    fence_id: fence.fence_id,
+    install_request_id: installRequestId,
+    quiesce_evidence_id: forwardQuiesce.evidence_id,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    acl_reader_confirmed_observation_id: aclReader.observation_id,
+    settlement_readback_1_observation_id: readback1.observation_id,
+    settlement_readback_2_request_id: randomUUID(),
+    settlement_readback_2_request_fingerprint:
+      fingerprint(`${label}-settlement-readback-2`),
+    start_source_fingerprint: fingerprint(`${label}-start-source`),
+    ...aclSettlementInput({
+      current,
+      fence,
+      installProof: vector.installProof,
+      installIntent: vector.installIntent,
+      label,
+      snapshot,
+      stage: "SETTLEMENT_READBACK_1",
+    }),
+  };
+  // The settlement snapshot spread above contributes only provider evidence;
+  // restore the one atomic parent operation and exact parent request identity.
+  closeInputValue.operation =
+    "FINISH_AND_CLOSE_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL";
+  closeInputValue.request_fingerprint = fingerprint(`${label}-finish-close`);
+  closeInputValue.expected_authority = "GOOGLE";
+  closeInputValue.acl_reader_confirmed_observation_id = aclReader.observation_id;
+  closeInputValue.settlement_readback_1_observation_id = readback1.observation_id;
+  closeInputValue.settlement_readback_2_request_id = randomUUID();
+  closeInputValue.settlement_readback_2_request_fingerprint =
+    fingerprint(`${label}-settlement-readback-2`);
+  closeInputValue.start_source_fingerprint = fingerprint(`${label}-start-source`);
+  closeInputValue.provider_observed_at = new Date().toISOString();
+  const close = rpc(
+    cluster,
+    database,
+    "finish_close_production_google_writer_provider_fence_install",
+    closeInputValue,
+  );
+  assert.equal(close.admission_state, "CLOSING");
+  assert.equal(close.lifecycle_mode, "REHEARSAL");
+  providerProofByEvidenceId.set(close.external_fence_evidence_id, {
+    quiesceEvidenceId: forwardQuiesce.evidence_id,
+    fenceId: fence.fence_id,
+    verificationId: close.provider_fence_verification_id,
+  });
+  const closed = drainFinalizeExistingClose(
+    cluster,
+    database,
+    close.external_fence_evidence_id,
+    close,
+    `${label}-rehearsal`,
+  );
+  assert.equal(closed.current.admission_state, "CLOSED");
+
+  // Isolated clock compression for the provider-wide 1800s function ceiling.
+  // The original owner freeze remains live, overlaps the fresh restore freeze,
+  // and continuously covers the exact WAF-active -> ACL-restore horizon.
+  psql(cluster, database, `
+    update production_control.vercel_writer_quiesce_evidence
+    set owner_acknowledged_at = now() - interval '1811 seconds',
+        drain_started_at = now() - interval '1811 seconds',
+        owner_freeze_expires_at = now() + interval '289 seconds',
+        expires_at = now() + interval '289 seconds'
+    where evidence_id = ${sqlLiteral(forwardQuiesce.evidence_id)}::uuid;
+    update production_control.vercel_writer_critical_waf_epochs
+    set critical_active_at = now() - interval '1811 seconds'
+    where epoch_id =
+      ${sqlLiteral(forwardQuiesce.critical_waf_epoch_id)}::uuid;
+  `);
+  current = state(cluster, database);
+  const abortRequestId = randomUUID();
+  const aborting = rpc(
+    cluster,
+    database,
+    "begin_abort_production_google_writer_provider_fence_install",
+    {
+      ...optimisticInput(current, `${label}-begin-restore`),
+      operation: "BEGIN_ABORT_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL",
+      fence_id: fence.fence_id,
+      install_request_id: installRequestId,
+      abort_request_id: abortRequestId,
+      restore_quiesce_evidence_id: restoreQuiesce.evidence_id,
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    },
+  );
+  assert.equal(aborting.status, "ABORTING");
+  const restoreDispatch = rpc(
+    cluster,
+    database,
+    "begin_production_google_writer_provider_fence_abort_dispatch",
+    {
+      ...optimisticInput(current, `${label}-restore-dispatch`),
+      operation:
+        "BEGIN_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_ABORT_DISPATCH",
+      fence_id: fence.fence_id,
+      install_request_id: installRequestId,
+      abort_request_id: abortRequestId,
+      dispatch_request_id: randomUUID(),
+      restore_quiesce_evidence_id: restoreQuiesce.evidence_id,
+      candidate_deployment_id: candidateIdentity.deploymentId,
+      candidate_deployment_commit: candidateIdentity.commit,
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      mutation_plan: "DRIVE_ACL_LEGACY_READER_TO_WRITER_V1",
+      provider_mutation_class:
+        "DRIVE_LEGACY_PERMISSION_READER_TO_WRITER_V1",
+      source_role: "reader",
+      target_role: "writer",
+      transition_intent: vector.restoreIntent,
+      transition_intent_fingerprint:
+        vector.restoreIntent.transitionIntentFingerprint,
+      provider_preflight_fingerprint:
+        fingerprint(`${label}-restore-provider-preflight`),
+      provider_preflight_position: "SOURCE",
+    },
+  );
+  assert.equal(restoreDispatch.dispatch_usable, true);
+  const restoreProviderObservedAt = new Date().toISOString();
+  const restoreResult = rpc(
+    cluster,
+    database,
+    "record_production_google_writer_acl_dispatch_result",
+    {
+      ...optimisticInput(current, `${label}-restore-result`),
+      operation:
+        "RECORD_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_ACL_DISPATCH_RESULT",
+      direction: "RESTORE",
+      outcome_status: "TARGET_CONFIRMED",
+      fence_id: fence.fence_id,
+      install_request_id: installRequestId,
+      dispatch_id: restoreDispatch.dispatch_id,
+      result_request_id: randomUUID(),
+      authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+      transition_proof: vector.restoreProof,
+      transition_proof_fingerprint: vector.restoreProof.transitionFingerprint,
+      provider_observed_at: restoreProviderObservedAt,
+    },
+  );
+  assert.equal(restoreResult.outcome_status, "TARGET_CONFIRMED");
+  const providerObservedAt = new Date().toISOString();
+  const abortInput = {
+    ...optimisticInput(current, `${label}-finish-restore`),
+    operation: "ABORT_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL",
+    fence_id: fence.fence_id,
+    install_request_id: installRequestId,
+    abort_request_id: abortRequestId,
+    abort_dispatch_id: restoreDispatch.dispatch_id,
+    restore_quiesce_evidence_id: restoreQuiesce.evidence_id,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+    provider_rollback_verified: true,
+    restored_legacy_role: "writer",
+    restored_legacy_can_edit: true,
+    restored_legacy_can_share: true,
+    active_run_owned_protection_count: 0,
+    removed_protected_range_ids: [],
+    restored_provider_fingerprint: baselineProviderFingerprint,
+    restored_acl_fingerprint: vector.shared.writerAclFingerprint,
+    restored_canonical_value_fingerprint: snapshot.canonical,
+    restored_combined_value_fingerprint: snapshot.combined,
+    restored_formula_fingerprint: snapshot.formula,
+    restore_transition_proof: vector.restoreProof,
+    restore_transition_proof_fingerprint: vector.restoreProof.transitionFingerprint,
+    provider_observed_at: providerObservedAt,
+  };
+  abortInput.restoration_evidence_fingerprint =
+    productionGoogleWriterProviderAbortEvidenceHash(
+      abortInput,
+    );
+  const restored = rpc(
+    cluster,
+    database,
+    "abort_production_google_writer_provider_fence_install",
+    abortInput,
+  );
+  assert.equal(restored.status, "ACL_RESTORED_WAF_ACTIVE");
+  assert.equal(restored.critical_window_active, true);
+  assert.equal(restored.baseline_restored, false);
+  const wafRestoration = restoreCriticalWafBaselineV4(
+    cluster,
+    database,
+    restoreWaf,
+    fence,
+    `${label}-restore-waf`,
+  );
+  const after = state(cluster, database);
+  assert.equal(after.activation_state, "DORMANT");
+  assert.equal(after.authority, "GOOGLE");
+  assert.equal(after.admission_state, "OPEN");
+  assert.equal(after.execution_gate, "PAUSED");
+  assert.equal(after.provider_fence_id, null);
+  assert.equal(
+    psql(cluster, database, `
+      select provider_principal_fingerprint
+      from scoring_authority.ingress_gates
+      where tournament_id = '2026';
+    `),
+    legacyProviderPrincipalFingerprint,
+    "the restored DORMANT/OPEN/PAUSED rehearsal retains the certified legacy principal",
+  );
+  return {
+    fence,
+    forwardQuiesce,
+    restoreQuiesce,
+    vector,
+    restored: wafRestoration.finalized,
+    aclRestored: restored,
+    wafRestoration,
+  };
+}
+
+function providerFenceFinishEvidence(reservation, label) {
+  const protectionRecords = providerProtectionRecords(
+    reservation.begin.protection_description_prefix,
+  );
+  return {
+    fence_id: reservation.begin.fence_id,
+    install_request_id: reservation.input.install_request_id,
+    quiesce_evidence_id: reservation.input.quiesce_evidence_id,
+    candidate_deployment_id: candidateIdentity.deploymentId,
+    candidate_deployment_commit: candidateIdentity.commit,
+    protection_description_prefix:
+      reservation.begin.protection_description_prefix,
+    protection_records: protectionRecords,
+    provider_fingerprint: fingerprint(label + "-installed-provider"),
+    acl_fingerprint: reservation.baseline.acl,
+    canonical_value_fingerprint: reservation.baseline.canonical,
+    formula_fingerprint: reservation.baseline.formula,
+    combined_value_fingerprint: reservation.baseline.combined,
+    structural_canary_fingerprint: fingerprint(label + "-structural-canary"),
+    permission_inventory_fingerprint:
+      fingerprint(label + "-permission-inventory"),
+  };
+}
+
+function providerFenceSettlementInput(
+  current,
+  finishEvidence,
+  stage,
+  label,
+  priorObservationId = undefined,
+) {
+  return {
+    ...optimisticInput(current, label),
+    ...finishEvidence,
+    operation:
+      "RECORD_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_SETTLEMENT",
+    stage,
+    observation_request_id: randomUUID(),
+    prior_observation_id: priorObservationId,
+    provider_observed_at: new Date().toISOString(),
+    authenticated_actor_fingerprint: fingerprint("authenticated-operator"),
+  };
 }
 
 function installProviderFence(cluster, database, quiesce, label) {
@@ -1658,6 +3356,8 @@ function beginInput(
     match_id: "2026-R1-1",
     operation: "WRITE_HOLE_SCORE",
     operation_request_id: operationRequestId,
+    expected_provider_principal_fingerprint:
+      legacyProviderPrincipalFingerprint,
     lease_nonce: leaseNonce,
     lease_seconds: 180,
   };
@@ -3160,6 +4860,1285 @@ test(
             `),
             /production_vercel_provider_attestation_inventory_contract_check/,
           );
+        },
+      );
+
+      await t.test(
+        "migration 040 upgrades 039 to the exact v4/v4 provider epoch without changing dormant Production authority",
+        () => {
+          const database = cloneDormantDatabase("migration_040_provider_v4");
+          const historicalV1 = certifyQuiesce(
+            cluster,
+            database,
+            "REHEARSAL",
+            "migration-040-historical-v1",
+          );
+          psql(cluster, database, `
+            update production_control.vercel_writer_quiesce_evidence
+            set owner_acknowledged_at = owner_acknowledged_at - interval '2 hours',
+                owner_freeze_expires_at = owner_freeze_expires_at - interval '2 hours',
+                drain_started_at = drain_started_at - interval '2 hours',
+                drain_completed_at = drain_completed_at - interval '2 hours',
+                verified_at = verified_at - interval '2 hours',
+                expires_at = expires_at - interval '2 hours',
+                created_at = created_at - interval '2 hours',
+                updated_at = updated_at - interval '2 hours'
+            where evidence_id = ${sqlLiteral(historicalV1.evidence_id)}::uuid;
+          `);
+          psqlFile(cluster, database, path.join(
+            migrationsDirectory,
+            "202608260039_production_all_project_provider_inventory_v3.sql",
+          ));
+
+          const historicalBefore = psql(cluster, database, `
+            select pg_catalog.jsonb_build_object(
+              -- Migration 040 adds these nullable link columns without
+              -- changing any historical v1 evidence value. Compare the
+              -- complete pre-040 row shape rather than schema additions.
+              'quiesce', pg_catalog.to_jsonb(quiesce) - array[
+                'critical_waf_epoch_id',
+                'critical_waf_observation_id',
+                'critical_waf_quiesce_stage'
+              ],
+              'attestations', (
+                select pg_catalog.jsonb_agg(
+                  pg_catalog.to_jsonb(attestation)
+                  order by attestation.stage
+                )
+                from production_control.vercel_provider_attestations attestation
+                where attestation.evidence_id = quiesce.evidence_id
+              )
+            )::text
+            from production_control.vercel_writer_quiesce_evidence quiesce
+            where quiesce.evidence_id =
+              ${sqlLiteral(historicalV1.evidence_id)}::uuid;
+          `);
+          const functionOidsBefore = psql(cluster, database, `
+            select pg_catalog.concat_ws(
+              ',',
+              'production_control.assert_exact_vercel_origin_inventory(jsonb)'::pg_catalog.regprocedure::oid,
+              'production_control.assert_exact_vercel_live_inventory(jsonb,jsonb,text,text,text,text)'::pg_catalog.regprocedure::oid,
+              'production_control.assert_current_provider_inventory_v3(jsonb,boolean,boolean)'::pg_catalog.regprocedure::oid
+            );
+          `).trim();
+
+          psqlFile(cluster, database, path.join(
+            migrationsDirectory,
+            "202608260040_production_provider_inventory_recertification_v4.sql",
+          ));
+
+          assert.equal(psql(cluster, database, `
+            select pg_catalog.jsonb_build_object(
+              'quiesce', pg_catalog.to_jsonb(quiesce) - array[
+                'critical_waf_epoch_id',
+                'critical_waf_observation_id',
+                'critical_waf_quiesce_stage'
+              ],
+              'attestations', (
+                select pg_catalog.jsonb_agg(
+                  pg_catalog.to_jsonb(attestation)
+                  order by attestation.stage
+                )
+                from production_control.vercel_provider_attestations attestation
+                where attestation.evidence_id = quiesce.evidence_id
+              )
+            )::text
+            from production_control.vercel_writer_quiesce_evidence quiesce
+            where quiesce.evidence_id =
+              ${sqlLiteral(historicalV1.evidence_id)}::uuid;
+          `), historicalBefore, "migration 040 must not rewrite v1 audit evidence");
+          assert.equal(psql(cluster, database, `
+            select pg_catalog.concat_ws(
+              '|',
+              (
+                select pg_catalog.count(*)
+                from information_schema.columns value
+                where value.table_schema = 'production_control'
+                  and value.table_name in (
+                    'vercel_writer_quiesce_evidence',
+                    'vercel_provider_attestation_challenges',
+                    'vercel_provider_attestations'
+                  )
+                  and value.column_name in (
+                    'routing_rule_hostname_operator',
+                    'routing_rule_canonical_hostname',
+                    'routing_rule_earlier_active_bypass_rule_count'
+                  )
+              ),
+              pg_catalog.has_table_privilege(
+                'service_role',
+                'production_control.vercel_routing_rule_audit_bindings',
+                'SELECT,INSERT,UPDATE,DELETE'
+              ),
+              pg_catalog.has_function_privilege(
+                'service_role',
+                'production_control.bind_current_vercel_routing_rule_audit(text,uuid,boolean,jsonb)',
+                'EXECUTE'
+              ),
+              binder.prosecdef,
+              binder.proconfig @> array['search_path=pg_catalog'],
+              guard.prosecdef,
+              guard.proconfig @> array['search_path=pg_catalog']
+            )
+            from pg_catalog.pg_proc binder
+            cross join pg_catalog.pg_proc guard
+            where binder.oid =
+              'production_control.bind_current_vercel_routing_rule_audit(text,uuid,boolean,jsonb)'::pg_catalog.regprocedure
+              and guard.oid =
+              'production_control.guard_vercel_routing_rule_audit_binding()'::pg_catalog.regprocedure;
+          `).trim(), "0|f|f|t|t|t|t");
+          assert.equal(psql(cluster, database, `
+            select pg_catalog.concat_ws(
+              ',',
+              'production_control.assert_exact_vercel_origin_inventory(jsonb)'::pg_catalog.regprocedure::oid,
+              'production_control.assert_exact_vercel_live_inventory(jsonb,jsonb,text,text,text,text)'::pg_catalog.regprocedure::oid,
+              'production_control.assert_current_provider_inventory_v3(jsonb,boolean,boolean)'::pg_catalog.regprocedure::oid
+            );
+          `).trim(), functionOidsBefore,
+          "migration 040 must replace migration039 runtime assertions in place");
+
+          assert.equal(psql(cluster, database, `
+            select pg_catalog.concat_ws(
+              '|',
+              activation.state,
+              activation.current_authority,
+              resource.participant_identity_authority,
+              gate.admission_state,
+              gate.state,
+              activation.scoring_ingress_enabled,
+              resource.workers_enabled,
+              gate.admission_protocol_enforced,
+              activation.first_supabase_write_possible_at is not null,
+              activation.first_supabase_write_observed_at is not null,
+              gate.provider_principal_fingerprint is null
+            )
+            from production_control.cutover_activation_state activation
+            cross join production_control.resource_scope resource
+            cross join scoring_authority.ingress_gates gate
+            where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+              and resource.scope_key = 'BAGGER_INV_PRODUCTION'
+              and gate.tournament_id = '2026';
+          `).trim(), "DORMANT|GOOGLE|PASSPORT|OPEN|PAUSED|f|f|f|f|f|t");
+
+          assert.doesNotThrow(() => psql(cluster, database, `
+            select production_control.assert_current_provider_inventory_v4(
+              ${jsonSql({
+                ...providerInventoryBindingV4,
+                ...credentialConfinementV4,
+              })}, true, true
+            );
+            select production_control.assert_current_provider_inventory_v3(
+              ${jsonSql({
+                ...providerInventoryBindingV4,
+                ...credentialConfinementV4,
+              })}, true, true
+            );
+          `));
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_current_provider_inventory_v3(
+                ${jsonSql({
+                  ...providerInventoryBindingV3,
+                  ...credentialConfinementV2,
+                })}, true, true
+              );
+            `),
+            /PRODUCTION_PROVIDER_INVENTORY_V4_BINDING_MISMATCH/,
+          );
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_current_provider_inventory_v3(
+                ${jsonSql({
+                  ...providerInventoryBindingV4,
+                  ...credentialConfinementV3,
+                })}, true, true
+              );
+            `),
+            /PRODUCTION_PROVIDER_INVENTORY_V4_BINDING_MISMATCH/,
+          );
+
+          const exactInventoryCases = [
+            {
+              label: "retained preview +0",
+              live: originInventoryV4,
+              id: "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
+              commit: "0671bb3b84ac5846218ea60838fe4e1cc07de97f",
+              origin:
+                "https://bagger-6lfjugfk7-sandbagger-invitational.vercel.app",
+              target: "PREVIEW",
+            },
+          ];
+          for (const inventoryCase of exactInventoryCases) {
+            assert.ok(inventoryCase.label);
+            assert.doesNotThrow(() => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              inventoryCase.live,
+              {
+                candidateDeploymentId: inventoryCase.id,
+                candidateDeploymentCommit: inventoryCase.commit,
+                candidateImmutableOrigin: inventoryCase.origin,
+                candidateDeploymentTarget: inventoryCase.target,
+                retainedInventory: originInventoryV4,
+              },
+            ));
+          }
+
+          const dynamicPreview = [
+            "dpl_PostgresAdmission040Preview",
+            "1234512345123451234512345123451234512345",
+            "https://bagger-migration-040-preview.vercel.app",
+            "PROJECT_PREVIEW",
+            "READY",
+            fingerprint("migration-040-dynamic-preview-metadata"),
+          ];
+          const dynamicProduction = [
+            "dpl_PostgresAdmission040Production",
+            "abcdefabcdefabcdefabcdefabcdefabcdefabcd",
+            "https://bagger-migration-040-production.vercel.app",
+            "PRODUCTION_TARGET",
+            "READY",
+            fingerprint("migration-040-dynamic-production-metadata"),
+          ];
+          const assertDynamic = (tuple, target) =>
+            assertExactLiveOriginInventory(
+              cluster,
+              database,
+              sortLiveOriginInventory([...originInventoryV4, tuple]),
+              {
+                candidateDeploymentId: tuple[0],
+                candidateDeploymentCommit: tuple[1],
+                candidateImmutableOrigin: tuple[2],
+                candidateDeploymentTarget: target,
+                retainedInventory: originInventoryV4,
+              },
+            );
+          assert.doesNotThrow(() => assertDynamic(dynamicPreview, "PREVIEW"));
+          assertCommandFailure(
+            () => assertDynamic(dynamicProduction, "PRODUCTION"),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_INPUT_INVALID/,
+          );
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              originInventoryV4,
+              {
+                candidateDeploymentId:
+                  "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
+                candidateDeploymentCommit:
+                  "561a61946be3536c7e32b46be53e4683cbb45579",
+                candidateImmutableOrigin:
+                  "https://bagger-drmix94o0-sandbagger-invitational.vercel.app",
+                candidateDeploymentTarget: "PRODUCTION",
+                retainedInventory: originInventoryV4,
+              },
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_INPUT_INVALID/,
+          );
+
+          const unrelated = [
+            "dpl_PostgresAdmission040Unrelated",
+            "9999999999999999999999999999999999999999",
+            "https://bagger-migration-040-unrelated.vercel.app",
+            "PROJECT_PREVIEW",
+            "READY",
+            fingerprint("migration-040-unrelated-metadata"),
+          ];
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              sortLiveOriginInventory([
+                ...originInventoryV4,
+                dynamicPreview,
+                unrelated,
+              ]),
+              {
+                candidateDeploymentId: dynamicPreview[0],
+                candidateDeploymentCommit: dynamicPreview[1],
+                candidateImmutableOrigin: dynamicPreview[2],
+                candidateDeploymentTarget: "PREVIEW",
+                retainedInventory: originInventoryV4,
+              },
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+          );
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              originInventoryV4.slice(1),
+              {
+                candidateDeploymentId: dynamicPreview[0],
+                candidateDeploymentCommit: dynamicPreview[1],
+                candidateImmutableOrigin: dynamicPreview[2],
+                candidateDeploymentTarget: "PREVIEW",
+                retainedInventory: originInventoryV4.slice(1),
+              },
+            ),
+            /PRODUCTION_VERCEL_ORIGIN_INVENTORY_MISMATCH/,
+          );
+          const driftedRetained = originInventoryV4.map((tuple, index) =>
+            index === 0
+              ? [...tuple.slice(0, 4), "ERROR", ...tuple.slice(5)]
+              : tuple
+          );
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_exact_vercel_origin_inventory(
+                ${jsonSql(sortLiveOriginInventory(driftedRetained))}
+              );
+            `),
+            /PRODUCTION_VERCEL_ORIGIN_INVENTORY_MISMATCH/,
+          );
+          const duplicateDeployment = [
+            dynamicPreview[0],
+            dynamicPreview[1],
+            originInventoryV4[0][2],
+            dynamicPreview[3],
+            dynamicPreview[4],
+            dynamicPreview[5],
+          ];
+          const duplicateId = [
+            originInventoryV4[0][0],
+            dynamicPreview[1],
+            dynamicPreview[2],
+            dynamicPreview[3],
+            dynamicPreview[4],
+            dynamicPreview[5],
+          ];
+          for (const tuple of [duplicateDeployment, duplicateId]) {
+            assertCommandFailure(
+              () => assertDynamic(tuple, "PREVIEW"),
+              /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_MISMATCH/,
+            );
+          }
+          assertCommandFailure(
+            () => assertExactLiveOriginInventory(
+              cluster,
+              database,
+              sortLiveOriginInventory([...originInventoryV4, dynamicProduction]),
+              {
+                candidateDeploymentId: dynamicProduction[0],
+                candidateDeploymentCommit: dynamicProduction[1],
+                candidateImmutableOrigin: dynamicProduction[2],
+                candidateDeploymentTarget: null,
+                retainedInventory: originInventoryV4,
+              },
+            ),
+            /PRODUCTION_VERCEL_LIVE_ORIGIN_INVENTORY_INPUT_INVALID/,
+          );
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_current_provider_inventory_v4(
+                ${jsonSql({
+                  ...providerInventoryBindingV4,
+                  ...credentialConfinementV4,
+                })}, null, true
+              );
+            `),
+            /PRODUCTION_PROVIDER_INVENTORY_V4_BINDING_MISMATCH/,
+          );
+
+          const historicalV3Id = randomUUID();
+          psql(cluster, database, `
+            insert into production_control.vercel_writer_quiesce_evidence
+            select (pg_catalog.jsonb_populate_record(
+              null::production_control.vercel_writer_quiesce_evidence,
+              pg_catalog.to_jsonb(value) || pg_catalog.jsonb_build_object(
+                'evidence_id', ${sqlLiteral(historicalV3Id)},
+                'evidence_request_id', ${sqlLiteral(randomUUID())},
+                'begin_request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-v3-begin-request"))},
+                'begin_payload_hash',
+                  ${sqlLiteral(fingerprint("migration-040-v3-begin-payload"))},
+                'finalize_request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-v3-finalize-request"))},
+                'finalize_payload_hash',
+                  ${sqlLiteral(fingerprint("migration-040-v3-finalize-payload"))},
+                'origin_inventory', ${jsonSql(originInventoryV3)},
+                'origin_inventory_count', 1291,
+                'origin_inventory_fingerprint',
+                  ${sqlLiteral(originInventoryV3Fingerprint)},
+                'live_origin_inventory', ${jsonSql(originInventoryV3)},
+                'live_origin_inventory_count', 1291,
+                'live_origin_inventory_fingerprint',
+                  ${sqlLiteral(originInventoryV3Fingerprint)},
+                'provider_inventory_schema',
+                  'step11-6-production-origin-inventory-v3',
+                'retained_provider_inventory_count', 1291,
+                'retained_provider_inventory_fingerprint',
+                  ${sqlLiteral(providerInventoryV3Fingerprint)},
+                'live_provider_inventory_count', 1291,
+                'live_provider_inventory_fingerprint',
+                  ${sqlLiteral(providerInventoryV3Fingerprint)},
+                'routing_rule_all_method_fence_required_host_count', 8,
+                'routing_rule_all_method_fence_required_hosts_fingerprint',
+                  ${sqlLiteral(providerInventoryBindingV3.routing_rule_all_method_fence_required_hosts_fingerprint)},
+                'routing_rule_all_method_fence_required_path_count', 1,
+                'routing_rule_all_method_fence_required_paths_fingerprint',
+                  ${sqlLiteral(providerInventoryBindingV3.routing_rule_all_method_fence_required_paths_fingerprint)},
+                'credential_confinement_evidence_schema',
+                  'step11-6-production-google-credential-confinement-v2',
+                'credential_confinement_record_count', 1291,
+                'credential_confinement_records_fingerprint',
+                  ${sqlLiteral(credentialConfinementV2.credential_confinement_records_fingerprint)},
+                'credential_confinement_evidence_fingerprint',
+                  ${sqlLiteral(credentialConfinementV2.credential_confinement_evidence_fingerprint)}
+              )
+            )).*
+            from production_control.vercel_writer_quiesce_evidence value
+            where value.evidence_id =
+              ${sqlLiteral(historicalV1.evidence_id)}::uuid;
+          `);
+          assert.equal(psql(cluster, database, `
+            select provider_inventory_schema || '|' ||
+              credential_confinement_evidence_schema
+            from production_control.vercel_writer_quiesce_evidence
+            where evidence_id = ${sqlLiteral(historicalV3Id)}::uuid;
+          `), "step11-6-production-origin-inventory-v3|step11-6-production-google-credential-confinement-v2");
+
+          const v4EvidenceId = randomUUID();
+          psql(cluster, database, `
+            insert into production_control.vercel_writer_quiesce_evidence
+            select (pg_catalog.jsonb_populate_record(
+              null::production_control.vercel_writer_quiesce_evidence,
+              pg_catalog.to_jsonb(value) || pg_catalog.jsonb_build_object(
+                'evidence_id', ${sqlLiteral(v4EvidenceId)},
+                'evidence_request_id', ${sqlLiteral(randomUUID())},
+                'begin_request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-v4-begin-request"))},
+                'begin_payload_hash',
+                  ${sqlLiteral(fingerprint("migration-040-v4-begin-payload"))},
+                'finalize_request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-v4-finalize-request"))},
+                'finalize_payload_hash',
+                  ${sqlLiteral(fingerprint("migration-040-v4-finalize-payload"))},
+                'origin_inventory', ${jsonSql(originInventoryV4)},
+                'origin_inventory_count', 1292,
+                'origin_inventory_fingerprint',
+                  ${sqlLiteral(originInventoryV4Fingerprint)},
+                'live_origin_inventory', ${jsonSql(originInventoryV4)},
+                'live_origin_inventory_count', 1292,
+                'live_origin_inventory_fingerprint',
+                  ${sqlLiteral(originInventoryV4Fingerprint)},
+                'provider_inventory_schema',
+                  'step11-6-production-origin-inventory-v4',
+                'retained_provider_inventory_count', 1292,
+                'retained_provider_inventory_fingerprint',
+                  ${sqlLiteral(providerInventoryV4Fingerprint)},
+                'live_provider_inventory_count', 1292,
+                'live_provider_inventory_fingerprint',
+                  ${sqlLiteral(providerInventoryV4Fingerprint)},
+                'routing_rule_all_method_fence_required_host_count', 8,
+                'routing_rule_all_method_fence_required_hosts_fingerprint',
+                  ${sqlLiteral(providerInventoryBindingV3.routing_rule_all_method_fence_required_hosts_fingerprint)},
+                'routing_rule_all_method_fence_required_path_count', 1,
+                'routing_rule_all_method_fence_required_paths_fingerprint',
+                  ${sqlLiteral(providerInventoryBindingV4.routing_rule_all_method_fence_required_paths_fingerprint)},
+                'credential_confinement_evidence_schema',
+                  'step11-6-production-google-credential-confinement-v3',
+                'credential_confinement_record_count', 1292,
+                'credential_confinement_records_fingerprint',
+                  ${sqlLiteral(credentialConfinementV3.credential_confinement_records_fingerprint)},
+                'credential_confinement_evidence_fingerprint',
+                  ${sqlLiteral(credentialConfinementV3.credential_confinement_evidence_fingerprint)}
+              )
+            )).*
+            from production_control.vercel_writer_quiesce_evidence value
+            where value.evidence_id =
+              ${sqlLiteral(historicalV1.evidence_id)}::uuid;
+          `);
+          assert.equal(psql(cluster, database, `
+            select credential_confinement_evidence_schema
+            from production_control.vercel_writer_quiesce_evidence
+            where evidence_id = ${sqlLiteral(v4EvidenceId)}::uuid;
+          `), "step11-6-production-google-credential-confinement-v3");
+          const activeV4EvidenceId = randomUUID();
+          psql(cluster, database, `
+            insert into production_control.vercel_writer_quiesce_evidence
+            select (pg_catalog.jsonb_populate_record(
+              null::production_control.vercel_writer_quiesce_evidence,
+              pg_catalog.to_jsonb(value) || pg_catalog.jsonb_build_object(
+                'evidence_id', ${sqlLiteral(activeV4EvidenceId)},
+                'evidence_request_id', ${sqlLiteral(randomUUID())},
+                'begin_request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-active-v4-begin-request"))},
+                'begin_payload_hash',
+                  ${sqlLiteral(fingerprint("migration-040-active-v4-begin-payload"))},
+                'finalize_request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-active-v4-finalize-request"))},
+                'finalize_payload_hash',
+                  ${sqlLiteral(fingerprint("migration-040-active-v4-finalize-payload"))},
+                'credential_confinement_evidence_schema',
+                  'step11-6-production-google-credential-confinement-v4',
+                'credential_confinement_record_count', 1292,
+                'credential_confinement_records_fingerprint',
+                  ${sqlLiteral(credentialConfinementV4.credential_confinement_records_fingerprint)},
+                'credential_confinement_evidence_fingerprint',
+                  ${sqlLiteral(credentialConfinementV4.credential_confinement_evidence_fingerprint)},
+                'routing_rule_all_method_fence_required_host_count',
+                  ${providerInventoryBindingV4.routing_rule_all_method_fence_required_host_count},
+                'routing_rule_all_method_fence_required_hosts_fingerprint',
+                  ${sqlLiteral(providerInventoryBindingV4.routing_rule_all_method_fence_required_hosts_fingerprint)}
+              )
+            )).*
+            from production_control.vercel_writer_quiesce_evidence value
+            where value.evidence_id = ${sqlLiteral(v4EvidenceId)}::uuid;
+          `);
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              update production_control.vercel_writer_quiesce_evidence
+              set retained_provider_inventory_fingerprint = null
+              where evidence_id = ${sqlLiteral(activeV4EvidenceId)}::uuid;
+            `),
+            /production_vercel_quiesce_inventory_contract_check/,
+          );
+
+          const v4ChallengeId = randomUUID();
+          const v4ChallengeRequestId = randomUUID();
+          const v4OperationRequestId = randomUUID();
+          const v4EvidenceRequestId = randomUUID();
+          const v4ChallengeFingerprint = fingerprint(
+            "migration-040-v4-challenge-request",
+          );
+          const sourceAttestationId = psql(cluster, database, `
+            select attestation_id
+            from production_control.vercel_provider_attestations
+            where evidence_id = ${sqlLiteral(historicalV1.evidence_id)}::uuid
+              and stage = 'BEGIN';
+          `).trim();
+          psql(cluster, database, `
+            insert into production_control.vercel_provider_attestation_challenges
+            select (pg_catalog.jsonb_populate_record(
+              null::production_control.vercel_provider_attestation_challenges,
+              pg_catalog.to_jsonb(value) || pg_catalog.jsonb_build_object(
+                'challenge_id', ${sqlLiteral(v4ChallengeId)},
+                'challenge_request_id', ${sqlLiteral(v4ChallengeRequestId)},
+                'operation_request_id', ${sqlLiteral(v4OperationRequestId)},
+                'evidence_request_id', ${sqlLiteral(v4EvidenceRequestId)},
+                'issue_request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-v4-issue-request"))},
+                'issue_payload_hash',
+                  ${sqlLiteral(fingerprint("migration-040-v4-issue-payload"))},
+                'challenge_request_fingerprint',
+                  ${sqlLiteral(v4ChallengeFingerprint)},
+                'status', 'ISSUED',
+                'issued_at', pg_catalog.now(),
+                'expires_at', pg_catalog.now() + interval '60 seconds',
+                'consumed_at', null,
+                'consumed_attestation_id', null,
+                'consume_request_id', null,
+                'consume_request_fingerprint', null,
+                'consume_payload_hash', null,
+                'abandon_request_id', null,
+                'abandon_request_fingerprint', null,
+                'abandon_payload_hash', null,
+                'abandoned_at', null,
+                'abandonment_reason', null,
+                'created_at', pg_catalog.now(),
+                'updated_at', pg_catalog.now()
+              )
+            )).*
+            from production_control.vercel_provider_attestation_challenges value
+            where value.challenge_id = (
+              select attestation.challenge_id
+              from production_control.vercel_provider_attestations attestation
+              where attestation.attestation_id =
+                ${sqlLiteral(sourceAttestationId)}::uuid
+            );
+
+            insert into production_control.vercel_provider_attestations
+            select (pg_catalog.jsonb_populate_record(
+              null::production_control.vercel_provider_attestations,
+              pg_catalog.to_jsonb(value) || pg_catalog.jsonb_build_object(
+                'attestation_id', ${sqlLiteral(randomUUID())},
+                'evidence_id', null,
+                'status', 'RESERVED',
+                'attestation_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-v4-attestation"))},
+                'challenge_id', ${sqlLiteral(v4ChallengeId)},
+                'challenge_request_fingerprint',
+                  ${sqlLiteral(v4ChallengeFingerprint)},
+                'operation_request_id', ${sqlLiteral(v4OperationRequestId)},
+                'evidence_request_id', ${sqlLiteral(v4EvidenceRequestId)},
+                'request_fingerprint',
+                  ${sqlLiteral(fingerprint("migration-040-v4-provider-request"))},
+                'receipt_request_fingerprint', null,
+                'live_origin_inventory', ${jsonSql(originInventoryV4)},
+                'live_origin_inventory_count', 1292,
+                'live_origin_inventory_fingerprint',
+                  ${sqlLiteral(originInventoryV4Fingerprint)},
+                'provider_inventory_schema',
+                  'step11-6-production-origin-inventory-v4',
+                'retained_origin_inventory_count', 1292,
+                'retained_origin_inventory_fingerprint',
+                  ${sqlLiteral(originInventoryV4Fingerprint)},
+                'retained_provider_inventory_count', 1292,
+                'retained_provider_inventory_fingerprint',
+                  ${sqlLiteral(providerInventoryV4Fingerprint)},
+                'live_provider_inventory_count', 1292,
+                'live_provider_inventory_fingerprint',
+                  ${sqlLiteral(providerInventoryV4Fingerprint)},
+                'routing_rule_all_method_fence_required_host_count',
+                  ${providerInventoryBindingV4.routing_rule_all_method_fence_required_host_count},
+                'routing_rule_all_method_fence_required_hosts_fingerprint',
+                  ${sqlLiteral(providerInventoryBindingV4.routing_rule_all_method_fence_required_hosts_fingerprint)},
+                'routing_rule_all_method_fence_required_path_count', 1,
+                'routing_rule_all_method_fence_required_paths_fingerprint',
+                  ${sqlLiteral(providerInventoryBindingV4.routing_rule_all_method_fence_required_paths_fingerprint)},
+                'credential_confinement_evidence_schema',
+                  'step11-6-production-google-credential-confinement-v4',
+                'credential_confinement_record_count', 1292,
+                'credential_confinement_records_fingerprint',
+                  ${sqlLiteral(credentialConfinementV4.credential_confinement_records_fingerprint)},
+                'credential_confinement_evidence_fingerprint',
+                  ${sqlLiteral(credentialConfinementV4.credential_confinement_evidence_fingerprint)},
+                'provider_observed_at', pg_catalog.now(),
+                'binding_expires_at', pg_catalog.now() + interval '20 minutes',
+                'bound_at', null,
+                'abandoned_at', null,
+                'recorded_at', pg_catalog.now()
+              )
+            )).*
+            from production_control.vercel_provider_attestations value
+            where value.attestation_id = ${sqlLiteral(sourceAttestationId)}::uuid;
+          `);
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              update production_control.vercel_provider_attestations
+              set retained_origin_inventory_fingerprint = null
+              where challenge_id = ${sqlLiteral(v4ChallengeId)}::uuid;
+            `),
+            /production_vercel_provider_attestation_inventory_contract_check/,
+          );
+
+          assert.equal(psql(cluster, database, `
+            select pg_catalog.concat_ws(
+              '|',
+              pg_catalog.has_function_privilege(
+                'anon',
+                'production_control.assert_current_provider_inventory_v4(jsonb,boolean,boolean)',
+                'EXECUTE'
+              ),
+              pg_catalog.has_function_privilege(
+                'authenticated',
+                'production_control.assert_current_provider_inventory_v4(jsonb,boolean,boolean)',
+                'EXECUTE'
+              ),
+              pg_catalog.has_function_privilege(
+                'service_role',
+                'production_control.assert_current_provider_inventory_v4(jsonb,boolean,boolean)',
+                'EXECUTE'
+              ),
+              validator.prosecdef,
+              validator.proconfig @> array['search_path=pg_catalog'],
+              pg_catalog.has_function_privilege(
+                'anon',
+                'production_control.assert_exact_vercel_origin_inventory(jsonb)',
+                'EXECUTE'
+              ),
+              pg_catalog.has_function_privilege(
+                'authenticated',
+                'production_control.assert_exact_vercel_live_inventory(jsonb,jsonb,text,text,text,text)',
+                'EXECUTE'
+              ),
+              pg_catalog.has_function_privilege(
+                'service_role',
+                'production_control.assert_exact_vercel_origin_inventory(jsonb)',
+                'EXECUTE'
+              ),
+              pg_catalog.has_function_privilege(
+                'service_role',
+                'production_control.assert_exact_vercel_live_inventory(jsonb,jsonb,text,text,text,text)',
+                'EXECUTE'
+              ),
+              retained.prosecdef,
+              retained.proconfig @> array['search_path=pg_catalog'],
+              live.prosecdef,
+              live.proconfig @> array['search_path=pg_catalog']
+            )
+            from pg_catalog.pg_proc validator
+            cross join pg_catalog.pg_proc retained
+            cross join pg_catalog.pg_proc live
+            where validator.oid =
+                'production_control.assert_current_provider_inventory_v4(jsonb,boolean,boolean)'::pg_catalog.regprocedure
+              and retained.oid =
+                'production_control.assert_exact_vercel_origin_inventory(jsonb)'::pg_catalog.regprocedure
+              and live.oid =
+                'production_control.assert_exact_vercel_live_inventory(jsonb,jsonb,text,text,text,text)'::pg_catalog.regprocedure;
+          `).trim(), "f|f|f|t|t|f|f|t|t|t|t|t|t");
+
+          const blockedDatabase = cloneDormantDatabase(
+            "migration_040_preflight_active_challenge",
+          );
+          psqlFile(cluster, blockedDatabase, path.join(
+            migrationsDirectory,
+            "202608260039_production_all_project_provider_inventory_v3.sql",
+          ));
+          const activeChallengeInput = {
+            ...scope,
+            actor_id: actor,
+            purpose: "REHEARSAL",
+            evidence_request_id: randomUUID(),
+            request_fingerprint: fingerprint("migration-040-blocked-receipt"),
+            candidate_deployment_id: retainedV3CandidateIdentity.deploymentId,
+            candidate_deployment_commit: retainedV3CandidateIdentity.commit,
+            candidate_deployment_target: "PREVIEW",
+            candidate_credential_generation:
+              retainedV3CandidateIdentity.credentialGeneration,
+            main_branch_alias_origin:
+              retainedV3CandidateIdentity.mainBranchAliasOrigin,
+            candidate_alias_origin: retainedV3CandidateIdentity.aliasOrigin,
+            candidate_immutable_origin:
+              retainedV3CandidateIdentity.immutableOrigin,
+            vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+            routing_rule_id: "step11_6_pg17_writer_quiesce_v3",
+            routing_rule_revision: "revision-v3",
+            routing_rule_scope:
+              "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
+            origin_inventory: originInventoryV3,
+            live_origin_inventory: originInventoryV3,
+            first_probe_records: quiesceProbeRecordsV3(),
+            authenticated_actor_fingerprint:
+              fingerprint("authenticated-operator"),
+            owner_principal_fingerprint:
+              fingerprint("production-workbook-owner"),
+            owner_override_operationally_frozen: true,
+            owner_freeze_ttl_seconds: 2100,
+            ...providerInventoryBindingV3,
+            ...credentialConfinementV2,
+          };
+          rpc(
+            cluster,
+            blockedDatabase,
+            "issue_production_vercel_provider_attestation_challenge",
+            {
+              ...providerChallengeIssueInput(
+                activeChallengeInput,
+                "BEGIN",
+                "migration-040-blocked-active-challenge",
+              ),
+              candidate_alias_origin:
+                retainedV3CandidateIdentity.aliasOrigin,
+              candidate_immutable_origin:
+                retainedV3CandidateIdentity.immutableOrigin,
+            },
+          );
+          assertCommandFailure(
+            () => psqlFile(cluster, blockedDatabase, path.join(
+              migrationsDirectory,
+              "202608260040_production_provider_inventory_recertification_v4.sql",
+            )),
+            /PRODUCTION_PROVIDER_INVENTORY_V4_MIGRATION_STATE_INVALID/,
+          );
+        },
+      );
+
+      await t.test(
+        "migration 040 makes v3 the only callable admission/dispatch contract and reserves admission across provider install",
+        () => {
+          const capabilityDatabase = cloneDormantDatabase(
+            "migration_040_admission_v3_capability",
+          );
+          certifySuccessfulRehearsal(
+            cluster,
+            capabilityDatabase,
+            "migration-040-v3-capability-certification",
+          );
+          psql(cluster, capabilityDatabase, [
+            "update production_control.vercel_writer_quiesce_evidence",
+            "set owner_acknowledged_at = owner_acknowledged_at - interval '2 hours',",
+            "owner_freeze_expires_at = owner_freeze_expires_at - interval '2 hours',",
+            "drain_started_at = drain_started_at - interval '2 hours',",
+            "drain_completed_at = drain_completed_at - interval '2 hours',",
+            "verified_at = verified_at - interval '2 hours',",
+            "expires_at = expires_at - interval '2 hours',",
+            "created_at = created_at - interval '2 hours',",
+            "updated_at = updated_at - interval '2 hours'",
+            "where status = 'VERIFIED';",
+          ].join("\n"));
+          for (const migration of [
+            "202608260039_production_all_project_provider_inventory_v3.sql",
+            "202608260040_production_provider_inventory_recertification_v4.sql",
+          ]) psqlFile(cluster, capabilityDatabase,
+            path.join(migrationsDirectory, migration));
+          certifyAclV2RehearsalV4(
+            cluster,
+            capabilityDatabase,
+            "migration-040-v3-capability-acl-v2-rehearsal",
+          );
+          let current = stageToArmedGoogleGate(
+            cluster,
+            capabilityDatabase,
+            "migration-040-v3-capability",
+          );
+          assert.equal(
+            psql(cluster, capabilityDatabase, `
+              select provider_principal_fingerprint
+              from scoring_authority.ingress_gates
+              where tournament_id = '2026';
+            `),
+            legacyProviderPrincipalFingerprint,
+            "arming the candidate must retain the rehearsal-certified principal",
+          );
+          const inspectedAdmission = rpc(
+            cluster,
+            capabilityDatabase,
+            "inspect_production_scoring_admission",
+            {
+              ...scope,
+              deployment_id: candidateIdentity.deploymentId,
+              deployment_commit: candidateIdentity.commit,
+              expected_provider_principal_fingerprint:
+                legacyProviderPrincipalFingerprint,
+              inspection_nonce: randomUUID(),
+              request_fingerprint:
+                fingerprint("migration-040-v3-inspect-principal"),
+            },
+          );
+          assert.equal(inspectedAdmission.contract_version, "ADMISSION_V3");
+          assert.equal(
+            inspectedAdmission.provider_credential_class,
+            "LEGACY_PROVIDER_FENCEABLE",
+          );
+          assert.equal(
+            inspectedAdmission.provider_principal_fingerprint,
+            legacyProviderPrincipalFingerprint,
+          );
+
+          assert.equal(psql(cluster, capabilityDatabase, [
+            "select pg_catalog.concat_ws('|',",
+            "pg_catalog.has_function_privilege('service_role',",
+            "'public.begin_production_scoring_ingress_v2(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('service_role',",
+            "'public.begin_production_scoring_ingress(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('service_role',",
+            "'public.mark_production_scoring_ingress_write_started(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('service_role',",
+            "'public.begin_production_scoring_ingress_v3(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('service_role',",
+            "'public.mark_production_scoring_ingress_write_started_v3(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('anon',",
+            "'public.begin_production_scoring_ingress_v3(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('service_role',",
+            "'public.report_production_scoring_ingress_outcome(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('service_role',",
+            "'public.report_production_scoring_ingress_outcome_v2_base(jsonb)', 'EXECUTE'),",
+            "pg_catalog.has_function_privilege('anon',",
+            "'public.report_production_scoring_ingress_outcome(jsonb)', 'EXECUTE'));",
+          ].join("\n")).trim(), "f|f|f|t|t|f|t|f|f");
+
+          const operationRequestId = randomUUID();
+          const firstNonce = randomUUID();
+          const retryNonce = randomUUID();
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              capabilityDatabase,
+              "begin_production_scoring_ingress_v3",
+              {
+                ...beginInput(
+                  current,
+                  "migration-040-v3-wrong-principal",
+                ),
+                expected_provider_principal_fingerprint:
+                  fingerprint("wrong-legacy-provider-principal"),
+              },
+            ),
+            /PRODUCTION_SCORING_INGRESS_V3_PROVIDER_PRINCIPAL_MISMATCH/,
+          );
+          const admitted = rpc(
+            cluster,
+            capabilityDatabase,
+            "begin_production_scoring_ingress_v3",
+            beginInput(
+              current,
+              "migration-040-v3-begin",
+              firstNonce,
+              operationRequestId,
+            ),
+          );
+          assert.equal(admitted.contract_version, "ADMISSION_V3");
+          assert.equal(
+            admitted.provider_credential_class,
+            "LEGACY_PROVIDER_FENCEABLE",
+          );
+          assert.equal(
+            admitted.provider_principal_fingerprint,
+            legacyProviderPrincipalFingerprint,
+          );
+          assert.equal(
+            admitted.provider_dispatch_must_begin_before_expires_at,
+            true,
+          );
+          assert.match(admitted.expires_at, /^\d{4}-\d\d-\d\dT/);
+          assert.equal(admitted.lease_nonce, firstNonce);
+          assert.equal(admitted.operation_request_id, operationRequestId);
+          assert.ok(Number(admitted.remaining_dispatch_ms) > 0);
+          assert.ok(Number(admitted.remaining_dispatch_ms) <= 180_000);
+          const replayed = rpc(
+            cluster,
+            capabilityDatabase,
+            "begin_production_scoring_ingress_v3",
+            beginInput(
+              current,
+              "migration-040-v3-replay",
+              retryNonce,
+              operationRequestId,
+            ),
+          );
+          assert.equal(replayed.lease_id, admitted.lease_id);
+          assert.equal(replayed.idempotent, true);
+          assert.equal(replayed.contract_version, "ADMISSION_V3");
+          assert.equal(
+            replayed.provider_credential_class,
+            "LEGACY_PROVIDER_FENCEABLE",
+          );
+          assert.equal(
+            replayed.provider_principal_fingerprint,
+            legacyProviderPrincipalFingerprint,
+          );
+          assert.match(replayed.expires_at, /^\d{4}-\d\d-\d\dT/);
+          assert.equal(replayed.lease_nonce, retryNonce);
+          assert.equal(replayed.operation_request_id, operationRequestId);
+          assert.ok(Number(replayed.remaining_dispatch_ms) > 0);
+          assert.ok(Number(replayed.remaining_dispatch_ms) <= 180_000);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              capabilityDatabase,
+              "mark_production_scoring_ingress_write_started_v3",
+              {
+                ...optimisticInput(current, "migration-040-v3-old-nonce"),
+                lease_id: admitted.lease_id,
+                lease_nonce: firstNonce,
+                operation_request_id: operationRequestId,
+                expected_provider_principal_fingerprint:
+                  legacyProviderPrincipalFingerprint,
+              },
+            ),
+            /PRODUCTION_SCORING_LEASE_NONCE_INVALID/,
+          );
+          const started = rpc(
+            cluster,
+            capabilityDatabase,
+            "mark_production_scoring_ingress_write_started_v3",
+            {
+              ...optimisticInput(current, "migration-040-v3-mark"),
+              lease_id: admitted.lease_id,
+              lease_nonce: retryNonce,
+              operation_request_id: operationRequestId,
+              expected_provider_principal_fingerprint:
+                legacyProviderPrincipalFingerprint,
+            },
+          );
+          assert.equal(started.contract_version, "ADMISSION_V3");
+          assert.equal(started.resolution_state, "WRITE_STARTED");
+          assert.equal(started.lease_id, admitted.lease_id);
+          assert.equal(started.expires_at, replayed.expires_at);
+          assert.equal(started.lease_nonce, retryNonce);
+          assert.equal(started.operation_request_id, operationRequestId);
+          assert.ok(Number(started.remaining_dispatch_ms) >= 0);
+          assert.ok(
+            Number(started.remaining_dispatch_ms) <=
+              Number(replayed.remaining_dispatch_ms),
+          );
+          assert.equal(
+            started.provider_credential_class,
+            "LEGACY_PROVIDER_FENCEABLE",
+          );
+          assert.equal(
+            started.provider_principal_fingerprint,
+            legacyProviderPrincipalFingerprint,
+          );
+          assert.match(started.write_started_at, /^\d{4}-\d\d-\d\dT/);
+          const outcomeProviderMutationKey =
+            fingerprint("migration-040-v3-outcome-provider-key");
+          const outcomeProviderBefore =
+            fingerprint("migration-040-v3-outcome-before");
+          const outcomeProviderAfter =
+            fingerprint("migration-040-v3-outcome-after");
+          const outcomeEvidence = psql(cluster, capabilityDatabase, `
+            select production_control.scoring_lease_outcome_evidence_hash(
+              lease_id, request_fingerprint, 'CONFIRMED_WRITE',
+              ${sqlLiteral(outcomeProviderMutationKey)},
+              ${sqlLiteral(outcomeProviderBefore)},
+              ${sqlLiteral(outcomeProviderAfter)},
+              ${sqlLiteral(outcomeProviderAfter)},
+              authority_generation_id, admission_generation_id,
+              admission_revision
+            )
+            from scoring_authority.scoring_ingress_leases
+            where lease_id = ${sqlLiteral(admitted.lease_id)}::uuid;
+          `);
+          const outcome = rpc(
+            cluster,
+            capabilityDatabase,
+            "report_production_scoring_ingress_outcome",
+            {
+              ...optimisticInput(current, "migration-040-v3-outcome"),
+              operation: "WRITE_HOLE_SCORE",
+              lease_id: admitted.lease_id,
+              lease_nonce: retryNonce,
+              operation_request_id: operationRequestId,
+              expected_provider_principal_fingerprint:
+                legacyProviderPrincipalFingerprint,
+              outcome_state: "CONFIRMED_WRITE",
+              provider_mutation_key: outcomeProviderMutationKey,
+              provider_before_fingerprint: outcomeProviderBefore,
+              provider_after_fingerprint: outcomeProviderAfter,
+              provider_readback_fingerprint: outcomeProviderAfter,
+              outcome_evidence_fingerprint: outcomeEvidence,
+            },
+          );
+          assert.equal(outcome.contract_version, "ADMISSION_V3");
+          assert.equal(outcome.resolution_state, "CONFIRMED_WRITE");
+          assert.equal(outcome.lease_id, admitted.lease_id);
+          assert.equal(outcome.lease_nonce, retryNonce);
+          assert.equal(outcome.operation_request_id, operationRequestId);
+          assert.equal(
+            outcome.provider_credential_class,
+            "LEGACY_PROVIDER_FENCEABLE",
+          );
+          assert.equal(
+            outcome.provider_principal_fingerprint,
+            legacyProviderPrincipalFingerprint,
+          );
+
+          const lostMarkOperationRequestId = randomUUID();
+          const lostMarkNonce = randomUUID();
+          const lostMarkAdmission = rpc(
+            cluster,
+            capabilityDatabase,
+            "begin_production_scoring_ingress_v3",
+            beginInput(
+              current,
+              "migration-040-v3-lost-mark-begin",
+              lostMarkNonce,
+              lostMarkOperationRequestId,
+            ),
+          );
+          psql(cluster, capabilityDatabase, `
+            update scoring_authority.scoring_ingress_leases
+            set expires_at = pg_catalog.clock_timestamp()
+              + interval '200 milliseconds'
+            where lease_id = ${sqlLiteral(lostMarkAdmission.lease_id)}::uuid;
+          `);
+          const lostMarkInput = {
+            ...optimisticInput(current, "migration-040-v3-lost-mark"),
+            lease_id: lostMarkAdmission.lease_id,
+            lease_nonce: lostMarkNonce,
+            operation_request_id: lostMarkOperationRequestId,
+            expected_provider_principal_fingerprint:
+              legacyProviderPrincipalFingerprint,
+          };
+          const lostMarkCommitted = rpc(
+            cluster,
+            capabilityDatabase,
+            "mark_production_scoring_ingress_write_started_v3",
+            lostMarkInput,
+          );
+          assert.equal(lostMarkCommitted.resolution_state, "WRITE_STARTED");
+          assert.ok(Number(lostMarkCommitted.remaining_dispatch_ms) > 0);
+          psql(cluster, capabilityDatabase, "select pg_catalog.pg_sleep(0.25);");
+          const lostMarkRecoveredAfterExpiry = rpc(
+            cluster,
+            capabilityDatabase,
+            "mark_production_scoring_ingress_write_started_v3",
+            lostMarkInput,
+          );
+          assert.equal(
+            lostMarkRecoveredAfterExpiry.resolution_state,
+            "WRITE_STARTED",
+          );
+          assert.equal(
+            Number(lostMarkRecoveredAfterExpiry.remaining_dispatch_ms),
+            0,
+          );
+          assert.equal(
+            psql(cluster, capabilityDatabase, `
+              select pg_catalog.concat_ws('|', resolution_state,
+                (write_started_at is not null)::text)
+              from scoring_authority.scoring_ingress_leases
+              where lease_id = ${sqlLiteral(lostMarkAdmission.lease_id)}::uuid;
+            `).trim(),
+            "WRITE_STARTED|true",
+          );
+
+          const fenceDatabase = cloneDormantDatabase(
+            "migration_040_provider_reservation",
+          );
+          certifySuccessfulRehearsal(
+            cluster,
+            fenceDatabase,
+            "migration-040-provider-reservation-certification",
+          );
+          psql(cluster, fenceDatabase, [
+            "update production_control.vercel_writer_quiesce_evidence",
+            "set owner_acknowledged_at = owner_acknowledged_at - interval '2 hours',",
+            "owner_freeze_expires_at = owner_freeze_expires_at - interval '2 hours',",
+            "drain_started_at = drain_started_at - interval '2 hours',",
+            "drain_completed_at = drain_completed_at - interval '2 hours',",
+            "verified_at = verified_at - interval '2 hours',",
+            "expires_at = expires_at - interval '2 hours',",
+            "created_at = created_at - interval '2 hours',",
+            "updated_at = updated_at - interval '2 hours'",
+            "where status = 'VERIFIED';",
+          ].join("\n"));
+          for (const migration of [
+            "202608260039_production_all_project_provider_inventory_v3.sql",
+            "202608260040_production_provider_inventory_recertification_v4.sql",
+          ]) psqlFile(cluster, fenceDatabase,
+            path.join(migrationsDirectory, migration));
+          certifyAclV2RehearsalV4(
+            cluster,
+            fenceDatabase,
+            "migration-040-provider-reservation-acl-v2-rehearsal",
+          );
+          current = stageToArmedGoogleGate(
+            cluster,
+            fenceDatabase,
+            "migration-040-provider-reservation",
+          );
+          const quiesce = certifyQuiesceV4(
+            cluster,
+            fenceDatabase,
+            "migration-040-provider-reservation",
+          );
+
+          const admissionFirstNonce = randomUUID();
+          const admissionFirst = rpc(
+            cluster,
+            fenceDatabase,
+            "begin_production_scoring_ingress_v3",
+            beginInput(
+              current,
+              "migration-040-admission-wins",
+              admissionFirstNonce,
+            ),
+          );
+          const blockedReservation = {
+            ...optimisticInput(
+              state(cluster, fenceDatabase),
+              "migration-040-admission-wins-fence",
+            ),
+            operation:
+              "BEGIN_PRODUCTION_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL",
+            lifecycle_mode: "CUTOVER",
+            install_request_id: randomUUID(),
+            quiesce_evidence_id: quiesce.evidence_id,
+            critical_waf_epoch_id: quiesce.critical_waf_epoch_id,
+            candidate_deployment_id: candidateIdentity.deploymentId,
+            candidate_deployment_commit: candidateIdentity.commit,
+            authenticated_actor_fingerprint:
+              fingerprint("authenticated-operator"),
+            dedicated_principal_fingerprint:
+              fingerprint("dedicated-google-principal"),
+            legacy_credential_generation_fingerprint:
+              fingerprint("legacy-google-credential-generation-v0"),
+            baseline_provider_fingerprint:
+              fingerprint("migration-040-admission-wins-provider"),
+            baseline_acl_fingerprint:
+              fingerprint("migration-040-admission-wins-acl"),
+            baseline_canonical_value_fingerprint:
+              fingerprint("migration-040-admission-wins-canonical"),
+            baseline_formula_fingerprint:
+              fingerprint("migration-040-admission-wins-formula"),
+            baseline_combined_value_fingerprint:
+              fingerprint("migration-040-admission-wins-combined"),
+            writer_scope_fingerprint:
+              fingerprint("canonical-google-writer-scope-v2"),
+            canonical_sheet_union_fingerprint:
+              emptyStructuredEvidenceFingerprint(cluster, fenceDatabase),
+          };
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              fenceDatabase,
+              "begin_production_google_writer_provider_fence_install",
+              blockedReservation,
+            ),
+            /PRODUCTION_GOOGLE_WRITER_PROVIDER_ACL_BEGIN_STATE_INVALID/,
+          );
+
+          psql(cluster, fenceDatabase,
+            "update scoring_authority.scoring_ingress_leases " +
+            "set expires_at = pg_catalog.now() - interval '1 second' " +
+            "where lease_id = " + sqlLiteral(admissionFirst.lease_id) +
+            "::uuid;");
+          const expired = rpc(
+            cluster,
+            fenceDatabase,
+            "mark_production_scoring_ingress_write_started_v3",
+            {
+              ...optimisticInput(current, "migration-040-expired-before-dispatch"),
+              lease_id: admissionFirst.lease_id,
+              lease_nonce: admissionFirstNonce,
+              operation_request_id: admissionFirst.operation_request_id,
+              expected_provider_principal_fingerprint:
+                legacyProviderPrincipalFingerprint,
+            },
+          );
+          assert.equal(expired.resolution_state, "PROVEN_NO_WRITE");
+          assert.equal(expired.requires_reconciliation, false);
+          assert.equal(expired.write_started_at, null);
+
+          const noSettlementReservation = beginProviderFenceReservation(
+            cluster,
+            fenceDatabase,
+            quiesce,
+            "migration-040-no-settlement-recovery",
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              fenceDatabase,
+              "begin_production_scoring_ingress_v3",
+              beginInput(current, "migration-040-provider-wins-v3"),
+            ),
+            /PRODUCTION_SCORING_PROVIDER_FENCE_ADMISSION_RESERVED/,
+          );
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              fenceDatabase,
+              "begin_production_scoring_ingress_v2",
+              beginInput(current, "migration-040-provider-wins-v2"),
+            ),
+            /PRODUCTION_SCORING_PROVIDER_FENCE_ADMISSION_RESERVED/,
+          );
+
+          const reservedFence = inspectProviderFence(
+            cluster,
+            fenceDatabase,
+            noSettlementReservation.input.install_request_id,
+            noSettlementReservation.begin.fence_id,
+          );
+          assert.equal(reservedFence.status, "INSTALLING");
+          assert.equal(reservedFence.admission_reservation_active, true);
+
+          const reservedAdmission = rpc(
+            cluster,
+            fenceDatabase,
+            "inspect_production_scoring_admission",
+            {
+              ...scope,
+              deployment_id: candidateIdentity.deploymentId,
+              deployment_commit: candidateIdentity.commit,
+            },
+          );
+          assert.equal(
+            reservedAdmission.provider_admission_reservation_active,
+            true,
+          );
+          assert.equal(reservedAdmission.new_legacy_admission_allowed, false);
+
+          // The ACL-v2 helper above owns the current install/close/drain/restore
+          // rehearsal. The removed tail exercised the retired protected-range
+          // provider contract; authority prepare/commit/rollback remain covered
+          // by the dedicated migration-040 state-machine cases below.
         },
       );
 

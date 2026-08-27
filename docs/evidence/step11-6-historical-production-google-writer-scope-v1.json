@@ -1,0 +1,441 @@
+{
+  "schemaVersion": "step11-6-historical-production-google-writer-scope-v1",
+  "inputs": {
+    "originInventorySchemaVersion": "step11-6-production-origin-inventory-v4",
+    "originInventoryProviderRecordCount": 1292,
+    "originInventoryProviderRecordsFingerprint": "abd27e4e2747c17053f6debf71ec0f523d39fea8e2383d4911f9dc4b87959cbe",
+    "activeAliasCensusSchemaVersion": "step11-6-production-active-alias-census-v1",
+    "activeAliasCensusCapturedAt": "2026-08-27T03:46:28Z",
+    "activeAliasRecordCount": 56,
+    "activeAliasRecordsFingerprint": "c584b50803b59b52e06d8b699afb0cd22b00c980a3f8be0a7b78f7140f98da1a",
+    "credentialConfinementEvidenceFingerprint": "6f468334a508553cdb9230c14ad85969c89169df6a2ec88011fb2e7e30c9656a",
+    "historicalSafeMethodEvidenceFingerprint": "6cb2ac60314de617f8c94d5d0814d710ec14b47eb4c49fdfa9662fdbe46fcd69"
+  },
+  "retainedSourceAudit": {
+    "retainedDeploymentCount": 1292,
+    "retainedUniqueNonNullShaCount": 1224,
+    "locallyResolvableRetainedUniqueShaCount": 1221,
+    "locallyUnresolvableRetainedUniqueShaCount": 3,
+    "retainedNullShaDeploymentCount": 8,
+    "readyNullShaDeploymentCount": 5,
+    "nonReadyNullShaDeploymentCount": 3,
+    "locallyUnresolvableShaList": [
+      "07685fc6f9e6db05c103493eb34e35425023aa42",
+      "87d9661818b335a00dfe5f12dbc96531bf005ace",
+      "fd3e2d11b19cc15c6120e2990c0b2c3dbcf95785"
+    ],
+    "readyDeploymentCount": 1158,
+    "readyUniqueNonNullShaCount": 1096,
+    "locallyResolvableReadyUniqueShaCount": 1093,
+    "locallyUnresolvableReadyUniqueShaCount": 3,
+    "sourceUnresolvedReadyDeploymentCount": 8,
+    "sourceUnresolvedReadyOriginsFingerprint": "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+    "sourceUnresolvedReadyDeployments": [
+      {
+        "deploymentId": "dpl_D5a6bBrjxMhG2E6ES3d8ZPcZkWKM",
+        "sha": "07685fc6f9e6db05c103493eb34e35425023aa42",
+        "origin": "https://bagger-1w07if9d1-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": "agent/prediction-model-recalibration",
+        "providerSource": "GIT",
+        "deploymentStatus": "READY",
+        "shaResolution": "EXACT_PROVIDER"
+      },
+      {
+        "deploymentId": "dpl_6oDzTbqkVhnZjbjjXzetdeAo1wTZ",
+        "sha": null,
+        "origin": "https://bagger-60ah92b8c-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": null,
+        "providerSource": "CLI",
+        "deploymentStatus": "READY",
+        "shaResolution": "UNAVAILABLE"
+      },
+      {
+        "deploymentId": "dpl_ChHaFtGCJKiFWtuv9BVF7mzvFZQD",
+        "sha": null,
+        "origin": "https://bagger-6nrmyunec-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": null,
+        "providerSource": "CLI",
+        "deploymentStatus": "READY",
+        "shaResolution": "UNAVAILABLE"
+      },
+      {
+        "deploymentId": "dpl_9bLBSKhf54AxxnuMsj1UjgfjQTrr",
+        "sha": null,
+        "origin": "https://bagger-b8ob0hjnu-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": null,
+        "providerSource": "CLI",
+        "deploymentStatus": "READY",
+        "shaResolution": "UNAVAILABLE"
+      },
+      {
+        "deploymentId": "dpl_F56GMeZixaqmAog88QhhDDD84wia",
+        "sha": null,
+        "origin": "https://bagger-f64olgv1h-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": null,
+        "providerSource": "CLI",
+        "deploymentStatus": "READY",
+        "shaResolution": "UNAVAILABLE"
+      },
+      {
+        "deploymentId": "dpl_8cwYsBGv1K8wgaYMJ5Ax8uMvyjuq",
+        "sha": "87d9661818b335a00dfe5f12dbc96531bf005ace",
+        "origin": "https://bagger-h0eycprri-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": "feature/mobile-game-center-redesign",
+        "providerSource": "GIT",
+        "deploymentStatus": "READY",
+        "shaResolution": "EXACT_PROVIDER"
+      },
+      {
+        "deploymentId": "dpl_3LJv1VckpSVWMkAK96NDmdjYtbRq",
+        "sha": null,
+        "origin": "https://bagger-kh2m1cy6h-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": null,
+        "providerSource": "CLI",
+        "deploymentStatus": "READY",
+        "shaResolution": "UNAVAILABLE"
+      },
+      {
+        "deploymentId": "dpl_73dJVxZVEXkUqrinj17RHVFcjP7j",
+        "sha": "fd3e2d11b19cc15c6120e2990c0b2c3dbcf95785",
+        "origin": "https://bagger-kj3c0pkvm-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "gitBranch": "agent/course-hole-number-schema",
+        "providerSource": "GIT",
+        "deploymentStatus": "READY",
+        "shaResolution": "EXACT_PROVIDER"
+      }
+    ],
+    "googleSheetsWritePresentUniqueBlobCount": 110,
+    "googleSheetsWriteBlobsFingerprint": "1d247abede703c4af1efd9d7efe85e4627cac9eabb0f134a6ffd22b588cdc3cb",
+    "canonicalRouteBlobBindingCount": 101,
+    "canonicalRouteBlobBindingsFingerprint": "81ca821971a5eeba6cd51e8f7eb7b0b90137bc00424ff50d6bad84b46d0c063f",
+    "canonicalRoutePaths": [
+      "app/api/admin/cms/route.js",
+      "app/api/admin/tournament/route.js",
+      "app/api/director/route.js",
+      "app/api/live-matches/route.js",
+      "app/api/scoring/current/route.js",
+      "app/api/scoring/matches/[matchId]/route.js"
+    ],
+    "canonicalMutationMethods": [
+      "POST"
+    ],
+    "observedCanonicalRouteExportedMethodUnion": [
+      "GET",
+      "POST"
+    ],
+    "observedGoogleTransportMutationMethodUnion": [
+      "POST",
+      "PUT"
+    ],
+    "reviewedSourceBindingStatus": "EXACT"
+  },
+  "canonicalWorksheetScope": {
+    "derivation": "REVIEWED_EXACT_ROUTE_AND_TRANSPORT_BLOB_BINDING",
+    "historicalCanonicalSheets": [
+      "Admin Audit Log",
+      "Awards",
+      "Calcutta Ownership",
+      "Calcutta Purchases",
+      "Calcutta Round Results",
+      "Calcutta Standings",
+      "Courses",
+      "Handicaps",
+      "Live Hole Scores",
+      "Live Matches",
+      "Match Update Log",
+      "Matches",
+      "Net Skins",
+      "Net Skins Result",
+      "Players",
+      "Team Names",
+      "Tournaments"
+    ],
+    "currentCanonicalSheets": [
+      "Admin Audit Log",
+      "Awards",
+      "Calcutta Ownership",
+      "Calcutta Purchases",
+      "Calcutta Round Results",
+      "Calcutta Standings",
+      "Courses",
+      "Handicaps",
+      "Live Hole Scores",
+      "Live Matches",
+      "Match Update Log",
+      "Matches",
+      "Net Skins",
+      "Net Skins Result",
+      "Players",
+      "Team Names",
+      "Tournaments"
+    ],
+    "currentUnionHistoricalCanonicalSheets": [
+      "Admin Audit Log",
+      "Awards",
+      "Calcutta Ownership",
+      "Calcutta Purchases",
+      "Calcutta Round Results",
+      "Calcutta Standings",
+      "Courses",
+      "Handicaps",
+      "Live Hole Scores",
+      "Live Matches",
+      "Match Update Log",
+      "Matches",
+      "Net Skins",
+      "Net Skins Result",
+      "Players",
+      "Team Names",
+      "Tournaments"
+    ],
+    "currentUnionHistoricalCanonicalSheetCount": 17,
+    "currentUnionHistoricalCanonicalSheetsFingerprint": "cf8e81dc38a72501fa87c2178f9a6fe06487dc8eeb3e3091169037941f2d2cb7",
+    "currentMinusHistorical": [],
+    "historicalMinusCurrent": [],
+    "unresolvedDynamicCanonicalTargetCount": 0,
+    "sourceUnresolvedDynamicTargetsPolicy": "ALL_METHOD_HOST_DENY_UNTIL_SOURCE_IS_AUDITABLE",
+    "noncanonicalMutationSheetsExcludedFromCanonicalRangeFence": [
+      "Notification Log",
+      "Odds Control",
+      "Odds Player Results",
+      "Odds Snapshots",
+      "Odds Team Results",
+      "Player Passport",
+      "Round Scorecards",
+      "Trusted Devices"
+    ]
+  },
+  "dedicatedProductionCredentialCandidates": {
+    "markerContract": "CURRENT_DISPATCH_BOUND_CANONICAL_LEGACY_V2_AND_PRODUCTION_WORKER",
+    "historicalMarkerBearingUniqueShaCount": 10,
+    "historicalMarkerBearingPreviewRuntimePolicy": "CANONICAL_DEDICATED_SELECTION_REQUIRES_VERCEL_ENV_EXACT_PRODUCTION",
+    "historicalMarkerBearingCanonicalRoutesUseOnlyPost": true,
+    "historicalMarkerBearingDeploymentsCoveredByProjectWidePostFence": true,
+    "count": 2,
+    "candidates": [
+      {
+        "deploymentId": "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
+        "sha": "0671bb3b84ac5846218ea60838fe4e1cc07de97f",
+        "origin": "https://bagger-6lfjugfk7-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "runtimeProductionGate": "VERCEL_ENV_EXACT_PRODUCTION",
+        "productionCanonicalCredentialReachableInRetainedPreviewDeployment": false,
+        "persistentAllMethodHostDenyRequiredAsDefenseInDepth": true
+      },
+      {
+        "deploymentId": "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+        "sha": "a0b79cdef3a34d640e9411035792bd1e91989566",
+        "origin": "https://bagger-pmt7catuz-sandbagger-invitational.vercel.app",
+        "deploymentTarget": "PREVIEW",
+        "runtimeProductionGate": "VERCEL_ENV_EXACT_PRODUCTION",
+        "productionCanonicalCredentialReachableInRetainedPreviewDeployment": false,
+        "persistentAllMethodHostDenyRequiredAsDefenseInDepth": true
+      }
+    ],
+    "nameOnlyProviderEvidence": {
+      "source": "READ_ONLY_VERCEL_DEPLOYMENT_ENV_NAME_AUDIT",
+      "sourceUnresolvedReadyEnvNames": [
+        "GOOGLE_PRIVATE_KEY",
+        "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        "GOOGLE_SHEETS_ID"
+      ],
+      "dedicatedCandidateAdditionalEnvNames": [
+        "PRODUCTION_GOOGLE_PRIVATE_KEY",
+        "PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL"
+      ],
+      "secretValuesRetained": false
+    }
+  },
+  "persistentProviderFence": {
+    "immutableAllMethodDenyOrigins": [
+      "https://bagger-1w07if9d1-sandbagger-invitational.vercel.app",
+      "https://bagger-60ah92b8c-sandbagger-invitational.vercel.app",
+      "https://bagger-6lfjugfk7-sandbagger-invitational.vercel.app",
+      "https://bagger-6nrmyunec-sandbagger-invitational.vercel.app",
+      "https://bagger-b8ob0hjnu-sandbagger-invitational.vercel.app",
+      "https://bagger-f64olgv1h-sandbagger-invitational.vercel.app",
+      "https://bagger-h0eycprri-sandbagger-invitational.vercel.app",
+      "https://bagger-kh2m1cy6h-sandbagger-invitational.vercel.app",
+      "https://bagger-kj3c0pkvm-sandbagger-invitational.vercel.app",
+      "https://bagger-pmt7catuz-sandbagger-invitational.vercel.app"
+    ],
+    "immutableAllMethodDenyOriginCount": 10,
+    "immutableAllMethodDenyOriginsFingerprint": "1a687f3ea97d9e9d2fe65e6732be2c1d9b80aa563370338d26a71b23a3ffa12f",
+    "currentAliasAwareAllMethodDenyOrigins": [
+      "https://bagger-1w07if9d1-sandbagger-invitational.vercel.app",
+      "https://bagger-60ah92b8c-sandbagger-invitational.vercel.app",
+      "https://bagger-6lfjugfk7-sandbagger-invitational.vercel.app",
+      "https://bagger-6nrmyunec-sandbagger-invitational.vercel.app",
+      "https://bagger-b8ob0hjnu-sandbagger-invitational.vercel.app",
+      "https://bagger-f64olgv1h-sandbagger-invitational.vercel.app",
+      "https://bagger-h0eycprri-sandbagger-invitational.vercel.app",
+      "https://bagger-inv-git-agent-course-hole-be25e6-sandbagger-invitational.vercel.app",
+      "https://bagger-inv-git-feature-mock-tour-b4f752-sandbagger-invitational.vercel.app",
+      "https://bagger-kh2m1cy6h-sandbagger-invitational.vercel.app",
+      "https://bagger-kj3c0pkvm-sandbagger-invitational.vercel.app",
+      "https://bagger-pmt7catuz-sandbagger-invitational.vercel.app"
+    ],
+    "currentAliasAwareAllMethodDenyOriginCount": 12,
+    "currentAliasAwareAllMethodDenyOriginsFingerprint": "3bbe7725448889d88678eb79501a3908613f7e3949f6a026e7b4855477540521",
+    "executableAllMethodHostOrigins": [
+      "https://bagger-1w07if9d1-sandbagger-invitational.vercel.app",
+      "https://bagger-60ah92b8c-sandbagger-invitational.vercel.app",
+      "https://bagger-6nrmyunec-sandbagger-invitational.vercel.app",
+      "https://bagger-b8ob0hjnu-sandbagger-invitational.vercel.app",
+      "https://bagger-f64olgv1h-sandbagger-invitational.vercel.app",
+      "https://bagger-h0eycprri-sandbagger-invitational.vercel.app",
+      "https://bagger-inv-git-agent-course-hole-be25e6-sandbagger-invitational.vercel.app",
+      "https://bagger-kh2m1cy6h-sandbagger-invitational.vercel.app",
+      "https://bagger-kj3c0pkvm-sandbagger-invitational.vercel.app"
+    ],
+    "executableAllMethodHostOriginCount": 9,
+    "executableAllMethodHostOriginsFingerprint": "0423e6a742d6527b10afc071856dbc6c5b1cca5e1ffb09a5d2523d0f04b31c0c",
+    "activeUnsafeAliases": [
+      {
+        "alias": "https://bagger-inv-git-agent-course-hole-be25e6-sandbagger-invitational.vercel.app",
+        "deploymentId": "dpl_73dJVxZVEXkUqrinj17RHVFcjP7j",
+        "policy": "DENY_UNLESS_REMOVED_OR_MOVED_TO_AUDITED_SOURCE"
+      },
+      {
+        "alias": "https://bagger-inv-git-feature-mock-tour-b4f752-sandbagger-invitational.vercel.app",
+        "deploymentId": "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
+        "policy": "MOVE_TO_BARRIER_AWARE_CANDIDATE_BEFORE_CLOSE"
+      }
+    ],
+    "featureAliasMustMoveToBarrierAwareCandidateBeforeClose": true,
+    "courseHoleAliasMustRemainDeniedUnlessRemovedOrMovedToAuditedSource": true,
+    "twoConsecutiveProviderAliasRecapturesRequiredBeforeClose": true,
+    "liveProviderAliasDriftFailsClosed": true,
+    "permanentWafContract": {
+      "canonicalHostname": "baggerinv.com",
+      "action": "DENY",
+      "active": true,
+      "projectWide": true,
+      "earlierActiveBypassRuleCount": 0,
+      "noncanonicalCanonicalMutationGroup": {
+        "hostnameOperator": "DOES_NOT_EQUAL",
+        "requestPathOperator": "DOES_NOT_EQUAL",
+        "requestPath": "/api/admin/step11-6-production-google-writer-fence",
+        "methodOperator": "IS_NOT_ANY_OF",
+        "methods": [
+          "GET",
+          "HEAD",
+          "OPTIONS"
+        ]
+      },
+      "sourceUnresolvedAndUnsafeAliasAllMethodGroup": {
+        "hostCount": 9,
+        "hostsFingerprint": "0423e6a742d6527b10afc071856dbc6c5b1cca5e1ffb09a5d2523d0f04b31c0c",
+        "sourceUnresolvedImmutableOriginCount": 8,
+        "sourceUnresolvedImmutableOriginsFingerprint": "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+        "exactUnsafeAliasCount": 1,
+        "exactUnsafeAliasesFingerprint": "7b405a5825ff6abb30c24e48aee1681923df549ca47b044e48e8cb0bc83d1aec",
+        "exactUnsafeAliasIncludedAsIncomingRequestHostname": true
+      },
+      "noncanonicalRoundScorecardsAllMethodGroup": {
+        "hostnameOperator": "DOES_NOT_EQUAL",
+        "pathOperator": "IS_ANY_OF",
+        "paths": [
+          "/api/cron/round-scorecards-archive"
+        ],
+        "methods": "ALL_METHODS"
+      },
+      "aliasRecapture": {
+        "requiredConsecutiveProviderCaptures": 2,
+        "providerSignedBeginAndFinalizeCapturesRequired": true,
+        "browserSuppliedAliasInventoryAllowed": false,
+        "providerAdminChangeFreezeRequired": true,
+        "featureAliasMustResolveToBarrierAwareCandidate": true,
+        "courseHoleAliasMustRemainInDeniedImmutableDeploymentSet": true,
+        "failClosedOnAnyAliasDrift": true
+      },
+      "historicalEvidenceBindings": {
+        "immutableOriginCount": 10,
+        "immutableOriginsFingerprint": "1a687f3ea97d9e9d2fe65e6732be2c1d9b80aa563370338d26a71b23a3ffa12f",
+        "aliasAwareOriginCount": 12,
+        "aliasAwareOriginsFingerprint": "3bbe7725448889d88678eb79501a3908613f7e3949f6a026e7b4855477540521"
+      }
+    }
+  },
+  "historicalRoundScorecardsSafeMethodWriter": {
+    "operationClass": "MIRROR_ARCHIVE",
+    "requestPath": "/api/cron/round-scorecards-archive",
+    "explicitMethods": [
+      "GET"
+    ],
+    "implicitFrameworkMethods": [
+      "HEAD"
+    ],
+    "affectedReadyOriginCount": 236,
+    "affectedReadyOriginsFingerprint": "a8263e02ab7b65df938367fbf39769c70b501a614ebcdfa46800bda2e82de3a2",
+    "everyAffectedDeploymentTarget": "PREVIEW",
+    "historicalBuildTimeWorkbookValuesProvenPreviewOnly": false,
+    "productionWorkbookExecutionExcludedByNameOnlyEvidence": false,
+    "conclusion": "NAME_ONLY_AND_CURRENT_SCOPE_EVIDENCE_CANNOT_EXCLUDE_HISTORICAL_PRODUCTION_WORKBOOK_EXECUTION",
+    "requiredControl": {
+      "type": "PERSISTENT_PROJECT_WIDE_PATH_DENY",
+      "path": "/api/cron/round-scorecards-archive",
+      "methods": "ALL_METHODS",
+      "canonicalSeventeenSheetFenceExpanded": false
+    }
+  },
+  "quiesceDurationSafety": {
+    "configuredWafQuiesceSeconds": 300,
+    "providerObservedCanonicalFunctionTimeoutSeconds": 300,
+    "providerEvidenceDeploymentId": "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
+    "providerEvidenceCanonicalRouteCount": 6,
+    "historicalReadyProviderFunctionTimeoutsExhaustivelyObserved": false,
+    "anyReadyOriginCouldOutliveConfiguredWafSecondsExcluded": false,
+    "strictlyGreaterThanObservedFunctionTimeout": false,
+    "historicalWriterTransportBlobCount": 110,
+    "writerTransportBlobWithExplicitAbortTimeoutCount": 80,
+    "writerTransportBlobWithoutExplicitAbortTimeoutCount": 30,
+    "ambiguousDispatchedGoogleRequestCanBeExcludedByElapsedTimeAlone": false,
+    "safe": false,
+    "blocker": "300_SECONDS_HAS_NO_MARGIN_OVER_A_300_SECOND_FUNCTION_AND_HISTORICAL_GOOGLE_FETCHES_CAN_REMAIN_AMBIGUOUS",
+    "requiredMinimumPolicy": "WAIT_LONGER_THAN_MAX_PROVIDER_FUNCTION_DURATION_AND_REQUIRE_ZERO_UNRESOLVED_REQUEST_LOGS_PLUS_GOOGLE_READBACK_IDEMPOTENCY_RESOLUTION",
+    "recommendedMinimumQuiesceSeconds": 360,
+    "classification": "DEFENSE_IN_DEPTH_FINDING_PRIMARY_CANONICAL_PROOF_USES_PROTECTED_RANGE_SETTLEMENT"
+  },
+  "primaryCanonicalProviderSettlement": {
+    "status": "IMPLEMENTED_PENDING_INDEPENDENT_ACCEPTANCE",
+    "t0Definition": "DURABLE_PROTECTED_RANGE_INSTALLATION_PLUS_LEGACY_PRINCIPAL_DENY_CONFIRMED",
+    "googleSheetsMaximumRequestProcessingSeconds": 180,
+    "minimumDatabaseClockSecondsAfterT0ForFirstReadback": 190,
+    "minimumDatabaseClockSecondsBetweenIndependentReadbacks": 10,
+    "minimumTotalDatabaseClockSecondsAfterT0": 200,
+    "firstReadbackRequiresExactCanonicalSeventeenSheetFingerprint": true,
+    "secondReadbackRequiresIndependentExactCanonicalSeventeenSheetFingerprint": true,
+    "unresolvedGoogleRequestsMustEqualZero": true,
+    "ownerWritesMustRemainFrozen": true,
+    "closeTransitionMustBeAtomicWithSecondReadback": true,
+    "finishAndCloseRpc": "finish_close_production_google_writer_provider_fence_install",
+    "resumableStages": [
+      "AWAITING_PROTECTIONS_INSTALLED",
+      "PROTECTIONS_INSTALLED",
+      "SETTLEMENT_READBACK_1",
+      "SETTLEMENT_READBACK_2"
+    ],
+    "allowsElapsedWafDurationAloneAsProof": false,
+    "acceptedAsPrimaryProof": false
+  },
+  "conclusion": {
+    "protectedCurrentUnionHistoricalCanonicalRangesRequired": true,
+    "persistentAllMethodFenceForSourceUnresolvedAndDedicatedCandidatesRequired": true,
+    "persistentNarrowRoundScorecardsPathFenceRequired": true,
+    "unknownDynamicTargetFailsClosedOrOriginRemainsDenied": true,
+    "canonicalSheetFencePlusAliasAwareProviderFenceSufficientOnlyWithRuntimeGateProof": true,
+    "unexplainedHistoricalCanonicalSheetDifferenceCount": 0,
+    "unexplainedConcurrencyWindowCount": 1,
+    "concurrencyBlocker": "PROVIDER_SETTLEMENT_INDEPENDENT_ACCEPTANCE_PENDING"
+  },
+  "evidenceFingerprint": "2f786886f4b0ec4f070757e8e23f462189304c722a015a260852ccd0888527cd"
+}

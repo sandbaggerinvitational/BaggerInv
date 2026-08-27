@@ -31,6 +31,15 @@ const candidateDeploymentId = "dpl_CandidateStep116A1";
 const candidateCommit = "7".repeat(40);
 const ruleId = "writer-quiesce-rule";
 const ruleRevision = "revision-17";
+const allMethodHostCount = 9;
+const allMethodHostsFingerprint =
+  "0423e6a742d6527b10afc071856dbc6c5b1cca5e1ffb09a5d2523d0f04b31c0c";
+const retainedAliasCensus = JSON.parse(readFileSync(new URL(
+  "../docs/evidence/step11-6-production-active-alias-census-v1.json",
+  import.meta.url,
+), "utf8"));
+const retainedCandidateAliasHostname =
+  "bagger-inv-git-feature-mock-tour-b4f752-sandbagger-invitational.vercel.app";
 
 function environment() {
   return {
@@ -57,13 +66,15 @@ function input(overrides = {}) {
       scope: PRODUCTION_GOOGLE_WRITER_QUIESCE_SCOPE,
       projectWide: true,
       action: "DENY",
+      hostnameOperator: "DOES_NOT_EQUAL",
+      canonicalHostname: "baggerinv.com",
       requestPathOperator: "DOES_NOT_EQUAL",
       requestPath: PRODUCTION_GOOGLE_WRITER_QUIESCE_CONTROL_PATH,
       methodOperator: "IS_NOT_ANY_OF",
       methods: ["OPTIONS", "GET", "HEAD"],
-      allMethodFenceRequiredHostCount: 8,
+      allMethodFenceRequiredHostCount: allMethodHostCount,
       allMethodFenceRequiredHostsFingerprint:
-        "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+        allMethodHostsFingerprint,
       allMethodFenceRequiredPathCount: 1,
       allMethodFenceRequiredPathsFingerprint:
         "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
@@ -83,11 +94,29 @@ function providerAttestationFor(selectedEnvironment = environment(), additions =
   const records = [...retained.recordTuples.map((tuple) => [...tuple]),
     ...additions.map((tuple) => [...tuple]), candidateTuple]
     .sort((left, right) => `${left[0]}\n${left[2]}` < `${right[0]}\n${right[2]}` ? -1 : 1);
+  const aliasRecords = retainedAliasCensus.records.map((record) => [...record]);
+  const candidateAliasHostname = selectedEnvironment.resources.candidateHostname;
+  const candidateImmutableHostname = selectedEnvironment.resources.deploymentHostname;
+  const candidateAliasIndex = aliasRecords.findIndex((record) =>
+    record[0] === retainedCandidateAliasHostname);
+  assert.notEqual(candidateAliasIndex, -1);
+  aliasRecords[candidateAliasIndex] = [
+    selectedEnvironment.resources.candidateDeploymentId,
+    selectedEnvironment.resources.candidateDeploymentId,
+    candidateImmutableHostname,
+    null,
+    null,
+  ];
+  aliasRecords[candidateAliasIndex][0] = candidateAliasHostname;
+  aliasRecords.sort((left, right) => left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0);
   return {
     signatureVerified: true,
-    routingRuleAllMethodFenceRequiredHostCount: 8,
+    routingRuleHostnameOperator: "DOES_NOT_EQUAL",
+    routingRuleCanonicalHostname: "baggerinv.com",
+    routingRuleEarlierActiveBypassRuleCount: 0,
+    routingRuleAllMethodFenceRequiredHostCount: allMethodHostCount,
     routingRuleAllMethodFenceRequiredHostsFingerprint:
-      "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+      allMethodHostsFingerprint,
     routingRuleAllMethodFenceRequiredPathCount: 1,
     routingRuleAllMethodFenceRequiredPathsFingerprint:
       "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
@@ -108,6 +137,12 @@ function providerAttestationFor(selectedEnvironment = environment(), additions =
     liveOriginInventoryFingerprint:
       createHash("sha256").update(JSON.stringify(records)).digest("hex"),
     liveOriginInventoryRecords: records,
+    aliasInventoryCount: aliasRecords.length,
+    aliasInventoryFingerprint:
+      createHash("sha256").update(JSON.stringify(aliasRecords)).digest("hex"),
+    aliasInventoryRecords: aliasRecords,
+    aliasPaginationPageCount: 1,
+    aliasPaginationFingerprint: "c".repeat(64),
   };
 }
 
@@ -137,7 +172,7 @@ function normalizeWithProvider(providerAttestation, selectedEnvironment = enviro
   );
 }
 
-test("retained complete 1,291-origin v3 provider inventory is projected and re-hashed exactly", () => {
+test("retained complete 1,292-origin v4 provider inventory is projected and re-hashed exactly", () => {
   const retained = productionLegacyDeploymentInventory();
   assert.equal(retained.recordCount, PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT);
   assert.equal(retained.vercelProjectId, PRODUCTION_VERCEL_PROJECT_ID);
@@ -161,7 +196,7 @@ test("retained complete 1,291-origin v3 provider inventory is projected and re-h
   assert.equal(retained.records.filter((record) =>
     record.scopeClass === "PRODUCTION_TARGET").length, 458);
   assert.equal(retained.records.filter((record) =>
-    record.scopeClass === "PROJECT_PREVIEW").length, 833);
+    record.scopeClass === "PROJECT_PREVIEW").length, 834);
   assert.equal(retained.paginationEvidence.exactPassMatch, true);
   assert.equal(retained.paginationEvidence.remainingCursor, null);
   assert.deepEqual(retained.recordTuple, [
@@ -186,19 +221,25 @@ test("retained complete 1,291-origin v3 provider inventory is projected and re-h
 
 test("normalization adds exact fixed and candidate origins without client inventory", () => {
   const normalized = normalize();
-  assert.equal(normalized.originInventoryCount, 1291);
+  assert.equal(normalized.originInventoryCount, 1292);
   assert.equal(normalized.originInventoryFingerprint,
     PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_FINGERPRINT);
   assert.equal(normalized.purpose, "REHEARSAL");
   assert.equal(normalized.candidateDeploymentId, candidateDeploymentId);
-  assert.ok(normalized.probeOrigins.includes("https://baggerinv.com"));
+  assert.equal(normalized.aliasInventoryCount, 56);
+  assert.equal(normalized.aliasInventoryRecords.length, 56);
+  assert.equal(createHash("sha256").update(
+    JSON.stringify(normalized.aliasInventoryRecords)).digest("hex"),
+  normalized.aliasInventoryFingerprint);
+  assert.equal(normalized.aliasPaginationPageCount, 1);
+  assert.equal(normalized.probeOrigins.includes("https://baggerinv.com"), false);
   assert.ok(normalized.probeOrigins.includes("https://www.baggerinv.com"));
   assert.ok(normalized.probeOrigins.includes("https://bagger-inv.vercel.app"));
   assert.ok(normalized.probeOrigins.includes(
     "https://bagger-inv-git-main-sandbagger-invitational.vercel.app"));
   assert.ok(normalized.probeOrigins.includes(
     "https://bagger-a1b2c3d4e-sandbagger-invitational.vercel.app"));
-  const expectedOriginCount = normalized.liveOriginInventoryCount + 5;
+  const expectedOriginCount = normalized.liveOriginInventoryCount + 4;
   const expectedTargetCount = expectedOriginCount * normalized.probeVectorCount;
   assert.equal(normalized.probeOrigins.length, expectedOriginCount);
   assert.equal(normalized.probeTargets.length, expectedTargetCount);
@@ -221,7 +262,7 @@ test("normalization adds exact fixed and candidate origins without client invent
 test("normalization accepts an exact candidate already present in the complete retained census", async () => {
   const retained = productionLegacyDeploymentInventory();
   const candidate = retained.records.find((record) =>
-    record.deploymentId === "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox");
+    record.deploymentId === "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm");
   const selectedEnvironment = environment();
   selectedEnvironment.resources.candidateDeploymentId = candidate.deploymentId;
   selectedEnvironment.resources.commitSha = candidate.sha;
@@ -240,7 +281,7 @@ test("normalization accepts an exact candidate already present in the complete r
   const normalized = normalizeProductionWriterQuiesceEvidenceInput(
     input(), selectedEnvironment, { providerAttestation: attestation },
   );
-  assert.equal(normalized.liveOriginInventoryCount, 1291);
+  assert.equal(normalized.liveOriginInventoryCount, 1292);
   assert.equal(normalized.probeOrigins.filter((origin) => origin === candidate.origin).length, 1);
   const proof = await probeProductionWriterQuiesceOrigins(normalized, {
     concurrency: 64,
@@ -266,8 +307,8 @@ test("normalization accepts an exact candidate already present in the complete r
 
 test("signed live inventory uniqueness and retained-candidate collisions fail closed", () => {
   const exact = providerAttestationFor();
-  assert.equal(exact.liveOriginInventoryCount, 1292);
-  assert.equal(normalizeWithProvider(exact).liveOriginInventoryCount, 1292,
+  assert.equal(exact.liveOriginInventoryCount, 1293);
+  assert.equal(normalizeWithProvider(exact).liveOriginInventoryCount, 1293,
     "retained complete project census plus exact dynamic candidate is sufficient");
 
   const duplicateTupleRecords = [
@@ -340,6 +381,8 @@ test("a post-capture deployment other than the exact dynamic candidate fails clo
 
 test("full server probe requires exact Vercel deny markers and emits SQL-shaped evidence", async () => {
   const normalized = normalize();
+  assert.equal(normalized.probeOrigins.includes("https://baggerinv.com"), false,
+    "the canonical apex is constrained by the central Google fence, not the retained noncanonical-host WAF");
   const probedVectors = new Set();
   const probedTargets = new Set();
   const fetchImpl = async (url, request) => {
@@ -389,7 +432,8 @@ test("full server probe requires exact Vercel deny markers and emits SQL-shaped 
     policy:
       "EXACT_HISTORICAL_SAFE_METHOD_GOOGLE_WRITER_PATH_REQUIRES_ALL_METHOD_PROJECT_WIDE_DENY",
   });
-  const fixed = proof.probeRecords.find((record) => record[0] === "https://baggerinv.com");
+  const fixed = proof.probeRecords.find((record) =>
+    record[0] === "https://www.baggerinv.com");
   assert.equal(fixed[1], "FIXED_ALIAS");
   assert.equal(fixed[2], null);
   assert.deepEqual(fixed[7], []);
@@ -406,6 +450,13 @@ test("full server probe requires exact Vercel deny markers and emits SQL-shaped 
     const source = productionLegacyDeploymentInventory().records.find((value) =>
       value.origin === origin);
     const record = proof.probeRecords.find((value) => value[0] === origin);
+    if (!source) {
+      assert.equal(origin,
+        "https://bagger-inv-git-agent-course-hole-be25e6-sandbagger-invitational.vercel.app");
+      assert.equal(record, undefined,
+        "the alias is bound by signed provider mapping plus WAF config, outside v4 +4 edge probes");
+      continue;
+    }
     assert.equal(record[3], source.sha);
     assert.equal(record[6], source.providerMetadataFingerprint,
       "the runtime probe tuple must carry projection field 5 for SQL scope binding");

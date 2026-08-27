@@ -76,13 +76,14 @@ function requestFor(value) {
 
 function envelopeFor(value) {
   return {
-    schemaVersion: "bagger-vercel-provider-attestation-envelope-v1",
+    schemaVersion: "bagger-vercel-provider-attestation-envelope-v2",
     algorithm: "Ed25519",
     signerKeyVersion: "STEP11_6_VERCEL_ATTESTER_V1",
     signerKeyFingerprint: "d".repeat(64),
     attestationFingerprint: "e".repeat(64),
     signature: "signed_provider_attestation",
     attestation: {
+      schemaVersion: "bagger-vercel-provider-attestation-noncanonical-host-v2",
       attestationId: ids[11],
       challengeId: value.challengeId,
       challengeRequestFingerprint: value.challengeRequestFingerprint,
@@ -96,6 +97,9 @@ function envelopeFor(value) {
       candidateDeploymentTarget: value.candidateDeploymentTarget,
       routingRuleId: value.routingRuleId,
       routingRuleConfigVersion: value.routingRuleConfigVersion,
+      routingRuleHostnameOperator: "DOES_NOT_EQUAL",
+      routingRuleCanonicalHostname: "baggerinv.com",
+      routingRuleEarlierActiveBypassRuleCount: 0,
     },
   };
 }
@@ -679,8 +683,40 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
   assert.ok(allowlist, "the server RPC allowlist must be statically extractable");
   const allowedRpcs = [...allowlist[1].matchAll(/"([a-z0-9_]+)"/g)]
     .map((match) => match[1]);
-  assert.equal(allowedRpcs.length, 18);
+  const expectedRpcs = new Set([
+    "inspect_production_scoring_admission",
+    "begin_production_google_writer_fence_rehearsal",
+    "finish_production_google_writer_fence_rehearsal",
+    "inspect_production_google_writer_fence_rehearsal",
+    "begin_production_vercel_writer_quiesce_evidence",
+    "finalize_production_vercel_writer_quiesce_evidence",
+    "inspect_production_vercel_writer_quiesce_evidence",
+    "issue_production_vercel_provider_attestation_challenge",
+    "inspect_production_vercel_provider_attestation_challenge",
+    "inspect_production_vercel_provider_challenge_abandonment",
+    "abandon_production_vercel_provider_attestation_challenge",
+    "consume_production_vercel_provider_attestation_challenge",
+    "begin_production_google_writer_provider_fence_install",
+    "begin_production_google_writer_provider_fence_install_dispatch",
+    "begin_abort_production_google_writer_provider_fence_install",
+    "begin_production_google_writer_provider_fence_abort_dispatch",
+    "record_production_google_writer_acl_dispatch_result",
+    "inspect_production_vercel_writer_critical_waf_epoch",
+    "begin_production_vercel_writer_critical_waf_epoch",
+    "begin_production_vercel_writer_critical_waf_dispatch",
+    "mark_production_vercel_writer_critical_waf_dispatch_started",
+    "record_production_vercel_writer_critical_waf_dispatch_result",
+    "record_production_vercel_writer_critical_waf_reattestation",
+    "finalize_production_google_writer_fence_waf_restore",
+    "bind_production_google_writer_provider_fence_rollback_waf_epoch",
+    "abort_production_google_writer_provider_fence_install",
+    "record_production_google_writer_provider_fence_settlement",
+    "finish_close_production_google_writer_provider_fence_install",
+    "inspect_production_google_writer_provider_fence",
+  ]);
   assert.equal(new Set(allowedRpcs).size, allowedRpcs.length);
+  assert.deepEqual(new Set(allowedRpcs), expectedRpcs,
+    "the bounded RPC surface must contain only the certified receipt, ACL, and WAF operations");
   for (const rpc of allowedRpcs) {
     assert.ok(rpc.length <= 63,
       `PostgREST RPC ${rpc} must survive PostgreSQL identifier storage exactly`);
@@ -690,6 +726,10 @@ test("both browser clients gate quiesce execution on the attestation workflow", 
     "inspect_production_vercel_provider_challenge_abandonment"));
   assert.ok(allowedRpcs.includes(
     "abandon_production_vercel_provider_attestation_challenge"));
+  assert.ok(allowedRpcs.includes(
+    "record_production_google_writer_provider_fence_settlement"));
+  assert.ok(allowedRpcs.includes(
+    "finish_close_production_google_writer_provider_fence_install"));
   assert.doesNotMatch(receiptAdapter,
     /"inspect_production_vercel_provider_attestation_challenge_abandonment"/,
     "the obsolete overlength PostgREST RPC name must not return");

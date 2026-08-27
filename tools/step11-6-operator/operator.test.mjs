@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -6,13 +7,18 @@ import {
   FIXED,
   OperatorRefusalError,
   buildOperationEnvelope,
+  computeAclV2AcceptanceFingerprint,
   computeCertificationFingerprint,
   computeEnvironmentDeltaFingerprintV2,
   computeExecutionBundleMaterialFingerprint,
   computeFingerprintSet,
   evaluateReadiness,
+  exactReviewedProjectWidePreviewException,
+  productionCredentialConfinementBinding,
   productionHistoricalSafeMethodWriterBinding,
+  productionHistoricalWriterScopeBinding,
   productionOriginInventoryBinding,
+  setAclV2AcceptanceArtifactForTest,
   validateManifest,
 } from "./operator.mjs";
 
@@ -21,6 +27,19 @@ const templateSource = readFileSync(
   "utf8",
 );
 const template = JSON.parse(templateSource);
+const credentialConfinementEvidence = JSON.parse(readFileSync(
+  new URL(
+    "../../docs/evidence/step11-6-production-google-credential-confinement-v4.json",
+    import.meta.url,
+  ),
+  "utf8",
+));
+const activeAliasCensus = JSON.parse(readFileSync(new URL(
+  "../../docs/evidence/step11-6-production-active-alias-census-v1.json",
+  import.meta.url,
+), "utf8"));
+const MIGRATION_SHA_PENDING = FIXED.migrationSha256.startsWith("__MIGRATION_040_") &&
+  FIXED.migrationSha256.endsWith("_PENDING__");
 
 const PROVIDER_ROUTE_INPUT_KEYS = new Set([
   "action", "confirmation", "currentVerificationId", "evidenceRequestId",
@@ -44,10 +63,15 @@ const U = Object.freeze({
   epoch: "55555555-5555-4555-8555-555555555555",
   quiesceEvidence: "66666666-6666-4666-8666-666666666666",
   quiesceRequest: "77777777-7777-4777-8777-777777777777",
+  rehearsalFence: "10101010-2020-4030-8040-505050505050",
+  rehearsalFenceInstall: "20202020-3030-4040-8050-606060606060",
+  step12QuiesceEvidence: "12121212-3434-4567-89ab-121212121212",
+  step12QuiesceRequest: "23232323-4545-4678-8abc-232323232323",
   providerFence: "88888888-8888-4888-8888-888888888888",
   providerFenceInstall: "99999999-9999-4999-8999-999999999999",
   providerFenceVerification: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
   providerFenceRemoval: "bbbbbbbb-cccc-4ddd-8eee-ffffffffffff",
+  providerFenceAbort: "abababab-cdcd-4efe-8a8a-bcbcbcbcbcbc",
   refreshedQuiesceEvidence: "cccccccc-dddd-4eee-8fff-000000000000",
   beginChallengeRequest: "dddddddd-eeee-4fff-8aaa-111111111111",
   beginChallenge: "eeeeeeee-ffff-4111-8bbb-222222222222",
@@ -59,6 +83,9 @@ const U = Object.freeze({
   finalizeAttestation: "55555555-6666-4777-8bbb-888888888888",
   beginAbandon: "66666666-7777-4888-8ccc-999999999999",
   finalizeAbandon: "77777777-8888-4999-8ddd-aaaaaaaaaaaa",
+  aclReaderConfirmedObservation: "88888888-9999-4aaa-8bbb-bbbbbbbbbbbb",
+  settlementReadback1Observation: "99999999-aaaa-4bbb-8ccc-cccccccccccc",
+  settlementReadback2Observation: "aaaaaaaa-bbbb-4ccc-8ddd-dddddddddddd",
 });
 
 const LIVE_ORIGIN_COUNT = FIXED.maximumLiveOriginInventoryCount;
@@ -68,6 +95,28 @@ const PROBE_RECORD_COUNT = PROBE_ORIGIN_COUNT * FIXED.quiesceProbeVectorCount;
 
 function copy(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function fixtureAliasRecords(candidateDeploymentId, candidateAliasOrigin,
+  candidateImmutableOrigin) {
+  const records = activeAliasCensus.records.map((record) => [...record]);
+  const index = records.findIndex((record) => record[0] ===
+    "bagger-inv-git-feature-mock-tour-b4f752-sandbagger-invitational.vercel.app");
+  assert.notEqual(index, -1);
+  records[index] = [
+    new URL(candidateAliasOrigin).hostname,
+    candidateDeploymentId,
+    new URL(candidateImmutableOrigin).hostname,
+    null,
+    null,
+  ];
+  return records.sort((left, right) => left[0] < right[0] ? -1 : left[0] > right[0] ? 1 : 0);
+}
+
+function assertCertifiedReadiness(result) {
+  const blockers = [];
+  if (MIGRATION_SHA_PENDING) blockers.push("release.migrationSha256 is unresolved");
+  assert.deepEqual(result, { ready: blockers.length === 0, blockers });
 }
 
 function bindComputedFingerprints(manifest) {
@@ -127,11 +176,19 @@ function certifiedManifest() {
     previewIsolationPassed: true,
     oldHostEnforcementPassed: true,
     dedicatedCredentialConfinementPassed: true,
+    aclEvidenceOnlyDiffPassed: true,
+    aclEvidenceOnlyDiffBaseSha: "e".repeat(40),
+    aclEvidenceOnlyDiffTargetSha: manifest.release.frozenSha,
+    aclEvidenceOnlyDiffAllowedPathCount: 2,
+    aclEvidenceOnlyDiffUnexpectedPathCount: 0,
+    aclEvidenceOnlyDiffFingerprint: "f".repeat(64),
     unexplainedConcurrencyWindows: 0,
     clientSecretExposures: 0,
   });
   Object.assign(manifest.providerFenceRehearsal, {
     status: "PASSED_RESTORED",
+    lifecycleMode: "REHEARSAL",
+    mechanism: "DRIVE_ACL_EXACT_LEGACY_PERMISSION_V2",
     quiesceEvidenceId: U.quiesceEvidence,
     capturedAt: "2026-08-26T11:00:00Z",
     restoredAt: "2026-08-26T11:01:00Z",
@@ -144,13 +201,29 @@ function certifiedManifest() {
     dedicatedWriterRetainedAccess: true,
     legacyWriterDenied: true,
     noDataValueWrites: true,
-    providerBaselineRestored: true,
+    wafBaselineRestored: true,
     previewResourcesAbsent: true,
-    protectedRangeCountBefore: 0,
-    protectedRangeCountAfter: 0,
-    baselineFingerprint: "0".repeat(64),
-    fencedFingerprint: "1".repeat(64),
-    restoredFingerprint: "0".repeat(64),
+    legacyDriveRoleBefore: "writer",
+    legacyDriveRoleDuring: "reader",
+    legacyDriveRoleAfter: "writer",
+    legacyDriveCanEditDuring: false,
+    legacyDriveCanShareDuring: false,
+    legacyPrincipalFingerprint: "d".repeat(64),
+    aclDowngradeDispatchResult: "TARGET_CONFIRMED",
+    aclRestoreDispatchResult: "TARGET_CONFIRMED",
+    unknownAclDispatchCount: 0,
+    googleCanonicalWriterOperationCount: 0,
+    supabaseCanonicalWriteCount: 0,
+    baselineProviderFingerprint: "0".repeat(64),
+    readerProviderFingerprint: "1".repeat(64),
+    restoredProviderFingerprint: "0".repeat(64),
+    baselineWafFingerprint: "a".repeat(64),
+    criticalWindowWafFingerprint: "b".repeat(64),
+    restoredWafFingerprint: "a".repeat(64),
+    criticalWindowActivatedAt: "2026-08-26T10:00:00Z",
+    aclRestoreConfirmedAt: "2026-08-26T10:30:10Z",
+    criticalWindowHeldSeconds: FIXED.criticalWindowWafMinimumHoldSeconds,
+    criticalWindowMinimumHoldSeconds: FIXED.criticalWindowWafMinimumHoldSeconds,
     deploymentScopeFingerprint: "2".repeat(64),
     googleCredentialScopeFingerprint: "3".repeat(64),
     writerCoverageFingerprint: "4".repeat(64),
@@ -163,18 +236,34 @@ function certifiedManifest() {
     probeRecordCount: PROBE_RECORD_COUNT,
     probeScopeFingerprint: "5".repeat(64),
   });
+  const candidateAliasOrigin =
+    "https://bagger-inv-git-feature-step116-sandbagger-invitational.vercel.app";
+  const candidateImmutableOrigin =
+    "https://bagger-step116candidate-sandbagger-invitational.vercel.app";
+  const aliasRecords = fixtureAliasRecords(
+    manifest.release.deploymentId, candidateAliasOrigin, candidateImmutableOrigin,
+  );
+  const aliasFingerprint = createHash("sha256")
+    .update(JSON.stringify(aliasRecords)).digest("hex");
+  const aliasPaginationFingerprint = "e".repeat(64);
+  const beginAliasObservedAt = "2026-08-26T10:00:10Z";
+  const finalizeAliasObservedAt = "2026-08-26T10:00:20Z";
   Object.assign(manifest.providerQuiesceEvidence, {
     status: "VERIFIED",
     evidenceId: U.quiesceEvidence,
     evidenceRequestId: U.quiesceRequest,
     priorEvidenceId: null,
     routingRule: {
+      mode: FIXED.criticalWindowWafMode,
+      groupCount: FIXED.criticalWindowWafGroupCount,
       projectId: FIXED.vercelProjectId,
       ruleId: "rule-production-writer-quiesce",
       revision: "revision-17",
       scope: FIXED.quiesceScope,
       projectWide: true,
       action: "DENY",
+      hostnameOperator: "DOES_NOT_EQUAL",
+      canonicalHostname: FIXED.criticalWindowWafCanonicalHostname,
       requestPathOperator: "DOES_NOT_EQUAL",
       requestPath: FIXED.providerControlEndpoint,
       methodOperator: "IS_NOT_ANY_OF",
@@ -187,13 +276,21 @@ function certifiedManifest() {
         FIXED.allMethodFenceRequiredPathCount,
       allMethodFenceRequiredPathsFingerprint:
         FIXED.allMethodFenceRequiredPathsFingerprint,
+      earlierActiveBypassRuleCount: 0,
     },
+    baselineWafFingerprint: "a".repeat(64),
+    criticalWindowWafFingerprint: "b".repeat(64),
+    criticalWindowActivatedAt: "2026-08-26T10:00:00Z",
+    restoredWafFingerprint: "a".repeat(64),
+    baselineWafRestored: true,
+    candidateControlExceptionExact: true,
+    canonicalUnsafeMethodsDenied: true,
+    canonicalHistoricalSafeWriterPathsDenied: true,
+    canonicalSafeReadsAllowed: true,
     candidateDeploymentId: manifest.release.deploymentId,
     candidateDeploymentCommit: manifest.release.frozenSha,
-    candidateAliasOrigin:
-      "https://bagger-inv-git-feature-step116-sandbagger-invitational.vercel.app",
-    candidateImmutableOrigin:
-      "https://bagger-step116candidate-sandbagger-invitational.vercel.app",
+    candidateAliasOrigin,
+    candidateImmutableOrigin,
     liveProviderInventoryCount: LIVE_ORIGIN_COUNT,
     liveProviderInventoryFingerprint: "7".repeat(64),
     liveOriginInventoryCount: LIVE_ORIGIN_COUNT,
@@ -206,9 +303,20 @@ function certifiedManifest() {
     probeScopeFingerprint: "5".repeat(64),
     deploymentScopeFingerprint: "3".repeat(64),
     credentialGenerationFingerprint: "4".repeat(64),
+    aliasRecaptureCount: FIXED.criticalWindowWafRequiredAliasRecaptureCount,
+    aliasInventoryCount: aliasRecords.length,
+    aliasInventoryFingerprint: aliasFingerprint,
+    aliasPaginationPageCount: 1,
+    aliasPaginationFingerprint,
+    beginAliasAttestationId: U.beginAttestation,
+    beginAliasAttestationFingerprint: "1".repeat(64),
+    beginAliasProviderObservedAt: beginAliasObservedAt,
+    finalizeAliasAttestationId: U.finalizeAttestation,
+    finalizeAliasAttestationFingerprint: "2".repeat(64),
+    finalizeAliasProviderObservedAt: finalizeAliasObservedAt,
     ownerOverrideOperationallyFrozen: true,
-    ownerFreezeConfirmation: FIXED.ownerFreezeConfirmation,
-    ownerFreezeTtlSeconds: 1800,
+    ownerFreezeConfirmation: FIXED.rehearsalOwnerFreezeConfirmation,
+    ownerFreezeTtlSeconds: 2100,
     ownerAcknowledgedAt: "2026-08-26T10:00:00Z",
     ownerFreezeExpiresAt: "2026-08-26T10:30:00Z",
     drainStartedAt: "2026-08-26T10:01:00Z",
@@ -216,6 +324,8 @@ function certifiedManifest() {
     unresolvedRequestLogCount: 0,
     unresolvedGoogleWriteCount: 0,
     allOriginsEdgeDenied: true,
+    canonicalApexExcludedFromEdgeDenyProbes: true,
+    canonicalApexWriteMethodsEdgeDenied: true,
     unresolvedProbeCount: 0,
     verifiedAt: "2026-08-26T10:06:01Z",
     expiresAt: "2026-08-26T10:20:00Z",
@@ -224,7 +334,48 @@ function certifiedManifest() {
     admissionRevision: 7,
     admissionGeneration: U.admission,
     authorityGeneration: U.authority,
+    providerPrincipalFingerprint: "d".repeat(64),
   });
+  Object.assign(manifest.aclV2Acceptance, {
+    acceptedAsPrimaryProof: true,
+    unexplainedConcurrencyWindowCount: 0,
+    rehearsalCandidateSha: manifest.certification.aclEvidenceOnlyDiffBaseSha,
+    rehearsalDeploymentId: "dpl_RehearsalAclV2Candidate123",
+    migrationSha256: manifest.release.migrationSha256,
+    baselineWafFingerprint: "a".repeat(64),
+    criticalWindowWafFingerprint: "b".repeat(64),
+    restoredWafFingerprint: "a".repeat(64),
+    criticalWindowActivatedAt: "2026-08-26T10:00:00Z",
+    criticalWindowHeldSeconds: FIXED.criticalWindowWafMinimumHoldSeconds,
+    fenceId: U.rehearsalFence,
+    installRequestId: U.rehearsalFenceInstall,
+    quiesceEvidenceId: U.quiesceEvidence,
+    restoreQuiesceEvidenceId: "45454545-5656-4789-8bcd-454545454545",
+    forwardDispatchId: "12121212-1212-4121-8121-121212121212",
+    forwardDispatchResult: "TARGET_CONFIRMED",
+    forwardTransitionProofFingerprint: "8".repeat(64),
+    aclReaderConfirmedAt: "2026-08-26T10:00:00Z",
+    reverseDispatchId: "34343434-3434-4343-8343-343434343434",
+    reverseDispatchResult: "TARGET_CONFIRMED",
+    reverseTransitionProofFingerprint: "9".repeat(64),
+    restoreCriticalWindowActivatedAt: "2026-08-26T10:00:00Z",
+    aclWriterRestoredAt: "2026-08-26T10:30:10Z",
+    rehearsalRestoredAt: "2026-08-26T10:30:11Z",
+    settlementReadback1Id: U.settlementReadback1Observation,
+    settlementReadback2Id: U.settlementReadback2Observation,
+    legacyRoleDuring: "reader",
+    legacyPrincipalFingerprint: "d".repeat(64),
+    wafBaselineRestored: true,
+    oldDeploymentEnforcementPassed: true,
+    staleClientEnforcementPassed: true,
+    lowLevelWriterEnforcementPassed: true,
+    previewIsolationPassed: true,
+    restoredProductionStatePassed: true,
+    capturedAt: "2026-08-26T10:30:11Z",
+  });
+  manifest.aclV2Acceptance.acceptanceFingerprint =
+    computeAclV2AcceptanceFingerprint(manifest.aclV2Acceptance);
+  setAclV2AcceptanceArtifactForTest(manifest.aclV2Acceptance);
   Object.assign(manifest.evidence, {
     startSourceFingerprint: "6".repeat(64),
     finalGoogleFingerprint: "7".repeat(64),
@@ -247,21 +398,47 @@ function certifiedManifest() {
     index += 1;
   }
   const signedAttestation = (stage, challengeId, attestationId, requestOperation) => ({
-    schemaVersion: "bagger-vercel-provider-attestation-envelope-v1",
+    schemaVersion: "bagger-vercel-provider-attestation-envelope-v2",
     algorithm: "Ed25519",
     signerKeyVersion: "STEP11_6_VERCEL_ATTESTER_V1",
     signerKeyFingerprint: manifest.release.providerAttestationSignerKeyFingerprint,
     attestation: {
+      schemaVersion: "bagger-vercel-provider-attestation-noncanonical-host-v2",
       attestationId,
       challengeId,
       requestId: manifest.stableRequestIds[requestOperation],
       stage,
-      purpose: "CUTOVER",
+      purpose: manifest.providerQuiesceEvidence.purpose,
       vercelProjectId: FIXED.vercelProjectId,
       vercelTeamId: manifest.resources.vercelTeamId,
       candidateDeploymentId: manifest.release.deploymentId,
       candidateDeploymentCommit: manifest.release.frozenSha,
-      candidateDeploymentTarget: "PRODUCTION",
+      candidateDeploymentTarget: "PREVIEW",
+      candidateAliasOrigin,
+      candidateImmutableOrigin,
+      aliasInventoryCount: aliasRecords.length,
+      aliasInventoryFingerprint: aliasFingerprint,
+      aliasInventoryRecords: copy(aliasRecords),
+      aliasPaginationPageCount: 1,
+      aliasPaginationFingerprint,
+      providerObservedAt: stage === "BEGIN" ?
+        beginAliasObservedAt : finalizeAliasObservedAt,
+      routingRuleHostnameOperator:
+        manifest.providerQuiesceEvidence.routingRule.hostnameOperator,
+      routingRuleCanonicalHostname:
+        manifest.providerQuiesceEvidence.routingRule.canonicalHostname,
+      routingRuleEarlierActiveBypassRuleCount:
+        manifest.providerQuiesceEvidence.routingRule.earlierActiveBypassRuleCount,
+      routingRuleAllMethodFenceRequiredHostCount:
+        manifest.providerQuiesceEvidence.routingRule.allMethodFenceRequiredHostCount,
+      routingRuleAllMethodFenceRequiredHostsFingerprint:
+        manifest.providerQuiesceEvidence.routingRule
+          .allMethodFenceRequiredHostsFingerprint,
+      routingRuleAllMethodFenceRequiredPathCount:
+        manifest.providerQuiesceEvidence.routingRule.allMethodFenceRequiredPathCount,
+      routingRuleAllMethodFenceRequiredPathsFingerprint:
+        manifest.providerQuiesceEvidence.routingRule
+          .allMethodFenceRequiredPathsFingerprint,
     },
     attestationFingerprint: stage === "BEGIN" ? "1".repeat(64) : "2".repeat(64),
     signature: "c2lnbmF0dXJl",
@@ -281,13 +458,13 @@ function certifiedManifest() {
     evidenceRequestId: U.quiesceRequest,
     challengeRequestFingerprint: stage === "BEGIN" ? "3".repeat(64) : "4".repeat(64),
     stage,
-    purpose: "CUTOVER",
+    purpose: manifest.providerQuiesceEvidence.purpose,
     status: "CONSUMED",
     vercelProjectId: FIXED.vercelProjectId,
     vercelTeamId: manifest.resources.vercelTeamId,
     candidateDeploymentId: manifest.release.deploymentId,
     candidateDeploymentCommit: manifest.release.frozenSha,
-    candidateDeploymentTarget: "PRODUCTION",
+    candidateDeploymentTarget: "PREVIEW",
     candidateAliasOrigin: manifest.providerQuiesceEvidence.candidateAliasOrigin,
     candidateImmutableOrigin: manifest.providerQuiesceEvidence.candidateImmutableOrigin,
     routingRuleId: manifest.providerQuiesceEvidence.routingRule.ruleId,
@@ -334,15 +511,67 @@ function certifiedManifest() {
     candidateDeploymentCommit: manifest.release.frozenSha,
     expectedBaselineFingerprint: "5".repeat(64),
     expectedCanonicalValueFingerprint: "6".repeat(64),
+    legacyDriveCanShare: true,
   });
   return bindComputedFingerprints(manifest);
+}
+
+function markQuiesceDraining(manifest) {
+  Object.assign(manifest.providerQuiesceEvidence, {
+    status: "DRAINING",
+    aliasRecaptureCount: 1,
+    finalizeAliasAttestationId: null,
+    finalizeAliasAttestationFingerprint: null,
+    finalizeAliasProviderObservedAt: null,
+  });
+  return manifest;
+}
+
+function activateFreshStep12CriticalWindow(manifest) {
+  const now = Date.now();
+  const iso = (offsetSeconds) =>
+    new Date(now + offsetSeconds * 1000).toISOString();
+  manifest.execution.step12StartedAt = iso(-950);
+  Object.assign(manifest.providerQuiesceEvidence, {
+    purpose: "CUTOVER",
+    ownerFreezeConfirmation: FIXED.cutoverOwnerFreezeConfirmation,
+    status: "VERIFIED",
+    evidenceId: U.step12QuiesceEvidence,
+    evidenceRequestId: U.step12QuiesceRequest,
+    priorEvidenceId: null,
+    baselineWafRestored: false,
+    restoredWafFingerprint: null,
+    criticalWindowActivatedAt: iso(-850),
+    ownerAcknowledgedAt: iso(-900),
+    ownerFreezeExpiresAt: iso(1200),
+    drainStartedAt: iso(-800),
+    drainCompletedAt: iso(-500),
+    verifiedAt: iso(-490),
+    expiresAt: iso(900),
+    beginAliasProviderObservedAt: iso(-840),
+    finalizeAliasProviderObservedAt: iso(-480),
+  });
+  for (const [stage, challenge] of Object.entries(
+    manifest.providerAttestationChallenges,
+  )) {
+    const upperStage = stage.toUpperCase();
+    const observedAt = upperStage === "BEGIN"
+      ? manifest.providerQuiesceEvidence.beginAliasProviderObservedAt
+      : manifest.providerQuiesceEvidence.finalizeAliasProviderObservedAt;
+    challenge.signedAttestation.attestation.purpose = "CUTOVER";
+    challenge.signedAttestation.attestation.providerObservedAt = observedAt;
+    challenge.retainedChallenge.purpose = "CUTOVER";
+    challenge.retainedChallenge.evidenceRequestId = U.step12QuiesceRequest;
+  }
+  manifest.persistentProviderFence.quiesceEvidenceId = U.step12QuiesceEvidence;
+  return manifest;
 }
 
 function installActiveProviderFenceFixture(manifest) {
   Object.assign(manifest.providerFenceProof, {
     status: "VERIFIED",
     evidenceId: U.evidence,
-    quiesceEvidenceId: U.quiesceEvidence,
+    quiesceEvidenceId: manifest.providerQuiesceEvidence.evidenceId,
     providerFenceId: U.providerFence,
     providerFenceVerificationId: U.providerFenceVerification,
     capturedAt: "2026-08-26T12:00:00Z",
@@ -369,22 +598,42 @@ function installActiveProviderFenceFixture(manifest) {
   });
   Object.assign(manifest.persistentProviderFence, {
     status: "INSTALLED",
+    lifecycleMode: "CUTOVER",
+    mechanism: "DRIVE_ACL_EXACT_LEGACY_PERMISSION_V2",
     fenceId: U.providerFence,
     installRequestId:
       manifest.stableRequestIds["install-persistent-provider-fence"],
     currentVerificationId: U.providerFenceVerification,
-    quiesceEvidenceId: U.quiesceEvidence,
+    quiesceEvidenceId: manifest.providerQuiesceEvidence.evidenceId,
     candidateDeploymentId: manifest.release.deploymentId,
     candidateDeploymentCommit: manifest.release.frozenSha,
     expectedBaselineFingerprint: "5".repeat(64),
     expectedCanonicalValueFingerprint: "6".repeat(64),
-    protectionCount: 17,
-    protectionSetFingerprint: "7".repeat(64),
+    legacyDriveRole: "reader",
+    legacyDriveCanEdit: false,
+    legacyDriveCanShare: false,
+    aclDispatchResult: "TARGET_CONFIRMED",
+    aclUnknownDispatchCount: 0,
+    aclTransitionFingerprint: "7".repeat(64),
     providerFingerprint: "8".repeat(64),
     aclFingerprint: "9".repeat(64),
     canonicalValueFingerprint: "a".repeat(64),
     formulaFingerprint: "b".repeat(64),
     permissionInventoryFingerprint: "c".repeat(64),
+    providerSettlementStage: "SETTLEMENT_READBACK_2",
+    providerSettlementLatestObservationId: U.settlementReadback2Observation,
+    aclReaderConfirmedObservationId: U.aclReaderConfirmedObservation,
+    settlementReadback1ObservationId: U.settlementReadback1Observation,
+    settlementReadback2ObservationId: U.settlementReadback2Observation,
+    providerSettlementNextEligibleAt: null,
+    providerSettlementRemainingWaitSeconds: 0,
+    providerSettlementInstallWaitSeconds:
+      FIXED.providerSettlementInstallWaitSeconds,
+    providerSettlementReadbackWaitSeconds:
+      FIXED.providerSettlementReadbackWaitSeconds,
+    settlementStructuralCanaryFingerprint: "d".repeat(64),
+    settlementCompletedAt: "2026-08-26T10:07:00Z",
+    admissionCloseCommitted: true,
     capturedAt: "2026-08-26T10:07:00Z",
     expiresAt: "2026-08-26T10:25:00Z",
     removalRequestId: null,
@@ -394,7 +643,9 @@ function installActiveProviderFenceFixture(manifest) {
 }
 
 function activeProviderFenceManifest() {
-  return installActiveProviderFenceFixture(certifiedManifest());
+  const manifest = certifiedManifest();
+  activateFreshStep12CriticalWindow(manifest);
+  return installActiveProviderFenceFixture(manifest);
 }
 
 function closingManifest() {
@@ -416,6 +667,7 @@ function closingManifest() {
 
 function cutoverFenceWindowManifest() {
   const manifest = certifiedManifest();
+  activateFreshStep12CriticalWindow(manifest);
   Object.assign(manifest.state, {
     cutoverPhase: "CURRENT_READS",
     activationState: "GOOGLE_LEASE_ARMED",
@@ -503,10 +755,20 @@ test("template is structurally valid, inert, and not execution-ready", () => {
   assert.ok(readiness.blockers.some((value) => value.includes("probeScopeFingerprint")));
 });
 
+test(`migration 040 SHA binding is ${MIGRATION_SHA_PENDING
+  ? "explicitly pending" : "resolved"}`, () => {
+  assert.equal(template.release.migrationSha256, FIXED.migrationSha256);
+  if (MIGRATION_SHA_PENDING) {
+    assert.match(FIXED.migrationSha256, /^__MIGRATION_040_[A-Z0-9_]+__$/);
+  } else {
+    assert.match(FIXED.migrationSha256, /^[0-9a-f]{64}$/);
+  }
+});
+
 test("claimed readiness is ignored; exact evidence derives readiness", () => {
   const manifest = certifiedManifest();
   manifest.executionReadiness.ready = false;
-  assert.deepEqual(evaluateReadiness(manifest), { ready: true, blockers: [] });
+  assertCertifiedReadiness(evaluateReadiness(manifest));
   manifest.executionReadiness.ready = true;
   manifest.providerFenceRehearsal.exactOldHostProviderFence = false;
   const result = evaluateReadiness(manifest);
@@ -516,7 +778,9 @@ test("claimed readiness is ignored; exact evidence derives readiness", () => {
 
 test("operator readiness binds the exact migration bytes", () => {
   const manifest = certifiedManifest();
-  assert.deepEqual(evaluateReadiness(manifest), { ready: true, blockers: [] });
+  assert.equal(template.release.migrationSha256, FIXED.migrationSha256);
+  assertCertifiedReadiness(evaluateReadiness(manifest));
+  if (MIGRATION_SHA_PENDING) return;
   manifest.release.migrationSha256 = "e".repeat(64);
   expectRefusal("MIGRATION_BINDING_DRIFT", () => validateManifest(manifest));
   const result = evaluateReadiness(manifest);
@@ -726,28 +990,28 @@ test("manifest rejects a caller-supplied origin subset or arbitrary matrix finge
 
 test("readiness requires restored rehearsal evidence and an absent Step 12 fence", () => {
   const manifest = certifiedManifest();
-  assert.deepEqual(evaluateReadiness(manifest), { ready: true, blockers: [] });
+  assertCertifiedReadiness(evaluateReadiness(manifest));
 
   const active = activeProviderFenceManifest();
   const activeReadiness = evaluateReadiness(active);
   assert.equal(activeReadiness.ready, false);
   assert.ok(activeReadiness.blockers.includes(
-    "persistentProviderFence is not absent/restored with zero protections",
+    "persistentProviderFence is not absent/restored at the exact legacy writer capabilities",
   ));
   assert.ok(activeReadiness.blockers.includes(
     "providerFenceProof is not MISSING at DORMANT readiness",
   ));
 
-  const rangeDrift = certifiedManifest();
-  rangeDrift.providerFenceRehearsal.protectedRangeCountAfter = 1;
-  assert.equal(evaluateReadiness(rangeDrift).ready, false);
+  const unknownAcl = certifiedManifest();
+  unknownAcl.providerFenceRehearsal.unknownAclDispatchCount = 1;
+  assert.equal(evaluateReadiness(unknownAcl).ready, false);
 
   const fingerprintDrift = certifiedManifest();
-  fingerprintDrift.providerFenceRehearsal.restoredFingerprint = "f".repeat(64);
+  fingerprintDrift.providerFenceRehearsal.restoredProviderFingerprint = "f".repeat(64);
   const fingerprintReadiness = evaluateReadiness(fingerprintDrift);
   assert.equal(fingerprintReadiness.ready, false);
   assert.ok(fingerprintReadiness.blockers.includes(
-    "providerFenceRehearsal restored fingerprint does not equal baseline",
+    "providerFenceRehearsal provider baseline was not restored",
   ));
 
   const providerInventoryDrift = certifiedManifest();
@@ -820,29 +1084,30 @@ test("scoring-admission inspection is exact-scope, owner-auth exempt, and read-o
     /^select public\.inspect_production_scoring_admission\(/);
 });
 
-test("retained origin inventory binding is the exact complete 1,291-record v3 artifact", () => {
+test("retained origin inventory binding is the exact complete 1,292-record v4 artifact", () => {
   assert.deepEqual(productionOriginInventoryBinding(), {
     artifact: FIXED.originInventoryArtifact,
-    schemaVersion: "step11-6-production-origin-inventory-v3",
+    schemaVersion: "step11-6-production-origin-inventory-v4",
     vercelProjectId: FIXED.vercelProjectId,
-    capturedAt: "2026-08-26T23:27:14.195Z",
-    providerRecordCount: 1291,
+    capturedAt: "2026-08-27T01:50:43.767Z",
+    providerRecordCount: 1292,
     providerRecordsFingerprint:
-      "6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692",
-    recordCount: 1291,
-    recordsFingerprint: "d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6",
+      "abd27e4e2747c17053f6debf71ec0f523d39fea8e2383d4911f9dc4b87959cbe",
+    recordCount: 1292,
+    recordsFingerprint: "9d25299c72424a2b5c3c613649b7f07760fda64c0b0bb4823edaf2cd91622774",
     productionTargetCount: 458,
-    projectPreviewCount: 833,
+    projectPreviewCount: 834,
     nullShaCount: 8,
     requiredDeployments: {
       priorLive: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
       frozenStep11: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-      step11_6Candidate: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+      step11_6CandidateV1: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+      step11_6CandidateV2: "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
     },
     paginationComplete: true,
-    minimumLiveOriginInventoryCount: 1291,
-    maximumLiveOriginInventoryCount: 1292,
-    fixedAliasOriginCount: 4,
+    minimumLiveOriginInventoryCount: 1292,
+    maximumLiveOriginInventoryCount: 1293,
+    fixedAliasOriginCount: 3,
     candidateAliasOriginCount: 1,
     probeVectorCount: 11,
   });
@@ -850,10 +1115,10 @@ test("retained origin inventory binding is the exact complete 1,291-record v3 ar
 
 test("historical safe-method writer evidence binds the one-path all-method fence", () => {
   assert.deepEqual(productionHistoricalSafeMethodWriterBinding(), {
-    artifact: "docs/evidence/step11-6-historical-safe-method-google-writer.json",
-    schemaVersion: "step11-6-historical-safe-method-google-writer-v1",
+    artifact: "docs/evidence/step11-6-historical-safe-method-google-writer-v2.json",
+    schemaVersion: "step11-6-historical-safe-method-google-writer-v2",
     evidenceFingerprint:
-      "6bf411a2e119e8552e6b3ac9ac51d8828e9fc853e5c43069dc40c31a6e794f28",
+      "6cb2ac60314de617f8c94d5d0814d710ec14b47eb4c49fdfa9662fdbe46fcd69",
     affectedOriginCount: 236,
     affectedOriginsFingerprint:
       "a8263e02ab7b65df938367fbf39769c70b501a614ebcdfa46800bda2e82de3a2",
@@ -866,15 +1131,202 @@ test("historical safe-method writer evidence binds the one-path all-method fence
     .allMethodFenceRequiredPathCount;
   assert.throws(() => validateManifest(missingPathBinding), (error) =>
     error.code === "PROVIDER_QUIESCE_RULE_INVALID");
+
+  const canonicalHostDrift = certifiedManifest();
+  canonicalHostDrift.providerQuiesceEvidence.routingRule.canonicalHostname =
+    "www.baggerinv.com";
+  expectRefusal("PROVIDER_QUIESCE_RULE_INVALID", () =>
+    validateManifest(canonicalHostDrift));
+
+  const earlierBypass = certifiedManifest();
+  earlierBypass.providerQuiesceEvidence.routingRule
+    .earlierActiveBypassRuleCount = 1;
+  expectRefusal("PROVIDER_QUIESCE_RULE_INVALID", () =>
+    validateManifest(earlierBypass));
+});
+
+test("operator binds historical immutable10/current12 scope and pending settlement honestly", () => {
+  assert.deepEqual(productionHistoricalWriterScopeBinding(), {
+    artifact: "docs/evidence/step11-6-historical-production-google-writer-scope-v1.json",
+    schemaVersion: "step11-6-historical-production-google-writer-scope-v1",
+    evidenceFingerprint:
+      "2f786886f4b0ec4f070757e8e23f462189304c722a015a260852ccd0888527cd",
+    canonicalSheetCount: 17,
+    canonicalSheetsFingerprint:
+      "cf8e81dc38a72501fa87c2178f9a6fe06487dc8eeb3e3091169037941f2d2cb7",
+    sourceUnresolvedImmutableOriginCount: 8,
+    sourceUnresolvedImmutableOriginsFingerprint:
+      "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+    historicalImmutableOriginCount: 10,
+    historicalImmutableOriginsFingerprint:
+      "1a687f3ea97d9e9d2fe65e6732be2c1d9b80aa563370338d26a71b23a3ffa12f",
+    historicalAliasAwareOriginCount: 12,
+    historicalAliasAwareOriginsFingerprint:
+      "3bbe7725448889d88678eb79501a3908613f7e3949f6a026e7b4855477540521",
+    activeAliasRecordCount: 56,
+    activeAliasRecordsFingerprint:
+      "c584b50803b59b52e06d8b699afb0cd22b00c980a3f8be0a7b78f7140f98da1a",
+    currentUnresolvedAliasCount: 1,
+    currentUnresolvedAliasesFingerprint:
+      "7b405a5825ff6abb30c24e48aee1681923df549ca47b044e48e8cb0bc83d1aec",
+    settlementAcceptedAsPrimaryProof: false,
+    unexplainedConcurrencyWindowCount: 1,
+  });
+});
+
+test("ACL-v2 acceptance rejects OUTCOME_UNKNOWN or a short WAF hold", () => {
+  const exact = certifiedManifest();
+  assert.equal(productionHistoricalWriterScopeBinding()
+    .settlementAcceptedAsPrimaryProof, false);
+  assert.equal(productionHistoricalWriterScopeBinding()
+    .unexplainedConcurrencyWindowCount, 1);
+  assert.equal(exact.aclV2Acceptance.acceptedAsPrimaryProof, true);
+  assert.equal(exact.aclV2Acceptance.unexplainedConcurrencyWindowCount, 0);
+  assert.equal(exact.aclV2Acceptance.acceptanceFingerprint,
+    computeAclV2AcceptanceFingerprint(exact.aclV2Acceptance));
+  assertCertifiedReadiness(evaluateReadiness(exact));
+
+  const unknown = certifiedManifest();
+  Object.assign(unknown.aclV2Acceptance, {
+    forwardDispatchResult: "OUTCOME_UNKNOWN",
+    unknownAclDispatchCount: 1,
+  });
+  unknown.aclV2Acceptance.acceptanceFingerprint =
+    computeAclV2AcceptanceFingerprint(unknown.aclV2Acceptance);
+  setAclV2AcceptanceArtifactForTest(unknown.aclV2Acceptance);
+  bindComputedFingerprints(unknown);
+  const unknownReadiness = evaluateReadiness(unknown);
+  assert.equal(unknownReadiness.ready, false);
+  assert.ok(unknownReadiness.blockers.includes(
+    "aclV2Acceptance Drive transitions are not both TARGET_CONFIRMED"));
+  assert.ok(unknownReadiness.blockers.includes(
+    "aclV2Acceptance contains an OUTCOME_UNKNOWN ACL dispatch"));
+
+  const shortHold = certifiedManifest();
+  shortHold.aclV2Acceptance.criticalWindowHeldSeconds =
+    FIXED.criticalWindowWafMinimumHoldSeconds - 1;
+  shortHold.aclV2Acceptance.acceptanceFingerprint =
+    computeAclV2AcceptanceFingerprint(shortHold.aclV2Acceptance);
+  setAclV2AcceptanceArtifactForTest(shortHold.aclV2Acceptance);
+  bindComputedFingerprints(shortHold);
+  assert.ok(evaluateReadiness(shortHold).blockers.includes(
+    "aclV2Acceptance critical WAF hold is shorter than 1810 seconds"));
+
+  const forgedFingerprint = certifiedManifest();
+  forgedFingerprint.aclV2Acceptance.acceptanceFingerprint = "f".repeat(64);
+  setAclV2AcceptanceArtifactForTest(forgedFingerprint.aclV2Acceptance);
+  bindComputedFingerprints(forgedFingerprint);
+  assert.ok(evaluateReadiness(forgedFingerprint).blockers.includes(
+    "aclV2Acceptance.acceptanceFingerprint is unresolved or invalid"));
+});
+
+test("ACL-v2 readiness requires the fixed immutable artifact, not a recomputed manifest self-hash", () => {
+  const manifest = certifiedManifest();
+  const immutableArtifact = copy(manifest.aclV2Acceptance);
+
+  manifest.aclV2Acceptance.oldDeploymentEnforcementPassed = false;
+  manifest.aclV2Acceptance.acceptanceFingerprint =
+    computeAclV2AcceptanceFingerprint(manifest.aclV2Acceptance);
+  bindComputedFingerprints(manifest);
+
+  // Keep the independently loaded fixed-path artifact on the original receipt.
+  setAclV2AcceptanceArtifactForTest(immutableArtifact);
+  const readiness = evaluateReadiness(manifest);
+  assert.equal(readiness.ready, false);
+  assert.ok(readiness.blockers.includes(
+    "aclV2Acceptance does not exactly match the immutable repository artifact",
+  ));
+});
+
+test("ACL-v2 readiness binds candidate SHA A to frozen SHA B through an evidence-only diff", () => {
+  const failedDiff = certifiedManifest();
+  failedDiff.certification.aclEvidenceOnlyDiffPassed = false;
+  bindComputedFingerprints(failedDiff);
+  assert.ok(evaluateReadiness(failedDiff).blockers.includes(
+    "ACL-v2 rehearsal SHA A to frozen certification SHA B evidence-only diff is not proved",
+  ));
+
+  const selfReferential = certifiedManifest();
+  selfReferential.certification.aclEvidenceOnlyDiffBaseSha =
+    selfReferential.release.frozenSha;
+  selfReferential.aclV2Acceptance.rehearsalCandidateSha =
+    selfReferential.release.frozenSha;
+  selfReferential.aclV2Acceptance.acceptanceFingerprint =
+    computeAclV2AcceptanceFingerprint(selfReferential.aclV2Acceptance);
+  setAclV2AcceptanceArtifactForTest(selfReferential.aclV2Acceptance);
+  bindComputedFingerprints(selfReferential);
+  assert.ok(evaluateReadiness(selfReferential).blockers.includes(
+    "ACL-v2 rehearsal SHA A to frozen certification SHA B evidence-only diff is not proved",
+  ));
+});
+
+test("ACL-v2 principal proof must equal the final DORMANT ADMISSION_V3 principal", () => {
+  const mismatch = certifiedManifest();
+  mismatch.aclV2Acceptance.legacyPrincipalFingerprint = "e".repeat(64);
+  mismatch.aclV2Acceptance.acceptanceFingerprint =
+    computeAclV2AcceptanceFingerprint(mismatch.aclV2Acceptance);
+  setAclV2AcceptanceArtifactForTest(mismatch.aclV2Acceptance);
+  bindComputedFingerprints(mismatch);
+  assert.ok(evaluateReadiness(mismatch).blockers.includes(
+    "legacy principal fingerprint does not bind rehearsal, ACL artifact, and ADMISSION_V3 gate",
+  ));
+});
+
+test("credential evidence pins the exact reviewed project-wide Preview exception", () => {
+  assert.equal(credentialConfinementEvidence.dynamicCandidateContract.cutoverTarget,
+    "PREVIEW");
+  assert.deepEqual(
+    credentialConfinementEvidence.dynamicCandidateContract
+      .permittedAdditionScopeClasses,
+    ["PROJECT_PREVIEW"],
+  );
+  const exact = credentialConfinementEvidence.environmentScopeContract
+    .reviewedProjectWidePreviewException;
+  assert.equal(exactReviewedProjectWidePreviewException(exact), true);
+
+  const extraProjectWideName = copy(exact);
+  extraProjectWideName.unshadowedNonsecretProjectWideRecords.push([
+    "PRODUCTION_GOOGLE_PRIVATE_KEY", ["preview"], null,
+  ]);
+  assert.equal(exactReviewedProjectWidePreviewException(extraProjectWideName), false);
+
+  const wrongBranch = copy(exact);
+  wrongBranch.requiredSameNameExactCandidateOverrides[0][2] = "unreviewed-branch";
+  assert.equal(exactReviewedProjectWidePreviewException(wrongBranch), false);
+
+  const permissive = copy(exact);
+  permissive.unreviewedProjectWideRelevantRecordAllowed = true;
+  assert.equal(exactReviewedProjectWidePreviewException(permissive), false);
+});
+
+test("credential evidence binds the sanitized Vercel environment review epoch", () => {
+  const binding = productionCredentialConfinementBinding();
+  assert.equal(binding.environmentReviewSchema,
+    FIXED.credentialConfinementEnvironmentReviewSchema);
+  assert.equal(binding.providerEnvironmentRecordCount,
+    FIXED.credentialConfinementProviderEnvironmentRecordCount);
+  assert.equal(binding.hiddenProductionEnvironmentRecordCount, 0);
+  assert.equal(binding.reviewedEnvironmentRecordCount,
+    FIXED.credentialConfinementReviewedEnvironmentRecordCount);
+  assert.equal(binding.reviewedEnvironmentRecordsFingerprint,
+    FIXED.credentialConfinementReviewedEnvironmentRecordsFingerprint);
+  assert.equal(binding.environmentReviewFingerprint,
+    FIXED.credentialConfinementEnvironmentReviewFingerprint);
+  assert.equal(binding.environmentContinuityFingerprint,
+    FIXED.credentialConfinementEnvironmentContinuityFingerprint);
+  assert.equal(credentialConfinementEvidence.providerEnvironmentResourceReview
+    .providerPlaintextValueReviewPerformed, false);
+  assert.equal(credentialConfinementEvidence.providerEnvironmentResourceReview
+    .rawValuesRetained, false);
 });
 
 test("operator accepts the exact current candidate as a retained zero-addition provider tuple", () => {
   const manifest = certifiedManifest();
   const retainedCandidate = {
-    deploymentId: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
-    commit: "a0b79cdef3a34d640e9411035792bd1e91989566",
+    deploymentId: "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
+    commit: "0671bb3b84ac5846218ea60838fe4e1cc07de97f",
     immutableOrigin:
-      "https://bagger-pmt7catuz-sandbagger-invitational.vercel.app",
+      "https://bagger-6lfjugfk7-sandbagger-invitational.vercel.app",
   };
   Object.assign(manifest.release, {
     deploymentId: retainedCandidate.deploymentId,
@@ -900,10 +1352,20 @@ test("operator accepts the exact current candidate as a retained zero-addition p
   manifest.providerFenceRehearsal.probeRecordCount =
     manifest.providerQuiesceEvidence.probeRecordCount;
   for (const challenge of Object.values(manifest.providerAttestationChallenges)) {
-    challenge.signedAttestation.attestation.candidateDeploymentId =
-      retainedCandidate.deploymentId;
-    challenge.signedAttestation.attestation.candidateDeploymentCommit =
-      retainedCandidate.commit;
+    const claim = challenge.signedAttestation.attestation;
+    const records = fixtureAliasRecords(
+      retainedCandidate.deploymentId,
+      manifest.providerQuiesceEvidence.candidateAliasOrigin,
+      retainedCandidate.immutableOrigin,
+    );
+    const fingerprint = createHash("sha256")
+      .update(JSON.stringify(records)).digest("hex");
+    claim.candidateDeploymentId = retainedCandidate.deploymentId;
+    claim.candidateDeploymentCommit = retainedCandidate.commit;
+    claim.candidateImmutableOrigin = retainedCandidate.immutableOrigin;
+    claim.aliasInventoryRecords = records;
+    claim.aliasInventoryFingerprint = fingerprint;
+    manifest.providerQuiesceEvidence.aliasInventoryFingerprint = fingerprint;
   }
   Object.assign(manifest.persistentProviderFence, {
     candidateDeploymentId: retainedCandidate.deploymentId,
@@ -932,13 +1394,13 @@ test("provider challenge payloads bind DB-issued scope before local signing", ()
   assert.equal(issue.payload.operationRequestId,
     manifest.stableRequestIds["begin-provider-quiesce"]);
   assert.equal(issue.payload.challengeRequestId, U.beginChallengeRequest);
-  assert.equal(issue.payload.evidenceRequestId, U.quiesceRequest);
+  assert.equal(issue.payload.evidenceRequestId, U.step12QuiesceRequest);
   assert.equal(issue.payload.providerAttestationStage, "BEGIN");
   assert.deepEqual(issue.receiptRpcs,
     ["issue_production_vercel_provider_attestation_challenge"]);
 
   const finalizeManifest = cutoverFenceWindowManifest();
-  finalizeManifest.providerQuiesceEvidence.status = "DRAINING";
+  markQuiesceDraining(finalizeManifest);
   bindCurrentExecutionFingerprint(finalizeManifest);
   const inspect = buildOperationEnvelope(
     finalizeManifest, "inspect-finalize-provider-attestation-challenge",
@@ -948,6 +1410,41 @@ test("provider challenge payloads bind DB-issued scope before local signing", ()
     finalizeManifest.stableRequestIds["finalize-provider-quiesce"]);
   assert.equal(inspect.payload.providerChallengeId, U.finalizeChallenge);
   assert.equal(inspect.payload.providerAttestationStage, "FINALIZE");
+});
+
+test("CUTOVER provider and WAF control candidates remain exact Project Preview runtimes", () => {
+  const manifest = cutoverFenceWindowManifest();
+  for (const challenge of Object.values(manifest.providerAttestationChallenges)) {
+    assert.equal(challenge.signedAttestation.attestation.candidateDeploymentTarget,
+      "PREVIEW");
+    assert.equal(challenge.retainedChallenge.candidateDeploymentTarget, "PREVIEW");
+  }
+  assert.equal(manifest.wafCriticalEpoch.candidateDeploymentTarget, "PREVIEW");
+  manifest.providerQuiesceEvidence.status = "MISSING";
+  bindCurrentExecutionFingerprint(manifest);
+  assert.doesNotThrow(() => buildOperationEnvelope(
+    manifest, "begin-provider-quiesce"));
+
+  const signedProduction = copy(manifest);
+  signedProduction.providerAttestationChallenges.begin.signedAttestation
+    .attestation.candidateDeploymentTarget = "PRODUCTION";
+  bindCurrentExecutionFingerprint(signedProduction);
+  assert.throws(() => buildOperationEnvelope(
+    signedProduction, "begin-provider-quiesce"), (error) =>
+    error.code === "PROVIDER_ATTESTATION_BINDING_MISMATCH");
+
+  const retainedProduction = copy(manifest);
+  retainedProduction.providerAttestationChallenges.begin.retainedChallenge
+    .candidateDeploymentTarget = "PRODUCTION";
+  bindCurrentExecutionFingerprint(retainedProduction);
+  assert.throws(() => buildOperationEnvelope(
+    retainedProduction, "inspect-begin-provider-attestation-abandonment"), (error) =>
+    error.code === "PROVIDER_ATTESTATION_RETAINED_CHALLENGE_MISMATCH");
+
+  const wafProduction = copy(manifest);
+  wafProduction.wafCriticalEpoch.candidateDeploymentTarget = "PRODUCTION";
+  assert.throws(() => validateManifest(wafProduction), (error) =>
+    error.code === "WAF_CRITICAL_EPOCH_TARGET_MISMATCH");
 });
 
 test("provider challenge abandonment payloads preserve exact consumed reservations and stable recovery IDs", () => {
@@ -986,14 +1483,15 @@ test("provider challenge abandonment payloads preserve exact consumed reservatio
   );
 
   const finalizeManifest = cutoverFenceWindowManifest();
-  finalizeManifest.providerQuiesceEvidence.status = "DRAINING";
+  markQuiesceDraining(finalizeManifest);
   bindCurrentExecutionFingerprint(finalizeManifest);
   const abandonFinalize = buildOperationEnvelope(
     finalizeManifest, "abandon-finalize-provider-attestation-challenge",
   );
   assertProviderRoutePayload(abandonFinalize);
   assert.equal(abandonFinalize.payload.providerAttestationStage, "FINALIZE");
-  assert.equal(abandonFinalize.payload.evidenceRequestId, U.quiesceRequest);
+  assert.equal(abandonFinalize.payload.evidenceRequestId,
+    U.step12QuiesceRequest);
   assert.equal(abandonFinalize.payload.abandonRequestId, U.finalizeAbandon);
   assert.equal(abandonFinalize.payload.providerRetainedChallenge.consumedAttestationId,
     U.finalizeAttestation);
@@ -1023,7 +1521,8 @@ test("provider quiesce begin is deterministic, owner-authorized, and inventory-f
     status: "MISSING",
     fenceId: "__PERSISTENT_PROVIDER_FENCE_UUID__",
     currentVerificationId: "__PERSISTENT_PROVIDER_FENCE_VERIFICATION_UUID__",
-    protectionCount: 0,
+    legacyDriveRole: "writer",
+    aclDispatchResult: "NOT_DISPATCHED",
   });
   bindCurrentExecutionFingerprint(manifest);
   const first = buildOperationEnvelope(manifest, "begin-provider-quiesce");
@@ -1037,15 +1536,15 @@ test("provider quiesce begin is deterministic, owner-authorized, and inventory-f
     ["begin_production_vercel_writer_quiesce_evidence"]);
   assert.equal(first.payload.action, "begin-provider-quiesce");
   assert.equal(first.payload.quiescePurpose, "CUTOVER");
-  assert.equal(first.payload.evidenceRequestId, U.quiesceRequest);
+  assert.equal(first.payload.evidenceRequestId, U.step12QuiesceRequest);
   assert.notEqual(first.payload.evidenceRequestId, first.stableRequestId);
   assert.equal(first.payload.priorEvidenceId, null);
-  assert.equal(first.payload.ownerFreezeTtlSeconds, 1800);
+  assert.equal(first.payload.ownerFreezeTtlSeconds, 2100);
   assert.equal(first.payload.ownerAcknowledgedAt, undefined);
   assert.equal(first.payload.ownerFreezeExpiresAt, undefined);
   assert.equal(first.payload.originInventory, undefined);
   assert.equal(first.payload.originInventoryFingerprint, undefined);
-  assert.equal(first.originInventoryBinding.recordCount, 1291);
+  assert.equal(first.originInventoryBinding.recordCount, 1292);
   assert.equal(first.payload.providerChallengeId, U.beginChallenge);
   assert.equal(first.payload.providerAttestationConsumeRequestId, U.beginConsume);
   assert.equal(first.payload.providerAttestation.attestation.stage, "BEGIN");
@@ -1069,22 +1568,32 @@ test("provider quiesce begin is deterministic, owner-authorized, and inventory-f
 
 test("quiesce finalize requires structured IDs, a 300-second drain, and zero unresolved writes", () => {
   const manifest = cutoverFenceWindowManifest();
-  manifest.providerQuiesceEvidence.status = "DRAINING";
+  markQuiesceDraining(manifest);
   bindCurrentExecutionFingerprint(manifest);
   const envelope = buildOperationEnvelope(manifest, "finalize-provider-quiesce");
   assertProviderRoutePayload(envelope);
-  assert.equal(envelope.payload.quiesceEvidenceId, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesceEvidenceId,
+    manifest.providerQuiesceEvidence.evidenceId);
+  assert.equal(envelope.diagnosticStateGuard.providerPrincipalFingerprint,
+    manifest.state.providerPrincipalFingerprint);
+  assert.equal(envelope.diagnosticStateGuard.certifiedLegacyPrincipalFingerprint,
+    manifest.aclV2Acceptance.legacyPrincipalFingerprint);
   assert.equal(envelope.payload.evidenceRequestId,
-    U.quiesceRequest);
+    U.step12QuiesceRequest);
   assert.deepEqual(envelope.receiptRpcs,
     ["finalize_production_vercel_writer_quiesce_evidence"]);
   assert.equal(envelope.payload.unresolvedRequestLogCount, undefined);
   assert.equal(envelope.payload.unresolvedGoogleWriteCount, undefined);
 
-  manifest.providerQuiesceEvidence.drainCompletedAt = "2026-08-26T10:05:59Z";
+  const drainStartedMs = Date.parse(
+    manifest.providerQuiesceEvidence.drainStartedAt,
+  );
+  manifest.providerQuiesceEvidence.drainCompletedAt =
+    new Date(drainStartedMs + 299_000).toISOString();
   expectRefusal("PROVIDER_QUIESCE_DRAIN_TOO_SHORT", () =>
     buildOperationEnvelope(manifest, "finalize-provider-quiesce"));
-  manifest.providerQuiesceEvidence.drainCompletedAt = "2026-08-26T10:06:00Z";
+  manifest.providerQuiesceEvidence.drainCompletedAt =
+    new Date(drainStartedMs + 300_000).toISOString();
   manifest.providerQuiesceEvidence.unresolvedGoogleWriteCount = 1;
   expectRefusal("PROVIDER_QUIESCE_UNRESOLVED_WRITES", () =>
     buildOperationEnvelope(manifest, "finalize-provider-quiesce"));
@@ -1098,34 +1607,293 @@ test("provider quiesce inspection is read-only and still binds both durable IDs"
   assert.equal(envelope.kind, "provider-read-only-payload");
   assert.equal(envelope.payload.evidenceRequestId,
     manifest.providerQuiesceEvidence.evidenceRequestId);
-  assert.equal(envelope.payload.quiesceEvidenceId, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesceEvidenceId,
+    manifest.providerQuiesceEvidence.evidenceId);
   assert.deepEqual(envelope.receiptRpcs,
     ["inspect_production_vercel_writer_quiesce_evidence"]);
 });
 
-test("persistent provider-fence install consumes verified quiesce and records both durable RPCs", () => {
+test("persistent provider-fence install exposes the resumable four-stage settlement contract", () => {
   const manifest = cutoverFenceWindowManifest();
   manifest.persistentProviderFence.status = "MISSING";
-  manifest.persistentProviderFence.protectionCount = 0;
+  manifest.persistentProviderFence.legacyDriveRole = "writer";
   bindCurrentExecutionFingerprint(manifest);
   const envelope = buildOperationEnvelope(manifest,
     "install-persistent-provider-fence");
   assertProviderRoutePayload(envelope);
   assert.equal(envelope.payload.installRequestId,
     manifest.stableRequestIds["install-persistent-provider-fence"]);
-  assert.equal(envelope.payload.quiesceEvidenceId, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesceEvidenceId,
+    manifest.providerQuiesceEvidence.evidenceId);
   assert.equal(envelope.payload.confirmation, FIXED.providerFenceDescription);
   assert.deepEqual(envelope.receiptRpcs, [
     "begin_production_google_writer_provider_fence_install",
-    "finish_production_google_writer_provider_fence_install",
+    "record_production_google_writer_provider_fence_settlement",
+    "record_production_google_writer_provider_fence_settlement",
+    "finish_close_production_google_writer_provider_fence_install",
   ]);
+  assert.equal(envelope.providerSettlementCheckpoint.stage,
+    "AWAITING_ACL_READER_CONFIRMED");
+  assert.equal(envelope.providerSettlementCheckpoint.nextOperation,
+    "DISPATCH_DRIVE_WRITER_TO_READER_AND_RECORD_TARGET_CONFIRMED");
+  assert.equal(envelope.providerSettlementCheckpoint.minimumSecondsAfterAclReaderConfirmed,
+    190);
+  assert.equal(envelope.providerSettlementCheckpoint.minimumSecondsBetweenReadbacks, 10);
+  assert.equal(envelope.providerSettlementCheckpoint.minimumTotalSeconds, 200);
+  assert.equal(envelope.providerSettlementCheckpoint.finishAndCloseRpc,
+    "finish_close_production_google_writer_provider_fence_install");
+});
+
+test("Step 12 accepts only a fresh active CRITICAL_WINDOW epoch and consumes it on restoration", () => {
+  const fresh = cutoverFenceWindowManifest();
+  const first = buildOperationEnvelope(
+    fresh, "install-persistent-provider-fence",
+  );
+  assert.equal(first.payload.quiesceEvidenceId, U.step12QuiesceEvidence);
+  assert.equal(first.providerSettlementCheckpoint.stage,
+    "AWAITING_ACL_READER_CONFIRMED");
+  assert.equal(fresh.providerQuiesceEvidence.ownerFreezeConfirmation,
+    FIXED.cutoverOwnerFreezeConfirmation);
+
+  const wrongPurposeConfirmation = cutoverFenceWindowManifest();
+  wrongPurposeConfirmation.providerQuiesceEvidence.ownerFreezeConfirmation =
+    FIXED.rehearsalOwnerFreezeConfirmation;
+  expectRefusal("PROVIDER_QUIESCE_OWNER_FREEZE_PURPOSE_MISMATCH", () =>
+    buildOperationEnvelope(
+      wrongPurposeConfirmation, "install-persistent-provider-fence",
+    ));
+
+  const wrongRehearsalConfirmation = certifiedManifest();
+  wrongRehearsalConfirmation.providerQuiesceEvidence.ownerFreezeConfirmation =
+    FIXED.cutoverOwnerFreezeConfirmation;
+  expectRefusal("PROVIDER_QUIESCE_OWNER_FREEZE_PURPOSE_MISMATCH", () =>
+    validateManifest(wrongRehearsalConfirmation));
+
+  const restoredHistorical = cutoverFenceWindowManifest();
+  Object.assign(restoredHistorical.providerQuiesceEvidence, {
+    baselineWafRestored: true,
+    restoredWafFingerprint:
+      restoredHistorical.providerQuiesceEvidence.baselineWafFingerprint,
+  });
+  bindCurrentExecutionFingerprint(restoredHistorical);
+  expectRefusal("PROVIDER_QUIESCE_EPOCH_ALREADY_CONSUMED", () =>
+    buildOperationEnvelope(
+      restoredHistorical, "install-persistent-provider-fence",
+    ));
+
+  const reusedRehearsalId = cutoverFenceWindowManifest();
+  reusedRehearsalId.providerQuiesceEvidence.evidenceId = U.quiesceEvidence;
+  reusedRehearsalId.persistentProviderFence.quiesceEvidenceId =
+    U.quiesceEvidence;
+  bindCurrentExecutionFingerprint(reusedRehearsalId);
+  expectRefusal("PROVIDER_QUIESCE_HISTORICAL_EPOCH_REUSE_FORBIDDEN", () =>
+    buildOperationEnvelope(
+      reusedRehearsalId, "install-persistent-provider-fence",
+    ));
+
+  const reusedRehearsalRun = cutoverFenceWindowManifest();
+  reusedRehearsalRun.persistentProviderFence.installRequestId =
+    reusedRehearsalRun.aclV2Acceptance.installRequestId;
+  bindCurrentExecutionFingerprint(reusedRehearsalRun);
+  expectRefusal("PERSISTENT_PROVIDER_FENCE_HISTORICAL_RUN_REUSE_FORBIDDEN", () =>
+    buildOperationEnvelope(
+      reusedRehearsalRun, "install-persistent-provider-fence",
+    ));
+
+  const principalDrift = cutoverFenceWindowManifest();
+  principalDrift.state.providerPrincipalFingerprint = "e".repeat(64);
+  bindCurrentExecutionFingerprint(principalDrift);
+  expectRefusal("LEGACY_PROVIDER_PRINCIPAL_BINDING_MISMATCH", () =>
+    buildOperationEnvelope(
+      principalDrift, "install-persistent-provider-fence",
+    ));
+
+  const installed = installActiveProviderFenceFixture(
+    cutoverFenceWindowManifest(),
+  );
+  Object.assign(installed.state, {
+    admissionState: "CLOSING",
+    gateExecutionState: "PAUSED",
+    activeClosureId: U.closure,
+    activeClosureKind: "LEGACY_ADMISSION",
+    activeClosureStatus: "CLOSING",
+  });
+  bindCurrentExecutionFingerprint(installed);
+  const lostResponseFirst = buildOperationEnvelope(
+    installed, "install-persistent-provider-fence",
+  );
+  const lostResponseReplay = buildOperationEnvelope(
+    installed, "install-persistent-provider-fence",
+  );
+  assert.deepEqual(lostResponseReplay, lostResponseFirst);
+  assert.equal(lostResponseReplay.providerSettlementCheckpoint.nextOperation,
+    "SETTLEMENT_COMPLETE_ADMISSION_CLOSING_DRAIN_REQUIRED");
+
+  const consumedReplay = copy(installed);
+  Object.assign(consumedReplay.providerQuiesceEvidence, {
+    baselineWafRestored: true,
+    restoredWafFingerprint:
+      consumedReplay.providerQuiesceEvidence.baselineWafFingerprint,
+  });
+  bindCurrentExecutionFingerprint(consumedReplay);
+  expectRefusal("PROVIDER_QUIESCE_EPOCH_ALREADY_CONSUMED", () =>
+    buildOperationEnvelope(
+      consumedReplay, "install-persistent-provider-fence",
+    ));
+});
+
+test("persistent provider-fence install resumes at each durable settlement boundary", () => {
+  const aclReader = cutoverFenceWindowManifest();
+  Object.assign(aclReader.state, {
+    admissionState: "CLOSING",
+    gateExecutionState: "PAUSED",
+  });
+  Object.assign(aclReader.persistentProviderFence, {
+    status: "INSTALLING",
+    fenceId: U.providerFence,
+    legacyDriveRole: "reader",
+    legacyDriveCanEdit: false,
+    legacyDriveCanShare: false,
+    aclDispatchResult: "TARGET_CONFIRMED",
+    providerSettlementStage: "ACL_READER_CONFIRMED",
+    providerSettlementLatestObservationId: U.aclReaderConfirmedObservation,
+    aclReaderConfirmedObservationId: U.aclReaderConfirmedObservation,
+    providerSettlementNextEligibleAt: "2026-08-26T10:10:00Z",
+    providerSettlementRemainingWaitSeconds: 73,
+    settlementStructuralCanaryFingerprint: "d".repeat(64),
+  });
+  bindCurrentExecutionFingerprint(aclReader);
+  const aclEnvelope = buildOperationEnvelope(
+    aclReader, "install-persistent-provider-fence",
+  );
+  assert.equal(aclEnvelope.providerSettlementCheckpoint.stage,
+    "ACL_READER_CONFIRMED");
+  assert.equal(aclEnvelope.providerSettlementCheckpoint.nextOperation,
+    "WAIT_UNTIL_ELIGIBLE_THEN_RECORD_SETTLEMENT_READBACK_1");
+  assert.equal(aclEnvelope.providerSettlementCheckpoint.remainingWaitSeconds, 73);
+
+  const readback1 = copy(aclReader);
+  Object.assign(readback1.persistentProviderFence, {
+    providerSettlementStage: "SETTLEMENT_READBACK_1",
+    providerSettlementLatestObservationId: U.settlementReadback1Observation,
+    settlementReadback1ObservationId: U.settlementReadback1Observation,
+    providerSettlementNextEligibleAt: "2026-08-26T10:10:10Z",
+    providerSettlementRemainingWaitSeconds: 4,
+  });
+  bindCurrentExecutionFingerprint(readback1);
+  const readback1Envelope = buildOperationEnvelope(
+    readback1, "install-persistent-provider-fence",
+  );
+  assert.equal(readback1Envelope.providerSettlementCheckpoint.nextOperation,
+    "WAIT_UNTIL_ELIGIBLE_THEN_ATOMIC_READBACK_2_FINISH_AND_CLOSE");
+
+  const installed = installActiveProviderFenceFixture(cutoverFenceWindowManifest());
+  Object.assign(installed.state, {
+    admissionState: "CLOSING",
+    gateExecutionState: "PAUSED",
+    activeClosureId: U.closure,
+    activeClosureKind: "LEGACY_ADMISSION",
+    activeClosureStatus: "CLOSING",
+  });
+  bindCurrentExecutionFingerprint(installed);
+  const lostResponse = buildOperationEnvelope(
+    installed, "install-persistent-provider-fence",
+  );
+  assert.equal(lostResponse.providerSettlementCheckpoint.stage,
+    "SETTLEMENT_READBACK_2");
+  assert.equal(lostResponse.providerSettlementCheckpoint.nextOperation,
+    "SETTLEMENT_COMPLETE_ADMISSION_CLOSING_DRAIN_REQUIRED");
+  assert.equal(lostResponse.providerSettlementCheckpoint.admissionCloseCommitted, true);
+
+  const staleOpen = copy(aclReader);
+  Object.assign(staleOpen.state, { admissionState: "OPEN", gateExecutionState: "OPEN" });
+  bindCurrentExecutionFingerprint(staleOpen);
+  expectRefusal("ADMISSION_STATE_MISMATCH", () => buildOperationEnvelope(
+    staleOpen, "install-persistent-provider-fence",
+  ));
+});
+
+test("persistent provider-fence install abort is exact, resumable, and fail-closed", () => {
+  const manifest = cutoverFenceWindowManifest();
+  manifest.stableRequestIds["abort-persistent-provider-fence-install"] =
+    U.providerFenceAbort;
+  Object.assign(manifest.state, {
+    admissionState: "CLOSING",
+    gateExecutionState: "PAUSED",
+  });
+  Object.assign(manifest.persistentProviderFence, {
+    status: "INSTALLING",
+    fenceId: U.providerFence,
+    abortRequestId: U.providerFenceAbort,
+    legacyDriveRole: "reader",
+    legacyDriveCanEdit: false,
+    legacyDriveCanShare: false,
+    aclDispatchResult: "TARGET_CONFIRMED",
+    providerSettlementStage: "ACL_READER_CONFIRMED",
+    providerSettlementLatestObservationId: U.aclReaderConfirmedObservation,
+    aclReaderConfirmedObservationId: U.aclReaderConfirmedObservation,
+    providerSettlementNextEligibleAt: "2026-08-26T10:10:00Z",
+    providerSettlementRemainingWaitSeconds: 73,
+    settlementStructuralCanaryFingerprint: "d".repeat(64),
+  });
+  bindCurrentExecutionFingerprint(manifest);
+  const envelope = buildOperationEnvelope(
+    manifest, "abort-persistent-provider-fence-install",
+  );
+  assertProviderRoutePayload(envelope);
+  assert.equal(envelope.payload.operationRequestId, U.providerFenceAbort);
+  assert.equal(envelope.payload.installRequestId,
+    manifest.persistentProviderFence.installRequestId);
+  assert.equal(envelope.payload.fenceId, U.providerFence);
+  assert.equal(envelope.payload.expectedBaselineFingerprint,
+    manifest.persistentProviderFence.expectedBaselineFingerprint);
+  assert.equal(envelope.payload.confirmation,
+    FIXED.providerFenceAbortConfirmation);
+  assert.deepEqual(envelope.receiptRpcs, [
+    "abort_production_google_writer_provider_fence_install",
+    "inspect_production_google_writer_provider_fence",
+  ]);
+
+  const staleOpen = copy(manifest);
+  Object.assign(staleOpen.state, {
+    admissionState: "OPEN",
+    gateExecutionState: "OPEN",
+  });
+  bindCurrentExecutionFingerprint(staleOpen);
+  expectRefusal("PERSISTENT_PROVIDER_FENCE_ABORT_NOT_SAFE", () =>
+    buildOperationEnvelope(staleOpen,
+      "abort-persistent-provider-fence-install"));
+
+  const advanced = copy(manifest);
+  advanced.state.preparedEpochId = U.epoch;
+  bindCurrentExecutionFingerprint(advanced);
+  expectRefusal("PERSISTENT_PROVIDER_FENCE_ABORT_NOT_SAFE", () =>
+    buildOperationEnvelope(advanced,
+      "abort-persistent-provider-fence-install"));
+
+  const recovered = copy(manifest);
+  Object.assign(recovered.state, {
+    admissionState: "OPEN",
+    gateExecutionState: "OPEN",
+  });
+  Object.assign(recovered.persistentProviderFence, {
+    status: "FAILED",
+    abortRestorationEvidenceFingerprint: "e".repeat(64),
+  });
+  bindCurrentExecutionFingerprint(recovered);
+  const replay = buildOperationEnvelope(
+    recovered, "abort-persistent-provider-fence-install",
+  );
+  assert.equal(replay.payload.operationRequestId, U.providerFenceAbort);
+  assert.equal(replay.payload.confirmation,
+    FIXED.providerFenceAbortConfirmation);
 });
 
 test("persistent provider-fence inspection supports baseline and active durable lookup", () => {
   const baseline = certifiedManifest();
   baseline.execution.step12OwnerAuthorizationRecorded = false;
   baseline.persistentProviderFence.status = "MISSING";
-  baseline.persistentProviderFence.protectionCount = 0;
+  baseline.persistentProviderFence.legacyDriveRole = "writer";
   bindCurrentExecutionFingerprint(baseline);
   const missing = buildOperationEnvelope(baseline,
     "inspect-persistent-provider-fence");
@@ -1146,12 +1914,46 @@ test("persistent provider-fence inspection supports baseline and active durable 
     ["inspect_production_google_writer_provider_fence"]);
 });
 
+test("OUTCOME_UNKNOWN Drive ACL dispatch is inspectable but never retryable or reversible", () => {
+  const manifest = cutoverFenceWindowManifest();
+  Object.assign(manifest.state, {
+    admissionState: "CLOSING",
+    gateExecutionState: "PAUSED",
+  });
+  Object.assign(manifest.persistentProviderFence, {
+    status: "FAILED",
+    fenceId: U.providerFence,
+    currentVerificationId: U.providerFenceVerification,
+    legacyDriveRole: "writer",
+    legacyDriveCanEdit: true,
+    legacyDriveCanShare: true,
+    aclDispatchResult: "OUTCOME_UNKNOWN",
+    aclUnknownDispatchCount: 1,
+    providerSettlementStage: "AWAITING_ACL_READER_CONFIRMED",
+  });
+  manifest.execution.step12OwnerAuthorizationRecorded = false;
+  bindCurrentExecutionFingerprint(manifest);
+  const inspect = buildOperationEnvelope(
+    manifest, "inspect-persistent-provider-fence",
+  );
+  assert.equal(inspect.kind, "provider-read-only-payload");
+  assert.equal(inspect.diagnosticStateGuard.aclDispatchResult, "OUTCOME_UNKNOWN");
+  assert.equal(inspect.providerSettlementCheckpoint.aclDispatchRetryAllowed, false);
+
+  manifest.execution.step12OwnerAuthorizationRecorded = true;
+  bindCurrentExecutionFingerprint(manifest);
+  expectRefusal("ACL_DISPATCH_UNKNOWN_NO_RETRY", () =>
+    buildOperationEnvelope(manifest, "install-persistent-provider-fence"));
+  expectRefusal("ACL_DISPATCH_UNKNOWN_NO_RETRY", () =>
+    buildOperationEnvelope(manifest, "abort-persistent-provider-fence-install"));
+});
+
 test("persistent provider-fence refresh requires a new verified quiesce record", () => {
   const manifest = activeProviderFenceManifest();
   expectRefusal("PERSISTENT_PROVIDER_FENCE_REFRESH_EVIDENCE_NOT_NEW", () =>
     buildOperationEnvelope(manifest, "refresh-persistent-provider-fence"));
 
-  manifest.providerQuiesceEvidence.priorEvidenceId = U.quiesceEvidence;
+  manifest.providerQuiesceEvidence.priorEvidenceId = U.step12QuiesceEvidence;
   manifest.providerQuiesceEvidence.evidenceId = U.refreshedQuiesceEvidence;
   bindCurrentExecutionFingerprint(manifest);
   const envelope = buildOperationEnvelope(manifest,
@@ -1173,7 +1975,8 @@ test("persistent provider-fence removal is emitted only for authoritative safe r
   assertProviderRoutePayload(envelope);
   assert.equal(envelope.payload.confirmation,
     FIXED.providerFenceRemoveConfirmation);
-  assert.equal(envelope.payload.quiesceEvidenceId, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesceEvidenceId,
+    manifest.providerQuiesceEvidence.evidenceId);
   assert.deepEqual(envelope.receiptRpcs, [
     "authorize_production_google_writer_provider_fence_removal",
     "finish_production_google_writer_provider_fence_removal",
@@ -1213,7 +2016,7 @@ test("stage payload binds exact frozen SHA and deterministic stable request iden
     buildOperationEnvelope(active, "stage-release"));
 
   const rehearsalDrift = certifiedManifest();
-  rehearsalDrift.providerFenceRehearsal.restoredFingerprint = "f".repeat(64);
+  rehearsalDrift.providerFenceRehearsal.restoredProviderFingerprint = "f".repeat(64);
   bindComputedFingerprints(rehearsalDrift);
   expectRefusal("STEP11_6_REHEARSAL_BASELINE_NOT_RESTORED", () =>
     buildOperationEnvelope(rehearsalDrift, "stage-release"));
@@ -1229,6 +2032,18 @@ test("stage payload binds exact frozen SHA and deterministic stable request iden
   bindComputedFingerprints(quiesceDrift);
   expectRefusal("STEP11_6_PROVIDER_QUIESCE_NOT_VERIFIED", () =>
     buildOperationEnvelope(quiesceDrift, "stage-release"));
+
+  const writerCapabilityDrift = certifiedManifest();
+  writerCapabilityDrift.persistentProviderFence.legacyDriveCanShare = false;
+  bindComputedFingerprints(writerCapabilityDrift);
+  expectRefusal("STEP11_6_PROVIDER_FENCE_NOT_RESTORED", () =>
+    buildOperationEnvelope(writerCapabilityDrift, "stage-release"));
+
+  const principalDrift = certifiedManifest();
+  principalDrift.state.providerPrincipalFingerprint = "e".repeat(64);
+  bindComputedFingerprints(principalDrift);
+  expectRefusal("STEP11_6_PROVIDER_PRINCIPAL_NOT_RESTORED", () =>
+    buildOperationEnvelope(principalDrift, "stage-release"));
 });
 
 test("phase skipping and stale optimistic revisions are refused", () => {
@@ -1259,7 +2074,8 @@ test("close requires barrier-aware state plus exact old-host provider fence", ()
   const envelope = buildOperationEnvelope(manifest, "close-legacy-admission");
   assert.equal(envelope.payload.expected_authority, "GOOGLE");
   assert.equal(envelope.payload.external_fence_evidence_id, U.evidence);
-  assert.equal(envelope.payload.quiesce_evidence_id, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesce_evidence_id,
+    manifest.providerQuiesceEvidence.evidenceId);
   assert.equal(envelope.payload.provider_fence_id, U.providerFence);
   assert.equal(envelope.payload.provider_fence_verification_id,
     U.providerFenceVerification);
@@ -1274,7 +2090,8 @@ test("provider-fence refresh preserves immutable scope and advances only bound e
   assert.equal(envelope.payload.closure_id, U.closure);
   assert.equal(envelope.payload.provider_evidence_fingerprint,
     manifest.providerFenceProof.boundImmutableScope.providerEvidenceFingerprint);
-  assert.equal(envelope.payload.quiesce_evidence_id, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesce_evidence_id,
+    manifest.providerQuiesceEvidence.evidenceId);
   assert.equal(envelope.payload.provider_fence_id, U.providerFence);
   assert.equal(envelope.payload.provider_fence_verification_id,
     U.providerFenceVerification);
@@ -1316,7 +2133,8 @@ test("prepare requires CLOSED and all machine-checkable safety predicates", () =
   const envelope = buildOperationEnvelope(closedManifest(), "prepare-authority");
   assert.equal(envelope.payload.epoch_type, "CUTOVER");
   assert.equal(envelope.payload.closure_id, U.closure);
-  assert.equal(envelope.payload.quiesce_evidence_id, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesce_evidence_id,
+    closedManifest().providerQuiesceEvidence.evidenceId);
   assert.equal(envelope.payload.provider_fence_id, U.providerFence);
   assert.equal(envelope.payload.provider_fence_verification_id,
     U.providerFenceVerification);
@@ -1333,7 +2151,8 @@ test("commit preserves possible versus observed and rejects pre-existing writes"
   bindCurrentExecutionFingerprint(manifest);
   const envelope = buildOperationEnvelope(manifest, "commit-authority");
   assert.equal(envelope.payload.epoch_id, U.epoch);
-  assert.equal(envelope.payload.quiesce_evidence_id, U.quiesceEvidence);
+  assert.equal(envelope.payload.quiesce_evidence_id,
+    manifest.providerQuiesceEvidence.evidenceId);
   assert.equal(envelope.payload.provider_fence_id, U.providerFence);
   assert.equal(envelope.payload.provider_fence_verification_id,
     U.providerFenceVerification);

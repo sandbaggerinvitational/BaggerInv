@@ -11,9 +11,13 @@ import { promisify } from "node:util";
 import { pathToFileURL } from "node:url";
 
 import {
+  createVercelWafProviderEvidence,
+  createVercelWafRuleInsertDispatchResult,
   createVercelProviderAttestation,
   pinnedEd25519PublicKeyBase64,
   VERCEL_PROVIDER_ATTESTATION_REQUEST_SCHEMA,
+  VERCEL_WAF_PROVIDER_EVIDENCE_REQUEST_SCHEMA,
+  VERCEL_WAF_RULE_INSERT_DISPATCH_RESULT_REQUEST_SCHEMA,
 } from "../../lib/vercel-provider-attestation.js";
 
 const execFileAsync = promisify(execFileCallback);
@@ -194,6 +198,7 @@ export function createVercelCliReadApi({
         !new Set([
           "/v1/security/firewall/config",
           "/v6/deployments",
+          "/v4/aliases",
         ]).has(apiPath.split("?")[0]) &&
         !/^\/v9\/projects\/[^/?]+\/env\?/.test(apiPath)) {
       fail("STEP11_6_VERCEL_ATTESTER_ENDPOINT_FORBIDDEN",
@@ -227,9 +232,12 @@ export function createVercelCliReadApi({
 }
 
 function args(argv) {
-  if (!new Set(["attest", "install-keychain-signer"]).has(argv[0])) {
+  if (!new Set([
+    "attest", "attest-waf", "attest-rule-insert-result",
+    "install-keychain-signer",
+  ]).has(argv[0])) {
     fail("STEP11_6_VERCEL_ATTESTER_COMMAND_INVALID",
-      "Expected attest or install-keychain-signer.");
+      "Expected attest, attest-waf, attest-rule-insert-result, or install-keychain-signer.");
   }
   if (argv[0] === "install-keychain-signer") {
     if (argv.length !== 1) fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID",
@@ -244,7 +252,10 @@ function args(argv) {
       fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID", "An attester argument was invalid.");
     }
     const name = key.slice(2);
-    if (!new Set(["request", "output", "vercel-bin"]).has(name) ||
+    if (!new Set([
+      "request", "output", "vercel-bin", "firewall-readback",
+      "provider-response", "outcome",
+    ]).has(name) ||
         Object.prototype.hasOwnProperty.call(parsed, name)) {
       fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID", "An attester argument was not allowed.");
     }
@@ -254,7 +265,71 @@ function args(argv) {
     fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID",
       "--request is required.");
   }
-  return { ...parsed, command: "attest" };
+  const command = argv[0];
+  if (command === "attest" &&
+      (parsed["firewall-readback"] || parsed["provider-response"] ||
+        parsed.outcome)) {
+    fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID",
+      "The deployment attester accepts only request, output, and vercel-bin.");
+  }
+  if (command !== "attest" && parsed["vercel-bin"]) {
+    fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID",
+      "Signed WAF readback commands do not execute a provider CLI.");
+  }
+  if (command === "attest-waf" &&
+      (!parsed["firewall-readback"] || parsed["provider-response"] || parsed.outcome)) {
+    fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID",
+      "attest-waf requires exactly one --firewall-readback file.");
+  }
+  if (command === "attest-rule-insert-result") {
+    const outcome = String(parsed.outcome || "").trim().toUpperCase();
+    const target = outcome === "TARGET_CONFIRMED";
+    const unknown = outcome === "OUTCOME_UNKNOWN";
+    if (!(target || unknown) || target &&
+        (!parsed["firewall-readback"] || !parsed["provider-response"]) ||
+        unknown && (parsed["firewall-readback"] || parsed["provider-response"])) {
+      fail("STEP11_6_VERCEL_ATTESTER_ARGUMENT_INVALID",
+        "TARGET_CONFIRMED requires exact provider-response and firewall-readback files; OUTCOME_UNKNOWN forbids both.");
+    }
+    parsed.outcome = outcome;
+  }
+  return { ...parsed, command };
+}
+
+function readJsonDocument(filePath, code, label) {
+  let value;
+  try {
+    value = JSON.parse(readFileSync(path.resolve(filePath), "utf8"));
+  } catch {
+    fail(code, `${label} was not a readable JSON document.`);
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    fail(code, `${label} was not a JSON object.`);
+  }
+  return value;
+}
+
+function exactRequestFromDocument(document, {
+  schemaVersion,
+  wrapperKey,
+  code,
+  label,
+}) {
+  if (document.schemaVersion === schemaVersion) return document;
+  const request = document[wrapperKey];
+  if (!request || typeof request !== "object" || Array.isArray(request) ||
+      request.schemaVersion !== schemaVersion) {
+    fail(code, `${label} had the wrong schema.`);
+  }
+  return request;
+}
+
+function writeSignedOutput(envelope, outputPath) {
+  const serialized = `${JSON.stringify(envelope, null, 2)}\n`;
+  if (outputPath) {
+    writeFileSync(path.resolve(outputPath), serialized, { mode: 0o600, flag: "wx" });
+  }
+  return serialized;
 }
 
 export async function runLocalVercelProviderAttester({
@@ -265,7 +340,11 @@ export async function runLocalVercelProviderAttester({
   privateKeyLoader = readKeychainAttestationPrivateKey,
   now = Date.now(),
 } = {}) {
-  const document = JSON.parse(readFileSync(path.resolve(requestPath), "utf8"));
+  const document = readJsonDocument(
+    requestPath,
+    "STEP11_6_VERCEL_ATTESTER_REQUEST_INVALID",
+    "The provider-attestation request file",
+  );
   // The protected route emits a public wrapper. Accept that exact wrapper or
   // an already extracted request; never reconstruct challenge fields locally.
   const request = document?.providerAttestationRequest || document;
@@ -279,11 +358,91 @@ export async function runLocalVercelProviderAttester({
     readApi: createVercelCliReadApi({ vercelBinary, execFileImpl }),
     now,
   });
-  const serialized = `${JSON.stringify(envelope, null, 2)}\n`;
-  if (outputPath) {
-    writeFileSync(path.resolve(outputPath), serialized, { mode: 0o600, flag: "wx" });
+  return writeSignedOutput(envelope, outputPath);
+}
+
+export async function runLocalVercelWafProviderAttester({
+  requestPath,
+  firewallReadbackPath,
+  outputPath,
+  execFileImpl = execFileAsync,
+  privateKeyLoader = readKeychainAttestationPrivateKey,
+  now = Date.now(),
+} = {}) {
+  const document = readJsonDocument(
+    requestPath,
+    "STEP11_6_VERCEL_WAF_ATTESTER_REQUEST_INVALID",
+    "The WAF provider-evidence request file",
+  );
+  const request = exactRequestFromDocument(document, {
+    schemaVersion: VERCEL_WAF_PROVIDER_EVIDENCE_REQUEST_SCHEMA,
+    wrapperKey: "wafProviderEvidenceRequest",
+    code: "STEP11_6_VERCEL_WAF_ATTESTER_REQUEST_INVALID",
+    label: "The WAF provider-evidence request file",
+  });
+  const firewallPayload = readJsonDocument(
+    firewallReadbackPath,
+    "STEP11_6_VERCEL_WAF_ATTESTER_READBACK_INVALID",
+    "The read-only WAF provider readback",
+  );
+  const envelope = createVercelWafProviderEvidence({
+    request,
+    firewallPayload,
+    privateKey: await privateKeyLoader({ execFileImpl }),
+    now,
+  });
+  return writeSignedOutput(envelope, outputPath);
+}
+
+export async function runLocalVercelWafRuleInsertResultAttester({
+  requestPath,
+  outcomeStatus,
+  providerResponsePath,
+  firewallReadbackPath,
+  outputPath,
+  execFileImpl = execFileAsync,
+  privateKeyLoader = readKeychainAttestationPrivateKey,
+  now = Date.now(),
+} = {}) {
+  const document = readJsonDocument(
+    requestPath,
+    "STEP11_6_VERCEL_WAF_RESULT_ATTESTER_REQUEST_INVALID",
+    "The WAF rule-insert result request file",
+  );
+  const request = exactRequestFromDocument(document, {
+    schemaVersion: VERCEL_WAF_RULE_INSERT_DISPATCH_RESULT_REQUEST_SCHEMA,
+    wrapperKey: "wafRuleInsertDispatchResultRequest",
+    code: "STEP11_6_VERCEL_WAF_RESULT_ATTESTER_REQUEST_INVALID",
+    label: "The WAF rule-insert result request file",
+  });
+  const outcome = String(outcomeStatus || "").trim().toUpperCase();
+  const target = outcome === "TARGET_CONFIRMED";
+  const unknown = outcome === "OUTCOME_UNKNOWN";
+  if (!(target || unknown) || target &&
+      (!providerResponsePath || !firewallReadbackPath) ||
+      unknown && (providerResponsePath || firewallReadbackPath)) {
+    fail("STEP11_6_VERCEL_WAF_RESULT_ATTESTER_ARGUMENT_INVALID",
+      "The signed rule-insert outcome files did not match its exact outcome.");
   }
-  return serialized;
+  const providerResponse = target ? readJsonDocument(
+    providerResponsePath,
+    "STEP11_6_VERCEL_WAF_RESULT_ATTESTER_RESPONSE_INVALID",
+    "The exact provider mutation response",
+  ) : null;
+  const firewallPayload = target ? readJsonDocument(
+    firewallReadbackPath,
+    "STEP11_6_VERCEL_WAF_RESULT_ATTESTER_READBACK_INVALID",
+    "The read-only post-dispatch WAF readback",
+  ) : null;
+  const envelope = createVercelWafRuleInsertDispatchResult({
+    request,
+    outcomeStatus: outcome,
+    providerResponse,
+    firewallPayload,
+    privateKey: await privateKeyLoader({ execFileImpl }),
+    now,
+  });
+  return writeSignedOutput(envelope, outputPath);
 }
 
 async function main() {
@@ -294,11 +453,25 @@ async function main() {
       process.stdout.write(`${JSON.stringify(installed, null, 2)}\n`);
       return;
     }
-    const output = await runLocalVercelProviderAttester({
-      requestPath: parsed.request,
-      outputPath: parsed.output,
-      vercelBinary: parsed["vercel-bin"] || undefined,
-    });
+    const output = parsed.command === "attest"
+      ? await runLocalVercelProviderAttester({
+        requestPath: parsed.request,
+        outputPath: parsed.output,
+        vercelBinary: parsed["vercel-bin"] || undefined,
+      })
+      : parsed.command === "attest-waf"
+        ? await runLocalVercelWafProviderAttester({
+          requestPath: parsed.request,
+          firewallReadbackPath: parsed["firewall-readback"],
+          outputPath: parsed.output,
+        })
+        : await runLocalVercelWafRuleInsertResultAttester({
+          requestPath: parsed.request,
+          outcomeStatus: parsed.outcome,
+          providerResponsePath: parsed["provider-response"],
+          firewallReadbackPath: parsed["firewall-readback"],
+          outputPath: parsed.output,
+        });
     if (!parsed.output) process.stdout.write(output);
   } catch (error) {
     process.stderr.write(`${error?.code || "STEP11_6_VERCEL_ATTESTER_FAILED"}: ${error.message}\n`);

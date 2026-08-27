@@ -324,10 +324,15 @@ test("failure classification produces participant-safe retry, conflict, authoriz
   assert.equal(classifyScoringSyncFailure({ status: 400, message: "Scoring has been locked" }).kind, "locked");
   assert.equal(classifyScoringSyncFailure({ status: 400, message: "This match is Final. Reopen it." }).kind, "finalized");
   assert.equal(classifyScoringSyncFailure({ status: 401, message: "Player Passport expired" }).kind, "authorization");
-  assert.equal(classifyScoringSyncFailure({
-    status: 409,
-    code: "PRODUCTION_SCORING_ADMISSION_INSPECTION_MISMATCH",
-  }).kind, "authority-transition");
+  for (const code of [
+    "PRODUCTION_SCORING_ADMISSION_INSPECTION_MISMATCH",
+    "PRODUCTION_SCORING_ADMISSION_V3_REJECTED",
+    "PRODUCTION_SCORING_ADMISSION_V3_UNAVAILABLE",
+    "PRODUCTION_SCORING_ADMISSION_V3_CONTRACT_UNAVAILABLE",
+  ]) {
+    assert.equal(classifyScoringSyncFailure({ status: 409, code }).kind,
+      "authority-transition", code);
+  }
   assert.equal(participantScoringSyncIssue({ failureKind: "locked", participantMessage: "Scoring has been locked by the Tournament Director." }), "Scoring has been locked by the Tournament Director.");
 });
 

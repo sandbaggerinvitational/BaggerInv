@@ -18,10 +18,12 @@ import {
 import styles from "./writer-fence.module.css";
 
 const API_PATH = "/api/admin/step11-6-production-google-writer-fence";
-const FENCE_CONFIRMATION = "STEP11_6_WRITER_FENCE_REHEARSAL";
+const DRIVE_ACL_DOWNGRADE_CONFIRMATION = "STEP12_GOOGLE_WRITER_PROVIDER_FENCE";
+const DRIVE_ACL_RESTORE_CONFIRMATION =
+  "ABORT_STEP12_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL";
 const OWNER_FREEZE_CONFIRMATION =
   "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS REHEARSAL";
-const STORAGE_KEY = "bagger.step11-6.writer-fence.recovery.v2";
+const STORAGE_KEY = "bagger.step11-6.drive-acl-rehearsal.recovery.v3";
 
 function requestId() {
   const value = globalThis.crypto?.randomUUID?.();
@@ -48,7 +50,16 @@ export default function WriterFenceClient({ environment }) {
   const [routingRuleRevision, setRoutingRuleRevision] = useState("");
   const inspection = result?.inspection || null;
   const baseline = inspection?.baselineMetadataFingerprint || recovery.baseline || "";
-  const canonicalValues = inspection?.canonicalValueFingerprint || recovery.canonicalValues || "";
+  const noSheetsTransportSentinel =
+    inspection?.noSheetsTransportSentinelFingerprint ||
+    recovery.noSheetsTransportSentinel || "";
+  const legacyDriveRole = inspection?.drivePermissionAudit?.legacyIdentityRole ||
+    inspection?.driveAcl?.legacyRole || inspection?.legacyRole ||
+    recovery.legacyDriveRole || "UNKNOWN";
+  const criticalWafEpoch = result?.criticalWafEpoch ||
+    inspection?.criticalWafEpoch || recovery.criticalWafEpoch || {};
+  const criticalWafEpochId = result?.controlReceipt?.criticalWafEpochId ||
+    recovery.criticalWafEpochId || criticalWafEpoch.epochId || "";
   const verifiedQuiesce = recovery.quiesceStatus === "VERIFIED" &&
     recovery.quiesceEvidenceId;
   const beginExecutable = canExecuteProviderQuiesceStage(recovery, "BEGIN");
@@ -90,6 +101,8 @@ export default function WriterFenceClient({ environment }) {
       scope: "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
       projectWide: true,
       action: "DENY",
+      hostnameOperator: "DOES_NOT_EQUAL",
+      canonicalHostname: "baggerinv.com",
       requestPathOperator: "DOES_NOT_EQUAL",
       requestPath: API_PATH,
       methodOperator: "IS_NOT_ANY_OF",
@@ -211,7 +224,30 @@ export default function WriterFenceClient({ environment }) {
     const keys = providerAttestationStageKeys(stage);
     let stable;
     try {
-      stable = ensureProviderAttestationStageState(recovery, stage, requestId);
+      let cycle = recovery;
+      if (keys.stage === "BEGIN" && recovery.quiesceStatus === "VERIFIED" &&
+          recovery.quiesceEvidenceId && recovery.quiesceRefreshPending !== true) {
+        cycle = {
+          ...recovery,
+          quiesceRefreshPending: true,
+          priorEvidenceIdForCycle: recovery.quiesceEvidenceId,
+          quiesceStatus: "REFRESH_PENDING",
+          evidenceRequestId: "",
+          beginOperationRequestId: "",
+          beginChallengeRequestId: "",
+          beginConsumeRequestId: "",
+          beginProviderChallenge: null,
+          beginProviderAttestationRequest: null,
+          beginSignedProviderAttestation: null,
+          finalizeOperationRequestId: "",
+          finalizeChallengeRequestId: "",
+          finalizeConsumeRequestId: "",
+          finalizeProviderChallenge: null,
+          finalizeProviderAttestationRequest: null,
+          finalizeSignedProviderAttestation: null,
+        };
+      }
+      stable = ensureProviderAttestationStageState(cycle, stage, requestId);
       storeExact(stable);
     } catch (cause) {
       clientError(cause, "STEP11_6_PROVIDER_ATTESTATION_REQUEST_ID_INVALID");
@@ -226,8 +262,6 @@ export default function WriterFenceClient({ environment }) {
       expectedBaselineFingerprint: "",
       expectedCanonicalValueFingerprint: "",
       confirmation: "",
-      rehearsalRunId: "",
-      rehearsalRequestId: "",
     }, stable[keys.operationKey]);
     if (!body?.challenge || !body?.providerAttestationRequest) return;
     try {
@@ -309,8 +343,12 @@ export default function WriterFenceClient({ environment }) {
       }));
       if (!response.ok || body.ok !== true) {
         setError(body);
-        if (body?.diagnostics?.rehearsalRunId) {
-          retain({ rehearsalRunId: body.diagnostics.rehearsalRunId });
+        if (body?.diagnostics?.fenceId || body?.diagnostics?.installRequestId) {
+          retain({
+            fenceId: body.diagnostics.fenceId || recovery.fenceId || "",
+            installRequestId: body.diagnostics.installRequestId ||
+              recovery.installRequestId || "",
+          });
         }
         return null;
       }
@@ -328,17 +366,24 @@ export default function WriterFenceClient({ environment }) {
   }
 
   async function inspectProvider() {
-    const body = await post("inspect", {
-      rehearsalRunId: recovery.rehearsalRunId || "",
-      rehearsalRequestId: recovery.rehearsalRequestId || "",
+    const body = await post("inspect-drive-acl-rehearsal", {
+      installRequestId: recovery.installRequestId || "",
+      fenceId: recovery.fenceId || "",
       expectedBaselineFingerprint: "",
       expectedCanonicalValueFingerprint: "",
       confirmation: "",
     }, requestId());
     if (body?.inspection) retain({
       baseline: body.inspection.baselineMetadataFingerprint,
-      canonicalValues: body.inspection.canonicalValueFingerprint,
-      rehearsalRunId: body.inspection.recoveryRunId || recovery.rehearsalRunId || "",
+      noSheetsTransportSentinel:
+        body.inspection.noSheetsTransportSentinelFingerprint,
+      criticalWafEpochId: body.controlReceipt?.criticalWafEpochId ||
+        recovery.criticalWafEpochId || "",
+      legacyDriveRole: body.inspection.drivePermissionAudit?.legacyIdentityRole ||
+        body.inspection.driveAcl?.legacyRole || body.inspection.legacyRole || "UNKNOWN",
+      fenceId: body.controlReceipt?.fenceId || recovery.fenceId || "",
+      installRequestId: body.controlReceipt?.installRequestId ||
+        recovery.installRequestId || "",
     });
   }
 
@@ -350,12 +395,14 @@ export default function WriterFenceClient({ environment }) {
       payload = buildProviderQuiesceStagePayload(stable, "BEGIN", {
         purpose: "REHEARSAL",
         routingRule: routingRule(),
+        priorEvidenceId: recovery.priorEvidenceIdForCycle || "",
       });
     } catch (cause) {
       clientError(cause, "STEP11_6_PROVIDER_ATTESTATION_REQUIRED");
       return;
     }
     retain({
+      quiesceStatus: "PROBING",
       routingRuleId: routingRuleId.trim(),
       routingRuleRevision: routingRuleRevision.trim(),
     });
@@ -363,12 +410,10 @@ export default function WriterFenceClient({ environment }) {
       ...payload,
       ownerOverrideOperationallyFrozen: ownerFreezeConfirmed,
       ownerFreezeConfirmation: OWNER_FREEZE_CONFIRMATION,
-      ownerFreezeTtlSeconds: 1800,
+      ownerFreezeTtlSeconds: 2100,
       expectedBaselineFingerprint: "",
       expectedCanonicalValueFingerprint: "",
       confirmation: "",
-      rehearsalRunId: "",
-      rehearsalRequestId: "",
     }, stable.beginOperationRequestId);
     if (body?.quiesce) retain({
       quiesceEvidenceId: body.quiesce.evidenceId,
@@ -397,13 +442,12 @@ export default function WriterFenceClient({ environment }) {
       expectedBaselineFingerprint: "",
       expectedCanonicalValueFingerprint: "",
       confirmation: "",
-      rehearsalRunId: "",
-      rehearsalRequestId: "",
     }, stable.finalizeOperationRequestId);
     if (body?.quiesce) retain({
       quiesceEvidenceId: body.quiesce.evidenceId,
       quiesceStatus: body.quiesce.status,
       quiesceExpiresAt: body.quiesce.expiresAt,
+      quiesceRefreshPending: false,
     });
   }
 
@@ -415,8 +459,6 @@ export default function WriterFenceClient({ environment }) {
       expectedBaselineFingerprint: "",
       expectedCanonicalValueFingerprint: "",
       confirmation: "",
-      rehearsalRunId: "",
-      rehearsalRequestId: "",
     }, requestId());
     if (body?.quiesce) retain({
       quiesceEvidenceId: body.quiesce.evidenceId,
@@ -425,34 +467,44 @@ export default function WriterFenceClient({ environment }) {
     });
   }
 
-  async function rehearse() {
-    const rehearsalRequestId = recovery.rehearsalRequestId || requestId();
-    retain({ rehearsalRequestId });
-    const body = await post("rehearse", {
+  async function downgradeDriveAcl() {
+    const installRequestId = recovery.installRequestId || requestId();
+    retain({ installRequestId });
+    const body = await post("downgrade-drive-acl-rehearsal", {
       quiesceEvidenceId: recovery.quiesceEvidenceId || "",
-      rehearsalRunId: "",
-      rehearsalRequestId: "",
+      criticalWafEpochId,
       expectedBaselineFingerprint: baseline,
-      expectedCanonicalValueFingerprint: canonicalValues,
-      confirmation: FENCE_CONFIRMATION,
-    }, rehearsalRequestId);
+      expectedCanonicalValueFingerprint: noSheetsTransportSentinel,
+      confirmation: DRIVE_ACL_DOWNGRADE_CONFIRMATION,
+    }, installRequestId);
     if (body) retain({
-      rehearsalRunId: body.controlReceipt?.runId || "",
-      rehearsalCertified: body.certificationPassed === true,
+      fenceId: body.controlReceipt?.fenceId || recovery.fenceId || "",
+      installRequestId: body.controlReceipt?.installRequestId || installRequestId,
+      criticalWafEpochId: body.controlReceipt?.criticalWafEpochId ||
+        criticalWafEpochId,
+      legacyDriveRole: body.inspection?.drivePermissionAudit?.legacyIdentityRole ||
+        body.inspection?.driveAcl?.legacyRole || body.inspection?.legacyRole ||
+        recovery.legacyDriveRole || "UNKNOWN",
+      aclDowngradeStatus: body.controlReceipt?.status || "",
     });
   }
 
-  async function restore() {
+  async function restoreDriveAcl() {
     const restoreRequestId = recovery.restoreRequestId || requestId();
     retain({ restoreRequestId });
-    const body = await post("restore", {
-      rehearsalRunId: recovery.rehearsalRunId || "",
-      rehearsalRequestId: recovery.rehearsalRequestId || "",
+    const body = await post("restore-drive-acl-rehearsal", {
+      installRequestId: recovery.installRequestId || "",
+      fenceId: recovery.fenceId || "",
+      quiesceEvidenceId: recovery.quiesceEvidenceId || "",
       expectedBaselineFingerprint: baseline,
-      expectedCanonicalValueFingerprint: canonicalValues,
-      confirmation: FENCE_CONFIRMATION,
+      expectedCanonicalValueFingerprint: noSheetsTransportSentinel,
+      confirmation: DRIVE_ACL_RESTORE_CONFIRMATION,
     }, restoreRequestId);
-    if (body?.baselineRestored === true) retain({ restoreRequestId: "" });
+    if (body?.baselineRestored === true) retain({
+      restoreRequestId: "",
+      legacyDriveRole: "writer",
+      aclDowngradeStatus: body.controlReceipt?.status || "REHEARSAL_RESTORED",
+    });
   }
 
   return <main className={styles.page}>
@@ -461,8 +513,8 @@ export default function WriterFenceClient({ environment }) {
       <h1>Production Google writer fence</h1>
       <p>
         This tool uses a durable, server-verified Vercel edge quiesce before temporarily
-        installing the exact rehearsal protections. It never accepts client-entered
-        fingerprints or timestamps and never writes cells, scores, or lifecycle facts.
+        downgrading the exact legacy Google service account from Drive writer to reader.
+        It changes only that exact permission and never writes cells, scores, or lifecycle facts.
       </p>
       <dl className={styles.facts}>
         <div><dt>Candidate SHA</dt><dd>{environment.resources.commitSha}</dd></div>
@@ -470,17 +522,29 @@ export default function WriterFenceClient({ environment }) {
         <div><dt>Branch</dt><dd>{environment.resources.branch}</dd></div>
         <div><dt>Director</dt><dd>CB01 · 2026</dd></div>
         <div><dt>Quiesce</dt><dd>{recovery.quiesceStatus || "NOT STARTED"}</dd></div>
+        <div><dt>Critical WAF epoch</dt><dd>{criticalWafEpoch.status || "NOT STARTED"}</dd></div>
+        <div><dt>WAF dispatch</dt><dd>{criticalWafEpoch.activeDispatchStatus || "NONE"}</dd></div>
+        <div><dt>Unknown WAF outcomes</dt><dd>{Number(
+          criticalWafEpoch.unknownDispatchCount || 0,
+        )}</dd></div>
+        <div><dt>Legacy Drive role</dt><dd>{legacyDriveRole}</dd></div>
       </dl>
       <div className={styles.warning}>
-        Begin quiesce performs a complete first edge probe. Finalize performs a second
-        complete probe and the database enforces at least five elapsed minutes with zero
-        unresolved writers. Request and run identities are retained in this browser so a
-        restart or lost response can be inspected safely. Each stage first issues a
-        database challenge. Download it, sign it with the Keychain attester, then load the
-        resulting envelope here. The browser never creates or verifies an attestation.
+        One durable WAF epoch captures BASELINE, stages and activates the exact temporary
+        five-group CRITICAL_WINDOW rule, binds one ACL fence, and later proves
+        BASELINE_RESTORED. Provider mutations are one-shot dispatches. OUTCOME_UNKNOWN is
+        inspect-only and must never be retried. The legacy Drive permission must
+        remain reader and that WAF must remain active for at least 1,810 seconds from the
+        signed provider activation time before restoration. ACL restoration first enters
+        ACL_RESTORED_WAF_ACTIVE; that is not PASS until the same WAF epoch reaches
+        BASELINE_RESTORED. The server separately
+        enforces the 190-second plus 10-second ACL readbacks. Request identities are
+        retained so a lost response can be inspected, but an OUTCOME_UNKNOWN Drive result must
+        never be retried. Download each challenge, sign it with the Keychain attester,
+        then load the resulting envelope here. The browser never verifies an attestation.
       </div>
       <fieldset className={styles.evidence} disabled={Boolean(busy)}>
-        <legend>Temporary Vercel rule and owner freeze</legend>
+        <legend>Temporary CRITICAL_WINDOW WAF and rehearsal owner freeze</legend>
         <label>
           Vercel rule ID
           <input value={routingRuleId}
@@ -501,14 +565,13 @@ export default function WriterFenceClient({ environment }) {
       </fieldset>
       <div className={styles.actions}>
         <button type="button" disabled={Boolean(busy)} onClick={inspectProvider}>
-          {busy === "inspect" ? "Inspecting…" : "Inspect workbook"}
+          {busy === "inspect-drive-acl-rehearsal" ? "Inspecting…" : "Inspect Drive ACL"}
         </button>
         <button type="button" disabled={Boolean(busy) || !ownerFreezeConfirmed ||
-          recovery.quiesceStatus === "VERIFIED" ||
           !routingRuleId.trim() || !routingRuleRevision.trim()}
           onClick={() => issueChallenge("BEGIN")}>
           {busy === "issue-provider-attestation-challenge"
-            ? "Issuing challenge…" : "Issue / recover BEGIN challenge"}
+            ? "Issuing challenge…" : "Issue / recover BEGIN or refresh challenge"}
         </button>
         <button type="button" disabled={Boolean(busy) ||
           !recovery.beginProviderChallenge || Boolean(verifiedQuiesce)}
@@ -536,7 +599,7 @@ export default function WriterFenceClient({ environment }) {
         <button type="button" disabled={Boolean(busy) || !ownerFreezeConfirmed ||
           !beginExecutable}
           onClick={beginQuiesce}>
-          {busy === "begin-provider-quiesce" ? "Probing origins…" : "Begin 5-minute quiesce"}
+          {busy === "begin-provider-quiesce" ? "Probing origins…" : "Begin critical window"}
         </button>
         <button type="button" disabled={Boolean(busy) || !recovery.quiesceEvidenceId ||
           recovery.quiesceStatus !== "DRAINING"}
@@ -577,23 +640,28 @@ export default function WriterFenceClient({ environment }) {
           {busy === "inspect-provider-quiesce" ? "Inspecting…" : "Inspect quiesce receipt"}
         </button>
         <button type="button" className={styles.primary}
-          disabled={Boolean(busy) || !baseline || !canonicalValues || !verifiedQuiesce ||
-            inspection?.state === "CONFLICT"}
-          onClick={rehearse}>
-          {busy === "rehearse" ? "Applying and restoring…" : "Apply Rehearsal Fence"}
+          disabled={Boolean(busy) || !baseline || !noSheetsTransportSentinel ||
+            !criticalWafEpochId || !verifiedQuiesce ||
+            legacyDriveRole === "reader"}
+          onClick={downgradeDriveAcl}>
+          {busy === "downgrade-drive-acl-rehearsal"
+            ? "Downgrading Drive permission…"
+            : "Downgrade legacy Drive writer to reader"}
         </button>
         <button type="button" className={styles.restore}
-          disabled={Boolean(busy) || !baseline || !canonicalValues ||
-            !recovery.rehearsalRunId || inspection?.state !== "INSTALLED"}
-          onClick={restore}>
-          {busy === "restore" ? "Restoring…" : "Restore exact rehearsal fence"}
+          disabled={Boolean(busy) || !baseline || !noSheetsTransportSentinel ||
+            !recovery.installRequestId || !recovery.fenceId || legacyDriveRole !== "reader"}
+          onClick={restoreDriveAcl}>
+          {busy === "restore-drive-acl-rehearsal"
+            ? "Restoring Drive permission…"
+            : "Restore legacy Drive writer permission after 1,810-second hold"}
         </button>
       </div>
       {error ? <section className={styles.error} aria-live="assertive">
         <strong>{error.code || "Operation stopped"}</strong>
         <p>{error.error || "The operation failed closed."}</p>
         {error.diagnostics?.restoreRequired === true
-          ? <p>Recovery state: exact fence restoration is still required.</p> : null}
+          ? <p>Recovery state: exact legacy Drive writer restoration is still required.</p> : null}
         {error.diagnostics && Object.keys(error.diagnostics).length > 0
           ? <details>
             <summary>Safe diagnostics</summary>

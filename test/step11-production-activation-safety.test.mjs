@@ -16,6 +16,8 @@ import {
   productionDirectorEntitlementEnvironment,
 } from "../lib/preview-director-authorization.js";
 import { validateAuthoritativeParticipantSession } from "../lib/scoring-participant-authorization.js";
+import { productionGoogleDrivePrincipalFingerprint } from
+  "../lib/google-service-account-credential-context.js";
 import {
   PRODUCTION_GOOGLE_WORKBOOK_ID,
   PRODUCTION_SUPABASE_PROJECT_REF,
@@ -217,31 +219,54 @@ test("Production legacy admin scoring cookie is insufficient once revalidation i
 test("Production Google write lease is opt-in, epoch-bound, and replaces caller resource claims", () => {
   const moduleUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
   const script = `
-    import { beginProductionGoogleAuthorityWrite, reportProductionGoogleAuthorityWriteOutcome } from ${JSON.stringify(moduleUrl)};
+    import { withProductionGoogleAuthorityWrite } from ${JSON.stringify(moduleUrl)};
     const admissionGeneration = "44444444-4444-4444-8444-444444444444";
     const env = ${JSON.stringify({
       ...baseEnv,
       PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
       PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: epochId,
       VERCEL_DEPLOYMENT_ID: "dpl_12345678Test",
+      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid",
+      GOOGLE_PRIVATE_KEY: "legacy-writer-key",
+      PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL:
+        "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+      PRODUCTION_GOOGLE_PRIVATE_KEY: "dedicated-production-key",
     })};
     env.PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION = admissionGeneration;
     const calls = [];
     const responses = [
       { ok: true, activation_revision: 11, admission_revision: 7, authority_generation_id: ${JSON.stringify(epochId)},
         admission_generation_id: admissionGeneration, deployment_id: env.VERCEL_DEPLOYMENT_ID,
-        authority: "GOOGLE", admission_state: "OPEN" },
+        authority: "GOOGLE", admission_state: "OPEN", contract_version: "ADMISSION_V3",
+        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(productionGoogleDrivePrincipalFingerprint("legacy-writer@example.invalid"))} },
       { ok: true, lease_id: "33333333-3333-4333-8333-333333333333", authority: "GOOGLE",
         authority_generation_id: ${JSON.stringify(epochId)}, admission_generation_id: admissionGeneration,
-        writer_intent: "CANONICAL_LEGACY", operation_request_id: "55555555-5555-4555-8555-555555555555",
+        contract_version: "ADMISSION_V3", provider_dispatch_must_begin_before_expires_at: true,
+        writer_intent: "CANONICAL_LEGACY", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(productionGoogleDrivePrincipalFingerprint("legacy-writer@example.invalid"))},
+        expires_at: new Date(Date.now() + 180_000).toISOString(),
+        remaining_dispatch_ms: 179_000,
+        operation_request_id: "55555555-5555-4555-8555-555555555555",
         replay_usable: true },
-      { ok: true, resolution_state: "PROVEN_NO_WRITE", idempotent: false },
+      { ok: true, resolution_state: "PROVEN_NO_WRITE", idempotent: false,
+        lease_id: "33333333-3333-4333-8333-333333333333",
+        lease_nonce: "FROM_REQUEST", operation_request_id: "55555555-5555-4555-8555-555555555555",
+        contract_version: "ADMISSION_V3", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
+        provider_principal_fingerprint: ${JSON.stringify(productionGoogleDrivePrincipalFingerprint("legacy-writer@example.invalid"))} },
     ];
     const fetchImpl = async (url, init) => {
       calls.push({ url, body: JSON.parse(init.body) });
-      return new Response(JSON.stringify(responses.shift()), { status: 200, headers: { "content-type": "application/json" } });
+      const payload = responses.shift();
+      if (String(url).endsWith("/begin_production_scoring_ingress_v3")) {
+        payload.lease_nonce = calls.at(-1).body.input.lease_nonce;
+      }
+      if (String(url).endsWith("/report_production_scoring_ingress_outcome")) {
+        payload.lease_nonce = calls.at(-1).body.input.lease_nonce;
+      }
+      return new Response(JSON.stringify(payload), { status: 200, headers: { "content-type": "application/json" } });
     };
-    const lease = await beginProductionGoogleAuthorityWrite({
+    const result = await withProductionGoogleAuthorityWrite({
       environment: "PREVIEW", project_ref: "idgigvjjqkfbqjeredpb", source_workbook_id: "preview",
       tournamentId: "2026", matchId: "2026-R1-1", actorId: "CB01", operation: "DIRECTOR:MARK-LIVE",
       operationRequestId: "55555555-5555-4555-8555-555555555555",
@@ -250,10 +275,8 @@ test("Production Google write lease is opt-in, epoch-bound, and replaces caller 
         deploymentId: env.VERCEL_DEPLOYMENT_ID, deploymentCommit: env.VERCEL_GIT_COMMIT_SHA },
       request: { method: "POST", url: "https://baggerinv.com/api/director", headers: new Headers({ host: "baggerinv.com",
         origin: "https://baggerinv.com", "x-forwarded-host": "baggerinv.com", "x-forwarded-proto": "https" }) },
-    }, { env, fetchImpl });
-    await reportProductionGoogleAuthorityWriteOutcome(lease, { outcomeState: "PROVEN_NO_WRITE",
-      providerMutationKey: lease.providerMutationKey, writeStarted: false }, { env, fetchImpl });
-    process.stdout.write(JSON.stringify({ calls, leaseId: lease.leaseId }));
+    }, async () => "wrapped", { env, fetchImpl });
+    process.stdout.write(JSON.stringify({ calls, result }));
   `;
   const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
     cwd: new URL("..", import.meta.url),
@@ -263,6 +286,7 @@ test("Production Google write lease is opt-in, epoch-bound, and replaces caller 
   const evidence = JSON.parse(child.stdout);
   assert.equal(evidence.calls.length, 3);
   assert.match(evidence.calls[0].url, /inspect_production_scoring_admission$/);
+  assert.match(evidence.calls[1].url, /begin_production_scoring_ingress_v3$/);
   const begin = evidence.calls[1].body.input;
   assert.equal(begin.environment, "PRODUCTION");
   assert.equal(begin.project_ref, PRODUCTION_SUPABASE_PROJECT_REF);
@@ -274,7 +298,8 @@ test("Production Google write lease is opt-in, epoch-bound, and replaces caller 
   assert.equal(begin.expected_activation_revision, 11);
   assert.equal(begin.expected_admission_revision, 7);
   assert.equal(begin.deployment_commit, commitSha);
-  assert.equal(evidence.calls[2].body.input.lease_id, evidence.leaseId);
+  assert.equal(evidence.result, "wrapped");
+  assert.equal(evidence.calls[2].body.input.lease_id, "33333333-3333-4333-8333-333333333333");
   assert.equal(evidence.calls[2].body.input.outcome_state, "PROVEN_NO_WRITE");
   assert.equal(evidence.calls[2].body.input.actor_id, "CB01");
 });
@@ -288,7 +313,7 @@ test("all foreground and high-impact Google writer boundaries include the dorman
   ]);
   assert.match(ingress, /import "server-only"/);
   assert.match(ingress, /inspect_production_scoring_admission/);
-  assert.match(ingress, /begin_production_scoring_ingress_v2/);
+  assert.match(ingress, /begin_production_scoring_ingress_v3/);
   assert.match(ingress, /mark_production_scoring_ingress_write_started/);
   assert.match(ingress, /report_production_scoring_ingress_outcome/);
   assert.doesNotMatch(ingress, /complete_production_scoring_ingress/);

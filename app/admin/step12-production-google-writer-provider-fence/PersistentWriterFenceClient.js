@@ -20,8 +20,11 @@ import styles from "../step11-6-production-google-writer-fence/writer-fence.modu
 const API_PATH = "/api/admin/step11-6-production-google-writer-fence";
 const STORAGE_KEY = "bagger.step12.provider-writer-fence.recovery.v1";
 const INSTALL_CONFIRMATION = "STEP12_GOOGLE_WRITER_PROVIDER_FENCE";
+const ABORT_INSTALL_CONFIRMATION =
+  "ABORT_STEP12_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL";
 const REMOVE_CONFIRMATION = "REMOVE_STEP12_GOOGLE_WRITER_PROVIDER_FENCE";
-const OWNER_CONFIRMATION = "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS CUTOVER";
+const OWNER_CONFIRMATION =
+  "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS PRODUCTION CUTOVER";
 
 const newId = () => {
   const value = globalThis.crypto?.randomUUID?.();
@@ -45,8 +48,13 @@ export default function PersistentWriterFenceClient({ environment }) {
   const [routingRuleId, setRoutingRuleId] = useState("");
   const [routingRuleRevision, setRoutingRuleRevision] = useState("");
   const baseline = result?.inspection?.baselineMetadataFingerprint || state.baseline || "";
-  const canonicalValues = result?.inspection?.canonicalValueFingerprint ||
-    state.canonicalValues || "";
+  const noSheetsTransportSentinel =
+    result?.inspection?.noSheetsTransportSentinelFingerprint ||
+    state.noSheetsTransportSentinel || "";
+  const criticalWafEpoch = result?.criticalWafEpoch ||
+    result?.inspection?.criticalWafEpoch || state.criticalWafEpoch || {};
+  const criticalWafEpochId = result?.controlReceipt?.criticalWafEpochId ||
+    state.criticalWafEpochId || criticalWafEpoch.epochId || "";
   const beginExecutable = canExecuteProviderQuiesceStage(state, "BEGIN");
   const finalizeExecutable = canExecuteProviderQuiesceStage(state, "FINALIZE");
   const beginAbandonable = canAbandonRetainedProviderAttestationChallenge(
@@ -86,6 +94,8 @@ export default function PersistentWriterFenceClient({ environment }) {
       scope: "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
       projectWide: true,
       action: "DENY",
+      hostnameOperator: "DOES_NOT_EQUAL",
+      canonicalHostname: "baggerinv.com",
       requestPathOperator: "DOES_NOT_EQUAL",
       requestPath: API_PATH,
       methodOperator: "IS_NOT_ANY_OF",
@@ -317,9 +327,20 @@ export default function PersistentWriterFenceClient({ environment }) {
       if (receipt.fenceId || receipt.installRequestId) retain({
         fenceId: receipt.fenceId || state.fenceId || "",
         installRequestId: receipt.installRequestId || state.installRequestId || "",
+        abortRequestId: receipt.abortRequestId || state.abortRequestId || "",
         currentVerificationId: receipt.activeVerificationId ||
           receipt.verification?.verificationId || state.currentVerificationId || "",
         fenceStatus: receipt.status || "",
+        settlementStage: receipt.providerSettlementStage ||
+          state.settlementStage || "",
+        settlementNextEligibleAt: receipt.providerSettlementNextEligibleAt || null,
+        settlementRemainingWaitSeconds: Number(
+          receipt.providerSettlementRemainingWaitSeconds ??
+            state.settlementRemainingWaitSeconds ?? 0,
+        ),
+        admissionState: receipt.admissionState || state.admissionState || "",
+        criticalWafEpochId: receipt.criticalWafEpochId ||
+          state.criticalWafEpochId || "",
       });
       return body;
     } catch {
@@ -341,7 +362,8 @@ export default function PersistentWriterFenceClient({ environment }) {
     });
     if (body?.inspection) retain({
       baseline: body.inspection.baselineMetadataFingerprint,
-      canonicalValues: body.inspection.canonicalValueFingerprint,
+      noSheetsTransportSentinel:
+        body.inspection.noSheetsTransportSentinelFingerprint,
     });
   }
 
@@ -368,7 +390,7 @@ export default function PersistentWriterFenceClient({ environment }) {
       ...payload,
       ownerOverrideOperationallyFrozen: ownerFreezeConfirmed,
       ownerFreezeConfirmation: OWNER_CONFIRMATION,
-      ownerFreezeTtlSeconds: 1800,
+      ownerFreezeTtlSeconds: 2100,
       expectedBaselineFingerprint: "",
       expectedCanonicalValueFingerprint: "",
     });
@@ -430,8 +452,9 @@ export default function PersistentWriterFenceClient({ environment }) {
     retain({ installRequestId });
     await post("install-persistent-provider-fence", installRequestId, {
       quiesceEvidenceId: state.quiesceEvidenceId || "",
+      criticalWafEpochId,
       expectedBaselineFingerprint: baseline,
-      expectedCanonicalValueFingerprint: canonicalValues,
+      expectedCanonicalValueFingerprint: noSheetsTransportSentinel,
       confirmation: INSTALL_CONFIRMATION,
     });
   }
@@ -446,6 +469,19 @@ export default function PersistentWriterFenceClient({ environment }) {
       quiesceEvidenceId: state.quiesceEvidenceId || "",
     });
     if (body) retain({ refreshRequestId: "" });
+  }
+
+  async function abortFenceInstall() {
+    const abortRequestId = state.abortRequestId || newId();
+    retain({ abortRequestId });
+    await post("abort-persistent-provider-fence-install", abortRequestId, {
+      installRequestId: state.installRequestId || "",
+      fenceId: state.fenceId || "",
+      quiesceEvidenceId: state.quiesceEvidenceId || "",
+      expectedBaselineFingerprint: baseline,
+      expectedCanonicalValueFingerprint: noSheetsTransportSentinel,
+      confirmation: ABORT_INSTALL_CONFIRMATION,
+    });
   }
 
   async function removeFence() {
@@ -465,26 +501,41 @@ export default function PersistentWriterFenceClient({ environment }) {
       <p className={styles.eyebrow}>STEP 12 · PERSISTENT PROVIDER FENCE</p>
       <h1>Production Google writer fence</h1>
       <p>
-        This Step-12-only control installs 17 exact whole-sheet protections and leaves
-        them installed through close, prepare, and commit. Removal is impossible until
-        the Production control plane authorizes a proven safe Google rollback or abort.
+        This Step-12-only control binds one signed critical-WAF epoch to the exact
+        legacy Drive permission at reader through close, prepare, and commit. Google
+        writer restoration is impossible until the Production control plane authorizes
+        a proven safe rollback or abort.
       </p>
       <dl className={styles.facts}>
         <div><dt>Candidate SHA</dt><dd>{environment.resources.commitSha}</dd></div>
         <div><dt>Workbook</dt><dd>{environment.resources.workbookId}</dd></div>
         <div><dt>Quiesce</dt><dd>{state.quiesceStatus || "NOT STARTED"}</dd></div>
         <div><dt>Fence</dt><dd>{state.fenceStatus || "NOT INSTALLED"}</dd></div>
+        <div><dt>Critical WAF epoch</dt><dd>{criticalWafEpoch.status || "NOT STARTED"}</dd></div>
+        <div><dt>WAF dispatch</dt><dd>{criticalWafEpoch.activeDispatchStatus || "NONE"}</dd></div>
+        <div><dt>Unknown WAF outcomes</dt><dd>{Number(
+          criticalWafEpoch.unknownDispatchCount || 0,
+        )}</dd></div>
+        <div><dt>Settlement</dt><dd>{state.settlementStage || "NOT STARTED"}</dd></div>
+        <div><dt>Wait remaining</dt><dd>{Number(
+          state.settlementRemainingWaitSeconds || 0,
+        )} seconds</dd></div>
+        <div><dt>Legacy admission</dt><dd>{state.admissionState || "OPEN"}</dd></div>
       </dl>
       <div className={styles.warning}>
         Active operations are unavailable unless the separate Step 12 enable flag and
         exact frozen SHA both match. A lost response never authorizes deletion: inspect
         discovers the durable quiesce/fence record by its retained request identity.
+        Every WAF provider mutation is reserve → mark-started → result. An
+        OUTCOME_UNKNOWN dispatch is terminal and inspection-only. Baseline restoration
+        uses the same FENCE_BOUND epoch and never restores the Google ACL after a
+        successful Supabase commit.
         Each quiesce stage uses a database-issued challenge downloaded for the local
         Keychain attester. Load the signed envelope before the stage can execute; the
         browser never creates an attestation.
       </div>
       <fieldset className={styles.evidence} disabled={Boolean(busy)}>
-        <legend>Temporary Vercel rule and owner freeze</legend>
+        <legend>Permanent Vercel rule and owner freeze</legend>
         <label>
           Vercel rule ID
           <input value={routingRuleId}
@@ -578,9 +629,26 @@ export default function PersistentWriterFenceClient({ environment }) {
           onClick={inspectQuiesce}>Inspect quiesce receipt</button>
         <button type="button" className={styles.primary}
           disabled={Boolean(busy) || state.quiesceStatus !== "VERIFIED" ||
-            !baseline || !canonicalValues || Boolean(state.installRequestId)}
+            !baseline || !noSheetsTransportSentinel || !criticalWafEpochId ||
+            state.fenceStatus === "INSTALLED"}
           onClick={installFence}>
-          {busy === "install-persistent-provider-fence" ? "Installing…" : "Install persistent fence"}
+          {busy === "install-persistent-provider-fence"
+            ? "Verifying…"
+            : state.installRequestId
+              ? "Continue provider settlement"
+              : "Install persistent fence"}
+        </button>
+        <button type="button" className={styles.restore}
+          disabled={Boolean(busy) || !ownerFreezeConfirmed ||
+            state.fenceStatus !== "INSTALLING" || !state.installRequestId ||
+            !state.fenceId || !state.quiesceEvidenceId || !baseline ||
+            !noSheetsTransportSentinel}
+          onClick={abortFenceInstall}>
+          {busy === "abort-persistent-provider-fence-install"
+            ? "Restoring failed install…"
+            : state.abortRequestId
+              ? "Continue failed-install recovery"
+              : "Abort failed install and restore admission"}
         </button>
         <button type="button" disabled={Boolean(busy) ||
           state.quiesceStatus !== "VERIFIED" || !state.currentVerificationId}

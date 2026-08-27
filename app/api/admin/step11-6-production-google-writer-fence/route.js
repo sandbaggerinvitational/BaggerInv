@@ -2,10 +2,12 @@ import { createHash } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
-import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
-import { assertProductionCutoverRequest } from
-  "../../../../lib/production-cutover-activation-contract.js";
-import { assertProductionShadowCandidateRequest } from "../../../../lib/production-shadow-candidate.js";
+import {
+  assertProductionWriterFenceDirectorAuthorization,
+  authorizeProductionWriterFenceDirectorCandidateControl,
+} from "../../../../lib/preview-director-authorization.js";
+import { PRODUCTION_CANONICAL_HOSTNAME } from
+  "../../../../lib/production-shadow-candidate.js";
 import {
   normalizeProductionWriterQuiesceEvidenceInput,
   probeProductionWriterQuiesceOrigins,
@@ -17,7 +19,6 @@ import {
   publicProductionWriterQuiesceError,
 } from "../../../../lib/production-google-writer-fence-quiesce.js";
 import {
-  executeProductionGoogleWriterFenceRehearsal,
   executeProductionGoogleWriterProviderFence,
   productionGoogleWriterFenceRehearsalEnvironment,
   productionGoogleWriterProviderFenceEnvironment,
@@ -25,12 +26,14 @@ import {
   PRODUCTION_GOOGLE_WRITER_FENCE_DIRECTOR,
 } from "../../../../lib/production-google-writer-fence-rehearsal-server.js";
 import {
-  productionGoogleWriterFenceReceiptDependencies,
-  productionGoogleWriterProviderFenceControlDependencies,
   productionGoogleWriterQuiesceReceiptDependencies,
 } from "../../../../lib/production-google-writer-fence-receipt-server.js";
 import {
+  executeProductionVercelWafProviderAction,
+} from "../../../../lib/production-vercel-waf-provider-executor.js";
+import {
   verifyVercelProviderAttestation,
+  VERCEL_PROVIDER_ALIAS_INVENTORY_RECORD_COUNT,
   VERCEL_PROVIDER_ATTESTATION_INITIAL_MAX_AGE_SECONDS,
   VERCEL_PROVIDER_ATTESTATION_REQUEST_SCHEMA,
   VERCEL_PROVIDER_ATTESTATION_TEAM_ID_ENV,
@@ -57,9 +60,19 @@ const QUIESCE_ACTIONS = new Set([
 ]);
 const PERSISTENT_ACTIONS = new Map([
   ["install-persistent-provider-fence", "install"],
+  ["abort-persistent-provider-fence-install", "abort-install"],
   ["inspect-persistent-provider-fence", "inspect"],
   ["refresh-persistent-provider-fence", "refresh"],
   ["remove-persistent-provider-fence", "remove"],
+]);
+const REHEARSAL_ACL_ACTIONS = new Map([
+  ["inspect-drive-acl-rehearsal", "inspect"],
+  ["downgrade-drive-acl-rehearsal", "install"],
+  ["restore-drive-acl-rehearsal", "abort-install"],
+]);
+const REHEARSAL_WAF_EXECUTOR_ACTIONS = new Map([
+  ["install-vercel-waf-provider-fence", "INSTALL"],
+  ["restore-vercel-waf-provider-baseline", "RESTORE"],
 ]);
 const INPUT_KEYS = new Set([
   "action", "confirmation", "currentVerificationId", "evidenceRequestId",
@@ -74,47 +87,21 @@ const INPUT_KEYS = new Set([
   "providerAttestationConsumeRequestId",
   "providerAttestation", "rehearsalRunId", "rehearsalRequestId", "routingRule",
   "providerRetainedChallenge", "abandonRequestId",
+  "criticalWafEpochId",
 ]);
 
 async function authorize(request) {
-  const productionRequest = clean(process.env.VERCEL_ENV).toLowerCase() === "production";
+  const director = await authorizeProductionWriterFenceDirectorCandidateControl(
+    request,
+  );
   try {
-    if (productionRequest) {
-      assertProductionCutoverRequest(request, process.env, { requireOrigin: true });
-    } else {
-      assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true });
-    }
+    return {
+      director,
+      actor: assertProductionWriterFenceDirectorAuthorization(director),
+    };
   } catch {
     return null;
   }
-  const director = await authorizePreviewDirector({
-    request,
-    env: process.env,
-    allowBootstrap: false,
-  });
-  const playerId = clean(director?.identity?.actor?.id || director?.identity?.player?.id);
-  const tournamentId = clean(
-    director?.identity?.tournamentId || director?.identity?.session?.tournamentId,
-  );
-  const authUserId = clean(director?.identity?.authUserId);
-  const expectedSource = productionRequest
-    ? "production-director-entitlement"
-    : "production-shadow-entitlement";
-  if (director?.status !== "active" ||
-      director?.source !== expectedSource ||
-      director?.identity?.impersonating === true ||
-      playerId !== PRODUCTION_GOOGLE_WRITER_FENCE_DIRECTOR ||
-      tournamentId !== "2026" ||
-      !/^[0-9a-f-]{36}$/i.test(authUserId)) return null;
-  return {
-    director,
-    actor: {
-      actorId: PRODUCTION_GOOGLE_WRITER_FENCE_DIRECTOR,
-      authenticatedActorFingerprint: sha256(
-        `production-google-writer-fence-authenticated-actor-v1\n${authUserId.toLowerCase()}`,
-      ),
-    },
-  };
 }
 
 function candidateEnvironment(environment) {
@@ -130,15 +117,23 @@ function candidateEnvironment(environment) {
 
 function publicControlReceipt(receipt = {}) {
   const verification = receipt.verification || null;
+  const abort = receipt.abort || null;
   return Object.freeze({
     runId: clean(receipt.runId || receipt.run_id),
     fenceId: clean(receipt.fenceId || receipt.fence_id),
     installRequestId: clean(receipt.installRequestId || receipt.install_request_id),
     quiesceEvidenceId: clean(receipt.quiesceEvidenceId || receipt.quiesce_evidence_id),
+    criticalWafEpochId: clean(
+      receipt.criticalWafEpochId || receipt.critical_waf_epoch_id,
+    ),
     activeVerificationId: clean(
       receipt.activeVerificationId || receipt.active_verification_id,
     ),
     removalRequestId: clean(receipt.removalRequestId || receipt.removal_request_id),
+    abortRequestId: clean(
+      abort?.abortRequestId || abort?.abort_request_id ||
+        receipt.abortRequestId || receipt.abort_request_id,
+    ),
     protectionDescriptionPrefix: clean(
       receipt.protectionDescriptionPrefix || receipt.protection_description_prefix,
     ),
@@ -149,7 +144,90 @@ function publicControlReceipt(receipt = {}) {
     removalAuthorizedAt:
       receipt.removalAuthorizedAt || receipt.removal_authorized_at || null,
     removedAt: receipt.removedAt || receipt.removed_at || null,
+    providerSettlementStage: clean(
+      receipt.providerSettlementStage || receipt.provider_settlement_stage,
+    ).toUpperCase(),
+    providerSettlementLatestObservationId: clean(
+      receipt.providerSettlementLatestObservationId ||
+        receipt.provider_settlement_latest_observation_id,
+    ),
+    protectionsInstalledObservationId: clean(
+      receipt.protectionsInstalledObservationId ||
+        receipt.protections_installed_observation_id,
+    ),
+    settlementReadback1ObservationId: clean(
+      receipt.settlementReadback1ObservationId ||
+        receipt.settlement_readback_1_observation_id,
+    ),
+    settlementReadback2ObservationId: clean(
+      receipt.settlementReadback2ObservationId ||
+        receipt.settlement_readback_2_observation_id,
+    ),
+    providerSettlementNextEligibleAt:
+      receipt.providerSettlementNextEligibleAt ||
+        receipt.provider_settlement_next_eligible_at || null,
+    providerSettlementRemainingWaitSeconds: Number(
+      receipt.providerSettlementRemainingWaitSeconds ??
+        receipt.provider_settlement_remaining_wait_seconds ?? 0,
+    ),
+    settlementStructuralCanaryFingerprint: clean(
+      receipt.settlementStructuralCanaryFingerprint ||
+        receipt.settlement_structural_canary_fingerprint ||
+        receipt.protectionsInstalledStructuralCanaryFingerprint ||
+        receipt.protections_installed_structural_canary_fingerprint,
+    ),
+    admissionState: clean(
+      receipt.admissionState || receipt.admission_state,
+    ).toUpperCase(),
+    settlementCompletedAt:
+      receipt.settlementCompletedAt || receipt.settlement_completed_at || null,
+    admissionReservationActive:
+      receipt.admissionReservationActive === true ||
+        receipt.admission_reservation_active === true,
+    admissionReservationState: clean(
+      receipt.admissionReservationState || receipt.admission_reservation_state,
+    ).toUpperCase(),
     idempotent: receipt.idempotent === true,
+    abort: abort ? Object.freeze({
+      abortId: clean(abort.abortId || abort.abort_id),
+      abortRequestId: clean(abort.abortRequestId || abort.abort_request_id),
+      requestFingerprint: clean(
+        abort.requestFingerprint || abort.request_fingerprint,
+      ),
+      restorationEvidenceFingerprint: clean(
+        abort.restorationEvidenceFingerprint ||
+          abort.restoration_evidence_fingerprint,
+      ),
+      removedProtectedRangeIds: Array.isArray(
+        abort.removedProtectedRangeIds || abort.removed_protected_range_ids,
+      ) ? [
+          ...(abort.removedProtectedRangeIds || abort.removed_protected_range_ids),
+        ].map(Number) : [],
+      activeRunOwnedProtectionCount: Number(
+        abort.activeRunOwnedProtectionCount ??
+          abort.active_run_owned_protection_count ?? -1,
+      ),
+      restoredProviderFingerprint: clean(
+        abort.restoredProviderFingerprint || abort.restored_provider_fingerprint,
+      ),
+      restoredAclFingerprint: clean(
+        abort.restoredAclFingerprint || abort.restored_acl_fingerprint,
+      ),
+      restoredCanonicalValueFingerprint: clean(
+        abort.restoredCanonicalValueFingerprint ||
+          abort.restored_canonical_value_fingerprint,
+      ),
+      restoredCombinedValueFingerprint: clean(
+        abort.restoredCombinedValueFingerprint ||
+          abort.restored_combined_value_fingerprint,
+      ),
+      restoredFormulaFingerprint: clean(
+        abort.restoredFormulaFingerprint || abort.restored_formula_fingerprint,
+      ),
+      providerObservedAt:
+        abort.providerObservedAt || abort.provider_observed_at || null,
+      abortedAt: abort.abortedAt || abort.aborted_at || null,
+    }) : null,
     verification: verification ? Object.freeze({
       verificationId: clean(verification.verification_id),
       quiesceEvidenceId: clean(verification.quiesce_evidence_id),
@@ -201,6 +279,41 @@ function publicQuiesceReceipt(receipt = {}) {
     liveOriginInventoryFingerprint: clean(
       receipt.live_origin_inventory_fingerprint || receipt.liveOriginInventoryFingerprint,
     ),
+    aliasRecaptureCount: Number(
+      receipt.alias_recapture_count || receipt.aliasRecaptureCount,
+    ),
+    aliasInventoryCount: Number(
+      receipt.alias_inventory_count || receipt.aliasInventoryCount,
+    ),
+    aliasInventoryFingerprint: clean(
+      receipt.alias_inventory_fingerprint || receipt.aliasInventoryFingerprint,
+    ),
+    aliasPaginationPageCount: Number(
+      receipt.alias_pagination_page_count || receipt.aliasPaginationPageCount,
+    ),
+    aliasPaginationFingerprint: clean(
+      receipt.alias_pagination_fingerprint || receipt.aliasPaginationFingerprint,
+    ),
+    beginAliasAttestationId: clean(
+      receipt.begin_alias_attestation_id || receipt.beginAliasAttestationId,
+    ),
+    beginAliasAttestationFingerprint: clean(
+      receipt.begin_alias_attestation_fingerprint ||
+        receipt.beginAliasAttestationFingerprint,
+    ),
+    beginAliasProviderObservedAt:
+      receipt.begin_alias_provider_observed_at ||
+        receipt.beginAliasProviderObservedAt || null,
+    finalizeAliasAttestationId: clean(
+      receipt.finalize_alias_attestation_id || receipt.finalizeAliasAttestationId,
+    ),
+    finalizeAliasAttestationFingerprint: clean(
+      receipt.finalize_alias_attestation_fingerprint ||
+        receipt.finalizeAliasAttestationFingerprint,
+    ),
+    finalizeAliasProviderObservedAt:
+      receipt.finalize_alias_provider_observed_at ||
+        receipt.finalizeAliasProviderObservedAt || null,
     routingRuleAllMethodFenceRequiredHostCount: Number(
       receipt.routing_rule_all_method_fence_required_host_count ||
         receipt.routingRuleAllMethodFenceRequiredHostCount,
@@ -310,6 +423,13 @@ function recoveredConsumedProviderAttestation(challenge) {
   const records = value?.live_origin_inventory;
   const count = Number(value?.live_origin_inventory_count);
   const fingerprint = clean(value?.live_origin_inventory_fingerprint).toLowerCase();
+  const aliasRecords = value?.alias_inventory_records;
+  const aliasCount = Number(value?.alias_inventory_count);
+  const aliasFingerprint = clean(value?.alias_inventory_fingerprint).toLowerCase();
+  const aliasPaginationPageCount = Number(value?.alias_pagination_page_count);
+  const aliasPaginationFingerprint = clean(
+    value?.alias_pagination_fingerprint,
+  ).toLowerCase();
   const bindingExpiresAt = Date.parse(clean(value?.binding_expires_at));
   const providerObservedAt = Date.parse(clean(value?.provider_observed_at));
   const current = Date.now();
@@ -336,10 +456,23 @@ function recoveredConsumedProviderAttestation(challenge) {
       clean(value.routing_rule_id) !== challenge.routingRuleId ||
       clean(value.routing_rule_config_version) !== challenge.routingRuleConfigVersion ||
       Number(value.routing_rule_pending_draft_change_count) !== 0 ||
+      clean(value.routing_rule_hostname_operator).toUpperCase() !==
+        "DOES_NOT_EQUAL" ||
+      clean(value.routing_rule_canonical_hostname).toLowerCase() !==
+        PRODUCTION_CANONICAL_HOSTNAME ||
+      Number(value.routing_rule_earlier_active_bypass_rule_count) !== 0 ||
       !Array.isArray(records) || count !== records.length ||
       count < PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_COUNT ||
       !/^[0-9a-f]{64}$/.test(fingerprint) ||
       sha256(JSON.stringify(records)) !== fingerprint ||
+      !Array.isArray(aliasRecords) ||
+      aliasCount !== VERCEL_PROVIDER_ALIAS_INVENTORY_RECORD_COUNT ||
+      aliasRecords.length !== aliasCount ||
+      !/^[0-9a-f]{64}$/.test(aliasFingerprint) ||
+      sha256(JSON.stringify(aliasRecords)) !== aliasFingerprint ||
+      !Number.isSafeInteger(aliasPaginationPageCount) ||
+      aliasPaginationPageCount < 1 ||
+      !/^[0-9a-f]{64}$/.test(aliasPaginationFingerprint) ||
       clean(value.provider_inventory_schema) !==
         PRODUCTION_LEGACY_DEPLOYMENT_INVENTORY_SCHEMA ||
       Number(value.retained_origin_inventory_count) !==
@@ -381,12 +514,20 @@ function recoveredConsumedProviderAttestation(challenge) {
     candidateDeploymentId: challenge.candidateDeploymentId,
     candidateDeploymentCommit: challenge.candidateDeploymentCommit,
     candidateDeploymentTarget: challenge.candidateDeploymentTarget,
+    candidateAliasOrigin: challenge.candidateAliasOrigin,
+    candidateImmutableOrigin: challenge.candidateImmutableOrigin,
     routingRuleId: challenge.routingRuleId,
     routingRuleConfigVersion: challenge.routingRuleConfigVersion,
     routingRuleEtag: value.routing_rule_etag ?? null,
     routingRuleFingerprint: clean(value.routing_rule_fingerprint).toLowerCase(),
     routingRulePendingDraftChangeCount:
       Number(value.routing_rule_pending_draft_change_count),
+    routingRuleHostnameOperator:
+      clean(value.routing_rule_hostname_operator).toUpperCase(),
+    routingRuleCanonicalHostname:
+      clean(value.routing_rule_canonical_hostname).toLowerCase(),
+    routingRuleEarlierActiveBypassRuleCount:
+      Number(value.routing_rule_earlier_active_bypass_rule_count),
     routingRuleAllMethodFenceRequiredHostCount:
       Number(value.routing_rule_all_method_fence_required_host_count),
     routingRuleAllMethodFenceRequiredHostsFingerprint:
@@ -406,6 +547,11 @@ function recoveredConsumedProviderAttestation(challenge) {
     liveOriginInventoryCount: count,
     liveOriginInventoryFingerprint: fingerprint,
     liveOriginInventoryRecords: records,
+    aliasInventoryCount: aliasCount,
+    aliasInventoryFingerprint: aliasFingerprint,
+    aliasInventoryRecords: aliasRecords,
+    aliasPaginationPageCount,
+    aliasPaginationFingerprint,
     redactedEnvironmentScopeFingerprint:
       clean(value.redacted_environment_scope_fingerprint).toLowerCase(),
     credentialConfinementEvidenceSchema:
@@ -445,19 +591,12 @@ function exactExecutionInput(input, action) {
   return { ...input, action };
 }
 
-async function inspectOwnerFingerprint(input, mode, dependencies) {
+async function inspectOwnerFingerprint(input, dependencies) {
   const inspectionInput = exactExecutionInput(input, "inspect");
-  const result = mode === "REHEARSAL"
-    ? await executeProductionGoogleWriterFenceRehearsal(inspectionInput, {
-      env: process.env,
-      fetchImpl: globalThis.fetch,
-      receipt: dependencies.rehearsal,
-    })
-    : await executeProductionGoogleWriterProviderFence(inspectionInput, {
-      env: process.env,
-      fetchImpl: globalThis.fetch,
-      control: dependencies.persistent,
-    });
+  const result = await executeProductionGoogleWriterProviderFence(
+    inspectionInput,
+    { authorization: dependencies.authorization },
+  );
   const ownerPrincipalFingerprint = clean(
     result.inspection?.drivePermissionAudit?.ownerPrincipalFingerprint,
   ).toLowerCase();
@@ -620,7 +759,6 @@ async function executeQuiesce(input, dependencies) {
   if (input.action === "begin-provider-quiesce") {
     const serverOwnerPrincipalFingerprint = await inspectOwnerFingerprint(
       input,
-      purpose,
       dependencies,
     );
     const receipt = await dependencies.quiesce.begin({
@@ -682,42 +820,56 @@ export async function POST(request) {
       code: "STEP11_6_GOOGLE_WRITER_FENCE_PAYLOAD_INVALID",
     }, { status: 400, headers: noStore });
   }
+  const action = clean(input.action);
+  if (!QUIESCE_ACTIONS.has(action) && !PERSISTENT_ACTIONS.has(action) &&
+      !REHEARSAL_ACL_ACTIONS.has(action) &&
+      !REHEARSAL_WAF_EXECUTOR_ACTIONS.has(action)) {
+    return NextResponse.json({
+      error: "The writer-fence action was invalid.",
+      code: "STEP11_6_GOOGLE_WRITER_FENCE_ACTION_INVALID",
+    }, { status: 400, headers: noStore });
+  }
   const dependencies = {
-    rehearsal: productionGoogleWriterFenceReceiptDependencies({
-      env: process.env,
-      fetchImpl: globalThis.fetch,
-      actor: authorization.actor,
-    }),
-    persistent: productionGoogleWriterProviderFenceControlDependencies({
-      env: process.env,
-      fetchImpl: globalThis.fetch,
-      actor: authorization.actor,
-    }),
+    authorization: authorization.director,
     quiesce: productionGoogleWriterQuiesceReceiptDependencies({
-      env: process.env,
-      fetchImpl: globalThis.fetch,
-      actor: authorization.actor,
+      authorization: authorization.director,
     }),
   };
   try {
     let result;
-    if (QUIESCE_ACTIONS.has(clean(input.action))) {
+    if (QUIESCE_ACTIONS.has(action)) {
       result = await executeQuiesce(input, dependencies);
-    } else if (PERSISTENT_ACTIONS.has(clean(input.action))) {
-      result = await executeProductionGoogleWriterProviderFence(
-        exactExecutionInput(input, PERSISTENT_ACTIONS.get(clean(input.action))),
+    } else if (REHEARSAL_WAF_EXECUTOR_ACTIONS.has(action)) {
+      const baseEnvironment = productionGoogleWriterFenceRehearsalEnvironment(
+        process.env,
+      );
+      if (!baseEnvironment?.allowed) {
+        const error = new Error("The exact writer-fence rehearsal is unavailable.");
+        error.code = "STEP11_6_VERCEL_WAF_EXECUTOR_ENVIRONMENT_UNAVAILABLE";
+        error.status = 404;
+        throw error;
+      }
+      result = await executeProductionVercelWafProviderAction(
+        exactExecutionInput(
+          { ...input, quiescePurpose: "REHEARSAL" },
+          REHEARSAL_WAF_EXECUTOR_ACTIONS.get(action),
+        ),
         {
-          env: process.env,
-          fetchImpl: globalThis.fetch,
-          control: dependencies.persistent,
+          authorization: authorization.director,
+          environment: candidateEnvironment(baseEnvironment),
         },
       );
+    } else if (PERSISTENT_ACTIONS.has(action)) {
+      result = await executeProductionGoogleWriterProviderFence(
+        exactExecutionInput(input, PERSISTENT_ACTIONS.get(action)),
+        { authorization: authorization.director },
+      );
     } else {
-      result = await executeProductionGoogleWriterFenceRehearsal(input, {
-        env: process.env,
-        fetchImpl: globalThis.fetch,
-        receipt: dependencies.rehearsal,
-      });
+      result = await executeProductionGoogleWriterProviderFence(
+        exactExecutionInput({ ...input, quiescePurpose: "REHEARSAL" },
+          REHEARSAL_ACL_ACTIONS.get(action)),
+        { authorization: authorization.director },
+      );
     }
     return NextResponse.json({
       ...result,
@@ -732,12 +884,12 @@ export async function POST(request) {
       previewResourceFallback: false,
     }, { headers: noStore });
   } catch (error) {
-    const payload = QUIESCE_ACTIONS.has(clean(input.action))
+    const payload = QUIESCE_ACTIONS.has(action)
       ? publicProductionWriterQuiesceError(error)
       : publicProductionGoogleWriterFenceError(error);
     console.error("Production Google writer-fence operation stopped safely", {
       code: payload.code,
-      action: clean(input.action).toLowerCase(),
+      action: action.toLowerCase(),
       restoreRequired: payload.diagnostics?.restoreRequired === true,
     });
     return NextResponse.json(payload, {

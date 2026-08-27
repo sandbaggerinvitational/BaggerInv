@@ -9,11 +9,11 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFileCallback);
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const ARTIFACT_URL = new URL(
-  "../../docs/evidence/step11-6-production-origin-inventory.json",
+  "../../docs/evidence/step11-6-production-origin-inventory-v4.json",
   import.meta.url,
 );
 
-export const INVENTORY_SCHEMA = "step11-6-production-origin-inventory-v3";
+export const INVENTORY_SCHEMA = "step11-6-production-origin-inventory-v4";
 export const VERCEL_PROJECT_ID = "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU";
 export const VERCEL_TEAM_ID = "team_kPw5zaib8uaQJALAwj4fWI6R";
 export const PROVIDER_RECORD_TUPLE = Object.freeze([
@@ -51,7 +51,8 @@ export const STATUS_SEMANTICS = Object.freeze({
 export const REQUIRED_DEPLOYMENTS = Object.freeze({
   priorLive: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
   frozenStep11: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-  step11_6Candidate: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+  step11_6CandidateV1: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+  step11_6CandidateV2: "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
 });
 
 const DEPLOYMENT_ID = /^dpl_[A-Za-z0-9]{8,64}$/;
@@ -349,7 +350,7 @@ export function buildInventoryArtifact(first, second, capturedAt = new Date().to
     providerRecords,
     records,
   };
-  if (targetCounts.PRODUCTION !== 458 || targetCounts.PREVIEW !== 833 ||
+  if (targetCounts.PRODUCTION !== 458 || targetCounts.PREVIEW !== 834 ||
       base.coverageSummary.nullShaRecordCount !== 8 ||
       base.coverageSummary.nullBranchRecordCount !== 8) {
     fail("The expected reviewed all-project census changed during capture.");

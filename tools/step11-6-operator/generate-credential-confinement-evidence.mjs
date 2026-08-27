@@ -4,13 +4,22 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 
+import {
+  buildVercelEnvironmentResourceReview,
+  reviewedVercelEnvironmentRecordIds,
+  validVercelEnvironmentResourceReview,
+  VERCEL_ENVIRONMENT_RESOURCE_REVIEW_SCHEMA,
+} from "../../lib/vercel-environment-resource-review.js";
+import { PRODUCTION_VERCEL_PROJECT_ID } from
+  "../../lib/google-service-account-credential-context.js";
+
 const ROOT = new URL("../../", import.meta.url);
 const INVENTORY_URL = new URL(
-  "../../docs/evidence/step11-6-production-origin-inventory.json",
+  "../../docs/evidence/step11-6-production-origin-inventory-v4.json",
   import.meta.url,
 );
 const EVIDENCE_URL = new URL(
-  "../../docs/evidence/step11-6-production-google-credential-confinement.json",
+  "../../docs/evidence/step11-6-production-google-credential-confinement-v4.json",
   import.meta.url,
 );
 
@@ -18,8 +27,14 @@ export const CREDENTIAL_CONFINEMENT_SCHEMA =
   "step11-6-production-google-credential-confinement-v1";
 export const CREDENTIAL_CONFINEMENT_SCHEMA_V2 =
   "step11-6-production-google-credential-confinement-v2";
+export const CREDENTIAL_CONFINEMENT_SCHEMA_V3 =
+  "step11-6-production-google-credential-confinement-v3";
+export const CREDENTIAL_CONFINEMENT_SCHEMA_V4 =
+  "step11-6-production-google-credential-confinement-v4";
 export const ORIGIN_INVENTORY_SCHEMA_V3 =
   "step11-6-production-origin-inventory-v3";
+export const ORIGIN_INVENTORY_SCHEMA_V4 =
+  "step11-6-production-origin-inventory-v4";
 export const CREDENTIAL_CONFINEMENT_MARKERS = Object.freeze([
   "PRODUCTION_GOOGLE_PRIVATE_KEY",
   "withProductionGoogleServiceAccountCredentials",
@@ -38,6 +53,23 @@ export const CREDENTIAL_CONFINEMENT_REVIEWED_GIT_OBJECT_UNAVAILABLE_SHAS =
     "07685fc6f9e6db05c103493eb34e35425023aa42",
     "87d9661818b335a00dfe5f12dbc96531bf005ace",
     "fd3e2d11b19cc15c6120e2990c0b2c3dbcf95785",
+  ]);
+export const CREDENTIAL_CONFINEMENT_CANDIDATE_BRANCH =
+  "feature/mock-tournament-qa-integration";
+export const CREDENTIAL_CONFINEMENT_VERCEL_TEAM_ID =
+  "team_kPw5zaib8uaQJALAwj4fWI6R";
+export const CREDENTIAL_CONFINEMENT_REVIEWED_SHADOWED_PROJECT_WIDE_PREVIEW_NAMES =
+  Object.freeze([
+    "GOOGLE_SHEETS_ID",
+    "NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_SUPABASE_AUTH_URL",
+    "PARTICIPANT_IDENTITY_AUTHORITY",
+    "SCORING_AUTHORITY",
+  ]);
+export const CREDENTIAL_CONFINEMENT_REVIEWED_UNSHADOWED_NONSECRET_PREVIEW_NAMES =
+  Object.freeze([
+    "SUPABASE_PARTICIPANT_AUTH_REHEARSAL_ENABLED",
+    "SUPABASE_PARTICIPANT_IDENTITY_SHADOW_ENABLED",
   ]);
 const NON_EXECUTABLE_BLOCKED_DEPLOYMENT = Object.freeze({
   deploymentId: "dpl_J4BFkTk2pqPeWxdUFxwQdRZJ9xCR",
@@ -184,6 +216,62 @@ function exactArray(value, expected) {
   return Array.isArray(value) && JSON.stringify(value) === JSON.stringify(expected);
 }
 
+function credentialConfinementEnvironmentScopeContractV3() {
+  const projectWidePreviewRecord = (name) => [name, ["preview"], null];
+  const exactCandidatePreviewRecord = (name) => [
+    name, ["preview"], CREDENTIAL_CONFINEMENT_CANDIDATE_BRANCH,
+  ];
+  return {
+    broadLegacyNames: ["GOOGLE_PRIVATE_KEY", "GOOGLE_SERVICE_ACCOUNT_EMAIL"],
+    broadLegacyTargets: ["preview", "production"],
+    dedicatedAndProductionResourcePreviewScope:
+      "EXACT_FEATURE_BRANCH_REQUIRED",
+    productionScope: "PRODUCTION_TARGET_WITH_NULL_BRANCH",
+    reviewedProjectWidePreviewException: {
+      recordTuple: ["name", "targets", "gitBranch"],
+      shadowedProjectWideRecords:
+        CREDENTIAL_CONFINEMENT_REVIEWED_SHADOWED_PROJECT_WIDE_PREVIEW_NAMES
+          .map(projectWidePreviewRecord),
+      requiredSameNameExactCandidateOverrides:
+        CREDENTIAL_CONFINEMENT_REVIEWED_SHADOWED_PROJECT_WIDE_PREVIEW_NAMES
+          .map(exactCandidatePreviewRecord),
+      unshadowedNonsecretProjectWideRecords:
+        CREDENTIAL_CONFINEMENT_REVIEWED_UNSHADOWED_NONSECRET_PREVIEW_NAMES
+          .map(projectWidePreviewRecord),
+      unreviewedProjectWideRelevantRecordAllowed: false,
+      wrongBranchRelevantRecordAllowed: false,
+    },
+    duplicateUnscopedDedicatedPreviewRecordAllowed: false,
+  };
+}
+
+function credentialConfinementEnvironmentScopeContractV4(environmentReview) {
+  if (!validVercelEnvironmentResourceReview(environmentReview)) {
+    throw new Error("The trusted Vercel environment resource review was invalid.");
+  }
+  return {
+    ...credentialConfinementEnvironmentScopeContractV3(),
+    providerEnvironmentResourceReview: {
+      schemaVersion: VERCEL_ENVIRONMENT_RESOURCE_REVIEW_SCHEMA,
+      providerEnvironmentRecordCount:
+        environmentReview.providerEnvironmentRecordCount,
+      hiddenProductionEnvCount: environmentReview.hiddenProductionEnvCount,
+      recordCount: environmentReview.recordCount,
+      recordsFingerprint: environmentReview.recordsFingerprint,
+      reviewFingerprint: environmentReview.reviewFingerprint,
+      ownerCertifiedContinuityBaselineFingerprint:
+        environmentReview.ownerCertifiedContinuityBaselineFingerprint,
+      providerPlaintextValueReviewPerformed: false,
+      providerCiphertextWhereExposedAndVersionContinuityRequired: true,
+      rawValuesRetained: false,
+      exactProviderMetadataRequired: true,
+      ciphertextHashRequiredWhereProviderExposesCiphertext: true,
+      sensitiveRedactedRecordsUseExactVersionMetadata: true,
+    },
+    hiddenProductionEnvironmentRecordsAllowed: false,
+  };
+}
+
 function providerTargetClass(value) {
   if (value === "PREVIEW") return "PREVIEW";
   if (value === "PRODUCTION") return "PRODUCTION";
@@ -197,9 +285,9 @@ function providerMetadataFingerprint(providerRecord) {
   ]));
 }
 
-function normalizedV3Inventory(inventory) {
+function normalizedVersionedInventory(inventory, expectedSchema) {
   if (!inventory || typeof inventory !== "object" || Array.isArray(inventory) ||
-      inventory.schemaVersion !== ORIGIN_INVENTORY_SCHEMA_V3 ||
+      inventory.schemaVersion !== expectedSchema ||
       !exactArray(inventory.providerRecordTuple, PROVIDER_RECORD_TUPLE_V3) ||
       !exactArray(inventory.recordTuple, PROJECTION_RECORD_TUPLE_V3) ||
       !Array.isArray(inventory.providerRecords) || !Array.isArray(inventory.records) ||
@@ -211,7 +299,7 @@ function normalizedV3Inventory(inventory) {
       sha256(JSON.stringify(inventory.providerRecords)) !==
         inventory.providerRecordsFingerprint ||
       sha256(JSON.stringify(inventory.records)) !== inventory.recordsFingerprint) {
-    throw new Error("The v3 Production origin inventory header or fingerprints were invalid.");
+    throw new Error("The versioned Production origin inventory header or fingerprints were invalid.");
   }
 
   const projectionByKey = new Map();
@@ -219,7 +307,7 @@ function normalizedV3Inventory(inventory) {
   const projectionOrigins = new Set();
   for (const record of inventory.records) {
     if (!Array.isArray(record) || record.length !== PROJECTION_RECORD_TUPLE_V3.length) {
-      throw new Error("A v3 Production origin projection tuple was invalid.");
+      throw new Error("A versioned Production origin projection tuple was invalid.");
     }
     const [deploymentId, sha, origin, scopeClass, deploymentStatus,
       providerMetadataFingerprint] = record;
@@ -232,7 +320,7 @@ function normalizedV3Inventory(inventory) {
         !HEX64.test(String(providerMetadataFingerprint)) ||
         projectionByKey.has(key) || projectionDeploymentIds.has(deploymentId) ||
         projectionOrigins.has(origin)) {
-      throw new Error("A v3 Production origin projection tuple was outside exact scope.");
+      throw new Error("A versioned Production origin projection tuple was outside exact scope.");
     }
     projectionByKey.set(key, record);
     projectionDeploymentIds.add(deploymentId);
@@ -244,7 +332,7 @@ function normalizedV3Inventory(inventory) {
   for (const providerRecord of inventory.providerRecords) {
     if (!Array.isArray(providerRecord) ||
         providerRecord.length !== PROVIDER_RECORD_TUPLE_V3.length) {
-      throw new Error("A v3 Production provider tuple was invalid.");
+      throw new Error("A versioned Production provider tuple was invalid.");
     }
     const [deploymentId, sha, providerCommitSha, origin, deploymentTarget,
       gitBranch, providerSource, deploymentStatus, createdAt, shaResolution] =
@@ -279,7 +367,7 @@ function normalizedV3Inventory(inventory) {
         projection[3] !== expectedScopeClass ||
         projection[4] !== deploymentStatus ||
         projection[5] !== providerMetadataFingerprint(providerRecord)) {
-      throw new Error("A v3 Production provider tuple did not match its exact projection.");
+      throw new Error("A versioned Production provider tuple did not match its exact projection.");
     }
     providerKeys.push(key);
     entries.push(Object.freeze({
@@ -294,7 +382,7 @@ function normalizedV3Inventory(inventory) {
       JSON.stringify(providerKeys) !== JSON.stringify(sortedKeys) ||
       projectionByKey.size !== providerKeys.length ||
       providerKeys.some((key) => !projectionByKey.has(key))) {
-    throw new Error("The v3 Production provider/projection tuple sets were not one-to-one.");
+    throw new Error("The versioned Production provider/projection tuple sets were not one-to-one.");
   }
   return Object.freeze(entries);
 }
@@ -443,8 +531,12 @@ function buildCredentialConfinementEvidenceV1(inventory) {
   };
 }
 
-export function buildCredentialConfinementEvidenceV2(inventory) {
-  const entries = normalizedV3Inventory(inventory);
+function buildVersionedCredentialConfinementEvidence(inventory, {
+  evidenceSchema,
+  inventorySchema,
+  environmentReview,
+}) {
+  const entries = normalizedVersionedInventory(inventory, inventorySchema);
   const nonNullEntries = entries.filter((entry) => entry.sha !== null);
   const retainedShas = [...new Set(nonNullEntries.map((entry) => entry.sha))]
     .sort(compare);
@@ -583,7 +675,7 @@ export function buildCredentialConfinementEvidenceV2(inventory) {
       entry.deploymentStatus === "READY").map((entry) => entry.origin),
   ])].sort(compare);
   const base = {
-    schemaVersion: CREDENTIAL_CONFINEMENT_SCHEMA_V2,
+    schemaVersion: evidenceSchema,
     originInventorySchemaVersion: inventory.schemaVersion,
     originInventoryRecordTuple: [...PROJECTION_RECORD_TUPLE_V3],
     originInventoryRecordCount: inventory.recordCount,
@@ -682,29 +774,38 @@ export function buildCredentialConfinementEvidenceV2(inventory) {
       nullShaNonBlockedPolicy: "LEGACY_PRINCIPAL_WRITER_CAPABLE",
       nullShaBlockedPolicy: "NON_EXECUTABLE_PROVIDER_BLOCKED",
     },
-    environmentScopeContract: {
-      broadLegacyNames: ["GOOGLE_PRIVATE_KEY", "GOOGLE_SERVICE_ACCOUNT_EMAIL"],
-      broadLegacyTargets: ["preview", "production"],
-      dedicatedAndProductionResourcePreviewScope:
-        "EXACT_FEATURE_BRANCH_REQUIRED",
-      productionScope: "PRODUCTION_TARGET_WITH_NULL_BRANCH",
-      duplicateUnscopedDedicatedPreviewRecordAllowed: false,
-    },
+    environmentScopeContract: evidenceSchema === CREDENTIAL_CONFINEMENT_SCHEMA_V4
+      ? credentialConfinementEnvironmentScopeContractV4(environmentReview)
+      : evidenceSchema === CREDENTIAL_CONFINEMENT_SCHEMA_V3
+        ? credentialConfinementEnvironmentScopeContractV3()
+      : {
+          broadLegacyNames: ["GOOGLE_PRIVATE_KEY", "GOOGLE_SERVICE_ACCOUNT_EMAIL"],
+          broadLegacyTargets: ["preview", "production"],
+          dedicatedAndProductionResourcePreviewScope:
+            "EXACT_FEATURE_BRANCH_REQUIRED",
+          productionScope: "PRODUCTION_TARGET_WITH_NULL_BRANCH",
+          duplicateUnscopedDedicatedPreviewRecordAllowed: false,
+        },
     dynamicCandidateContract: {
       candidateShaBinding: "SIGNED_PROVIDER_ATTESTATION_AND_RELEASE_SHA",
-      candidateBranch: "feature/mock-tournament-qa-integration",
+      candidateBranch: CREDENTIAL_CONFINEMENT_CANDIDATE_BRANCH,
       rehearsalTarget: "PREVIEW",
-      cutoverTarget: "PRODUCTION",
-      permittedAdditionScopeClasses: ["PROJECT_PREVIEW", "PRODUCTION_TARGET"],
+      cutoverTarget: evidenceSchema === CREDENTIAL_CONFINEMENT_SCHEMA_V4
+        ? "PREVIEW" : "PRODUCTION",
+      permittedAdditionScopeClasses:
+        evidenceSchema === CREDENTIAL_CONFINEMENT_SCHEMA_V4
+          ? ["PROJECT_PREVIEW"] : ["PROJECT_PREVIEW", "PRODUCTION_TARGET"],
       arbitraryProductionTargetAdditionAllowed: false,
       differentShaAdditionAllowed: false,
       databaseAdmissionRequiredForProductionCanonicalLegacyWrite: true,
     },
+    ...(evidenceSchema === CREDENTIAL_CONFINEMENT_SCHEMA_V4
+      ? { providerEnvironmentResourceReview: environmentReview } : {}),
   };
   const classificationTotal = Object.values(base.classifications)
     .reduce((total, value) => total + value.recordCount, 0);
   if (classificationTotal !== entries.length) {
-    throw new Error("The v2 credential classifications were not exhaustive and exclusive.");
+    throw new Error("The versioned credential classifications were not exhaustive and exclusive.");
   }
   return {
     ...base,
@@ -712,11 +813,35 @@ export function buildCredentialConfinementEvidenceV2(inventory) {
   };
 }
 
+export function buildCredentialConfinementEvidenceV2(inventory) {
+  return buildVersionedCredentialConfinementEvidence(inventory, {
+    evidenceSchema: CREDENTIAL_CONFINEMENT_SCHEMA_V2,
+    inventorySchema: ORIGIN_INVENTORY_SCHEMA_V3,
+  });
+}
+
+export function buildCredentialConfinementEvidenceV3(inventory) {
+  return buildVersionedCredentialConfinementEvidence(inventory, {
+    evidenceSchema: CREDENTIAL_CONFINEMENT_SCHEMA_V3,
+    inventorySchema: ORIGIN_INVENTORY_SCHEMA_V4,
+  });
+}
+
+export function buildCredentialConfinementEvidenceV4(inventory, environmentReview) {
+  return buildVersionedCredentialConfinementEvidence(inventory, {
+    evidenceSchema: CREDENTIAL_CONFINEMENT_SCHEMA_V4,
+    inventorySchema: ORIGIN_INVENTORY_SCHEMA_V4,
+    environmentReview,
+  });
+}
+
 export function buildCredentialConfinementEvidence() {
   const inventory = JSON.parse(readFileSync(INVENTORY_URL, "utf8"));
-  return inventory.schemaVersion === ORIGIN_INVENTORY_SCHEMA_V3
-    ? buildCredentialConfinementEvidenceV2(inventory)
-    : buildCredentialConfinementEvidenceV1(inventory);
+  const committed = JSON.parse(readFileSync(EVIDENCE_URL, "utf8"));
+  return buildCredentialConfinementEvidenceV4(
+    inventory,
+    committed.providerEnvironmentResourceReview,
+  );
 }
 
 export function verifyCredentialConfinementEvidence() {
@@ -728,8 +853,80 @@ export function verifyCredentialConfinementEvidence() {
   return actual;
 }
 
+function providerReadJson(apiPath, { vercelBinary } = {}) {
+  const binary = vercelBinary || "npx";
+  const args = vercelBinary
+    ? ["api", apiPath]
+    : ["--no-install", "vercel", "api", apiPath];
+  const result = spawnSync(binary, args, {
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  if (result.status !== 0) {
+    throw new Error("The authenticated Vercel CLI read-only environment query failed.");
+  }
+  try {
+    return JSON.parse(result.stdout);
+  } catch {
+    throw new Error("The authenticated Vercel CLI returned invalid environment JSON.");
+  }
+}
+
+export function captureCredentialConfinementProviderEnvironmentReview({
+  teamId,
+  vercelBinary,
+  readProviderJson = providerReadJson,
+} = {}) {
+  const selectedTeamId = String(teamId || "").trim();
+  if (selectedTeamId !== CREDENTIAL_CONFINEMENT_VERCEL_TEAM_ID ||
+      typeof readProviderJson !== "function") {
+    throw new Error("An exact Vercel team identity and read-only provider reader are required.");
+  }
+  const query = `teamId=${encodeURIComponent(selectedTeamId)}`;
+  const listPath = `/v9/projects/${encodeURIComponent(PRODUCTION_VERCEL_PROJECT_ID)}/env?${query}`;
+  const listPayload = readProviderJson(listPath, { vercelBinary });
+  reviewedVercelEnvironmentRecordIds(listPayload);
+  return buildVercelEnvironmentResourceReview(listPayload);
+}
+
+export function writeCredentialConfinementEvidenceWithProviderReview({
+  teamId,
+  vercelBinary,
+  readProviderJson,
+} = {}) {
+  const inventory = JSON.parse(readFileSync(INVENTORY_URL, "utf8"));
+  const review = captureCredentialConfinementProviderEnvironmentReview({
+    teamId,
+    vercelBinary,
+    readProviderJson,
+  });
+  const evidence = buildCredentialConfinementEvidenceV4(inventory, review);
+  writeFileSync(EVIDENCE_URL, `${JSON.stringify(evidence, null, 2)}\n`, { mode: 0o644 });
+  return Object.freeze({
+    schemaVersion: evidence.schemaVersion,
+    providerEnvironmentRecordCount: review.providerEnvironmentRecordCount,
+    hiddenProductionEnvCount: review.hiddenProductionEnvCount,
+    reviewedEnvironmentRecordCount: review.recordCount,
+    reviewedEnvironmentRecordsFingerprint: review.recordsFingerprint,
+    reviewedEnvironmentReviewFingerprint: review.reviewFingerprint,
+    evidenceFingerprint: evidence.evidenceFingerprint,
+  });
+}
+
+function cliValue(name) {
+  const index = process.argv.indexOf(name);
+  if (index < 0 || index + 1 >= process.argv.length) return undefined;
+  return process.argv[index + 1];
+}
+
 if (process.argv[1] && new URL(`file://${process.argv[1]}`).href === import.meta.url) {
-  if (process.argv.includes("--write")) {
+  if (process.argv.includes("--write-provider-environment")) {
+    const result = writeCredentialConfinementEvidenceWithProviderReview({
+      teamId: cliValue("--team-id"),
+      vercelBinary: cliValue("--vercel-bin"),
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  } else if (process.argv.includes("--write")) {
     writeFileSync(EVIDENCE_URL, `${JSON.stringify(buildCredentialConfinementEvidence(), null, 2)}\n`, {
       mode: 0o644,
     });

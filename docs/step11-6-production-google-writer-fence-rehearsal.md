@@ -1,311 +1,309 @@
 # Step 11.6 Production Google writer-fence rehearsal
 
-This candidate-only tool certifies a provider-level fence for the legacy Google
-service-account identity. It does **not** perform Step 12, change application
-authority, write a cell, create a score, or mutate Supabase application data.
-It records only the dedicated dormant control-plane rehearsal receipt.
+This document certifies the Production legacy-writer boundary. It does not
+authorize or perform Step 12. Production must finish this rehearsal in
+`DORMANT` with Google scoring, Passport identity, legacy Google admission
+`OPEN`, Supabase scoring ingress disabled, workers disabled, and no Supabase
+canonical write possible or observed.
 
-## Operator surface
+## Certified mechanism
 
-Use the authenticated candidate page:
+The writer fence is the exact Production workbook Drive permission of the
+legacy Google service account. The forward transition is:
 
-`/admin/step11-6-production-google-writer-fence`
+```text
+legacy service account: writer -> reader
+```
 
-The page exposes the following same-origin controls:
+The restoration transition used only by this Step 11.6 rehearsal is:
 
-1. **Inspect workbook** — reads sanitized metadata and establishes the exact baseline.
-2. **Begin controlled quiesce** — the server loads and hashes the complete
-   1,291-deployment all-project v3 inventory, verifies its signed full-provider
-   and enforcement-projection tuples, and probes every signed immutable, fixed,
-   and candidate origin against the exact eleven-method/path write vector. For
-   signed live inventory count `N`, a snapshot contains `11 × (N + 5)` probes.
-3. **Finalize quiesce** — repeats the complete probe. The database requires at
-   least 300 elapsed seconds and zero unresolved request logs/writes.
-4. **Inspect quiesce receipt** — discovers a lost response by retained request ID.
-5. **Inspect / abandon a retained BEGIN or FINALIZE challenge** — reads the
-   authoritative challenge/reservation state. An expired unconsumed challenge,
-   or a stale consumed attestation that remains `RESERVED` and never bound to
-   quiesce evidence, may be immutably abandoned with a separate stable request
-   identity. A `BOUND` reservation or any evidence progression cannot be
-   abandoned.
-6. **Apply Rehearsal Fence** — in one request, atomically adds 17 whole-sheet,
-   non-warning protected ranges, proves the dedicated identity can edit them,
-   proves the legacy service account cannot, attempts one same-description
-   update against a run-owned protection and requires a provider `403`, then
-   restores the exact baseline in `finally`.
-7. **Restore exact rehearsal fence** — recovery-only; deletes only exact tagged whole-sheet ranges
-   owned by the dedicated identity and requires exact baseline readback. A
-   recovery-only restore records `FAILED / restoration_confirmed=true`; it
-   clears the authority-mutation safety guard but does not certify the candidate.
+```text
+legacy service account: reader -> writer
+```
 
-The provider canary changes no application value: it asks the legacy identity
-to set one temporary protection's description to the description it already
-has. A successful canary response fails certification, even though the
-requested metadata is unchanged. No cell/value request is constructed.
+No cell value, formula, worksheet structure, score, pairing, lifecycle fact, or
+protected range is changed. The dedicated Production Google service account
+remains a writer for approved authoring and later mirror/archive work. Preview
+identities and workbooks are rejected.
 
-Before installation, the server creates a durable Production control-plane
-receipt. That transaction must prove `DORMANT / GOOGLE / PASSPORT`, admission
-`OPEN`, zero active or unresolved legacy writers, scoring ingress and workers
-off, and neither first-write marker set. It serializes the one authorized
-rehearsal. Each protected-range description is run-owned:
+An old deployment cannot bypass this boundary: its retained credential may
+still authenticate, but the provider no longer grants that principal edit or
+reshare capability. Application-local state, DNS, hostname routing, stale
+clients, and deployment age therefore cannot restore canonical Google write
+authority.
 
-`STEP11_6_WRITER_FENCE_REHEARSAL:<run UUID>:<sheet ID>`
+## Two different WAF configurations
 
-Recovery Restore requires that exact authoritative run receipt; it cannot
-delete another rehearsal run's ranges or a later Step 12 fence.
+`BASELINE` is the exact pre-rehearsal Vercel firewall configuration. It is
+compatible with normal legacy scoring at `baggerinv.com` and is the state that
+must be restored when Step 11.6 ends.
 
-The tool reads the complete used range of all 17 canonical sheets twice: once
-with `FORMULA` and once with `UNFORMATTED_VALUE` plus `SERIAL_NUMBER`. It retains
-separate formula, unformatted-value, used-range, and combined SHA-256
-fingerprints. Formula and value fingerprints must be identical before install,
-after the provider proof, and after restoration before the response may state
-`applicationDataChanged=false`. There is no `A:ZZ` cap.
+`CRITICAL_WINDOW` is a temporary five-group configuration used only while a
+Drive ACL transition could be in flight:
 
-It also enumerates the exact workbook with Drive `permissions.list` using only
-`drive.metadata.readonly`. The response exposes hashes, roles, and counts—never
-emails, domains, permission IDs, or service-account principals. Certification
-requires exactly one owner, no pending ownership transfer, both the legacy and
-dedicated service accounts to be ordinary non-owner editors, and no
-group/domain/anyone editor grant. The single Drive owner is recorded as an
-explicit operational override and is **not** claimed to be machine-fenced.
+1. allow only the exact signed candidate-control `POST` on the certified
+   candidate alias and immutable candidate hostname;
+2. deny all other requests on noncanonical hosts;
+3. deny non-safe methods on the canonical apex;
+4. deny safe-method requests to the audited historical writer routes on the
+   canonical apex;
+5. allow ordinary safe reads on the canonical apex.
 
-## Required candidate gates
+Group order, exact host/path sets, project ID, active firewall version, and the
+absence of an earlier broad bypass are attested. The critical-window rule is
+not a permanent launch rule. Treating it as permanent would block Supabase
+scoring `POST`s after Step 12.
 
-- exact Production-shadow candidate host and same-origin request;
-- Vercel Preview deployment in project `bagger-inv`;
-- branch `feature/mock-tournament-qa-integration`;
-- exact candidate SHA in both the normal candidate contract and
-  `PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_EXPECTED_COMMIT_SHA`;
-- `PRODUCTION_STEP11_6_GOOGLE_WRITER_FENCE_REHEARSAL_ENABLED=true`;
-- exact Production workbook and Supabase project tuple;
-- active non-impersonating Production-shadow Director `CB01` for tournament
-  `2026`;
-- distinct legacy `GOOGLE_*` and dedicated `PRODUCTION_GOOGLE_*` service-account
-  emails and RSA public-key fingerprints;
-- dormant candidate flags: Google scoring, no Supabase scoring ingress, no
-  workers, no publication, and no public read cutover.
-- exact server-configured Vercel project/rule/revision and the retained
-  `docs/evidence/step11-6-production-origin-inventory.json` artifact, schema
-  `step11-6-production-origin-inventory-v3`: 1,291 all-project deployments,
-  comprising 458 Production-target and 833 project Preview records, with full
-  provider fingerprint
-  `6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692`
-  and one-to-one projection fingerprint
-  `d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6`;
-- exact generated credential-confinement evidence, schema
-  `step11-6-production-google-credential-confinement-v2`, for all 1,291
-  retained origins (classification fingerprint
-  `9ce65239f41086f56ea126e2491afe36ae90e85172a8536706f549912b27979b`,
-  evidence fingerprint
-  `071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133`),
-  including five READY null-SHA deployments and three READY deployments whose
-  exact Git objects are unavailable, all conservatively treated as potential
-  legacy writers;
-- exact historical safe-method Google-writer evidence at
-  `docs/evidence/step11-6-historical-safe-method-google-writer.json`, evidence
-  fingerprint
-  `6bf411a2e119e8552e6b3ac9ac51d8828e9fc853e5c43069dc40c31a6e794f28`,
-  proving 236 READY immutable origins can reach the historical
-  `GET`/implicit-`HEAD` Round Scorecards archive writer and binding the single
-  all-method path-set fingerprint
-  `fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa`;
-- two complete dynamically sized live probe matrices (`22 × (N + 5)` total
-  edge requests) covering the exact retained inventory or retained inventory
-  plus one exact current candidate, regardless `READY`/`ERROR`/`BLOCKED`
-  status, four fixed aliases, and the dynamic candidate alias, with exact `403`,
-  `x-vercel-mitigated: deny`,
-  `server: Vercel`, and `x-vercel-id` evidence;
-- an action-time owner-write freeze with the database-issued 30-minute
-  window. The browser supplies neither evidence fingerprints nor timestamps.
-- a bounded Vercel provider-admin change freeze with monitoring of the active
-  firewall version and pending-draft state through restoration/removal.
+The two configurations are joined by one durable
+`CRITICAL_WINDOW_WAF_V1` epoch. Its legal lifecycle is:
 
-The exhaustive two-pass edge proof plus the mandatory five-minute drain is
-budgeted as a roughly 15–25 minute controlled live window. Each snapshot uses
-`N + 5` compact per-origin tuples carrying an eleven-bit coverage mask and eleven
-ordered provider-proof fingerprints; the database validates and expands the
-logical `11 × (N + 5)` origin×vector set without relying on a multi-megabyte repeated
-JSON matrix.
+```text
+ACTIVATION_PENDING
+-> ACTIVE_UNBOUND
+-> FENCE_BOUND
+-> RESTORE_PENDING
+-> BASELINE_RESTORED
+```
 
-The signed provider attestation is consumed into a durable `RESERVED` row
-before the exhaustive edge probes begin. If probing or the network fails after
-that transaction, the challenge is not reusable forever and local storage must
-not be cleared as a workaround. Inspect the exact retained stage. Once the
-database reports `ELIGIBLE_CONSUMED_UNBOUND`, abandon it with the retained
-abandonment request ID. The database serializes abandonment against binding,
-requires the reservation still be unbound with no quiesce progression, marks
-both challenge and reservation `ABANDONED`, and preserves the consumed IDs and
-fingerprints in the audit chronology. A lost abandonment response is recovered
-by retrying that exact ID. Reissue BEGIN with a new evidence and all-new stage
-IDs; reissue FINALIZE with the same draining evidence ID and all-new FINALIZE
-IDs. Keep the provider deny rule installed while recovering.
+There is no reusable `VERIFIED` receipt and no separate restore epoch. The
+epoch binds the full ordered active configuration, rule count, provider
+version/etag, captured zero-draft baseline, exact run-owned five-group rule,
+candidate deployment/SHA/target, control-host fingerprint, purpose, and signed
+provider observations. `critical_active_at` comes only from signed active
+provider readback. A drain timestamp or caller boolean is not activation proof.
 
-Only public-key hashes and sanitized metadata fingerprints are returned. OAuth
-tokens, private keys, service-account principals, protected-range principals,
-Drive principals/permission IDs, and cell values are never returned.
+## Provider prerequisites
 
-The inventory artifact binds two ordered, one-to-one tuple forms. The full
-provider tuple is `deploymentId`, `sha`, `providerCommitSha`, `origin`,
-`deploymentTarget`, `gitBranch`, `providerSource`, `deploymentStatus`,
-`createdAt`, and `shaResolution`. The enforcement projection is
-`deploymentId`, `sha`, `origin`, `scopeClass`, `deploymentStatus`, and
-`providerMetadataFingerprint`. A signed live observation must be exactly the
-retained 1,291 tuple pairs, or those pairs plus one exact current-candidate pair.
-No mutable reviewed-deployment addendum is accepted.
+Before any mutation, require all of the following:
 
-## Fixed provider scope
+- exact Vercel project `prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU`;
+- exact Production Supabase project `ymqhhtxaywtqllynrmxe`;
+- exact workbook `1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4`;
+- exact candidate SHA, branch, deployment ID, alias, and immutable hostname;
+- Supabase Director `CB01` with active `DIRECTOR` entitlement for `2026`;
+- exact legacy Drive permission at role `writer` before the rehearsal;
+- exact legacy-principal fingerprint from the database ACL intent/proof, equal
+  to the final `DORMANT` ADMISSION_V3
+  `provider_principal_fingerprint` (a key-generation fingerprint is provenance,
+  not a substitute);
+- exact dedicated Production identity retained at role `writer`;
+- no additional non-owner editor that could act as a canonical legacy writer;
+- `canEdit=false` and `canShare=false` after the legacy role becomes `reader`;
+- `writersCanShare=true` only for the exact dedicated/legacy pre-fence writer
+  set so the dedicated identity can perform the permission transition; after
+  fencing, the legacy identity must prove `canEdit=false` and
+  `canShare=false`, with no other non-owner editor present;
+- owner/provider-admin freeze explicitly recorded for the active window;
+- `CRITICAL_WINDOW` WAF attested and its activation time durably recorded.
 
-The canonical union is derived from the mutation-intent allowlists and must
-exactly equal this fixed 17-sheet Production provider-ID catalog:
+The Drive permission-management scope is limited to the supported
+`drive.file` contract. Metadata inspection uses `drive.metadata.readonly`. Do
+not broaden scopes or weaken sharing policy to make the rehearsal pass.
+The Step 11.6 receipt accepts only the exact purpose-bound statement
+`I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS REHEARSAL`. It cannot be
+replayed as a Step 12 cutover freeze.
 
-| Sheet | ID |
-|---|---:|
-| Players | 0 |
-| Awards | 28074660 |
-| Calcutta Ownership | 214637017 |
-| Net Skins Result | 270637829 |
-| Calcutta Round Results | 314908504 |
-| Calcutta Standings | 388354025 |
-| Tournaments | 625223812 |
-| Net Skins | 804336907 |
-| Team Names | 844307454 |
-| Live Matches | 1074655326 |
-| Calcutta Purchases | 1403525379 |
-| Admin Audit Log | 1404770729 |
-| Match Update Log | 1471947317 |
-| Courses | 1677468900 |
-| Matches | 1763222762 |
-| Live Hole Scores | 1802214847 |
-| Handicaps | 1940053655 |
+## Candidate control boundary
 
-Any missing/recreated sheet, existing protection on this union, malformed tag,
-partial fence, duplicate fence, or baseline drift fails closed.
+The candidate-only control page is:
 
-## Lost-response and restoration behavior
+```text
+/admin/step11-6-production-google-writer-fence
+```
 
-All 17 additions and all exact deletions use one atomic Sheets `batchUpdate` per
-direction. After every mutation attempt, provider metadata is re-read. This
-recovers an add/delete whose response was lost and makes Inspect/Restore safe to
-retry. Restore never deletes an unrelated protection.
+The protected API is:
 
-If automatic restoration cannot prove the exact metadata and canonical-value
-baselines, the response says
-`restoreRequired=true`; stop and use Inspect before any retry.
+```text
+/api/admin/step11-6-production-google-writer-fence
+```
 
-The begin and finish calls are serialized by a durable Production Supabase
-receipt. Begin binds the verified quiesce evidence ID, candidate deployment ID/SHA, current activation and
-admission generations/revisions, value/metadata/Drive baselines, fixed writer
-scope, server-probed origin inventory, owner fingerprint, and owner-freeze window.
-Finish binds the installed provider fingerprint, exact run-owned protection IDs,
-legacy denial, dedicated editability, restored metadata/value/provider
-fingerprints, and zero active run-owned protections. A lost successful response
-is recovered by retrying **Apply** with the same request identity; the restored
-receipt is read back without installing a second fence.
+The ACL rehearsal aliases are:
 
-## Scope limitation and cutover requirement
+- `inspect-drive-acl-rehearsal`;
+- `downgrade-drive-acl-rehearsal`;
+- `restore-drive-acl-rehearsal`.
 
-The proof applies to the legacy service-account identity, not to the human
-spreadsheet owner. Google owner override is explicitly untested and must not be
-reported as machine-fenced.
+They map to the same provider-fence implementation with
+`lifecycle_mode=REHEARSAL`. That mode is legal only against the certified
+`DORMANT / GOOGLE / PASSPORT` state. It must not stage, prepare, commit, enable
+ingress, enable workers, or change application authority.
 
-Before the live rehearsal is invoked, all Google-mutating application activity
-must be operationally paused and checked for in-flight multi-call operations.
-The protected-range installation can reject the next call in a legacy
-multi-call sequence; it is not itself an in-flight-operation drain. This is a
-hard execution precondition outside this candidate route.
+The route accepts only same-origin HTTPS requests on the exact candidate alias
+or immutable candidate hostname and validates the exact candidate SHA, branch,
+deployment, Vercel project, Production workbook, Production Supabase project,
+and server-side Director entitlement before reading a request body or invoking
+provider code. Passport, a generic Preview session, and a copied browser token
+are not sufficient.
 
-## Mandatory all-origin quiesce and drain
+That same exact Project Preview candidate is the sole control runtime for later
+`CUTOVER` and `ROLLBACK` provider operations. The distinct
+`productionWriterFenceCandidateCutoverEnvironment` contract keeps the candidate
+non-authoritative, binds its SHA/project/Production resources and eligible
+phase, and rejects `VERCEL_ENV=production`; lifecycle purpose never changes the
+candidate deployment target from `PREVIEW`.
 
-Before `Apply Rehearsal Fence`, install one temporary **project-level** Vercel
-WAF deny rule across every Production and Preview deployment/hostname in the
-`bagger-inv` project. Its action is **Deny**, and it has exactly these three OR
-groups:
+## Controlled rehearsal sequence
 
-1. Request Path **Does not equal**
-   `/api/admin/step11-6-production-google-writer-fence` **and** Method **Is not
-   any of** `GET`, `HEAD`, `OPTIONS`.
-2. Host **Is any of** the exact eight source-unresolved READY immutable
-   hostnames, with no method exception:
-   `bagger-1w07if9d1-sandbagger-invitational.vercel.app`,
-   `bagger-60ah92b8c-sandbagger-invitational.vercel.app`,
-   `bagger-6nrmyunec-sandbagger-invitational.vercel.app`,
-   `bagger-b8ob0hjnu-sandbagger-invitational.vercel.app`,
-   `bagger-f64olgv1h-sandbagger-invitational.vercel.app`,
-   `bagger-h0eycprri-sandbagger-invitational.vercel.app`,
-   `bagger-kh2m1cy6h-sandbagger-invitational.vercel.app`, and
-   `bagger-kj3c0pkvm-sandbagger-invitational.vercel.app`.
-3. Request Path **Is any of** the exact single historical safe-method writer
-   path `/api/cron/round-scorecards-archive`, with no method exception.
+1. Inspect read-only Production control state and Drive ACL. Capture distinct,
+   signed `BASELINE_CAPTURE` WAF evidence for the exact full active
+   configuration, provider version/etag, ordered rules, zero pending draft, and
+   exact legacy permission fingerprint. Begin one fresh rehearsal epoch.
+2. Record the owner's current freeze confirmation. Reserve and start exactly
+   one `CRITICAL_RULE_INSERT` provider dispatch. Its exact module-owned response
+   confirms the staged rule and records the provider-assigned rule identity;
+   do not preselect that identity or fabricate a signed draft observation.
+   Reserve and start one `CRITICAL_DRAFT_ACTIVATE` dispatch, then require
+   distinct signed `CRITICAL_ACTIVE` evidence. The epoch is now
+   `ACTIVE_UNBOUND`, and its provider-observed time is the only WAF activation
+   timestamp.
+3. Atomically bind that exact `ACTIVE_UNBOUND` epoch, quiesce evidence, and one
+   Drive ACL fence. Reinspect the Drive ACL and issue one durable, idempotent
+   forward dispatch.
+   Require provider result `TARGET_CONFIRMED` and fresh readback showing the
+   exact legacy identity at `reader`, `canEdit=false`, and `canShare=false`.
+4. Treat that confirmation as `T0`. After at least 190 database-clock seconds,
+   perform readback 1. After at least another 10 seconds, perform independent
+   readback 2. Both must prove the same permission identity, role, capability
+   state, workbook, authority generation, and activation revision.
+5. Run the safe old-deployment, immutable-host, alias, stale-tab, stale-PWA,
+   and low-level writer fault injections. Google canonical writer calls and
+   Supabase canonical writes must both remain zero.
+6. Keep `CRITICAL_WINDOW` active and the legacy permission at `reader` for at
+   least 1,810 seconds from the database-recorded WAF activation timestamp.
+   Refresh owner/provider freeze evidence before it expires. The 1,810-second
+   horizon bounds already-running legacy functions; it is not evidence that an
+   ambiguous Drive permission request resolved.
+7. Record fresh, distinct signed `CRITICAL_REATTEST` evidence on the same
+   `FENCE_BOUND` epoch. Reinspect exact source state. Issue one durable ACL
+   restore dispatch. Require
+   provider result `TARGET_CONFIRMED` and fresh readback of that same permission
+   at `writer` with the exact baseline `canEdit=true` and `canShare=true`
+   capabilities. Record the explicit intermediate state
+   `ACL_RESTORED_WAF_ACTIVE`; this is not a restored/PASS state.
+8. Reserve and start one `BASELINE_VERSION_ACTIVATE` dispatch on the same
+   epoch. Require distinct signed `BASELINE_RESTORED` evidence whose full
+   semantic configuration matches the captured baseline. Only then finalize
+   the fence to `REHEARSAL_RESTORED` and reopen the rehearsal control record.
+9. Prove live Production returned to `DORMANT / GOOGLE / PASSPORT`, admission
+   `OPEN`, zero active writers, ingress disabled, workers disabled, first
+   Supabase write possible `false`, and first Supabase write observed `false`.
 
-The exact sorted eight-origin fingerprint is
-`62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d`.
-The first group keeps ordinary read-only traffic available, permits only the
-exact authenticated candidate rehearsal POST, and blocks every other mutating
-HTTP method without depending on a route inventory. The second group closes
-all methods on source-unresolved READY code, so an unknown mutating `GET`,
-`HEAD`, or `OPTIONS` path cannot bypass the fence. The third group blocks the
-audited historical archive writer on all 236 affected immutable deployments,
-including explicit `GET` and framework-dispatched `HEAD`. Do not scope any
-group to
-Vercel's Production environment: immutable Preview deployments may still hold
-Production Google credentials.
+The 190+10 settlement and the 1,810-second critical-window hold are independent
+requirements. Neither substitutes for an exact Drive provider result.
 
-After saving the rule:
+Every WAF provider mutation uses a durable reserve → mark-started → result
+contract. A committed-but-lost provider response is `OUTCOME_UNKNOWN`. That
+dispatch remains terminal and inspect-only; it cannot be retried after a TTL,
+reused by another fence, or cleared by baseline restoration guesses.
 
-1. Open the authenticated candidate page and begin the server-probed quiesce.
-   Client-supplied origin lists or opaque fingerprints are not accepted.
-2. After at least 300 seconds, finalize it. The database uses its own clock and
-   current unresolved-writer predicates; browser timestamps cannot shorten the drain.
-3. Capture stable formula and unformatted-value fingerprints before applying the Google
-   protections.
-4. Run the provider rehearsal and require exact value and metadata restoration.
-5. Delete only this temporary WAF rule, verify a probe is no longer edge-denied,
-   and re-certify live Google/Passport operation without making a score.
+## Ambiguous Drive result
 
-The four fixed aliases plus the candidate alias are diagnostic canaries, not an
-exhaustive provider alias inventory. The security boundary is the authenticated
-Vercel **project-wide** active firewall configuration, which applies to every
-project hostname before application routing. The local attester binds the exact
-active version/rule/conditions, rejects `active=null`, never accepts a matching
-draft in place of active, and rejects every nonempty pending draft. No other
-Vercel firewall, deployment, alias, or environment change is permitted during
-the bounded window. If provider-admin monitoring or the change freeze cannot be
-maintained, retain the deny and stop.
+Drive v3 permission updates do not provide a supported compare-and-swap token
+for this transition. A lost or ambiguous ACL dispatch result is therefore
+`OUTCOME_UNKNOWN`, not success and not a safe retry condition.
 
-If any origin is not covered, any writer may still be running, or restoration
-cannot be proven, keep new mutations paused and stop. A DNS or alias redirect
-does not satisfy this gate.
+For either direction, `OUTCOME_UNKNOWN` means:
 
-Do not deploy or invoke this tool merely because its tests pass. The controlled
-Production rehearsal requires the separate owner authorization and coordinated
-operator window already defined by Step 11.6.
+- keep `CRITICAL_WINDOW` active;
+- keep the durable dispatch reservation;
+- do not issue attempt 2;
+- do not reopen legacy admission;
+- do not begin another close or Step 12;
+- inspect only through the certified provider recovery path;
+- stop for owner/provider recovery authorization if the exact result cannot be
+  proven.
 
-## Step 12 persistent fence (not invoked by Step 11.6)
+Waiting 1,810 seconds does not clear `OUTCOME_UNKNOWN`. A delayed restore request could
+otherwise re-enable an old writer after a later close. The rehearsal may pass
+only when both ACL transitions are `TARGET_CONFIRMED`.
 
-The distinct authenticated page
-`/admin/step12-production-google-writer-provider-fence` is available only when
-the separate Step 12 enable flag and exact frozen-SHA variable match and the
-Step 11.6 rehearsal flag is false. Step 11.6 does not render or invoke these
-controls.
+## Evidence split
 
-The corrected Step 12 sequence is:
+The historical artifact remains immutable historical evidence:
 
-1. deploy/promote the barrier-aware candidate and complete read, identity, and
-   current-read phases;
-2. arm the v2 Google gate (`GOOGLE_LEASE_ARMED`, admission `OPEN`, protocol
-   enforced) while Google remains canonical;
-3. begin/finalize a fresh `CUTOVER` WAF quiesce;
-4. install and durably verify the exact 17 protections tagged
-   `STEP12_GOOGLE_WRITER_PROVIDER_FENCE:<fence UUID>:<sheet ID>`;
-5. remove the temporary WAF rule while the persistent protections remain;
-6. close admission, drain, fingerprint, prepare, and commit. These authority
-   operations bind the exact fence, verification, and quiesce IDs.
+```text
+docs/evidence/step11-6-historical-production-google-writer-scope-v1.json
+acceptedAsPrimaryProof = false
+unexplainedConcurrencyWindowCount = 1
+```
 
-The persistent fence survives close, prepare, and commit. Inspect and refresh
-recover by durable install request ID. Removal first obtains an authoritative
-authorization that accepts only a proven safe Google rollback/abort state with
-Supabase ingress, workers, leases, outbox/archive work, and prepared epochs
-clear. It takes a fresh pre-removal provider/ACL/formula/value snapshot, deletes
-only the 17 exact run-owned range IDs, and requires the post-delete state to
-match that fresh snapshot. It does not assume install-time application values
-remain unchanged throughout legitimate mirror or reconciliation activity.
+Do not edit or reinterpret it as accepted primary proof. Step 11.6 readiness
+instead loads a separate ACL-v2 acceptance record from the fixed repository
+path:
+
+```text
+docs/evidence/step11-6-production-google-drive-acl-v2-acceptance-v1.json
+```
+
+The manifest must exactly equal that artifact. Its self-hash is only an
+integrity check and is not provenance. The file must be generated from the
+protected provider and database receipts after the real rehearsal has restored
+Production; it must not be handwritten from expected values. Readiness remains
+false while the artifact is absent. The record requires:
+
+- schema `step11-6-production-google-drive-acl-v2-acceptance-v1`;
+- `acceptedAsPrimaryProof=true`;
+- `unexplainedConcurrencyWindowCount=0`;
+- the exact historical artifact fingerprint as a provenance input;
+- exact migration/SHA/deployment/resource bindings;
+- exact fence, install, quiesce, restoration, dispatch, settlement-readback,
+  and transition-proof identities from the durable receipts;
+- exact `BASELINE` and `CRITICAL_WINDOW` WAF fingerprints;
+- exact forward and reverse Drive dispatch IDs/results;
+- exact database timestamps for reader confirmation, restore critical-window
+  activation, writer restoration, and rehearsal restoration;
+- the exact legacy-principal fingerprint, equal to the final `DORMANT`
+  ADMISSION_V3 `provider_principal_fingerprint`;
+- both settlement readbacks and the 1,810-second hold proof;
+- all origin/stale-client/low-level writer tests;
+- zero Google data writes and zero Supabase canonical writes;
+- exact restored Production snapshot.
+
+The implementation candidate that performs the rehearsal is SHA A. After the
+provider/DB-derived artifact is committed, SHA B becomes the certification
+frozen SHA. The artifact records SHA A, not its own eventual commit. The
+external execution bundle binds SHA B and proves the A-to-B diff contains only
+approved evidence/binding paths and zero unexpected paths. This avoids a
+self-referential commit while preserving immutable provenance.
+
+The operator bundle refuses readiness if this independent ACL-v2 record is
+missing, differs from the fixed artifact, is caller-invented, reports
+`OUTCOME_UNKNOWN`, or reports any unexplained window.
+
+## Failure and recovery
+
+- Failure before a Drive dispatch commits: preserve `BASELINE`; no ACL recovery
+  is needed.
+- Forward dispatch `TARGET_CONFIRMED` but later certification failure: retain
+  `CRITICAL_WINDOW` and `reader`, complete the 1,810-second hold, then perform
+  the exact confirmed restoration sequence.
+- Either ACL dispatch `OUTCOME_UNKNOWN`: fail closed and request provider recovery; do
+  not retry or restore WAF baseline.
+- Restore `TARGET_CONFIRMED` but database response lost: inspect the durable
+  request identity, then resume finalization idempotently; do not dispatch a
+  second Drive update.
+- Any Preview substitution, principal mismatch, sharing-policy mismatch, WAF
+  drift, active writer, ambiguous Google call, or Production authority drift is
+  a STOP condition.
+
+## End-state invariant
+
+Step 11.6 is complete only when Production is observably back at:
+
+```text
+phase                         DORMANT
+scoring authority             GOOGLE
+participant identity          PASSPORT
+legacy Google admission       OPEN
+legacy Drive permission       writer / canEdit=true / canShare=true
+Vercel WAF                    BASELINE (exact restored fingerprint)
+critical WAF epoch            BASELINE_RESTORED (terminal/nonreusable)
+provider fence                REHEARSAL_RESTORED
+active legacy writers         0
+Supabase scoring ingress      disabled
+workers                       disabled
+first Supabase write possible false
+first Supabase write observed false
+```
+
+Step 12 still requires a separate explicit owner authorization.

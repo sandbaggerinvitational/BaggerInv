@@ -3,9 +3,13 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import {
+  WAF_CRITICAL_EPOCH_OPERATIONS,
+  buildWafCriticalEpochEnvelope,
+} from "./waf-critical-epoch.mjs";
 
 export const FIXED = Object.freeze({
-  schemaVersion: "bagger-step11.6-operator-v3",
+  schemaVersion: "bagger-step11.6-operator-v5-acl",
   environment: "PRODUCTION",
   projectRef: "ymqhhtxaywtqllynrmxe",
   projectUrl: "https://ymqhhtxaywtqllynrmxe.supabase.co",
@@ -23,54 +27,146 @@ export const FIXED = Object.freeze({
   providerFenceBranch: "feature/mock-tournament-qa-integration",
   providerFenceDirector: "CB01",
   providerFenceDescription: "STEP12_GOOGLE_WRITER_PROVIDER_FENCE",
+  providerFenceAbortConfirmation:
+    "ABORT_STEP12_GOOGLE_WRITER_PROVIDER_FENCE_INSTALL",
   providerFenceRemoveConfirmation: "REMOVE_STEP12_GOOGLE_WRITER_PROVIDER_FENCE",
-  ownerFreezeConfirmation: "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS CUTOVER",
+  rehearsalOwnerFreezeConfirmation:
+    "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS REHEARSAL",
+  cutoverOwnerFreezeConfirmation:
+    "I CONFIRM GOOGLE OWNER WRITES ARE FROZEN FOR THIS PRODUCTION CUTOVER",
   quiesceScope: "PRODUCTION_GOOGLE_CANONICAL_WRITER_QUIESCE",
-  originInventoryArtifact: "docs/evidence/step11-6-production-origin-inventory.json",
-  originInventorySchema: "step11-6-production-origin-inventory-v3",
-  originInventoryCount: 1291,
-  originInventoryFingerprint: "d238c5eeefef4606e0a05c2d0dbcee1a2b29cd07a2dd480435c0e75a0c3a91a6",
-  providerInventoryCount: 1291,
+  originInventoryArtifact: "docs/evidence/step11-6-production-origin-inventory-v4.json",
+  originInventorySchema: "step11-6-production-origin-inventory-v4",
+  originInventoryCount: 1292,
+  originInventoryFingerprint: "9d25299c72424a2b5c3c613649b7f07760fda64c0b0bb4823edaf2cd91622774",
+  providerInventoryCount: 1292,
   providerInventoryFingerprint:
-    "6488da5c86e50bd0c524a94a8c8f97c1aeb8576393fc14d68a7bd76ebe338692",
+    "abd27e4e2747c17053f6debf71ec0f523d39fea8e2383d4911f9dc4b87959cbe",
   credentialConfinementArtifact:
-    "docs/evidence/step11-6-production-google-credential-confinement.json",
+    "docs/evidence/step11-6-production-google-credential-confinement-v4.json",
   credentialConfinementSchema:
-    "step11-6-production-google-credential-confinement-v2",
-  credentialConfinementRecordCount: 1291,
+    "step11-6-production-google-credential-confinement-v4",
+  credentialConfinementRecordCount: 1292,
   credentialConfinementRecordsFingerprint:
-    "9ce65239f41086f56ea126e2491afe36ae90e85172a8536706f549912b27979b",
+    "7549a25c6cbdcec38ea0f331c8aff344cfee837a916ac8871fb5a4956f67838e",
   credentialConfinementEvidenceFingerprint:
-    "071ca9163f6a1033e17136ace4c82b3163aa7a1c29900300ddafeeda5b7bb133",
-  allMethodFenceRequiredHostCount: 8,
-  allMethodFenceRequiredHostsFingerprint:
+    "6f468334a508553cdb9230c14ad85969c89169df6a2ec88011fb2e7e30c9656a",
+  credentialConfinementEnvironmentReviewSchema:
+    "step11-6-vercel-environment-resource-review-v1",
+  credentialConfinementProviderEnvironmentRecordCount: 121,
+  credentialConfinementHiddenProductionEnvironmentRecordCount: 0,
+  credentialConfinementReviewedEnvironmentRecordCount: 12,
+  credentialConfinementReviewedEnvironmentRecordsFingerprint:
+    "b7d8cdd805ecbaa05b39b71aec9d904b3df8a0077a38e2adc8762312d3cf4d8a",
+  credentialConfinementEnvironmentReviewFingerprint:
+    "eae8a72c03308c75d8eea8b330e798b316842a6a3f05791c7acec1f0f1a2dd54",
+  credentialConfinementEnvironmentContinuityFingerprint:
+    "a5507591c0c3577e9638a8193706b689a7e6da902e6f6216b829df1d4be4254b",
+  sourceUnresolvedAllMethodHostCount: 8,
+  sourceUnresolvedAllMethodHostsFingerprint:
     "62f14a6635bc9ec16ce681e04b17bbd0f39e9ff55a858bbcb75f4aa75bc3bc4d",
+  allMethodFenceRequiredHostCount: 9,
+  allMethodFenceRequiredHostsFingerprint:
+    "0423e6a742d6527b10afc071856dbc6c5b1cca5e1ffb09a5d2523d0f04b31c0c",
   historicalSafeMethodWriterArtifact:
-    "docs/evidence/step11-6-historical-safe-method-google-writer.json",
+    "docs/evidence/step11-6-historical-safe-method-google-writer-v2.json",
   historicalSafeMethodWriterSchema:
-    "step11-6-historical-safe-method-google-writer-v1",
+    "step11-6-historical-safe-method-google-writer-v2",
   historicalSafeMethodWriterEvidenceFingerprint:
-    "6bf411a2e119e8552e6b3ac9ac51d8828e9fc853e5c43069dc40c31a6e794f28",
+    "6cb2ac60314de617f8c94d5d0814d710ec14b47eb4c49fdfa9662fdbe46fcd69",
   historicalSafeMethodWriterAffectedOriginCount: 236,
   historicalSafeMethodWriterAffectedOriginsFingerprint:
     "a8263e02ab7b65df938367fbf39769c70b501a614ebcdfa46800bda2e82de3a2",
   allMethodFenceRequiredPathCount: 1,
   allMethodFenceRequiredPathsFingerprint:
     "fc445deac5eb4c5369e21394fc2ddb42169192b7a297a1780875ed0dd276dcfa",
+  historicalWriterScopeArtifact:
+    "docs/evidence/step11-6-historical-production-google-writer-scope-v1.json",
+  historicalWriterScopeSchema:
+    "step11-6-historical-production-google-writer-scope-v1",
+  historicalWriterScopeEvidenceFingerprint:
+    "2f786886f4b0ec4f070757e8e23f462189304c722a015a260852ccd0888527cd",
+  aclAcceptanceArtifact:
+    "docs/evidence/step11-6-production-google-drive-acl-v2-acceptance-v1.json",
+  historicalCanonicalSheetCount: 17,
+  historicalCanonicalSheetsFingerprint:
+    "cf8e81dc38a72501fa87c2178f9a6fe06487dc8eeb3e3091169037941f2d2cb7",
+  historicalImmutableDenyOriginCount: 10,
+  historicalImmutableDenyOriginsFingerprint:
+    "1a687f3ea97d9e9d2fe65e6732be2c1d9b80aa563370338d26a71b23a3ffa12f",
+  historicalCurrentAliasAwareDenyOriginCount: 12,
+  historicalCurrentAliasAwareDenyOriginsFingerprint:
+    "3bbe7725448889d88678eb79501a3908613f7e3949f6a026e7b4855477540521",
+  activeAliasCensusRecordCount: 56,
+  activeAliasCensusRecordsFingerprint:
+    "c584b50803b59b52e06d8b699afb0cd22b00c980a3f8be0a7b78f7140f98da1a",
+  currentUnresolvedAliasCount: 1,
+  currentUnresolvedAliasesFingerprint:
+    "7b405a5825ff6abb30c24e48aee1681923df549ca47b044e48e8cb0bc83d1aec",
+  historicalWafCanonicalHostname: "baggerinv.com",
+  historicalWafRequiredAliasRecaptureCount: 2,
+  criticalWindowWafCanonicalHostname: "baggerinv.com",
+  criticalWindowWafRequiredAliasRecaptureCount: 2,
+  criticalWindowWafGroupCount: 5,
+  criticalWindowWafMinimumHoldSeconds: 1810,
+  legacyCompatibleBaselineWafMode: "BASELINE",
+  criticalWindowWafMode: "CRITICAL_WINDOW",
+  legacyDriveRoleOpen: "writer",
+  legacyDriveRoleClosed: "reader",
+  aclTransitionResultTarget: "TARGET_CONFIRMED",
+  aclTransitionResultUnknown: "OUTCOME_UNKNOWN",
+  aclAcceptanceSchema: "step11-6-production-google-drive-acl-v2-acceptance-v1",
+  providerAliasInventoryRecordCount: 56,
+  unsafeCourseAliasHostname:
+    "bagger-inv-git-agent-course-hole-be25e6-sandbagger-invitational.vercel.app",
+  unsafeCourseAliasDeploymentId: "dpl_73dJVxZVEXkUqrinj17RHVFcjP7j",
+  unsafeCourseAliasDeploymentHostname:
+    "bagger-kj3c0pkvm-sandbagger-invitational.vercel.app",
+  providerSettlementInstallWaitSeconds: 190,
+  providerSettlementReadbackWaitSeconds: 10,
+  providerSettlementMinimumTotalSeconds: 200,
+  providerSettlementFinishAndCloseRpc:
+    "finish_close_production_google_writer_provider_fence_install",
   requiredPriorLiveDeploymentId: "dpl_5uQB4VBY3FEgWHTS5vZYU2J9rmM2",
   requiredFrozenStep11DeploymentId: "dpl_CBgDhovX4cfQx15EJWWvm6Kti25j",
-  originInventoryCapturedAt: "2026-08-26T23:27:14.195Z",
+  originInventoryCapturedAt: "2026-08-27T01:50:43.767Z",
   originInventoryPageRecordsFingerprint:
-    "52d6db20fa7adf18aeb9678d0adc7b984855ae0315851e1fdf21e3c49e0d8b38",
-  minimumLiveOriginInventoryCount: 1291,
-  maximumLiveOriginInventoryCount: 1291 + 1,
-  quiesceFixedAliasOriginCount: 4,
+    "7f19f6f112e2b44b3f6979f7b600a7b926c961cf231fcb2bb583c915b2ababd5",
+  minimumLiveOriginInventoryCount: 1292,
+  maximumLiveOriginInventoryCount: 1292 + 1,
+  quiesceFixedAliasOriginCount: 3,
   quiesceCandidateAliasOriginCount: 1,
   quiesceProbeVectorCount: 11,
   migrationName:
-    "202608260039_production_all_project_provider_inventory_v3.sql",
-  migrationSha256: "14f1233ac8c61461ffdeae1df8b8be90a81c1236076d7493168a3542fddcda96",
+    "202608260040_production_provider_inventory_recertification_v4.sql",
+  migrationSha256: "__MIGRATION_040_SHA256_PENDING__",
   runbook: "docs/step12-production-cutover-runbook-v2.md",
+});
+
+const REVIEWED_PROJECT_WIDE_PREVIEW_EXCEPTION = Object.freeze({
+  recordTuple: ["name", "targets", "gitBranch"],
+  shadowedProjectWideRecords: [
+    ["GOOGLE_SHEETS_ID", ["preview"], null],
+    ["NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY", ["preview"], null],
+    ["NEXT_PUBLIC_SUPABASE_AUTH_URL", ["preview"], null],
+    ["PARTICIPANT_IDENTITY_AUTHORITY", ["preview"], null],
+    ["SCORING_AUTHORITY", ["preview"], null],
+  ],
+  requiredSameNameExactCandidateOverrides: [
+    ["GOOGLE_SHEETS_ID", ["preview"], FIXED.providerFenceBranch],
+    ["NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY", ["preview"],
+      FIXED.providerFenceBranch],
+    ["NEXT_PUBLIC_SUPABASE_AUTH_URL", ["preview"], FIXED.providerFenceBranch],
+    ["PARTICIPANT_IDENTITY_AUTHORITY", ["preview"],
+      FIXED.providerFenceBranch],
+    ["SCORING_AUTHORITY", ["preview"], FIXED.providerFenceBranch],
+  ],
+  unshadowedNonsecretProjectWideRecords: [
+    ["SUPABASE_PARTICIPANT_AUTH_REHEARSAL_ENABLED", ["preview"], null],
+    ["SUPABASE_PARTICIPANT_IDENTITY_SHADOW_ENABLED", ["preview"], null],
+  ],
+  unreviewedProjectWideRelevantRecordAllowed: false,
+  wrongBranchRelevantRecordAllowed: false,
 });
 
 const HEX40 = /^[0-9a-f]{40}$/;
@@ -121,6 +217,7 @@ const PROVIDER_ACTIONS = new Set([
   "finalize-provider-quiesce",
   "inspect-provider-quiesce",
   "install-persistent-provider-fence",
+  "abort-persistent-provider-fence-install",
   "inspect-persistent-provider-fence",
   "refresh-persistent-provider-fence",
   "remove-persistent-provider-fence",
@@ -231,6 +328,12 @@ const PROVIDER_ACTION_INPUT_KEYS = Object.freeze({
     "action", "operationRequestId", "installRequestId", "quiesceEvidenceId",
     "expectedCommitSha", "expectedWorkbookId", "expectedBranch",
     "expectedDirectorPlayerId", "expectedBaselineFingerprint",
+    "expectedCanonicalValueFingerprint", "confirmation",
+  ],
+  "abort-persistent-provider-fence-install": [
+    "action", "operationRequestId", "installRequestId", "fenceId",
+    "quiesceEvidenceId", "expectedCommitSha", "expectedWorkbookId",
+    "expectedBranch", "expectedDirectorPlayerId", "expectedBaselineFingerprint",
     "expectedCanonicalValueFingerprint", "confirmation",
   ],
   "inspect-persistent-provider-fence": [
@@ -412,7 +515,18 @@ export const OPERATIONS = Object.freeze({
     endpoint: FIXED.providerControlEndpoint,
     receiptRpcs: [
       "begin_production_google_writer_provider_fence_install",
-      "finish_production_google_writer_provider_fence_install",
+      "record_production_google_writer_provider_fence_settlement",
+      "record_production_google_writer_provider_fence_settlement",
+      "finish_close_production_google_writer_provider_fence_install",
+    ],
+  },
+  "abort-persistent-provider-fence-install": {
+    kind: "provider-action-payload",
+    rpc: null,
+    endpoint: FIXED.providerControlEndpoint,
+    receiptRpcs: [
+      "abort_production_google_writer_provider_fence_install",
+      "inspect_production_google_writer_provider_fence",
     ],
   },
   "inspect-persistent-provider-fence": {
@@ -550,6 +664,15 @@ export function canonicalJson(value) {
   return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
 }
 
+export function exactReviewedProjectWidePreviewException(value) {
+  try {
+    return canonicalJson(value) ===
+      canonicalJson(REVIEWED_PROJECT_WIDE_PREVIEW_EXCEPTION);
+  } catch {
+    return false;
+  }
+}
+
 export function sha256Hex(value) {
   return createHash("sha256").update(String(value), "utf8").digest("hex");
 }
@@ -585,13 +708,14 @@ let retainedOriginInventoryByOrigin;
 let retainedOriginInventoryByDeploymentId;
 let credentialConfinementBinding;
 let historicalSafeMethodWriterBinding;
+let historicalWriterScopeBinding;
 
 export function productionHistoricalSafeMethodWriterBinding() {
   if (historicalSafeMethodWriterBinding) return historicalSafeMethodWriterBinding;
   let artifact;
   try {
     artifact = JSON.parse(readFileSync(new URL(
-      "../../docs/evidence/step11-6-historical-safe-method-google-writer.json",
+      "../../docs/evidence/step11-6-historical-safe-method-google-writer-v2.json",
       import.meta.url,
     ), "utf8"));
   } catch {
@@ -645,6 +769,318 @@ export function productionHistoricalSafeMethodWriterBinding() {
   return historicalSafeMethodWriterBinding;
 }
 
+export function productionHistoricalWriterScopeBinding() {
+  if (historicalWriterScopeBinding) return historicalWriterScopeBinding;
+  let artifact;
+  try {
+    artifact = JSON.parse(readFileSync(new URL(
+      "../../docs/evidence/step11-6-historical-production-google-writer-scope-v1.json",
+      import.meta.url,
+    ), "utf8"));
+  } catch {
+    refuse("HISTORICAL_WRITER_SCOPE_ARTIFACT_UNAVAILABLE",
+      "The historical Production Google writer-scope artifact could not be loaded.");
+  }
+  const { evidenceFingerprint, ...base } = artifact;
+  const source = artifact.retainedSourceAudit;
+  const sheets = artifact.canonicalWorksheetScope;
+  const fence = artifact.persistentProviderFence;
+  const waf = fence?.permanentWafContract;
+  const settlement = artifact.primaryCanonicalProviderSettlement;
+  if (artifact.schemaVersion !== FIXED.historicalWriterScopeSchema ||
+      evidenceFingerprint !== FIXED.historicalWriterScopeEvidenceFingerprint ||
+      sha256Hex(JSON.stringify(base)) !== evidenceFingerprint ||
+      artifact.inputs?.activeAliasRecordCount !== FIXED.activeAliasCensusRecordCount ||
+      artifact.inputs?.activeAliasRecordsFingerprint !==
+        FIXED.activeAliasCensusRecordsFingerprint ||
+      source?.sourceUnresolvedReadyDeploymentCount !==
+        FIXED.sourceUnresolvedAllMethodHostCount ||
+      source?.sourceUnresolvedReadyOriginsFingerprint !==
+        FIXED.sourceUnresolvedAllMethodHostsFingerprint ||
+      sheets?.currentUnionHistoricalCanonicalSheetCount !==
+        FIXED.historicalCanonicalSheetCount ||
+      sheets?.currentUnionHistoricalCanonicalSheetsFingerprint !==
+        FIXED.historicalCanonicalSheetsFingerprint ||
+      sheets?.currentMinusHistorical?.length !== 0 ||
+      sheets?.historicalMinusCurrent?.length !== 0 ||
+      sheets?.unresolvedDynamicCanonicalTargetCount !== 0 ||
+      fence?.immutableAllMethodDenyOriginCount !==
+        FIXED.historicalImmutableDenyOriginCount ||
+      fence?.immutableAllMethodDenyOriginsFingerprint !==
+        FIXED.historicalImmutableDenyOriginsFingerprint ||
+      fence?.currentAliasAwareAllMethodDenyOriginCount !==
+        FIXED.historicalCurrentAliasAwareDenyOriginCount ||
+      fence?.currentAliasAwareAllMethodDenyOriginsFingerprint !==
+        FIXED.historicalCurrentAliasAwareDenyOriginsFingerprint ||
+      waf?.canonicalHostname !== FIXED.historicalWafCanonicalHostname ||
+      waf?.action !== "DENY" || waf?.active !== true ||
+      waf?.projectWide !== true || waf?.earlierActiveBypassRuleCount !== 0 ||
+      waf?.noncanonicalCanonicalMutationGroup?.hostnameOperator !==
+        "DOES_NOT_EQUAL" ||
+      waf?.noncanonicalCanonicalMutationGroup?.requestPathOperator !==
+        "DOES_NOT_EQUAL" ||
+      waf?.noncanonicalCanonicalMutationGroup?.requestPath !==
+        FIXED.providerControlEndpoint ||
+      waf?.noncanonicalCanonicalMutationGroup?.methodOperator !==
+        "IS_NOT_ANY_OF" ||
+      canonicalJson(waf?.noncanonicalCanonicalMutationGroup?.methods) !==
+        canonicalJson(["GET", "HEAD", "OPTIONS"]) ||
+      fence?.executableAllMethodHostOriginCount !==
+        FIXED.allMethodFenceRequiredHostCount ||
+      fence?.executableAllMethodHostOriginsFingerprint !==
+        FIXED.allMethodFenceRequiredHostsFingerprint ||
+      waf?.sourceUnresolvedAndUnsafeAliasAllMethodGroup?.hostCount !==
+        FIXED.allMethodFenceRequiredHostCount ||
+      waf?.sourceUnresolvedAndUnsafeAliasAllMethodGroup?.hostsFingerprint !==
+        FIXED.allMethodFenceRequiredHostsFingerprint ||
+      waf?.sourceUnresolvedAndUnsafeAliasAllMethodGroup
+        ?.sourceUnresolvedImmutableOriginCount !==
+        FIXED.sourceUnresolvedAllMethodHostCount ||
+      waf?.sourceUnresolvedAndUnsafeAliasAllMethodGroup
+        ?.sourceUnresolvedImmutableOriginsFingerprint !==
+        FIXED.sourceUnresolvedAllMethodHostsFingerprint ||
+      waf?.sourceUnresolvedAndUnsafeAliasAllMethodGroup?.exactUnsafeAliasCount !==
+        FIXED.currentUnresolvedAliasCount ||
+      waf?.sourceUnresolvedAndUnsafeAliasAllMethodGroup
+        ?.exactUnsafeAliasesFingerprint !==
+        FIXED.currentUnresolvedAliasesFingerprint ||
+      waf?.sourceUnresolvedAndUnsafeAliasAllMethodGroup
+        ?.exactUnsafeAliasIncludedAsIncomingRequestHostname !== true ||
+      waf?.noncanonicalRoundScorecardsAllMethodGroup?.hostnameOperator !==
+        "DOES_NOT_EQUAL" ||
+      canonicalJson(waf?.noncanonicalRoundScorecardsAllMethodGroup?.paths) !==
+        canonicalJson(["/api/cron/round-scorecards-archive"]) ||
+      waf?.noncanonicalRoundScorecardsAllMethodGroup?.methods !== "ALL_METHODS" ||
+      waf?.aliasRecapture?.requiredConsecutiveProviderCaptures !==
+        FIXED.historicalWafRequiredAliasRecaptureCount ||
+      waf?.aliasRecapture?.providerSignedBeginAndFinalizeCapturesRequired !== true ||
+      waf?.aliasRecapture?.browserSuppliedAliasInventoryAllowed !== false ||
+      waf?.aliasRecapture?.providerAdminChangeFreezeRequired !== true ||
+      waf?.aliasRecapture?.failClosedOnAnyAliasDrift !== true ||
+      waf?.historicalEvidenceBindings?.immutableOriginCount !==
+        FIXED.historicalImmutableDenyOriginCount ||
+      waf?.historicalEvidenceBindings?.immutableOriginsFingerprint !==
+        FIXED.historicalImmutableDenyOriginsFingerprint ||
+      waf?.historicalEvidenceBindings?.aliasAwareOriginCount !==
+        FIXED.historicalCurrentAliasAwareDenyOriginCount ||
+      waf?.historicalEvidenceBindings?.aliasAwareOriginsFingerprint !==
+        FIXED.historicalCurrentAliasAwareDenyOriginsFingerprint ||
+      settlement?.minimumDatabaseClockSecondsAfterT0ForFirstReadback !==
+        FIXED.providerSettlementInstallWaitSeconds ||
+      settlement?.minimumDatabaseClockSecondsBetweenIndependentReadbacks !==
+        FIXED.providerSettlementReadbackWaitSeconds ||
+      settlement?.minimumTotalDatabaseClockSecondsAfterT0 !==
+        FIXED.providerSettlementMinimumTotalSeconds ||
+      settlement?.finishAndCloseRpc !==
+        FIXED.providerSettlementFinishAndCloseRpc ||
+      settlement?.acceptedAsPrimaryProof !== false ||
+      artifact.conclusion?.unexplainedConcurrencyWindowCount !== 1) {
+    refuse("HISTORICAL_WRITER_SCOPE_ARTIFACT_INVALID",
+      "The historical Production Google writer-scope artifact was invalid or drifted.");
+  }
+  historicalWriterScopeBinding = Object.freeze({
+    artifact: FIXED.historicalWriterScopeArtifact,
+    schemaVersion: artifact.schemaVersion,
+    evidenceFingerprint,
+    canonicalSheetCount: sheets.currentUnionHistoricalCanonicalSheetCount,
+    canonicalSheetsFingerprint:
+      sheets.currentUnionHistoricalCanonicalSheetsFingerprint,
+    sourceUnresolvedImmutableOriginCount:
+      source.sourceUnresolvedReadyDeploymentCount,
+    sourceUnresolvedImmutableOriginsFingerprint:
+      source.sourceUnresolvedReadyOriginsFingerprint,
+    historicalImmutableOriginCount: fence.immutableAllMethodDenyOriginCount,
+    historicalImmutableOriginsFingerprint:
+      fence.immutableAllMethodDenyOriginsFingerprint,
+    historicalAliasAwareOriginCount:
+      fence.currentAliasAwareAllMethodDenyOriginCount,
+    historicalAliasAwareOriginsFingerprint:
+      fence.currentAliasAwareAllMethodDenyOriginsFingerprint,
+    activeAliasRecordCount: artifact.inputs.activeAliasRecordCount,
+    activeAliasRecordsFingerprint: artifact.inputs.activeAliasRecordsFingerprint,
+    currentUnresolvedAliasCount:
+      waf.sourceUnresolvedAndUnsafeAliasAllMethodGroup.exactUnsafeAliasCount,
+    currentUnresolvedAliasesFingerprint:
+      waf.sourceUnresolvedAndUnsafeAliasAllMethodGroup.exactUnsafeAliasesFingerprint,
+    settlementAcceptedAsPrimaryProof: settlement.acceptedAsPrimaryProof,
+    unexplainedConcurrencyWindowCount:
+      artifact.conclusion.unexplainedConcurrencyWindowCount,
+  });
+  return historicalWriterScopeBinding;
+}
+
+const ACL_V2_ACCEPTANCE_KEYS = Object.freeze([
+  "artifactPath", "schemaVersion", "acceptanceFingerprint",
+  "acceptedAsPrimaryProof",
+  "unexplainedConcurrencyWindowCount", "historicalWriterScopeArtifact",
+  "historicalWriterScopeEvidenceFingerprint", "rehearsalCandidateSha",
+  "rehearsalDeploymentId",
+  "migrationSha256", "productionProjectRef", "sourceWorkbookId",
+  "originInventoryFingerprint", "credentialConfinementEvidenceFingerprint",
+  "lifecycleMode", "mechanism", "baselineWafMode", "criticalWindowWafMode",
+  "criticalWindowWafGroupCount", "baselineWafFingerprint",
+  "criticalWindowWafFingerprint", "restoredWafFingerprint",
+  "criticalWindowActivatedAt", "criticalWindowHeldSeconds",
+  "criticalWindowMinimumHoldSeconds", "fenceId", "installRequestId",
+  "quiesceEvidenceId", "restoreQuiesceEvidenceId", "forwardDispatchId",
+  "forwardDispatchResult", "forwardTransitionProofFingerprint",
+  "aclReaderConfirmedAt", "reverseDispatchId", "reverseDispatchResult",
+  "reverseTransitionProofFingerprint", "restoreCriticalWindowActivatedAt",
+  "aclWriterRestoredAt", "rehearsalRestoredAt",
+  "settlementReadback1Id", "settlementReadback2Id", "legacyRoleBefore",
+  "legacyRoleDuring", "legacyRoleAfter", "legacyCanEditDuring",
+  "legacyCanShareDuring", "legacyPrincipalFingerprint",
+  "unknownAclDispatchCount", "wafBaselineRestored",
+  "googleDataMutationCount", "supabaseCanonicalWriteCount",
+  "oldDeploymentEnforcementPassed", "staleClientEnforcementPassed",
+  "lowLevelWriterEnforcementPassed", "previewIsolationPassed",
+  "restoredProductionStatePassed", "capturedAt",
+]);
+
+export function computeAclV2AcceptanceFingerprint(acceptance) {
+  requireObject(acceptance, "ACL_V2_ACCEPTANCE_REQUIRED", "aclV2Acceptance");
+  const material = clone(acceptance);
+  delete material.acceptanceFingerprint;
+  return sha256Hex(canonicalJson({
+    domain: "BAGGER_STEP11_6_PRODUCTION_GOOGLE_DRIVE_ACL_V2_ACCEPTANCE_V1",
+    acceptance: material,
+  }));
+}
+
+let aclV2AcceptanceArtifactTestOverride = null;
+
+/** Test-only immutable-artifact seam. Production CLI paths always read the
+ * fixed repository artifact. This exists so focused tests can exercise the
+ * post-rehearsal state before the real provider/DB-derived artifact exists. */
+export function setAclV2AcceptanceArtifactForTest(artifact) {
+  const testContext = process.execArgv.includes("--test") ||
+    String(process.argv[1] || "").endsWith("/operator.test.mjs");
+  if (!testContext) {
+    refuse("ACL_V2_ACCEPTANCE_TEST_OVERRIDE_FORBIDDEN",
+      "The ACL-v2 artifact override is available only to the Node test runner.");
+  }
+  aclV2AcceptanceArtifactTestOverride = clone(requireObject(
+    artifact, "ACL_V2_ACCEPTANCE_REQUIRED", "aclV2AcceptanceArtifact"));
+}
+
+function loadAclV2AcceptanceArtifact() {
+  if (aclV2AcceptanceArtifactTestOverride) {
+    return { artifact: clone(aclV2AcceptanceArtifactTestOverride), error: null };
+  }
+  try {
+    const artifact = JSON.parse(readFileSync(new URL(
+      "../../docs/evidence/step11-6-production-google-drive-acl-v2-acceptance-v1.json",
+      import.meta.url,
+    ), "utf8"));
+    assertNoSecrets(artifact, FIXED.aclAcceptanceArtifact);
+    return { artifact, error: null };
+  } catch (error) {
+    return {
+      artifact: null,
+      error: `ACL-v2 acceptance artifact unavailable: ${error?.message || "unknown error"}`,
+    };
+  }
+}
+
+function validateAclV2Acceptance(manifest) {
+  const acceptance = requireObject(manifest.aclV2Acceptance,
+    "ACL_V2_ACCEPTANCE_REQUIRED", "aclV2Acceptance");
+  if (!exactObjectKeys(acceptance, ACL_V2_ACCEPTANCE_KEYS)) {
+    refuse("ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+      "aclV2Acceptance must have the exact sanitized ACL-v2 field set.");
+  }
+  requireEqual(acceptance.artifactPath, FIXED.aclAcceptanceArtifact,
+    "ACL_V2_ACCEPTANCE_BINDING_DRIFT", "aclV2Acceptance.artifactPath");
+  requireEqual(acceptance.schemaVersion, FIXED.aclAcceptanceSchema,
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID", "aclV2Acceptance.schemaVersion");
+  requireEqual(acceptance.historicalWriterScopeArtifact,
+    FIXED.historicalWriterScopeArtifact, "ACL_V2_ACCEPTANCE_BINDING_DRIFT",
+    "aclV2Acceptance.historicalWriterScopeArtifact");
+  requireEqual(acceptance.historicalWriterScopeEvidenceFingerprint,
+    FIXED.historicalWriterScopeEvidenceFingerprint,
+    "ACL_V2_ACCEPTANCE_BINDING_DRIFT",
+    "aclV2Acceptance.historicalWriterScopeEvidenceFingerprint");
+  requireEqual(acceptance.productionProjectRef, FIXED.projectRef,
+    "ACL_V2_ACCEPTANCE_BINDING_DRIFT", "aclV2Acceptance.productionProjectRef");
+  requireEqual(acceptance.sourceWorkbookId, FIXED.sourceWorkbookId,
+    "ACL_V2_ACCEPTANCE_BINDING_DRIFT", "aclV2Acceptance.sourceWorkbookId");
+  requireEqual(acceptance.originInventoryFingerprint,
+    FIXED.originInventoryFingerprint, "ACL_V2_ACCEPTANCE_BINDING_DRIFT",
+    "aclV2Acceptance.originInventoryFingerprint");
+  requireEqual(acceptance.credentialConfinementEvidenceFingerprint,
+    FIXED.credentialConfinementEvidenceFingerprint,
+    "ACL_V2_ACCEPTANCE_BINDING_DRIFT",
+    "aclV2Acceptance.credentialConfinementEvidenceFingerprint");
+  requireEqual(acceptance.lifecycleMode, "REHEARSAL",
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID", "aclV2Acceptance.lifecycleMode");
+  requireEqual(acceptance.mechanism, "DRIVE_ACL_EXACT_LEGACY_PERMISSION_V2",
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID", "aclV2Acceptance.mechanism");
+  requireEqual(acceptance.baselineWafMode, FIXED.legacyCompatibleBaselineWafMode,
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID", "aclV2Acceptance.baselineWafMode");
+  requireEqual(acceptance.criticalWindowWafMode, FIXED.criticalWindowWafMode,
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+    "aclV2Acceptance.criticalWindowWafMode");
+  requireEqual(acceptance.criticalWindowWafGroupCount,
+    FIXED.criticalWindowWafGroupCount, "ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+    "aclV2Acceptance.criticalWindowWafGroupCount");
+  requireEqual(acceptance.criticalWindowMinimumHoldSeconds,
+    FIXED.criticalWindowWafMinimumHoldSeconds,
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+    "aclV2Acceptance.criticalWindowMinimumHoldSeconds");
+  for (const field of [
+    "acceptedAsPrimaryProof", "legacyCanEditDuring", "legacyCanShareDuring",
+    "wafBaselineRestored", "oldDeploymentEnforcementPassed",
+    "staleClientEnforcementPassed", "lowLevelWriterEnforcementPassed",
+    "previewIsolationPassed", "restoredProductionStatePassed",
+  ]) requireBoolean(acceptance[field], "ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+    `aclV2Acceptance.${field}`);
+  for (const field of [
+    "unexplainedConcurrencyWindowCount", "criticalWindowHeldSeconds",
+    "criticalWindowMinimumHoldSeconds", "unknownAclDispatchCount",
+    "googleDataMutationCount", "supabaseCanonicalWriteCount",
+  ]) {
+    requireInteger(acceptance[field], "ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+      `aclV2Acceptance.${field}`);
+    if (acceptance[field] < 0) refuse("ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+      `aclV2Acceptance.${field} cannot be negative.`);
+  }
+  for (const field of [
+    "acceptanceFingerprint", "rehearsalCandidateSha", "rehearsalDeploymentId",
+    "migrationSha256",
+    "baselineWafFingerprint", "criticalWindowWafFingerprint",
+    "restoredWafFingerprint", "criticalWindowActivatedAt", "forwardDispatchId",
+    "reverseDispatchId", "settlementReadback1Id", "settlementReadback2Id",
+    "fenceId", "installRequestId", "quiesceEvidenceId",
+    "restoreQuiesceEvidenceId", "forwardTransitionProofFingerprint",
+    "aclReaderConfirmedAt", "reverseTransitionProofFingerprint",
+    "restoreCriticalWindowActivatedAt", "aclWriterRestoredAt",
+    "rehearsalRestoredAt", "legacyRoleDuring",
+    "legacyPrincipalFingerprint", "capturedAt",
+  ]) requireString(acceptance[field], "ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+    `aclV2Acceptance.${field}`);
+  for (const field of ["forwardDispatchResult", "reverseDispatchResult"]) {
+    if (!new Set(["NOT_DISPATCHED", FIXED.aclTransitionResultTarget,
+      FIXED.aclTransitionResultUnknown]).has(acceptance[field])) {
+      refuse("ACL_V2_ACCEPTANCE_CONTRACT_INVALID",
+        `aclV2Acceptance.${field} is not a certified ACL result.`);
+    }
+  }
+  requireEqual(acceptance.legacyRoleBefore, FIXED.legacyDriveRoleOpen,
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID", "aclV2Acceptance.legacyRoleBefore");
+  requireEqual(acceptance.legacyRoleAfter, FIXED.legacyDriveRoleOpen,
+    "ACL_V2_ACCEPTANCE_CONTRACT_INVALID", "aclV2Acceptance.legacyRoleAfter");
+  if (!unresolved(acceptance.legacyRoleDuring)) {
+    requireEqual(acceptance.legacyRoleDuring, FIXED.legacyDriveRoleClosed,
+      "ACL_V2_ACCEPTANCE_CONTRACT_INVALID", "aclV2Acceptance.legacyRoleDuring");
+  }
+  if (!unresolved(acceptance.acceptanceFingerprint)) {
+    requireResolved(acceptance.acceptanceFingerprint, HEX64,
+      "ACL_V2_ACCEPTANCE_FINGERPRINT_INVALID",
+      "aclV2Acceptance.acceptanceFingerprint");
+  }
+  return acceptance;
+}
+
 /**
  * Revalidate the repository-retained all-project provider census without ever
  * accepting an operator-supplied origin list. The application route repeats
@@ -656,7 +1092,7 @@ export function productionOriginInventoryBinding() {
   let artifact;
   try {
     artifact = JSON.parse(readFileSync(new URL(
-      "../../docs/evidence/step11-6-production-origin-inventory.json",
+      "../../docs/evidence/step11-6-production-origin-inventory-v4.json",
       import.meta.url,
     ), "utf8"));
   } catch {
@@ -695,7 +1131,8 @@ export function productionOriginInventoryBinding() {
   const requiredDeployments = {
     priorLive: FIXED.requiredPriorLiveDeploymentId,
     frozenStep11: FIXED.requiredFrozenStep11DeploymentId,
-    step11_6Candidate: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+    step11_6CandidateV1: "dpl_2oK3GmMa8f93wqjHNp1Gp2Y6Paox",
+    step11_6CandidateV2: "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
   };
   if (!exactObjectKeys(artifact, [
     "schemaVersion", "vercelProjectId", "vercelTeamId", "capturedAt",
@@ -892,6 +1329,13 @@ export function productionOriginInventoryBinding() {
       "PROJECT_PREVIEW", "READY",
       "acb7fa3de11c8e6e5704c41a22b1693b42428b7b70c1d9ed73763ea6330ddb8e",
     ],
+    [
+      "dpl_Bb75GADMcDdvVhQbrBb1e9dKp8Bm",
+      "0671bb3b84ac5846218ea60838fe4e1cc07de97f",
+      "https://bagger-6lfjugfk7-sandbagger-invitational.vercel.app",
+      "PROJECT_PREVIEW", "READY",
+      "23d503936f3f41ede80f5e03d7b5df423d43d120d88fbf5c2aeb781866628913",
+    ],
   ];
   if (records.some((record, index) =>
         keys[index] !== `${sorted[index].deploymentId}\n${sorted[index].origin}`) ||
@@ -905,7 +1349,7 @@ export function productionOriginInventoryBinding() {
       canonicalJson(expectedCoverageSummary) !==
         canonicalJson(artifact.coverageSummary) || !exactPagination ||
       nullShaCount !== 8 || productionTargetCount !== 458 ||
-      projectPreviewCount !== 833 ||
+      projectPreviewCount !== 834 ||
       !records.some((record) =>
         record.deploymentId === FIXED.requiredPriorLiveDeploymentId) ||
       !records.some((record) =>
@@ -956,7 +1400,7 @@ export function productionCredentialConfinementBinding() {
   let artifact;
   try {
     artifact = JSON.parse(readFileSync(new URL(
-      "../../docs/evidence/step11-6-production-google-credential-confinement.json",
+      "../../docs/evidence/step11-6-production-google-credential-confinement-v4.json",
       import.meta.url,
     ), "utf8"));
   } catch {
@@ -977,7 +1421,8 @@ export function productionCredentialConfinementBinding() {
     "markerPatterns", "gitObjectAudit", "classifications",
     "markerBearingPreviewPathSummary", "canonicalMutationRouteAudit",
     "allMethodFenceRequiredHosts", "providerInventoryContract",
-    "environmentScopeContract", "dynamicCandidateContract", "evidenceFingerprint",
+    "environmentScopeContract", "providerEnvironmentResourceReview",
+    "dynamicCandidateContract", "evidenceFingerprint",
   ]) || artifact.schemaVersion !== FIXED.credentialConfinementSchema ||
       artifact.originInventorySchemaVersion !== origin.schemaVersion ||
       artifact.originInventoryRecordCount !== origin.recordCount ||
@@ -997,14 +1442,14 @@ export function productionCredentialConfinementBinding() {
       artifact.gitObjectAudit?.nullShaProviderBlockedRecordCount !== 3 ||
       artifact.canonicalMutationRouteAudit?.dedicatedWriterMarkerMatchCount !== 0 ||
       artifact.allMethodFenceRequiredHosts?.count !==
-        FIXED.allMethodFenceRequiredHostCount ||
+        FIXED.sourceUnresolvedAllMethodHostCount ||
       artifact.allMethodFenceRequiredHosts?.fingerprint !==
-        FIXED.allMethodFenceRequiredHostsFingerprint ||
+        FIXED.sourceUnresolvedAllMethodHostsFingerprint ||
       !Array.isArray(artifact.allMethodFenceRequiredHosts?.origins) ||
       artifact.allMethodFenceRequiredHosts.origins.length !==
-        FIXED.allMethodFenceRequiredHostCount ||
+        FIXED.sourceUnresolvedAllMethodHostCount ||
       sha256Hex(JSON.stringify(artifact.allMethodFenceRequiredHosts.origins)) !==
-        FIXED.allMethodFenceRequiredHostsFingerprint ||
+        FIXED.sourceUnresolvedAllMethodHostsFingerprint ||
       artifact.providerInventoryContract?.providerRecordCount !==
         origin.providerRecordCount ||
       artifact.providerInventoryContract?.providerRecordsFingerprint !==
@@ -1013,10 +1458,89 @@ export function productionCredentialConfinementBinding() {
       artifact.providerInventoryContract?.projectionRecordsFingerprint !==
         origin.recordsFingerprint ||
       artifact.providerInventoryContract?.oneToOneProjection !== true ||
+      artifact.dynamicCandidateContract?.rehearsalTarget !== "PREVIEW" ||
+      artifact.dynamicCandidateContract?.cutoverTarget !== "PREVIEW" ||
+      !Array.isArray(
+        artifact.dynamicCandidateContract?.permittedAdditionScopeClasses,
+      ) ||
+      artifact.dynamicCandidateContract.permittedAdditionScopeClasses.length !== 1 ||
+      artifact.dynamicCandidateContract.permittedAdditionScopeClasses[0] !==
+        "PROJECT_PREVIEW" ||
       artifact.dynamicCandidateContract?.arbitraryProductionTargetAdditionAllowed !== false ||
       artifact.dynamicCandidateContract?.differentShaAdditionAllowed !== false ||
+      !exactObjectKeys(artifact.environmentScopeContract, [
+        "broadLegacyNames", "broadLegacyTargets",
+        "dedicatedAndProductionResourcePreviewScope", "productionScope",
+        "reviewedProjectWidePreviewException",
+        "duplicateUnscopedDedicatedPreviewRecordAllowed",
+        "providerEnvironmentResourceReview",
+        "hiddenProductionEnvironmentRecordsAllowed",
+      ]) ||
+      !exactReviewedProjectWidePreviewException(artifact.environmentScopeContract
+        ?.reviewedProjectWidePreviewException) ||
       artifact.environmentScopeContract
-        ?.duplicateUnscopedDedicatedPreviewRecordAllowed !== false) {
+        ?.duplicateUnscopedDedicatedPreviewRecordAllowed !== false ||
+      artifact.environmentScopeContract
+        ?.hiddenProductionEnvironmentRecordsAllowed !== false ||
+      !exactObjectKeys(artifact.providerEnvironmentResourceReview, [
+        "schemaVersion", "recordTuple", "providerEnvironmentRecordCount",
+        "hiddenProductionEnvCount", "recordCount", "recordsFingerprint",
+        "records", "ownerCertifiedContinuityBaseline",
+        "ownerCertifiedContinuityBaselineFingerprint",
+        "providerPlaintextValueReviewPerformed",
+        "providerCiphertextWhereExposedAndVersionContinuityRequired",
+        "rawValuesRetained", "reviewFingerprint",
+      ]) ||
+      artifact.providerEnvironmentResourceReview.schemaVersion !==
+        FIXED.credentialConfinementEnvironmentReviewSchema ||
+      artifact.providerEnvironmentResourceReview.providerEnvironmentRecordCount !==
+        FIXED.credentialConfinementProviderEnvironmentRecordCount ||
+      artifact.providerEnvironmentResourceReview.hiddenProductionEnvCount !==
+        FIXED.credentialConfinementHiddenProductionEnvironmentRecordCount ||
+      artifact.providerEnvironmentResourceReview.recordCount !==
+        FIXED.credentialConfinementReviewedEnvironmentRecordCount ||
+      artifact.providerEnvironmentResourceReview.recordsFingerprint !==
+        FIXED.credentialConfinementReviewedEnvironmentRecordsFingerprint ||
+      artifact.providerEnvironmentResourceReview.reviewFingerprint !==
+        FIXED.credentialConfinementEnvironmentReviewFingerprint ||
+      artifact.providerEnvironmentResourceReview
+        .ownerCertifiedContinuityBaselineFingerprint !==
+          FIXED.credentialConfinementEnvironmentContinuityFingerprint ||
+      artifact.providerEnvironmentResourceReview
+        .providerPlaintextValueReviewPerformed !== false ||
+      artifact.providerEnvironmentResourceReview
+        .providerCiphertextWhereExposedAndVersionContinuityRequired !== true ||
+      artifact.providerEnvironmentResourceReview.rawValuesRetained !== false ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.schemaVersion !== FIXED.credentialConfinementEnvironmentReviewSchema ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.providerEnvironmentRecordCount !==
+          FIXED.credentialConfinementProviderEnvironmentRecordCount ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.hiddenProductionEnvCount !==
+          FIXED.credentialConfinementHiddenProductionEnvironmentRecordCount ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.recordCount !== FIXED.credentialConfinementReviewedEnvironmentRecordCount ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.recordsFingerprint !==
+          FIXED.credentialConfinementReviewedEnvironmentRecordsFingerprint ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.reviewFingerprint !== FIXED.credentialConfinementEnvironmentReviewFingerprint ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.ownerCertifiedContinuityBaselineFingerprint !==
+          FIXED.credentialConfinementEnvironmentContinuityFingerprint ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.providerPlaintextValueReviewPerformed !== false ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.providerCiphertextWhereExposedAndVersionContinuityRequired !== true ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.rawValuesRetained !== false ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.exactProviderMetadataRequired !== true ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.ciphertextHashRequiredWhereProviderExposesCiphertext !== true ||
+      artifact.environmentScopeContract.providerEnvironmentResourceReview
+        ?.sensitiveRedactedRecordsUseExactVersionMetadata !== true) {
     refuse("CREDENTIAL_CONFINEMENT_ARTIFACT_INVALID",
       "The Production Google credential-confinement artifact was invalid.");
   }
@@ -1026,6 +1550,21 @@ export function productionCredentialConfinementBinding() {
     recordCount: artifact.classificationRecordCount,
     recordsFingerprint: artifact.classificationRecordsFingerprint,
     evidenceFingerprint,
+    environmentReviewSchema:
+      artifact.providerEnvironmentResourceReview.schemaVersion,
+    providerEnvironmentRecordCount:
+      artifact.providerEnvironmentResourceReview.providerEnvironmentRecordCount,
+    hiddenProductionEnvironmentRecordCount:
+      artifact.providerEnvironmentResourceReview.hiddenProductionEnvCount,
+    reviewedEnvironmentRecordCount:
+      artifact.providerEnvironmentResourceReview.recordCount,
+    reviewedEnvironmentRecordsFingerprint:
+      artifact.providerEnvironmentResourceReview.recordsFingerprint,
+    environmentReviewFingerprint:
+      artifact.providerEnvironmentResourceReview.reviewFingerprint,
+    environmentContinuityFingerprint:
+      artifact.providerEnvironmentResourceReview
+        .ownerCertifiedContinuityBaselineFingerprint,
     allMethodFenceRequiredHostCount:
       artifact.allMethodFenceRequiredHosts.count,
     allMethodFenceRequiredHostsFingerprint:
@@ -1075,6 +1614,9 @@ function validateExecutionPolicy(manifest) {
   }
   requireBoolean(execution.step12OwnerAuthorizationRecorded,
     "EXECUTION_POLICY_REQUIRED", "execution.step12OwnerAuthorizationRecorded");
+  if (execution.step12StartedAt !== null) requireTimestamp(
+    execution.step12StartedAt, "EXECUTION_POLICY_REQUIRED",
+    "execution.step12StartedAt");
 }
 
 function validateResources(manifest) {
@@ -1101,16 +1643,24 @@ function validateResources(manifest) {
 function assertRoutingRuleShape(rule, { resolved = false } = {}) {
   requireObject(rule, "PROVIDER_QUIESCE_RULE_REQUIRED", "providerQuiesceEvidence.routingRule");
   if (!exactObjectKeys(rule, [
-    "projectId", "ruleId", "revision", "scope", "projectWide", "action",
-    "requestPathOperator", "requestPath", "methodOperator", "methods",
+    "mode", "groupCount", "projectId", "ruleId", "revision", "scope",
+    "projectWide", "action",
+    "hostnameOperator", "canonicalHostname", "requestPathOperator",
+    "requestPath", "methodOperator", "methods",
     "allMethodFenceRequiredHostCount",
     "allMethodFenceRequiredHostsFingerprint",
     "allMethodFenceRequiredPathCount",
     "allMethodFenceRequiredPathsFingerprint",
+    "earlierActiveBypassRuleCount",
   ])) {
     refuse("PROVIDER_QUIESCE_RULE_INVALID",
       "providerQuiesceEvidence.routingRule must have the exact reviewed field set.");
   }
+  requireEqual(rule.mode, FIXED.criticalWindowWafMode,
+    "PROVIDER_QUIESCE_RULE_INVALID", "providerQuiesceEvidence.routingRule.mode");
+  requireEqual(rule.groupCount, FIXED.criticalWindowWafGroupCount,
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.groupCount");
   requireEqual(rule.projectId, FIXED.vercelProjectId,
     "PROVIDER_QUIESCE_RULE_INVALID", "providerQuiesceEvidence.routingRule.projectId");
   requireEqual(rule.scope, FIXED.quiesceScope,
@@ -1119,6 +1669,12 @@ function assertRoutingRuleShape(rule, { resolved = false } = {}) {
     "PROVIDER_QUIESCE_RULE_INVALID", "providerQuiesceEvidence.routingRule.projectWide");
   requireEqual(rule.action, "DENY",
     "PROVIDER_QUIESCE_RULE_INVALID", "providerQuiesceEvidence.routingRule.action");
+  requireEqual(rule.hostnameOperator, "DOES_NOT_EQUAL",
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.hostnameOperator");
+  requireEqual(rule.canonicalHostname, FIXED.criticalWindowWafCanonicalHostname,
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.canonicalHostname");
   requireEqual(rule.requestPathOperator, "DOES_NOT_EQUAL",
     "PROVIDER_QUIESCE_RULE_INVALID", "providerQuiesceEvidence.routingRule.requestPathOperator");
   requireEqual(rule.requestPath, FIXED.providerControlEndpoint,
@@ -1143,6 +1699,9 @@ function assertRoutingRuleShape(rule, { resolved = false } = {}) {
     FIXED.allMethodFenceRequiredPathsFingerprint,
     "PROVIDER_QUIESCE_RULE_INVALID",
     "providerQuiesceEvidence.routingRule.allMethodFenceRequiredPathsFingerprint");
+  requireEqual(rule.earlierActiveBypassRuleCount, 0,
+    "PROVIDER_QUIESCE_RULE_INVALID",
+    "providerQuiesceEvidence.routingRule.earlierActiveBypassRuleCount");
   for (const field of ["ruleId", "revision"]) {
     const value = requireString(rule[field], "PROVIDER_QUIESCE_RULE_INVALID",
       `providerQuiesceEvidence.routingRule.${field}`);
@@ -1152,6 +1711,70 @@ function assertRoutingRuleShape(rule, { resolved = false } = {}) {
     }
   }
   return rule;
+}
+
+function validatedProviderAliasClaim(manifest, stage) {
+  const challenge = requireObject(
+    manifest.providerAttestationChallenges?.[stage.toLowerCase()],
+    "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+    `providerAttestationChallenges.${stage.toLowerCase()}`,
+  );
+  const envelope = requireObject(challenge.signedAttestation,
+    "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+    `providerAttestationChallenges.${stage.toLowerCase()}.signedAttestation`);
+  const claim = requireObject(envelope.attestation,
+    "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+    `providerAttestationChallenges.${stage.toLowerCase()}.signedAttestation.attestation`);
+  const records = claim.aliasInventoryRecords;
+  const quiesce = manifest.providerQuiesceEvidence;
+  let candidateAliasHostname = "";
+  let candidateImmutableHostname = "";
+  try {
+    candidateAliasHostname = new URL(quiesce.candidateAliasOrigin).hostname.toLowerCase();
+    candidateImmutableHostname =
+      new URL(quiesce.candidateImmutableOrigin).hostname.toLowerCase();
+  } catch {
+    refuse("PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+      "The provider alias recapture candidate origins were invalid.");
+  }
+  const courseTuple = [
+    FIXED.unsafeCourseAliasHostname,
+    FIXED.unsafeCourseAliasDeploymentId,
+    FIXED.unsafeCourseAliasDeploymentHostname,
+    null,
+    null,
+  ];
+  const candidateTuple = [
+    candidateAliasHostname,
+    manifest.release.deploymentId,
+    candidateImmutableHostname,
+    null,
+    null,
+  ];
+  const aliases = Array.isArray(records) ? records.map((record) => record?.[0]) : [];
+  if (claim.stage !== stage || claim.purpose !== quiesce.purpose ||
+      claim.candidateAliasOrigin !== quiesce.candidateAliasOrigin ||
+      claim.candidateImmutableOrigin !== quiesce.candidateImmutableOrigin ||
+      claim.aliasInventoryCount !== FIXED.providerAliasInventoryRecordCount ||
+      !Array.isArray(records) || records.length !== claim.aliasInventoryCount ||
+      !HEX64.test(String(claim.aliasInventoryFingerprint || "")) ||
+      sha256Hex(JSON.stringify(records)) !== claim.aliasInventoryFingerprint ||
+      new Set(aliases).size !== aliases.length ||
+      canonicalJson(aliases) !== canonicalJson([...aliases].sort()) ||
+      records.filter((record) => canonicalJson(record) === canonicalJson(courseTuple))
+        .length !== 1 ||
+      records.filter((record) => canonicalJson(record) === canonicalJson(candidateTuple))
+        .length !== 1 ||
+      !Number.isSafeInteger(claim.aliasPaginationPageCount) ||
+      claim.aliasPaginationPageCount < 1 ||
+      !HEX64.test(String(claim.aliasPaginationFingerprint || "")) ||
+      !UUID.test(String(claim.attestationId || "")) ||
+      !HEX64.test(String(envelope.attestationFingerprint || "")) ||
+      !Number.isFinite(Date.parse(String(claim.providerObservedAt || "")))) {
+    refuse("PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+      `The signed ${stage} provider alias census was incomplete or drifted.`);
+  }
+  return Object.freeze({ envelope, claim, records });
 }
 
 function validateStructuredProviderEvidence(manifest) {
@@ -1172,6 +1795,16 @@ function validateStructuredProviderEvidence(manifest) {
     refuse("PROVIDER_QUIESCE_STATUS_INVALID",
       "providerQuiesceEvidence.status is outside the durable evidence states.");
   }
+  if (!new Set(["REHEARSAL", "CUTOVER"]).has(quiesce.purpose)) {
+    refuse("PROVIDER_QUIESCE_PURPOSE_INVALID",
+      "providerQuiesceEvidence.purpose must be REHEARSAL or CUTOVER.");
+  }
+  const purposeBoundOwnerFreeze = quiesce.purpose === "CUTOVER"
+    ? FIXED.cutoverOwnerFreezeConfirmation
+    : FIXED.rehearsalOwnerFreezeConfirmation;
+  requireEqual(quiesce.ownerFreezeConfirmation, purposeBoundOwnerFreeze,
+    "PROVIDER_QUIESCE_OWNER_FREEZE_PURPOSE_MISMATCH",
+    "providerQuiesceEvidence.ownerFreezeConfirmation");
   assertRoutingRuleShape(quiesce.routingRule);
   requireEqual(quiesce.originInventoryArtifact, FIXED.originInventoryArtifact,
     "ORIGIN_INVENTORY_BINDING_DRIFT", "providerQuiesceEvidence.originInventoryArtifact");
@@ -1208,7 +1841,8 @@ function validateStructuredProviderEvidence(manifest) {
     "liveProviderInventoryCount", "liveOriginInventoryCount", "probeOriginCount",
     "probeVectorCount", "probeRecordCount",
     "unresolvedRequestLogCount", "unresolvedGoogleWriteCount",
-    "unresolvedProbeCount", "ownerFreezeTtlSeconds",
+    "unresolvedProbeCount", "ownerFreezeTtlSeconds", "aliasRecaptureCount",
+    "aliasInventoryCount", "aliasPaginationPageCount",
   ]) requireInteger(quiesce[field], "PROVIDER_QUIESCE_EVIDENCE_INVALID",
     `providerQuiesceEvidence.${field}`);
   if (["DRAINING", "VERIFIED"].includes(quiesce.status)) {
@@ -1235,13 +1869,121 @@ function validateStructuredProviderEvidence(manifest) {
       "PROVIDER_QUIESCE_VECTOR_COVERAGE_INCOMPLETE",
       "providerQuiesceEvidence.probeRecordCount");
   }
-  if (quiesce.ownerFreezeTtlSeconds !== 1800) {
+  if (quiesce.ownerFreezeTtlSeconds !== 2100) {
     refuse("PROVIDER_QUIESCE_OWNER_FREEZE_TTL_INVALID",
-      "providerQuiesceEvidence.ownerFreezeTtlSeconds must be the certified 1800-second window.");
+      "providerQuiesceEvidence.ownerFreezeTtlSeconds must be the certified 2100-second window.");
   }
-  for (const field of ["ownerOverrideOperationallyFrozen", "allOriginsEdgeDenied"]) {
+  for (const field of [
+    "ownerOverrideOperationallyFrozen", "allOriginsEdgeDenied",
+    "canonicalApexExcludedFromEdgeDenyProbes",
+    "canonicalApexWriteMethodsEdgeDenied", "baselineWafRestored",
+    "candidateControlExceptionExact", "canonicalUnsafeMethodsDenied",
+    "canonicalHistoricalSafeWriterPathsDenied", "canonicalSafeReadsAllowed",
+  ]) {
     requireBoolean(quiesce[field], "PROVIDER_QUIESCE_EVIDENCE_INVALID",
       `providerQuiesceEvidence.${field}`);
+  }
+  if (["DRAINING", "VERIFIED"].includes(quiesce.status)) {
+    requireEqual(quiesce.canonicalApexExcludedFromEdgeDenyProbes, true,
+      "PROVIDER_QUIESCE_CANONICAL_APEX_POLICY_INVALID",
+      "providerQuiesceEvidence.canonicalApexExcludedFromEdgeDenyProbes");
+    requireEqual(quiesce.canonicalApexWriteMethodsEdgeDenied, true,
+      "PROVIDER_QUIESCE_CANONICAL_APEX_POLICY_INVALID",
+      "providerQuiesceEvidence.canonicalApexWriteMethodsEdgeDenied");
+    for (const field of [
+      "candidateControlExceptionExact", "canonicalUnsafeMethodsDenied",
+      "canonicalHistoricalSafeWriterPathsDenied", "canonicalSafeReadsAllowed",
+    ]) requireEqual(quiesce[field], true,
+      "PROVIDER_QUIESCE_CRITICAL_WINDOW_INCOMPLETE",
+      `providerQuiesceEvidence.${field}`);
+    for (const field of ["baselineWafFingerprint", "criticalWindowWafFingerprint"]) {
+      requireResolved(quiesce[field], HEX64,
+        "PROVIDER_QUIESCE_CRITICAL_WINDOW_INCOMPLETE",
+        `providerQuiesceEvidence.${field}`);
+    }
+    requireTimestamp(quiesce.criticalWindowActivatedAt,
+      "PROVIDER_QUIESCE_CRITICAL_WINDOW_INCOMPLETE",
+      "providerQuiesceEvidence.criticalWindowActivatedAt");
+    const requiredAliasRecaptureCount = quiesce.status === "VERIFIED" ?
+      FIXED.criticalWindowWafRequiredAliasRecaptureCount : 1;
+    requireEqual(quiesce.aliasRecaptureCount, requiredAliasRecaptureCount,
+      "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+      "providerQuiesceEvidence.aliasRecaptureCount");
+    requireEqual(quiesce.aliasInventoryCount,
+      FIXED.providerAliasInventoryRecordCount,
+      "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+      "providerQuiesceEvidence.aliasInventoryCount");
+    for (const field of ["aliasInventoryFingerprint", "aliasPaginationFingerprint",
+      "beginAliasAttestationFingerprint"]) requireResolved(quiesce[field], HEX64,
+      "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+      `providerQuiesceEvidence.${field}`);
+    requireResolved(quiesce.beginAliasAttestationId, UUID,
+      "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+      "providerQuiesceEvidence.beginAliasAttestationId");
+    const beginObservedAt = requireTimestamp(quiesce.beginAliasProviderObservedAt,
+      "PROVIDER_ALIAS_RECAPTURE_TIMESTAMP_INVALID",
+      "providerQuiesceEvidence.beginAliasProviderObservedAt");
+    const beginAlias = validatedProviderAliasClaim(manifest, "BEGIN");
+    if (quiesce.aliasInventoryCount !== beginAlias.claim.aliasInventoryCount ||
+        quiesce.aliasInventoryFingerprint !== beginAlias.claim.aliasInventoryFingerprint ||
+        quiesce.aliasPaginationPageCount !== beginAlias.claim.aliasPaginationPageCount ||
+        quiesce.aliasPaginationFingerprint !==
+          beginAlias.claim.aliasPaginationFingerprint ||
+        quiesce.beginAliasAttestationId !== beginAlias.claim.attestationId ||
+        quiesce.beginAliasAttestationFingerprint !==
+          beginAlias.envelope.attestationFingerprint ||
+        beginObservedAt !== beginAlias.claim.providerObservedAt) {
+      refuse("PROVIDER_ALIAS_RECAPTURE_DRIFT",
+        "The durable BEGIN alias capture did not match its signed provider census.");
+    }
+    if (quiesce.status === "VERIFIED") {
+      requireResolved(quiesce.finalizeAliasAttestationId, UUID,
+        "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+        "providerQuiesceEvidence.finalizeAliasAttestationId");
+      requireResolved(quiesce.finalizeAliasAttestationFingerprint, HEX64,
+        "PROVIDER_ALIAS_RECAPTURE_INCOMPLETE",
+        "providerQuiesceEvidence.finalizeAliasAttestationFingerprint");
+      const finalizeObservedAt = requireTimestamp(
+        quiesce.finalizeAliasProviderObservedAt,
+        "PROVIDER_ALIAS_RECAPTURE_TIMESTAMP_INVALID",
+        "providerQuiesceEvidence.finalizeAliasProviderObservedAt",
+      );
+      const finalizeAlias = validatedProviderAliasClaim(manifest, "FINALIZE");
+      if (quiesce.finalizeAliasAttestationId !== finalizeAlias.claim.attestationId ||
+          quiesce.finalizeAliasAttestationFingerprint !==
+            finalizeAlias.envelope.attestationFingerprint ||
+          finalizeObservedAt !== finalizeAlias.claim.providerObservedAt ||
+          quiesce.beginAliasAttestationId === quiesce.finalizeAliasAttestationId ||
+          quiesce.beginAliasAttestationFingerprint ===
+            quiesce.finalizeAliasAttestationFingerprint ||
+          beginAlias.claim.aliasInventoryFingerprint !==
+            finalizeAlias.claim.aliasInventoryFingerprint ||
+          canonicalJson(beginAlias.records) !== canonicalJson(finalizeAlias.records) ||
+          beginAlias.claim.aliasPaginationPageCount !==
+            finalizeAlias.claim.aliasPaginationPageCount ||
+          beginAlias.claim.aliasPaginationFingerprint !==
+            finalizeAlias.claim.aliasPaginationFingerprint ||
+          Date.parse(beginObservedAt) >= Date.parse(finalizeObservedAt)) {
+        refuse("PROVIDER_ALIAS_RECAPTURE_DRIFT",
+          "The durable FINALIZE alias capture did not match the independent signed census.");
+      }
+    } else if (quiesce.finalizeAliasAttestationId ||
+        quiesce.finalizeAliasAttestationFingerprint ||
+        quiesce.finalizeAliasProviderObservedAt) {
+      refuse("PROVIDER_ALIAS_RECAPTURE_TIMESTAMP_INVALID",
+        "A DRAINING receipt cannot claim a FINALIZE alias capture.");
+    }
+  }
+  if (quiesce.baselineWafRestored === true) {
+    requireResolved(quiesce.restoredWafFingerprint, HEX64,
+      "PROVIDER_QUIESCE_BASELINE_RESTORATION_INVALID",
+      "providerQuiesceEvidence.restoredWafFingerprint");
+    requireEqual(quiesce.restoredWafFingerprint, quiesce.baselineWafFingerprint,
+      "PROVIDER_QUIESCE_BASELINE_RESTORATION_INVALID",
+      "providerQuiesceEvidence.restoredWafFingerprint");
+  } else if (quiesce.restoredWafFingerprint !== null) {
+    refuse("PROVIDER_QUIESCE_CRITICAL_WINDOW_CONSUMPTION_INVALID",
+      "An active CRITICAL_WINDOW epoch cannot retain a restored WAF fingerprint.");
   }
 
   const fence = requireObject(manifest.persistentProviderFence,
@@ -1252,10 +1994,169 @@ function validateStructuredProviderEvidence(manifest) {
     refuse("PERSISTENT_PROVIDER_FENCE_STATUS_INVALID",
       "persistentProviderFence.status is outside the durable fence states.");
   }
-  requireInteger(fence.protectionCount,
-    "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.protectionCount");
+  requireEqual(fence.lifecycleMode, "CUTOVER",
+    "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.lifecycleMode");
+  requireEqual(fence.mechanism, "DRIVE_ACL_EXACT_LEGACY_PERMISSION_V2",
+    "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.mechanism");
+  if (!new Set([FIXED.legacyDriveRoleOpen, FIXED.legacyDriveRoleClosed])
+    .has(fence.legacyDriveRole)) {
+    refuse("PERSISTENT_PROVIDER_FENCE_INVALID",
+      "persistentProviderFence.legacyDriveRole is invalid.");
+  }
+  requireBoolean(fence.legacyDriveCanEdit,
+    "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.legacyDriveCanEdit");
+  if (typeof fence.legacyDriveCanShare !== "boolean" &&
+      !unresolved(fence.legacyDriveCanShare)) {
+    refuse("PERSISTENT_PROVIDER_FENCE_INVALID",
+      "persistentProviderFence.legacyDriveCanShare is invalid.");
+  }
+  if (!new Set(["NOT_DISPATCHED", FIXED.aclTransitionResultTarget,
+    FIXED.aclTransitionResultUnknown]).has(fence.aclDispatchResult)) {
+    refuse("PERSISTENT_PROVIDER_FENCE_INVALID",
+      "persistentProviderFence.aclDispatchResult is invalid.");
+  }
+  requireInteger(fence.aclUnknownDispatchCount,
+    "PERSISTENT_PROVIDER_FENCE_INVALID",
+    "persistentProviderFence.aclUnknownDispatchCount");
+  const settlementStages = new Set([
+    "AWAITING_ACL_READER_CONFIRMED", "ACL_READER_CONFIRMED",
+    "SETTLEMENT_READBACK_1", "SETTLEMENT_READBACK_2",
+  ]);
+  if (!settlementStages.has(fence.providerSettlementStage)) {
+    refuse("PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.providerSettlementStage is invalid.");
+  }
+  requireInteger(fence.providerSettlementRemainingWaitSeconds,
+    "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+    "persistentProviderFence.providerSettlementRemainingWaitSeconds");
+  if (fence.providerSettlementRemainingWaitSeconds < 0) {
+    refuse("PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "The provider-settlement remaining wait cannot be negative.");
+  }
+  requireEqual(fence.providerSettlementInstallWaitSeconds,
+    FIXED.providerSettlementInstallWaitSeconds,
+    "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+    "persistentProviderFence.providerSettlementInstallWaitSeconds");
+  requireEqual(fence.providerSettlementReadbackWaitSeconds,
+    FIXED.providerSettlementReadbackWaitSeconds,
+    "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+    "persistentProviderFence.providerSettlementReadbackWaitSeconds");
+  requireBoolean(fence.admissionCloseCommitted,
+    "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+    "persistentProviderFence.admissionCloseCommitted");
+  const settlementIds = [
+    "providerSettlementLatestObservationId", "aclReaderConfirmedObservationId",
+    "settlementReadback1ObservationId", "settlementReadback2ObservationId",
+  ];
+  for (const field of settlementIds) {
+    if (fence[field] !== null) requireResolved(fence[field], UUID,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID", `persistentProviderFence.${field}`);
+  }
+  const expectedLatestField = {
+    AWAITING_ACL_READER_CONFIRMED: null,
+    ACL_READER_CONFIRMED: "aclReaderConfirmedObservationId",
+    SETTLEMENT_READBACK_1: "settlementReadback1ObservationId",
+    SETTLEMENT_READBACK_2: "settlementReadback2ObservationId",
+  }[fence.providerSettlementStage];
+  const requiredObservationFields = fence.providerSettlementStage ===
+    "AWAITING_ACL_READER_CONFIRMED" ? [] : fence.providerSettlementStage ===
+      "ACL_READER_CONFIRMED" ? ["aclReaderConfirmedObservationId"] :
+      fence.providerSettlementStage === "SETTLEMENT_READBACK_1" ? [
+        "aclReaderConfirmedObservationId", "settlementReadback1ObservationId",
+      ] : [
+        "aclReaderConfirmedObservationId", "settlementReadback1ObservationId",
+        "settlementReadback2ObservationId",
+      ];
+  if (expectedLatestField === null) {
+    requireEqual(fence.providerSettlementLatestObservationId, null,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.providerSettlementLatestObservationId");
+  } else {
+    requireEqual(fence.providerSettlementLatestObservationId,
+      fence[expectedLatestField], "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.providerSettlementLatestObservationId");
+  }
+  for (const field of requiredObservationFields) requireResolved(fence[field], UUID,
+    "PERSISTENT_PROVIDER_SETTLEMENT_INVALID", `persistentProviderFence.${field}`);
+  if (["ACL_READER_CONFIRMED", "SETTLEMENT_READBACK_1"]
+    .includes(fence.providerSettlementStage)) {
+    requireTimestamp(fence.providerSettlementNextEligibleAt,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.providerSettlementNextEligibleAt");
+  } else {
+    requireEqual(fence.providerSettlementNextEligibleAt, null,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.providerSettlementNextEligibleAt");
+  }
+  if (fence.aclDispatchResult === FIXED.aclTransitionResultUnknown) {
+    if (!new Set(["INSTALLING", "FAILED"]).has(fence.status) ||
+        fence.aclUnknownDispatchCount < 1) {
+      refuse("PERSISTENT_PROVIDER_FENCE_INVALID",
+        "An OUTCOME_UNKNOWN ACL dispatch must remain durably blocked and unresolved.");
+    }
+  } else if (fence.providerSettlementStage === "AWAITING_ACL_READER_CONFIRMED") {
+    requireEqual(fence.settlementStructuralCanaryFingerprint, null,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.settlementStructuralCanaryFingerprint");
+  } else {
+    requireResolved(fence.settlementStructuralCanaryFingerprint, HEX64,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.settlementStructuralCanaryFingerprint");
+  }
+  if (fence.providerSettlementStage === "SETTLEMENT_READBACK_2") {
+    requireTimestamp(fence.settlementCompletedAt,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.settlementCompletedAt");
+    requireEqual(fence.admissionCloseCommitted, true,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.admissionCloseCommitted");
+  } else {
+    requireEqual(fence.settlementCompletedAt, null,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.settlementCompletedAt");
+    requireEqual(fence.admissionCloseCommitted, false,
+      "PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "persistentProviderFence.admissionCloseCommitted");
+  }
+  if (fence.status === "MISSING" &&
+      fence.providerSettlementStage !== "AWAITING_ACL_READER_CONFIRMED") {
+    refuse("PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "A missing persistent fence cannot retain a settlement stage.");
+  }
+  if (fence.aclDispatchResult === FIXED.aclTransitionResultUnknown) {
+    // OUTCOME_UNKNOWN remains queryable for recovery diagnostics, but every mutation
+    // guard below refuses redispatch, reversal, close, prepare, or reopen.
+  } else if (fence.providerSettlementStage === "AWAITING_ACL_READER_CONFIRMED") {
+    requireEqual(fence.legacyDriveRole, FIXED.legacyDriveRoleOpen,
+      "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.legacyDriveRole");
+    requireEqual(fence.aclDispatchResult, "NOT_DISPATCHED",
+      "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.aclDispatchResult");
+  } else if (!new Set(["REMOVAL_AUTHORIZED", "REMOVED"]).has(fence.status)) {
+    requireEqual(fence.legacyDriveRole, FIXED.legacyDriveRoleClosed,
+      "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.legacyDriveRole");
+    requireEqual(fence.legacyDriveCanEdit, false,
+      "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.legacyDriveCanEdit");
+    requireEqual(fence.legacyDriveCanShare, false,
+      "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.legacyDriveCanShare");
+    requireEqual(fence.aclDispatchResult, FIXED.aclTransitionResultTarget,
+      "PERSISTENT_PROVIDER_FENCE_INVALID", "persistentProviderFence.aclDispatchResult");
+    requireEqual(fence.aclUnknownDispatchCount, 0,
+      "PERSISTENT_PROVIDER_FENCE_INVALID",
+      "persistentProviderFence.aclUnknownDispatchCount");
+  }
+  if (fence.status === "INSTALLING" &&
+      fence.providerSettlementStage === "SETTLEMENT_READBACK_2") {
+    refuse("PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "A completed settlement cannot remain INSTALLING.");
+  }
+  if (["INSTALLED", "REMOVAL_AUTHORIZED", "REMOVED"].includes(fence.status) &&
+      fence.providerSettlementStage !== "SETTLEMENT_READBACK_2") {
+    refuse("PERSISTENT_PROVIDER_SETTLEMENT_INVALID",
+      "An installed or removed persistent fence requires the atomic readback-2 proof.");
+  }
   productionOriginInventoryBinding();
   productionCredentialConfinementBinding();
+  productionHistoricalWriterScopeBinding();
 }
 
 function validateStagedProvenance(manifest) {
@@ -1291,6 +2192,86 @@ function validateStagedProvenance(manifest) {
   return { present: allPresent };
 }
 
+function validateWafCriticalEpochManifest(manifest) {
+  const epoch = requireObject(
+    manifest.wafCriticalEpoch,
+    "WAF_CRITICAL_EPOCH_REQUIRED",
+    "wafCriticalEpoch",
+  );
+  requireEqual(epoch.contractVersion, "CRITICAL_WINDOW_WAF_V1",
+    "WAF_CRITICAL_EPOCH_CONTRACT_MISMATCH", "wafCriticalEpoch.contractVersion");
+  if (!new Set(["REHEARSAL", "CUTOVER"]).has(epoch.purpose) ||
+      !new Set(["REHEARSAL", "CUTOVER", "ROLLBACK"]).has(
+        epoch.transitionMode,
+      ) ||
+      (epoch.purpose === "REHEARSAL") !==
+        (epoch.transitionMode === "REHEARSAL")) {
+    refuse("WAF_CRITICAL_EPOCH_MODE_INVALID",
+      "The WAF purpose and transition mode were not an exact supported pair.");
+  }
+  requireEqual(epoch.candidateDeploymentTarget, "PREVIEW",
+    "WAF_CRITICAL_EPOCH_TARGET_MISMATCH",
+    "wafCriticalEpoch.candidateDeploymentTarget");
+  requireEqual(epoch.authenticatedActorId, "CB01",
+    "WAF_CRITICAL_EPOCH_ACTOR_MISMATCH",
+    "wafCriticalEpoch.authenticatedActorId");
+  if (!new Set([
+    "MISSING", "ACTIVATION_PENDING", "ACTIVE_UNBOUND", "FENCE_BOUND",
+    "RESTORE_PENDING", "BASELINE_RESTORED",
+  ]).has(epoch.status)) {
+    refuse("WAF_CRITICAL_EPOCH_STATUS_INVALID",
+      "The WAF epoch status was outside the certified state machine.");
+  }
+  for (const [field, pattern] of [
+    ["epochId", UUID], ["epochRequestId", UUID],
+    ["candidateDeploymentId", DEPLOYMENT_ID],
+    ["candidateDeploymentCommit", HEX40],
+    ["authenticatedActorFingerprint", HEX64],
+    ["candidateControlHostsFingerprint", HEX64],
+    ["runOwnedRuleNonce", UUID], ["runOwnedRuleFingerprint", HEX64],
+    ["runOwnedInsertDocumentFingerprint", HEX64],
+  ]) {
+    if (!unresolved(epoch[field]) && !pattern.test(String(epoch[field]))) {
+      refuse("WAF_CRITICAL_EPOCH_FIELD_INVALID",
+        `wafCriticalEpoch.${field} was invalid.`);
+    }
+  }
+  if (!unresolved(epoch.candidateDeploymentId) &&
+      !unresolved(manifest.release.deploymentId)) {
+    requireEqual(epoch.candidateDeploymentId, manifest.release.deploymentId,
+      "WAF_CRITICAL_EPOCH_CANDIDATE_MISMATCH",
+      "wafCriticalEpoch.candidateDeploymentId");
+  }
+  if (!unresolved(epoch.candidateDeploymentCommit) &&
+      !unresolved(manifest.release.frozenSha)) {
+    requireEqual(epoch.candidateDeploymentCommit, manifest.release.frozenSha,
+      "WAF_CRITICAL_EPOCH_CANDIDATE_MISMATCH",
+      "wafCriticalEpoch.candidateDeploymentCommit");
+  }
+  const dispatches = requireObject(epoch.dispatches,
+    "WAF_CRITICAL_EPOCH_DISPATCHES_REQUIRED", "wafCriticalEpoch.dispatches");
+  for (const step of [
+    "CRITICAL_RULE_INSERT", "CRITICAL_DRAFT_ACTIVATE",
+    "BASELINE_VERSION_ACTIVATE",
+  ]) {
+    const dispatch = requireObject(dispatches[step],
+      "WAF_CRITICAL_EPOCH_DISPATCH_REQUIRED", `wafCriticalEpoch.dispatches.${step}`);
+    for (const field of ["dispatchRequestId", "transitionRequestId"]) {
+      if (!unresolved(dispatch[field]) && !UUID.test(String(dispatch[field]))) {
+        refuse("WAF_CRITICAL_EPOCH_DISPATCH_INVALID",
+          `wafCriticalEpoch.dispatches.${step}.${field} was invalid.`);
+      }
+    }
+  }
+  const inputs = requireObject(epoch.operationInputs,
+    "WAF_CRITICAL_EPOCH_INPUTS_REQUIRED", "wafCriticalEpoch.operationInputs");
+  for (const operation of Object.keys(WAF_CRITICAL_EPOCH_OPERATIONS)
+    .filter((name) => !name.startsWith("inspect-"))) {
+    requireObject(inputs[operation], "WAF_CRITICAL_EPOCH_INPUT_REQUIRED",
+      `wafCriticalEpoch.operationInputs.${operation}`);
+  }
+}
+
 export function validateManifest(manifest) {
   requireObject(manifest, "MANIFEST_REQUIRED", "manifest");
   requireEqual(manifest.schemaVersion, FIXED.schemaVersion, "SCHEMA_VERSION_MISMATCH", "schemaVersion");
@@ -1306,21 +2287,43 @@ export function validateManifest(manifest) {
       "MIGRATION_BINDING_DRIFT", "release.migrationSha256");
   }
   requireEqual(manifest.release.runbook, FIXED.runbook, "RUNBOOK_BINDING_DRIFT", "release.runbook");
+  for (const [field, expected] of [
+    ["historicalWriterScopeSchema", FIXED.historicalWriterScopeSchema],
+    ["historicalWriterScopeEvidenceFingerprint",
+      FIXED.historicalWriterScopeEvidenceFingerprint],
+    ["historicalCanonicalSheetCount", FIXED.historicalCanonicalSheetCount],
+    ["historicalCanonicalSheetsFingerprint",
+      FIXED.historicalCanonicalSheetsFingerprint],
+    ["historicalImmutableDenyOriginCount",
+      FIXED.historicalImmutableDenyOriginCount],
+    ["historicalImmutableDenyOriginsFingerprint",
+      FIXED.historicalImmutableDenyOriginsFingerprint],
+    ["historicalCurrentAliasAwareDenyOriginCount",
+      FIXED.historicalCurrentAliasAwareDenyOriginCount],
+    ["historicalCurrentAliasAwareDenyOriginsFingerprint",
+      FIXED.historicalCurrentAliasAwareDenyOriginsFingerprint],
+    ["activeAliasCensusRecordCount", FIXED.activeAliasCensusRecordCount],
+    ["activeAliasCensusRecordsFingerprint",
+      FIXED.activeAliasCensusRecordsFingerprint],
+  ]) requireEqual(manifest.release[field], expected,
+    "HISTORICAL_WRITER_SCOPE_BINDING_DRIFT", `release.${field}`);
   requireObject(manifest.certification, "CERTIFICATION_REQUIRED", "certification");
   requireObject(manifest.providerFenceRehearsal,
     "PROVIDER_FENCE_REHEARSAL_REQUIRED", "providerFenceRehearsal");
-  validateStructuredProviderEvidence(manifest);
+  validateAclV2Acceptance(manifest);
   requireObject(manifest.providerAttestationChallenges,
     "PROVIDER_ATTESTATION_CHALLENGES_REQUIRED", "providerAttestationChallenges");
   requireObject(manifest.providerAttestationChallenges.begin,
     "PROVIDER_ATTESTATION_CHALLENGES_REQUIRED", "providerAttestationChallenges.begin");
   requireObject(manifest.providerAttestationChallenges.finalize,
     "PROVIDER_ATTESTATION_CHALLENGES_REQUIRED", "providerAttestationChallenges.finalize");
+  validateStructuredProviderEvidence(manifest);
   requireObject(manifest.providerFenceProof, "PROVIDER_FENCE_REQUIRED", "providerFenceProof");
   requireObject(manifest.state, "STATE_REQUIRED", "state");
   requireObject(manifest.evidence, "EVIDENCE_REQUIRED", "evidence");
   requireObject(manifest.stableRequestIds, "REQUEST_IDS_REQUIRED", "stableRequestIds");
   requireObject(manifest.operationInputs, "OPERATION_INPUTS_REQUIRED", "operationInputs");
+  validateWafCriticalEpochManifest(manifest);
   const stagedProvenance = validateStagedProvenance(manifest);
   if ((manifest.state.cutoverPhase !== "DORMANT" ||
       manifest.state.activationState !== "DORMANT") &&
@@ -1366,7 +2369,31 @@ export function evaluateReadiness(manifest) {
   const release = manifest.release;
   const certification = manifest.certification;
   const rehearsal = manifest.providerFenceRehearsal;
+  const manifestAclAcceptance = manifest.aclV2Acceptance;
+  let aclAcceptance = manifestAclAcceptance;
   const state = manifest.state;
+  const historicalWriterScope = productionHistoricalWriterScopeBinding();
+
+  const loadedAclAcceptance = loadAclV2AcceptanceArtifact();
+  if (!loadedAclAcceptance.artifact) {
+    blockers.push(loadedAclAcceptance.error ||
+      "ACL-v2 acceptance artifact is unavailable");
+  } else {
+    try {
+      validateAclV2Acceptance({
+        aclV2Acceptance: loadedAclAcceptance.artifact,
+      });
+      aclAcceptance = loadedAclAcceptance.artifact;
+      if (canonicalJson(manifestAclAcceptance) !== canonicalJson(aclAcceptance)) {
+        blockers.push(
+          "aclV2Acceptance does not exactly match the immutable repository artifact",
+        );
+      }
+    } catch (error) {
+      blockers.push(`${error.code ?? "ACL_V2_ACCEPTANCE_ARTIFACT_INVALID"}: ` +
+        `${error.message}`);
+    }
+  }
 
   for (const [field, pattern] of [
     ["candidateSha", HEX40], ["frozenSha", HEX40], ["certificationFingerprint", HEX64],
@@ -1438,6 +2465,144 @@ export function evaluateReadiness(manifest) {
     if (certification[key] !== true) blockers.push(`certification.${key} is not true`);
   }
   if (certification.unexplainedConcurrencyWindows !== 0) blockers.push("unexplained concurrency windows are non-zero");
+  if (historicalWriterScope.settlementAcceptedAsPrimaryProof !== false ||
+      historicalWriterScope.unexplainedConcurrencyWindowCount !== 1) {
+    blockers.push(
+      "historical writer-scope evidence no longer preserves false/one history",
+    );
+  }
+  if (unresolved(aclAcceptance.acceptanceFingerprint) ||
+      !HEX64.test(String(aclAcceptance.acceptanceFingerprint).toLowerCase()) ||
+      aclAcceptance.acceptanceFingerprint !==
+        computeAclV2AcceptanceFingerprint(aclAcceptance)) {
+    blockers.push("aclV2Acceptance.acceptanceFingerprint is unresolved or invalid");
+  }
+  if (aclAcceptance.acceptedAsPrimaryProof !== true) {
+    blockers.push("aclV2Acceptance.acceptedAsPrimaryProof is not true");
+  }
+  if (aclAcceptance.unexplainedConcurrencyWindowCount !== 0) {
+    blockers.push("aclV2Acceptance unexplained concurrency windows are non-zero");
+  }
+  for (const [field, expected] of [
+    ["migrationSha256", release.migrationSha256],
+    ["rehearsalCandidateSha", certification.aclEvidenceOnlyDiffBaseSha],
+  ]) {
+    if (aclAcceptance[field] !== expected) {
+      blockers.push(`aclV2Acceptance.${field} does not match the release`);
+    }
+  }
+  if (unresolved(aclAcceptance.rehearsalCandidateSha) ||
+      !HEX40.test(String(aclAcceptance.rehearsalCandidateSha).toLowerCase())) {
+    blockers.push("aclV2Acceptance.rehearsalCandidateSha is unresolved");
+  }
+  if (unresolved(aclAcceptance.rehearsalDeploymentId) ||
+      !DEPLOYMENT_ID.test(String(aclAcceptance.rehearsalDeploymentId))) {
+    blockers.push("aclV2Acceptance.rehearsalDeploymentId is unresolved");
+  }
+  if (certification.aclEvidenceOnlyDiffPassed !== true ||
+      certification.aclEvidenceOnlyDiffUnexpectedPathCount !== 0 ||
+      !Number.isSafeInteger(certification.aclEvidenceOnlyDiffAllowedPathCount) ||
+      certification.aclEvidenceOnlyDiffAllowedPathCount < 1 ||
+      unresolved(certification.aclEvidenceOnlyDiffFingerprint) ||
+      !HEX64.test(String(certification.aclEvidenceOnlyDiffFingerprint).toLowerCase()) ||
+      certification.aclEvidenceOnlyDiffBaseSha !==
+        aclAcceptance.rehearsalCandidateSha ||
+      certification.aclEvidenceOnlyDiffTargetSha !== release.frozenSha ||
+      certification.aclEvidenceOnlyDiffBaseSha ===
+        certification.aclEvidenceOnlyDiffTargetSha) {
+    blockers.push(
+      "ACL-v2 rehearsal SHA A to frozen certification SHA B evidence-only diff is not proved",
+    );
+  }
+  for (const field of [
+    "baselineWafFingerprint", "criticalWindowWafFingerprint",
+    "restoredWafFingerprint",
+  ]) {
+    if (unresolved(aclAcceptance[field]) ||
+        !HEX64.test(String(aclAcceptance[field]).toLowerCase())) {
+      blockers.push(`aclV2Acceptance.${field} is unresolved`);
+    }
+  }
+  for (const field of [
+    "forwardDispatchId", "reverseDispatchId", "settlementReadback1Id",
+    "settlementReadback2Id", "fenceId", "installRequestId",
+    "quiesceEvidenceId", "restoreQuiesceEvidenceId",
+  ]) {
+    if (unresolved(aclAcceptance[field]) || !UUID.test(String(aclAcceptance[field]))) {
+      blockers.push(`aclV2Acceptance.${field} is unresolved`);
+    }
+  }
+  for (const field of [
+    "forwardTransitionProofFingerprint", "reverseTransitionProofFingerprint",
+  ]) {
+    if (unresolved(aclAcceptance[field]) ||
+        !HEX64.test(String(aclAcceptance[field]).toLowerCase())) {
+      blockers.push(`aclV2Acceptance.${field} is unresolved`);
+    }
+  }
+  for (const field of [
+    "aclReaderConfirmedAt", "restoreCriticalWindowActivatedAt",
+    "aclWriterRestoredAt", "rehearsalRestoredAt",
+  ]) {
+    if (unresolved(aclAcceptance[field]) ||
+        !Number.isFinite(Date.parse(String(aclAcceptance[field])))) {
+      blockers.push(`aclV2Acceptance.${field} is unresolved`);
+    }
+  }
+  const providerHeldSeconds = Math.floor((
+    Date.parse(String(aclAcceptance.aclWriterRestoredAt)) -
+    Date.parse(String(aclAcceptance.restoreCriticalWindowActivatedAt))
+  ) / 1000);
+  if (!Number.isFinite(providerHeldSeconds) ||
+      providerHeldSeconds < FIXED.criticalWindowWafMinimumHoldSeconds ||
+      providerHeldSeconds !== aclAcceptance.criticalWindowHeldSeconds ||
+      Date.parse(String(aclAcceptance.rehearsalRestoredAt)) <
+        Date.parse(String(aclAcceptance.aclWriterRestoredAt))) {
+    blockers.push(
+      "aclV2Acceptance DB-recorded CRITICAL_WINDOW hold/restoration chronology is invalid",
+    );
+  }
+  if (aclAcceptance.quiesceEvidenceId !== rehearsal.quiesceEvidenceId) {
+    blockers.push(
+      "aclV2Acceptance quiesce receipt does not bind providerFenceRehearsal",
+    );
+  }
+  if (aclAcceptance.forwardDispatchResult !== FIXED.aclTransitionResultTarget ||
+      aclAcceptance.reverseDispatchResult !== FIXED.aclTransitionResultTarget) {
+    blockers.push("aclV2Acceptance Drive transitions are not both TARGET_CONFIRMED");
+  }
+  if (aclAcceptance.unknownAclDispatchCount !== 0) {
+    blockers.push("aclV2Acceptance contains an OUTCOME_UNKNOWN ACL dispatch");
+  }
+  if (aclAcceptance.legacyRoleBefore !== FIXED.legacyDriveRoleOpen ||
+      aclAcceptance.legacyRoleDuring !== FIXED.legacyDriveRoleClosed ||
+      aclAcceptance.legacyRoleAfter !== FIXED.legacyDriveRoleOpen ||
+      aclAcceptance.legacyCanEditDuring !== false ||
+      aclAcceptance.legacyCanShareDuring !== false) {
+    blockers.push("aclV2Acceptance legacy Drive role/capability sequence is invalid");
+  }
+  if (aclAcceptance.criticalWindowHeldSeconds <
+      FIXED.criticalWindowWafMinimumHoldSeconds) {
+    blockers.push("aclV2Acceptance critical WAF hold is shorter than 1810 seconds");
+  }
+  if (aclAcceptance.restoredWafFingerprint !==
+      aclAcceptance.baselineWafFingerprint ||
+      aclAcceptance.wafBaselineRestored !== true) {
+    blockers.push("aclV2Acceptance exact WAF baseline was not restored");
+  }
+  if (aclAcceptance.googleDataMutationCount !== 0 ||
+      aclAcceptance.supabaseCanonicalWriteCount !== 0) {
+    blockers.push("aclV2Acceptance reports a Production data mutation");
+  }
+  for (const field of [
+    "oldDeploymentEnforcementPassed", "staleClientEnforcementPassed",
+    "lowLevelWriterEnforcementPassed", "previewIsolationPassed",
+    "restoredProductionStatePassed",
+  ]) {
+    if (aclAcceptance[field] !== true) {
+      blockers.push(`aclV2Acceptance.${field} is not true`);
+    }
+  }
   if (certification.clientSecretExposures !== 0) blockers.push("client secret exposures are non-zero");
   if (rehearsal.status !== "PASSED_RESTORED") {
     blockers.push("provider fence rehearsal status is not PASSED_RESTORED");
@@ -1447,12 +2612,14 @@ export function evaluateReadiness(manifest) {
     "legacyDeploymentsFenced", "googleCredentialsSeparated",
     "nonOwnerManualGoogleScoringFenced", "ownerOverrideOperationallyFrozen",
     "dedicatedWriterRetainedAccess", "legacyWriterDenied", "noDataValueWrites",
-    "providerBaselineRestored", "previewResourcesAbsent",
+    "wafBaselineRestored", "previewResourcesAbsent",
   ]) {
     if (rehearsal[key] !== true) blockers.push(`providerFenceRehearsal.${key} is not true`);
   }
   for (const key of [
-    "baselineFingerprint", "fencedFingerprint", "restoredFingerprint",
+    "baselineProviderFingerprint", "readerProviderFingerprint",
+    "restoredProviderFingerprint", "baselineWafFingerprint",
+    "criticalWindowWafFingerprint", "restoredWafFingerprint",
     "deploymentScopeFingerprint", "googleCredentialScopeFingerprint",
     "writerCoverageFingerprint", "probeScopeFingerprint",
   ]) {
@@ -1508,19 +2675,59 @@ export function evaluateReadiness(manifest) {
       manifest.providerQuiesceEvidence.probeScopeFingerprint) {
     blockers.push("providerFenceRehearsal.probeScopeFingerprint is not the durable quiesce scope");
   }
-  if (rehearsal.protectedRangeCountBefore !== rehearsal.protectedRangeCountAfter) {
-    blockers.push("providerFenceRehearsal protected-range baseline was not restored");
+  if (rehearsal.lifecycleMode !== "REHEARSAL" ||
+      rehearsal.mechanism !== "DRIVE_ACL_EXACT_LEGACY_PERMISSION_V2") {
+    blockers.push("providerFenceRehearsal ACL-v2 lifecycle/mechanism is invalid");
   }
-  if (rehearsal.restoredFingerprint !== rehearsal.baselineFingerprint) {
-    blockers.push("providerFenceRehearsal restored fingerprint does not equal baseline");
+  if (rehearsal.legacyDriveRoleBefore !== FIXED.legacyDriveRoleOpen ||
+      rehearsal.legacyDriveRoleDuring !== FIXED.legacyDriveRoleClosed ||
+      rehearsal.legacyDriveRoleAfter !== FIXED.legacyDriveRoleOpen ||
+      rehearsal.legacyDriveCanEditDuring !== false ||
+      rehearsal.legacyDriveCanShareDuring !== false) {
+    blockers.push("providerFenceRehearsal Drive role/capability sequence is invalid");
+  }
+  if (unresolved(rehearsal.legacyPrincipalFingerprint) ||
+      !HEX64.test(String(rehearsal.legacyPrincipalFingerprint).toLowerCase()) ||
+      rehearsal.legacyPrincipalFingerprint !==
+        aclAcceptance.legacyPrincipalFingerprint ||
+      rehearsal.legacyPrincipalFingerprint !== state.providerPrincipalFingerprint) {
+    blockers.push(
+      "legacy principal fingerprint does not bind rehearsal, ACL artifact, and ADMISSION_V3 gate",
+    );
+  }
+  if (rehearsal.aclDowngradeDispatchResult !== FIXED.aclTransitionResultTarget ||
+      rehearsal.aclRestoreDispatchResult !== FIXED.aclTransitionResultTarget ||
+      rehearsal.unknownAclDispatchCount !== 0) {
+    blockers.push("providerFenceRehearsal ACL dispatch proof is unresolved");
+  }
+  if (rehearsal.googleCanonicalWriterOperationCount !== 0 ||
+      rehearsal.supabaseCanonicalWriteCount !== 0) {
+    blockers.push("providerFenceRehearsal reports a canonical data mutation");
+  }
+  if (rehearsal.restoredProviderFingerprint !==
+      rehearsal.baselineProviderFingerprint) {
+    blockers.push("providerFenceRehearsal provider baseline was not restored");
+  }
+  if (rehearsal.restoredWafFingerprint !== rehearsal.baselineWafFingerprint ||
+      rehearsal.criticalWindowHeldSeconds <
+        FIXED.criticalWindowWafMinimumHoldSeconds ||
+      rehearsal.criticalWindowMinimumHoldSeconds !==
+        FIXED.criticalWindowWafMinimumHoldSeconds) {
+    blockers.push("providerFenceRehearsal WAF baseline/hold proof is invalid");
   }
   if (manifest.providerQuiesceEvidence.status !== "VERIFIED") {
     blockers.push("providerQuiesceEvidence is not VERIFIED historical evidence");
   }
   if (!new Set(["MISSING", "REMOVED"])
     .has(manifest.persistentProviderFence.status) ||
-      manifest.persistentProviderFence.protectionCount !== 0) {
-    blockers.push("persistentProviderFence is not absent/restored with zero protections");
+      manifest.persistentProviderFence.legacyDriveRole !==
+        FIXED.legacyDriveRoleOpen ||
+      manifest.persistentProviderFence.legacyDriveCanEdit !== true ||
+      manifest.persistentProviderFence.legacyDriveCanShare !== true ||
+      manifest.persistentProviderFence.aclUnknownDispatchCount !== 0) {
+    blockers.push(
+      "persistentProviderFence is not absent/restored at the exact legacy writer capabilities",
+    );
   }
   if (manifest.providerFenceProof.status !== "MISSING") {
     blockers.push("providerFenceProof is not MISSING at DORMANT readiness");
@@ -1613,10 +2820,16 @@ function assertStep116DormantNonImpact(manifest) {
     );
   }
   requireEqual(
-    manifest.providerFenceRehearsal.restoredFingerprint,
-    manifest.providerFenceRehearsal.baselineFingerprint,
+    manifest.providerFenceRehearsal.restoredProviderFingerprint,
+    manifest.providerFenceRehearsal.baselineProviderFingerprint,
     "STEP11_6_REHEARSAL_BASELINE_NOT_RESTORED",
-    "providerFenceRehearsal.restoredFingerprint",
+    "providerFenceRehearsal.restoredProviderFingerprint",
+  );
+  requireEqual(
+    manifest.providerFenceRehearsal.restoredWafFingerprint,
+    manifest.providerFenceRehearsal.baselineWafFingerprint,
+    "STEP11_6_REHEARSAL_BASELINE_NOT_RESTORED",
+    "providerFenceRehearsal.restoredWafFingerprint",
   );
   requireEqual(
     manifest.providerQuiesceEvidence.status,
@@ -1631,10 +2844,56 @@ function assertStep116DormantNonImpact(manifest) {
     "persistentProviderFence.status",
   );
   requireEqual(
-    manifest.persistentProviderFence.protectionCount,
+    manifest.persistentProviderFence.legacyDriveRole,
+    FIXED.legacyDriveRoleOpen,
+    "STEP11_6_PROVIDER_FENCE_NOT_RESTORED",
+    "persistentProviderFence.legacyDriveRole",
+  );
+  requireEqual(
+    manifest.persistentProviderFence.legacyDriveCanEdit,
+    true,
+    "STEP11_6_PROVIDER_FENCE_NOT_RESTORED",
+    "persistentProviderFence.legacyDriveCanEdit",
+  );
+  requireEqual(
+    manifest.persistentProviderFence.legacyDriveCanShare,
+    true,
+    "STEP11_6_PROVIDER_FENCE_NOT_RESTORED",
+    "persistentProviderFence.legacyDriveCanShare",
+  );
+  requireEqual(
+    manifest.persistentProviderFence.aclUnknownDispatchCount,
     0,
     "STEP11_6_PROVIDER_FENCE_NOT_RESTORED",
-    "persistentProviderFence.protectionCount",
+    "persistentProviderFence.aclUnknownDispatchCount",
+  );
+  const legacyPrincipalFingerprint = requireResolved(
+    manifest.providerFenceRehearsal.legacyPrincipalFingerprint,
+    HEX64,
+    "STEP11_6_PROVIDER_PRINCIPAL_NOT_RESTORED",
+    "providerFenceRehearsal.legacyPrincipalFingerprint",
+  );
+  requireEqual(
+    legacyPrincipalFingerprint,
+    requireResolved(
+      manifest.aclV2Acceptance.legacyPrincipalFingerprint,
+      HEX64,
+      "STEP11_6_PROVIDER_PRINCIPAL_NOT_RESTORED",
+      "aclV2Acceptance.legacyPrincipalFingerprint",
+    ),
+    "STEP11_6_PROVIDER_PRINCIPAL_NOT_RESTORED",
+    "ACL-v2 legacy principal fingerprint",
+  );
+  requireEqual(
+    legacyPrincipalFingerprint,
+    requireResolved(
+      manifest.state.providerPrincipalFingerprint,
+      HEX64,
+      "STEP11_6_PROVIDER_PRINCIPAL_NOT_RESTORED",
+      "state.providerPrincipalFingerprint",
+    ),
+    "STEP11_6_PROVIDER_PRINCIPAL_NOT_RESTORED",
+    "ADMISSION_V3 provider principal fingerprint",
   );
   requireEqual(
     manifest.providerFenceProof.status,
@@ -1844,7 +3103,10 @@ function assertOwnerFreeze(quiesce, { requireDrain = false } = {}) {
   requireEqual(quiesce.ownerOverrideOperationallyFrozen, true,
     "PROVIDER_QUIESCE_OWNER_FREEZE_REQUIRED",
     "providerQuiesceEvidence.ownerOverrideOperationallyFrozen");
-  requireEqual(quiesce.ownerFreezeConfirmation, FIXED.ownerFreezeConfirmation,
+  const purposeBoundOwnerFreeze = quiesce.purpose === "CUTOVER"
+    ? FIXED.cutoverOwnerFreezeConfirmation
+    : FIXED.rehearsalOwnerFreezeConfirmation;
+  requireEqual(quiesce.ownerFreezeConfirmation, purposeBoundOwnerFreeze,
     "PROVIDER_QUIESCE_OWNER_FREEZE_REQUIRED",
     "providerQuiesceEvidence.ownerFreezeConfirmation");
   if (requireDrain) {
@@ -1869,6 +3131,103 @@ function assertOwnerFreeze(quiesce, { requireDrain = false } = {}) {
       refuse("PROVIDER_QUIESCE_OWNER_FREEZE_WINDOW_INVALID",
         "The complete quiesce drain must remain inside the owner freeze window.");
     }
+  }
+}
+
+function assertCertifiedLegacyPrincipalBinding(manifest) {
+  const legacyPrincipalFingerprint = requireResolved(
+    manifest.aclV2Acceptance.legacyPrincipalFingerprint,
+    HEX64,
+    "LEGACY_PROVIDER_PRINCIPAL_BINDING_MISMATCH",
+    "aclV2Acceptance.legacyPrincipalFingerprint",
+  );
+  requireEqual(
+    requireResolved(
+      manifest.providerFenceRehearsal.legacyPrincipalFingerprint,
+      HEX64,
+      "LEGACY_PROVIDER_PRINCIPAL_BINDING_MISMATCH",
+      "providerFenceRehearsal.legacyPrincipalFingerprint",
+    ),
+    legacyPrincipalFingerprint,
+    "LEGACY_PROVIDER_PRINCIPAL_BINDING_MISMATCH",
+    "providerFenceRehearsal legacy principal",
+  );
+  requireEqual(
+    requireResolved(
+      manifest.state.providerPrincipalFingerprint,
+      HEX64,
+      "LEGACY_PROVIDER_PRINCIPAL_BINDING_MISMATCH",
+      "state.providerPrincipalFingerprint",
+    ),
+    legacyPrincipalFingerprint,
+    "LEGACY_PROVIDER_PRINCIPAL_BINDING_MISMATCH",
+    "ADMISSION_V3 provider principal",
+  );
+  return legacyPrincipalFingerprint;
+}
+
+function assertFreshActiveCriticalWindow(manifest, quiesce) {
+  assertCertifiedLegacyPrincipalBinding(manifest);
+  requireEqual(quiesce.purpose, "CUTOVER",
+    "PROVIDER_QUIESCE_ACTIVE_EPOCH_REQUIRED",
+    "providerQuiesceEvidence.purpose");
+  requireEqual(quiesce.routingRule.mode, FIXED.criticalWindowWafMode,
+    "PROVIDER_QUIESCE_ACTIVE_EPOCH_REQUIRED",
+    "providerQuiesceEvidence.routingRule.mode");
+  requireEqual(quiesce.routingRule.groupCount, FIXED.criticalWindowWafGroupCount,
+    "PROVIDER_QUIESCE_ACTIVE_EPOCH_REQUIRED",
+    "providerQuiesceEvidence.routingRule.groupCount");
+  requireEqual(quiesce.baselineWafRestored, false,
+    "PROVIDER_QUIESCE_EPOCH_ALREADY_CONSUMED",
+    "providerQuiesceEvidence.baselineWafRestored");
+  requireEqual(quiesce.restoredWafFingerprint, null,
+    "PROVIDER_QUIESCE_EPOCH_ALREADY_CONSUMED",
+    "providerQuiesceEvidence.restoredWafFingerprint");
+  const step12StartedAt = requireTimestamp(manifest.execution.step12StartedAt,
+    "STEP12_START_TIMESTAMP_REQUIRED", "execution.step12StartedAt");
+  const activatedAt = requireTimestamp(quiesce.criticalWindowActivatedAt,
+    "PROVIDER_QUIESCE_ACTIVE_EPOCH_REQUIRED",
+    "providerQuiesceEvidence.criticalWindowActivatedAt");
+  const verifiedAt = requireTimestamp(quiesce.verifiedAt,
+    "PROVIDER_QUIESCE_ACTIVE_EPOCH_REQUIRED",
+    "providerQuiesceEvidence.verifiedAt");
+  const ownerFreezeExpiresAt = requireTimestamp(quiesce.ownerFreezeExpiresAt,
+    "PROVIDER_QUIESCE_ACTIVE_EPOCH_REQUIRED",
+    "providerQuiesceEvidence.ownerFreezeExpiresAt");
+  const expiresAt = requireTimestamp(quiesce.expiresAt,
+    "PROVIDER_QUIESCE_ACTIVE_EPOCH_REQUIRED",
+    "providerQuiesceEvidence.expiresAt");
+  const now = Date.now();
+  if (Date.parse(activatedAt) < Date.parse(step12StartedAt) ||
+      Date.parse(verifiedAt) < Date.parse(step12StartedAt) ||
+      Date.parse(verifiedAt) > now || Date.parse(ownerFreezeExpiresAt) <= now ||
+      Date.parse(expiresAt) <= now) {
+    refuse("PROVIDER_QUIESCE_ACTIVE_EPOCH_STALE",
+      "The verified CRITICAL_WINDOW epoch is not fresh and unexpired after Step 12 start.");
+  }
+  const rehearsalEvidenceId = manifest.providerFenceRehearsal.quiesceEvidenceId;
+  if (String(quiesce.evidenceId).toLowerCase() ===
+      String(rehearsalEvidenceId || "").toLowerCase()) {
+    refuse("PROVIDER_QUIESCE_HISTORICAL_EPOCH_REUSE_FORBIDDEN",
+      "Step 12 must use a new provider quiesce evidence identity, not the restored rehearsal epoch.");
+  }
+  const rehearsalAcceptance = manifest.aclV2Acceptance;
+  const cutoverFence = manifest.persistentProviderFence;
+  if (String(cutoverFence.installRequestId || "").toLowerCase() ===
+      String(rehearsalAcceptance.installRequestId || "").toLowerCase() ||
+      (!unresolved(cutoverFence.fenceId) &&
+        String(cutoverFence.fenceId).toLowerCase() ===
+          String(rehearsalAcceptance.fenceId || "").toLowerCase())) {
+    refuse("PERSISTENT_PROVIDER_FENCE_HISTORICAL_RUN_REUSE_FORBIDDEN",
+      "Step 12 must use a new install/fence run identity after Step 12 starts.");
+  }
+  const beginClaim = validatedProviderAliasClaim(manifest, "BEGIN").claim;
+  const finalizeClaim = validatedProviderAliasClaim(manifest, "FINALIZE").claim;
+  if (Date.parse(beginClaim.providerObservedAt) < Date.parse(step12StartedAt) ||
+      Date.parse(finalizeClaim.providerObservedAt) < Date.parse(step12StartedAt) ||
+      Date.parse(finalizeClaim.providerObservedAt) > now) {
+    refuse("PROVIDER_QUIESCE_PROVIDER_ATTESTATION_STALE",
+      "The provider-signed alias attestations were not captured in this active Step 12 epoch.");
   }
 }
 
@@ -1922,6 +3281,7 @@ function assertVerifiedQuiesce(manifest) {
     refuse("PROVIDER_QUIESCE_EVIDENCE_WINDOW_INVALID",
       "The verified quiesce interval is outside its drain or owner-freeze window.");
   }
+  assertFreshActiveCriticalWindow(manifest, quiesce);
   return quiesce;
 }
 
@@ -1929,6 +3289,7 @@ function assertPersistentProviderFence(manifest, {
   allowRemovalAuthorized = false,
   linkCurrentQuiesce = true,
 } = {}) {
+  assertCertifiedLegacyPrincipalBinding(manifest);
   const fence = manifest.persistentProviderFence;
   const allowed = allowRemovalAuthorized
     ? new Set(["INSTALLED", "REMOVAL_AUTHORIZED"])
@@ -1946,11 +3307,32 @@ function assertPersistentProviderFence(manifest, {
   const quiesceEvidenceId = requireResolved(fence.quiesceEvidenceId, UUID,
     "PERSISTENT_PROVIDER_FENCE_ID_REQUIRED", "persistentProviderFence.quiesceEvidenceId");
   assertCandidateEvidenceBinding(manifest, fence, "persistentProviderFence");
-  requireEqual(fence.protectionCount, 17, "PERSISTENT_PROVIDER_FENCE_INCOMPLETE",
-    "persistentProviderFence.protectionCount");
+  requireEqual(fence.lifecycleMode, "CUTOVER",
+    "PERSISTENT_PROVIDER_FENCE_INCOMPLETE", "persistentProviderFence.lifecycleMode");
+  requireEqual(fence.mechanism, "DRIVE_ACL_EXACT_LEGACY_PERMISSION_V2",
+    "PERSISTENT_PROVIDER_FENCE_INCOMPLETE", "persistentProviderFence.mechanism");
+  requireEqual(fence.legacyDriveRole, FIXED.legacyDriveRoleClosed,
+    "PERSISTENT_PROVIDER_FENCE_INCOMPLETE", "persistentProviderFence.legacyDriveRole");
+  requireEqual(fence.legacyDriveCanEdit, false,
+    "PERSISTENT_PROVIDER_FENCE_INCOMPLETE",
+    "persistentProviderFence.legacyDriveCanEdit");
+  requireEqual(fence.legacyDriveCanShare, false,
+    "PERSISTENT_PROVIDER_FENCE_INCOMPLETE",
+    "persistentProviderFence.legacyDriveCanShare");
+  requireEqual(fence.aclDispatchResult, FIXED.aclTransitionResultTarget,
+    "PERSISTENT_PROVIDER_FENCE_INCOMPLETE", "persistentProviderFence.aclDispatchResult");
+  requireEqual(fence.aclUnknownDispatchCount, 0,
+    "PERSISTENT_PROVIDER_FENCE_INCOMPLETE",
+    "persistentProviderFence.aclUnknownDispatchCount");
+  requireEqual(fence.providerSettlementStage, "SETTLEMENT_READBACK_2",
+    "PERSISTENT_PROVIDER_FENCE_SETTLEMENT_INCOMPLETE",
+    "persistentProviderFence.providerSettlementStage");
+  requireEqual(fence.admissionCloseCommitted, true,
+    "PERSISTENT_PROVIDER_FENCE_SETTLEMENT_INCOMPLETE",
+    "persistentProviderFence.admissionCloseCommitted");
   for (const field of [
     "expectedBaselineFingerprint", "expectedCanonicalValueFingerprint",
-    "protectionSetFingerprint", "providerFingerprint", "aclFingerprint",
+    "aclTransitionFingerprint", "providerFingerprint", "aclFingerprint",
     "canonicalValueFingerprint", "formulaFingerprint", "permissionInventoryFingerprint",
   ]) requireResolved(fence[field], HEX64, "PERSISTENT_PROVIDER_FENCE_INCOMPLETE",
     `persistentProviderFence.${field}`);
@@ -2097,9 +3479,14 @@ function assertOperationGuard(manifest, operation) {
     case "install-persistent-provider-fence": {
       const quiesce = assertVerifiedQuiesce(manifest);
       const fence = manifest.persistentProviderFence;
-      if (!["MISSING", "INSTALLING"].includes(fence.status)) {
+      if (fence.aclDispatchResult === FIXED.aclTransitionResultUnknown ||
+          fence.aclUnknownDispatchCount !== 0) {
+        refuse("ACL_DISPATCH_UNKNOWN_NO_RETRY",
+          "An OUTCOME_UNKNOWN Drive ACL dispatch may be inspected but never redispatched.");
+      }
+      if (!["MISSING", "INSTALLING", "INSTALLED"].includes(fence.status)) {
         refuse("PERSISTENT_PROVIDER_FENCE_INSTALL_STATE_INVALID",
-          "A new persistent fence can only start from MISSING or recover INSTALLING.");
+          "A persistent fence install may start, resume settlement, or recover its atomic-close response only.");
       }
       assertCandidateEvidenceBinding(manifest, fence, "persistentProviderFence");
       requireEqual(requireResolved(fence.installRequestId, UUID,
@@ -2119,18 +3506,18 @@ function assertOperationGuard(manifest, operation) {
       requireResolved(fence.expectedCanonicalValueFingerprint, HEX64,
         "PERSISTENT_PROVIDER_FENCE_BASELINE_REQUIRED",
         "persistentProviderFence.expectedCanonicalValueFingerprint");
-      requireEqual(state.cutoverPhase, "CURRENT_READS", "PHASE_SKIP_FORBIDDEN", "state.cutoverPhase");
-      requireEqual(state.activationState, "GOOGLE_LEASE_ARMED", "PHASE_SKIP_FORBIDDEN", "state.activationState");
-      requireEqual(state.scoringAuthority, "GOOGLE", "AUTHORITY_MISMATCH", "state.scoringAuthority");
+      requireEqual(state.cutoverPhase, "CURRENT_READS", "PHASE_SKIP_FORBIDDEN",
+        "state.cutoverPhase");
+      requireEqual(state.activationState, "GOOGLE_LEASE_ARMED", "PHASE_SKIP_FORBIDDEN",
+        "state.activationState");
+      requireEqual(state.scoringAuthority, "GOOGLE", "AUTHORITY_MISMATCH",
+        "state.scoringAuthority");
       requireEqual(state.participantIdentityAuthority, "SUPABASE", "IDENTITY_MISMATCH",
         "state.participantIdentityAuthority");
-      requireEqual(state.admissionState, "OPEN", "ADMISSION_STATE_MISMATCH", "state.admissionState");
-      requireEqual(state.gateExecutionState, "OPEN", "GATE_STATE_MISMATCH", "state.gateExecutionState");
       requireEqual(state.admissionProtocolEnforced, true,
         "ADMISSION_PROTOCOL_STATE_MISMATCH", "state.admissionProtocolEnforced");
       requireEqual(state.admissionDeploymentId, manifest.release.deploymentId,
         "PROVIDER_CANDIDATE_BINDING_MISMATCH", "state.admissionDeploymentId");
-      requireEqual(state.activeClosureId, null, "CLOSURE_STATE_MISMATCH", "state.activeClosureId");
       requireEqual(state.scoringIngressEnabled, false,
         "INGRESS_STATE_MISMATCH", "state.scoringIngressEnabled");
       requireEqual(state.workersEnabled, false,
@@ -2138,13 +3525,119 @@ function assertOperationGuard(manifest, operation) {
       assertNoLegacyWriters(manifest);
       assertDurableQueuesDrained(manifest);
       assertFirstWrite(manifest, { possible: false, observed: false });
-      assertInitialCutoverFenceWindowState(manifest);
+      if (fence.status === "MISSING") {
+        assertInitialCutoverFenceWindowState(manifest);
+      } else if (fence.status === "INSTALLING") {
+        requireEqual(state.admissionState, "CLOSING", "ADMISSION_STATE_MISMATCH",
+          "state.admissionState");
+        requireEqual(state.gateExecutionState, "PAUSED", "GATE_STATE_MISMATCH",
+          "state.gateExecutionState");
+        requireEqual(state.activeClosureId, null, "CLOSURE_STATE_MISMATCH",
+          "state.activeClosureId");
+        requireEqual(state.activeClosureKind, null, "CLOSURE_STATE_MISMATCH",
+          "state.activeClosureKind");
+        requireEqual(state.activeClosureStatus, null, "CLOSURE_STATE_MISMATCH",
+          "state.activeClosureStatus");
+      } else {
+        assertPersistentProviderFence(manifest);
+        requireEqual(state.admissionState, "CLOSING", "ADMISSION_STATE_MISMATCH",
+          "state.admissionState");
+        requireEqual(state.gateExecutionState, "PAUSED", "GATE_STATE_MISMATCH",
+          "state.gateExecutionState");
+        requireResolved(state.activeClosureId, UUID, "CLOSURE_STATE_MISMATCH",
+          "state.activeClosureId");
+        requireEqual(state.activeClosureKind, "LEGACY_ADMISSION",
+          "CLOSURE_STATE_MISMATCH", "state.activeClosureKind");
+        requireEqual(state.activeClosureStatus, "CLOSING",
+          "CLOSURE_STATE_MISMATCH", "state.activeClosureStatus");
+      }
+      return;
+    }
+    case "abort-persistent-provider-fence-install": {
+      const quiesce = assertVerifiedQuiesce(manifest);
+      const fence = manifest.persistentProviderFence;
+      if (fence.aclDispatchResult === FIXED.aclTransitionResultUnknown ||
+          fence.aclUnknownDispatchCount !== 0) {
+        refuse("ACL_DISPATCH_UNKNOWN_NO_RETRY",
+          "An OUTCOME_UNKNOWN Drive ACL dispatch may not be reversed, retried, or reopened.");
+      }
+      if (!["INSTALLING", "FAILED"].includes(fence.status)) {
+        refuse(
+          "PERSISTENT_PROVIDER_FENCE_ABORT_STATE_INVALID",
+          "Only an unfinished installation or its exact completed abort receipt may use recovery.",
+        );
+      }
+      assertCandidateEvidenceBinding(manifest, fence, "persistentProviderFence");
+      requireResolved(fence.fenceId, UUID,
+        "PERSISTENT_PROVIDER_FENCE_ID_REQUIRED", "persistentProviderFence.fenceId");
+      requireResolved(fence.installRequestId, UUID,
+        "PERSISTENT_PROVIDER_FENCE_INSTALL_ID_REQUIRED",
+        "persistentProviderFence.installRequestId");
+      requireEqual(requireResolved(fence.abortRequestId, UUID,
+        "PERSISTENT_PROVIDER_FENCE_ABORT_ID_REQUIRED",
+        "persistentProviderFence.abortRequestId"),
+      requireResolved(manifest.stableRequestIds[operation], UUID,
+        "STABLE_REQUEST_ID_REQUIRED", `stableRequestIds.${operation}`),
+      "PERSISTENT_PROVIDER_FENCE_ABORT_ID_MISMATCH",
+      "persistentProviderFence.abortRequestId");
+      requireEqual(String(fence.quiesceEvidenceId).toLowerCase(),
+        String(quiesce.evidenceId).toLowerCase(),
+        "PERSISTENT_PROVIDER_FENCE_QUIESCE_MISMATCH",
+        "persistentProviderFence.quiesceEvidenceId");
+      requireResolved(fence.expectedBaselineFingerprint, HEX64,
+        "PERSISTENT_PROVIDER_FENCE_BASELINE_REQUIRED",
+        "persistentProviderFence.expectedBaselineFingerprint");
+      requireResolved(fence.expectedCanonicalValueFingerprint, HEX64,
+        "PERSISTENT_PROVIDER_FENCE_BASELINE_REQUIRED",
+        "persistentProviderFence.expectedCanonicalValueFingerprint");
+      requireEqual(state.cutoverPhase, "CURRENT_READS", "PHASE_SKIP_FORBIDDEN",
+        "state.cutoverPhase");
+      requireEqual(state.activationState, "GOOGLE_LEASE_ARMED", "PHASE_SKIP_FORBIDDEN",
+        "state.activationState");
+      requireEqual(state.scoringAuthority, "GOOGLE", "AUTHORITY_MISMATCH",
+        "state.scoringAuthority");
+      requireEqual(state.participantIdentityAuthority, "SUPABASE", "IDENTITY_MISMATCH",
+        "state.participantIdentityAuthority");
+      requireEqual(state.scoringIngressEnabled, false,
+        "INGRESS_STATE_MISMATCH", "state.scoringIngressEnabled");
+      requireEqual(state.workersEnabled, false,
+        "WORKERS_MUST_BE_DISABLED", "state.workersEnabled");
+      requireEqual(state.activeClosureId, null,
+        "PERSISTENT_PROVIDER_FENCE_ABORT_NOT_SAFE", "state.activeClosureId");
+      requireEqual(state.preparedEpochId, null,
+        "PERSISTENT_PROVIDER_FENCE_ABORT_NOT_SAFE", "state.preparedEpochId");
+      assertNoLegacyWriters(manifest);
+      assertDurableQueuesDrained(manifest);
+      assertFirstWrite(manifest, { possible: false, observed: false });
+      if (fence.status === "INSTALLING") {
+        requireEqual(state.admissionProtocolEnforced, true,
+          "ADMISSION_PROTOCOL_STATE_MISMATCH", "state.admissionProtocolEnforced");
+        requireEqual(state.admissionState, "CLOSING",
+          "PERSISTENT_PROVIDER_FENCE_ABORT_NOT_SAFE", "state.admissionState");
+        requireEqual(state.gateExecutionState, "PAUSED",
+          "PERSISTENT_PROVIDER_FENCE_ABORT_NOT_SAFE", "state.gateExecutionState");
+      } else {
+        requireEqual(fence.abortRequestId,
+          manifest.stableRequestIds[operation],
+          "PERSISTENT_PROVIDER_FENCE_ABORT_ID_MISMATCH",
+          "persistentProviderFence.abortRequestId");
+        requireResolved(fence.abortRestorationEvidenceFingerprint, HEX64,
+          "PERSISTENT_PROVIDER_FENCE_ABORT_RECEIPT_REQUIRED",
+          "persistentProviderFence.abortRestorationEvidenceFingerprint");
+      }
       return;
     }
     case "inspect-persistent-provider-fence": {
       const fence = manifest.persistentProviderFence;
       assertCandidateEvidenceBinding(manifest, fence, "persistentProviderFence");
-      if (fence.status !== "MISSING") {
+      if (["INSTALLING", "FAILED"].includes(fence.status)) {
+        requireResolved(fence.installRequestId, UUID,
+          "PERSISTENT_PROVIDER_FENCE_ID_REQUIRED",
+          "persistentProviderFence.installRequestId");
+        requireResolved(fence.fenceId, UUID,
+          "PERSISTENT_PROVIDER_FENCE_ID_REQUIRED",
+          "persistentProviderFence.fenceId");
+      } else if (fence.status !== "MISSING") {
         assertPersistentProviderFence(manifest, {
           allowRemovalAuthorized: true,
           linkCurrentQuiesce: false,
@@ -2481,7 +3974,9 @@ function signedProviderAttestation(manifest, challenge, stage, requestOperation)
     "PROVIDER_ATTESTATION_REQUIRED", `providerAttestationChallenges.${stage.toLowerCase()}.signedAttestation`);
   const claim = requireObject(envelope.attestation, "PROVIDER_ATTESTATION_REQUIRED",
     `providerAttestationChallenges.${stage.toLowerCase()}.signedAttestation.attestation`);
-  if (envelope.schemaVersion !== "bagger-vercel-provider-attestation-envelope-v1" ||
+  validatedProviderAliasClaim(manifest, stage);
+  const routing = manifest.providerQuiesceEvidence.routingRule;
+  if (envelope.schemaVersion !== "bagger-vercel-provider-attestation-envelope-v2" ||
       envelope.algorithm !== "Ed25519" ||
       envelope.signerKeyVersion !== "STEP11_6_VERCEL_ATTESTER_V1" ||
       !HEX64.test(String(envelope.signerKeyFingerprint || "")) ||
@@ -2493,12 +3988,31 @@ function signedProviderAttestation(manifest, challenge, stage, requestOperation)
       claim.attestationId === challenge.challengeId ||
       claim.challengeId !== challenge.challengeId ||
       claim.requestId !== manifest.stableRequestIds[requestOperation] ||
-      claim.stage !== stage || claim.purpose !== "CUTOVER" ||
+      claim.schemaVersion !==
+        "bagger-vercel-provider-attestation-noncanonical-host-v2" ||
+      claim.stage !== stage ||
+      claim.purpose !== manifest.providerQuiesceEvidence.purpose ||
       claim.vercelProjectId !== FIXED.vercelProjectId ||
       claim.vercelTeamId !== manifest.resources.vercelTeamId ||
       claim.candidateDeploymentId !== manifest.release.deploymentId ||
       claim.candidateDeploymentCommit !== manifest.release.frozenSha ||
-      claim.candidateDeploymentTarget !== "PRODUCTION") {
+      claim.candidateDeploymentTarget !== "PREVIEW" ||
+      claim.candidateAliasOrigin !==
+        manifest.providerQuiesceEvidence.candidateAliasOrigin ||
+      claim.candidateImmutableOrigin !==
+        manifest.providerQuiesceEvidence.candidateImmutableOrigin ||
+      claim.routingRuleHostnameOperator !== routing.hostnameOperator ||
+      claim.routingRuleCanonicalHostname !== routing.canonicalHostname ||
+      claim.routingRuleEarlierActiveBypassRuleCount !==
+        routing.earlierActiveBypassRuleCount ||
+      claim.routingRuleAllMethodFenceRequiredHostCount !==
+        routing.allMethodFenceRequiredHostCount ||
+      claim.routingRuleAllMethodFenceRequiredHostsFingerprint !==
+        routing.allMethodFenceRequiredHostsFingerprint ||
+      claim.routingRuleAllMethodFenceRequiredPathCount !==
+        routing.allMethodFenceRequiredPathCount ||
+      claim.routingRuleAllMethodFenceRequiredPathsFingerprint !==
+        routing.allMethodFenceRequiredPathsFingerprint) {
     refuse("PROVIDER_ATTESTATION_BINDING_MISMATCH",
       `The ${stage} provider attestation does not match its DB challenge and release scope.`);
   }
@@ -2518,14 +4032,14 @@ function retainedProviderAttestationChallenge(
   );
   const quiesce = manifest.providerQuiesceEvidence;
   const status = String(retained.status || "").toUpperCase();
-  const expectedTarget = "PRODUCTION";
+  const expectedTarget = "PREVIEW";
   const exact = [
     [retained.challengeId, challenge.challengeId],
     [retained.challengeRequestId, challenge.challengeRequestId],
     [retained.operationRequestId, manifest.stableRequestIds[requestOperation]],
     [retained.evidenceRequestId, quiesce.evidenceRequestId],
     [retained.stage, stage],
-    [retained.purpose, "CUTOVER"],
+    [retained.purpose, quiesce.purpose],
     [retained.vercelProjectId, FIXED.vercelProjectId],
     [retained.vercelTeamId, manifest.resources.vercelTeamId],
     [retained.candidateDeploymentId, manifest.release.deploymentId],
@@ -2724,13 +4238,25 @@ function providerActionDefaults(manifest, operation) {
       expectedCanonicalValueFingerprint: fence.expectedCanonicalValueFingerprint,
       confirmation: FIXED.providerFenceDescription,
     };
+    case "abort-persistent-provider-fence-install": return {
+      ...common,
+      installRequestId: fence.installRequestId,
+      fenceId: fence.fenceId,
+      quiesceEvidenceId: fence.quiesceEvidenceId,
+      expectedBaselineFingerprint: fence.expectedBaselineFingerprint,
+      expectedCanonicalValueFingerprint: fence.expectedCanonicalValueFingerprint,
+      confirmation: FIXED.providerFenceAbortConfirmation,
+    };
     case "inspect-persistent-provider-fence": {
       const absent = fence.status === "MISSING";
+      const hasVerification = new Set([
+        "INSTALLED", "REMOVAL_AUTHORIZED", "REMOVED",
+      ]).has(fence.status);
       return {
         ...common,
         installRequestId: absent ? null : fence.installRequestId,
         fenceId: absent ? null : fence.fenceId,
-        currentVerificationId: absent ? null : fence.currentVerificationId,
+        currentVerificationId: hasVerification ? fence.currentVerificationId : null,
       };
     }
     case "refresh-persistent-provider-fence": return {
@@ -2999,6 +4525,7 @@ function validateRenderedProviderPayload(operation, payload) {
 }
 
 function buildDiagnosticStateGuard(manifest) {
+  const providerSettlement = manifest.persistentProviderFence;
   return {
     activationState: manifest.state.activationState,
     activationRevision: manifest.state.activationRevision,
@@ -3015,6 +4542,10 @@ function buildDiagnosticStateGuard(manifest) {
     admissionState: manifest.state.admissionState,
     admissionRevision: manifest.state.admissionRevision,
     admissionGeneration: manifest.state.admissionGeneration,
+    providerPrincipalFingerprint:
+      manifest.state.providerPrincipalFingerprint,
+    certifiedLegacyPrincipalFingerprint:
+      manifest.aclV2Acceptance.legacyPrincipalFingerprint,
     activeClosureId: manifest.state.activeClosureId,
     activeClosureKind: manifest.state.activeClosureKind,
     activeClosureStatus: manifest.state.activeClosureStatus,
@@ -3032,9 +4563,78 @@ function buildDiagnosticStateGuard(manifest) {
     quiesceEvidenceId: manifest.providerQuiesceEvidence.evidenceId,
     quiesceEvidenceRequestId: manifest.providerQuiesceEvidence.evidenceRequestId,
     persistentProviderFenceStatus: manifest.persistentProviderFence.status,
+    persistentProviderFenceLifecycleMode:
+      manifest.persistentProviderFence.lifecycleMode,
+    persistentProviderFenceMechanism:
+      manifest.persistentProviderFence.mechanism,
     persistentProviderFenceId: manifest.persistentProviderFence.fenceId,
     persistentProviderFenceVerificationId:
       manifest.persistentProviderFence.currentVerificationId,
+    legacyDriveRole: manifest.persistentProviderFence.legacyDriveRole,
+    legacyDriveCanEdit: manifest.persistentProviderFence.legacyDriveCanEdit,
+    legacyDriveCanShare: manifest.persistentProviderFence.legacyDriveCanShare,
+    aclDispatchResult: manifest.persistentProviderFence.aclDispatchResult,
+    aclUnknownDispatchCount:
+      manifest.persistentProviderFence.aclUnknownDispatchCount,
+    criticalWindowWafMode: manifest.providerQuiesceEvidence.routingRule.mode,
+    criticalWindowWafGroupCount:
+      manifest.providerQuiesceEvidence.routingRule.groupCount,
+    criticalWindowWafFingerprint:
+      manifest.providerQuiesceEvidence.criticalWindowWafFingerprint,
+    criticalWindowActivatedAt:
+      manifest.providerQuiesceEvidence.criticalWindowActivatedAt,
+    aclV2AcceptanceFingerprint:
+      manifest.aclV2Acceptance.acceptanceFingerprint,
+    providerSettlementStage: providerSettlement.providerSettlementStage,
+    providerSettlementLatestObservationId:
+      providerSettlement.providerSettlementLatestObservationId,
+    aclReaderConfirmedObservationId:
+      providerSettlement.aclReaderConfirmedObservationId,
+    settlementReadback1ObservationId:
+      providerSettlement.settlementReadback1ObservationId,
+    settlementReadback2ObservationId:
+      providerSettlement.settlementReadback2ObservationId,
+    providerSettlementNextEligibleAt:
+      providerSettlement.providerSettlementNextEligibleAt,
+    providerSettlementRemainingWaitSeconds:
+      providerSettlement.providerSettlementRemainingWaitSeconds,
+    providerSettlementInstallWaitSeconds:
+      providerSettlement.providerSettlementInstallWaitSeconds,
+    providerSettlementReadbackWaitSeconds:
+      providerSettlement.providerSettlementReadbackWaitSeconds,
+    settlementCompletedAt: providerSettlement.settlementCompletedAt,
+    admissionCloseCommitted: providerSettlement.admissionCloseCommitted,
+  };
+}
+
+function buildProviderSettlementCheckpoint(manifest) {
+  const fence = manifest.persistentProviderFence;
+  const stage = fence.providerSettlementStage;
+  const nextOperation = stage === "AWAITING_ACL_READER_CONFIRMED"
+    ? "DISPATCH_DRIVE_WRITER_TO_READER_AND_RECORD_TARGET_CONFIRMED"
+    : stage === "ACL_READER_CONFIRMED"
+      ? "WAIT_UNTIL_ELIGIBLE_THEN_RECORD_SETTLEMENT_READBACK_1"
+      : stage === "SETTLEMENT_READBACK_1"
+        ? "WAIT_UNTIL_ELIGIBLE_THEN_ATOMIC_READBACK_2_FINISH_AND_CLOSE"
+        : "SETTLEMENT_COMPLETE_ADMISSION_CLOSING_DRAIN_REQUIRED";
+  return {
+    stage,
+    nextOperation,
+    mechanism: fence.mechanism,
+    lifecycleMode: fence.lifecycleMode,
+    legacyDriveRole: fence.legacyDriveRole,
+    aclDispatchResult: fence.aclDispatchResult,
+    aclUnknownDispatchCount: fence.aclUnknownDispatchCount,
+    aclDispatchRetryAllowed: false,
+    nextEligibleAt: fence.providerSettlementNextEligibleAt,
+    remainingWaitSeconds: fence.providerSettlementRemainingWaitSeconds,
+    minimumSecondsAfterAclReaderConfirmed:
+      FIXED.providerSettlementInstallWaitSeconds,
+    minimumSecondsBetweenReadbacks:
+      FIXED.providerSettlementReadbackWaitSeconds,
+    minimumTotalSeconds: FIXED.providerSettlementMinimumTotalSeconds,
+    finishAndCloseRpc: FIXED.providerSettlementFinishAndCloseRpc,
+    admissionCloseCommitted: fence.admissionCloseCommitted,
   };
 }
 
@@ -3056,6 +4656,8 @@ export function buildOperationEnvelope(manifest, operation) {
   }
   const diagnosticStateGuard = buildDiagnosticStateGuard(manifest);
   if (PROVIDER_ACTIONS.has(operation)) {
+    const providerSettlementCheckpoint =
+      buildProviderSettlementCheckpoint(manifest);
     let payload = providerActionDefaults(manifest, operation);
     payload = mergeProviderActionInput(manifest, operation, payload);
     validateRenderedProviderPayload(operation, payload);
@@ -3064,6 +4666,7 @@ export function buildOperationEnvelope(manifest, operation) {
       operation,
       payload,
       diagnosticStateGuard,
+      providerSettlementCheckpoint,
       originInventoryBinding: productionOriginInventoryBinding(),
     }));
     const envelope = {
@@ -3085,6 +4688,7 @@ export function buildOperationEnvelope(manifest, operation) {
       requestFingerprint,
       payload,
       diagnosticStateGuard,
+      providerSettlementCheckpoint,
       originInventoryBinding: productionOriginInventoryBinding(),
       sqlEnvelope: null,
       runbook: FIXED.runbook,
@@ -3143,7 +4747,10 @@ function environmentDeltaMaterial(manifest) {
       directorPlayerId: FIXED.providerFenceDirector,
       fenceDescription: FIXED.providerFenceDescription,
       fenceRemoveConfirmation: FIXED.providerFenceRemoveConfirmation,
-      ownerFreezeConfirmation: FIXED.ownerFreezeConfirmation,
+      rehearsalOwnerFreezeConfirmation:
+        FIXED.rehearsalOwnerFreezeConfirmation,
+      cutoverOwnerFreezeConfirmation:
+        FIXED.cutoverOwnerFreezeConfirmation,
       quiesceScope: FIXED.quiesceScope,
       originInventoryArtifact: FIXED.originInventoryArtifact,
       originInventorySchema: FIXED.originInventorySchema,
@@ -3158,6 +4765,20 @@ function environmentDeltaMaterial(manifest) {
         FIXED.credentialConfinementRecordsFingerprint,
       credentialConfinementEvidenceFingerprint:
         FIXED.credentialConfinementEvidenceFingerprint,
+      credentialConfinementEnvironmentReviewSchema:
+        FIXED.credentialConfinementEnvironmentReviewSchema,
+      credentialConfinementProviderEnvironmentRecordCount:
+        FIXED.credentialConfinementProviderEnvironmentRecordCount,
+      credentialConfinementHiddenProductionEnvironmentRecordCount:
+        FIXED.credentialConfinementHiddenProductionEnvironmentRecordCount,
+      credentialConfinementReviewedEnvironmentRecordCount:
+        FIXED.credentialConfinementReviewedEnvironmentRecordCount,
+      credentialConfinementReviewedEnvironmentRecordsFingerprint:
+        FIXED.credentialConfinementReviewedEnvironmentRecordsFingerprint,
+      credentialConfinementEnvironmentReviewFingerprint:
+        FIXED.credentialConfinementEnvironmentReviewFingerprint,
+      credentialConfinementEnvironmentContinuityFingerprint:
+        FIXED.credentialConfinementEnvironmentContinuityFingerprint,
       historicalSafeMethodWriterArtifact:
         FIXED.historicalSafeMethodWriterArtifact,
       historicalSafeMethodWriterSchema:
@@ -3177,6 +4798,22 @@ function environmentDeltaMaterial(manifest) {
       fixedAliasOriginCount: FIXED.quiesceFixedAliasOriginCount,
       candidateAliasOriginCount: FIXED.quiesceCandidateAliasOriginCount,
       probeVectorCount: FIXED.quiesceProbeVectorCount,
+      aclAcceptanceSchema: FIXED.aclAcceptanceSchema,
+      aclMechanism: "DRIVE_ACL_EXACT_LEGACY_PERMISSION_V2",
+      legacyDriveRoleOpen: FIXED.legacyDriveRoleOpen,
+      legacyDriveRoleClosed: FIXED.legacyDriveRoleClosed,
+      aclTargetResult: FIXED.aclTransitionResultTarget,
+      aclUnknownResult: FIXED.aclTransitionResultUnknown,
+      aclUnknownRetryAllowed: false,
+      providerSettlementInstallWaitSeconds:
+        FIXED.providerSettlementInstallWaitSeconds,
+      providerSettlementReadbackWaitSeconds:
+        FIXED.providerSettlementReadbackWaitSeconds,
+      criticalWindowWafMode: FIXED.criticalWindowWafMode,
+      criticalWindowWafGroupCount: FIXED.criticalWindowWafGroupCount,
+      criticalWindowWafMinimumHoldSeconds:
+        FIXED.criticalWindowWafMinimumHoldSeconds,
+      baselineWafMode: FIXED.legacyCompatibleBaselineWafMode,
     },
     migration: {
       name: manifest.release.migrationName,
@@ -3201,6 +4838,7 @@ export function computeCertificationFingerprint(manifest) {
     domain: "BAGGER_STEP11_6_CERTIFICATION_V2",
     certification: clone(manifest.certification),
     providerFenceRehearsal: clone(manifest.providerFenceRehearsal),
+    aclV2Acceptance: clone(manifest.aclV2Acceptance),
     providerQuiesceEvidence: clone(manifest.providerQuiesceEvidence),
     state: clone(manifest.state),
     resources: clone(manifest.resources),
@@ -3315,10 +4953,13 @@ function usage() {
       "operator.mjs validate --manifest <path>",
       "operator.mjs readiness --manifest <path>",
       "operator.mjs payload --manifest <path> --operation <name>",
+      "operator.mjs waf-payload --manifest <path> --operation <name>",
       "operator.mjs fingerprint --manifest <path>",
       "operator.mjs operations",
+      "operator.mjs waf-operations",
     ],
     operations: Object.keys(OPERATIONS),
+    wafCriticalEpochOperations: Object.keys(WAF_CRITICAL_EPOCH_OPERATIONS),
   };
 }
 
@@ -3329,7 +4970,14 @@ export function main() {
     return;
   }
   if (command === "operations") {
-    print({ operations: OPERATIONS });
+    print({
+      operations: OPERATIONS,
+      wafCriticalEpochOperations: WAF_CRITICAL_EPOCH_OPERATIONS,
+    });
+    return;
+  }
+  if (command === "waf-operations") {
+    print({ wafCriticalEpochOperations: WAF_CRITICAL_EPOCH_OPERATIONS });
     return;
   }
   const manifestPath = argument("--manifest");
@@ -3351,6 +4999,12 @@ export function main() {
     const operation = argument("--operation");
     if (!operation) refuse("OPERATION_REQUIRED", "--operation <name> is required.");
     print(buildOperationEnvelope(manifest, operation));
+    return;
+  }
+  if (command === "waf-payload") {
+    const operation = argument("--operation");
+    if (!operation) refuse("OPERATION_REQUIRED", "--operation <name> is required.");
+    print(buildWafCriticalEpochEnvelope(manifest, operation));
     return;
   }
   refuse("UNKNOWN_COMMAND", `Unknown command: ${command}`);
