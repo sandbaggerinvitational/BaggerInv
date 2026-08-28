@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { normalizedReadDiagnostics } from "../lib/google-sheets-server-read.js";
 import { initializeTournamentWorkbook } from "../lib/tournament-workbook-initialization.js";
 import { createRuntimeProfile, runtimePerformanceReport } from "../lib/runtime-performance.js";
 
@@ -74,6 +75,12 @@ test("normalized reads classify static, semi-static, and live sheets and cache b
   assert.match(model, /invalidateNormalizedSheetCache\(Array\.isArray\(sheetNames\) \? sheetNames : undefined\)/);
   assert.match(liveRoute, /Server-Timing|attachRuntimeTiming/);
   assert.match(diagnostic, /slowestOperations: runtimePerformanceReport\(\)/);
+});
+
+test("live read diagnostics are safe before a Google token is cached", () => {
+  const state = normalizedReadDiagnostics();
+  assert.equal(state.tokenCached, false);
+  assert.equal(state.pendingReads, 0);
 });
 
 test("personalized match assembly reuses the initialized tournament model", async () => {
