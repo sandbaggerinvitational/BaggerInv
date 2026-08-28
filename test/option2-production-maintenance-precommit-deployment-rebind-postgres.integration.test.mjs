@@ -29,6 +29,8 @@ const capabilityMigration =
   "202608280051_production_maintenance_single_deployment_capability.sql";
 const precommitCapabilityGuardMigration =
   "202608280052_production_maintenance_precommit_capability_guard.sql";
+const postcutoverApplicationReleaseMigration =
+  "202608280053_production_postcutover_application_release_rebind.sql";
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const postgresBinaries = Object.fromEntries(
   ["createdb", "initdb", "pg_ctl", "psql"].map((name) => [
@@ -37,9 +39,13 @@ const postgresBinaries = Object.fromEntries(
   ]),
 );
 
-const releaseSha = "a".repeat(40);
+const releaseSha = "7baf9b284d4784d7387f3e4fa876b9d47cd0a177";
+const postcutoverReleaseSha = "56ded61379e3308ab5c465ce186140550f3827a7";
 const oldDeployment = "dpl_MaintenanceOriginal050";
 const newDeployment = "dpl_MaintenanceReplacement050";
+const postcutoverDeployment = "dpl_PostcutoverApplication053";
+const postcutoverDeploymentHostname =
+  "bagger-postcutover-application-053.vercel.app";
 const candidateDeployment = "dpl_MaintenanceCandidate050";
 const candidateDeploymentHostname = "bagger-maintenance-candidate.vercel.app";
 const epochId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
@@ -768,6 +774,18 @@ function rebindInputV2(current, label, overrides = {}) {
   });
 }
 
+function postcutoverApplicationRebindInput(current, label, overrides = {}) {
+  return rebindInputV2(current, label, {
+    original_deployment_id: newDeployment,
+    deployment_id: postcutoverDeployment,
+    deployment_commit: postcutoverReleaseSha,
+    runtime_deployment_commit: postcutoverReleaseSha,
+    runtime_deployment_hostname: postcutoverDeploymentHostname,
+    request_fingerprint: fingerprint(`postcutover-rebind-${label}`),
+    ...overrides,
+  });
+}
+
 function capabilityScope(extra = {}) {
   return {
     ...scope,
@@ -778,6 +796,14 @@ function capabilityScope(extra = {}) {
     deployment_capability_ceiling: "OBSERVATION",
     ...extra,
   };
+}
+
+function postcutoverCapabilityScope(extra = {}) {
+  return capabilityScope({
+    deployment_id: postcutoverDeployment,
+    deployment_commit: postcutoverReleaseSha,
+    ...extra,
+  });
 }
 
 function configureCurrentReadsBeforeCapabilityBinding(cluster, database, {
@@ -1816,6 +1842,196 @@ test(
         assert.equal(finalState.admission_deployment_id, newDeployment);
         assert.equal(finalState.authority, "SUPABASE");
         assert.equal(finalState.resource_workers, true);
+
+        const providerBeforeApplicationRelease = psql(cluster, database, `
+          select pg_catalog.pg_get_functiondef(
+            'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+              ::regprocedure
+          );
+        `);
+        psqlFile(
+          cluster,
+          database,
+          path.join(migrationsDirectory, precommitCapabilityGuardMigration),
+        );
+        assert.deepEqual(baseState(cluster, database), finalState);
+        psqlFile(
+          cluster,
+          database,
+          path.join(
+            migrationsDirectory,
+            postcutoverApplicationReleaseMigration,
+          ),
+        );
+        assert.deepEqual(baseState(cluster, database), finalState);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.pg_get_functiondef(
+            'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+              ::regprocedure
+          );
+        `), providerBeforeApplicationRelease);
+
+        psql(cluster, database, `
+          select production_control
+            .assert_production_maintenance_runtime_capability(
+              ${jsonSql(capabilityScope())}, 'OBSERVATION'
+            );
+        `);
+
+        const wrongTargetInput = postcutoverApplicationRebindInput(
+          baseState(cluster, database),
+          "wrong-target",
+          { runtime_deployment_target: "PREVIEW" },
+        );
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "rebind_production_maintenance_precommit_deployment",
+            wrongTargetInput,
+          ),
+          /PRODUCTION_POSTCUTOVER_APPLICATION_RELEASE_INPUT_INVALID/,
+        );
+        assert.deepEqual(baseState(cluster, database), finalState);
+
+        const exactApplicationInput = postcutoverApplicationRebindInput(
+          baseState(cluster, database),
+          "exact",
+        );
+        const applicationRebound = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          exactApplicationInput,
+        );
+        assert.equal(
+          applicationRebound.code,
+          "PRODUCTION_POSTCUTOVER_APPLICATION_RELEASE_REBOUND",
+        );
+        assert.equal(applicationRebound.idempotent, false);
+        assert.equal(applicationRebound.deployment_commit, postcutoverReleaseSha);
+        assert.equal(applicationRebound.deployment_id, postcutoverDeployment);
+        assert.equal(applicationRebound.cutover_phase, "OBSERVATION");
+        assert.equal(applicationRebound.authority, "SUPABASE");
+        assert.equal(
+          applicationRebound.participant_identity_authority,
+          "SUPABASE",
+        );
+        assert.equal(applicationRebound.maintenance_state, "NORMAL");
+        assert.equal(applicationRebound.ingress, "OPEN");
+        assert.equal(applicationRebound.workers_enabled, true);
+
+        const applicationState = baseState(cluster, database);
+        assert.equal(
+          applicationState.activation_revision,
+          finalState.activation_revision + 1,
+        );
+        assert.equal(
+          applicationState.admission_revision,
+          finalState.admission_revision + 1,
+        );
+        assert.equal(
+          applicationState.expected_deployment_commit,
+          postcutoverReleaseSha,
+        );
+        assert.equal(
+          applicationState.admission_deployment_id,
+          postcutoverDeployment,
+        );
+        for (const field of [
+          "activation_state",
+          "authority_generation_id",
+          "authority",
+          "boundary_mode",
+          "read_cutover_phase",
+          "maintenance_state",
+          "activation_ingress",
+          "first_write_possible_at",
+          "first_write_observed_at",
+          "resource_authority",
+          "identity_authority",
+          "read_authority",
+          "resource_ingress",
+          "resource_workers",
+          "admission_state",
+          "admission_generation_id",
+          "execution_gate",
+          "active_epoch_id",
+          "active_closure_id",
+        ]) {
+          assert.deepEqual(
+            applicationState[field],
+            finalState[field],
+            `${field} is invariant across the application release`,
+          );
+        }
+
+        assert.equal(psql(cluster, database, `
+          select deployment_id
+          from production_control.scoring_admission_closures
+          where closure_id = ${sqlLiteral(closureId)}::uuid;
+        `), postcutoverDeployment);
+        assert.equal(psql(cluster, database, `
+          select deployment_commit
+          from scoring_authority.authority_epochs
+          where epoch_id = ${sqlLiteral(epochId)}::uuid;
+        `), postcutoverReleaseSha);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.worker_controls value
+          where value.worker_name in (
+            'SCORING_GOOGLE_OUTBOX', 'ROUND_SCORECARDS_ARCHIVE',
+            'ODDS_CALCULATION'
+          )
+            and value.enabled
+            and value.metadata->>'deployment_commit' =
+              ${sqlLiteral(postcutoverReleaseSha)}
+            and value.metadata->>'deployment_id' =
+              ${sqlLiteral(postcutoverDeployment)};
+        `), "3");
+        assert.equal(psql(cluster, database, `
+          select deployment_commit
+          from production_control.odds_calculation_runtime
+          where scope_key = 'BAGGER_INV_PRODUCTION' and enabled;
+        `), postcutoverReleaseSha);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_application_release_rebindings
+          where prior_deployment_id = ${sqlLiteral(newDeployment)}
+            and prior_deployment_commit = ${sqlLiteral(releaseSha)}
+            and deployment_id = ${sqlLiteral(postcutoverDeployment)}
+            and deployment_commit = ${sqlLiteral(postcutoverReleaseSha)};
+        `), "1");
+
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control
+              .assert_production_maintenance_runtime_capability(
+                ${jsonSql(capabilityScope())}, 'OBSERVATION'
+              );
+          `),
+          /PRODUCTION_(?:POSTCUTOVER_APPLICATION_RELEASE_REQUIRED|EXACT_RELEASE_REQUIRED)/,
+        );
+        psql(cluster, database, `
+          select production_control
+            .assert_production_maintenance_runtime_capability(
+              ${jsonSql(postcutoverCapabilityScope())}, 'OBSERVATION'
+            );
+        `);
+
+        const replay = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          exactApplicationInput,
+        );
+        assert.equal(replay.idempotent, true);
+        assert.equal(replay.application_rebind_id, applicationRebound.application_rebind_id);
+        assert.deepEqual(baseState(cluster, database), applicationState);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_application_release_rebindings;
+        `), "1");
       });
     } finally {
       await destroyCluster(cluster);
@@ -1869,6 +2085,26 @@ test(
         path.join(migrationsDirectory, precommitCapabilityGuardMigration),
       );
       assert.deepEqual(baseState(cluster, templateDatabase), beforeMigration);
+      assert.equal(psql(cluster, templateDatabase, `
+        select pg_catalog.pg_get_functiondef(
+          'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+            ::regprocedure
+        );
+      `), providerBefore);
+
+      const beforeApplicationReleaseMigration = baseState(
+        cluster,
+        templateDatabase,
+      );
+      psqlFile(
+        cluster,
+        templateDatabase,
+        path.join(migrationsDirectory, postcutoverApplicationReleaseMigration),
+      );
+      assert.deepEqual(
+        baseState(cluster, templateDatabase),
+        beforeApplicationReleaseMigration,
+      );
       assert.equal(psql(cluster, templateDatabase, `
         select pg_catalog.pg_get_functiondef(
           'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
