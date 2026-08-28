@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
@@ -146,6 +147,26 @@ test("offline preparation produces inert Production-only templates deterministic
   assert.equal(first.source_workbook_id, PRODUCTION_GOOGLE_WORKBOOK_ID);
   assert.equal(first.completed_history.length, 9);
   assert.equal(first.current_tournament.counts.matches, 1);
+  assert.equal(
+    first.current_tournament.semantic_parity_contract,
+    "production-current-shadow-semantic-parity-v1",
+  );
+  assert.match(first.current_tournament.semantic_payload_fingerprint, /^[0-9a-f]{64}$/);
+  assert.equal(
+    JSON.parse(first.current_tournament.semantic_payload_canonical_json)
+      .contract_version,
+    first.current_tournament.semantic_parity_contract,
+  );
+  assert.equal(
+    createHash("sha256")
+      .update(first.current_tournament.semantic_payload_canonical_json)
+      .digest("hex"),
+    first.current_tournament.semantic_payload_fingerprint,
+  );
+  assert.equal(
+    first.current_tournament.semantic_payload_fingerprint,
+    second.current_tournament.semantic_payload_fingerprint,
+  );
   assert.equal(first.current_tournament.input_template.actor_id, "step10b-production-shadow-bootstrap");
   assert.equal(first.current_tournament.input_template.operation, "CURRENT_TOURNAMENT_SHADOW_IMPORT");
   assert.equal("director_authorization" in first.current_tournament.input_template, false);
