@@ -339,6 +339,14 @@ button:disabled { cursor: not-allowed; }
 .sideNavGroup a > b, .sideNavGroup button > b { min-width: 0; font-weight: 750; }
 .sideNavGroup a > i, .sideNavGroup button > i { color: rgba(255,255,255,.5); font: normal 1.45rem/1 Arial, sans-serif; }
 .sideNavGroup button:disabled { opacity: .65; }
+.sideNavSite .sideNavGroup > div { gap: 0; }
+.sideNavSite .sideNavGroup a {
+  min-height: 0;
+  display: block;
+  padding: 13px 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.28rem;
+}
 .sideNav a:hover, .sideNav button:hover, .sideNav a.current { background: rgba(255,255,255,.08); color: var(--gold-soft); transform: translateX(3px); }
 .sideNav a.current::before {
   content: "";
@@ -381,6 +389,7 @@ button:disabled { cursor: not-allowed; }
   .sideNavHome { font-size: 1.42rem; }
   .sideNavGroup { padding-top: 18px; }
   .sideNavGroup a, .sideNavGroup button { font-size: .94rem; padding: 9px 10px; }
+  .sideNavSite .sideNavGroup a { font-size: 1.16rem; padding: 11px 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

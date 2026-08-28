@@ -105,7 +105,7 @@ export default function ParticipantIdentity() {
     };
   }, [refresh]);
 
-  const navigationVisible = Boolean(player) || participantNavigationRoute(pathname);
+  const navigationVisible = participantNavigationRoute(pathname);
 
   useEffect(() => {
     if (!navigationVisible) return undefined;

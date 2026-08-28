@@ -136,6 +136,42 @@ test("Google and Supabase foundation adapters preserve tournament, team, roster,
   assert.deepEqual(supabase.rounds.map((round) => round.course.id), ["C1", "C2", "C3"]);
 });
 
+test("Supabase foundation uses all 24 active tournament players when only one is assigned to matches", () => {
+  const view = structuredClone(supabaseView);
+  view.players = Array.from({ length: 24 }, (_, index) => {
+    const ordinal = index + 1;
+    const side = ordinal <= 12 ? 1 : 2;
+    return {
+      player_id: `P${ordinal}`,
+      display_name: `Player ${String(ordinal).padStart(2, "0")}`,
+      team_id: side === 1 ? "T1" : "T2",
+      team_side: side,
+      participation_status: "ACTIVE",
+      tournament_source_payload: { "Roster Order": side === 1 ? ordinal : ordinal - 12 },
+      presentation: { slug: `player-${ordinal}`, photo: `p${ordinal}` },
+    };
+  });
+  view.teams[1].source_payload.Captain = "P13";
+  view.matches = [supabaseMatch(1, "BB", courseRows[0], ["P1"], [])];
+
+  const foundation = tournamentFoundationFromSupabaseView(view, guideProjection);
+  assert.equal(view.matches[0].participants.length, 1);
+  assert.equal(foundation.roster.length, 24);
+  assert.deepEqual(foundation.roster.map((player) => player.id), Array.from({ length: 24 }, (_, index) => `P${index + 1}`));
+  assert.deepEqual(foundation.teams.map((team) => team.roster.length), [12, 12]);
+  assert.ok(foundation.roster.every((player) => player.participationStatus === "ACTIVE"));
+});
+
+test("Supabase foundation retains match-derived roster fallback when view.players is unavailable or empty", () => {
+  for (const mode of ["missing", "empty"]) {
+    const view = structuredClone(supabaseView);
+    if (mode === "missing") delete view.players;
+    else view.players = [];
+    const foundation = tournamentFoundationFromSupabaseView(view, guideProjection);
+    assert.deepEqual(foundation.roster.map((player) => player.id), ["P1", "P2", "P3", "P4"], mode);
+  }
+});
+
 test("Homepage foundation overlay cannot replace scores, match lifecycle, or derived tournament state", () => {
   const foundation = tournamentFoundationFromSupabaseView(supabaseView, guideProjection);
   const live = structuredClone(googleData);

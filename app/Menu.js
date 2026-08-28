@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { readFreshPlayerPassportSession } from "../lib/participant-session-client.js";
 import { formatTournamentEdition } from "../lib/tournament-branding";
+import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
+import { navigationSections } from "./navigation";
 import Sheet from "./ui/Sheet";
 
 const hubSections = [
@@ -16,6 +18,24 @@ const hubSections = [
     { icon: "contacts", label: "Important Contacts", href: "/tournament-guide/contacts" },
   ] },
 ];
+
+function activeNavigationHrefForPath(pathname, hash) {
+  const links = navigationSections.flatMap((section) => section.links);
+  const hashMatch = links.find(({ href }) => {
+    if (!href.includes("#")) return false;
+    const [linkPath, linkHash] = href.split("#");
+    return pathname === linkPath && hash === `#${linkHash}`;
+  });
+
+  if (hashMatch) return hashMatch.href;
+
+  return links
+    .filter(({ href }) => !href.includes("#"))
+    .filter(({ href }) => href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`))
+    .sort((left, right) => right.href.length - left.href.length)[0]?.href || "";
+}
 
 function HubIcon({ name }) {
   const common = {
@@ -43,6 +63,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   const [tournament, setTournament] = useState({ name: "", edition: "", location: "", year: "" });
   const closeButton = useRef(null);
   const shellCapabilityRevision = useRef(-1);
+  const activeHref = activeNavigationHref || activeNavigationHrefForPath(pathname, hash);
 
   useEffect(() => {
     if (appShell || !isOpen) return undefined;
@@ -122,6 +143,37 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
     return () => window.removeEventListener("hashchange", updateHash);
   }, [pathname]);
 
+  const siteContent = <>
+    <div className="sideMenuTop">
+      <div>
+        <strong>Sandbagger Invitational</strong>
+        <span>Established {SITE_ESTABLISHED_YEAR}</span>
+      </div>
+      <button ref={closeButton} className="closeMenuButton" type="button" aria-label="Close navigation menu" onClick={() => setIsOpen(false)}>×</button>
+    </div>
+    <div className="sideMenuScroll">
+      <nav className="sideNav sideNavSite" aria-label="Site navigation">
+        {navigationSections.map((group) => group.label ? (
+          <section className="sideNavGroup" key={group.label}>
+            <h2>{group.label}</h2>
+            <div>{group.links.map((link) => <Link
+              className={activeHref === link.href ? "current" : ""}
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+            >{link.label}</Link>)}</div>
+          </section>
+        ) : group.links.map((link) => <Link
+          className={`sideNavHome ${activeHref === link.href ? "current" : ""}`}
+          href={link.href === "/" ? homeHref : link.href}
+          key={link.href}
+          onClick={() => setIsOpen(false)}
+        >{link.label}</Link>))}
+      </nav>
+      {director ? <section className="sideNavGroup sideNavDirector"><h2>Director</h2><div><Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={() => setIsOpen(false)}><span><HubIcon name="director" /></span><b>Tournament Director</b><i aria-hidden="true">›</i></Link></div></section> : null}
+    </div>
+  </>;
+
   const hubContent = (close = () => setIsOpen(false)) => <>
     <div className="sideMenuTop">
       <div>
@@ -159,7 +211,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
       <button
         className={`menuButton ${isOpen ? "active" : ""}`}
         type="button"
-        aria-label="Open Tournament Hub"
+        aria-label={appShell ? "Open Tournament Hub" : "Open navigation menu"}
         aria-expanded={isOpen}
         onClick={() => setIsOpen(true)}
       >
@@ -170,7 +222,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
 
       {appShell
         ? <Sheet open={isOpen} onClose={() => setIsOpen(false)} placement="right" label="Tournament Hub" initialFocusRef={closeButton} panelClassName="sideMenu open">{({ close }) => hubContent(close)}</Sheet>
-        : <><div className={`menuBackdrop ${isOpen ? "show" : ""}`} onClick={() => setIsOpen(false)} /><aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Tournament Hub">{hubContent()}</aside></>}
+        : <><div className={`menuBackdrop ${isOpen ? "show" : ""}`} onClick={() => setIsOpen(false)} /><aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Site navigation">{siteContent}</aside></>}
     </>
   );
 }

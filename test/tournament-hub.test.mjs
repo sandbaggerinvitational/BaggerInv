@@ -6,19 +6,20 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 
 test("Tournament Hub exposes major destinations without duplicating Tournament Guide navigation", async () => {
   const menu = await source("app/Menu.js");
+  const hub = menu.slice(menu.indexOf("const hubSections"), menu.indexOf("function activeNavigationHrefForPath"));
   for (const label of ["Tournament Guide", "Tournament History", "Important Contacts"]) {
-    assert.match(menu, new RegExp(label));
+    assert.match(hub, new RegExp(label));
   }
   for (const href of ["/tournament-guide", "/history", "/tournament-guide/contacts"]) {
-    assert.ok(menu.includes(`href: "${href}"`), href);
+    assert.ok(hub.includes(`href: "${href}"`), href);
   }
   for (const duplicate of ["Schedule", "Courses", "Rules", "Dining", "Local Guide", "Contact Tournament Director"]) {
-    assert.doesNotMatch(menu, new RegExp(`label: "${duplicate}"`));
+    assert.doesNotMatch(hub, new RegExp(`label: "${duplicate}"`));
   }
   for (const duplicateHref of ["/home#today-schedule-title", "/courses", "/tournament-guide/rules", "/tournament-guide/dining", "/tournament-guide/getting-around"]) {
-    assert.ok(!menu.includes(`href: "${duplicateHref}"`), duplicateHref);
+    assert.ok(!hub.includes(`href: "${duplicateHref}"`), duplicateHref);
   }
-  assert.doesNotMatch(menu, /navigationSections|Odds Center|War Room|Admin Center/);
+  assert.doesNotMatch(hub, /navigationSections|Odds Center|War Room|Admin Center/);
   assert.doesNotMatch(menu, /target=|window\.open|https?:\/\//);
   assert.doesNotMatch(menu, /Notification Preferences|Refresh Tournament Data|router\.refresh\(\)/);
   assert.match(menu, /label: "Tournament"/);
@@ -26,12 +27,25 @@ test("Tournament Hub exposes major destinations without duplicating Tournament G
   assert.match(menu, /currentQuery === linkQuery/);
 });
 
+test("public desktop menu uses the original website navigation sections", async () => {
+  const [menu, navigation] = await Promise.all([source("app/Menu.js"), source("app/navigation.js")]);
+  assert.match(menu, /import \{ navigationSections \} from "\.\/navigation"/);
+  assert.match(menu, /<nav className="sideNav sideNavSite" aria-label="Site navigation">[\s\S]*navigationSections\.map/);
+  assert.match(menu, /appShell[\s\S]*\? <Sheet[\s\S]*: <>[\s\S]*\{siteContent\}/);
+  assert.match(menu, /href=\{link\.href === "\/" \? homeHref : link\.href\}/);
+  for (const label of ["Home", "Match Center", "Odds Center", "War Room", "Players", "Tournament", "Admin Center"]) {
+    assert.match(navigation, new RegExp(label));
+  }
+});
+
 test("Tournament Hub remains accessible and keeps the participant shell visible", async () => {
-  const [menu, navigation, sheet, sheetCss] = await Promise.all([
-    source("app/Menu.js"), source("app/ParticipantIdentity.js"), source("app/ui/Sheet.js"), source("app/ui/sheet.module.css"),
+  const [menu, navigation, appHeader, sheet, sheetCss] = await Promise.all([
+    source("app/Menu.js"), source("app/ParticipantIdentity.js"), source("app/ParticipantAppHeader.js"),
+    source("app/ui/Sheet.js"), source("app/ui/sheet.module.css"),
   ]);
   assert.match(menu, /appShell[\s\S]*<Sheet open=\{isOpen\}/);
   assert.match(menu, /label="Tournament Hub"/);
+  assert.match(appHeader, /<Menu homeHref="\/home" appShell \/>/);
   assert.match(sheet, /aria-modal="true"/);
   assert.match(sheet, /event\.key === "Escape"/);
   assert.match(sheet, /background\.inert = true/);

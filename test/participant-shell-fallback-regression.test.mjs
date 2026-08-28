@@ -46,9 +46,12 @@ test("Home and identity session responses clear only a failed Preview impersonat
   assert.equal((homeClient.match(/fetch\("\/api\/participant\/home"/g) || []).length >= 2, true);
 });
 
-test("bottom navigation does not depend on a successful identity payload", async () => {
+test("authenticated players receive participant navigation only on participant routes", async () => {
   const shell = await source("app/ParticipantIdentity.js");
-  assert.match(shell, /const navigationVisible = Boolean\(player\) \|\| participantNavigationRoute\(pathname\)/);
+  assert.equal(participantNavigationRoute("/"), false);
+  assert.equal(participantNavigationRoute("/home"), true);
+  assert.match(shell, /const navigationVisible = participantNavigationRoute\(pathname\)/);
+  assert.doesNotMatch(shell, /Boolean\(player\) \|\| participantNavigationRoute\(pathname\)/);
   assert.match(shell, /if \(!navigationVisible \|\| pathname\.startsWith\("\/admin"\)\) return null/);
   assert.doesNotMatch(shell, /if \(!player \|\| pathname\.startsWith\("\/admin"\)\) return null/);
   assert.match(shell, /player \? `\$\{player\.name\}'s tournament navigation` : "Tournament navigation"/);
