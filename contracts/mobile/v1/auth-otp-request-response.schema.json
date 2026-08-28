@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:auth-otp-request-response",
+  "title": "Bagger Mobile API v1 OTP request acknowledgement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted",
+        "method",
+        "verificationType",
+        "challengeId",
+        "expiresInSeconds",
+        "resendAfterSeconds",
+        "message"
+      ],
+      "properties": {
+        "accepted": { "const": true },
+        "method": { "const": "email" },
+        "verificationType": { "const": "email" },
+        "challengeId": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "expiresInSeconds": { "const": 900 },
+        "resendAfterSeconds": { "const": 60 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

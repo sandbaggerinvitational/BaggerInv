@@ -4,11 +4,43 @@
   "title": "Bagger Mobile API v1 health response",
   "type": "object",
   "additionalProperties": false,
-  "required": ["ok", "apiVersion", "service", "environment"],
+  "required": ["ok", "apiVersion", "service", "environment", "authority"],
   "properties": {
     "ok": { "const": true },
     "apiVersion": { "const": "v1" },
     "service": { "const": "bagger-mobile-api" },
-    "environment": { "const": "preview" }
+    "environment": { "const": "preview" },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "authentication",
+        "identity",
+        "reads",
+        "scoringReads",
+        "scoringWrites",
+        "productionShadow",
+        "nativeAuth",
+        "antiAbuse",
+        "sessionCertification",
+        "authUserCreation",
+        "requestRateLimit"
+      ],
+      "properties": {
+        "mode": { "const": "isolated-development" },
+        "authentication": { "const": "preview" },
+        "identity": { "const": "preview" },
+        "reads": { "const": "preview" },
+        "scoringReads": { "const": "preview" },
+        "scoringWrites": { "const": "preview" },
+        "productionShadow": { "const": false },
+        "nativeAuth": { "const": "email-otp" },
+        "antiAbuse": { "const": "supabase-turnstile" },
+        "sessionCertification": { "const": "signed-proof-v1" },
+        "authUserCreation": { "const": "disabled" },
+        "requestRateLimit": { "const": "edge-ip+server-hash" }
+      }
+    }
   }
 }

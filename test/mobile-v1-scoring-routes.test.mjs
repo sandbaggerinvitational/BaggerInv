@@ -3,8 +3,11 @@ import test from "node:test";
 import { GET as currentGET } from "../app/api/mobile/v1/scoring/current/route.js";
 import { POST as finalizePOST } from "../app/api/mobile/v1/scoring/finalize/route.js";
 import { POST as holePOST } from "../app/api/mobile/v1/scoring/hole/route.js";
+import { issueMobileNativeCertification } from "../lib/mobile-native-certification.js";
 
 const authUserId = "11111111-1111-4111-8111-111111111111";
+const previewWorkbookId = "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts";
+const previewSupabaseUrl = "https://idgigvjjqkfbqjeredpb.supabase.co";
 const environmentKeys = [
   "VERCEL_ENV",
   "GOOGLE_SHEETS_ID",
@@ -13,23 +16,53 @@ const environmentKeys = [
   "PARTICIPANT_IDENTITY_AUTHORITY",
   "SCORING_AUTHORITY",
   "SCORING_READ_SOURCE",
+  "MATCH_AUTHORIZATION_SOURCE",
+  "HOME_READ_SOURCE",
+  "TOURNAMENT_READ_SOURCE",
+  "LEADERBOARDS_CORE_READ_SOURCE",
+  "GUIDE_READ_SOURCE",
+  "COURSE_PRESENTATION_READ_SOURCE",
   "SUPABASE_SCORING_MIRROR_URL",
   "SUPABASE_SCORING_MIRROR_SECRET_KEY",
+  "SUPABASE_SCORING_MIRROR_ENABLED",
   "NEXT_PUBLIC_SUPABASE_AUTH_URL",
   "NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY",
+  "MOBILE_NATIVE_AUTH_ANTI_ABUSE_MODE",
+  "PARTICIPANT_AUTH_CAPTCHA_REQUIRED",
+  "PARTICIPANT_AUTH_CAPTCHA_CONFIGURED",
+  "NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY",
+  "PARTICIPANT_AUTH_RATE_LIMIT_SECRET",
+  "MOBILE_NATIVE_CERTIFICATION_SIGNING_SECRET",
+  "MOBILE_NATIVE_SUPABASE_SIGNUPS_DISABLED",
+  "MOBILE_NATIVE_EDGE_RATE_LIMIT_CONFIGURED",
 ];
 const previewEnv = {
   VERCEL_ENV: "preview",
-  GOOGLE_SHEETS_ID: "mobile-step-1c-preview-workbook",
-  GOOGLE_SHEETS_SPREADSHEET_ID: "mobile-step-1c-preview-workbook",
-  PREVIEW_SCORING_SHEET_ID: "mobile-step-1c-preview-workbook",
+  GOOGLE_SHEETS_ID: previewWorkbookId,
+  GOOGLE_SHEETS_SPREADSHEET_ID: previewWorkbookId,
+  PREVIEW_SCORING_SHEET_ID: previewWorkbookId,
   PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
   SCORING_AUTHORITY: "supabase",
   SCORING_READ_SOURCE: "supabase",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  MATCH_AUTHORIZATION_SOURCE: "supabase",
+  HOME_READ_SOURCE: "supabase",
+  TOURNAMENT_READ_SOURCE: "supabase",
+  LEADERBOARDS_CORE_READ_SOURCE: "supabase",
+  GUIDE_READ_SOURCE: "supabase",
+  COURSE_PRESENTATION_READ_SOURCE: "supabase",
+  SUPABASE_SCORING_MIRROR_URL: previewSupabaseUrl,
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "synthetic-server-only-key",
-  NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_ENABLED: "true",
+  NEXT_PUBLIC_SUPABASE_AUTH_URL: previewSupabaseUrl,
   NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "sb_publishable_preview",
+  MOBILE_NATIVE_AUTH_ANTI_ABUSE_MODE: "supabase-turnstile",
+  PARTICIPANT_AUTH_CAPTCHA_REQUIRED: "true",
+  PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "true",
+  NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY: "preview-turnstile-site-key",
+  PARTICIPANT_AUTH_RATE_LIMIT_SECRET: "preview-native-rate-limit-secret-at-least-32-chars",
+  MOBILE_NATIVE_CERTIFICATION_SIGNING_SECRET: "preview-native-certification-secret-at-least-32-chars",
+  MOBILE_NATIVE_SUPABASE_SIGNUPS_DISABLED: "true",
+  MOBILE_NATIVE_EDGE_RATE_LIMIT_CONFIGURED: "true",
 };
 
 async function withEnvironment(values, callback) {
@@ -59,6 +92,16 @@ function canonicalContext() {
     email: "private@example.test",
     phone: "+15555550100",
   };
+}
+
+function certifiedHeaders(extra = {}) {
+  const { token } = issueMobileNativeCertification({
+    authUserId,
+    playerId: "P1",
+    tournamentId: "2026",
+    env: previewEnv,
+  });
+  return { Authorization: "Bearer valid", "X-Bagger-Certification": token, ...extra };
 }
 
 function requestDetails(input, init = {}) {
@@ -104,7 +147,7 @@ test("every mobile scoring route requires Step 1A Bearer authentication and uses
       assert.equal(response.status, 401);
       assert.equal(response.headers.get("www-authenticate"), "Bearer");
       assert.equal(response.headers.get("cache-control"), "private, no-store, max-age=0");
-      assert.equal(response.headers.get("vary"), "Authorization");
+      assert.equal(response.headers.get("vary"), "Authorization, X-Bagger-Certification");
       assert.deepEqual(await response.json(), {
         ok: false,
         apiVersion: "v1",
@@ -139,7 +182,7 @@ test("client Match manipulation is denied from canonical identity context before
   await withEnvironment(previewEnv, async () => withIdentityFetch(async (calls) => {
     const response = await currentGET(new Request(
       "https://preview.example/api/mobile/v1/scoring/current?matchId=OTHER&playerId=ATTACKER",
-      { headers: { Authorization: "Bearer valid" } },
+      { headers: certifiedHeaders() },
     ));
     assert.equal(response.status, 403);
     const body = await response.json();
@@ -153,7 +196,7 @@ test("malformed JSON and fields that claim Player or canonical score authority a
   await withEnvironment(previewEnv, async () => withIdentityFetch(async () => {
     const malformed = await holePOST(new Request("https://preview.example/api/mobile/v1/scoring/hole", {
       method: "POST",
-      headers: { Authorization: "Bearer valid", "Content-Type": "application/json" },
+      headers: certifiedHeaders({ "Content-Type": "application/json" }),
       body: "{",
     }));
     assert.equal(malformed.status, 400);
@@ -163,7 +206,7 @@ test("malformed JSON and fields that claim Player or canonical score authority a
   await withEnvironment(previewEnv, async () => withIdentityFetch(async () => {
     const spoof = await holePOST(new Request("https://preview.example/api/mobile/v1/scoring/hole", {
       method: "POST",
-      headers: { Authorization: "Bearer valid", "Content-Type": "application/json" },
+      headers: certifiedHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify({
         matchId: "M1", holeNumber: 1, teamOneGrossScores: [4, 5], teamTwoGrossScores: [5, 6],
         mutationId: "11111111-1111-4111-8111-111111111111", expectedMatchRevision: 10, expectedHoleRevision: 0,
@@ -175,7 +218,7 @@ test("malformed JSON and fields that claim Player or canonical score authority a
   }));
 });
 
-test("mobile scoring fails closed when Preview scoring authority is not intentionally Supabase", async () => {
+test("the common mobile gate rejects Preview before identity lookup when scoring authority is not Supabase", async () => {
   await withEnvironment({ ...previewEnv, SCORING_AUTHORITY: "google" }, async () => withIdentityFetch(async (calls) => {
     const response = await holePOST(new Request("https://preview.example/api/mobile/v1/scoring/hole", {
       method: "POST",
@@ -189,9 +232,9 @@ test("mobile scoring fails closed when Preview scoring authority is not intentio
     assert.deepEqual(await response.json(), {
       ok: false,
       apiVersion: "v1",
-      error: { code: "SCORING_UNAVAILABLE", message: "Authoritative scoring is temporarily unavailable." },
+      error: { code: "MOBILE_API_UNAVAILABLE", message: "The mobile API is unavailable in this environment." },
     });
-    assert.equal(calls.length, 2);
+    assert.equal(calls.length, 0);
   }));
 });
 

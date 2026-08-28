@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:auth-otp-certify-response",
+  "title": "Bagger Mobile API v1 OTP certification acknowledgement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["certified", "certificationToken", "expiresInSeconds"],
+      "properties": {
+        "certified": { "const": true },
+        "certificationToken": {
+          "type": "string",
+          "pattern": "^v1\\.[0-9]{10}\\.[0-9]{10}\\.[A-Za-z0-9_-]{22}\\.[A-Za-z0-9_-]{43}$"
+        },
+        "expiresInSeconds": { "const": 43200 }
+      }
+    }
+  }
+}

@@ -12,19 +12,39 @@ import {
   mobileBearerTokenFromRequest,
   resolveMobileBearerIdentity,
   verifyMobileSupabaseAccessToken,
+  verifyMobileSupabaseAuthenticatedUser,
 } from "../lib/mobile-bearer-identity.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const authUserId = "11111111-1111-4111-8111-111111111111";
+const previewSupabaseUrl = "https://idgigvjjqkfbqjeredpb.supabase.co";
+const previewWorkbookId = "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts";
 const previewEnv = {
   VERCEL_ENV: "preview",
-  GOOGLE_SHEETS_ID: "preview-workbook",
-  PREVIEW_SCORING_SHEET_ID: "preview-workbook",
+  GOOGLE_SHEETS_ID: previewWorkbookId,
+  PREVIEW_SCORING_SHEET_ID: previewWorkbookId,
   PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: previewSupabaseUrl,
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-only-secret",
-  NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_ENABLED: "true",
+  NEXT_PUBLIC_SUPABASE_AUTH_URL: previewSupabaseUrl,
   NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "publishable-preview-key",
+  HOME_READ_SOURCE: "supabase",
+  TOURNAMENT_READ_SOURCE: "supabase",
+  LEADERBOARDS_CORE_READ_SOURCE: "supabase",
+  GUIDE_READ_SOURCE: "supabase",
+  COURSE_PRESENTATION_READ_SOURCE: "supabase",
+  SCORING_READ_SOURCE: "supabase",
+  MATCH_AUTHORIZATION_SOURCE: "supabase",
+  SCORING_AUTHORITY: "supabase",
+  MOBILE_NATIVE_AUTH_ANTI_ABUSE_MODE: "supabase-turnstile",
+  PARTICIPANT_AUTH_CAPTCHA_REQUIRED: "true",
+  PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "true",
+  NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY: "preview-turnstile-site-key",
+  PARTICIPANT_AUTH_RATE_LIMIT_SECRET: "preview-native-rate-limit-secret-at-least-32-chars",
+  MOBILE_NATIVE_CERTIFICATION_SIGNING_SECRET: "preview-native-certification-secret-at-least-32-chars",
+  MOBILE_NATIVE_SUPABASE_SIGNUPS_DISABLED: "true",
+  MOBILE_NATIVE_EDGE_RATE_LIMIT_CONFIGURED: "true",
 };
 
 const canonicalContext = (overrides = {}) => ({
@@ -41,10 +61,12 @@ const canonicalContext = (overrides = {}) => ({
   ...overrides,
 });
 
-function requestWithAuthorization(authorization, url = "https://preview.example/api/mobile/v1/session") {
+function requestWithAuthorization(authorization, url = "https://preview.example/api/mobile/v1/session", certification = null) {
   return {
     url,
-    headers: { get: (name) => name.toLowerCase() === "authorization" ? authorization : null },
+    headers: { get: (name) => name.toLowerCase() === "authorization" ? authorization
+      : name.toLowerCase() === "x-bagger-certification" ? certification
+      : null },
     body: { playerId: "ATTACKER", displayName: "Fake Player" },
   };
 }
@@ -53,7 +75,26 @@ test("Preview health is a stable v1 contract and never leaks configuration", () 
   const result = mobileHealthResult(previewEnv);
   assert.deepEqual(result, {
     status: 200,
-    body: { ok: true, apiVersion: "v1", service: "bagger-mobile-api", environment: "preview" },
+    body: {
+      ok: true,
+      apiVersion: "v1",
+      service: "bagger-mobile-api",
+      environment: "preview",
+      authority: {
+        mode: "isolated-development",
+        authentication: "preview",
+        identity: "preview",
+        reads: "preview",
+        scoringReads: "preview",
+        scoringWrites: "preview",
+        productionShadow: false,
+        nativeAuth: "email-otp",
+        antiAbuse: "supabase-turnstile",
+        sessionCertification: "signed-proof-v1",
+        authUserCreation: "disabled",
+        requestRateLimit: "edge-ip+server-hash",
+      },
+    },
   });
   const serialized = JSON.stringify(result.body);
   for (const sensitive of [
@@ -61,6 +102,7 @@ test("Preview health is a stable v1 contract and never leaks configuration", () 
     previewEnv.SUPABASE_SCORING_MIRROR_URL,
     previewEnv.NEXT_PUBLIC_SUPABASE_AUTH_URL,
     previewEnv.NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY,
+    previewEnv.GOOGLE_SHEETS_ID,
   ]) assert.equal(serialized.includes(sensitive), false);
 });
 
@@ -70,6 +112,7 @@ test("Production and incomplete Preview environments fail closed without identit
     { ...previewEnv, PARTICIPANT_IDENTITY_AUTHORITY: "passport" },
     { ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" },
     { ...previewEnv, NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://different-project.supabase.co" },
+    { ...previewEnv, MOBILE_NATIVE_CERTIFICATION_SIGNING_SECRET: "" },
   ]) {
     assert.deepEqual(mobileHealthResult(env), {
       status: 503,
@@ -80,6 +123,48 @@ test("Production and incomplete Preview environments fail closed without identit
       },
     });
   }
+});
+
+test("Production-shadow, Production resources, and mismatched Auth/identity authority fail closed", () => {
+  const productionSupabaseUrl = "https://ymqhhtxaywtqllynrmxe.supabase.co";
+  for (const env of [
+    { ...previewEnv, PRODUCTION_SHADOW_CANDIDATE_ENABLED: "true" },
+    { ...previewEnv, PRODUCTION_CUTOVER_ACTIVATION_ENABLED: "true" },
+    { ...previewEnv, PRODUCTION_FOUNDATION_ENABLED: "true" },
+    {
+      ...previewEnv,
+      NEXT_PUBLIC_SUPABASE_AUTH_URL: productionSupabaseUrl,
+      SUPABASE_SCORING_MIRROR_URL: productionSupabaseUrl,
+    },
+    { ...previewEnv, NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://different-project.supabase.co" },
+    { ...previewEnv, NEXT_PUBLIC_SUPABASE_AUTH_URL: `${previewSupabaseUrl}/rest/v1` },
+  ]) assert.equal(mobileHealthResult(env).status, 503);
+});
+
+test("every mobile read and scoring selector must explicitly select isolated Supabase", () => {
+  for (const name of [
+    "HOME_READ_SOURCE",
+    "TOURNAMENT_READ_SOURCE",
+    "LEADERBOARDS_CORE_READ_SOURCE",
+    "GUIDE_READ_SOURCE",
+    "COURSE_PRESENTATION_READ_SOURCE",
+    "SCORING_READ_SOURCE",
+    "MATCH_AUTHORIZATION_SOURCE",
+    "SCORING_AUTHORITY",
+  ]) {
+    const result = mobileHealthResult({ ...previewEnv, [name]: "google" });
+    assert.equal(result.status, 503, `${name} must not fall back to Google`);
+  }
+  assert.equal(mobileHealthResult({ ...previewEnv, SUPABASE_SCORING_MIRROR_ENABLED: "false" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, PREVIEW_SCORING_SHEET_ID: "other" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, MOBILE_NATIVE_AUTH_ANTI_ABUSE_MODE: "" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, PARTICIPANT_AUTH_CAPTCHA_REQUIRED: "false" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "false" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY: "" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, PARTICIPANT_AUTH_RATE_LIMIT_SECRET: "short" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, MOBILE_NATIVE_CERTIFICATION_SIGNING_SECRET: "short" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, MOBILE_NATIVE_SUPABASE_SIGNUPS_DISABLED: "false" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, MOBILE_NATIVE_EDGE_RATE_LIMIT_CONFIGURED: "false" }).status, 503);
 });
 
 test("Bearer parsing rejects missing, wrong, empty, malformed, and ambiguous headers", () => {
@@ -134,6 +219,32 @@ test("Supabase verification distinguishes rejected tokens from provider outages"
   }
 });
 
+test("native certification receives only a server-verified Auth UUID and confirmed email", async () => {
+  const client = { auth: { getUser: async () => ({
+    data: { user: {
+      id: authUserId,
+      email: " Approved@Example.com ",
+      email_confirmed_at: "2026-08-28T12:00:00.000Z",
+      confirmed_at: "2026-08-28T12:00:00.000Z",
+      user_metadata: { playerId: "ATTACKER" },
+    } },
+    error: null,
+  }) } };
+  assert.deepEqual(await verifyMobileSupabaseAuthenticatedUser("opaque-token", { client }), {
+    status: "active",
+    authUserId,
+    email: "approved@example.com",
+    emailVerified: true,
+  });
+  client.auth.getUser = async () => ({ data: { user: {
+    id: authUserId,
+    email: "approved@example.com",
+    email_confirmed_at: null,
+    confirmed_at: "2026-08-28T12:00:00.000Z",
+  } }, error: null });
+  assert.equal((await verifyMobileSupabaseAuthenticatedUser("opaque-token", { client })).emailVerified, false);
+});
+
 test("verified Auth UUID resolves to the canonical Player and ignores client identity claims", async () => {
   const request = requestWithAuthorization(
     "Bearer verified-token",
@@ -148,9 +259,16 @@ test("verified Auth UUID resolves to the canonical Player and ignores client ide
         assert.equal(token, "verified-token");
         return { status: "active", authUserId };
       },
+      readCertification: () => "test-certification-proof",
       readForAuth: async (lookup) => {
         receivedLookup = lookup;
         return { payload: { ok: true, data: canonicalContext() } };
+      },
+      verifyCertification: (input) => {
+        assert.equal(input.request, request);
+        assert.equal(input.authUserId, authUserId);
+        assert.equal(input.playerId, "CB01");
+        assert.equal(input.tournamentId, "2026");
       },
     },
   });
@@ -185,6 +303,25 @@ test("verified Auth UUID resolves to the canonical Player and ignores client ide
   }
 });
 
+test("a raw valid Supabase session cannot bypass Bagger certification", async () => {
+  let identityRead = false;
+  await assert.rejects(
+    () => resolveMobileBearerIdentity({
+      request: requestWithAuthorization("Bearer verified-token"),
+      env: previewEnv,
+      dependencies: {
+        verifyAccessToken: async () => ({ status: "active", authUserId }),
+        readForAuth: async () => {
+          identityRead = true;
+          return { payload: { ok: true, data: canonicalContext() } };
+        },
+      },
+    }),
+    (error) => error instanceof MobileApiError && error.code === "AUTH_CERTIFICATION_FAILED",
+  );
+  assert.equal(identityRead, false);
+});
+
 test("missing, suspended, revoked, inactive, and unapproved mappings receive one controlled denial", async () => {
   for (const code of [
     "ACTIVE_USER_PLAYER_LINK_REQUIRED",
@@ -202,6 +339,7 @@ test("missing, suspended, revoked, inactive, and unapproved mappings receive one
         env: previewEnv,
         dependencies: {
           verifyAccessToken: async () => ({ status: "active", authUserId }),
+          readCertification: () => "test-certification-proof",
           readForAuth: async () => ({ payload: { ok: false, code } }),
         },
       });
@@ -231,6 +369,7 @@ test("identity authority outages and Auth UUID mismatches fail safely", async ()
   await assert.rejects(
     () => resolveMobileBearerIdentity({ ...base, dependencies: {
       verifyAccessToken: async () => ({ status: "active", authUserId }),
+      readCertification: () => "test-certification-proof",
       readForAuth: async () => ({ payload: { ok: true, data: canonicalContext({ authUserId: "22222222-2222-4222-8222-222222222222" }) } }),
     } }),
     (error) => error.code === "MOBILE_API_UNAVAILABLE" && error.status === 503,
@@ -238,6 +377,7 @@ test("identity authority outages and Auth UUID mismatches fail safely", async ()
   await assert.rejects(
     () => resolveMobileBearerIdentity({ ...base, dependencies: {
       verifyAccessToken: async () => ({ status: "active", authUserId }),
+      readCertification: () => "test-certification-proof",
       readForAuth: async () => {
         const context = canonicalContext();
         delete context.authUserId;
@@ -261,22 +401,55 @@ test("unclassified errors use a stable participant-safe response", () => {
   assert.equal(JSON.stringify(internal).includes("database host"), false);
 });
 
+test("native authentication errors remain stable and participant-safe", () => {
+  for (const [code, status, message] of [
+    ["INVALID_AUTH_REQUEST", 400, "The authentication request is invalid."],
+    ["AUTH_METHOD_UNAVAILABLE", 409, "This authentication method is unavailable."],
+    ["AUTH_CERTIFICATION_FAILED", 403, "Authentication certification failed."],
+  ]) {
+    assert.deepEqual(mobileApiErrorResult(new MobileApiError(code)), {
+      status,
+      body: { ok: false, apiVersion: "v1", error: { code, message } },
+    });
+  }
+});
+
 test("v1 schemas and documentation describe the exact bounded contract", async () => {
-  const [health, session, error, documentation] = await Promise.all([
+  const [health, session, error, certification, documentation] = await Promise.all([
     source("contracts/mobile/v1/health.schema.json"),
     source("contracts/mobile/v1/session.schema.json"),
     source("contracts/mobile/v1/error.schema.json"),
+    source("contracts/mobile/v1/auth-otp-certify-response.schema.json"),
     source("contracts/mobile/v1/README.md"),
   ]);
   const healthSchema = JSON.parse(health);
   const sessionSchema = JSON.parse(session);
   const errorSchema = JSON.parse(error);
+  const certificationSchema = JSON.parse(certification);
   assert.equal(healthSchema.properties.apiVersion.const, "v1");
   assert.equal(healthSchema.properties.service.const, "bagger-mobile-api");
+  assert.deepEqual(healthSchema.properties.authority.required, [
+    "mode",
+    "authentication",
+    "identity",
+    "reads",
+    "scoringReads",
+    "scoringWrites",
+    "productionShadow",
+    "nativeAuth",
+    "antiAbuse",
+    "sessionCertification",
+    "authUserCreation",
+    "requestRateLimit",
+  ]);
+  assert.equal(healthSchema.properties.authority.properties.productionShadow.const, false);
   assert.deepEqual(errorSchema.properties.error.properties.code.enum, MOBILE_API_ERROR_CODES);
   assert.equal(sessionSchema.properties.data.properties.player.additionalProperties, false);
   assert.equal(sessionSchema.properties.data.properties.tournament.additionalProperties, false);
-  for (const required of ["Authorization: Bearer", "Preview", "Production", "MOBILE_API_UNAVAILABLE", "No email", "Handicap is not included"]) {
+  assert.deepEqual(certificationSchema.properties.data.required,
+    ["certified", "certificationToken", "expiresInSeconds"]);
+  for (const required of ["Authorization: Bearer", "X-Bagger-Certification", "signed-proof-v1",
+    "Preview", "Production", "MOBILE_API_UNAVAILABLE", "No email", "Handicap is not included"]) {
     assert.match(documentation, new RegExp(required));
   }
 });

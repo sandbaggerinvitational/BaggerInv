@@ -6,15 +6,47 @@ import { GET as matchesGET } from "../app/api/mobile/v1/matches/route.js";
 import { GET as scheduleGET } from "../app/api/mobile/v1/schedule/route.js";
 import { GET as todayGET } from "../app/api/mobile/v1/today/route.js";
 import { mobileV1ReadResponse } from "../lib/mobile-v1-route.js";
+import { issueMobileNativeCertification } from "../lib/mobile-native-certification.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const previewWorkbookId = "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts";
+const previewSupabaseUrl = "https://idgigvjjqkfbqjeredpb.supabase.co";
 const keys = ["VERCEL_ENV", "GOOGLE_SHEETS_ID", "PREVIEW_SCORING_SHEET_ID", "PARTICIPANT_IDENTITY_AUTHORITY",
-  "SUPABASE_SCORING_MIRROR_URL", "SUPABASE_SCORING_MIRROR_SECRET_KEY", "NEXT_PUBLIC_SUPABASE_AUTH_URL",
-  "NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY"];
-const preview = { VERCEL_ENV: "preview", GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
-  PARTICIPANT_IDENTITY_AUTHORITY: "supabase", SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
-  SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret", NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co",
-  NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "publishable" };
+  "SUPABASE_SCORING_MIRROR_URL", "SUPABASE_SCORING_MIRROR_SECRET_KEY", "SUPABASE_SCORING_MIRROR_ENABLED",
+  "NEXT_PUBLIC_SUPABASE_AUTH_URL", "NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY", "HOME_READ_SOURCE",
+  "TOURNAMENT_READ_SOURCE", "LEADERBOARDS_CORE_READ_SOURCE", "GUIDE_READ_SOURCE",
+  "COURSE_PRESENTATION_READ_SOURCE", "SCORING_READ_SOURCE", "MATCH_AUTHORIZATION_SOURCE", "SCORING_AUTHORITY",
+  "MOBILE_NATIVE_AUTH_ANTI_ABUSE_MODE", "PARTICIPANT_AUTH_CAPTCHA_REQUIRED",
+  "PARTICIPANT_AUTH_CAPTCHA_CONFIGURED", "NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY",
+  "PARTICIPANT_AUTH_RATE_LIMIT_SECRET", "MOBILE_NATIVE_CERTIFICATION_SIGNING_SECRET",
+  "MOBILE_NATIVE_SUPABASE_SIGNUPS_DISABLED", "MOBILE_NATIVE_EDGE_RATE_LIMIT_CONFIGURED"];
+const preview = {
+  VERCEL_ENV: "preview",
+  GOOGLE_SHEETS_ID: previewWorkbookId,
+  PREVIEW_SCORING_SHEET_ID: previewWorkbookId,
+  PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
+  SUPABASE_SCORING_MIRROR_URL: previewSupabaseUrl,
+  SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret",
+  SUPABASE_SCORING_MIRROR_ENABLED: "true",
+  NEXT_PUBLIC_SUPABASE_AUTH_URL: previewSupabaseUrl,
+  NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "publishable",
+  HOME_READ_SOURCE: "supabase",
+  TOURNAMENT_READ_SOURCE: "supabase",
+  LEADERBOARDS_CORE_READ_SOURCE: "supabase",
+  GUIDE_READ_SOURCE: "supabase",
+  COURSE_PRESENTATION_READ_SOURCE: "supabase",
+  SCORING_READ_SOURCE: "supabase",
+  MATCH_AUTHORIZATION_SOURCE: "supabase",
+  SCORING_AUTHORITY: "supabase",
+  MOBILE_NATIVE_AUTH_ANTI_ABUSE_MODE: "supabase-turnstile",
+  PARTICIPANT_AUTH_CAPTCHA_REQUIRED: "true",
+  PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "true",
+  NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY: "preview-turnstile-site-key",
+  PARTICIPANT_AUTH_RATE_LIMIT_SECRET: "preview-native-rate-limit-secret-at-least-32-chars",
+  MOBILE_NATIVE_CERTIFICATION_SIGNING_SECRET: "preview-native-certification-secret-at-least-32-chars",
+  MOBILE_NATIVE_SUPABASE_SIGNUPS_DISABLED: "true",
+  MOBILE_NATIVE_EDGE_RATE_LIMIT_CONFIGURED: "true",
+};
 
 async function withEnv(values, fn) {
   const old = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
@@ -23,6 +55,16 @@ async function withEnv(values, fn) {
 }
 
 const routes = [["today", todayGET], ["matches", matchesGET], ["leaders", leadersGET], ["schedule", scheduleGET]];
+
+function certifiedHeaders(extra = {}) {
+  const { token } = issueMobileNativeCertification({
+    authUserId: "11111111-1111-4111-8111-111111111111",
+    playerId: "P1",
+    tournamentId: "2026",
+    env: preview,
+  });
+  return { Authorization: "Bearer valid", "X-Bagger-Certification": token, ...extra };
+}
 
 test("every Step 1B route deterministically requires Bearer auth before domain reads", async () => {
   await withEnv(preview, async () => {
@@ -75,11 +117,11 @@ test("shared protected route handler supports canonical ETag revalidation", asyn
         tournament: { id: "2026" }, membership: { active: true } } });
     try {
       const response = await mobileV1ReadResponse(new Request("https://preview.example/api/mobile/v1/test", {
-        headers: { Authorization: "Bearer valid", "If-None-Match": "\"canonical-r1\"" },
+        headers: certifiedHeaders({ "If-None-Match": "\"canonical-r1\"" }),
       }), async () => ({ status: 200, revision: "canonical-r1", body: { ok: true } }));
       assert.equal(response.status, 304);
       assert.equal(response.headers.get("etag"), "\"canonical-r1\"");
-      assert.equal(response.headers.get("vary"), "Authorization");
+      assert.equal(response.headers.get("vary"), "Authorization, X-Bagger-Certification");
     } finally { globalThis.fetch = original; }
   });
 });
@@ -93,7 +135,7 @@ test("shared protected route handler denies an authenticated but unmapped partic
     try {
       let loaded = false;
       const response = await mobileV1ReadResponse(new Request("https://preview.example/api/mobile/v1/test", {
-        headers: { Authorization: "Bearer valid" },
+        headers: certifiedHeaders(),
       }), async () => { loaded = true; return { status: 200, body: {} }; });
       assert.equal(response.status, 403);
       assert.equal((await response.json()).error.code, "PARTICIPANT_NOT_FOUND");
