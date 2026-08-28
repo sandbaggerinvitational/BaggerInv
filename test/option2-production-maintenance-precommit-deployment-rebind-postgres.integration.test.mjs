@@ -31,6 +31,8 @@ const precommitCapabilityGuardMigration =
   "202608280052_production_maintenance_precommit_capability_guard.sql";
 const postcutoverApplicationReleaseMigration =
   "202608280053_production_postcutover_application_release_rebind.sql";
+const postcutoverNormalReleaseMigration =
+  "202608280054_production_postcutover_normal_release_rebind.sql";
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const postgresBinaries = Object.fromEntries(
   ["createdb", "initdb", "pg_ctl", "psql"].map((name) => [
@@ -46,6 +48,14 @@ const newDeployment = "dpl_MaintenanceReplacement050";
 const postcutoverDeployment = "dpl_PostcutoverApplication053";
 const postcutoverDeploymentHostname =
   "bagger-postcutover-application-053.vercel.app";
+const normalReleaseSha = postcutoverReleaseSha;
+const normalReleaseDeployment = "dpl_PostcutoverNormalRelease054";
+const normalReleaseDeploymentHostname =
+  "bagger-postcutover-normal-release-054.vercel.app";
+const repeatedNormalReleaseSha = "e".repeat(40);
+const repeatedNormalReleaseDeployment = "dpl_PostcutoverNormalRelease055";
+const repeatedNormalReleaseDeploymentHostname =
+  "bagger-postcutover-normal-release-055.vercel.app";
 const candidateDeployment = "dpl_MaintenanceCandidate050";
 const candidateDeploymentHostname = "bagger-maintenance-candidate.vercel.app";
 const epochId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
@@ -802,6 +812,64 @@ function postcutoverCapabilityScope(extra = {}) {
   return capabilityScope({
     deployment_id: postcutoverDeployment,
     deployment_commit: postcutoverReleaseSha,
+    ...extra,
+  });
+}
+
+function normalReleaseAuthorizationInput(current, label, overrides = {}) {
+  return {
+    ...scope,
+    operation: "AUTHORIZE_PRODUCTION_POSTCUTOVER_NORMAL_RELEASE",
+    target_deployment_commit: normalReleaseSha,
+    expected_predecessor_deployment_id: postcutoverDeployment,
+    expected_predecessor_deployment_commit: postcutoverReleaseSha,
+    expected_activation_revision: Number(current.activation_revision),
+    expected_authority_generation: current.authority_generation_id,
+    expected_admission_revision: Number(current.admission_revision),
+    expected_admission_generation: current.admission_generation_id,
+    actor_id: actor,
+    request_fingerprint: fingerprint(`normal-release-authorize-${label}`),
+    ...overrides,
+  };
+}
+
+function normalReleaseDirectInput(current, label, overrides = {}) {
+  return rebindInputV2(current, label, {
+    operation: "REBIND_PRODUCTION_POSTCUTOVER_NORMAL_RELEASE",
+    contract_version: "production-postcutover-normal-release-rebind-v1",
+    original_deployment_id: postcutoverDeployment,
+    expected_predecessor_deployment_id: postcutoverDeployment,
+    expected_predecessor_deployment_commit: postcutoverReleaseSha,
+    deployment_id: normalReleaseDeployment,
+    deployment_commit: normalReleaseSha,
+    runtime_deployment_commit: normalReleaseSha,
+    runtime_deployment_hostname: normalReleaseDeploymentHostname,
+    request_fingerprint: fingerprint(`normal-release-${label}`),
+    ...overrides,
+  });
+}
+
+function normalReleaseCanonicalInput(current, label, overrides = {}) {
+  const input = rebindInputV2(current, label, {
+    original_deployment_id: postcutoverDeployment,
+    deployment_id: normalReleaseDeployment,
+    deployment_commit: normalReleaseSha,
+    runtime_deployment_commit: normalReleaseSha,
+    runtime_deployment_hostname: normalReleaseDeploymentHostname,
+    request_fingerprint: fingerprint(`normal-release-canonical-${label}`),
+    ...overrides,
+  });
+  delete input.expected_release_sequence;
+  delete input.expected_predecessor_deployment_id;
+  delete input.expected_predecessor_deployment_commit;
+  delete input.contract_version;
+  return input;
+}
+
+function normalReleaseCapabilityScope(extra = {}) {
+  return capabilityScope({
+    deployment_id: normalReleaseDeployment,
+    deployment_commit: normalReleaseSha,
     ...extra,
   });
 }
@@ -1871,6 +1939,9 @@ test(
           );
         `), providerBeforeApplicationRelease);
 
+        const orderedFreshDatabase = "maintenance_normal_release_fresh_order";
+        createDatabase(cluster, orderedFreshDatabase, database);
+
         psql(cluster, database, `
           select production_control
             .assert_production_maintenance_runtime_capability(
@@ -2032,6 +2103,644 @@ test(
           select pg_catalog.count(*)
           from production_control.postcutover_application_release_rebindings;
         `), "1");
+
+        const providerBeforeNormalRelease = psql(cluster, database, `
+          select pg_catalog.pg_get_functiondef(
+            'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+              ::regprocedure
+          );
+        `);
+        psqlFile(
+          cluster,
+          database,
+          path.join(migrationsDirectory, postcutoverNormalReleaseMigration),
+        );
+        assert.deepEqual(baseState(cluster, database), applicationState);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.pg_get_functiondef(
+            'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+              ::regprocedure
+          );
+        `), providerBeforeNormalRelease);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_application_release_rebindings;
+        `), "1");
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_normal_release_rebindings
+          where release_kind = 'BASELINE_053'
+            and release_sequence = 1
+            and deployment_id = ${sqlLiteral(postcutoverDeployment)}
+            and deployment_commit = ${sqlLiteral(postcutoverReleaseSha)};
+        `), "1");
+        assert.equal(psql(cluster, database, `
+          select release_sequence::text || ':' || deployment_id || ':' ||
+            deployment_commit
+          from production_control.postcutover_normal_release_head
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `), `1:${postcutoverDeployment}:${postcutoverReleaseSha}`);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.has_function_privilege(
+            'service_role',
+            'production_control.authorize_production_postcutover_normal_release(jsonb)',
+            'EXECUTE'
+          );
+        `), "f");
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            set role service_role;
+            select production_control
+              .authorize_production_postcutover_normal_release(
+                ${jsonSql(normalReleaseAuthorizationInput(
+                  applicationState,
+                  "service-role-denied",
+                ))}
+              );
+          `),
+          /permission denied for function authorize_production_postcutover_normal_release/,
+        );
+
+        const authorizationInput = normalReleaseAuthorizationInput(
+          applicationState,
+          "exact",
+        );
+        const authorization = ownerControlFunction(
+          cluster,
+          database,
+          "authorize_production_postcutover_normal_release",
+          authorizationInput,
+        );
+        assert.equal(authorization.ok, true);
+        assert.equal(authorization.idempotent, false);
+        assert.equal(authorization.status, "PENDING");
+        assert.equal(
+          authorization.release_sequence,
+          2,
+        );
+        assert.equal(authorization.target_deployment_commit, normalReleaseSha);
+        const authorizationReplay = ownerControlFunction(
+          cluster,
+          database,
+          "authorize_production_postcutover_normal_release",
+          authorizationInput,
+        );
+        assert.equal(authorizationReplay.idempotent, true);
+        assert.equal(
+          authorizationReplay.release_intent_id,
+          authorization.release_intent_id,
+        );
+
+        const explicitSequenceDatabase = "normal_release_054_explicit_sequence";
+        createDatabase(cluster, explicitSequenceDatabase, database);
+        const explicitSequenceRebound = rpc(
+          cluster,
+          explicitSequenceDatabase,
+          "rebind_production_postcutover_normal_release",
+          normalReleaseDirectInput(applicationState, "explicit-sequence", {
+            expected_release_sequence: 2,
+          }),
+        );
+        assert.equal(explicitSequenceRebound.release_sequence, 2);
+        assert.equal(
+          explicitSequenceRebound.deployment_commit,
+          postcutoverReleaseSha,
+          "a config-only redeploy may keep the exact predecessor Git SHA",
+        );
+
+        const directInput = normalReleaseDirectInput(applicationState, "matrix");
+        for (const [label, overrides, expectedError] of [
+          ["not-ready", { runtime_deployment_status: "BUILDING" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INPUT_INVALID/],
+          ["wrong-sha", { deployment_commit: "d".repeat(40), runtime_deployment_commit: "d".repeat(40) }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_NOT_SAFE/],
+          ["sha-snapshot-mismatch", { runtime_deployment_commit: "d".repeat(40) }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INPUT_INVALID/],
+          ["wrong-project", { runtime_vercel_project_id: "prj_PreviewWrong054" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INPUT_INVALID/],
+          ["wrong-team", { runtime_vercel_team_id: "team_PreviewWrong054" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INPUT_INVALID/],
+          ["wrong-env", { runtime_environment: "preview" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INPUT_INVALID/],
+          ["preview-host", { runtime_deployment_hostname: "bagger-inv-git-preview-054.vercel.app" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INPUT_INVALID/],
+          ["wrong-resource", { project_ref: "preview-project-ref" }, /PRODUCTION_RESOURCE_ASSERTION_FAILED/],
+          ["wrong-epoch", { epoch_id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_NOT_SAFE/],
+          ["wrong-authority-generation", { expected_authority_generation: "dddddddd-dddd-4ddd-8ddd-dddddddddddd", runtime_expected_authority_epoch: "dddddddd-dddd-4ddd-8ddd-dddddddddddd" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_NOT_SAFE/],
+          ["wrong-admission-generation", { expected_admission_generation: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", runtime_expected_admission_generation: "cccccccc-cccc-4ccc-8ccc-cccccccccccc" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_NOT_SAFE/],
+          ["wrong-capability", { runtime_deployment_capability_ceiling: "WORKERS" }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INPUT_INVALID/],
+          ["stale-predecessor", { expected_predecessor_deployment_id: newDeployment }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_NOT_SAFE/],
+          ["stale-sequence", { expected_release_sequence: 3 }, /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_SEQUENCE_STALE/],
+        ]) {
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "rebind_production_postcutover_normal_release",
+              {
+                ...directInput,
+                request_fingerprint: fingerprint(`normal-matrix-${label}`),
+                ...overrides,
+              },
+            ),
+            expectedError,
+          );
+          assert.deepEqual(baseState(cluster, database), applicationState);
+        }
+
+        let normalFailureClone = 0;
+        const unhealthyClone = (label, mutation) => {
+          normalFailureClone += 1;
+          const cloneName = `normal_release_054_${normalFailureClone}_${label}`;
+          createDatabase(cluster, cloneName, database);
+          psql(cluster, cloneName, mutation);
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              cloneName,
+              "rebind_production_postcutover_normal_release",
+              {
+                ...normalReleaseDirectInput(
+                  baseState(cluster, cloneName),
+                  `unhealthy-${label}`,
+                ),
+                expected_activation_revision:
+                  Number(applicationState.activation_revision),
+                expected_admission_revision:
+                  Number(applicationState.admission_revision),
+              },
+            ),
+            /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_NOT_SAFE/,
+          );
+        };
+        unhealthyClone("ingress", `
+          update production_control.resource_scope
+          set scoring_ingress_enabled = false
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        unhealthyClone("workers", `
+          update production_control.resource_scope
+          set workers_enabled = false
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        unhealthyClone("worker-epoch-missing", `
+          update production_control.worker_controls
+          set metadata = metadata - 'activation_epoch_id'
+          where worker_name = 'SCORING_GOOGLE_OUTBOX';
+        `);
+        unhealthyClone("worker-epoch-stale", `
+          update production_control.worker_controls
+          set metadata = pg_catalog.jsonb_set(
+            metadata,
+            '{activation_epoch_id}',
+            pg_catalog.to_jsonb(
+              'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'::text
+            )
+          )
+          where worker_name = 'ROUND_SCORECARDS_ARCHIVE';
+        `);
+        unhealthyClone("extra-worker-enabled", `
+          update production_control.worker_controls
+          set enabled = true
+          where worker_name = 'GUIDE_SYNCHRONIZATION';
+        `);
+        unhealthyClone("extra-worker-scheduled", `
+          update production_control.worker_controls
+          set scheduler_installed = true
+          where worker_name = 'DRAFT_SYNCHRONIZATION';
+        `);
+        unhealthyClone("extra-worker-google-write", `
+          update production_control.worker_controls
+          set google_writes_allowed = true
+          where worker_name = 'PREDICTION_SETTINGS_SYNCHRONIZATION';
+        `);
+        unhealthyClone("transition", `
+          update production_control.cutover_activation_state
+          set active_transition_epoch_id = ${sqlLiteral(epochId)}::uuid
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `);
+        unhealthyClone("rollback", `
+          insert into production_control.scoring_admission_closures (
+            closure_id, closure_kind, prior_legacy_closure_id,
+            tournament_id, authority, authority_generation_id,
+            admission_generation_id, deployment_id, status,
+            opening_admission_revision, closing_admission_revision,
+            lease_high_watermark, close_request_fingerprint,
+            close_payload_hash, closing_at, actor_id, boundary_mode
+          ) select
+            'ffffffff-ffff-4fff-8fff-ffffffffffff'::uuid,
+            'SUPABASE_INGRESS', gate.active_closure_id,
+            '2026', 'SUPABASE', activation.authority_generation_id,
+            gate.admission_generation_id, gate.admission_deployment_id,
+            'CLOSING', gate.admission_revision,
+            gate.admission_revision + 1, 0,
+            ${sqlLiteral(fingerprint("pending-rollback-close-request"))},
+            ${sqlLiteral(fingerprint("pending-rollback-close-payload"))},
+            pg_catalog.now(), ${sqlLiteral(actor)},
+            'MAINTENANCE_WINDOW_V1'
+          from production_control.cutover_activation_state activation
+          cross join scoring_authority.ingress_gates gate
+          where activation.scope_key = 'BAGGER_INV_PRODUCTION'
+            and gate.tournament_id = '2026';
+        `);
+        unhealthyClone("reconciliation", `
+          update scoring_authority.authority_epochs
+          set status = 'PREPARED'
+          where epoch_id = ${sqlLiteral(epochId)}::uuid;
+        `);
+
+        const canonicalInput = normalReleaseCanonicalInput(
+          applicationState,
+          "exact",
+        );
+        assert.equal("expected_release_sequence" in canonicalInput, false);
+        assert.equal(
+          "expected_predecessor_deployment_commit" in canonicalInput,
+          false,
+        );
+        const normalRebound = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          canonicalInput,
+        );
+        assert.equal(
+          normalRebound.code,
+          "PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND",
+        );
+        assert.equal(normalRebound.idempotent, false);
+        assert.equal(
+          normalRebound.release_sequence,
+          2,
+        );
+        assert.equal(normalRebound.deployment_id, normalReleaseDeployment);
+        assert.equal(normalRebound.deployment_commit, normalReleaseSha);
+
+        const normalState = baseState(cluster, database);
+        assert.equal(
+          normalState.activation_revision,
+          applicationState.activation_revision + 1,
+        );
+        assert.equal(
+          normalState.admission_revision,
+          applicationState.admission_revision + 1,
+        );
+        assert.equal(normalState.expected_deployment_commit, normalReleaseSha);
+        assert.equal(
+          normalState.admission_deployment_id,
+          normalReleaseDeployment,
+        );
+        for (const field of [
+          "activation_state",
+          "authority_generation_id",
+          "authority",
+          "boundary_mode",
+          "read_cutover_phase",
+          "maintenance_state",
+          "activation_ingress",
+          "first_write_possible_at",
+          "first_write_observed_at",
+          "resource_authority",
+          "identity_authority",
+          "read_authority",
+          "resource_ingress",
+          "resource_workers",
+          "admission_state",
+          "admission_generation_id",
+          "execution_gate",
+          "active_epoch_id",
+          "active_closure_id",
+        ]) {
+          assert.deepEqual(
+            normalState[field],
+            applicationState[field],
+            `${field} is invariant across normal release sequence 2`,
+          );
+        }
+        assert.equal(psql(cluster, database, `
+          select status || ':' || consumed_release_rebind_id::text
+          from production_control.postcutover_normal_release_intents
+          where release_intent_id = ${sqlLiteral(authorization.release_intent_id)}::uuid;
+        `).startsWith("CONSUMED:"), true);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_normal_release_rebindings;
+        `), "2");
+        assert.equal(psql(cluster, database, `
+          select release_sequence::text || ':' || deployment_id || ':' ||
+            deployment_commit
+          from production_control.postcutover_normal_release_head;
+        `), `2:${normalReleaseDeployment}:${normalReleaseSha}`);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.worker_controls value
+          where value.worker_name in (
+            'SCORING_GOOGLE_OUTBOX', 'ROUND_SCORECARDS_ARCHIVE',
+            'ODDS_CALCULATION'
+          )
+            and value.enabled
+            and value.metadata->>'deployment_commit' =
+              ${sqlLiteral(normalReleaseSha)}
+            and value.metadata->>'deployment_id' =
+              ${sqlLiteral(normalReleaseDeployment)};
+        `), "3");
+        assert.equal(psql(cluster, database, `
+          select deployment_commit
+          from scoring_authority.authority_epochs
+          where epoch_id = ${sqlLiteral(epochId)}::uuid;
+        `), normalReleaseSha);
+
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control
+              .assert_production_maintenance_runtime_capability(
+                ${jsonSql(postcutoverCapabilityScope())}, 'OBSERVATION'
+              );
+          `),
+          /PRODUCTION_(?:POSTCUTOVER_NORMAL_RELEASE_REQUIRED|EXACT_RELEASE_REQUIRED)/,
+        );
+        psql(cluster, database, `
+          select production_control
+            .assert_production_maintenance_runtime_capability(
+              ${jsonSql(normalReleaseCapabilityScope())}, 'OBSERVATION'
+            );
+        `);
+        const normalOddsRevision = Number(psql(cluster, database, `
+          select runtime_revision
+          from production_control.odds_calculation_runtime
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `));
+        psql(cluster, database, `
+          select production_control.assert_production_odds_calculation_scope(
+            ${jsonSql({
+              ...oddsRuntimeInput(
+                normalState,
+                true,
+                normalOddsRevision,
+                "normal-release-scope",
+              ),
+              deployment_id: normalReleaseDeployment,
+              deployment_commit: normalReleaseSha,
+            })},
+            true
+          );
+        `);
+
+        const normalReplay = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          canonicalInput,
+        );
+        assert.equal(normalReplay.idempotent, true);
+        assert.equal(normalReplay.release_rebind_id, normalRebound.release_rebind_id);
+        assert.deepEqual(baseState(cluster, database), normalState);
+
+        const repeatedAuthorizationInput = normalReleaseAuthorizationInput(
+          normalState,
+          "sequence-3",
+          {
+            target_deployment_commit: repeatedNormalReleaseSha,
+            expected_predecessor_deployment_id: normalReleaseDeployment,
+            expected_predecessor_deployment_commit: normalReleaseSha,
+            expected_release_sequence: 3,
+          },
+        );
+        const repeatedAuthorization = ownerControlFunction(
+          cluster,
+          database,
+          "authorize_production_postcutover_normal_release",
+          repeatedAuthorizationInput,
+        );
+        assert.equal(repeatedAuthorization.release_sequence, 3);
+        assert.equal(repeatedAuthorization.status, "PENDING");
+
+        const repeatedCanonicalInput = normalReleaseCanonicalInput(
+          normalState,
+          "sequence-3",
+          {
+            original_deployment_id: normalReleaseDeployment,
+            deployment_id: repeatedNormalReleaseDeployment,
+            deployment_commit: repeatedNormalReleaseSha,
+            runtime_deployment_commit: repeatedNormalReleaseSha,
+            runtime_deployment_hostname:
+              repeatedNormalReleaseDeploymentHostname,
+          },
+        );
+        const repeatedRebound = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          repeatedCanonicalInput,
+        );
+        assert.equal(repeatedRebound.release_sequence, 3);
+        assert.equal(repeatedRebound.idempotent, false);
+        assert.equal(
+          repeatedRebound.deployment_id,
+          repeatedNormalReleaseDeployment,
+        );
+        assert.equal(
+          repeatedRebound.deployment_commit,
+          repeatedNormalReleaseSha,
+        );
+
+        const repeatedState = baseState(cluster, database);
+        assert.equal(
+          repeatedState.activation_revision,
+          normalState.activation_revision + 1,
+        );
+        assert.equal(
+          repeatedState.admission_revision,
+          normalState.admission_revision + 1,
+        );
+        assert.equal(
+          repeatedState.expected_deployment_commit,
+          repeatedNormalReleaseSha,
+        );
+        assert.equal(
+          repeatedState.admission_deployment_id,
+          repeatedNormalReleaseDeployment,
+        );
+        for (const field of [
+          "activation_state",
+          "authority_generation_id",
+          "authority",
+          "boundary_mode",
+          "read_cutover_phase",
+          "maintenance_state",
+          "activation_ingress",
+          "first_write_possible_at",
+          "first_write_observed_at",
+          "resource_authority",
+          "identity_authority",
+          "read_authority",
+          "resource_ingress",
+          "resource_workers",
+          "admission_state",
+          "admission_generation_id",
+          "execution_gate",
+          "active_epoch_id",
+          "active_closure_id",
+        ]) {
+          assert.deepEqual(
+            repeatedState[field],
+            normalState[field],
+            `${field} is invariant across normal release sequence 3`,
+          );
+        }
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_normal_release_rebindings;
+        `), "3");
+        assert.equal(psql(cluster, database, `
+          select release_sequence::text || ':' || deployment_id || ':' ||
+            deployment_commit
+          from production_control.postcutover_normal_release_head;
+        `), `3:${repeatedNormalReleaseDeployment}:${repeatedNormalReleaseSha}`);
+        assert.equal(psql(cluster, database, `
+          select pg_catalog.count(*)
+          from production_control.worker_controls value
+          where value.worker_name in (
+            'SCORING_GOOGLE_OUTBOX', 'ROUND_SCORECARDS_ARCHIVE',
+            'ODDS_CALCULATION'
+          )
+            and value.enabled
+            and value.metadata->>'deployment_commit' =
+              ${sqlLiteral(repeatedNormalReleaseSha)}
+            and value.metadata->>'deployment_id' =
+              ${sqlLiteral(repeatedNormalReleaseDeployment)};
+        `), "3");
+        assert.equal(psql(cluster, database, `
+          select deployment_commit
+          from scoring_authority.authority_epochs
+          where epoch_id = ${sqlLiteral(epochId)}::uuid;
+        `), repeatedNormalReleaseSha);
+        assert.equal(psql(cluster, database, `
+          select deployment_commit || ':' || activation_revision::text
+          from production_control.odds_calculation_runtime
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `), `${repeatedNormalReleaseSha}:${repeatedState.activation_revision}`);
+
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control
+              .assert_production_maintenance_runtime_capability(
+                ${jsonSql(normalReleaseCapabilityScope())}, 'OBSERVATION'
+              );
+          `),
+          /PRODUCTION_(?:POSTCUTOVER_NORMAL_RELEASE_REQUIRED|EXACT_RELEASE_REQUIRED)/,
+        );
+        psql(cluster, database, `
+          select production_control
+            .assert_production_maintenance_runtime_capability(
+              ${jsonSql(capabilityScope({
+                deployment_id: repeatedNormalReleaseDeployment,
+                deployment_commit: repeatedNormalReleaseSha,
+              }))},
+              'OBSERVATION'
+            );
+        `);
+        const repeatedOddsRevision = Number(psql(cluster, database, `
+          select runtime_revision
+          from production_control.odds_calculation_runtime
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `));
+        psql(cluster, database, `
+          select production_control.assert_production_odds_calculation_scope(
+            ${jsonSql({
+              ...oddsRuntimeInput(
+                repeatedState,
+                true,
+                repeatedOddsRevision,
+                "repeated-normal-release-scope",
+              ),
+              deployment_id: repeatedNormalReleaseDeployment,
+              deployment_commit: repeatedNormalReleaseSha,
+            })},
+            true
+          );
+        `);
+
+        const repeatedReplay = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          repeatedCanonicalInput,
+        );
+        assert.equal(repeatedReplay.idempotent, true);
+        assert.equal(
+          repeatedReplay.release_rebind_id,
+          repeatedRebound.release_rebind_id,
+        );
+        assert.deepEqual(baseState(cluster, database), repeatedState);
+
+        assertCommandFailure(
+          () => ownerControlFunction(
+            cluster,
+            database,
+            "authorize_production_postcutover_normal_release",
+            normalReleaseAuthorizationInput(repeatedState, "stale-sequence-2", {
+              target_deployment_commit: "f".repeat(40),
+              expected_predecessor_deployment_id: normalReleaseDeployment,
+              expected_predecessor_deployment_commit: normalReleaseSha,
+              expected_release_sequence: 4,
+            }),
+          ),
+          /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_INTENT_NOT_SAFE/,
+        );
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "rebind_production_maintenance_precommit_deployment",
+            canonicalInput,
+          ),
+          /PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_STALE_REPLAY/,
+        );
+        assert.deepEqual(baseState(cluster, database), repeatedState);
+
+        const freshBefore054 = baseState(cluster, orderedFreshDatabase);
+        psqlFile(
+          cluster,
+          orderedFreshDatabase,
+          path.join(migrationsDirectory, postcutoverNormalReleaseMigration),
+        );
+        assert.deepEqual(baseState(cluster, orderedFreshDatabase), freshBefore054);
+        assert.equal(psql(cluster, orderedFreshDatabase, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_normal_release_head;
+        `), "0");
+        const fresh053 = rpc(
+          cluster,
+          orderedFreshDatabase,
+          "rebind_production_maintenance_precommit_deployment",
+          postcutoverApplicationRebindInput(
+            baseState(cluster, orderedFreshDatabase),
+            "fresh-after-054",
+          ),
+        );
+        assert.equal(
+          fresh053.code,
+          "PRODUCTION_POSTCUTOVER_APPLICATION_RELEASE_REBOUND",
+        );
+        const fresh053State = baseState(cluster, orderedFreshDatabase);
+        assert.equal(psql(cluster, orderedFreshDatabase, `
+          select release_sequence
+          from production_control.postcutover_normal_release_head;
+        `), "1");
+        ownerControlFunction(
+          cluster,
+          orderedFreshDatabase,
+          "authorize_production_postcutover_normal_release",
+          normalReleaseAuthorizationInput(fresh053State, "fresh-sequence-2"),
+        );
+        const freshNormal = rpc(
+          cluster,
+          orderedFreshDatabase,
+          "rebind_production_maintenance_precommit_deployment",
+          normalReleaseCanonicalInput(fresh053State, "fresh-sequence-2"),
+        );
+        assert.equal(
+          freshNormal.release_sequence,
+          2,
+        );
+        assert.equal(psql(cluster, orderedFreshDatabase, `
+          select pg_catalog.count(*)
+          from production_control.postcutover_normal_release_rebindings;
+        `), "2");
       });
     } finally {
       await destroyCluster(cluster);
