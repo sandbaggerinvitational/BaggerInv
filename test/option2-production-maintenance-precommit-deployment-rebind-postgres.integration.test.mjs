@@ -27,6 +27,8 @@ const targetMigration =
   "202608280050_production_maintenance_precommit_deployment_rebind.sql";
 const capabilityMigration =
   "202608280051_production_maintenance_single_deployment_capability.sql";
+const precommitCapabilityGuardMigration =
+  "202608280052_production_maintenance_precommit_capability_guard.sql";
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const postgresBinaries = Object.fromEntries(
   ["createdb", "initdb", "pg_ctl", "psql"].map((name) => [
@@ -776,6 +778,39 @@ function capabilityScope(extra = {}) {
     deployment_capability_ceiling: "OBSERVATION",
     ...extra,
   };
+}
+
+function configureCurrentReadsBeforeCapabilityBinding(cluster, database, {
+  boundaryMode = "MAINTENANCE_WINDOW_V1",
+} = {}) {
+  psql(cluster, database, `
+    update production_control.cutover_activation_state
+    set state = 'STAGED', activation_revision = 10,
+        current_authority = 'GOOGLE',
+        boundary_mode = ${sqlLiteral(boundaryMode)},
+        read_cutover_phase = 'CURRENT_READS',
+        read_source_fingerprint = ${sqlLiteral(sourceFingerprint)},
+        maintenance_state = 'NORMAL', maintenance_started_at = null,
+        maintenance_ended_at = null, active_transition_epoch_id = null,
+        scoring_ingress_enabled = false,
+        first_supabase_write_possible_at = null,
+        first_supabase_write_observed_at = null
+    where scope_key = 'BAGGER_INV_PRODUCTION';
+
+    update production_control.resource_scope
+    set public_supabase_reads_enabled = true,
+        current_tournament_read_authority = 'SUPABASE',
+        scoring_authority = 'GOOGLE', scoring_ingress_enabled = false,
+        google_writes_enabled = false, workers_enabled = false
+    where scope_key = 'BAGGER_INV_PRODUCTION';
+
+    update scoring_authority.ingress_gates
+    set state = 'PAUSED', authority = 'GOOGLE', active_epoch_id = null,
+        boundary_mode = ${sqlLiteral(boundaryMode)},
+        admission_state = 'OPEN', active_closure_id = null,
+        unresolved_client_queues = 0
+    where tournament_id = '2026';
+  `);
 }
 
 function commitInput(current, deployment, label) {
@@ -1781,6 +1816,226 @@ test(
         assert.equal(finalState.admission_deployment_id, newDeployment);
         assert.equal(finalState.authority, "SUPABASE");
         assert.equal(finalState.resource_workers, true);
+      });
+    } finally {
+      await destroyCluster(cluster);
+    }
+  },
+);
+
+test(
+  "migration 052 treats the certified OBSERVATION ceiling as dormant until the precommit binding",
+  { timeout: 120_000 },
+  async (t) => {
+    if (!(await allBinariesAvailable())) {
+      t.skip(`PostgreSQL 17 toolchain is unavailable at ${pgBin}`);
+      return;
+    }
+    const cluster = await createCluster();
+    const templateDatabase = "maintenance_precommit_guard_template";
+    let cloneCounter = 0;
+    const clone = (label) => {
+      cloneCounter += 1;
+      const database = `maintenance_precommit_guard_${cloneCounter}_${label}`;
+      createDatabase(cluster, database, templateDatabase);
+      return database;
+    };
+    try {
+      createDatabase(cluster, templateDatabase);
+      installSupabaseCompatibility(cluster, templateDatabase);
+      await installThrough(
+        cluster,
+        templateDatabase,
+        providerInventoryV4Migration,
+      );
+      installControlFixture(cluster, templateDatabase);
+      await installThrough(
+        cluster,
+        templateDatabase,
+        capabilityMigration,
+        providerInventoryV3Migration,
+      );
+
+      const beforeMigration = baseState(cluster, templateDatabase);
+      const providerBefore = psql(cluster, templateDatabase, `
+        select pg_catalog.pg_get_functiondef(
+          'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+            ::regprocedure
+        );
+      `);
+      psqlFile(
+        cluster,
+        templateDatabase,
+        path.join(migrationsDirectory, precommitCapabilityGuardMigration),
+      );
+      assert.deepEqual(baseState(cluster, templateDatabase), beforeMigration);
+      assert.equal(psql(cluster, templateDatabase, `
+        select pg_catalog.pg_get_functiondef(
+          'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+            ::regprocedure
+        );
+      `), providerBefore);
+
+      installPreparedFixture(cluster, templateDatabase);
+      installOddsInputFixture(cluster, templateDatabase);
+
+      await t.test(
+        "CURRENT_READS accepts the exact dormant OBSERVATION capability metadata",
+        () => {
+          const database = clone("current_reads");
+          configureCurrentReadsBeforeCapabilityBinding(cluster, database);
+          const readScope = capabilityScope({
+            read_contract: "ACTIVE_CUTOVER",
+            cutover_phase: "OBSERVATION",
+          });
+          psql(cluster, database, `
+            select production_control.assert_production_cutover_read_scope(
+              ${jsonSql(readScope)}, 'CURRENT_READS'
+            );
+          `);
+          assert.equal(
+            psql(cluster, database, `
+              select pg_catalog.count(*)
+              from production_control
+                .maintenance_deployment_capability_bindings;
+            `),
+            "0",
+          );
+          assert.equal(baseState(cluster, database).active_epoch_id, null);
+          assert.equal(
+            baseState(cluster, database).read_cutover_phase,
+            "CURRENT_READS",
+          );
+        },
+      );
+
+      await t.test(
+        "CURRENT_READS rejects a wrong advertised contract or ceiling",
+        () => {
+          const database = clone("wrong_metadata");
+          configureCurrentReadsBeforeCapabilityBinding(cluster, database);
+          const exact = capabilityScope({
+            read_contract: "ACTIVE_CUTOVER",
+            cutover_phase: "OBSERVATION",
+          });
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_production_cutover_read_scope(
+                ${jsonSql({
+                  ...exact,
+                  deployment_capability_contract:
+                    "production-maintenance-single-deployment-capability-v0",
+                })},
+                'CURRENT_READS'
+              );
+            `),
+            /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+          );
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_production_cutover_read_scope(
+                ${jsonSql({
+                  ...exact,
+                  deployment_capability_ceiling: "WORKERS",
+                })},
+                'CURRENT_READS'
+              );
+            `),
+            /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+          );
+        },
+      );
+
+      await t.test(
+        "SCORING_COMMIT still rejects an unbound maintenance deployment",
+        () => {
+          const database = clone("scoring_commit_unbound");
+          assertCommandFailure(
+            () => rpc(
+              cluster,
+              database,
+              "set_production_cutover_read_state",
+              phaseInput(
+                baseState(cluster, database),
+                "SCORING_PREPARE",
+                "SCORING_COMMIT",
+                "migration-052-unbound",
+              ),
+            ),
+            /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+          );
+          assert.equal(
+            baseState(cluster, database).read_cutover_phase,
+            "SCORING_PREPARE",
+          );
+        },
+      );
+
+      await t.test(
+        "the exact post-bind deployment guard remains strict",
+        () => {
+          const database = clone("post_bind");
+          rpc(
+            cluster,
+            database,
+            "rebind_production_maintenance_precommit_deployment",
+            rebindInputV2(baseState(cluster, database), "migration-052"),
+          );
+          const readScope = capabilityScope({
+            read_contract: "ACTIVE_CUTOVER",
+            cutover_phase: "OBSERVATION",
+          });
+          psql(cluster, database, `
+            select production_control.assert_production_cutover_read_scope(
+              ${jsonSql(readScope)}, 'CURRENT_READS'
+            );
+          `);
+          assertCommandFailure(
+            () => psql(cluster, database, `
+              select production_control.assert_production_cutover_read_scope(
+                ${jsonSql({ ...readScope, deployment_id: oldDeployment })},
+                'CURRENT_READS'
+              );
+            `),
+            /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+          );
+          assert.equal(
+            baseState(cluster, database).read_cutover_phase,
+            "SCORING_PREPARE",
+          );
+        },
+      );
+
+      await t.test("PROVIDER_FENCE_V2 read behavior is unchanged", () => {
+        const database = clone("provider_fence");
+        configureCurrentReadsBeforeCapabilityBinding(cluster, database, {
+          boundaryMode: "PROVIDER_FENCE_V2",
+        });
+        const exact = capabilityScope({
+          read_contract: "ACTIVE_CUTOVER",
+          cutover_phase: "CURRENT_READS",
+        });
+        const {
+          deployment_capability_contract: ignoredContract,
+          deployment_capability_ceiling: ignoredCeiling,
+          ...providerReadScope
+        } = exact;
+        assert.equal(ignoredContract.length > 0, true);
+        assert.equal(ignoredCeiling, "OBSERVATION");
+        psql(cluster, database, `
+          select production_control.assert_production_cutover_read_scope(
+            ${jsonSql(providerReadScope)}, 'CURRENT_READS'
+          );
+        `);
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control.assert_production_cutover_read_scope(
+              ${jsonSql({ ...exact, cutover_phase: "OBSERVATION" })},
+              'CURRENT_READS'
+            );
+          `),
+          /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+        );
       });
     } finally {
       await destroyCluster(cluster);
