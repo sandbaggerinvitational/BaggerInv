@@ -6,9 +6,12 @@ import test from "node:test";
 import {
   PRODUCTION_CUTOVER_CONFIGURATION_PLAN,
   PRODUCTION_CUTOVER_PHASES,
+  PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING,
+  PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT,
   PRODUCTION_VERCEL_PROJECT_ID,
   assertProductionCutoverActivation,
   productionCutoverActivationEnvironment,
+  productionCutoverPhaseAtLeast,
   productionCutoverRequestEnvironment,
 } from "../lib/production-cutover-activation-contract.js";
 import {
@@ -124,6 +127,50 @@ test("identity phase cannot be eligible without Director Auth and legacy-admin r
   assert.equal(missingRevalidation.allowed, false);
   assert.equal(missingRevalidation.reason, "production-admin-session-revalidation-required");
   assert.equal(productionCutoverActivationEnvironment(identityEnv).allowed, true);
+});
+
+test("the maintenance capability ceiling authorizes dormant server capability only for the exact contract", () => {
+  const capabilityEnv = {
+    ...identityEnv,
+    PRODUCTION_CUTOVER_PHASE: "SCORING_COMMIT",
+    PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT,
+    PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING,
+  };
+  const state = productionCutoverActivationEnvironment(capabilityEnv);
+  assert.equal(state.allowed, true);
+  assert.equal(state.phase, "SCORING_COMMIT");
+  assert.equal(state.phaseIndex, PRODUCTION_CUTOVER_PHASES.indexOf("SCORING_COMMIT"));
+  assert.equal(
+    state.authorizationPhaseIndex,
+    PRODUCTION_CUTOVER_PHASES.indexOf("OBSERVATION"),
+  );
+  assert.equal(state.maintenanceDeploymentCapability.allowed, true);
+  assert.equal(state.maintenanceDeploymentCapability.databasePhaseAuthoritative, true);
+  assert.doesNotThrow(() => assertProductionCutoverActivation({
+    env: capabilityEnv,
+    requiredPhase: "OBSERVATION",
+  }));
+  assert.equal(productionCutoverPhaseAtLeast(capabilityEnv, "WORKERS"), true);
+  assert.throws(() => assertProductionCutoverActivation({
+    env: identityEnv,
+    requiredPhase: "WORKERS",
+  }), { code: "PRODUCTION_CUTOVER_RESOURCE_MISMATCH" });
+
+  for (const env of [
+    {
+      ...capabilityEnv,
+      PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT: "wrong-contract",
+    },
+    {
+      ...capabilityEnv,
+      PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING: "ODDS_WAR_ROOM",
+    },
+    { ...capabilityEnv, PRODUCTION_CUTOVER_PHASE: "WORKERS" },
+  ]) {
+    const invalid = productionCutoverActivationEnvironment(env);
+    assert.equal(invalid.allowed, false);
+    assert.equal(invalid.reason, "maintenance-deployment-capability-invalid");
+  }
 });
 
 test("Production mutation request proof is same-origin and derives environment only from server configuration", () => {

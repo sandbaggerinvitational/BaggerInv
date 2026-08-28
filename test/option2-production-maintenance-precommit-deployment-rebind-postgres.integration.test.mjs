@@ -25,6 +25,8 @@ const providerInventoryV3Migration =
   "202608260039_production_all_project_provider_inventory_v3.sql";
 const targetMigration =
   "202608280050_production_maintenance_precommit_deployment_rebind.sql";
+const capabilityMigration =
+  "202608280051_production_maintenance_single_deployment_capability.sql";
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const postgresBinaries = Object.fromEntries(
   ["createdb", "initdb", "pg_ctl", "psql"].map((name) => [
@@ -46,6 +48,8 @@ const leaseFingerprint = "3".repeat(64);
 const stagedCertificationFingerprint = "4".repeat(64);
 const stagedEnvironmentFingerprint = "5".repeat(64);
 const actor = "maintenance-rebind-postgres-test";
+const predictionSourceFingerprint = "b".repeat(64);
+const predictionEffectiveFingerprint = "c".repeat(64);
 const scope = Object.freeze({
   environment: "PRODUCTION",
   project_ref: "ymqhhtxaywtqllynrmxe",
@@ -712,6 +716,68 @@ function rebindInput(current, label, overrides = {}) {
   };
 }
 
+function installOddsInputFixture(cluster, database) {
+  psql(cluster, database, `
+    insert into scoring_authority.odds_input_configurations (
+      tournament_id, configuration_revision, source_workbook_id,
+      settings, historical_ratings, settings_fingerprint,
+      ratings_fingerprint, pairing_fingerprint, bundle_fingerprint,
+      is_current, imported_by, source_fingerprint, canonical_settings,
+      effective_settings, effective_settings_fingerprint,
+      settings_contract_version, validation_status, validation_diagnostics,
+      synchronized_at
+    ) values (
+      '2026', 1, ${sqlLiteral(scope.source_workbook_id)},
+      '[]'::jsonb, '{}'::jsonb, ${sqlLiteral("d".repeat(64))},
+      ${sqlLiteral("e".repeat(64))}, ${sqlLiteral("f".repeat(64))},
+      ${sqlLiteral("1".repeat(64))}, true, ${sqlLiteral(actor)},
+      ${sqlLiteral(predictionSourceFingerprint)}, '{}'::jsonb, '{}'::jsonb,
+      ${sqlLiteral(predictionEffectiveFingerprint)},
+      'prediction-settings-v1', 'VALID', '{}'::jsonb, pg_catalog.now()
+    );
+  `);
+}
+
+function rebindInputV2(current, label, overrides = {}) {
+  return rebindInput(current, label, {
+    runtime_binding_contract:
+      "production-maintenance-precommit-deployment-rebind-v2",
+    runtime_deployment_capability_contract:
+      "production-maintenance-single-deployment-capability-v1",
+    runtime_deployment_capability_ceiling: "OBSERVATION",
+    runtime_public_supabase_reads_enabled: true,
+    runtime_workers_enabled: true,
+    runtime_google_mirror_enabled: true,
+    runtime_scorecard_archive_enabled: true,
+    runtime_outbox_worker_secret_configured: true,
+    runtime_archive_worker_secret_configured: true,
+    runtime_odds_calculation_enabled: true,
+    runtime_war_room_input_source: "SUPABASE",
+    runtime_prediction_settings_read_source: "SUPABASE",
+    runtime_odds_calculation_input_source: "SUPABASE",
+    runtime_prediction_settings_source_fingerprint:
+      predictionSourceFingerprint,
+    runtime_prediction_settings_effective_fingerprint:
+      predictionEffectiveFingerprint,
+    runtime_odds_publication_authority: "GOOGLE",
+    runtime_supabase_odds_publication_enabled: false,
+    runtime_supabase_odds_google_mirror_enabled: false,
+    ...overrides,
+  });
+}
+
+function capabilityScope(extra = {}) {
+  return {
+    ...scope,
+    deployment_id: newDeployment,
+    deployment_commit: releaseSha,
+    deployment_capability_contract:
+      "production-maintenance-single-deployment-capability-v1",
+    deployment_capability_ceiling: "OBSERVATION",
+    ...extra,
+  };
+}
+
 function commitInput(current, deployment, label) {
   return {
     ...scope,
@@ -731,6 +797,72 @@ function commitInput(current, deployment, label) {
     reconciliation_fingerprint: reconciliationFingerprint,
     request_fingerprint: fingerprint(`commit-${label}`),
   };
+}
+
+function phaseInput(current, priorPhase, targetPhase, label) {
+  return capabilityScope({
+    actor_id: actor,
+    mode: "ACTIVATE",
+    expected_prior_phase: priorPhase,
+    target_phase: targetPhase,
+    source_fingerprint: sourceFingerprint,
+    expected_activation_revision: Number(current.activation_revision),
+    request_fingerprint: fingerprint(`phase-${label}`),
+  });
+}
+
+function commitInputV2(current, label) {
+  return {
+    ...commitInput(current, newDeployment, label),
+    deployment_capability_contract:
+      "production-maintenance-single-deployment-capability-v1",
+    deployment_capability_ceiling: "OBSERVATION",
+  };
+}
+
+function resumeInputV2(current, label) {
+  return capabilityScope({
+    boundary_mode: "MAINTENANCE_WINDOW_V1",
+    actor_id: actor,
+    epoch_id: epochId,
+    expected_activation_revision: Number(current.activation_revision),
+    expected_authority_generation: current.authority_generation_id,
+    expected_admission_revision: Number(current.admission_revision),
+    expected_admission_generation: current.admission_generation_id,
+    runtime_verification_fingerprint: fingerprint(`runtime-${label}`),
+    configuration_fingerprint: stagedEnvironmentFingerprint,
+    request_fingerprint: fingerprint(`resume-${label}`),
+  });
+}
+
+function workerInput(current, workerName, label) {
+  return capabilityScope({
+    actor_id: actor,
+    worker_name: workerName,
+    enabled: true,
+    expected_activation_revision: Number(current.activation_revision),
+    expected_epoch_id: current.authority_generation_id,
+    google_service_account_email:
+      "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
+    request_fingerprint: fingerprint(`worker-${label}`),
+  });
+}
+
+function oddsRuntimeInput(current, expectedEnabled, expectedRevision, label) {
+  return capabilityScope({
+    vercel_project_id: "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    canonical_domain: "https://baggerinv.com",
+    tournament_year: 2026,
+    worker_name: "ODDS_CALCULATION",
+    operation_mode: "PRODUCTION_CUTOVER",
+    cutover_phase: "ODDS_WAR_ROOM",
+    actor_id: actor,
+    enabled: true,
+    expected_runtime_enabled: expectedEnabled,
+    expected_runtime_revision: expectedRevision,
+    expected_activation_revision: Number(current.activation_revision),
+    request_fingerprint: fingerprint(`odds-${label}`),
+  });
 }
 
 test(
@@ -1164,6 +1296,491 @@ test(
         assert.equal(resumed.authority, "SUPABASE");
         assert.equal(resumed.ingress, "OPEN");
         assert.equal(resumed.first_supabase_canonical_write_possible, true);
+      });
+    } finally {
+      await destroyCluster(cluster);
+    }
+  },
+);
+
+test(
+  "migration 051 binds one maintenance deployment through observation while database phases stay authoritative",
+  { timeout: 120_000 },
+  async (t) => {
+    if (!(await allBinariesAvailable())) {
+      t.skip(`PostgreSQL 17 toolchain is unavailable at ${pgBin}`);
+      return;
+    }
+    const cluster = await createCluster();
+    const templateDatabase = "maintenance_capability_template";
+    let cloneCounter = 0;
+    const clone = (label) => {
+      cloneCounter += 1;
+      const database = `maintenance_capability_${cloneCounter}_${label}`;
+      createDatabase(cluster, database, templateDatabase);
+      return database;
+    };
+    try {
+      createDatabase(cluster, templateDatabase);
+      installSupabaseCompatibility(cluster, templateDatabase);
+      await installThrough(
+        cluster,
+        templateDatabase,
+        providerInventoryV4Migration,
+      );
+      installControlFixture(cluster, templateDatabase);
+      await installThrough(
+        cluster,
+        templateDatabase,
+        targetMigration,
+        providerInventoryV3Migration,
+      );
+      const beforeMigration = baseState(cluster, templateDatabase);
+      assert.equal(beforeMigration.activation_state, "DORMANT");
+      assert.equal(beforeMigration.authority, "GOOGLE");
+      assert.equal(beforeMigration.resource_authority, "GOOGLE");
+      assert.equal(beforeMigration.identity_authority, "PASSPORT");
+      assert.equal(beforeMigration.maintenance_state, "NORMAL");
+      assert.equal(beforeMigration.admission_state, "OPEN");
+      assert.equal(beforeMigration.activation_ingress, false);
+      assert.equal(beforeMigration.resource_ingress, false);
+      assert.equal(beforeMigration.resource_workers, false);
+      assert.equal(beforeMigration.first_write_possible_at, null);
+      assert.equal(beforeMigration.first_write_observed_at, null);
+      const providerBefore = psql(cluster, templateDatabase, `
+        select pg_catalog.pg_get_functiondef(
+          'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+            ::regprocedure
+        );
+      `);
+      psqlFile(
+        cluster,
+        templateDatabase,
+        path.join(migrationsDirectory, capabilityMigration),
+      );
+      assert.deepEqual(baseState(cluster, templateDatabase), beforeMigration);
+      assert.equal(psql(cluster, templateDatabase, `
+        select pg_catalog.pg_get_functiondef(
+          'public.stage_production_cutover_release_provider_fence_v2(jsonb)'
+            ::regprocedure
+        );
+      `), providerBefore);
+      const semantic = installSemanticFixture(cluster, templateDatabase);
+      const provenanceDatabase = "maintenance_capability_provenance";
+      createDatabase(cluster, provenanceDatabase, templateDatabase);
+
+      await t.test("exact release provenance carries the versioned ceiling and safely supersedes an unused release", () => {
+        const current = baseState(cluster, provenanceDatabase);
+        const firstInput = releaseBindingInput(current, semantic);
+        const first = ownerControlFunction(
+          cluster,
+          provenanceDatabase,
+          "bind_production_maintenance_release_candidate",
+          firstInput,
+        );
+        const firstConfiguration = parseJsonOutput(psql(
+          cluster,
+          provenanceDatabase,
+          `select production_control
+            .production_maintenance_selected_configuration_v2(
+              ${sqlLiteral(releaseSha)},
+              ${sqlLiteral(candidateDeployment)},
+              ${sqlLiteral(candidateDeploymentHostname)},
+              ${sqlLiteral(first.binding_fingerprint)}
+            )::text;`,
+        ));
+        assert.equal(
+          firstConfiguration.deployment_capability_contract,
+          "production-maintenance-single-deployment-capability-v1",
+        );
+        assert.equal(
+          firstConfiguration.deployment_capability_ceiling,
+          "OBSERVATION",
+        );
+        assert.equal(firstConfiguration.postcommit_redeployment_required, false);
+        const firstProvenance = rpc(
+          cluster,
+          provenanceDatabase,
+          "inspect_production_maintenance_stage_provenance",
+          {
+            ...firstInput,
+            release_binding_fingerprint: first.binding_fingerprint,
+            selected_release_configuration: firstConfiguration,
+            request_fingerprint: fingerprint("inspect-capability-provenance"),
+          },
+        );
+        assert.equal(firstProvenance.eligible, true);
+        assert.equal(firstProvenance.deployment_commit, releaseSha);
+
+        const nextRelease = "b".repeat(40);
+        const nextDeployment = "dpl_MaintenanceCandidate051B";
+        const nextHostname = "bagger-maintenance-candidate-b.vercel.app";
+        const secondInput = {
+          ...firstInput,
+          deployment_id: nextDeployment,
+          deployment_commit: nextRelease,
+          candidate_commit_sha: nextRelease,
+          candidate_deployment_hostname: nextHostname,
+          request_fingerprint: fingerprint("bind-release-051-b"),
+        };
+        const second = ownerControlFunction(
+          cluster,
+          provenanceDatabase,
+          "bind_production_maintenance_release_candidate",
+          secondInput,
+        );
+        assert.equal(second.release_sha, nextRelease);
+        assert.equal(second.candidate_deployment_id, nextDeployment);
+        assert.equal(psql(cluster, provenanceDatabase, `
+          select pg_catalog.count(*)
+          from production_control.maintenance_release_candidate_history;
+        `), "1");
+        assert.equal(psql(cluster, provenanceDatabase, `
+          select release_sha
+          from production_control.maintenance_release_candidates
+          where scope_key = 'BAGGER_INV_PRODUCTION';
+        `), nextRelease);
+      });
+      installPreparedFixture(cluster, templateDatabase);
+      installOddsInputFixture(cluster, templateDatabase);
+
+      await t.test("SCORING_COMMIT cannot advance without the exact binding", () => {
+        const database = clone("unbound");
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "set_production_cutover_read_state",
+            phaseInput(
+              baseState(cluster, database),
+              "SCORING_PREPARE",
+              "SCORING_COMMIT",
+              "unbound",
+            ),
+          ),
+          /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+        );
+        assert.equal(
+          baseState(cluster, database).read_cutover_phase,
+          "SCORING_PREPARE",
+        );
+      });
+
+      await t.test("attestation is exact, dormant, and idempotent", () => {
+        const database = clone("binding");
+        const current = baseState(cluster, database);
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "rebind_production_maintenance_precommit_deployment",
+            rebindInputV2(current, "wrong-ceiling", {
+              runtime_deployment_capability_ceiling: "WORKERS",
+            }),
+          ),
+          /PRODUCTION_MAINTENANCE_CAPABILITY_ATTESTATION_INVALID/,
+        );
+        const exactInput = rebindInputV2(
+          baseState(cluster, database),
+          "exact-capability",
+        );
+        const rebound = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          exactInput,
+        );
+        assert.equal(rebound.deployment_capability_ceiling, "OBSERVATION");
+        assert.equal(rebound.capabilities_dormant, true);
+        assert.equal(rebound.workers_enabled, false);
+        assert.equal(rebound.odds_runtime_enabled, false);
+        const replay = rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          exactInput,
+        );
+        assert.equal(replay.idempotent, true);
+        assert.deepEqual(parseJsonOutput(psql(cluster, database, `
+          select pg_catalog.jsonb_build_object(
+            'workers', resource.workers_enabled,
+            'google_writes', resource.google_writes_enabled,
+            'odds_runtime', runtime.enabled,
+            'worker_count', (
+              select pg_catalog.count(*)
+              from production_control.worker_controls value
+              where value.enabled
+            )
+          )::text
+          from production_control.resource_scope resource
+          cross join production_control.odds_calculation_runtime runtime
+          where resource.scope_key = 'BAGGER_INV_PRODUCTION'
+            and runtime.scope_key = 'BAGGER_INV_PRODUCTION';
+        `)), {
+          workers: false,
+          google_writes: false,
+          odds_runtime: false,
+          worker_count: 0,
+        });
+      });
+
+      await t.test("the OBSERVATION ceiling never advances the database phase", () => {
+        const database = clone("read-ceiling");
+        rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          rebindInputV2(baseState(cluster, database), "read-ceiling"),
+        );
+        const readScope = capabilityScope({
+          cutover_phase: "OBSERVATION",
+          read_contract: "ACTIVE_CUTOVER",
+        });
+        psql(cluster, database, `
+          select production_control.assert_production_cutover_read_scope(
+            ${jsonSql(readScope)}, 'CURRENT_READS'
+          );
+        `);
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control.assert_production_cutover_read_scope(
+              ${jsonSql(readScope)}, 'ODDS_WAR_ROOM'
+            );
+          `),
+          /PRODUCTION_CUTOVER_READ_SCOPE_REQUIRED/,
+        );
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control.assert_production_cutover_read_scope(
+              ${jsonSql({ ...readScope, deployment_id: oldDeployment })},
+              'CURRENT_READS'
+            );
+          `),
+          /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+        );
+        psql(cluster, database, `
+          update scoring_authority.ingress_gates
+          set admission_deployment_id = ${sqlLiteral(oldDeployment)}
+          where tournament_id = '2026';
+        `);
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control.assert_production_cutover_read_scope(
+              ${jsonSql(readScope)}, 'CURRENT_READS'
+            );
+          `),
+          /PRODUCTION_MAINTENANCE_RUNTIME_CAPABILITY_REQUIRED/,
+        );
+        psql(cluster, database, `
+          update scoring_authority.ingress_gates
+          set admission_deployment_id = ${sqlLiteral(newDeployment)}
+          where tournament_id = '2026';
+        `);
+        psql(cluster, database, `
+          update scoring_authority.odds_input_configurations
+          set source_fingerprint = ${sqlLiteral("0".repeat(64))}
+          where tournament_id = '2026' and is_current;
+        `);
+        assertCommandFailure(
+          () => psql(cluster, database, `
+            select production_control
+              .assert_production_maintenance_runtime_capability(
+                ${jsonSql(capabilityScope())}, 'ODDS_WAR_ROOM'
+              );
+          `),
+          /PRODUCTION_MAINTENANCE_PREDICTION_SETTINGS_BINDING_REQUIRED/,
+        );
+        assert.equal(
+          baseState(cluster, database).read_cutover_phase,
+          "SCORING_PREPARE",
+        );
+      });
+
+      await t.test("commit, workers, Odds, and observation require each database milestone", () => {
+        const database = clone("phases");
+        rpc(
+          cluster,
+          database,
+          "rebind_production_maintenance_precommit_deployment",
+          rebindInputV2(baseState(cluster, database), "phases"),
+        );
+
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "commit_production_authority_epoch",
+            commitInputV2(baseState(cluster, database), "too-early"),
+          ),
+          /PRODUCTION_MAINTENANCE_SCORING_COMMIT_PHASE_REQUIRED/,
+        );
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "set_production_cutover_read_state",
+            phaseInput(
+              baseState(cluster, database),
+              "SCORING_PREPARE",
+              "WORKERS",
+              "skip-to-workers",
+            ),
+          ),
+          /PRODUCTION_READ_STATE_PRECONDITION_FAILED/,
+        );
+
+        const scoringCommitPhase = rpc(
+          cluster,
+          database,
+          "set_production_cutover_read_state",
+          phaseInput(
+            baseState(cluster, database),
+            "SCORING_PREPARE",
+            "SCORING_COMMIT",
+            "scoring-commit",
+          ),
+        );
+        assert.equal(scoringCommitPhase.phase, "SCORING_COMMIT");
+        const committed = rpc(
+          cluster,
+          database,
+          "commit_production_authority_epoch",
+          commitInputV2(baseState(cluster, database), "exact"),
+        );
+        assert.equal(committed.authority, "SUPABASE");
+        assert.equal(committed.ingress, "PAUSED");
+
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "set_production_cutover_worker_state",
+            workerInput(
+              baseState(cluster, database),
+              "SCORING_GOOGLE_OUTBOX",
+              "before-workers-phase",
+            ),
+          ),
+          /PRODUCTION_CUTOVER_WORKERS_PHASE_REQUIRED/,
+        );
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "set_production_cutover_read_state",
+            phaseInput(
+              baseState(cluster, database),
+              "SCORING_COMMIT",
+              "WORKERS",
+              "before-resume",
+            ),
+          ),
+          /PRODUCTION_WORKERS_PHASE_PRECONDITION_REQUIRED/,
+        );
+
+        const resumed = rpc(
+          cluster,
+          database,
+          "resume_production_supabase_scoring",
+          resumeInputV2(baseState(cluster, database), "exact"),
+        );
+        assert.equal(resumed.ingress, "OPEN");
+        const workersPhase = rpc(
+          cluster,
+          database,
+          "set_production_cutover_read_state",
+          phaseInput(
+            baseState(cluster, database),
+            "SCORING_COMMIT",
+            "WORKERS",
+            "workers",
+          ),
+        );
+        assert.equal(workersPhase.phase, "WORKERS");
+        assertCommandFailure(
+          () => rpc(
+            cluster,
+            database,
+            "set_production_cutover_read_state",
+            phaseInput(
+              baseState(cluster, database),
+              "WORKERS",
+              "ODDS_WAR_ROOM",
+              "before-certified-workers",
+            ),
+          ),
+          /PRODUCTION_ODDS_WORKER_PRECONDITION_REQUIRED/,
+        );
+
+        for (const [workerName, label] of [
+          ["SCORING_GOOGLE_OUTBOX", "outbox"],
+          ["ROUND_SCORECARDS_ARCHIVE", "archive"],
+        ]) {
+          const enabled = rpc(
+            cluster,
+            database,
+            "set_production_cutover_worker_state",
+            workerInput(baseState(cluster, database), workerName, label),
+          );
+          assert.equal(enabled.enabled, true);
+        }
+        const oddsPhase = rpc(
+          cluster,
+          database,
+          "set_production_cutover_read_state",
+          phaseInput(
+            baseState(cluster, database),
+            "WORKERS",
+            "ODDS_WAR_ROOM",
+            "odds-war-room",
+          ),
+        );
+        assert.equal(oddsPhase.phase, "ODDS_WAR_ROOM");
+
+        const configured = rpc(
+          cluster,
+          database,
+          "configure_production_odds_calculation_runtime",
+          oddsRuntimeInput(baseState(cluster, database), false, 0, "enable"),
+        );
+        assert.equal(configured.enabled, true);
+        assert.equal(configured.cutover_phase, "ODDS_WAR_ROOM");
+        const observation = rpc(
+          cluster,
+          database,
+          "set_production_cutover_read_state",
+          phaseInput(
+            baseState(cluster, database),
+            "ODDS_WAR_ROOM",
+            "OBSERVATION",
+            "observation",
+          ),
+        );
+        assert.equal(observation.phase, "OBSERVATION");
+
+        const reboundOdds = rpc(
+          cluster,
+          database,
+          "configure_production_odds_calculation_runtime",
+          oddsRuntimeInput(baseState(cluster, database), true, 1, "observe"),
+        );
+        assert.equal(reboundOdds.runtime_revision, 2);
+        psql(cluster, database, `
+          select production_control.assert_production_odds_calculation_scope(
+            ${jsonSql(oddsRuntimeInput(
+              baseState(cluster, database),
+              true,
+              2,
+              "scope",
+            ))},
+            true
+          );
+        `);
+        const finalState = baseState(cluster, database);
+        assert.equal(finalState.read_cutover_phase, "OBSERVATION");
+        assert.equal(finalState.admission_deployment_id, newDeployment);
+        assert.equal(finalState.authority, "SUPABASE");
+        assert.equal(finalState.resource_workers, true);
       });
     } finally {
       await destroyCluster(cluster);

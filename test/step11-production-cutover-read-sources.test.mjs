@@ -231,6 +231,44 @@ test("active read transport is bounded, exact-resource, and cannot be caller-ove
   assert.equal(scoring.body.input.match_id, "2026-R1-1");
 });
 
+test("maintenance reads send the exact bound OBSERVATION ceiling while database phase remains authoritative", () => {
+  const env = {
+    ...activeBase,
+    VERCEL_DEPLOYMENT_ID: "dpl_SingleDeploymentCapability051",
+    PRODUCTION_CUTOVER_PHASE: "SCORING_COMMIT",
+    PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT:
+      "production-maintenance-single-deployment-capability-v1",
+    PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING: "OBSERVATION",
+    TOURNAMENT_READ_SOURCE: "supabase",
+    WAR_ROOM_INPUT_SOURCE: "supabase",
+  };
+  assert.equal(tournamentReadEnvironment(env).resolved, "supabase");
+  assert.equal(resolveWarRoomInputSource(env).resolved, "supabase");
+  const state = productionCutoverReadTransportEnvironment(
+    env,
+    "read_game_center_view",
+  );
+  assert.equal(state.allowed, true);
+  const translated = productionCutoverReadRpcTranslation(
+    "read_game_center_view",
+    { target_match_id: "2026-R1-1" },
+    env,
+  );
+  assert.equal(translated.body.input.cutover_phase, "OBSERVATION");
+  assert.equal(
+    translated.body.input.deployment_capability_contract,
+    "production-maintenance-single-deployment-capability-v1",
+  );
+  assert.equal(
+    translated.body.input.deployment_capability_ceiling,
+    "OBSERVATION",
+  );
+  assert.equal(
+    translated.body.input.deployment_id,
+    "dpl_SingleDeploymentCapability051",
+  );
+});
+
 test("Guide course context is readable in READ_CUTOVER without opening general current reads", () => {
   const env = { ...activeBase, PRODUCTION_CUTOVER_PHASE: "READ_CUTOVER" };
   const body = { production_cutover_surface: "GUIDE_COURSE_CONTEXT" };

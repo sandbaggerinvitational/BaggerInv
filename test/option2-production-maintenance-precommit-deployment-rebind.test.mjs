@@ -6,6 +6,10 @@ const migrationUrl = new URL(
   "../supabase/production_migrations/202608280050_production_maintenance_precommit_deployment_rebind.sql",
   import.meta.url,
 );
+const capabilityMigrationUrl = new URL(
+  "../supabase/production_migrations/202608280051_production_maintenance_single_deployment_capability.sql",
+  import.meta.url,
+);
 const libraryUrl = new URL(
   "../lib/production-maintenance-precommit-deployment-rebind.js",
   import.meta.url,
@@ -14,8 +18,9 @@ const routeUrl = new URL(
   "../app/api/admin/production-maintenance-precommit-deployment-rebind/route.js",
   import.meta.url,
 );
-const [sql, librarySource, routeSource] = await Promise.all([
+const [sql, capabilitySql, librarySource, routeSource] = await Promise.all([
   readFile(migrationUrl, "utf8"),
+  readFile(capabilityMigrationUrl, "utf8"),
   readFile(libraryUrl, "utf8"),
   readFile(routeUrl, "utf8"),
 ]);
@@ -78,6 +83,56 @@ test("provider-fence behavior is not replaced or weakened", () => {
   );
 });
 
+test("migration 051 binds one maintenance-only OBSERVATION capability ceiling", () => {
+  assert.match(capabilitySql, /maintenance_deployment_capability_bindings/);
+  assert.match(
+    capabilitySql,
+    /production-maintenance-single-deployment-capability-v1/,
+  );
+  assert.match(capabilitySql, /capability_ceiling = 'OBSERVATION'/);
+  assert.match(
+    capabilitySql,
+    /runtime_workers_enabled'[\s\S]*?is distinct from 'true'::jsonb/,
+  );
+  assert.match(
+    capabilitySql,
+    /runtime_outbox_worker_secret_configured'[\s\S]*?'true'::jsonb/,
+  );
+  assert.match(
+    capabilitySql,
+    /runtime_archive_worker_secret_configured'[\s\S]*?'true'::jsonb/,
+  );
+  assert.match(capabilitySql, /runtime_war_room_input_source/);
+  assert.match(capabilitySql, /runtime_prediction_settings_read_source/);
+  assert.match(capabilitySql, /runtime_odds_calculation_input_source/);
+  assert.match(capabilitySql, /runtime_prediction_settings_source_fingerprint/);
+  assert.match(capabilitySql, /runtime_prediction_settings_effective_fingerprint/);
+  assert.match(
+    capabilitySql,
+    /runtime_odds_publication_authority'[\s\S]*?'GOOGLE'/,
+  );
+  assert.match(
+    capabilitySql,
+    /PRODUCTION_CUTOVER_WORKERS_PHASE_REQUIRED/,
+  );
+  assert.match(
+    capabilitySql,
+    /assert_production_odds_calculation_scope_pre_capability/,
+  );
+  assert.match(
+    capabilitySql,
+    /target_rank|set_production_cutover_read_state_pre_capability|cutover_phase_rank/,
+  );
+  assert.doesNotMatch(
+    capabilitySql,
+    /create or replace function\s+public\.prepare_production_authority_epoch_provider_fence_v2/i,
+  );
+  assert.doesNotMatch(
+    capabilitySql,
+    /create or replace function\s+public\.commit_production_authority_epoch_provider_fence_v2/i,
+  );
+});
+
 test("release provenance is rebound to a database-computed exact release", () => {
   assert.match(sql, /maintenance_release_candidates/);
   assert.match(sql, /candidate_deployment_status' is distinct from 'READY'/);
@@ -120,6 +175,9 @@ async function importLibrary() {
   const activationStub = `
 const PRODUCTION_VERCEL_PROJECT_ID = "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU";
 const PRODUCTION_VERCEL_PROJECT_NAME = "bagger-inv";
+const PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT =
+  "production-maintenance-single-deployment-capability-v1";
+const PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING = "OBSERVATION";
 function assertProductionCutoverActivation({ env, requiredPhase }) {
   if (String(env.PRODUCTION_CUTOVER_ACTIVATION_ENABLED).toLowerCase() !== "true") {
     const error = new Error("disabled");
@@ -127,7 +185,16 @@ function assertProductionCutoverActivation({ env, requiredPhase }) {
     throw error;
   }
   const phase = String(env.PRODUCTION_CUTOVER_PHASE || "").toUpperCase();
-  if (phase !== requiredPhase) {
+  const capabilityContract = String(
+    env.PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT || "",
+  );
+  const capabilityCeiling = String(
+    env.PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING || "",
+  ).toUpperCase();
+  const capabilityAllowed = phase === "SCORING_COMMIT" &&
+    capabilityContract === PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT &&
+    capabilityCeiling === PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING;
+  if (phase !== requiredPhase && !capabilityAllowed) {
     const error = new Error("phase");
     error.diagnostics = { reason: "cutover-phase-not-reached" };
     throw error;
@@ -136,6 +203,11 @@ function assertProductionCutoverActivation({ env, requiredPhase }) {
     allowed: true,
     phase,
     resources: { commitSha: String(env.PRODUCTION_CUTOVER_EXPECTED_COMMIT_SHA) },
+    maintenanceDeploymentCapability: {
+      allowed: capabilityAllowed,
+      contract: capabilityAllowed ? capabilityContract : "",
+      ceiling: capabilityAllowed ? capabilityCeiling : "",
+    },
   };
 }`;
   const resourceStub = `
@@ -168,6 +240,9 @@ function validEnvironment() {
     PRODUCTION_CUTOVER_ACTIVATION_ENABLED: "true",
     PRODUCTION_FOUNDATION_ENABLED: "true",
     PRODUCTION_CUTOVER_PHASE: "SCORING_COMMIT",
+    PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CONTRACT:
+      "production-maintenance-single-deployment-capability-v1",
+    PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING: "OBSERVATION",
     PRODUCTION_CUTOVER_EXPECTED_COMMIT_SHA: release,
     PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
     PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH:
@@ -175,16 +250,28 @@ function validEnvironment() {
     PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION:
       "22222222-2222-4222-8222-222222222222",
     PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED: "true",
-    PRODUCTION_SUPABASE_WORKERS_ENABLED: "false",
-    PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED: "false",
-    ROUND_SCORECARDS_ARCHIVE_ENABLED: "false",
+    PRODUCTION_SUPABASE_PUBLIC_READS_ENABLED: "true",
+    PRODUCTION_SUPABASE_WORKERS_ENABLED: "true",
+    PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED: "true",
+    ROUND_SCORECARDS_ARCHIVE_ENABLED: "true",
+    SCORING_GOOGLE_OUTBOX_WORKER_SECRET: "x".repeat(32),
+    ROUND_SCORECARDS_ARCHIVE_WORKER_SECRET: "y".repeat(32),
+    PRODUCTION_SUPABASE_ODDS_CALCULATION_ENABLED: "true",
+    WAR_ROOM_INPUT_SOURCE: "supabase",
+    PREDICTION_SETTINGS_READ_SOURCE: "supabase",
+    ODDS_CALCULATION_INPUT_SOURCE: "supabase",
+    WAR_ROOM_PREDICTION_SETTINGS_SOURCE_FINGERPRINT: "8".repeat(64),
+    WAR_ROOM_PREDICTION_SETTINGS_EFFECTIVE_FINGERPRINT: "9".repeat(64),
+    ODDS_PUBLICATION_AUTHORITY: "google",
+    PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "false",
+    PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "false",
     SCORING_AUTHORITY: "supabase",
     PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
     PRODUCTION_SUPABASE_SECRET_KEY: "sb_secret_test_only_not_a_real_key_050",
   };
 }
 
-test("runtime eligibility is exact Production, SHA, phase, epoch, and future-bound paused config", async () => {
+test("runtime eligibility attests the exact dormant single-deployment capability", async () => {
   const module = await importLibrary();
   const env = validEnvironment();
   assert.equal(
@@ -198,7 +285,13 @@ test("runtime eligibility is exact Production, SHA, phase, epoch, and future-bou
     ["PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH", "", "prepared-authority-epoch-required"],
     ["SCORING_AUTHORITY", "google", "exact-paused-runtime-configuration-required"],
     ["PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED", "false", "exact-paused-runtime-configuration-required"],
-    ["PRODUCTION_SUPABASE_WORKERS_ENABLED", "true", "exact-paused-runtime-configuration-required"],
+    ["PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING", "ODDS_WAR_ROOM", "exact-paused-runtime-configuration-required"],
+    ["PRODUCTION_SUPABASE_WORKERS_ENABLED", "false", "exact-paused-runtime-configuration-required"],
+    ["SCORING_GOOGLE_OUTBOX_WORKER_SECRET", "short", "exact-paused-runtime-configuration-required"],
+    ["ROUND_SCORECARDS_ARCHIVE_WORKER_SECRET", "short", "exact-paused-runtime-configuration-required"],
+    ["WAR_ROOM_INPUT_SOURCE", "google", "exact-paused-runtime-configuration-required"],
+    ["WAR_ROOM_PREDICTION_SETTINGS_SOURCE_FINGERPRINT", "bad", "exact-paused-runtime-configuration-required"],
+    ["ODDS_PUBLICATION_AUTHORITY", "supabase", "exact-paused-runtime-configuration-required"],
   ]) {
     const result = module.productionMaintenancePrecommitDeploymentEnvironment({
       ...env,
@@ -255,8 +348,33 @@ test("the live route derives replacement deployment and epoch claims from server
   );
   assert.equal(observedRequest.runtime_deployment_status, "READY");
   assert.equal(observedRequest.runtime_cutover_phase, "SCORING_COMMIT");
+  assert.equal(
+    observedRequest.runtime_deployment_capability_contract,
+    "production-maintenance-single-deployment-capability-v1",
+  );
+  assert.equal(observedRequest.runtime_deployment_capability_ceiling, "OBSERVATION");
   assert.equal(observedRequest.runtime_scoring_authority, "SUPABASE");
   assert.equal(observedRequest.runtime_supabase_scoring_ingress_enabled, true);
+  assert.equal(observedRequest.runtime_workers_enabled, true);
+  assert.equal(observedRequest.runtime_google_mirror_enabled, true);
+  assert.equal(observedRequest.runtime_scorecard_archive_enabled, true);
+  assert.equal(observedRequest.runtime_outbox_worker_secret_configured, true);
+  assert.equal(observedRequest.runtime_archive_worker_secret_configured, true);
+  assert.equal(observedRequest.runtime_odds_calculation_enabled, true);
+  assert.equal(observedRequest.runtime_war_room_input_source, "SUPABASE");
+  assert.equal(observedRequest.runtime_odds_publication_authority, "GOOGLE");
+  assert.equal(
+    JSON.stringify(observedRequest).includes(
+      env.SCORING_GOOGLE_OUTBOX_WORKER_SECRET,
+    ),
+    false,
+  );
+  assert.equal(
+    JSON.stringify(observedRequest).includes(
+      env.ROUND_SCORECARDS_ARCHIVE_WORKER_SECRET,
+    ),
+    false,
+  );
 });
 
 test("canonical route requires exact Production activation and active Director", () => {
