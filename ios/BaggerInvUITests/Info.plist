@@ -12,6 +12,8 @@
 	<string>$(BAGGER_STEP2C_RESTORED_TODAY_QA)</string>
 	<key>BAGGER_STEP2C_PHYSICAL_TODAY_QA</key>
 	<string>$(BAGGER_STEP2C_PHYSICAL_TODAY_QA)</string>
+	<key>BAGGER_STEP2D_PHYSICAL_MATCHES_QA</key>
+	<string>$(BAGGER_STEP2D_PHYSICAL_MATCHES_QA)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

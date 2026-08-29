@@ -40,6 +40,20 @@ final class TodayUITestLaunchTests: XCTestCase {
         XCTAssertEqual(scenario, .signedOut)
     }
 
+    func testExplicitMatchesFixtureIsAccepted() {
+        let launch = TodayUITestLaunch.resolve(arguments: [
+            "BaggerInv",
+            "--bagger-ui-testing",
+            "--bagger-ui-test-scenario",
+            "matches.cached-offline",
+        ])
+
+        guard case .scenario(let scenario) = launch else {
+            return XCTFail("Expected the explicit Matches fixture scenario.")
+        }
+        XCTAssertEqual(scenario, .matchesCachedOffline)
+    }
+
     func testMissingOrUnknownScenarioFailsClosedInsteadOfLaunchingLive() {
         XCTAssertInvalid(TodayUITestLaunch.resolve(arguments: [
             "BaggerInv",

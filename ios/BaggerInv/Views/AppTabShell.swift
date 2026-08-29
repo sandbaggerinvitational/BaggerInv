@@ -12,6 +12,7 @@ struct BaggerAppShell: View {
     let participant: ParticipantSession
     let tournamentData: TournamentDataCoordinator?
     let fixturePresentation: TodayPresentation?
+    let fixtureMatchesState: MobileReadState<MobileMatchesData>?
     let onSignOut: () -> Void
 
     @State private var selection: BaggerAppTab = .today
@@ -24,17 +25,20 @@ struct BaggerAppShell: View {
         self.participant = participant
         self.tournamentData = tournamentData
         fixturePresentation = nil
+        fixtureMatchesState = nil
         self.onSignOut = onSignOut
     }
 
     init(
         participant: ParticipantSession,
         fixturePresentation: TodayPresentation,
+        fixtureMatchesState: MobileReadState<MobileMatchesData>,
         onSignOut: @escaping () -> Void = {}
     ) {
         self.participant = participant
         tournamentData = nil
         self.fixturePresentation = fixturePresentation
+        self.fixtureMatchesState = fixtureMatchesState
         self.onSignOut = onSignOut
     }
 
@@ -52,11 +56,14 @@ struct BaggerAppShell: View {
             .tag(BaggerAppTab.today)
             .accessibilityIdentifier("tab.today")
 
-            placeholderTab(
-                title: "Matches",
-                message: "Your round-by-round match experience arrives next.",
-                symbol: "person.2.fill"
-            )
+            NavigationStack {
+                matchesContent
+                    .baggerNavigationChrome(
+                        title: "Matches",
+                        participant: participant,
+                        onSignOut: onSignOut
+                    )
+            }
             .tabItem { Label("Matches", systemImage: "person.2.fill") }
             .tag(BaggerAppTab.matches)
             .accessibilityIdentifier("tab.matches")
@@ -92,6 +99,28 @@ struct BaggerAppShell: View {
         .toolbarBackground(BaggerPalette.cream, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .accessibilityIdentifier("app.shell")
+    }
+
+    @ViewBuilder
+    private var matchesContent: some View {
+        if let fixtureMatchesState {
+            MatchesFixtureView(
+                participant: participant,
+                state: fixtureMatchesState
+            )
+        } else if let tournamentData {
+            MatchesRepositoryView(
+                participant: participant,
+                repository: tournamentData.matches
+            )
+        } else {
+            VStack(spacing: 14) {
+                Image(systemName: "exclamationmark.shield")
+                Text("Matches are unavailable in this configuration.")
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(BaggerPalette.canvas.ignoresSafeArea())
+        }
     }
 
     @ViewBuilder

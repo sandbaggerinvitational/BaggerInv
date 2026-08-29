@@ -268,6 +268,46 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         print("STEP2C_PHYSICAL_TODAY_COMPLETE")
     }
 
+    /// Physical-device Step 2D acceptance for the existing certified Preview
+    /// session. This is read-only: it never opens CAPTCHA, requests an OTP,
+    /// signs out, or calls a scoring route.
+    func testPhysicalPreviewMatchesRestorationRefreshAndDetail() throws {
+        let authorization = ProcessInfo.processInfo.environment["BAGGER_STEP2D_PHYSICAL_MATCHES_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2D_PHYSICAL_MATCHES_QA") as? String)
+        guard authorization == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2D_PHYSICAL_MATCHES_QA=1 only for an explicitly authorized physical-device run."
+            )
+        }
+
+        let app = acceptanceApp()
+        app.launch()
+
+        let initialCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        openMatches(in: app)
+        assertMatchesProduct(in: app, timeout: 45)
+        let selectedRoundIdentifier = exerciseRoundSelectionAndMatchDetail(in: app)
+        pullToRefreshMatches(in: app, timeout: 45)
+        XCTAssertTrue(
+            app.descendants(matching: .any)[selectedRoundIdentifier].isSelected,
+            "Pull to refresh did not retain the selected Round."
+        )
+        assertMatchesProduct(in: app, timeout: 45)
+
+        app.terminate()
+        app.launch()
+
+        let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        XCTAssertEqual(
+            restoredCanonicalParticipant,
+            initialCanonicalParticipant,
+            "The physical relaunch did not restore the same canonical participant context."
+        )
+        openMatches(in: app)
+        assertMatchesProduct(in: app, timeout: 45)
+        print("STEP2D_PHYSICAL_MATCHES_COMPLETE")
+    }
+
     private func approvedPreviewEmail() -> String? {
         let suppliedValue = ProcessInfo.processInfo.environment["BAGGER_STEP2A_QA_EMAIL"] ??
             (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2A_QA_EMAIL") as? String)
@@ -427,28 +467,34 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
     }
 
     private func assertFiveTabShell(in app: XCUIApplication) {
-        let tabs = [
-            (name: "Today", placeholder: nil as String?),
-            (name: "Matches", placeholder: "placeholder.matches"),
+        let today = app.tabBars.buttons["Today"]
+        XCTAssertTrue(today.waitForExistence(timeout: 5), "The live Today tab was missing.")
+
+        let matches = app.tabBars.buttons["Matches"]
+        XCTAssertTrue(matches.waitForExistence(timeout: 5), "The live Matches tab was missing.")
+        matches.tap()
+        XCTAssertTrue(matches.isSelected, "The live Matches tab did not become selected.")
+        XCTAssertTrue(
+            app.descendants(matching: .any)["matches.screen"].waitForExistence(timeout: 5),
+            "The real native Matches destination was missing."
+        )
+
+        for tab in [
             (name: "Score", placeholder: "placeholder.score"),
             (name: "Leaders", placeholder: "placeholder.leaders"),
             (name: "More", placeholder: "placeholder.more"),
-        ]
-
-        for tab in tabs {
+        ] {
             let button = app.tabBars.buttons[tab.name]
             XCTAssertTrue(button.waitForExistence(timeout: 5), "The live \(tab.name) tab was missing.")
             button.tap()
             XCTAssertTrue(button.isSelected, "The live \(tab.name) tab did not become selected.")
-            if let placeholder = tab.placeholder {
-                XCTAssertTrue(
-                    app.descendants(matching: .any)[placeholder].waitForExistence(timeout: 5),
-                    "The restrained \(tab.name) placeholder was missing."
-                )
-            }
+            XCTAssertTrue(
+                app.descendants(matching: .any)[tab.placeholder].waitForExistence(timeout: 5),
+                "The restrained \(tab.name) placeholder was missing."
+            )
         }
 
-        app.tabBars.buttons["Today"].tap()
+        today.tap()
         XCTAssertTrue(
             app.descendants(matching: .any)["today.screen"].waitForExistence(timeout: 5),
             "Today did not remain the live shell's real product destination."
@@ -459,6 +505,142 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         let screen = app.descendants(matching: .any)["today.screen"]
         XCTAssertTrue(screen.exists, "The Today screen was unavailable for refresh.")
         screen.swipeDown()
+    }
+
+    private func openMatches(in app: XCUIApplication) {
+        let matches = app.tabBars.buttons["Matches"]
+        XCTAssertTrue(matches.waitForExistence(timeout: 5), "The native Matches tab was unavailable.")
+        matches.tap()
+        XCTAssertTrue(matches.isSelected, "The native Matches tab was not selected.")
+        XCTAssertTrue(
+            app.descendants(matching: .any)["matches.screen"].waitForExistence(timeout: 5),
+            "The native Matches destination did not appear."
+        )
+    }
+
+    private func assertMatchesProduct(in app: XCUIApplication, timeout: TimeInterval) {
+        let screen = app.descendants(matching: .any)["matches.screen"]
+        XCTAssertTrue(screen.waitForExistence(timeout: timeout), "The native Matches screen was missing.")
+
+        let deadline = Date().addingTimeInterval(timeout)
+        var reachedEligibleContent = false
+        while Date() < deadline {
+            let status = screen.value as? String ?? ""
+            if status.localizedCaseInsensitiveContains("content"),
+               status.localizedCaseInsensitiveContains("freshness fresh"),
+               status.localizedCaseInsensitiveContains("revision present")
+            {
+                reachedEligibleContent = true
+                break
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
+        XCTAssertTrue(
+            reachedEligibleContent,
+            "The live Matches product did not reach fresh, revision-backed content."
+        )
+        XCTAssertTrue(
+            app.descendants(matching: .any)["matches.roundSelector"].waitForExistence(timeout: 5),
+            "The live Round selector was missing."
+        )
+        XCTAssertTrue(
+            app.descendants(matching: .any)["matches.hero"].waitForExistence(timeout: 5),
+            "The authenticated golfer's canonical Your Match hero was missing."
+        )
+        _ = reachableMatchesElement("matches.allMatches", in: app)
+    }
+
+    private func exerciseRoundSelectionAndMatchDetail(in app: XCUIApplication) -> String {
+        let screen = app.scrollViews["matches.screen"].exists
+            ? app.scrollViews["matches.screen"]
+            : app.scrollViews.firstMatch
+        for _ in 0..<6 {
+            screen.swipeDown()
+        }
+
+        let roundButtons = app.buttons
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'matches.round.'"))
+            .allElementsBoundByIndex
+        XCTAssertGreaterThan(roundButtons.count, 1, "Live Preview did not expose multiple selectable Rounds.")
+        guard let selectedRound = roundButtons.first(where: { !$0.isSelected }) else {
+            XCTFail("No alternate live Round was available for selection.")
+            return ""
+        }
+        let roundSelector = app.descendants(matching: .any)["matches.roundSelector"]
+        for _ in 0..<4 where !selectedRound.isHittable {
+            roundSelector.swipeLeft()
+        }
+        XCTAssertTrue(selectedRound.isHittable, "The alternate live Round was not tappable.")
+        selectedRound.tap()
+        XCTAssertTrue(selectedRound.isSelected, "The selected live Round did not update.")
+        let selectedRoundIdentifier = selectedRound.identifier
+
+        let card = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'matches.card.'"))
+            .firstMatch
+        for _ in 0..<8 where !card.isHittable {
+            screen.swipeUp()
+        }
+        XCTAssertTrue(card.isHittable, "No live participant-visible Match card was tappable.")
+        card.tap()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["matches.detail"].waitForExistence(timeout: 5),
+            "Native Match Detail did not open."
+        )
+
+        let back = app.navigationBars.buttons.firstMatch
+        XCTAssertTrue(back.waitForExistence(timeout: 5), "Match Detail had no Back control.")
+        back.tap()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["matches.screen"].waitForExistence(timeout: 5),
+            "Back did not return to the Matches screen."
+        )
+        XCTAssertTrue(
+            app.descendants(matching: .any)[selectedRoundIdentifier].isSelected,
+            "Back from Match Detail did not retain the selected Round."
+        )
+        return selectedRoundIdentifier
+    }
+
+    private func pullToRefreshMatches(in app: XCUIApplication, timeout: TimeInterval) {
+        let screen = app.scrollViews["matches.screen"].exists
+            ? app.scrollViews["matches.screen"]
+            : app.scrollViews.firstMatch
+        XCTAssertTrue(screen.exists, "The Matches screen was unavailable for refresh.")
+        for _ in 0..<8 {
+            screen.swipeDown()
+        }
+
+        let priorStatus = screen.value as? String ?? ""
+        let start = screen.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.22))
+        let end = screen.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82))
+        start.press(forDuration: 0.1, thenDragTo: end)
+
+        let deadline = Date().addingTimeInterval(timeout)
+        var observedRefreshTransition = false
+        while Date() < deadline {
+            let status = screen.value as? String ?? ""
+            if status != priorStatus {
+                observedRefreshTransition = true
+                break
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+        }
+        XCTAssertTrue(observedRefreshTransition, "The physical pull gesture did not initiate a Matches refresh.")
+    }
+
+    @discardableResult
+    private func reachableMatchesElement(_ identifier: String, in app: XCUIApplication) -> XCUIElement {
+        let element = app.descendants(matching: .any)[identifier]
+        if element.waitForExistence(timeout: 1) { return element }
+        let screen = app.scrollViews["matches.screen"].exists
+            ? app.scrollViews["matches.screen"]
+            : app.scrollViews.firstMatch
+        for _ in 0..<8 where !element.exists {
+            screen.swipeUp()
+        }
+        XCTAssertTrue(element.exists, "The live Matches element \(identifier) was not reachable.")
+        return element
     }
 
     /// Pastes without passing the sensitive value to an XCTest typing command,

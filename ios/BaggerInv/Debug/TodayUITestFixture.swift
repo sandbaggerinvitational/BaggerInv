@@ -10,6 +10,11 @@ enum TodayUITestScenario: String {
     case cachedOffline = "today.cached-offline"
     case emptyOffline = "today.empty-offline"
     case longContent = "today.long-content"
+    case matchesStandard = "matches.standard"
+    case matchesNoUserMatch = "matches.no-user-match"
+    case matchesCachedOffline = "matches.cached-offline"
+    case matchesEmptyOffline = "matches.empty-offline"
+    case matchesLongContent = "matches.long-content"
 }
 
 enum TodayUITestLaunch {
@@ -52,7 +57,8 @@ struct TodayUITestFixtureRoot: View {
         default:
             BaggerAppShell(
                 participant: TodayUITestFixtures.participant,
-                fixturePresentation: TodayUITestFixtures.presentation(for: scenario)
+                fixturePresentation: TodayUITestFixtures.presentation(for: scenario),
+                fixtureMatchesState: MatchesUITestFixtures.state(for: scenario)
             )
         }
     }
@@ -101,10 +107,15 @@ private enum TodayUITestFixtures {
             current = .init(availability: .content, value: match(status: "Final"), freshness: .current)
         case .noCurrentMatch:
             current = .init(availability: .empty, value: nil, freshness: .current)
-        case .standard, .cachedOffline, .longContent:
+        case .standard, .cachedOffline, .longContent,
+             .matchesStandard, .matchesNoUserMatch, .matchesCachedOffline,
+             .matchesEmptyOffline, .matchesLongContent:
             current = .init(
                 availability: .content,
-                value: match(status: "Upcoming", longContent: scenario == .longContent),
+                value: match(
+                    status: "Upcoming",
+                    longContent: scenario == .longContent || scenario == .matchesLongContent
+                ),
                 freshness: scenario == .cachedOffline ? .offline : .current
             )
         case .emptyOffline:

@@ -1,6 +1,6 @@
 # Bagger Invitational for iOS
 
-This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C adds the first real participant product surface: a native Today experience inside the approved five-tab application shell.
+This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added the first real participant product surface, Today, inside the approved five-tab application shell. Step 2D replaces the Matches placeholder with a cached-first native Match Center and read-only Match Detail.
 
 ## Requirements
 
@@ -108,10 +108,10 @@ A paid Apple Developer Program membership is not required for Simulator use. Do 
 - `Networking/` owns typed async HTTP transport and centralized protected headers.
 - `Security/` stores the Bagger certification and sensitive session state in Keychain-backed storage.
 - `Models/` contains the Step 2A identity contracts and complete Step 2B read DTOs.
-- `Presentation/` maps canonical read DTOs to UI-ready Today values without changing match, identity, schedule, or standings authority.
-- `Design/` contains the small native Bagger palette, spacing, card, and typography treatment used by Today.
-- `Views/` contains the authentication UI, five-tab shell, real Today destination, and restrained placeholders for later products.
-- `Debug/` contains an allowlisted, Debug-only synthetic Today fixture launcher for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
+- `Presentation/` maps canonical read DTOs to UI-ready Today and Matches values without changing match, identity, schedule, or standings authority.
+- `Design/` contains the small native Bagger palette, spacing, card, and typography treatment shared by Today and Matches.
+- `Views/` contains the authentication UI, five-tab shell, real Today and Matches destinations, read-only Match Detail, and restrained placeholders for later products.
+- `Debug/` contains allowlisted, Debug-only synthetic Today and Matches fixture launchers for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
 
 The app does not read canonical Bagger tables through Supabase. Supabase establishes the native Auth session; the mobile v1 API separately certifies that identity and returns the canonical Bagger Player. Protected API calls require both the Supabase Bearer token and the signed Bagger certification.
 
@@ -120,6 +120,7 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 - **Step 2A — COMPLETE:** native Preview authority, authentication, certification, canonical identity, secure restoration, and sign-out foundation.
 - **Step 2B — COMPLETE:** typed mobile read DTOs, authenticated transport, participant-scoped cache, repositories, coordinator, diagnostics, focused tests, and isolated Preview live QA are proven.
 - **Step 2C — COMPLETE:** native five-tab shell, cached-first Today product experience, Simulator validation, and physical-device online/offline validation.
+- **Step 2D — COMPLETE:** cached-first Matches tab, canonical Round selection, authenticated golfer Match hero, participant-visible selected-Round list, and native read-only Match Detail.
 
 ## Step 2B mobile read architecture
 
@@ -146,7 +147,7 @@ The authenticated app uses the fixed native information architecture:
 Today | Matches | Score | Leaders | More
 ```
 
-Today is implemented; the other four destinations are intentionally restrained placeholders. `Score` means future score entry—not Tournament Score—and exposes no scoring action in Step 2C.
+Today and Matches are implemented; Score, Leaders, and More remain intentionally restrained placeholders. `Score` means future score entry—not Tournament Score—and exposes no scoring action in Step 2D.
 
 Today preserves the approved product hierarchy:
 
@@ -191,6 +192,45 @@ xcodebuild \
 ```
 
 The opt-in live Preview tests remain user-mediated and never request an OTP unless the run is separately authorized. Step 2C does not require or authorize Production authentication, participant reads, or scoring.
+
+## Step 2D Matches and Match Detail
+
+The Matches tab follows the approved native hierarchy:
+
+```text
+Round selector
+→ Your Match hero
+→ every participant-visible Match in the selected Round
+→ read-only Match Detail
+```
+
+`MatchesRepositoryView` observes the existing Step 2B Matches repository. SwiftUI does not construct requests, inject credentials, inspect ETags, decode JSON, or access Supabase. The product uses only the existing protected `GET /api/mobile/v1/matches` projection; Round switching and Match Detail operate from that one loaded DTO and never create per-Match requests. Match Detail uses a typed canonical Match-ID destination, which keeps it suitable for future deep-link routing without coupling navigation to a list-cell instance.
+
+`MatchesPresenter` is deterministic presentation logic. It groups Matches by the contract's canonical Round fields while preserving first-seen server ordering inside each Round. The tournament's `currentRound` is the default when that Round is available. A session-local golfer selection remains stable while navigating to Match Detail and back. If refresh removes that Round, resolution fails safely to the canonical current Round, then the nearest available numbered Round, then the first canonical available Round. The selector is generated only from Rounds actually present in the response; it never hardcodes a tournament schedule or derives Round membership from Match IDs or the device clock.
+
+The Your Match hero trusts only `authenticatedPlayer.involved`. It never matches names, guesses from team membership, or recalculates participant relationships. When more than one Match is unexpectedly marked involved in a Round, the first canonical Match is shown and a generic non-PII Debug diagnostic records the contract anomaly. When none is involved, the selected Round's all-Matches section remains usable. The canonical all-Matches collection stays in server order and includes the involved Match with an explicit **Your Match** treatment so the list remains complete.
+
+Scheduled, live, and completed presentation uses the server's `scheduled`, `inProgress`, and `completed` state plus only contract-supported progress and result values. Known format codes use the existing trusted Bagger mapping (`BB` to Best Ball, `SC` to Scramble, and `SI` to Singles); unknown values remain visible rather than being guessed. Course, tee, tee-time label, player/team names, progress, and final result remain nullable exactly as projected by mobile v1. The app does not infer an absolute tee-time date, calculate a Match winner, derive live golf status, or expose score-entry permissions.
+
+The read-only Match Detail is powered by the same cached Match representation and shows the available Round, format, state, sides/players, course, tee, tee time, progress, and final result. It can subtly identify the authenticated participant from the canonical relationship fields, but it exposes no scoring controls, mutation state, hidden score details, or administrative data. Step 2D does not call `/scoring/current`, create a Match-detail endpoint, or access canonical tables directly.
+
+Matches inherits the Step 2B cached-first lifecycle. Eligible cache is displayed only after Preview authority and participant certification are established, and revalidation continues through the shared authenticated repository. A refresh does not blank populated content. Transient/offline failure keeps a valid cached selected Round and permits cached Match Detail while displaying a restrained stale/offline notice; no-cache failure provides a controlled retry state. Pull to refresh and foreground revalidation delegate to the existing coordinator. Global environment or authentication invalidation still cancels reads, hides participant content, and fails closed through the Step 2A/2B coordinator.
+
+### Current Matches contract boundaries
+
+The current mobile projection is sufficient for the Step 2D Match Center and read-only detail, with these bounded presentation gaps:
+
+- participant-visible non-owned Matches may not include richer golf differential language such as `2 UP`, dormie, or holes remaining, so native does not invent it;
+- the projection does not provide a separate participant-facing Match number, Round catalog/status object, or canonical Match-detail image registry;
+- an empty Round absent from the `/matches` collection cannot be manufactured for the selector;
+- tee-time clock/timezone values do not by themselves authorize inferring a calendar timestamp;
+- logos/team colors remain optional design enhancements and are not identity authority.
+
+These are future product/contract enhancements, not reasons to calculate unofficial values in Swift. Owned-Match scoring context remains explicitly deferred to Step 2E.
+
+### Deterministic Matches UI validation
+
+Debug-only Matches fixtures cover canonical-current-Round selection, scheduled/live/completed Match states, Round switching, a Round without an involved Match, long participant/team/course content, and cached-offline presentation. As with Today fixtures, they require the explicit allowlisted UI-test launch path, construct no live credentials or participant cache, and are excluded from Release behavior.
 
 ## Participant-scoped read cache
 
@@ -249,8 +289,8 @@ Step 2A includes:
 - temporary signed-in diagnostic UI
 - secure sign-out
 
-Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Step 2B adds only the shared read/cache foundation and a temporary diagnostic; those exclusions otherwise remain in force.
+Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D add only the shared read/cache foundation and the Today/Matches read surfaces; phone Auth, scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
 
 ## Next step
 
-**Step 2D — Matches + Match Detail** is the next planned implementation. It should reuse the Step 2B repository/cache foundation and Step 2C shell/design language, default to the canonical current round, show the authenticated golfer's Match hero, and then show all matches for that selected round. Scoring remains separate and must continue to honor Step 1C/1D authorization and reliability boundaries.
+**Step 2E — Native scoring read UI + Scorecard** is the next planned implementation. It should consume `GET /api/mobile/v1/scoring/current` to establish the owned-Match scoring context, hole navigation, format-specific player score rows, prior-hole review, and canonical read-only/final scorecard states. It must preserve the Step 2A authority/session boundary and remain separate from Step 2F's durable offline mutation queue and Step 2G's scoring mutation, conflict, correction, and finalization behavior.
