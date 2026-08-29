@@ -13,6 +13,7 @@ struct BaggerAppShell: View {
     let tournamentData: TournamentDataCoordinator?
     let fixturePresentation: TodayPresentation?
     let fixtureMatchesState: MobileReadState<MobileMatchesData>?
+    let fixtureScoringState: ScoringCurrentState?
     let onSignOut: () -> Void
 
     @State private var selection: BaggerAppTab = .today
@@ -26,6 +27,7 @@ struct BaggerAppShell: View {
         self.tournamentData = tournamentData
         fixturePresentation = nil
         fixtureMatchesState = nil
+        fixtureScoringState = nil
         self.onSignOut = onSignOut
     }
 
@@ -33,13 +35,17 @@ struct BaggerAppShell: View {
         participant: ParticipantSession,
         fixturePresentation: TodayPresentation,
         fixtureMatchesState: MobileReadState<MobileMatchesData>,
+        fixtureScoringState: ScoringCurrentState,
+        startsOnScore: Bool = false,
         onSignOut: @escaping () -> Void = {}
     ) {
         self.participant = participant
         tournamentData = nil
         self.fixturePresentation = fixturePresentation
         self.fixtureMatchesState = fixtureMatchesState
+        self.fixtureScoringState = fixtureScoringState
         self.onSignOut = onSignOut
+        _selection = State(initialValue: startsOnScore ? .score : .today)
     }
 
     var body: some View {
@@ -68,11 +74,14 @@ struct BaggerAppShell: View {
             .tag(BaggerAppTab.matches)
             .accessibilityIdentifier("tab.matches")
 
-            placeholderTab(
-                title: "Score",
-                message: "Native score entry is not enabled in this Preview build.",
-                symbol: "list.bullet.clipboard.fill"
-            )
+            NavigationStack {
+                scoreContent
+                    .baggerNavigationChrome(
+                        title: "Score",
+                        participant: participant,
+                        onSignOut: onSignOut
+                    )
+            }
             .tabItem { Label("Score", systemImage: "list.bullet.clipboard.fill") }
             .tag(BaggerAppTab.score)
             .accessibilityIdentifier("tab.score")
@@ -99,6 +108,26 @@ struct BaggerAppShell: View {
         .toolbarBackground(BaggerPalette.cream, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .accessibilityIdentifier("app.shell")
+        .onChange(of: selection) { selectedTab in
+            guard selectedTab == .score, fixtureScoringState == nil else { return }
+            Task { await tournamentData?.scoring.refresh() }
+        }
+    }
+
+    @ViewBuilder
+    private var scoreContent: some View {
+        if let fixtureScoringState {
+            ScoreFixtureView(state: fixtureScoringState)
+        } else if let tournamentData {
+            ScoreRepositoryView(store: tournamentData.scoring)
+        } else {
+            VStack(spacing: 14) {
+                Image(systemName: "exclamationmark.shield")
+                Text("Scoring is unavailable in this configuration.")
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(BaggerPalette.canvas.ignoresSafeArea())
+        }
     }
 
     @ViewBuilder

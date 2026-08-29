@@ -84,7 +84,9 @@ struct MobileTimestamp: Codable, Equatable, Hashable, Sendable, CustomStringConv
     var description: String { rawValue }
 
     private static func parse(_ value: String) -> Date? {
-        guard value.hasSuffix("Z") else { return nil }
+        guard value.hasSuffix("Z") || value.hasSuffix("+00:00") || value.hasSuffix("+0000") else {
+            return nil
+        }
         let fractional = ISO8601DateFormatter()
         fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         if let parsed = fractional.date(from: value) { return parsed }

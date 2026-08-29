@@ -10,6 +10,18 @@ protocol MobileAPIServing {
     func matches(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileMatchesResponse>
     func leaders(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileLeadersResponse>
     func schedule(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileScheduleResponse>
+    func scoringCurrent(accessToken: String, certification: String, matchID: String?) async throws -> MobileScoringCurrentResponse
+}
+
+extension MobileAPIServing {
+    /// Fail-closed default keeps narrowly scoped test doubles source-compatible.
+    func scoringCurrent(
+        accessToken: String,
+        certification: String,
+        matchID: String?
+    ) async throws -> MobileScoringCurrentResponse {
+        throw MobileAPIClientError.server(code: .scoringUnavailable, status: 503)
+    }
 }
 
 enum MobileConditionalRead<Response: Sendable>: Sendable {
@@ -134,15 +146,61 @@ struct MobileAPIClient: MobileAPIServing {
         )
     }
 
+    func scoringCurrent(
+        accessToken: String,
+        certification: String,
+        matchID: String?
+    ) async throws -> MobileScoringCurrentResponse {
+        let queryItems: [URLQueryItem]
+        if let matchID {
+            guard !matchID.isEmpty else { throw MobileAPIClientError.invalidURL }
+            queryItems = [URLQueryItem(name: "matchId", value: matchID)]
+        } else {
+            queryItems = []
+        }
+        let request = try request(
+            path: "/api/mobile/v1/scoring/current",
+            method: "GET",
+            queryItems: queryItems,
+            accessToken: accessToken,
+            certification: certification
+        )
+        let result = try await send(request, expectedStatus: 200)
+        do {
+            let response = try decoder.decode(MobileScoringCurrentResponse.self, from: result.data)
+            guard response.isContractCompatible else {
+                throw MobileContractError.incompatibleResponse
+            }
+            return response
+        } catch let error as MobileContractError {
+            throw error
+        } catch is DecodingError {
+            throw MobileContractError.incompatibleResponse
+        } catch is MobileReadModelError {
+            throw MobileContractError.incompatibleResponse
+        } catch {
+            throw MobileContractError.incompatibleResponse
+        }
+    }
+
     private func request(
         path: String,
         method: String,
         body: Data? = nil,
+        queryItems: [URLQueryItem] = [],
         accessToken: String? = nil,
         certification: String? = nil
     ) throws -> URLRequest {
         guard baseURL.scheme == "https",
-              let url = URL(string: path, relativeTo: baseURL)?.absoluteURL,
+              let relativeURL = URL(string: path, relativeTo: baseURL)?.absoluteURL,
+              var components = URLComponents(url: relativeURL, resolvingAgainstBaseURL: false)
+        else {
+            throw MobileAPIClientError.invalidURL
+        }
+        if !queryItems.isEmpty {
+            components.queryItems = queryItems
+        }
+        guard let url = components.url,
               url.scheme == "https",
               url.host == baseURL.host
         else {

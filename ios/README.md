@@ -1,6 +1,6 @@
 # Bagger Invitational for iOS
 
-This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added the first real participant product surface, Today, inside the approved five-tab application shell. Step 2D replaces the Matches placeholder with a cached-first native Match Center and read-only Match Detail.
+This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E adds the first canonical owned-Match scoring reader and a native, read-only official Scorecard without enabling scoring mutations.
 
 ## Requirements
 
@@ -104,14 +104,14 @@ A paid Apple Developer Program membership is not required for Simulator use. Do 
 - `Configuration/` loads and validates the fixed Preview environment and exact authority attestation.
 - `Auth/` owns official Supabase Swift OTP verification and session lifecycle.
 - `Captcha/` contains the tightly allowlisted WKWebView used only for Turnstile.
-- `Data/` owns participant-scoped read credentials, cache storage, cached-first repositories, and tournament-data lifecycle orchestration.
+- `Data/` owns participant-scoped read credentials, cache storage, cached-first repositories, the memory-only scoring-current store, and tournament-data lifecycle orchestration.
 - `Networking/` owns typed async HTTP transport and centralized protected headers.
 - `Security/` stores the Bagger certification and sensitive session state in Keychain-backed storage.
-- `Models/` contains the Step 2A identity contracts and complete Step 2B read DTOs.
-- `Presentation/` maps canonical read DTOs to UI-ready Today and Matches values without changing match, identity, schedule, or standings authority.
+- `Models/` contains the Step 2A identity contracts, complete Step 2B read DTOs, and the complete scoring-current DTO.
+- `Presentation/` maps canonical read DTOs to UI-ready Today, Matches, and scoring values without changing match, identity, schedule, standings, scoring permission, handicap, net, winner, or result authority.
 - `Design/` contains the small native Bagger palette, spacing, card, and typography treatment shared by Today and Matches.
-- `Views/` contains the authentication UI, five-tab shell, real Today and Matches destinations, read-only Match Detail, and restrained placeholders for later products.
-- `Debug/` contains allowlisted, Debug-only synthetic Today and Matches fixture launchers for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
+- `Views/` contains the authentication UI, five-tab shell, real Today, Matches, and Score destinations, read-only Match Detail and Scorecard, and restrained placeholders for later products.
+- `Debug/` contains allowlisted, Debug-only synthetic Today, Matches, and scoring fixture launchers for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
 
 The app does not read canonical Bagger tables through Supabase. Supabase establishes the native Auth session; the mobile v1 API separately certifies that identity and returns the canonical Bagger Player. Protected API calls require both the Supabase Bearer token and the signed Bagger certification.
 
@@ -121,6 +121,7 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 - **Step 2B — COMPLETE:** typed mobile read DTOs, authenticated transport, participant-scoped cache, repositories, coordinator, diagnostics, focused tests, and isolated Preview live QA are proven.
 - **Step 2C — COMPLETE:** native five-tab shell, cached-first Today product experience, Simulator validation, and physical-device online/offline validation.
 - **Step 2D — COMPLETE:** cached-first Matches tab, canonical Round selection, authenticated golfer Match hero, participant-visible selected-Round list, and native read-only Match Detail.
+- **Step 2E — COMPLETE:** memory-only canonical scoring-current reader, owned-Match scoring orientation, format-specific BB/SC/SI controls with explicitly ephemeral drafts, and an official read-only native Scorecard. No official score submission is enabled.
 
 ## Step 2B mobile read architecture
 
@@ -147,7 +148,7 @@ The authenticated app uses the fixed native information architecture:
 Today | Matches | Score | Leaders | More
 ```
 
-Today and Matches are implemented; Score, Leaders, and More remain intentionally restrained placeholders. `Score` means future score entry—not Tournament Score—and exposes no scoring action in Step 2D.
+Today, Matches, and Score are implemented; Leaders and More remain intentionally restrained placeholders. `Score` means owned-Match score entry and review—not Tournament Score. Step 2E exposes canonical scoring state and ephemeral interaction only; no official submission exists yet.
 
 Today preserves the approved product hierarchy:
 
@@ -226,11 +227,37 @@ The current mobile projection is sufficient for the Step 2D Match Center and rea
 - tee-time clock/timezone values do not by themselves authorize inferring a calendar timestamp;
 - logos/team colors remain optional design enhancements and are not identity authority.
 
-These are future product/contract enhancements, not reasons to calculate unofficial values in Swift. Owned-Match scoring context remains explicitly deferred to Step 2E.
+These are future product/contract enhancements, not reasons to calculate unofficial values in Swift. Owned-Match scoring context is supplied separately by Step 2E's no-store scoring-current service.
 
 ### Deterministic Matches UI validation
 
 Debug-only Matches fixtures cover canonical-current-Round selection, scheduled/live/completed Match states, Round switching, a Round without an involved Match, long participant/team/course content, and cached-offline presentation. As with Today fixtures, they require the explicit allowlisted UI-test launch path, construct no live credentials or participant cache, and are excluded from Release behavior.
+
+## Step 2E scoring reader and Scorecard
+
+The Score tab consumes only:
+
+```text
+GET /api/mobile/v1/scoring/current
+```
+
+It uses the existing protected transport, so every request requires the current Supabase Bearer token and signed `X-Bagger-Certification`. The service supports the contract's optional canonical `matchId` scope, uses `Cache-Control: no-store`, sends no ETag, and adds no scoring POST method. The scoring store is memory-only and activates only after the Step 2A participant session has established the current Auth identity. Sign-out, identity change, or environment re-attestation cancels work and erases its snapshot.
+
+The server remains authoritative for Match selection, participant slots and side order, format, handicap values, strokes, gross and net scores, hole winner, Match progress/result/revisions, and permission. The presentation layer preserves this structure and supports canonical Best Ball (`BB`), Scramble (`SC`), and Singles (`SI`) row shapes. An unknown format remains available for official read-only review but cannot expose editable controls.
+
+Score controls use the contract-compatible gross range `1...20`, 56-point no-keyboard targets, and canonical slot order. Changes are deliberately ephemeral, in-memory UI drafts labeled **Edited · Not saved**. They are neither official nor durable, never change canonical net/winner/result presentation, and are discarded by explicit refresh, structural/snapshot/permission change, sign-out, or app termination. The disabled **Save & Next** control explains that official submission is not available in this build.
+
+The native Scorecard is canonical-only and groups the phone layout into Front 9 and Back 9 vertical sections. It displays only server-returned gross, strokes, net, winner, progress, and final result values. Selecting a Scorecard hole returns to that hole without creating a draft.
+
+Unlike the Step 2B read products, scoring-current is never written under `ReadCache/v1` or any other disk product cache. During a transient network failure, the current in-memory official snapshot may remain visible for orientation with an explicit offline/scoring-unavailable warning, but editing is disabled and no persistence is implied.
+
+This boundary is deliberate:
+
+- **Step 2E:** canonical read UI plus disposable interaction drafts.
+- **Step 2F:** durable SQLite-backed local scoring intent, partitioning, ordered replay, retry, and quarantine semantics from the approved Step 1D reliability specification.
+- **Step 2G:** real `/scoring/hole` and `/scoring/finalize` mutation authority, acknowledgements, revision conflicts, corrections, and finalization.
+
+Debug scoring fixtures cover no Match, upcoming/active BB, active SC, active SI, read-only, completed, unknown format, official/unscored holes, long content, and offline orientation. Fixture mode remains explicit, synthetic, Debug-only, and disconnected from credentials and live transport.
 
 ## Participant-scoped read cache
 
@@ -274,7 +301,7 @@ These mechanisms are intentionally separate:
 - **READ CACHE:** replaceable, server-derived snapshots for Today, Matches, Leaders, and Schedule. It may be discarded and rebuilt from canonical mobile reads.
 - **FUTURE SCORING QUEUE:** durable private mutation intent governed by the scoring reliability specification. It must preserve local-vs-official state, idempotency, retries, conflicts, and acknowledgements.
 
-The read cache is never a score source of truth, mutation journal, outbox, or evidence that a score is official. Step 2B does not implement scoring reads, scoring writes, or the Step 1D durable mutation queue.
+The read cache is never a score source of truth, mutation journal, outbox, or evidence that a score is official. Step 2E's scoring reader deliberately bypasses this cache, and no scoring write or Step 1D durable mutation queue exists yet.
 
 ## Step 2A scope retained
 
@@ -289,8 +316,8 @@ Step 2A includes:
 - temporary signed-in diagnostic UI
 - secure sign-out
 
-Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D add only the shared read/cache foundation and the Today/Matches read surfaces; phone Auth, scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
+Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E adds only the isolated Preview scoring read surface. Phone Auth, scoring mutations, durable scoring intent, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
 
 ## Next step
 
-**Step 2E — Native scoring read UI + Scorecard** is the next planned implementation. It should consume `GET /api/mobile/v1/scoring/current` to establish the owned-Match scoring context, hole navigation, format-specific player score rows, prior-hole review, and canonical read-only/final scorecard states. It must preserve the Step 2A authority/session boundary and remain separate from Step 2F's durable offline mutation queue and Step 2G's scoring mutation, conflict, correction, and finalization behavior.
+**Step 2F — Durable native offline scoring queue** is next. It should implement the approved Step 1D identity/tournament/Match-partitioned durable intent model, stable mutation IDs, ordered replay with one in-flight mutation per Match, revision handoff, backoff, interrupted-sync recovery, and conflict/action-required quarantine. It must reuse—not invent—the existing mobile scoring contracts. Real official mutation and finalization handling remains Step 2G.

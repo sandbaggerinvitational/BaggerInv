@@ -408,6 +408,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 44YX7TT8Q4;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandbaggerinvitational.bagger.preview.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -423,6 +424,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 44YX7TT8Q4;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandbaggerinvitational.bagger.preview.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -437,6 +439,7 @@
 			baseConfigurationReference = A00000000000000000000012 /* Base.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 44YX7TT8Q4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BaggerInvUITests/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandbaggerinvitational.bagger.preview.uitests;
@@ -452,6 +455,7 @@
 			baseConfigurationReference = A00000000000000000000012 /* Base.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 44YX7TT8Q4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BaggerInvUITests/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandbaggerinvitational.bagger.preview.uitests;

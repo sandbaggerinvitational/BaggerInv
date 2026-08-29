@@ -16,10 +16,12 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     let matches: MobileReadRepository<MobileMatchesResponse>
     let leaders: MobileReadRepository<MobileLeadersResponse>
     let schedule: MobileReadRepository<MobileScheduleResponse>
+    let scoring: ScoringCurrentStore
 
     private let cache: any ReadCacheStoring
     private var activeContext: ActiveMobileReadContext?
     private var isSuspended = false
+    private var scoringWasActiveBeforeSuspension = false
     private var lifecycleGeneration: UInt = 0
     private var pendingCleanupPartitions: Set<ReadCachePartition> = []
     private(set) var cacheCleanupIssue = false
@@ -82,6 +84,10 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
                 etag: etag
             )
         }
+        scoring = ScoringCurrentStore(
+            api: api,
+            credentialProvider: credentialProvider
+        )
 
         let invalidation: @MainActor @Sendable () -> Void = { [weak self] in
             self?.deliverAccessInvalidationOnce()
@@ -90,6 +96,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         matches.setAccessInvalidationHandler(invalidation)
         leaders.setAccessInvalidationHandler(invalidation)
         schedule.setAccessInvalidationHandler(invalidation)
+        scoring.setAccessInvalidationHandler(invalidation)
 
         let authorityRevalidation: @MainActor @Sendable () -> Void = { [weak self] in
             self?.authorityRevalidationHandler?()
@@ -98,6 +105,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         matches.setAuthorityRevalidationHandler(authorityRevalidation)
         leaders.setAuthorityRevalidationHandler(authorityRevalidation)
         schedule.setAuthorityRevalidationHandler(authorityRevalidation)
+        scoring.setAuthorityRevalidationHandler(authorityRevalidation)
     }
 
     func setAccessInvalidationHandler(_ handler: @escaping @MainActor @Sendable () -> Void) {
@@ -159,6 +167,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard isCurrent(context, generation: activationGeneration) else { return }
         await schedule.activate(context, beginRefresh: false)
         guard isCurrent(context, generation: activationGeneration) else { return }
+        await scoring.activate(authUserID: authUserID, beginRefresh: false)
+        guard isCurrent(context, generation: activationGeneration) else { return }
         Task { await refreshAll() }
     }
 
@@ -168,6 +178,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         let previous = activeContext
         activeContext = nil
         isSuspended = false
+        scoringWasActiveBeforeSuspension = false
         await today.deactivate(deleteCache: false)
         guard lifecycleGeneration == deactivationGeneration else { return }
         await matches.deactivate(deleteCache: false)
@@ -175,6 +186,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         await leaders.deactivate(deleteCache: false)
         guard lifecycleGeneration == deactivationGeneration else { return }
         await schedule.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
+        await scoring.deactivate()
         guard lifecycleGeneration == deactivationGeneration else { return }
         if deleteCache, let previous {
             await removePartitionWithRetry(previous.cachePartition)
@@ -185,15 +198,18 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard activeContext != nil, !isSuspended else { return }
         lifecycleGeneration &+= 1
         isSuspended = true
+        scoringWasActiveBeforeSuspension = scoring.state.phase != .idle
         async let todaySuspension: Void = today.suspendRefresh()
         async let matchesSuspension: Void = matches.suspendRefresh()
         async let leadersSuspension: Void = leaders.suspendRefresh()
         async let scheduleSuspension: Void = schedule.suspendRefresh()
+        async let scoringSuspension: Void = scoring.suspendForEnvironmentReattestation()
         _ = await (
             todaySuspension,
             matchesSuspension,
             leadersSuspension,
-            scheduleSuspension
+            scheduleSuspension,
+            scoringSuspension
         )
     }
 
@@ -201,6 +217,11 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard activeContext != nil, isSuspended else { return }
         lifecycleGeneration &+= 1
         isSuspended = false
+        let shouldRestoreScoring = scoringWasActiveBeforeSuspension
+        scoringWasActiveBeforeSuspension = false
+        if shouldRestoreScoring {
+            await scoring.refresh()
+        }
     }
 
     func refreshAll() async {
@@ -220,6 +241,9 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let leadersRefresh: Void = leaders.refreshIfStale(olderThan: staleAfter)
         async let scheduleRefresh: Void = schedule.refreshIfStale(olderThan: staleAfter)
         _ = await (todayRefresh, matchesRefresh, leadersRefresh, scheduleRefresh)
+        if scoring.state.phase != .idle {
+            await scoring.refresh()
+        }
     }
 
     func activeCacheByteCount() async -> Int? {

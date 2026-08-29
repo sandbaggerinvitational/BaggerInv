@@ -179,6 +179,14 @@ final class MobileReadModelDecodingTests: XCTestCase {
             try MobileTimestamp("2026-09-25T11:20:00Z").rawValue,
             "2026-09-25T11:20:00Z"
         )
+        XCTAssertEqual(
+            try MobileTimestamp("2026-09-25T11:20:00.123+00:00").rawValue,
+            "2026-09-25T11:20:00.123+00:00"
+        )
+        XCTAssertEqual(
+            try MobileTimestamp("2026-09-25T11:20:00+0000").rawValue,
+            "2026-09-25T11:20:00+0000"
+        )
     }
 
     func testInvalidCalendarDatesFailDecoding() throws {

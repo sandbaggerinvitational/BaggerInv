@@ -111,6 +111,121 @@ enum TestFixtures {
         meta: readMeta
     )
 
+    static let scoringResponse = MobileScoringCurrentResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileScoringCurrentData(
+            scoring: MobileScoringCurrent(
+                match: MobileScoringMatch(
+                    matchId: "match-preview-1",
+                    roundNumber: 2,
+                    format: .bestBall,
+                    status: .inProgress,
+                    matchRevision: 7,
+                    permissionRevision: 3,
+                    result: nil
+                ),
+                player: MobileScoringPlayer(
+                    playerId: participant.player.playerId,
+                    displayName: participant.player.displayName,
+                    teamSide: 1
+                ),
+                sides: [
+                    MobileScoringSide(
+                        side: 1,
+                        teamId: "team-preview-1",
+                        name: "Preview Team",
+                        participants: [
+                            MobileScoringParticipant(
+                                playerId: participant.player.playerId,
+                                displayName: participant.player.displayName,
+                                slot: 1,
+                                isAuthenticatedPlayer: true,
+                                handicapIndex: 8.4,
+                                courseHandicap: 9,
+                                playingHandicap: 8,
+                                strokes: 1
+                            ),
+                            MobileScoringParticipant(
+                                playerId: "player-preview-2",
+                                displayName: "Preview Partner",
+                                slot: 2,
+                                isAuthenticatedPlayer: false,
+                                handicapIndex: 10.1,
+                                courseHandicap: 11,
+                                playingHandicap: 10,
+                                strokes: 1
+                            ),
+                        ]
+                    ),
+                    MobileScoringSide(
+                        side: 2,
+                        teamId: "team-preview-2",
+                        name: "Other Team",
+                        participants: [
+                            MobileScoringParticipant(
+                                playerId: "player-preview-3",
+                                displayName: "Preview Opponent",
+                                slot: 1,
+                                isAuthenticatedPlayer: false,
+                                handicapIndex: 7.2,
+                                courseHandicap: 8,
+                                playingHandicap: 7,
+                                strokes: 0
+                            ),
+                            MobileScoringParticipant(
+                                playerId: "player-preview-4",
+                                displayName: "Preview Opponent Two",
+                                slot: 2,
+                                isAuthenticatedPlayer: false,
+                                handicapIndex: 12.3,
+                                courseHandicap: 13,
+                                playingHandicap: 12,
+                                strokes: 1
+                            ),
+                        ]
+                    ),
+                ],
+                course: MobileScoringCourse(
+                    courseId: "course-preview-1",
+                    name: "Preview Course",
+                    tee: "Blue",
+                    rating: 72.1,
+                    slope: 131,
+                    par: 72,
+                    holes: [
+                        MobileScoringCourseHole(holeNumber: 1, par: 4, strokeIndex: 5, yardage: 411),
+                    ]
+                ),
+                scores: [
+                    MobileScoringHoleScore(
+                        holeNumber: 1,
+                        revision: 2,
+                        gross: MobileScoringGross(teamOne: [4, 5], teamTwo: [5, 6]),
+                        strokes: MobileScoringStrokes(teamOne: [1, 0], teamTwo: [0, 1]),
+                        net: MobileScoringNet(teamOne: 3, teamTwo: 5),
+                        winner: .teamOne,
+                        updatedAt: try! MobileTimestamp("2027-01-15T08:01:00.000Z")
+                    ),
+                ],
+                progress: MobileScoringProgress(
+                    currentHole: 2,
+                    holesRemaining: 17,
+                    scorecardComplete: false,
+                    statusText: "1 UP through 1"
+                ),
+                permission: MobileScoringPermission(
+                    canScore: true,
+                    readOnly: false,
+                    canFinalize: false,
+                    reason: nil
+                ),
+                snapshot: MobileScoringSnapshot(snapshotId: "snapshot-preview-1", revision: 4)
+            )
+        ),
+        meta: MobileScoringMeta(generatedAt: try! MobileTimestamp("2027-01-15T08:02:00.000Z"))
+    )
+
     static func healthObject(
         environment: String = "preview",
         apiVersion: String = "v1",
@@ -264,6 +379,9 @@ final class MockMobileAPI: MobileAPIServing {
     var leadersValue: MobileConditionalRead<MobileLeadersResponse> = .modified(TestFixtures.leadersResponse, etag: "\"fixture-revision-1\"")
     var scheduleValue: MobileConditionalRead<MobileScheduleResponse> = .modified(TestFixtures.scheduleResponse, etag: "\"fixture-revision-1\"")
     var readError: (any Error)?
+    var scoringValue = TestFixtures.scoringResponse
+    var scoringError: (any Error)?
+    var scoringDelayNanoseconds: UInt64?
 
     private(set) var healthCallCount = 0
     private(set) var otpCallCount = 0
@@ -276,6 +394,10 @@ final class MockMobileAPI: MobileAPIServing {
     private(set) var sessionAccessToken: String?
     private(set) var sessionCertification: String?
     private(set) var readCallCount = 0
+    private(set) var scoringCallCount = 0
+    private(set) var scoringMatchID: String?
+    private(set) var scoringAccessToken: String?
+    private(set) var scoringCertification: String?
     private var suspendNextHealthCall = false
     private var healthSuspended = false
     private var healthContinuation: CheckedContinuation<Void, Never>?
@@ -351,6 +473,22 @@ final class MockMobileAPI: MobileAPIServing {
         readCallCount += 1
         if let readError { throw readError }
         return scheduleValue
+    }
+
+    func scoringCurrent(
+        accessToken: String,
+        certification: String,
+        matchID: String?
+    ) async throws -> MobileScoringCurrentResponse {
+        scoringCallCount += 1
+        scoringMatchID = matchID
+        scoringAccessToken = accessToken
+        scoringCertification = certification
+        if let scoringDelayNanoseconds {
+            try await Task.sleep(nanoseconds: scoringDelayNanoseconds)
+        }
+        if let scoringError { throw scoringError }
+        return scoringValue
     }
 }
 

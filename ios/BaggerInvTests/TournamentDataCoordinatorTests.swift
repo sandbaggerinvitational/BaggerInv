@@ -40,6 +40,7 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.matches.state, .empty)
         XCTAssertEqual(coordinator.leaders.state, .empty)
         XCTAssertEqual(coordinator.schedule.state, .empty)
+        XCTAssertEqual(coordinator.scoring.state, .idle)
         let removalCount = await cache.partitionRemovalCount()
         let byteCount = await cache.totalStoredByteCount()
         XCTAssertEqual(removalCount, 1)
@@ -99,6 +100,35 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         await coordinator.deactivate(deleteCache: true)
         let deletedBytes = await cache.totalStoredByteCount()
         XCTAssertEqual(deletedBytes, 0)
+    }
+
+    func testEnvironmentReattestationHidesAndRestoresPreviouslyActiveScoringReader() async throws {
+        let cache = CoordinatorMemoryCache()
+        let api = MockMobileAPI()
+        let coordinator = makeCoordinator(api: api, cache: cache)
+        await coordinator.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+        await coordinator.refreshAll()
+        let cacheWritesBeforeScoring = await cache.totalWriteCount()
+
+        await coordinator.scoring.refresh()
+        XCTAssertEqual(coordinator.scoring.state.phase, .ready)
+        XCTAssertEqual(api.scoringCallCount, 1)
+        let cacheWritesAfterScoring = await cache.totalWriteCount()
+        XCTAssertEqual(
+            cacheWritesAfterScoring,
+            cacheWritesBeforeScoring,
+            "The no-store scoring reader must never persist into the Step 2B read cache."
+        )
+
+        await coordinator.suspendForEnvironmentReattestation()
+        XCTAssertEqual(coordinator.scoring.state, .idle)
+
+        await coordinator.resumeAfterEnvironmentReattestation()
+        XCTAssertEqual(coordinator.scoring.state.phase, .ready)
+        XCTAssertEqual(api.scoringCallCount, 2)
     }
 
     func testEnvironmentSuspensionCancelsEveryInFlightReadAndPreventsLateCachePublication() async throws {

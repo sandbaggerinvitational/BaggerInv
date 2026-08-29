@@ -15,6 +15,17 @@ enum TodayUITestScenario: String {
     case matchesCachedOffline = "matches.cached-offline"
     case matchesEmptyOffline = "matches.empty-offline"
     case matchesLongContent = "matches.long-content"
+    case scoreNoMatch = "score.no-match"
+    case scoreUpcomingBestBall = "score.upcoming-bb"
+    case scoreActiveBestBall = "score.active-bb"
+    case scoreActiveScramble = "score.active-sc"
+    case scoreActiveSingles = "score.active-si"
+    case scoreReadOnly = "score.read-only"
+    case scoreCompleted = "score.completed"
+    case scoreUnknownFormat = "score.unknown-format"
+    case scoreMixedHoles = "score.mixed-holes"
+    case scoreLongContent = "score.long-content"
+    case scoreOffline = "score.offline"
 }
 
 enum TodayUITestLaunch {
@@ -58,7 +69,9 @@ struct TodayUITestFixtureRoot: View {
             BaggerAppShell(
                 participant: TodayUITestFixtures.participant,
                 fixturePresentation: TodayUITestFixtures.presentation(for: scenario),
-                fixtureMatchesState: MatchesUITestFixtures.state(for: scenario)
+                fixtureMatchesState: MatchesUITestFixtures.state(for: scenario),
+                fixtureScoringState: ScoringUITestFixtures.state(for: scenario),
+                startsOnScore: scenario.rawValue.hasPrefix("score.")
             )
         }
     }
@@ -109,7 +122,11 @@ private enum TodayUITestFixtures {
             current = .init(availability: .empty, value: nil, freshness: .current)
         case .standard, .cachedOffline, .longContent,
              .matchesStandard, .matchesNoUserMatch, .matchesCachedOffline,
-             .matchesEmptyOffline, .matchesLongContent:
+             .matchesEmptyOffline, .matchesLongContent,
+             .scoreNoMatch, .scoreUpcomingBestBall, .scoreActiveBestBall,
+             .scoreActiveScramble, .scoreActiveSingles, .scoreReadOnly,
+             .scoreCompleted, .scoreUnknownFormat, .scoreMixedHoles,
+             .scoreLongContent, .scoreOffline:
             current = .init(
                 availability: .content,
                 value: match(

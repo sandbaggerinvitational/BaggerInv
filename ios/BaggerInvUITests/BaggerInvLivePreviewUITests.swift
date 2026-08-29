@@ -63,9 +63,8 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         app.launch()
 
         let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
-        XCTAssertEqual(
-            restoredCanonicalParticipant,
-            initialCanonicalParticipant,
+        XCTAssertTrue(
+            restoredCanonicalParticipant == initialCanonicalParticipant,
             "Relaunch did not restore the same canonical participant context."
         )
         print("STEP2A_SESSION_RESTORED")
@@ -257,9 +256,8 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         app.launch()
 
         let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
-        XCTAssertEqual(
-            restoredCanonicalParticipant,
-            initialCanonicalParticipant,
+        XCTAssertTrue(
+            restoredCanonicalParticipant == initialCanonicalParticipant,
             "The physical relaunch did not restore the same canonical participant context."
         )
         assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
@@ -308,6 +306,94 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         print("STEP2D_PHYSICAL_MATCHES_COMPLETE")
     }
 
+    /// One explicitly authorized Step 2E Preview acceptance. It reuses a
+    /// restored certified session when available; otherwise it performs the
+    /// same user-mediated one-OTP boundary as the earlier native milestones.
+    /// It reads scoring-current, exercises only ephemeral UI drafts, and never
+    /// invokes a scoring mutation.
+    func testLivePreviewScoringReadAndEphemeralDraft() throws {
+        let authorization = ProcessInfo.processInfo.environment["BAGGER_STEP2E_LIVE_SCORING_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2E_LIVE_SCORING_QA") as? String)
+        guard authorization == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2E_LIVE_SCORING_QA=1 only for an explicitly authorized live scoring-read run."
+            )
+        }
+
+        UIPasteboard.general.string = otpPasteboardSentinel
+        let app = acceptanceApp()
+        app.launch()
+
+        if app.textFields["Approved participant email"].waitForExistence(timeout: 12) {
+            guard let email = approvedPreviewEmail() else {
+                throw XCTSkip("Set BAGGER_STEP2A_QA_EMAIL for the authorized Preview participant.")
+            }
+            let emailField = app.textFields["Approved participant email"]
+            UIPasteboard.general.string = email
+            try pasteCurrentPasteboard(into: emailField, in: app)
+            UIPasteboard.general.string = otpPasteboardSentinel
+            app.buttons["Send Code"].tap()
+
+            let otpField = completeTurnstileAndWaitForOTPEntry(in: app)
+            print("STEP2E_OTP_SENT_AND_AWAITING_CODE")
+            try waitForOTPPasteboardValue(timeout: 10 * 60)
+            try pasteCurrentPasteboard(into: otpField, in: app)
+            UIPasteboard.general.string = otpPasteboardSentinel
+            app.buttons["Verify"].tap()
+        }
+
+        let initialCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        let firstReadStart = Date()
+        let didCreateDraft = assertLiveScoringRead(in: app, exerciseEphemeralDraft: true)
+        print(String(format: "STEP2E_SCORING_CURRENT_READY_SECONDS=%.3f", Date().timeIntervalSince(firstReadStart)))
+
+        app.terminate()
+        app.launch()
+
+        let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        XCTAssertTrue(
+            restoredCanonicalParticipant == initialCanonicalParticipant,
+            "Relaunch did not restore the same canonical participant context."
+        )
+        _ = assertLiveScoringRead(in: app, exerciseEphemeralDraft: false)
+        if didCreateDraft {
+            XCTAssertFalse(
+                app.descendants(matching: .any)["score.draftNotice"].exists,
+                "An ephemeral Step 2E draft falsely survived app termination."
+            )
+        }
+        print("STEP2E_SCORING_READ_RESTORED_NO_MUTATION")
+    }
+
+    /// Physical-device Step 2E acceptance for an existing certified Preview
+    /// session. This remains read-only at the API boundary and leaves the
+    /// session available for user-mediated offline verification.
+    func testPhysicalPreviewScoringReadAndScorecard() throws {
+        let authorization = ProcessInfo.processInfo.environment["BAGGER_STEP2E_PHYSICAL_SCORING_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2E_PHYSICAL_SCORING_QA") as? String)
+        guard authorization == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2E_PHYSICAL_SCORING_QA=1 only for an explicitly authorized physical-device run."
+            )
+        }
+
+        let app = acceptanceApp()
+        app.launch()
+        let initialCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        _ = assertLiveScoringRead(in: app, exerciseEphemeralDraft: true)
+
+        app.terminate()
+        app.launch()
+        let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        XCTAssertTrue(
+            restoredCanonicalParticipant == initialCanonicalParticipant,
+            "The physical relaunch did not restore the same canonical participant context."
+        )
+        _ = assertLiveScoringRead(in: app, exerciseEphemeralDraft: false)
+        XCTAssertFalse(app.descendants(matching: .any)["score.draftNotice"].exists)
+        print("STEP2E_PHYSICAL_SCORING_READ_COMPLETE")
+    }
+
     private func approvedPreviewEmail() -> String? {
         let suppliedValue = ProcessInfo.processInfo.environment["BAGGER_STEP2A_QA_EMAIL"] ??
             (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2A_QA_EMAIL") as? String)
@@ -318,6 +404,79 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             return nil
         }
         return value
+    }
+
+    @discardableResult
+    private func assertLiveScoringRead(
+        in app: XCUIApplication,
+        exerciseEphemeralDraft: Bool
+    ) -> Bool {
+        let scoreTab = app.tabBars.buttons["Score"]
+        XCTAssertTrue(scoreTab.waitForExistence(timeout: 8), "The native Score tab was unavailable.")
+        scoreTab.tap()
+        XCTAssertTrue(scoreTab.isSelected, "The native Score tab was not selected.")
+
+        let screen = app.descendants(matching: .any)["score.screen"]
+        XCTAssertTrue(screen.waitForExistence(timeout: 10), "The native Score screen did not appear.")
+        XCTAssertTrue(
+            app.descendants(matching: .any)["score.matchContext"].waitForExistence(timeout: 45),
+            "The approved Preview participant did not resolve an owned canonical scoring context."
+        )
+        let scrollView = app.scrollViews["score.screen"].exists
+            ? app.scrollViews["score.screen"]
+            : app.scrollViews.firstMatch
+        let holeNavigator = app.descendants(matching: .any)["score.holeNavigator"]
+        for _ in 0..<8 where !holeNavigator.exists {
+            scrollView.swipeUp()
+        }
+        XCTAssertTrue(
+            holeNavigator.waitForExistence(timeout: 8),
+            "The canonical hole navigator was missing."
+        )
+
+        let saveAndNext = app.descendants(matching: .any)["score.saveNext"]
+        for _ in 0..<14 where !saveAndNext.exists {
+            scrollView.swipeUp()
+        }
+        if saveAndNext.exists {
+            XCTAssertFalse(saveAndNext.isEnabled, "Save & Next enabled an official mutation in Step 2E.")
+        }
+
+        var createdDraft = false
+        if exerciseEphemeralDraft {
+            let increment = app.buttons
+                .matching(NSPredicate(format: "label BEGINSWITH[c] 'Increase ' AND label ENDSWITH[c] ' gross score'"))
+                .firstMatch
+            for _ in 0..<14 where !increment.exists || !increment.isHittable {
+                scrollView.swipeDown()
+            }
+            if increment.exists, increment.isEnabled, increment.isHittable {
+                increment.tap()
+                XCTAssertTrue(
+                    app.descendants(matching: .any)["score.draftNotice"].waitForExistence(timeout: 5),
+                    "The local score interaction did not expose its Not saved state."
+                )
+                createdDraft = true
+            }
+        }
+
+        let scorecard = app.descendants(matching: .any)["score.scorecard.quick"]
+        for _ in 0..<16 where !scorecard.exists || !scorecard.isHittable {
+            scrollView.swipeUp()
+        }
+        XCTAssertTrue(scorecard.isHittable, "The official native Scorecard was not reachable.")
+        scorecard.tap()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["scorecard.screen"].waitForExistence(timeout: 8),
+            "The official native Scorecard did not open."
+        )
+        XCTAssertTrue(
+            app.descendants(matching: .any)["scorecard.hole.1"].waitForExistence(timeout: 8),
+            "The official Scorecard did not expose canonical hole rows."
+        )
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(screen.waitForExistence(timeout: 5), "Back did not return to Score.")
+        return createdDraft
     }
 
     private func acceptanceApp() -> XCUIApplication {
@@ -381,13 +540,18 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             ))
             .firstMatch
 
-        if challengeControl.exists && challengeControl.isHittable {
+        let challengeControlLoaded = challengeControl.waitForExistence(timeout: 15)
+        if otpField.exists {
+            return otpField
+        }
+
+        if challengeControlLoaded && challengeControl.isHittable {
             challengeControl.tap()
         } else {
             // The managed Turnstile widget exposes different accessibility trees
-            // across WebKit releases. Its only interactive surface is centered in
-            // this dedicated, non-scrolling challenge view.
-            webView.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            // across WebKit releases. The checkbox sits on the leading side of
+            // the centered widget in this dedicated, non-scrolling challenge view.
+            webView.coordinate(withNormalizedOffset: CGVector(dx: 0.28, dy: 0.5)).tap()
         }
 
         XCTAssertTrue(
@@ -479,8 +643,16 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             "The real native Matches destination was missing."
         )
 
+        let score = app.tabBars.buttons["Score"]
+        XCTAssertTrue(score.waitForExistence(timeout: 5), "The live Score tab was missing.")
+        score.tap()
+        XCTAssertTrue(score.isSelected, "The live Score tab did not become selected.")
+        XCTAssertTrue(
+            app.descendants(matching: .any)["score.screen"].waitForExistence(timeout: 10),
+            "The real native Score destination was missing."
+        )
+
         for tab in [
-            (name: "Score", placeholder: "placeholder.score"),
             (name: "Leaders", placeholder: "placeholder.leaders"),
             (name: "More", placeholder: "placeholder.more"),
         ] {
