@@ -1,0 +1,6 @@
+#include "Base.xcconfig"
+
+// `/$()/` preserves the two URL slashes in xcconfig syntax.
+BAGGER_API_BASE_URL = https:/$()/native-preview.baggerinv.com
+SUPABASE_URL = https:/$()/idgigvjjqkfbqjeredpb.supabase.co
+SUPABASE_PUBLISHABLE_KEY = REPLACE_WITH_PREVIEW_CLIENT_SAFE_PUBLISHABLE_KEY

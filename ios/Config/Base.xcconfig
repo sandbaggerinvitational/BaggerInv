@@ -1,0 +1,5 @@
+// Shared native build settings. Environment endpoints belong in the selected
+// environment xcconfig and are never discovered at runtime.
+IPHONEOS_DEPLOYMENT_TARGET = 16.0
+SWIFT_VERSION = 6.0
+BAGGER_BUNDLE_IDENTIFIER = com.sandbaggerinvitational.bagger.preview
