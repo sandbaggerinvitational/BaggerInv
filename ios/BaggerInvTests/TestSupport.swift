@@ -56,6 +56,61 @@ enum TestFixtures {
         accessTokenExpiresAt: now.addingTimeInterval(3_600)
     )
 
+    static let readTournament = MobileReadTournament(
+        tournamentId: participant.tournament.tournamentId,
+        name: participant.tournament.name,
+        year: participant.tournament.year,
+        status: "Live",
+        currentRound: 2,
+        timeZone: "America/Chicago"
+    )
+
+    static let readMeta = MobileReadMeta(
+        generatedAt: try! MobileTimestamp("2027-01-15T08:00:00.000Z"),
+        revision: "fixture-revision-1"
+    )
+
+    static let todayResponse = MobileTodayResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileTodayData(
+            tournament: readTournament,
+            player: MobileReadPlayer(
+                playerId: participant.player.playerId,
+                displayName: participant.player.displayName,
+                team: MobileReadTeam(teamId: participant.player.team?.teamId, name: participant.player.team?.name ?? "")
+            ),
+            currentMatch: nil,
+            immediateSchedule: []
+        ),
+        meta: readMeta
+    )
+
+    static let matchesResponse = MobileMatchesResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileMatchesData(tournament: readTournament, matches: []),
+        meta: readMeta
+    )
+
+    static let leadersResponse = MobileLeadersResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileLeadersData(tournament: readTournament, teamStandings: [], playerStandings: []),
+        meta: readMeta
+    )
+
+    static let scheduleResponse = MobileScheduleResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileScheduleData(
+            tournamentId: participant.tournament.tournamentId,
+            timeZone: "America/Chicago",
+            events: []
+        ),
+        meta: readMeta
+    )
+
     static func healthObject(
         environment: String = "preview",
         apiVersion: String = "v1",
@@ -204,6 +259,11 @@ final class MockMobileAPI: MobileAPIServing {
     var certificationError: (any Error)?
     var participantValue = TestFixtures.participant
     var participantError: (any Error)?
+    var todayValue: MobileConditionalRead<MobileTodayResponse> = .modified(TestFixtures.todayResponse, etag: "\"fixture-revision-1\"")
+    var matchesValue: MobileConditionalRead<MobileMatchesResponse> = .modified(TestFixtures.matchesResponse, etag: "\"fixture-revision-1\"")
+    var leadersValue: MobileConditionalRead<MobileLeadersResponse> = .modified(TestFixtures.leadersResponse, etag: "\"fixture-revision-1\"")
+    var scheduleValue: MobileConditionalRead<MobileScheduleResponse> = .modified(TestFixtures.scheduleResponse, etag: "\"fixture-revision-1\"")
+    var readError: (any Error)?
 
     private(set) var healthCallCount = 0
     private(set) var otpCallCount = 0
@@ -215,11 +275,34 @@ final class MockMobileAPI: MobileAPIServing {
     private(set) var certifiedAccessToken: String?
     private(set) var sessionAccessToken: String?
     private(set) var sessionCertification: String?
+    private(set) var readCallCount = 0
+    private var suspendNextHealthCall = false
+    private var healthSuspended = false
+    private var healthContinuation: CheckedContinuation<Void, Never>?
 
     func health() async throws -> MobileHealthResponse {
         healthCallCount += 1
+        if suspendNextHealthCall {
+            suspendNextHealthCall = false
+            healthSuspended = true
+            await withCheckedContinuation { continuation in
+                healthContinuation = continuation
+            }
+            healthSuspended = false
+        }
         if let healthError { throw healthError }
         return healthValue
+    }
+
+    func suspendNextHealth() {
+        suspendNextHealthCall = true
+    }
+
+    func hasSuspendedHealth() -> Bool { healthSuspended }
+
+    func resumeSuspendedHealth() {
+        healthContinuation?.resume()
+        healthContinuation = nil
     }
 
     func requestOTP(identifier: String, captchaToken: String) async throws -> OTPRequestAcknowledgement {
@@ -244,6 +327,30 @@ final class MockMobileAPI: MobileAPIServing {
         sessionCertification = certification
         if let participantError { throw participantError }
         return participantValue
+    }
+
+    func today(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileTodayResponse> {
+        readCallCount += 1
+        if let readError { throw readError }
+        return todayValue
+    }
+
+    func matches(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileMatchesResponse> {
+        readCallCount += 1
+        if let readError { throw readError }
+        return matchesValue
+    }
+
+    func leaders(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileLeadersResponse> {
+        readCallCount += 1
+        if let readError { throw readError }
+        return leadersValue
+    }
+
+    func schedule(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileScheduleResponse> {
+        readCallCount += 1
+        if let readError { throw readError }
+        return scheduleValue
     }
 }
 
@@ -340,5 +447,45 @@ final class MockCertificationStore: BaggerCertificationStoring {
     func delete() throws {
         deleteCallCount += 1
         credentialValue = nil
+    }
+}
+
+@MainActor
+final class MockTournamentDataLifecycle: TournamentDataLifecycle {
+    private(set) var activateCallCount = 0
+    private(set) var deactivateCallCount = 0
+    private(set) var refreshAllCallCount = 0
+    private(set) var foregroundRefreshCallCount = 0
+    private(set) var suspendCallCount = 0
+    private(set) var resumeCallCount = 0
+    private(set) var activatedAuthUserID: String?
+    private(set) var activatedParticipant: ParticipantSession?
+    private(set) var deleteCacheValues: [Bool] = []
+
+    func activate(authUserID: String, participant: ParticipantSession) async {
+        activateCallCount += 1
+        activatedAuthUserID = authUserID
+        activatedParticipant = participant
+    }
+
+    func deactivate(deleteCache: Bool) async {
+        deactivateCallCount += 1
+        deleteCacheValues.append(deleteCache)
+    }
+
+    func suspendForEnvironmentReattestation() async {
+        suspendCallCount += 1
+    }
+
+    func resumeAfterEnvironmentReattestation() async {
+        resumeCallCount += 1
+    }
+
+    func refreshAll() async {
+        refreshAllCallCount += 1
+    }
+
+    func refreshForForeground() async {
+        foregroundRefreshCallCount += 1
     }
 }

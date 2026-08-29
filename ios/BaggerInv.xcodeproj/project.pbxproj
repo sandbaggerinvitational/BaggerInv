@@ -62,7 +62,11 @@
 			path = BaggerInv;
 			sourceTree = "<group>";
 		};
-		A00000000000000000000021 /* BaggerInvTests */ = {isa = PBXFileSystemSynchronizedRootGroup; path = BaggerInvTests; sourceTree = "<group>"; };
+		A00000000000000000000021 /* BaggerInvTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BaggerInvTests;
+			sourceTree = "<group>";
+		};
 		A00000000000000000000023 /* BaggerInvUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -346,7 +350,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-		};
+			};
 			name = Release;
 		};
 		A00000000000000000000083 /* Debug */ = {
@@ -355,6 +359,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44YX7TT8Q4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BaggerInv/Info.plist;
@@ -379,6 +384,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44YX7TT8Q4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BaggerInv/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

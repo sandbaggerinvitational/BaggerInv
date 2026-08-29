@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AuthenticatedDiagnosticView: View {
     let participant: ParticipantSession
+    let tournamentData: TournamentDataCoordinator?
     let onSignOut: () -> Void
 
     var body: some View {
@@ -26,6 +27,11 @@ struct AuthenticatedDiagnosticView: View {
 
                 statusRow(label: "API", value: "Connected", symbol: "checkmark.circle.fill")
                 statusRow(label: "Identity", value: "Certified", symbol: "checkmark.shield.fill")
+
+                if let tournamentData {
+                    Divider()
+                    DataFoundationDiagnosticView(coordinator: tournamentData)
+                }
 
                 Button("Sign Out", role: .destructive, action: onSignOut)
                     .buttonStyle(.bordered)

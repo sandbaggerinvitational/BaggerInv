@@ -71,6 +71,27 @@ final class AppCoordinatorTests: XCTestCase {
     }
 
     @MainActor
+    func testRestoredCanonicalSessionActivatesExactReadCachePartitionContext() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+
+        await coordinator.bootstrap()
+
+        XCTAssertEqual(data.activateCallCount, 1)
+        XCTAssertEqual(data.activatedAuthUserID, TestFixtures.authSession.userID)
+        XCTAssertEqual(data.activatedParticipant, TestFixtures.participant)
+    }
+
+    @MainActor
     func testBeginSignInNormalizesEmailAndRequiresCaptcha() {
         let coordinator = makeCoordinator()
 
@@ -117,6 +138,22 @@ final class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(store.savedUserID, TestFixtures.authSession.userID)
         XCTAssertEqual(api.participantCallCount, 1)
         XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+    }
+
+    @MainActor
+    func testFreshAuthenticationActivatesReadsOnlyAfterCanonicalParticipantResolution() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        let store = MockCertificationStore()
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+
+        await coordinator.verifyOTP(code: "123456", context: challengeContext())
+
+        XCTAssertEqual(api.participantCallCount, 1)
+        XCTAssertEqual(data.activateCallCount, 1)
+        XCTAssertEqual(data.activatedAuthUserID, TestFixtures.authSession.userID)
+        XCTAssertEqual(data.activatedParticipant, TestFixtures.participant)
     }
 
     @MainActor
@@ -197,6 +234,191 @@ final class AppCoordinatorTests: XCTestCase {
     }
 
     @MainActor
+    func testSignOutDeactivatesAndDeletesDisposableReadCache() async {
+        let auth = MockAuthService()
+        let store = MockCertificationStore()
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(auth: auth, store: store, data: data)
+
+        await coordinator.signOut()
+
+        XCTAssertEqual(data.deactivateCallCount, 1)
+        XCTAssertEqual(data.deleteCacheValues, [true])
+        XCTAssertEqual(auth.signOutCallCount, 1)
+        XCTAssertEqual(store.deleteCallCount, 1)
+    }
+
+    @MainActor
+    func testEnvironmentFailureHidesAndDeletesEligibleParticipantCache() async {
+        let api = MockMobileAPI()
+        api.healthError = StubError.planned
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, data: data)
+
+        await coordinator.bootstrap()
+
+        XCTAssertEqual(coordinator.state, .environmentUnavailable)
+        XCTAssertEqual(data.deactivateCallCount, 1)
+        XCTAssertEqual(data.deleteCacheValues, [true])
+        XCTAssertEqual(data.activateCallCount, 0)
+    }
+
+    @MainActor
+    func testForegroundRefreshRunsOnlyWhileAuthenticated() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+
+        await coordinator.refreshTournamentDataForForeground()
+        XCTAssertEqual(data.foregroundRefreshCallCount, 0)
+
+        await coordinator.bootstrap()
+        await coordinator.refreshTournamentDataForForeground()
+        XCTAssertEqual(data.foregroundRefreshCallCount, 1)
+    }
+
+    @MainActor
+    func testForegroundAuthorityFailureHidesParticipantReadsAndFailsEnvironmentClosed() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.bootstrap()
+        api.healthError = MobileContractError.incompatibleHealth
+
+        await coordinator.refreshTournamentDataForForeground()
+
+        XCTAssertEqual(coordinator.state, .environmentUnavailable)
+        XCTAssertEqual(data.deactivateCallCount, 1)
+        XCTAssertEqual(data.deleteCacheValues, [true])
+        XCTAssertEqual(auth.signOutCallCount, 0)
+    }
+
+    @MainActor
+    func testForegroundTransportFailureRetainsAuthenticatedStateAndEligibleCache() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.bootstrap()
+        api.healthError = MobileAPIClientError.transportUnavailable
+
+        await coordinator.refreshTournamentDataForForeground()
+
+        XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+        XCTAssertEqual(data.deactivateCallCount, 0)
+        XCTAssertEqual(data.foregroundRefreshCallCount, 0)
+        XCTAssertEqual(auth.signOutCallCount, 0)
+    }
+
+    @MainActor
+    func testReadUnavailableReattestationKeepsAuthenticatedStateWhenAuthorityPasses() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.bootstrap()
+
+        await coordinator.revalidateReadAuthorityAfterUnavailableResponse()
+
+        XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+        XCTAssertEqual(api.healthCallCount, 2)
+        XCTAssertEqual(data.deactivateCallCount, 0)
+        XCTAssertEqual(data.suspendCallCount, 1)
+        XCTAssertEqual(data.resumeCallCount, 1)
+    }
+
+    @MainActor
+    func testReadUnavailableReattestationFailsClosedWhenAuthorityNoLongerPasses() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.bootstrap()
+        api.healthError = StubError.planned
+
+        await coordinator.revalidateReadAuthorityAfterUnavailableResponse()
+
+        XCTAssertEqual(coordinator.state, .environmentUnavailable)
+        XCTAssertEqual(api.healthCallCount, 2)
+        XCTAssertEqual(data.deactivateCallCount, 1)
+        XCTAssertEqual(data.deleteCacheValues, [true])
+        XCTAssertEqual(data.suspendCallCount, 1)
+        XCTAssertEqual(data.resumeCallCount, 0)
+        XCTAssertEqual(auth.signOutCallCount, 0)
+    }
+
+    @MainActor
+    func testSignOutDuringAuthorityReattestationCannotRestoreParticipantOrReadsLate() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.bootstrap()
+        api.suspendNextHealth()
+        let revalidation = Task { @MainActor in
+            await coordinator.revalidateReadAuthorityAfterUnavailableResponse()
+        }
+        for _ in 0..<1_000 where !api.hasSuspendedHealth() {
+            await Task.yield()
+        }
+        XCTAssertTrue(api.hasSuspendedHealth())
+
+        await coordinator.signOut()
+        api.resumeSuspendedHealth()
+        await revalidation.value
+
+        XCTAssertEqual(coordinator.state, .signedOut)
+        XCTAssertEqual(data.suspendCallCount, 1)
+        XCTAssertEqual(data.resumeCallCount, 0)
+        XCTAssertEqual(data.deactivateCallCount, 1)
+        XCTAssertEqual(auth.signOutCallCount, 1)
+    }
+
+    @MainActor
     func testSignOutInvalidatesInFlightVerificationBeforeCertification() async {
         let api = MockMobileAPI()
         let auth = SuspendingAuthService()
@@ -229,13 +451,15 @@ final class AppCoordinatorTests: XCTestCase {
     private func makeCoordinator(
         api: MockMobileAPI = MockMobileAPI(),
         auth: MockAuthService = MockAuthService(),
-        store: MockCertificationStore = MockCertificationStore()
+        store: MockCertificationStore = MockCertificationStore(),
+        data: MockTournamentDataLifecycle? = nil
     ) -> AppCoordinator {
         AppCoordinator(
             environment: TestFixtures.environment,
             api: api,
             auth: auth,
             certificationStore: store,
+            tournamentDataLifecycle: data,
             now: { TestFixtures.now }
         )
     }

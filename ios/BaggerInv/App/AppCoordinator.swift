@@ -9,20 +9,28 @@ final class AppCoordinator: ObservableObject {
     private let api: (any MobileAPIServing)?
     private let auth: (any AuthServicing)?
     private let certificationStore: (any BaggerCertificationStoring)?
+    private let tournamentDataLifecycle: (any TournamentDataLifecycle)?
+    let tournamentData: TournamentDataCoordinator?
     private let now: () -> Date
     private var authenticationEpoch: UInt = 0
+    private var readAuthorityRevalidationTask: Task<Void, Never>?
+    private var readAuthorityRevalidationGeneration: UInt = 0
 
     init(
         environment: NativeEnvironment,
         api: any MobileAPIServing,
         auth: any AuthServicing,
         certificationStore: any BaggerCertificationStoring,
+        tournamentDataLifecycle: (any TournamentDataLifecycle)? = nil,
+        tournamentData: TournamentDataCoordinator? = nil,
         now: @escaping () -> Date = Date.init
     ) {
         self.environment = environment
         self.api = api
         self.auth = auth
         self.certificationStore = certificationStore
+        self.tournamentDataLifecycle = tournamentDataLifecycle
+        self.tournamentData = tournamentData
         self.now = now
     }
 
@@ -31,6 +39,8 @@ final class AppCoordinator: ObservableObject {
         api = nil
         auth = nil
         certificationStore = nil
+        tournamentDataLifecycle = nil
+        tournamentData = nil
         now = Date.init
         state = .environmentUnavailable
     }
@@ -38,12 +48,36 @@ final class AppCoordinator: ObservableObject {
     static func live(bundle: Bundle = .main) -> AppCoordinator {
         do {
             let environment = try NativeEnvironment.load(bundle: bundle)
-            return AppCoordinator(
-                environment: environment,
-                api: MobileAPIClient(baseURL: environment.apiBaseURL),
-                auth: SupabaseAuthService(environment: environment),
-                certificationStore: BaggerCertificationStore()
+            let api = MobileAPIClient(baseURL: environment.apiBaseURL)
+            let auth = SupabaseAuthService(environment: environment)
+            let certificationStore = BaggerCertificationStore()
+            let credentialProvider = NativeMobileReadCredentialProvider(
+                auth: auth,
+                certificationStore: certificationStore
             )
+            let cache = try DiskReadCacheStore()
+            let tournamentData = TournamentDataCoordinator(
+                api: api,
+                credentialProvider: credentialProvider,
+                cache: cache
+            )
+            let coordinator = AppCoordinator(
+                environment: environment,
+                api: api,
+                auth: auth,
+                certificationStore: certificationStore,
+                tournamentDataLifecycle: tournamentData,
+                tournamentData: tournamentData
+            )
+            tournamentData.setAccessInvalidationHandler { [weak coordinator] in
+                Task { @MainActor [weak coordinator] in
+                    await coordinator?.handleReadAccessInvalidation()
+                }
+            }
+            tournamentData.setAuthorityRevalidationHandler { [weak coordinator] in
+                coordinator?.startReadAuthorityRevalidation()
+            }
+            return coordinator
         } catch {
             return AppCoordinator(configurationFailure: ())
         }
@@ -60,6 +94,7 @@ final class AppCoordinator: ObservableObject {
             _ = try await api.health()
         } catch {
             guard epoch == authenticationEpoch else { return }
+            await tournamentDataLifecycle?.deactivate(deleteCache: true)
             state = .environmentUnavailable
             return
         }
@@ -86,6 +121,11 @@ final class AppCoordinator: ObservableObject {
             let participant = try await api.participantSession(
                 accessToken: session.accessToken,
                 certification: certification.token
+            )
+            guard !Task.isCancelled, epoch == authenticationEpoch else { return }
+            await tournamentDataLifecycle?.activate(
+                authUserID: session.userID,
+                participant: participant
             )
             guard !Task.isCancelled, epoch == authenticationEpoch else { return }
             state = .authenticated(participant)
@@ -225,6 +265,11 @@ final class AppCoordinator: ObservableObject {
                 certification: certification.certificationToken
             )
             guard epoch == authenticationEpoch else { return }
+            await tournamentDataLifecycle?.activate(
+                authUserID: supabaseSession.userID,
+                participant: participant
+            )
+            guard epoch == authenticationEpoch else { return }
             state = .authenticated(participant)
         } catch let error as MobileAPIClientError where error.requiresCredentialDiscard {
             await discardAuthentication()
@@ -259,13 +304,111 @@ final class AppCoordinator: ObservableObject {
 
     func signOut() async {
         authenticationEpoch &+= 1
+        readAuthorityRevalidationGeneration &+= 1
+        readAuthorityRevalidationTask?.cancel()
+        readAuthorityRevalidationTask = nil
         await discardAuthentication()
         state = .signedOut
     }
 
+    func refreshTournamentDataForForeground() async {
+        guard case .authenticated = state else { return }
+        let epoch = authenticationEpoch
+        guard let api else { return }
+        do {
+            _ = try await api.health()
+            guard epoch == authenticationEpoch, case .authenticated = state else { return }
+            await tournamentDataLifecycle?.refreshForForeground()
+        } catch is CancellationError {
+            return
+        } catch let error as MobileAPIClientError where error == .transportUnavailable || error == .invalidHTTPResponse {
+            // A transient inability to reach health does not overturn the last
+            // exact authority attestation or erase eligible offline snapshots.
+            return
+        } catch {
+            guard epoch == authenticationEpoch else { return }
+            await failEnvironmentClosed()
+        }
+    }
+
     private func discardAuthentication() async {
+        await tournamentDataLifecycle?.deactivate(deleteCache: true)
         try? certificationStore?.delete()
         await auth?.signOut()
+    }
+
+    private func handleReadAccessInvalidation() async {
+        guard case .authenticated = state else {
+            guard state == .checkingEnvironment else { return }
+            readAuthorityRevalidationGeneration &+= 1
+            readAuthorityRevalidationTask?.cancel()
+            readAuthorityRevalidationTask = nil
+            authenticationEpoch &+= 1
+            await discardAuthentication()
+            state = .signedOut
+            return
+        }
+        readAuthorityRevalidationGeneration &+= 1
+        readAuthorityRevalidationTask?.cancel()
+        readAuthorityRevalidationTask = nil
+        authenticationEpoch &+= 1
+        await discardAuthentication()
+        state = .signedOut
+    }
+
+    func revalidateReadAuthorityAfterUnavailableResponse() async {
+        startReadAuthorityRevalidation()
+        let task = readAuthorityRevalidationTask
+        await task?.value
+    }
+
+    private func startReadAuthorityRevalidation() {
+        guard readAuthorityRevalidationTask == nil,
+              case .authenticated(let participant) = state,
+              api != nil
+        else { return }
+        state = .checkingEnvironment
+        let epoch = authenticationEpoch
+        readAuthorityRevalidationGeneration &+= 1
+        let revalidationGeneration = readAuthorityRevalidationGeneration
+        readAuthorityRevalidationTask = Task { @MainActor [weak self] in
+            await self?.performReadAuthorityRevalidation(participant: participant, epoch: epoch)
+            guard self?.readAuthorityRevalidationGeneration == revalidationGeneration else { return }
+            self?.readAuthorityRevalidationTask = nil
+        }
+    }
+
+    private func performReadAuthorityRevalidation(
+        participant: ParticipantSession,
+        epoch: UInt
+    ) async {
+        guard let api else { return }
+        await tournamentDataLifecycle?.suspendForEnvironmentReattestation()
+        do {
+            _ = try await api.health()
+            guard !Task.isCancelled,
+                  epoch == authenticationEpoch,
+                  state == .checkingEnvironment
+            else { return }
+            await tournamentDataLifecycle?.resumeAfterEnvironmentReattestation()
+            guard !Task.isCancelled,
+                  epoch == authenticationEpoch,
+                  state == .checkingEnvironment
+            else { return }
+            state = .authenticated(participant)
+        } catch {
+            guard !Task.isCancelled,
+                  epoch == authenticationEpoch,
+                  state == .checkingEnvironment
+            else { return }
+            await failEnvironmentClosed()
+        }
+    }
+
+    private func failEnvironmentClosed() async {
+        authenticationEpoch &+= 1
+        await tournamentDataLifecycle?.deactivate(deleteCache: true)
+        state = .environmentUnavailable
     }
 
     private static func isValidEmail(_ email: String) -> Bool {

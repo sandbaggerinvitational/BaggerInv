@@ -6,6 +6,15 @@ protocol MobileAPIServing {
     func requestOTP(identifier: String, captchaToken: String) async throws -> OTPRequestAcknowledgement
     func certify(challengeId: String, accessToken: String) async throws -> OTPCertificationAcknowledgement
     func participantSession(accessToken: String, certification: String) async throws -> ParticipantSession
+    func today(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileTodayResponse>
+    func matches(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileMatchesResponse>
+    func leaders(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileLeadersResponse>
+    func schedule(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileScheduleResponse>
+}
+
+enum MobileConditionalRead<Response: Sendable>: Sendable {
+    case modified(Response, etag: String?)
+    case notModified(etag: String?)
 }
 
 @MainActor
@@ -73,6 +82,58 @@ struct MobileAPIClient: MobileAPIServing {
         return response.data
     }
 
+    func today(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileTodayResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/today",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag
+        )
+    }
+
+    func matches(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileMatchesResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/matches",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag
+        )
+    }
+
+    func leaders(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileLeadersResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/leaders",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag
+        )
+    }
+
+    func schedule(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileScheduleResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/schedule",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag
+        )
+    }
+
     private func request(
         path: String,
         method: String,
@@ -116,10 +177,56 @@ struct MobileAPIClient: MobileAPIServing {
         return request
     }
 
-    private func send(_ request: URLRequest, expectedStatus: Int) async throws -> HTTPTransportResult {
-        let result: HTTPTransportResult
+    private func protectedRead<Response: MobileReadResponseValidating>(
+        path: String,
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<Response> {
+        var request = try request(
+            path: path,
+            method: "GET",
+            accessToken: accessToken,
+            certification: certification
+        )
+        request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        if let etag, !etag.isEmpty {
+            request.setValue(etag, forHTTPHeaderField: "If-None-Match")
+        }
+
+        let result = try await perform(request)
+        let returnedETag = result.response.value(forHTTPHeaderField: "ETag")
+        if result.response.statusCode == 304 {
+            return .notModified(etag: returnedETag)
+        }
+        guard result.response.statusCode == 200 else {
+            throw responseError(for: result)
+        }
         do {
-            result = try await transport.data(for: request)
+            let response = try decoder.decode(Response.self, from: result.data)
+            guard response.isReadContractCompatible else {
+                throw MobileContractError.incompatibleResponse
+            }
+            return .modified(response, etag: returnedETag)
+        } catch let error as MobileContractError {
+            throw error
+        } catch {
+            throw MobileContractError.incompatibleResponse
+        }
+    }
+
+    private func send(_ request: URLRequest, expectedStatus: Int) async throws -> HTTPTransportResult {
+        let result = try await perform(request)
+
+        guard result.response.statusCode == expectedStatus else {
+            throw responseError(for: result)
+        }
+        return result
+    }
+
+    private func perform(_ request: URLRequest) async throws -> HTTPTransportResult {
+        do {
+            return try await transport.data(for: request)
         } catch is CancellationError {
             throw CancellationError()
         } catch let error as MobileAPIClientError {
@@ -127,17 +234,16 @@ struct MobileAPIClient: MobileAPIServing {
         } catch {
             throw MobileAPIClientError.transportUnavailable
         }
+    }
 
-        guard result.response.statusCode == expectedStatus else {
-            if let response = try? decoder.decode(MobileErrorResponse.self, from: result.data),
-               response.ok == false,
-               response.apiVersion == "v1"
-            {
-                throw MobileAPIClientError.server(code: response.error.code, status: result.response.statusCode)
-            }
-            throw MobileAPIClientError.unexpectedStatus(result.response.statusCode)
+    private func responseError(for result: HTTPTransportResult) -> MobileAPIClientError {
+        if let response = try? decoder.decode(MobileErrorResponse.self, from: result.data),
+           response.ok == false,
+           response.apiVersion == "v1"
+        {
+            return .server(code: response.error.code, status: result.response.statusCode)
         }
-        return result
+        return .unexpectedStatus(result.response.statusCode)
     }
 }
 

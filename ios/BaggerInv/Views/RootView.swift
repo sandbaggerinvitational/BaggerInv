@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RootView: View {
     @ObservedObject var coordinator: AppCoordinator
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         VStack(spacing: 0) {
@@ -20,6 +21,10 @@ struct RootView: View {
             if coordinator.state == .launching {
                 await coordinator.bootstrap()
             }
+        }
+        .onChange(of: scenePhase) { newPhase in
+            guard newPhase == .active else { return }
+            Task { await coordinator.refreshTournamentDataForForeground() }
         }
     }
 
@@ -73,7 +78,10 @@ struct RootView: View {
         case .loadingParticipant:
             ProgressStateView(title: "Loading participant", message: "Resolving your canonical Bagger Player…")
         case .authenticated(let participant):
-            AuthenticatedDiagnosticView(participant: participant) {
+            AuthenticatedDiagnosticView(
+                participant: participant,
+                tournamentData: coordinator.tournamentData
+            ) {
                 Task { await coordinator.signOut() }
             }
         case .authenticationError(let presentation):

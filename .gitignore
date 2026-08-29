@@ -9,3 +9,4 @@ xcuserdata/
 DerivedData/
 *.xcuserstate
 ios/Config/Preview.xcconfig
+.DS_Store

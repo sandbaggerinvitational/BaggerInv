@@ -50,7 +50,18 @@ final class SupabaseAuthService: AuthServicing {
     }
 
     func validSession() async throws -> SupabaseAuthSession {
-        map(try await client.auth.session)
+        do {
+            return map(try await client.auth.session)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch let error as AuthError {
+            if error.invalidatesLocalSession {
+                throw SupabaseAuthServiceError.sessionMissing
+            }
+            throw SupabaseAuthServiceError.sessionUnavailable
+        } catch {
+            throw SupabaseAuthServiceError.sessionUnavailable
+        }
     }
 
     func verifyEmailOTP(email: String, code: String) async throws -> SupabaseAuthSession {
@@ -76,4 +87,25 @@ final class SupabaseAuthService: AuthServicing {
 
 enum SupabaseAuthServiceError: Error, Equatable {
     case sessionMissing
+    case sessionUnavailable
+}
+
+private extension AuthError {
+    var invalidatesLocalSession: Bool {
+        switch self {
+        case .sessionMissing:
+            return true
+        case .api(_, let errorCode, _, _):
+            return errorCode == .sessionNotFound ||
+                errorCode == .sessionExpired ||
+                errorCode == .refreshTokenNotFound ||
+                errorCode == .refreshTokenAlreadyUsed ||
+                errorCode == .userNotFound ||
+                errorCode == .userBanned ||
+                errorCode == .badJWT ||
+                errorCode == .noAuthorization
+        default:
+            return false
+        }
+    }
 }

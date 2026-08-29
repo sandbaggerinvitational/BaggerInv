@@ -4,6 +4,7 @@ import XCTest
 @MainActor
 final class BaggerInvLivePreviewUITests: XCTestCase {
     private let otpPasteboardSentinel = "BAGGER_STEP2A_WAITING_FOR_OTP"
+    private let cacheAuditReleaseSentinel = "BAGGER_STEP2B_CACHE_AUDIT_COMPLETE"
 
     override func setUp() {
         super.setUp()
@@ -102,6 +103,89 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         )
     }
 
+    /// Runs the one intentionally live Step 2B Preview read/cache acceptance flow.
+    /// It uses the same user-mediated OTP boundary as Step 2A, then verifies all
+    /// four read products, termination/relaunch cache eligibility, ETag-backed
+    /// revalidation, and sign-out cleanup without printing participant payloads.
+    func testLivePreviewReadCacheFoundation() throws {
+        let liveReadAuthorization = ProcessInfo.processInfo.environment["BAGGER_STEP2B_LIVE_READ_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2B_LIVE_READ_QA") as? String)
+        guard liveReadAuthorization == "1" else {
+            throw XCTSkip("Set BAGGER_STEP2B_LIVE_READ_QA=1 only for an explicitly authorized live read-cache run.")
+        }
+        guard let email = approvedPreviewEmail() else {
+            throw XCTSkip("Set BAGGER_STEP2A_QA_EMAIL to run the authorized live Preview test.")
+        }
+
+        UIPasteboard.general.string = otpPasteboardSentinel
+        let app = XCUIApplication()
+        app.launch()
+        assertSignedOutBootstrap(in: app)
+
+        let emailField = app.textFields["Approved participant email"]
+        UIPasteboard.general.string = email
+        try pasteCurrentPasteboard(into: emailField, in: app)
+        UIPasteboard.general.string = otpPasteboardSentinel
+        app.buttons["Send Code"].tap()
+
+        let otpField = completeTurnstileAndWaitForOTPEntry(in: app)
+        print("STEP2B_OTP_SENT_AND_AWAITING_CODE")
+        try waitForOTPPasteboardValue(timeout: 10 * 60)
+        try pasteCurrentPasteboard(into: otpField, in: app)
+        UIPasteboard.general.string = otpPasteboardSentinel
+
+        let coldStart = Date()
+        app.buttons["Verify"].tap()
+        _ = assertAuthenticated(in: app, timeout: 45)
+        assertDataFoundation(in: app, expectedSource: "network", timeout: 45)
+        print(String(format: "STEP2B_COLD_PRODUCTS_READY_SECONDS=%.3f", Date().timeIntervalSince(coldStart)))
+
+        app.terminate()
+        let warmStart = Date()
+        app.launch()
+        _ = assertAuthenticated(in: app, timeout: 45)
+        assertDataFoundation(in: app, expectedSource: "cache", timeout: 45)
+        print(String(format: "STEP2B_WARM_CACHE_AND_REVALIDATION_SECONDS=%.3f", Date().timeIntervalSince(warmStart)))
+        print("STEP2B_CACHE_READY_FOR_INSPECTION")
+
+        try waitForCacheAuditRelease(timeout: 5 * 60)
+        let refresh = app.buttons["Refresh All"]
+        XCTAssertTrue(refresh.isHittable, "The development refresh control was unavailable.")
+        refresh.tap()
+        assertDataFoundation(in: app, expectedSource: "cache", timeout: 45)
+        print("STEP2B_EXPLICIT_REVALIDATION_COMPLETE")
+
+        let signOut = app.buttons["Sign Out"]
+        XCTAssertTrue(signOut.isHittable, "The native Sign Out button was not available.")
+        signOut.tap()
+        assertSignedOutBootstrap(in: app)
+        app.terminate()
+        app.launch()
+        assertSignedOutBootstrap(in: app)
+        print("STEP2B_SIGN_OUT_CACHE_ISOLATION_COMPLETE")
+    }
+
+    /// Read-only live validation for a securely restored Step 2A session. This
+    /// test never opens CAPTCHA, requests an OTP, signs out, or mutates scoring.
+    func testRestoredPreviewReadProductsWithoutAuthenticationMutation() throws {
+        guard ProcessInfo.processInfo.environment["BAGGER_STEP2B_RESTORED_READ_QA"] == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2B_RESTORED_READ_QA=1 only when a restorable Preview session is known to exist."
+            )
+        }
+        let app = XCUIApplication()
+        app.launch()
+        guard app.staticTexts["Signed In"].waitForExistence(timeout: 30) else {
+            throw XCTSkip("No restorable Preview session is currently available.")
+        }
+        _ = assertAuthenticated(in: app, timeout: 5)
+        let refresh = app.buttons["Refresh All"]
+        XCTAssertTrue(refresh.isHittable, "The development refresh control was unavailable.")
+        refresh.tap()
+        assertDataFoundation(in: app, expectedSource: nil, timeout: 45)
+        print("STEP2B_RESTORED_READ_PRODUCTS_COMPLETE")
+    }
+
     private func approvedPreviewEmail() -> String? {
         let suppliedValue = ProcessInfo.processInfo.environment["BAGGER_STEP2A_QA_EMAIL"] ??
             (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2A_QA_EMAIL") as? String)
@@ -193,6 +277,44 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         throw LivePreviewQAError.otpTimedOut
     }
 
+    private func waitForCacheAuditRelease(timeout: TimeInterval) throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if UIPasteboard.general.string == cacheAuditReleaseSentinel { return }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
+        XCTFail("The cache inspection release signal was not supplied before timeout.")
+        throw LivePreviewQAError.cacheAuditTimedOut
+    }
+
+    private func assertDataFoundation(
+        in app: XCUIApplication,
+        expectedSource: String?,
+        timeout: TimeInterval
+    ) {
+        for product in ["today", "leaders", "schedule", "matches"] {
+            let row = app.descendants(matching: .any)["dataFoundation.\(product)"]
+            XCTAssertTrue(row.waitForExistence(timeout: timeout), "The \(product) repository diagnostic was missing.")
+            let predicate = NSPredicate { evaluated, _ in
+                guard let element = evaluated as? XCUIElement else { return false }
+                let value = (element.value as? String) ?? ""
+                let sourceMatches = expectedSource.map {
+                    value.localizedCaseInsensitiveContains("source \($0)")
+                } ?? true
+                return value.localizedCaseInsensitiveContains("Fresh") && sourceMatches &&
+                    value.localizedCaseInsensitiveContains("revision present")
+            }
+            let expectation = XCTNSPredicateExpectation(predicate: predicate, object: row)
+            let waitResult = XCTWaiter.wait(for: [expectation], timeout: timeout)
+            let finalValue = (row.value as? String) ?? "missing diagnostic value"
+            XCTAssertEqual(
+                waitResult,
+                .completed,
+                "The \(product) product did not become fresh from \(expectedSource ?? "an eligible source"). Final safe status: \(finalValue)"
+            )
+        }
+    }
+
     /// Pastes without passing the sensitive value to an XCTest typing command,
     /// which keeps both the email and OTP out of the XCTest activity transcript.
     private func pasteCurrentPasteboard(into field: XCUIElement, in app: XCUIApplication) throws {
@@ -247,4 +369,5 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
 private enum LivePreviewQAError: Error {
     case otpTimedOut
     case pasteUnavailable
+    case cacheAuditTimedOut
 }
