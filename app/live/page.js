@@ -1,16 +1,12 @@
 export const dynamic = "force-dynamic";
 import { Header, Footer } from "../components";
 import MatchCenter from "./MatchCenter";
-import LeaderboardsSupabaseRead from "./LeaderboardsSupabaseRead";
 import TournamentSupabaseRead from "./TournamentSupabaseRead";
 import { getTournamentData } from "./sheetData";
 import { pageMetadata } from "../../lib/seo";
 import PreviewModeBadge from "../PreviewModeBadge";
-import styles from "./tournament-dashboard.module.css";
 import { workbookInitializationMessage } from "../../lib/tournament-workbook-initialization";
 import { requireTournamentReadSource } from "../../lib/tournament-read-source";
-import { requireLeaderboardsCoreReadSource } from "../../lib/leaderboards-core-read-source";
-import { requireNetSkinsReadSource } from "../../lib/net-skins-read-source";
 import { redirect } from "next/navigation";
 import { isLegacyCalcuttaModule } from "../../lib/leaderboards-navigation";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
@@ -21,27 +17,31 @@ export const metadata = pageMetadata({
   path: "/live",
 });
 
-export default async function LivePage({ searchParams }) {
+export default async function LivePage({ searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const query = await searchParams;
   const view = String(query?.view || "").trim();
   const leaderboardTab = String(query?.tab || "").trim();
   const leaderboardModule = String(query?.module || "").trim();
+  const explicitPwaEntry = String(query?.source || "").trim() === "shortcut";
+  if (explicitPwaEntry) {
+    const params = new URLSearchParams({ source: "shortcut" });
+    const safeOption = (value) => /^[a-z0-9-]{1,40}$/i.test(value);
+    if (leaderboardTab && safeOption(leaderboardTab)) params.set("tab", leaderboardTab);
+    if (leaderboardModule && safeOption(leaderboardModule)) params.set("module", leaderboardModule);
+    if (view === "leaderboards") redirect(`/app/leaderboards?${params}`);
+    if (view === "calcutta") params.set("view", "calcutta");
+    redirect(`/app/tournament?${params}`);
+  }
   if (view === "leaderboards" && (isLegacyCalcuttaModule(leaderboardTab) || isLegacyCalcuttaModule(leaderboardModule))) redirect("/live?view=calcutta");
   const requestedLeaderboardModule = leaderboardTab || leaderboardModule;
   if (view === "leaderboards" && requestedLeaderboardModule === "net-skins") redirect("/live?view=leaderboards&tab=skins");
   const source = requireTournamentReadSource(env);
-  if (source.resolved === "supabase" && ["points", "scores"].includes(view)) redirect("/live?view=leaderboards");
-  if (source.resolved === "supabase" && view && !["leaderboards", "calcutta"].includes(view)) redirect("/live");
-  const leaderboardsSource = requireLeaderboardsCoreReadSource(env);
-  const netSkinsSource = requireNetSkinsReadSource(env);
-  const netSkinsReadSource = netSkinsSource.resolved;
-  const supabaseLeaderboards = leaderboardsSource.resolved === "supabase" && view === "leaderboards";
-  const supabaseTournament = source.resolved === "supabase" && (!view || view === "calcutta");
+  const supabaseTournament = source.resolved === "supabase";
   let data;
   let error = "";
 
-  if (!supabaseTournament && !supabaseLeaderboards) {
+  if (!supabaseTournament) {
     try {
       data = await getTournamentData();
     } catch (caughtError) {
@@ -56,11 +56,11 @@ export default async function LivePage({ searchParams }) {
   return (
     <main>
       <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
-      <Header homeHref="/home" />
-      {supabaseTournament ? <TournamentSupabaseRead initialView={view} /> : supabaseLeaderboards
-        ? <LeaderboardsSupabaseRead previewMode={process.env.VERCEL_ENV === "preview"} netSkinsReadSource={netSkinsReadSource} />
+      {participantPresentation ? null : <Header />}
+      {supabaseTournament
+        ? <TournamentSupabaseRead initialView={view} presentation={participantPresentation ? "participant" : "public"} />
         : <MatchCenter initialData={data} loadError={error} previewMode={process.env.VERCEL_ENV === "preview"} />}
-      <div className={styles.tournamentFooter}><Footer /></div>
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

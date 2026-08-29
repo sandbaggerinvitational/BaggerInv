@@ -24,20 +24,27 @@ const destinations = [
   { icon: "contacts", title: "Important Contacts", detail: "Tournament-week assistance", href: "/tournament-guide/contacts" },
 ];
 
-export default async function TournamentGuidePage({ searchParams }) {
+const guidePresentationHref = (href, participantPresentation) => {
+  if (!participantPresentation) return href;
+  return String(href || "")
+    .replace(/^\/tournament-guide(?=\/|\?|$)/, "/app/guide")
+    .replace(/^\/courses(?=\/|\?|$)/, "/app/courses");
+};
+
+export default async function TournamentGuidePage({ searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const legacySection = String((await searchParams)?.section || "");
   if (legacySection) {
     const destination = legacySection === "match-formats" ? "rules" : legacySection === "travel" ? "getting-around" : legacySection;
-    if (["schedule", "rules", "dining", "getting-around", "contacts"].includes(destination)) redirect(`/tournament-guide/${destination}`);
+    if (["schedule", "rules", "dining", "getting-around", "contacts"].includes(destination)) redirect(`${participantPresentation ? "/app/guide" : "/tournament-guide"}/${destination}`);
   }
 
   const { tournamentIdentity, courses } = await resolveTournamentGuideContent({ env });
 
-  return <main><Header />
+  return <main>{participantPresentation ? null : <Header />}
     <TournamentGuideHero tournament={tournamentIdentity} courses={courses} />
     <div className={styles.shell}>
-      <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{destinations.map((item) => <Link href={item.href} prefetch={false} key={item.href}><i><GuideDirectoryIcon name={item.icon} /></i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section>
-    </div><Footer />
+      <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{destinations.map((item) => <Link href={guidePresentationHref(item.href, participantPresentation)} prefetch={false} key={item.href}><i><GuideDirectoryIcon name={item.icon} /></i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section>
+    </div>{participantPresentation ? null : <Footer />}
   </main>;
 }

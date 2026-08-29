@@ -11,11 +11,11 @@ import Sheet from "./ui/Sheet";
 
 const hubSections = [
   { label: "Tournament", links: [
-    { icon: "guide", label: "Tournament Guide", href: "/tournament-guide" },
-    { icon: "history", label: "Tournament History", href: "/history" },
+    { icon: "guide", label: "Tournament Guide", href: "/app/guide" },
+    { icon: "history", label: "Tournament History", href: "/app/history" },
   ] },
   { label: "Support", links: [
-    { icon: "contacts", label: "Important Contacts", href: "/tournament-guide/contacts" },
+    { icon: "contacts", label: "Important Contacts", href: "/app/guide/contacts" },
   ] },
 ];
 

@@ -341,10 +341,12 @@ export default function GameCenter({ initialData, matchId, backTo }) {
   const displayResult = data.state === "pre" ? "" : clean(data.result).toUpperCase();
   const resultWinner = [teamNames[1], teamNames[2]].find((name) => displayResult.startsWith(clean(name).toUpperCase()));
   const resultText = resultWinner ? displayResult.slice(clean(resultWinner).length).trim() : displayResult;
-  const leaderboardReturn = clean(backTo).startsWith("/live?view=leaderboards");
+  const leaderboardReturn = clean(backTo).startsWith("/live?view=leaderboards") || clean(backTo).startsWith("/app/leaderboards");
   const backHref = backTo === "home"
     ? "/home"
-    : backTo === "tournament" ? "/live" : leaderboardReturn ? backTo : "/my-match";
+    : backTo === "tournament" ? "/app/tournament" : leaderboardReturn
+      ? clean(backTo).replace(/^\/live\?view=leaderboards&?/, "/app/leaderboards?").replace(/\?$/, "")
+      : "/my-match";
   const backLabel = backTo === "home"
     ? "Back to Home"
     : backTo === "tournament" ? "Back to Tournament" : leaderboardReturn ? "Back to Leaderboards" : "Back to My Match";

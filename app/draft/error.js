@@ -9,7 +9,7 @@ export default function DraftError({ reset }) {
         title="Draft information is temporarily unavailable."
         message="The current certified Draft projection could not be loaded. Please try again shortly."
         onRetry={reset}
-        returnHref="/home"
+        returnHref="/draft"
       />
     </main>
   );

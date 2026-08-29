@@ -1,2 +1,2 @@
-import { ScreenSkeleton } from "../ui/StatePrimitives";
-export default function TournamentLoading(){return <ScreenSkeleton label="Opening Tournament" cards={3}/>;}
+import { Header, Footer } from "../components";
+export default function TournamentLoading(){return <main><Header/><div className="appLoading" aria-live="polite" aria-busy="true"><div className="loadingBrand" role="status">Opening Match Center…</div><div className="loadingShell" aria-hidden="true"><div className="skeleton skeletonTitle"/><div className="skeleton skeletonLine"/><div className="loadingGrid"><div className="skeleton loadingCard"/><div className="skeleton loadingCard"/></div></div></div><Footer/></main>;}

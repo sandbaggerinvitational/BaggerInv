@@ -19,10 +19,10 @@ function SupportingDetails({ event }) {
   </>;
 }
 
-function LocationActions({ event }) {
+function LocationActions({ event, participantPresentation = false }) {
   if (!event.courseHref) return null;
   return <div className={styles.locationActions}>
-    <Link href={event.courseHref}>View Course</Link>
+    <Link href={participantPresentation ? event.courseHref.replace(/^\/courses(?=\/|\?|$)/, "/app/courses") : event.courseHref}>View Course</Link>
   </div>;
 }
 
@@ -32,7 +32,7 @@ function EventStatus({ event }) {
   return <StatusBadge status={event.status} />;
 }
 
-function EventCard({ event }) {
+function EventCard({ event, participantPresentation = false }) {
   return <details className={`${styles.itineraryCard} ${event.emphasized ? styles.itineraryCardEmphasized : ""}`} onClick={(interaction) => {
     if (interaction.target.closest("a, button, summary")) return;
     interaction.currentTarget.open = !interaction.currentTarget.open;
@@ -52,12 +52,12 @@ function EventCard({ event }) {
     </summary>
     <div className={event.roundNumber ? styles.eventExpanded : `${styles.eventExpanded} ${styles.eventExpandedNonGolf}`}>
       <SupportingDetails event={event} />
-      <LocationActions event={event} />
+      <LocationActions event={event} participantPresentation={participantPresentation} />
     </div>
   </details>;
 }
 
-export default function ScheduleItinerary({ records, tournament, rounds, courses, tournamentRules, formatRules, initialNow = "" }) {
+export default function ScheduleItinerary({ records, tournament, rounds, courses, tournamentRules, formatRules, initialNow = "", participantPresentation = false }) {
   const [initialTime] = useState(() => initialNow ? new Date(initialNow).getTime() : Date.now());
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function ScheduleItinerary({ records, tournament, rounds, courses
     <div className={styles.itineraryDays}>
       {[...groups.entries()].map(([day, events]) => <section className={styles.itineraryDay} key={day}>
         <header><div><h2>{events[0]?.dayHeading || day}</h2><span>{events[0]?.dateLabel || "Tournament itinerary"}</span></div>{events.some((event) => event.isToday) ? <b>Today</b> : null}</header>
-        <div>{events.map((event) => <EventCard event={event} key={event.id} />)}</div>
+        <div>{events.map((event) => <EventCard event={event} participantPresentation={participantPresentation} key={event.id} />)}</div>
       </section>)}
     </div>
   </>;

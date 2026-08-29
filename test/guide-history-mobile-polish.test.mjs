@@ -24,11 +24,11 @@ test("Guide mobile directory preserves its six canonical destinations without re
   assert.match(css, /min-height:44px/);
 });
 
-test("Guide and nested course references remain inside the participant shell without changing primary navigation ownership", async () => {
+test("Guide and nested course references use the explicit participant namespace", async () => {
   const shell = await source("lib/participant-shell.js");
-  assert.match(shell, /\/courses\\\/\[\^\/\]\+\(\?:\\\/holes/);
+  assert.match(shell, /\/app\/courses/);
   assert.match(shell, /return "Course Hole"/);
-  assert.match(shell, /if \(route === "\/tournament-guide"\) return "Tournament Guide"/);
+  assert.match(shell, /if \(route === "\/app\/guide"\) return "Tournament Guide"/);
   const destination = shell.slice(0, shell.indexOf("export function participantNavigationRoute"));
   assert.doesNotMatch(destination, /Tournament Guide/);
 });

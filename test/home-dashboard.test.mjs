@@ -71,7 +71,7 @@ test("Home keeps compact team score context and delegates rankings to Leaderboar
   const source = await readFile(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8");
   assert.match(source, /formatTeamPoints\(tournament\.teamOne\?\.score\)/);
   assert.match(source, /formatTeamPoints\(tournament\.teamTwo\?\.score\)/);
-  assert.match(source, /href="\/live\?view=leaderboards">View Leaderboards/);
+  assert.match(source, /href="\/app\/leaderboards">View Leaderboards/);
   assert.doesNotMatch(source, /function TournamentLeaders|compactTournamentLeaders|Live Standings/);
   assert.doesNotMatch(source, /StatusBadge/);
   assert.match(source, /\{progress\.liveMatches\} live/);

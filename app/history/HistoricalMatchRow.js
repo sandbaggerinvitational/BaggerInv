@@ -13,14 +13,14 @@ import density from "./history-density.module.css";
 
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
 
-function PlayerName({ player }) {
-  return player?.slug ? <Link href={`/players/${player.slug}`}>{player.name}</Link> : <>{player?.name}</>;
+function PlayerName({ player, participantPresentation = false }) {
+  return player?.slug ? <Link href={`${participantPresentation ? "/app/players" : "/players"}/${player.slug}`}>{player.name}</Link> : <>{player?.name}</>;
 }
 
-function Side({ team, players = [] }) {
+function Side({ team, players = [], participantPresentation = false }) {
   return <div className={styles.side}>
     <span>{team.name}</span>
-    <div>{players.filter(Boolean).map((player) => <strong key={player.id || player.slug || player.name}><PlayerName player={player} /></strong>)}</div>
+    <div>{players.filter(Boolean).map((player) => <strong key={player.id || player.slug || player.name}><PlayerName player={player} participantPresentation={participantPresentation} /></strong>)}</div>
   </div>;
 }
 
@@ -47,7 +47,7 @@ function resultText(match, tournament, state, scorecards, use2026Presentation) {
   return match.teeTime ? `Tee time ${match.teeTime}` : "Scheduled";
 }
 
-export default function HistoricalMatchRow({ match, round, tournament, scorecards = [] }) {
+export default function HistoricalMatchRow({ match, round, tournament, scorecards = [], participantPresentation = false }) {
   const state = matchState(match);
   const use2026Presentation = Number(tournament?.year) === 2026;
   const result = resultText(match, tournament, state, scorecards, use2026Presentation);
@@ -65,9 +65,9 @@ export default function HistoricalMatchRow({ match, round, tournament, scorecard
     </header>
 
     <div className={`${styles.matchup} ${density.matchup}`}>
-      <Side team={tournament.teamOne} players={match.team1Players} />
+      <Side team={tournament.teamOne} players={match.team1Players} participantPresentation={participantPresentation} />
       <b aria-label="versus">VS</b>
-      <Side team={tournament.teamTwo} players={match.team2Players} />
+      <Side team={tournament.teamTwo} players={match.team2Players} participantPresentation={participantPresentation} />
     </div>
 
     <div
@@ -80,7 +80,7 @@ export default function HistoricalMatchRow({ match, round, tournament, scorecard
 
     {ghost ? <p className={styles.notice}><strong>Ghost match.</strong> Selected player results are excluded from official records.</p> : null}
 
-    {state === "final" ? <ScorecardTable scorecards={scorecardTableData} compact deferClosedContent historyDensity showSummary stackPairingIdentities={use2026Presentation} /> : null}
+    {state === "final" ? <ScorecardTable scorecards={scorecardTableData} compact deferClosedContent historyDensity showSummary stackPairingIdentities={use2026Presentation} participantPresentation={participantPresentation} /> : null}
 
     {state === "final" && segments.length ? <details className={styles.story}>
       <summary className={density.storySummary}>Match story <span aria-hidden="true">⌄</span></summary>

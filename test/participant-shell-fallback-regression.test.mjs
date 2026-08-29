@@ -21,10 +21,13 @@ test("stale Preview impersonation failures are narrowly recoverable", () => {
 
 test("shared participant navigation is route-owned during loading and errors", () => {
   for (const route of [
-    "/home", "/my-match", "/score", "/game-center/2026-R3-4", "/live", "/live?view=leaderboards",
-    "/odds-center", "/me", "/players/holman-moores", "/tournament-guide/rules", "/courses/CPGC01", "/history/2026",
+    "/home", "/my-match", "/score", "/game-center/2026-R3-4", "/app/tournament", "/app/leaderboards",
+    "/app/odds", "/me", "/app/players/holman-moores", "/app/guide/rules", "/app/courses/CPGC01", "/app/history/2026",
   ]) assert.equal(participantNavigationRoute(route.split("?")[0]), true, route);
-  for (const route of ["/", "/admin/director", "/participant-auth", "/activate", "/score/access/legacy"])
+  for (const route of [
+    "/", "/live", "/players/holman-moores", "/history/2026", "/courses/CPGC01", "/tournament-guide/rules",
+    "/odds-center", "/admin/director", "/participant-auth", "/activate", "/score/access/legacy",
+  ])
     assert.equal(participantNavigationRoute(route), false, route);
 });
 

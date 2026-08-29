@@ -75,7 +75,7 @@ test("2017–2025 year pages share one top rail and never render bottom duplicat
   assert.ok(hero >= 0 && hero < rail && rail < content);
   assert.equal((yearPage.match(/surface="year"/g) || []).length, 1);
   assert.match(yearPage, /left=\{previousYear \? \{/);
-  assert.match(yearPage, /center=\{\{[\s\S]*href: "\/history"[\s\S]*label: "All Tournament Years"/);
+  assert.match(yearPage, /center=\{\{[\s\S]*href: historyPresentationHref\("\/history", participantPresentation\)[\s\S]*label: "All Tournament Years"/);
   assert.match(yearPage, /right=\{nextYear \? \{/);
   assert.doesNotMatch(yearPage, /tournamentYearNavigationBottom/);
   assert.doesNotMatch(yearPage, /disabled|aria-disabled/);
@@ -116,7 +116,7 @@ test("completed Round History distributes first, middle, and final destinations 
 
 test("completed Team History uses one shared parent destination without sibling controls", () => {
   assert.match(teamPage, /<HistoryNavigation/);
-  assert.match(teamPage, /href: `\/history\/\$\{team\.year\}`/);
+  assert.match(teamPage, /href: historyPresentationHref\(`\/history\/\$\{team\.year\}`, participantPresentation\)/);
   assert.match(teamPage, /label: "Tournament"/);
   assert.match(teamPage, /detail: String\(team\.year\)/);
   assert.match(teamPage, /ariaLabel: `\$\{team\.year\} Tournament`/);
@@ -153,14 +153,14 @@ test("History-context Course navigation orders Tournament left and source Round 
   const hero = coursePage.indexOf("<section className={styles.hero}");
   const content = coursePage.indexOf("<div className={styles.shell}", end);
   const context = coursePage.slice(start, end);
-  const tournament = context.indexOf("href: tournamentReturn.href");
-  const round = context.indexOf("href: historyReturn.href");
+  const tournament = context.indexOf("href: coursePresentationHref(tournamentReturn.href, participantPresentation)");
+  const round = context.indexOf("href: coursePresentationHref(historyReturn.href, participantPresentation)");
   assert.ok(hero >= 0 && hero < start && start < content);
   assert.ok(tournament >= 0 && tournament < round);
-  assert.match(context, /href: tournamentReturn\.href[\s\S]*label: "Tournament"[\s\S]*detail: String\(resolvedSearchParams\.year\)[\s\S]*direction: "left"/);
-  assert.match(context, /href: historyReturn\.href[\s\S]*label: "Round"[\s\S]*detail: `Round \$\{Number\(resolvedSearchParams\.round\)\}`[\s\S]*direction: "right"/);
+  assert.match(context, /href: coursePresentationHref\(tournamentReturn\.href, participantPresentation\)[\s\S]*label: "Tournament"[\s\S]*detail: String\(resolvedSearchParams\.year\)[\s\S]*direction: "left"/);
+  assert.match(context, /href: coursePresentationHref\(historyReturn\.href, participantPresentation\)[\s\S]*label: "Round"[\s\S]*detail: `Round \$\{Number\(resolvedSearchParams\.round\)\}`[\s\S]*direction: "right"/);
   assert.match(coursePage, /historyReturn && !tournamentReturn/);
-  assert.match(coursePage, /<Link href=\{historyReturn\.href\}>‹ \{historyReturn\.label\}<\/Link>/);
+  assert.match(coursePage, /<Link href=\{coursePresentationHref\(historyReturn\.href, participantPresentation\)\}>‹ \{historyReturn\.label\}<\/Link>/);
   assert.match(coursePage, /!historyReturn && originReturn/);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
 });

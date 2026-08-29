@@ -37,6 +37,6 @@ test("Tournament keeps its server and first client render cache-independent", as
   assertCacheRestoredAfterMount(component, "readTournamentLiveCache");
   assert.match(component, /restoredCache\.current = true;[\s\S]*acceptData\(cached\);/);
   assert.match(component, /cachedPresentation: restoredCache\.current/);
-  assert.equal((component.match(/\/api\/tournament\/live/g) || []).length, 2,
-    "the canonical Tournament endpoint remains the initial fetch and dashboard refresh source");
+  assert.equal((component.match(/\/api\/tournament\/live/g) || []).length, 3,
+    "the canonical Tournament endpoint remains the initial fetch and both presentation refresh sources");
 });

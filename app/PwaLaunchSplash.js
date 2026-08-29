@@ -1,18 +1,27 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import AssetImage from "./AssetImage";
 import { tournamentLogo } from "../lib/asset-paths";
+import { participantAppShellRoute } from "../lib/participant-shell.js";
 import { formatTournamentDates, formatTournamentEdition } from "../lib/tournament-branding";
 import styles from "./pwa-launch-splash.module.css";
 
 export default function PwaLaunchSplash() {
+  const pathname = usePathname();
   const [identity, setIdentity] = useState(null);
   const [phase, setPhase] = useState("visible");
   const exitFrame = useRef(null);
+  const participantPresentation = participantAppShellRoute(pathname);
 
   useEffect(() => {
     const root = document.documentElement;
+    if (!participantPresentation) {
+      root.classList.remove("pwa-cold-launch", "pwa-home-entering");
+      setPhase("hidden");
+      return;
+    }
     if (!root.classList.contains("pwa-cold-launch")) {
       setPhase("hidden");
       return;
@@ -49,7 +58,7 @@ export default function PwaLaunchSplash() {
       window.cancelAnimationFrame(exitFrame.current);
       window.removeEventListener("sbi:tournament-ready", onTournamentReady);
     };
-  }, []);
+  }, [participantPresentation]);
 
   const finish = (event) => {
     if (phase !== "exiting" || event.target !== event.currentTarget) return;
@@ -59,6 +68,8 @@ export default function PwaLaunchSplash() {
     setPhase("hidden");
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("pwa-home-entering")));
   };
+
+  if (!participantPresentation) return null;
 
   return <section
     className={`${styles.splash} ${phase === "exiting" ? styles.exiting : ""} ${phase === "hidden" ? styles.hidden : ""}`}

@@ -164,7 +164,7 @@ export default function RootLayout({ children }) {
           <link key={url} rel="apple-touch-startup-image" href={url} media={media} />
         ))}
         <style dangerouslySetInnerHTML={{ __html: `html{background:#092f25}.pwa-app-scene{opacity:1}html.pwa-cold-launch,html.pwa-cold-launch body{margin:0;background:#092f25}html.pwa-cold-launch .pwa-app-scene,html.pwa-home-entering .pwa-app-scene{opacity:0}` }} />
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;var launchRoute=window.location.pathname==="/"||window.location.pathname==="/home";var key="sbi-pwa-launch-seen";if(standalone&&launchRoute&&!window.sessionStorage.getItem(key)){window.sessionStorage.setItem(key,"1");window.__sbiPwaLaunchStartedAt=performance.now();document.documentElement.classList.add("pwa-cold-launch");}}catch(error){}})();` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;var launchRoute=window.location.pathname==="/home";var key="sbi-pwa-launch-seen";if(standalone&&launchRoute&&!window.sessionStorage.getItem(key)){window.sessionStorage.setItem(key,"1");window.__sbiPwaLaunchStartedAt=performance.now();document.documentElement.classList.add("pwa-cold-launch");}}catch(error){}})();` }} />
       </head>
       <body>
         <PwaLaunchSplash />

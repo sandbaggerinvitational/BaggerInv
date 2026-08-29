@@ -37,17 +37,21 @@ const completedOverview = yearPage.slice(
   yearPage.indexOf("function CurrentHistoryOverview")
 );
 
-test("participant History routes use The Bagger app shell while event branding remains distinct", () => {
-  for (const route of ["/history", "/history/2025", "/history/2025/round/1", "/history/2025/team/Team%202", "/history/2026"])
+test("participant History is explicitly namespaced while bare History retains website branding", () => {
+  for (const route of ["/app/history", "/app/history/2025", "/app/history/2025/round/1", "/app/history/2025/team/Team%202", "/app/history/2026"])
     assert.equal(participantAppShellRoute(route), true, route);
-  assert.equal(participantAppShellRoute("/"), false);
-  assert.equal(participantRouteContext("/history/2025"), "2025 History");
-  assert.equal(participantRouteContext("/history/2025/round/3"), "2025 Round History");
+  for (const route of ["/", "/history", "/history/2025", "/history/2025/round/1", "/history/2025/team/Team%202"])
+    assert.equal(participantAppShellRoute(route), false, route);
+  assert.equal(participantRouteContext("/app/history/2025"), "2025 History");
+  assert.equal(participantRouteContext("/app/history/2025/round/3"), "2025 Round History");
   assert.match(components, /appIdentity \? "The Bagger" : "Sandbagger Invitational"/);
   assert.match(components, /appIdentity \? null : <span>Official Tournament Website<\/span>/);
   assert.match(yearPage, /9th Annual Sandbagger Invitational|historyEditionLabel/i);
   assert.match(globals, /footer:not\(\[data-app-footer="true"\]\)/);
-  for (const file of [historyPage, yearPage, roundPage, historyTeamPage]) assert.doesNotMatch(file, /<Footer variant="app" \/>/);
+  for (const file of [historyPage, yearPage, roundPage, historyTeamPage]) {
+    assert.match(file, /participantPresentation \? null : <Header \/>/);
+    assert.match(file, /participantPresentation \? null : <Footer \/>/);
+  }
 });
 
 test("the 2025 overview removes only the dead scorecard summary and preserves final order", () => {

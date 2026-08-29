@@ -25,9 +25,9 @@ const code = guideFormatCode;
 function Text({ value }) { return paragraphs(value).map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 20)}`}>{paragraph}</p>); }
 function Empty({ title }) { return <div className={styles.empty}><span>Tournament Guide</span><h2>{title}</h2><p>Published tournament information will appear here when available.</p></div>; }
 
-function Schedule({ tournament, records, description, rounds, courses, tournamentRules, formatRules, initialNow }) {
+function Schedule({ tournament, records, description, rounds, courses, tournamentRules, formatRules, initialNow, participantPresentation = false }) {
   if (!records.length) return <Empty title="Schedule" />;
-  return <section className={`${styles.focusedContent} ${styles.scheduleExperience}`}><header><p className={styles.eyebrow}>Tournament Week</p><h1>Schedule</h1><Text value={description} /></header><ScheduleItinerary records={records} tournament={tournament} rounds={rounds} courses={courses} tournamentRules={tournamentRules} formatRules={formatRules} initialNow={initialNow} /></section>;
+  return <section className={`${styles.focusedContent} ${styles.scheduleExperience}`}><header><p className={styles.eyebrow}>Tournament Week</p><h1>Schedule</h1><Text value={description} /></header><ScheduleItinerary records={records} tournament={tournament} rounds={rounds} courses={courses} tournamentRules={tournamentRules} formatRules={formatRules} initialNow={initialNow} participantPresentation={participantPresentation} /></section>;
 }
 
 function Dining({ records }) {
@@ -74,10 +74,10 @@ function Rules({ ruleBook, tournamentRules, rounds, liveRounds }) {
 
 function Placeholder({ title, detail }) { return <section className={styles.placeholder}><span>Tournament Guide</span><h1>{title}</h1><p>{detail}</p></section>; }
 
-export default async function GuideDetailPage({ section }) {
+export default async function GuideDetailPage({ section, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const content = await resolveTournamentGuideContent({ env });
   const { tournament, schedule: itinerary, ruleBook } = content;
   const descriptions = Object.fromEntries(content.overview.map((item) => [item["Section Slug"], item.Description]));
-  return <main className={styles.guideDetailPage}><Header /><div className={styles.shell}><Link className={styles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} tournamentRules={content.tournamentRules} formatRules={content.rounds} initialNow={content.timelineNow} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} liveRounds={content.liveRounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div><Footer /></main>;
+  return <main className={styles.guideDetailPage}>{participantPresentation ? null : <Header />}<div className={styles.shell}><Link className={styles.backToGuide} href={participantPresentation ? "/app/guide" : "/tournament-guide"}>‹ Tournament Guide</Link>{section === "schedule" ? <Schedule tournament={content.liveTournament} records={itinerary} description={descriptions.itinerary} rounds={content.liveRounds} courses={content.courses} tournamentRules={content.tournamentRules} formatRules={content.rounds} initialNow={content.timelineNow} participantPresentation={participantPresentation} /> : null}{section === "rules" ? <Rules ruleBook={ruleBook} tournamentRules={content.tournamentRules} rounds={content.rounds} liveRounds={content.liveRounds} /> : null}{section === "dining" ? <Dining records={content.dining} /> : null}{section === "getting-around" ? <LocalGuide records={content.localGuide} /> : null}{section === "contacts" ? <ImportantContacts records={content.importantContacts} /> : null}</div>{participantPresentation ? null : <Footer />}</main>;
 }

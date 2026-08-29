@@ -7,14 +7,13 @@ import AssetImage from "../AssetImage";
 import PublicMatchCard from "../PublicMatchCard";
 import StatusBadge from "../StatusBadge";
 import { addTournamentRanks } from "../../lib/rankings";
+import { buildLeaderboard } from "../../lib/leaderboards-core-engine";
 import { courseLogo, teamLogo } from "../../lib/asset-paths";
 import { formatTeamPoints } from "../../lib/formatters";
 import { clinchingScenariosEligible } from "../../lib/live-tournament";
 import { MATCH_FILTERS, defaultMatchFilter, filterMatches, relativeUpdatedLabel } from "../../lib/live-match-ux";
 import MatchFilterEmptyState from "./MatchFilterEmptyState";
 import TournamentLeaderboard from "../TournamentLeaderboard";
-import TournamentDashboard from "./TournamentDashboard";
-import LeaderboardsDashboard from "./LeaderboardsDashboard";
 import styles from "./live.module.css";
 import scoreStyles from "../score-typography.module.css";
 
@@ -194,10 +193,39 @@ function PlayerLiveScorecard({ row }) {
   </div>;
 }
 
-function MatchCenterExperience({ initialData, loadError }) {
+function withMatchDerivedLeaderboards(data) {
+  if (!data?.tournament) return data;
+  const rounds = data.rounds || [];
+  const matches = rounds.flatMap((round) => round.matches || []);
+  const playerMap = {};
+  for (const match of matches) {
+    for (const side of [1, 2]) {
+      for (const player of match[`team${side}Players`] || []) {
+        playerMap[player.id] = { name: player.name, slug: player.slug, photo: player.photo };
+      }
+    }
+  }
+  const teams = {
+    1: data.tournament.teamOne,
+    2: data.tournament.teamTwo,
+  };
+  return {
+    ...data,
+    leaderboard: data.leaderboard?.length
+      ? data.leaderboard
+      : buildLeaderboard(matches, playerMap, teams),
+    roundLeaderboards: Object.keys(data.roundLeaderboards || {}).length
+      ? data.roundLeaderboards
+      : Object.fromEntries(rounds.map((round) => [
+        round.number,
+        buildLeaderboard(round.matches || [], playerMap, teams),
+      ])),
+  };
+}
+
+export function MatchCenterExperience({ initialData, loadError, readUrl = "/api/live" }) {
   const searchParams = useSearchParams();
-  const [passportPlayer, setPassportPlayer] = useState(null);
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState(() => withMatchDerivedLeaderboards(initialData));
   const tournament = data?.tournament;
   const rounds = data?.rounds || [];
   const [activeRound, setActiveRound] = useState(
@@ -208,27 +236,21 @@ function MatchCenterExperience({ initialData, loadError }) {
   const [clock, setClock] = useState(() => Date.now());
   const [refreshState, setRefreshState] = useState("current");
   const refreshPromise = useRef(null);
-  useEffect(() => {
-    fetch("/api/player-passport/session", { cache: "no-store" })
-      .then(async (response) => response.ok ? (await response.json()).player : null)
-      .then(setPassportPlayer)
-      .catch(() => {});
-  }, []);
   const refresh = useCallback(async () => {
     if (refreshPromise.current) return refreshPromise.current;
     setRefreshState("refreshing");
-    refreshPromise.current = fetch("/api/live", { cache: "no-store" })
+    refreshPromise.current = fetch(readUrl, { cache: "no-store" })
       .then(async (response) => {
         const payload = await response.json();
         if (!response.ok || !payload.data) throw new Error(payload.error || "Unable to refresh live scores.");
-        setData(payload.data);
+        setData((current) => withMatchDerivedLeaderboards({ ...current, ...payload.data }));
         setLastRefresh(Date.now());
         setRefreshState("current");
       })
       .catch(() => setRefreshState("error"))
       .finally(() => { refreshPromise.current = null; });
     return refreshPromise.current;
-  }, []);
+  }, [readUrl]);
   useEffect(() => {
     const poll = () => { if (document.visibilityState === "visible") refresh(); };
     const timer = window.setInterval(poll, 30_000);
@@ -256,9 +278,7 @@ function MatchCenterExperience({ initialData, loadError }) {
   const focusedRound = Number(searchParams.get("round")) || active?.number || 1;
   const focusedRoundData = rounds.find((round) => round.number === focusedRound) || active;
   const focusedPoints = addTournamentRanks(data?.roundLeaderboards?.[focusedRound] || [], "points");
-  const focusedBack = passportPlayer
-    ? <Link href="/home">← Back to My Tournament</Link>
-    : <Link href="/live">← Back to Match Center</Link>;
+  const focusedBack = <Link href="/live">← Back to Match Center</Link>;
 
   if (focusedView === "matchups") return <section className={styles.focusedLiveView}>
     <div className={styles.focusedHeader}>{focusedBack}<span>Round {focusedRound}</span><h1>Live Matchups</h1><p>The leading side is highlighted as scores are entered.</p></div>
@@ -284,8 +304,6 @@ function MatchCenterExperience({ initialData, loadError }) {
     {championshipMode ? <ChampionshipBanner tournament={tournament} /> : <LiveBanner tournament={tournament} />}
     <section className={styles.content}>
       <div className={styles.liveControls}>
-        {passportPlayer ? <Link href="/home" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, border: "1px solid #0b4938", color: "#0b4938", fontWeight: 900, textDecoration: "none" }}>My Tournament</Link> : null}
-        <Link href="/my-match" style={{ display: "inline-grid", placeItems: "center", minHeight: 44, padding: "10px 18px", borderRadius: 999, background: "#0b4938", color: "#fff", fontWeight: 900, textDecoration: "none" }}>My Match</Link>
         <div className={styles.freshness} data-state={refreshState} role="status" aria-live="polite">
           <span aria-hidden="true" />
           <strong>{refreshState === "refreshing" ? "Refreshing" : refreshState === "error" ? "Unable to refresh" : "Up to date"}</strong>
@@ -315,9 +333,5 @@ function MatchCenterExperience({ initialData, loadError }) {
 }
 
 export default function MatchCenter(props) {
-  const searchParams = useSearchParams();
-  if (searchParams.get("view") === "leaderboards") return <LeaderboardsDashboard {...props} />;
-  return searchParams.get("view")
-    ? <MatchCenterExperience {...props} />
-    : <TournamentDashboard {...props} />;
+  return <MatchCenterExperience {...props} />;
 }

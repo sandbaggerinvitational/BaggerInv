@@ -44,7 +44,7 @@ export function MatchBreakdown({ breakdown }) {
   </section>;
 }
 
-export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, points, pointsLabel = "Round Points", playerPoints = [], breakdown, officialFinal, matchId, returnTo = "/live?view=leaderboards", onClose }) {
+export function RoundLeaderboardSheet({ title, identity, roundLabel, formatLabel, courseName, rank, holes, gross, net, netToPar, points, pointsLabel = "Round Points", playerPoints = [], breakdown, officialFinal, matchId, returnTo = "/app/leaderboards", onClose }) {
   const final = officialFinal ?? Number(holes) >= 18;
   const scorecardHref = matchId ? `/game-center/${encodeURIComponent(matchId)}?from=${encodeURIComponent(returnTo)}` : "";
   return <LeaderboardDetailSheet title={title} identity={identity} context={{ primary: [roundLabel, formatLabel].filter(Boolean).join(" • "), secondary: courseName }} status={final ? "Final" : "Live"} metrics={[

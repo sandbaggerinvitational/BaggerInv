@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { refreshCanonical2017To2022HistoricalData, refreshCanonical2023HistoricalData, refreshHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header } from "../../components";
+import { Header, Footer } from "../../components";
 import AssetImage from "../../AssetImage";
 import TeamLogoPlate from "../../TeamLogoPlate";
 import {
@@ -208,6 +208,14 @@ function completedRecordHolderContexts(record) {
     .filter((winner) => winner?.holder);
 }
 
+const historyPresentationHref = (href, participantPresentation) => {
+  if (!participantPresentation) return href;
+  return String(href || "")
+    .replace(/^\/history(?=\/|\?|$)/, "/app/history")
+    .replace(/^\/players(?=\/|\?|$)/, "/app/players")
+    .replace(/^\/courses(?=\/|\?|$)/, "/app/courses");
+};
+
 function CompletedYearOverview({
   tournament,
   leaderboard,
@@ -216,6 +224,7 @@ function CompletedYearOverview({
   matches,
   records = null,
   evidenceGatedSections = false,
+  participantPresentation = false,
 }) {
   const standings = historyStandingsSummary(leaderboard, 5);
   const scoreParts = String(tournament["Final Score"] ?? "")
@@ -278,7 +287,7 @@ function CompletedYearOverview({
     const playerProfileHref = historicalPlayerProfileHref(player.slug, tournament.year);
     return <div className={`${pwaStyles.standingsRow} ${completedStyles.standingRow}`} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(rank)}, ${player.name}, ${standingsCountLabel(row.wins, "win")}, ${standingsCountLabel(row.losses, "loss", "losses")}, ${standingsCountLabel(row.halves, "tie")}, ${pointsTracked ? `${formatPlayerPoints(row.points)} points` : "points not recorded"}`}>
       <strong>{rank}</strong>
-      <span>{playerProfileHref ? <Link aria-label={`View ${player.name} career profile`} href={playerProfileHref} prefetch={false}>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></Link> : <>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></>}</span>
+      <span>{playerProfileHref ? <Link aria-label={`View ${player.name} career profile`} href={historyPresentationHref(playerProfileHref, participantPresentation)} prefetch={false}>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></Link> : <>{player.name}<small>{row.wins} W · {row.losses} L · {row.halves} T</small></>}</span>
       <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
     </div>;
   };
@@ -290,13 +299,13 @@ function CompletedYearOverview({
         <h2 id="completed-champion-heading">Tournament Final</h2>
       </div>
       <div className={completedStyles.result} role="group" aria-label={`${tournament.championTeam?.name}, ${tournament.year} Champions, ${championScore} points. ${tournament.runnerUpTeam?.name}, Runner-up, ${runnerUpScore} points.`}>
-        <Link className={completedStyles.resultTeam} href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.championTeam?.side || "Team 1")}`} prefetch={false}>
+        <Link className={completedStyles.resultTeam} href={historyPresentationHref(`/history/${tournament.year}/team/${encodeURIComponent(tournament.championTeam?.side || "Team 1")}`, participantPresentation)} prefetch={false}>
           <AssetImage src={teamLogo(tournament.championTeam?.logo)} alt="" className={completedStyles.resultLogo} fallbackClassName={completedStyles.resultLogoFallback} fallback={tournament.championTeam?.name?.slice(0, 1) || "C"} inferFallback={false} />
           <span><small>Champions</small><strong>{tournament.championTeam?.name || "To Be Determined"}</strong></span>
           <b>{championScore}</b>
         </Link>
         <div className={completedStyles.finalDivider}><span>Final score</span><i aria-hidden="true" /></div>
-        <Link className={completedStyles.resultTeam} data-runner-up="true" href={`/history/${tournament.year}/team/${encodeURIComponent(tournament.runnerUpTeam?.side || "Team 2")}`} prefetch={false}>
+        <Link className={completedStyles.resultTeam} data-runner-up="true" href={historyPresentationHref(`/history/${tournament.year}/team/${encodeURIComponent(tournament.runnerUpTeam?.side || "Team 2")}`, participantPresentation)} prefetch={false}>
           <AssetImage src={teamLogo(tournament.runnerUpTeam?.logo)} alt="" className={completedStyles.resultLogo} fallbackClassName={completedStyles.resultLogoFallback} fallback={tournament.runnerUpTeam?.name?.slice(0, 1) || "R"} inferFallback={false} />
           <span><small>Runner-up</small><strong>{tournament.runnerUpTeam?.name || "To Be Determined"}</strong></span>
           <b>{runnerUpScore}</b>
@@ -311,7 +320,7 @@ function CompletedYearOverview({
         {tournament.courses.map((course, index) => {
           const round = roundNumber(course.Round);
           return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
-            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`} prefetch={index === 0 ? undefined : false}>
+            <Link className={pwaStyles.overviewRoundPrimary} href={historyPresentationHref(`/history/${tournament.year}/round/${round}`, participantPresentation)} prefetch={index === 0 ? undefined : false}>
               <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
               <span>
                 <b>{course.Round} · {completedFormatName(course.Format)}</b>
@@ -319,7 +328,7 @@ function CompletedYearOverview({
               </span>
               <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })} prefetch={false}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={historyPresentationHref(historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round }), participantPresentation)} prefetch={false}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -329,7 +338,7 @@ function CompletedYearOverview({
       <span className={styles.sectionLabel}>Teams</span>
       <h2 id="completed-teams-heading">The Teams</h2>
       <div className={pwaStyles.overviewTeamList}>
-        {tournament.teams.map((team) => <Link className={`${pwaStyles.overviewTeam} ${completedStyles.teamSummary}`} href={`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`} key={team.side}>
+        {tournament.teams.map((team) => <Link className={`${pwaStyles.overviewTeam} ${completedStyles.teamSummary}`} href={historyPresentationHref(`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`, participantPresentation)} key={team.side}>
           <AssetImage src={teamLogo(team.logo)} alt="" className={pwaStyles.overviewTeamLogo} fallbackClassName={pwaStyles.overviewTeamFallback} fallback={team.name.slice(0, 1)} inferFallback={false} />
           <strong>{team.name}</strong>
           <span className={completedStyles.teamMetadata}>
@@ -380,7 +389,7 @@ function CompletedYearOverview({
   </div>;
 }
 
-function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTracked, scoringStatistics, participant }) {
+function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTracked, scoringStatistics, participant, participantPresentation = false }) {
   const standings = historyStandingsSummary(leaderboard, 5);
   const allStatistics = scoringItems(scoringStatistics, participant, tournament.courses);
   const primaryLabels = new Set(["Best Individual Round", "Best Team Round", "Average Score", "Birdie Leader", "Scorecard Coverage"]);
@@ -390,7 +399,7 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
     const player = leaderboardPlayer(row);
     return <div className={pwaStyles.standingsRow} role="listitem" key={`${keyPrefix}-${row.id || player.name}`} aria-label={`${rankAccessibleLabel(row.tournamentRank || row.rank)}, ${player.name}, ${formatPlayerPoints(row.points)} points`}>
       <strong>{row.tournamentRank || row.rank}</strong>
-      {player.slug ? <Link href={`/players/${player.slug}`} prefetch={false}>{player.name}</Link> : <span>{player.name}</span>}
+      {player.slug ? <Link href={historyPresentationHref(`/players/${player.slug}`, participantPresentation)} prefetch={false}>{player.name}</Link> : <span>{player.name}</span>}
       <b>{pointsTracked ? formatPlayerPoints(row.points) : `${row.wins}-${row.losses}-${row.halves}`}</b>
     </div>;
   };
@@ -404,12 +413,12 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
           const round = roundNumber(course.Round);
           const availablePoints = pointsForRound(roundPoints, round);
           return <article className={pwaStyles.overviewRound} key={`${course["Course ID"]}-${course.Round}`}>
-            <Link className={pwaStyles.overviewRoundPrimary} href={`/history/${tournament.year}/round/${round}`} prefetch={index === 0 ? undefined : false}>
+            <Link className={pwaStyles.overviewRoundPrimary} href={historyPresentationHref(`/history/${tournament.year}/round/${round}`, participantPresentation)} prefetch={index === 0 ? undefined : false}>
               <AssetImage src={courseLogo(course["Course Logo"])} alt="" className={pwaStyles.overviewRoundLogo} fallbackClassName={pwaStyles.overviewRoundLogoFallback} fallback="⛳" />
               <span><b>{course.Round}</b><strong>{course.Course}</strong><small>{getFormatName(course.Format)}{availablePoints !== null ? ` · ${availablePoints} points` : ""}</small></span>
               <em>View Round <i aria-hidden="true">→</i></em>
             </Link>
-            <Link className={pwaStyles.overviewRoundCourse} href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })} prefetch={false}>Course Profile</Link>
+            <Link className={pwaStyles.overviewRoundCourse} href={historyPresentationHref(historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round }), participantPresentation)} prefetch={false}>Course Profile</Link>
           </article>;
         })}
       </div>
@@ -419,7 +428,7 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
       <span className={styles.sectionLabel}>Teams</span>
       <h2 id="history-teams-heading">Tournament Sides</h2>
       <div className={pwaStyles.overviewTeamList}>
-        {tournament.teams.map((team) => <Link className={pwaStyles.overviewTeam} href={`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`} key={team.side}>
+        {tournament.teams.map((team) => <Link className={pwaStyles.overviewTeam} href={historyPresentationHref(`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`, participantPresentation)} key={team.side}>
           <AssetImage src={teamLogo(team.logo)} alt="" className={pwaStyles.overviewTeamLogo} fallbackClassName={pwaStyles.overviewTeamFallback} fallback={team.name.slice(0, 1)} inferFallback={false} />
           <strong>{team.name}</strong><span>View roster <i aria-hidden="true">→</i></span>
         </Link>)}
@@ -464,7 +473,7 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
   </div>;
 }
 
-export default async function TournamentYearPage({ params, searchParams }) {
+export default async function TournamentYearPage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { year } = await params;
   const query = await searchParams;
@@ -504,7 +513,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
       } = model);
     } catch {
       return (
-        <HistoryUnavailablePage year={year} section="Tournament History" />
+        <HistoryUnavailablePage year={year} section="Tournament History" participantPresentation={participantPresentation} />
       );
     }
   } else if (useSupabaseCompleted) {
@@ -531,7 +540,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
       } = model);
       resolveHistoryPlayer = (slug) => completedHistoryResolvePlayer(view, slug);
     } catch {
-      return <HistoryUnavailablePage year={year} section="Tournament History" />;
+      return <HistoryUnavailablePage year={year} section="Tournament History" participantPresentation={participantPresentation} />;
     }
   } else {
     const scorecardAnalyticsPromise = step3CCompletedYear
@@ -549,7 +558,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           : refreshHistoricalData());
     } catch {
       if (step3CCompletedYear) {
-        return <HistoryUnavailablePage year={year} section="Tournament History" />;
+        return <HistoryUnavailablePage year={year} section="Tournament History" participantPresentation={participantPresentation} />;
       }
       throw new Error(`Unable to load ${year} History.`);
     }
@@ -733,7 +742,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
     : null;
   return (
     <main>
-      <Header />
+      {participantPresentation ? null : <Header />}
 
       <section className={`${styles.tournamentHero} ${useSupabase2026 || useCompletedMaster ? pwaStyles.currentTournamentHero : useStep3CCompletedMaster ? pwaStyles.currentTournamentHero : ""} ${useFrozenCompletedPresentation ? completedStyles.hero : ""}`}
         data-completed-prototype={useCompletedMaster ? String(tournament.year) : undefined}
@@ -776,18 +785,20 @@ export default async function TournamentYearPage({ params, searchParams }) {
         </div>
       </section>
 
-      <PlayerProfileReturnNavigation context={playerReturnContext} />
+      <PlayerProfileReturnNavigation context={playerReturnContext
+        ? { ...playerReturnContext, href: historyPresentationHref(playerReturnContext.href, participantPresentation) }
+        : null} />
 
       <HistoryNavigation
         ariaLabel={`${tournament.year} tournament year navigation`}
         center={{
-          href: "/history",
+          href: historyPresentationHref("/history", participantPresentation),
           label: "All Tournament Years",
           ariaLabel: "All Tournament Years",
           prefetch: false,
         }}
         left={previousYear ? {
-          href: `/history/${previousYear}`,
+          href: historyPresentationHref(`/history/${previousYear}`, participantPresentation),
           label: "Previous Year",
           detail: String(previousYear),
           direction: "left",
@@ -795,7 +806,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           prefetch: false,
         } : null}
         right={nextYear ? {
-          href: `/history/${nextYear}`,
+          href: historyPresentationHref(`/history/${nextYear}`, participantPresentation),
           label: "Next Year",
           detail: String(nextYear),
           direction: "right",
@@ -845,6 +856,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           scorecards={completed2023Scorecards.length ? completed2023Scorecards : tournamentScorecards}
           matches={tournamentMatches}
           records={completed2023Records || completed2024Records}
+          participantPresentation={participantPresentation}
         /> : useStep3CCompletedMaster ? <CompletedYearOverview
           tournament={tournament}
           leaderboard={leaderboard}
@@ -853,6 +865,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           matches={tournamentMatches}
           records={[]}
           evidenceGatedSections
+          participantPresentation={participantPresentation}
         /> : useSupabase2026 ? <CurrentHistoryOverview
           tournament={tournament}
           roundPoints={roundPoints}
@@ -860,6 +873,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           pointsTracked={pointsTracked}
           scoringStatistics={scoringStatistics}
           participant={participant}
+          participantPresentation={participantPresentation}
         /> : <>
         <section className={styles.section}>
           <span className={styles.sectionLabel}>The Teams</span>
@@ -869,9 +883,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
             {tournament.teams.map((team) => (
               <Link
                 className={styles.teamSeasonCard}
-                href={`/history/${tournament.year}/team/${encodeURIComponent(
-                  team.side
-                )}`}
+                href={historyPresentationHref(`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`, participantPresentation)}
                 key={team.side}
               >
                 <TeamLogoPlate
@@ -911,7 +923,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
                 >
                   <Link
                     className={styles.courseRoundPrimary}
-                    href={`/history/${tournament.year}/round/${round}`}
+                    href={historyPresentationHref(`/history/${tournament.year}/round/${round}`, participantPresentation)}
                     prefetch={index === 0 ? undefined : false}
                   >
                     <AssetImage
@@ -941,7 +953,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
 
                   <Link
                     className={styles.courseProfileLink}
-                    href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}
+                    href={historyPresentationHref(historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round }), participantPresentation)}
                     prefetch={false}
                   >
                     View Course Profile
@@ -956,7 +968,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
           <span className={styles.sectionLabel}>Player Standings</span>
           <h2>{tournament.year} Leaderboard</h2>
 
-          <TournamentLeaderboard rows={leaderboard} pointsTracked={pointsTracked} prefetchPlayerLinks={false} emptyMessage="No completed matches have been recorded for this tournament yet." />
+          <TournamentLeaderboard rows={leaderboard} pointsTracked={pointsTracked} prefetchPlayerLinks={false} emptyMessage="No completed matches have been recorded for this tournament yet." participantPresentation={participantPresentation} />
         </section>
 
         <section className={styles.section}>
@@ -1044,7 +1056,7 @@ export default async function TournamentYearPage({ params, searchParams }) {
         </section>
         </>}
       </section>
-
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

@@ -5,6 +5,7 @@ import {
 } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Header, Footer } from "../../components";
 import HistoryNavigation from "../../history/HistoryNavigation";
 import PlayerAvatar from "../../PlayerAvatar";
 import { CareerHonors } from "../../HonorBadges";
@@ -40,11 +41,6 @@ import {
 } from "../../../lib/leaderboards";
 import { buildCanonicalRecordHolderAuthority } from "../../../lib/record-holder-authority";
 import PlayerIntelligenceSections from "./PlayerIntelligenceSections";
-import { cookies } from "next/headers";
-import { PLAYER_PASSPORT_COOKIE } from "../../../lib/player-passport";
-import { resolvePlayerPassportToken } from "../../../lib/player-passport-server";
-import { requireParticipantIdentityAuthority } from "../../../lib/participant-identity-authority";
-import { resolveSupabaseParticipantIdentity } from "../../../lib/participant-identity-resolver";
 import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
@@ -111,7 +107,16 @@ function ChampionshipTimeline({ years, styles }) {
 }
 
 
-export default async function PlayerPage({ params, searchParams }) {
+const participantHref = (href, participantPresentation) => {
+  if (!participantPresentation) return href;
+  return String(href || "")
+    .replace(/^\/players(?=\/|\?|$)/, "/app/players")
+    .replace(/^\/history(?=\/|\?|$)/, "/app/history")
+    .replace(/^\/courses(?=\/|\?|$)/, "/app/courses")
+    .replace(/^\/tournament-guide(?=\/|\?|$)/, "/app/guide");
+};
+
+export default async function PlayerPage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const useSupabase = isSupabaseSecondaryHistory(env);
   const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
@@ -149,22 +154,6 @@ export default async function PlayerPage({ params, searchParams }) {
   const historyReturnContext = historicalPlayerReturnContext(query);
   const player = useSupabase ? calculations.getPlayerBySlug(slug) : getPlayerBySlug(slug);
   if (!player) notFound();
-  const cookieStore = await cookies();
-  const participantIdentityAuthority = requireParticipantIdentityAuthority(env);
-  let participantIdentity = null;
-  if (participantIdentityAuthority.resolved === "supabase") {
-    try {
-      participantIdentity = await resolveSupabaseParticipantIdentity({ cookieStore, env });
-    } catch {
-      // Player profiles are public. Missing participant identity only changes
-      // the contextual back-link and must not make the profile unavailable.
-    }
-  } else {
-    participantIdentity = await resolvePlayerPassportToken(
-      cookieStore.get(PLAYER_PASSPORT_COOKIE)?.value || ""
-    );
-  }
-
   const officialRecords = useSupabase ? readSupabaseRecords() : getRecords();
   const stats = officialRecords.all.find(({ player: rowPlayer }) =>
     rowPlayer["Player ID"] === player["Player ID"]
@@ -200,22 +189,22 @@ export default async function PlayerPage({ params, searchParams }) {
   });
   const primaryNavigation = historyReturnContext
     ? {
-        href: historyReturnContext.href,
+        href: participantHref(historyReturnContext.href, participantPresentation),
         label: historyReturnContext.label,
         direction: "left",
         ariaLabel: historyReturnContext.accessibleLabel,
         prefetch: false,
       }
     : {
-        href: participantIdentity ? "/home" : playerDirectoryReturnHref,
-        label: participantIdentity ? "My Tournament" : "All Sandbaggers",
+        href: participantPresentation ? "/home" : playerDirectoryReturnHref,
+        label: participantPresentation ? "My Tournament" : "All Sandbaggers",
         direction: "left",
-        ariaLabel: participantIdentity ? "Back to My Tournament" : "Back to All Sandbaggers",
+        ariaLabel: participantPresentation ? "Back to My Tournament" : "Back to All Sandbaggers",
         prefetch: false,
       };
-  const browseNavigation = historyReturnContext || participantIdentity
+  const browseNavigation = historyReturnContext || participantPresentation
     ? {
-        href: playerDirectoryReturnHref,
+        href: participantPresentation ? "/app/players" : playerDirectoryReturnHref,
         label: "Browse All Sandbaggers",
         ariaLabel: "Browse All Sandbaggers",
         prefetch: false,
@@ -224,6 +213,7 @@ export default async function PlayerPage({ params, searchParams }) {
 
   return (
     <main data-career-profile>
+      {participantPresentation ? null : <Header />}
       <section
         className={styles.pageHero}
         data-secondary-history-source={useSupabase ? "supabase" : "google"}
@@ -284,6 +274,7 @@ export default async function PlayerPage({ params, searchParams }) {
           formatMatchHistory={formatMatchHistory}
           playerName={player["Display Name"]}
           playerSlug={player.slug}
+          participantPresentation={participantPresentation}
         />
 
         <section className={styles.captainLegacySection}>
@@ -316,10 +307,10 @@ export default async function PlayerPage({ params, searchParams }) {
                         ? styles.captainLegacyChampion
                         : ""
                     }`}
-                    href={withPlayerOriginContext(
+                    href={participantHref(withPlayerOriginContext(
                       `/history/${season.year}/team/${encodeURIComponent(season.teamSide)}`,
                       player.slug
-                    )}
+                    ), participantPresentation)}
                     key={season.year}
                     prefetch={false}
                   >
@@ -433,6 +424,7 @@ export default async function PlayerPage({ params, searchParams }) {
           </div>
         </section>
       </section>
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

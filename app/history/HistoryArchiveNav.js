@@ -9,6 +9,7 @@ export default function HistoryArchiveNav({
   teams = [],
   activeRound = null,
   activeSide = "",
+  participantPresentation = false,
 }) {
   const roundItems = rounds
     .map((round) => ({
@@ -21,11 +22,11 @@ export default function HistoryArchiveNav({
   return (
     <nav className={styles.shell} aria-label={`${year} tournament history sections`}>
       <div className={styles.rail}>
-        <Link href="/history">Archive</Link>
-        <Link href={`/history/${year}`} aria-current={!activeRound && !activeSide ? "page" : undefined}>Overview</Link>
+        <Link href={participantPresentation ? "/app/history" : "/history"}>Archive</Link>
+        <Link href={`${participantPresentation ? "/app/history" : "/history"}/${year}`} aria-current={!activeRound && !activeSide ? "page" : undefined}>Overview</Link>
         {roundItems.map((round) => (
           <Link
-            href={`/history/${year}/round/${round.number}`}
+            href={`${participantPresentation ? "/app/history" : "/history"}/${year}/round/${round.number}`}
             aria-current={Number(activeRound) === round.number ? "page" : undefined}
             aria-label={`Round ${round.number} history`}
             key={round.number}
@@ -37,7 +38,7 @@ export default function HistoryArchiveNav({
           const side = String(team.side || team.id || team.name || "");
           return (
             <Link
-              href={`/history/${year}/team/${encodeURIComponent(side)}`}
+              href={`${participantPresentation ? "/app/history" : "/history"}/${year}/team/${encodeURIComponent(side)}`}
               aria-current={normalizedSide && normalizedSide === side.toLowerCase() ? "page" : undefined}
               key={side}
             >

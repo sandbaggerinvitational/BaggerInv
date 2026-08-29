@@ -91,9 +91,9 @@ test("2025 year navigation appears once immediately below the hero with bounded 
   assert.ok(heroIndex >= 0 && heroIndex < yearNavigationIndex);
   assert.ok(yearNavigationIndex < contentIndex);
   assert.equal((overview.match(/surface="year"/g) || []).length, 1);
-  assert.match(overview, /href: `\/history\/\$\{previousYear\}`[\s\S]*ariaLabel: `Previous Year, \$\{previousYear\}`/);
-  assert.match(overview, /href: "\/history"[\s\S]*ariaLabel: "All Tournament Years"/);
-  assert.match(overview, /href: `\/history\/\$\{nextYear\}`[\s\S]*ariaLabel: `Next Year, \$\{nextYear\}`/);
+  assert.match(overview, /href: historyPresentationHref\(`\/history\/\$\{previousYear\}`, participantPresentation\)[\s\S]*ariaLabel: `Previous Year, \$\{previousYear\}`/);
+  assert.match(overview, /href: historyPresentationHref\("\/history", participantPresentation\)[\s\S]*ariaLabel: "All Tournament Years"/);
+  assert.match(overview, /href: historyPresentationHref\(`\/history\/\$\{nextYear\}`, participantPresentation\)[\s\S]*ariaLabel: `Next Year, \$\{nextYear\}`/);
   assert.doesNotMatch(overview, /tournamentYearNavigationBottom/);
 });
 
@@ -120,10 +120,10 @@ test("2025 History-context Course Profiles expose explicit round and tournament 
   });
   assert.equal(historyCourseTournamentReturn({ view: "archive" }), null);
   assert.match(coursePage, /tournamentReturn \? <HistoryNavigation/);
-  assert.match(coursePage, /href: tournamentReturn\.href[\s\S]*direction: "left"/);
-  assert.match(coursePage, /href: historyReturn\.href[\s\S]*direction: "right"/);
-  assert.match(coursePage, /historyReturn && !tournamentReturn \? <nav[\s\S]*href=\{historyReturn\.href\}/);
-  assert.match(coursePage, /!historyReturn && originReturn \? <Link[\s\S]*href=\{originReturn\.href\}/);
+  assert.match(coursePage, /href: coursePresentationHref\(tournamentReturn\.href, participantPresentation\)[\s\S]*direction: "left"/);
+  assert.match(coursePage, /href: coursePresentationHref\(historyReturn\.href, participantPresentation\)[\s\S]*direction: "right"/);
+  assert.match(coursePage, /historyReturn && !tournamentReturn \? <nav[\s\S]*href=\{coursePresentationHref\(historyReturn\.href, participantPresentation\)\}/);
+  assert.match(coursePage, /!historyReturn && originReturn \? <Link[\s\S]*href=\{coursePresentationHref\(originReturn\.href, participantPresentation\)\}/);
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
 });
 

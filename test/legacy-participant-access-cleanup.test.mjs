@@ -36,7 +36,7 @@ test("Supabase score and My Match pages pass a server-controlled identity source
   assert.doesNotMatch(supabaseInactiveBranch, /api\/scoring\/access|\/activate|participant match code/i);
 });
 
-test("every Preview Home presentation path carries the canonical Supabase identity authority", async () => {
+test("participant Home carries Supabase identity authority while public Home remains session-neutral", async () => {
   const [rootHome, homePage, supabaseHome, mobileHome, commandCenter, personalizedHome, mePage, profile] = await Promise.all([
     source("app/page.js"),
     source("app/home/page.js"),
@@ -47,10 +47,9 @@ test("every Preview Home presentation path carries the canonical Supabase identi
     source("app/me/page.js"),
     source("app/me/ParticipantProfile.js"),
   ]);
-  for (const home of [rootHome, homePage]) {
-    assert.match(home, /requireParticipantIdentityAuthority\(env\)\.resolved/);
-    assert.match(home, /participantIdentityAuthority=\{participantIdentityAuthority\}/);
-  }
+  assert.doesNotMatch(rootHome, /requireParticipantIdentityAuthority|participantIdentityAuthority|MobileTournamentHome/);
+  assert.match(homePage, /requireParticipantIdentityAuthority\(env\)\.resolved/);
+  assert.match(homePage, /participantIdentityAuthority=\{participantIdentityAuthority\}/);
   assert.match(supabaseHome, /participantIdentityAuthority="supabase"/);
   assert.match(mobileHome, /participantIdentityAuthority=\{participantIdentityAuthority\}/);
   assert.match(commandCenter, /participantIdentityAuthority=\{participantIdentityAuthority\}/);
@@ -97,11 +96,10 @@ test("Supabase Home does not register the legacy Trusted Devices install callbac
   assert.match(effect, /saveReadiness\(\{ pwaInstalled: true \}\)/);
 });
 
-test("public player profile decorates navigation through Supabase identity in Preview", async () => {
+test("public player profile navigation is independent of Supabase identity", async () => {
   const profile = await source("app/players/[slug]/page.js");
-  assert.match(profile, /participantIdentityAuthority\.resolved === "supabase"/);
-  assert.match(profile, /resolveSupabaseParticipantIdentity\(\{ cookieStore, env \}\)/);
-  assert.match(profile, /else \{[\s\S]*resolvePlayerPassportToken/);
+  assert.doesNotMatch(profile, /participantIdentityAuthority|resolveSupabaseParticipantIdentity|resolvePlayerPassportToken|cookies\(\)/);
+  assert.match(profile, /participantPresentation \? "\/home" : playerDirectoryReturnHref/);
 });
 
 test("legacy QR and match-code sessions cannot cross the Supabase participant boundary", async () => {

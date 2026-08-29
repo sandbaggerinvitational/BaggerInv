@@ -130,7 +130,8 @@ test("public Match Center refreshes while visible and stops its timer cleanly", 
   assert.match(source, /setInterval\(poll, 30_000\)/);
   assert.match(source, /document\.visibilityState === "visible"/);
   assert.match(source, /clearInterval\(timer\)/);
-  assert.match(source, /fetch\("\/api\/live"/);
+  assert.match(source, /readUrl = "\/api\/live"/);
+  assert.match(source, /fetch\(readUrl/);
   assert.match(source, /refreshPromise\.current/);
   assert.match(source, /Unable to refresh/);
 });

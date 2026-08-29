@@ -31,7 +31,7 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "", 
     <section className={styles.schedule} data-density={compact ? "next" : "full"} aria-labelledby={compact ? "next-schedule-title" : "today-schedule-title"}>
       <header className={styles.sectionHeader}>
         <div><p>{compact ? compactEyebrow : "Today"}</p><h2 id={compact ? "next-schedule-title" : "today-schedule-title"}>{compact ? compactTitle : "Today’s Schedule"}</h2></div>
-        <Link href="/tournament-guide/schedule">{compact ? <>View Full Schedule <span aria-hidden="true">→</span></> : "View Tournament Guide"}</Link>
+        <Link href="/app/guide/schedule">{compact ? <>View Full Schedule <span aria-hidden="true">→</span></> : "View Tournament Guide"}</Link>
       </header>
       {(!compact || preview.kind === "event") && displayedItems.length ? <ol>{displayedItems.map((item) => {
         const subtitle = timelineOptionalText(item.subtitle);

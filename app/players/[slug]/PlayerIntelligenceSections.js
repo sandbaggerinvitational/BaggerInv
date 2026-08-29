@@ -66,7 +66,7 @@ function RankingList({ rows }) {
   );
 }
 
-function TournamentHistoryRow({ playerName, playerSlug, season }) {
+function TournamentHistoryRow({ playerName, playerSlug, season, participantPresentation = false }) {
   const upcoming = season.finish === "Upcoming";
   const completedHistoryYear = isCompletedHistoryPlayerYear(season.year);
   // Preserve the existing current-tournament destination. It is deliberately
@@ -112,9 +112,12 @@ function TournamentHistoryRow({ playerName, playerSlug, season }) {
   const rowStyle = {
     "--history-team-color": season.teamColor || "var(--tsi-gold-600)",
   };
-  const historyHref = completedHistoryYear
+  const publicHistoryHref = completedHistoryYear
     ? withPlayerOriginContext(`/history/${season.year}`, playerSlug)
     : `/history/${season.year}`;
+  const historyHref = participantPresentation
+    ? publicHistoryHref.replace(/^\/history(?=\/|\?|$)/, "/app/history")
+    : publicHistoryHref;
 
   return linkedTournamentYear ? (
     <Link
@@ -145,6 +148,7 @@ export default function PlayerIntelligenceSections({
   formatMatchHistory,
   playerName,
   playerSlug,
+  participantPresentation = false,
 }) {
   const { official, hole, progression } = intelligence;
   const careerRankingRows = intelligence.rankingRows.filter((row) =>
@@ -230,7 +234,7 @@ export default function PlayerIntelligenceSections({
             <span>Avg Score</span>
           </div>
           {intelligence.tournamentHistory.map((season) => (
-            <TournamentHistoryRow playerName={playerName} playerSlug={playerSlug} season={season} key={season.year} />
+            <TournamentHistoryRow playerName={playerName} playerSlug={playerSlug} season={season} participantPresentation={participantPresentation} key={season.year} />
           ))}
         </div>
       </IntelligenceSection>
@@ -258,6 +262,7 @@ export default function PlayerIntelligenceSections({
                 history={formatMatchHistory[format.code]}
                 playerName={playerName}
                 playerSlug={playerSlug}
+                participantPresentation={participantPresentation}
               />
             </article>
           ))}

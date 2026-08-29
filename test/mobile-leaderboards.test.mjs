@@ -331,10 +331,10 @@ test("Championship Projections opens in-place player details from every publishe
   assert.match(insightStyles, /data-podium="3"/);
 });
 
-test("Leaderboards use shared tournament identity, URL tabs, search, detail sheets, and Passport highlighting", async () => {
-  const [source, matchCenter, sharedRow] = await Promise.all([readFile(componentUrl, "utf8"), readFile(matchCenterUrl, "utf8"), readFile(new URL("../app/live/LeaderboardRow.js", import.meta.url), "utf8")]);
-  assert.match(matchCenter, /searchParams\.get\("view"\) === "leaderboards"/);
-  assert.match(matchCenter, /<LeaderboardsDashboard/);
+test("Leaderboards use shared tournament identity, explicit app routing, URL tabs, detail sheets, and Passport highlighting", async () => {
+  const [source, participantPage, sharedRow] = await Promise.all([readFile(componentUrl, "utf8"), readFile(new URL("../app/app/leaderboards/page.js", import.meta.url), "utf8"), readFile(new URL("../app/live/LeaderboardRow.js", import.meta.url), "utf8")]);
+  assert.match(participantPage, /<LeaderboardsSupabaseRead/);
+  assert.match(participantPage, /<LeaderboardsDashboard/);
   assert.match(source, /import TournamentIdentityHeader/);
   assert.match(source, /<TournamentIdentityHeader/);
   assert.match(source, /LEADERBOARD_MODULES\.map/);

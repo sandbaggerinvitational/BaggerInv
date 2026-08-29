@@ -87,7 +87,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
       >
         <span style={{ width: `${percentage}%` }} />
       </div>
-      <Link className={styles.leaderboardsCta} href="/live?view=leaderboards">View Leaderboards <span aria-hidden="true">→</span></Link>
+      <Link className={styles.leaderboardsCta} href="/app/leaderboards">View Leaderboards <span aria-hidden="true">→</span></Link>
     </section>
   );
 }

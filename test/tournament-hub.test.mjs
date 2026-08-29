@@ -10,7 +10,7 @@ test("Tournament Hub exposes major destinations without duplicating Tournament G
   for (const label of ["Tournament Guide", "Tournament History", "Important Contacts"]) {
     assert.match(hub, new RegExp(label));
   }
-  for (const href of ["/tournament-guide", "/history", "/tournament-guide/contacts"]) {
+  for (const href of ["/app/guide", "/app/history", "/app/guide/contacts"]) {
     assert.ok(hub.includes(`href: "${href}"`), href);
   }
   for (const duplicate of ["Schedule", "Courses", "Rules", "Dining", "Local Guide", "Contact Tournament Director"]) {
@@ -67,13 +67,20 @@ test("external tournament content asks before leaving The Bagger", async () => {
   assert.match(course, /<ExternalLinkConfirm[\s\S]*href=\{website\}/);
 });
 
-test("Tournament Hub content routes retain shared headers and notification anchor", async () => {
-  const [guide, courses, history, profile] = await Promise.all([
-    source("app/tournament-guide/page.js"), source("app/courses/page.js"), source("app/history/page.js"), source("app/me/ParticipantProfile.js"),
+test("shared content pages preserve website chrome while participant wrappers select PWA presentation", async () => {
+  const [guide, courses, history, participantGuide, participantCourses, participantHistory, profile] = await Promise.all([
+    source("app/tournament-guide/page.js"), source("app/courses/page.js"), source("app/history/page.js"),
+    source("app/app/guide/page.js"), source("app/app/courses/page.js"), source("app/app/history/page.js"),
+    source("app/me/ParticipantProfile.js"),
   ]);
-  for (const page of [guide, history]) assert.match(page, /<Header \/>/);
-  assert.doesNotMatch(courses, /<Header \/>|<Footer \/>/);
-  assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide<\/Link>/);
+  for (const page of [guide, courses, history]) {
+    assert.match(page, /participantPresentation \? null : <Header \/>/);
+    assert.match(page, /participantPresentation \? null : <Footer \/>/);
+  }
+  for (const wrapper of [participantGuide, participantCourses, participantHistory]) {
+    assert.match(wrapper, /participantPresentation: true/);
+  }
+  assert.match(courses, /href=\{participantPresentation \? "\/app\/guide" : "\/tournament-guide"\}/);
   assert.match(profile, /id="notification-preferences"/);
 });
 

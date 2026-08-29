@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../lib/stats";
 import Link from "next/link";
 import { after } from "next/server";
-import { Header } from "../components";
+import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { defaultAssets, optimizedAssetUrl } from "../../lib/asset-paths";
 import { getTournaments } from "../../lib/stats";
@@ -32,7 +32,7 @@ export const metadata = pageMetadata({
   path: "/history",
 });
 
-export default async function HistoryPage() {
+export default async function HistoryPage({ participantPresentation = false } = {}) {
   const env = await applicationPageEnvironment();
   const useSupabase2026 = isSupabaseHistory2026("2026", env);
   const useSupabaseCompleted = isSupabaseCompletedHistoryYear("2017", env);
@@ -73,7 +73,7 @@ export default async function HistoryPage() {
 
   return (
     <main>
-      <Header />
+      {participantPresentation ? null : <Header />}
 
       <section className={`${styles.pageHero} ${pwaStyles.archiveHero}`}>
         <p className={styles.eyebrow}>The Complete Archive</p>
@@ -86,7 +86,7 @@ export default async function HistoryPage() {
 
       <section className={`${styles.content} ${pwaStyles.archiveContent}`} id="champions">
         {currentHistoryUnavailable ? (
-          <HistoryUnavailableNotice year="2026" />
+          <HistoryUnavailableNotice year="2026" participantPresentation={participantPresentation} />
         ) : null}
         {completedHistoryUnavailable ? (
           <HistoryUnavailableNotice year="2017–2025" />
@@ -98,7 +98,7 @@ export default async function HistoryPage() {
             return <article className={styles.historyPhotoCard} key={tournament.year}>
               <Link
                 className={styles.historyCardPrimary}
-                href={`/history/${tournament.year}`}
+                href={`${participantPresentation ? "/app/history" : "/history"}/${tournament.year}`}
                 aria-label={completed
                   ? `View ${tournament.year} Tournament History`
                   : `${tournament.year}, ${historyEditionLabel(tournament.year)}, ${tournament.Destination}, ${historyTournamentCardResult(tournament)}`}
@@ -133,6 +133,7 @@ export default async function HistoryPage() {
           })}
         </div>
       </section>
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

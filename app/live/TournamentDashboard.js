@@ -217,8 +217,8 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
   return <section className={styles.page}>
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     {calcuttaAvailable ? <nav className={styles.destinations} aria-label="Select tournament destination">
-      <Link href="/live" aria-current={selectedRound !== "calcutta" ? "page" : undefined} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</Link>
-      <Link href="/live?view=calcutta" aria-current={selectedRound === "calcutta" ? "page" : undefined} onClick={openCalcutta}>Calcutta</Link>
+      <Link href="/app/tournament" aria-current={selectedRound !== "calcutta" ? "page" : undefined} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</Link>
+      <Link href="/app/tournament?view=calcutta" aria-current={selectedRound === "calcutta" ? "page" : undefined} onClick={openCalcutta}>Calcutta</Link>
     </nav> : null}
     {selectedRound === "calcutta" ? data?.calcutta ? <CalcuttaExperience model={data.calcutta} /> : <div className={styles.empty} role="status"><strong>{secondaryState === "error" ? "Calcutta is temporarily unavailable." : "Loading Calcutta…"}</strong><span>{secondaryState === "error" ? "The live Tournament remains available. This projected section can be retried independently." : "Loading the latest imported Director-published results."}</span>{secondaryState === "error" ? <button type="button" onClick={() => { setSecondaryState("idle"); openCalcutta(); }}>Try again</button> : null}</div> : <>
     <nav className={styles.rounds} aria-label="Select tournament round">{rounds.map((round) => <button type="button" aria-pressed={String(selectedRound) === String(round.number)} onClick={() => setSelectedRound(round.number)} key={round.number}>{round.label}</button>)}</nav>
@@ -243,7 +243,7 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
         <div>{matches.length ? matches.map((match) => <TournamentMatchCard match={match} round={round} tournament={tournament} key={match.id} />) : <MatchFilterEmptyState filter={activeFilter} round={round} className={styles.empty} />}</div>
       </details>;
     })}{!visibleRounds.length ? <div className={styles.empty} data-empty-reason={overallEmptyState.reason} role="status"><strong>{overallEmptyState.title}</strong><span>{overallEmptyState.detail}</span></div> : null}</div>
-    <Link className={styles.leaderboardsCta} href="/live?view=leaderboards">View Leaderboards <span aria-hidden="true">→</span></Link>
+    <Link className={styles.leaderboardsCta} href="/app/leaderboards">View Leaderboards <span aria-hidden="true">→</span></Link>
     </>}
   </section>;
 }

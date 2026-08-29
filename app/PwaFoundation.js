@@ -1,16 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { participantAppShellRoute } from "../lib/participant-shell.js";
 import styles from "./pwa-foundation.module.css";
 import { ConnectionBanner } from "./ui/StatePrimitives";
 
 export default function PwaFoundation() {
+  const pathname = usePathname();
   const [prompt, setPrompt] = useState(null);
   const [dismissed, setDismissed] = useState(true);
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [online, setOnline] = useState(true);
   const [updateReady, setUpdateReady] = useState(false);
-  const [showGlobalInstall, setShowGlobalInstall] = useState(false);
+  const participantPresentation = participantAppShellRoute(pathname);
+  const showGlobalInstall = participantPresentation && !["/home", "/participant-auth"].includes(pathname);
 
   useEffect(() => {
     let controllerChangeHandler = null;
@@ -41,9 +45,6 @@ export default function PwaFoundation() {
     window.addEventListener("online", syncOnlineState);
     window.addEventListener("offline", syncOnlineState);
     setDismissed(window.localStorage.getItem("sbi-pwa-prompt-dismissed") === "true");
-    // Authentication stays focused on sign-in; install guidance resumes on
-    // ordinary PWA routes where it cannot cover the primary auth action.
-    setShowGlobalInstall(!["/home", "/participant-auth"].includes(window.location.pathname));
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
@@ -71,6 +72,7 @@ export default function PwaFoundation() {
     };
   }, []);
 
+  if (!participantPresentation) return null;
   if (!online) return <ConnectionBanner state="offline">You’re offline. Saved information stays available.</ConnectionBanner>;
   if (updateReady) return <aside className={styles.update} role="status"><p>A newer version of SBI is ready.</p><button type="button" onClick={() => window.location.reload()}>Update</button></aside>;
   if (!showGlobalInstall || dismissed || (!prompt && !showIosHelp)) return null;

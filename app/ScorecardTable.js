@@ -24,11 +24,11 @@ function teeLabel(value) {
   return /\btees?$/i.test(tee) ? tee.replace(/\bTee$/i, "Tees") : `${tee} Tees`;
 }
 
-function PlayerLink({ name, slug }) {
-  return slug ? <Link href={`/players/${slug}`}>{name}</Link> : <>{name}</>;
+function PlayerLink({ name, slug, participantPresentation = false }) {
+  return slug ? <Link href={`${participantPresentation ? "/app/players" : "/players"}/${slug}`}>{name}</Link> : <>{name}</>;
 }
 
-function Participant({ scorecard, stackPairingIdentities = false }) {
+function Participant({ scorecard, stackPairingIdentities = false, participantPresentation = false }) {
   if (scorecard.scoreType === "TEAM") {
     const participantNames = scorecard.participantNames || [];
     const accessibleName = [participantNames.join(" and "), "Scramble scoring side"]
@@ -40,7 +40,7 @@ function Participant({ scorecard, stackPairingIdentities = false }) {
           <div className={pairingStyles.pairingNames}>
             {participantNames.map((name, index) => (
               <strong key={`${scorecard.matchId}-${scorecard.teamId}-${index}`}>
-                <PlayerLink name={name} slug={scorecard.participantSlugs?.[index]} />
+                <PlayerLink name={name} slug={scorecard.participantSlugs?.[index]} participantPresentation={participantPresentation} />
               </strong>
             ))}
           </div>
@@ -50,7 +50,7 @@ function Participant({ scorecard, stackPairingIdentities = false }) {
             {participantNames.map((name, index) => (
               <span key={`${scorecard.matchId}-${scorecard.teamId}-${index}`}>
                 {index ? " + " : ""}
-                <PlayerLink name={name} slug={scorecard.participantSlugs?.[index]} />
+                <PlayerLink name={name} slug={scorecard.participantSlugs?.[index]} participantPresentation={participantPresentation} />
               </span>
             ))}
           </small>
@@ -60,7 +60,7 @@ function Participant({ scorecard, stackPairingIdentities = false }) {
   }
   return (
     <strong>
-      <PlayerLink name={scorecard.playerName || scorecard.playerId || "Player"} slug={scorecard.playerSlug} />
+      <PlayerLink name={scorecard.playerName || scorecard.playerId || "Player"} slug={scorecard.playerSlug} participantPresentation={participantPresentation} />
     </strong>
   );
 }
@@ -124,6 +124,7 @@ function ScoreGrid({
   stackPairingIdentities = false,
   hideHoleWinnerSummary = false,
   suppressHoleWinners = false,
+  participantPresentation = false,
 }) {
   const start = segment === "back" ? 10 : 1;
   const end = segment === "front" ? 9 : 18;
@@ -144,7 +145,7 @@ function ScoreGrid({
   for (const scorecard of ordered) {
     rows.push(
       <tr key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
-        <th><Participant scorecard={scorecard} stackPairingIdentities={stackPairingIdentities} /></th>
+        <th><Participant scorecard={scorecard} stackPairingIdentities={stackPairingIdentities} participantPresentation={participantPresentation} /></th>
         {holeNumbers.map((holeNumber) => (
           <ScoreCell
             hole={scorecard.holes.find((hole) => hole.holeNumber === holeNumber)}
@@ -233,7 +234,7 @@ function ScoreGrid({
   );
 }
 
-function ScorecardSummary({ scorecards, stackPairingIdentities }) {
+function ScorecardSummary({ scorecards, stackPairingIdentities, participantPresentation = false }) {
   return <div className={summaryStyles.summary} aria-label="Scorecard totals">
     {scorecards.map((scorecard) => {
       const strokes = scorecard.historySummary
@@ -243,7 +244,7 @@ function ScorecardSummary({ scorecards, stackPairingIdentities }) {
         ? scorecard.historySummary.netTotal
         : scorecard.netTotals?.total;
       return <div className={`${summaryStyles.row} ${density.summaryRow}`} key={`${scorecard.matchId}-${scorecard.scoreType}-${scorecard.playerId || scorecard.teamId}`}>
-        <span><Participant scorecard={scorecard} stackPairingIdentities={stackPairingIdentities} /></span>
+        <span><Participant scorecard={scorecard} stackPairingIdentities={stackPairingIdentities} participantPresentation={participantPresentation} /></span>
         <dl>
           <div><dt>Gross</dt><dd>{scorecard.total ?? "—"}</dd></div>
           <div><dt>Strokes</dt><dd>{strokes ?? "—"}</dd></div>
@@ -263,6 +264,7 @@ export default function ScorecardTable({
   showSummary = false,
   stackPairingIdentities = false,
   historicalCoverage = null,
+  participantPresentation = false,
 }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
@@ -360,20 +362,20 @@ export default function ScorecardTable({
             </div>
           ) : null}
 
-          {showSummary ? <ScorecardSummary scorecards={available} stackPairingIdentities={stackPairingIdentities} /> : null}
+          {showSummary ? <ScorecardSummary scorecards={available} stackPairingIdentities={stackPairingIdentities} participantPresentation={participantPresentation} /> : null}
 
           {(!deferClosedContent || !mobileHistoryLayout) ? <div className={styles.desktopGrid}>
-            <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
+            <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} participantPresentation={participantPresentation} />
           </div> : null}
 
           {(!deferClosedContent || mobileHistoryLayout) ? <div className={`${styles.mobileGrid} ${historyDensity ? density.mobileGrid : ""}`}>
             {hasFront ? <section>
               <header><strong>Front 9</strong><span>Holes 1–9</span></header>
-              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="front" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
+              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="front" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} participantPresentation={participantPresentation} />
             </section> : null}
             {hasBack ? <section>
               <header><strong>Back 9</strong><span>Holes 10–18</span></header>
-              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="back" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} />
+              <ScoreGrid hideHoleWinnerSummary={historyDensity} scorecards={available} segment="back" suppressHoleWinners={partialIdentityCoverage} stackPairingIdentities={stackPairingIdentities} participantPresentation={participantPresentation} />
             </section> : null}
           </div> : null}
 

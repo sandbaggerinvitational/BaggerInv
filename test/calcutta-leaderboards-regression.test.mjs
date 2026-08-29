@@ -48,9 +48,9 @@ test("Tournament remains the canonical accessible Calcutta parent", async () => 
     source("app/live/TournamentDashboard.js"),
     source("lib/participant-shell.js"),
   ]);
-  assert.match(tournament, /href="\/live\?view=calcutta"/);
+  assert.match(tournament, /href="\/app\/tournament\?view=calcutta"/);
   assert.match(tournament, /<CalcuttaExperience model=\{data\.calcutta\}/);
-  assert.equal(participantDestination("/live", "view=calcutta"), "Tournament");
+  assert.equal(participantDestination("/app/tournament", "view=calcutta"), "Tournament");
   assert.doesNotMatch(shell, /Google|googleapis|script\.google/);
 });
 

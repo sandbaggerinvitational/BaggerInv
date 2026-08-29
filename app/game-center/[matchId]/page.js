@@ -1,4 +1,3 @@
-import { Header } from "../../components";
 import PreviewModeBadge from "../../PreviewModeBadge";
 import { privatePageMetadata } from "../../../lib/seo";
 import GameCenter from "../GameCenter";
@@ -19,7 +18,7 @@ export const metadata = privatePageMetadata("Game Center | Sandbagger Invitation
 function safeReturnContext(value) {
   const context = String(value || "").trim();
   if (["home", "my-match", "tournament"].includes(context)) return context;
-  if (context.startsWith("/live?view=leaderboards")) return context;
+  if (context.startsWith("/live?view=leaderboards") || context.startsWith("/app/leaderboards")) return context;
   return "my-match";
 }
 
@@ -47,7 +46,6 @@ export default async function GameCenterPage({ params, searchParams }) {
 
   return <main className={styles.page}>
     <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
-    <Header homeHref="/home" />
     <div className={styles.content}>
       <GameCenter initialData={initialData} matchId={matchId} backTo={backTo} />
     </div>

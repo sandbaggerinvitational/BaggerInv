@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { Header } from "../../components";
+import { Header, Footer } from "../../components";
 import HistoryNavigation from "../../history/HistoryNavigation";
 import AssetImage from "../../AssetImage";
 import ExternalLinkConfirm from "../../ExternalLinkConfirm";
@@ -73,7 +73,15 @@ function NineScorecard({ holes, label }) {
   </div>;
 }
 
-export default async function CoursePage({ params, searchParams }) {
+const coursePresentationHref = (href, participantPresentation) => {
+  if (!participantPresentation) return href;
+  return String(href || "")
+    .replace(/^\/courses(?=\/|\?|$)/, "/app/courses")
+    .replace(/^\/history(?=\/|\?|$)/, "/app/history")
+    .replace(/^\/tournament-guide(?=\/|\?|$)/, "/app/guide");
+};
+
+export default async function CoursePage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { courseId } = await params;
   const resolvedSearchParams = await searchParams;
@@ -89,14 +97,14 @@ export default async function CoursePage({ params, searchParams }) {
   const scheduleReturn = resolvedOriginReturn?.placement === "below-hero" ? resolvedOriginReturn : null;
   const originReturn = scheduleReturn ? null : resolvedOriginReturn;
   return <main className={styles.page} data-historical-course-source={resolved.source}>
-    <Header homeHref="/home" />
+    {participantPresentation ? null : <Header />}
     <section className={styles.hero}>
       {model.images[0] ? <AssetImage src={courseHero(model.images[0])} alt={`${course.Course} course`} className={styles.heroImage} fallbackClassName={styles.heroFallback} fallback={course.Course} loading="eager" width={1440} height={720} sizes="100vw" decoding="async" fetchPriority="high" /> : null}
       <div className={styles.heroShade} />
       <div className={styles.heroContent}>
         {historyReturn && !tournamentReturn ? <nav className={styles.historyNavigation} aria-label="History course navigation">
-          <Link href={historyReturn.href}>‹ {historyReturn.label}</Link>
-        </nav> : !historyReturn && originReturn ? <Link aria-label={originReturn.accessibleLabel} href={originReturn.href}>‹ {originReturn.label}</Link> : null}
+          <Link href={coursePresentationHref(historyReturn.href, participantPresentation)}>‹ {historyReturn.label}</Link>
+        </nav> : !historyReturn && originReturn ? <Link aria-label={originReturn.accessibleLabel} href={coursePresentationHref(originReturn.href, participantPresentation)}>‹ {originReturn.label}</Link> : null}
         <div className={styles.identity}>
           <div className={styles.logoPlate}><AssetImage src={courseLogo(course["Course Logo"])} alt={`${course.Course} logo`} className={styles.logo} fallbackClassName={styles.logoFallback} fallback="⛳" loading="eager" /></div>
           <div><span>{model.location}</span><h1>{course.Course}</h1>{course.Designer ? <p>{course.Designer}</p> : null}</div>
@@ -107,7 +115,7 @@ export default async function CoursePage({ params, searchParams }) {
     {scheduleReturn ? <HistoryNavigation
       ariaLabel="Schedule course navigation"
       left={{
-        href: scheduleReturn.href,
+        href: coursePresentationHref(scheduleReturn.href, participantPresentation),
         label: scheduleReturn.label,
         direction: "left",
         ariaLabel: scheduleReturn.accessibleLabel,
@@ -118,14 +126,14 @@ export default async function CoursePage({ params, searchParams }) {
     {tournamentReturn ? <HistoryNavigation
       ariaLabel={`${tournamentReturn.label} course history navigation`}
       left={{
-        href: tournamentReturn.href,
+        href: coursePresentationHref(tournamentReturn.href, participantPresentation),
         label: "Tournament",
         detail: String(resolvedSearchParams.year),
         direction: "left",
         ariaLabel: tournamentReturn.label,
       }}
       right={historyReturn && Number.isInteger(Number(resolvedSearchParams?.round)) ? {
-        href: historyReturn.href,
+        href: coursePresentationHref(historyReturn.href, participantPresentation),
         label: "Round",
         detail: `Round ${Number(resolvedSearchParams.round)}`,
         direction: "right",
@@ -145,5 +153,6 @@ export default async function CoursePage({ params, searchParams }) {
 
       {website ? <div className={styles.actions}><ExternalLinkConfirm href={website}>Visit Official Course Website →</ExternalLinkConfirm></div> : null}
     </div>
+    {participantPresentation ? null : <Footer />}
   </main>;
 }

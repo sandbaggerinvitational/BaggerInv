@@ -23,6 +23,9 @@ function withEnvironment(values, callback) {
 
 const sheetData = fs.readFileSync(new URL("../app/live/sheetData.js", import.meta.url), "utf8");
 const homePage = fs.readFileSync(new URL("../app/page.js", import.meta.url), "utf8");
+const participantHomePage = fs.readFileSync(new URL("../app/home/page.js", import.meta.url), "utf8");
+const participantTournamentPage = fs.readFileSync(new URL("../app/app/tournament/page.js", import.meta.url), "utf8");
+const participantLeaderboardsPage = fs.readFileSync(new URL("../app/app/leaderboards/page.js", import.meta.url), "utf8");
 const mobileHome = fs.readFileSync(new URL("../app/MobileTournamentHome.js", import.meta.url), "utf8");
 const livePage = fs.readFileSync(new URL("../app/live/page.js", import.meta.url), "utf8");
 const matchCenter = fs.readFileSync(new URL("../app/live/MatchCenter.js", import.meta.url), "utf8");
@@ -54,19 +57,27 @@ test("Preview mobile tournament payload uses authenticated normalized tabs", () 
   assert.doesNotMatch(sheetData, /Website Feed/);
 });
 
-test("Home, Tournament, and Leaderboards share the selected tournament contract", () => {
+test("website Home and participant Tournament/Leaderboards share source contracts without sharing presentation", () => {
   assert.match(homePage, /readHomepageCurrentTournament/);
-  assert.doesNotMatch(homePage, /getTournamentData|sheetData/);
-  assert.match(homePage, /mobileTournamentDashboardEnabled\(liveData\?\.tournament\)/);
-  assert.match(livePage, /getTournamentData/);
-  assert.match(matchCenter, /view"\) === "leaderboards"/);
+  assert.doesNotMatch(homePage, /getTournamentData|sheetData|MobileTournamentHome|mobileTournamentDashboardEnabled/);
+  assert.match(participantHomePage, /MobileTournamentHome/);
+  assert.match(livePage, /requireTournamentReadSource/);
+  assert.match(livePage, /presentation=\{participantPresentation \? "participant" : "public"\}/);
+  assert.match(participantTournamentPage, /requireTournamentReadSource/);
+  assert.match(participantTournamentPage, /TournamentSupabaseRead/);
+  assert.match(participantLeaderboardsPage, /requireLeaderboardsCoreReadSource/);
+  assert.match(participantLeaderboardsPage, /LeaderboardsSupabaseRead/);
+  assert.match(livePage, /const view = String\(query\?\.view \|\| ""\)\.trim\(\)/);
+  assert.match(matchCenter, /const focusedView = searchParams\.get\("view"\)/);
+  assert.match(matchCenter, /const focusedBack = <Link href="\/live">/);
   assert.doesNotMatch(homePage, /Website Feed/);
   assert.doesNotMatch(livePage, /Website Feed/);
   assert.doesNotMatch(matchCenter, /Website Feed/);
 });
 
 test("Upcoming normalized tournaments retain mobile dashboard and empty standings behavior", () => {
-  assert.match(homePage, /MobileTournamentHome/);
+  assert.match(participantHomePage, /MobileTournamentHome/);
+  assert.doesNotMatch(homePage, /MobileTournamentHome/);
   assert.match(mobileHome, /TournamentCommandCenter/);
   assert.match(matchCenter, /Player Standings/);
   assert.match(matchCenter, /No points have been decided in this round yet/);

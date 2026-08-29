@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { refreshCanonical2017To2022HistoricalData, refreshHistoricalData } from "../../../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header } from "../../../../components";
+import { Header, Footer } from "../../../../components";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
 import PublicMatchCard from "../../../../PublicMatchCard";
 import {
@@ -94,7 +94,14 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default async function TeamSeasonPage({ params, searchParams }) {
+const historyPresentationHref = (href, participantPresentation) => {
+  if (!participantPresentation) return href;
+  return String(href || "")
+    .replace(/^\/history(?=\/|\?|$)/, "/app/history")
+    .replace(/^\/players(?=\/|\?|$)/, "/app/players");
+};
+
+export default async function TeamSeasonPage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { year, side } = await params;
   const query = await searchParams;
@@ -124,7 +131,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
         throw new Error("The 2026 historical team match view is incomplete.");
       }
     } catch {
-      return <HistoryUnavailablePage year={year} section="Team History" />;
+      return <HistoryUnavailablePage year={year} section="Team History" participantPresentation={participantPresentation} />;
     }
   } else if (useSupabaseCompleted) {
     try {
@@ -141,7 +148,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
       }
       resolveHistoryPlayer = (slug) => completedHistoryResolvePlayer(view, slug);
     } catch {
-      return <HistoryUnavailablePage year={year} section="Team History" />;
+      return <HistoryUnavailablePage year={year} section="Team History" participantPresentation={participantPresentation} />;
     }
   } else {
     try {
@@ -150,7 +157,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
         : refreshHistoricalData());
     } catch {
       if (isStep3CCompletedHistoryYear(year)) {
-        return <HistoryUnavailablePage year={year} section="Team History" />;
+        return <HistoryUnavailablePage year={year} section="Team History" participantPresentation={participantPresentation} />;
       }
       throw new Error(`Unable to load ${year} Team History.`);
     }
@@ -166,7 +173,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
 
   return (
     <main>
-      <Header />
+      {participantPresentation ? null : <Header />}
       <section className={`${styles.pageHero} ${styles.teamRosterHero} ${useSupabase2026 ? pwaStyles.teamHero : ""}`}>
         <TeamLogoPlate
           filename={team.logo}
@@ -184,12 +191,14 @@ export default async function TeamSeasonPage({ params, searchParams }) {
         </div>
       </section>
 
-      <PlayerProfileReturnNavigation context={playerReturnContext} />
+      <PlayerProfileReturnNavigation context={playerReturnContext
+        ? { ...playerReturnContext, href: historyPresentationHref(playerReturnContext.href, participantPresentation) }
+        : null} />
 
       <HistoryNavigation
         ariaLabel={`${team.year} team history navigation`}
         left={{
-          href: `/history/${team.year}`,
+          href: historyPresentationHref(`/history/${team.year}`, participantPresentation),
           label: "Tournament",
           detail: String(team.year),
           direction: "left",
@@ -208,7 +217,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
                 <Link
                   aria-label={`${group.label}, ${getFormatName(group.format)}, ${group.course?.Course || "course not recorded"}, ${roundStatusLabel(group.lifecycle)}. View round results.`}
                   className={pwaStyles.teamRoundSummary}
-                  href={`/history/${team.year}/round/${group.number}`}
+                  href={historyPresentationHref(`/history/${team.year}/round/${group.number}`, participantPresentation)}
                   key={group.number}
                 >
                   <span>
@@ -238,7 +247,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
             <Link
               aria-label={`${player["Display Name"]}${isCaptain ? ", Team Captain" : ""}, Tournament Handicap ${handicapLabel}`}
               className={styles.rosterCard}
-              href={`/players/${player.slug}`}
+              href={historyPresentationHref(`/players/${player.slug}`, participantPresentation)}
               key={player["Player ID"]}
             >
               <span>
@@ -271,7 +280,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
                 </h3>
                 <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.teamMatchList : ""}`}>
                   {group.matches.map((match) => (
-                    <PublicMatchCard key={match.id} match={match} round={{ label: group.label, format: group.format }} tournament={team.tournament} variant="historical" />
+                    <PublicMatchCard key={match.id} match={match} round={{ label: group.label, format: group.format }} tournament={team.tournament} variant="historical" participantPresentation={participantPresentation} />
                   ))}
                 </div>
               </section>
@@ -280,6 +289,7 @@ export default async function TeamSeasonPage({ params, searchParams }) {
         ) : null}
       </section>
       <HistoryBackToTop />
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

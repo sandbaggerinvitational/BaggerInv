@@ -57,7 +57,7 @@ test("Team History owns identity, round summaries, and roster without match-deta
   const page = await source("app/history/[year]/team/[side]/page.js");
   assert.match(page, /Tournament Performance/);
   assert.match(page, /Tournament Handicaps/);
-  assert.match(page, /href=\{`\/history\/\$\{team\.year\}\/round\/\$\{group\.number\}`\}/);
+  assert.match(page, /href=\{historyPresentationHref\(`\/history\/\$\{team\.year\}\/round\/\$\{group\.number\}`, participantPresentation\)\}/);
   assert.doesNotMatch(page, /HistoricalMatchRow|ScorecardTable|Match story/i);
 });
 

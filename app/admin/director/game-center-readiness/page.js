@@ -10,6 +10,6 @@ export const metadata = { title: "Game Center Readiness | Sandbagger Invitationa
 export default async function GameCenterReadinessPage() {
   const store = await cookies();
   const result = await authorizePreviewDirector({ cookieStore: store, allowBootstrap: true });
-  if (result.status !== "active") redirect("/home");
-  return <main><Header homeHref="/home" /><GameCenterReadinessClient /></main>;
+  if (result.status !== "active") redirect("/");
+  return <main><Header /><GameCenterReadinessClient /></main>;
 }

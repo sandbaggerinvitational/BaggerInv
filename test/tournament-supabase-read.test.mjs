@@ -89,7 +89,7 @@ test("Match Center advertises Calcutta only for an available published presentat
 
   const dashboard = await source("app/live/TournamentDashboard.js");
   assert.match(dashboard, /const calcuttaAvailable = calcuttaDestinationAvailable\(data\)/);
-  assert.match(dashboard, /\{calcuttaAvailable \? <nav[\s\S]*href="\/live\?view=calcutta"[\s\S]*<\/nav> : null\}/);
+  assert.match(dashboard, /\{calcuttaAvailable \? <nav[\s\S]*href="\/app\/tournament\?view=calcutta"[\s\S]*<\/nav> : null\}/);
 });
 
 test("canonical Supabase live state produces deterministic points, progress, and momentum", () => {

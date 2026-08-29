@@ -22,6 +22,7 @@ const [
   scoringCss,
   profileCss,
   serviceWorker,
+  participantProfileRoute,
 ] = await Promise.all([
   source("app/players/[slug]/page.js"),
   source("app/players/[slug]/PlayerIntelligenceSections.js"),
@@ -40,14 +41,17 @@ const [
   source("app/scoring-stats.module.css"),
   source("app/historical.module.css"),
   source("public/sw.js"),
+  source("app/app/players/[slug]/page.js"),
 ]);
 
-test("Career Profile is owned by the PWA shell without its website header or footer", () => {
-  assert.match(shell, /\/\^\\\/players\\\/\[\^\/\]\+\$\//);
+test("Career Profile presentation is selected by URL instead of participant session", () => {
+  assert.match(shell, /\/app\/players/);
   assert.match(shell, /return "Career Profile"/);
   assert.match(profile, /<main data-career-profile>/);
   assert.match(profile, /<HistoryNavigation/);
-  assert.doesNotMatch(profile, /<Header|<Footer|ContextBackLink/);
+  assert.match(profile, /participantPresentation \? null : <Header \/>/);
+  assert.match(profile, /participantPresentation \? null : <Footer \/>/);
+  assert.match(participantProfileRoute, /participantPresentation: true/);
   assert.match(layout, /<ParticipantRouteFrame navigation=\{<Suspense fallback=\{null\}><ParticipantIdentity/);
 });
 
@@ -125,7 +129,7 @@ test("all historical destinations share the same canonical, fail-closed Player r
   for (const destination of [overview, round, team]) {
     assert.match(destination, /isCompletedHistoryPlayerYear/);
     assert.match(destination, /playerOriginReturnContext\(query, getPlayerBySlug\)/);
-    assert.match(destination, /<PlayerProfileReturnNavigation context=\{playerReturnContext\} \/>/);
+    assert.match(destination, /<PlayerProfileReturnNavigation context=\{playerReturnContext[\s\S]*historyPresentationHref\(playerReturnContext\.href, participantPresentation\)/);
   }
   assert.match(playerReturn, /<HistoryNavigation/);
   assert.match(playerReturn, /href: context\.href/);

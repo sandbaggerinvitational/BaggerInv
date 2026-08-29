@@ -14,10 +14,7 @@ export default function ParticipantRouteFrame({ children, navigation }) {
     return () => document.body.classList.remove("participant-app-shell-active");
   }, [appRoute]);
 
-  if (!appRoute) return <>
-    <div className="pwa-app-scene" data-participant-route={pathname}>{children}</div>
-    {navigation}
-  </>;
+  if (!appRoute) return <div className="pwa-app-scene" data-participant-route={pathname}>{children}</div>;
 
   return <div className="participantAppShell" data-participant-app-shell data-route={pathname}>
     <ParticipantAppHeader />

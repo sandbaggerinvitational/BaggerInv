@@ -22,7 +22,7 @@ test("2017–2025 Archive cards use the canonical Tournament History destination
     .sort((a, b) => a - b);
 
   assert.deepEqual(archiveYears, completedYears);
-  assert.match(archivePage, /href=\{`\/history\/\$\{tournament\.year\}`\}/);
+  assert.match(archivePage, /href=\{`\$\{participantPresentation \? "\/app\/history" : "\/history"\}\/\$\{tournament\.year\}`\}/);
   assert.match(archivePage, /`View \$\{tournament\.year\} Tournament History`/);
   assert.doesNotMatch(archivePage, /from=player|player=/);
 });
@@ -46,15 +46,15 @@ test("the full Archive card link has semantic focus treatment without nested lin
 
 test("2026 preserves its current in-progress Archive behavior", () => {
   assert.equal(historyTournamentCardResult({ year: 2026 }), "Tournament in progress");
-  assert.match(archivePage, /href=\{`\/history\/\$\{tournament\.year\}`\}/);
+  assert.match(archivePage, /href=\{`\$\{participantPresentation \? "\/app\/history" : "\/history"\}\/\$\{tournament\.year\}`\}/);
   assert.match(archivePage, /historyTournamentCardResult\(tournament\)/);
   assert.doesNotMatch(archivePage, /View 2026 Champion/);
 });
 
 test("normal Archive entry and explicit Player-origin History remain distinct", () => {
   assert.doesNotMatch(archivePage, /withPlayerOriginContext|from=player|player=/);
-  assert.match(yearPage, /<PlayerProfileReturnNavigation context=\{playerReturnContext\} \/>/);
-  assert.match(yearPage, /href: "\/history"[\s\S]*label: "All Tournament Years"/);
+  assert.match(yearPage, /<PlayerProfileReturnNavigation context=\{playerReturnContext[\s\S]*historyPresentationHref\(playerReturnContext\.href, participantPresentation\)/);
+  assert.match(yearPage, /href: historyPresentationHref\("\/history", participantPresentation\)[\s\S]*label: "All Tournament Years"/);
 });
 
 test("the public Champions product remains available outside the PWA", () => {

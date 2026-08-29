@@ -13,8 +13,9 @@ const identityHeaderUrl = new URL("../app/TournamentIdentityHeader.js", import.m
 const identityStylesUrl = new URL("../app/tournament-identity-header.module.css", import.meta.url);
 
 test("Tournament dashboard uses the shared tournament identity header", async () => {
-  const [source, styles, center, home, header] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(centerUrl, "utf8"), readFile(homeUrl, "utf8"), readFile(identityHeaderUrl, "utf8")]);
-  assert.match(center, /<TournamentDashboard \{\.\.\.props\} \/>/);
+  const [source, styles, participantPage, home, header] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(new URL("../app/app/tournament/page.js", import.meta.url), "utf8"), readFile(homeUrl, "utf8"), readFile(identityHeaderUrl, "utf8")]);
+  assert.match(participantPage, /<TournamentSupabaseRead initialView=\{initialView\}/);
+  assert.match(participantPage, /<TournamentDashboard initialData=\{data\}/);
   assert.match(source, /import TournamentIdentityHeader from "\.\.\/TournamentIdentityHeader"/);
   assert.match(home, /import TournamentIdentityHeader from "\.\/TournamentIdentityHeader"/);
   assert.match(source, /<TournamentIdentityHeader variant="hero" year=\{tournament\.year\}/);
@@ -187,7 +188,7 @@ test("dedicated Leaderboards retains Scramble pairing rows after Tournament remo
 test("Tournament delegates all full standings to the dedicated Leaderboards destination", async () => {
   const source = await readFile(componentUrl, "utf8");
   assert.doesNotMatch(source, /function OverallLeaderboard|function ScoreLeaderboard|Round Leaderboard|Individual Gross & Net/);
-  assert.match(source, /href="\/live\?view=leaderboards">View Leaderboards/);
+  assert.match(source, /href="\/app\/leaderboards">View Leaderboards/);
 });
 
 test("Snapshot counts use distinct live, remaining, and final labels", async () => {
@@ -249,11 +250,10 @@ test("Official final result text is retained from the finalized row", async () =
   assert.match(source, /formatStoredMatchResult\(match/);
 });
 
-test("Tournament-only footer is compact in mobile browser and absent in standalone mode", async () => {
-  const [styles, page] = await Promise.all([readFile(stylesUrl, "utf8"), readFile(pageUrl, "utf8")]);
-  assert.match(page, /className=\{styles\.tournamentFooter\}/);
-  assert.match(styles, /@media\(display-mode:standalone\)\{\.tournamentFooter\{display:none\}\}/);
-  assert.match(styles, /@media\(max-width:699px\)\{\.tournamentFooter/);
+test("public Match Center owns the website Footer while participant Tournament relies on the app shell", async () => {
+  const [page, participantPage] = await Promise.all([readFile(pageUrl, "utf8"), readFile(new URL("../app/app/tournament/page.js", import.meta.url), "utf8")]);
+  assert.match(page, /participantPresentation \? null : <Footer \/>/);
+  assert.doesNotMatch(participantPage, /<Footer|tournamentFooter/);
 });
 
 test("Frozen Home and My Match implementations remain untouched by Tournament styling", async () => {

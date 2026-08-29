@@ -8,13 +8,9 @@ import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
 import { tournamentStartTimestamp } from "../lib/tournament-countdown";
 import AssetImage from "./AssetImage";
 import TournamentStatusHero from "./TournamentStatusHero";
-import { mobileTournamentDashboardEnabled } from "../lib/spreadsheet-environment";
-import MobileTournamentHome from "./MobileTournamentHome";
 import StatusBadge from "./StatusBadge";
-import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
 import { readHomepageCurrentTournament } from "../lib/homepage-current-tournament";
 import { requireHomepageCurrentReadSource } from "../lib/tournament-read-source";
-import { requireParticipantIdentityAuthority } from "../lib/participant-identity-authority";
 import { loadCompletedHistoryYears } from "../lib/completed-history-service";
 import { loadHistory2026View } from "../lib/history-2026-service";
 import { applicationPageEnvironment } from "../lib/production-shadow-request-environment";
@@ -37,7 +33,6 @@ function playerName(player) {
 export default async function Home() {
   const env = await applicationPageEnvironment();
   const homepageSource = requireHomepageCurrentReadSource(env);
-  const participantIdentityAuthority = requireParticipantIdentityAuthority(env).resolved;
   let currentRead = null;
   let tournaments = [];
   let currentTournament = {};
@@ -139,16 +134,8 @@ export default async function Home() {
     },
   };
 
-  if (mobileTournamentDashboardEnabled(liveData?.tournament)) {
-    return <>
-      <PwaSplashIdentityBridge tournament={presentationLiveData?.tournament || null} />
-      <MobileTournamentHome liveData={presentationLiveData} participantIdentityAuthority={participantIdentityAuthority} />
-    </>;
-  }
-
   return (
     <>
-      <PwaSplashIdentityBridge tournament={presentationLiveData?.tournament || null} />
       <main>
       <Header />
 

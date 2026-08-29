@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { refreshHistoricalData } from "../../lib/stats";
 import Link from "next/link";
+import { Header, Footer } from "../components";
 import PlayerAvatar from "../PlayerAvatar";
 import { CompactHonors } from "../HonorBadges";
 import { playerDirectoryHref } from "../../lib/context-navigation";
@@ -22,7 +23,7 @@ export const metadata = pageMetadata({
   path: "/players",
 });
 
-export default async function PlayersPage({ searchParams }) {
+export default async function PlayersPage({ searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const useSupabase = isSupabaseSecondaryHistory(env);
   const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
@@ -34,6 +35,7 @@ export default async function PlayersPage({ searchParams }) {
 
   return (
     <main data-secondary-history-source={useSupabase ? "supabase" : "google"}>
+      {participantPresentation ? null : <Header />}
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>The Competitors</p>
         <h1>Sandbaggers</h1>
@@ -48,9 +50,9 @@ export default async function PlayersPage({ searchParams }) {
           {players.map(({ player, stats }) => (
             <Link
               className={styles.playerCard}
-              href={`/players/${player.slug}?returnTo=${encodeURIComponent(
-                directoryHref
-              )}`}
+              href={participantPresentation
+                ? `/app/players/${player.slug}`
+                : `/players/${player.slug}?returnTo=${encodeURIComponent(directoryHref)}`}
               key={player["Player ID"]}
             >
               <div className={styles.playerTop}>
@@ -121,7 +123,7 @@ export default async function PlayersPage({ searchParams }) {
           ))}
         </div>
       </section>
-
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

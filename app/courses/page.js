@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
+import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
 import { courseLogo } from "../../lib/asset-paths";
 import {
@@ -24,7 +25,14 @@ export const metadata = pageMetadata({
 
 const formatName = (value) => ({ BB: "2v2 Best Ball", SC: "Scramble", SI: "Singles" })[String(value || "").trim().toUpperCase()] || value || "";
 
-export default async function CoursesPage({ searchParams }) {
+const coursePresentationHref = (href, participantPresentation) => {
+  if (!participantPresentation) return href;
+  return String(href || "")
+    .replace(/^\/courses(?=\/|\?|$)/, "/app/courses")
+    .replace(/^\/tournament-guide(?=\/|\?|$)/, "/app/guide");
+};
+
+export default async function CoursesPage({ searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const archive = String((await searchParams)?.view || "") === "archive";
   const archiveSource = archive ? requireHistoricalCourseReadSource(env) : null;
@@ -43,8 +51,9 @@ export default async function CoursesPage({ searchParams }) {
 
   return (
     <main data-historical-course-source={archive ? archiveSource.resolved : "current-guide"}>
+      {participantPresentation ? null : <Header />}
       <section className={`${styles.content} ${guideStyles.guideDetailShell}`}>
-        <Link className={guideStyles.backToGuide} href="/tournament-guide">‹ Tournament Guide</Link>
+        <Link className={guideStyles.backToGuide} href={participantPresentation ? "/app/guide" : "/tournament-guide"}>‹ Tournament Guide</Link>
         <header className={guideStyles.detailHeading}>
           <p className={styles.eyebrow}>{archive ? "Course Archive" : `${tournament?.year || "Current"} Tournament`}</p>
           <h1>{archive ? "Every Tournament Course" : "Courses"}</h1>
@@ -60,12 +69,12 @@ export default async function CoursesPage({ searchParams }) {
               {group.appearances.map((course) => <Link
                 aria-label={`View ${group.year} Round ${course.round} — ${course.Course}`}
                 className={`${styles.courseIndexCard} ${courseStyles.archiveCard}`}
-                href={courseProfileHref({
+                href={coursePresentationHref(courseProfileHref({
                   courseId: course["Course ID"],
                   origin: COURSE_ORIGINS.ARCHIVE,
                   year: group.year,
                   round: course.round,
-                })}
+                }), participantPresentation)}
                 key={`${group.year}-${course.round}-${course["Course ID"]}`}
                 prefetch={false}
               >
@@ -88,7 +97,7 @@ export default async function CoursesPage({ searchParams }) {
         </div> : <div className={styles.courseIndexGrid}>
           {courses.map((course) => <Link
             className={styles.courseIndexCard}
-            href={courseProfileHref({ courseId: course["Course ID"], origin: COURSE_ORIGINS.CURRENT })}
+            href={coursePresentationHref(courseProfileHref({ courseId: course["Course ID"], origin: COURSE_ORIGINS.CURRENT }), participantPresentation)}
             key={course["Course ID"]}
           >
             <AssetImage
@@ -103,8 +112,9 @@ export default async function CoursesPage({ searchParams }) {
             <span>{[courseRoundLabel(course.Round), formatName(course.Format), course["Tee Played"] ? `${course["Tee Played"]} Tees` : ""].filter(Boolean).join(" • ")}</span>
           </Link>)}
         </div>}
-        <Link className={guideStyles.secondaryAction} href={archive ? "/courses" : "/courses?view=archive"}>{archive ? "View Current Tournament" : "View Course Archive"} →</Link>
+        <Link className={guideStyles.secondaryAction} href={coursePresentationHref(archive ? "/courses" : "/courses?view=archive", participantPresentation)}>{archive ? "View Current Tournament" : "View Course Archive"} →</Link>
       </section>
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

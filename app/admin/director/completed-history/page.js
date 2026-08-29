@@ -15,6 +15,6 @@ export default async function CompletedHistoryPage() {
   if (process.env.VERCEL_ENV !== "preview") notFound();
   const store = await cookies();
   const result = await authorizePreviewDirector({ cookieStore: store, allowBootstrap: false });
-  if (result.status !== "active") redirect("/home");
-  return <main><Header homeHref="/home" /><CompletedHistoryClient /></main>;
+  if (result.status !== "active") redirect("/");
+  return <main><Header /><CompletedHistoryClient /></main>;
 }

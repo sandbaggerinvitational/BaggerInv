@@ -10,6 +10,6 @@ export const metadata = { title: "Tournament Director | Sandbagger Invitational"
 export default async function DirectorPage() {
   const store = await cookies();
   const result = await authorizePreviewDirector({ cookieStore: store, allowBootstrap: true });
-  if (["inactive", "forbidden"].includes(result.status)) redirect("/home");
-  return <main><Header homeHref="/home" /><DirectorDashboard directorName={result.identity?.actor?.name || "Tournament Director"} /></main>;
+  if (["inactive", "forbidden"].includes(result.status)) redirect("/");
+  return <main><Header /><DirectorDashboard directorName={result.identity?.actor?.name || "Tournament Director"} /></main>;
 }

@@ -32,12 +32,15 @@ function winnerColor(match, side) {
   return "#777d79";
 }
 
-function MatchRow({ match, playerName, playerSlug }) {
+function MatchRow({ match, playerName, playerSlug, participantPresentation = false }) {
   const opponents = match.opponents.map((player) => player.name).join(" + ");
   const partner = match.partner.map((player) => player.name).join(" + ");
-  const matchHref = match.href
+  const publicMatchHref = match.href
     ? withPlayerOriginContext(match.href, playerSlug)
     : null;
+  const matchHref = participantPresentation && publicMatchHref
+    ? publicMatchHref.replace(/^\/history(?=\/|\?|$)/, "/app/history")
+    : publicMatchHref;
 
   return (
     <article className={styles.profileMatchRow} id={`profile-match-${match.id}`}>
@@ -87,7 +90,7 @@ function MatchRow({ match, playerName, playerSlug }) {
   );
 }
 
-export default function PlayerFormatMatchHistory({ history, playerName, playerSlug }) {
+export default function PlayerFormatMatchHistory({ history, playerName, playerSlug, participantPresentation = false }) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
   const [hasRenderedContent, setHasRenderedContent] = useState(false);
@@ -163,7 +166,7 @@ export default function PlayerFormatMatchHistory({ history, playerName, playerSl
                   </button>
                   <div id={yearId} hidden={!yearOpen}>
                     {group.matches.map((match) => (
-                      <MatchRow match={match} playerName={playerName} playerSlug={playerSlug} key={match.id} />
+                      <MatchRow match={match} playerName={playerName} playerSlug={playerSlug} participantPresentation={participantPresentation} key={match.id} />
                     ))}
                   </div>
                 </section>

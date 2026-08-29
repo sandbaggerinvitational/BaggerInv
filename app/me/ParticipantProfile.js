@@ -173,7 +173,7 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
     <section className={styles.card}>
       <div className={styles.sectionHeading}><span>Career</span><h2>Profile &amp; Matches</h2></div>
       <div className={styles.links}>
-        <Link href={profile.slug ? `/players/${profile.slug}` : "/players"}><strong>Career, history, and achievements</strong><span>Explore your Sandbagger Invitational player profile</span></Link>
+        <Link href={profile.slug ? `/app/players/${profile.slug}` : "/app/players"}><strong>Career, history, and achievements</strong><span>Explore your Sandbagger Invitational player profile</span></Link>
         <Link href="/my-match"><strong>My Matches</strong><span>Your tournament assignments and scorecards</span></Link>
       </div>
     </section>
@@ -181,7 +181,7 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
     <section className={styles.card}>
       <div className={styles.sectionHeading}><span>Resources</span><h2>Utilities</h2></div>
       <div className={styles.links}>
-        <Link href="/tournament-guide"><strong>Tournament Guide</strong><span>Schedule, rules, and important information</span></Link>
+        <Link href="/app/guide"><strong>Tournament Guide</strong><span>Schedule, rules, and important information</span></Link>
         <button className={nativeStyles.share} type="button" onClick={shareApp}><strong>Share SBI</strong><span>Open the iPhone Share Sheet or copy the website link</span></button>
       </div>
       {shareMessage ? <p className={nativeStyles.feedback} role="status">{shareMessage}</p> : null}

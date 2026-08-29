@@ -9,15 +9,17 @@ test("the five primary participant destinations and contextual parents remain ex
   const [navigation, styles] = await Promise.all([
     source("app/ParticipantIdentity.js"), source("app/participant-navigation.module.css"),
   ]);
-  for (const [href, label] of [["/home", "Home"], ["/my-match", "My Match"], ["/live", "Tournament"], ["/live?view=leaderboards", "Leaderboards"], ["/me", "Player"]]) {
+  for (const [href, label] of [["/home", "Home"], ["/my-match", "My Match"], ["/app/tournament", "Tournament"], ["/app/leaderboards", "Leaderboards"], ["/me", "Player"]]) {
     assert.match(navigation, new RegExp(`href: "${href.replaceAll("?", "\\?")}", label: "${label}"`));
   }
   assert.equal((navigation.match(/href: "/g) || []).length, 5);
   assert.equal(participantDestination("/game-center/M1"), "My Match");
   assert.equal(participantDestination("/score"), "My Match");
-  assert.equal(participantDestination("/live", "view=calcutta"), "Tournament");
-  assert.equal(participantDestination("/live", "view=leaderboards&tab=skins"), "Leaderboards");
-  assert.equal(participantDestination("/odds-center"), "Leaderboards");
+  assert.equal(participantDestination("/app/tournament", "view=calcutta"), "Tournament");
+  assert.equal(participantDestination("/app/leaderboards", "tab=skins"), "Leaderboards");
+  assert.equal(participantDestination("/app/odds"), "Leaderboards");
+  assert.equal(participantDestination("/live", "view=leaderboards"), "");
+  assert.equal(participantDestination("/odds-center"), "");
   assert.equal(participantDestination("/tournament-guide"), "");
   assert.equal(participantDestination("/history/2026"), "");
   assert.match(navigation, /aria-current=\{currentDestination === item\.label \? "page"/);
@@ -25,20 +27,20 @@ test("the five primary participant destinations and contextual parents remain ex
   assert.match(styles, /aria-current=page\] span\{[^}]*background:#f3e6c5/);
 });
 
-test("Tournament canonically owns the existing lazy Calcutta experience", async () => {
-  const [page, wrapper, tournament, leaderboards] = await Promise.all([
-    source("app/live/page.js"), source("app/live/TournamentSupabaseRead.js"),
+test("participant Tournament canonically owns the existing lazy Calcutta experience", async () => {
+  const [page, wrapper, tournament, leaderboards, publicLive] = await Promise.all([
+    source("app/app/tournament/page.js"), source("app/live/TournamentSupabaseRead.js"),
     source("app/live/TournamentDashboard.js"), source("app/live/LeaderboardsDashboard.js"),
+    source("app/live/page.js"),
   ]);
-  assert.match(page, /view === "leaderboards" && \(isLegacyCalcuttaModule\(leaderboardTab\) \|\| isLegacyCalcuttaModule\(leaderboardModule\)\)\) redirect\("\/live\?view=calcutta"\)/);
-  assert.ok(page.indexOf("isLegacyCalcuttaModule(leaderboardTab)") < page.indexOf("requireTournamentReadSource(env)"));
-  assert.match(page, /\(!view \|\| view === "calcutta"\)/);
-  assert.match(page, /<TournamentSupabaseRead initialView=\{view\}/);
+  assert.match(page, /String\(query\?\.view \|\| ""\) === "calcutta" \? "calcutta" : ""/);
+  assert.match(page, /<TournamentSupabaseRead initialView=\{initialView\}/);
   assert.match(wrapper, /<TournamentDashboard[\s\S]*initialView=\{initialView\}/);
-  assert.match(tournament, /href="\/live\?view=calcutta"/);
+  assert.match(tournament, /href="\/app\/tournament\?view=calcutta"/);
   assert.match(tournament, /secondaryReadUrl \+ "\?module=calcutta"/);
   assert.match(tournament, /<CalcuttaExperience model=\{data\.calcutta\}/);
   assert.doesNotMatch(leaderboards, /\["calcutta", "Calcutta"\]|tab === "calcutta"|CalcuttaExperience/);
+  assert.match(publicLive, /presentation=\{participantPresentation \? "participant" : "public"\}/);
 });
 
 test("Leaderboards owns exactly Players, Teams, Net Skins, and Insights", async () => {
@@ -90,7 +92,7 @@ test("My Match remains the assignment summary and Game Center remains one-match 
   assert.doesNotMatch(myMatch, /This isn’t me|This isn't me|Not you\?|Change player/i);
   assert.match(gameCenter, /Match Flow/);
   assert.match(gameCenter, /scorecardTable/);
-  assert.match(gameCenter, /leaderboardReturn \? backTo : "\/my-match"/);
+  assert.match(gameCenter, /const backHref = backTo === "home"[\s\S]*: "\/my-match"/);
   assert.match(scoreStyles, /participant-scoring-focus-active \[data-participant-navigation\]/);
 });
 

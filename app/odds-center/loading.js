@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Header, Footer } from "../components";
 import { claimOddsCenterLoadingReload } from "../../lib/odds-center-loading-recovery";
 
 const ROUTER_RECOVERY_AFTER_MS = 8_000;
@@ -35,7 +36,7 @@ export default function OddsCenterLoading() {
     };
   }, [router]);
 
-  return <main className="appLoading" aria-live="polite" aria-busy="true" aria-label="Loading Odds Center">
+  return <main><Header/><div className="appLoading" aria-live="polite" aria-busy="true" aria-label="Loading Odds Center">
     <div className="loadingBrand" role="status">Loading Odds Center…</div>
     <div className="loadingShell" aria-hidden="true">
       <div className="skeleton skeletonTitle" />
@@ -46,6 +47,6 @@ export default function OddsCenterLoading() {
         <div className="skeleton loadingCard" />
         <div className="skeleton loadingCard" />
       </div>
-    </div>
+    </div></div><Footer/>
   </main>;
 }

@@ -45,8 +45,8 @@ test("the shared derived label is compact uppercase muted sans-serif", () => {
 });
 
 test("gross identities and every Front 9, Back 9, and full-grid value stay on the existing path", () => {
-  assert.match(scorecard, /<th><Participant scorecard=\{scorecard\} stackPairingIdentities=\{stackPairingIdentities\} \/><\/th>/);
-  assert.equal([...scorecard.matchAll(/<ScoreGrid\b[^>]*stackPairingIdentities=\{stackPairingIdentities\} \/>/g)].length, 3);
+  assert.match(scorecard, /<th><Participant scorecard=\{scorecard\} stackPairingIdentities=\{stackPairingIdentities\} participantPresentation=\{participantPresentation\} \/><\/th>/);
+  assert.equal([...scorecard.matchAll(/<ScoreGrid\b[^>]*stackPairingIdentities=\{stackPairingIdentities\} participantPresentation=\{participantPresentation\} \/>/g)].length, 3);
   assert.match(scorecard, /<NetCell hole=\{netRow\.holes\.find/);
   assert.match(scorecard, /scorecard\.frontNine \?\? "—"/);
   assert.match(scorecard, /scorecard\.backNine \?\? "—"/);

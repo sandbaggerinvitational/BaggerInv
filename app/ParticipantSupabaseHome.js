@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "./components";
 import MobileTournamentHome from "./MobileTournamentHome";
 import PreviewModeBadge from "./PreviewModeBadge";
 import PwaSplashIdentityBridge from "./PwaSplashIdentityBridge";
@@ -90,7 +89,7 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
       schedule(() => {
         hydrateNetSkins();
         router.prefetch("/my-match");
-        router.prefetch("/live?view=leaderboards");
+        router.prefetch("/app/leaderboards");
         const selected = selectRelevantPlayerMatches(next.participant?.matches || [], next.participant?.tournament?.currentRound).primary;
         if (selected?.matchId) router.prefetch(`/game-center/${encodeURIComponent(selected.matchId)}?from=home`);
         recordParticipantAuthDiagnostic("HOME_SECONDARY_COMPLETE", { routeTo: "/home", durationMs: performance.now() - startedAt });
@@ -136,7 +135,6 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
   return <main className="mobileHomeMain">
     <PwaSplashIdentityBridge tournament={null} />
     <PreviewModeBadge visible />
-    <Header activeNavigationHref="/live" homeHref="/home" />
     {state === "error"
       ? <ErrorState title="Home is temporarily unavailable." message="Your latest saved information is unchanged. Check your connection and try again." onRetry={refresh} />
       : <ScreenSkeleton label={state === "signed-out" ? "Opening participant sign-in" : "Opening Home"} cards={3} />}

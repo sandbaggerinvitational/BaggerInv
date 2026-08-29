@@ -22,11 +22,11 @@ test("participant Home navigation uses the canonical same-origin dashboard", asy
   assert.match(mobileHome, /getTournamentData/);
   assert.match(mobileHome, /MobileTournamentHome/);
   assert.doesNotMatch(mobileHome, /refreshHistoricalData|kiawahHero|Website Feed/);
-  assert.match(menu, /aria-label="Tournament Hub"/);
+  assert.match(menu, /aria-label="Tournament Hub navigation"/);
   assert.doesNotMatch(menu, /href: "\/home#today-schedule-title"/);
-  for (const participantSource of [activation, tournament, profile]) {
-    assert.match(participantSource, /\/home/);
-  }
+  assert.match(activation, /\/home/);
+  assert.doesNotMatch(tournament, /href="\/(?:home|my-match|app\/)/);
+  assert.match(profile, /participantPresentation \? "\/home" : playerDirectoryReturnHref/);
   assert.doesNotMatch(score, /My Tournament|Tournament Coverage|Live Leaderboard|My Profile/);
   assert.equal(participantDestination("/home"), "Home");
 });
@@ -66,7 +66,7 @@ test("My Match navigation always opens the dashboard instead of restoring a scor
   assert.match(scoreEntry, /Return to My Match<\/Link>/);
   assert.match(scoreEntry, /href="\/my-match"/);
   assert.doesNotMatch(scoreEntry, /Return to My Match<\/Link>[\s\S]{0,100}href="\/score"/);
-  assert.match(gameCenter, /leaderboardReturn \? backTo : "\/my-match"/);
+  assert.match(gameCenter, /const backHref = backTo === "home"[\s\S]*: "\/my-match"/);
   assert.match(profile, /href="\/my-match"/);
   assert.match(activation, /href="\/my-match">Open My Match/);
   assert.match(manifest, /url:\s*"\/my-match\?source=shortcut"/);

@@ -7,6 +7,7 @@ import { ErrorState } from "./ui/StatePrimitives";
 
 export default function Error({ error, reset }) {
   const pathname = usePathname();
+  const participantPresentation = participantAppShellRoute(pathname);
   useEffect(() => {
     console.error("Tournament page error boundary", {
       message: error?.message || "Unknown rendering error",
@@ -16,7 +17,7 @@ export default function Error({ error, reset }) {
       route: window.location.pathname,
     });
   }, [error]);
-  if (participantAppShellRoute(pathname)) return <main>
+  if (participantPresentation) return <main>
     <ErrorState title="We couldn’t open this page." message="Check your connection and try again." onRetry={reset} />
   </main>;
   return (

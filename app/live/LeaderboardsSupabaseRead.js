@@ -46,15 +46,15 @@ export default function LeaderboardsSupabaseRead({ previewMode = false, netSkins
       acceptData({ data: result.data, player: result.player });
       const clientTotal = performance.now() - startedAt;
       const timings = parseTiming(response.headers.get("server-timing") || "");
-      recordParticipantAuthDiagnostic("LEADERBOARDS_CORE_USABLE", { routeTo: "/live?view=leaderboards", durationMs: clientTotal });
+      recordParticipantAuthDiagnostic("LEADERBOARDS_CORE_USABLE", { routeTo: "/app/leaderboards", durationMs: clientTotal });
       console.info("Leaderboards core Supabase timing", { ...timings, clientTotal: Math.round(clientTotal),
         cachedPresentation: restoredCache.current, googleRequests: Number(response.headers.get("x-leaderboards-core-google-requests") || 0),
         sourceFingerprint: response.headers.get("x-leaderboards-core-fingerprint") || "" });
       const schedule = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 450));
       schedule(() => {
-        router.prefetch("/live");
+        router.prefetch("/app/tournament");
         router.prefetch("/my-match");
-        recordParticipantAuthDiagnostic("LEADERBOARDS_PREFETCH_COMPLETE", { routeTo: "/live?view=leaderboards", durationMs: performance.now() - startedAt });
+        recordParticipantAuthDiagnostic("LEADERBOARDS_PREFETCH_COMPLETE", { routeTo: "/app/leaderboards", durationMs: performance.now() - startedAt });
         flushParticipantAuthDiagnostics().catch(() => null);
       }, { timeout: 1200 });
     } catch (error) {
@@ -68,7 +68,7 @@ export default function LeaderboardsSupabaseRead({ previewMode = false, netSkins
     if (cached) {
       restoredCache.current = true;
       acceptData(cached);
-      recordParticipantAuthDiagnostic("LEADERBOARDS_CACHED_CORE", { routeTo: "/live?view=leaderboards", durationMs: 0 });
+      recordParticipantAuthDiagnostic("LEADERBOARDS_CACHED_CORE", { routeTo: "/app/leaderboards", durationMs: 0 });
     }
     refresh();
     const navigating = () => { requestSequence.current += 1; controllerRef.current?.abort(); };

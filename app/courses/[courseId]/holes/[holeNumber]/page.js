@@ -33,7 +33,7 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default async function CourseHolePage({ params, searchParams }) {
+export default async function CourseHolePage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { courseId, holeNumber } = await params;
   const query = await searchParams;
@@ -67,8 +67,8 @@ export default async function CourseHolePage({ params, searchParams }) {
 
   return (
     <main data-historical-course-source={source.resolved}>
-      <Header />
-      <ContextBackLink href={`/courses/${encodeURIComponent(courseId)}`} label={`Back to ${course.Course}`} />
+      {participantPresentation ? null : <Header />}
+      <ContextBackLink href={`${participantPresentation ? "/app/courses" : "/courses"}/${encodeURIComponent(courseId)}`} label={`Back to ${course.Course}`} />
 
       <section className={styles.pageHero}>
         <p className={styles.eyebrow}>{course.Course}{hole?.tee ? ` · ${hole.tee}` : ""}</p>
@@ -99,7 +99,7 @@ export default async function CourseHolePage({ params, searchParams }) {
           )}
         </section>
       </section>
-      <Footer />
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

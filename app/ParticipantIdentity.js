@@ -14,8 +14,8 @@ const PREVIEW_SESSION_KEY = "sbi-preview-session";
 const itemsFor = () => [
   { href: "/home", label: "Home", icon: "home" },
   { href: "/my-match", label: "My Match", icon: "golf" },
-  { href: "/live", label: "Tournament", icon: "trophy" },
-  { href: "/live?view=leaderboards", label: "Leaderboards", icon: "podium" },
+  { href: "/app/tournament", label: "Tournament", icon: "trophy" },
+  { href: "/app/leaderboards", label: "Leaderboards", icon: "podium" },
   { href: "/me", label: "Player", icon: "profile" },
 ];
 
@@ -128,7 +128,7 @@ export default function ParticipantIdentity() {
 
   useEffect(() => {
     document.body.classList.toggle("passport-navigation-active", navigationVisible);
-    document.body.classList.toggle("preview-impersonation-active", Boolean(impersonation));
+    document.body.classList.toggle("preview-impersonation-active", navigationVisible && Boolean(impersonation));
     return () => {
       document.body.classList.remove("passport-navigation-active");
       document.body.classList.remove("preview-impersonation-active");

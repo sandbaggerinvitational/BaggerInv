@@ -6,18 +6,18 @@ import { participantAppShellRoute, participantIdlePrefetchRoutes, participantRou
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("participant AppShell is explicit and public route ownership is preserved", () => {
-  for (const route of ["/home", "/my-match", "/live", "/game-center/2026-R1-1", "/score", "/me", "/players", "/players/holman-moores", "/tournament-guide/rules", "/courses", "/courses/CPGC01", "/courses/CPGC01/holes/1", "/history", "/history/2025", "/history/2025/round/3", "/history/2025/team/Team%202", "/history/2026/round/1", "/odds-center"])
+  for (const route of ["/home", "/my-match", "/game-center/2026-R1-1", "/score", "/me", "/app/tournament", "/app/leaderboards", "/app/players", "/app/players/holman-moores", "/app/guide/rules", "/app/courses", "/app/courses/CPGC01", "/app/courses/CPGC01/holes/1", "/app/history", "/app/history/2025", "/app/history/2025/round/3", "/app/history/2025/team/Team%202", "/app/odds"])
     assert.equal(participantAppShellRoute(route), true, route);
-  for (const route of ["/", "/admin/director", "/participant-auth", "/activate", "/score/access/token"])
+  for (const route of ["/", "/live", "/players", "/players/holman-moores", "/tournament-guide/rules", "/courses", "/courses/CPGC01", "/history", "/history/2025", "/odds-center", "/admin/director", "/participant-auth", "/activate", "/score/access/token"])
     assert.equal(participantAppShellRoute(route), false, route);
-  assert.equal(participantRouteContext("/live", "view=leaderboards"), "Leaderboards");
+  assert.equal(participantRouteContext("/app/leaderboards"), "Leaderboards");
   assert.equal(participantRouteContext("/score"), "Scorecard");
-  assert.equal(participantRouteContext("/courses/CPGC01/holes/1"), "Course Hole");
-  assert.equal(participantRouteContext("/history/2025"), "2025 History");
-  assert.equal(participantRouteContext("/history/2025/round/3"), "2025 Round History");
-  assert.equal(participantRouteContext("/history/2025/team/Team%202"), "2025 Team History");
-  assert.equal(participantRouteContext("/players"), "Players");
-  assert.equal(participantRouteContext("/players/holman-moores"), "Career Profile");
+  assert.equal(participantRouteContext("/app/courses/CPGC01/holes/1"), "Course Hole");
+  assert.equal(participantRouteContext("/app/history/2025"), "2025 History");
+  assert.equal(participantRouteContext("/app/history/2025/round/3"), "2025 Round History");
+  assert.equal(participantRouteContext("/app/history/2025/team/Team%202"), "2025 Team History");
+  assert.equal(participantRouteContext("/app/players"), "Players");
+  assert.equal(participantRouteContext("/app/players/holman-moores"), "Career Profile");
 });
 
 test("persistent participant shell owns compact header, content scene, and navigation slot", async () => {
@@ -40,7 +40,7 @@ test("persistent participant shell owns compact header, content scene, and navig
 
 test("bottom navigation manually prefetches likely primary routes and reacts to the keyboard", async () => {
   const [navigation, css] = await Promise.all([source("app/ParticipantIdentity.js"), source("app/participant-navigation.module.css")]);
-  assert.deepEqual(participantIdlePrefetchRoutes("/home"), ["/my-match", "/live", "/live?view=leaderboards", "/me"]);
+  assert.deepEqual(participantIdlePrefetchRoutes("/home"), ["/my-match", "/app/tournament", "/app/leaderboards", "/me"]);
   assert.ok(participantIdlePrefetchRoutes("/my-match").includes("/score"));
   assert.match(navigation, /participantIdlePrefetchRoutes/);
   assert.match(navigation, /router\.prefetch\(href\)/);
@@ -112,10 +112,10 @@ test("Supabase Home command-center order starts with identity and actionable mat
   assert.match(command, /ModuleSkeleton/);
 });
 
-test("participant route loading and errors use shared state foundations", async () => {
-  const files = await Promise.all(["home/loading.js", "my-match/loading.js", "live/loading.js", "score/loading.js", "me/loading.js", "tournament-guide/loading.js", "courses/loading.js", "game-center/[matchId]/loading.js"].map((path) => source(`app/${path}`)));
+test("participant-only route loading and errors use shared state foundations", async () => {
+  const files = await Promise.all(["home/loading.js", "my-match/loading.js", "score/loading.js", "me/loading.js", "game-center/[matchId]/loading.js"].map((path) => source(`app/${path}`)));
   files.forEach((value) => assert.match(value, /ScreenSkeleton/));
-  const errors = await Promise.all(["app/game-center/[matchId]/error.js", "app/tournament-guide/error.js", "app/courses/error.js"].map(source));
+  const errors = await Promise.all(["app/game-center/[matchId]/error.js", "app/error.js"].map(source));
   errors.forEach((value) => assert.match(value, /ErrorState/));
   errors.forEach((value) => assert.doesNotMatch(value, /Google Sheets|Supabase|RPC|workbook|projection/i));
 });

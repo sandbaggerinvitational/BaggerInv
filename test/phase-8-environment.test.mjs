@@ -140,8 +140,9 @@ test("preview diagnostic blocks scoring when data is missing or production-backe
   });
 });
 
-test("Tournament Mode replaces the flagged homepage for upcoming and live tournaments", () => {
+test("Tournament Mode remains available to participant Home without replacing the public homepage", () => {
   const homePage = fs.readFileSync(new URL("../app/page.js", import.meta.url), "utf8");
+  const participantHomePage = fs.readFileSync(new URL("../app/home/page.js", import.meta.url), "utf8");
   const mobileHome = fs.readFileSync(new URL("../app/MobileTournamentHome.js", import.meta.url), "utf8");
   const commandCenter = fs.readFileSync(new URL("../app/TournamentCommandCenter.js", import.meta.url), "utf8");
   const tournamentSchedule = fs.readFileSync(new URL("../app/TournamentSchedule.js", import.meta.url), "utf8");
@@ -152,8 +153,8 @@ test("Tournament Mode replaces the flagged homepage for upcoming and live tourna
     assert.equal(mobileTournamentDashboardEnabled({ status: "Live" }), true);
     assert.equal(mobileTournamentDashboardEnabled(null), false);
   });
-  assert.match(homePage, /mobileTournamentDashboardEnabled\(liveData\?\.tournament\)/);
-  assert.equal(mobileHome.includes('activeNavigationHref="/live"'), true);
+  assert.doesNotMatch(homePage, /mobileTournamentDashboardEnabled|MobileTournamentHome/);
+  assert.match(participantHomePage, /MobileTournamentHome/);
   for (const section of [
     "Today’s Schedule",
     "Tournament Pulse",

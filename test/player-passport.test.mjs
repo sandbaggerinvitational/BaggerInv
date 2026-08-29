@@ -95,7 +95,7 @@ test("invitation references preselect identity but do not create authorization",
   assert.match(activationPage, /activationCode/);
 });
 
-test("active Passport replaces onboarding with participant destinations", async () => {
+test("active Passport exposes participant destinations without altering public presentation", async () => {
   const [page, activation, navigation, score, live, profile, sheets] = await Promise.all([
     readFile(new URL("../app/activate/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/activate/PlayerPassportActivation.js", import.meta.url), "utf8"),
@@ -117,8 +117,7 @@ test("active Passport replaces onboarding with participant destinations", async 
   assert.match(navigation, /Leaderboard/);
   assert.match(navigation, /Player/);
   assert.doesNotMatch(score, /My Tournament|Live Leaderboard/);
-  assert.match(live, /Back to My Tournament/);
-  assert.match(live, />My Tournament</);
+  assert.doesNotMatch(live, /Back to My Tournament|>My Tournament</);
   assert.match(profile, /Back to My Tournament/);
   assert.match(profile, /Browse All Sandbaggers/);
   assert.match(sheets, /record\["Course Name"\] \|\| record\.Course \|\| record\["Full Course Name"\]/);
@@ -189,20 +188,20 @@ test("participant navigation uses one fixed safe-area-aware native shell", async
 });
 
 test("Participant Mode active destinations cover direct and nested routes", () => {
-  assert.equal(participantDestination("/", "", "clay-beltran"), "Home");
+  assert.equal(participantDestination("/", "", "clay-beltran"), "");
   assert.equal(participantDestination("/home", "", "clay-beltran"), "Home");
   assert.equal(participantDestination("/my-match", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/score", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/score/access/token", "", "clay-beltran"), "My Match");
   assert.equal(participantDestination("/game-center/2026-R3-M2", "", "clay-beltran"), "My Match");
-  assert.equal(participantDestination("/live", "", "clay-beltran"), "Tournament");
-  assert.equal(participantDestination("/live", "?view=calcutta", "clay-beltran"), "Tournament");
-  assert.equal(participantDestination("/live", "?view=points", "clay-beltran"), "Leaderboards");
-  assert.equal(participantDestination("/odds-center", "", "clay-beltran"), "Leaderboards");
+  assert.equal(participantDestination("/app/tournament", "", "clay-beltran"), "Tournament");
+  assert.equal(participantDestination("/app/tournament", "?view=calcutta", "clay-beltran"), "Tournament");
+  assert.equal(participantDestination("/app/leaderboards", "?view=points", "clay-beltran"), "Leaderboards");
+  assert.equal(participantDestination("/app/odds", "", "clay-beltran"), "Leaderboards");
   assert.equal(participantDestination("/tournament-guide", "", "clay-beltran"), "");
   assert.equal(participantDestination("/history/2026", "", "clay-beltran"), "");
-  assert.equal(participantDestination("/players", "", "clay-beltran"), "Player");
-  assert.equal(participantDestination("/players/clay-beltran", "", "clay-beltran"), "Player");
-  assert.equal(participantDestination("/players/another-player", "", "clay-beltran"), "");
+  assert.equal(participantDestination("/app/players", "", "clay-beltran"), "Player");
+  assert.equal(participantDestination("/app/players/clay-beltran", "", "clay-beltran"), "Player");
+  assert.equal(participantDestination("/app/players/another-player", "", "clay-beltran"), "");
   assert.equal(participantDestination("/records", "", "clay-beltran"), "");
 });

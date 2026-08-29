@@ -9,7 +9,7 @@ import {
 } from "../lib/participant-shell.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [scorecard, summaryCss, directory, profile, frame, layout, navigation, components] = await Promise.all([
+const [scorecard, summaryCss, directory, profile, frame, layout, navigation, components, participantDirectory] = await Promise.all([
   source("app/ScorecardTable.js"),
   source("app/scorecard-summary.module.css"),
   source("app/players/page.js"),
@@ -18,6 +18,7 @@ const [scorecard, summaryCss, directory, profile, frame, layout, navigation, com
   source("app/layout.js"),
   source("app/ParticipantIdentity.js"),
   source("app/components.js"),
+  source("app/app/players/page.js"),
 ]);
 
 test("historical scorecard totals keep golfer identity and three metrics in one compact 390px row", () => {
@@ -49,12 +50,15 @@ test("Step 5C deferred scorecard delivery remains request-free and single-tree",
   assert.doesNotMatch(scorecard, /fetch\(|axios|\/api\/|supabase|googleapis/i);
 });
 
-test("Browse All Sandbaggers is owned by the existing PWA shell without website chrome", () => {
-  assert.equal(participantAppShellRoute("/players"), true);
-  assert.equal(participantRouteContext("/players"), "Players");
-  assert.equal(participantDestination("/players"), "Player");
-  assert.doesNotMatch(directory, /import \{ Header, Footer \}/);
-  assert.doesNotMatch(directory, /<Header|<Footer|ParticipantAppHeader|ParticipantIdentity|BottomNav/);
+test("Browse All Sandbaggers has separate website and explicit PWA presentations", () => {
+  assert.equal(participantAppShellRoute("/players"), false);
+  assert.equal(participantAppShellRoute("/app/players"), true);
+  assert.equal(participantRouteContext("/app/players"), "Players");
+  assert.equal(participantDestination("/app/players"), "Player");
+  assert.match(directory, /import \{ Header, Footer \}/);
+  assert.match(directory, /participantPresentation \? null : <Header \/>/);
+  assert.match(directory, /participantPresentation \? null : <Footer \/>/);
+  assert.match(participantDirectory, /participantPresentation: true/);
   assert.match(frame, /<ParticipantAppHeader \/>/);
   assert.match(frame, /\{navigation\}/);
   assert.equal((layout.match(/<ParticipantIdentity \/>/g) || []).length, 1);
@@ -67,9 +71,9 @@ test("directory facts, images, and canonical Career destinations remain unchange
   for (const label of ["Active", "Alumni", "Career", "Win %", "Avg. Handicap", "Appearances", "Biggest Rival"]) {
     assert.match(directory, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
-  assert.match(directory, /href=\{`\/players\/\$\{player\.slug\}\?returnTo=/);
+  assert.match(directory, /participantPresentation[\s\S]*`\/app\/players\/\$\{player\.slug\}`[\s\S]*`\/players\/\$\{player\.slug\}\?returnTo=/);
   assert.match(profile, /label: "Browse All Sandbaggers"/);
-  assert.match(profile, /href: playerDirectoryReturnHref/);
+  assert.match(profile, /href: participantPresentation \? "\/app\/players" : playerDirectoryReturnHref/);
 });
 
 test("public website Header and Footer remain available to non-PWA routes", () => {

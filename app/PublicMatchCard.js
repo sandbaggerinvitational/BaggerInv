@@ -37,15 +37,15 @@ function strokeText(value) {
   return historicalStrokeText(value);
 }
 
-function PlayerName({ player }) {
+function PlayerName({ player, participantPresentation = false }) {
   if (!player?.slug) return <>{player?.name}</>;
-  return <Link href={`/players/${player.slug}`}>{player.name}</Link>;
+  return <Link href={`${participantPresentation ? "/app/players" : "/players"}/${player.slug}`}>{player.name}</Link>;
 }
 
-function PlayerSlot({ player, showHandicap = true, showStroke = true, reserveStrokeRow = true }) {
+function PlayerSlot({ player, showHandicap = true, showStroke = true, reserveStrokeRow = true, participantPresentation = false }) {
   if (!player) return <div className={`${styles.playerSlot} ${reserveStrokeRow ? "" : styles.playerSlotWithoutStroke}`} aria-hidden="true" />;
   return <div className={`${styles.playerSlot} ${reserveStrokeRow ? "" : styles.playerSlotWithoutStroke}`}>
-    <strong><PlayerName player={player} /></strong>
+    <strong><PlayerName player={player} participantPresentation={participantPresentation} /></strong>
     <span className={styles.playerHandicapSlot}>
       {showHandicap && hasValue(player.playingHcp) ? <small>HCP {formatHandicap(player.playingHcp)}</small> : null}
     </span>
@@ -73,7 +73,7 @@ function ScrambleTeamMeta({ teamHcp, teamStroke, showStroke = true }) {
   </div>;
 }
 
-function MatchupRoster({ tournament, match, showStrokeCopy = true }) {
+function MatchupRoster({ tournament, match, showStrokeCopy = true, participantPresentation = false }) {
   const scramble = match.format === "SC";
   const teamOnePlayers = match.team1Players || [];
   const teamTwoPlayers = match.team2Players || [];
@@ -85,9 +85,9 @@ function MatchupRoster({ tournament, match, showStrokeCopy = true }) {
     <TeamHeader team={tournament.teamTwo} />
     {Array.from({ length: playerCount }, (_, index) => (
       <Fragment key={`player-row-${index}`}>
-        <PlayerSlot player={teamOnePlayers[index]} showHandicap={!scramble} showStroke={showStrokeCopy && !scramble} reserveStrokeRow={showStrokeCopy} />
+        <PlayerSlot player={teamOnePlayers[index]} showHandicap={!scramble} showStroke={showStrokeCopy && !scramble} reserveStrokeRow={showStrokeCopy} participantPresentation={participantPresentation} />
         <span className={`${styles.playerPairSpacer} ${showStrokeCopy ? "" : styles.playerPairSpacerWithoutStroke}`} aria-hidden="true" />
-        <PlayerSlot player={teamTwoPlayers[index]} showHandicap={!scramble} showStroke={showStrokeCopy && !scramble} reserveStrokeRow={showStrokeCopy} />
+        <PlayerSlot player={teamTwoPlayers[index]} showHandicap={!scramble} showStroke={showStrokeCopy && !scramble} reserveStrokeRow={showStrokeCopy} participantPresentation={participantPresentation} />
       </Fragment>
     ))}
     {scramble ? <>
@@ -98,7 +98,7 @@ function MatchupRoster({ tournament, match, showStrokeCopy = true }) {
   </div>;
 }
 
-function CompactHistoricalSide({ team, players = [], teamStroke = null, showStroke = true }) {
+function CompactHistoricalSide({ team, players = [], teamStroke = null, showStroke = true, participantPresentation = false }) {
   const teamStrokeLabel = strokeText(teamStroke);
   return <div className={styles.historicalFinalSide}>
     <span>{team.name}</span>
@@ -106,7 +106,7 @@ function CompactHistoricalSide({ team, players = [], teamStroke = null, showStro
       {players.filter(Boolean).map((player) => {
         const playerStrokeLabel = strokeText(player.stroke);
         return <div key={player.id || player.slug || player.name}>
-          <strong><PlayerName player={player} /></strong>
+          <strong><PlayerName player={player} participantPresentation={participantPresentation} /></strong>
           {showStroke && playerStrokeLabel ? <small>{playerStrokeLabel}</small> : null}
         </div>;
       })}
@@ -115,12 +115,12 @@ function CompactHistoricalSide({ team, players = [], teamStroke = null, showStro
   </div>;
 }
 
-function CompactHistoricalPlayerName({ player, side, slot }) {
+function CompactHistoricalPlayerName({ player, side, slot, participantPresentation = false }) {
   if (!player) {
     return <span className={styles.historicalFinalPlayerName} data-side={side} data-player-slot={slot} aria-hidden="true" />;
   }
   return <strong className={styles.historicalFinalPlayerName} data-side={side} data-player-slot={slot}>
-    <PlayerName player={player} />
+    <PlayerName player={player} participantPresentation={participantPresentation} />
   </strong>;
 }
 
@@ -135,7 +135,7 @@ function CompactHistoricalStrokeLine({ label, side, slot }) {
   >{label || "\u00a0"}</small>;
 }
 
-function CompactHistoricalPairing({ teamOne, teamTwo, teamOnePlayers = [], teamTwoPlayers = [], teamOneStroke = null, teamTwoStroke = null, showStroke = true }) {
+function CompactHistoricalPairing({ teamOne, teamTwo, teamOnePlayers = [], teamTwoPlayers = [], teamOneStroke = null, teamTwoStroke = null, showStroke = true, participantPresentation = false }) {
   const playerRows = historicalPairingPlayerRows(teamOnePlayers, teamTwoPlayers);
   const teamOneStrokeLabel = strokeText(teamOneStroke);
   const teamTwoStrokeLabel = strokeText(teamTwoStroke);
@@ -146,9 +146,9 @@ function CompactHistoricalPairing({ teamOne, teamTwo, teamOnePlayers = [], teamT
     <span className={styles.historicalFinalPairSpacer} aria-hidden="true" />
     <span className={styles.historicalFinalTeamLabel} data-side="2">{teamTwo.name}</span>
     {playerRows.map((row, index) => <Fragment key={`historical-player-slot-${row.slot}`}>
-      <CompactHistoricalPlayerName player={row.left.player} side="1" slot={row.slot} />
+      <CompactHistoricalPlayerName player={row.left.player} side="1" slot={row.slot} participantPresentation={participantPresentation} />
       {index === 0 ? <b aria-label="versus">VS</b> : <span className={styles.historicalFinalPairSpacer} aria-hidden="true" />}
-      <CompactHistoricalPlayerName player={row.right.player} side="2" slot={row.slot} />
+      <CompactHistoricalPlayerName player={row.right.player} side="2" slot={row.slot} participantPresentation={participantPresentation} />
       {showStroke ? <>
         <CompactHistoricalStrokeLine label={row.left.strokeText} side="1" slot={row.slot} />
         <span className={styles.historicalFinalPairSpacer} aria-hidden="true" />
@@ -214,7 +214,7 @@ function TrophyIcon() {
   </svg>;
 }
 
-export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], scorecardCoverage = null, historyDensity = false, completedHistoryCompact = false }) {
+export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], scorecardCoverage = null, historyDensity = false, completedHistoryCompact = false, participantPresentation = false }) {
   const scorecardTableData = historyDensity ? scorecardPresentationData(scorecards) : scorecards;
   const winningSide = winnerSide(match);
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
@@ -281,9 +281,9 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
       {variant === "historical" && isGhostMatch ? <div className={styles.ghostMatchNotice}><strong>GHOST MATCH</strong><span>Selected player results are excluded from official records.</span></div> : null}
 
       {match.format === "SI" ? <div className={styles.historicalFinalMatchup}>
-        <CompactHistoricalSide team={tournament.teamOne} players={match.team1Players} showStroke={!completedHistoryMatchupCleanup} />
+        <CompactHistoricalSide team={tournament.teamOne} players={match.team1Players} showStroke={!completedHistoryMatchupCleanup} participantPresentation={participantPresentation} />
         <b aria-label="versus">VS</b>
-        <CompactHistoricalSide team={tournament.teamTwo} players={match.team2Players} showStroke={!completedHistoryMatchupCleanup} />
+        <CompactHistoricalSide team={tournament.teamTwo} players={match.team2Players} showStroke={!completedHistoryMatchupCleanup} participantPresentation={participantPresentation} />
       </div> : <CompactHistoricalPairing
         teamOne={tournament.teamOne}
         teamTwo={tournament.teamTwo}
@@ -292,6 +292,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         teamOneStroke={match.format === "SC" ? match.team1Stroke : null}
         teamTwoStroke={match.format === "SC" ? match.team2Stroke : null}
         showStroke={!completedHistoryMatchupCleanup}
+        participantPresentation={participantPresentation}
       />}
 
       <div className={styles.historicalFinalResult}>
@@ -308,6 +309,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         historyDensity={historyDensity}
         showSummary={historyScorecardParity}
         stackPairingIdentities={historyScorecardParity}
+        participantPresentation={participantPresentation}
       />
 
       {(hasSegments || scorecards.length || match.notes) ? <details className={styles.historicalMatchDetails}>
@@ -344,7 +346,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         <span>Selected player results are excluded from official records.</span>
       </div>
     ) : null}
-    {hasPairing ? <MatchupRoster tournament={tournament} match={match} showStrokeCopy={!historyScorecardParity} /> : <div className={styles.pairingPending}><strong>Pairing announcement coming soon</strong><span>{match.teeTime ? `${match.teeTime} · ` : ""}{match.course?.name || round?.course?.name || "Course to be announced"}</span></div>}
+    {hasPairing ? <MatchupRoster tournament={tournament} match={match} showStrokeCopy={!historyScorecardParity} participantPresentation={participantPresentation} /> : <div className={styles.pairingPending}><strong>Pairing announcement coming soon</strong><span>{match.teeTime ? `${match.teeTime} · ` : ""}{match.course?.name || round?.course?.name || "Course to be announced"}</span></div>}
     {variant === "live" && (match.currentHole || match.liveStatusText) ? <div className={styles.liveTracker}>
       <span>Through {match.currentHole || "—"}</span>
       <div data-leading={liveLeader === 1 ? "true" : undefined}><strong>{tournament.teamOne.name}</strong><b>{match.team1HolesWon}</b></div>
@@ -361,6 +363,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
           historyDensity={historyDensity}
           showSummary={historyScorecardParity}
           stackPairingIdentities={historyScorecardParity}
+          participantPresentation={participantPresentation}
         />
         <MatchProgressionSummary scorecards={scorecards} />
       </>

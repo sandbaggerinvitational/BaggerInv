@@ -6,7 +6,7 @@ import {
   refreshHistoricalData,
 } from "../../../../../lib/stats";
 import { notFound } from "next/navigation";
-import { Header } from "../../../../components";
+import { Header, Footer } from "../../../../components";
 import AssetImage from "../../../../AssetImage";
 import HistoricalDetailNavigation from "../../../../HistoricalDetailNavigation";
 import PublicMatchCard from "../../../../PublicMatchCard";
@@ -141,7 +141,15 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default async function HistoricalRoundPage({ params, searchParams }) {
+const historyPresentationHref = (href, participantPresentation) => {
+  if (!participantPresentation) return href;
+  return String(href || "")
+    .replace(/^\/history(?=\/|\?|$)/, "/app/history")
+    .replace(/^\/players(?=\/|\?|$)/, "/app/players")
+    .replace(/^\/courses(?=\/|\?|$)/, "/app/courses");
+};
+
+export default async function HistoricalRoundPage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { year, round } = await params;
   const query = await searchParams;
@@ -165,7 +173,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
       scorecardAnalytics = model?.scorecardAnalytics ?? null;
     } catch {
       return (
-        <HistoryUnavailablePage year={year} section={`Round ${round} History`} />
+        <HistoryUnavailablePage year={year} section={`Round ${round} History`} participantPresentation={participantPresentation} />
       );
     }
   } else if (useSupabaseCompleted) {
@@ -184,7 +192,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
       roundTournamentMatches = model.tournamentMatches;
       resolveHistoryPlayer = (slug) => completedHistoryResolvePlayer(view, slug);
     } catch {
-      return <HistoryUnavailablePage year={year} section={`Round ${round} History`} />;
+      return <HistoryUnavailablePage year={year} section={`Round ${round} History`} participantPresentation={participantPresentation} />;
     }
   } else {
     const canonical2017To2022 = isStep3CCompletedHistoryYear(year);
@@ -207,7 +215,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
             : refreshHistoricalData());
     } catch {
       if (canonical2017To2022) {
-        return <HistoryUnavailablePage year={year} section={`Round ${round} History`} />;
+        return <HistoryUnavailablePage year={year} section={`Round ${round} History`} participantPresentation={participantPresentation} />;
       }
       throw new Error(`Unable to load ${year} Round ${round} History.`);
     }
@@ -505,7 +513,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
 
   return (
     <main>
-      <Header />
+      {participantPresentation ? null : <Header />}
 
       <section className={`${styles.roundArchiveHero} ${useSupabase2026 ? pwaStyles.roundHero : ""}`}>
         <AssetImage
@@ -551,25 +559,27 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
         </div>
       </section>
 
-      <PlayerProfileReturnNavigation context={playerReturnContext} />
+      <PlayerProfileReturnNavigation context={playerReturnContext
+        ? { ...playerReturnContext, href: historyPresentationHref(playerReturnContext.href, participantPresentation) }
+        : null} />
       <HistoryMatchAnchorTarget enabled={Boolean(playerReturnContext)} />
 
       <section className={`${styles.content} ${useSupabase2026 ? pwaStyles.roundContent : ""}`}>
         <HistoricalDetailNavigation
-          backHref={`/history/${archive.year}`}
+          backHref={historyPresentationHref(`/history/${archive.year}`, participantPresentation)}
           backLabel="Tournament"
           backDetail={String(archive.year)}
           backAriaLabel={`${archive.year} Tournament`}
           completedYear={Number(archive.year) >= 2017 && Number(archive.year) <= 2026}
           previousHref={
             archive.previousRound
-              ? `/history/${archive.year}/round/${archive.previousRound.number}`
+              ? historyPresentationHref(`/history/${archive.year}/round/${archive.previousRound.number}`, participantPresentation)
               : null
           }
           previousLabel={archive.previousRound?.label}
           nextHref={
             archive.nextRound
-              ? `/history/${archive.year}/round/${archive.nextRound.number}`
+              ? historyPresentationHref(`/history/${archive.year}/round/${archive.nextRound.number}`, participantPresentation)
               : null
           }
           nextLabel={archive.nextRound?.label}
@@ -610,7 +620,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
         ) : (
           <div className={`${styles.roundMatchGrid} ${useSupabase2026 ? pwaStyles.matchList : ""} ${completedHistoryPresentation ? completedRoundStyles.matchList : ""}`}>
             {archive.matches.map((match) => (
-              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} /> : completed2023 ? <PublicMatchCard
+              useSupabase2026 ? <HistoricalMatchRow key={match.id} match={match} round={{ label: `Round ${archive.round}`, format: canonicalFormat }} tournament={archive} scorecards={displayScorecardsForMatch(match.id)} participantPresentation={participantPresentation} /> : completed2023 ? <PublicMatchCard
                 key={match.id}
                 match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
                 round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }}
@@ -620,6 +630,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
                 scorecardCoverage={scorecardCoverageForMatch(match.id)}
                 historyDensity
                 completedHistoryCompact={completedHistoryPresentation}
+                participantPresentation={participantPresentation}
               /> : completedStep3C ? <PublicMatchCard
                 key={match.id}
                 match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
@@ -630,6 +641,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
                 scorecardCoverage={scorecardCoverageForMatch(match.id)}
                 historyDensity
                 completedHistoryCompact={completedHistoryPresentation}
+                participantPresentation={participantPresentation}
               /> : <PublicMatchCard
                 key={match.id}
                 match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
@@ -639,6 +651,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
                 scorecards={completeLegacyMatchIds.has(match.id) ? displayScorecardsForMatch(match.id) : []}
                 historyDensity
                 completedHistoryCompact={completedHistoryMaster}
+                participantPresentation={participantPresentation}
               />
             ))}
           </div>
@@ -666,6 +679,7 @@ export default async function HistoricalRoundPage({ params, searchParams }) {
 
         <HistoryBackToTop />
       </section>
+      {participantPresentation ? null : <Footer />}
     </main>
   );
 }

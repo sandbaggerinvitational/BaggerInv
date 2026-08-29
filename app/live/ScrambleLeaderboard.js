@@ -27,7 +27,7 @@ function PairingSheet({ row, players, matches, round, roundLabel, courseName, to
   return <RoundLeaderboardSheet title="Scramble Pairing" identity={<ScrambleTeamIdentity playerIds={row.playerIds} players={players} large />} roundLabel={roundLabel} formatLabel="Scramble" courseName={courseName} rank={row.displayRank} holes={row.holes} gross={row.gross} net={row.net} netToPar={toPar(row.netToPar)} points={row.points} pointsLabel="Team Points" playerPoints={playerPoints} breakdown={breakdown} officialFinal={row.officialFinal} matchId={match?.id} returnTo={returnTo} onClose={onClose} />;
 }
 
-export default function ScrambleLeaderboard({ rows = [], round, players = [], matches = [], officialRows = [], tournament = {}, currentPlayerId = "", eyebrow = "Round Leaderboard", roundLabel = `Round ${round}`, courseName = "", returnTo = "/live?view=leaderboards&tab=players&round=2" }) {
+export default function ScrambleLeaderboard({ rows = [], round, players = [], matches = [], officialRows = [], tournament = {}, currentPlayerId = "", eyebrow = "Round Leaderboard", roundLabel = `Round ${round}`, courseName = "", returnTo = "/app/leaderboards?tab=players&round=2" }) {
   const [selectedId, setSelectedId] = useState("");
   const ranked = useMemo(() => roundCompetitionRows(rows, round, "SC", officialRows, matches), [rows, round, officialRows, matches]);
   const selected = ranked.find((row) => row.id === selectedId);

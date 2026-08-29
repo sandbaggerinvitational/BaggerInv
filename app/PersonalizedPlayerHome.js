@@ -154,7 +154,7 @@ function PlayerNetSkins({ netSkins, playerId }) {
         <h2 id="home-net-skins-title">Net Skins</h2>
         <div className={styles.netSkinsSummary}><strong>{skins} skin{skins === 1 ? "" : "s"}</strong><span aria-hidden="true">·</span><strong>{skinsCurrency(winnings)} winnings</strong></div>
       </div>
-      <Link href="/live?view=leaderboards&tab=skins">View <i aria-hidden="true">→</i></Link>
+      <Link href="/app/leaderboards?tab=skins">View <i aria-hidden="true">→</i></Link>
     </div>
   </section>;
 }

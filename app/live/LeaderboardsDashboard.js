@@ -153,7 +153,7 @@ function RoundPlayers({ data, selectedRound, currentPlayer }) {
   const selectedTeam = selected ? (data.leaderboard || []).find((player) => String(player.id) === String(selected.id))?.team : "";
   const pairing = ["SC", "SCRAMBLE"].includes(clean(round?.format).toUpperCase());
   const roundContext = [round?.label, round?.course?.name].filter(Boolean).join(" · ");
-  const returnTo = `/live?view=leaderboards&tab=players&round=${encodeURIComponent(selectedRound)}`;
+  const returnTo = `/app/leaderboards?tab=players&round=${encodeURIComponent(selectedRound)}`;
   if (pairing) return <ScrambleLeaderboard rows={data.scoreLeaderboard || []} round={round?.number} players={data.players || []} matches={round?.matches || []} officialRows={data.roundLeaderboards?.[round?.number] || []} tournament={data.tournament || {}} currentPlayerId={currentPlayer?.id} eyebrow={roundContext || "Round 2"} roundLabel={round?.label} courseName={round?.course?.name} returnTo={returnTo} />;
   const columns = [["holes", "Thru"], ["gross", "Gross"], ["net", "Net"], ["netToPar", "Net +/-"], ["points", "Points"]];
   const complete = rows.length > 0 && rows.every((row) => row.officialFinal);
@@ -529,7 +529,7 @@ export default function LeaderboardsDashboard({
         setOddsSnapshots(Array.isArray(payload.snapshots) ? payload.snapshots : []);
         setIntelligenceDerived(payload.derived || null);
         const durationMs = performance.now() - startedAt;
-        recordParticipantAuthDiagnostic("PUBLISHED_ODDS_MODULE_USABLE", { routeTo: "/live?view=leaderboards&tab=insights", durationMs });
+        recordParticipantAuthDiagnostic("PUBLISHED_ODDS_MODULE_USABLE", { routeTo: "/app/leaderboards?tab=insights", durationMs });
         if (previewMode) console.info("Published Odds module timing", {
           durationMs: Math.round(durationMs),
           source: response.headers.get("x-published-odds-read-source") || "unknown",
