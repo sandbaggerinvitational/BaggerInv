@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { buildParticipantHomePresentationImport } from "../lib/participant-home-supabase.js";
+import { calcuttaDestinationAvailable, publishedTournamentSecondaryModules } from "../lib/calcutta-presentation-availability.js";
 import { tournamentReadEnvironment } from "../lib/tournament-read-source.js";
 import { compareTournamentLiveParity, tournamentLiveDataFromSupabaseView } from "../lib/tournament-live-supabase.js";
 import { readTournamentLiveCache, tournamentLiveCacheVersion, writeTournamentLiveCache } from "../lib/tournament-live-cache.js";
@@ -72,6 +73,23 @@ test("Director-published Calcutta is imported as a lazy display projection", () 
   assert.deepEqual(imported.presentation.tournamentSecondary.calcutta, {
     available: true, standings: [{ team: "The Pickles", points: 10 }],
   });
+});
+
+test("Match Center advertises Calcutta only for an available published presentation", async () => {
+  assert.deepEqual(publishedTournamentSecondaryModules({ calcutta: null }), []);
+  assert.deepEqual(publishedTournamentSecondaryModules({ calcutta: { available: false } }), []);
+  assert.equal(calcuttaDestinationAvailable({ presentation: { secondaryModules: [] } }), false);
+
+  const secondaryModules = publishedTournamentSecondaryModules({
+    calcutta: { available: true, standings: [] },
+  });
+  assert.deepEqual(secondaryModules, ["calcutta"]);
+  assert.equal(calcuttaDestinationAvailable({ presentation: { secondaryModules } }), true);
+  assert.equal(calcuttaDestinationAvailable({ calcutta: { available: true } }), true);
+
+  const dashboard = await source("app/live/TournamentDashboard.js");
+  assert.match(dashboard, /const calcuttaAvailable = calcuttaDestinationAvailable\(data\)/);
+  assert.match(dashboard, /\{calcuttaAvailable \? <nav[\s\S]*href="\/live\?view=calcutta"[\s\S]*<\/nav> : null\}/);
 });
 
 test("canonical Supabase live state produces deterministic points, progress, and momentum", () => {

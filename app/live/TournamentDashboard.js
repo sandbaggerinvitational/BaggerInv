@@ -12,6 +12,7 @@ import { formatHandicap, formatStatusLabel, formatTeamPoints } from "../../lib/f
 import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
+import { calcuttaDestinationAvailable } from "../../lib/calcutta-presentation-availability";
 import styles from "./tournament-dashboard.module.css";
 import scoreStyles from "../score-typography.module.css";
 
@@ -207,6 +208,7 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
     matches: selectedRounds.flatMap((round) => round.matches || []),
   });
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
+  const calcuttaAvailable = calcuttaDestinationAvailable(data);
   if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
     <strong>{refreshState === "refreshing" ? "Preparing Tournament…" : "Tournament data is temporarily unavailable."}</strong>
     <span>{refreshState === "refreshing" ? "Please wait while tournament data is refreshed." : "Automatic recovery could not be completed."}</span>
@@ -214,10 +216,10 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
   </div></section>;
   return <section className={styles.page}>
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
-    <nav className={styles.destinations} aria-label="Select tournament destination">
+    {calcuttaAvailable ? <nav className={styles.destinations} aria-label="Select tournament destination">
       <Link href="/live" aria-current={selectedRound !== "calcutta" ? "page" : undefined} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</Link>
       <Link href="/live?view=calcutta" aria-current={selectedRound === "calcutta" ? "page" : undefined} onClick={openCalcutta}>Calcutta</Link>
-    </nav>
+    </nav> : null}
     {selectedRound === "calcutta" ? data?.calcutta ? <CalcuttaExperience model={data.calcutta} /> : <div className={styles.empty} role="status"><strong>{secondaryState === "error" ? "Calcutta is temporarily unavailable." : "Loading Calcutta…"}</strong><span>{secondaryState === "error" ? "The live Tournament remains available. This projected section can be retried independently." : "Loading the latest imported Director-published results."}</span>{secondaryState === "error" ? <button type="button" onClick={() => { setSecondaryState("idle"); openCalcutta(); }}>Try again</button> : null}</div> : <>
     <nav className={styles.rounds} aria-label="Select tournament round">{rounds.map((round) => <button type="button" aria-pressed={String(selectedRound) === String(round.number)} onClick={() => setSelectedRound(round.number)} key={round.number}>{round.label}</button>)}</nav>
     <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
