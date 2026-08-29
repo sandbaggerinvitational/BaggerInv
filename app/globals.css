@@ -750,11 +750,12 @@ h2 {
 .yearGrid {
   margin-top: 40px;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
 }
 
 .yearCard {
+  min-width: 0;
   min-height: 240px;
   padding: 20px;
   border: 1px solid var(--line);
@@ -763,9 +764,11 @@ h2 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 .yearCardLogo {
+  flex: 0 0 auto;
   width: 72px;
   height: 72px;
   padding: 9px;
@@ -776,11 +779,22 @@ h2 {
   background: #fffaf0;
 }
 .yearCardLogo img { width: 100%; height: 100%; object-fit: contain; }
-.yearCardLogo + span { margin-top: 14px; }
+.yearCardLogo + .yearCardYear { margin-top: 14px; }
 
-.yearCard span {
+.yearCardYear {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 2.1rem;
+}
+
+.yearCard .yearCardStatus {
+  align-self: flex-start;
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  font: 900 .62rem/1 Arial, sans-serif;
+  white-space: nowrap;
 }
 
 .yearCard strong {
@@ -829,7 +843,7 @@ footer span {
   .liveScorePreview { width: min(620px,100%); justify-self: center; }
 
   .yearGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -954,7 +968,7 @@ footer span {
   }
 
   .yearGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sideMenu {

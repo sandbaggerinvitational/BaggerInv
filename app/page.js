@@ -3,7 +3,7 @@ import { refreshHistoricalData } from "../lib/stats";
 import Link from "next/link";
 import { Header, Footer } from "./components";
 import { getTournaments } from "../lib/stats";
-import { homePageHero, tournamentLogo } from "../lib/asset-paths";
+import { homePageHero } from "../lib/asset-paths";
 import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
 import { tournamentStartTimestamp } from "../lib/tournament-countdown";
 import AssetImage from "./AssetImage";
@@ -14,6 +14,7 @@ import { requireHomepageCurrentReadSource } from "../lib/tournament-read-source"
 import { loadCompletedHistoryYears } from "../lib/completed-history-service";
 import { loadHistory2026View } from "../lib/history-2026-service";
 import { applicationPageEnvironment } from "../lib/production-shadow-request-environment";
+import { publicHomepageTournamentLogo } from "./homepage-history-card";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -278,19 +279,21 @@ export default async function Home() {
             >
               <span className="yearCardLogo">
                 <AssetImage
-                  src={tournamentLogo(tournament.logoFileName)}
+                  src={publicHomepageTournamentLogo(tournament)}
                   alt={`${tournament.year} tournament logo`}
                   fallback={String(tournament.year)}
                   inferFallback={false}
                 />
               </span>
-              <span>{tournament.year}</span>
+              <span className="yearCardYear">{tournament.year}</span>
               <p>
                 {tournament.Destination ||
                   tournament.Location ||
                   "Tournament destination"}
               </p>
-              {Number(tournament.year) === Number(year) && !tournament.championTeamId ? <StatusBadge status="Upcoming" /> : null}
+              {Number(tournament.year) === Number(year) && !tournament.championTeamId ? (
+                <StatusBadge className="yearCardStatus" status="Upcoming" />
+              ) : null}
               <strong>View tournament</strong>
             </Link>
           ))}
