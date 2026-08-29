@@ -25,6 +25,7 @@ import {
   loadCompletedHistoryYears,
 } from "../../lib/completed-history-service";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
+import publicStyles from "./public-history.module.css";
 
 export const metadata = pageMetadata({
   title: "History | The Sandbagger Invitational",
@@ -75,7 +76,7 @@ export default async function HistoryPage({ participantPresentation = false } = 
     <main>
       {participantPresentation ? null : <Header />}
 
-      <section className={`${styles.pageHero} ${pwaStyles.archiveHero}`}>
+      <section className={`${styles.pageHero} ${participantPresentation ? pwaStyles.archiveHero : ""}`}>
         <p className={styles.eyebrow}>The Complete Archive</p>
         <h1>Tournament History</h1>
         <p>
@@ -84,14 +85,14 @@ export default async function HistoryPage({ participantPresentation = false } = 
         </p>
       </section>
 
-      <section className={`${styles.content} ${pwaStyles.archiveContent}`} id="champions">
+      <section className={`${styles.content} ${participantPresentation ? pwaStyles.archiveContent : ""}`} id="champions">
         {currentHistoryUnavailable ? (
           <HistoryUnavailableNotice year="2026" participantPresentation={participantPresentation} />
         ) : null}
         {completedHistoryUnavailable ? (
           <HistoryUnavailableNotice year="2017–2025" />
         ) : null}
-        <div className={`${styles.historyCardGrid} ${pwaStyles.yearGrid}`}>
+        <div className={`${styles.historyCardGrid} ${participantPresentation ? pwaStyles.yearGrid : ""}`}>
           {tournaments.map((tournament, index) => {
             const heroPath = historyHeroPath(tournament);
             const completed = Boolean(tournament.championTeamId);
@@ -107,7 +108,7 @@ export default async function HistoryPage({ participantPresentation = false } = 
                 <div className={styles.historyPhotoFrame}>
                   <AssetImage
                     src={optimizedAssetUrl(heroPath, 640, 72)}
-                    alt=""
+                    alt={participantPresentation ? "" : `${tournament.year} ${tournament.Destination}`}
                     className={styles.historyPhoto}
                     fallbackClassName={styles.historyPhotoPlaceholder}
                     fallback={tournament.Destination}
@@ -129,6 +130,14 @@ export default async function HistoryPage({ participantPresentation = false } = 
                   <strong>{historyTournamentCardResult(tournament)}</strong>
                 </div>
               </Link>
+              {!participantPresentation && completed ? (
+                <Link
+                  className={publicStyles.championLink}
+                  href={`/champions/${tournament.year}`}
+                >
+                  View {tournament.year} Champion →
+                </Link>
+              ) : null}
             </article>;
           })}
         </div>

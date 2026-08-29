@@ -11,6 +11,7 @@ import AssetImage from "../../../../AssetImage";
 import HistoricalDetailNavigation from "../../../../HistoricalDetailNavigation";
 import PublicMatchCard from "../../../../PublicMatchCard";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
+import PublicHistoricalDetailNavigation from "../../../PublicHistoricalDetailNavigation";
 import {
   courseHero,
   courseLogo,
@@ -510,6 +511,126 @@ export default async function HistoricalRoundPage({ params, searchParams, partic
       ? playerOriginReturnContext(query, resolveHistoryPlayer)
       : playerOriginReturnContext(query, getPlayerBySlug)
     : null;
+
+  if (!participantPresentation) {
+    const publicNavigation = (position) => (
+      <PublicHistoricalDetailNavigation
+        backHref={`/history/${archive.year}`}
+        backLabel={`Back to ${archive.year} Tournament`}
+        previousHref={archive.previousRound
+          ? `/history/${archive.year}/round/${archive.previousRound.number}`
+          : null}
+        previousLabel={archive.previousRound?.label}
+        nextHref={archive.nextRound
+          ? `/history/${archive.year}/round/${archive.nextRound.number}`
+          : null}
+        nextLabel={archive.nextRound?.label}
+        position={position}
+      />
+    );
+    const publicMatchScorecards = (matchId) => {
+      if (useSupabase2026) return displayScorecardsForMatch(matchId);
+      const coverage = scorecardCoverageForMatch(matchId);
+      if (useSupabaseCompleted || completed2023 || completedStep3C) {
+        return coverage?.state !== "NONE" ? displayScorecardsForMatch(matchId) : [];
+      }
+      return completeLegacyMatchIds.has(matchId) ? displayScorecardsForMatch(matchId) : [];
+    };
+
+    return (
+      <main data-public-history-round-page>
+        <Header />
+        <section className={styles.roundArchiveHero}>
+          <AssetImage
+            src={courseHero(archive.course["Course Profile Image"])}
+            alt={`${archive.course.Course} course`}
+            className={styles.roundArchiveHeroImage}
+            fallbackClassName={styles.roundArchiveHeroFallback}
+            fallback={archive.tournament.Destination}
+            loading="eager"
+            width={1440}
+            height={720}
+            sizes="100vw"
+            decoding="async"
+            fetchPriority="high"
+          />
+          <div className={styles.roundArchiveHeroShade} />
+          <div className={styles.roundArchiveHeroContent}>
+            <div className={styles.roundArchiveCourseLogo}>
+              <AssetImage
+                src={courseLogo(archive.course["Course Logo"])}
+                alt={`${archive.course.Course} logo`}
+                className={styles.roundArchiveCourseLogoImage}
+                fallbackClassName={styles.roundArchiveCourseLogoFallback}
+                fallback="⛳"
+                width={150}
+                height={150}
+                sizes="(max-width: 720px) 72px, 150px"
+                decoding="async"
+              />
+            </div>
+            <div>
+              <p>{archive.year} · Round {archive.round}</p>
+              <h1>{archive.course.Course}</h1>
+              <h2>{canonicalFormat}</h2>
+              <span>{archive.course.City}, {archive.course.State}</span>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.content}>
+          {publicNavigation("top")}
+          <div className={styles.roundArchiveScoreboard}>
+            <div className={styles.roundArchiveTeam}>
+              <TeamLogoPlate filename={archive.teamOne.logo} teamName={archive.teamOne.name} variant="scoreboard" />
+              <strong>{archive.teamOne.name}</strong>
+              <b>{displayPoints(archive.teamOne.points)}</b>
+            </div>
+            <div className={styles.roundArchiveWinner}>
+              <span>{archive.roundWinner === "In Progress" ? "Round Status" : completedHistoryPresentation && (archive.roundWinner === "Halved" || archive.roundWinner === "Not recorded") ? "Round Result" : "Round Winner"}</span>
+              <strong>{archive.roundWinner}</strong>
+            </div>
+            <div className={styles.roundArchiveTeam}>
+              <TeamLogoPlate filename={archive.teamTwo.logo} teamName={archive.teamTwo.name} variant="scoreboard" />
+              <strong>{archive.teamTwo.name}</strong>
+              <b>{displayPoints(archive.teamTwo.points)}</b>
+            </div>
+          </div>
+
+          {!archive.matches.length ? (
+            <div className={styles.roundArchiveEmpty}>No matchups have been recorded for this round.</div>
+          ) : (
+            <div className={styles.roundMatchGrid}>
+              {archive.matches.map((match) => (
+                <PublicMatchCard
+                  key={match.id}
+                  match={{ ...match, format: match.format || archive.format, formatName: canonicalFormat }}
+                  round={{ label: `Round ${archive.round}`, format: canonicalFormat, course: { name: archive.course.Course } }}
+                  tournament={archive}
+                  variant="historical"
+                  scorecards={publicMatchScorecards(match.id)}
+                  scorecardCoverage={scorecardCoverageForMatch(match.id)}
+                  participantPresentation={false}
+                />
+              ))}
+            </div>
+          )}
+
+          <section className={styles.section}>
+            <span className={styles.sectionLabel}>Available Scorecard History</span>
+            <h2>{roundScorecards.length ? "Round Statistics" : "Historical Scorecards"}</h2>
+            {roundScorecards.length ? (
+              <ScoringStatGrid items={legacyRoundStatisticItems} />
+            ) : (
+              <p>Detailed historical scorecards are not available for this round.</p>
+            )}
+          </section>
+          {publicNavigation(undefined)}
+        </section>
+        <Footer />
+      </main>
+    );
+  }
 
   return (
     <main>

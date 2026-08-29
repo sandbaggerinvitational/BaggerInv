@@ -171,6 +171,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
         >{link.label}</Link>))}
       </nav>
       {director ? <section className="sideNavGroup sideNavDirector"><h2>Director</h2><div><Link className="directorMenuLink" href="/admin/director" prefetch={false} onClick={() => setIsOpen(false)}><span><HubIcon name="director" /></span><b>Tournament Director</b><i aria-hidden="true">›</i></Link></div></section> : null}
+      <div className="sideMenuFooter">24 players · Two teams · One trophy</div>
     </div>
   </>;
 

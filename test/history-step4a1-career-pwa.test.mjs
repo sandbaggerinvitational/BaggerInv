@@ -66,17 +66,17 @@ test("History-origin Profile navigation reuses the approved contextual navigatio
   assert.ok(profile.indexOf("<HistoryNavigation") < profile.indexOf("<CareerHonors"));
 });
 
-test("rankings, records, rival, draft history, and partners are genuinely display-only", () => {
-  assert.match(intelligence, /<div key=\{row\.key\}>[\s\S]*<strong>\{rank\(row\.rank\)\}<\/strong>[\s\S]*<\/div>/);
+test("public profile restores linked website intelligence while the PWA stays display-only", () => {
+  assert.match(intelligence, /participantPresentation \? \([\s\S]*<div key=\{row\.key\}>\{content\}<\/div>[\s\S]*\) : \([\s\S]*<Link href=\{RANKING_HREFS\[row\.key\]/);
   assert.match(intelligence, /"matchWins"/);
-  assert.doesNotMatch(intelligence, /title="Current Rankings"/);
-  assert.match(intelligence, /<article key=\{record\.slug\}>/);
-  assert.doesNotMatch(intelligence, /Record Holder/);
-  assert.doesNotMatch(intelligence, /View Leaderboard|record\.href/);
-  assert.doesNotMatch(profile, /Compare players|compareHref|\/compare/);
-  assert.match(profile, /<LeaderboardPlayer[\s\S]*linked=\{false\}/);
-  assert.match(profile, /className=\{styles\.profileDraftHistory\}[\s\S]*<article/);
-  assert.doesNotMatch(profile, /Open Historical Draft Analytics|href=\{`\/draft\/\$\{draft\.year\}`\}/);
+  assert.match(intelligence, /title="Current Rankings"/);
+  assert.match(intelligence, /participantPresentation \? \([\s\S]*<article key=\{record\.slug\}>[\s\S]*\) : \([\s\S]*<Link href=\{`\/records\/\$\{record\.slug\}`\}/);
+  assert.match(intelligence, /Record Holder/);
+  assert.match(intelligence, /View Leaderboard/);
+  assert.match(profile, /participantPresentation \? null : \([\s\S]*Compare players →/);
+  assert.match(profile, /linked=\{!participantPresentation\}/);
+  assert.match(profile, /participantPresentation \? \([\s\S]*<article key=\{draft\.year\}[\s\S]*\) : \([\s\S]*<Link href=\{`\/draft\/\$\{draft\.year\}`\}/);
+  assert.match(profile, /Open Historical Draft Analytics →/);
 });
 
 test("Career-only density and Top Partners mobile layout do not change frozen History cards", () => {
@@ -94,7 +94,7 @@ test("Career-only density and Top Partners mobile layout do not change frozen Hi
   assert.match(profileCss, /\.careerContent \{[\s\S]*padding-top: 30px/);
   assert.match(profileCss, /\.careerContent > \.honorsSection \{[\s\S]*margin-top: 0/);
   assert.match(profile, /styles\.profilePartnersTable/);
-  assert.doesNotMatch(profile, /styles\.dataTable\} \$\{styles\.simpleTable/);
+  assert.match(profile, /participantPresentation \? styles\.profilePartnersTable : styles\.simpleTable/);
   assert.match(profile, /className=\{styles\.profilePartnerResult\}/);
   assert.match(profileCss, /\.profilePartnersTable \.tableRow \{[\s\S]*grid-template-columns: 46px minmax\(0, 1fr\) auto/);
   assert.match(profileCss, /\.careerContent \.profilePartnersTable \.tableRow \{[\s\S]*min-width: 0/);
@@ -122,7 +122,8 @@ test("Tournament, Match, and Team remain canonical Player-origin drill-downs", (
   assert.match(profile, /withPlayerOriginContext\([\s\S]*`\/history\/\$\{season\.year\}\/team/);
   assert.match(profile, /View Team →/);
   assert.match(profile, /aria-label=\{`View \$\{player\["Display Name"\]\}'s \$\{season\.year\} \$\{season\.teamName\} Team History`\}/);
-  assert.doesNotMatch(formatHistory, /ScorecardTable|scorecardsByMatch|profileMatchScorecard/);
+  assert.match(formatHistory, /participantPresentation \? null : \([\s\S]*profileMatchScorecard[\s\S]*<ScorecardTable/);
+  assert.match(formatHistory, /scorecardsByMatch\[match\.id\] \|\| \[\]/);
 });
 
 test("all historical destinations share the same canonical, fail-closed Player return", () => {

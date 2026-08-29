@@ -19,6 +19,7 @@ import { resolveTournamentGuideContent } from "../../tournament-guide/resolveGui
 import { requireHistoricalCourseReadSource } from "../../../lib/historical-course-read-source";
 import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 import styles from "./course-detail.module.css";
+import PublicCoursePage, { resolvePublicCourse } from "./PublicCoursePage";
 
 const resolveCourse = cache(async (courseId, archive = false, year = null, round = null, env = process.env) => {
   if (!archive) {
@@ -39,12 +40,10 @@ const resolveCourse = cache(async (courseId, archive = false, year = null, round
   return { model: courseDetailModel(courseId, content, { year, round }), source: "google" };
 });
 
-export async function generateMetadata({ params, searchParams }) {
+export async function generateMetadata({ params }) {
   const env = await applicationPageEnvironment();
   const { courseId } = await params;
-  const query = await searchParams;
-  const archive = String(query?.view || "") === "archive";
-  const { model } = await resolveCourse(courseId, archive, query?.year, query?.round, env);
+  const { model } = await resolvePublicCourse(courseId, env) || {};
   return pageMetadata({
     title: model ? `${model.course.Course} | The Sandbagger Invitational` : "Course | The Sandbagger Invitational",
     description: model ? `${model.course.Course} tournament course details.` : "Sandbagger Invitational course details.",
@@ -84,6 +83,7 @@ const coursePresentationHref = (href, participantPresentation) => {
 export default async function CoursePage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { courseId } = await params;
+  if (!participantPresentation) return <PublicCoursePage courseId={courseId} env={env} />;
   const resolvedSearchParams = await searchParams;
   const archive = String(resolvedSearchParams?.view || "") === "archive";
   const resolved = await resolveCourse(courseId, archive, resolvedSearchParams?.year, resolvedSearchParams?.round, env);

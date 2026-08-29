@@ -9,7 +9,7 @@ const componentPath = new URL(
 const statsPath = new URL("../lib/stats.js", import.meta.url);
 const matchCardPath = new URL("../app/PublicMatchCard.js", import.meta.url);
 
-test("player format history uses accessible nested accordions and compact match details", async () => {
+test("player format history keeps compact PWA details and restores public inline scorecards", async () => {
   const source = await readFile(componentPath, "utf8");
 
   assert.match(source, /aria-expanded=\{open\}/);
@@ -20,7 +20,8 @@ test("player format history uses accessible nested accordions and compact match 
   assert.match(source, /View Match →/);
   assert.match(source, /withPlayerOriginContext\(match\.href, playerSlug\)/);
   assert.match(source, /prefetch=\{false\}/);
-  assert.doesNotMatch(source, /ScorecardTable|scorecardsByMatch|profileMatchScorecard/);
+  assert.match(source, /participantPresentation \? null : \([\s\S]*profileMatchScorecard[\s\S]*ScorecardTable/);
+  assert.match(source, /scorecards=\{scorecardsByMatch\[match\.id\] \|\| \[\]\}/);
 });
 
 test("format history joins matches by stable player IDs and exposes reconciliation state", async () => {

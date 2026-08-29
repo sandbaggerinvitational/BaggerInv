@@ -165,14 +165,14 @@ test("point missingness is independent from match results and preserves recorded
 test("Top 5 and Full Standings share canonical, request-neutral Career Profile links", () => {
   assert.match(overview, /historicalPlayerProfileHref\(player\.slug, tournament\.year\)/);
   assert.match(overview, /aria-label=\{`View \$\{player\.name\} career profile`\}/);
-  assert.match(overview, /href=\{playerProfileHref\} prefetch=\{false\}/);
+  assert.match(overview, /href=\{historyPresentationHref\(playerProfileHref, participantPresentation\)\} prefetch=\{false\}/);
   assert.match(overview, /standings\.map\(\(row\) => renderStanding\(row, "summary"\)\)/);
   assert.match(overview, /leaderboard\.map\(\(row\) => renderStanding\(row, "full"\)\)/);
   assert.doesNotMatch(overview, /linkHistoricalPlayers/);
   assert.match(completedCss, /\.standingRow > span > a \{[\s\S]*min-height: 44px/);
 });
 
-test("History-context navigation takes precedence without changing normal profile identity", () => {
+test("public profile restores website back navigation while PWA context navigation remains explicit", () => {
   assert.match(profile, /refreshCanonicalCareerHistoricalData/);
   assert.match(profile, /loadCanonicalCareerScorecardAnalytics/);
   assert.match(profile, /const historyReturnContext = historicalPlayerReturnContext\(query\)/);
@@ -180,7 +180,8 @@ test("History-context navigation takes precedence without changing normal profil
   assert.match(profile, /<HistoryNavigation/);
   assert.match(profile, /left=\{primaryNavigation\}/);
   assert.match(profile, /right=\{browseNavigation\}/);
-  assert.doesNotMatch(profile, /<ContextBackLink/);
+  assert.match(profile, /participantPresentation \? null : \([\s\S]*<ContextBackLink[\s\S]*label="Back to All Sandbaggers"/);
+  assert.match(profile, /participantPresentation \? \([\s\S]*<HistoryNavigation/);
   assert.match(profile, /path: `\/players\/\$\{slug\}`/);
   assert.doesNotMatch(profile, /history\.back|router\.back|window\.history/);
 });

@@ -92,16 +92,17 @@ test("current Course Detail uses the Guide resolver while archive transport uses
   assert.doesNotMatch(loader, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
 });
 
-test("Course Detail remains inside The Bagger and has no map action", async () => {
+test("participant Course Detail remains inside the explicit app boundary and has no map action", async () => {
   const [page, css] = await Promise.all([
     readFile(new URL("../app/courses/[courseId]/page.js", import.meta.url), "utf8"),
     readFile(new URL("../app/courses/[courseId]/course-detail.module.css", import.meta.url), "utf8"),
   ]);
-  assert.match(page, /<Header homeHref="\/home"/);
+  assert.match(page, /if \(!participantPresentation\) return <PublicCoursePage courseId=\{courseId\} env=\{env\} \/>/);
+  assert.match(page, /\.replace\(\/\^\\\/courses[\s\S]*?"\/app\/courses"\)/);
   assert.match(page, /historyCourseReturn/);
   assert.match(page, /courseOriginReturn/);
   assert.match(page, /!historyReturn && originReturn/);
-  assert.match(page, /href=\{originReturn\.href\}>‹ \{originReturn\.label\}<\/Link>/);
+  assert.match(page, /href=\{coursePresentationHref\(originReturn\.href, participantPresentation\)\}>‹ \{originReturn\.label\}<\/Link>/);
   assert.doesNotMatch(page, /View Scorecard|href="#course-scorecard"/);
   assert.match(page, /Front Nine/);
   assert.match(page, /Back Nine/);

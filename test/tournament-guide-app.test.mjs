@@ -37,7 +37,7 @@ test("Guide destinations are focused same-origin Supabase views with a flag-gate
   assert.match(normalized, /publicGuideRecords\(itineraryRows, guideTournament\)/);
   for (const sheet of ["Tournament Itinerary", "Courses", "Rule Book", "Tournament Rules", "Rounds", "Dining", "Local Guide", "Important Contacts"]) assert.match(schema, new RegExp(sheet));
   assert.doesNotMatch(detail, /target="_blank"|window\.open|https?:\/\//);
-  assert.match(detail, /<Link className=\{styles\.backToGuide\} href="\/tournament-guide">‹ Tournament Guide<\/Link>/);
+  assert.match(detail, /<Link className=\{styles\.backToGuide\} href=\{participantPresentation \? "\/app\/guide" : "\/tournament-guide"\}>‹ Tournament Guide<\/Link>/);
   assert.doesNotMatch(detail, /Find what you need|className=\{styles\.directory\}/);
 });
 
@@ -52,7 +52,7 @@ test("Courses defaults to the active tournament and offers the historical archiv
   assert.match(resolver, /courses: stored\.courses \|\| \[\]/);
   assert.match(courses, /View Course Archive/);
   assert.match(courses, /\/courses\?view=archive/);
-  assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
+  assert.match(courses, /href=\{participantPresentation \? "\/app\/guide" : "\/tournament-guide"\}>‹ Tournament Guide/);
 });
 
 test("Tournament Guide landing owns the published projection-driven annual hero while detail routes stay compact", async () => {
@@ -81,7 +81,7 @@ test("Tournament Guide landing owns the published projection-driven annual hero 
   assert.doesNotMatch(detail, /TournamentGuideHero/);
   assert.doesNotMatch(courses, /TournamentGuideHero/);
   assert.match(detail, /className=\{styles\.backToGuide\}/);
-  assert.match(courses, /href="\/tournament-guide">‹ Tournament Guide/);
+  assert.match(courses, /href=\{participantPresentation \? "\/app\/guide" : "\/tournament-guide"\}>‹ Tournament Guide/);
   assert.doesNotMatch(courseDetail, /TournamentGuideHero/);
 });
 
@@ -124,7 +124,7 @@ test("Guide preserves shared app chrome and ends naturally after quick access", 
   assert.doesNotMatch(page, /Welcome|overviewItems|sectionDescription|className=\{styles\.overview\}/);
   assert.match(css, /\.directory/);
   assert.match(css, /padding:18px 0 92px/);
-  assert.match(schedule, /\/tournament-guide\/schedule/);
+  assert.match(schedule, /\/app\/guide\/schedule/);
   assert.match(rules, /\/tournament-guide\/rules/);
 });
 

@@ -7,6 +7,7 @@ import GuideDirectoryIcon from "./GuideDirectoryIcon";
 import styles from "./tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
+import PublicTournamentGuide from "./PublicTournamentGuide";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
@@ -33,6 +34,10 @@ const guidePresentationHref = (href, participantPresentation) => {
 
 export default async function TournamentGuidePage({ searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
+  if (!participantPresentation) {
+    const content = await resolveTournamentGuideContent({ env });
+    return <PublicTournamentGuide content={content} />;
+  }
   const legacySection = String((await searchParams)?.section || "");
   if (legacySection) {
     const destination = legacySection === "match-formats" ? "rules" : legacySection === "travel" ? "getting-around" : legacySection;

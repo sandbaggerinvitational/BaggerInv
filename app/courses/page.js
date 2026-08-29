@@ -16,6 +16,7 @@ import courseStyles from "./course-directory.module.css";
 import { pageMetadata } from "../../lib/seo";
 import { requireHistoricalCourseReadSource } from "../../lib/historical-course-read-source";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
+import PublicCoursesPage from "./PublicCoursesPage";
 
 export const metadata = pageMetadata({
   title: "Courses | The Sandbagger Invitational",
@@ -34,6 +35,7 @@ const coursePresentationHref = (href, participantPresentation) => {
 
 export default async function CoursesPage({ searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
+  if (!participantPresentation) return <PublicCoursesPage env={env} />;
   const archive = String((await searchParams)?.view || "") === "archive";
   const archiveSource = archive ? requireHistoricalCourseReadSource(env) : null;
   const content = !archive

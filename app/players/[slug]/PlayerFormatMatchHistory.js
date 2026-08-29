@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import styles from "../../historical.module.css";
 import { withPlayerOriginContext } from "../../../lib/context-navigation";
+import ScorecardTable from "../../ScorecardTable";
 
 const FORMAT_LABELS = {
   BB: "Best Ball",
@@ -32,7 +33,7 @@ function winnerColor(match, side) {
   return "#777d79";
 }
 
-function MatchRow({ match, playerName, playerSlug, participantPresentation = false }) {
+function MatchRow({ match, playerName, playerSlug, participantPresentation = false, scorecards = [] }) {
   const opponents = match.opponents.map((player) => player.name).join(" + ");
   const partner = match.partner.map((player) => player.name).join(" + ");
   const publicMatchHref = match.href
@@ -86,11 +87,26 @@ function MatchRow({ match, playerName, playerSlug, participantPresentation = fal
           View Match →
         </Link>
       ) : null}
+      {participantPresentation ? null : (
+        <div className={styles.profileMatchScorecard}>
+          <ScorecardTable
+            scorecards={scorecards}
+            compact
+            title={`${match.year} · Round ${match.round} Scorecard`}
+          />
+        </div>
+      )}
     </article>
   );
 }
 
-export default function PlayerFormatMatchHistory({ history, playerName, playerSlug, participantPresentation = false }) {
+export default function PlayerFormatMatchHistory({
+  history,
+  playerName,
+  playerSlug,
+  participantPresentation = false,
+  scorecardsByMatch = {},
+}) {
   const accordionId = useId();
   const [open, setOpen] = useState(false);
   const [hasRenderedContent, setHasRenderedContent] = useState(false);
@@ -166,7 +182,14 @@ export default function PlayerFormatMatchHistory({ history, playerName, playerSl
                   </button>
                   <div id={yearId} hidden={!yearOpen}>
                     {group.matches.map((match) => (
-                      <MatchRow match={match} playerName={playerName} playerSlug={playerSlug} participantPresentation={participantPresentation} key={match.id} />
+                      <MatchRow
+                        match={match}
+                        playerName={playerName}
+                        playerSlug={playerSlug}
+                        participantPresentation={participantPresentation}
+                        scorecards={scorecardsByMatch[match.id] || []}
+                        key={match.id}
+                      />
                     ))}
                   </div>
                 </section>

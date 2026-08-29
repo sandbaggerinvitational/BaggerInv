@@ -251,7 +251,7 @@ test("Team History content requests metadata, preserves roster order, and render
   assert.equal((page.match(/includeTournamentPlayerMetadata:\s*true/g) || []).length, 1);
   assert.match(page, /Team Captain/);
   assert.match(page, /Tournament Handicap \$\{handicapLabel\}/);
-  assert.equal((page.match(/formatHistoryTournamentHandicap\(handicap\)/g) || []).length, 2);
+  assert.equal((page.match(/formatHistoryTournamentHandicap\(handicap\)/g) || []).length, 4);
   assert.match(page, /rosterCaptainMarker/);
   assert.match(css, /\.rosterCaptainMarker\s*\{[\s\S]*?width:\s*20px;[\s\S]*?height:\s*20px;/);
   assert.doesNotMatch(adapter, /\.sort\(\(left, right\) => \(number\(left\.handicap/);

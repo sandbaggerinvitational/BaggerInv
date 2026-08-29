@@ -412,6 +412,17 @@
   white-space: nowrap;
 }
 
+.publicRivalProfileCard {
+  grid-template-columns: 1.35fr .65fr .85fr auto;
+}
+
+.rivalCompareLink {
+  color: var(--tsi-green-900);
+  font-size: .83rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .rivalEmpty {
   margin-top: 22px;
   padding: 22px;
@@ -1338,6 +1349,10 @@
     grid-column: 1 / -1;
   }
 
+  .publicRivalProfileCard .rivalCompareLink {
+    grid-column: 1 / -1;
+  }
+
   .courseDetailGrid,
   .tournamentGrid {
     grid-template-columns: 1fr;
@@ -1416,6 +1431,10 @@
   }
 
   .rivalProfileCard > div:first-child {
+    grid-column: auto;
+  }
+
+  .publicRivalProfileCard .rivalCompareLink {
     grid-column: auto;
   }
 }
@@ -1618,7 +1637,8 @@
   gap: 12px;
 }
 
-.profileDraftHistory > article {
+.profileDraftHistory > article,
+.profileDraftHistory > a {
   padding: 17px;
   display: grid;
   gap: 5px;
@@ -1629,20 +1649,38 @@
   background: var(--tsi-white);
 }
 
-.profileDraftHistory > article strong {
+.profileDraftHistory > article strong,
+.profileDraftHistory > a strong {
   color: #9a7422;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.2rem;
 }
 
 .profileDraftHistory > article span,
-.profileDraftHistory > article small {
+.profileDraftHistory > article small,
+.profileDraftHistory > a span,
+.profileDraftHistory > a small {
   color: var(--tsi-muted);
   font-size: .7rem;
 }
 
-.profileDraftHistory > article b {
+.profileDraftHistory > article b,
+.profileDraftHistory > a b {
   font-size: .85rem;
+}
+
+.profileDraftAnalyticsLink {
+  align-content: center;
+  border-top-color: #d4b15f !important;
+  color: #0b4335 !important;
+  font-weight: 900;
+}
+
+.profileMatchScorecard {
+  grid-column: 1 / -1;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5dfd2;
 }
 
 @media (min-width: 821px) {
@@ -4662,7 +4700,8 @@
   display: grid;
 }
 
-.playerRankingList > div {
+.playerRankingList > div,
+.playerRankingList > a {
   min-height: 40px;
   border-bottom: 1px solid var(--tsi-line);
   color: var(--tsi-ink);
@@ -4670,6 +4709,10 @@
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 14px;
+}
+
+.playerRankingList > a:hover span {
+  color: var(--tsi-green-700);
 }
 
 .playerRankingList i {
@@ -4864,6 +4907,32 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.playerRecordsHeld > a {
+  min-height: 112px;
+  padding: 15px;
+  border: 1px solid var(--tsi-line);
+  border-radius: var(--tsi-radius-sm);
+  background: linear-gradient(145deg, rgba(247, 242, 232, .76), #fff);
+  color: var(--tsi-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.playerRecordsHeld > a span {
+  color: var(--tsi-gold-600);
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.playerRecordsHeld > a b {
+  color: var(--tsi-green-700);
+  font-size: .76rem;
 }
 
 .playerRecordsHeld strong {

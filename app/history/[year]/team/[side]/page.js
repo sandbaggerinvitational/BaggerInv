@@ -3,6 +3,7 @@ import { refreshCanonical2017To2022HistoricalData, refreshHistoricalData } from 
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../../../components";
+import ContextBackLink from "../../../../ContextBackLink";
 import TeamLogoPlate from "../../../../TeamLogoPlate";
 import PublicMatchCard from "../../../../PublicMatchCard";
 import {
@@ -170,6 +171,62 @@ export default async function TeamSeasonPage({ params, searchParams, participant
       ? playerOriginReturnContext(query, resolveHistoryPlayer)
       : playerOriginReturnContext(query, getPlayerBySlug)
     : null;
+
+  if (!participantPresentation) {
+    return (
+      <main data-public-history-team-page>
+        <Header />
+        <ContextBackLink
+          href={`/history/${team.year}`}
+          label={`Back to ${team.year} Tournament`}
+        />
+        <section className={`${styles.pageHero} ${styles.teamRosterHero}`}>
+          <TeamLogoPlate
+            filename={team.logo}
+            teamName={team.name}
+            variant="roster"
+            loading="eager"
+          />
+          <div>
+            <p className={styles.eyebrow}>{team.year} Team Roster</p>
+            <h1>{team.name}</h1>
+            <p>
+              Captain: {team.captain?.["Display Name"] || team.captainRecordedName || "Captain not recorded"} · Average
+              handicap {formatHistoryTournamentHandicap(team.averageHandicap)}
+            </p>
+          </div>
+        </section>
+        <section className={styles.content}>
+          <div className={styles.rosterGrid}>
+            {team.roster.map(({ player, handicap }) => {
+              const isCaptain = team.captainId === player["Player ID"];
+              const handicapLabel = handicap === null || handicap === undefined
+                ? "unavailable"
+                : formatHistoryTournamentHandicap(handicap);
+              return (
+                <Link
+                  aria-label={`${player["Display Name"]}${isCaptain ? ", Team Captain" : ""}, Tournament Handicap ${handicapLabel}`}
+                  className={styles.rosterCard}
+                  href={`/players/${player.slug}`}
+                  key={player["Player ID"]}
+                >
+                  <span>
+                    {player["Display Name"]}
+                    {isCaptain ? (
+                      <i className={styles.rosterCaptainMarker} title="Captain" aria-label="Team Captain">C</i>
+                    ) : null}
+                  </span>
+                  <strong>{formatHistoryTournamentHandicap(handicap)}</strong>
+                  <small>Tournament Handicap</small>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+        <Footer />
+      </main>
+    );
+  }
 
   return (
     <main>

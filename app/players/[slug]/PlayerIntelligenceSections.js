@@ -20,14 +20,15 @@ function formatPercentage(value) {
   return `${value.toFixed(1)}%`;
 }
 
-function IntelligenceSection({ eyebrow, title, children, open = false, defer = false }) {
+function IntelligenceSection({ eyebrow, title, children, open = false, defer = false, participantPresentation = false }) {
+  const shouldDefer = participantPresentation && defer;
   const [expanded, setExpanded] = useState(open);
-  const [hasRenderedContent, setHasRenderedContent] = useState(open || !defer);
+  const [hasRenderedContent, setHasRenderedContent] = useState(open || !shouldDefer);
 
   return (
     <details
       className={styles.playerIntelligenceSection}
-      data-career-detail={defer ? "deferred" : "eager"}
+      data-career-detail={shouldDefer ? "deferred" : "eager"}
       data-detail-mounted={hasRenderedContent ? "true" : "false"}
       onToggle={(event) => {
         const nextOpen = event.currentTarget.open;
@@ -52,16 +53,32 @@ function rank(rankValue) {
   return rankValue ? `#${rankValue}` : "—";
 }
 
-function RankingList({ rows }) {
+const RANKING_HREFS = Object.freeze({
+  careerPoints: "/records/career-points",
+  matchWins: "/records/match-wins",
+  winPercentage: "/records/win-percentage",
+  holeDifferential: "/records/highest-hole-differential",
+  birdies: "/records/career-most-birdies",
+  averageGross: "/records/career-lowest-average-score",
+});
+
+function RankingList({ rows, participantPresentation = false }) {
   return (
     <div className={styles.playerRankingList}>
-      {rows.map((row) => (
-        <div key={row.key}>
+      {rows.map((row) => {
+        const content = <>
           <span>{row.label}</span>
           <i aria-hidden="true" />
           <strong>{rank(row.rank)}</strong>
-        </div>
-      ))}
+        </>;
+        return participantPresentation ? (
+          <div key={row.key}>{content}</div>
+        ) : (
+          <Link href={RANKING_HREFS[row.key] || "/records"} key={row.key}>
+            {content}
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -149,6 +166,7 @@ export default function PlayerIntelligenceSections({
   playerName,
   playerSlug,
   participantPresentation = false,
+  scorecardsByMatch = {},
 }) {
   const { official, hole, progression } = intelligence;
   const careerRankingRows = intelligence.rankingRows.filter((row) =>
@@ -157,7 +175,7 @@ export default function PlayerIntelligenceSections({
 
   return (
     <div className={styles.playerIntelligence}>
-      <IntelligenceSection eyebrow="Complete Career View" title="Career Snapshot" open>
+      <IntelligenceSection eyebrow="Complete Career View" title="Career Snapshot" open participantPresentation={participantPresentation}>
         <h3>Official Career</h3>
         <ScoringStatGrid career dense items={[
           { label: "Overall Record", value: official.recordDisplay },
@@ -176,10 +194,10 @@ export default function PlayerIntelligenceSections({
           { label: "Average Net Score", value: formatScoringNumber(hole.averageNetScore) },
         ]} />
         <h3>Career Rankings</h3>
-        <RankingList rows={careerRankingRows} />
+        <RankingList rows={careerRankingRows} participantPresentation={participantPresentation} />
       </IntelligenceSection>
 
-      <IntelligenceSection defer eyebrow="Recorded Scorecards" title="Scoring Profile">
+      <IntelligenceSection defer eyebrow="Recorded Scorecards" title="Scoring Profile" participantPresentation={participantPresentation}>
         <h3>Gross</h3>
         <ScoringStatGrid career dense items={[
           { label: "Average Gross", value: formatScoringNumber(hole.averageGrossScore) },
@@ -208,7 +226,7 @@ export default function PlayerIntelligenceSections({
         </p>
       </IntelligenceSection>
 
-      <IntelligenceSection defer eyebrow="Reconstructed Match Play" title="Match Play Profile">
+      <IntelligenceSection defer eyebrow="Reconstructed Match Play" title="Match Play Profile" participantPresentation={participantPresentation}>
         <ScoringStatGrid career dense items={[
           { label: "Holes Won", value: hole.holesWon },
           { label: "Holes Lost", value: hole.holesLost },
@@ -223,7 +241,7 @@ export default function PlayerIntelligenceSections({
         ]} />
       </IntelligenceSection>
 
-      <IntelligenceSection defer eyebrow="Career Trends" title="Tournament History">
+      <IntelligenceSection defer eyebrow="Career Trends" title="Tournament History" participantPresentation={participantPresentation}>
         <div className={styles.playerTournamentHistory}>
           <div className={styles.playerTournamentHistoryHead} aria-hidden="true">
             <span>Year</span>
@@ -239,7 +257,7 @@ export default function PlayerIntelligenceSections({
         </div>
       </IntelligenceSection>
 
-      <IntelligenceSection defer eyebrow="Best Format First" title="Format Performance">
+      <IntelligenceSection defer eyebrow="Best Format First" title="Format Performance" participantPresentation={participantPresentation}>
         <div className={styles.playerFormatIntelligence}>
           {intelligence.formats.map((format, index) => (
             <article key={format.code}>
@@ -263,6 +281,7 @@ export default function PlayerIntelligenceSections({
                 playerName={playerName}
                 playerSlug={playerSlug}
                 participantPresentation={participantPresentation}
+                scorecardsByMatch={scorecardsByMatch}
               />
             </article>
           ))}
@@ -270,16 +289,26 @@ export default function PlayerIntelligenceSections({
       </IntelligenceSection>
 
       {intelligence.recordsHeld.length ? (
-        <IntelligenceSection eyebrow="Current Record Book" title="Records Held">
+        <IntelligenceSection eyebrow="Current Record Book" title="Records Held" participantPresentation={participantPresentation}>
           <div className={styles.playerRecordsHeld}>
-            {intelligence.recordsHeld.map((record) => (
-              <article key={record.slug}>
+            {intelligence.recordsHeld.map((record) => participantPresentation ? (
+              <article key={record.slug}><strong>{record.title}</strong></article>
+            ) : (
+              <Link href={`/records/${record.slug}`} key={record.slug}>
+                <span>Record Holder</span>
                 <strong>{record.title}</strong>
-              </article>
+                <b>View Leaderboard →</b>
+              </Link>
             ))}
           </div>
         </IntelligenceSection>
       ) : null}
+
+      {participantPresentation ? null : (
+        <IntelligenceSection eyebrow="Official Leaderboards" title="Current Rankings">
+          <RankingList rows={intelligence.rankingRows} />
+        </IntelligenceSection>
+      )}
     </div>
   );
 }

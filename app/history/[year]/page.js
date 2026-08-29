@@ -32,6 +32,7 @@ import { pageMetadata } from "../../../lib/seo";
 import TournamentLeaderboard from "../../TournamentLeaderboard";
 import StatusBadge from "../../StatusBadge";
 import { getDraftByYear } from "../../../lib/draft";
+import { isSupabaseDraftRead } from "../../../lib/draft-read-source";
 import {
   loadCanonical2017To2022HistoryAnalytics,
   loadCanonical2023HistoryAnalytics,
@@ -90,6 +91,8 @@ import {
   loadCompletedHistoryView,
 } from "../../../lib/completed-history-service";
 import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
+import { formatHistoryTournamentHandicap } from "../../../lib/history-team-metadata";
+import publicStyles from "../public-history.module.css";
 
 export async function generateMetadata({ params }) {
   const env = await applicationPageEnvironment();
@@ -160,6 +163,15 @@ function tournamentStatus(tournament) {
   };
 }
 
+function publicTournamentStatus(tournament, status) {
+  const lifecycle = String(tournament?.lifecycle || tournament?.state?.status || "")
+    .trim()
+    .toUpperCase();
+  return !status.complete && ["ACTIVE", "IN_PROGRESS", "LIVE"].includes(lifecycle)
+    ? { ...status, label: "In Progress" }
+    : status;
+}
+
 function leaderboardPlayer(row = {}) {
   const player = row.player && typeof row.player === "object" ? row.player : {};
   return {
@@ -215,6 +227,178 @@ const historyPresentationHref = (href, participantPresentation) => {
     .replace(/^\/players(?=\/|\?|$)/, "/app/players")
     .replace(/^\/courses(?=\/|\?|$)/, "/app/courses");
 };
+
+function PublicYearNavigation({ previousYear, nextYear, bottom = false }) {
+  return (
+    <nav
+      aria-label="Tournament year navigation"
+      className={`${publicStyles.yearNavigation} ${bottom ? publicStyles.yearNavigationBottom : ""}`}
+    >
+      {previousYear ? (
+        <Link href={`/history/${previousYear}`}>
+          <span>← Previous Year</span>
+          <strong>{previousYear}</strong>
+        </Link>
+      ) : <span />}
+      <Link className={publicStyles.historyHome} href="/history">
+        All Tournament Years
+      </Link>
+      {nextYear ? (
+        <Link href={`/history/${nextYear}`}>
+          <span>Next Year →</span>
+          <strong>{nextYear}</strong>
+        </Link>
+      ) : <span />}
+    </nav>
+  );
+}
+
+function PublicYearOverview({
+  draft,
+  leaderboard,
+  participant,
+  pointsTracked,
+  roundPoints,
+  scoringStatistics,
+  status,
+  tournament,
+  tournamentScorecards,
+}) {
+  return (
+    <section className={styles.content} data-public-history-year>
+      {draft ? (
+        <Link className={styles.draftHistoryLink} href={`/draft/${tournament.year}`} prefetch={false}>
+          <span>Official Team Selection</span>
+          <strong>View {tournament.year} Draft</strong>
+          <b>View Draft →</b>
+        </Link>
+      ) : null}
+
+      <div className={styles.finalScoreCard}>
+        <div>
+          <span>Champions</span>
+          <strong>{tournament.championTeam?.name || "To Be Determined"}</strong>
+        </div>
+        <div className={styles.finalScoreCenter}>
+          <span>{status.label}</span>
+          {status.score ? <b>{status.score}</b> : null}
+        </div>
+        <div>
+          <span>Runner-Up</span>
+          <strong>{tournament.runnerUpTeam?.name || "To Be Determined"}</strong>
+        </div>
+      </div>
+
+      <section className={styles.section}>
+        <span className={styles.sectionLabel}>The Teams</span>
+        <h2>Rosters</h2>
+        <div className={styles.teamSeasonGrid}>
+          {tournament.teams.map((team) => (
+            <Link
+              className={styles.teamSeasonCard}
+              href={`/history/${tournament.year}/team/${encodeURIComponent(team.side)}`}
+              key={team.side}
+            >
+              <TeamLogoPlate filename={team.logo} teamName={team.name} variant="card" />
+              <div>
+                <h3>{team.name}</h3>
+                <p>Captain: {team.captain?.["Display Name"] || team.captainRecordedName || "Captain not recorded"}</p>
+                <strong>Avg. Team Handicap: {formatHistoryTournamentHandicap(team.averageHandicap)}</strong>
+                <em>View full roster →</em>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <span className={styles.sectionLabel}>The Destination</span>
+        <h2>Courses Played</h2>
+        <div className={styles.courseCardGrid}>
+          {tournament.courses.map((course, index) => {
+            const round = roundNumber(course.Round);
+            const availablePoints = pointsForRound(roundPoints, round);
+            return (
+              <article className={`${styles.courseCard} ${styles.courseRoundCard}`} key={`${course["Course ID"]}-${course.Round}`}>
+                <Link
+                  className={styles.courseRoundPrimary}
+                  href={`/history/${tournament.year}/round/${round}`}
+                  prefetch={index === 0 ? undefined : false}
+                >
+                  <AssetImage
+                    src={courseLogo(course["Course Logo"])}
+                    alt={`${course.Course} logo`}
+                    className={styles.courseLogo}
+                    fallbackClassName={styles.courseLogoPlaceholder}
+                    fallback="⛳"
+                  />
+                  <span>{course.Round}</span>
+                  <h3>{course.Course}</h3>
+                  <p>{course.City}, {course.State}</p>
+                  <strong>{getFormatName(course.Format)}</strong>
+                  <small
+                    className={styles.courseRoundPoints}
+                    data-empty={availablePoints === null}
+                    aria-hidden={availablePoints === null ? "true" : undefined}
+                  >
+                    {availablePoints !== null ? `${availablePoints} Points Available` : "\u00a0"}
+                  </small>
+                  <b>View Round Results →</b>
+                </Link>
+                <Link
+                  className={styles.courseProfileLink}
+                  href={historyCourseProfileHref({ courseId: course["Course ID"], year: tournament.year, round })}
+                  prefetch={false}
+                >
+                  View Course Profile
+                </Link>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <span className={styles.sectionLabel}>Player Standings</span>
+        <h2>{tournament.year} Leaderboard</h2>
+        <TournamentLeaderboard
+          rows={leaderboard}
+          pointsTracked={pointsTracked}
+          prefetchPlayerLinks={false}
+          emptyMessage="No completed matches have been recorded for this tournament yet."
+        />
+      </section>
+
+      <section className={styles.section}>
+        <span className={styles.sectionLabel}>Available Scorecard History</span>
+        <h2>{tournamentScorecards.length ? "Tournament Scoring Statistics" : "Historical Scorecards"}</h2>
+        {tournamentScorecards.length ? (
+          <ScoringStatGrid items={scoringItems(scoringStatistics, participant, tournament.courses)} />
+        ) : (
+          <p>Detailed historical scorecards are not available for this tournament.</p>
+        )}
+      </section>
+
+      <section className={styles.section}>
+        <span className={styles.sectionLabel}>Tournament Honors</span>
+        <h2>Awards</h2>
+        <div className={styles.awardGrid}>
+          {tournament.awards.length ? tournament.awards.map((award) => (
+            <div className={styles.awardCard} key={award.Award}>
+              <span>{award.Award}</span>
+              <strong>{award.winnerPlayer?.["Display Name"] || award.Winner}</strong>
+            </div>
+          )) : (
+            <div className={styles.awardCard}>
+              <span>Sandbagger of the Year</span>
+              <strong>Not awarded</strong>
+            </div>
+          )}
+        </div>
+      </section>
+    </section>
+  );
+}
 
 function CompletedYearOverview({
   tournament,
@@ -571,6 +755,10 @@ export default async function TournamentYearPage({ params, searchParams, partici
     scorecardAnalytics = await scorecardAnalyticsPromise;
   }
 
+  if (!participantPresentation && !draft && (useSupabase2026 || useSupabaseCompleted) && isSupabaseDraftRead(env)) {
+    draft = await getDraftByYear(year, { env }).catch(() => null);
+  }
+
   const pointsTracked = leaderboardRows.some((row) => row.pointsTracked);
   const leaderboard = addTournamentRanks(
     leaderboardRows,
@@ -740,6 +928,66 @@ export default async function TournamentYearPage({ params, searchParams, partici
       ? playerOriginReturnContext(query, resolveHistoryPlayer)
       : playerOriginReturnContext(query, getPlayerBySlug)
     : null;
+
+  if (!participantPresentation) {
+    return (
+      <main data-public-history-year-page>
+        <Header />
+        <section className={styles.tournamentHero}>
+          <AssetImage
+            src={historyHeroPath(tournament)}
+            alt={`${tournament.year} ${tournament.Destination}`}
+            className={styles.tournamentHeroImage}
+            fallbackClassName={styles.tournamentHeroFallback}
+            fallback={tournament.Destination}
+            loading="eager"
+            width={1440}
+            height={720}
+            sizes="100vw"
+            decoding="async"
+            fetchPriority="high"
+          />
+          <div className={styles.tournamentHeroOverlay} />
+          <div className={styles.tournamentHeroContent}>
+            {tournament.logoFileName ? (
+              <AssetImage
+                src={tournamentLogo(tournament.logoFileName)}
+                alt={`${tournament.year} Sandbagger Invitational tournament logo`}
+                className={styles.tournamentEditionLogo}
+                fallbackClassName={styles.tournamentEditionLogoFallback}
+                fallback=""
+                loading="eager"
+                width={132}
+                height={132}
+                sizes="(max-width: 720px) 64px, 132px"
+                decoding="async"
+              />
+            ) : null}
+            <p>{tournament.editionTitle || historyEditionLabel(tournament.year)}</p>
+            <h1>{tournament.year}</h1>
+            <h2>{tournament.Destination}</h2>
+            <span>{tournament.Dates}</span>
+          </div>
+        </section>
+
+        <PublicYearNavigation previousYear={previousYear} nextYear={nextYear} />
+        <PublicYearOverview
+          draft={draft}
+          leaderboard={leaderboard}
+          participant={participant}
+          pointsTracked={pointsTracked}
+          roundPoints={roundPoints}
+          scoringStatistics={scoringStatistics}
+          status={publicTournamentStatus(tournament, status)}
+          tournament={tournament}
+          tournamentScorecards={tournamentScorecards}
+        />
+        <PublicYearNavigation previousYear={previousYear} nextYear={nextYear} bottom />
+        <Footer />
+      </main>
+    );
+  }
+
   return (
     <main>
       {participantPresentation ? null : <Header />}

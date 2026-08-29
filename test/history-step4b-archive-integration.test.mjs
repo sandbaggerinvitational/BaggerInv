@@ -27,18 +27,19 @@ test("2017–2025 Archive cards use the canonical Tournament History destination
   assert.doesNotMatch(archivePage, /from=player|player=/);
 });
 
-test("Archive champion facts remain visible without a separate Champion action", () => {
+test("Archive champion facts retain a separate public-only Champion action", () => {
   assert.match(archivePage, /<strong>\{historyTournamentCardResult\(tournament\)\}<\/strong>/);
   assert.match(archivePage, /const completed = Boolean\(tournament\.championTeamId\)/);
-  assert.doesNotMatch(archivePage, /\/champions\/\$\{tournament\.year\}/);
-  assert.doesNotMatch(archivePage, /View \{tournament\.year\} Champion/);
+  assert.match(archivePage, /!participantPresentation && completed[\s\S]*\/champions\/\$\{tournament\.year\}/);
+  assert.match(archivePage, /View \{tournament\.year\} Champion/);
   assert.doesNotMatch(archivePage, /historyChampionLink/);
   assert.doesNotMatch(archiveCss, /\.historyChampionLink/);
 });
 
-test("the full Archive card link has semantic focus treatment without nested links", () => {
+test("the Archive primary and public Champion links remain semantic siblings", () => {
   assert.match(archivePage, /<article className=\{styles\.historyPhotoCard\}[\s\S]*?<Link[\s\S]*?className=\{styles\.historyCardPrimary\}/);
-  assert.equal((archivePage.match(/<Link/g) || []).length, 1);
+  assert.match(archivePage, /<\/Link>[\s\S]*!participantPresentation && completed[\s\S]*<Link[\s\S]*href=\{`\/champions\/\$\{tournament\.year\}`\}/);
+  assert.equal((archivePage.match(/<Link/g) || []).length, 2);
   assert.match(archiveCss, /\.historyPhotoCard:focus-within/);
   assert.match(archiveCss, /\.historyCardPrimary:focus-visible/);
   assert.match(archiveCss, /outline: 3px solid var\(--tsi-gold-500\)/);
@@ -61,8 +62,8 @@ test("the public Champions product remains available outside the PWA", () => {
   assert.match(championsPage, /href=\{`\/champions\/\$\{tournament\.year\}`\}/);
 });
 
-test("the completed Match Center banner routes Final Results to canonical Tournament History", () => {
+test("the completed Match Center banner preserves the public Champions destination", () => {
   assert.match(liveMatchCenter, /const championshipMode = tournament\.state\.complete && tournament\.state\.championSide;/);
-  assert.match(liveMatchCenter, /href=\{`\/history\/\$\{tournament\.year\}`\}>View Final Results →<\/Link>/);
-  assert.doesNotMatch(liveMatchCenter, /href=\{`\/champions\/\$\{tournament\.year\}`\}/);
+  assert.match(liveMatchCenter, /href=\{`\/champions\/\$\{tournament\.year\}`\}>View Final Results →<\/Link>/);
+  assert.doesNotMatch(liveMatchCenter, /href=\{`\/history\/\$\{tournament\.year\}`\}>View Final Results →<\/Link>/);
 });
