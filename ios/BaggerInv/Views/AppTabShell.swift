@@ -71,9 +71,9 @@ struct BaggerAppShell: View {
             placeholderTab(
                 title: "Score",
                 message: "Native score entry is not enabled in this Preview build.",
-                symbol: "square.and.pencil"
+                symbol: "list.bullet.clipboard.fill"
             )
-            .tabItem { Label("Score", systemImage: "square.and.pencil") }
+            .tabItem { Label("Score", systemImage: "list.bullet.clipboard.fill") }
             .tag(BaggerAppTab.score)
             .accessibilityIdentifier("tab.score")
 
