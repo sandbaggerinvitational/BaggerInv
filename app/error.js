@@ -25,7 +25,7 @@ export default function Error({ error, reset }) {
       <div className="errorCard">
         <span>Sandbagger Invitational</span>
         <h1>Unable to load tournament data.</h1>
-        <p>The page hit an unexpected problem. Your Google Sheet data has not been changed.</p>
+        <p>The page hit an unexpected problem. Your tournament data has not been changed.</p>
         <button type="button" onClick={() => reset()}>Try again</button>
       </div>
     </main>

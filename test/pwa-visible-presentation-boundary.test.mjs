@@ -38,5 +38,6 @@ test("public routes cannot receive install, offline, update, splash, or particip
   }
   assert.match(splash, /classList\.remove\("pwa-cold-launch", "pwa-home-entering"\)/);
   assert.match(error, /Unable to load tournament data\./);
+  assert.match(error, /The page hit an unexpected problem\. Your tournament data has not been changed\./);
   assert.match(error, /participantPresentation[\s\S]*We couldn’t open this page\.[\s\S]*Unable to load tournament data\./);
 });
