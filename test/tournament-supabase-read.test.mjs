@@ -3,7 +3,11 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { buildParticipantHomePresentationImport } from "../lib/participant-home-supabase.js";
 import { tournamentReadEnvironment } from "../lib/tournament-read-source.js";
-import { compareTournamentLiveParity, tournamentLiveDataFromSupabaseView } from "../lib/tournament-live-supabase.js";
+import {
+  compareTournamentLiveParity,
+  readTournamentLiveView,
+  tournamentLiveDataFromSupabaseView,
+} from "../lib/tournament-live-supabase.js";
 import { readTournamentLiveCache, tournamentLiveCacheVersion, writeTournamentLiveCache } from "../lib/tournament-live-cache.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -13,6 +17,7 @@ const preview = {
   PREVIEW_SCORING_SHEET_ID: "preview-workbook",
   SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret",
+  SUPABASE_SCORING_MIRROR_ENABLED: "true",
   TOURNAMENT_READ_SOURCE: "supabase",
 };
 
@@ -33,6 +38,28 @@ test("Tournament RPC is compact, service-only, and uses canonical score authorit
   assert.match(migration, /revoke all on function public\.read_tournament_live_view\(text\) from public, anon, authenticated/);
   assert.match(migration, /grant execute on function public\.read_tournament_live_view\(text\) to service_role/);
   assert.doesNotMatch(migration, /create policy|using\s*\(\s*true\s*\)/i);
+});
+
+test("Preview Tournament RPC sends only installed SQL arguments", async () => {
+  const originalFetch = globalThis.fetch;
+  const bodies = [];
+  globalThis.fetch = async (_url, init) => {
+    bodies.push(JSON.parse(init.body));
+    return Response.json({ ok: true, data: { matches: [] } });
+  };
+  try {
+    await readTournamentLiveView("2026", { env: preview });
+    await readTournamentLiveView("2026", {
+      env: preview,
+      productionCutoverSurface: "GUIDE_COURSE_CONTEXT",
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  assert.deepEqual(bodies, [
+    { target_tournament_id: "2026" },
+    { target_tournament_id: "2026" },
+  ]);
 });
 
 test("Tournament default context resolves only from a Director-published projection", async () => {
