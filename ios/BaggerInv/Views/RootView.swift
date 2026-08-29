@@ -6,12 +6,14 @@ struct RootView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                PreviewBadge()
+            if !isAuthenticated {
+                HStack {
+                    Spacer()
+                    PreviewBadge()
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
 
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -26,6 +28,11 @@ struct RootView: View {
             guard newPhase == .active else { return }
             Task { await coordinator.refreshTournamentDataForForeground() }
         }
+    }
+
+    private var isAuthenticated: Bool {
+        if case .authenticated = coordinator.state { return true }
+        return false
     }
 
     @ViewBuilder
@@ -78,11 +85,21 @@ struct RootView: View {
         case .loadingParticipant:
             ProgressStateView(title: "Loading participant", message: "Resolving your canonical Bagger Player…")
         case .authenticated(let participant):
-            AuthenticatedDiagnosticView(
-                participant: participant,
-                tournamentData: coordinator.tournamentData
-            ) {
-                Task { await coordinator.signOut() }
+            if let tournamentData = coordinator.tournamentData {
+                BaggerAppShell(
+                    participant: participant,
+                    tournamentData: tournamentData
+                ) {
+                    Task { await coordinator.signOut() }
+                }
+            } else {
+                ControlledErrorView(
+                    title: "Preview unavailable",
+                    message: "The native tournament data foundation is not available.",
+                    actionTitle: "Sign Out"
+                ) {
+                    Task { await coordinator.signOut() }
+                }
             }
         case .authenticationError(let presentation):
             ControlledErrorView(

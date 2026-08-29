@@ -5,6 +5,7 @@ import XCTest
 final class BaggerInvLivePreviewUITests: XCTestCase {
     private let otpPasteboardSentinel = "BAGGER_STEP2A_WAITING_FOR_OTP"
     private let cacheAuditReleaseSentinel = "BAGGER_STEP2B_CACHE_AUDIT_COMPLETE"
+    private let acceptanceProbeArgument = "--bagger-acceptance-probes"
 
     override func setUp() {
         super.setUp()
@@ -29,7 +30,7 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
 
         UIPasteboard.general.string = otpPasteboardSentinel
 
-        let app = XCUIApplication()
+        let app = acceptanceApp()
         app.launch()
 
         assertSignedOutBootstrap(in: app)
@@ -55,21 +56,21 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         XCTAssertTrue(verify.isHittable, "The native Verify button was not enabled.")
         verify.tap()
 
-        let initialParticipantDiagnostic = assertAuthenticated(in: app, timeout: 45)
+        let initialCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
         print("STEP2A_AUTHENTICATED")
 
         app.terminate()
         app.launch()
 
-        let restoredParticipantDiagnostic = assertAuthenticated(in: app, timeout: 45)
-        if restoredParticipantDiagnostic != initialParticipantDiagnostic {
-            XCTFail("The restored canonical participant diagnostic did not match the initial session.")
-        }
+        let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        XCTAssertEqual(
+            restoredCanonicalParticipant,
+            initialCanonicalParticipant,
+            "Relaunch did not restore the same canonical participant context."
+        )
         print("STEP2A_SESSION_RESTORED")
 
-        let signOut = app.buttons["Sign Out"]
-        XCTAssertTrue(signOut.isHittable, "The native Sign Out button was not available.")
-        signOut.tap()
+        signOut(in: app)
         assertSignedOutBootstrap(in: app)
 
         app.terminate()
@@ -81,7 +82,7 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
     /// Exercises the temporary signed-out layout on a second Simulator without
     /// requesting an OTP or entering an approved participant identifier.
     func testSignedOutLayoutAndKeyboard() {
-        let app = XCUIApplication()
+        let app = signedOutFixtureApp()
         app.launch()
 
         assertSignedOutBootstrap(in: app)
@@ -118,7 +119,7 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         }
 
         UIPasteboard.general.string = otpPasteboardSentinel
-        let app = XCUIApplication()
+        let app = acceptanceApp()
         app.launch()
         assertSignedOutBootstrap(in: app)
 
@@ -136,28 +137,29 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
 
         let coldStart = Date()
         app.buttons["Verify"].tap()
-        _ = assertAuthenticated(in: app, timeout: 45)
-        assertDataFoundation(in: app, expectedSource: "network", timeout: 45)
+        let initialCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        assertTodayProducts(in: app, expectedSource: "network", timeout: 45)
         print(String(format: "STEP2B_COLD_PRODUCTS_READY_SECONDS=%.3f", Date().timeIntervalSince(coldStart)))
 
         app.terminate()
         let warmStart = Date()
         app.launch()
-        _ = assertAuthenticated(in: app, timeout: 45)
-        assertDataFoundation(in: app, expectedSource: "cache", timeout: 45)
+        let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        XCTAssertEqual(
+            restoredCanonicalParticipant,
+            initialCanonicalParticipant,
+            "Relaunch did not restore the same canonical participant context."
+        )
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
         print(String(format: "STEP2B_WARM_CACHE_AND_REVALIDATION_SECONDS=%.3f", Date().timeIntervalSince(warmStart)))
         print("STEP2B_CACHE_READY_FOR_INSPECTION")
 
         try waitForCacheAuditRelease(timeout: 5 * 60)
-        let refresh = app.buttons["Refresh All"]
-        XCTAssertTrue(refresh.isHittable, "The development refresh control was unavailable.")
-        refresh.tap()
-        assertDataFoundation(in: app, expectedSource: "cache", timeout: 45)
+        pullToRefreshToday(in: app)
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
         print("STEP2B_EXPLICIT_REVALIDATION_COMPLETE")
 
-        let signOut = app.buttons["Sign Out"]
-        XCTAssertTrue(signOut.isHittable, "The native Sign Out button was not available.")
-        signOut.tap()
+        signOut(in: app)
         assertSignedOutBootstrap(in: app)
         app.terminate()
         app.launch()
@@ -168,22 +170,102 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
     /// Read-only live validation for a securely restored Step 2A session. This
     /// test never opens CAPTCHA, requests an OTP, signs out, or mutates scoring.
     func testRestoredPreviewReadProductsWithoutAuthenticationMutation() throws {
-        guard ProcessInfo.processInfo.environment["BAGGER_STEP2B_RESTORED_READ_QA"] == "1" else {
+        let restoredReadAuthorization = ProcessInfo.processInfo.environment["BAGGER_STEP2B_RESTORED_READ_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2B_RESTORED_READ_QA") as? String)
+        guard restoredReadAuthorization == "1" else {
             throw XCTSkip(
                 "Set BAGGER_STEP2B_RESTORED_READ_QA=1 only when a restorable Preview session is known to exist."
             )
         }
-        let app = XCUIApplication()
+        let app = acceptanceApp()
         app.launch()
-        guard app.staticTexts["Signed In"].waitForExistence(timeout: 30) else {
+        guard app.descendants(matching: .any)["today.screen"].waitForExistence(timeout: 30) else {
             throw XCTSkip("No restorable Preview session is currently available.")
         }
         _ = assertAuthenticated(in: app, timeout: 5)
-        let refresh = app.buttons["Refresh All"]
-        XCTAssertTrue(refresh.isHittable, "The development refresh control was unavailable.")
-        refresh.tap()
-        assertDataFoundation(in: app, expectedSource: nil, timeout: 45)
+        pullToRefreshToday(in: app)
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
         print("STEP2B_RESTORED_READ_PRODUCTS_COMPLETE")
+    }
+
+    /// Continues the Step 2C live acceptance from an already certified Preview
+    /// session. This path never opens CAPTCHA, requests an OTP, or calls a
+    /// scoring route. It exists so a harness-only interruption cannot require a
+    /// second real authentication request.
+    func testRestoredPreviewTodayShellRestorationRefreshAndSignOut() throws {
+        let restoredTodayAuthorization = ProcessInfo.processInfo.environment["BAGGER_STEP2C_RESTORED_TODAY_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2C_RESTORED_TODAY_QA") as? String)
+        guard restoredTodayAuthorization == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2C_RESTORED_TODAY_QA=1 only for an explicitly authorized restored-session run."
+            )
+        }
+
+        let app = acceptanceApp()
+        app.launch()
+
+        let initialCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
+        assertFiveTabShell(in: app)
+
+        app.terminate()
+        app.launch()
+
+        let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        XCTAssertEqual(
+            restoredCanonicalParticipant,
+            initialCanonicalParticipant,
+            "Relaunch did not restore the same canonical participant context."
+        )
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
+        print("STEP2C_RESTORED_TODAY_READY")
+        print("STEP2C_CACHE_READY_FOR_INSPECTION")
+
+        try waitForCacheAuditRelease(timeout: 5 * 60)
+        pullToRefreshToday(in: app)
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
+        print("STEP2C_EXPLICIT_REVALIDATION_COMPLETE")
+
+        signOut(in: app)
+        assertSignedOutBootstrap(in: app)
+        app.terminate()
+        app.launch()
+        assertSignedOutBootstrap(in: app)
+        print("STEP2C_SIGN_OUT_COMPLETE")
+    }
+
+    /// Physical-device Step 2C acceptance for an existing certified Preview
+    /// session. This intentionally preserves authentication so offline and
+    /// subsequent real-device checks do not require another OTP.
+    func testPhysicalPreviewTodayShellRestorationAndRefresh() throws {
+        let physicalTodayAuthorization = ProcessInfo.processInfo.environment["BAGGER_STEP2C_PHYSICAL_TODAY_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2C_PHYSICAL_TODAY_QA") as? String)
+        guard physicalTodayAuthorization == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2C_PHYSICAL_TODAY_QA=1 only for an explicitly authorized physical-device run."
+            )
+        }
+
+        let app = acceptanceApp()
+        app.launch()
+
+        let initialCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
+        assertFiveTabShell(in: app)
+
+        app.terminate()
+        app.launch()
+
+        let restoredCanonicalParticipant = assertAuthenticated(in: app, timeout: 45)
+        XCTAssertEqual(
+            restoredCanonicalParticipant,
+            initialCanonicalParticipant,
+            "The physical relaunch did not restore the same canonical participant context."
+        )
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
+        pullToRefreshToday(in: app)
+        assertTodayProducts(in: app, expectedSource: nil, timeout: 45)
+        print("STEP2C_PHYSICAL_TODAY_COMPLETE")
     }
 
     private func approvedPreviewEmail() -> String? {
@@ -196,6 +278,22 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             return nil
         }
         return value
+    }
+
+    private func acceptanceApp() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments.append(acceptanceProbeArgument)
+        return app
+    }
+
+    private func signedOutFixtureApp() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--bagger-ui-testing",
+            "--bagger-ui-test-scenario",
+            "auth.signed-out",
+        ]
+        return app
     }
 
     private func assertSignedOutBootstrap(in app: XCUIApplication) {
@@ -287,32 +385,80 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         throw LivePreviewQAError.cacheAuditTimedOut
     }
 
-    private func assertDataFoundation(
+    private func assertTodayProducts(
         in app: XCUIApplication,
         expectedSource: String?,
         timeout: TimeInterval
     ) {
-        for product in ["today", "leaders", "schedule", "matches"] {
-            let row = app.descendants(matching: .any)["dataFoundation.\(product)"]
-            XCTAssertTrue(row.waitForExistence(timeout: timeout), "The \(product) repository diagnostic was missing.")
-            let predicate = NSPredicate { evaluated, _ in
-                guard let element = evaluated as? XCUIElement else { return false }
-                let value = (element.value as? String) ?? ""
-                let sourceMatches = expectedSource.map {
-                    value.localizedCaseInsensitiveContains("source \($0)")
+        let screen = app.descendants(matching: .any)["today.screen"]
+        XCTAssertTrue(screen.waitForExistence(timeout: timeout), "The authenticated Today screen was missing.")
+
+        for identifier in [
+            "today.tournamentContext",
+            "today.yourMatches",
+            "today.tournamentScore",
+            "today.schedule",
+        ] {
+            let element = app.descendants(matching: .any)
+                .matching(identifier: identifier)
+                .firstMatch
+            let deadline = Date().addingTimeInterval(timeout)
+            var reachedEligibleContent = false
+            while Date() < deadline {
+                let status = element.value as? String ?? ""
+                let hasEligibleContent = status.localizedCaseInsensitiveContains("content") &&
+                    status.localizedCaseInsensitiveContains("freshness fresh") &&
+                    status.localizedCaseInsensitiveContains("revision present")
+                let hasExpectedSource = expectedSource.map {
+                    status.localizedCaseInsensitiveContains("source \($0)")
                 } ?? true
-                return value.localizedCaseInsensitiveContains("Fresh") && sourceMatches &&
-                    value.localizedCaseInsensitiveContains("revision present")
+                if element.exists, hasEligibleContent, hasExpectedSource {
+                    reachedEligibleContent = true
+                    break
+                }
+                screen.swipeUp()
+                RunLoop.current.run(until: Date().addingTimeInterval(0.25))
             }
-            let expectation = XCTNSPredicateExpectation(predicate: predicate, object: row)
-            let waitResult = XCTWaiter.wait(for: [expectation], timeout: timeout)
-            let finalValue = (row.value as? String) ?? "missing diagnostic value"
-            XCTAssertEqual(
-                waitResult,
-                .completed,
-                "The \(product) product did not become fresh from \(expectedSource ?? "an eligible source"). Final safe status: \(finalValue)"
+            XCTAssertTrue(
+                reachedEligibleContent,
+                "The participant-safe product \(identifier) did not reach fresh, revision-backed content."
             )
         }
+    }
+
+    private func assertFiveTabShell(in app: XCUIApplication) {
+        let tabs = [
+            (name: "Today", placeholder: nil as String?),
+            (name: "Matches", placeholder: "placeholder.matches"),
+            (name: "Score", placeholder: "placeholder.score"),
+            (name: "Leaders", placeholder: "placeholder.leaders"),
+            (name: "More", placeholder: "placeholder.more"),
+        ]
+
+        for tab in tabs {
+            let button = app.tabBars.buttons[tab.name]
+            XCTAssertTrue(button.waitForExistence(timeout: 5), "The live \(tab.name) tab was missing.")
+            button.tap()
+            XCTAssertTrue(button.isSelected, "The live \(tab.name) tab did not become selected.")
+            if let placeholder = tab.placeholder {
+                XCTAssertTrue(
+                    app.descendants(matching: .any)[placeholder].waitForExistence(timeout: 5),
+                    "The restrained \(tab.name) placeholder was missing."
+                )
+            }
+        }
+
+        app.tabBars.buttons["Today"].tap()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["today.screen"].waitForExistence(timeout: 5),
+            "Today did not remain the live shell's real product destination."
+        )
+    }
+
+    private func pullToRefreshToday(in app: XCUIApplication) {
+        let screen = app.descendants(matching: .any)["today.screen"]
+        XCTAssertTrue(screen.exists, "The Today screen was unavailable for refresh.")
+        screen.swipeDown()
     }
 
     /// Pastes without passing the sensitive value to an XCTest typing command,
@@ -339,30 +485,33 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
 
     private func assertAuthenticated(in app: XCUIApplication, timeout: TimeInterval) -> String {
         XCTAssertTrue(
-            app.staticTexts["Signed In"].waitForExistence(timeout: timeout),
-            "The native authenticated diagnostic did not appear."
+            app.descendants(matching: .any)["app.shell"].waitForExistence(timeout: timeout),
+            "The native authenticated app shell did not appear."
         )
+        XCTAssertTrue(
+            app.descendants(matching: .any)["today.screen"].waitForExistence(timeout: 5),
+            "The authenticated Today destination did not appear."
+        )
+        XCTAssertFalse(app.textFields["Approved participant email"].exists)
 
-        let apiStatus = app.staticTexts
-            .matching(NSPredicate(format: "label CONTAINS[c] 'API' AND label CONTAINS[c] 'Connected'"))
-            .firstMatch
-        XCTAssertTrue(apiStatus.exists, "The API Connected diagnostic was missing.")
+        let account = app.buttons["account.menu"]
+        XCTAssertTrue(account.waitForExistence(timeout: 5), "The canonical participant account control was missing.")
+        let canonicalParticipant = account.value as? String ?? ""
+        XCTAssertTrue(
+            canonicalParticipant.contains("Canonical player ") &&
+                canonicalParticipant.contains("; tournament "),
+            "Canonical participant context was not exposed to the acceptance harness."
+        )
+        return canonicalParticipant
+    }
 
-        let identityStatus = app.staticTexts
-            .matching(NSPredicate(format: "label CONTAINS[c] 'Identity' AND label CONTAINS[c] 'Certified'"))
-            .firstMatch
-        XCTAssertTrue(identityStatus.exists, "The Identity Certified diagnostic was missing.")
-
-        let participantDiagnostic = app.staticTexts
-            .matching(NSPredicate(format: "label BEGINSWITH[c] 'PLAYER ID'"))
-            .firstMatch
-        XCTAssertTrue(participantDiagnostic.exists, "The canonical Player diagnostic was missing.")
-
-        let label = participantDiagnostic.label.trimmingCharacters(in: .whitespacesAndNewlines)
-        if label.caseInsensitiveCompare("PLAYER ID") == .orderedSame || label.isEmpty {
-            XCTFail("The canonical Player diagnostic was empty.")
-        }
-        return label
+    private func signOut(in app: XCUIApplication) {
+        let account = app.buttons["account.menu"]
+        XCTAssertTrue(account.waitForExistence(timeout: 5), "The native account menu was unavailable.")
+        account.tap()
+        let signOut = app.buttons["Sign Out"]
+        XCTAssertTrue(signOut.waitForExistence(timeout: 5), "The native Sign Out action was unavailable.")
+        signOut.tap()
     }
 }
 

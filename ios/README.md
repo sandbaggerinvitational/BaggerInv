@@ -1,6 +1,6 @@
 # Bagger Invitational for iOS
 
-This directory contains the native SwiftUI foundation for **Bagger Preview**. Step 2A established the isolated Preview environment, email OTP, Supabase session, Bagger identity certification, canonical participant resolution, secure restoration, and sign-out. Step 2B adds the authenticated mobile read/cache implementation. It is not yet the full tournament application.
+This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C adds the first real participant product surface: a native Today experience inside the approved five-tab application shell.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ Open `ios/BaggerInv.xcodeproj` in Xcode, select the shared `BaggerInv` scheme, a
 
 `com.sandbaggerinvitational.bagger.preview`
 
-The app is intentionally presented as **Bagger Preview**, and the bootstrap UI keeps a visible `PREVIEW` indicator.
+The app is intentionally presented as **Bagger Preview**, and both authentication and the participant shell keep a visible `PREVIEW` indicator.
 
 ## Configure isolated Preview
 
@@ -93,7 +93,8 @@ Physical-device testing uses normal automatic development signing only:
 2. In Xcode Settings > Accounts, sign in with the development Apple ID.
 3. Select the `BaggerInv` target, open Signing & Capabilities, enable automatic signing, and choose the development team.
 4. Enable Developer Mode on the iPhone if Xcode requests it.
-5. Select the connected iPhone as the run destination and press Run.
+5. For physical UI tests, also enable Settings > Developer > Enable UI Automation.
+6. Select the connected iPhone as the run destination and press Run.
 
 A paid Apple Developer Program membership is not required for Simulator use. Do not create distribution signing, TestFlight builds, App Store Connect records, push-notification entitlements, or Production provisioning during Step 2A.
 
@@ -107,7 +108,10 @@ A paid Apple Developer Program membership is not required for Simulator use. Do 
 - `Networking/` owns typed async HTTP transport and centralized protected headers.
 - `Security/` stores the Bagger certification and sensitive session state in Keychain-backed storage.
 - `Models/` contains the Step 2A identity contracts and complete Step 2B read DTOs.
-- `Views/` contains temporary bootstrap and diagnostic SwiftUI, not final product screens.
+- `Presentation/` maps canonical read DTOs to UI-ready Today values without changing match, identity, schedule, or standings authority.
+- `Design/` contains the small native Bagger palette, spacing, card, and typography treatment used by Today.
+- `Views/` contains the authentication UI, five-tab shell, real Today destination, and restrained placeholders for later products.
+- `Debug/` contains an allowlisted, Debug-only synthetic Today fixture launcher for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
 
 The app does not read canonical Bagger tables through Supabase. Supabase establishes the native Auth session; the mobile v1 API separately certifies that identity and returns the canonical Bagger Player. Protected API calls require both the Supabase Bearer token and the signed Bagger certification.
 
@@ -115,6 +119,7 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 
 - **Step 2A — COMPLETE:** native Preview authority, authentication, certification, canonical identity, secure restoration, and sign-out foundation.
 - **Step 2B — COMPLETE:** typed mobile read DTOs, authenticated transport, participant-scoped cache, repositories, coordinator, diagnostics, focused tests, and isolated Preview live QA are proven.
+- **Step 2C — COMPLETE:** native five-tab shell, cached-first Today product experience, Simulator validation, and physical-device online/offline validation.
 
 ## Step 2B mobile read architecture
 
@@ -131,7 +136,61 @@ Every request uses the existing centralized protected transport with both the cu
 
 A protected read that returns the structured `MOBILE_API_UNAVAILABLE` code cannot by itself distinguish an invalid authority from an isolated product-source outage. The coordinator therefore hides participant UI, re-runs the exact Step 2A `/health` contract, and resumes the retained participant state only after that attestation succeeds. A failed attestation cancels reads, deletes the active partition, and enters the existing environment-unavailable state. A purely transient foreground health transport failure retains the last verified participant state and eligible offline cache; an incompatible or server-rejected health response still fails closed.
 
-The temporary authenticated diagnostic exposes data-foundation state and an explicit **Refresh All** action. It does not implement the final Today, Matches, Leaders, or Schedule screens.
+The Step 2B diagnostic is no longer the primary authenticated experience. The app enters the tab shell and Today consumes the same repositories; participant views still never inspect ETags, credentials, cache files, or URL requests.
+
+## Step 2C Today and app shell
+
+The authenticated app uses the fixed native information architecture:
+
+```text
+Today | Matches | Score | Leaders | More
+```
+
+Today is implemented; the other four destinations are intentionally restrained placeholders. `Score` means future score entry—not Tournament Score—and exposes no scoring action in Step 2C.
+
+Today preserves the approved product hierarchy:
+
+```text
+tournament context
+→ server-selected current/next match
+→ relationship-filtered personal matches
+→ canonical team standings / Tournament Score
+→ bounded published schedule for the tournament-local day
+```
+
+`TodayPresenter` is deterministic presentation logic. It uses `/today.currentMatch` exactly, filters personal matches only with `authenticatedPlayer.involved`, preserves the server's standings order/ranks/records, formats half points without changing numeric values, and filters schedule-day membership in the IANA tournament timezone. When the full schedule has no event for that local day, the server-projected `/today.immediateSchedule` may appear as **Up Next**. It never selects a different match, calculates standings, infers scoring authority, or accesses Google/Supabase tables.
+
+Each section handles content, loading, empty, and temporary unavailable states independently. Eligible cached content remains visible during refresh and transient failure; a restrained banner communicates cached/stale/offline status. Pull to refresh delegates once to `TournamentDataCoordinator.refreshAll()`. Global environment or authentication invalidation remains owned by the Step 2A coordinator and still fails closed.
+
+The visual treatment translates the current PWA's warm paper, deep evergreen, muted gold, serif display hierarchy, compact cards, strong Tournament Score surface, and accessible status copy into native SwiftUI. The Preview app is deliberately constrained to its audited light appearance until a full native dark palette is designed; this avoids unsafe automatic inversion. System fonts preserve Dynamic Type, and status/winner/offline meaning never relies on color alone.
+
+No player, team, course, or tournament images are bundled in Step 2C. Mobile v1 does not provide canonical image references for every surface (notably match-team IDs), and repository asset licensing is not yet documented well enough to copy marks blindly. Text and neutral initial roundels are the accessible fallback. Asset ownership and a canonical ID registry should be reviewed before shipping branded marks.
+
+### Deterministic Today UI validation
+
+Debug builds accept fixture mode only with both explicit allowlisted arguments:
+
+```text
+--bagger-ui-testing --bagger-ui-test-scenario today.standard
+```
+
+Other synthetic scenarios cover live/final/no-match, cached-offline, no-cache-offline, and long-content layouts. Missing or unknown scenarios fail to a controlled fixture error and never fall back to live dependencies. Fixture mode constructs no URL session, Supabase client, Keychain state, credentials, OTP, or participant cache. Release builds do not compile the launcher.
+
+The user-mediated live acceptance harness separately adds `--bagger-acceptance-probes`. Only an explicit Debug launch may then expose participant-safe repository readiness and canonical-context equality through accessibility values for XCTest. Ordinary Debug launches and all Release builds expose neither probe; normal VoiceOver labels remain participant-facing.
+
+Run the deterministic Today UI suite with:
+
+```sh
+xcodebuild \
+  -project ios/BaggerInv.xcodeproj \
+  -scheme BaggerInv \
+  -configuration Debug \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=26.5' \
+  -only-testing:BaggerInvUITests/BaggerInvTodayUITests \
+  test
+```
+
+The opt-in live Preview tests remain user-mediated and never request an OTP unless the run is separately authorized. Step 2C does not require or authorize Production authentication, participant reads, or scoring.
 
 ## Participant-scoped read cache
 
@@ -194,4 +253,4 @@ Step 2A intentionally did not include product screens, phone OTP UI, direct Supa
 
 ## Next step
 
-**Step 2C — Today** may build the first real product screen after the Step 2B validation gate passes. It should consume the shared repositories rather than constructing HTTP requests in SwiftUI, preserve cached-first and freshness behavior, and follow the approved hierarchy: tournament context, current/next match hero, your matches, tournament score, today's schedule, and optional tournament pulse. It must not introduce scoring mutations or merge the read cache with the future scoring queue.
+**Step 2D — Matches + Match Detail** is the next planned implementation. It should reuse the Step 2B repository/cache foundation and Step 2C shell/design language, default to the canonical current round, show the authenticated golfer's Match hero, and then show all matches for that selected round. Scoring remains separate and must continue to honor Step 1C/1D authorization and reliability boundaries.
