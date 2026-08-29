@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { after, NextResponse } from "next/server";
 import { currentNetSkinsOperationalResult } from "../../../../lib/net-skins-supabase.js";
 import { requireNetSkinsReadSource } from "../../../../lib/net-skins-read-source.js";
+import { currentProductionNetSkinsV1 } from "../../../../lib/production-net-skins-v1.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
@@ -24,11 +25,17 @@ export async function GET(request) {
     const identityStarted = performance.now();
     const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStarted;
-    const operational = await currentNetSkinsOperationalResult(identity.tournamentId, {
-      recalculatePending: !source.productionShadowCandidate,
-      calculatedBy: `participant-read:${identity.playerId}`,
-      env,
-    });
+    // Active Production consumes the canonical, read-only V1 contract. Preview
+    // retains its existing isolated recalculation behavior until its dedicated
+    // worker is invoked through the Preview contract.
+    const productionV1 = source.productionCutover?.handled === true;
+    const operational = productionV1
+      ? await currentProductionNetSkinsV1({ playerId: identity.playerId, env })
+      : await currentNetSkinsOperationalResult(identity.tournamentId, {
+        recalculatePending: !source.productionShadowCandidate,
+        calculatedBy: `participant-read:${identity.playerId}`,
+        env,
+      });
     const totalMs = performance.now() - startedAt;
     if (operational.recalculation) after(async () => {
       try {
@@ -45,10 +52,12 @@ export async function GET(request) {
     const response = NextResponse.json({
       data: {
         netSkins: operational.netSkins,
+        netSkinsState: operational.netSkinsState || null,
         freshness: {
           stale: operational.stale,
           jobs: operational.jobs,
           recalculated: Boolean(operational.recalculation),
+          revision: operational.revision || "",
         },
       },
       player: { id: identity.playerId, name: identity.displayName },
@@ -66,6 +75,7 @@ export async function GET(request) {
     }, { headers: responseHeaders });
     response.headers.set("X-Net-Skins-Read-Source", "supabase");
     response.headers.set("X-Net-Skins-Google-Requests", "0");
+    if (operational.netSkinsState?.state) response.headers.set("X-Net-Skins-State", operational.netSkinsState.state);
     response.headers.set("X-Participant-Identity-Authority", "supabase");
     response.headers.set("Server-Timing", `identity;dur=${identityMs.toFixed(1)}, postgres;dur=${Number(operational.queryMs || 0).toFixed(1)}, supabase;dur=${Number(operational.serviceMs || 0).toFixed(1)}, calculation;dur=${Number(operational.recalculation?.calculated?.calculationMs || 0).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;

@@ -139,10 +139,30 @@ function MyRounds({ matches, totalCount, timeZone }) {
 
 const skinsCurrency = (value) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: Number(value) % 1 ? 2 : 0 }).format(Number(value) || 0);
 
-function PlayerNetSkins({ netSkins, playerId }) {
+function PlayerNetSkins({ netSkins, netSkinsState = null, playerId }) {
+  const canonicalState = String(netSkinsState?.state || "").trim().toUpperCase();
+  if (canonicalState === "NOT_CONFIGURED") return null;
   const entries = (netSkins?.rounds || []).flatMap((round) => (round.leaderboard || [])
     .filter((row) => row.playerIds?.includes(playerId))
     .map((row) => ({ ...row, round: round.round })));
+  if (canonicalState === "UNAVAILABLE") return <section className={styles.netSkins} data-state="unavailable" aria-labelledby="home-net-skins-title">
+    <div className={styles.netSkinsLayout}>
+      <span className={styles.skinCoin} aria-hidden="true">S</span>
+      <div className={styles.netSkinsCopy}><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2><div className={styles.netSkinsSummary}><strong>Temporarily unavailable</strong></div></div>
+    </div>
+  </section>;
+  if (!entries.length && ["CONFIGURED", "IN_PROGRESS"].includes(canonicalState)) {
+    const message = canonicalState === "IN_PROGRESS"
+      ? "In progress · official results publish after the round is final"
+      : "Configured · official results publish after scoring begins";
+    return <section className={styles.netSkins} data-state={canonicalState.toLowerCase()} aria-labelledby="home-net-skins-title">
+      <div className={styles.netSkinsLayout}>
+        <span className={styles.skinCoin} aria-hidden="true">S</span>
+        <div className={styles.netSkinsCopy}><p>Your Competitions</p><h2 id="home-net-skins-title">Net Skins</h2><div className={styles.netSkinsSummary}><strong>{message}</strong></div></div>
+        <Link href="/app/leaderboards?tab=skins">View <i aria-hidden="true">→</i></Link>
+      </div>
+    </section>;
+  }
   if (!playerId || !entries.length) return null;
   const skins = entries.reduce((sum, row) => sum + (Number(row.skinsWon) || 0), 0);
   const winnings = entries.reduce((sum, row) => sum + (Number(row.totalWinnings) || 0), 0);
@@ -170,18 +190,18 @@ function parseServerTiming(value = "") {
   }).filter(([name]) => name));
 }
 
-export function PersonalizedPlayerHomeSecondary({ netSkins = null, data = null }) {
+export function PersonalizedPlayerHomeSecondary({ netSkins = null, netSkinsState = null, data = null }) {
   const selection = selectRelevantPlayerMatches(data?.matches || [], data?.tournament?.currentRound);
   const matches = selection.ordered;
   const summaryMatches = homeRoundSummaryMatches(matches, promotedMatchIds(selection));
   if (!data) return null;
   return <>
-    <PlayerNetSkins netSkins={netSkins} playerId={data?.player?.id} />
+    <PlayerNetSkins netSkins={netSkins} netSkinsState={netSkinsState} playerId={data?.player?.id} />
     {summaryMatches.length ? <MyRounds matches={summaryMatches} totalCount={matches.length} timeZone={data?.tournament?.timeZone} /> : null}
   </>;
 }
 
-export default function PersonalizedPlayerHome({ netSkins = null, initialData = null, managed = false, participantIdentityAuthority = "passport", showSecondary = true }) {
+export default function PersonalizedPlayerHome({ netSkins = null, netSkinsState = null, initialData = null, managed = false, participantIdentityAuthority = "passport", showSecondary = true }) {
   const cachedInitialization = useMemo(() => managed ? null : readParticipantInitializationCache(), [managed]);
   const [payload, setPayload] = useState(initialData || cachedInitialization?.data || null);
   const [state, setState] = useState(initialData || cachedInitialization ? "ready" : "loading");
@@ -369,7 +389,7 @@ export default function PersonalizedPlayerHome({ netSkins = null, initialData = 
       {message ? <p className={styles.message} role="alert">{message}</p> : null}
     </div>}
 
-    {showSecondary && secondaryReady ? <PlayerNetSkins netSkins={netSkins} playerId={player?.id} /> : null}
+    {showSecondary && secondaryReady ? <PlayerNetSkins netSkins={netSkins} netSkinsState={netSkinsState} playerId={player?.id} /> : null}
     {showSecondary && secondaryReady && summaryMatches.length ? <MyRounds
       matches={summaryMatches}
       totalCount={matches.length}

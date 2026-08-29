@@ -18,7 +18,20 @@ function parseTiming(value = "") {
   }).filter(([name]) => name));
 }
 
-export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" }) {
+function canonicalNetSkinsPresentation(payload, productionNetSkinsV1) {
+  if (!productionNetSkinsV1 || !payload?.liveData || payload.liveData.netSkinsState) {
+    return payload;
+  }
+  // A cached participant-home projection may still carry the legacy derived
+  // payload. The canonical V1 state must arrive before Production advertises
+  // or renders Net Skins.
+  return { ...payload, liveData: { ...payload.liveData, netSkins: null } };
+}
+
+export default function ParticipantSupabaseHome({
+  netSkinsReadSource = "google",
+  productionNetSkinsV1 = false,
+}) {
   const router = useRouter();
   const [payload, setPayload] = useState(null);
   const [state, setState] = useState("loading");
@@ -40,7 +53,11 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
       if (!response.ok || !result.data?.netSkins) throw new Error(result.code || "NET_SKINS_READ_UNAVAILABLE");
       setPayload((current) => {
         if (!current?.liveData) return current;
-        const next = { ...current, liveData: { ...current.liveData, netSkins: result.data.netSkins } };
+        const next = { ...current, liveData: {
+          ...current.liveData,
+          netSkins: result.data.netSkins,
+          netSkinsState: result.data.netSkinsState || null,
+        } };
         writeParticipantHomeCache(next);
         return next;
       });
@@ -126,11 +143,14 @@ export default function ParticipantSupabaseHome({ netSkinsReadSource = "google" 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (payload?.liveData) return <>
-    <PwaSplashIdentityBridge tournament={payload.liveData.tournament} />
+  if (payload?.liveData) {
+    const presentation = canonicalNetSkinsPresentation(payload, productionNetSkinsV1);
+    return <>
+    <PwaSplashIdentityBridge tournament={presentation.liveData.tournament} />
     <PreviewModeBadge visible />
-    <MobileTournamentHome liveData={payload.liveData} initialParticipantData={payload.participant} participantIdentityAuthority="supabase" />
+    <MobileTournamentHome liveData={presentation.liveData} initialParticipantData={presentation.participant} participantIdentityAuthority="supabase" />
   </>;
+  }
 
   return <main className="mobileHomeMain">
     <PwaSplashIdentityBridge tournament={null} />

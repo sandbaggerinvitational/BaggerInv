@@ -121,11 +121,11 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
         logo={liveTournament.logo}
         status={status}
       />
-      <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed participantIdentityAuthority={participantIdentityAuthority} showSecondary={false} />
+      <PersonalizedPlayerHome netSkins={liveData?.netSkins} netSkinsState={liveData?.netSkinsState} initialData={initialParticipantData} managed participantIdentityAuthority={participantIdentityAuthority} showSecondary={false} />
       {pulse}
       {timelineAvailable ? <TournamentSchedule compact events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
       <DeferredHomeContent fallback={<ModuleSkeleton label="Loading tournament moments" />}><TournamentMoments moments={moments} /></DeferredHomeContent>
-      <DeferredHomeContent fallback={<ModuleSkeleton label="Loading your tournament details" />}><PersonalizedPlayerHomeSecondary netSkins={liveData?.netSkins} data={initialParticipantData} /></DeferredHomeContent>
+      <DeferredHomeContent fallback={<ModuleSkeleton label="Loading your tournament details" />}><PersonalizedPlayerHomeSecondary netSkins={liveData?.netSkins} netSkinsState={liveData?.netSkinsState} data={initialParticipantData} /></DeferredHomeContent>
     </div>
   );
 
@@ -134,6 +134,6 @@ export default function TournamentCommandCenter({ tournament, liveData, initialP
     {pulse}
     <DeferredHomeContent><TournamentMoments moments={moments} /></DeferredHomeContent>
     {timelineAvailable ? <TournamentSchedule events={scheduleEvents} timeZone={liveTournament.timeZone} initialNow={liveData.timeline.previewDateActive ? liveData.timeline.effectiveNow : ""} /> : null}
-    <PersonalizedPlayerHome netSkins={liveData?.netSkins} initialData={initialParticipantData} managed={false} participantIdentityAuthority={participantIdentityAuthority} />
+    <PersonalizedPlayerHome netSkins={liveData?.netSkins} netSkinsState={liveData?.netSkinsState} initialData={initialParticipantData} managed={false} participantIdentityAuthority={participantIdentityAuthority} />
   </div>;
 }

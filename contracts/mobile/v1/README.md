@@ -190,7 +190,7 @@ Success (`200`):
 
 ## Tournament read routes
 
-All read responses use `{ "ok": true, "apiVersion": "v1", "data": ..., "meta": ... }` and are private to the verified Bearer identity with its exact Bagger certification proof. `meta.generatedAt` is an ISO-8601 UTC response timestamp. `meta.revision` is the existing canonical product fingerprint: participant Home for `/today`, Tournament Live for `/matches`, Leaderboards Core for `/leaders`, and the published Guide delivery fingerprint (falling back to its existing projection revision) for `/schedule`. The same value is a strong `ETag`; matching `If-None-Match` requests receive `304`. No revision store was introduced.
+All read responses use `{ "ok": true, "apiVersion": "v1", "data": ..., "meta": ... }` and are private to the verified Bearer identity with its exact Bagger certification proof. `meta.generatedAt` is an ISO-8601 UTC response timestamp. `meta.revision` is the existing canonical product fingerprint: participant Home for `/today`, Tournament Live for `/matches`, Leaderboards Core for `/leaders`, the published Guide delivery fingerprint (falling back to its existing projection revision) for `/schedule`, and the deterministic canonical Net Skins revision for `/net-skins`. The same value is a strong `ETag`; matching `If-None-Match` requests receive `304`. No client-selected revision store was introduced.
 
 ### `GET /today`
 
@@ -207,6 +207,32 @@ Returns overall team and Player standings from Leaderboards Core and its establi
 ### `GET /schedule`
 
 Returns only the published participant itinerary from the current Guide projection. Editorial metadata, raw source rows, contacts, unpublished content, Details copy, and administration fields are excluded.
+
+### `GET /net-skins`
+
+Authentication is the same verified Supabase Bearer session plus `X-Bagger-Certification` required by every protected mobile read. The request has no Player, tournament, environment, publication, or revision query selector. The server-resolved canonical Player ID and tournament are the only identity inputs.
+
+The server adapter calls the service-role-only Production RPC `read_production_net_skins_v1(input jsonb)`. Its input is pinned to the exact Production Supabase project, Production workbook, and tournament by server configuration. The client never receives or supplies a service credential and cannot select Preview resources. The adapter performs no Net Skins calculation and never calls Google; canonical Supabase scoring/configuration produces the response.
+
+The stable state values are:
+
+| State | Meaning |
+| --- | --- |
+| `NOT_CONFIGURED` | No valid tournament-scoped Net Skins configuration exists. This is a successful empty read, not an error. |
+| `CONFIGURED` | Valid entries exist, but no provisional payout is published. |
+| `IN_PROGRESS` | Canonical scores are in progress. Configuration identity is available, but provisional payout results remain hidden. |
+| `OFFICIAL` | The server has finalized and published the official result for every included result. |
+| `UNAVAILABLE` | The canonical product is temporarily unable to provide a safe result. No fallback data is returned. |
+
+`publicationPolicy` is always `OFFICIAL_ONLY`. Configuration summaries expose stable `roundId`, canonical `matchIds`, stable configuration `entryId`, and stable `playerIds`; a pairing remains one stable entry containing both canonical Player IDs. Only an `OFFICIAL` round has `officialResults`. Its skins and leaderboard are decorated and validated against those configuration identities; raw calculation payloads and name-only identity are never part of the native contract.
+
+The canonical revision is `net-skins-v1:<configuration-revision>:<result-revision-or-0>:<state>`. It is returned in `data.revision`, `meta.revision`, and the strong `ETag`. Freshness exposes bounded configured/calculated/published timestamps, a source fingerprint, and `stale`; clients must not infer authority from timestamps alone.
+
+Transport/Auth/resource failures use the existing enumeration-safe mobile errors (`UNAUTHORIZED`, `INVALID_TOKEN`, `PARTICIPANT_NOT_FOUND`, `AUTH_CERTIFICATION_FAILED`, or `MOBILE_API_UNAVAILABLE`). `NOT_CONFIGURED` and `UNAVAILABLE` are successful domain states, so participant clients can render them without parsing internal PostgREST errors. No email, phone, Auth UUID, Director entitlement, source row, internal job, or service diagnostic is returned.
+
+#### Production activation boundary
+
+This endpoint and `net-skins.schema.json` define the final Production-native DTO without depending on a Preview-only RPC or PWA route. The repository-wide mobile authority/health gate nevertheless remains intentionally isolated to Preview. Consequently this route is dormant against Production until a separately authorized Production activation changes that shared native authority milestone. This task does not bypass the health/session proof, point Preview at Production, enable another mobile-v1 route in Production, or change the native Swift application. Activating Production native transport is separate work.
 
 ## Date and time
 

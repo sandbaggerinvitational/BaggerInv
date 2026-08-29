@@ -12,12 +12,14 @@ export const dynamic = "force-dynamic";
 export default async function ParticipantLeaderboardsPage() {
   const env = await applicationPageEnvironment();
   const source = requireLeaderboardsCoreReadSource(env);
-  const netSkinsReadSource = requireNetSkinsReadSource(env).resolved;
+  const netSkinsSource = requireNetSkinsReadSource(env);
+  const netSkinsReadSource = netSkinsSource.resolved;
   if (source.resolved === "supabase") return <>
     <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} />
     <LeaderboardsSupabaseRead
       previewMode={process.env.VERCEL_ENV === "preview"}
       netSkinsReadSource={netSkinsReadSource}
+      productionNetSkinsV1={netSkinsSource.productionCutover?.handled === true}
     />
   </>;
 

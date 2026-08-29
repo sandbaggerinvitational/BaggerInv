@@ -25,7 +25,10 @@ export default async function MobileHomePage() {
   const participantIdentityAuthority = requireParticipantIdentityAuthority(env).resolved;
   const netSkinsSource = requireNetSkinsReadSource(env);
   const netSkinsReadSource = netSkinsSource.resolved;
-  if (source.resolved === "supabase") return <ParticipantSupabaseHome netSkinsReadSource={netSkinsReadSource} />;
+  if (source.resolved === "supabase") return <ParticipantSupabaseHome
+    netSkinsReadSource={netSkinsReadSource}
+    productionNetSkinsV1={netSkinsSource.productionCutover?.handled === true}
+  />;
 
   let liveData;
   try {

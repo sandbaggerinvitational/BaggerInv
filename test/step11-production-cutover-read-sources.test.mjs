@@ -182,28 +182,38 @@ test("activation disabled preserves certified live Production legacy resolution"
   assert.equal(oddsCalculationEnvironment(legacy).publicationAuthority, "google");
 });
 
-test("Net Skins and Calcutta cannot acquire a Production source without real configuration", () => {
-  for (const [variable, selector, configuredFlag] of [
-    ["NET_SKINS_READ_SOURCE", netSkinsReadEnvironment, "PRODUCTION_NET_SKINS_CONFIGURED"],
-    ["CALCUTTA_READ_SOURCE", calcuttaReadEnvironment, "PRODUCTION_CALCUTTA_CONFIGURED"],
-  ]) {
-    const missing = selector({ ...activeBase, PRODUCTION_CUTOVER_PHASE: "CURRENT_READS", [variable]: "google" });
-    assert.equal(missing.resolved, "unavailable", variable);
-    assert.equal(missing.blocked, true, variable);
-    const enabled = selector({
-      ...activeBase,
-      PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
-      [variable]: "supabase",
-      [configuredFlag]: "true",
-    });
-    assert.equal(enabled.resolved, "supabase", variable);
-    assert.equal(enabled.blocked, false, variable);
-  }
+test("Net Skins reads canonical NOT_CONFIGURED state while Calcutta retains its configuration gate", () => {
+  const netSkins = netSkinsReadEnvironment({
+    ...activeBase,
+    PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
+    NET_SKINS_READ_SOURCE: "supabase",
+    PRODUCTION_NET_SKINS_CONFIGURED: "false",
+  });
+  assert.equal(netSkins.resolved, "supabase");
+  assert.equal(netSkins.blocked, false);
+  assert.equal(netSkins.fallbackUsed, false);
+
+  const missingCalcutta = calcuttaReadEnvironment({
+    ...activeBase,
+    PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
+    CALCUTTA_READ_SOURCE: "google",
+  });
+  assert.equal(missingCalcutta.resolved, "unavailable");
+  assert.equal(missingCalcutta.blocked, true);
+  const enabledCalcutta = calcuttaReadEnvironment({
+    ...activeBase,
+    PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
+    CALCUTTA_READ_SOURCE: "supabase",
+    PRODUCTION_CALCUTTA_CONFIGURED: "true",
+  });
+  assert.equal(enabledCalcutta.resolved, "supabase");
+  assert.equal(enabledCalcutta.blocked, false);
 });
 
 test("active read transport is bounded, exact-resource, and cannot be caller-overridden", () => {
   assert.ok(PRODUCTION_CUTOVER_READ_RPCS.includes("read_preview_completed_history"));
   assert.ok(PRODUCTION_CUTOVER_READ_RPCS.includes("read_preview_scoring_authority"));
+  assert.ok(PRODUCTION_CUTOVER_READ_RPCS.includes("read_production_net_skins_v1"));
   assert.equal(PRODUCTION_CUTOVER_READ_RPCS.some((name) =>
     /^(?:replace|write|publish|claim|complete|fail|request|submit|finalize|reopen|import|sync|configure|begin|commit|abort|reset|mark)_/.test(name)
   ), false);
@@ -229,6 +239,21 @@ test("active read transport is bounded, exact-resource, and cannot be caller-ove
   assert.equal(scoring.functionName, "read_production_cutover_scoring_authority");
   assert.equal(scoring.body.input.mode, "MATCH");
   assert.equal(scoring.body.input.match_id, "2026-R1-1");
+
+  const netSkins = productionCutoverReadRpcTranslation("read_production_net_skins_v1", {
+    input: {
+      player_id: "CB01",
+      project_ref: "idgigvjjqkfbqjeredpb",
+      environment: "PREVIEW",
+      tournament_id: "other",
+    },
+  }, env);
+  assert.equal(netSkins.functionName, "read_production_net_skins_v1");
+  assert.equal(netSkins.body.input.player_id, "CB01");
+  assert.equal(netSkins.body.input.project_ref, PRODUCTION_SUPABASE_PROJECT_REF);
+  assert.equal(netSkins.body.input.environment, "PRODUCTION");
+  assert.equal(netSkins.body.input.tournament_id, "2026");
+  assert.equal(netSkins.body.input.source_workbook_id, PRODUCTION_GOOGLE_WORKBOOK_ID);
 });
 
 test("maintenance reads send the exact bound OBSERVATION ceiling while database phase remains authoritative", () => {

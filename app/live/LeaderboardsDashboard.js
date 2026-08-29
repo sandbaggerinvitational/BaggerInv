@@ -23,7 +23,7 @@ import { participantRoundBreakdown, playerRoundBreakdown } from "../../lib/leade
 import { netSkinsCountLabel, netSkinsRankAccessibleLabel, netSkinsResultPresentation } from "../../lib/net-skins-presentation";
 import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from "../../lib/participant-auth-client-diagnostics";
 import { teamRoundRecap } from "../../lib/team-round-recap";
-import { LEADERBOARD_MODULES, normalizeLeaderboardModule } from "../../lib/leaderboards-navigation";
+import { leaderboardModulesForNetSkinsState, normalizeLeaderboardModule } from "../../lib/leaderboards-navigation";
 import {
   PLAYER_METRICS,
   playerPerformanceRows,
@@ -391,6 +391,7 @@ function Insights({ data, snapshots, derived = null, previewMode = false }) {
 
 function NetSkinsBoard({ data, currentPlayer }) {
   const rounds = data.netSkins?.rounds || [];
+  const state = data.netSkinsState?.state || "";
   const [selectedRound, setSelectedRound] = useState(String(rounds[0]?.round || ""));
   const [selectedTeamId, setSelectedTeamId] = useState("");
   const [waitingExpanded, setWaitingExpanded] = useState(false);
@@ -458,6 +459,10 @@ function NetSkinsBoard({ data, currentPlayer }) {
     largestSkin && !mostValuableHole ? { label: "Largest Current Skin", copy: `Hole ${largestSkin.hole} carries the largest current skin at ${currency(largestSkin.skinValue)}.` } : null,
     round.completedHoles > 0 && round.completedHoles < 18 ? { label: "Remaining Skin Opportunities", copy: `${18 - round.completedHoles} ${18 - round.completedHoles === 1 ? "skin opportunity remains" : "skin opportunities remain"}.` } : null,
   ].filter(Boolean) : [];
+  if (state === "NOT_CONFIGURED") return <section className={skinsStyles.board}><div className={styles.empty}><strong>Net Skins are not configured for this tournament.</strong><span>This competition is not currently available.</span></div></section>;
+  if (state === "UNAVAILABLE") return <section className={skinsStyles.board}><div className={styles.empty}><strong>Net Skins are temporarily unavailable.</strong><span>Core team and player standings remain available.</span></div></section>;
+  if (state === "CONFIGURED") return <section className={skinsStyles.board}><div className={styles.empty}><strong>Net Skins are configured.</strong><span>Official standings and payouts will appear after scoring begins.</span></div></section>;
+  if (state === "IN_PROGRESS") return <section className={skinsStyles.board}><div className={styles.empty}><strong>Net Skins are in progress.</strong><span>Official standings and payouts will publish after the round is final.</span></div></section>;
   if (!rounds.length) return <section className={skinsStyles.board}><div className={styles.empty}><strong>Net Skins have not started yet.</strong><span>Competition details will appear when the tournament field is ready.</span></div></section>;
   return <section className={skinsStyles.experience} aria-label="Net Skins standings">
     <nav className={styles.roundSelector} aria-label="Net Skins round">
@@ -492,6 +497,7 @@ export default function LeaderboardsDashboard({
   coreReadSource = "google",
   coreReadUrl = "/api/live",
   secondaryReadUrl = "/api/live",
+  productionNetSkinsV1 = false,
   onConfirmedCore,
 }) {
   const pathname = usePathname();
@@ -508,6 +514,8 @@ export default function LeaderboardsDashboard({
   const lastConfirmedAt = useRef(Date.now());
   const navigationStartedAt = useRef(null);
   const supabaseCore = coreReadSource === "supabase";
+  const netSkinsState = secondaryData?.netSkinsState || null;
+  const leaderboardModules = leaderboardModulesForNetSkinsState(netSkinsState, { supabase: productionNetSkinsV1 });
   const roundValues = useMemo(() => new Set((data?.rounds || []).map((round) => String(round.number))), [data?.rounds]);
   const selectionFrom = useCallback((params) => ({
     tab: normalizeLeaderboardModule(params.get("tab")),
@@ -550,6 +558,11 @@ export default function LeaderboardsDashboard({
     setSelection(selectionFrom(params));
     window.history.pushState(null, "", `${pathname}?${params.toString()}`);
   }, [pathname, searchParams, selectedRound, selectionFrom]);
+  useEffect(() => {
+    if (productionNetSkinsV1 && secondaryState === "ready" && tab === "skins" && netSkinsState?.visible !== true) {
+      updateQuery({ tab: "players" });
+    }
+  }, [netSkinsState, productionNetSkinsV1, secondaryState, tab, updateQuery]);
   useEffect(() => setSelection(selectionFrom(searchParams)), [searchParams, selectionFrom]);
   useEffect(() => {
     const transition = navigationStartedAt.current;
@@ -597,8 +610,8 @@ export default function LeaderboardsDashboard({
   }, [secondaryData, secondaryReadUrl, supabaseCore]);
 
   useEffect(() => {
-    if (tab === "skins") loadSecondary();
-  }, [loadSecondary, tab]);
+    if (productionNetSkinsV1 || tab === "skins") loadSecondary();
+  }, [loadSecondary, productionNetSkinsV1, tab]);
 
   useEffect(() => {
     if (!supabaseCore) {
@@ -620,7 +633,7 @@ export default function LeaderboardsDashboard({
   return <section className={styles.page}>
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Player, team, round standings, and Championship projections.</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
-    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{LEADERBOARD_MODULES.map(({ value, label }) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
+    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{leaderboardModules.map(({ value, label }) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
     {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} metric={metric} onMetric={tab === "players" && selectedRound === "overall" ? (value) => updateQuery({ metric: value }) : undefined} /> : null}
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
