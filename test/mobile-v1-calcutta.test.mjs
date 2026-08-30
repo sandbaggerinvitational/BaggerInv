@@ -221,7 +221,7 @@ test("Calcutta docs pin participant publication, no-rounding, stale, and dormant
     "Explicit unpublish preserves the canonical lifecycle and facts",
     "canonical decimal string",
     "current canonical revisions",
-    "not native activation",
+    "Production serving remains a later explicitly authorized milestone",
   ]) assert.ok(nativeSpec.includes(term), `native product spec must include ${term}`);
   assert.doesNotMatch(nativeSpec, /Calcutta standings \| Web-only\/post-V1 evaluation/);
 });
