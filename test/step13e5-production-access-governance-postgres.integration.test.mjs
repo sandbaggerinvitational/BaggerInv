@@ -11,6 +11,10 @@ const migration = path.join(
   repositoryRoot,
   "supabase/production_migrations/202608300061_production_access_governance_v1.sql",
 );
+const ownerGuardMigration = path.join(
+  repositoryRoot,
+  "supabase/production_migrations/202608300062_initial_owner_adoption_guard_correction.sql",
+);
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(
   ["createdb", "initdb", "pg_ctl", "psql"].map((name) => [name, path.join(pgBin, name)]),
@@ -371,18 +375,82 @@ function installFixture(cluster, database) {
       workers boolean not null
     );
 
+    create table production_control.resource_scope (
+      scope_key text primary key,
+      project_ref text not null,
+      project_url text not null,
+      google_workbook_id text not null,
+      vercel_project text not null,
+      canonical_domain text not null,
+      current_tournament_id text not null,
+      current_tournament_year integer not null
+    );
+    create table production_control.cutover_activation_state (
+      scope_key text primary key
+    );
+
+    create function production_control.assert_production_service_role()
+    returns void language plpgsql stable security definer
+    set search_path = pg_catalog, production_control
+    as $fixture$
+    declare
+      claim_role text;
+      claims_text text;
+    begin
+      claims_text := nullif(
+        pg_catalog.current_setting('request.jwt.claims', true), ''
+      );
+      claim_role := coalesce(
+        nullif(
+          pg_catalog.current_setting('request.jwt.claim.role', true), ''
+        ),
+        case when claims_text is null then null
+          else claims_text::jsonb->>'role' end
+      );
+      if claim_role is distinct from 'service_role' then
+        raise exception using errcode = '42501',
+          message = 'PRODUCTION_SERVICE_ROLE_REQUIRED';
+      end if;
+    end
+    $fixture$;
+
     create function production_control.assert_exact_cutover_resource_scope(
       input jsonb, ignored boolean
-    ) returns void language plpgsql as $fixture$
+    ) returns void language plpgsql security definer
+    set search_path = pg_catalog, production_control
+    as $fixture$
+    declare
+      resource production_control.resource_scope%rowtype;
+      activation production_control.cutover_activation_state%rowtype;
     begin
-      if input->>'environment' is distinct from 'PRODUCTION'
-         or input->>'project_ref' is distinct from 'ymqhhtxaywtqllynrmxe'
-         or input->>'project_url' is distinct from
+      perform production_control.assert_production_service_role();
+      select value.* into strict resource
+      from production_control.resource_scope value
+      where value.scope_key = 'BAGGER_INV_PRODUCTION';
+      select value.* into strict activation
+      from production_control.cutover_activation_state value
+      where value.scope_key = 'BAGGER_INV_PRODUCTION';
+      if resource.project_ref <> 'ymqhhtxaywtqllynrmxe'
+         or resource.project_url <>
            'https://ymqhhtxaywtqllynrmxe.supabase.co'
-         or input->>'source_workbook_id' is distinct from
+         or resource.google_workbook_id <>
            '1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4'
-         or input->>'tournament_id' is distinct from '2026' then
-        raise exception 'PRODUCTION_RESOURCE_ASSERTION_FAILED';
+         or resource.vercel_project <> 'bagger-inv'
+         or resource.canonical_domain <> 'https://baggerinv.com'
+         or resource.current_tournament_id <> '2026'
+         or resource.current_tournament_year <> 2026 then
+        raise exception using errcode = 'P0001',
+          message = 'PRODUCTION_RESOURCE_SCOPE_INVALID';
+      end if;
+      if pg_catalog.upper(coalesce(input->>'environment', '')) <> 'PRODUCTION'
+         or input->>'project_ref' is distinct from resource.project_ref
+         or input->>'project_url' is distinct from resource.project_url
+         or input->>'source_workbook_id'
+           is distinct from resource.google_workbook_id
+         or input->>'tournament_id'
+           is distinct from resource.current_tournament_id then
+        raise exception using errcode = 'P0001',
+          message = 'PRODUCTION_RESOURCE_ASSERTION_FAILED';
       end if;
     end
     $fixture$;
@@ -518,8 +586,6 @@ function installFixture(cluster, database) {
     returns jsonb language sql stable as $fixture$ select '{}'::jsonb $fixture$;
     create function production_control.director_private_net_skins_v1()
     returns jsonb language sql stable as $fixture$ select '{}'::jsonb $fixture$;
-    create function production_control.assert_production_service_role()
-    returns void language plpgsql stable as $fixture$ begin return; end $fixture$;
     create function production_control.assert_production_cutover_read_scope(
       input jsonb, required_phase text
     ) returns void language plpgsql stable as $fixture$ begin return; end $fixture$;
@@ -529,6 +595,14 @@ function installFixture(cluster, database) {
 
     insert into production_control.authority_sentinel values
       ('SUPABASE', 'SUPABASE', 'SUPABASE', 'SUPABASE', 'NORMAL', 'OPEN', true);
+    insert into production_control.resource_scope values (
+      'BAGGER_INV_PRODUCTION', 'ymqhhtxaywtqllynrmxe',
+      'https://ymqhhtxaywtqllynrmxe.supabase.co',
+      '1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4', 'bagger-inv',
+      'https://baggerinv.com', '2026', 2026
+    );
+    insert into production_control.cutover_activation_state values
+      ('BAGGER_INV_PRODUCTION');
     insert into scoring_authority.tournaments values
       ('2026', 2026, 'Sandbagger Invitational');
     insert into scoring_authority.teams values
@@ -659,7 +733,7 @@ function installFixture(cluster, database) {
   `);
 }
 
-test("migration 061 enforces bounded Production access governance on PostgreSQL 17", async (context) => {
+test("migrations 061 and 062 enforce bounded Production access governance on PostgreSQL 17", async (context) => {
   if (!(await available())) {
     context.skip("PostgreSQL 17 binaries unavailable");
     return;
@@ -1077,6 +1151,85 @@ test("migration 061 enforces bounded Production access governance on PostgreSQL 
       expected_entitlement_event_count: 1,
       reason: "Certified initial Production owner adoption",
     };
+
+    assert.throws(
+      () => rpc(
+        cluster,
+        database,
+        "adopt_initial_production_owner_v1",
+        adoptionInput,
+        { databaseOwner: true },
+      ),
+      /PRODUCTION_SERVICE_ROLE_REQUIRED/,
+      "the real migration-019 resource assertion reproduces the 061 no-JWT/service-role contradiction",
+    );
+    const inertBeforeGuardCorrection = parseJson(sql(cluster, database, `
+      select jsonb_build_object(
+        'owners', (select count(*) from production_control.tournament_owner_capabilities_v1),
+        'context', (select count(*) from production_control.access_governance_context_v1),
+        'receipts', (select count(*) from production_control.access_governance_operation_receipts_v1),
+        'audit', (select count(*) from production_control.access_governance_audit_events_v1),
+        'revision', production_control.access_governance_revision_v1('2026'),
+        'activeDirectors', (select count(*) from production_control.director_entitlements where tournament_id = '2026' and role = 'DIRECTOR' and status = 'ACTIVE')
+      )::text;
+    `));
+    const normalRuntimeGuardsBefore = parseJson(sql(cluster, database, `
+      select jsonb_build_object(
+        'serviceRole', pg_catalog.pg_get_functiondef(
+          'production_control.assert_production_service_role()'::pg_catalog.regprocedure
+        ),
+        'resourceScope', pg_catalog.pg_get_functiondef(
+          'production_control.assert_exact_cutover_resource_scope(jsonb,boolean)'::pg_catalog.regprocedure
+        )
+      )::text;
+    `));
+
+    sqlFile(cluster, database, ownerGuardMigration);
+
+    assert.deepEqual(parseJson(sql(cluster, database, `
+      select jsonb_build_object(
+        'owners', (select count(*) from production_control.tournament_owner_capabilities_v1),
+        'context', (select count(*) from production_control.access_governance_context_v1),
+        'receipts', (select count(*) from production_control.access_governance_operation_receipts_v1),
+        'audit', (select count(*) from production_control.access_governance_audit_events_v1),
+        'revision', production_control.access_governance_revision_v1('2026'),
+        'activeDirectors', (select count(*) from production_control.director_entitlements where tournament_id = '2026' and role = 'DIRECTOR' and status = 'ACTIVE')
+      )::text;
+    `)), inertBeforeGuardCorrection, "guard-correction installation must be inert");
+    assert.deepEqual(parseJson(sql(cluster, database, `
+      select jsonb_build_object(
+        'serviceRole', pg_catalog.pg_get_functiondef(
+          'production_control.assert_production_service_role()'::pg_catalog.regprocedure
+        ),
+        'resourceScope', pg_catalog.pg_get_functiondef(
+          'production_control.assert_exact_cutover_resource_scope(jsonb,boolean)'::pg_catalog.regprocedure
+        )
+      )::text;
+    `)), normalRuntimeGuardsBefore, "migration 062 must not replace normal runtime guards");
+    assert.deepEqual(parseJson(sql(cluster, database, `
+      select jsonb_build_object(
+        'anonAdopt', has_function_privilege('anon',
+          'public.adopt_initial_production_owner_v1(jsonb)', 'execute'),
+        'authenticatedAdopt', has_function_privilege('authenticated',
+          'public.adopt_initial_production_owner_v1(jsonb)', 'execute'),
+        'serviceAdopt', has_function_privilege('service_role',
+          'public.adopt_initial_production_owner_v1(jsonb)', 'execute'),
+        'anonScope', has_function_privilege('anon',
+          'production_control.assert_initial_owner_adoption_resource_scope_v1(jsonb)', 'execute'),
+        'authenticatedScope', has_function_privilege('authenticated',
+          'production_control.assert_initial_owner_adoption_resource_scope_v1(jsonb)', 'execute'),
+        'serviceScope', has_function_privilege('service_role',
+          'production_control.assert_initial_owner_adoption_resource_scope_v1(jsonb)', 'execute')
+      )::text;
+    `)), {
+      anonAdopt: false,
+      authenticatedAdopt: false,
+      serviceAdopt: false,
+      anonScope: false,
+      authenticatedScope: false,
+      serviceScope: false,
+    });
+
     assert.throws(
       () => rpc(cluster, database, "adopt_initial_production_owner_v1", adoptionInput),
       /ACCESS_GOVERNANCE_DATABASE_OWNER_SESSION_REQUIRED/,
@@ -1085,6 +1238,64 @@ test("migration 061 enforces bounded Production access governance on PostgreSQL 
     assert.throws(
       () => sql(cluster, database, `set role service_role; select public.adopt_initial_production_owner_v1(${jsonSql(adoptionInput)});`, { databaseOwner: true }),
       /permission denied for function adopt_initial_production_owner_v1/,
+    );
+    assert.throws(
+      () => sql(cluster, database, `set role authenticated; select public.adopt_initial_production_owner_v1(${jsonSql(adoptionInput)});`, { databaseOwner: true }),
+      /permission denied for function adopt_initial_production_owner_v1/,
+      "an authenticated participant or ordinary Director cannot invoke bootstrap adoption",
+    );
+    assert.throws(
+      () => sql(cluster, database, `set role anon; select public.adopt_initial_production_owner_v1(${jsonSql(adoptionInput)});`, { databaseOwner: true }),
+      /permission denied for function adopt_initial_production_owner_v1/,
+    );
+    assert.throws(
+      () => rpc(cluster, database, "adopt_initial_production_owner_v1", {
+        ...adoptionInput,
+        project_ref: "preview-project",
+        operation_request_id: "40000000-0000-4000-8000-000000000090",
+        request_payload_hash: "d".repeat(64),
+      }, { databaseOwner: true }),
+      /PRODUCTION_RESOURCE_ASSERTION_FAILED/,
+    );
+    assert.throws(
+      () => rpc(cluster, database, "adopt_initial_production_owner_v1", {
+        ...adoptionInput,
+        actor_player_id: "GR01",
+        actor_auth_user_id: "00000000-0000-4000-8000-000000000003",
+        expected_entitlement_id: "10000000-0000-4000-8000-000000000006",
+        expected_entitlement_event_id: 0,
+        expected_entitlement_event_count: 0,
+        operation_request_id: "40000000-0000-4000-8000-000000000091",
+        request_payload_hash: "e".repeat(64),
+      }, { databaseOwner: true }),
+      /ACCESS_GOVERNANCE_ACTIVE_DIRECTOR_REQUIRED/,
+    );
+    sql(cluster, database, `
+      update participant_identity.participant_auth_identifiers
+      set status = 'REVOKED'
+      where player_id = 'CB01' and status = 'VERIFIED';
+    `);
+    assert.throws(
+      () => rpc(cluster, database, "adopt_initial_production_owner_v1", {
+        ...adoptionInput,
+        operation_request_id: "40000000-0000-4000-8000-000000000092",
+        request_payload_hash: "f".repeat(64),
+      }, { databaseOwner: true }),
+      /ACCESS_GOVERNANCE_OWNER_IDENTITY_NOT_READY/,
+    );
+    sql(cluster, database, `
+      update participant_identity.participant_auth_identifiers
+      set status = 'VERIFIED'
+      where player_id = 'CB01' and status = 'REVOKED';
+    `);
+    assert.throws(
+      () => rpc(cluster, database, "adopt_initial_production_owner_v1", {
+        ...adoptionInput,
+        expected_revision: 4,
+        operation_request_id: "40000000-0000-4000-8000-000000000093",
+        request_payload_hash: "1".repeat(64),
+      }, { databaseOwner: true }),
+      /ACCESS_GOVERNANCE_REVISION_STALE/,
     );
     assert.throws(
       () => rpc(cluster, database, "adopt_initial_production_owner_v1", {
@@ -1102,6 +1313,37 @@ test("migration 061 enforces bounded Production access governance on PostgreSQL 
     assert.equal(adopted.playerId, "CB01");
     const adoptionRetry = rpc(cluster, database, "adopt_initial_production_owner_v1", adoptionInput, { databaseOwner: true });
     assert.equal(adoptionRetry.idempotent, true);
+    assert.throws(
+      () => rpc(cluster, database, "adopt_initial_production_owner_v1", {
+        ...adoptionInput,
+        reason: "Conflicting initial Production owner adoption payload",
+      }, { databaseOwner: true }),
+      /ACCESS_GOVERNANCE_IDEMPOTENCY_CONFLICT/,
+    );
+    assert.throws(
+      () => rpc(cluster, database, "adopt_initial_production_owner_v1", {
+        ...adoptionInput,
+        operation_request_id: "40000000-0000-4000-8000-000000000094",
+        request_payload_hash: "2".repeat(64),
+        expected_revision: 6,
+      }, { databaseOwner: true }),
+      /ACCESS_GOVERNANCE_OWNER_ALREADY_ADOPTED/,
+    );
+    assert.deepEqual(parseJson(sql(cluster, database, `
+      select jsonb_build_object(
+        'activeOwners', (select count(*) from production_control.tournament_owner_capabilities_v1 where tournament_id = '2026' and player_id = 'CB01' and status = 'ACTIVE'),
+        'revision', production_control.access_governance_revision_v1('2026'),
+        'receipts', (select count(*) from production_control.access_governance_operation_receipts_v1 where operation = 'INITIAL_OWNER_ADOPTION'),
+        'audit', (select count(*) from production_control.access_governance_audit_events_v1 where action = 'OWNER_ADOPTED' and target_player_id = 'CB01'),
+        'activeDirector', (select count(*) from production_control.director_entitlements where tournament_id = '2026' and player_id = 'CB01' and role = 'DIRECTOR' and status = 'ACTIVE')
+      )::text;
+    `)), {
+      activeOwners: 1,
+      revision: 6,
+      receipts: 1,
+      audit: 1,
+      activeDirector: 1,
+    });
     assert.equal(sql(cluster, database, `select role || ':' || status from production_control.director_entitlements where player_id = 'CB01';`), "DIRECTOR:ACTIVE");
     assert.equal(sql(cluster, database, `select role || ':' || role_active::text from participant_identity.tournament_roles where auth_user_id = '${ownerActor.authUserId}' and role = 'DIRECTOR';`), "DIRECTOR:true");
 
