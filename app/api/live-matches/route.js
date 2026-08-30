@@ -87,7 +87,8 @@ export async function POST(request) {
   const authorization = await authorized(request, authority);
   if (authorization?.status !== "active") return deny();
   try {
-    const { action, matchId, updates, updatedBy, operationRequestId, scoringAuthorityContract } = await request.json();
+    const { action, matchId, updates, updatedBy, operationRequestId, scoringAuthorityContract,
+      expectedMatchRevision, expectedPermissionRevision } = await request.json();
     const mutationAuthority = assertDirectorMutationAuthority({ surface: "live-matches", action, authority: authority.resolved });
     await assertScoringMutationAuthorityContractBeforeDispatch(scoringAuthorityContract, { request });
     if (mutationAuthority.resolvedAuthority === "supabase") {
@@ -104,6 +105,8 @@ export async function POST(request) {
         authUserId: authorization.identity?.authUserId,
         playerId: authorization.identity?.actor?.id,
         operationRequestId,
+        expectedMatchRevision,
+        expectedPermissionRevision,
       });
       if (!lifecycle.delegated) throw Object.assign(
         new Error("The canonical Supabase match-control transaction was not selected."),

@@ -29,6 +29,7 @@ export async function GET(request) {
   try {
     const data = await readProductionDirectorOverview({
       env: process.env,
+      request,
       actorAuthUserId: authorization.identity?.authUserId,
       actorPlayerId: authorization.identity?.actor?.id || authorization.identity?.player?.id,
     });

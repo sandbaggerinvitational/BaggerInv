@@ -47,6 +47,7 @@ async function authorize(request) {
 }
 
 function resultPayload(action, result, diagnostics) {
+  const current = result.context?.current_projection || null;
   return {
     ok: true,
     action,
@@ -60,6 +61,12 @@ function resultPayload(action, result, diagnostics) {
     sourceFingerprint: result.sourceFingerprint || result.source?.source_fingerprint,
     payloadFingerprint: result.payloadFingerprint || result.source?.payload_fingerprint,
     readbackParity: result.readbackParity,
+    current: current ? {
+      revisionId: current.revision_id,
+      revisionNumber: current.revision_number,
+      validationStatus: current.validation_status,
+      synchronizedAt: current.imported_at,
+    } : null,
     googleRead: result.googleRead,
     fallbackUsed: false,
     requestDiagnostics: diagnostics,

@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import WeeklyHandicapPanel from "./WeeklyHandicapPanel.js";
+import {
+  DraftGuidePanel,
+  OddsAndSideGamesPanel,
+  SystemAuditPanel,
+  TournamentDayPanel,
+} from "./ProductionDirectorOperations.js";
 import styles from "./production-director.module.css";
 
 const pretty = (value) => String(value || "Unavailable").toLowerCase().replaceAll("_", " ")
@@ -21,14 +27,6 @@ function StateBadge({ state, children }) {
   const positive = ["ready", "healthy", "published", "official", "open", "supabase", "normal", "configured"].includes(normalized);
   const attention = ["attention", "paused", "unavailable"].includes(normalized);
   return <span className={styles.stateBadge} data-state={positive ? "ready" : attention ? "attention" : "neutral"}>{children || pretty(state)}</span>;
-}
-
-function ComingSoon({ title, copy }) {
-  return <section className={styles.comingSoon} data-coming-soon="true">
-    <span>Coming Soon</span>
-    <h2>{title}</h2>
-    <p>{copy}</p>
-  </section>;
 }
 
 function AuthorityCards({ authority }) {
@@ -62,7 +60,7 @@ function PublicationCards({ publications }) {
 
 function Activity({ items }) {
   return <section className={styles.panel}>
-    <header><span>Recent activity</span><h2>Director Audit</h2></header>
+    <header><span>Recent activity</span><h2>Match Activity</h2></header>
     {items.length ? <ul className={styles.activity}>{items.map((item) => <li key={item.id}>
       <div><strong>{item.label}</strong><span>{pretty(item.status)}</span></div>
       <time>{timestamp(item.updatedAt)}</time>
@@ -122,49 +120,12 @@ function Overview({ data }) {
   </>;
 }
 
-function TournamentDay({ data }) {
-  return <>
-    <section className={styles.panel}>
-      <header><span>Live operations</span><h2>Tournament Day</h2><p>Review the current lifecycle before using certified match controls.</p></header>
-      <div className={styles.dayStatus}>
-        <div><small>Lifecycle</small><strong>{pretty(data.tournament.status)}</strong></div>
-        <div><small>Operating round</small><strong>{data.tournament.currentRound.label}</strong></div>
-        <div><small>Scoring ingress</small><strong>{data.authority.ingress.label}</strong></div>
-      </div>
-    </section>
-    <ComingSoon title="Certified Tournament-Day Controls" copy="Mark Live, scoring access, Finalize, and Reopen controls will appear here as their existing Production contracts are mounted." />
-  </>;
-}
-
-function OddsAndSideGames({ data }) {
-  return <section className={styles.panel}>
-    <header><span>Publication status</span><h2>Odds & Side Games</h2><p>Current official Production states, with unpublished data kept private.</p></header>
-    <PublicationCards publications={data.publications} />
-  </section>;
-}
-
-function SystemAudit({ data }) {
-  return <>
-    <section className={styles.panel}>
-      <header><span>System status</span><h2>Authority & Runtime</h2></header>
-      <AuthorityCards authority={data.authority} />
-      <div className={styles.runtimeLine}><span>Maintenance</span><StateBadge state={data.authority.maintenance.value}>{data.authority.maintenance.label}</StateBadge></div>
-    </section>
-    <section className={styles.panel}>
-      <header><span>Background processing</span><h2>Workers</h2></header>
-      {data.workers.items.length ? <ul className={styles.workerList}>{data.workers.items.map((worker) => <li key={worker.id}><span>{pretty(worker.id)}</span><StateBadge state={worker.enabled ? "ready" : "attention"}>{worker.enabled ? "Enabled" : "Needs attention"}</StateBadge></li>)}</ul> : <p className={styles.empty}>Worker status is temporarily unavailable.</p>}
-    </section>
-    <Issues issues={data.readinessIssues} />
-    <Activity items={data.recentActivity} />
-  </>;
-}
-
 export default function ProductionDirectorConsole({ directorName, initialSection = "overview" }) {
   const [data, setData] = useState(null);
   const [failure, setFailure] = useState(null);
   const [loading, setLoading] = useState(true);
-  const load = useCallback(async () => {
-    setLoading(true); setFailure(null);
+  const load = useCallback(async ({ background = false } = {}) => {
+    if (!background) { setLoading(true); setFailure(null); }
     try {
       const response = await fetch("/api/director/production-overview", {
         cache: "no-store", credentials: "same-origin",
@@ -172,14 +133,17 @@ export default function ProductionDirectorConsole({ directorName, initialSection
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(payload.error || "Director Console is temporarily unavailable."), { code: payload.code });
       setData(payload.data);
+      return payload.data;
     } catch (error) {
-      setFailure({
+      if (!background) setFailure({
         code: error?.code || "DIRECTOR_DATA_UNAVAILABLE",
         message: error?.message || "Director Console is temporarily unavailable.",
       });
-    } finally { setLoading(false); }
+      return null;
+    } finally { if (!background) setLoading(false); }
   }, []);
   useEffect(() => { load(); }, [load]);
+  const refresh = useCallback(() => load({ background: true }), [load]);
 
   if (loading) return <section className={styles.shell}><div className={styles.loading} role="status"><strong>Opening Director Console</strong><span>Loading current Production tournament state…</span></div></section>;
   if (failure) {
@@ -204,10 +168,10 @@ export default function ProductionDirectorConsole({ directorName, initialSection
     <main className={styles.content}>
       {section === "overview" ? <Overview data={data} /> : null}
       {section === "handicaps" ? <div className={styles.handicapSlot} data-production-console-slot="handicaps"><WeeklyHandicapPanel /></div> : null}
-      {section === "tournament-day" ? <TournamentDay data={data} /> : null}
-      {section === "odds-side-games" ? <OddsAndSideGames data={data} /> : null}
-      {section === "draft-guide" ? <ComingSoon title="Draft & Guide" copy="Read-only status and supported synchronization actions will appear here in a future Director Console phase." /> : null}
-      {section === "system-audit" ? <SystemAudit data={data} /> : null}
+      {section === "tournament-day" ? <TournamentDayPanel data={data} refresh={refresh} /> : null}
+      {section === "odds-side-games" ? <OddsAndSideGamesPanel data={data} refresh={refresh} /> : null}
+      {section === "draft-guide" ? <DraftGuidePanel data={data} refresh={refresh} /> : null}
+      {section === "system-audit" ? <SystemAuditPanel data={data} /> : null}
     </main>
   </section>;
 }

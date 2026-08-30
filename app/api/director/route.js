@@ -283,6 +283,8 @@ export async function POST(request) {
         authUserId: identity.authUserId,
         playerId: identity.actor.id,
         operationRequestId: input.operationRequestId,
+        expectedMatchRevision: input.expectedMatchRevision,
+        expectedPermissionRevision: input.expectedPermissionRevision,
       });
       if (!lifecycle.delegated) {
         const error = new Error("The canonical Supabase lifecycle transaction was not selected.");
@@ -330,7 +332,7 @@ export async function POST(request) {
         }
       });
       console.info("Director action transaction", trace.report({ matchId: input.matchId, updatedBy, authority: "supabase" }));
-      return NextResponse.json({ ok: true, changed: false, authority: "supabase", mirror: {
+      return NextResponse.json({ ok: true, changed: false, authority: "supabase", receipt: lifecycle.result, mirror: {
         delivered: mirror.delivered, failed: mirror.failed, pending: mirror.pending === true,
       } });
     }
