@@ -1,30 +1,35 @@
 import { NextResponse } from "next/server";
 
-import { authorizePreviewDirector, previewDirectorEntitlementEnabled } from "../../../../lib/preview-director-authorization.js";
+import {
+  authorizePreviewDirector,
+  previewDirectorEntitlementEnabled,
+  productionDirectorEntitlementEnvironment,
+} from "../../../../lib/preview-director-authorization.js";
+import {
+  directorAccessDiscoveryEnvironment,
+  resolveDirectorAccessDiscovery,
+} from "../../../../lib/director-access-discovery.js";
 
 export const dynamic = "force-dynamic";
 
 const headers = { "Cache-Control": "private, no-store" };
 
-function previewSupabaseDirectorNavigationEnabled() {
-  return previewDirectorEntitlementEnabled();
+function directorNavigationDiscoveryEnvironment() {
+  return directorAccessDiscoveryEnvironment({
+    previewEnabled: previewDirectorEntitlementEnabled(),
+    production: productionDirectorEntitlementEnvironment(),
+  });
 }
 
 export async function GET(request) {
-  if (!previewSupabaseDirectorNavigationEnabled()) {
-    return NextResponse.json({ error: "Not found." }, { status: 404, headers });
-  }
-
-  const authorization = await authorizePreviewDirector({ request, allowBootstrap: true });
-  if (authorization.status === "unavailable") {
-    return NextResponse.json({ authorized: false }, {
-      status: 503,
-      headers: { ...headers, "Retry-After": "1", "X-Director-Retryable": "identity" },
-    });
-  }
-  return NextResponse.json({
-    authorized: authorization.status === "active",
-    source: authorization.status === "active" ? authorization.source || "entitlement" : undefined,
-    linked: authorization.linked === true || undefined,
-  }, { headers });
+  const environment = directorNavigationDiscoveryEnvironment();
+  const response = await resolveDirectorAccessDiscovery({
+    request,
+    environment,
+    authorizeDirector: authorizePreviewDirector,
+  });
+  return NextResponse.json(response.body, {
+    status: response.status,
+    headers: { ...headers, ...response.headers },
+  });
 }
