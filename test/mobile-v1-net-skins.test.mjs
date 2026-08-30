@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   MOBILE_NET_SKINS_STATES,
   mobileNetSkinsDataFromProductionView,
+  mobileNetSkinsRepresentationRevision,
   mobileNetSkinsResult,
   readMobileProductionNetSkinsV1,
 } from "../lib/mobile-v1-net-skins.js";
@@ -90,7 +91,9 @@ test("NOT_CONFIGURED and UNAVAILABLE are stable successful domain states", async
       dependencies: { readProductionNetSkinsV1: async () => successfulRead(view(state)) },
     });
     assert.equal(result.status, 200);
-    assert.equal(result.revision, `net-skins-v1:0:0:${state}`);
+    assert.match(result.revision, /^[0-9a-f]{64}$/);
+    assert.equal(result.revision, result.body.meta.revision);
+    assert.equal(result.body.data.revision, `net-skins-v1:0:0:${state}`);
     assert.equal(result.body.data.state, state);
     assert.equal(result.body.data.published, false);
     assert.deepEqual(result.body.data.rounds, []);
@@ -142,6 +145,27 @@ test("CONFIGURED and IN_PROGRESS expose stable configuration identity but no pro
       entryIds: ["2026-R1-SI-CB01"],
     });
   }
+});
+
+test("Net Skins representation ETag changes with participant-visible state, not response time", async () => {
+  const data = mobileNetSkinsDataFromProductionView(view("CONFIGURED"), identity);
+  const revision = mobileNetSkinsRepresentationRevision(data);
+  assert.match(revision, /^[0-9a-f]{64}$/);
+  assert.equal(mobileNetSkinsRepresentationRevision(structuredClone(data)), revision);
+  assert.notEqual(mobileNetSkinsRepresentationRevision({
+    ...data,
+    freshness: { ...data.freshness, stale: true },
+  }), revision);
+
+  const first = await mobileNetSkinsResult(identity, {
+    now,
+    dependencies: { readProductionNetSkinsV1: async () => successfulRead(view("CONFIGURED")) },
+  });
+  const later = await mobileNetSkinsResult(identity, {
+    now: new Date("2026-09-25T19:00:00.000Z"),
+    dependencies: { readProductionNetSkinsV1: async () => successfulRead(view("CONFIGURED")) },
+  });
+  assert.equal(first.revision, later.revision);
 });
 
 test("OFFICIAL exposes only normalized official results with stable entry, Match, pairing, and Player IDs", () => {
@@ -270,7 +294,7 @@ test("route, schema, and documentation preserve the mobile v1 boundary without c
   assert.deepEqual(schema.$defs.state.enum, MOBILE_NET_SKINS_STATES);
   assert.equal(schema.properties.data.properties.contractVersion.const, "production-net-skins-v1");
   for (const term of [
-    "GET /net-skins", "read_production_net_skins_v1", "NOT_CONFIGURED", "OFFICIAL_ONLY",
+    "GET /net-skins", "read_preview_mobile_net_skins_v1", "read_production_net_skins_v1", "NOT_CONFIGURED", "OFFICIAL_ONLY",
     "Production activation", "X-Bagger-Certification", "ETag", "Player ID",
   ]) assert.match(docs, new RegExp(term));
 });
