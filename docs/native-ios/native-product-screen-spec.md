@@ -79,7 +79,7 @@ SF Symbols listed here are concepts to verify against the deployment target when
 | Today | `sun.max` or `house` | Compact tournament context, relevant Match hero, personal Match summary, tournament score, immediate schedule, optional bounded pulse | Today → Match Detail; Today → Schedule | Render private participant-partitioned cache, then revalidate `/today`; also use cached/revalidated `/matches` and `/leaders` for sections | Purpose-built no-tournament/no-Match states; cached data remains visibly stale offline; personal content requires restored same-account context | Tournament score opens Leaders; scoring CTA activates Score; schedule opens More's native Schedule destination |
 | Matches | `rectangle.stack` | Selected Round, authenticated golfer's Match, and every participant-visible Match in that Round | Matches → Match Detail | Render cached `/matches`, then ETag revalidate; active Round refreshes more frequently while visible | Cached Round remains browsable offline with freshness label; no-Match Round has an intentional state; auth required | Authorized scoring CTA activates Score with Match context |
 | Score | `figure.golf` if available, otherwise `pencil.and.list.clipboard` | Contextual upcoming/read-only/active/completed scoring product | Score → Scorecard; Score → Conflict Review; finalization confirmation is a sheet/dialog | Scoring reads are private/no-store; display the last canonical snapshot as explicitly last-known, layered with Step 1D durable local intent; refresh on Step 1D events | Never a broken blank tab: sign-in, no tournament, upcoming, unavailable, read-only, offline, review, and final states all have defined content | Match/Today CTAs focus this tab; completed state links to Scorecard and next Match context |
-| Leaders | `trophy` | Overall Tournament Score and individual Player Leaders; Round Scores when contract support exists | Leaders only in V1; rows do not open native Player detail | Render cached `/leaders`, revalidate with ETag, update rows without replacing the screen | Before-first-point and unavailable states are explicit; cached standings are labeled when offline/stale | Today's Tournament Score opens this tab |
+| Leaders | `trophy` | Tournament Score, canonical Round Scores, Player Leaders, official Net Skins, and published Calcutta | Leaders only in V1; rows do not open native Player detail | Render participant-partitioned caches for `/leaders`, `/net-skins`, and `/calcutta`, revalidate with representation ETags, and preserve independently valid products | Before-first-point, unpublished, empty, unavailable, and stale states are product-specific; one secondary failure does not blank Tournament Score | Today's Tournament Score opens this tab |
 | More | `ellipsis.circle` | Curated native and web-backed secondary destinations | More → Schedule / Player Passport / Settings; web content opens in an in-app browser | Native destinations use their own policies; the menu itself is static | Remains useful without tournament data; web links explain that connectivity may be required | Houses full Schedule linked from Today and account/settings used by authentication flows |
 
 Recommended conceptual deep-link roots are `bagger://today`, `bagger://matches`, `bagger://score`, `bagger://leaders`, and `bagger://more`. Universal links should eventually use the existing Bagger domain, but no Associated Domains configuration belongs in this step.
@@ -746,8 +746,10 @@ Leaders answers: **What is the tournament score, and who is performing best?**
 Its order is:
 
 1. Tournament Score;
-2. Round Score Breakdown when canonical contract support is added; and
-3. Player Leaders.
+2. Round Score Breakdown;
+3. Player Leaders;
+4. Net Skins; and
+5. published Calcutta.
 
 The Tournament Score intentionally appears on both Today and Leaders. Today uses it as context; Leaders is the definitive place to understand it.
 
@@ -769,15 +771,9 @@ Half-point formatting follows the Today rule: exact `.5` values may display `½`
 
 ### 12.3 Round Score Breakdown
 
-The approved product wants a Round-by-Round team score, but the Step 1B `/leaders` DTO explicitly excludes Round scorecards and only exposes overall `teamStandings` and `playerStandings`. `/matches` does not expose enough canonical points to rebuild Round totals safely.
+`/leaders.roundStandings` is the bounded authoritative Round team-score projection from Leaderboards Core. It supplies numeric Round order, canonical Round name/status, and canonical team points/rank/record/remaining Matches. Only official Match results contribute points. A Round with no official result supplies null rank/points rather than a fabricated zero.
 
-Therefore:
-
-> **P1 — DATA CONTRACT GAP: ROUND SCORE BREAKDOWN**
-
-Until a bounded authoritative Round team-standings DTO is approved, omit this section. Do not show locally summed estimates, zero placeholders for future Rounds, or a permanently disabled card. The first SwiftUI build can proceed without it, but the recommended TestFlight V1 should add it through a later backend-contract step.
-
-When supported, the native section should show each Round in numeric order, both teams' canonical Round points, and `Live`, `Final`, or `Not Started` from the authority. Tapping a Round should switch to the corresponding Matches Round; it should not open another leaderboard page.
+The native section shows each Round in the order supplied, both teams' canonical Round points, and `Live`, `Final`, or `Not Started` from the authority. Tapping a Round may switch to the corresponding Matches Round; it does not open another leaderboard page. Swift never sums `/matches` for this product.
 
 ### 12.4 Player Leaders
 
@@ -800,14 +796,26 @@ V1 Player rows are **not tappable**. A native Player performance detail would ex
 | Module | Classification | Rationale |
 | --- | --- | --- |
 | Overall Tournament Score | Native V1 | Core tournament truth already available |
-| Round team scores | Native recommended V1 after P1 contract | Product priority; authority missing today |
+| Round team scores | Native V1 | Canonical `/leaders.roundStandings` is available |
 | Player points/record | Native V1 | Already in canonical mobile standings |
 | Separate Match-record board | Exclude as a module in V1 | Record is already secondary text in Player rows |
 | Round Player performance | Post-V1 | No bounded mobile contract; less important than core scoring |
-| Net Skins | Post-V1 or web-backed | Existing product exists, but Step 1B intentionally excludes it |
+| Net Skins | Native V1 | Same participant DTO is available through isolated Preview and the separately gated Production reader |
 | Published Odds Center | Web-backed V1 | Existing participant-facing web product; not tournament scoring truth |
-| Calcutta standings | Web-only/post-V1 evaluation | No approved stable native destination/DTO; never expose admin inputs |
+| Calcutta standings | Native V1 in isolated Preview | `production-calcutta-v1` is the shared participant DTO; publication remains server-enforced and Production-native serving remains disabled |
 | Career/statistical leaderboards | Web-backed V1 | Useful secondary history, outside live native loop |
+
+#### 12.5.1 Calcutta V1 contract boundary
+
+`GET /api/mobile/v1/calcutta` is the additive participant-safe Calcutta contract. It uses the existing verified Bearer session plus Bagger certification and derives the viewer only from the canonical Auth UUID → stable Player ID → active tournament membership chain. The request never selects a Player, tournament, environment, publication, or revision.
+
+The contract states are `NOT_CONFIGURED`, `CONFIGURED`, `AUCTION_COMPLETE`, `IN_PROGRESS`, `OFFICIAL`, and `UNAVAILABLE`. Auction lifecycle and publication are separate: there is no `AUCTION_OPEN` because the installed product records the completed auction manually and has no live-bidding authority. An authenticated active participant receives the full market only when `publicationState` is `PUBLISHED`; unpublished purchase, ownership, and result facts remain absent. Explicit unpublish preserves the canonical lifecycle and facts, so an `IN_PROGRESS` or `OFFICIAL` response may be `UNPUBLISHED` with both market and result hidden.
+
+The server supplies stable Player IDs and display names, recorded purchases and ownership, official Round inputs, ranks, points, and the complete participant-visible golfer/portfolio result. It supplies every USD money value and every ownership/payout/ROI fraction as a canonical decimal string because the authoritative rule is no payout rounding and valid results may contain fractions of a cent. Swift formats those values but never derives a payout, rank, tie award, ROI, ownership allocation, or finality state.
+
+A result may be marked stale only when its configuration and completed-auction revisions still match the current canonical revisions. A configuration or auction change invalidates that result. `data.revision` binds configuration, auction, publication, result, lifecycle state, and publication state. The response `meta.revision` and ETag additionally bind the current source fingerprint and stale/updating flags, so a freshness transition cannot be hidden by a `304`; response timestamps are not authority.
+
+Isolated Preview now supplies this same DTO from Preview Supabase through a service-only, configuration-fingerprint-bound publication ledger. A new Preview configuration returns to `UNPUBLISHED`; unpublished market and result values remain absent before Swift decoding. Production serving remains a later explicitly authorized milestone.
 
 ### 12.6 Leaders states
 
@@ -849,7 +857,7 @@ APP
   Settings                         Native
 ```
 
-Course Archive is the web Courses destination rather than a duplicate row. Net Skins/Calcutta may appear only inside an existing participant-safe web tournament surface; no standalone row is required in core V1. Director, editing, publication, War Room, and intelligence tools never appear for normal participants.
+Course Archive is the web Courses destination rather than a duplicate row. Net Skins and published Calcutta belong in the native Leaders product once their canonical Preview readers are certified; they do not need duplicate More rows. Director, editing, publication, War Room, and intelligence tools never appear for normal participants.
 
 ### 13.2 Native V1 destinations
 
@@ -916,8 +924,8 @@ The native app must not inject the Supabase Bearer token, scoring credential, or
 - Courses/course-hole orientation;
 - History, Records, and career profiles;
 - rich Player detail from Leaders;
-- Round performance and Net Skins;
-- Calcutta participant standings if a participant-safe product/contract is approved; and
+- Round Player performance if a bounded participant contract is later approved;
+- Production activation of the approved Net Skins and Calcutta participant contracts as a separate authority milestone; and
 - notifications and notification settings.
 
 ### 13.5 Web/Admin-only exclusions
@@ -939,9 +947,9 @@ Public published intelligence may be linked as participant web content; its admi
 
 | Classification | Destinations |
 | --- | --- |
-| **Native V1** | Login/OTP, Today, Matches, Match Detail summary, Score, owned-Match Scorecard, Conflict Review, Leaders, More, Schedule, Player Passport, Settings |
+| **Native V1** | Login/OTP, Today, Matches, Match Detail summary, Score, owned-Match Scorecard, Conflict Review, Leaders with Tournament/Round/Player standings, official Net Skins, published Calcutta, More, Schedule, Player Passport, Settings |
 | **Web-backed V1** | Full Tournament Guide, Courses/Course Archive, Rules, History, Records, Career/Players/Statistics, Dining, Local Guide, Important Contacts, published Odds Center |
-| **Post-V1 native** | Rich Guide modules, Courses, History/Records/Career, native Player detail, Round/secondary leaderboards, Net Skins, Calcutta participant product, notifications |
+| **Post-V1 native** | Rich Guide modules, Courses, History/Records/Career, native Player detail, Round Player performance, notifications, and Production activation work that remains separately authorized |
 | **Web/Admin only** | Director, Guide editing, odds publishing, War Room/admin intelligence, source/data health, draft admin, scoring correction/reopen |
 
 ## 15. Navigation model
@@ -951,7 +959,7 @@ Each tab owns a shallow navigation stack:
 - **Today:** Match hero/row → Match Detail; Tournament Score → Leaders tab; Full Schedule → More's Schedule destination.
 - **Matches:** row/hero → Match Detail; scoring CTA → Score tab focused on canonical Match ID.
 - **Score:** active editor → Scorecard; affected hole → Conflict Review; Finish Match → confirmation sheet → final result state.
-- **Leaders:** Round row (after contract support) → Matches tab with that Round selected; Player rows have no action in V1.
+- **Leaders:** Round row → Matches tab with that Round selected; Player rows have no action in V1.
 - **More:** native Schedule/Passport/Settings destinations or explicit in-app browser for web-backed content.
 
 Avoid more than two pushes from a primary tab. Switching from Today/Matches into Score should activate the existing Score tab rather than push a second scoring screen. The selected Match ID is a navigation hint only; `/scoring/current?matchId` revalidates identity and Match scope.
@@ -1169,8 +1177,10 @@ Every product claim below was checked against the Step 1A–1C schemas and adapt
 | Scorecard, owned Match | `/scoring/current.scores` + local overlay | Canonical snapshot no-store/last-known; local queue durable | Yes + Match membership | Supported up to 18 holes |
 | Finalization | Refresh `/scoring/current`, then `POST /scoring/finalize` | No-store; outcome probe only per Step 1D | Yes + `canFinalize` | Online-only; no blind retry |
 | Leaders Tournament Score | `/leaders.teamStandings` | Private cache + ETag | Yes | Canonical overall points/rank/record |
-| Leaders Round Scores | None in mobile v1 | None | — | P1 gap; never derive from Match list |
+| Leaders Round Scores | `/leaders.roundStandings` | Private cache + representation ETag | Yes | Canonical team scores/status by Round; never derive from Match list |
 | Player Leaders | `/leaders.playerStandings` | Private cache + ETag | Yes | Rank/name/team/points/record; no profile URL |
+| Net Skins | `/net-skins` | Private cache + representation ETag | Yes | Server-enforced `OFFICIAL_ONLY`; no provisional payout authority in Swift |
+| Published Calcutta | `/calcutta` | Private cache + representation ETag | Yes | Market/result only when server publication is `PUBLISHED`; canonical decimal strings |
 | Full Schedule | `/schedule` | Private cache + ETag | Yes | Published participant itinerary only |
 | Player Passport | `/session` + local app build metadata | Session no-store; protected minimal local context | Yes | Handicap and rich career/profile fields absent |
 | Settings | Local app metadata/session state; approved public support/privacy URLs | Local | Session only for account actions | No backend configuration exposed |
@@ -1209,7 +1219,6 @@ Priority definitions:
 
 | Gap | Screen / desired information | Why it matters | Closest existing mobile source | Suggested later backend step |
 | --- | --- | --- | --- | --- |
-| Round Score Breakdown | Leaders: canonical team points by Round and Round state | Product owner wants Tournament Score plus how it accumulated; client cannot calculate points safely | `/leaders` has overall team standings; underlying Leaderboards Core has Rounds but DTO excludes them | Add a bounded additive `roundStandings` field to mobile v1 `/leaders`, sourced from Leaderboards Core; schema/test/fixture update only after approval |
 | Live differential for participant-visible non-owned Matches | Matches list/Match Detail: `Tied`, `2 UP`, etc. while live | `Live · Thru N` is truthful but less informative; acceptance target is full Round awareness | `/matches.progress.currentHole`; owned Match `/scoring/current.progress.statusText` | Add a participant-safe canonical `statusText`/match-state summary to Match DTO from Tournament Live authority; do not expose hole scores or revisions |
 
 The first SwiftUI build and even an internal Preview milestone can proceed with these sections omitted/degraded. The recommended TestFlight V1 should resolve them or explicitly approve the reduced presentation.
@@ -1227,13 +1236,12 @@ The first SwiftUI build and even an internal Preview milestone can proceed with 
 | Canonical tournament day number/date | Today header | Tournament DTO has current Round/status/timezone; Schedule has event dates | Add optional canonical tournament-day context if it improves multi-day navigation |
 | Absolute Match tee-time instant | Matches/deep links/notifications | Match tee time has local clock/zone but no date | Add canonical tee timestamp/date before tee-time notifications; display-only V1 remains safe |
 | Rich native Guide/Courses/History/Records | More | Existing web products | Convert selectively after the core tournament loop proves value |
-| Net Skins/Calcutta native modules | Leaders/More | Explicitly excluded from Step 1B; web/backend products exist | Define participant-safe bounded mobile products in a later feature step |
 | APNs categories/deep links | App-wide | Product concepts only | Post-core notifications project; not first TestFlight blocker |
 
 ### 22.4 Required expected-gap answers
 
 - **Tournament Score on Today:** available by composing canonical `/leaders`; not a gap.
-- **Round Scores on Leaders:** P1 gap.
+- **Round Scores on Leaders:** available through canonical `/leaders.roundStandings`; not a gap.
 - **Your Matches across all Rounds on Today:** available from `/matches` filtered by canonical relationship; not a gap.
 - **Match current score/status:** owned Match available from `/scoring/current`; non-owned live differential is P1.
 - **Hole-by-hole non-scoring Match Detail:** P2 gap.
@@ -1716,7 +1724,7 @@ A golfer can understand:
 - canonical top Player ranks, points, and useful records; and
 - their own canonical position when outside the initial top rows.
 
-Round Scores appear only after the P1 authoritative contract exists. Their absence cannot be filled by client calculation.
+Round Scores use the authoritative `/leaders.roundStandings` projection. Their values cannot be filled or amended by client calculation.
 
 ### 27.5 More
 
@@ -1760,16 +1768,15 @@ The 20-day target is achievable only if the core tournament/scoring loop displac
 - curated web-backed More links in in-app Safari;
 - conceptual deep-link router for Today/Matches/Score/Leaders/Schedule;
 - restrained haptics and state transitions after accessibility behavior is complete;
-- Round Score Breakdown if the P1 contract lands early enough without endangering scoring quality;
+- canonical Round Score Breakdown;
 - support/privacy links and bounded diagnostics.
 
 ### CAN SLIP
 
-- Round Score Breakdown when the P1 contract remains absent (must remain a documented recommended-V1 gap);
 - rich/narrative Tournament Pulse;
 - spectator hole-by-hole Match Detail and non-owned scorecards;
 - native Player detail from Leaders;
-- native Guide, Courses, History, Records, Career, Net Skins, or Calcutta;
+- native Guide, Courses, History, Records, or Career beyond the approved Step 2H/2I scope;
 - push notifications;
 - elaborate tournament-final celebrations;
 - advanced course logos/artwork; and
@@ -1811,7 +1818,7 @@ Connect `/scoring/hole`, authoritative acknowledgement/refresh, local/official s
 
 ### 2H — Leaders
 
-Implement Tournament Score, Player Leaders, ties, authenticated Player emphasis, cached refresh, and final state. Add Round Scores only if the approved P1 contract exists.
+Implement Tournament Score, canonical Round Scores from `/leaders.roundStandings`, Player Leaders, official-only Net Skins, and server-published Calcutta. Preserve independent cached refresh and partial-failure states, authenticated Player emphasis, canonical ties, and precision-safe Calcutta strings. Do not calculate standings, skins, ownership, payouts, or settlement in Swift.
 
 ### 2I — More, Schedule, Player Passport, Settings, web boundary
 

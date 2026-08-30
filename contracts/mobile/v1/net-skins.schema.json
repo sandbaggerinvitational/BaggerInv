@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:net-skins",
+  "title": "Bagger Mobile API v1 Production Net Skins response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion", "tournamentId", "state", "publicationPolicy", "published",
+        "configurationRevision", "resultRevision", "configurationFingerprint", "revision",
+        "freshness", "rounds", "player"
+      ],
+      "properties": {
+        "contractVersion": { "const": "production-net-skins-v1" },
+        "tournamentId": { "type": "string", "minLength": 1 },
+        "state": { "$ref": "#/$defs/state" },
+        "publicationPolicy": { "const": "OFFICIAL_ONLY" },
+        "published": { "type": "boolean" },
+        "configurationRevision": { "type": "integer", "minimum": 0 },
+        "resultRevision": { "type": ["integer", "null"], "minimum": 0 },
+        "configurationFingerprint": { "$ref": "#/$defs/nullableFingerprint" },
+        "revision": {
+          "type": "string",
+          "pattern": "^net-skins-v1:[0-9]+:[0-9]+:(NOT_CONFIGURED|CONFIGURED|IN_PROGRESS|OFFICIAL|UNAVAILABLE)$"
+        },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "rounds": { "type": "array", "items": { "$ref": "#/$defs/round" } },
+        "player": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["playerId", "eligibleRoundIds", "entryIds"],
+          "properties": {
+            "playerId": { "type": "string", "minLength": 1 },
+            "eligibleRoundIds": { "$ref": "#/$defs/idArray" },
+            "entryIds": { "$ref": "#/$defs/idArray" }
+          }
+        }
+      }
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  },
+  "$defs": {
+    "state": {
+      "enum": ["NOT_CONFIGURED", "CONFIGURED", "IN_PROGRESS", "OFFICIAL", "UNAVAILABLE"]
+    },
+    "roundState": {
+      "enum": ["CONFIGURED", "IN_PROGRESS", "OFFICIAL", "UNAVAILABLE"]
+    },
+    "nullableFingerprint": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      ]
+    },
+    "fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "nullableTimestamp": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "idArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stale", "configuredAt", "calculatedAt", "publishedAt", "sourceFingerprint"],
+      "properties": {
+        "stale": { "type": "boolean" },
+        "configuredAt": { "$ref": "#/$defs/nullableTimestamp" },
+        "calculatedAt": { "$ref": "#/$defs/nullableTimestamp" },
+        "publishedAt": { "$ref": "#/$defs/nullableTimestamp" },
+        "sourceFingerprint": { "$ref": "#/$defs/nullableFingerprint" }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entryId", "entryType", "matchId", "playerIds"],
+      "properties": {
+        "entryId": { "type": "string", "minLength": 1 },
+        "entryType": { "enum": ["INDIVIDUAL", "PAIRING"] },
+        "matchId": { "type": "string", "minLength": 1 },
+        "playerIds": { "$ref": "#/$defs/idArray" }
+      }
+    },
+    "skin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skinId", "holeNumber", "matchId", "winnerEntryId", "winnerPlayerIds",
+        "winningNetScore", "skinValue"
+      ],
+      "properties": {
+        "skinId": { "type": "string", "minLength": 1 },
+        "holeNumber": { "type": "integer", "minimum": 1, "maximum": 18 },
+        "matchId": { "type": "string", "minLength": 1 },
+        "winnerEntryId": { "type": "string", "minLength": 1 },
+        "winnerPlayerIds": { "$ref": "#/$defs/idArray" },
+        "winningNetScore": { "type": "number" },
+        "skinValue": { "type": "number", "minimum": 0 }
+      }
+    },
+    "leaderboardRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rank", "displayRank", "entryId", "playerIds", "skinsWon",
+        "totalWinnings", "winningHoleNumbers"
+      ],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1 },
+        "displayRank": { "type": "string", "minLength": 1 },
+        "entryId": { "type": "string", "minLength": 1 },
+        "playerIds": { "$ref": "#/$defs/idArray" },
+        "skinsWon": { "type": "integer", "minimum": 0 },
+        "totalWinnings": { "type": "number", "minimum": 0 },
+        "winningHoleNumbers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1, "maximum": 18 }
+        }
+      }
+    },
+    "officialResults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pot", "eligibleCount", "completedHoles", "skinsAwarded", "skinValue",
+        "complete", "finalized", "skins", "leaderboard"
+      ],
+      "properties": {
+        "pot": { "type": "number", "minimum": 0 },
+        "eligibleCount": { "type": "integer", "minimum": 0 },
+        "completedHoles": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "skinsAwarded": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "skinValue": { "type": "number", "minimum": 0 },
+        "complete": { "const": true },
+        "finalized": { "const": true },
+        "skins": { "type": "array", "items": { "$ref": "#/$defs/skin" } },
+        "leaderboard": { "type": "array", "items": { "$ref": "#/$defs/leaderboardRow" } }
+      }
+    },
+    "round": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roundId", "roundNumber", "format", "entryType", "matchIds", "buyInPerEntry",
+        "eligibleEntryCount", "eligiblePlayerIds", "state", "configurationRevision",
+        "resultRevision", "configurationFingerprint", "freshness", "entries", "officialResults"
+      ],
+      "properties": {
+        "roundId": { "type": "string", "minLength": 1 },
+        "roundNumber": { "type": "integer", "minimum": 1 },
+        "format": { "enum": ["BB", "SC", "SI"] },
+        "entryType": { "enum": ["INDIVIDUAL", "PAIRING"] },
+        "matchIds": { "$ref": "#/$defs/idArray" },
+        "buyInPerEntry": { "type": "number", "minimum": 0 },
+        "eligibleEntryCount": { "type": "integer", "minimum": 0 },
+        "eligiblePlayerIds": { "$ref": "#/$defs/idArray" },
+        "state": { "$ref": "#/$defs/roundState" },
+        "configurationRevision": { "type": "integer", "minimum": 0 },
+        "resultRevision": { "type": ["integer", "null"], "minimum": 0 },
+        "configurationFingerprint": { "$ref": "#/$defs/fingerprint" },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "entries": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
+        "officialResults": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/officialResults" }
+          ]
+        }
+      }
+    }
+  }
+}
