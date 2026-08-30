@@ -343,7 +343,7 @@ export default function WeeklyHandicapPanel({ onOperation }) {
           <th scope="row"><strong>{row.displayName}</strong><span>{row.playerId}{row.teamName ? ` · ${row.teamName}` : ""}</span></th>
           <td data-label="Current"><strong>{handicapLabel(row.currentHandicapDecimal, row.currentHandicap)}</strong></td>
           <td data-label="Proposed"><label htmlFor={`weekly-handicap-${row.playerId}`} className={styles.srOnly}>Proposed handicap for {row.displayName}</label><input id={`weekly-handicap-${row.playerId}`} inputMode="decimal" value={row.proposedInput} disabled={editorLocked} aria-invalid={row.error ? "true" : undefined} aria-describedby={row.error ? `weekly-handicap-error-${row.playerId}` : undefined} onChange={(event) => updateProposal(row.playerId, event.target.value)} />{row.error ? <small id={`weekly-handicap-error-${row.playerId}`} className={styles.inlineError}>{row.error}</small> : null}</td>
-          <td data-label="Change"><strong data-change={row.changed ? "true" : undefined}>{changeLabel(row.change)}</strong></td>
+          <td data-label="Change"><strong data-change={row.changed ? "true" : undefined}>{row.changed ? changeLabel(row.change) : "No change"}</strong></td>
           <td data-label="Affected match"><div className={styles.matchList}>{row.affectedMatches.length ? row.affectedMatches.map((match) => <span key={match.matchId} data-frozen={match.frozen || match.started || !match.safeToRefresh ? "true" : undefined}>{matchLabel(match)}<small>{match.frozen || match.started || !match.safeToRefresh ? `${match.status} · frozen` : `${match.status} · refresh`}</small></span>) : <em>None scheduled</em>}</div></td>
         </tr>)}</tbody>
       </table>

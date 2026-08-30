@@ -148,6 +148,7 @@ test("weekly handicap UI uses the dedicated same-origin staged workflow and keep
   assert.match(component, /type="date"/);
   assert.match(component, /Bulk paste/);
   assert.match(component, /data-changed=\{row\.changed/);
+  assert.match(component, /row\.changed \? changeLabel\(row\.change\) : "No change"/);
   assert.match(component, /Review revision before approval/);
   assert.match(component, /I reviewed every changed player, the effective date, and all affected matches/);
   assert.match(component, /Authoritative receipt/);
