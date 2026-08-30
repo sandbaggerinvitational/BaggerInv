@@ -190,7 +190,7 @@ Success (`200`):
 
 ## Tournament read routes
 
-All read responses use `{ "ok": true, "apiVersion": "v1", "data": ..., "meta": ... }` and are private to the verified Bearer identity with its exact Bagger certification proof. `meta.generatedAt` is an ISO-8601 UTC response timestamp. `meta.revision` is the existing canonical product fingerprint: participant Home for `/today`, Tournament Live for `/matches`, Leaderboards Core for `/leaders`, and the published Guide delivery fingerprint (falling back to its existing projection revision) for `/schedule`. The same value is a strong `ETag`; matching `If-None-Match` requests receive `304`. No revision store was introduced.
+All read responses use `{ "ok": true, "apiVersion": "v1", "data": ..., "meta": ... }` and are private to the verified Bearer identity with its exact Bagger certification proof. `meta.generatedAt` is an ISO-8601 UTC response timestamp. `meta.revision` is the product representation fingerprint: participant Home for `/today`, Tournament Live for `/matches`, the complete bounded Leaderboards Core projection for `/leaders`, the published Guide delivery fingerprint (falling back to its existing projection revision) for `/schedule`, and the complete bounded participant representations for `/net-skins` and `/calcutta`. The `meta.revision` value is also the strong `ETag`; matching `If-None-Match` requests receive `304`. Response-generation time is intentionally excluded, so an unchanged canonical representation revalidates while any participant-visible product change receives a new validator. No client-selected revision store was introduced.
 
 ### `GET /today`
 
@@ -202,11 +202,68 @@ Returns participant-visible Tournament Live matches ordered by round and canonic
 
 ### `GET /leaders`
 
-Returns overall team and Player standings from Leaderboards Core and its established ranking helpers. Ties retain canonical display ranks. Round scorecards and secondary leaderboard modules are excluded.
+Returns overall team and Player standings from Leaderboards Core and its established ranking helpers. Ties retain canonical display ranks. It also returns `roundStandings` in numeric Round order, with canonical Round name/status and the two team standings for each Round. Only official Match results contribute Round points; an upcoming Round with no official result returns `rank: null` and `points: null` rather than a fabricated zero. Half points remain exact JSON numbers. Native Swift therefore does not sum `/matches` to obtain Round Scores. Round scorecards, Round Player leaderboards, and secondary calculation detail remain excluded.
 
 ### `GET /schedule`
 
 Returns only the published participant itinerary from the current Guide projection. Editorial metadata, raw source rows, contacts, unpublished content, Details copy, and administration fields are excluded.
+
+### `GET /net-skins`
+
+Authentication is the same verified Supabase Bearer session plus `X-Bagger-Certification` required by every protected mobile read. The request has no Player, tournament, environment, publication, or revision query selector. The server-resolved canonical Player ID and tournament are the only identity inputs.
+
+The server adapter chooses authority only after the server proves its environment. Exact isolated Preview calls the service-role-only Preview RPC `read_preview_mobile_net_skins_v1(input jsonb)` against Preview Supabase. Production retains the separate `read_production_net_skins_v1(input jsonb)` reader, pinned to Production resources, but the repository-wide mobile health gate still leaves Production native access fail-closed. The client never receives or supplies a service credential and cannot select Player, tournament, environment, publication, or authority. Both readers feed the same participant DTO. The adapter performs no Net Skins calculation and never calls Google; canonical Supabase scoring/configuration and stored official snapshots produce the response.
+
+The stable state values are:
+
+| State | Meaning |
+| --- | --- |
+| `NOT_CONFIGURED` | No valid tournament-scoped Net Skins configuration exists. This is a successful empty read, not an error. |
+| `CONFIGURED` | Valid entries exist, but no provisional payout is published. |
+| `IN_PROGRESS` | Canonical scores are in progress. Configuration identity is available, but provisional payout results remain hidden. |
+| `OFFICIAL` | The server has finalized and published the official result for every included result. |
+| `UNAVAILABLE` | The canonical product is temporarily unable to provide a safe result. No fallback data is returned. |
+
+`publicationPolicy` is always `OFFICIAL_ONLY`. Configuration summaries expose stable `roundId`, canonical `matchIds`, stable configuration `entryId`, and stable `playerIds`; a pairing remains one stable entry containing both canonical Player IDs. Only an `OFFICIAL` round has `officialResults`. Its skins and leaderboard are decorated and validated against those configuration identities; raw calculation payloads and name-only identity are never part of the native contract.
+
+The canonical domain revision is `net-skins-v1:<configuration-revision>:<result-revision-or-0>:<state>` and is returned in `data.revision`. `meta.revision` and the strong `ETag` are an opaque fingerprint over the complete bounded participant representation, including its canonical configuration/result revision, Round states, official facts, Player relationship, and freshness. Freshness exposes bounded configured/calculated/published timestamps, a source fingerprint, and `stale`; clients must not infer authority from timestamps alone.
+
+Transport/Auth/resource failures use the existing enumeration-safe mobile errors (`UNAUTHORIZED`, `INVALID_TOKEN`, `PARTICIPANT_NOT_FOUND`, `AUTH_CERTIFICATION_FAILED`, or `MOBILE_API_UNAVAILABLE`). `NOT_CONFIGURED` and `UNAVAILABLE` are successful domain states, so participant clients can render them without parsing internal PostgREST errors. No email, phone, Auth UUID, Director entitlement, source row, internal job, or service diagnostic is returned.
+
+#### Production activation boundary
+
+This endpoint and `net-skins.schema.json` define one environment-compatible participant DTO. Isolated Preview now serves it through Preview-only authority; the repository-wide mobile authority/health gate keeps the Production route dormant until a separately authorized Production activation. Preview never falls back to the Production reader, and Production semantics are unchanged. Activating Production native transport is separate work.
+
+### `GET /calcutta`
+
+Authentication is the same verified Supabase Bearer session plus `X-Bagger-Certification` required by every protected mobile read. The request has no Player, tournament, environment, publication, or revision query selector. The server-resolved canonical Player ID and tournament are the only identity inputs. Every active authenticated tournament participant receives the same full **published** market; `viewer.playerId` identifies the verified viewer without changing market contents.
+
+The server adapter chooses authority only after the server proves its environment. Exact isolated Preview calls the service-role-only Preview RPC `read_preview_mobile_calcutta_v1(input jsonb)` against Preview Supabase. Production retains the separate `read_production_calcutta_v1(input jsonb)` reader, while the shared mobile gate keeps Production native access fail-closed. Preview publication is held in a server-only, configuration-fingerprint-bound ledger. Its one-time compatibility adoption is limited to an exact current snapshot whose fingerprint matches the approved configuration and whose canonical model was already participant-visible (`available = true`); an approved configuration alone remains unpublished. Every later approved configuration change resets visibility to `UNPUBLISHED`, and only an explicit service-side publication operation can expose that changed market/result. The client never receives a service credential, cannot select authority or publication, and cannot request recalculation. Both internal readers feed the same participant DTO. The mobile adapter only validates and reshapes canonical stored facts; it does not recreate auction, ownership, rank, tie, payout, ROI, settlement, or publication logic.
+
+The versioned lifecycle state is independent from publication:
+
+There is no `AUCTION_OPEN` state: the installed workflow records a completed auction manually and has no live-bidding authority.
+
+| State | Meaning |
+| --- | --- |
+| `NOT_CONFIGURED` | No valid tournament-scoped Calcutta configuration exists. This is a successful empty read. |
+| `CONFIGURED` | The bounded Calcutta rules/configuration exist, but a complete recorded auction does not. No market is exposed. |
+| `AUCTION_COMPLETE` | Final purchase prices and exactly reconciled ownership have been recorded. A published market may be shown before any result exists. |
+| `IN_PROGRESS` | At least one official completed Round contributes to the server-computed result, but the tournament is not final. |
+| `OFFICIAL` | The tournament result and participant-visible financial result are final. |
+| `UNAVAILABLE` | The server cannot provide a safe current result. No fallback result is returned. |
+
+`publicationState` is exactly `UNPUBLISHED` or `PUBLISHED`, and `published` is its boolean equivalent. The rule is enforced before the participant DTO is built in both environments. `UNPUBLISHED` always returns `market: null` and `result: null`, even if an auction was recorded or the preserved lifecycle is already `IN_PROGRESS` or `OFFICIAL`. Explicit unpublish changes visibility, not canonical auction/result facts, lifecycle, or their revision bindings; `resultRevision` may therefore remain non-null while the result body is hidden. `PUBLISHED` returns the full bounded market: pot, every purchased Player, purchase price, and every owner's stable Player identity and ownership fraction. A published `IN_PROGRESS` or `OFFICIAL` state requires a result. A published `AUCTION_COMPLETE` market may have `result: null` until a valid calculation exists. `UNAVAILABLE` never returns a result; it may retain the already-published market only while the exact current configuration and auction facts remain valid.
+
+The market and result contain only stable Player IDs and display names. They contain no email, phone, Auth UUID, identity-link row, Director entitlement, source row, raw configuration table, job, audit record, or storyline. The result is bounded to completed Round numbers, golfer rankings and server-computed Round facts, and owner portfolios/investments. It does not expose any mutation, bid, auction administration, or publication control.
+
+`currencyCode` is always `USD`. Every money value, ownership fraction, payout fraction, and ROI is a canonical base-10 string: no currency symbol, grouping separator, exponent, or client-selected precision. This preserves the installed `payout_rounding: NONE` rule and valid sub-cent server results such as `118.125`. Ranks, points, gross/net scores, and course handicaps remain JSON numbers. Native may format the strings for display but must never calculate, settle, round, or redistribute Calcutta value.
+
+The canonical domain revision is `calcutta-v1:<configuration-revision>:<auction-revision>:<publication-revision>:<result-revision-or-0>:<state>:<publication-state>` and is returned in `data.revision`. `meta.revision` and the strong `ETag` are an opaque representation fingerprint over the complete bounded participant response, including the domain revision, publication-safe market/result, canonical Player names, source fingerprint, lifecycle timestamps, and `stale`/`updating` flags. A freshness or visible-name transition therefore cannot incorrectly return `304`. A stale result is eligible only when it was calculated from the exact current configuration and auction revisions. A changed configuration or auction invalidates the old result rather than serving it as stale. There is no Google, browser-route, raw-snapshot, or cross-environment fallback.
+
+#### Production activation boundary
+
+This endpoint and `calcutta.schema.json` define one environment-compatible participant DTO. Isolated Preview now serves it through Preview-only canonical authority. The repository-wide mobile authority and health contract still leave Production mobile fail-closed. Serving this endpoint from Production remains a separate, explicitly authorized Production-native milestone.
 
 ## Date and time
 

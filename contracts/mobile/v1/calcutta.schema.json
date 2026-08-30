@@ -1,0 +1,454 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:calcutta",
+  "title": "Bagger Mobile API v1 Production Calcutta response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractVersion", "tournamentId", "state", "publicationState", "published",
+        "currencyCode", "configurationRevision", "auctionRevision", "publicationRevision",
+        "resultRevision", "configurationFingerprint", "auctionFingerprint", "revision",
+        "freshness", "market", "result", "viewer"
+      ],
+      "properties": {
+        "contractVersion": { "const": "production-calcutta-v1" },
+        "tournamentId": { "$ref": "#/$defs/identifier" },
+        "state": { "$ref": "#/$defs/state" },
+        "publicationState": { "$ref": "#/$defs/publicationState" },
+        "published": { "type": "boolean" },
+        "currencyCode": { "const": "USD" },
+        "configurationRevision": { "type": "integer", "minimum": 1 },
+        "auctionRevision": { "type": "integer", "minimum": 0 },
+        "publicationRevision": { "type": "integer", "minimum": 0 },
+        "resultRevision": { "type": ["integer", "null"], "minimum": 1 },
+        "configurationFingerprint": { "$ref": "#/$defs/nullableFingerprint" },
+        "auctionFingerprint": { "$ref": "#/$defs/nullableFingerprint" },
+        "revision": {
+          "type": "string",
+          "pattern": "^calcutta-v1:[0-9]+:[0-9]+:[0-9]+:[0-9]+:(NOT_CONFIGURED|CONFIGURED|AUCTION_COMPLETE|IN_PROGRESS|OFFICIAL|UNAVAILABLE):(UNPUBLISHED|PUBLISHED)$"
+        },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "market": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/market" }
+          ]
+        },
+        "result": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/result" }
+          ]
+        },
+        "viewer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["playerId"],
+          "properties": {
+            "playerId": { "$ref": "#/$defs/identifier" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["publicationState"],
+            "properties": { "publicationState": { "const": "PUBLISHED" } }
+          },
+          "then": {
+            "properties": {
+              "published": { "const": true },
+              "market": { "$ref": "#/$defs/market" }
+            }
+          },
+          "else": {
+            "properties": {
+              "published": { "const": false },
+              "market": { "type": "null" },
+              "result": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["state"],
+            "properties": { "state": { "enum": ["NOT_CONFIGURED", "CONFIGURED"] } }
+          },
+          "then": {
+            "properties": {
+              "publicationState": { "const": "UNPUBLISHED" },
+              "published": { "const": false },
+              "auctionRevision": { "const": 0 },
+              "auctionFingerprint": { "type": "null" },
+              "resultRevision": { "type": "null" },
+              "market": { "type": "null" },
+              "result": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["state"],
+            "properties": { "state": { "const": "NOT_CONFIGURED" } }
+          },
+          "then": {
+            "properties": {
+              "configurationRevision": { "const": 1 },
+              "configurationFingerprint": { "type": "null" },
+              "publicationRevision": { "const": 0 },
+              "resultRevision": { "type": "null" }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["state"],
+            "properties": {
+              "state": {
+                "enum": ["CONFIGURED", "AUCTION_COMPLETE", "IN_PROGRESS", "OFFICIAL", "UNAVAILABLE"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "configurationFingerprint": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["state"],
+            "properties": {
+              "state": {
+                "enum": ["AUCTION_COMPLETE", "IN_PROGRESS", "OFFICIAL", "UNAVAILABLE"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "auctionRevision": { "type": "integer", "minimum": 1 },
+              "auctionFingerprint": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "required": ["state"],
+                "properties": { "state": { "enum": ["IN_PROGRESS", "OFFICIAL"] } }
+              },
+              {
+                "required": ["publicationState"],
+                "properties": { "publicationState": { "const": "PUBLISHED" } }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "publicationState": { "const": "PUBLISHED" },
+              "published": { "const": true },
+              "market": { "$ref": "#/$defs/market" },
+              "result": { "$ref": "#/$defs/result" },
+              "resultRevision": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "required": ["state"],
+                "properties": { "state": { "const": "IN_PROGRESS" } }
+              },
+              {
+                "required": ["publicationState"],
+                "properties": { "publicationState": { "const": "PUBLISHED" } }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "allOf": [
+                  { "$ref": "#/$defs/result" },
+                  { "properties": { "tournamentComplete": { "const": false } } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "required": ["state"],
+                "properties": { "state": { "const": "OFFICIAL" } }
+              },
+              {
+                "required": ["publicationState"],
+                "properties": { "publicationState": { "const": "PUBLISHED" } }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "allOf": [
+                  { "$ref": "#/$defs/result" },
+                  { "properties": { "tournamentComplete": { "const": true } } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["state"],
+            "properties": { "state": { "const": "UNAVAILABLE" } }
+          },
+          "then": { "properties": { "result": { "type": "null" } } }
+        },
+        {
+          "if": {
+            "required": ["result"],
+            "properties": { "result": { "type": "object" } }
+          },
+          "then": { "properties": { "resultRevision": { "type": "integer", "minimum": 1 } } }
+        }
+      ]
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "NOT_CONFIGURED", "CONFIGURED", "AUCTION_COMPLETE",
+        "IN_PROGRESS", "OFFICIAL", "UNAVAILABLE"
+      ]
+    },
+    "publicationState": { "enum": ["UNPUBLISHED", "PUBLISHED"] },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "nullableFingerprint": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      ]
+    },
+    "nullableTimestamp": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "decimal": {
+      "type": "string",
+      "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+    },
+    "nonnegativeDecimal": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+    },
+    "ownershipFraction": {
+      "type": "string",
+      "pattern": "^(?:1|0\\.[0-9]*[1-9])$"
+    },
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "displayName"],
+      "properties": {
+        "playerId": { "$ref": "#/$defs/identifier" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stale", "updating", "configuredAt", "auctionUpdatedAt",
+        "publishedAt", "calculatedAt", "sourceFingerprint"
+      ],
+      "properties": {
+        "stale": { "type": "boolean" },
+        "updating": { "type": "boolean" },
+        "configuredAt": { "$ref": "#/$defs/nullableTimestamp" },
+        "auctionUpdatedAt": { "$ref": "#/$defs/nullableTimestamp" },
+        "publishedAt": { "$ref": "#/$defs/nullableTimestamp" },
+        "calculatedAt": { "$ref": "#/$defs/nullableTimestamp" },
+        "sourceFingerprint": { "$ref": "#/$defs/nullableFingerprint" }
+      }
+    },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player", "ownershipFraction"],
+      "properties": {
+        "player": { "$ref": "#/$defs/player" },
+        "ownershipFraction": { "$ref": "#/$defs/ownershipFraction" }
+      }
+    },
+    "purchase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player", "purchasePrice", "owners"],
+      "properties": {
+        "player": { "$ref": "#/$defs/player" },
+        "purchasePrice": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "owners": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/owner" }
+        }
+      }
+    },
+    "market": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pot", "purchases"],
+      "properties": {
+        "pot": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "purchases": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/purchase" }
+        }
+      }
+    },
+    "roundResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roundId", "roundNumber", "format", "grossScore", "netScore",
+        "courseHandicap", "rank", "tieSize", "points", "payoutFraction",
+        "guaranteedWinnings"
+      ],
+      "properties": {
+        "roundId": { "$ref": "#/$defs/identifier" },
+        "roundNumber": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "format": { "enum": ["BB", "SC", "SI"] },
+        "grossScore": { "type": "number" },
+        "netScore": { "type": "number" },
+        "courseHandicap": { "type": "number" },
+        "rank": { "type": "integer", "minimum": 1 },
+        "tieSize": { "type": "integer", "minimum": 1 },
+        "points": { "type": "number" },
+        "payoutFraction": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "guaranteedWinnings": { "$ref": "#/$defs/nonnegativeDecimal" }
+      }
+    },
+    "golfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rank", "tieSize", "player", "rounds", "totalPoints",
+        "overallPayoutFraction", "totalPayoutFraction", "guaranteedWinnings",
+        "tournamentValue", "netProfit", "roi", "remainingUpside"
+      ],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1 },
+        "tieSize": { "type": "integer", "minimum": 1 },
+        "player": { "$ref": "#/$defs/player" },
+        "rounds": {
+          "type": "array",
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/roundResult" }
+        },
+        "totalPoints": { "type": "number" },
+        "overallPayoutFraction": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "totalPayoutFraction": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "guaranteedWinnings": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "tournamentValue": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "netProfit": { "$ref": "#/$defs/decimal" },
+        "roi": { "$ref": "#/$defs/decimal" },
+        "remainingUpside": { "$ref": "#/$defs/nonnegativeDecimal" }
+      }
+    },
+    "investment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "player", "ownershipFraction", "purchaseCost", "guaranteedWinnings",
+        "tournamentValue", "netProfit", "roi"
+      ],
+      "properties": {
+        "player": { "$ref": "#/$defs/player" },
+        "ownershipFraction": { "$ref": "#/$defs/ownershipFraction" },
+        "purchaseCost": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "guaranteedWinnings": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "tournamentValue": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "netProfit": { "$ref": "#/$defs/decimal" },
+        "roi": { "$ref": "#/$defs/decimal" }
+      }
+    },
+    "portfolio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rank", "owner", "investments", "purchaseCost", "guaranteedWinnings",
+        "tournamentValue", "netProfit", "roi"
+      ],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1 },
+        "owner": { "$ref": "#/$defs/player" },
+        "investments": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/investment" }
+        },
+        "purchaseCost": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "guaranteedWinnings": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "tournamentValue": { "$ref": "#/$defs/nonnegativeDecimal" },
+        "netProfit": { "$ref": "#/$defs/decimal" },
+        "roi": { "$ref": "#/$defs/decimal" }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tournamentComplete", "completedRounds", "golfers", "portfolios"],
+      "properties": {
+        "tournamentComplete": { "type": "boolean" },
+        "completedRounds": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 3,
+          "items": { "type": "integer", "minimum": 1, "maximum": 3 }
+        },
+        "golfers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/golfer" }
+        },
+        "portfolios": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/portfolio" }
+        }
+      }
+    }
+  }
+}

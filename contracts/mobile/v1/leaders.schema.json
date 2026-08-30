@@ -1,5 +1,72 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "urn:bagger:mobile:v1:leaders",
-  "type": "object", "additionalProperties": false, "required": ["ok", "apiVersion", "data", "meta"],
-  "properties": { "ok": { "const": true }, "apiVersion": { "const": "v1" }, "data": { "type": "object", "additionalProperties": false, "required": ["tournament", "teamStandings", "playerStandings"], "properties": { "tournament": { "$ref": "shared.schema.json#/$defs/tournament" }, "teamStandings": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["rank", "teamId", "name", "points", "record", "remainingMatches"], "properties": { "rank": { "type": ["integer", "null"] }, "teamId": { "type": "string" }, "name": { "type": "string" }, "points": { "type": ["number", "null"] }, "record": { "type": "string" }, "remainingMatches": { "type": ["integer", "null"] } } } }, "playerStandings": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["rank", "playerId", "displayName", "team", "points", "record"], "properties": { "rank": { "type": ["integer", "null"] }, "playerId": { "type": "string" }, "displayName": { "type": "string" }, "team": { "$ref": "shared.schema.json#/$defs/team" }, "points": { "type": ["number", "null"] }, "record": { "type": "string" } } } } } }, "meta": { "$ref": "shared.schema.json#/$defs/meta" } }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:leaders",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tournament", "teamStandings", "roundStandings", "playerStandings"],
+      "properties": {
+        "tournament": { "$ref": "shared.schema.json#/$defs/tournament" },
+        "teamStandings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/teamStanding" }
+        },
+        "roundStandings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["roundNumber", "roundName", "status", "teamStandings"],
+            "properties": {
+              "roundNumber": { "type": "integer", "minimum": 1 },
+              "roundName": { "type": "string" },
+              "status": { "enum": ["upcoming", "inProgress", "final"] },
+              "teamStandings": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/teamStanding" }
+              }
+            }
+          }
+        },
+        "playerStandings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rank", "playerId", "displayName", "team", "points", "record"],
+            "properties": {
+              "rank": { "type": ["integer", "null"] },
+              "playerId": { "type": "string" },
+              "displayName": { "type": "string" },
+              "team": { "$ref": "shared.schema.json#/$defs/team" },
+              "points": { "type": ["number", "null"] },
+              "record": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  },
+  "$defs": {
+    "teamStanding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rank", "teamId", "name", "points", "record", "remainingMatches"],
+      "properties": {
+        "rank": { "type": ["integer", "null"] },
+        "teamId": { "type": "string" },
+        "name": { "type": "string" },
+        "points": { "type": ["number", "null"] },
+        "record": { "type": "string" },
+        "remainingMatches": { "type": ["integer", "null"] }
+      }
+    }
+  }
 }

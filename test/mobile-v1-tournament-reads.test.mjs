@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   mobileLeadersResult,
   mobileMatchesResult,
+  mobileRoundStandings,
   mobileScheduleResult,
   mobileTodayResult,
 } from "../lib/mobile-v1-tournament-reads.js";
@@ -100,8 +101,122 @@ test("leaders delegates canonical team/player ordering to the existing leaderboa
   } });
   assert.deepEqual(calls, ["teams", "performance", "rank"]);
   assert.equal(result.body.data.teamStandings[0].teamId, "T2");
+  assert.deepEqual(result.body.data.roundStandings, []);
   assert.equal(result.body.data.playerStandings[0].playerId, "P2");
   assert.equal(result.body.data.playerStandings[0].rank, 1);
+  assert.match(result.revision, /^[0-9a-f]{64}$/);
+  assert.equal(result.body.meta.revision, result.revision);
+});
+
+test("round standings preserve canonical numeric order, half points, lifecycle, and empty future authority", () => {
+  const final = (id, teamOnePoints, teamTwoPoints, winner) => ({
+    id,
+    round: 1,
+    status: "Final",
+    finalizedAt: "2026-09-24T12:00:00.000Z",
+    expectedRoundMatchCount: 2,
+    pointsAvailable: 3,
+    team1Points: teamOnePoints,
+    team2Points: teamTwoPoints,
+    matchupWinner: winner,
+  });
+  const rows = mobileRoundStandings([
+    { number: 10, label: "Finale", matches: [] },
+    { number: 2, label: "Scramble", matches: [{ id: "M-LIVE", status: "Live" }] },
+    { number: 1, label: "Best Ball", matches: [
+      final("M1", 1.5, 1.5, "Halved"),
+      final("M2", 2, 1, "Team 1"),
+    ] },
+  ], {
+    status: "Live",
+    currentRound: 2,
+    teamOne: { id: "T1", name: "Pickles" },
+    teamTwo: { id: "T2", name: "Rippers" },
+  });
+
+  assert.deepEqual(rows.map((row) => row.roundNumber), [1, 2, 10]);
+  assert.deepEqual(rows.map((row) => row.status), ["final", "inProgress", "upcoming"]);
+  assert.deepEqual(rows[0].teamStandings.map((row) => row.points), [3.5, 2.5]);
+  assert.deepEqual(rows[0].teamStandings.map((row) => row.rank), [1, 2]);
+  assert.equal(rows[0].teamStandings[0].record, "1-0-1");
+  for (const future of rows.slice(1)) {
+    assert.deepEqual(future.teamStandings.map((row) => row.points), [null, null]);
+    assert.deepEqual(future.teamStandings.map((row) => row.rank), [null, null]);
+  }
+});
+
+test("round standings fail closed on invalid final results and preserve canonical ties", () => {
+  const rows = mobileRoundStandings([{
+    number: 1,
+    label: "Round One",
+    matches: [{
+      id: "INVALID-FINAL",
+      status: "Final",
+      finalizedAt: "2026-09-24T12:00:00.000Z",
+      pointsAvailable: 3,
+      team1Points: 2,
+      team2Points: 2,
+      matchupWinner: "Team 1",
+    }],
+  }], {
+    status: "Final",
+    currentRound: "FINAL",
+    teamOne: { id: "T1", name: "A very long canonical team name" },
+    teamTwo: { id: "T2", name: "Another very long canonical team name" },
+  });
+  assert.equal(rows[0].status, "upcoming");
+  assert.deepEqual(rows[0].teamStandings.map((row) => row.points), [null, null]);
+  assert.deepEqual(rows[0].teamStandings.map((row) => row.rank), [null, null]);
+
+  const tied = mobileRoundStandings([{
+    number: 1,
+    label: "Round One",
+    matches: [{
+      id: "TIE",
+      status: "Final",
+      finalizedAt: "2026-09-24T12:00:00.000Z",
+      pointsAvailable: 3,
+      team1Points: 1.5,
+      team2Points: 1.5,
+      matchupWinner: "Halved",
+    }],
+  }], {
+    status: "Final",
+    currentRound: "FINAL",
+    teamOne: { id: "T1", name: "Pickles" },
+    teamTwo: { id: "T2", name: "Rippers" },
+  });
+  assert.deepEqual(tied[0].teamStandings.map((row) => row.points), [1.5, 1.5]);
+  assert.deepEqual(tied[0].teamStandings.map((row) => row.rank), [1, 1]);
+  assert.throws(
+    () => mobileRoundStandings([{ number: 0, label: "Invalid", matches: [] }], tournament()),
+    (error) => error.code === "MOBILE_API_UNAVAILABLE",
+  );
+  assert.throws(
+    () => mobileRoundStandings([
+      { number: 1, label: "One", matches: [] },
+      { number: 1, label: "Duplicate", matches: [] },
+    ], tournament()),
+    (error) => error.code === "MOBILE_API_UNAVAILABLE",
+  );
+});
+
+test("leaders ETag changes when the bounded round representation changes under one source revision", async () => {
+  const build = async (roundLabel) => mobileLeadersResult(identity, { now, dependencies: {
+    requireLeaderboardsCoreReadSource: source,
+    readLeaderboardsCoreView: async () => rpc({}),
+    leaderboardsCoreDataFromSupabaseView: () => ({
+      revision: "same-source-revision",
+      slotVerification: { pass: true },
+      tournament: tournament(),
+      rounds: [{ number: 1, label: roundLabel, matches: [] }],
+      leaderboard: [],
+      scoreLeaderboard: [],
+    }),
+  } });
+  const first = await build("Round One");
+  const second = await build("Opening Round");
+  assert.notEqual(first.revision, second.revision);
 });
 
 test("schedule exposes normalized published projection fields and stable optional nulls only", async () => {
