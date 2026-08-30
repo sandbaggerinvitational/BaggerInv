@@ -2,18 +2,33 @@ import SwiftUI
 
 struct ScoreScreen: View {
     let presentation: ScoringPresentation
+    let queueState: ScoringQueueCoordinatorState
     let onRefresh: @MainActor @Sendable () async -> Void
+    let onSave: @MainActor @Sendable (ScoringDraft) async throws -> ScoringQueueSaveResult
+    let onManualRetry: @MainActor @Sendable (String) async throws -> Void
 
     @State private var selectedHole: Int?
     @State private var drafts: [Int: ScoringDraft] = [:]
     @State private var pickerTarget: ScoringPickerTarget?
+    @State private var isSaving = false
+    @State private var saveFailure = false
 
     init(
         presentation: ScoringPresentation,
-        onRefresh: @escaping @MainActor @Sendable () async -> Void
+        queueState: ScoringQueueCoordinatorState = .inactive,
+        onRefresh: @escaping @MainActor @Sendable () async -> Void,
+        onSave: @escaping @MainActor @Sendable (ScoringDraft) async throws -> ScoringQueueSaveResult = { _ in
+            throw ScoringQueueCoordinatorError.inactiveIdentity
+        },
+        onManualRetry: @escaping @MainActor @Sendable (String) async throws -> Void = { _ in
+            throw ScoringQueueCoordinatorError.notEligibleForRetry
+        }
     ) {
         self.presentation = presentation
+        self.queueState = queueState
         self.onRefresh = onRefresh
+        self.onSave = onSave
+        self.onManualRetry = onManualRetry
         _selectedHole = State(initialValue: presentation.initialSelectedHole())
     }
 
@@ -26,7 +41,7 @@ struct ScoreScreen: View {
                     ScoreNotice(
                         symbol: "wifi.slash",
                         title: orientationNoticeTitle,
-                        message: "The last official snapshot remains visible for orientation. Nothing entered here is saved."
+                        message: orientationNoticeMessage
                     )
                     .accessibilityIdentifier("score.offline")
                 }
@@ -127,6 +142,24 @@ struct ScoreScreen: View {
 
             availabilityNotice
 
+            if let matchID = presentation.matchID,
+               !queueState.isOffline || unresolvedQueueCount(matchID: matchID) > 0
+            {
+                ScoringReliabilityStatusView(
+                    status: reliabilityStatus(matchID: matchID),
+                    unresolvedCount: unresolvedQueueCount(matchID: matchID),
+                    onRetry: retryAction(matchID: matchID)
+                )
+                if let notice = queueAgeNotice(matchID: matchID) {
+                    ScoreNotice(
+                        symbol: "clock.badge.exclamationmark",
+                        title: notice.title,
+                        message: notice.message
+                    )
+                    .accessibilityIdentifier("score.queue.ageNotice")
+                }
+            }
+
             if let activeHoleNumber = effectiveSelectedHole,
                let hole = presentation.hole(activeHoleNumber)
             {
@@ -184,11 +217,22 @@ struct ScoreScreen: View {
                     holeNumber: hole.holeNumber
                 )
 
-                if presentation.availability == .active {
-                    SaveAndNextPreview(
+                if let matchID = presentation.matchID,
+                   let record = latestQueueRecord(matchID: matchID, holeNumber: hole.holeNumber),
+                   record.isUnresolved
+                {
+                    LocalScoringIntentCard(
+                        record: record,
+                        status: reliabilityStatus(matchID: matchID, holeNumber: hole.holeNumber)
+                    )
+                }
+
+                if presentation.canCreateDurableIntent {
+                    DurableSaveAndNext(
                         hasDraft: drafts[hole.holeNumber]?.isEmpty == false,
-                        isEditable: presentation.isEditable,
-                        onNext: { selectNextHole(after: hole.holeNumber) }
+                        isSaving: isSaving,
+                        saveFailed: saveFailure,
+                        onSave: { saveAndAdvance(holeNumber: hole.holeNumber) }
                     )
                 }
             } else {
@@ -258,6 +302,16 @@ struct ScoreScreen: View {
 
     private var orientationNoticeTitle: String {
         presentation.safeErrorCode == nil ? "Offline · scoring unavailable" : "Scoring unavailable · orientation only"
+    }
+
+    private var orientationNoticeMessage: String {
+        let hasDurableIntent = presentation.matchID.map {
+            unresolvedQueueCount(matchID: $0) > 0
+        } ?? false
+        if hasDurableIntent {
+            return "The last official snapshot remains visible. Completed Save & Next scores remain stored on this iPhone, but they are not Official until Bagger confirms them."
+        }
+        return "The last official snapshot remains visible for orientation. A completed Save & Next must finish saving on this iPhone before it can be shown as Saved on iPhone."
     }
 
     /// TabView may retain Score's local state from an earlier loading render.
@@ -346,6 +400,96 @@ struct ScoreScreen: View {
         drafts.removeAll()
         pickerTarget = nil
         await onRefresh()
+    }
+
+    private func saveAndAdvance(holeNumber: Int) {
+        guard !isSaving, let draft = drafts[holeNumber], !draft.isEmpty else { return }
+        isSaving = true
+        saveFailure = false
+        Task { @MainActor in
+            defer { isSaving = false }
+            do {
+                _ = try await onSave(draft)
+                drafts.removeValue(forKey: holeNumber)
+                selectNextHole(after: holeNumber)
+            } catch {
+                saveFailure = true
+            }
+        }
+    }
+
+    private func queueRecords(matchID: String) -> [ScoringQueueRecord] {
+        queueState.records
+            .filter { $0.partition.matchId == matchID }
+            .sorted { $0.sequence < $1.sequence }
+    }
+
+    private func unresolvedQueueCount(matchID: String) -> Int {
+        queueRecords(matchID: matchID).filter(\.isUnresolved).count
+    }
+
+    private func queueAgeNotice(matchID: String) -> (title: String, message: String)? {
+        let recordIDs = Set(queueRecords(matchID: matchID).map(\.localQueueRecordId))
+        let support = recordIDs.compactMap { queueState.supportMetadataByRecordID[$0] }
+        if support.contains(.ninetyDayGuidance) {
+            return (
+                "Unresolved score retained",
+                "This score has remained unresolved for at least 90 days. It was not deleted or submitted automatically; contact Bagger support before resolving it."
+            )
+        }
+        if support.contains(.thirtyDayGuidance) {
+            return (
+                "Unresolved score retained",
+                "This score has remained unresolved for at least 30 days. It was not deleted; review it with Bagger support before taking action."
+            )
+        }
+        if !recordIDs.isDisjoint(with: queueState.agedPendingRecordIDs) {
+            return (
+                "Older score recheck",
+                "This saved score is more than six hours old. Bagger will refresh canonical Match state before any replay."
+            )
+        }
+        return nil
+    }
+
+    private func latestQueueRecord(matchID: String, holeNumber: Int) -> ScoringQueueRecord? {
+        queueRecords(matchID: matchID)
+            .filter { $0.intent.holeNumber == holeNumber }
+            .max { $0.sequence < $1.sequence }
+    }
+
+    private func reliabilityStatus(matchID: String, holeNumber: Int? = nil) -> ScoringReliabilityStatus {
+        if queueState.lastPersistenceFailure || queueState.hasHiddenQuarantinedRecords {
+            return .needsReview
+        }
+        let records = queueRecords(matchID: matchID).filter { record in
+            holeNumber.map { record.intent.holeNumber == $0 } ?? true
+        }
+        if records.contains(where: { $0.state == .conflict || $0.state == .actionRequired || $0.state == .quarantined }) {
+            if records.contains(where: { $0.stateReasonCode == .authentication }) { return .signInAgain }
+            return .needsReview
+        }
+        if records.contains(where: { $0.state == .syncing || ($0.state == .acknowledged && $0.acknowledgement?.refreshPending == true) }) {
+            return .syncing
+        }
+        if records.contains(where: { $0.state == .retryable }) {
+            return queueState.isOffline ? .offline : .retrying
+        }
+        if records.contains(where: { $0.state == .queued }) {
+            return queueState.isOffline ? .offline : .savedOnIPhone
+        }
+        if presentation.status == .final { return .matchFinal }
+        if presentation.readOnly { return .readOnly }
+        return .official
+    }
+
+    private func retryAction(matchID: String) -> (() -> Void)? {
+        guard let record = queueRecords(matchID: matchID).first(where: { $0.state == .retryable }) else {
+            return nil
+        }
+        return {
+            Task { @MainActor in try? await onManualRetry(record.localQueueRecordId) }
+        }
     }
 }
 
@@ -771,30 +915,145 @@ private struct CanonicalHoleContext: View {
     }
 }
 
-private struct SaveAndNextPreview: View {
+private struct DurableSaveAndNext: View {
     let hasDraft: Bool
-    let isEditable: Bool
-    let onNext: () -> Void
+    let isSaving: Bool
+    let saveFailed: Bool
+    let onSave: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Button(action: onNext) {
-                Text(hasDraft ? "Save & Next · Not available yet" : "Save & Next")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, minHeight: 54)
+            Button(action: onSave) {
+                HStack(spacing: 8) {
+                    if isSaving { ProgressView().tint(.white) }
+                    Text(isSaving ? "Saving on iPhone…" : "Save & Next")
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity, minHeight: 54)
             }
             .buttonStyle(.borderedProminent)
             .tint(BaggerPalette.actionGreen)
-            .disabled(true)
-            .accessibilityHint("Official score submission arrives in a later Preview step")
+            .disabled(!hasDraft || isSaving)
+            .accessibilityHint("Durably saves this score on the iPhone before advancing. It is not Official until Bagger confirms it.")
             .accessibilityIdentifier("score.saveNext")
 
-            Text(isEditable
-                 ? "Preview edits stay on this screen only. They are not saved or official."
-                 : "Official scoring changes are not available in this state.")
+            Text(saveFailed
+                 ? "Not saved. Keep this screen open and try again."
+                 : "The iPhone must finish saving before this score can advance. Saved on iPhone is not the same as Official.")
                 .font(.footnote)
-                .foregroundStyle(BaggerPalette.muted)
+                .foregroundStyle(saveFailed ? BaggerPalette.liveRed : BaggerPalette.muted)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+private struct ScoringReliabilityStatusView: View {
+    let status: ScoringReliabilityStatus
+    let unresolvedCount: Int
+    let onRetry: (() -> Void)?
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.title3)
+                .foregroundStyle(BaggerPalette.goldText)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(BaggerPalette.ink)
+                    .accessibilityIdentifier("score.reliability.status")
+                if unresolvedCount > 0 {
+                    Text("\(unresolvedCount) local \(unresolvedCount == 1 ? "score" : "scores") not yet confirmed Official")
+                        .font(.footnote)
+                        .foregroundStyle(BaggerPalette.muted)
+                        .accessibilityIdentifier("score.reliability.count")
+                }
+            }
+            Spacer(minLength: 8)
+            if let onRetry, status == .retrying || status == .offline {
+                Button("Retry", action: onRetry)
+                    .buttonStyle(.bordered)
+                    .tint(BaggerPalette.actionGreen)
+                    .accessibilityIdentifier("score.queue.retry")
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .baggerCard(border: status == .needsReview ? BaggerPalette.liveRed : BaggerPalette.matchBorder)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("score.reliability")
+    }
+
+    private var title: String {
+        switch status {
+        case .official: "Official"
+        case .savedOnIPhone: "Saved on iPhone"
+        case .syncing: "Syncing"
+        case .offline: "Offline · Saved on iPhone"
+        case .retrying: "Waiting to sync"
+        case .needsReview: "Needs Review"
+        case .readOnly: "Read-only"
+        case .matchFinal: "Match Final"
+        case .signInAgain: "Sign in again"
+        }
+    }
+
+    private var symbol: String {
+        switch status {
+        case .official: "checkmark.seal.fill"
+        case .savedOnIPhone: "iphone"
+        case .syncing: "arrow.triangle.2.circlepath"
+        case .offline: "wifi.slash"
+        case .retrying: "clock.arrow.circlepath"
+        case .needsReview: "exclamationmark.triangle.fill"
+        case .readOnly: "lock.fill"
+        case .matchFinal: "flag.checkered"
+        case .signInAgain: "person.crop.circle.badge.exclamationmark"
+        }
+    }
+}
+
+private struct LocalScoringIntentCard: View {
+    let record: ScoringQueueRecord
+    let status: ScoringReliabilityStatus
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            BaggerSectionHeading("Local Score Intent")
+            HStack(alignment: .firstTextBaseline) {
+                Text(statusTitle)
+                    .font(.headline)
+                    .foregroundStyle(BaggerPalette.actionGreen)
+                Spacer(minLength: 8)
+                Text("Not Official")
+                    .font(.caption.weight(.black))
+                    .foregroundStyle(BaggerPalette.deepEvergreen)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(BaggerPalette.scoreGold, in: Capsule())
+            }
+            Text("Side 1: \(record.intent.teamOneGrossScores.map(String.init).joined(separator: " · "))")
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(BaggerPalette.ink)
+            Text("Side 2: \(record.intent.teamTwoGrossScores.map(String.init).joined(separator: " · "))")
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(BaggerPalette.ink)
+        }
+        .baggerCard(border: BaggerPalette.gold)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("score.queue.intent.\(record.intent.holeNumber)")
+    }
+
+    private var statusTitle: String {
+        switch status {
+        case .savedOnIPhone, .offline: "Saved on iPhone"
+        case .syncing: "Syncing"
+        case .retrying: "Waiting to sync"
+        case .needsReview: "Needs Review"
+        case .signInAgain: "Sign in again"
+        case .official: "Awaiting canonical refresh"
+        case .readOnly: "Read-only"
+        case .matchFinal: "Match Final"
         }
     }
 }

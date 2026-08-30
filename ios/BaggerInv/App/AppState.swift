@@ -31,3 +31,9 @@ struct AuthenticationErrorPresentation: Equatable {
     let message: String
     let recovery: Recovery
 }
+
+struct ScoringQueueSignOutPresentation: Equatable {
+    /// Nil means the durable queue could not be read. Sign-out still requires
+    /// explicit confirmation and the database remains retained on device.
+    let unresolvedCount: Int?
+}

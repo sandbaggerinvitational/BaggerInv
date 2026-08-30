@@ -11,6 +11,11 @@ protocol MobileAPIServing {
     func leaders(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileLeadersResponse>
     func schedule(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileScheduleResponse>
     func scoringCurrent(accessToken: String, certification: String, matchID: String?) async throws -> MobileScoringCurrentResponse
+    func scoringHole(
+        request: MobileScoringHoleRequest,
+        accessToken: String,
+        certification: String
+    ) async throws -> MobileScoringHoleResponse
 }
 
 extension MobileAPIServing {
@@ -21,6 +26,17 @@ extension MobileAPIServing {
         matchID: String?
     ) async throws -> MobileScoringCurrentResponse {
         throw MobileAPIClientError.server(code: .scoringUnavailable, status: 503)
+    }
+
+    /// Fail-closed default keeps read-only and narrowly scoped test doubles
+    /// source-compatible. Step 2F can inject an explicit mutation sender without
+    /// making a live score request through an unrelated mock.
+    func scoringHole(
+        request: MobileScoringHoleRequest,
+        accessToken: String,
+        certification: String
+    ) async throws -> MobileScoringHoleResponse {
+        throw MobileScoringMutationError.definitelyNotSent(.clientUnavailable)
     }
 }
 
@@ -183,6 +199,125 @@ struct MobileAPIClient: MobileAPIServing {
         }
     }
 
+    func scoringHole(
+        request intent: MobileScoringHoleRequest,
+        accessToken: String,
+        certification: String
+    ) async throws -> MobileScoringHoleResponse {
+        guard intent.isContractCompatible else {
+            throw MobileScoringMutationError.definitelyNotSent(.invalidRequest)
+        }
+        guard !accessToken.isEmpty else {
+            throw MobileScoringMutationError.definitelyNotSent(.missingBearer)
+        }
+        guard !certification.isEmpty else {
+            throw MobileScoringMutationError.definitelyNotSent(.missingCertification)
+        }
+
+        let body: Data
+        do {
+            body = try encoder.encode(intent)
+        } catch {
+            throw MobileScoringMutationError.definitelyNotSent(.encoding)
+        }
+
+        let urlRequest: URLRequest
+        do {
+            urlRequest = try request(
+                path: "/api/mobile/v1/scoring/hole",
+                method: "POST",
+                body: body,
+                accessToken: accessToken,
+                certification: certification
+            )
+        } catch let error as MobileAPIClientError {
+            let reason: MobileScoringMutationPreflightFailure
+            switch error {
+            case .invalidURL:
+                reason = .invalidURL
+            case .missingBearer:
+                reason = .missingBearer
+            case .missingCertification:
+                reason = .missingCertification
+            default:
+                reason = .requestConstruction
+            }
+            throw MobileScoringMutationError.definitelyNotSent(reason)
+        } catch {
+            throw MobileScoringMutationError.definitelyNotSent(.requestConstruction)
+        }
+
+        let result: HTTPTransportResult
+        do {
+            // Once transport begins, even cancellation cannot prove that the
+            // server did not commit. The queue must retry this same mutation ID.
+            result = try await transport.data(for: urlRequest)
+        } catch is CancellationError {
+            throw MobileScoringMutationError.unknownOutcome(
+                reason: .cancelled,
+                code: nil,
+                status: nil,
+                data: nil,
+                retryAfter: nil
+            )
+        } catch {
+            throw MobileScoringMutationError.unknownOutcome(
+                reason: .transport,
+                code: nil,
+                status: nil,
+                data: nil,
+                retryAfter: nil
+            )
+        }
+
+        let status = result.response.statusCode
+        let retryAfter = Self.retryAfter(from: result.response)
+        if status == 200 {
+            do {
+                let response = try decoder.decode(MobileScoringHoleResponse.self, from: result.data)
+                guard response.isContractCompatible(for: intent) else {
+                    throw MobileContractError.incompatibleResponse
+                }
+                return response
+            } catch {
+                // A malformed or mismatched acknowledgement arrived only after
+                // transport. It cannot safely be treated as a known rejection.
+                throw MobileScoringMutationError.unknownOutcome(
+                    reason: .invalidAcknowledgement,
+                    code: nil,
+                    status: status,
+                    data: nil,
+                    retryAfter: retryAfter
+                )
+            }
+        }
+
+        let errorResponse = (try? decoder.decode(MobileErrorResponse.self, from: result.data)).flatMap { response in
+            response.ok == false && response.apiVersion == "v1" ? response : nil
+        }
+        let code = errorResponse?.error.code
+        let errorData = errorResponse?.data.flatMap { data in
+            data.isBoundedScoringMutationContext && data.matchId == intent.matchId ? data : nil
+        }
+
+        if (400...499).contains(status) {
+            throw MobileScoringMutationError.rejected(
+                code: code,
+                status: status,
+                data: errorData,
+                retryAfter: retryAfter
+            )
+        }
+
+        throw MobileScoringMutationError.unknownOutcome(
+            reason: status >= 500 ? .serverFailure : .unexpectedResponse,
+            code: code,
+            status: status,
+            data: errorData,
+            retryAfter: retryAfter
+        )
+    }
+
     private func request(
         path: String,
         method: String,
@@ -302,6 +437,102 @@ struct MobileAPIClient: MobileAPIServing {
             return .server(code: response.error.code, status: result.response.statusCode)
         }
         return .unexpectedStatus(result.response.statusCode)
+    }
+
+    private static func retryAfter(from response: HTTPURLResponse) -> MobileRetryAfter? {
+        guard let header = response.value(forHTTPHeaderField: "Retry-After")?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !header.isEmpty,
+            header.utf8.count <= 128
+        else { return nil }
+
+        if header.allSatisfy(\.isNumber),
+           let seconds = TimeInterval(header),
+           seconds.isFinite,
+           seconds >= 0
+        {
+            return .delay(seconds)
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        for format in [
+            "EEE',' dd MMM yyyy HH':'mm':'ss zzz",
+            "EEEE',' dd-MMM-yy HH':'mm':'ss zzz",
+            "EEE MMM d HH':'mm':'ss yyyy",
+        ] {
+            formatter.dateFormat = format
+            if let date = formatter.date(from: header) {
+                return .date(date)
+            }
+        }
+        return nil
+    }
+}
+
+enum MobileScoringMutationPreflightFailure: String, Equatable, Sendable {
+    case clientUnavailable
+    case invalidRequest
+    case invalidURL
+    case missingBearer
+    case missingCertification
+    case encoding
+    case requestConstruction
+}
+
+enum MobileScoringMutationUnknownReason: String, Equatable, Sendable {
+    case cancelled
+    case transport
+    case invalidAcknowledgement
+    case serverFailure
+    case unexpectedResponse
+}
+
+enum MobileScoringMutationOutcomeCertainty: String, Equatable, Sendable {
+    case definitelyNotSent
+    case knownRejected
+    case unknown
+}
+
+enum MobileRetryAfter: Equatable, Sendable {
+    case delay(TimeInterval)
+    case date(Date)
+}
+
+enum MobileScoringMutationError: Error, Equatable, Sendable, CustomStringConvertible {
+    case definitelyNotSent(MobileScoringMutationPreflightFailure)
+    case rejected(
+        code: MobileErrorCode?,
+        status: Int,
+        data: MobileErrorData?,
+        retryAfter: MobileRetryAfter?
+    )
+    case unknownOutcome(
+        reason: MobileScoringMutationUnknownReason,
+        code: MobileErrorCode?,
+        status: Int?,
+        data: MobileErrorData?,
+        retryAfter: MobileRetryAfter?
+    )
+
+    var outcomeCertainty: MobileScoringMutationOutcomeCertainty {
+        switch self {
+        case .definitelyNotSent: .definitelyNotSent
+        case .rejected: .knownRejected
+        case .unknownOutcome: .unknown
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .definitelyNotSent(let reason):
+            "scoring_mutation_not_sent_\(reason.rawValue)"
+        case .rejected(let code, let status, _, _):
+            "scoring_mutation_rejected_\(code?.rawValue ?? "unknown")_\(status)"
+        case .unknownOutcome(let reason, let code, let status, _, _):
+            "scoring_mutation_unknown_\(reason.rawValue)_\(code?.rawValue ?? "unknown")_\(status.map(String.init) ?? "none")"
+        }
     }
 }
 

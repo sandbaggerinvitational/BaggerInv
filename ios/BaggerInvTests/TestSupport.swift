@@ -596,14 +596,38 @@ final class MockTournamentDataLifecycle: TournamentDataLifecycle {
     private(set) var foregroundRefreshCallCount = 0
     private(set) var suspendCallCount = 0
     private(set) var resumeCallCount = 0
+    private(set) var prepareScoringQueueForSignOutCallCount = 0
+    private(set) var cancelScoringQueueSignOutPreparationCallCount = 0
     private(set) var activatedAuthUserID: String?
     private(set) var activatedParticipant: ParticipantSession?
     private(set) var deleteCacheValues: [Bool] = []
+    var unresolvedScoringIntentCountValue: Int? = 0
+    private var suspendNextActivation = false
+    private var activationContinuation: CheckedContinuation<Void, Never>?
 
     func activate(authUserID: String, participant: ParticipantSession) async {
         activateCallCount += 1
         activatedAuthUserID = authUserID
         activatedParticipant = participant
+        if suspendNextActivation {
+            suspendNextActivation = false
+            await withCheckedContinuation { continuation in
+                activationContinuation = continuation
+            }
+        }
+    }
+
+    func suspendNextActivationCall() {
+        suspendNextActivation = true
+    }
+
+    func hasSuspendedActivation() -> Bool {
+        activationContinuation != nil
+    }
+
+    func resumeSuspendedActivation() {
+        activationContinuation?.resume()
+        activationContinuation = nil
     }
 
     func deactivate(deleteCache: Bool) async {
@@ -625,5 +649,17 @@ final class MockTournamentDataLifecycle: TournamentDataLifecycle {
 
     func refreshForForeground() async {
         foregroundRefreshCallCount += 1
+    }
+
+    func unresolvedScoringIntentCount() async -> Int? {
+        unresolvedScoringIntentCountValue
+    }
+
+    func prepareScoringQueueForSignOut() async {
+        prepareScoringQueueForSignOutCallCount += 1
+    }
+
+    func cancelScoringQueueSignOutPreparation() async {
+        cancelScoringQueueSignOutPreparationCallCount += 1
     }
 }

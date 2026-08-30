@@ -9,6 +9,15 @@ struct MobileReadCredentials: Sendable {
 @MainActor
 protocol MobileReadCredentialProviding {
     func credentials(expectedAuthUserID: String) async throws -> MobileReadCredentials
+    func refreshedCredentials(expectedAuthUserID: String) async throws -> MobileReadCredentials
+}
+
+extension MobileReadCredentialProviding {
+    /// Fail-closed compatibility for injected test providers. The live provider
+    /// performs a forced Supabase refresh-token exchange below.
+    func refreshedCredentials(expectedAuthUserID: String) async throws -> MobileReadCredentials {
+        try await credentials(expectedAuthUserID: expectedAuthUserID)
+    }
 }
 
 @MainActor
@@ -38,6 +47,27 @@ final class NativeMobileReadCredentialProvider: MobileReadCredentialProviding {
         } catch {
             throw MobileReadCredentialError.authSessionUnavailable
         }
+        return try credentials(from: session, expectedAuthUserID: expectedAuthUserID)
+    }
+
+    func refreshedCredentials(expectedAuthUserID: String) async throws -> MobileReadCredentials {
+        let session: SupabaseAuthSession
+        do {
+            session = try await auth.refreshSession()
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch SupabaseAuthServiceError.sessionMissing {
+            throw MobileReadCredentialError.authSessionMissing
+        } catch {
+            throw MobileReadCredentialError.authSessionUnavailable
+        }
+        return try credentials(from: session, expectedAuthUserID: expectedAuthUserID)
+    }
+
+    private func credentials(
+        from session: SupabaseAuthSession,
+        expectedAuthUserID: String
+    ) throws -> MobileReadCredentials {
         guard session.userID == expectedAuthUserID else {
             throw MobileReadCredentialError.authIdentityChanged
         }

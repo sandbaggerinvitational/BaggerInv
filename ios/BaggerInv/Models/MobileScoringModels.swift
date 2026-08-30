@@ -19,6 +19,85 @@ struct MobileScoringMeta: Codable, Equatable, Sendable {
     let generatedAt: MobileTimestamp
 }
 
+struct MobileScoringHoleRequest: Codable, Equatable, Sendable {
+    let matchId: String
+    let holeNumber: Int
+    let teamOneGrossScores: [Int]
+    let teamTwoGrossScores: [Int]
+    let mutationId: String
+    let expectedMatchRevision: Int
+    let expectedHoleRevision: Int
+
+    var isContractCompatible: Bool {
+        MobileScoringIdentifier.isValid(matchId) &&
+        (1...18).contains(holeNumber) &&
+        MobileScoringGross.isValid(teamOneGrossScores) &&
+        MobileScoringGross.isValid(teamTwoGrossScores) &&
+        MobileScoringIdentifier.isValid(mutationId) &&
+        expectedMatchRevision >= 0 &&
+        expectedHoleRevision >= 0
+    }
+}
+
+struct MobileScoringHoleResponse: Codable, Equatable, Sendable {
+    let ok: Bool
+    let apiVersion: String
+    let data: MobileScoringHoleAcknowledgement
+    let meta: MobileScoringMeta
+
+    var isContractCompatible: Bool {
+        ok && apiVersion == "v1" && data.isStructurallyCompatible
+    }
+
+    func isContractCompatible(for request: MobileScoringHoleRequest) -> Bool {
+        isContractCompatible &&
+        request.isContractCompatible &&
+        data.matchId == request.matchId &&
+        data.mutationId == request.mutationId &&
+        data.hole.holeNumber == request.holeNumber
+    }
+}
+
+struct MobileScoringHoleAcknowledgement: Codable, Equatable, Sendable {
+    let mutationId: String
+    let accepted: Bool
+    let idempotent: Bool
+    let semanticNoop: Bool
+    let matchId: String
+    let hole: MobileScoringHoleScore
+    let match: MobileScoringAcknowledgedMatch
+    let refreshRequired: Bool
+
+    var isStructurallyCompatible: Bool {
+        MobileScoringIdentifier.isValid(mutationId) &&
+        accepted &&
+        MobileScoringIdentifier.isValid(matchId) &&
+        hole.isStructurallyCompatible &&
+        match.isStructurallyCompatible &&
+        !refreshRequired
+    }
+}
+
+struct MobileScoringAcknowledgedMatch: Codable, Equatable, Sendable {
+    let revision: Int
+    let status: MobileScoringAcknowledgedMatchStatus
+    let currentHole: Int
+    let holesRemaining: Int
+    let scorecardComplete: Bool
+    @MobileRequiredNullable var statusText: String?
+
+    var isStructurallyCompatible: Bool {
+        revision >= 0 &&
+        (0...18).contains(currentHole) &&
+        (0...18).contains(holesRemaining)
+    }
+}
+
+enum MobileScoringAcknowledgedMatchStatus: String, Codable, Equatable, Sendable {
+    case inProgress
+    case readyToFinalize
+}
+
 struct MobileScoringCurrent: Codable, Equatable, Sendable {
     let match: MobileScoringMatch
     let player: MobileScoringPlayer
@@ -191,7 +270,7 @@ struct MobileScoringGross: Codable, Equatable, Sendable {
         Self.isValid(teamOne) && Self.isValid(teamTwo)
     }
 
-    private static func isValid(_ values: [Int]) -> Bool {
+    static func isValid(_ values: [Int]) -> Bool {
         values.count >= 1 && values.count <= 2 && values.allSatisfy { (1...20).contains($0) }
     }
 }
@@ -248,9 +327,20 @@ struct MobileScoringSnapshot: Codable, Equatable, Sendable {
     var isStructurallyCompatible: Bool { revision >= 0 }
 }
 
-private enum MobileScoringIdentifier {
+enum MobileScoringIdentifier {
     static func isValid(_ value: String) -> Bool {
         value.count <= 128 &&
         value.range(of: #"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"#, options: .regularExpression) != nil
+    }
+}
+
+extension MobileErrorData {
+    var isBoundedScoringMutationContext: Bool {
+        MobileScoringIdentifier.isValid(matchId) &&
+        (currentMatchRevision.map { $0 >= 0 } ?? true) &&
+        (currentHoleRevision.map { $0 >= 0 } ?? true) &&
+        (currentPermissionRevision.map { $0 >= 0 } ?? true) &&
+        (scoredHoles.map { (0...18).contains($0) } ?? true) &&
+        refreshRequired
     }
 }

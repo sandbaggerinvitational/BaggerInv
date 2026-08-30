@@ -1,6 +1,6 @@
 # Bagger Invitational for iOS
 
-This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E adds the first canonical owned-Match scoring reader and a native, read-only official Scorecard without enabling scoring mutations.
+This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E added the first canonical owned-Match scoring reader and a native, read-only official Scorecard. Step 2F adds durable, identity-partitioned scoring intent and foreground replay without changing server scoring authority or enabling finalization.
 
 ## Requirements
 
@@ -105,6 +105,7 @@ A paid Apple Developer Program membership is not required for Simulator use. Do 
 - `Auth/` owns official Supabase Swift OTP verification and session lifecycle.
 - `Captcha/` contains the tightly allowlisted WKWebView used only for Turnstile.
 - `Data/` owns participant-scoped read credentials, cache storage, cached-first repositories, the memory-only scoring-current store, and tournament-data lifecycle orchestration.
+- `ScoringQueue/` owns the versioned SQLite scoring-intent repository, queue policies, ordered replay, retry scheduling, crash recovery, and conflict/action-required/quarantine states. It contains no credentials and remains separate from the disposable read cache.
 - `Networking/` owns typed async HTTP transport and centralized protected headers.
 - `Security/` stores the Bagger certification and sensitive session state in Keychain-backed storage.
 - `Models/` contains the Step 2A identity contracts, complete Step 2B read DTOs, and the complete scoring-current DTO.
@@ -122,6 +123,7 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 - **Step 2C — COMPLETE:** native five-tab shell, cached-first Today product experience, Simulator validation, and physical-device online/offline validation.
 - **Step 2D — COMPLETE:** cached-first Matches tab, canonical Round selection, authenticated golfer Match hero, participant-visible selected-Round list, and native read-only Match Detail.
 - **Step 2E — COMPLETE:** memory-only canonical scoring-current reader, owned-Match scoring orientation, format-specific BB/SC/SI controls with explicitly ephemeral drafts, and an official read-only native Scorecard. No official score submission is enabled.
+- **Step 2F — COMPLETE:** SQLite-backed scoring intent, atomic local Save & Next, identity/tournament/Match partitioning, stable mutation IDs, ordered foreground replay, retry/backoff, crash recovery, stale-policy enforcement, retained unresolved intent across sign-out, database auditing, and physical-device acceptance are proven.
 
 ## Step 2B mobile read architecture
 
@@ -259,6 +261,62 @@ This boundary is deliberate:
 
 Debug scoring fixtures cover no Match, upcoming/active BB, active SC, active SI, read-only, completed, unknown format, official/unscored holes, long content, and offline orientation. Fixture mode remains explicit, synthetic, Debug-only, and disconnected from credentials and live transport.
 
+## Step 2F durable offline scoring queue
+
+Step 2F replaces ephemeral Save & Next drafts with a private SQLite outbox for unresolved golfer scoring intent. The stable live database path is:
+
+```text
+Application Support/BaggerInv/ScoringQueue/scoring-queue.sqlite3
+```
+
+The queue is explicitly versioned as schema `1`. Schema creation and supported migrations run in place inside transactions. Records that cannot be migrated or decoded safely are quarantined; unresolved scoring intent is never silently discarded to repair an incompatible schema.
+
+SQLite runs in WAL journal mode with `synchronous = FULL`, foreign-key enforcement, a bounded busy timeout, and immediate transactions for inserts and state transitions. Save & Next is successful only after the local transaction commits. Only then may the app say **Saved on iPhone** and advance to the next hole. A failed durable write leaves the editor on the current hole and never implies that the score was saved.
+
+The database, WAL, and sidecar files live in the application-private container with `completeUntilFirstUserAuthentication` data protection. The queue directory is excluded from device backup to keep unresolved intent bound to predictable single-device replay semantics. Credentials remain in Keychain; the scoring queue never stores Bearer or refresh tokens, Bagger certification, OTP or Turnstile values, email, phone, Supabase secrets, or service-role credentials.
+
+Every record is partitioned by the exact verified identity context:
+
+```text
+Supabase Auth UUID
+→ canonical Bagger Player ID
+→ tournament ID
+→ Match ID
+```
+
+A different Player, a different Auth UUID for the same Player, a tournament switch, or a Match reassignment cannot replay the old partition. Hidden partitions remain durable for review but are not visible or actionable from another identity. Unresolved intent is retained across sign-out: replay stops, the user receives an explicit warning, auth secrets are removed, and the old queue partition remains hidden rather than being deleted.
+
+Queue records use these durable states:
+
+- `queued`: committed locally and eligible for guarded replay.
+- `syncing`: one leased request is in flight for the Match.
+- `retryable`: a transient or unknown-outcome failure retains the same mutation ID and a persisted retry time.
+- `acknowledged`: `accepted: true` is durable, but required canonical refresh may still be pending.
+- `conflict`: official state must be refreshed and compared before participant resolution.
+- `actionRequired`: authentication, identity, lifecycle, stale-tournament, read-only, or other non-automatic recovery is required.
+- `quarantined`: the record is unsafe to submit automatically, including corrupt/unsupported data, idempotency conflict, or stale idempotency uncertainty.
+- `resolved`: the intent was explicitly kept official, reapplied as a new mutation, superseded before transmission, abandoned, or proven official-equivalent.
+
+`draft` is not a queue state. It remains unsaved editor state. **Saved on iPhone** means SQLite durably committed the intent; **Syncing**, **Offline**, **Waiting to sync**, and **Needs Review** report queue truth. **Official** is reserved for canonical server acknowledgement followed by the required no-store scoring refresh. The official Scorecard remains server-derived and is never silently overwritten by queued intent.
+
+A stable lowercase UUID mutation ID is created once per new durable intent. An exact duplicate unresolved save reuses its record and mutation ID. A changed same-hole intent may supersede a provably never-transmitted record only by resolving the old record and creating a new record with a new mutation ID. An intent that may have reached the server is retained and retried with its original mutation ID.
+
+Replay is oldest sequence first per Match, with at most one in-flight mutation per Match and a global maximum of two Match workers. A conflict, action-required state, quarantine, unresolved predecessor, queue-health problem, or unsafe identity/snapshot mismatch blocks later mutations for that Match. An accepted acknowledgement is persisted before the mandatory `GET /api/mobile/v1/scoring/current?matchId=...` refresh; if the app exits after acknowledgement, relaunch performs refresh only and does not resubmit. An expired `syncing` lease becomes retryable with unknown outcome and reuses the same mutation ID.
+
+Transient foreground retry delays are approximately 2 seconds, then 5 seconds, followed by `min(15 minutes, 10 seconds × 2^(attemptIndex-3))` with ±20 percent jitter. A longer valid `Retry-After` wins. After eight consecutive transient failures in one foreground session, aggressive retry pauses until a due time, foreground/resume, credible connectivity change, or manual retry. Manual retry requires at least two seconds since the prior attempt. Reachability is only a hint; request outcome remains authoritative.
+
+Age policy is explicit and never silently deletes unresolved intent:
+
+- under 6 hours: normal bounded automatic retry;
+- 6–24 hours: mandatory canonical refresh and safe reconciliation before replay;
+- 24 hours–7 days: automatic replay stops in `actionRequired/stale`;
+- 7 days or more: quarantine as stale idempotency-uncertain and never auto-submit;
+- 30- and 90-day ages add maintenance/support metadata, not destructive cleanup.
+
+Revision and snapshot metadata are retained as preconditions, never incremented or treated as official by the client. Safe automatic rebase is bounded to three deterministic metadata-only attempts and only when refreshed official state proves the target blank or unchanged. A real local/official mismatch remains a conflict; idempotency conflict is quarantined and never receives a silent replacement mutation ID.
+
+Step 2F may exercise the typed `/api/mobile/v1/scoring/hole` transport only through injected deterministic tests unless an isolated Preview mutation is separately authorized. Finalization is not part of this queue and `/api/mobile/v1/scoring/finalize` remains online-only future work for Step 2G. The queue requires no background-execution entitlement: launch and foreground restoration revalidate environment, identity, snapshot, and canonical scoring state before eligible replay resumes.
+
 ## Participant-scoped read cache
 
 Replaceable read snapshots live under:
@@ -294,14 +352,14 @@ All four products refresh after activation. The diagnostic's explicit refresh re
 
 Nullable properties that the mobile JSON Schemas mark as required use a small Codable wrapper: an explicit JSON `null` remains valid, but an omitted required key fails decoding. HTTP 200 envelopes are also rejected before repository publication when `ok`, API version, or product structure is incompatible.
 
-## READ CACHE versus future SCORING QUEUE
+## READ CACHE versus SCORING QUEUE
 
 These mechanisms are intentionally separate:
 
 - **READ CACHE:** replaceable, server-derived snapshots for Today, Matches, Leaders, and Schedule. It may be discarded and rebuilt from canonical mobile reads.
-- **FUTURE SCORING QUEUE:** durable private mutation intent governed by the scoring reliability specification. It must preserve local-vs-official state, idempotency, retries, conflicts, and acknowledgements.
+- **SCORING QUEUE:** durable private mutation intent governed by the scoring reliability specification. It preserves local-vs-official state, stable idempotency, retry timing, ordering, identity isolation, conflicts, acknowledgements, and crash recovery.
 
-The read cache is never a score source of truth, mutation journal, outbox, or evidence that a score is official. Step 2E's scoring reader deliberately bypasses this cache, and no scoring write or Step 1D durable mutation queue exists yet.
+The read cache is never a score source of truth, mutation journal, outbox, or evidence that a score is official. Step 2E's scoring reader deliberately bypasses this cache. Conversely, unresolved scoring intent is never put in `ReadCache/v1`, deleted under the read-cache sign-out policy, or presented as a cached canonical score. The scoring queue is durable user intent; the read cache is replaceable server data.
 
 ## Step 2A scope retained
 
@@ -316,8 +374,20 @@ Step 2A includes:
 - temporary signed-in diagnostic UI
 - secure sign-out
 
-Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E adds only the isolated Preview scoring read surface. Phone Auth, scoring mutations, durable scoring intent, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
+Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E added the isolated Preview scoring read surface; Step 2F adds durable local scoring intent and guarded replay. Phone Auth, participant-facing conflict/finalization workflows, Production scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
+
+## Future Leaders product requirement
+
+Before Step 2H, native Leaders must receive a fresh participant-facing PWA parity audit. The eventual native experience must include:
+
+- Tournament Score;
+- Player Leaders;
+- Round Scores when canonical mobile support exists;
+- Net Skins from a participant-safe canonical server projection;
+- Calcutta from a participant-safe published server projection, without Director/admin controls.
+
+Native must not recreate leaderboard, Net Skins, Round Score, Calcutta auction, settlement, or publication authority in Swift. If Net Skins or Calcutta are not yet available through mobile v1, the smallest safe read contract must be classified and established before Step 2H rather than silently narrowing the native Leaders product.
 
 ## Next step
 
-**Step 2F — Durable native offline scoring queue** is next. It should implement the approved Step 1D identity/tournament/Match-partitioned durable intent model, stable mutation IDs, ordered replay with one in-flight mutation per Match, revision handoff, backoff, interrupted-sync recovery, and conflict/action-required quarantine. It must reuse—not invent—the existing mobile scoring contracts. Real official mutation and finalization handling remains Step 2G.
+**Step 2G — Official scoring mutations, conflicts, corrections, and finalization** is next after Step 2F final acceptance. It should connect the proven queue to the existing `/api/mobile/v1/scoring/hole` and `/api/mobile/v1/scoring/finalize` contracts, preserve stable mutation IDs across uncertain outcomes, reconcile canonical acknowledgements and revisions, expose Keep Official and explicit Reapply flows, and keep finalization online-only. It must not weaken Preview authority, identity partitioning, server permission, or canonical scoring ownership.

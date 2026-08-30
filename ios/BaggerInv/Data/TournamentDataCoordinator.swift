@@ -8,6 +8,15 @@ protocol TournamentDataLifecycle: AnyObject {
     func resumeAfterEnvironmentReattestation() async
     func refreshAll() async
     func refreshForForeground() async
+    func unresolvedScoringIntentCount() async -> Int?
+    func prepareScoringQueueForSignOut() async
+    func cancelScoringQueueSignOutPreparation() async
+}
+
+extension TournamentDataLifecycle {
+    func unresolvedScoringIntentCount() async -> Int? { 0 }
+    func prepareScoringQueueForSignOut() async {}
+    func cancelScoringQueueSignOutPreparation() async {}
 }
 
 @MainActor
@@ -17,6 +26,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     let leaders: MobileReadRepository<MobileLeadersResponse>
     let schedule: MobileReadRepository<MobileScheduleResponse>
     let scoring: ScoringCurrentStore
+    let scoringReliability: ScoringQueueCoordinator?
 
     private let cache: any ReadCacheStoring
     private var activeContext: ActiveMobileReadContext?
@@ -33,6 +43,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         api: any MobileAPIServing,
         credentialProvider: any MobileReadCredentialProviding,
         cache: any ReadCacheStoring,
+        scoringQueueRepository: (any ScoringQueueRepository)? = nil,
+        liveScoringMutationSendingEnabled: Bool = false,
         now: @escaping () -> Date = Date.init
     ) {
         self.cache = cache
@@ -88,6 +100,22 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             api: api,
             credentialProvider: credentialProvider
         )
+        if let scoringQueueRepository {
+            scoringReliability = ScoringQueueCoordinator(
+                repository: scoringQueueRepository,
+                api: api,
+                credentialProvider: credentialProvider,
+                liveMutationSendingEnabled: liveScoringMutationSendingEnabled,
+                now: now
+            )
+        } else {
+            scoringReliability = nil
+        }
+
+        let scoringStore = scoring
+        scoringReliability?.setCanonicalUpdateHandler { [weak scoringStore] response in
+            scoringStore?.applyCanonicalQueueRefresh(response)
+        }
 
         let invalidation: @MainActor @Sendable () -> Void = { [weak self] in
             self?.deliverAccessInvalidationOnce()
@@ -106,6 +134,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         leaders.setAuthorityRevalidationHandler(authorityRevalidation)
         schedule.setAuthorityRevalidationHandler(authorityRevalidation)
         scoring.setAuthorityRevalidationHandler(authorityRevalidation)
+        scoringReliability?.setAccessInvalidationHandler(invalidation)
+        scoringReliability?.setAuthorityRevalidationHandler(authorityRevalidation)
     }
 
     func setAccessInvalidationHandler(_ handler: @escaping @MainActor @Sendable () -> Void) {
@@ -167,7 +197,19 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard isCurrent(context, generation: activationGeneration) else { return }
         await schedule.activate(context, beginRefresh: false)
         guard isCurrent(context, generation: activationGeneration) else { return }
-        await scoring.activate(authUserID: authUserID, beginRefresh: false)
+        await scoring.activate(
+            authUserID: authUserID,
+            playerID: participant.player.playerId,
+            beginRefresh: false
+        )
+        guard isCurrent(context, generation: activationGeneration) else { return }
+        await scoringReliability?.activate(
+            identity: ScoringQueueIdentityPartition(
+                authUserId: authUserID,
+                playerId: participant.player.playerId,
+                tournamentId: participant.tournament.tournamentId
+            )
+        )
         guard isCurrent(context, generation: activationGeneration) else { return }
         Task { await refreshAll() }
     }
@@ -189,6 +231,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard lifecycleGeneration == deactivationGeneration else { return }
         await scoring.deactivate()
         guard lifecycleGeneration == deactivationGeneration else { return }
+        await scoringReliability?.deactivate()
+        guard lifecycleGeneration == deactivationGeneration else { return }
         if deleteCache, let previous {
             await removePartitionWithRetry(previous.cachePartition)
         }
@@ -204,12 +248,14 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let leadersSuspension: Void = leaders.suspendRefresh()
         async let scheduleSuspension: Void = schedule.suspendRefresh()
         async let scoringSuspension: Void = scoring.suspendForEnvironmentReattestation()
+        async let queueSuspension: Void = scoringReliability?.suspendForEnvironmentReattestation() ?? ()
         _ = await (
             todaySuspension,
             matchesSuspension,
             leadersSuspension,
             scheduleSuspension,
-            scoringSuspension
+            scoringSuspension,
+            queueSuspension
         )
     }
 
@@ -221,7 +267,9 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         scoringWasActiveBeforeSuspension = false
         if shouldRestoreScoring {
             await scoring.refresh()
+            scoringReliability?.markNetworkUnavailable(scoring.state.isOrientationOnly)
         }
+        await scoringReliability?.resumeAfterEnvironmentReattestation()
     }
 
     func refreshAll() async {
@@ -243,7 +291,22 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         _ = await (todayRefresh, matchesRefresh, leadersRefresh, scheduleRefresh)
         if scoring.state.phase != .idle {
             await scoring.refresh()
+            scoringReliability?.markNetworkUnavailable(scoring.state.isOrientationOnly)
         }
+        await scoringReliability?.refreshForForeground()
+    }
+
+    func unresolvedScoringIntentCount() async -> Int? {
+        guard let scoringReliability else { return 0 }
+        return await scoringReliability.unresolvedActiveCount()
+    }
+
+    func prepareScoringQueueForSignOut() async {
+        await scoringReliability?.prepareForSignOut()
+    }
+
+    func cancelScoringQueueSignOutPreparation() async {
+        await scoringReliability?.cancelSignOutPreparation()
     }
 
     func activeCacheByteCount() async -> Int? {

@@ -54,6 +54,34 @@ final class TodayUITestLaunchTests: XCTestCase {
         XCTAssertEqual(scenario, .matchesCachedOffline)
     }
 
+    func testExplicitDurableScoringFixtureIsAccepted() {
+        let launch = TodayUITestLaunch.resolve(arguments: [
+            "BaggerInv",
+            "--bagger-ui-testing",
+            "--bagger-ui-test-scenario",
+            "score.durable-offline",
+        ])
+
+        guard case .scenario(let scenario) = launch else {
+            return XCTFail("Expected the explicit durable scoring fixture scenario.")
+        }
+        XCTAssertEqual(scenario, .scoreDurableOffline)
+    }
+
+    func testExplicitScoringSignOutWarningFixtureIsAccepted() {
+        let launch = TodayUITestLaunch.resolve(arguments: [
+            "BaggerInv",
+            "--bagger-ui-testing",
+            "--bagger-ui-test-scenario",
+            "score.signout-warning",
+        ])
+
+        guard case .scenario(let scenario) = launch else {
+            return XCTFail("Expected the explicit scoring sign-out fixture scenario.")
+        }
+        XCTAssertEqual(scenario, .scoreSignOutWarning)
+    }
+
     func testMissingOrUnknownScenarioFailsClosedInsteadOfLaunchingLive() {
         XCTAssertInvalid(TodayUITestLaunch.resolve(arguments: [
             "BaggerInv",

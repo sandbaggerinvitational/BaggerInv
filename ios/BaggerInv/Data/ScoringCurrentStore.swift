@@ -56,6 +56,7 @@ final class ScoringCurrentStore: ObservableObject {
     private let api: any MobileAPIServing
     private let credentialProvider: any MobileReadCredentialProviding
     private var activeAuthUserID: String?
+    private var activePlayerID: String?
     private var activeMatchID: String?
     private var refreshTask: Task<Void, Never>?
     private var generation: UInt = 0
@@ -80,6 +81,7 @@ final class ScoringCurrentStore: ObservableObject {
 
     func activate(
         authUserID: String,
+        playerID: String? = nil,
         matchID: String? = nil,
         beginRefresh: Bool = true
     ) async {
@@ -91,9 +93,10 @@ final class ScoringCurrentStore: ObservableObject {
             return
         }
 
-        if activeAuthUserID != authUserID || activeMatchID != matchID {
+        if activeAuthUserID != authUserID || activePlayerID != playerID || activeMatchID != matchID {
             await deactivate()
             activeAuthUserID = authUserID
+            activePlayerID = playerID
             activeMatchID = matchID
             generation &+= 1
         }
@@ -158,12 +161,34 @@ final class ScoringCurrentStore: ObservableObject {
     func deactivate() async {
         generation &+= 1
         activeAuthUserID = nil
+        activePlayerID = nil
         activeMatchID = nil
         state = .idle
         let task = refreshTask
         refreshTask = nil
         task?.cancel()
         await task?.value
+    }
+
+    /// Publishes a canonical no-store refresh performed by the scoring queue
+    /// only when it belongs to the Match already owned by this store. Queue
+    /// reconciliation must not make a historical/other-Match partition become
+    /// the participant's visible scoring context.
+    func applyCanonicalQueueRefresh(_ response: MobileScoringCurrentResponse) {
+        guard activeAuthUserID != nil,
+              response.isContractCompatible,
+              let canonical = response.data.scoring,
+              activePlayerID.map({ $0 == canonical.player.playerId }) ?? true,
+              (activeMatchID ?? state.scoring?.match.matchId) == canonical.match.matchId
+        else { return }
+
+        state.scoring = canonical
+        state.generatedAt = response.meta.generatedAt
+        state.phase = .ready
+        state.isRefreshing = false
+        state.lastSafeError = nil
+        state.lastServerCode = nil
+        state.lastHTTPStatus = nil
     }
 
     private func performRefresh(
@@ -199,6 +224,12 @@ final class ScoringCurrentStore: ObservableObject {
             guard isActive(expectedAuthUserID, matchID: matchID, generation: operationGeneration) else { return }
             guard response.isContractCompatible else {
                 throw MobileContractError.incompatibleResponse
+            }
+            if let activePlayerID,
+               let scoring = response.data.scoring,
+               scoring.player.playerId != activePlayerID
+            {
+                throw MobileReadCredentialError.authIdentityChanged
             }
             if let matchID, let scoring = response.data.scoring, scoring.match.matchId != matchID {
                 throw MobileContractError.incompatibleResponse

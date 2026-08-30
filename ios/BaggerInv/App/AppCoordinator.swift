@@ -4,6 +4,7 @@ import Combine
 @MainActor
 final class AppCoordinator: ObservableObject {
     @Published private(set) var state: AppState = .launching
+    @Published private(set) var scoringQueueSignOutPresentation: ScoringQueueSignOutPresentation?
 
     let environment: NativeEnvironment?
     private let api: (any MobileAPIServing)?
@@ -56,10 +57,16 @@ final class AppCoordinator: ObservableObject {
                 certificationStore: certificationStore
             )
             let cache = try DiskReadCacheStore()
+            let scoringQueue = try SQLiteScoringQueueRepository()
             let tournamentData = TournamentDataCoordinator(
                 api: api,
                 credentialProvider: credentialProvider,
-                cache: cache
+                cache: cache,
+                scoringQueueRepository: scoringQueue,
+                // Step 2F proves local durability and the replay engine with
+                // deterministic transports. Real score submission remains
+                // disabled until Step 2G or an explicit isolated QA grant.
+                liveScoringMutationSendingEnabled: false
             )
             let coordinator = AppCoordinator(
                 environment: environment,
@@ -303,12 +310,43 @@ final class AppCoordinator: ObservableObject {
     }
 
     func signOut() async {
+        scoringQueueSignOutPresentation = nil
         authenticationEpoch &+= 1
         readAuthorityRevalidationGeneration &+= 1
         readAuthorityRevalidationTask?.cancel()
         readAuthorityRevalidationTask = nil
         await discardAuthentication()
         state = .signedOut
+    }
+
+    func requestSignOut() async {
+        // Pause new durable admissions before counting. This closes the race in
+        // which Save could commit after a zero count but before authentication
+        // was discarded.
+        await tournamentDataLifecycle?.prepareScoringQueueForSignOut()
+        guard let unresolvedCount = await tournamentDataLifecycle?.unresolvedScoringIntentCount() else {
+            scoringQueueSignOutPresentation = ScoringQueueSignOutPresentation(
+                unresolvedCount: nil
+            )
+            return
+        }
+        guard unresolvedCount > 0 else {
+            await signOut()
+            return
+        }
+        scoringQueueSignOutPresentation = ScoringQueueSignOutPresentation(
+            unresolvedCount: unresolvedCount
+        )
+    }
+
+    func cancelSignOut() async {
+        scoringQueueSignOutPresentation = nil
+        await tournamentDataLifecycle?.cancelScoringQueueSignOutPreparation()
+    }
+
+    func confirmSignOutWithUnresolvedScores() async {
+        guard scoringQueueSignOutPresentation != nil else { return }
+        await signOut()
     }
 
     func refreshTournamentDataForForeground() async {
@@ -332,14 +370,15 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func discardAuthentication() async {
+        await tournamentDataLifecycle?.prepareScoringQueueForSignOut()
         await tournamentDataLifecycle?.deactivate(deleteCache: true)
         try? certificationStore?.delete()
         await auth?.signOut()
     }
 
-    private func handleReadAccessInvalidation() async {
+    func handleReadAccessInvalidation() async {
         guard case .authenticated = state else {
-            guard state == .checkingEnvironment else { return }
+            guard state == .checkingEnvironment || state == .loadingParticipant else { return }
             readAuthorityRevalidationGeneration &+= 1
             readAuthorityRevalidationTask?.cancel()
             readAuthorityRevalidationTask = nil

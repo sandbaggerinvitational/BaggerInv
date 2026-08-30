@@ -28,6 +28,15 @@ struct RootView: View {
             guard newPhase == .active else { return }
             Task { await coordinator.refreshTournamentDataForForeground() }
         }
+        .scoringQueueSignOutConfirmation(
+            presentation: coordinator.scoringQueueSignOutPresentation,
+            onKeepWorking: {
+                Task { await coordinator.cancelSignOut() }
+            },
+            onConfirmSignOut: {
+                Task { await coordinator.confirmSignOutWithUnresolvedScores() }
+            }
+        )
     }
 
     private var isAuthenticated: Bool {
@@ -90,7 +99,7 @@ struct RootView: View {
                     participant: participant,
                     tournamentData: tournamentData
                 ) {
-                    Task { await coordinator.signOut() }
+                    Task { await coordinator.requestSignOut() }
                 }
             } else {
                 ControlledErrorView(

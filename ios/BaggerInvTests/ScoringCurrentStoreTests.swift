@@ -161,6 +161,38 @@ final class ScoringCurrentStoreTests: XCTestCase {
         XCTAssertEqual(harness.store.state, .idle)
     }
 
+    func testQueueCanonicalRefreshPublishesIntoTheAlreadyOwnedMatch() async throws {
+        let harness = makeHarness()
+        let matchID = try XCTUnwrap(TestFixtures.scoringResponse.data.scoring?.match.matchId)
+        await harness.store.activate(
+            authUserID: TestFixtures.authSession.userID,
+            playerID: TestFixtures.participant.player.playerId,
+            matchID: matchID,
+            beginRefresh: false
+        )
+
+        harness.store.applyCanonicalQueueRefresh(TestFixtures.scoringResponse)
+
+        XCTAssertEqual(harness.store.state.phase, .ready)
+        XCTAssertEqual(harness.store.state.scoring, TestFixtures.scoringResponse.data.scoring)
+        XCTAssertEqual(harness.store.state.generatedAt, TestFixtures.scoringResponse.meta.generatedAt)
+        XCTAssertNil(harness.store.state.lastSafeError)
+    }
+
+    func testQueueCanonicalRefreshCannotReplaceAnotherActiveMatch() async throws {
+        let harness = makeHarness()
+        await harness.store.activate(
+            authUserID: TestFixtures.authSession.userID,
+            playerID: TestFixtures.participant.player.playerId,
+            matchID: "different-match",
+            beginRefresh: false
+        )
+
+        harness.store.applyCanonicalQueueRefresh(TestFixtures.scoringResponse)
+
+        XCTAssertEqual(harness.store.state, .idle)
+    }
+
     private func makeHarness() -> (
         store: ScoringCurrentStore,
         api: MockMobileAPI,

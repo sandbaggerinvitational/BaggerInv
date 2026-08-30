@@ -5,8 +5,18 @@ import Supabase
 protocol AuthServicing {
     func restoredSession() async -> SupabaseAuthSession?
     func validSession() async throws -> SupabaseAuthSession
+    func refreshSession() async throws -> SupabaseAuthSession
     func verifyEmailOTP(email: String, code: String) async throws -> SupabaseAuthSession
     func signOut() async
+}
+
+extension AuthServicing {
+    /// Test doubles and narrowly scoped implementations remain source-compatible.
+    /// The live Supabase service overrides this with an actual refresh-token
+    /// exchange so a server-rejected JWT is never retried unchanged.
+    func refreshSession() async throws -> SupabaseAuthSession {
+        try await validSession()
+    }
 }
 
 @MainActor
@@ -52,6 +62,21 @@ final class SupabaseAuthService: AuthServicing {
     func validSession() async throws -> SupabaseAuthSession {
         do {
             return map(try await client.auth.session)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch let error as AuthError {
+            if error.invalidatesLocalSession {
+                throw SupabaseAuthServiceError.sessionMissing
+            }
+            throw SupabaseAuthServiceError.sessionUnavailable
+        } catch {
+            throw SupabaseAuthServiceError.sessionUnavailable
+        }
+    }
+
+    func refreshSession() async throws -> SupabaseAuthSession {
+        do {
+            return map(try await client.auth.refreshSession(refreshToken: nil))
         } catch is CancellationError {
             throw CancellationError()
         } catch let error as AuthError {

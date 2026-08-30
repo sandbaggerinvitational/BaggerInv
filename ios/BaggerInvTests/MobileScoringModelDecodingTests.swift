@@ -213,6 +213,104 @@ final class MobileScoringModelDecodingTests: XCTestCase {
         XCTAssertFalse(invalidHole.isContractCompatible)
     }
 
+    func testHoleMutationRequestEncodesExactV1IntentShape() throws {
+        let request = makeHoleRequest()
+
+        XCTAssertTrue(request.isContractCompatible)
+        let object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: encoder.encode(request)) as? [String: Any]
+        )
+        XCTAssertEqual(
+            Set(object.keys),
+            Set([
+                "matchId",
+                "holeNumber",
+                "teamOneGrossScores",
+                "teamTwoGrossScores",
+                "mutationId",
+                "expectedMatchRevision",
+                "expectedHoleRevision",
+            ])
+        )
+        XCTAssertEqual(object["matchId"] as? String, request.matchId)
+        XCTAssertEqual(object["holeNumber"] as? Int, request.holeNumber)
+        XCTAssertEqual(object["teamOneGrossScores"] as? [Int], request.teamOneGrossScores)
+        XCTAssertEqual(object["teamTwoGrossScores"] as? [Int], request.teamTwoGrossScores)
+        XCTAssertEqual(object["mutationId"] as? String, request.mutationId)
+        XCTAssertEqual(object["expectedMatchRevision"] as? Int, request.expectedMatchRevision)
+        XCTAssertEqual(object["expectedHoleRevision"] as? Int, request.expectedHoleRevision)
+    }
+
+    func testHoleMutationRequestFailsClosedForInvalidIdentifiersScoresAndRevisions() {
+        XCTAssertFalse(makeHoleRequest(mutationID: "-invalid").isContractCompatible)
+        XCTAssertFalse(makeHoleRequest(teamOne: [0, 5]).isContractCompatible)
+        XCTAssertFalse(makeHoleRequest(teamTwo: [5, 21]).isContractCompatible)
+        XCTAssertFalse(makeHoleRequest(expectedMatchRevision: -1).isContractCompatible)
+        XCTAssertFalse(makeHoleRequest(expectedHoleRevision: -1).isContractCompatible)
+        XCTAssertFalse(makeHoleRequest(holeNumber: 19).isContractCompatible)
+    }
+
+    func testHoleAcknowledgementDecodesCanonicalAcceptedResponse() throws {
+        let request = makeHoleRequest()
+        let response = try decoder.decode(
+            MobileScoringHoleResponse.self,
+            from: TestFixtures.jsonData(acknowledgementObject(for: request))
+        )
+
+        XCTAssertTrue(response.isContractCompatible)
+        XCTAssertTrue(response.isContractCompatible(for: request))
+        XCTAssertEqual(response.data.mutationId, request.mutationId)
+        XCTAssertTrue(response.data.accepted)
+        XCTAssertFalse(response.data.idempotent)
+        XCTAssertFalse(response.data.semanticNoop)
+        XCTAssertEqual(response.data.matchId, request.matchId)
+        XCTAssertEqual(response.data.hole.holeNumber, request.holeNumber)
+        XCTAssertEqual(response.data.hole.revision, 4)
+        XCTAssertEqual(response.data.match.revision, 13)
+        XCTAssertEqual(response.data.match.status, .inProgress)
+        XCTAssertEqual(response.data.match.currentHole, 8)
+        XCTAssertEqual(response.data.match.statusText, "1 UP through 7")
+    }
+
+    func testHoleAcknowledgementRequiresAcceptedAndMatchingRequestIdentity() throws {
+        let request = makeHoleRequest()
+        var rejectedObject = acknowledgementObject(for: request)
+        var rejectedData = rejectedObject["data"] as! [String: Any]
+        rejectedData["accepted"] = false
+        rejectedObject["data"] = rejectedData
+        let rejected = try decoder.decode(
+            MobileScoringHoleResponse.self,
+            from: TestFixtures.jsonData(rejectedObject)
+        )
+        XCTAssertFalse(rejected.isContractCompatible)
+
+        let otherMutation = makeHoleRequest(
+            mutationID: "22222222-2222-4222-8222-222222222222"
+        )
+        let accepted = try decoder.decode(
+            MobileScoringHoleResponse.self,
+            from: TestFixtures.jsonData(acknowledgementObject(for: request))
+        )
+        XCTAssertFalse(accepted.isContractCompatible(for: otherMutation))
+    }
+
+    func testHoleAcknowledgementRequiresNullableStatusTextKey() throws {
+        let request = makeHoleRequest()
+        var root = acknowledgementObject(for: request)
+        var data = root["data"] as! [String: Any]
+        var match = data["match"] as! [String: Any]
+        match.removeValue(forKey: "statusText")
+        data["match"] = match
+        root["data"] = data
+
+        XCTAssertThrowsError(
+            try decoder.decode(
+                MobileScoringHoleResponse.self,
+                from: TestFixtures.jsonData(root)
+            )
+        )
+    }
+
     private func decode(
         mutating mutation: (inout [String: Any]) -> Void
     ) throws -> MobileScoringCurrentResponse {
@@ -231,5 +329,70 @@ final class MobileScoringModelDecodingTests: XCTestCase {
     private func responseObject() throws -> [String: Any] {
         let data = try encoder.encode(TestFixtures.scoringResponse)
         return try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+    }
+
+    private func makeHoleRequest(
+        mutationID: String = "11111111-1111-4111-8111-111111111111",
+        teamOne: [Int] = [4, 5],
+        teamTwo: [Int] = [5, 6],
+        expectedMatchRevision: Int = 12,
+        expectedHoleRevision: Int = 3,
+        holeNumber: Int = 7
+    ) -> MobileScoringHoleRequest {
+        MobileScoringHoleRequest(
+            matchId: "match-preview-1",
+            holeNumber: holeNumber,
+            teamOneGrossScores: teamOne,
+            teamTwoGrossScores: teamTwo,
+            mutationId: mutationID,
+            expectedMatchRevision: expectedMatchRevision,
+            expectedHoleRevision: expectedHoleRevision
+        )
+    }
+
+    private func acknowledgementObject(
+        for request: MobileScoringHoleRequest
+    ) -> [String: Any] {
+        [
+            "ok": true,
+            "apiVersion": "v1",
+            "data": [
+                "mutationId": request.mutationId,
+                "accepted": true,
+                "idempotent": false,
+                "semanticNoop": false,
+                "matchId": request.matchId,
+                "hole": [
+                    "holeNumber": request.holeNumber,
+                    "revision": 4,
+                    "gross": [
+                        "teamOne": request.teamOneGrossScores,
+                        "teamTwo": request.teamTwoGrossScores,
+                    ],
+                    "strokes": [
+                        "teamOne": [1, 0],
+                        "teamTwo": [0, 1],
+                    ],
+                    "net": [
+                        "teamOne": 3,
+                        "teamTwo": 5,
+                    ],
+                    "winner": "teamOne",
+                    "updatedAt": "2027-01-15T08:03:00.000Z",
+                ],
+                "match": [
+                    "revision": 13,
+                    "status": "inProgress",
+                    "currentHole": 8,
+                    "holesRemaining": 11,
+                    "scorecardComplete": false,
+                    "statusText": "1 UP through 7",
+                ],
+                "refreshRequired": false,
+            ],
+            "meta": [
+                "generatedAt": "2027-01-15T08:03:00.000Z",
+            ],
+        ]
     }
 }

@@ -92,6 +92,43 @@ final class AppCoordinatorTests: XCTestCase {
     }
 
     @MainActor
+    func testQueueAccessInvalidationWhileLoadingParticipantCannotFinishAuthenticated() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        data.suspendNextActivationCall()
+        let coordinator = makeCoordinator(
+            api: api,
+            auth: auth,
+            store: store,
+            data: data
+        )
+        let bootstrap = Task { await coordinator.bootstrap() }
+
+        for _ in 0..<100 where !data.hasSuspendedActivation() {
+            await Task.yield()
+        }
+        XCTAssertTrue(data.hasSuspendedActivation())
+        XCTAssertEqual(coordinator.state, .loadingParticipant)
+
+        await coordinator.handleReadAccessInvalidation()
+        data.resumeSuspendedActivation()
+        await bootstrap.value
+
+        XCTAssertEqual(coordinator.state, .signedOut)
+        XCTAssertEqual(auth.signOutCallCount, 1)
+        XCTAssertEqual(store.deleteCallCount, 1)
+        XCTAssertGreaterThanOrEqual(data.deactivateCallCount, 1)
+    }
+
+    @MainActor
     func testBeginSignInNormalizesEmailAndRequiresCaptcha() {
         let coordinator = makeCoordinator()
 
@@ -244,6 +281,84 @@ final class AppCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(data.deactivateCallCount, 1)
         XCTAssertEqual(data.deleteCacheValues, [true])
+        XCTAssertEqual(auth.signOutCallCount, 1)
+        XCTAssertEqual(store.deleteCallCount, 1)
+    }
+
+    @MainActor
+    func testSignOutWithUnresolvedScoringIntentRequiresExplicitConfirmation() async {
+        let auth = MockAuthService()
+        let store = MockCertificationStore()
+        let data = MockTournamentDataLifecycle()
+        data.unresolvedScoringIntentCountValue = 2
+        let coordinator = makeCoordinator(auth: auth, store: store, data: data)
+
+        await coordinator.requestSignOut()
+
+        XCTAssertEqual(
+            coordinator.scoringQueueSignOutPresentation,
+            ScoringQueueSignOutPresentation(unresolvedCount: 2)
+        )
+        XCTAssertEqual(data.prepareScoringQueueForSignOutCallCount, 1)
+        XCTAssertEqual(auth.signOutCallCount, 0)
+        XCTAssertEqual(store.deleteCallCount, 0)
+        XCTAssertNotEqual(coordinator.state, .signedOut)
+    }
+
+    @MainActor
+    func testSignOutFailsClosedWhenDurableQueueCountCannotBeRead() async {
+        let auth = MockAuthService()
+        let store = MockCertificationStore()
+        let data = MockTournamentDataLifecycle()
+        data.unresolvedScoringIntentCountValue = nil
+        let coordinator = makeCoordinator(auth: auth, store: store, data: data)
+
+        await coordinator.requestSignOut()
+
+        XCTAssertEqual(
+            coordinator.scoringQueueSignOutPresentation,
+            ScoringQueueSignOutPresentation(unresolvedCount: nil)
+        )
+        XCTAssertEqual(data.prepareScoringQueueForSignOutCallCount, 1)
+        XCTAssertEqual(auth.signOutCallCount, 0)
+        XCTAssertEqual(store.deleteCallCount, 0)
+        XCTAssertNotEqual(coordinator.state, .signedOut)
+    }
+
+    @MainActor
+    func testCancellingScoringQueueSignOutWarningPreservesSessionAndResumesQueue() async {
+        let auth = MockAuthService()
+        let store = MockCertificationStore()
+        let data = MockTournamentDataLifecycle()
+        data.unresolvedScoringIntentCountValue = 1
+        let coordinator = makeCoordinator(auth: auth, store: store, data: data)
+        await coordinator.requestSignOut()
+
+        await coordinator.cancelSignOut()
+
+        XCTAssertNil(coordinator.scoringQueueSignOutPresentation)
+        XCTAssertEqual(data.cancelScoringQueueSignOutPreparationCallCount, 1)
+        XCTAssertEqual(auth.signOutCallCount, 0)
+        XCTAssertEqual(store.deleteCallCount, 0)
+        XCTAssertNotEqual(coordinator.state, .signedOut)
+    }
+
+    @MainActor
+    func testConfirmedSignOutRetainsQueueButClearsSecretsAndParticipantState() async {
+        let auth = MockAuthService()
+        let store = MockCertificationStore()
+        let data = MockTournamentDataLifecycle()
+        data.unresolvedScoringIntentCountValue = 3
+        let coordinator = makeCoordinator(auth: auth, store: store, data: data)
+        await coordinator.requestSignOut()
+
+        await coordinator.confirmSignOutWithUnresolvedScores()
+
+        XCTAssertNil(coordinator.scoringQueueSignOutPresentation)
+        XCTAssertEqual(coordinator.state, .signedOut)
+        XCTAssertGreaterThanOrEqual(data.prepareScoringQueueForSignOutCallCount, 1)
+        XCTAssertEqual(data.deactivateCallCount, 1)
+        XCTAssertEqual(data.deleteCacheValues, [true], "Only the disposable read cache should be deleted.")
         XCTAssertEqual(auth.signOutCallCount, 1)
         XCTAssertEqual(store.deleteCallCount, 1)
     }

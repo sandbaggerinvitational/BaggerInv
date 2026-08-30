@@ -14,6 +14,7 @@ struct BaggerAppShell: View {
     let fixturePresentation: TodayPresentation?
     let fixtureMatchesState: MobileReadState<MobileMatchesData>?
     let fixtureScoringState: ScoringCurrentState?
+    let fixtureUsesDurableScoringQueue: Bool
     let onSignOut: () -> Void
 
     @State private var selection: BaggerAppTab = .today
@@ -28,6 +29,7 @@ struct BaggerAppShell: View {
         fixturePresentation = nil
         fixtureMatchesState = nil
         fixtureScoringState = nil
+        fixtureUsesDurableScoringQueue = false
         self.onSignOut = onSignOut
     }
 
@@ -36,6 +38,7 @@ struct BaggerAppShell: View {
         fixturePresentation: TodayPresentation,
         fixtureMatchesState: MobileReadState<MobileMatchesData>,
         fixtureScoringState: ScoringCurrentState,
+        fixtureUsesDurableScoringQueue: Bool = false,
         startsOnScore: Bool = false,
         onSignOut: @escaping () -> Void = {}
     ) {
@@ -44,6 +47,7 @@ struct BaggerAppShell: View {
         self.fixturePresentation = fixturePresentation
         self.fixtureMatchesState = fixtureMatchesState
         self.fixtureScoringState = fixtureScoringState
+        self.fixtureUsesDurableScoringQueue = fixtureUsesDurableScoringQueue
         self.onSignOut = onSignOut
         _selection = State(initialValue: startsOnScore ? .score : .today)
     }
@@ -117,9 +121,20 @@ struct BaggerAppShell: View {
     @ViewBuilder
     private var scoreContent: some View {
         if let fixtureScoringState {
-            ScoreFixtureView(state: fixtureScoringState)
+            if fixtureUsesDurableScoringQueue {
+#if DEBUG
+                DurableScoringQueueUITestFixtureView(state: fixtureScoringState)
+#else
+                ScoreFixtureView(state: fixtureScoringState)
+#endif
+            } else {
+                ScoreFixtureView(state: fixtureScoringState)
+            }
         } else if let tournamentData {
-            ScoreRepositoryView(store: tournamentData.scoring)
+            ScoreRepositoryView(
+                store: tournamentData.scoring,
+                reliability: tournamentData.scoringReliability
+            )
         } else {
             VStack(spacing: 14) {
                 Image(systemName: "exclamationmark.shield")

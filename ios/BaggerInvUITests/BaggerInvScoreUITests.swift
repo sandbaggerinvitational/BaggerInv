@@ -12,6 +12,8 @@ final class BaggerInvScoreUITests: XCTestCase {
         case unknownFormat = "score.unknown-format"
         case longContent = "score.long-content"
         case offline = "score.offline"
+        case durableOffline = "score.durable-offline"
+        case signOutWarning = "score.signout-warning"
     }
 
     override func setUp() {
@@ -113,19 +115,21 @@ final class BaggerInvScoreUITests: XCTestCase {
         )
     }
 
-    func testDraftIsEphemeralAndNeverEnablesSubmission() {
+    func testPersistenceFailureNeverAdvancesOrClaimsSaved() {
         let app = launch(.activeBestBall)
 
-        let increment = reachableButton("Increase Alex Morgan gross score", in: app)
-        increment.tap()
+        enterCompleteBestBallDraft(in: app)
+        scrollScoreToTop(in: app)
         let editedValue = reachableButton("Alex Morgan gross score", in: app)
         XCTAssertTrue(
             accessibilityValue(of: editedValue).localizedCaseInsensitiveContains("edited · not saved"),
             "The local draft was not clearly distinguished from an official score."
         )
 
-        let saveAndNext = reachableElement("score.saveNext", in: app)
-        XCTAssertFalse(saveAndNext.isEnabled, "Save & Next became enabled before mutation support exists.")
+        let saveAndNext = reachableElement("score.saveNext", in: app, requireHittable: true)
+        saveAndNext.tap()
+        assertReachable(labelContaining: "Not saved", in: app)
+        XCTAssertTrue(element("score.hole.7", in: app).isSelected, "A failed durable save advanced to another hole.")
 
         app.terminate()
         let relaunched = launch(.activeBestBall)
@@ -137,7 +141,7 @@ final class BaggerInvScoreUITests: XCTestCase {
         XCTAssertFalse(element("score.draftNotice", in: relaunched).exists)
     }
 
-    func testOfflineSnapshotRemainsOrientationOnly() {
+    func testOfflineSnapshotKeepsCanonicalOrientationAndDraftControls() {
         let app = launch(.offline)
 
         assertExists("score.offline", in: app)
@@ -147,8 +151,45 @@ final class BaggerInvScoreUITests: XCTestCase {
         )
         assertReachable("score.matchContext", in: app)
         assertReachable("score.holeNavigator", in: app)
-        assertEditingDisabled(in: app)
+        XCTAssertTrue(reachableButton("Increase Alex Morgan gross score", in: app).isEnabled)
         assertReachable("score.scorecard", in: app)
+    }
+
+    func testDurableOfflineMultiHoleSaveSurvivesProcessRelaunch() {
+        let queueID = "ui-multihole-\(UUID().uuidString.lowercased())"
+        var app = launch(
+            .durableOffline,
+            additionalArguments: [
+                "--bagger-ui-test-queue-id", queueID,
+                "--bagger-ui-test-reset-scoring-queue",
+            ]
+        )
+
+        enterCompleteBestBallDraft(in: app)
+        saveAndWaitForHole(8, in: app)
+        assertReliabilityCount(1, in: app)
+
+        enterCompleteBestBallDraft(in: app)
+        saveAndWaitForHole(9, in: app)
+        assertReliabilityCount(2, in: app)
+        XCTAssertTrue(
+            element("score.reliability.status", in: app).label.localizedCaseInsensitiveContains("Offline"),
+            "The durable offline queue did not expose its persistent offline status."
+        )
+
+        app.terminate()
+        app = launch(
+            .durableOffline,
+            additionalArguments: ["--bagger-ui-test-queue-id", queueID]
+        )
+
+        assertReliabilityCount(2, in: app)
+        XCTAssertTrue(element("score.hole.7", in: app).isSelected, "Relaunch did not restore canonical hole orientation.")
+        assertReachable("score.queue.intent.7", in: app)
+        XCTAssertTrue(
+            element("score.queue.intent.7", in: app).label.localizedCaseInsensitiveContains("Not Official"),
+            "A restored local queue record was represented as Official."
+        )
     }
 
     func testNoMatchDoesNotInventScoringControls() {
@@ -159,6 +200,27 @@ final class BaggerInvScoreUITests: XCTestCase {
         XCTAssertFalse(element("score.holeNavigator", in: app).exists)
         XCTAssertFalse(element("score.controls", in: app).exists)
         XCTAssertFalse(element("score.scorecard", in: app).exists)
+    }
+
+    func testUnresolvedScoreSignOutRequiresExplicitChoice() {
+        let app = launch(.signOutWarning)
+
+        openSignOut(in: app)
+        XCTAssertTrue(app.staticTexts["Unresolved scores"].waitForExistence(timeout: 3))
+        XCTAssertTrue(element(labelContaining: "2 scores", in: app).exists)
+        let keepWorking = app.buttons.matching(identifier: "score.signOut.keepWorking").firstMatch
+        XCTAssertTrue(keepWorking.waitForExistence(timeout: 3))
+        let confirm = app.buttons.matching(identifier: "score.signOut.confirm").firstMatch
+        XCTAssertTrue(confirm.exists)
+        keepWorking.tap()
+        XCTAssertTrue(element("app.shell", in: app).waitForExistence(timeout: 3))
+
+        openSignOut(in: app)
+        XCTAssertTrue(confirm.waitForExistence(timeout: 3))
+        confirm.tap()
+        let confirmed = element("score.signOut.confirmed", in: app)
+        XCTAssertTrue(confirmed.waitForExistence(timeout: 3))
+        XCTAssertTrue(confirmed.label.localizedCaseInsensitiveContains("retained"))
     }
 
     func testLongContentAndAccessibilityXXXLRemainUsable() throws {
@@ -217,6 +279,15 @@ final class BaggerInvScoreUITests: XCTestCase {
         return app
     }
 
+    private func openSignOut(in app: XCUIApplication) {
+        let account = app.buttons["account.menu"]
+        XCTAssertTrue(account.waitForExistence(timeout: 3), "The account menu was unavailable.")
+        account.tap()
+        let signOut = app.buttons["Sign Out"]
+        XCTAssertTrue(signOut.waitForExistence(timeout: 3), "The Sign Out action was unavailable.")
+        signOut.tap()
+    }
+
     private func assertEditingDisabled(in app: XCUIApplication) {
         let decrease = reachableButton("Decrease Alex Morgan gross score", in: app)
         let value = reachableButton("Alex Morgan gross score", in: app)
@@ -225,6 +296,44 @@ final class BaggerInvScoreUITests: XCTestCase {
         XCTAssertFalse(value.isEnabled, "A read-only gross-score selector was enabled.")
         XCTAssertFalse(increase.isEnabled, "A read-only score increment control was enabled.")
         XCTAssertFalse(element("score.saveNext", in: app).exists)
+    }
+
+    private func enterCompleteBestBallDraft(in app: XCUIApplication) {
+        scrollScoreToTop(in: app)
+        for name in ["Alex Morgan", "Jordan Lee", "Taylor Kim", "Cameron Diaz"] {
+            let increment = reachableButton("Increase \(name) gross score", in: app)
+            XCTAssertTrue(increment.isEnabled, "The \(name) score control was unexpectedly read-only.")
+            increment.tap()
+        }
+        let save = reachableElement("score.saveNext", in: app, requireHittable: true)
+        XCTAssertTrue(save.isEnabled, "Save & Next did not enable for a complete canonical slot-ordered draft.")
+    }
+
+    private func saveAndWaitForHole(_ hole: Int, in app: XCUIApplication) {
+        reachableElement("score.saveNext", in: app, requireHittable: true).tap()
+        let selected = element("score.hole.\(hole)", in: app)
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "isSelected == true"),
+            object: selected
+        )
+        XCTAssertEqual(
+            XCTWaiter.wait(for: [expectation], timeout: 5),
+            .completed,
+            "Durable Save & Next did not advance to Hole \(hole)."
+        )
+    }
+
+    private func assertReliabilityCount(_ expected: Int, in app: XCUIApplication) {
+        let count = reachableElement("score.reliability.count", in: app)
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label CONTAINS[c] %@", "\(expected) local"),
+            object: count
+        )
+        XCTAssertEqual(
+            XCTWaiter.wait(for: [expectation], timeout: 5),
+            .completed,
+            "The Score screen did not expose \(expected) durable local score intent(s)."
+        )
     }
 
     private func reachableButton(_ label: String, in app: XCUIApplication) -> XCUIElement {
@@ -279,10 +388,11 @@ final class BaggerInvScoreUITests: XCTestCase {
             ? app.scrollViews["score.screen"]
             : app.scrollViews.firstMatch
         XCTAssertTrue(screen.exists, "The Score scroll view was unavailable while returning to the top.")
-        for _ in 0..<30 {
+        let topContent = element("score.matchContext", in: app)
+        for _ in 0..<12 where !topContent.isHittable {
             screen.swipeDown()
         }
-        XCTAssertTrue(element("score.matchContext", in: app).exists, "The Score screen could not return to its top content.")
+        XCTAssertTrue(topContent.exists, "The Score screen could not return to its top content.")
     }
 
     @discardableResult

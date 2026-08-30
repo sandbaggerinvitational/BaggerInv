@@ -412,14 +412,21 @@ struct ScoringPresentation: Equatable, Sendable {
     }
 
     var isEditable: Bool {
-        availability == .active &&
+        canCreateDurableIntent
+    }
+
+    /// A previously verified, writable canonical snapshot may accept durable
+    /// local intent while connectivity is unavailable. The queue still must
+    /// revalidate authority before replay; this does not make the snapshot or
+    /// device authoritative.
+    var canCreateDurableIntent: Bool {
+        (availability == .active || availability == .offline) &&
             status == .live &&
             canScore &&
             !readOnly &&
             format?.isSupported == true &&
             !courseHoles.isEmpty &&
-            hasValidInputShape &&
-            !orientationOnly
+            hasValidInputShape
     }
 
     var structuralSignature: String {
@@ -575,13 +582,85 @@ struct ScoringPresentation: Equatable, Sendable {
     }
 
     func isDraftCompatible(_ draft: ScoringDraft?) -> Bool {
-        guard isEditable, let draft, let matchID else { return false }
+        guard canCreateDurableIntent, let draft, let matchID else { return false }
         return draft.matchID == matchID &&
             draft.snapshotID == snapshotID &&
             draft.snapshotRevision == snapshotRevision &&
             draft.permissionRevision == permissionRevision &&
             draft.structuralSignature == structuralSignature &&
             canonicalHoleNumbers.contains(draft.holeNumber)
+    }
+
+    func queueSaveInput(
+        draft: ScoringDraft,
+        identity: ScoringQueueIdentityPartition,
+        originatingAppBuild: String,
+        now: Date
+    ) throws -> ScoringQueueSaveInput {
+        guard canCreateDurableIntent,
+              isDraftCompatible(draft),
+              let matchID,
+              let format,
+              let queueFormat = format.queueFormat,
+              !draft.isEmpty
+        else {
+            throw ScoringQueueProjectionError.incompatibleDraft
+        }
+
+        let rows = inputRows(for: draft.holeNumber)
+        guard !rows.isEmpty else { throw ScoringQueueProjectionError.invalidInputShape }
+        var valuesBySide: [Int: [Int]] = [:]
+        for side in sides {
+            let sideRows = rows.filter { $0.key.side == side.side }
+            let values = try sideRows.map { row -> Int in
+                guard let value = ScoringInteraction.displayedGross(for: row, draft: draft),
+                      (Self.minimumGross...Self.maximumGross).contains(value)
+                else { throw ScoringQueueProjectionError.incompleteScores }
+                return value
+            }
+            valuesBySide[side.side] = values
+        }
+        guard let teamOne = valuesBySide[1], let teamTwo = valuesBySide[2] else {
+            throw ScoringQueueProjectionError.invalidInputShape
+        }
+
+        let official = officialHole(draft.holeNumber)
+        let officialGross = official.flatMap { hole -> ScoringQueueGross? in
+            guard let first = hole.sides.first(where: { $0.side == 1 }),
+                  let second = hole.sides.first(where: { $0.side == 2 })
+            else { return nil }
+            return ScoringQueueGross(teamOne: first.gross, teamTwo: second.gross)
+        }
+        let sideSlotCount = queueFormat == .bestBall ? 2 : 1
+        return ScoringQueueSaveInput(
+            partition: ScoringQueuePartition(
+                authUserId: identity.authUserId,
+                playerId: identity.playerId,
+                tournamentId: identity.tournamentId,
+                matchId: matchID
+            ),
+            intent: ScoringQueueIntent(
+                holeNumber: draft.holeNumber,
+                teamOneGrossScores: teamOne,
+                teamTwoGrossScores: teamTwo
+            ),
+            base: ScoringQueueBase(
+                expectedMatchRevision: matchRevision,
+                expectedHoleRevision: official?.revision ?? 0,
+                snapshotId: snapshotID,
+                snapshotRevision: snapshotRevision,
+                scoringFormat: queueFormat,
+                sideSlotCount: sideSlotCount,
+                officialGrossAtSave: officialGross
+            ),
+            lastKnownServer: ScoringQueueLastKnownServer(
+                matchRevision: matchRevision,
+                holeRevision: official?.revision ?? 0,
+                permissionRevision: permissionRevision,
+                refreshedAt: now
+            ),
+            originatingAppBuild: originatingAppBuild
+        )
     }
 
     private func inputRowsForShape(side: ScoringSidePresentation) -> [ScoringInputKey] {
@@ -596,6 +675,23 @@ struct ScoringPresentation: Equatable, Sendable {
             return [ScoringInputKey(side: side.side, slot: participant.slot)]
         case .unsupported:
             return []
+        }
+    }
+}
+
+enum ScoringQueueProjectionError: Error, Equatable {
+    case incompatibleDraft
+    case incompleteScores
+    case invalidInputShape
+}
+
+private extension ScoringFormatPresentation {
+    var queueFormat: ScoringQueueFormat? {
+        switch self {
+        case .bestBall: .bestBall
+        case .scramble: .scramble
+        case .singles: .singles
+        case .unsupported: nil
         }
     }
 }

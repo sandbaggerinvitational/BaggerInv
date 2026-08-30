@@ -26,6 +26,8 @@ enum TodayUITestScenario: String {
     case scoreMixedHoles = "score.mixed-holes"
     case scoreLongContent = "score.long-content"
     case scoreOffline = "score.offline"
+    case scoreDurableOffline = "score.durable-offline"
+    case scoreSignOutWarning = "score.signout-warning"
 }
 
 enum TodayUITestLaunch {
@@ -65,12 +67,20 @@ struct TodayUITestFixtureRoot: View {
             }
             .background(Color(uiColor: .systemBackground))
             .accessibilityIdentifier("auth.signed-out.fixture")
+        case .scoreSignOutWarning:
+            ScoringQueueSignOutUITestFixtureRoot(
+                participant: TodayUITestFixtures.participant,
+                presentation: TodayUITestFixtures.presentation(for: scenario),
+                matchesState: MatchesUITestFixtures.state(for: scenario),
+                scoringState: ScoringUITestFixtures.state(for: scenario)
+            )
         default:
             BaggerAppShell(
                 participant: TodayUITestFixtures.participant,
                 fixturePresentation: TodayUITestFixtures.presentation(for: scenario),
                 fixtureMatchesState: MatchesUITestFixtures.state(for: scenario),
                 fixtureScoringState: ScoringUITestFixtures.state(for: scenario),
+                fixtureUsesDurableScoringQueue: scenario == .scoreDurableOffline,
                 startsOnScore: scenario.rawValue.hasPrefix("score.")
             )
         }
@@ -126,7 +136,8 @@ private enum TodayUITestFixtures {
              .scoreNoMatch, .scoreUpcomingBestBall, .scoreActiveBestBall,
              .scoreActiveScramble, .scoreActiveSingles, .scoreReadOnly,
              .scoreCompleted, .scoreUnknownFormat, .scoreMixedHoles,
-             .scoreLongContent, .scoreOffline:
+             .scoreLongContent, .scoreOffline, .scoreDurableOffline,
+             .scoreSignOutWarning:
             current = .init(
                 availability: .content,
                 value: match(

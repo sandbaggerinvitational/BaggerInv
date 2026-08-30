@@ -37,9 +37,9 @@ enum ScoringUITestFixtures {
         return ScoringCurrentState(
             scoring: scoring,
             generatedAt: generatedAt,
-            phase: scenario == .scoreOffline ? .offline : .ready,
+            phase: scenario == .scoreOffline || scenario == .scoreDurableOffline ? .offline : .ready,
             isRefreshing: false,
-            lastSafeError: scenario == .scoreOffline ? .transport : nil,
+            lastSafeError: scenario == .scoreOffline || scenario == .scoreDurableOffline ? .transport : nil,
             lastServerCode: nil,
             lastHTTPStatus: nil
         )

@@ -135,7 +135,7 @@ final class ScoringPresentationTests: XCTestCase {
         XCTAssertFalse(changedStructure.isDraftCompatible(draft))
 
         let offline = makePresentation(format: .bestBall, phase: .offline)
-        XCTAssertFalse(offline.isDraftCompatible(draft))
+        XCTAssertTrue(offline.isDraftCompatible(draft))
 
         let readOnly = makePresentation(format: .bestBall, readOnly: true)
         XCTAssertFalse(readOnly.isDraftCompatible(draft))
@@ -151,8 +151,38 @@ final class ScoringPresentationTests: XCTestCase {
         let offline = makePresentation(format: .bestBall, phase: .offline)
         XCTAssertEqual(offline.availability, .offline)
         XCTAssertTrue(offline.orientationOnly)
-        XCTAssertFalse(offline.isEditable)
+        XCTAssertTrue(offline.isEditable)
         XCTAssertNotNil(offline.officialHole(1))
+    }
+
+    func testOfflineCanonicalSnapshotProjectsDurableSlotOrderedIntent() throws {
+        let presentation = makePresentation(format: .bestBall, phase: .offline)
+        var draft = try XCTUnwrap(presentation.makeDraft(for: 1))
+        let first = try XCTUnwrap(presentation.inputRows(for: 1).first)
+        draft.set(6, for: first.key)
+
+        let input = try presentation.queueSaveInput(
+            draft: draft,
+            identity: ScoringQueueIdentityPartition(
+                authUserId: "fixture-auth",
+                playerId: "player-1-1",
+                tournamentId: "fixture-tournament"
+            ),
+            originatingAppBuild: "test",
+            now: Date(timeIntervalSince1970: 1_800_000_000)
+        )
+
+        XCTAssertEqual(input.partition.authUserId, "fixture-auth")
+        XCTAssertEqual(input.partition.playerId, "player-1-1")
+        XCTAssertEqual(input.partition.tournamentId, "fixture-tournament")
+        XCTAssertEqual(input.partition.matchId, "match-scoring")
+        XCTAssertEqual(input.intent.holeNumber, 1)
+        XCTAssertEqual(input.intent.teamOneGrossScores, [6, 5])
+        XCTAssertEqual(input.intent.teamTwoGrossScores, [5, 6])
+        XCTAssertEqual(input.base.scoringFormat, .bestBall)
+        XCTAssertEqual(input.base.sideSlotCount, 2)
+        XCTAssertEqual(input.base.officialGrossAtSave?.teamOne, [4, 5])
+        XCTAssertEqual(input.base.officialGrossAtSave?.teamTwo, [5, 6])
     }
 
     func testInvalidBestBallOrSinglesShapeCannotEdit() {
