@@ -500,6 +500,7 @@ function QueueSummary({ title, counts }) {
 
 const AUDIT_FILTERS = Object.freeze([
   ["ALL", "All activity"], ["MATCH", "Matches"], ["HANDICAP", "Handicaps"],
+  ["ACCESS", "Players & access"],
   ["ODDS", "Odds"], ["SIDE_GAME", "Side games"],
   ["SYNCHRONIZATION", "Sync"], ["RELEASE", "Releases"],
 ]);

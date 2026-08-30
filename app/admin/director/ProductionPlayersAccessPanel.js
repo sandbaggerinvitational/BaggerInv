@@ -18,6 +18,21 @@ import {
 import styles from "./ProductionPlayersAccessPanel.module.css";
 
 const ENDPOINT = "/api/director/players-access";
+const GOVERNANCE_ACTIONS = new Set([
+  "create-player",
+  "set-global-status",
+  "withdraw-membership",
+  "reactivate-membership",
+  "grant-director",
+  "revoke-director",
+]);
+const EMPTY_PLAYER_DRAFT = Object.freeze({
+  firstName: "",
+  lastName: "",
+  displayName: "",
+  slug: "",
+  globalStatus: "ACTIVE",
+});
 
 function timestamp(value) {
   const date = new Date(value);
@@ -40,7 +55,8 @@ function StateBadge({ value, children }) {
 function receiptFrom(payload = {}, action) {
   const value = payload.data || payload.result || payload;
   const receipt = value.receipt || value.auditReceipt || value.audit_receipt || {};
-  const revision = Number(value.revision ?? value.currentRevision ?? value.current_revision);
+  const revision = Number(value.revision ?? value.governanceRevision ?? value.governance_revision ??
+    value.currentRevision ?? value.current_revision);
   return {
     action,
     revision: Number.isSafeInteger(revision) ? revision : null,
@@ -58,7 +74,58 @@ function actionTitle(action) {
     "suspend-access": "Suspend Participant Access",
     "resume-access": "Resume Participant Access",
     "bulk-enroll": "Approve Participant Identifiers",
+    "create-player": "Create Global Player",
+    "set-global-status": "Change Global Player Status",
+    "withdraw-membership": "Withdraw Tournament Membership",
+    "reactivate-membership": "Reactivate Tournament Membership",
+    "grant-director": "Grant Director Access",
+    "revoke-director": "Revoke Director Access",
   })[action] || "Update Participant Access";
+}
+
+function booleanValue(...values) {
+  const value = values.find((candidate) => candidate !== undefined && candidate !== null);
+  return value === true || /^(?:1|true|yes|on|enabled)$/i.test(String(value ?? "").trim());
+}
+
+function textList(...values) {
+  const source = values.find((candidate) => Array.isArray(candidate));
+  return (source || []).map((item) => {
+    if (typeof item === "string") return item.trim();
+    return String(item?.message || item?.label || item?.reason || item?.code || "").trim();
+  }).filter(Boolean);
+}
+
+function membershipReadiness(player) {
+  const membership = player?.membership || {};
+  const readiness = membership.readiness || membership.readinessProjection || membership.readiness_projection || {};
+  const summary = typeof readiness === "string"
+    ? readiness
+    : String(readiness.summary || readiness.message || readiness.label || membership.readinessMessage || "").trim();
+  const blockers = textList(
+    membership.blockers,
+    readiness.blockers,
+    readiness.items,
+  );
+  if (!blockers.length && membership.blocker) blockers.push(productionPlayerAccessStatusLabel(membership.blocker));
+  return { summary, blockers };
+}
+
+function validatePlayerDraft(draft) {
+  const firstName = String(draft.firstName || "").trim();
+  const lastName = String(draft.lastName || "").trim();
+  const displayName = String(draft.displayName || "").trim() || `${firstName} ${lastName}`.trim();
+  const slug = String(draft.slug || "").trim().toLowerCase();
+  const globalStatus = String(draft.globalStatus || "ACTIVE").trim().toUpperCase();
+  const errors = [];
+  if (!firstName) errors.push("First name is required.");
+  if (!lastName) errors.push("Last name is required.");
+  if (!displayName) errors.push("Display name is required.");
+  if (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    errors.push("Profile slug may contain lowercase letters, numbers, and single hyphens only.");
+  }
+  if (!["ACTIVE", "ALUMNI"].includes(globalStatus)) errors.push("Choose Active or Alumni.");
+  return { errors, value: { firstName, lastName, displayName, slug, globalStatus } };
 }
 
 function DetailValue({ label, value, status }) {
@@ -75,6 +142,14 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
   const [emailDraft, setEmailDraft] = useState("");
   const [phoneDraft, setPhoneDraft] = useState("");
   const [loginDraft, setLoginDraft] = useState("EMAIL_PRIMARY");
+  const [globalStatusDraft, setGlobalStatusDraft] = useState("ACTIVE");
+  const [membershipReason, setMembershipReason] = useState("");
+  const [directorReason, setDirectorReason] = useState("");
+  const [addPlayerOpen, setAddPlayerOpen] = useState(false);
+  const [addPlayerStep, setAddPlayerStep] = useState("details");
+  const [addPlayerDraft, setAddPlayerDraft] = useState(() => ({ ...EMPTY_PLAYER_DRAFT }));
+  const [addPlayerErrors, setAddPlayerErrors] = useState([]);
+  const [createdPlayer, setCreatedPlayer] = useState(null);
   const [bulkDraft, setBulkDraft] = useState("");
   const [bulkErrors, setBulkErrors] = useState([]);
   const [review, setReview] = useState(null);
@@ -124,17 +199,47 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
   );
   const selected = players.find((player) => player.playerId === selectedPlayerId) || null;
   const editorLocked = phase === "review" || phase === "submitting";
+  const actorIsOwner = booleanValue(data?.actor?.owner, data?.actor?.isOwner, data?.actor?.is_owner);
+  const ownerAdoptionRequired = booleanValue(
+    data?.actor?.ownerAdoptionRequired,
+    data?.actor?.owner_adoption_required,
+    data?.ownerAdoptionRequired,
+    data?.owner_adoption_required,
+  );
+  const governanceRevision = Number.isSafeInteger(Number(data?.governanceRevision))
+    ? Number(data.governanceRevision)
+    : Number(data?.revision || 0);
+  const selectedReadiness = membershipReadiness(selected);
 
   useEffect(() => {
     setEmailDraft("");
     setPhoneDraft("");
     setLoginDraft(selected?.preferredLoginMethod || "EMAIL_PRIMARY");
+    setGlobalStatusDraft(selected?.globalStatus || "ACTIVE");
+    setMembershipReason("");
+    setDirectorReason("");
     setReview(null);
     setConfirmed(false);
-  }, [selected?.playerId, selected?.preferredLoginMethod]);
+  }, [selected?.globalStatus, selected?.playerId, selected?.preferredLoginMethod]);
 
   const can = useCallback((action, player = selected) =>
     productionPlayerAccessActionAvailable(data?.capabilities || {}, action, player), [data?.capabilities, selected]);
+
+  const governanceCapability = useCallback((action) =>
+    data?.capabilities?.[action] === true || can(action), [can, data?.capabilities]);
+  const canWithdrawMembership = Boolean(selected) && governanceCapability("withdraw-membership") &&
+    booleanValue(selected?.membership?.canWithdraw, selected?.membership?.can_withdraw);
+  const canReactivateMembership = Boolean(selected) && governanceCapability("reactivate-membership") &&
+    booleanValue(selected?.membership?.canReactivate, selected?.membership?.can_reactivate);
+  const selectedGovernance = selected?.governance || selected?.directorGovernance || selected?.director_governance || {};
+  const selectedIsOwner = selected?.directorStatus === "OWNER" || selectedGovernance.ownerStatus === "ACTIVE" ||
+    selectedGovernance.owner_status === "ACTIVE";
+  const selectedIsDirector = ["ACTIVE", "DIRECTOR", "OWNER"].includes(selected?.directorStatus) ||
+    booleanValue(selectedGovernance.director, selectedGovernance.isDirector, selectedGovernance.is_director);
+  const canGrantDirector = actorIsOwner && !ownerAdoptionRequired && !selectedIsDirector &&
+    governanceCapability("grant-director") && selectedGovernance.canGrant !== false && selectedGovernance.can_grant !== false;
+  const canRevokeDirector = actorIsOwner && !ownerAdoptionRequired && selectedIsDirector && !selectedIsOwner &&
+    governanceCapability("revoke-director") && selectedGovernance.canRevoke !== false && selectedGovernance.can_revoke !== false;
 
   const openReview = useCallback((action, input, display, rows = []) => {
     setReview({ action, input, display, rows });
@@ -203,6 +308,97 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
     });
   };
 
+  const resetAddPlayer = useCallback(() => {
+    setAddPlayerDraft({ ...EMPTY_PLAYER_DRAFT });
+    setAddPlayerErrors([]);
+    setAddPlayerStep("details");
+    setCreatedPlayer(null);
+  }, []);
+
+  const validateAddPlayer = () => {
+    const validation = validatePlayerDraft(addPlayerDraft);
+    setAddPlayerErrors(validation.errors);
+    if (validation.errors.length) {
+      setMessage("Correct the Player details before continuing. No Production change has been made.");
+      return;
+    }
+    setAddPlayerDraft(validation.value);
+    setAddPlayerStep("validate");
+    setMessage("");
+  };
+
+  const reviewAddPlayer = () => {
+    const validation = validatePlayerDraft(addPlayerDraft);
+    if (validation.errors.length || !governanceCapability("create-player")) {
+      setAddPlayerErrors(validation.errors);
+      setMessage(validation.errors.length
+        ? "Correct the Player details before continuing."
+        : "Global Player creation is not available for the current Production state.");
+      setAddPlayerStep("details");
+      return;
+    }
+    setAddPlayerStep("review");
+    openReview("create-player", validation.value, {
+      player: validation.value.displayName,
+      change: `Create an ${productionPlayerAccessStatusLabel(validation.value.globalStatus).toLowerCase()} global Player`,
+      consequence: "The server allocates the stable Player ID transactionally. This does not add tournament membership, a team, a handicap, login identifiers, Auth access, scoring permission, or Director access.",
+    });
+  };
+
+  const reviewGlobalStatus = () => {
+    if (!selected || !governanceCapability("set-global-status") || !booleanValue(selected.canSetGlobalStatus)) return;
+    if (globalStatusDraft === "ALUMNI" && selected.membership.exists && selected.membership.status === "ACTIVE") {
+      setMessage("Withdraw the Player from the active tournament before changing the global Player status to Alumni.");
+      return;
+    }
+    openReview("set-global-status", {
+      playerId: selected.playerId,
+      globalStatus: globalStatusDraft,
+      expectedProfileRevision: Number(selected.profile?.revision || 0),
+    }, {
+      player: `${selected.displayName} · ${selected.playerId}`,
+      change: `Global Player status: ${productionPlayerAccessStatusLabel(globalStatusDraft)}`,
+      consequence: "This changes only the global Player status. Stable identity, Auth linking, tournament history, scorecards, records, and audit history remain intact.",
+    });
+  };
+
+  const reviewMembership = (action) => {
+    const reason = membershipReason.trim();
+    if (!selected || !reason || !governanceCapability(action)) {
+      if (!reason) setMessage("Enter a reason before reviewing the membership change.");
+      return;
+    }
+    const withdrawing = action === "withdraw-membership";
+    openReview(action, {
+      playerId: selected.playerId,
+      reason,
+      expectedMembershipRevision: Number(selected.membership.revision || 0),
+    }, {
+      player: `${selected.displayName} · ${selected.playerId}`,
+      change: withdrawing ? "Withdraw from the active tournament" : "Reactivate tournament membership",
+      consequence: withdrawing
+        ? "The server will fail closed for live, scored, finalized, snapshot, Net Skins, Calcutta, or published Odds dependencies. Unstarted pairings, Draft selections, and completed history are preserved and reported as readiness items; no competition facts are deleted or rewritten."
+        : "The Player returns only to the supported tournament membership state. Team, handicap, pairings, login identifiers, Auth, and scoring permission are not assigned automatically.",
+    });
+  };
+
+  const reviewDirector = (action) => {
+    const reason = directorReason.trim();
+    if (!selected || !actorIsOwner || ownerAdoptionRequired || !reason || !governanceCapability(action)) {
+      if (!actorIsOwner || ownerAdoptionRequired) setMessage("Owner authorization is required for Director governance.");
+      else if (!reason) setMessage("Enter a governance reason before review.");
+      return;
+    }
+    const granting = action === "grant-director";
+    openReview(action, { playerId: selected.playerId, reason, confirmed: true }, {
+      player: `${selected.displayName} · ${selected.playerId}`,
+      change: granting ? "Grant Production Tournament Director access" : "Revoke Production Tournament Director access",
+      consequence: granting
+        ? "This grants high-impact Production Director authorization only. It does not alter Player identity, scoring facts, team assignment, or participant access."
+        : "This removes Production Director authorization only. The Player, Auth link, tournament membership, participant access, and immutable audit history are preserved. Final-administrator protections remain server enforced.",
+    });
+  };
+
   const reviewBulk = () => {
     const parsed = parseProductionPlayerAccessBulk(bulkDraft, players);
     setBulkErrors(parsed.errors);
@@ -225,7 +421,11 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
 
   const commitReview = async () => {
     if (!review || !confirmed || !data || phase === "submitting") return;
-    const intent = { endpoint: ENDPOINT, action: review.action, expectedRevision: data.revision, ...review.input };
+    const governanceAction = GOVERNANCE_ACTIONS.has(review.action);
+    const expectedRevision = governanceAction ? governanceRevision : data.revision;
+    const intent = governanceAction
+      ? { endpoint: ENDPOINT, action: review.action, expectedRevision: governanceRevision, ...review.input }
+      : { endpoint: ENDPOINT, action: review.action, expectedRevision: data.revision, ...review.input };
     const operation = identityRegistry().acquire(intent);
     setPhase("submitting");
     setMessage("");
@@ -237,14 +437,17 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           action: review.action,
-          expectedRevision: data.revision,
+          expectedRevision,
           operationRequestId: operation.operationRequestId,
           ...review.input,
         }),
       });
       const payload = await response.json().catch(() => ({}));
+      const returnedRevision = Number(governanceAction
+        ? payload.data?.governanceRevision ?? payload.data?.governance_revision ?? payload.data?.revision
+        : payload.data?.revision);
       if (!response.ok || payload.ok !== true || payload.data?.ok !== true ||
-          !Number.isSafeInteger(Number(payload.data?.revision)) || Number(payload.data.revision) < 0) {
+          !Number.isSafeInteger(returnedRevision) || returnedRevision < 0) {
         throw new Error(payload.error || `${actionTitle(review.action)} failed (${response.status}).`);
       }
       identityRegistry().confirm(operation);
@@ -252,17 +455,41 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
       const nextReceipt = receiptFrom(payload, review.action);
       setReceipt(nextReceipt);
       const completedAction = review.action;
+      const responsePlayer = payload.data?.player || payload.data?.createdPlayer || payload.data?.created_player || {};
+      const responsePlayerId = String(
+        responsePlayer.playerId || responsePlayer.player_id || payload.data?.playerId || payload.data?.player_id || "",
+      ).trim().toUpperCase();
       setReview(null);
       setConfirmed(false);
-      await load({ background: true });
+      const refreshed = await load({ background: true });
       setEmailDraft(""); setPhoneDraft("");
       if (completedAction === "bulk-enroll") setBulkDraft("");
+      if (completedAction === "create-player") {
+        const refreshedPlayer = refreshed.players.find((player) => player.playerId === responsePlayerId);
+        setCreatedPlayer(refreshedPlayer || {
+          playerId: responsePlayerId,
+          displayName: addPlayerDraft.displayName,
+          globalStatus: addPlayerDraft.globalStatus,
+        });
+        setAddPlayerStep("created");
+        if (refreshedPlayer) setSelectedPlayerId(refreshedPlayer.playerId);
+      }
+      if (["withdraw-membership", "reactivate-membership"].includes(completedAction)) setMembershipReason("");
+      if (["grant-director", "revoke-director"].includes(completedAction)) setDirectorReason("");
       setBulkErrors([]);
       setPhase("ready");
       setMessage(`${actionTitle(completedAction)} completed and authoritative state was refreshed.`);
       onOperation?.({ label: actionTitle(completedAction), status: "success" });
     } catch (error) {
       if (serverConfirmed) {
+        if (review.action === "create-player") {
+          setCreatedPlayer({
+            playerId: "",
+            displayName: addPlayerDraft.displayName,
+            globalStatus: addPlayerDraft.globalStatus,
+          });
+          setAddPlayerStep("created");
+        }
         setReview(null);
         setConfirmed(false);
         setPhase("ready");
@@ -288,8 +515,8 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
   return <section className={styles.panel} aria-labelledby="players-access-title">
     <header className={styles.heading}>
       <div><span>People & access</span><h2 id="players-access-title">Players & Access</h2>
-        <p>Review tournament membership and approved participant login methods. Stored identifiers remain masked.</p></div>
-      <div><small>Directory revision</small><strong>{data.revision}</strong><span>{data.contractVersion || "Production contract"}</span></div>
+        <p>Manage permanent Player records, tournament participation, approved login methods, and bounded access governance. Stored identifiers remain masked.</p></div>
+      <div><small>Directory revision</small><strong>{data.revision}</strong><span>Governance revision {governanceRevision}</span><button type="button" className={styles.addPlayerButton} disabled={editorLocked || !governanceCapability("create-player")} onClick={() => { if (!addPlayerOpen) resetAddPlayer(); setAddPlayerOpen((current) => !current); }}>{addPlayerOpen ? "Close Add Player" : "Add Player"}</button></div>
     </header>
 
     <div className={styles.summary} aria-label="Participant access summary">
@@ -299,6 +526,27 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
       <article><small>Not Enrolled</small><strong>{data.summary.notEnrolled}</strong></article>
       <article data-attention={data.summary.needsAttention ? "true" : undefined}><small>Needs Attention</small><strong>{data.summary.needsAttention}</strong></article>
     </div>
+
+    {addPlayerOpen ? <section className={styles.addPlayer} aria-labelledby="add-player-title" aria-label="Global Player Creation">
+      <header><div><span>Permanent Player record</span><h3 id="add-player-title">Add Player</h3><p>Create a reusable global Player first. Tournament membership, contact identifiers, Auth, team, handicap, scoring permission, and Director access remain separate actions.</p></div><StateBadge value={governanceCapability("create-player") ? "ACTIVE" : "UNAVAILABLE"}>{governanceCapability("create-player") ? "Available" : "Read Only"}</StateBadge></header>
+      <ol className={styles.steps} aria-label="Add Player progress">
+        {["details", "validate", "review", "created"].map((step, index) => <li key={step} data-current={addPlayerStep === step ? "true" : undefined} data-complete={["details", "validate", "review", "created"].indexOf(addPlayerStep) > index ? "true" : undefined}><span>{index + 1}</span>{step === "created" ? "Create" : productionPlayerAccessStatusLabel(step)}</li>)}
+      </ol>
+      {addPlayerStep === "details" ? <>
+        <div className={styles.playerForm}>
+          <label htmlFor="add-player-first-name"><span>First name</span><input id="add-player-first-name" autoComplete="off" value={addPlayerDraft.firstName} disabled={editorLocked} onChange={(event) => setAddPlayerDraft((current) => ({ ...current, firstName: event.target.value }))} /></label>
+          <label htmlFor="add-player-last-name"><span>Last name</span><input id="add-player-last-name" autoComplete="off" value={addPlayerDraft.lastName} disabled={editorLocked} onChange={(event) => setAddPlayerDraft((current) => ({ ...current, lastName: event.target.value }))} /></label>
+          <label htmlFor="add-player-display-name"><span>Display name</span><input id="add-player-display-name" autoComplete="off" value={addPlayerDraft.displayName} disabled={editorLocked} placeholder="Defaults to first and last name" onChange={(event) => setAddPlayerDraft((current) => ({ ...current, displayName: event.target.value }))} /></label>
+          <label htmlFor="add-player-slug"><span>Profile slug (optional)</span><input id="add-player-slug" autoComplete="off" value={addPlayerDraft.slug} disabled={editorLocked} placeholder="Allocated safely if omitted" onChange={(event) => setAddPlayerDraft((current) => ({ ...current, slug: event.target.value }))} /></label>
+          <label htmlFor="add-player-global-status"><span>Global Player status</span><select id="add-player-global-status" value={addPlayerDraft.globalStatus} disabled={editorLocked} onChange={(event) => setAddPlayerDraft((current) => ({ ...current, globalStatus: event.target.value }))}><option value="ACTIVE">Active</option><option value="ALUMNI">Alumni</option></select></label>
+        </div>
+        {addPlayerErrors.length ? <ul className={styles.errors} role="alert">{addPlayerErrors.map((error) => <li key={error}>{error}</li>)}</ul> : null}
+        <div className={styles.flowActions}><button type="button" className={styles.secondaryButton} onClick={() => { resetAddPlayer(); setAddPlayerOpen(false); }}>Cancel</button><button type="button" disabled={editorLocked || !governanceCapability("create-player")} onClick={validateAddPlayer}>Validate Player</button></div>
+      </> : null}
+      {addPlayerStep === "validate" ? <div className={styles.validationResult}><StateBadge value="ELIGIBLE">Validated</StateBadge><h4>{addPlayerDraft.displayName}</h4><dl><DetailValue label="First name" value={addPlayerDraft.firstName} /><DetailValue label="Last name" value={addPlayerDraft.lastName} /><DetailValue label="Profile slug" value={addPlayerDraft.slug || "Server allocated"} /><DetailValue label="Global status" value={productionPlayerAccessStatusLabel(addPlayerDraft.globalStatus)} status={addPlayerDraft.globalStatus} /></dl><p>Names and format passed client review. The Production operation remains authoritative for duplicate identity, Player ID allocation, and slug collision checks.</p><div className={styles.flowActions}><button type="button" className={styles.secondaryButton} onClick={() => setAddPlayerStep("details")}>Edit Details</button><button type="button" onClick={reviewAddPlayer}>Continue to Review</button></div></div> : null}
+      {addPlayerStep === "review" ? <p className={styles.flowNotice}>Review the Production operation below. Nothing is created until the confirmed server response succeeds.</p> : null}
+      {addPlayerStep === "created" ? <div className={styles.createdPlayer}><StateBadge value="ACTIVE">Created</StateBadge><h4>{createdPlayer?.displayName || addPlayerDraft.displayName}</h4><p>{createdPlayer?.playerId ? `Stable Player ID ${createdPlayer.playerId} was allocated by Production.` : "Production confirmed the new global Player record."}</p><div className={styles.nextActions}><article><strong>Add to Tournament</strong><span>Separate operation. Team assignment and competition readiness remain in Tournament Setup.</span></article><article><strong>Add Email or Mobile</strong><span>Select the Player and use the existing approved-identifier workflow. No Auth user is created manually.</span></article></div><div className={styles.flowActions}><button type="button" className={styles.secondaryButton} onClick={() => { resetAddPlayer(); setAddPlayerOpen(false); }}>Done</button><button type="button" onClick={resetAddPlayer}>Create Another Player</button></div></div> : null}
+    </section> : null}
 
     <div className={styles.directoryControls}>
       <label htmlFor="players-access-search"><span>Search players</span><input id="players-access-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, Player ID, team, or masked identifier" /></label>
@@ -313,7 +561,7 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
           <button type="button" disabled={editorLocked} aria-current={selected?.playerId === player.playerId ? "true" : undefined} onClick={() => setSelectedPlayerId(player.playerId)}>
             <span className={styles.avatar} aria-hidden="true">{player.displayName.split(/\s+/).map((part) => part[0]).join("").slice(0, 2)}</span>
             <span><strong>{player.displayName}</strong><small>{player.playerId}{player.membership.teamName || player.membership.teamId ? ` · ${player.membership.teamName || player.membership.teamId}` : ""}</small><small className={styles.directoryContacts}>{player.maskedEmail || "No email"} · {player.maskedPhone || "No mobile"}</small><small>Preferred: {productionPlayerAccessStatusLabel(player.preferredLoginMethod)}</small></span>
-            <span className={styles.directoryStates}><StateBadge value={player.enrollmentState} /><StateBadge value={player.authLinkState} />{player.participantAccessState !== player.enrollmentState ? <StateBadge value={player.participantAccessState} /> : null}{["ACTIVE", "DIRECTOR", "OWNER"].includes(player.directorStatus) ? <StateBadge value={player.directorStatus}>Director</StateBadge> : null}{player.needsAttention ? <StateBadge value="NEEDS_REVIEW">Review</StateBadge> : null}</span>
+            <span className={styles.directoryStates}><StateBadge value={player.globalStatus} /><StateBadge value={player.membership.status} /><StateBadge value={player.enrollmentState} /><StateBadge value={player.authLinkState} />{player.participantAccessState !== player.enrollmentState ? <StateBadge value={player.participantAccessState} /> : null}{["ACTIVE", "DIRECTOR", "OWNER"].includes(player.directorStatus) ? <StateBadge value={player.directorStatus}>Director</StateBadge> : null}{player.needsAttention ? <StateBadge value="NEEDS_REVIEW">Review</StateBadge> : null}</span>
           </button>
         </li>)}</ul> : <p className={styles.empty}>No players match this search and filter.</p>}
       </section>
@@ -324,6 +572,7 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
           {selected.needsAttention ? <p className={styles.warning}><strong>Review needed.</strong> One or more identity or membership checks require Director attention.</p> : null}
           <dl className={styles.detailGrid}>
             <DetailValue label="Global Player" value={productionPlayerAccessStatusLabel(selected.globalStatus)} status={selected.globalStatus} />
+            <DetailValue label="Public profile" value={selected.profile?.slug ? `/${selected.profile.slug}` : "No profile slug"} />
             <DetailValue label="Tournament membership" value={productionPlayerAccessStatusLabel(selected.membership.status)} status={selected.membership.status} />
             <DetailValue label="Team" value={selected.membership.teamName || selected.membership.teamId} />
             <DetailValue label="Enrollment" value={productionPlayerAccessStatusLabel(selected.enrollmentState)} status={selected.enrollmentState} />
@@ -354,14 +603,24 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
               {can("resume-access") ? <button type="button" disabled={editorLocked} onClick={() => reviewParticipantAccess("resume-access")}>Review Access Resumption</button> : null}
               {!can("suspend-access") && !can("resume-access") ? <p>{["ACTIVE", "DIRECTOR", "OWNER"].includes(selected.directorStatus) ? "Director access must be reviewed separately before participant access can change." : "No participant access change is available for this state."}</p> : null}
             </article>
-            <article><header><strong>2026 membership</strong><span>{productionPlayerAccessStatusLabel(selected.membership.status)}</span></header>
-              <p>Tournament membership is read only in this phase. Activation and deactivation require a separate certified tournament-setup operation.</p>
+            <article aria-label="Tournament membership is read only when no bounded status action is available"><header><strong>2026 membership</strong><span>{productionPlayerAccessStatusLabel(selected.membership.status)}</span></header>
+              <p><strong>Team:</strong> {selected.membership.teamName || selected.membership.teamId || "Team Not Assigned"}</p>
+              {selectedReadiness.summary ? <p className={styles.readinessSummary}>{selectedReadiness.summary}</p> : null}
+              {selectedReadiness.blockers.length ? <ul className={styles.readinessList}>{selectedReadiness.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}</ul> : null}
+              {!selected.membership.exists ? <><button type="button" disabled>Add to Tournament</button><p>Team assignment is intentionally managed in Tournament Setup. Add to Tournament is disabled here until that bounded operation can preserve team, handicap, pairing, and scoring readiness.</p></> : null}
+              {canWithdrawMembership || canReactivateMembership ? <label htmlFor="players-access-membership-reason"><span>Reason</span><textarea id="players-access-membership-reason" className={styles.reasonInput} value={membershipReason} disabled={editorLocked} onChange={(event) => setMembershipReason(event.target.value)} placeholder="Required for the immutable audit record" /></label> : null}
+              {canWithdrawMembership ? <button type="button" disabled={editorLocked || membershipReason.trim().length < 10} onClick={() => reviewMembership("withdraw-membership")}>Review Withdrawal</button> : null}
+              {canReactivateMembership ? <button type="button" disabled={editorLocked || membershipReason.trim().length < 10} onClick={() => reviewMembership("reactivate-membership")}>Review Reactivation</button> : null}
+              {selected.membership.exists && !canWithdrawMembership && !canReactivateMembership ? <p>No membership status change is available. Any competition dependency remains protected.</p> : null}
             </article>
-          </div>
-
-          <div className={styles.deferredGrid}>
-            <article><span>Coming Soon</span><strong>Global Player Creation</strong><p>Creating a new global player record is intentionally unavailable in this phase.</p></article>
-            <article><span>Coming Soon</span><strong>Director Role Management</strong><p>Director grants and revocations remain read-only until their bounded Production operation is installed.</p></article>
+            <article><header><strong>Global Player status</strong><span>{productionPlayerAccessStatusLabel(selected.globalStatus)}</span></header>
+              {booleanValue(selected.canSetGlobalStatus) && governanceCapability("set-global-status") ? <><label htmlFor="players-access-global-status"><span>Permanent Player status</span><select id="players-access-global-status" value={globalStatusDraft} disabled={editorLocked} onChange={(event) => setGlobalStatusDraft(event.target.value)}><option value="ACTIVE">Active</option><option value="ALUMNI" disabled={selected.membership.exists && selected.membership.status === "ACTIVE"}>Alumni</option></select></label>{selected.membership.exists && selected.membership.status === "ACTIVE" ? <p className={styles.readinessSummary}>Withdraw tournament membership first before changing this global Player to Alumni.</p> : null}<p>This status is separate from 2026 membership. Alumni retain identity, appearances, career statistics, championships, records, scorecards, and Auth history.</p><button type="button" disabled={editorLocked || globalStatusDraft === selected.globalStatus || (globalStatusDraft === "ALUMNI" && selected.membership.exists && selected.membership.status === "ACTIVE")} onClick={reviewGlobalStatus}>Review Global Status</button></> : <p>Global status is read only for this Player in the current Production state.</p>}
+            </article>
+            <article className={styles.governanceCard} aria-label="Director Role Management"><header><strong>Director governance</strong><span>{selectedIsDirector ? "Tournament Director" : "Not a Director"}</span></header>
+              {ownerAdoptionRequired ? <div className={styles.lockedNotice}><strong>Initial Owner adoption required</strong><p>Production has not yet adopted an Owner-level administrator. Director grants and revocations remain locked until the separate explicit, audited Owner adoption procedure is authorized and completed.</p></div> : null}
+              {!ownerAdoptionRequired && !actorIsOwner ? <div className={styles.lockedNotice}><strong>Owner authorization required</strong><p>Ordinary Directors may review entitlement status but cannot grant or revoke Director access.</p></div> : null}
+              {actorIsOwner && !ownerAdoptionRequired ? <><StateBadge value="ACTIVE">Owner-authorized session</StateBadge>{selectedIsOwner ? <p className={styles.readinessSummary}>The adopted Production Owner cannot be revoked here. This prevents final-owner lockout.</p> : null}<label htmlFor="players-access-director-reason"><span>Governance reason</span><textarea id="players-access-director-reason" className={styles.reasonInput} value={directorReason} disabled={editorLocked || selectedIsOwner} onChange={(event) => setDirectorReason(event.target.value)} placeholder="At least 10 characters; stored in the immutable audit record" /></label>{canGrantDirector ? <button type="button" disabled={editorLocked || directorReason.trim().length < 10} onClick={() => reviewDirector("grant-director")}>Review Director Grant</button> : null}{canRevokeDirector ? <button type="button" disabled={editorLocked || directorReason.trim().length < 10} onClick={() => reviewDirector("revoke-director")}>Review Director Revocation</button> : null}{!canGrantDirector && !canRevokeDirector && !selectedIsOwner ? <p>The selected Player does not meet the current bounded grant/revoke prerequisites. Auth linking, active membership, self-lockout, and final-administrator protections are server enforced.</p> : null}</> : null}
+            </article>
           </div>
         </> : <p className={styles.empty}>Select a player to review membership and access.</p>}
       </section>
@@ -376,16 +635,16 @@ export default function ProductionPlayersAccessPanel({ onOperation }) {
 
     {review ? <section className={styles.review} aria-labelledby="players-access-review-title">
       <header><span>Review before commit</span><h3 id="players-access-review-title">{actionTitle(review.action)}</h3><p>No Production change has been made.</p></header>
-      <dl><div><dt>Target</dt><dd>{review.display.player}</dd></div><div><dt>Requested change</dt><dd>{review.display.change}</dd></div><div><dt>Expected revision</dt><dd>{data.revision}</dd></div></dl>
+      <dl><div><dt>Target</dt><dd>{review.display.player}</dd></div><div><dt>Requested change</dt><dd>{review.display.change}</dd></div><div><dt>{GOVERNANCE_ACTIONS.has(review.action) ? "Expected governance revision" : "Expected directory revision"}</dt><dd>{GOVERNANCE_ACTIONS.has(review.action) ? governanceRevision : data.revision}</dd></div></dl>
       {review.rows.length ? <div className={styles.reviewTable} role="region" aria-label="Bulk enrollment review" tabIndex="0"><table><thead><tr><th>Player</th><th>Email</th><th>Mobile</th></tr></thead><tbody>{review.rows.map((row) => <tr key={row.playerId}><th scope="row"><strong>{row.displayName}</strong><span>{row.playerId}</span></th><td>{row.maskedEmail}</td><td>{row.maskedPhone}</td></tr>)}</tbody></table></div> : null}
       <p className={styles.consequence}>{review.display.consequence}</p>
-      <label className={styles.confirmation}><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed the masked identifiers, target players, and effect of this Production update.</span></label>
-      <div className={styles.reviewActions}><button type="button" className={styles.secondaryButton} disabled={phase === "submitting"} onClick={() => { setReview(null); setConfirmed(false); setPhase("ready"); }}>Return to Editing</button><button type="button" disabled={!confirmed || phase === "submitting"} onClick={commitReview}>{phase === "submitting" ? "Confirming…" : `Confirm ${actionTitle(review.action)}`}</button></div>
+      <label className={styles.confirmation}><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>{GOVERNANCE_ACTIONS.has(review.action) ? "I reviewed the target Player, current state, consequences, and immutable Production audit effect." : "I reviewed the masked identifiers, target players, and effect of this Production update."}</span></label>
+      <div className={styles.reviewActions}><button type="button" className={styles.secondaryButton} disabled={phase === "submitting"} onClick={() => { if (review.action === "create-player") setAddPlayerStep("validate"); setReview(null); setConfirmed(false); setPhase("ready"); }}>Return to Editing</button><button type="button" disabled={!confirmed || phase === "submitting"} onClick={commitReview}>{phase === "submitting" ? "Confirming…" : `Confirm ${actionTitle(review.action)}`}</button></div>
     </section> : null}
 
     {message ? <p className={styles.message} data-error={phase === "failure" || phase === "review" ? "true" : undefined} role={phase === "failure" ? "alert" : "status"}>{message}</p> : null}
-    {receipt ? <p className={styles.receipt}><strong>{actionTitle(receipt.action)} confirmed</strong><span>{receipt.revision !== null ? `Directory revision ${receipt.revision}` : "Authoritative server response received"}{receipt.idempotent ? " · safe retry" : ""}{receipt.timestamp ? ` · ${timestamp(receipt.timestamp)}` : ""}</span></p> : null}
+    {receipt ? <p className={styles.receipt}><strong>{actionTitle(receipt.action)} confirmed</strong><span>{receipt.revision !== null ? `${GOVERNANCE_ACTIONS.has(receipt.action) ? "Governance" : "Directory"} revision ${receipt.revision}` : "Authoritative server response received"}{receipt.idempotent ? " · safe retry" : ""}{receipt.timestamp ? ` · ${timestamp(receipt.timestamp)}` : ""}</span></p> : null}
 
-    <details className={styles.audit}><summary>Recent access activity <span>{data.audit.length}</span></summary>{data.audit.length ? <ol>{data.audit.map((item, index) => <li key={item.id || `${item.action}-${index}`}><div><strong>{productionPlayerAccessStatusLabel(item.action)}</strong><span>{item.targetPlayerId || "Production access"}</span></div><small>{item.actorDisplayName || "Tournament Director"}<br />{timestamp(item.timestamp)}</small><StateBadge value={item.result} /></li>)}</ol> : <p>No recent access activity is available.</p>}</details>
+    <details className={styles.audit}><summary>Recent access activity <span>{data.audit.length}</span></summary>{data.audit.length ? <ol>{data.audit.map((item, index) => <li key={item.id || `${item.action}-${index}`}><div><strong>{productionPlayerAccessStatusLabel(item.action)}</strong><span>{item.summary || item.targetPlayerId || "Production access"}</span></div><small>{item.actorDisplayName || "Tournament Director"}<br />{timestamp(item.timestamp)}</small><StateBadge value={item.result} /></li>)}</ol> : <p>No recent access activity is available.</p>}</details>
   </section>;
 }

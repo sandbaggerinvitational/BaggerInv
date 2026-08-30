@@ -7,7 +7,8 @@
 .panel > header > span,
 .heading > div > span,
 .bulk header span,
-.review header > span {
+.review header > span,
+.addPlayer header > div > span {
   color: #8a7241;
   font-size: .62rem;
   font-weight: 900;
@@ -80,6 +81,23 @@
   overflow-wrap: anywhere;
 }
 
+.addPlayerButton {
+  min-height: 38px;
+  margin-top: 5px;
+  padding: 7px 10px;
+  border: 1px solid #0b4938;
+  border-radius: 9px;
+  background: #0b4938;
+  color: #fff;
+  font-family: inherit;
+  font-size: .63rem;
+  font-weight: 900;
+}
+
+.addPlayerButton:disabled {
+  opacity: .48;
+}
+
 .summary {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -134,7 +152,10 @@
 .directoryControls input,
 .actionGrid input,
 .actionGrid select,
-.bulk textarea {
+.actionGrid textarea,
+.bulk textarea,
+.playerForm input,
+.playerForm select {
   box-sizing: border-box;
   width: 100%;
   min-height: 44px;
@@ -147,6 +168,185 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 1.3;
+}
+
+.addPlayer {
+  display: grid;
+  gap: 14px;
+  padding: 17px;
+  border: 1px solid #b7ccbf;
+  border-radius: 15px;
+  background: #f8fbf9;
+  box-shadow: 0 8px 22px rgba(15, 55, 43, .05);
+}
+
+.addPlayer > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.addPlayer > header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.addPlayer h3,
+.addPlayer h4 {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.addPlayer h3 {
+  font-size: 1.18rem;
+}
+
+.addPlayer h4 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.addPlayer header p,
+.validationResult > p,
+.createdPlayer > p,
+.flowNotice {
+  max-width: 760px;
+  color: #60736d;
+  font-size: .67rem;
+  line-height: 1.5;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid #d8e1dc;
+  border-radius: 9px;
+  background: #fff;
+  color: #60736d;
+  font-size: .61rem;
+  font-weight: 850;
+}
+
+.steps li span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #eef3f0;
+  font-size: .56rem;
+}
+
+.steps li[data-current="true"] {
+  border-color: #176348;
+  background: #eaf5ee;
+  color: #176348;
+}
+
+.steps li[data-complete="true"] span {
+  background: #176348;
+  color: #fff;
+}
+
+.playerForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.playerForm label {
+  display: grid;
+  gap: 5px;
+}
+
+.playerForm label > span {
+  color: #526b63;
+  font-size: .61rem;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.flowActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.flowActions button {
+  min-height: 42px;
+  padding: 8px 13px;
+  border: 1px solid #0b4938;
+  border-radius: 9px;
+  background: #0b4938;
+  color: #fff;
+  font-family: inherit;
+  font-size: .66rem;
+  font-weight: 850;
+}
+
+.flowActions button:disabled {
+  opacity: .48;
+}
+
+.validationResult,
+.createdPlayer {
+  display: grid;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid #cbd9d2;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.validationResult dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.nextActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.nextActions article {
+  display: grid;
+  gap: 4px;
+  padding: 11px;
+  border-radius: 10px;
+  background: #eef3f0;
+}
+
+.nextActions strong {
+  font-size: .7rem;
+}
+
+.nextActions span {
+  color: #60736d;
+  font-size: .62rem;
+  line-height: 1.45;
+}
+
+.flowNotice {
+  padding: 11px 12px;
+  border: 1px solid #d3bd7f;
+  border-radius: 10px;
+  background: #fff8e7;
 }
 
 .filters {
@@ -457,6 +657,50 @@
   line-height: 1.42;
 }
 
+.reasonInput {
+  min-height: 76px !important;
+  resize: vertical;
+}
+
+.readinessSummary {
+  padding: 8px 9px;
+  border-radius: 8px;
+  background: #eef3f0;
+  color: #36594e !important;
+}
+
+.readinessList {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 10px 8px 25px;
+  border: 1px solid #d7a092;
+  border-radius: 8px;
+  background: #fff1ed;
+  color: #913b2e;
+  font-size: .62rem;
+  line-height: 1.4;
+}
+
+.governanceCard {
+  border-color: #c6ae68 !important;
+  background: #fffaf0 !important;
+}
+
+.lockedNotice {
+  display: grid;
+  gap: 4px;
+  padding: 9px;
+  border: 1px solid #d3bd7f;
+  border-radius: 9px;
+  background: #fff8e7;
+}
+
+.lockedNotice strong {
+  color: #73591c;
+  font-size: .67rem;
+}
+
 .actionGrid button,
 .bulk > button,
 .reviewActions button,
@@ -750,7 +994,8 @@
 
 @media (max-width: 720px) {
   .heading,
-  .bulk > header {
+  .bulk > header,
+  .addPlayer > header {
     flex-direction: column;
   }
 
@@ -769,6 +1014,21 @@
   .deferredGrid,
   .review dl,
   .reviewActions {
+    grid-template-columns: 1fr;
+  }
+
+  .playerForm,
+  .validationResult dl,
+  .nextActions {
+    grid-template-columns: 1fr;
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .flowActions {
+    display: grid;
     grid-template-columns: 1fr;
   }
 

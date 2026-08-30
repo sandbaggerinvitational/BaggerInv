@@ -10,6 +10,13 @@ import {
   readProductionPlayersAccess,
 } from "../../../../lib/production-player-access-server.js";
 import {
+  mutateProductionAccessGovernance,
+  readProductionAccessGovernance,
+} from "../../../../lib/production-access-governance-server.js";
+import {
+  mergeProductionPlayerAccessGovernance,
+} from "../../../../lib/production-access-governance-contract.js";
+import {
   dataAuthorityResponseHeaders,
   withDataAuthorityRequestScope,
 } from "../../../../lib/data-authority-request.js";
@@ -18,7 +25,7 @@ export const dynamic = "force-dynamic";
 
 const clean = (value) => String(value ?? "").trim();
 const responseHeaders = { "Cache-Control": "private, no-store" };
-const ACTIONS = new Set([
+const PLAYER_ACCESS_ACTIONS = new Set([
   "approve-email",
   "approve-phone",
   "revoke-phone",
@@ -27,6 +34,15 @@ const ACTIONS = new Set([
   "resume-access",
   "bulk-enroll",
 ]);
+const GOVERNANCE_ACTIONS = new Set([
+  "create-player",
+  "set-global-status",
+  "withdraw-membership",
+  "reactivate-membership",
+  "grant-director",
+  "revoke-director",
+]);
+const ACTIONS = new Set([...PLAYER_ACCESS_ACTIONS, ...GOVERNANCE_ACTIONS]);
 
 function unavailable() {
   return NextResponse.json({ error: "Not found." }, { status: 404, headers: responseHeaders });
@@ -75,7 +91,7 @@ function actor(identity = {}) {
 
 function safeFailure(error) {
   const candidate = clean(error?.code).toUpperCase();
-  const code = /^PLAYER_ACCESS_[A-Z0-9_]{3,120}$/.test(candidate)
+  const code = /^(?:PLAYER_ACCESS|ACCESS_GOVERNANCE)_[A-Z0-9_]{3,120}$/.test(candidate)
     ? candidate
     : "PLAYER_ACCESS_OPERATION_FAILED";
   const messages = {
@@ -93,6 +109,39 @@ function safeFailure(error) {
     PLAYER_ACCESS_DIRECTOR_ACCESS_REVIEW_REQUIRED: "Director access must be reviewed separately before participant access can be suspended.",
     PLAYER_ACCESS_RESUME_IDENTITY_NOT_READY: "Participant access cannot resume until the current membership and verified identity are valid.",
     PLAYER_ACCESS_REVISION_STALE: "Players & Access changed since this page loaded. Refresh and review again.",
+    ACCESS_GOVERNANCE_PLAYER_NAME_INVALID: "Enter a valid Player name.",
+    ACCESS_GOVERNANCE_DISPLAY_NAME_INVALID: "Enter a valid Player display name.",
+    ACCESS_GOVERNANCE_PLAYER_SLUG_INVALID: "Use a unique lowercase profile slug containing letters, numbers, and hyphens.",
+    ACCESS_GOVERNANCE_GLOBAL_STATUS_INVALID: "Select Active or Alumni.",
+    ACCESS_GOVERNANCE_REASON_REQUIRED: "Enter a concise non-sensitive reason.",
+    ACCESS_GOVERNANCE_CONFIRMATION_REQUIRED: "Confirm this high-impact access change before continuing.",
+    ACCESS_GOVERNANCE_REVISION_STALE: "Access governance changed since this page loaded. Refresh and review again.",
+    ACCESS_GOVERNANCE_PROFILE_REVISION_REQUIRED: "Refresh this Player profile before changing its status.",
+    ACCESS_GOVERNANCE_MEMBERSHIP_REVISION_REQUIRED: "Refresh this tournament membership before changing it.",
+    ACCESS_GOVERNANCE_PROFILE_REVISION_STALE: "This Player profile changed since the page loaded. Refresh and review the status change again.",
+    ACCESS_GOVERNANCE_MEMBERSHIP_REVISION_STALE: "This tournament membership changed since the page loaded. Refresh and review the membership change again.",
+    ACCESS_GOVERNANCE_PLAYER_ID_COLLISION: "The next stable Player ID could not be reserved safely. Refresh and try again.",
+    ACCESS_GOVERNANCE_PLAYER_INPUT_INVALID: "Enter valid Player details before continuing.",
+    ACCESS_GOVERNANCE_PLAYER_IDENTITY_COLLISION: "A Player with that identity already exists.",
+    ACCESS_GOVERNANCE_PLAYER_ID_SPACE_EXHAUSTED: "A stable Player ID could not be allocated safely.",
+    ACCESS_GOVERNANCE_PLAYER_SLUG_COLLISION: "That Player profile slug is already in use.",
+    ACCESS_GOVERNANCE_DUPLICATE_PLAYER: "That Player already exists.",
+    ACCESS_GOVERNANCE_MEMBERSHIP_DEPENDENCY_BLOCKED: "This membership change is blocked by current tournament dependencies.",
+    ACCESS_GOVERNANCE_ACTIVE_MEMBERSHIP_BLOCKS_ALUMNI: "Withdraw the Player from the active tournament before changing the global status to Alumni.",
+    ACCESS_GOVERNANCE_ACTIVE_MEMBERSHIP_REQUIRED: "This action requires active tournament membership.",
+    ACCESS_GOVERNANCE_INACTIVE_MEMBERSHIP_REQUIRED: "Only a withdrawn or inactive tournament member can be reactivated.",
+    ACCESS_GOVERNANCE_ACTIVE_GLOBAL_PLAYER_REQUIRED: "Only an Active global Player can return to the tournament roster.",
+    ACCESS_GOVERNANCE_OWNER_REQUIRED: "Owner access is required for Director entitlement changes.",
+    ACCESS_GOVERNANCE_ACTIVE_OWNER_REQUIRED: "Active Owner access is required for Director entitlement changes.",
+    ACCESS_GOVERNANCE_OWNER_ADOPTION_REQUIRED: "Owner governance must be adopted through the certified owner process before Director entitlements can change.",
+    ACCESS_GOVERNANCE_LINKED_IDENTITY_REQUIRED: "Director access requires an active linked participant identity.",
+    ACCESS_GOVERNANCE_LINKED_AUTH_REQUIRED: "Director access requires an active linked and verified participant identity.",
+    ACCESS_GOVERNANCE_TARGET_ALREADY_OWNER: "An active Production Owner does not need a separate Director grant.",
+    ACCESS_GOVERNANCE_SELF_REVOKE_BLOCKED: "You cannot revoke your own Director access.",
+    ACCESS_GOVERNANCE_OWNER_REVOKE_BLOCKED: "Owner access cannot be revoked through the Director operation.",
+    ACCESS_GOVERNANCE_FINAL_OWNER_PROTECTED: "The final Production Owner cannot be revoked.",
+    ACCESS_GOVERNANCE_FINAL_ADMIN_PROTECTED: "The final active Production administrator cannot be revoked.",
+    ACCESS_GOVERNANCE_SAFE_REASON_REQUIRED: "Enter a concise non-sensitive governance reason.",
   };
   return {
     error: messages[code] || "The Players & Access operation did not complete.",
@@ -107,7 +156,14 @@ export async function GET(request) {
     const scoped = await withDataAuthorityRequestScope({
       label: "production-players-access-read",
       source: "supabase-production-players-access-v1",
-    }, () => readProductionPlayersAccess(actor(access.identity)));
+    }, async () => {
+      const identity = actor(access.identity);
+      const [playersAccess, governance] = await Promise.all([
+        readProductionPlayersAccess(identity),
+        readProductionAccessGovernance(identity),
+      ]);
+      return mergeProductionPlayerAccessGovernance(playersAccess, governance);
+    });
     return NextResponse.json({ ok: true, data: scoped.result }, {
       headers: { ...responseHeaders, ...dataAuthorityResponseHeaders(scoped.diagnostics) },
     });
@@ -142,20 +198,40 @@ export async function POST(request) {
     }, { status: 400, headers: responseHeaders });
   }
   try {
+    const governanceAction = GOVERNANCE_ACTIONS.has(action);
     const scoped = await withDataAuthorityRequestScope({
       label: `production-players-access-${action}`,
-      source: "supabase-production-players-access-v1",
-    }, () => mutateProductionPlayersAccess({
-      ...actor(access.identity),
-      action,
-      expectedRevision: input.expectedRevision,
-      operationRequestId: input.operationRequestId,
-      playerId: input.playerId,
-      email: input.email,
-      phone: input.phone,
-      preferredLoginMethod: input.preferredLoginMethod,
-      entries: input.entries,
-    }));
+      source: governanceAction
+        ? "supabase-production-access-governance-v1"
+        : "supabase-production-players-access-v1",
+    }, () => governanceAction
+      ? mutateProductionAccessGovernance({
+        ...actor(access.identity),
+        action,
+        expectedRevision: input.governanceRevision ?? input.expectedGovernanceRevision ?? input.expectedRevision,
+        expectedProfileRevision: input.expectedProfileRevision,
+        expectedMembershipRevision: input.expectedMembershipRevision,
+        operationRequestId: input.operationRequestId,
+        playerId: input.playerId,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        displayName: input.displayName,
+        slug: input.slug,
+        globalStatus: input.globalStatus,
+        reason: input.reason,
+        confirmed: input.confirmed,
+      })
+      : mutateProductionPlayersAccess({
+        ...actor(access.identity),
+        action,
+        expectedRevision: input.expectedRevision,
+        operationRequestId: input.operationRequestId,
+        playerId: input.playerId,
+        email: input.email,
+        phone: input.phone,
+        preferredLoginMethod: input.preferredLoginMethod,
+        entries: input.entries,
+      }));
     return NextResponse.json({
       ok: true,
       action,
