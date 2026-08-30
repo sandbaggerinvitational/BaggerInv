@@ -115,7 +115,8 @@ test("Match Center advertises Calcutta only for an available published presentat
   assert.equal(calcuttaDestinationAvailable({ calcutta: { available: true } }), true);
 
   const dashboard = await source("app/live/TournamentDashboard.js");
-  assert.match(dashboard, /const calcuttaAvailable = calcuttaDestinationAvailable\(data\)/);
+  assert.match(dashboard, /const calcuttaAvailabilityResolved = Boolean\(data\?\.calcutta \|\| data\?\.calcuttaState\)/);
+  assert.match(dashboard, /const calcuttaAvailable = calcuttaAvailabilityResolved &&[\s\S]*calcuttaDestinationAvailable\(data\)/);
   assert.match(dashboard, /\{calcuttaAvailable \? <nav[\s\S]*href="\/app\/tournament\?view=calcutta"[\s\S]*<\/nav> : null\}/);
 });
 

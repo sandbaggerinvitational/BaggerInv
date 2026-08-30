@@ -180,7 +180,7 @@ test("participant routes share one Tournament-owned Supabase operational result 
   assert.match(route, /X-Calcutta-Google-Requests/);
   assert.doesNotMatch(route, /getTournamentData|google-sheets/);
   assert.match(tournamentRoute, /currentCalcuttaOperationalResult/);
-  assert.match(tournamentDashboard, /href="\/live\?view=calcutta"/);
+  assert.match(tournamentDashboard, /href="\/app\/tournament\?view=calcutta"/);
   assert.match(tournamentDashboard, /\?module=calcutta/);
   assert.doesNotMatch(wrapper, /\/api\/leaderboards\/calcutta/);
   assert.doesNotMatch(leaderboardsDashboard, /\["calcutta", "Calcutta"\]/);

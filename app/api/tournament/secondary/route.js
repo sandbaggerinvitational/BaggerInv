@@ -17,6 +17,19 @@ export async function GET(request) {
     const module = new URL(request.url).searchParams.get("module") || "";
     if (module !== "calcutta") return NextResponse.json({ error: "Tournament module is not available." }, { status: 400, headers });
     const calcuttaSource = requireCalcuttaReadSource(env);
+    // The Production V1 market is participant-only. The authenticated
+    // /api/leaderboards/calcutta boundary owns that read; this legacy public
+    // projection endpoint must never expose a published auction.
+    if (calcuttaSource.productionCutover?.handled === true) {
+      return NextResponse.json({ error: "Not found." }, {
+        status: 404,
+        headers: {
+          ...headers,
+          "X-Tournament-Google-Requests": "0",
+          "X-Calcutta-Read-Source": "supabase-production-calcutta-v1-private",
+        },
+      });
+    }
     if (calcuttaSource.resolved === "supabase") {
       const operational = await currentCalcuttaOperationalResult("", {
         recalculatePending: !calcuttaSource.productionShadowCandidate,

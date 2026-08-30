@@ -806,8 +806,20 @@ V1 Player rows are **not tappable**. A native Player performance detail would ex
 | Round Player performance | Post-V1 | No bounded mobile contract; less important than core scoring |
 | Net Skins | Post-V1 or web-backed | Existing product exists, but Step 1B intentionally excludes it |
 | Published Odds Center | Web-backed V1 | Existing participant-facing web product; not tournament scoring truth |
-| Calcutta standings | Web-only/post-V1 evaluation | No approved stable native destination/DTO; never expose admin inputs |
+| Calcutta standings | Contract-defined; native UI/activation later | `production-calcutta-v1` is the approved participant DTO; current Swift and Production-native serving remain unchanged |
 | Career/statistical leaderboards | Web-backed V1 | Useful secondary history, outside live native loop |
+
+#### 12.5.1 Calcutta V1 contract boundary
+
+`GET /api/mobile/v1/calcutta` is the additive participant-safe Calcutta contract. It uses the existing verified Bearer session plus Bagger certification and derives the viewer only from the canonical Auth UUID → stable Player ID → active tournament membership chain. The request never selects a Player, tournament, environment, publication, or revision.
+
+The contract states are `NOT_CONFIGURED`, `CONFIGURED`, `AUCTION_COMPLETE`, `IN_PROGRESS`, `OFFICIAL`, and `UNAVAILABLE`. Auction lifecycle and publication are separate: there is no `AUCTION_OPEN` because the installed product records the completed auction manually and has no live-bidding authority. An authenticated active participant receives the full market only when `publicationState` is `PUBLISHED`; unpublished purchase, ownership, and result facts remain absent. Explicit unpublish preserves the canonical lifecycle and facts, so an `IN_PROGRESS` or `OFFICIAL` response may be `UNPUBLISHED` with both market and result hidden.
+
+The server supplies stable Player IDs and display names, recorded purchases and ownership, official Round inputs, ranks, points, and the complete participant-visible golfer/portfolio result. It supplies every USD money value and every ownership/payout/ROI fraction as a canonical decimal string because the authoritative rule is no payout rounding and valid results may contain fractions of a cent. Swift formats those values but never derives a payout, rank, tie award, ROI, ownership allocation, or finality state.
+
+A result may be marked stale only when its configuration and completed-auction revisions still match the current canonical revisions. A configuration or auction change invalidates that result. `data.revision` binds configuration, auction, publication, result, lifecycle state, and publication state. The response `meta.revision` and ETag additionally bind the current source fingerprint and stale/updating flags, so a freshness transition cannot be hidden by a `304`; response timestamps are not authority.
+
+This is a contract milestone, not native activation. No current Swift model, cache product, navigation destination, Preview-only health assertion, or Production-native authority changes in this step. A native screen and Production serving require a later explicitly authorized milestone.
 
 ### 12.6 Leaders states
 
@@ -917,7 +929,7 @@ The native app must not inject the Supabase Bearer token, scoring credential, or
 - History, Records, and career profiles;
 - rich Player detail from Leaders;
 - Round performance and Net Skins;
-- Calcutta participant standings if a participant-safe product/contract is approved; and
+- a Calcutta native screen and Production activation using the approved participant-safe V1 contract; and
 - notifications and notification settings.
 
 ### 13.5 Web/Admin-only exclusions
@@ -1227,7 +1239,8 @@ The first SwiftUI build and even an internal Preview milestone can proceed with 
 | Canonical tournament day number/date | Today header | Tournament DTO has current Round/status/timezone; Schedule has event dates | Add optional canonical tournament-day context if it improves multi-day navigation |
 | Absolute Match tee-time instant | Matches/deep links/notifications | Match tee time has local clock/zone but no date | Add canonical tee timestamp/date before tee-time notifications; display-only V1 remains safe |
 | Rich native Guide/Courses/History/Records | More | Existing web products | Convert selectively after the core tournament loop proves value |
-| Net Skins/Calcutta native modules | Leaders/More | Explicitly excluded from Step 1B; web/backend products exist | Define participant-safe bounded mobile products in a later feature step |
+| Net Skins native module | Leaders/More | Explicitly excluded from Step 1B; the web/backend product exists | Define and activate the participant-safe native product in a later feature step |
+| Calcutta native module | Leaders/More | `production-calcutta-v1` now defines the bounded DTO; Swift UI and Production-native serving remain dormant | Add the screen and activate Production transport only in a separately authorized native milestone |
 | APNs categories/deep links | App-wide | Product concepts only | Post-core notifications project; not first TestFlight blocker |
 
 ### 22.4 Required expected-gap answers

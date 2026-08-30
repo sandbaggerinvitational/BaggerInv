@@ -98,7 +98,7 @@ export default function TournamentSupabaseRead({ initialView = "", presentation 
       initialData={payload}
       initialView={initialView}
       readUrl="/api/tournament/live"
-      secondaryReadUrl="/api/tournament/secondary"
+      secondaryReadUrl="/api/leaderboards/calcutta"
       onConfirmedData={acceptData}
     />;
 

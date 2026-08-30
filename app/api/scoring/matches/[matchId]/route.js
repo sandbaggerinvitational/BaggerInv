@@ -11,7 +11,7 @@ import { drainGoogleOutbox } from "../../../../../lib/scoring-google-outbox.js";
 import { validateAuthoritativeParticipantSession } from "../../../../../lib/scoring-participant-authorization.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../../lib/intelligence-derived-supabase.js";
-import { recalculateCalcuttaTournament } from "../../../../../lib/calcutta-supabase.js";
+import { recalculateCalcuttaAfterCanonicalMutation } from "../../../../../lib/calcutta-post-commit.js";
 import { drainScorecardArchiveJobs } from "../../../../../lib/scorecard-archive-worker.js";
 import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../../../../lib/scoring-read-service.js";
 import { productionShadowScoringMutationResponse } from "../../../../../lib/production-shadow-scoring-safety.js";
@@ -135,8 +135,9 @@ export async function POST(request, { params }) {
           recalculateIntelligenceDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring intelligence worker · ${current.playerId || "participant"}`,
           }),
-          recalculateCalcuttaTournament(String(current.tournamentId || current.year || ""), {
+          recalculateCalcuttaAfterCanonicalMutation(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring Calcutta worker · ${current.playerId || "participant"}`,
+            mutationKey: input.clientMutationId || `scoring:${matchId}`,
           }),
         ]);
         const mirror = drained.status === "fulfilled" ? drained.value : { ok: false, failed: 1 };

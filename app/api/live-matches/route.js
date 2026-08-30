@@ -19,7 +19,7 @@ import { persistDirectorMatchLifecycle } from "../../../lib/scoring-persistence-
 import { drainGoogleOutbox } from "../../../lib/scoring-google-outbox";
 import { recalculateCompetitionDerivedTournament } from "../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../lib/intelligence-derived-supabase.js";
-import { recalculateCalcuttaTournament } from "../../../lib/calcutta-supabase.js";
+import { recalculateCalcuttaAfterCanonicalMutation } from "../../../lib/calcutta-post-commit.js";
 import { drainScorecardArchiveJobs } from "../../../lib/scorecard-archive-worker.js";
 import { authorizePreviewDirector, productionDirectorEntitlementEnvironment } from "../../../lib/preview-director-authorization.js";
 import { requireScoringAuthority } from "../../../lib/scoring-authority.js";
@@ -130,8 +130,9 @@ export async function POST(request) {
           recalculateIntelligenceDerivedTournament("", {
             calculatedBy: `Director lifecycle intelligence worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
           }),
-          recalculateCalcuttaTournament("", {
+          recalculateCalcuttaAfterCanonicalMutation("", {
             calculatedBy: `Director lifecycle Calcutta worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
+            mutationKey: operationRequestId,
           }),
         ]);
         for (const [domain, result] of [["archive", archive], ["competition", derived], ["intelligence", intelligence], ["calcutta", calcutta]]) {
@@ -231,7 +232,10 @@ export async function POST(request) {
           drainScorecardArchiveJobs({ maximum: 4, stopOnFailure: false }),
           recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
           recalculateIntelligenceDerivedTournament("", { calculatedBy: `Director lifecycle intelligence worker · ${updatedBy || "Director"}` }),
-          recalculateCalcuttaTournament("", { calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}` }),
+          recalculateCalcuttaAfterCanonicalMutation("", {
+            calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}`,
+            mutationKey: operationRequestId,
+          }),
         ]);
       } catch (error) {
         console.error("Competition derived-state Director lifecycle recalculation remains pending", {

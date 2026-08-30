@@ -190,7 +190,7 @@ Success (`200`):
 
 ## Tournament read routes
 
-All read responses use `{ "ok": true, "apiVersion": "v1", "data": ..., "meta": ... }` and are private to the verified Bearer identity with its exact Bagger certification proof. `meta.generatedAt` is an ISO-8601 UTC response timestamp. `meta.revision` is the existing canonical product fingerprint: participant Home for `/today`, Tournament Live for `/matches`, Leaderboards Core for `/leaders`, the published Guide delivery fingerprint (falling back to its existing projection revision) for `/schedule`, and the deterministic canonical Net Skins revision for `/net-skins`. The same value is a strong `ETag`; matching `If-None-Match` requests receive `304`. No client-selected revision store was introduced.
+All read responses use `{ "ok": true, "apiVersion": "v1", "data": ..., "meta": ... }` and are private to the verified Bearer identity with its exact Bagger certification proof. `meta.generatedAt` is an ISO-8601 UTC response timestamp. `meta.revision` is the existing canonical product fingerprint: participant Home for `/today`, Tournament Live for `/matches`, Leaderboards Core for `/leaders`, the published Guide delivery fingerprint (falling back to its existing projection revision) for `/schedule`, and the deterministic canonical Net Skins revision for `/net-skins`. Calcutta uses an opaque representation revision that binds its domain revision plus the current source fingerprint and stale/updating flags. The `meta.revision` value is also the strong `ETag`; matching `If-None-Match` requests receive `304`. No client-selected revision store was introduced.
 
 ### `GET /today`
 
@@ -233,6 +233,37 @@ Transport/Auth/resource failures use the existing enumeration-safe mobile errors
 #### Production activation boundary
 
 This endpoint and `net-skins.schema.json` define the final Production-native DTO without depending on a Preview-only RPC or PWA route. The repository-wide mobile authority/health gate nevertheless remains intentionally isolated to Preview. Consequently this route is dormant against Production until a separately authorized Production activation changes that shared native authority milestone. This task does not bypass the health/session proof, point Preview at Production, enable another mobile-v1 route in Production, or change the native Swift application. Activating Production native transport is separate work.
+
+### `GET /calcutta`
+
+Authentication is the same verified Supabase Bearer session plus `X-Bagger-Certification` required by every protected mobile read. The request has no Player, tournament, environment, publication, or revision query selector. The server-resolved canonical Player ID and tournament are the only identity inputs. Every active authenticated tournament participant receives the same full **published** market; `viewer.playerId` identifies the verified viewer without changing market contents.
+
+The server adapter calls the service-role-only Production RPC `read_production_calcutta_v1(input jsonb)`. The client never receives a service credential, cannot select Preview resources, and cannot request recalculation. The mobile adapter only validates and reshapes the server-computed participant projection. It does not recreate auction, ownership, rank, tie, payout, ROI, settlement, or publication logic.
+
+The versioned lifecycle state is independent from publication:
+
+There is no `AUCTION_OPEN` state: the installed workflow records a completed auction manually and has no live-bidding authority.
+
+| State | Meaning |
+| --- | --- |
+| `NOT_CONFIGURED` | No valid tournament-scoped Calcutta configuration exists. This is a successful empty read. |
+| `CONFIGURED` | The bounded Calcutta rules/configuration exist, but a complete recorded auction does not. No market is exposed. |
+| `AUCTION_COMPLETE` | Final purchase prices and exactly reconciled ownership have been recorded. A published market may be shown before any result exists. |
+| `IN_PROGRESS` | At least one official completed Round contributes to the server-computed result, but the tournament is not final. |
+| `OFFICIAL` | The tournament result and participant-visible financial result are final. |
+| `UNAVAILABLE` | The server cannot provide a safe current result. No fallback result is returned. |
+
+`publicationState` is exactly `UNPUBLISHED` or `PUBLISHED`, and `published` is its boolean equivalent. `UNPUBLISHED` always returns `market: null` and `result: null`, even if an auction was recorded or the preserved lifecycle is already `IN_PROGRESS` or `OFFICIAL`. Explicit unpublish changes visibility, not canonical auction/result facts, lifecycle, or their revision bindings; `resultRevision` may therefore remain non-null while the result body is hidden. `PUBLISHED` returns the full bounded market: pot, every purchased Player, purchase price, and every owner's stable Player identity and ownership fraction. A published `IN_PROGRESS` or `OFFICIAL` state requires a result. A published `AUCTION_COMPLETE` market may have `result: null` until a valid calculation exists. `UNAVAILABLE` never returns a result; it may retain the already-published market only while the exact current configuration and auction facts remain valid.
+
+The market and result contain only stable Player IDs and display names. They contain no email, phone, Auth UUID, identity-link row, Director entitlement, source row, raw configuration table, job, audit record, or storyline. The result is bounded to completed Round numbers, golfer rankings and server-computed Round facts, and owner portfolios/investments. It does not expose any mutation, bid, auction administration, or publication control.
+
+`currencyCode` is always `USD`. Every money value, ownership fraction, payout fraction, and ROI is a canonical base-10 string: no currency symbol, grouping separator, exponent, or client-selected precision. This preserves the installed `payout_rounding: NONE` rule and valid sub-cent server results such as `118.125`. Ranks, points, gross/net scores, and course handicaps remain JSON numbers. Native may format the strings for display but must never calculate, settle, round, or redistribute Calcutta value.
+
+The canonical domain revision is `calcutta-v1:<configuration-revision>:<auction-revision>:<publication-revision>:<result-revision-or-0>:<state>:<publication-state>` and is returned in `data.revision`. `meta.revision` and the strong `ETag` are an opaque representation fingerprint over that domain revision, the current source fingerprint, and the `stale`/`updating` flags. A freshness transition therefore cannot incorrectly return `304` while the visible result becomes stale or settles. `freshness` also includes bounded lifecycle timestamps. A stale result is eligible only when it was calculated from the exact current configuration and auction revisions. A changed configuration or auction invalidates the old result rather than serving it as stale. There is no Google, Preview, browser-route, or raw-snapshot fallback.
+
+#### Production activation boundary
+
+This endpoint and `calcutta.schema.json` define the final Production-native DTO. They do not activate it. The repository-wide mobile authority and health contract remain intentionally isolated to Preview, and the current Swift application has no Calcutta DTO, repository, cache product, or screen. Serving this endpoint from Production or changing the native environment is a separate, explicitly authorized Production-native milestone.
 
 ## Date and time
 

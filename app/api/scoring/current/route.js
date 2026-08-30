@@ -13,7 +13,7 @@ import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../.
 import { readScoringMatchView } from "../../../../lib/scoring-read-supabase.js";
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
-import { recalculateCalcuttaTournament } from "../../../../lib/calcutta-supabase.js";
+import { recalculateCalcuttaAfterCanonicalMutation } from "../../../../lib/calcutta-post-commit.js";
 import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
 import { productionCutoverPhaseAtLeast } from "../../../../lib/production-cutover-activation-contract.js";
 import { attachScoringMutationAuthorityContract, currentScoringMutationAuthorityContract } from "../../../../lib/scoring-mutation-authority-server.js";
@@ -147,8 +147,9 @@ export async function POST(request) {
           recalculateIntelligenceDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring intelligence worker · ${current.playerId || "participant"}`,
           }),
-          recalculateCalcuttaTournament(String(current.tournamentId || current.year || ""), {
+          recalculateCalcuttaAfterCanonicalMutation(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring Calcutta worker · ${current.playerId || "participant"}`,
+            mutationKey: input.clientMutationId || `scoring:${current.matchId}`,
           }),
         ]);
         const mirror = drained.status === "fulfilled" ? drained.value : { ok: false, failed: 1 };

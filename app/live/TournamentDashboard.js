@@ -23,6 +23,17 @@ const CalcuttaExperience = dynamic(() => import("./CalcuttaExperience"), {
 const FILTERS = [["all", "All"], ["live", "Live"], ["upcoming", "Upcoming"], ["final", "Final"]];
 const initials = (name) => String(name || "SBI").split(/\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join("").toUpperCase();
 const hasValue = (value) => value !== null && value !== undefined && value !== "";
+const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value || {}, key);
+
+function preserveCalcuttaProjection(next, current) {
+  return {
+    ...(next || {}),
+    ...(!hasOwn(next, "calcutta") && current?.calcutta ? { calcutta: current.calcutta } : {}),
+    ...(!hasOwn(next, "calcuttaState") && current?.calcuttaState
+      ? { calcuttaState: current.calcuttaState }
+      : {}),
+  };
+}
 
 function Logo({ filename, name, type = "team", size = "medium" }) {
   const src = type === "tournament" ? tournamentLogo(filename) : type === "course" ? courseLogo(filename) : teamLogo(filename);
@@ -149,10 +160,15 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
   const [lastRefresh, setLastRefresh] = useState(Date.now());
   const [clock, setClock] = useState(Date.now());
   const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
-  const [secondaryState, setSecondaryState] = useState(initialData?.calcutta ? "ready" : "idle");
+  const [secondaryState, setSecondaryState] = useState(
+    initialData?.calcutta || initialData?.calcuttaState ? "ready" : "idle",
+  );
   const pending = useRef(null);
+  const secondaryPending = useRef(null);
   useEffect(() => {
-    if (initialData?.tournament) setData(initialData);
+    if (initialData?.tournament) {
+      setData((current) => preserveCalcuttaProjection(initialData, current));
+    }
   }, [initialData]);
   const refresh = useCallback(() => {
     if (pending.current) return pending.current;
@@ -160,21 +176,49 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
     pending.current = fetchWithTransientRetry(readUrl, { cache: "no-store" }).then(async (response) => {
       const payload = await response.json();
       if (!response.ok || !payload.data) throw new Error(payload.error || "Unable to refresh tournament data.");
-      setData(payload.data); onConfirmedData?.(payload.data); setLastRefresh(Date.now()); setRefreshState("current");
+      setData((current) => preserveCalcuttaProjection(payload.data, current));
+      onConfirmedData?.(payload.data); setLastRefresh(Date.now()); setRefreshState("current");
     }).catch(() => setRefreshState("error")).finally(() => { pending.current = null; });
     return pending.current;
   }, [onConfirmedData, readUrl]);
+  const loadCalcutta = useCallback((force = false) => {
+    if ((!force && (data?.calcutta || data?.calcuttaState)) || !secondaryReadUrl || secondaryPending.current) {
+      return secondaryPending.current;
+    }
+    setSecondaryState("loading");
+    secondaryPending.current = fetch(secondaryReadUrl + "?module=calcutta", {
+      cache: "no-store",
+      credentials: "same-origin",
+    }).then(async (response) => {
+      const payload = await response.json();
+      const calcutta = payload.data?.calcutta || payload.data || null;
+      const calcuttaState = payload.calcuttaState || payload.data?.calcuttaState || null;
+      if (!response.ok || (!calcutta && !calcuttaState)) {
+        throw new Error(payload.error || "Calcutta is unavailable.");
+      }
+      setData((current) => {
+        const next = { ...(current || {}) };
+        delete next.calcutta;
+        delete next.calcuttaState;
+        return {
+          ...next,
+          ...(calcutta ? { calcutta } : {}),
+          ...(calcuttaState ? { calcuttaState } : {}),
+        };
+      });
+      setSecondaryState("ready");
+    }).catch(() => setSecondaryState("error")).finally(() => {
+      secondaryPending.current = null;
+    });
+    return secondaryPending.current;
+  }, [data?.calcutta, data?.calcuttaState, secondaryReadUrl]);
   const openCalcutta = useCallback(() => {
     setSelectedRound("calcutta");
-    if (data?.calcutta || !secondaryReadUrl || secondaryState === "loading") return;
-    setSecondaryState("loading");
-    fetch(secondaryReadUrl + "?module=calcutta", { cache: "no-store" }).then(async (response) => {
-      const payload = await response.json();
-      if (!response.ok || !payload.data) throw new Error(payload.error || "Calcutta is unavailable.");
-      setData((current) => ({ ...current, calcutta: payload.data }));
-      setSecondaryState("ready");
-    }).catch(() => setSecondaryState("error"));
-  }, [data?.calcutta, secondaryReadUrl, secondaryState]);
+    return loadCalcutta();
+  }, [loadCalcutta]);
+  useEffect(() => {
+    if (secondaryState === "idle" && secondaryReadUrl) loadCalcutta();
+  }, [loadCalcutta, secondaryReadUrl, secondaryState]);
   useEffect(() => {
     if (initialView === "calcutta") {
       openCalcutta();
@@ -186,13 +230,17 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
   }, [data?.rounds, data?.tournament?.currentRound, initialView, openCalcutta]);
   useEffect(() => {
     if (!initialData) refresh();
-    const poll = () => { if (document.visibilityState === "visible") refresh(); };
+    const poll = () => {
+      if (document.visibilityState !== "visible") return;
+      refresh();
+      if (secondaryReadUrl) loadCalcutta(true);
+    };
     const timer = window.setInterval(poll, 45_000);
     const clockTimer = window.setInterval(() => setClock(Date.now()), 10_000);
     window.addEventListener("focus", poll);
     document.addEventListener("visibilitychange", poll);
     return () => { window.clearInterval(timer); window.clearInterval(clockTimer); window.removeEventListener("focus", poll); document.removeEventListener("visibilitychange", poll); };
-  }, [refresh]);
+  }, [initialData, loadCalcutta, refresh, secondaryReadUrl]);
   const tournament = data?.tournament;
   const rounds = data?.rounds || [];
   const activeRound = rounds.find((round) => Number(round.number) === Number(selectedRound)) || rounds.find((round) => Number(round.number) === Number(tournament?.currentRound)) || rounds[0];
@@ -208,7 +256,19 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
     matches: selectedRounds.flatMap((round) => round.matches || []),
   });
   const updated = refreshState === "error" ? "Unable to refresh • showing last confirmed data" : refreshState === "refreshing" ? "Updating tournament data…" : relativeUpdatedLabel(lastRefresh, clock);
-  const calcuttaAvailable = calcuttaDestinationAvailable(data);
+  const calcuttaAvailabilityResolved = Boolean(data?.calcutta || data?.calcuttaState) ||
+    !secondaryReadUrl || secondaryState === "ready";
+  const calcuttaAvailable = calcuttaAvailabilityResolved &&
+    calcuttaDestinationAvailable(data);
+  const calcuttaMessage = data?.calcuttaState?.state === "UNAVAILABLE"
+    ? ["Calcutta is temporarily unavailable.", "The live Tournament remains available. Try again later."]
+    : data?.calcuttaState?.publicationState === "UNPUBLISHED"
+      ? ["Calcutta is not published.", "The Director has not published the participant market."]
+      : data?.calcuttaState?.state === "NOT_CONFIGURED"
+        ? ["Calcutta is not configured.", "The live Tournament remains available."]
+        : secondaryState === "error"
+          ? ["Calcutta is temporarily unavailable.", "The live Tournament remains available. This section can be retried independently."]
+          : ["Loading Calcutta…", "Loading the latest Director-published market."];
   if (!tournament) return <section className={styles.page}><div className={styles.empty} role="status">
     <strong>{refreshState === "refreshing" ? "Preparing Tournament…" : "Tournament data is temporarily unavailable."}</strong>
     <span>{refreshState === "refreshing" ? "Please wait while tournament data is refreshed." : "Automatic recovery could not be completed."}</span>
@@ -220,7 +280,18 @@ export default function TournamentDashboard({ initialData, initialView = "", loa
       <Link href="/app/tournament" aria-current={selectedRound !== "calcutta" ? "page" : undefined} onClick={() => setSelectedRound(activeRound?.number || tournament.currentRound || rounds[0]?.number)}>Tournament</Link>
       <Link href="/app/tournament?view=calcutta" aria-current={selectedRound === "calcutta" ? "page" : undefined} onClick={openCalcutta}>Calcutta</Link>
     </nav> : null}
-    {selectedRound === "calcutta" ? data?.calcutta ? <CalcuttaExperience model={data.calcutta} /> : <div className={styles.empty} role="status"><strong>{secondaryState === "error" ? "Calcutta is temporarily unavailable." : "Loading Calcutta…"}</strong><span>{secondaryState === "error" ? "The live Tournament remains available. This projected section can be retried independently." : "Loading the latest imported Director-published results."}</span>{secondaryState === "error" ? <button type="button" onClick={() => { setSecondaryState("idle"); openCalcutta(); }}>Try again</button> : null}</div> : <>
+    {selectedRound === "calcutta" ? data?.calcutta ? <>
+      {secondaryState === "error" || data?.calcuttaState?.stale || data?.calcuttaState?.freshness?.stale || data?.calcuttaState?.freshness?.updating
+        ? <p className={styles.note} role="status" aria-live="polite">
+          {secondaryState === "error"
+            ? "Unable to refresh Calcutta; showing the last confirmed result."
+            : data?.calcuttaState?.stale || data?.calcuttaState?.freshness?.stale
+            ? "Calcutta is updating; showing the last calculated result."
+            : "Calcutta is updating from official tournament results."}
+        </p>
+        : null}
+      <CalcuttaExperience model={data.calcutta} />
+    </> : <div className={styles.empty} role="status"><strong>{calcuttaMessage[0]}</strong><span>{calcuttaMessage[1]}</span>{secondaryState === "error" ? <button type="button" onClick={() => { setData((current) => ({ ...current, calcuttaState: null })); setSecondaryState("idle"); }}>Try again</button> : null}</div> : <>
     <nav className={styles.rounds} aria-label="Select tournament round">{rounds.map((round) => <button type="button" aria-pressed={String(selectedRound) === String(round.number)} onClick={() => setSelectedRound(round.number)} key={round.number}>{round.label}</button>)}</nav>
     <div className={styles.filters} role="group" aria-label="Filter tournament matches">{FILTERS.map(([value,label]) => { const count = selectedRounds.flatMap((round) => round.matches || []).filter((match) => value === "all" || matchState(match) === value).length; return <button type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} key={value}>{label}<span>{count}</span></button>; })}</div>
     <Snapshot tournament={tournament} activeRound={activeRound} momentum={data?.momentum} updatedLabel={updated} />

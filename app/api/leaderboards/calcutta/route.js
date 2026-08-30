@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { currentCalcuttaOperationalResult } from "../../../../lib/calcutta-supabase.js";
 import { requireCalcuttaReadSource } from "../../../../lib/calcutta-read-source.js";
+import { currentProductionCalcuttaV1 } from "../../../../lib/production-calcutta-v1.js";
 import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { requireParticipantIdentityAuthority } from "../../../../lib/participant-identity-authority.js";
 import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
@@ -22,18 +23,27 @@ export async function GET(request) {
     const identityStartedAt = performance.now();
     const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStartedAt;
-    const operational = await currentCalcuttaOperationalResult(identity.tournamentId, {
-      recalculatePending: !source.productionShadowCandidate,
-      calculatedBy: `participant-read:${identity.playerId}`,
-      env,
-    });
-    if (!operational.calcutta) throw Object.assign(new Error("Calcutta result is unavailable."), { code: "CALCUTTA_RESULT_REQUIRED" });
+    const productionV1 = source.productionCutover?.handled === true;
+    const operational = productionV1
+      ? await currentProductionCalcuttaV1({ playerId: identity.playerId, env })
+      : await currentCalcuttaOperationalResult(identity.tournamentId, {
+        recalculatePending: !source.productionShadowCandidate,
+        calculatedBy: `participant-read:${identity.playerId}`,
+        env,
+      });
+    if (!productionV1 && !operational.calcutta) {
+      throw Object.assign(new Error("Calcutta result is unavailable."), {
+        code: "CALCUTTA_RESULT_REQUIRED",
+      });
+    }
     const totalMs = performance.now() - startedAt;
     const response = NextResponse.json({
       data: operational.calcutta,
+      calcuttaState: operational.calcuttaState || null,
       freshness: {
         stale: operational.stale, snapshot: operational.snapshot, job: operational.job,
         recalculated: Boolean(operational.recalculation),
+        revision: operational.revision || "",
       },
       player: { id: identity.playerId, name: identity.displayName },
       readDiagnostics: {
@@ -47,6 +57,10 @@ export async function GET(request) {
     }, { headers });
     response.headers.set("X-Calcutta-Read-Source", "supabase");
     response.headers.set("X-Calcutta-Google-Requests", "0");
+    if (operational.calcuttaState?.state) {
+      response.headers.set("X-Calcutta-State", operational.calcuttaState.state);
+      response.headers.set("X-Calcutta-Publication-State", operational.calcuttaState.publicationState);
+    }
     response.headers.set("X-Participant-Identity-Authority", "supabase");
     response.headers.set("Server-Timing", `identity;dur=${identityMs.toFixed(1)}, postgres;dur=${Number(operational.queryMs || 0).toFixed(1)}, supabase;dur=${Number(operational.serviceMs || 0).toFixed(1)}, calculation;dur=${Number(operational.recalculation?.calculated?.calculationMs || 0).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;
