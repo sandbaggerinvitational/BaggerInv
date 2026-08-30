@@ -138,7 +138,7 @@ test("Production overview reads Supabase contracts without touching Preview, Pas
 
 test("Production console foundation exposes the bounded navigation and hides legacy editors", async () => {
   assert.deepEqual(PRODUCTION_DIRECTOR_SECTIONS.map((section) => section.label), [
-    "Overview", "Players & Access", "Handicaps", "Tournament Day", "Odds & Side Games", "Draft & Guide", "System / Audit",
+    "Overview", "Players & Access", "Handicaps", "Tournament Setup", "Tournament Day", "Odds & Side Games", "Draft & Guide", "System / Audit",
   ]);
   const [consoleSource, page, productionRoute, legacyDashboard] = await Promise.all([
     source("app/admin/director/ProductionDirectorConsole.js"),

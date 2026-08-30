@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
 import styles from "./production-director.module.css";
@@ -112,11 +112,58 @@ export function TournamentDayPanel({ data, refresh }) {
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState(null);
   const [refreshFailed, setRefreshFailed] = useState(false);
+  const [setupReadiness, setSetupReadiness] = useState({ phase: "loading", matches: [] });
   const identities = useRef(null);
   const registry = () => {
     if (!identities.current) identities.current = createClientMutationOperationIdentityRegistry();
     return identities.current;
   };
+  const loadSetupReadiness = useCallback(async () => {
+    try {
+      const payload = await jsonRequest("/api/director/tournament-setup");
+      setSetupReadiness({ phase: "ready", matches: Array.isArray(payload.data?.matches) ? payload.data.matches : [] });
+      return true;
+    } catch {
+      setSetupReadiness({ phase: "failure", matches: [] });
+      return false;
+    }
+  }, []);
+  useEffect(() => { loadSetupReadiness(); }, [loadSetupReadiness]);
+  const setupMatches = useMemo(() => new Map(
+    setupReadiness.matches.map((match) => [clean(match.matchId || match.match_id), match]),
+  ), [setupReadiness.matches]);
+  const rounds = useMemo(() => data.tournamentDay.rounds.map((round) => ({
+    ...round,
+    matches: round.matches.map((match) => {
+      if (upper(match.status) !== "UPCOMING") return match;
+      const setup = setupMatches.get(clean(match.id));
+      const scoringReady = setupReadiness.phase === "ready" && setup?.scoringReady === true;
+      const reasons = Array.isArray(setup?.scoringReadinessReasons)
+        ? setup.scoringReadinessReasons.filter(Boolean)
+        : [];
+      const readinessMessage = scoringReady
+        ? ""
+        : reasons[0] || (setupReadiness.phase === "loading"
+          ? "Checking authoritative scoring readiness before Mark Live."
+          : setupReadiness.phase === "failure"
+            ? "Scoring readiness is temporarily unavailable. Mark Live is paused."
+            : "Complete Tournament Setup and prepare a current scoring snapshot before Mark Live.");
+      const current = {
+        ...match,
+        scoringReady,
+        scoringReadinessReasons: reasons,
+      };
+      const priorWarnings = match.warnings.filter((warning) =>
+        !/^Scoring readiness must be verified before this match can be marked Live\.$/.test(warning));
+      return {
+        ...current,
+        actions: scoringReady
+          ? ["mark-live", ...match.actions.filter((action) => action !== "mark-live")]
+          : match.actions.filter((action) => action !== "mark-live"),
+        warnings: [...new Set([readinessMessage, ...priorWarnings].filter(Boolean))],
+      };
+    }),
+  })), [data.tournamentDay.rounds, setupMatches, setupReadiness.phase]);
   const execute = async () => {
     if (!pending) return;
     const definition = ACTIONS[pending.action];
@@ -135,7 +182,7 @@ export function TournamentDayPanel({ data, refresh }) {
       const authoritative = response.receipt || response.data?.match || {};
       setPending(null);
       setReceipt({ title: `${definition.label} confirmed`, message: `Match ${pending.match.matchNumber} is authoritative at revision ${authoritative.match_revision ?? pending.match.matchRevision + 1}.` });
-      const refreshed = await refresh();
+      const [refreshed] = await Promise.all([refresh(), loadSetupReadiness()]);
       if (!refreshed) {
         setRefreshFailed(true);
         setReceipt({
@@ -159,7 +206,7 @@ export function TournamentDayPanel({ data, refresh }) {
     </section>
     <Receipt receipt={receipt} />
     {refreshFailed ? <div className={styles.inlineNotice} role="alert">Controls are paused because the latest authoritative match revisions are unavailable. <button type="button" onClick={async () => setRefreshFailed(!(await refresh()))}>Refresh Authoritative State</button></div> : null}
-    {data.tournamentDay.rounds.map((round) => <section className={styles.panel} key={round.number}>
+    {rounds.map((round) => <section className={styles.panel} key={round.number}>
       <header><span>Round {round.number}</span><h2>{round.label}</h2><p>{round.format} · {pretty(round.status)}</p></header>
       <div className={styles.matchGrid}>{round.matches.map((match) => <MatchCard key={match.id} match={match} busy={busy || refreshFailed || !data.tournamentDay.available} onAction={(action, selected) => setPending({ action, match: selected })} />)}</div>
     </section>)}
