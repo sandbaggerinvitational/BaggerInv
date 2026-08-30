@@ -138,7 +138,7 @@ test("Production overview reads Supabase contracts without touching Preview, Pas
 
 test("Production console foundation exposes the bounded navigation and hides legacy editors", async () => {
   assert.deepEqual(PRODUCTION_DIRECTOR_SECTIONS.map((section) => section.label), [
-    "Overview", "Handicaps", "Tournament Day", "Odds & Side Games", "Draft & Guide", "System / Audit",
+    "Overview", "Players & Access", "Handicaps", "Tournament Day", "Odds & Side Games", "Draft & Guide", "System / Audit",
   ]);
   const [consoleSource, page, productionRoute, legacyDashboard] = await Promise.all([
     source("app/admin/director/ProductionDirectorConsole.js"),
@@ -151,6 +151,7 @@ test("Production console foundation exposes the bounded navigation and hides leg
     "Reset Preview Tournament", "Open Full Admin", "Player Passport", "Workbook Connected",
   ]) assert.doesNotMatch(consoleSource, new RegExp(hidden), hidden);
   assert.match(consoleSource, /data-production-console-slot="handicaps"[\s\S]*WeeklyHandicapPanel/);
+  assert.match(consoleSource, /section === "players-access"[\s\S]*ProductionPlayersAccessPanel/);
   assert.match(page, /production\.production && !production\.enabled[\s\S]*allowBootstrap: !production\.production[\s\S]*ProductionDirectorConsole[\s\S]*DirectorDashboard/);
   assert.match(productionRoute, /authorization\.source !== "production-director-entitlement"/);
   assert.match(productionRoute, /DIRECTOR_DATA_UNAVAILABLE/);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import WeeklyHandicapPanel from "./WeeklyHandicapPanel.js";
+import ProductionPlayersAccessPanel from "./ProductionPlayersAccessPanel.js";
 import {
   DraftGuidePanel,
   OddsAndSideGamesPanel,
@@ -167,6 +168,7 @@ export default function ProductionDirectorConsole({ directorName, initialSection
     </nav>
     <main className={styles.content}>
       {section === "overview" ? <Overview data={data} /> : null}
+      {section === "players-access" ? <ProductionPlayersAccessPanel /> : null}
       {section === "handicaps" ? <div className={styles.handicapSlot} data-production-console-slot="handicaps"><WeeklyHandicapPanel /></div> : null}
       {section === "tournament-day" ? <TournamentDayPanel data={data} refresh={refresh} /> : null}
       {section === "odds-side-games" ? <OddsAndSideGamesPanel data={data} refresh={refresh} /> : null}
