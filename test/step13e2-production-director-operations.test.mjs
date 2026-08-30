@@ -21,7 +21,7 @@ const mutationContract = {
   deploymentCommit: "a".repeat(40),
 };
 
-function fixture({ status = "UPCOMING", locked = false, scoredHoles = 0, complete = false, unresolved = 0, result = "Scheduled", permissions = "active" } = {}) {
+function fixture({ status = "UPCOMING", locked = false, scoredHoles = 0, complete = false, unresolved = 0, result = "Scheduled", permissions = "active", scoringReady = true } = {}) {
   const players = [
     { player_id: "CB01", display_name: "Clay", team_side: 1 },
     { player_id: "AM01", display_name: "Alex", team_side: 2 },
@@ -32,6 +32,8 @@ function fixture({ status = "UPCOMING", locked = false, scoredHoles = 0, complet
     scored_holes: scoredHoles, holes_remaining: 18 - scoredHoles,
     running_result: result, result_winner: complete ? "Team 1" : "",
     scorecard_complete: complete, unresolved_mutations: unresolved,
+    scoring_ready: scoringReady,
+    scoring_readiness_reasons: scoringReady ? [] : ["Scoring snapshot needs preparation."],
     match_revision: 7, permission_revision: 4, updated_at: "2026-09-24T15:00:00Z",
   };
   const permissionRows = permissions === "missing" ? [] : players.map((player, index) => ({
@@ -59,6 +61,10 @@ test("Tournament Day exposes only legal state-aware controls and keeps scoring l
   assert.equal(upcoming.available, true);
   assert.deepEqual(upcoming.rounds[0].matches[0].actions, ["mark-live", "scoring-lock", "access-revoke"]);
   assert.equal(upcoming.rounds[0].matches[0].accessState, "ACTIVE");
+
+  const notReady = buildProductionTournamentDay({ ...fixture({ scoringReady: false }), mutationContract });
+  assert.deepEqual(notReady.rounds[0].matches[0].actions, ["scoring-lock", "access-revoke"]);
+  assert.match(notReady.rounds[0].matches[0].warnings[0], /snapshot needs preparation/i);
 
   const locked = buildProductionTournamentDay({ ...fixture({ status: "LIVE", locked: true, permissions: "revoked" }), mutationContract });
   assert.deepEqual(locked.rounds[0].matches[0].actions, ["scoring-unlock"]);
@@ -121,6 +127,10 @@ test("Tournament Day UI reuses certified APIs, preserves idempotency, threads st
     source("lib/scoring-persistence-adapter.js"),
   ]);
   assert.match(ui, /createClientMutationOperationIdentityRegistry/);
+  assert.match(ui, /\/api\/director\/tournament-setup/);
+  assert.match(ui, /setup\?\.scoringReady === true/);
+  assert.match(ui, /Scoring readiness is temporarily unavailable\. Mark Live is paused\./);
+  assert.match(ui, /priorWarnings = match\.warnings\.filter/);
   assert.match(ui, /"match-mark-live"/);
   assert.match(ui, /"match-lock-scoring"/);
   assert.match(ui, /"match-unlock-scoring"/);
@@ -130,7 +140,7 @@ test("Tournament Day UI reuses certified APIs, preserves idempotency, threads st
   assert.match(ui, /"match-reopen"/);
   assert.match(ui, /expectedMatchRevision: pending\.match\.matchRevision/);
   assert.match(ui, /expectedPermissionRevision: pending\.match\.permissionRevision/);
-  assert.match(ui, /await refresh\(\)/);
+  assert.match(ui, /Promise\.all\(\[refresh\(\), loadSetupReadiness\(\)\]\)/);
   assert.match(ui, /Controls are paused because the latest authoritative match revisions are unavailable/);
   assert.match(ui, /Scoring is locked and participant scoring access is revoked/);
   assert.match(ui, /Scoring is unlocked and participant scoring access is activated/);
@@ -139,6 +149,7 @@ test("Tournament Day UI reuses certified APIs, preserves idempotency, threads st
   assert.match(liveRoute, /expectedPermissionRevision/);
   assert.match(adapter, /expected_match_revision: expectedMatchRevision == null/);
   assert.match(adapter, /permission_revision: expectedPermissionRevision == null/);
+  assert.match(adapter, /PRODUCTION_MATCH_NOT_SCORING_READY:[\s\S]*prepare a current scoring snapshot/);
 });
 
 test("Odds UI is Supabase-publication-only and Prediction Settings sync never auto-publishes", async () => {
