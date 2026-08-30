@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import WeeklyHandicapPanel from "./WeeklyHandicapPanel.js";
 import ProductionPlayersAccessPanel from "./ProductionPlayersAccessPanel.js";
 import ProductionTournamentSetupPanel from "./ProductionTournamentSetupPanel.js";
+import ProductionFutureYearAdministrationPanel from "./ProductionFutureYearAdministrationPanel.js";
 import {
   DraftGuidePanel,
   OddsAndSideGamesPanel,
@@ -172,6 +173,7 @@ export default function ProductionDirectorConsole({ directorName, initialSection
       {section === "players-access" ? <ProductionPlayersAccessPanel /> : null}
       {section === "handicaps" ? <div className={styles.handicapSlot} data-production-console-slot="handicaps"><WeeklyHandicapPanel /></div> : null}
       {section === "tournament-setup" ? <ProductionTournamentSetupPanel /> : null}
+      {section === "tournaments" ? <ProductionFutureYearAdministrationPanel /> : null}
       {section === "tournament-day" ? <TournamentDayPanel data={data} refresh={refresh} /> : null}
       {section === "odds-side-games" ? <OddsAndSideGamesPanel data={data} refresh={refresh} /> : null}
       {section === "draft-guide" ? <DraftGuidePanel data={data} refresh={refresh} /> : null}
