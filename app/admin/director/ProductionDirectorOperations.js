@@ -33,8 +33,8 @@ async function jsonRequest(endpoint, body) {
 
 function Status({ value, children }) {
   const normalized = upper(value);
-  const ready = ["ACTIVE", "CURRENT", "ENABLED", "HEALTHY", "LIVE", "OPEN", "OFFICIAL", "PUBLISHED", "READY", "SUPABASE", "NORMAL", "VALID"].includes(normalized);
-  const attention = ["FAILED", "STALE", "MIXED", "NEEDS_SETUP", "UNAVAILABLE", "BLOCKED", "RETRYABLE"].includes(normalized);
+  const ready = ["ACTIVE", "COMPLETE", "CURRENT", "ENABLED", "HEALTHY", "LIVE", "OPEN", "OFFICIAL", "PUBLISHED", "READY", "RECONCILED", "SUPABASE", "NORMAL", "VALID", "VALIDATED"].includes(normalized);
+  const attention = ["ATTENTION", "FAILED", "STALE", "MIXED", "NEEDS_SETUP", "RECALCULATION_REQUIRED", "UNAVAILABLE", "BLOCKED", "RETRYABLE"].includes(normalized);
   return <span className={styles.stateBadge} data-state={ready ? "ready" : attention ? "attention" : "neutral"}>{children || pretty(value)}</span>;
 }
 
@@ -290,6 +290,8 @@ function OddsPanel({ data, refresh }) {
 
 function NetSkinsCard({ data, refresh }) {
   const state = data.publications.netSkins;
+  const privateState = data.privateOperations?.netSkins;
+  const readiness = privateState?.readiness;
   const fingerprint = useRequestFingerprints();
   const [busy, setBusy] = useState("");
   const [queued, setQueued] = useState(false);
@@ -318,23 +320,106 @@ function NetSkinsCard({ data, refresh }) {
   };
   return <article className={styles.operationCard}>
     <header><div><small>Supabase canonical contract</small><h3>Net Skins</h3></div><Status value={state.state} /></header>
-    <p>{upper(state.state) === "NOT_CONFIGURED" ? "Net Skins will become configurable once tournament pairings and handicap inputs are complete." : "Official-only Net Skins results use canonical pairings, handicaps, and completed scoring."}</p>
+    <p>{upper(state.state) === "NOT_CONFIGURED"
+      ? readiness?.canConfigure
+        ? "The canonical tournament inputs are complete and ready for Director configuration."
+        : "Net Skins is not configured. The readiness review below identifies only the canonical facts still needed."
+      : "Official-only Net Skins results use canonical pairings, handicaps, and completed scoring."}</p>
     <dl className={styles.compactFacts}>
       <div><dt>Configuration revision</dt><dd>{state.configurationRevision ?? 0}</dd></div>
       <div><dt>Configured rounds</dt><dd>{state.configuredRounds?.join(", ") || "None"}</dd></div>
       <div><dt>Result revision</dt><dd>{state.resultRevision ?? 0}</dd></div>
-      <div><dt>Freshness</dt><dd>{state.stale ? "Updating" : "Current"}</dd></div>
+      <div><dt>Input readiness</dt><dd><Status value={readiness?.state || "UNAVAILABLE"} /></dd></div>
     </dl>
+    {readiness ? <details className={styles.disclosure} open={upper(state.state) === "NOT_CONFIGURED"}>
+      <summary>Canonical input readiness · {readiness.readyMatches} of {readiness.totalMatches} matches ready</summary>
+      {readiness.issues.length ? <div className={styles.readinessIssues}>{readiness.issues.map((issue) => <article key={issue.code}>
+        <div><strong>{issue.label}</strong><Status value="NEEDS_SETUP">Needs setup</Status></div>
+        <p>{issue.summary}</p>
+        {issue.byRound.length ? <span>{issue.byRound.map((round) => `Round ${round.round}: ${round.missingCount}`).join(" · ")}</span> : null}
+      </article>)}</div> : <div className={styles.allReady}><strong>Canonical inputs are ready</strong><span>All certified Net Skins V1 prerequisites are complete.</span></div>}
+    </details> : <div className={styles.inlineNotice}>Actionable Net Skins readiness is temporarily unavailable. No configuration action is offered.</div>}
     <div className={styles.actionRow}>
-      {upper(state.state) === "NOT_CONFIGURED" ? <button type="button" disabled={Boolean(busy)} onClick={() => run("configure")}>{busy ? "Checking readiness…" : "Configure from Canonical Inputs"}</button> : <button type="button" disabled={Boolean(busy)} onClick={() => run("enqueue")}>Queue Recalculation</button>}
+      {upper(state.state) === "NOT_CONFIGURED" ? <button type="button" disabled={Boolean(busy) || !readiness?.canConfigure} onClick={() => run("configure")}>{busy ? "Checking readiness…" : readiness?.canConfigure ? "Configure from Canonical Inputs" : "Complete Canonical Setup First"}</button> : <button type="button" disabled={Boolean(busy)} onClick={() => run("enqueue")}>Queue Recalculation</button>}
       {queued ? <button type="button" disabled={Boolean(busy)} onClick={() => run("process")}>Process Queued Calculation</button> : null}
     </div>
+    <PrivateJobList title="Net Skins calculations" jobs={privateState?.jobs || []} />
     {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
   </article>;
 }
 
+function PrivateJobList({ title, jobs = [] }) {
+  return <details className={styles.disclosure}>
+    <summary>{title} · {jobs.length ? `${jobs.length} recent` : "none"}</summary>
+    {jobs.length ? <div className={styles.privateJobs}>{jobs.map((job, index) => <article key={`${job.domain}-${job.round || "all"}-${job.requestedAt}-${index}`}>
+      <div><strong>{job.round ? `Round ${job.round}` : pretty(job.domain)}</strong><span>Requested {timestamp(job.requestedAt)}</span></div>
+      <Status value={job.status} />
+      <div><span>Configuration {job.configurationRevision || "current"}</span>{job.resultRevision ? <span>Result {job.resultRevision}</span> : null}</div>
+      {job.failureDescription ? <p>{job.failureDescription}</p> : null}
+    </article>)}</div> : <p className={styles.empty}>No recalculation jobs have been recorded.</p>}
+  </details>;
+}
+
+function decimalMoney(value, currency = "USD") {
+  const amount = clean(value);
+  if (!amount) return "Not recorded";
+  return currency === "USD" ? `$${amount}` : `${amount} ${currency}`;
+}
+
+function CalcuttaPrivateReview({ review }) {
+  if (!review) return <div className={styles.inlineNotice}>Director-private Calcutta review is temporarily unavailable. Unpublished facts remain protected.</div>;
+  if (!review.configuration) return <div className={styles.empty}>No Calcutta rules, payout allocation, purchases, owners, or prices have been entered for 2026.</div>;
+  return <div className={styles.privateReview}>
+    <dl className={styles.compactFacts}>
+      <div><dt>Rules validation</dt><dd><Status value={review.configuration.validationStatus} /></dd></div>
+      <div><dt>Auction reconciliation</dt><dd><Status value={review.auction?.reconciliationStatus || "NOT_RECORDED"} /></dd></div>
+      <div><dt>Market pot</dt><dd>{review.auction ? decimalMoney(review.auction.pot, review.currencyCode) : "Not recorded"}</dd></div>
+      <div><dt>Purchased players</dt><dd>{review.auction?.purchaseCount || 0}</dd></div>
+      <div><dt>Owners</dt><dd>{review.auction?.ownerCount || 0}</dd></div>
+      <div><dt>Result freshness</dt><dd><Status value={review.result?.freshness || "MISSING"} /></dd></div>
+    </dl>
+    <details className={styles.disclosure}>
+      <summary>Rules & payout allocation</summary>
+      <div className={styles.ruleFacts}>
+        <p>Player assets · Manual completed auction entry · No payout rounding · No settlement ledger</p>
+        {review.configuration.pointStructure.length ? <div className={`${styles.dataTable} ${styles.pointTable}`} role="table" aria-label="Calcutta point awards">
+          <div role="row"><strong>Place</strong><strong>Round 1</strong><strong>Round 2</strong><strong>Round 3</strong></div>
+          {review.configuration.pointStructure.map((row) => <div role="row" key={row.place}><span>{row.place}</span><span>{row.round1Award}</span><span>{row.round2Award}</span><span>{row.round3Award}</span></div>)}
+        </div> : <p>No point awards have been recorded.</p>}
+        {review.configuration.payoutStructure.length ? <div className={styles.dataTable} role="table" aria-label="Calcutta payout allocation">
+          <div role="row"><strong>Place</strong><strong>Round 1</strong><strong>Round 2</strong><strong>Round 3</strong><strong>Overall</strong></div>
+          {review.configuration.payoutStructure.map((row) => <div role="row" key={row.place}><span>{row.place}</span><span>{row.round1Fraction}</span><span>{row.round2Fraction}</span><span>{row.round3Fraction}</span><span>{row.overallFraction}</span></div>)}
+        </div> : <p>No payout allocation has been recorded.</p>}
+      </div>
+    </details>
+    <details className={styles.disclosure}>
+      <summary>Auction & ownership · {review.auction?.purchaseCount || 0} purchased</summary>
+      {review.auction?.purchases?.length ? <div className={styles.purchaseList}>{review.auction.purchases.map((purchase) => <article key={purchase.player.id}>
+        <header><div><strong>{purchase.player.name || purchase.player.id}</strong><span>{purchase.player.id}</span></div><strong>{decimalMoney(purchase.purchasePrice, review.currencyCode)}</strong></header>
+        <ul>{purchase.owners.map((owner) => <li key={owner.player.id}><span>{owner.player.name || owner.player.id}</span><span>{owner.ownershipFraction} ownership</span></li>)}</ul>
+      </article>)}</div> : <p className={styles.empty}>No completed auction facts have been recorded.</p>}
+    </details>
+    <details className={styles.disclosure}>
+      <summary>Result & recalculation</summary>
+      <dl className={styles.compactFacts}>
+        <div><dt>Result state</dt><dd>{pretty(review.result?.state || "Not calculated")}</dd></div>
+        <div><dt>Result revision</dt><dd>{review.result?.revision ?? "None"}</dd></div>
+        <div><dt>Completed rounds</dt><dd>{review.result?.completedRounds?.join(", ") || "None"}</dd></div>
+        <div><dt>Calculated</dt><dd>{timestamp(review.result?.calculatedAt)}</dd></div>
+      </dl>
+    </details>
+  </div>;
+}
+
 function CalcuttaCard({ data, refresh }) {
   const state = data.publications.calcutta;
+  const privateState = data.privateOperations?.calcutta;
+  const privateStateAligned = Boolean(privateState) &&
+    privateState.configurationRevision === state.configurationRevision &&
+    privateState.auctionRevision === state.auctionRevision &&
+    privateState.publicationRevision === state.publicationRevision &&
+    upper(privateState.state) === upper(state.state) &&
+    upper(privateState.publicationState) === upper(state.publicationState);
   const fingerprint = useRequestFingerprints();
   const [busy, setBusy] = useState("");
   const [queued, setQueued] = useState(false);
@@ -373,13 +458,14 @@ function CalcuttaCard({ data, refresh }) {
       <div><dt>Result revision</dt><dd>{state.resultRevision ?? "None"}</dd></div>
     </dl>
     {upper(state.state) === "NOT_CONFIGURED" ? <div className={styles.workflowSteps}><span>Rules / Payouts</span><span>Auction</span><span>Ownership</span><span>Review</span><span>Publication</span></div> : null}
-    <div className={styles.inlineNotice}>The installed Director inspection contract intentionally withholds unpublished rules, auction facts, owners, shares, and pot totals. Detailed setup/review remains read-only until a certified private read is available.</div>
+    {privateState && !privateStateAligned ? <div className={styles.inlineNotice} role="alert">Calcutta changed while this page was loading. Refresh before reviewing or performing an action.</div> : <CalcuttaPrivateReview review={privateStateAligned ? privateState : null} />}
     <div className={styles.actionRow}>
-      {state.auctionRevision > 0 ? <button type="button" disabled={Boolean(busy)} onClick={() => run("enqueue")}>Queue Recalculation</button> : null}
-      {queued ? <button type="button" disabled={Boolean(busy)} onClick={() => run("process")}>Process Queued Calculation</button> : null}
-      {!state.published && state.configurationRevision > 0 && state.auctionRevision > 0 && state.configurationFingerprint && state.auctionFingerprint ? <button type="button" disabled={Boolean(busy)} data-impact="high" onClick={() => run("publish")}>Publish Exact Auction Revision</button> : null}
+      {state.auctionRevision > 0 ? <button type="button" disabled={Boolean(busy) || !privateStateAligned} onClick={() => run("enqueue")}>Queue Recalculation</button> : null}
+      {queued ? <button type="button" disabled={Boolean(busy) || !privateStateAligned} onClick={() => run("process")}>Process Queued Calculation</button> : null}
+      {!state.published && state.configurationRevision > 0 && state.auctionRevision > 0 && state.configurationFingerprint && state.auctionFingerprint ? <button type="button" disabled={Boolean(busy) || !privateStateAligned} data-impact="high" onClick={() => run("publish")}>Publish Exact Auction Revision</button> : null}
       {state.published ? <button type="button" disabled={Boolean(busy)} data-impact="high" onClick={() => run("unpublish")}>Unpublish</button> : null}
     </div>
+    <PrivateJobList title="Calcutta calculations" jobs={privateState?.jobs || []} />
     {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
   </article>;
 }
@@ -412,7 +498,18 @@ function QueueSummary({ title, counts }) {
   </article>;
 }
 
+const AUDIT_FILTERS = Object.freeze([
+  ["ALL", "All activity"], ["MATCH", "Matches"], ["HANDICAP", "Handicaps"],
+  ["ODDS", "Odds"], ["SIDE_GAME", "Side games"],
+  ["SYNCHRONIZATION", "Sync"], ["RELEASE", "Releases"],
+]);
+
 export function SystemAuditPanel({ data }) {
+  const [auditFilter, setAuditFilter] = useState("ALL");
+  const privateTimeline = data.privateOperations?.auditTimeline || [];
+  const filteredTimeline = auditFilter === "ALL"
+    ? privateTimeline
+    : privateTimeline.filter((item) => item.category === auditFilter);
   return <>
     <section className={styles.panel}>
       <header><span>System status</span><h2>Production Runtime</h2><p>Safe operational health only. Secrets, infrastructure fingerprints, claims, and evidence blobs are never displayed.</p></header>
@@ -431,8 +528,20 @@ export function SystemAuditPanel({ data }) {
       </div>
     </section>
     <section className={styles.panel}>
-      <header><span>Recent safe activity</span><h2>Operational Timeline</h2><p>Match lifecycle activity is shown below. A broader Director audit timeline remains unavailable until a sanitized bounded audit-read contract exists.</p></header>
-      {data.recentActivity.length ? <ul className={styles.activity}>{data.recentActivity.map((item) => <li key={item.id}><div><strong>{item.label}</strong><span>{pretty(item.status)}</span></div><time>{timestamp(item.updatedAt)}</time></li>)}</ul> : <p className={styles.empty}>No recent match lifecycle activity is available.</p>}
+      <header><span>Recent safe activity</span><h2>Operational Timeline</h2><p>Allowlisted Director and tournament activity only. Raw audit payloads, internal identifiers, and infrastructure evidence are never returned.</p></header>
+      {data.privateOperations?.available ? <>
+        <div className={styles.auditFilters} aria-label="Filter operational timeline">{AUDIT_FILTERS.map(([value, label]) => <button type="button" key={value} aria-pressed={auditFilter === value} onClick={() => setAuditFilter(value)}>{label}</button>)}</div>
+        {filteredTimeline.length ? <ul className={styles.activity}>{filteredTimeline.map((item) => <li key={item.id}>
+          <div><strong>{item.title}</strong><span>{item.summary} · {item.actorName}</span></div>
+          <div className={styles.activityMeta}><Status value={item.status} /><time>{timestamp(item.occurredAt)}</time></div>
+        </li>)}</ul> : <p className={styles.empty}>No recent activity matches this filter.</p>}
+      </> : <>
+        <div className={styles.inlineNotice}>The sanitized cross-domain audit timeline is temporarily unavailable. Recent safe match activity remains visible below.</div>
+        {data.recentActivity?.length ? <ul className={styles.activity}>{data.recentActivity.map((item) => <li key={item.id}>
+          <div><strong>{item.label}</strong><span>Authoritative match activity</span></div>
+          <div className={styles.activityMeta}><Status value={item.status} /><time>{timestamp(item.updatedAt)}</time></div>
+        </li>)}</ul> : <p className={styles.empty}>No recent match activity is available.</p>}
+      </>}
     </section>
   </>;
 }

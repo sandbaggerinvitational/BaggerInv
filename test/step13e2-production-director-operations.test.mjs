@@ -163,7 +163,8 @@ test("side-game, Draft, Guide, and System panels honor missing-operation boundar
   const ui = await source("app/admin/director/ProductionDirectorOperations.js");
   assert.match(ui, /Net Skins will become configurable once tournament pairings and handicap inputs are complete/);
   assert.match(ui, /No 2026 financial facts have been entered/);
-  assert.match(ui, /intentionally withholds unpublished rules, auction facts, owners, shares, and pot totals/);
+  assert.match(ui, /Director-private Calcutta review/);
+  assert.match(ui, /Rules & payout allocation/);
   assert.match(ui, /domain="DRAFT"/);
   assert.match(ui, /domain="GUIDE"/);
   assert.match(ui, /\["STALE", "UNAVAILABLE"\]/);
@@ -171,7 +172,8 @@ test("side-game, Draft, Guide, and System panels honor missing-operation boundar
   assert.match(ui, /Publish Exact Auction Revision/);
   assert.match(ui, /failed sync preserves the previous revision/i);
   assert.match(ui, /No generic enable, disable, or unbounded retry is exposed/);
-  assert.match(ui, /sanitized bounded audit-read contract/);
+  assert.match(ui, /Allowlisted Director and tournament activity only/);
+  assert.match(ui, /Raw audit payloads, internal identifiers, and infrastructure evidence are never returned/);
   assert.doesNotMatch(ui, /service.role|service_role|secret key|access token|request_fingerprint|payload_hash|raw SQL/i);
 });
 
