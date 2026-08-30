@@ -25,6 +25,13 @@ import { withProductionGoogleAuthorityWrite } from "../../../lib/production-cuto
 import { productionCutoverPhaseAtLeast } from "../../../lib/production-cutover-activation-contract.js";
 import { certifyGoogleWorkbookMutationReadback, googleWorkbookMutationOutcome } from "../../../lib/google-workbook-mutation-intent.js";
 import { assertScoringMutationAuthorityContractBeforeDispatch, currentScoringMutationAuthorityContract } from "../../../lib/scoring-mutation-authority-server.js";
+import {
+  publishedOddsSnapshotsFromView,
+  readPublishedOddsView,
+} from "../../../lib/published-odds-supabase.js";
+import { requirePublishedOddsReadSource } from "../../../lib/published-odds-read-source.js";
+import { loadProductionOddsCalculationInputs } from "../../../lib/production-odds-calculation-server.js";
+import { PRODUCTION_TOURNAMENT_ID } from "../../../lib/production-foundation-resource-contract.js";
 
 export const dynamic = "force-dynamic";
 
@@ -140,6 +147,43 @@ function refresh() {
   for (const path of ["/admin/director", "/home", "/live", "/my-match"]) revalidatePath(path);
 }
 
+async function readDirectorOddsProjectionState(preview) {
+  const production = String(process.env.VERCEL_ENV || "").trim().toLowerCase() ===
+    "production";
+  if (!production) {
+    const [sheets, snapshots] = await Promise.all([
+      loadPredictionSheets().catch(() => null),
+      readOddsSnapshots().catch(() => []),
+    ]);
+    return { sheets, snapshots, source: preview.preview ? "preview" : "google" };
+  }
+  const source = requirePublishedOddsReadSource(process.env);
+  if (source.resolved !== "supabase") {
+    const error = new Error("Production Championship Odds reads require Supabase.");
+    error.code = "PRODUCTION_ODDS_SUPABASE_READ_REQUIRED";
+    error.status = 503;
+    throw error;
+  }
+  const [inputs, published] = await Promise.all([
+      loadProductionOddsCalculationInputs(PRODUCTION_TOURNAMENT_ID),
+      readPublishedOddsView({
+        tournamentId: PRODUCTION_TOURNAMENT_ID,
+        sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
+      }, { env: process.env }),
+  ]);
+  if (!published.payload?.ok) {
+    const error = new Error("Production Championship Odds publication is unavailable.");
+    error.code = published.payload?.code || "PRODUCTION_ODDS_PUBLICATION_UNAVAILABLE";
+    error.status = 503;
+    throw error;
+  }
+  return {
+    sheets: inputs.sheets,
+    snapshots: publishedOddsSnapshotsFromView(published.payload.data),
+    source: "supabase",
+  };
+}
+
 async function setMatchesLiveAndOpenScoring(matches, updatedBy) {
   await Promise.all(matches.filter((match) => match.status !== "Final").map(async (match) => {
     if (!/^(Live|Reopened)$/i.test(match.status)) await markLiveMatch(match.id, updatedBy);
@@ -158,9 +202,11 @@ export async function GET(request) {
     const session = authorization.identity.session;
     const measured = await withWorkbookWriteDiagnostics("director-dashboard", () => withNormalizedReadDiagnostics("GET /api/director", () => Promise.all([
       getTournamentData(), readTournamentReadiness(), preview.preview && session.type === "player-passport" ? currentPushDevice(session) : null,
-      preview.preview ? readNotificationLog() : [], loadPredictionSheets().catch(() => null), readOddsSnapshots().catch(() => []),
+      preview.preview ? readNotificationLog() : [], readDirectorOddsProjectionState(preview),
     ])));
-    const [tournamentData, readiness, device, notificationLog, projectionSheets, projectionSnapshots] = measured.result.result;
+    const [tournamentData, readiness, device, notificationLog, projectionState] = measured.result.result;
+    const projectionSheets = projectionState.sheets;
+    const projectionSnapshots = projectionState.snapshots;
     const operations = await readDirectorOperationsData(tournamentData.tournament.year);
     trace.stage("Workbook verification", "PASS");
     console.info("Director workbook access", { normalized: measured.result.diagnostics, authenticated: measured.diagnostics });

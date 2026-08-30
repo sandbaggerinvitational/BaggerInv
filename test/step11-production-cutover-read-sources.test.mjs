@@ -123,14 +123,14 @@ test("CURRENT_READS sources fail closed before phase and resolve after phase", (
   }
 });
 
-test("ODDS_WAR_ROOM inputs require their later phase and publication remains Google", () => {
+test("ODDS_WAR_ROOM inputs require their later phase and publication uses one exact authority tuple", () => {
   const earlyEnv = {
     ...activeBase,
     PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
     WAR_ROOM_INPUT_SOURCE: "supabase",
     PREDICTION_SETTINGS_READ_SOURCE: "supabase",
     ODDS_CALCULATION_INPUT_SOURCE: "supabase",
-    ODDS_PUBLICATION_AUTHORITY: "supabase",
+    ODDS_PUBLICATION_AUTHORITY: "google",
   };
   assert.throws(() => resolveWarRoomInputSource(earlyEnv), {
     code: "PRODUCTION_CUTOVER_READ_SOURCE_UNAVAILABLE",
@@ -147,6 +147,23 @@ test("ODDS_WAR_ROOM inputs require their later phase and publication remains Goo
   assert.equal(odds.inputSource, "supabase");
   assert.equal(odds.publicationAuthority, "google");
   assert.equal(odds.fallbackUsed, false);
+
+  const migrated = oddsCalculationEnvironment({
+    ...activeEnv,
+    ODDS_PUBLICATION_AUTHORITY: "supabase",
+    PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "true",
+    PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "false",
+  });
+  assert.equal(migrated.publicationAuthority, "supabase");
+  assert.equal(migrated.publicationEligible, true);
+  assert.equal(migrated.publicationBlocked, false);
+
+  const mismatched = oddsCalculationEnvironment({
+    ...activeEnv,
+    ODDS_PUBLICATION_AUTHORITY: "supabase",
+  });
+  assert.equal(mismatched.publicationAuthority, "unavailable");
+  assert.equal(mismatched.publicationBlocked, true);
 });
 
 test("invalid, incomplete, and malformed active Production requests never resolve to Google", () => {

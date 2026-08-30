@@ -300,6 +300,43 @@ test("runtime eligibility attests the exact dormant single-deployment capability
     assert.equal(result.allowed, false, name);
     assert.equal(result.reason, reason, name);
   }
+
+  const canonicalSupabaseOdds = {
+    ...env,
+    ODDS_PUBLICATION_AUTHORITY: "supabase",
+    PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "true",
+    PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "false",
+  };
+  const canonical =
+    module.productionMaintenancePrecommitDeploymentEnvironment(
+      canonicalSupabaseOdds,
+    );
+  assert.equal(canonical.allowed, true);
+  assert.equal(canonical.canonicalSupabaseOddsPublication, true);
+  assert.equal(canonical.legacyGoogleOddsPublication, false);
+
+  for (const mutation of [
+    {
+      ODDS_PUBLICATION_AUTHORITY: "google",
+      PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "true",
+    },
+    {
+      ODDS_PUBLICATION_AUTHORITY: "supabase",
+      PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "false",
+    },
+    { PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "true" },
+  ]) {
+    const mixed = module.productionMaintenancePrecommitDeploymentEnvironment({
+      ...canonicalSupabaseOdds,
+      ...mutation,
+    });
+    assert.equal(mixed.allowed, false, JSON.stringify(mutation));
+    assert.equal(
+      mixed.reason,
+      "exact-paused-runtime-configuration-required",
+      JSON.stringify(mutation),
+    );
+  }
 });
 
 test("the live route derives replacement deployment and epoch claims from server env", async () => {
@@ -373,6 +410,46 @@ test("the live route derives replacement deployment and epoch claims from server
     JSON.stringify(observedRequest).includes(
       env.ROUND_SCORECARDS_ARCHIVE_WORKER_SECRET,
     ),
+    false,
+  );
+
+  const canonicalEnv = {
+    ...env,
+    ODDS_PUBLICATION_AUTHORITY: "supabase",
+    PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "true",
+    PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "false",
+  };
+  let canonicalRequest = null;
+  await module.rebindProductionMaintenancePrecommitDeployment({
+    actorId: "CB01",
+    input: {
+      originalDeploymentId: "dpl_OriginalPrepared050",
+      epochId: canonicalEnv.PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH,
+      closureId: "33333333-3333-4333-8333-333333333333",
+      expectedActivationRevision: 17,
+      expectedAuthorityGeneration:
+        "44444444-4444-4444-8444-444444444444",
+      expectedAdmissionRevision: 23,
+      expectedAdmissionGeneration:
+        canonicalEnv.PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION,
+      stagedEnvironmentDeltaFingerprintV2: "5".repeat(64),
+      requestFingerprint: "7".repeat(64),
+    },
+  }, {
+    env: canonicalEnv,
+    now: () => Date.parse("2026-08-29T12:00:00.000Z"),
+    fetchImpl: async (_url, request) => {
+      canonicalRequest = JSON.parse(request.body).input;
+      return new Response(JSON.stringify({ ok: true, code: "REBOUND" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    },
+  });
+  assert.equal(canonicalRequest.runtime_odds_publication_authority, "SUPABASE");
+  assert.equal(canonicalRequest.runtime_supabase_odds_publication_enabled, true);
+  assert.equal(
+    canonicalRequest.runtime_supabase_odds_google_mirror_enabled,
     false,
   );
 });

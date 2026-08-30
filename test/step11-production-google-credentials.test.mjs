@@ -424,12 +424,21 @@ test("Google-writing identities remain unavailable until authority and explicit 
     ODDS_PUBLICATION_AUTHORITY: "supabase",
     PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED: "true",
     PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "true",
+    PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "true",
   };
   assert.equal(productionGoogleCredentialEnvironment({
     env: oddsReady,
     operation: "ODDS_GOOGLE_MIRROR",
     resources,
   }).allowed, true);
+  assert.equal(productionGoogleCredentialEnvironment({
+    env: {
+      ...oddsReady,
+      PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "false",
+    },
+    operation: "ODDS_GOOGLE_MIRROR",
+    resources,
+  }).allowed, false);
 });
 
 test("the allowlist contains synchronization, mirror, archive, and metadata only", () => {

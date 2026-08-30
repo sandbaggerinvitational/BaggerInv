@@ -34,7 +34,7 @@ function DiagnosticsPanel({ diagnostics }) {
   </details>;
 }
 
-export default function OddsAdmin({ embedded = false, sharedSecret = "", directorAuthorized = false, initialPhase = "", publicationReady = true, regenerationPhases = [], previewMode = false, onPublished }) {
+export default function OddsAdmin({ embedded = false, sharedSecret = "", directorAuthorized = false, initialPhase = "", publicationReady = true, regenerationPhases = [], previewMode = false, productionMode = false, onPublished }) {
   const [phase, setPhase] = useState(ODDS_PHASES.includes(initialPhase) ? initialPhase : ODDS_PHASES[0]);
   const [iterations, setIterations] = useState(10_000);
   const [secret, setSecret] = useState(sharedSecret);
@@ -47,11 +47,15 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
   useEffect(() => { if (ODDS_PHASES.includes(initialPhase)) setPhase(initialPhase); }, [initialPhase]);
   const selectablePhases = ODDS_PHASES.filter((item) => item === initialPhase || regenerationPhases.includes(item));
   const regeneration = regenerationPhases.includes(phase);
+  const durableMode = previewMode || productionMode;
+  const calculationEndpoint = productionMode
+    ? "/api/admin/production-odds-calculations"
+    : "/api/odds/calculations";
 
   async function waitForCalculation(jobId, { retainForPublication = true } = {}) {
     const deadline = Date.now() + 15 * 60_000;
     while (Date.now() < deadline) {
-      const response = await directorFetch(`/api/odds/calculations?job=${encodeURIComponent(jobId)}`, { credentials: "same-origin" });
+      const response = await directorFetch(`${calculationEndpoint}?job=${encodeURIComponent(jobId)}`, { credentials: "same-origin" });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Calculation status could not be read.");
       const job = data.jobs?.[0];
@@ -76,7 +80,7 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
     setBusy(true); setPreview(null); setDiagnostics(null); setCalculationJob(null);
     setStatus(`Requesting a durable ${iterations.toLocaleString()}-iteration calculation…`);
     try {
-      const response = await directorFetch("/api/odds/calculations", { method: "POST", credentials: "same-origin",
+      const response = await directorFetch(calculationEndpoint, { method: "POST", credentials: "same-origin",
         headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "request", phase, iterations }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Calculation could not be requested.");
@@ -121,6 +125,7 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
     setBusy(true); setPreview(null); setDiagnostics(null); setStatus(`Running ${iterations.toLocaleString()} tournament simulations…`);
     const endpoint = previewMode ? "/api/odds/publish-preview" : "/api/odds/publish";
     const requestPayload = { phase, iterations, ...(previewMode ? { jobId: calculationJob?.job_id } : {}) };
+    if (productionMode) requestPayload.jobId = calculationJob?.job_id;
     const requestBody = JSON.stringify(requestPayload);
     const requestStack = new Error("Championship Projection request initiated").stack;
     try {
@@ -154,9 +159,9 @@ export default function OddsAdmin({ embedded = false, sharedSecret = "", directo
   }
 
   const resetCalculation = () => setCalculationJob(null);
-  const action = previewMode && !calculationJob ? prepareCalculation : publish;
-  const actionLabel = busy ? (previewMode ? "Calculation continues safely in the background…" : "Generating official projection…")
+  const action = durableMode && !calculationJob ? prepareCalculation : publish;
+  const actionLabel = busy ? (durableMode ? "Calculation continues safely in the background…" : "Generating official projection…")
     : calculationJob ? (regeneration ? "Publish Completed Regeneration" : "Publish Completed Official Projection")
-      : previewMode ? "Prepare Official Projection" : regeneration ? "Regenerate Official Projection" : "Generate & Publish Official Projection";
+      : durableMode ? "Prepare Official Projection" : regeneration ? "Regenerate Official Projection" : "Generate & Publish Official Projection";
   return <section className={styles.admin}><p>Official Tournament Intelligence</p><h1>Championship Projections</h1>{previewMode ? <button type="button" disabled={busy} onClick={refreshSupabaseInputs}>Verify Supabase Odds Inputs</button> : null}{regenerationPhases.length ? <div><strong>Preview Regeneration</strong><br /><span>Choose a published milestone to replace it using the current engine.</span></div> : null}<label>Official milestone{directorAuthorized && selectablePhases.length <= 1 ? <strong>{projectionPresentationLabel(phase)}</strong> : <select value={phase} onChange={(event) => { setPhase(event.target.value); resetCalculation(); }}>{(directorAuthorized ? selectablePhases : ODDS_PHASES).map((item) => <option value={item} key={item}>{projectionPresentationLabel(item)}{regenerationPhases.includes(item) ? " · Regenerate" : ""}</option>)}</select>}</label><label>Simulation count<select value={iterations} onChange={(event) => { setIterations(Number(event.target.value)); resetCalculation(); }}>{COUNTS.map((count) => <option value={count} key={count}>{count.toLocaleString()}</option>)}</select></label>{!embedded ? <label>Publishing password<input type="password" value={secret} onChange={(event) => setSecret(event.target.value)} /></label> : null}<button disabled={(!publicationReady && !regeneration) || (!secret && !directorAuthorized) || busy} onClick={action}>{actionLabel}</button>{previewMode ? <details><summary>Preview recovery rehearsal</summary><label>Safe interruption boundary<select value={rehearsalFailure} onChange={(event) => setRehearsalFailure(event.target.value)}><option value="BEFORE_FIRST_CHUNK">Before first chunk</option><option value="AFTER_CHECKPOINT">After checkpoint</option><option value="MID_CALCULATION">Mid-calculation</option><option value="AFTER_FINAL_CHECKPOINT">After final checkpoint</option><option value="AFTER_RESULT_COMMIT">After result commit</option></select></label><button type="button" disabled={busy} onClick={prepareRecoveryRehearsal}>Run non-publishing recovery rehearsal</button><small>This Preview-only rehearsal can retry a durable calculation, but it cannot publish Odds or create a Google mirror job.</small></details> : null}{status ? <div>{status}</div> : null}<DiagnosticsPanel diagnostics={diagnostics} />{preview ? <div><span>Published Official Snapshot</span><strong>{projectionPresentationLabel(preview.phase)}</strong><br /><strong>{preview.teams?.[0]?.name}: {preview.teams?.[0]?.probability}%</strong><br /><strong>{preview.teams?.[1]?.name}: {preview.teams?.[1]?.probability}%</strong><br /><span>{preview.totalPointsAvailable} total tournament points modeled</span></div> : null}<small>Long calculations continue on a durable server job after this page closes. A completed result remains separate from publication until the Director explicitly publishes it.</small></section>;
 }

@@ -20,11 +20,136 @@ import { requireOddsCalculationInputSource, requireOddsPublicationAuthority } fr
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import { withProductionGoogleAuthoringWrite } from "../../../../lib/production-google-authoring.js";
 import { GOOGLE_AUTHORING_OPERATIONS } from "../../../../lib/google-workbook-mutation-intent.js";
+import {
+  readPublishableProductionOddsCalculation,
+} from "../../../../lib/production-odds-calculation-server.js";
+import {
+  productionOddsPublicationRequestFingerprint,
+  publishProductionOddsCalculation,
+  readProductionOddsPublicationState,
+} from "../../../../lib/production-odds-publication-server.js";
+import { assertProductionCutoverRequest } from "../../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
+const clean = (value) => String(value ?? "").trim();
+
+async function publishProductionProjection(request) {
+  try {
+    assertProductionCutoverRequest(request, process.env, { requireOrigin: true });
+    const source = requireOddsCalculationInputSource(process.env);
+    requireOddsPublicationAuthority(process.env);
+    if (source.inputSource !== "supabase" ||
+        source.publicationAuthority !== "supabase" ||
+        source.publicationEligible !== true) {
+      const error = new Error("Supabase Championship Odds publication authority is required.");
+      error.code = "PRODUCTION_ODDS_SUPABASE_PUBLICATION_REQUIRED";
+      error.status = 503;
+      throw error;
+    }
+    const director = await authorizePreviewDirector({
+      request,
+      env: process.env,
+      allowBootstrap: false,
+    });
+    if (director?.status !== "active" || director.identity?.impersonating === true) {
+      return NextResponse.json({ error: "Tournament Director access is required." }, {
+        status: 403,
+        headers: { "Cache-Control": "private, no-store" },
+      });
+    }
+    const input = await request.json();
+    const jobId = clean(input.jobId).toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(jobId)) {
+      return NextResponse.json({
+        error: "A completed resilient Production calculation is required before publication.",
+        code: "PRODUCTION_ODDS_CALCULATION_JOB_REQUIRED",
+      }, { status: 409, headers: { "Cache-Control": "private, no-store" } });
+    }
+    const prepared = await readPublishableProductionOddsCalculation(jobId);
+    if (input.phase && clean(input.phase) !== clean(prepared.job.phase)) {
+      return NextResponse.json({
+        error: "The requested milestone does not match the completed calculation.",
+        code: "PRODUCTION_ODDS_CALCULATION_MILESTONE_MISMATCH",
+      }, { status: 409, headers: { "Cache-Control": "private, no-store" } });
+    }
+    const current = await readProductionOddsPublicationState();
+    const retainedReference = prepared.job.publication_reference || {};
+    const retainedExpectedRevision = Number(
+      retainedReference.expected_predecessor_revision,
+    );
+    const expectedPublicationRevision = prepared.alreadyPublished &&
+      Number.isSafeInteger(retainedExpectedRevision) && retainedExpectedRevision >= 0
+      ? retainedExpectedRevision
+      : current.publication_revision;
+    const expectedSnapshotId = prepared.alreadyPublished &&
+      Object.hasOwn(retainedReference, "expected_predecessor_snapshot_id")
+      ? clean(retainedReference.expected_predecessor_snapshot_id) || null
+      : current.published_snapshot_id;
+    const actorAuthUserId = clean(director.identity?.authUserId).toLowerCase();
+    const actorPlayerId = clean(
+      director.identity?.player?.id || director.identity?.actor?.id,
+    );
+    const requestFingerprint = productionOddsPublicationRequestFingerprint({
+      jobId,
+      expectedPublicationRevision,
+      expectedSnapshotId,
+      expectedActivationRevision: current.activation_revision,
+      expectedAuthorityEpochId: current.authority_epoch_id,
+      actorAuthUserId,
+      actorPlayerId,
+    });
+    const publication = await publishProductionOddsCalculation({
+      jobId,
+      expectedPublicationRevision,
+      expectedSnapshotId,
+      expectedActivationRevision: current.activation_revision,
+      expectedAuthorityEpochId: current.authority_epoch_id,
+      actorAuthUserId,
+      actorPlayerId,
+      requestFingerprint,
+    });
+    for (const path of [
+      "/api/leaderboards/insights",
+      "/odds-center",
+      "/app/odds",
+      "/live",
+      "/home",
+    ]) revalidatePath(path);
+    return NextResponse.json({
+      ok: true,
+      snapshot: publication.published_payload,
+      source: { inputs: "supabase", publication: "supabase" },
+      publication: {
+        contractVersion: publication.publication_contract_version,
+        snapshotId: publication.snapshot_id,
+        revision: publication.publication_revision,
+        state: publication.publication_state,
+        freshness: publication.freshness,
+        idempotent: publication.idempotent === true,
+      },
+      googlePublication: "RETIRED",
+      googleMirror: "RETIRED",
+    }, { headers: { "Cache-Control": "private, no-store" } });
+  } catch (error) {
+    console.error("Production Championship Odds publication failed", {
+      code: clean(error?.code || "PRODUCTION_ODDS_PUBLICATION_FAILED"),
+    });
+    return NextResponse.json({
+      error: "Championship projections could not be published.",
+      code: clean(error?.code || "PRODUCTION_ODDS_PUBLICATION_FAILED"),
+    }, {
+      status: Number(error?.status || 503),
+      headers: { "Cache-Control": "private, no-store" },
+    });
+  }
+}
+
 async function publishProjection(request) {
+  if (clean(process.env.VERCEL_ENV).toLowerCase() === "production") {
+    return publishProductionProjection(request);
+  }
   const trace = createPublicationTrace();
   const diagnostic = { stepReached: "Authorization", workbookOperation: "None", simulationPhase: "Unknown", worksheet: "None", function: "POST /api/odds/publish" };
   const start = (name, details = {}) => { diagnostic.stepReached = name; Object.assign(diagnostic, details); trace.start(name, details); };
@@ -233,6 +358,9 @@ async function publishProjection(request) {
 }
 
 export async function POST(request) {
+  if (clean(process.env.VERCEL_ENV).toLowerCase() === "production") {
+    return publishProjection(request);
+  }
   const measured = await withWorkbookWriteDiagnostics("championship-projection-publication", () => publishProjection(request));
   console.info("Championship projection workbook access", measured.diagnostics);
   return measured.result;
