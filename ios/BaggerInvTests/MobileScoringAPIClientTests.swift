@@ -314,13 +314,65 @@ final class MobileScoringAPIClientTests: XCTestCase {
         }
     }
 
-    func testHoleMutationRaw429WithoutV1EnvelopePreservesRetryableRejection() async throws {
+    func testHoleMutation4xxWithoutCompatibleV1EnvelopeIsUnknownOutcome() async throws {
         let intent = makeHoleRequest()
-        let transport = HeaderRecordingHTTPTransport(
-            statusCode: 429,
-            responseData: Data("rate limited".utf8),
-            headers: ["Retry-After": "17"]
-        )
+        let incompatibleBodies = [
+            Data("rate limited".utf8),
+            try TestFixtures.jsonData([
+                "ok": false,
+                "apiVersion": "v2",
+                "error": [
+                    "code": MobileErrorCode.revisionConflict.rawValue,
+                    "message": "Conflict",
+                ],
+                "data": NSNull(),
+            ]),
+        ]
+
+        for body in incompatibleBodies {
+            let transport = HeaderRecordingHTTPTransport(
+                statusCode: 429,
+                responseData: body,
+                headers: ["Retry-After": "17"]
+            )
+            let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+            do {
+                _ = try await client.scoringHole(
+                    request: intent,
+                    accessToken: accessToken,
+                    certification: certification
+                )
+                XCTFail("Expected an uncertain 4xx outcome")
+            } catch let error as MobileScoringMutationError {
+                guard case .unknownOutcome(let reason, let code, let status, let data, let retryAfter) = error else {
+                    return XCTFail("Expected unknown outcome, got \(error)")
+                }
+                XCTAssertEqual(reason, .unexpectedResponse)
+                XCTAssertNil(code)
+                XCTAssertEqual(status, 429)
+                XCTAssertNil(data)
+                XCTAssertEqual(retryAfter, .delay(17))
+                XCTAssertEqual(error.outcomeCertainty, .unknown)
+                XCTAssertFalse(error.description.contains(accessToken))
+                XCTAssertFalse(error.description.contains(certification))
+            }
+            XCTAssertEqual(transport.requests.count, 1)
+        }
+    }
+
+    func testHoleMutationFutureV1ErrorCodeIsKnownPermanentRejection() async throws {
+        let intent = makeHoleRequest()
+        let body = try TestFixtures.jsonData([
+            "ok": false,
+            "apiVersion": "v1",
+            "error": [
+                "code": "FUTURE_SCORING_REJECTION",
+                "message": "Rejected",
+            ],
+            "data": NSNull(),
+        ])
+        let transport = RecordingHTTPTransport(statusCode: 418, responseData: body)
         let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
 
         do {
@@ -329,19 +381,17 @@ final class MobileScoringAPIClientTests: XCTestCase {
                 accessToken: accessToken,
                 certification: certification
             )
-            XCTFail("Expected rate-limit rejection")
+            XCTFail("Expected a future v1 rejection")
         } catch let error as MobileScoringMutationError {
-            guard case .rejected(let code, let status, let data, let retryAfter) = error else {
-                return XCTFail("Expected bounded known rejection, got \(error)")
+            guard case .rejected(let code, let status, let data, _) = error else {
+                return XCTFail("Expected known rejection, got \(error)")
             }
-            XCTAssertNil(code)
-            XCTAssertEqual(status, 429)
+            XCTAssertNil(code, "Future codes must not gain typed behavior")
+            XCTAssertEqual(status, 418)
             XCTAssertNil(data)
-            XCTAssertEqual(retryAfter, .delay(17))
             XCTAssertEqual(error.outcomeCertainty, .knownRejected)
-            XCTAssertFalse(error.description.contains(accessToken))
-            XCTAssertFalse(error.description.contains(certification))
         }
+        XCTAssertEqual(transport.requests.count, 1)
     }
 
     func testHoleMutationServerFailureIsUnknownOutcomeWithSameBoundedDiagnostics() async throws {
@@ -418,6 +468,384 @@ final class MobileScoringAPIClientTests: XCTestCase {
         }
     }
 
+    func testHoleMutationCanonicalGrossMismatchIsUnknownOutcome() async throws {
+        let intent = makeHoleRequest()
+        var object = try acknowledgementObject(for: intent)
+        var data = object["data"] as! [String: Any]
+        var hole = data["hole"] as! [String: Any]
+        var gross = hole["gross"] as! [String: Any]
+        gross["teamTwo"] = [4, 6]
+        hole["gross"] = gross
+        data["hole"] = hole
+        object["data"] = data
+        let transport = RecordingHTTPTransport(
+            statusCode: 200,
+            responseData: try TestFixtures.jsonData(object)
+        )
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        do {
+            _ = try await client.scoringHole(
+                request: intent,
+                accessToken: accessToken,
+                certification: certification
+            )
+            XCTFail("Expected mismatched canonical gross acknowledgement to fail closed")
+        } catch let error as MobileScoringMutationError {
+            guard case .unknownOutcome(let reason, _, let status, _, _) = error else {
+                return XCTFail("Expected unknown outcome, got \(error)")
+            }
+            XCTAssertEqual(reason, .invalidAcknowledgement)
+            XCTAssertEqual(status, 200)
+        }
+    }
+
+    func testHoleMutationStaleCanonicalRevisionAcknowledgementIsUnknownOutcome() async throws {
+        let intent = makeHoleRequest()
+
+        for (container, staleRevision) in [("match", 11), ("hole", 2)] {
+            var object = try acknowledgementObject(for: intent)
+            var data = object["data"] as! [String: Any]
+            var canonical = data[container] as! [String: Any]
+            canonical["revision"] = staleRevision
+            data[container] = canonical
+            object["data"] = data
+            let transport = RecordingHTTPTransport(
+                statusCode: 200,
+                responseData: try TestFixtures.jsonData(object)
+            )
+            let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+            do {
+                _ = try await client.scoringHole(
+                    request: intent,
+                    accessToken: accessToken,
+                    certification: certification
+                )
+                XCTFail("Expected stale \(container) revision to fail closed")
+            } catch let error as MobileScoringMutationError {
+                guard case .unknownOutcome(let reason, _, let status, _, _) = error else {
+                    return XCTFail("Expected unknown outcome, got \(error)")
+                }
+                XCTAssertEqual(reason, .invalidAcknowledgement)
+                XCTAssertEqual(status, 200)
+            }
+            XCTAssertEqual(transport.requests.count, 1)
+        }
+    }
+
+    func testFinalizationUsesCertifiedPOSTWithExactNoStoreBody() async throws {
+        let intent = makeFinalizeRequest()
+        let transport = RecordingHTTPTransport(
+            statusCode: 200,
+            responseData: try finalizeAcknowledgementData(for: intent)
+        )
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        let response = try await client.scoringFinalize(
+            request: intent,
+            accessToken: accessToken,
+            certification: certification
+        )
+
+        XCTAssertTrue(response.isContractCompatible(for: intent))
+        XCTAssertEqual(transport.requests.count, 1, "Finalization transport must never auto-retry")
+        let request = try XCTUnwrap(transport.requests.first)
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.url?.path, "/api/mobile/v1/scoring/finalize")
+        XCTAssertNil(request.url?.query)
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(accessToken)")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "X-Bagger-Certification"), certification)
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Cache-Control"), "no-store")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+        XCTAssertNil(request.value(forHTTPHeaderField: "If-None-Match"))
+        XCTAssertEqual(
+            try JSONDecoder().decode(MobileScoringFinalizeRequest.self, from: XCTUnwrap(request.httpBody)),
+            intent
+        )
+    }
+
+    func testFinalizationInvalidIntentAndCredentialsAreDefinitelyNotSent() async throws {
+        let transport = RecordingHTTPTransport(statusCode: 200, responseData: Data())
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        await assertFinalizationError(.definitelyNotSent(.invalidRequest)) {
+            try await client.scoringFinalize(
+                request: self.makeFinalizeRequest(matchID: ""),
+                accessToken: self.accessToken,
+                certification: self.certification
+            )
+        }
+        await assertFinalizationError(.definitelyNotSent(.missingBearer)) {
+            try await client.scoringFinalize(
+                request: self.makeFinalizeRequest(),
+                accessToken: "",
+                certification: self.certification
+            )
+        }
+        await assertFinalizationError(.definitelyNotSent(.missingCertification)) {
+            try await client.scoringFinalize(
+                request: self.makeFinalizeRequest(),
+                accessToken: self.accessToken,
+                certification: ""
+            )
+        }
+
+        XCTAssertTrue(transport.requests.isEmpty)
+    }
+
+    func testFinalizationTransportFailureAndCancellationAreUnknownWithoutRetry() async throws {
+        for (transportError, expectedReason) in [
+            (StubError.planned as any Error, MobileScoringMutationUnknownReason.transport),
+            (CancellationError() as any Error, MobileScoringMutationUnknownReason.cancelled),
+        ] {
+            let transport = RecordingHTTPTransport(statusCode: 200, responseData: Data())
+            transport.error = transportError
+            let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+            do {
+                _ = try await client.scoringFinalize(
+                    request: makeFinalizeRequest(),
+                    accessToken: accessToken,
+                    certification: certification
+                )
+                XCTFail("Expected unknown finalization outcome")
+            } catch let error as MobileScoringFinalizationError {
+                guard case .unknownOutcome(let reason, let code, let status, let data, let retryAfter) = error else {
+                    XCTFail("Expected unknown outcome, got \(error)")
+                    continue
+                }
+                XCTAssertEqual(reason, expectedReason)
+                XCTAssertNil(code)
+                XCTAssertNil(status)
+                XCTAssertNil(data)
+                XCTAssertNil(retryAfter)
+                XCTAssertEqual(error.outcomeCertainty, .unknown)
+            }
+            XCTAssertEqual(transport.requests.count, 1, "An unknown finalization outcome must not auto-retry")
+        }
+    }
+
+    func testFinalizationKnown4xxIsTypedRejectedWithBoundedContext() async throws {
+        let intent = makeFinalizeRequest()
+        let body = try TestFixtures.jsonData([
+            "ok": false,
+            "apiVersion": "v1",
+            "error": [
+                "code": MobileErrorCode.finalizationNotReady.rawValue,
+                "message": "Not ready",
+            ],
+            "data": [
+                "matchId": intent.matchId,
+                "currentMatchRevision": 31,
+                "currentPermissionRevision": 7,
+                "scoredHoles": 17,
+                "refreshRequired": true,
+            ],
+        ])
+        let transport = RecordingHTTPTransport(statusCode: 409, responseData: body)
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        do {
+            _ = try await client.scoringFinalize(
+                request: intent,
+                accessToken: accessToken,
+                certification: certification
+            )
+            XCTFail("Expected finalization rejection")
+        } catch let error as MobileScoringFinalizationError {
+            guard case .rejected(let code, let status, let data, _) = error else {
+                return XCTFail("Expected typed rejection, got \(error)")
+            }
+            XCTAssertEqual(code, .finalizationNotReady)
+            XCTAssertEqual(status, 409)
+            XCTAssertEqual(data?.matchId, intent.matchId)
+            XCTAssertEqual(data?.currentMatchRevision, 31)
+            XCTAssertEqual(error.outcomeCertainty, .knownRejected)
+            XCTAssertFalse(error.description.contains(accessToken))
+            XCTAssertFalse(error.description.contains(certification))
+        }
+        XCTAssertEqual(transport.requests.count, 1)
+    }
+
+    func testFinalization4xxWithoutCompatibleV1EnvelopeIsUnknownOutcome() async throws {
+        let intent = makeFinalizeRequest()
+        let incompatibleBodies = [
+            Data("conflict".utf8),
+            try TestFixtures.jsonData([
+                "ok": false,
+                "apiVersion": "v2",
+                "error": [
+                    "code": MobileErrorCode.finalizationNotReady.rawValue,
+                    "message": "Not ready",
+                ],
+                "data": NSNull(),
+            ]),
+        ]
+
+        for body in incompatibleBodies {
+            let transport = RecordingHTTPTransport(statusCode: 409, responseData: body)
+            let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+            do {
+                _ = try await client.scoringFinalize(
+                    request: intent,
+                    accessToken: accessToken,
+                    certification: certification
+                )
+                XCTFail("Expected an uncertain finalization outcome")
+            } catch let error as MobileScoringFinalizationError {
+                guard case .unknownOutcome(let reason, let code, let status, let data, _) = error else {
+                    return XCTFail("Expected unknown outcome, got \(error)")
+                }
+                XCTAssertEqual(reason, .unexpectedResponse)
+                XCTAssertNil(code)
+                XCTAssertEqual(status, 409)
+                XCTAssertNil(data)
+                XCTAssertEqual(error.outcomeCertainty, .unknown)
+            }
+            XCTAssertEqual(transport.requests.count, 1, "Finalization must not auto-retry")
+        }
+    }
+
+    func testFinalizationFutureV1ErrorCodeIsKnownRejectionWithoutTypedBehavior() async throws {
+        let intent = makeFinalizeRequest()
+        let body = try TestFixtures.jsonData([
+            "ok": false,
+            "apiVersion": "v1",
+            "error": [
+                "code": "FUTURE_FINALIZATION_REJECTION",
+                "message": "Rejected",
+            ],
+            "data": NSNull(),
+        ])
+        let transport = RecordingHTTPTransport(statusCode: 409, responseData: body)
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        do {
+            _ = try await client.scoringFinalize(
+                request: intent,
+                accessToken: accessToken,
+                certification: certification
+            )
+            XCTFail("Expected a future v1 rejection")
+        } catch let error as MobileScoringFinalizationError {
+            guard case .rejected(let code, let status, let data, _) = error else {
+                return XCTFail("Expected known rejection, got \(error)")
+            }
+            XCTAssertNil(code)
+            XCTAssertEqual(status, 409)
+            XCTAssertNil(data)
+            XCTAssertEqual(error.outcomeCertainty, .knownRejected)
+        }
+        XCTAssertEqual(transport.requests.count, 1, "Finalization must not auto-retry")
+    }
+
+    func testFinalizationServerFailureIsUnknownWithoutRetry() async throws {
+        let intent = makeFinalizeRequest()
+        let body = try TestFixtures.jsonData([
+            "ok": false,
+            "apiVersion": "v1",
+            "error": [
+                "code": MobileErrorCode.internalError.rawValue,
+                "message": "Internal failure",
+            ],
+            "data": [
+                "matchId": intent.matchId,
+                "refreshRequired": true,
+            ],
+        ])
+        let transport = RecordingHTTPTransport(statusCode: 503, responseData: body)
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        do {
+            _ = try await client.scoringFinalize(
+                request: intent,
+                accessToken: accessToken,
+                certification: certification
+            )
+            XCTFail("Expected unknown finalization outcome")
+        } catch let error as MobileScoringFinalizationError {
+            guard case .unknownOutcome(let reason, let code, let status, let data, _) = error else {
+                return XCTFail("Expected unknown outcome, got \(error)")
+            }
+            XCTAssertEqual(reason, .serverFailure)
+            XCTAssertEqual(code, .internalError)
+            XCTAssertEqual(status, 503)
+            XCTAssertEqual(data?.matchId, intent.matchId)
+            XCTAssertEqual(error.outcomeCertainty, .unknown)
+        }
+        XCTAssertEqual(transport.requests.count, 1, "5xx finalization responses must not auto-retry")
+    }
+
+    func testFinalizationMismatched200AcknowledgementIsUnknownOutcome() async throws {
+        let intent = makeFinalizeRequest()
+        for key in ["mutationId", "matchId"] {
+            var object = try finalizeAcknowledgementObject(for: intent)
+            var data = object["data"] as! [String: Any]
+            if key == "mutationId" {
+                data["mutationId"] = "33333333-3333-4333-8333-333333333333"
+            } else {
+                var match = data["match"] as! [String: Any]
+                match["matchId"] = "another-match"
+                data["match"] = match
+            }
+            object["data"] = data
+            let transport = RecordingHTTPTransport(
+                statusCode: 200,
+                responseData: try TestFixtures.jsonData(object)
+            )
+            let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+            do {
+                _ = try await client.scoringFinalize(
+                    request: intent,
+                    accessToken: accessToken,
+                    certification: certification
+                )
+                XCTFail("Expected mismatched finalization acknowledgement")
+            } catch let error as MobileScoringFinalizationError {
+                guard case .unknownOutcome(let reason, _, let status, _, _) = error else {
+                    return XCTFail("Expected unknown outcome, got \(error)")
+                }
+                XCTAssertEqual(reason, .invalidAcknowledgement)
+                XCTAssertEqual(status, 200)
+            }
+            XCTAssertEqual(transport.requests.count, 1)
+        }
+    }
+
+    func testFinalizationStaleRevisionAcknowledgementIsUnknownOutcome() async throws {
+        let intent = makeFinalizeRequest(expectedMatchRevision: 31)
+        var object = try finalizeAcknowledgementObject(for: intent)
+        var data = object["data"] as! [String: Any]
+        var match = data["match"] as! [String: Any]
+        match["revision"] = 30
+        data["match"] = match
+        object["data"] = data
+        let transport = RecordingHTTPTransport(
+            statusCode: 200,
+            responseData: try TestFixtures.jsonData(object)
+        )
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        do {
+            _ = try await client.scoringFinalize(
+                request: intent,
+                accessToken: accessToken,
+                certification: certification
+            )
+            XCTFail("Expected stale finalization acknowledgement")
+        } catch let error as MobileScoringFinalizationError {
+            guard case .unknownOutcome(let reason, _, let status, _, _) = error else {
+                return XCTFail("Expected unknown outcome, got \(error)")
+            }
+            XCTAssertEqual(reason, .invalidAcknowledgement)
+            XCTAssertEqual(status, 200)
+        }
+        XCTAssertEqual(transport.requests.count, 1)
+    }
+
     func testHoleMutationDropsUnboundedOrCrossMatchErrorContext() async throws {
         let intent = makeHoleRequest()
         let body = try TestFixtures.jsonData([
@@ -478,6 +906,18 @@ final class MobileScoringAPIClientTests: XCTestCase {
         }
     }
 
+    private func assertFinalizationError(
+        _ expected: MobileScoringFinalizationError,
+        operation: () async throws -> MobileScoringFinalizeResponse
+    ) async {
+        do {
+            _ = try await operation()
+            XCTFail("Expected \(expected)")
+        } catch {
+            XCTAssertEqual(error as? MobileScoringFinalizationError, expected)
+        }
+    }
+
     private func makeHoleRequest() -> MobileScoringHoleRequest {
         MobileScoringHoleRequest(
             matchId: "match-preview-1",
@@ -487,6 +927,18 @@ final class MobileScoringAPIClientTests: XCTestCase {
             mutationId: "11111111-1111-4111-8111-111111111111",
             expectedMatchRevision: 12,
             expectedHoleRevision: 3
+        )
+    }
+
+    private func makeFinalizeRequest(
+        matchID: String = "match-preview-1",
+        mutationID: String = "22222222-2222-4222-8222-222222222222",
+        expectedMatchRevision: Int = 30
+    ) -> MobileScoringFinalizeRequest {
+        MobileScoringFinalizeRequest(
+            matchId: matchID,
+            mutationId: mutationID,
+            expectedMatchRevision: expectedMatchRevision
         )
     }
 
@@ -538,6 +990,39 @@ final class MobileScoringAPIClientTests: XCTestCase {
             ],
             "meta": [
                 "generatedAt": "2027-01-15T08:03:00.000Z",
+            ],
+        ]
+    }
+
+    private func finalizeAcknowledgementData(
+        for request: MobileScoringFinalizeRequest
+    ) throws -> Data {
+        try TestFixtures.jsonData(finalizeAcknowledgementObject(for: request))
+    }
+
+    private func finalizeAcknowledgementObject(
+        for request: MobileScoringFinalizeRequest
+    ) throws -> [String: Any] {
+        [
+            "ok": true,
+            "apiVersion": "v1",
+            "data": [
+                "mutationId": request.mutationId,
+                "accepted": true,
+                "idempotent": false,
+                "match": [
+                    "matchId": request.matchId,
+                    "revision": 31,
+                    "permissionRevision": 7,
+                    "status": "completed",
+                    "scoringLocked": true,
+                    "result": "teamOne",
+                    "finalizedAt": "2027-01-15T08:04:00.000Z",
+                ],
+                "refreshRequired": true,
+            ],
+            "meta": [
+                "generatedAt": "2027-01-15T08:04:00.000Z",
             ],
         ]
     }

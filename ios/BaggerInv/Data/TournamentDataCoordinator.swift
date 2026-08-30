@@ -4,8 +4,11 @@ import Foundation
 protocol TournamentDataLifecycle: AnyObject {
     func activate(authUserID: String, participant: ParticipantSession) async
     func deactivate(deleteCache: Bool) async
+    func prepareForApplicationInactivity()
+    func prepareForForegroundRevalidation()
     func suspendForEnvironmentReattestation() async
     func resumeAfterEnvironmentReattestation() async
+    func pauseForBackground() async
     func refreshAll() async
     func refreshForForeground() async
     func unresolvedScoringIntentCount() async -> Int?
@@ -14,6 +17,9 @@ protocol TournamentDataLifecycle: AnyObject {
 }
 
 extension TournamentDataLifecycle {
+    func prepareForApplicationInactivity() {}
+    func prepareForForegroundRevalidation() {}
+    func pauseForBackground() async {}
     func unresolvedScoringIntentCount() async -> Int? { 0 }
     func prepareScoringQueueForSignOut() async {}
     func cancelScoringQueueSignOutPreparation() async {}
@@ -27,8 +33,10 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     let schedule: MobileReadRepository<MobileScheduleResponse>
     let scoring: ScoringCurrentStore
     let scoringReliability: ScoringQueueCoordinator?
+    let scoringFinalization: ScoringFinalizationCoordinator?
 
     private let cache: any ReadCacheStoring
+    private let applicationActivity: NativeApplicationActivity
     private var activeContext: ActiveMobileReadContext?
     private var isSuspended = false
     private var scoringWasActiveBeforeSuspension = false
@@ -44,10 +52,14 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         credentialProvider: any MobileReadCredentialProviding,
         cache: any ReadCacheStoring,
         scoringQueueRepository: (any ScoringQueueRepository)? = nil,
-        liveScoringMutationSendingEnabled: Bool = false,
+        scoringFinalizationProbeStore: (any ScoringFinalizationProbeStoring)? = nil,
+        applicationActivity: NativeApplicationActivity = NativeApplicationActivity(isActive: true),
+        scoringHoleMutationAuthorization: (any ScoringHoleMutationAuthorizing)? = nil,
+        liveScoringFinalizationSendingEnabled: Bool = false,
         now: @escaping () -> Date = Date.init
     ) {
         self.cache = cache
+        self.applicationActivity = applicationActivity
         today = MobileReadRepository(
             product: .today,
             cache: cache,
@@ -101,19 +113,38 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             credentialProvider: credentialProvider
         )
         if let scoringQueueRepository {
-            scoringReliability = ScoringQueueCoordinator(
+            let reliability = ScoringQueueCoordinator(
                 repository: scoringQueueRepository,
                 api: api,
                 credentialProvider: credentialProvider,
-                liveMutationSendingEnabled: liveScoringMutationSendingEnabled,
+                applicationActivity: applicationActivity,
+                mutationAuthorization: scoringHoleMutationAuthorization,
                 now: now
             )
+            scoringReliability = reliability
+            if let scoringFinalizationProbeStore {
+                scoringFinalization = ScoringFinalizationCoordinator(
+                    api: api,
+                    credentialProvider: credentialProvider,
+                    queue: reliability,
+                    probeStore: scoringFinalizationProbeStore,
+                    applicationActivity: applicationActivity,
+                    liveMutationSendingEnabled: liveScoringFinalizationSendingEnabled,
+                    now: now
+                )
+            } else {
+                scoringFinalization = nil
+            }
         } else {
             scoringReliability = nil
+            scoringFinalization = nil
         }
 
         let scoringStore = scoring
         scoringReliability?.setCanonicalUpdateHandler { [weak scoringStore] response in
+            scoringStore?.applyCanonicalQueueRefresh(response)
+        }
+        scoringFinalization?.setCanonicalUpdateHandler { [weak scoringStore] response in
             scoringStore?.applyCanonicalQueueRefresh(response)
         }
 
@@ -135,7 +166,9 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         schedule.setAuthorityRevalidationHandler(authorityRevalidation)
         scoring.setAuthorityRevalidationHandler(authorityRevalidation)
         scoringReliability?.setAccessInvalidationHandler(invalidation)
+        scoringFinalization?.setAccessInvalidationHandler(invalidation)
         scoringReliability?.setAuthorityRevalidationHandler(authorityRevalidation)
+        scoringFinalization?.setAuthorityRevalidationHandler(authorityRevalidation)
     }
 
     func setAccessInvalidationHandler(_ handler: @escaping @MainActor @Sendable () -> Void) {
@@ -173,7 +206,9 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
                 await resumeAfterEnvironmentReattestation()
                 return
             }
-            Task { await refreshAll() }
+            if applicationActivity.isActive {
+                Task { await refreshAll() }
+            }
             return
         }
 
@@ -203,15 +238,24 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             beginRefresh: false
         )
         guard isCurrent(context, generation: activationGeneration) else { return }
-        await scoringReliability?.activate(
-            identity: ScoringQueueIdentityPartition(
-                authUserId: authUserID,
-                playerId: participant.player.playerId,
-                tournamentId: participant.tournament.tournamentId
-            )
+        let scoringIdentity = ScoringQueueIdentityPartition(
+            authUserId: authUserID,
+            playerId: participant.player.playerId,
+            tournamentId: participant.tournament.tournamentId
         )
+        // Queue replay must remain fenced until the online-only finalization
+        // owner has loaded its durable probe and either reclaimed Match
+        // ownership or proved no probe exists for this exact identity.
+        if scoringFinalization != nil {
+            scoringReliability?.beginFinalizationRecoveryBarrier(blockLocalSaves: true)
+        }
+        await scoringReliability?.activate(identity: scoringIdentity)
         guard isCurrent(context, generation: activationGeneration) else { return }
-        Task { await refreshAll() }
+        await scoringFinalization?.activate(identity: scoringIdentity)
+        guard isCurrent(context, generation: activationGeneration) else { return }
+        if applicationActivity.isActive {
+            Task { await refreshAll() }
+        }
     }
 
     func deactivate(deleteCache: Bool) async {
@@ -231,6 +275,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard lifecycleGeneration == deactivationGeneration else { return }
         await scoring.deactivate()
         guard lifecycleGeneration == deactivationGeneration else { return }
+        await scoringFinalization?.deactivate()
+        guard lifecycleGeneration == deactivationGeneration else { return }
         await scoringReliability?.deactivate()
         guard lifecycleGeneration == deactivationGeneration else { return }
         if deleteCache, let previous {
@@ -249,27 +295,47 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let scheduleSuspension: Void = schedule.suspendRefresh()
         async let scoringSuspension: Void = scoring.suspendForEnvironmentReattestation()
         async let queueSuspension: Void = scoringReliability?.suspendForEnvironmentReattestation() ?? ()
+        async let finalizationSuspension: Void = scoringFinalization?.suspendForEnvironmentReattestation() ?? ()
         _ = await (
             todaySuspension,
             matchesSuspension,
             leadersSuspension,
             scheduleSuspension,
             scoringSuspension,
-            queueSuspension
+            queueSuspension,
+            finalizationSuspension
         )
     }
 
+    /// Closes scoring transport synchronously at the scene callback boundary;
+    /// the async pause that follows performs the remaining repository work.
+    func prepareForApplicationInactivity() {
+        scoringReliability?.prepareForApplicationInactivity()
+        scoringFinalization?.prepareForApplicationInactivity()
+    }
+
+    /// Foreground is not scoring authority until exact health and canonical
+    /// scoring revalidation complete. Arm both barriers before starting health.
+    func prepareForForegroundRevalidation() {
+        scoringReliability?.prepareForForegroundRevalidation()
+        scoringFinalization?.prepareForForegroundRevalidation()
+    }
+
     func resumeAfterEnvironmentReattestation() async {
-        guard activeContext != nil, isSuspended else { return }
+        guard let context = activeContext, isSuspended else { return }
         lifecycleGeneration &+= 1
+        let resumeGeneration = lifecycleGeneration
         isSuspended = false
         let shouldRestoreScoring = scoringWasActiveBeforeSuspension
         scoringWasActiveBeforeSuspension = false
         if shouldRestoreScoring {
             await scoring.refresh()
+            guard isCurrent(context, generation: resumeGeneration) else { return }
             scoringReliability?.markNetworkUnavailable(scoring.state.isOrientationOnly)
         }
         await scoringReliability?.resumeAfterEnvironmentReattestation()
+        guard isCurrent(context, generation: resumeGeneration) else { return }
+        await scoringFinalization?.resumeAfterEnvironmentReattestation()
     }
 
     func refreshAll() async {
@@ -281,32 +347,82 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         _ = await (todayRefresh, matchesRefresh, leadersRefresh, scheduleRefresh)
     }
 
+    func pauseForBackground() async {
+        guard activeContext != nil else { return }
+        async let queuePause: Void = scoringReliability?.pauseForBackground() ?? ()
+        async let finalizationPause: Void = scoringFinalization?.pauseForBackground() ?? ()
+        _ = await (queuePause, finalizationPause)
+    }
+
     func refreshForForeground() async {
-        guard activeContext != nil, !isSuspended else { return }
+        guard let context = activeContext, !isSuspended else { return }
+        let refreshGeneration = lifecycleGeneration
         let staleAfter: TimeInterval = 5 * 60
         async let todayRefresh: Void = today.refreshIfStale(olderThan: staleAfter)
         async let matchesRefresh: Void = matches.refreshIfStale(olderThan: staleAfter)
         async let leadersRefresh: Void = leaders.refreshIfStale(olderThan: staleAfter)
         async let scheduleRefresh: Void = schedule.refreshIfStale(olderThan: staleAfter)
         _ = await (todayRefresh, matchesRefresh, leadersRefresh, scheduleRefresh)
+        guard isCurrent(context, generation: refreshGeneration) else { return }
         if scoring.state.phase != .idle {
             await scoring.refresh()
+            guard isCurrent(context, generation: refreshGeneration) else { return }
             scoringReliability?.markNetworkUnavailable(scoring.state.isOrientationOnly)
         }
         await scoringReliability?.refreshForForeground()
+        guard isCurrent(context, generation: refreshGeneration) else { return }
+        await scoringFinalization?.resumeForForeground()
+        guard isCurrent(context, generation: refreshGeneration) else { return }
+        if scoringFinalization?.state.phase == .outcomeUnknown ||
+            scoringFinalization?.state.phase == .acknowledgedRefreshPending
+        {
+            await scoringFinalization?.refreshUnknownOutcome()
+        } else {
+            await scoringFinalization?.reconsiderEligibility(using: scoring.state.scoring)
+        }
     }
 
     func unresolvedScoringIntentCount() async -> Int? {
+        guard let context = activeContext else { return 0 }
+        let countGeneration = lifecycleGeneration
         guard let scoringReliability else { return 0 }
-        return await scoringReliability.unresolvedActiveCount()
+        guard let queueCount = await scoringReliability.unresolvedActiveCount() else { return nil }
+        guard isCurrent(context, generation: countGeneration) else { return nil }
+        let finalizationCount: Int
+        if let scoringFinalization {
+            guard let count = await scoringFinalization.unresolvedProbeCount() else { return nil }
+            guard isCurrent(context, generation: countGeneration) else { return nil }
+            finalizationCount = count
+        } else {
+            finalizationCount = 0
+        }
+        return queueCount + finalizationCount
     }
 
     func prepareScoringQueueForSignOut() async {
+        guard let context = activeContext else { return }
+        let preparationGeneration = lifecycleGeneration
+        // Close a previously confirmed finalization immediately on the sign-
+        // out tap, before queue reload/count I/O yields.
+        scoringFinalization?.prepareForSignOutSynchronously()
+        // Finalization's synchronous preparation installs a recovery fence
+        // before releasing its held guard; now finish the queue reload/count
+        // preparation under that already-closed admission boundary.
         await scoringReliability?.prepareForSignOut()
+        guard isCurrent(context, generation: preparationGeneration) else { return }
     }
 
     func cancelScoringQueueSignOutPreparation() async {
+        guard let context = activeContext else { return }
+        let cancellationGeneration = lifecycleGeneration
+        // Arm probe recovery before reopening queue admission. The
+        // finalization owner releases this fence only after durable probe I/O.
+        if scoringFinalization != nil {
+            scoringReliability?.beginFinalizationRecoveryBarrier(blockLocalSaves: true)
+        }
         await scoringReliability?.cancelSignOutPreparation()
+        guard isCurrent(context, generation: cancellationGeneration) else { return }
+        await scoringFinalization?.cancelSignOutPreparation()
     }
 
     func activeCacheByteCount() async -> Int? {

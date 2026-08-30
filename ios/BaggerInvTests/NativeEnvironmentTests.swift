@@ -32,7 +32,7 @@ final class NativeEnvironmentTests: XCTestCase {
         XCTAssertThrowsError(
             try NativeEnvironment(
                 apiBaseURL: NativeEnvironment.previewAPIURL,
-                supabaseURL: URL(string: "https://production-project.supabase.co")!,
+                supabaseURL: URL(string: "https://wrong-project.supabase.co")!,
                 supabasePublishableKey: publishableKey
             )
         ) { error in

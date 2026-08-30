@@ -10,6 +10,13 @@ enum ScoringQueueCoordinatorTestError: Error, Equatable {
     case persistenceUnavailable
 }
 
+/// Tests opt in explicitly to transport capability. The application target's
+/// default remains fail-closed and does not carry an unrestricted policy.
+@MainActor
+final class TestScoringHoleMutationAuthorization: ScoringHoleMutationAuthorizing {
+    let allowsTransport = true
+}
+
 actor InMemoryScoringQueueRepository: ScoringQueueRepository {
     private var storage: [String: ScoringQueueRecord]
     private var identifierCounter: Int
@@ -21,6 +28,9 @@ actor InMemoryScoringQueueRepository: ScoringQueueRepository {
     private(set) var handoffObservedPredecessorRefreshPending: Bool?
     private var identityReadFailureEnabled = false
     private var unresolvedIdentityCountAdjustment = 0
+    private var replacementStateToFail: ScoringQueueState?
+    private var shouldSuspendNextSave = false
+    private var saveContinuation: CheckedContinuation<Void, Never>?
     private var suspendNextTransportStartReturn = false
     private var transportStartContinuation: CheckedContinuation<Void, Never>?
 
@@ -32,17 +42,28 @@ actor InMemoryScoringQueueRepository: ScoringQueueRepository {
         self.saveDate = saveDate
     }
 
-    func save(_ input: ScoringQueueSaveInput) throws -> ScoringQueueSaveResult {
+    func save(_ input: ScoringQueueSaveInput) async throws -> ScoringQueueSaveResult {
         saveCalls += 1
-        let sameHole = storage.values
+        if shouldSuspendNextSave {
+            shouldSuspendNextSave = false
+            await withCheckedContinuation { continuation in
+                saveContinuation = continuation
+            }
+        }
+        let partitionRecords = storage.values.filter { $0.partition == input.partition }
+        let sameHole = partitionRecords
             .filter {
-                $0.partition == input.partition &&
-                    $0.intent.holeNumber == input.intent.holeNumber &&
+                $0.intent.holeNumber == input.intent.holeNumber &&
                     $0.isUnresolved
             }
             .sorted { $0.sequence < $1.sequence }
         if let duplicate = sameHole.first(where: { $0.intent == input.intent }) {
             return .reused(duplicate)
+        }
+        guard !partitionRecords.contains(where: {
+            $0.isUnresolved && $0.blocksNewLocalIntentForMatch
+        }) else {
+            throw SQLiteScoringQueueRepositoryError.reviewRequired
         }
 
         identifierCounter += 1
@@ -99,6 +120,10 @@ actor InMemoryScoringQueueRepository: ScoringQueueRepository {
         _ updated: ScoringQueueRecord,
         expecting current: ScoringQueueRecord
     ) throws -> ScoringQueueRecord {
+        if replacementStateToFail == updated.state {
+            replacementStateToFail = nil
+            throw ScoringQueueCoordinatorTestError.persistenceUnavailable
+        }
         guard let stored = storage[current.localQueueRecordId] else {
             throw ScoringQueueCoordinatorTestError.missingRecord
         }
@@ -298,6 +323,79 @@ actor InMemoryScoringQueueRepository: ScoringQueueRepository {
         return current
     }
 
+    func reapplyConflict(
+        recordId: String,
+        evidence: ScoringQueueConflictReapplyEvidence,
+        originatingAppBuild: String
+    ) throws -> ScoringQueueConflictReapplyResult {
+        guard var current = storage[recordId],
+              current.state == .conflict,
+              current.stateReasonCode == .revision,
+              let conflict = current.conflict,
+              !conflict.refreshRequired,
+              evidence.partition == current.partition,
+              evidence.matchId == current.partition.matchId,
+              evidence.playerId == current.partition.playerId,
+              evidence.snapshotId == current.base.snapshotId,
+              evidence.snapshotRevision == current.base.snapshotRevision,
+              evidence.scoringFormat == current.base.scoringFormat,
+              evidence.sideSlotCount == current.base.sideSlotCount,
+              evidence.matchStatus == .inProgress,
+              evidence.canScore,
+              !evidence.readOnly,
+              evidence.server.refreshedAt > conflict.recordedAt,
+              evidence.server.refreshedAt > current.lastKnownServer.refreshedAt,
+              evidence.server.matchRevision >= current.lastKnownServer.matchRevision,
+              evidence.server.holeRevision >= current.lastKnownServer.holeRevision,
+              evidence.server.permissionRevision >= current.lastKnownServer.permissionRevision,
+              evidence.server.matchRevision >= (conflict.currentMatchRevision ?? 0),
+              evidence.server.holeRevision >= (conflict.currentHoleRevision ?? 0),
+              evidence.server.permissionRevision >= (conflict.currentPermissionRevision ?? 0)
+        else { throw ScoringQueueCoordinatorTestError.invalidTransition }
+
+        identifierCounter += 1
+        let sequence = (sequenceByPartition[current.partition] ?? 0) + 1
+        sequenceByPartition[current.partition] = sequence
+        let createdAt = max(saveDate, max(current.updatedAt, evidence.server.refreshedAt))
+        let replacement = ScoringQueueSaveInput(
+            partition: current.partition,
+            intent: current.intent,
+            base: ScoringQueueBase(
+                expectedMatchRevision: evidence.server.matchRevision,
+                expectedHoleRevision: evidence.server.holeRevision,
+                snapshotId: evidence.snapshotId,
+                snapshotRevision: evidence.snapshotRevision,
+                scoringFormat: evidence.scoringFormat,
+                sideSlotCount: evidence.sideSlotCount,
+                officialGrossAtSave: evidence.officialGross
+            ),
+            lastKnownServer: evidence.server,
+            originatingAppBuild: originatingAppBuild
+        ).makeQueuedRecord(
+            localQueueRecordId: Self.uuid(identifierCounter),
+            mutationId: Self.uuid(identifierCounter + 10_000),
+            sequence: sequence,
+            createdAt: createdAt
+        )
+
+        current.state = .resolved
+        current.stateReasonCode = nil
+        current.acknowledgement = nil
+        current.conflict = nil
+        current.resolution = ScoringQueueResolution(
+            reason: .reappliedAsNewMutation,
+            resolvedAt: createdAt,
+            relatedLocalQueueRecordId: replacement.localQueueRecordId
+        )
+        current.updatedAt = createdAt
+        storage[current.localQueueRecordId] = current
+        storage[replacement.localQueueRecordId] = replacement
+        return ScoringQueueConflictReapplyResult(
+            resolvedConflict: current,
+            replacement: replacement
+        )
+    }
+
     func recoverInterruptedSync(at date: Date) throws -> [ScoringQueueRecord] {
         recoveryCalls += 1
         var recovered: [ScoringQueueRecord] = []
@@ -337,6 +435,23 @@ actor InMemoryScoringQueueRepository: ScoringQueueRepository {
         unresolvedIdentityCountAdjustment = adjustment
     }
 
+    func failNextReplacement(to state: ScoringQueueState) {
+        replacementStateToFail = state
+    }
+
+    func suspendNextSave() {
+        shouldSuspendNextSave = true
+    }
+
+    func hasSuspendedSave() -> Bool {
+        saveContinuation != nil
+    }
+
+    func resumeSuspendedSave() {
+        saveContinuation?.resume()
+        saveContinuation = nil
+    }
+
     private static func uuid(_ value: Int) -> String {
         String(format: "00000000-0000-4000-8000-%012d", value)
     }
@@ -350,11 +465,19 @@ final class CoordinatorQueueCredentials: MobileReadCredentialProviding {
     var returnedAuthUserID: String?
     private(set) var credentialCalls = 0
     private(set) var refreshCalls = 0
+    private var shouldSuspendNextCredentials = false
+    private var credentialContinuation: CheckedContinuation<Void, Never>?
     private var shouldSuspendNextRefresh = false
     private var refreshContinuation: CheckedContinuation<Void, Never>?
 
     func credentials(expectedAuthUserID: String) async throws -> MobileReadCredentials {
         credentialCalls += 1
+        if shouldSuspendNextCredentials {
+            shouldSuspendNextCredentials = false
+            await withCheckedContinuation { continuation in
+                credentialContinuation = continuation
+            }
+        }
         if let credentialError { throw credentialError }
         return credentialsValue(expectedAuthUserID: expectedAuthUserID, suffix: "normal")
     }
@@ -373,6 +496,19 @@ final class CoordinatorQueueCredentials: MobileReadCredentialProviding {
 
     func suspendNextRefresh() {
         shouldSuspendNextRefresh = true
+    }
+
+    func suspendNextCredentials() {
+        shouldSuspendNextCredentials = true
+    }
+
+    func hasSuspendedCredentials() -> Bool {
+        credentialContinuation != nil
+    }
+
+    func resumeSuspendedCredentials() {
+        credentialContinuation?.resume()
+        credentialContinuation = nil
     }
 
     func hasSuspendedRefresh() -> Bool {
@@ -406,19 +542,40 @@ final class CoordinatorQueueAPI: MobileAPIServing {
 
     enum HoleOutcome {
         case accept
+        case commitThenFail(MobileScoringMutationError)
+        case replaceCanonicalThenFail(MobileScoringCurrentResponse, MobileScoringMutationError)
         case fail(MobileScoringMutationError)
+    }
+
+    enum FinalizationOutcome {
+        case accept
+        case acceptWithoutCanonicalProjection
+        case commitThenFail(MobileScoringFinalizationError)
+        case fail(MobileScoringFinalizationError)
     }
 
     private var canonicalByMatch: [String: MobileScoringCurrentResponse] = [:]
     private var currentOutcomesByMatch: [String: [CurrentOutcome]] = [:]
     private var outcomesByMatch: [String: [HoleOutcome]] = [:]
+    private var committedHoleAcknowledgements: [String: MobileScoringHoleResponse] = [:]
+    private var finalizationOutcomesByMatch: [String: [FinalizationOutcome]] = [:]
     private var activeByMatch: [String: Int] = [:]
+    private var matchesSuspendingNextCurrent: Set<String> = []
+    private var suspendedCurrentContinuations: [String: CheckedContinuation<Void, Never>] = [:]
+    private var matchesSuspendingNextHole: Set<String> = []
+    private var suspendedHoleContinuations: [String: CheckedContinuation<Void, Never>] = [:]
+    private var matchesSuspendingNextFinalization: Set<String> = []
+    private var suspendedFinalizationContinuations: [String: CheckedContinuation<Void, Never>] = [:]
     private(set) var scoringCurrentMatchIDs: [String] = []
     private(set) var holeRequests: [MobileScoringHoleRequest] = []
     private(set) var holeAccessTokens: [String] = []
+    private(set) var finalizationRequests: [MobileScoringFinalizeRequest] = []
     private(set) var maximumActiveMutations = 0
     private(set) var maximumActiveByMatch: [String: Int] = [:]
     var mutationDelayNanoseconds: UInt64 = 0
+    var finalizationDelayNanoseconds: UInt64 = 0
+    var finalizationResponseDelayAttempt: Int?
+    var finalizationCommitBeforeResponseDelayAttempt: Int?
 
     func configureCanonical(
         for partition: ScoringQueuePartition,
@@ -428,6 +585,7 @@ final class CoordinatorQueueAPI: MobileAPIServing {
         status: MobileMatchStatus = .inProgress,
         canScore: Bool = true,
         readOnly: Bool = false,
+        canFinalize: Bool = false,
         snapshotId: String? = nil,
         snapshotRevision: Int = 1
     ) {
@@ -439,6 +597,7 @@ final class CoordinatorQueueAPI: MobileAPIServing {
             status: status,
             canScore: canScore,
             readOnly: readOnly,
+            canFinalize: canFinalize,
             snapshotId: snapshotId,
             snapshotRevision: snapshotRevision
         )
@@ -450,6 +609,49 @@ final class CoordinatorQueueAPI: MobileAPIServing {
 
     func setCurrentOutcomes(_ outcomes: [CurrentOutcome], for matchId: String) {
         currentOutcomesByMatch[matchId] = outcomes
+    }
+
+    func suspendNextCurrent(for matchId: String) {
+        matchesSuspendingNextCurrent.insert(matchId)
+    }
+
+    func hasSuspendedCurrent(for matchId: String) -> Bool {
+        suspendedCurrentContinuations[matchId] != nil
+    }
+
+    func resumeSuspendedCurrent(for matchId: String) {
+        suspendedCurrentContinuations.removeValue(forKey: matchId)?.resume()
+    }
+
+    func suspendNextHole(for matchId: String) {
+        matchesSuspendingNextHole.insert(matchId)
+    }
+
+    func hasSuspendedHole(for matchId: String) -> Bool {
+        suspendedHoleContinuations[matchId] != nil
+    }
+
+    func resumeSuspendedHole(for matchId: String) {
+        suspendedHoleContinuations.removeValue(forKey: matchId)?.resume()
+    }
+
+    func suspendNextFinalization(for matchId: String) {
+        matchesSuspendingNextFinalization.insert(matchId)
+    }
+
+    func hasSuspendedFinalization(for matchId: String) -> Bool {
+        suspendedFinalizationContinuations[matchId] != nil
+    }
+
+    func resumeSuspendedFinalization(for matchId: String) {
+        suspendedFinalizationContinuations.removeValue(forKey: matchId)?.resume()
+    }
+
+    func setFinalizationOutcomes(
+        _ outcomes: [FinalizationOutcome],
+        for matchId: String
+    ) {
+        finalizationOutcomesByMatch[matchId] = outcomes
     }
 
     func health() async throws -> MobileHealthResponse { TestFixtures.health }
@@ -507,6 +709,11 @@ final class CoordinatorQueueAPI: MobileAPIServing {
             throw ScoringQueueCoordinatorTestError.missingCanonical
         }
         scoringCurrentMatchIDs.append(matchID)
+        if matchesSuspendingNextCurrent.remove(matchID) != nil {
+            await withCheckedContinuation { continuation in
+                suspendedCurrentContinuations[matchID] = continuation
+            }
+        }
         if var outcomes = currentOutcomesByMatch[matchID], !outcomes.isEmpty {
             let outcome = outcomes.removeFirst()
             currentOutcomesByMatch[matchID] = outcomes
@@ -538,8 +745,19 @@ final class CoordinatorQueueAPI: MobileAPIServing {
         )
         defer { activeByMatch[request.matchId, default: 1] -= 1 }
 
+        if matchesSuspendingNextHole.remove(request.matchId) != nil {
+            await withCheckedContinuation { continuation in
+                suspendedHoleContinuations[request.matchId] = continuation
+            }
+        }
+
         if mutationDelayNanoseconds > 0 {
             try await Task.sleep(nanoseconds: mutationDelayNanoseconds)
+        }
+
+        let acknowledgementKey = "\(request.matchId):\(request.mutationId)"
+        if let committed = committedHoleAcknowledgements[acknowledgementKey] {
+            return idempotentResponse(committed)
         }
 
         let outcome: HoleOutcome
@@ -552,8 +770,61 @@ final class CoordinatorQueueAPI: MobileAPIServing {
         switch outcome {
         case .fail(let error):
             throw error
+        case .replaceCanonicalThenFail(let canonical, let error):
+            canonicalByMatch[request.matchId] = canonical
+            throw error
+        case .commitThenFail(let error):
+            _ = try accept(request)
+            throw error
         case .accept:
             return try accept(request)
+        }
+    }
+
+    func scoringFinalize(
+        request: MobileScoringFinalizeRequest,
+        accessToken: String,
+        certification: String
+    ) async throws -> MobileScoringFinalizeResponse {
+        finalizationRequests.append(request)
+        let attemptNumber = finalizationRequests.count
+        if matchesSuspendingNextFinalization.remove(request.matchId) != nil {
+            await withCheckedContinuation { continuation in
+                suspendedFinalizationContinuations[request.matchId] = continuation
+            }
+        }
+        let shouldDelay = finalizationDelayNanoseconds > 0 &&
+            (finalizationResponseDelayAttempt == nil ||
+                finalizationResponseDelayAttempt == attemptNumber)
+        let outcome: FinalizationOutcome
+        if var outcomes = finalizationOutcomesByMatch[request.matchId], !outcomes.isEmpty {
+            outcome = outcomes.removeFirst()
+            finalizationOutcomesByMatch[request.matchId] = outcomes
+        } else {
+            outcome = .accept
+        }
+        if finalizationCommitBeforeResponseDelayAttempt == attemptNumber,
+           case .accept = outcome
+        {
+            let response = try acceptFinalization(request)
+            if shouldDelay {
+                try await Task.sleep(nanoseconds: finalizationDelayNanoseconds)
+            }
+            return response
+        }
+        if shouldDelay {
+            try await Task.sleep(nanoseconds: finalizationDelayNanoseconds)
+        }
+        switch outcome {
+        case .accept:
+            return try acceptFinalization(request)
+        case .acceptWithoutCanonicalProjection:
+            return try acceptFinalization(request, updateCanonicalProjection: false)
+        case .commitThenFail(let error):
+            _ = try acceptFinalization(request)
+            throw error
+        case .fail(let error):
+            throw error
         }
     }
 
@@ -588,7 +859,7 @@ final class CoordinatorQueueAPI: MobileAPIServing {
             readOnly: current.permission.readOnly
         )
 
-        return MobileScoringHoleResponse(
+        let response = MobileScoringHoleResponse(
             ok: true,
             apiVersion: "v1",
             data: MobileScoringHoleAcknowledgement(
@@ -607,6 +878,78 @@ final class CoordinatorQueueAPI: MobileAPIServing {
                     statusText: nil
                 ),
                 refreshRequired: false
+            ),
+            meta: TestFixtures.scoringResponse.meta
+        )
+        committedHoleAcknowledgements["\(request.matchId):\(request.mutationId)"] = response
+        return response
+    }
+
+    private func idempotentResponse(
+        _ response: MobileScoringHoleResponse
+    ) -> MobileScoringHoleResponse {
+        MobileScoringHoleResponse(
+            ok: response.ok,
+            apiVersion: response.apiVersion,
+            data: MobileScoringHoleAcknowledgement(
+                mutationId: response.data.mutationId,
+                accepted: response.data.accepted,
+                idempotent: true,
+                semanticNoop: response.data.semanticNoop,
+                matchId: response.data.matchId,
+                hole: response.data.hole,
+                match: response.data.match,
+                refreshRequired: response.data.refreshRequired
+            ),
+            meta: response.meta
+        )
+    }
+
+    private func acceptFinalization(
+        _ request: MobileScoringFinalizeRequest,
+        updateCanonicalProjection: Bool = true
+    ) throws -> MobileScoringFinalizeResponse {
+        guard let currentResponse = canonicalByMatch[request.matchId],
+              let current = currentResponse.data.scoring
+        else { throw ScoringQueueCoordinatorTestError.missingCanonical }
+        let newRevision = current.match.matchRevision + 1
+        let partition = ScoringQueuePartition(
+            authUserId: CoordinatorQueueFixtures.identity.authUserId,
+            playerId: current.player.playerId,
+            tournamentId: CoordinatorQueueFixtures.identity.tournamentId,
+            matchId: request.matchId
+        )
+        if updateCanonicalProjection {
+            canonicalByMatch[request.matchId] = CoordinatorQueueFixtures.canonicalResponse(
+                partition: partition,
+                matchRevision: newRevision,
+                permissionRevision: current.match.permissionRevision + 1,
+                scores: current.scores,
+                status: .completed,
+                canScore: false,
+                readOnly: true,
+                canFinalize: false,
+                snapshotId: current.snapshot.snapshotId,
+                snapshotRevision: current.snapshot.revision
+            )
+        }
+        return MobileScoringFinalizeResponse(
+            ok: true,
+            apiVersion: "v1",
+            data: MobileScoringFinalizeAcknowledgement(
+                mutationId: request.mutationId,
+                accepted: true,
+                idempotent: false,
+                match: MobileScoringFinalizedMatch(
+                    matchId: request.matchId,
+                    revision: newRevision,
+                    permissionRevision: current.match.permissionRevision + 1,
+                    status: .completed,
+                    scoringLocked: true,
+                    result: nil,
+                    finalizedAt: TestFixtures.scoringResponse.meta.generatedAt
+                ),
+                refreshRequired: true
             ),
             meta: TestFixtures.scoringResponse.meta
         )
@@ -753,6 +1096,7 @@ enum CoordinatorQueueFixtures {
         status: MobileMatchStatus,
         canScore: Bool,
         readOnly: Bool,
+        canFinalize: Bool = false,
         snapshotId: String? = nil,
         snapshotRevision: Int = 1
     ) -> MobileScoringCurrentResponse {
@@ -784,7 +1128,7 @@ enum CoordinatorQueueFixtures {
             permission: MobileScoringPermission(
                 canScore: canScore,
                 readOnly: readOnly,
-                canFinalize: false,
+                canFinalize: canFinalize,
                 reason: nil
             ),
             snapshot: MobileScoringSnapshot(

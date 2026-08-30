@@ -1,34 +1,308 @@
 import SwiftUI
 
+enum ScoringFinalizationUIPhase: Equatable {
+    case hidden
+    case ready
+    case submitting
+    case reconciling
+    case acknowledgedRefreshPending
+    case outcomeUnknown
+    case confirmationRequired
+    case blocked(ScoringFinalizationBlocker)
+    case matchFinal
+}
+
+struct ScoringFinalizationUIModel: Equatable {
+    let phase: ScoringFinalizationUIPhase
+    let canRequestFinalization: Bool
+
+    static func make(
+        presentation: ScoringPresentation,
+        queueState: ScoringQueueCoordinatorState,
+        coordinatorState: ScoringFinalizationState,
+        liveFinalizationSendingEnabled: Bool = true
+    ) -> Self {
+        guard liveFinalizationSendingEnabled else {
+            return Self(phase: .hidden, canRequestFinalization: false)
+        }
+        guard let matchID = presentation.matchID else {
+            return Self(phase: .hidden, canRequestFinalization: false)
+        }
+        let stateMatches = coordinatorState.matchId.map { $0 == matchID } ?? true
+        guard stateMatches else {
+            return Self(phase: .blocked(.contract), canRequestFinalization: false)
+        }
+
+        // A durable unknown/acknowledged probe must remain visible until its
+        // coordinator removes it and releases the queue guard. A separately
+        // refreshed final presentation cannot hide that unresolved recovery.
+        switch coordinatorState.phase {
+        case .submitting:
+            return Self(phase: .submitting, canRequestFinalization: false)
+        case .reconciling:
+            return Self(phase: .reconciling, canRequestFinalization: false)
+        case .acknowledgedRefreshPending:
+            return Self(phase: .acknowledgedRefreshPending, canRequestFinalization: false)
+        case .outcomeUnknown:
+            return Self(phase: .outcomeUnknown, canRequestFinalization: false)
+        case .blocked:
+            return Self(
+                phase: .blocked(coordinatorState.blocker ?? .contract),
+                canRequestFinalization: false
+            )
+        case .matchFinal:
+            return Self(phase: .matchFinal, canRequestFinalization: false)
+        case .idle, .confirmationRequired:
+            break
+        }
+        if presentation.status == .final {
+            return Self(phase: .matchFinal, canRequestFinalization: false)
+        }
+
+        let unresolvedForMatch = queueState.records.contains {
+            $0.partition.matchId == matchID && $0.isUnresolved
+        }
+        let queueReady = !unresolvedForMatch &&
+            !queueState.isOffline &&
+            !queueState.isSuspended &&
+            !queueState.lastPersistenceFailure &&
+            !queueState.hasHiddenQuarantinedRecords
+        let canonicalReady = presentation.availability == .active &&
+            presentation.status == .live &&
+            presentation.canFinalize &&
+            presentation.scorecardComplete &&
+            !presentation.readOnly &&
+            !presentation.isRefreshing &&
+            !presentation.orientationOnly
+        let ready = queueReady && canonicalReady
+
+        switch coordinatorState.phase {
+        case .submitting:
+            return Self(phase: .submitting, canRequestFinalization: false)
+        case .reconciling:
+            return Self(phase: .reconciling, canRequestFinalization: false)
+        case .acknowledgedRefreshPending:
+            return Self(phase: .acknowledgedRefreshPending, canRequestFinalization: false)
+        case .outcomeUnknown:
+            return Self(phase: .outcomeUnknown, canRequestFinalization: false)
+        case .confirmationRequired:
+            if ready {
+                return Self(phase: .confirmationRequired, canRequestFinalization: true)
+            }
+            return Self(
+                phase: .blocked(blocker(presentation: presentation, queueReady: queueReady)),
+                canRequestFinalization: false
+            )
+        case .blocked:
+            return Self(
+                phase: .blocked(coordinatorState.blocker ?? .contract),
+                canRequestFinalization: false
+            )
+        case .matchFinal:
+            return Self(phase: .matchFinal, canRequestFinalization: false)
+        case .idle:
+            if ready {
+                return Self(phase: .ready, canRequestFinalization: true)
+            }
+            let shouldExplain = presentation.canFinalize ||
+                presentation.scorecardComplete ||
+                coordinatorState.matchId == matchID
+            guard shouldExplain else {
+                return Self(phase: .hidden, canRequestFinalization: false)
+            }
+            return Self(
+                phase: .blocked(blocker(presentation: presentation, queueReady: queueReady)),
+                canRequestFinalization: false
+            )
+        }
+    }
+
+    private static func blocker(
+        presentation: ScoringPresentation,
+        queueReady: Bool
+    ) -> ScoringFinalizationBlocker {
+        if !queueReady { return .queue }
+        if presentation.readOnly { return .readOnly }
+        if presentation.status == .final { return .lifecycle }
+        if presentation.orientationOnly || presentation.isRefreshing { return .canonicalUnavailable }
+        return .notReady
+    }
+}
+
+struct ScoringLocalIntentRow: Identifiable, Equatable {
+    let side: Int
+    let slot: Int
+    let label: String
+    let officialGross: Int?
+    let savedGross: Int
+
+    var id: String { "\(side):\(slot)" }
+}
+
+struct ScoringLocalIntentComparison: Equatable {
+    let recordID: String
+    let holeNumber: Int
+    let rows: [ScoringLocalIntentRow]
+    let state: ScoringQueueState
+    let reason: ScoringQueueStateReasonCode?
+    let allowsKeepOfficial: Bool
+    let allowsReapply: Bool
+
+    static func make(
+        record: ScoringQueueRecord,
+        presentation: ScoringPresentation
+    ) -> Self {
+        let officialGross: ScoringQueueGross? = record.conflict?.officialGross ?? presentation
+            .officialHole(record.intent.holeNumber)
+            .flatMap { hole in
+                guard let teamOne = hole.sides.first(where: { $0.side == 1 })?.gross,
+                      let teamTwo = hole.sides.first(where: { $0.side == 2 })?.gross
+                else { return nil }
+                return ScoringQueueGross(teamOne: teamOne, teamTwo: teamTwo)
+            }
+
+        let rows = presentation.sides.flatMap { side -> [ScoringLocalIntentRow] in
+            let saved = side.side == 1
+                ? record.intent.teamOneGrossScores
+                : record.intent.teamTwoGrossScores
+            let official = side.side == 1
+                ? officialGross?.teamOne
+                : officialGross?.teamTwo
+            return saved.enumerated().map { index, value in
+                let participant = side.participants.indices.contains(index)
+                    ? side.participants[index]
+                    : nil
+                let label = saved.count == side.participants.count
+                    ? participant?.displayName ?? "\(side.name) slot \(index + 1)"
+                    : side.name
+                return ScoringLocalIntentRow(
+                    side: side.side,
+                    slot: participant?.slot ?? index + 1,
+                    label: label,
+                    officialGross: official.flatMap { $0.indices.contains(index) ? $0[index] : nil },
+                    savedGross: value
+                )
+            }
+        }
+        let reviewable = record.state == .conflict &&
+            record.stateReasonCode == .revision &&
+            record.conflict?.refreshRequired == false
+        let reapplicationIsCanonicallyEligible = presentation.canCreateDurableIntent &&
+            presentation.matchID == record.partition.matchId &&
+            presentation.snapshotID == record.base.snapshotId &&
+            presentation.snapshotRevision == record.base.snapshotRevision
+        return Self(
+            recordID: record.localQueueRecordId,
+            holeNumber: record.intent.holeNumber,
+            rows: rows,
+            state: record.state,
+            reason: record.stateReasonCode,
+            allowsKeepOfficial: reviewable,
+            allowsReapply: reviewable && reapplicationIsCanonicallyEligible
+        )
+    }
+}
+
+enum ScoringQueueUIProjection {
+    static func records(
+        matchID: String,
+        state: ScoringQueueCoordinatorState
+    ) -> [ScoringQueueRecord] {
+        state.records
+            .filter { $0.partition.matchId == matchID }
+            .sorted { $0.sequence < $1.sequence }
+    }
+
+    static func reviewRecords(
+        matchID: String,
+        state: ScoringQueueCoordinatorState
+    ) -> [ScoringQueueRecord] {
+        records(matchID: matchID, state: state).filter {
+            $0.state == .conflict || $0.state == .actionRequired || $0.state == .quarantined
+        }
+    }
+
+    static func latestUnresolvedPerHole(
+        matchID: String,
+        state: ScoringQueueCoordinatorState
+    ) -> [ScoringQueueRecord] {
+        let grouped = Dictionary(
+            grouping: records(matchID: matchID, state: state).filter(\.isUnresolved)
+        ) { $0.intent.holeNumber }
+        return grouped.values.compactMap { records in
+            records.max { $0.sequence < $1.sequence }
+        }
+        .sorted { lhs, rhs in
+            if lhs.intent.holeNumber != rhs.intent.holeNumber {
+                return lhs.intent.holeNumber < rhs.intent.holeNumber
+            }
+            return lhs.sequence < rhs.sequence
+        }
+    }
+}
+
 struct ScoreScreen: View {
     let presentation: ScoringPresentation
     let queueState: ScoringQueueCoordinatorState
+    let finalizationState: ScoringFinalizationState
+    let liveHoleMutationSendingEnabled: Bool
+    let liveFinalizationSendingEnabled: Bool
     let onRefresh: @MainActor @Sendable () async -> Void
     let onSave: @MainActor @Sendable (ScoringDraft) async throws -> ScoringQueueSaveResult
     let onManualRetry: @MainActor @Sendable (String) async throws -> Void
+    let onKeepOfficial: @MainActor @Sendable (String) async throws -> Void
+    let onReapplyMyScore: @MainActor @Sendable (String) async throws -> Void
+    let onFinalize: @MainActor @Sendable (String) async throws -> Void
+    let onRefreshFinalizationOutcome: @MainActor @Sendable () async -> Void
 
     @State private var selectedHole: Int?
     @State private var drafts: [Int: ScoringDraft] = [:]
     @State private var pickerTarget: ScoringPickerTarget?
     @State private var isSaving = false
     @State private var saveFailure = false
+    @State private var pendingReviewAction: PendingScoringReviewAction?
+    @State private var isReviewConfirmationPresented = false
+    @State private var reviewRecordIDInFlight: String?
+    @State private var reviewActionFailed = false
+    @State private var isFinalizeConfirmationPresented = false
+    @State private var finalizationActionFailed = false
 
     init(
         presentation: ScoringPresentation,
         queueState: ScoringQueueCoordinatorState = .inactive,
+        finalizationState: ScoringFinalizationState = .idle,
+        liveHoleMutationSendingEnabled: Bool = false,
+        liveFinalizationSendingEnabled: Bool = true,
         onRefresh: @escaping @MainActor @Sendable () async -> Void,
         onSave: @escaping @MainActor @Sendable (ScoringDraft) async throws -> ScoringQueueSaveResult = { _ in
             throw ScoringQueueCoordinatorError.inactiveIdentity
         },
         onManualRetry: @escaping @MainActor @Sendable (String) async throws -> Void = { _ in
             throw ScoringQueueCoordinatorError.notEligibleForRetry
-        }
+        },
+        onKeepOfficial: @escaping @MainActor @Sendable (String) async throws -> Void = { _ in
+            throw ScoringQueueCoordinatorError.notReviewable
+        },
+        onReapplyMyScore: @escaping @MainActor @Sendable (String) async throws -> Void = { _ in
+            throw ScoringQueueCoordinatorError.notReviewable
+        },
+        onFinalize: @escaping @MainActor @Sendable (String) async throws -> Void = { _ in
+            throw ScoringFinalizationCoordinatorError.notReady
+        },
+        onRefreshFinalizationOutcome: @escaping @MainActor @Sendable () async -> Void = {}
     ) {
         self.presentation = presentation
         self.queueState = queueState
+        self.finalizationState = finalizationState
+        self.liveHoleMutationSendingEnabled = liveHoleMutationSendingEnabled
+        self.liveFinalizationSendingEnabled = liveFinalizationSendingEnabled
         self.onRefresh = onRefresh
         self.onSave = onSave
         self.onManualRetry = onManualRetry
+        self.onKeepOfficial = onKeepOfficial
+        self.onReapplyMyScore = onReapplyMyScore
+        self.onFinalize = onFinalize
+        self.onRefreshFinalizationOutcome = onRefreshFinalizationOutcome
         _selectedHole = State(initialValue: presentation.initialSelectedHole())
     }
 
@@ -74,6 +348,31 @@ struct ScoreScreen: View {
             )
             .presentationDetents([.medium])
         }
+        .confirmationDialog(
+            "Resolve saved score?",
+            isPresented: $isReviewConfirmationPresented,
+            titleVisibility: .visible,
+            presenting: pendingReviewAction
+        ) { action in
+            Button(action.buttonTitle, role: action.kind == .keepOfficial ? .destructive : nil) {
+                performReviewAction(action)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { action in
+            Text(action.message)
+        }
+        .confirmationDialog(
+            "Finalize this Match?",
+            isPresented: $isFinalizeConfirmationPresented,
+            titleVisibility: .visible
+        ) {
+            Button("Finalize Match", role: .destructive) {
+                submitFinalization()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("All saved scores must be Official first. Once finalized, this Match becomes read-only.")
+        }
         .onChange(of: presentation.canonicalVersion) { _ in
             drafts.removeAll()
             pickerTarget = nil
@@ -81,6 +380,11 @@ struct ScoreScreen: View {
         }
         .onChange(of: presentation.canonicalHoleNumbers) { _ in
             reconcileSelection()
+        }
+        .onChange(of: allowsLocalIntentAdmission) { allowed in
+            guard !allowed else { return }
+            drafts.removeAll()
+            pickerTarget = nil
         }
         .onAppear {
             // TabView may construct Score while scoring-current is still
@@ -160,6 +464,24 @@ struct ScoreScreen: View {
                 }
             }
 
+            if let matchID = presentation.matchID {
+                let reviewRecords = reviewQueueRecords(matchID: matchID)
+                if !reviewRecords.isEmpty {
+                    ScoringReviewCenter(
+                        comparisons: reviewRecords.map {
+                            ScoringLocalIntentComparison.make(
+                                record: $0,
+                                presentation: presentation
+                            )
+                        },
+                        recordIDInFlight: reviewRecordIDInFlight,
+                        actionFailed: reviewActionFailed,
+                        onKeepOfficial: { requestReviewAction(.keepOfficial, for: $0) },
+                        onReapply: { requestReviewAction(.reapply, for: $0) }
+                    )
+                }
+            }
+
             if let activeHoleNumber = effectiveSelectedHole,
                let hole = presentation.hole(activeHoleNumber)
             {
@@ -182,6 +504,7 @@ struct ScoreScreen: View {
                     ScoringScorecardView(
                         presentation: presentation,
                         selectedHole: activeHoleNumber,
+                        pendingRecords: pendingScorecardRecords,
                         onSelectHole: { self.selectedHole = $0 }
                     )
                 } label: {
@@ -205,6 +528,7 @@ struct ScoreScreen: View {
                         presentation: presentation,
                         hole: hole,
                         draft: drafts[hole.holeNumber],
+                        isEditable: allowsLocalIntentAdmission,
                         onDecrement: { adjust($0, by: -1, hole: hole) },
                         onIncrement: { adjust($0, by: 1, hole: hole) },
                         onChoose: { openPicker(for: $0, hole: hole) },
@@ -232,6 +556,7 @@ struct ScoreScreen: View {
                         hasDraft: drafts[hole.holeNumber]?.isEmpty == false,
                         isSaving: isSaving,
                         saveFailed: saveFailure,
+                        isEnabled: allowsLocalIntentAdmission,
                         onSave: { saveAndAdvance(holeNumber: hole.holeNumber) }
                     )
                 }
@@ -247,6 +572,7 @@ struct ScoreScreen: View {
                 ScoringScorecardView(
                     presentation: presentation,
                     selectedHole: effectiveSelectedHole,
+                    pendingRecords: pendingScorecardRecords,
                     onSelectHole: { selectedHole = $0 }
                 )
             } label: {
@@ -271,6 +597,26 @@ struct ScoreScreen: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("score.scorecard")
             .accessibilityHint("Opens the official Scorecard")
+
+            ScoringFinalizationCard(
+                model: finalizationUIModel,
+                actionFailed: finalizationActionFailed,
+                onRequestFinalization: {
+                    guard finalizationUIModel.canRequestFinalization else { return }
+                    isFinalizeConfirmationPresented = true
+                },
+                onRefreshOfficialState: {
+                    Task { @MainActor in
+                        if finalizationUIModel.phase == .outcomeUnknown ||
+                            finalizationUIModel.phase == .acknowledgedRefreshPending
+                        {
+                            await onRefreshFinalizationOutcome()
+                        } else {
+                            await refreshCanonicalState()
+                        }
+                    }
+                }
+            )
         }
     }
 
@@ -334,6 +680,7 @@ struct ScoreScreen: View {
     }
 
     private func ensureDraft(for hole: ScoringCourseHolePresentation) -> ScoringDraft? {
+        guard allowsLocalIntentAdmission else { return nil }
         if let existing = drafts[hole.holeNumber], presentation.isDraftCompatible(existing) {
             return existing
         }
@@ -341,6 +688,7 @@ struct ScoreScreen: View {
     }
 
     private func adjust(_ row: ScoringInputRowPresentation, by delta: Int, hole: ScoringCourseHolePresentation) {
+        guard allowsLocalIntentAdmission else { return }
         guard var draft = ensureDraft(for: hole) else { return }
         let defaultGross = hole.par.map { Int($0.rounded()) } ?? 4
         if ScoringInteraction.displayedGross(for: row, draft: draft) == nil {
@@ -360,14 +708,14 @@ struct ScoreScreen: View {
     }
 
     private func openPicker(for row: ScoringInputRowPresentation, hole: ScoringCourseHolePresentation) {
-        guard presentation.isEditable else { return }
+        guard allowsLocalIntentAdmission else { return }
         let draft = ensureDraft(for: hole)
         let value = ScoringInteraction.displayedGross(for: row, draft: draft) ?? hole.par.map { Int($0.rounded()) } ?? 4
         pickerTarget = ScoringPickerTarget(row: row, holeNumber: hole.holeNumber, initialValue: value)
     }
 
     private func setDraft(_ value: Int, for row: ScoringInputRowPresentation) {
-        guard presentation.isEditable,
+        guard allowsLocalIntentAdmission,
               let target = pickerTarget,
               let hole = presentation.hole(target.holeNumber),
               presentation.inputRows(for: target.holeNumber).contains(where: { $0.key == row.key }),
@@ -403,7 +751,11 @@ struct ScoreScreen: View {
     }
 
     private func saveAndAdvance(holeNumber: Int) {
-        guard !isSaving, let draft = drafts[holeNumber], !draft.isEmpty else { return }
+        guard allowsLocalIntentAdmission,
+              !isSaving,
+              let draft = drafts[holeNumber],
+              !draft.isEmpty
+        else { return }
         isSaving = true
         saveFailure = false
         Task { @MainActor in
@@ -418,10 +770,85 @@ struct ScoreScreen: View {
         }
     }
 
+    private var pendingScorecardRecords: [ScoringQueueRecord] {
+        guard let matchID = presentation.matchID else { return [] }
+        return ScoringQueueUIProjection.latestUnresolvedPerHole(
+            matchID: matchID,
+            state: queueState
+        )
+    }
+
+    private var allowsLocalIntentAdmission: Bool {
+        guard presentation.canCreateDurableIntent,
+              let matchID = presentation.matchID
+        else { return false }
+        return queueState.allowsNewLocalIntent(matchId: matchID)
+    }
+
+    private var finalizationUIModel: ScoringFinalizationUIModel {
+        ScoringFinalizationUIModel.make(
+            presentation: presentation,
+            queueState: queueState,
+            coordinatorState: finalizationState,
+            liveFinalizationSendingEnabled: liveFinalizationSendingEnabled
+        )
+    }
+
+    private func reviewQueueRecords(matchID: String) -> [ScoringQueueRecord] {
+        ScoringQueueUIProjection.reviewRecords(matchID: matchID, state: queueState)
+    }
+
+    private func requestReviewAction(
+        _ kind: PendingScoringReviewAction.Kind,
+        for comparison: ScoringLocalIntentComparison
+    ) {
+        guard (kind == .keepOfficial && comparison.allowsKeepOfficial) ||
+                (kind == .reapply && comparison.allowsReapply)
+        else { return }
+        pendingReviewAction = PendingScoringReviewAction(
+            recordID: comparison.recordID,
+            holeNumber: comparison.holeNumber,
+            kind: kind
+        )
+        isReviewConfirmationPresented = true
+    }
+
+    private func performReviewAction(_ action: PendingScoringReviewAction) {
+        guard reviewRecordIDInFlight == nil else { return }
+        pendingReviewAction = nil
+        reviewRecordIDInFlight = action.recordID
+        reviewActionFailed = false
+        Task { @MainActor in
+            defer { reviewRecordIDInFlight = nil }
+            do {
+                switch action.kind {
+                case .keepOfficial:
+                    try await onKeepOfficial(action.recordID)
+                case .reapply:
+                    try await onReapplyMyScore(action.recordID)
+                }
+            } catch {
+                reviewActionFailed = true
+            }
+        }
+    }
+
+    private func submitFinalization() {
+        guard let matchID = presentation.matchID,
+              finalizationUIModel.canRequestFinalization
+        else { return }
+        finalizationActionFailed = false
+        Task { @MainActor in
+            do {
+                try await onFinalize(matchID)
+            } catch {
+                finalizationActionFailed = true
+            }
+        }
+    }
+
     private func queueRecords(matchID: String) -> [ScoringQueueRecord] {
-        queueState.records
-            .filter { $0.partition.matchId == matchID }
-            .sorted { $0.sequence < $1.sequence }
+        ScoringQueueUIProjection.records(matchID: matchID, state: queueState)
     }
 
     private func unresolvedQueueCount(matchID: String) -> Int {
@@ -489,6 +916,356 @@ struct ScoreScreen: View {
         }
         return {
             Task { @MainActor in try? await onManualRetry(record.localQueueRecordId) }
+        }
+    }
+}
+
+private struct PendingScoringReviewAction: Equatable {
+    enum Kind: Equatable {
+        case keepOfficial
+        case reapply
+    }
+
+    let recordID: String
+    let holeNumber: Int
+    let kind: Kind
+
+    var buttonTitle: String {
+        switch kind {
+        case .keepOfficial: "Keep Official"
+        case .reapply: "Reapply My Score"
+        }
+    }
+
+    var message: String {
+        switch kind {
+        case .keepOfficial:
+            "Your saved score for Hole \(holeNumber) will be discarded. Bagger’s Official score will remain unchanged."
+        case .reapply:
+            "Bagger will refresh the Match first, then create a new scoring intent with current canonical permission and revisions."
+        }
+    }
+}
+
+private struct ScoringReviewCenter: View {
+    let comparisons: [ScoringLocalIntentComparison]
+    let recordIDInFlight: String?
+    let actionFailed: Bool
+    let onKeepOfficial: (ScoringLocalIntentComparison) -> Void
+    let onReapply: (ScoringLocalIntentComparison) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            BaggerSectionHeading("Needs Review")
+            Text("Saved scores are listed oldest first. Bagger never overwrites a different Official score automatically.")
+                .font(.footnote)
+                .foregroundStyle(BaggerPalette.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(Array(comparisons.enumerated()), id: \.element.recordID) { index, comparison in
+                ScoringReviewRecordCard(
+                    comparison: comparison,
+                    isWorking: recordIDInFlight == comparison.recordID,
+                    onKeepOfficial: { onKeepOfficial(comparison) },
+                    onReapply: { onReapply(comparison) }
+                )
+                if index < comparisons.count - 1 {
+                    Divider().overlay(BaggerPalette.warmBorder)
+                }
+            }
+
+            if actionFailed {
+                Label("The review action could not be completed. Refresh Official scoring state and try again.", systemImage: "exclamationmark.triangle.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(BaggerPalette.liveRed)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("score.review.error")
+            }
+        }
+        .baggerCard(border: BaggerPalette.liveRed)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("score.review.center")
+    }
+}
+
+private struct ScoringReviewRecordCard: View {
+    let comparison: ScoringLocalIntentComparison
+    let isWorking: Bool
+    let onKeepOfficial: () -> Void
+    let onReapply: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 11) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text("Hole \(comparison.holeNumber)")
+                    .font(.headline)
+                    .foregroundStyle(BaggerPalette.ink)
+                Spacer(minLength: 8)
+                Text(stateLabel)
+                    .font(.caption.weight(.black))
+                    .foregroundStyle(BaggerPalette.deepEvergreen)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(BaggerPalette.scoreGold, in: Capsule())
+            }
+
+            Text(reasonMessage)
+                .font(.footnote)
+                .foregroundStyle(BaggerPalette.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(comparison.rows) { row in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(row.label)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(BaggerPalette.ink)
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 16) {
+                            scoreText("Official", value: row.officialGross)
+                            scoreText("Your saved score", value: row.savedGross)
+                        }
+                        VStack(alignment: .leading, spacing: 3) {
+                            scoreText("Official", value: row.officialGross)
+                            scoreText("Your saved score", value: row.savedGross)
+                        }
+                    }
+                }
+                .accessibilityElement(children: .combine)
+            }
+
+            if isWorking {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Refreshing Official scoring state")
+                        .font(.footnote.weight(.semibold))
+                }
+                .accessibilityElement(children: .combine)
+            } else if comparison.allowsKeepOfficial || comparison.allowsReapply {
+                VStack(spacing: 9) {
+                    if comparison.allowsKeepOfficial {
+                        Button("Keep Official", action: onKeepOfficial)
+                            .buttonStyle(.bordered)
+                            .tint(BaggerPalette.actionGreen)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .accessibilityHint("Discards your saved score without changing the Official score")
+                            .accessibilityIdentifier("score.review.keep.\(comparison.recordID)")
+                    }
+                    if comparison.allowsReapply {
+                        Button("Reapply My Score", action: onReapply)
+                            .buttonStyle(.borderedProminent)
+                            .tint(BaggerPalette.actionGreen)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .accessibilityHint("Refreshes canonical scoring state and creates a new scoring intent")
+                            .accessibilityIdentifier("score.review.reapply.\(comparison.recordID)")
+                    }
+                }
+            } else if comparison.state == .quarantined {
+                Label("Automatic retry is disabled for this saved score.", systemImage: "hand.raised.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(BaggerPalette.liveRed)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("score.review.record.\(comparison.recordID)")
+    }
+
+    private func scoreText(_ label: String, value: Int?) -> some View {
+        Text("\(label): \(value.map(String.init) ?? "—")")
+            .font(.subheadline.monospacedDigit())
+            .foregroundStyle(label == "Official" ? BaggerPalette.actionGreen : BaggerPalette.goldText)
+    }
+
+    private var stateLabel: String {
+        switch comparison.state {
+        case .conflict: "CONFLICT"
+        case .actionRequired: "ACTION REQUIRED"
+        case .quarantined: "REVIEW ONLY"
+        default: "NEEDS REVIEW"
+        }
+    }
+
+    private var reasonMessage: String {
+        switch comparison.reason {
+        case .revision:
+            "The Official score changed after this score was saved on the iPhone. Choose which intent to keep."
+        case .authorization:
+            "Scoring authorization changed. Your saved score was preserved and was not submitted again."
+        case .readOnly, .finalized:
+            "This Match is now read-only. Your saved score remains preserved for review."
+        case .authentication, .identity, .identityChanged, .identityMismatch:
+            "Bagger must restore the exact participant identity before this saved score can be reviewed."
+        case .idempotencyConflict:
+            "Bagger detected incompatible reuse of a mutation identity. This score will not retry automatically."
+        case .invalidRecordOrContract, .unknownPermanentResponse, .staleIdempotencyUncertain, .queueHealth:
+            "This saved score cannot be submitted safely without review."
+        case .stale, .staleTournament:
+            "This saved score is too old or belongs to a different tournament context for automatic submission."
+        case .matchMissing:
+            "The canonical Match is no longer available for this saved score."
+        case .authRefresh, .environment, .unknownOutcome, .rebaseLimit, nil:
+            "Bagger needs a fresh canonical review before any further score submission."
+        }
+    }
+}
+
+private struct ScoringFinalizationCard: View {
+    let model: ScoringFinalizationUIModel
+    let actionFailed: Bool
+    let onRequestFinalization: () -> Void
+    let onRefreshOfficialState: () -> Void
+
+    @ViewBuilder
+    var body: some View {
+        if model.phase != .hidden {
+            VStack(alignment: .leading, spacing: 11) {
+                BaggerSectionHeading("Match Completion")
+                HStack(alignment: .top, spacing: 11) {
+                    if isBusy {
+                        ProgressView()
+                            .padding(.top, 2)
+                            .accessibilityHidden(true)
+                    } else {
+                        Image(systemName: symbol)
+                            .font(.title3)
+                            .foregroundStyle(BaggerPalette.goldText)
+                            .accessibilityHidden(true)
+                    }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(title)
+                            .font(.headline)
+                            .foregroundStyle(BaggerPalette.ink)
+                        Text(message)
+                            .font(.subheadline)
+                            .foregroundStyle(BaggerPalette.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                if model.canRequestFinalization {
+                    Button("Finalize Match", action: onRequestFinalization)
+                        .buttonStyle(.borderedProminent)
+                        .tint(BaggerPalette.actionGreen)
+                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .accessibilityHint("Requires confirmation and an online canonical scoring check")
+                        .accessibilityIdentifier("score.finalize")
+                } else if shouldOfferRefresh {
+                    Button("Refresh Official Score", action: onRefreshOfficialState)
+                        .buttonStyle(.bordered)
+                        .tint(BaggerPalette.actionGreen)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .accessibilityIdentifier("score.finalize.refresh")
+                }
+
+                if actionFailed {
+                    Text("Finalization did not begin. Official scoring state remains unchanged.")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(BaggerPalette.liveRed)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("score.finalize.error")
+                }
+            }
+            .baggerCard(border: border)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("score.finalization")
+        }
+    }
+
+    private var isBusy: Bool {
+        model.phase == .submitting || model.phase == .reconciling
+    }
+
+    private var shouldOfferRefresh: Bool {
+        if model.phase == .outcomeUnknown || model.phase == .acknowledgedRefreshPending { return true }
+        if case .blocked(let blocker) = model.phase {
+            return blocker == .canonicalUnavailable || blocker == .notReady
+        }
+        return false
+    }
+
+    private var title: String {
+        switch model.phase {
+        case .hidden: ""
+        case .ready: "Ready to finalize"
+        case .submitting: "Finalizing Match"
+        case .reconciling: "Confirming Match Final"
+        case .acknowledgedRefreshPending: "Finalization accepted"
+        case .outcomeUnknown: "Finalization status unknown"
+        case .confirmationRequired: "Confirmation required again"
+        case .blocked(let blocker): blockerTitle(blocker)
+        case .matchFinal: "Match Final"
+        }
+    }
+
+    private var message: String {
+        switch model.phase {
+        case .hidden: ""
+        case .ready:
+            "All saved scores are Official and the canonical Scorecard is complete. Finalization is online-only."
+        case .submitting:
+            "Bagger is sending the explicit finalization request. Do not close the app."
+        case .reconciling:
+            "The request completed. Bagger is refreshing canonical scoring state before showing Match Final."
+        case .acknowledgedRefreshPending:
+            "Bagger accepted finalization. Refreshing canonical Match Final state; another finalization will not be sent."
+        case .outcomeUnknown:
+            "The response was interrupted. Refresh canonical scoring state; Bagger will not finalize again automatically."
+        case .confirmationRequired:
+            "The prior attempt did not finalize the Match. A new submission requires another explicit confirmation."
+        case .blocked(let blocker): blockerMessage(blocker)
+        case .matchFinal:
+            "Canonical scoring state confirms this Match is final and read-only."
+        }
+    }
+
+    private var symbol: String {
+        switch model.phase {
+        case .matchFinal: "checkmark.seal.fill"
+        case .ready, .confirmationRequired: "flag.checkered"
+        case .blocked, .outcomeUnknown: "exclamationmark.triangle.fill"
+        case .submitting, .reconciling, .acknowledgedRefreshPending, .hidden: "arrow.triangle.2.circlepath"
+        }
+    }
+
+    private var border: Color {
+        switch model.phase {
+        case .blocked, .outcomeUnknown: BaggerPalette.liveRed
+        default: BaggerPalette.gold
+        }
+    }
+
+    private func blockerTitle(_ blocker: ScoringFinalizationBlocker) -> String {
+        switch blocker {
+        case .queue: "Saved scores still need resolution"
+        case .canonicalUnavailable: "Official scoring state unavailable"
+        case .notReady: "Match not ready to finalize"
+        case .readOnly: "Match is read-only"
+        case .authentication: "Sign in again"
+        case .authorization: "Finalization not authorized"
+        case .lifecycle: "Match lifecycle changed"
+        case .contract: "Finalization unavailable"
+        }
+    }
+
+    private func blockerMessage(_ blocker: ScoringFinalizationBlocker) -> String {
+        switch blocker {
+        case .queue:
+            "Every queued, syncing, retrying, acknowledged, conflicted, action-required, or quarantined score must be resolved before finalization."
+        case .canonicalUnavailable:
+            "Bagger needs a fresh online canonical Scorecard before finalization can begin."
+        case .notReady:
+            "The canonical Scorecard or Match permission does not currently allow finalization."
+        case .readOnly:
+            "Canonical permission is read-only. No finalization request will be sent."
+        case .authentication:
+            "Bagger must restore the exact authenticated participant before finalization."
+        case .authorization:
+            "The server does not authorize this participant to finalize the Match."
+        case .lifecycle:
+            "The canonical Match lifecycle changed. Refresh Official scoring state for the latest result."
+        case .contract:
+            "Bagger cannot safely construct a finalization request from the current scoring context."
         }
     }
 }
@@ -703,6 +1480,7 @@ private struct ScoreRowsSection: View {
     let presentation: ScoringPresentation
     let hole: ScoringCourseHolePresentation
     let draft: ScoringDraft?
+    let isEditable: Bool
     let onDecrement: (ScoringInputRowPresentation) -> Void
     let onIncrement: (ScoringInputRowPresentation) -> Void
     let onChoose: (ScoringInputRowPresentation) -> Void
@@ -715,13 +1493,14 @@ private struct ScoreRowsSection: View {
                     Text(side.name.uppercased())
                         .font(.caption.weight(.black))
                         .foregroundStyle(BaggerPalette.goldText)
+                        .accessibilityIdentifier("score.controls")
 
                     ForEach(rows(for: side.side)) { row in
                         GrossScoreControl(
                             row: row,
                             displayedGross: ScoringInteraction.displayedGross(for: row, draft: draft),
                             isEdited: ScoringInteraction.isEdited(row: row, draft: draft),
-                            isEditable: presentation.isEditable,
+                            isEditable: isEditable,
                             onDecrement: { onDecrement(row) },
                             onIncrement: { onIncrement(row) },
                             onChoose: { onChoose(row) }
@@ -745,7 +1524,6 @@ private struct ScoreRowsSection: View {
             }
         }
         .baggerCard()
-        .accessibilityIdentifier("score.controls")
     }
 
     private func rows(for side: Int) -> [ScoringInputRowPresentation] {
@@ -919,6 +1697,7 @@ private struct DurableSaveAndNext: View {
     let hasDraft: Bool
     let isSaving: Bool
     let saveFailed: Bool
+    let isEnabled: Bool
     let onSave: () -> Void
 
     var body: some View {
@@ -933,7 +1712,7 @@ private struct DurableSaveAndNext: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(BaggerPalette.actionGreen)
-            .disabled(!hasDraft || isSaving)
+            .disabled(!isEnabled || !hasDraft || isSaving)
             .accessibilityHint("Durably saves this score on the iPhone before advancing. It is not Official until Bagger confirms it.")
             .accessibilityIdentifier("score.saveNext")
 

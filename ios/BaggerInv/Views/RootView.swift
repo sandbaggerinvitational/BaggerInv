@@ -24,9 +24,11 @@ struct RootView: View {
                 await coordinator.bootstrap()
             }
         }
+        .onAppear {
+            coordinator.handleApplicationSceneChange(isActive: scenePhase == .active)
+        }
         .onChange(of: scenePhase) { newPhase in
-            guard newPhase == .active else { return }
-            Task { await coordinator.refreshTournamentDataForForeground() }
+            coordinator.handleApplicationSceneChange(isActive: newPhase == .active)
         }
         .scoringQueueSignOutConfirmation(
             presentation: coordinator.scoringQueueSignOutPresentation,

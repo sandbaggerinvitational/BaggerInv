@@ -92,6 +92,122 @@ final class SQLiteScoringQueueRepositoryTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: stableURL.path))
     }
 
+    func testOrphanedEmptyLegacySidecarsDoNotBlockStableQueueOpen() async throws {
+        let applicationSupport = FileManager.default.temporaryDirectory
+            .appendingPathComponent("SQLiteScoringQueueLegacySidecarTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: applicationSupport) }
+        let queueDirectory = applicationSupport
+            .appendingPathComponent("BaggerInv", isDirectory: true)
+            .appendingPathComponent("ScoringQueue", isDirectory: true)
+        let legacyURL = queueDirectory
+            .appendingPathComponent("v1", isDirectory: true)
+            .appendingPathComponent("scoring-queue.sqlite3", isDirectory: false)
+        try FileManager.default.createDirectory(
+            at: legacyURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try Data().write(to: URL(fileURLWithPath: legacyURL.path + "-wal"))
+        try Data(repeating: 0, count: 32_768).write(
+            to: URL(fileURLWithPath: legacyURL.path + "-shm")
+        )
+        let fileManager = FixedApplicationSupportFileManager(
+            applicationSupport: applicationSupport
+        )
+
+        let repository = try SQLiteScoringQueueRepository(
+            fileManager: ScoringQueueFileManager(fileManager)
+        )
+        let configuration = try await repository.configuration()
+        let records = try await repository.records(
+            for: ScoringQueueIdentityPartition(
+                authUserId: "00000000-0000-4000-8000-000000000091",
+                playerId: "player-orphan-sidecar",
+                tournamentId: "tournament-orphan-sidecar"
+            )
+        )
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: configuration.databaseURL.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: legacyURL.path))
+        XCTAssertTrue(records.isEmpty)
+        await repository.close()
+    }
+
+    func testStableQueueRecordsSurviveAlongsideEmptyLegacySidecars() async throws {
+        let applicationSupport = FileManager.default.temporaryDirectory
+            .appendingPathComponent("SQLiteScoringQueueStableSidecarTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: applicationSupport) }
+        let queueDirectory = applicationSupport
+            .appendingPathComponent("BaggerInv", isDirectory: true)
+            .appendingPathComponent("ScoringQueue", isDirectory: true)
+        let stableURL = queueDirectory.appendingPathComponent("scoring-queue.sqlite3")
+        let partition = makePartition(match: "match-stable-sidecar")
+        let seed = try SQLiteScoringQueueRepository(
+            databaseURL: stableURL,
+            now: { Self.baseDate }
+        )
+        let saved = try insertedRecord(
+            try await seed.save(makeInput(partition: partition, hole: 7))
+        )
+        await seed.close()
+
+        let legacyURL = queueDirectory
+            .appendingPathComponent("v1", isDirectory: true)
+            .appendingPathComponent("scoring-queue.sqlite3", isDirectory: false)
+        try FileManager.default.createDirectory(
+            at: legacyURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try Data().write(to: URL(fileURLWithPath: legacyURL.path + "-wal"))
+        try Data(repeating: 0, count: 32_768).write(
+            to: URL(fileURLWithPath: legacyURL.path + "-shm")
+        )
+        let fileManager = FixedApplicationSupportFileManager(
+            applicationSupport: applicationSupport
+        )
+
+        let reopened = try SQLiteScoringQueueRepository(
+            fileManager: ScoringQueueFileManager(fileManager),
+            now: { Self.baseDate }
+        )
+        let records = try await reopened.records(in: partition)
+
+        XCTAssertEqual(records.map(\.localQueueRecordId), [saved.localQueueRecordId])
+        XCTAssertTrue(FileManager.default.fileExists(atPath: stableURL.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: legacyURL.path))
+        await reopened.close()
+    }
+
+    func testOrphanedNonemptyLegacyWALFailsClosed() throws {
+        let applicationSupport = FileManager.default.temporaryDirectory
+            .appendingPathComponent("SQLiteScoringQueueLegacyWALTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: applicationSupport) }
+        let queueDirectory = applicationSupport
+            .appendingPathComponent("BaggerInv", isDirectory: true)
+            .appendingPathComponent("ScoringQueue", isDirectory: true)
+        let legacyURL = queueDirectory
+            .appendingPathComponent("v1", isDirectory: true)
+            .appendingPathComponent("scoring-queue.sqlite3", isDirectory: false)
+        try FileManager.default.createDirectory(
+            at: legacyURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try Data([0x01]).write(to: URL(fileURLWithPath: legacyURL.path + "-wal"))
+        let fileManager = FixedApplicationSupportFileManager(
+            applicationSupport: applicationSupport
+        )
+
+        XCTAssertThrowsError(
+            try SQLiteScoringQueueRepository(fileManager: ScoringQueueFileManager(fileManager))
+        ) { error in
+            XCTAssertEqual(error as? SQLiteScoringQueueRepositoryError, .unsafeMigration)
+        }
+        XCTAssertFalse(
+            FileManager.default.fileExists(
+                atPath: queueDirectory.appendingPathComponent("scoring-queue.sqlite3").path
+            )
+        )
+    }
+
     func testUnsupportedLegacyStoreIsProtectedBeforeMigrationFailsClosed() throws {
         let applicationSupport = FileManager.default.temporaryDirectory
             .appendingPathComponent("SQLiteScoringQueueLegacyProtectionTests-\(UUID().uuidString)", isDirectory: true)
@@ -1583,6 +1699,98 @@ final class SQLiteScoringQueueRepositoryTests: XCTestCase {
         await repository.close()
     }
 
+    func testRelatedPartitionReviewPreservesAcknowledgedCanonicalDisagreementConflicts() async throws {
+        let databaseURL = temporaryDatabaseURL()
+        defer { removeDatabaseRoot(databaseURL) }
+        let active = makePartition(match: "active-match").identity
+        let staleTournamentConflictPartition = ScoringQueuePartition(
+            authUserId: active.authUserId,
+            playerId: active.playerId,
+            tournamentId: "tournament-2024",
+            matchId: "stale-tournament-conflict"
+        )
+        let changedAuthConflictPartition = ScoringQueuePartition(
+            authUserId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+            playerId: active.playerId,
+            tournamentId: active.tournamentId,
+            matchId: "changed-auth-conflict"
+        )
+        let ordinaryStalePartition = ScoringQueuePartition(
+            authUserId: active.authUserId,
+            playerId: active.playerId,
+            tournamentId: "tournament-2025",
+            matchId: "ordinary-stale-intent"
+        )
+        let repository = try SQLiteScoringQueueRepository(
+            databaseURL: databaseURL,
+            now: { Self.baseDate }
+        )
+        let staleTournamentConflict = try await makeReviewableConflict(
+            repository: repository,
+            partition: staleTournamentConflictPartition
+        )
+        let changedAuthConflict = try await makeReviewableConflict(
+            repository: repository,
+            partition: changedAuthConflictPartition
+        )
+        _ = try await repository.save(
+            makeInput(partition: ordinaryStalePartition, hole: 1)
+        )
+
+        XCTAssertEqual(staleTournamentConflict.state, .conflict)
+        XCTAssertEqual(staleTournamentConflict.stateReasonCode, .revision)
+        XCTAssertEqual(staleTournamentConflict.acknowledgement?.accepted, true)
+        XCTAssertEqual(staleTournamentConflict.acknowledgement?.refreshPending, true)
+        XCTAssertNotNil(staleTournamentConflict.conflict)
+        XCTAssertEqual(changedAuthConflict.state, .conflict)
+        XCTAssertEqual(changedAuthConflict.stateReasonCode, .revision)
+        XCTAssertEqual(changedAuthConflict.acknowledgement?.accepted, true)
+        XCTAssertEqual(changedAuthConflict.acknowledgement?.refreshPending, true)
+        XCTAssertNotNil(changedAuthConflict.conflict)
+
+        let changed = try await repository.markRelatedPartitionsForReview(
+            activeIdentity: active,
+            at: Self.baseDate.addingTimeInterval(10)
+        )
+        let retainedStaleTournamentConflict = try await repository.records(
+            in: staleTournamentConflictPartition
+        )
+        let retainedChangedAuthConflict = try await repository.records(
+            in: changedAuthConflictPartition
+        )
+        let staleTournamentUnresolved = try await repository.unresolvedCount(
+            in: staleTournamentConflictPartition
+        )
+        let changedAuthUnresolved = try await repository.unresolvedCount(
+            in: changedAuthConflictPartition
+        )
+
+        XCTAssertEqual(changed, 1)
+        XCTAssertEqual(
+            retainedStaleTournamentConflict,
+            [staleTournamentConflict],
+            "A canonical-disagreement conflict must retain its accepted acknowledgement proof."
+        )
+        XCTAssertEqual(
+            retainedChangedAuthConflict,
+            [changedAuthConflict],
+            "An Auth-related canonical disagreement must remain in its stronger conflict review state."
+        )
+        let ordinaryStaleRecords = try await repository.records(in: ordinaryStalePartition)
+        XCTAssertEqual(ordinaryStaleRecords.count, 1)
+        XCTAssertEqual(ordinaryStaleRecords.first?.state, .actionRequired)
+        XCTAssertEqual(ordinaryStaleRecords.first?.stateReasonCode, .staleTournament)
+        XCTAssertEqual(staleTournamentUnresolved, 1)
+        XCTAssertEqual(changedAuthUnresolved, 1)
+
+        let repeated = try await repository.markRelatedPartitionsForReview(
+            activeIdentity: active,
+            at: Self.baseDate.addingTimeInterval(11)
+        )
+        XCTAssertEqual(repeated, 0)
+        await repository.close()
+    }
+
     func testUnsupportedFutureSchemaIsPreservedAndFailsClosed() throws {
         let databaseURL = temporaryDatabaseURL()
         defer { removeDatabaseRoot(databaseURL) }
@@ -1862,6 +2070,426 @@ final class SQLiteScoringQueueRepositoryTests: XCTestCase {
         }
         let retained = try await repository.records(in: partition)
         XCTAssertEqual(retained, [conflict])
+        await repository.close()
+    }
+
+    func testConflictCanonicalReviewRejectsEveryRevisionRegression() async throws {
+        let expectations: [(
+            name: String,
+            matchRevision: Int,
+            holeRevision: Int,
+            permissionRevision: Int
+        )] = [
+            ("match", 12, 4, 5),
+            ("hole", 13, 3, 5),
+            ("permission", 13, 4, 4),
+        ]
+
+        for expectation in expectations {
+            let databaseURL = temporaryDatabaseURL()
+            defer { removeDatabaseRoot(databaseURL) }
+            let partition = makePartition(match: "review-regressed-\(expectation.name)")
+            let repository = try SQLiteScoringQueueRepository(
+                databaseURL: databaseURL,
+                now: { Self.baseDate }
+            )
+            let conflict = try await makeReviewableConflict(
+                repository: repository,
+                partition: partition
+            )
+            let refreshedAt = Self.baseDate.addingTimeInterval(5)
+            var regressed = conflict
+            regressed.conflict = ScoringQueueConflict(
+                officialGross: conflict.conflict?.officialGross,
+                currentMatchRevision: expectation.matchRevision,
+                currentHoleRevision: expectation.holeRevision,
+                currentPermissionRevision: expectation.permissionRevision,
+                refreshRequired: false,
+                recordedAt: refreshedAt
+            )
+            regressed.lastKnownServer = ScoringQueueLastKnownServer(
+                matchRevision: expectation.matchRevision,
+                holeRevision: expectation.holeRevision,
+                permissionRevision: expectation.permissionRevision,
+                refreshedAt: refreshedAt
+            )
+            regressed.updatedAt = refreshedAt
+
+            do {
+                _ = try await repository.replace(regressed, expecting: conflict)
+                XCTFail("Regressed \(expectation.name) revision must not replace conflict evidence")
+            } catch {
+                XCTAssertEqual(
+                    error as? SQLiteScoringQueueRepositoryError,
+                    .invalidStateTransition,
+                    expectation.name
+                )
+            }
+            let retained = try await repository.records(in: partition)
+            XCTAssertEqual(retained, [conflict])
+            await repository.close()
+        }
+    }
+
+    func testKeepOfficialResolutionRejectsEveryRevisionRegression() async throws {
+        let expectations: [(
+            name: String,
+            matchRevision: Int,
+            holeRevision: Int,
+            permissionRevision: Int
+        )] = [
+            ("match", 12, 4, 5),
+            ("hole", 13, 3, 5),
+            ("permission", 13, 4, 4),
+        ]
+
+        for expectation in expectations {
+            let databaseURL = temporaryDatabaseURL()
+            defer { removeDatabaseRoot(databaseURL) }
+            let partition = makePartition(match: "keep-official-regressed-\(expectation.name)")
+            let repository = try SQLiteScoringQueueRepository(
+                databaseURL: databaseURL,
+                now: { Self.baseDate }
+            )
+            let conflict = try await makeReviewableConflict(
+                repository: repository,
+                partition: partition
+            )
+            let resolvedAt = Self.baseDate.addingTimeInterval(5)
+            var resolved = conflict
+            resolved.state = .resolved
+            resolved.stateReasonCode = nil
+            resolved.acknowledgement = nil
+            resolved.conflict = nil
+            resolved.resolution = ScoringQueueResolution(
+                reason: .keptOfficial,
+                resolvedAt: resolvedAt,
+                relatedLocalQueueRecordId: nil
+            )
+            resolved.lastKnownServer = ScoringQueueLastKnownServer(
+                matchRevision: expectation.matchRevision,
+                holeRevision: expectation.holeRevision,
+                permissionRevision: expectation.permissionRevision,
+                refreshedAt: resolvedAt
+            )
+            resolved.updatedAt = resolvedAt
+
+            do {
+                _ = try await repository.replace(resolved, expecting: conflict)
+                XCTFail("Regressed \(expectation.name) revision must not resolve Keep Official")
+            } catch {
+                XCTAssertEqual(
+                    error as? SQLiteScoringQueueRepositoryError,
+                    .invalidStateTransition,
+                    expectation.name
+                )
+            }
+            let retained = try await repository.records(in: partition)
+            XCTAssertEqual(retained, [conflict])
+            await repository.close()
+        }
+    }
+
+    func testKeepOfficialCannotResolveBelowStrongerRetainedConflictWhenLastKnownIsUnchanged() async throws {
+        let databaseURL = temporaryDatabaseURL()
+        defer { removeDatabaseRoot(databaseURL) }
+        let partition = makePartition(match: "keep-official-conflict-floor")
+        let repository = try SQLiteScoringQueueRepository(
+            databaseURL: databaseURL,
+            now: { Self.baseDate }
+        )
+        let queued = try insertedRecord(
+            try await repository.save(makeInput(partition: partition, hole: 1))
+        )
+        let acquired = try await repository.acquireSyncLease(
+            in: partition,
+            leaseId: "keep-official-conflict-floor:lease",
+            at: Self.baseDate.addingTimeInterval(1)
+        )
+        let syncing = try XCTUnwrap(acquired)
+        var conflict = try await repository.markTransportStarted(
+            recordId: queued.localQueueRecordId,
+            leaseId: "keep-official-conflict-floor:lease",
+            at: Self.baseDate.addingTimeInterval(2)
+        )
+        conflict.state = .conflict
+        conflict.stateReasonCode = .revision
+        conflict.attempt.outcomeCertainty = .knownRejected
+        conflict.attempt.syncLeaseId = nil
+        conflict.attempt.syncLeaseStartedAt = nil
+        conflict.conflict = ScoringQueueConflict(
+            officialGross: ScoringQueueGross(teamOne: [7, 5], teamTwo: [5, 6]),
+            currentMatchRevision: 13,
+            currentHoleRevision: 4,
+            currentPermissionRevision: 5,
+            refreshRequired: false,
+            recordedAt: Self.baseDate.addingTimeInterval(3)
+        )
+        conflict.updatedAt = Self.baseDate.addingTimeInterval(3)
+        conflict = try await repository.replace(
+            conflict,
+            expecting: leaseWithTransportState(
+                syncing,
+                at: Self.baseDate.addingTimeInterval(2)
+            )
+        )
+
+        var resolved = conflict
+        resolved.state = .resolved
+        resolved.stateReasonCode = nil
+        resolved.conflict = nil
+        resolved.resolution = ScoringQueueResolution(
+            reason: .keptOfficial,
+            resolvedAt: Self.baseDate.addingTimeInterval(4),
+            relatedLocalQueueRecordId: nil
+        )
+        // This deliberately retains 12/3/4 while the conflict response has
+        // already established the stronger 13/4/5 floor.
+        resolved.updatedAt = Self.baseDate.addingTimeInterval(4)
+
+        do {
+            _ = try await repository.replace(resolved, expecting: conflict)
+            XCTFail("Keep Official must not bypass the stronger retained conflict revision vector")
+        } catch {
+            XCTAssertEqual(
+                error as? SQLiteScoringQueueRepositoryError,
+                .invalidStateTransition
+            )
+        }
+        let retained = try await repository.records(in: partition)
+        XCTAssertEqual(retained, [conflict])
+        await repository.close()
+    }
+
+    func testConflictReapplyAtomicallyResolvesOriginalAndInsertsFreshQueuedIntent() async throws {
+        let databaseURL = temporaryDatabaseURL()
+        defer { removeDatabaseRoot(databaseURL) }
+        let partition = makePartition(match: "match-reapply")
+        let repository = try SQLiteScoringQueueRepository(
+            databaseURL: databaseURL,
+            now: { Self.baseDate }
+        )
+        let conflict = try await makeReviewableConflict(
+            repository: repository,
+            partition: partition
+        )
+        let official = ScoringQueueGross(teamOne: [7, 5], teamTwo: [5, 6])
+        let evidence = reapplyEvidence(
+            partition: partition,
+            official: official,
+            refreshedAt: Self.baseDate.addingTimeInterval(5)
+        )
+
+        let result = try await repository.reapplyConflict(
+            recordId: conflict.localQueueRecordId,
+            evidence: evidence,
+            originatingAppBuild: "2.0.0-200"
+        )
+
+        XCTAssertEqual(result.resolvedConflict.state, .resolved)
+        XCTAssertNil(result.resolvedConflict.acknowledgement)
+        XCTAssertNil(result.resolvedConflict.conflict)
+        XCTAssertEqual(result.resolvedConflict.resolution?.reason, .reappliedAsNewMutation)
+        XCTAssertEqual(
+            result.resolvedConflict.resolution?.relatedLocalQueueRecordId,
+            result.replacement.localQueueRecordId
+        )
+        XCTAssertEqual(result.replacement.state, .queued)
+        XCTAssertEqual(result.replacement.queueSchemaVersion, 1)
+        XCTAssertEqual(result.replacement.partition, conflict.partition)
+        XCTAssertEqual(result.replacement.intent, conflict.intent)
+        XCTAssertNotEqual(result.replacement.localQueueRecordId, conflict.localQueueRecordId)
+        XCTAssertNotEqual(result.replacement.mutationId, conflict.mutationId)
+        XCTAssertEqual(result.replacement.sequence, conflict.sequence + 1)
+        XCTAssertEqual(result.replacement.base.expectedMatchRevision, 14)
+        XCTAssertEqual(result.replacement.base.originalExpectedMatchRevision, 14)
+        XCTAssertEqual(result.replacement.base.expectedHoleRevision, 5)
+        XCTAssertEqual(result.replacement.base.originalExpectedHoleRevision, 5)
+        XCTAssertEqual(result.replacement.base.officialGrossAtSave, official)
+        XCTAssertEqual(result.replacement.base.automaticRebaseCount, 0)
+        XCTAssertEqual(result.replacement.lastKnownServer, evidence.server)
+        XCTAssertEqual(result.replacement.originatingAppBuild, "2.0.0-200")
+        let unresolvedCount = try await repository.unresolvedCount(in: partition)
+        XCTAssertEqual(unresolvedCount, 1)
+
+        await repository.close()
+        let reopened = try SQLiteScoringQueueRepository(databaseURL: databaseURL)
+        let reopenedRecords = try await reopened.records(in: partition)
+        XCTAssertEqual(reopenedRecords, [result.resolvedConflict, result.replacement])
+        await reopened.close()
+    }
+
+    func testConflictReapplyRejectsMismatchedStaleOrNonwritableCanonicalEvidence() async throws {
+        let databaseURL = temporaryDatabaseURL()
+        defer { removeDatabaseRoot(databaseURL) }
+        let partition = makePartition(match: "match-reapply-guards")
+        let repository = try SQLiteScoringQueueRepository(
+            databaseURL: databaseURL,
+            now: { Self.baseDate }
+        )
+        let conflict = try await makeReviewableConflict(
+            repository: repository,
+            partition: partition
+        )
+        let fresh = Self.baseDate.addingTimeInterval(5)
+        let wrongAuthPartition = ScoringQueuePartition(
+            authUserId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+            playerId: partition.playerId,
+            tournamentId: partition.tournamentId,
+            matchId: partition.matchId
+        )
+        let cases: [(ScoringQueueConflictReapplyEvidence, SQLiteScoringQueueRepositoryError)] = [
+            (reapplyEvidence(partition: wrongAuthPartition, refreshedAt: fresh), .canonicalContextMismatch),
+            (reapplyEvidence(partition: partition, matchId: "other-match", refreshedAt: fresh), .canonicalContextMismatch),
+            (reapplyEvidence(partition: partition, playerId: "other-player", refreshedAt: fresh), .canonicalContextMismatch),
+            (reapplyEvidence(partition: partition, snapshotId: "other-snapshot", refreshedAt: fresh), .canonicalContextMismatch),
+            (reapplyEvidence(partition: partition, status: .completed, refreshedAt: fresh), .canonicalContextNotWritable),
+            (reapplyEvidence(partition: partition, canScore: false, refreshedAt: fresh), .canonicalContextNotWritable),
+            (reapplyEvidence(partition: partition, readOnly: true, refreshedAt: fresh), .canonicalContextNotWritable),
+            (
+                reapplyEvidence(
+                    partition: partition,
+                    refreshedAt: Self.baseDate.addingTimeInterval(4)
+                ),
+                .staleCanonicalEvidence
+            ),
+            (
+                reapplyEvidence(
+                    partition: partition,
+                    matchRevision: 12,
+                    refreshedAt: fresh
+                ),
+                .staleCanonicalEvidence
+            ),
+            (
+                reapplyEvidence(
+                    partition: partition,
+                    holeRevision: 3,
+                    refreshedAt: fresh
+                ),
+                .staleCanonicalEvidence
+            ),
+            (
+                reapplyEvidence(
+                    partition: partition,
+                    permissionRevision: 4,
+                    refreshedAt: fresh
+                ),
+                .staleCanonicalEvidence
+            ),
+        ]
+
+        for (evidence, expectedError) in cases {
+            do {
+                _ = try await repository.reapplyConflict(
+                    recordId: conflict.localQueueRecordId,
+                    evidence: evidence,
+                    originatingAppBuild: "2.0.0-200"
+                )
+                XCTFail("Expected reapply evidence to fail closed with \(expectedError)")
+            } catch {
+                XCTAssertEqual(error as? SQLiteScoringQueueRepositoryError, expectedError)
+            }
+            let retained = try await repository.records(in: partition)
+            XCTAssertEqual(retained, [conflict])
+        }
+        await repository.close()
+    }
+
+    func testConflictReapplyInsertFailureRollsBackOriginalAndSequenceAllocation() async throws {
+        let databaseURL = temporaryDatabaseURL()
+        defer { removeDatabaseRoot(databaseURL) }
+        let partition = makePartition(match: "match-reapply-transaction-rollback")
+        let repository = try SQLiteScoringQueueRepository(
+            databaseURL: databaseURL,
+            now: { Self.baseDate }
+        )
+        let conflict = try await makeReviewableConflict(
+            repository: repository,
+            partition: partition
+        )
+        try executeSQL(
+            """
+            CREATE TRIGGER reject_reapply_insert
+            BEFORE INSERT ON queue_records
+            WHEN NEW.sequence > 1
+            BEGIN
+                SELECT RAISE(ABORT, 'injected reapply insert failure');
+            END;
+            """,
+            databaseURL: databaseURL
+        )
+
+        do {
+            _ = try await repository.reapplyConflict(
+                recordId: conflict.localQueueRecordId,
+                evidence: reapplyEvidence(
+                    partition: partition,
+                    refreshedAt: Self.baseDate.addingTimeInterval(5)
+                ),
+                originatingAppBuild: "2.0.0-200"
+            )
+            XCTFail("The injected replacement insert failure must abort reapply")
+        } catch {
+            // The concrete SQLite error is an implementation detail; the
+            // persisted atomicity guarantees below are the contract.
+        }
+
+        let retained = try await repository.records(in: partition)
+        XCTAssertEqual(retained, [conflict])
+        XCTAssertEqual(
+            try scalarInt(
+                "SELECT last_sequence FROM queue_sequence_high_water",
+                databaseURL: databaseURL
+            ),
+            1
+        )
+        await repository.close()
+    }
+
+    func testConflictReapplyIdentifierCollisionRollsBackResolutionAndSequence() async throws {
+        let databaseURL = temporaryDatabaseURL()
+        defer { removeDatabaseRoot(databaseURL) }
+        let partition = makePartition(match: "match-reapply-rollback")
+        let IDs = LockedIdentifierSource([
+            "aaaaaaaa-0000-4000-8000-000000000001",
+            "bbbbbbbb-0000-4000-8000-000000000001",
+            "aaaaaaaa-0000-4000-8000-000000000002",
+            "bbbbbbbb-0000-4000-8000-000000000001",
+        ])
+        let repository = try SQLiteScoringQueueRepository(
+            databaseURL: databaseURL,
+            now: { Self.baseDate },
+            identifierGenerator: { IDs.next() }
+        )
+        let conflict = try await makeReviewableConflict(
+            repository: repository,
+            partition: partition
+        )
+
+        do {
+            _ = try await repository.reapplyConflict(
+                recordId: conflict.localQueueRecordId,
+                evidence: reapplyEvidence(
+                    partition: partition,
+                    refreshedAt: Self.baseDate.addingTimeInterval(5)
+                ),
+                originatingAppBuild: "2.0.0-200"
+            )
+            XCTFail("A replacement mutation-ID collision must roll back the complete reapply transaction")
+        } catch {
+            XCTAssertEqual(error as? SQLiteScoringQueueRepositoryError, .identifierCollision)
+        }
+
+        let retained = try await repository.records(in: partition)
+        XCTAssertEqual(retained, [conflict])
+        XCTAssertEqual(
+            try scalarInt(
+                "SELECT last_sequence FROM queue_sequence_high_water",
+                databaseURL: databaseURL
+            ),
+            1
+        )
         await repository.close()
     }
 
@@ -2215,6 +2843,82 @@ private extension SQLiteScoringQueueRepositoryTests {
             throw TestFailure.unexpectedSaveResult
         }
         return record
+    }
+
+    func makeReviewableConflict(
+        repository: SQLiteScoringQueueRepository,
+        partition: ScoringQueuePartition
+    ) async throws -> ScoringQueueRecord {
+        let queued = try insertedRecord(
+            try await repository.save(makeInput(partition: partition, hole: 1))
+        )
+        let acknowledged = try await makeCanonicallyAcknowledged(
+            queued,
+            repository: repository,
+            canonicalMatchRevision: 13,
+            canonicalHoleRevision: 4,
+            at: Self.baseDate.addingTimeInterval(3),
+            completeRefresh: false
+        )
+        let official = ScoringQueueGross(teamOne: [7, 5], teamTwo: [5, 6])
+        var reviewed = acknowledged
+        reviewed.state = .conflict
+        reviewed.stateReasonCode = .revision
+        reviewed.conflict = ScoringQueueConflict(
+            officialGross: official,
+            currentMatchRevision: 13,
+            currentHoleRevision: 4,
+            currentPermissionRevision: 5,
+            refreshRequired: false,
+            recordedAt: Self.baseDate.addingTimeInterval(4)
+        )
+        reviewed.lastKnownServer = ScoringQueueLastKnownServer(
+            matchRevision: 13,
+            holeRevision: 4,
+            permissionRevision: 5,
+            refreshedAt: Self.baseDate.addingTimeInterval(4)
+        )
+        reviewed.attempt.nextRetryAt = nil
+        reviewed.updatedAt = Self.baseDate.addingTimeInterval(4)
+        return try await repository.replace(reviewed, expecting: acknowledged)
+    }
+
+    func reapplyEvidence(
+        partition: ScoringQueuePartition,
+        matchId: String? = nil,
+        playerId: String? = nil,
+        snapshotId: String? = "snapshot-1",
+        status: MobileMatchStatus = .inProgress,
+        canScore: Bool = true,
+        readOnly: Bool = false,
+        official: ScoringQueueGross? = ScoringQueueGross(
+            teamOne: [7, 5],
+            teamTwo: [5, 6]
+        ),
+        matchRevision: Int = 14,
+        holeRevision: Int? = nil,
+        permissionRevision: Int = 6,
+        refreshedAt: Date
+    ) -> ScoringQueueConflictReapplyEvidence {
+        ScoringQueueConflictReapplyEvidence(
+            partition: partition,
+            matchId: matchId ?? partition.matchId,
+            playerId: playerId ?? partition.playerId,
+            snapshotId: snapshotId,
+            snapshotRevision: 1,
+            scoringFormat: .bestBall,
+            sideSlotCount: 2,
+            matchStatus: status,
+            canScore: canScore,
+            readOnly: readOnly,
+            officialGross: official,
+            server: ScoringQueueLastKnownServer(
+                matchRevision: matchRevision,
+                holeRevision: holeRevision ?? (official == nil ? 0 : 5),
+                permissionRevision: permissionRevision,
+                refreshedAt: refreshedAt
+            )
+        )
     }
 
     func handoffEvidence(

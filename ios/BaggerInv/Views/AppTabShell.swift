@@ -133,7 +133,8 @@ struct BaggerAppShell: View {
         } else if let tournamentData {
             ScoreRepositoryView(
                 store: tournamentData.scoring,
-                reliability: tournamentData.scoringReliability
+                reliability: tournamentData.scoringReliability,
+                finalization: tournamentData.scoringFinalization
             )
         } else {
             VStack(spacing: 14) {

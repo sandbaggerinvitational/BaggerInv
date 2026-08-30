@@ -3,9 +3,22 @@ import SwiftUI
 struct ScoringScorecardView: View {
     let presentation: ScoringPresentation
     let selectedHole: Int?
+    let pendingRecords: [ScoringQueueRecord]
     let onSelectHole: (Int) -> Void
 
     @Environment(\.dismiss) private var dismiss
+
+    init(
+        presentation: ScoringPresentation,
+        selectedHole: Int?,
+        pendingRecords: [ScoringQueueRecord] = [],
+        onSelectHole: @escaping (Int) -> Void
+    ) {
+        self.presentation = presentation
+        self.selectedHole = selectedHole
+        self.pendingRecords = pendingRecords
+        self.onSelectHole = onSelectHole
+    }
 
     var body: some View {
         ScrollView {
@@ -24,7 +37,13 @@ struct ScoringScorecardView: View {
                                     OfficialScorecardRow(
                                         row: row,
                                         sides: presentation.sides,
-                                        isSelected: selectedHole == row.hole.holeNumber
+                                        isSelected: selectedHole == row.hole.holeNumber,
+                                        pending: pendingRecord(for: row.hole.holeNumber).map {
+                                            ScoringLocalIntentComparison.make(
+                                                record: $0,
+                                                presentation: presentation
+                                            )
+                                        }
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -84,12 +103,19 @@ struct ScoringScorecardView: View {
         .baggerCard(border: BaggerPalette.gold)
         .accessibilityElement(children: .combine)
     }
+
+    private func pendingRecord(for holeNumber: Int) -> ScoringQueueRecord? {
+        pendingRecords
+            .filter { $0.intent.holeNumber == holeNumber && $0.isUnresolved }
+            .max { $0.sequence < $1.sequence }
+    }
 }
 
 private struct OfficialScorecardRow: View {
     let row: ScoringScorecardHolePresentation
     let sides: [ScoringSidePresentation]
     let isSelected: Bool
+    let pending: ScoringLocalIntentComparison?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
@@ -142,6 +168,10 @@ private struct OfficialScorecardRow: View {
                     .font(.subheadline)
                     .foregroundStyle(BaggerPalette.muted)
             }
+
+            if let pending {
+                ScorecardPendingIntentOverlay(comparison: pending)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 8)
@@ -162,6 +192,55 @@ private struct OfficialScorecardRow: View {
         } else {
             parts.append("No official score")
         }
+        if let pending {
+            parts.append("Saved on iPhone, not Official")
+            for local in pending.rows {
+                parts.append("\(local.label), your saved score \(local.savedGross)")
+            }
+        }
         return parts.joined(separator: ", ")
+    }
+}
+
+private struct ScorecardPendingIntentOverlay: View {
+    let comparison: ScoringLocalIntentComparison
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Label(statusTitle, systemImage: comparison.state == .conflict ? "exclamationmark.triangle.fill" : "iphone")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(comparison.state == .conflict ? BaggerPalette.liveRed : BaggerPalette.goldText)
+            ForEach(comparison.rows) { row in
+                Text("\(row.label) · Official \(row.officialGross.map(String.init) ?? "—") · Your saved score \(row.savedGross)")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(BaggerPalette.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text("Not Official")
+                .font(.caption2.weight(.black))
+                .foregroundStyle(BaggerPalette.deepEvergreen)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(BaggerPalette.scoreGold, in: Capsule())
+        }
+        .padding(9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(BaggerPalette.cream, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(BaggerPalette.gold, lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("scorecard.local.\(comparison.holeNumber)")
+    }
+
+    private var statusTitle: String {
+        switch comparison.state {
+        case .conflict, .actionRequired, .quarantined: "Needs Review"
+        case .syncing, .acknowledged: "Syncing"
+        case .retryable: "Waiting to sync"
+        case .queued: "Saved on iPhone"
+        case .resolved: "Resolved"
+        }
     }
 }

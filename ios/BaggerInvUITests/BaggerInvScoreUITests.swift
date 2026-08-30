@@ -14,6 +14,10 @@ final class BaggerInvScoreUITests: XCTestCase {
         case offline = "score.offline"
         case durableOffline = "score.durable-offline"
         case signOutWarning = "score.signout-warning"
+        case conflictReview = "score.conflict-review"
+        case correctionPending = "score.correction-pending"
+        case finalizationReady = "score.finalization-ready"
+        case finalizationUnknown = "score.finalization-unknown"
     }
 
     override func setUp() {
@@ -76,6 +80,132 @@ final class BaggerInvScoreUITests: XCTestCase {
         let final = launch(.completed)
         assertReachable(labelContaining: "Match Final", in: final)
         assertEditingDisabled(in: final)
+    }
+
+    func testFinalizationFailsClosedUntilCanonicalReadinessAndShowsFinalState() {
+        let incomplete = launch(.activeBestBall)
+        XCTAssertFalse(
+            element("score.finalize", in: incomplete).exists,
+            "An incomplete canonical Scorecard offered finalization."
+        )
+        incomplete.terminate()
+
+        let final = launch(.completed)
+        assertReachable(labelContaining: "Match Final", in: final)
+        XCTAssertFalse(
+            element("score.finalize", in: final).exists,
+            "A finalized Match offered another finalization request."
+        )
+    }
+
+    func testConflictReviewComparesOfficialAndSavedThenKeepsOfficial() {
+        let app = launch(.conflictReview)
+
+        assertReachable("score.review.center", in: app)
+        assertReachable("score.review.record.fixture-conflict-record", in: app)
+        assertReachable(labelContaining: "Official: 4", in: app)
+        assertReachable(labelContaining: "Your saved score: 6", in: app)
+
+        let keep = reachableElement(
+            "score.review.keep.fixture-conflict-record",
+            in: app,
+            requireHittable: true
+        )
+        keep.tap()
+        XCTAssertTrue(
+            element(labelContaining: "Resolve saved score?", in: app).waitForExistence(timeout: 3),
+            "Keep Official did not require explicit confirmation."
+        )
+        confirmationButton("Keep Official", in: app).tap()
+        assertDisappears("score.review.center", in: app)
+        scrollScoreToTop(in: app)
+        XCTAssertTrue(
+            element("score.reliability.status", in: app).label.localizedCaseInsensitiveContains("Official"),
+            "Keeping Official did not return the deterministic fixture to canonical Official state."
+        )
+    }
+
+    func testConflictReapplyCreatesNewSavedIntent() {
+        let app = launch(.conflictReview)
+        let reapply = reachableElement(
+            "score.review.reapply.fixture-conflict-record",
+            in: app,
+            requireHittable: true
+        )
+        reapply.tap()
+        XCTAssertTrue(
+            element(labelContaining: "Resolve saved score?", in: app).waitForExistence(timeout: 3),
+            "Reapply My Score did not require explicit confirmation."
+        )
+        confirmationButton("Reapply My Score", in: app).tap()
+
+        assertDisappears("score.review.center", in: app)
+        assertReachable("score.queue.intent.7", in: app)
+        XCTAssertTrue(
+            element("score.queue.intent.7", in: app).label.localizedCaseInsensitiveContains("Not Official"),
+            "The reapplied replacement intent was presented as Official."
+        )
+        scrollScoreToTop(in: app)
+        XCTAssertTrue(
+            element("score.reliability.status", in: app).label.localizedCaseInsensitiveContains("Saved on iPhone"),
+            "The new reapplication intent did not enter the local saved state."
+        )
+    }
+
+    func testCorrectionOverlayKeepsOfficialAndLocalValuesDistinct() {
+        let app = launch(.correctionPending)
+
+        let scorecard = reachableElement("score.scorecard.quick", in: app, requireHittable: true)
+        scorecard.tap()
+        assertExists("scorecard.screen", in: app)
+        let overlay = reachableElement(
+            "scorecard.local.7",
+            in: app,
+            scrollViewIdentifier: "scorecard.screen"
+        )
+        let accessibilitySummary = "\(overlay.label) \(overlay.value as? String ?? "")"
+        XCTAssertTrue(
+            accessibilitySummary.localizedCaseInsensitiveContains("Official 4") &&
+                accessibilitySummary.localizedCaseInsensitiveContains("Your saved score 6") &&
+                accessibilitySummary.localizedCaseInsensitiveContains("Not Official"),
+            "The correction overlay blurred canonical and local values. Accessibility summary: \(accessibilitySummary)"
+        )
+    }
+
+    func testReadyFinalizationRequiresConfirmationBeforeMatchFinal() {
+        let app = launch(.finalizationReady)
+
+        assertReachable(labelContaining: "Ready to finalize", in: app)
+        let finalize = reachableElement("score.finalize", in: app, requireHittable: true)
+        finalize.tap()
+        XCTAssertTrue(
+            element(labelContaining: "Finalize this Match?", in: app).waitForExistence(timeout: 3),
+            "Finalize Match did not present its explicit confirmation."
+        )
+        XCTAssertFalse(
+            element(labelContaining: "Canonical scoring state confirms this Match is final", in: app).exists,
+            "The fixture finalized before explicit confirmation."
+        )
+        confirmationButton("Finalize Match", in: app).tap()
+        assertReachable(labelContaining: "Canonical scoring state confirms this Match is final", in: app)
+        XCTAssertFalse(element("score.finalize", in: app).exists)
+    }
+
+    func testLostFinalizationResponseUsesRefreshOnlyRecovery() {
+        let app = launch(.finalizationUnknown)
+
+        assertReachable(labelContaining: "Finalization status unknown", in: app)
+        XCTAssertFalse(
+            element("score.finalize", in: app).exists,
+            "An unresolved finalization outcome offered another POST action."
+        )
+        let refresh = reachableElement("score.finalize.refresh", in: app, requireHittable: true)
+        refresh.tap()
+        assertReachable(labelContaining: "Canonical scoring state confirms this Match is final", in: app)
+        XCTAssertFalse(
+            element("score.finalize", in: app).exists,
+            "Refresh-only recovery exposed a second finalization action."
+        )
     }
 
     func testHoleSelectionAndScorecardBackPreserveOrientation() {
@@ -393,6 +523,34 @@ final class BaggerInvScoreUITests: XCTestCase {
             screen.swipeDown()
         }
         XCTAssertTrue(topContent.exists, "The Score screen could not return to its top content.")
+    }
+
+    private func confirmationButton(_ label: String, in app: XCUIApplication) -> XCUIElement {
+        let buttons = app.buttons
+            .matching(NSPredicate(format: "label == %@", label))
+            .allElementsBoundByIndex
+        guard let button = buttons.first(where: { $0.isHittable }) else {
+            XCTFail("The confirmation action \(label) was not hittable.")
+            return app.buttons[label]
+        }
+        return button
+    }
+
+    private func assertDisappears(
+        _ identifier: String,
+        in app: XCUIApplication,
+        timeout: TimeInterval = 5
+    ) {
+        let target = element(identifier, in: app)
+        let expectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "exists == false"),
+            object: target
+        )
+        XCTAssertEqual(
+            XCTWaiter.wait(for: [expectation], timeout: timeout),
+            .completed,
+            "The element \(identifier) did not disappear."
+        )
     }
 
     @discardableResult

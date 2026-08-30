@@ -28,6 +28,10 @@ enum TodayUITestScenario: String {
     case scoreOffline = "score.offline"
     case scoreDurableOffline = "score.durable-offline"
     case scoreSignOutWarning = "score.signout-warning"
+    case scoreConflictReview = "score.conflict-review"
+    case scoreCorrectionPending = "score.correction-pending"
+    case scoreFinalizationReady = "score.finalization-ready"
+    case scoreFinalizationUnknown = "score.finalization-unknown"
 }
 
 enum TodayUITestLaunch {
@@ -137,7 +141,9 @@ private enum TodayUITestFixtures {
              .scoreActiveScramble, .scoreActiveSingles, .scoreReadOnly,
              .scoreCompleted, .scoreUnknownFormat, .scoreMixedHoles,
              .scoreLongContent, .scoreOffline, .scoreDurableOffline,
-             .scoreSignOutWarning:
+             .scoreSignOutWarning, .scoreConflictReview,
+             .scoreCorrectionPending, .scoreFinalizationReady,
+             .scoreFinalizationUnknown:
             current = .init(
                 availability: .content,
                 value: match(

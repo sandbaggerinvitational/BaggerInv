@@ -545,9 +545,20 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             return otpField
         }
 
+        // Turnstile can finish while WebKit is rebuilding its accessibility
+        // tree. Never act on a stale WebView reference after the native OTP
+        // field has appeared; this keeps the authorized request single-shot.
+        if !webView.exists {
+            XCTAssertTrue(
+                otpField.waitForExistence(timeout: 5),
+                "Turnstile left the challenge view without presenting native OTP entry."
+            )
+            return otpField
+        }
+
         if challengeControlLoaded && challengeControl.isHittable {
             challengeControl.tap()
-        } else {
+        } else if webView.exists {
             // The managed Turnstile widget exposes different accessibility trees
             // across WebKit releases. The checkbox sits on the leading side of
             // the centered widget in this dedicated, non-scrolling challenge view.

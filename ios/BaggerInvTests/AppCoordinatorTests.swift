@@ -3,6 +3,86 @@ import XCTest
 
 final class AppCoordinatorTests: XCTestCase {
     @MainActor
+    func testPreviewScoringCapabilityEnablesOnlyExactCertifiedPreviewBuild() {
+        let capability = PreviewScoringMutationCapability.resolve(
+            environment: TestFixtures.environment,
+            bundleIdentifier: PreviewScoringMutationCapability.previewBundleIdentifier
+        )
+
+        XCTAssertTrue(capability.allowsTransport)
+        XCTAssertTrue(capability.allowsFinalizationTransport)
+        XCTAssertEqual(
+            capability.allowsTransport,
+            capability.allowsFinalizationTransport,
+            "Hole replay and online-only finalization must share one build capability"
+        )
+    }
+
+    @MainActor
+    func testPreviewScoringCapabilityFailsClosedForWrongBundle() {
+        let capability = PreviewScoringMutationCapability.resolve(
+            environment: TestFixtures.environment,
+            bundleIdentifier: "com.sandbaggerinvitational.bagger"
+        )
+
+        XCTAssertFalse(capability.allowsTransport)
+        XCTAssertFalse(capability.allowsFinalizationTransport)
+    }
+
+    @MainActor
+    func testPreviewScoringCapabilityFailsClosedForWrongAPIOrSupabaseAuthority() {
+        let bundleIdentifier = PreviewScoringMutationCapability.previewBundleIdentifier
+        let wrongAPI = PreviewScoringMutationCapability.resolve(
+            apiBaseURL: URL(string: "https://example.invalid")!,
+            supabaseURL: NativeEnvironment.previewSupabaseURL,
+            bundleIdentifier: bundleIdentifier
+        )
+        let wrongSupabase = PreviewScoringMutationCapability.resolve(
+            apiBaseURL: NativeEnvironment.previewAPIURL,
+            supabaseURL: URL(string: "https://wrong-project.supabase.co")!,
+            bundleIdentifier: bundleIdentifier
+        )
+        let missingBundle = PreviewScoringMutationCapability.resolve(
+            apiBaseURL: NativeEnvironment.previewAPIURL,
+            supabaseURL: NativeEnvironment.previewSupabaseURL,
+            bundleIdentifier: nil
+        )
+
+        XCTAssertFalse(wrongAPI.allowsTransport)
+        XCTAssertFalse(wrongAPI.allowsFinalizationTransport)
+        XCTAssertFalse(wrongSupabase.allowsTransport)
+        XCTAssertFalse(wrongSupabase.allowsFinalizationTransport)
+        XCTAssertFalse(missingBundle.allowsTransport)
+        XCTAssertFalse(missingBundle.allowsFinalizationTransport)
+    }
+
+    @MainActor
+    func testMutationTransportAuthorizationEpochCannotSurviveBackgroundAndReauthorization() {
+        let activity = NativeApplicationActivity(
+            isActive: true,
+            mutationTransportAuthorized: true
+        )
+        let original = try! XCTUnwrap(activity.mutationTransportAuthorization)
+        XCTAssertTrue(activity.permits(original))
+
+        activity.update(isActive: false)
+        XCTAssertFalse(activity.permits(original))
+        XCTAssertNil(activity.mutationTransportAuthorization)
+
+        activity.update(isActive: true)
+        XCTAssertNil(
+            activity.mutationTransportAuthorization,
+            "Returning active must not itself restore scoring transport authority"
+        )
+        activity.authorizeMutationTransport()
+        let replacement = try! XCTUnwrap(activity.mutationTransportAuthorization)
+
+        XCTAssertNotEqual(original, replacement)
+        XCTAssertFalse(activity.permits(original))
+        XCTAssertTrue(activity.permits(replacement))
+    }
+
+    @MainActor
     func testBootstrapWithoutSupabaseSessionEndsSignedOut() async {
         let api = MockMobileAPI()
         let auth = MockAuthService()
@@ -89,6 +169,86 @@ final class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(data.activateCallCount, 1)
         XCTAssertEqual(data.activatedAuthUserID, TestFixtures.authSession.userID)
         XCTAssertEqual(data.activatedParticipant, TestFixtures.participant)
+    }
+
+    @MainActor
+    func testBackgroundDuringRestoredSessionActivationPausesQueueAfterActivationCompletes() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        data.suspendNextActivationCall()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        // Record the initial foreground phase before bootstrap, matching
+        // RootView's independent scene lifecycle task.
+        await coordinator.refreshTournamentDataForForeground()
+
+        let bootstrap = Task { @MainActor in await coordinator.bootstrap() }
+        for _ in 0..<1_000 where !data.hasSuspendedActivation() {
+            await Task.yield()
+        }
+        XCTAssertTrue(data.hasSuspendedActivation())
+        XCTAssertEqual(coordinator.state, .loadingParticipant)
+
+        await coordinator.pauseTournamentDataForBackground()
+        XCTAssertEqual(data.backgroundPauseCallCount, 0)
+        data.resumeSuspendedActivation()
+        await bootstrap.value
+
+        XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+        XCTAssertEqual(data.activateCallCount, 1)
+        XCTAssertEqual(data.backgroundPauseCallCount, 1)
+        XCTAssertEqual(data.foregroundRefreshCallCount, 0)
+    }
+
+    @MainActor
+    func testActiveTransitionDuringSuspendedActivationConvergesThroughFreshHealth() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        data.suspendNextActivationCall()
+        let coordinator = AppCoordinator(
+            environment: TestFixtures.environment,
+            api: api,
+            auth: auth,
+            certificationStore: store,
+            tournamentDataLifecycle: data,
+            now: { TestFixtures.now }
+        )
+
+        let bootstrap = Task { @MainActor in await coordinator.bootstrap() }
+        for _ in 0..<1_000 where !data.hasSuspendedActivation() {
+            await Task.yield()
+        }
+        XCTAssertTrue(data.hasSuspendedActivation())
+        XCTAssertEqual(coordinator.state, .loadingParticipant)
+        XCTAssertEqual(api.healthCallCount, 1)
+
+        // RootView can report active while participant activation is still
+        // suspended. That callback arms the gate; activation must notice the
+        // missing grant and perform a new exact health check before resuming.
+        coordinator.handleApplicationSceneChange(isActive: true)
+        data.resumeSuspendedActivation()
+        await bootstrap.value
+
+        XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+        XCTAssertEqual(api.healthCallCount, 2)
+        XCTAssertEqual(data.activateCallCount, 1)
+        XCTAssertEqual(data.foregroundRefreshCallCount, 1)
+        XCTAssertEqual(data.backgroundPauseCallCount, 0)
     }
 
     @MainActor
@@ -396,7 +556,105 @@ final class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(data.foregroundRefreshCallCount, 0)
 
         await coordinator.bootstrap()
+        await coordinator.pauseTournamentDataForBackground()
+        XCTAssertEqual(data.backgroundPauseCallCount, 1)
         await coordinator.refreshTournamentDataForForeground()
+        XCTAssertEqual(data.foregroundRefreshCallCount, 1)
+    }
+
+    @MainActor
+    func testBackgroundPauseDoesNotRefreshOrResumeTransport() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.bootstrap()
+
+        await coordinator.pauseTournamentDataForBackground()
+
+        XCTAssertEqual(data.backgroundPauseCallCount, 1)
+        XCTAssertEqual(data.foregroundRefreshCallCount, 0)
+        XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+    }
+
+    @MainActor
+    func testNewerBackgroundTransitionPreventsDelayedForegroundHealthFromResumingReplay() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.bootstrap()
+        api.suspendNextHealth()
+
+        let foreground = Task { @MainActor in
+            await coordinator.refreshTournamentDataForForeground()
+        }
+        for _ in 0..<1_000 where !api.hasSuspendedHealth() {
+            await Task.yield()
+        }
+        XCTAssertTrue(api.hasSuspendedHealth())
+
+        await coordinator.pauseTournamentDataForBackground()
+        api.resumeSuspendedHealth()
+        await foreground.value
+
+        XCTAssertEqual(data.backgroundPauseCallCount, 1)
+        XCTAssertEqual(data.foregroundRefreshCallCount, 0)
+        XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+    }
+
+    @MainActor
+    func testBackgroundDuringReadAuthorityHealthDoesNotResumeSuspendedLifecycle() async {
+        let api = MockMobileAPI()
+        let auth = MockAuthService()
+        auth.restoredSessionValue = TestFixtures.authSession
+        let store = MockCertificationStore()
+        store.credentialValue = StoredBaggerCertification(
+            token: TestFixtures.certificationToken,
+            userID: TestFixtures.authSession.userID,
+            expiresAt: TestFixtures.now.addingTimeInterval(3_600)
+        )
+        let data = MockTournamentDataLifecycle()
+        let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
+        await coordinator.refreshTournamentDataForForeground()
+        await coordinator.bootstrap()
+        api.suspendNextHealth()
+
+        let revalidation = Task { @MainActor in
+            await coordinator.revalidateReadAuthorityAfterUnavailableResponse()
+        }
+        for _ in 0..<1_000 where !api.hasSuspendedHealth() {
+            await Task.yield()
+        }
+        XCTAssertTrue(api.hasSuspendedHealth())
+        XCTAssertEqual(coordinator.state, .checkingEnvironment)
+
+        await coordinator.pauseTournamentDataForBackground()
+        api.resumeSuspendedHealth()
+        await revalidation.value
+
+        XCTAssertEqual(data.suspendCallCount, 1)
+        XCTAssertEqual(data.backgroundPauseCallCount, 1)
+        XCTAssertEqual(data.resumeCallCount, 0)
+        XCTAssertEqual(data.foregroundRefreshCallCount, 0)
+        XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
+
+        await coordinator.refreshTournamentDataForForeground()
+        XCTAssertEqual(data.resumeCallCount, 1)
         XCTAssertEqual(data.foregroundRefreshCallCount, 1)
     }
 
@@ -438,12 +696,14 @@ final class AppCoordinatorTests: XCTestCase {
         let data = MockTournamentDataLifecycle()
         let coordinator = makeCoordinator(api: api, auth: auth, store: store, data: data)
         await coordinator.bootstrap()
+        await coordinator.pauseTournamentDataForBackground()
         api.healthError = MobileAPIClientError.transportUnavailable
 
         await coordinator.refreshTournamentDataForForeground()
 
         XCTAssertEqual(coordinator.state, .authenticated(TestFixtures.participant))
         XCTAssertEqual(data.deactivateCallCount, 0)
+        XCTAssertEqual(data.backgroundPauseCallCount, 1)
         XCTAssertEqual(data.foregroundRefreshCallCount, 0)
         XCTAssertEqual(auth.signOutCallCount, 0)
     }
@@ -569,7 +829,7 @@ final class AppCoordinatorTests: XCTestCase {
         store: MockCertificationStore = MockCertificationStore(),
         data: MockTournamentDataLifecycle? = nil
     ) -> AppCoordinator {
-        AppCoordinator(
+        let coordinator = AppCoordinator(
             environment: TestFixtures.environment,
             api: api,
             auth: auth,
@@ -577,6 +837,8 @@ final class AppCoordinatorTests: XCTestCase {
             tournamentDataLifecycle: data,
             now: { TestFixtures.now }
         )
+        coordinator.handleApplicationSceneChange(isActive: true)
+        return coordinator
     }
 
     private func challengeContext() -> OTPChallengeContext {

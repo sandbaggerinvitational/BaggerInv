@@ -182,6 +182,24 @@ struct ScoringQueueRevisionHandoffEvidence: Equatable, Sendable {
     let targetOfficialGross: ScoringQueueGross?
 }
 
+/// Fresh canonical evidence used by the explicit "Reapply My Score" path.
+/// This is deliberately a storage input, not a capability: the coordinator
+/// must still obtain it through an authenticated, no-store scoring refresh.
+struct ScoringQueueConflictReapplyEvidence: Equatable, Sendable {
+    let partition: ScoringQueuePartition
+    let matchId: String
+    let playerId: String
+    let snapshotId: String?
+    let snapshotRevision: Int
+    let scoringFormat: ScoringQueueFormat
+    let sideSlotCount: Int
+    let matchStatus: MobileMatchStatus
+    let canScore: Bool
+    let readOnly: Bool
+    let officialGross: ScoringQueueGross?
+    let server: ScoringQueueLastKnownServer
+}
+
 struct ScoringQueueConflict: Codable, Equatable, Sendable {
     let officialGross: ScoringQueueGross?
     let currentMatchRevision: Int?
@@ -332,6 +350,11 @@ enum ScoringQueueSaveResult: Equatable, Sendable {
     case superseded(previous: ScoringQueueRecord, record: ScoringQueueRecord)
 }
 
+struct ScoringQueueConflictReapplyResult: Equatable, Sendable {
+    let resolvedConflict: ScoringQueueRecord
+    let replacement: ScoringQueueRecord
+}
+
 /// Persistence boundary for the durable queue. Implementations own time,
 /// identifier, and sequence allocation so Save remains one atomic transaction.
 protocol ScoringQueueRepository: Sendable {
@@ -377,6 +400,15 @@ protocol ScoringQueueRepository: Sendable {
         canonical: MobileScoringCurrent,
         at date: Date
     ) async throws -> ScoringQueueRecord
+
+    /// Atomically preserves the reviewed conflict as resolved and creates a
+    /// brand-new queued intent with a brand-new mutation ID. No network work
+    /// occurs inside this persistence operation.
+    func reapplyConflict(
+        recordId: String,
+        evidence: ScoringQueueConflictReapplyEvidence,
+        originatingAppBuild: String
+    ) async throws -> ScoringQueueConflictReapplyResult
 
     func recoverInterruptedSync(at date: Date) async throws -> [ScoringQueueRecord]
 }

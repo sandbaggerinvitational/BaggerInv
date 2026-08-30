@@ -54,7 +54,11 @@ struct MobileScoringHoleResponse: Codable, Equatable, Sendable {
         request.isContractCompatible &&
         data.matchId == request.matchId &&
         data.mutationId == request.mutationId &&
-        data.hole.holeNumber == request.holeNumber
+        data.hole.holeNumber == request.holeNumber &&
+        data.hole.gross.teamOne == request.teamOneGrossScores &&
+        data.hole.gross.teamTwo == request.teamTwoGrossScores &&
+        data.match.revision >= request.expectedMatchRevision &&
+        data.hole.revision >= request.expectedHoleRevision
     }
 }
 
@@ -96,6 +100,70 @@ struct MobileScoringAcknowledgedMatch: Codable, Equatable, Sendable {
 enum MobileScoringAcknowledgedMatchStatus: String, Codable, Equatable, Sendable {
     case inProgress
     case readyToFinalize
+}
+
+struct MobileScoringFinalizeRequest: Codable, Equatable, Sendable {
+    let matchId: String
+    let mutationId: String
+    let expectedMatchRevision: Int
+
+    var isContractCompatible: Bool {
+        MobileScoringIdentifier.isValid(matchId) &&
+        MobileScoringIdentifier.isValid(mutationId) &&
+        expectedMatchRevision >= 0
+    }
+}
+
+struct MobileScoringFinalizeResponse: Codable, Equatable, Sendable {
+    let ok: Bool
+    let apiVersion: String
+    let data: MobileScoringFinalizeAcknowledgement
+    let meta: MobileScoringMeta
+
+    var isContractCompatible: Bool {
+        ok && apiVersion == "v1" && data.isStructurallyCompatible
+    }
+
+    func isContractCompatible(for request: MobileScoringFinalizeRequest) -> Bool {
+        isContractCompatible &&
+        request.isContractCompatible &&
+        data.mutationId == request.mutationId &&
+        data.match.matchId == request.matchId &&
+        data.match.revision >= request.expectedMatchRevision
+    }
+}
+
+struct MobileScoringFinalizeAcknowledgement: Codable, Equatable, Sendable {
+    let mutationId: String
+    let accepted: Bool
+    let idempotent: Bool
+    let match: MobileScoringFinalizedMatch
+    let refreshRequired: Bool
+
+    var isStructurallyCompatible: Bool {
+        MobileScoringIdentifier.isValid(mutationId) &&
+        accepted &&
+        match.isStructurallyCompatible &&
+        refreshRequired
+    }
+}
+
+struct MobileScoringFinalizedMatch: Codable, Equatable, Sendable {
+    let matchId: String
+    let revision: Int
+    @MobileRequiredNullable var permissionRevision: Int?
+    let status: MobileMatchStatus
+    let scoringLocked: Bool
+    @MobileRequiredNullable var result: MobileScoringWinner?
+    @MobileRequiredNullable var finalizedAt: MobileTimestamp?
+
+    var isStructurallyCompatible: Bool {
+        MobileScoringIdentifier.isValid(matchId) &&
+        revision >= 0 &&
+        (permissionRevision.map { $0 >= 0 } ?? true) &&
+        status == .completed &&
+        scoringLocked
+    }
 }
 
 struct MobileScoringCurrent: Codable, Equatable, Sendable {
@@ -307,7 +375,8 @@ struct MobileScoringPermission: Codable, Equatable, Sendable {
     @MobileRequiredNullable var reason: MobileScoringPermissionReason?
 
     var isStructurallyCompatible: Bool {
-        !(canScore && readOnly)
+        !(canScore && readOnly) &&
+        (!canFinalize || (canScore && !readOnly))
     }
 }
 

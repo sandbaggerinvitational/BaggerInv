@@ -594,6 +594,7 @@ final class MockTournamentDataLifecycle: TournamentDataLifecycle {
     private(set) var deactivateCallCount = 0
     private(set) var refreshAllCallCount = 0
     private(set) var foregroundRefreshCallCount = 0
+    private(set) var backgroundPauseCallCount = 0
     private(set) var suspendCallCount = 0
     private(set) var resumeCallCount = 0
     private(set) var prepareScoringQueueForSignOutCallCount = 0
@@ -649,6 +650,10 @@ final class MockTournamentDataLifecycle: TournamentDataLifecycle {
 
     func refreshForForeground() async {
         foregroundRefreshCallCount += 1
+    }
+
+    func pauseForBackground() async {
+        backgroundPauseCallCount += 1
     }
 
     func unresolvedScoringIntentCount() async -> Int? {

@@ -1,6 +1,6 @@
 # Bagger Invitational for iOS
 
-This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E added the first canonical owned-Match scoring reader and a native, read-only official Scorecard. Step 2F adds durable, identity-partitioned scoring intent and foreground replay without changing server scoring authority or enabling finalization.
+This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E added the first canonical owned-Match scoring reader and a native, read-only official Scorecard. Step 2F added durable, identity-partitioned scoring intent. Step 2G completed the isolated-Preview scoring loop with canonical mutation acknowledgements, mandatory refresh, participant-controlled conflict resolution, corrections, and online-only finalization logic.
 
 ## Requirements
 
@@ -32,9 +32,9 @@ Keep these values in `Preview.xcconfig`:
 
 - `BAGGER_API_BASE_URL`: `https://native-preview.baggerinv.com`
 - `SUPABASE_URL`: the isolated Preview Supabase project URL from the approved configuration
-- `SUPABASE_PUBLISHABLE_KEY`: the Preview client-safe publishable/anon key
+- `SUPABASE_PUBLISHABLE_KEY`: the Preview client-safe publishable key
 
-`Preview.xcconfig` is intentionally ignored by Git, while `Preview.xcconfig.example` is reproducible and safe to commit. Supabase project URLs and publishable/anon keys are client-safe public configuration; they do not grant server authority.
+`Preview.xcconfig` is intentionally ignored by Git, while `Preview.xcconfig.example` is reproducible and safe to commit. Supabase project URLs and publishable keys are client-safe public configuration; they do not grant server authority.
 
 Never place any of the following in the iOS project or local client configuration:
 
@@ -122,8 +122,10 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 - **Step 2B — COMPLETE:** typed mobile read DTOs, authenticated transport, participant-scoped cache, repositories, coordinator, diagnostics, focused tests, and isolated Preview live QA are proven.
 - **Step 2C — COMPLETE:** native five-tab shell, cached-first Today product experience, Simulator validation, and physical-device online/offline validation.
 - **Step 2D — COMPLETE:** cached-first Matches tab, canonical Round selection, authenticated golfer Match hero, participant-visible selected-Round list, and native read-only Match Detail.
-- **Step 2E — COMPLETE:** memory-only canonical scoring-current reader, owned-Match scoring orientation, format-specific BB/SC/SI controls with explicitly ephemeral drafts, and an official read-only native Scorecard. No official score submission is enabled.
+- **Step 2E — COMPLETE:** memory-only canonical scoring-current reader, owned-Match scoring orientation, format-specific BB/SC/SI controls with explicitly ephemeral drafts, and an official read-only native Scorecard. At that milestone, no official score submission was enabled.
 - **Step 2F — COMPLETE:** SQLite-backed scoring intent, atomic local Save & Next, identity/tournament/Match partitioning, stable mutation IDs, ordered foreground replay, retry/backoff, crash recovery, stale-policy enforcement, retained unresolved intent across sign-out, database auditing, and physical-device acceptance are proven.
+- **Step 2G — COMPLETE:** official hole-mutation transport, acknowledgement-before-refresh durability, same-ID lost-response recovery, conflict comparison, Keep Official, explicit Reapply with a new mutation ID, correction overlays, and online-only finalization logic are implemented and proven. The isolated-Preview hole workflow was certified through normal acknowledgement, ordered replay, lost-response/idempotent recovery, correction, revision conflict, Keep Official, canonical restoration, and physical-device acceptance. No live finalization was authorized; finalization success, blockers, and lost-response reconciliation remain deterministically verified with injected transport.
+- **Next — Step 2H:** native Leaders plus a fresh participant-facing PWA leaderboard parity audit.
 
 ## Step 2B mobile read architecture
 
@@ -150,7 +152,7 @@ The authenticated app uses the fixed native information architecture:
 Today | Matches | Score | Leaders | More
 ```
 
-Today, Matches, and Score are implemented; Leaders and More remain intentionally restrained placeholders. `Score` means owned-Match score entry and review—not Tournament Score. Step 2E exposes canonical scoring state and ephemeral interaction only; no official submission exists yet.
+Today, Matches, and Score are implemented; Leaders and More remain intentionally restrained placeholders. `Score` means owned-Match score entry and review—not Tournament Score. Step 2E established the canonical read surface; Step 2F made local Save & Next durable; Step 2G added official isolated-Preview replay, conflict/correction handling, and online-only finalization logic without changing Production authority.
 
 Today preserves the approved product hierarchy:
 
@@ -243,11 +245,11 @@ The Score tab consumes only:
 GET /api/mobile/v1/scoring/current
 ```
 
-It uses the existing protected transport, so every request requires the current Supabase Bearer token and signed `X-Bagger-Certification`. The service supports the contract's optional canonical `matchId` scope, uses `Cache-Control: no-store`, sends no ETag, and adds no scoring POST method. The scoring store is memory-only and activates only after the Step 2A participant session has established the current Auth identity. Sign-out, identity change, or environment re-attestation cancels work and erases its snapshot.
+Step 2E introduced this reader through the existing protected transport, so every request requires the current Supabase Bearer token and signed `X-Bagger-Certification`. The service supports the contract's optional canonical `matchId` scope, uses `Cache-Control: no-store`, and sends no ETag. The scoring store remains memory-only and activates only after the Step 2A participant session has established the current Auth identity. Sign-out, identity change, or environment re-attestation cancels work and erases its snapshot. Step 2G added scoring POST operations only through the separate durable queue/finalization coordinators described below; the reader itself remains no-store and read-only.
 
 The server remains authoritative for Match selection, participant slots and side order, format, handicap values, strokes, gross and net scores, hole winner, Match progress/result/revisions, and permission. The presentation layer preserves this structure and supports canonical Best Ball (`BB`), Scramble (`SC`), and Singles (`SI`) row shapes. An unknown format remains available for official read-only review but cannot expose editable controls.
 
-Score controls use the contract-compatible gross range `1...20`, 56-point no-keyboard targets, and canonical slot order. Changes are deliberately ephemeral, in-memory UI drafts labeled **Edited · Not saved**. They are neither official nor durable, never change canonical net/winner/result presentation, and are discarded by explicit refresh, structural/snapshot/permission change, sign-out, or app termination. The disabled **Save & Next** control explains that official submission is not available in this build.
+Step 2E introduced score controls with the contract-compatible gross range `1...20`, 56-point no-keyboard targets, canonical slot order, and explicitly ephemeral drafts. The current architecture keeps edits ephemeral only until Save & Next: Step 2F then commits the intent atomically to the separate SQLite queue before advancing. Pending intent remains visibly distinct from canonical values, and Step 2G may submit it only through the guarded queue path after exact isolated-Preview authority and participant context are proven. Canonical net, winner, result, permission, and Scorecard values are never changed by an editor draft or queue overlay.
 
 The native Scorecard is canonical-only and groups the phone layout into Front 9 and Back 9 vertical sections. It displays only server-returned gross, strokes, net, winner, progress, and final result values. Selecting a Scorecard hole returns to that hole without creating a draft.
 
@@ -259,7 +261,7 @@ This boundary is deliberate:
 - **Step 2F:** durable SQLite-backed local scoring intent, partitioning, ordered replay, retry, and quarantine semantics from the approved Step 1D reliability specification.
 - **Step 2G:** real `/scoring/hole` and `/scoring/finalize` mutation authority, acknowledgements, revision conflicts, corrections, and finalization.
 
-Debug scoring fixtures cover no Match, upcoming/active BB, active SC, active SI, read-only, completed, unknown format, official/unscored holes, long content, and offline orientation. Fixture mode remains explicit, synthetic, Debug-only, and disconnected from credentials and live transport.
+Debug scoring fixtures cover no Match, upcoming/active BB, active SC, active SI, read-only, completed, unknown format, official/unscored holes, long content, offline orientation, and durable-offline queue presentation. Separately gated Step 2G workflow fixtures cover revision-conflict review, Keep Official, Reapply with a replacement mutation ID, a pending correction overlay, finalization readiness/confirmation, and unknown-finalization refresh-only recovery. These fixtures are explicit, synthetic, Debug-only, disconnected from credentials and live transport, and cannot submit an official score.
 
 ## Step 2F durable offline scoring queue
 
@@ -315,7 +317,39 @@ Age policy is explicit and never silently deletes unresolved intent:
 
 Revision and snapshot metadata are retained as preconditions, never incremented or treated as official by the client. Safe automatic rebase is bounded to three deterministic metadata-only attempts and only when refreshed official state proves the target blank or unchanged. A real local/official mismatch remains a conflict; idempotency conflict is quarantined and never receives a silent replacement mutation ID.
 
-Step 2F may exercise the typed `/api/mobile/v1/scoring/hole` transport only through injected deterministic tests unless an isolated Preview mutation is separately authorized. Finalization is not part of this queue and `/api/mobile/v1/scoring/finalize` remains online-only future work for Step 2G. The queue requires no background-execution entitlement: launch and foreground restoration revalidate environment, identity, snapshot, and canonical scoring state before eligible replay resumes.
+Step 2F originally exercised the typed `/api/mobile/v1/scoring/hole` transport only through injected deterministic tests. Step 2G connected that transport to the same guarded queue and certified the hole path against isolated Preview. Finalization is still not part of the queue: Step 2G keeps `/api/mobile/v1/scoring/finalize` online-only behind an explicit confirmation and canonical reconciliation probe. Its behavior is deterministically covered with injected transport, but no live finalization was authorized or performed during Step 2G certification. The queue requires no background-execution entitlement: launch and foreground restoration revalidate environment, identity, snapshot, and canonical scoring state before eligible replay resumes.
+
+Scene activity is a shared synchronous safety gate owned above the read, queue, and finalization coordinators. Entering an inactive/background scene immediately makes scoring transport ineligible and then cancels or suspends asynchronous work. Returning to the foreground does not reopen replay merely because a scene event arrived: the app first repeats the exact Preview health attestation and completes the canonical scoring revalidation barrier for the current identity generation. Obsolete activation, health, refresh, queue, or finalization tasks cannot resume transport after a newer background or identity transition.
+
+## Step 2G official scoring workflow
+
+Step 2G keeps the Step 2F ordering rule even on a fast network:
+
+```text
+durable SQLite commit
+→ ordered Match worker
+→ POST /api/mobile/v1/scoring/hole
+→ durable acknowledgement
+→ GET /api/mobile/v1/scoring/current?matchId=...
+→ canonical value agrees
+→ Official
+```
+
+The central authenticated transport constructs the exact mobile-v1 hole payload from the durable record: stable mutation ID, canonical Match ID, hole, immutable side/slot gross ordering, and expected Match/hole revisions. It never sends client-computed strokes, net, winner, permission, lifecycle, or participant identity. A retry after timeout, process interruption, token refresh, 5xx response, or unknown outcome reuses the original mutation ID. Both a normal acknowledgement and an idempotent acknowledgement are persisted before the mandatory no-store canonical refresh. If the app terminates after acknowledgement, restoration performs refresh only and cannot submit that mutation again.
+
+The official Scorecard always remains server-derived. Pending or conflicted intent is shown as a separate local overlay such as **Saved on iPhone**, never substituted for the official gross value. A correction to an existing official hole is a new durable record with a new mutation ID and current canonical revision preconditions. It remains ordered behind every older unresolved record in the Match.
+
+On `REVISION_CONFLICT`, replay stops for that Match and refreshes canonical scoring state. Canonically equivalent intent resolves without another write. A provably blank/unchanged target may receive at most three metadata-only safe rebases under the Step 1D rules. A real value mismatch remains **Needs Review** and presents the current Official value beside **Your saved score**. **Keep Official** performs no server write. **Reapply My Score** first refreshes and revalidates identity, Match, snapshot, permission, and lifecycle, resolves the original conflict, then atomically creates a new record with a new mutation ID and current revisions. Changed canonical evidence must be shown again before either explicit decision is accepted. `IDEMPOTENCY_CONFLICT` and invalid intent remain quarantined and cannot manufacture replacement IDs.
+
+Known authorization and lifecycle rejections remain durable Match-wide admission blockers. A failed or contradictory follow-up read cannot make scoring writable. Authentication or canonical participant invalidation fails the authenticated shell closed; read-only, authorization-revoked, missing-Match, finalized, stale, conflict, and quarantine states preserve local intent for review rather than deleting it or letting a later hole leapfrog.
+
+Finalization is deliberately separate from the offline hole queue. It is online-only, uses `POST /api/mobile/v1/scoring/finalize`, and requires an explicit confirmation plus an acquired Match guard proving that every local queue state is clear and canonical `canFinalize` is true. A tiny protected finalization probe records its schema version, local probe ID, exact identity partition, Match ID, stable mutation ID, expected Match revision, outcome phase, created/updated timestamps, and an optional bounded server error code. It contains no score payload and is not an offline retry queue. An accepted response is persisted before refresh. An unknown outcome always reconciles through `GET /scoring/current`; canonical final means success, while an active/finalizable Match requires a fresh explicit confirmation before any further POST. No automatic finalization retry loop exists.
+
+The finalization probe is stored privately under Application Support with `completeUntilFirstUserAuthentication` protection and is excluded from backup. Like the scoring queue, it contains no Bearer token, refresh token, certification, OTP, Turnstile token, email, phone, or server credential. Sign-out and environment invalidation cancel transport ownership, preserve unresolved proof, release the Match guard, and prevent a late response from publishing into a new identity lifecycle.
+
+Official hole transport is a permanent capability only for the single compiled isolated-Preview environment. It remains gated by the exact Step 2A health authority, the restored Supabase session, signed Bagger certification, canonical participant/Match identity, server scoring permission, and the queue's identity/tournament/Match partition. There is no environment picker, Production URL, Production Supabase configuration, runtime discovery, or fallback. A failed authority check disables scoring transport. Production mobile remains absent and fail-closed, and native scoring never writes directly to Supabase or another data source.
+
+Release behavior contains no QA Match, hole, gross-score baseline, OTP, credential, or fixture activation path.
 
 ## Participant-scoped read cache
 
@@ -374,7 +408,7 @@ Step 2A includes:
 - temporary signed-in diagnostic UI
 - secure sign-out
 
-Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E added the isolated Preview scoring read surface; Step 2F adds durable local scoring intent and guarded replay. Phone Auth, participant-facing conflict/finalization workflows, Production scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
+Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E added the isolated Preview scoring read surface; Step 2F added durable local scoring intent and guarded replay; Step 2G added participant-facing conflict review, corrections, official isolated-Preview hole replay, and online-only finalization logic. Phone Auth, Production scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
 
 ## Future Leaders product requirement
 
@@ -386,8 +420,8 @@ Before Step 2H, native Leaders must receive a fresh participant-facing PWA parit
 - Net Skins from a participant-safe canonical server projection;
 - Calcutta from a participant-safe published server projection, without Director/admin controls.
 
-Native must not recreate leaderboard, Net Skins, Round Score, Calcutta auction, settlement, or publication authority in Swift. If Net Skins or Calcutta are not yet available through mobile v1, the smallest safe read contract must be classified and established before Step 2H rather than silently narrowing the native Leaders product.
+Native must not recreate leaderboard, Net Skins, Round Score, Calcutta auction, settlement, or publication authority in Swift. The current stable website branch now defines additive participant-safe mobile-v1 contracts for Net Skins and published Calcutta, but those contracts and their dependencies are not yet part of the native branch ancestry and do not by themselves activate Production native access. Before Step 2H, audit them against the current PWA, deliberately synchronize only the stable shared contracts/routes needed by native, verify isolated-Preview availability and authority, and extend the authenticated participant-scoped read/cache foundation. Do not merge the website branch wholesale. Round Scores remain a separate canonical mobile-contract gap until server support exists.
 
 ## Next step
 
-**Step 2G — Official scoring mutations, conflicts, corrections, and finalization** is next after Step 2F final acceptance. It should connect the proven queue to the existing `/api/mobile/v1/scoring/hole` and `/api/mobile/v1/scoring/finalize` contracts, preserve stable mutation IDs across uncertain outcomes, reconcile canonical acknowledgements and revisions, expose Keep Official and explicit Reapply flows, and keep finalization online-only. It must not weaken Preview authority, identity partitioning, server permission, or canonical scoring ownership.
+**Step 2H — Leaders + PWA leaderboard parity audit** is next. It must cover Tournament Score, Player Leaders, Round Scores when canonical support exists, Net Skins, Calcutta, and every other participant-facing leaderboard module present in the current stable PWA. Swift must consume server-projected canonical products rather than calculate ranks, points, skins, auction ownership, payout, settlement, or publication authority. Production native activation remains a separate explicit release gate.

@@ -243,7 +243,26 @@ enum ScoringQueueValidator {
                 return
             }
         case .conflict:
-            guard record.conflict != nil else {
+            guard record.conflict != nil,
+                  record.acknowledgement.map({ acknowledgement in
+                      acknowledgement.accepted &&
+                      acknowledgement.refreshPending &&
+                      acknowledgement.canonicalMatchRevision >= 0 &&
+                      acknowledgement.canonicalHoleRevision >= 0 &&
+                      record.attempt.outcomeCertainty == .knownAccepted
+                  }) ?? true else {
+                issues.append(.invalidStateMetadata(record.state))
+                return
+            }
+        case .actionRequired:
+            // A server-accepted mutation can move from conflict into a
+            // lifecycle/permission review state after its mandatory refresh.
+            // Preserve that acceptance proof so this mutation ID can never be
+            // treated as submit-eligible again. Ordinary action-required
+            // records have neither acknowledgement nor conflict metadata.
+            guard record.acknowledgement.map({ _ in
+                record.hasAcceptedAcknowledgementProof && record.conflict != nil
+            }) ?? true else {
                 issues.append(.invalidStateMetadata(record.state))
                 return
             }
@@ -257,11 +276,18 @@ enum ScoringQueueValidator {
                 issues.append(.invalidStateMetadata(record.state))
                 return
             }
-        case .queued, .syncing, .retryable, .actionRequired:
+        case .queued, .syncing, .retryable:
             break
         }
 
-        if record.state != .acknowledged, record.acknowledgement != nil {
+        // A later cross-device write can make the mandatory canonical refresh
+        // disagree with an already accepted mutation. Keep the accepted proof
+        // on that conflict/action-required record until the golfer explicitly
+        // resolves it or canonical state proves it equivalent.
+        if record.state != .acknowledged,
+           record.state != .conflict,
+           record.state != .actionRequired,
+           record.acknowledgement != nil {
             issues.append(.invalidStateMetadata(record.state))
         }
         if record.state != .resolved, record.resolution != nil {
@@ -394,7 +420,7 @@ enum ScoringQueueTransitionPolicy {
         case .retryable:
             [.queued, .syncing, .acknowledged, .conflict, .actionRequired, .quarantined, .resolved]
         case .acknowledged:
-            []
+            [.conflict]
         case .conflict:
             [.actionRequired, .quarantined, .resolved]
         case .actionRequired:
@@ -455,6 +481,16 @@ enum ScoringQueueTransitionPolicy {
 }
 
 extension ScoringQueueRecord {
+    /// Durable proof that this logical mutation was already accepted by the
+    /// server and is awaiting explicit/canonical reconciliation. Such a record
+    /// is refresh/review-only and must never be automatically rebased or sent.
+    var hasAcceptedAcknowledgementProof: Bool {
+        guard let acknowledgement else { return false }
+        return acknowledgement.accepted &&
+            acknowledgement.refreshPending &&
+            attempt.outcomeCertainty == .knownAccepted
+    }
+
     var isUnresolved: Bool {
         switch state {
         case .acknowledged:
@@ -475,6 +511,19 @@ extension ScoringQueueRecord {
         case .acknowledged:
             acknowledgement?.refreshPending ?? true
         case .queued, .syncing, .retryable, .resolved:
+            false
+        }
+    }
+
+    /// Unlike queued/syncing/retryable/acknowledged work, these states prove
+    /// that automatic progression is unsafe. They block admission of a new
+    /// intent anywhere in the same Match until canonical review resolves the
+    /// earlier record.
+    var blocksNewLocalIntentForMatch: Bool {
+        switch state {
+        case .conflict, .actionRequired, .quarantined:
+            true
+        case .queued, .syncing, .retryable, .acknowledged, .resolved:
             false
         }
     }

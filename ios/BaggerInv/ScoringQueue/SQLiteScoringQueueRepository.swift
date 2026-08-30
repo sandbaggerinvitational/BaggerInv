@@ -46,6 +46,9 @@ enum SQLiteScoringQueueRepositoryError: Error, Equatable {
     case leaseMismatch
     case receiptNotReady
     case queueHealth
+    case canonicalContextMismatch
+    case canonicalContextNotWritable
+    case staleCanonicalEvidence
 }
 
 private struct SQLiteIndexedQueueRow {
@@ -173,20 +176,20 @@ actor SQLiteScoringQueueRepository: ScoringQueueReceiptRepository, ScoringQueueP
 
         let connection = try openConnection()
         let result = try connection.immediateTransaction {
-            let sameHole = try fetchRecords(
+            let matchRecords = try fetchRecords(
                 matching: input.partition,
-                holeNumber: input.intent.holeNumber,
                 connection: connection
-            ).filter(Self.isUnresolved)
+            )
+            let sameHole = matchRecords.filter {
+                $0.intent.holeNumber == input.intent.holeNumber
+            }.filter(Self.isUnresolved)
 
             if let existing = sameHole.first(where: { $0.intent == input.intent }) {
                 return ScoringQueueSaveResult.reused(existing)
             }
 
-            guard !sameHole.contains(where: {
-                $0.state == .conflict ||
-                    $0.state == .actionRequired ||
-                    $0.state == .quarantined
+            guard !matchRecords.contains(where: {
+                Self.isUnresolved($0) && $0.blocksNewLocalIntentForMatch
             }) else {
                 throw SQLiteScoringQueueRepositoryError.reviewRequired
             }
@@ -531,6 +534,174 @@ actor SQLiteScoringQueueRepository: ScoringQueueReceiptRepository, ScoringQueueP
         }
     }
 
+    func reapplyConflict(
+        recordId: String,
+        evidence: ScoringQueueConflictReapplyEvidence,
+        originatingAppBuild: String
+    ) throws -> ScoringQueueConflictReapplyResult {
+        try validate(evidence.partition)
+        guard !originatingAppBuild.isEmpty,
+              originatingAppBuild.utf8.count <= 128,
+              evidence.server.refreshedAt.timeIntervalSinceReferenceDate.isFinite
+        else {
+            throw SQLiteScoringQueueRepositoryError.invalidRecord(.invalidRecordOrContract)
+        }
+
+        let connection = try openConnection()
+        let result = try connection.immediateTransaction {
+            guard let current = try fetchRecord(id: recordId, connection: connection),
+                  current.state == .conflict,
+                  current.stateReasonCode == .revision,
+                  let conflict = current.conflict,
+                  !conflict.refreshRequired,
+                  current.attempt.syncLeaseId == nil,
+                  current.attempt.syncLeaseStartedAt == nil
+            else {
+                throw SQLiteScoringQueueRepositoryError.reviewRequired
+            }
+
+            guard evidence.partition == current.partition,
+                  evidence.matchId == current.partition.matchId,
+                  evidence.playerId == current.partition.playerId,
+                  evidence.snapshotId == current.base.snapshotId,
+                  evidence.snapshotRevision == current.base.snapshotRevision,
+                  evidence.scoringFormat == current.base.scoringFormat,
+                  evidence.sideSlotCount == current.base.sideSlotCount
+            else {
+                throw SQLiteScoringQueueRepositoryError.canonicalContextMismatch
+            }
+
+            guard evidence.matchStatus == .inProgress,
+                  evidence.canScore,
+                  !evidence.readOnly
+            else {
+                throw SQLiteScoringQueueRepositoryError.canonicalContextNotWritable
+            }
+
+            guard evidence.server.refreshedAt > conflict.recordedAt,
+                  evidence.server.refreshedAt > current.lastKnownServer.refreshedAt,
+                  evidence.server.matchRevision >= 0,
+                  evidence.server.holeRevision >= 0,
+                  evidence.server.permissionRevision >= 0,
+                  evidence.server.matchRevision >= current.lastKnownServer.matchRevision,
+                  evidence.server.holeRevision >= current.lastKnownServer.holeRevision,
+                  evidence.server.permissionRevision >= current.lastKnownServer.permissionRevision,
+                  evidence.server.matchRevision >= (conflict.currentMatchRevision ?? 0),
+                  evidence.server.holeRevision >= (conflict.currentHoleRevision ?? 0),
+                  evidence.server.permissionRevision >= (conflict.currentPermissionRevision ?? 0)
+            else {
+                throw SQLiteScoringQueueRepositoryError.staleCanonicalEvidence
+            }
+
+            let expectedSlots = evidence.scoringFormat == .bestBall ? 2 : 1
+            guard evidence.sideSlotCount == expectedSlots else {
+                throw SQLiteScoringQueueRepositoryError.canonicalContextMismatch
+            }
+            if let official = evidence.officialGross {
+                guard official.teamOne.count == expectedSlots,
+                      official.teamTwo.count == expectedSlots,
+                      official.teamOne.allSatisfy({ (1...20).contains($0) }),
+                      official.teamTwo.allSatisfy({ (1...20).contains($0) })
+                else {
+                    throw SQLiteScoringQueueRepositoryError.canonicalContextMismatch
+                }
+            } else if evidence.server.holeRevision != 0 {
+                throw SQLiteScoringQueueRepositoryError.canonicalContextMismatch
+            }
+
+            // Resolving this record and inserting its replacement has a net
+            // unresolved-count change of zero. Apply bounds inside the same
+            // transaction so a concurrent Save cannot invalidate admission.
+            let matchCount = try unresolvedCount(
+                in: current.partition,
+                connection: connection
+            ) - 1
+            guard matchCount < ScoringQueueContract.maximumUnresolvedRecordsPerMatch else {
+                throw SQLiteScoringQueueRepositoryError.matchQueueLimit
+            }
+            let identityCount = try unresolvedCount(
+                for: current.partition.identity,
+                connection: connection
+            ) - 1
+            guard identityCount < ScoringQueueContract.maximumUnresolvedRecordsPerIdentityTournament else {
+                throw SQLiteScoringQueueRepositoryError.identityQueueLimit
+            }
+
+            let localRecordID = identifierGenerator()
+            let mutationID = identifierGenerator()
+            guard Self.isLowercaseUUID(localRecordID),
+                  Self.isValidMutationID(mutationID)
+            else {
+                throw SQLiteScoringQueueRepositoryError.invalidIdentifier
+            }
+            guard try !identifierExists(
+                localRecordID: localRecordID,
+                mutationID: mutationID,
+                matchID: current.partition.matchId,
+                connection: connection
+            ) else {
+                throw SQLiteScoringQueueRepositoryError.identifierCollision
+            }
+
+            let sequence = try allocateSequence(
+                for: current.partition,
+                connection: connection
+            )
+            let createdAt = max(
+                now(),
+                max(current.updatedAt, evidence.server.refreshedAt)
+            )
+            let replacement = ScoringQueueSaveInput(
+                partition: current.partition,
+                intent: current.intent,
+                base: ScoringQueueBase(
+                    expectedMatchRevision: evidence.server.matchRevision,
+                    expectedHoleRevision: evidence.server.holeRevision,
+                    snapshotId: evidence.snapshotId,
+                    snapshotRevision: evidence.snapshotRevision,
+                    scoringFormat: evidence.scoringFormat,
+                    sideSlotCount: evidence.sideSlotCount,
+                    officialGrossAtSave: evidence.officialGross
+                ),
+                lastKnownServer: evidence.server,
+                originatingAppBuild: originatingAppBuild
+            ).makeQueuedRecord(
+                localQueueRecordId: localRecordID,
+                mutationId: mutationID,
+                sequence: sequence,
+                createdAt: createdAt
+            )
+            try validate(replacement)
+
+            var resolved = current
+            resolved.state = .resolved
+            resolved.stateReasonCode = nil
+            // A conflict can retain an accepted acknowledgement while the
+            // mandatory refresh is under review. Once the golfer explicitly
+            // reapplies, that proof and the reviewed conflict belong only to
+            // the preserved audit history represented by the resolution; they
+            // are not valid state metadata for a resolved record.
+            resolved.acknowledgement = nil
+            resolved.conflict = nil
+            resolved.resolution = ScoringQueueResolution(
+                reason: .reappliedAsNewMutation,
+                resolvedAt: createdAt,
+                relatedLocalQueueRecordId: replacement.localQueueRecordId
+            )
+            resolved.updatedAt = createdAt
+            try validateReplacement(resolved, from: current)
+
+            try write(resolved, replacing: current, connection: connection)
+            try insert(replacement, connection: connection)
+            return ScoringQueueConflictReapplyResult(
+                resolvedConflict: resolved,
+                replacement: replacement
+            )
+        }
+        applySidecarProtectionBestEffort()
+        return result
+    }
+
     func recoverInterruptedSync(at date: Date) throws -> [ScoringQueueRecord] {
         try recoverLeases(notOwnedBy: nil, at: date)
     }
@@ -559,7 +730,12 @@ actor SQLiteScoringQueueRepository: ScoringQueueReceiptRepository, ScoringQueueP
             let related = try decodeRows(statement)
             var changed = 0
             for current in related where Self.isUnresolved(current) {
+                // A conflict is already a stronger Match-wide review blocker.
+                // It may also retain an accepted acknowledgement while a
+                // canonical disagreement is under review; rewriting it as
+                // actionRequired would discard or invalidate that proof.
                 guard current.state != .acknowledged,
+                      current.state != .conflict,
                       current.state != .quarantined
                 else { continue }
                 var updated = current
@@ -1476,9 +1652,21 @@ private extension SQLiteScoringQueueRepository {
         case .retryable:
             return [.queued, .acknowledged, .conflict, .actionRequired, .quarantined, .resolved].contains(updated.state)
         case .acknowledged:
-            return false
+            // The POST was accepted, but a newer canonical refresh may show
+            // a different official value. Preserve the acknowledgement while
+            // moving the record into an explicit review state.
+            return updated.state == .conflict &&
+                updated.stateReasonCode == .revision &&
+                updated.acknowledgement == current.acknowledgement &&
+                updated.acknowledgement?.refreshPending == true &&
+                updated.conflict != nil &&
+                updated.resolution == nil &&
+                updated.quarantineReason == nil
         case .conflict:
-            return [.actionRequired, .quarantined, .resolved].contains(updated.state)
+            return conflictCanonicalEvidenceDoesNotRegress(
+                from: current,
+                to: updated
+            ) && [.actionRequired, .quarantined, .resolved].contains(updated.state)
         case .actionRequired:
             return [.conflict, .resolved, .quarantined].contains(updated.state)
         case .quarantined:
@@ -1612,15 +1800,18 @@ private extension SQLiteScoringQueueRepository {
                 updated.attempt.lastHttpStatus == current.attempt.lastHttpStatus &&
                 updated.attempt.lastErrorCode == current.attempt.lastErrorCode &&
                 updated.attempt.nextRetryAt == nil &&
-                current.conflict?.refreshRequired == true &&
                 updated.conflict?.refreshRequired == false &&
-                (updated.conflict?.recordedAt ?? .distantPast) >=
+                (updated.conflict?.recordedAt ?? .distantPast) >
                     (current.conflict?.recordedAt ?? .distantPast) &&
                 updated.conflict?.currentMatchRevision == updated.lastKnownServer.matchRevision &&
                 updated.conflict?.currentHoleRevision == updated.lastKnownServer.holeRevision &&
                 updated.conflict?.currentPermissionRevision == updated.lastKnownServer.permissionRevision &&
                 updated.lastKnownServer.refreshedAt >= (updated.conflict?.recordedAt ?? .distantFuture) &&
                 updated.lastKnownServer.refreshedAt > current.lastKnownServer.refreshedAt &&
+                conflictCanonicalEvidenceDoesNotRegress(
+                    from: current,
+                    to: updated
+                ) &&
                 updated.acknowledgement == current.acknowledgement &&
                 updated.resolution == current.resolution &&
                 updated.quarantineReason == current.quarantineReason
@@ -1664,6 +1855,34 @@ private extension SQLiteScoringQueueRepository {
             updated.attempt.lastErrorCode == current.attempt.lastErrorCode
     }
 
+    /// Generic conflict transitions may carry a newer canonical comparison
+    /// (including Keep Official). When they do, the persisted revision vector
+    /// must be at least as new as both retained sources of server evidence.
+    static func conflictCanonicalEvidenceDoesNotRegress(
+        from current: ScoringQueueRecord,
+        to updated: ScoringQueueRecord
+    ) -> Bool {
+        let resolvesFromCanonicalEvidence = updated.state == .resolved && (
+            updated.resolution?.reason == .keptOfficial ||
+                updated.resolution?.reason == .officialEquivalent
+        )
+        guard updated.lastKnownServer != current.lastKnownServer ||
+                resolvesFromCanonicalEvidence
+        else {
+            return true
+        }
+        return updated.lastKnownServer.matchRevision >= max(
+            current.lastKnownServer.matchRevision,
+            current.conflict?.currentMatchRevision ?? 0
+        ) && updated.lastKnownServer.holeRevision >= max(
+            current.lastKnownServer.holeRevision,
+            current.conflict?.currentHoleRevision ?? 0
+        ) && updated.lastKnownServer.permissionRevision >= max(
+            current.lastKnownServer.permissionRevision,
+            current.conflict?.currentPermissionRevision ?? 0
+        )
+    }
+
     static func immutableAcknowledgementFactsMatch(
         _ current: ScoringQueueRecord,
         _ updated: ScoringQueueRecord
@@ -1689,6 +1908,10 @@ private extension SQLiteScoringQueueRepository {
         guard current.state == .conflict,
               current.stateReasonCode == .revision,
               current.conflict?.refreshRequired == true,
+              // An accepted mutation is refresh/review-only. Even if the
+              // canonical target later appears blank, storage must reject any
+              // attempt to turn that same mutation ID back into queued work.
+              !current.hasAcceptedAcknowledgementProof,
               updated.state == .queued,
               updated.stateReasonCode == nil,
               updated.conflict == nil,
@@ -1778,17 +2001,34 @@ private extension SQLiteScoringQueueRepository {
                 stableURL.lastPathComponent,
                 isDirectory: false
             )
-            do {
-                let candidateAttributes = try fileManager.attributesOfItem(
-                    atPath: candidate.path
+            // A process may leave an empty WAL/SHM sidecar directory after a
+            // legacy database was checkpointed and adopted. Sidecars alone are
+            // not a database and must not prevent the stable queue from opening.
+            guard fileManager.fileExists(atPath: candidate.path) else {
+                try verifyOrphanedLegacySidecarsAreSafe(
+                    for: candidate,
+                    fileManager: fileManager
                 )
-                guard candidateAttributes[.type] as? FileAttributeType == .typeRegular else {
-                    throw SQLiteScoringQueueRepositoryError.unsafeMigration
-                }
-                legacyStores.append((version, candidate))
-            } catch let error as CocoaError where error.code == .fileNoSuchFile {
                 continue
             }
+            let candidateAttributes: [FileAttributeKey: Any]
+            do {
+                candidateAttributes = try fileManager.attributesOfItem(
+                    atPath: candidate.path
+                )
+            } catch where isMissingFileError(error) {
+                // Treat a candidate that vanished between `fileExists` and
+                // metadata inspection exactly like an absent candidate.
+                try verifyOrphanedLegacySidecarsAreSafe(
+                    for: candidate,
+                    fileManager: fileManager
+                )
+                continue
+            }
+            guard candidateAttributes[.type] as? FileAttributeType == .typeRegular else {
+                throw SQLiteScoringQueueRepositoryError.unsafeMigration
+            }
+            legacyStores.append((version, candidate))
         }
 
         guard !legacyStores.isEmpty else { return }
@@ -1825,6 +2065,33 @@ private extension SQLiteScoringQueueRepository {
             legacyConnection.close()
             throw error
         }
+    }
+
+    static func verifyOrphanedLegacySidecarsAreSafe(
+        for missingDatabaseURL: URL,
+        fileManager: FileManager
+    ) throws {
+        let orphanedWALPath = missingDatabaseURL.path + "-wal"
+        guard fileManager.fileExists(atPath: orphanedWALPath) else { return }
+        let walAttributes: [FileAttributeKey: Any]
+        do {
+            walAttributes = try fileManager.attributesOfItem(atPath: orphanedWALPath)
+        } catch where isMissingFileError(error) {
+            return
+        }
+        let byteCount = (walAttributes[.size] as? NSNumber)?.int64Value ?? -1
+        guard byteCount == 0 else {
+            // A non-empty WAL without its main database may contain committed
+            // intent and cannot be discarded or ignored.
+            throw SQLiteScoringQueueRepositoryError.unsafeMigration
+        }
+    }
+
+    static func isMissingFileError(_ error: any Error) -> Bool {
+        let cocoa = error as NSError
+        guard cocoa.domain == NSCocoaErrorDomain else { return false }
+        return cocoa.code == CocoaError.Code.fileNoSuchFile.rawValue ||
+            cocoa.code == CocoaError.Code.fileReadNoSuchFile.rawValue
     }
 
     static func prepareProtectedDirectory(_ directory: URL, fileManager: FileManager) throws {

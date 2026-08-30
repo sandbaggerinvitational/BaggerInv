@@ -260,6 +260,266 @@ final class ScoringPresentationTests: XCTestCase {
         XCTAssertTrue(presentation.scorecardComplete)
     }
 
+    func testFinalizationUIRequiresFreshCanonicalReadinessAndEmptyHealthyQueue() {
+        let readyPresentation = makePresentation(
+            format: .bestBall,
+            scoredHoles: Array(1...18),
+            canFinalize: true,
+            scorecardComplete: true
+        )
+        let ready = ScoringFinalizationUIModel.make(
+            presentation: readyPresentation,
+            queueState: .inactive,
+            coordinatorState: .idle
+        )
+        XCTAssertEqual(ready.phase, .ready)
+        XCTAssertTrue(ready.canRequestFinalization)
+
+        var unresolvedQueue = ScoringQueueCoordinatorState.inactive
+        unresolvedQueue.records = [makeQueueRecord(state: .queued)]
+        let queued = ScoringFinalizationUIModel.make(
+            presentation: readyPresentation,
+            queueState: unresolvedQueue,
+            coordinatorState: .idle
+        )
+        XCTAssertEqual(queued.phase, .blocked(.queue))
+        XCTAssertFalse(queued.canRequestFinalization)
+
+        var unhealthyQueue = ScoringQueueCoordinatorState.inactive
+        unhealthyQueue.lastPersistenceFailure = true
+        XCTAssertEqual(
+            ScoringFinalizationUIModel.make(
+                presentation: readyPresentation,
+                queueState: unhealthyQueue,
+                coordinatorState: .idle
+            ).phase,
+            .blocked(.queue)
+        )
+
+        let stale = makePresentation(
+            format: .bestBall,
+            scoredHoles: Array(1...18),
+            canFinalize: true,
+            scorecardComplete: true,
+            phase: .offline
+        )
+        XCTAssertEqual(
+            ScoringFinalizationUIModel.make(
+                presentation: stale,
+                queueState: .inactive,
+                coordinatorState: .idle
+            ).phase,
+            .blocked(.canonicalUnavailable)
+        )
+
+        let incomplete = makePresentation(
+            format: .bestBall,
+            canFinalize: true,
+            scorecardComplete: false
+        )
+        XCTAssertEqual(
+            ScoringFinalizationUIModel.make(
+                presentation: incomplete,
+                queueState: .inactive,
+                coordinatorState: .idle
+            ).phase,
+            .blocked(.notReady)
+        )
+    }
+
+    func testFinalizationUIMapsCoordinatorLifecycleWithoutImplicitResubmission() {
+        let presentation = makePresentation(
+            format: .bestBall,
+            scoredHoles: Array(1...18),
+            canFinalize: true,
+            scorecardComplete: true
+        )
+        func state(
+            _ phase: ScoringFinalizationPhase,
+            blocker: ScoringFinalizationBlocker? = nil
+        ) -> ScoringFinalizationState {
+            ScoringFinalizationState(
+                phase: phase,
+                matchId: "match-scoring",
+                blocker: blocker,
+                lastServerCode: nil
+            )
+        }
+
+        XCTAssertEqual(
+            ScoringFinalizationUIModel.make(
+                presentation: presentation,
+                queueState: .inactive,
+                coordinatorState: state(.submitting)
+            ).phase,
+            .submitting
+        )
+        XCTAssertEqual(
+            ScoringFinalizationUIModel.make(
+                presentation: presentation,
+                queueState: .inactive,
+                coordinatorState: state(.reconciling)
+            ).phase,
+            .reconciling
+        )
+        let unknown = ScoringFinalizationUIModel.make(
+            presentation: presentation,
+            queueState: .inactive,
+            coordinatorState: state(.outcomeUnknown)
+        )
+        XCTAssertEqual(unknown.phase, .outcomeUnknown)
+        XCTAssertFalse(unknown.canRequestFinalization)
+
+        let confirmation = ScoringFinalizationUIModel.make(
+            presentation: presentation,
+            queueState: .inactive,
+            coordinatorState: state(.confirmationRequired)
+        )
+        XCTAssertEqual(confirmation.phase, .confirmationRequired)
+        XCTAssertTrue(confirmation.canRequestFinalization)
+
+        XCTAssertEqual(
+            ScoringFinalizationUIModel.make(
+                presentation: presentation,
+                queueState: .inactive,
+                coordinatorState: state(.blocked, blocker: .authorization)
+            ).phase,
+            .blocked(.authorization)
+        )
+        XCTAssertEqual(
+            ScoringFinalizationUIModel.make(
+                presentation: presentation,
+                queueState: .inactive,
+                coordinatorState: state(.matchFinal)
+            ).phase,
+            .matchFinal
+        )
+    }
+
+    func testLocalIntentComparisonPreservesCanonicalSideSlotOrderAndOfficialBoundary() {
+        let presentation = makePresentation(format: .bestBall)
+        let record = makeQueueRecord(
+            state: .conflict,
+            reason: .revision,
+            conflict: ScoringQueueConflict(
+                officialGross: ScoringQueueGross(teamOne: [4, 5], teamTwo: [5, 6]),
+                currentMatchRevision: 14,
+                currentHoleRevision: 2,
+                currentPermissionRevision: 5,
+                refreshRequired: false,
+                recordedAt: Date(timeIntervalSince1970: 100)
+            )
+        )
+
+        let comparison = ScoringLocalIntentComparison.make(
+            record: record,
+            presentation: presentation
+        )
+
+        XCTAssertEqual(comparison.rows.map(\.label), [
+            "Side 1 Slot 1", "Side 1 Slot 2", "Side 2 Slot 1", "Side 2 Slot 2",
+        ])
+        XCTAssertEqual(comparison.rows.map(\.officialGross), [4, 5, 5, 6])
+        XCTAssertEqual(comparison.rows.map(\.savedGross), [6, 5, 5, 7])
+        XCTAssertTrue(comparison.allowsKeepOfficial)
+        XCTAssertTrue(comparison.allowsReapply)
+
+        let quarantined = ScoringLocalIntentComparison.make(
+            record: makeQueueRecord(
+                state: .quarantined,
+                reason: .idempotencyConflict
+            ),
+            presentation: presentation
+        )
+        XCTAssertFalse(quarantined.allowsKeepOfficial)
+        XCTAssertFalse(quarantined.allowsReapply)
+    }
+
+    func testCompletedMatchConflictAllowsKeepOfficialButNotReapply() {
+        let presentation = makePresentation(
+            format: .bestBall,
+            status: .completed,
+            currentHole: 18,
+            scoredHoles: Array(1...18)
+        )
+        let record = makeQueueRecord(
+            state: .conflict,
+            reason: .revision,
+            conflict: ScoringQueueConflict(
+                officialGross: ScoringQueueGross(teamOne: [4, 5], teamTwo: [5, 6]),
+                currentMatchRevision: 14,
+                currentHoleRevision: 2,
+                currentPermissionRevision: 5,
+                refreshRequired: false,
+                recordedAt: Date(timeIntervalSince1970: 100)
+            )
+        )
+
+        let comparison = ScoringLocalIntentComparison.make(
+            record: record,
+            presentation: presentation
+        )
+
+        XCTAssertEqual(presentation.status, .final)
+        XCTAssertTrue(comparison.allowsKeepOfficial)
+        XCTAssertFalse(
+            comparison.allowsReapply,
+            "A canonical final Match may discard local intent but must never create a new mutation"
+        )
+    }
+
+    func testReviewProjectionIsMatchScopedOldestFirstAndScorecardUsesLatestPerHole() {
+        let oldest = makeQueueRecord(
+            recordID: "record-oldest",
+            matchID: "match-scoring",
+            hole: 1,
+            sequence: 1,
+            state: .conflict,
+            reason: .revision
+        )
+        let laterSameHole = makeQueueRecord(
+            recordID: "record-later",
+            matchID: "match-scoring",
+            hole: 1,
+            sequence: 3,
+            state: .actionRequired,
+            reason: .readOnly
+        )
+        let middle = makeQueueRecord(
+            recordID: "record-middle",
+            matchID: "match-scoring",
+            hole: 2,
+            sequence: 2,
+            state: .quarantined,
+            reason: .idempotencyConflict
+        )
+        let otherMatch = makeQueueRecord(
+            recordID: "record-other",
+            matchID: "other-match",
+            hole: 3,
+            sequence: 0,
+            state: .conflict,
+            reason: .revision
+        )
+        var state = ScoringQueueCoordinatorState.inactive
+        state.records = [laterSameHole, otherMatch, middle, oldest]
+
+        XCTAssertEqual(
+            ScoringQueueUIProjection.reviewRecords(
+                matchID: "match-scoring",
+                state: state
+            ).map(\.localQueueRecordId),
+            ["record-oldest", "record-middle", "record-later"]
+        )
+        XCTAssertEqual(
+            ScoringQueueUIProjection.latestUnresolvedPerHole(
+                matchID: "match-scoring",
+                state: state
+            ).map(\.localQueueRecordId),
+            ["record-later", "record-middle"]
+        )
+    }
+
     private func makePresentation(
         format: MobileScoringFormat,
         status: MobileMatchStatus = .inProgress,
@@ -268,10 +528,13 @@ final class ScoringPresentationTests: XCTestCase {
         scoredHoles: [Int] = [1],
         canScore: Bool = true,
         readOnly: Bool = false,
+        canFinalize: Bool = false,
+        scorecardComplete: Bool? = nil,
         permissionRevision: Int = 4,
         snapshotRevision: Int = 9,
         phase: ScoringCurrentPhase = .ready,
-        includeCourseHoles: Bool = true
+        includeCourseHoles: Bool = true,
+        isRefreshing: Bool = false
     ) -> ScoringPresentation {
         let participantCount: Int
         if let participantsPerSide {
@@ -353,13 +616,13 @@ final class ScoringPresentationTests: XCTestCase {
             progress: MobileScoringProgress(
                 currentHole: currentHole,
                 holesRemaining: status == .completed ? 0 : 18 - currentHole,
-                scorecardComplete: status == .completed,
+                scorecardComplete: scorecardComplete ?? (status == .completed),
                 statusText: "Canonical status text"
             ),
             permission: MobileScoringPermission(
                 canScore: canScore && status == .inProgress,
                 readOnly: readOnly || status != .inProgress,
-                canFinalize: false,
+                canFinalize: canFinalize,
                 reason: status == .completed ? .matchFinalized : readOnly ? .matchLocked : nil
             ),
             snapshot: MobileScoringSnapshot(snapshotId: "snapshot-1", revision: snapshotRevision)
@@ -368,7 +631,7 @@ final class ScoringPresentationTests: XCTestCase {
             scoring: scoring,
             generatedAt: try! MobileTimestamp("2026-09-25T14:30:00.000Z"),
             phase: phase,
-            isRefreshing: false,
+            isRefreshing: isRefreshing,
             lastSafeError: phase == .offline ? .transport : nil,
             lastServerCode: nil,
             lastHTTPStatus: nil
@@ -384,6 +647,57 @@ final class ScoringPresentationTests: XCTestCase {
             lastSafeError: nil,
             lastServerCode: nil,
             lastHTTPStatus: nil
+        )
+    }
+
+    private func makeQueueRecord(
+        recordID: String = "record-1",
+        matchID: String = "match-scoring",
+        hole: Int = 1,
+        sequence: Int64 = 1,
+        state: ScoringQueueState,
+        reason: ScoringQueueStateReasonCode? = nil,
+        conflict: ScoringQueueConflict? = nil
+    ) -> ScoringQueueRecord {
+        ScoringQueueRecord(
+            localQueueRecordId: recordID,
+            mutationId: "11111111-1111-4111-8111-\(String(format: "%012lld", sequence))",
+            partition: ScoringQueuePartition(
+                authUserId: "fixture-auth",
+                playerId: "player-1-1",
+                tournamentId: "fixture-tournament",
+                matchId: matchID
+            ),
+            intent: ScoringQueueIntent(
+                holeNumber: hole,
+                teamOneGrossScores: [6, 5],
+                teamTwoGrossScores: [5, 7]
+            ),
+            base: ScoringQueueBase(
+                expectedMatchRevision: 12,
+                expectedHoleRevision: 1,
+                snapshotId: "snapshot-1",
+                snapshotRevision: 9,
+                scoringFormat: .bestBall,
+                sideSlotCount: 2,
+                officialGrossAtSave: ScoringQueueGross(
+                    teamOne: [4, 5],
+                    teamTwo: [5, 6]
+                )
+            ),
+            sequence: sequence,
+            state: state,
+            stateReasonCode: reason,
+            lastKnownServer: ScoringQueueLastKnownServer(
+                matchRevision: 12,
+                holeRevision: 1,
+                permissionRevision: 4,
+                refreshedAt: Date(timeIntervalSince1970: 90)
+            ),
+            conflict: conflict,
+            quarantineReason: state == .quarantined ? .idempotencyConflict : nil,
+            originatingAppBuild: "test",
+            createdAt: Date(timeIntervalSince1970: Double(sequence))
         )
     }
 }

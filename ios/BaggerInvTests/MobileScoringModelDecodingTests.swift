@@ -213,6 +213,18 @@ final class MobileScoringModelDecodingTests: XCTestCase {
         XCTAssertFalse(invalidHole.isContractCompatible)
     }
 
+    func testFinalizationPermissionRequiresWritableScoringAuthority() throws {
+        let contradictory = try decode(mutating: { scoring in
+            var permission = scoring["permission"] as! [String: Any]
+            permission["canScore"] = false
+            permission["readOnly"] = false
+            permission["canFinalize"] = true
+            scoring["permission"] = permission
+        })
+
+        XCTAssertFalse(contradictory.isContractCompatible)
+    }
+
     func testHoleMutationRequestEncodesExactV1IntentShape() throws {
         let request = makeHoleRequest()
 
@@ -294,6 +306,57 @@ final class MobileScoringModelDecodingTests: XCTestCase {
         XCTAssertFalse(accepted.isContractCompatible(for: otherMutation))
     }
 
+    func testHoleAcknowledgementRequiresCanonicalGrossArraysToMatchIntentExactly() throws {
+        let request = makeHoleRequest()
+        var root = acknowledgementObject(for: request)
+        var data = root["data"] as! [String: Any]
+        var hole = data["hole"] as! [String: Any]
+        var gross = hole["gross"] as! [String: Any]
+        gross["teamOne"] = [3, 5]
+        hole["gross"] = gross
+        data["hole"] = hole
+        root["data"] = data
+
+        let response = try decoder.decode(
+            MobileScoringHoleResponse.self,
+            from: TestFixtures.jsonData(root)
+        )
+
+        XCTAssertTrue(response.isContractCompatible)
+        XCTAssertFalse(response.isContractCompatible(for: request))
+    }
+
+    func testHoleAcknowledgementRejectsCanonicalRevisionsOlderThanRequestPreconditions() throws {
+        let request = makeHoleRequest(
+            expectedMatchRevision: 13,
+            expectedHoleRevision: 4
+        )
+        let equalRevisionResponse = try decoder.decode(
+            MobileScoringHoleResponse.self,
+            from: TestFixtures.jsonData(acknowledgementObject(for: request))
+        )
+        XCTAssertTrue(equalRevisionResponse.isContractCompatible(for: request))
+
+        for (container, staleRevision) in [("match", 12), ("hole", 3)] {
+            var root = acknowledgementObject(for: request)
+            var data = root["data"] as! [String: Any]
+            var canonical = data[container] as! [String: Any]
+            canonical["revision"] = staleRevision
+            data[container] = canonical
+            root["data"] = data
+
+            let staleResponse = try decoder.decode(
+                MobileScoringHoleResponse.self,
+                from: TestFixtures.jsonData(root)
+            )
+            XCTAssertTrue(staleResponse.isContractCompatible)
+            XCTAssertFalse(
+                staleResponse.isContractCompatible(for: request),
+                "A stale canonical \(container) revision must not acknowledge the request"
+            )
+        }
+    }
+
     func testHoleAcknowledgementRequiresNullableStatusTextKey() throws {
         let request = makeHoleRequest()
         var root = acknowledgementObject(for: request)
@@ -309,6 +372,163 @@ final class MobileScoringModelDecodingTests: XCTestCase {
                 from: TestFixtures.jsonData(root)
             )
         )
+    }
+
+    func testFinalizeRequestEncodesExactV1IntentShape() throws {
+        let request = makeFinalizeRequest()
+
+        XCTAssertTrue(request.isContractCompatible)
+        let object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: encoder.encode(request)) as? [String: Any]
+        )
+        XCTAssertEqual(
+            Set(object.keys),
+            Set(["matchId", "mutationId", "expectedMatchRevision"])
+        )
+        XCTAssertEqual(object["matchId"] as? String, request.matchId)
+        XCTAssertEqual(object["mutationId"] as? String, request.mutationId)
+        XCTAssertEqual(object["expectedMatchRevision"] as? Int, request.expectedMatchRevision)
+        XCTAssertFalse(makeFinalizeRequest(matchID: "").isContractCompatible)
+        XCTAssertFalse(makeFinalizeRequest(mutationID: "-invalid").isContractCompatible)
+        XCTAssertFalse(makeFinalizeRequest(expectedMatchRevision: -1).isContractCompatible)
+    }
+
+    func testFinalizeAcknowledgementDecodesExactCanonicalResponse() throws {
+        let request = makeFinalizeRequest()
+        let response = try decoder.decode(
+            MobileScoringFinalizeResponse.self,
+            from: TestFixtures.jsonData(finalizeAcknowledgementObject(for: request))
+        )
+
+        XCTAssertTrue(response.isContractCompatible)
+        XCTAssertTrue(response.isContractCompatible(for: request))
+        XCTAssertEqual(response.data.mutationId, request.mutationId)
+        XCTAssertTrue(response.data.accepted)
+        XCTAssertFalse(response.data.idempotent)
+        XCTAssertTrue(response.data.refreshRequired)
+        XCTAssertEqual(response.data.match.matchId, request.matchId)
+        XCTAssertEqual(response.data.match.revision, 31)
+        XCTAssertEqual(response.data.match.permissionRevision, 7)
+        XCTAssertEqual(response.data.match.status, .completed)
+        XCTAssertTrue(response.data.match.scoringLocked)
+        XCTAssertEqual(response.data.match.result, .teamOne)
+        XCTAssertEqual(response.data.match.finalizedAt?.rawValue, "2027-01-15T08:04:00.000Z")
+    }
+
+    func testFinalizeAcknowledgementRejectsRevisionOlderThanRequestPrecondition() throws {
+        let request = makeFinalizeRequest(expectedMatchRevision: 31)
+        let equalRevision = try decoder.decode(
+            MobileScoringFinalizeResponse.self,
+            from: TestFixtures.jsonData(finalizeAcknowledgementObject(for: request))
+        )
+        XCTAssertTrue(equalRevision.isContractCompatible(for: request))
+
+        var staleObject = finalizeAcknowledgementObject(for: request)
+        var data = staleObject["data"] as! [String: Any]
+        var match = data["match"] as! [String: Any]
+        match["revision"] = 30
+        data["match"] = match
+        staleObject["data"] = data
+        let staleRevision = try decoder.decode(
+            MobileScoringFinalizeResponse.self,
+            from: TestFixtures.jsonData(staleObject)
+        )
+
+        XCTAssertTrue(staleRevision.isContractCompatible)
+        XCTAssertFalse(staleRevision.isContractCompatible(for: request))
+    }
+
+    func testFinalizeAcknowledgementRequiresMatchingRequestIdentityAndCanonicalConstants() throws {
+        let request = makeFinalizeRequest()
+        let response = try decoder.decode(
+            MobileScoringFinalizeResponse.self,
+            from: TestFixtures.jsonData(finalizeAcknowledgementObject(for: request))
+        )
+        XCTAssertFalse(
+            response.isContractCompatible(
+                for: makeFinalizeRequest(
+                    mutationID: "33333333-3333-4333-8333-333333333333"
+                )
+            )
+        )
+        XCTAssertFalse(
+            response.isContractCompatible(
+                for: makeFinalizeRequest(matchID: "another-match")
+            )
+        )
+
+        for mutation in [
+            { (root: inout [String: Any]) in
+                var data = root["data"] as! [String: Any]
+                data["accepted"] = false
+                root["data"] = data
+            },
+            { (root: inout [String: Any]) in
+                var data = root["data"] as! [String: Any]
+                data["refreshRequired"] = false
+                root["data"] = data
+            },
+            { (root: inout [String: Any]) in
+                var data = root["data"] as! [String: Any]
+                var match = data["match"] as! [String: Any]
+                match["status"] = "inProgress"
+                data["match"] = match
+                root["data"] = data
+            },
+            { (root: inout [String: Any]) in
+                var data = root["data"] as! [String: Any]
+                var match = data["match"] as! [String: Any]
+                match["scoringLocked"] = false
+                data["match"] = match
+                root["data"] = data
+            },
+        ] {
+            var object = finalizeAcknowledgementObject(for: request)
+            mutation(&object)
+            let incompatible = try decoder.decode(
+                MobileScoringFinalizeResponse.self,
+                from: TestFixtures.jsonData(object)
+            )
+            XCTAssertFalse(incompatible.isContractCompatible(for: request))
+        }
+    }
+
+    func testFinalizeAcknowledgementRequiredNullableFieldsMustBePresent() throws {
+        let request = makeFinalizeRequest()
+        var nullableObject = finalizeAcknowledgementObject(for: request)
+        var nullableData = nullableObject["data"] as! [String: Any]
+        var nullableMatch = nullableData["match"] as! [String: Any]
+        nullableMatch["permissionRevision"] = NSNull()
+        nullableMatch["result"] = NSNull()
+        nullableMatch["finalizedAt"] = NSNull()
+        nullableData["match"] = nullableMatch
+        nullableObject["data"] = nullableData
+
+        let response = try decoder.decode(
+            MobileScoringFinalizeResponse.self,
+            from: TestFixtures.jsonData(nullableObject)
+        )
+        XCTAssertTrue(response.isContractCompatible(for: request))
+        XCTAssertNil(response.data.match.permissionRevision)
+        XCTAssertNil(response.data.match.result)
+        XCTAssertNil(response.data.match.finalizedAt)
+
+        for key in ["permissionRevision", "result", "finalizedAt"] {
+            var missingObject = finalizeAcknowledgementObject(for: request)
+            var data = missingObject["data"] as! [String: Any]
+            var match = data["match"] as! [String: Any]
+            match.removeValue(forKey: key)
+            data["match"] = match
+            missingObject["data"] = data
+
+            XCTAssertThrowsError(
+                try decoder.decode(
+                    MobileScoringFinalizeResponse.self,
+                    from: TestFixtures.jsonData(missingObject)
+                ),
+                "Expected missing match.\(key) to fail decoding"
+            )
+        }
     }
 
     private func decode(
@@ -347,6 +567,18 @@ final class MobileScoringModelDecodingTests: XCTestCase {
             mutationId: mutationID,
             expectedMatchRevision: expectedMatchRevision,
             expectedHoleRevision: expectedHoleRevision
+        )
+    }
+
+    private func makeFinalizeRequest(
+        matchID: String = "match-preview-1",
+        mutationID: String = "22222222-2222-4222-8222-222222222222",
+        expectedMatchRevision: Int = 30
+    ) -> MobileScoringFinalizeRequest {
+        MobileScoringFinalizeRequest(
+            matchId: matchID,
+            mutationId: mutationID,
+            expectedMatchRevision: expectedMatchRevision
         )
     }
 
@@ -392,6 +624,33 @@ final class MobileScoringModelDecodingTests: XCTestCase {
             ],
             "meta": [
                 "generatedAt": "2027-01-15T08:03:00.000Z",
+            ],
+        ]
+    }
+
+    private func finalizeAcknowledgementObject(
+        for request: MobileScoringFinalizeRequest
+    ) -> [String: Any] {
+        [
+            "ok": true,
+            "apiVersion": "v1",
+            "data": [
+                "mutationId": request.mutationId,
+                "accepted": true,
+                "idempotent": false,
+                "match": [
+                    "matchId": request.matchId,
+                    "revision": 31,
+                    "permissionRevision": 7,
+                    "status": "completed",
+                    "scoringLocked": true,
+                    "result": "teamOne",
+                    "finalizedAt": "2027-01-15T08:04:00.000Z",
+                ],
+                "refreshRequired": true,
+            ],
+            "meta": [
+                "generatedAt": "2027-01-15T08:04:00.000Z",
             ],
         ]
     }

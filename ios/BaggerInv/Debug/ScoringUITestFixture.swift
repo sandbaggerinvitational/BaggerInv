@@ -26,12 +26,17 @@ enum ScoringUITestFixtures {
         let status: MobileMatchStatus = scenario == .scoreCompleted ? .completed :
             scenario == .scoreUpcomingBestBall ? .scheduled : .inProgress
         let isReadOnly = scenario == .scoreReadOnly || status != .inProgress
+        let readyToFinalize = scenario == .scoreFinalizationReady ||
+            scenario == .scoreFinalizationUnknown
         let scoring = makeScoring(
             format: format,
             status: status,
             readOnly: isReadOnly,
             longContent: scenario == .scoreLongContent,
-            mixedHoles: scenario == .scoreMixedHoles || scenario == .scoreCompleted
+            mixedHoles: scenario == .scoreMixedHoles ||
+                scenario == .scoreCompleted ||
+                scenario == .scoreCorrectionPending,
+            readyToFinalize: readyToFinalize
         )
 
         return ScoringCurrentState(
@@ -45,6 +50,25 @@ enum ScoringUITestFixtures {
         )
     }
 
+    static func finalizedWorkflowState() -> ScoringCurrentState {
+        ScoringCurrentState(
+            scoring: makeScoring(
+                format: .bestBall,
+                status: .completed,
+                readOnly: true,
+                longContent: false,
+                mixedHoles: true,
+                readyToFinalize: false
+            ),
+            generatedAt: generatedAt,
+            phase: .ready,
+            isRefreshing: false,
+            lastSafeError: nil,
+            lastServerCode: nil,
+            lastHTTPStatus: nil
+        )
+    }
+
     private static let generatedAt = try! MobileTimestamp("2026-09-24T12:00:00.000Z")
 
     private static func makeScoring(
@@ -52,7 +76,8 @@ enum ScoringUITestFixtures {
         status: MobileMatchStatus,
         readOnly: Bool,
         longContent: Bool,
-        mixedHoles: Bool
+        mixedHoles: Bool,
+        readyToFinalize: Bool
     ) -> MobileScoringCurrent {
         let sides = fixtureSides(longContent: longContent)
         let holes = (1...18).map { number in
@@ -63,7 +88,8 @@ enum ScoringUITestFixtures {
                 yardage: Double(145 + number * 17)
             )
         }
-        let scoredThrough = mixedHoles ? 12 : 6
+        let scorecardComplete = status == .completed || readyToFinalize
+        let scoredThrough = scorecardComplete ? 18 : mixedHoles ? 12 : 6
         let scores = (1...scoredThrough).map { number in
             officialScore(holeNumber: number, format: format)
         }
@@ -97,15 +123,15 @@ enum ScoringUITestFixtures {
             ),
             scores: scores,
             progress: MobileScoringProgress(
-                currentHole: final ? 18 : 7,
-                holesRemaining: final ? 0 : 12,
-                scorecardComplete: final,
+                currentHole: scorecardComplete ? 18 : 7,
+                holesRemaining: scorecardComplete ? 0 : 12,
+                scorecardComplete: scorecardComplete,
                 statusText: final ? "Pines win 3 & 2" : "Pines 1 UP · Thru 6"
             ),
             permission: MobileScoringPermission(
                 canScore: !readOnly,
                 readOnly: readOnly,
-                canFinalize: false,
+                canFinalize: readyToFinalize,
                 reason: final ? .matchFinalized : readOnly ? .matchLocked : nil
             ),
             snapshot: MobileScoringSnapshot(snapshotId: "fixture-snapshot-v1", revision: 9)
