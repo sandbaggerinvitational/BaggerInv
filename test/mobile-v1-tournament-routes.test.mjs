@@ -152,8 +152,12 @@ test("schemas, fixtures, and route sources document bounded identity-safe contra
   assert.equal(fixtures.synthetic, true);
   assert.deepEqual(fixtures.matches.map((row) => row.status), ["scheduled", "inProgress", "completed"]);
   assert.equal(fixtures.today.at(-1).status, null);
+  assert.equal(fixtures.leaders.roundStandings[0].roundNumber, 1);
+  assert.equal(fixtures.leaders.roundStandings[0].teamStandings[0].points, 2.5);
+  const leadersSchema = schemas[schemaNames.indexOf("leaders")];
+  assert.ok(leadersSchema.properties.data.required.includes("roundStandings"));
   const docs = await source("contracts/mobile/v1/README.md");
-  for (const term of ["GET /today", "GET /matches", "GET /leaders", "GET /schedule", "ISO-8601", "America/Chicago", "ETag", "published participant itinerary"]) assert.match(docs, new RegExp(term));
+  for (const term of ["GET /today", "GET /matches", "GET /leaders", "GET /schedule", "roundStandings", "Round Scores", "ISO-8601", "America/Chicago", "ETag", "published participant itinerary"]) assert.match(docs, new RegExp(term));
   const implementation = await source("lib/mobile-v1-tournament-reads.js");
   for (const forbidden of ["request.json", "searchParams", "authorization", "SUPABASE_SCORING_MIRROR_SECRET_KEY", "console.", "service_role"]) assert.equal(implementation.includes(forbidden), false);
   for (const path of ["today", "matches", "leaders", "schedule"]) {
