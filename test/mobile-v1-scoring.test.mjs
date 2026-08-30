@@ -202,8 +202,17 @@ test("hole mutation accepts gross-score intent only and delegates the exact PWA 
     expectedRevision: 0,
   });
   assert.equal(persistenceInput.current.playerId, "P1");
+  assert.equal(persistenceInput.current.authUserId, identity().authUserId);
   assert.equal(persistenceInput.current.accessVersion, 7);
   assert.equal(persistenceInput.current.identityAuthority, "supabase");
+  assert.deepEqual(persistenceInput.authorizationContext, {
+    source: "mobile-native-certified",
+    identity: {
+      authUserId: identity().authUserId,
+      playerId: "P1",
+      tournamentId: "2026",
+    },
+  });
   assert.equal(persistenceInput.includeCanonicalAcknowledgement, true);
   assert.deepEqual(result.body.data.hole.strokes.teamOne, [1, 0]);
   assert.equal(result.body.data.hole.net.teamOne, 3);
@@ -261,7 +270,8 @@ test("match membership, lifecycle, and permission are revalidated before every m
         throw Object.assign(new Error(code), { code });
       },
     }) }), (error) => error.code === expected);
-    assert.equal(persisted, ["SCORING_PERMISSION_REVOKED", "SCORING_PERMISSION_STALE", "MATCH_LOCKED", "MATCH_FINAL"].includes(code));
+    assert.equal(persisted, ["SCORING_PERMISSION_REVOKED", "SCORING_PERMISSION_STALE", "MATCH_LOCKED",
+      "MATCH_NOT_SCOREABLE", "MATCH_FINAL"].includes(code));
   }
 });
 
@@ -364,6 +374,15 @@ test("explicit participant finalization delegates readiness and lifecycle to the
     action: "confirm", clientMutationId: "finalize:M1:10", expectedMatchRevision: 10,
   });
   assert.equal(persistenceInput.current.playerId, "P1");
+  assert.equal(persistenceInput.current.authUserId, identity().authUserId);
+  assert.deepEqual(persistenceInput.authorizationContext, {
+    source: "mobile-native-certified",
+    identity: {
+      authUserId: identity().authUserId,
+      playerId: "P1",
+      tournamentId: "2026",
+    },
+  });
   assert.equal(persistenceInput.includeCanonicalAcknowledgement, true);
   assert.equal(result.body.data.match.status, "completed");
   assert.equal(result.body.data.match.scoringLocked, true);
