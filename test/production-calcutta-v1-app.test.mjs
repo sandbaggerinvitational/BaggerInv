@@ -57,6 +57,13 @@ const freshness = Object.freeze({
   source_fingerprint: fingerprint("d"),
 });
 
+const frozen2026Dispatch = async (_functionName, body) => ({
+  pointerAware: true,
+  frozen2026: true,
+  body,
+  annualRuntimeInput: null,
+});
+
 const market = Object.freeze({
   pot: "300.000",
   purchases: [
@@ -356,7 +363,11 @@ test("active Production read uses only the exact scoped Calcutta V1 RPC", async 
     });
   };
   try {
-    const read = await currentProductionCalcuttaV1({ playerId: "CB01", env: activeProduction });
+    const read = await currentProductionCalcuttaV1({
+      playerId: "CB01",
+      env: activeProduction,
+      resolveProductionCurrentReadDispatch: frozen2026Dispatch,
+    });
     assert.equal(read.calcuttaState.state, "AUCTION_COMPLETE");
     assert.equal(read.recalculation, null);
     assert.equal(calls.length, 1);

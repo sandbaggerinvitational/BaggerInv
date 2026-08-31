@@ -129,9 +129,13 @@ async function continueCalculation(jobId, { failureAt = "" } = {}) {
   return null;
 }
 
-function safeJob(job = {}) {
+function safeJob(job = {}, runtimeContext = null) {
   const safe = publicOddsCalculationJob(job);
-  const isolation = assertProductionOddsStoredJobScope(job, process.env);
+  const isolation = assertProductionOddsStoredJobScope(
+    job,
+    process.env,
+    runtimeContext,
+  );
   const revision = job.source_revision || {};
   safe.publicationEligible = isolation.publicationEligible;
   safe.mirrorEligible = isolation.mirrorEligible;
@@ -152,8 +156,8 @@ function safeJob(job = {}) {
   return safe;
 }
 
-function safeJobs(payload = {}) {
-  return (payload.jobs || []).map(safeJob);
+function safeJobs(payload = {}, runtimeContext = null) {
+  return (payload.jobs || []).map((job) => safeJob(job, runtimeContext));
 }
 
 export async function GET(request) {
@@ -170,7 +174,7 @@ export async function GET(request) {
     if (!result.payload?.ok) throw Object.assign(new Error("Calculation state is unavailable."), {
       code: result.payload?.code,
     });
-    const jobs = safeJobs(result.payload);
+    const jobs = safeJobs(result.payload, result.runtimeContext);
     return NextResponse.json({
       ok: true,
       operationMode: state.mode,
@@ -300,7 +304,7 @@ export async function POST(request) {
       accepted: true,
       duplicate: requested.requested.duplicate === true,
       jobId: requestedJobId,
-      job: safeJob(requested.requested.job),
+      job: safeJob(requested.requested.job, requested.runtimeContext),
       operationMode: state.mode,
       failureBoundary: failureAt || null,
       calculationCompleted: false,

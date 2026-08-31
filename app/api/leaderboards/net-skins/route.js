@@ -30,7 +30,11 @@ export async function GET(request) {
     // worker is invoked through the Preview contract.
     const productionV1 = source.productionCutover?.handled === true;
     const operational = productionV1
-      ? await currentProductionNetSkinsV1({ playerId: identity.playerId, env })
+      ? await currentProductionNetSkinsV1({
+        playerId: identity.playerId,
+        tournamentId: identity.tournamentId,
+        env,
+      })
       : await currentNetSkinsOperationalResult(identity.tournamentId, {
         recalculatePending: !source.productionShadowCandidate,
         calculatedBy: `participant-read:${identity.playerId}`,

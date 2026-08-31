@@ -83,7 +83,8 @@ function fixture(cluster, database) {
     create schema auth; create schema production_control;
     create schema scoring_authority; create schema participant_identity;
     create table auth.users(id uuid primary key, email text,
-      email_confirmed_at timestamptz);
+      email_confirmed_at timestamptz, phone text,
+      phone_confirmed_at timestamptz);
     create table scoring_authority.players(player_id text primary key,
       display_name text not null, source_payload jsonb not null default '{}');
     create table scoring_authority.tournaments(tournament_id text primary key,
@@ -252,7 +253,7 @@ function fixture(cluster, database) {
       entitlement_id uuid primary key default gen_random_uuid(),
       auth_user_id uuid,tournament_id text,player_id text,role text,
       status text,granted_by text,granted_at timestamptz default now(),
-      revoked_at timestamptz);
+      revoked_at timestamptz, unique(auth_user_id,tournament_id));
     create table production_control.director_entitlement_events(
       event_id bigint generated always as identity primary key,
       entitlement_id uuid,action text,actor text,reason text,
@@ -269,7 +270,7 @@ function fixture(cluster, database) {
     returns void language plpgsql as $f$ begin null; end $f$;
     create function production_control.access_governance_global_status_v1(text)
     returns text language sql as $f$ select 'ACTIVE'::text $f$;
-    insert into auth.users values(
+    insert into auth.users(id,email,email_confirmed_at) values(
       '00000000-0000-4000-8000-000000000001','owner@example.org',now());
     insert into scoring_authority.players values('CB01','Owner','{}');
     insert into scoring_authority.tournaments(tournament_id,tournament_year,name,
@@ -446,9 +447,54 @@ test("migration 066 installs atomically and inertly on PostgreSQL 17", async (t)
       (tournament_id,match_id,requirement_class,status,writer_installed)
     values ('2099','2099-R1-1','OPTIONAL_ARCHIVE',
       'PROVISIONING_REQUIRED',false);
+    insert into participant_identity.user_player_links(
+      auth_user_id,player_id,status,link_revision,link_method,linked_by
+    ) values (
+      '00000000-0000-4000-8000-000000000001','CB01','ACTIVE',1,
+      'APPROVED_EMAIL_OTP','fixture'
+    );
+    insert into participant_identity.participant_auth_identifiers(
+      player_id,auth_user_id,identifier_type,normalized_value_private,
+      status,verified_at,verification_source,revision,source_system,
+      source_tournament_id,source_configuration_revision,created_by,updated_by
+    ) values (
+      'CB01','00000000-0000-4000-8000-000000000001','EMAIL',
+      'owner@example.org','VERIFIED',now(),'OTP',1,'SUPABASE','2026',1,
+      'fixture','fixture'
+    );
     do $test$
     declare payload jsonb; response jsonb;
     begin
+      payload := pg_catalog.jsonb_build_object(
+        'contract_version','production-future-runtime-activation-v2',
+        'environment','PRODUCTION','project_ref','ymqhhtxaywtqllynrmxe',
+        'project_url','https://ymqhhtxaywtqllynrmxe.supabase.co',
+        'source_workbook_id','workbook-production',
+        'target_tournament_id','2099','target_tournament_year',2099,
+        'action','GRANT_FUTURE_DIRECTOR','target_player_id','CB01',
+        'expected_revision',0,
+        'reason','Select an eligible future tournament Director',
+        'operation_request_id','00000000-0000-4000-8000-000000000109',
+        'authorization',pg_catalog.jsonb_build_object(
+          'player_id','CB01','auth_user_id',
+          '00000000-0000-4000-8000-000000000001',
+          'role','DIRECTOR','tournament_id','2026'));
+      response := public.mutate_production_future_runtime_v2(payload ||
+        pg_catalog.jsonb_build_object('request_payload_hash',
+          production_control.future_runtime_hash_v2(payload)));
+      if response->>'code' <> 'PRODUCTION_FUTURE_DIRECTOR_GRANTED'
+         or response->>'nextRevision' <> '1'
+         or response->>'changed' <> 'true' then
+        raise exception 'unexpected future Director grant: %', response;
+      end if;
+      response := public.mutate_production_future_runtime_v2(payload ||
+        pg_catalog.jsonb_build_object('request_payload_hash',
+          production_control.future_runtime_hash_v2(payload)));
+      if response->>'idempotent' <> 'true'
+         or response->>'nextRevision' <> '1' then
+        raise exception 'future Director retry was not idempotent: %', response;
+      end if;
+
       payload := pg_catalog.jsonb_build_object(
         'contract_version','production-future-runtime-activation-v2',
         'environment','PRODUCTION','project_ref','ymqhhtxaywtqllynrmxe',
@@ -476,7 +522,18 @@ test("migration 066 installs atomically and inertly on PostgreSQL 17", async (t)
     (select count(*) from scoring_authority.matches
       where tournament_id='2099' and scoring_snapshot_id is null),
     (select writer_installed from production_control.future_match_google_compatibility_jobs_v1
-      where match_id='2099-R1-1'));`), "1|18|1|f");
+      where match_id='2099-R1-1'),
+    (select governance_revision
+      from production_control.future_tournament_director_governance_v1
+      where tournament_id='2099'),
+    (select count(*) from production_control.director_entitlements
+      where tournament_id='2099' and player_id='CB01' and role='DIRECTOR'
+        and status='ACTIVE' and revoked_at is null),
+    (select count(*) from participant_identity.tournament_roles
+      where tournament_id='2099'
+        and auth_user_id='00000000-0000-4000-8000-000000000001'
+        and role='DIRECTOR' and role_active and revoked_at is null));`),
+    "1|18|1|f|1|1|1");
 
   // A certified annual projection is bound to the promoted runtime revision.
   // Changing it after Ready returns the tournament to Configuring exactly
@@ -511,7 +568,7 @@ test("migration 066 installs atomically and inertly on PostgreSQL 17", async (t)
       end if;
       response := public.synchronize_production_future_annual_projection_v1(payload);
       if response->>'changed' <> 'true'
-         or response->>'setupRevision' <> '3'
+         or response->>'setupRevision' <> '2'
          or response->>'lifecycleRevision' <> '4' then
         raise exception 'unexpected changed annual sync: %', response;
       end if;
@@ -528,7 +585,7 @@ test("migration 066 installs atomically and inertly on PostgreSQL 17", async (t)
     (select count(*) from production_control.future_annual_projection_bindings_v1
       where tournament_id='2099' and domain='GUIDE')
     ) from production_control.future_tournament_catalog_v1
-    where tournament_id='2099';`), "CONFIGURING|4|3|t|t|1");
+    where tournament_id='2099';`), "CONFIGURING|4|2|t|t|1");
 
   assert.match(sql(cluster, database, `select
     production_control.future_runtime_readiness_v2('2099')::text;`),

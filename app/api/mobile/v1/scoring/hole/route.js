@@ -7,7 +7,11 @@ import { productionShadowScoringMutationResponse } from "../../../../../../lib/p
 export const dynamic = "force-dynamic";
 
 export const POST = (request) => productionShadowScoringMutationResponse(request) || mobileV1ScoringResponse(request, async (identity) => {
-  const result = await mobileScoringHoleResult(identity, await readMobileScoringJson(request));
-  after(() => runMobileScoringPostCommit({ tournamentId: identity.tournamentId }));
+  const input = await readMobileScoringJson(request);
+  const result = await mobileScoringHoleResult(identity, input);
+  after(() => runMobileScoringPostCommit({
+    tournamentId: identity.tournamentId,
+    matchId: input.matchId,
+  }));
   return result;
 });

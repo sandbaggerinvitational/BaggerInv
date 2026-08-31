@@ -153,6 +153,7 @@ test("future annual sync uses future RPCs and keeps frozen 2026 provenance separ
   assert.equal(mutation.target_tournament_year, 2027);
   assert.equal(mutation.expected_setup_revision, 9);
   assert.equal(mutation.expected_runtime_revision, 4);
+  assert.equal(mutation.source_revision, 1);
   assert.equal(result.result.readbackParity, true);
   assert.equal(result.result.googleWrite, false);
 });
@@ -170,7 +171,7 @@ test("annual route accepts target scope without changing source authority", asyn
   assert.doesNotMatch(service, /GOOGLE.*PUBLICATION_AUTHORITY|google.*fallback/i);
 });
 
-test("future annual projection SQL advances setup and safely reopens Ready candidates", async () => {
+test("future annual projection SQL preserves promoted structure and safely reopens Ready candidates", async () => {
   const migration = await readFile(new URL(
     "../supabase/production_migrations/202608300066_production_future_runtime_activation_v1.sql",
     import.meta.url,
@@ -183,7 +184,8 @@ test("future annual projection SQL advances setup and safely reopens Ready candi
     /lifecycle = case when value\.lifecycle = 'READY_FOR_ACTIVATION'[\s\S]*?then 'CONFIGURING'/);
   assert.match(migration,
     /lifecycle_revision = case when value\.lifecycle = 'READY_FOR_ACTIVATION'[\s\S]*?value\.lifecycle_revision \+ 1/);
-  assert.match(migration, /setup_revision = value\.setup_revision \+ 1/);
+  assert.match(migration,
+    /setup_revision = case when promotion\.tournament_id is null[\s\S]*?then value\.setup_revision \+ 1 else value\.setup_revision end/);
   assert.match(migration,
     /readiness_fingerprint = null, readiness_setup_revision = null/);
 });

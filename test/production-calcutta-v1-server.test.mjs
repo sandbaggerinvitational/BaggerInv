@@ -40,7 +40,7 @@ test("Director operations are revision-bound, explicit, and never caller-select 
   assert.match(server, /PRODUCTION_CALCUTTA_V1_PUBLICATION_POLICY/);
   assert.match(server, /expected_configuration_revision/);
   assert.match(server, /expected_configuration_fingerprint/);
-  assert.match(server, /nullable: Number\(expectedConfigurationRevision\) === 1/);
+  assert.match(server, /nullable: \[0, 1\]\.includes\(Number\(expectedConfigurationRevision\)\)/);
   assert.match(server, /expected_auction_revision/);
   assert.match(server, /expected_auction_fingerprint/);
   assert.match(server, /expected_publication_revision/);
@@ -76,7 +76,7 @@ test("bounded worker reuses the existing Calcutta engine and binds both current 
 
 test("worker inspects service-only revision tokens without using the participant market read", () => {
   assert.match(server, /export async function inspectProductionCalcuttaV1/);
-  assert.match(server, /rpc\("inspect_production_calcutta_v1", \{\}/);
+  assert.match(server, /mutationRpc\("inspect_production_calcutta_v1", \{/);
   assert.match(server, /dependencies\.inspectProductionCalcuttaV1/);
   assert.match(server, /state\.configuration_revision/);
   assert.match(server, /state\.auction_revision/);
@@ -107,9 +107,14 @@ test("post-commit selector drains Production V1 and never invokes Preview mutati
   const result = await recalculateCalcuttaAfterCanonicalMutation("2026", {
     calculatedBy: "focused test",
     mutationKey: "mutation-1",
+    matchId: "R1-M1",
   }, {
     env: { VERCEL_ENV: "production" },
     dependencies: {
+      resolveProductionCalcuttaPostCommitMatch: async ({ matchId }) => {
+        assert.equal(matchId, "R1-M1");
+        return { tournamentId: "2026", matchId };
+      },
       drainCurrentProductionCalcuttaV1Jobs: async (input) => {
         productionCalls += 1;
         assert.equal(input.workerId, "production-calcutta-v1-post-commit-worker");

@@ -64,9 +64,19 @@ export async function GET(request) {
     }
     const content = participantContent(data);
     const selected = section ? SECTION_READERS[section](content) : content;
+    const tournamentId = clean(
+      data.tournament_id || data.tournamentId ||
+      read.payload.target_tournament_id ||
+      content.tournamentIdentity?.id || content.tournament?.id || "2026",
+    );
+    if (!/^\d{4}$/.test(tournamentId)) {
+      throw Object.assign(new Error("Published Guide tournament scope is unavailable."), {
+        code: "GUIDE_TOURNAMENT_SCOPE_UNAVAILABLE",
+      });
+    }
     const response = NextResponse.json({
       source: "supabase",
-      tournamentId: "2026",
+      tournamentId,
       revision: Number(data.projection_revision || 0),
       publicationSequence: Number(data.publication_sequence || 0),
       contentFingerprint: fingerprint,

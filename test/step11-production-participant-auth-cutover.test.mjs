@@ -194,7 +194,13 @@ test("approved first login creates once, binds the stable Player ID, then reauth
     ];
     const rpc = async (name, input) => {
       calls.push({ kind: "rpc", name, input });
-      if (name === "authorize_production_participant_otp_request") return { payload: decisions.shift() };
+      if (name === "authorize_production_participant_otp_request") return {
+        payload: decisions.shift(),
+        productionRuntime: {
+          tournamentId: "2026", pointerRevision: 1,
+          futureGeneration: false,
+        },
+      };
       if (name === "complete_production_participant_first_login") return { payload: { ok: true } };
       throw new Error("unexpected-rpc:" + name);
     };

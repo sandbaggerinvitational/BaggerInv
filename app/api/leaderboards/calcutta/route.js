@@ -25,7 +25,11 @@ export async function GET(request) {
     const identityMs = performance.now() - identityStartedAt;
     const productionV1 = source.productionCutover?.handled === true;
     const operational = productionV1
-      ? await currentProductionCalcuttaV1({ playerId: identity.playerId, env })
+      ? await currentProductionCalcuttaV1({
+        playerId: identity.playerId,
+        tournamentId: identity.tournamentId,
+        env,
+      })
       : await currentCalcuttaOperationalResult(identity.tournamentId, {
         recalculatePending: !source.productionShadowCandidate,
         calculatedBy: `participant-read:${identity.playerId}`,

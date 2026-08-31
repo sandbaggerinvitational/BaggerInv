@@ -53,6 +53,22 @@ test("Production worker reuses the shared JS engine and has claim, complete, and
   assert.doesNotMatch(server, /paid|unpaid|collection|payment|balance|settlement/i);
 });
 
+test("current Net Skins mutations dispatch from one certified annual runtime without a caller year", () => {
+  assert.match(server, /resolveProductionScoringDispatchContext/);
+  assert.match(server, /productionScoringOperationsRpc/);
+  assert.match(server, /requiredPhase: "OBSERVATION"/);
+  assert.match(server, /runtime\?\.tournamentId[\s\S]*PRODUCTION_TOURNAMENT_ID/);
+  assert.match(server, /ANNUAL_RUNTIME_V1/);
+  assert.match(server, /runtime\?\.runtimeGenerationId/);
+  assert.match(server, /scoringDispatchContext: dispatchContext/);
+  assert.match(server, /job\.tournament_id[\s\S]*job\.runtime_generation_id/);
+  assert.match(server, /PRODUCTION_NET_SKINS_JOB_RUNTIME_MISMATCH/);
+  assert.match(server, /const scopedOptions = \{ \.\.\.options, scoringDispatchContext: dispatchContext \}/);
+  assert.doesNotMatch(server, /configureProductionNetSkinsV1\(\{[\s\S]{0,200}tournamentId/);
+  assert.doesNotMatch(server, /enqueueProductionNetSkinsV1Recalculation\(\{[\s\S]{0,200}tournamentId/);
+  assert.doesNotMatch(server, /processProductionNetSkinsV1Job\(\{[\s\S]{0,200}tournamentId/);
+});
+
 test("Director route is Production-only, same-origin, entitlement-bound, and has no GET", () => {
   assert.match(route, /assertProductionCutoverActivation\(\{ requiredPhase: "OBSERVATION" \}\)/);
   assert.match(route, /assertProductionCutoverRequest\(request, process\.env, \{ requireOrigin: true \}\)/);

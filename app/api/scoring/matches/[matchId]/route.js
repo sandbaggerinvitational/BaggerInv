@@ -138,6 +138,7 @@ export async function POST(request, { params }) {
           recalculateCalcuttaAfterCanonicalMutation(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring Calcutta worker · ${current.playerId || "participant"}`,
             mutationKey: input.clientMutationId || `scoring:${matchId}`,
+            matchId,
           }),
         ]);
         const mirror = drained.status === "fulfilled" ? drained.value : { ok: false, failed: 1 };

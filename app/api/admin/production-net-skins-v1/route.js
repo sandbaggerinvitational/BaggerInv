@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import {
@@ -14,6 +14,8 @@ import {
   dataAuthorityResponseHeaders,
   withDataAuthorityRequestScope,
 } from "../../../../lib/data-authority-request.js";
+import { recalculateCompetitionDerivedTournament } from
+  "../../../../lib/competition-derived-supabase.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -107,7 +109,7 @@ export async function POST(request) {
         return configureProductionNetSkinsV1({
           ...options,
           ...actor(access.identity),
-          // V1 is intentionally fixed to all three approved 2026 rounds.
+          // V1 is intentionally fixed to all three approved tournament rounds.
           eligibleRoundNumbers: [1, 2, 3],
         });
       }
@@ -124,6 +126,15 @@ export async function POST(request) {
         workerId: "production-net-skins-v1-director-worker",
       });
     });
+    if (action === "process") {
+      after(() => recalculateCompetitionDerivedTournament("", {
+        calculatedBy:
+          `Net Skins dependency worker · ${actor(access.identity).actorPlayerId}`,
+      }).catch((error) => console.error(
+        "Storyline recalculation after Net Skins remains pending",
+        { code: clean(error?.code || "STORYLINES_RECALCULATION_FAILED") },
+      )));
+    }
     return NextResponse.json({
       ok: true,
       action,

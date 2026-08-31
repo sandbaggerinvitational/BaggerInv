@@ -74,7 +74,9 @@ async function publishProductionProjection(request) {
         code: "PRODUCTION_ODDS_CALCULATION_MILESTONE_MISMATCH",
       }, { status: 409, headers: { "Cache-Control": "private, no-store" } });
     }
-    const current = await readProductionOddsPublicationState();
+    const current = await readProductionOddsPublicationState({
+      runtimeContext: prepared.runtimeContext,
+    });
     const retainedReference = prepared.job.publication_reference || {};
     const retainedExpectedRevision = Number(
       retainedReference.expected_predecessor_revision,
@@ -99,6 +101,7 @@ async function publishProductionProjection(request) {
       expectedAuthorityEpochId: current.authority_epoch_id,
       actorAuthUserId,
       actorPlayerId,
+      tournamentId: current.runtimeContext.runtime.tournamentId,
     });
     const publication = await publishProductionOddsCalculation({
       jobId,
@@ -109,7 +112,15 @@ async function publishProductionProjection(request) {
       actorAuthUserId,
       actorPlayerId,
       requestFingerprint,
+      runtimeContext: current.runtimeContext,
     });
+    after(() => recalculateIntelligenceDerivedTournament("", {
+      calculatedBy:
+        `Odds publication intelligence worker · ${actorPlayerId || "Director"}`,
+    }).catch((error) => console.error(
+      "Odds intelligence recalculation remains pending",
+      { code: error?.code || "INTELLIGENCE_RECALCULATION_FAILED" },
+    )));
     for (const path of [
       "/api/leaderboards/insights",
       "/odds-center",
@@ -322,9 +333,12 @@ async function publishProjection(request) {
     for (const path of ["/live", "/home"]) revalidatePath(path);
     pass("PWA refresh", { function: "revalidatePath", paths: ["/live", "/home"] });
 
-    if (process.env.VERCEL_ENV === "preview") after(() => recalculateIntelligenceDerivedTournament(String(preview.year), {
-      calculatedBy: `Odds publication intelligence worker · ${director?.identity?.player?.id || "Director"}`,
-    }).catch((error) => console.error("Odds intelligence recalculation remains pending", { code: error?.code || "INTELLIGENCE_RECALCULATION_FAILED" })));
+    if (process.env.VERCEL_ENV === "preview") {
+      const derivedTournamentId = String(preview.year);
+      after(() => recalculateIntelligenceDerivedTournament(derivedTournamentId, {
+        calculatedBy: `Odds publication intelligence worker · ${director?.identity?.player?.id || "Director"}`,
+      }).catch((error) => console.error("Odds intelligence recalculation remains pending", { code: error?.code || "INTELLIGENCE_RECALCULATION_FAILED" })));
+    }
 
     trace.complete("Publication complete", { function: "POST /api/odds/publish" });
     return NextResponse.json({ ok: true, snapshot, source: { inputs: source.inputSource, publication: source.publicationAuthority }, nativePublication: nativePublication?.payload || null,

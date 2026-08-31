@@ -23,11 +23,24 @@ const common = {
 
 test("future runtime action builders match the bounded V2 RPC request contract", () => {
   assert.deepEqual(PRODUCTION_FUTURE_RUNTIME_ACTIONS, [
+    "grant-future-director",
     "add-global-course", "configure-global-course-context", "assign-future-course",
     "promote-runtime", "stage-handicaps", "approve-handicaps",
     "configure-match", "replace-pairings", "prepare-scoring-context", "mark-ready-v2",
     "activate", "close", "prepare-archive-plan",
   ]);
+  const director = buildFutureRuntimeMutation("grant-future-director", {
+    ...common, expectedRevision: 0, targetPlayerId: "CB01",
+  });
+  assert.deepEqual({
+    action: director.action,
+    target_player_id: director.target_player_id,
+    expected_revision: director.expected_revision,
+  }, {
+    action: "GRANT_FUTURE_DIRECTOR",
+    target_player_id: "CB01",
+    expected_revision: 0,
+  });
   const course = buildFutureRuntimeMutation("add-global-course", {
     ...common, expectedRevision: 4, courseName: "Pinehurst No. 10", location: "Pinehurst, NC",
   });
@@ -117,9 +130,13 @@ test("future runtime action builders match the bounded V2 RPC request contract",
     expectedPointerRevision: 3,
     readinessFingerprint: "a".repeat(64),
   });
-  assert.equal(activate.action, "ACTIVATE_TOURNAMENT");
+  assert.equal(activate.action, "PREPARE_ANNUAL_SCORING_TRANSITION");
   assert.equal(activate.expected_pointer_revision, 3);
   assert.equal(activate.readiness_fingerprint, "a".repeat(64));
+  assert.throws(() => buildFutureRuntimeMutation("close", {
+    ...common,
+    completionFingerprint: "b".repeat(64),
+  }), (error) => error.code === "PRODUCTION_ANNUAL_SCORING_TRANSITION_REQUIRED");
 });
 
 function runtimePayload(overrides = {}) {
@@ -146,6 +163,10 @@ function runtimePayload(overrides = {}) {
     }],
     compatibilityJobs: [{ jobId: "job-1", matchId: "2027-R1-1", status: "CERTIFIED", attempts: 1 }],
     annualProjections: [{ domain: "GUIDE", sourceRevision: 1, bindingRevision: 1, status: "CERTIFIED" }],
+    futureDirectorGovernance: {
+      revision: 1,
+      directors: [{ playerId: "CB01", displayName: "Clay Beltran", status: "ACTIVE", roleActive: true }],
+    },
     readiness: { ready: true, fingerprint: "d".repeat(64), blockers: [], counts: { matches: 1 } },
     activation: null,
     archivePlan: null,
@@ -157,6 +178,7 @@ function runtimePayload(overrides = {}) {
         contextRevision: 2, holeCount: 18, scoringReady: true }],
     }],
     capabilities: {
+      grantFutureDirector: true,
       addGlobalCourse: true, configureGlobalCourseContext: true,
       assignFutureCourse: true, promoteRuntime: true, stageHandicaps: true,
       approveHandicaps: true, configureMatch: true, replacePairings: true,
@@ -176,6 +198,11 @@ test("future runtime normalization exposes safe preparation state and no privile
   assert.equal(runtime.courseAllocatorRevision, 4);
   assert.equal(runtime.courseCatalog[0].teeContexts[0].scoringReady, true);
   assert.equal(runtime.capabilities.assignFutureCourse, true);
+  assert.equal(runtime.capabilities.grantFutureDirector, true);
+  assert.deepEqual(runtime.futureDirectorGovernance, {
+    revision: 1,
+    directors: [{ playerId: "CB01", displayName: "Clay Beltran", status: "ACTIVE", roleActive: true }],
+  });
   assert.equal(runtime.handicapDraft.status, "DRAFT");
   assert.deepEqual(runtime.handicapDraft.entries, [{ playerId: "CB01", tournamentHandicap: "+2.25" }]);
   assert.equal(runtime.matches[0].teeId, "Blue");
@@ -226,10 +253,25 @@ test("Director route keeps runtime RPCs server-only, exact scoped, and archive e
     source("app/admin/director/ProductionFutureYearAdministrationPanel.js"),
   ]);
   assert.match(route, /mutateProductionFutureRuntime/);
+  assert.match(route, /PRODUCTION_ANNUAL_SCORING_TRANSITION_ACTIONS/);
+  for (const action of ["prepare", "close", "drain", "activate", "abort"]) {
+    assert.match(server, new RegExp(`${action}_production_annual_scoring_transition_v1`));
+  }
+  assert.match(route, /expectedCurrentTournamentId: input\.expectedCurrentTournamentId/);
+  assert.match(route, /expectedGoogleWriterGenerationId:/);
+  assert.match(route, /expectedPredecessorAnnualAdmissionRevision:/);
+  assert.match(route, /PRODUCTION_ANNUAL_SCORING_PRECOMMIT_ABORTED/);
   assert.match(route, /assertProductionCutoverRequest\(request, process\.env, \{ requireOrigin: true \}\)/);
   assert.match(server, /read_production_future_runtime_v2/);
   assert.match(server, /mutate_production_future_runtime_v2/);
   assert.match(server, /tournament_id: PRODUCTION_TOURNAMENT_ID/);
+  assert.doesNotMatch(server, /action:\s*"ACTIVATE_TOURNAMENT"/);
+  assert.match(panel, /expectedCurrentTournamentId: runtime\.currentTournament\.tournamentId/);
+  assert.match(panel, /keeps the current pointer and scoring admission unchanged/);
+  assert.match(panel, /authorized annual-transition operator/);
+  assert.match(panel, /This panel never closes admission or commits the current pointer/);
+  assert.match(panel, /Close \/ drain \/ activation operator workflow/);
+  assert.doesNotMatch(panel, /onStage\("close"/);
   assert.match(panel, /Archive execution unavailable/);
   assert.doesNotMatch(panel, /archive-tournament/);
 });

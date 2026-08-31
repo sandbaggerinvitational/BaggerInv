@@ -28,6 +28,9 @@ import { withProductionGoogleAuthorityWrite } from "../../../lib/production-cuto
 import { productionCutoverPhaseAtLeast } from "../../../lib/production-cutover-activation-contract.js";
 import { certifyGoogleWorkbookMutationReadback, googleWorkbookMutationOutcome } from "../../../lib/google-workbook-mutation-intent.js";
 import { assertScoringMutationAuthorityContractBeforeDispatch, currentScoringMutationAuthorityContract } from "../../../lib/scoring-mutation-authority-server.js";
+import { readProductionCurrentTournamentRuntime } from "../../../lib/production-current-tournament-runtime.js";
+import { readMatchAuthorizationMatrix } from "../../../lib/match-authorization-supabase.js";
+import { productionLiveMatchAdminDataFromSupabaseView, readTournamentLiveView } from "../../../lib/tournament-live-supabase.js";
 
 export const dynamic = "force-dynamic";
 
@@ -65,7 +68,29 @@ export async function GET(request) {
   const authorization = await authorized(request, authority);
   if (authorization?.status !== "active") return deny();
   try {
-    const data = await readLiveMatchAdminData();
+    let data;
+    if (authority.resolved === "supabase" && process.env.VERCEL_ENV === "production") {
+      const runtime = await readProductionCurrentTournamentRuntime({}, { env: process.env });
+      if (runtime.tournamentId === "2026") data = await readLiveMatchAdminData();
+      else {
+        const [current, matchAuthorization] = await Promise.all([
+          readTournamentLiveView(runtime.tournamentId, { env: process.env }),
+          readMatchAuthorizationMatrix(runtime.tournamentId, { env: process.env }),
+        ]);
+        if (!current.payload?.ok) throw Object.assign(
+          new Error("The current Production match scope is unavailable."),
+          { code: current.payload?.code || "CURRENT_LIVE_MATCH_SCOPE_UNAVAILABLE", status: 503 },
+        );
+        if (!matchAuthorization.payload?.ok) throw Object.assign(
+          new Error("The current Production match authorization scope is unavailable."),
+          { code: matchAuthorization.payload?.code || "CURRENT_MATCH_AUTHORIZATION_SCOPE_UNAVAILABLE", status: 503 },
+        );
+        data = productionLiveMatchAdminDataFromSupabaseView(
+          current.payload.data,
+          matchAuthorization.payload,
+        );
+      }
+    } else data = await readLiveMatchAdminData();
     const scoringAuthorityContract = await currentScoringMutationAuthorityContract({ request });
     return NextResponse.json({ data: {
       ...data,
@@ -136,6 +161,7 @@ export async function POST(request) {
           recalculateCalcuttaAfterCanonicalMutation("", {
             calculatedBy: `Director lifecycle Calcutta worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
             mutationKey: operationRequestId,
+            matchId,
           }),
         ]);
         for (const [domain, result] of [["archive", archive], ["competition", derived], ["intelligence", intelligence], ["calcutta", calcutta]]) {
@@ -238,6 +264,7 @@ export async function POST(request) {
           recalculateCalcuttaAfterCanonicalMutation("", {
             calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}`,
             mutationKey: operationRequestId,
+            matchId,
           }),
         ]);
       } catch (error) {

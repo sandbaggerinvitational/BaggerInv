@@ -17,10 +17,15 @@ import {
 } from "../lib/future-match-google-compatibility-worker.js";
 
 const manifest = Object.freeze({
-  contractVersion: "production-future-google-match-provisioning-v1",
+  contractVersion: "production-future-google-match-provisioning-v2",
   tournamentId: "2027",
   tournamentYear: 2027,
   matchId: "2027-R1-1",
+  writerGenerationId: "8be8669d-cff6-4f6d-9c73-9adac3739771",
+  destinationWorkbookId: "annual-workbook-2027",
+  targetContractFingerprint: "b".repeat(64),
+  structuralFingerprint: "c".repeat(64),
+  runtimeRevision: 4,
   templateLiveMatchId: "2026-R1-1",
   templateArchiveMatchId: "2026-R1-1",
   liveMatch: {
@@ -44,8 +49,34 @@ const job = Object.freeze({
   matchId: "2027-R1-1",
   attempt: 1,
   expectedManifestFingerprint: futureMatchGoogleCompatibilityManifestFingerprint(manifest),
-  sourceWorkbookId: "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4",
+  sourceWorkbookId: manifest.destinationWorkbookId,
+  writerGenerationId: manifest.writerGenerationId,
+  destinationWorkbookId: manifest.destinationWorkbookId,
+  targetContractFingerprint: manifest.targetContractFingerprint,
+  structuralFingerprint: manifest.structuralFingerprint,
+  runtimeRevision: manifest.runtimeRevision,
   manifest,
+});
+
+const writerContext = Object.freeze({
+  contractVersion: "production-future-google-match-provisioning-v2",
+  targetTournamentId: manifest.tournamentId,
+  tournamentYear: manifest.tournamentYear,
+  writerGenerationId: manifest.writerGenerationId,
+  destinationWorkbookId: manifest.destinationWorkbookId,
+  targetContractFingerprint: manifest.targetContractFingerprint,
+  implementationFingerprint: "d".repeat(64),
+  nonAuthoritative: true,
+  rollbackAllowed: false,
+});
+
+const resolveWriterContext = async () => writerContext;
+const writerResources = () => ({
+  environment: "PRODUCTION",
+  tournamentId: manifest.tournamentId,
+  tournamentYear: manifest.tournamentYear,
+  googleWorkbookId: manifest.destinationWorkbookId,
+  futureGoogleWriterContext: writerContext,
 });
 
 function verifiedDelivery(overrides = {}) {
@@ -57,6 +88,11 @@ function verifiedDelivery(overrides = {}) {
     tournamentId: projection.tournamentId,
     matchId: projection.matchId,
     manifestFingerprint: projection.manifestFingerprint,
+    writerGenerationId: projection.writerGenerationId,
+    destinationWorkbookId: projection.destinationWorkbookId,
+    targetContractFingerprint: projection.targetContractFingerprint,
+    structuralFingerprint: projection.structuralFingerprint,
+    runtimeRevision: projection.runtimeRevision,
     googleReadbackFingerprint: "a".repeat(64),
     liveMatches: { rowNumber: 40, formulaFields: ["Team 1 Player 1 Stroke"] },
     matches: { rowNumber: 40, formulaFields: ["Match ID"] },
@@ -66,9 +102,13 @@ function verifiedDelivery(overrides = {}) {
 
 test("future match projection contains configuration and dormant control only", () => {
   const projection = futureMatchGoogleCompatibilityProjection(manifest);
-  assert.equal(projection.contractVersion, "production-future-match-google-compatibility-v1");
+  assert.equal(projection.contractVersion, "production-future-match-google-compatibility-v2");
   assert.equal(projection.matchId, "2027-R1-1");
   assert.equal(projection.liveMatch["Team 1 Player 2"], "AA02");
+  assert.equal(projection.writerGenerationId, manifest.writerGenerationId);
+  assert.equal(projection.destinationWorkbookId, manifest.destinationWorkbookId);
+  assert.equal(projection.structuralFingerprint, manifest.structuralFingerprint);
+  assert.equal(projection.runtimeRevision, manifest.runtimeRevision);
   for (const field of [
     "Matchup Winner", "Team 1 Points", "Final Result", "Finalized At",
     "Match Status", "Scoring Locked", "Access Active", "Access Version",
@@ -134,6 +174,8 @@ test("claimed job is exact-scope bound before any Google writer can run", () => 
   const input = futureMatchGoogleCompatibilityJobInput(job);
   assert.equal(input.tournamentId, "2027");
   assert.equal(input.matchId, "2027-R1-1");
+  assert.equal(input.writerGenerationId, manifest.writerGenerationId);
+  assert.equal(input.destinationWorkbookId, manifest.destinationWorkbookId);
   assert.throws(() => futureMatchGoogleCompatibilityJobInput({
     ...job,
     tournamentId: "2028",
@@ -152,6 +194,8 @@ test("worker uses the dedicated Production credential and checkpoints exact read
     workerId: "worker-1",
     env: { VERCEL_ENV: "production" },
     dependencies: {
+      resolveFutureMatchGoogleCompatibilityContext: resolveWriterContext,
+      productionFutureGoogleWriterResources: writerResources,
       claimFutureMatchGoogleCompatibility: async () => ({ payload: { job } }),
       withProductionGoogleServiceAccountCredentials: async (options, callback) => {
         credentialOptions = options;
@@ -174,17 +218,53 @@ test("worker uses the dedicated Production credential and checkpoints exact read
   assert.equal(completed.claim_token, job.claimToken);
   assert.equal(completed.target_tournament_id, "2027");
   assert.equal(completed.expected_manifest_fingerprint, job.expectedManifestFingerprint);
+  assert.equal(completed.expected_structural_fingerprint, manifest.structuralFingerprint);
   assert.equal(completed.readback_fingerprint, "a".repeat(64));
   assert.equal(completed.readback_checkpoint.liveMatchVerified, true);
   assert.equal(completed.readback_checkpoint.archiveMatchVerified, true);
   assert.equal(completed.readback_checkpoint.liveMatchesRowNumber, 40);
   assert.equal(completed.readback_checkpoint.matchesRowNumber, 40);
+  assert.equal(completed.readback_checkpoint.writerGenerationId, manifest.writerGenerationId);
+  assert.equal(completed.readback_checkpoint.destinationWorkbookId, manifest.destinationWorkbookId);
+  assert.equal(completed.readback_checkpoint.targetContractFingerprint, manifest.targetContractFingerprint);
+  assert.equal(completed.readback_checkpoint.structuralFingerprint, manifest.structuralFingerprint);
+  assert.equal(completed.readback_checkpoint.runtimeRevision, manifest.runtimeRevision);
+});
+
+test("writer verification binding mismatch fails before checkpoint", async () => {
+  let completed = false;
+  let failure;
+  const result = await processNextFutureMatchGoogleCompatibility({
+    env: { VERCEL_ENV: "production" },
+    dependencies: {
+      resolveFutureMatchGoogleCompatibilityContext: resolveWriterContext,
+      productionFutureGoogleWriterResources: writerResources,
+      claimFutureMatchGoogleCompatibility: async () => ({ payload: { job } }),
+      withProductionGoogleServiceAccountCredentials: async (_options, callback) => callback(),
+      measure: async (_label, callback) => ({ result: await callback(), diagnostics: {} }),
+      provisionFutureMatchGoogleCompatibility: async () => verifiedDelivery({
+        destinationWorkbookId: "wrong-workbook",
+      }),
+      completeFutureMatchGoogleCompatibility: async () => { completed = true; },
+      failFutureMatchGoogleCompatibility: async (input) => {
+        failure = input;
+        return { payload: { ok: true } };
+      },
+    },
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.errorStage, "google-writer");
+  assert.equal(result.errorCode, "FUTURE_MATCH_GOOGLE_COMPATIBILITY_READBACK_MISMATCH");
+  assert.equal(completed, false);
+  assert.equal(failure.retryable, true);
 });
 
 test("lost-response retry is reported idempotently without another compatibility state", async () => {
   const result = await processNextFutureMatchGoogleCompatibility({
     env: { VERCEL_ENV: "production" },
     dependencies: {
+      resolveFutureMatchGoogleCompatibilityContext: resolveWriterContext,
+      productionFutureGoogleWriterResources: writerResources,
       claimFutureMatchGoogleCompatibility: async () => ({ payload: { job: { ...job, attempt: 2 } } }),
       withProductionGoogleServiceAccountCredentials: async (_options, callback) => callback(),
       measure: async (_label, callback) => ({ result: await callback(), diagnostics: {} }),
@@ -202,6 +282,8 @@ test("Google failure is retryable and never invokes a rollback/delete path", asy
   const result = await processNextFutureMatchGoogleCompatibility({
     env: { VERCEL_ENV: "production" },
     dependencies: {
+      resolveFutureMatchGoogleCompatibilityContext: resolveWriterContext,
+      productionFutureGoogleWriterResources: writerResources,
       claimFutureMatchGoogleCompatibility: async () => ({ payload: { job } }),
       withProductionGoogleServiceAccountCredentials: async (_options, callback) => callback(),
       measure: async (_label, callback) => callback(),
@@ -227,7 +309,9 @@ test("drain is bounded and stops only when the claim queue is empty", async () =
   let claims = 0;
   const result = await drainFutureMatchGoogleCompatibility({
     maximum: 3,
+    env: { VERCEL_ENV: "test" },
     dependencies: {
+      resolveFutureMatchGoogleCompatibilityContext: resolveWriterContext,
       claimFutureMatchGoogleCompatibility: async () => {
         claims += 1;
         return claims === 1 ? { payload: { job } } : { payload: { job: null } };
@@ -253,6 +337,9 @@ test("writer copies protected formulas and worker transport stays exact-scoped a
   const authority = await readFile(new URL(
     "../lib/scoring-authority-supabase.js", import.meta.url,
   ), "utf8");
+  const futureServer = await readFile(new URL(
+    "../lib/production-future-google-writer-server.js", import.meta.url,
+  ), "utf8");
   assert.match(writer, /pasteType:\s*"PASTE_FORMULA"/);
   assert.match(writer, /target\.rawValues\?\.\["Match ID"\]/);
   assert.match(writer, /valueInputOption:\s*"RAW"/);
@@ -265,9 +352,14 @@ test("writer copies protected formulas and worker transport stays exact-scoped a
   assert.match(route, /export async function GET\(\)[\s\S]*METHOD_NOT_ALLOWED/);
   assert.match(route, /VERCEL_ENV[\s\S]*production/);
   assert.doesNotMatch(route, /export async function (?:PUT|PATCH|DELETE)/);
+  assert.match(runtime, /resolve_production_future_match_google_compatibility_v2:\s*"WORKERS"/);
+  assert.match(futureServer, /"resolve_production_future_match_google_compatibility_v2"/);
   for (const rpc of ["claim", "complete", "fail"]) {
-    assert.match(runtime, new RegExp(`${rpc}_production_future_match_google_compatibility_v1:\\s*"WORKERS"`));
+    assert.match(runtime, new RegExp(`${rpc}_production_future_match_google_compatibility_v2:\\s*"WORKERS"`));
+    assert.match(futureServer, new RegExp(`${rpc}:\\s*"${rpc}_production_future_match_google_compatibility_v2"`));
   }
-  assert.match(authority, /contract_version:\s*"production-future-google-match-provisioning-v1"/);
-  assert.match(authority, /target_tournament_id:\s*clean\(options\.targetTournamentId\)/);
+  assert.match(authority, /productionFutureGoogleWriterRpc\("claim"/);
+  assert.match(authority, /productionFutureGoogleWriterRpc\("complete"/);
+  assert.match(authority, /productionFutureGoogleWriterRpc\("fail"/);
+  assert.match(authority, /resolveProductionFutureGoogleWriterContext/);
 });

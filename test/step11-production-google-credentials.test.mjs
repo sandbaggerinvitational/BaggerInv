@@ -22,6 +22,10 @@ import {
   PRODUCTION_TOURNAMENT_ID,
   PRODUCTION_TOURNAMENT_YEAR,
 } from "../lib/production-foundation-resource-contract.js";
+import {
+  productionFutureGoogleWriterResources,
+  resolveProductionFutureGoogleWriterContext,
+} from "../lib/production-future-google-writer-server.js";
 
 const root = process.cwd();
 const legacyEmail = "preview-legacy@example.invalid";
@@ -439,6 +443,47 @@ test("Google-writing identities remain unavailable until authority and explicit 
     operation: "ODDS_GOOGLE_MIRROR",
     resources,
   }).allowed, false);
+});
+
+test("future Match compatibility credentials require the branded annual writer context", async () => {
+  const scoringReady = {
+    ...productionEnv,
+    SCORING_AUTHORITY: "supabase",
+    PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED: "true",
+  };
+  const unbranded = productionGoogleCredentialEnvironment({
+    env: scoringReady,
+    operation: "FUTURE_MATCH_GOOGLE_COMPATIBILITY",
+    resources,
+  });
+  assert.equal(unbranded.allowed, false);
+  assert.equal(unbranded.requestedResources.tournamentId, false);
+  assert.equal(unbranded.requestedResources.tournamentYear, false);
+
+  const writerContext = await resolveProductionFutureGoogleWriterContext({
+    targetTournamentId: "2099",
+    rpc: async () => ({
+      payload: {
+        ok: true,
+        contractVersion: "production-future-google-match-provisioning-v2",
+        targetTournamentId: "2099",
+        writerGenerationId: "10000000-0000-4000-8000-000000000099",
+        destinationWorkbookId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+        targetContractFingerprint: "a".repeat(64),
+        implementationFingerprint: "b".repeat(64),
+        nonAuthoritative: true,
+        rollbackAllowed: false,
+      },
+    }),
+  });
+  const branded = productionGoogleCredentialEnvironment({
+    env: scoringReady,
+    operation: "FUTURE_MATCH_GOOGLE_COMPATIBILITY",
+    resources: productionFutureGoogleWriterResources(writerContext),
+  });
+  assert.equal(branded.allowed, true);
+  assert.equal(branded.requestedResources.tournamentId, true);
+  assert.equal(branded.requestedResources.tournamentYear, true);
 });
 
 test("the allowlist contains synchronization, mirror, archive, and metadata only", () => {

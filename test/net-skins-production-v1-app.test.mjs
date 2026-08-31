@@ -50,6 +50,13 @@ const freshness = Object.freeze({
   source_fingerprint: "b".repeat(64),
 });
 
+const frozen2026Dispatch = async (_functionName, body) => ({
+  pointerAware: true,
+  frozen2026: true,
+  body,
+  annualRuntimeInput: null,
+});
+
 function view(state, rounds = []) {
   return {
     contract_version: "production-net-skins-v1",
@@ -179,7 +186,11 @@ test("Production V1 uses the exact active cutover RPC and cannot accept caller r
     });
   };
   try {
-    const result = await currentProductionNetSkinsV1({ playerId: "CB01", env: activeProduction });
+    const result = await currentProductionNetSkinsV1({
+      playerId: "CB01",
+      env: activeProduction,
+      resolveProductionCurrentReadDispatch: frozen2026Dispatch,
+    });
     assert.equal(result.netSkinsState.state, "NOT_CONFIGURED");
     assert.equal(result.recalculation, null);
     assert.equal(calls.length, 1);

@@ -96,6 +96,9 @@ test("Production publication RPC is deterministic, optimistic, idempotent, and m
       readProductionOddsPublicationState,
     } from "./lib/production-odds-publication-server.js";
     const calls = [];
+    const runtimeContext = { frozen2026: true,
+      runtime: { tournamentId: "2026", tournamentYear: 2026 },
+      googleDestination: null };
     const rpc = async (name, input) => {
       calls.push({ name, input });
       if (name === "read_production_odds_publication_v1") return { payload: {
@@ -111,7 +114,8 @@ test("Production publication RPC is deterministic, optimistic, idempotent, and m
         mirror_created: false, google_writes: 0, idempotent: false }
       };
     };
-    const state = await readProductionOddsPublicationState({ rpc });
+    const state = await readProductionOddsPublicationState({ rpc,
+      runtimeContext });
     const args = { jobId: "${jobId}", expectedPublicationRevision: state.publication_revision,
       expectedSnapshotId: state.published_snapshot_id,
       expectedActivationRevision: state.activation_revision,
@@ -122,7 +126,7 @@ test("Production publication RPC is deterministic, optimistic, idempotent, and m
       expectedPublicationRevision: 5,
       expectedSnapshotId: "00000000-0000-4000-8000-000000000003" });
     const result = await publishProductionOddsCalculation({ ...args,
-      requestFingerprint: first, rpc });
+      requestFingerprint: first, rpc, runtimeContext });
     process.stdout.write(JSON.stringify({ calls, first, retry, result }));
   `;
   const child = spawnSync(process.execPath, [

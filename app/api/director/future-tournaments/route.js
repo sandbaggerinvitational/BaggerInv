@@ -8,6 +8,7 @@ import {
 import {
   mutateProductionFutureYearAdministration,
   mutateProductionFutureRuntime,
+  PRODUCTION_ANNUAL_SCORING_TRANSITION_ACTIONS,
   readProductionFutureYearAdministrationWithRuntime,
 } from "../../../../lib/production-future-year-administration-server.js";
 import {
@@ -25,6 +26,9 @@ const clean = (value) => String(value ?? "").trim();
 const responseHeaders = { "Cache-Control": "private, no-store" };
 const ACTIONS = new Set(PRODUCTION_FUTURE_YEAR_ADMINISTRATION_ACTIONS);
 const RUNTIME_ACTIONS = new Set(PRODUCTION_FUTURE_RUNTIME_ACTIONS);
+const ANNUAL_TRANSITION_ACTIONS = new Set(
+  PRODUCTION_ANNUAL_SCORING_TRANSITION_ACTIONS,
+);
 
 function unavailable() {
   return NextResponse.json({ error: "Not found." }, { status: 404, headers: responseHeaders });
@@ -64,12 +68,13 @@ function actor(identity = {}) {
   return {
     actorAuthUserId: clean(identity.authUserId),
     actorPlayerId: clean(identity.actor?.id || identity.player?.id),
+    actorTournamentId: clean(identity.tournamentId || identity.session?.tournamentId),
   };
 }
 
 function safeFailure(error) {
   const candidate = clean(error?.code).toUpperCase();
-  const code = /^(?:(?:PRODUCTION_)?FUTURE_(?:YEAR|RUNTIME|TOURNAMENT|TEAM|ROSTER|ROUND|COURSE|MATCH)|(?:PRODUCTION_)?GLOBAL_COURSE|PRODUCTION_SUPABASE)_[A-Z0-9_]{3,120}$/.test(candidate)
+  const code = /^(?:(?:PRODUCTION_)?FUTURE_(?:YEAR|RUNTIME|TOURNAMENT|TEAM|ROSTER|ROUND|COURSE|MATCH)|(?:PRODUCTION_)?GLOBAL_COURSE|PRODUCTION_SUPABASE|PRODUCTION_ANNUAL_SCORING)_[A-Z0-9_]{3,120}$/.test(candidate)
     ? candidate
     : "FUTURE_YEAR_OPERATION_FAILED";
   const messages = {
@@ -132,6 +137,12 @@ function safeFailure(error) {
     FUTURE_GLOBAL_COURSE_ASSIGNMENT_INPUT_INVALID: "Select an exact scoring-ready Course context and future round.",
     FUTURE_TOURNAMENT_ACTIVATION_NOT_READY: "Complete authoritative activation readiness before activating this tournament.",
     FUTURE_TOURNAMENT_CLOSE_NOT_READY: "Complete the authoritative close checklist before closing this tournament.",
+    PRODUCTION_ANNUAL_SCORING_TRANSITION_REQUIRED: "Use the reviewed annual scoring transition to close and replace the current tournament.",
+    PRODUCTION_ANNUAL_SCORING_TRANSITION_ACTION_INVALID: "Select a supported annual scoring transition stage.",
+    PRODUCTION_ANNUAL_SCORING_PRECOMMIT_ABORTED: "Annual activation state changed before commit. Refresh the authoritative transition and review it again.",
+    PRODUCTION_ANNUAL_SCORING_CLOSE_REVISION_CONFLICT: "The annual close fence changed. Refresh and review it again.",
+    PRODUCTION_ANNUAL_SCORING_DRAIN_REVISION_CONFLICT: "The annual scoring drain changed. Refresh and review it again.",
+    PRODUCTION_ANNUAL_SCORING_ABORT_REVISION_CONFLICT: "The annual recovery state changed. Refresh and review it again.",
   };
   return {
     error: messages[code] || "The Future Tournament operation did not complete.",
@@ -184,7 +195,8 @@ export async function POST(request) {
     }, { status: 400, headers: responseHeaders });
   }
   const action = clean(input?.action).toLowerCase();
-  if (!ACTIONS.has(action) && !RUNTIME_ACTIONS.has(action)) {
+  if (!ACTIONS.has(action) && !RUNTIME_ACTIONS.has(action) &&
+      !ANNUAL_TRANSITION_ACTIONS.has(action)) {
     return NextResponse.json({
       error: "Unsupported Future Tournament action.",
       code: "FUTURE_YEAR_ACTION_INVALID",
@@ -194,7 +206,7 @@ export async function POST(request) {
     const scoped = await withDataAuthorityRequestScope({
       label: `production-future-year-administration-${action}`,
       source: "supabase-production-future-year-administration-v1",
-    }, () => (RUNTIME_ACTIONS.has(action)
+    }, () => (RUNTIME_ACTIONS.has(action) || ANNUAL_TRANSITION_ACTIONS.has(action)
       ? mutateProductionFutureRuntime({
         ...actor(access.identity),
         action,
@@ -227,6 +239,41 @@ export async function POST(request) {
         readinessFingerprint: input.readinessFingerprint,
         expectedPointerRevision: input.expectedPointerRevision,
         completionFingerprint: input.completionFingerprint,
+        expectedCurrentTournamentId: input.expectedCurrentTournamentId,
+        transitionId: input.transitionId,
+        expectedRuntimeGenerationId: input.expectedRuntimeGenerationId,
+        expectedAnnualAuthorityGenerationId:
+          input.expectedAnnualAuthorityGenerationId,
+        expectedAnnualAdmissionGenerationId:
+          input.expectedAnnualAdmissionGenerationId,
+        expectedGoogleWriterGenerationId:
+          input.expectedGoogleWriterGenerationId,
+        annualDestinationWorkbookId: input.annualDestinationWorkbookId,
+        expectedGoogleTargetContractFingerprint:
+          input.expectedGoogleTargetContractFingerprint,
+        expectedPlatformActivationRevision:
+          input.expectedPlatformActivationRevision,
+        expectedPlatformAuthorityGenerationId:
+          input.expectedPlatformAuthorityGenerationId,
+        expectedPlatformAdmissionGenerationId:
+          input.expectedPlatformAdmissionGenerationId,
+        expectedPlatformAdmissionRevision:
+          input.expectedPlatformAdmissionRevision,
+        expectedPredecessorRuntimeGenerationId:
+          input.expectedPredecessorRuntimeGenerationId,
+        expectedPredecessorAnnualAuthorityGenerationId:
+          input.expectedPredecessorAnnualAuthorityGenerationId,
+        expectedPredecessorAnnualAdmissionGenerationId:
+          input.expectedPredecessorAnnualAdmissionGenerationId,
+        expectedPredecessorAnnualAdmissionRevision:
+          input.expectedPredecessorAnnualAdmissionRevision,
+        startSourceFingerprint: input.startSourceFingerprint,
+        finalSourceFingerprint: input.finalSourceFingerprint,
+        reconciliationFingerprint: input.reconciliationFingerprint,
+        externalFenceEvidenceId: input.externalFenceEvidenceId,
+        providerFenceId: input.providerFenceId,
+        providerFenceVerificationId: input.providerFenceVerificationId,
+        quiesceEvidenceId: input.quiesceEvidenceId,
       })
       : mutateProductionFutureYearAdministration({
       ...actor(access.identity),

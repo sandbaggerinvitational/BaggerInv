@@ -292,6 +292,22 @@ create table participant_identity.future_tournament_participant_bindings_v1 (
   )
 );
 
+-- Future annual Director selection is explicit governance, not a clone of the
+-- current tournament's role. This row is created only by the bounded Owner
+-- mutation below, so installation remains inert.
+create table production_control.future_tournament_director_governance_v1 (
+  tournament_id text primary key references
+    production_control.future_tournament_catalog_v1(tournament_id)
+    on delete restrict,
+  governance_revision bigint not null check (governance_revision > 0),
+  updated_by_player_id text not null references scoring_authority.players(
+    player_id
+  ) on delete restrict,
+  updated_by_auth_user_id uuid not null references auth.users(id)
+    on delete restrict,
+  updated_at timestamptz not null default pg_catalog.clock_timestamp()
+);
+
 create table production_control.future_annual_runtime_generations_v1 (
   runtime_generation_id uuid primary key default extensions.gen_random_uuid(),
   tournament_id text not null unique references
@@ -373,6 +389,7 @@ create table production_control.future_runtime_operation_receipts_v2 (
     'ASSIGN_FUTURE_COURSE', 'PROMOTE_RUNTIME_STRUCTURE',
     'BIND_ANNUAL_PROJECTION', 'STAGE_HANDICAPS', 'APPROVE_HANDICAPS',
     'CONFIGURE_MATCH', 'REPLACE_PAIRINGS', 'PREPARE_SCORING_CONTEXT',
+    'GRANT_FUTURE_DIRECTOR',
     'MARK_READY_FOR_ACTIVATION', 'ACTIVATE_TOURNAMENT',
     'CLOSE_TOURNAMENT', 'PREPARE_ARCHIVE_PLAN'
   )),
@@ -400,7 +417,7 @@ create table production_control.future_runtime_audit_events_v2 (
   target_kind text not null check (target_kind in (
     'GLOBAL_COURSE', 'COURSE_ASSIGNMENT', 'RUNTIME',
     'ANNUAL_PROJECTION', 'HANDICAP',
-    'MATCH', 'PAIRINGS', 'SCORING_CONTEXT', 'ACTIVATION',
+    'MATCH', 'PAIRINGS', 'SCORING_CONTEXT', 'IDENTITY', 'ACTIVATION',
     'CLOSE', 'ARCHIVE_PLAN'
   )),
   target_id text not null,
@@ -501,6 +518,8 @@ alter table production_control.future_annual_projection_bindings_v1 enable row l
 alter table participant_identity.future_tournament_identity_contexts_v1
   enable row level security;
 alter table participant_identity.future_tournament_participant_bindings_v1
+  enable row level security;
+alter table production_control.future_tournament_director_governance_v1
   enable row level security;
 alter table production_control.future_annual_runtime_generations_v1 enable row level security;
 alter table production_control.future_archive_plans_v1 enable row level security;
@@ -1584,12 +1603,20 @@ begin
     certified_by_player_id = excluded.certified_by_player_id,
     certified_at = excluded.certified_at,
     updated_at = pg_catalog.clock_timestamp();
+  -- Before runtime promotion the projection is part of the staged structure
+  -- and therefore advances its structural setup revision.  After promotion,
+  -- the structural manifest is immutable: annual Guide/Draft/Prediction
+  -- refreshes are independently revisioned by their binding row and must not
+  -- invalidate promotion.source_setup_revision.  A changed post-promotion
+  -- projection still clears activation readiness (and reopens Ready to
+  -- Configuring) so it must be reviewed again before activation.
   update production_control.future_tournament_catalog_v1 value set
     lifecycle = case when value.lifecycle = 'READY_FOR_ACTIVATION'
       then 'CONFIGURING' else value.lifecycle end,
     lifecycle_revision = case when value.lifecycle = 'READY_FOR_ACTIVATION'
       then value.lifecycle_revision + 1 else value.lifecycle_revision end,
-    setup_revision = value.setup_revision + 1,
+    setup_revision = case when promotion.tournament_id is null
+      then value.setup_revision + 1 else value.setup_revision end,
     readiness_fingerprint = null, readiness_setup_revision = null,
     updated_by_player_id = actor_player,
     updated_at = pg_catalog.clock_timestamp()
@@ -1747,6 +1774,28 @@ begin
       ) order by value.domain
     ) from production_control.future_annual_projection_bindings_v1 value
       where value.tournament_id = target_id), '[]'::jsonb),
+    'futureDirectorGovernance', pg_catalog.jsonb_build_object(
+      'revision', coalesce((select value.governance_revision
+        from production_control.future_tournament_director_governance_v1 value
+        where value.tournament_id = target_id), 0),
+      'directors', coalesce((select pg_catalog.jsonb_agg(
+        pg_catalog.jsonb_build_object(
+          'playerId', entitlement.player_id,
+          'displayName', player.display_name,
+          'status', entitlement.status,
+          'roleActive', role_value.role_active and
+            role_value.revoked_at is null
+        ) order by entitlement.player_id)
+        from production_control.director_entitlements entitlement
+        join scoring_authority.players player
+          on player.player_id = entitlement.player_id
+        left join participant_identity.tournament_roles role_value
+          on role_value.tournament_id = entitlement.tournament_id
+         and role_value.auth_user_id = entitlement.auth_user_id
+         and role_value.role = 'DIRECTOR'
+        where entitlement.tournament_id = target_id
+          and entitlement.role = 'DIRECTOR'), '[]'::jsonb)
+    ),
     'readiness', readiness,
     'activation', case when generation.runtime_generation_id is null then null
       else pg_catalog.jsonb_build_object(
@@ -1798,6 +1847,19 @@ begin
       'stageHandicaps', true, 'approveHandicaps', true,
       'configureMatch', true, 'replacePairings', true,
       'prepareScoringContext', true,
+      'grantFutureDirector', catalog.lifecycle in ('DRAFT', 'CONFIGURING')
+        and exists (
+          select 1
+          from production_control.tournament_owner_capabilities_v1 owner_value
+          where owner_value.tournament_id = '2026'
+            and owner_value.player_id = pg_catalog.upper(pg_catalog.btrim(
+              input#>>'{authorization,player_id}'
+            ))
+            and owner_value.auth_user_id =
+              (input#>>'{authorization,auth_user_id}')::uuid
+            and owner_value.status = 'ACTIVE'
+            and owner_value.revoked_at is null
+        ),
       'markReady', (readiness->>'ready')::boolean,
       'activateTournament', catalog.lifecycle = 'READY_FOR_ACTIVATION'
         and (readiness->>'ready')::boolean,
@@ -2028,12 +2090,18 @@ declare
   generation_id uuid;
   authority_generation_id_value uuid;
   admission_generation_id_value uuid;
+  target_player_value text;
+  target_auth_value uuid;
+  target_auth_candidates uuid[];
+  entitlement_value production_control.director_entitlements%rowtype;
+  role_changed boolean := false;
 begin
   if action_value not in (
     'ADD_GLOBAL_COURSE', 'CONFIGURE_GLOBAL_COURSE_CONTEXT',
     'ASSIGN_FUTURE_COURSE', 'PROMOTE_RUNTIME_STRUCTURE',
     'STAGE_HANDICAPS', 'APPROVE_HANDICAPS', 'CONFIGURE_MATCH',
     'REPLACE_PAIRINGS', 'PREPARE_SCORING_CONTEXT',
+    'GRANT_FUTURE_DIRECTOR',
     'MARK_READY_FOR_ACTIVATION', 'ACTIVATE_TOURNAMENT',
     'CLOSE_TOURNAMENT', 'PREPARE_ARCHIVE_PLAN'
   ) then
@@ -2043,7 +2111,7 @@ begin
   perform production_control.assert_future_runtime_service_scope_v2(
     input, true, action_value in (
       'ADD_GLOBAL_COURSE', 'CONFIGURE_GLOBAL_COURSE_CONTEXT',
-      'PROMOTE_RUNTIME_STRUCTURE',
+      'PROMOTE_RUNTIME_STRUCTURE', 'GRANT_FUTURE_DIRECTOR',
       'MARK_READY_FOR_ACTIVATION', 'ACTIVATE_TOURNAMENT',
       'CLOSE_TOURNAMENT', 'PREPARE_ARCHIVE_PLAN'
     )
@@ -2086,9 +2154,184 @@ begin
       'future-runtime-v2:' || action_value || ':' || coalesce(target_id, ''), 0
     )
   );
+  select value.* into receipt
+  from production_control.future_runtime_operation_receipts_v2 value
+  where value.action = action_value
+    and value.operation_request_id = request_id;
+  if receipt.receipt_id is not null then
+    if receipt.database_request_payload_hash <> database_hash
+       or receipt.declared_request_payload_hash <> declared_hash then
+      raise exception using errcode = '23505',
+        message = 'PRODUCTION_FUTURE_RUNTIME_IDEMPOTENCY_CONFLICT';
+    end if;
+    return receipt.response || pg_catalog.jsonb_build_object(
+      'idempotent', true
+    );
+  end if;
   target_object := nullif(target_id, '');
 
-  if action_value = 'ADD_GLOBAL_COURSE' then
+  if action_value = 'GRANT_FUTURE_DIRECTOR' then
+    target_player_value := pg_catalog.upper(pg_catalog.btrim(coalesce(
+      input->>'target_player_id', ''
+    )));
+    select value.* into strict catalog
+    from production_control.future_tournament_catalog_v1 value
+    where value.tournament_id = target_id for update;
+    select value.governance_revision into prior_revision
+    from production_control.future_tournament_director_governance_v1 value
+    where value.tournament_id = target_id for update;
+    prior_revision := coalesce(prior_revision, 0);
+    if target_player_value !~ '^[A-Z0-9][A-Z0-9_-]{1,31}$'
+       or catalog.tournament_year <= 2026
+       or catalog.tournament_year <> (input->>'target_tournament_year')::integer
+       or catalog.lifecycle not in ('DRAFT', 'CONFIGURING')
+       or target_id = (select value.tournament_id
+         from production_control.current_tournament_pointer_v1 value
+         where value.scope_key = 'BAGGER_INV_PRODUCTION')
+       or expected_revision <> prior_revision
+       or production_control.access_governance_global_status_v1(
+         target_player_value
+       ) <> 'ACTIVE'
+       or not exists (
+         select 1
+         from production_control.future_tournament_roster_v1 membership
+         where membership.tournament_id = target_id
+           and membership.player_id = target_player_value
+           and membership.participation_status = 'ACTIVE'
+       ) then
+      raise exception using errcode = '40001',
+        message = 'PRODUCTION_FUTURE_DIRECTOR_PREDECESSOR_INVALID';
+    end if;
+
+    select pg_catalog.array_agg(candidate.auth_user_id order by
+      candidate.auth_user_id::text) into target_auth_candidates
+    from (
+      select distinct link.auth_user_id
+      from participant_identity.user_player_links link
+      join auth.users auth_user on auth_user.id = link.auth_user_id
+      join participant_identity.participant_auth_identifiers identifier
+        on identifier.player_id = link.player_id
+       and identifier.auth_user_id = link.auth_user_id
+       and identifier.status = 'VERIFIED'
+       and identifier.revoked_at is null
+      where link.player_id = target_player_value
+        and link.status = 'ACTIVE' and link.revoked_at is null
+        and (
+          (identifier.identifier_type = 'EMAIL'
+            and auth_user.email_confirmed_at is not null
+            and pg_catalog.lower(pg_catalog.btrim(coalesce(
+              auth_user.email, ''
+            ))) = identifier.normalized_value_private)
+          or (identifier.identifier_type = 'PHONE'
+            and auth_user.phone_confirmed_at is not null
+            and pg_catalog.btrim(coalesce(auth_user.phone, '')) =
+              identifier.normalized_value_private)
+        )
+    ) candidate;
+    if coalesce(pg_catalog.cardinality(target_auth_candidates), 0) <> 1 then
+      raise exception using errcode = '55000',
+        message = 'PRODUCTION_FUTURE_DIRECTOR_LINKED_IDENTITY_REQUIRED';
+    end if;
+    target_auth_value := target_auth_candidates[1];
+
+    select value.* into entitlement_value
+    from production_control.director_entitlements value
+    where value.tournament_id = target_id
+      and value.auth_user_id = target_auth_value;
+    if entitlement_value.entitlement_id is not null and (
+      entitlement_value.player_id is distinct from target_player_value
+      or entitlement_value.role <> 'DIRECTOR'
+    ) then
+      raise exception using errcode = '55000',
+        message = 'PRODUCTION_FUTURE_DIRECTOR_IDENTITY_CONFLICT';
+    end if;
+    changed_value := entitlement_value.entitlement_id is null
+      or entitlement_value.status <> 'ACTIVE'
+      or entitlement_value.revoked_at is not null;
+    if changed_value then
+      insert into production_control.director_entitlements (
+        auth_user_id, tournament_id, player_id, role, status,
+        granted_by, granted_at, revoked_at
+      ) values (
+        target_auth_value, target_id, target_player_value, 'DIRECTOR',
+        'ACTIVE', actor_player, pg_catalog.clock_timestamp(), null
+      ) on conflict (auth_user_id, tournament_id) do update set
+        player_id = excluded.player_id, role = 'DIRECTOR', status = 'ACTIVE',
+        granted_by = excluded.granted_by, granted_at = excluded.granted_at,
+        revoked_at = null;
+      select value.* into strict entitlement_value
+      from production_control.director_entitlements value
+      where value.tournament_id = target_id
+        and value.auth_user_id = target_auth_value;
+      insert into production_control.director_entitlement_events (
+        entitlement_id, action, actor, reason
+      ) values (
+        entitlement_value.entitlement_id, 'GRANTED', actor_player,
+        pg_catalog.btrim(input->>'reason')
+      );
+    end if;
+    role_changed := not exists (
+      select 1 from participant_identity.tournament_roles role_value
+      where role_value.tournament_id = target_id
+        and role_value.auth_user_id = target_auth_value
+        and role_value.role = 'DIRECTOR'
+        and role_value.role_active and role_value.revoked_at is null
+    );
+    insert into participant_identity.tournament_roles (
+      tournament_id, auth_user_id, role, role_active, role_revision,
+      granted_at, granted_by, revoked_at, revoked_by
+    ) values (
+      target_id, target_auth_value, 'DIRECTOR', true, 1,
+      pg_catalog.clock_timestamp(), actor_player, null, null
+    ) on conflict (tournament_id, auth_user_id, role) do update set
+      role_active = true,
+      role_revision = participant_identity.tournament_roles.role_revision +
+        case when participant_identity.tournament_roles.role_active
+          and participant_identity.tournament_roles.revoked_at is null
+          then 0 else 1 end,
+      granted_at = case when participant_identity.tournament_roles.role_active
+          and participant_identity.tournament_roles.revoked_at is null
+        then participant_identity.tournament_roles.granted_at
+        else pg_catalog.clock_timestamp() end,
+      granted_by = case when participant_identity.tournament_roles.role_active
+          and participant_identity.tournament_roles.revoked_at is null
+        then participant_identity.tournament_roles.granted_by
+        else actor_player end,
+      revoked_at = null, revoked_by = null,
+      updated_at = case when participant_identity.tournament_roles.role_active
+          and participant_identity.tournament_roles.revoked_at is null
+        then participant_identity.tournament_roles.updated_at
+        else pg_catalog.clock_timestamp() end;
+    changed_value := changed_value or role_changed;
+    next_revision := prior_revision + case when changed_value then 1 else 0 end;
+    if changed_value then
+      insert into production_control.future_tournament_director_governance_v1 (
+        tournament_id, governance_revision, updated_by_player_id,
+        updated_by_auth_user_id
+      ) values (
+        target_id, next_revision, actor_player, actor_auth
+      ) on conflict (tournament_id) do update set
+        governance_revision = excluded.governance_revision,
+        updated_by_player_id = excluded.updated_by_player_id,
+        updated_by_auth_user_id = excluded.updated_by_auth_user_id,
+        updated_at = pg_catalog.clock_timestamp();
+    end if;
+    target_kind := 'IDENTITY';
+    target_object := target_player_value;
+    safe_metadata := pg_catalog.jsonb_build_object(
+      'summary', 'Future tournament Director granted',
+      'playerId', target_player_value, 'role', 'DIRECTOR',
+      'identityChanged', false, 'membershipChanged', false
+    );
+    result_value := pg_catalog.jsonb_build_object(
+      'ok', true, 'code', 'PRODUCTION_FUTURE_DIRECTOR_GRANTED',
+      'action', action_value, 'tournamentId', target_id,
+      'targetPlayerId', target_player_value,
+      'priorRevision', prior_revision, 'nextRevision', next_revision,
+      'changed', changed_value, 'idempotent', false
+    );
+
+  elsif action_value = 'ADD_GLOBAL_COURSE' then
     select value.allocator_revision into strict prior_revision
     from production_control.global_course_id_allocator_v1 value
     where value.scope_key = 'BAGGER_INV_PRODUCTION' for update;
@@ -3902,6 +4145,7 @@ revoke all on table production_control.global_course_id_allocator_v1,
   production_control.future_runtime_promotions_v2,
   production_control.future_runtime_match_bindings_v2,
   production_control.future_annual_projection_bindings_v1,
+  production_control.future_tournament_director_governance_v1,
   production_control.future_annual_runtime_generations_v1,
   production_control.future_archive_plans_v1,
   production_control.future_runtime_operation_receipts_v2,

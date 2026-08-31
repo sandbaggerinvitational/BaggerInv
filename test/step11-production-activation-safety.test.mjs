@@ -210,6 +210,10 @@ test("Production Director activation uses current Auth claims and Production ent
     allowBootstrap: true,
     dependencies: {
       verifyClaims: async () => ({ status: "active", claims: { sub: authUserId } }),
+      readCurrentTournamentRuntime: async () => ({
+        tournamentId: "2026", tournamentYear: 2026, lifecycle: "ACTIVE",
+        status: "FROZEN_2026_RUNTIME", pointerRevision: 1,
+      }),
       readEntitlement: async (input) => { entitlementInput = input; return activeEntitlement(); },
       inspectPassport: async () => { passportInspections += 1; return { status: "active" }; },
     },

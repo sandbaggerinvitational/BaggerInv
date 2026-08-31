@@ -34,8 +34,12 @@ test("future-year panel wires the bounded runtime preparation and keeps archive 
   assert.match(panel, /assign-future-course/);
   assert.match(panel, /Hole \| Par \| Stroke index \| Yardage/);
   assert.match(panel, /Future Handicaps/);
+  assert.match(panel, /Future Tournament Director/);
+  assert.match(panel, /grant-future-director/);
+  assert.match(panel, /does not clone 2026 Director rights/);
   assert.match(panel, /Pairings & scoring snapshots/);
-  assert.match(panel, /Review activation/);
+  assert.match(panel, /Review transition preparation/);
+  assert.match(panel, /This panel never closes admission or commits the current pointer/);
   assert.match(panel, /Prepare archive plan/);
   assert.match(panel, /Archive execution unavailable/);
   assert.match(panel, /claimed and retried only by the certified worker/);

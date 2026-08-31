@@ -30,8 +30,10 @@ import {
   readPublishedOddsView,
 } from "../../../lib/published-odds-supabase.js";
 import { requirePublishedOddsReadSource } from "../../../lib/published-odds-read-source.js";
-import { loadProductionOddsCalculationInputs } from "../../../lib/production-odds-calculation-server.js";
-import { PRODUCTION_TOURNAMENT_ID } from "../../../lib/production-foundation-resource-contract.js";
+import {
+  loadProductionOddsCalculationInputs,
+  resolveProductionOddsRuntimeContext,
+} from "../../../lib/production-odds-calculation-server.js";
 
 export const dynamic = "force-dynamic";
 
@@ -164,11 +166,14 @@ async function readDirectorOddsProjectionState(preview) {
     error.status = 503;
     throw error;
   }
+  const runtimeContext = await resolveProductionOddsRuntimeContext();
+  const target = runtimeContext.runtime.tournamentId;
   const [inputs, published] = await Promise.all([
-      loadProductionOddsCalculationInputs(PRODUCTION_TOURNAMENT_ID),
+      loadProductionOddsCalculationInputs(target, { runtimeContext }),
       readPublishedOddsView({
-        tournamentId: PRODUCTION_TOURNAMENT_ID,
-        sourceWorkbookId: process.env.GOOGLE_SHEETS_ID,
+        tournamentId: target,
+        sourceWorkbookId: runtimeContext.googleDestination
+          ?.destinationWorkbookId || process.env.GOOGLE_SHEETS_ID,
       }, { env: process.env }),
   ]);
   if (!published.payload?.ok) {
@@ -192,6 +197,15 @@ async function setMatchesLiveAndOpenScoring(matches, updatedBy) {
 }
 
 export async function GET(request) {
+  // The legacy dashboard read is Google/2026-shaped. Production uses the
+  // pointer-aware /api/director/production-overview contract; fail closed here
+  // so a future-current Director can never receive a mixed-year legacy view.
+  if (String(process.env.VERCEL_ENV || "").trim().toLowerCase() === "production") {
+    return NextResponse.json({ error: "Not found." }, {
+      status: 404,
+      headers: { "Cache-Control": "private, no-store" },
+    });
+  }
   const trace = transactionTrace("dashboard-load");
   const authorization = await authorize(request);
   trace.stage("Identity verification", authorization.status === "active" ? "PASS" : "FAIL", authorization.status);
@@ -323,6 +337,7 @@ export async function POST(request) {
             recalculateCalcuttaAfterCanonicalMutation("", {
               calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}`,
               mutationKey: input.operationRequestId,
+              matchId: input.matchId,
             }),
           ]);
         } catch (error) {
@@ -429,6 +444,7 @@ export async function POST(request) {
           recalculateCalcuttaAfterCanonicalMutation("", {
             calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}`,
             mutationKey: input.operationRequestId,
+            matchId: input.matchId,
           }),
         ]);
       } catch (error) {

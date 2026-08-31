@@ -210,6 +210,14 @@ test("a Production control mirror uses the dedicated scope and checkpoints the c
     workerId,
     env: { VERCEL_ENV: "production" },
     dependencies: {
+      scoringDispatchContext: { contract: "test-certified-2026-worker-context" },
+      productionScoringDispatchGoogleResources: (context) => {
+        assert.equal(context.contract, "test-certified-2026-worker-context");
+        return {
+          googleWorkbookId: PRODUCTION_GOOGLE_WORKBOOK_ID,
+          supabaseProjectRef: PRODUCTION_SUPABASE_PROJECT_REF,
+        };
+      },
       claimGoogleOutbox: async () => ({ payload: {
         event: {
           id: "event-1",

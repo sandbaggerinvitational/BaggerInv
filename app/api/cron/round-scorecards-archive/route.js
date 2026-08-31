@@ -21,7 +21,12 @@ async function archiveOperation(request) {
   if (!authorized(request)) return NextResponse.json({ ok: false, code: "ARCHIVE_WORKER_UNAUTHORIZED" }, { status: 401 });
   const body = await request.json().catch(() => ({}));
   if (body.action === "reconcile") {
-    const result = await reconcileRoundScorecardsArchives({ tournamentId: body.tournamentId || "2026" });
+    const result = await reconcileRoundScorecardsArchives({
+      tournamentId: process.env.VERCEL_ENV === "production"
+        ? ""
+        : body.tournamentId || "2026",
+      env: process.env,
+    });
     return NextResponse.json(result, { status: result.ok ? 200 : 409 });
   }
   const result = await drainScorecardArchiveJobs({

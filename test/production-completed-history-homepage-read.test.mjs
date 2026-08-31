@@ -192,7 +192,7 @@ test("Production completed History rejects Preview transport contamination befor
   });
 });
 
-test("Homepage completed-history composition uses only the Production reader and exposes every certified year to the render branch", async () => {
+test("Homepage completed-history composition keeps explicit 2026 history while current presentation follows the Production pointer", async () => {
   const observed = runServerScript(`
     const { loadCompletedHistoryYears } = await import(${JSON.stringify(completedHistoryServiceModule)});
     const env = ${JSON.stringify(productionEnv)};
@@ -280,7 +280,15 @@ test("Homepage completed-history composition uses only the Production reader and
   assert.ok(renderStart >= 0 && renderEnd > renderStart);
   assert.match(
     page.slice(supabaseBranchStart, googleBranchStart),
-    /tournaments = \[\.\.\.completed\.tournaments, currentTournament\]/,
+    /readProductionCurrentTournamentRuntime/,
+  );
+  assert.match(
+    page.slice(supabaseBranchStart, googleBranchStart),
+    /tournaments = \[\.\.\.completed\.tournaments, history2026\]/,
+  );
+  assert.match(
+    page.slice(supabaseBranchStart, googleBranchStart),
+    /currentTournamentContext\?\.tournamentId === "2026"/,
   );
   assert.match(page.slice(renderStart, renderEnd), /tournaments\.map/);
   assert.match(page.slice(renderStart, renderEnd), /tournament\.year/);
