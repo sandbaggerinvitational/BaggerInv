@@ -1,0 +1,369 @@
+{
+  "fixtureVersion": 1,
+  "synthetic": true,
+  "contractFamily": "mobile-v1-participant-content",
+  "description": "Deterministic synthetic scenario inventory for the six Step 2I.1 participant-content read contracts.",
+  "products": [
+    {
+      "productId": "passport",
+      "endpoint": "GET /api/mobile/v1/passport",
+      "schema": "passport.schema.json",
+      "scenarios": [
+        {
+          "scenarioId": "passport-veteran",
+          "covers": ["veteran"],
+          "entityIds": ["fx-passport-player-veteran", "fx-passport-record-veteran", "fx-passport-season-veteran"],
+          "fragment": {
+            "player": { "playerId": "fx-passport-player-veteran", "displayName": "Synthetic Veteran" },
+            "career": {
+              "summary": { "appearances": 12, "championships": 2 },
+              "recordsHeld": [{ "recordId": "fx-passport-record-veteran", "title": "Synthetic consecutive-match record" }],
+              "captainLegacy": { "seasons": [{ "year": 2024, "result": "Synthetic finalist" }] }
+            }
+          }
+        },
+        {
+          "scenarioId": "passport-new-player",
+          "covers": ["new-player"],
+          "entityIds": ["fx-passport-player-new"],
+          "fragment": {
+            "player": { "playerId": "fx-passport-player-new", "displayName": "Synthetic Rookie", "careerYears": [] },
+            "career": { "tournamentHistory": [], "formatPerformance": [], "recordsHeld": [], "topPartners": [] }
+          }
+        },
+        {
+          "scenarioId": "passport-no-records",
+          "covers": ["no-records"],
+          "entityIds": ["fx-passport-player-no-records"],
+          "fragment": {
+            "player": { "playerId": "fx-passport-player-no-records", "displayName": "Synthetic Steady Golfer" },
+            "career": { "recordsHeld": [] }
+          }
+        },
+        {
+          "scenarioId": "passport-no-captain",
+          "covers": ["no-captain"],
+          "entityIds": ["fx-passport-player-no-captain"],
+          "fragment": {
+            "player": { "playerId": "fx-passport-player-no-captain", "displayName": "Synthetic Non-Captain" },
+            "career": { "captainLegacy": { "championships": 0, "seasons": [] } }
+          }
+        },
+        {
+          "scenarioId": "passport-long-history",
+          "covers": ["long-history"],
+          "entityIds": ["fx-passport-player-long-history", "fx-passport-tournament-first", "fx-passport-tournament-latest"],
+          "expectations": {
+            "historyYears": [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+          },
+          "fragment": {
+            "player": { "playerId": "fx-passport-player-long-history", "displayName": "Synthetic Long-Career Golfer" },
+            "career": {
+              "tournamentHistory": [
+                { "tournamentId": "fx-passport-tournament-first", "year": 2009 },
+                { "tournamentId": "fx-passport-tournament-latest", "year": 2026 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "productId": "guide",
+      "endpoint": "GET /api/mobile/v1/guide",
+      "schema": "guide.schema.json",
+      "scenarios": [
+        {
+          "scenarioId": "guide-populated",
+          "covers": ["populated"],
+          "entityIds": ["fx-guide-section-welcome", "fx-guide-rule-one", "fx-guide-course-alpha", "fx-guide-dining-one", "fx-guide-local-one", "fx-guide-contact-one"],
+          "fragment": {
+            "publicationState": "PUBLISHED",
+            "overview": [{ "sectionId": "fx-guide-section-welcome", "title": "Synthetic Welcome" }],
+            "rules": { "items": [{ "ruleId": "fx-guide-rule-one", "title": "Synthetic Rule" }] },
+            "courses": [{ "courseId": "fx-guide-course-alpha", "name": "Example Course Alpha" }],
+            "dining": [{ "diningId": "fx-guide-dining-one", "meal": "Synthetic Dinner" }],
+            "localGuide": [{ "entryId": "fx-guide-local-one", "title": "Synthetic Island Activity" }],
+            "contacts": [{
+              "contactId": "fx-guide-contact-one",
+              "name": "Synthetic Concierge",
+              "phone": "+1 (555) 010-0001",
+              "email": "concierge@example.invalid",
+              "website": "https://help.example.invalid/"
+            }]
+          }
+        },
+        {
+          "scenarioId": "guide-withdrawn",
+          "covers": ["withdrawn"],
+          "entityIds": ["fx-guide-withdrawn-state"],
+          "fragment": {
+            "publicationState": "UNPUBLISHED",
+            "publishedAt": null,
+            "tournament": null,
+            "overview": [],
+            "rules": { "roundFormats": [], "items": [] },
+            "courses": [],
+            "dining": [],
+            "localGuide": [],
+            "contacts": []
+          }
+        },
+        {
+          "scenarioId": "guide-long-rules",
+          "covers": ["long-rules"],
+          "entityIds": ["fx-guide-rule-long"],
+          "expectations": { "minimumRuleCharacters": 512 },
+          "fragment": {
+            "rules": { "items": [{ "ruleId": "fx-guide-rule-long", "title": "Synthetic Extended Rule", "body": "Synthetic long-form rule content for native layout validation. Synthetic long-form rule content for native layout validation. Synthetic long-form rule content for native layout validation. Synthetic long-form rule content for native layout validation. Synthetic long-form rule content for native layout validation. Synthetic long-form rule content for native layout validation. Synthetic long-form rule content for native layout validation. Synthetic long-form rule content for native layout validation. Syntheti" }] }
+          }
+        },
+        {
+          "scenarioId": "guide-multiple-courses",
+          "covers": ["multiple-courses"],
+          "entityIds": ["fx-guide-course-bravo", "fx-guide-course-charlie", "fx-guide-course-delta"],
+          "fragment": {
+            "courses": [
+              { "courseId": "fx-guide-course-bravo", "name": "Example Course Bravo" },
+              { "courseId": "fx-guide-course-charlie", "name": "Example Course Charlie" },
+              { "courseId": "fx-guide-course-delta", "name": "Example Course Delta" }
+            ]
+          }
+        },
+        {
+          "scenarioId": "guide-missing-optional-actions",
+          "covers": ["missing-optional-actions"],
+          "entityIds": ["fx-guide-contact-no-actions", "fx-guide-local-no-actions"],
+          "fragment": {
+            "contacts": [{ "contactId": "fx-guide-contact-no-actions", "name": "Synthetic Information Desk", "phone": null, "email": null, "website": null }],
+            "localGuide": [{ "entryId": "fx-guide-local-no-actions", "title": "Synthetic Scenic Walk", "phone": null, "website": null }]
+          }
+        }
+      ]
+    },
+    {
+      "productId": "history",
+      "endpoint": "GET /api/mobile/v1/history",
+      "schema": "history.schema.json",
+      "scenarios": [
+        {
+          "scenarioId": "history-current",
+          "covers": ["current"],
+          "entityIds": ["fx-history-current-tournament"],
+          "fragment": {
+            "tournaments": [{
+              "tournamentId": "fx-history-current-tournament",
+              "year": 2026,
+              "name": "Synthetic Current Invitational",
+              "status": "inProgress",
+              "champion": null,
+              "runnerUp": null,
+              "finalScore": null,
+              "detailAvailable": true
+            }]
+          }
+        },
+        {
+          "scenarioId": "history-completed",
+          "covers": ["completed"],
+          "entityIds": ["fx-history-completed-tournament", "fx-history-champion-team", "fx-history-runner-up-team"],
+          "fragment": {
+            "tournaments": [{
+              "tournamentId": "fx-history-completed-tournament",
+              "year": 2025,
+              "name": "Synthetic Completed Invitational",
+              "status": "final",
+              "champion": { "teamId": "fx-history-champion-team", "name": "Synthetic Team North", "side": 1, "points": 8.5 },
+              "runnerUp": { "teamId": "fx-history-runner-up-team", "name": "Synthetic Team South", "side": 2, "points": 7.5 },
+              "finalScore": { "teamOnePoints": 8.5, "teamTwoPoints": 7.5, "label": "8½ – 7½" },
+              "detailAvailable": true
+            }]
+          }
+        },
+        {
+          "scenarioId": "history-many-years",
+          "covers": ["many-years"],
+          "entityIds": ["fx-history-many-years-archive", "fx-history-archive-first", "fx-history-archive-latest"],
+          "expectations": {
+            "archiveYears": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+          },
+          "fragment": {
+            "tournaments": [
+              { "tournamentId": "fx-history-archive-first", "year": 2017, "status": "final" },
+              { "tournamentId": "fx-history-archive-latest", "year": 2026, "status": "inProgress" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "productId": "historyDetail",
+      "endpoint": "GET /api/mobile/v1/history/{year}",
+      "schema": "history-detail.schema.json",
+      "scenarios": [
+        {
+          "scenarioId": "history-detail-bounded",
+          "covers": ["bounded-detail"],
+          "entityIds": ["fx-history-detail-tournament", "fx-history-detail-team-one", "fx-history-detail-team-two", "fx-history-detail-round-one", "fx-history-detail-match-one"],
+          "expectations": { "maximumTeams": 2, "maximumRounds": 8, "maximumMatches": 64, "maximumStandings": 128, "maximumAwards": 64, "maximumScorecards": 256 },
+          "fragment": {
+            "tournament": { "tournamentId": "fx-history-detail-tournament", "year": 2025, "status": "final" },
+            "teams": [{ "teamId": "fx-history-detail-team-one" }, { "teamId": "fx-history-detail-team-two" }],
+            "rounds": [{ "roundNumber": 1, "matchIds": ["fx-history-detail-match-one"] }],
+            "matches": [{ "matchId": "fx-history-detail-match-one", "scorecardIds": [] }],
+            "standings": [],
+            "awards": [],
+            "scorecards": []
+          }
+        },
+        {
+          "scenarioId": "history-detail-no-scorecard",
+          "covers": ["no-scorecard"],
+          "entityIds": ["fx-history-detail-no-scorecard-tournament", "fx-history-detail-no-scorecard-match"],
+          "fragment": {
+            "tournament": { "tournamentId": "fx-history-detail-no-scorecard-tournament", "year": 2012, "status": "final" },
+            "matches": [{ "matchId": "fx-history-detail-no-scorecard-match", "scorecardIds": [] }],
+            "scorecards": []
+          }
+        }
+      ]
+    },
+    {
+      "productId": "records",
+      "endpoint": "GET /api/mobile/v1/records",
+      "schema": "records.schema.json",
+      "scenarios": [
+        {
+          "scenarioId": "records-single-holder",
+          "covers": ["single-holder"],
+          "entityIds": ["fx-records-category-single", "fx-records-record-single", "fx-records-player-single"],
+          "fragment": {
+            "categories": [{
+              "categoryId": "fx-records-category-single",
+              "title": "Synthetic Career Records",
+              "records": [{
+                "recordId": "fx-records-record-single",
+                "title": "Synthetic most points",
+                "tied": false,
+                "holders": [{ "entityType": "PLAYER", "playerIds": ["fx-records-player-single"], "displayName": "Synthetic Holder One" }]
+              }]
+            }]
+          }
+        },
+        {
+          "scenarioId": "records-tied-holders",
+          "covers": ["tied-holders"],
+          "entityIds": ["fx-records-category-tie", "fx-records-record-tie", "fx-records-player-tie-one", "fx-records-player-tie-two"],
+          "fragment": {
+            "categories": [{
+              "categoryId": "fx-records-category-tie",
+              "records": [{
+                "recordId": "fx-records-record-tie",
+                "title": "Synthetic tied low round",
+                "tied": true,
+                "holders": [
+                  { "entityType": "PLAYER", "playerIds": ["fx-records-player-tie-one"], "displayName": "Synthetic Holder Alpha" },
+                  { "entityType": "PLAYER", "playerIds": ["fx-records-player-tie-two"], "displayName": "Synthetic Holder Bravo" }
+                ]
+              }]
+            }]
+          }
+        },
+        {
+          "scenarioId": "records-multiple-categories",
+          "covers": ["multiple-categories"],
+          "entityIds": ["fx-records-category-career", "fx-records-category-course", "fx-records-category-match"],
+          "fragment": {
+            "categories": [
+              { "categoryId": "fx-records-category-career", "title": "Synthetic Career" },
+              { "categoryId": "fx-records-category-course", "title": "Synthetic Course" },
+              { "categoryId": "fx-records-category-match", "title": "Synthetic Match" }
+            ]
+          }
+        },
+        {
+          "scenarioId": "records-empty",
+          "covers": ["empty"],
+          "entityIds": ["fx-records-empty-state"],
+          "fragment": { "coverage": { "tournamentCount": 0 }, "categories": [] }
+        },
+        {
+          "scenarioId": "records-long-content",
+          "covers": ["long-content"],
+          "entityIds": ["fx-records-category-long", "fx-records-record-long", "fx-records-player-long"],
+          "expectations": { "minimumTitleCharacters": 180, "minimumHolderNameCharacters": 120 },
+          "fragment": {
+            "categories": [{
+              "categoryId": "fx-records-category-long",
+              "records": [{
+                "recordId": "fx-records-record-long",
+                "title": "Synthetic record title for deterministic long-content validation. Synthetic record title for deterministic long-content validation. Synthetic record title for deterministic long-co",
+                "holders": [{ "playerIds": ["fx-records-player-long"], "displayName": "Synthetic Long Holder Name for Layout Validation Synthetic Long Holder Name for Layout Validation Synthetic Long Holder " }]
+              }]
+            }]
+          }
+        }
+      ]
+    },
+    {
+      "productId": "odds",
+      "endpoint": "GET /api/mobile/v1/odds",
+      "schema": "odds.schema.json",
+      "scenarios": [
+        {
+          "scenarioId": "odds-published",
+          "covers": ["published"],
+          "entityIds": ["fx-odds-team-published", "fx-odds-player-published"],
+          "fragment": {
+            "publication": { "state": "PUBLISHED", "revision": 7, "publishedAt": "2026-08-30T12:00:00.000Z", "currentPhase": "Pre-Tournament" },
+            "snapshots": [{
+              "phase": "Pre-Tournament",
+              "teams": [{ "teamId": "fx-odds-team-published", "name": "Synthetic Team East", "probability": 52.5, "americanOdds": "+110" }],
+              "players": [{ "rank": 1, "playerId": "fx-odds-player-published", "displayName": "Synthetic Odds Leader", "probability": 18.5, "americanOdds": "+440" }]
+            }]
+          }
+        },
+        {
+          "scenarioId": "odds-unpublished",
+          "covers": ["unpublished"],
+          "entityIds": ["fx-odds-unpublished-state"],
+          "fragment": {
+            "publication": { "state": "UNPUBLISHED", "revision": 0, "publishedAt": null, "currentPhase": null },
+            "snapshots": []
+          }
+        },
+        {
+          "scenarioId": "odds-long-names",
+          "covers": ["long-names"],
+          "entityIds": ["fx-odds-player-long-name"],
+          "expectations": { "minimumPlayerNameCharacters": 160 },
+          "fragment": {
+            "snapshots": [{ "players": [{ "rank": 12, "playerId": "fx-odds-player-long-name", "displayName": "Synthetic Long Odds Participant Name for Layout Validation Synthetic Long Odds Participant Name for Layout Validation Synthetic Long Odds Participant Name for L" }] }]
+          }
+        },
+        {
+          "scenarioId": "odds-tied-ranks",
+          "covers": ["tied-ranks"],
+          "entityIds": ["fx-odds-player-tie-one", "fx-odds-player-tie-two"],
+          "fragment": {
+            "snapshots": [{ "players": [
+              { "rank": 3, "playerId": "fx-odds-player-tie-one", "displayName": "Synthetic Odds Tie Alpha", "probability": 10, "americanOdds": "+900" },
+              { "rank": 3, "playerId": "fx-odds-player-tie-two", "displayName": "Synthetic Odds Tie Bravo", "probability": 10, "americanOdds": "+900" }
+            ] }]
+          }
+        },
+        {
+          "scenarioId": "odds-edge-values",
+          "covers": ["edge-values"],
+          "entityIds": ["fx-odds-player-zero", "fx-odds-player-hundred"],
+          "fragment": {
+            "snapshots": [{ "players": [
+              { "rank": 31, "playerId": "fx-odds-player-zero", "displayName": "Synthetic Zero Boundary", "probability": 0, "americanOdds": "+100000" },
+              { "rank": 1, "playerId": "fx-odds-player-hundred", "displayName": "Synthetic Hundred Boundary", "probability": 100, "americanOdds": "-100000" }
+            ] }]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -265,6 +265,54 @@ The canonical domain revision is `calcutta-v1:<configuration-revision>:<auction-
 
 This endpoint and `calcutta.schema.json` define one environment-compatible participant DTO. Isolated Preview now serves it through Preview-only canonical authority. The repository-wide mobile authority and health contract still leave Production mobile fail-closed. Serving this endpoint from Production remains a separate, explicitly authorized Production-native milestone.
 
+## Participant content routes
+
+The participant-content family provides bounded native projections for the More experience. Every route is a protected mobile read: it requires the verified Supabase Bearer session plus `X-Bagger-Certification`, resolves the canonical Player and active tournament membership on the server, and accepts no client-selected Player, tournament, publication, or authority. Isolated Preview reads only Preview Supabase and published Guide authority; there is no Preview-to-Production, Google, rendered-PWA, or Passport-cookie fallback. Production mobile remains disabled by the repository-wide authority gate.
+
+All six representations use `Cache-Control: private, no-cache`, `Vary: Authorization, X-Bagger-Certification`, a deterministic strong `ETag`, and `304` revalidation. `meta.generatedAt` is not part of the representation fingerprint. Native may retain an identity/tournament-partitioned private read cache, but a newer canonical response always replaces the prior representation. In particular, a publication withdrawal cannot be overridden by stale published content.
+
+### `GET /passport`
+
+Returns the Passport for the authenticated canonical Player only. The route does not accept `playerId`. It combines the existing Leaderboards Core current-tournament projection with the existing canonical secondary-history, historical-statistics, Player-intelligence, draft, and corrected record-holder authorities. The completed career source is delivered to the adapter as one bounded 2017–2025 bundle plus the current 2026 projection; the route does not issue one external request per year.
+
+The response includes canonical Player/team identity, current tournament record/standing/handicap and Round performance, career summary and honors, rankings, aggregate scoring and Match-progression profiles, Tournament History, BB/SC/SI performance and bounded Match history, Records Held, Captain Legacy, Biggest Rival, Draft History, and Top Partners. “Hole-by-Hole” is the canonical aggregate career scoring profile currently exposed by the PWA, not a newly invented 18-hole historical engine. Raw scorecards, Auth UUID, email, phone, diagnostics, web navigation fields, and client-selected identity are excluded. The complete participant representation is capped at 128 KiB and all nested collections are contract-bounded. `passport.schema.json` is the authoritative DTO.
+
+### `GET /guide`
+
+Returns the current published participant Guide as structured native content. Schedule is deliberately excluded because `/schedule` remains its sole mobile authority. A published response contains tournament identity, overview sections, structured Rules and Round formats, current Courses and their exact canonical 18-hole tee assignments, Dining, Local Guide, and participant-safe Important Contacts. Safe external-action values are plain email/phone/HTTPS source values; stable repository asset references are relative allowlisted asset keys. The response contains no HTML execution surface, Director controls, publication controls, private notes, or arbitrary URL schemes.
+
+`publicationState` is `PUBLISHED` or `UNPUBLISHED`. The canonical no-publication result is a successful `UNPUBLISHED` representation with `publishedAt` and tournament set to `null` and every content collection empty. Transient/corrupt authority failures remain errors and are never disguised as withdrawal. A `PUBLISHED` to `UNPUBLISHED` transition changes the representation ETag and hides the prior published body. `guide.schema.json` is the authoritative DTO.
+
+The complete Guide representation is capped at 768 KiB in addition to its per-section bounds.
+
+### `GET /history`
+
+Returns a bounded archive summary in canonical descending year order. Each item contains tournament identity/context, lifecycle, the two canonical teams and points, champion/runner-up when final, final score when known, detail availability, and revision. The current tournament remains `inProgress` or `upcoming` until canonical authority declares it final; the adapter never fabricates a champion. The completed-year archive is read as one server aggregate.
+
+### `GET /history/[year]`
+
+Returns one bounded canonical tournament detail for a supported year (currently 2017–2026). The response contains team/roster facts, Round results, Match summaries, Player standings, awards, and available verified historical scorecard projections. Scorecards are optional historical authority, not reconstructed from unrelated mobile data. Unsafe or unsupported year shapes fail closed. `history.schema.json` and `history-detail.schema.json` define the archive and detail representations.
+
+Archive and one-year detail representations are capped at 256 KiB and 1 MiB respectively.
+
+### `GET /records`
+
+Returns the participant-facing global Records catalog grouped in canonical order. It uses the corrected canonical record-holder authority over existing all-time, verified scorecard, and Match-progression records. Each record contains its stable ID/title, direction/unit/presentation value, eligibility context, tied state, and the complete bounded holder set with canonical Player IDs where available. Passport `recordsHeld` is only the authenticated Player subset; `/records` is the global catalog. Native must not detect records or match holders by display name. `records.schema.json` is authoritative.
+
+The complete Records representation is capped at 512 KiB; a canonical empty catalog is a valid response.
+
+### `GET /odds`
+
+Returns only the canonical published Championship Odds snapshots already approved for participants. The mobile adapter does not calculate probability, American odds, expected points, expected record, ranking, or average finish. It validates and bounds the stored snapshots in canonical phase order.
+
+`publication.state` is `UNPUBLISHED` or `PUBLISHED`. `UNPUBLISHED` always has `publishedAt: null`, `currentPhase: null`, and an empty `snapshots` array, even if a prior publication existed. The Preview publication ledger is service-only and explicit; revocation increments its revision and therefore changes the representation ETag. `PUBLISHED` contains only verified stored snapshots and identifies exactly one current phase. Model inputs, Director controls, job state, engine diagnostics, and unpublished payloads are excluded. `odds.schema.json` is authoritative.
+
+The complete Odds representation is capped at 256 KiB.
+
+### Preview participant-content authority
+
+Migration `202608300002_preview_mobile_participant_content_v1.sql` adds one service-role-only Preview reader for bounded History/career bundles and Odds, plus an RLS-protected Odds publication ledger and service-only publication operation. It grants no `anon` or `authenticated` table/RPC access. Guide remains backed by the existing immutable published Guide projection; Passport and Records reuse existing canonical career services. Native never calls Supabase tables or these internal RPCs directly.
+
 ## Date and time
 
 - Calendar dates are `YYYY-MM-DD`.

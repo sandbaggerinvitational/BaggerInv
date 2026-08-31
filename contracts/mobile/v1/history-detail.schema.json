@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:history-detail",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tournament", "teams", "rounds", "matches", "standings", "awards", "scorecards"],
+      "properties": {
+        "tournament": { "$ref": "history.schema.json#/$defs/tournamentSummary" },
+        "teams": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/team" } },
+        "rounds": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/round" } },
+        "matches": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/match" } },
+        "standings": { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/standing" } },
+        "awards": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/award" } },
+        "scorecards": { "type": "array", "maxItems": 256, "items": { "$ref": "#/$defs/scorecard" } }
+      }
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  },
+  "$defs": {
+    "playerRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "displayName"],
+      "properties": {
+        "playerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "rosterPlayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "displayName", "handicap", "isCaptain"],
+      "properties": {
+        "playerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "handicap": { "type": ["number", "null"] },
+        "isCaptain": { "type": "boolean" }
+      }
+    },
+    "team": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["teamId", "name", "side", "points", "captain", "averageHandicap", "roster"],
+      "properties": {
+        "teamId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "side": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "points": { "type": ["number", "null"] },
+        "captain": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/playerRef" }] },
+        "averageHandicap": { "type": ["number", "null"] },
+        "roster": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/rosterPlayer" } }
+      }
+    },
+    "course": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["courseId", "name", "location", "tee", "par", "yardage"],
+      "properties": {
+        "courseId": { "type": ["string", "null"], "maxLength": 128 },
+        "name": { "type": ["string", "null"], "maxLength": 160 },
+        "location": { "type": ["string", "null"], "maxLength": 240 },
+        "tee": { "type": ["string", "null"], "maxLength": 80 },
+        "par": { "type": ["number", "null"] },
+        "yardage": { "type": ["number", "null"] }
+      }
+    },
+    "round": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roundNumber", "name", "status", "format", "course", "teamStandings", "matchIds"],
+      "properties": {
+        "roundNumber": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "status": { "enum": ["upcoming", "inProgress", "final"] },
+        "format": { "type": ["string", "null"], "maxLength": 16 },
+        "course": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/course" }] },
+        "teamStandings": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "history.schema.json#/$defs/teamResult" } },
+        "matchIds": { "type": "array", "maxItems": 32, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" } }
+      }
+    },
+    "side": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["side", "participants"],
+      "properties": {
+        "side": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "participants": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/playerRef" } }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "winner", "teamOnePoints", "teamTwoPoints"],
+      "properties": {
+        "summary": { "type": ["string", "null"], "maxLength": 240 },
+        "winner": { "type": ["string", "null"], "maxLength": 160 },
+        "teamOnePoints": { "type": ["number", "null"] },
+        "teamTwoPoints": { "type": ["number", "null"] }
+      }
+    },
+    "match": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matchId", "matchNumber", "status", "format", "course", "sides", "result", "scorecardIds"],
+      "properties": {
+        "matchId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "matchNumber": { "type": ["integer", "null"], "minimum": 1, "maximum": 32 },
+        "status": { "enum": ["upcoming", "inProgress", "final"] },
+        "format": { "type": ["string", "null"], "maxLength": 16 },
+        "course": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/course" }] },
+        "sides": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/side" } },
+        "result": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/result" }] },
+        "scorecardIds": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } }
+      }
+    },
+    "standing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rank", "playerId", "displayName", "teamName", "points", "wins", "losses", "ties"],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1, "maximum": 128 },
+        "playerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "teamName": { "type": ["string", "null"], "maxLength": 160 },
+        "points": { "type": ["number", "null"] },
+        "wins": { "type": ["number", "null"] },
+        "losses": { "type": ["number", "null"] },
+        "ties": { "type": ["number", "null"] }
+      }
+    },
+    "award": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["awardId", "title", "recipient", "playerId"],
+      "properties": {
+        "awardId": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "recipient": { "type": ["string", "null"], "maxLength": 160 },
+        "playerId": { "type": ["string", "null"], "maxLength": 128 }
+      }
+    },
+    "hole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["holeNumber", "grossScore", "par", "strokeIndex", "strokesReceived", "netScore"],
+      "properties": {
+        "holeNumber": { "type": ["integer", "null"], "minimum": 1, "maximum": 18 },
+        "grossScore": { "type": ["integer", "null"], "minimum": 1, "maximum": 20 },
+        "par": { "type": ["integer", "null"], "minimum": 3, "maximum": 6 },
+        "strokeIndex": { "type": ["integer", "null"], "minimum": 1, "maximum": 18 },
+        "strokesReceived": { "type": ["integer", "null"], "minimum": 0, "maximum": 6 },
+        "netScore": { "type": ["integer", "null"], "minimum": -5, "maximum": 20 }
+      }
+    },
+    "scorecard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scorecardId", "matchId", "entityType", "playerId", "teamId", "participantPlayerIds", "status", "grossTotal", "netTotal", "holes"],
+      "properties": {
+        "scorecardId": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "matchId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "entityType": { "enum": ["INDIVIDUAL", "TEAM"] },
+        "playerId": { "type": ["string", "null"], "maxLength": 128 },
+        "teamId": { "type": ["string", "null"], "maxLength": 128 },
+        "participantPlayerIds": { "type": "array", "maxItems": 4, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" } },
+        "status": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "grossTotal": { "type": ["number", "null"] },
+        "netTotal": { "type": ["number", "null"] },
+        "holes": { "type": "array", "maxItems": 18, "items": { "$ref": "#/$defs/hole" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,460 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:passport",
+  "title": "Bagger Mobile API v1 authenticated Player Passport response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractVersion", "player", "currentTournament", "career"],
+      "properties": {
+        "contractVersion": { "const": "mobile-passport-v1" },
+        "player": { "$ref": "#/$defs/player" },
+        "currentTournament": { "$ref": "#/$defs/currentTournament" },
+        "career": { "$ref": "#/$defs/career" }
+      }
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "nullableNumber": { "type": ["number", "null"] },
+    "nullableNonNegativeNumber": { "type": ["number", "null"], "minimum": 0 },
+    "nullableInteger": { "type": ["integer", "null"] },
+    "nullablePositiveInteger": { "type": ["integer", "null"], "minimum": 1 },
+    "year": { "type": "integer", "minimum": 2000, "maximum": 2200 },
+    "nullableYear": { "type": ["integer", "null"], "minimum": 2000, "maximum": 2200 },
+    "team": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["teamId", "name", "side"],
+      "properties": {
+        "teamId": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/id" }]
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "side": { "type": ["integer", "null"], "minimum": 1, "maximum": 2 }
+      }
+    },
+    "playerReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "displayName"],
+      "properties": {
+        "playerId": { "$ref": "#/$defs/id" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wins", "losses", "halves", "matches", "points", "recordedPointMatches"],
+      "properties": {
+        "wins": { "type": "integer", "minimum": 0 },
+        "losses": { "type": "integer", "minimum": 0 },
+        "halves": { "type": "integer", "minimum": 0 },
+        "matches": { "type": "integer", "minimum": 0 },
+        "points": { "$ref": "#/$defs/nullableNumber" },
+        "recordedPointMatches": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "segmentRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["won", "lost", "halved"],
+      "properties": {
+        "won": { "type": "integer", "minimum": 0 },
+        "lost": { "type": "integer", "minimum": 0 },
+        "halved": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "displayName", "active", "careerYears", "portraitAssetKey", "team"],
+      "properties": {
+        "playerId": { "$ref": "#/$defs/id" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "active": { "const": true },
+        "careerYears": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["firstYear", "lastYear", "current"],
+          "properties": {
+            "firstYear": { "$ref": "#/$defs/nullableYear" },
+            "lastYear": { "$ref": "#/$defs/nullableYear" },
+            "current": { "type": "boolean" }
+          }
+        },
+        "portraitAssetKey": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._'-]{0,127}$"
+            }
+          ]
+        },
+        "team": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/team" }] }
+      }
+    },
+    "currentTournamentRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wins", "losses", "halves", "points"],
+      "properties": {
+        "wins": { "type": "integer", "minimum": 0 },
+        "losses": { "type": "integer", "minimum": 0 },
+        "halves": { "type": "integer", "minimum": 0 },
+        "points": { "type": "number" }
+      }
+    },
+    "currentRound": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "roundNumber", "format", "status", "throughHole", "holesPlayed", "scoringEntity",
+        "gross", "net", "rank", "tied", "points"
+      ],
+      "properties": {
+        "roundNumber": { "type": "integer", "minimum": 1 },
+        "format": { "enum": ["BB", "SC", "SI"] },
+        "status": { "enum": ["scheduled", "inProgress", "completed"] },
+        "throughHole": { "type": ["integer", "null"], "minimum": 1, "maximum": 18 },
+        "holesPlayed": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "scoringEntity": { "enum": ["player", "team"] },
+        "gross": { "$ref": "#/$defs/nullableNumber" },
+        "net": { "$ref": "#/$defs/nullableNumber" },
+        "rank": { "$ref": "#/$defs/nullablePositiveInteger" },
+        "tied": { "type": "boolean" },
+        "points": { "$ref": "#/$defs/nullableNumber" }
+      }
+    },
+    "currentTournament": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tournamentId", "name", "year", "status", "currentRound", "tournamentHandicap",
+        "team", "record", "standing", "teamStanding", "rounds"
+      ],
+      "properties": {
+        "tournamentId": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "year": { "$ref": "#/$defs/nullableYear" },
+        "status": { "type": ["string", "null"], "maxLength": 64 },
+        "currentRound": { "$ref": "#/$defs/nullablePositiveInteger" },
+        "tournamentHandicap": { "$ref": "#/$defs/nullableNumber" },
+        "team": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/team" }] },
+        "record": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/currentTournamentRecord" }] },
+        "standing": { "$ref": "#/$defs/nullablePositiveInteger" },
+        "teamStanding": { "$ref": "#/$defs/nullablePositiveInteger" },
+        "rounds": { "type": "array", "maxItems": 18, "items": { "$ref": "#/$defs/currentRound" } }
+      }
+    },
+    "careerSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record", "winPercentage", "appearances", "championships", "runnerUpFinishes", "averageHandicap"
+      ],
+      "properties": {
+        "record": { "$ref": "#/$defs/record" },
+        "winPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+        "appearances": { "type": "integer", "minimum": 0 },
+        "championships": { "type": "integer", "minimum": 0 },
+        "runnerUpFinishes": { "type": "integer", "minimum": 0 },
+        "averageHandicap": { "$ref": "#/$defs/nullableNumber" }
+      }
+    },
+    "honors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "championshipYears", "sandbaggerOfYearYears", "pointsChampionYears",
+        "boardOfGovernors", "handicapCommittee"
+      ],
+      "properties": {
+        "championshipYears": { "$ref": "#/$defs/yearArray" },
+        "sandbaggerOfYearYears": { "$ref": "#/$defs/yearArray" },
+        "pointsChampionYears": { "$ref": "#/$defs/yearArray" },
+        "boardOfGovernors": { "type": "boolean" },
+        "handicapCommittee": { "type": "boolean" }
+      }
+    },
+    "yearArray": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/year" }
+    },
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric", "rank"],
+      "properties": {
+        "metric": {
+          "enum": ["careerPoints", "matchWins", "winPercentage", "holeDifferential", "birdies", "averageGross"]
+        },
+        "rank": { "$ref": "#/$defs/nullablePositiveInteger" }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completeScorecards", "scoringHoles", "matchPlayHoles"],
+      "properties": {
+        "completeScorecards": { "type": "integer", "minimum": 0 },
+        "scoringHoles": { "type": "integer", "minimum": 0 },
+        "matchPlayHoles": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "holePerformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample", "totalHolesPlayed", "holesWon", "holesLost", "holesHalved", "holeDifferential",
+        "frontNineHolesWon", "backNineHolesWon", "closingHolesWon", "birdies", "eagles", "pars",
+        "bogeys", "doubleBogeysOrWorse", "averageGrossScore", "averageNetScore", "averagePar3Score",
+        "averagePar4Score", "averagePar5Score", "averageFrontNineScore", "averageBackNineScore",
+        "birdieRate", "parRate", "bogeyRate", "doubleBogeyOrWorseRate"
+      ],
+      "properties": {
+        "sample": { "$ref": "#/$defs/sample" },
+        "totalHolesPlayed": { "type": "integer", "minimum": 0 },
+        "holesWon": { "type": "integer", "minimum": 0 },
+        "holesLost": { "type": "integer", "minimum": 0 },
+        "holesHalved": { "type": "integer", "minimum": 0 },
+        "holeDifferential": { "type": "integer" },
+        "frontNineHolesWon": { "type": "integer", "minimum": 0 },
+        "backNineHolesWon": { "type": "integer", "minimum": 0 },
+        "closingHolesWon": { "type": "integer", "minimum": 0 },
+        "birdies": { "type": "integer", "minimum": 0 },
+        "eagles": { "type": "integer", "minimum": 0 },
+        "pars": { "type": "integer", "minimum": 0 },
+        "bogeys": { "type": "integer", "minimum": 0 },
+        "doubleBogeysOrWorse": { "type": "integer", "minimum": 0 },
+        "averageGrossScore": { "$ref": "#/$defs/nullableNumber" },
+        "averageNetScore": { "$ref": "#/$defs/nullableNumber" },
+        "averagePar3Score": { "$ref": "#/$defs/nullableNumber" },
+        "averagePar4Score": { "$ref": "#/$defs/nullableNumber" },
+        "averagePar5Score": { "$ref": "#/$defs/nullableNumber" },
+        "averageFrontNineScore": { "$ref": "#/$defs/nullableNumber" },
+        "averageBackNineScore": { "$ref": "#/$defs/nullableNumber" },
+        "birdieRate": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "parRate": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "bogeyRate": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "doubleBogeyOrWorseRate": { "type": ["number", "null"], "minimum": 0, "maximum": 100 }
+      }
+    },
+    "matchProgression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matches", "largestLeadHeld", "largestComebackCompleted", "matchesWonAfterTrailing",
+        "largestLeadBlown", "mostLeadChangesExperienced", "totalLeadChangesExperienced",
+        "mostConsecutiveHolesWon", "mostConsecutiveHolesLost", "mostClosingHolesWon",
+        "totalClosingHolesWon", "frontNine", "backNine", "closing"
+      ],
+      "properties": {
+        "matches": { "type": "integer", "minimum": 0 },
+        "largestLeadHeld": { "type": "integer", "minimum": 0 },
+        "largestComebackCompleted": { "type": "integer", "minimum": 0 },
+        "matchesWonAfterTrailing": { "type": "integer", "minimum": 0 },
+        "largestLeadBlown": { "type": "integer", "minimum": 0 },
+        "mostLeadChangesExperienced": { "type": "integer", "minimum": 0 },
+        "totalLeadChangesExperienced": { "type": "integer", "minimum": 0 },
+        "mostConsecutiveHolesWon": { "type": "integer", "minimum": 0 },
+        "mostConsecutiveHolesLost": { "type": "integer", "minimum": 0 },
+        "mostClosingHolesWon": { "type": "integer", "minimum": 0 },
+        "totalClosingHolesWon": { "type": "integer", "minimum": 0 },
+        "frontNine": { "$ref": "#/$defs/segmentRecord" },
+        "backNine": { "$ref": "#/$defs/segmentRecord" },
+        "closing": { "$ref": "#/$defs/segmentRecord" }
+      }
+    },
+    "tournamentHistory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tournamentId", "year", "team", "result", "record", "points", "averageScore",
+        "scorecardSample", "wasCaptain", "honors"
+      ],
+      "properties": {
+        "tournamentId": { "$ref": "#/$defs/id" },
+        "year": { "$ref": "#/$defs/year" },
+        "team": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/team" }] },
+        "result": { "enum": ["champion", "runnerUp", "completed", "upcoming"] },
+        "record": { "$ref": "#/$defs/record" },
+        "points": { "$ref": "#/$defs/nullableNumber" },
+        "averageScore": { "$ref": "#/$defs/nullableNumber" },
+        "scorecardSample": { "type": "integer", "minimum": 0 },
+        "wasCaptain": { "type": "boolean" },
+        "honors": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 3,
+          "items": { "enum": ["champion", "sandbaggerOfYear", "pointsChampion"] }
+        }
+      }
+    },
+    "course": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["courseId", "name"],
+      "properties": {
+        "courseId": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/id" }]
+        },
+        "name": { "type": "string", "maxLength": 160 }
+      }
+    },
+    "matchSegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "winner", "winnerSide"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "winner": { "type": ["string", "null"], "maxLength": 160 },
+        "winnerSide": { "type": ["integer", "null"], "minimum": 0, "maximum": 2 }
+      }
+    },
+    "formatMatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matchId", "year", "roundNumber", "matchNumber", "outcome", "partner", "opponents",
+        "team", "opposingTeam", "winner", "winnerSide", "course", "segments"
+      ],
+      "properties": {
+        "matchId": { "$ref": "#/$defs/id" },
+        "year": { "$ref": "#/$defs/year" },
+        "roundNumber": { "type": "integer", "minimum": 1 },
+        "matchNumber": { "$ref": "#/$defs/nullablePositiveInteger" },
+        "outcome": { "enum": ["win", "loss", "half", "unknown"] },
+        "partner": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/playerReference" } },
+        "opponents": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/playerReference" } },
+        "team": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/team" }] },
+        "opposingTeam": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/team" }] },
+        "winner": { "type": ["string", "null"], "maxLength": 160 },
+        "winnerSide": { "type": ["integer", "null"], "minimum": 0, "maximum": 2 },
+        "course": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/course" }] },
+        "segments": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/matchSegment" } }
+      }
+    },
+    "formatPerformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format", "label", "scoringLabel", "record", "winPercentage", "scoringAverage",
+        "scoringSample", "firstYear", "latestYear", "matches"
+      ],
+      "properties": {
+        "format": { "enum": ["BB", "SC", "SI"] },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "scoringLabel": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "record": { "$ref": "#/$defs/record" },
+        "winPercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+        "scoringAverage": { "$ref": "#/$defs/nullableNumber" },
+        "scoringSample": { "type": "integer", "minimum": 0 },
+        "firstYear": { "$ref": "#/$defs/nullableYear" },
+        "latestYear": { "$ref": "#/$defs/nullableYear" },
+        "matches": { "type": "array", "maxItems": 128, "items": { "$ref": "#/$defs/formatMatch" } }
+      }
+    },
+    "recordHeld": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recordId", "title"],
+      "properties": {
+        "recordId": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 240 }
+      }
+    },
+    "captainSeason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["year", "team", "result"],
+      "properties": {
+        "year": { "$ref": "#/$defs/year" },
+        "team": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/team" }] },
+        "result": { "enum": ["Champion", "Runner-Up", "Completed", "Upcoming"] }
+      }
+    },
+    "captainLegacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record", "championships", "seasons"],
+      "properties": {
+        "record": { "$ref": "#/$defs/record" },
+        "championships": { "type": "integer", "minimum": 0 },
+        "seasons": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/captainSeason" } }
+      }
+    },
+    "rival": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player", "record"],
+      "properties": {
+        "player": { "$ref": "#/$defs/playerReference" },
+        "record": { "$ref": "#/$defs/record" }
+      }
+    },
+    "draftHistory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["year", "pick", "teamName", "finish", "draftValueScore"],
+      "properties": {
+        "year": { "$ref": "#/$defs/year" },
+        "pick": { "type": "integer", "minimum": 1 },
+        "teamName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "finish": { "$ref": "#/$defs/nullablePositiveInteger" },
+        "draftValueScore": { "$ref": "#/$defs/nullableNumber" }
+      }
+    },
+    "partner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rank", "tied", "player", "record"],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1 },
+        "tied": { "type": "boolean" },
+        "player": { "$ref": "#/$defs/playerReference" },
+        "record": { "$ref": "#/$defs/record" }
+      }
+    },
+    "career": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary", "honors", "rankings", "holePerformance", "matchProgression", "tournamentHistory",
+        "formatPerformance", "recordsHeld", "captainLegacy", "biggestRival", "draftHistory", "topPartners"
+      ],
+      "properties": {
+        "summary": { "$ref": "#/$defs/careerSummary" },
+        "honors": { "$ref": "#/$defs/honors" },
+        "rankings": { "type": "array", "minItems": 6, "maxItems": 6, "items": { "$ref": "#/$defs/ranking" } },
+        "holePerformance": { "$ref": "#/$defs/holePerformance" },
+        "matchProgression": { "$ref": "#/$defs/matchProgression" },
+        "tournamentHistory": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/tournamentHistory" } },
+        "formatPerformance": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/formatPerformance" } },
+        "recordsHeld": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/recordHeld" } },
+        "captainLegacy": { "$ref": "#/$defs/captainLegacy" },
+        "biggestRival": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/rival" }] },
+        "draftHistory": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/draftHistory" } },
+        "topPartners": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/partner" } }
+      }
+    }
+  }
+}
