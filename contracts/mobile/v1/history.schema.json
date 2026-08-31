@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:history",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tournaments"],
+      "properties": {
+        "tournaments": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "$ref": "#/$defs/tournamentSummary" }
+        }
+      }
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  },
+  "$defs": {
+    "teamResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["teamId", "name", "side", "points"],
+      "properties": {
+        "teamId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "side": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "points": { "type": ["number", "null"] }
+      }
+    },
+    "finalScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["teamOnePoints", "teamTwoPoints", "label"],
+      "properties": {
+        "teamOnePoints": { "type": ["number", "null"] },
+        "teamTwoPoints": { "type": ["number", "null"] },
+        "label": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "tournamentSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tournamentId", "year", "name", "editionTitle", "destination",
+        "startDate", "endDate", "status", "teams", "champion", "runnerUp",
+        "finalScore", "detailAvailable", "revision"
+      ],
+      "properties": {
+        "tournamentId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+        "year": { "type": "integer", "minimum": 2017, "maximum": 2026 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "editionTitle": { "type": ["string", "null"], "maxLength": 200 },
+        "destination": { "type": ["string", "null"], "maxLength": 240 },
+        "startDate": { "type": ["string", "null"], "format": "date" },
+        "endDate": { "type": ["string", "null"], "format": "date" },
+        "status": { "enum": ["upcoming", "inProgress", "final"] },
+        "teams": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/teamResult" }
+        },
+        "champion": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/teamResult" }
+          ]
+        },
+        "runnerUp": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/teamResult" }
+          ]
+        },
+        "finalScore": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/finalScore" }
+          ]
+        },
+        "detailAvailable": { "type": "boolean" },
+        "revision": { "type": "string", "maxLength": 128 }
+      }
+    }
+  }
+}
