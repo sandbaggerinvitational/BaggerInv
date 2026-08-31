@@ -90,7 +90,7 @@ function publishedRead(overrides = {}) {
         }],
         tournamentRules: [{
           Year: "2026",
-          Round: "1",
+          Round: "Round 1",
           Format: "BB",
           "Team Size": "2",
           "Points Available": "3",
@@ -196,6 +196,23 @@ test("published Guide maps the canonical structured products without duplicating
   assert.match(result.revision, /^[0-9a-f]{64}$/);
   assert.equal(result.revision, result.body.meta.revision);
   await assertMobileV1Schema("guide", result.body);
+});
+
+test("Guide accepts canonical Round labels while malformed labels fail closed", () => {
+  const canonical = mobileGuideDataFromProjection(publishedRead(), identity);
+  assert.equal(canonical.rules.roundFormats[0].roundNumber, 1);
+
+  const numericCompatibility = publishedRead();
+  numericCompatibility.payload.data.content.content.tournamentRules[0].Round = "1";
+  assert.equal(mobileGuideDataFromProjection(numericCompatibility, identity)
+    .rules.roundFormats[0].roundNumber, 1);
+
+  for (const label of ["Round 0", "Round 100", "Round 1.5", "Round One", "Round 1 Final"]) {
+    const malformed = publishedRead();
+    malformed.payload.data.content.content.tournamentRules[0].Round = label;
+    assert.throws(() => mobileGuideDataFromProjection(malformed, identity),
+      (error) => error.code === "MOBILE_API_UNAVAILABLE", label);
+  }
 });
 
 test("Guide preserves canonical order keys for equally ordered curated rows", () => {
