@@ -441,6 +441,7 @@ final class MobileReadRepositoryTests: XCTestCase {
                 tournamentID: tournamentID
             ),
             authUserID: authUserID,
+            playerID: TestFixtures.participant.player.playerId,
             tournamentID: tournamentID
         )
     }

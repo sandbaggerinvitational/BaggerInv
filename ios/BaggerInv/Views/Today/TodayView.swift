@@ -70,7 +70,7 @@ struct TodayRepositoryView: View {
                 : nil,
             isRefreshing: today.state.isRefreshing || matches.state.isRefreshing ||
                 leaders.state.isRefreshing || schedule.state.isRefreshing,
-            onRefresh: { await coordinator.refreshAll() }
+            onRefresh: { await coordinator.refreshTodaySurface() }
         )
     }
 }

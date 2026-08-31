@@ -88,7 +88,7 @@ final class BaggerInvTodayUITests: XCTestCase {
         XCTAssertFalse(element("today.offlineStatus", in: app).exists)
     }
 
-    func testFiveTabShellUsesRealMatchesAndScoreWithRestrainedRemainingPlaceholders() {
+    func testFiveTabShellUsesRealMatchesScoreAndLeadersWithRestrainedMorePlaceholder() {
         let app = launch(.standard)
 
         assertTab("Today", identifier: "tab.today", in: app)
@@ -106,7 +106,12 @@ final class BaggerInvTodayUITests: XCTestCase {
         XCTAssertTrue(score.isSelected, "The Score tab did not become selected.")
         assertExists("tab.score", in: app)
         assertExists("score.screen", in: app)
-        assertPlaceholderTab("Leaders", identifier: "tab.leaders", placeholder: "placeholder.leaders", in: app)
+        let leaders = app.tabBars.buttons["Leaders"]
+        XCTAssertTrue(leaders.waitForExistence(timeout: 3), "The Leaders tab was missing.")
+        leaders.tap()
+        XCTAssertTrue(leaders.isSelected, "The Leaders tab did not become selected.")
+        assertExists("tab.leaders", in: app)
+        assertExists("leaders.screen", in: app)
         assertPlaceholderTab("More", identifier: "tab.more", placeholder: "placeholder.more", in: app)
 
         app.tabBars.buttons["Today"].tap()

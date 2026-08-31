@@ -14,6 +14,7 @@ struct BaggerAppShell: View {
     let fixturePresentation: TodayPresentation?
     let fixtureMatchesState: MobileReadState<MobileMatchesData>?
     let fixtureScoringState: ScoringCurrentState?
+    let fixtureLeaders: LeadersFixturePresentation?
     let fixtureUsesDurableScoringQueue: Bool
     let onSignOut: () -> Void
 
@@ -29,6 +30,7 @@ struct BaggerAppShell: View {
         fixturePresentation = nil
         fixtureMatchesState = nil
         fixtureScoringState = nil
+        fixtureLeaders = nil
         fixtureUsesDurableScoringQueue = false
         self.onSignOut = onSignOut
     }
@@ -38,8 +40,10 @@ struct BaggerAppShell: View {
         fixturePresentation: TodayPresentation,
         fixtureMatchesState: MobileReadState<MobileMatchesData>,
         fixtureScoringState: ScoringCurrentState,
+        fixtureLeaders: LeadersFixturePresentation? = nil,
         fixtureUsesDurableScoringQueue: Bool = false,
         startsOnScore: Bool = false,
+        startsOnLeaders: Bool = false,
         onSignOut: @escaping () -> Void = {}
     ) {
         self.participant = participant
@@ -47,9 +51,10 @@ struct BaggerAppShell: View {
         self.fixturePresentation = fixturePresentation
         self.fixtureMatchesState = fixtureMatchesState
         self.fixtureScoringState = fixtureScoringState
+        self.fixtureLeaders = fixtureLeaders
         self.fixtureUsesDurableScoringQueue = fixtureUsesDurableScoringQueue
         self.onSignOut = onSignOut
-        _selection = State(initialValue: startsOnScore ? .score : .today)
+        _selection = State(initialValue: startsOnLeaders ? .leaders : startsOnScore ? .score : .today)
     }
 
     var body: some View {
@@ -90,11 +95,14 @@ struct BaggerAppShell: View {
             .tag(BaggerAppTab.score)
             .accessibilityIdentifier("tab.score")
 
-            placeholderTab(
-                title: "Leaders",
-                message: "Full tournament and player standings arrive in a later step.",
-                symbol: "trophy.fill"
-            )
+            NavigationStack {
+                leadersContent
+                    .baggerNavigationChrome(
+                        title: "Leaders",
+                        participant: participant,
+                        onSignOut: onSignOut
+                    )
+            }
             .tabItem { Label("Leaders", systemImage: "trophy.fill") }
             .tag(BaggerAppTab.leaders)
             .accessibilityIdentifier("tab.leaders")
@@ -115,6 +123,29 @@ struct BaggerAppShell: View {
         .onChange(of: selection) { selectedTab in
             guard selectedTab == .score, fixtureScoringState == nil else { return }
             Task { await tournamentData?.scoring.refresh() }
+        }
+    }
+
+    @ViewBuilder
+    private var leadersContent: some View {
+        if let fixtureLeaders {
+            LeadersScreen(
+                score: fixtureLeaders.score,
+                players: fixtureLeaders.players,
+                netSkins: fixtureLeaders.netSkins,
+                calcutta: fixtureLeaders.calcutta,
+                startingProduct: fixtureLeaders.startingProduct,
+                onRefresh: { _ in }
+            )
+        } else if let tournamentData {
+            LeadersRepositoryView(participant: participant, coordinator: tournamentData)
+        } else {
+            VStack(spacing: 14) {
+                Image(systemName: "exclamationmark.shield")
+                Text("Leaders are unavailable in this configuration.")
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(BaggerPalette.canvas.ignoresSafeArea())
         }
     }
 

@@ -394,6 +394,67 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         print("STEP2E_PHYSICAL_SCORING_READ_COMPLETE")
     }
 
+    /// Step 2H read-only acceptance using an already certified Preview
+    /// session. This never opens authentication, requests an OTP, writes a
+    /// competition product, or touches a scoring mutation route.
+    func testRestoredPreviewLeadersReadOnlyAcceptance() throws {
+        let authorization = ProcessInfo.processInfo.environment["BAGGER_STEP2H_RESTORED_LEADERS_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2H_RESTORED_LEADERS_QA") as? String)
+        guard authorization == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2H_RESTORED_LEADERS_QA=1 only for an explicitly authorized read-only Preview run."
+            )
+        }
+
+        let app = acceptanceApp()
+        app.launch()
+        guard app.tabBars.buttons["Leaders"].waitForExistence(timeout: 30) else {
+            throw XCTSkip("No restorable Preview session is currently available; no OTP was requested.")
+        }
+        _ = assertAuthenticated(in: app, timeout: 8)
+        let leadersOpenStart = Date()
+        openLeaders(in: app)
+
+        assertLeadersProduct("leaders.score", in: app, timeout: 45)
+        assertLiveLeadersPayload(in: app)
+        print(String(format: "STEP2H_LEADERS_OPEN_SECONDS=%.3f", Date().timeIntervalSince(leadersOpenStart)))
+        print("STEP2H_TOURNAMENT_AND_ROUND_SCORES_PASS")
+
+        let playersStart = Date()
+        selectLeadersProduct("players", in: app)
+        assertLeadersProduct("leaders.players.product", in: app, timeout: 45)
+        print(String(format: "STEP2H_PLAYERS_SWITCH_SECONDS=%.3f", Date().timeIntervalSince(playersStart)))
+        print("STEP2H_PLAYER_LEADERS_PASS")
+
+        let netSkinsStart = Date()
+        selectLeadersProduct("netSkins", in: app)
+        assertLeadersProduct("leaders.netSkins", in: app, timeout: 45)
+        print(String(format: "STEP2H_NET_SKINS_SWITCH_SECONDS=%.3f", Date().timeIntervalSince(netSkinsStart)))
+        refreshLeadersAcceptance(in: app)
+        assertLeadersProduct("leaders.netSkins", expectedHTTPStatus: 304, in: app, timeout: 45)
+        print("STEP2H_NET_SKINS_PASS_ETAG_304")
+
+        let calcuttaStart = Date()
+        selectLeadersProduct("calcutta", in: app)
+        assertLeadersProduct("leaders.calcutta", in: app, timeout: 45)
+        print(String(format: "STEP2H_CALCUTTA_SWITCH_SECONDS=%.3f", Date().timeIntervalSince(calcuttaStart)))
+        refreshLeadersAcceptance(in: app)
+        assertLeadersProduct("leaders.calcutta", expectedHTTPStatus: 304, in: app, timeout: 45)
+        print("STEP2H_CALCUTTA_PASS_ETAG_304")
+
+        selectLeadersProduct("score", in: app)
+        refreshLeadersAcceptance(in: app)
+        assertLeadersProduct("leaders.score", expectedHTTPStatus: 304, in: app, timeout: 45)
+        print("STEP2H_LEADERS_PASS_ETAG_304")
+
+        app.terminate()
+        app.launch()
+        _ = assertAuthenticated(in: app, timeout: 45)
+        openLeaders(in: app)
+        assertLeadersProduct("leaders.score", in: app, timeout: 45)
+        print("STEP2H_RELAUNCH_CACHE_AND_REVALIDATION_PASS")
+    }
+
     private func approvedPreviewEmail() -> String? {
         let suppliedValue = ProcessInfo.processInfo.environment["BAGGER_STEP2A_QA_EMAIL"] ??
             (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2A_QA_EMAIL") as? String)
@@ -663,19 +724,23 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             "The real native Score destination was missing."
         )
 
-        for tab in [
-            (name: "Leaders", placeholder: "placeholder.leaders"),
-            (name: "More", placeholder: "placeholder.more"),
-        ] {
-            let button = app.tabBars.buttons[tab.name]
-            XCTAssertTrue(button.waitForExistence(timeout: 5), "The live \(tab.name) tab was missing.")
-            button.tap()
-            XCTAssertTrue(button.isSelected, "The live \(tab.name) tab did not become selected.")
-            XCTAssertTrue(
-                app.descendants(matching: .any)[tab.placeholder].waitForExistence(timeout: 5),
-                "The restrained \(tab.name) placeholder was missing."
-            )
-        }
+        let leaders = app.tabBars.buttons["Leaders"]
+        XCTAssertTrue(leaders.waitForExistence(timeout: 5), "The live Leaders tab was missing.")
+        leaders.tap()
+        XCTAssertTrue(leaders.isSelected, "The live Leaders tab did not become selected.")
+        XCTAssertTrue(
+            app.descendants(matching: .any)["leaders.screen"].waitForExistence(timeout: 10),
+            "The real native Leaders destination was missing."
+        )
+
+        let more = app.tabBars.buttons["More"]
+        XCTAssertTrue(more.waitForExistence(timeout: 5), "The live More tab was missing.")
+        more.tap()
+        XCTAssertTrue(more.isSelected, "The live More tab did not become selected.")
+        XCTAssertTrue(
+            app.descendants(matching: .any)["placeholder.more"].waitForExistence(timeout: 5),
+            "The restrained More placeholder was missing."
+        )
 
         today.tap()
         XCTAssertTrue(
@@ -699,6 +764,105 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             app.descendants(matching: .any)["matches.screen"].waitForExistence(timeout: 5),
             "The native Matches destination did not appear."
         )
+    }
+
+    private func openLeaders(in app: XCUIApplication) {
+        let leaders = app.tabBars.buttons["Leaders"]
+        XCTAssertTrue(leaders.waitForExistence(timeout: 5), "The native Leaders tab was unavailable.")
+        leaders.tap()
+        XCTAssertTrue(leaders.isSelected, "The native Leaders tab was not selected.")
+        XCTAssertTrue(
+            app.descendants(matching: .any)["leaders.screen"].waitForExistence(timeout: 8),
+            "The native Leaders destination did not appear."
+        )
+    }
+
+    private func selectLeadersProduct(_ product: String, in app: XCUIApplication) {
+        let selector = app.descendants(matching: .any)["leaders.product.\(product)"]
+        let screen = app.scrollViews["leaders.screen"].exists
+            ? app.scrollViews["leaders.screen"]
+            : app.scrollViews.firstMatch
+        for _ in 0..<8 where !selector.isHittable {
+            screen.swipeDown()
+        }
+        XCTAssertTrue(selector.waitForExistence(timeout: 5), "The \(product) Leaders selector was missing.")
+        XCTAssertTrue(selector.isHittable, "The \(product) Leaders selector was not tappable.")
+        selector.tap()
+        XCTAssertTrue(selector.isSelected, "The \(product) Leaders product was not selected.")
+    }
+
+    private func assertLeadersProduct(
+        _ identifier: String,
+        expectedHTTPStatus: Int? = nil,
+        in app: XCUIApplication,
+        timeout: TimeInterval
+    ) {
+        let diagnosticIdentifier: String
+        switch identifier {
+        case "leaders.score": diagnosticIdentifier = "leaders.read.score"
+        case "leaders.players.product": diagnosticIdentifier = "leaders.read.players"
+        case "leaders.netSkins": diagnosticIdentifier = "leaders.read.netSkins"
+        case "leaders.calcutta": diagnosticIdentifier = "leaders.read.calcutta"
+        default:
+            XCTFail("The read-only Preview product probe has no diagnostic element for \(identifier).")
+            return
+        }
+        let product = app.staticTexts
+            .matching(identifier: diagnosticIdentifier)
+            .firstMatch
+        XCTAssertTrue(
+            product.waitForExistence(timeout: min(5, timeout)),
+            "The read-only Preview product \(identifier) did not expose its canonical heading."
+        )
+        let deadline = Date().addingTimeInterval(timeout)
+        var reachedCanonicalContent = false
+        while Date() < deadline {
+            let diagnostic = product.value as? String ?? ""
+            let hasContent = diagnostic.localizedCaseInsensitiveContains("content")
+            let isFresh = diagnostic.localizedCaseInsensitiveContains("freshness fresh")
+            let hasRevision = diagnostic.localizedCaseInsensitiveContains("revision present")
+            let hasExpectedStatus = expectedHTTPStatus.map {
+                diagnostic.localizedCaseInsensitiveContains("http \($0)")
+            } ?? true
+            if product.exists, hasContent, isFresh, hasRevision, hasExpectedStatus {
+                reachedCanonicalContent = true
+                break
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        }
+        XCTAssertTrue(
+            reachedCanonicalContent,
+            "The read-only Preview product \(identifier) did not reach canonical fresh content."
+        )
+    }
+
+    private func assertLiveLeadersPayload(in app: XCUIApplication) {
+        let diagnostic = app.staticTexts
+            .matching(identifier: "leaders.read.score")
+            .firstMatch
+        XCTAssertTrue(
+            diagnostic.waitForExistence(timeout: 5),
+            "The live Tournament Score did not expose its canonical payload diagnostic."
+        )
+        let value = diagnostic.value as? String ?? ""
+        XCTAssertNotNil(
+            value.range(of: #"teams [1-9][0-9]*"#, options: .regularExpression),
+            "The live /leaders representation did not contain canonical Tournament Score teams."
+        )
+        XCTAssertNotNil(
+            value.range(of: #"rounds [1-9][0-9]*"#, options: .regularExpression),
+            "The live /leaders representation did not contain canonical Round Scores."
+        )
+        XCTAssertNotNil(
+            value.range(of: #"players [1-9][0-9]*"#, options: .regularExpression),
+            "The live /leaders representation did not contain canonical Player standings."
+        )
+    }
+
+    private func refreshLeadersAcceptance(in app: XCUIApplication) {
+        let refresh = app.buttons["leaders.acceptance.refresh"]
+        XCTAssertTrue(refresh.waitForExistence(timeout: 5), "The read-only Leaders refresh probe was unavailable.")
+        refresh.tap()
     }
 
     private func assertMatchesProduct(in app: XCUIApplication, timeout: TimeInterval) {

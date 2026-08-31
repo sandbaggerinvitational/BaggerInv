@@ -5,6 +5,8 @@ enum MobileReadProduct: String, CaseIterable, Codable, Sendable {
     case today
     case matches
     case leaders
+    case netSkins
+    case calcutta
     case schedule
 }
 

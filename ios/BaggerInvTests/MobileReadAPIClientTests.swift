@@ -11,6 +11,8 @@ final class MobileReadAPIClientTests: XCTestCase {
             .response(status: 200, data: try ReadResponseFixtures.today(), headers: [:]),
             .response(status: 200, data: try ReadResponseFixtures.matches(), headers: [:]),
             .response(status: 200, data: try ReadResponseFixtures.leaders(), headers: [:]),
+            .response(status: 200, data: try ReadResponseFixtures.netSkins(), headers: [:]),
+            .response(status: 200, data: try ReadResponseFixtures.calcutta(), headers: [:]),
             .response(status: 200, data: try ReadResponseFixtures.schedule(), headers: [:]),
         ])
         let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
@@ -18,6 +20,8 @@ final class MobileReadAPIClientTests: XCTestCase {
         _ = try await client.today(accessToken: accessToken, certification: certification, etag: nil)
         _ = try await client.matches(accessToken: accessToken, certification: certification, etag: nil)
         _ = try await client.leaders(accessToken: accessToken, certification: certification, etag: nil)
+        _ = try await client.netSkins(accessToken: accessToken, certification: certification, etag: nil)
+        _ = try await client.calcutta(accessToken: accessToken, certification: certification, etag: nil)
         _ = try await client.schedule(accessToken: accessToken, certification: certification, etag: nil)
 
         let requests = await transport.recordedRequests()
@@ -27,6 +31,8 @@ final class MobileReadAPIClientTests: XCTestCase {
                 "/api/mobile/v1/today",
                 "/api/mobile/v1/matches",
                 "/api/mobile/v1/leaders",
+                "/api/mobile/v1/net-skins",
+                "/api/mobile/v1/calcutta",
                 "/api/mobile/v1/schedule",
             ]
         )
@@ -36,6 +42,46 @@ final class MobileReadAPIClientTests: XCTestCase {
             XCTAssertEqual(request.value(forHTTPHeaderField: "X-Bagger-Certification"), certification)
             XCTAssertEqual(request.value(forHTTPHeaderField: "Cache-Control"), "no-cache")
         }
+    }
+
+    func testLeadersSubproductsRoundTripValidatorsAndAcceptNotModified() async throws {
+        let netSkinsRequestETag = #"W/\"net-skins-revision-4\""#
+        let netSkinsResponseETag = #"\"net-skins-revision-5\""#
+        let calcuttaRequestETag = #"\"calcutta-revision-9\""#
+        let calcuttaResponseETag = #"W/\"calcutta-revision-9\""#
+        let transport = ScriptedMobileReadHTTPTransport(steps: [
+            .response(
+                status: 200,
+                data: try ReadResponseFixtures.netSkins(),
+                headers: ["ETag": netSkinsResponseETag]
+            ),
+            .response(status: 304, data: Data(), headers: ["ETag": calcuttaResponseETag]),
+        ])
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        let netSkins = try await client.netSkins(
+            accessToken: accessToken,
+            certification: certification,
+            etag: netSkinsRequestETag
+        )
+        let calcutta = try await client.calcutta(
+            accessToken: accessToken,
+            certification: certification,
+            etag: calcuttaRequestETag
+        )
+
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests[0].value(forHTTPHeaderField: "If-None-Match"), netSkinsRequestETag)
+        XCTAssertEqual(requests[1].value(forHTTPHeaderField: "If-None-Match"), calcuttaRequestETag)
+        guard case .modified(let response, let validator) = netSkins else {
+            return XCTFail("Expected a modified Net Skins response")
+        }
+        XCTAssertEqual(response.data.publicationPolicy, "OFFICIAL_ONLY")
+        XCTAssertEqual(validator, netSkinsResponseETag)
+        guard case .notModified(let validator) = calcutta else {
+            return XCTFail("Expected a not-modified Calcutta response")
+        }
+        XCTAssertEqual(validator, calcuttaResponseETag)
     }
 
     func testPublicAndProtectedRequestsKeepAuthenticationHeadersSeparated() async throws {
@@ -350,10 +396,19 @@ private enum ReadResponseFixtures {
             data: [
                 "tournament": tournament(),
                 "teamStandings": [],
+                "roundStandings": [],
                 "playerStandings": [],
             ],
             revision: revision
         )
+    }
+
+    static func netSkins() throws -> Data {
+        try JSONEncoder().encode(TestFixtures.netSkinsResponse)
+    }
+
+    static func calcutta() throws -> Data {
+        try JSONEncoder().encode(TestFixtures.calcuttaResponse)
     }
 
     static func schedule(revision: String = "schedule-revision-1") throws -> Data {

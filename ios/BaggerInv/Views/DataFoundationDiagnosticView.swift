@@ -4,6 +4,8 @@ struct DataFoundationDiagnosticView: View {
     @ObservedObject private var today: MobileReadRepository<MobileTodayResponse>
     @ObservedObject private var matches: MobileReadRepository<MobileMatchesResponse>
     @ObservedObject private var leaders: MobileReadRepository<MobileLeadersResponse>
+    @ObservedObject private var netSkins: MobileReadRepository<MobileNetSkinsResponse>
+    @ObservedObject private var calcutta: MobileReadRepository<MobileCalcuttaResponse>
     @ObservedObject private var schedule: MobileReadRepository<MobileScheduleResponse>
 
     private let coordinator: TournamentDataCoordinator
@@ -13,6 +15,8 @@ struct DataFoundationDiagnosticView: View {
         _today = ObservedObject(wrappedValue: coordinator.today)
         _matches = ObservedObject(wrappedValue: coordinator.matches)
         _leaders = ObservedObject(wrappedValue: coordinator.leaders)
+        _netSkins = ObservedObject(wrappedValue: coordinator.netSkins)
+        _calcutta = ObservedObject(wrappedValue: coordinator.calcutta)
         _schedule = ObservedObject(wrappedValue: coordinator.schedule)
     }
 
@@ -25,6 +29,8 @@ struct DataFoundationDiagnosticView: View {
             diagnosticRow(label: "Today", state: today.state)
             diagnosticRow(label: "Matches", state: matches.state)
             diagnosticRow(label: "Leaders", state: leaders.state)
+            diagnosticRow(label: "Net Skins", state: netSkins.state)
+            diagnosticRow(label: "Calcutta", state: calcutta.state)
             diagnosticRow(label: "Schedule", state: schedule.state)
 
             if let lastValidated {
@@ -47,6 +53,8 @@ struct DataFoundationDiagnosticView: View {
             today.state.validatedAt,
             matches.state.validatedAt,
             leaders.state.validatedAt,
+            netSkins.state.validatedAt,
+            calcutta.state.validatedAt,
             schedule.state.validatedAt,
         ].compactMap { $0 }.max()
     }

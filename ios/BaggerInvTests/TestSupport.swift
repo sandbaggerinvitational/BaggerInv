@@ -96,7 +96,75 @@ enum TestFixtures {
     static let leadersResponse = MobileLeadersResponse(
         ok: true,
         apiVersion: "v1",
-        data: MobileLeadersData(tournament: readTournament, teamStandings: [], playerStandings: []),
+        data: MobileLeadersData(
+            tournament: readTournament,
+            teamStandings: [],
+            roundStandings: [],
+            playerStandings: []
+        ),
+        meta: readMeta
+    )
+
+    static let netSkinsResponse = MobileNetSkinsResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileNetSkinsData(
+            contractVersion: "production-net-skins-v1",
+            tournamentId: participant.tournament.tournamentId,
+            state: .notConfigured,
+            publicationPolicy: "OFFICIAL_ONLY",
+            published: false,
+            configurationRevision: 0,
+            resultRevision: nil,
+            configurationFingerprint: nil,
+            revision: "net-skins-v1:0:0:NOT_CONFIGURED",
+            freshness: MobileNetSkinsFreshness(
+                stale: false,
+                configuredAt: nil,
+                calculatedAt: nil,
+                publishedAt: nil,
+                sourceFingerprint: nil
+            ),
+            rounds: [],
+            player: MobileNetSkinsPlayerContext(
+                playerId: participant.player.playerId,
+                eligibleRoundIds: [],
+                entryIds: []
+            )
+        ),
+        meta: readMeta
+    )
+
+    static let calcuttaResponse = MobileCalcuttaResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileCalcuttaData(
+            contractVersion: "production-calcutta-v1",
+            tournamentId: participant.tournament.tournamentId,
+            state: .notConfigured,
+            publicationState: .unpublished,
+            published: false,
+            currencyCode: "USD",
+            configurationRevision: 1,
+            auctionRevision: 0,
+            publicationRevision: 0,
+            resultRevision: nil,
+            configurationFingerprint: nil,
+            auctionFingerprint: nil,
+            revision: "calcutta-v1:1:0:0:0:NOT_CONFIGURED:UNPUBLISHED",
+            freshness: MobileCalcuttaFreshness(
+                stale: false,
+                updating: false,
+                configuredAt: nil,
+                auctionUpdatedAt: nil,
+                publishedAt: nil,
+                calculatedAt: nil,
+                sourceFingerprint: nil
+            ),
+            market: nil,
+            result: nil,
+            viewer: MobileCalcuttaViewer(playerId: participant.player.playerId)
+        ),
         meta: readMeta
     )
 
@@ -377,6 +445,8 @@ final class MockMobileAPI: MobileAPIServing {
     var todayValue: MobileConditionalRead<MobileTodayResponse> = .modified(TestFixtures.todayResponse, etag: "\"fixture-revision-1\"")
     var matchesValue: MobileConditionalRead<MobileMatchesResponse> = .modified(TestFixtures.matchesResponse, etag: "\"fixture-revision-1\"")
     var leadersValue: MobileConditionalRead<MobileLeadersResponse> = .modified(TestFixtures.leadersResponse, etag: "\"fixture-revision-1\"")
+    var netSkinsValue: MobileConditionalRead<MobileNetSkinsResponse> = .modified(TestFixtures.netSkinsResponse, etag: "\"fixture-net-skins-revision-1\"")
+    var calcuttaValue: MobileConditionalRead<MobileCalcuttaResponse> = .modified(TestFixtures.calcuttaResponse, etag: "\"fixture-calcutta-revision-1\"")
     var scheduleValue: MobileConditionalRead<MobileScheduleResponse> = .modified(TestFixtures.scheduleResponse, etag: "\"fixture-revision-1\"")
     var readError: (any Error)?
     var scoringValue = TestFixtures.scoringResponse
@@ -394,6 +464,7 @@ final class MockMobileAPI: MobileAPIServing {
     private(set) var sessionAccessToken: String?
     private(set) var sessionCertification: String?
     private(set) var readCallCount = 0
+    private(set) var leadersCallCount = 0
     private(set) var scoringCallCount = 0
     private(set) var scoringMatchID: String?
     private(set) var scoringAccessToken: String?
@@ -465,8 +536,21 @@ final class MockMobileAPI: MobileAPIServing {
 
     func leaders(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileLeadersResponse> {
         readCallCount += 1
+        leadersCallCount += 1
         if let readError { throw readError }
         return leadersValue
+    }
+
+    func netSkins(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileNetSkinsResponse> {
+        readCallCount += 1
+        if let readError { throw readError }
+        return netSkinsValue
+    }
+
+    func calcutta(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileCalcuttaResponse> {
+        readCallCount += 1
+        if let readError { throw readError }
+        return calcuttaValue
     }
 
     func schedule(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileScheduleResponse> {

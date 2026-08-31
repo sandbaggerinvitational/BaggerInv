@@ -139,7 +139,20 @@ struct MobileReadMeta: Codable, Equatable, Sendable {
 
 protocol MobileReadPayload: Codable, Equatable, Sendable {
     var tournamentID: String { get }
+    var participantPlayerID: String? { get }
     var isStructurallyCompatible: Bool { get }
+    var revocableParticipantRepresentationKeys: Set<String> { get }
+    func isCompatible(expectedPlayerID: String) -> Bool
+}
+
+extension MobileReadPayload {
+    var participantPlayerID: String? { nil }
+    var revocableParticipantRepresentationKeys: Set<String> { [] }
+
+    /// Older read contracts without a canonical viewer remain bound by the
+    /// authenticated request and cache partition. Viewer-bearing contracts
+    /// override this method and require an exact canonical Player match.
+    func isCompatible(expectedPlayerID: String) -> Bool { true }
 }
 
 protocol MobileReadResponseValidating: Decodable, Sendable {
@@ -157,9 +170,18 @@ struct MobileReadResponse<Payload: MobileReadPayload>: Codable, Equatable, Senda
     }
 
     func isCompatible(expectedTournamentID: String) -> Bool {
-        isReadContractCompatible &&
-        !expectedTournamentID.isEmpty &&
-        data.tournamentID == expectedTournamentID
+        guard isReadContractCompatible,
+              !expectedTournamentID.isEmpty,
+              data.tournamentID == expectedTournamentID
+        else { return false }
+        return true
+    }
+
+    func isCompatible(expectedTournamentID: String, expectedPlayerID: String) -> Bool {
+        guard isCompatible(expectedTournamentID: expectedTournamentID),
+              !expectedPlayerID.isEmpty
+        else { return false }
+        return data.isCompatible(expectedPlayerID: expectedPlayerID)
     }
 }
 
@@ -318,6 +340,11 @@ struct MobileTodayData: MobileReadPayload {
     let immediateSchedule: [MobileScheduleEvent]
 
     var tournamentID: String { tournament.tournamentId }
+    var participantPlayerID: String? { player.playerId }
+
+    func isCompatible(expectedPlayerID: String) -> Bool {
+        player.playerId == expectedPlayerID
+    }
     var isStructurallyCompatible: Bool {
         tournament.isStructurallyCompatible &&
         player.isStructurallyCompatible &&
@@ -354,16 +381,56 @@ struct MobilePlayerStanding: Codable, Equatable, Sendable {
     let record: String
 }
 
+enum MobileRoundStandingStatus: String, Codable, Equatable, Sendable {
+    case upcoming
+    case inProgress
+    case final
+}
+
+struct MobileRoundStanding: Codable, Equatable, Sendable {
+    let roundNumber: Int
+    let roundName: String
+    let status: MobileRoundStandingStatus
+    let teamStandings: [MobileTeamStanding]
+
+    var isStructurallyCompatible: Bool {
+        roundNumber >= 1 &&
+        teamStandings.allSatisfy(\.isStructurallyCompatible)
+    }
+}
+
 struct MobileLeadersData: MobileReadPayload {
     let tournament: MobileReadTournament
     let teamStandings: [MobileTeamStanding]
+    let roundStandings: [MobileRoundStanding]
     let playerStandings: [MobilePlayerStanding]
 
     var tournamentID: String { tournament.tournamentId }
     var isStructurallyCompatible: Bool {
         tournament.isStructurallyCompatible &&
-        teamStandings.allSatisfy { !$0.teamId.isEmpty } &&
-        playerStandings.allSatisfy { !$0.playerId.isEmpty && !$0.displayName.isEmpty }
+        teamStandings.allSatisfy(\.isStructurallyCompatible) &&
+        roundStandings.allSatisfy(\.isStructurallyCompatible) &&
+        playerStandings.allSatisfy(\.isStructurallyCompatible)
+    }
+}
+
+private extension MobileTeamStanding {
+    var isStructurallyCompatible: Bool {
+        !teamId.isEmpty &&
+        !name.isEmpty &&
+        (rank.map { $0 >= 1 } ?? true) &&
+        (points.map(\.isFinite) ?? true) &&
+        (remainingMatches.map { $0 >= 0 } ?? true)
+    }
+}
+
+private extension MobilePlayerStanding {
+    var isStructurallyCompatible: Bool {
+        !playerId.isEmpty &&
+        !displayName.isEmpty &&
+        !team.name.isEmpty &&
+        (rank.map { $0 >= 1 } ?? true) &&
+        (points.map(\.isFinite) ?? true)
     }
 }
 

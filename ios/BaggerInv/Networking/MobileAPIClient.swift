@@ -9,6 +9,8 @@ protocol MobileAPIServing {
     func today(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileTodayResponse>
     func matches(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileMatchesResponse>
     func leaders(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileLeadersResponse>
+    func netSkins(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileNetSkinsResponse>
+    func calcutta(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileCalcuttaResponse>
     func schedule(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileScheduleResponse>
     func scoringCurrent(accessToken: String, certification: String, matchID: String?) async throws -> MobileScoringCurrentResponse
     func scoringHole(
@@ -24,6 +26,22 @@ protocol MobileAPIServing {
 }
 
 extension MobileAPIServing {
+    func netSkins(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileNetSkinsResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
+    func calcutta(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileCalcuttaResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
     /// Fail-closed default keeps narrowly scoped test doubles source-compatible.
     func scoringCurrent(
         accessToken: String,
@@ -190,6 +208,32 @@ struct MobileAPIClient: MobileAPIServing {
     ) async throws -> MobileConditionalRead<MobileLeadersResponse> {
         try await protectedRead(
             path: "/api/mobile/v1/leaders",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag
+        )
+    }
+
+    func netSkins(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileNetSkinsResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/net-skins",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag
+        )
+    }
+
+    func calcutta(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileCalcuttaResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/calcutta",
             accessToken: accessToken,
             certification: certification,
             etag: etag

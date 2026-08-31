@@ -30,6 +30,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     let today: MobileReadRepository<MobileTodayResponse>
     let matches: MobileReadRepository<MobileMatchesResponse>
     let leaders: MobileReadRepository<MobileLeadersResponse>
+    let netSkins: MobileReadRepository<MobileNetSkinsResponse>
+    let calcutta: MobileReadRepository<MobileCalcuttaResponse>
     let schedule: MobileReadRepository<MobileScheduleResponse>
     let scoring: ScoringCurrentStore
     let scoringReliability: ScoringQueueCoordinator?
@@ -96,6 +98,30 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
                 etag: etag
             )
         }
+        netSkins = MobileReadRepository(
+            product: .netSkins,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now
+        ) { credentials, etag in
+            try await api.netSkins(
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
+        calcutta = MobileReadRepository(
+            product: .calcutta,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now
+        ) { credentials, etag in
+            try await api.calcutta(
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
         schedule = MobileReadRepository(
             product: .schedule,
             cache: cache,
@@ -154,6 +180,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         today.setAccessInvalidationHandler(invalidation)
         matches.setAccessInvalidationHandler(invalidation)
         leaders.setAccessInvalidationHandler(invalidation)
+        netSkins.setAccessInvalidationHandler(invalidation)
+        calcutta.setAccessInvalidationHandler(invalidation)
         schedule.setAccessInvalidationHandler(invalidation)
         scoring.setAccessInvalidationHandler(invalidation)
 
@@ -163,6 +191,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         today.setAuthorityRevalidationHandler(authorityRevalidation)
         matches.setAuthorityRevalidationHandler(authorityRevalidation)
         leaders.setAuthorityRevalidationHandler(authorityRevalidation)
+        netSkins.setAuthorityRevalidationHandler(authorityRevalidation)
+        calcutta.setAuthorityRevalidationHandler(authorityRevalidation)
         schedule.setAuthorityRevalidationHandler(authorityRevalidation)
         scoring.setAuthorityRevalidationHandler(authorityRevalidation)
         scoringReliability?.setAccessInvalidationHandler(invalidation)
@@ -196,6 +226,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         let context = ActiveMobileReadContext(
             cachePartition: partition,
             authUserID: authUserID,
+            playerID: participant.player.playerId,
             tournamentID: participant.tournament.tournamentId
         )
         if let activeContext, activeContext != context {
@@ -229,6 +260,10 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         await matches.activate(context, beginRefresh: false)
         guard isCurrent(context, generation: activationGeneration) else { return }
         await leaders.activate(context, beginRefresh: false)
+        guard isCurrent(context, generation: activationGeneration) else { return }
+        await netSkins.activate(context, beginRefresh: false)
+        guard isCurrent(context, generation: activationGeneration) else { return }
+        await calcutta.activate(context, beginRefresh: false)
         guard isCurrent(context, generation: activationGeneration) else { return }
         await schedule.activate(context, beginRefresh: false)
         guard isCurrent(context, generation: activationGeneration) else { return }
@@ -271,6 +306,10 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard lifecycleGeneration == deactivationGeneration else { return }
         await leaders.deactivate(deleteCache: false)
         guard lifecycleGeneration == deactivationGeneration else { return }
+        await netSkins.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
+        await calcutta.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
         await schedule.deactivate(deleteCache: false)
         guard lifecycleGeneration == deactivationGeneration else { return }
         await scoring.deactivate()
@@ -292,6 +331,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let todaySuspension: Void = today.suspendRefresh()
         async let matchesSuspension: Void = matches.suspendRefresh()
         async let leadersSuspension: Void = leaders.suspendRefresh()
+        async let netSkinsSuspension: Void = netSkins.suspendRefresh()
+        async let calcuttaSuspension: Void = calcutta.suspendRefresh()
         async let scheduleSuspension: Void = schedule.suspendRefresh()
         async let scoringSuspension: Void = scoring.suspendForEnvironmentReattestation()
         async let queueSuspension: Void = scoringReliability?.suspendForEnvironmentReattestation() ?? ()
@@ -300,6 +341,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             todaySuspension,
             matchesSuspension,
             leadersSuspension,
+            netSkinsSuspension,
+            calcuttaSuspension,
             scheduleSuspension,
             scoringSuspension,
             queueSuspension,
@@ -343,6 +386,27 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let todayRefresh: Void = today.refresh()
         async let matchesRefresh: Void = matches.refresh()
         async let leadersRefresh: Void = leaders.refresh()
+        async let netSkinsRefresh: Void = netSkins.refresh()
+        async let calcuttaRefresh: Void = calcutta.refresh()
+        async let scheduleRefresh: Void = schedule.refresh()
+        _ = await (
+            todayRefresh,
+            matchesRefresh,
+            leadersRefresh,
+            netSkinsRefresh,
+            calcuttaRefresh,
+            scheduleRefresh
+        )
+    }
+
+    /// Today owns the four original bounded read products. Pulling Today must
+    /// not eagerly revalidate the optional Leaders subproducts that have their
+    /// own selected-product refresh controls.
+    func refreshTodaySurface() async {
+        guard activeContext != nil, !isSuspended else { return }
+        async let todayRefresh: Void = today.refresh()
+        async let matchesRefresh: Void = matches.refresh()
+        async let leadersRefresh: Void = leaders.refresh()
         async let scheduleRefresh: Void = schedule.refresh()
         _ = await (todayRefresh, matchesRefresh, leadersRefresh, scheduleRefresh)
     }
@@ -361,9 +425,14 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let todayRefresh: Void = today.refreshIfStale(olderThan: staleAfter)
         async let matchesRefresh: Void = matches.refreshIfStale(olderThan: staleAfter)
         async let leadersRefresh: Void = leaders.refreshIfStale(olderThan: staleAfter)
+        async let netSkinsRefresh: Void = netSkins.refreshIfStale(olderThan: staleAfter)
+        async let calcuttaRefresh: Void = calcutta.refreshIfStale(olderThan: staleAfter)
         async let scheduleRefresh: Void = schedule.refreshIfStale(olderThan: staleAfter)
-        _ = await (todayRefresh, matchesRefresh, leadersRefresh, scheduleRefresh)
-        guard isCurrent(context, generation: refreshGeneration) else { return }
+
+        // Canonical scoring recovery is the foreground critical path. Optional
+        // participant read products continue concurrently, but a slow Skins or
+        // Calcutta response must never delay queue replay or finalization
+        // reconciliation.
         if scoring.state.phase != .idle {
             await scoring.refresh()
             guard isCurrent(context, generation: refreshGeneration) else { return }
@@ -380,6 +449,14 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         } else {
             await scoringFinalization?.reconsiderEligibility(using: scoring.state.scoring)
         }
+        _ = await (
+            todayRefresh,
+            matchesRefresh,
+            leadersRefresh,
+            netSkinsRefresh,
+            calcuttaRefresh,
+            scheduleRefresh
+        )
     }
 
     func unresolvedScoringIntentCount() async -> Int? {

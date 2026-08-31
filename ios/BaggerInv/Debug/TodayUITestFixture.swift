@@ -79,13 +79,19 @@ struct TodayUITestFixtureRoot: View {
                 scoringState: ScoringUITestFixtures.state(for: scenario)
             )
         default:
+            let arguments = ProcessInfo.processInfo.arguments
             BaggerAppShell(
                 participant: TodayUITestFixtures.participant,
                 fixturePresentation: TodayUITestFixtures.presentation(for: scenario),
                 fixtureMatchesState: MatchesUITestFixtures.state(for: scenario),
                 fixtureScoringState: ScoringUITestFixtures.state(for: scenario),
+                fixtureLeaders: LeadersUITestFixtures.bundle(
+                    participant: TodayUITestFixtures.participant,
+                    arguments: arguments
+                ),
                 fixtureUsesDurableScoringQueue: scenario == .scoreDurableOffline,
-                startsOnScore: scenario.rawValue.hasPrefix("score.")
+                startsOnScore: scenario.rawValue.hasPrefix("score."),
+                startsOnLeaders: arguments.contains("--bagger-start-leaders")
             )
         }
     }

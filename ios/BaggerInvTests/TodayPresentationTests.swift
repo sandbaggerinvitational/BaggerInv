@@ -406,6 +406,7 @@ final class TodayPresentationTests: XCTestCase {
         MobileLeadersData(
             tournament: TestFixtures.readTournament,
             teamStandings: teams,
+            roundStandings: [],
             playerStandings: []
         )
     }

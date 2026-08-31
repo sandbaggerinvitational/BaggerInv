@@ -144,6 +144,19 @@ final class MobileReadModelDecodingTests: XCTestCase {
         XCTAssertEqual(response.meta.revision, "leaders:fingerprint/opaque-v3")
     }
 
+    func testLeadersAcceptsSchemaValidEmptyRoundNameWithoutInventingAuthority() throws {
+        let fixture = try ReadFixture.leaders()
+        let json = try XCTUnwrap(String(data: fixture, encoding: .utf8))
+        let payload = try XCTUnwrap(
+            json.replacingOccurrences(of: "Opening Round", with: "").data(using: .utf8)
+        )
+
+        let response = try decoder.decode(MobileLeadersResponse.self, from: payload)
+
+        XCTAssertTrue(response.isCompatible(expectedTournamentID: ReadFixture.tournamentID))
+        XCTAssertEqual(response.data.roundStandings.first?.roundName, "")
+    }
+
     func testScheduleDecodesAbsoluteAndLocalTimesWithOptionalFields() throws {
         let response = try decoder.decode(
             MobileScheduleResponse.self,
@@ -543,6 +556,31 @@ private enum ReadFixture {
                         "points": 7.5,
                         "record": "4-2-1",
                         "remainingMatches": NSNull(),
+                    ],
+                ],
+                "roundStandings": [
+                    [
+                        "roundNumber": 1,
+                        "roundName": "Opening Round",
+                        "status": "final",
+                        "teamStandings": [
+                            [
+                                "rank": 1,
+                                "teamId": "team:pickles/2026",
+                                "name": "Pickles",
+                                "points": 3.5,
+                                "record": "3-2-1",
+                                "remainingMatches": 0,
+                            ],
+                            [
+                                "rank": 2,
+                                "teamId": "team:rippers/2026",
+                                "name": "Rippers",
+                                "points": 2.5,
+                                "record": "2-3-1",
+                                "remainingMatches": 0,
+                            ],
+                        ],
                     ],
                 ],
                 "playerStandings": [

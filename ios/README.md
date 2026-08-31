@@ -1,6 +1,6 @@
 # Bagger Invitational for iOS
 
-This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E added the first canonical owned-Match scoring reader and a native, read-only official Scorecard. Step 2F added durable, identity-partitioned scoring intent. Step 2G completed the isolated-Preview scoring loop with canonical mutation acknowledgements, mandatory refresh, participant-controlled conflict resolution, corrections, and online-only finalization logic.
+This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E added the first canonical owned-Match scoring reader and a native, read-only official Scorecard. Step 2F added durable, identity-partitioned scoring intent. Step 2G completed the isolated-Preview scoring loop with canonical mutation acknowledgements, mandatory refresh, participant-controlled conflict resolution, corrections, and online-only finalization logic. Step 2H adds the complete V1 participant Leaders experience: Tournament Score, canonical Round Scores, Player Leaders, official-only Net Skins, and published Calcutta.
 
 ## Requirements
 
@@ -108,11 +108,11 @@ A paid Apple Developer Program membership is not required for Simulator use. Do 
 - `ScoringQueue/` owns the versioned SQLite scoring-intent repository, queue policies, ordered replay, retry scheduling, crash recovery, and conflict/action-required/quarantine states. It contains no credentials and remains separate from the disposable read cache.
 - `Networking/` owns typed async HTTP transport and centralized protected headers.
 - `Security/` stores the Bagger certification and sensitive session state in Keychain-backed storage.
-- `Models/` contains the Step 2A identity contracts, complete Step 2B read DTOs, and the complete scoring-current DTO.
-- `Presentation/` maps canonical read DTOs to UI-ready Today, Matches, and scoring values without changing match, identity, schedule, standings, scoring permission, handicap, net, winner, or result authority.
+- `Models/` contains the Step 2A identity contracts, complete protected-read and Leaders DTOs, and the complete scoring-current DTO. Calcutta base-10 strings retain their canonical digits as the display/authority representation; `Decimal` is only a bounded convenience value and never replaces those digits.
+- `Presentation/` maps canonical read DTOs to UI-ready Today, Matches, Leaders, and scoring values without changing match, identity, schedule, standings, Net Skins, Calcutta, scoring permission, handicap, net, winner, result, or financial authority.
 - `Design/` contains the small native Bagger palette, spacing, card, and typography treatment shared by Today and Matches.
-- `Views/` contains the authentication UI, five-tab shell, real Today, Matches, and Score destinations, read-only Match Detail and Scorecard, and restrained placeholders for later products.
-- `Debug/` contains allowlisted, Debug-only synthetic Today, Matches, and scoring fixture launchers for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
+- `Views/` contains the authentication UI, five-tab shell, real Today, Matches, Score, and Leaders destinations, read-only Match Detail and Scorecard, and a restrained More placeholder.
+- `Debug/` contains allowlisted, Debug-only synthetic Today, Matches, scoring, and Leaders fixture launchers for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
 
 The app does not read canonical Bagger tables through Supabase. Supabase establishes the native Auth session; the mobile v1 API separately certifies that identity and returns the canonical Bagger Player. Protected API calls require both the Supabase Bearer token and the signed Bagger certification.
 
@@ -125,7 +125,8 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 - **Step 2E — COMPLETE:** memory-only canonical scoring-current reader, owned-Match scoring orientation, format-specific BB/SC/SI controls with explicitly ephemeral drafts, and an official read-only native Scorecard. At that milestone, no official score submission was enabled.
 - **Step 2F — COMPLETE:** SQLite-backed scoring intent, atomic local Save & Next, identity/tournament/Match partitioning, stable mutation IDs, ordered foreground replay, retry/backoff, crash recovery, stale-policy enforcement, retained unresolved intent across sign-out, database auditing, and physical-device acceptance are proven.
 - **Step 2G — COMPLETE:** official hole-mutation transport, acknowledgement-before-refresh durability, same-ID lost-response recovery, conflict comparison, Keep Official, explicit Reapply with a new mutation ID, correction overlays, and online-only finalization logic are implemented and proven. The isolated-Preview hole workflow was certified through normal acknowledgement, ordered replay, lost-response/idempotent recovery, correction, revision conflict, Keep Official, canonical restoration, and physical-device acceptance. No live finalization was authorized; finalization success, blockers, and lost-response reconciliation remain deterministically verified with injected transport.
-- **Next — Step 2H:** native Leaders plus a fresh participant-facing PWA leaderboard parity audit.
+- **Step 2H — COMPLETE:** the four-product native Leaders destination presents canonical Tournament Score and Round Scores, overall Player Leaders, official-only Net Skins, and published participant-safe Calcutta with participant/tournament cache isolation, ETag revalidation, publication invalidation, precision-safe financial decoding, Simulator coverage, live isolated-Preview read acceptance, and physical-iPhone online/offline, relaunch, accessibility, and sign-out isolation acceptance.
+- **Next — Step 2I:** More, full Schedule, Player Passport, Settings, and the curated secondary-content directory.
 
 ## Step 2B mobile read architecture
 
@@ -135,6 +136,8 @@ The shared read foundation consumes only the certified mobile v1 endpoints:
 - `GET /api/mobile/v1/matches`
 - `GET /api/mobile/v1/leaders`
 - `GET /api/mobile/v1/schedule`
+- `GET /api/mobile/v1/net-skins`
+- `GET /api/mobile/v1/calcutta`
 
 Every request uses the existing centralized protected transport with both the current Supabase Bearer token and `X-Bagger-Certification`. The credential provider revalidates the active Auth UUID and Bagger proof before returning credentials. The read layer does not use Supabase for direct canonical-table access and does not treat cache metadata as authentication authority.
 
@@ -152,7 +155,7 @@ The authenticated app uses the fixed native information architecture:
 Today | Matches | Score | Leaders | More
 ```
 
-Today, Matches, and Score are implemented; Leaders and More remain intentionally restrained placeholders. `Score` means owned-Match score entry and review—not Tournament Score. Step 2E established the canonical read surface; Step 2F made local Save & Next durable; Step 2G added official isolated-Preview replay, conflict/correction handling, and online-only finalization logic without changing Production authority.
+Today, Matches, Score, and Leaders are implemented; More remains intentionally restrained. `Score` means owned-Match score entry and review—not Tournament Score. `Leaders` owns the tournament competition products. Step 2E established the canonical scoring read surface; Step 2F made local Save & Next durable; Step 2G added official isolated-Preview replay, conflict/correction handling, and online-only finalization logic without changing Production authority.
 
 Today preserves the approved product hierarchy:
 
@@ -166,7 +169,7 @@ tournament context
 
 `TodayPresenter` is deterministic presentation logic. It uses `/today.currentMatch` exactly, filters personal matches only with `authenticatedPlayer.involved`, preserves the server's standings order/ranks/records, formats half points without changing numeric values, and filters schedule-day membership in the IANA tournament timezone. When the full schedule has no event for that local day, the server-projected `/today.immediateSchedule` may appear as **Up Next**. It never selects a different match, calculates standings, infers scoring authority, or accesses Google/Supabase tables.
 
-Each section handles content, loading, empty, and temporary unavailable states independently. Eligible cached content remains visible during refresh and transient failure; a restrained banner communicates cached/stale/offline status. Pull to refresh delegates once to `TournamentDataCoordinator.refreshAll()`. Global environment or authentication invalidation remains owned by the Step 2A coordinator and still fails closed.
+Each section handles content, loading, empty, and temporary unavailable states independently. Eligible cached content remains visible during refresh and transient failure; a restrained banner communicates cached/stale/offline status. Today pull to refresh delegates to the bounded four-product Today surface and does not eagerly load optional Leaders products. Global environment or authentication invalidation remains owned by the Step 2A coordinator and still fails closed.
 
 The visual treatment translates the current PWA's warm paper, deep evergreen, muted gold, serif display hierarchy, compact cards, strong Tournament Score surface, and accessible status copy into native SwiftUI. The Preview app is deliberately constrained to its audited light appearance until a full native dark palette is designed; this avoids unsafe automatic inversion. System fonts preserve Dynamic Type, and status/winner/offline meaning never relies on color alone.
 
@@ -382,7 +385,7 @@ or
 
 ETags are opaque and round-trip exactly. A `304 Not Modified` with no usable cache triggers one unconditional retry; a second `304` is treated as a cache inconsistency. A transport failure preserves an existing value as offline cache. Other safe failures preserve an existing value as stale where appropriate; no cached value is invented when none exists.
 
-All four products refresh after activation. The diagnostic's explicit refresh revalidates all products, while foreground refresh revalidates products whose last validation is at least five minutes old. Refresh operations support per-product request deduplication and explicit cancellation. Cancelling the shared product request affects its current waiters, keeps an existing value intact, clears the in-flight slot, and permits a later refresh. Environment re-attestation invalidates and cancels every in-flight product generation so a late transport completion cannot publish or persist while authority is uncertain.
+All six protected-read repositories activate and begin a bounded refresh with the verified participant context, so switching among Leaders products does not create avoidable blank states. The four Today-surface products refresh through the existing bounded Today pull-to-refresh workflow; optional Leaders reads are not re-requested merely because Today refreshes. Foreground revalidation refreshes eligible products whose last validation is at least five minutes old. Score and Players share one `/leaders` repository and concurrent calls deduplicate. Refresh operations support per-product request deduplication and explicit cancellation. Cancelling a shared product request keeps an existing value intact, clears the in-flight slot, and permits a later refresh. Environment re-attestation invalidates and cancels every in-flight product generation so a late transport completion cannot publish or persist while authority is uncertain.
 
 Nullable properties that the mobile JSON Schemas mark as required use a small Codable wrapper: an explicit JSON `null` remains valid, but an omitted required key fails decoding. HTTP 200 envelopes are also rejected before repository publication when `ok`, API version, or product structure is incompatible.
 
@@ -390,7 +393,7 @@ Nullable properties that the mobile JSON Schemas mark as required use a small Co
 
 These mechanisms are intentionally separate:
 
-- **READ CACHE:** replaceable, server-derived snapshots for Today, Matches, Leaders, and Schedule. It may be discarded and rebuilt from canonical mobile reads.
+- **READ CACHE:** replaceable, server-derived snapshots for Today, Matches, Leaders (including Round Scores), Schedule, Net Skins, and Calcutta. It may be discarded and rebuilt from canonical mobile reads.
 - **SCORING QUEUE:** durable private mutation intent governed by the scoring reliability specification. It preserves local-vs-official state, stable idempotency, retry timing, ordering, identity isolation, conflicts, acknowledgements, and crash recovery.
 
 The read cache is never a score source of truth, mutation journal, outbox, or evidence that a score is official. Step 2E's scoring reader deliberately bypasses this cache. Conversely, unresolved scoring intent is never put in `ReadCache/v1`, deleted under the read-cache sign-out policy, or presented as a cached canonical score. The scoring queue is durable user intent; the read cache is replaceable server data.
@@ -410,18 +413,41 @@ Step 2A includes:
 
 Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E added the isolated Preview scoring read surface; Step 2F added durable local scoring intent and guarded replay; Step 2G added participant-facing conflict review, corrections, official isolated-Preview hole replay, and online-only finalization logic. Phone Auth, Production scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
 
-## Future Leaders product requirement
+## Step 2H full Leaders
 
-Before Step 2H, native Leaders must receive a fresh participant-facing PWA parity audit. The eventual native experience must include:
+Step 2H deliberately integrates only the certified shared handoff commit `a33055fb2fcfbdd018deeb0ee19ac554533d42bd`; it does not merge the website branch. That handoff adds canonical Round Scores to `/api/mobile/v1/leaders` and exposes isolated-Preview `/api/mobile/v1/net-skins` and `/api/mobile/v1/calcutta` through the same participant-safe DTOs used by their server authority. Its presence in native ancestry does not enable Production native operation.
 
-- Tournament Score;
-- Player Leaders;
-- Round Scores when canonical mobile support exists;
-- Net Skins from a participant-safe canonical server projection;
-- Calcutta from a participant-safe published server projection, without Director/admin controls.
+The Leaders tab uses a phone-first four-product selector:
 
-Native must not recreate leaderboard, Net Skins, Round Score, Calcutta auction, settlement, or publication authority in Swift. The current stable website branch now defines additive participant-safe mobile-v1 contracts for Net Skins and published Calcutta, but those contracts and their dependencies are not yet part of the native branch ancestry and do not by themselves activate Production native access. Before Step 2H, audit them against the current PWA, deliberately synchronize only the stable shared contracts/routes needed by native, verify isolated-Preview availability and authority, and extend the authenticated participant-scoped read/cache foundation. Do not merge the website branch wholesale. Round Scores remain a separate canonical mobile-contract gap until server support exists.
+```text
+Score    → Tournament Score + canonical Round Scores
+Players  → canonical overall Player standings
+Net Skins → canonical official-only results
+Calcutta → canonical published participant view
+```
+
+Score and Players observe the same `LeadersRepository`; switching between them cannot duplicate or locally reconstruct `/leaders`. Round cards display `roundStandings` exactly, including canonical `upcoming`, `inProgress`, and `final` lifecycle and nullable future rank/points. Player order and tied ranks remain in server order, while the authenticated golfer receives only an ID-based visual/accessibility emphasis.
+
+Net Skins and Calcutta use dedicated typed repositories through the existing authenticated `MobileAPIClient`. Net Skins preserves the server's `NOT_CONFIGURED`, `CONFIGURED`, `IN_PROGRESS`, `OFFICIAL`, and `UNAVAILABLE` states and never derives net scores, winners, carryovers, rankings, or value. Calcutta preserves the separate publication and lifecycle states; `UNPUBLISHED` contains no visible market/result. Cache replacement tracks each participant-visible official Net Skins Round plus the published Calcutta representation, so any canonical visibility reduction atomically replaces or fail-closed invalidates the older disk entry.
+
+Calcutta monetary, ownership, and ROI values decode from canonical base-10 strings while retaining their exact original digits and scale. Native currency/percentage formatting groups and decorates those canonical digits directly—even beyond Foundation `Decimal` precision—and does not calculate ownership, purchase price, payout, tournament value, ROI, profit/loss, projection, or settlement. The participant screen contains no Director, publication, auction-management, settlement, War Room, or diagnostic controls.
+
+All three endpoint families use `private, no-cache` with representation ETags. Eligible participant-private cache appears immediately, then revalidates with the actual received `If-None-Match` validator. `304` retains the representation and updates validation metadata; a changed `200` validates and atomically replaces it. Transient offline failure keeps eligible content with explicit stale copy—especially for financial data. Cache identity remains:
+
+```text
+Preview environment
+→ Supabase Auth UUID
+→ canonical Bagger Player ID
+→ tournament ID
+→ product
+```
+
+Sign-out deletes the disposable Leaders, Net Skins, and Calcutta read partition without touching unresolved durable scoring intent. Account and tournament switches cannot reuse another partition.
+
+The asset audit considered the existing Bagger and team marks, but `/leaders` does not project canonical asset keys. Step 2H therefore uses authoritative text and neutral initials rather than fragile name-to-logo matching. No new image asset is bundled and app-size impact is effectively zero.
+
+The V1 parity audit intentionally defers Round Player leaderboards and richer team-Round details until a bounded participant mobile contract exists. Net Skins/Calcutta storylines are PWA presentation, Championship Insights and Published Odds remain later curated content, Match Center intelligence remains in Today/Matches, and all War Room/Director surfaces are admin-only. Those documented Post-V1 or separate-product boundaries do not require Swift to acquire server authority.
 
 ## Next step
 
-**Step 2H — Leaders + PWA leaderboard parity audit** is next. It must cover Tournament Score, Player Leaders, Round Scores when canonical support exists, Net Skins, Calcutta, and every other participant-facing leaderboard module present in the current stable PWA. Swift must consume server-projected canonical products rather than calculate ranks, points, skins, auction ownership, payout, settlement, or publication authority. Production native activation remains a separate explicit release gate.
+**Step 2I — More + full Schedule + Player Passport + secondary content** is next. Before implementation it must re-audit the current participant PWA, then build the native More directory, full Schedule, Player Passport when supported by canonical projections, meaningful Settings, and deliberate web-backed handoffs for approved secondary content. Production native activation remains a separate explicit release gate.

@@ -106,6 +106,30 @@ final class ReadCacheStoreTests: XCTestCase {
         }
     }
 
+    func testAllSixProtectedReadProductsUseDistinctParticipantPrivateFiles() async throws {
+        let root = try makeTemporaryRoot()
+        defer { removeTemporaryRoot(root) }
+        let store = try DiskReadCacheStore(rootDirectory: root)
+        let partition = try PartitionInputs.standard.partition()
+
+        XCTAssertEqual(
+            Set(MobileReadProduct.allCases),
+            Set([.today, .matches, .leaders, .netSkins, .calcutta, .schedule])
+        )
+        for (index, product) in MobileReadProduct.allCases.enumerated() {
+            try await store.write(Data([UInt8(index + 1)]), product: product, partition: partition)
+        }
+
+        let names = try FileManager.default.contentsOfDirectory(
+            at: await store.fileURL(product: .leaders, partition: partition).deletingLastPathComponent(),
+            includingPropertiesForKeys: nil
+        ).map(\.lastPathComponent)
+        XCTAssertEqual(
+            Set(names),
+            Set(["today.json", "matches.json", "leaders.json", "netSkins.json", "calcutta.json", "schedule.json"])
+        )
+    }
+
     func testWriteAppliesFileProtectionWhenThePlatformReportsIt() async throws {
         let root = try makeTemporaryRoot()
         defer { removeTemporaryRoot(root) }
@@ -176,18 +200,19 @@ final class ReadCacheStoreTests: XCTestCase {
         let store = try DiskReadCacheStore(rootDirectory: root)
         let partition = try PartitionInputs.standard.partition()
 
-        try await store.write(Data("today".utf8), product: .today, partition: partition)
-        try await store.write(Data("schedule".utf8), product: .schedule, partition: partition)
+        for product in MobileReadProduct.allCases {
+            try await store.write(Data(product.rawValue.utf8), product: product, partition: partition)
+        }
         let partitionDirectory = await store.fileURL(product: .today, partition: partition)
             .deletingLastPathComponent()
 
         try await store.remove(partition: partition)
         try await store.remove(partition: partition)
 
-        let today = try await store.read(product: .today, partition: partition)
-        let schedule = try await store.read(product: .schedule, partition: partition)
-        XCTAssertNil(today)
-        XCTAssertNil(schedule)
+        for product in MobileReadProduct.allCases {
+            let value = try await store.read(product: product, partition: partition)
+            XCTAssertNil(value, "Sign-out partition deletion retained \(product.rawValue)")
+        }
         XCTAssertFalse(FileManager.default.fileExists(atPath: partitionDirectory.path))
         let byteCount = try await store.byteCount(partition: partition)
         XCTAssertEqual(byteCount, 0)

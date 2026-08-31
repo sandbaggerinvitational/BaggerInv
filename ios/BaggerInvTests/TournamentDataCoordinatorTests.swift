@@ -3,7 +3,7 @@ import XCTest
 
 @MainActor
 final class TournamentDataCoordinatorTests: XCTestCase {
-    func testActivationLoadsAllFourProductsWithoutRepeatingSessionResolution() async throws {
+    func testActivationLoadsAllSixProductsWithoutRepeatingSessionResolution() async throws {
         let cache = CoordinatorMemoryCache()
         let api = MockMobileAPI()
         let coordinator = makeCoordinator(api: api, cache: cache)
@@ -17,11 +17,148 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.today.state.value, TestFixtures.todayResponse.data)
         XCTAssertEqual(coordinator.matches.state.value, TestFixtures.matchesResponse.data)
         XCTAssertEqual(coordinator.leaders.state.value, TestFixtures.leadersResponse.data)
+        XCTAssertEqual(coordinator.netSkins.state.value, TestFixtures.netSkinsResponse.data)
+        XCTAssertEqual(coordinator.calcutta.state.value, TestFixtures.calcuttaResponse.data)
         XCTAssertEqual(coordinator.schedule.state.value, TestFixtures.scheduleResponse.data)
-        XCTAssertEqual(api.readCallCount, 4)
+        XCTAssertEqual(api.readCallCount, 6)
         XCTAssertEqual(api.participantCallCount, 0)
         let cacheByteCount = await coordinator.activeCacheByteCount()
         XCTAssertGreaterThan(try XCTUnwrap(cacheByteCount), 0)
+    }
+
+    func testTodaySurfaceRefreshKeepsOptionalLeadersProductsLazy() async throws {
+        let cache = CoordinatorMemoryCache()
+        let api = MockMobileAPI()
+        let coordinator = TournamentDataCoordinator(
+            api: api,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+        await coordinator.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+
+        await coordinator.refreshTodaySurface()
+
+        XCTAssertEqual(api.readCallCount, 4)
+        XCTAssertEqual(coordinator.today.state.value, TestFixtures.todayResponse.data)
+        XCTAssertEqual(coordinator.matches.state.value, TestFixtures.matchesResponse.data)
+        XCTAssertEqual(coordinator.leaders.state.value, TestFixtures.leadersResponse.data)
+        XCTAssertEqual(coordinator.schedule.state.value, TestFixtures.scheduleResponse.data)
+        XCTAssertEqual(coordinator.netSkins.state, .empty)
+        XCTAssertEqual(coordinator.calcutta.state, .empty)
+    }
+
+    func testConcurrentScoreAndPlayersRefreshesShareOneLeadersRequest() async throws {
+        let cache = CoordinatorMemoryCache()
+        let api = SuspendedLeadersMobileAPI()
+        let coordinator = TournamentDataCoordinator(
+            api: api,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+        await coordinator.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+
+        let scoreRefresh = Task { @MainActor in await coordinator.leaders.refresh() }
+        for _ in 0..<1_000 where !api.isLeadersRequestSuspended {
+            await Task.yield()
+        }
+        XCTAssertTrue(api.isLeadersRequestSuspended)
+        let playersRefresh = Task { @MainActor in await coordinator.leaders.refresh() }
+        for _ in 0..<100 { await Task.yield() }
+        XCTAssertEqual(api.leadersCallCount, 1)
+
+        api.releaseLeadersRequest()
+        await scoreRefresh.value
+        await playersRefresh.value
+
+        XCTAssertEqual(api.leadersCallCount, 1)
+        XCTAssertEqual(coordinator.leaders.state.value, TestFixtures.leadersResponse.data)
+        XCTAssertEqual(coordinator.leaders.state.freshness, .fresh)
+    }
+
+    func testChangedLeadersResponseAtomicallyUpdatesAndReloadsTheSharedRepresentation() async throws {
+        let cache = CoordinatorMemoryCache()
+        let api = MockMobileAPI()
+        let initial = leadersResponse(
+            revision: "leaders-atomic-1",
+            overallPoints: (4, 3),
+            roundStatus: .inProgress,
+            roundPoints: (2.5, 1.5),
+            playerPoints: (3, 2)
+        )
+        let changed = leadersResponse(
+            revision: "leaders-atomic-2",
+            overallPoints: (8.5, 7.5),
+            roundStatus: .final,
+            roundPoints: (3.5, 2.5),
+            playerPoints: (5, 4.5)
+        )
+        api.leadersValue = .modified(initial, etag: #""leaders-atomic-1""#)
+        let coordinator = TournamentDataCoordinator(
+            api: api,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+        await coordinator.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+
+        await coordinator.leaders.refresh()
+
+        XCTAssertEqual(coordinator.leaders.state.value, initial.data)
+        XCTAssertEqual(coordinator.leaders.state.revision, initial.meta.revision)
+        let initialEntryCount = await cache.storedEntryCount()
+        XCTAssertEqual(initialEntryCount, 1)
+
+        api.leadersValue = .modified(changed, etag: #""leaders-atomic-2""#)
+        await coordinator.leaders.refresh()
+
+        let updated = try XCTUnwrap(coordinator.leaders.state.value)
+        XCTAssertEqual(updated, changed.data)
+        XCTAssertEqual(updated.teamStandings, changed.data.teamStandings)
+        XCTAssertEqual(updated.roundStandings, changed.data.roundStandings)
+        XCTAssertEqual(updated.playerStandings, changed.data.playerStandings)
+        XCTAssertEqual(coordinator.leaders.state.revision, changed.meta.revision)
+        XCTAssertEqual(coordinator.leaders.state.source, .network)
+        XCTAssertEqual(coordinator.leaders.state.freshness, .fresh)
+        XCTAssertEqual(api.leadersCallCount, 2)
+        let updatedEntryCount = await cache.storedEntryCount()
+        XCTAssertEqual(updatedEntryCount, 1, "The shared /leaders representation split across cache records.")
+
+        let reloadedAPI = MockMobileAPI()
+        let reloaded = TournamentDataCoordinator(
+            api: reloadedAPI,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+        await reloaded.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+
+        let restored = try XCTUnwrap(reloaded.leaders.state.value)
+        XCTAssertEqual(restored, changed.data)
+        XCTAssertEqual(restored.teamStandings, changed.data.teamStandings)
+        XCTAssertEqual(restored.roundStandings, changed.data.roundStandings)
+        XCTAssertEqual(restored.playerStandings, changed.data.playerStandings)
+        XCTAssertEqual(reloaded.leaders.state.revision, changed.meta.revision)
+        XCTAssertEqual(reloaded.leaders.state.source, .diskCache)
+        XCTAssertEqual(reloaded.leaders.state.freshness, .cached)
+        XCTAssertEqual(reloadedAPI.readCallCount, 0)
     }
 
     func testDeactivationCancelsReadsClearsMemoryAndDeletesActivePartition() async throws {
@@ -39,6 +176,8 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.today.state, .empty)
         XCTAssertEqual(coordinator.matches.state, .empty)
         XCTAssertEqual(coordinator.leaders.state, .empty)
+        XCTAssertEqual(coordinator.netSkins.state, .empty)
+        XCTAssertEqual(coordinator.calcutta.state, .empty)
         XCTAssertEqual(coordinator.schedule.state, .empty)
         XCTAssertEqual(coordinator.scoring.state, .idle)
         let removalCount = await cache.partitionRemovalCount()
@@ -78,13 +217,15 @@ final class TournamentDataCoordinatorTests: XCTestCase {
             participant: TestFixtures.participant
         )
         await coordinator.refreshAll()
-        XCTAssertEqual(api.readCallCount, 4)
+        XCTAssertEqual(api.readCallCount, 6)
 
         await coordinator.suspendForEnvironmentReattestation()
 
         XCTAssertEqual(coordinator.today.state.value, TestFixtures.todayResponse.data)
         XCTAssertEqual(coordinator.matches.state.value, TestFixtures.matchesResponse.data)
         XCTAssertEqual(coordinator.leaders.state.value, TestFixtures.leadersResponse.data)
+        XCTAssertEqual(coordinator.netSkins.state.value, TestFixtures.netSkinsResponse.data)
+        XCTAssertEqual(coordinator.calcutta.state.value, TestFixtures.calcuttaResponse.data)
         XCTAssertEqual(coordinator.schedule.state.value, TestFixtures.scheduleResponse.data)
         let retainedBytes = await cache.totalStoredByteCount()
         XCTAssertGreaterThan(retainedBytes, 0)
@@ -94,8 +235,10 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.today.state.value, TestFixtures.todayResponse.data)
         XCTAssertEqual(coordinator.matches.state.value, TestFixtures.matchesResponse.data)
         XCTAssertEqual(coordinator.leaders.state.value, TestFixtures.leadersResponse.data)
+        XCTAssertEqual(coordinator.netSkins.state.value, TestFixtures.netSkinsResponse.data)
+        XCTAssertEqual(coordinator.calcutta.state.value, TestFixtures.calcuttaResponse.data)
         XCTAssertEqual(coordinator.schedule.state.value, TestFixtures.scheduleResponse.data)
-        XCTAssertEqual(api.readCallCount, 4, "Resume must not loop the failing request automatically.")
+        XCTAssertEqual(api.readCallCount, 6, "Resume must not loop the failing request automatically.")
 
         await coordinator.deactivate(deleteCache: true)
         let deletedBytes = await cache.totalStoredByteCount()
@@ -145,23 +288,23 @@ final class TournamentDataCoordinatorTests: XCTestCase {
             participant: TestFixtures.participant
         )
         await coordinator.refreshAll()
-        XCTAssertEqual(api.readCallCount, 4)
+        XCTAssertEqual(api.readCallCount, 6)
         let writesBeforeSuspension = await cache.totalWriteCount()
 
         api.suspendNextReadBatch()
         let refresh = Task { @MainActor in await coordinator.refreshAll() }
-        for _ in 0..<1_000 where api.suspendedReadCount < 4 {
+        for _ in 0..<1_000 where api.suspendedReadCount < 6 {
             await Task.yield()
         }
-        XCTAssertEqual(api.suspendedReadCount, 4)
+        XCTAssertEqual(api.suspendedReadCount, 6)
 
         let suspension = Task { @MainActor in
             await coordinator.suspendForEnvironmentReattestation()
         }
-        for _ in 0..<1_000 where api.cancellationRequestCount < 4 {
+        for _ in 0..<1_000 where api.cancellationRequestCount < 6 {
             await Task.yield()
         }
-        XCTAssertEqual(api.cancellationRequestCount, 4)
+        XCTAssertEqual(api.cancellationRequestCount, 6)
         api.releaseSuspendedReads()
         await suspension.value
         await refresh.value
@@ -171,22 +314,64 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.today.state.value, TestFixtures.todayResponse.data)
         XCTAssertEqual(coordinator.matches.state.value, TestFixtures.matchesResponse.data)
         XCTAssertEqual(coordinator.leaders.state.value, TestFixtures.leadersResponse.data)
+        XCTAssertEqual(coordinator.netSkins.state.value, TestFixtures.netSkinsResponse.data)
+        XCTAssertEqual(coordinator.calcutta.state.value, TestFixtures.calcuttaResponse.data)
         XCTAssertEqual(coordinator.schedule.state.value, TestFixtures.scheduleResponse.data)
         XCTAssertFalse(coordinator.today.state.isRefreshing)
         XCTAssertFalse(coordinator.matches.state.isRefreshing)
         XCTAssertFalse(coordinator.leaders.state.isRefreshing)
+        XCTAssertFalse(coordinator.netSkins.state.isRefreshing)
+        XCTAssertFalse(coordinator.calcutta.state.isRefreshing)
         XCTAssertFalse(coordinator.schedule.state.isRefreshing)
 
         await coordinator.resumeAfterEnvironmentReattestation()
         await coordinator.refreshAll()
 
-        XCTAssertEqual(api.readCallCount, 12)
+        XCTAssertEqual(api.readCallCount, 18)
         let writesAfterResume = await cache.totalWriteCount()
-        XCTAssertEqual(writesAfterResume, writesBeforeSuspension + 4)
+        XCTAssertEqual(writesAfterResume, writesBeforeSuspension + 6)
         XCTAssertEqual(coordinator.today.state.freshness, .fresh)
         XCTAssertEqual(coordinator.matches.state.freshness, .fresh)
         XCTAssertEqual(coordinator.leaders.state.freshness, .fresh)
+        XCTAssertEqual(coordinator.netSkins.state.freshness, .fresh)
+        XCTAssertEqual(coordinator.calcutta.state.freshness, .fresh)
         XCTAssertEqual(coordinator.schedule.state.freshness, .fresh)
+    }
+
+    func testForegroundScoringRefreshDoesNotWaitForSuspendedLeadersProducts() async throws {
+        let cache = CoordinatorMemoryCache()
+        let api = SuspendingReadMobileAPI()
+        let coordinator = TournamentDataCoordinator(
+            api: api,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+        await coordinator.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+        await coordinator.scoring.refresh()
+        XCTAssertEqual(api.scoringCallCount, 1)
+
+        api.suspendNextReadBatch()
+        let foreground = Task { @MainActor in await coordinator.refreshForForeground() }
+        for _ in 0..<1_000 where api.suspendedReadCount < 6 {
+            await Task.yield()
+        }
+        XCTAssertEqual(api.suspendedReadCount, 6)
+        for _ in 0..<1_000 where api.scoringCallCount < 2 {
+            await Task.yield()
+        }
+
+        XCTAssertEqual(
+            api.scoringCallCount,
+            2,
+            "Optional Leaders revalidation delayed the scoring-critical foreground refresh."
+        )
+        api.releaseSuspendedReads()
+        await foreground.value
     }
 
     func testDeactivateWinsAgainstSuspendedActivationWithoutStaleRepositoryReactivation() async throws {
@@ -214,6 +399,8 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.today.state, .empty)
         XCTAssertEqual(coordinator.matches.state, .empty)
         XCTAssertEqual(coordinator.leaders.state, .empty)
+        XCTAssertEqual(coordinator.netSkins.state, .empty)
+        XCTAssertEqual(coordinator.calcutta.state, .empty)
         XCTAssertEqual(coordinator.schedule.state, .empty)
         XCTAssertEqual(api.readCallCount, 0)
     }
@@ -292,7 +479,7 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(invalidationCount, 2)
         XCTAssertTrue(coordinator.cacheCleanupIssue)
         XCTAssertEqual(coordinator.today.state, .empty)
-        XCTAssertEqual(api.readCallCount, 4)
+        XCTAssertEqual(api.readCallCount, 6)
     }
 
     private func makeCoordinator(
@@ -304,6 +491,89 @@ final class TournamentDataCoordinatorTests: XCTestCase {
             credentialProvider: CoordinatorCredentialProvider(),
             cache: cache,
             now: { TestFixtures.now }
+        )
+    }
+
+    private func leadersResponse(
+        revision: String,
+        overallPoints: (Double, Double),
+        roundStatus: MobileRoundStandingStatus,
+        roundPoints: (Double, Double),
+        playerPoints: (Double, Double)
+    ) -> MobileLeadersResponse {
+        let previewTeam = MobileReadTeam(teamId: "team-preview-1", name: "Preview Team")
+        let otherTeam = MobileReadTeam(teamId: "team-preview-2", name: "Other Team")
+        return MobileLeadersResponse(
+            ok: true,
+            apiVersion: "v1",
+            data: MobileLeadersData(
+                tournament: TestFixtures.readTournament,
+                teamStandings: [
+                    MobileTeamStanding(
+                        rank: 1,
+                        teamId: "team-preview-1",
+                        name: previewTeam.name,
+                        points: overallPoints.0,
+                        record: "4-1-0",
+                        remainingMatches: 1
+                    ),
+                    MobileTeamStanding(
+                        rank: 2,
+                        teamId: "team-preview-2",
+                        name: otherTeam.name,
+                        points: overallPoints.1,
+                        record: "3-2-0",
+                        remainingMatches: 1
+                    ),
+                ],
+                roundStandings: [
+                    MobileRoundStanding(
+                        roundNumber: 2,
+                        roundName: "Second Round",
+                        status: roundStatus,
+                        teamStandings: [
+                            MobileTeamStanding(
+                                rank: 1,
+                                teamId: "team-preview-1",
+                                name: previewTeam.name,
+                                points: roundPoints.0,
+                                record: "2-0-0",
+                                remainingMatches: 0
+                            ),
+                            MobileTeamStanding(
+                                rank: 2,
+                                teamId: "team-preview-2",
+                                name: otherTeam.name,
+                                points: roundPoints.1,
+                                record: "0-2-0",
+                                remainingMatches: 0
+                            ),
+                        ]
+                    ),
+                ],
+                playerStandings: [
+                    MobilePlayerStanding(
+                        rank: 1,
+                        playerId: TestFixtures.participant.player.playerId,
+                        displayName: TestFixtures.participant.player.displayName,
+                        team: previewTeam,
+                        points: playerPoints.0,
+                        record: "3-0-0"
+                    ),
+                    MobilePlayerStanding(
+                        rank: 2,
+                        playerId: "player-preview-2",
+                        displayName: "Other Golfer",
+                        team: otherTeam,
+                        points: playerPoints.1,
+                        record: "2-1-0"
+                    ),
+                ]
+            ),
+            meta: MobileReadMeta(
+                generatedAt: TestFixtures.readMeta.generatedAt,
+                revision: revision
+            )
         )
     }
 }
@@ -370,6 +640,7 @@ private actor CoordinatorMemoryCache: ReadCacheStoring {
     func partitionRemovalAttempts() -> Int { partitionRemovalAttemptCount }
     func totalStoredByteCount() -> Int { values.values.reduce(0) { $0 + $1.count } }
     func totalWriteCount() -> Int { writeCount }
+    func storedEntryCount() -> Int { values.count }
 
     func failNextPartitionRemovals(_ count: Int) {
         partitionRemovalFailuresRemaining = count
@@ -402,6 +673,7 @@ private enum CoordinatorCacheError: Error {
 @MainActor
 private final class SuspendingReadMobileAPI: MobileAPIServing {
     private(set) var readCallCount = 0
+    private(set) var scoringCallCount = 0
     private(set) var suspendedReadCount = 0
     private(set) var cancellationRequestCount = 0
     private var shouldSuspendReads = false
@@ -459,6 +731,24 @@ private final class SuspendingReadMobileAPI: MobileAPIServing {
         return .modified(TestFixtures.leadersResponse, etag: "\"fixture-revision-1\"")
     }
 
+    func netSkins(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileNetSkinsResponse> {
+        await suspendReadIfRequested()
+        return .modified(TestFixtures.netSkinsResponse, etag: "\"fixture-net-skins-revision-1\"")
+    }
+
+    func calcutta(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileCalcuttaResponse> {
+        await suspendReadIfRequested()
+        return .modified(TestFixtures.calcuttaResponse, etag: "\"fixture-calcutta-revision-1\"")
+    }
+
     func schedule(
         accessToken: String,
         certification: String,
@@ -466,6 +756,15 @@ private final class SuspendingReadMobileAPI: MobileAPIServing {
     ) async throws -> MobileConditionalRead<MobileScheduleResponse> {
         await suspendReadIfRequested()
         return .modified(TestFixtures.scheduleResponse, etag: "\"fixture-revision-1\"")
+    }
+
+    func scoringCurrent(
+        accessToken: String,
+        certification: String,
+        matchID: String?
+    ) async throws -> MobileScoringCurrentResponse {
+        scoringCallCount += 1
+        return TestFixtures.scoringResponse
     }
 
     private func suspendReadIfRequested() async {
@@ -481,5 +780,69 @@ private final class SuspendingReadMobileAPI: MobileAPIServing {
                 self?.cancellationRequestCount += 1
             }
         }
+    }
+}
+
+@MainActor
+private final class SuspendedLeadersMobileAPI: MobileAPIServing {
+    private(set) var leadersCallCount = 0
+    private(set) var isLeadersRequestSuspended = false
+    private var leadersContinuation: CheckedContinuation<Void, Never>?
+
+    func releaseLeadersRequest() {
+        leadersContinuation?.resume()
+        leadersContinuation = nil
+        isLeadersRequestSuspended = false
+    }
+
+    func health() async throws -> MobileHealthResponse { TestFixtures.health }
+
+    func requestOTP(identifier: String, captchaToken: String) async throws -> OTPRequestAcknowledgement {
+        TestFixtures.otpAcknowledgement
+    }
+
+    func certify(challengeId: String, accessToken: String) async throws -> OTPCertificationAcknowledgement {
+        TestFixtures.certificationAcknowledgement
+    }
+
+    func participantSession(accessToken: String, certification: String) async throws -> ParticipantSession {
+        TestFixtures.participant
+    }
+
+    func today(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileTodayResponse> {
+        .modified(TestFixtures.todayResponse, etag: "\"fixture-revision-1\"")
+    }
+
+    func matches(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileMatchesResponse> {
+        .modified(TestFixtures.matchesResponse, etag: "\"fixture-revision-1\"")
+    }
+
+    func leaders(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileLeadersResponse> {
+        leadersCallCount += 1
+        isLeadersRequestSuspended = true
+        await withCheckedContinuation { continuation in
+            leadersContinuation = continuation
+        }
+        return .modified(TestFixtures.leadersResponse, etag: "\"fixture-revision-1\"")
+    }
+
+    func schedule(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileScheduleResponse> {
+        .modified(TestFixtures.scheduleResponse, etag: "\"fixture-revision-1\"")
     }
 }

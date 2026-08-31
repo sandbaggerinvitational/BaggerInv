@@ -62,6 +62,7 @@ struct MobileReadState<Value: Equatable & Sendable>: Equatable, Sendable {
 struct ActiveMobileReadContext: Equatable, Sendable {
     let cachePartition: ReadCachePartition
     let authUserID: String
+    let playerID: String
     let tournamentID: String
 }
 
@@ -75,11 +76,17 @@ private struct ReadCacheEnvelope<Response: MobileReadPayloadResponse>: Codable, 
     var validatedAt: Date
 }
 
+private enum RevocableCacheReplacement {
+    case persisted
+    case invalidated
+    case unsafe
+}
+
 protocol MobileReadPayloadResponse: Codable, Equatable, Sendable {
     associatedtype Payload: MobileReadPayload
     var data: Payload { get }
     var meta: MobileReadMeta { get }
-    func isCompatible(expectedTournamentID: String) -> Bool
+    func isCompatible(expectedTournamentID: String, expectedPlayerID: String) -> Bool
 }
 
 extension MobileReadResponse: MobileReadPayloadResponse {
@@ -159,7 +166,10 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                 guard entry.cacheSchemaVersion == DiskReadCacheStore.cacheSchemaVersion,
                       entry.partitionDigest == context.cachePartition.digest,
                       entry.product == product,
-                      entry.response.isCompatible(expectedTournamentID: context.tournamentID),
+                      entry.response.isCompatible(
+                          expectedTournamentID: context.tournamentID,
+                          expectedPlayerID: context.playerID
+                      ),
                       generation == activationGeneration,
                       activeContext == context
                 else {
@@ -306,10 +316,14 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                 entry.validatedAt = now()
                 cachedEntry = entry
                 state = state(from: entry, source: state.source ?? .diskCache, freshness: .fresh)
+                state.lastHTTPStatus = 304
                 await persist(entry, context: context, operationGeneration: operationGeneration)
 
             case .modified(let response, let etag):
-                guard response.isCompatible(expectedTournamentID: context.tournamentID) else {
+                guard response.isCompatible(
+                    expectedTournamentID: context.tournamentID,
+                    expectedPlayerID: context.playerID
+                ) else {
                     throw MobileReadFailure.contract
                 }
                 let fetchedAt = now()
@@ -322,8 +336,36 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                     fetchedAt: fetchedAt,
                     validatedAt: fetchedAt
                 )
+
+                let previouslyVisibleKeys =
+                    cachedEntry?.response.data.revocableParticipantRepresentationKeys ?? []
+                let currentlyVisibleKeys = response.data.revocableParticipantRepresentationKeys
+                let revokesPreviouslyVisibleRepresentation =
+                    !previouslyVisibleKeys.subtracting(currentlyVisibleKeys).isEmpty
+                if revokesPreviouslyVisibleRepresentation {
+                    let replacement = await replaceRevocableCacheFailClosed(
+                        with: entry,
+                        context: context,
+                        operationGeneration: operationGeneration
+                    )
+                    guard isActive(context, generation: operationGeneration) else { return }
+                    cachedEntry = entry
+                    state = state(from: entry, source: .network, freshness: .fresh)
+                    state.lastHTTPStatus = 200
+                    switch replacement {
+                    case .persisted:
+                        break
+                    case .invalidated:
+                        state.cachePersistenceIssue = true
+                    case .unsafe:
+                        state.cachePersistenceIssue = true
+                        accessInvalidationHandler?()
+                    }
+                    return
+                }
                 cachedEntry = entry
                 state = state(from: entry, source: .network, freshness: .fresh)
+                state.lastHTTPStatus = 200
                 await persist(entry, context: context, operationGeneration: operationGeneration)
             }
         } catch is CancellationError {
@@ -333,6 +375,37 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
         } catch {
             guard isActive(context, generation: operationGeneration) else { return }
             handle(error)
+        }
+    }
+
+    /// A visibility-reducing canonical response must never leave the older
+    /// published/official representation eligible on disk. Prefer atomic
+    /// replacement; if persistence fails, remove that product (or quarantine
+    /// the whole disposable partition) before publishing the reduced view.
+    private func replaceRevocableCacheFailClosed(
+        with entry: ReadCacheEnvelope<Response>,
+        context: ActiveMobileReadContext,
+        operationGeneration: UInt
+    ) async -> RevocableCacheReplacement {
+        do {
+            let data = try encoder.encode(entry)
+            guard isActive(context, generation: operationGeneration), !Task.isCancelled else {
+                return .unsafe
+            }
+            try await cache.write(data, product: product, partition: context.cachePartition)
+            return .persisted
+        } catch {
+            do {
+                try await cache.remove(product: product, partition: context.cachePartition)
+                return .invalidated
+            } catch {
+                do {
+                    try await cache.remove(partition: context.cachePartition)
+                    return .invalidated
+                } catch {
+                    return .unsafe
+                }
+            }
         }
     }
 
