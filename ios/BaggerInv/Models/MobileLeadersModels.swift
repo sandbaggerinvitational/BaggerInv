@@ -292,8 +292,9 @@ struct MobileNetSkinsData: MobileReadPayload {
     let rounds: [MobileNetSkinsRound]
     let player: MobileNetSkinsPlayerContext
 
-    var tournamentID: String { tournamentId }
-    var participantPlayerID: String? { player.playerId }
+    var contextBinding: MobileReadContextBinding {
+        .participant(playerID: player.playerId, tournamentID: tournamentId)
+    }
     /// Each official Round is an independently revocable participant-visible
     /// representation. Comparing this set prevents an older official Round
     /// from resurfacing when another Round remains official.
@@ -303,9 +304,6 @@ struct MobileNetSkinsData: MobileReadPayload {
         })
     }
 
-    func isCompatible(expectedPlayerID: String) -> Bool {
-        player.playerId == expectedPlayerID
-    }
     var isStructurallyCompatible: Bool {
         let expectedRevision = "net-skins-v1:\(configurationRevision):\(resultRevision ?? 0):\(state.rawValue)"
         return contractVersion == "production-net-skins-v1" &&
@@ -495,15 +493,13 @@ struct MobileCalcuttaData: MobileReadPayload {
     @MobileRequiredNullable var result: MobileCalcuttaResult?
     let viewer: MobileCalcuttaViewer
 
-    var tournamentID: String { tournamentId }
-    var participantPlayerID: String? { viewer.playerId }
+    var contextBinding: MobileReadContextBinding {
+        .participant(playerID: viewer.playerId, tournamentID: tournamentId)
+    }
     var revocableParticipantRepresentationKeys: Set<String> {
         publicationState == .published ? ["published-calcutta"] : []
     }
 
-    func isCompatible(expectedPlayerID: String) -> Bool {
-        viewer.playerId == expectedPlayerID
-    }
     var isStructurallyCompatible: Bool {
         let expectedRevision = "calcutta-v1:\(configurationRevision):\(auctionRevision):" +
             "\(publicationRevision):\(resultRevision ?? 0):\(state.rawValue):\(publicationState.rawValue)"

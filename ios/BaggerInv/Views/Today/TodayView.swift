@@ -34,15 +34,21 @@ struct TodayRepositoryDiagnostics: Equatable, Sendable {
 struct TodayRepositoryView: View {
     let participant: ParticipantSession
     let coordinator: TournamentDataCoordinator
+    let onOpenFullSchedule: () -> Void
 
     @ObservedObject private var today: MobileReadRepository<MobileTodayResponse>
     @ObservedObject private var matches: MobileReadRepository<MobileMatchesResponse>
     @ObservedObject private var leaders: MobileReadRepository<MobileLeadersResponse>
     @ObservedObject private var schedule: MobileReadRepository<MobileScheduleResponse>
 
-    init(participant: ParticipantSession, coordinator: TournamentDataCoordinator) {
+    init(
+        participant: ParticipantSession,
+        coordinator: TournamentDataCoordinator,
+        onOpenFullSchedule: @escaping () -> Void = {}
+    ) {
         self.participant = participant
         self.coordinator = coordinator
+        self.onOpenFullSchedule = onOpenFullSchedule
         _today = ObservedObject(wrappedValue: coordinator.today)
         _matches = ObservedObject(wrappedValue: coordinator.matches)
         _leaders = ObservedObject(wrappedValue: coordinator.leaders)
@@ -70,7 +76,8 @@ struct TodayRepositoryView: View {
                 : nil,
             isRefreshing: today.state.isRefreshing || matches.state.isRefreshing ||
                 leaders.state.isRefreshing || schedule.state.isRefreshing,
-            onRefresh: { await coordinator.refreshTodaySurface() }
+            onRefresh: { await coordinator.refreshTodaySurface() },
+            onOpenFullSchedule: onOpenFullSchedule
         )
     }
 }
@@ -80,17 +87,20 @@ struct TodayScreen: View {
     var readDiagnostics: TodayRepositoryDiagnostics?
     let isRefreshing: Bool
     let onRefresh: @MainActor @Sendable () async -> Void
+    let onOpenFullSchedule: () -> Void
 
     init(
         presentation: TodayPresentation,
         readDiagnostics: TodayRepositoryDiagnostics? = nil,
         isRefreshing: Bool,
-        onRefresh: @escaping @MainActor @Sendable () async -> Void
+        onRefresh: @escaping @MainActor @Sendable () async -> Void,
+        onOpenFullSchedule: @escaping () -> Void = {}
     ) {
         self.presentation = presentation
         self.readDiagnostics = readDiagnostics
         self.isRefreshing = isRefreshing
         self.onRefresh = onRefresh
+        self.onOpenFullSchedule = onOpenFullSchedule
     }
 
     var body: some View {
@@ -121,8 +131,10 @@ struct TodayScreen: View {
                     .accessibilityIdentifier("today.tournamentScore")
                     .todayReadDiagnostic(readDiagnostics?.leaders)
 
-                    TodayScheduleSection(section: presentation.schedule)
-                        .accessibilityIdentifier("today.schedule")
+                    TodayScheduleSection(
+                        section: presentation.schedule,
+                        onOpenFullSchedule: onOpenFullSchedule
+                    )
                         .todayReadDiagnostic(readDiagnostics?.schedule)
                 }
 
@@ -612,10 +624,12 @@ private struct TournamentScoreSection: View {
 
 private struct TodayScheduleSection: View {
     let section: TodaySection<TodaySchedulePresentation>
+    let onOpenFullSchedule: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             BaggerSectionHeading(section.value?.title ?? "Today’s Schedule")
+                .accessibilityIdentifier("today.schedule")
             switch section.availability {
             case .content:
                 if let schedule = section.value {
@@ -643,6 +657,16 @@ private struct TodayScheduleSection: View {
                     message: "Published tournament events could not be loaded right now."
                 )
             }
+
+            Button(action: onOpenFullSchedule) {
+                Label("View Full Schedule", systemImage: "calendar")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(BaggerPalette.actionGreen)
+            .controlSize(.large)
+            .accessibilityHint("Opens the full tournament Schedule")
+            .accessibilityIdentifier("today.fullSchedule")
         }
     }
 }

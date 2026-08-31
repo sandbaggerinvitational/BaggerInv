@@ -301,6 +301,54 @@ final class MobileReadAPIClientTests: XCTestCase {
             XCTAssertFalse(diagnostic.contains(certification))
         }
     }
+
+    func testParticipantContentReadsUseTypedProtectedPathsAndValidatedHistoryYear() async throws {
+        let transport = ScriptedMobileReadHTTPTransport(steps: Array(
+            repeating: .response(status: 304, data: Data(), headers: [:]),
+            count: 6
+        ))
+        let client = MobileAPIClient(baseURL: NativeEnvironment.previewAPIURL, transport: transport)
+
+        _ = try await client.passport(accessToken: accessToken, certification: certification, etag: "passport")
+        _ = try await client.guide(accessToken: accessToken, certification: certification, etag: "guide")
+        _ = try await client.history(accessToken: accessToken, certification: certification, etag: "history")
+        _ = try await client.historyDetail(
+            year: 2025,
+            accessToken: accessToken,
+            certification: certification,
+            etag: "history-2025"
+        )
+        _ = try await client.records(accessToken: accessToken, certification: certification, etag: "records")
+        _ = try await client.odds(accessToken: accessToken, certification: certification, etag: "odds")
+
+        let requests = await transport.recordedRequests()
+        XCTAssertEqual(requests.compactMap(\.url?.path), [
+            "/api/mobile/v1/passport",
+            "/api/mobile/v1/guide",
+            "/api/mobile/v1/history",
+            "/api/mobile/v1/history/2025",
+            "/api/mobile/v1/records",
+            "/api/mobile/v1/odds",
+        ])
+        XCTAssertTrue(requests.allSatisfy {
+            $0.value(forHTTPHeaderField: "Authorization") == "Bearer \(accessToken)" &&
+            $0.value(forHTTPHeaderField: "X-Bagger-Certification") == certification
+        })
+
+        do {
+            _ = try await client.historyDetail(
+                year: 2027,
+                accessToken: accessToken,
+                certification: certification,
+                etag: nil
+            )
+            XCTFail("An uncontracted history year must fail before transport")
+        } catch {
+            XCTAssertEqual(error as? MobileAPIClientError, .invalidURL)
+        }
+        let requestCount = await transport.requestCount()
+        XCTAssertEqual(requestCount, 6)
+    }
 }
 
 private actor ScriptedMobileReadHTTPTransport: HTTPTransporting {

@@ -179,6 +179,79 @@ enum TestFixtures {
         meta: readMeta
     )
 
+    static let historySummary = MobileHistoryTournamentSummary(
+        tournamentId: "history-tournament-2025",
+        year: 2025,
+        name: "2025 Preview Invitational",
+        editionTitle: nil,
+        destination: nil,
+        startDate: nil,
+        endDate: nil,
+        status: .final,
+        teams: [
+            MobileHistoryTeamResult(teamId: "history-team-1", name: "Team One", side: 1, points: 8.5),
+            MobileHistoryTeamResult(teamId: "history-team-2", name: "Team Two", side: 2, points: 7.5),
+        ],
+        champion: nil,
+        runnerUp: nil,
+        finalScore: nil,
+        detailAvailable: true,
+        revision: "history-2025-revision-1"
+    )
+
+    static let historyDetailResponse = MobileHistoryDetailResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileHistoryDetailData(
+            tournament: historySummary,
+            teams: [
+                MobileHistoryTeam(
+                    teamId: "history-team-1",
+                    name: "Team One",
+                    side: 1,
+                    points: 8.5,
+                    captain: nil,
+                    averageHandicap: nil,
+                    roster: []
+                ),
+                MobileHistoryTeam(
+                    teamId: "history-team-2",
+                    name: "Team Two",
+                    side: 2,
+                    points: 7.5,
+                    captain: nil,
+                    averageHandicap: nil,
+                    roster: []
+                ),
+            ],
+            rounds: [],
+            matches: [],
+            standings: [],
+            awards: [],
+            scorecards: []
+        ),
+        meta: readMeta
+    )
+
+    static let guideResponse = MobileGuideResponse(
+        ok: true,
+        apiVersion: "v1",
+        data: MobileGuideData(
+            contractVersion: "guide-v1",
+            tournamentId: participant.tournament.tournamentId,
+            publicationState: .unpublished,
+            publishedAt: nil,
+            tournament: nil,
+            overview: [],
+            rules: MobileGuideRules(roundFormats: [], items: []),
+            courses: [],
+            dining: [],
+            localGuide: [],
+            contacts: []
+        ),
+        meta: readMeta
+    )
+
     static let scoringResponse = MobileScoringCurrentResponse(
         ok: true,
         apiVersion: "v1",
@@ -448,6 +521,14 @@ final class MockMobileAPI: MobileAPIServing {
     var netSkinsValue: MobileConditionalRead<MobileNetSkinsResponse> = .modified(TestFixtures.netSkinsResponse, etag: "\"fixture-net-skins-revision-1\"")
     var calcuttaValue: MobileConditionalRead<MobileCalcuttaResponse> = .modified(TestFixtures.calcuttaResponse, etag: "\"fixture-calcutta-revision-1\"")
     var scheduleValue: MobileConditionalRead<MobileScheduleResponse> = .modified(TestFixtures.scheduleResponse, etag: "\"fixture-revision-1\"")
+    var historyDetailValue: MobileConditionalRead<MobileHistoryDetailResponse> = .modified(
+        TestFixtures.historyDetailResponse,
+        etag: "\"history-2025-revision-1\""
+    )
+    var guideValue: MobileConditionalRead<MobileGuideResponse> = .modified(
+        TestFixtures.guideResponse,
+        etag: "\"guide-revision-1\""
+    )
     var readError: (any Error)?
     var scoringValue = TestFixtures.scoringResponse
     var scoringError: (any Error)?
@@ -465,6 +546,8 @@ final class MockMobileAPI: MobileAPIServing {
     private(set) var sessionCertification: String?
     private(set) var readCallCount = 0
     private(set) var leadersCallCount = 0
+    private(set) var historyDetailCallYears: [Int] = []
+    private(set) var guideCallCount = 0
     private(set) var scoringCallCount = 0
     private(set) var scoringMatchID: String?
     private(set) var scoringAccessToken: String?
@@ -557,6 +640,28 @@ final class MockMobileAPI: MobileAPIServing {
         readCallCount += 1
         if let readError { throw readError }
         return scheduleValue
+    }
+
+    func historyDetail(
+        year: Int,
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileHistoryDetailResponse> {
+        historyDetailCallYears.append(year)
+        if let readError { throw readError }
+        return historyDetailValue
+    }
+
+    func guide(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileGuideResponse> {
+        readCallCount += 1
+        guideCallCount += 1
+        if let readError { throw readError }
+        return guideValue
     }
 
     func scoringCurrent(

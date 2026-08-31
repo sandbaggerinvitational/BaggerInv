@@ -82,6 +82,40 @@ final class TodayUITestLaunchTests: XCTestCase {
         XCTAssertEqual(scenario, .scoreSignOutWarning)
     }
 
+    func testExplicitMoreFixtureIsAccepted() {
+        let launch = TodayUITestLaunch.resolve(arguments: [
+            "BaggerInv",
+            "--bagger-ui-testing",
+            "--bagger-ui-test-scenario",
+            "more.standard",
+        ])
+
+        guard case .scenario(let scenario) = launch else {
+            return XCTFail("Expected the explicit More fixture scenario.")
+        }
+        XCTAssertEqual(scenario, .moreStandard)
+    }
+
+    func testExplicitScheduleFixturesAreAccepted() {
+        for rawValue in [
+            "schedule.standard",
+            "schedule.cached-offline",
+            "schedule.empty",
+        ] {
+            let launch = TodayUITestLaunch.resolve(arguments: [
+                "BaggerInv",
+                "--bagger-ui-testing",
+                "--bagger-ui-test-scenario",
+                rawValue,
+            ])
+
+            guard case .scenario(let scenario) = launch else {
+                return XCTFail("Expected explicit Schedule fixture \(rawValue).")
+            }
+            XCTAssertTrue(scenario.rawValue.hasPrefix("schedule."))
+        }
+    }
+
     func testMissingOrUnknownScenarioFailsClosedInsteadOfLaunchingLive() {
         XCTAssertInvalid(TodayUITestLaunch.resolve(arguments: [
             "BaggerInv",

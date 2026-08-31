@@ -1,6 +1,6 @@
 # Bagger Invitational for iOS
 
-This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E added the first canonical owned-Match scoring reader and a native, read-only official Scorecard. Step 2F added durable, identity-partitioned scoring intent. Step 2G completed the isolated-Preview scoring loop with canonical mutation acknowledgements, mandatory refresh, participant-controlled conflict resolution, corrections, and online-only finalization logic. Step 2H adds the complete V1 participant Leaders experience: Tournament Score, canonical Round Scores, Player Leaders, official-only Net Skins, and published Calcutta.
+This directory contains the native SwiftUI application for **Bagger Preview**. Step 2A established isolated Preview authentication and canonical participant identity. Step 2B added the authenticated mobile read/cache engine. Step 2C added Today and the five-tab application shell. Step 2D added the cached-first Match Center and read-only Match Detail. Step 2E added the first canonical owned-Match scoring reader and a native, read-only official Scorecard. Step 2F added durable, identity-partitioned scoring intent. Step 2G completed the isolated-Preview scoring loop with canonical mutation acknowledgements, mandatory refresh, participant-controlled conflict resolution, corrections, and online-only finalization logic. Step 2H added the complete V1 participant Leaders experience: Tournament Score, canonical Round Scores, Player Leaders, official-only Net Skins, and published Calcutta. Step 2I completes the all-native More experience: full Schedule, Player Passport, Tournament Guide, Courses, Rules, History, Records, Published Odds, Dining, Local Guide, Important Contacts, and Settings.
 
 ## Requirements
 
@@ -108,11 +108,11 @@ A paid Apple Developer Program membership is not required for Simulator use. Do 
 - `ScoringQueue/` owns the versioned SQLite scoring-intent repository, queue policies, ordered replay, retry scheduling, crash recovery, and conflict/action-required/quarantine states. It contains no credentials and remains separate from the disposable read cache.
 - `Networking/` owns typed async HTTP transport and centralized protected headers.
 - `Security/` stores the Bagger certification and sensitive session state in Keychain-backed storage.
-- `Models/` contains the Step 2A identity contracts, complete protected-read and Leaders DTOs, and the complete scoring-current DTO. Calcutta base-10 strings retain their canonical digits as the display/authority representation; `Decimal` is only a bounded convenience value and never replaces those digits.
-- `Presentation/` maps canonical read DTOs to UI-ready Today, Matches, Leaders, and scoring values without changing match, identity, schedule, standings, Net Skins, Calcutta, scoring permission, handicap, net, winner, result, or financial authority.
-- `Design/` contains the small native Bagger palette, spacing, card, and typography treatment shared by Today and Matches.
-- `Views/` contains the authentication UI, five-tab shell, real Today, Matches, Score, and Leaders destinations, read-only Match Detail and Scorecard, and a restrained More placeholder.
-- `Debug/` contains allowlisted, Debug-only synthetic Today, Matches, scoring, and Leaders fixture launchers for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
+- `Models/` contains the Step 2A identity contracts, complete protected-read, Leaders, and Step 2I participant-content DTOs, and the complete scoring-current DTO. Calcutta base-10 strings retain their canonical digits as the display/authority representation; `Decimal` is only a bounded convenience value and never replaces those digits.
+- `Presentation/` maps canonical read DTOs to UI-ready Today, Matches, Leaders, More, and scoring values without changing match, identity, schedule, standings, career statistics, History, Records, Odds, Net Skins, Calcutta, scoring permission, handicap, net, winner, result, or financial authority.
+- `Design/` contains the small native Bagger palette, spacing, card, and typography treatment shared throughout the participant app.
+- `Views/` contains the authentication UI, five-tab shell, real Today, Matches, Score, Leaders, and More destinations, read-only Match Detail and Scorecard, full Schedule, Player Passport, Guide/Courses/Rules, History/Records/Odds, local-information products, and Settings.
+- `Debug/` contains allowlisted, Debug-only synthetic Today, Matches, scoring, Leaders, and More fixture launchers for deterministic UI/accessibility testing. An ordinary app launch cannot enter this mode.
 
 The app does not read canonical Bagger tables through Supabase. Supabase establishes the native Auth session; the mobile v1 API separately certifies that identity and returns the canonical Bagger Player. Protected API calls require both the Supabase Bearer token and the signed Bagger certification.
 
@@ -126,7 +126,8 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 - **Step 2F — COMPLETE:** SQLite-backed scoring intent, atomic local Save & Next, identity/tournament/Match partitioning, stable mutation IDs, ordered foreground replay, retry/backoff, crash recovery, stale-policy enforcement, retained unresolved intent across sign-out, database auditing, and physical-device acceptance are proven.
 - **Step 2G — COMPLETE:** official hole-mutation transport, acknowledgement-before-refresh durability, same-ID lost-response recovery, conflict comparison, Keep Official, explicit Reapply with a new mutation ID, correction overlays, and online-only finalization logic are implemented and proven. The isolated-Preview hole workflow was certified through normal acknowledgement, ordered replay, lost-response/idempotent recovery, correction, revision conflict, Keep Official, canonical restoration, and physical-device acceptance. No live finalization was authorized; finalization success, blockers, and lost-response reconciliation remain deterministically verified with injected transport.
 - **Step 2H — COMPLETE:** the four-product native Leaders destination presents canonical Tournament Score and Round Scores, overall Player Leaders, official-only Net Skins, and published participant-safe Calcutta with participant/tournament cache isolation, ETag revalidation, publication invalidation, precision-safe financial decoding, Simulator coverage, live isolated-Preview read acceptance, and physical-iPhone online/offline, relaunch, accessibility, and sign-out isolation acceptance.
-- **Next — Step 2I:** More, full Schedule, Player Passport, Settings, and the curated secondary-content directory.
+- **Step 2I — COMPLETE:** the all-native More directory presents full Schedule, authenticated Player Passport, published Tournament Guide/Courses/Rules/Dining/Local Guide/Contacts, canonical Tournament History and year detail, Records, Published Odds, and Settings. Typed participant-bound reads, lazy cached-first loading, per-product and per-year private cache keys, ETag/304 revalidation, fail-closed Guide/Odds publication revocation, safe system handoffs, deterministic coverage, live isolated-Preview acceptance, and physical-iPhone online/offline, relaunch, external-action, and sign-out isolation acceptance are proven.
+- **Next — Step 2J:** universal-link-ready routing, app-wide polish and accessibility, approved native identity assets, restrained haptics/animation, and outdoor one-handed usability.
 
 ## Step 2B mobile read architecture
 
@@ -138,6 +139,12 @@ The shared read foundation consumes only the certified mobile v1 endpoints:
 - `GET /api/mobile/v1/schedule`
 - `GET /api/mobile/v1/net-skins`
 - `GET /api/mobile/v1/calcutta`
+- `GET /api/mobile/v1/passport`
+- `GET /api/mobile/v1/guide`
+- `GET /api/mobile/v1/history`
+- `GET /api/mobile/v1/history/{year}`
+- `GET /api/mobile/v1/records`
+- `GET /api/mobile/v1/odds`
 
 Every request uses the existing centralized protected transport with both the current Supabase Bearer token and `X-Bagger-Certification`. The credential provider revalidates the active Auth UUID and Bagger proof before returning credentials. The read layer does not use Supabase for direct canonical-table access and does not treat cache metadata as authentication authority.
 
@@ -155,7 +162,7 @@ The authenticated app uses the fixed native information architecture:
 Today | Matches | Score | Leaders | More
 ```
 
-Today, Matches, Score, and Leaders are implemented; More remains intentionally restrained. `Score` means owned-Match score entry and review—not Tournament Score. `Leaders` owns the tournament competition products. Step 2E established the canonical scoring read surface; Step 2F made local Save & Next durable; Step 2G added official isolated-Preview replay, conflict/correction handling, and online-only finalization logic without changing Production authority.
+Today, Matches, Score, Leaders, and More are implemented. `Score` means owned-Match score entry and review—not Tournament Score. `Leaders` owns the tournament competition products, while `More` owns Schedule, Passport, curated participant content, and Settings. Step 2E established the canonical scoring read surface; Step 2F made local Save & Next durable; Step 2G added official isolated-Preview replay, conflict/correction handling, and online-only finalization logic without changing Production authority.
 
 Today preserves the approved product hierarchy:
 
@@ -366,6 +373,8 @@ The partition digest is SHA-256 over the exact isolated environment, Supabase Au
 
 Each schema-v1 cache envelope records its schema version, partition digest, product, decoded mobile response, ETag, fetch time, and last validation time. Cache reads fail closed unless the envelope, product, partition, contract, and tournament are structurally compatible. Incompatible or corrupt product entries are removed rather than displayed.
 
+Step 2I keeps static products in distinct `<product>.json` files and adds validated `historyDetail-<year>.json` keys for the supported 2017–2026 archive range. The requested year is part of both the cache filename and envelope discriminator, and a History detail response must prove that same canonical year before it can publish.
+
 Writes use Foundation atomic replacement. Cache directories and files use `completeUntilFirstUserAuthentication` file protection, and partition directories are excluded from device backup. A cache-write failure does not replace a valid in-memory network response, but it is surfaced as cache-persistence status.
 
 Sign-out clears memory and makes the active partition inaccessible before the protected auth state is discarded, then deletes the entire partition. Disk deletion first atomically moves the digest directory to a strictly validated hidden quarantine name, so an interrupted or temporarily failed physical deletion cannot be restored by the current or a later process. Partition removal receives one immediate retry; any remaining cleanup failure is retained as a privacy-safe diagnostic and retried on the next data activation. Identity or tournament changes deactivate the old context and prevent its data from becoming current. Definite authentication or authorization failures invalidate access and clear participant state rather than exposing cached private content; a transient Supabase refresh transport failure retains eligible cache as offline data without treating it as new authority.
@@ -385,7 +394,7 @@ or
 
 ETags are opaque and round-trip exactly. A `304 Not Modified` with no usable cache triggers one unconditional retry; a second `304` is treated as a cache inconsistency. A transport failure preserves an existing value as offline cache. Other safe failures preserve an existing value as stale where appropriate; no cached value is invented when none exists.
 
-All six protected-read repositories activate and begin a bounded refresh with the verified participant context, so switching among Leaders products does not create avoidable blank states. The four Today-surface products refresh through the existing bounded Today pull-to-refresh workflow; optional Leaders reads are not re-requested merely because Today refreshes. Foreground revalidation refreshes eligible products whose last validation is at least five minutes old. Score and Players share one `/leaders` repository and concurrent calls deduplicate. Refresh operations support per-product request deduplication and explicit cancellation. Cancelling a shared product request keeps an existing value intact, clears the in-flight slot, and permits a later refresh. Environment re-attestation invalidates and cancels every in-flight product generation so a late transport completion cannot publish or persist while authority is uncertain.
+The six launch-critical protected-read repositories activate and begin a bounded refresh with the verified participant context, so switching among Leaders products does not create avoidable blank states. The four Today-surface products refresh through the existing bounded Today pull-to-refresh workflow; optional Leaders reads are not re-requested merely because Today refreshes. Step 2I's Passport, Guide, History, Records, Odds, and per-year History-detail repositories activate lazily when their destination is opened: an eligible cache publishes first, one shared request revalidates it, sibling Guide destinations reuse one repository, and unopened optional products create no eager network fan-out. Foreground revalidation refreshes core products older than five minutes and any optional product already activated in the current participant lifecycle. Score and Players share one `/leaders` repository, and all concurrent calls for one product deduplicate. Refresh operations support per-product request deduplication and explicit cancellation. Cancelling a shared product request keeps an existing value intact, clears the in-flight slot, and permits a later refresh. Environment re-attestation invalidates and cancels every in-flight product generation so a late transport completion cannot publish or persist while authority is uncertain.
 
 Nullable properties that the mobile JSON Schemas mark as required use a small Codable wrapper: an explicit JSON `null` remains valid, but an omitted required key fails decoding. HTTP 200 envelopes are also rejected before repository publication when `ok`, API version, or product structure is incompatible.
 
@@ -393,7 +402,7 @@ Nullable properties that the mobile JSON Schemas mark as required use a small Co
 
 These mechanisms are intentionally separate:
 
-- **READ CACHE:** replaceable, server-derived snapshots for Today, Matches, Leaders (including Round Scores), Schedule, Net Skins, and Calcutta. It may be discarded and rebuilt from canonical mobile reads.
+- **READ CACHE:** replaceable, server-derived snapshots for Today, Matches, Leaders (including Round Scores), Schedule, Net Skins, Calcutta, Passport, Guide, History and its year details, Records, and Odds. It may be discarded and rebuilt from canonical mobile reads.
 - **SCORING QUEUE:** durable private mutation intent governed by the scoring reliability specification. It preserves local-vs-official state, stable idempotency, retry timing, ordering, identity isolation, conflicts, acknowledgements, and crash recovery.
 
 The read cache is never a score source of truth, mutation journal, outbox, or evidence that a score is official. Step 2E's scoring reader deliberately bypasses this cache. Conversely, unresolved scoring intent is never put in `ReadCache/v1`, deleted under the read-cache sign-out policy, or presented as a cached canonical score. The scoring queue is durable user intent; the read cache is replaceable server data.
@@ -411,7 +420,7 @@ Step 2A includes:
 - temporary signed-in diagnostic UI
 - secure sign-out
 
-Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E added the isolated Preview scoring read surface; Step 2F added durable local scoring intent and guarded replay; Step 2G added participant-facing conflict review, corrections, official isolated-Preview hole replay, and online-only finalization logic. Phone Auth, Production scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
+Step 2A intentionally did not include product screens, phone OTP UI, direct Supabase table access, scoring reads or writes, an offline mutation queue, push notifications, TestFlight, or Production native configuration. Steps 2B–2D added the shared read/cache foundation and Today/Matches surfaces; Step 2E added the isolated Preview scoring read surface; Step 2F added durable local scoring intent and guarded replay; Step 2G added participant-facing conflict review, corrections, official isolated-Preview hole replay, and online-only finalization logic; Step 2H added full native Leaders; Step 2I added the all-native More directory and bounded participant-content family. Phone Auth, Production scoring, push, release distribution, direct canonical-table access, and Production native configuration remain out of scope.
 
 ## Step 2H full Leaders
 
@@ -446,8 +455,47 @@ Sign-out deletes the disposable Leaders, Net Skins, and Calcutta read partition 
 
 The asset audit considered the existing Bagger and team marks, but `/leaders` does not project canonical asset keys. Step 2H therefore uses authoritative text and neutral initials rather than fragile name-to-logo matching. No new image asset is bundled and app-size impact is effectively zero.
 
-The V1 parity audit intentionally defers Round Player leaderboards and richer team-Round details until a bounded participant mobile contract exists. Net Skins/Calcutta storylines are PWA presentation, Championship Insights and Published Odds remain later curated content, Match Center intelligence remains in Today/Matches, and all War Room/Director surfaces are admin-only. Those documented Post-V1 or separate-product boundaries do not require Swift to acquire server authority.
+The V1 parity audit intentionally defers Round Player leaderboards and richer team-Round details until a bounded participant mobile contract exists. Net Skins/Calcutta storylines remain PWA presentation; Step 2I promotes Published Odds from deferred curated content to a bounded native read, while narrative Championship Insights remains deferred. Match Center intelligence remains in Today/Matches, and all War Room/Director surfaces are admin-only. Those documented Post-V1 or separate-product boundaries do not require Swift to acquire server authority.
+
+## Step 2I all-native More and participant content
+
+Step 2I deliberately imports only the certified shared participant-content handoff chain; it does not merge the website branch. The shared commits and their native cherry-picks are:
+
+- `d1419a7` → `2009446` — export the bounded participant-content contracts and Preview readers;
+- `5fa76af` → `51ec5e6` — require every participant-content authority in the native Preview gate;
+- `c367522` → `e9840e3` — accept the canonical Guide Round labels; and
+- `1ee626d` → `357be51` — restore canonical History-detail ranks.
+
+Their presence in native ancestry does not enable Production native operation. Every protected participant-content request still requires the current Supabase Bearer token plus `X-Bagger-Certification`; the server alone resolves the verified Auth UUID to the canonical Player and active tournament. The client cannot select a Player, tournament, publication state, environment, or authority. There is no direct Supabase-table access and no fallback to Production, Google, rendered PWA content, browser Passport cookies, or another identity source.
+
+The More tab is now a native SwiftUI directory:
+
+```text
+Tournament  → Schedule, Tournament Guide, Courses, Rules & Formats
+My Bagger   → Player Passport, Tournament History, Records
+Competition → Published Odds
+Local       → Dining, Local Guide, Important Contacts
+App         → Settings
+```
+
+Every listed destination is native. Tournament Guide, Courses, Rules, Dining, Local Guide, and Contacts share the one structured `/guide` representation; Schedule remains solely `/schedule`. The app embeds neither web content nor an authenticated token bridge. Validated HTTPS, phone, text, email, and Apple Maps actions may deliberately leave the app through the corresponding system handler, but arbitrary URL schemes and malformed source values do not become actions.
+
+`/passport` is bound to the authenticated canonical Player and presents current tournament context plus the server-supplied career summary, honors, rankings, aggregate scoring and Match-progression profiles, Tournament History, BB/SC/SI performance, Records Held, Captain Legacy, Biggest Rival, Draft History, and Top Partners. `/history` preserves the canonical archive order, while bounded `/history/{year}` destinations for 2017–2026 show only server-projected teams, rosters, Rounds, Matches, standings, awards, and available verified scorecards. `/records` preserves the canonical category, record, and complete holder order and uses stable identifiers rather than display-name matching. `/odds` displays only explicitly published stored snapshots in canonical phase order.
+
+Swift performs presentation formatting, safe grouping, and accessibility labeling only. It does not recalculate career statistics, rankings, records, holder identity, historical winners, probabilities, American odds, expected points, expected records, or average finishes. It does not derive Odds from Matches or scores. Full Schedule preserves the canonical event order and tournament timezone; absolute timestamps may drive `Now`, `Next`, and ended display state, but local clocks or the device clock never become tournament authority.
+
+Passport, Guide, History, Records, Odds, and year details use the shared cached-first repository and opaque representation ETags. They load on demand, publish compatible private cache immediately, send the actual validator through `If-None-Match`, retain the DTO and update validation metadata on `304`, and validate plus atomically replace it on a changed `200`. Transient failure retains eligible content with explicit cached/stale/offline messaging; no-cache failure remains a controlled retry state.
+
+Guide and Odds add publication-revocation safety. A canonical `PUBLISHED` → `UNPUBLISHED` response has a changed representation ETag and an empty hidden-content shape. Native treats that visibility reduction as security-sensitive: it atomically replaces the older cache, or removes that product (and, if necessary, quarantines the disposable partition) before publishing the reduced representation. A failed persistence operation cannot leave previously published Guide or Odds content eligible for a later offline relaunch.
+
+All Step 2I snapshots remain private inside the existing SHA-256 partition over Preview environment, Supabase Auth UUID, canonical Bagger Player ID, and tournament ID. Files retain complete-until-first-user-authentication protection and backup exclusion. Account or tournament changes cannot reuse another partition. Settings shows only the signed-in participant/tournament summary, a Player Passport link, the explicit Preview environment, app version/build, and Sign Out. Sign Out first closes scoring admission and warns rather than silently discarding unresolved scoring intent; after confirmation it clears in-memory participant content, atomically makes the disposable read partition inaccessible, removes certification/Auth state, and returns to the native sign-in screen. Durable unresolved scoring intent remains separately partitioned and is not deleted as read cache.
+
+Step 2I intentionally adds no downloaded or bundled player, team, tournament, or course artwork. The Guide contract's validated repository asset keys are preserved as inert future presentation metadata; Swift does not interpret them as filesystem paths or arbitrary remote URLs. Current More screens use authoritative text and SF Symbols, keeping asset-size impact effectively zero. A curated native catalog requires canonical ID/key mapping plus ownership/licensing review and remains Step 2J work.
+
+Deterministic unit and UI coverage exercises rich and empty Passport states, full and offline Schedule, published/withdrawn Guide, deep native Guide sections, long content and accessibility sizes, History archive/year detail, Records, published/unpublished Odds, cache identity/year validation, lazy request sharing, ETag/304 behavior, publication withdrawal, environment cancellation, and sign-out deletion. Live isolated-Preview acceptance proved all Step 2I reads and real ETag/304 revalidation. Physical-iPhone acceptance proved cached offline browsing after force-quit/relaunch, refresh recovery after connectivity returned, system Directions/Phone/Email/website handoffs, and sign-out/relaunch with no participant content visible.
+
+Round Player leaderboards, richer non-owned Match/scorecard detail, a separate Player directory/profile product, narrative Championship Insights, notifications and notification settings, phone/SMS Auth, and all Director/War Room/editing/publication controls remain deferred or excluded. Production native activation remains a separate explicit release gate.
 
 ## Next step
 
-**Step 2I — More + full Schedule + Player Passport + secondary content** is next. Before implementation it must re-audit the current participant PWA, then build the native More directory, full Schedule, Player Passport when supported by canonical projections, meaningful Settings, and deliberate web-backed handoffs for approved secondary content. Production native activation remains a separate explicit release gate.
+**Step 2J — deep links, polish, accessibility, and assets** is next. It should complete universal-link-ready routing, broader app-wide Dynamic Type/VoiceOver/contrast/Reduce Motion review, an approved canonical native identity-asset catalog, restrained haptics and motion, final empty/error copy, and one-handed outdoor usability without changing mobile authority or enabling Production.

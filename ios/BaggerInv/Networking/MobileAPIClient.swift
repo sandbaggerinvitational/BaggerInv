@@ -12,6 +12,12 @@ protocol MobileAPIServing {
     func netSkins(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileNetSkinsResponse>
     func calcutta(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileCalcuttaResponse>
     func schedule(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileScheduleResponse>
+    func passport(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobilePassportResponse>
+    func guide(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileGuideResponse>
+    func history(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileHistoryResponse>
+    func historyDetail(year: Int, accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileHistoryDetailResponse>
+    func records(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileRecordsResponse>
+    func odds(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileOddsResponse>
     func scoringCurrent(accessToken: String, certification: String, matchID: String?) async throws -> MobileScoringCurrentResponse
     func scoringHole(
         request: MobileScoringHoleRequest,
@@ -26,6 +32,55 @@ protocol MobileAPIServing {
 }
 
 extension MobileAPIServing {
+    func passport(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobilePassportResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
+    func guide(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileGuideResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
+    func history(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileHistoryResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
+    func historyDetail(
+        year: Int,
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileHistoryDetailResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
+    func records(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileRecordsResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
+    func odds(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileOddsResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
     func netSkins(
         accessToken: String,
         certification: String,
@@ -250,6 +305,92 @@ struct MobileAPIClient: MobileAPIServing {
             accessToken: accessToken,
             certification: certification,
             etag: etag
+        )
+    }
+
+    func passport(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobilePassportResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/passport",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag,
+            maximumResponseBytes: 128 * 1_024
+        )
+    }
+
+    func guide(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileGuideResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/guide",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag,
+            maximumResponseBytes: 768 * 1_024
+        )
+    }
+
+    func history(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileHistoryResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/history",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag,
+            maximumResponseBytes: 256 * 1_024
+        )
+    }
+
+    func historyDetail(
+        year: Int,
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileHistoryDetailResponse> {
+        guard (2017...2026).contains(year) else { throw MobileAPIClientError.invalidURL }
+        return try await protectedRead(
+            path: "/api/mobile/v1/history/\(year)",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag,
+            maximumResponseBytes: 1_024 * 1_024
+        )
+    }
+
+    func records(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileRecordsResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/records",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag,
+            maximumResponseBytes: 512 * 1_024
+        )
+    }
+
+    func odds(
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileOddsResponse> {
+        try await protectedRead(
+            path: "/api/mobile/v1/odds",
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag,
+            maximumResponseBytes: 256 * 1_024
         )
     }
 
@@ -606,7 +747,8 @@ struct MobileAPIClient: MobileAPIServing {
         path: String,
         accessToken: String,
         certification: String,
-        etag: String?
+        etag: String?,
+        maximumResponseBytes: Int? = nil
     ) async throws -> MobileConditionalRead<Response> {
         var request = try request(
             path: path,
@@ -626,6 +768,9 @@ struct MobileAPIClient: MobileAPIServing {
         }
         guard result.response.statusCode == 200 else {
             throw responseError(for: result)
+        }
+        if let maximumResponseBytes, result.data.count > maximumResponseBytes {
+            throw MobileContractError.incompatibleResponse
         }
         do {
             let response = try decoder.decode(Response.self, from: result.data)

@@ -455,6 +455,79 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         print("STEP2H_RELAUNCH_CACHE_AND_REVALIDATION_PASS")
     }
 
+    /// Step 2I read-only acceptance using an already certified Preview
+    /// session. It only opens native read surfaces: no external Link, sign-out,
+    /// scoring, or other mutation control is activated.
+    func testRestoredPreviewMoreReadOnlyAcceptance() throws {
+        let authorization = ProcessInfo.processInfo.environment["BAGGER_STEP2I_RESTORED_MORE_QA"] ??
+            (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2I_RESTORED_MORE_QA") as? String)
+        guard authorization == "1" else {
+            throw XCTSkip(
+                "Set BAGGER_STEP2I_RESTORED_MORE_QA=1 only for an explicitly authorized read-only Preview run."
+            )
+        }
+
+        let app = acceptanceApp()
+        app.launch()
+        guard app.tabBars.buttons["More"].waitForExistence(timeout: 30) else {
+            throw XCTSkip("No restorable Preview session is currently available; no OTP was requested.")
+        }
+        _ = assertAuthenticated(in: app, timeout: 8)
+        app.tabBars.buttons["More"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["more.screen"].waitForExistence(timeout: 5))
+
+        let products: [(String, String, String)] = [
+            ("schedule", "schedule.screen", "schedule.event."),
+            ("passport", "passport.screen", "passport.hero"),
+            ("tournament-guide", "guide.screen", "guide.hero"),
+            ("courses", "courses.screen", "courses.course."),
+            ("rules", "rules.screen", "rules."),
+            ("records", "records.screen", "records.record."),
+            ("odds", "odds.screen", "odds.snapshot."),
+            ("dining", "dining.screen", "dining.entry."),
+            ("local-guide", "localGuide.screen", "localGuide.entry."),
+            ("contacts", "contacts.screen", "contacts.entry."),
+        ]
+
+        for (destination, screen, contentPrefix) in products {
+            openLiveMoreDestination(destination, in: app)
+            XCTAssertTrue(
+                app.descendants(matching: .any)[screen].waitForExistence(timeout: 45),
+                "The live native \(destination) screen did not reach content."
+            )
+            assertLiveMoreContent(prefix: contentPrefix, in: app)
+            navigateLiveBackToMore(in: app)
+        }
+
+        openLiveMoreDestination("history", in: app)
+        XCTAssertTrue(app.descendants(matching: .any)["history.screen"].waitForExistence(timeout: 45))
+        let detailYear = app.buttons
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'history.year.'"))
+            .firstMatch
+        makeLiveMoreElementReachable(detailYear, in: app)
+        XCTAssertTrue(detailYear.isHittable, "No detail-available live History year was reachable.")
+        detailYear.tap()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["history.detail.screen"].waitForExistence(timeout: 45),
+            "The first detail-available live History year did not open."
+        )
+        assertLiveMoreContent(prefix: "history.team.", in: app)
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["history.screen"].waitForExistence(timeout: 5))
+        navigateLiveBackToMore(in: app)
+
+        openLiveMoreDestination("settings", in: app)
+        XCTAssertTrue(app.descendants(matching: .any)["settings.screen"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["settings.previewEnvironment"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["settings.version"].exists)
+        XCTAssertFalse(
+            app.descendants(matching: .any)
+                .matching(NSPredicate(format: "label CONTAINS[c] 'Player ID'"))
+                .firstMatch.exists
+        )
+        print("STEP2I_MORE_READ_ONLY_PRODUCTS_PASS")
+    }
+
     private func approvedPreviewEmail() -> String? {
         let suppliedValue = ProcessInfo.processInfo.environment["BAGGER_STEP2A_QA_EMAIL"] ??
             (Bundle(for: Self.self).object(forInfoDictionaryKey: "BAGGER_STEP2A_QA_EMAIL") as? String)
@@ -465,6 +538,55 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
             return nil
         }
         return value
+    }
+
+    private func openLiveMoreDestination(_ destination: String, in app: XCUIApplication) {
+        let row = app.descendants(matching: .any)["more.destination.\(destination)"]
+        makeLiveMoreElementReachable(row, in: app)
+        XCTAssertTrue(row.isHittable, "The live More destination \(destination) was not tappable.")
+        row.tap()
+    }
+
+    private func navigateLiveBackToMore(in app: XCUIApplication) {
+        var back = app.navigationBars.buttons["More"].firstMatch
+        XCTAssertTrue(back.waitForExistence(timeout: 5), "The native More back control was missing.")
+        back.tap()
+        let moreScreen = app.descendants(matching: .any)["more.screen"]
+        if !moreScreen.waitForExistence(timeout: 5) {
+            // On a physical device a foreground system notification can consume
+            // the synthesized Back tap. Retry only if the destination still
+            // exposes its native More control after the interruption clears.
+            back = app.navigationBars.buttons["More"].firstMatch
+            if back.waitForExistence(timeout: 2), back.isHittable {
+                back.tap()
+            }
+        }
+        XCTAssertTrue(moreScreen.waitForExistence(timeout: 5))
+    }
+
+    private func assertLiveMoreContent(prefix: String, in app: XCUIApplication) {
+        let content: XCUIElement
+        if prefix.hasSuffix(".") {
+            content = app.descendants(matching: .any)
+                .matching(NSPredicate(format: "identifier BEGINSWITH %@", prefix))
+                .firstMatch
+        } else {
+            content = app.descendants(matching: .any)[prefix]
+        }
+        makeLiveMoreElementReachable(content, in: app)
+        XCTAssertTrue(content.exists, "The live More product had no canonical content matching \(prefix).")
+    }
+
+    private func makeLiveMoreElementReachable(_ element: XCUIElement, in app: XCUIApplication) {
+        if element.waitForExistence(timeout: 2), element.isHittable { return }
+        for _ in 0..<8 {
+            app.swipeDown()
+            if element.exists, element.isHittable { return }
+        }
+        for _ in 0..<18 {
+            app.swipeUp()
+            if element.exists, element.isHittable { return }
+        }
     }
 
     @discardableResult
@@ -738,8 +860,8 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         more.tap()
         XCTAssertTrue(more.isSelected, "The live More tab did not become selected.")
         XCTAssertTrue(
-            app.descendants(matching: .any)["placeholder.more"].waitForExistence(timeout: 5),
-            "The restrained More placeholder was missing."
+            app.descendants(matching: .any)["more.screen"].waitForExistence(timeout: 5),
+            "The native More directory was missing."
         )
 
         today.tap()

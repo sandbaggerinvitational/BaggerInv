@@ -33,6 +33,12 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     let netSkins: MobileReadRepository<MobileNetSkinsResponse>
     let calcutta: MobileReadRepository<MobileCalcuttaResponse>
     let schedule: MobileReadRepository<MobileScheduleResponse>
+    let passport: MobileReadRepository<MobilePassportResponse>
+    let guide: MobileReadRepository<MobileGuideResponse>
+    let history: MobileReadRepository<MobileHistoryResponse>
+    let records: MobileReadRepository<MobileRecordsResponse>
+    let odds: MobileReadRepository<MobileOddsResponse>
+    let historyDetails: [Int: MobileReadRepository<MobileHistoryDetailResponse>]
     let scoring: ScoringCurrentStore
     let scoringReliability: ScoringQueueCoordinator?
     let scoringFinalization: ScoringFinalizationCoordinator?
@@ -134,6 +140,90 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
                 etag: etag
             )
         }
+        passport = MobileReadRepository(
+            product: .passport,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now
+        ) { credentials, etag in
+            try await api.passport(
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
+        guide = MobileReadRepository(
+            product: .guide,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now
+        ) { credentials, etag in
+            try await api.guide(
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
+        history = MobileReadRepository(
+            product: .history,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now
+        ) { credentials, etag in
+            try await api.history(
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
+        records = MobileReadRepository(
+            product: .records,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now
+        ) { credentials, etag in
+            try await api.records(
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
+        odds = MobileReadRepository(
+            product: .odds,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now
+        ) { credentials, etag in
+            try await api.odds(
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
+        var details: [Int: MobileReadRepository<MobileHistoryDetailResponse>] = [:]
+        for year in 2017...2026 {
+            let cacheKey = try! MobileReadCacheKey(historyYear: year)
+            details[year] = MobileReadRepository(
+                cacheKey: cacheKey,
+                cache: cache,
+                credentialProvider: credentialProvider,
+                now: now,
+                responseValidator: { response, context in
+                    response.isCompatible(
+                        expectedTournamentID: context.tournamentID,
+                        expectedPlayerID: context.playerID
+                    ) && response.data.tournament.year == year
+                }
+            ) { credentials, etag in
+                try await api.historyDetail(
+                    year: year,
+                    accessToken: credentials.accessToken,
+                    certification: credentials.certification,
+                    etag: etag
+                )
+            }
+        }
+        historyDetails = details
         scoring = ScoringCurrentStore(
             api: api,
             credentialProvider: credentialProvider
@@ -183,6 +273,12 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         netSkins.setAccessInvalidationHandler(invalidation)
         calcutta.setAccessInvalidationHandler(invalidation)
         schedule.setAccessInvalidationHandler(invalidation)
+        passport.setAccessInvalidationHandler(invalidation)
+        guide.setAccessInvalidationHandler(invalidation)
+        history.setAccessInvalidationHandler(invalidation)
+        records.setAccessInvalidationHandler(invalidation)
+        odds.setAccessInvalidationHandler(invalidation)
+        historyDetails.values.forEach { $0.setAccessInvalidationHandler(invalidation) }
         scoring.setAccessInvalidationHandler(invalidation)
 
         let authorityRevalidation: @MainActor @Sendable () -> Void = { [weak self] in
@@ -194,6 +290,12 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         netSkins.setAuthorityRevalidationHandler(authorityRevalidation)
         calcutta.setAuthorityRevalidationHandler(authorityRevalidation)
         schedule.setAuthorityRevalidationHandler(authorityRevalidation)
+        passport.setAuthorityRevalidationHandler(authorityRevalidation)
+        guide.setAuthorityRevalidationHandler(authorityRevalidation)
+        history.setAuthorityRevalidationHandler(authorityRevalidation)
+        records.setAuthorityRevalidationHandler(authorityRevalidation)
+        odds.setAuthorityRevalidationHandler(authorityRevalidation)
+        historyDetails.values.forEach { $0.setAuthorityRevalidationHandler(authorityRevalidation) }
         scoring.setAuthorityRevalidationHandler(authorityRevalidation)
         scoringReliability?.setAccessInvalidationHandler(invalidation)
         scoringFinalization?.setAccessInvalidationHandler(invalidation)
@@ -312,6 +414,20 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         guard lifecycleGeneration == deactivationGeneration else { return }
         await schedule.deactivate(deleteCache: false)
         guard lifecycleGeneration == deactivationGeneration else { return }
+        await passport.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
+        await guide.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
+        await history.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
+        await records.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
+        await odds.deactivate(deleteCache: false)
+        guard lifecycleGeneration == deactivationGeneration else { return }
+        for year in historyDetails.keys.sorted() {
+            await historyDetails[year]?.deactivate(deleteCache: false)
+            guard lifecycleGeneration == deactivationGeneration else { return }
+        }
         await scoring.deactivate()
         guard lifecycleGeneration == deactivationGeneration else { return }
         await scoringFinalization?.deactivate()
@@ -334,6 +450,11 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let netSkinsSuspension: Void = netSkins.suspendRefresh()
         async let calcuttaSuspension: Void = calcutta.suspendRefresh()
         async let scheduleSuspension: Void = schedule.suspendRefresh()
+        async let passportSuspension: Void = passport.suspendRefresh()
+        async let guideSuspension: Void = guide.suspendRefresh()
+        async let historySuspension: Void = history.suspendRefresh()
+        async let recordsSuspension: Void = records.suspendRefresh()
+        async let oddsSuspension: Void = odds.suspendRefresh()
         async let scoringSuspension: Void = scoring.suspendForEnvironmentReattestation()
         async let queueSuspension: Void = scoringReliability?.suspendForEnvironmentReattestation() ?? ()
         async let finalizationSuspension: Void = scoringFinalization?.suspendForEnvironmentReattestation() ?? ()
@@ -344,10 +465,18 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             netSkinsSuspension,
             calcuttaSuspension,
             scheduleSuspension,
+            passportSuspension,
+            guideSuspension,
+            historySuspension,
+            recordsSuspension,
+            oddsSuspension,
             scoringSuspension,
             queueSuspension,
             finalizationSuspension
         )
+        for year in historyDetails.keys.sorted() {
+            await historyDetails[year]?.suspendRefresh()
+        }
     }
 
     /// Closes scoring transport synchronously at the scene callback boundary;
@@ -411,6 +540,53 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         _ = await (todayRefresh, matchesRefresh, leadersRefresh, scheduleRefresh)
     }
 
+    func loadPassport() async { await activateAndLoad(passport) }
+    func loadGuide() async { await activateAndLoad(guide) }
+    func loadHistory() async { await activateAndLoad(history) }
+    func loadRecords() async { await activateAndLoad(records) }
+    func loadOdds() async { await activateAndLoad(odds) }
+
+    func refreshPassport() async { await activateAndRefresh(passport) }
+    func refreshGuide() async { await activateAndRefresh(guide) }
+    func refreshHistory() async { await activateAndRefresh(history) }
+    func refreshRecords() async { await activateAndRefresh(records) }
+    func refreshOdds() async { await activateAndRefresh(odds) }
+
+    func loadHistoryDetail(year: Int) async {
+        guard let repository = historyDetails[year] else { return }
+        await activateAndLoad(repository)
+    }
+
+    func refreshHistoryDetail(year: Int) async {
+        guard let repository = historyDetails[year] else { return }
+        await activateAndRefresh(repository)
+    }
+
+    private func activate<Response: MobileReadPayloadResponse>(
+        _ repository: MobileReadRepository<Response>
+    ) async -> Bool {
+        guard let context = activeContext, !isSuspended else { return false }
+        let refreshGeneration = lifecycleGeneration
+        await repository.activate(context, beginRefresh: false)
+        return isCurrent(context, generation: refreshGeneration)
+    }
+
+    private func activateAndLoad<Response: MobileReadPayloadResponse>(
+        _ repository: MobileReadRepository<Response>
+    ) async {
+        let wasActive = repository.isActive
+        guard await activate(repository) else { return }
+        guard !wasActive || repository.state.freshness != .fresh else { return }
+        await repository.refresh()
+    }
+
+    private func activateAndRefresh<Response: MobileReadPayloadResponse>(
+        _ repository: MobileReadRepository<Response>
+    ) async {
+        guard await activate(repository) else { return }
+        await repository.refresh()
+    }
+
     func pauseForBackground() async {
         guard activeContext != nil else { return }
         async let queuePause: Void = scoringReliability?.pauseForBackground() ?? ()
@@ -428,6 +604,11 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         async let netSkinsRefresh: Void = netSkins.refreshIfStale(olderThan: staleAfter)
         async let calcuttaRefresh: Void = calcutta.refreshIfStale(olderThan: staleAfter)
         async let scheduleRefresh: Void = schedule.refreshIfStale(olderThan: staleAfter)
+        async let passportRefresh: Void = passport.isActive ? passport.refresh() : ()
+        async let guideRefresh: Void = guide.isActive ? guide.refresh() : ()
+        async let historyRefresh: Void = history.isActive ? history.refresh() : ()
+        async let recordsRefresh: Void = records.isActive ? records.refresh() : ()
+        async let oddsRefresh: Void = odds.isActive ? odds.refresh() : ()
 
         // Canonical scoring recovery is the foreground critical path. Optional
         // participant read products continue concurrently, but a slow Skins or
@@ -455,8 +636,18 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             leadersRefresh,
             netSkinsRefresh,
             calcuttaRefresh,
-            scheduleRefresh
+            scheduleRefresh,
+            passportRefresh,
+            guideRefresh,
+            historyRefresh,
+            recordsRefresh,
+            oddsRefresh
         )
+        for year in historyDetails.keys.sorted() {
+            guard let repository = historyDetails[year], repository.isActive else { continue }
+            await repository.refresh()
+            guard isCurrent(context, generation: refreshGeneration) else { return }
+        }
     }
 
     func unresolvedScoringIntentCount() async -> Int? {

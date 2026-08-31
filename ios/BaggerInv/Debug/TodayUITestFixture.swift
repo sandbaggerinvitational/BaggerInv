@@ -32,6 +32,18 @@ enum TodayUITestScenario: String {
     case scoreCorrectionPending = "score.correction-pending"
     case scoreFinalizationReady = "score.finalization-ready"
     case scoreFinalizationUnknown = "score.finalization-unknown"
+    case moreStandard = "more.standard"
+    case moreSignOutWarning = "more.signout-warning"
+    case morePassportEmpty = "more.passport-empty"
+    case moreGuideUnpublished = "more.guide-unpublished"
+    case moreOddsUnpublished = "more.odds-unpublished"
+    case moreHistoryCurrent = "more.history-current"
+    case moreRecordsTied = "more.records-tied"
+    case moreLongContent = "more.long-content"
+    case moreCachedOffline = "more.cached-offline"
+    case scheduleStandard = "schedule.standard"
+    case scheduleCachedOffline = "schedule.cached-offline"
+    case scheduleEmpty = "schedule.empty"
 }
 
 enum TodayUITestLaunch {
@@ -71,12 +83,13 @@ struct TodayUITestFixtureRoot: View {
             }
             .background(Color(uiColor: .systemBackground))
             .accessibilityIdentifier("auth.signed-out.fixture")
-        case .scoreSignOutWarning:
+        case .scoreSignOutWarning, .moreSignOutWarning:
             ScoringQueueSignOutUITestFixtureRoot(
                 participant: TodayUITestFixtures.participant,
                 presentation: TodayUITestFixtures.presentation(for: scenario),
                 matchesState: MatchesUITestFixtures.state(for: scenario),
-                scoringState: ScoringUITestFixtures.state(for: scenario)
+                scoringState: ScoringUITestFixtures.state(for: scenario),
+                startsOnMore: scenario == .moreSignOutWarning
             )
         default:
             let arguments = ProcessInfo.processInfo.arguments
@@ -89,9 +102,19 @@ struct TodayUITestFixtureRoot: View {
                     participant: TodayUITestFixtures.participant,
                     arguments: arguments
                 ),
+                fixtureScheduleState: MoreUITestFixtures.scheduleState(for: scenario),
+                fixturePassportState: MoreUITestFixtures.passportState(for: scenario),
+                fixtureGuideState: MoreUITestFixtures.guideState(for: scenario),
+                fixtureHistoryState: MoreUITestFixtures.historyState(for: scenario),
+                fixtureHistoryDetailStates: MoreUITestFixtures.historyDetailStates(for: scenario),
+                fixtureRecordsState: MoreUITestFixtures.recordsState(for: scenario),
+                fixtureOddsState: MoreUITestFixtures.oddsState(for: scenario),
+                fixtureScheduleNow: MoreUITestFixtures.now,
                 fixtureUsesDurableScoringQueue: scenario == .scoreDurableOffline,
                 startsOnScore: scenario.rawValue.hasPrefix("score."),
-                startsOnLeaders: arguments.contains("--bagger-start-leaders")
+                startsOnLeaders: arguments.contains("--bagger-start-leaders"),
+                startsOnMore: scenario.rawValue.hasPrefix("more."),
+                startsOnSchedule: scenario.rawValue.hasPrefix("schedule.")
             )
         }
     }
@@ -149,7 +172,12 @@ private enum TodayUITestFixtures {
              .scoreLongContent, .scoreOffline, .scoreDurableOffline,
              .scoreSignOutWarning, .scoreConflictReview,
              .scoreCorrectionPending, .scoreFinalizationReady,
-             .scoreFinalizationUnknown:
+             .scoreFinalizationUnknown, .moreStandard,
+             .moreSignOutWarning, .morePassportEmpty,
+             .moreGuideUnpublished, .moreOddsUnpublished,
+             .moreHistoryCurrent, .moreRecordsTied,
+             .moreLongContent, .moreCachedOffline, .scheduleStandard,
+             .scheduleCachedOffline, .scheduleEmpty:
             current = .init(
                 availability: .content,
                 value: match(

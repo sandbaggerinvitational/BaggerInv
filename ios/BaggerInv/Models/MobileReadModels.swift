@@ -137,22 +137,36 @@ struct MobileReadMeta: Codable, Equatable, Sendable {
     @MobileRequiredNullable var revision: String?
 }
 
+enum MobileReadContextBinding: Equatable, Sendable {
+    case authenticatedRequest
+    case tournament(String)
+    case participant(playerID: String, tournamentID: String)
+
+    func isCompatible(expectedTournamentID: String, expectedPlayerID: String?) -> Bool {
+        guard !expectedTournamentID.isEmpty else { return false }
+        switch self {
+        case .authenticatedRequest:
+            return true
+        case .tournament(let tournamentID):
+            return !tournamentID.isEmpty && tournamentID == expectedTournamentID
+        case .participant(let playerID, let tournamentID):
+            guard !playerID.isEmpty,
+                  !tournamentID.isEmpty,
+                  tournamentID == expectedTournamentID
+            else { return false }
+            return expectedPlayerID.map { !$0.isEmpty && $0 == playerID } ?? true
+        }
+    }
+}
+
 protocol MobileReadPayload: Codable, Equatable, Sendable {
-    var tournamentID: String { get }
-    var participantPlayerID: String? { get }
+    var contextBinding: MobileReadContextBinding { get }
     var isStructurallyCompatible: Bool { get }
     var revocableParticipantRepresentationKeys: Set<String> { get }
-    func isCompatible(expectedPlayerID: String) -> Bool
 }
 
 extension MobileReadPayload {
-    var participantPlayerID: String? { nil }
     var revocableParticipantRepresentationKeys: Set<String> { [] }
-
-    /// Older read contracts without a canonical viewer remain bound by the
-    /// authenticated request and cache partition. Viewer-bearing contracts
-    /// override this method and require an exact canonical Player match.
-    func isCompatible(expectedPlayerID: String) -> Bool { true }
 }
 
 protocol MobileReadResponseValidating: Decodable, Sendable {
@@ -171,17 +185,23 @@ struct MobileReadResponse<Payload: MobileReadPayload>: Codable, Equatable, Senda
 
     func isCompatible(expectedTournamentID: String) -> Bool {
         guard isReadContractCompatible,
-              !expectedTournamentID.isEmpty,
-              data.tournamentID == expectedTournamentID
+              data.contextBinding.isCompatible(
+                  expectedTournamentID: expectedTournamentID,
+                  expectedPlayerID: nil
+              )
         else { return false }
         return true
     }
 
     func isCompatible(expectedTournamentID: String, expectedPlayerID: String) -> Bool {
         guard isCompatible(expectedTournamentID: expectedTournamentID),
-              !expectedPlayerID.isEmpty
+              !expectedPlayerID.isEmpty,
+              data.contextBinding.isCompatible(
+                  expectedTournamentID: expectedTournamentID,
+                  expectedPlayerID: expectedPlayerID
+              )
         else { return false }
-        return data.isCompatible(expectedPlayerID: expectedPlayerID)
+        return true
     }
 }
 
@@ -339,11 +359,8 @@ struct MobileTodayData: MobileReadPayload {
     @MobileRequiredNullable var currentMatch: MobileMatch?
     let immediateSchedule: [MobileScheduleEvent]
 
-    var tournamentID: String { tournament.tournamentId }
-    var participantPlayerID: String? { player.playerId }
-
-    func isCompatible(expectedPlayerID: String) -> Bool {
-        player.playerId == expectedPlayerID
+    var contextBinding: MobileReadContextBinding {
+        .participant(playerID: player.playerId, tournamentID: tournament.tournamentId)
     }
     var isStructurallyCompatible: Bool {
         tournament.isStructurallyCompatible &&
@@ -357,7 +374,9 @@ struct MobileMatchesData: MobileReadPayload {
     let tournament: MobileReadTournament
     let matches: [MobileMatch]
 
-    var tournamentID: String { tournament.tournamentId }
+    var contextBinding: MobileReadContextBinding {
+        .tournament(tournament.tournamentId)
+    }
     var isStructurallyCompatible: Bool {
         tournament.isStructurallyCompatible && matches.allSatisfy(\.isStructurallyCompatible)
     }
@@ -405,7 +424,9 @@ struct MobileLeadersData: MobileReadPayload {
     let roundStandings: [MobileRoundStanding]
     let playerStandings: [MobilePlayerStanding]
 
-    var tournamentID: String { tournament.tournamentId }
+    var contextBinding: MobileReadContextBinding {
+        .tournament(tournament.tournamentId)
+    }
     var isStructurallyCompatible: Bool {
         tournament.isStructurallyCompatible &&
         teamStandings.allSatisfy(\.isStructurallyCompatible) &&
@@ -439,7 +460,7 @@ struct MobileScheduleData: MobileReadPayload {
     let timeZone: String
     let events: [MobileScheduleEvent]
 
-    var tournamentID: String { tournamentId }
+    var contextBinding: MobileReadContextBinding { .tournament(tournamentId) }
     var isStructurallyCompatible: Bool {
         !tournamentId.isEmpty && !timeZone.isEmpty && TimeZone(identifier: timeZone) != nil
     }

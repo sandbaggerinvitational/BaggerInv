@@ -52,6 +52,131 @@ final class TournamentDataCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.calcutta.state, .empty)
     }
 
+    func testHistoryDetailCacheAndNetworkStayLazyUntilOneValidatedYearIsRequested() async throws {
+        let cache = LazyHistoryCoordinatorCache()
+        let api = MockMobileAPI()
+        let coordinator = TournamentDataCoordinator(
+            api: api,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+
+        await coordinator.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+
+        let startupReads = await cache.recordedReadFilenames()
+        XCTAssertTrue(startupReads.allSatisfy {
+            !["passport.json", "guide.json", "history.json", "records.json", "odds.json"].contains($0)
+        })
+        let activationHistoryReads = await cache.historyDetailReadYears()
+        XCTAssertEqual(activationHistoryReads, [])
+        XCTAssertEqual(api.historyDetailCallYears, [])
+
+        await coordinator.loadHistoryDetail(year: 2025)
+
+        let requestedHistoryReads = await cache.historyDetailReadYears()
+        XCTAssertEqual(requestedHistoryReads, [2025])
+        XCTAssertEqual(api.historyDetailCallYears, [2025])
+        XCTAssertEqual(coordinator.historyDetails[2025]?.state.value, TestFixtures.historyDetailResponse.data)
+        XCTAssertEqual(coordinator.historyDetails[2024]?.state, .empty)
+
+        await coordinator.loadHistoryDetail(year: 2016)
+        let invalidYearHistoryReads = await cache.historyDetailReadYears()
+        XCTAssertEqual(invalidYearHistoryReads, [2025])
+        XCTAssertEqual(api.historyDetailCallYears, [2025])
+    }
+
+    func testRelaunchRevalidatesRecentGuideCacheButSequentialDestinationsShareRequest() async throws {
+        let cache = LazyHistoryCoordinatorCache()
+        let seedAPI = MockMobileAPI()
+        let seed = TournamentDataCoordinator(
+            api: seedAPI,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+        await seed.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+        XCTAssertEqual(seed.guide.state, .empty)
+        XCTAssertEqual(seedAPI.guideCallCount, 0)
+
+        await seed.refreshGuide()
+        XCTAssertEqual(seed.guide.state.value, TestFixtures.guideResponse.data)
+        XCTAssertEqual(seed.guide.state.source, .network)
+        XCTAssertEqual(seedAPI.guideCallCount, 1)
+        await seed.deactivate(deleteCache: false)
+
+        let revalidationAPI = MockMobileAPI()
+        revalidationAPI.guideValue = .notModified(etag: "\"guide-revision-1\"")
+        let restored = TournamentDataCoordinator(
+            api: revalidationAPI,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now.addingTimeInterval(60) }
+        )
+        await restored.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+        XCTAssertEqual(restored.guide.state, .empty)
+        XCTAssertEqual(revalidationAPI.guideCallCount, 0)
+
+        await restored.loadGuide()
+
+        XCTAssertEqual(restored.guide.state.value, TestFixtures.guideResponse.data)
+        XCTAssertEqual(restored.guide.state.source, .diskCache)
+        XCTAssertEqual(restored.guide.state.freshness, .fresh)
+        XCTAssertEqual(revalidationAPI.guideCallCount, 1)
+
+        await restored.loadGuide()
+        XCTAssertEqual(revalidationAPI.guideCallCount, 1, "Sequential Guide destinations duplicated one representation request")
+    }
+
+    func testForegroundRevalidatesVisitedMoreAndHistoryYearButNotUnvisitedProducts() async throws {
+        let cache = LazyHistoryCoordinatorCache()
+        let api = MockMobileAPI()
+        let coordinator = TournamentDataCoordinator(
+            api: api,
+            credentialProvider: CoordinatorCredentialProvider(),
+            cache: cache,
+            applicationActivity: NativeApplicationActivity(isActive: false),
+            now: { TestFixtures.now }
+        )
+        await coordinator.activate(
+            authUserID: TestFixtures.authSession.userID,
+            participant: TestFixtures.participant
+        )
+
+        await coordinator.refreshForForeground()
+        XCTAssertEqual(api.guideCallCount, 0)
+        XCTAssertEqual(api.historyDetailCallYears, [])
+
+        await coordinator.loadGuide()
+        await coordinator.loadHistoryDetail(year: 2025)
+        XCTAssertEqual(api.guideCallCount, 1)
+        XCTAssertEqual(api.historyDetailCallYears, [2025])
+
+        await coordinator.refreshForForeground()
+
+        XCTAssertEqual(api.guideCallCount, 2)
+        XCTAssertEqual(api.historyDetailCallYears, [2025, 2025])
+        XCTAssertEqual(coordinator.records.state, .empty)
+        XCTAssertEqual(coordinator.odds.state, .empty)
+        XCTAssertEqual(coordinator.historyDetails[2024]?.state, .empty)
+        let readFilenames = await cache.recordedReadFilenames()
+        XCTAssertFalse(readFilenames.contains("records.json"))
+        XCTAssertFalse(readFilenames.contains("odds.json"))
+        XCTAssertFalse(readFilenames.contains("historyDetail-2024.json"))
+    }
+
     func testConcurrentScoreAndPlayersRefreshesShareOneLeadersRequest() async throws {
         let cache = CoordinatorMemoryCache()
         let api = SuspendedLeadersMobileAPI()
@@ -586,6 +711,58 @@ private final class CoordinatorCredentialProvider: MobileReadCredentialProviding
             accessToken: TestFixtures.authSession.accessToken,
             certification: TestFixtures.certificationToken
         )
+    }
+}
+
+private actor LazyHistoryCoordinatorCache: ReadCacheStoring {
+    private var values: [String: Data] = [:]
+    private var detailReadYears: [Int] = []
+    private var readFilenames: [String] = []
+
+    func read(product: MobileReadProduct, partition: ReadCachePartition) throws -> Data? {
+        guard product != .historyDetail else { throw ReadCacheError.invalidCacheKey }
+        return values[storageKey(filename: "\(product.rawValue).json", partition: partition)]
+    }
+
+    func write(_ data: Data, product: MobileReadProduct, partition: ReadCachePartition) throws {
+        guard product != .historyDetail else { throw ReadCacheError.invalidCacheKey }
+        values[storageKey(filename: "\(product.rawValue).json", partition: partition)] = data
+    }
+
+    func remove(product: MobileReadProduct, partition: ReadCachePartition) throws {
+        guard product != .historyDetail else { throw ReadCacheError.invalidCacheKey }
+        values.removeValue(forKey: storageKey(filename: "\(product.rawValue).json", partition: partition))
+    }
+
+    func read(key: MobileReadCacheKey, partition: ReadCachePartition) -> Data? {
+        readFilenames.append(key.filename)
+        if let year = key.historyYear { detailReadYears.append(year) }
+        return values[storageKey(filename: key.filename, partition: partition)]
+    }
+
+    func write(_ data: Data, key: MobileReadCacheKey, partition: ReadCachePartition) {
+        values[storageKey(filename: key.filename, partition: partition)] = data
+    }
+
+    func remove(key: MobileReadCacheKey, partition: ReadCachePartition) {
+        values.removeValue(forKey: storageKey(filename: key.filename, partition: partition))
+    }
+
+    func remove(partition: ReadCachePartition) {
+        let prefix = "\(partition.digest)|"
+        values = values.filter { !$0.key.hasPrefix(prefix) }
+    }
+
+    func byteCount(partition: ReadCachePartition) -> Int {
+        let prefix = "\(partition.digest)|"
+        return values.filter { $0.key.hasPrefix(prefix) }.values.reduce(0) { $0 + $1.count }
+    }
+
+    func historyDetailReadYears() -> [Int] { detailReadYears }
+    func recordedReadFilenames() -> [String] { readFilenames }
+
+    private func storageKey(filename: String, partition: ReadCachePartition) -> String {
+        "\(partition.digest)|\(filename)"
     }
 }
 

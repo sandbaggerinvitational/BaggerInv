@@ -398,6 +398,94 @@ final class MobileReadRepositoryTests: XCTestCase {
         XCTAssertTrue(harness.repository.state.cachePersistenceIssue)
     }
 
+    func testGuidePublishedToUnpublished200ReplacesVisibleAndPersistedRepresentation() async throws {
+        let cache = InMemoryReadCache()
+        let activeContext = try context()
+        let published = guideResponse(published: true)
+        let unpublished = guideResponse(published: false)
+        let fetcher = ScriptedParticipantFetcher<MobileGuideResponse>(results: [
+            .modified(published, etag: "\"guide-published\""),
+            .modified(unpublished, etag: "\"guide-unpublished\""),
+        ])
+        let repository = makeParticipantRepository(
+            product: .guide,
+            cache: cache,
+            fetcher: fetcher
+        )
+        await repository.activate(activeContext, beginRefresh: false)
+
+        await repository.refresh()
+        XCTAssertEqual(repository.state.value?.publicationState, .published)
+        XCTAssertEqual(repository.state.value?.tournament?.name, "Sensitive Published Guide")
+
+        await repository.refresh()
+        XCTAssertEqual(repository.state.value?.publicationState, .unpublished)
+        XCTAssertNil(repository.state.value?.tournament)
+        XCTAssertTrue(repository.state.value?.overview.isEmpty ?? false)
+        XCTAssertEqual(repository.state.lastHTTPStatus, 200)
+
+        let persisted = await cache.storedData(
+            product: .guide,
+            partition: activeContext.cachePartition
+        )
+        let persistedData = try XCTUnwrap(persisted)
+        XCTAssertFalse(String(decoding: persistedData, as: UTF8.self).contains("Sensitive Published Guide"))
+
+        let relaunched = makeParticipantRepository(
+            product: .guide,
+            cache: cache,
+            fetcher: ScriptedParticipantFetcher<MobileGuideResponse>(results: [])
+        )
+        await relaunched.activate(activeContext, beginRefresh: false)
+        XCTAssertEqual(relaunched.state.source, .diskCache)
+        XCTAssertEqual(relaunched.state.value?.publicationState, .unpublished)
+        XCTAssertNil(relaunched.state.value?.tournament)
+    }
+
+    func testOddsPublishedToUnpublished200ReplacesVisibleAndPersistedRepresentation() async throws {
+        let cache = InMemoryReadCache()
+        let activeContext = try context()
+        let published = oddsResponse(published: true)
+        let unpublished = oddsResponse(published: false)
+        let fetcher = ScriptedParticipantFetcher<MobileOddsResponse>(results: [
+            .modified(published, etag: "\"odds-published\""),
+            .modified(unpublished, etag: "\"odds-unpublished\""),
+        ])
+        let repository = makeParticipantRepository(
+            product: .odds,
+            cache: cache,
+            fetcher: fetcher
+        )
+        await repository.activate(activeContext, beginRefresh: false)
+
+        await repository.refresh()
+        XCTAssertEqual(repository.state.value?.publication.state, .published)
+        XCTAssertEqual(repository.state.value?.snapshots.first?.teams.first?.name, "Sensitive Odds Team")
+
+        await repository.refresh()
+        XCTAssertEqual(repository.state.value?.publication.state, .unpublished)
+        XCTAssertNil(repository.state.value?.publication.currentPhase)
+        XCTAssertTrue(repository.state.value?.snapshots.isEmpty ?? false)
+        XCTAssertEqual(repository.state.lastHTTPStatus, 200)
+
+        let persisted = await cache.storedData(
+            product: .odds,
+            partition: activeContext.cachePartition
+        )
+        let persistedData = try XCTUnwrap(persisted)
+        XCTAssertFalse(String(decoding: persistedData, as: UTF8.self).contains("Sensitive Odds Team"))
+
+        let relaunched = makeParticipantRepository(
+            product: .odds,
+            cache: cache,
+            fetcher: ScriptedParticipantFetcher<MobileOddsResponse>(results: [])
+        )
+        await relaunched.activate(activeContext, beginRefresh: false)
+        XCTAssertEqual(relaunched.state.source, .diskCache)
+        XCTAssertEqual(relaunched.state.value?.publication.state, .unpublished)
+        XCTAssertTrue(relaunched.state.value?.snapshots.isEmpty ?? false)
+    }
+
     private func makeHarness(
         results: [ScriptedTodayFetcher.Result] = [],
         cache: InMemoryReadCache = InMemoryReadCache(),
@@ -424,6 +512,21 @@ final class MobileReadRepositoryTests: XCTestCase {
             cache: cache,
             credentialProvider: credentialProvider,
             now: now
+        ) { credentials, etag in
+            try await fetcher.fetch(credentials: credentials, etag: etag)
+        }
+    }
+
+    private func makeParticipantRepository<Response: MobileReadPayloadResponse>(
+        product: MobileReadProduct,
+        cache: InMemoryReadCache,
+        fetcher: ScriptedParticipantFetcher<Response>
+    ) -> MobileReadRepository<Response> {
+        MobileReadRepository(
+            product: product,
+            cache: cache,
+            credentialProvider: StubReadCredentialProvider(),
+            now: { TestFixtures.now }
         ) { credentials, etag in
             try await fetcher.fetch(credentials: credentials, etag: etag)
         }
@@ -470,6 +573,110 @@ final class MobileReadRepositoryTests: XCTestCase {
             meta: MobileReadMeta(
                 generatedAt: try! MobileTimestamp("2027-01-15T08:05:00.000Z"),
                 revision: revision
+            )
+        )
+    }
+
+    private func guideResponse(published: Bool) -> MobileGuideResponse {
+        MobileGuideResponse(
+            ok: true,
+            apiVersion: "v1",
+            data: MobileGuideData(
+                contractVersion: "guide-v1",
+                tournamentId: TestFixtures.participant.tournament.tournamentId,
+                publicationState: published ? .published : .unpublished,
+                publishedAt: published
+                    ? try! MobileTimestamp("2027-01-15T08:00:00.000Z")
+                    : nil,
+                tournament: published
+                    ? MobileGuideTournament(
+                        tournamentId: TestFixtures.participant.tournament.tournamentId,
+                        year: 2026,
+                        name: "Sensitive Published Guide",
+                        editionTitle: nil,
+                        dates: nil,
+                        location: nil,
+                        timeZone: "America/Chicago",
+                        logoAssetKey: nil,
+                        heroAssetKey: nil,
+                        mobileHeroAssetKey: nil
+                    )
+                    : nil,
+                overview: [],
+                rules: MobileGuideRules(roundFormats: [], items: []),
+                courses: [],
+                dining: [],
+                localGuide: [],
+                contacts: []
+            ),
+            meta: MobileReadMeta(
+                generatedAt: TestFixtures.readMeta.generatedAt,
+                revision: published ? "guide-published" : "guide-unpublished"
+            )
+        )
+    }
+
+    private func oddsResponse(published: Bool) -> MobileOddsResponse {
+        let timestamp = try! MobileTimestamp("2027-01-15T08:00:00.000Z")
+        let snapshots = published
+            ? [
+                MobileOddsSnapshot(
+                    phase: .preTournament,
+                    phaseOrder: 0,
+                    label: "Pre-Tournament",
+                    isCurrent: true,
+                    publishedAt: timestamp,
+                    iterations: 10_000,
+                    totalPointsAvailable: 20,
+                    teams: [
+                        MobileOddsTeam(
+                            side: 1,
+                            teamId: "team-preview-1",
+                            name: "Sensitive Odds Team",
+                            probability: 55,
+                            americanOdds: "+120",
+                            expectedPoints: 11
+                        ),
+                        MobileOddsTeam(
+                            side: 2,
+                            teamId: "team-preview-2",
+                            name: "Other Team",
+                            probability: 45,
+                            americanOdds: "-110",
+                            expectedPoints: 9
+                        ),
+                    ],
+                    players: [
+                        MobileOddsPlayer(
+                            rank: 1,
+                            playerId: TestFixtures.participant.player.playerId,
+                            displayName: TestFixtures.participant.player.displayName,
+                            teamSide: 1,
+                            probability: 12.5,
+                            americanOdds: "+700",
+                            expectedPoints: 3,
+                            expectedRecord: "2-1-0",
+                            averageFinish: 1.5
+                        ),
+                    ]
+                ),
+            ]
+            : []
+        return MobileOddsResponse(
+            ok: true,
+            apiVersion: "v1",
+            data: MobileOddsData(
+                publication: MobileOddsPublication(
+                    state: published ? .published : .unpublished,
+                    revision: published ? 1 : 2,
+                    publishedAt: published ? timestamp : nil,
+                    currentPhase: published ? .preTournament : nil
+                ),
+                snapshots: snapshots
+            ),
+            meta: MobileReadMeta(
+                generatedAt: TestFixtures.readMeta.generatedAt,
+                revision: published ? "odds-published" : "odds-unpublished"
             )
         )
     }
@@ -540,6 +747,23 @@ private final class ScriptedTodayFetcher {
         case .notModified(let etag): return .notModified(etag: etag)
         case .failure(let error): throw error
         }
+    }
+}
+
+@MainActor
+private final class ScriptedParticipantFetcher<Response: MobileReadPayloadResponse> {
+    private var results: [MobileConditionalRead<Response>]
+
+    init(results: [MobileConditionalRead<Response>]) {
+        self.results = results
+    }
+
+    func fetch(
+        credentials: MobileReadCredentials,
+        etag: String?
+    ) async throws -> MobileConditionalRead<Response> {
+        guard !results.isEmpty else { throw MobileAPIClientError.transportUnavailable }
+        return results.removeFirst()
     }
 }
 

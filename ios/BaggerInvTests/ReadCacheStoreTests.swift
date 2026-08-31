@@ -106,7 +106,30 @@ final class ReadCacheStoreTests: XCTestCase {
         }
     }
 
-    func testAllSixProtectedReadProductsUseDistinctParticipantPrivateFiles() async throws {
+    func testHistoryDetailCacheKeysValidateYearAndRemainAdditiveToSchemaV1() async throws {
+        XCTAssertEqual(DiskReadCacheStore.cacheSchemaVersion, 1)
+        XCTAssertEqual(try MobileReadCacheKey(historyYear: 2017).filename, "historyDetail-2017.json")
+        XCTAssertEqual(try MobileReadCacheKey(historyYear: 2026).filename, "historyDetail-2026.json")
+        XCTAssertThrowsError(try MobileReadCacheKey(historyYear: 2016)) { error in
+            XCTAssertEqual(error as? ReadCacheError, .invalidCacheKey)
+        }
+        XCTAssertThrowsError(try MobileReadCacheKey(historyYear: 2027)) { error in
+            XCTAssertEqual(error as? ReadCacheError, .invalidCacheKey)
+        }
+
+        let root = try makeTemporaryRoot()
+        defer { removeTemporaryRoot(root) }
+        let store = try DiskReadCacheStore(rootDirectory: root)
+        let partition = try PartitionInputs.standard.partition()
+        do {
+            try await store.write(Data(), product: .historyDetail, partition: partition)
+            XCTFail("A history-detail product without a validated year must fail closed")
+        } catch {
+            XCTAssertEqual(error as? ReadCacheError, .invalidCacheKey)
+        }
+    }
+
+    func testAllProtectedReadCacheKeysUseDistinctParticipantPrivateFiles() async throws {
         let root = try makeTemporaryRoot()
         defer { removeTemporaryRoot(root) }
         let store = try DiskReadCacheStore(rootDirectory: root)
@@ -114,11 +137,17 @@ final class ReadCacheStoreTests: XCTestCase {
 
         XCTAssertEqual(
             Set(MobileReadProduct.allCases),
-            Set([.today, .matches, .leaders, .netSkins, .calcutta, .schedule])
+            Set([
+                .today, .matches, .leaders, .netSkins, .calcutta, .schedule,
+                .passport, .guide, .history, .historyDetail, .records, .odds,
+            ])
         )
-        for (index, product) in MobileReadProduct.allCases.enumerated() {
+        let staticProducts = MobileReadProduct.allCases.filter { $0 != .historyDetail }
+        for (index, product) in staticProducts.enumerated() {
             try await store.write(Data([UInt8(index + 1)]), product: product, partition: partition)
         }
+        let historyDetailKey = try MobileReadCacheKey(historyYear: 2025)
+        try await store.write(Data([255]), key: historyDetailKey, partition: partition)
 
         let names = try FileManager.default.contentsOfDirectory(
             at: await store.fileURL(product: .leaders, partition: partition).deletingLastPathComponent(),
@@ -126,7 +155,11 @@ final class ReadCacheStoreTests: XCTestCase {
         ).map(\.lastPathComponent)
         XCTAssertEqual(
             Set(names),
-            Set(["today.json", "matches.json", "leaders.json", "netSkins.json", "calcutta.json", "schedule.json"])
+            Set([
+                "today.json", "matches.json", "leaders.json", "netSkins.json", "calcutta.json",
+                "schedule.json", "passport.json", "guide.json", "history.json", "records.json",
+                "odds.json", "historyDetail-2025.json",
+            ])
         )
     }
 
@@ -200,19 +233,27 @@ final class ReadCacheStoreTests: XCTestCase {
         let store = try DiskReadCacheStore(rootDirectory: root)
         let partition = try PartitionInputs.standard.partition()
 
-        for product in MobileReadProduct.allCases {
+        let staticProducts = MobileReadProduct.allCases.filter { $0 != .historyDetail }
+        for product in staticProducts {
             try await store.write(Data(product.rawValue.utf8), product: product, partition: partition)
         }
+        let historyDetailKey = try MobileReadCacheKey(historyYear: 2025)
+        try await store.write(Data("history-2025".utf8), key: historyDetailKey, partition: partition)
         let partitionDirectory = await store.fileURL(product: .today, partition: partition)
             .deletingLastPathComponent()
 
         try await store.remove(partition: partition)
         try await store.remove(partition: partition)
 
-        for product in MobileReadProduct.allCases {
+        for product in staticProducts {
             let value = try await store.read(product: product, partition: partition)
             XCTAssertNil(value, "Sign-out partition deletion retained \(product.rawValue)")
         }
+        let restoredHistoryDetail = try await store.read(
+            key: historyDetailKey,
+            partition: partition
+        )
+        XCTAssertNil(restoredHistoryDetail)
         XCTAssertFalse(FileManager.default.fileExists(atPath: partitionDirectory.path))
         let byteCount = try await store.byteCount(partition: partition)
         XCTAssertEqual(byteCount, 0)

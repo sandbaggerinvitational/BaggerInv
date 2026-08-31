@@ -8,6 +8,53 @@ enum MobileReadProduct: String, CaseIterable, Codable, Sendable {
     case netSkins
     case calcutta
     case schedule
+    case passport
+    case guide
+    case history
+    case historyDetail
+    case records
+    case odds
+}
+
+struct MobileReadCacheKey: Codable, Equatable, Hashable, Sendable {
+    let product: MobileReadProduct
+    let historyYear: Int?
+
+    init(product: MobileReadProduct) {
+        precondition(product != .historyDetail, "History detail cache keys require a validated year.")
+        self.product = product
+        historyYear = nil
+    }
+
+    init(historyYear: Int) throws {
+        guard (2017...2026).contains(historyYear) else {
+            throw ReadCacheError.invalidCacheKey
+        }
+        product = .historyDetail
+        self.historyYear = historyYear
+    }
+
+    var filename: String {
+        if let historyYear {
+            return "\(product.rawValue)-\(historyYear).json"
+        }
+        return "\(product.rawValue).json"
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let product = try container.decode(MobileReadProduct.self, forKey: .product)
+        let historyYear = try container.decodeIfPresent(Int.self, forKey: .historyYear)
+        if product == .historyDetail {
+            guard let historyYear, (2017...2026).contains(historyYear) else {
+                throw ReadCacheError.invalidCacheKey
+            }
+        } else if historyYear != nil {
+            throw ReadCacheError.invalidCacheKey
+        }
+        self.product = product
+        self.historyYear = historyYear
+    }
 }
 
 struct ReadCachePartition: Equatable, Hashable, Sendable {
@@ -35,6 +82,26 @@ protocol ReadCacheStoring: Sendable {
     func remove(product: MobileReadProduct, partition: ReadCachePartition) async throws
     func remove(partition: ReadCachePartition) async throws
     func byteCount(partition: ReadCachePartition) async throws -> Int
+    func read(key: MobileReadCacheKey, partition: ReadCachePartition) async throws -> Data?
+    func write(_ data: Data, key: MobileReadCacheKey, partition: ReadCachePartition) async throws
+    func remove(key: MobileReadCacheKey, partition: ReadCachePartition) async throws
+}
+
+extension ReadCacheStoring {
+    func read(key: MobileReadCacheKey, partition: ReadCachePartition) async throws -> Data? {
+        guard key.historyYear == nil else { throw ReadCacheError.invalidCacheKey }
+        return try await read(product: key.product, partition: partition)
+    }
+
+    func write(_ data: Data, key: MobileReadCacheKey, partition: ReadCachePartition) async throws {
+        guard key.historyYear == nil else { throw ReadCacheError.invalidCacheKey }
+        try await write(data, product: key.product, partition: partition)
+    }
+
+    func remove(key: MobileReadCacheKey, partition: ReadCachePartition) async throws {
+        guard key.historyYear == nil else { throw ReadCacheError.invalidCacheKey }
+        try await remove(product: key.product, partition: partition)
+    }
 }
 
 actor DiskReadCacheStore: ReadCacheStoring {
@@ -70,16 +137,26 @@ actor DiskReadCacheStore: ReadCacheStoring {
         )
     }
 
-    func read(product: MobileReadProduct, partition: ReadCachePartition) throws -> Data? {
-        let url = fileURL(product: product, partition: partition)
+    func read(product: MobileReadProduct, partition: ReadCachePartition) async throws -> Data? {
+        guard product != .historyDetail else { throw ReadCacheError.invalidCacheKey }
+        return try await read(key: MobileReadCacheKey(product: product), partition: partition)
+    }
+
+    func read(key: MobileReadCacheKey, partition: ReadCachePartition) async throws -> Data? {
+        let url = fileURL(key: key, partition: partition)
         guard fileManager.fileExists(atPath: url.path) else { return nil }
         return try Data(contentsOf: url, options: [.mappedIfSafe])
     }
 
-    func write(_ data: Data, product: MobileReadProduct, partition: ReadCachePartition) throws {
+    func write(_ data: Data, product: MobileReadProduct, partition: ReadCachePartition) async throws {
+        guard product != .historyDetail else { throw ReadCacheError.invalidCacheKey }
+        try await write(data, key: MobileReadCacheKey(product: product), partition: partition)
+    }
+
+    func write(_ data: Data, key: MobileReadCacheKey, partition: ReadCachePartition) async throws {
         let directory = partitionDirectory(partition)
         try createProtectedDirectory(directory)
-        let destination = fileURL(product: product, partition: partition)
+        let destination = fileURL(key: key, partition: partition)
         try data.write(
             to: destination,
             options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
@@ -90,8 +167,13 @@ actor DiskReadCacheStore: ReadCacheStoring {
         )
     }
 
-    func remove(product: MobileReadProduct, partition: ReadCachePartition) throws {
-        let url = fileURL(product: product, partition: partition)
+    func remove(product: MobileReadProduct, partition: ReadCachePartition) async throws {
+        guard product != .historyDetail else { throw ReadCacheError.invalidCacheKey }
+        try await remove(key: MobileReadCacheKey(product: product), partition: partition)
+    }
+
+    func remove(key: MobileReadCacheKey, partition: ReadCachePartition) async throws {
+        let url = fileURL(key: key, partition: partition)
         guard fileManager.fileExists(atPath: url.path) else { return }
         try fileManager.removeItem(at: url)
     }
@@ -129,7 +211,11 @@ actor DiskReadCacheStore: ReadCacheStoring {
     }
 
     func fileURL(product: MobileReadProduct, partition: ReadCachePartition) -> URL {
-        partitionDirectory(partition).appendingPathComponent("\(product.rawValue).json", isDirectory: false)
+        fileURL(key: MobileReadCacheKey(product: product), partition: partition)
+    }
+
+    func fileURL(key: MobileReadCacheKey, partition: ReadCachePartition) -> URL {
+        partitionDirectory(partition).appendingPathComponent(key.filename, isDirectory: false)
     }
 
     private func partitionDirectory(_ partition: ReadCachePartition) -> URL {
@@ -190,5 +276,6 @@ actor DiskReadCacheStore: ReadCacheStoring {
 
 enum ReadCacheError: Error, Equatable {
     case invalidPartition
+    case invalidCacheKey
     case storageUnavailable
 }

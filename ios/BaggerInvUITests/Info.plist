@@ -20,6 +20,8 @@
 	<string>$(BAGGER_STEP2E_PHYSICAL_SCORING_QA)</string>
 	<key>BAGGER_STEP2H_RESTORED_LEADERS_QA</key>
 	<string>$(BAGGER_STEP2H_RESTORED_LEADERS_QA)</string>
+	<key>BAGGER_STEP2I_RESTORED_MORE_QA</key>
+	<string>$(BAGGER_STEP2I_RESTORED_MORE_QA)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

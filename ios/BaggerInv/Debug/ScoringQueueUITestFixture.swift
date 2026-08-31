@@ -145,6 +145,7 @@ struct ScoringQueueSignOutUITestFixtureRoot: View {
     let presentation: TodayPresentation
     let matchesState: MobileReadState<MobileMatchesData>
     let scoringState: ScoringCurrentState
+    let startsOnMore: Bool
 
     @State private var signOutPresentation: ScoringQueueSignOutPresentation?
     @State private var didConfirmSignOut = false
@@ -167,7 +168,16 @@ struct ScoringQueueSignOutUITestFixtureRoot: View {
                     fixturePresentation: presentation,
                     fixtureMatchesState: matchesState,
                     fixtureScoringState: scoringState,
-                    startsOnScore: true,
+                    fixtureScheduleState: MoreUITestFixtures.scheduleState(for: .scheduleStandard),
+                    fixturePassportState: MoreUITestFixtures.passportState(for: .moreStandard),
+                    fixtureGuideState: MoreUITestFixtures.guideState(for: .moreStandard),
+                    fixtureHistoryState: MoreUITestFixtures.historyState(for: .moreStandard),
+                    fixtureHistoryDetailStates: MoreUITestFixtures.historyDetailStates(for: .moreStandard),
+                    fixtureRecordsState: MoreUITestFixtures.recordsState(for: .moreStandard),
+                    fixtureOddsState: MoreUITestFixtures.oddsState(for: .moreStandard),
+                    fixtureScheduleNow: MoreUITestFixtures.now,
+                    startsOnScore: !startsOnMore,
+                    startsOnMore: startsOnMore,
                     onSignOut: {
                         signOutPresentation = ScoringQueueSignOutPresentation(unresolvedCount: 2)
                     }

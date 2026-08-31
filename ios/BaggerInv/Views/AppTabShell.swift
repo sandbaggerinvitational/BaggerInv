@@ -15,10 +15,19 @@ struct BaggerAppShell: View {
     let fixtureMatchesState: MobileReadState<MobileMatchesData>?
     let fixtureScoringState: ScoringCurrentState?
     let fixtureLeaders: LeadersFixturePresentation?
+    let fixtureScheduleState: MobileReadState<MobileScheduleData>?
+    let fixturePassportState: MobileReadState<MobilePassportData>?
+    let fixtureGuideState: MobileReadState<MobileGuideData>?
+    let fixtureHistoryState: MobileReadState<MobileHistoryArchiveData>?
+    let fixtureHistoryDetailStates: [Int: MobileReadState<MobileHistoryDetailData>]
+    let fixtureRecordsState: MobileReadState<MobileRecordsData>?
+    let fixtureOddsState: MobileReadState<MobileOddsData>?
+    let fixtureScheduleNow: Date
     let fixtureUsesDurableScoringQueue: Bool
     let onSignOut: () -> Void
 
     @State private var selection: BaggerAppTab = .today
+    @State private var morePath: [MoreDestination] = []
 
     init(
         participant: ParticipantSession,
@@ -31,6 +40,14 @@ struct BaggerAppShell: View {
         fixtureMatchesState = nil
         fixtureScoringState = nil
         fixtureLeaders = nil
+        fixtureScheduleState = nil
+        fixturePassportState = nil
+        fixtureGuideState = nil
+        fixtureHistoryState = nil
+        fixtureHistoryDetailStates = [:]
+        fixtureRecordsState = nil
+        fixtureOddsState = nil
+        fixtureScheduleNow = Date()
         fixtureUsesDurableScoringQueue = false
         self.onSignOut = onSignOut
     }
@@ -41,9 +58,19 @@ struct BaggerAppShell: View {
         fixtureMatchesState: MobileReadState<MobileMatchesData>,
         fixtureScoringState: ScoringCurrentState,
         fixtureLeaders: LeadersFixturePresentation? = nil,
+        fixtureScheduleState: MobileReadState<MobileScheduleData>? = nil,
+        fixturePassportState: MobileReadState<MobilePassportData>? = nil,
+        fixtureGuideState: MobileReadState<MobileGuideData>? = nil,
+        fixtureHistoryState: MobileReadState<MobileHistoryArchiveData>? = nil,
+        fixtureHistoryDetailStates: [Int: MobileReadState<MobileHistoryDetailData>] = [:],
+        fixtureRecordsState: MobileReadState<MobileRecordsData>? = nil,
+        fixtureOddsState: MobileReadState<MobileOddsData>? = nil,
+        fixtureScheduleNow: Date = Date(),
         fixtureUsesDurableScoringQueue: Bool = false,
         startsOnScore: Bool = false,
         startsOnLeaders: Bool = false,
+        startsOnMore: Bool = false,
+        startsOnSchedule: Bool = false,
         onSignOut: @escaping () -> Void = {}
     ) {
         self.participant = participant
@@ -52,9 +79,22 @@ struct BaggerAppShell: View {
         self.fixtureMatchesState = fixtureMatchesState
         self.fixtureScoringState = fixtureScoringState
         self.fixtureLeaders = fixtureLeaders
+        self.fixtureScheduleState = fixtureScheduleState
+        self.fixturePassportState = fixturePassportState
+        self.fixtureGuideState = fixtureGuideState
+        self.fixtureHistoryState = fixtureHistoryState
+        self.fixtureHistoryDetailStates = fixtureHistoryDetailStates
+        self.fixtureRecordsState = fixtureRecordsState
+        self.fixtureOddsState = fixtureOddsState
+        self.fixtureScheduleNow = fixtureScheduleNow
         self.fixtureUsesDurableScoringQueue = fixtureUsesDurableScoringQueue
         self.onSignOut = onSignOut
-        _selection = State(initialValue: startsOnLeaders ? .leaders : startsOnScore ? .score : .today)
+        _selection = State(
+            initialValue: startsOnMore || startsOnSchedule
+                ? .more
+                : startsOnLeaders ? .leaders : startsOnScore ? .score : .today
+        )
+        _morePath = State(initialValue: startsOnSchedule ? [.schedule] : [])
     }
 
     var body: some View {
@@ -107,11 +147,17 @@ struct BaggerAppShell: View {
             .tag(BaggerAppTab.leaders)
             .accessibilityIdentifier("tab.leaders")
 
-            placeholderTab(
-                title: "More",
-                message: "Schedule, Player Passport, and settings will live here.",
-                symbol: "ellipsis.circle.fill"
-            )
+            NavigationStack(path: $morePath) {
+                MoreDirectoryView()
+                    .baggerNavigationChrome(
+                        title: "More",
+                        participant: participant,
+                        onSignOut: onSignOut
+                    )
+                    .navigationDestination(for: MoreDestination.self) { destination in
+                        moreDestination(destination)
+                    }
+            }
             .tabItem { Label("More", systemImage: "ellipsis.circle.fill") }
             .tag(BaggerAppTab.more)
             .accessibilityIdentifier("tab.more")
@@ -205,12 +251,14 @@ struct BaggerAppShell: View {
             TodayScreen(
                 presentation: fixturePresentation,
                 isRefreshing: false,
-                onRefresh: {}
+                onRefresh: {},
+                onOpenFullSchedule: openFullSchedule
             )
         } else if let tournamentData {
             TodayRepositoryView(
                 participant: participant,
-                coordinator: tournamentData
+                coordinator: tournamentData,
+                onOpenFullSchedule: openFullSchedule
             )
         } else {
             VStack(spacing: 14) {
@@ -220,6 +268,121 @@ struct BaggerAppShell: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(BaggerPalette.canvas.ignoresSafeArea())
         }
+    }
+
+    @ViewBuilder
+    private func moreDestination(_ destination: MoreDestination) -> some View {
+        switch destination {
+        case .schedule:
+            if let fixtureScheduleState {
+                FullScheduleFixtureView(state: fixtureScheduleState, now: fixtureScheduleNow)
+            } else if let tournamentData {
+                FullScheduleRepositoryView(repository: tournamentData.schedule)
+            } else {
+                MoreUnavailableStateView(
+                    title: destination.title,
+                    message: "The native tournament data foundation is unavailable.",
+                    identifierPrefix: "schedule",
+                    onRetry: {}
+                )
+            }
+        case .settings:
+            SettingsView(participant: participant, onSignOut: onSignOut)
+        case .passport, .passportTournamentHistory, .passportFormat, .passportCaptainLegacy:
+            if let fixturePassportState {
+                PassportFixtureView(
+                    state: fixturePassportState,
+                    destination: destination,
+                    onSignOut: onSignOut
+                )
+            } else if let tournamentData {
+                PassportRepositoryView(
+                    repository: tournamentData.passport,
+                    destination: destination,
+                    onLoad: { await tournamentData.loadPassport() },
+                    onRefresh: { await tournamentData.refreshPassport() },
+                    onSignOut: onSignOut
+                )
+            } else {
+                missingMoreData(destination, identifierPrefix: "passport")
+            }
+        case .tournamentGuide, .courses, .course, .rules, .dining, .localGuide, .contacts:
+            if let fixtureGuideState {
+                GuideFixtureView(state: fixtureGuideState, destination: destination)
+            } else if let tournamentData {
+                GuideRepositoryView(
+                    repository: tournamentData.guide,
+                    destination: destination,
+                    onLoad: { await tournamentData.loadGuide() },
+                    onRefresh: { await tournamentData.refreshGuide() }
+                )
+            } else {
+                missingMoreData(destination, identifierPrefix: "guide")
+            }
+        case .odds:
+            if let fixtureOddsState {
+                OddsFixtureView(state: fixtureOddsState)
+            } else if let tournamentData {
+                OddsRepositoryView(
+                    repository: tournamentData.odds,
+                    onLoad: { await tournamentData.loadOdds() },
+                    onRefresh: { await tournamentData.refreshOdds() }
+                )
+            } else {
+                missingMoreData(destination, identifierPrefix: "odds")
+            }
+        case .history:
+            if let fixtureHistoryState {
+                HistoryArchiveFixtureView(state: fixtureHistoryState)
+            } else if let tournamentData {
+                HistoryArchiveRepositoryView(
+                    repository: tournamentData.history,
+                    onLoad: { await tournamentData.loadHistory() },
+                    onRefresh: { await tournamentData.refreshHistory() }
+                )
+            } else {
+                missingMoreData(destination, identifierPrefix: "history")
+            }
+        case .historyYear(let year):
+            if let state = fixtureHistoryDetailStates[year] {
+                HistoryDetailFixtureView(state: state)
+            } else if let tournamentData {
+                HistoryYearRouteView(coordinator: tournamentData, year: year)
+            } else {
+                missingMoreData(destination, identifierPrefix: "history.detail")
+            }
+        case .records:
+            if let fixtureRecordsState {
+                RecordsFixtureView(state: fixtureRecordsState)
+            } else if let tournamentData {
+                RecordsRepositoryView(
+                    repository: tournamentData.records,
+                    onLoad: { await tournamentData.loadRecords() },
+                    onRefresh: { await tournamentData.refreshRecords() }
+                )
+            } else {
+                missingMoreData(destination, identifierPrefix: "records")
+            }
+        }
+    }
+
+    private func missingMoreData(
+        _ destination: MoreDestination,
+        identifierPrefix: String
+    ) -> some View {
+        MoreUnavailableStateView(
+            title: destination.title,
+            message: "The native tournament data foundation is unavailable.",
+            identifierPrefix: identifierPrefix,
+            onRetry: {}
+        )
+        .navigationTitle(destination.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func openFullSchedule() {
+        morePath = [.schedule]
+        selection = .more
     }
 
     private func placeholderTab(

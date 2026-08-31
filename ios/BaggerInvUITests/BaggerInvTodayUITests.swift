@@ -88,7 +88,7 @@ final class BaggerInvTodayUITests: XCTestCase {
         XCTAssertFalse(element("today.offlineStatus", in: app).exists)
     }
 
-    func testFiveTabShellUsesRealMatchesScoreAndLeadersWithRestrainedMorePlaceholder() {
+    func testFiveTabShellUsesNativeProductDestinations() {
         let app = launch(.standard)
 
         assertTab("Today", identifier: "tab.today", in: app)
@@ -112,7 +112,12 @@ final class BaggerInvTodayUITests: XCTestCase {
         XCTAssertTrue(leaders.isSelected, "The Leaders tab did not become selected.")
         assertExists("tab.leaders", in: app)
         assertExists("leaders.screen", in: app)
-        assertPlaceholderTab("More", identifier: "tab.more", placeholder: "placeholder.more", in: app)
+        let more = app.tabBars.buttons["More"]
+        XCTAssertTrue(more.waitForExistence(timeout: 3), "The More tab was missing.")
+        more.tap()
+        XCTAssertTrue(more.isSelected, "The More tab did not become selected.")
+        assertExists("tab.more", in: app)
+        assertExists("more.screen", in: app)
 
         app.tabBars.buttons["Today"].tap()
         assertExists("tab.today", in: app)
@@ -167,20 +172,6 @@ final class BaggerInvTodayUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 5), "The five-tab app shell was not interactive.")
         XCTAssertTrue(app.tabBars.buttons["Today"].isSelected, "The fixture did not open on Today.")
         return app
-    }
-
-    private func assertPlaceholderTab(
-        _ name: String,
-        identifier: String,
-        placeholder: String,
-        in app: XCUIApplication
-    ) {
-        let button = app.tabBars.buttons[name]
-        XCTAssertTrue(button.waitForExistence(timeout: 3), "The \(name) tab was missing.")
-        button.tap()
-        XCTAssertTrue(button.isSelected, "The \(name) tab did not become selected.")
-        assertExists(identifier, in: app)
-        assertExists(placeholder, in: app)
     }
 
     private func assertTab(_ name: String, identifier: String, in app: XCUIApplication) {

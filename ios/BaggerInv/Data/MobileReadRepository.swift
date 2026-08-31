@@ -70,6 +70,9 @@ private struct ReadCacheEnvelope<Response: MobileReadPayloadResponse>: Codable, 
     let cacheSchemaVersion: Int
     let partitionDigest: String
     let product: MobileReadProduct
+    /// Additive schema-v1 discriminator. Older static-product envelopes omit
+    /// this field and continue to decode as nil.
+    let historyYear: Int?
     var response: Response
     var etag: String?
     let fetchedAt: Date
@@ -100,14 +103,21 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
         _ credentials: MobileReadCredentials,
         _ etag: String?
     ) async throws -> MobileConditionalRead<Response>
+    typealias ResponseValidator = @MainActor @Sendable (
+        _ response: Response,
+        _ context: ActiveMobileReadContext
+    ) -> Bool
 
     @Published private(set) var state: MobileReadState<Value> = .empty
 
     let product: MobileReadProduct
+    let cacheKey: MobileReadCacheKey
+    var isActive: Bool { activeContext != nil }
 
     private let cache: any ReadCacheStoring
     private let credentialProvider: any MobileReadCredentialProviding
     private let fetcher: Fetcher
+    private let responseValidator: ResponseValidator
     private let now: () -> Date
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
@@ -118,17 +128,42 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
     private var accessInvalidationHandler: (@MainActor @Sendable () -> Void)?
     private var authorityRevalidationHandler: (@MainActor @Sendable () -> Void)?
 
-    init(
+    convenience init(
         product: MobileReadProduct,
         cache: any ReadCacheStoring,
         credentialProvider: any MobileReadCredentialProviding,
         now: @escaping () -> Date = Date.init,
         fetcher: @escaping Fetcher
     ) {
-        self.product = product
+        self.init(
+            cacheKey: MobileReadCacheKey(product: product),
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now,
+            responseValidator: { response, context in
+                response.isCompatible(
+                    expectedTournamentID: context.tournamentID,
+                    expectedPlayerID: context.playerID
+                )
+            },
+            fetcher: fetcher
+        )
+    }
+
+    init(
+        cacheKey: MobileReadCacheKey,
+        cache: any ReadCacheStoring,
+        credentialProvider: any MobileReadCredentialProviding,
+        now: @escaping () -> Date = Date.init,
+        responseValidator: @escaping ResponseValidator,
+        fetcher: @escaping Fetcher
+    ) {
+        product = cacheKey.product
+        self.cacheKey = cacheKey
         self.cache = cache
         self.credentialProvider = credentialProvider
         self.now = now
+        self.responseValidator = responseValidator
         self.fetcher = fetcher
         encoder = JSONEncoder()
         decoder = JSONDecoder()
@@ -161,15 +196,13 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
         cachedEntry = nil
 
         do {
-            if let data = try await cache.read(product: product, partition: context.cachePartition) {
+            if let data = try await cache.read(key: cacheKey, partition: context.cachePartition) {
                 let entry = try decoder.decode(ReadCacheEnvelope<Response>.self, from: data)
                 guard entry.cacheSchemaVersion == DiskReadCacheStore.cacheSchemaVersion,
                       entry.partitionDigest == context.cachePartition.digest,
-                      entry.product == product,
-                      entry.response.isCompatible(
-                          expectedTournamentID: context.tournamentID,
-                          expectedPlayerID: context.playerID
-                      ),
+                      entry.product == cacheKey.product,
+                      entry.historyYear == cacheKey.historyYear,
+                      responseValidator(entry.response, context),
                       generation == activationGeneration,
                       activeContext == context
                 else {
@@ -179,7 +212,7 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                 state = state(from: entry, source: .diskCache, freshness: .cached)
             }
         } catch {
-            try? await cache.remove(product: product, partition: context.cachePartition)
+            try? await cache.remove(key: cacheKey, partition: context.cachePartition)
             guard generation == activationGeneration, activeContext == context else { return }
             cachedEntry = nil
             state = .empty
@@ -320,17 +353,15 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                 await persist(entry, context: context, operationGeneration: operationGeneration)
 
             case .modified(let response, let etag):
-                guard response.isCompatible(
-                    expectedTournamentID: context.tournamentID,
-                    expectedPlayerID: context.playerID
-                ) else {
+                guard responseValidator(response, context) else {
                     throw MobileReadFailure.contract
                 }
                 let fetchedAt = now()
                 let entry = ReadCacheEnvelope(
                     cacheSchemaVersion: DiskReadCacheStore.cacheSchemaVersion,
                     partitionDigest: context.cachePartition.digest,
-                    product: product,
+                    product: cacheKey.product,
+                    historyYear: cacheKey.historyYear,
                     response: response,
                     etag: etag,
                     fetchedAt: fetchedAt,
@@ -392,11 +423,11 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
             guard isActive(context, generation: operationGeneration), !Task.isCancelled else {
                 return .unsafe
             }
-            try await cache.write(data, product: product, partition: context.cachePartition)
+            try await cache.write(data, key: cacheKey, partition: context.cachePartition)
             return .persisted
         } catch {
             do {
-                try await cache.remove(product: product, partition: context.cachePartition)
+                try await cache.remove(key: cacheKey, partition: context.cachePartition)
                 return .invalidated
             } catch {
                 do {
@@ -417,7 +448,7 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
         do {
             let data = try encoder.encode(entry)
             guard isActive(context, generation: operationGeneration), !Task.isCancelled else { return }
-            try await cache.write(data, product: product, partition: context.cachePartition)
+            try await cache.write(data, key: cacheKey, partition: context.cachePartition)
         } catch {
             guard isActive(context, generation: operationGeneration) else { return }
             state.cachePersistenceIssue = true
