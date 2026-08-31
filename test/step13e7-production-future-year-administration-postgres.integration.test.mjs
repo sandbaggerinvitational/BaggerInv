@@ -9,6 +9,8 @@ import test from "node:test";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migration = path.join(root,
   "supabase/production_migrations/202608300064_production_future_year_administration_v1.sql");
+const roleGuardMigration = path.join(root,
+  "supabase/production_migrations/202608300065_production_future_year_runtime_role_guard.sql");
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(["createdb", "initdb", "pg_ctl", "psql"]
   .map((name) => [name, path.join(pgBin, name)]));
@@ -26,19 +28,27 @@ function run(command, args, options = {}) {
   return result.stdout.trim();
 }
 
-function environment(cluster, role = "service_role") {
+function environment(cluster, role = "service_role", claimsRole = null,
+  claimsText = null) {
+  const options = [];
+  if (role) options.push(`-c request.jwt.claim.role=${role}`);
+  if (claimsRole) options.push(
+    `-c request.jwt.claims={\"role\":\"${claimsRole}\"}`,
+  );
+  if (claimsText) options.push(`-c request.jwt.claims=${claimsText}`);
   return {
     ...process.env,
     PGHOST: cluster.socket,
     PGPORT: String(cluster.port),
     PGUSER: "postgres",
-    PGOPTIONS: role ? `-c request.jwt.claim.role=${role}` : "",
+    PGOPTIONS: options.join(" "),
   };
 }
 
-function sql(cluster, database, input, { role = "service_role" } = {}) {
+function sql(cluster, database, input,
+  { role = "service_role", claimsRole = null, claimsText = null } = {}) {
   return run(bin.psql, ["-X", "-qAt", "-v", "ON_ERROR_STOP=1", "-d", database], {
-    env: environment(cluster, role), input,
+    env: environment(cluster, role, claimsRole, claimsText), input,
   });
 }
 
@@ -212,7 +222,10 @@ function fixture(cluster, database) {
     returns void language plpgsql security definer set search_path=pg_catalog,
       production_control as $fixture$
     begin
-      if current_setting('request.jwt.claim.role', true) is distinct from 'service_role'
+      if coalesce(
+           nullif(current_setting('request.jwt.claim.role', true), ''),
+           nullif(current_setting('request.jwt.claims', true), '')::jsonb->>'role'
+         ) is distinct from 'service_role'
          or input->>'contract_version' is distinct from 'production-players-access-v1'
          or input->>'environment' is distinct from 'PRODUCTION'
          or input->>'project_ref' is distinct from 'ymqhhtxaywtqllynrmxe'
@@ -228,6 +241,25 @@ function fixture(cluster, database) {
              and value.auth_user_id=(input#>>'{authorization,auth_user_id}')::uuid
          ) then
         raise exception using errcode='42501', message='FIXTURE_DIRECTOR_REQUIRED';
+      end if;
+    end $fixture$;
+    create function production_control.assert_production_service_role()
+    returns void language plpgsql security definer set search_path=pg_catalog,
+      production_control as $fixture$
+    declare
+      claim_role text;
+      claims_text text;
+    begin
+      claims_text := nullif(current_setting('request.jwt.claims', true), '');
+      claim_role := coalesce(
+        nullif(current_setting('request.jwt.claim.role', true), ''),
+        case when claims_text is null then null
+          else claims_text::jsonb->>'role'
+        end
+      );
+      if claim_role is distinct from 'service_role' then
+        raise exception using errcode='42501',
+          message='PRODUCTION_SERVICE_ROLE_REQUIRED';
       end if;
     end $fixture$;
     create function production_control.assert_access_governance_owner_v1(
@@ -313,6 +345,7 @@ test("migration 064 compiles and enforces future-year staging on PostgreSQL 17",
       (select count(*) from scoring_authority.scoring_snapshots));
   `);
   sqlFile(cluster, database, migration);
+  sqlFile(cluster, database, roleGuardMigration);
   assert.equal(sql(cluster, database, String.raw`
     select concat_ws('|',
       (select count(*) from scoring_authority.tournaments),
@@ -338,6 +371,15 @@ test("migration 064 compiles and enforces future-year staging on PostgreSQL 17",
       has_table_privilege('service_role',
         'production_control.future_tournament_catalog_v1', 'SELECT'));
   `), "t|f|f");
+  assert.equal(sql(cluster, database, String.raw`
+    select concat_ws('|',
+      has_function_privilege('service_role',
+        'production_control.assert_future_year_runtime_v1(jsonb,boolean)',
+        'EXECUTE'),
+      has_function_privilege('authenticated',
+        'production_control.assert_future_year_runtime_v1(jsonb,boolean)',
+        'EXECUTE'));
+  `), "f|f");
 
   const catalogRead = rpc(cluster, database,
     "read_production_future_year_administration_v1",
@@ -519,4 +561,30 @@ test("migration 064 compiles and enforces future-year staging on PostgreSQL 17",
     "read_production_future_year_administration_v1",
     scope(director, "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1"),
     { role: "authenticated" }), /PRODUCTION_FUTURE_YEAR_SCOPE_REQUIRED|FIXTURE_DIRECTOR_REQUIRED/);
+
+  const claimsOnlyRead = rpc(cluster, database,
+    "read_production_future_year_administration_v1",
+    scope(director, "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1"),
+    { role: null, claimsRole: "service_role" });
+  assert.equal(claimsOnlyRead.ok, true);
+  for (const claimsRole of ["authenticated", "anon"]) {
+    assert.throws(() => rpc(cluster, database,
+      "read_production_future_year_administration_v1",
+      scope(director, "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1"),
+      { role: null, claimsRole }), /PRODUCTION_FUTURE_YEAR_SCOPE_REQUIRED/);
+  }
+  assert.throws(() => rpc(cluster, database,
+    "read_production_future_year_administration_v1",
+    scope(director, "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1"),
+    { role: null }), /PRODUCTION_FUTURE_YEAR_SCOPE_REQUIRED/);
+  assert.throws(() => rpc(cluster, database,
+    "read_production_future_year_administration_v1",
+    scope(director, "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1"),
+    { role: "authenticated", claimsRole: "service_role" }),
+  /PRODUCTION_FUTURE_YEAR_SCOPE_REQUIRED/);
+  assert.throws(() => rpc(cluster, database,
+    "read_production_future_year_administration_v1",
+    scope(director, "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1"),
+    { role: null, claimsText: "not-json" }),
+  /PRODUCTION_FUTURE_YEAR_SCOPE_REQUIRED/);
 });

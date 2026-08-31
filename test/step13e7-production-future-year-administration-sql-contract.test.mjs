@@ -8,6 +8,11 @@ const migrationUrl = new URL(
 );
 const sql = await readFile(migrationUrl, "utf8");
 const contains = (pattern, message) => assert.match(sql, pattern, message);
+const roleGuardMigrationUrl = new URL(
+  "../supabase/production_migrations/202608300065_production_future_year_runtime_role_guard.sql",
+  import.meta.url,
+);
+const roleGuardSql = await readFile(roleGuardMigrationUrl, "utf8");
 
 test("migration 064 is additive, inert, and preserves the represented 2026 current state", () => {
   assert.ok(sql.startsWith("-- Step 13E.7 Production Future-Year Administration V1."));
@@ -66,6 +71,26 @@ test("transport is service-role-only, exact Production-scoped, Director-based, a
   contains(/grant execute on function[\s\S]*read_production_future_year_administration_v1\(jsonb\)[\s\S]*to service_role;/i);
   contains(/grant execute on function[\s\S]*mutate_production_future_year_administration_v1\(jsonb\)[\s\S]*to service_role;/i);
   assert.doesNotMatch(sql, /grant execute[\s\S]{0,160}\bto\s+(?:anon|authenticated|public)\b/i);
+});
+
+test("migration 065 accepts the PostgREST JSON service-role claim without weakening the guard", () => {
+  assert.ok(roleGuardSql.startsWith(
+    "-- Step 13E.7 Production Future-Year Administration V1 runtime role guard.",
+  ));
+  assert.equal((roleGuardSql.match(/\bbegin;/gi) ?? []).length, 1);
+  assert.equal((roleGuardSql.match(/\bcommit;/gi) ?? []).length, 1);
+  assert.match(roleGuardSql,
+    /perform production_control\.assert_production_service_role\(\);/i);
+  assert.match(roleGuardSql,
+    /when insufficient_privilege or invalid_text_representation[\s\S]*message = 'PRODUCTION_FUTURE_YEAR_SCOPE_REQUIRED'/i);
+  assert.match(roleGuardSql,
+    /create or replace function production_control\.assert_future_year_runtime_v1/i);
+  assert.match(roleGuardSql,
+    /revoke all on function[\s\S]*assert_future_year_runtime_v1\(jsonb, boolean\)[\s\S]*from public, anon, authenticated, service_role;/i);
+  assert.doesNotMatch(roleGuardSql, /\bgrant\b/i,
+    "the correction must not broaden execute access");
+  assert.doesNotMatch(roleGuardSql, /\b(?:insert|update|delete|truncate)\b/i,
+    "the correction must be inert");
 });
 
 test("bounded action contract supports only safe Draft structure operations", () => {
