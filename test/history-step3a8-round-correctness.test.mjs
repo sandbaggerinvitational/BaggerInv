@@ -149,8 +149,9 @@ test("standings population starts from every canonical eligible player, includin
   assert.equal(rows.length, 3);
   assert.deepEqual(rows.find((row) => row.id === "C"), {
     id: "C", player: players[2], teamSide: 2, teamName: "Two", wins: 0, losses: 0,
-    halves: 0, points: 0, pointsTracked: true, winPercentage: 0,
+    halves: 0, points: 0, pointsTracked: true, winPercentage: 0, rank: 2,
   });
+  assert.deepEqual(rows.map((row) => row.rank), [1, 2, 2]);
 });
 
 test("the current canonical adapter produces one standings row for all 24 roster identities", () => {

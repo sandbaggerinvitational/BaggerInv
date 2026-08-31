@@ -9,6 +9,7 @@ import {
   mobileHistoryRepresentationRevision,
   mobileHistoryResult,
 } from "../lib/mobile-v1-history.js";
+import { buildHistory2026Adapter } from "../lib/history-2026-adapter.js";
 import {
   MOBILE_ODDS_LIMITS,
   mobileOddsDataFromView,
@@ -22,6 +23,10 @@ import {
   mobileRecordsResult,
 } from "../lib/mobile-v1-records.js";
 import { assertMobileV1Schema } from "./support/mobile-v1-schema-validator.mjs";
+import {
+  makeGuideProjection,
+  makeHistory2026Aggregate,
+} from "./fixtures/history-2026.mjs";
 
 const now = new Date("2026-08-30T18:00:00.000Z");
 const identity = { tournamentId: "2026", playerId: "P1" };
@@ -211,6 +216,30 @@ test("History requires canonical standing ranks and never fabricates array-posit
     assert.throws(() => mobileHistoryDetailData(malformed),
       (error) => error.code === "MOBILE_API_UNAVAILABLE");
   }
+});
+
+test("History detail projects the shared competition ranks for a complete canonical 2026 view", async () => {
+  const view = buildHistory2026Adapter(makeHistory2026Aggregate(), {
+    guideProjection: makeGuideProjection(),
+  });
+  assert.equal(view.leaderboardRows.length, 24);
+  assert.equal(view.leaderboardRows.every((row) => Number.isInteger(row.rank)), true);
+
+  const data = mobileHistoryDetailData(view);
+  assert.equal(data.standings.length, 24);
+  assert.deepEqual(data.standings.slice(0, 6).map((row) => row.rank), [1, 1, 1, 1, 1, 6]);
+  assert.equal(data.teams.length, 2);
+  assert.equal(data.rounds.length, 3);
+  assert.equal(data.matches.length, 24);
+  assert.equal(data.scorecards.length, 46);
+
+  const revision = mobileHistoryRepresentationRevision(data);
+  await assertMobileV1Schema("history-detail", {
+    ok: true,
+    apiVersion: "v1",
+    data,
+    meta: { generatedAt: now.toISOString(), revision },
+  });
 });
 
 test("History rejects malformed nonblank numerics while preserving truly missing optionals", () => {

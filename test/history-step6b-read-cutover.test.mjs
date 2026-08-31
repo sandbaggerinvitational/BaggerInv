@@ -14,6 +14,11 @@ import {
   isSupabaseCompletedHistoryYear,
   requireCompletedHistoryReadSource,
 } from "../lib/completed-history-read-source.js";
+import {
+  mobileHistoryDetailData,
+  mobileHistoryRepresentationRevision,
+} from "../lib/mobile-v1-history.js";
+import { assertMobileV1Schema } from "./support/mobile-v1-schema-validator.mjs";
 
 const root = new URL("../", import.meta.url);
 
@@ -185,7 +190,7 @@ test("completed History source gate is reversible, Preview-only, and fails close
   assert.throws(() => requireCompletedHistoryReadSource(incomplete), /credentials-missing/);
 });
 
-test("2017/2018 preserve official champion identity without fabricating a final score", () => {
+test("2017/2018 preserve official champion identity without fabricating a final score", async () => {
   for (const year of [2017, 2018]) {
     const view = buildCompletedHistoryPresentation(yearRead({ year }));
     assert.equal(view.tournament.championTeam.name, "Side One");
@@ -195,6 +200,16 @@ test("2017/2018 preserve official champion identity without fabricating a final 
     assert.equal(view.rounds[0].teamTwo.points, null);
     assert.equal(view.rounds[0].roundWinner, "Not recorded");
     assert.equal(view.leaderboardRows.every((row) => row.pointsTracked === false), true);
+    assert.equal(view.leaderboardRows.every((row) => Number.isInteger(row.rank)), true);
+
+    const data = mobileHistoryDetailData(view);
+    const revision = mobileHistoryRepresentationRevision(data);
+    await assertMobileV1Schema("history-detail", {
+      ok: true,
+      apiVersion: "v1",
+      data,
+      meta: { generatedAt: "2026-08-31T12:00:00.000Z", revision },
+    });
   }
 });
 
