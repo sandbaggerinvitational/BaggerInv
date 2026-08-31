@@ -112,7 +112,7 @@ test("Production Director projection freshness is explicit and never implies fal
   assert.equal(result.stale.reason, "NEWER_OR_DIFFERENT_GOOGLE_SOURCE");
 });
 
-test("inspection fails closed while Production cutover activation is disabled", () => {
+test("Production Prediction Settings inspection is retired before database or Google access", () => {
   const result = runServerModule(`
     let databaseReached = false;
     let code = "";
@@ -125,114 +125,38 @@ test("inspection fails closed while Production cutover activation is disabled", 
     } catch (error) { code = error?.code || ""; }
     console.log(JSON.stringify({ code, databaseReached }));
   `);
-  assert.equal(result.code, "PRODUCTION_CUTOVER_RESOURCE_MISMATCH");
+  assert.equal(result.code, "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
   assert.equal(result.databaseReached, false);
 });
 
-test("unchanged source is a no-op; changed source creates a revision with exact readback", () => {
-  const initialSheets = predictionSheets();
-  const changedSheets = predictionSheets({ "Handicap Category Weight": 0.123456 });
+test("retired Production Prediction Settings synchronization cannot construct an envelope or reach a dependency", () => {
   const result = runServerModule(`
-    const initialSheets = ${JSON.stringify(initialSheets)};
-    const changedSheets = ${JSON.stringify(changedSheets)};
-    const oldEnvelope = buildProductionDirectorProjectionEnvelope({
-      domain: "PREDICTION_SETTINGS", sheets: initialSheets, actorPlayerId,
-    });
-    const newEnvelope = buildProductionDirectorProjectionEnvelope({
-      domain: "PREDICTION_SETTINGS", sheets: changedSheets, actorPlayerId,
-    });
-    const noOpCalls = [];
-    const noOpRpc = async (functionName, input) => {
-      noOpCalls.push({ functionName, input });
-      if (functionName === "read_production_director_sync_context") return {
-        ok: true, domain: "PREDICTION_SETTINGS", activation_revision: 12,
-        current_projection: {
-          revision_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", revision_number: 1,
-          source_fingerprint: oldEnvelope.source_fingerprint,
-          payload_fingerprint: oldEnvelope.payload_fingerprint,
-        }, canonical_context: {},
-      };
-      if (functionName === "synchronize_production_director_projection") return {
-        ok: true, changed: false, duplicate: true,
-        revision_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", revision_number: 1,
-      };
-      if (functionName === "read_production_prediction_settings") return {
-        ok: true, data: {
-          revision_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", revision_number: 1,
-          source_fingerprint: oldEnvelope.source_fingerprint,
-          payload_fingerprint: oldEnvelope.payload_fingerprint,
-        },
-      };
-      throw new Error("unexpected RPC " + functionName);
-    };
-    const noOp = await synchronizeProductionDirectorProjection({
-      domain: "PREDICTION_SETTINGS", actorAuthUserId, actorPlayerId, env: activeEnv,
-      dependencies: googleDependencies(initialSheets, noOpRpc),
-    });
-    let changedInput;
-    const changedRpc = async (functionName, input) => {
-      if (functionName === "read_production_director_sync_context") return {
-        ok: true, domain: "PREDICTION_SETTINGS", activation_revision: 19,
-        current_projection: {
-          revision_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", revision_number: 1,
-          source_fingerprint: oldEnvelope.source_fingerprint,
-          payload_fingerprint: oldEnvelope.payload_fingerprint,
-        }, canonical_context: {},
-      };
-      if (functionName === "synchronize_production_director_projection") {
-        changedInput = input;
-        return { ok: true, changed: true, duplicate: false,
-          revision_id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", revision_number: 2 };
-      }
-      if (functionName === "read_production_prediction_settings") return {
-        ok: true, data: {
-          revision_id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", revision_number: 2,
-          source_fingerprint: newEnvelope.source_fingerprint,
-          payload_fingerprint: newEnvelope.payload_fingerprint,
-        },
-      };
-      throw new Error("unexpected RPC " + functionName);
-    };
-    const inspected = await inspectProductionDirectorProjectionSynchronization({
-      domain: "PREDICTION_SETTINGS", actorAuthUserId, actorPlayerId, env: activeEnv,
-      dependencies: googleDependencies(changedSheets, changedRpc),
-    });
-    const changed = await synchronizeProductionDirectorProjection({
-      domain: "PREDICTION_SETTINGS", actorAuthUserId, actorPlayerId, env: activeEnv,
-      dependencies: googleDependencies(changedSheets, changedRpc),
-    });
-    console.log(JSON.stringify({
-      noOp, changed, inspectedFreshness: inspected.freshness,
-      noOpFunctions: noOpCalls.map((entry) => entry.functionName),
-      noOpMutation: noOpCalls[1].input,
-      changedInput,
-      sourceChanged: oldEnvelope.source_fingerprint !== newEnvelope.source_fingerprint,
-    }));
+    const sheets = ${JSON.stringify(predictionSheets())};
+    let dependencyReached = false;
+    let envelopeCode = "";
+    let synchronizeCode = "";
+    try {
+      buildProductionDirectorProjectionEnvelope({
+        domain: "PREDICTION_SETTINGS", sheets, actorPlayerId,
+      });
+    } catch (error) { envelopeCode = error?.code || ""; }
+    try {
+      await synchronizeProductionDirectorProjection({
+        domain: "PREDICTION_SETTINGS", actorAuthUserId, actorPlayerId,
+        env: activeEnv,
+        dependencies: googleDependencies(sheets, async () => {
+          dependencyReached = true;
+          return {};
+        }),
+      });
+    } catch (error) { synchronizeCode = error?.code || ""; }
+    console.log(JSON.stringify({ envelopeCode, synchronizeCode, dependencyReached }));
   `);
-  assert.equal(result.noOp.changed, false);
-  assert.equal(result.noOp.duplicate, true);
-  assert.equal(result.noOp.readbackParity, true);
-  assert.equal(result.noOp.fallbackUsed, false);
-  assert.equal(result.noOp.googleWrite, false);
-  assert.deepEqual(result.noOpFunctions, [
-    "read_production_director_sync_context",
-    "synchronize_production_director_projection",
-    "read_production_prediction_settings",
-  ]);
-  assert.equal(result.noOpMutation.project_ref, PRODUCTION_SUPABASE_PROJECT_REF);
-  assert.equal(result.noOpMutation.source_workbook_id, PRODUCTION_GOOGLE_WORKBOOK_ID);
-  assert.equal(result.noOpMutation.deployment_commit, commitSha);
-  assert.equal(result.noOpMutation.expected_activation_revision, 12);
-  assert.equal(result.noOpMutation.operation_authority, "GOOGLE_DIRECTOR_SYNC");
-  assert.equal(result.noOpMutation.actor_auth_user_id, actorAuthUserId);
-  assert.equal(result.noOpMutation.actor_player_id, actorPlayerId);
-  assert.equal(result.inspectedFreshness.status, "STALE");
-  assert.equal(result.sourceChanged, true);
-  assert.equal(result.changed.changed, true);
-  assert.equal(result.changed.duplicate, false);
-  assert.equal(result.changed.revisionNumber, 2);
-  assert.equal(result.changed.readbackParity, true);
-  assert.equal(result.changedInput.source_fingerprint, result.changed.sourceFingerprint);
+  assert.equal(result.envelopeCode,
+    "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
+  assert.equal(result.synchronizeCode,
+    "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
+  assert.equal(result.dependencyReached, false);
 });
 
 test("migration and POST route expose only the retained post-cutover authoring domains", async () => {

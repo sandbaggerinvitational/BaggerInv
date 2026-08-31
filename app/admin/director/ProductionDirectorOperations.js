@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
+import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
 import styles from "./production-director.module.css";
 
 const clean = (value) => String(value ?? "").trim();
@@ -307,7 +308,7 @@ function OddsPanel({ data, refresh }) {
         <div><small>Publication</small><strong>{publication.label}</strong><Status value={publication.state} /></div>
         <div><small>Publication revision</small><strong>{publication.revision ?? "—"}</strong><span>{timestamp(publication.publishedAt)}</span></div>
         <div><small>Freshness</small><strong>{pretty(publication.freshness)}</strong><Status value={publication.freshness} /></div>
-        <div><small>Prediction Settings</small><strong>Revision {data.projections.predictionSettings.revision ?? "—"}</strong><span>Synchronization does not publish Odds</span></div>
+        <div><small>Prediction Settings</small><strong>Revision {data.projections.predictionSettings.revision ?? "—"}</strong><span>Saving settings does not calculate or publish Odds</span></div>
       </div>
       <div className={styles.oddsRequest}>
         <label>Milestone<select value={phase} onChange={(event) => setPhase(event.target.value)}>{["Pre-Tournament", "After Round 1", "After Round 2", "Round 3 Pairings Announced", "Final Results"].map((item) => <option key={item}>{item}</option>)}</select></label>
@@ -329,8 +330,8 @@ function OddsPanel({ data, refresh }) {
       </article>)}</div> : <p className={styles.empty}>No retained calculation jobs are available.</p>}
     </section>
     <section className={styles.panel}>
-      <header><span>Calculation inputs</span><h2>Prediction Settings</h2><p>Google remains the approved authoring surface. Synchronization updates Supabase inputs but never publishes Odds automatically.</p></header>
-      <ProjectionSyncCard domain="PREDICTION_SETTINGS" title="Prediction Settings" description="Check for an eligible Google revision, then explicitly synchronize it into the current Supabase calculation inputs." status={data.projections.predictionSettings} onChanged={refresh} />
+      <header><span>Supabase-native calculation inputs</span><h2>Prediction Settings</h2><p>Review and save a complete versioned configuration. Saving a revision marks prior calculations stale but never calculates or publishes Odds automatically.</p></header>
+      <ProductionPredictionSettingsEditor onChanged={refresh} />
     </section>
   </>;
 }

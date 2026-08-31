@@ -72,90 +72,41 @@ function run(body) {
   return JSON.parse(result.stdout.trim());
 }
 
-test("future Prediction Settings require and retain explicit annual scope", () => {
+test("future Google Prediction Settings synchronization is retired before annual scope or dependencies", () => {
   const result = run(`
-    const scopedSheets = ${JSON.stringify(sheets())};
-    const unscopedSheets = ${JSON.stringify(sheets({ yearScoped: false }))};
-    const envelope = buildProductionDirectorProjectionEnvelope({
-      domain: "PREDICTION_SETTINGS", sheets: scopedSheets, actorPlayerId,
-      targetTournamentId: "2027", targetTournamentYear: 2027,
-    });
-    let unscopedCode = "";
+    let envelopeCode = "";
+    let synchronizationCode = "";
+    let dependencyCalls = 0;
     try {
       buildProductionDirectorProjectionEnvelope({
-        domain: "PREDICTION_SETTINGS", sheets: unscopedSheets, actorPlayerId,
-        targetTournamentId: "2027", targetTournamentYear: 2027,
+        domain: "PREDICTION_SETTINGS",
+        sheets: ${JSON.stringify(sheets())},
+        actorPlayerId,
+        targetTournamentId: "2027",
+        targetTournamentYear: 2027,
       });
-    } catch (error) { unscopedCode = error.code; }
-    console.log(JSON.stringify({
-      tournamentId: envelope.payload.settings.length && envelope.payload.settings[0].Year,
-      rowCount: envelope.payload.settings.length,
-      expectedRows: ${PREDICTION_SETTING_SPECS.length},
-      unscopedCode,
-    }));
+    } catch (error) { envelopeCode = error.code; }
+    try {
+      await synchronizeProductionDirectorProjection({
+        domain: "PREDICTION_SETTINGS",
+        actorAuthUserId,
+        actorPlayerId,
+        targetTournamentId: "2027",
+        targetTournamentYear: 2027,
+        env: activeEnv,
+        dependencies: {
+          productionRpc: async () => { dependencyCalls += 1; },
+          withProductionGoogleCredentials: async () => { dependencyCalls += 1; },
+          withWorkbookWriteDiagnostics: async () => { dependencyCalls += 1; },
+          readWorkbookSheetsByName: async () => { dependencyCalls += 1; },
+        },
+      });
+    } catch (error) { synchronizationCode = error.code; }
+    console.log(JSON.stringify({ envelopeCode, synchronizationCode, dependencyCalls }));
   `);
-  assert.equal(result.tournamentId, "2027");
-  assert.equal(result.rowCount, result.expectedRows);
-  assert.equal(result.unscopedCode, "PRODUCTION_FUTURE_PREDICTION_SETTINGS_YEAR_SCOPE_REQUIRED");
-});
-
-test("future annual sync uses future RPCs and keeps frozen 2026 provenance separate from target scope", () => {
-  const result = run(`
-    const sourceSheets = ${JSON.stringify(sheets())};
-    const calls = [];
-    let stored = null;
-    const productionRpc = async (name, input) => {
-      calls.push({ name, input });
-      if (name === "read_production_future_annual_projection_v1" && !stored) return {
-        ok: true, domain: "PREDICTION_SETTINGS", activation_revision: 126,
-        setup_revision: 9, runtime_revision: 4,
-        current_projection: null, canonical_context: {},
-      };
-      if (name === "synchronize_production_future_annual_projection_v1") {
-        stored = {
-          revision_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
-          revision_number: 1,
-          source_fingerprint: input.source_fingerprint,
-          payload_fingerprint: input.payload_fingerprint,
-        };
-        return { ok: true, changed: true, duplicate: false, ...stored };
-      }
-      if (name === "read_production_future_annual_projection_v1") return {
-        ok: true, domain: "PREDICTION_SETTINGS", activation_revision: 126,
-        setup_revision: 10, runtime_revision: 4,
-        current_projection: stored, data: stored,
-      };
-      throw new Error("Unexpected RPC " + name);
-    };
-    const result = await synchronizeProductionDirectorProjection({
-      domain: "PREDICTION_SETTINGS", actorAuthUserId, actorPlayerId,
-      targetTournamentId: "2027", targetTournamentYear: 2027, env: activeEnv,
-      dependencies: {
-        productionRpc,
-        withProductionGoogleCredentials: async (_input, execute) => execute(),
-        withWorkbookWriteDiagnostics: async (_label, execute) => ({
-          result: await execute(), diagnostics: { sheetsApiCalls: 1, httpRequests: 1, workbookWrites: 0 },
-        }),
-        readWorkbookSheetsByName: async () => sourceSheets,
-      },
-    });
-    console.log(JSON.stringify({ result, calls }));
-  `);
-  assert.deepEqual(result.calls.map((call) => call.name), [
-    "read_production_future_annual_projection_v1",
-    "synchronize_production_future_annual_projection_v1",
-    "read_production_future_annual_projection_v1",
-  ]);
-  const mutation = result.calls[1].input;
-  assert.equal(mutation.tournament_id, "2026");
-  assert.equal(mutation.tournament_year, 2026);
-  assert.equal(mutation.target_tournament_id, "2027");
-  assert.equal(mutation.target_tournament_year, 2027);
-  assert.equal(mutation.expected_setup_revision, 9);
-  assert.equal(mutation.expected_runtime_revision, 4);
-  assert.equal(mutation.source_revision, 1);
-  assert.equal(result.result.readbackParity, true);
-  assert.equal(result.result.googleWrite, false);
+  assert.equal(result.envelopeCode, "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
+  assert.equal(result.synchronizationCode, "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
+  assert.equal(result.dependencyCalls, 0);
 });
 
 test("annual route accepts target scope without changing source authority", async () => {

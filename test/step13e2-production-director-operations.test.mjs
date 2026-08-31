@@ -152,7 +152,7 @@ test("Tournament Day UI reuses certified APIs, preserves idempotency, threads st
   assert.match(adapter, /PRODUCTION_MATCH_NOT_SCORING_READY:[\s\S]*prepare a current scoring snapshot/);
 });
 
-test("Odds UI is Supabase-publication-only and Prediction Settings sync never auto-publishes", async () => {
+test("Odds UI is Supabase-publication-only and Prediction Settings authoring never auto-publishes", async () => {
   const [ui, publishRoute, syncRoute] = await Promise.all([
     source("app/admin/director/ProductionDirectorOperations.js"),
     source("app/api/odds/publish/route.js"),
@@ -162,11 +162,11 @@ test("Odds UI is Supabase-publication-only and Prediction Settings sync never au
   assert.match(ui, /\/api\/odds\/publish/);
   assert.match(ui, /job\.publicationEligible === true/);
   assert.match(ui, /upper\(job\.status\) === "RETRYABLE"/);
-  assert.match(ui, /Synchronization does not publish Odds/);
-  assert.match(ui, /domain="PREDICTION_SETTINGS"/);
+  assert.match(ui, /ProductionPredictionSettingsEditor/);
+  assert.doesNotMatch(ui, /domain="PREDICTION_SETTINGS"/);
   assert.doesNotMatch(ui, /publication-operations|odds\/prediction-settings|Google Odds publication/i);
   assert.match(publishRoute, /googlePublication: "RETIRED"/);
-  assert.match(syncRoute, /current_projection/);
+  assert.match(syncRoute, /PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED/);
   assert.doesNotMatch(syncRoute, /publishProductionOdds|\/api\/odds\/publish/);
 });
 

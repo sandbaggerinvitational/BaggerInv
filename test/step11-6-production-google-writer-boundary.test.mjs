@@ -1321,7 +1321,7 @@ test("low-level Production transport binds each mutation intent and operation to
     guide: "OK",
     draft: "OK",
     settings: "OK",
-    predictionSettings: "OK",
+    predictionSettings: "PRODUCTION_GOOGLE_MUTATION_OPERATION_NOT_ALLOWED",
     passport: "OK",
     odds: "OK",
     scoringMirror: "OK",

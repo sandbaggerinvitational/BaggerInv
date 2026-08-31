@@ -85,6 +85,12 @@ export async function POST(request) {
   if (!new Set(["diagnose", "synchronize"]).has(action)) {
     return NextResponse.json({ error: "Unsupported Production synchronization action." }, { status: 400, headers: noStore });
   }
+  if (clean(input?.domain).toUpperCase() === "PREDICTION_SETTINGS") {
+    return NextResponse.json({
+      error: "Production Prediction Settings are managed in the Director Console.",
+      code: "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED",
+    }, { status: 410, headers: noStore });
+  }
   const correctionReason = clean(input?.correctionReason);
   if (correctionReason && correctionReason.length < 10) {
     return NextResponse.json({ error: "A historical Draft correction reason must contain at least 10 characters." }, { status: 400, headers: noStore });

@@ -25,6 +25,15 @@ globalThis.__sbiCmsSaveTransactions = saveTransactions;
 const REVALIDATED_PATHS = ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/draft", "/tournament-guide"];
 const MATCH_REVALIDATED_PATHS = ["/home", "/admin", "/players", "/live"];
 
+function retiredProductionPredictionSettings(resource) {
+  if (String(process.env.VERCEL_ENV || "").trim().toLowerCase() !== "production" ||
+      resource !== "prediction-settings") return null;
+  return NextResponse.json({
+    error: "Production Prediction Settings are managed in the Director Console.",
+    code: "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED",
+  }, { status: 410 });
+}
+
 function blockedProductionShadowCms() {
   const candidate = productionShadowCandidateEnvironment(process.env);
   if (!candidate.requested) return null;
@@ -56,6 +65,8 @@ export async function GET(request) {
   if (candidateBlock) return candidateBlock;
   const query = new URL(request.url).searchParams;
   const resource = query.get("resource");
+  const retiredBlock = retiredProductionPredictionSettings(resource);
+  if (retiredBlock) return retiredBlock;
   const filters = filtersFrom(query);
   try {
     const {
@@ -88,6 +99,8 @@ export async function POST(request) {
   try {
     body = await request.json();
     const { resource, action = "save", key, record, tournament, year, updatedBy, direction } = body;
+    const retiredBlock = retiredProductionPredictionSettings(resource);
+    if (retiredBlock) return retiredBlock;
     const mutationAuthority = assertDirectorMutationAuthority({ surface: "admin-cms", action: resource });
     const transactionId = String(request.headers.get("x-save-transaction-id") || body.transactionId || "").trim();
     const filters = { tournament: String(tournament || ""), year: String(year || "") };

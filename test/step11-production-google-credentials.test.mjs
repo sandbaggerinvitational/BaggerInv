@@ -492,7 +492,6 @@ test("the allowlist contains synchronization, mirror, archive, and metadata only
     "PRODUCTION_WORKBOOK_METADATA_READ",
     "CANONICAL_LEGACY_V2",
     "GUIDE_SYNCHRONIZATION",
-    "PREDICTION_SETTINGS_SYNCHRONIZATION",
     "DRAFT_SYNCHRONIZATION",
     "SCORING_GOOGLE_OUTBOX",
     "ROUND_SCORECARDS_ARCHIVE",
@@ -504,6 +503,7 @@ test("the allowlist contains synchronization, mirror, archive, and metadata only
     "PASSPORT_MUTATION",
     "ODDS_PUBLICATION",
     "PREVIEW_RESET",
+    "PREDICTION_SETTINGS_SYNCHRONIZATION",
   ]) assert.equal(operations.includes(forbidden), false);
   assert.throws(
     () => assertProductionGoogleCredentialEnvironment({

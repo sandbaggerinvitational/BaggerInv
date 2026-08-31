@@ -7,7 +7,7 @@ import styles from "./scorecard-calibration.module.css";
 const percent = (value) => Number.isFinite(value) ? `${value.toFixed(1)}%` : "Not enough data";
 const score = (value) => Number.isFinite(value) ? value.toFixed(4) : "Not enough data";
 
-export default function ScorecardCalibration({ secret, tournamentId, year, updatedBy }) {
+export default function ScorecardCalibration({ secret, tournamentId, year, updatedBy, previewMode = false }) {
   const [report, setReport] = useState(null);
   const [status, setStatus] = useState("Building shadow calibration report…");
 
@@ -33,7 +33,7 @@ export default function ScorecardCalibration({ secret, tournamentId, year, updat
       <div className={styles.safety}><strong>Public influence: OFF</strong><span>Calibration remains Admin-only even when the setting is enabled.</span></div>
     </section>
 
-    <CmsManager
+    {previewMode ? <CmsManager
       resource="prediction-settings"
       secret={secret}
       tournamentId={tournamentId}
@@ -41,7 +41,9 @@ export default function ScorecardCalibration({ secret, tournamentId, year, updat
       updatedBy={updatedBy}
       title="Prediction Settings"
       description="Configure the shadow scorecard category, cap, confidence, and sample-size thresholds. Changes do not affect public predictions in this phase."
-    />
+    /> : <section className={styles.notice}>
+      Production Prediction Settings are managed in the Supabase-native Director Console.
+    </section>}
 
     {status ? <div className={styles.notice}>{status}</div> : report ? <>
       <section className={styles.summary}>

@@ -141,6 +141,28 @@ test("Google authority preserves every known Director mutation and explicit lega
   }), (error) => error.code === DIRECTOR_MUTATION_ERROR_CODES.UNKNOWN_OPERATION && error.status === 400);
 });
 
+test("Production retires only Google Prediction Settings authoring while Preview remains available", () => {
+  const production = directorMutationAuthorityDiagnostics({
+    surface: "admin-cms",
+    action: "prediction-settings",
+    authority: "supabase",
+    env: { VERCEL_ENV: "production" },
+  });
+  assert.equal(production.allowed, false);
+  assert.equal(production.productionGoogleAuthoringRetired, true);
+  assert.equal(production.code,
+    DIRECTOR_MUTATION_ERROR_CODES.PRODUCTION_GOOGLE_AUTHORING_RETIRED);
+  assert.throws(() => assertDirectorMutationAuthority({
+    surface: "admin-cms", action: "prediction-settings",
+    authority: "supabase", env: { VERCEL_ENV: "production" },
+  }), (error) => error.status === 410 &&
+    error.code === "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
+  assert.equal(directorMutationAuthorityDiagnostics({
+    surface: "admin-cms", action: "prediction-settings",
+    authority: "supabase", env: { VERCEL_ENV: "preview" },
+  }).allowed, true);
+});
+
 test("invalid mutation authority fails closed", () => {
   assert.throws(
     () => assertDirectorMutationAuthority({
