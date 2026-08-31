@@ -233,10 +233,32 @@ test("Director UI implements Edit, Validate, Review, Save, history, and future-c
   assert.match(editor, /Save Revision/);
   assert.match(editor, /Current effective/);
   assert.match(editor, /Proposed effective/);
+  assert.match(editor, />Current <b>/);
+  assert.match(editor, />Proposed</);
+  assert.match(editor, /changed \? "Changed" : "Unchanged"/);
+  const percentDeclaration = editor.match(/const PERCENT_SETTING_KEYS = new Set\(\[([^\]]+)]\)/);
+  assert.ok(percentDeclaration, "editor must declare its percentage-valued settings explicitly");
+  assert.deepEqual(
+    [...percentDeclaration[1].matchAll(/"([^"]+)"/g)].map((match) => match[1]),
+    ["Maximum Win Probability", "Minimum Win Probability"],
+    "relative weights and win-percentage history inputs must not be presented as percentages",
+  );
   assert.match(editor, /Revision history/);
   assert.match(editor, /Copy Previous as Draft/);
   assert.match(editor, /READY_FOR_ACTIVATION/);
   assert.match(editor, /Published snapshot unchanged/);
+  assert.match(editor, /Prediction Settings revision \{receipt\.revision\}/);
+  assert.match(editor, /Effective time/);
+  assert.match(editor, /Director/);
+  assert.match(editor, /Changed settings/);
+  assert.match(editor, /Recalculation/);
+  assert.match(editor, /readback\?\.current\?\.effectiveAt/);
+  assert.match(editor, /history\?\.actorPlayerId/);
+  assert.match(editor, /result\.data\.effectiveAt/);
+  assert.match(editor, /result\.data\.directorPlayerId/);
+  assert.match(editor, /result\.data\.changedSettingCount/);
+  assert.match(editor, /result\.data\.recalculationRequired/);
+  assert.match(editor, /No calculation or publication was requested/);
   assert.doesNotMatch(editor, /sourceFingerprint|effectiveSettingsFingerprint|payloadHash/);
   assert.doesNotMatch(editor, /\/api\/odds\/publish|production-odds-calculations/);
   assert.doesNotMatch(editor, /Google/);

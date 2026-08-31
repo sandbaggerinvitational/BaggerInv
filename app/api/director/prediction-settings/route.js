@@ -79,10 +79,15 @@ function safeFailure(error) {
     PREDICTION_SETTINGS_PROBABILITY_BOUNDS_REVERSED: "Minimum Win Probability cannot exceed Maximum Win Probability.",
     PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED: "Production Prediction Settings are now authored in this Director Console.",
   };
+  const diagnostics = error?.diagnostics || {};
+  const issues = [
+    ...(Array.isArray(diagnostics.issues) ? diagnostics.issues : []),
+    ...(Array.isArray(diagnostics.errors) ? diagnostics.errors : []),
+  ];
   return {
     error: messages[code] || error?.message || "The Prediction Settings operation did not complete.",
     code,
-    issues: Array.isArray(error?.diagnostics?.issues) ? error.diagnostics.issues : [],
+    issues,
   };
 }
 

@@ -9,6 +9,7 @@ const ENDPOINT = "/api/director/prediction-settings";
 const FUTURE_ENDPOINT = "/api/director/future-tournaments";
 const SAVE_CONFIRMATION = "SAVE PREDICTION SETTINGS REVISION";
 const ELIGIBLE_FUTURE_STATES = new Set(["DRAFT", "CONFIGURING", "READY_FOR_ACTIVATION"]);
+const PERCENT_SETTING_KEYS = new Set(["Maximum Win Probability", "Minimum Win Probability"]);
 
 const clean = (value) => String(value ?? "").trim();
 const upper = (value) => clean(value).toUpperCase();
@@ -53,6 +54,29 @@ function displayValue(value) {
   return String(value);
 }
 
+function displaySettingValue(key, value) {
+  const rendered = displayValue(value);
+  return PERCENT_SETTING_KEYS.has(key) && rendered !== "—" ? `${rendered}%` : rendered;
+}
+
+function comparableSettingValue(specification, value) {
+  if (["number", "integer"].includes(specification?.type)) {
+    if (clean(value) === "") return value;
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return value;
+    return specification.type === "integer"
+      ? Math.max(specification.minimum ?? -Infinity, Math.round(parsed))
+      : parsed;
+  }
+  if (specification?.type === "boolean") return value === true || upper(value) === "TRUE";
+  return typeof value === "string" ? clean(value) : value;
+}
+
+function settingChanged(specification, current, proposed) {
+  return JSON.stringify(comparableSettingValue(specification, current)) !==
+    JSON.stringify(comparableSettingValue(specification, proposed));
+}
+
 function valuesFor(data) {
   return { ...(data?.draft?.canonicalSettings || data?.current?.canonicalSettings || {}) };
 }
@@ -70,17 +94,20 @@ function SettingControl({ specification, value, disabled, onChange }) {
       {specification.allowedValues.map((option) => <option key={option} value={option}>{option}</option>)}
     </select>;
   }
-  return <input
-    id={id}
-    type={["number", "integer"].includes(specification.type) ? "number" : "text"}
-    inputMode={["number", "integer"].includes(specification.type) ? "decimal" : undefined}
-    step={specification.type === "integer" ? "1" : specification.type === "number" ? "any" : undefined}
-    min={specification.minimum}
-    max={specification.maximum}
-    value={value ?? ""}
-    disabled={disabled}
-    onChange={(event) => onChange(event.target.value)}
-  />;
+  const control = <input
+      id={id}
+      type={["number", "integer"].includes(specification.type) ? "number" : "text"}
+      inputMode={["number", "integer"].includes(specification.type) ? "decimal" : undefined}
+      step={specification.type === "integer" ? "1" : specification.type === "number" ? "any" : undefined}
+      min={specification.minimum}
+      max={specification.maximum}
+      value={value ?? ""}
+      disabled={disabled}
+      onChange={(event) => onChange(event.target.value)}
+    />;
+  return PERCENT_SETTING_KEYS.has(specification.canonicalKey)
+    ? <span className={styles.predictionPercentControl}>{control}<span aria-hidden="true">%</span></span>
+    : control;
 }
 
 function Relationship({ relationship = {} }) {
@@ -119,6 +146,7 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
+  const [receipt, setReceipt] = useState(null);
   const identities = useRef(null);
   if (!identities.current) identities.current = createClientMutationOperationIdentityRegistry();
 
@@ -171,7 +199,7 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
   const reviewDraft = data?.draft || null;
   const liveChangedKeys = specifications
     .map((item) => item.canonicalKey)
-    .filter((key) => JSON.stringify(currentValues[key]) !== JSON.stringify(values[key]));
+    .filter((key) => settingChanged(specByKey.get(key), currentValues[key], values[key]));
   const changedKeys = mode === "review" && reviewDraft ? reviewDraft.changedKeys : liveChangedKeys;
   const reviewKeys = reviewDraft ? specifications.map((item) => item.canonicalKey).filter((key) =>
     reviewDraft.changedKeys.includes(key) ||
@@ -186,6 +214,7 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
     setValues(valuesFor(data));
     setMode("edit");
     setMessage("");
+    setReceipt(null);
   };
 
   const stageAndValidate = async () => {
@@ -198,16 +227,22 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
       reason: clean(reason) || "Director reviewed Prediction Settings revision",
     };
     const operation = identities.current.acquire(intent);
-    setBusy("review"); setMessage("");
+    setBusy("review"); setMessage(""); setReceipt(null);
     try {
       const staged = await jsonRequest(ENDPOINT, { ...intent, operationRequestId: operation.operationRequestId });
       identities.current.confirm(operation);
-      await jsonRequest(ENDPOINT, {
+      const validationIntent = {
         action: "validate",
         targetTournamentId,
         expectedRevision,
         draftId: staged.data.draftId,
+      };
+      const validationOperation = identities.current.acquire(validationIntent);
+      await jsonRequest(ENDPOINT, {
+        ...validationIntent,
+        operationRequestId: validationOperation.operationRequestId,
       });
+      identities.current.confirm(validationOperation);
       await load(targetTournamentId, { quiet: true, forceReview: true });
       setMessage("Validation passed. Review the exact canonical and effective changes before saving.");
     } catch (error) {
@@ -217,14 +252,20 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
   };
 
   const validateStoredDraft = async () => {
-    setBusy("validate"); setMessage("");
+    setBusy("validate"); setMessage(""); setReceipt(null);
     try {
-      await jsonRequest(ENDPOINT, {
+      const validationIntent = {
         action: "validate",
         targetTournamentId,
         expectedRevision: Number(data?.current?.revision || 0),
         draftId: data.draft.draftId,
+      };
+      const validationOperation = identities.current.acquire(validationIntent);
+      await jsonRequest(ENDPOINT, {
+        ...validationIntent,
+        operationRequestId: validationOperation.operationRequestId,
       });
+      identities.current.confirm(validationOperation);
       await load(targetTournamentId, { quiet: true, forceReview: true });
       setMessage("Validation passed. Review the exact canonical and effective changes before saving.");
     } catch (error) { setMessage(error.message); }
@@ -241,14 +282,24 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
       confirmation: SAVE_CONFIRMATION,
     };
     const operation = identities.current.acquire(intent);
-    setBusy("save"); setMessage("");
+    setBusy("save"); setMessage(""); setReceipt(null);
     try {
       const result = await jsonRequest(ENDPOINT, { ...intent, operationRequestId: operation.operationRequestId });
       identities.current.confirm(operation);
-      await load(targetTournamentId, { quiet: true });
+      const readback = await load(targetTournamentId, { quiet: true });
       await onChanged?.();
       setReason("");
-      setMessage(`Prediction Settings revision ${result.data.configurationRevision || "saved"} is current. No calculation or publication was requested.`);
+      const committedRevision = Number(result.data.configurationRevision || 0);
+      const history = readback?.history?.find((item) =>
+        Number(item.revision) === committedRevision && item.current === true);
+      setReceipt({
+        revision: committedRevision,
+        effectiveAt: result.data.effectiveAt || readback?.current?.effectiveAt,
+        director: result.data.directorPlayerId || history?.actorPlayerId,
+        changedSettingCount: Number(result.data.changedSettingCount || 0),
+        recalculationRequired: result.data.recalculationRequired === true || readback?.relationship?.recalculationRequired === true,
+      });
+      setMessage("The settings revision is current. No calculation or publication was requested.");
     } catch (error) { setMessage(error.message); }
     finally { setBusy(""); }
   };
@@ -262,7 +313,7 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
       reason: "Copy prior Prediction Settings for Director review",
     };
     const operation = identities.current.acquire(intent);
-    setBusy("copy"); setMessage("");
+    setBusy("copy"); setMessage(""); setReceipt(null);
     try {
       await jsonRequest(ENDPOINT, { ...intent, operationRequestId: operation.operationRequestId });
       identities.current.confirm(operation);
@@ -279,7 +330,7 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
     <div className={styles.predictionToolbar}>
       <label>
         <span>Tournament</span>
-        <select value={targetTournamentId} disabled={Boolean(busy)} onChange={(event) => { setMessage(""); load(event.target.value); }}>
+        <select value={targetTournamentId} disabled={Boolean(busy)} onChange={(event) => { setMessage(""); setReceipt(null); load(event.target.value); }}>
           {(targets.length ? targets : [{ tournamentId: data.tournamentId, tournamentYear: Number(data.tournamentId), current: true }]).map((item) => <option key={item.tournamentId} value={item.tournamentId}>{item.tournamentYear || item.tournamentId}{item.current ? " · Current" : ` · ${pretty(item.lifecycle)}`}</option>)}
         </select>
       </label>
@@ -304,10 +355,10 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
         <div role="row"><strong>Setting</strong><strong>Current</strong><strong>Proposed</strong><strong>Current effective</strong><strong>Proposed effective</strong></div>
         {reviewKeys.map((key) => <div role="row" key={key}>
           <span>{specByKey.get(key)?.displayLabel || key}</span>
-          <span>{displayValue(currentValues[key])}</span>
-          <strong>{displayValue(reviewDraft.canonicalSettings[key])}</strong>
-          <span>{displayValue(currentEffectiveValues[key])}</span>
-          <span>{displayValue(reviewDraft.effectiveSettings[key])}</span>
+          <span>{displaySettingValue(key, currentValues[key])}</span>
+          <strong>{displaySettingValue(key, reviewDraft.canonicalSettings[key])}</strong>
+          <span>{displaySettingValue(key, currentEffectiveValues[key])}</span>
+          <span>{displaySettingValue(key, reviewDraft.effectiveSettings[key])}</span>
         </div>)}
       </div>
       <div className={styles.actionRow}>
@@ -321,9 +372,13 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
           {category.settings.map((key) => {
             const specification = specByKey.get(key);
             if (!specification) return null;
+            const changed = settingChanged(specification, currentValues[key], values[key]);
             return <label className={styles.predictionSetting} key={key}>
               <span><strong>{specification.displayLabel}</strong><small>{specification.description}</small></span>
-              {mode === "edit" ? <SettingControl specification={specification} value={values[key]} disabled={Boolean(busy)} onChange={(value) => setValues((current) => ({ ...current, [key]: value }))} /> : <b>{displayValue(values[key])}</b>}
+              {mode === "edit" ? <span className={styles.predictionEditValue} data-changed={changed}>
+                <span className={styles.predictionEditComparison}><span>Current <b>{displaySettingValue(key, currentValues[key])}</b></span><em>{changed ? "Changed" : "Unchanged"}</em></span>
+                <span className={styles.predictionProposedValue}><small>Proposed</small><SettingControl specification={specification} value={values[key]} disabled={Boolean(busy)} onChange={(value) => setValues((current) => ({ ...current, [key]: value }))} /></span>
+              </span> : <b>{displaySettingValue(key, values[key])}</b>}
             </label>;
           })}
         </div>
@@ -341,6 +396,16 @@ export default function ProductionPredictionSettingsEditor({ onChanged }) {
       <summary>Revision history · {data.history.length}</summary>
       <ul>{data.history.map((item) => <li key={item.configurationId}><span><strong>Revision {item.revision}</strong><small>{provenanceLabel(item.authoringAuthority)} · {timestamp(item.effectiveAt)}</small></span>{item.current ? <State value="CURRENT" /> : <span>{item.changedSettingCount ? `${item.changedSettingCount} changed` : "Certified revision"}</span>}</li>)}</ul>
     </details> : null}
+    {receipt ? <div className={styles.predictionReceipt} role="status">
+      <header><div><small>Revision saved</small><strong>Prediction Settings revision {receipt.revision}</strong></div><State value="CURRENT" /></header>
+      <dl>
+        <div><dt>Effective time</dt><dd>{timestamp(receipt.effectiveAt)}</dd></div>
+        <div><dt>Director</dt><dd>{receipt.director || "Authorized Director"}</dd></div>
+        <div><dt>Changed settings</dt><dd>{receipt.changedSettingCount}</dd></div>
+        <div><dt>Recalculation</dt><dd>{receipt.recalculationRequired ? "Required" : "Current"}</dd></div>
+      </dl>
+      <p>No calculation or publication was requested.</p>
+    </div> : null}
     {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
   </div>;
 }

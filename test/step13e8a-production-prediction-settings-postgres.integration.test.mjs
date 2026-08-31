@@ -9,6 +9,7 @@ import test from "node:test";
 
 import { PRODUCTION_PREDICTION_SETTING_SPECS } from
   "../lib/production-prediction-settings-contract.js";
+import { scoringShadowPayloadHash } from "../lib/scoring-shadow.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migrationsDirectory = path.join(root, "supabase", "production_migrations");
@@ -211,6 +212,64 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     sqlFile(cluster, database, path.join(migrationsDirectory, name));
   }
 
+  const initial = canonicalSettings();
+  const initialRows = settingsRows(initial);
+  sql(cluster, database, `
+    insert into scoring_authority.odds_input_configurations(
+      id,tournament_id,configuration_revision,source_workbook_id,settings,
+      historical_ratings,settings_fingerprint,ratings_fingerprint,
+      pairing_fingerprint,bundle_fingerprint,is_current,imported_by,
+      source_tab,source_fingerprint,canonical_settings,effective_settings,
+      effective_settings_fingerprint,settings_contract_version,
+      validation_status,validation_diagnostics,synchronized_at
+    ) values (
+      '10000000-0000-4000-8000-000000000001','2026',1,'${workbook}',
+      ${json(initialRows)},'{}',repeat('1',64),repeat('2',64),repeat('3',64),
+      repeat('4',64),true,'Google import','Prediction Settings',repeat('5',64),
+      ${json(initial)},${json(initial)},repeat('6',64),
+      'prediction-settings-v1','VALID','{}','2026-01-01T00:00:00Z'
+    );
+    set session_replication_role=replica;
+    insert into scoring_authority.odds_calculation_jobs(
+      job_id,tournament_id,phase,total_iterations,completed_iterations,
+      engine_version,publication_contract_version,
+      checkpoint_contract_version,deterministic_seed,input_fingerprint,
+      settings_fingerprint,invocation_fingerprint,source_revision,
+      input_snapshot,checkpoint_payload,checkpoint_hash,status,requested_by,
+      requested_at,completed_at,output_timestamp,input_configuration_id,
+      effective_settings_fingerprint,input_bundle_fingerprint,
+      production_operation_mode,production_deployment_commit,
+      publication_status
+    ) values (
+      repeat('7',64),'2026','Pre-Tournament',10000,10000,
+      'prediction-settings-fixture','production-odds-publication-v1',
+      'production-odds-checkpoint-v1','settings-revision-1',repeat('8',64),
+      repeat('1',64),repeat('7',64),
+      jsonb_build_object(
+        'production_job_identity_contract',
+          'production-odds-calculation-job-identity-v2',
+        'configuration_revision',1),
+      '{}'::jsonb,'{}'::jsonb,repeat('9',64),'SUCCEEDED','fixture',
+      '2026-01-02T00:00:00Z','2026-01-02T01:00:00Z',
+      '2026-01-02T01:00:00Z','10000000-0000-4000-8000-000000000001',
+      repeat('6',64),repeat('4',64),'PRODUCTION_CUTOVER',repeat('a',40),
+      'READY'
+    );
+    insert into scoring_authority.odds_published_snapshots(
+      id,tournament_id,milestone,phase_order,publication_revision,
+      published_at,published_payload,payload_hash,source_fingerprint,
+      engine_version,engine_metadata,google_publication_fingerprint,
+      google_publication_reference,is_current_for_milestone,
+      is_current_official,publication_verified,imported_by
+    ) values (
+      '11000000-0000-4000-8000-000000000001','2026','Pre-Tournament',0,1,
+      '2026-01-03T00:00:00Z','{"fixture":true}',repeat('b',64),
+      repeat('c',64),'legacy-google-fixture','{}',repeat('d',64),
+      '{"sheet":"Odds"}',true,false,true,'Google import'
+    );
+    set session_replication_role=origin;
+  `);
+
   const inertBefore = sql(cluster, database, `select concat_ws('|',
     (select count(*) from scoring_authority.odds_input_configurations),
     (select count(*) from scoring_authority.odds_calculation_jobs),
@@ -218,6 +277,19 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     (select count(*) from scoring_authority.odds_publication_current),
     (select tournament_id from production_control.current_tournament_pointer_v1
       where scope_key='BAGGER_INV_PRODUCTION'));`);
+  const preservedBefore = sql(cluster, database, `select concat_ws('|',
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_input_configurations value
+      where value.id='10000000-0000-4000-8000-000000000001'),'sha256'),'hex'),
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_calculation_jobs value
+      where value.job_id=repeat('7',64)),'sha256'),'hex'),
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_published_snapshots value
+      where value.id='11000000-0000-4000-8000-000000000001'),'sha256'),'hex'),
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_publication_current value
+      where value.tournament_id='2026'),'sha256'),'hex'));`);
   sqlFile(cluster, database, path.join(migrationsDirectory, migration080));
   assert.equal(sql(cluster, database, `select concat_ws('|',
     (select count(*) from scoring_authority.odds_input_configurations),
@@ -227,6 +299,19 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     (select tournament_id from production_control.current_tournament_pointer_v1
       where scope_key='BAGGER_INV_PRODUCTION'));`), inertBefore);
   assert.equal(sql(cluster, database, `select concat_ws('|',
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_input_configurations value
+      where value.id='10000000-0000-4000-8000-000000000001'),'sha256'),'hex'),
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_calculation_jobs value
+      where value.job_id=repeat('7',64)),'sha256'),'hex'),
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_published_snapshots value
+      where value.id='11000000-0000-4000-8000-000000000001'),'sha256'),'hex'),
+    encode(extensions.digest((select to_jsonb(value)::text
+      from scoring_authority.odds_publication_current value
+      where value.tournament_id='2026'),'sha256'),'hex'));`), preservedBefore);
+  assert.equal(sql(cluster, database, `select concat_ws('|',
     (select count(*) from production_control.prediction_setting_definitions_v1),
     has_function_privilege('service_role',
       'public.stage_production_prediction_settings_revision_v1(jsonb)','EXECUTE'),
@@ -235,9 +320,22 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     has_function_privilege('anon',
       'public.read_production_prediction_settings_authoring_v1(jsonb)','EXECUTE'));`),
   "30|t|f|f");
+  const hashContractProbe = {
+    z: [true, null, {
+      decimal: 0.30000000000000004,
+      tiny: 1e-7,
+      negativeTiny: -1.234e-8,
+      fixedBoundary: 1e-6,
+      fixedLarge: 1e20,
+      exponentLarge: 1e21,
+      exponentLargeFraction: 1.0000000000000001e21,
+    }],
+    a: { "Long Setting Name": 15, "Another Setting": "value" },
+  };
+  assert.equal(sql(cluster, database,
+    `select production_control.prediction_settings_hash_v1(${json(hashContractProbe)});`),
+  scoringShadowPayloadHash(hashContractProbe));
 
-  const initial = canonicalSettings();
-  const initialRows = settingsRows(initial);
   sql(cluster, database, `
     insert into auth.users(id,email,email_confirmed_at)
     values ('${actorAuth}','owner@example.org',pg_catalog.clock_timestamp());
@@ -265,21 +363,18 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     ) values ('00000000-0000-4000-8000-000000000002','${actorAuth}',
       '2026','CB01','DIRECTOR','ACTIVE','step13e8a',
       pg_catalog.clock_timestamp());
-    insert into scoring_authority.odds_input_configurations(
-      id,tournament_id,configuration_revision,source_workbook_id,settings,
-      historical_ratings,settings_fingerprint,ratings_fingerprint,
-      pairing_fingerprint,bundle_fingerprint,is_current,imported_by,
-      source_tab,source_fingerprint,canonical_settings,effective_settings,
-      effective_settings_fingerprint,settings_contract_version,
-      validation_status,validation_diagnostics,synchronized_at
-    ) values (
-      '10000000-0000-4000-8000-000000000001','2026',1,'${workbook}',
-      ${json(initialRows)},'{}',repeat('1',64),repeat('2',64),repeat('3',64),
-      repeat('4',64),true,'Google import','Prediction Settings',repeat('5',64),
-      ${json(initial)},${json(initial)},repeat('6',64),
-      'prediction-settings-v1','VALID','{}',pg_catalog.clock_timestamp()
-    );
   `);
+
+  const initialRead = JSON.parse(sql(cluster, database,
+    `select public.read_production_prediction_settings_authoring_v1(${json({
+      ...actorScope(), operation: "READ_PRODUCTION_PREDICTION_SETTINGS_AUTHORING_V1",
+      history_limit: 10,
+    })})::text;`));
+  assert.equal(initialRead.ok, true);
+  assert.equal(initialRead.data.current.revision, 1);
+  assert.equal(initialRead.data.current.authoringAuthority, "GOOGLE_IMPORT");
+  assert.equal(initialRead.data.relationship.recalculationRequired, false);
+  assert.equal(initialRead.data.relationship.latestCalculationSettingsRevision, 1);
 
   const proposed = { ...initial, "Player Category Weight": 43 };
   const stageInput = {
@@ -298,6 +393,8 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
 
   const validateInput = {
     ...actorScope(), operation: "VALIDATE_PRODUCTION_PREDICTION_SETTINGS_REVISION_V1",
+    operation_request_id: "21000000-0000-4000-8000-000000000002",
+    request_payload_hash: "1".repeat(64),
     target_tournament_id: "2026", draft_id: staged.draftId,
     expected_configuration_revision: 1,
   };
@@ -305,6 +402,19 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     `select public.validate_production_prediction_settings_revision_v1(${json(validateInput)})::text;`));
   assert.equal(validated.ok, true);
   assert.equal(validated.state, "VALIDATED");
+  assert.equal(validated.idempotent, false);
+  const validateRetry = JSON.parse(sql(cluster, database,
+    `select public.validate_production_prediction_settings_revision_v1(${json(validateInput)})::text;`));
+  assert.equal(validateRetry.ok, true);
+  assert.equal(validateRetry.idempotent, true);
+  const validateConflict = JSON.parse(sql(cluster, database,
+    `select public.validate_production_prediction_settings_revision_v1(${json({
+      ...validateInput, expected_configuration_revision: 2,
+      request_payload_hash: "2".repeat(64),
+    })})::text;`));
+  assert.equal(validateConflict.ok, false);
+  assert.equal(validateConflict.code,
+    "PREDICTION_SETTINGS_IDEMPOTENCY_CONFLICT");
 
   const commitInput = {
     ...actorScope(), operation: "COMMIT_PRODUCTION_PREDICTION_SETTINGS_REVISION_V1",
@@ -318,6 +428,8 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     `select public.commit_production_prediction_settings_revision_v1(${json(commitInput)})::text;`));
   assert.equal(committed.ok, true);
   assert.equal(committed.configurationRevision, 2);
+  assert.equal(committed.directorPlayerId, "CB01");
+  assert.match(committed.effectiveAt, /^2026-|^2027-/);
   assert.equal(committed.recalculationRequired, true);
   assert.equal(committed.automaticCalculationRequested, false);
   assert.equal(committed.automaticPublicationRequested, false);
@@ -328,7 +440,57 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     (select count(*) from scoring_authority.odds_calculation_jobs),
     (select count(*) from scoring_authority.odds_published_snapshots),
     (select count(*) from production_control.prediction_settings_audit_events_v1));`),
-  "2|1|0|0|3");
+  "2|1|1|1|3");
+
+  const postCommitRead = JSON.parse(sql(cluster, database,
+    `select public.read_production_prediction_settings_authoring_v1(${json({
+      ...actorScope(), operation: "READ_PRODUCTION_PREDICTION_SETTINGS_AUTHORING_V1",
+      history_limit: 10,
+    })})::text;`));
+  assert.equal(postCommitRead.data.current.revision, 2);
+  assert.equal(postCommitRead.data.current.authoringAuthority,
+    "SUPABASE_DIRECTOR");
+  assert.equal(postCommitRead.data.relationship.recalculationRequired, true);
+  assert.equal(postCommitRead.data.relationship.latestCalculationSettingsRevision, 1);
+  assert.equal(postCommitRead.data.relationship.publishedSnapshotUnchanged, true);
+
+  sql(cluster, database, `
+    set session_replication_role=replica;
+    insert into scoring_authority.odds_calculation_jobs(
+      job_id,tournament_id,phase,total_iterations,completed_iterations,
+      engine_version,publication_contract_version,
+      checkpoint_contract_version,deterministic_seed,input_fingerprint,
+      settings_fingerprint,invocation_fingerprint,source_revision,
+      input_snapshot,checkpoint_payload,checkpoint_hash,status,requested_by,
+      requested_at,completed_at,output_timestamp,input_configuration_id,
+      effective_settings_fingerprint,input_bundle_fingerprint,
+      production_operation_mode,production_deployment_commit,
+      publication_status
+    ) select
+      repeat('e',64),'2026','Pre-Tournament',10000,10000,
+      'prediction-settings-fixture','production-odds-publication-v1',
+      'production-odds-checkpoint-v1','settings-revision-2',repeat('f',64),
+      value.settings_fingerprint,repeat('e',64),
+      jsonb_build_object(
+        'production_job_identity_contract',
+          'production-odds-calculation-job-identity-v2',
+        'configuration_revision',value.configuration_revision),
+      '{}'::jsonb,'{}'::jsonb,repeat('0',64),'SUCCEEDED','fixture',
+      '2026-01-04T00:00:00Z','2026-01-04T01:00:00Z',
+      '2026-01-04T01:00:00Z',value.id,
+      value.effective_settings_fingerprint,value.bundle_fingerprint,
+      'PRODUCTION_CUTOVER',repeat('a',40),'READY'
+    from scoring_authority.odds_input_configurations value
+    where value.tournament_id='2026' and value.is_current;
+    set session_replication_role=origin;
+  `);
+  const recalculatedRead = JSON.parse(sql(cluster, database,
+    `select public.read_production_prediction_settings_authoring_v1(${json({
+      ...actorScope(), operation: "READ_PRODUCTION_PREDICTION_SETTINGS_AUTHORING_V1",
+      history_limit: 10,
+    })})::text;`));
+  assert.equal(recalculatedRead.data.relationship.recalculationRequired, false);
+  assert.equal(recalculatedRead.data.relationship.latestCalculationSettingsRevision, 2);
 
   const retry = JSON.parse(sql(cluster, database,
     `select public.commit_production_prediction_settings_revision_v1(${json(commitInput)})::text;`));
@@ -392,6 +554,8 @@ test("migration 080 installs inertly and certifies current/future Supabase-nativ
     `select public.validate_production_prediction_settings_revision_v1(${json({
       ...actorScope("2027"),
       operation: "VALIDATE_PRODUCTION_PREDICTION_SETTINGS_REVISION_V1",
+      operation_request_id: "51000000-0000-4000-8000-000000000005",
+      request_payload_hash: "3".repeat(64),
       target_tournament_id: "2027", draft_id: copied.draftId,
       expected_configuration_revision: 0,
     })})::text;`));

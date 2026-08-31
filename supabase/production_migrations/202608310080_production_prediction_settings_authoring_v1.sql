@@ -193,7 +193,7 @@ create table production_control.prediction_settings_operation_receipts_v1 (
     tournament_id
   ) on delete restrict,
   operation text not null check (operation in (
-    'STAGE', 'COMMIT', 'COPY_PREVIOUS'
+    'STAGE', 'VALIDATE', 'COMMIT', 'COPY_PREVIOUS'
   )),
   operation_request_id uuid not null,
   declared_request_payload_hash text not null check (
@@ -283,10 +283,109 @@ before update or delete on
 for each row execute function
   production_control.reject_prediction_settings_immutable_v1();
 
+-- Use the same compact, recursively key-sorted JSON representation as the
+-- application scoringShadowPayloadHash contract.  Hashing jsonb::text would
+-- instead bind PostgreSQL's whitespace/key-order representation and make a
+-- stored settings fingerprint impossible for the runtime to verify.
+create function production_control.prediction_settings_json_number_v1(
+  value jsonb
+)
+returns text
+language plpgsql
+immutable
+strict
+set search_path = pg_catalog
+as $prediction_settings_json_number$
+declare
+  number_value numeric := (value #>> '{}')::numeric;
+  absolute_value numeric := pg_catalog.abs(number_value);
+  plain_value text := pg_catalog.abs(number_value)::text;
+  integer_value text;
+  fraction_value text;
+  significant_value text;
+  exponent_value integer;
+  first_nonzero integer;
+  sign_value text := case when number_value < 0 then '-' else '' end;
+begin
+  if number_value = 0 then return '0'; end if;
+  integer_value := pg_catalog.split_part(plain_value, '.', 1);
+  fraction_value := pg_catalog.split_part(plain_value, '.', 2);
+
+  -- JSON.stringify uses exponent notation below 1e-6 and at/above 1e21.
+  -- PostgreSQL numeric text is expanded decimal, so reconstruct the same
+  -- compact significand without changing the numeric value.
+  if absolute_value < 0.000001 then
+    first_nonzero := pg_catalog.length(fraction_value) -
+      pg_catalog.length(pg_catalog.ltrim(fraction_value, '0')) + 1;
+    significant_value := pg_catalog.rtrim(
+      pg_catalog.substr(fraction_value, first_nonzero), '0');
+    exponent_value := -first_nonzero;
+  elsif absolute_value >= 1000000000000000000000 then
+    significant_value := pg_catalog.rtrim(
+      integer_value || fraction_value, '0');
+    exponent_value := pg_catalog.length(integer_value) - 1;
+  else
+    if fraction_value <> '' then
+      plain_value := integer_value || '.' ||
+        pg_catalog.rtrim(fraction_value, '0');
+      plain_value := pg_catalog.rtrim(plain_value, '.');
+    end if;
+    return sign_value || plain_value;
+  end if;
+
+  return sign_value || pg_catalog.substr(significant_value, 1, 1) ||
+    case when pg_catalog.length(significant_value) > 1
+      then '.' || pg_catalog.substr(significant_value, 2)
+      else '' end ||
+    'e' || case when exponent_value >= 0 then '+' else '' end ||
+    exponent_value::text;
+end;
+$prediction_settings_json_number$;
+
+create function production_control.prediction_settings_canonical_json_v1(
+  value jsonb
+)
+returns text
+language plpgsql
+immutable
+strict
+set search_path = pg_catalog
+as $prediction_settings_canonical_json$
+declare
+  value_type text := pg_catalog.jsonb_typeof(value);
+  result_value text;
+begin
+  if value_type = 'object' then
+    select '{' || coalesce(pg_catalog.string_agg(
+      pg_catalog.to_jsonb(entry.key)::text || ':' ||
+        production_control.prediction_settings_canonical_json_v1(entry.value),
+      ',' order by entry.key collate "C"
+    ), '') || '}'
+      into result_value
+    from pg_catalog.jsonb_each(value) entry;
+    return result_value;
+  elsif value_type = 'array' then
+    select '[' || coalesce(pg_catalog.string_agg(
+      production_control.prediction_settings_canonical_json_v1(entry.value),
+      ',' order by entry.ordinality
+    ), '') || ']'
+      into result_value
+    from pg_catalog.jsonb_array_elements(value) with ordinality entry;
+    return result_value;
+  elsif value_type = 'number' then
+    return production_control.prediction_settings_json_number_v1(value);
+  end if;
+  return value::text;
+end;
+$prediction_settings_canonical_json$;
+
 create function production_control.prediction_settings_hash_v1(value jsonb)
-returns text language sql immutable
+returns text language sql immutable strict
 set search_path = pg_catalog, extensions as $$
-  select pg_catalog.encode(extensions.digest(value::text, 'sha256'), 'hex')
+  select pg_catalog.encode(extensions.digest(
+    production_control.prediction_settings_canonical_json_v1(value),
+    'sha256'
+  ), 'hex')
 $$;
 
 create function production_control.validate_prediction_settings_v1(
@@ -889,15 +988,29 @@ set search_path = pg_catalog
 as $validate_prediction_settings_draft$
 declare
   target text;
+  actor_player text := pg_catalog.upper(pg_catalog.btrim(coalesce(
+    input#>>'{authorization,player_id}', ''
+  )));
+  actor_auth uuid;
+  request_id uuid;
   draft_id_value uuid;
+  declared_hash text := pg_catalog.lower(pg_catalog.btrim(coalesce(
+    input->>'request_payload_hash', ''
+  )));
   expected_revision bigint;
+  database_hash text;
+  prior_receipt jsonb;
   draft production_control.prediction_settings_drafts_v1%rowtype;
   current_config scoring_authority.odds_input_configurations%rowtype;
   validation jsonb;
+  response_value jsonb;
 begin
   target := production_control.assert_prediction_settings_authoring_v1(input);
   if input->>'operation' is distinct from
        'VALIDATE_PRODUCTION_PREDICTION_SETTINGS_REVISION_V1'
+     or coalesce(input->>'operation_request_id', '')
+       !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+     or declared_hash !~ '^[0-9a-f]{64}$'
      or coalesce(input->>'draft_id', '')
        !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
      or coalesce(input->>'expected_configuration_revision', '')
@@ -906,11 +1019,29 @@ begin
       'ok', false, 'code', 'PREDICTION_SETTINGS_INPUT_INVALID'
     );
   end if;
+  actor_auth := (input#>>'{authorization,auth_user_id}')::uuid;
+  request_id := (input->>'operation_request_id')::uuid;
   draft_id_value := (input->>'draft_id')::uuid;
   expected_revision := (input->>'expected_configuration_revision')::bigint;
+  database_hash := production_control.prediction_settings_hash_v1(
+    pg_catalog.jsonb_build_object(
+      'operation', 'VALIDATE', 'tournamentId', target,
+      'actorPlayerId', actor_player, 'actorAuthUserId', actor_auth,
+      'draftId', draft_id_value,
+      'expectedConfigurationRevision', expected_revision
+    )
+  );
+  prior_receipt := production_control.prediction_settings_receipt_v1(
+    target, 'VALIDATE', request_id, declared_hash, database_hash
+  );
+  if prior_receipt is not null then return prior_receipt; end if;
   perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(
     'production-prediction-settings:' || target, 0
   ));
+  prior_receipt := production_control.prediction_settings_receipt_v1(
+    target, 'VALIDATE', request_id, declared_hash, database_hash
+  );
+  if prior_receipt is not null then return prior_receipt; end if;
   select value.* into strict draft
   from production_control.prediction_settings_drafts_v1 value
   where value.draft_id = draft_id_value
@@ -953,11 +1084,10 @@ begin
   if draft.state = 'STAGED' then
     insert into production_control.prediction_settings_audit_events_v1 (
       tournament_id, draft_id, action, actor_player_id,
-      actor_auth_user_id, summary
+      actor_auth_user_id, operation_request_id, request_payload_hash, summary
     ) values (
       target, draft_id_value, 'REVISION_VALIDATED',
-      pg_catalog.upper(input#>>'{authorization,player_id}'),
-      (input#>>'{authorization,auth_user_id}')::uuid,
+      actor_player, actor_auth, request_id, database_hash,
       pg_catalog.jsonb_build_object(
         'draftRevision', draft.draft_revision,
         'changedSettingCount',
@@ -965,7 +1095,7 @@ begin
       )
     );
   end if;
-  return pg_catalog.jsonb_build_object(
+  response_value := pg_catalog.jsonb_build_object(
     'ok', true,
     'code', 'PREDICTION_SETTINGS_REVISION_VALIDATED',
     'idempotent', draft.state = 'VALIDATED',
@@ -978,6 +1108,15 @@ begin
     'changedSettingCount',
       (validation->>'changedSettingCount')::integer
   );
+  insert into production_control.prediction_settings_operation_receipts_v1 (
+    tournament_id, operation, operation_request_id,
+    declared_request_payload_hash, request_payload_hash,
+    actor_player_id, actor_auth_user_id, response
+  ) values (
+    target, 'VALIDATE', request_id, declared_hash, database_hash,
+    actor_player, actor_auth, response_value
+  );
+  return response_value;
 exception when no_data_found then
   return pg_catalog.jsonb_build_object(
     'ok', false, 'code', 'PREDICTION_SETTINGS_DRAFT_NOT_FOUND'
@@ -1025,6 +1164,7 @@ declare
   projection_value jsonb;
   payload_fingerprint_value text;
   configuration_id_value uuid;
+  effective_at_value timestamptz;
   response_value jsonb;
 begin
   target := production_control.assert_prediction_settings_authoring_v1(input);
@@ -1181,9 +1321,10 @@ begin
       'previousConfigurationId', current_config.id
     )
   );
+  effective_at_value := pg_catalog.clock_timestamp();
   update scoring_authority.odds_input_configurations set
     is_current = false,
-    superseded_at = pg_catalog.clock_timestamp()
+    superseded_at = effective_at_value
   where tournament_id = target and is_current;
   insert into scoring_authority.odds_input_configurations (
     tournament_id, configuration_revision, source_workbook_id,
@@ -1220,7 +1361,7 @@ begin
       'automaticCalculationRequested', false,
       'automaticPublicationRequested', false
     ),
-    pg_catalog.clock_timestamp(), current_config.id
+    effective_at_value, current_config.id
   ) returning id into configuration_id_value;
 
   if target <> pointer.tournament_id then
@@ -1262,7 +1403,7 @@ begin
       target, 'PREDICTION_SETTINGS', source_workbook_value, next_revision,
       next_binding_revision, source_fingerprint_value,
       payload_fingerprint_value, projection_value, 'CERTIFIED',
-      actor_player, pg_catalog.clock_timestamp(), 'SUPABASE_DIRECTOR'
+      actor_player, effective_at_value, 'SUPABASE_DIRECTOR'
     ) on conflict (tournament_id, domain) do update set
       source_workbook_id = excluded.source_workbook_id,
       source_revision = excluded.source_revision,
@@ -1274,22 +1415,22 @@ begin
       certified_by_player_id = excluded.certified_by_player_id,
       certified_at = excluded.certified_at,
       authoring_authority = excluded.authoring_authority,
-      updated_at = pg_catalog.clock_timestamp();
+      updated_at = effective_at_value;
   end if;
   insert into production_control.prediction_settings_revision_provenance_v1 (
     configuration_id, tournament_id, authoring_authority,
     authoring_contract, draft_id, actor_player_id, actor_auth_user_id,
-    changed_setting_count
+    changed_setting_count, created_at
   ) values (
     configuration_id_value, target, 'SUPABASE_DIRECTOR',
     'production-prediction-settings-authoring-v1', draft_id_value,
     actor_player, actor_auth,
-    (validation->>'changedSettingCount')::integer
+    (validation->>'changedSettingCount')::integer, effective_at_value
   );
   update production_control.prediction_settings_drafts_v1 set
     state = 'COMMITTED',
     committed_configuration_id = configuration_id_value,
-    committed_at = pg_catalog.clock_timestamp()
+    committed_at = effective_at_value
   where draft_id = draft_id_value;
   response_value := pg_catalog.jsonb_build_object(
     'ok', true,
@@ -1298,6 +1439,8 @@ begin
     'tournamentId', target,
     'configurationId', configuration_id_value,
     'configurationRevision', next_revision,
+    'effectiveAt', effective_at_value,
+    'directorPlayerId', actor_player,
     'changedKeys', validation->'changedKeys',
     'changedSettingCount',
       (validation->>'changedSettingCount')::integer,
@@ -1625,6 +1768,8 @@ revoke all on function public.import_production_prediction_settings(jsonb)
 
 revoke all on function
   production_control.reject_prediction_settings_immutable_v1(),
+  production_control.prediction_settings_json_number_v1(jsonb),
+  production_control.prediction_settings_canonical_json_v1(jsonb),
   production_control.prediction_settings_hash_v1(jsonb),
   production_control.validate_prediction_settings_v1(jsonb,jsonb),
   production_control.assert_prediction_settings_authoring_v1(jsonb),
