@@ -114,12 +114,24 @@ export function contentFromSupabase(payload = {}, liveView = null) {
 export async function resolveTournamentGuideContent({ surface = "guide", env = process.env } = {}) {
   const source = requireGuideReadSource(env, surface === "course" ? "course" : "guide");
   if (source.source.resolved === "google") return resolveGoogleGuideContent();
-  const [read, liveRead] = await Promise.all([
-    readGuideProjection({ surface, env }),
-    surface === "guide" ? readTournamentLiveView(source.tournamentId, {
+  const runtime = String(env.VERCEL_ENV || "").trim().toLowerCase() === "production"
+    ? await (await import("../../lib/production-current-tournament-runtime.js"))
+      .readProductionCurrentTournamentRuntime({}, { env })
+    : null;
+  const tournamentId = runtime?.tournamentId || source.tournamentId;
+  const liveReadPromise = surface !== "guide" ? Promise.resolve(null)
+    : runtime ? readTournamentLiveView(tournamentId, {
       env,
       productionCutoverSurface: "GUIDE_COURSE_CONTEXT",
-    }) : Promise.resolve(null),
+    }) : readTournamentLiveView(source.tournamentId, {
+      env,
+      productionCutoverSurface: "GUIDE_COURSE_CONTEXT",
+    });
+  const [read, liveRead] = await Promise.all([
+    runtime
+      ? readGuideProjection({ surface, tournamentId, env })
+      : readGuideProjection({ surface, env }),
+    liveReadPromise,
   ]);
   if (!read.payload?.ok) {
     const error = new Error("Tournament Guide is temporarily unavailable.");

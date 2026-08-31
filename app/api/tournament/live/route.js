@@ -7,6 +7,10 @@ import { guideReadEnvironment } from "../../../../lib/guide-read-source.js";
 import { readGuideProjection } from "../../../../lib/guide-supabase.js";
 import { applyGuideCoursesToTournament, guideParticipantProjection } from "../../../../lib/guide-participant-adapter.js";
 import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
+import {
+  assertProductionCurrentTournamentRuntimeMatch,
+  readProductionCurrentTournamentRuntime,
+} from "../../../../lib/production-current-tournament-runtime.js";
 
 export const dynamic = "force-dynamic";
 
@@ -22,11 +26,15 @@ export async function GET(request) {
     if (source.resolved !== "supabase") {
       return NextResponse.json({ error: "Tournament Supabase read is not active." }, { status: 404, headers });
     }
+    const currentTournamentContext = String(env.VERCEL_ENV || "").trim().toLowerCase() === "production"
+      ? await readProductionCurrentTournamentRuntime({}, { env })
+      : null;
+    const tournamentId = currentTournamentContext?.tournamentId || "";
     const serviceStarted = performance.now();
     const [read, guideRead] = await Promise.all([
-      readTournamentLiveView("", { env }),
+      readTournamentLiveView(tournamentId, { env }),
       guideSource.resolved === "supabase"
-        ? readGuideProjection({ surface: "course", env }).catch((error) => ({
+        ? readGuideProjection({ surface: "course", tournamentId, env }).catch((error) => ({
           payload: { ok: false, code: error?.code || "GUIDE_PROJECTION_UNAVAILABLE" }, durationMs: 0,
         }))
         : Promise.resolve(null),
@@ -34,6 +42,11 @@ export async function GET(request) {
     const serviceMs = performance.now() - serviceStarted;
     if (!read.payload?.ok) throw Object.assign(new Error("Tournament live state is unavailable."), { code: read.payload?.code });
     let data = tournamentLiveDataFromSupabaseView(read.payload.data);
+    if (currentTournamentContext) {
+      assertProductionCurrentTournamentRuntimeMatch(currentTournamentContext, data.tournament?.id, {
+        code: "CURRENT_RUNTIME_READ_TRANSPORT_NOT_POINTER_AWARE",
+      });
+    }
     if (guideRead?.payload?.ok) data = applyGuideCoursesToTournament(data, guideRead);
     let prepared = null;
     if (momentumSource.resolved === "supabase") {

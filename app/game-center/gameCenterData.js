@@ -23,8 +23,17 @@ export async function getGameCenterData(matchId, currentPlayerId = "", options =
 
   const source = requireGameCenterReadSource(options.env || process.env);
   if (source.resolved === "supabase") {
+    const env = options.env || process.env;
+    const readCurrentTournamentRuntime = options.readCurrentTournamentRuntime ||
+      (await import("../../lib/production-current-tournament-runtime.js"))
+        .readProductionCurrentTournamentRuntime;
+    const currentTournamentContext = clean(env.VERCEL_ENV).toLowerCase() === "production"
+      ? await readCurrentTournamentRuntime({}, { env })
+      : null;
     const startedAt = performance.now();
-    const read = await readGameCenterView(id, { env: options.env });
+    const read = currentTournamentContext
+      ? await readGameCenterView(id, { env, tournamentId: currentTournamentContext.tournamentId })
+      : await readGameCenterView(id, { env: options.env });
     if (!read.payload?.ok) {
       if (read.payload?.code === "MATCH_NOT_FOUND") notFound();
       const error = new Error("Game Center Supabase read failed.");
@@ -32,6 +41,16 @@ export async function getGameCenterData(matchId, currentPlayerId = "", options =
       throw error;
     }
     const scoring = gameCenterDataFromSupabaseView(read.payload.data, currentPlayerId);
+    if (currentTournamentContext) {
+      const returnedTournamentId = clean(scoring.tournament?.id || scoring.tournament?.tournamentId ||
+        scoring.tournament?.tournament_id);
+      if (!returnedTournamentId || returnedTournamentId !== currentTournamentContext.tournamentId) {
+        const error = new Error("The current Production tournament read transport is not ready for the active tournament.");
+        error.code = "CURRENT_RUNTIME_READ_TRANSPORT_NOT_POINTER_AWARE";
+        error.status = 503;
+        throw error;
+      }
+    }
     const match = scoring.match;
     const teamNames = scoring.display.teamNames;
     const points = gameCenterPoints(match, scoring.holeScores);

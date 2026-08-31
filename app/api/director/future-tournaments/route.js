@@ -7,10 +7,12 @@ import {
 } from "../../../../lib/production-cutover-activation-contract.js";
 import {
   mutateProductionFutureYearAdministration,
-  readProductionFutureYearAdministration,
+  mutateProductionFutureRuntime,
+  readProductionFutureYearAdministrationWithRuntime,
 } from "../../../../lib/production-future-year-administration-server.js";
 import {
   PRODUCTION_FUTURE_YEAR_ADMINISTRATION_ACTIONS,
+  PRODUCTION_FUTURE_RUNTIME_ACTIONS,
 } from "../../../../lib/production-future-year-administration-contract.js";
 import {
   dataAuthorityResponseHeaders,
@@ -22,6 +24,7 @@ export const dynamic = "force-dynamic";
 const clean = (value) => String(value ?? "").trim();
 const responseHeaders = { "Cache-Control": "private, no-store" };
 const ACTIONS = new Set(PRODUCTION_FUTURE_YEAR_ADMINISTRATION_ACTIONS);
+const RUNTIME_ACTIONS = new Set(PRODUCTION_FUTURE_RUNTIME_ACTIONS);
 
 function unavailable() {
   return NextResponse.json({ error: "Not found." }, { status: 404, headers: responseHeaders });
@@ -66,7 +69,7 @@ function actor(identity = {}) {
 
 function safeFailure(error) {
   const candidate = clean(error?.code).toUpperCase();
-  const code = /^(?:(?:PRODUCTION_)?FUTURE_(?:YEAR|TOURNAMENT|TEAM|ROSTER|ROUND|COURSE|MATCH)|PRODUCTION_SUPABASE)_[A-Z0-9_]{3,120}$/.test(candidate)
+  const code = /^(?:(?:PRODUCTION_)?FUTURE_(?:YEAR|RUNTIME|TOURNAMENT|TEAM|ROSTER|ROUND|COURSE|MATCH)|(?:PRODUCTION_)?GLOBAL_COURSE|PRODUCTION_SUPABASE)_[A-Z0-9_]{3,120}$/.test(candidate)
     ? candidate
     : "FUTURE_YEAR_OPERATION_FAILED";
   const messages = {
@@ -114,6 +117,21 @@ function safeFailure(error) {
     FUTURE_TOURNAMENT_ACTIVATION_NOT_INSTALLED: "Future tournament activation is not installed in this phase.",
     FUTURE_TOURNAMENT_CLOSE_NOT_INSTALLED: "Tournament close is not installed in this phase.",
     FUTURE_TOURNAMENT_ARCHIVE_NOT_INSTALLED: "Tournament archive is not installed in this phase.",
+    FUTURE_RUNTIME_TARGET_TOURNAMENT_REQUIRED: "Select a future tournament before managing runtime preparation.",
+    FUTURE_RUNTIME_PREDECESSOR_MISMATCH: "Future Tournament state changed while it was loading. Refresh and review again.",
+    FUTURE_RUNTIME_FINGERPRINT_REQUIRED: "Refresh authoritative readiness before continuing.",
+    FUTURE_RUNTIME_HANDICAPS_INVALID: "Review the complete future tournament handicap revision.",
+    FUTURE_RUNTIME_HANDICAP_SOURCE_INVALID: "Select a valid prior-year handicap source.",
+    FUTURE_RUNTIME_PAIRINGS_INVALID: "Review the complete future match pairing.",
+    FUTURE_RUNTIME_OPERATION_REQUEST_CONFLICT: "That operation identity was already used for a different runtime change.",
+    GLOBAL_COURSE_INPUT_INVALID: "Review the permanent Course details.",
+    PRODUCTION_GLOBAL_COURSE_CONTEXT_INPUT_INVALID: "Review the Course tee, rating, slope, and par.",
+    PRODUCTION_GLOBAL_COURSE_HOLE_INPUT_INVALID: "Review every Course hole definition.",
+    PRODUCTION_GLOBAL_COURSE_HOLES_INCOMPLETE: "Provide all 18 holes with unique stroke indexes and matching total par.",
+    FUTURE_GLOBAL_COURSE_HOLES_INCOMPLETE: "Provide all 18 holes with unique stroke indexes.",
+    FUTURE_GLOBAL_COURSE_ASSIGNMENT_INPUT_INVALID: "Select an exact scoring-ready Course context and future round.",
+    FUTURE_TOURNAMENT_ACTIVATION_NOT_READY: "Complete authoritative activation readiness before activating this tournament.",
+    FUTURE_TOURNAMENT_CLOSE_NOT_READY: "Complete the authoritative close checklist before closing this tournament.",
   };
   return {
     error: messages[code] || "The Future Tournament operation did not complete.",
@@ -132,7 +150,7 @@ export async function GET(request) {
     const scoped = await withDataAuthorityRequestScope({
       label: "production-future-year-administration-read",
       source: "supabase-production-future-year-administration-v1",
-    }, () => readProductionFutureYearAdministration({
+    }, () => readProductionFutureYearAdministrationWithRuntime({
       ...actor(access.identity),
       targetTournamentId,
     }));
@@ -166,7 +184,7 @@ export async function POST(request) {
     }, { status: 400, headers: responseHeaders });
   }
   const action = clean(input?.action).toLowerCase();
-  if (!ACTIONS.has(action)) {
+  if (!ACTIONS.has(action) && !RUNTIME_ACTIONS.has(action)) {
     return NextResponse.json({
       error: "Unsupported Future Tournament action.",
       code: "FUTURE_YEAR_ACTION_INVALID",
@@ -176,7 +194,41 @@ export async function POST(request) {
     const scoped = await withDataAuthorityRequestScope({
       label: `production-future-year-administration-${action}`,
       source: "supabase-production-future-year-administration-v1",
-    }, () => mutateProductionFutureYearAdministration({
+    }, () => (RUNTIME_ACTIONS.has(action)
+      ? mutateProductionFutureRuntime({
+        ...actor(access.identity),
+        action,
+        targetTournamentId: input.targetTournamentId,
+        tournamentYear: input.tournamentYear,
+        expectedRevision: input.expectedRevision,
+        operationRequestId: input.operationRequestId,
+        reason: input.reason,
+        courseName: input.courseName,
+        location: input.location,
+        rating: input.rating,
+        slope: input.slope,
+        par: input.par,
+        holes: input.holes,
+        roundNumber: input.roundNumber,
+        courseContextRevision: input.courseContextRevision,
+        sourceYear: input.sourceYear,
+        effectiveDate: input.effectiveDate,
+        method: input.method,
+        sourceEvidenceDate: input.sourceEvidenceDate,
+        entries: input.entries,
+        handicapRevisionId: input.handicapRevisionId,
+        matchId: input.matchId,
+        matchNumber: input.matchNumber,
+        courseId: input.courseId,
+        teeId: input.teeId,
+        teeTime: input.teeTime,
+        startingHole: input.startingHole,
+        participants: input.participants,
+        readinessFingerprint: input.readinessFingerprint,
+        expectedPointerRevision: input.expectedPointerRevision,
+        completionFingerprint: input.completionFingerprint,
+      })
+      : mutateProductionFutureYearAdministration({
       ...actor(access.identity),
       action,
       targetTournamentId: input.targetTournamentId,
@@ -208,7 +260,7 @@ export async function POST(request) {
       sourceTournamentId: input.sourceTournamentId,
       sourceRoundNumber: input.sourceRoundNumber,
       matchCount: input.matchCount,
-    }));
+    })));
     return NextResponse.json({
       ok: true,
       action,

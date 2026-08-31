@@ -364,7 +364,7 @@ test("server mutations bind revision, idempotency and hash without trusting Owne
   assert.equal(receipt.revision, 7);
 });
 
-test("transport allowlists only the two Supabase RPCs and always disables caching", async () => {
+test("transport allowlists only the bounded annual and runtime Supabase RPCs and disables caching", async () => {
   const { productionFutureYearAdministrationRpc } = await importFutureYearServer();
   await assert.rejects(
     productionFutureYearAdministrationRpc("activate_production_future_tournament", {}, {
@@ -392,9 +392,7 @@ test("transport allowlists only the two Supabase RPCs and always disables cachin
 test("bounded future setup domain errors remain typed for Director recovery", async () => {
   const serverSource = await source("lib/production-future-year-administration-server.js");
   const route = await source("app/api/director/future-tournaments/route.js");
-  for (const domain of ["TEAM", "ROSTER", "ROUND", "COURSE", "MATCH"]) {
-    assert.match(serverSource, new RegExp(`FUTURE_\\(\\?:YEAR\\|TOURNAMENT[^\\n]+${domain}`));
-  }
+  assert.match(serverSource, /FUTURE_\(\?:YEAR\|RUNTIME\|TOURNAMENT\|TEAM\|ROSTER\|ROUND\|COURSE\|MATCH\)/);
   assert.match(route, /FUTURE_TEAM_CAPTAIN_OR_INPUT_INVALID/);
   assert.match(route, /FUTURE_ROUND_MATCH_STRUCTURE_LOCKED/);
   assert.match(route, /FUTURE_EXISTING_COURSE_TEE_REQUIRED/);
@@ -412,7 +410,7 @@ test("Director route is Production-only, same-origin, Supabase-only and leaves O
   assert.match(route, /allowBootstrap: false/);
   assert.match(route, /result\.source !== "production-director-entitlement"/);
   assert.match(route, /searchParams\.get\("targetTournamentId"\)/);
-  assert.match(route, /readProductionFutureYearAdministration\(\{/);
+  assert.match(route, /readProductionFutureYearAdministrationWithRuntime\(\{/);
   assert.match(route, /mutateProductionFutureYearAdministration\(\{/);
   assert.match(route, /fallbackUsed: false,[\s\S]*googleRequests: 0/);
   assert.match(route, /Cache-Control": "private, no-store"/);

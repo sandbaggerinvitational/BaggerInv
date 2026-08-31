@@ -10,6 +10,7 @@ import AssetImage from "./AssetImage";
 import TournamentStatusHero from "./TournamentStatusHero";
 import StatusBadge from "./StatusBadge";
 import { readHomepageCurrentTournament } from "../lib/homepage-current-tournament";
+import { readProductionCurrentTournamentRuntime } from "../lib/production-current-tournament-runtime";
 import { requireHomepageCurrentReadSource } from "../lib/tournament-read-source";
 import { loadCompletedHistoryYears } from "../lib/completed-history-service";
 import { loadHistory2026View } from "../lib/history-2026-service";
@@ -38,14 +39,27 @@ export default async function Home() {
   let tournaments = [];
   let currentTournament = {};
   if (homepageSource.resolved === "supabase") {
+    const currentTournamentContext = clean(env.VERCEL_ENV).toLowerCase() === "production"
+      ? await readProductionCurrentTournamentRuntime({}, { env })
+      : null;
     const [homepage, completed, currentHistory] = await Promise.all([
-      readHomepageCurrentTournament({ source: homepageSource, env }),
+      readHomepageCurrentTournament({
+        source: homepageSource,
+        env,
+        tournamentId: currentTournamentContext?.tournamentId,
+        currentTournamentContext,
+      }),
       loadCompletedHistoryYears({ env }),
       loadHistory2026View({ env }),
     ]);
     currentRead = homepage;
-    currentTournament = currentHistory.tournament || {};
-    tournaments = [...completed.tournaments, currentTournament].sort((a, b) => Number(a.year) - Number(b.year));
+    const history2026 = currentHistory.tournament || {};
+    currentTournament = currentTournamentContext?.tournamentId === "2026"
+      ? history2026
+      : { year: currentTournamentContext?.tournamentYear };
+    tournaments = [...completed.tournaments, history2026]
+      .filter((item, index, values) => item?.year && values.findIndex((candidate) => Number(candidate?.year) === Number(item.year)) === index)
+      .sort((a, b) => Number(a.year) - Number(b.year));
   } else {
     await refreshHistoricalData();
     tournaments = [...getTournaments()].sort((a, b) => a.year - b.year);

@@ -12,12 +12,13 @@ test("Director Console exposes the bounded Future Tournaments annual-administrat
   });
 });
 
-test("future-year panel uses the contract builder, scoped endpoint, and keeps unsupported lifecycle writers unavailable", async () => {
+test("future-year panel wires the bounded runtime preparation and keeps archive execution plan-only", async () => {
   const [panel, consoleSource] = await Promise.all([
     source("app/admin/director/ProductionFutureYearAdministrationPanel.js"),
     source("app/admin/director/ProductionDirectorConsole.js"),
   ]);
   assert.match(panel, /buildFutureYearAdministrationMutation/);
+  assert.match(panel, /buildFutureRuntimeMutation/);
   assert.match(panel, /\/api\/director\/future-tournaments/);
   assert.match(panel, /targetTournamentId=\$\{encodeURIComponent\(targetTournamentId\)\}/);
   assert.match(panel, /Clone 2026 structure/);
@@ -28,8 +29,16 @@ test("future-year panel uses the contract builder, scoped endpoint, and keeps un
   assert.match(panel, /Audit timeline/);
   assert.match(panel, /useCallback\(async \(targetTournamentId = "", quiet = false\)/);
   assert.match(panel, /Generate deterministic match structure/);
-  assert.match(panel, /Activate tournament unavailable/);
-  assert.match(panel, /google compatibility writer remain disabled by contract/i);
-  assert.doesNotMatch(panel, /activate-tournament|close-tournament|archive-tournament|create-global-course|google-compatibility-writer/);
+  assert.match(panel, /Runtime match promotion/);
+  assert.match(panel, /Configure scoring context/);
+  assert.match(panel, /assign-future-course/);
+  assert.match(panel, /Hole \| Par \| Stroke index \| Yardage/);
+  assert.match(panel, /Future Handicaps/);
+  assert.match(panel, /Pairings & scoring snapshots/);
+  assert.match(panel, /Review activation/);
+  assert.match(panel, /Prepare archive plan/);
+  assert.match(panel, /Archive execution unavailable/);
+  assert.match(panel, /claimed and retried only by the certified worker/);
+  assert.doesNotMatch(panel, /archive-tournament|completeCompatibilityJob|writeFutureMatchGoogleCompatibility/);
   assert.match(consoleSource, /section === "tournaments"[\s\S]*ProductionFutureYearAdministrationPanel/);
 });

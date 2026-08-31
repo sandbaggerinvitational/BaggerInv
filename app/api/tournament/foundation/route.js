@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { readTournamentFoundation } from "../../../../lib/tournament-foundation.js";
+import { readProductionCurrentTournamentRuntime } from "../../../../lib/production-current-tournament-runtime.js";
 import { tournamentFoundationReadEnvironment } from "../../../../lib/tournament-read-source.js";
 import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
@@ -23,7 +24,14 @@ export async function GET(request) {
   try {
     env = applicationRequestEnvironment(request);
     selected = tournamentFoundationReadEnvironment(env);
-    const read = await readTournamentFoundation({ env });
+    const currentTournamentContext = String(env.VERCEL_ENV || "").trim().toLowerCase() === "production"
+      ? await readProductionCurrentTournamentRuntime({}, { env })
+      : null;
+    const read = await readTournamentFoundation({
+      env,
+      tournamentId: currentTournamentContext?.tournamentId,
+      currentTournamentContext,
+    });
     const response = NextResponse.json({ data: read.data, readDiagnostics: read.diagnostics }, {
       headers: responseHeaders(read.diagnostics.source, read.diagnostics.googleRequests),
     });

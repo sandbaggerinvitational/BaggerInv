@@ -101,12 +101,16 @@ export async function POST(request) {
           actorAuthUserId,
           actorPlayerId,
           correctionReason,
+          targetTournamentId: input.targetTournamentId,
+          targetTournamentYear: input.targetTournamentYear,
         })
       : inspectProductionDirectorProjectionSynchronization({
           domain: input.domain,
           actorAuthUserId,
           actorPlayerId,
           correctionReason,
+          targetTournamentId: input.targetTournamentId,
+          targetTournamentYear: input.targetTournamentYear,
         }));
     return NextResponse.json(resultPayload(action, scoped.result, scoped.diagnostics), {
       headers: { ...noStore, ...dataAuthorityResponseHeaders(scoped.diagnostics) },
