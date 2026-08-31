@@ -1,77 +1,109 @@
-# Draft Supabase Projection Contract
+# Draft Supabase Projection and Authoring Contract
 
-Step 8 keeps Google Sheets as the Tournament Director authoring authority and
-projects the two Draft tabs into immutable, tournament-scoped Supabase
-revisions. Application routes never write Draft facts and the Supabase read
-path has no Google or bundled-data fallback.
+Step 13E.8B makes the Production Director Console the Draft authoring surface.
+Directors stage, validate, review, and commit bounded tournament-scoped Draft
+revisions in Supabase. Installing the authoring workflow does not create a
+revision or change an existing configuration, pick, status, or current pointer.
+The valid Google-imported Production revisions remain unchanged and retain
+their Google synchronization provenance.
+
+Production public, participant, and Director reads use the canonical Supabase
+Draft projection with no foreground Google request or Google fallback. The
+Google `Draft Settings` and `Draft Picks` tabs remain historical,
+non-authoritative records. Preview may retain its isolated Google authoring and
+explicit two-tab synchronization workflow.
 
 ## Consumers
 
-| Consumer | Facts | Derived inputs | Step 8 source |
+| Consumer | Facts | Derived inputs | Current source |
 | --- | --- | --- | --- |
 | `/draft` | Current configuration, picks, teams, players | Current Draft analysis | Bounded Supabase Draft read plus canonical History and Published Odds |
-| `/draft/[year]` | One recorded Draft revision | Year analysis | Bounded Supabase Draft read plus canonical History and Published Odds |
+| `/draft/[year]` | One recorded Draft revision | Year analysis | Year-addressed Supabase Draft read plus canonical History and Published Odds |
 | `/draft/analytics` | Recorded Draft years and picks | DVS, captain/player summaries, trends | Supabase Draft plus request-local canonical History/Statistics |
 | Player Profile | A player's selected picks | Finish and DVS | Bounded `PLAYER` Draft scope plus canonical profile History |
 | History year page | Recorded Draft-year availability | None | Bounded Supabase Draft read |
 | Sitemap | Recorded Draft years | None | Bounded Supabase Draft read |
 
 No homepage or participant PWA component currently consumes Draft facts. The
-Admin CMS remains the only Draft writer and continues writing Google first.
+Production Admin CMS Draft tab now shows a legacy/non-authoritative notice and
+routes Directors to the Supabase-native editor.
 
-## Draft Settings
+## Draft Setup
 
-The exact source fields are `Year`, `Draft Name Override`, `Draft Date`, `Draft
-Time`, `Time Zone`, `Draft Location`, `Draft Status Mode`, `Draft Format`,
-`Total Picks`, `Team 1 ID`, `Team 2 ID`, `Team 1 Captain Player ID`, `Team 2
-Captain Player ID`, `First Pick Team ID`, `Notes`, `Updated At`, and `Updated
-By`. Year, total picks, two distinct canonical teams, captain identities when
-present, and first-pick team are validated. Date, time, zone, location, name,
-status, format, notes, and source audit values remain lossless strings so the
-storage migration does not invent new Draft rules.
+The existing semantics remain `Year`, `Draft Name Override`, `Draft Date`,
+`Draft Time`, `Time Zone`, `Draft Location`, `Draft Status Mode`, `Draft
+Format`, `Total Picks`, `Team 1 ID`, `Team 2 ID`, `Team 1 Captain Player ID`,
+`Team 2 Captain Player ID`, `First Pick Team ID`, and `Notes`. The legacy
+Google import also retains `Updated At` and `Updated By` as source provenance;
+the Director does not edit those values.
 
-## Draft Picks
+Year, total picks, two distinct canonical Teams, captain identities when
+present, and first-pick Team are validated against the exact tournament.
+Date, time, time zone, location, name, status, format, and notes remain
+lossless strings, so values such as `7/12/2026`, `7:00 PM`, and `CST` are not
+silently coerced. Draft Setup consumes canonical tournament Team and roster
+facts and never mutates them.
 
-The exact source fields are `Year`, `Pick Number`, `Team ID`, `Player ID`,
-`Selected At`, `Selected By`, `Notes`, `Updated At`, and `Updated By`.
-Projection adds deterministic `round_number`, `pick_within_round`, and an
-explicit `PENDING` or `SELECTED` evidence state. Pick numbers must be unique,
-contiguous, and in range. Selected players use stable Player IDs, must belong
-to the canonical tournament roster/team, and may appear only once per Draft.
-Pick numbers are validated for uniqueness, range, and deterministic source
-ordering. `Draft Picks.Team ID` remains authoritative for the actual selecting
-team; a Director-approved trade or order override is retained and diagnosed
-rather than rewritten from the default `Snake` configuration.
+## Draft Board and Picks
+
+The existing pick semantics remain `Year`, `Pick Number`, `Team ID`, `Player
+ID`, `Selected At`, `Selected By`, and `Notes`. Pick numbers must be unique,
+contiguous, and within the configured total. Selected Players use stable
+Player IDs, must be active in the canonical tournament roster and assigned to
+the selected Team, and may appear only once. Captains cannot also be selected
+as Draft picks.
+
+Projection retains deterministic `round_number`, `pick_within_round`, and
+explicit `PENDING` or `SELECTED` evidence. `Team ID` remains authoritative for
+the actual selecting Team; a retained Director-approved trade or order
+override is diagnosed rather than rewritten from the default `Snake`
+configuration. Selection timestamps and actor provenance are server-owned and
+are not editable in the Console.
 
 ## Recorded historical coverage
 
-The authoritative Draft tabs contain settings and 22 selections for 2025 and
-settings and 22 selections for 2026. No earlier year is projected or
-fabricated. The raw 2025 `CRIPSYBOYS` setting remains in provenance while the
-certified canonical team identity is `CRISPYBOYS`. All other unresolved team,
-captain, player, roster, duplicate, or ordering conditions fail closed.
+The preserved Google-imported projection contains settings and 22 selections
+for 2025 and settings and 22 selections for 2026. No earlier year is projected
+or fabricated. The raw 2025 `CRIPSYBOYS` source value remains in provenance
+while the certified canonical Team ID is `CRISPYBOYS`.
 
-## Versioning and mutability
+## Revision workflow and mutability
 
-Each recorded year has one current pointer to append-only revisions. A source,
-configuration, picks, and complete payload fingerprint are stored with the
-workbook, exact two-tab source, actor, timestamp, previous revision, validation
-diagnostics, and contract version. An unchanged synchronization is a no-op.
-The active/current tournament may advance through ordinary supported CMS
-synchronization. A completed historical year requires a Director-supplied
-correction reason and creates a new revision; it never updates certified facts
-in place. Database triggers reject direct writes outside the security-definer
-import operation, including service-role table writes.
+Each tournament has its own append-only revisions and current pointer. A
+Director edit follows `Edit → Validate → Review Changes → Save Revision`.
+Mutations require the exact predecessor revision, a stable operation request
+identity, a canonical payload hash, and same-key/same-payload idempotency.
+Same-key/different-payload reuse is rejected. Privileged table transport stays
+server-only; clients do not write Draft tables directly.
 
-## Source and failure contract
+Mutable setup and in-progress Drafts may advance through complete reviewed
+revisions. A completed, fully selected, frozen, historical, or archived Draft
+is read-only in the ordinary workflow and returns `CORRECTION_REQUIRED`.
+Step 13E.8B does not install a historical correction operation. Existing
+history is never rewritten merely to make the Console editable.
 
-`DRAFT_READ_SOURCE=google|supabase` is Preview-only. Production hard-resolves
-to the existing Google behavior. Supabase selection additionally requires the
-exact isolated Preview project, an isolated non-Production workbook, and
-server-only credentials. Missing/invalid projections fail explicitly through
-the Draft error boundary. There is no automatic Google, mutable `stats.js`, or
-bundled historical fallback on the Supabase branch.
+Canonical roster or Team changes that conflict with an existing Draft are
+reported as a dependency-readiness conflict. They do not silently remove a
+drafted Player, change a pick, or rewrite history.
 
-The supported synchronization reads only `Draft Settings` and `Draft Picks`.
-Google remains editable; Supabase remains the sole application-readable
-versioned projection when selected.
+## Annual isolation and copy
+
+Reads and mutations are scoped to one exact tournament. Current and future
+tournaments have independent setup, picks, current pointers, staged revisions,
+and history. Copy Previous Draft Setup is available only for a mutable future
+tournament and uses its immediately preceding year. It creates a review draft,
+not a current revision, and copies no selected Player, completed status,
+selection timestamp, or historical audit fact. Copied Team and captain defaults
+must validate against the target tournament.
+
+## Production and Preview source contract
+
+Production hard-resolves Draft reads and Director authoring to Supabase. The
+retired Production Google synchronization and Admin CMS mutation paths return a
+typed retirement response before acquiring Google credentials or transport.
+Later edits to the Google Draft tabs cannot change Production Draft state.
+
+`DRAFT_READ_SOURCE=google|supabase` and the Google two-tab synchronization
+adapter remain Preview-only compatibility boundaries. Preview requires its
+isolated non-Production project and workbook. Guide synchronization is
+unchanged and remains the sole Production Google human-authoring workflow.

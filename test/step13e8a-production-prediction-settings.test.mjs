@@ -177,7 +177,7 @@ test("migration 080 is additive and inert while implementing the bounded revisio
     /update scoring_authority\.odds_publication_current/i);
 });
 
-test("Production Google Prediction Settings authoring is retired without retiring Preview, Guide, Draft, or archives", async () => {
+test("Production Google Prediction Settings and Draft authoring are retired without retiring Preview, Guide, or archives", async () => {
   const [syncRoute, syncService, cmsRoute, calibration, credential,
     intent, inventory, directorOperations] = await Promise.all([
     readFile(new URL("../app/api/admin/production-director-synchronization/route.js", import.meta.url), "utf8"),
@@ -195,18 +195,20 @@ test("Production Google Prediction Settings authoring is retired without retirin
   assert.match(calibration, /previewMode \? <CmsManager/);
   assert.doesNotMatch(credential,
     /^\s*PREDICTION_SETTINGS_SYNCHRONIZATION:\s*Object\.freeze/m);
+  assert.doesNotMatch(credential,
+    /^\s*DRAFT_SYNCHRONIZATION:\s*Object\.freeze/m);
   assert.doesNotMatch(intent,
     /\[GOOGLE_AUTHORING_OPERATIONS\.ADMIN_CMS_PREDICTION_SETTINGS\]:/);
   assert.doesNotMatch(inventory,
     /^\s*PREDICTION_SETTINGS:\s*GOOGLE_AUTHORING_OPERATIONS/m);
   assert.match(credential, /GUIDE_SYNCHRONIZATION/);
-  assert.match(credential, /DRAFT_SYNCHRONIZATION/);
   assert.match(credential, /ROUND_SCORECARDS_ARCHIVE/);
-  assert.match(inventory, /DRAFT_GUIDE_PRESENTATION/);
+  assert.match(inventory, /GUIDE_PRESENTATION/);
   assert.doesNotMatch(directorOperations,
     /<ProjectionSyncCard\s+domain="PREDICTION_SETTINGS"/);
   assert.match(directorOperations, /domain="GUIDE"/);
-  assert.match(directorOperations, /domain="DRAFT"/);
+  assert.match(directorOperations, /ProductionDraftEditor/);
+  assert.doesNotMatch(directorOperations, /<ProjectionSyncCard\s+domain="DRAFT"/);
 });
 
 test("Supabase-native settings remain current in Production War Room reads without a Vercel fingerprint rebind", async () => {

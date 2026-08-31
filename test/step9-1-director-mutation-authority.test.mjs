@@ -141,7 +141,7 @@ test("Google authority preserves every known Director mutation and explicit lega
   }), (error) => error.code === DIRECTOR_MUTATION_ERROR_CODES.UNKNOWN_OPERATION && error.status === 400);
 });
 
-test("Production retires only Google Prediction Settings authoring while Preview remains available", () => {
+test("Production retires Google Prediction Settings authoring while Preview remains available", () => {
   const production = directorMutationAuthorityDiagnostics({
     surface: "admin-cms",
     action: "prediction-settings",

@@ -8,3 +8,4 @@
 .controlBar input{width:100%;min-height:48px;padding:10px 13px;border:1px solid #d5cec1;border-radius:10px;background:#fff;font:inherit}.controlBar label:first-child{min-width:0;flex:1}.controlBar label:nth-child(2){min-width:min(280px,45vw)}
 .stack{display:grid;gap:24px}
 @media(max-width:620px){.controlBar label:nth-child(2){min-width:0}}
+.readOnly>a{display:inline-flex;align-items:center;min-height:46px;margin-top:22px;padding:0 18px;border-radius:999px;background:#0b3529;color:#fff;font-size:.78rem;font-weight:800}

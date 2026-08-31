@@ -176,7 +176,8 @@ test("side-game, Draft, Guide, and System panels honor missing-operation boundar
   assert.match(ui, /No 2026 financial facts have been entered/);
   assert.match(ui, /Director-private Calcutta review/);
   assert.match(ui, /Rules & payout allocation/);
-  assert.match(ui, /domain="DRAFT"/);
+  assert.match(ui, /ProductionDraftEditor/);
+  assert.doesNotMatch(ui, /<ProjectionSyncCard\s+domain="DRAFT"/);
   assert.match(ui, /domain="GUIDE"/);
   assert.match(ui, /\["STALE", "UNAVAILABLE"\]/);
   assert.match(ui, /correctionReason/);

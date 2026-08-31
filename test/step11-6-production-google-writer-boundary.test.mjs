@@ -211,6 +211,9 @@ test("inventory and route sources preserve distinct canonical, authoring, and mi
     assert.match(inventory, new RegExp(intent));
   }
   for (const symbol of classifiedWriterSymbols) assert.match(inventory, new RegExp(`\\b${symbol}\\b`), symbol);
+  assert.match(cms, /function retiredProductionDraft/);
+  assert.match(cms, /PRODUCTION_DRAFT_GOOGLE_AUTHORING_RETIRED/,
+    "Production retires Draft before the retained Preview workbook intent can run");
   assert.match(cms, /ADMIN_CMS_DRAFT/);
   assert.match(cms, /ADMIN_CMS_PREDICTION_SETTINGS/);
   assert.match(guide, /TOURNAMENT_GUIDE/);
@@ -1319,6 +1322,9 @@ test("low-level Production transport binds each mutation intent and operation to
     empty: "PRODUCTION_GOOGLE_MUTATION_SHEET_REQUIRED",
     unknown: "PRODUCTION_GOOGLE_MUTATION_OPERATION_NOT_ALLOWED",
     guide: "OK",
+    // Preview still uses this bounded intent. Production Draft authoring is
+    // retired at the CMS and Director mutation-authority boundaries before a
+    // workbook transport can be reached.
     draft: "OK",
     settings: "OK",
     predictionSettings: "PRODUCTION_GOOGLE_MUTATION_OPERATION_NOT_ALLOWED",

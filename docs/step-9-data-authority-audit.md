@@ -1,5 +1,11 @@
 # Step 9 — Data Authority and Google Dependency Audit
 
+> **Supersession note — August 31, 2026:** Steps 13E.8A and 13E.8B moved
+> Production Prediction Settings and Draft authoring to bounded Supabase-native
+> Director workflows. Tournament Guide is now the sole remaining Production
+> Google human-authoring domain. The evidence and conclusions below describe
+> the historical Step 9 repository state and are intentionally not rewritten.
+
 ## Audit status
 
 **BLOCKED — inventory and safe cleanup complete; a dual-authority defect and

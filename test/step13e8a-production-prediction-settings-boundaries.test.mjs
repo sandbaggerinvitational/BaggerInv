@@ -542,7 +542,7 @@ function runServerScript(body) {
   return JSON.parse(result.stdout.trim());
 }
 
-test("retired Google Prediction Settings cannot alter Supabase state while Guide and Draft remain callable", () => {
+test("retired Google Prediction Settings and Draft cannot alter Supabase state while Guide remains callable", () => {
   const result = runServerScript(`
     const configuration = { revision: 2, value: 35 };
     let retiredDependencies = 0;
@@ -589,11 +589,12 @@ test("retired Google Prediction Settings cannot alter Supabase state while Guide
   assert.equal(result.retiredDependencies, 0);
   assert.equal(result.retiredCode,
     "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
-  for (const domain of ["GUIDE", "DRAFT"]) {
-    assert.equal(result.retained[domain].rpcCalls, 1, domain);
-    assert.equal(result.retained[domain].code,
-      "PRODUCTION_DIRECTOR_SYNC_CONTEXT_UNAVAILABLE", domain);
-  }
+  assert.equal(result.retained.GUIDE.rpcCalls, 1);
+  assert.equal(result.retained.GUIDE.code,
+    "PRODUCTION_DIRECTOR_SYNC_CONTEXT_UNAVAILABLE");
+  assert.equal(result.retained.DRAFT.rpcCalls, 0);
+  assert.equal(result.retained.DRAFT.code,
+    "PRODUCTION_DRAFT_GOOGLE_AUTHORING_RETIRED");
 });
 
 test("participant, website, mobile, annual, and Tournament Setup surfaces do not acquire Director configuration internals", async () => {

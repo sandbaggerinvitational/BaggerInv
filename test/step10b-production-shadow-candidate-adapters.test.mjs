@@ -59,7 +59,9 @@ test("Production projection translations carry exact immutable read contracts", 
   const draft = productionShadowCandidateRpcTranslation("read_preview_draft_view", {
     target_scope: "PLAYER", target_player_id: "CP01",
   });
-  assert.equal(draft.functionName, "read_production_draft_projection");
+  assert.equal(draft.functionName, "read_production_draft_view_v1");
+  assert.equal(draft.body.input.target_scope, "PLAYER");
+  assert.equal(draft.body.input.target_player_id, "CP01");
   assert.deepEqual(draft.request, { scope: "PLAYER", year: null, playerId: "CP01" });
 
   const player = productionShadowCandidateRpcTranslation("read_preview_secondary_history_players", {});

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
+import ProductionDraftEditor from "./ProductionDraftEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
 import styles from "./production-director.module.css";
 
@@ -529,13 +530,18 @@ export function OddsAndSideGamesPanel({ data, refresh }) {
 }
 
 export function DraftGuidePanel({ data, refresh }) {
-  return <section className={styles.panel}>
-    <header><span>Explicit synchronization</span><h2>Draft & Guide</h2><p>Google remains the temporary authoring surface. Supabase changes only after a validated Director synchronization succeeds.</p></header>
-    <div className={styles.operationGrid}>
-      <ProjectionSyncCard domain="DRAFT" title="Draft" description="Google Draft edits do not become Production-current until this synchronization succeeds. A failed sync preserves the previous revision." status={data.projections.draft} onChanged={refresh} />
-      <ProjectionSyncCard domain="GUIDE" title="Tournament Guide" description="Google Guide edits do not become Production-current until this synchronization succeeds. Public and participant reads remain Supabase-only." status={data.projections.guide} onChanged={refresh} />
-    </div>
-  </section>;
+  return <>
+    <section className={styles.panel}>
+      <header><span>Supabase-native authoring</span><h2>Draft</h2><p>Review and save a complete tournament-scoped Draft revision. Current public and participant Draft presentation continues to read the canonical Supabase projection.</p></header>
+      <ProductionDraftEditor onChanged={refresh} />
+    </section>
+    <section className={styles.panel}>
+      <header><span>Explicit synchronization</span><h2>Tournament Guide</h2><p>Google remains the temporary Guide authoring surface. Supabase changes only after a validated Director synchronization succeeds.</p></header>
+      <div className={styles.operationGrid}>
+        <ProjectionSyncCard domain="GUIDE" title="Tournament Guide" description="Google Guide edits do not become Production-current until this synchronization succeeds. A failed sync preserves the previous revision, and public and participant reads remain Supabase-only." status={data.projections.guide} onChanged={refresh} />
+      </div>
+    </section>
+  </>;
 }
 
 function QueueSummary({ title, counts }) {
@@ -549,7 +555,7 @@ function QueueSummary({ title, counts }) {
 const AUDIT_FILTERS = Object.freeze([
   ["ALL", "All activity"], ["MATCH", "Matches"], ["HANDICAP", "Handicaps"],
   ["ACCESS", "Players & access"],
-  ["ODDS", "Odds"], ["SIDE_GAME", "Side games"],
+  ["ODDS", "Odds"], ["DRAFT", "Draft"], ["SIDE_GAME", "Side games"],
   ["SYNCHRONIZATION", "Sync"], ["RELEASE", "Releases"],
 ]);
 

@@ -91,6 +91,12 @@ export async function POST(request) {
       code: "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED",
     }, { status: 410, headers: noStore });
   }
+  if (clean(input?.domain).toUpperCase() === "DRAFT") {
+    return NextResponse.json({
+      error: "Production Drafts are managed in the Director Console.",
+      code: "PRODUCTION_DRAFT_GOOGLE_AUTHORING_RETIRED",
+    }, { status: 410, headers: noStore });
+  }
   const correctionReason = clean(input?.correctionReason);
   if (correctionReason && correctionReason.length < 10) {
     return NextResponse.json({ error: "A historical Draft correction reason must contain at least 10 characters." }, { status: 400, headers: noStore });

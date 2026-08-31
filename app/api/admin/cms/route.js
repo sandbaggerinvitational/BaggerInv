@@ -34,6 +34,15 @@ function retiredProductionPredictionSettings(resource) {
   }, { status: 410 });
 }
 
+function retiredProductionDraft(resource) {
+  if (String(process.env.VERCEL_ENV || "").trim().toLowerCase() !== "production" ||
+      !["draft-settings", "draft-picks"].includes(resource)) return null;
+  return NextResponse.json({
+    error: "Production Drafts are managed in the Director Console.",
+    code: "PRODUCTION_DRAFT_GOOGLE_AUTHORING_RETIRED",
+  }, { status: 410 });
+}
+
 function blockedProductionShadowCms() {
   const candidate = productionShadowCandidateEnvironment(process.env);
   if (!candidate.requested) return null;
@@ -65,7 +74,7 @@ export async function GET(request) {
   if (candidateBlock) return candidateBlock;
   const query = new URL(request.url).searchParams;
   const resource = query.get("resource");
-  const retiredBlock = retiredProductionPredictionSettings(resource);
+  const retiredBlock = retiredProductionPredictionSettings(resource) || retiredProductionDraft(resource);
   if (retiredBlock) return retiredBlock;
   const filters = filtersFrom(query);
   try {
@@ -99,7 +108,7 @@ export async function POST(request) {
   try {
     body = await request.json();
     const { resource, action = "save", key, record, tournament, year, updatedBy, direction } = body;
-    const retiredBlock = retiredProductionPredictionSettings(resource);
+    const retiredBlock = retiredProductionPredictionSettings(resource) || retiredProductionDraft(resource);
     if (retiredBlock) return retiredBlock;
     const mutationAuthority = assertDirectorMutationAuthority({ surface: "admin-cms", action: resource });
     const transactionId = String(request.headers.get("x-save-transaction-id") || body.transactionId || "").trim();
