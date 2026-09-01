@@ -18,6 +18,7 @@ struct BaggerAssetGalleryView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 24) {
+                    BaggerDesignSystemGallerySections()
                     gallerySection(
                         title: "Brand",
                         kind: "brand",
@@ -52,8 +53,9 @@ struct BaggerAssetGalleryView: View {
                 }
                 .padding(16)
             }
+            .accessibilityIdentifier("design.gallery.scroll")
             .background(BaggerPalette.canvas)
-            .navigationTitle("Asset Foundation")
+            .navigationTitle("Design System")
             .accessibilityIdentifier("asset.gallery")
         }
     }

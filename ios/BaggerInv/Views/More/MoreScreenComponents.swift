@@ -7,15 +7,19 @@ struct MoreFreshnessBannerView: View {
 
     var body: some View {
         if let message {
-            Label(message, systemImage: freshness == .offline ? "wifi.slash" : "clock.arrow.circlepath")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(BaggerPalette.deepEvergreen)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 13)
-                .padding(.vertical, 10)
-                .background(BaggerPalette.scoreGold.opacity(0.28), in: RoundedRectangle(cornerRadius: 12))
+            BaggerFreshnessBanner(kind: bannerKind, message: message)
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("\(identifierPrefix).freshness")
+        }
+    }
+
+    private var bannerKind: BaggerFreshnessKind {
+        switch freshness {
+        case .cached: .cached
+        case .refreshing: .refreshing
+        case .stale, .failed: .stale
+        case .offline: .offline
+        case .empty, .fresh: .cached
         }
     }
 
@@ -38,22 +42,10 @@ struct MoreLoadingStateView: View {
     let identifier: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: BaggerLayout.sectionSpacing) {
-            BaggerSectionHeading(title)
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(0..<6, id: \.self) { index in
-                    RoundedRectangle(cornerRadius: 5)
-                        .fill(BaggerPalette.warmBorder.opacity(0.58))
-                        .frame(maxWidth: index.isMultiple(of: 2) ? .infinity : 230)
-                        .frame(height: index == 0 ? 20 : 14)
-                }
-            }
-            .redacted(reason: .placeholder)
-            .baggerCard()
-        }
+        BaggerLoadingState(title: title, lineCount: 6)
         .padding(BaggerLayout.pageInset)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(BaggerPalette.canvas.ignoresSafeArea())
+        .baggerScreenBackground()
         .accessibilityLabel("Loading \(title)")
         .accessibilityIdentifier(identifier)
     }
@@ -66,23 +58,15 @@ struct MoreUnavailableStateView: View {
     let onRetry: @MainActor @Sendable () async -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("\(title) isn’t available right now", systemImage: "wifi.exclamationmark")
-                .font(.headline)
-                .foregroundStyle(BaggerPalette.ink)
-            Text(message)
-                .font(.subheadline)
-                .foregroundStyle(BaggerPalette.muted)
-                .fixedSize(horizontal: false, vertical: true)
-            Button("Try Again") { Task { await onRetry() } }
-                .buttonStyle(.borderedProminent)
-                .tint(BaggerPalette.actionGreen)
-                .controlSize(.large)
-                .accessibilityIdentifier("\(identifierPrefix).retry")
-        }
+        BaggerErrorState(
+            title: "\(title) isn’t available right now",
+            message: message,
+            retryIdentifier: "\(identifierPrefix).retry",
+            onRetry: { Task { await onRetry() } }
+        )
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(BaggerLayout.pageInset)
-        .background(BaggerPalette.canvas.ignoresSafeArea())
+        .baggerScreenBackground()
         .accessibilityIdentifier("\(identifierPrefix).unavailable")
     }
 }
@@ -93,11 +77,7 @@ struct MoreEmptyStateView: View {
     let identifier: String
 
     var body: some View {
-        Label(title, systemImage: systemImage)
-            .font(.headline)
-            .foregroundStyle(BaggerPalette.ink)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .baggerCard()
+        BaggerEmptyState(title: title, systemImage: systemImage)
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier(identifier)
     }
