@@ -1,7 +1,111 @@
 {
   "synthetic": true,
   "today": [{ "case": "upcoming-match", "status": "scheduled" }, { "case": "completed-match", "status": "completed" }, { "case": "no-immediate-match", "status": null }],
-  "matches": [{ "matchId": "FIXTURE-SCHEDULED", "status": "scheduled" }, { "matchId": "FIXTURE-ACTIVE", "status": "inProgress" }, { "matchId": "FIXTURE-COMPLETED", "status": "completed" }],
+  "matches": [
+    {
+      "matchId": "FIXTURE-BB-SCHEDULED",
+      "displayMatchNumber": "1",
+      "round": { "roundNumber": 1, "name": "Round 1", "format": "Best Ball" },
+      "status": "scheduled",
+      "course": { "courseId": "FIXTURE-C1", "name": "Fixture Course", "tee": "Tournament" },
+      "teeTime": { "localTime": "08:10:00", "label": "8:10 AM", "timeZone": "America/Chicago" },
+      "teams": [
+        {
+          "side": 1,
+          "teamId": "FIXTURE-T1",
+          "name": "Fixture Team One",
+          "playingHandicap": null,
+          "strokesReceived": null,
+          "participants": [
+            { "playerId": "FIXTURE-P1", "displayName": "Fixture Player One", "teamSide": 1, "isAuthenticatedPlayer": true, "playingHandicap": 7.5, "strokesReceived": 0 },
+            { "playerId": "FIXTURE-P2", "displayName": "Fixture Player Two", "teamSide": 1, "isAuthenticatedPlayer": false, "playingHandicap": 11, "strokesReceived": 4 }
+          ]
+        },
+        {
+          "side": 2,
+          "teamId": "FIXTURE-T2",
+          "name": "Fixture Team Two",
+          "playingHandicap": null,
+          "strokesReceived": null,
+          "participants": [
+            { "playerId": "FIXTURE-P3", "displayName": "Fixture Player Three", "teamSide": 2, "isAuthenticatedPlayer": false, "playingHandicap": 5.5, "strokesReceived": 0 },
+            { "playerId": "FIXTURE-P4", "displayName": "Fixture Player Four", "teamSide": 2, "isAuthenticatedPlayer": false, "playingHandicap": null, "strokesReceived": null }
+          ]
+        }
+      ],
+      "authenticatedPlayer": { "involved": true, "teamSide": 1, "partnerPlayerIds": ["FIXTURE-P2"], "opponentPlayerIds": ["FIXTURE-P3", "FIXTURE-P4"] },
+      "progress": null,
+      "result": null
+    },
+    {
+      "matchId": "FIXTURE-SC-ACTIVE",
+      "displayMatchNumber": "2",
+      "round": { "roundNumber": 2, "name": "Round 2", "format": "Scramble" },
+      "status": "inProgress",
+      "course": { "courseId": "FIXTURE-C2", "name": "Fixture Scramble Course", "tee": "Tournament" },
+      "teeTime": { "localTime": "09:20:00", "label": "9:20 AM", "timeZone": "America/Chicago" },
+      "teams": [
+        {
+          "side": 1,
+          "teamId": "FIXTURE-T1",
+          "name": "Fixture Team One",
+          "playingHandicap": 3.5,
+          "strokesReceived": 1,
+          "participants": [
+            { "playerId": "FIXTURE-P1", "displayName": "Fixture Player One", "teamSide": 1, "isAuthenticatedPlayer": true, "playingHandicap": 7.5, "strokesReceived": null },
+            { "playerId": "FIXTURE-P2", "displayName": "Fixture Player Two", "teamSide": 1, "isAuthenticatedPlayer": false, "playingHandicap": 11, "strokesReceived": null }
+          ]
+        },
+        {
+          "side": 2,
+          "teamId": "FIXTURE-T2",
+          "name": "Fixture Team Two",
+          "playingHandicap": 4.25,
+          "strokesReceived": 0,
+          "participants": [
+            { "playerId": "FIXTURE-P3", "displayName": "Fixture Player Three", "teamSide": 2, "isAuthenticatedPlayer": false, "playingHandicap": 5.5, "strokesReceived": null },
+            { "playerId": "FIXTURE-P4", "displayName": "Fixture Player Four", "teamSide": 2, "isAuthenticatedPlayer": false, "playingHandicap": 12, "strokesReceived": null }
+          ]
+        }
+      ],
+      "authenticatedPlayer": { "involved": true, "teamSide": 1, "partnerPlayerIds": ["FIXTURE-P2"], "opponentPlayerIds": ["FIXTURE-P3", "FIXTURE-P4"] },
+      "progress": { "currentHole": 7 },
+      "result": null
+    },
+    {
+      "matchId": "FIXTURE-SI-COMPLETED",
+      "displayMatchNumber": "3",
+      "round": { "roundNumber": 3, "name": "Round 3", "format": "Singles" },
+      "status": "completed",
+      "course": null,
+      "teeTime": null,
+      "teams": [
+        {
+          "side": 1,
+          "teamId": "FIXTURE-T1",
+          "name": "Fixture Team One",
+          "playingHandicap": null,
+          "strokesReceived": null,
+          "participants": [
+            { "playerId": "FIXTURE-P1", "displayName": "Fixture Player One", "teamSide": 1, "isAuthenticatedPlayer": true, "playingHandicap": -0.5, "strokesReceived": 2 }
+          ]
+        },
+        {
+          "side": 2,
+          "teamId": "FIXTURE-T2",
+          "name": "Fixture Team Two",
+          "playingHandicap": null,
+          "strokesReceived": null,
+          "participants": [
+            { "playerId": "FIXTURE-P3", "displayName": "Fixture Player Three", "teamSide": 2, "isAuthenticatedPlayer": false, "playingHandicap": 2.25, "strokesReceived": 0 }
+          ]
+        }
+      ],
+      "authenticatedPlayer": { "involved": true, "teamSide": 1, "partnerPlayerIds": [], "opponentPlayerIds": ["FIXTURE-P3"] },
+      "progress": null,
+      "result": { "summary": "Fixture Team One wins 2 & 1", "winner": "Fixture Team One", "teamOnePoints": 1, "teamTwoPoints": 0 }
+    }
+  ],
   "leaders": { "teamStandings": [{ "rank": 1, "teamId": "FIXTURE-T1", "points": 4 }], "roundStandings": [{ "roundNumber": 1, "roundName": "Round 1", "status": "final", "teamStandings": [{ "rank": 1, "teamId": "FIXTURE-T1", "points": 2.5 }, { "rank": 2, "teamId": "FIXTURE-T2", "points": 0.5 }] }], "playerStandings": [{ "rank": 1, "playerId": "FIXTURE-P1", "points": 2 }] },
   "schedule": [{ "eventId": "FIXTURE-EVENT", "date": "2026-09-24", "startAt": "2026-09-24T23:00:00.000Z", "endAt": null, "location": null }]
 }

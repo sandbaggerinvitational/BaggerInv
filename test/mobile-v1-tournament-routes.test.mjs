@@ -7,6 +7,7 @@ import { GET as scheduleGET } from "../app/api/mobile/v1/schedule/route.js";
 import { GET as todayGET } from "../app/api/mobile/v1/today/route.js";
 import { mobileV1ReadResponse } from "../lib/mobile-v1-route.js";
 import { issueMobileNativeCertification } from "../lib/mobile-native-certification.js";
+import { assertMobileV1Schema } from "./support/mobile-v1-schema-validator.mjs";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const previewWorkbookId = "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts";
@@ -62,14 +63,61 @@ async function withEnv(values, fn) {
 
 const routes = [["today", todayGET], ["matches", matchesGET], ["leaders", leadersGET], ["schedule", scheduleGET]];
 
-function certifiedHeaders(extra = {}) {
+function certifiedHeaders(extra = {}, identityOverrides = {}) {
   const { token } = issueMobileNativeCertification({
     authUserId: "11111111-1111-4111-8111-111111111111",
     playerId: "P1",
     tournamentId: "2026",
     env: preview,
+    ...identityOverrides,
   });
   return { Authorization: "Bearer valid", "X-Bagger-Certification": token, ...extra };
+}
+
+function canonicalParticipantContext() {
+  return { ok: true, data: {
+    authUserId: "11111111-1111-4111-8111-111111111111",
+    playerId: "P1",
+    displayName: "Preview Golfer",
+    tournament: { id: "2026", year: 2026, name: "Bagger Invitational" },
+    membership: { active: true },
+  } };
+}
+
+function canonicalTournamentLiveView() {
+  return {
+    tournament: { tournament_id: "2026", tournament_year: 2026, name: "Sandbagger Invitational" },
+    teams: [
+      { team_side: 1, team_id: "T1", name: "The Pickles" },
+      { team_side: 2, team_id: "T2", name: "Lipp it and Rip it" },
+    ],
+    rounds: [{ tournament_id: "2026", round_number: 1, name: "Round 1", format: "BB" }],
+    tournament_presentation: {
+      source_fingerprint: "a".repeat(64),
+      presentation: { tournament: { status: "Live", currentRound: 1, timeZone: "America/New_York" } },
+    },
+    live_revision: { totalMatchRevisions: 1 },
+    query_ms: 1,
+    matches: [{
+      round: { round_number: 1, format: "BB" },
+      match: { match_id: "2026-R1-1", round_number: 1, format: "BB", status: "LIVE",
+        scoring_locked: false, current_hole: 1, scored_holes: 1, holes_remaining: 17, match_revision: 1 },
+      snapshot: { course_id: "TPG", tee: "Gold", par: 72, rating: 71.9, slope: 136, team_configuration: {} },
+      presentation: { display_match_number: "1", course_name: "Turtle Point", tee_time: "8:00 AM",
+        tournament_time_zone: "America/New_York" },
+      participants: [
+        { player_id: "P1", display_name: "Player One", team_side: 1, player_slot: 1,
+          playing_handicap: 7.5, final_strokes: 0 },
+        { player_id: "P2", display_name: "Player Two", team_side: 1, player_slot: 2,
+          playing_handicap: 11, final_strokes: 4 },
+        { player_id: "P3", display_name: "Player Three", team_side: 2, player_slot: 1,
+          playing_handicap: 5.25, final_strokes: 1 },
+        { player_id: "P4", display_name: "Player Four", team_side: 2, player_slot: 2,
+          playing_handicap: null, final_strokes: null },
+      ],
+      scores: [{ hole_number: 1, hole_winner: "Team 1", updated_at: "2026-09-01T12:00:00.000Z" }],
+    }],
+  };
 }
 
 test("every Step 1B route deterministically requires Bearer auth before domain reads", async () => {
@@ -146,6 +194,102 @@ test("shared protected route handler denies an authenticated but unmapped partic
       assert.equal(response.status, 403);
       assert.equal((await response.json()).error.code, "PARTICIPANT_NOT_FOUND");
       assert.equal(loaded, false);
+    } finally { globalThis.fetch = original; }
+  });
+});
+
+test("matches route composes its strict response with private 200 to 304 revalidation", async () => {
+  await withEnv(preview, async () => {
+    const original = globalThis.fetch;
+    const rpcBodies = [];
+    globalThis.fetch = async (input, init = {}) => {
+      const url = String(input?.url || input);
+      if (url.includes("/auth/v1/user")) {
+        return Response.json({ id: "11111111-1111-4111-8111-111111111111" });
+      }
+      if (url.includes("/rest/v1/rpc/read_participant_identity_context_for_auth")) {
+        return Response.json(canonicalParticipantContext());
+      }
+      if (url.includes("/rest/v1/rpc/read_tournament_live_view")) {
+        rpcBodies.push(JSON.parse(init.body));
+        return Response.json({ ok: true, data: canonicalTournamentLiveView() });
+      }
+      if (url.includes("/rest/v1/rpc/read_current_guide_projection")) {
+        return Response.json({ ok: true, data: { projection_revision: 1, content: { content: { courses: [] } } } });
+      }
+      throw new Error(`Unexpected synthetic request: ${url}`);
+    };
+    try {
+      const url = "https://native-preview.example/api/mobile/v1/matches?playerId=ATTACKER&tournamentId=OTHER";
+      const first = await matchesGET(new Request(url, { headers: certifiedHeaders() }));
+      assert.equal(first.status, 200);
+      assert.equal(first.headers.get("cache-control"), "private, no-cache");
+      assert.equal(first.headers.get("vary"), "Authorization, X-Bagger-Certification");
+      const etag = first.headers.get("etag");
+      assert.match(etag, /^"[0-9a-f]{64}"$/);
+      const body = await first.json();
+      assertMobileV1Schema("matches", body);
+      assert.equal(body.data.matches[0].teams[0].teamId, "T1");
+      assert.equal(body.data.matches[0].displayMatchNumber, "1");
+      assert.deepEqual(rpcBodies[0], { target_tournament_id: "2026" });
+
+      const second = await matchesGET(new Request(url, {
+        headers: certifiedHeaders({ "If-None-Match": etag }),
+      }));
+      assert.equal(second.status, 304);
+      assert.equal(second.headers.get("etag"), etag);
+      assert.equal(await second.text(), "");
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+});
+
+test("matches maps canonical WRONG_TOURNAMENT identity denial without loading tournament data", async () => {
+  await withEnv(preview, async () => {
+    const original = globalThis.fetch;
+    let liveRead = false;
+    globalThis.fetch = async (input) => {
+      const url = String(input?.url || input);
+      if (url.includes("/auth/v1/user")) {
+        return Response.json({ id: "11111111-1111-4111-8111-111111111111" });
+      }
+      if (url.includes("/rest/v1/rpc/read_participant_identity_context_for_auth")) {
+        return Response.json({ ok: false, code: "WRONG_TOURNAMENT" });
+      }
+      if (url.includes("/rest/v1/rpc/read_tournament_live_view")) liveRead = true;
+      throw new Error(`Unexpected synthetic request: ${url}`);
+    };
+    try {
+      const response = await matchesGET(new Request("https://native-preview.example/api/mobile/v1/matches", {
+        headers: certifiedHeaders(),
+      }));
+      assert.equal(response.status, 403);
+      assert.equal((await response.json()).error.code, "PARTICIPANT_NOT_FOUND");
+      assert.equal(liveRead, false);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+});
+
+test("matches requires exact certification and rejects wrong Player or tournament proofs", async () => {
+  await withEnv(preview, async () => {
+    const original = globalThis.fetch;
+    globalThis.fetch = async (input) => String(input.url || input).includes("/auth/v1/user")
+      ? Response.json({ id: "11111111-1111-4111-8111-111111111111" })
+      : Response.json({ ok: true, data: { authUserId: "11111111-1111-4111-8111-111111111111", playerId: "P1",
+        tournament: { id: "2026" }, membership: { active: true } } });
+    try {
+      for (const headers of [
+        { Authorization: "Bearer valid" },
+        certifiedHeaders({}, { playerId: "ATTACKER" }),
+        certifiedHeaders({}, { tournamentId: "OTHER" }),
+      ]) {
+        const response = await matchesGET(new Request("https://preview.example/api/mobile/v1/matches", { headers }));
+        assert.equal(response.status, 403);
+        assert.equal((await response.json()).error.code, "AUTH_CERTIFICATION_FAILED");
+      }
     } finally { globalThis.fetch = original; }
   });
 });
