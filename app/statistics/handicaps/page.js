@@ -30,6 +30,7 @@ function HandicapTable({ title, description, rows, high = false }) {
       <p>{description}</p>
 
       <AdvancedTable
+        label={title}
         headers={["Rank", "Player", "Handicap", "Year", "Team"]}
       >
         {rankedRows.map((row) => (
@@ -105,6 +106,7 @@ export default async function HandicapsPage() {
             </p>
 
             <AdvancedTable
+              label="Most Improved Handicaps"
               headers={[
                 "Rank",
                 "Player",

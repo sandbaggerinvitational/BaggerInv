@@ -35,6 +35,7 @@ function RivalryTable({ title, description, rows, valueLabel, value }) {
       <p>{description}</p>
 
       <AdvancedTable
+        label={title}
         headers={["Rank", "Rivalry", "Record", "Meetings", valueLabel]}
       >
         {rankedRows.map((row) => (

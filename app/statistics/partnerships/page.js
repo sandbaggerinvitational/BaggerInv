@@ -35,6 +35,7 @@ function PartnershipTable({ title, description, rows, valueLabel, value }) {
       <p>{description}</p>
 
       <AdvancedTable
+        label={title}
         headers={[
           "Rank",
           "Partnership",

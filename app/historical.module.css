@@ -2589,17 +2589,40 @@
   line-height: 1.6;
 }
 
+.advancedStatsStack,
+.advancedStatSection {
+  min-width: 0;
+}
+
 .advancedTableWrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   margin-top: 24px;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--tsi-line);
   border-radius: var(--tsi-radius-md);
   background: var(--tsi-white);
   box-shadow: var(--tsi-shadow-sm);
 }
 
+.advancedTableWrap:focus-visible {
+  outline: 3px solid var(--tsi-gold-500);
+  outline-offset: 3px;
+}
+
 .advancedTable {
+  width: 100%;
   min-width: 820px;
+  border-collapse: collapse;
+}
+
+.advancedTable > thead,
+.advancedTable > tbody {
+  display: block;
 }
 
 .advancedTableHead,
@@ -2609,6 +2632,30 @@
   grid-template-columns: var(--advanced-columns);
   gap: 14px;
   align-items: center;
+}
+
+.advancedTableHead > th,
+.advancedTableRow > th,
+.advancedTableRow > td {
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.advancedTableRow > th {
+  font-weight: inherit;
+}
+
+.advancedTableCaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .advancedTableHead {
@@ -2630,7 +2677,7 @@
   border-bottom: 0;
 }
 
-.advancedTableRow > strong:first-child {
+.advancedTableRow > td:first-child > strong:first-child {
   color: var(--tsi-red-600);
 }
 
