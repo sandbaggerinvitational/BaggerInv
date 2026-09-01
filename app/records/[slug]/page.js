@@ -25,14 +25,13 @@ import {
 import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
+import { isPublicRecordSlug } from "../../../lib/public-record-routes";
 
 export const dynamic = "force-dynamic";
 
 const resolveLeaderboard = cache(async (slug) => {
+  if (!isPublicRecordSlug(slug)) return null;
   const officialDefinition = getLeaderboardDefinition(slug);
-  if (!officialDefinition &&
-      !isScorecardRecordSlug(slug) &&
-      !isMatchProgressionRecordSlug(slug)) return null;
 
   const env = await applicationPageEnvironment();
   const useSupabase = isSupabaseSecondaryHistory(env);

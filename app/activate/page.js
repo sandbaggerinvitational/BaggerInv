@@ -5,11 +5,9 @@ import PlayerPassportActivation from "./PlayerPassportActivation";
 import { cookies } from "next/headers";
 import { PLAYER_PASSPORT_COOKIE } from "../../lib/player-passport";
 import { resolvePlayerPassportToken } from "../../lib/player-passport-server";
+import { privatePageMetadata } from "../../lib/seo";
 
-export const metadata = {
-  title: "Activate Player Passport",
-  robots: { index: false, follow: false },
-};
+export const metadata = privatePageMetadata("Activate Player Passport");
 
 export default async function ActivatePage({ searchParams }) {
   if (!liveTournamentV2Enabled()) notFound();

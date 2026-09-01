@@ -1,4 +1,5 @@
-import { absoluteUrl } from "../lib/seo";
+import { absoluteUrl } from "../lib/seo.js";
+import { PUBLIC_RECORD_SLUGS } from "../lib/public-record-routes.js";
 
 const STATIC_ROUTES = [
   "/",
@@ -33,9 +34,18 @@ function entry(path, changeFrequency = "monthly", priority = 0.6) {
 }
 
 function staticEntries() {
-  return STATIC_ROUTES.map((path) =>
-    entry(path, path === "/live" ? "hourly" : "weekly", path === "/" ? 1 : 0.8)
-  );
+  return [
+    ...STATIC_ROUTES.map((path) =>
+      entry(path, path === "/live" ? "hourly" : "weekly", path === "/" ? 1 : 0.8)
+    ),
+    ...PUBLIC_RECORD_SLUGS.map((slug) =>
+      entry(`/records/${slug}`, "monthly", 0.6)
+    ),
+  ];
+}
+
+function uniqueEntries(entries) {
+  return [...new Map(entries.map((item) => [item.url, item])).values()];
 }
 
 export default async function sitemap() {
@@ -49,11 +59,9 @@ export default async function sitemap() {
   try {
     const [
       { getCourses, getPlayers, getTournaments, refreshHistoricalData },
-      { getLeaderboardSlugs },
       { getDraftYears },
     ] = await Promise.all([
       import("../lib/stats"),
-      import("../lib/leaderboards"),
       import("../lib/draft"),
     ]);
     await refreshHistoricalData();
@@ -64,10 +72,6 @@ export default async function sitemap() {
     const courses = getCourses().map((course) =>
       entry(`/courses/${encodeURIComponent(course["Course ID"])}`, "yearly", 0.5)
     );
-    const leaderboards = getLeaderboardSlugs().map((slug) =>
-      entry(`/records/${slug}`, "monthly", 0.6)
-    );
-
     const tournamentRoutes = getTournaments().flatMap((tournament) => {
       const year = tournament.year;
       const routes = [entry(`/history/${year}`, "yearly", 0.7)];
@@ -99,14 +103,13 @@ export default async function sitemap() {
       entry(`/draft/${year}`, "yearly", 0.7)
     );
 
-    return [
+    return uniqueEntries([
       ...staticEntries(),
       ...players,
       ...courses,
-      ...leaderboards,
       ...tournamentRoutes,
       ...draftRoutes,
-    ];
+    ]);
   } catch (error) {
     console.error("Dynamic sitemap data was unavailable; serving public static routes only.", error);
     return staticEntries();

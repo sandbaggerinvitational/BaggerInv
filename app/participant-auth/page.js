@@ -3,9 +3,10 @@ import { participantIdentityAuthorityEnvironment } from "../../lib/participant-i
 import ParticipantAuthRehearsal from "./ParticipantAuthRehearsal.js";
 import { participantAuthExperienceConfiguration } from "../../lib/participant-sms-auth-feature.js";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment.js";
+import { privatePageMetadata } from "../../lib/seo.js";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Sign In · The Bagger", robots: { index: false, follow: false } };
+export const metadata = privatePageMetadata("Sign In · The Bagger");
 
 export default async function ParticipantAuthPage() {
   let env;

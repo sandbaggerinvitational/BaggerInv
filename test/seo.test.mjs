@@ -8,6 +8,7 @@ import {
   absoluteUrl,
   pageMetadata,
   privatePageMetadata,
+  publicPageTitle,
 } from "../lib/seo.js";
 
 test("homepage metadata uses the approved social description", () => {
@@ -46,11 +47,33 @@ test("production SEO URLs always use baggerinv.com", () => {
   );
 });
 
+test("public titles contain the site name exactly once", () => {
+  assert.equal(publicPageTitle("History"), "History | The Sandbagger Invitational");
+  assert.equal(
+    publicPageTitle("History | The Sandbagger Invitational"),
+    "History | The Sandbagger Invitational",
+  );
+  assert.equal(
+    publicPageTitle("History | Sandbagger Invitational"),
+    "History | The Sandbagger Invitational",
+  );
+  assert.equal(publicPageTitle("The Sandbagger Invitational"), "The Sandbagger Invitational");
+
+  const metadata = pageMetadata({ title: "History | The Sandbagger Invitational" });
+  assert.deepEqual(metadata.title, { absolute: "History | The Sandbagger Invitational" });
+  assert.equal(metadata.openGraph.title, "History | The Sandbagger Invitational");
+  assert.equal(metadata.twitter.title, "History | The Sandbagger Invitational");
+});
+
 test("private application pages are excluded from search indexing", () => {
   const metadata = privatePageMetadata("Admin");
   assert.equal(metadata.robots.index, false);
   assert.equal(metadata.robots.follow, false);
   assert.equal(metadata.robots.noarchive, true);
+  assert.deepEqual(metadata.title, { absolute: "Admin" });
+  assert.deepEqual(metadata.alternates, { canonical: null });
+  assert.equal(metadata.openGraph, null);
+  assert.equal(metadata.twitter, null);
 });
 
 test("root metadata configures the production title template and icons", async () => {

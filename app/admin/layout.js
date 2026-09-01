@@ -5,6 +5,6 @@ export const metadata = {
   twitter: null,
 };
 
-export default function ParticipantNamespaceLayout({ children }) {
+export default function AdminNamespaceLayout({ children }) {
   return children;
 }
