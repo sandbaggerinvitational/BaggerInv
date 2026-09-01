@@ -5,16 +5,18 @@ struct BaggerInvApp: App {
     @StateObject private var coordinator: AppCoordinator
 #if DEBUG
     private let uiTestLaunch: TodayUITestLaunch
+    private let assetGalleryEnabled: Bool
 #endif
 
     init() {
 #if DEBUG
         let launch = TodayUITestLaunch.resolve()
         uiTestLaunch = launch
-        switch launch {
-        case .disabled:
+        assetGalleryEnabled = BaggerAssetGalleryLaunch.isEnabled()
+        switch (assetGalleryEnabled, launch) {
+        case (false, .disabled):
             _coordinator = StateObject(wrappedValue: AppCoordinator.live())
-        case .scenario, .invalid:
+        case (true, _), (false, .scenario), (false, .invalid):
             _coordinator = StateObject(wrappedValue: AppCoordinator(configurationFailure: ()))
         }
 #else
@@ -32,13 +34,17 @@ struct BaggerInvApp: App {
     @ViewBuilder
     private var applicationRoot: some View {
 #if DEBUG
-        switch uiTestLaunch {
-        case .disabled:
-            RootView(coordinator: coordinator)
-        case .scenario(let scenario):
-            TodayUITestFixtureRoot(scenario: scenario)
-        case .invalid:
-            InvalidTodayUITestFixtureRoot()
+        if assetGalleryEnabled {
+            BaggerAssetGalleryView()
+        } else {
+            switch uiTestLaunch {
+            case .disabled:
+                RootView(coordinator: coordinator)
+            case .scenario(let scenario):
+                TodayUITestFixtureRoot(scenario: scenario)
+            case .invalid:
+                InvalidTodayUITestFixtureRoot()
+            }
         }
 #else
         RootView(coordinator: coordinator)
