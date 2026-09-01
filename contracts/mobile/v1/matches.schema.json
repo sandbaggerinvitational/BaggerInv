@@ -1,5 +1,124 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "urn:bagger:mobile:v1:matches",
-  "type": "object", "additionalProperties": false, "required": ["ok", "apiVersion", "data", "meta"],
-  "properties": { "ok": { "const": true }, "apiVersion": { "const": "v1" }, "data": { "type": "object", "additionalProperties": false, "required": ["tournament", "matches"], "properties": { "tournament": { "$ref": "shared.schema.json#/$defs/tournament" }, "matches": { "type": "array", "items": { "$ref": "shared.schema.json#/$defs/match" } } } }, "meta": { "$ref": "shared.schema.json#/$defs/meta" } }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:matches",
+  "$defs": {
+    "round": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roundNumber", "name", "format"],
+      "properties": {
+        "roundNumber": { "type": ["integer", "null"], "minimum": 1 },
+        "name": { "type": ["string", "null"], "maxLength": 200 },
+        "format": { "type": ["string", "null"], "maxLength": 100 }
+      }
+    },
+    "course": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["courseId", "name", "tee"],
+      "properties": {
+        "courseId": { "type": ["string", "null"], "maxLength": 200 },
+        "name": { "type": ["string", "null"], "maxLength": 300 },
+        "tee": { "type": ["string", "null"], "maxLength": 100 }
+      }
+    },
+    "teeTime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["localTime", "label", "timeZone"],
+      "properties": {
+        "localTime": { "type": ["string", "null"], "pattern": "^\\d{2}:\\d{2}:\\d{2}$" },
+        "label": { "type": "string", "maxLength": 100 },
+        "timeZone": { "type": "string", "minLength": 1, "maxLength": 100 }
+      }
+    },
+    "participant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "displayName", "teamSide", "isAuthenticatedPlayer", "playingHandicap", "strokesReceived"],
+      "properties": {
+        "playerId": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "teamSide": { "type": "integer", "enum": [1, 2] },
+        "isAuthenticatedPlayer": { "type": "boolean" },
+        "playingHandicap": { "type": ["number", "null"] },
+        "strokesReceived": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "team": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["side", "teamId", "name", "playingHandicap", "strokesReceived", "participants"],
+      "properties": {
+        "side": { "type": "integer", "enum": [1, 2] },
+        "teamId": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "name": { "type": ["string", "null"], "maxLength": 300 },
+        "playingHandicap": { "type": ["number", "null"] },
+        "strokesReceived": { "type": ["integer", "null"], "minimum": 0 },
+        "participants": { "type": "array", "maxItems": 2, "items": { "$ref": "#/$defs/participant" } }
+      }
+    },
+    "authenticatedPlayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["involved", "teamSide", "partnerPlayerIds", "opponentPlayerIds"],
+      "properties": {
+        "involved": { "type": "boolean" },
+        "teamSide": { "type": ["integer", "null"], "enum": [1, 2, null] },
+        "partnerPlayerIds": { "type": "array", "maxItems": 1, "items": { "type": "string", "minLength": 1, "maxLength": 200 } },
+        "opponentPlayerIds": { "type": "array", "maxItems": 2, "items": { "type": "string", "minLength": 1, "maxLength": 200 } }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currentHole"],
+      "properties": { "currentHole": { "type": ["integer", "null"], "minimum": 0, "maximum": 18 } }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "winner", "teamOnePoints", "teamTwoPoints"],
+      "properties": {
+        "summary": { "type": ["string", "null"], "maxLength": 500 },
+        "winner": { "type": ["string", "null"], "maxLength": 300 },
+        "teamOnePoints": { "type": ["number", "null"] },
+        "teamTwoPoints": { "type": ["number", "null"] }
+      }
+    },
+    "match": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matchId", "displayMatchNumber", "round", "status", "course", "teeTime", "teams", "authenticatedPlayer", "progress", "result"],
+      "properties": {
+        "matchId": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "displayMatchNumber": { "type": ["string", "null"], "minLength": 1, "maxLength": 100 },
+        "round": { "$ref": "#/$defs/round" },
+        "status": { "enum": ["scheduled", "inProgress", "completed"] },
+        "course": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/course" }] },
+        "teeTime": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/teeTime" }] },
+        "teams": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "#/$defs/team" } },
+        "authenticatedPlayer": { "$ref": "#/$defs/authenticatedPlayer" },
+        "progress": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/progress" }] },
+        "result": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/result" }] }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tournament", "matches"],
+      "properties": {
+        "tournament": { "$ref": "shared.schema.json#/$defs/tournament" },
+        "matches": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/match" } }
+      }
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  }
 }

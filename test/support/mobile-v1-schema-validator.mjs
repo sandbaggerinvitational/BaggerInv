@@ -7,6 +7,7 @@ import addFormats from "ajv-formats";
 const contractDirectory = new URL("../../contracts/mobile/v1/", import.meta.url);
 const schemaNames = [
   "shared",
+  "matches",
   "passport",
   "guide",
   "history",

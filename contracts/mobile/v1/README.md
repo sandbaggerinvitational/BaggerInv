@@ -198,7 +198,13 @@ Returns bounded tournament and Player context, at most one current match, and at
 
 ### `GET /matches`
 
-Returns participant-visible Tournament Live matches ordered by round and canonical match ID. Status is `scheduled`, `inProgress`, or `completed`. Relationships are derived only from the server-resolved Player ID. Scoring permissions/capabilities, hole inputs, internal revisions, and Director controls are excluded.
+Returns participant-visible Tournament Live matches ordered by round and canonical match ID. Status is `scheduled`, `inProgress`, or `completed`. Relationships are derived only from the server-resolved Player ID.
+
+Each Match includes the canonical `displayMatchNumber` used by the participant PWA. Each side includes its stable `teamId`. Participant rows preserve their canonical slot order and expose required-nullable `playingHandicap` and `strokesReceived` display facts from Tournament Live. `playingHandicap` is the PWA's `HCP` value; it is not Course Handicap and must never be relabeled as Course Handicap. For Best Ball and Singles, `strokesReceived` is the canonical full-Match relative allocation: `0` means “No strokes,” a positive value is presented as `+N stroke(s)`, and unavailable authority is `null`.
+
+For Scramble, each side exposes required-nullable `playingHandicap` and `strokesReceived` from the final Tournament Live presentation projection used by the PWA. That projection takes exact-key participant/team display overrides when present and otherwise uses the immutable scoring snapshot team configuration; the mobile adapter merely passes through its final values. Those values are presented as “Team Playing Handicap” and `+N team stroke(s)`; individual participant `strokesReceived` is `null` for Scramble. No handicap or stroke value is calculated by the mobile adapter.
+
+The response is capped at 64 Matches, two participants per side, and 256 KiB. Its strong representation `ETag` fingerprints the complete bounded response in addition to the Tournament Live source revision, so a visible handicap, stroke, team-identity, or Match-number change cannot incorrectly return `304`. Scoring permissions/capabilities, Course Handicap, Handicap Index, hole inputs, hole-by-hole allocations, scoring/mutation revisions, queue state, internal authority, and Director controls are excluded. `/matches` never fans out to `/scoring/current`.
 
 ### `GET /leaders`
 
