@@ -20,6 +20,7 @@
   --participant-header-height: 58px;
   --participant-nav-height: 68px;
   --participant-nav-total: calc(var(--participant-nav-height) + var(--safe-bottom));
+  --public-site-header-height: max(84px, calc(82px + var(--safe-top)));
 }
 
 @supports (height: 100svh) { :root { --app-height: 100svh; } }
@@ -143,7 +144,6 @@ button:disabled { cursor: not-allowed; }
 }
 
 .siteHeader {
-  --public-site-header-height: max(84px, calc(82px + var(--safe-top)));
   position: sticky;
   top: 0;
   z-index: 50;
@@ -872,8 +872,11 @@ footer span {
 }
 
 @media (max-width: 640px) {
-  .siteHeader {
+  :root {
     --public-site-header-height: calc(72px + var(--safe-top));
+  }
+
+  .siteHeader {
     min-height: 72px;
   }
 

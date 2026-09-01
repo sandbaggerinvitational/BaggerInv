@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { readFreshPlayerPassportSession } from "../lib/participant-session-client.js";
@@ -17,6 +18,8 @@ const hubSections = [
     { icon: "contacts", label: "Important Contacts", href: "/app/guide/contacts" },
   ] },
 ];
+
+const PUBLIC_MENU_FOCUSABLE = "a[href],button:not([disabled]),[tabindex]:not([tabindex='-1'])";
 
 function activeNavigationHrefForPath(pathname, hash) {
   const links = navigationSections.flatMap((section) => section.links);
@@ -60,11 +63,17 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   const [director, setDirector] = useState(false);
   const [capabilityRevision, setCapabilityRevision] = useState(0);
   const [tournament, setTournament] = useState({ name: "", edition: "", location: "", year: "" });
+  const [publicOverlayRoot, setPublicOverlayRoot] = useState(null);
   const menuButton = useRef(null);
   const closeButton = useRef(null);
+  const publicDialog = useRef(null);
   const publicMenuWasOpen = useRef(false);
   const shellCapabilityRevision = useRef(-1);
   const activeHref = activeNavigationHref || activeNavigationHrefForPath(pathname, hash);
+
+  useEffect(() => {
+    if (!appShell) setPublicOverlayRoot(document.body);
+  }, [appShell]);
 
   useEffect(() => {
     if (appShell) return undefined;
@@ -78,11 +87,35 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     menuButton.current?.focus({ preventScroll: true });
-    const closeOnEscape = (event) => { if (event.key === "Escape") setIsOpen(false); };
-    window.addEventListener("keydown", closeOnEscape);
+    const handlePublicMenuKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const links = [...(publicDialog.current?.querySelectorAll(PUBLIC_MENU_FOCUSABLE) || [])];
+      if (!links.length) return;
+      const first = links[0];
+      const last = links[links.length - 1];
+      if (!event.shiftKey && document.activeElement === menuButton.current) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && document.activeElement === menuButton.current) {
+        event.preventDefault();
+        last.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        menuButton.current?.focus({ preventScroll: true });
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        menuButton.current?.focus({ preventScroll: true });
+      }
+    };
+    window.addEventListener("keydown", handlePublicMenuKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", handlePublicMenuKeyDown);
     };
   }, [appShell, isOpen]);
 
@@ -208,6 +241,13 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
     </div>
   </>;
 
+  const publicOverlay = !appShell && publicOverlayRoot ? createPortal(<>
+    <div className={`menuBackdrop ${isOpen ? "show" : ""}`} onClick={() => setIsOpen(false)} />
+    <div className="menuDrawerViewport">
+      <aside ref={publicDialog} className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Site navigation">{siteContent}</aside>
+    </div>
+  </>, publicOverlayRoot) : null;
+
   return (
     <>
       <button
@@ -225,7 +265,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
 
       {appShell
         ? <Sheet open={isOpen} onClose={() => setIsOpen(false)} placement="right" label="Tournament Hub" initialFocusRef={closeButton} panelClassName="sideMenu open">{({ close }) => hubContent(close)}</Sheet>
-        : <><div className={`menuBackdrop ${isOpen ? "show" : ""}`} onClick={() => setIsOpen(false)} /><div className="menuDrawerViewport"><aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Site navigation">{siteContent}</aside></div></>}
+        : publicOverlay}
     </>
   );
 }

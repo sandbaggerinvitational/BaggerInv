@@ -7,8 +7,13 @@ import { navigationSections } from "../app/navigation.js";
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const participantDestinations = ["/home", "/my-match", "/score", "/game-center/", "/me", "/participant-auth", "/app/"];
 
-test("public drawer is clipped to the viewport at every audited responsive width", async () => {
+test("public drawer is portaled outside the filtered header and contained by the viewport", async () => {
   const [menu, css] = await Promise.all([source("app/Menu.js"), source("app/globals.css")]);
+  assert.match(menu, /import \{ createPortal \} from "react-dom"/);
+  assert.match(menu, /setPublicOverlayRoot\(document\.body\)/);
+  assert.match(menu, /createPortal\(<[\s\S]*className="menuDrawerViewport"[\s\S]*publicOverlayRoot\)/);
+  assert.match(css, /:root\s*\{[\s\S]*--public-site-header-height:\s*max\(84px,\s*calc\(82px \+ var\(--safe-top\)\)\)/);
+  assert.doesNotMatch(css, /\.siteHeader\s*\{[^}]*--public-site-header-height/s);
   assert.match(menu, /className="menuDrawerViewport"/);
   assert.match(css, /\.menuDrawerViewport\{[^}]*position:fixed;[^}]*inset:var\(--public-site-header-height\) 0 0;[^}]*overflow:clip;[^}]*contain:layout paint/s);
   assert.match(css, /\.sideMenu\s*\{[^}]*width:\s*min\(100vw,\s*520px\)/s);
@@ -30,7 +35,7 @@ test("opening public navigation preserves the exact site brand and changes only 
   assert.doesNotMatch(siteContent, /sideMenuTop|Sandbagger Invitational|sandbagger-logo\.png/);
   assert.match(menu, /aria-label=\{appShell \? "Open Tournament Hub" : isOpen \? "Close navigation menu" : "Open navigation menu"\}/);
   assert.match(menu, /onClick=\{\(\) => appShell \? setIsOpen\(true\) : setIsOpen\(\(open\) => !open\)\}/);
-  assert.match(css, /\.siteHeader\s*\{[^}]*--public-site-header-height:[^;}]+;/s);
+  assert.match(css, /:root\s*\{[\s\S]*--public-site-header-height:[^;}]+;/s);
   assert.match(css, /\.menuBackdrop\s*\{[^}]*inset:\s*var\(--public-site-header-height\) 0 0;/s);
   assert.match(css, /\.siteHeader \.menuButton\.active span:nth-child\(1\)[^}]*translateY\(7px\) rotate\(45deg\)/s);
   assert.match(css, /\.siteHeader \.menuButton\.active span:nth-child\(2\)[^}]*opacity:\s*0/s);
@@ -44,7 +49,9 @@ test("every public close path restores focus to the menu opener", async () => {
   assert.match(menu, /const publicMenuWasOpen = useRef\(false\)/);
   assert.match(menu, /requestAnimationFrame\(\(\) => menuButton\.current\?\.focus\(\{ preventScroll: true \}\)\)/);
   assert.match(menu, /ref=\{menuButton\}[\s\S]*aria-expanded=\{isOpen\}/);
-  assert.match(menu, /event\.key === "Escape"\) setIsOpen\(false\)/);
+  assert.match(menu, /event\.key === "Escape"[\s\S]*setIsOpen\(false\)/);
+  assert.match(menu, /document\.activeElement === menuButton\.current[\s\S]*first\.focus\(\)/);
+  assert.match(menu, /document\.activeElement === last[\s\S]*menuButton\.current\?\.focus/);
   assert.match(menu, /className=\{`menuBackdrop[\s\S]*onClick=\{\(\) => setIsOpen\(false\)\}/);
   assert.match(menu, /isOpen \? "Close navigation menu" : "Open navigation menu"/);
   assert.match(menu, /href=\{link\.href\}[\s\S]*onClick=\{\(\) => setIsOpen\(false\)\}/);
