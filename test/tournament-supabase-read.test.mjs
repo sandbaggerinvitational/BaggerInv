@@ -129,10 +129,11 @@ test("canonical Supabase live state produces deterministic points, progress, and
     live_revision: { totalMatchRevisions: 2 }, query_ms: 2.5,
     matches: [1, 2].map((numberValue) => ({
       round: { round_number: 1, format: "BB" },
-      match: { match_id: `2026-R1-${numberValue}`, round_number: 1, format: "BB", status: "FINAL", scoring_locked: true,
+      match: { match_id: numberValue === 1 ? "opaque-z" : "opaque-a", round_number: 1, format: "BB", status: "FINAL", scoring_locked: true,
         current_hole: 18, scored_holes: 18, holes_remaining: 0, result_winner: numberValue === 1 ? "Team 1" : "Team 2", match_revision: 1 },
       snapshot: { course_id: "TPG", tee: "Gold", par: 72, rating: 71.9, slope: 136, team_configuration: {} },
-      presentation: { display_match_number: String(numberValue), course_name: "Turtle Point", tournament_location: "Kiawah Island",
+      presentation: { display_match_number: numberValue === 1 ? "20" : "1", match_sort_order: numberValue,
+        course_name: "Turtle Point", tournament_location: "Kiawah Island",
         team_1_logo: "pickles.png", team_2_logo: "lippit.png" },
       participants: [
         { player_id: `P${numberValue}`, display_name: `Player ${numberValue}`, team_side: 1, player_slot: 1, playing_handicap: 1, final_strokes: 0 },
@@ -144,6 +145,8 @@ test("canonical Supabase live state produces deterministic points, progress, and
   };
   const data = tournamentLiveDataFromSupabaseView(view);
   assert.equal(data.rounds.length, 1);
+  assert.deepEqual(data.rounds[0].matches.map((match) => match.id), ["opaque-z", "opaque-a"]);
+  assert.deepEqual(data.rounds[0].matches.map((match) => match.match), ["20", "1"]);
   assert.equal(data.rounds[0].progress.completedMatches, 2);
   assert.equal(data.tournament.teamOne.score + data.tournament.teamTwo.score, 6);
   assert.equal(data.tournament.state.remainingMatches, 0);

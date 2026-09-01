@@ -198,7 +198,7 @@ Returns bounded tournament and Player context, at most one current match, and at
 
 ### `GET /matches`
 
-Returns participant-visible Tournament Live matches ordered by round and canonical match ID. Status is `scheduled`, `inProgress`, or `completed`. Relationships are derived only from the server-resolved Player ID.
+Returns participant-visible Tournament Live matches in the canonical order supplied by the service-only Preview RPC (`round_number`, then `match_sort_order`, with its canonical Match-ID tie-break). `displayMatchNumber` is presentation-only and is never native or mobile ordering authority. Status is `scheduled`, `inProgress`, or `completed`. Relationships are derived only from the server-resolved Player ID.
 
 Each Match includes the canonical `displayMatchNumber` used by the participant PWA. Each side includes its stable `teamId`. Participant rows preserve their canonical slot order and expose required-nullable `playingHandicap` and `strokesReceived` display facts from Tournament Live. `playingHandicap` is the PWA's `HCP` value; it is not Course Handicap and must never be relabeled as Course Handicap. For Best Ball and Singles, `strokesReceived` is the canonical full-Match relative allocation: `0` means “No strokes,” a positive value is presented as `+N stroke(s)`, and unavailable authority is `null`.
 
