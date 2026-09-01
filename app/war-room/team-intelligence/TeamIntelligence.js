@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { formatCode } from "../../../lib/prediction-engine";
+import { formatCode, pick } from "../../../lib/prediction-engine";
 import { currentTournamentYear, getTeamContext } from "../../../lib/tournament-context";
 import { buildTeamIntelligenceLineupRuntime } from "../../../lib/team-intelligence-lineup-runtime";
 import {
