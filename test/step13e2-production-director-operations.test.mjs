@@ -170,7 +170,7 @@ test("Odds UI is Supabase-publication-only and Prediction Settings authoring nev
   assert.doesNotMatch(syncRoute, /publishProductionOdds|\/api\/odds\/publish/);
 });
 
-test("side-game, Draft, Guide, and System panels honor missing-operation boundaries", async () => {
+test("side-game, Supabase-native Draft/Guide, and System panels honor operation boundaries", async () => {
   const ui = await source("app/admin/director/ProductionDirectorOperations.js");
   assert.match(ui, /Net Skins will become configurable once tournament pairings and handicap inputs are complete/);
   assert.match(ui, /No 2026 financial facts have been entered/);
@@ -178,11 +178,11 @@ test("side-game, Draft, Guide, and System panels honor missing-operation boundar
   assert.match(ui, /Rules & payout allocation/);
   assert.match(ui, /ProductionDraftEditor/);
   assert.doesNotMatch(ui, /<ProjectionSyncCard\s+domain="DRAFT"/);
-  assert.match(ui, /domain="GUIDE"/);
-  assert.match(ui, /\["STALE", "UNAVAILABLE"\]/);
-  assert.match(ui, /correctionReason/);
+  assert.match(ui, /ProductionGuideEditor/);
+  assert.doesNotMatch(ui, /<ProjectionSyncCard\s+domain="GUIDE"/);
+  assert.match(ui, /"STALE"[\s\S]*"UNAVAILABLE"/);
   assert.match(ui, /Publish Exact Auction Revision/);
-  assert.match(ui, /failed sync preserves the previous revision/i);
+  assert.match(ui, /ProductionPredictionSettingsEditor/);
   assert.match(ui, /No generic enable, disable, or unbounded retry is exposed/);
   assert.match(ui, /Allowlisted Director and tournament activity only/);
   assert.match(ui, /Raw audit payloads, internal identifiers, and infrastructure evidence are never returned/);

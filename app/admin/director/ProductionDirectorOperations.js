@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
 import ProductionDraftEditor from "./ProductionDraftEditor.js";
+import ProductionGuideEditor from "./ProductionGuideEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
 import styles from "./production-director.module.css";
 
@@ -214,63 +215,6 @@ export function TournamentDayPanel({ data, refresh }) {
     </section>)}
     <Confirmation pending={pending} busy={busy} onCancel={() => setPending(null)} onConfirm={execute} />
   </>;
-}
-
-function useRequestFingerprints() {
-  const values = useRef(new Map());
-  return useCallback(async (intent, confirm = false) => {
-    const key = JSON.stringify(intent);
-    if (confirm) { values.current.delete(key); return ""; }
-    if (values.current.has(key)) return values.current.get(key);
-    const seed = globalThis.crypto?.randomUUID?.();
-    if (!seed || !globalThis.crypto?.subtle) throw new Error("Secure operation identity is unavailable. Refresh and try again.");
-    const bytes = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${seed}\n${key}`));
-    const fingerprint = [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-    values.current.set(key, fingerprint);
-    return fingerprint;
-  }, []);
-}
-
-function ProjectionSyncCard({ domain, title, description, status, onChanged }) {
-  const [diagnosis, setDiagnosis] = useState(null);
-  const [busy, setBusy] = useState("");
-  const [message, setMessage] = useState("");
-  const [correctionReason, setCorrectionReason] = useState("");
-  const run = async (action) => {
-    setBusy(action); setMessage("");
-    try {
-      const result = await jsonRequest("/api/admin/production-director-synchronization", {
-        action,
-        domain,
-        ...(domain === "DRAFT" && action === "synchronize" ? { correctionReason } : {}),
-      });
-      setDiagnosis(result);
-      setMessage(action === "synchronize"
-        ? `${title} synchronization completed at revision ${result.revisionNumber ?? result.current?.revisionNumber ?? "current"}.`
-        : `Google source check: ${pretty(result.freshness?.status || result.freshness)}.`);
-      if (action === "synchronize") await onChanged();
-    } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
-  };
-  const freshness = diagnosis?.freshness?.status || diagnosis?.freshness || status.freshness;
-  const synchronizationAvailable = Boolean(diagnosis) && ["STALE", "UNAVAILABLE"].includes(upper(freshness));
-  const draftReasonReady = domain !== "DRAFT" || clean(correctionReason).length >= 10;
-  return <article className={styles.operationCard}>
-    <header><div><small>Google-authored · Supabase-current</small><h3>{title}</h3></div><Status value={status.available ? status.state || status.validation || "READY" : "UNAVAILABLE"} /></header>
-    <p>{description}</p>
-    <dl className={styles.compactFacts}>
-      <div><dt>Current revision</dt><dd>{status.revision ?? "Unavailable"}</dd></div>
-      <div><dt>Last synchronized</dt><dd>{timestamp(status.synchronizedAt)}</dd></div>
-      <div><dt>Source freshness</dt><dd><Status value={freshness}>{upper(freshness) === "UNKNOWN" ? "Not checked" : pretty(freshness)}</Status></dd></div>
-      {status.pickCount !== undefined ? <div><dt>Current picks</dt><dd>{status.pickCount}</dd></div> : null}
-    </dl>
-    {synchronizationAvailable && domain === "DRAFT" ? <label className={styles.operationField}>Change reason <textarea value={correctionReason} minLength={10} onChange={(event) => setCorrectionReason(event.target.value)} placeholder="Explain the Draft revision (10 characters minimum)." /><small>This is required so any completed-year correction remains attributable.</small></label> : null}
-    <div className={styles.actionRow}>
-      <button type="button" disabled={Boolean(busy)} onClick={() => run("diagnose")}>{busy === "diagnose" ? "Checking…" : "Check Google Source"}</button>
-      {synchronizationAvailable ? <button type="button" disabled={Boolean(busy) || !draftReasonReady} data-impact="high" onClick={() => run("synchronize")}>{busy === "synchronize" ? "Synchronizing…" : `Synchronize ${title}`}</button> : null}
-    </div>
-    {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
-  </article>;
 }
 
 function OddsPanel({ data, refresh }) {
@@ -536,10 +480,8 @@ export function DraftGuidePanel({ data, refresh }) {
       <ProductionDraftEditor onChanged={refresh} />
     </section>
     <section className={styles.panel}>
-      <header><span>Explicit synchronization</span><h2>Tournament Guide</h2><p>Google remains the temporary Guide authoring surface. Supabase changes only after a validated Director synchronization succeeds.</p></header>
-      <div className={styles.operationGrid}>
-        <ProjectionSyncCard domain="GUIDE" title="Tournament Guide" description="Google Guide edits do not become Production-current until this synchronization succeeds. A failed sync preserves the previous revision, and public and participant reads remain Supabase-only." status={data.projections.guide} onChanged={refresh} />
-      </div>
+      <header><span>Supabase-native authoring</span><h2>Tournament Guide</h2><p>Create a private Guide draft, validate and preview the participant-safe projection, then publish one immutable tournament-scoped revision.</p></header>
+      <ProductionGuideEditor onChanged={refresh} />
     </section>
   </>;
 }

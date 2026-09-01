@@ -93,7 +93,10 @@ export default function AdminCenter({ tournaments, previewMode = false, liveTour
           ? <div className={styles.stack}><CmsManager resource="draft-settings" {...shared} description="Schedule the draft, assign its teams and captains, set the pick count, and control the public draft presentation." /><CmsManager resource="draft-picks" {...shared} description="Build the official draft board. Player selections write directly to the Draft Picks sheet." /></div>
           : <div className={styles.readOnly}><div><p>Legacy / non-authoritative</p><h2>Production Draft moved to the Director Console</h2><span>The Google Draft Settings and Draft Picks tabs remain available as historical records, but later edits do not change the Production Draft. Use the Supabase-native Director workflow for authoritative revisions.</span></div><a href="/admin/director?section=draft-guide">Open Director Draft →</a></div>
         : null}
-        {active === "schedule" ? <CmsManager resource="schedule" {...shared} description="Build the tournament-week itinerary, connect rounds and courses, publish events, and reorder the schedule." /> : null}
+        {active === "schedule" ? previewMode
+          ? <CmsManager resource="schedule" {...shared} description="Build the tournament-week itinerary, connect rounds and courses, publish events, and reorder the schedule." />
+          : <div className={styles.readOnly}><div><p>Legacy / non-authoritative</p><h2>Production Guide moved to the Director Console</h2><span>The Google Tournament Itinerary tab remains available as a historical record, but later edits do not change the Production Guide.</span></div><a href="/admin/director?section=draft-guide">Open Director Guide →</a></div>
+        : null}
         {active === "courses" ? <CmsManager resource="courses" {...shared} description="Manage the selected year's course assignments, tees, ratings, yardage, imagery, and GPS links." /> : null}
         {active === "matches" ? <CmsManager resource="matches" {...shared} description="Create and edit official pairings, formats, tee times, starting holes, and match status." /> : null}
         {active === "live-scoring" ? liveTournamentV2
@@ -101,7 +104,10 @@ export default function AdminCenter({ tournaments, previewMode = false, liveTour
           : <div className={styles.readOnly}><h2>Live Scoring Preview Disabled</h2><p>The Phase 8 preview feature flag is not enabled in this environment.</p></div>
         : null}
         {active === "standings" ? <StandingsPanel secret={secret} year={tournament?.year} /> : null}
-        {active === "guide" ? <GuideEditor tournaments={tournaments} embedded sharedSecret={secret} sharedUpdatedBy={updatedBy} selectedTournamentId={tournamentId} onTournamentChange={selectTournament} /> : null}
+        {active === "guide" ? previewMode
+          ? <GuideEditor tournaments={tournaments} embedded sharedSecret={secret} sharedUpdatedBy={updatedBy} selectedTournamentId={tournamentId} onTournamentChange={selectTournament} />
+          : <div className={styles.readOnly}><div><p>Legacy / non-authoritative</p><h2>Production Guide moved to the Director Console</h2><span>The former Google Guide editor is retained only in isolated Preview. Production Guide drafts, validation, preview, and publication now use Supabase.</span></div><a href="/admin/director?section=draft-guide">Open Director Guide →</a></div>
+        : null}
         {active === "odds" ? <OddsAdmin embedded sharedSecret={secret} previewMode={previewMode} /> : null}
         {active === "media" ? <CmsManager resource="media" {...shared} description="Catalog approved logos, hero images, course photos, player photos, and championship artwork for use throughout the site." /> : null}
         {active === "history" ? <CmsManager resource="awards" {...shared} title="History & Awards" description="Manage year-specific awards and winners. Championship team and final score remain in the Tournament record." /> : null}

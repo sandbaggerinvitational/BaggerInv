@@ -91,7 +91,7 @@ test("Director Draft workflow is bounded, idempotent, review-first, and keeps co
   assert.doesNotMatch(editor, /Raw JSON|payload hash|source fingerprint|internal SQL|RPC name/i);
 });
 
-test("Draft replaces only its Director synchronization card and leaves Guide synchronization intact", async () => {
+test("Draft remains Supabase-native while the subsequent Guide migration replaces its own synchronization card", async () => {
   const [operations, admin] = await Promise.all([
     read("../app/admin/director/ProductionDirectorOperations.js"),
     read("../app/admin/AdminCenter.js"),
@@ -100,8 +100,9 @@ test("Draft replaces only its Director synchronization card and leaves Guide syn
   assert.match(operations, /import ProductionDraftEditor/);
   assert.match(operations, /<ProductionDraftEditor onChanged=\{refresh\}/);
   assert.doesNotMatch(operations, /<ProjectionSyncCard\s+domain="DRAFT"/);
-  assert.match(operations, /<ProjectionSyncCard domain="GUIDE" title="Tournament Guide"/);
-  assert.match(operations, /Google remains the temporary Guide authoring surface/);
+  assert.match(operations, /import ProductionGuideEditor/);
+  assert.match(operations, /<ProductionGuideEditor onChanged=\{refresh\}/);
+  assert.doesNotMatch(operations, /<ProjectionSyncCard domain="GUIDE"/);
   assert.match(operations, /Supabase-native authoring/);
   assert.match(operations, /\["DRAFT", "Draft"\]/);
 

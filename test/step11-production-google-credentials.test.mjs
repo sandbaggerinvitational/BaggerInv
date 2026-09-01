@@ -303,12 +303,19 @@ test("the exact isolated candidate may certify metadata but cannot select synchr
   assert.equal(metadata.allowed, true);
   assert.equal(metadata.candidateMetadataReadApproved, true);
   assert.equal(metadata.policy.googleWrite, false);
-  for (const operation of ["GUIDE_SYNCHRONIZATION", "SCORING_GOOGLE_OUTBOX", "ODDS_GOOGLE_MIRROR"]) {
+  for (const operation of ["SCORING_GOOGLE_OUTBOX", "ODDS_GOOGLE_MIRROR"]) {
     const state = productionGoogleCredentialEnvironment({ env: candidateEnv, operation, resources });
     assert.equal(state.allowed, false, operation);
     assert.equal(state.candidateMetadataReadApproved, false, operation);
     assert.equal(state.reason, "production-environment-required", operation);
   }
+  const retiredGuide = productionGoogleCredentialEnvironment({
+    env: candidateEnv,
+    operation: "GUIDE_SYNCHRONIZATION",
+    resources,
+  });
+  assert.equal(retiredGuide.allowed, false);
+  assert.equal(retiredGuide.reason, "production-google-operation-not-allowed");
 });
 
 test("candidate metadata certification still rejects Preview or inexact workbook resources", () => {
@@ -361,7 +368,7 @@ test("the Preview/legacy identity cannot masquerade as the Production worker ide
   ]) {
     const state = productionGoogleCredentialEnvironment({
       env,
-      operation: "PRODUCTION_WORKBOOK_METADATA_READ",
+      operation: "NET_SKINS_SYNCHRONIZATION",
       resources,
     });
     assert.equal(state.allowed, false);
@@ -385,7 +392,7 @@ test("Production selection rejects every Preview or inexact resource boundary", 
   for (const [env, requested, reason] of cases) {
     const state = productionGoogleCredentialEnvironment({
       env,
-      operation: "GUIDE_SYNCHRONIZATION",
+      operation: "NET_SKINS_SYNCHRONIZATION",
       resources: requested,
     });
     assert.equal(state.allowed, false, reason);
@@ -491,7 +498,6 @@ test("the allowlist contains synchronization, mirror, archive, and metadata only
   for (const required of [
     "PRODUCTION_WORKBOOK_METADATA_READ",
     "CANONICAL_LEGACY_V2",
-    "GUIDE_SYNCHRONIZATION",
     "SCORING_GOOGLE_OUTBOX",
     "ROUND_SCORECARDS_ARCHIVE",
     "ODDS_GOOGLE_MIRROR",
@@ -504,6 +510,7 @@ test("the allowlist contains synchronization, mirror, archive, and metadata only
     "PREVIEW_RESET",
     "PREDICTION_SETTINGS_SYNCHRONIZATION",
     "DRAFT_SYNCHRONIZATION",
+    "GUIDE_SYNCHRONIZATION",
   ]) assert.equal(operations.includes(forbidden), false);
   assert.throws(
     () => assertProductionGoogleCredentialEnvironment({

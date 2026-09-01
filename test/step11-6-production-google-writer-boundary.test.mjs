@@ -1337,7 +1337,7 @@ test("low-level Production transport binds each mutation intent and operation to
   });
 });
 
-test("noncanonical and direct-deployment hosts fail before authoring selects a credential", () => {
+test("retired Production Guide authoring fails before host, resource, credential, or callback dispatch", () => {
   const authoringUrl = new URL("../lib/production-google-authoring.js", import.meta.url).href;
   const intentUrl = new URL("../lib/google-workbook-mutation-intent.js", import.meta.url).href;
   const foundationUrl = new URL("../lib/production-foundation-resource-contract.js", import.meta.url).href;
@@ -1378,8 +1378,8 @@ test("noncanonical and direct-deployment hosts fail before authoring selects a c
   assert.equal(child.status, 0, child.stderr);
   assert.deepEqual(JSON.parse(child.stdout), {
     callbacks: 0,
-    results: ["PRODUCTION_CUTOVER_REQUEST_UNAVAILABLE", "PRODUCTION_CUTOVER_REQUEST_UNAVAILABLE",
-      "PRODUCTION_GOOGLE_AUTHORING_RESOURCE_MISMATCH"],
+    results: ["PRODUCTION_GUIDE_GOOGLE_AUTHORING_RETIRED", "PRODUCTION_GUIDE_GOOGLE_AUTHORING_RETIRED",
+      "PRODUCTION_GUIDE_GOOGLE_AUTHORING_RETIRED"],
   });
 });
 

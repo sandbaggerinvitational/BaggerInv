@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { deleteTournamentGuideRecord, readTournamentGuideAdminData, saveTournamentGuideRecord } from "../../../lib/google-sheets-write";
 import { directorTransactionError } from "../../../lib/director-transaction-error";
 import { withProductionGoogleAuthoringWrite } from "../../../lib/production-google-authoring.js";
 import { GOOGLE_AUTHORING_OPERATIONS } from "../../../lib/google-workbook-mutation-intent.js";
@@ -16,9 +15,24 @@ function deny() {
   return NextResponse.json({ error: "Invalid admin password." }, { status: 401 });
 }
 
+function retiredProductionGuide() {
+  if (String(process.env.VERCEL_ENV || "").trim().toLowerCase() !== "production") return null;
+  return NextResponse.json({
+    error: "Production Tournament Guide content is managed in the Director Console.",
+    code: "PRODUCTION_GUIDE_GOOGLE_AUTHORING_RETIRED",
+  }, { status: 410, headers: { "Cache-Control": "private, no-store" } });
+}
+
+async function legacyPreviewGuideRuntime() {
+  return import("../../../lib/google-sheets-write");
+}
+
 export async function GET(request) {
+  const retired = retiredProductionGuide();
+  if (retired) return retired;
   if (!authorized(request)) return deny();
   try {
+    const { readTournamentGuideAdminData } = await legacyPreviewGuideRuntime();
     return NextResponse.json({ data: await readTournamentGuideAdminData() });
   } catch (error) {
     console.error("Tournament Guide admin load failed", { sheet: "Guide tabs", reason: error?.message || String(error), stack: error?.stack });
@@ -27,8 +41,11 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const retired = retiredProductionGuide();
+  if (retired) return retired;
   if (!authorized(request)) return deny();
   try {
+    const { saveTournamentGuideRecord } = await legacyPreviewGuideRuntime();
     const { type, record, updatedBy } = await request.json();
     const saved = await withProductionGoogleAuthoringWrite({
       request,
@@ -42,8 +59,11 @@ export async function POST(request) {
 }
 
 export async function DELETE(request) {
+  const retired = retiredProductionGuide();
+  if (retired) return retired;
   if (!authorized(request)) return deny();
   try {
+    const { deleteTournamentGuideRecord } = await legacyPreviewGuideRuntime();
     const { type, id, updatedBy } = await request.json();
     return NextResponse.json(await withProductionGoogleAuthoringWrite({
       request,

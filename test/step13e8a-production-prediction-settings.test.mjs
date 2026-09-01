@@ -177,7 +177,7 @@ test("migration 080 is additive and inert while implementing the bounded revisio
     /update scoring_authority\.odds_publication_current/i);
 });
 
-test("Production Google Prediction Settings and Draft authoring are retired without retiring Preview, Guide, or archives", async () => {
+test("Production Google Prediction Settings, Draft, and Guide authoring are retired without retiring Preview or archives", async () => {
   const [syncRoute, syncService, cmsRoute, calibration, credential,
     intent, inventory, directorOperations] = await Promise.all([
     readFile(new URL("../app/api/admin/production-director-synchronization/route.js", import.meta.url), "utf8"),
@@ -201,12 +201,14 @@ test("Production Google Prediction Settings and Draft authoring are retired with
     /\[GOOGLE_AUTHORING_OPERATIONS\.ADMIN_CMS_PREDICTION_SETTINGS\]:/);
   assert.doesNotMatch(inventory,
     /^\s*PREDICTION_SETTINGS:\s*GOOGLE_AUTHORING_OPERATIONS/m);
-  assert.match(credential, /GUIDE_SYNCHRONIZATION/);
+  assert.doesNotMatch(credential,
+    /^\s*GUIDE_SYNCHRONIZATION:\s*Object\.freeze/m);
   assert.match(credential, /ROUND_SCORECARDS_ARCHIVE/);
-  assert.match(inventory, /GUIDE_PRESENTATION/);
+  assert.doesNotMatch(inventory,
+    /^\s*GUIDE:\s*GOOGLE_AUTHORING_OPERATIONS/m);
   assert.doesNotMatch(directorOperations,
     /<ProjectionSyncCard\s+domain="PREDICTION_SETTINGS"/);
-  assert.match(directorOperations, /domain="GUIDE"/);
+  assert.match(directorOperations, /ProductionGuideEditor/);
   assert.match(directorOperations, /ProductionDraftEditor/);
   assert.doesNotMatch(directorOperations, /<ProjectionSyncCard\s+domain="DRAFT"/);
 });

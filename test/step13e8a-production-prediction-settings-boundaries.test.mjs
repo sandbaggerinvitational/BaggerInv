@@ -542,7 +542,7 @@ function runServerScript(body) {
   return JSON.parse(result.stdout.trim());
 }
 
-test("retired Google Prediction Settings and Draft cannot alter Supabase state while Guide remains callable", () => {
+test("retired Google Prediction Settings, Draft, and Guide cannot alter Supabase state", () => {
   const result = runServerScript(`
     const configuration = { revision: 2, value: 35 };
     let retiredDependencies = 0;
@@ -589,9 +589,9 @@ test("retired Google Prediction Settings and Draft cannot alter Supabase state w
   assert.equal(result.retiredDependencies, 0);
   assert.equal(result.retiredCode,
     "PRODUCTION_PREDICTION_SETTINGS_GOOGLE_AUTHORING_RETIRED");
-  assert.equal(result.retained.GUIDE.rpcCalls, 1);
+  assert.equal(result.retained.GUIDE.rpcCalls, 0);
   assert.equal(result.retained.GUIDE.code,
-    "PRODUCTION_DIRECTOR_SYNC_CONTEXT_UNAVAILABLE");
+    "PRODUCTION_GUIDE_GOOGLE_AUTHORING_RETIRED");
   assert.equal(result.retained.DRAFT.rpcCalls, 0);
   assert.equal(result.retained.DRAFT.code,
     "PRODUCTION_DRAFT_GOOGLE_AUTHORING_RETIRED");

@@ -256,7 +256,7 @@ test("CURRENT Draft dispatch follows the annual pointer while explicit history r
   assert.equal(result.reads, 1);
 });
 
-test("Production Google Draft authoring is retired while Preview intent and Guide credentials remain", async () => {
+test("Production Google Draft and Guide authoring are retired while Preview intent remains", async () => {
   const [cms, syncRoute, syncService, credential, intent, inventory, api] = await Promise.all([
     readFile(new URL("../app/api/admin/cms/route.js", import.meta.url), "utf8"),
     readFile(new URL("../app/api/admin/production-director-synchronization/route.js", import.meta.url), "utf8"),
@@ -270,11 +270,11 @@ test("Production Google Draft authoring is retired while Preview intent and Guid
     assert.match(source, /PRODUCTION_DRAFT_GOOGLE_AUTHORING_RETIRED/);
   }
   assert.doesNotMatch(credential, /^\s*DRAFT_SYNCHRONIZATION:\s*Object\.freeze/m);
-  assert.match(credential, /^\s*GUIDE_SYNCHRONIZATION:\s*Object\.freeze/m);
+  assert.doesNotMatch(credential, /^\s*GUIDE_SYNCHRONIZATION:\s*Object\.freeze/m);
   assert.match(intent, /\[GOOGLE_AUTHORING_OPERATIONS\.ADMIN_CMS_DRAFT\]:\s*sheetSet\(/,
     "the isolated Preview Draft editor retains its bounded workbook intent");
   assert.doesNotMatch(inventory, /^\s*DRAFT:\s*GOOGLE_AUTHORING_OPERATIONS/m);
-  assert.match(inventory, /^\s*GUIDE:\s*GOOGLE_AUTHORING_OPERATIONS/m);
+  assert.doesNotMatch(inventory, /^\s*GUIDE:\s*GOOGLE_AUTHORING_OPERATIONS/m);
   assert.match(api, /new Set\(\["stage", "validate", "commit", "copy-previous"\]\)/);
   assert.doesNotMatch(api, /record-pick|reset-picks/);
 });
