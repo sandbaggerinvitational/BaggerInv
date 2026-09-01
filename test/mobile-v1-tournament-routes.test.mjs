@@ -94,7 +94,14 @@ function canonicalTournamentLiveView() {
     rounds: [{ tournament_id: "2026", round_number: 1, name: "Round 1", format: "BB" }],
     tournament_presentation: {
       source_fingerprint: "a".repeat(64),
-      presentation: { tournament: { status: "Live", currentRound: 1, timeZone: "America/New_York" } },
+      presentation: {
+        tournament: { status: "Live", currentRound: 1, timeZone: "America/New_York" },
+        tournamentMatchDisplay: {
+          "2026-R1-1": {
+            team1Players: [{ id: "P1", playingHcp: null, stroke: null }],
+          },
+        },
+      },
     },
     live_revision: { totalMatchRevisions: 1 },
     query_ms: 1,
@@ -231,6 +238,8 @@ test("matches route composes its strict response with private 200 to 304 revalid
       assertMobileV1Schema("matches", body);
       assert.equal(body.data.matches[0].teams[0].teamId, "T1");
       assert.equal(body.data.matches[0].displayMatchNumber, "1");
+      assert.equal(body.data.matches[0].teams[0].participants[0].playingHandicap, 7.5);
+      assert.equal(body.data.matches[0].teams[0].participants[0].strokesReceived, 0);
       assert.deepEqual(rpcBodies[0], { target_tournament_id: "2026" });
 
       const second = await matchesGET(new Request(url, {
