@@ -7,6 +7,7 @@ import {
   absoluteUrl,
   pageMetadata,
 } from "../lib/seo";
+import { browserInstallabilityEnabled } from "../lib/browser-installability-policy";
 import PwaFoundation from "./PwaFoundation";
 import ParticipantIdentity from "./ParticipantIdentity";
 import PwaLaunchSplash from "./PwaLaunchSplash";
@@ -20,6 +21,7 @@ const homeMetadata = pageMetadata({
   description: DEFAULT_DESCRIPTION,
   path: "/",
 });
+const installabilityEnabled = browserInstallabilityEnabled();
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -69,7 +71,7 @@ export const metadata = {
       sizes: "180x180",
     },
   },
-  manifest: "/manifest.webmanifest",
+  ...(installabilityEnabled ? { manifest: "/manifest.webmanifest" } : {}),
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -155,7 +157,7 @@ const appleStartupImages = metadata.appleWebApp.startupImage;
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" data-browser-installability={installabilityEnabled ? "enabled" : "retired"}>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="The Bagger" />
@@ -171,7 +173,7 @@ export default function RootLayout({ children }) {
         <DirectorTransactionStatus />
         <ParticipantRouteFrame navigation={<Suspense fallback={null}><ParticipantIdentity /></Suspense>}>{children}</ParticipantRouteFrame>
         <Analytics />
-        <PwaFoundation />
+        <PwaFoundation installabilityEnabled={installabilityEnabled} />
         <Suspense fallback={null}><ParticipantAuthDiagnostics /></Suspense>
       </body>
     </html>

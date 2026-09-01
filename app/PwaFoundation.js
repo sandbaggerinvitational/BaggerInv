@@ -6,7 +6,7 @@ import { participantAppShellRoute } from "../lib/participant-shell.js";
 import styles from "./pwa-foundation.module.css";
 import { ConnectionBanner } from "./ui/StatePrimitives";
 
-export default function PwaFoundation() {
+export default function PwaFoundation({ installabilityEnabled = false }) {
   const pathname = usePathname();
   const [prompt, setPrompt] = useState(null);
   const [dismissed, setDismissed] = useState(true);
@@ -49,7 +49,7 @@ export default function PwaFoundation() {
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
     const ios = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-    setShowIosHelp(ios && !standalone);
+    setShowIosHelp(installabilityEnabled && ios && !standalone);
     const capture = (event) => {
       event.preventDefault();
       window.__sbiInstallPrompt = event;
@@ -61,21 +61,25 @@ export default function PwaFoundation() {
       window.__sbiInstallPrompt = null;
       window.dispatchEvent(new Event("sbi:pwa-installed"));
     };
-    window.addEventListener("beforeinstallprompt", capture);
-    window.addEventListener("appinstalled", installed);
+    if (installabilityEnabled) {
+      window.addEventListener("beforeinstallprompt", capture);
+      window.addEventListener("appinstalled", installed);
+    }
     return () => {
-      window.removeEventListener("beforeinstallprompt", capture);
-      window.removeEventListener("appinstalled", installed);
+      if (installabilityEnabled) {
+        window.removeEventListener("beforeinstallprompt", capture);
+        window.removeEventListener("appinstalled", installed);
+      }
       window.removeEventListener("online", syncOnlineState);
       window.removeEventListener("offline", syncOnlineState);
       if (controllerChangeHandler) navigator.serviceWorker.removeEventListener("controllerchange", controllerChangeHandler);
     };
-  }, []);
+  }, [installabilityEnabled]);
 
   if (!participantPresentation) return null;
   if (!online) return <ConnectionBanner state="offline">You’re offline. Saved information stays available.</ConnectionBanner>;
   if (updateReady) return <aside className={styles.update} role="status"><p>A newer version of SBI is ready.</p><button type="button" onClick={() => window.location.reload()}>Update</button></aside>;
-  if (!showGlobalInstall || dismissed || (!prompt && !showIosHelp)) return null;
+  if (!installabilityEnabled || !showGlobalInstall || dismissed || (!prompt && !showIosHelp)) return null;
   return <aside className={`${styles.install} pwaInstallGuidance`} aria-label="Install The Bagger app">
     <div><strong>Install The Bagger</strong><ol aria-label="Installation steps"><li>Tap Share</li><li>Add to Home Screen</li><li>Tap Add</li></ol></div>
     <button className={styles.dismiss} type="button" aria-label="Dismiss install guidance" onClick={() => { setDismissed(true); window.localStorage.setItem("sbi-pwa-prompt-dismissed", "true"); }}>×</button>

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import manifest from "../app/manifest.js";
+import manifest from "../lib/web-app-manifest.js";
 import { applyParticipantFinalizationResult } from "../lib/scoring-finalization-state.js";
 import { readParticipantScoringMatch } from "../lib/scoring-read-service.js";
 import { requireScoringReadSource, scoringReadEnvironment } from "../lib/scoring-read-source.js";

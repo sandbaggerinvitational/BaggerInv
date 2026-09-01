@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { accessCodeMatches, accessTokenMatches, hashAccessCode, hashAccessToken } from "../lib/live-hole-scoring.js";
 import { canScoreMatch, createScoringSession, participantSessionMatchesAccess, verifyScoringSession } from "../lib/scoring-access.js";
-import manifest from "../app/manifest.js";
+import manifest from "../lib/web-app-manifest.js";
 
 const secret = "participant-session-secret-long-enough";
 const salt = "participant-access-test-salt";

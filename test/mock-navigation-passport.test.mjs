@@ -56,7 +56,7 @@ test("My Match navigation always opens the dashboard instead of restoring a scor
     source("app/game-center/GameCenter.js"),
     source("app/me/ParticipantProfile.js"),
     source("app/activate/PlayerPassportActivation.js"),
-    source("app/manifest.js"),
+    source("lib/web-app-manifest.js"),
   ]);
 
   assert.match(navigation, /href:\s*"\/my-match",\s*label:\s*"My Match"/);
@@ -99,15 +99,16 @@ test("legacy public site remains separate from participant Home", async () => {
   assert.match(admin, /Open public site/);
 });
 
-test("every administrative brand header returns to PWA Home", async () => {
+test("administrative pages use the public brand home while Production redirects to the canonical Console", async () => {
   const [adminPage, directorPage] = await Promise.all([
     source("app/admin/page.js"),
     source("app/admin/director/page.js"),
   ]);
-  assert.match(adminPage, /<Header homeHref="\/home"/);
-  assert.match(directorPage, /<Header homeHref="\/home"/);
-  assert.doesNotMatch(adminPage, /<Header\s*\/>/);
-  assert.doesNotMatch(directorPage, /<Header\s*\/>/);
+  assert.match(adminPage, /if \(process\.env\.VERCEL_ENV === "production"\) redirect\("\/admin\/director"\)/);
+  assert.match(adminPage, /<Header\s*\/>/);
+  assert.match(directorPage, /<Header\s*\/>/);
+  assert.doesNotMatch(adminPage, /<Header homeHref="\/home"/);
+  assert.doesNotMatch(directorPage, /<Header homeHref="\/home"/);
 });
 
 test("Home status follows the resolved tournament state", () => {

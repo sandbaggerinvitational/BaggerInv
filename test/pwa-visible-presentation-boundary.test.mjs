@@ -33,7 +33,7 @@ test("public routes cannot receive install, offline, update, splash, or particip
 
   const foundationGate = foundation.indexOf("if (!participantPresentation) return null");
   assert.ok(foundationGate >= 0);
-  for (const visiblePresentation of ["if (!online)", "if (updateReady)", "if (!showGlobalInstall"]) {
+  for (const visiblePresentation of ["if (!online)", "if (updateReady)", "if (!installabilityEnabled || !showGlobalInstall"]) {
     assert.ok(foundationGate < foundation.indexOf(visiblePresentation), visiblePresentation);
   }
   assert.match(splash, /classList\.remove\("pwa-cold-launch", "pwa-home-entering"\)/);

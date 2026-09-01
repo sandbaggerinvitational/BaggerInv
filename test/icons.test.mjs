@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import manifest from "../app/manifest.js";
+import manifest from "../lib/web-app-manifest.js";
 
 const PNG_SIGNATURE = "89504e470d0a1a0a";
 

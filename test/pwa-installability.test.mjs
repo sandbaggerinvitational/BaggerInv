@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("PWA foundation registers the service worker and supports install guidance", async () => {
+test("PWA foundation retains the service worker and gates Preview install guidance", async () => {
   const source = await readFile(
     new URL("../app/PwaFoundation.js", import.meta.url),
     "utf8",
@@ -10,6 +10,8 @@ test("PWA foundation registers the service worker and supports install guidance"
   assert.match(source, /serviceWorker\.register\("\/sw\.js", \{ updateViaCache: "none" \}\)/);
   assert.match(source, /registration\.update\(\)/);
   assert.match(source, /beforeinstallprompt/);
+  assert.match(source, /if \(installabilityEnabled\) \{/);
+  assert.match(source, /if \(!installabilityEnabled \|\| !showGlobalInstall/);
   assert.match(source, /Add to Home Screen/);
   assert.match(source, /Tap Share/);
   assert.match(source, /Tap Add/);
@@ -54,7 +56,7 @@ test("offline page does not imply that scores can be saved offline", async () =>
 test("iPhone release metadata uses safe-area viewport, launch images, and a maskable icon", async () => {
   const [layout, manifestSource] = await Promise.all([
     readFile(new URL("../app/layout.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/manifest.js", import.meta.url), "utf8"),
+    readFile(new URL("../lib/web-app-manifest.js", import.meta.url), "utf8"),
   ]);
   assert.match(layout, /viewportFit: "cover"/);
   assert.match(layout, /statusBarStyle: "black-translucent"/);

@@ -42,15 +42,22 @@ function standalone() {
 export default function PlayerSetupBanner({ readiness, onUpdated }) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [installabilityEnabled, setInstallabilityEnabled] = useState(false);
 
   useEffect(() => {
-    if (!readiness) return undefined;
+    setInstallabilityEnabled(
+      document.documentElement.dataset.browserInstallability !== "retired",
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!readiness || !installabilityEnabled) return undefined;
     const installed = () => saveReadiness({ pwaInstalled: true }).then(onUpdated).catch(() => {});
     window.addEventListener("sbi:pwa-installed", installed);
     return () => {
       window.removeEventListener("sbi:pwa-installed", installed);
     };
-  }, [onUpdated]);
+  }, [installabilityEnabled, onUpdated, readiness]);
 
   useEffect(() => {
     if (!readiness || readiness.pwaInstalled || !standalone()) return;
@@ -65,6 +72,8 @@ export default function PlayerSetupBanner({ readiness, onUpdated }) {
   }, [readiness, onUpdated]);
 
   if (!readiness || (readiness.pwaInstalled && (readiness.notificationReady || readiness.notificationsEnabled))) return null;
+
+  if (!readiness.pwaInstalled && !installabilityEnabled) return null;
 
   if (!readiness.pwaInstalled) return <aside className={styles.banner} aria-label="Tournament app setup">
     <span aria-hidden="true">📱</span><div><strong>Get the full tournament experience</strong><p>Add The Bagger to your Home Screen:</p><ol aria-label="Installation steps"><li>Tap Share</li><li>Add to Home Screen</li><li>Tap Add</li></ol>{message ? <small role="status">{message}</small> : null}</div>

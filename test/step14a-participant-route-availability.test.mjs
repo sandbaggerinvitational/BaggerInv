@@ -76,7 +76,7 @@ test("participant entry points remain owned by the PWA without public navigation
     source("app/PersonalizedPlayerHome.js"),
     source("app/me/ParticipantProfile.js"),
     source("app/game-center/GameCenter.js"),
-    source("app/manifest.js"),
+    source("lib/web-app-manifest.js"),
     source("lib/notification-templates.js"),
   ]);
 

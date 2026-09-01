@@ -48,7 +48,7 @@ test("splash consumes participant Home initialization and never attaches to the 
 
 test("launch is an opaque splash scene followed by a separate Home entrance", async () => {
   const [layout, frame, splash, manifest] = await Promise.all([
-    source("app/layout.js"), source("app/ParticipantRouteFrame.js"), source("app/PwaLaunchSplash.js"), source("app/manifest.js"),
+    source("app/layout.js"), source("app/ParticipantRouteFrame.js"), source("app/PwaLaunchSplash.js"), source("lib/web-app-manifest.js"),
   ]);
   assert.match(layout, /<ParticipantRouteFrame navigation=\{<Suspense fallback=\{null\}><ParticipantIdentity \/><\/Suspense>\}>\{children\}<\/ParticipantRouteFrame>/);
   assert.match(frame, /className="pwa-app-scene"/);
