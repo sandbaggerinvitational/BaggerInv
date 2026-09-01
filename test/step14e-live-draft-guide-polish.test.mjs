@@ -78,6 +78,27 @@ test("Draft averages remain unavailable unless every active team member has a ca
   assert.equal(result.teams[0].averageHandicap, null);
 });
 
+test("Draft averages consume the existing Production leaderboard roster shape", () => {
+  const draft = {
+    year: 2026,
+    teams: [
+      { id: "PICKLES", side: "Team 1", averageHandicap: null },
+      { id: "LIPPIT", side: "Team 2", averageHandicap: null },
+    ],
+    picks: [],
+    rosters: [],
+  };
+  const players = [
+    { player_id: "A", team_side: 1, participation_status: "ACTIVE", tournament_source_payload: { "Tournament Handicap": "5.5" } },
+    { player_id: "B", team_side: 1, participation_status: "ACTIVE", tournament_source_payload: { "Tournament Handicap": "6.5" } },
+    { player_id: "C", team_side: 2, participation_status: "ACTIVE", tournament_source_payload: { "Tournament Handicap": "7.5" } },
+    { player_id: "D", team_side: 2, participation_status: "ACTIVE", tournament_source_payload: { "Tournament Handicap": "8.5" } },
+  ];
+  const result = withCanonicalDraftTeamAverages(draft, players, { tournamentId: "2026" });
+  assert.equal(result.teams[0].averageHandicap, 6);
+  assert.equal(result.teams[1].averageHandicap, 8);
+});
+
 test("Guide overview fallback promises only published domains", () => {
   const content = {
     schedule: [],
@@ -106,7 +127,7 @@ test("Step 14E presentation wiring preserves semantic and public boundaries", as
   assert.doesNotMatch(card, /Last confirmed \{match\.updatedAt\}/);
   assert.match(matchCenter, /now=\{clock\}/);
   assert.match(draftPage, /withCanonicalDraftTeamAverages/);
-  assert.match(draftPage, /readTournamentLiveView/);
+  assert.match(draftPage, /readLeaderboardsCoreView/);
   assert.match(draftCss, /min-height:44px/);
   assert.match(guide, /publicGuideOverviewFallback\(content\)/);
   assert.match(appGuide, /participantPresentation: true/);
