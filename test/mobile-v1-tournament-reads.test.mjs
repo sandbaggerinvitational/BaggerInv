@@ -53,12 +53,18 @@ function match(id, status, playerIds = ["P1", "P2", "P3", "P4"], overrides = {})
 }
 
 function matchesDependencies(rows, revision = "live-r2") {
+  return matchesRoundDependencies([
+    { number: 2, label: "Round 2", format: "BB", matches: rows },
+  ], revision);
+}
+
+function matchesRoundDependencies(rounds, revision = "live-r2") {
   return {
     requireTournamentReadSource: source,
     readTournamentLiveView: async () => rpc({ marker: true }),
     readGuideProjection: async () => guide(),
     tournamentLiveDataFromSupabaseView: () => ({ revision, tournament: tournament(),
-      rounds: [{ number: 2, label: "Round 2", format: "BB", matches: rows }] }),
+      rounds }),
     applyGuideCoursesToTournament: (value) => value,
   };
 }
@@ -91,11 +97,11 @@ test("today maps canonical participant, live match, published schedule, and no-m
 test("matches preserves canonical ordering, lifecycle, relationships, and excludes scoring authority", async () => {
   const rows = [match("M3", "Final"), match("M1", "Upcoming"), match("M2", "Live")];
   const result = await mobileMatchesResult(identity, { now, dependencies: matchesDependencies(rows) });
-  assert.deepEqual(result.body.data.matches.map((row) => row.matchId), ["M1", "M2", "M3"]);
-  assert.deepEqual(result.body.data.matches.map((row) => row.status), ["scheduled", "inProgress", "completed"]);
-  assert.deepEqual(result.body.data.matches.map((row) => row.displayMatchNumber), ["1", "2", "3"]);
-  assert.equal(result.body.data.matches[1].progress.currentHole, 7);
-  assert.equal(result.body.data.matches[2].result.teamOnePoints, 2);
+  assert.deepEqual(result.body.data.matches.map((row) => row.matchId), ["M3", "M1", "M2"]);
+  assert.deepEqual(result.body.data.matches.map((row) => row.status), ["completed", "scheduled", "inProgress"]);
+  assert.deepEqual(result.body.data.matches.map((row) => row.displayMatchNumber), ["3", "1", "2"]);
+  assert.equal(result.body.data.matches[2].progress.currentHole, 7);
+  assert.equal(result.body.data.matches[0].result.teamOnePoints, 2);
   assert.equal(result.body.data.matches[0].teams[0].teamId, "T1");
   assert.equal(result.body.data.matches[0].teams[1].teamId, "T2");
   const serialized = JSON.stringify(result.body);
@@ -103,6 +109,70 @@ test("matches preserves canonical ordering, lifecycle, relationships, and exclud
     if (forbidden === "revision") continue;
     assert.equal(serialized.includes(forbidden), false);
   }
+});
+
+test("matches preserves canonical BB, Scramble, and Singles order through Match 12", async () => {
+  const uninvolvedPlayers = ["P5", "P6", "P7", "P8"];
+  const roundMatches = ({ round, format, formatName, count }) => Array.from(
+    { length: count },
+    (_, index) => {
+      const numberValue = index + 1;
+      return match(
+        `opaque-r${round}-${String(count - numberValue + 1).padStart(2, "0")}`,
+        "Upcoming",
+        round === 3 && numberValue === 7
+          ? ["P1", "P2", "P3", "P4"]
+          : uninvolvedPlayers,
+        {
+          round,
+          match: String(numberValue),
+          format,
+          formatName,
+          ...(format === "SC" ? {
+            team1PlayingHcp: 3.5,
+            team2PlayingHcp: 4.25,
+            team1Stroke: 0,
+            team2Stroke: 2,
+          } : {}),
+        },
+      );
+    },
+  );
+  const rounds = [
+    { number: 1, label: "Round 1", format: "BB",
+      matches: roundMatches({ round: 1, format: "BB", formatName: "Best Ball", count: 4 }) },
+    { number: 2, label: "Round 2", format: "SC",
+      matches: roundMatches({ round: 2, format: "SC", formatName: "Scramble", count: 4 }) },
+    { number: 3, label: "Round 3", format: "SI",
+      matches: roundMatches({ round: 3, format: "SI", formatName: "Singles", count: 12 }) },
+  ];
+
+  const result = await mobileMatchesResult(identity, {
+    now,
+    dependencies: matchesRoundDependencies(rounds, "live-canonical-order"),
+  });
+  const returnedRound = (numberValue) => result.body.data.matches
+    .filter((row) => row.round.roundNumber === numberValue);
+
+  assert.deepEqual(returnedRound(1).map((row) => row.displayMatchNumber), ["1", "2", "3", "4"]);
+  assert.deepEqual(returnedRound(2).map((row) => row.displayMatchNumber), ["1", "2", "3", "4"]);
+  assert.deepEqual(returnedRound(3).map((row) => row.displayMatchNumber),
+    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]);
+  assert.notDeepEqual(returnedRound(3).map((row) => row.displayMatchNumber),
+    ["1", "10", "11", "12", "2", "3", "4", "5", "6", "7", "8", "9"]);
+  assert.equal(returnedRound(3).findIndex((row) => row.authenticatedPlayer.involved), 6);
+  assert.equal(returnedRound(3)[6].matchId, "opaque-r3-06");
+});
+
+test("display Match number remains presentation-only and cannot reorder canonical Matches", async () => {
+  const rows = [
+    match("opaque-z", "Upcoming", ["P5", "P6", "P7", "P8"], { match: "2" }),
+    match("opaque-a", "Upcoming", ["P5", "P6", "P7", "P8"], { match: "1" }),
+  ];
+  const result = await mobileMatchesResult(identity, { now, dependencies: matchesDependencies(rows) });
+
+  assert.deepEqual(result.body.data.matches.map((row) => row.matchId), ["opaque-z", "opaque-a"]);
+  assert.deepEqual(result.body.data.matches.map((row) => row.displayMatchNumber), ["2", "1"]);
 });
 
 test("matches passes through canonical BB, SC, and SI Playing Handicap and stroke semantics", async () => {
@@ -166,6 +236,22 @@ test("matches ETag fingerprints the complete bounded representation", async () =
   assert.equal(first.revision, unchanged.revision);
   assert.notEqual(first.revision, changed.revision);
   assert.equal(first.body.meta.revision, first.revision);
+});
+
+test("matches ETag fingerprints canonical Match order under one source revision", async () => {
+  const firstMatch = match("opaque-z", "Upcoming", ["P5", "P6", "P7", "P8"], { match: "1" });
+  const secondMatch = match("opaque-a", "Upcoming", ["P5", "P6", "P7", "P8"], { match: "2" });
+  const build = async (rows) => mobileMatchesResult(identity, {
+    now,
+    dependencies: matchesDependencies(rows, "same-live-revision"),
+  });
+
+  const first = await build([firstMatch, secondMatch]);
+  const unchanged = await build([firstMatch, secondMatch]);
+  const reordered = await build([secondMatch, firstMatch]);
+
+  assert.equal(first.revision, unchanged.revision);
+  assert.notEqual(first.revision, reordered.revision);
 });
 
 test("matches fails closed when canonical participant, item, or byte bounds are exceeded", async () => {
