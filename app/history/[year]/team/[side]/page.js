@@ -91,7 +91,7 @@ export async function generateMetadata({ params }) {
     description: team
       ? `${team.name}'s ${year} Sandbagger Invitational roster, captain, and tournament handicaps.`
       : "Historical Sandbagger Invitational team roster.",
-    path: `/history/${year}/team/${encodeURIComponent(side)}`,
+    path: `/history/${year}/team/${encodeURIComponent(decodedSide)}`,
   });
 }
 

@@ -99,7 +99,8 @@ test("public dynamic route families retain distinct path-aware metadata without 
   assert.match(pages[0], /path: `\/players\/\$\{slug\}`/);
   assert.match(pages[1], /path: `\/history\/\$\{year\}`/);
   assert.match(pages[2], /path: `\/history\/\$\{year\}\/round\/\$\{round\}`/);
-  assert.match(pages[3], /path: `\/history\/\$\{year\}\/team\/\$\{encodeURIComponent\(side\)\}`/);
+  assert.match(pages[3], /const decodedSide = decodeURIComponent\(side\)/);
+  assert.match(pages[3], /path: `\/history\/\$\{year\}\/team\/\$\{encodeURIComponent\(decodedSide\)\}`/);
   assert.match(pages[4], /path: `\/champions\/\$\{year\}`/);
   assert.match(pages[5], /path: `\/courses\/\$\{encodeURIComponent\(courseId\)\}`/);
   assert.match(pages[6], /path: `\/courses\/\$\{encodeURIComponent\(courseId\)\}\/holes\/\$\{holeNumber\}`/);
