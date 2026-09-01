@@ -93,6 +93,8 @@ import {
 import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 import { formatHistoryTournamentHandicap } from "../../../lib/history-team-metadata";
 import publicStyles from "../public-history.module.css";
+import { loadCanonicalPlayerPresentation } from "../../../lib/canonical-player-presentation-service";
+import { mergeCanonicalLeaderboardPresentation } from "../../../lib/player-presentation";
 
 export async function generateMetadata({ params }) {
   const env = await applicationPageEnvironment();
@@ -702,7 +704,12 @@ export default async function TournamentYearPage({ params, searchParams, partici
     }
   } else if (useSupabaseCompleted) {
     try {
-      const view = await loadCompletedHistoryView({ year: Number(year), env });
+      const [view, canonicalPlayerPresentation] = await Promise.all([
+        loadCompletedHistoryView({ year: Number(year), env }),
+        participantPresentation
+          ? Promise.resolve({ players: [] })
+          : loadCanonicalPlayerPresentation({ env }).catch(() => ({ players: [] })),
+      ]);
       const model = completedHistoryTournamentPageModel(view);
       if (
         !model?.tournament ||
@@ -722,6 +729,12 @@ export default async function TournamentYearPage({ params, searchParams, partici
         scorecardAnalytics,
         tournamentMatches: completedTournamentMatches,
       } = model);
+      if (!participantPresentation) {
+        leaderboardRows = mergeCanonicalLeaderboardPresentation(
+          leaderboardRows,
+          canonicalPlayerPresentation.players,
+        );
+      }
       resolveHistoryPlayer = (slug) => completedHistoryResolvePlayer(view, slug);
     } catch {
       return <HistoryUnavailablePage year={year} section="Tournament History" participantPresentation={participantPresentation} />;

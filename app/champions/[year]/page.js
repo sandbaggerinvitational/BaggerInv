@@ -25,6 +25,8 @@ import {
 } from "../../../lib/completed-history-service";
 import HistoryUnavailablePage from "../../history/HistoryUnavailable";
 import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
+import { loadCanonicalPlayerPresentation } from "../../../lib/canonical-player-presentation-service";
+import { mergeCanonicalLeaderboardPresentation } from "../../../lib/player-presentation";
 
 function roundNumber(value) {
   return Number(String(value ?? "").replace(/\D/g, ""));
@@ -52,10 +54,16 @@ export default async function ChampionshipDetailPage({ params }) {
   let completedRounds = null;
   if (useSupabaseCompleted) {
     try {
-      const view = await loadCompletedHistoryView({ year: Number(year), env });
+      const [view, canonicalPlayerPresentation] = await Promise.all([
+        loadCompletedHistoryView({ year: Number(year), env }),
+        loadCanonicalPlayerPresentation({ env }).catch(() => ({ players: [] })),
+      ]);
       const model = completedHistoryTournamentPageModel(view);
       tournament = model.tournament;
-      leaderboardRows = model.leaderboardRows;
+      leaderboardRows = mergeCanonicalLeaderboardPresentation(
+        model.leaderboardRows,
+        canonicalPlayerPresentation.players,
+      );
       completedRounds = view.rounds;
     } catch {
       return <HistoryUnavailablePage year={year} section="Championship History" />;
