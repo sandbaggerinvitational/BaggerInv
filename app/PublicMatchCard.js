@@ -9,7 +9,7 @@ import { scorecardPresentationData } from "../lib/scorecard-presentation";
 import styles from "./live/live.module.css";
 import scoreStyles from "./score-typography.module.css";
 import ScorecardTable from "./ScorecardTable";
-import { matchState } from "../lib/live-match-ux";
+import { formatMatchConfirmationTime, matchState } from "../lib/live-match-ux";
 import MatchProgressionSummary from "./MatchProgressionSummary";
 import { reconstructMatchProgression } from "../lib/match-progression";
 import {
@@ -214,7 +214,7 @@ function TrophyIcon() {
   </svg>;
 }
 
-export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], scorecardCoverage = null, historyDensity = false, completedHistoryCompact = false, participantPresentation = false }) {
+export default function PublicMatchCard({ match, round, tournament, variant = "live", scorecards = [], scorecardCoverage = null, historyDensity = false, completedHistoryCompact = false, participantPresentation = false, now = Date.now() }) {
   const scorecardTableData = historyDensity ? scorecardPresentationData(scorecards) : scorecards;
   const winningSide = winnerSide(match);
   const halved = !winningSide && [match.matchupWinner, match.overallWinner].includes("Halved");
@@ -250,6 +250,10 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
     : state === "live"
       ? (match.liveStatusText || (liveLeader ? `${liveLeader === 1 ? tournament.teamOne.name : tournament.teamTwo.name} ${Math.abs(Number(match.team1HolesWon) - Number(match.team2HolesWon))} UP` : "All square"))
       : (match.teeTime ? `Tee time ${match.teeTime}` : "Scheduled");
+  const confirmedTime = formatMatchConfirmationTime(match.updatedAt, {
+    timeZone: tournament.timeZone,
+    now,
+  });
 
   if (completedHistoryCompact) {
     const winningPlayers = winningSide === 1
@@ -390,6 +394,6 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         <div className={`${styles.matchScoreRow} ${winningSide === 2 ? styles.matchScoreWinner : ""}`} data-team="two"><span><i aria-hidden="true" />{tournament.teamTwo.name}</span><strong className={scoreStyles.centeredScore}>{formatTeamPoints(match.team2Points)}</strong></div>
       </div> : null}
     </div> : null}
-    <footer className={styles.matchFreshness}>{match.updatedAt ? <>Last confirmed {match.updatedAt}{match.updatedBy ? ` by ${match.updatedBy}` : ""}</> : state === "live" ? "Waiting for the next confirmed update" : state === "final" ? "Official result" : `${match.course?.name || round?.course?.name || "Course TBA"} · ${match.formatName || round?.format || "Format TBA"}`}</footer>
+    <footer className={styles.matchFreshness}>{confirmedTime ? <>Last confirmed <time dateTime={match.updatedAt}>{confirmedTime}</time>{match.updatedBy ? ` by ${match.updatedBy}` : ""}</> : state === "live" ? "Waiting for the next confirmed update" : state === "final" ? "Official result" : `${match.course?.name || round?.course?.name || "Course TBA"} · ${match.formatName || round?.format || "Format TBA"}`}</footer>
   </article>;
 }

@@ -20,6 +20,7 @@ import {
   contactsViewModel,
   contactWebsiteHref,
 } from "../../lib/tournament-guide-contacts";
+import { publicGuideOverviewFallback } from "../../lib/tournament-guide-overview";
 import styles from "./public-tournament-guide.module.css";
 
 const clean = (value) => String(value ?? "").trim();
@@ -231,7 +232,7 @@ export default function PublicTournamentGuide({ content }) {
       <section className={styles.overview} id="overview">
         <p className={styles.eyebrow}>Everything You Need</p>
         <h2>{identity.destination || `${identity.year} Tournament Week`}</h2>
-        <Text value={descriptions.overview || "Schedules, rules, tournament tools, dining, local information, and important contacts for Sandbagger Invitational week."} />
+        <Text value={descriptions.overview || publicGuideOverviewFallback(content)} />
         {overviewItems.length ? <dl>{overviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl> : null}
       </section>
       {content.schedule.length ? <Schedule content={content} description={descriptions.itinerary || descriptions.schedule} /> : null}

@@ -288,7 +288,7 @@ export function MatchCenterExperience({ initialData, loadError, readUrl = "/api/
       <em>—</em>
       <div><b className={scoreStyles.centeredScore}>{formatTeamPoints(tournament.teamTwo.score)}</b><strong>{tournament.teamTwo.name}</strong></div>
     </div>
-    {focusedRoundData ? <div className={styles.matchGrid}>{focusedRoundData.matches.map((match) => <PublicMatchCard match={match} round={focusedRoundData} tournament={tournament} key={match.id} />)}</div> : null}
+    {focusedRoundData ? <div className={styles.matchGrid}>{focusedRoundData.matches.map((match) => <PublicMatchCard match={match} round={focusedRoundData} tournament={tournament} now={clock} key={match.id} />)}</div> : null}
   </section>;
   if (focusedView === "scores") return <section className={styles.focusedLiveView}>
     <div className={styles.focusedHeader}>{focusedBack}<span>Round {focusedRound}</span><h1>Gross &amp; Net Leaderboard</h1></div>
@@ -318,7 +318,7 @@ export function MatchCenterExperience({ initialData, loadError, readUrl = "/api/
           {MATCH_FILTERS.map(([value, label]) => <button type="button" role="tab" aria-selected={matchFilter === value} onClick={() => setMatchFilter(value)} key={value}>{label}<span>{value === "all" ? active.matches.length : filterMatches(active.matches, value).length}</span></button>)}
         </div>
         <div className={styles.roundHeader}><div><span>{active.format}</span><h2>{active.label}</h2><p>{active.course.name}{active.course.tee ? ` · ${active.course.tee} tees` : ""}</p></div><div className={styles.roundTotals}><span>Round Points</span><strong className={scoreStyles.score}>{formatTeamPoints(roundTotals.teamOne)}<i className={scoreStyles.separator} aria-hidden="true">–</i>{formatTeamPoints(roundTotals.teamTwo)}</strong></div></div>
-        {visibleMatches.length ? <div className={styles.matchGrid}>{visibleMatches.map((match) => <PublicMatchCard match={match} round={active} tournament={tournament} key={match.id} />)}</div> : <MatchFilterEmptyState filter={matchFilter} round={active} className={styles.emptyState} />}
+        {visibleMatches.length ? <div className={styles.matchGrid}>{visibleMatches.map((match) => <PublicMatchCard match={match} round={active} tournament={tournament} now={clock} key={match.id} />)}</div> : <MatchFilterEmptyState filter={matchFilter} round={active} className={styles.emptyState} />}
       </section> : null}
       {rounds.length ? <div className={styles.roundSelectorSection}><span>Browse rounds</span><RoundNavigation rounds={rounds} activeRound={active?.number} onSelect={setActiveRound} /></div> : null}
       <div className={styles.desktopInsights}>{active ? <RoundProgress round={active} /> : null}<TournamentStats tournament={tournament} rounds={rounds} remainingByRound={data?.remainingByRound || []} momentum={data?.momentum} /></div>

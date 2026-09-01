@@ -7,6 +7,8 @@ import { pageMetadata } from "../../lib/seo";
 import { getDraftAnalysis } from "../../lib/draft-analysis";
 import { loadDraftRuntime } from "../../lib/draft-runtime";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
+import { withCanonicalDraftTeamAverages } from "../../lib/draft-team-handicap";
+import { readTournamentLiveView } from "../../lib/tournament-live-supabase";
 
 export const metadata = pageMetadata({
   title: "Sandbagger Draft",
@@ -18,10 +20,24 @@ export const metadata = pageMetadata({
 export default async function DraftPage() {
   const env = await applicationPageEnvironment();
   const runtime = await loadDraftRuntime({ env });
-  const [draft, drafts] = await Promise.all([
+  const tournamentReadPromise = runtime.source.resolved === "supabase"
+    ? readTournamentLiveView(runtime.draftOptions.tournamentId, { env })
+    : Promise.resolve(null);
+  const [storedDraft, drafts, tournamentRead] = await Promise.all([
     getCurrentDraft(runtime.draftOptions),
     getDrafts(runtime.draftOptions),
+    tournamentReadPromise,
   ]);
+  if (runtime.source.resolved === "supabase" && (!tournamentRead?.payload?.ok || !tournamentRead.payload.data)) {
+    const error = new Error("Current tournament roster is temporarily unavailable for the Draft.");
+    error.code = tournamentRead?.payload?.code || "DRAFT_CANONICAL_ROSTER_UNAVAILABLE";
+    throw error;
+  }
+  const draft = runtime.source.resolved === "supabase"
+    ? withCanonicalDraftTeamAverages(storedDraft, tournamentRead.payload.data.players, {
+        tournamentId: runtime.draftOptions.tournamentId,
+      })
+    : storedDraft;
   const analysis = draft ? await getDraftAnalysis(draft, runtime.analysisOptions) : null;
 
   if (!draft) {
