@@ -30,6 +30,7 @@ function canonicalNetSkinsPresentation(payload, productionNetSkinsV1) {
 
 export default function ParticipantSupabaseHome({
   netSkinsReadSource = "google",
+  previewMode = false,
   productionNetSkinsV1 = false,
 }) {
   const router = useRouter();
@@ -147,14 +148,14 @@ export default function ParticipantSupabaseHome({
     const presentation = canonicalNetSkinsPresentation(payload, productionNetSkinsV1);
     return <>
     <PwaSplashIdentityBridge tournament={presentation.liveData.tournament} />
-    <PreviewModeBadge visible />
+    <PreviewModeBadge visible={previewMode} />
     <MobileTournamentHome liveData={presentation.liveData} initialParticipantData={presentation.participant} participantIdentityAuthority="supabase" />
   </>;
   }
 
   return <main className="mobileHomeMain">
     <PwaSplashIdentityBridge tournament={null} />
-    <PreviewModeBadge visible />
+    <PreviewModeBadge visible={previewMode} />
     {state === "error"
       ? <ErrorState title="Home is temporarily unavailable." message="Your latest saved information is unchanged. Check your connection and try again." onRetry={refresh} />
       : <ScreenSkeleton label={state === "signed-out" ? "Opening participant sign-in" : "Opening Home"} cards={3} />}

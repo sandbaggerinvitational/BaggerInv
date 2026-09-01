@@ -27,6 +27,7 @@ export default async function MobileHomePage() {
   const netSkinsReadSource = netSkinsSource.resolved;
   if (source.resolved === "supabase") return <ParticipantSupabaseHome
     netSkinsReadSource={netSkinsReadSource}
+    previewMode={process.env.VERCEL_ENV === "preview"}
     productionNetSkinsV1={netSkinsSource.productionCutover?.handled === true}
   />;
 
