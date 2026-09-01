@@ -10,6 +10,12 @@ import { GOOGLE_AUTHORING_OPERATIONS } from "../../../../lib/google-workbook-mut
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
+  if (process.env.VERCEL_ENV === "production") {
+    return NextResponse.json({ error: "Not found." }, {
+      status: 404,
+      headers: { "Cache-Control": "private, no-store" },
+    });
+  }
   try {
     const reference = new URL(request.url).searchParams.get("player") || "";
     return NextResponse.json({ data: await readPlayerPassportActivationOptions(reference) });
@@ -19,6 +25,12 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  if (process.env.VERCEL_ENV === "production") {
+    return NextResponse.json({ error: "Not found." }, {
+      status: 404,
+      headers: { "Cache-Control": "private, no-store" },
+    });
+  }
   let reference = "";
   try {
     const payload = await request.json();

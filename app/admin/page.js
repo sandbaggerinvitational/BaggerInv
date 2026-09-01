@@ -3,11 +3,13 @@ import { getTournaments, refreshHistoricalData } from "../../lib/stats";
 import AdminCenter from "./AdminCenter";
 import { privatePageMetadata } from "../../lib/seo";
 import { liveTournamentV2Enabled } from "../../lib/spreadsheet-environment";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 export const metadata = privatePageMetadata("Admin Center | Sandbagger Invitational");
 
 export default async function AdminPage() {
+  if (process.env.VERCEL_ENV === "production") redirect("/admin/director");
   await refreshHistoricalData();
   const tournaments = [...getTournaments()].sort((a, b) => b.year - a.year).map((item) => ({
     id: item.id,

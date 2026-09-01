@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 export const metadata = privatePageMetadata("Guide Editor | Sandbagger Invitational");
 
 export default async function GuideEditorPage({ searchParams }) {
+  if (process.env.VERCEL_ENV === "production") redirect("/admin/director?section=draft-guide");
   const query = await searchParams;
   const tournament = query?.tournament ? `&tournament=${encodeURIComponent(query.tournament)}` : "";
   redirect(`/admin?tab=guide${tournament}`);

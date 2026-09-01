@@ -1,5 +1,5 @@
 import PreviewModeBadge from "../PreviewModeBadge";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { liveTournamentV2Enabled } from "../../lib/spreadsheet-environment";
 import PlayerPassportActivation from "./PlayerPassportActivation";
 import { cookies } from "next/headers";
@@ -10,6 +10,7 @@ import { privatePageMetadata } from "../../lib/seo";
 export const metadata = privatePageMetadata("Activate Player Passport");
 
 export default async function ActivatePage({ searchParams }) {
+  if (process.env.VERCEL_ENV === "production") redirect("/participant-auth");
   if (!liveTournamentV2Enabled()) notFound();
   const query = await searchParams;
   const cookieStore = await cookies();

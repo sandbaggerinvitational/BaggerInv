@@ -25,6 +25,14 @@ globalThis.__sbiCmsSaveTransactions = saveTransactions;
 const REVALIDATED_PATHS = ["/", "/admin", "/players", "/live", "/history", "/champions", "/courses", "/draft", "/tournament-guide"];
 const MATCH_REVALIDATED_PATHS = ["/home", "/admin", "/players", "/live"];
 
+function retiredProductionHumanAdmin() {
+  if (process.env.VERCEL_ENV !== "production") return null;
+  return NextResponse.json({ error: "Not found." }, {
+    status: 404,
+    headers: { "Cache-Control": "private, no-store" },
+  });
+}
+
 function retiredProductionPredictionSettings(resource) {
   if (String(process.env.VERCEL_ENV || "").trim().toLowerCase() !== "production" ||
       resource !== "prediction-settings") return null;
@@ -78,6 +86,8 @@ async function loadGoogleCmsRuntime() {
 }
 
 export async function GET(request) {
+  const retired = retiredProductionHumanAdmin();
+  if (retired) return retired;
   if (!authorized(request)) return deny();
   const candidateBlock = blockedProductionShadowCms();
   if (candidateBlock) return candidateBlock;
@@ -110,6 +120,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const retired = retiredProductionHumanAdmin();
+  if (retired) return retired;
   if (!authorized(request)) return deny();
   const candidateBlock = blockedProductionShadowCms();
   if (candidateBlock) return candidateBlock;

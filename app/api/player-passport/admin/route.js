@@ -27,6 +27,12 @@ function authorized(request) {
 }
 
 export async function GET(request) {
+  if (process.env.VERCEL_ENV === "production") {
+    return NextResponse.json({ error: "Not found." }, {
+      status: 404,
+      headers: { "Cache-Control": "private, no-store" },
+    });
+  }
   if (!authorized(request)) return NextResponse.json({ error: "Invalid admin password." }, { status: 401 });
   try {
     return NextResponse.json({ data: await readPlayerPassportAdminData() });
@@ -36,6 +42,12 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  if (process.env.VERCEL_ENV === "production") {
+    return NextResponse.json({ error: "Not found." }, {
+      status: 404,
+      headers: { "Cache-Control": "private, no-store" },
+    });
+  }
   if (!authorized(request)) return NextResponse.json({ error: "Invalid admin password." }, { status: 401 });
   try {
     const { action, playerId, deviceId, updatedBy } = await request.json();

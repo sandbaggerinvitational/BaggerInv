@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Header, Footer } from "../components";
 import { loadPredictionDiagnostics } from "../../lib/prediction-data";
 import {
@@ -96,6 +97,7 @@ function appearanceYearsByPlayer(matches) {
 }
 
 export default async function DataHealthPage({ searchParams }) {
+  if (process.env.VERCEL_ENV === "production") redirect("/admin/director?section=system-audit");
   const query = await searchParams;
   const embedded = query?.embedded === "1";
   let diagnostics;

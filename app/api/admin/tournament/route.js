@@ -17,8 +17,16 @@ function authorized(request) {
   return Boolean(secret) && allowed.includes(secret);
 }
 const deny = () => NextResponse.json({ error: "Invalid admin password." }, { status: 401 });
+const retiredProductionHumanAdmin = () => process.env.VERCEL_ENV === "production"
+  ? NextResponse.json({ error: "Not found." }, {
+      status: 404,
+      headers: { "Cache-Control": "private, no-store" },
+    })
+  : null;
 
 export async function GET(request) {
+  const retired = retiredProductionHumanAdmin();
+  if (retired) return retired;
   if (!authorized(request)) return deny();
   try { return NextResponse.json({
     ...await readTournamentAdminData(new URL(request.url).searchParams.get("tournament")),
@@ -31,6 +39,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const retired = retiredProductionHumanAdmin();
+  if (retired) return retired;
   if (!authorized(request)) return deny();
   try {
     assertDirectorMutationAuthority({ surface: "director", action: "tournament-admin-update" });
