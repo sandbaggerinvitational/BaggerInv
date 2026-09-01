@@ -61,12 +61,21 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   const [director, setDirector] = useState(false);
   const [capabilityRevision, setCapabilityRevision] = useState(0);
   const [tournament, setTournament] = useState({ name: "", edition: "", location: "", year: "" });
+  const menuButton = useRef(null);
   const closeButton = useRef(null);
+  const publicMenuWasOpen = useRef(false);
   const shellCapabilityRevision = useRef(-1);
   const activeHref = activeNavigationHref || activeNavigationHrefForPath(pathname, hash);
 
   useEffect(() => {
-    if (appShell || !isOpen) return undefined;
+    if (appShell) return undefined;
+    if (!isOpen) {
+      if (!publicMenuWasOpen.current) return undefined;
+      publicMenuWasOpen.current = false;
+      const frame = window.requestAnimationFrame(() => menuButton.current?.focus({ preventScroll: true }));
+      return () => window.cancelAnimationFrame(frame);
+    }
+    publicMenuWasOpen.current = true;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeButton.current?.focus();
@@ -210,6 +219,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   return (
     <>
       <button
+        ref={menuButton}
         className={`menuButton ${isOpen ? "active" : ""}`}
         type="button"
         aria-label={appShell ? "Open Tournament Hub" : "Open navigation menu"}
@@ -223,7 +233,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
 
       {appShell
         ? <Sheet open={isOpen} onClose={() => setIsOpen(false)} placement="right" label="Tournament Hub" initialFocusRef={closeButton} panelClassName="sideMenu open">{({ close }) => hubContent(close)}</Sheet>
-        : <><div className={`menuBackdrop ${isOpen ? "show" : ""}`} onClick={() => setIsOpen(false)} /><aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Site navigation">{siteContent}</aside></>}
+        : <><div className={`menuBackdrop ${isOpen ? "show" : ""}`} onClick={() => setIsOpen(false)} /><div className="menuDrawerViewport"><aside className={`sideMenu ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-modal="true" role="dialog" aria-label="Site navigation">{siteContent}</aside></div></>}
     </>
   );
 }

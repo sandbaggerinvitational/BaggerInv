@@ -38,8 +38,4 @@ export const navigationSections = [
       { label: "Board of Governors", href: "/board-of-governors" },
     ],
   },
-  {
-    label: "Admin",
-    links: [{ label: "Admin Center", href: "/admin" }],
-  },
 ];

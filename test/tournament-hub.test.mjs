@@ -33,9 +33,10 @@ test("public desktop menu uses the original website navigation sections", async 
   assert.match(menu, /<nav className="sideNav sideNavSite" aria-label="Site navigation">[\s\S]*navigationSections\.map/);
   assert.match(menu, /appShell[\s\S]*\? <Sheet[\s\S]*: <>[\s\S]*\{siteContent\}/);
   assert.match(menu, /href=\{link\.href === "\/" \? homeHref : link\.href\}/);
-  for (const label of ["Home", "Match Center", "Odds Center", "War Room", "Players", "Tournament", "Admin Center"]) {
+  for (const label of ["Home", "Match Center", "Odds Center", "War Room", "Players", "Tournament"]) {
     assert.match(navigation, new RegExp(label));
   }
+  assert.doesNotMatch(navigation, /Admin Center|href:\s*"\/admin"/);
 });
 
 test("Tournament Hub remains accessible and keeps the participant shell visible", async () => {

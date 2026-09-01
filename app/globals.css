@@ -253,8 +253,9 @@ button:disabled { cursor: not-allowed; }
 }
 
 .sideMenu.open { transform: none; }
-.siteHeader .sideMenu{position:fixed;top:0;right:0;z-index:90;height:100vh;height:100dvh;max-height:none!important;transform:translateX(100%);transition:transform .3s ease}
-.siteHeader .sideMenu.open{transform:translateX(0)}
+.menuDrawerViewport{position:fixed;inset:0;z-index:90;overflow:clip;pointer-events:none;contain:layout paint}
+.menuDrawerViewport .sideMenu{position:absolute;top:0;right:0;height:100vh;height:100dvh;max-height:none!important;visibility:hidden;pointer-events:none;transform:translateX(100%);transition:transform .3s ease,visibility 0s linear .3s}
+.menuDrawerViewport .sideMenu.open{visibility:visible;pointer-events:auto;transform:translateX(0);transition-delay:0s}
 
 .sideMenuTop {
   flex: 0 0 auto;
