@@ -162,6 +162,68 @@ test("canonical Supabase live state produces deterministic points, progress, and
   assert.equal(unstarted.team2Points, null);
 });
 
+test("nullable display handicap fields cannot mask canonical zero-stroke authority", () => {
+  const view = {
+    tournament: { tournament_id: "2026", tournament_year: 2026, name: "Sandbagger Invitational" },
+    teams: [{ team_side: 1, team_id: "T1", name: "The Pickles" },
+      { team_side: 2, team_id: "T2", name: "Lipp it and Rip it" }],
+    rounds: [{ tournament_id: "2026", round_number: 1, name: "Round 1", format: "SC" }],
+    tournament_presentation: {
+      source_fingerprint: "a".repeat(64),
+      presentation: {
+        tournament: { status: "Live", currentRound: 1 },
+        tournamentMatchDisplay: {
+          "2026-R1-1": {
+            team1Players: [
+              { id: "P1", playingHcp: null, stroke: null },
+              { id: "P2", playingHcp: null, stroke: null },
+            ],
+            team2Players: [
+              { id: "P3", playingHcp: 4.25, stroke: 3 },
+              { id: "P4", playingHcp: 0, stroke: 0 },
+            ],
+            team1PlayingHcp: null,
+            team2PlayingHcp: 0,
+            team1Stroke: null,
+            team2Stroke: 0,
+          },
+        },
+      },
+    },
+    live_revision: { totalMatchRevisions: 1 },
+    matches: [{
+      round: { round_number: 1, format: "SC" },
+      match: { match_id: "2026-R1-1", round_number: 1, format: "SC", status: "LIVE",
+        scoring_locked: false, current_hole: 0, scored_holes: 0, holes_remaining: 18, match_revision: 1 },
+      snapshot: { course_id: "TPG", tee: "Gold", par: 72, rating: 71.9, slope: 136,
+        team_configuration: { team_1_playing_handicap: 3.5, team_2_playing_handicap: 4.5,
+          team_1_strokes: 0, team_2_strokes: 1 } },
+      presentation: { display_match_number: "1", course_name: "Turtle Point" },
+      participants: [
+        { player_id: "P1", display_name: "Player One", team_side: 1, player_slot: 1,
+          playing_handicap: 7.5, final_strokes: 0 },
+        { player_id: "P2", display_name: "Player Two", team_side: 1, player_slot: 2,
+          playing_handicap: null, final_strokes: null },
+        { player_id: "P3", display_name: "Player Three", team_side: 2, player_slot: 1,
+          playing_handicap: 5.25, final_strokes: 2 },
+        { player_id: "P4", display_name: "Player Four", team_side: 2, player_slot: 2,
+          playing_handicap: 6, final_strokes: 1 },
+      ],
+      scores: [],
+    }],
+  };
+
+  const match = tournamentLiveDataFromSupabaseView(view).rounds[0].matches[0];
+  assert.deepEqual(match.team1Players.map(({ playingHcp, stroke }) => [playingHcp, stroke]), [
+    [7.5, 0], [null, null],
+  ]);
+  assert.deepEqual(match.team2Players.map(({ playingHcp, stroke }) => [playingHcp, stroke]), [
+    [4.25, 3], [0, 0],
+  ]);
+  assert.deepEqual([match.team1PlayingHcp, match.team1Stroke], [3.5, 0]);
+  assert.deepEqual([match.team2PlayingHcp, match.team2Stroke], [0, 0]);
+});
+
 test("Tournament display cache is revisioned and cannot authorize scoring", () => {
   const previousWindow = globalThis.window;
   const session = new Map();
