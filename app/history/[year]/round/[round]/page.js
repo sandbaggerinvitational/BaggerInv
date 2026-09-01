@@ -31,7 +31,11 @@ import {
   loadCanonical2024HistoryAnalytics,
   loadLegacyHistoryAnalytics,
 } from "../../../../../lib/legacy-history-analytics";
-import { buildScoringHighlights, filterScorecards } from "../../../../../lib/scorecard-analytics";
+import {
+  buildScoringHighlights,
+  filterScorecards,
+} from "../../../../../lib/scorecard-analytics";
+import { indexScorecardsByMatch } from "../../../../../lib/scorecard-index";
 import { buildLegacyHistoryScorecardCoverage } from "../../../../../lib/legacy-history-scorecard-coverage";
 import ScoringStatGrid, { formatScoringNumber } from "../../../../ScoringStatGrid";
 import {
@@ -298,18 +302,19 @@ export default async function HistoricalRoundPage({ params, searchParams, partic
     : useSupabaseCompleted
       ? roundTournamentMatches
       : getTournamentMatches(archive.year).filter((match) => Number(match.Round) === Number(archive.round));
-  const displayScorecardsForMatch = (matchId) => {
-    const presentationScorecards = completed2023
-      ? canonical2023RoundScorecards
-      : completed2024 && [1, 3].includes(Number(archive.round))
-        ? selectCanonical2024NetPresentationScorecards({
+  const presentationScorecards = completed2023
+    ? canonical2023RoundScorecards
+    : completed2024 && [1, 3].includes(Number(archive.round))
+      ? selectCanonical2024NetPresentationScorecards({
           year: archive.year,
           round: archive.round,
           scorecards: scorecardAnalytics.scorecards,
           projectedScorecards: scorecardAnalytics.history2024NetProjectionScorecards,
         })
-        : scorecardAnalytics.scorecards;
-    const cards = filterScorecards(presentationScorecards, { matchId });
+      : scorecardAnalytics.scorecards;
+  const presentationScorecardsByMatch = indexScorecardsByMatch(presentationScorecards);
+  const displayScorecardsForMatch = (matchId) => {
+    const cards = presentationScorecardsByMatch.get(String(matchId || "").trim()) || [];
     const formatAwareCards = Number(archive.round) === 2 && (completed2023 || completed2024 || completed2025)
       ? completed2025
         ? canonicalize2025ScrambleScorecardPresentation({

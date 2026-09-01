@@ -143,6 +143,7 @@ button:disabled { cursor: not-allowed; }
 }
 
 .siteHeader {
+  --public-site-header-height: max(84px, calc(82px + var(--safe-top)));
   position: sticky;
   top: 0;
   z-index: 50;
@@ -207,11 +208,16 @@ button:disabled { cursor: not-allowed; }
   height: 2px;
   border-radius: 99px;
   background: white;
+  transition: opacity .18s ease, transform .18s ease;
 }
+
+.siteHeader .menuButton.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.siteHeader .menuButton.active span:nth-child(2) { opacity: 0; }
+.siteHeader .menuButton.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 .menuBackdrop {
   position: fixed;
-  inset: 0;
+  inset: var(--public-site-header-height) 0 0;
   z-index: 80;
   background: rgba(0, 0, 0, 0.58);
   opacity: 0;
@@ -253,8 +259,8 @@ button:disabled { cursor: not-allowed; }
 }
 
 .sideMenu.open { transform: none; }
-.menuDrawerViewport{position:fixed;inset:0;z-index:90;overflow:clip;pointer-events:none;contain:layout paint}
-.menuDrawerViewport .sideMenu{position:absolute;top:0;right:0;height:100vh;height:100dvh;max-height:none!important;visibility:hidden;pointer-events:none;transform:translateX(100%);transition:transform .3s ease,visibility 0s linear .3s}
+.menuDrawerViewport{position:fixed;inset:var(--public-site-header-height) 0 0;z-index:90;overflow:clip;pointer-events:none;contain:layout paint}
+.menuDrawerViewport .sideMenu{position:absolute;top:0;right:0;height:100%;max-height:none!important;visibility:hidden;pointer-events:none;transform:translateX(100%);transition:transform .3s ease,visibility 0s linear .3s}
 .menuDrawerViewport .sideMenu.open{visibility:visible;pointer-events:auto;transform:translateX(0);transition-delay:0s}
 
 .sideMenuTop {
@@ -394,7 +400,7 @@ button:disabled { cursor: not-allowed; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sideMenu, .menuBackdrop, .sideNavGroup a, .sideNavGroup button { transition: none; }
+  .sideMenu, .menuBackdrop, .menuButton span, .sideNavGroup a, .sideNavGroup button { transition: none; }
   .sideNavDirector { animation: none; }
   .participantRouteScene { animation: none; }
 }
@@ -867,6 +873,7 @@ footer span {
 
 @media (max-width: 640px) {
   .siteHeader {
+    --public-site-header-height: calc(72px + var(--safe-top));
     min-height: 72px;
   }
 

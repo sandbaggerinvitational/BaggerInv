@@ -34,7 +34,8 @@ test("participant profile route retains the explicit compact PWA branch", () => 
 test("restored public presentation retains canonical Supabase and corrected point semantics", () => {
   assert.match(profile, /loadSecondaryHistoryModel/);
   assert.match(profile, /secondaryHistory\.scorecardAnalytics/);
-  assert.match(profile, /filterScorecards\(careerScorecards, \{ matchId \}\)/);
+  assert.match(profile, /indexScorecardsByMatch\(careerScorecards, \{ matchIds: playerMatchIds \}\)/);
+  assert.match(profile, /scorecardPresentationData\(indexedCareerScorecards\.get\(matchId\) \|\| \[\]\)/);
   assert.match(profile, /rival\.record\.recordedPointMatches > 0/);
   assert.match(profile, /formatPlayerPoints\(rival\.record\.points\)/);
   assert.doesNotMatch(profile, /<strong>\{rival\.record\.matches\}<\/strong>/);

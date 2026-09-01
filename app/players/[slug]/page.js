@@ -35,7 +35,8 @@ import {
   loadCanonicalCareerScorecardAnalytics,
   loadScorecardAnalytics,
 } from "../../../lib/scorecard-data";
-import { filterScorecards } from "../../../lib/scorecard-analytics";
+import { indexScorecardsByMatch } from "../../../lib/scorecard-index";
+import { scorecardPresentationData } from "../../../lib/scorecard-presentation";
 import { buildPlayerIntelligence } from "../../../lib/player-intelligence";
 import {
   getLeaderboardFromRecords,
@@ -132,6 +133,15 @@ export default async function PlayerPage({ params, searchParams, participantPres
     : loadScorecardAnalytics();
   if (!useSupabase) await refreshHistoricalData();
   const canonicalOfficialRecords = useSupabase ? readSupabaseRecords() : getRecords();
+  const routeParams = await params;
+  const queryPromise = searchParams;
+  const supabasePlayer = useSupabase
+    ? calculations.getPlayerBySlug(routeParams.slug)
+    : null;
+  if (useSupabase && !supabasePlayer) notFound();
+  const supabaseDraftsPromise = useSupabase
+    ? getPlayerDrafts(supabasePlayer["Player ID"], { history: calculations, env })
+    : null;
   const recordScorecardAnalytics = await recordScorecardAnalyticsPromise;
   const recordPlayerNames = Object.fromEntries(
     canonicalOfficialRecords.all.map(({ player }) => [
@@ -148,15 +158,15 @@ export default async function PlayerPage({ params, searchParams, participantPres
     ghostMatchExclusions: recordScorecardAnalytics.ghostMatchExclusions,
   });
   if (!useSupabase) await refreshCanonicalCareerHistoricalData();
-  const { slug } = await params;
-  const query = await searchParams;
+  const { slug } = routeParams;
+  const query = await queryPromise;
   const playerDirectoryReturnHref = safePlayerDirectoryReturnHref(
     query?.returnTo
   );
   const historyReturnContext = historicalPlayerReturnContext(query);
-  const player = useSupabase ? calculations.getPlayerBySlug(slug) : getPlayerBySlug(slug);
+  const player = useSupabase ? supabasePlayer : getPlayerBySlug(slug);
   if (!player) notFound();
-  const officialRecords = useSupabase ? readSupabaseRecords() : getRecords();
+  const officialRecords = useSupabase ? canonicalOfficialRecords : getRecords();
   const stats = officialRecords.all.find(({ player: rowPlayer }) =>
     rowPlayer["Player ID"] === player["Player ID"]
   )?.stats;
@@ -168,7 +178,9 @@ export default async function PlayerPage({ params, searchParams, participantPres
     stats.records
   );
   const playerDraftHistory = getPlayerDraftHistory(
-    await getPlayerDrafts(player["Player ID"], useSupabase ? { history: calculations, env } : { env }),
+    useSupabase
+      ? await supabaseDraftsPromise
+      : await getPlayerDrafts(player["Player ID"], { env }),
     player["Player ID"],
     useSupabase ? { history: calculations } : undefined
   );
@@ -188,20 +200,25 @@ export default async function PlayerPage({ params, searchParams, participantPres
     scorecards: careerScorecards,
     ghostMatchExclusions: scorecardAnalytics.ghostMatchExclusions,
     recordsHeld: recordAuthority.recordsHeldForPlayer(player["Player ID"]),
+    ...(useSupabase ? {
+      holePlayers: recordAuthority.scorecardCatalog.playerAnalytics,
+      matchProgression: recordAuthority.matchProgression,
+    } : {}),
   });
   const playerMatchIds = new Set(
     Object.values(formatMatchHistory).flatMap((history) =>
       history.matches.map((match) => match.id)
     )
   );
+  const indexedCareerScorecards = participantPresentation
+    ? null
+    : indexScorecardsByMatch(careerScorecards, { matchIds: playerMatchIds });
   const scorecardsByMatch = participantPresentation
     ? {}
-    : Object.fromEntries(
-        [...playerMatchIds].map((matchId) => [
-          matchId,
-          filterScorecards(careerScorecards, { matchId }),
-        ])
-      );
+    : Object.fromEntries([...playerMatchIds].map((matchId) => [
+        matchId,
+        scorecardPresentationData(indexedCareerScorecards.get(matchId) || []),
+      ]));
   const compareHref = rival
     ? `/compare?player1=${encodeURIComponent(player["Player ID"])}&player2=${encodeURIComponent(rival.player["Player ID"])}`
     : "/compare";

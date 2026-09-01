@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { readFreshPlayerPassportSession } from "../lib/participant-session-client.js";
 import { formatTournamentEdition } from "../lib/tournament-branding";
-import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
 import { navigationSections } from "./navigation";
 import Sheet from "./ui/Sheet";
 
@@ -78,7 +77,7 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
     publicMenuWasOpen.current = true;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    closeButton.current?.focus();
+    menuButton.current?.focus({ preventScroll: true });
     const closeOnEscape = (event) => { if (event.key === "Escape") setIsOpen(false); };
     window.addEventListener("keydown", closeOnEscape);
     return () => {
@@ -153,13 +152,6 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
   }, [pathname]);
 
   const siteContent = <>
-    <div className="sideMenuTop">
-      <div>
-        <strong>Sandbagger Invitational</strong>
-        <span>Established {SITE_ESTABLISHED_YEAR}</span>
-      </div>
-      <button ref={closeButton} className="closeMenuButton" type="button" aria-label="Close navigation menu" onClick={() => setIsOpen(false)}>×</button>
-    </div>
     <div className="sideMenuScroll">
       <nav className="sideNav sideNavSite" aria-label="Site navigation">
         {navigationSections.map((group) => group.label ? (
@@ -222,9 +214,9 @@ export default function Menu({ activeNavigationHref = "", homeHref = "/", appShe
         ref={menuButton}
         className={`menuButton ${isOpen ? "active" : ""}`}
         type="button"
-        aria-label={appShell ? "Open Tournament Hub" : "Open navigation menu"}
+        aria-label={appShell ? "Open Tournament Hub" : isOpen ? "Close navigation menu" : "Open navigation menu"}
         aria-expanded={isOpen}
-        onClick={() => setIsOpen(true)}
+        onClick={() => appShell ? setIsOpen(true) : setIsOpen((open) => !open)}
       >
         <span />
         <span />

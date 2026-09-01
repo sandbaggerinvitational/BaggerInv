@@ -41,6 +41,7 @@ function stats(id) {
     percentages: { overall: 100, BB: 100, SC: 0, SI: 0 },
     appearances: [2025],
     championships: [],
+    careerTimeline: [],
     seasons: [{ year: 2025, overall: { wins: 1, losses: 0, halves: 0, matches: 1, points: 1 } }],
     sandbaggerRatings: { OVERALL: { rating: 1500, matches: 1 }, BB: { rating: 1500, matches: 1 } },
     id,
@@ -183,6 +184,71 @@ test("normalized bundle projects the unchanged War Room consumer contract", () =
   assert.equal(compatibleSheets.teamNames.find((row) => row.Year === 2025 && row["Team Side"] === "Team 1")["Team ID"], "2025-T1");
   assert.equal(compatibleSheets.handicaps.find((row) => row.Year === 2025 && row["Player ID"] === "P2")["Roster Order"], 2);
   assert.equal(predictionBundleParityProjection(bundle).metadata.source, undefined);
+});
+
+test("Team Intelligence serializes only fields consumed by its four tools", () => {
+  const input = fixture();
+  const bundle = buildGooglePredictionInputBundle({ ...input, workbookId: "preview-workbook" });
+  const base = buildWarRoomConsumerData({
+    bundle,
+    calculations: input.calculations,
+    scorecardAnalytics: input.scorecardAnalytics,
+    scope: "lineup",
+  });
+  const team = buildWarRoomConsumerData({
+    bundle,
+    calculations: input.calculations,
+    scorecardAnalytics: input.scorecardAnalytics,
+    scope: "team-intelligence",
+  });
+
+  assert.deepEqual(Object.keys(team.sheets).sort(), [
+    "courses",
+    "handicaps",
+    "liveTournaments",
+    "players",
+    "scorecards",
+    "settings",
+    "teamNames",
+  ]);
+  for (const key of Object.keys(team.sheets)) {
+    assert.deepEqual(team.sheets[key], base.sheets[key], `${key} must retain the full compatibility projection exactly`);
+  }
+  assert.deepEqual(team.historical, base.historical);
+  assert.deepEqual(team.partnershipPredictionMap, base.partnershipPredictionMap);
+  assert.deepEqual(team.headToHead, base.headToHead);
+  assert.equal("scorecardAnalytics" in team, false);
+  assert.equal(team.players.length, 4);
+  assert.equal(team.seasons.length, 1);
+  assert.equal(team.partnershipPredictionMap["P1|P2"].record.matches, 1);
+
+  const formerPayloadShape = {
+    ...team,
+    sheets: legacyPredictionSheetsFromBundle(bundle),
+    scorecardAnalytics: base.scorecardAnalytics,
+  };
+  assert.ok(
+    Buffer.byteLength(JSON.stringify(team)) < Buffer.byteLength(JSON.stringify(formerPayloadShape)),
+    "Team Intelligence payload should omit server-only scorecards and compatibility tabs"
+  );
+
+  const guardedBundle = { ...bundle };
+  for (const field of ["holes", "rules", "matches"]) {
+    Object.defineProperty(guardedBundle, field, {
+      get() { throw new Error(`Team Intelligence must not construct omitted ${field}`); },
+    });
+  }
+  const guardedHistory = { ...bundle.historicalFacts };
+  for (const field of ["matches", "recordEligibility"]) {
+    Object.defineProperty(guardedHistory, field, {
+      get() { throw new Error(`Team Intelligence must not construct omitted historical ${field}`); },
+    });
+  }
+  guardedBundle.historicalFacts = guardedHistory;
+  assert.deepEqual(
+    legacyPredictionSheetsFromBundle(guardedBundle, { scope: "team-intelligence" }),
+    team.sheets,
+  );
 });
 
 test("legacy compatibility sheets never duplicate the active roster from current-year handicap provenance", () => {

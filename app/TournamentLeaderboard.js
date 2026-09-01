@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import PlayerAvatar from "./PlayerAvatar";
 import { formatPlayerPoints } from "../lib/formatters";

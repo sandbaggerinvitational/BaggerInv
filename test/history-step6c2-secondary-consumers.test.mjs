@@ -55,13 +55,17 @@ test("ratings, handicaps, partnerships, rivalries, compare, and governors preser
     source("app/compare/page.js"),
     source("app/board-of-governors/page.js"),
   ]);
-  for (const method of [
-    "getRecords", "getHandicapStats", "getPartnershipStats",
-    "getRivalryStats", "getSandbaggerRatings", "getHeadToHead",
-    "getAllPlayerStats",
-  ]) {
+  for (const method of ["getHandicapStats"]) {
     assert.match(stats, new RegExp(`${method}: invoke\\(${method}\\)`));
   }
+  assert.match(stats, /const ratings = memoized\(getSandbaggerRatings\)/);
+  assert.match(stats, /const allPlayerStats = memoized\(\(\) => getAllPlayerStats\(ratings\(\)\)\)/);
+  assert.match(stats, /const records = memoized\(\(\) => getRecords\(allPlayerStats\(\)\)\)/);
+  assert.match(stats, /const partnershipStats = memoized\(getPartnershipStats\)/);
+  assert.match(stats, /const rivalryStats = memoized\(getRivalryStats\)/);
+  assert.match(stats, /const chronological = memoized\(chronologicalMatches\)/);
+  assert.match(stats, /const exclusions = memoized\(ghostMatchExclusions\)/);
+  assert.match(stats, /getHeadToHead: headToHead/);
   assert.match(handicaps, /calculations\.getHandicapStats\(\)/);
   assert.match(partnerships, /calculations\.getPartnershipStats\(\)/);
   assert.match(rivalries, /calculations\.getRivalryStats\(\)/);

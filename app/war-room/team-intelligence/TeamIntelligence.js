@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { formatCode, pick, settingsMap } from "../../../lib/prediction-engine";
-import { currentTournamentYear, getCourseOptions, getFormatCourse, getTeamContext, scorecardForTee } from "../../../lib/tournament-context";
-import { optimizeLineups } from "../../../lib/lineup-optimizer";
+import { formatCode } from "../../../lib/prediction-engine";
+import { currentTournamentYear, getTeamContext } from "../../../lib/tournament-context";
+import { buildTeamIntelligenceLineupRuntime } from "../../../lib/team-intelligence-lineup-runtime";
 import {
   chemistryGrade,
   buildLineupPlans,
@@ -145,29 +145,17 @@ function LineupLab({ data }) {
   const [excluded, setExcluded] = useState("");
   const [selectedId, setSelectedId] = useState("");
   const [opponentId, setOpponentId] = useState("");
-  const course = useMemo(() => getFormatCourse(sheets, year, format), [sheets, year, format]);
-  const scorecards = useMemo(() => getCourseOptions(sheets, course), [sheets, course]);
-  const assignedTee = clean(pick(course, "Tee", "Tee Name"));
-  const scorecard = scorecardForTee(scorecards, assignedTee);
-  const complete = clean(pick(scorecard, "Course Rating", "Rating")) && clean(pick(scorecard, "Slope Rating", "Slope")) && clean(pick(scorecard, "Par"));
-  const optimizer = useMemo(() => complete ? optimizeLineups({
-    format, team1: teams.team1, team2: teams.team2,
-    scorecard: { rating: pick(scorecard, "Course Rating", "Rating"), slope: pick(scorecard, "Slope Rating", "Slope"), par: pick(scorecard, "Par") },
-    historical: data.historical, partnerships: data.partnershipPredictionMap, headToHead: data.headToHead, settings: settingsMap(sheets.settings || []),
-  }) : null, [complete, format, teams, scorecard, data, sheets.settings]);
-  const optimizersByFormat = useMemo(() => Object.fromEntries(["BB", "SC"].map((code) => {
-    const assignedCourse = getFormatCourse(sheets, year, code);
-    const cards = getCourseOptions(sheets, assignedCourse);
-    const assigned = clean(pick(assignedCourse, "Tee", "Tee Name"));
-    const card = scorecardForTee(cards, assigned);
-    const values = { rating: pick(card, "Course Rating", "Rating"), slope: pick(card, "Slope Rating", "Slope"), par: pick(card, "Par") };
-    if (!clean(values.rating) || !clean(values.slope) || !clean(values.par)) return [code, null];
-    return [code, optimizeLineups({
-      format: code, team1: teams.team1, team2: teams.team2, scorecard: values,
-      historical: data.historical, partnerships: data.partnershipPredictionMap,
-      headToHead: data.headToHead, settings: settingsMap(sheets.settings || []),
-    })];
-  })), [sheets, year, teams, data]);
+  const lineupRuntime = useMemo(() => buildTeamIntelligenceLineupRuntime({
+    sheets,
+    year,
+    teams,
+    historical: data.historical,
+    partnershipPredictionMap: data.partnershipPredictionMap,
+    headToHead: data.headToHead,
+  }), [sheets, year, teams, data]);
+  const optimizersByFormat = lineupRuntime.optimizersByFormat;
+  const complete = lineupRuntime.isReady(format);
+  const optimizer = lineupRuntime.optimizerFor(format);
   const partnershipMap = useMemo(() => Object.fromEntries(data.partnerships.map((row) => [row.key, row])), [data.partnerships]);
   const source = side === "team1" ? optimizer?.team1Pairings || [] : optimizer?.team2Pairings || [];
   const rows = useMemo(() => rankPairings(annotatePairings(source, partnershipMap).filter((row) =>

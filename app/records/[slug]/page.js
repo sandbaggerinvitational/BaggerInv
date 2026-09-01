@@ -13,22 +13,31 @@ import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
 import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import {
+  buildScorecardRecordLeaderboard,
+  isScorecardRecordSlug,
   scorecardLeaderboardRows,
 } from "../../../lib/scorecard-record-leaderboards";
 import {
+  buildMatchProgressionAnalytics,
+  isMatchProgressionRecordSlug,
   matchProgressionLeaderboardRows,
 } from "../../../lib/match-progression";
-import { buildCanonicalRecordHolderAuthority } from "../../../lib/record-holder-authority";
 import { isSupabaseSecondaryHistory } from "../../../lib/secondary-history-read-source";
 import { loadSecondaryHistoryModel } from "../../../lib/secondary-history-service";
 import { applicationPageEnvironment } from "../../../lib/production-shadow-request-environment";
 
 export const dynamic = "force-dynamic";
 
-const resolveLeaderboard = cache(async (slug, useSupabase, env) => {
+const resolveLeaderboard = cache(async (slug) => {
+  const officialDefinition = getLeaderboardDefinition(slug);
+  if (!officialDefinition &&
+      !isScorecardRecordSlug(slug) &&
+      !isMatchProgressionRecordSlug(slug)) return null;
+
+  const env = await applicationPageEnvironment();
+  const useSupabase = isSupabaseSecondaryHistory(env);
   const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
   if (!useSupabase) await refreshHistoricalData();
-  const officialDefinition = getLeaderboardDefinition(slug);
   if (officialDefinition) {
     const records = useSupabase
       ? secondaryHistory.calculations.getRecords()
@@ -44,15 +53,17 @@ const resolveLeaderboard = cache(async (slug, useSupabase, env) => {
   const playerNames = Object.fromEntries(analytics.scorecards
     .filter((card) => card.playerId)
     .map((card) => [card.playerId, card.playerName || card.playerId]));
-  const authority = buildCanonicalRecordHolderAuthority({
-    scorecards: analytics.scorecards,
-    playerNames,
-    ghostMatchExclusions: analytics.ghostMatchExclusions,
-  });
-  const record = authority.scorecardCatalog.bySlug[slug];
-  const progressionRecord = record
-    ? null
-    : authority.matchProgression.byRecordSlug[slug];
+  const record = isScorecardRecordSlug(slug)
+    ? buildScorecardRecordLeaderboard(slug, analytics.scorecards, {
+        playerNames,
+        ghostMatchExclusions: analytics.ghostMatchExclusions,
+      })
+    : null;
+  const progressionRecord = isMatchProgressionRecordSlug(slug)
+    ? buildMatchProgressionAnalytics(analytics.scorecards, {
+        ghostMatchExclusions: analytics.ghostMatchExclusions,
+      }).byRecordSlug[slug]
+    : null;
   const resolvedRecord = record || progressionRecord;
   if (!resolvedRecord) return null;
   const aggregateColumns = [
@@ -82,10 +93,8 @@ const resolveLeaderboard = cache(async (slug, useSupabase, env) => {
 });
 
 export async function generateMetadata({ params }) {
-  const env = await applicationPageEnvironment();
-  const useSupabase = isSupabaseSecondaryHistory(env);
   const { slug } = await params;
-  const leaderboard = await resolveLeaderboard(slug, useSupabase, env);
+  const leaderboard = await resolveLeaderboard(slug);
 
   const title = leaderboard
     ? `${leaderboard.title} | The Sandbagger Invitational`
@@ -103,7 +112,7 @@ export default async function FullLeaderboardPage({ params }) {
   const env = await applicationPageEnvironment();
   const useSupabase = isSupabaseSecondaryHistory(env);
   const { slug } = await params;
-  const leaderboard = await resolveLeaderboard(slug, useSupabase, env);
+  const leaderboard = await resolveLeaderboard(slug);
   if (!leaderboard) notFound();
 
   const defaultSort =

@@ -303,5 +303,7 @@ test("Player and Records consumers use the shared authority, with old Career hol
   assert.match(playerPage, /recordAuthority\.recordsHeldForPlayer/);
   assert.doesNotMatch(playerIntelligence, /currentRecordHolders|buildScorecardRecordLeaderboards/);
   assert.match(recordsPage, /buildCanonicalRecordHolderAuthority/);
-  assert.match(recordDetail, /buildCanonicalRecordHolderAuthority/);
+  assert.match(recordDetail, /buildScorecardRecordLeaderboard/);
+  assert.match(recordDetail, /buildMatchProgressionAnalytics/);
+  assert.doesNotMatch(recordDetail, /buildCanonicalRecordHolderAuthority/);
 });

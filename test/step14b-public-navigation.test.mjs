@@ -10,12 +10,32 @@ const participantDestinations = ["/home", "/my-match", "/score", "/game-center/"
 test("public drawer is clipped to the viewport at every audited responsive width", async () => {
   const [menu, css] = await Promise.all([source("app/Menu.js"), source("app/globals.css")]);
   assert.match(menu, /className="menuDrawerViewport"/);
-  assert.match(css, /\.menuDrawerViewport\{[^}]*position:fixed;[^}]*inset:0;[^}]*overflow:clip;[^}]*contain:layout paint/s);
+  assert.match(css, /\.menuDrawerViewport\{[^}]*position:fixed;[^}]*inset:var\(--public-site-header-height\) 0 0;[^}]*overflow:clip;[^}]*contain:layout paint/s);
   assert.match(css, /\.sideMenu\s*\{[^}]*width:\s*min\(100vw,\s*520px\)/s);
-  assert.match(css, /\.menuDrawerViewport \.sideMenu\{[^}]*position:absolute;[^}]*right:0;[^}]*visibility:hidden;[^}]*transform:translateX\(100%\)/s);
+  assert.match(css, /\.menuDrawerViewport \.sideMenu\{[^}]*position:absolute;[^}]*right:0;[^}]*height:100%;[^}]*visibility:hidden;[^}]*transform:translateX\(100%\)/s);
   assert.match(css, /\.menuDrawerViewport \.sideMenu\.open\{[^}]*visibility:visible;[^}]*pointer-events:auto;[^}]*transform:translateX\(0\)/s);
   assert.match(css, /@media\s*\(max-width:\s*560px\)[\s\S]*?\.sideMenu\s*\{\s*width:\s*100vw;/);
   assert.doesNotMatch(css, /(?:html|body)[^{]*\{[^}]*overflow-x:\s*hidden/s);
+});
+
+test("opening public navigation preserves the exact site brand and changes only the right control", async () => {
+  const [header, menu, css] = await Promise.all([
+    source("app/components.js"),
+    source("app/Menu.js"),
+    source("app/globals.css"),
+  ]);
+  const siteContent = menu.slice(menu.indexOf("const siteContent"), menu.indexOf("const hubContent"));
+
+  assert.match(header, /<header className="siteHeader">[\s\S]*<Link href=\{homeHref\} className="brand">[\s\S]*sandbagger-logo\.png[\s\S]*<strong>Sandbagger Invitational<\/strong>[\s\S]*Established \{SITE_ESTABLISHED_YEAR\}[\s\S]*<Menu/);
+  assert.doesNotMatch(siteContent, /sideMenuTop|Sandbagger Invitational|sandbagger-logo\.png/);
+  assert.match(menu, /aria-label=\{appShell \? "Open Tournament Hub" : isOpen \? "Close navigation menu" : "Open navigation menu"\}/);
+  assert.match(menu, /onClick=\{\(\) => appShell \? setIsOpen\(true\) : setIsOpen\(\(open\) => !open\)\}/);
+  assert.match(css, /\.siteHeader\s*\{[^}]*--public-site-header-height:[^;}]+;/s);
+  assert.match(css, /\.menuBackdrop\s*\{[^}]*inset:\s*var\(--public-site-header-height\) 0 0;/s);
+  assert.match(css, /\.siteHeader \.menuButton\.active span:nth-child\(1\)[^}]*translateY\(7px\) rotate\(45deg\)/s);
+  assert.match(css, /\.siteHeader \.menuButton\.active span:nth-child\(2\)[^}]*opacity:\s*0/s);
+  assert.match(css, /\.siteHeader \.menuButton\.active span:nth-child\(3\)[^}]*translateY\(-7px\) rotate\(-45deg\)/s);
+  assert.doesNotMatch(css, /\.menuButton\.active[^,{]*[+~][^,{]*\.brand|\.siteHeader:has\([^)]*menuButton\.active[^}]*\.brand/s);
 });
 
 test("every public close path restores focus to the menu opener", async () => {
@@ -26,7 +46,7 @@ test("every public close path restores focus to the menu opener", async () => {
   assert.match(menu, /ref=\{menuButton\}[\s\S]*aria-expanded=\{isOpen\}/);
   assert.match(menu, /event\.key === "Escape"\) setIsOpen\(false\)/);
   assert.match(menu, /className=\{`menuBackdrop[\s\S]*onClick=\{\(\) => setIsOpen\(false\)\}/);
-  assert.match(menu, /aria-label="Close navigation menu" onClick=\{\(\) => setIsOpen\(false\)\}/);
+  assert.match(menu, /isOpen \? "Close navigation menu" : "Open navigation menu"/);
   assert.match(menu, /href=\{link\.href\}[\s\S]*onClick=\{\(\) => setIsOpen\(false\)\}/);
 });
 
