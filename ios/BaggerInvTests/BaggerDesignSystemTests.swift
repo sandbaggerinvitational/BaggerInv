@@ -77,6 +77,7 @@ final class BaggerDesignSystemTests: XCTestCase {
 
         let avatarSizes = BaggerIdentitySize.allCases.map(\.dimension)
         let logoSizes = BaggerLogoSize.allCases.map(\.dimension)
+        XCTAssertEqual(BaggerDesign.Size.Avatar.navigation, 48)
         XCTAssertEqual(avatarSizes, avatarSizes.sorted())
         XCTAssertEqual(logoSizes, logoSizes.sorted())
         XCTAssertEqual(Set(avatarSizes).count, avatarSizes.count)

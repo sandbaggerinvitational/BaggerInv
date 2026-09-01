@@ -46,6 +46,12 @@ final class TodayPresentationTests: XCTestCase {
         XCTAssertEqual(presentation.currentMatch.value?.ownSide?.side, 2)
         XCTAssertEqual(presentation.currentMatch.value?.opponentSide?.side, 1)
         XCTAssertEqual(
+            presentation.currentMatch.value?.ownSide?.teamID,
+            TestFixtures.participant.player.team?.teamId
+        )
+        XCTAssertNil(presentation.currentMatch.value?.opponentSide?.teamID)
+        XCTAssertEqual(presentation.currentMatch.value?.courseID, "course-1")
+        XCTAssertEqual(
             presentation.currentMatch.value?.ownSide?.participants.first(where: \.isAuthenticatedPlayer)?.playerID,
             TestFixtures.participant.player.playerId
         )
@@ -54,6 +60,60 @@ final class TodayPresentationTests: XCTestCase {
         XCTAssertEqual(personal.map(\.match.matchID), ["other-live", "today-selected", "later-personal"])
         XCTAssertEqual(personal.map(\.isCurrent), [false, true, false])
         XCTAssertFalse(personal.contains { $0.match.matchID == "unrelated" })
+    }
+
+    func testCanonicalTwoTeamIdentityJoinUsesIDsOnlyAndFailsClosedWhenAmbiguous() throws {
+        let match = makeMatch(
+            id: "identity-match",
+            status: .scheduled,
+            involved: true,
+            ownSide: 1,
+            round: 1
+        )
+        let ownTeamID = try XCTUnwrap(TestFixtures.participant.player.team?.teamId)
+        let opponentTeamID = "canonical-opponent-id"
+        let twoTeamPresentation = makePresentation(
+            today: makeToday(currentMatch: match),
+            leaders: makeLeaders([
+                standing(rank: 1, teamID: ownTeamID, name: "A display name", points: 1),
+                standing(rank: 2, teamID: opponentTeamID, name: "Another display name", points: 0),
+            ])
+        )
+
+        XCTAssertEqual(twoTeamPresentation.currentMatch.value?.ownSide?.teamID, ownTeamID)
+        XCTAssertEqual(twoTeamPresentation.currentMatch.value?.opponentSide?.teamID, opponentTeamID)
+        XCTAssertEqual(twoTeamPresentation.currentMatch.value?.courseID, "course-1")
+
+        let ambiguous = makePresentation(
+            today: makeToday(currentMatch: match),
+            leaders: makeLeaders([
+                standing(rank: 1, teamID: ownTeamID, name: "Own", points: 1),
+                standing(rank: 2, teamID: opponentTeamID, name: "Opponent", points: 0),
+                standing(rank: 3, teamID: "third-team", name: "Third", points: 0),
+            ])
+        )
+        XCTAssertEqual(ambiguous.currentMatch.value?.ownSide?.teamID, ownTeamID)
+        XCTAssertNil(ambiguous.currentMatch.value?.opponentSide?.teamID)
+
+        let participantAbsent = makePresentation(
+            today: makeToday(currentMatch: match),
+            leaders: makeLeaders([
+                standing(rank: 1, teamID: "other-one", name: "Other One", points: 1),
+                standing(rank: 2, teamID: "other-two", name: "Other Two", points: 0),
+            ])
+        )
+        XCTAssertEqual(participantAbsent.currentMatch.value?.ownSide?.teamID, ownTeamID)
+        XCTAssertNil(participantAbsent.currentMatch.value?.opponentSide?.teamID)
+
+        let duplicateIDs = makePresentation(
+            today: makeToday(currentMatch: match),
+            leaders: makeLeaders([
+                standing(rank: 1, teamID: ownTeamID, name: "Own One", points: 1),
+                standing(rank: 1, teamID: ownTeamID, name: "Own Duplicate", points: 1),
+            ])
+        )
+        XCTAssertEqual(duplicateIDs.currentMatch.value?.ownSide?.teamID, ownTeamID)
+        XCTAssertNil(duplicateIDs.currentMatch.value?.opponentSide?.teamID)
     }
 
     func testMatchStatusCopyUsesOnlyCanonicalLifecycleAndResultFields() throws {

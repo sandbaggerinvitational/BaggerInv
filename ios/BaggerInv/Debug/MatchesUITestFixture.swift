@@ -107,6 +107,7 @@ enum MatchesUITestFixtures {
                     roundName: "Singles",
                     format: "SI",
                     status: .scheduled,
+                    authenticated: hasAuthenticatedMatch,
                     longContent: longContent
                 ),
             ]

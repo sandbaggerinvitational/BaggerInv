@@ -120,6 +120,7 @@ enum BaggerDesign {
         enum Avatar {
             static let small: CGFloat = 32
             static let medium: CGFloat = 44
+            static let navigation: CGFloat = 48
             static let large: CGFloat = 64
             static let hero: CGFloat = 96
         }

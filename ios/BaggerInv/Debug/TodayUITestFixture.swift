@@ -8,8 +8,10 @@ enum TodayUITestScenario: String {
     case final = "today.final"
     case noCurrentMatch = "today.no-current-match"
     case cachedOffline = "today.cached-offline"
+    case stale = "today.stale"
     case emptyOffline = "today.empty-offline"
     case longContent = "today.long-content"
+    case canonicalAssets = "today.canonical-assets"
     case matchesStandard = "matches.standard"
     case matchesNoUserMatch = "matches.no-user-match"
     case matchesCachedOffline = "matches.cached-offline"
@@ -93,13 +95,14 @@ struct TodayUITestFixtureRoot: View {
             )
         default:
             let arguments = ProcessInfo.processInfo.arguments
+            let participant = TodayUITestFixtures.participant(for: scenario)
             BaggerAppShell(
-                participant: TodayUITestFixtures.participant,
+                participant: participant,
                 fixturePresentation: TodayUITestFixtures.presentation(for: scenario),
                 fixtureMatchesState: MatchesUITestFixtures.state(for: scenario),
                 fixtureScoringState: ScoringUITestFixtures.state(for: scenario),
                 fixtureLeaders: LeadersUITestFixtures.bundle(
-                    participant: TodayUITestFixtures.participant,
+                    participant: participant,
                     arguments: arguments
                 ),
                 fixtureScheduleState: MoreUITestFixtures.scheduleState(for: scenario),
@@ -150,6 +153,34 @@ private enum TodayUITestFixtures {
         )
     )
 
+    static func participant(for scenario: TodayUITestScenario) -> ParticipantSession {
+        switch scenario {
+        case .canonicalAssets:
+            ParticipantSession(
+                player: ParticipantPlayer(
+                    playerId: "CB01",
+                    displayName: "Clay Beltran",
+                    team: ParticipantTeam(teamId: "PICKLES", name: "Pickles")
+                ),
+                tournament: participant.tournament
+            )
+        case .longContent:
+            ParticipantSession(
+                player: ParticipantPlayer(
+                    playerId: "UNKNOWN_PLAYER",
+                    displayName: "Clayton Alexander Beltran-Montgomery",
+                    team: ParticipantTeam(
+                        teamId: "UNKNOWN_TEAM_A",
+                        name: "The Evergreen Invitational Pickle Society"
+                    )
+                ),
+                tournament: participant.tournament
+            )
+        default:
+            participant
+        }
+    }
+
     static func presentation(for scenario: TodayUITestScenario) -> TodayPresentation {
         if scenario == .emptyOffline { return emptyOffline }
 
@@ -163,7 +194,7 @@ private enum TodayUITestFixtures {
             current = .init(availability: .content, value: match(status: "Final"), freshness: .current)
         case .noCurrentMatch:
             current = .init(availability: .empty, value: nil, freshness: .current)
-        case .standard, .cachedOffline, .longContent,
+        case .standard, .cachedOffline, .stale, .longContent, .canonicalAssets,
              .matchesStandard, .matchesNoUserMatch, .matchesCachedOffline,
              .matchesEmptyOffline, .matchesLongContent,
              .scoreNoMatch, .scoreUpcomingBestBall, .scoreActiveBestBall,
@@ -182,15 +213,15 @@ private enum TodayUITestFixtures {
                 availability: .content,
                 value: match(
                     status: "Upcoming",
-                    longContent: scenario == .longContent || scenario == .matchesLongContent
+                    scenario: scenario
                 ),
-                freshness: scenario == .cachedOffline ? .offline : .current
+                freshness: freshness(scenario)
             )
         case .emptyOffline:
             fatalError("Handled above")
         }
 
-        let personalCurrent = current.value ?? match(status: "Upcoming", longContent: scenario == .longContent)
+        let personalCurrent = current.value ?? match(status: "Upcoming", scenario: scenario)
         let personal = [
             TodayPersonalMatchPresentation(match: completedMatch, isCurrent: false),
             TodayPersonalMatchPresentation(match: personalCurrent, isCurrent: scenario != .noCurrentMatch),
@@ -198,21 +229,27 @@ private enum TodayUITestFixtures {
         ]
 
         return TodayPresentation(
-            participant: participantPresentation,
+            participant: participantPresentation(for: scenario),
             tournament: .init(availability: .content, value: tournament(longContent: scenario == .longContent), freshness: freshness(scenario)),
             currentMatch: current,
             personalMatches: .init(availability: .content, value: personal, freshness: freshness(scenario)),
-            tournamentScore: .init(availability: .content, value: score, freshness: freshness(scenario)),
-            schedule: .init(availability: .content, value: schedule, freshness: freshness(scenario)),
-            freshnessBanner: scenario == .cachedOffline
-                ? TodayFreshnessBanner(kind: .offline, lastValidated: Date(timeIntervalSince1970: 1_800_000_000))
-                : nil
+            tournamentScore: .init(
+                availability: .content,
+                value: score(for: scenario),
+                freshness: freshness(scenario)
+            ),
+            schedule: .init(
+                availability: .content,
+                value: schedule(longContent: scenario == .longContent),
+                freshness: freshness(scenario)
+            ),
+            freshnessBanner: freshnessBanner(for: scenario)
         )
     }
 
     private static var emptyOffline: TodayPresentation {
         TodayPresentation(
-            participant: participantPresentation,
+            participant: participantPresentation(for: .emptyOffline),
             tournament: .init(
                 availability: .unavailable,
                 value: TodayTournamentPresentation(
@@ -233,13 +270,14 @@ private enum TodayUITestFixtures {
         )
     }
 
-    private static var participantPresentation: TodayParticipantPresentation {
-        TodayParticipantPresentation(
-            playerID: participant.player.playerId,
-            displayName: participant.player.displayName,
-            teamID: participant.player.team?.teamId,
-            teamName: participant.player.team?.name,
-            tournamentID: participant.tournament.tournamentId
+    private static func participantPresentation(for scenario: TodayUITestScenario) -> TodayParticipantPresentation {
+        let session = participant(for: scenario)
+        return TodayParticipantPresentation(
+            playerID: session.player.playerId,
+            displayName: session.player.displayName,
+            teamID: session.player.team?.teamId,
+            teamName: session.player.team?.name,
+            tournamentID: session.tournament.tournamentId
         )
     }
 
@@ -248,7 +286,7 @@ private enum TodayUITestFixtures {
             name: longContent
                 ? "The Exceptionally Long Bagger Invitational Tournament Name"
                 : "Bagger Invitational",
-            year: 2026,
+            year: longContent ? 2030 : 2026,
             statusText: "Live",
             roundText: "Round 2",
             timeZoneIdentifier: "America/Chicago",
@@ -256,20 +294,31 @@ private enum TodayUITestFixtures {
         )
     }
 
-    private static func match(status: String, longContent: Bool = false) -> TodayMatchPresentation {
+    private static func match(
+        status: String,
+        scenario: TodayUITestScenario = .standard
+    ) -> TodayMatchPresentation {
+        let longContent = scenario == .longContent || scenario == .matchesLongContent
+        let canonicalAssets = scenario == .canonicalAssets
+        let session = participant(for: scenario)
         let progress = status == "Live" ? "Hole 7" : nil
         let result = status == "Final" ? "Won 2 & 1" : nil
         return TodayMatchPresentation(
-            matchID: "fixture-match-current",
+            matchID: "fixture-r2-owned",
             eyebrow: status == "Upcoming" ? "YOUR NEXT MATCH" : "YOUR MATCH",
             statusText: status,
             roundText: "Round 2",
-            format: "Four-Ball",
+            format: "Scramble",
             ownSide: TodayMatchSidePresentation(
                 side: 1,
-                name: "Pines",
+                teamID: session.player.team?.teamId,
+                name: session.player.team?.name,
                 participants: [
-                    .init(playerID: "fixture-player-a", displayName: "Alex Morgan", isAuthenticatedPlayer: true),
+                    .init(
+                        playerID: session.player.playerId,
+                        displayName: session.player.displayName,
+                        isAuthenticatedPlayer: true
+                    ),
                     .init(
                         playerID: "fixture-player-b",
                         displayName: longContent ? "Christopher Montgomery-Wellington" : "Jordan Lee",
@@ -279,14 +328,16 @@ private enum TodayUITestFixtures {
             ),
             opponentSide: TodayMatchSidePresentation(
                 side: 2,
-                name: "Dunes",
+                teamID: longContent ? "UNKNOWN_TEAM_B" : canonicalAssets ? "LIPPIT" : "fixture-team-gold",
+                name: longContent ? "The Golden Coastal Links and Dunes Club" : canonicalAssets ? "Lippit" : "Dunes",
                 participants: [
                     .init(playerID: "fixture-player-c", displayName: "Taylor Kim", isAuthenticatedPlayer: false),
                     .init(playerID: "fixture-player-d", displayName: "Cameron Diaz", isAuthenticatedPlayer: false),
                 ]
             ),
-            courseName: longContent ? "The Ocean Course at Kiawah Island Resort" : "Ocean Course",
-            tee: "Tournament Tees",
+            courseID: longContent ? "UNKNOWN_COURSE" : canonicalAssets ? "CPGC01" : "fixture-course-2",
+            courseName: longContent ? "The Cougar Point Course at Kiawah Island Golf Resort" : "Cougar Point",
+            tee: longContent ? "Championship Tournament Tees" : canonicalAssets ? "Tournament Tees" : "Gold",
             teeTimeLabel: "8:10 AM",
             progressText: progress,
             resultText: result
@@ -295,20 +346,33 @@ private enum TodayUITestFixtures {
 
     private static var completedMatch: TodayMatchPresentation {
         TodayMatchPresentation(
-            matchID: "fixture-match-one",
+            matchID: "fixture-r1-final",
             eyebrow: "YOUR MATCH",
             statusText: "Final",
             roundText: "Round 1",
-            format: "Foursomes",
-            ownSide: nil,
+            format: "Best Ball",
+            ownSide: TodayMatchSidePresentation(
+                side: 1,
+                teamID: "fixture-team-green",
+                name: "Pines",
+                participants: [
+                    .init(playerID: "fixture-player-a", displayName: "Alex Morgan", isAuthenticatedPlayer: true),
+                    .init(playerID: "fixture-player-b", displayName: "Jordan Lee", isAuthenticatedPlayer: false),
+                ]
+            ),
             opponentSide: TodayMatchSidePresentation(
                 side: 2,
+                teamID: "fixture-team-gold",
                 name: "Dunes",
-                participants: [.init(playerID: "fixture-player-e", displayName: "Riley Chen", isAuthenticatedPlayer: false)]
+                participants: [
+                    .init(playerID: "fixture-player-c", displayName: "Taylor Kim", isAuthenticatedPlayer: false),
+                    .init(playerID: "fixture-player-d", displayName: "Cameron Diaz", isAuthenticatedPlayer: false),
+                ]
             ),
+            courseID: "fixture-course-1",
             courseName: "Turtle Point",
-            tee: nil,
-            teeTimeLabel: nil,
+            tee: "Gold",
+            teeTimeLabel: "9:20 AM",
             progressText: nil,
             resultText: "Won 2 & 1"
         )
@@ -316,31 +380,46 @@ private enum TodayUITestFixtures {
 
     private static var laterMatch: TodayMatchPresentation {
         TodayMatchPresentation(
-            matchID: "fixture-match-three",
+            matchID: "fixture-r3-scheduled",
             eyebrow: "YOUR NEXT MATCH",
             statusText: "Upcoming",
             roundText: "Round 3",
             format: "Singles",
-            ownSide: nil,
+            ownSide: TodayMatchSidePresentation(
+                side: 1,
+                teamID: "fixture-team-green",
+                name: "Pines",
+                participants: [
+                    .init(playerID: "fixture-player-a", displayName: "Alex Morgan", isAuthenticatedPlayer: true),
+                    .init(playerID: "fixture-player-b", displayName: "Jordan Lee", isAuthenticatedPlayer: false),
+                ]
+            ),
             opponentSide: TodayMatchSidePresentation(
                 side: 2,
+                teamID: "fixture-team-gold",
                 name: "Dunes",
-                participants: [.init(playerID: "fixture-player-f", displayName: "Sam Rivera", isAuthenticatedPlayer: false)]
+                participants: [
+                    .init(playerID: "fixture-player-c", displayName: "Taylor Kim", isAuthenticatedPlayer: false),
+                    .init(playerID: "fixture-player-d", displayName: "Cameron Diaz", isAuthenticatedPlayer: false),
+                ]
             ),
-            courseName: "Cougar Point",
-            tee: nil,
-            teeTimeLabel: "2:10 PM",
+            courseID: "fixture-course-3",
+            courseName: "Ocean Course",
+            tee: "Gold",
+            teeTimeLabel: "9:20 AM",
             progressText: nil,
             resultText: nil
         )
     }
 
-    private static var score: TodayTournamentScorePresentation {
-        TodayTournamentScorePresentation(
+    private static func score(for scenario: TodayUITestScenario) -> TodayTournamentScorePresentation {
+        let longContent = scenario == .longContent
+        let canonicalAssets = scenario == .canonicalAssets
+        return TodayTournamentScorePresentation(
             teams: [
                 .init(
-                    teamID: "fixture-team-green",
-                    name: "Pines",
+                    teamID: longContent ? "UNKNOWN_TEAM_A" : canonicalAssets ? "PICKLES" : "fixture-team-green",
+                    name: longContent ? "The Evergreen Invitational Pickle Society" : canonicalAssets ? "Pickles" : "Pines",
                     rank: 1,
                     points: 8.5,
                     pointsText: "8½",
@@ -350,8 +429,8 @@ private enum TodayUITestFixtures {
                     isTiedForLead: false
                 ),
                 .init(
-                    teamID: "fixture-team-gold",
-                    name: "Dunes",
+                    teamID: longContent ? "UNKNOWN_TEAM_B" : canonicalAssets ? "LIPPIT" : "fixture-team-gold",
+                    name: longContent ? "The Golden Coastal Links and Dunes Club" : canonicalAssets ? "Lippit" : "Dunes",
                     rank: 2,
                     points: 7.5,
                     pointsText: "7½",
@@ -365,20 +444,57 @@ private enum TodayUITestFixtures {
         )
     }
 
-    private static var schedule: TodaySchedulePresentation {
+    private static func schedule(longContent: Bool) -> TodaySchedulePresentation {
         TodaySchedulePresentation(
             title: "Today’s Schedule",
             source: .fullScheduleToday,
             events: [
                 .init(eventID: "breakfast", title: "Breakfast", subtitle: nil, location: "Clubhouse", type: "meal", startTimeText: "7:00 AM", endTimeText: "8:00 AM", isNow: false, isCompleted: true),
-                .init(eventID: "round-two", title: "Round 2", subtitle: "Four-Ball", location: "Ocean Course", type: "golf", startTimeText: "8:10 AM", endTimeText: nil, isNow: true, isCompleted: false),
-                .init(eventID: "dinner", title: "Team Dinner", subtitle: "Jacket optional", location: "Atlantic Room", type: "dinner", startTimeText: "7:00 PM", endTimeText: nil, isNow: false, isCompleted: false),
+                .init(
+                    eventID: "round-two",
+                    title: longContent ? "Round 2 Championship Four-Ball Matches" : "Round 2",
+                    subtitle: longContent ? "Four-Ball matches across every championship tournament pairing" : "Four-Ball",
+                    location: longContent ? "The Ocean Course at Kiawah Island Golf Resort" : "Ocean Course",
+                    type: "golf",
+                    startTimeText: "8:10 AM",
+                    endTimeText: nil,
+                    isNow: true,
+                    isCompleted: false
+                ),
+                .init(
+                    eventID: "dinner",
+                    title: longContent ? "Bagger Invitational Team Celebration Dinner" : "Team Dinner",
+                    subtitle: longContent ? "Jacket optional · tournament guests welcome" : "Jacket optional",
+                    location: longContent ? "The Atlantic Ballroom and Ocean Terrace" : "Atlantic Room",
+                    type: "dinner",
+                    startTimeText: "7:00 PM",
+                    endTimeText: nil,
+                    isNow: false,
+                    isCompleted: false
+                ),
             ]
         )
     }
 
     private static func freshness(_ scenario: TodayUITestScenario) -> TodayPresentedFreshness {
-        scenario == .cachedOffline ? .offline : .current
+        switch scenario {
+        case .cachedOffline: .offline
+        case .stale: .stale
+        default: .current
+        }
+    }
+
+    private static func freshnessBanner(for scenario: TodayUITestScenario) -> TodayFreshnessBanner? {
+        let kind: TodayFreshnessBannerKind
+        switch scenario {
+        case .cachedOffline: kind = .offline
+        case .stale: kind = .stale
+        default: return nil
+        }
+        return TodayFreshnessBanner(
+            kind: kind,
+            lastValidated: Date(timeIntervalSince1970: 1_800_000_000)
+        )
     }
 }
 #endif

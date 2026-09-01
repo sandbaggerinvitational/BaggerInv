@@ -27,6 +27,8 @@ struct BaggerAppShell: View {
     let onSignOut: () -> Void
 
     @State private var selection: BaggerAppTab = .today
+    @State private var matchesPath: [MatchesDestination] = []
+    @State private var leadersSelection: LeadersProduct = .score
     @State private var morePath: [MoreDestination] = []
 
     init(
@@ -94,6 +96,7 @@ struct BaggerAppShell: View {
                 ? .more
                 : startsOnLeaders ? .leaders : startsOnScore ? .score : .today
         )
+        _leadersSelection = State(initialValue: fixtureLeaders?.startingProduct ?? .score)
         _morePath = State(initialValue: startsOnSchedule ? [.schedule] : [])
     }
 
@@ -101,17 +104,17 @@ struct BaggerAppShell: View {
         TabView(selection: $selection) {
             NavigationStack {
                 todayContent
-                    .baggerNavigationChrome(
-                        title: "Today",
+                    .baggerTodayChrome(
                         participant: participant,
-                        onSignOut: onSignOut
+                        profile: todayProfile,
+                        onOpenPassport: openPassport
                     )
             }
             .tabItem { Label("Today", systemImage: "sun.max.fill") }
             .tag(BaggerAppTab.today)
             .accessibilityIdentifier("tab.today")
 
-            NavigationStack {
+            NavigationStack(path: $matchesPath) {
                 matchesContent
                     .baggerNavigationChrome(
                         title: "Matches",
@@ -180,11 +183,15 @@ struct BaggerAppShell: View {
                 players: fixtureLeaders.players,
                 netSkins: fixtureLeaders.netSkins,
                 calcutta: fixtureLeaders.calcutta,
-                startingProduct: fixtureLeaders.startingProduct,
+                selection: $leadersSelection,
                 onRefresh: { _ in }
             )
         } else if let tournamentData {
-            LeadersRepositoryView(participant: participant, coordinator: tournamentData)
+            LeadersRepositoryView(
+                participant: participant,
+                coordinator: tournamentData,
+                selection: $leadersSelection
+            )
         } else {
             VStack(spacing: 14) {
                 Image(systemName: "exclamationmark.shield")
@@ -252,12 +259,16 @@ struct BaggerAppShell: View {
                 presentation: fixturePresentation,
                 isRefreshing: false,
                 onRefresh: {},
+                onOpenMatch: openMatch,
+                onOpenLeaders: openLeaders,
                 onOpenFullSchedule: openFullSchedule
             )
         } else if let tournamentData {
             TodayRepositoryView(
                 participant: participant,
                 coordinator: tournamentData,
+                onOpenMatch: openMatch,
+                onOpenLeaders: openLeaders,
                 onOpenFullSchedule: openFullSchedule
             )
         } else {
@@ -385,6 +396,34 @@ struct BaggerAppShell: View {
         selection = .more
     }
 
+    private func openPassport() {
+        morePath = [.passport]
+        selection = .more
+    }
+
+    private func openMatch(_ matchID: String) {
+        matchesPath = [.match(matchID: matchID)]
+        selection = .matches
+    }
+
+    private func openLeaders() {
+        leadersSelection = .score
+        selection = .leaders
+    }
+
+    private var todayProfile: TodayParticipantPresentation {
+        if let fixturePresentation {
+            return fixturePresentation.participant
+        }
+        return TodayParticipantPresentation(
+            playerID: participant.player.playerId,
+            displayName: participant.player.displayName,
+            teamID: participant.player.team?.teamId,
+            teamName: participant.player.team?.name,
+            tournamentID: participant.tournament.tournamentId
+        )
+    }
+
     private func placeholderTab(
         title: String,
         message: String,
@@ -419,6 +458,21 @@ struct BaggerAppShell: View {
 }
 
 private extension View {
+    func baggerTodayChrome(
+        participant: ParticipantSession,
+        profile: TodayParticipantPresentation,
+        onOpenPassport: @escaping () -> Void
+    ) -> some View {
+        toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                TodayAppHeader(
+                    participant: participant,
+                    profile: profile,
+                    onOpenPassport: onOpenPassport
+                )
+            }
+    }
+
     func baggerNavigationChrome(
         title: String,
         participant: ParticipantSession,
@@ -450,6 +504,64 @@ private extension View {
             .toolbarBackground(BaggerPalette.cream, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.light, for: .navigationBar)
+    }
+}
+
+private struct TodayAppHeader: View {
+    let participant: ParticipantSession
+    let profile: TodayParticipantPresentation
+    let onOpenPassport: () -> Void
+
+    var body: some View {
+        ZStack {
+            Text("Today")
+                .font(.headline)
+                .foregroundStyle(BaggerDesign.Color.textPrimary)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityIdentifier("today.headerTitle")
+
+            HStack(spacing: BaggerDesign.Space.medium) {
+                Text("THE BAGGER")
+                    .font(.caption2.weight(.bold))
+                    .tracking(0.55)
+                    .foregroundStyle(BaggerDesign.Color.brandEvergreenDeep)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .frame(maxWidth: 86, alignment: .leading)
+                    .accessibilityLabel("The Bagger app")
+                    .accessibilityIdentifier("today.appIdentity")
+
+                Spacer(minLength: BaggerDesign.Space.hero)
+
+                Button(action: onOpenPassport) {
+                    BaggerPlayerAvatar(
+                        playerID: profile.playerID,
+                        displayName: profile.displayName,
+                        size: .navigation,
+                        accessibility: .decorative
+                    )
+                    .frame(
+                        minWidth: BaggerDesign.Size.Avatar.navigation,
+                        minHeight: BaggerDesign.Size.Avatar.navigation
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Open \(profile.displayName)’s Player Passport")
+                .accessibilityHint("Opens your native Player Passport")
+                .baggerAcceptanceProbeValue(
+                    BaggerAcceptanceProbes.isEnabled()
+                        ? "Canonical player \(participant.player.playerId); tournament \(participant.tournament.tournamentId)"
+                        : nil
+                )
+                .accessibilityIdentifier("today.profile")
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 56)
+        .padding(.horizontal, BaggerDesign.Space.screenInset)
+        .background(BaggerPalette.cream)
+        .overlay(alignment: .bottom) {
+            Divider().overlay(BaggerDesign.Color.borderDefault.opacity(0.7))
+        }
     }
 }
 

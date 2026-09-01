@@ -792,10 +792,10 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         XCTAssertTrue(screen.waitForExistence(timeout: timeout), "The authenticated Today screen was missing.")
 
         for identifier in [
-            "today.tournamentContext",
-            "today.yourMatches",
-            "today.tournamentScore",
-            "today.schedule",
+            "today.diagnostic.today",
+            "today.diagnostic.matches",
+            "today.diagnostic.leaders",
+            "today.diagnostic.schedule",
         ] {
             let element = app.descendants(matching: .any)
                 .matching(identifier: identifier)
@@ -1145,9 +1145,9 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
         )
         XCTAssertFalse(app.textFields["Approved participant email"].exists)
 
-        let account = app.buttons["account.menu"]
-        XCTAssertTrue(account.waitForExistence(timeout: 5), "The canonical participant account control was missing.")
-        let canonicalParticipant = account.value as? String ?? ""
+        let profile = app.buttons["today.profile"]
+        XCTAssertTrue(profile.waitForExistence(timeout: 5), "The canonical participant profile control was missing.")
+        let canonicalParticipant = profile.value as? String ?? ""
         XCTAssertTrue(
             canonicalParticipant.contains("Canonical player ") &&
                 canonicalParticipant.contains("; tournament "),
@@ -1157,6 +1157,9 @@ final class BaggerInvLivePreviewUITests: XCTestCase {
     }
 
     private func signOut(in app: XCUIApplication) {
+        let matches = app.tabBars.buttons["Matches"]
+        XCTAssertTrue(matches.waitForExistence(timeout: 5), "The Matches tab was unavailable for safe sign out.")
+        matches.tap()
         let account = app.buttons["account.menu"]
         XCTAssertTrue(account.waitForExistence(timeout: 5), "The native account menu was unavailable.")
         account.tap()

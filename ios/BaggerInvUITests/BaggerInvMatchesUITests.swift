@@ -35,7 +35,7 @@ final class BaggerInvMatchesUITests: XCTestCase {
         roundThree.tap()
 
         XCTAssertTrue(roundThree.isSelected, "Round 3 did not become selected.")
-        assertReachable("matches.hero.empty", in: app)
+        assertReachable("matches.hero", in: app)
         assertReachable("matches.card.fixture-r3-scheduled", in: app)
 
         app.terminate()

@@ -34,6 +34,8 @@ struct TodayRepositoryDiagnostics: Equatable, Sendable {
 struct TodayRepositoryView: View {
     let participant: ParticipantSession
     let coordinator: TournamentDataCoordinator
+    let onOpenMatch: (String) -> Void
+    let onOpenLeaders: () -> Void
     let onOpenFullSchedule: () -> Void
 
     @ObservedObject private var today: MobileReadRepository<MobileTodayResponse>
@@ -44,10 +46,14 @@ struct TodayRepositoryView: View {
     init(
         participant: ParticipantSession,
         coordinator: TournamentDataCoordinator,
+        onOpenMatch: @escaping (String) -> Void = { _ in },
+        onOpenLeaders: @escaping () -> Void = {},
         onOpenFullSchedule: @escaping () -> Void = {}
     ) {
         self.participant = participant
         self.coordinator = coordinator
+        self.onOpenMatch = onOpenMatch
+        self.onOpenLeaders = onOpenLeaders
         self.onOpenFullSchedule = onOpenFullSchedule
         _today = ObservedObject(wrappedValue: coordinator.today)
         _matches = ObservedObject(wrappedValue: coordinator.matches)
@@ -77,6 +83,8 @@ struct TodayRepositoryView: View {
             isRefreshing: today.state.isRefreshing || matches.state.isRefreshing ||
                 leaders.state.isRefreshing || schedule.state.isRefreshing,
             onRefresh: { await coordinator.refreshTodaySurface() },
+            onOpenMatch: onOpenMatch,
+            onOpenLeaders: onOpenLeaders,
             onOpenFullSchedule: onOpenFullSchedule
         )
     }
@@ -87,6 +95,8 @@ struct TodayScreen: View {
     var readDiagnostics: TodayRepositoryDiagnostics?
     let isRefreshing: Bool
     let onRefresh: @MainActor @Sendable () async -> Void
+    let onOpenMatch: (String) -> Void
+    let onOpenLeaders: () -> Void
     let onOpenFullSchedule: () -> Void
 
     init(
@@ -94,21 +104,23 @@ struct TodayScreen: View {
         readDiagnostics: TodayRepositoryDiagnostics? = nil,
         isRefreshing: Bool,
         onRefresh: @escaping @MainActor @Sendable () async -> Void,
+        onOpenMatch: @escaping (String) -> Void = { _ in },
+        onOpenLeaders: @escaping () -> Void = {},
         onOpenFullSchedule: @escaping () -> Void = {}
     ) {
         self.presentation = presentation
         self.readDiagnostics = readDiagnostics
         self.isRefreshing = isRefreshing
         self.onRefresh = onRefresh
+        self.onOpenMatch = onOpenMatch
+        self.onOpenLeaders = onOpenLeaders
         self.onOpenFullSchedule = onOpenFullSchedule
     }
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: BaggerLayout.sectionSpacing) {
+            LazyVStack(alignment: .leading, spacing: BaggerDesign.Space.sectionGap) {
                 TournamentContextSection(section: presentation.tournament)
-                    .accessibilityIdentifier("today.tournamentContext")
-                    .todayReadDiagnostic(readDiagnostics?.today)
 
                 if let banner = presentation.freshnessBanner {
                     TodayFreshnessBannerView(banner: banner)
@@ -117,25 +129,26 @@ struct TodayScreen: View {
                 if hasNoUsableProductData {
                     NoProductDataView(onRetry: onRefresh)
                 } else {
-                    CurrentMatchSection(section: presentation.currentMatch)
-                        .accessibilityIdentifier("today.matchHero")
+                    CurrentMatchSection(
+                        section: presentation.currentMatch,
+                        onOpenMatch: onOpenMatch
+                    )
 
-                    PersonalMatchesSection(section: presentation.personalMatches)
-                        .accessibilityIdentifier("today.yourMatches")
-                        .todayReadDiagnostic(readDiagnostics?.matches)
+                    PersonalMatchesSection(
+                        section: presentation.personalMatches,
+                        onOpenMatch: onOpenMatch
+                    )
 
                     TournamentScoreSection(
                         section: presentation.tournamentScore,
-                        participantTeamID: presentation.participant.teamID
+                        participantTeamID: presentation.participant.teamID,
+                        onOpenLeaders: onOpenLeaders
                     )
-                    .accessibilityIdentifier("today.tournamentScore")
-                    .todayReadDiagnostic(readDiagnostics?.leaders)
 
                     TodayScheduleSection(
                         section: presentation.schedule,
                         onOpenFullSchedule: onOpenFullSchedule
                     )
-                        .todayReadDiagnostic(readDiagnostics?.schedule)
                 }
 
                 if isRefreshing {
@@ -150,13 +163,18 @@ struct TodayScreen: View {
                     .accessibilityElement(children: .combine)
                 }
             }
-            .padding(.horizontal, BaggerLayout.pageInset)
-            .padding(.top, 12)
-            .padding(.bottom, 28)
+            .padding(.horizontal, BaggerDesign.Space.screenInset)
+            .padding(.top, BaggerDesign.Space.medium)
+            .padding(.bottom, BaggerDesign.Space.xxxLarge)
         }
-        .background(BaggerPalette.canvas.ignoresSafeArea())
+        .baggerScreenBackground()
         .refreshable(action: onRefresh)
         .accessibilityIdentifier("today.screen")
+        .overlay(alignment: .topLeading) {
+            if let readDiagnostics {
+                TodayReadDiagnosticProbes(diagnostics: readDiagnostics)
+            }
+        }
     }
 
     private var hasNoUsableProductData: Bool {
@@ -195,51 +213,136 @@ private struct NoProductDataView: View {
 
 private struct TournamentContextSection: View {
     let section: TodaySection<TodayTournamentPresentation>
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            BaggerEyebrow(text: "Bagger Invitational")
+        Group {
             if let tournament = section.value {
-                Text(tournament.name)
-                    .font(.system(.title, design: .serif, weight: .bold))
-                    .foregroundStyle(BaggerPalette.ink)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                let details = [
-                    tournament.year.map(String.init),
-                    tournament.roundText,
-                    tournament.statusText,
-                ].compactMap { $0 }
-                if !details.isEmpty {
-                    Text(details.joined(separator: " · "))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(BaggerPalette.actionGreen)
-                }
-
-                if tournament.isSessionFallback && section.availability != .content {
-                    Label("Tournament details are updating", systemImage: "arrow.triangle.2.circlepath")
-                        .font(.footnote)
-                        .foregroundStyle(BaggerPalette.muted)
+                if dynamicTypeSize.isAccessibilitySize {
+                    VStack(alignment: .leading, spacing: BaggerDesign.Space.small) {
+                        tournamentMark(tournament)
+                        tournamentCopy(tournament)
+                    }
+                } else {
+                    HStack(alignment: .center, spacing: BaggerDesign.Space.medium) {
+                        tournamentMark(tournament)
+                        tournamentCopy(tournament)
+                        Spacer(minLength: 0)
+                    }
                 }
             } else {
-                TodayLoadingLines(count: 2)
+                HStack(spacing: BaggerDesign.Space.medium) {
+                    BaggerBrandMark(size: .large, accessibility: .decorative)
+                    TodayLoadingLines(count: 2)
+                    Spacer(minLength: 0)
+                    TodayPreviewIndicator()
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 2)
-        .accessibilityElement(children: .combine)
+        .padding(.horizontal, BaggerDesign.Space.large)
+        .padding(.vertical, BaggerDesign.Space.medium)
+        .background(
+            LinearGradient(
+                colors: [
+                    BaggerDesign.Color.surfacePrimary,
+                    BaggerDesign.Color.backgroundSecondary.opacity(0.72),
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: BaggerDesign.Radius.hero, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: BaggerDesign.Radius.hero, style: .continuous)
+                .stroke(
+                    BaggerDesign.Color.borderDefault.opacity(0.38),
+                    lineWidth: BaggerDesign.Border.thin
+                )
+        }
+    }
+
+    private func tournamentMark(_ tournament: TodayTournamentPresentation) -> some View {
+        BaggerTournamentMark(
+            year: tournament.year ?? -1,
+            size: .large,
+            accessibility: .decorative
+        )
+        .accessibilityIdentifier("today.tournamentMark")
+    }
+
+    private func tournamentCopy(_ tournament: TodayTournamentPresentation) -> some View {
+        VStack(alignment: .leading, spacing: BaggerDesign.Space.xSmall) {
+            HStack(alignment: .firstTextBaseline, spacing: BaggerDesign.Space.small) {
+                BaggerEyebrow(
+                    text: tournament.year.map(String.init) ?? "TOURNAMENT"
+                )
+                .accessibilityIdentifier("today.tournamentYear")
+                Spacer(minLength: BaggerDesign.Space.xSmall)
+                TodayPreviewIndicator()
+            }
+            Text(tournament.name)
+                .font(BaggerDesign.Typography.titlePrimary)
+                .foregroundStyle(BaggerDesign.Color.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("today.tournamentContext")
+
+            let context = [tournament.roundText, tournament.statusText].compactMap { $0 }
+            if !context.isEmpty {
+                Text(context.joined(separator: " · "))
+                    .font(BaggerDesign.Typography.bodyEmphasis)
+                    .foregroundStyle(BaggerDesign.Color.brandAction)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("today.tournamentLifecycle")
+            }
+
+            if tournament.isSessionFallback && section.availability != .content {
+                Label("Tournament details are updating", systemImage: "arrow.triangle.2.circlepath")
+                    .font(BaggerDesign.Typography.caption)
+                    .foregroundStyle(BaggerDesign.Color.textSecondary)
+            }
+        }
+        .accessibilityAddTraits(.isHeader)
+    }
+}
+
+private struct TodayPreviewIndicator: View {
+    var body: some View {
+        Text("PREVIEW")
+            .font(.caption2.weight(.semibold))
+            .tracking(0.65)
+            .foregroundStyle(BaggerDesign.Color.brandEvergreenDeep)
+            .padding(.horizontal, 6)
+            .padding(.vertical, BaggerDesign.Space.hairline)
+            .background(BaggerDesign.Color.brandGoldMuted.opacity(0.64), in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(BaggerDesign.Color.brandGold.opacity(0.66), lineWidth: BaggerDesign.Border.thin)
+            }
+            .fixedSize()
+            .accessibilityLabel("Preview environment")
+            .accessibilityIdentifier("today.previewIndicator")
     }
 }
 
 private struct CurrentMatchSection: View {
     let section: TodaySection<TodayMatchPresentation>
+    let onOpenMatch: (String) -> Void
 
     var body: some View {
         Group {
             switch section.availability {
             case .content:
                 if let match = section.value {
-                    CurrentMatchCard(match: match)
+                    Button {
+                        onOpenMatch(match.matchID)
+                    } label: {
+                        CurrentMatchCard(match: match)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("today.currentMatch.\(match.matchID)")
+                    .accessibilityLabel(match.accessibilitySummary)
+                    .accessibilityHint("View Match Details")
                 }
             case .loading:
                 VStack(alignment: .leading, spacing: 12) {
@@ -268,7 +371,7 @@ private struct CurrentMatchCard: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 15) {
+        VStack(alignment: .leading, spacing: BaggerDesign.Space.medium) {
             Group {
                 if dynamicTypeSize.isAccessibilitySize {
                     VStack(alignment: .leading, spacing: 10) {
@@ -285,14 +388,32 @@ private struct CurrentMatchCard: View {
             }
 
             if let courseLine = courseLine {
-                Label(courseLine, systemImage: "flag.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(BaggerPalette.actionGreen)
-            }
-            if let time = match.teeTimeLabel {
+                HStack(alignment: .center, spacing: BaggerDesign.Space.medium) {
+                    BaggerCourseLogo(
+                        courseID: match.courseID ?? "",
+                        courseName: match.courseName ?? "Golf course",
+                        size: .medium,
+                        accessibility: .decorative
+                    )
+                    .accessibilityIdentifier("today.currentMatch.courseLogo")
+
+                    VStack(alignment: .leading, spacing: BaggerDesign.Space.xSmall) {
+                        Text(courseLine)
+                            .font(BaggerDesign.Typography.bodyEmphasis)
+                            .foregroundStyle(BaggerDesign.Color.brandAction)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if let time = match.teeTimeLabel {
+                            Label(time, systemImage: "clock.fill")
+                                .font(BaggerDesign.Typography.captionEmphasis)
+                                .foregroundStyle(BaggerDesign.Color.textPrimary)
+                        }
+                    }
+                }
+                .accessibilityIdentifier("today.currentMatch.courseIdentity")
+            } else if let time = match.teeTimeLabel {
                 Label(time, systemImage: "clock.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(BaggerPalette.ink)
+                    .font(BaggerDesign.Typography.bodyEmphasis)
+                    .foregroundStyle(BaggerDesign.Color.textPrimary)
             }
 
             if let own = match.ownSide, let opponent = match.opponentSide {
@@ -316,10 +437,21 @@ private struct CurrentMatchCard: View {
                     .padding(12)
                     .background(BaggerPalette.evergreen.opacity(0.09), in: RoundedRectangle(cornerRadius: 12))
             }
+
+            HStack(spacing: BaggerDesign.Space.small) {
+                Text("View Match Details")
+                    .font(BaggerDesign.Typography.button)
+                Spacer(minLength: BaggerDesign.Space.small)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.bold))
+            }
+            .foregroundStyle(BaggerDesign.Color.brandAction)
+            .frame(minHeight: BaggerDesign.Size.minimumTouchTarget)
+            .accessibilityHidden(true)
         }
-        .baggerCard(border: BaggerPalette.matchBorder)
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("Current match, \(match.statusText)")
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .baggerCard(style: .selected)
     }
 
     private var courseLine: String? {
@@ -352,13 +484,13 @@ private struct MatchSidesView: View {
     var body: some View {
         Group {
             if dynamicTypeSize.isAccessibilitySize {
-                VStack(spacing: 12) {
+                VStack(spacing: BaggerDesign.Space.small) {
                     MatchSideView(side: own, isOwnSide: true)
                     versus
                     MatchSideView(side: opponent, isOwnSide: false)
                 }
             } else {
-                HStack(alignment: .center, spacing: 9) {
+                HStack(alignment: .center, spacing: BaggerDesign.Space.small) {
                     MatchSideView(side: own, isOwnSide: true)
                         .frame(maxWidth: .infinity)
                     versus
@@ -383,21 +515,20 @@ private struct MatchSideView: View {
     let isOwnSide: Bool
 
     var body: some View {
-        VStack(spacing: 7) {
-            ZStack {
-                Circle()
-                    .fill(isOwnSide ? BaggerPalette.scoreGold.opacity(0.48) : BaggerPalette.cream)
-                Text(initials)
-                    .font(.caption.weight(.black))
-                    .foregroundStyle(BaggerPalette.deepEvergreen)
-            }
-            .frame(width: 42, height: 42)
-            .accessibilityHidden(true)
+        VStack(spacing: 6) {
+            BaggerTeamLogo(
+                teamID: side.teamID ?? "",
+                teamName: side.name ?? "Side \(side.side)",
+                size: .medium,
+                accessibility: .decorative
+            )
+            .scaleEffect(1.12)
+            .frame(width: 50, height: 50)
 
             if let name = side.name {
                 Text(name)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(BaggerPalette.muted)
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(BaggerDesign.Color.brandEvergreenSoft)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -411,12 +542,7 @@ private struct MatchSideView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilitySummary)
-    }
-
-    private var initials: String {
-        let source = side.name ?? side.participants.first?.displayName ?? "Team"
-        let words = source.split(separator: " ").prefix(2)
-        return words.compactMap(\.first).map(String.init).joined().uppercased()
+        .accessibilityIdentifier("today.currentMatch.side.\(side.side)")
     }
 
     private var accessibilitySummary: String {
@@ -429,16 +555,26 @@ private struct MatchSideView: View {
 
 private struct PersonalMatchesSection: View {
     let section: TodaySection<[TodayPersonalMatchPresentation]>
+    let onOpenMatch: (String) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             BaggerSectionHeading("Your Matches")
+                .accessibilityIdentifier("today.yourMatches")
             switch section.availability {
             case .content:
                 if let matches = section.value {
                     VStack(spacing: 0) {
                         ForEach(Array(matches.enumerated()), id: \.element.match.matchID) { index, item in
-                            PersonalMatchRow(item: item)
+                            Button {
+                                onOpenMatch(item.match.matchID)
+                            } label: {
+                                PersonalMatchRow(item: item)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("today.personalMatch.\(item.match.matchID)")
+                            .accessibilityLabel(item.accessibilitySummary)
+                            .accessibilityHint("Opens Match Detail")
                             if index < matches.count - 1 {
                                 Divider().overlay(BaggerPalette.warmBorder)
                             }
@@ -483,7 +619,7 @@ private struct PersonalMatchRow: View {
                 if let opponents = opponentNames {
                     Text("vs \(opponents)")
                         .font(.subheadline)
-                        .foregroundStyle(BaggerPalette.muted)
+                        .foregroundStyle(BaggerDesign.Color.textPrimary.opacity(0.78))
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -499,9 +635,14 @@ private struct PersonalMatchRow: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(BaggerDesign.Color.textMuted)
+                .accessibilityHidden(true)
         }
+        .frame(minHeight: BaggerDesign.Size.minimumTouchTarget)
+        .contentShape(Rectangle())
         .padding(.vertical, 10)
-        .accessibilityElement(children: .combine)
     }
 
     private var opponentNames: String? {
@@ -513,48 +654,119 @@ private struct PersonalMatchRow: View {
     }
 }
 
+private extension TodayPersonalMatchPresentation {
+    var accessibilitySummary: String {
+        let round = match.roundText ?? "Match"
+        let opponents = match.opponentSide?.participants.map(\.displayName).joined(separator: ", ")
+        let detail = match.resultText ?? match.progressText ?? match.teeTimeLabel
+        return [
+            isCurrent ? "Current match" : round,
+            opponents.map { "versus \($0)" },
+            match.statusText,
+            detail,
+        ].compactMap { $0 }.joined(separator: ", ")
+    }
+}
+
+private extension TodayMatchPresentation {
+    var accessibilitySummary: String {
+        let course = [courseName, tee].compactMap { $0 }.joined(separator: ", ").nilIfEmpty
+        let ownPlayers = ownSide?.participants.map(\.displayName).joined(separator: ", ").nilIfEmpty
+        let opponentPlayers = opponentSide?.participants.map(\.displayName).joined(separator: ", ").nilIfEmpty
+        let ownIdentity = [ownSide?.name, ownPlayers].compactMap { $0 }.joined(separator: ", ").nilIfEmpty
+        let opponentIdentity = [opponentSide?.name, opponentPlayers]
+            .compactMap { $0 }
+            .joined(separator: ", ")
+            .nilIfEmpty
+        let matchup: String? = {
+            switch (ownIdentity, opponentIdentity) {
+            case let (.some(own), .some(opponents)):
+                return "Your side, \(own), versus \(opponents)"
+            case let (.some(own), .none):
+                return "Your side, \(own)"
+            case let (.none, .some(opponents)):
+                return "Versus \(opponents)"
+            case (.none, .none):
+                return nil
+            }
+        }()
+
+        return [
+            "Current match",
+            roundText,
+            format,
+            course,
+            teeTimeLabel,
+            matchup,
+            "Status \(statusText)",
+            progressText,
+            resultText,
+            "View Match Details",
+        ].compactMap { $0 }.joined(separator: ", ")
+    }
+}
+
 private struct TournamentScoreSection: View {
     let section: TodaySection<TodayTournamentScorePresentation>
     let participantTeamID: String?
+    let onOpenLeaders: () -> Void
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             BaggerSectionHeading("Tournament Score")
+                .accessibilityIdentifier("today.tournamentScore")
             switch section.availability {
             case .content:
                 if let score = section.value {
-                    VStack(alignment: .leading, spacing: 15) {
-                        if let context = score.contextText {
-                            Text(context.uppercased())
-                                .font(.caption.weight(.bold))
-                                .tracking(1)
-                                .foregroundStyle(.white.opacity(0.72))
-                        }
-                        if dynamicTypeSize.isAccessibilitySize {
-                            VStack(spacing: 16) {
-                                teamScores(score.teams)
+                    Button(action: onOpenLeaders) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            if let context = score.contextText {
+                                Text(context.uppercased())
+                                    .font(BaggerDesign.Typography.captionEmphasis)
+                                    .tracking(1)
+                                    .foregroundStyle(.white.opacity(0.78))
                             }
-                        } else {
-                            HStack(alignment: .top, spacing: 18) {
-                                teamScores(score.teams)
+                            if dynamicTypeSize.isAccessibilitySize {
+                                VStack(spacing: BaggerDesign.Space.medium) {
+                                    teamScores(score.teams)
+                                }
+                            } else {
+                                HStack(alignment: .top, spacing: BaggerDesign.Space.medium) {
+                                    teamScores(score.teams)
+                                }
                             }
+
+                            HStack(spacing: BaggerDesign.Space.small) {
+                                Text("View Leaders")
+                                    .font(BaggerDesign.Typography.button)
+                                Spacer(minLength: BaggerDesign.Space.small)
+                                Image(systemName: "chevron.right")
+                                    .font(.footnote.weight(.bold))
+                            }
+                            .foregroundStyle(.white)
+                            .frame(minHeight: BaggerDesign.Size.minimumTouchTarget)
+                            .accessibilityHidden(true)
                         }
-                    }
-                    .padding(18)
-                    .background(
-                        LinearGradient(
-                            colors: [BaggerPalette.deepEvergreen, BaggerPalette.actionGreen],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+                        .padding(.horizontal, BaggerDesign.Space.large)
+                        .padding(.vertical, BaggerDesign.Space.medium)
+                        .background(
+                            LinearGradient(
+                                colors: [BaggerPalette.deepEvergreen, BaggerPalette.actionGreen],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: BaggerLayout.cardRadius, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: BaggerLayout.cardRadius, style: .continuous)
-                            .stroke(BaggerPalette.softGreen, lineWidth: 1)
+                        .clipShape(RoundedRectangle(cornerRadius: BaggerDesign.Radius.hero, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: BaggerDesign.Radius.hero, style: .continuous)
+                                .stroke(BaggerPalette.softGreen, lineWidth: BaggerDesign.Border.thin)
+                        }
+                        .shadow(color: BaggerPalette.deepEvergreen.opacity(0.15), radius: 13, y: 7)
                     }
-                    .shadow(color: BaggerPalette.deepEvergreen.opacity(0.15), radius: 13, y: 7)
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("today.openLeaders")
+                    .accessibilityHint("Opens Tournament Score in Leaders")
                 }
             case .loading:
                 TodayLoadingCard()
@@ -576,19 +788,32 @@ private struct TournamentScoreSection: View {
     @ViewBuilder
     private func teamScores(_ teams: [TodayTeamScorePresentation]) -> some View {
         ForEach(teams, id: \.teamID) { team in
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 7) {
-                    Text(team.name.uppercased())
-                        .font(.caption.weight(.bold))
-                        .tracking(0.7)
-                        .foregroundStyle(.white.opacity(0.8))
-                    if team.teamID == participantTeamID {
-                        Image(systemName: "person.fill")
-                            .font(.caption2)
-                            .foregroundStyle(BaggerPalette.scoreGold)
-                            .accessibilityLabel("Your team")
+            VStack(alignment: .center, spacing: 4) {
+                BaggerTeamLogo(
+                    teamID: team.teamID,
+                    teamName: team.name,
+                    size: .medium,
+                    accessibility: .decorative
+                )
+                .scaleEffect(1.12)
+                .frame(width: 50, height: 50)
+                .accessibilityIdentifier("today.tournamentScore.logo.\(team.teamID)")
+
+                Text(team.name.uppercased())
+                    .font(.caption.weight(.bold))
+                    .tracking(0.7)
+                    .foregroundStyle(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .overlay(alignment: .trailing) {
+                        if team.teamID == participantTeamID {
+                            Image(systemName: "person.fill")
+                                .font(.caption2)
+                                .foregroundStyle(BaggerPalette.scoreGold)
+                                .offset(x: BaggerDesign.Space.large)
+                                .accessibilityLabel("Your team")
+                        }
                     }
-                }
                 Text(team.pointsText)
                     .font(.system(.largeTitle, design: .rounded, weight: .bold))
                     .monospacedDigit()
@@ -607,9 +832,11 @@ private struct TournamentScoreSection: View {
                         .foregroundStyle(.white)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .multilineTextAlignment(.center)
             .accessibilityElement(children: .combine)
             .accessibilityLabel(scoreAccessibilityLabel(team))
+            .accessibilityIdentifier("today.tournamentScore.team.\(team.teamID)")
         }
     }
 
@@ -636,6 +863,9 @@ private struct TodayScheduleSection: View {
                     VStack(spacing: 0) {
                         ForEach(Array(schedule.events.enumerated()), id: \.offset) { index, event in
                             ScheduleEventRow(event: event)
+                                .accessibilityIdentifier(
+                                    "today.schedule.event.\(event.eventID ?? String(index))"
+                                )
                             if index < schedule.events.count - 1 {
                                 Divider().overlay(BaggerPalette.warmBorder)
                             }
@@ -662,9 +892,7 @@ private struct TodayScheduleSection: View {
                 Label("View Full Schedule", systemImage: "calendar")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.bordered)
-            .tint(BaggerPalette.actionGreen)
-            .controlSize(.large)
+            .buttonStyle(BaggerSecondaryButtonStyle(expands: true))
             .accessibilityHint("Opens the full tournament Schedule")
             .accessibilityIdentifier("today.fullSchedule")
         }
@@ -677,9 +905,9 @@ private struct ScheduleEventRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: symbol)
-                .font(.headline)
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(BaggerPalette.actionGreen)
-                .frame(width: 36, height: 36)
+                .frame(width: 34, height: 34)
                 .background(BaggerPalette.cream, in: Circle())
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
@@ -743,23 +971,16 @@ private struct MatchStatusPill: View {
     let status: String
 
     var body: some View {
-        HStack(spacing: 5) {
-            if status == "Live" {
-                Circle()
-                    .fill(BaggerPalette.liveRed)
-                    .frame(width: 7, height: 7)
-                    .accessibilityHidden(true)
-            }
-            Text(status.uppercased())
-                .font(.caption2.weight(.black))
-                .tracking(0.6)
-        }
-        .foregroundStyle(status == "Live" ? BaggerPalette.liveRed : BaggerPalette.actionGreen)
-        .padding(.horizontal, 9)
-        .padding(.vertical, 6)
-        .background(BaggerPalette.evergreen.opacity(0.09), in: Capsule())
-        .fixedSize()
+        BaggerStatusBadge(kind: kind, title: status)
         .accessibilityLabel("Match status: \(status)")
+    }
+
+    private var kind: BaggerStatusKind {
+        switch status {
+        case "Live": .live
+        case "Final": .final
+        default: .upcoming
+        }
     }
 }
 
@@ -767,24 +988,21 @@ private struct TodayFreshnessBannerView: View {
     let banner: TodayFreshnessBanner
 
     var body: some View {
-        HStack(spacing: 9) {
-            Image(systemName: icon)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(message)
-                    .font(.footnote.weight(.bold))
-                if let date = banner.lastValidated {
-                    Text("Last checked \(date.formatted(date: .omitted, time: .shortened))")
-                        .font(.caption)
-                }
-            }
-            Spacer(minLength: 0)
-        }
-        .foregroundStyle(BaggerPalette.ink)
-        .padding(12)
-        .background(BaggerPalette.scoreGold.opacity(0.28), in: RoundedRectangle(cornerRadius: 12))
-        .accessibilityElement(children: .combine)
+        BaggerFreshnessBanner(kind: freshnessKind, message: fullMessage)
         .accessibilityIdentifier("today.offlineStatus")
+    }
+
+    private var fullMessage: String {
+        guard let date = banner.lastValidated else { return message }
+        return "\(message) Last checked \(date.formatted(date: .omitted, time: .shortened))."
+    }
+
+    private var freshnessKind: BaggerFreshnessKind {
+        switch banner.kind {
+        case .cached: .cached
+        case .stale: .stale
+        case .offline: .offline
+        }
     }
 
     private var message: String {
@@ -792,14 +1010,6 @@ private struct TodayFreshnessBannerView: View {
         case .cached: "Showing saved tournament data while Bagger refreshes."
         case .stale: "Showing the last update. Pull to refresh."
         case .offline: "Offline · showing the last verified update."
-        }
-    }
-
-    private var icon: String {
-        switch banner.kind {
-        case .cached: "arrow.triangle.2.circlepath"
-        case .stale: "clock.badge.exclamationmark"
-        case .offline: "wifi.slash"
         }
     }
 }
@@ -883,21 +1093,25 @@ private extension String {
     var nilIfEmpty: String? { isEmpty ? nil : self }
 }
 
-private struct TodayReadDiagnosticModifier: ViewModifier {
-    let value: String?
+private struct TodayReadDiagnosticProbes: View {
+    let diagnostics: TodayRepositoryDiagnostics
 
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if let value {
-            content.accessibilityValue(Text(value))
-        } else {
-            content
+    var body: some View {
+        VStack(spacing: 0) {
+            probe(identifier: "today.diagnostic.today", value: diagnostics.today)
+            probe(identifier: "today.diagnostic.matches", value: diagnostics.matches)
+            probe(identifier: "today.diagnostic.leaders", value: diagnostics.leaders)
+            probe(identifier: "today.diagnostic.schedule", value: diagnostics.schedule)
         }
+        .allowsHitTesting(false)
     }
-}
 
-private extension View {
-    func todayReadDiagnostic(_ value: String?) -> some View {
-        modifier(TodayReadDiagnosticModifier(value: value))
+    private func probe(identifier: String, value: String) -> some View {
+        Text("Read diagnostic")
+            .font(.system(size: 1))
+            .frame(width: 1, height: 1)
+            .opacity(0.01)
+            .accessibilityValue(Text(value))
+            .accessibilityIdentifier(identifier)
     }
 }

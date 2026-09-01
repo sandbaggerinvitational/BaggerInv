@@ -46,6 +46,7 @@ struct TodayMatchParticipantPresentation: Equatable, Sendable {
 
 struct TodayMatchSidePresentation: Equatable, Sendable {
     let side: Int
+    let teamID: String?
     let name: String?
     let participants: [TodayMatchParticipantPresentation]
 }
@@ -58,6 +59,7 @@ struct TodayMatchPresentation: Equatable, Sendable {
     let format: String?
     let ownSide: TodayMatchSidePresentation?
     let opponentSide: TodayMatchSidePresentation?
+    let courseID: String?
     let courseName: String?
     let tee: String?
     let teeTimeLabel: String?
@@ -204,12 +206,20 @@ enum TodayPresenter {
             teamName: participant.player.team?.name,
             tournamentID: participant.tournament.tournamentId
         )
+        let matchTeamIDs = matchTeamIdentity(
+            participantTeamID: participant.player.team?.teamId,
+            leaders: leaders.value
+        )
 
         return TodayPresentation(
             participant: participantPresentation,
             tournament: tournamentSection(participant: participant, state: today),
-            currentMatch: currentMatchSection(state: today),
-            personalMatches: personalMatchesSection(today: today, matches: matches),
+            currentMatch: currentMatchSection(state: today, teamIDs: matchTeamIDs),
+            personalMatches: personalMatchesSection(
+                today: today,
+                matches: matches,
+                teamIDs: matchTeamIDs
+            ),
             tournamentScore: tournamentScoreSection(state: leaders),
             schedule: scheduleSection(today: today, schedule: schedule, now: now, locale: locale),
             freshnessBanner: freshnessBanner(states: [
@@ -258,7 +268,8 @@ enum TodayPresenter {
     }
 
     private static func currentMatchSection(
-        state: MobileReadState<MobileTodayData>
+        state: MobileReadState<MobileTodayData>,
+        teamIDs: MatchTeamIdentity
     ) -> TodaySection<TodayMatchPresentation> {
         guard let data = state.value else {
             return TodaySection(availability: unavailableOrLoading(state), value: nil, freshness: nil)
@@ -266,12 +277,13 @@ enum TodayPresenter {
         guard let match = data.currentMatch else {
             return emptySection(state: state)
         }
-        return contentSection(matchPresentation(match), state: state)
+        return contentSection(matchPresentation(match, teamIDs: teamIDs), state: state)
     }
 
     private static func personalMatchesSection(
         today: MobileReadState<MobileTodayData>,
-        matches: MobileReadState<MobileMatchesData>
+        matches: MobileReadState<MobileMatchesData>,
+        teamIDs: MatchTeamIdentity
     ) -> TodaySection<[TodayPersonalMatchPresentation]> {
         guard let data = matches.value else {
             return TodaySection(availability: unavailableOrLoading(matches), value: nil, freshness: nil)
@@ -282,7 +294,7 @@ enum TodayPresenter {
             .filter(\.authenticatedPlayer.involved)
             .map { match in
                 TodayPersonalMatchPresentation(
-                    match: matchPresentation(match),
+                    match: matchPresentation(match, teamIDs: teamIDs),
                     isCurrent: match.matchId == currentMatchID
                 )
             }
@@ -368,10 +380,17 @@ enum TodayPresenter {
         return TodaySection(availability: .loading, value: nil, freshness: nil)
     }
 
-    private static func matchPresentation(_ match: MobileMatch) -> TodayMatchPresentation {
+    private static func matchPresentation(
+        _ match: MobileMatch,
+        teamIDs: MatchTeamIdentity
+    ) -> TodayMatchPresentation {
         let ownSideNumber = match.authenticatedPlayer.teamSide
-        let own = match.teams.first { $0.side == ownSideNumber }.map(matchSidePresentation)
-        let opponent = match.teams.first { $0.side != ownSideNumber }.map(matchSidePresentation)
+        let own = match.teams.first { $0.side == ownSideNumber }.map {
+            matchSidePresentation($0, teamID: teamIDs.ownTeamID)
+        }
+        let opponent = match.teams.first { $0.side != ownSideNumber }.map {
+            matchSidePresentation($0, teamID: teamIDs.opponentTeamID)
+        }
 
         let status: String
         let eyebrow: String
@@ -399,6 +418,7 @@ enum TodayPresenter {
             format: nonempty(match.round.format),
             ownSide: own,
             opponentSide: opponent,
+            courseID: nonempty(match.course?.courseId),
             courseName: nonempty(match.course?.name),
             tee: nonempty(match.course?.tee),
             teeTimeLabel: nonempty(match.teeTime?.label),
@@ -407,9 +427,13 @@ enum TodayPresenter {
         )
     }
 
-    private static func matchSidePresentation(_ side: MobileMatchTeam) -> TodayMatchSidePresentation {
+    private static func matchSidePresentation(
+        _ side: MobileMatchTeam,
+        teamID: String?
+    ) -> TodayMatchSidePresentation {
         TodayMatchSidePresentation(
             side: side.side,
+            teamID: teamID,
             name: nonempty(side.name),
             participants: side.participants.map {
                 TodayMatchParticipantPresentation(
@@ -418,6 +442,35 @@ enum TodayPresenter {
                     isAuthenticatedPlayer: $0.isAuthenticatedPlayer
                 )
             }
+        )
+    }
+
+    /// Match-side DTOs omit team IDs. The participant side remains bound to the
+    /// canonical session team. The opposing ID is joined from `/leaders` only
+    /// when the current tournament representation has exactly two canonical
+    /// teams; ambiguous data deliberately falls back to text/initials.
+    private static func matchTeamIdentity(
+        participantTeamID: String?,
+        leaders: MobileLeadersData?
+    ) -> MatchTeamIdentity {
+        guard let ownTeamID = nonempty(participantTeamID) else {
+            return MatchTeamIdentity(ownTeamID: nil, opponentTeamID: nil)
+        }
+
+        let canonicalTeamIDs = leaders?.teamStandings
+            .map(\.teamId)
+            .filter { !$0.isEmpty } ?? []
+        let uniqueTeamIDs = Array(Set(canonicalTeamIDs))
+        let opponentTeamID: String?
+        if uniqueTeamIDs.count == 2, uniqueTeamIDs.contains(ownTeamID) {
+            opponentTeamID = uniqueTeamIDs.first { $0 != ownTeamID }
+        } else {
+            opponentTeamID = nil
+        }
+
+        return MatchTeamIdentity(
+            ownTeamID: ownTeamID,
+            opponentTeamID: opponentTeamID
         )
     }
 
@@ -578,6 +631,11 @@ enum TodayPresenter {
             lastValidated: eligible.compactMap(\.validatedAt).min()
         )
     }
+}
+
+private struct MatchTeamIdentity: Sendable {
+    let ownTeamID: String?
+    let opponentTeamID: String?
 }
 
 private struct AnyReadPresentationState: Sendable {

@@ -45,13 +45,19 @@ struct LeadersFixturePresentation {
 
 struct LeadersRepositoryView: View {
     let participant: ParticipantSession
+    @Binding private var selection: LeadersProduct
 
     @ObservedObject private var leaders: MobileReadRepository<MobileLeadersResponse>
     @ObservedObject private var netSkins: MobileReadRepository<MobileNetSkinsResponse>
     @ObservedObject private var calcutta: MobileReadRepository<MobileCalcuttaResponse>
 
-    init(participant: ParticipantSession, coordinator: TournamentDataCoordinator) {
+    init(
+        participant: ParticipantSession,
+        coordinator: TournamentDataCoordinator,
+        selection: Binding<LeadersProduct>
+    ) {
         self.participant = participant
+        _selection = selection
         _leaders = ObservedObject(wrappedValue: coordinator.leaders)
         _netSkins = ObservedObject(wrappedValue: coordinator.netSkins)
         _calcutta = ObservedObject(wrappedValue: coordinator.calcutta)
@@ -69,6 +75,7 @@ struct LeadersRepositoryView: View {
                 )
             },
             calcuttaProvider: { LeadersPresenter.calcutta(participant: participant, state: calcutta.state) },
+            selection: $selection,
             diagnostics: BaggerAcceptanceProbes.isEnabled()
                 ? LeadersRepositoryDiagnostics(
                     leaders: leaders.state,
@@ -108,7 +115,7 @@ struct LeadersScreen: View {
     let onRefresh: @MainActor @Sendable (LeadersProduct) async -> Void
     let onProductSelected: @MainActor @Sendable (LeadersProduct) async -> Void
 
-    @State private var selection: LeadersProduct
+    @Binding private var selection: LeadersProduct
     @State private var selectedNetSkinsRoundID: String?
 
     init(
@@ -116,8 +123,8 @@ struct LeadersScreen: View {
         players: LeadersPlayersPresentation,
         netSkins: LeadersNetSkinsPresentation,
         calcutta: LeadersCalcuttaPresentation,
+        selection: Binding<LeadersProduct>,
         diagnostics: LeadersRepositoryDiagnostics? = nil,
-        startingProduct: LeadersProduct = .score,
         onRefresh: @escaping @MainActor @Sendable (LeadersProduct) async -> Void,
         onProductSelected: @escaping @MainActor @Sendable (LeadersProduct) async -> Void = { _ in }
     ) {
@@ -128,7 +135,7 @@ struct LeadersScreen: View {
         self.diagnostics = diagnostics
         self.onRefresh = onRefresh
         self.onProductSelected = onProductSelected
-        _selection = State(initialValue: startingProduct)
+        _selection = selection
     }
 
     init(
@@ -136,8 +143,8 @@ struct LeadersScreen: View {
         playersProvider: @escaping () -> LeadersPlayersPresentation,
         netSkinsProvider: @escaping () -> LeadersNetSkinsPresentation,
         calcuttaProvider: @escaping () -> LeadersCalcuttaPresentation,
+        selection: Binding<LeadersProduct>,
         diagnostics: LeadersRepositoryDiagnostics? = nil,
-        startingProduct: LeadersProduct = .score,
         onRefresh: @escaping @MainActor @Sendable (LeadersProduct) async -> Void,
         onProductSelected: @escaping @MainActor @Sendable (LeadersProduct) async -> Void = { _ in }
     ) {
@@ -148,7 +155,7 @@ struct LeadersScreen: View {
         self.diagnostics = diagnostics
         self.onRefresh = onRefresh
         self.onProductSelected = onProductSelected
-        _selection = State(initialValue: startingProduct)
+        _selection = selection
     }
 
     var body: some View {

@@ -737,6 +737,16 @@ private struct MatchDetailView: View {
         .navigationTitle("Match")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("matches.detail")
+        .overlay(alignment: .topLeading) {
+            if BaggerAcceptanceProbes.isEnabled() {
+                Text("Match identity")
+                    .font(.system(size: 1))
+                    .frame(width: 1, height: 1)
+                    .opacity(0.01)
+                    .allowsHitTesting(false)
+                    .accessibilityIdentifier("matches.detail.\(match.matchID)")
+            }
+        }
     }
 
     @ViewBuilder

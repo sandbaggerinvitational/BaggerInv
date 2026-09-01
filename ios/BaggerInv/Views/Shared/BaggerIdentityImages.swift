@@ -8,6 +8,7 @@ enum BaggerImageAccessibility: Equatable, Sendable {
 enum BaggerIdentitySize: CaseIterable, Sendable {
     case small
     case medium
+    case navigation
     case large
     case hero
 
@@ -15,6 +16,7 @@ enum BaggerIdentitySize: CaseIterable, Sendable {
         switch self {
         case .small: BaggerDesign.Size.Avatar.small
         case .medium: BaggerDesign.Size.Avatar.medium
+        case .navigation: BaggerDesign.Size.Avatar.navigation
         case .large: BaggerDesign.Size.Avatar.large
         case .hero: BaggerDesign.Size.Avatar.hero
         }
@@ -110,6 +112,7 @@ struct BaggerPlayerAvatar: View {
         switch size {
         case .small: .caption.weight(.bold)
         case .medium: .subheadline.weight(.bold)
+        case .navigation: .headline.weight(.bold)
         case .large: .title3.weight(.bold)
         case .hero: .title.weight(.bold)
         }
