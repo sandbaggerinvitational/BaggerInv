@@ -8,7 +8,10 @@ import { getDraftAnalysis } from "../../lib/draft-analysis";
 import { loadDraftRuntime } from "../../lib/draft-runtime";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 import { withCanonicalDraftTeamAverages } from "../../lib/draft-team-handicap";
-import { readLeaderboardsCoreView } from "../../lib/leaderboards-core-supabase";
+import {
+  canonicalTeamPresentationFromLeaderboardsView,
+  readLeaderboardsCoreView,
+} from "../../lib/leaderboards-core-supabase";
 import { loadCanonicalPlayerPresentation } from "../../lib/canonical-player-presentation-service";
 import { mergeCanonicalDraftPresentation } from "../../lib/player-presentation";
 
@@ -44,8 +47,11 @@ export default async function DraftPage() {
         tournamentId: runtime.draftOptions.tournamentId,
       })
     : storedDraft;
+  const canonicalTeams = runtime.source.resolved === "supabase"
+    ? canonicalTeamPresentationFromLeaderboardsView(rosterRead.payload.data)
+    : [];
   const draft = runtime.source.resolved === "supabase"
-    ? mergeCanonicalDraftPresentation(canonicalDraft, playerPresentation.players)
+    ? mergeCanonicalDraftPresentation(canonicalDraft, playerPresentation.players, canonicalTeams)
     : canonicalDraft;
   const analysis = draft ? await getDraftAnalysis(draft, runtime.analysisOptions) : null;
 
