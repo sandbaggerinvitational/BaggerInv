@@ -182,13 +182,15 @@ function holeDefinitions() {
   }));
 }
 
+const opaqueSinglesId = "match:round/3#opaque-10";
+
 const fixtures = [
   { id: "BB-Z", round: 1, format: "BB", sort: 1, display: "10", status: "UPCOMING", players: [["P2", 1, 1, "7.5", 0], ["P3", 1, 2, "11.2", 4], ["P4", 2, 1, "8.0", 1], ["P5", 2, 2, "12.1", 5]] },
   { id: "BB-MY", round: 1, format: "BB", sort: 2, display: "2", status: "UPCOMING", players: [["P1", 1, 1, "10.4", 2], ["P3", 1, 2, "11.2", 4], ["P4", 2, 1, "8.0", 1], ["P5", 2, 2, "12.1", 5]] },
   { id: "SC-MY", round: 2, format: "SC", sort: 1, display: "1", status: "LIVE", players: [["P1", 1, 1, "10.4", 0], ["P3", 1, 2, "11.2", 0], ["P4", 2, 1, "8.0", 0], ["P5", 2, 2, "12.1", 0]] },
   { id: "SC-A", round: 2, format: "SC", sort: 2, display: "10", status: "LIVE", players: [["P2", 1, 1, "7.5", 0], ["P3", 1, 2, "11.2", 0], ["P4", 2, 1, "8.0", 0], ["P5", 2, 2, "12.1", 0]] },
   { id: "SI-Z", round: 3, format: "SI", sort: 1, display: "1", status: "FINAL", players: [["P2", 1, 1, "7.5", 0], ["P4", 2, 1, "8.0", 1]] },
-  { id: "SI-10", round: 3, format: "SI", sort: 2, display: "10", status: "FINAL", players: [["P2", 1, 1, "17.0", 4], ["P4", 2, 1, "12.9", 0]], rich: true },
+  { id: opaqueSinglesId, round: 3, format: "SI", sort: 2, display: "10", status: "FINAL", players: [["P2", 1, 1, "17.0", 4], ["P4", 2, 1, "12.9", 0]], rich: true },
   { id: "SI-MY", round: 3, format: "SI", sort: 3, display: "2", status: "FINAL", players: [["P1", 1, 1, "10.4", 2], ["P5", 2, 1, "12.1", 0]] },
 ];
 
@@ -306,7 +308,7 @@ function seedFixture(cluster, database) {
   const scoreRows = Array.from({ length: 18 }, (_, index) => {
     const hole = index + 1;
     const winner = hole <= 6 || hole === 13 ? "Team 1" : "Halved";
-    return `('SI-10', ${hole}, 99, '[4]'::jsonb, '[5]'::jsonb, '[0]'::jsonb, '[0]'::jsonb,
+    return `(${sqlLiteral(opaqueSinglesId)}, ${hole}, 99, '[4]'::jsonb, '[5]'::jsonb, '[0]'::jsonb, '[0]'::jsonb,
       4, 5, ${sqlLiteral(winner)}, ${sqlLiteral(`private-mutation-${hole}`)}, 'private-actor',
       '2026-08-11T19:${String(hole).padStart(2, "0")}:00Z'::timestamptz,
       '2026-08-11T19:${String(hole).padStart(2, "0")}:00Z'::timestamptz)`;
@@ -336,7 +338,7 @@ test("Preview Match Detail RPC compiles and enforces participant-safe canonical 
     installRequiredMigrations(cluster, database);
     seedFixture(cluster, database);
 
-    const input = { environment: "PREVIEW", tournament_id: "2026", player_id: "P1", match_id: "SI-10" };
+    const input = { environment: "PREVIEW", tournament_id: "2026", player_id: "P1", match_id: opaqueSinglesId };
     const detail = rpc(cluster, database, input);
     assert.equal(detail.ok, true);
     assert.deepEqual(Object.keys(detail).sort(), [
@@ -384,7 +386,7 @@ test("Preview Match Detail RPC compiles and enforces participant-safe canonical 
     const owned = rpc(cluster, database, { ...input, match_id: "SI-MY" });
     assert.equal(owned.navigation.is_my_match, true);
     assert.equal(owned.navigation.my_match_id, "SI-MY");
-    assert.equal(owned.navigation.previous_match_id, "SI-10");
+    assert.equal(owned.navigation.previous_match_id, opaqueSinglesId);
     assert.equal(owned.navigation.next_match_id, null);
     assert.equal(owned.participants.filter((player) => player.is_authenticated_player).length, 1);
 
@@ -430,7 +432,7 @@ test("Preview Match Detail RPC compiles and enforces participant-safe canonical 
       environment: "PREVIEW",
       tournament_id: "2027",
       player_id: "PW",
-      match_id: "SI-10",
+      match_id: opaqueSinglesId,
     }), {
       ok: false, code: "MATCH_DETAIL_NOT_FOUND",
     });
@@ -466,7 +468,7 @@ test("Preview Match Detail RPC compiles and enforces participant-safe canonical 
     psql(cluster, database, `
       update scoring_authority.hole_scores
       set team_1_gross_scores = '[4,5,6]'::jsonb
-      where match_id = 'SI-10' and hole_number = 1;
+      where match_id = ${sqlLiteral(opaqueSinglesId)} and hole_number = 1;
     `);
     assert.deepEqual(rpc(cluster, database, input), {
       ok: false, code: "MATCH_DETAIL_AUTHORITY_INVALID",

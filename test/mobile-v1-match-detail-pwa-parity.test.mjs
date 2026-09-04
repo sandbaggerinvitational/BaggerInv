@@ -16,7 +16,7 @@ import { runningMatchStatusAtHole } from "../lib/scoring-experience.js";
 const identity = Object.freeze({
   tournamentId: "fx-2026",
   playerId: "fx-player-1",
-  matchId: "fx-2026-r3-2",
+  matchId: "match:round/3#opaque-2",
 });
 
 function canonicalFinalSinglesView() {
@@ -134,13 +134,13 @@ function canonicalFinalSinglesView() {
       updated_at: `2026-09-03T19:${String(index).padStart(2, "0")}:00.000Z`,
     })),
     navigation: {
-      previous: { id: "fx-2026-r3-1", label: "Round 3, Match 1" },
-      next: { id: "fx-2026-r3-3", label: "Round 3, Match 3" },
+      previous: { id: "match:round/3#opaque-1", label: "Round 3, Match 1" },
+      next: { id: "match:round/3#opaque-3", label: "Round 3, Match 3" },
       position: { round: 3, index: 2, total: 12 },
       round_match_index: 2,
       round_match_count: 12,
-      previous_match_id: "fx-2026-r3-1",
-      next_match_id: "fx-2026-r3-3",
+      previous_match_id: "match:round/3#opaque-1",
+      next_match_id: "match:round/3#opaque-3",
       my_match_id: identity.matchId,
       is_my_match: true,
     },

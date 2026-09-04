@@ -301,7 +301,7 @@ test("strict participant contract rejects scoring authority, permission, revisio
   }
 });
 
-test("schema aligns canonical IDs, format cardinality, and handicap scopes with the server projection", async () => {
+test("schema aligns canonical identity IDs, format cardinality, and handicap scopes with the server projection", async () => {
   const validate = await contractValidator();
   const built = await responses();
   const [, bestBall] = built.find(([scenario]) => scenario.format === "BB" && scenario.status === "inProgress");
@@ -312,8 +312,12 @@ test("schema aligns canonical IDs, format cardinality, and handicap scopes with 
   invalidTeamName.data.match.teams[0].name = null;
   assert.equal(validate(invalidTeamName), false);
 
+  const invalidTeamId = structuredClone(bestBall);
+  invalidTeamId.data.match.teams[0].teamId = "not a canonical identity ID";
+  assert.equal(validate(invalidTeamId), false);
+
   const invalidNavigationId = structuredClone(bestBall);
-  invalidNavigationId.data.match.navigation.previousMatchId = "not a canonical ID";
+  invalidNavigationId.data.match.navigation.previousMatchId = "x".repeat(201);
   assert.equal(validate(invalidNavigationId), false);
 
   const invalidBestBallCount = structuredClone(bestBall);
@@ -335,6 +339,26 @@ test("schema aligns canonical IDs, format cardinality, and handicap scopes with 
   const invalidBestBallTeamHandicap = structuredClone(bestBall);
   invalidBestBallTeamHandicap.data.match.teams[0].playingHandicap = 3.25;
   assert.equal(validate(invalidBestBallTeamHandicap), false);
+});
+
+test("schema preserves the same bounded opaque Match IDs as the matches collection contract", async () => {
+  const validate = await contractValidator();
+  const [, response] = (await responses())[0];
+  const opaque = structuredClone(response);
+  opaque.data.match.matchId = "match:round/2#opaque";
+  opaque.data.match.navigation.previousMatchId = "match:round/2#previous";
+  opaque.data.match.navigation.nextMatchId = "match:round/2#next";
+  opaque.data.match.navigation.myMatchId = "match:round/2#mine";
+  opaque.data.match.navigation.isMyMatch = false;
+  assert.equal(validate(opaque), true, validationMessage(validate));
+
+  const tooLong = structuredClone(opaque);
+  tooLong.data.match.matchId = "m".repeat(201);
+  assert.equal(validate(tooLong), false);
+
+  const empty = structuredClone(opaque);
+  empty.data.match.matchId = "";
+  assert.equal(validate(empty), false);
 });
 
 test("schema rejects contradictory lifecycle, winner, and unplayed-score state", async () => {
