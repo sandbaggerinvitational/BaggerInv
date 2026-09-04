@@ -69,6 +69,7 @@ struct BaggerAppShell: View {
         fixtureOddsState: MobileReadState<MobileOddsData>? = nil,
         fixtureScheduleNow: Date = Date(),
         fixtureUsesDurableScoringQueue: Bool = false,
+        startsOnMatches: Bool = false,
         startsOnScore: Bool = false,
         startsOnLeaders: Bool = false,
         startsOnMore: Bool = false,
@@ -94,7 +95,9 @@ struct BaggerAppShell: View {
         _selection = State(
             initialValue: startsOnMore || startsOnSchedule
                 ? .more
-                : startsOnLeaders ? .leaders : startsOnScore ? .score : .today
+                : startsOnLeaders
+                    ? .leaders
+                    : startsOnScore ? .score : startsOnMatches ? .matches : .today
         )
         _leadersSelection = State(initialValue: fixtureLeaders?.startingProduct ?? .score)
         _morePath = State(initialValue: startsOnSchedule ? [.schedule] : [])
@@ -116,10 +119,11 @@ struct BaggerAppShell: View {
 
             NavigationStack(path: $matchesPath) {
                 matchesContent
-                    .baggerNavigationChrome(
-                        title: "Matches",
+                    .baggerMatchesChrome(
+                        isRoot: matchesPath.isEmpty,
                         participant: participant,
-                        onSignOut: onSignOut
+                        profile: todayProfile,
+                        onOpenPassport: openPassport
                     )
             }
             .tabItem { Label("Matches", systemImage: "person.2.fill") }
@@ -463,9 +467,50 @@ private extension View {
         profile: TodayParticipantPresentation,
         onOpenPassport: @escaping () -> Void
     ) -> some View {
+        baggerAppHeaderChrome(
+            title: "Today",
+            identifierPrefix: "today",
+            participant: participant,
+            profile: profile,
+            onOpenPassport: onOpenPassport
+        )
+    }
+
+    func baggerMatchesChrome(
+        isRoot: Bool,
+        participant: ParticipantSession,
+        profile: TodayParticipantPresentation,
+        onOpenPassport: @escaping () -> Void
+    ) -> some View {
+        toolbar(isRoot ? .hidden : .visible, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if isRoot {
+                    BaggerAppHeader(
+                        title: "Matches",
+                        identifierPrefix: "matches",
+                        participant: participant,
+                        profile: profile,
+                        onOpenPassport: onOpenPassport
+                    )
+                }
+            }
+            .toolbarBackground(BaggerPalette.cream, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.light, for: .navigationBar)
+    }
+
+    private func baggerAppHeaderChrome(
+        title: String,
+        identifierPrefix: String,
+        participant: ParticipantSession,
+        profile: TodayParticipantPresentation,
+        onOpenPassport: @escaping () -> Void
+    ) -> some View {
         toolbar(.hidden, for: .navigationBar)
             .safeAreaInset(edge: .top, spacing: 0) {
-                TodayAppHeader(
+                BaggerAppHeader(
+                    title: title,
+                    identifierPrefix: identifierPrefix,
                     participant: participant,
                     profile: profile,
                     onOpenPassport: onOpenPassport
@@ -507,29 +552,32 @@ private extension View {
     }
 }
 
-private struct TodayAppHeader: View {
+private struct BaggerAppHeader: View {
+    let title: String
+    let identifierPrefix: String
     let participant: ParticipantSession
     let profile: TodayParticipantPresentation
     let onOpenPassport: () -> Void
 
     var body: some View {
         ZStack {
-            Text("Today")
+            Text(title)
                 .font(.headline)
                 .foregroundStyle(BaggerDesign.Color.textPrimary)
                 .accessibilityAddTraits(.isHeader)
-                .accessibilityIdentifier("today.headerTitle")
+                .accessibilityIdentifier("\(identifierPrefix).headerTitle")
 
             HStack(spacing: BaggerDesign.Space.medium) {
                 Text("THE BAGGER")
                     .font(.caption2.weight(.bold))
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     .tracking(0.55)
                     .foregroundStyle(BaggerDesign.Color.brandEvergreenDeep)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
                     .frame(maxWidth: 86, alignment: .leading)
                     .accessibilityLabel("The Bagger app")
-                    .accessibilityIdentifier("today.appIdentity")
+                    .accessibilityIdentifier("\(identifierPrefix).appIdentity")
 
                 Spacer(minLength: BaggerDesign.Space.hero)
 
@@ -540,6 +588,7 @@ private struct TodayAppHeader: View {
                         size: .navigation,
                         accessibility: .decorative
                     )
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     .frame(
                         minWidth: BaggerDesign.Size.Avatar.navigation,
                         minHeight: BaggerDesign.Size.Avatar.navigation
@@ -553,7 +602,7 @@ private struct TodayAppHeader: View {
                         ? "Canonical player \(participant.player.playerId); tournament \(participant.tournament.tournamentId)"
                         : nil
                 )
-                .accessibilityIdentifier("today.profile")
+                .accessibilityIdentifier("\(identifierPrefix).profile")
             }
         }
         .frame(maxWidth: .infinity, minHeight: 56)

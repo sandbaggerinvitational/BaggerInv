@@ -370,15 +370,112 @@ struct MobileTodayData: MobileReadPayload {
     }
 }
 
+/// Strict participant Match-list DTOs. `/today.currentMatch` intentionally
+/// retains the smaller `MobileMatch` shape, while `/matches` requires these
+/// additive identity and golf-intelligence fields even when their values are
+/// canonically `null`.
+struct MobileMatchesParticipant: Codable, Equatable, Sendable {
+    let playerId: String
+    let displayName: String
+    let teamSide: Int
+    let isAuthenticatedPlayer: Bool
+    @MobileRequiredNullable var playingHandicap: Double?
+    @MobileRequiredNullable var strokesReceived: Int?
+
+    var isStructurallyCompatible: Bool {
+        !playerId.isEmpty &&
+        !displayName.isEmpty &&
+        (teamSide == 1 || teamSide == 2) &&
+        (playingHandicap.map(\.isFinite) ?? true) &&
+        (strokesReceived.map { $0 >= 0 } ?? true)
+    }
+}
+
+struct MobileMatchesTeam: Codable, Equatable, Sendable {
+    let side: Int
+    let teamId: String
+    @MobileRequiredNullable var name: String?
+    @MobileRequiredNullable var playingHandicap: Double?
+    @MobileRequiredNullable var strokesReceived: Int?
+    let participants: [MobileMatchesParticipant]
+
+    var isStructurallyCompatible: Bool {
+        (side == 1 || side == 2) &&
+        !teamId.isEmpty &&
+        participants.count <= 2 &&
+        (playingHandicap.map(\.isFinite) ?? true) &&
+        (strokesReceived.map { $0 >= 0 } ?? true) &&
+        participants.allSatisfy(\.isStructurallyCompatible)
+    }
+}
+
+struct MobileMatchesMatch: Codable, Equatable, Sendable {
+    let matchId: String
+    @MobileRequiredNullable var displayMatchNumber: String?
+    let round: MobileMatchRound
+    let status: MobileMatchStatus
+    @MobileRequiredNullable var course: MobileMatchCourse?
+    @MobileRequiredNullable var teeTime: MobileMatchTeeTime?
+    let teams: [MobileMatchesTeam]
+    let authenticatedPlayer: MobileAuthenticatedPlayerRelationship
+    @MobileRequiredNullable var progress: MobileMatchProgress?
+    @MobileRequiredNullable var result: MobileMatchResult?
+
+    var isStructurallyCompatible: Bool {
+        let lifecycleIsConsistent: Bool
+        switch status {
+        case .scheduled:
+            lifecycleIsConsistent = progress == nil && result == nil
+        case .inProgress:
+            lifecycleIsConsistent = progress != nil && result == nil
+        case .completed:
+            lifecycleIsConsistent = progress == nil && result != nil
+        }
+
+        let authenticatedParticipants = teams.flatMap(\.participants).filter(\.isAuthenticatedPlayer)
+        let relationshipIsConsistent = authenticatedPlayer.involved
+            ? authenticatedParticipants.count == 1 &&
+                authenticatedParticipants.first?.teamSide == authenticatedPlayer.teamSide
+            : authenticatedParticipants.isEmpty
+
+        let formatSemanticsAreCompatible: Bool
+        switch round.format?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() {
+        case "SC", "SCRAMBLE":
+            formatSemanticsAreCompatible = teams.allSatisfy {
+                $0.participants.allSatisfy { $0.strokesReceived == nil }
+            }
+        case "BB", "BEST BALL", "SI", "SINGLES":
+            formatSemanticsAreCompatible = teams.allSatisfy {
+                $0.playingHandicap == nil && $0.strokesReceived == nil
+            }
+        default:
+            formatSemanticsAreCompatible = true
+        }
+
+        return !matchId.isEmpty &&
+        (displayMatchNumber.map { !$0.isEmpty } ?? true) &&
+        teams.count == 2 &&
+        Set(teams.map(\.side)) == Set([1, 2]) &&
+        teams.allSatisfy(\.isStructurallyCompatible) &&
+        authenticatedPlayer.isStructurallyCompatible &&
+        lifecycleIsConsistent &&
+        relationshipIsConsistent &&
+        formatSemanticsAreCompatible &&
+        (teeTime.map { !$0.timeZone.isEmpty && TimeZone(identifier: $0.timeZone) != nil } ?? true)
+    }
+}
+
 struct MobileMatchesData: MobileReadPayload {
     let tournament: MobileReadTournament
-    let matches: [MobileMatch]
+    let matches: [MobileMatchesMatch]
 
     var contextBinding: MobileReadContextBinding {
         .tournament(tournament.tournamentId)
     }
     var isStructurallyCompatible: Bool {
-        tournament.isStructurallyCompatible && matches.allSatisfy(\.isStructurallyCompatible)
+        tournament.isStructurallyCompatible &&
+        matches.count <= 64 &&
+        matches.allSatisfy(\.isStructurallyCompatible)
     }
 }
 

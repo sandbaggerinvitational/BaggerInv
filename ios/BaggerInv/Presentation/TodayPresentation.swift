@@ -427,6 +427,53 @@ enum TodayPresenter {
         )
     }
 
+    /// `/matches` has its own strict additive Match shape. Today keeps the
+    /// same compact personal-Matches presentation while consuming each side's
+    /// canonical team ID directly; `/today.currentMatch` continues using the
+    /// lean Match DTO and its established identity fallback above.
+    private static func matchPresentation(
+        _ match: MobileMatchesMatch,
+        teamIDs _: MatchTeamIdentity
+    ) -> TodayMatchPresentation {
+        let ownSideNumber = match.authenticatedPlayer.teamSide
+        let own = match.teams.first { $0.side == ownSideNumber }.map(matchSidePresentation)
+        let opponent = match.teams.first { $0.side != ownSideNumber }.map(matchSidePresentation)
+
+        let status: String
+        let eyebrow: String
+        let progress: String?
+        switch match.status {
+        case .scheduled:
+            status = "Upcoming"
+            eyebrow = "YOUR NEXT MATCH"
+            progress = nil
+        case .inProgress:
+            status = "Live"
+            eyebrow = "YOUR MATCH"
+            progress = match.progress?.currentHole.map { "Hole \($0)" }
+        case .completed:
+            status = "Final"
+            eyebrow = "YOUR MATCH"
+            progress = nil
+        }
+
+        return TodayMatchPresentation(
+            matchID: match.matchId,
+            eyebrow: eyebrow,
+            statusText: status,
+            roundText: roundText(number: match.round.roundNumber, name: match.round.name),
+            format: nonempty(match.round.format),
+            ownSide: own,
+            opponentSide: opponent,
+            courseID: nonempty(match.course?.courseId),
+            courseName: nonempty(match.course?.name),
+            tee: nonempty(match.course?.tee),
+            teeTimeLabel: nonempty(match.teeTime?.label),
+            progressText: progress,
+            resultText: nonempty(match.result?.summary)
+        )
+    }
+
     private static func matchSidePresentation(
         _ side: MobileMatchTeam,
         teamID: String?
@@ -434,6 +481,23 @@ enum TodayPresenter {
         TodayMatchSidePresentation(
             side: side.side,
             teamID: teamID,
+            name: nonempty(side.name),
+            participants: side.participants.map {
+                TodayMatchParticipantPresentation(
+                    playerID: $0.playerId,
+                    displayName: $0.displayName,
+                    isAuthenticatedPlayer: $0.isAuthenticatedPlayer
+                )
+            }
+        )
+    }
+
+    private static func matchSidePresentation(
+        _ side: MobileMatchesTeam
+    ) -> TodayMatchSidePresentation {
+        TodayMatchSidePresentation(
+            side: side.side,
+            teamID: side.teamId,
             name: nonempty(side.name),
             participants: side.participants.map {
                 TodayMatchParticipantPresentation(

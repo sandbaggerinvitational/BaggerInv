@@ -32,6 +32,8 @@ final class BaggerAssetTests: XCTestCase {
     }
 
     func testCourseMappingUsesReviewedAliasesOnly() {
+        XCTAssertEqual(BaggerAsset.courseLogo(courseID: "TPGC01").reference?.catalogName, "course_tpgc01_logo")
+        XCTAssertEqual(BaggerAsset.courseLogo(courseID: "CPGC01").reference?.catalogName, "course_cpgc01_logo")
         XCTAssertEqual(
             BaggerAsset.courseLogo(courseID: "OCGC01", assetKey: "ocean-course-logo").reference?.catalogName,
             "course_ocgc01_logo"
@@ -41,6 +43,14 @@ final class BaggerAssetTests: XCTestCase {
         XCTAssertEqual(BaggerAsset.courseLogo(courseID: "SRGC02").reference?.catalogName, "course_argc01_logo")
         XCTAssertEqual(BaggerAsset.courseLogo(courseID: "PDC02").reference?.catalogName, "course_pdc01_logo")
         XCTAssertEqual(BaggerAsset.courseLogo(courseID: "UNKNOWN").fallback, .systemSymbol("flag.fill"))
+    }
+
+    func testTeamAndCourseDisplayNamesNeverResolveIdentityAssets() {
+        XCTAssertNil(BaggerAsset.team(teamID: "The Pickles").reference)
+        XCTAssertNil(BaggerAsset.team(teamID: "Lipp it and Rip it").reference)
+        XCTAssertNil(BaggerAsset.courseLogo(courseID: "Turtle Point").reference)
+        XCTAssertNil(BaggerAsset.courseLogo(courseID: "Cougar Point").reference)
+        XCTAssertNil(BaggerAsset.courseLogo(courseID: "Ocean Course").reference)
     }
 
     func testTournamentMappingUsesCanonicalYearAndExactKey() {

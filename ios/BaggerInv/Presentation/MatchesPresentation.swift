@@ -46,17 +46,94 @@ enum MatchesMatchStatusPresentation: String, Equatable, Hashable, Sendable {
     case final = "Final"
 }
 
+enum MatchesRoundFormatMode: Equatable, Hashable, Sendable {
+    case uniform(String)
+    case mixed
+    case unavailable
+}
+
+enum MatchesFormatPresentation: Equatable, Hashable, Sendable {
+    case bestBall
+    case scramble
+    case singles
+    case other
+    case unavailable
+}
+
+enum MatchesGolfContextScope: Equatable, Hashable, Sendable {
+    case participant
+    case team
+}
+
+struct MatchesGolfContextPresentation: Equatable, Hashable, Sendable {
+    let scope: MatchesGolfContextScope
+    let playingHandicap: Double?
+    let strokesReceived: Int?
+
+    var playingHandicapText: String? {
+        guard let playingHandicap else { return nil }
+        let value = MatchesGolfValueFormatter.playingHandicap(playingHandicap)
+        switch scope {
+        case .participant: return "HCP \(value)"
+        case .team: return "Team HCP \(value)"
+        }
+    }
+
+    var strokesText: String? {
+        guard let strokesReceived else { return nil }
+        switch scope {
+        case .participant:
+            guard strokesReceived > 0 else { return "No strokes" }
+            return "+\(strokesReceived) \(strokesReceived == 1 ? "stroke" : "strokes")"
+        case .team:
+            guard strokesReceived > 0 else { return "No strokes" }
+            return "+\(strokesReceived) \(strokesReceived == 1 ? "stroke" : "strokes")"
+        }
+    }
+
+    var compactText: String? {
+        let values = [playingHandicapText, strokesText].compactMap { $0 }
+        return values.isEmpty ? nil : values.joined(separator: " · ")
+    }
+
+    var accessibilityText: String? {
+        let handicap = playingHandicap.map {
+            let value = MatchesGolfValueFormatter.playingHandicap($0)
+            return scope == .team
+                ? "Team Playing Handicap \(value)"
+                : "Playing Handicap \(value)"
+        }
+        let accessibilityStrokes = strokesReceived.map { strokes in
+            switch scope {
+            case .participant:
+                return strokes > 0
+                    ? "\(strokes) \(strokes == 1 ? "stroke" : "strokes")"
+                    : "No strokes"
+            case .team:
+                return strokes > 0
+                    ? "\(strokes) team \(strokes == 1 ? "stroke" : "strokes")"
+                    : "No team strokes"
+            }
+        }
+        let values = [handicap, accessibilityStrokes].compactMap { $0 }
+        return values.isEmpty ? nil : values.joined(separator: ", ")
+    }
+}
+
 struct MatchesParticipantPresentation: Identifiable, Equatable, Hashable, Sendable {
     let playerID: String
     let displayName: String
     let isAuthenticatedPlayer: Bool
+    let golfContext: MatchesGolfContextPresentation?
 
     var id: String { playerID }
 }
 
 struct MatchesSidePresentation: Identifiable, Equatable, Hashable, Sendable {
     let side: Int
+    let teamID: String
     let name: String?
+    let golfContext: MatchesGolfContextPresentation?
     let participants: [MatchesParticipantPresentation]
 
     var id: Int { side }
@@ -68,10 +145,13 @@ struct MatchesSidePresentation: Identifiable, Equatable, Hashable, Sendable {
 
 struct MatchesMatchPresentation: Identifiable, Equatable, Hashable, Sendable {
     let matchID: String
+    let displayMatchNumber: String?
     let roundID: MatchesRoundID
     let roundText: String
     let formatText: String?
+    let format: MatchesFormatPresentation
     let status: MatchesMatchStatusPresentation
+    let courseID: String?
     let courseName: String?
     let tee: String?
     let teeTimeLabel: String?
@@ -105,9 +185,21 @@ struct MatchesMatchPresentation: Identifiable, Equatable, Hashable, Sendable {
 struct MatchesRoundPresentation: Identifiable, Equatable, Hashable, Sendable {
     let id: MatchesRoundID
     let title: String
+    let formatMode: MatchesRoundFormatMode
     let matches: [MatchesMatchPresentation]
     let yourMatch: MatchesMatchPresentation?
     let hasMultipleInvolvedMatches: Bool
+
+    var contextTitle: String {
+        let base = id.number.map { "Round \($0)" } ?? title
+        guard case .uniform(let format) = formatMode else { return base }
+        guard base.caseInsensitiveCompare(format) != .orderedSame else { return base }
+        return "\(base) · \(format)"
+    }
+
+    var showsPerMatchFormat: Bool {
+        formatMode == .mixed
+    }
 }
 
 enum MatchesDestination: Hashable, Sendable {
@@ -219,7 +311,11 @@ enum MatchesPresenter {
         state: MobileReadState<MobileMatchesData>,
         selectedRoundID: MatchesRoundID? = nil
     ) -> MatchesPresentation {
-        make(state: state, selectedRoundID: selectedRoundID, fallbackTournament: nil)
+        make(
+            state: state,
+            selectedRoundID: selectedRoundID,
+            fallbackTournament: nil
+        )
     }
 
     static func match(id: String, in presentation: MatchesPresentation) -> MatchesMatchPresentation? {
@@ -268,6 +364,7 @@ enum MatchesPresenter {
             return MatchesRoundPresentation(
                 id: group.id,
                 title: roundText(group.source),
+                formatMode: roundFormatMode(group.matches),
                 matches: group.matches,
                 yourMatch: involved.first,
                 hasMultipleInvolvedMatches: involved.count > 1
@@ -304,17 +401,17 @@ enum MatchesPresenter {
     }
 
     static func formatText(_ rawFormat: String?) -> String? {
-        guard let format = nonempty(rawFormat) else { return nil }
-        switch format.uppercased() {
-        case "BB": return "Best Ball"
-        case "SC": return "Scramble"
-        case "SI": return "Singles"
-        default: return format
+        switch canonicalFormat(rawFormat) {
+        case .bestBall: return "Best Ball"
+        case .scramble: return "Scramble"
+        case .singles: return "Singles"
+        case .other: return nonempty(rawFormat)
+        case .unavailable: return nil
         }
     }
 
     private static func matchPresentation(
-        _ match: MobileMatch,
+        _ match: MobileMatchesMatch,
         roundID: MatchesRoundID
     ) -> MatchesMatchPresentation {
         let status: MatchesMatchStatusPresentation
@@ -349,16 +446,20 @@ enum MatchesPresenter {
             resultText = nil
         }
 
+        let presentedFormat = canonicalFormat(match.round.format)
         return MatchesMatchPresentation(
             matchID: match.matchId,
+            displayMatchNumber: nonempty(match.displayMatchNumber),
             roundID: roundID,
             roundText: roundText(match.round),
             formatText: formatText(match.round.format),
+            format: presentedFormat,
             status: status,
+            courseID: nonempty(match.course?.courseId),
             courseName: nonempty(match.course?.name),
             tee: nonempty(match.course?.tee),
             teeTimeLabel: teeTimeText(match.teeTime),
-            teams: match.teams.map(sidePresentation),
+            teams: match.teams.map { sidePresentation($0, format: presentedFormat) },
             authenticatedPlayerInvolved: match.authenticatedPlayer.involved,
             authenticatedPlayerSide: match.authenticatedPlayer.teamSide,
             progressText: progressText,
@@ -369,18 +470,69 @@ enum MatchesPresenter {
         )
     }
 
-    private static func sidePresentation(_ side: MobileMatchTeam) -> MatchesSidePresentation {
-        MatchesSidePresentation(
+    private static func sidePresentation(
+        _ side: MobileMatchesTeam,
+        format: MatchesFormatPresentation
+    ) -> MatchesSidePresentation {
+        let sideGolfContext = format == .scramble
+            ? golfContext(
+                scope: .team,
+                playingHandicap: side.playingHandicap,
+                strokesReceived: side.strokesReceived
+            )
+            : nil
+        return MatchesSidePresentation(
             side: side.side,
+            teamID: side.teamId,
             name: nonempty(side.name),
+            golfContext: sideGolfContext,
             participants: side.participants.map {
                 MatchesParticipantPresentation(
                     playerID: $0.playerId,
                     displayName: $0.displayName,
-                    isAuthenticatedPlayer: $0.isAuthenticatedPlayer
+                    isAuthenticatedPlayer: $0.isAuthenticatedPlayer,
+                    golfContext: format == .bestBall || format == .singles
+                        ? golfContext(
+                            scope: .participant,
+                            playingHandicap: $0.playingHandicap,
+                            strokesReceived: $0.strokesReceived
+                        )
+                        : nil
                 )
             }
         )
+    }
+
+    private static func canonicalFormat(_ rawFormat: String?) -> MatchesFormatPresentation {
+        guard let rawFormat = nonempty(rawFormat) else { return .unavailable }
+        switch rawFormat.uppercased() {
+        case "BB", "BEST BALL": return .bestBall
+        case "SC", "SCRAMBLE": return .scramble
+        case "SI", "SINGLES": return .singles
+        default: return .other
+        }
+    }
+
+    private static func golfContext(
+        scope: MatchesGolfContextScope,
+        playingHandicap: Double?,
+        strokesReceived: Int?
+    ) -> MatchesGolfContextPresentation? {
+        guard playingHandicap != nil || strokesReceived != nil else { return nil }
+        return MatchesGolfContextPresentation(
+            scope: scope,
+            playingHandicap: playingHandicap,
+            strokesReceived: strokesReceived
+        )
+    }
+
+    private static func roundFormatMode(
+        _ matches: [MatchesMatchPresentation]
+    ) -> MatchesRoundFormatMode {
+        let formats = matches.map(\.formatText)
+        guard formats.contains(where: { $0 != nil }) else { return .unavailable }
+        guard formats.allSatisfy({ $0 != nil }), let first = formats[0] else { return .mixed }
+        return formats.dropFirst().allSatisfy({ $0 == first }) ? .uniform(first) : .mixed
     }
 
     private static func roundID(_ round: MobileMatchRound) -> MatchesRoundID {
@@ -412,7 +564,7 @@ enum MatchesPresenter {
         return points
     }
 
-    private static func winnerText(_ winner: String, teams: [MobileMatchTeam]) -> String {
+    private static func winnerText(_ winner: String, teams: [MobileMatchesTeam]) -> String {
         switch winner.lowercased() {
         case "teamone", "team1", "1":
             return "\(sideName(1, teams: teams)) wins"
@@ -425,7 +577,7 @@ enum MatchesPresenter {
         }
     }
 
-    private static func sideName(_ side: Int, teams: [MobileMatchTeam]) -> String {
+    private static func sideName(_ side: Int, teams: [MobileMatchesTeam]) -> String {
         guard let name = nonempty(teams.first(where: { $0.side == side })?.name) else {
             return "Team \(side)"
         }
@@ -480,5 +632,17 @@ enum MatchesPresenter {
         }
         guard let kind else { return nil }
         return MatchesFreshnessBanner(kind: kind, lastValidated: state.validatedAt)
+    }
+}
+
+private enum MatchesGolfValueFormatter {
+    static func playingHandicap(_ value: Double) -> String {
+        let displayedMagnitude = (abs(value) * 10).rounded(.toNearestOrAwayFromZero) / 10
+        let magnitude = String(
+            format: "%.1f",
+            locale: Locale(identifier: "en_US_POSIX"),
+            displayedMagnitude
+        )
+        return value < 0 ? "(\(magnitude))" : magnitude
     }
 }

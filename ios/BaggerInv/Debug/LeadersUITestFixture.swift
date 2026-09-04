@@ -70,18 +70,23 @@ enum LeadersUITestFixtures {
         let long = variant == .longContent
         let tied = variant == .scoreTie
         let final = variant == .scoreFinal
+        let usesCanonicalKiawahTeams = participant.player.team?.teamId == "PICKLES"
         let teamOne = MobileTeamStanding(
             rank: 1,
             teamId: participant.player.team?.teamId ?? "fixture-team-green",
-            name: long ? "The Mighty Briny Pickle Preservation Society" : "Pines",
+            name: long
+                ? "The Mighty Briny Pickle Preservation Society"
+                : usesCanonicalKiawahTeams ? "Pickles" : "Pines",
             points: tied ? 8 : 8.5,
             record: "7-4-1",
             remainingMatches: 2
         )
         let teamTwo = MobileTeamStanding(
             rank: tied ? 1 : 2,
-            teamId: "fixture-team-gold",
-            name: long ? "Long Drive Legends and Fairway Philosophers" : "Dunes",
+            teamId: usesCanonicalKiawahTeams ? "LIPPIT" : "fixture-team-gold",
+            name: long
+                ? "Long Drive Legends and Fairway Philosophers"
+                : usesCanonicalKiawahTeams ? "Lipp it and Rip it" : "Dunes",
             points: tied ? 8 : 7.5,
             record: "6-5-1",
             remainingMatches: 2

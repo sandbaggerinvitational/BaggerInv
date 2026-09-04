@@ -17,6 +17,9 @@ enum TodayUITestScenario: String {
     case matchesCachedOffline = "matches.cached-offline"
     case matchesEmptyOffline = "matches.empty-offline"
     case matchesLongContent = "matches.long-content"
+    case matchesCanonicalAssets = "matches.canonical-assets"
+    case matchesMissingAssets = "matches.missing-assets"
+    case matchesMixedFormat = "matches.mixed-format"
     case scoreNoMatch = "score.no-match"
     case scoreUpcomingBestBall = "score.upcoming-bb"
     case scoreActiveBestBall = "score.active-bb"
@@ -114,6 +117,7 @@ struct TodayUITestFixtureRoot: View {
                 fixtureOddsState: MoreUITestFixtures.oddsState(for: scenario),
                 fixtureScheduleNow: MoreUITestFixtures.now,
                 fixtureUsesDurableScoringQueue: scenario == .scoreDurableOffline,
+                startsOnMatches: scenario.rawValue.hasPrefix("matches."),
                 startsOnScore: scenario.rawValue.hasPrefix("score."),
                 startsOnLeaders: arguments.contains("--bagger-start-leaders"),
                 startsOnMore: scenario.rawValue.hasPrefix("more."),
@@ -155,7 +159,8 @@ private enum TodayUITestFixtures {
 
     static func participant(for scenario: TodayUITestScenario) -> ParticipantSession {
         switch scenario {
-        case .canonicalAssets:
+        case .canonicalAssets, .matchesStandard, .matchesNoUserMatch,
+             .matchesCachedOffline, .matchesCanonicalAssets, .matchesMixedFormat:
             ParticipantSession(
                 player: ParticipantPlayer(
                     playerId: "CB01",
@@ -164,7 +169,7 @@ private enum TodayUITestFixtures {
                 ),
                 tournament: participant.tournament
             )
-        case .longContent:
+        case .longContent, .matchesLongContent, .matchesMissingAssets:
             ParticipantSession(
                 player: ParticipantPlayer(
                     playerId: "UNKNOWN_PLAYER",
@@ -197,6 +202,7 @@ private enum TodayUITestFixtures {
         case .standard, .cachedOffline, .stale, .longContent, .canonicalAssets,
              .matchesStandard, .matchesNoUserMatch, .matchesCachedOffline,
              .matchesEmptyOffline, .matchesLongContent,
+             .matchesCanonicalAssets, .matchesMissingAssets, .matchesMixedFormat,
              .scoreNoMatch, .scoreUpcomingBestBall, .scoreActiveBestBall,
              .scoreActiveScramble, .scoreActiveSingles, .scoreReadOnly,
              .scoreCompleted, .scoreUnknownFormat, .scoreMixedHoles,

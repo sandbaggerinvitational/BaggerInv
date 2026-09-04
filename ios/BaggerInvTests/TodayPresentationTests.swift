@@ -459,7 +459,43 @@ final class TodayPresentationTests: XCTestCase {
     }
 
     private func makeMatches(_ matches: [MobileMatch]) -> MobileMatchesData {
-        MobileMatchesData(tournament: TestFixtures.readTournament, matches: matches)
+        MobileMatchesData(
+            tournament: TestFixtures.readTournament,
+            matches: matches.map(matchesContractMatch)
+        )
+    }
+
+    private func matchesContractMatch(_ match: MobileMatch) -> MobileMatchesMatch {
+        MobileMatchesMatch(
+            matchId: match.matchId,
+            displayMatchNumber: nil,
+            round: match.round,
+            status: match.status,
+            course: match.course,
+            teeTime: match.teeTime,
+            teams: match.teams.map { side in
+                MobileMatchesTeam(
+                    side: side.side,
+                    teamId: "team-\(side.side)",
+                    name: side.name,
+                    playingHandicap: nil,
+                    strokesReceived: nil,
+                    participants: side.participants.map {
+                        MobileMatchesParticipant(
+                            playerId: $0.playerId,
+                            displayName: $0.displayName,
+                            teamSide: $0.teamSide,
+                            isAuthenticatedPlayer: $0.isAuthenticatedPlayer,
+                            playingHandicap: nil,
+                            strokesReceived: nil
+                        )
+                    }
+                )
+            },
+            authenticatedPlayer: match.authenticatedPlayer,
+            progress: match.progress,
+            result: match.result
+        )
     }
 
     private func makeLeaders(_ teams: [MobileTeamStanding]) -> MobileLeadersData {

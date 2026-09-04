@@ -11,7 +11,8 @@ final class MobileReadModelDecodingTests: XCTestCase {
                 id: "match:round/2#17",
                 status: "inProgress",
                 progress: ["currentHole": 7],
-                result: NSNull()
+                result: NSNull(),
+                includeMatchIntelligence: false
             ))
         )
 
@@ -123,7 +124,127 @@ final class MobileReadModelDecodingTests: XCTestCase {
         XCTAssertEqual(response.data.matches[2].result?.teamOnePoints, 1.5)
         XCTAssertEqual(response.data.matches[2].result?.teamTwoPoints, 0.5)
         XCTAssertEqual(response.data.matches[2].teams.count, 2)
+        XCTAssertEqual(response.data.matches[0].displayMatchNumber, "17")
+        XCTAssertEqual(response.data.matches[0].teams.map(\.teamId), ["PICKLES", "LIPPIT"])
+        XCTAssertEqual(response.data.matches[0].teams[0].participants[0].playingHandicap, 7.5)
+        XCTAssertEqual(response.data.matches[0].teams[0].participants[0].strokesReceived, 0)
+        XCTAssertNil(response.data.matches[0].teams[1].participants[1].strokesReceived)
         XCTAssertEqual(response.meta.revision, "live:fingerprint/opaque-v2")
+    }
+
+    func testMatchesDecodesBBScrambleAndSinglesCanonicalIntelligenceWithoutLosingPrecision() throws {
+        let bestBall = ReadFixture.match(
+            id: "bb",
+            status: "scheduled",
+            progress: NSNull(),
+            result: NSNull(),
+            displayMatchNumber: "4",
+            format: "Best Ball",
+            participantPlayingHandicaps: [[12.34567, 0.0], [-0.5, NSNull()]],
+            participantStrokes: [[0, 4], [1, NSNull()]]
+        )
+        let scramble = ReadFixture.match(
+            id: "sc",
+            status: "scheduled",
+            progress: NSNull(),
+            result: NSNull(),
+            displayMatchNumber: "5",
+            format: "Scramble",
+            teamPlayingHandicaps: [3.5, 4.25],
+            teamStrokes: [0, 2],
+            participantStrokes: [[NSNull(), NSNull()], [NSNull(), NSNull()]]
+        )
+        let singles = ReadFixture.match(
+            id: "si",
+            status: "scheduled",
+            progress: NSNull(),
+            result: NSNull(),
+            displayMatchNumber: NSNull(),
+            format: "Singles",
+            participantStrokes: [[2, 0], [0, NSNull()]]
+        )
+
+        let response = try decoder.decode(
+            MobileMatchesResponse.self,
+            from: ReadFixture.matches([bestBall, scramble, singles])
+        )
+
+        XCTAssertEqual(response.data.matches[0].displayMatchNumber, "4")
+        XCTAssertEqual(response.data.matches[0].teams[0].participants[0].playingHandicap, 12.34567)
+        XCTAssertEqual(response.data.matches[0].teams[0].participants[0].strokesReceived, 0)
+        XCTAssertEqual(response.data.matches[1].teams[0].playingHandicap, 3.5)
+        XCTAssertEqual(response.data.matches[1].teams[0].strokesReceived, 0)
+        XCTAssertTrue(response.data.matches[1].teams.flatMap(\.participants).allSatisfy {
+            $0.strokesReceived == nil
+        })
+        XCTAssertNil(response.data.matches[2].displayMatchNumber)
+        XCTAssertEqual(response.data.matches[2].teams[0].participants[0].strokesReceived, 2)
+        XCTAssertTrue(response.isCompatible(expectedTournamentID: ReadFixture.tournamentID))
+    }
+
+    func testMatchesRejectsFormatSpecificGolfIntelligenceOnTheWrongCanonicalLevel() throws {
+        let scrambleWithParticipantStrokes = ReadFixture.match(
+            id: "bad-scramble",
+            status: "scheduled",
+            progress: NSNull(),
+            result: NSNull(),
+            format: "Scramble",
+            teamPlayingHandicaps: [3.5, 4.25],
+            teamStrokes: [0, 2],
+            participantStrokes: [[1, NSNull()], [NSNull(), NSNull()]]
+        )
+        let bestBallWithTeamStrokes = ReadFixture.match(
+            id: "bad-best-ball",
+            status: "scheduled",
+            progress: NSNull(),
+            result: NSNull(),
+            format: "Best Ball",
+            teamPlayingHandicaps: [3.5, NSNull()],
+            teamStrokes: [1, NSNull()]
+        )
+
+        for match in [scrambleWithParticipantStrokes, bestBallWithTeamStrokes] {
+            let response = try decoder.decode(
+                MobileMatchesResponse.self,
+                from: ReadFixture.matches([match])
+            )
+            XCTAssertFalse(response.isCompatible(expectedTournamentID: ReadFixture.tournamentID))
+        }
+    }
+
+    func testMatchesRejectsMissingRequiredAdditiveIntelligenceKeys() throws {
+        let fields = ["displayMatchNumber", "teamId", "teamPlayingHandicap", "teamStrokes", "playerPlayingHandicap", "playerStrokes"]
+        for field in fields {
+            var match = ReadFixture.match(
+                id: "missing-\(field)",
+                status: "scheduled",
+                progress: NSNull(),
+                result: NSNull()
+            )
+            switch field {
+            case "displayMatchNumber":
+                match.removeValue(forKey: "displayMatchNumber")
+            case "teamId", "teamPlayingHandicap", "teamStrokes":
+                var teams = try XCTUnwrap(match["teams"] as? [[String: Any]])
+                let key = field == "teamId"
+                    ? "teamId"
+                    : field == "teamPlayingHandicap" ? "playingHandicap" : "strokesReceived"
+                teams[0].removeValue(forKey: key)
+                match["teams"] = teams
+            default:
+                var teams = try XCTUnwrap(match["teams"] as? [[String: Any]])
+                var participants = try XCTUnwrap(teams[0]["participants"] as? [[String: Any]])
+                participants[0].removeValue(
+                    forKey: field == "playerPlayingHandicap" ? "playingHandicap" : "strokesReceived"
+                )
+                teams[0]["participants"] = participants
+                match["teams"] = teams
+            }
+            XCTAssertThrowsError(
+                try decoder.decode(MobileMatchesResponse.self, from: ReadFixture.matches([match])),
+                "Missing \(field) must not decode as canonical null."
+            )
+        }
     }
 
     func testLeadersDecodesHalfPointsTiesAndNullableRanks() throws {
@@ -391,14 +512,79 @@ private enum ReadFixture {
         id: String,
         status: String,
         progress: Any,
-        result: Any
+        result: Any,
+        includeMatchIntelligence: Bool = true,
+        displayMatchNumber: Any = "17",
+        format: String = "BB",
+        teamPlayingHandicaps: [Any] = [NSNull(), NSNull()],
+        teamStrokes: [Any] = [NSNull(), NSNull()],
+        participantPlayingHandicaps: [[Any]] = [[7.5, 11.0], [5.5, NSNull()]],
+        participantStrokes: [[Any]] = [[0, 4], [0, NSNull()]]
     ) -> [String: Any] {
-        [
+        var teams: [[String: Any]] = [
+            [
+                "side": 1,
+                "name": "Pickles",
+                "participants": [
+                    participant(
+                        id: "player:opaque/alpha",
+                        name: "Preview Golfer",
+                        side: 1,
+                        authenticated: true,
+                        includeMatchIntelligence: includeMatchIntelligence,
+                        playingHandicap: participantPlayingHandicaps[0][0],
+                        strokesReceived: participantStrokes[0][0]
+                    ),
+                    participant(
+                        id: "player:partner/2",
+                        name: "Partner",
+                        side: 1,
+                        authenticated: false,
+                        includeMatchIntelligence: includeMatchIntelligence,
+                        playingHandicap: participantPlayingHandicaps[0][1],
+                        strokesReceived: participantStrokes[0][1]
+                    ),
+                ],
+            ],
+            [
+                "side": 2,
+                "name": "Rippers",
+                "participants": [
+                    participant(
+                        id: "player:opponent/3",
+                        name: "Opponent One",
+                        side: 2,
+                        authenticated: false,
+                        includeMatchIntelligence: includeMatchIntelligence,
+                        playingHandicap: participantPlayingHandicaps[1][0],
+                        strokesReceived: participantStrokes[1][0]
+                    ),
+                    participant(
+                        id: "player:opponent/4",
+                        name: "Opponent Two",
+                        side: 2,
+                        authenticated: false,
+                        includeMatchIntelligence: includeMatchIntelligence,
+                        playingHandicap: participantPlayingHandicaps[1][1],
+                        strokesReceived: participantStrokes[1][1]
+                    ),
+                ],
+            ],
+        ]
+        if includeMatchIntelligence {
+            for index in teams.indices {
+                teams[index]["teamId"] = index == 0 ? "PICKLES" : "LIPPIT"
+                teams[index]["playingHandicap"] = teamPlayingHandicaps[index]
+                teams[index]["strokesReceived"] = teamStrokes[index]
+            }
+        }
+
+        var value: [String: Any] = [
             "matchId": id,
             "round": [
                 "roundNumber": 2,
                 "name": "Round 2",
-                "format": "Best Ball",
+                "format": format,
             ],
             "status": status,
             "course": [
@@ -411,44 +597,7 @@ private enum ReadFixture {
                 "label": "8:10 AM",
                 "timeZone": "America/New_York",
             ],
-            "teams": [
-                [
-                    "side": 1,
-                    "name": "Pickles",
-                    "participants": [
-                        participant(
-                            id: "player:opaque/alpha",
-                            name: "Preview Golfer",
-                            side: 1,
-                            authenticated: true
-                        ),
-                        participant(
-                            id: "player:partner/2",
-                            name: "Partner",
-                            side: 1,
-                            authenticated: false
-                        ),
-                    ],
-                ],
-                [
-                    "side": 2,
-                    "name": "Rippers",
-                    "participants": [
-                        participant(
-                            id: "player:opponent/3",
-                            name: "Opponent One",
-                            side: 2,
-                            authenticated: false
-                        ),
-                        participant(
-                            id: "player:opponent/4",
-                            name: "Opponent Two",
-                            side: 2,
-                            authenticated: false
-                        ),
-                    ],
-                ],
-            ],
+            "teams": teams,
             "authenticatedPlayer": [
                 "involved": true,
                 "teamSide": 1,
@@ -458,20 +607,30 @@ private enum ReadFixture {
             "progress": progress,
             "result": result,
         ]
+        if includeMatchIntelligence { value["displayMatchNumber"] = displayMatchNumber }
+        return value
     }
 
     private static func participant(
         id: String,
         name: String,
         side: Int,
-        authenticated: Bool
+        authenticated: Bool,
+        includeMatchIntelligence: Bool,
+        playingHandicap: Any,
+        strokesReceived: Any
     ) -> [String: Any] {
-        [
+        var value: [String: Any] = [
             "playerId": id,
             "displayName": name,
             "teamSide": side,
             "isAuthenticatedPlayer": authenticated,
         ]
+        if includeMatchIntelligence {
+            value["playingHandicap"] = playingHandicap
+            value["strokesReceived"] = strokesReceived
+        }
+        return value
     }
 
     static func today(
