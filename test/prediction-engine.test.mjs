@@ -1,6 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { PREDICTION_SETTING_DEFAULTS, allocateStrokes, courseHandicap, formatCode, playingHandicaps, predict, settingsMap, teamVibesForPlayers, teamVibesTier } from "../lib/prediction-engine.js";
+import {
+  PREDICTION_SETTING_DEFAULTS,
+  allocateStrokes,
+  courseHandicap,
+  formatCode,
+  playingHandicaps,
+  predict,
+  roundPostgresNumeric,
+  settingsMap,
+  teamVibesForPlayers,
+  teamVibesTier,
+} from "../lib/prediction-engine.js";
+import { getStrokesOnHole } from "../lib/scorecard-net.js";
 
 test("normalizes supported match formats", () => {
   assert.equal(formatCode("Best Ball"), "BB");
@@ -13,12 +25,66 @@ test("calculates course and singles handicaps", () => {
   assert.deepEqual(playingHandicaps("Singles", [7, 11]).playerStrokes, [0, 4]);
 });
 
+test("PostgreSQL-compatible rounding uses half-away-from-zero semantics", () => {
+  assert.deepEqual(
+    [0.49, 0.5, 0.51, -0.49, -0.5, -0.51].map(roundPostgresNumeric),
+    [0, 1, 1, 0, -1, -1]
+  );
+  assert.equal(Object.is(roundPostgresNumeric(-0.49), -0), false);
+  assert.equal(roundPostgresNumeric(0.49999999999999994), 0);
+  assert.equal(roundPostgresNumeric(-0.49999999999999994), 0);
+});
+
+test("keeps Course Handicap exact until each format's final PostgreSQL rounding point", () => {
+  const exact = [4.8, 5.4, 9, 10].map((handicap) => courseHandicap(handicap, 72, 113, 72));
+  assert.deepEqual(exact, [4.8, 5.4, 9, 10]);
+
+  const oldPrematurelyRounded = Math.round((Math.round(exact[1]) - Math.round(exact[0])) * 0.9);
+  assert.equal(oldPrematurelyRounded, 0);
+  assert.deepEqual(playingHandicaps("BB", exact).playerStrokes, [0, 1, 4, 5]);
+});
+
+test("Singles rounds exact relative Course Handicap differences once", () => {
+  const exact = [4.8, 5.3].map((handicap) => courseHandicap(handicap, 72, 113, 72));
+  assert.deepEqual(playingHandicaps("SI", exact).playerStrokes, [0, 1]);
+});
+
+test("Scramble weights exact Course Handicaps then rounds once like PostgreSQL", () => {
+  const play = playingHandicaps("SC", [-1, -1, 1, 1]);
+  assert.deepEqual({ teamA: play.teamA, teamB: play.teamB }, { teamA: -1, teamB: 1 });
+  assert.deepEqual({ strokesA: play.strokesA, strokesB: play.strokesB }, { strokesA: 0, strokesB: 2 });
+});
+
+test("Turtle Point preview preserves exact Course Handicaps before Best Ball allocation", () => {
+  const course = { rating: 71.9, slope: 136, par: 72 };
+  const exact = [12.1, 3.5, 8.2, -0.8].map((handicap) =>
+    courseHandicap(handicap, course.rating, course.slope, course.par));
+  assert.ok(Math.abs(exact[0] - 14.46283185840708) < 1e-12);
+  assert.ok(Math.abs(exact[3] - -1.0628318584070796) < 1e-12);
+  assert.deepEqual(playingHandicaps("BB", exact).playerStrokes, [14, 5, 10, 0]);
+});
+
 test("allocates strokes in stroke-index order", () => {
   const holes = Array.from({ length: 18 }, (_, index) => ({ "Hole Number": index + 1, "Stroke Index": 18 - index }));
   const result = allocateStrokes(2, holes);
   assert.equal(result[17], 1);
   assert.equal(result[16], 1);
   assert.equal(result.reduce((sum, value) => sum + value, 0), 2);
+});
+
+test("display stroke allocation retains the canonical nonnegative integer contract", () => {
+  const holes = Array.from({ length: 18 }, (_, index) => ({ "Hole Number": index + 1, "Stroke Index": index + 1 }));
+  assert.deepEqual(allocateStrokes(0, holes), Array(18).fill(0));
+  assert.deepEqual(allocateStrokes(-1, holes), Array(18).fill(0));
+  const nineteen = allocateStrokes(19, holes);
+  assert.equal(nineteen[0], 2);
+  assert.ok(nineteen.slice(1).every((value) => value === 1));
+  for (const strokes of [0, 1, 5, 18, 19, 25]) {
+    assert.deepEqual(
+      allocateStrokes(strokes, holes),
+      holes.map((hole) => getStrokesOnHole(strokes, hole["Stroke Index"])),
+    );
+  }
 });
 
 test("predictions remain bounded and total 100", () => {

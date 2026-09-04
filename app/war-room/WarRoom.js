@@ -8,6 +8,7 @@ import {
   pick,
   playingHandicaps,
   predict,
+  roundPostgresNumeric,
   settingsMap,
 } from "../../lib/prediction-engine";
 import {
@@ -358,7 +359,7 @@ export default function WarRoom({ initialData, loadError, initialSelection = {} 
               <div className={styles.sectionTitle}><span>02</span><div><p>Handicap Breakdown</p><h2>Where the strokes fall</h2></div></div>
               <div className={styles.playerTable}>
                 <div className={styles.tableHead}><span>Player</span><span>Tournament</span><span>Course</span><span>Playing</span></div>
-                {details.map((player, index) => <div key={player.id}><strong>{player.name}</strong><span>{player.tournamentHandicap.toFixed(1)}</span><span>{Math.round(player.courseHandicap)}</span><b>{netForPlayer(index)}</b></div>)}
+                {details.map((player, index) => <div key={player.id}><strong>{player.name}</strong><span>{player.tournamentHandicap.toFixed(1)}</span><span>{roundPostgresNumeric(player.courseHandicap)}</span><b>{netForPlayer(index)}</b></div>)}
               </div>
               <div className={styles.strokeEdgeCard}>
                 <span>Match Stroke Edge</span>
