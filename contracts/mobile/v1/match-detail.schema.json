@@ -1,0 +1,747 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:match-detail",
+  "title": "Bagger Mobile API v1 participant Match Detail response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "apiVersion", "data", "meta"],
+  "properties": {
+    "ok": { "const": true },
+    "apiVersion": { "const": "v1" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tournament", "match"],
+      "properties": {
+        "tournament": { "$ref": "#/$defs/tournament" },
+        "match": { "$ref": "#/$defs/match" }
+      }
+    },
+    "meta": { "$ref": "shared.schema.json#/$defs/meta" }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "nullableIdentifier": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/identifier" }
+      ]
+    },
+    "boundedText": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "tournament": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tournamentId", "name", "year", "status", "timeZone", "location"],
+      "properties": {
+        "tournamentId": { "$ref": "#/$defs/identifier" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "year": { "type": ["integer", "null"], "minimum": 1900, "maximum": 2200 },
+        "status": { "type": ["string", "null"], "maxLength": 100 },
+        "timeZone": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "location": { "type": ["string", "null"], "maxLength": 300 }
+      }
+    },
+    "round": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roundNumber", "name", "format", "formatName"],
+      "properties": {
+        "roundNumber": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "name": { "type": ["string", "null"], "maxLength": 200 },
+        "format": { "enum": ["BB", "SC", "SI"] },
+        "formatName": { "type": "string", "minLength": 1, "maxLength": 100 }
+      }
+    },
+    "course": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["courseId", "name", "tee", "yardage", "par", "rating", "slope"],
+      "properties": {
+        "courseId": { "$ref": "#/$defs/nullableIdentifier" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "tee": { "type": ["string", "null"], "maxLength": 100 },
+        "yardage": { "type": ["integer", "null"], "minimum": 1, "maximum": 20000 },
+        "par": { "type": ["number", "null"], "minimum": 1, "maximum": 100 },
+        "rating": { "type": ["number", "null"], "minimum": 1, "maximum": 100 },
+        "slope": { "type": ["integer", "null"], "minimum": 1, "maximum": 300 }
+      }
+    },
+    "teeTime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["localTime", "label", "timeZone"],
+      "properties": {
+        "localTime": { "type": ["string", "null"], "pattern": "^\\d{2}:\\d{2}:\\d{2}$" },
+        "label": { "type": "string", "maxLength": 100 },
+        "timeZone": { "type": "string", "minLength": 1, "maxLength": 100 }
+      }
+    },
+    "participant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "displayName", "teamSide", "isAuthenticatedPlayer", "playingHandicap", "strokesReceived"],
+      "properties": {
+        "playerId": { "$ref": "#/$defs/identifier" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "teamSide": { "type": "integer", "enum": [1, 2] },
+        "isAuthenticatedPlayer": { "type": "boolean" },
+        "playingHandicap": { "type": ["number", "null"] },
+        "strokesReceived": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "team": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["side", "teamId", "name", "playingHandicap", "strokesReceived", "participants"],
+      "properties": {
+        "side": { "type": "integer", "enum": [1, 2] },
+        "teamId": { "$ref": "#/$defs/identifier" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "playingHandicap": { "type": ["number", "null"] },
+        "strokesReceived": { "type": ["integer", "null"], "minimum": 0 },
+        "participants": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/participant" }
+        }
+      }
+    },
+    "authenticatedPlayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["involved", "teamSide", "partnerPlayerIds", "opponentPlayerIds"],
+      "properties": {
+        "involved": { "type": "boolean" },
+        "teamSide": { "type": ["integer", "null"], "enum": [1, 2, null] },
+        "partnerPlayerIds": {
+          "type": "array",
+          "maxItems": 1,
+          "items": { "$ref": "#/$defs/identifier" }
+        },
+        "opponentPlayerIds": {
+          "type": "array",
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currentHole", "holesPlayed", "holesRemaining", "statusText"],
+      "properties": {
+        "currentHole": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "holesPlayed": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "holesRemaining": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "statusText": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "notation", "winnerSide", "winnerTeamId"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "notation": { "type": ["string", "null"], "maxLength": 100 },
+        "winnerSide": { "type": ["integer", "null"], "enum": [1, 2, null] },
+        "winnerTeamId": { "$ref": "#/$defs/nullableIdentifier" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "winnerSide": { "type": "null" } } },
+          "then": { "properties": { "winnerTeamId": { "type": "null" } } },
+          "else": { "properties": { "winnerTeamId": { "$ref": "#/$defs/identifier" } } }
+        }
+      ]
+    },
+    "navigation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roundMatchIndex", "roundMatchCount", "previousMatchId", "nextMatchId", "myMatchId", "isMyMatch"],
+      "properties": {
+        "roundMatchIndex": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "roundMatchCount": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "previousMatchId": { "$ref": "#/$defs/nullableIdentifier" },
+        "nextMatchId": { "$ref": "#/$defs/nullableIdentifier" },
+        "myMatchId": { "$ref": "#/$defs/nullableIdentifier" },
+        "isMyMatch": { "type": "boolean" }
+      }
+    },
+    "playerHoleScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["playerId", "gross", "strokes"],
+      "properties": {
+        "playerId": { "$ref": "#/$defs/identifier" },
+        "gross": { "type": ["integer", "null"], "minimum": 1, "maximum": 20 },
+        "strokes": { "type": ["integer", "null"], "minimum": 0, "maximum": 20 }
+      }
+    },
+    "teamHoleScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gross", "strokes"],
+      "properties": {
+        "gross": { "type": ["integer", "null"], "minimum": 1, "maximum": 20 },
+        "strokes": { "type": ["integer", "null"], "minimum": 0, "maximum": 20 }
+      }
+    },
+    "playerSideScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["side", "scope", "playerScores", "teamScore", "netScore"],
+      "properties": {
+        "side": { "type": "integer", "enum": [1, 2] },
+        "scope": { "const": "players" },
+        "playerScores": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/playerHoleScore" }
+        },
+        "teamScore": { "type": "null" },
+        "netScore": { "type": ["integer", "null"], "minimum": -20, "maximum": 20 }
+      }
+    },
+    "teamSideScore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["side", "scope", "playerScores", "teamScore", "netScore"],
+      "properties": {
+        "side": { "type": "integer", "enum": [1, 2] },
+        "scope": { "const": "team" },
+        "playerScores": { "type": "array", "maxItems": 0 },
+        "teamScore": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/teamHoleScore" }
+          ]
+        },
+        "netScore": { "type": ["integer", "null"], "minimum": -20, "maximum": 20 }
+      }
+    },
+    "sideScore": {
+      "oneOf": [
+        { "$ref": "#/$defs/playerSideScore" },
+        { "$ref": "#/$defs/teamSideScore" }
+      ]
+    },
+    "hole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["holeNumber", "par", "yardage", "strokeIndex", "state", "official", "winningSide", "sideOne", "sideTwo", "resultLabel", "runningResult", "story", "updatedAt"],
+      "properties": {
+        "holeNumber": { "type": "integer", "minimum": 1, "maximum": 18 },
+        "par": { "type": ["integer", "null"], "minimum": 1, "maximum": 10 },
+        "yardage": { "type": ["integer", "null"], "minimum": 1, "maximum": 1000 },
+        "strokeIndex": { "type": ["integer", "null"], "minimum": 1, "maximum": 18 },
+        "state": { "enum": ["unplayed", "halved", "sideOne", "sideTwo"] },
+        "official": { "type": "boolean" },
+        "winningSide": { "type": ["integer", "null"], "enum": [1, 2, null] },
+        "sideOne": {
+          "allOf": [
+            { "$ref": "#/$defs/sideScore" },
+            { "properties": { "side": { "const": 1 } } }
+          ]
+        },
+        "sideTwo": {
+          "allOf": [
+            { "$ref": "#/$defs/sideScore" },
+            { "properties": { "side": { "const": 2 } } }
+          ]
+        },
+        "resultLabel": { "type": ["string", "null"], "maxLength": 300 },
+        "runningResult": { "type": ["string", "null"], "maxLength": 200 },
+        "story": { "type": ["string", "null"], "maxLength": 500 },
+        "updatedAt": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "state": { "enum": ["unplayed", "halved"] } } },
+          "then": { "properties": { "winningSide": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "state": { "const": "unplayed" } } },
+          "then": {
+            "properties": {
+              "official": { "const": false },
+              "resultLabel": { "type": "null" },
+              "runningResult": { "type": "null" },
+              "updatedAt": { "type": "null" },
+              "sideOne": {
+                "properties": {
+                  "playerScores": {
+                    "items": {
+                      "properties": {
+                        "gross": { "type": "null" },
+                        "strokes": { "type": "null" }
+                      }
+                    }
+                  },
+                  "teamScore": { "type": "null" },
+                  "netScore": { "type": "null" }
+                }
+              },
+              "sideTwo": {
+                "properties": {
+                  "playerScores": {
+                    "items": {
+                      "properties": {
+                        "gross": { "type": "null" },
+                        "strokes": { "type": "null" }
+                      }
+                    }
+                  },
+                  "teamScore": { "type": "null" },
+                  "netScore": { "type": "null" }
+                }
+              }
+            }
+          },
+          "else": { "properties": { "official": { "const": true } } }
+        },
+        {
+          "if": { "properties": { "state": { "const": "sideOne" } } },
+          "then": { "properties": { "winningSide": { "const": 1 } } }
+        },
+        {
+          "if": { "properties": { "state": { "const": "sideTwo" } } },
+          "then": { "properties": { "winningSide": { "const": 2 } } }
+        }
+      ]
+    },
+    "scorecard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "complete", "confirmedAt", "holes"],
+      "properties": {
+        "state": { "enum": ["unavailable", "inProgress", "confirmed"] },
+        "complete": { "type": "boolean" },
+        "confirmedAt": { "type": ["string", "null"], "format": "date-time" },
+        "holes": {
+          "type": "array",
+          "minItems": 18,
+          "maxItems": 18,
+          "items": { "$ref": "#/$defs/hole" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "state": { "enum": ["unavailable", "inProgress"] } } },
+          "then": { "properties": { "confirmedAt": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "state": { "const": "unavailable" } } },
+          "then": { "properties": { "complete": { "const": false } } }
+        },
+        {
+          "if": { "properties": { "state": { "const": "confirmed" } } },
+          "then": {
+            "properties": {
+              "complete": { "const": true },
+              "confirmedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      ]
+    },
+    "flowSegment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "winnerSide", "result", "holesRecorded"],
+      "properties": {
+        "status": { "enum": ["notStarted", "allSquare", "leading", "final"] },
+        "winnerSide": { "type": ["integer", "null"], "enum": [1, 2, null] },
+        "result": { "type": ["string", "null"], "maxLength": 200 },
+        "holesRecorded": { "type": "integer", "minimum": 0, "maximum": 18 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "notStarted" } } },
+          "then": {
+            "properties": {
+              "winnerSide": { "type": "null" },
+              "result": { "type": "null" },
+              "holesRecorded": { "const": 0 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "allSquare" } } },
+          "then": {
+            "properties": {
+              "winnerSide": { "type": "null" },
+              "result": { "type": "string", "minLength": 1 },
+              "holesRecorded": { "minimum": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "leading" } } },
+          "then": {
+            "properties": {
+              "winnerSide": { "enum": [1, 2] },
+              "result": { "type": "string", "minLength": 1 },
+              "holesRecorded": { "minimum": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "final" } } },
+          "then": {
+            "properties": {
+              "result": { "type": "string", "minLength": 1 },
+              "holesRecorded": { "minimum": 1 }
+            }
+          }
+        }
+      ]
+    },
+    "flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["front", "back", "overall"],
+      "properties": {
+        "front": { "$ref": "#/$defs/flowSegment" },
+        "back": { "$ref": "#/$defs/flowSegment" },
+        "overall": { "$ref": "#/$defs/flowSegment" }
+      }
+    },
+    "clinch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["holeNumber", "winnerSide", "winnerTeamId", "summary"],
+      "properties": {
+        "holeNumber": { "type": "integer", "minimum": 1, "maximum": 18 },
+        "winnerSide": { "type": "integer", "enum": [1, 2] },
+        "winnerTeamId": { "$ref": "#/$defs/identifier" },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["holesPlayed", "sideOneHolesWon", "halved", "sideTwoHolesWon", "biggestLead", "leadChanges", "holesRemaining"],
+      "properties": {
+        "holesPlayed": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "sideOneHolesWon": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "halved": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "sideTwoHolesWon": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "biggestLead": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "leadChanges": { "type": "integer", "minimum": 0, "maximum": 18 },
+        "holesRemaining": { "type": "integer", "minimum": 0, "maximum": 18 }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["updatedAt", "confirmedAt"],
+      "properties": {
+        "updatedAt": { "type": ["string", "null"], "format": "date-time" },
+        "confirmedAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "match": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matchId", "displayMatchNumber", "round", "status", "course", "teeTime", "teams", "authenticatedPlayer", "progress", "result", "navigation", "scorecard", "flow", "clinch", "stats", "freshness"],
+      "properties": {
+        "matchId": { "$ref": "#/$defs/identifier" },
+        "displayMatchNumber": { "type": ["string", "null"], "minLength": 1, "maxLength": 100 },
+        "round": { "$ref": "#/$defs/round" },
+        "status": { "enum": ["scheduled", "inProgress", "completed"] },
+        "course": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/course" }] },
+        "teeTime": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/teeTime" }] },
+        "teams": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            {
+              "allOf": [
+                { "$ref": "#/$defs/team" },
+                { "properties": { "side": { "const": 1 } } }
+              ]
+            },
+            {
+              "allOf": [
+                { "$ref": "#/$defs/team" },
+                { "properties": { "side": { "const": 2 } } }
+              ]
+            }
+          ],
+          "items": false
+        },
+        "authenticatedPlayer": { "$ref": "#/$defs/authenticatedPlayer" },
+        "progress": { "$ref": "#/$defs/progress" },
+        "result": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/result" }] },
+        "navigation": { "$ref": "#/$defs/navigation" },
+        "scorecard": { "$ref": "#/$defs/scorecard" },
+        "flow": { "$ref": "#/$defs/flow" },
+        "clinch": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/clinch" }] },
+        "stats": { "$ref": "#/$defs/stats" },
+        "freshness": { "$ref": "#/$defs/freshness" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "scheduled" } } },
+          "then": {
+            "properties": {
+              "result": { "type": "null" },
+              "progress": {
+                "properties": {
+                  "currentHole": { "const": 0 },
+                  "holesPlayed": { "const": 0 },
+                  "holesRemaining": { "const": 18 },
+                  "statusText": { "type": "null" }
+                }
+              },
+              "scorecard": {
+                "properties": {
+                  "state": { "const": "unavailable" },
+                  "complete": { "const": false },
+                  "confirmedAt": { "type": "null" },
+                  "holes": {
+                    "items": {
+                      "properties": {
+                        "state": { "const": "unplayed" },
+                        "official": { "const": false }
+                      }
+                    }
+                  }
+                }
+              },
+              "flow": {
+                "properties": {
+                  "front": {
+                    "properties": {
+                      "status": { "const": "notStarted" },
+                      "winnerSide": { "type": "null" },
+                      "result": { "type": "null" },
+                      "holesRecorded": { "const": 0 }
+                    }
+                  },
+                  "back": {
+                    "properties": {
+                      "status": { "const": "notStarted" },
+                      "winnerSide": { "type": "null" },
+                      "result": { "type": "null" },
+                      "holesRecorded": { "const": 0 }
+                    }
+                  },
+                  "overall": {
+                    "properties": {
+                      "status": { "const": "notStarted" },
+                      "winnerSide": { "type": "null" },
+                      "result": { "type": "null" },
+                      "holesRecorded": { "const": 0 }
+                    }
+                  }
+                }
+              },
+              "clinch": { "type": "null" },
+              "stats": {
+                "properties": {
+                  "holesPlayed": { "const": 0 },
+                  "sideOneHolesWon": { "const": 0 },
+                  "halved": { "const": 0 },
+                  "sideTwoHolesWon": { "const": 0 },
+                  "biggestLead": { "const": 0 },
+                  "leadChanges": { "const": 0 },
+                  "holesRemaining": { "const": 18 }
+                }
+              },
+              "freshness": { "properties": { "confirmedAt": { "type": "null" } } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "inProgress" } } },
+          "then": {
+            "properties": {
+              "result": { "$ref": "#/$defs/result" },
+              "scorecard": {
+                "properties": {
+                  "state": { "const": "inProgress" },
+                  "confirmedAt": { "type": "null" }
+                }
+              },
+              "freshness": { "properties": { "confirmedAt": { "type": "null" } } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "completed" } } },
+          "then": {
+            "properties": {
+              "result": { "$ref": "#/$defs/result" },
+              "scorecard": {
+                "properties": {
+                  "state": { "const": "confirmed" },
+                  "complete": { "const": true },
+                  "confirmedAt": { "type": "string", "format": "date-time" }
+                }
+              },
+              "freshness": {
+                "properties": { "confirmedAt": { "type": "string", "format": "date-time" } }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "round": { "properties": { "format": { "const": "BB" } } } } },
+          "then": {
+            "properties": {
+              "teams": {
+                "minItems": 2,
+                "maxItems": 2,
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "playingHandicap": { "type": "null" },
+                      "strokesReceived": { "type": "null" },
+                      "participants": { "minItems": 2, "maxItems": 2 }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "playingHandicap": { "type": "null" },
+                      "strokesReceived": { "type": "null" },
+                      "participants": { "minItems": 2, "maxItems": 2 }
+                    }
+                  }
+                ],
+                "items": false
+              },
+              "scorecard": {
+                "properties": {
+                  "holes": {
+                    "items": {
+                      "properties": {
+                        "sideOne": {
+                          "properties": {
+                            "scope": { "const": "players" },
+                            "playerScores": { "minItems": 2, "maxItems": 2 }
+                          }
+                        },
+                        "sideTwo": {
+                          "properties": {
+                            "scope": { "const": "players" },
+                            "playerScores": { "minItems": 2, "maxItems": 2 }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "round": { "properties": { "format": { "const": "SI" } } } } },
+          "then": {
+            "properties": {
+              "teams": {
+                "minItems": 2,
+                "maxItems": 2,
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "playingHandicap": { "type": "null" },
+                      "strokesReceived": { "type": "null" },
+                      "participants": { "minItems": 1, "maxItems": 1 }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "playingHandicap": { "type": "null" },
+                      "strokesReceived": { "type": "null" },
+                      "participants": { "minItems": 1, "maxItems": 1 }
+                    }
+                  }
+                ],
+                "items": false
+              },
+              "scorecard": {
+                "properties": {
+                  "holes": {
+                    "items": {
+                      "properties": {
+                        "sideOne": {
+                          "properties": {
+                            "scope": { "const": "players" },
+                            "playerScores": { "minItems": 1, "maxItems": 1 }
+                          }
+                        },
+                        "sideTwo": {
+                          "properties": {
+                            "scope": { "const": "players" },
+                            "playerScores": { "minItems": 1, "maxItems": 1 }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "round": { "properties": { "format": { "const": "SC" } } } } },
+          "then": {
+            "properties": {
+              "teams": {
+                "minItems": 2,
+                "maxItems": 2,
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "participants": {
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": { "properties": { "strokesReceived": { "type": "null" } } }
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "participants": {
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": { "properties": { "strokesReceived": { "type": "null" } } }
+                      }
+                    }
+                  }
+                ],
+                "items": false
+              },
+              "scorecard": {
+                "properties": {
+                  "holes": {
+                    "items": {
+                      "properties": {
+                        "sideOne": { "properties": { "scope": { "const": "team" } } },
+                        "sideTwo": { "properties": { "scope": { "const": "team" } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
