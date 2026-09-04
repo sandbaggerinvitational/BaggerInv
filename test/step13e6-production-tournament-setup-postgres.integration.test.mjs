@@ -9,6 +9,8 @@ import test from "node:test";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migration = path.join(root,
   "supabase/production_migrations/202608300063_production_tournament_setup_v1.sql");
+const emptyPairingsMigration = path.join(root,
+  "supabase/production_migrations/202609030083_production_empty_pairings_v1.sql");
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(["createdb", "initdb", "pg_ctl", "psql"]
   .map((name) => [name, path.join(pgBin, name)]));
@@ -450,17 +452,36 @@ function fixture(cluster, database) {
       '{"team_1":[],"team_2":[],"all_ids":[]}','{}',now(),now(),repeat('c',64),
       '10000000-0000-4000-8000-000000000001'
     );
+    insert into scoring_authority.scoring_snapshots values (
+      '2026-R1-4:S1','2026','2026-R1-4',1,'sandbagger-2026-v1','BB',0.9,
+      'COURSE-1','Tournament',72,120,72,'lowest-playing-handicap',
+      (select jsonb_agg(jsonb_build_object('hole_number',n,'par',4,'stroke_index',n,'yardage',400) order by n)
+        from generate_series(1,18) n),
+      '{"team_1":["CB05"],"team_2":[],"all_ids":["CB05"]}','{}',now(),now(),repeat('d',64),
+      '10000000-0000-4000-8000-000000000001'
+    );
+    insert into scoring_authority.scoring_snapshots values (
+      '2026-R3-1:S1','2026','2026-R3-1',1,'sandbagger-2026-v1','SI',1,
+      'COURSE-1','Tournament',72,120,72,'lowest-playing-handicap',
+      (select jsonb_agg(jsonb_build_object('hole_number',n,'par',4,'stroke_index',n,'yardage',400) order by n)
+        from generate_series(1,18) n),
+      '{"team_1":[],"team_2":[],"all_ids":[]}','{}',now(),now(),repeat('f',64),
+      '10000000-0000-4000-8000-000000000001'
+    );
     insert into scoring_authority.matches
       (match_id,tournament_id,round_number,format,scoring_snapshot_id,status)
     values ('2026-R1-1','2026',1,'BB','2026-R1-1:S1','UPCOMING'),
-      ('2026-R1-2','2026',1,'BB','2026-R1-2:S1','UPCOMING');
+      ('2026-R1-2','2026',1,'BB','2026-R1-2:S1','UPCOMING'),
+      ('2026-R1-4','2026',1,'BB','2026-R1-4:S1','UPCOMING'),
+      ('2026-R3-1','2026',3,'SI','2026-R3-1:S1','UPCOMING');
     insert into scoring_authority.match_participants
       (match_id,player_id,team_side,player_slot,tournament_handicap,handicap_index,
        course_handicap,playing_handicap,final_strokes,handicap_revision_id)
     values ('2026-R1-1','CB01',1,1,5,5,5,0,0,'10000000-0000-4000-8000-000000000001'),
       ('2026-R1-1','CB02',1,2,5,5,5,0,0,'10000000-0000-4000-8000-000000000001'),
       ('2026-R1-1','WD01',2,1,5,5,5,0,0,'10000000-0000-4000-8000-000000000001'),
-      ('2026-R1-1','WD02',2,2,5,5,5,0,0,'10000000-0000-4000-8000-000000000001');
+      ('2026-R1-1','WD02',2,2,5,5,5,0,0,'10000000-0000-4000-8000-000000000001'),
+      ('2026-R1-4','CB05',1,1,5,5,5,0,0,'10000000-0000-4000-8000-000000000001');
     update scoring_authority.scoring_snapshots snapshot set
       participant_configuration = context.value->'participant_configuration',
       team_configuration = context.value->'team_configuration'
@@ -471,13 +492,19 @@ function fixture(cluster, database) {
     insert into scoring_authority.scoring_permissions
       select '2026-R1-1',player_id,false,1,now(),now()
       from scoring_authority.match_participants where match_id='2026-R1-1';
+    insert into scoring_authority.scoring_permissions values
+      ('2026-R1-4','CB05',false,1,now(),now());
     insert into scoring_authority.match_holes
       select '2026-R1-1',n,'2026-R1-1:S1',n,4,400 from generate_series(1,18) n;
+    insert into scoring_authority.match_holes
+      select '2026-R1-4',n,'2026-R1-4:S1',n,4,400 from generate_series(1,18) n;
     insert into scoring_authority.game_center_presentations
       (match_id,tournament_id,course_name,tee_time,starting_hole,display_match_number,
        match_sort_order,source_workbook_id,source_payload_hash,imported_by)
     values ('2026-R1-1','2026','Course One','08:00','1','1',101,
-      'workbook-production',repeat('b',64),'fixture');
+      'workbook-production',repeat('b',64),'fixture'),
+      ('2026-R1-4','2026','Course One','08:40','1','4',104,
+      'workbook-production',repeat('e',64),'fixture');
     insert into scoring_authority.odds_publication_current values ('2026','UNPUBLISHED');
     insert into scoring_authority.calcutta_v1_current(tournament_id) values ('2026');
     insert into production_control.tournament_owner_capabilities_v1 values
@@ -485,7 +512,7 @@ function fixture(cluster, database) {
   `);
 }
 
-test("migration 063 compiles and enforces representative Production setup behavior on PostgreSQL 17", async (context) => {
+test("migrations 063 and 083 compile and enforce zero-or-complete Production pairing behavior on PostgreSQL 17", async (context) => {
   if (!(await available())) return context.skip("PostgreSQL 17 binaries unavailable");
   const cluster = await createCluster();
   context.after(() => destroyCluster(cluster));
@@ -493,6 +520,15 @@ test("migration 063 compiles and enforces representative Production setup behavi
   run(bin.createdb, [database], { env: environment(cluster) });
   fixture(cluster, database);
   sqlFile(cluster, database, migration);
+  sqlFile(cluster, database, emptyPairingsMigration);
+
+  assert.equal(sql(cluster, database, String.raw`
+    select concat_ws('|',
+      has_function_privilege('service_role', 'public.mutate_production_tournament_setup_v1(jsonb)', 'execute'),
+      has_function_privilege('service_role', 'production_control.apply_tournament_setup_pairings_v1(jsonb,bigint,text)', 'execute'),
+      has_function_privilege('authenticated', 'production_control.assert_tournament_setup_pairing_clear_safe_v1(text)', 'execute'),
+      has_function_privilege('anon', 'production_control.materialize_tournament_setup_legacy_match_v1(text,bigint,text)', 'execute'));
+  `), "t|f|f|f");
 
   const read = rpc(cluster, database, "read_production_tournament_setup_v1",
     scope("READ_PRODUCTION_TOURNAMENT_SETUP_V1"));
@@ -506,6 +542,127 @@ test("migration 063 compiles and enforces representative Production setup behavi
   assert.equal(read.data.matches[0].scoring_readiness_code,
     "PRODUCTION_MATCH_SCORING_READY");
   assert.deepEqual(read.data.matches[0].scoring_readiness_reasons, []);
+
+  assert.equal(JSON.parse(sql(cluster, database, String.raw`
+    select production_control.apply_tournament_setup_pairings_v1(
+      '{"match_id":"2026-R3-1","format":"SI","participants":[]}'::jsonb,
+      1, 'CB01'
+    )::text;
+  `)).changed, false);
+  for (const count of [1, 2, 3]) {
+    const invalidParticipants = Array.from({ length: count }, (_, index) => ({
+      player_id: `CB0${index + 1}`, team_side: index < 2 ? 1 : 2,
+      player_slot: index % 2 + 1,
+    }));
+    assert.throws(() => sql(cluster, database, String.raw`
+      select production_control.apply_tournament_setup_pairings_v1(
+        ${json({ match_id: "2026-R1-4", format: "BB", participants: invalidParticipants })},
+        1, 'CB01'
+      );
+    `), /TOURNAMENT_SETUP_PAIRING_COUNT_INVALID/);
+  }
+
+  const legacyClear = scope("REPLACE_PAIRINGS", {
+    expected_revision: 0,
+    operation_request_id: "20000000-0000-4000-8000-000000000501",
+    request_payload_hash: "5".repeat(64),
+    match_id: "2026-R1-4",
+    format: "BB",
+    participants: [],
+  });
+  const legacyClearConflict = {
+    ...legacyClear,
+    request_payload_hash: "6".repeat(64),
+  };
+  const legacyMarkAfterClear = {
+    environment: "PRODUCTION",
+    project_ref: "ymqhhtxaywtqllynrmxe",
+    project_url: "https://ymqhhtxaywtqllynrmxe.supabase.co",
+    source_workbook_id: "workbook-production",
+    tournament_id: "2026",
+    expected_epoch_id: "30000000-0000-4000-8000-000000000001",
+    operation: "MARK_LIVE",
+    match_id: "2026-R1-4",
+    mutation_key: "cleared-mark-live-000000001",
+    expected_match_revision: 1,
+    authorization: {
+      tournament_id: "2026",
+      match_id: "2026-R1-4",
+      player_id: actor.playerId,
+      auth_user_id: actor.authUserId,
+      permission_revision: 2,
+      role: "DIRECTOR",
+    },
+  };
+  const legacyClearResults = sql(cluster, database, String.raw`
+    begin;
+    update scoring_authority.odds_publication_current
+      set publication_state='PUBLISHED' where tournament_id='2026';
+    update scoring_authority.scoring_permissions set revoked_at=null
+      where match_id='2026-R1-4';
+    select public.mutate_production_tournament_setup_v1(${json(legacyClear)})::text;
+    select public.mutate_production_tournament_setup_v1(${json(legacyClear)})::text;
+    select public.mutate_production_tournament_setup_v1(${json(legacyClearConflict)})::text;
+    select concat_ws('|',
+      (select count(*) from scoring_authority.match_participants where match_id='2026-R1-4'),
+      (select count(*) from scoring_authority.scoring_permissions where match_id='2026-R1-4'),
+      (select count(*) from scoring_authority.match_holes where match_id='2026-R1-4'),
+      (select count(*) from scoring_authority.scoring_snapshots where snapshot_id='2026-R1-4:S1'),
+      (select count(*) from scoring_authority.tournament_setup_match_details_v1 where match_id='2026-R1-4' and prepared_setup_revision is null),
+      (select match_revision from scoring_authority.matches where match_id='2026-R1-4'),
+      (select permission_revision from scoring_authority.matches where match_id='2026-R1-4'),
+      (select revision from production_control.tournament_setup_context_v1 where tournament_id='2026'),
+      (select count(*) from production_control.tournament_setup_operation_receipts_v1 where operation_request_id='20000000-0000-4000-8000-000000000501'),
+      (select count(*) from production_control.tournament_setup_audit_events_v1 where operation_request_id='20000000-0000-4000-8000-000000000501')
+    );
+    select production_control.assert_production_match_scoring_ready_v1('2026-R1-4')::text;
+    select public.mutate_production_match_control(${json(legacyMarkAfterClear)})::text;
+    select concat_ws('|',
+      (select count(*) from scoring_authority.score_mutations where match_id='2026-R1-4'),
+      (select publication_state from scoring_authority.odds_publication_current where tournament_id='2026'),
+      (select count(*) from scoring_authority.handicap_revision_entries where revision_id='10000000-0000-4000-8000-000000000001' and player_id='CB05'));
+    rollback;
+  `).split("\n");
+  const clearFirst = JSON.parse(legacyClearResults[0]);
+  const clearRetry = JSON.parse(legacyClearResults[1]);
+  const clearConflict = JSON.parse(legacyClearResults[2]);
+  const clearReadiness = JSON.parse(legacyClearResults[4]);
+  const clearMarkLive = JSON.parse(legacyClearResults[5]);
+  assert.equal(clearFirst.ok, true);
+  assert.equal(clearFirst.changed, true);
+  assert.equal(clearFirst.revision, 1);
+  assert.deepEqual(clearFirst.warnings, [
+    "Published Odds remain unchanged; review them after new pairings are configured.",
+  ]);
+  assert.equal(clearRetry.idempotent, true);
+  assert.equal(clearRetry.revision, 1);
+  assert.equal(clearConflict.code, "TOURNAMENT_SETUP_IDEMPOTENCY_CONFLICT");
+  assert.equal(legacyClearResults[3], "0|0|0|1|1|1|2|1|1|1");
+  assert.equal(clearReadiness.ready, false);
+  assert.ok(clearReadiness.reasons.some((item) => item.code === "PAIRINGS_INCOMPLETE"));
+  assert.equal(clearMarkLive.ok, false);
+  assert.equal(clearMarkLive.code, "PRODUCTION_MATCH_NOT_SCORING_READY");
+  assert.equal(legacyClearResults[6], "0|PUBLISHED|1");
+  assert.equal(sql(cluster, database, String.raw`
+    select concat_ws('|',
+      (select count(*) from scoring_authority.match_participants where match_id='2026-R1-4'),
+      (select count(*) from scoring_authority.match_holes where match_id='2026-R1-4'),
+      (select count(*) from scoring_authority.tournament_setup_match_details_v1 where match_id='2026-R1-4'),
+      production_control.tournament_setup_revision_v1('2026'));
+  `), "1|18|0|0");
+
+  for (const unsafe of [
+    "update scoring_authority.matches set status='LIVE' where match_id='2026-R1-4'",
+    "insert into scoring_authority.hole_scores values ('2026-R1-4')",
+    "update scoring_authority.matches set status='FINAL', finalized_at=now() where match_id='2026-R1-4'",
+    "insert into scoring_authority.finalized_scorecard_snapshots(match_id,state) values ('2026-R1-4','CURRENT')",
+    "insert into scoring_authority.scoring_ingress_leases(tournament_id,match_id,expires_at) values ('2026','2026-R1-4',now()+interval '5 minutes')",
+    "insert into scoring_authority.score_mutations values ('2026-R1-4','unsafe','HOLE_SCORE',repeat('f',64),0,1,'{}','CB01')",
+    "update scoring_authority.scoring_permissions set can_score=true where match_id='2026-R1-4'",
+  ]) {
+    assert.throws(() => sql(cluster, database, `begin; ${unsafe}; select production_control.assert_tournament_setup_pairing_clear_safe_v1('2026-R1-4');`),
+      /TOURNAMENT_SETUP_PAIRING_CLEAR_UNSAFE/);
+  }
 
   const operationId = (number) => `20000000-0000-4000-8000-${String(number).padStart(12, "0")}`;
   const mutationFor = (operation, revision, number, values = {}) => scope(operation, {

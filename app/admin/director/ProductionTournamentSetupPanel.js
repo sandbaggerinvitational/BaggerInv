@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
+  buildTournamentSetupParticipantSlots,
   buildTournamentSetupMutation,
   productionTournamentFormatParticipantCount,
 } from "../../../lib/production-tournament-setup-contract.js";
@@ -219,10 +220,9 @@ function MatchesEditor({ data, disabled, stage }) {
 
 function MatchCard({ match, roster, teams, courses, disabled, stage }) {
   const expected = productionTournamentFormatParticipantCount(match.format);
-  const empty = Array.from({ length: expected }, (_, index) => ({ teamSide: index < expected / 2 ? 1 : 2, playerSlot: index % (expected / 2) + 1, playerId: "" }));
-  const [participants, setParticipants] = useState(match.participants.length === expected ? match.participants : empty);
+  const [participants, setParticipants] = useState(() => buildTournamentSetupParticipantSlots(match.participants, match.format));
   const [metadata, setMetadata] = useState({ courseId: match.courseId, tee: match.tee, teeTime: match.teeTime, startingHole: match.startingHole });
-  useEffect(() => setParticipants(match.participants.length === expected ? match.participants : empty), [match, expected]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => setParticipants(buildTournamentSetupParticipantSlots(match.participants, match.format)), [match]);
   useEffect(() => setMetadata({ courseId: match.courseId, tee: match.tee, teeTime: match.teeTime, startingHole: match.startingHole }), [match]);
   const choose = (index) => (event) => setParticipants((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, playerId: event.target.value } : item));
   const chooseCourse = (event) => {
@@ -231,6 +231,7 @@ function MatchCard({ match, roster, teams, courses, disabled, stage }) {
   };
   const matchCourses = courses.filter((course) => course.roundNumber === match.roundNumber);
   const scoringBlockers = match.scoringReady ? [] : match.scoringReadinessReasons;
+  const pairingIncomplete = match.participantCount !== expected;
   return <details className={styles.matchCard} open={!match.scoringReady || match.blockers.length > 0}>
     <summary><div><span>Round {match.roundNumber} · {match.format}</span><strong>Match {match.matchNumber}</strong><small>{match.courseName || match.courseId} · {match.teeTime || "Tee time required"} · Start {match.startingHole}</small></div><StateBadge value={match.locked ? "LOCKED" : match.scoringReady ? "READY" : "NEEDS_ATTENTION"} /></summary>
     <Blockers blockers={[...match.blockers, ...scoringBlockers.filter((item) => !match.blockers.includes(item))]} warnings={match.warnings} />
@@ -240,8 +241,9 @@ function MatchCard({ match, roster, teams, courses, disabled, stage }) {
       const eligible = roster.filter((player) => player.membershipStatus === "ACTIVE" && player.teamSide === participant.teamSide);
       return <label key={`${participant.teamSide}:${participant.playerSlot}`}><span>{team?.name || `Team ${participant.teamSide}`} · Slot {participant.playerSlot}</span><select value={participant.playerId} disabled={disabled} onChange={choose(index)}><option value="">Select Player</option>{eligible.map((player) => <option key={player.playerId} value={player.playerId}>{player.displayName} · {player.tournamentHandicap || "handicap required"}</option>)}</select></label>;
     })}</div>
-    <div className={styles.buttonRow}><button type="button" disabled={disabled || participants.some((item) => !item.playerId)} onClick={() => stage("replace-pairings", { matchId: match.matchId, format: match.format, participants }, `Replace ${match.matchId} pairings and rebuild its unstarted context`)}>Review Pairings</button><button className={styles.secondaryButton} type="button" disabled={disabled || participants.some((item) => !item.playerId)} onClick={() => stage("prepare-scoring-context", { matchId: match.matchId }, `Prepare immutable scoring context for ${match.matchId}`)}>{match.snapshot.prepared && !match.scoringReady ? "Prepare Current Scoring Context" : "Prepare Scoring Context"}</button></div>
-    <p className={styles.help}>Pairing changes never activate scoring access. Tournament Day retains the separate certified access operation.</p>
+    {pairingIncomplete ? <p className={styles.help} role="status"><strong>Pairing incomplete.</strong> The assigned slots above are canonical. Complete every slot or safely clear the unstarted pairing.</p> : null}
+    <div className={styles.buttonRow}><button type="button" disabled={disabled || participants.some((item) => !item.playerId)} onClick={() => stage("replace-pairings", { matchId: match.matchId, format: match.format, participants }, `Replace ${match.matchId} pairings and rebuild its unstarted context`)}>Review Pairings</button>{match.participants.length > 0 ? <button className={styles.secondaryButton} type="button" disabled={disabled || !match.canClearPairings} onClick={() => stage("replace-pairings", { matchId: match.matchId, format: match.format, participants: [] }, `Clear all participants from strictly unstarted ${match.matchId}`)}>Clear Pairings</button> : null}<button className={styles.secondaryButton} type="button" disabled={disabled || pairingIncomplete || participants.some((item) => !item.playerId)} onClick={() => stage("prepare-scoring-context", { matchId: match.matchId }, `Prepare immutable scoring context for ${match.matchId}`)}>{match.snapshot.prepared && !match.scoringReady ? "Prepare Current Scoring Context" : "Prepare Scoring Context"}</button></div>
+    <p className={styles.help}>Pairing changes never activate scoring access. Clearing is limited to strictly unstarted matches and preserves prior snapshots as audit evidence. Tournament Day retains the separate certified access operation.</p>
   </details>;
 }
 

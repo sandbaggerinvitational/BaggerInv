@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  buildTournamentSetupParticipantSlots,
   buildTournamentSetupMutation,
   canonicalTournamentSetupHoles,
   canonicalTournamentSetupParticipants,
@@ -179,6 +180,7 @@ test("BB, Scramble, and Singles preserve the certified participant/slot shapes",
   assert.equal(productionTournamentFormatParticipantCount("SI"), 2);
 
   for (const format of ["BB", "SC", "SI"]) {
+    assert.deepEqual(canonicalTournamentSetupParticipants([], format), []);
     const normalized = canonicalTournamentSetupParticipants(pairings[format], format);
     assert.equal(normalized.length, productionTournamentFormatParticipantCount(format));
     assert.deepEqual(normalized.map(({ teamSide, playerSlot }) => `${teamSide}:${playerSlot}`),
@@ -199,10 +201,44 @@ test("BB, Scramble, and Singles preserve the certified participant/slot shapes",
   ], "BB"), (error) => error.code === "TOURNAMENT_SETUP_PAIRING_STRUCTURE_INVALID");
   assert.throws(() => canonicalTournamentSetupParticipants(pairings.BB.slice(0, 3), "BB"),
     (error) => error.code === "TOURNAMENT_SETUP_PAIRING_COUNT_INVALID");
+  for (const count of [1, 2, 3]) {
+    assert.throws(() => canonicalTournamentSetupParticipants(pairings.BB.slice(0, count), "BB"),
+      (error) => error.code === "TOURNAMENT_SETUP_PAIRING_COUNT_INVALID");
+  }
   assert.throws(() => canonicalTournamentSetupParticipants([
     { ...pairings.SI[0], teamSide: 1 },
     { ...pairings.SI[1], teamSide: 1 },
   ], "SI"), (error) => error.code === "TOURNAMENT_SETUP_PAIRING_STRUCTURE_INVALID");
+});
+
+test("legacy partial pairings retain their canonical slots and expose only safe clearing", () => {
+  const partial = setupPayload({
+    matches: [{
+      ...setupPayload().matches[0],
+      participant_count: 1,
+      participants: [pairings.BB[0]],
+      strictly_unstarted: true,
+      access_active: false,
+      scoring_ready: false,
+      scoring_readiness_reasons: [{
+        code: "SCORING_PAIRINGS_INCOMPLETE",
+        message: "Complete the match pairings.",
+      }],
+    }],
+  });
+  const match = normalizeProductionTournamentSetupPayload(partial).matches[0];
+  const slots = buildTournamentSetupParticipantSlots(match.participants, match.format);
+  assert.equal(slots.length, 4);
+  assert.equal(slots[0].playerId, "CB01");
+  assert.deepEqual(slots.slice(1).map((slot) => slot.playerId), ["", "", ""]);
+  assert.equal(match.canClearPairings, true);
+  assert.equal(match.snapshot.prepared, false);
+
+  const active = normalizeProductionTournamentSetupPayload({
+    ...partial,
+    matches: [{ ...partial.matches[0], access_active: true }],
+  }).matches[0];
+  assert.equal(active.canClearPairings, false);
 });
 
 test("course inputs require exactly 18 holes with unique hole and stroke-index slots", () => {
@@ -264,6 +300,15 @@ test("mutations canonicalize format facts and surface safe authoritative receipt
   assert.equal(operation.operation_request_id, operationRequestId);
   assert.equal(operation.match_id, "2026-R1-1");
   assert.equal(operation.participants.length, 4);
+
+  const clear = buildTournamentSetupMutation("replace-pairings", {
+    expectedRevision: 12,
+    operationRequestId,
+    matchId: "2026-r1-1",
+    format: "bb",
+    participants: [],
+  });
+  assert.deepEqual(clear.participants, []);
 
   const receipt = normalizeProductionTournamentSetupMutation({
     ok: true,
@@ -543,6 +588,8 @@ test("Director route is Production-only, same-origin, Supabase-only, and fail-cl
   assert.match(route, /result\.source !== "production-director-entitlement"/);
   assert.match(route, /readProductionTournamentSetup\(actor\(access\.identity\)\)/);
   assert.match(route, /mutateProductionTournamentSetup\(\{/);
+  assert.match(route, /TOURNAMENT_SETUP_PAIRING_CLEAR_UNSAFE/);
+  assert.match(route, /strictly unstarted, unscored, and inaccessible to scorers/);
   assert.match(route, /fallbackUsed: false,[\s\S]*googleRequests: 0/);
   assert.match(route, /Cache-Control": "private, no-store"/);
   assert.match(server, /requiredPhase: "OBSERVATION"/);
@@ -568,7 +615,10 @@ test("guided Tournament Setup UI reviews every mutation and never reuses legacy 
   assert.match(panel, /I reviewed the target, current state, downstream consequences, and immutable audit effect/);
   assert.match(panel, /disabled=\{!confirmed \|\| phase === "submitting"\}[\s\S]*Confirm Production Change/);
   assert.match(panel, /method: "POST",[\s\S]*credentials: "same-origin"/);
-  assert.match(panel, /Pairing changes never activate scoring access\. Tournament Day retains the separate certified access operation\./);
+  assert.match(panel, /Pairing incomplete\./);
+  assert.match(panel, /Clear Pairings/);
+  assert.match(panel, /buildTournamentSetupParticipantSlots\(match\.participants, match\.format\)/);
+  assert.match(panel, /Clearing is limited to strictly unstarted matches and preserves prior snapshots as audit evidence\./);
   assert.match(panel, /Creating a brand-new global course is deferred/);
   assert.match(panel, /Existing global course/);
   assert.match(panel, /Selecting an identity does not copy or invent a tee, rating, slope, par, or hole facts/);
