@@ -26,10 +26,21 @@
       "maxLength": 128,
       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
     },
+    "matchIdentifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
     "nullableIdentifier": {
       "oneOf": [
         { "type": "null" },
         { "$ref": "#/$defs/identifier" }
+      ]
+    },
+    "nullableMatchIdentifier": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/matchIdentifier" }
       ]
     },
     "boundedText": {
@@ -170,9 +181,9 @@
       "properties": {
         "roundMatchIndex": { "type": "integer", "minimum": 1, "maximum": 64 },
         "roundMatchCount": { "type": "integer", "minimum": 1, "maximum": 64 },
-        "previousMatchId": { "$ref": "#/$defs/nullableIdentifier" },
-        "nextMatchId": { "$ref": "#/$defs/nullableIdentifier" },
-        "myMatchId": { "$ref": "#/$defs/nullableIdentifier" },
+        "previousMatchId": { "$ref": "#/$defs/nullableMatchIdentifier" },
+        "nextMatchId": { "$ref": "#/$defs/nullableMatchIdentifier" },
+        "myMatchId": { "$ref": "#/$defs/nullableMatchIdentifier" },
         "isMyMatch": { "type": "boolean" }
       }
     },
@@ -455,7 +466,7 @@
       "additionalProperties": false,
       "required": ["matchId", "displayMatchNumber", "round", "status", "course", "teeTime", "teams", "authenticatedPlayer", "progress", "result", "navigation", "scorecard", "flow", "clinch", "stats", "freshness"],
       "properties": {
-        "matchId": { "$ref": "#/$defs/identifier" },
+        "matchId": { "$ref": "#/$defs/matchIdentifier" },
         "displayMatchNumber": { "type": ["string", "null"], "minLength": 1, "maxLength": 100 },
         "round": { "$ref": "#/$defs/round" },
         "status": { "enum": ["scheduled", "inProgress", "completed"] },

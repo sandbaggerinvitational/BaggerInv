@@ -455,6 +455,47 @@ test("Preview reader calls only the isolated participant-bound RPC with exact au
   }), /mobile API is unavailable/i);
 });
 
+test("opaque Match IDs pass unchanged through the Preview reader and canonical projection", async () => {
+  const opaqueMatchId = "match:round/2#opaque";
+  const raw = rawFixture({ format: "SC", matchId: opaqueMatchId });
+  raw.navigation.previous_match_id = "match:round/2#previous";
+  raw.navigation.next_match_id = "match:round/2#next";
+  raw.navigation.my_match_id = opaqueMatchId;
+  const calls = [];
+  await readMobilePreviewMatchDetailV1({ ...identity, matchId: opaqueMatchId }, {
+    env: preview,
+    dependencies: {
+      scoringShadowRpc: async (...args) => { calls.push(args); return { payload: raw }; },
+    },
+  });
+  assert.equal(calls[0][1].input.match_id, opaqueMatchId);
+
+  const projected = mobileMatchDetailDataFromPreviewView(raw, { ...identity, matchId: opaqueMatchId });
+  assert.equal(projected.match.matchId, opaqueMatchId);
+  assert.deepEqual(projected.match.navigation, {
+    roundMatchIndex: 2,
+    roundMatchCount: 6,
+    previousMatchId: "match:round/2#previous",
+    nextMatchId: "match:round/2#next",
+    myMatchId: opaqueMatchId,
+    isMyMatch: true,
+  });
+  await assertMobileV1Schema("match-detail", {
+    ok: true,
+    apiVersion: "v1",
+    data: projected,
+    meta: { generatedAt: "2026-09-03T15:00:00.000Z", revision: "opaque-match-id-fixture" },
+  });
+
+  await assert.rejects(
+    () => readMobilePreviewMatchDetailV1({ ...identity, matchId: "m".repeat(201) }, {
+      env: preview,
+      dependencies: { scoringShadowRpc: async () => { throw new Error("must not run"); } },
+    }),
+    /mobile API is unavailable/i,
+  );
+});
+
 test("Match Detail response ETag is representation-stable and changes with canonical scores", async () => {
   const firstRaw = rawFixture();
   const first = await mobileMatchDetailResult(identity, firstRaw.match.match_id, {
@@ -563,6 +604,30 @@ test("protected Match Detail route ignores client authority and supports private
       assert.equal(second.status, 304);
       assert.equal(second.headers.get("etag"), etag);
       assert.equal(await second.text(), "");
+    } finally {
+      transport.restore();
+    }
+  });
+});
+
+test("protected Match Detail route preserves an encoded opaque Match path component", async () => {
+  await withEnvironment(preview, async () => {
+    const opaqueMatchId = "match:round/2#opaque";
+    const detail = rawFixture({ format: "SC", matchId: opaqueMatchId });
+    detail.navigation.my_match_id = opaqueMatchId;
+    const transport = installRouteFetch({ detail });
+    try {
+      const url = `https://native-preview.example/api/mobile/v1/matches/${encodeURIComponent(opaqueMatchId)}`;
+      assert.match(url, /match%3Around%2F2%23opaque$/);
+      const response = await matchDetailGET(new Request(url, { headers: certifiedHeaders() }), {
+        params: Promise.resolve({ matchId: opaqueMatchId }),
+      });
+      assert.equal(response.status, 200);
+      const body = await response.json();
+      await assertMobileV1Schema("match-detail", body);
+      assert.equal(body.data.match.matchId, opaqueMatchId);
+      assert.equal(body.data.match.navigation.myMatchId, opaqueMatchId);
+      assert.equal(transport.matchDetailBodies[0].input.match_id, opaqueMatchId);
     } finally {
       transport.restore();
     }
