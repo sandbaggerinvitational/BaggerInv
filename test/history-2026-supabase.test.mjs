@@ -38,6 +38,15 @@ const previewEnv = {
 
 const matchId = (record) => record?.match?.match_id || record?.match_id;
 const scorecardsFor = (view, id) => view.analytics.scorecards.filter((scorecard) => scorecard.matchId === id);
+const TURTLE_POINT_GOLD_HOLES = Object.freeze([
+  [1, 4, 9, 372], [2, 5, 5, 501], [3, 4, 15, 369], [4, 3, 13, 189],
+  [5, 5, 7, 510], [6, 4, 11, 375], [7, 3, 17, 158], [8, 4, 1, 444],
+  [9, 4, 3, 376], [10, 5, 12, 512], [11, 4, 6, 362], [12, 4, 4, 422],
+  [13, 5, 10, 503], [14, 3, 16, 160], [15, 4, 8, 342], [16, 3, 14, 164],
+  [17, 4, 18, 348], [18, 4, 2, 403],
+].map(([hole_number, par, stroke_index, yardage]) => Object.freeze({
+  hole_number, par, stroke_index, yardage,
+})));
 
 test("2026 History source is explicitly Preview-only, year-bound, and Production-hard-blocked", () => {
   const preview = history2026ReadEnvironment(previewEnv);
@@ -192,6 +201,141 @@ test("finalized snapshots fail closed on noncanonical identities and scoring con
       `${item.label} drift must fail closed`
     );
   }
+});
+
+test("strictly unstarted empty match-hole context does not compete with the canonical course definition", () => {
+  const aggregate = makeHistory2026Aggregate();
+  const record = aggregate.matches.find((entry) => entry.match.match_id === "2026-R1-1");
+  const authoritative = aggregate.matches.find((entry) => entry.match.match_id === "2026-R1-2").scoring_snapshot;
+  Object.assign(record.match, {
+    status: "UPCOMING",
+    lifecycle: "UPCOMING",
+    scorecard_complete: false,
+    scored_holes: 0,
+    result_winner: "",
+    running_result: "Scheduled",
+    team_1_points: 0,
+    team_2_points: 0,
+    finalized_at: null,
+  });
+  record.participants = [];
+  record.scores = [];
+  record.scoring_snapshot.hole_definitions = [];
+  aggregate.finalized_snapshots = aggregate.finalized_snapshots.filter((entry) => entry.match_id !== "2026-R1-1");
+
+  const view = buildHistory2026Adapter(aggregate, { guideProjection: makeGuideProjection() });
+  const turtlePoint = view.rounds.find((round) => round.round === 1).course;
+  assert.equal(view.matches.find((match) => match.id === "2026-R1-1").status, "UPCOMING");
+  assert.equal(turtlePoint.Par, authoritative.par);
+  assert.equal(
+    turtlePoint.Yardage,
+    authoritative.hole_definitions.reduce((total, hole) => total + hole.yardage, 0)
+  );
+  assert.equal(view.analytics.missingScorecards.length, 0);
+  assert.equal(view.analytics.warnings.length, 0);
+});
+
+test("the current TPGC01 Gold definition survives one cleared unstarted match context", () => {
+  const aggregate = makeHistory2026Aggregate();
+  for (const record of aggregate.matches.filter((entry) => entry.match.round_number === 1)) {
+    Object.assign(record.match, {
+      status: "UPCOMING",
+      lifecycle: "UPCOMING",
+      scorecard_complete: false,
+      scored_holes: 0,
+      result_winner: "",
+      running_result: "Scheduled",
+      team_1_points: 0,
+      team_2_points: 0,
+      finalized_at: null,
+    });
+    Object.assign(record.scoring_snapshot, {
+      course_id: "TPGC01",
+      tee: "Gold",
+      rating: 71.9,
+      slope: 136,
+      par: 72,
+      hole_definitions: cloneHistoryFixture(TURTLE_POINT_GOLD_HOLES),
+    });
+    record.participants = [];
+    record.scores = [];
+  }
+  aggregate.matches.find((entry) => entry.match.match_id === "2026-R1-1")
+    .scoring_snapshot.hole_definitions = [];
+  aggregate.finalized_snapshots = aggregate.finalized_snapshots.filter((entry) => entry.payload.round.round_number !== 1);
+
+  const view = buildHistory2026Adapter(aggregate, { guideProjection: makeGuideProjection() });
+  const course = view.rounds.find((round) => round.round === 1).course;
+  assert.equal(course["Course ID"], "TPGC01");
+  assert.equal(course["Tee Played"], "Gold");
+  assert.equal(course.Rating, 71.9);
+  assert.equal(course.Slope, 136);
+  assert.equal(course.Par, 72);
+  assert.equal(course.Yardage, 6510);
+});
+
+test("actual competing canonical course-hole definitions still fail closed", () => {
+  const aggregate = makeHistory2026Aggregate();
+  const record = aggregate.matches.find((entry) => entry.match.match_id === "2026-R1-2");
+  Object.assign(record.match, {
+    status: "LIVE",
+    lifecycle: "LIVE",
+    scorecard_complete: false,
+    finalized_at: null,
+  });
+  aggregate.finalized_snapshots = aggregate.finalized_snapshots.filter((entry) => entry.match_id !== "2026-R1-2");
+  record.scoring_snapshot.hole_definitions = cloneHistoryFixture(record.scoring_snapshot.hole_definitions);
+  record.scoring_snapshot.hole_definitions[0].stroke_index = 18;
+
+  assert.throws(
+    () => buildHistory2026Adapter(aggregate, { guideProjection: makeGuideProjection() }),
+    /incompatible historical hole configurations/i
+  );
+});
+
+test("empty or partial course context with scoring evidence remains fail-closed", () => {
+  for (const definitionCount of [0, 17]) {
+    const aggregate = makeHistory2026Aggregate();
+    const record = aggregate.matches.find((entry) => entry.match.match_id === "2026-R1-2");
+    Object.assign(record.match, {
+      status: "UPCOMING",
+      lifecycle: "UPCOMING",
+      scorecard_complete: false,
+      scored_holes: 1,
+      finalized_at: null,
+    });
+    aggregate.finalized_snapshots = aggregate.finalized_snapshots.filter((entry) => entry.match_id !== "2026-R1-2");
+    record.scoring_snapshot.hole_definitions = record.scoring_snapshot.hole_definitions.slice(0, definitionCount);
+
+    assert.throws(
+      () => buildHistory2026Adapter(aggregate, { guideProjection: makeGuideProjection() }),
+      /does not contain 18 holes/i
+    );
+  }
+});
+
+test("a course with only empty unstarted contexts still fails closed", () => {
+  const aggregate = makeHistory2026Aggregate();
+  for (const record of aggregate.matches.filter((entry) => entry.match.round_number === 1)) {
+    Object.assign(record.match, {
+      status: "UPCOMING",
+      lifecycle: "UPCOMING",
+      scorecard_complete: false,
+      scored_holes: 0,
+      result_winner: "",
+      team_1_points: 0,
+      team_2_points: 0,
+      finalized_at: null,
+    });
+    record.scores = [];
+    record.scoring_snapshot.hole_definitions = [];
+  }
+  aggregate.finalized_snapshots = aggregate.finalized_snapshots.filter((entry) => entry.payload.round.round_number !== 1);
+
+  assert.throws(
+    () => buildHistory2026Adapter(aggregate, { guideProjection: makeGuideProjection() }),
+    /does not contain 18 holes/i
+  );
 });
 
 test("correction and re-Finalization select only the newest coherent current revision", () => {
