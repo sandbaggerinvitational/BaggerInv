@@ -217,6 +217,31 @@ export function TournamentDayPanel({ data, refresh }) {
   </>;
 }
 
+function useRequestFingerprints() {
+  const values = useRef(new Map());
+  return useCallback(async (intent, confirm = false) => {
+    const key = JSON.stringify(intent);
+    if (confirm) {
+      values.current.delete(key);
+      return "";
+    }
+    if (values.current.has(key)) return values.current.get(key);
+    const seed = globalThis.crypto?.randomUUID?.();
+    if (!seed || !globalThis.crypto?.subtle) {
+      throw new Error("Secure operation identity is unavailable. Refresh and try again.");
+    }
+    const bytes = await globalThis.crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(`${seed}\n${key}`),
+    );
+    const fingerprint = [...new Uint8Array(bytes)]
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+    values.current.set(key, fingerprint);
+    return fingerprint;
+  }, []);
+}
+
 function OddsPanel({ data, refresh }) {
   const [jobs, setJobs] = useState([]);
   const [jobsFailure, setJobsFailure] = useState("");
