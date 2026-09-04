@@ -2,6 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:bagger:mobile:v1:matches",
   "$defs": {
+    "matchIdentifier": {
+      "description": "Exact opaque string of 1–200 Unicode scalar values; no trimming, normalization, or semantic parsing. NUL, malformed surrogate sequences, and the exact values . and .. are forbidden. Length and pattern use Unicode-aware JSON Schema semantics.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[^\\u0000\\uD800-\\uDFFF]+$",
+      "not": { "enum": [".", ".."] }
+    },
     "round": {
       "type": "object",
       "additionalProperties": false,
@@ -91,7 +99,7 @@
       "additionalProperties": false,
       "required": ["matchId", "displayMatchNumber", "round", "status", "course", "teeTime", "teams", "authenticatedPlayer", "progress", "result"],
       "properties": {
-        "matchId": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "matchId": { "$ref": "#/$defs/matchIdentifier" },
         "displayMatchNumber": { "type": ["string", "null"], "minLength": 1, "maxLength": 100 },
         "round": { "$ref": "#/$defs/round" },
         "status": { "enum": ["scheduled", "inProgress", "completed"] },

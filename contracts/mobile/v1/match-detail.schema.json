@@ -27,9 +27,12 @@
       "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
     },
     "matchIdentifier": {
+      "description": "Exact opaque string of 1–200 Unicode scalar values; no trimming, normalization, or semantic parsing. NUL, malformed surrogate sequences, and the exact values . and .. are forbidden. Length and pattern use Unicode-aware JSON Schema semantics.",
       "type": "string",
       "minLength": 1,
-      "maxLength": 200
+      "maxLength": 200,
+      "pattern": "^[^\\u0000\\uD800-\\uDFFF]+$",
+      "not": { "enum": [".", ".."] }
     },
     "nullableIdentifier": {
       "oneOf": [

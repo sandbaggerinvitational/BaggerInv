@@ -9,6 +9,7 @@ import {
   mobileTodayResult,
 } from "../lib/mobile-v1-tournament-reads.js";
 import { assertMobileV1Schema } from "./support/mobile-v1-schema-validator.mjs";
+import { validOpaqueMatchIDs, invalidOpaqueMatchIDs } from "./support/mobile-opaque-match-id-cases.mjs";
 
 const now = new Date("2026-09-24T12:00:00.000Z");
 const identity = {
@@ -173,6 +174,26 @@ test("display Match number remains presentation-only and cannot reorder canonica
 
   assert.deepEqual(result.body.data.matches.map((row) => row.matchId), ["opaque-z", "opaque-a"]);
   assert.deepEqual(result.body.data.matches.map((row) => row.displayMatchNumber), ["2", "1"]);
+});
+
+test("matches preserves every valid exact opaque ID through projection and schema", async () => {
+  const rows = validOpaqueMatchIDs.map(({ value }) =>
+    match(value, "Upcoming", ["P1", "P2", "P3", "P4"], { match: "12" }));
+  const result = await mobileMatchesResult(identity, { now, dependencies: matchesDependencies(rows) });
+  assert.deepEqual(result.body.data.matches.map(({ matchId }) => matchId), validOpaqueMatchIDs.map(({ value }) => value));
+  assert.ok(result.body.data.matches.every(({ displayMatchNumber }) => displayMatchNumber === "12"));
+  await assertMobileV1Schema("matches", result.body);
+});
+
+test("matches rejects invalid opaque IDs instead of trimming, coercing, or substituting display numbers", async () => {
+  for (const { case: name, value } of invalidOpaqueMatchIDs) {
+    const row = { ...match("valid-fixture", "Upcoming"), id: value, match: "12" };
+    await assert.rejects(() => mobileMatchesResult(identity, { now, dependencies: matchesDependencies([row]) }),
+      { code: "MOBILE_API_UNAVAILABLE" }, name);
+  }
+  const emptyPrimary = { ...match("", "Upcoming"), matchId: "fallback-must-not-replace-empty" };
+  await assert.rejects(() => mobileMatchesResult(identity, { now, dependencies: matchesDependencies([emptyPrimary]) }),
+    { code: "MOBILE_API_UNAVAILABLE" });
 });
 
 test("matches passes through canonical BB, SC, and SI Playing Handicap and stroke semantics", async () => {

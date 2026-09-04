@@ -206,6 +206,16 @@ test("nullable display handicap fields cannot mask canonical zero-stroke authori
   ]);
   assert.deepEqual([match.team1PlayingHcp, match.team1Stroke], [3.5, 0]);
   assert.deepEqual([match.team2PlayingHcp, match.team2Stroke], [0, 0]);
+
+  const exactView = structuredClone(view);
+  const exactID = " 2026-R1-1 ";
+  exactView.matches[0].match.match_id = exactID;
+  exactView.tournament_presentation.presentation.tournamentMatchDisplay[exactID] = {
+    team1Players: [{ id: "P1", playingHcp: 9.25, stroke: 4 }],
+  };
+  const exactMatch = tournamentLiveDataFromSupabaseView(exactView).rounds[0].matches[0];
+  assert.equal(exactMatch.id, exactID);
+  assert.deepEqual([exactMatch.team1Players[0].playingHcp, exactMatch.team1Players[0].stroke], [9.25, 4]);
 });
 
 test("Tournament display cache is revisioned and cannot authorize scoring", () => {

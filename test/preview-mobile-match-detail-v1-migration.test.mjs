@@ -93,3 +93,23 @@ test("Preview Match Detail RPC returns only the approved top-level projection", 
     assert.match(sql, new RegExp(`'${key}'`));
   }
 });
+
+test("additive opaque-ID repair keeps exact Unicode lookup and existing read-only privileges", async () => {
+  const sql = await source(
+    "supabase/migrations/202609040001_preview_mobile_opaque_match_id_contract.sql",
+  );
+  assert.match(sql, /current_setting\('server_encoding'\) <> 'UTF8'/);
+  assert.match(sql, /target_match text := input->>'match_id'/);
+  assert.match(sql, /jsonb_typeof\(input->'match_id'\) is distinct from 'string'/);
+  assert.match(sql, /char_length\(target_match\) not between 1 and 200/);
+  assert.match(sql, /target_match collate pg_catalog\."C" in \('\.', '\.\.'\)/);
+  assert.doesNotMatch(sql, /(?:btrim|trim|normalize)\([^\n]*(?:match_id|target_match)/i);
+  assert.match(sql, /value\.match_id collate pg_catalog\."C" = target_match collate pg_catalog\."C"/);
+  assert.match(sql, /selected\.match_id collate pg_catalog\."C" = my_match\.match_id collate pg_catalog\."C"/);
+  assert.match(sql, /language plpgsql\nstable\nsecurity definer\nset search_path = pg_catalog, scoring_authority, public/);
+  assert.match(sql, /revoke all on function public\.read_preview_mobile_match_detail_v1\(jsonb\)\s+from public, anon, authenticated, service_role/);
+  assert.match(sql, /grant execute on function public\.read_preview_mobile_match_detail_v1\(jsonb\)\s+to service_role/);
+  assert.doesNotMatch(sql, /(?:insert into|update scoring_authority|delete from|alter table|create table)/i);
+  assert.equal((sql.match(/create or replace function/g) || []).length, 1);
+  assert.match(sql, /notify pgrst, 'reload schema'/);
+});

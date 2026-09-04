@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { GET as matchDetailGET } from "../app/api/mobile/v1/matches/[matchId]/route.js";
 import { issueMobileNativeCertification } from "../lib/mobile-native-certification.js";
+import { mobileMatchesResult } from "../lib/mobile-v1-tournament-reads.js";
 import {
   MOBILE_MATCH_DETAIL_LIMITS,
   mobileMatchDetailDataFromPreviewView,
@@ -10,6 +11,7 @@ import {
   readMobilePreviewMatchDetailV1,
 } from "../lib/mobile-v1-match-detail.js";
 import { assertMobileV1Schema } from "./support/mobile-v1-schema-validator.mjs";
+import { validOpaqueMatchIDs, invalidOpaqueMatchIDs } from "./support/mobile-opaque-match-id-cases.mjs";
 
 const preview = Object.freeze({
   VERCEL_ENV: "preview",
@@ -496,6 +498,55 @@ test("opaque Match IDs pass unchanged through the Preview reader and canonical p
   );
 });
 
+test("every opaque ID and navigation reference remains exact through reader and canonical projection", async () => {
+  for (const [index, { case: name, value }] of validOpaqueMatchIDs.entries()) {
+    const raw = rawFixture({ matchId: value });
+    raw.navigation.previous_match_id = validOpaqueMatchIDs[(index + 1) % validOpaqueMatchIDs.length].value;
+    raw.navigation.next_match_id = validOpaqueMatchIDs[(index + 2) % validOpaqueMatchIDs.length].value;
+    const calls = [];
+    await readMobilePreviewMatchDetailV1({ ...identity, matchId: value }, {
+      env: preview,
+      dependencies: { scoringShadowRpc: async (...args) => { calls.push(args); return { payload: raw }; } },
+    });
+    assert.equal(calls[0][1].input.match_id, value, name);
+    const projected = map(raw);
+    assert.equal(projected.match.matchId, value, name);
+    assert.equal(projected.match.navigation.myMatchId, value, name);
+    assert.equal(projected.match.navigation.previousMatchId, raw.navigation.previous_match_id, name);
+    assert.equal(projected.match.navigation.nextMatchId, raw.navigation.next_match_id, name);
+    await assertMobileV1Schema("match-detail", {
+      ok: true, apiVersion: "v1", data: projected,
+      meta: { generatedAt: "2026-09-03T15:00:00.000Z", revision: "opaque-exact-projection" },
+    });
+  }
+});
+
+test("invalid opaque IDs fail closed before RPC and in every projected navigation ID", async () => {
+  for (const { case: name, value } of invalidOpaqueMatchIDs) {
+    await assert.rejects(() => readMobilePreviewMatchDetailV1({ ...identity, matchId: value }, {
+      env: preview,
+      dependencies: { scoringShadowRpc: async () => assert.fail("invalid ID must not reach RPC") },
+    }), { code: "MOBILE_API_UNAVAILABLE" }, name);
+    const invalidMatch = rawFixture();
+    invalidMatch.match.match_id = value;
+    assert.throws(() => map(invalidMatch), { code: "MOBILE_API_UNAVAILABLE" }, name);
+    if (value === null || value === undefined) continue;
+    for (const field of ["previous_match_id", "next_match_id", "my_match_id"]) {
+      const invalidNavigation = rawFixture();
+      invalidNavigation.navigation[field] = value;
+      assert.throws(() => map(invalidNavigation), { code: "MOBILE_API_UNAVAILABLE" }, `${name}: ${field}`);
+    }
+  }
+});
+
+test("exact Match identity comparison cannot trim or Unicode-normalize mismatched RPC data", () => {
+  for (const [requested, returned] of [[" match", "match"], ["match ", "match"], ["match-é", "match-e\u0301"]]) {
+    const raw = rawFixture({ matchId: returned });
+    assert.throws(() => mobileMatchDetailDataFromPreviewView(raw, { ...identity, matchId: requested }),
+      { code: "MOBILE_API_UNAVAILABLE" });
+  }
+});
+
 test("Match Detail response ETag is representation-stable and changes with canonical scores", async () => {
   const firstRaw = rawFixture();
   const first = await mobileMatchDetailResult(identity, firstRaw.match.match_id, {
@@ -630,6 +681,56 @@ test("protected Match Detail route preserves an encoded opaque Match path compon
       assert.equal(transport.matchDetailBodies[0].input.match_id, opaqueMatchId);
     } finally {
       transport.restore();
+    }
+  });
+});
+
+test("real Tournament Live projection round-trips every opaque /matches ID through protected Match Detail and ETag", async () => {
+  await withEnvironment(preview, async () => {
+    const details = validOpaqueMatchIDs.map(({ value }, index) => rawFixture({
+      matchId: value, format: ["BB", "SC", "SI"][index % 3], owned: index % 2 === 0,
+    }));
+    const view = {
+      tournament: details[0].tournament, teams: details[0].teams,
+      rounds: [details[0].round], matches: details,
+      tournament_presentation: { presentation: { tournament: { status: "Live", currentRound: 1 } } },
+      live_revision: { revision: "opaque-exact-roundtrip" },
+    };
+    const collection = await mobileMatchesResult(identity, {
+      env: preview, now: new Date("2026-09-03T15:00:00.000Z"),
+      dependencies: {
+        requireTournamentReadSource: () => ({ resolved: "supabase" }),
+        readTournamentLiveView: async () => ({ payload: { ok: true, data: view } }),
+        readGuideProjection: async () => ({ payload: { ok: true, data: {} } }),
+        applyGuideCoursesToTournament: (value) => value,
+      },
+    });
+    await assertMobileV1Schema("matches", collection.body);
+    assert.deepEqual(collection.body.data.matches.map(({ matchId }) => matchId),
+      validOpaqueMatchIDs.map(({ value }) => value));
+    for (const [index, listedMatch] of collection.body.data.matches.entries()) {
+      const transport = installRouteFetch({ detail: details[index] });
+      try {
+        const url = `https://native-preview.example/api/mobile/v1/matches/${encodeURIComponent(listedMatch.matchId)}`;
+        const routeContext = { params: Promise.resolve({ matchId: listedMatch.matchId }) };
+        const response = await matchDetailGET(new Request(url, { headers: certifiedHeaders() }), routeContext);
+        assert.equal(response.status, 200, validOpaqueMatchIDs[index].case);
+        const body = await response.json();
+        await assertMobileV1Schema("match-detail", body);
+        assert.equal(body.data.match.matchId, listedMatch.matchId);
+        assert.equal(body.data.match.authenticatedPlayer.involved, listedMatch.authenticatedPlayer.involved);
+        assert.deepEqual(Buffer.from(body.data.match.matchId, "utf8"), Buffer.from(details[index].match.match_id, "utf8"));
+        assert.equal(transport.matchDetailBodies[0].input.match_id, listedMatch.matchId);
+        const etag = response.headers.get("etag");
+        const revalidated = await matchDetailGET(new Request(url, {
+          headers: certifiedHeaders({ "If-None-Match": etag }),
+        }), routeContext);
+        assert.equal(revalidated.status, 304);
+        assert.equal(revalidated.headers.get("etag"), etag);
+        assert.equal(await revalidated.text(), "");
+      } finally {
+        transport.restore();
+      }
     }
   });
 });

@@ -61,6 +61,18 @@ test("an empty or partially finalized round is never complete", () => {
   ]), false);
 });
 
+test("round completion compares exact opaque IDs without trimming or Unicode normalization", () => {
+  const ids = ["match", " match", "match ", " ", "match-é", "match-e\u0301", "match/2#opaque"];
+  const matches = ids.map((id) => finalMatch({ id, expectedRoundMatchCount: ids.length }));
+  assert.equal(isRoundComplete(1, matches), true);
+  const duplicate = matches.map((match) => ({ ...match }));
+  duplicate[1].id = duplicate[0].id;
+  assert.equal(isRoundComplete(1, duplicate), false);
+  const missing = matches.map((match) => ({ ...match }));
+  missing[0].id = "";
+  assert.equal(isRoundComplete(1, missing), false);
+});
+
 test("automatic state advances only after each official round is finalized", () => {
   const round = (number, status = "Scheduled") => ({
     id: `R${number}`,

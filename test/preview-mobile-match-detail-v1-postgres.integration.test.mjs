@@ -167,7 +167,11 @@ function installRequiredMigrations(cluster, database) {
     "202608120015_preview_single_participant_auth_diagnostics.sql",
     "202608120016_preview_single_participant_auth_email_confirmation.sql",
     "202608120017_preview_game_center_reads.sql",
+    "202608120024_preview_participant_home_reads.sql",
+    "202608120025_preview_tournament_live_reads.sql",
+    "202608120026_preview_tournament_published_context.sql",
     "202609030001_preview_mobile_match_detail_v1.sql",
+    "202609040001_preview_mobile_opaque_match_id_contract.sql",
   ]) {
     psqlFile(cluster, database, path.join(migrationsDirectory, name));
   }
@@ -194,7 +198,7 @@ const fixtures = [
   { id: "SI-MY", round: 3, format: "SI", sort: 3, display: "2", status: "FINAL", players: [["P1", 1, 1, "10.4", 2], ["P5", 2, 1, "12.1", 0]] },
 ];
 
-function seedFixture(cluster, database) {
+function seedFixture(cluster, database, matchFixtures = fixtures) {
   const holes = holeDefinitions();
   psql(cluster, database, `
     insert into scoring_authority.tournaments
@@ -230,7 +234,7 @@ function seedFixture(cluster, database) {
       ('2027', 1, 'SI', 'Wrong Round', 'UPCOMING');
   `);
 
-  const snapshotRows = fixtures.map((fixture) => {
+  const snapshotRows = matchFixtures.map((fixture) => {
     const teamConfiguration = fixture.format === "SC" ? {
       team_1_playing_handicap: 3.5,
       team_2_playing_handicap: 1.0,
@@ -249,7 +253,7 @@ function seedFixture(cluster, database) {
     values ${snapshotRows};
   `);
 
-  const matchRows = fixtures.map((fixture) => {
+  const matchRows = matchFixtures.map((fixture) => {
     const scored = fixture.rich ? 18 : 0;
     const current = fixture.rich ? 18 : 0;
     const remaining = fixture.rich ? 0 : 18;
@@ -271,7 +275,7 @@ function seedFixture(cluster, database) {
     values ${matchRows};
   `);
 
-  const participantRows = fixtures.flatMap((fixture) => fixture.players.map(
+  const participantRows = matchFixtures.flatMap((fixture) => fixture.players.map(
     ([player, side, slot, handicap, strokes]) => `(${sqlLiteral(fixture.id)}, ${sqlLiteral(player)}, ${side}, ${slot}, ${handicap}, ${strokes})`,
   )).join(",\n");
   psql(cluster, database, `
@@ -280,7 +284,7 @@ function seedFixture(cluster, database) {
     values ${participantRows};
   `);
 
-  const presentationRows = fixtures.map((fixture) => `(
+  const presentationRows = matchFixtures.map((fixture) => `(
     ${sqlLiteral(fixture.id)}, '2026', 'The Ocean Course', 'ocean.svg', '6793',
     '10:10 AM', '1', ${sqlLiteral(fixture.display)}, ${fixture.sort},
     'team-one.svg', '#123456', '#abcdef', 'team-two.svg', '#654321', '#fedcba',
@@ -301,7 +305,7 @@ function seedFixture(cluster, database) {
     select fixture.id, hole.number, fixture.id || ':S1', hole.number,
       case when hole.number % 3 = 1 then 5 when hole.number % 3 = 2 then 4 else 3 end,
       340 + (hole.number * 11)
-    from (values ${fixtures.map((fixture) => `(${sqlLiteral(fixture.id)})`).join(",")}) fixture(id)
+    from (values ${matchFixtures.map((fixture) => `(${sqlLiteral(fixture.id)})`).join(",")}) fixture(id)
     cross join pg_catalog.generate_series(1, 18) hole(number);
   `);
 
@@ -321,6 +325,151 @@ function seedFixture(cluster, database) {
     values ${scoreRows};
   `);
 }
+
+const exactOpaqueCases = [
+  ["leading whitespace", " leading"],
+  ["trailing whitespace", "trailing "],
+  ["internal spaces", "match with internal spaces"],
+  ["whitespace-only ID", " "],
+  ["tabs and line breaks", "\tmatch\n"],
+  ["slash", "/"],
+  ["hash", "#"],
+  ["colon", ":"],
+  ["reserved combination", "match:round/2#opaque"],
+  ["literal percent encoding", "%2F"],
+  ["literal double percent encoding", "%252F"],
+  ["backslash", "match\\opaque"],
+  ["non-BMP Unicode", "match:🦅"],
+  ["200 BMP scalar values", "x".repeat(200)],
+  ["200 non-BMP scalar values / 400 UTF-16 units", "🦅".repeat(200)],
+  ["200 mixed scalar values / 300 UTF-16 units", "x".repeat(100) + "🦅".repeat(100)],
+  ["untrimmed collision baseline", "same"],
+  ["untrimmed leading collision", " same"],
+  ["untrimmed trailing collision", "same "],
+  ["composed Unicode", "é"],
+  ["decomposed Unicode", "e\u0301"],
+  ["Next.js query prefix", "nxtPmatchId"],
+  ["Next.js interception prefix", "nxtImatchId"],
+];
+
+test("Preview SQL preserves the canonical exact opaque Match-ID contract", {
+  timeout: 120_000,
+}, async (t) => {
+  if (!(await allBinariesAvailable())) {
+    t.skip(`PostgreSQL 17 toolchain is unavailable at ${pgBin}`);
+    return;
+  }
+  const cluster = await createCluster();
+  const database = "preview_mobile_exact_opaque_ids";
+  try {
+    runCommand(postgresBinaries.createdb, [database], { env: psqlEnvironment(cluster) });
+    installSupabaseCompatibility(cluster, database);
+    installRequiredMigrations(cluster, database);
+    const opaqueFixtures = exactOpaqueCases.map(([, id], index) => ({
+      id, round: 3, format: "SI", sort: index + 4,
+      display: String(index + 20), status: "UPCOMING",
+      players: [["P1", 1, 1, "10.4", 2], ["P4", 2, 1, "8.0", 1]],
+    }));
+    seedFixture(cluster, database, [...fixtures, ...opaqueFixtures]);
+    const input = { environment: "PREVIEW", tournament_id: "2026", player_id: "P1" };
+    const live = parseJsonOutput(psql(cluster, database,
+      "set role service_role; select public.read_tournament_live_view('2026')::text; reset role;"));
+    assert.equal(live.ok, true);
+    const projectedIds = live.data.matches.map((entry) => entry.match.match_id);
+
+    const readOnlyFingerprint = () => psql(cluster, database, `
+      select jsonb_build_object(
+        'matches', (select md5(jsonb_agg(to_jsonb(v) order by v.match_id collate "C")::text) from scoring_authority.matches v),
+        'scores', (select md5(jsonb_agg(to_jsonb(v) order by v.match_id collate "C", v.hole_number)::text) from scoring_authority.hole_scores v),
+        'snapshots', (select md5(jsonb_agg(to_jsonb(v) order by v.snapshot_id collate "C")::text) from scoring_authority.scoring_snapshots v),
+        'permissions', (select md5(coalesce(jsonb_agg(to_jsonb(v))::text, '[]')) from scoring_authority.scoring_permissions v),
+        'audit', (select md5(coalesce(jsonb_agg(to_jsonb(v))::text, '[]')) from scoring_authority.audit_events v)
+      )::text;
+    `);
+    const beforeReads = readOnlyFingerprint();
+    for (const [label, id] of exactOpaqueCases) {
+      await t.test(`exact /matches → Match Detail round-trip: ${label}`, () => {
+        const projected = projectedIds.find((candidate) => candidate === id);
+        assert.equal(projected, id);
+        const detail = rpc(cluster, database, { ...input, match_id: projected });
+        assert.equal(detail.ok, true);
+        assert.equal(detail.match.match_id, id);
+        assert.deepEqual(Buffer.from(detail.match.match_id, "utf8"), Buffer.from(id, "utf8"));
+        assert.equal(detail.navigation.is_my_match, false);
+        // Canonical navigation carries the same exact neighboring strings.
+        const position = opaqueFixtures.findIndex((fixture) => fixture.id === id);
+        assert.equal(detail.navigation.previous_match_id,
+          position === 0 ? "SI-MY" : opaqueFixtures[position - 1].id);
+        assert.equal(detail.navigation.next_match_id, opaqueFixtures[position + 1]?.id ?? null);
+      });
+    }
+
+    for (const [label, id] of [
+      ["empty", ""], ["dot", "."], ["double dot", ".."],
+      ["201 BMP scalars", "x".repeat(201)],
+      ["201 non-BMP scalars", "🦅".repeat(201)],
+      ["null", null], ["number", 7], ["boolean", true], ["array", []], ["object", {}],
+    ]) {
+      await t.test(`invalid ID rejected by SQL: ${label}`, () => {
+        assert.deepEqual(rpc(cluster, database, { ...input, match_id: id }), {
+          ok: false, code: "PREVIEW_PARTICIPANT_MATCH_DETAIL_REQUIRED",
+        });
+      });
+    }
+    for (const [label, id] of [
+      ["NUL", "match\u0000id"],
+      ["unpaired high surrogate", "match\ud800"],
+      ["unpaired low surrogate", "match\udc00"],
+      ["reversed surrogate pair", "\udc00\ud800"],
+    ]) {
+      await t.test(`invalid Unicode rejected before RPC: ${label}`, () => {
+        assert.throws(() => rpc(cluster, database, { ...input, match_id: id }),
+          /unsupported Unicode escape sequence|invalid input syntax for type json|Unicode low surrogate|Unicode high surrogate/);
+      });
+    }
+    await t.test("no trimmed or normalized fallback lookup", () => {
+      for (const id of ["leading", "trailing", "match", "É"]) {
+        assert.deepEqual(rpc(cluster, database, { ...input, match_id: id }), {
+          ok: false, code: "MATCH_DETAIL_NOT_FOUND",
+        });
+      }
+    });
+    await t.test("opaque owned/non-owned IDs preserve participant and tournament isolation", () => {
+      const id = exactOpaqueCases[0][1];
+      assert.equal(rpc(cluster, database, { ...input, match_id: id }).participants
+        .some((participant) => participant.is_authenticated_player), true);
+      assert.equal(rpc(cluster, database, { ...input, player_id: "P2", match_id: id }).participants
+        .some((participant) => participant.is_authenticated_player), false);
+      assert.deepEqual(rpc(cluster, database, { ...input, player_id: "PI", match_id: id }), {
+        ok: false, code: "PREVIEW_PARTICIPANT_MATCH_DETAIL_REQUIRED",
+      });
+      assert.deepEqual(rpc(cluster, database, {
+        ...input, tournament_id: "2027", player_id: "PW", match_id: id,
+      }), { ok: false, code: "MATCH_DETAIL_NOT_FOUND" });
+    });
+    await t.test("service-role-only access, stable security definer, RLS and scoring rows remain unchanged", () => {
+      assert.equal(psql(cluster, database, `
+        select concat_ws('|',
+          has_function_privilege('service_role', 'public.read_preview_mobile_match_detail_v1(jsonb)', 'EXECUTE'),
+          has_function_privilege('authenticated', 'public.read_preview_mobile_match_detail_v1(jsonb)', 'EXECUTE'),
+          has_function_privilege('anon', 'public.read_preview_mobile_match_detail_v1(jsonb)', 'EXECUTE'));
+      `), "t|f|f");
+      assert.equal(psql(cluster, database, `
+        select concat_ws('|', p.prosecdef, p.provolatile, p.proconfig[1])
+        from pg_catalog.pg_proc p where p.oid = 'public.read_preview_mobile_match_detail_v1(jsonb)'::regprocedure;
+      `), "t|s|search_path=pg_catalog, scoring_authority, public");
+      assert.equal(psql(cluster, database, `
+        select bool_and(c.relrowsecurity) from pg_catalog.pg_class c
+        join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+        where n.nspname = 'scoring_authority' and c.relname in
+          ('matches', 'match_participants', 'match_holes', 'hole_scores', 'scoring_snapshots', 'game_center_presentations');
+      `), "t");
+      assert.equal(readOnlyFingerprint(), beforeReads);
+    });
+  } finally {
+    await destroyCluster(cluster);
+  }
+});
 
 test("Preview Match Detail RPC compiles and enforces participant-safe canonical reads", {
   timeout: 120_000,
