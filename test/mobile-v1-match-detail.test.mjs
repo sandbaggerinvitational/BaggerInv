@@ -296,6 +296,58 @@ test("final Singles supports a non-owned Match, official confirmation, full flow
   assert.equal(match.stats.sideOneHolesWon, 7);
 });
 
+test("live Singles preserves an early clinch while a complete scorecard awaits final confirmation", () => {
+  const winners = [
+    ...Array(7).fill("Team 1"),
+    ...Array(5).fill("Halved"),
+    ...Array(6).fill("Team 1"),
+  ];
+  const raw = rawFixture({ format: "SI", status: "LIVE", winners, clinched: true });
+  raw.match.result_winner = "Team 1";
+  raw.match.scorecard_complete = true;
+  raw.match.running_result = "Team 1 wins 7 & 6";
+
+  const match = map(raw).match;
+
+  assert.equal(match.status, "inProgress");
+  assert.equal(match.scorecard.state, "inProgress");
+  assert.equal(match.scorecard.complete, true);
+  assert.deepEqual(match.clinch, {
+    holeNumber: 12,
+    winnerSide: 1,
+    winnerTeamId: "PICKLES",
+    summary: "The Pickles clinched on Hole 12.",
+  });
+});
+
+test("final Singles decided on Hole 18 does not invent an early-clinch hole", () => {
+  const raw = rawFixture({
+    format: "SI",
+    status: "FINAL",
+    winners: ["Team 1", ...Array(17).fill("Halved")],
+    clinched: true,
+  });
+  raw.match.running_result = "Team 1 wins 1 UP";
+
+  const match = map(raw).match;
+
+  assert.equal(match.status, "completed");
+  assert.equal(match.result.notation, "1 UP");
+  assert.equal(match.clinch, null);
+  assert.equal(match.scorecard.state, "confirmed");
+});
+
+test("Singles still fails closed when canonical clinched state has no decided result", () => {
+  const raw = rawFixture({
+    format: "SI",
+    status: "LIVE",
+    winners: ["Halved"],
+    clinched: true,
+  });
+
+  assert.throws(() => map(raw), /mobile API is unavailable/i);
+});
+
 test("scheduled Match Detail keeps a bounded unplayed official record without inventing a result", () => {
   const raw = rawFixture({ status: "UPCOMING", winners: [] });
   raw.match.running_result = "Scheduled";
