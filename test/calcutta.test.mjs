@@ -1,12 +1,117 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { buildCalcuttaModel, calcuttaPublicationReadiness, calcuttaPublicationRecords, calcuttaRoundResultsFromTournamentModel, deriveCalcuttaRoundResults, rankWithTieAverages } from "../lib/calcutta.js";
+import {
+  buildCalcuttaModel,
+  calcuttaPublicationReadiness,
+  calcuttaPublicationRecords,
+  calcuttaRoundResultsFromFrozenScoringContext,
+  calcuttaRoundResultsFromTournamentModel,
+  deriveCalcuttaRoundResults,
+  getCalcuttaSignedStrokesOnHole,
+  rankWithTieAverages,
+  roundCalcuttaCourseHandicap,
+} from "../lib/calcutta.js";
+import { getStrokesOnHole } from "../lib/scorecard-net.js";
 
 const players = {
   A: { name: "Clay Beltran" }, B: { name: "Patrick Noonan" }, C: { name: "David Tatum" },
   O1: { name: "Taylor Lippincott" }, O2: { name: "Michael Hunnicutt" },
 };
+
+function frozenMatch({ format = "BB", participants, gross = 5 } = {}) {
+  const matchId = `2026-R${format === "SI" ? 3 : 1}-1`;
+  return {
+    match: { match_id: matchId, round_number: format === "SI" ? 3 : 1, format },
+    snapshot: { snapshot_id: "85000000-0000-4000-8000-000000000001", canonical_hash: "a".repeat(64) },
+    participants,
+    holes: Array.from({ length: 18 }, (_, index) => ({ hole_number: index + 1, stroke_index: index + 1, par: 4 })),
+    scores: Array.from({ length: 18 }, (_, index) => ({
+      hole_number: index + 1,
+      team_1_gross_scores: format === "BB" ? [gross, gross] : [gross],
+      team_2_gross_scores: format === "BB" ? [gross, gross] : [gross],
+    })),
+  };
+}
+
+test("Calcutta signed full-Course-Handicap allocation follows forward and reverse Stroke Index cycles", () => {
+  const allocation = (total) => Array.from({ length: 18 }, (_, index) =>
+    getCalcuttaSignedStrokesOnHole(total, index + 1));
+  assert.deepEqual(allocation(0), Array(18).fill(0));
+  assert.deepEqual(allocation(1), [1, ...Array(17).fill(0)]);
+  assert.deepEqual(allocation(5), [...Array(5).fill(1), ...Array(13).fill(0)]);
+  assert.deepEqual(allocation(18), Array(18).fill(1));
+  assert.deepEqual(allocation(19), [2, ...Array(17).fill(1)]);
+  assert.deepEqual(allocation(-1), [...Array(17).fill(0), -1]);
+  assert.deepEqual(allocation(-5), [...Array(13).fill(0), ...Array(5).fill(-1)]);
+  assert.deepEqual(allocation(-18), Array(18).fill(-1));
+  assert.deepEqual(allocation(-19), [...Array(17).fill(-1), -2]);
+  assert.equal(allocation(-19).reduce((sum, value) => sum + value, 0), -19);
+});
+
+test("Calcutta full Course Handicap rounding matches PostgreSQL half-away-from-zero boundaries", () => {
+  for (const [value, expected] of [[0, 0], [0.49, 0], [0.5, 1], [18.5, 19], [-0.49, 0], [-0.5, -1], [-18.5, -19]]) {
+    assert.equal(roundCalcuttaCourseHandicap(value), expected);
+  }
+  assert.equal(roundCalcuttaCourseHandicap(null), null);
+});
+
+test("BB Calcutta uses frozen full rounded Course Handicap while match play stays 90-percent relative", () => {
+  const results = calcuttaRoundResultsFromFrozenScoringContext({
+    year: 2026,
+    rounds: [{ number: 1, status: "FINAL" }],
+    matches: [frozenMatch({ participants: [
+      { player_id: "CS01", team_side: 1, player_slot: 1, course_handicap: 16.5088 },
+      { player_id: "P2", team_side: 1, player_slot: 2, course_handicap: 4.2 },
+      { player_id: "P3", team_side: 2, player_slot: 1, course_handicap: -0.9425 },
+      { player_id: "P4", team_side: 2, player_slot: 2, course_handicap: 8.4 },
+    ] })],
+  });
+  const chris = results.find((row) => row["Player IDs"] === "CS01");
+  assert.equal(chris["Full Course Handicap"], 17);
+  assert.equal(chris["Gross Score"], 90);
+  assert.equal(chris["Net Score"], 73);
+  assert.equal(getStrokesOnHole(16, 17), 0);
+  assert.equal(getCalcuttaSignedStrokesOnHole(17, 17), 1);
+  assert.equal(5 - getStrokesOnHole(16, 17), 5);
+  assert.equal(5 - getCalcuttaSignedStrokesOnHole(17, 17), 4);
+});
+
+test("SI Calcutta uses frozen full rounded Course Handicap without opponent normalization", () => {
+  const results = calcuttaRoundResultsFromFrozenScoringContext({
+    year: 2026,
+    rounds: [{ number: 3, status: "FINAL" }],
+    matches: [frozenMatch({ format: "SI", gross: 4, participants: [
+      { player_id: "CS01", team_side: 1, player_slot: 1, course_handicap: 16.5088 },
+      { player_id: "MB01", team_side: 2, player_slot: 1, course_handicap: -1.0628 },
+    ] })],
+  });
+  const chris = results.find((row) => row["Player IDs"] === "CS01");
+  const miles = results.find((row) => row["Player IDs"] === "MB01");
+  assert.equal(chris["Full Course Handicap"], 17);
+  assert.equal(chris["Net Score"], 72 - 17);
+  assert.equal(miles["Full Course Handicap"], -1);
+  assert.equal(miles["Net Score"], 72 - (-1));
+  assert.equal(getStrokesOnHole(18, 18), 1);
+  assert.equal(getCalcuttaSignedStrokesOnHole(17, 18), 0);
+  assert.equal(4 - getStrokesOnHole(18, 18), 3);
+  assert.equal(4 - getCalcuttaSignedStrokesOnHole(17, 18), 4);
+  assert.equal(getCalcuttaSignedStrokesOnHole(-1, 18), -1);
+  assert.equal(4 - getCalcuttaSignedStrokesOnHole(-1, 18), 5);
+});
+
+test("Calcutta BB/SI derivation fails closed without complete frozen context", () => {
+  const match = frozenMatch({ participants: [
+    { player_id: "P1", team_side: 1, player_slot: 1, course_handicap: 1 },
+    { player_id: "P2", team_side: 1, player_slot: 2, course_handicap: 2 },
+    { player_id: "P3", team_side: 2, player_slot: 1, course_handicap: 3 },
+    { player_id: "P4", team_side: 2, player_slot: 2, course_handicap: 4 },
+  ] });
+  match.snapshot.canonical_hash = "";
+  assert.throws(() => calcuttaRoundResultsFromFrozenScoringContext({
+    year: 2026, rounds: [{ number: 1, status: "FINAL" }], matches: [match],
+  }), (error) => error.code === "CALCUTTA_FROZEN_SCORING_CONTEXT_REQUIRED");
+});
 
 function fixture() {
   return buildCalcuttaModel({

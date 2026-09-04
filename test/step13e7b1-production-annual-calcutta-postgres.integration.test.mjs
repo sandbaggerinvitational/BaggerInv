@@ -11,6 +11,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migrationsDirectory = path.join(root, "supabase", "production_migrations");
 const predecessor = "202608300068_production_future_participant_identity_runtime_v1.sql";
 const migration075 = "202608300075_production_annual_calcutta_v1.sql";
+const migration085 = "202609040085_production_calcutta_full_course_handicap_v2.sql";
 const providerInventory = "202608260038_production_provider_preview_target_inventory_v4.sql";
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(["createdb", "initdb", "pg_ctl", "psql"]
@@ -327,4 +328,46 @@ test("migration 075 compiles inertly, preserves 2026 RPCs, and enforces PostgreS
   assert.throws(() => sql(cluster, database, `set role service_role;
     select public.future_production_inspect_calcutta_v1('{}'::jsonb);`),
   /permission denied for function future_production_inspect_calcutta_v1/);
+
+  const v2InertBefore = sql(cluster, database, `select concat_ws('|',
+    (select count(*) from scoring_authority.calcutta_v1_configuration_revisions),
+    (select count(*) from scoring_authority.calcutta_v1_auction_fact_revisions),
+    (select count(*) from scoring_authority.calcutta_v1_publication_revisions),
+    (select count(*) from scoring_authority.calcutta_v1_recalculation_jobs),
+    (select count(*) from scoring_authority.calcutta_v1_result_revisions),
+    (select count(*) from production_control.operation_audit_events
+      where domain='CALCUTTA'));`);
+  sqlFile(cluster, database, path.join(migrationsDirectory, migration085));
+  assert.equal(sql(cluster, database, `select concat_ws('|',
+    (select count(*) from scoring_authority.calcutta_v1_configuration_revisions),
+    (select count(*) from scoring_authority.calcutta_v1_auction_fact_revisions),
+    (select count(*) from scoring_authority.calcutta_v1_publication_revisions),
+    (select count(*) from scoring_authority.calcutta_v1_recalculation_jobs),
+    (select count(*) from scoring_authority.calcutta_v1_result_revisions),
+    (select count(*) from production_control.operation_audit_events
+      where domain='CALCUTTA'));`), v2InertBefore);
+  const directV2 = functionDefinition(cluster, database,
+    "public.complete_production_calcutta_v1_recalculation(jsonb)");
+  const annualV2 = functionDefinition(cluster, database,
+    "public.future_production_complete_calcutta_recalculation_v1(jsonb)");
+  assert.match(directV2, /calcutta-js-v2/);
+  assert.doesNotMatch(directV2, /calcutta-js-v1/);
+  assert.match(annualV2, /calcutta-js-v2/);
+  assert.doesNotMatch(annualV2, /calcutta-js-v1/);
+  assert.equal(sql(cluster, database, `select
+    production_control.calcutta_v1_source_revision('2026')
+      ->>'calculation_policy';`), "calcutta-bb-si-full-course-handicap-v1");
+  assert.match(sql(cluster, database, `select pg_catalog.pg_get_constraintdef(oid)
+    from pg_catalog.pg_constraint where conrelid =
+      'scoring_authority.calcutta_v1_result_revisions'::pg_catalog.regclass
+      and conname='calcutta_v1_result_revisions_engine_version_check';`),
+  /calcutta-js-v1.*calcutta-js-v2/);
+  assert.equal(sql(cluster, database, `select concat_ws('|',
+    pg_catalog.has_function_privilege('service_role',
+      'public.complete_production_calcutta_v1_recalculation(jsonb)', 'EXECUTE'),
+    pg_catalog.has_function_privilege('authenticated',
+      'public.complete_production_calcutta_v1_recalculation(jsonb)', 'EXECUTE'),
+    pg_catalog.has_function_privilege('service_role',
+      'public.future_production_complete_calcutta_recalculation_v1(jsonb)', 'EXECUTE'));
+  `), "t|f|f");
 });

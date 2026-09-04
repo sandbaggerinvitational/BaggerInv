@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildCalcuttaConfigurationImport,
   buildCalcuttaDerivedWrite,
+  CALCUTTA_ENGINE_VERSION,
   calculateCalcuttaFromSupabaseViews,
   calcuttaDataFromResultView,
   compareCalcuttaParity,
@@ -41,7 +42,7 @@ function imported(sheets = configurationSheets()) {
 }
 
 function coreData() {
-  return {
+  const data = {
     tournament: { id: "2026", year },
     players: [{ id: "P1", name: "Player One" }, { id: "P2", name: "Player Two" }],
     rounds: [
@@ -63,6 +64,21 @@ function coreData() {
       holes: [{ matchId: "2026-R1-1", holeNumber: 1, holeRevision: 1 }, { matchId: "2026-R2-1", holeNumber: 1, holeRevision: 1 }],
     },
   };
+  data.matches = [{
+    match: { match_id: "2026-R1-1", round_number: 1, format: "SI" },
+    snapshot: { snapshot_id: "85000000-0000-4000-8000-000000000001", canonical_hash: "a".repeat(64) },
+    participants: [
+      { player_id: "P1", team_side: 1, player_slot: 1, course_handicap: 10 },
+      { player_id: "P2", team_side: 2, player_slot: 1, course_handicap: 10 },
+    ],
+    holes: Array.from({ length: 18 }, (_, index) => ({ hole_number: index + 1, stroke_index: index + 1, par: 4 })),
+    scores: Array.from({ length: 18 }, (_, index) => ({
+      hole_number: index + 1,
+      team_1_gross_scores: [index < 8 ? 5 : 4],
+      team_2_gross_scores: [index < 10 ? 5 : 4],
+    })),
+  }];
+  return data;
 }
 
 function configurationView(value = imported()) {
@@ -113,6 +129,79 @@ test("canonical Supabase adapter reuses the existing engine and preserves Scramb
   assert.equal(roundTwo[0].teamAward, undefined);
   assert.equal(roundTwo[0].points + roundTwo[1].points, 20);
   assert.equal(roundTwo[0].payoutPercent + roundTwo[1].payoutPercent, 0.1);
+});
+
+test("Supabase Calcutta v2 replaces BB/SI matchup net with frozen full Course Handicap and leaves SC unchanged", () => {
+  const core = coreData();
+  core.rounds = [
+    { number: 1, status: "FINAL", matches: [{ id: "2026-R1-1", status: "FINAL" }] },
+    { number: 2, status: "FINAL", matches: [{ id: "2026-R2-1", status: "FINAL" }] },
+  ];
+  core.scoreLeaderboard[0] = { id: "P1", round: 1, format: "BB", playerIds: ["P1"], gross: 90, net: 74 };
+  core.scoreLeaderboard[1] = { id: "P2", round: 1, format: "BB", playerIds: ["P2"], gross: 90, net: 90 };
+  core.matches = [{
+    match: { match_id: "2026-R1-1", round_number: 1, format: "BB" },
+    snapshot: { snapshot_id: "85000000-0000-4000-8000-000000000001", canonical_hash: "b".repeat(64) },
+    participants: [
+      { player_id: "P1", team_side: 1, player_slot: 1, course_handicap: 16.5088 },
+      { player_id: "P2", team_side: 1, player_slot: 2, course_handicap: -0.6 },
+      { player_id: "P3", team_side: 2, player_slot: 1, course_handicap: 4.1 },
+      { player_id: "P4", team_side: 2, player_slot: 2, course_handicap: 8.1 },
+    ],
+    holes: Array.from({ length: 18 }, (_, index) => ({ hole_number: index + 1, stroke_index: index + 1, par: 4 })),
+    scores: Array.from({ length: 18 }, (_, index) => ({
+      hole_number: index + 1, team_1_gross_scores: [5, 5], team_2_gross_scores: [5, 5],
+    })),
+  }];
+  const calculated = calculateCalcuttaFromSupabaseViews(configurationView(), core);
+  const p1 = calculated.canonicalRoundResults.find((row) => row.Round === 1 && row["Player IDs"] === "P1");
+  const p2 = calculated.canonicalRoundResults.find((row) => row.Round === 1 && row["Player IDs"] === "P2");
+  const scramble = calculated.canonicalRoundResults.find((row) => row.Round === 2);
+  assert.equal(p1["Full Course Handicap"], 17);
+  assert.equal(p1["Net Score"], 73);
+  assert.equal(p2["Full Course Handicap"], -1);
+  assert.equal(p2["Net Score"], 91);
+  assert.equal(scramble["Net Score"], 68);
+  assert.equal(calculated.canonicalInputVerification.handicapPolicy, "calcutta-bb-si-full-course-handicap-v1");
+});
+
+test("Calcutta engine version and source fingerprint bind the corrected full-Course-Handicap policy", () => {
+  assert.equal(CALCUTTA_ENGINE_VERSION, "calcutta-js-v2");
+  const calculated = calculateCalcuttaFromSupabaseViews(configurationView(), coreData());
+  assert.equal(calculated.sourceRevision.calcuttaEngineVersion, "calcutta-js-v2");
+  assert.equal(calculated.sourceRevision.calcuttaHandicapPolicy, "calcutta-bb-si-full-course-handicap-v1");
+});
+
+test("Calcutta v2 fails closed when completed BB/SI results lack raw frozen Match context", () => {
+  const core = coreData();
+  delete core.matches;
+  assert.throws(() => calculateCalcuttaFromSupabaseViews(configurationView(), core),
+    (error) => error.code === "CALCUTTA_FROZEN_SCORING_CONTEXT_REQUIRED");
+});
+
+test("later roster handicap changes cannot alter a completed Match frozen Calcutta result", () => {
+  const core = coreData();
+  core.rounds = [{ number: 3, status: "FINAL", matches: [{ id: "2026-R3-1", status: "FINAL" }] }];
+  core.matches = [{
+    match: { match_id: "2026-R3-1", round_number: 3, format: "SI" },
+    snapshot: { snapshot_id: "85000000-0000-4000-8000-000000000003", canonical_hash: "c".repeat(64) },
+    participants: [
+      { player_id: "P1", team_side: 1, player_slot: 1, course_handicap: 16.5088 },
+      { player_id: "P2", team_side: 2, player_slot: 1, course_handicap: -1.0628 },
+    ],
+    holes: Array.from({ length: 18 }, (_, index) => ({ hole_number: index + 1, stroke_index: index + 1, par: 4 })),
+    scores: Array.from({ length: 18 }, (_, index) => ({
+      hole_number: index + 1, team_1_gross_scores: [4], team_2_gross_scores: [4],
+    })),
+  }];
+  core.players = core.players.map((player) => ({ ...player, tournamentHandicap: 99 }));
+  const calculated = calculateCalcuttaFromSupabaseViews(configurationView(), core);
+  const p1 = calculated.canonicalRoundResults.find((row) => row.Round === 3 && row["Player IDs"] === "P1");
+  const p2 = calculated.canonicalRoundResults.find((row) => row.Round === 3 && row["Player IDs"] === "P2");
+  assert.equal(p1["Full Course Handicap"], 17);
+  assert.equal(p1["Net Score"], 55);
+  assert.equal(p2["Full Course Handicap"], -1);
+  assert.equal(p2["Net Score"], 73);
 });
 
 test("financial result fingerprints and logical payload are deterministic", () => {
