@@ -206,6 +206,31 @@ For Scramble, each side exposes required-nullable `playingHandicap` and `strokes
 
 The response is capped at 64 Matches, two participants per side, and 256 KiB. Its strong representation `ETag` fingerprints the complete bounded response in addition to the Tournament Live source revision, so a visible handicap, stroke, team-identity, or Match-number change cannot incorrectly return `304`. Scoring permissions/capabilities, Course Handicap, Handicap Index, hole inputs, hole-by-hole allocations, scoring/mutation revisions, queue state, internal authority, and Director controls are excluded. `/matches` never fans out to `/scoring/current`.
 
+### `GET /matches/:matchId`
+
+Returns one strict, bounded, read-only participant Match Detail representation from the same isolated Preview Game Center/Tournament Live authority used by the participant PWA. The `matchId` path component is bounded and opaque. The server-resolved authenticated Player and active tournament membership remain authority: the client cannot supply a Player or tournament selector, and any active participant may read a participant-visible Match only within that exact tournament. Owned and non-owned Matches use the same participant DTO. This route requires the ordinary Supabase Bearer token plus `X-Bagger-Certification`, and it has the same fail-closed Preview authority and participant-isolation boundary as the other protected mobile reads.
+
+The response is `{ ok, apiVersion, data: { tournament, match }, meta }` and is validated by `match-detail.schema.json`. The tournament context adds nullable participant-safe location to the established identity, year, status, and time-zone facts. The Match preserves its opaque stable ID, nullable presentation-only `displayMatchNumber`, canonical Round number/name/format (`BB`, `SC`, or `SI`), lifecycle (`scheduled`, `inProgress`, or `completed`), course and tee-time context, exactly two canonical teams, one or two participants per side, exact numeric Playing Handicap/stroke display facts, authenticated-Player relationship, progress, canonical result, and freshness.
+
+Navigation is round-scoped and server ordered. `roundMatchIndex` and `roundMatchCount` describe the current Match in the canonical Round sequence; `previousMatchId` and `nextMatchId` remain within that Round. `myMatchId` identifies the authenticated golfer's canonical Match in the Round without moving it, and `isMyMatch` describes the current response. Native must not sort by opaque Match ID or `displayMatchNumber`, and it must not infer My Match from display names.
+
+The scorecard always contains exactly 18 canonical hole definitions so an incomplete authority fails closed instead of producing a partial tracker. `state` is `unavailable`, `inProgress`, or `confirmed`; `complete` is the canonical completeness fact and is independent of lifecycle/confirmation. Each hole includes integer par/yardage/stroke-index facts when available, an explicit `official` flag, winner/result labels, running result, bounded server-projected story, and freshness. Unplayed score, winner/result, running-result, and timestamp values remain null rather than zero; the bounded story may simply state that the hole has not been recorded.
+
+Per-hole scoring is intentionally discriminated and cannot be confused across formats:
+
+| `scope` | Formats | Participant-safe score shape |
+| --- | --- | --- |
+| `players` | Best Ball and Singles | One or two ordered `{ playerId, gross, strokes }` rows, `teamScore: null`, and the canonical side `netScore`. |
+| `team` | Scramble | `playerScores: []`, one nullable `{ gross, strokes }` team score, and the canonical side `netScore`. |
+
+The Preview RPC supplies bounded canonical scoring, course, identity, lifecycle, and ordering facts. At the protected server route boundary, the mobile projection reuses the same trusted Game Center helpers as the PWA to produce participant-facing winner, running-result, per-hole story, Match Flow, clinch, and statistics fields. Native performs none of those calculations and never receives the private inputs needed to become scoring authority. Exact numeric Playing Handicap and course rating values remain JSON numbers without adapter rounding or truncation; neither is relabeled as Course Handicap.
+
+`flow` includes non-null front-nine, back-nine, and overall segments with explicit `notStarted`, `allSquare`, `leading`, or `final` state. `clinch` is nullable and, when present, includes canonical hole, side, team ID, and summary. `stats` contains only bounded participant presentation totals. These server projections let native render the PWA's read-only Match Center hierarchy without acquiring competition authority.
+
+The complete participant-safe representation is bounded to one Match, two teams, at most two Players per side, and exactly 18 holes. Transport enforces the route's byte ceiling. It uses `Cache-Control: private, no-cache`, a strong representation `ETag`, `If-None-Match`, and `304` revalidation. A native participant-private cache may display an eligible representation immediately while revalidating, partitioned by environment, verified Auth UUID, canonical Player, tournament, Match, and product. A changed canonical representation replaces it atomically.
+
+The contract excludes scoring permissions, `canScore`, scoring locks/capabilities, Match/hole/permission revisions, mutation state, queue state, actor/audit fields, internal source diagnostics, Director controls, and service credentials. It never fans out to `/scoring/current` and grants no write or finalization authority.
+
 ### `GET /leaders`
 
 Returns overall team and Player standings from Leaderboards Core and its established ranking helpers. Ties retain canonical display ranks. It also returns `roundStandings` in numeric Round order, with canonical Round name/status and the two team standings for each Round. Only official Match results contribute Round points; an upcoming Round with no official result returns `rank: null` and `points: null` rather than a fabricated zero. Half points remain exact JSON numbers. Native Swift therefore does not sum `/matches` to obtain Round Scores. Round scorecards, Round Player leaderboards, and secondary calculation detail remain excluded.

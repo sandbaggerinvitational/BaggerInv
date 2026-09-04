@@ -8,6 +8,7 @@ const contractDirectory = new URL("../../contracts/mobile/v1/", import.meta.url)
 const schemaNames = [
   "shared",
   "matches",
+  "match-detail",
   "passport",
   "guide",
   "history",
