@@ -679,7 +679,11 @@ export default async function TournamentYearPage({ params, searchParams, partici
   if (useSupabase2026) {
     try {
       const model = history2026TournamentPageModel(
-        await loadHistory2026View({ year: Number(year), env })
+        await loadHistory2026View({
+          year: Number(year),
+          env,
+          includeTournamentPlayerMetadata: true,
+        })
       );
       if (
         !model?.tournament ||
