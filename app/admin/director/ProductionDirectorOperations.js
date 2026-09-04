@@ -96,7 +96,7 @@ function MatchCard({ match, busy, onAction }) {
     </div>
     <dl className={styles.matchFacts}>
       <div><dt>Course</dt><dd>{[match.course, match.tee].filter(Boolean).join(" · ") || "Not assigned"}</dd></div>
-      <div><dt>Start</dt><dd>{[match.teeTime, match.startingHole ? `Hole ${match.startingHole}` : ""].filter(Boolean).join(" · ") || "Not scheduled"}</dd></div>
+      <div><dt>Tee time</dt><dd>{match.teeTime || "Not scheduled"}</dd></div>
       <div><dt>Progress</dt><dd>{match.scoredHoles} / 18 holes{match.currentHole ? ` · Current ${match.currentHole}` : ""}</dd></div>
       <div><dt>Running result</dt><dd>{match.result || "No result yet"}</dd></div>
       <div><dt>Scoring lock</dt><dd><Status value={match.scoringLocked ? "LOCKED" : "OPEN"}>{match.scoringLocked ? "Locked" : "Unlocked"}</Status></dd></div>

@@ -11,6 +11,8 @@ const migration = path.join(root,
   "supabase/production_migrations/202608300063_production_tournament_setup_v1.sql");
 const emptyPairingsMigration = path.join(root,
   "supabase/production_migrations/202609030083_production_empty_pairings_v1.sql");
+const startingHoleRetirementMigration = path.join(root,
+  "supabase/production_migrations/202609040084_production_starting_hole_retirement_v1.sql");
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(["createdb", "initdb", "pg_ctl", "psql"]
   .map((name) => [name, path.join(pgBin, name)]));
@@ -503,7 +505,7 @@ function fixture(cluster, database) {
        match_sort_order,source_workbook_id,source_payload_hash,imported_by)
     values ('2026-R1-1','2026','Course One','08:00','1','1',101,
       'workbook-production',repeat('b',64),'fixture'),
-      ('2026-R1-4','2026','Course One','08:40','1','4',104,
+      ('2026-R1-4','2026','Course One','08:40','','4',104,
       'workbook-production',repeat('e',64),'fixture');
     insert into scoring_authority.odds_publication_current values ('2026','UNPUBLISHED');
     insert into scoring_authority.calcutta_v1_current(tournament_id) values ('2026');
@@ -512,7 +514,7 @@ function fixture(cluster, database) {
   `);
 }
 
-test("migrations 063 and 083 compile and enforce zero-or-complete Production pairing behavior on PostgreSQL 17", async (context) => {
+test("migrations 063, 083, and 084 compile and enforce starting-hole-free zero-or-complete pairing behavior on PostgreSQL 17", async (context) => {
   if (!(await available())) return context.skip("PostgreSQL 17 binaries unavailable");
   const cluster = await createCluster();
   context.after(() => destroyCluster(cluster));
@@ -521,6 +523,20 @@ test("migrations 063 and 083 compile and enforce zero-or-complete Production pai
   fixture(cluster, database);
   sqlFile(cluster, database, migration);
   sqlFile(cluster, database, emptyPairingsMigration);
+  sqlFile(cluster, database, startingHoleRetirementMigration);
+
+  assert.equal(sql(cluster, database, String.raw`
+    select is_nullable || '|' || coalesce(column_default, '')
+    from information_schema.columns
+    where table_schema='scoring_authority'
+      and table_name='tournament_setup_match_details_v1'
+      and column_name='starting_hole';
+  `), "YES|");
+  assert.equal(sql(cluster, database, String.raw`
+    select pg_get_functiondef(
+      'production_control.apply_tournament_setup_scoring_context_v1(jsonb,bigint,text)'::regprocedure
+    ) not like '%starting_hole%';
+  `), "t");
 
   assert.equal(sql(cluster, database, String.raw`
     select concat_ws('|',
@@ -613,7 +629,8 @@ test("migrations 063 and 083 compile and enforce zero-or-complete Production pai
       (select permission_revision from scoring_authority.matches where match_id='2026-R1-4'),
       (select revision from production_control.tournament_setup_context_v1 where tournament_id='2026'),
       (select count(*) from production_control.tournament_setup_operation_receipts_v1 where operation_request_id='20000000-0000-4000-8000-000000000501'),
-      (select count(*) from production_control.tournament_setup_audit_events_v1 where operation_request_id='20000000-0000-4000-8000-000000000501')
+      (select count(*) from production_control.tournament_setup_audit_events_v1 where operation_request_id='20000000-0000-4000-8000-000000000501'),
+      (select starting_hole is null from scoring_authority.tournament_setup_match_details_v1 where match_id='2026-R1-4')
     );
     select production_control.assert_production_match_scoring_ready_v1('2026-R1-4')::text;
     select public.mutate_production_match_control(${json(legacyMarkAfterClear)})::text;
@@ -637,7 +654,7 @@ test("migrations 063 and 083 compile and enforce zero-or-complete Production pai
   assert.equal(clearRetry.idempotent, true);
   assert.equal(clearRetry.revision, 1);
   assert.equal(clearConflict.code, "TOURNAMENT_SETUP_IDEMPOTENCY_CONFLICT");
-  assert.equal(legacyClearResults[3], "0|0|0|1|1|1|2|1|1|1");
+  assert.equal(legacyClearResults[3], "0|0|0|1|1|1|2|1|1|1|t");
   assert.equal(clearReadiness.ready, false);
   assert.ok(clearReadiness.reasons.some((item) => item.code === "PAIRINGS_INCOMPLETE"));
   assert.equal(clearMarkLive.ok, false);

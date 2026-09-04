@@ -227,6 +227,7 @@ test("legacy partial pairings retain their canonical slots and expose only safe 
     }],
   });
   const match = normalizeProductionTournamentSetupPayload(partial).matches[0];
+  assert.equal(Object.hasOwn(match, "startingHole"), false);
   const slots = buildTournamentSetupParticipantSlots(match.participants, match.format);
   assert.equal(slots.length, 4);
   assert.equal(slots[0].playerId, "CB01");
@@ -478,7 +479,6 @@ test("all eight mutations emit the exact canonical snake_case SQL boundary paylo
     course_id: "KIAWAH-OCEAN",
     tee: "Tournament",
     tee_time: "08:05",
-    starting_hole: 10,
   });
   assert.deepEqual(built[6], {
     operation: "REPLACE_PAIRINGS",
