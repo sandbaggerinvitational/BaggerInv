@@ -4,6 +4,26 @@ import test from "node:test";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
+test("participant HCP migration changes only published read precedence, preserving the certified function", async () => {
+  const sql = await source("supabase/migrations/202609050002_preview_mobile_participant_playing_hcp.sql");
+  const previous = await source("supabase/migrations/202609050001_preview_mobile_scramble_team_hcp.sql");
+  const oldLookup = "  -- The collection's read_tournament_live_view exposes this same published\n  -- presentation. Read only this tournament's exact Match key; never trim,\n  -- normalize, split or derive it. BB/SI do not use team-handicap projection.\n  if match_row.format = 'SC' then\n    select value.presentation->'tournamentMatchDisplay'->target_match\n    into published_match_display\n    from scoring_authority.participant_home_presentations value\n    where value.tournament_id = target_tournament;\n  end if;\n";
+  const newLookup = "  -- Match and participant identity select the same published values as\n  -- /matches. The exact opaque Match key is never trimmed or normalized.\n  select value.presentation->'tournamentMatchDisplay'->target_match\n  into published_match_display\n  from scoring_authority.participant_home_presentations value\n  where value.tournament_id = target_tournament;\n";
+  const oldField = "    'playing_handicap', participant.playing_handicap,";
+  const newField = "    'playing_handicap', coalesce(\n      nullif((\n        select published.value->'playingHcp'\n        from pg_catalog.jsonb_array_elements(coalesce(\n          nullif(published_match_display->(case when participant.team_side = 1\n            then 'team1Players' else 'team2Players' end), 'null'::jsonb),\n          '[]'::jsonb)) with ordinality published(value, position)\n        where pg_catalog.btrim(coalesce(published.value->>'id', '')) =\n          pg_catalog.btrim(participant.player_id)\n        order by published.position\n        limit 1\n      ), 'null'::jsonb),\n      pg_catalog.to_jsonb(participant.playing_handicap)),";
+  assert.equal(sql.split(newLookup).length, 2);
+  assert.equal(sql.split(newField).length, 2);
+  const restored = sql.slice(sql.indexOf("begin;"))
+    .replace(newLookup, oldLookup).replace(newField, oldField);
+  assert.equal(restored, previous.slice(previous.indexOf("begin;")),
+    "strokes, score state, exact IDs, navigation, schema and privileges are otherwise byte-identical");
+  assert.doesNotMatch(sql, /(?:insert into|update scoring_authority|delete from|alter table|create table)/i);
+  assert.equal((sql.match(/create or replace function/g) || []).length, 1);
+  assert.doesNotMatch(newField, /(?:round|floor|ceil|handicap_index|course_handicap|final_strokes)\s*\(/i);
+  assert.match(newField, /order by published\.position\s+limit 1/);
+});
+
+
 test("Scramble Team HCP migration changes only exact published handicap pass-through", async () => {
   const sql = await source("supabase/migrations/202609050001_preview_mobile_scramble_team_hcp.sql");
   const previous = await source("supabase/migrations/202609040001_preview_mobile_opaque_match_id_contract.sql");
