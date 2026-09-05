@@ -12,6 +12,18 @@ const migrationUrl = new URL(
   "../../supabase/production_migrations/202609050089_production_tournament_awards_v1.sql",
   import.meta.url,
 );
+const compatibilityMigrationUrl = new URL(
+  "../../supabase/production_migrations/202609050090_production_tournament_awards_service_scope_v1.sql",
+  import.meta.url,
+);
+const tournamentSetupMigrationUrl = new URL(
+  "../../supabase/production_migrations/202608300063_production_tournament_setup_v1.sql",
+  import.meta.url,
+);
+const handicapMigrationUrl = new URL(
+  "../../supabase/production_migrations/202608290058_production_handicap_revisions_v1.sql",
+  import.meta.url,
+);
 const panelUrl = new URL(
   "../../app/admin/director/ProductionTournamentAwardsPanel.js",
   import.meta.url,
@@ -28,8 +40,11 @@ const serverUrl = new URL(
   "../../lib/production-tournament-awards-server.js",
   import.meta.url,
 );
-const [sql, panel, setupPanel, route, server] = await Promise.all([
+const [sql, compatibilitySql, tournamentSetupSql, handicapSql, panel, setupPanel, route, server] = await Promise.all([
   readFile(migrationUrl, "utf8"),
+  readFile(compatibilityMigrationUrl, "utf8"),
+  readFile(tournamentSetupMigrationUrl, "utf8"),
+  readFile(handicapMigrationUrl, "utf8"),
   readFile(panelUrl, "utf8"),
   readFile(setupPanelUrl, "utf8"),
   readFile(routeUrl, "utf8"),
@@ -105,6 +120,33 @@ test("089 installs inert private revision storage and bounded service-only RPCs"
   assert.doesNotMatch(sql, /grant (?:select|insert|update|delete|all) on (?:table )?production_control\.tournament_award/i);
 });
 
+test("090 replaces only the incompatible role check with the established private scope contract", () => {
+  assert.match(compatibilitySql, /^-- Production Director Tournament Awards V1\.1[\s\S]*\nbegin;/);
+  assert.match(compatibilitySql, /notify pgrst, 'reload schema';\ncommit;\s*$/);
+  assert.match(compatibilitySql, /create or replace function production_control\.assert_tournament_awards_runtime_v1\(/);
+  assert.match(compatibilitySql, /perform production_control\.assert_exact_cutover_resource_scope\(input, false\);/);
+  assert.match(compatibilitySql, /perform production_control\.assert_production_scoring_actor\(input, true\);/);
+  const helperBody = compatibilitySql.slice(
+    compatibilitySql.indexOf("as $assert_tournament_awards_runtime$"),
+    compatibilitySql.indexOf("$assert_tournament_awards_runtime$;", compatibilitySql.indexOf("as $assert_tournament_awards_runtime$") + 1),
+  );
+  assert.doesNotMatch(helperBody, /request\.jwt\.claim\.role/);
+  assert.doesNotMatch(compatibilitySql, /\b(?:insert|update|delete|truncate)\b/i);
+  assert.doesNotMatch(compatibilitySql, /grant execute/i);
+  assert.match(compatibilitySql, /from public, anon, authenticated, service_role;/);
+
+  assert.match(tournamentSetupSql, /assert_player_access_runtime_v1\([\s\S]*production-players-access-v1/);
+  assert.match(handicapSql, /assert_exact_cutover_resource_scope\(input, false\);[\s\S]*assert_production_scoring_actor\(input, true\);/);
+
+  const readBody = sql.slice(
+    sql.indexOf("create function public.read_production_tournament_awards_v1"),
+    sql.indexOf("create function public.save_production_tournament_awards_v1"),
+  );
+  const writeBody = sql.slice(sql.indexOf("create function public.save_production_tournament_awards_v1"));
+  assert.match(readBody, /assert_tournament_awards_runtime_v1\(input\)/);
+  assert.match(writeBody, /assert_tournament_awards_runtime_v1\(input\)/);
+});
+
 test("SQL validation preserves current-roster and stable-Team identity boundaries", () => {
   assert.match(sql, /recipient_kind in \('PLAYER', 'TEAM', 'TEXT', 'UNAVAILABLE'\)/);
   assert.match(sql, /membership\.participation_status = 'ACTIVE'/);
@@ -141,6 +183,10 @@ test("Director route uses Production Auth, same-origin mutation, and Supabase-on
   assert.match(route, /googleRequests: 0/);
   assert.match(server, /recordDataAuthorityTransport\("supabase"/);
   assert.match(server, /const RPCS = new Set\(\[/);
+  assert.match(server, /const result = \{ apikey: secret, "content-type": "application\/json" \}/);
+  assert.match(server, /if \(!secret\.startsWith\("sb_secret_"\)\) result\.authorization/);
+  assert.ok(route.indexOf("const access = await authorize(request)") < route.indexOf("readProductionTournamentAwards(actor(access.identity))"));
+  assert.ok(route.indexOf("const access = await authorize(request, { mutation: true })") < route.indexOf("saveProductionTournamentAwards({ ...input"));
   assert.doesNotMatch(server, /google-sheets|googleapis|fetchGoogle/i);
 });
 

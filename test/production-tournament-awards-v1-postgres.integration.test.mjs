@@ -16,6 +16,7 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migrationsDirectory = path.join(root, "supabase", "production_migrations");
 const migration089 = "202609050089_production_tournament_awards_v1.sql";
+const migration090 = "202609050090_production_tournament_awards_service_scope_v1.sql";
 const annualPredecessor = "202608300068_production_future_participant_identity_runtime_v1.sql";
 const hashPredecessor = "202608310080_production_prediction_settings_authoring_v1.sql";
 const providerInventoryV4 = "202608260038_production_provider_preview_target_inventory_v4.sql";
@@ -53,6 +54,19 @@ function sql(cluster, database, input, jwtRole = "service_role") {
   });
 }
 
+function sqlWithClaims(cluster, database, input, {
+  claimsRole = "service_role",
+  databaseRole = "service_role",
+} = {}) {
+  return run(bin.psql, ["-X", "-qAt", "-v", "ON_ERROR_STOP=1", "-d", database], {
+    env: {
+      ...environment(cluster),
+      PGOPTIONS: `-c request.jwt.claims={\"role\":\"${claimsRole}\"}`,
+    },
+    input: `set role ${databaseRole};\n${input}`,
+  });
+}
+
 function sqlFile(cluster, database, filename) {
   return run(bin.psql, ["-X", "-q", "-v", "ON_ERROR_STOP=1", "-d", database, "-f", filename], {
     env: environment(cluster),
@@ -65,6 +79,15 @@ function json(value) {
 
 function rpc(cluster, database, name, input, jwtRole = "service_role") {
   return JSON.parse(sql(cluster, database, `select public.${name}(${json(input)})::text`, jwtRole));
+}
+
+function rpcWithClaims(cluster, database, name, input, options) {
+  return JSON.parse(sqlWithClaims(
+    cluster,
+    database,
+    `select public.${name}(${json(input)})::text`,
+    options,
+  ));
 }
 
 function canonicalHash(value) {
@@ -183,11 +206,24 @@ function installAnnualFixture(cluster, database) {
 }
 
 function seedActorAndRoster(cluster, database) {
+  const players = Array.from({ length: 24 }, (_, index) => {
+    const number = String(index + 1).padStart(2, "0");
+    const playerId = `P${number}`;
+    const payload = index === 0
+      ? '{"Slug":"director-one","Photo Filename":"director.jpg"}'
+      : `{\"Slug\":\"player-${number}\",\"Photo Filename\":\"player-${number}.jpg\"}`;
+    return `('${playerId}','${index === 0 ? "Director One" : `Player ${number}`}','${payload}')`;
+  }).join(",\n      ");
+  const memberships = Array.from({ length: 24 }, (_, index) => {
+    const number = String(index + 1).padStart(2, "0");
+    const playerId = `P${number}`;
+    const side = index < 12 ? 1 : 2;
+    return `('2026','${playerId}','TEAM-${side}',${side},'ACTIVE','${playerId}','{}')`;
+  }).join(",\n      ");
   sql(cluster, database, `
     insert into scoring_authority.players(player_id,display_name,source_payload)
     values
-      ('P01','Director One','{"Slug":"director-one","Photo Filename":"director.jpg"}'),
-      ('P02','Player Two','{"Slug":"player-two","Photo Filename":"player-two.jpg"}');
+      ${players};
     insert into scoring_authority.teams(tournament_id,team_id,team_side,name,source_payload)
     values
       ('2026','TEAM-1',1,'Team One','{"Team Logo":"team-one.png"}'),
@@ -196,8 +232,7 @@ function seedActorAndRoster(cluster, database) {
       tournament_id,player_id,team_id,team_side,participation_status,
       source_roster_key,source_payload
     ) values
-      ('2026','P01','TEAM-1',1,'ACTIVE','P01','{}'),
-      ('2026','P02','TEAM-2',2,'ACTIVE','P02','{}');
+      ${memberships};
     insert into auth.users(id,email,email_confirmed_at)
     values ('${actorAuth}','director@example.org',clock_timestamp());
     insert into participant_identity.user_player_links(
@@ -224,7 +259,7 @@ function seedActorAndRoster(cluster, database) {
   `);
 }
 
-test("migration 089 executes inertly and enforces Awards revisions on PostgreSQL 17", async (t) => {
+test("migration 090 accepts the sb_secret_ claims transport without weakening Awards security", async (t) => {
   if (!(await available())) return t.skip("PostgreSQL 17 binaries unavailable");
   const cluster = await createCluster();
   t.after(() => destroyCluster(cluster));
@@ -276,13 +311,59 @@ test("migration 089 executes inertly and enforces Awards revisions on PostgreSQL
     (select count(*) from production_control.tournament_award_operation_receipts_v1),
     (select count(*) from production_control.tournament_award_audit_events_v1))`), "0|0|0|0|0");
 
-  const read = rpc(cluster, database, "read_production_tournament_awards_v1", {
+  const emptyInput = {
     ...actorScope(), operation: "READ_PRODUCTION_TOURNAMENT_AWARDS_V1",
-  });
+  };
+  assert.throws(
+    () => rpcWithClaims(cluster, database, "read_production_tournament_awards_v1", emptyInput),
+    /PRODUCTION_TOURNAMENT_AWARDS_SCOPE_REQUIRED/,
+  );
+
+  const awardsBeforePatch = sql(cluster, database, `select concat_ws('|',
+    (select count(*) from production_control.tournament_award_revisions_v1),
+    (select count(*) from production_control.tournament_award_items_v1),
+    (select count(*) from production_control.tournament_awards_current_v1),
+    (select count(*) from production_control.tournament_award_operation_receipts_v1),
+    (select count(*) from production_control.tournament_award_audit_events_v1))`);
+  sqlFile(cluster, database, path.join(migrationsDirectory, migration090));
+  assert.equal(sql(cluster, database, `select concat_ws('|',
+    (select count(*) from production_control.tournament_award_revisions_v1),
+    (select count(*) from production_control.tournament_award_items_v1),
+    (select count(*) from production_control.tournament_awards_current_v1),
+    (select count(*) from production_control.tournament_award_operation_receipts_v1),
+    (select count(*) from production_control.tournament_award_audit_events_v1))`), awardsBeforePatch);
+
+  const read = rpcWithClaims(
+    cluster,
+    database,
+    "read_production_tournament_awards_v1",
+    emptyInput,
+  );
   assert.equal(read.revision, 0);
   assert.deepEqual(read.awards, []);
-  assert.equal(read.roster.length, 2);
+  assert.equal(read.roster.length, 24);
+  assert.equal(new Set(read.roster.map((player) => player.playerId)).size, 24);
   assert.equal(read.teams.length, 2);
+  assert.deepEqual(read.teams.map((team) => team.teamId), ["TEAM-1", "TEAM-2"]);
+
+  const invalidMutation = {
+    ...actorScope(),
+    operation: "SAVE_PRODUCTION_TOURNAMENT_AWARDS_V1",
+    operation_request_id: "89000000-0000-4000-8000-000000000100",
+    expected_revision: 0,
+    request_payload_hash: "a".repeat(64),
+    awards: [{
+      award_id: "89000000-0000-4000-8000-000000000099",
+      title: "",
+      display_order: 1,
+      recipient_kind: "UNAVAILABLE",
+      publication_state: "DRAFT",
+    }],
+  };
+  assert.throws(
+    () => rpcWithClaims(cluster, database, "save_production_tournament_awards_v1", invalidMutation),
+    /TOURNAMENT_AWARDS_UNSAFE_CONTENT/,
+  );
 
   const pendingId = "89000000-0000-4000-8000-000000000001";
   const playerId = "89000000-0000-4000-8000-000000000002";
@@ -291,18 +372,18 @@ test("migration 089 executes inertly and enforces Awards revisions on PostgreSQL
     { awardId: pendingId, title: "Tournament MVP", displayOrder: 1, recipientKind: "UNAVAILABLE", publicationState: "DRAFT" },
     { awardId: playerId, title: "Sandbagger of the Year", displayOrder: 2, recipientKind: "PLAYER", winnerPlayerId: "P02", publicationState: "PUBLISHED" },
   ];
-  const saved = rpc(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: firstAwards, expectedRevision: 0, requestId: firstRequest }));
+  const saved = rpcWithClaims(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: firstAwards, expectedRevision: 0, requestId: firstRequest }));
   assert.equal(saved.revision, 1);
   assert.equal(saved.itemCount, 2);
   assert.equal(saved.publishedCount, 1);
-  const retry = rpc(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: firstAwards, expectedRevision: 0, requestId: firstRequest }));
+  const retry = rpcWithClaims(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: firstAwards, expectedRevision: 0, requestId: firstRequest }));
   assert.equal(retry.idempotent, true);
   assert.equal(retry.revision, 1);
   assert.equal(sql(cluster, database, "select count(*) from production_control.tournament_award_audit_events_v1"), "1");
 
-  assert.throws(() => rpc(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: firstAwards, expectedRevision: 0, requestId: "89000000-0000-4000-8000-000000000102" })), /TOURNAMENT_AWARDS_REVISION_STALE/);
-  assert.throws(() => rpc(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: [{ ...firstAwards[0], title: "Different" }, firstAwards[1]], expectedRevision: 0, requestId: firstRequest })), /TOURNAMENT_AWARDS_OPERATION_REQUEST_CONFLICT/);
-  assert.throws(() => rpc(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: [firstAwards[0]], expectedRevision: 1, requestId: "89000000-0000-4000-8000-000000000103" })), /TOURNAMENT_AWARDS_PUBLISHED_REMOVAL_INVALID/);
+  assert.throws(() => rpcWithClaims(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: firstAwards, expectedRevision: 0, requestId: "89000000-0000-4000-8000-000000000102" })), /TOURNAMENT_AWARDS_REVISION_STALE/);
+  assert.throws(() => rpcWithClaims(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: [{ ...firstAwards[0], title: "Different" }, firstAwards[1]], expectedRevision: 0, requestId: firstRequest })), /TOURNAMENT_AWARDS_OPERATION_REQUEST_CONFLICT/);
+  assert.throws(() => rpcWithClaims(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: [firstAwards[0]], expectedRevision: 1, requestId: "89000000-0000-4000-8000-000000000103" })), /TOURNAMENT_AWARDS_PUBLISHED_REMOVAL_INVALID/);
 
   const secondAwards = [
     firstAwards[0],
@@ -310,9 +391,9 @@ test("migration 089 executes inertly and enforces Awards revisions on PostgreSQL
     { awardId: "89000000-0000-4000-8000-000000000003", title: "Team Award", displayOrder: 3, recipientKind: "TEAM", winnerTeamId: "TEAM-1", publicationState: "PUBLISHED" },
     { awardId: "89000000-0000-4000-8000-000000000004", title: "Recognition", displayOrder: 4, recipientKind: "TEXT", recipientDisplay: "Tournament volunteers", publicationState: "PUBLISHED" },
   ];
-  const second = rpc(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: secondAwards, expectedRevision: 1, requestId: "89000000-0000-4000-8000-000000000104" }));
+  const second = rpcWithClaims(cluster, database, "save_production_tournament_awards_v1", saveInput({ awards: secondAwards, expectedRevision: 1, requestId: "89000000-0000-4000-8000-000000000104" }));
   assert.equal(second.revision, 2);
-  const after = rpc(cluster, database, "read_production_tournament_awards_v1", {
+  const after = rpcWithClaims(cluster, database, "read_production_tournament_awards_v1", {
     ...actorScope(), operation: "READ_PRODUCTION_TOURNAMENT_AWARDS_V1",
   });
   assert.equal(after.revision, 2);
@@ -324,5 +405,20 @@ test("migration 089 executes inertly and enforces Awards revisions on PostgreSQL
     has_function_privilege('service_role','public.read_production_tournament_awards_v1(jsonb)','EXECUTE'),
     has_function_privilege('authenticated','public.read_production_tournament_awards_v1(jsonb)','EXECUTE'),
     has_function_privilege('anon','public.save_production_tournament_awards_v1(jsonb)','EXECUTE'),
-    has_function_privilege('service_role','production_control.tournament_awards_public_projection_v1(text)','EXECUTE'))`), "t|f|f|f");
+    has_function_privilege('service_role','production_control.tournament_awards_public_projection_v1(text)','EXECUTE'),
+    has_function_privilege('service_role','production_control.assert_tournament_awards_runtime_v1(jsonb)','EXECUTE'),
+    has_table_privilege('authenticated','production_control.tournament_award_items_v1','SELECT'),
+    has_table_privilege('service_role','production_control.tournament_award_items_v1','INSERT'))`), "t|f|f|f|f|f|f");
+  assert.throws(
+    () => rpcWithClaims(cluster, database, "read_production_tournament_awards_v1", emptyInput, {
+      claimsRole: "authenticated", databaseRole: "authenticated",
+    }),
+    /permission denied for function read_production_tournament_awards_v1/,
+  );
+  assert.throws(
+    () => rpcWithClaims(cluster, database, "read_production_tournament_awards_v1", emptyInput, {
+      claimsRole: "anon", databaseRole: "anon",
+    }),
+    /permission denied for function read_production_tournament_awards_v1/,
+  );
 });
