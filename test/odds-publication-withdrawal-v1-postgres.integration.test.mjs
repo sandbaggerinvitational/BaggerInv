@@ -8,9 +8,13 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 
+import { publishedOddsFreshness } from "../lib/published-odds-supabase.js";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migration = path.join(root,
   "supabase/production_migrations/202609040087_production_odds_publication_withdrawal_v1.sql");
+const compatibilityMigration = path.join(root,
+  "supabase/production_migrations/202609050088_production_odds_legacy_projection_compatibility_v1.sql");
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(["createdb", "initdb", "pg_ctl", "psql"]
   .map((name) => [name, path.join(pgBin, name)]));
@@ -251,7 +255,10 @@ function installFixture(cluster, database) {
           'published_at','2026-07-01T12:00:00Z','authority_epoch_id','30000000-0000-4000-8000-000000000001',
           'activation_revision',153,'adoption_kind','LEGACY_GOOGLE_ADOPTED'),
         'snapshots',jsonb_build_array(jsonb_build_object('milestone','Pre-Tournament',
-          'phase_order',0,'publication_state_revision',1,'published_at','2026-07-01T12:00:00Z',
+          'phase_order',0,'publication_state_revision',null,'publication_revision',1,
+          'authority_contract_version','legacy-google-published-odds-v1',
+          'origin_authority','GOOGLE','published_at','2026-07-01T12:00:00Z',
+          'payload_hash',repeat('a',64),
           'payload',jsonb_build_object('phase','Pre-Tournament','phaseOrder',0,'publishedAt','2026-07-01T12:00:00Z'),
           'is_current_official',(select is_current_official from scoring_authority.odds_published_snapshots where id='${snapshot1}'),
           'publication_verified',true)), 'history_count',1)) $$;
@@ -270,9 +277,9 @@ function installFixture(cluster, database) {
       publication_state_revision,published_at,published_payload,payload_hash,
       authority_contract_version,publication_authority,is_current_for_milestone,
       is_current_official,publication_verified
-    ) values ('${snapshot1}','2026','Pre-Tournament',0,1,1,
+    ) values ('${snapshot1}','2026','Pre-Tournament',0,1,null,
       '2026-07-01T12:00:00Z','{"phase":"Pre-Tournament"}',repeat('a',64),
-      'production-odds-publication-v1','SUPABASE',true,true,true);
+      'legacy-google-published-odds-v1','SUPABASE',true,true,true);
     insert into scoring_authority.odds_publication_current values (
       '2026','production-odds-publication-v1','SUPABASE','PUBLISHED','CURRENT',
       '${snapshot1}',1,'{}','2026-07-01T12:00:00Z','CB01','${authUser}',
@@ -308,6 +315,67 @@ test("087 is inert, withdraws atomically/idempotently, unblocks Setup, and prese
   `PUBLISHED|1|${snapshot1}|1`);
   assert.match(sql(cluster, database, `select production_control.tournament_setup_dependency_codes_v1()::text`),
     /ODDS_PUBLICATION_DEPENDENCY/);
+
+  // Exact Production legacy shape: 087 incorrectly drops the current flag
+  // through the nested public projection before the additive patch is applied.
+  assert.equal(sql(cluster, database, `select
+    public.read_published_odds_view('2026',
+      '1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4')
+      #>>'{data,snapshots,0,is_current_official}'`), "false");
+  sqlFile(cluster, database, compatibilityMigration);
+  const publicView = JSON.parse(sql(cluster, database, `select
+    public.read_published_odds_view('2026',
+      '1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4')::text`));
+  assert.equal(publicView.data.snapshots[0].is_current_official, true);
+  assert.equal(publicView.data.snapshots[0].publication_lifecycle, "PUBLISHED");
+  const publicModel = publishedOddsFreshness(publicView.data);
+  assert.equal(publicModel.status, "CURRENT_OFFICIAL");
+  assert.equal(publicModel.current, true);
+  assert.equal(publicModel.publicationRevision, 1);
+
+  const directBase = (snapshot, publication = {}) => json({
+    ok: true,
+    data: {
+      publication: {
+        state: "PUBLISHED",
+        snapshot_id: snapshot1,
+        publication_revision: 1,
+        adoption_kind: "LEGACY_GOOGLE_ADOPTED",
+        ...publication,
+      },
+      snapshots: [snapshot],
+    },
+  });
+  const projectedCurrent = (snapshot, publication = {}) => sql(cluster,
+    database, `select production_control.odds_publication_withdrawal_projection_v1(
+      ${directBase(snapshot, publication)},'2026')
+      #>>'{data,snapshots,0,is_current_official}'`);
+  const legacy = {
+    publication_state_revision: null,
+    publication_revision: 1,
+    authority_contract_version: "legacy-google-published-odds-v1",
+    is_current_official: true,
+  };
+  assert.equal(projectedCurrent(legacy), "true");
+  assert.equal(projectedCurrent({ ...legacy, publication_revision: 2 }), "false");
+  assert.equal(projectedCurrent({ ...legacy, is_current_official: false }), "false");
+  assert.equal(projectedCurrent({ ...legacy,
+    authority_contract_version: "production-odds-publication-v1" }), "false");
+  assert.throws(() => projectedCurrent(legacy, {
+    snapshot_id: "10000000-0000-4000-8000-000000000009",
+  }), /PRODUCTION_ODDS_PUBLIC_POINTER_DIVERGED/);
+  assert.equal(projectedCurrent({
+    publication_state_revision: 1,
+    publication_revision: 1,
+    authority_contract_version: "production-odds-publication-v1",
+    is_current_official: true,
+  }, { adoption_kind: "SUPABASE_DIRECTOR" }), "true");
+  assert.equal(sql(cluster, database, `begin;
+    delete from scoring_authority.odds_publication_public_pointer_v1
+      where tournament_id='2026';
+    select production_control.odds_publication_withdrawal_projection_v1(
+      ${directBase(legacy)},'2026')
+      #>>'{data,snapshots,0,is_current_official}'; rollback;`), "false");
 
   const input = withdrawalInput();
   for (const [status, publicationStatus] of [
