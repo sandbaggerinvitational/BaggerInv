@@ -7,6 +7,7 @@ import {
   buildTournamentSetupMutation,
   productionTournamentFormatParticipantCount,
 } from "../../../lib/production-tournament-setup-contract.js";
+import ProductionTournamentAwardsPanel from "./ProductionTournamentAwardsPanel.js";
 import styles from "./ProductionTournamentSetupPanel.module.css";
 
 const ENDPOINT = "/api/director/tournament-setup";
@@ -17,6 +18,7 @@ const SECTIONS = Object.freeze([
   ["rounds", "Rounds"],
   ["courses", "Courses"],
   ["matches", "Matches & Pairings"],
+  ["awards", "Awards"],
   ["readiness", "Readiness"],
 ]);
 
@@ -344,6 +346,7 @@ export default function ProductionTournamentSetupPanel() {
     {section === "rounds" ? <RoundsEditor data={data} disabled={disabled || !data.capabilities["update-round"].allowed} stage={stage} /> : null}
     {section === "courses" ? <CoursesEditor data={data} disabled={disabled || !data.capabilities["upsert-course"].allowed} stage={stage} /> : null}
     {section === "matches" ? <MatchesEditor data={data} disabled={disabled || (!data.capabilities["upsert-match"].allowed && !data.capabilities["replace-pairings"].allowed)} stage={stage} /> : null}
+    {section === "awards" ? <ProductionTournamentAwardsPanel disabled={disabled} /> : null}
     {section === "readiness" ? <Readiness data={data} /> : null}
     {review ? <section className={styles.review} aria-labelledby="tournament-setup-review-title"><header><span>Review before commit</span><h3 id="tournament-setup-review-title">{pretty(review.action)}</h3><p>No Production change has been made.</p></header><dl><div><dt>Requested change</dt><dd>{review.description}</dd></div><div><dt>Expected setup revision</dt><dd>{review.expectedRevision}</dd></div><div><dt>Operation identity</dt><dd>Prepared for one safe, idempotent Production operation</dd></div></dl><p>The server will revalidate exact resources, Director entitlement, revision, dependencies, and frozen competition facts atomically.</p><label className={styles.confirmation}><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed the target, current state, downstream consequences, and immutable audit effect.</span></label><div className={styles.buttonRow}><button type="button" className={styles.secondaryButton} disabled={phase === "submitting"} onClick={() => { setReview(null); setConfirmed(false); setPhase("ready"); }}>Return to Editing</button><button type="button" disabled={!confirmed || phase === "submitting"} onClick={commit}>{phase === "submitting" ? "Confirming…" : "Confirm Production Change"}</button></div></section> : null}
     {message ? <p className={styles.message} data-error={phase === "failure" ? "true" : undefined} role={phase === "failure" ? "alert" : "status"}>{message}</p> : null}

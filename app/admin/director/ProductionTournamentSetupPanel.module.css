@@ -7,7 +7,7 @@
 .hero h2 { font-size: clamp(1.8rem, 4vw, 2.7rem); }
 .hero p, .sectionHeader p { margin: .45rem 0 0; line-height: 1.55; }
 .hero small { opacity: .78; }
-.sectionNav { display: grid; grid-template-columns: repeat(7, minmax(8rem, 1fr)); gap: .55rem; overflow-x: auto; padding-bottom: .2rem; }
+.sectionNav { display: grid; grid-template-columns: repeat(8, minmax(8rem, 1fr)); gap: .55rem; overflow-x: auto; padding-bottom: .2rem; }
 .sectionNav > button { display: flex; min-height: 4.6rem; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: .5rem; padding: .75rem; border: 1px solid #d7d1c2; border-radius: .85rem; color: #193c34; background: #fffdf8; text-align: left; }
 .sectionNav > button[aria-current="page"] { border-color: #116249; box-shadow: 0 0 0 2px rgba(17, 98, 73, .14); background: #f2f8f4; }
 .sectionNav > button > span:first-child { font-weight: 800; white-space: nowrap; }
@@ -84,11 +84,20 @@
 .loading, .failure { display: grid; min-height: 16rem; place-content: center; text-align: center; }
 .loading strong { color: #143c32; font-family: Georgia, serif; font-size: 1.5rem; }
 .loading span { margin-top: .4rem; color: #68756f; }
+.awardsShell, .awardList { display: grid; gap: 1rem; }
+.emptyState { margin: 1rem 0 0; padding: 1rem; border-radius: .8rem; color: #68756f; background: #f4f1e9; }
+.awardList { margin-top: 1rem; }
+.awardCard { display: grid; gap: .8rem; padding: 1rem; border: 1px solid #ded7ca; border-radius: .9rem; background: #fbf8f1; }
+.awardCard[data-retired="true"] { opacity: .76; background: #f1eee7; }
+.awardCard > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.awardCard h4 { margin: .1rem 0; color: #143d33; font-family: Georgia, serif; font-size: 1.1rem; }
+.awardCard small { color: #66736d; }
+.dangerButton { border-color: #8b3328 !important; background: #8b3328 !important; }
 
 @media (max-width: 760px) {
   .hero, .sectionHeader { flex-direction: column; }
   .hero > div:last-child { justify-items: start; }
-  .sectionNav { grid-template-columns: repeat(7, minmax(9.5rem, 1fr)); }
+  .sectionNav { grid-template-columns: repeat(8, minmax(9.5rem, 1fr)); }
   .pairingBoard { grid-template-columns: 1fr; }
   .holeGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .review dl div { grid-template-columns: 1fr; gap: .15rem; }
