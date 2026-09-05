@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import { constants as fsConstants } from "node:fs";
-import { access, mkdir, mkdtemp, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import test from "node:test";
+import { identicalLegacyCourses } from "./fixtures/identical-legacy-courses.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migration = path.join(root,
@@ -13,6 +14,8 @@ const emptyPairingsMigration = path.join(root,
   "supabase/production_migrations/202609030083_production_empty_pairings_v1.sql");
 const startingHoleRetirementMigration = path.join(root,
   "supabase/production_migrations/202609040084_production_starting_hole_retirement_v1.sql");
+const identicalAdoptionMigration = path.join(root,
+  "supabase/production_migrations/202609040086_production_identical_legacy_course_adoption_v1.sql");
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(["createdb", "initdb", "pg_ctl", "psql"]
   .map((name) => [name, path.join(pgBin, name)]));
@@ -369,13 +372,13 @@ function fixture(cluster, database) {
     returns text language sql stable set search_path = pg_catalog as $fixture$
       select 'ACTIVE'::text
     $fixture$;
-    create function production_control.handicap_v1_match_is_unstarted(target text)
+    create function production_control.handicap_v1_match_is_unstarted(target_match_id text)
     returns boolean language sql stable set search_path = pg_catalog, scoring_authority as $fixture$
       select value.status = 'UPCOMING' and value.scored_holes = 0
         and not value.scoring_locked and value.finalized_at is null
         and not exists (select 1 from scoring_authority.hole_scores score where score.match_id = value.match_id)
         and not exists (select 1 from scoring_authority.score_mutations mutation where mutation.match_id = value.match_id)
-      from scoring_authority.matches value where value.match_id = target
+      from scoring_authority.matches value where value.match_id = target_match_id
     $fixture$;
     create function production_control.handicap_v1_match_context(target text, revision uuid)
     returns jsonb language sql stable set search_path = pg_catalog, scoring_authority as $fixture$
@@ -1098,4 +1101,255 @@ test("migrations 063, 083, and 084 compile and enforce starting-hole-free zero-o
       (select count(*) from scoring_authority.audit_events),
       (select count(*) from scoring_authority.google_outbox_events));
   `), "1|1|1");
+});
+
+test("086 permits only identical first-time legacy adoption, inert installation and serialized Odds dependencies", async (context) => {
+  if (!(await available())) return context.skip("PostgreSQL 17 binaries unavailable");
+  const cluster = await createCluster();
+  context.after(() => destroyCluster(cluster));
+  const database = "identical_course_adoption";
+  run(bin.createdb, [database], { env: environment(cluster) });
+  fixture(cluster, database);
+  sqlFile(cluster, database, migration);
+  sqlFile(cluster, database, emptyPairingsMigration);
+  sqlFile(cluster, database, startingHoleRetirementMigration);
+  // Exercise the installed started-state definition, not the harness stub.
+  const handicapSql = await readFile(path.join(root,
+    "supabase/production_migrations/202608290058_production_handicap_revisions_v1.sql"), "utf8");
+  const unstarted = handicapSql.match(/create or replace function production_control\.handicap_v1_match_is_unstarted\([\s\S]*?\$\$;/)[0];
+  sql(cluster, database, unstarted);
+  sql(cluster, database, `
+    delete from scoring_authority.matches where match_id='2026-R3-1';
+    delete from scoring_authority.scoring_snapshots where match_id='2026-R3-1';
+    insert into scoring_authority.rounds(tournament_id,round_number,format,name,handicap_allowance)
+      values ('2026',2,'SC','Scramble',1) on conflict do nothing;
+    alter table scoring_authority.odds_publication_current
+      add column publication_revision integer default 1,
+      add column payload_hash text default repeat('a',64),
+      add column freshness_state text default 'CURRENT',
+      add column pairing_fingerprint text default 'old-pairing-fingerprint';
+    update scoring_authority.odds_publication_current set publication_state='PUBLISHED';
+  `);
+  for (const course of identicalLegacyCourses) {
+    const round = course.round_numbers[0];
+    sql(cluster, database, `
+      insert into scoring_authority.completed_history_course_identities
+        values ('${course.course_id}','${course.course_name}','Kiawah Island');
+      insert into scoring_authority.scoring_snapshots
+        (snapshot_id,tournament_id,match_id,snapshot_revision,scoring_rules_version,format,
+        handicap_allowance,course_id,tee,rating,slope,par,match_netting_baseline,
+        hole_definitions,participant_configuration,team_configuration,canonical_hash)
+      select '2026-R${round}-'||n||':S1','2026','2026-R${round}-'||n,1,'sandbagger-2026-v1',
+        '${round === 2 ? "SC" : "SI"}',1,'${course.course_id}','${course.tee}',
+        ${course.rating},${course.slope},${course.par},'lowest-playing-handicap',
+        ${json(course.holes)},'{"team_1":[],"team_2":[],"all_ids":[]}','{}',repeat('e',64)
+      from generate_series(1,${course.matchCount}) n;
+      insert into scoring_authority.matches
+        (match_id,tournament_id,round_number,format,scoring_snapshot_id,status)
+      select match_id,'2026',${round},format,snapshot_id,'UPCOMING'
+      from scoring_authority.scoring_snapshots where course_id='${course.course_id}';
+      insert into scoring_authority.match_holes
+      select s.match_id,(h->>'hole_number')::integer,s.snapshot_id,(h->>'stroke_index')::integer,
+        (h->>'par')::integer,(h->>'yardage')::integer
+      from scoring_authority.scoring_snapshots s,
+        jsonb_array_elements(s.hole_definitions) h where s.course_id='${course.course_id}';
+    `);
+  }
+  const invariantTables = [
+    "matches", "scoring_snapshots", "match_holes", "match_participants", "scoring_permissions",
+    "hole_scores", "score_mutations", "finalized_scorecard_snapshots", "tournament_players",
+    "handicap_revision_current", "handicap_revision_entries", "odds_publication_current",
+    "odds_calculation_jobs", "net_skins_v1_configuration_current", "net_skins_v1_result_revisions",
+    "calcutta_v1_current", "calcutta_v1_result_revisions",
+  ];
+  const fingerprint = (tables) => sql(cluster, database,
+    `select encode(extensions.digest(jsonb_build_array(${tables.map((name) =>
+      `(select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]') from ${name} t)`).join(",")})::text,'sha256'),'hex');`);
+  const invariants = invariantTables.map((name) => "scoring_authority." + name);
+  const setupTables = ["scoring_authority.tournament_setup_course_tees_v1",
+    "scoring_authority.tournament_setup_course_holes_v1", "scoring_authority.tournament_setup_round_courses_v1",
+    "scoring_authority.tournament_setup_match_details_v1", "production_control.tournament_setup_context_v1",
+    "production_control.tournament_setup_operation_receipts_v1", "production_control.tournament_setup_audit_events_v1"];
+  const beforeInstall = fingerprint([...invariants, ...setupTables]);
+  const guardBefore = sql(cluster, database,
+    "select pg_get_functiondef('production_control.tournament_setup_dependency_codes_v1(text,text,integer,text,text)'::regprocedure);");
+  sqlFile(cluster, database, identicalAdoptionMigration);
+  assert.equal(fingerprint([...invariants, ...setupTables]), beforeInstall, "installation creates no domain state");
+  assert.equal(sql(cluster, database,
+    "select pg_get_functiondef('production_control.tournament_setup_dependency_codes_v1(text,text,integer,text,text)'::regprocedure);"), guardBefore);
+  const beforeAdoption = fingerprint(invariants);
+  const certificate = (course) => JSON.parse(sql(cluster, database,
+    `select production_control.certify_identical_legacy_course_adoption_v1('2026',${json(course)})::text;`));
+  const makeRequest = (course, revision = 0, id = 1) => scope("UPSERT_COURSE", {
+    expected_revision: revision,
+    operation_request_id: `60000000-0000-4000-8000-${String(id).padStart(12, "0")}`,
+    request_payload_hash: String(id % 10).repeat(64), course,
+  });
+  const mutate = (input) => rpc(cluster, database, "mutate_production_tournament_setup_v1", input);
+  for (const course of identicalLegacyCourses) {
+    const proof = certificate(course);
+    assert.equal(proof.eligible, true);
+    assert.equal(proof.orderedHoleFingerprint, course.fingerprint);
+    assert.equal(proof.matchCount, course.matchCount);
+    assert.equal(certificate({ ...course, holes: [...course.holes].reverse() }).eligible, true,
+      "input order normalizes by hole number");
+  }
+  const r2 = identicalLegacyCourses[0], r3 = identicalLegacyCourses[1];
+  const assertBlocked = (course, before = "", label = "") => {
+    let result;
+    try {
+      result = JSON.parse(sql(cluster, database, `begin; ${before}
+        select public.mutate_production_tournament_setup_v1(${json(makeRequest(course))})::text;
+        rollback;`));
+    } catch (error) {
+      assert.match(error.message, /TOURNAMENT_SETUP_(COURSE_SCORING_VALUES_INVALID|HOLE_NUMBER_STROKE_INDEX_INCOMPLETE|HOLE_DEFINITION_INVALID)/, label);
+      return;
+    }
+    assert.equal(result.ok, false, label);
+    assert.ok(result.blockers?.some((code) => ["ODDS_PUBLICATION_DEPENDENCY",
+      "STARTED_MATCH_DEPENDENCY", "ACTIVE_SCORING_ACCESS_DEPENDENCY",
+      "NET_SKINS_RESULT_DEPENDENCY", "CALCUTTA_AUCTION_DEPENDENCY"].includes(code)), JSON.stringify(result));
+  };
+  for (const [field, value] of [["course_id","OCGC01"],["tee","Gold"],["rating",72.8],["slope",139]]) {
+    assertBlocked({ ...r2, [field]: value }, "", field);
+  }
+  assertBlocked({ ...r2, par: 73, holes: r2.holes.map((h,i) => i ? h : { ...h, par: 5 }) }, "", "par");
+  for (const field of ["par", "stroke_index", "yardage"]) {
+    const changed = structuredClone(r2);
+    if (field === "yardage") changed.holes[0].yardage++;
+    else [changed.holes[0][field], changed.holes[1][field]] = [changed.holes[1][field], changed.holes[0][field]];
+    assertBlocked(changed, "", field);
+  }
+  assertBlocked({ ...r2, holes: r2.holes.slice(0,17) }, "", "partial holes");
+  assertBlocked({ ...r2, round_numbers: [2,3] }, "", "round overreach");
+  const unsafeStates = [
+    "update scoring_authority.scoring_snapshots set rating=72.8 where match_id='2026-R2-6';",
+    "update scoring_authority.scoring_snapshots set course_id='OCGC01' where match_id='2026-R2-6';",
+    "update scoring_authority.scoring_snapshots set hole_definitions='[]' where match_id='2026-R2-6';",
+    "delete from scoring_authority.match_holes where match_id='2026-R2-6' and hole_number=18;",
+    "update scoring_authority.match_holes set yardage=yardage+1 where match_id='2026-R2-6' and hole_number=18;",
+    "update scoring_authority.match_holes set snapshot_id='old' where match_id='2026-R2-6';",
+    ...["status='LIVE'", "status='FINAL'", "scored_holes=1", "current_hole=1", "holes_remaining=17",
+      "scoring_locked=true", "unresolved_mutations=1", "result_winner='Team 1'", "running_result='1 UP'",
+      "team_1_holes_won=1", "scorecard_complete=true", "clinched=true", "finalized_at=now()"]
+      .map((change) => `update scoring_authority.matches set ${change} where match_id='2026-R2-6';`),
+    "insert into scoring_authority.hole_scores values ('2026-R2-6');",
+    "insert into scoring_authority.score_mutations values ('2026-R2-6','test','CONTROL',repeat('f',64),0,1,'{}','CB01');",
+    "insert into scoring_authority.finalized_scorecard_snapshots(match_id,state) values ('2026-R2-6','SUPERSEDED');",
+    "insert into scoring_authority.scoring_ingress_leases(tournament_id,match_id,expires_at) values ('2026','2026-R2-6',now()+interval '5 minutes');",
+    "insert into scoring_authority.scoring_permissions values ('2026-R2-6','CB01',true,1,null,now());",
+    "insert into scoring_authority.scoring_permissions values ('2026-R2-6','CB01',false,1,null,now());",
+    "insert into scoring_authority.scoring_permissions values ('2026-R2-6','CB01',false,2,now(),now());",
+    `insert into scoring_authority.tournament_setup_course_tees_v1
+      (tournament_id,course_id,tee_id,display_name,rating,slope,par,setup_revision,updated_by_player_id)
+      values ('2026','OTHER','Gold','Other',74,150,72,1,'CB01');
+      insert into scoring_authority.tournament_setup_match_details_v1
+      (match_id,tournament_id,round_number,match_number,course_id,tee_id,setup_revision,
+      prepared_setup_revision,prepared_configuration_fingerprint,updated_by_player_id)
+      values ('2026-R2-6','2026',2,6,'OTHER','Gold',1,1,repeat('f',64),'CB01');`,
+  ];
+  for (const state of unsafeStates) assertBlocked(r2, state, state);
+  for (const [status, publication] of [["PENDING","NOT_READY"],["RUNNING","NOT_READY"],
+    ["RETRYABLE","NOT_READY"],["SUCCEEDED","READY"]]) {
+    assertBlocked(r2, `insert into scoring_authority.odds_calculation_jobs values ('2026','${status}','${publication}');`, status);
+  }
+  // Other-domain dependencies and the global guard are never removed.
+  assertBlocked(r2, "update scoring_authority.calcutta_v1_current set auction_revision=1;", "Calcutta");
+  assertBlocked(r2, "insert into scoring_authority.net_skins_v1_recalculation_jobs values ('2026',2,'PENDING');", "Net Skins");
+  assert.equal(fingerprint([...invariants, ...setupTables]), beforeInstall, "all failed attempts are inert");
+
+  // An in-flight job owns the existing shared runtime lock. Adoption waits,
+  // then sees the committed job rather than bypassing it on an old read.
+  const job = spawn(bin.psql, ["-X","-qAt","-v","ON_ERROR_STOP=1","-d",database], { env: environment(cluster) });
+  let output = "", errors = "";
+  const locked = new Promise((resolve, reject) => {
+    job.stdout.on("data", (data) => { output += data; if (output.includes("JOB_LOCK_HELD")) resolve(); });
+    job.stderr.on("data", (data) => { errors += data; });
+    job.on("error", reject);
+    job.on("exit", (code) => { if (!output.includes("JOB_LOCK_HELD")) reject(new Error(errors || String(code))); });
+  });
+  const jobDone = new Promise((resolve) => job.on("exit", resolve));
+  job.stdin.end(`begin; select pg_advisory_xact_lock_shared(731102026031::bigint);
+    insert into scoring_authority.odds_calculation_jobs values ('2026','PENDING','NOT_READY');
+    select 'JOB_LOCK_HELD'; select pg_sleep(0.5); commit;`);
+  await locked;
+  const raced = mutate(makeRequest(r2));
+  assert.equal(raced.ok, false);
+  assert.ok(raced.blockers.includes("ODDS_PUBLICATION_DEPENDENCY"));
+  assert.equal(await jobDone, 0, errors);
+  sql(cluster, database, "delete from scoring_authority.odds_calculation_jobs;");
+
+  // A terminal rehearsal job and another year's job are not active 2026 work.
+  sql(cluster, database, `insert into scoring_authority.odds_calculation_jobs values
+    ('2026','SUCCEEDED','REHEARSAL_ONLY'),('2027','PENDING','NOT_READY');`);
+  const beforeAllowed = fingerprint(invariants);
+  const first = mutate(makeRequest(r2));
+  assert.equal(first.ok, true);
+  assert.equal(first.revision, 1);
+  assert.deepEqual(first.warnings, ["ODDS_PUBLICATION_REVIEW_REQUIRED"]);
+  assert.equal(first.snapshotPrepared, false);
+  assert.equal(first.scoringMutationCreated, false);
+  const retry = mutate(makeRequest(r2));
+  assert.equal(retry.idempotent, true);
+  assert.equal(retry.revision, 1);
+  assert.equal(mutate({ ...makeRequest(r2), course: { ...r2, slope: 139 } }).code,
+    "TOURNAMENT_SETUP_IDEMPOTENCY_CONFLICT");
+  assert.equal(mutate(makeRequest(r3,0,2)).code, "TOURNAMENT_SETUP_REVISION_STALE");
+  const second = mutate(makeRequest(r3,1,2));
+  assert.equal(second.ok, true);
+  assert.equal(second.revision, 2);
+  assert.deepEqual(second.warnings, ["ODDS_PUBLICATION_REVIEW_REQUIRED"]);
+  assert.equal(mutate(makeRequest(r3,1,2)).idempotent, true);
+  assert.equal(fingerprint(invariants), beforeAllowed, "all domain facts and publication bits unchanged");
+
+  const after = rpc(cluster, database, "read_production_tournament_setup_v1",
+    scope("READ_PRODUCTION_TOURNAMENT_SETUP_V1"));
+  for (const course of identicalLegacyCourses) {
+    const row = after.data.courses.find((item) => item.courseId === course.course_id);
+    assert.equal(row.setupManaged, true);
+    const result = JSON.parse(sql(cluster, database, `
+      select jsonb_build_object(
+        'holes',production_control.legacy_course_adoption_holes_v1(jsonb_agg(
+          jsonb_build_object('hole_number',hole_number,'par',par,'stroke_index',stroke_index,'yardage',yardage)
+          order by hole_number)),
+        'fingerprint',encode(extensions.digest(production_control.legacy_course_adoption_holes_v1(jsonb_agg(
+          jsonb_build_object('hole_number',hole_number,'par',par,'stroke_index',stroke_index,'yardage',yardage)
+          order by hole_number))::text,'sha256'),'hex'))
+      from scoring_authority.tournament_setup_course_holes_v1 where course_id='${course.course_id}';`));
+    assert.deepEqual(result.holes, course.holes);
+    assert.equal(result.fingerprint, course.fingerprint);
+    // The unchanged exact inputs produce the same canonical Course Handicap.
+    assert.equal(sql(cluster, database, `
+      select bool_and((h.tournament_handicap*c.slope/113+(c.rating-c.par)) =
+        (h.tournament_handicap*s.slope/113+(s.rating-s.par)))
+      from scoring_authority.tournament_setup_course_tees_v1 c
+      join scoring_authority.scoring_snapshots s on s.course_id=c.course_id and s.tee=c.tee_id
+      cross join scoring_authority.handicap_revision_entries h where c.course_id='${course.course_id}';`), "t");
+  }
+  assert.equal(sql(cluster, database, `select concat_ws('|',
+    (select count(*) from production_control.tournament_setup_operation_receipts_v1),
+    (select count(*) from production_control.tournament_setup_audit_events_v1),
+    (select count(*) from scoring_authority.tournament_setup_match_details_v1 where starting_hole is not null
+      or prepared_setup_revision is not null), production_control.tournament_setup_revision_v1('2026'));`), "2|2|0|2");
+  const material = mutate(makeRequest({ ...r2, rating: 72.8 }, 2, 3));
+  assert.equal(material.ok, false);
+  assert.ok(material.blockers.includes("ODDS_PUBLICATION_DEPENDENCY"));
+  for (const role of ["anon","authenticated","service_role"]) {
+    assert.equal(sql(cluster, database, `select has_function_privilege('${role}',
+      'production_control.certify_identical_legacy_course_adoption_v1(text,jsonb)','execute');`), "f");
+  }
+  for (const overrides of [{ environment: "PREVIEW" }, { tournament_id: "2027" },
+    { authorization: { ...scope("").authorization, role: "PARTICIPANT" } }]) {
+    assert.throws(() => mutate({ ...makeRequest(r2,2,4), ...overrides }), /FIXTURE_DIRECTOR_SCOPE_REQUIRED/);
+  }
+  assert.equal(sql(cluster, database, `select bool_and(relrowsecurity) from pg_class
+    where oid in ('scoring_authority.tournament_setup_course_tees_v1'::regclass,
+      'scoring_authority.tournament_setup_course_holes_v1'::regclass,
+      'production_control.tournament_setup_operation_receipts_v1'::regclass);`), "t");
+  assert.equal(sql(cluster, database, `select bool_and(prosecdef and proconfig @> array['search_path=pg_catalog'])
+    from pg_proc where oid in (
+      'production_control.legacy_course_adoption_holes_v1(jsonb)'::regprocedure,
+      'production_control.certify_identical_legacy_course_adoption_v1(text,jsonb)'::regprocedure);`), "t");
+  sql(cluster, database, "delete from scoring_authority.odds_calculation_jobs;");
+  assert.equal(fingerprint(invariants), beforeAdoption);
 });
