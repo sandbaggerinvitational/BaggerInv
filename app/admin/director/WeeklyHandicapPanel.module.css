@@ -40,12 +40,226 @@
 }
 
 .heading p,
-.review p {
+.review p,
+.sourceWorkspace p {
   max-width: 680px;
   margin: 0;
   color: #60736d;
   font-size: .74rem;
   line-height: 1.5;
+}
+
+.sourceWorkspace {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #c9d9d1;
+  border-radius: 14px;
+  background: #f0f7f3;
+}
+
+.sourceWorkspace > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.sourceWorkspace > header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.sourceWorkspace > header span,
+.sourceWorkspace label > span {
+  color: #526b63;
+  font-size: .61rem;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.sourceWorkspace h3 {
+  margin: 0;
+  font: 700 1.08rem Georgia, serif;
+}
+
+.sourceWorkspace button,
+.sourceEditor input,
+.stageActions button {
+  box-sizing: border-box;
+  min-height: 44px;
+  border: 1px solid #0b4938;
+  border-radius: 9px;
+  font: inherit;
+}
+
+.sourceWorkspace button,
+.stageActions button {
+  padding: 8px 12px;
+  background: #0b4938;
+  color: #fff;
+  font-size: .69rem;
+  font-weight: 900;
+}
+
+.sourceWorkspace button:disabled,
+.stageActions button:disabled {
+  opacity: .5;
+}
+
+.sourceSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(110px, .35fr)) minmax(180px, 1fr);
+  gap: 8px;
+}
+
+.sourceSummary article {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.sourceSummary small {
+  color: #60736d;
+  font-size: .56rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sourceTable {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #c9d9d1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.sourceTable table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
+.sourceTable th,
+.sourceTable td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e5ebe7;
+  color: #526b63;
+  font-size: .65rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sourceTable thead th {
+  background: #eef3f0;
+  font-size: .55rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.sourceTable tbody tr:last-child > * { border-bottom: 0; }
+
+.sourceMeta {
+  display: grid;
+  gap: 2px;
+}
+
+.sourceMeta small {
+  color: #7b8a85;
+  font-size: .55rem;
+}
+
+.sourceTable tbody th button {
+  display: grid;
+  min-width: 150px;
+  border: 0;
+  background: transparent;
+  color: #173c30;
+  text-align: left;
+}
+
+.sourceTable tbody th button span {
+  color: #60736d;
+  font-size: .56rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.sourceEditor {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(130px, 1fr));
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #c9d9d1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.sourceEditor > header {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 3px;
+}
+
+.sourceEditor > label:not(.sourceConfirm) {
+  display: grid;
+  gap: 5px;
+}
+
+.sourceEditor input {
+  width: 100%;
+  padding: 0 10px;
+  background: #fff;
+  color: #173c30;
+  font-size: 16px;
+}
+
+.sourceConfirm {
+  display: flex;
+  grid-column: span 2;
+  align-items: center;
+  gap: 8px;
+}
+
+.sourceConfirm input { width: 20px; min-height: 20px; }
+
+.sourceActions {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 8px;
+}
+
+.sourceActions button:last-child {
+  background: #fff;
+  color: #8e342a;
+  border-color: #b95b4d;
+}
+
+.sourceEditor > button { align-self: end; }
+
+.sourceHint {
+  margin: 0;
+  padding: 10px;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.stageActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stageActions .reviewButton { min-height: 50px; }
+
+.stageActions > button:last-child {
+  min-height: 50px;
+  border-color: #88671e;
+  background: #fff8e7;
+  color: #71571d;
 }
 
 .heading > div:last-child {
@@ -632,6 +846,12 @@
     grid-template-columns: 1fr;
   }
 
+  .sourceWorkspace > header { flex-direction: column; }
+  .sourceWorkspace > header > button { width: 100%; }
+  .sourceSummary { grid-template-columns: 1fr 1fr; }
+  .sourceSummary > button { grid-column: 1 / -1; }
+  .sourceEditor { grid-template-columns: 1fr 1fr; }
+
   .review > ul li small,
   .history code {
     text-align: left;
@@ -642,7 +862,10 @@
   .bulkEditor,
   .reviewActions,
   .review dl,
-  .receipt dl {
+  .receipt dl,
+  .sourceSummary,
+  .sourceEditor,
+  .stageActions {
     grid-template-columns: 1fr;
   }
 
@@ -650,4 +873,11 @@
     grid-column: 1;
     width: 100%;
   }
+
+  .sourceSummary > button,
+  .sourceConfirm,
+  .sourceActions,
+  .sourceEditor > header { grid-column: 1; }
+
+  .sourceActions { flex-direction: column; }
 }

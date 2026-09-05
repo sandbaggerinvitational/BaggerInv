@@ -43,6 +43,11 @@ function handicapLabel(decimal, fallback = null) {
   return fallback === null || fallback === undefined ? "—" : String(fallback);
 }
 
+function sourceHandicapLabel(decimal) {
+  const value = handicapLabel(decimal);
+  return value.startsWith("-") ? `+${value.slice(1)}` : value;
+}
+
 function matchLabel(match) {
   const round = match.roundNumber ? `R${match.roundNumber}` : "Round ?";
   const number = match.matchNumber ? `M${match.matchNumber}` : match.matchId;
@@ -91,6 +96,13 @@ export default function WeeklyHandicapPanel({ onOperation }) {
   const [review, setReview] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
   const [latestReceipt, setLatestReceipt] = useState(null);
+  const [sourcePlayerId, setSourcePlayerId] = useState("");
+  const [ghinNumber, setGhinNumber] = useState("");
+  const [currentIndex, setCurrentIndex] = useState("");
+  const [lowIndex, setLowIndex] = useState("");
+  const [lowIndexDate, setLowIndexDate] = useState("");
+  const [replaceConfirmed, setReplaceConfirmed] = useState(false);
+  const [sourceBusy, setSourceBusy] = useState(false);
   const operationIdentities = useRef(null);
 
   const identityRegistry = useCallback(() => {
@@ -129,6 +141,12 @@ export default function WeeklyHandicapPanel({ onOperation }) {
   );
   const summary = useMemo(() => weeklyHandicapDraftSummary(rows), [rows]);
   const changedRows = useMemo(() => rows.filter((row) => row.changed), [rows]);
+  const sourcePlayers = data?.sourceEvidence?.players || [];
+  const sourceByPlayer = useMemo(
+    () => new Map(sourcePlayers.map((player) => [player.playerId, player])),
+    [sourcePlayers],
+  );
+  const selectedSource = sourceByPlayer.get(sourcePlayerId) || null;
   const editorLocked = ["staging", "validating", "review", "approving"].includes(phase);
 
   const invalidateReview = () => {
@@ -163,6 +181,85 @@ export default function WeeklyHandicapPanel({ onOperation }) {
     return { payload, operationRequestId: operation.operationRequestId };
   };
 
+  const selectSourcePlayer = (playerId) => {
+    const source = sourceByPlayer.get(playerId);
+    setSourcePlayerId(playerId);
+    setGhinNumber("");
+    setCurrentIndex(source?.currentIndexDecimal !== null && source?.currentIndexDecimal !== undefined
+      ? sourceHandicapLabel(source.currentIndexDecimal)
+      : "");
+    setLowIndex(source?.lowIndexDecimal !== null && source?.lowIndexDecimal !== undefined
+      ? sourceHandicapLabel(source.lowIndexDecimal)
+      : "");
+    setLowIndexDate(source?.lowIndexDate || "");
+    setReplaceConfirmed(false);
+  };
+
+  const saveGhinIdentity = async () => {
+    if (!selectedSource || !ghinNumber.trim()) return;
+    setSourceBusy(true); setMessage("");
+    try {
+      await post("set-ghin-identity", {
+        playerId: selectedSource.playerId,
+        ghinNumber,
+        expectedIdentityId: selectedSource.identityId || null,
+        replaceConfirmed,
+      });
+      setMessage(`Verified GHIN identity saved for ${selectedSource.displayName || selectedSource.playerId}.`);
+      await load();
+      setGhinNumber(""); setReplaceConfirmed(false);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "GHIN identity was not saved.");
+    } finally { setSourceBusy(false); }
+  };
+
+  const retireGhinIdentity = async () => {
+    if (!selectedSource?.identityId || !window.confirm(
+      `Retire the verified GHIN identity for ${selectedSource.displayName || selectedSource.playerId}? Existing evidence will be preserved.`,
+    )) return;
+    setSourceBusy(true); setMessage("");
+    try {
+      await post("retire-ghin-identity", {
+        playerId: selectedSource.playerId,
+        expectedIdentityId: selectedSource.identityId,
+        retirementConfirmed: true,
+      });
+      setMessage("GHIN identity retired. Historical source evidence remains preserved.");
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "GHIN identity was not retired.");
+    } finally { setSourceBusy(false); }
+  };
+
+  const saveManualSource = async () => {
+    if (!selectedSource?.identityId) return;
+    setSourceBusy(true); setMessage("");
+    try {
+      await post("save-manual-source", {
+        playerId: selectedSource.playerId,
+        expectedIdentityId: selectedSource.identityId,
+        expectedPointerRevision: selectedSource.pointerRevision,
+        currentIndex,
+        lowIndex,
+        lowIndexDate,
+      });
+      setMessage(`Manual Current HI and Low HI evidence recorded for ${selectedSource.displayName || selectedSource.playerId}.`);
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Handicap source evidence was not saved.");
+    } finally { setSourceBusy(false); }
+  };
+
+  const applyHybridProposals = () => {
+    if (!data.sourceEvidence.complete) return;
+    setProposals(Object.fromEntries(data.players.map((player) => [
+      player.playerId,
+      sourceByPlayer.get(player.playerId)?.hybridDecimal || "",
+    ])));
+    invalidateReview();
+    setMessage("Hybrid values loaded as draft proposals. Review or adjust them before staging.");
+  };
+
   const applyBulkPaste = () => {
     const result = parseWeeklyHandicapBulkPaste(bulkValue, data?.players || []);
     setBulkErrors(result.errors);
@@ -173,7 +270,7 @@ export default function WeeklyHandicapPanel({ onOperation }) {
     setMessage(`${Object.keys(result.updates).length} proposed handicap${Object.keys(result.updates).length === 1 ? "" : "s"} applied for review.`);
   };
 
-  const stageAndValidate = async () => {
+  const stageAndValidate = async ({ fromHybrid = false } = {}) => {
     setMessage(""); setServerIssues([]); setConfirmed(false);
     if (!effectiveDate) {
       setMessage("Choose an effective date before staging this weekly revision.");
@@ -187,20 +284,28 @@ export default function WeeklyHandicapPanel({ onOperation }) {
       setMessage("Enter at least one changed handicap before staging this revision.");
       return;
     }
+    if (fromHybrid && !data.sourceEvidence.complete) {
+      setMessage("Complete accepted Current HI and Low HI evidence is required for every active Player.");
+      return;
+    }
     try {
       let staged = stagedRevision;
       if (!staged) {
         setPhase("staging");
-        const stagedResponse = await post("stage", {
+        const stageInput = {
           expectedRevision: data.revision,
           effectiveDate,
+          expectedSourceFingerprint: fromHybrid ? data.sourceEvidence.sourceFingerprint : undefined,
           entries: rows.map((row) => ({
             playerId: row.playerId,
             proposedHandicap: row.proposedDecimal,
             sourceIndex: row.sourceIndexDecimal,
             lowIndex: row.lowIndexDecimal,
           })),
-        });
+        };
+        const stagedResponse = fromHybrid
+          ? await post("stage-hybrid-draft", stageInput)
+          : await post("stage", stageInput);
         staged = weeklyHandicapRevisionFromResponse(stagedResponse.payload);
         if (!staged.revisionId) throw new Error("The staged handicap revision did not return its revision ID.");
         setStagedRevision(staged);
@@ -318,6 +423,29 @@ export default function WeeklyHandicapPanel({ onOperation }) {
       <div><small>Approved revision</small><strong>{data.revision}</strong><span>{data.tournamentYear || data.tournamentId}</span></div>
     </header>
 
+    <section className={styles.sourceWorkspace} aria-labelledby="handicap-source-title">
+      <header><div><span>Proposal evidence</span><h3 id="handicap-source-title">GHIN identity &amp; Hybrid source</h3><p>Current HI and Low HI remain private proposal evidence. Only an approved handicap revision affects scoring.</p></div><button type="button" disabled aria-disabled="true">GHIN Auto Refresh — Pending Provider Authorization</button></header>
+      <div className={styles.sourceSummary}>
+        <article><small>Source coverage</small><strong>{data.sourceEvidence.coverageCount}/{data.sourceEvidence.rosterCount || data.players.length}</strong></article>
+        <article><small>Hybrid draft</small><strong>{data.sourceEvidence.complete ? "Ready" : "Incomplete"}</strong></article>
+        <button type="button" disabled={!data.sourceEvidence.complete || editorLocked} onClick={applyHybridProposals}>Use Hybrid proposals</button>
+      </div>
+      <div className={styles.sourceTable} role="region" aria-label="Private handicap source evidence" tabIndex="0"><table><thead><tr><th>Player</th><th>GHIN #</th><th>Current HI</th><th>Low HI</th><th>Low date</th><th>Hybrid</th><th>Approved</th><th>Source</th></tr></thead><tbody>{data.players.map((player) => {
+        const source = sourceByPlayer.get(player.playerId) || {};
+        return <tr key={player.playerId}><th scope="row"><button type="button" onClick={() => selectSourcePlayer(player.playerId)} aria-label={`Edit private handicap source for ${player.displayName}`}>{player.displayName}<span>{player.playerId}</span></button></th><td data-label="GHIN #">{source.maskedGhinNumber || "Not mapped"}</td><td data-label="Current HI">{sourceHandicapLabel(source.currentIndexDecimal)}</td><td data-label="Low HI">{sourceHandicapLabel(source.lowIndexDecimal)}</td><td data-label="Low date">{source.lowIndexDate || "—"}</td><td data-label="Hybrid"><strong>{sourceHandicapLabel(source.hybridDecimal)}</strong></td><td data-label="Approved"><strong>{handicapLabel(player.currentHandicapDecimal, player.currentHandicap)}</strong></td><td data-label="Source"><span className={styles.sourceMeta}>{source.stale ? "Stale — previous evidence" : source.provenance === "DIRECTOR_MANUAL" ? "Director manual" : source.sourceState === "COMPLETE" ? source.provenance : "Missing"}<small>{source.observedAt ? timestamp(source.observedAt) : "Not recorded"}</small></span></td></tr>;
+      })}</tbody></table></div>
+      {selectedSource ? <form className={styles.sourceEditor} onSubmit={(event) => event.preventDefault()}>
+        <header><strong>{selectedSource.displayName || selectedSource.playerId}</strong><span>{selectedSource.identityId ? `Verified · ${selectedSource.maskedGhinNumber}` : "No GHIN mapping"}</span></header>
+        <label><span>{selectedSource.identityId ? "Replacement GHIN Number" : "GHIN Number"}</span><input inputMode="numeric" autoComplete="off" value={ghinNumber} onChange={(event) => setGhinNumber(event.target.value)} placeholder="Digits only" /></label>
+        {selectedSource.identityId ? <label className={styles.sourceConfirm}><input type="checkbox" checked={replaceConfirmed} onChange={(event) => setReplaceConfirmed(event.target.checked)} /><span>I confirm this verified identity replacement.</span></label> : null}
+        <div className={styles.sourceActions}><button type="button" disabled={sourceBusy || !ghinNumber.trim() || Boolean(selectedSource.identityId && !replaceConfirmed)} onClick={saveGhinIdentity}>{selectedSource.identityId ? "Replace mapping" : "Verify mapping"}</button>{selectedSource.identityId ? <button type="button" disabled={sourceBusy} onClick={retireGhinIdentity}>Retire mapping</button> : null}</div>
+        <label><span>Current HI</span><input inputMode="decimal" value={currentIndex} disabled={!selectedSource.identityId} onChange={(event) => setCurrentIndex(event.target.value)} placeholder="12.2 or +0.8" /></label>
+        <label><span>Low HI</span><input inputMode="decimal" value={lowIndex} disabled={!selectedSource.identityId} onChange={(event) => setLowIndex(event.target.value)} placeholder="10.8 or +1.0" /></label>
+        <label><span>Low HI date</span><input type="date" value={lowIndexDate} disabled={!selectedSource.identityId} onChange={(event) => setLowIndexDate(event.target.value)} /></label>
+        <button type="button" disabled={sourceBusy || !selectedSource.identityId || !currentIndex.trim() || !lowIndex.trim() || !lowIndexDate} onClick={saveManualSource}>Record manual source evidence</button>
+      </form> : <p className={styles.sourceHint}>Choose a Player to manage the private GHIN identity or append manual source evidence.</p>}
+    </section>
+
     <div className={styles.controls}>
       <label htmlFor="weekly-handicap-effective-date"><span>Effective date</span><input id="weekly-handicap-effective-date" type="date" value={effectiveDate} disabled={editorLocked} onChange={(event) => { setEffectiveDate(event.target.value); invalidateReview(); }} /></label>
       <div className={styles.bulkEditor}><label htmlFor="weekly-handicap-bulk"><span>Bulk paste</span><small>One Player ID and handicap per line; tab or comma separated.</small></label>
@@ -357,7 +485,7 @@ export default function WeeklyHandicapPanel({ onOperation }) {
       <ul>{review.changedRows.map((row) => <li key={row.playerId}><strong>{row.displayName}</strong><span>{handicapLabel(row.currentHandicapDecimal, row.currentHandicap)} → {handicapLabel(row.proposedDecimal, row.proposedHandicap)}</span><small>{row.affectedMatches.length ? row.affectedMatches.map(matchLabel).join(" · ") : "No scheduled match affected"}</small></li>)}</ul>
       <label className={styles.confirmation}><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed every changed player, the effective date, and all affected matches.</span></label>
       <div className={styles.reviewActions}><button type="button" disabled={phase === "approving"} onClick={() => { setReview(null); setStagedRevision(null); setConfirmed(false); setPhase("editing"); }}>Back to edit</button><button type="button" disabled={!confirmed || phase === "approving"} onClick={approve}>{phase === "approving" ? "Approving…" : "Approve weekly revision"}</button></div>
-    </section> : <button className={styles.reviewButton} type="button" disabled={["staging", "validating", "approving"].includes(phase)} onClick={stageAndValidate}>{phase === "staging" ? "Staging…" : phase === "validating" ? "Validating…" : stagedRevision ? "Retry server validation" : "Stage & review changes"}</button>}
+    </section> : <div className={styles.stageActions}><button className={styles.reviewButton} type="button" disabled={["staging", "validating", "approving"].includes(phase)} onClick={() => stageAndValidate()}>{phase === "staging" ? "Staging…" : phase === "validating" ? "Validating…" : stagedRevision ? "Retry server validation" : "Stage & review changes"}</button><button type="button" disabled={!data.sourceEvidence.complete || ["staging", "validating", "approving"].includes(phase)} onClick={() => stageAndValidate({ fromHybrid: true })}>Create Handicap Draft from Hybrid</button></div>}
 
     {message ? <p className={styles.message} data-error={phase === "failure" ? "true" : undefined} role={phase === "failure" ? "alert" : "status"}>{message}</p> : null}
 
