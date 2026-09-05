@@ -103,6 +103,10 @@ export default function WeeklyHandicapPanel({ onOperation }) {
   const [lowIndexDate, setLowIndexDate] = useState("");
   const [replaceConfirmed, setReplaceConfirmed] = useState(false);
   const [sourceBusy, setSourceBusy] = useState(false);
+  const [bulkSourceValue, setBulkSourceValue] = useState("");
+  const [bulkSourcePreview, setBulkSourcePreview] = useState(null);
+  const [bulkSourceConfirmed, setBulkSourceConfirmed] = useState(false);
+  const [bulkSourceBusy, setBulkSourceBusy] = useState(false);
   const operationIdentities = useRef(null);
 
   const identityRegistry = useCallback(() => {
@@ -148,6 +152,7 @@ export default function WeeklyHandicapPanel({ onOperation }) {
   );
   const selectedSource = sourceByPlayer.get(sourcePlayerId) || null;
   const editorLocked = ["staging", "validating", "review", "approving"].includes(phase);
+  const sourceMutationBusy = sourceBusy || bulkSourceBusy;
 
   const invalidateReview = () => {
     setStagedRevision(null);
@@ -259,6 +264,54 @@ export default function WeeklyHandicapPanel({ onOperation }) {
     invalidateReview();
     setMessage("Hybrid values loaded as draft proposals. Review or adjust them before staging.");
   };
+
+  const previewBulkSource = async () => {
+    if (!bulkSourceValue.trim()) return;
+    setBulkSourceBusy(true); setBulkSourceConfirmed(false); setMessage("");
+    try {
+      const response = await post("preview-bulk-manual-source", { bulkText: bulkSourceValue });
+      const preview = response.payload.data || response.payload.result || response.payload;
+      setBulkSourcePreview(preview);
+      setMessage(preview.ready
+        ? `${preview.readyCount} source row${preview.readyCount === 1 ? " is" : "s are"} ready for confirmation.`
+        : "Correct every invalid bulk source row, then preview again.");
+    } catch (error) {
+      setBulkSourcePreview(null);
+      setMessage(error instanceof Error ? error.message : "Bulk source preview failed.");
+    } finally { setBulkSourceBusy(false); }
+  };
+
+  const saveBulkSource = async () => {
+    if (!bulkSourcePreview?.ready || !bulkSourceConfirmed) return;
+    setBulkSourceBusy(true); setMessage("");
+    try {
+      const response = await post("save-bulk-manual-source", {
+        expectedPreviewFingerprint: bulkSourcePreview.previewFingerprint,
+        entries: bulkSourcePreview.entries,
+      });
+      const result = response.payload.data || response.payload.result || response.payload;
+      setBulkSourceValue(""); setBulkSourcePreview(null); setBulkSourceConfirmed(false);
+      await load();
+      setMessage(`${result.recordedCount} immutable manual source observation${result.recordedCount === 1 ? " was" : "s were"} recorded. Approved handicaps were not changed.`);
+    } catch (error) {
+      setBulkSourceConfirmed(false);
+      setMessage(error instanceof Error ? error.message : "Bulk source evidence was not saved. Preview it again before retrying.");
+    } finally { setBulkSourceBusy(false); }
+  };
+
+  const bulkSourceRows = (bulkSourcePreview?.rows || []).map((row) => {
+    const source = sourceByPlayer.get(row.playerId) || {};
+    const player = data.players.find((candidate) => candidate.playerId === row.playerId);
+    return {
+      ...row,
+      displayName: row.displayName || player?.displayName || row.playerId || `Row ${row.rowNumber}`,
+      maskedGhinNumber: row.maskedGhinNumber || source.maskedGhinNumber || "Not mapped",
+      approvedTournamentHandicap: row.approvedTournamentHandicap ?? player?.currentHandicapDecimal ?? null,
+      existingCurrentIndex: row.existingCurrentIndex ?? source.currentIndexDecimal ?? null,
+      existingLowIndex: row.existingLowIndex ?? source.lowIndexDecimal ?? null,
+      existingLowIndexDate: row.existingLowIndexDate ?? source.lowIndexDate ?? null,
+    };
+  });
 
   const applyBulkPaste = () => {
     const result = parseWeeklyHandicapBulkPaste(bulkValue, data?.players || []);
@@ -438,12 +491,29 @@ export default function WeeklyHandicapPanel({ onOperation }) {
         <header><strong>{selectedSource.displayName || selectedSource.playerId}</strong><span>{selectedSource.identityId ? `Verified · ${selectedSource.maskedGhinNumber}` : "No GHIN mapping"}</span></header>
         <label><span>{selectedSource.identityId ? "Replacement GHIN Number" : "GHIN Number"}</span><input inputMode="numeric" autoComplete="off" value={ghinNumber} onChange={(event) => setGhinNumber(event.target.value)} placeholder="Digits only" /></label>
         {selectedSource.identityId ? <label className={styles.sourceConfirm}><input type="checkbox" checked={replaceConfirmed} onChange={(event) => setReplaceConfirmed(event.target.checked)} /><span>I confirm this verified identity replacement.</span></label> : null}
-        <div className={styles.sourceActions}><button type="button" disabled={sourceBusy || !ghinNumber.trim() || Boolean(selectedSource.identityId && !replaceConfirmed)} onClick={saveGhinIdentity}>{selectedSource.identityId ? "Replace mapping" : "Verify mapping"}</button>{selectedSource.identityId ? <button type="button" disabled={sourceBusy} onClick={retireGhinIdentity}>Retire mapping</button> : null}</div>
+        <div className={styles.sourceActions}><button type="button" disabled={sourceMutationBusy || !ghinNumber.trim() || Boolean(selectedSource.identityId && !replaceConfirmed)} onClick={saveGhinIdentity}>{selectedSource.identityId ? "Replace mapping" : "Verify mapping"}</button>{selectedSource.identityId ? <button type="button" disabled={sourceMutationBusy} onClick={retireGhinIdentity}>Retire mapping</button> : null}</div>
         <label><span>Current HI</span><input inputMode="decimal" value={currentIndex} disabled={!selectedSource.identityId} onChange={(event) => setCurrentIndex(event.target.value)} placeholder="12.2 or +0.8" /></label>
         <label><span>Low HI</span><input inputMode="decimal" value={lowIndex} disabled={!selectedSource.identityId} onChange={(event) => setLowIndex(event.target.value)} placeholder="10.8 or +1.0" /></label>
         <label><span>Low HI date</span><input type="date" value={lowIndexDate} disabled={!selectedSource.identityId} onChange={(event) => setLowIndexDate(event.target.value)} /></label>
-        <button type="button" disabled={sourceBusy || !selectedSource.identityId || !currentIndex.trim() || !lowIndex.trim() || !lowIndexDate} onClick={saveManualSource}>Record manual source evidence</button>
+        <button type="button" disabled={sourceMutationBusy || !selectedSource.identityId || !currentIndex.trim() || !lowIndex.trim() || !lowIndexDate} onClick={saveManualSource}>Record manual source evidence</button>
       </form> : <p className={styles.sourceHint}>Choose a Player to manage the private GHIN identity or append manual source evidence.</p>}
+
+      <section className={styles.bulkSourceWorkspace} aria-labelledby="bulk-source-title">
+        <header><div><span>Manual source evidence</span><h4 id="bulk-source-title">Bulk Current / Low Import</h4><p>Paste stable Player IDs with Current HI, Low HI, and an optional Low HI Date. Previewing never writes data.</p></div></header>
+        <label htmlFor="bulk-source-input"><span>Current / Low source rows</span><small>One Player per line; comma or tab separated. Format: Player ID, Current HI, Low HI, optional YYYY-MM-DD.</small></label>
+        <textarea id="bulk-source-input" value={bulkSourceValue} disabled={sourceMutationBusy || editorLocked} onChange={(event) => { setBulkSourceValue(event.target.value); setBulkSourcePreview(null); setBulkSourceConfirmed(false); }} placeholder={"AM01,10.8,9.7,2026-03-05\nCB01,12.2,10.8,"} />
+        <div className={styles.bulkSourceActions}><button type="button" disabled={!bulkSourceValue.trim() || sourceMutationBusy || editorLocked} onClick={previewBulkSource}>{bulkSourceBusy && !bulkSourcePreview ? "Previewing…" : "Preview Import"}</button></div>
+        {bulkSourcePreview ? <section className={styles.bulkSourcePreview} aria-labelledby="bulk-source-preview-title" aria-live="polite">
+          <header><div><span>Validation preview</span><h4 id="bulk-source-preview-title">Review before saving</h4></div><dl><div><dt>Rows parsed</dt><dd>{bulkSourcePreview.rowsParsed}</dd></div><div><dt>Ready</dt><dd>{bulkSourcePreview.readyCount}</dd></div><div><dt>Invalid</dt><dd>{bulkSourcePreview.invalidCount}</dd></div><div><dt>Replacing</dt><dd>{bulkSourcePreview.replacingCount}</dd></div></dl></header>
+          <div className={styles.bulkSourceTable} role="region" aria-label="Bulk Current and Low import preview" tabIndex="0"><table><thead><tr><th>Player</th><th>Current</th><th>Low</th><th>Low date</th><th>Hybrid</th><th>Approved</th><th>Existing source</th><th>Status</th></tr></thead><tbody>{bulkSourceRows.map((row, index) => {
+            const invalid = !["READY", "WILL_REPLACE_CURRENT_SOURCE"].includes(row.status);
+            const rowKey = `${row.playerId || "row"}-${row.rowNumber || index}`.replace(/[^A-Za-z0-9_-]/g, "-");
+            return <tr key={rowKey} data-invalid={invalid ? "true" : undefined} aria-describedby={`bulk-source-status-${rowKey}`}><th scope="row"><strong>{row.displayName}</strong><span>{row.playerId || `Row ${row.rowNumber}`} · {row.maskedGhinNumber}</span></th><td data-label="Current">{sourceHandicapLabel(row.currentIndex)}</td><td data-label="Low">{sourceHandicapLabel(row.lowIndex)}</td><td data-label="Low date">{row.lowIndexDate || "—"}</td><td data-label="Hybrid"><strong>{sourceHandicapLabel(row.hybrid)}</strong></td><td data-label="Approved">{handicapLabel(row.approvedTournamentHandicap)}</td><td data-label="Existing source">{row.existingCurrentIndex !== null && row.existingCurrentIndex !== undefined ? `${sourceHandicapLabel(row.existingCurrentIndex)} / ${sourceHandicapLabel(row.existingLowIndex)}${row.existingLowIndexDate ? ` · ${row.existingLowIndexDate}` : ""}` : "None"}</td><td data-label="Status"><strong>{row.status === "WILL_REPLACE_CURRENT_SOURCE" ? "Will replace current source" : row.status === "READY" ? "Ready" : row.status === "READY_FOR_SERVER_VALIDATION" ? "Pending re-preview" : "Invalid"}</strong><small id={`bulk-source-status-${rowKey}`}>{row.message}</small></td></tr>;
+          })}</tbody></table></div>
+          <label className={styles.bulkSourceConfirm}><input type="checkbox" checked={bulkSourceConfirmed} disabled={!bulkSourcePreview.ready || sourceMutationBusy} onChange={(event) => setBulkSourceConfirmed(event.target.checked)} /><span>I reviewed every Player, normalized handicap, date, and replacement status.</span></label>
+          <div className={styles.bulkSourceActions}><button type="button" disabled={!bulkSourcePreview.ready || !bulkSourceConfirmed || sourceMutationBusy || editorLocked} onClick={saveBulkSource}>{bulkSourceBusy ? "Saving…" : "Confirm & append observations"}</button></div>
+        </section> : null}
+      </section>
     </section>
 
     <div className={styles.controls}>

@@ -12,12 +12,15 @@ import {
   validateProductionHandicapRevision,
 } from "../../../../lib/production-handicap-management-server.js";
 import {
+  previewProductionBulkManualHandicapSource,
   readProductionHandicapSource,
+  recordProductionBulkManualHandicapSource,
   recordProductionManualHandicapSource,
   retireProductionPlayerGhinIdentity,
   setProductionPlayerGhinIdentity,
   stageProductionHybridHandicapDraft,
 } from "../../../../lib/production-handicap-source-server.js";
+import { parseBulkManualHandicapSource } from "../../../../lib/production-handicap-source-contract.js";
 import {
   dataAuthorityResponseHeaders,
   withDataAuthorityRequestScope,
@@ -30,6 +33,7 @@ const headers = { "Cache-Control": "private, no-store" };
 const REVISION_ACTIONS = new Set(["stage", "validate", "approve"]);
 const SOURCE_ACTIONS = new Set([
   "set-ghin-identity", "retire-ghin-identity", "save-manual-source", "stage-hybrid-draft",
+  "preview-bulk-manual-source", "save-bulk-manual-source",
 ]);
 
 function unavailable() {
@@ -81,11 +85,14 @@ function actor(identity = {}) {
 }
 
 function safeFailure(error) {
+  const code = /^(?:PRODUCTION_)?(?:HANDICAP|GHIN)_[A-Z0-9_]{3,120}$/.test(clean(error?.code))
+    ? clean(error.code)
+    : "PRODUCTION_HANDICAP_OPERATION_FAILED";
   return {
-    error: "The Production handicap operation did not complete.",
-    code: /^(?:PRODUCTION_)?(?:HANDICAP|GHIN)_[A-Z0-9_]{3,120}$/.test(clean(error?.code))
-      ? clean(error.code)
-      : "PRODUCTION_HANDICAP_OPERATION_FAILED",
+    error: code === "PRODUCTION_HANDICAP_SOURCE_BULK_PREVIEW_STALE"
+      ? "Source evidence changed after preview. Preview the bulk import again."
+      : "The Production handicap operation did not complete.",
+    code,
     issues: Array.isArray(error?.diagnostics?.validation?.issues)
       ? error.diagnostics.validation.issues
       : [],
@@ -180,6 +187,36 @@ export async function POST(request) {
           currentIndex: input.currentIndex,
           lowIndex: input.lowIndex,
           lowIndexDate: input.lowIndexDate,
+        });
+      }
+      if (action === "preview-bulk-manual-source") {
+        const parsed = parseBulkManualHandicapSource(input.bulkText);
+        if (parsed.errors.length) {
+          return {
+            ok: true,
+            code: "PRODUCTION_HANDICAP_SOURCE_BULK_PREVIEW_INVALID",
+            ready: false,
+            rowsParsed: parsed.rowsParsed,
+            readyCount: 0,
+            invalidCount: parsed.errors.length,
+            replacingCount: 0,
+            previewFingerprint: null,
+            entries: [],
+            rows: parsed.rows,
+            errors: parsed.errors,
+          };
+        }
+        return previewProductionBulkManualHandicapSource({
+          ...actor(access.identity),
+          entries: parsed.entries,
+        });
+      }
+      if (action === "save-bulk-manual-source") {
+        return recordProductionBulkManualHandicapSource({
+          ...actor(access.identity),
+          operationRequestId: input.operationRequestId,
+          expectedPreviewFingerprint: input.expectedPreviewFingerprint,
+          entries: input.entries,
         });
       }
       if (action === "stage-hybrid-draft") {

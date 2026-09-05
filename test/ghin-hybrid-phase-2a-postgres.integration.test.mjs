@@ -10,6 +10,7 @@ import test from "node:test";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migrations = path.join(root, "supabase", "production_migrations");
 const migration091 = "202609050091_production_ghin_hybrid_foundation_v1.sql";
+const migration092 = "202609050092_production_handicap_source_bulk_import_v1.sql";
 const annualPredecessor = "202608300068_production_future_participant_identity_runtime_v1.sql";
 const hashPredecessor = "202608310080_production_prediction_settings_authoring_v1.sql";
 const providerInventory = "202608260038_production_provider_preview_target_inventory_v4.sql";
@@ -145,6 +146,7 @@ test("Phase 2A PostgreSQL contract is inert, private, append-only, idempotent, a
   seed(cluster, database);
   const before = sql(cluster, database, "select concat_ws('|',(select revision_number from scoring_authority.handicap_revision_current where tournament_id='2026'),(select count(*) from scoring_authority.handicap_revisions),(select count(*) from scoring_authority.match_participants),(select count(*) from scoring_authority.hole_scores))");
   sqlFile(cluster, database, path.join(migrations, migration091));
+  sqlFile(cluster, database, path.join(migrations, migration092));
   assert.equal(sql(cluster, database, "select concat_ws('|',(select revision_number from scoring_authority.handicap_revision_current where tournament_id='2026'),(select count(*) from scoring_authority.handicap_revisions),(select count(*) from scoring_authority.match_participants),(select count(*) from scoring_authority.hole_scores))"), before);
   assert.equal(sql(cluster, database, "select concat_ws('|',(select count(*) from production_control.player_external_identities_v1),(select count(*) from production_control.handicap_source_observations_v1),(select count(*) from production_control.handicap_source_current_v1),(select count(*) from production_control.handicap_source_operation_receipts_v1),(select count(*) from production_control.handicap_source_audit_events_v1))"), "0|0|0|0|0");
   assert.equal(sql(cluster, database, "select concat_ws('|',production_control.hybrid_handicap_v1(12.2,10.8),production_control.hybrid_handicap_v1(10.1,10.0),production_control.hybrid_handicap_v1(-0.1,0),production_control.hybrid_handicap_v1(-0.8,-1.0),production_control.hybrid_handicap_v1(-0.8,0.6))"), "11.5|10.1|-0.1|-0.9|-0.1");
@@ -152,12 +154,36 @@ test("Phase 2A PostgreSQL contract is inert, private, append-only, idempotent, a
   const initial = rpc(cluster, database, "read_production_handicap_source_v1", scope("READ_PRODUCTION_HANDICAP_SOURCE_V1"));
   assert.equal(initial.rosterCount, 24); assert.equal(initial.coverageCount, 0); assert.equal(initial.complete, false);
   assert.equal(initial.autoRefresh, "DISABLED_AWAITING_PROVIDER_AUTHORIZATION");
+  sql(cluster, database, "update scoring_authority.tournament_players set participation_status='INACTIVE' where tournament_id='2026' and player_id='P24'");
+  const invalidRosterPreview = rpc(cluster, database, "preview_production_bulk_manual_handicap_source_v1", {
+    ...scope("PREVIEW_PRODUCTION_BULK_MANUAL_HANDICAP_SOURCE_V1"),
+    entries: [
+      { player_id: "P24", current_index: "8", low_index: "7", low_index_date: null },
+      { player_id: "P99", current_index: "8", low_index: "7", low_index_date: null },
+    ],
+  });
+  assert.equal(invalidRosterPreview.ready, false); assert.equal(invalidRosterPreview.invalidCount, 2);
+  assert.equal(invalidRosterPreview.rows.find((row) => row.playerId === "P24").status, "INACTIVE_PLAYER");
+  assert.equal(invalidRosterPreview.rows.find((row) => row.playerId === "P99").status, "UNKNOWN_PLAYER");
+  sql(cluster, database, "update scoring_authority.tournament_players set participation_status='ACTIVE' where tournament_id='2026' and player_id='P24'");
   const setRequest = "91000000-0000-4000-8000-000000000001";
   const setInput = { ...scope("SET_PRODUCTION_PLAYER_GHIN_IDENTITY_V1"), operation_request_id: setRequest, request_payload_hash: "a".repeat(64), player_id: "P01", external_identifier: "1234567", expected_identity_id: null, replace_confirmed: false };
   const identity = rpc(cluster, database, "set_production_player_ghin_identity_v1", setInput);
   assert.equal(identity.code, "PRODUCTION_GHIN_IDENTITY_VERIFIED"); assert.equal(identity.maskedGhinNumber, "••••4567");
   assert.equal(rpc(cluster, database, "set_production_player_ghin_identity_v1", setInput).idempotent, true);
   assert.throws(() => rpc(cluster, database, "set_production_player_ghin_identity_v1", { ...setInput, external_identifier: "7654321" }), /PRODUCTION_HANDICAP_SOURCE_IDEMPOTENCY_CONFLICT/);
+
+  const incompleteBulkPreview = rpc(cluster, database, "preview_production_bulk_manual_handicap_source_v1", {
+    ...scope("PREVIEW_PRODUCTION_BULK_MANUAL_HANDICAP_SOURCE_V1"),
+    entries: [
+      { player_id: "P01", current_index: "-0.8", low_index: "0.6", low_index_date: null },
+      { player_id: "P02", current_index: "8", low_index: "7", low_index_date: "2026-09-05" },
+    ],
+  });
+  assert.equal(incompleteBulkPreview.ready, false);
+  assert.equal(incompleteBulkPreview.invalidCount, 1);
+  assert.equal(incompleteBulkPreview.rows.find((row) => row.playerId === "P02").status, "MISSING_GHIN_MAPPING");
+  assert.equal(sql(cluster, database, "select count(*) from production_control.handicap_source_observations_v1"), "0");
 
   const observationInput = { ...scope("RECORD_PRODUCTION_MANUAL_HANDICAP_SOURCE_V1"), operation_request_id: "91000000-0000-4000-8000-000000000002", request_payload_hash: "b".repeat(64), player_id: "P01", expected_identity_id: identity.identityId, expected_pointer_revision: 0, current_index: "-0.8", low_index: "0.6", low_index_date: "2026-09-05", provenance: "DIRECTOR_MANUAL" };
   const observation = rpc(cluster, database, "record_production_manual_handicap_source_v1", observationInput);
@@ -167,10 +193,46 @@ test("Phase 2A PostgreSQL contract is inert, private, append-only, idempotent, a
   assert.throws(() => sql(cluster, database, "select * from production_control.handicap_source_observations_v1", { role: "authenticated" }), /permission denied/);
   const afterOne = rpc(cluster, database, "read_production_handicap_source_v1", scope("READ_PRODUCTION_HANDICAP_SOURCE_V1"));
   assert.equal(afterOne.coverageCount, 1); assert.equal(afterOne.players[0].maskedGhinNumber.includes("1234567"), false);
+
+  const replacementPreview = rpc(cluster, database, "preview_production_bulk_manual_handicap_source_v1", {
+    ...scope("PREVIEW_PRODUCTION_BULK_MANUAL_HANDICAP_SOURCE_V1"),
+    entries: [{ player_id: "P01", current_index: "10.1", low_index: "10", low_index_date: null }],
+  });
+  assert.equal(replacementPreview.ready, true);
+  assert.equal(replacementPreview.replacingCount, 1);
+  assert.equal(replacementPreview.rows[0].hybrid, "10.1");
+  assert.equal(replacementPreview.rows[0].maskedGhinNumber, "••••4567");
+  const bulkRequest = "91000000-0000-4000-8000-000000000011";
+  const bulkInput = {
+    ...scope("RECORD_PRODUCTION_BULK_MANUAL_HANDICAP_SOURCE_V1"),
+    operation_request_id: bulkRequest,
+    request_payload_hash: "7".repeat(64),
+    expected_preview_fingerprint: replacementPreview.previewFingerprint,
+    entry_mode: "BULK_IMPORT",
+    entries: replacementPreview.entries,
+  };
+  const bulkResult = rpc(cluster, database, "record_production_bulk_manual_handicap_source_v1", bulkInput);
+  assert.equal(bulkResult.recordedCount, 1);
+  assert.equal(bulkResult.rows[0].hybrid, "10.1");
+  assert.equal(bulkResult.rows[0].lowIndexDate, null);
+  assert.equal(rpc(cluster, database, "record_production_bulk_manual_handicap_source_v1", bulkInput).idempotent, true);
+  assert.throws(() => rpc(cluster, database, "record_production_bulk_manual_handicap_source_v1", {
+    ...bulkInput,
+    entries: [{ ...bulkInput.entries[0], current_index: "10.2" }],
+  }), /PRODUCTION_HANDICAP_SOURCE_IDEMPOTENCY_CONFLICT/);
+  assert.equal(sql(cluster, database, "select concat_ws('|',(select count(*) from production_control.handicap_source_observations_v1 where player_id='P01'),(select pointer_revision from production_control.handicap_source_current_v1 where player_id='P01'),(select count(*) from production_control.handicap_source_audit_events_v1 where operation_request_id='91000000-0000-4000-8000-000000000011'))"), "2|2|1");
+  assert.throws(() => rpc(cluster, database, "record_production_bulk_manual_handicap_source_v1", {
+    ...scope("RECORD_PRODUCTION_BULK_MANUAL_HANDICAP_SOURCE_V1"),
+    operation_request_id: "91000000-0000-4000-8000-000000000012",
+    request_payload_hash: "9".repeat(64),
+    expected_preview_fingerprint: replacementPreview.previewFingerprint,
+    entry_mode: "BULK_IMPORT",
+    entries: replacementPreview.entries,
+  }), /PRODUCTION_HANDICAP_SOURCE_BULK_PREVIEW_STALE/);
   assert.throws(() => rpc(cluster, database, "set_production_player_ghin_identity_v1", { ...scope("SET_PRODUCTION_PLAYER_GHIN_IDENTITY_V1"), operation_request_id: "91000000-0000-4000-8000-000000000003", request_payload_hash: "f".repeat(64), player_id: "P02", external_identifier: "1234567", expected_identity_id: null, replace_confirmed: false }), /PRODUCTION_GHIN_IDENTITY_ALREADY_ASSIGNED/);
   const retired = rpc(cluster, database, "retire_production_player_ghin_identity_v1", { ...scope("RETIRE_PRODUCTION_PLAYER_GHIN_IDENTITY_V1"), operation_request_id: "91000000-0000-4000-8000-000000000004", request_payload_hash: "1".repeat(64), player_id: "P01", expected_identity_id: identity.identityId, retirement_confirmed: true });
   assert.equal(retired.code, "PRODUCTION_GHIN_IDENTITY_RETIRED");
-  assert.equal(sql(cluster, database, "select concat_ws('|',(select count(*) from production_control.handicap_source_observations_v1 where player_id='P01'),(select count(*) from production_control.handicap_source_current_v1 where player_id='P01'))"), "1|0");
+  assert.equal(sql(cluster, database, "select concat_ws('|',(select count(*) from production_control.handicap_source_observations_v1 where player_id='P01'),(select count(*) from production_control.handicap_source_current_v1 where player_id='P01'))"), "2|0");
   const replacementP02 = rpc(cluster, database, "set_production_player_ghin_identity_v1", { ...scope("SET_PRODUCTION_PLAYER_GHIN_IDENTITY_V1"), operation_request_id: "91000000-0000-4000-8000-000000000005", request_payload_hash: "2".repeat(64), player_id: "P02", external_identifier: "1234567", expected_identity_id: null, replace_confirmed: false });
   rpc(cluster, database, "record_production_manual_handicap_source_v1", { ...scope("RECORD_PRODUCTION_MANUAL_HANDICAP_SOURCE_V1"), operation_request_id: "91000000-0000-4000-8000-000000000006", request_payload_hash: "3".repeat(64), player_id: "P02", expected_identity_id: replacementP02.identityId, expected_pointer_revision: 0, current_index: "8.2", low_index: "6.2", low_index_date: "2026-09-05", provenance: "DIRECTOR_MANUAL" });
   const replacementP01 = rpc(cluster, database, "set_production_player_ghin_identity_v1", { ...scope("SET_PRODUCTION_PLAYER_GHIN_IDENTITY_V1"), operation_request_id: "91000000-0000-4000-8000-000000000007", request_payload_hash: "4".repeat(64), player_id: "P01", external_identifier: "7654321", expected_identity_id: null, replace_confirmed: false });
@@ -178,9 +240,29 @@ test("Phase 2A PostgreSQL contract is inert, private, append-only, idempotent, a
 
   for (let number = 3; number <= 24; number += 1) {
     const player = `P${String(number).padStart(2, "0")}`;
-    const identityResult = rpc(cluster, database, "set_production_player_ghin_identity_v1", { ...scope("SET_PRODUCTION_PLAYER_GHIN_IDENTITY_V1"), operation_request_id: `91000000-0000-4000-8000-${String(number * 2 + 101).padStart(12, "0")}`, request_payload_hash: "c".repeat(64), player_id: player, external_identifier: String(2000000 + number), expected_identity_id: null, replace_confirmed: false });
-    rpc(cluster, database, "record_production_manual_handicap_source_v1", { ...scope("RECORD_PRODUCTION_MANUAL_HANDICAP_SOURCE_V1"), operation_request_id: `91000000-0000-4000-8000-${String(number * 2 + 102).padStart(12, "0")}`, request_payload_hash: "d".repeat(64), player_id: player, expected_identity_id: identityResult.identityId, expected_pointer_revision: 0, current_index: String(8 + number / 10), low_index: String(6 + number / 10), low_index_date: "2026-09-05", provenance: "DIRECTOR_MANUAL" });
+    rpc(cluster, database, "set_production_player_ghin_identity_v1", { ...scope("SET_PRODUCTION_PLAYER_GHIN_IDENTITY_V1"), operation_request_id: `91000000-0000-4000-8000-${String(number * 2 + 101).padStart(12, "0")}`, request_payload_hash: "c".repeat(64), player_id: player, external_identifier: String(2000000 + number), expected_identity_id: null, replace_confirmed: false });
   }
+  const allEntries = Array.from({ length: 24 }, (_, index) => ({
+    player_id: `P${String(index + 1).padStart(2, "0")}`,
+    current_index: String(8 + (index + 1) / 10),
+    low_index: String(6 + (index + 1) / 10),
+    low_index_date: index === 23 ? null : "2026-09-05",
+  }));
+  const fullPreview = rpc(cluster, database, "preview_production_bulk_manual_handicap_source_v1", {
+    ...scope("PREVIEW_PRODUCTION_BULK_MANUAL_HANDICAP_SOURCE_V1"), entries: allEntries,
+  });
+  assert.equal(fullPreview.ready, true); assert.equal(fullPreview.readyCount, 24);
+  assert.equal(fullPreview.invalidCount, 0); assert.equal(fullPreview.replacingCount, 2);
+  const fullBulkInput = {
+    ...scope("RECORD_PRODUCTION_BULK_MANUAL_HANDICAP_SOURCE_V1"),
+    operation_request_id: "91000000-0000-4000-8000-000000000097",
+    request_payload_hash: "0".repeat(64), expected_preview_fingerprint: fullPreview.previewFingerprint,
+    entry_mode: "BULK_IMPORT", entries: fullPreview.entries,
+  };
+  const fullBulk = rpc(cluster, database, "record_production_bulk_manual_handicap_source_v1", fullBulkInput);
+  assert.equal(fullBulk.recordedCount, 24);
+  assert.equal(rpc(cluster, database, "record_production_bulk_manual_handicap_source_v1", fullBulkInput).idempotent, true);
+  assert.equal(sql(cluster, database, "select concat_ws('|',(select count(*) from production_control.handicap_source_observations_v1),(select count(*) from production_control.handicap_source_current_v1),(select count(*) from production_control.handicap_source_audit_events_v1 where operation_request_id='91000000-0000-4000-8000-000000000097'))"), "28|24|24");
   sql(cluster, database, "update production_control.handicap_source_current_v1 set source_status='STALE' where tournament_id='2026' and player_id='P24' and provider='GHIN'");
   const stale = rpc(cluster, database, "read_production_handicap_source_v1", scope("READ_PRODUCTION_HANDICAP_SOURCE_V1"));
   assert.equal(stale.coverageCount, 23); assert.equal(stale.complete, false);
