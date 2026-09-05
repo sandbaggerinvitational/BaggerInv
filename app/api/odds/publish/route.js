@@ -88,7 +88,8 @@ async function publishProductionProjection(request) {
     const expectedSnapshotId = prepared.alreadyPublished &&
       Object.hasOwn(retainedReference, "expected_predecessor_snapshot_id")
       ? clean(retainedReference.expected_predecessor_snapshot_id) || null
-      : current.published_snapshot_id;
+      : current.publication_predecessor_snapshot_id ||
+        current.published_snapshot_id;
     const actorAuthUserId = clean(director.identity?.authUserId).toLowerCase();
     const actorPlayerId = clean(
       director.identity?.player?.id || director.identity?.actor?.id,

@@ -249,6 +249,13 @@ function OddsPanel({ data, refresh }) {
   const [receipt, setReceipt] = useState(null);
   const [phase, setPhase] = useState("Pre-Tournament");
   const [iterations, setIterations] = useState(25000);
+  const withdrawalIdentities = useRef(null);
+  const withdrawalRegistry = () => {
+    if (!withdrawalIdentities.current) {
+      withdrawalIdentities.current = createClientMutationOperationIdentityRegistry();
+    }
+    return withdrawalIdentities.current;
+  };
   const loadJobs = useCallback(async () => {
     try {
       const result = await jsonRequest("/api/admin/production-odds-calculations");
@@ -258,14 +265,38 @@ function OddsPanel({ data, refresh }) {
   useEffect(() => { loadJobs(); }, [loadJobs]);
   const operate = async (action, job = null) => {
     if (action === "publish" && !globalThis.confirm?.(`Publish the certified ${job.phase} Championship Odds snapshot to Production?`)) return;
+    const publication = data.publications.odds;
+    if (action === "withdraw" && !globalThis.confirm?.("Withdraw the current Championship Odds publication from the public Odds Center? Its immutable publication history will be preserved.")) return;
     setBusy(`${action}:${job?.job_id || "new"}`); setReceipt(null);
+    let withdrawalIdentity = null;
     try {
+      if (action === "withdraw") {
+        const intent = {
+          action: "WITHDRAW_ODDS_PUBLICATION",
+          tournamentId: data.tournament.id,
+          publicationPointerRevision: publication.pointerRevision,
+          publicationRevision: publication.revision,
+          publicationSnapshotId: publication.snapshotId,
+          reasonCode: "TOURNAMENT_SETUP_CHANGED",
+        };
+        withdrawalIdentity = withdrawalRegistry().acquire(intent);
+      }
       const result = action === "publish"
         ? await jsonRequest("/api/odds/publish", { jobId: job.job_id, phase: job.phase })
+        : action === "withdraw"
+          ? await jsonRequest("/api/director/odds-publication", {
+            action,
+            expectedPublicationPointerRevision: publication.pointerRevision,
+            expectedPublicationRevision: publication.revision,
+            expectedPublicationSnapshotId: publication.snapshotId,
+            operationRequestId: withdrawalIdentity.operationRequestId,
+            reasonCode: "TOURNAMENT_SETUP_CHANGED",
+          })
         : await jsonRequest("/api/admin/production-odds-calculations", action === "request"
           ? { action, phase, iterations }
           : { action, jobId: job.job_id });
-      setReceipt({ title: action === "publish" ? "Odds published" : action === "retry" ? "Calculation retry accepted" : "Calculation requested", message: action === "publish" ? `Publication revision ${result.publication?.revision ?? "confirmed"} is now current.` : `Calculation ${result.jobId || job?.job_id} was accepted.` });
+      if (withdrawalIdentity) withdrawalRegistry().confirm(withdrawalIdentity);
+      setReceipt({ title: action === "publish" ? "Odds published" : action === "withdraw" ? "Odds publication withdrawn" : action === "retry" ? "Calculation retry accepted" : "Calculation requested", message: action === "publish" ? `Publication revision ${result.publication?.revision ?? "confirmed"} is now current.` : action === "withdraw" ? `Publication revision ${result.data?.publication_revision ?? publication.revision} remains in immutable history and is no longer public.` : `Calculation ${result.jobId || job?.job_id} was accepted.` });
       await Promise.all([loadJobs(), refresh()]);
     } catch (error) { setReceipt({ title: "Odds operation did not complete", message: error.message }); }
     finally { setBusy(""); }
@@ -280,6 +311,18 @@ function OddsPanel({ data, refresh }) {
         <div><small>Freshness</small><strong>{pretty(publication.freshness)}</strong><Status value={publication.freshness} /></div>
         <div><small>Prediction Settings</small><strong>Revision {data.projections.predictionSettings.revision ?? "—"}</strong><span>Saving settings does not calculate or publish Odds</span></div>
       </div>
+      {upper(publication.state) === "PUBLISHED" ? <div className={styles.actionRow}>
+        <button type="button" disabled={Boolean(busy) || !publication.snapshotId || !publication.pointerRevision} data-impact="high" onClick={() => operate("withdraw")}>Withdraw Current Publication</button>
+        <span>The published snapshot and its provenance remain in immutable history.</span>
+      </div> : null}
+      {publication.history?.length ? <details className={styles.disclosure} open={upper(publication.state) === "WITHDRAWN"}>
+        <summary>Historical publications · {publication.history.length}</summary>
+        <div className={styles.jobList}>{publication.history.map((item) => <article key={`${item.revision}:${item.publishedAt}`}>
+          <div><strong>Publication revision {item.revision}</strong><span>{item.milestone || "Championship Odds"} · {timestamp(item.publishedAt)}</span></div>
+          <Status value={item.lifecycle} />
+          {item.lifecycle === "WITHDRAWN" ? <span>Withdrawn {timestamp(item.withdrawnAt)} · {pretty(item.withdrawalReason)}</span> : null}
+        </article>)}</div>
+      </details> : null}
       <div className={styles.oddsRequest}>
         <label>Milestone<select value={phase} onChange={(event) => setPhase(event.target.value)}>{["Pre-Tournament", "After Round 1", "After Round 2", "Round 3 Pairings Announced", "Final Results"].map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Iterations<select value={iterations} onChange={(event) => setIterations(Number(event.target.value))}>{[10000, 25000, 50000, 100000].map((item) => <option value={item} key={item}>{item.toLocaleString()}</option>)}</select></label>

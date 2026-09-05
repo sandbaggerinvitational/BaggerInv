@@ -62,6 +62,16 @@ export async function GET(request) {
     if (tournamentYear !== year) return NextResponse.json({ error: "The requested tournament is unavailable.", code: "WRONG_TOURNAMENT" }, { status: 403 });
     const snapshots = publishedOddsSnapshotsFromView(read.payload.data);
     const publication = publishedOddsFreshness(read.payload.data);
+    if (publication.status === "UNPUBLISHED") {
+      const response = NextResponse.json({ snapshots: [], derived, publication }, {
+        headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
+      });
+      response.headers.set("X-Published-Odds-Read-Source", "supabase");
+      response.headers.set("X-Published-Odds-Google-Requests", "0");
+      response.headers.set("X-Intelligence-Google-Requests", "0");
+      response.headers.set("X-Published-Odds-Freshness", publication.status);
+      return response;
+    }
     if (!publication.current) throw Object.assign(new Error("The current official Published Odds snapshot is unavailable."), {
       code: publication.stale ? "PUBLISHED_ODDS_CURRENT_OFFICIAL_STALE" : "PUBLISHED_ODDS_CURRENT_OFFICIAL_REQUIRED",
       publication,
