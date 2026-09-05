@@ -4,6 +4,26 @@ import test from "node:test";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
+test("Scramble Team HCP migration changes only exact published handicap pass-through", async () => {
+  const sql = await source("supabase/migrations/202609050001_preview_mobile_scramble_team_hcp.sql");
+  const previous = await source("supabase/migrations/202609040001_preview_mobile_opaque_match_id_contract.sql");
+  assert.match(sql, /if match_row\.format = 'SC' then/);
+  assert.match(sql, /value\.presentation->'tournamentMatchDisplay'->target_match/);
+  assert.match(sql, /from scoring_authority\.participant_home_presentations value\s+where value\.tournament_id = target_tournament/);
+  assert.doesNotMatch(sql, /(?:insert into|update scoring_authority|delete from|alter table|create table)/i);
+  assert.equal((sql.match(/create or replace function/g) || []).length, 1);
+  let unchanged = sql.slice(sql.indexOf("begin;"));
+  unchanged = unchanged.replace("  published_match_display jsonb;\n", "");
+  unchanged = unchanged.replace(/  -- The collection's read_tournament_live_view[\s\S]*?  end if;\n\n/, "");
+  for (const side of [1, 2]) {
+    const passThrough = `'team_${side}_playing_handicap', coalesce(\n          nullif(published_match_display->'team${side}PlayingHcp', 'null'::jsonb),\n          snapshot_row.team_configuration->'team_${side}_playing_handicap')`;
+    assert.ok(unchanged.includes(passThrough));
+    unchanged = unchanged.replace(passThrough, `'team_${side}_playing_handicap', snapshot_row.team_configuration->'team_${side}_playing_handicap'`);
+  }
+  assert.equal(unchanged, previous.slice(previous.indexOf("begin;")),
+    "all existing Match-ID, schema, participant, scoring, navigation and privilege behavior must remain byte-identical");
+});
+
 test("Preview Match Detail RPC is participant-scoped, bounded, and service-role only", async () => {
   const sql = await source(
     "supabase/migrations/202609030001_preview_mobile_match_detail_v1.sql",

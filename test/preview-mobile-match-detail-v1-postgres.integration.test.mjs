@@ -6,6 +6,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
+import { mobileMatchesResult } from "../lib/mobile-v1-tournament-reads.js";
+import { mobileMatchDetailResult } from "../lib/mobile-v1-match-detail.js";
+import { assertMobileV1Schema } from "./support/mobile-v1-schema-validator.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migrationsDirectory = path.join(repositoryRoot, "supabase", "migrations");
@@ -172,6 +175,7 @@ function installRequiredMigrations(cluster, database) {
     "202608120026_preview_tournament_published_context.sql",
     "202609030001_preview_mobile_match_detail_v1.sql",
     "202609040001_preview_mobile_opaque_match_id_contract.sql",
+    "202609050001_preview_mobile_scramble_team_hcp.sql",
   ]) {
     psqlFile(cluster, database, path.join(migrationsDirectory, name));
   }
@@ -325,6 +329,156 @@ function seedFixture(cluster, database, matchFixtures = fixtures) {
     values ${scoreRows};
   `);
 }
+
+test("Scramble published Team HCP passes through real Preview SQL into both mobile endpoint projections", {
+  timeout: 120_000,
+}, async (t) => {
+  if (!(await allBinariesAvailable())) {
+    t.skip(`PostgreSQL 17 toolchain is unavailable at ${pgBin}`);
+    return;
+  }
+  const cluster = await createCluster();
+  const database = "preview_scramble_team_hcp";
+  try {
+    runCommand(postgresBinaries.createdb, [database], { env: psqlEnvironment(cluster) });
+    installSupabaseCompatibility(cluster, database);
+    installRequiredMigrations(cluster, database);
+    // Seed only the disposable local database. No remote data or auth is used.
+    const scrambleTemplate = fixtures.find(({ id }) => id === "SC-A");
+    const extraScrambles = ["SC-THREE", "SC-FOUR", "2026-R2-5", " match:round/2#🦅 "]
+      .map((id, index) => ({ ...scrambleTemplate, id, sort: index + 3, display: String(index + 3) }));
+    seedFixture(cluster, database, [...fixtures, ...extraScrambles]);
+    // The existing SQL-only seed uses a "Scheduled" placeholder. The mobile
+    // schema requires unavailable Upcoming status text to be null instead.
+    psql(cluster, database, "update scoring_authority.matches set running_result = '' where status = 'UPCOMING';");
+    const target = "2026-R2-5";
+    const opaque = extraScrambles.at(-1).id;
+    const input = { environment: "PREVIEW", tournament_id: "2026", player_id: "P1" };
+    const now = new Date("2026-09-05T12:00:00Z");
+    const publish = (display) => psql(cluster, database, `
+      insert into scoring_authority.participant_home_presentations
+        (tournament_id, presentation, source_workbook_id, source_fingerprint, imported_by)
+      values ('2026', ${jsonSql({ tournament: { status: "Live", currentRound: 2 }, tournamentMatchDisplay: display })},
+        'preview-workbook', '${"c".repeat(64)}', 'local-regression')
+      on conflict (tournament_id) do update set presentation = excluded.presentation;
+    `);
+    const projections = async (matchId, playerId = "P1") => {
+      const liveRead = parseJsonOutput(psql(cluster, database,
+        "set role service_role; select public.read_tournament_live_view('2026')::text; reset role;"));
+      const identity = { tournamentId: "2026", playerId };
+      const collection = await mobileMatchesResult(identity, { now, dependencies: {
+        requireTournamentReadSource: () => ({ resolved: "supabase" }),
+        readTournamentLiveView: async () => ({ payload: liveRead }),
+        readGuideProjection: async () => ({ payload: { ok: true, data: {} } }),
+        applyGuideCoursesToTournament: (value) => value,
+      } });
+      const raw = rpc(cluster, database, { ...input, player_id: playerId, match_id: matchId });
+      const detail = await mobileMatchDetailResult(identity, matchId, { now, dependencies: {
+        readMobilePreviewMatchDetailV1: async () => ({ payload: raw }),
+      } });
+      await assertMobileV1Schema("matches", collection.body);
+      await assertMobileV1Schema("match-detail", detail.body);
+      const listed = collection.body.data.matches.find((match) => match.matchId === matchId);
+      assert.ok(listed);
+      assert.equal(detail.body.data.match.matchId, listed.matchId);
+      return { listed, detail, raw };
+    };
+    const teamHcp = (match) => match.teams.map((team) => team.playingHandicap);
+    const teamStrokes = (match) => match.teams.map((team) => team.strokesReceived);
+    const withoutTeamHcp = (data) => {
+      const copy = structuredClone(data);
+      copy.match.teams.forEach((team) => { delete team.playingHandicap; });
+      return copy;
+    };
+    psql(cluster, database, `
+      update scoring_authority.scoring_snapshots set team_configuration =
+        team_configuration || '{"team_1_playing_handicap":null,"team_2_playing_handicap":null}'::jsonb
+      where match_id = ${sqlLiteral(target)};
+    `);
+    publish({ [target]: { team1PlayingHcp: 3.0, team2PlayingHcp: 1.0, team1Stroke: 2, team2Stroke: 0 } });
+    // Capture the real old RPC response, then replace only the read projection.
+    psqlFile(cluster, database, path.join(migrationsDirectory, "202609040001_preview_mobile_opaque_match_id_contract.sql"));
+    const before = await projections(target);
+    const beforeBB = await projections("BB-Z");
+    const beforeSI = await projections(opaqueSinglesId);
+    assert.deepEqual(teamHcp(before.listed), [3, 1]);
+    assert.deepEqual(teamHcp(before.detail.body.data.match), [null, null]);
+    const fingerprint = () => psql(cluster, database, `
+      select jsonb_build_object(
+        'snapshots', (select md5(jsonb_agg(to_jsonb(v) order by v.snapshot_id collate "C")::text) from scoring_authority.scoring_snapshots v),
+        'participants', (select md5(jsonb_agg(to_jsonb(v) order by v.match_id collate "C", v.team_side, v.player_slot)::text) from scoring_authority.match_participants v),
+        'scores', (select md5(jsonb_agg(to_jsonb(v) order by v.match_id collate "C", v.hole_number)::text) from scoring_authority.hole_scores v),
+        'published', (select md5(jsonb_agg(to_jsonb(v) order by v.tournament_id)::text) from scoring_authority.participant_home_presentations v)
+      )::text;
+    `);
+    const beforeMigration = fingerprint();
+    psqlFile(cluster, database, path.join(migrationsDirectory, "202609050001_preview_mobile_scramble_team_hcp.sql"));
+    await t.test("Round 2 Match 5/6: HCP 3/1, strokes 2/0, only two response values change", async () => {
+      const after = await projections(target);
+      assert.deepEqual(teamHcp(after.listed), [3, 1]);
+      assert.deepEqual(teamHcp(after.detail.body.data.match), [3, 1]);
+      assert.deepEqual(teamStrokes(after.listed), [2, 0]);
+      assert.deepEqual(teamStrokes(after.detail.body.data.match), [2, 0]);
+      assert.equal(after.raw.navigation.round_match_index, 5);
+      assert.equal(after.raw.navigation.round_match_count, 6);
+      assert.deepEqual(withoutTeamHcp(after.detail.body.data), withoutTeamHcp(before.detail.body.data));
+      assert.notEqual(after.detail.revision, before.detail.revision, "HCP change invalidates the old ETag revision");
+      assert.equal((await projections(target)).detail.revision, after.detail.revision, "unchanged response retains ETag revision");
+      assert.equal(fingerprint(), beforeMigration, "migration and reads must not change stored values");
+    });
+    await t.test("Best Ball and Singles participant HCP and every other response field remain unchanged", async () => {
+      assert.deepEqual((await projections("BB-Z")).detail.body, beforeBB.detail.body);
+      assert.deepEqual((await projections(opaqueSinglesId)).detail.body, beforeSI.detail.body);
+    });
+    for (const [label, published, expected] of [
+      ["published overrides non-null snapshot", { team1PlayingHcp: 3, team2PlayingHcp: 1 }, [3, 1]],
+      ["numeric zero is preserved", { team1PlayingHcp: 0, team2PlayingHcp: 0 }, [0, 0]],
+      ["negative and fractional values are not rounded or calculated", { team1PlayingHcp: -1.25, team2PlayingHcp: 2.375 }, [-1.25, 2.375]],
+      ["null falls back identically to snapshot", { team1PlayingHcp: null, team2PlayingHcp: null }, [3.5, 1]],
+      ["missing falls back identically to snapshot", {}, [3.5, 1]],
+      ["side-specific fallback", { team1PlayingHcp: 0, team2PlayingHcp: null }, [0, 1]],
+    ]) {
+      await t.test(label, async () => {
+        publish({ "SC-A": published });
+        const result = await projections("SC-A");
+        assert.deepEqual(teamHcp(result.listed), expected);
+        assert.deepEqual(teamHcp(result.detail.body.data.match), expected);
+        assert.deepEqual(teamStrokes(result.detail.body.data.match), [2, 0]);
+      });
+    }
+    await t.test("owned/non-owned and exact whitespace/reserved/non-BMP keys use the same published authority", async () => {
+      publish({ [opaque]: { team1PlayingHcp: 6.25, team2PlayingHcp: 0 },
+        [opaque.trim()]: { team1PlayingHcp: 99, team2PlayingHcp: 99 } });
+      for (const player of ["P1", "P2"]) {
+        const result = await projections(opaque, player);
+        assert.deepEqual(teamHcp(result.listed), [6.25, 0]);
+        assert.deepEqual(teamHcp(result.detail.body.data.match), [6.25, 0]);
+        assert.equal(result.detail.body.data.match.authenticatedPlayer.involved, player === "P2");
+        assert.deepEqual(teamStrokes(result.detail.body.data.match), [2, 0]);
+      }
+    });
+    await t.test("missing publication stays null with absent snapshot HCP; no derivation", async () => {
+      publish({});
+      const result = await projections(target);
+      assert.deepEqual(teamHcp(result.listed), [null, null]);
+      assert.deepEqual(teamHcp(result.detail.body.data.match), [null, null]);
+    });
+    await t.test("another tournament's same Match key cannot supply Team HCP", async () => {
+      psql(cluster, database, `insert into scoring_authority.participant_home_presentations
+        (tournament_id, presentation, source_workbook_id, source_fingerprint, imported_by)
+        values ('2027', ${jsonSql({ tournamentMatchDisplay: { [target]: { team1PlayingHcp: 99, team2PlayingHcp: 99 } } })},
+          'wrong-workbook', '${"d".repeat(64)}', 'local-regression');`);
+      const result = await projections(target);
+      assert.deepEqual(teamHcp(result.detail.body.data.match), [null, null]);
+      assert.deepEqual(rpc(cluster, database, { ...input, player_id: "PI", match_id: target }),
+        { ok: false, code: "PREVIEW_PARTICIPANT_MATCH_DETAIL_REQUIRED" });
+      assert.deepEqual(rpc(cluster, database, { ...input, tournament_id: "2027", player_id: "PW", match_id: target }),
+        { ok: false, code: "MATCH_DETAIL_NOT_FOUND" });
+    });
+  } finally {
+    await destroyCluster(cluster);
+  }
+});
 
 const exactOpaqueCases = [
   ["leading whitespace", " leading"],
