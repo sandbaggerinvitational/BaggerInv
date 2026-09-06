@@ -131,7 +131,8 @@ The app does not read canonical Bagger tables through Supabase. Supabase establi
 - **Step 2J.1 — COMPLETE:** the global native design system standardizes semantic color, Dynamic Type typography, spacing, surfaces, controls, status/state treatments, identity-image wrappers, accessibility behavior, and a Debug-only component gallery without redesigning certified product screens.
 - **Step 2J.2 — COMPLETE:** Today now clearly separates The Bagger app identity from the current tournament, applies canonical participant/team/course/tournament imagery with controlled fallbacks, preserves the certified data hierarchy, and provides exact native navigation to Passport, Match Detail, Leaders, and full Schedule. Simulator, accessibility, deterministic regression, and user-approved physical-iPhone acceptance are proven.
 - **Step 2J.3A — COMPLETE:** the Matches index preserves canonical server Match order across Best Ball, Scramble, and Singles; presents server-projected display Match numbers, team identities, Playing Handicap, and strokes without native golf calculations; applies canonical team/Course assets and controlled fallbacks; and retains exact Match Detail navigation with selected-Round continuity. Deterministic regression and user-approved physical-iPhone acceptance are proven; Match Detail visual polish was intentionally not started.
-- **Next — Step 2J.3B:** Match Detail visual and UX polish, beginning from the physically reviewed existing native detail without altering Match/scoring authority.
+- **Step 2J.3B — COMPLETE:** the full native Match Game Center uses certified dedicated Match Detail DTOs, exact opaque-ID navigation, lazy partitioned read caching, authoritative 404 revocation, canonical handicap/stroke parity, and the complete approved BB/SC/SI product hierarchy. Physical acceptance and final native/UI/build certification are complete.
+- **Step 2J.3C — COMPLETE:** one shared native golf-scorecard grammar covers BB/SC/SI with anchored identities, local horizontal scroll, canonical stroke markers/results/status, matching nines and accessible disclosure. Physical `scorecard pass` is approved; this remains part of the combined Step 2J.3B implementation commit.
 
 ## Step 2B mobile read architecture
 
@@ -530,6 +531,14 @@ The full Your Match card and each All Matches row navigate by canonical Match ID
 
 This polish changes presentation and native navigation only. It adds no Match/scoring calculation, sorting authority, repository/cache behavior, scoring state, newly authored backend/PWA work, or Production configuration. The compact All Matches `VS` marker's final optical vertical alignment remains a non-blocking whole-app final-polish note; its independent centered gutter, semantic order, and Dynamic Type behavior are preserved.
 
-## Next step
+## Step 2J.3B + 2J.3C native Match Game Center
 
-**Step 2J.3B — Match Detail visual and UX polish** is next. It should begin from the current physically reviewed, read-only native Match Detail and apply the shared design and identity foundations without changing canonical Match order, Match/scoring authority, cached-first behavior, navigation, or Production configuration. Final distribution-archive measurement and rights clearance remain explicit release prerequisites rather than inferred from the completed visual foundation.
+The dedicated read-only Match Detail endpoint now supplies the full native Game Center: canonical header/context/navigation, scoreboard, HCP/strokes, Hole Tracker, Selected Hole, Match Flow/clinch, expandable golf scorecard, Match Stats and Course Information. Today and Matches retain their own caller navigation stacks. Swift never derives authoritative golf values.
+
+Match IDs retain exact Unicode-scalar semantics through DTO decode, navigation, repository identity, private cache keys and single-component URL encoding. Transient failures may retain eligible stale content; an authoritative participant-safe 404 immediately revokes in-memory and persisted Match Detail without affecting other Matches, the collection or scoring SQLite. All participant-facing handicap values use one decimal without replacing canonical numbers. Scramble suppresses individual HCP regardless of value and retains canonical Team HCP/strokes.
+
+The user approved the complete experience across representative Best Ball, Scramble and Singles, including the Step 2J.3C scorecard. See [combined certification](STEP_2J3BC_CERTIFICATION.md) for exact tournament-wide parity, regression counts, build/physical evidence, handoff ancestry and the two test-only legacy expectation corrections. Production remains untouched.
+
+## Stop point
+
+No next polish step is started automatically. The All Matches `VS` optical vertical-alignment item remains deferred to final whole-app micro-polish. Final distribution-archive measurement and rights clearance remain explicit release prerequisites; Preview certification does not approve Production or distribution.

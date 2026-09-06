@@ -18,15 +18,26 @@ struct MatchesRepositoryDiagnostics: Equatable, Sendable {
 
 struct MatchesRepositoryView: View {
     let participant: ParticipantSession
+    let coordinator: TournamentDataCoordinator
+    let profile: TodayParticipantPresentation
+    let onOpenPassport: () -> Void
+    let onNavigateMatch: (String) -> Void
     @ObservedObject private var matches: MobileReadRepository<MobileMatchesResponse>
     @State private var selectedRoundID: MatchesRoundID?
 
     init(
         participant: ParticipantSession,
-        repository: MobileReadRepository<MobileMatchesResponse>
+        coordinator: TournamentDataCoordinator,
+        profile: TodayParticipantPresentation,
+        onOpenPassport: @escaping () -> Void,
+        onNavigateMatch: @escaping (String) -> Void
     ) {
         self.participant = participant
-        _matches = ObservedObject(wrappedValue: repository)
+        self.coordinator = coordinator
+        self.profile = profile
+        self.onOpenPassport = onOpenPassport
+        self.onNavigateMatch = onNavigateMatch
+        _matches = ObservedObject(wrappedValue: coordinator.matches)
     }
 
     var body: some View {
@@ -40,7 +51,11 @@ struct MatchesRepositoryView: View {
             diagnostics: BaggerAcceptanceProbes.isEnabled()
                 ? MatchesRepositoryDiagnostics(state: matches.state)
                 : nil,
-            onRefresh: { await matches.refresh() }
+            onRefresh: { await matches.refresh() },
+            coordinator: coordinator,
+            profile: profile,
+            onOpenPassport: onOpenPassport,
+            onNavigateMatch: onNavigateMatch
         )
     }
 }
@@ -48,6 +63,10 @@ struct MatchesRepositoryView: View {
 struct MatchesFixtureView: View {
     let participant: ParticipantSession
     let state: MobileReadState<MobileMatchesData>
+    var matchDetailStates: [String: MobileReadState<MobileMatchDetailData>] = [:]
+    let profile: TodayParticipantPresentation
+    let onOpenPassport: () -> Void
+    let onNavigateMatch: (String) -> Void
     @State private var selectedRoundID: MatchesRoundID?
 
     var body: some View {
@@ -58,7 +77,11 @@ struct MatchesFixtureView: View {
                 selectedRoundID: selectedRoundID
             ),
             selectedRoundID: $selectedRoundID,
-            onRefresh: {}
+            onRefresh: {},
+            fixtureMatchDetailStates: matchDetailStates,
+            profile: profile,
+            onOpenPassport: onOpenPassport,
+            onNavigateMatch: onNavigateMatch
         )
     }
 }
@@ -68,6 +91,11 @@ struct MatchesScreen: View {
     @Binding var selectedRoundID: MatchesRoundID?
     var diagnostics: MatchesRepositoryDiagnostics?
     let onRefresh: @MainActor @Sendable () async -> Void
+    var coordinator: TournamentDataCoordinator?
+    var fixtureMatchDetailStates: [String: MobileReadState<MobileMatchDetailData>]
+    let profile: TodayParticipantPresentation
+    let onOpenPassport: () -> Void
+    let onNavigateMatch: (String) -> Void
 
     @State private var selectedTournamentID: String?
 
@@ -75,12 +103,22 @@ struct MatchesScreen: View {
         presentation: MatchesPresentation,
         selectedRoundID: Binding<MatchesRoundID?>,
         diagnostics: MatchesRepositoryDiagnostics? = nil,
-        onRefresh: @escaping @MainActor @Sendable () async -> Void
+        onRefresh: @escaping @MainActor @Sendable () async -> Void,
+        coordinator: TournamentDataCoordinator? = nil,
+        fixtureMatchDetailStates: [String: MobileReadState<MobileMatchDetailData>] = [:],
+        profile: TodayParticipantPresentation,
+        onOpenPassport: @escaping () -> Void,
+        onNavigateMatch: @escaping (String) -> Void
     ) {
         self.presentation = presentation
         _selectedRoundID = selectedRoundID
         self.diagnostics = diagnostics
         self.onRefresh = onRefresh
+        self.coordinator = coordinator
+        self.fixtureMatchDetailStates = fixtureMatchDetailStates
+        self.profile = profile
+        self.onOpenPassport = onOpenPassport
+        self.onNavigateMatch = onNavigateMatch
     }
 
     var body: some View {
@@ -124,15 +162,26 @@ struct MatchesScreen: View {
         .accessibilityIdentifier("matches.screen")
         .matchesReadDiagnostic(diagnostics?.summary)
         .navigationDestination(for: MatchesDestination.self) { destination in
-            if let match = presentation.match(for: destination) {
-                MatchDetailView(match: match)
-            } else {
-                MatchDetailUnavailableView()
+            switch destination {
+            case .match(let matchID):
+                matchDetailDestination(matchID: matchID)
             }
         }
         .onAppear(perform: reconcileSelection)
         .onChange(of: presentation.tournamentID) { _ in reconcileSelection() }
         .onChange(of: presentation.selectedRoundID) { _ in reconcileSelection() }
+    }
+
+    @ViewBuilder
+    private func matchDetailDestination(matchID: String) -> some View {
+        MatchGameCenterRouteView(
+            matchID: matchID,
+            coordinator: coordinator,
+            fixtureState: fixtureMatchDetailStates[matchID],
+            profile: profile,
+            onOpenPassport: onOpenPassport,
+            onNavigateMatch: onNavigateMatch
+        )
     }
 
     @ViewBuilder
@@ -171,6 +220,166 @@ struct MatchesScreen: View {
             selectedRoundID = resolved
         }
     }
+}
+
+struct MatchGameCenterRouteView: View {
+    let matchID: String
+    let coordinator: TournamentDataCoordinator?
+    let fixtureState: MobileReadState<MobileMatchDetailData>?
+    let profile: TodayParticipantPresentation
+    let onOpenPassport: () -> Void
+    let onNavigateMatch: (String) -> Void
+
+    var body: some View {
+        Group {
+            if let fixtureState {
+                #if DEBUG
+                if MatchGameCenterLoadingUITestView.isEnabled {
+                    MatchGameCenterLoadingUITestView(
+                        loadedState: fixtureState,
+                        matchID: matchID,
+                        onNavigateMatch: onNavigateMatch
+                    )
+                } else {
+                    fixtureContent(fixtureState)
+                }
+                #else
+                fixtureContent(fixtureState)
+                #endif
+            } else if let coordinator,
+                      let repository = coordinator.matchDetailRepository(matchID: matchID)
+            {
+                MatchGameCenterRepositoryView(
+                    matchID: matchID,
+                    coordinator: coordinator,
+                    repository: repository,
+                    onNavigateMatch: onNavigateMatch
+                )
+            } else if MobileOpaqueMatchID.isValid(matchID) {
+                // Resolving the native repository is not a participant-safe
+                // server 404. Never flash not-found copy during this boundary.
+                MatchGameCenterContentView(
+                    state: .empty,
+                    requestedMatchID: matchID,
+                    onRefresh: {},
+                    onNavigate: onNavigateMatch,
+                    onBackToMyMatch: onNavigateMatch
+                )
+            } else {
+                MatchDetailInvalidRouteView()
+            }
+        }
+        // Sibling navigation replaces the current route. Its presentation state
+        // belongs to the exact byte identity, not Swift String equivalence or a
+        // reused view slot from the previously displayed Match.
+        .id(Data(matchID.utf8))
+        .baggerMatchDetailChrome(profile: profile, onOpenPassport: onOpenPassport)
+    }
+
+    private func fixtureContent(_ state: MobileReadState<MobileMatchDetailData>) -> some View {
+        MatchGameCenterContentView(
+            state: state,
+            requestedMatchID: matchID,
+            onRefresh: {},
+            onNavigate: onNavigateMatch,
+            onBackToMyMatch: onNavigateMatch
+        )
+    }
+}
+
+private extension View {
+    func baggerMatchDetailChrome(
+        profile: TodayParticipantPresentation,
+        onOpenPassport: @escaping () -> Void
+    ) -> some View {
+        toolbar(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: onOpenPassport) {
+                        BaggerPlayerAvatar(
+                            playerID: profile.playerID,
+                            displayName: profile.displayName,
+                            size: .medium,
+                            accessibility: .decorative
+                        )
+                        .frame(
+                            minWidth: BaggerDesign.Size.minimumTouchTarget,
+                            minHeight: BaggerDesign.Size.minimumTouchTarget
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Open \(profile.displayName)’s Player Passport")
+                    .accessibilityHint("Opens your native Player Passport")
+                    .accessibilityIdentifier("matches.detail.profile")
+                }
+            }
+            .toolbarBackground(BaggerPalette.cream, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.light, for: .navigationBar)
+    }
+}
+
+private struct MatchGameCenterRepositoryView: View {
+    let matchID: String
+    let coordinator: TournamentDataCoordinator
+    @ObservedObject var repository: MobileReadRepository<MobileMatchDetailResponse>
+    let onNavigateMatch: (String) -> Void
+    @Environment(\.scenePhase) private var scenePhase
+
+    var body: some View {
+        MatchGameCenterContentView(
+            state: repository.state,
+            requestedMatchID: matchID,
+            onRefresh: { await coordinator.refreshMatchDetail(matchID: matchID) },
+            onNavigate: onNavigateMatch,
+            onBackToMyMatch: onNavigateMatch
+        )
+        .overlay(alignment: .topLeading) {
+            if BaggerAcceptanceProbes.isEnabled() {
+                Text("Match read acceptance")
+                    .font(.system(size: 1))
+                    .frame(width: 1, height: 1)
+                    .opacity(0.01)
+                    .allowsHitTesting(false)
+                    .accessibilityIdentifier("match.gameCenter.readAcceptance")
+                    .accessibilityValue(acceptanceSummary)
+            }
+        }
+        .task(id: MatchDetailRefreshIdentity(matchID: Data(matchID.utf8), isForeground: scenePhase == .active)) {
+            guard scenePhase == .active else { return }
+            await coordinator.loadMatchDetail(matchID: matchID)
+            // Match Center's visible read-only projection stays current. Swift
+            // only refreshes the canonical result; it never computes scoring.
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: .seconds(45))
+                } catch {
+                    return
+                }
+                guard !Task.isCancelled, scenePhase == .active else { return }
+                await coordinator.refreshMatchDetail(matchID: matchID)
+            }
+        }
+        .onDisappear {
+            coordinator.endViewingMatchDetail(matchID: matchID)
+        }
+    }
+
+    private var acceptanceSummary: String {
+        #if DEBUG
+        let state = repository.state
+        let match = state.value?.match
+        let identity = match.map { MobileOpaqueMatchID.isEqual($0.matchId, matchID) } ?? false
+        return "content \(match != nil); freshness \(state.freshness.rawValue); status \(state.lastHTTPStatus ?? 0); round trip \(identity); format \(match?.round.format.rawValue ?? "none"); owned \(match?.navigation.isMyMatch ?? false); modified \(repository.modifiedResponseCount); not modified \(repository.notModifiedResponseCount); cache loads \(repository.cacheLoadCount)"
+        #else
+        return ""
+        #endif
+    }
+}
+
+private struct MatchDetailRefreshIdentity: Hashable {
+    let matchID: Data
+    let isForeground: Bool
 }
 
 private struct MatchesRoundSelector: View {
@@ -945,7 +1154,7 @@ private struct MatchContextLine: View {
 }
 
 /// Matches-index statuses intentionally delegate to the same semantic badge
-/// used by Today. Match Detail keeps its existing presentation until 2J.3B.
+/// used by Today and the native Match Game Center.
 private struct MatchesIndexStatusBadge: View {
     let status: MatchesMatchStatusPresentation
 
@@ -1081,135 +1290,13 @@ private struct MatchesUnavailableState: View {
     }
 }
 
-private struct MatchDetailView: View {
-    let match: MatchesMatchPresentation
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: BaggerLayout.sectionSpacing) {
-                VStack(alignment: .leading, spacing: 7) {
-                    if match.authenticatedPlayerInvolved {
-                        BaggerEyebrow(text: "Your Match")
-                    }
-                    detailHeader
-                }
-
-                MatchContextLine(match: match)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .baggerCard()
-
-                VStack(alignment: .leading, spacing: 12) {
-                    BaggerSectionHeading("Matchup")
-                    MatchesSidesView(
-                        sides: match.teams,
-                        ownedSide: match.authenticatedPlayerSide
-                    )
-                    .accessibilityIdentifier("matches.detail.sides")
-                }
-                .baggerCard(border: match.authenticatedPlayerInvolved ? BaggerPalette.gold : BaggerPalette.warmBorder)
-
-                if match.status == .live {
-                    MatchDetailStateCard(
-                        title: "Current Progress",
-                        value: match.progressText ?? "Progress has not been posted.",
-                        symbol: "flag.fill",
-                        identifier: "matches.detail.progress"
-                    )
-                } else if match.status == .final {
-                    MatchDetailStateCard(
-                        title: "Final Result",
-                        value: match.resultText ?? "Final result has not been posted.",
-                        symbol: "checkmark.seal.fill",
-                        identifier: "matches.detail.result"
-                    )
-                }
-            }
-            .padding(.horizontal, BaggerLayout.pageInset)
-            .padding(.top, 12)
-            .padding(.bottom, 28)
-        }
-        .background(BaggerPalette.canvas.ignoresSafeArea())
-        .navigationTitle("Match")
-        .navigationBarTitleDisplayMode(.inline)
-        .accessibilityIdentifier("matches.detail")
-        .overlay(alignment: .topLeading) {
-            if BaggerAcceptanceProbes.isEnabled() {
-                Text("Match identity")
-                    .font(.system(size: 1))
-                    .frame(width: 1, height: 1)
-                    .opacity(0.01)
-                    .allowsHitTesting(false)
-                    .accessibilityIdentifier("matches.detail.\(match.matchID)")
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var detailHeader: some View {
-        if dynamicTypeSize.isAccessibilitySize {
-            VStack(alignment: .leading, spacing: 10) {
-                detailHeaderCopy
-                detailStatus
-            }
-        } else {
-            HStack(alignment: .top, spacing: 10) {
-                detailHeaderCopy
-                Spacer(minLength: 4)
-                detailStatus
-            }
-        }
-    }
-
-    private var detailHeaderCopy: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(match.roundText)
-                .font(.system(.title, design: .serif, weight: .bold))
-                .foregroundStyle(BaggerPalette.ink)
-                .fixedSize(horizontal: false, vertical: true)
-            if let format = match.formatText {
-                Text(format)
-                    .font(.headline)
-                    .foregroundStyle(BaggerPalette.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-
-    private var detailStatus: some View {
-        MatchesStatusPill(status: match.status)
-            .accessibilityIdentifier("matches.detail.status")
-    }
-}
-
-private struct MatchDetailStateCard: View {
-    let title: String
-    let value: String
-    let symbol: String
-    let identifier: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            BaggerEyebrow(text: title)
-            Label(value, systemImage: symbol)
-                .font(.system(.title3, design: .serif, weight: .bold))
-                .foregroundStyle(BaggerPalette.actionGreen)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .baggerCard(border: BaggerPalette.matchBorder)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(identifier)
-    }
-}
-
-private struct MatchDetailUnavailableView: View {
+private struct MatchDetailInvalidRouteView: View {
     var body: some View {
         VStack(spacing: 14) {
             Image(systemName: "exclamationmark.circle")
                 .font(.largeTitle)
                 .foregroundStyle(BaggerPalette.goldText)
-            Text("This Match is no longer available.")
+            Text("This Match link couldn’t be opened.")
                 .font(.headline)
                 .multilineTextAlignment(.center)
         }
@@ -1218,7 +1305,7 @@ private struct MatchDetailUnavailableView: View {
         .background(BaggerPalette.canvas.ignoresSafeArea())
         .navigationTitle("Match")
         .navigationBarTitleDisplayMode(.inline)
-        .accessibilityIdentifier("matches.detail.unavailable")
+        .accessibilityIdentifier("matches.detail.invalidLink")
     }
 }
 

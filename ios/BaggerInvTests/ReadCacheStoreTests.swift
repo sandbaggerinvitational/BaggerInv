@@ -127,6 +127,97 @@ final class ReadCacheStoreTests: XCTestCase {
         } catch {
             XCTAssertEqual(error as? ReadCacheError, .invalidCacheKey)
         }
+        do {
+            try await store.write(Data(), product: .matchDetail, partition: partition)
+            XCTFail("A Match-detail product without a validated Match ID must fail closed")
+        } catch {
+            XCTAssertEqual(error as? ReadCacheError, .invalidCacheKey)
+        }
+    }
+
+    func testMatchDetailCacheKeyIsValidatedHashedAndIndependentOfPresentationText() throws {
+        let key = try MobileReadCacheKey(matchID: "match:round-3.12")
+        let same = try MobileReadCacheKey(matchID: "match:round-3.12")
+        let other = try MobileReadCacheKey(matchID: "match:round-3.2")
+
+        XCTAssertEqual(key.product, .matchDetail)
+        XCTAssertEqual(key.matchID, "match:round-3.12")
+        XCTAssertEqual(key.filename, same.filename)
+        XCTAssertNotEqual(key.filename, other.filename)
+        XCTAssertTrue(key.filename.hasPrefix("matchDetail-"))
+        XCTAssertTrue(key.filename.hasSuffix(".json"))
+        XCTAssertFalse(key.filename.contains("match:round-3.12"))
+        XCTAssertNoThrow(try MobileReadCacheKey(matchID: "../match"))
+        XCTAssertNoThrow(try MobileReadCacheKey(matchID: "match/12"))
+    }
+
+    func testOpaqueMatchCacheKeysPreserveReservedCharactersAndUnicodeBytes() throws {
+        for matchID in OpaqueMatchIDFixtures.validIDs {
+            let key = try MobileReadCacheKey(matchID: matchID)
+            let decoded = try JSONDecoder().decode(MobileReadCacheKey.self, from: JSONEncoder().encode(key))
+            XCTAssertEqual(Data(try XCTUnwrap(decoded.matchID).utf8), Data(matchID.utf8))
+            XCTAssertEqual(key, decoded)
+            XCTAssertNotNil(key.filename.range(of: #"^matchDetail-[a-f0-9]{64}\.json$"#, options: .regularExpression))
+        }
+    }
+
+    func testOpaqueMatchCacheKeyBoundsCountUnicodeScalarsWithoutNormalization() throws {
+        let maximum = String(repeating: "🏌", count: 200)
+        let tooManyScalars = "e" + String(repeating: "\u{301}", count: 200)
+        XCTAssertEqual(maximum.unicodeScalars.count, 200)
+        XCTAssertGreaterThan(maximum.utf8.count, 200)
+        XCTAssertEqual(tooManyScalars.count, 1)
+        XCTAssertEqual(tooManyScalars.unicodeScalars.count, 201)
+        XCTAssertNoThrow(try MobileReadCacheKey(matchID: maximum))
+        XCTAssertThrowsError(try MobileReadCacheKey(matchID: ""))
+        XCTAssertThrowsError(try MobileReadCacheKey(matchID: "."))
+        XCTAssertThrowsError(try MobileReadCacheKey(matchID: ".."))
+        XCTAssertThrowsError(try MobileReadCacheKey(matchID: "match\u{0}id"))
+        XCTAssertThrowsError(try MobileReadCacheKey(matchID: tooManyScalars))
+    }
+
+    func testCanonicalEquivalentUnicodeMatchIDsHaveDistinctCacheKeysAndFiles() async throws {
+        let composed = try MobileReadCacheKey(matchID: "café")
+        let decomposed = try MobileReadCacheKey(matchID: "cafe\u{301}")
+        XCTAssertEqual(composed.matchID, decomposed.matchID, "Swift String equality normalizes these spellings")
+        XCTAssertNotEqual(composed, decomposed)
+        XCTAssertEqual(Set([composed, decomposed]).count, 2)
+        XCTAssertNotEqual(composed.filename, decomposed.filename)
+
+        let root = try makeTemporaryRoot()
+        defer { removeTemporaryRoot(root) }
+        let store = try DiskReadCacheStore(rootDirectory: root)
+        let partition = try PartitionInputs.standard.partition()
+        try await store.write(Data([1]), key: composed, partition: partition)
+        try await store.write(Data([2]), key: decomposed, partition: partition)
+        let first = try await store.read(key: composed, partition: partition)
+        let second = try await store.read(key: decomposed, partition: partition)
+        XCTAssertEqual(first, Data([1]))
+        XCTAssertEqual(second, Data([2]))
+    }
+
+    func testExactMatchRevocationPreservesCanonicallyEquivalentIDAndMatchesAcrossStoreRecreation() async throws {
+        let root = try makeTemporaryRoot()
+        defer { removeTemporaryRoot(root) }
+        let partition = try PartitionInputs.standard.partition()
+        let composed = try MobileReadCacheKey(matchID: "café")
+        let decomposed = try MobileReadCacheKey(matchID: "cafe\u{301}")
+        let store = try DiskReadCacheStore(rootDirectory: root)
+        try await store.write(Data("withdrawn".utf8), key: composed, partition: partition)
+        try await store.write(Data("other exact Match".utf8), key: decomposed, partition: partition)
+        try await store.write(Data("Matches list".utf8), product: .matches, partition: partition)
+
+        try await store.remove(key: composed, partition: partition)
+
+        let reopened = try DiskReadCacheStore(rootDirectory: root)
+        let removed = try await reopened.read(key: composed, partition: partition)
+        let other = try await reopened.read(key: decomposed, partition: partition)
+        let matches = try await reopened.read(product: .matches, partition: partition)
+        XCTAssertNil(removed)
+        XCTAssertEqual(other, Data("other exact Match".utf8))
+        XCTAssertEqual(matches, Data("Matches list".utf8))
+        let originalURL = await reopened.fileURL(key: composed, partition: partition)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: originalURL.path))
     }
 
     func testAllProtectedReadCacheKeysUseDistinctParticipantPrivateFiles() async throws {
@@ -140,14 +231,19 @@ final class ReadCacheStoreTests: XCTestCase {
             Set([
                 .today, .matches, .leaders, .netSkins, .calcutta, .schedule,
                 .passport, .guide, .history, .historyDetail, .records, .odds,
+                .matchDetail,
             ])
         )
-        let staticProducts = MobileReadProduct.allCases.filter { $0 != .historyDetail }
+        let staticProducts = MobileReadProduct.allCases.filter {
+            $0 != .historyDetail && $0 != .matchDetail
+        }
         for (index, product) in staticProducts.enumerated() {
             try await store.write(Data([UInt8(index + 1)]), product: product, partition: partition)
         }
         let historyDetailKey = try MobileReadCacheKey(historyYear: 2025)
         try await store.write(Data([255]), key: historyDetailKey, partition: partition)
+        let matchDetailKey = try MobileReadCacheKey(matchID: "fixture-match-12")
+        try await store.write(Data([254]), key: matchDetailKey, partition: partition)
 
         let names = try FileManager.default.contentsOfDirectory(
             at: await store.fileURL(product: .leaders, partition: partition).deletingLastPathComponent(),
@@ -158,7 +254,7 @@ final class ReadCacheStoreTests: XCTestCase {
             Set([
                 "today.json", "matches.json", "leaders.json", "netSkins.json", "calcutta.json",
                 "schedule.json", "passport.json", "guide.json", "history.json", "records.json",
-                "odds.json", "historyDetail-2025.json",
+                "odds.json", "historyDetail-2025.json", matchDetailKey.filename,
             ])
         )
     }
@@ -233,12 +329,16 @@ final class ReadCacheStoreTests: XCTestCase {
         let store = try DiskReadCacheStore(rootDirectory: root)
         let partition = try PartitionInputs.standard.partition()
 
-        let staticProducts = MobileReadProduct.allCases.filter { $0 != .historyDetail }
+        let staticProducts = MobileReadProduct.allCases.filter {
+            $0 != .historyDetail && $0 != .matchDetail
+        }
         for product in staticProducts {
             try await store.write(Data(product.rawValue.utf8), product: product, partition: partition)
         }
         let historyDetailKey = try MobileReadCacheKey(historyYear: 2025)
         try await store.write(Data("history-2025".utf8), key: historyDetailKey, partition: partition)
+        let matchDetailKey = try MobileReadCacheKey(matchID: "fixture-match-12")
+        try await store.write(Data("match-detail".utf8), key: matchDetailKey, partition: partition)
         let partitionDirectory = await store.fileURL(product: .today, partition: partition)
             .deletingLastPathComponent()
 
@@ -254,6 +354,11 @@ final class ReadCacheStoreTests: XCTestCase {
             partition: partition
         )
         XCTAssertNil(restoredHistoryDetail)
+        let restoredMatchDetail = try await store.read(
+            key: matchDetailKey,
+            partition: partition
+        )
+        XCTAssertNil(restoredMatchDetail)
         XCTAssertFalse(FileManager.default.fileExists(atPath: partitionDirectory.path))
         let byteCount = try await store.byteCount(partition: partition)
         XCTAssertEqual(byteCount, 0)

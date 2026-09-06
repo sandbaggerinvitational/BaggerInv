@@ -44,7 +44,14 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     let scoringFinalization: ScoringFinalizationCoordinator?
 
     private let cache: any ReadCacheStoring
+    private let api: any MobileAPIServing
+    private let credentialProvider: any MobileReadCredentialProviding
+    private let now: () -> Date
     private let applicationActivity: NativeApplicationActivity
+    // Swift String equality folds canonically equivalent Unicode. Server IDs
+    // are opaque UTF-8 values, so repository identity must use their bytes.
+    private var matchDetails: [Data: MobileReadRepository<MobileMatchDetailResponse>] = [:]
+    private var activeMatchDetailID: String?
     private var activeContext: ActiveMobileReadContext?
     private var isSuspended = false
     private var scoringWasActiveBeforeSuspension = false
@@ -67,6 +74,9 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         now: @escaping () -> Date = Date.init
     ) {
         self.cache = cache
+        self.api = api
+        self.credentialProvider = credentialProvider
+        self.now = now
         self.applicationActivity = applicationActivity
         today = MobileReadRepository(
             product: .today,
@@ -311,6 +321,94 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         authorityRevalidationHandler = handler
     }
 
+    func matchDetailRepository(matchID: String) -> MobileReadRepository<MobileMatchDetailResponse>? {
+        let identity = Data(matchID.utf8)
+        if let repository = matchDetails[identity] { return repository }
+        guard let cacheKey = try? MobileReadCacheKey(matchID: matchID) else { return nil }
+
+        let repository = MobileReadRepository<MobileMatchDetailResponse>(
+            cacheKey: cacheKey,
+            cache: cache,
+            credentialProvider: credentialProvider,
+            now: now,
+            responseValidator: { response, context in
+                guard response.isCompatible(
+                    expectedTournamentID: context.tournamentID,
+                    expectedPlayerID: context.playerID
+                ), MobileOpaqueMatchID.isEqual(response.data.match.matchId, matchID) else { return false }
+
+                let authenticatedParticipants = response.data.match.teams
+                    .flatMap(\.participants)
+                    .filter(\.isAuthenticatedPlayer)
+                if response.data.match.authenticatedPlayer.involved {
+                    return authenticatedParticipants.count == 1 &&
+                        authenticatedParticipants.first?.playerId == context.playerID
+                }
+                return authenticatedParticipants.isEmpty
+            },
+            canonicalRevocationPredicate: { error in
+                guard let apiError = error as? MobileAPIClientError else { return false }
+                switch apiError {
+                case .unexpectedStatus(let status):
+                    return status == 404
+                case .server(_, let status):
+                    return status == 404
+                default:
+                    return false
+                }
+            }
+        ) { [api] credentials, etag in
+            try await api.matchDetail(
+                matchID: matchID,
+                accessToken: credentials.accessToken,
+                certification: credentials.certification,
+                etag: etag
+            )
+        }
+
+        let invalidation: @MainActor @Sendable () -> Void = { [weak self] in
+            self?.deliverAccessInvalidationOnce()
+        }
+        let authorityRevalidation: @MainActor @Sendable () -> Void = { [weak self] in
+            self?.authorityRevalidationHandler?()
+        }
+        repository.setAccessInvalidationHandler(invalidation)
+        repository.setAuthorityRevalidationHandler(authorityRevalidation)
+        matchDetails[identity] = repository
+        return repository
+    }
+
+    func loadMatchDetail(matchID: String) async {
+        guard let repository = matchDetailRepository(matchID: matchID) else { return }
+        let beginsViewingSession = !MobileOpaqueMatchID.isEqual(activeMatchDetailID, matchID)
+        if beginsViewingSession {
+            for (otherID, otherRepository) in matchDetails where otherID != Data(matchID.utf8) && otherRepository.isActive {
+                await otherRepository.deactivate(deleteCache: false)
+            }
+            activeMatchDetailID = matchID
+        }
+        if beginsViewingSession {
+            await activateAndRefresh(repository)
+        } else {
+            await activateAndLoad(repository)
+        }
+    }
+
+    func refreshMatchDetail(matchID: String) async {
+        guard let repository = matchDetailRepository(matchID: matchID) else { return }
+        activeMatchDetailID = matchID
+        await activateAndRefresh(repository)
+    }
+
+    /// Ends only the visible-Match lifecycle. The small eligible representation
+    /// remains available in memory and in the private cache for immediate reuse;
+    /// the next viewing session still performs validator revalidation.
+    func endViewingMatchDetail(matchID: String) {
+        if MobileOpaqueMatchID.isEqual(activeMatchDetailID, matchID) {
+            activeMatchDetailID = nil
+        }
+    }
+
     func activate(authUserID: String, participant: ParticipantSession) async {
         let partition: ReadCachePartition
         do {
@@ -428,6 +526,12 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             await historyDetails[year]?.deactivate(deleteCache: false)
             guard lifecycleGeneration == deactivationGeneration else { return }
         }
+        for matchID in matchDetails.keys.sorted(by: { $0.lexicographicallyPrecedes($1) }) {
+            await matchDetails[matchID]?.deactivate(deleteCache: false)
+            guard lifecycleGeneration == deactivationGeneration else { return }
+        }
+        matchDetails.removeAll()
+        activeMatchDetailID = nil
         await scoring.deactivate()
         guard lifecycleGeneration == deactivationGeneration else { return }
         await scoringFinalization?.deactivate()
@@ -476,6 +580,9 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         )
         for year in historyDetails.keys.sorted() {
             await historyDetails[year]?.suspendRefresh()
+        }
+        for matchID in matchDetails.keys.sorted(by: { $0.lexicographicallyPrecedes($1) }) {
+            await matchDetails[matchID]?.suspendRefresh()
         }
     }
 
@@ -647,6 +754,12 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             guard let repository = historyDetails[year], repository.isActive else { continue }
             await repository.refresh()
             guard isCurrent(context, generation: refreshGeneration) else { return }
+        }
+        if let matchID = activeMatchDetailID,
+           let repository = matchDetails[Data(matchID.utf8)],
+           repository.isActive
+        {
+            await repository.refresh()
         }
     }
 

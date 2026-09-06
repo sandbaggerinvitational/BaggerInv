@@ -86,7 +86,7 @@ final class BaggerInvTodayUITests: XCTestCase {
         )
     }
 
-    func testCurrentAndPersonalMatchesOpenTheirExactExistingMatchDetail() {
+    func testCurrentAndPersonalMatchesOpenExactMatchDetailAndReturnToToday() {
         let app = launch(
             .standard,
             additionalArguments: ["--bagger-acceptance-probes"]
@@ -97,21 +97,24 @@ final class BaggerInvTodayUITests: XCTestCase {
             in: app,
             requireHittable: true
         ).tap()
-        XCTAssertTrue(app.tabBars.buttons["Matches"].isSelected)
+        XCTAssertTrue(app.tabBars.buttons["Today"].isSelected)
         assertMatchDetail(
             matchID: "fixture-r2-owned",
             format: "Scramble",
-            course: "Cougar Point",
-            player: "Alex Morgan",
+            course: "The Ocean Course at Kiawah Island",
+            player: "Clay Beltran",
             in: app
         )
         app.navigationBars.buttons.firstMatch.tap()
-        assertExists("matches.screen", in: app)
+        assertExists("today.screen", in: app)
+        XCTAssertTrue(app.tabBars.buttons["Today"].isSelected)
 
+        // Detail now decodes its own canonical DTO fixture. Its course/player
+        // assertions must not come from the obsolete collection-only Detail.
         let personalMatches = [
-            (matchID: "fixture-r1-final", format: "Best Ball", course: "Turtle Point"),
-            (matchID: "fixture-r2-owned", format: "Scramble", course: "Cougar Point"),
-            (matchID: "fixture-r3-scheduled", format: "Singles", course: "Ocean Course"),
+            (matchID: "fixture-r1-final", format: "Best Ball", player: "Alex Morgan"),
+            (matchID: "fixture-r2-owned", format: "Scramble", player: "Clay Beltran"),
+            (matchID: "fixture-r3-scheduled", format: "Singles", player: "Alex Morgan"),
         ]
         for expected in personalMatches {
             app.tabBars.buttons["Today"].tap()
@@ -121,16 +124,17 @@ final class BaggerInvTodayUITests: XCTestCase {
                 in: app,
                 requireHittable: true
             ).tap()
-            XCTAssertTrue(app.tabBars.buttons["Matches"].isSelected)
+            XCTAssertTrue(app.tabBars.buttons["Today"].isSelected)
             assertMatchDetail(
                 matchID: expected.matchID,
                 format: expected.format,
-                course: expected.course,
-                player: "Alex Morgan",
+                course: "The Ocean Course at Kiawah Island",
+                player: expected.player,
                 in: app
             )
             app.navigationBars.buttons.firstMatch.tap()
-            assertExists("matches.screen", in: app)
+            assertExists("today.screen", in: app)
+            XCTAssertTrue(app.tabBars.buttons["Today"].isSelected)
         }
     }
 
@@ -396,7 +400,7 @@ final class BaggerInvTodayUITests: XCTestCase {
         )
         XCTAssertTrue(
             element(labelContaining: player, in: app).waitForExistence(timeout: 3),
-            "Match Detail for \(matchID) did not preserve the authenticated player \(player)."
+            "Match Detail for \(matchID) did not preserve the canonical participant \(player)."
         )
     }
 

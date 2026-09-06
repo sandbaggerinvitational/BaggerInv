@@ -283,7 +283,7 @@ final class LeadersPresentationTests: XCTestCase {
         XCTAssertEqual(published.golfers.first?.tieSize, 2)
         XCTAssertEqual(published.golfers.first?.rounds.first?.grossText, "78")
         XCTAssertEqual(published.golfers.first?.rounds.first?.netText, "72")
-        XCTAssertEqual(published.golfers.first?.rounds.first?.courseHandicapText, "6")
+        XCTAssertEqual(published.golfers.first?.rounds.first?.courseHandicapText, "6.0")
         XCTAssertEqual(published.golfers.first?.rounds.first?.finishText, "Rank 2 · Tied 2")
         XCTAssertEqual(published.golfers.first?.rounds.first?.pointsText, "2.5")
         XCTAssertEqual(published.golfers.map(\.isAuthenticatedPlayer), [false, true])

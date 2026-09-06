@@ -99,10 +99,12 @@ struct TodayUITestFixtureRoot: View {
         default:
             let arguments = ProcessInfo.processInfo.arguments
             let participant = TodayUITestFixtures.participant(for: scenario)
+            let matchDetailID = MatchDetailUITestFixtures.startingMatchID(arguments: arguments)
             BaggerAppShell(
                 participant: participant,
                 fixturePresentation: TodayUITestFixtures.presentation(for: scenario),
                 fixtureMatchesState: MatchesUITestFixtures.state(for: scenario),
+                fixtureMatchDetailStates: MatchDetailUITestFixtures.states,
                 fixtureScoringState: ScoringUITestFixtures.state(for: scenario),
                 fixtureLeaders: LeadersUITestFixtures.bundle(
                     participant: participant,
@@ -117,11 +119,12 @@ struct TodayUITestFixtureRoot: View {
                 fixtureOddsState: MoreUITestFixtures.oddsState(for: scenario),
                 fixtureScheduleNow: MoreUITestFixtures.now,
                 fixtureUsesDurableScoringQueue: scenario == .scoreDurableOffline,
-                startsOnMatches: scenario.rawValue.hasPrefix("matches."),
+                startsOnMatches: scenario.rawValue.hasPrefix("matches.") || matchDetailID != nil,
                 startsOnScore: scenario.rawValue.hasPrefix("score."),
                 startsOnLeaders: arguments.contains("--bagger-start-leaders"),
                 startsOnMore: scenario.rawValue.hasPrefix("more."),
-                startsOnSchedule: scenario.rawValue.hasPrefix("schedule.")
+                startsOnSchedule: scenario.rawValue.hasPrefix("schedule."),
+                startsOnMatchDetailID: matchDetailID
             )
         }
     }

@@ -213,7 +213,13 @@ final class MorePresentationTests: XCTestCase {
     }
 
     func testPassportRichCareerPreservesEveryCanonicalCollectionOrder() {
-        let presentation = PassportPresenter.make(data: passportData(rich: true), locale: locale)
+        let data = passportData(rich: true)
+        let presentation = PassportPresenter.make(data: data, locale: locale)
+
+        XCTAssertEqual(presentation.currentTournament.tournamentHandicap, "8.4")
+        XCTAssertEqual(presentation.careerSummary.first(where: { $0.id == "average-handicap" })?.value, "9.3")
+        XCTAssertEqual(data.currentTournament.tournamentHandicap, 8.4)
+        XCTAssertEqual(data.career.summary.averageHandicap, 9.25)
 
         XCTAssertEqual(presentation.displayName, "Long Preview Golfer Name")
         XCTAssertEqual(presentation.teamName, "Preview Team")
@@ -415,6 +421,30 @@ final class MorePresentationTests: XCTestCase {
         )
 
         XCTAssertEqual(presentation.scorecards.map(\.participantLabel), ["Alex Morgan", "Dunes"])
+    }
+
+    func testHistoryHandicapsUseOneDecimalWithoutChangingCanonicalValues() {
+        let team = MobileHistoryTeam(
+            teamId: "team-one", name: "Pines", side: 1, points: 8, captain: nil,
+            averageHandicap: 4.25,
+            roster: [
+                MobileHistoryRosterPlayer(playerId: "player-one", displayName: "Alex Morgan", handicap: -2.75, isCaptain: false),
+                MobileHistoryRosterPlayer(playerId: "player-two", displayName: "Taylor Kim", handicap: 0, isCaptain: false),
+                MobileHistoryRosterPlayer(playerId: "player-three", displayName: "Sam Green", handicap: nil, isCaptain: false),
+            ]
+        )
+        let presentation = HistoryPresenter.detail(
+            data: MobileHistoryDetailData(
+                tournament: historySummary(id: "history-handicap", year: 2026, teams: []),
+                teams: [team], rounds: [], matches: [], standings: [], awards: [], scorecards: []
+            ),
+            locale: locale
+        )
+        XCTAssertEqual(presentation.teams[0].averageHandicap, "4.3")
+        XCTAssertEqual(presentation.teams[0].roster.map(\.handicap), ["(2.8)", "0.0", nil])
+        XCTAssertEqual(team.averageHandicap, 4.25)
+        XCTAssertEqual(team.roster.map(\.handicap), [-2.75, 0, nil])
+        XCTAssertEqual(presentation.teams[0].points, "8")
     }
 
     func testOddsOnlyFormatsCanonicalValuesAndPreservesRankingOrder() throws {

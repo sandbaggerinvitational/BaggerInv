@@ -452,7 +452,7 @@ struct MobileMatchesMatch: Codable, Equatable, Sendable {
             formatSemanticsAreCompatible = true
         }
 
-        return !matchId.isEmpty &&
+        return MobileOpaqueMatchID.isValid(matchId) &&
         (displayMatchNumber.map { !$0.isEmpty } ?? true) &&
         teams.count == 2 &&
         Set(teams.map(\.side)) == Set([1, 2]) &&

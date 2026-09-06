@@ -238,6 +238,7 @@ final class MatchesPresentationTests: XCTestCase {
         XCTAssertTrue(match.teams.flatMap(\.participants).allSatisfy { $0.golfContext == nil })
         XCTAssertEqual(match.teams[0].golfContext?.compactText, "Team HCP 3.5 · No strokes")
         XCTAssertEqual(match.teams[1].golfContext?.compactText, "Team HCP 4.3 · +2 strokes")
+        XCTAssertEqual(match.teams[1].golfContext?.playingHandicap, 4.25)
         XCTAssertEqual(
             match.teams[0].golfContext?.accessibilityText,
             "Team Playing Handicap 3.5, No team strokes"
@@ -293,6 +294,7 @@ final class MatchesPresentationTests: XCTestCase {
 
         XCTAssertEqual(match.teams[0].participants[0].golfContext?.compactText, "HCP (0.5) · No strokes")
         XCTAssertEqual(match.teams[0].participants[1].golfContext?.compactText, "HCP 12.3 · +1 stroke")
+        XCTAssertEqual(match.teams[0].participants[1].golfContext?.playingHandicap, 12.34567)
         XCTAssertNil(match.teams[1].participants[0].golfContext)
         XCTAssertEqual(match.teams[1].participants[1].golfContext?.compactText, "HCP 0.0 · No strokes")
     }
@@ -388,6 +390,25 @@ final class MatchesPresentationTests: XCTestCase {
         )
         XCTAssertNil(presentation.match(for: .match(matchID: "missing")))
         XCTAssertNil(presentation.round(withID: .number(99)))
+    }
+
+    func testNavigationDestinationAndRowsDistinguishNormalizationEquivalentOpaqueIDs() throws {
+        let composed = "café"
+        let decomposed = "cafe\u{301}"
+        let first = MatchesDestination.match(matchID: composed)
+        let second = MatchesDestination.match(matchID: decomposed)
+        XCTAssertNotEqual(first, second)
+        XCTAssertEqual(Set([first, second]).count, 2)
+
+        let presentation = makePresentation(
+            currentRound: 2,
+            matches: [makeMatch(id: composed, round: 2), makeMatch(id: decomposed, round: 2)]
+        )
+        let firstRow = try XCTUnwrap(presentation.match(for: first))
+        let secondRow = try XCTUnwrap(presentation.match(for: second))
+        XCTAssertEqual(Data(firstRow.matchID.utf8), Data(composed.utf8))
+        XCTAssertEqual(Data(secondRow.matchID.utf8), Data(decomposed.utf8))
+        XCTAssertNotEqual(firstRow.id, secondRow.id)
     }
 
     func testFreshnessAndAvailabilityPreserveCachedOfflineAndNoCacheStates() {

@@ -75,9 +75,9 @@ struct ScoringParticipantPresentation: Identifiable, Equatable, Hashable, Sendab
 
     var handicapSummary: String? {
         let components: [String] = [
-            handicapIndex.map { "HI \(ScoringNumberFormatter.string($0))" },
-            courseHandicap.map { "CH \(ScoringNumberFormatter.string($0))" },
-            playingHandicap.map { "PH \(ScoringNumberFormatter.string($0))" },
+            handicapIndex.map { "HI \(HandicapDisplayFormatter.string($0))" },
+            courseHandicap.map { "CH \(HandicapDisplayFormatter.string($0))" },
+            playingHandicap.map { "PH \(HandicapDisplayFormatter.string($0))" },
         ].compactMap { $0 }
         return components.isEmpty ? nil : components.joined(separator: " · ")
     }

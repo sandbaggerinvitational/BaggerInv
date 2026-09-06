@@ -72,7 +72,7 @@ struct MatchesGolfContextPresentation: Equatable, Hashable, Sendable {
 
     var playingHandicapText: String? {
         guard let playingHandicap else { return nil }
-        let value = MatchesGolfValueFormatter.playingHandicap(playingHandicap)
+        let value = MatchGolfDisplayFormatter.playingHandicap(playingHandicap)
         switch scope {
         case .participant: return "HCP \(value)"
         case .team: return "Team HCP \(value)"
@@ -81,14 +81,7 @@ struct MatchesGolfContextPresentation: Equatable, Hashable, Sendable {
 
     var strokesText: String? {
         guard let strokesReceived else { return nil }
-        switch scope {
-        case .participant:
-            guard strokesReceived > 0 else { return "No strokes" }
-            return "+\(strokesReceived) \(strokesReceived == 1 ? "stroke" : "strokes")"
-        case .team:
-            guard strokesReceived > 0 else { return "No strokes" }
-            return "+\(strokesReceived) \(strokesReceived == 1 ? "stroke" : "strokes")"
-        }
+        return MatchGolfDisplayFormatter.strokes(strokesReceived, scope: scope)
     }
 
     var compactText: String? {
@@ -98,22 +91,13 @@ struct MatchesGolfContextPresentation: Equatable, Hashable, Sendable {
 
     var accessibilityText: String? {
         let handicap = playingHandicap.map {
-            let value = MatchesGolfValueFormatter.playingHandicap($0)
+            let value = MatchGolfDisplayFormatter.playingHandicap($0)
             return scope == .team
                 ? "Team Playing Handicap \(value)"
                 : "Playing Handicap \(value)"
         }
         let accessibilityStrokes = strokesReceived.map { strokes in
-            switch scope {
-            case .participant:
-                return strokes > 0
-                    ? "\(strokes) \(strokes == 1 ? "stroke" : "strokes")"
-                    : "No strokes"
-            case .team:
-                return strokes > 0
-                    ? "\(strokes) team \(strokes == 1 ? "stroke" : "strokes")"
-                    : "No team strokes"
-            }
+            MatchGolfDisplayFormatter.strokes(strokes, scope: scope, accessibility: true)
         }
         let values = [handicap, accessibilityStrokes].compactMap { $0 }
         return values.isEmpty ? nil : values.joined(separator: ", ")
@@ -164,7 +148,7 @@ struct MatchesMatchPresentation: Identifiable, Equatable, Hashable, Sendable {
     let teamOnePointsText: String?
     let teamTwoPointsText: String?
 
-    var id: String { matchID }
+    var id: Data { Data(matchID.utf8) }
 
     var ownSide: MatchesSidePresentation? {
         guard authenticatedPlayerInvolved, let authenticatedPlayerSide else { return nil }
@@ -204,6 +188,20 @@ struct MatchesRoundPresentation: Identifiable, Equatable, Hashable, Sendable {
 
 enum MatchesDestination: Hashable, Sendable {
     case match(matchID: String)
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case let (.match(lhsID), .match(rhsID)):
+            return MobileOpaqueMatchID.isEqual(lhsID, rhsID)
+        }
+    }
+
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .match(let matchID):
+            hasher.combine(Data(matchID.utf8))
+        }
+    }
 }
 
 struct MatchesPresentation: Equatable, Sendable {
@@ -238,7 +236,7 @@ struct MatchesPresentation: Equatable, Sendable {
 
     func match(withID id: String) -> MatchesMatchPresentation? {
         for round in rounds {
-            if let match = round.matches.first(where: { $0.matchID == id }) {
+            if let match = round.matches.first(where: { MobileOpaqueMatchID.isEqual($0.matchID, id) }) {
                 return match
             }
         }
@@ -632,17 +630,5 @@ enum MatchesPresenter {
         }
         guard let kind else { return nil }
         return MatchesFreshnessBanner(kind: kind, lastValidated: state.validatedAt)
-    }
-}
-
-private enum MatchesGolfValueFormatter {
-    static func playingHandicap(_ value: Double) -> String {
-        let displayedMagnitude = (abs(value) * 10).rounded(.toNearestOrAwayFromZero) / 10
-        let magnitude = String(
-            format: "%.1f",
-            locale: Locale(identifier: "en_US_POSIX"),
-            displayedMagnitude
-        )
-        return value < 0 ? "(\(magnitude))" : magnitude
     }
 }

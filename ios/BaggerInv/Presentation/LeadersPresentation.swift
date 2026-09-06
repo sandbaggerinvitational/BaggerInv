@@ -822,7 +822,7 @@ enum LeadersPresenter {
                         formatText: round.format.displayName,
                         grossText: LeadersFormatter.number(round.grossScore.decimalValue),
                         netText: LeadersFormatter.number(round.netScore.decimalValue),
-                        courseHandicapText: LeadersFormatter.number(round.courseHandicap.decimalValue),
+                        courseHandicapText: HandicapDisplayFormatter.string(round.courseHandicap.decimalValue),
                         finishText: round.tieSize > 1
                             ? "Rank \(round.rank) · Tied \(round.tieSize)"
                             : "Rank \(round.rank)",

@@ -73,6 +73,9 @@ private struct ReadCacheEnvelope<Response: MobileReadPayloadResponse>: Codable, 
     /// Additive schema-v1 discriminator. Older static-product envelopes omit
     /// this field and continue to decode as nil.
     let historyYear: Int?
+    /// Dynamic Match Detail cache entries are bound to one validated Match ID.
+    /// Older envelopes and every static product decode this additive field as nil.
+    let matchID: String?
     var response: Response
     var etag: String?
     let fetchedAt: Date
@@ -107,8 +110,14 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
         _ response: Response,
         _ context: ActiveMobileReadContext
     ) -> Bool
+    typealias CanonicalRevocationPredicate = @MainActor @Sendable (_ error: any Error) -> Bool
 
     @Published private(set) var state: MobileReadState<Value> = .empty
+#if DEBUG
+    private(set) var modifiedResponseCount = 0
+    private(set) var notModifiedResponseCount = 0
+    private(set) var cacheLoadCount = 0
+#endif
 
     let product: MobileReadProduct
     let cacheKey: MobileReadCacheKey
@@ -118,6 +127,7 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
     private let credentialProvider: any MobileReadCredentialProviding
     private let fetcher: Fetcher
     private let responseValidator: ResponseValidator
+    private let canonicalRevocationPredicate: CanonicalRevocationPredicate
     private let now: () -> Date
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
@@ -125,6 +135,10 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
     private var cachedEntry: ReadCacheEnvelope<Response>?
     private var inFlight: Task<Void, Never>?
     private var generation: UInt = 0
+    /// An exact entry withdrawn by the server cannot become eligible again by
+    /// reopening the screen while its disk removal is pending or has failed.
+    private var canonicalRevocations: [ReadCachePartition: MobileReadState<Value>] = [:]
+    private var cacheEligibilityRevision: UInt = 0
     private var accessInvalidationHandler: (@MainActor @Sendable () -> Void)?
     private var authorityRevalidationHandler: (@MainActor @Sendable () -> Void)?
 
@@ -156,6 +170,7 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
         credentialProvider: any MobileReadCredentialProviding,
         now: @escaping () -> Date = Date.init,
         responseValidator: @escaping ResponseValidator,
+        canonicalRevocationPredicate: @escaping CanonicalRevocationPredicate = { _ in false },
         fetcher: @escaping Fetcher
     ) {
         product = cacheKey.product
@@ -164,6 +179,7 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
         self.credentialProvider = credentialProvider
         self.now = now
         self.responseValidator = responseValidator
+        self.canonicalRevocationPredicate = canonicalRevocationPredicate
         self.fetcher = fetcher
         encoder = JSONEncoder()
         decoder = JSONDecoder()
@@ -191,17 +207,27 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
 
         generation &+= 1
         let activationGeneration = generation
+        let activationEligibilityRevision = cacheEligibilityRevision
         activeContext = context
         state = .empty
         cachedEntry = nil
 
+        if let revokedState = canonicalRevocations[context.cachePartition] {
+            state = revokedState
+            if beginRefresh { startRefresh() }
+            return
+        }
+
         do {
             if let data = try await cache.read(key: cacheKey, partition: context.cachePartition) {
+                guard isActive(context, generation: activationGeneration),
+                      cacheEligibilityRevision == activationEligibilityRevision else { return }
                 let entry = try decoder.decode(ReadCacheEnvelope<Response>.self, from: data)
                 guard entry.cacheSchemaVersion == DiskReadCacheStore.cacheSchemaVersion,
                       entry.partitionDigest == context.cachePartition.digest,
                       entry.product == cacheKey.product,
                       entry.historyYear == cacheKey.historyYear,
+                      MobileOpaqueMatchID.isEqual(entry.matchID, cacheKey.matchID),
                       responseValidator(entry.response, context),
                       generation == activationGeneration,
                       activeContext == context
@@ -209,11 +235,17 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                     throw MobileReadFailure.cacheInconsistency
                 }
                 cachedEntry = entry
+#if DEBUG
+                cacheLoadCount += 1
+#endif
                 state = state(from: entry, source: .diskCache, freshness: .cached)
             }
         } catch {
+            guard isActive(context, generation: activationGeneration),
+                  cacheEligibilityRevision == activationEligibilityRevision else { return }
             try? await cache.remove(key: cacheKey, partition: context.cachePartition)
-            guard generation == activationGeneration, activeContext == context else { return }
+            guard isActive(context, generation: activationGeneration),
+                  cacheEligibilityRevision == activationEligibilityRevision else { return }
             cachedEntry = nil
             state = .empty
         }
@@ -340,6 +372,7 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                 }
             }
 
+            cacheEligibilityRevision &+= 1
             switch result {
             case .notModified(let returnedETag):
                 guard var entry = cachedEntry else {
@@ -347,6 +380,9 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                 }
                 entry.etag = returnedETag ?? entry.etag
                 entry.validatedAt = now()
+#if DEBUG
+                notModifiedResponseCount += 1
+#endif
                 cachedEntry = entry
                 state = state(from: entry, source: state.source ?? .diskCache, freshness: .fresh)
                 state.lastHTTPStatus = 304
@@ -354,14 +390,26 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
 
             case .modified(let response, let etag):
                 guard responseValidator(response, context) else {
+                    if product == .matchDetail {
+                        await invalidateCanonicallyRevokedCache(
+                            for: MobileReadFailure.contract,
+                            context: context,
+                            operationGeneration: operationGeneration
+                        )
+                        return
+                    }
                     throw MobileReadFailure.contract
                 }
+#if DEBUG
+                modifiedResponseCount += 1
+#endif
                 let fetchedAt = now()
                 let entry = ReadCacheEnvelope(
                     cacheSchemaVersion: DiskReadCacheStore.cacheSchemaVersion,
                     partitionDigest: context.cachePartition.digest,
                     product: cacheKey.product,
                     historyYear: cacheKey.historyYear,
+                    matchID: cacheKey.matchID,
                     response: response,
                     etag: etag,
                     fetchedAt: fetchedAt,
@@ -405,7 +453,50 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
             state.freshness = state.value == nil ? .empty : previousFreshness
         } catch {
             guard isActive(context, generation: operationGeneration) else { return }
+            // A canonical Match Detail body that cannot establish its identity
+            // or decode its protected contract is not eligible stale content.
+            // Keep this fail-closed boundary separate from timeouts and 5xx.
+            let incompatibleMatchDetail = product == .matchDetail &&
+                (error is MobileContractError || error is DecodingError)
+            if canonicalRevocationPredicate(error) || incompatibleMatchDetail {
+                await invalidateCanonicallyRevokedCache(
+                    for: error,
+                    context: context,
+                    operationGeneration: operationGeneration
+                )
+                return
+            }
             handle(error)
+        }
+    }
+
+    /// A definitive server withdrawal (for example, an exact Match becoming
+    /// unavailable) must hide and remove its older cached representation. A
+    /// transient transport or server failure still keeps eligible cache.
+    private func invalidateCanonicallyRevokedCache(
+        for error: any Error,
+        context: ActiveMobileReadContext,
+        operationGeneration: UInt
+    ) async {
+        // Clear every published field before the first suspension point. Disk
+        // availability must never determine how long protected content renders.
+        let diagnostic = serverDiagnostic(error)
+        cacheEligibilityRevision &+= 1
+        cachedEntry = nil
+        state = .empty
+        state.freshness = .failed
+        state.lastSafeError = classify(error)
+        state.lastServerCode = diagnostic.code
+        state.lastHTTPStatus = diagnostic.status
+        canonicalRevocations[context.cachePartition] = state
+
+        do {
+            try await cache.remove(key: cacheKey, partition: context.cachePartition)
+        } catch {
+            canonicalRevocations[context.cachePartition]?.cachePersistenceIssue = true
+            if isActive(context, generation: operationGeneration) {
+                state.cachePersistenceIssue = true
+            }
         }
     }
 
@@ -424,6 +515,8 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
                 return .unsafe
             }
             try await cache.write(data, key: cacheKey, partition: context.cachePartition)
+            guard isActive(context, generation: operationGeneration), !Task.isCancelled else { return .unsafe }
+            canonicalRevocations.removeValue(forKey: context.cachePartition)
             return .persisted
         } catch {
             do {
@@ -449,6 +542,8 @@ final class MobileReadRepository<Response: MobileReadPayloadResponse>: Observabl
             let data = try encoder.encode(entry)
             guard isActive(context, generation: operationGeneration), !Task.isCancelled else { return }
             try await cache.write(data, key: cacheKey, partition: context.cachePartition)
+            guard isActive(context, generation: operationGeneration), !Task.isCancelled else { return }
+            canonicalRevocations.removeValue(forKey: context.cachePartition)
         } catch {
             guard isActive(context, generation: operationGeneration) else { return }
             state.cachePersistenceIssue = true

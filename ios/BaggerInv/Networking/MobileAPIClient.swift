@@ -8,6 +8,7 @@ protocol MobileAPIServing {
     func participantSession(accessToken: String, certification: String) async throws -> ParticipantSession
     func today(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileTodayResponse>
     func matches(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileMatchesResponse>
+    func matchDetail(matchID: String, accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileMatchDetailResponse>
     func leaders(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileLeadersResponse>
     func netSkins(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileNetSkinsResponse>
     func calcutta(accessToken: String, certification: String, etag: String?) async throws -> MobileConditionalRead<MobileCalcuttaResponse>
@@ -32,6 +33,15 @@ protocol MobileAPIServing {
 }
 
 extension MobileAPIServing {
+    func matchDetail(
+        matchID: String,
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileMatchDetailResponse> {
+        throw MobileAPIClientError.server(code: .mobileAPIUnavailable, status: 503)
+    }
+
     func passport(
         accessToken: String,
         certification: String,
@@ -253,6 +263,25 @@ struct MobileAPIClient: MobileAPIServing {
             accessToken: accessToken,
             certification: certification,
             etag: etag
+        )
+    }
+
+    func matchDetail(
+        matchID: String,
+        accessToken: String,
+        certification: String,
+        etag: String?
+    ) async throws -> MobileConditionalRead<MobileMatchDetailResponse> {
+        guard MobileOpaqueMatchID.isValid(matchID) else {
+            throw MobileAPIClientError.invalidURL
+        }
+        return try await protectedRead(
+            path: "/api/mobile/v1/matches",
+            pathComponent: matchID,
+            accessToken: accessToken,
+            certification: certification,
+            etag: etag,
+            maximumResponseBytes: 256 * 1_024
         )
     }
 
@@ -693,6 +722,7 @@ struct MobileAPIClient: MobileAPIServing {
 
     private func request(
         path: String,
+        pathComponent: String? = nil,
         method: String,
         body: Data? = nil,
         queryItems: [URLQueryItem] = [],
@@ -704,6 +734,16 @@ struct MobileAPIClient: MobileAPIServing {
               var components = URLComponents(url: relativeURL, resolvingAgainstBaseURL: false)
         else {
             throw MobileAPIClientError.invalidURL
+        }
+        if let pathComponent {
+            // Encode one opaque identifier, including literal percent signs,
+            // slashes and fragments, inside the shared router. Only RFC 3986
+            // unreserved characters remain literal; exact dot IDs are invalid.
+            let allowed = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")
+            guard let encoded = pathComponent.addingPercentEncoding(withAllowedCharacters: allowed) else {
+                throw MobileAPIClientError.invalidURL
+            }
+            components.percentEncodedPath = [components.percentEncodedPath, encoded].joined(separator: "/")
         }
         if !queryItems.isEmpty {
             components.queryItems = queryItems
@@ -745,6 +785,7 @@ struct MobileAPIClient: MobileAPIServing {
 
     private func protectedRead<Response: MobileReadResponseValidating>(
         path: String,
+        pathComponent: String? = nil,
         accessToken: String,
         certification: String,
         etag: String?,
@@ -752,6 +793,7 @@ struct MobileAPIClient: MobileAPIServing {
     ) async throws -> MobileConditionalRead<Response> {
         var request = try request(
             path: path,
+            pathComponent: pathComponent,
             method: "GET",
             accessToken: accessToken,
             certification: certification

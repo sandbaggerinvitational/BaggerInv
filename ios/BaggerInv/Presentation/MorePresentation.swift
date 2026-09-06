@@ -352,7 +352,7 @@ enum PassportPresenter {
                 value("appearances", "Appearances", String(summary.appearances)),
                 value("championships", "Championships", String(summary.championships)),
                 value("runner-up-finishes", "Runner-Up Finishes", String(summary.runnerUpFinishes)),
-                value("average-handicap", "Average Handicap", decimal(summary.averageHandicap, locale: locale)),
+                value("average-handicap", "Average Handicap", summary.averageHandicap.map { HandicapDisplayFormatter.string($0) }),
             ],
             honors: honors(data.career.honors),
             rankings: data.career.rankings.map {
@@ -469,7 +469,7 @@ enum PassportPresenter {
             teamName: tournament.team?.name,
             standing: tournament.standing.map { "#\($0)" },
             teamStanding: tournament.teamStanding.map { "#\($0)" },
-            tournamentHandicap: decimal(tournament.tournamentHandicap, locale: locale),
+            tournamentHandicap: tournament.tournamentHandicap.map { HandicapDisplayFormatter.string($0) },
             record: tournament.record.map { "\($0.wins)-\($0.losses)-\($0.halves)" },
             points: tournament.record.map { TodayPointsFormatter.string(for: $0.points) },
             rounds: tournament.rounds.map { round in
@@ -1138,12 +1138,12 @@ enum HistoryPresenter {
                     side: team.side,
                     points: team.points.map { TodayPointsFormatter.string(for: $0) },
                     captainName: team.captain?.displayName,
-                    averageHandicap: number(team.averageHandicap, locale: locale),
+                    averageHandicap: team.averageHandicap.map { HandicapDisplayFormatter.string($0) },
                     roster: team.roster.map {
                         HistoryRosterPlayerPresentation(
                             playerID: $0.playerId,
                             displayName: $0.displayName,
-                            handicap: number($0.handicap, locale: locale),
+                            handicap: $0.handicap.map { HandicapDisplayFormatter.string($0) },
                             isCaptain: $0.isCaptain
                         )
                     }

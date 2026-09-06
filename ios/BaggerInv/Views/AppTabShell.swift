@@ -13,6 +13,7 @@ struct BaggerAppShell: View {
     let tournamentData: TournamentDataCoordinator?
     let fixturePresentation: TodayPresentation?
     let fixtureMatchesState: MobileReadState<MobileMatchesData>?
+    let fixtureMatchDetailStates: [String: MobileReadState<MobileMatchDetailData>]
     let fixtureScoringState: ScoringCurrentState?
     let fixtureLeaders: LeadersFixturePresentation?
     let fixtureScheduleState: MobileReadState<MobileScheduleData>?
@@ -27,6 +28,7 @@ struct BaggerAppShell: View {
     let onSignOut: () -> Void
 
     @State private var selection: BaggerAppTab = .today
+    @State private var todayPath: [MatchesDestination] = []
     @State private var matchesPath: [MatchesDestination] = []
     @State private var leadersSelection: LeadersProduct = .score
     @State private var morePath: [MoreDestination] = []
@@ -40,6 +42,7 @@ struct BaggerAppShell: View {
         self.tournamentData = tournamentData
         fixturePresentation = nil
         fixtureMatchesState = nil
+        fixtureMatchDetailStates = [:]
         fixtureScoringState = nil
         fixtureLeaders = nil
         fixtureScheduleState = nil
@@ -58,6 +61,7 @@ struct BaggerAppShell: View {
         participant: ParticipantSession,
         fixturePresentation: TodayPresentation,
         fixtureMatchesState: MobileReadState<MobileMatchesData>,
+        fixtureMatchDetailStates: [String: MobileReadState<MobileMatchDetailData>] = [:],
         fixtureScoringState: ScoringCurrentState,
         fixtureLeaders: LeadersFixturePresentation? = nil,
         fixtureScheduleState: MobileReadState<MobileScheduleData>? = nil,
@@ -74,12 +78,14 @@ struct BaggerAppShell: View {
         startsOnLeaders: Bool = false,
         startsOnMore: Bool = false,
         startsOnSchedule: Bool = false,
+        startsOnMatchDetailID: String? = nil,
         onSignOut: @escaping () -> Void = {}
     ) {
         self.participant = participant
         tournamentData = nil
         self.fixturePresentation = fixturePresentation
         self.fixtureMatchesState = fixtureMatchesState
+        self.fixtureMatchDetailStates = fixtureMatchDetailStates
         self.fixtureScoringState = fixtureScoringState
         self.fixtureLeaders = fixtureLeaders
         self.fixtureScheduleState = fixtureScheduleState
@@ -101,17 +107,34 @@ struct BaggerAppShell: View {
         )
         _leadersSelection = State(initialValue: fixtureLeaders?.startingProduct ?? .score)
         _morePath = State(initialValue: startsOnSchedule ? [.schedule] : [])
+        _matchesPath = State(
+            initialValue: startsOnMatchDetailID.map { [.match(matchID: $0)] } ?? []
+        )
     }
 
     var body: some View {
         TabView(selection: $selection) {
-            NavigationStack {
+            NavigationStack(path: $todayPath) {
                 todayContent
                     .baggerTodayChrome(
+                        isRoot: todayPath.isEmpty,
                         participant: participant,
                         profile: todayProfile,
                         onOpenPassport: openPassport
                     )
+                    .navigationDestination(for: MatchesDestination.self) { destination in
+                        switch destination {
+                        case .match(let matchID):
+                            MatchGameCenterRouteView(
+                                matchID: matchID,
+                                coordinator: tournamentData,
+                                fixtureState: fixtureMatchDetailStates[matchID],
+                                profile: todayProfile,
+                                onOpenPassport: openPassport,
+                                onNavigateMatch: replaceTodayMatchDetail
+                            )
+                        }
+                    }
             }
             .tabItem { Label("Today", systemImage: "sun.max.fill") }
             .tag(BaggerAppTab.today)
@@ -239,12 +262,19 @@ struct BaggerAppShell: View {
         if let fixtureMatchesState {
             MatchesFixtureView(
                 participant: participant,
-                state: fixtureMatchesState
+                state: fixtureMatchesState,
+                matchDetailStates: fixtureMatchDetailStates,
+                profile: todayProfile,
+                onOpenPassport: openPassport,
+                onNavigateMatch: replaceMatchDetail
             )
         } else if let tournamentData {
             MatchesRepositoryView(
                 participant: participant,
-                repository: tournamentData.matches
+                coordinator: tournamentData,
+                profile: todayProfile,
+                onOpenPassport: openPassport,
+                onNavigateMatch: replaceMatchDetail
             )
         } else {
             VStack(spacing: 14) {
@@ -406,8 +436,18 @@ struct BaggerAppShell: View {
     }
 
     private func openMatch(_ matchID: String) {
+        guard MobileReadCacheKey.isValidMatchID(matchID) else { return }
+        todayPath = [.match(matchID: matchID)]
+    }
+
+    private func replaceTodayMatchDetail(_ matchID: String) {
+        guard MobileReadCacheKey.isValidMatchID(matchID) else { return }
+        todayPath = [.match(matchID: matchID)]
+    }
+
+    private func replaceMatchDetail(_ matchID: String) {
+        guard MobileReadCacheKey.isValidMatchID(matchID) else { return }
         matchesPath = [.match(matchID: matchID)]
-        selection = .matches
     }
 
     private func openLeaders() {
@@ -463,17 +503,26 @@ struct BaggerAppShell: View {
 
 private extension View {
     func baggerTodayChrome(
+        isRoot: Bool,
         participant: ParticipantSession,
         profile: TodayParticipantPresentation,
         onOpenPassport: @escaping () -> Void
     ) -> some View {
-        baggerAppHeaderChrome(
-            title: "Today",
-            identifierPrefix: "today",
-            participant: participant,
-            profile: profile,
-            onOpenPassport: onOpenPassport
-        )
+        toolbar(isRoot ? .hidden : .visible, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if isRoot {
+                    BaggerAppHeader(
+                        title: "Today",
+                        identifierPrefix: "today",
+                        participant: participant,
+                        profile: profile,
+                        onOpenPassport: onOpenPassport
+                    )
+                }
+            }
+            .toolbarBackground(BaggerPalette.cream, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.light, for: .navigationBar)
     }
 
     func baggerMatchesChrome(
