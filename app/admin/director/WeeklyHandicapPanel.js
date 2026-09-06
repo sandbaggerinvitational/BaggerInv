@@ -4,8 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
 import { directorFetch } from "../../../lib/director-client-transaction.js";
 import {
+  currentApprovedWeeklyHandicapRevision,
   normalizeWeeklyHandicapPayload,
   parseWeeklyHandicapBulkPaste,
+  weeklyHandicapApprovalReceipt,
   weeklyHandicapDraftRows,
   weeklyHandicapDraftSummary,
   weeklyHandicapRevisionFromResponse,
@@ -52,22 +54,6 @@ function matchLabel(match) {
   const round = match.roundNumber ? `R${match.roundNumber}` : "Round ?";
   const number = match.matchNumber ? `M${match.matchNumber}` : match.matchId;
   return `${round} · ${number}`;
-}
-
-function responseReceipt(payload = {}) {
-  const value = payload.data || payload.result || payload;
-  const receipt = value.receipt || value.auditReceipt || value.audit_receipt || {};
-  const result = {
-    receiptId: receipt.receiptId || receipt.receipt_id || "",
-    payloadHash: receipt.payloadHash || receipt.payload_hash || "",
-    status: receipt.status || "",
-    approvedAt: receipt.approvedAt || receipt.approved_at || "",
-  };
-  if (!result.receiptId || !/^[0-9a-f]{64}$/i.test(result.payloadHash) ||
-      result.status !== "APPROVED" || !Number.isFinite(Date.parse(result.approvedAt))) {
-    throw new Error("The approved revision did not return an authoritative receipt.");
-  }
-  return result;
 }
 
 function proposalsFrom(players) {
@@ -167,23 +153,28 @@ export default function WeeklyHandicapPanel({ onOperation }) {
     invalidateReview();
   };
 
-  const post = async (action, input) => {
+  const post = async (action, input, { deferConfirmation = false } = {}) => {
     const intent = { endpoint: ENDPOINT, action, ...input };
     const operation = identityRegistry().acquire(intent);
-    const response = await directorFetch(ENDPOINT, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ...input, action, operationRequestId: operation.operationRequestId }),
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const error = new Error(payload.error || `Weekly handicap ${action} failed (${response.status}).`);
-      error.issues = payload.issues || payload.validationIssues || payload.data?.issues || [];
+    try {
+      const response = await directorFetch(ENDPOINT, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...input, action, operationRequestId: operation.operationRequestId }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const error = new Error(payload.error || `Weekly handicap ${action} failed (${response.status}).`);
+        error.issues = payload.issues || payload.validationIssues || payload.data?.issues || [];
+        throw error;
+      }
+      if (!deferConfirmation) identityRegistry().confirm(operation);
+      return { payload, operation };
+    } catch (error) {
+      if (error && typeof error === "object") error.operation = operation;
       throw error;
     }
-    identityRegistry().confirm(operation);
-    return { payload, operationRequestId: operation.operationRequestId };
   };
 
   const selectSourcePlayer = (playerId) => {
@@ -425,6 +416,8 @@ export default function WeeklyHandicapPanel({ onOperation }) {
 
   const approve = async () => {
     if (!review || !confirmed) return;
+    const targetRevisionId = review.revisionId;
+    let approvalOperation = null;
     setMessage(""); setPhase("approving");
     try {
       const approvalResponse = await post("approve", {
@@ -437,8 +430,13 @@ export default function WeeklyHandicapPanel({ onOperation }) {
           frozenMatchCount: review.summary.frozenMatchCount,
           effectiveDate: review.effectiveDate,
         },
+      }, { deferConfirmation: true });
+      approvalOperation = approvalResponse.operation;
+      const receipt = weeklyHandicapApprovalReceipt(approvalResponse.payload, {
+        expectedOperationRequestId: approvalOperation.operationRequestId,
+        expectedRevisionId: targetRevisionId,
       });
-      const receipt = responseReceipt(approvalResponse.payload);
+      identityRegistry().confirm(approvalOperation);
       setLatestReceipt(receipt);
       setReview(null); setStagedRevision(null); setConfirmed(false); setServerIssues([]);
       setPhase("approved");
@@ -453,6 +451,35 @@ export default function WeeklyHandicapPanel({ onOperation }) {
       });
       setPhase("approved");
     } catch (error) {
+      approvalOperation ||= error?.operation || null;
+      try {
+        const authoritative = await load();
+        const committed = currentApprovedWeeklyHandicapRevision(authoritative, targetRevisionId);
+        if (committed?.receipt) {
+          const receipt = weeklyHandicapApprovalReceipt({
+            code: "HANDICAP_REVISION_APPROVED",
+            revisionId: committed.revisionId,
+            receipt: {
+              ...committed.receipt,
+              status: committed.status,
+              approvedAt: committed.approvedAt,
+            },
+          }, { expectedRevisionId: targetRevisionId });
+          if (approvalOperation) identityRegistry().confirm(approvalOperation);
+          setLatestReceipt(receipt);
+          setReview(null); setStagedRevision(null); setConfirmed(false); setServerIssues([]);
+          setPhase("approved");
+          setMessage("Weekly handicap revision was already committed. Authoritative Production state has been refreshed.");
+          onOperation?.({
+            label: "Weekly handicaps approved",
+            status: "success",
+            detail: `Revision ${committed.revision} · already committed`,
+          });
+          return;
+        }
+      } catch {
+        // Preserve the original failure and operation identity when recovery is inconclusive.
+      }
       setServerIssues(Array.isArray(error?.issues) ? error.issues : []);
       setMessage(error instanceof Error ? error.message : "Weekly handicap approval failed.");
       setPhase("failure");

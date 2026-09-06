@@ -3,13 +3,16 @@ import fs from "node:fs";
 import test from "node:test";
 
 import {
+  currentApprovedWeeklyHandicapRevision,
   normalizeWeeklyHandicapPayload,
   parseWeeklyHandicapBulkPaste,
+  weeklyHandicapApprovalReceipt,
   weeklyHandicapDraftRows,
   weeklyHandicapDraftSummary,
   weeklyHandicapInputError,
   weeklyHandicapRevisionFromResponse,
 } from "../lib/director-weekly-handicaps.js";
+import { createClientMutationOperationIdentityRegistry } from "../lib/client-mutation-operation-identity.js";
 
 const source = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -46,7 +49,11 @@ test("weekly handicap payload normalizes stable roster IDs, current values, matc
     started: false, frozen: false, safeToRefresh: true,
     affectedPlayerIds: [],
   });
-  assert.deepEqual(result.history[0].receipt, { receiptId: "receipt-4", payloadHash: "a".repeat(64) });
+  assert.deepEqual(result.history[0].receipt, {
+    receiptId: "receipt-4",
+    operationRequestId: "",
+    payloadHash: "a".repeat(64),
+  });
 });
 
 test("draft rows highlight only real changes and summarize unique refreshable and frozen matches", () => {
@@ -129,6 +136,158 @@ test("stage and validate responses preserve the staged revision and authoritativ
   } }).valid, false);
 });
 
+test("approval receipts accept every supported casing and validate request identity", () => {
+  const payloadHash = "a".repeat(64);
+  const operationRequestId = "11111111-1111-4111-8111-111111111111";
+  const revisionId = "22222222-2222-4222-8222-222222222222";
+  const receiptBase = {
+    status: "APPROVED",
+    approved_at: "2026-09-06T03:53:12.42944+00:00",
+  };
+  const options = { expectedOperationRequestId: operationRequestId, expectedRevisionId: revisionId };
+  const variants = [
+    {
+      revisionId,
+      receipt: {
+        receiptId: "receipt-camel",
+        operationRequestId,
+        payloadHash,
+        status: "APPROVED",
+        approvedAt: receiptBase.approved_at,
+      },
+    },
+    {
+      revision_id: revisionId,
+      receipt: {
+        receipt_id: "receipt-payload-hash",
+        operation_request_id: operationRequestId,
+        payload_hash: payloadHash,
+        ...receiptBase,
+      },
+    },
+    {
+      code: "HANDICAP_REVISION_APPROVED",
+      revision_id: revisionId,
+      request_payload_hash: payloadHash,
+      receipt: {
+        receipt_id: "receipt-request-payload-hash",
+        operation_request_id: operationRequestId,
+        request_payload_hash: payloadHash,
+        ...receiptBase,
+      },
+    },
+  ];
+  for (const payload of variants) {
+    const receipt = weeklyHandicapApprovalReceipt(payload, options);
+    assert.equal(receipt.operationRequestId, operationRequestId);
+    assert.equal(receipt.payloadHash, payloadHash);
+    assert.equal(receipt.revisionId, revisionId);
+    assert.equal(receipt.status, "APPROVED");
+  }
+});
+
+test("approval receipt validation fails closed for malformed or conflicting responses", () => {
+  const payloadHash = "b".repeat(64);
+  const operationRequestId = "33333333-3333-4333-8333-333333333333";
+  const revisionId = "44444444-4444-4444-8444-444444444444";
+  const valid = {
+    code: "HANDICAP_REVISION_APPROVED",
+    revision_id: revisionId,
+    request_payload_hash: payloadHash,
+    receipt: {
+      receipt_id: "receipt-valid",
+      operation_request_id: operationRequestId,
+      request_payload_hash: payloadHash,
+      status: "APPROVED",
+      approved_at: "2026-09-06T03:53:12.42944+00:00",
+    },
+  };
+  const options = { expectedOperationRequestId: operationRequestId, expectedRevisionId: revisionId };
+  assert.throws(() => weeklyHandicapApprovalReceipt({ receipt: {} }, options), /authoritative receipt/);
+  assert.throws(() => weeklyHandicapApprovalReceipt({
+    ...valid,
+    receipt: { ...valid.receipt, operation_request_id: "55555555-5555-4555-8555-555555555555" },
+  }, options), /authoritative receipt/);
+  assert.throws(() => weeklyHandicapApprovalReceipt({
+    ...valid,
+    receipt: { ...valid.receipt, request_payload_hash: "c".repeat(64) },
+  }, options), /authoritative receipt/);
+  assert.throws(() => weeklyHandicapApprovalReceipt({
+    ...valid,
+    revision_id: "66666666-6666-4666-8666-666666666666",
+  }, options), /authoritative receipt/);
+  assert.throws(() => weeklyHandicapApprovalReceipt({
+    ...valid,
+    receipt: { ...valid.receipt, status: "DRAFT" },
+  }, options), /authoritative receipt/);
+});
+
+test("an uncertain receipt keeps the exact operation identity for an idempotent retry", () => {
+  const generated = [
+    "77777777-7777-4777-8777-777777777777",
+    "88888888-8888-4888-8888-888888888888",
+  ];
+  const registry = createClientMutationOperationIdentityRegistry({ randomUUID: () => generated.shift() });
+  const intent = { endpoint: "/api/director/handicaps", action: "approve", revisionId: "revision-7" };
+  const first = registry.acquire(intent);
+  assert.throws(() => weeklyHandicapApprovalReceipt({ receipt: {} }, {
+    expectedOperationRequestId: first.operationRequestId,
+  }), /authoritative receipt/);
+  assert.equal(registry.size(), 1);
+  const retry = registry.acquire(intent);
+  assert.equal(retry.operationRequestId, first.operationRequestId);
+  assert.equal(registry.confirm(retry), true);
+  assert.equal(registry.size(), 0);
+  const conflictingIntent = registry.acquire({ ...intent, revisionId: "revision-8" });
+  assert.notEqual(conflictingIntent.operationRequestId, first.operationRequestId);
+});
+
+test("authoritative current state recovers an already-committed approval only for the exact target", () => {
+  const revisionId = "99999999-9999-4999-8999-999999999999";
+  const operationRequestId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const payloadHash = "d".repeat(64);
+  const normalized = normalizeWeeklyHandicapPayload({ data: {
+    tournament_id: "2026",
+    revision: 7,
+    current: {
+      current_revision: 7,
+      revision: {
+        revision_id: revisionId,
+        revision_number: 7,
+        status: "APPROVED",
+        approved_at: "2026-09-06T03:53:12.42944+00:00",
+      },
+    },
+    players: [],
+    history: [{
+      revision_id: revisionId,
+      revision_number: 7,
+      status: "APPROVED",
+      approved_at: "2026-09-06T03:53:12.42944+00:00",
+      receipts: [{
+        operation: "APPROVE",
+        receipt_id: "receipt-recovered",
+        operation_request_id: operationRequestId,
+        request_payload_hash: payloadHash,
+        status: "APPROVED",
+        approved_at: "2026-09-06T03:53:12.42944+00:00",
+      }],
+    }],
+  } });
+  const committed = currentApprovedWeeklyHandicapRevision(normalized, revisionId);
+  assert.equal(committed.revision, 7);
+  assert.equal(committed.receipt.operationRequestId, operationRequestId);
+  assert.equal(committed.receipt.payloadHash, payloadHash);
+  assert.equal(currentApprovedWeeklyHandicapRevision(
+    normalized,
+    "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+  ), null);
+  assert.equal(currentApprovedWeeklyHandicapRevision({
+    ...normalized,
+    currentRevisionStatus: "DRAFT",
+  }, revisionId), null);
+});
+
 test("weekly handicap UI uses the dedicated same-origin staged workflow and keeps authoritative history", () => {
   const [component, css] = [
     source("app/admin/director/WeeklyHandicapPanel.js"),
@@ -163,7 +322,10 @@ test("weekly handicap UI uses the dedicated same-origin staged workflow and keep
   assert.match(component, /validatedSummary/);
   assert.match(component, /refreshableMatchCount: review\.summary\.refreshableMatchCount/);
   assert.match(component, /frozenMatchCount: review\.summary\.frozenMatchCount/);
-  assert.match(component, /approved revision did not return an authoritative receipt/);
+  assert.match(source("lib/director-weekly-handicaps.js"), /approved revision did not return an authoritative receipt/);
+  assert.match(component, /deferConfirmation: true/);
+  assert.match(component, /currentApprovedWeeklyHandicapRevision/);
+  assert.match(component, /already committed\. Authoritative Production state has been refreshed/);
   assert.match(css, /tbody tr\[data-changed="true"\]/);
   assert.match(css, /min-height: 44px/);
   assert.match(css, /@media \(max-width: 430px\)/);
@@ -175,7 +337,23 @@ test("failed or stale mutations preserve the local draft for deliberate retry", 
   const approveBlock = component.slice(component.indexOf("const approve = async"), component.indexOf("if (!data) return"));
   assert.match(approveBlock, /catch \(error\)/);
   assert.match(approveBlock, /setPhase\("failure"\)/);
+  assert.ok(
+    approveBlock.indexOf("weeklyHandicapApprovalReceipt") < approveBlock.indexOf("identityRegistry().confirm"),
+    "approval identity must be confirmed only after semantic receipt validation",
+  );
+  assert.ok(approveBlock.includes("approvalOperation ||= error?.operation"));
+  assert.match(approveBlock, /currentApprovedWeeklyHandicapRevision/);
   assert.doesNotMatch(approveBlock, /setProposals|proposalsFrom/);
   assert.match(component, /stagedRevision \? "Retry server validation"/);
   assert.doesNotMatch(component, /Math\.round|toFixed\(0\)|step="0\.1"|min="0"/);
+});
+
+test("server non-draft, stale-predecessor, and no-change protections remain fail closed", () => {
+  const migration = source("supabase/production_migrations/202608290058_production_handicap_revisions_v1.sql");
+  assert.match(migration, /HANDICAP_REVISION_NOT_DRAFT/);
+  assert.match(migration, /Only a draft handicap revision can be approved\./);
+  assert.match(migration, /HANDICAP_PREDECESSOR_STALE/);
+  assert.match(migration, /The approved handicap predecessor changed\./);
+  assert.match(migration, /HANDICAP_NO_CHANGES/);
+  assert.match(migration, /The staged roster is identical to the approved handicap revision\./);
 });
