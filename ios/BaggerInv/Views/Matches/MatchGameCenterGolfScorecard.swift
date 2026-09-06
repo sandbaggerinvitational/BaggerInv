@@ -72,14 +72,15 @@ struct MatchGameCenterGolfScorecard: View {
 
 /// Both nines share measured widths and type-based heights. Names/statuses cannot
 /// stretch scoring rows; both team bands share the tallest intrinsic team title.
-private struct ScorecardNineView: View {
+struct ScorecardNineView: View {
     let nine: MatchGolfScorecardNine
     let cellWidth: CGFloat
     let bandHeight: CGFloat
+    var identifierPrefix: String = "match.gameCenter.scorecard"
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric(relativeTo: .caption) private var rowHeight: CGFloat = 36
 
-    private var prefix: String { "match.gameCenter.scorecard.\(nine.id)" }
+    private var prefix: String { "\(identifierPrefix).\(nine.id)" }
     private var identityWidth: CGFloat { dynamicTypeSize.isAccessibilitySize ? 116 : 84 }
 
     var body: some View {
@@ -283,12 +284,12 @@ private struct ScorecardHoleCell: View {
     }
 }
 
-private struct ScorecardNaturalCellWidth: PreferenceKey {
+struct ScorecardNaturalCellWidth: PreferenceKey {
     static let defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
 }
 
-private struct ScorecardNaturalBandHeight: PreferenceKey {
+struct ScorecardNaturalBandHeight: PreferenceKey {
     static let defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
 }

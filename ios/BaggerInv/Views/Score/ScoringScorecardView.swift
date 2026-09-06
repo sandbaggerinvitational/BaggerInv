@@ -7,6 +7,11 @@ struct ScoringScorecardView: View {
     let onSelectHole: (Int) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scoreMatchDisplay) private var matchDisplay
+    @ScaledMetric(relativeTo: .caption) private var minimumCellWidth: CGFloat = 62
+    @ScaledMetric(relativeTo: .caption) private var minimumBandHeight: CGFloat = 44
+    @State private var measuredCellWidth: CGFloat = 0
+    @State private var measuredBandHeight: CGFloat = 0
 
     init(
         presentation: ScoringPresentation,
@@ -25,37 +30,39 @@ struct ScoringScorecardView: View {
             LazyVStack(alignment: .leading, spacing: BaggerLayout.sectionSpacing) {
                 summary
 
-                ForEach(Array(presentation.scorecardSections.enumerated()), id: \.offset) { _, section in
-                    VStack(alignment: .leading, spacing: 10) {
-                        BaggerSectionHeading(section.title)
-                        VStack(spacing: 0) {
-                            ForEach(Array(section.holes.enumerated()), id: \.element.id) { index, row in
-                                Button {
-                                    onSelectHole(row.hole.holeNumber)
-                                    dismiss()
-                                } label: {
-                                    OfficialScorecardRow(
-                                        row: row,
-                                        sides: presentation.sides,
-                                        isSelected: selectedHole == row.hole.holeNumber,
-                                        pending: pendingRecord(for: row.hole.holeNumber).map {
-                                            ScoringLocalIntentComparison.make(
-                                                record: $0,
-                                                presentation: presentation
-                                            )
-                                        }
-                                    )
-                                }
-                                .buttonStyle(.plain)
-                                .accessibilityHint("Returns to Hole \(row.hole.holeNumber)")
-                                .accessibilityIdentifier("scorecard.hole.\(row.hole.holeNumber)")
-
-                                if index < section.holes.count - 1 {
-                                    Divider().overlay(BaggerPalette.warmBorder)
-                                }
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Review or correct a hole").font(.subheadline.weight(.semibold))
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 6) {
+                        ForEach(presentation.reviewHoles) { hole in
+                            Button {
+                                onSelectHole(hole.holeNumber)
+                                dismiss()
+                            } label: {
+                                Text(String(hole.holeNumber)).font(.headline.monospacedDigit())
+                                    .frame(maxWidth: .infinity, minHeight: 44)
+                                    .background(selectedHole == hole.holeNumber ? BaggerPalette.scoreGold : BaggerPalette.paper,
+                                                in: RoundedRectangle(cornerRadius: 8))
                             }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Hole \(hole.holeNumber)\(pendingRecord(for: hole.holeNumber) != nil ? ", saved on iPhone, not Official" : presentation.officialHoleNumbers.contains(hole.holeNumber) ? ", Official" : ", not recorded")")
+                            .accessibilityHint("Returns to this hole; does not change scores")
+                            .accessibilityAddTraits(selectedHole == hole.holeNumber ? .isSelected : [])
+                            .accessibilityIdentifier("scorecard.hole.\(hole.holeNumber)")
                         }
-                        .baggerCard()
+                    }
+                }
+                ForEach(ScoreGolfScorecardPresentation.make(presentation)) { nine in
+                    ScorecardNineView(nine: nine,
+                                      cellWidth: max(minimumCellWidth, measuredCellWidth + 16),
+                                      bandHeight: max(minimumBandHeight, measuredBandHeight),
+                                      identifierPrefix: "scorecard.grid")
+                }
+                Text("• Applied stroke · ½ Halved · — Unavailable\nOnly Official server values appear in the grid.")
+                    .font(.caption).foregroundStyle(BaggerPalette.muted)
+                ForEach(pendingRecords.filter(\.isUnresolved), id: \.localQueueRecordId) { record in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Hole \(record.intent.holeNumber) · Local score").font(.subheadline.weight(.semibold))
+                        ScorecardPendingIntentOverlay(comparison: ScoringLocalIntentComparison.make(record: record, presentation: presentation))
                     }
                 }
             }
@@ -67,41 +74,12 @@ struct ScoringScorecardView: View {
         .navigationTitle("Scorecard")
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("scorecard.screen")
+        .onPreferenceChange(ScorecardNaturalCellWidth.self) { measuredCellWidth = $0 }
+        .onPreferenceChange(ScorecardNaturalBandHeight.self) { measuredBandHeight = $0 }
     }
 
     private var summary: some View {
-        VStack(alignment: .leading, spacing: 11) {
-            BaggerEyebrow(text: "Official Scorecard")
-            Text([presentation.roundText, presentation.format?.title].compactMap { $0 }.joined(separator: " · "))
-                .font(.system(.title2, design: .serif, weight: .bold))
-                .foregroundStyle(BaggerPalette.ink)
-            if let course = presentation.courseAndTeeText {
-                Label(course, systemImage: "flag.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(BaggerPalette.actionGreen)
-            }
-            ForEach(presentation.sides) { side in
-                Text("\(side.name): \(side.participants.map(\.displayName).joined(separator: " + "))")
-                    .font(.subheadline)
-                    .foregroundStyle(BaggerPalette.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            if let status = presentation.statusText {
-                Label(status, systemImage: presentation.status == .final ? "checkmark.seal.fill" : "flag.fill")
-                    .font(.headline)
-                    .foregroundStyle(BaggerPalette.actionGreen)
-            }
-            if let result = presentation.result {
-                Text("Result · \(result.title(sides: presentation.sides))")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(BaggerPalette.ink)
-            }
-            Text("Official server values only")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(BaggerPalette.goldText)
-        }
-        .baggerCard(border: BaggerPalette.gold)
-        .accessibilityElement(children: .combine)
+        ScorecardIdentityHeader(header: .init(score: presentation, context: matchDisplay))
     }
 
     private func pendingRecord(for holeNumber: Int) -> ScoringQueueRecord? {
@@ -111,94 +89,103 @@ struct ScoringScorecardView: View {
     }
 }
 
-private struct OfficialScorecardRow: View {
-    let row: ScoringScorecardHolePresentation
-    let sides: [ScoringSidePresentation]
-    let isSelected: Bool
-    let pending: ScoringLocalIntentComparison?
+private struct ScorecardIdentityHeader: View {
+    let header: ScorecardIdentityHeaderPresentation
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Hole \(row.hole.holeNumber)")
-                    .font(.headline)
-                    .foregroundStyle(BaggerPalette.ink)
-                if isSelected {
-                    Text("SELECTED")
-                        .font(.caption2.weight(.black))
-                        .foregroundStyle(BaggerPalette.deepEvergreen)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(BaggerPalette.scoreGold, in: Capsule())
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 3) {
+                BaggerEyebrow(text: "Official Scorecard")
+                Text(header.roundAndFormat)
+                    .font(.subheadline.weight(.bold))
+                    .accessibilityIdentifier("scorecard.header.context")
+                if let number = header.matchNumberText {
+                    Text(number).font(.caption.weight(.semibold))
+                        .accessibilityIdentifier("scorecard.header.matchNumber")
                 }
-                Spacer(minLength: 8)
-                Text(row.hole.contextText ?? "")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(BaggerPalette.muted)
-                    .multilineTextAlignment(.trailing)
             }
-
-            if let official = row.official {
-                ForEach(official.sides, id: \.side) { sideValues in
-                    VStack(alignment: .leading, spacing: 3) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(sides.first(where: { $0.side == sideValues.side })?.name ?? "Side \(sideValues.side)")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(BaggerPalette.ink)
-                            Spacer(minLength: 8)
-                            Text("Gross \(sideValues.gross.map(String.init).joined(separator: " / "))")
-                                .font(.subheadline.monospacedDigit())
-                                .foregroundStyle(BaggerPalette.ink)
+            if let course = header.courseAndTeeText {
+                HStack(spacing: 6) {
+                    BaggerCourseLogo(courseID: header.courseID ?? "", courseName: header.courseName ?? "Course",
+                                     size: .small, accessibility: .decorative)
+                        .scaleEffect(18 / BaggerLogoSize.small.dimension)
+                        .frame(width: 18, height: 18)
+                    Text(course).font(.subheadline.weight(.semibold))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("scorecard.header.course")
+                }
+                .foregroundStyle(BaggerPalette.actionGreen)
+            }
+            if !header.sides.isEmpty {
+                VStack(alignment: .leading, spacing: 5) {
+                    if dynamicTypeSize.isAccessibilitySize {
+                        VStack(alignment: .leading, spacing: 5) { teams }
+                    } else {
+                        HStack(alignment: .center, spacing: 8) { teams }
+                    }
+                    ForEach(header.sides) { side in
+                        let names = header.playerNames(for: side)
+                        if !names.isEmpty {
+                            Text(names).font(.caption)
+                                .foregroundStyle(BaggerPalette.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .accessibilityLabel("\(side.name) players: \(names)")
+                                .accessibilityIdentifier("scorecard.header.players.\(side.side)")
                         }
-                        HStack(spacing: 12) {
-                            Text("Strokes \(sideValues.strokes.map(ScoringNumberFormatter.string).joined(separator: " / "))")
-                            Text(sideValues.net.map { "Net \(ScoringNumberFormatter.string($0))" } ?? "Net —")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(BaggerPalette.muted)
                     }
                 }
-                if let winner = official.winner {
-                    Label("\(winner.title(sides: sides)) · Official", systemImage: "checkmark.seal.fill")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(BaggerPalette.actionGreen)
-                }
-            } else {
-                Text("No official score")
-                    .font(.subheadline)
-                    .foregroundStyle(BaggerPalette.muted)
             }
-
-            if let pending {
-                ScorecardPendingIntentOverlay(comparison: pending)
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 5) { result; official }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    result
+                    Spacer(minLength: 0)
+                    official
+                }
             }
         }
+        .foregroundStyle(BaggerPalette.ink)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 8)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilitySummary)
+        .baggerCard(border: BaggerPalette.gold)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("scorecard.header")
     }
 
-    private var accessibilitySummary: String {
-        var parts = ["Hole \(row.hole.holeNumber)"]
-        if let context = row.hole.contextText { parts.append(context) }
-        if let official = row.official {
-            for side in official.sides {
-                let name = sides.first(where: { $0.side == side.side })?.name ?? "Side \(side.side)"
-                parts.append("\(name) gross \(side.gross.map(String.init).joined(separator: ", "))")
-                if let net = side.net { parts.append("net \(ScoringNumberFormatter.string(net))") }
+    @ViewBuilder private var teams: some View {
+        ForEach(Array(header.sides.enumerated()), id: \.element.id) { index, side in
+            if index > 0 {
+                Text("vs").font(.caption.weight(.semibold)).foregroundStyle(BaggerPalette.muted)
+                    .accessibilityLabel("versus")
             }
-            if let winner = official.winner { parts.append("\(winner.title(sides: sides)), official") }
-        } else {
-            parts.append("No official score")
-        }
-        if let pending {
-            parts.append("Saved on iPhone, not Official")
-            for local in pending.rows {
-                parts.append("\(local.label), your saved score \(local.savedGross)")
+            HStack(spacing: 6) {
+                BaggerTeamLogo(teamID: side.teamID ?? "", teamName: side.name, size: .small, accessibility: .decorative)
+                    .scaleEffect(0.75).frame(width: 24, height: 24)
+                Text(side.name).font(.subheadline.weight(.bold))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("scorecard.header.team.\(side.side)")
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        return parts.joined(separator: ", ")
+    }
+
+    @ViewBuilder private var result: some View {
+        if let text = header.resultText {
+            Text(text).font(.footnote.weight(.semibold))
+                .foregroundStyle(BaggerPalette.actionGreen)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("scorecard.header.result")
+        }
+    }
+
+    private var official: some View {
+        Text("Official").font(.caption2.weight(.bold))
+            .foregroundStyle(BaggerPalette.goldText)
+            .padding(.horizontal, 6).padding(.vertical, 3)
+            .background(BaggerPalette.paper, in: Capsule())
+            .fixedSize()
+            .accessibilityIdentifier("scorecard.header.official")
     }
 }
 

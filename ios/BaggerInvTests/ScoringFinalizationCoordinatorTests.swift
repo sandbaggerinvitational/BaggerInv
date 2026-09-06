@@ -3,6 +3,37 @@ import XCTest
 
 @MainActor
 final class ScoringFinalizationCoordinatorTests: XCTestCase {
+    func testSettledMatchSelectionResetsOnlyPresentationWithoutMutation() async throws {
+        let harness = await makeHarness(matchId: "switch-settled")
+        let allowed = await harness.finalization.prepareForMatchSelection()
+        XCTAssertTrue(allowed)
+        XCTAssertEqual(harness.finalization.state, .idle)
+        XCTAssertTrue(harness.api.finalizationRequests.isEmpty)
+        XCTAssertTrue(harness.api.holeRequests.isEmpty)
+        let probe = try await harness.probes.probe(for: CoordinatorQueueFixtures.identity)
+        XCTAssertNil(probe)
+    }
+
+    func testMatchSelectionCannotRemoveAnUnresolvedDurableProbe() async throws {
+        let harness = await makeHarness(matchId: "switch-probe")
+        let probe = finalizationProbe(matchId: "switch-probe", phase: .outcomeUnknown)
+        try await harness.probes.save(probe)
+        let allowed = await harness.finalization.prepareForMatchSelection()
+        XCTAssertFalse(allowed)
+        let retained = try await harness.probes.probe(for: CoordinatorQueueFixtures.identity)
+        XCTAssertEqual(retained, probe)
+        XCTAssertTrue(harness.api.finalizationRequests.isEmpty)
+    }
+
+    func testInactiveApplicationCannotResetFinalizationForMatchSelection() async {
+        let harness = await makeHarness(matchId: "switch-inactive")
+        harness.finalization.prepareForApplicationInactivity()
+        let before = harness.finalization.state
+        let allowed = await harness.finalization.prepareForMatchSelection()
+        XCTAssertFalse(allowed); XCTAssertEqual(harness.finalization.state, before)
+        XCTAssertTrue(harness.api.finalizationRequests.isEmpty)
+    }
+
     func testInactiveActivationWithoutProbeReopensLocalSaveAfterTransientForegroundHealthFailure() async throws {
         let matchId = "finalize-cold-no-probe"
         let activity = NativeApplicationActivity(

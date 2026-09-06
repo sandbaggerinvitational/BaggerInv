@@ -865,6 +865,31 @@ final class ScoringFinalizationCoordinator: ObservableObject {
         }
     }
 
+    /// A presentation-context switch may reset only a settled UI outcome.
+    /// Never drop a durable probe, release a guard, or change write authority.
+    func prepareForMatchSelection() async -> Bool {
+        guard let identity = activeIdentity, !isSuspended, !isSignOutPrepared,
+              hasCurrentTransportAuthorization, activeTransportTask == nil,
+              activeProbeReconciliationID == nil, heldGuard == nil,
+              !isRecoveringDurableProbe, !hasKnownDurableProbe,
+              !state.hasUnresolvedOutcome,
+              state.blocker != .authentication, state.blocker != .authorization, state.blocker != .contract
+        else { return false }
+        let operation = generation
+        do {
+            guard try await probeStore.probe(for: identity) == nil,
+                  operation == generation, activeIdentity == identity,
+                  hasCurrentTransportAuthorization, !isSuspended, !isSignOutPrepared,
+                  activeTransportTask == nil, activeProbeReconciliationID == nil,
+                  heldGuard == nil, !isRecoveringDurableProbe, !hasKnownDurableProbe,
+                  !state.hasUnresolvedOutcome,
+                  state.blocker != .authentication, state.blocker != .authorization, state.blocker != .contract
+            else { return false }
+            state = .idle
+            return true
+        } catch { return false }
+    }
+
     func reconsiderEligibility(using canonical: MobileScoringCurrent?) async {
         guard !isSuspended,
               hasCurrentTransportAuthorization,

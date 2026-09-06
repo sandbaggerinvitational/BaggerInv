@@ -1,5 +1,7 @@
 import SwiftUI
 
+enum ScoreScreenDestination: Hashable { case scorecard }
+
 enum ScoringFinalizationUIPhase: Equatable {
     case hidden
     case ready
@@ -20,7 +22,8 @@ struct ScoringFinalizationUIModel: Equatable {
         presentation: ScoringPresentation,
         queueState: ScoringQueueCoordinatorState,
         coordinatorState: ScoringFinalizationState,
-        liveFinalizationSendingEnabled: Bool = true
+        liveFinalizationSendingEnabled: Bool = true,
+        hasActiveLocalReview: Bool = false
     ) -> Self {
         guard liveFinalizationSendingEnabled else {
             return Self(phase: .hidden, canRequestFinalization: false)
@@ -57,6 +60,11 @@ struct ScoringFinalizationUIModel: Equatable {
         }
         if presentation.status == .final {
             return Self(phase: .matchFinal, canRequestFinalization: false)
+        }
+        // Presentation priority only: never hide active/unknown recovery or
+        // alter canonical readiness. A local correction must be resolved first.
+        if hasActiveLocalReview {
+            return Self(phase: .hidden, canRequestFinalization: false)
         }
 
         let unresolvedForMatch = queueState.records.contains {
@@ -254,10 +262,15 @@ struct ScoreScreen: View {
     let onReapplyMyScore: @MainActor @Sendable (String) async throws -> Void
     let onFinalize: @MainActor @Sendable (String) async throws -> Void
     let onRefreshFinalizationOutcome: @MainActor @Sendable () async -> Void
+    let matchSelection: ScoreMatchSelectionStore?
+    let onSelectMatch: @MainActor @Sendable (String) async throws -> Void
 
+    @Environment(\.scoreMatchDisplay) private var scorecardMatchDisplay
     @State private var selectedHole: Int?
-    @State private var drafts: [Int: ScoringDraft] = [:]
-    @State private var pickerTarget: ScoringPickerTarget?
+    @State private var editors: [Int: ScoreEntryEditor] = [:]
+    @State private var isDiscardRefreshPresented = false
+    @State private var correctionSaveHole: Int?
+    @State private var isCorrectionSavePresented = false
     @State private var isSaving = false
     @State private var saveFailure = false
     @State private var pendingReviewAction: PendingScoringReviewAction?
@@ -266,6 +279,9 @@ struct ScoreScreen: View {
     @State private var reviewActionFailed = false
     @State private var isFinalizeConfirmationPresented = false
     @State private var finalizationActionFailed = false
+    @State private var isMatchSelectionPresented = false
+    @State private var isDiscardMatchSelectionPresented = false
+    @State private var correctionFocusHole: Int?
 
     init(
         presentation: ScoringPresentation,
@@ -273,6 +289,8 @@ struct ScoreScreen: View {
         finalizationState: ScoringFinalizationState = .idle,
         liveHoleMutationSendingEnabled: Bool = false,
         liveFinalizationSendingEnabled: Bool = true,
+        matchSelection: ScoreMatchSelectionStore? = nil,
+        onSelectMatch: @escaping @MainActor @Sendable (String) async throws -> Void = { _ in throw ScoreMatchSelectionError.unavailable },
         onRefresh: @escaping @MainActor @Sendable () async -> Void,
         onSave: @escaping @MainActor @Sendable (ScoringDraft) async throws -> ScoringQueueSaveResult = { _ in
             throw ScoringQueueCoordinatorError.inactiveIdentity
@@ -303,13 +321,15 @@ struct ScoreScreen: View {
         self.onReapplyMyScore = onReapplyMyScore
         self.onFinalize = onFinalize
         self.onRefreshFinalizationOutcome = onRefreshFinalizationOutcome
+        self.matchSelection = matchSelection
+        self.onSelectMatch = onSelectMatch
         _selectedHole = State(initialValue: presentation.initialSelectedHole())
     }
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: BaggerLayout.sectionSpacing) {
-                header
+            VStack(alignment: .leading, spacing: 12) {
+                if presentation.matchID == nil { header }
 
                 if presentation.orientationOnly {
                     ScoreNotice(
@@ -341,12 +361,48 @@ struct ScoreScreen: View {
         .background(BaggerPalette.canvas.ignoresSafeArea())
         .refreshable(action: refreshCanonicalState)
         .accessibilityIdentifier("score.screen")
-        .sheet(item: $pickerTarget) { target in
-            GrossScorePicker(
-                target: target,
-                onApply: { value in setDraft(value, for: target.row) }
+        .navigationDestination(for: ScoreScreenDestination.self) { _ in
+            ScoringScorecardView(
+                presentation: presentation,
+                selectedHole: effectiveSelectedHole,
+                pendingRecords: pendingScorecardRecords,
+                onSelectHole: { if !isSaving { selectHoleForReview($0) } }
             )
-            .presentationDetents([.medium])
+            .environment(\.scoreMatchDisplay, scorecardMatchDisplay)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if let hole = effectiveSelectedHole, presentation.canCreateDurableIntent {
+                saveDock(holeNumber: hole)
+            }
+        }
+        .alert("Discard unsaved entries and refresh?", isPresented: $isDiscardRefreshPresented) {
+            Button("Discard and Refresh", role: .destructive) {
+                editors.removeAll()
+                Task { await onRefresh() }
+            }
+            Button("Keep Editing", role: .cancel) {}
+        }
+        .alert("Discard unsaved entries and choose a Match?", isPresented: $isDiscardMatchSelectionPresented) {
+            Button("Discard and Choose", role: .destructive) {
+                editors.removeAll(); correctionFocusHole = nil
+                isMatchSelectionPresented = true
+            }
+            Button("Keep Editing", role: .cancel) {}
+        } message: {
+            Text("Only unsaved keypad edits are discarded. Scores already saved on this iPhone stay with their original Match.")
+        }
+        .sheet(isPresented: $isMatchSelectionPresented) {
+            if let matchSelection {
+                ScoreMatchSelectionSheet(store: matchSelection, currentMatchID: presentation.matchID, onSelect: onSelectMatch)
+            }
+        }
+        .alert("Save this correction?", isPresented: $isCorrectionSavePresented) {
+            Button("Save Correction") {
+                if let hole = correctionSaveHole { saveAndAdvance(holeNumber: hole) }
+            }
+            Button("Keep Editing", role: .cancel) {}
+        } message: {
+            Text("Your changed gross scores will be saved on this iPhone. They are not Official until Bagger confirms them.")
         }
         .confirmationDialog(
             "Resolve saved score?",
@@ -374,17 +430,20 @@ struct ScoreScreen: View {
             Text("All saved scores must be Official first. Once finalized, this Match becomes read-only.")
         }
         .onChange(of: presentation.canonicalVersion) { _ in
-            drafts.removeAll()
-            pickerTarget = nil
+            editors.removeAll()
+            correctionFocusHole = nil
             reconcileSelection()
+        }
+        .onChange(of: presentation.matchID) { _ in
+            editors.removeAll(); correctionFocusHole = nil
+            selectedHole = presentation.initialSelectedHole()
         }
         .onChange(of: presentation.canonicalHoleNumbers) { _ in
             reconcileSelection()
         }
         .onChange(of: allowsLocalIntentAdmission) { allowed in
             guard !allowed else { return }
-            drafts.removeAll()
-            pickerTarget = nil
+            editors.removeAll()
         }
         .onAppear {
             // TabView may construct Score while scoring-current is still
@@ -442,18 +501,20 @@ struct ScoreScreen: View {
 
     private var matchContent: some View {
         Group {
-            ScoreMatchContext(presentation: presentation)
+            matchContext
 
             availabilityNotice
 
             if let matchID = presentation.matchID,
                !queueState.isOffline || unresolvedQueueCount(matchID: matchID) > 0
             {
-                ScoringReliabilityStatusView(
-                    status: reliabilityStatus(matchID: matchID),
-                    unresolvedCount: unresolvedQueueCount(matchID: matchID),
-                    onRetry: retryAction(matchID: matchID)
-                )
+                if reliabilityStatus(matchID: matchID) != .official {
+                    ScoringReliabilityStatusView(
+                        status: reliabilityStatus(matchID: matchID),
+                        unresolvedCount: unresolvedQueueCount(matchID: matchID),
+                        onRetry: retryAction(matchID: matchID)
+                    )
+                }
                 if let notice = queueAgeNotice(matchID: matchID) {
                     ScoreNotice(
                         symbol: "clock.badge.exclamationmark",
@@ -488,34 +549,39 @@ struct ScoreScreen: View {
                 HoleNavigator(
                     holes: presentation.reviewHoles,
                     officialHoleNumbers: presentation.officialHoleNumbers,
+                    currentHole: presentation.canonicalCurrentHole,
+                    pendingHoleNumbers: Set(pendingScorecardRecords.map { $0.intent.holeNumber }),
                     selectedHole: selectedHoleBinding
                 )
 
-                HoleHeader(hole: hole)
-
-                HoleStepControls(
-                    canGoPrevious: presentation.canonicalHoleNumbers.first != hole.holeNumber,
-                    canGoNext: presentation.canonicalHoleNumbers.last != hole.holeNumber,
-                    onPrevious: { selectPreviousHole(before: hole.holeNumber) },
-                    onNext: { selectNextHole(after: hole.holeNumber) }
-                )
-
-                NavigationLink {
-                    ScoringScorecardView(
-                        presentation: presentation,
-                        selectedHole: activeHoleNumber,
-                        pendingRecords: pendingScorecardRecords,
-                        onSelectHole: { self.selectedHole = $0 }
-                    )
-                } label: {
-                    Label("Scorecard", systemImage: "list.bullet.clipboard.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, minHeight: 48)
+                HStack(spacing: 4) {
+                    Button { selectPreviousHole(before: hole.holeNumber) } label: {
+                        Image(systemName: "chevron.left").frame(width: 44, height: 44)
+                    }
+                    .disabled(isSaving || presentation.canonicalHoleNumbers.first == hole.holeNumber)
+                    .accessibilityLabel("Previous hole").accessibilityIdentifier("score.previousHole")
+                    HoleHeader(hole: hole)
+                    Button { selectNextHole(after: hole.holeNumber) } label: {
+                        Image(systemName: "chevron.right").frame(width: 44, height: 44)
+                    }
+                    .disabled(isSaving || presentation.canonicalHoleNumbers.last == hole.holeNumber)
+                    .accessibilityLabel("Next hole").accessibilityIdentifier("score.nextHole")
+                NavigationLink(value: ScoreScreenDestination.scorecard) {
+                    Image(systemName: "list.bullet.clipboard")
+                        .frame(width: 44, height: 44)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
                 .tint(BaggerPalette.actionGreen)
                 .accessibilityIdentifier("score.scorecard.quick")
+                .accessibilityLabel("Scorecard")
                 .accessibilityHint("Opens the official Scorecard")
+                .disabled(isSaving)
+                }
+                .foregroundStyle(BaggerPalette.actionGreen)
+
+                if presentation.officialHole(hole.holeNumber) != nil {
+                    compactOfficialContext(holeNumber: hole.holeNumber)
+                }
 
                 if presentation.format?.isSupported == false {
                     ScoreNotice(
@@ -524,22 +590,21 @@ struct ScoreScreen: View {
                         message: "This Match format is not supported for native score entry. Official Scorecard review remains available."
                     )
                 } else {
-                    ScoreRowsSection(
+                    ScoreEntryControls(
                         presentation: presentation,
-                        hole: hole,
-                        draft: drafts[hole.holeNumber],
-                        isEditable: allowsLocalIntentAdmission,
-                        onDecrement: { adjust($0, by: -1, hole: hole) },
-                        onIncrement: { adjust($0, by: 1, hole: hole) },
-                        onChoose: { openPicker(for: $0, hole: hole) },
-                        onDiscard: { drafts.removeValue(forKey: hole.holeNumber) }
+                        holeNumber: hole.holeNumber,
+                        editor: editor(for: hole.holeNumber),
+                        enabled: allowsLocalIntentAdmission && !isSaving,
+                        correctionActive: correctionFocusHole == hole.holeNumber || editor(for: hole.holeNumber)?.hasChanges == true,
+                        onFinishReview: { correctionFocusHole = nil },
+                        onSelect: { key in
+                            if editor(for: hole.holeNumber)?.isCorrection == true { correctionFocusHole = hole.holeNumber }
+                            updateEditor(hole.holeNumber) { $0.select(key) }
+                        },
+                        onAction: { action in updateEditor(hole.holeNumber) { $0.apply(action) } },
+                        onDiscard: { editors.removeValue(forKey: hole.holeNumber); correctionFocusHole = nil }
                     )
                 }
-
-                CanonicalHoleContext(
-                    presentation: presentation,
-                    holeNumber: hole.holeNumber
-                )
 
                 if let matchID = presentation.matchID,
                    let record = latestQueueRecord(matchID: matchID, holeNumber: hole.holeNumber),
@@ -551,15 +616,6 @@ struct ScoreScreen: View {
                     )
                 }
 
-                if presentation.canCreateDurableIntent {
-                    DurableSaveAndNext(
-                        hasDraft: drafts[hole.holeNumber]?.isEmpty == false,
-                        isSaving: isSaving,
-                        saveFailed: saveFailure,
-                        isEnabled: allowsLocalIntentAdmission,
-                        onSave: { saveAndAdvance(holeNumber: hole.holeNumber) }
-                    )
-                }
             } else {
                 ScoreNotice(
                     symbol: "flag.checkered",
@@ -567,36 +623,6 @@ struct ScoreScreen: View {
                     message: "This canonical scoring snapshot does not currently include hole details."
                 )
             }
-
-            NavigationLink {
-                ScoringScorecardView(
-                    presentation: presentation,
-                    selectedHole: effectiveSelectedHole,
-                    pendingRecords: pendingScorecardRecords,
-                    onSelectHole: { selectedHole = $0 }
-                )
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "list.bullet.clipboard.fill")
-                        .font(.title2)
-                        .foregroundStyle(BaggerPalette.goldText)
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Official Scorecard")
-                            .font(.headline)
-                            .foregroundStyle(BaggerPalette.ink)
-                        Text("Review canonical hole scores and Match state")
-                            .font(.footnote)
-                            .foregroundStyle(BaggerPalette.muted)
-                    }
-                    Spacer(minLength: 8)
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(BaggerPalette.actionGreen)
-                }
-                .baggerCard(border: BaggerPalette.matchBorder)
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("score.scorecard")
-            .accessibilityHint("Opens the official Scorecard")
 
             ScoringFinalizationCard(
                 model: finalizationUIModel,
@@ -646,6 +672,16 @@ struct ScoreScreen: View {
         }
     }
 
+    @ViewBuilder private var matchContext: some View {
+        let official = presentation.matchID.map { reliabilityStatus(matchID: $0) == .official } ?? false
+        if matchSelection != nil {
+            ScoreMatchContext(presentation: presentation, showsOfficial: official,
+                              onChooseMatch: { requestMatchSelection() }, switchingDisabled: !canChooseMatch)
+        } else {
+            ScoreMatchContext(presentation: presentation, showsOfficial: official)
+        }
+    }
+
     private var orientationNoticeTitle: String {
         presentation.safeErrorCode == nil ? "Offline · scoring unavailable" : "Scoring unavailable · orientation only"
     }
@@ -670,90 +706,145 @@ struct ScoreScreen: View {
     private var selectedHoleBinding: Binding<Int?> {
         Binding(
             get: { presentation.reconciledSelectedHole(selectedHole) },
-            set: { selectedHole = $0 }
+            set: { if !isSaving, let number = $0 { selectHoleForReview(number) } }
         )
     }
 
     private func reconcileSelection() {
         selectedHole = presentation.reconciledSelectedHole(selectedHole)
-        drafts = drafts.filter { presentation.isDraftCompatible($0.value) }
+        editors = editors.filter { presentation.isDraftCompatible($0.value.base) }
     }
 
-    private func ensureDraft(for hole: ScoringCourseHolePresentation) -> ScoringDraft? {
+    private func editor(for number: Int) -> ScoreEntryEditor? {
         guard allowsLocalIntentAdmission else { return nil }
-        if let existing = drafts[hole.holeNumber], presentation.isDraftCompatible(existing) {
+        if let existing = editors[number], presentation.isDraftCompatible(existing.base) {
             return existing
         }
-        return presentation.makeDraft(for: hole.holeNumber)
+        guard let base = presentation.makeDraft(for: number) else { return nil }
+        let rows = presentation.inputRows(for: number)
+        var pending: [ScoringInputKey: Int] = [:]
+        if let record = pendingScorecardRecords.first(where: { $0.intent.holeNumber == number }) {
+            for row in rows {
+                let values = row.key.side == 1 ? record.intent.teamOneGrossScores : record.intent.teamTwoGrossScores
+                let index = row.key.slot - 1
+                if values.indices.contains(index) { pending[row.key] = values[index] }
+            }
+        }
+        return ScoreEntryEditor(base: base, rows: rows, pending: pending)
     }
 
-    private func adjust(_ row: ScoringInputRowPresentation, by delta: Int, hole: ScoringCourseHolePresentation) {
-        guard allowsLocalIntentAdmission else { return }
-        guard var draft = ensureDraft(for: hole) else { return }
-        let defaultGross = hole.par.map { Int($0.rounded()) } ?? 4
-        if ScoringInteraction.displayedGross(for: row, draft: draft) == nil {
-            let next = min(
-                max(defaultGross + delta, ScoringPresentation.minimumGross),
-                ScoringPresentation.maximumGross
-            )
-            draft.set(next == row.officialGross ? nil : next, for: row.key)
-        } else {
-            draft = ScoringInteraction.changing(row: row, by: delta, in: draft, defaultValue: defaultGross)
-        }
-        if draft.isEmpty {
-            drafts.removeValue(forKey: hole.holeNumber)
-        } else {
-            drafts[hole.holeNumber] = draft
-        }
+    private func updateEditor(_ number: Int, change: (inout ScoreEntryEditor) -> Void) {
+        guard !isSaving, var value = editor(for: number) else { return }
+        change(&value)
+        editors[number] = value
+        saveFailure = false
     }
 
-    private func openPicker(for row: ScoringInputRowPresentation, hole: ScoringCourseHolePresentation) {
-        guard allowsLocalIntentAdmission else { return }
-        let draft = ensureDraft(for: hole)
-        let value = ScoringInteraction.displayedGross(for: row, draft: draft) ?? hole.par.map { Int($0.rounded()) } ?? 4
-        pickerTarget = ScoringPickerTarget(row: row, holeNumber: hole.holeNumber, initialValue: value)
+    private func compactOfficialContext(holeNumber: Int) -> some View {
+        let copy = ScoreHoleResultPresentation(official: presentation.officialHole(holeNumber), sides: presentation.sides)
+        return VStack(alignment: .leading, spacing: 3) {
+            Text(copy.resultText)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(BaggerPalette.ink)
+                .accessibilityIdentifier("score.holeResult.result")
+            if let net = copy.netText {
+                Text(net)
+                    .font(.caption)
+                    .accessibilityIdentifier("score.holeResult.net")
+            }
+            if let authority = copy.authorityText {
+                Text(authority)
+                .font(.caption2)
+                .accessibilityIdentifier("score.holeResult.authority")
+            }
+        }
+        .foregroundStyle(BaggerPalette.muted)
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("score.holeResult")
     }
 
-    private func setDraft(_ value: Int, for row: ScoringInputRowPresentation) {
-        guard allowsLocalIntentAdmission,
-              let target = pickerTarget,
-              let hole = presentation.hole(target.holeNumber),
-              presentation.inputRows(for: target.holeNumber).contains(where: { $0.key == row.key }),
-              var draft = ensureDraft(for: hole)
-        else { return }
-        draft.set(value == row.officialGross ? nil : value, for: row.key)
-        if draft.isEmpty {
-            drafts.removeValue(forKey: hole.holeNumber)
-        } else {
-            drafts[hole.holeNumber] = draft
+    private func saveDock(holeNumber: Int) -> some View {
+        let current = editor(for: holeNumber)
+        return VStack(spacing: 3) {
+            Button {
+                if current?.isCorrection == true {
+                    correctionSaveHole = holeNumber
+                    isCorrectionSavePresented = true
+                } else {
+                    saveAndAdvance(holeNumber: holeNumber)
+                }
+            } label: {
+                HStack {
+                    if isSaving { ProgressView().tint(.white) }
+                    Text(isSaving ? "Saving on iPhone…" : current?.isCorrection == true ? "Save Correction" : holeNumber == presentation.canonicalHoleNumbers.last ? "Save Hole \(holeNumber)" : "Save & Next")
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .foregroundStyle(Color.white)
+                .background(current?.canSave == true ? BaggerPalette.evergreen : BaggerPalette.muted,
+                            in: RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+            .disabled(!allowsLocalIntentAdmission || isSaving || current?.canSave != true)
+            .accessibilityIdentifier("score.saveNext")
+            .accessibilityHint("Saves on this iPhone before advancing. Not Official until Bagger confirms it. Never finalizes the Match.")
+            Text(saveFailure ? "Not saved. Your entries remain here. Try again." :
+                    current?.hasChanges == true ? current?.isComplete == true ? "Ready · Not Official until confirmed" : "\(current?.enteredCount ?? 0) of \(current?.rows.count ?? 0) entered · Complete all scores" :
+                    current?.isCorrection == true ? "Recorded scores · Select a target to correct" : "Enter gross scores · Save stays on this iPhone first")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(saveFailure ? BaggerPalette.liveRed : BaggerPalette.muted)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("score.saveState")
         }
+        .padding(.horizontal, BaggerLayout.pageInset).padding(.vertical, 6)
+        .background(BaggerPalette.canvas)
     }
 
     private func selectNextHole(after number: Int) {
         guard let index = presentation.canonicalHoleNumbers.firstIndex(of: number),
               presentation.canonicalHoleNumbers.indices.contains(index + 1)
         else { return }
-        selectedHole = presentation.canonicalHoleNumbers[index + 1]
+        selectHoleForReview(presentation.canonicalHoleNumbers[index + 1])
     }
 
     private func selectPreviousHole(before number: Int) {
         guard let index = presentation.canonicalHoleNumbers.firstIndex(of: number), index > 0 else { return }
-        selectedHole = presentation.canonicalHoleNumbers[index - 1]
+        selectHoleForReview(presentation.canonicalHoleNumbers[index - 1])
+    }
+
+    private func selectHoleForReview(_ number: Int) {
+        selectedHole = number
+        correctionFocusHole = presentation.officialHole(number) == nil ? nil : number
+    }
+
+    private var canChooseMatch: Bool {
+        !isSaving && reviewRecordIDInFlight == nil && !presentation.isRefreshing &&
+        !finalizationState.hasUnresolvedOutcome && !isFinalizeConfirmationPresented &&
+        !queueState.isSuspended
+    }
+
+    private func requestMatchSelection() {
+        guard canChooseMatch else { return }
+        if editors.values.contains(where: \.hasChanges) { isDiscardMatchSelectionPresented = true }
+        else { isMatchSelectionPresented = true }
     }
 
     @MainActor
     private func refreshCanonicalState() async {
-        // Step 2E drafts are intentionally ephemeral. An explicit canonical
-        // refresh discards them even when the server snapshot is unchanged.
-        drafts.removeAll()
-        pickerTarget = nil
+        guard !isSaving else { return }
+        if editors.values.contains(where: \.hasChanges) {
+            isDiscardRefreshPresented = true
+            return
+        }
+        editors.removeAll()
         await onRefresh()
     }
 
     private func saveAndAdvance(holeNumber: Int) {
         guard allowsLocalIntentAdmission,
               !isSaving,
-              let draft = drafts[holeNumber],
+              let draft = editor(for: holeNumber)?.saveDraft(),
               !draft.isEmpty
         else { return }
         isSaving = true
@@ -762,7 +853,8 @@ struct ScoreScreen: View {
             defer { isSaving = false }
             do {
                 _ = try await onSave(draft)
-                drafts.removeValue(forKey: holeNumber)
+                editors.removeValue(forKey: holeNumber)
+                correctionFocusHole = nil
                 selectNextHole(after: holeNumber)
             } catch {
                 saveFailure = true
@@ -790,7 +882,8 @@ struct ScoreScreen: View {
             presentation: presentation,
             queueState: queueState,
             coordinatorState: finalizationState,
-            liveFinalizationSendingEnabled: liveFinalizationSendingEnabled
+            liveFinalizationSendingEnabled: liveFinalizationSendingEnabled,
+            hasActiveLocalReview: correctionFocusHole != nil || editors.values.contains(where: \.hasChanges)
         )
     }
 
@@ -1119,42 +1212,47 @@ private struct ScoringFinalizationCard: View {
     @ViewBuilder
     var body: some View {
         if model.phase != .hidden {
-            VStack(alignment: .leading, spacing: 11) {
-                BaggerSectionHeading("Match Completion")
-                HStack(alignment: .top, spacing: 11) {
+            VStack(alignment: .leading, spacing: 7) {
+              if model.canRequestFinalization {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 10) { completionHeading; Spacer(minLength: 0); finalizeButton }
+                    VStack(alignment: .leading, spacing: 6) { completionHeading; finalizeButton }
+                }
+              } else {
+                HStack(spacing: 6) {
                     if isBusy {
                         ProgressView()
-                            .padding(.top, 2)
                             .accessibilityHidden(true)
                     } else {
                         Image(systemName: symbol)
-                            .font(.title3)
+                            .font(.caption)
                             .foregroundStyle(BaggerPalette.goldText)
                             .accessibilityHidden(true)
                     }
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(title)
-                            .font(.headline)
-                            .foregroundStyle(BaggerPalette.ink)
-                        Text(message)
-                            .font(.subheadline)
-                            .foregroundStyle(BaggerPalette.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    Text("Match Completion")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(BaggerPalette.ink)
+                }
+              }
+                VStack(alignment: .leading, spacing: 3) {
+                  if !model.canRequestFinalization {
+                    Text(title)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(BaggerPalette.ink)
+                  }
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(BaggerPalette.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("score.finalization.message")
                 }
 
-                if model.canRequestFinalization {
-                    Button("Finalize Match", action: onRequestFinalization)
-                        .buttonStyle(.borderedProminent)
-                        .tint(BaggerPalette.actionGreen)
-                        .frame(maxWidth: .infinity, minHeight: 52)
-                        .accessibilityHint("Requires confirmation and an online canonical scoring check")
-                        .accessibilityIdentifier("score.finalize")
-                } else if shouldOfferRefresh {
+                if !model.canRequestFinalization && shouldOfferRefresh {
                     Button("Refresh Official Score", action: onRefreshOfficialState)
                         .buttonStyle(.bordered)
+                        .controlSize(.large)
                         .tint(BaggerPalette.actionGreen)
-                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .frame(maxWidth: .infinity, minHeight: 44)
                         .accessibilityIdentifier("score.finalize.refresh")
                 }
 
@@ -1170,6 +1268,20 @@ private struct ScoringFinalizationCard: View {
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("score.finalization")
         }
+    }
+
+    private var completionHeading: some View {
+        Label("Match Completion", systemImage: "flag.checkered")
+            .font(.subheadline.weight(.bold)).foregroundStyle(BaggerPalette.ink)
+    }
+
+    private var finalizeButton: some View {
+        Button("Finalize Match", action: onRequestFinalization)
+            .font(.subheadline.weight(.semibold))
+            .buttonStyle(.bordered).controlSize(.large)
+            .tint(BaggerPalette.actionGreen).frame(minHeight: 44)
+            .accessibilityHint("Requires confirmation and an online canonical scoring check")
+            .accessibilityIdentifier("score.finalize")
     }
 
     private var isBusy: Bool {
@@ -1202,7 +1314,7 @@ private struct ScoringFinalizationCard: View {
         switch model.phase {
         case .hidden: ""
         case .ready:
-            "All saved scores are Official and the canonical Scorecard is complete. Finalization is online-only."
+            "All scores Official · Online-only; confirmation required."
         case .submitting:
             "Bagger is sending the explicit finalization request. Do not close the app."
         case .reconciling:
@@ -1270,41 +1382,16 @@ private struct ScoringFinalizationCard: View {
     }
 }
 
-private struct HoleStepControls: View {
-    let canGoPrevious: Bool
-    let canGoNext: Bool
-    let onPrevious: () -> Void
-    let onNext: () -> Void
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Button(action: onPrevious) {
-                Label("Previous", systemImage: "chevron.left")
-                    .frame(maxWidth: .infinity, minHeight: 48)
-            }
-            .disabled(!canGoPrevious)
-            .accessibilityLabel("Previous hole")
-            .accessibilityIdentifier("score.previousHole")
-
-            Button(action: onNext) {
-                Label("Next", systemImage: "chevron.right")
-                    .frame(maxWidth: .infinity, minHeight: 48)
-            }
-            .disabled(!canGoNext)
-            .accessibilityLabel("Next hole")
-            .accessibilityIdentifier("score.nextHole")
-        }
-        .buttonStyle(.bordered)
-        .tint(BaggerPalette.actionGreen)
-    }
-}
-
 private struct ScoreMatchContext: View {
     let presentation: ScoringPresentation
+    let showsOfficial: Bool
+    var onChooseMatch: (() -> Void)? = nil
+    var switchingDisabled = false
+    @Environment(\.scoreMatchDisplay) private var matchDisplay
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 13) {
+        VStack(alignment: .leading, spacing: 5) {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 10) {
                     heading
@@ -1319,48 +1406,70 @@ private struct ScoreMatchContext: View {
             }
 
             if let course = presentation.courseAndTeeText {
-                Label(course, systemImage: "flag.fill")
+                HStack(spacing: 6) {
+                    BaggerCourseLogo(
+                        courseID: presentation.courseID ?? "",
+                        courseName: presentation.courseName ?? "Course",
+                        size: .small,
+                        accessibility: .decorative
+                    )
+                    // Stay within the existing subheadline line box. The
+                    // adjacent canonical text owns the VoiceOver identity.
+                    .scaleEffect(18 / BaggerLogoSize.small.dimension)
+                    .frame(width: 18, height: 18)
+                    Text(course).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("score.courseText")
+                }
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(BaggerPalette.actionGreen)
+                    .accessibilityElement(children: .contain)
+                    .accessibilityIdentifier("score.courseContext")
+            }
+            if matchDisplay?.isCached == true {
+                Text("Match context cached").font(.caption2).foregroundStyle(BaggerPalette.muted)
             }
 
-            VStack(spacing: 0) {
-                ForEach(Array(presentation.sides.enumerated()), id: \.element.id) { index, side in
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(side.name)
-                            .font(.headline)
-                            .foregroundStyle(BaggerPalette.ink)
-                        Text(side.participants.map(\.displayName).joined(separator: " + "))
-                            .font(.subheadline)
-                            .foregroundStyle(BaggerPalette.muted)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 9)
-                    if index < presentation.sides.count - 1 {
-                        Divider().overlay(BaggerPalette.warmBorder)
-                    }
-                }
-            }
-
-            if presentation.status == .final, let result = presentation.result {
-                Label(result.title(sides: presentation.sides), systemImage: "checkmark.seal.fill")
-                    .font(.headline)
+            if let status = presentation.statusText ?? presentation.result?.title(sides: presentation.sides) {
+                Text("\(showsOfficial ? "Official · " : "")\(status)")
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(BaggerPalette.actionGreen)
+                    .accessibilityIdentifier(showsOfficial ? "score.reliability.status" : "score.matchStatus")
+            } else if showsOfficial {
+                Text("Official").font(.caption.weight(.semibold))
+                    .foregroundStyle(BaggerPalette.actionGreen)
+                    .accessibilityIdentifier("score.reliability.status")
             }
         }
-        .baggerCard(border: BaggerPalette.gold)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("score.matchContext")
     }
 
-    private var heading: some View {
+    @ViewBuilder private var heading: some View {
+        if let onChooseMatch {
+            Button(action: onChooseMatch) {
+                HStack(spacing: 6) {
+                    headingText
+                    Image(systemName: "chevron.up.chevron.down").font(.caption.weight(.semibold)).accessibilityHidden(true)
+                }
+                .frame(minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain).disabled(switchingDisabled)
+            .accessibilityIdentifier("score.chooseMatch")
+            .accessibilityHint("Choose from freshly verified score-authorized Matches")
+        } else { headingText }
+    }
+
+    private var headingText: some View {
         VStack(alignment: .leading, spacing: 4) {
-            BaggerEyebrow(text: "Your Match")
             Text([presentation.roundText, presentation.format?.title].compactMap { $0 }.joined(separator: " · "))
-                .font(.system(.title3, design: .serif, weight: .bold))
+                .font(.subheadline.weight(.bold))
                 .foregroundStyle(BaggerPalette.ink)
                 .fixedSize(horizontal: false, vertical: true)
+            if let number = matchDisplay?.match.displayMatchNumber {
+                Text("Match \(number)").font(.caption.weight(.semibold))
+            }
         }
     }
 }
@@ -1369,13 +1478,19 @@ private struct ScoreStatusPill: View {
     let presentation: ScoringPresentation
 
     var body: some View {
-        Text(label)
-            .font(.caption.weight(.black))
-            .foregroundStyle(foreground)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(background, in: Capsule())
-            .fixedSize()
+        if presentation.status == .live && !presentation.readOnly && !presentation.orientationOnly {
+            BaggerStatusBadge(kind: .live)
+                .accessibilityLabel("Match status: Live")
+                .accessibilityIdentifier("score.status.live")
+        } else {
+            Text(label)
+                .font(.caption.weight(.black))
+                .foregroundStyle(foreground)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(background, in: Capsule())
+                .fixedSize()
+        }
     }
 
     private var label: String {
@@ -1396,11 +1511,14 @@ private struct ScoreStatusPill: View {
 private struct HoleNavigator: View {
     let holes: [ScoringCourseHolePresentation]
     let officialHoleNumbers: Set<Int>
+    let currentHole: Int?
+    let pendingHoleNumbers: Set<Int>
     @Binding var selectedHole: Int?
+    @ScaledMetric(relativeTo: .headline) private var holeWidth: CGFloat = 44
+    @ScaledMetric(relativeTo: .headline) private var holeHeight: CGFloat = 48
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            BaggerSectionHeading("Select Hole")
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -1411,14 +1529,14 @@ private struct HoleNavigator: View {
                                 VStack(spacing: 3) {
                                     Text(String(hole.holeNumber))
                                         .font(.headline.monospacedDigit())
-                                    if officialHoleNumbers.contains(hole.holeNumber) {
-                                        Image(systemName: "checkmark.circle.fill")
+                                    if pendingHoleNumbers.contains(hole.holeNumber) || officialHoleNumbers.contains(hole.holeNumber) || currentHole == hole.holeNumber {
+                                        Image(systemName: pendingHoleNumbers.contains(hole.holeNumber) ? "iphone" : officialHoleNumbers.contains(hole.holeNumber) ? "checkmark.circle.fill" : "flag.fill")
                                             .font(.caption2)
                                             .accessibilityHidden(true)
                                     }
                                 }
                                 .foregroundStyle(selectedHole == hole.holeNumber ? Color.white : BaggerPalette.deepEvergreen)
-                                .frame(width: 52, height: 52)
+                                .frame(width: holeWidth, height: holeHeight)
                                 .background(
                                     selectedHole == hole.holeNumber ? BaggerPalette.evergreen : BaggerPalette.paper,
                                     in: RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -1433,7 +1551,7 @@ private struct HoleNavigator: View {
                             }
                             .buttonStyle(.plain)
                             .id(hole.holeNumber)
-                            .accessibilityLabel("Hole \(hole.holeNumber)\(officialHoleNumbers.contains(hole.holeNumber) ? ", official score recorded" : "")")
+                            .accessibilityLabel("Hole \(hole.holeNumber)\(officialHoleNumbers.contains(hole.holeNumber) ? ", official score recorded" : "")\(pendingHoleNumbers.contains(hole.holeNumber) ? ", saved on iPhone, not Official" : "")\(currentHole == hole.holeNumber ? ", canonical current hole" : "")")
                             .accessibilityAddTraits(selectedHole == hole.holeNumber ? .isSelected : [])
                             .accessibilityIdentifier("score.hole.\(hole.holeNumber)")
                         }
@@ -1459,13 +1577,12 @@ private struct HoleHeader: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            BaggerEyebrow(text: "Current Selection")
-            Text("Hole \(hole.holeNumber)")
-                .font(.system(.largeTitle, design: .serif, weight: .bold))
+            Text("Hole \(hole.holeNumber) of 18")
+                .font(.system(.title3, design: .serif, weight: .bold))
                 .foregroundStyle(BaggerPalette.ink)
             if let context = hole.contextText {
                 Text(context)
-                    .font(.headline)
+                    .font(.caption)
                     .foregroundStyle(BaggerPalette.actionGreen)
             }
         }
@@ -1473,256 +1590,6 @@ private struct HoleHeader: View {
         .padding(.horizontal, 2)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("score.holeHeader")
-    }
-}
-
-private struct ScoreRowsSection: View {
-    let presentation: ScoringPresentation
-    let hole: ScoringCourseHolePresentation
-    let draft: ScoringDraft?
-    let isEditable: Bool
-    let onDecrement: (ScoringInputRowPresentation) -> Void
-    let onIncrement: (ScoringInputRowPresentation) -> Void
-    let onChoose: (ScoringInputRowPresentation) -> Void
-    let onDiscard: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(presentation.sides) { side in
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(side.name.uppercased())
-                        .font(.caption.weight(.black))
-                        .foregroundStyle(BaggerPalette.goldText)
-                        .accessibilityIdentifier("score.controls")
-
-                    ForEach(rows(for: side.side)) { row in
-                        GrossScoreControl(
-                            row: row,
-                            displayedGross: ScoringInteraction.displayedGross(for: row, draft: draft),
-                            isEdited: ScoringInteraction.isEdited(row: row, draft: draft),
-                            isEditable: isEditable,
-                            onDecrement: { onDecrement(row) },
-                            onIncrement: { onIncrement(row) },
-                            onChoose: { onChoose(row) }
-                        )
-                    }
-                }
-            }
-
-            if draft?.isEmpty == false {
-                HStack(alignment: .center, spacing: 10) {
-                    Label("Edited · Not saved", systemImage: "pencil.circle.fill")
-                        .font(.footnote.weight(.bold))
-                        .foregroundStyle(BaggerPalette.goldText)
-                    Spacer()
-                    Button("Discard edits", action: onDiscard)
-                        .font(.footnote.weight(.bold))
-                        .foregroundStyle(BaggerPalette.actionGreen)
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("score.draftNotice")
-            }
-        }
-        .baggerCard()
-    }
-
-    private func rows(for side: Int) -> [ScoringInputRowPresentation] {
-        presentation.inputRows(for: hole.holeNumber).filter { $0.key.side == side }
-    }
-}
-
-private struct GrossScoreControl: View {
-    let row: ScoringInputRowPresentation
-    let displayedGross: Int?
-    let isEdited: Bool
-    let isEditable: Bool
-    let onDecrement: () -> Void
-    let onIncrement: () -> Void
-    let onChoose: () -> Void
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(row.title)
-                            .font(.headline)
-                            .foregroundStyle(BaggerPalette.ink)
-                            .fixedSize(horizontal: false, vertical: true)
-                        if row.isAuthenticatedPlayer {
-                            Text("YOU")
-                                .font(.caption2.weight(.black))
-                                .foregroundStyle(BaggerPalette.deepEvergreen)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(BaggerPalette.scoreGold, in: Capsule())
-                        }
-                    }
-                    if let detail = row.detail, !detail.isEmpty {
-                        Text(detail)
-                            .font(.caption)
-                            .foregroundStyle(BaggerPalette.muted)
-                    }
-                }
-                Spacer(minLength: 6)
-                if let strokes = row.canonicalStrokes, strokes != 0 {
-                    Text("+\(ScoringNumberFormatter.string(strokes)) stroke\(strokes == 1 ? "" : "s")")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(BaggerPalette.actionGreen)
-                }
-            }
-
-            if dynamicTypeSize.isAccessibilitySize {
-                scoreControls
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                scoreControls
-            }
-
-            Text(stateText)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(isEdited ? BaggerPalette.goldText : BaggerPalette.muted)
-        }
-        .padding(.vertical, 5)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("score.input.side\(row.key.side).slot\(row.key.slot)")
-    }
-
-    private var scoreControls: some View {
-        HStack(spacing: 12) {
-            ScoreAdjustmentButton(
-                symbol: "minus",
-                label: "Decrease \(row.title) gross score",
-                enabled: isEditable && (displayedGross ?? ScoringPresentation.maximumGross) > ScoringPresentation.minimumGross,
-                action: onDecrement
-            )
-
-            Button(action: onChoose) {
-                Text(displayedGross.map(String.init) ?? "—")
-                    .font(.system(size: 34, weight: .black, design: .rounded).monospacedDigit())
-                    .foregroundStyle(isEditable ? BaggerPalette.deepEvergreen : BaggerPalette.muted)
-                    .frame(minWidth: 76, minHeight: 56)
-                    .background(BaggerPalette.cream, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(isEdited ? BaggerPalette.gold : BaggerPalette.warmBorder, lineWidth: isEdited ? 2 : 1)
-                    }
-            }
-            .buttonStyle(.plain)
-            .disabled(!isEditable)
-            .accessibilityLabel("\(row.title) gross score")
-            .accessibilityValue(accessibilityValue)
-            .accessibilityHint(isEditable ? "Opens score selector" : "Official value, read-only")
-
-            ScoreAdjustmentButton(
-                symbol: "plus",
-                label: "Increase \(row.title) gross score",
-                enabled: isEditable && (displayedGross ?? 0) < ScoringPresentation.maximumGross,
-                action: onIncrement
-            )
-        }
-    }
-
-    private var stateText: String {
-        if isEdited { return "Edited · Not saved" }
-        if row.officialGross != nil { return "Official" }
-        return isEditable ? "No official score" : "Read-only · No official score"
-    }
-
-    private var accessibilityValue: String {
-        let value = displayedGross.map(String.init) ?? "not entered"
-        return "\(value), \(stateText.lowercased())"
-    }
-}
-
-private struct ScoreAdjustmentButton: View {
-    let symbol: String
-    let label: String
-    let enabled: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.title2.weight(.black))
-                .foregroundStyle(enabled ? Color.white : BaggerPalette.muted)
-                .frame(width: 56, height: 56)
-                .background(enabled ? BaggerPalette.evergreen : BaggerPalette.cream, in: Circle())
-        }
-        .buttonStyle(.plain)
-        .disabled(!enabled)
-        .accessibilityLabel(label)
-    }
-}
-
-private struct CanonicalHoleContext: View {
-    let presentation: ScoringPresentation
-    let holeNumber: Int
-
-    var body: some View {
-        let official = presentation.officialHole(holeNumber)
-        VStack(alignment: .leading, spacing: 10) {
-            BaggerSectionHeading("Official Hole Context")
-            if let official {
-                ForEach(official.sides, id: \.side) { side in
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(presentation.sides.first(where: { $0.side == side.side })?.name ?? "Side \(side.side)")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(BaggerPalette.ink)
-                        Spacer(minLength: 8)
-                        Text(side.net.map { "Net \(ScoringNumberFormatter.string($0))" } ?? "Net —")
-                            .font(.subheadline.monospacedDigit())
-                            .foregroundStyle(BaggerPalette.muted)
-                    }
-                }
-                if let winner = official.winner {
-                    Label("\(winner.title(sides: presentation.sides)) · Official", systemImage: "checkmark.seal.fill")
-                        .font(.footnote.weight(.bold))
-                        .foregroundStyle(BaggerPalette.actionGreen)
-                }
-            } else {
-                Text("No official score has been recorded for this hole.")
-                    .font(.subheadline)
-                    .foregroundStyle(BaggerPalette.muted)
-            }
-        }
-        .baggerCard()
-        .accessibilityElement(children: .combine)
-    }
-}
-
-private struct DurableSaveAndNext: View {
-    let hasDraft: Bool
-    let isSaving: Bool
-    let saveFailed: Bool
-    let isEnabled: Bool
-    let onSave: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Button(action: onSave) {
-                HStack(spacing: 8) {
-                    if isSaving { ProgressView().tint(.white) }
-                    Text(isSaving ? "Saving on iPhone…" : "Save & Next")
-                        .font(.headline)
-                }
-                .frame(maxWidth: .infinity, minHeight: 54)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(BaggerPalette.actionGreen)
-            .disabled(!isEnabled || !hasDraft || isSaving)
-            .accessibilityHint("Durably saves this score on the iPhone before advancing. It is not Official until Bagger confirms it.")
-            .accessibilityIdentifier("score.saveNext")
-
-            Text(saveFailed
-                 ? "Not saved. Keep this screen open and try again."
-                 : "The iPhone must finish saving before this score can advance. Saved on iPhone is not the same as Official.")
-                .font(.footnote)
-                .foregroundStyle(saveFailed ? BaggerPalette.liveRed : BaggerPalette.muted)
-                .fixedSize(horizontal: false, vertical: true)
-        }
     }
 }
 
@@ -1739,7 +1606,7 @@ private struct ScoringReliabilityStatusView: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.headline)
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(BaggerPalette.ink)
                     .accessibilityIdentifier("score.reliability.status")
                 if unresolvedCount > 0 {
@@ -1758,7 +1625,7 @@ private struct ScoringReliabilityStatusView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .baggerCard(border: status == .needsReview ? BaggerPalette.liveRed : BaggerPalette.matchBorder)
+        .padding(.vertical, 3)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("score.reliability")
     }
@@ -1907,60 +1774,5 @@ private struct ScoreLoadingCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .baggerCard()
         .accessibilityElement(children: .combine)
-    }
-}
-
-private struct ScoringPickerTarget: Identifiable {
-    let row: ScoringInputRowPresentation
-    let holeNumber: Int
-    let initialValue: Int
-
-    var id: String { "\(holeNumber):\(row.key.side):\(row.key.slot)" }
-}
-
-private struct GrossScorePicker: View {
-    let target: ScoringPickerTarget
-    let onApply: (Int) -> Void
-
-    @State private var selection: Int
-    @Environment(\.dismiss) private var dismiss
-
-    init(target: ScoringPickerTarget, onApply: @escaping (Int) -> Void) {
-        self.target = target
-        self.onApply = onApply
-        _selection = State(initialValue: min(max(target.initialValue, ScoringPresentation.minimumGross), ScoringPresentation.maximumGross))
-    }
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 8) {
-                Text("Hole \(target.holeNumber) · \(target.row.title)")
-                    .font(.headline)
-                    .foregroundStyle(BaggerPalette.ink)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                Picker("Gross score", selection: $selection) {
-                    ForEach(ScoringPresentation.minimumGross...ScoringPresentation.maximumGross, id: \.self) { score in
-                        Text(String(score)).tag(score)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .accessibilityValue(String(selection))
-            }
-            .background(BaggerPalette.canvas.ignoresSafeArea())
-            .navigationTitle("Choose Gross Score")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Apply") {
-                        onApply(selection)
-                        dismiss()
-                    }
-                }
-            }
-        }
     }
 }

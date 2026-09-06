@@ -154,6 +154,7 @@ enum ScoringPresenter {
             status: status,
             result: winner(scoring.match.result),
             sides: sides,
+            courseID: scoring.course.courseId,
             courseName: scoring.course.name,
             tee: scoring.course.tee,
             courseHoles: scoring.course.holes.map {
@@ -212,6 +213,7 @@ enum ScoringPresenter {
             status: nil,
             result: nil,
             sides: [],
+            courseID: nil,
             courseName: nil,
             tee: nil,
             courseHoles: [],
@@ -386,6 +388,7 @@ struct ScoringPresentation: Equatable, Sendable {
     let status: ScoringMatchStatusPresentation?
     let result: ScoringWinnerPresentation?
     let sides: [ScoringSidePresentation]
+    let courseID: String?
     let courseName: String?
     let tee: String?
     let courseHoles: [ScoringCourseHolePresentation]

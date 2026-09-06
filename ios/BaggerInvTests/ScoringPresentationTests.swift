@@ -2,6 +2,35 @@ import XCTest
 @testable import BaggerInv
 
 final class ScoringPresentationTests: XCTestCase {
+    func testScoreCourseIdentityUsesCanonicalReadWithoutMatchesContext() {
+        for format in [MobileScoringFormat.bestBall, .scramble, .singles] {
+            let value = makePresentation(format: format, courseID: "OCGC01")
+            XCTAssertEqual(value.courseID, "OCGC01")
+            XCTAssertEqual(value.courseAndTeeText, "Ocean Course · Gold")
+            XCTAssertEqual(BaggerAsset.courseLogo(courseID: value.courseID!).reference?.catalogName, "course_ocgc01_logo")
+        }
+    }
+
+    func testMissingOrUnknownCourseAssetPreservesCanonicalTextWithoutNameGuessing() {
+        for id in [nil, "unknown-course", "Ocean Course"] as [String?] {
+            let value = makePresentation(format: .bestBall, courseID: id)
+            XCTAssertEqual(value.courseID, id)
+            XCTAssertEqual(value.courseAndTeeText, "Ocean Course · Gold")
+            XCTAssertNil(BaggerAsset.courseLogo(courseID: value.courseID ?? "").reference)
+            XCTAssertEqual(BaggerAsset.courseLogo(courseID: value.courseID ?? "").fallback, .systemSymbol("flag.fill"))
+        }
+    }
+
+    func testCourseAssetIdentityDoesNotChangeScoringAuthorityOrValues() {
+        let baseline = makePresentation(format: .bestBall)
+        let canonicalLogo = makePresentation(format: .bestBall, courseID: "OCGC01")
+        XCTAssertEqual(baseline.canonicalVersion, canonicalLogo.canonicalVersion)
+        XCTAssertEqual(baseline.inputRows(for: 1), canonicalLogo.inputRows(for: 1))
+        XCTAssertEqual(baseline.officialHoles, canonicalLogo.officialHoles)
+        XCTAssertEqual(baseline.sides, canonicalLogo.sides)
+        XCTAssertEqual(baseline.canFinalize, canonicalLogo.canFinalize)
+    }
+
     func testBestBallPreservesCanonicalSideAndSlotOrder() throws {
         let presentation = makePresentation(format: .bestBall)
 
@@ -534,7 +563,8 @@ final class ScoringPresentationTests: XCTestCase {
         snapshotRevision: Int = 9,
         phase: ScoringCurrentPhase = .ready,
         includeCourseHoles: Bool = true,
-        isRefreshing: Bool = false
+        isRefreshing: Bool = false,
+        courseID: String? = "course-1"
     ) -> ScoringPresentation {
         let participantCount: Int
         if let participantsPerSide {
@@ -604,7 +634,7 @@ final class ScoringPresentationTests: XCTestCase {
             ),
             sides: sides,
             course: MobileScoringCourse(
-                courseId: "course-1",
+                courseId: courseID,
                 name: "Ocean Course",
                 tee: "Gold",
                 rating: 72.4,

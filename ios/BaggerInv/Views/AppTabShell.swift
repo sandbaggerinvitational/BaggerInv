@@ -30,6 +30,7 @@ struct BaggerAppShell: View {
     @State private var selection: BaggerAppTab = .today
     @State private var todayPath: [MatchesDestination] = []
     @State private var matchesPath: [MatchesDestination] = []
+    @State private var scorePath: [ScoreScreenDestination] = []
     @State private var leadersSelection: LeadersProduct = .score
     @State private var morePath: [MoreDestination] = []
 
@@ -110,6 +111,13 @@ struct BaggerAppShell: View {
         _matchesPath = State(
             initialValue: startsOnMatchDetailID.map { [.match(matchID: $0)] } ?? []
         )
+#if DEBUG
+        // Fixture-only physical review entry uses the ordinary Scorecard route.
+        if startsOnScore && !fixtureUsesDurableScoringQueue &&
+            ProcessInfo.processInfo.arguments.contains("--bagger-ui-test-open-scorecard") {
+            _scorePath = State(initialValue: [.scorecard])
+        }
+#endif
     }
 
     var body: some View {
@@ -153,12 +161,13 @@ struct BaggerAppShell: View {
             .tag(BaggerAppTab.matches)
             .accessibilityIdentifier("tab.matches")
 
-            NavigationStack {
+            NavigationStack(path: $scorePath) {
                 scoreContent
-                    .baggerNavigationChrome(
-                        title: "Score",
+                    .baggerScoreChrome(
+                        isRoot: scorePath.isEmpty,
                         participant: participant,
-                        onSignOut: onSignOut
+                        profile: todayProfile,
+                        onOpenPassport: openPassport
                     )
             }
             .tabItem { Label("Score", systemImage: "list.bullet.clipboard.fill") }
@@ -244,8 +253,11 @@ struct BaggerAppShell: View {
         } else if let tournamentData {
             ScoreRepositoryView(
                 store: tournamentData.scoring,
+                matches: tournamentData.matches,
                 reliability: tournamentData.scoringReliability,
-                finalization: tournamentData.scoringFinalization
+                finalization: tournamentData.scoringFinalization,
+                matchSelection: tournamentData.scoreMatchSelection,
+                onSelectMatch: { try await tournamentData.selectScoreMatch($0) }
             )
         } else {
             VStack(spacing: 14) {
@@ -502,6 +514,24 @@ struct BaggerAppShell: View {
 }
 
 private extension View {
+    func baggerScoreChrome(
+        isRoot: Bool,
+        participant: ParticipantSession,
+        profile: TodayParticipantPresentation,
+        onOpenPassport: @escaping () -> Void
+    ) -> some View {
+        toolbar(isRoot ? .hidden : .visible, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if isRoot {
+                    BaggerAppHeader(title: "Score", identifierPrefix: "score", participant: participant,
+                                    profile: profile, onOpenPassport: onOpenPassport)
+                }
+            }
+            .toolbarBackground(BaggerPalette.cream, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.light, for: .navigationBar)
+    }
+
     func baggerTodayChrome(
         isRoot: Bool,
         participant: ParticipantSession,

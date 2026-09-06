@@ -40,6 +40,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     let odds: MobileReadRepository<MobileOddsResponse>
     let historyDetails: [Int: MobileReadRepository<MobileHistoryDetailResponse>]
     let scoring: ScoringCurrentStore
+    let scoreMatchSelection: ScoreMatchSelectionStore
     let scoringReliability: ScoringQueueCoordinator?
     let scoringFinalization: ScoringFinalizationCoordinator?
 
@@ -238,6 +239,8 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             api: api,
             credentialProvider: credentialProvider
         )
+        scoreMatchSelection = ScoreMatchSelectionStore(api: api, credentials: credentialProvider,
+                                                       activity: applicationActivity, now: now)
         if let scoringQueueRepository {
             let reliability = ScoringQueueCoordinator(
                 repository: scoringQueueRepository,
@@ -290,6 +293,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         odds.setAccessInvalidationHandler(invalidation)
         historyDetails.values.forEach { $0.setAccessInvalidationHandler(invalidation) }
         scoring.setAccessInvalidationHandler(invalidation)
+        scoreMatchSelection.setAccessInvalidationHandler(invalidation)
 
         let authorityRevalidation: @MainActor @Sendable () -> Void = { [weak self] in
             self?.authorityRevalidationHandler?()
@@ -307,6 +311,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
         odds.setAuthorityRevalidationHandler(authorityRevalidation)
         historyDetails.values.forEach { $0.setAuthorityRevalidationHandler(authorityRevalidation) }
         scoring.setAuthorityRevalidationHandler(authorityRevalidation)
+        scoreMatchSelection.setAuthorityRevalidationHandler(authorityRevalidation)
         scoringReliability?.setAccessInvalidationHandler(invalidation)
         scoringFinalization?.setAccessInvalidationHandler(invalidation)
         scoringReliability?.setAuthorityRevalidationHandler(authorityRevalidation)
@@ -478,6 +483,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
             playerId: participant.player.playerId,
             tournamentId: participant.tournament.tournamentId
         )
+        scoreMatchSelection.activate(identity: scoringIdentity)
         // Queue replay must remain fenced until the online-only finalization
         // owner has loaded its durable probe and either reclaimed Match
         // ownership or proved no probe exists for this exact identity.
@@ -494,6 +500,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     }
 
     func deactivate(deleteCache: Bool) async {
+        scoreMatchSelection.deactivate()
         lifecycleGeneration &+= 1
         let deactivationGeneration = lifecycleGeneration
         let previous = activeContext
@@ -544,6 +551,7 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     }
 
     func suspendForEnvironmentReattestation() async {
+        scoreMatchSelection.invalidate()
         guard activeContext != nil, !isSuspended else { return }
         lifecycleGeneration &+= 1
         isSuspended = true
@@ -589,13 +597,43 @@ final class TournamentDataCoordinator: TournamentDataLifecycle {
     /// Closes scoring transport synchronously at the scene callback boundary;
     /// the async pause that follows performs the remaining repository work.
     func prepareForApplicationInactivity() {
+        scoreMatchSelection.invalidate()
         scoringReliability?.prepareForApplicationInactivity()
         scoringFinalization?.prepareForApplicationInactivity()
+    }
+
+    /// Read-only Match selection. Durable records stay with their original
+    /// partitions; selecting a row is never a scoring permission grant.
+    func selectScoreMatch(_ matchID: String) async throws {
+        guard let context = activeContext, !isSuspended, applicationActivity.isActive,
+              scoringFinalization?.state.hasUnresolvedOutcome != true
+        else { throw ScoreMatchSelectionError.unavailable }
+        let operation = lifecycleGeneration
+        try await scoreMatchSelection.verifySelection(matchID: matchID)
+        guard isCurrent(context, generation: operation), scoreMatchSelection.canCommitSelection(matchID: matchID)
+        else { throw ScoreMatchSelectionError.unavailable }
+        if let scoringFinalization {
+            guard await scoringFinalization.prepareForMatchSelection() else { throw ScoreMatchSelectionError.unavailable }
+        }
+        guard isCurrent(context, generation: operation), scoreMatchSelection.canCommitSelection(matchID: matchID)
+        else { throw ScoreMatchSelectionError.unavailable }
+        // Use the existing fresh canonical read and generation-fenced store;
+        // do not install a cached choice response as writable state.
+        await scoring.refresh(matchID: matchID)
+        guard isCurrent(context, generation: operation), scoreMatchSelection.canCommitSelection(matchID: matchID),
+              scoring.state.phase == .ready, let canonical = scoring.state.scoring,
+              MobileOpaqueMatchID.isEqual(canonical.match.matchId, matchID),
+              canonical.player.playerId == context.playerID,
+              canonical.permission.canScore, !canonical.permission.readOnly
+        else { throw ScoreMatchSelectionError.unavailable }
+        scoringReliability?.markNetworkUnavailable(false)
+        scoreMatchSelection.invalidate()
     }
 
     /// Foreground is not scoring authority until exact health and canonical
     /// scoring revalidation complete. Arm both barriers before starting health.
     func prepareForForegroundRevalidation() {
+        scoreMatchSelection.invalidate()
         scoringReliability?.prepareForForegroundRevalidation()
         scoringFinalization?.prepareForForegroundRevalidation()
     }

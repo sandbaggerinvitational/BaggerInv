@@ -71,6 +71,11 @@ enum ScoringUITestFixtures {
 
     private static let generatedAt = try! MobileTimestamp("2026-09-24T12:00:00.000Z")
 
+    static func finalizationReview(format: MobileScoringFormat) -> MobileScoringCurrent {
+        makeScoring(format: format, status: .inProgress, readOnly: false,
+                    longContent: false, mixedHoles: false, readyToFinalize: true)
+    }
+
     private static func makeScoring(
         format: MobileScoringFormat,
         status: MobileMatchStatus,
@@ -79,7 +84,12 @@ enum ScoringUITestFixtures {
         mixedHoles: Bool,
         readyToFinalize: Bool
     ) -> MobileScoringCurrent {
-        let sides = fixtureSides(longContent: longContent)
+        // Singles has exactly one canonical participant per side. The old UI
+        // fixture retained both BB players and correctly failed the edit gate.
+        let sides = fixtureSides(longContent: longContent).map { side in
+            MobileScoringSide(side: side.side, teamId: side.teamId, name: side.name,
+                              participants: format == .singles ? Array(side.participants.prefix(1)) : side.participants)
+        }
         let holes = (1...18).map { number in
             MobileScoringCourseHole(
                 holeNumber: number,
@@ -94,6 +104,9 @@ enum ScoringUITestFixtures {
             officialScore(holeNumber: number, format: format)
         }
         let final = status == .completed
+        let resultTeam = ProcessInfo.processInfo.arguments.contains("--bagger-ui-test-scorecard-team-assets")
+            ? sides[0].name : "Pines"
+        let genericResult = ProcessInfo.processInfo.arguments.contains("--bagger-ui-test-generic-scorecard-result")
         return MobileScoringCurrent(
             match: MobileScoringMatch(
                 matchId: "fixture-scoring-match",
@@ -111,7 +124,8 @@ enum ScoringUITestFixtures {
             ),
             sides: sides,
             course: MobileScoringCourse(
-                courseId: "fixture-ocean-course",
+                courseId: ProcessInfo.processInfo.arguments.contains("--bagger-ui-test-known-course-asset")
+                    ? "OCGC01" : "fixture-ocean-course",
                 name: longContent
                     ? "The Exceptionally Long Ocean Course at Kiawah Island Resort"
                     : "Ocean Course",
@@ -126,7 +140,7 @@ enum ScoringUITestFixtures {
                 currentHole: scorecardComplete ? 18 : 7,
                 holesRemaining: scorecardComplete ? 0 : 12,
                 scorecardComplete: scorecardComplete,
-                statusText: final ? "Pines win 3 & 2" : "Pines 1 UP · Thru 6"
+                statusText: final ? (genericResult ? "Team 1 7 UP through 18" : "\(resultTeam) win 3 & 2") : "\(resultTeam) 1 UP · Thru 6"
             ),
             permission: MobileScoringPermission(
                 canScore: !readOnly,
@@ -139,11 +153,12 @@ enum ScoringUITestFixtures {
     }
 
     private static func fixtureSides(longContent: Bool) -> [MobileScoringSide] {
-        [
+        let canonicalAssets = ProcessInfo.processInfo.arguments.contains("--bagger-ui-test-scorecard-team-assets")
+        return [
             MobileScoringSide(
                 side: 1,
-                teamId: "fixture-team-green",
-                name: longContent ? "The Evergreen Pines Invitational Team" : "Pines",
+                teamId: canonicalAssets ? "PICKLES" : "fixture-team-green",
+                name: canonicalAssets ? "The Pickles" : longContent ? "The Evergreen Pines Invitational Team" : "Pines",
                 participants: [
                     participant(
                         id: "fixture-player-a",
@@ -163,8 +178,8 @@ enum ScoringUITestFixtures {
             ),
             MobileScoringSide(
                 side: 2,
-                teamId: "fixture-team-gold",
-                name: longContent ? "The Golden Coastal Dunes Invitational Team" : "Dunes",
+                teamId: canonicalAssets ? "LIPPIT" : "fixture-team-gold",
+                name: canonicalAssets ? "Lipp it and Rip it" : longContent ? "The Golden Coastal Dunes Invitational Team" : "Dunes",
                 participants: [
                     participant(
                         id: "fixture-player-c",

@@ -42,7 +42,7 @@ final class BaggerInvScoreUITests: XCTestCase {
             "Best Ball did not orient to the canonical current hole."
         )
         XCTAssertTrue(
-            reachableElement("score.scorecard", in: app, requireHittable: true).isHittable,
+            reachableElement("score.scorecard.quick", in: app, requireHittable: true).isHittable,
             "The official Scorecard destination was unavailable."
         )
     }
@@ -69,7 +69,7 @@ final class BaggerInvScoreUITests: XCTestCase {
         assertReachable(labelContaining: "Read-only format", in: unsupported)
         XCTAssertFalse(element("score.controls", in: unsupported).exists)
         XCTAssertFalse(element("score.saveNext", in: unsupported).exists)
-        assertReachable("score.scorecard", in: unsupported)
+        assertReachable("score.scorecard.quick", in: unsupported)
         unsupported.terminate()
 
         let readOnly = launch(.readOnly)
@@ -175,7 +175,7 @@ final class BaggerInvScoreUITests: XCTestCase {
     func testReadyFinalizationRequiresConfirmationBeforeMatchFinal() {
         let app = launch(.finalizationReady)
 
-        assertReachable(labelContaining: "Ready to finalize", in: app)
+        assertReachable("score.finalize", in: app)
         let finalize = reachableElement("score.finalize", in: app, requireHittable: true)
         finalize.tap()
         XCTAssertTrue(
@@ -252,7 +252,7 @@ final class BaggerInvScoreUITests: XCTestCase {
         scrollScoreToTop(in: app)
         let editedValue = reachableButton("Alex Morgan gross score", in: app)
         XCTAssertTrue(
-            accessibilityValue(of: editedValue).localizedCaseInsensitiveContains("edited · not saved"),
+            accessibilityValue(of: editedValue).localizedCaseInsensitiveContains("edited, not saved"),
             "The local draft was not clearly distinguished from an official score."
         )
 
@@ -281,8 +281,9 @@ final class BaggerInvScoreUITests: XCTestCase {
         )
         assertReachable("score.matchContext", in: app)
         assertReachable("score.holeNavigator", in: app)
-        XCTAssertTrue(reachableButton("Increase Alex Morgan gross score", in: app).isEnabled)
-        assertReachable("score.scorecard", in: app)
+        XCTAssertTrue(reachableButton("Alex Morgan gross score", in: app).isEnabled)
+        XCTAssertTrue(reachableElement("score.keypad.plus", in: app, requireHittable: true).isEnabled)
+        assertReachable("score.scorecard.quick", in: app)
     }
 
     func testDurableOfflineMultiHoleSaveSurvivesProcessRelaunch() {
@@ -329,7 +330,7 @@ final class BaggerInvScoreUITests: XCTestCase {
         XCTAssertTrue(element(labelContaining: "No scoring match", in: app).exists)
         XCTAssertFalse(element("score.holeNavigator", in: app).exists)
         XCTAssertFalse(element("score.controls", in: app).exists)
-        XCTAssertFalse(element("score.scorecard", in: app).exists)
+        XCTAssertFalse(element("score.scorecard.quick", in: app).exists)
     }
 
     func testUnresolvedScoreSignOutRequiresExplicitChoice() {
@@ -410,6 +411,7 @@ final class BaggerInvScoreUITests: XCTestCase {
     }
 
     private func openSignOut(in app: XCUIApplication) {
+        app.tabBars.buttons["More"].tap()
         let account = app.buttons["account.menu"]
         XCTAssertTrue(account.waitForExistence(timeout: 3), "The account menu was unavailable.")
         account.tap()
@@ -419,24 +421,24 @@ final class BaggerInvScoreUITests: XCTestCase {
     }
 
     private func assertEditingDisabled(in app: XCUIApplication) {
-        let decrease = reachableButton("Decrease Alex Morgan gross score", in: app)
         let value = reachableButton("Alex Morgan gross score", in: app)
-        let increase = reachableButton("Increase Alex Morgan gross score", in: app)
-        XCTAssertFalse(decrease.isEnabled, "A read-only score decrement control was enabled.")
-        XCTAssertFalse(value.isEnabled, "A read-only gross-score selector was enabled.")
-        XCTAssertFalse(increase.isEnabled, "A read-only score increment control was enabled.")
+        XCTAssertFalse(value.isEnabled, "A read-only scoring target was enabled.")
+        XCTAssertFalse(element("score.keypad", in: app).exists)
         XCTAssertFalse(element("score.saveNext", in: app).exists)
     }
 
     private func enterCompleteBestBallDraft(in app: XCUIApplication) {
         scrollScoreToTop(in: app)
         for name in ["Alex Morgan", "Jordan Lee", "Taylor Kim", "Cameron Diaz"] {
-            let increment = reachableButton("Increase \(name) gross score", in: app)
-            XCTAssertTrue(increment.isEnabled, "The \(name) score control was unexpectedly read-only.")
-            increment.tap()
+            let target = reachableButton("\(name) gross score", in: app)
+            XCTAssertTrue(target.isEnabled)
+            target.tap()
+            reachableElement("score.keypad.5", in: app, requireHittable: true).tap()
+            XCTAssertTrue(accessibilityValue(of: target).contains("5, Edited"),
+                          "\(name) did not receive the local keypress: \(accessibilityValue(of: target))")
         }
         let save = reachableElement("score.saveNext", in: app, requireHittable: true)
-        XCTAssertTrue(save.isEnabled, "Save & Next did not enable for a complete canonical slot-ordered draft.")
+        XCTAssertTrue(save.isEnabled, "A complete ordered draft must enable Save.")
     }
 
     private func saveAndWaitForHole(_ hole: Int, in app: XCUIApplication) {
@@ -468,7 +470,7 @@ final class BaggerInvScoreUITests: XCTestCase {
 
     private func reachableButton(_ label: String, in app: XCUIApplication) -> XCUIElement {
         let button = app.buttons[label]
-        if button.waitForExistence(timeout: 1), button.isHittable || !button.isEnabled {
+        if button.waitForExistence(timeout: 1), fullyHittable(button, in: app) || !button.isEnabled {
             return button
         }
 
@@ -476,14 +478,22 @@ final class BaggerInvScoreUITests: XCTestCase {
             ? app.scrollViews["score.screen"]
             : app.scrollViews.firstMatch
         XCTAssertTrue(screen.exists, "The Score scroll view was unavailable while finding \(label).")
-        for _ in 0..<12 where !button.exists || (!button.isHittable && button.isEnabled) {
-            screen.swipeUp()
+        for _ in 0..<12 where !button.exists || (!fullyHittable(button, in: app) && button.isEnabled) {
+            if button.exists && button.frame.midY < screen.frame.midY { screen.swipeDown(velocity: .slow) }
+            else { screen.swipeUp(velocity: .slow) }
         }
         XCTAssertTrue(button.exists, "The Score button \(label) was not reachable.")
         if button.isEnabled {
-            XCTAssertTrue(button.isHittable, "The Score button \(label) was not tappable.")
+            XCTAssertTrue(fullyHittable(button, in: app), "The Score button \(label) was not tappable.")
         }
         return button
+    }
+
+    private func fullyHittable(_ target: XCUIElement, in app: XCUIApplication) -> Bool {
+        guard target.isHittable else { return false }
+        guard target.identifier.hasPrefix("score.keypad.") || target.identifier.hasPrefix("score.input.") else { return true }
+        let save = app.buttons["score.saveNext"]
+        return !save.exists || target.frame.maxY <= save.frame.minY - 4
     }
 
     private func accessibilityValue(of element: XCUIElement) -> String {
@@ -561,7 +571,7 @@ final class BaggerInvScoreUITests: XCTestCase {
         requireHittable: Bool = false
     ) -> XCUIElement {
         let target = element(identifier, in: app)
-        if target.waitForExistence(timeout: 1), !requireHittable || target.isHittable {
+        if target.waitForExistence(timeout: 1), !requireHittable || fullyHittable(target, in: app) {
             return target
         }
 
@@ -569,12 +579,13 @@ final class BaggerInvScoreUITests: XCTestCase {
             ? app.scrollViews[scrollViewIdentifier]
             : app.scrollViews.firstMatch
         XCTAssertTrue(screen.exists, "The scroll view was unavailable while finding \(identifier).")
-        for _ in 0..<30 where !target.exists || (requireHittable && !target.isHittable) {
-            screen.swipeUp()
+        for _ in 0..<30 where !target.exists || (requireHittable && !fullyHittable(target, in: app)) {
+            if target.exists && target.frame.midY < screen.frame.midY { screen.swipeDown(velocity: .slow) }
+            else { screen.swipeUp(velocity: .slow) }
         }
         XCTAssertTrue(target.exists, "The Score element \(identifier) was not reachable.")
         if requireHittable {
-            XCTAssertTrue(target.isHittable, "The Score element \(identifier) was not tappable.")
+            XCTAssertTrue(fullyHittable(target, in: app), "The Score element \(identifier) was not tappable.")
         }
         return target
     }
